@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Connection Plug-in
 Bundle-SymbolicName: net.tourbook.connection
-Bundle-Version: 0.0.8
+Bundle-Version: 0.8.0
 Bundle-Localization: plugin
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: lib/comm.jar,
