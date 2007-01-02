@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension-point id="statisticYear" name="Year Statistic" schema="schema/statisticYear.exsd"/>
+   <extension-point id="deviceDataReader" name="Device Data Reader" schema="schema/deviceDataReader.exsd"/>
+
+     <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="net.tourbook.application.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            name="Perspective"
+            class="net.tourbook.application.Perspective"
+            id="net.tourbook.perspective">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="net.tourbook.views.rawData.RawDataView"
+            icon="icons/device.gif"
+            id="net.tourbook.views.rawData.RawDataView"
+            name="Data Import">
+      </view>
+     <view
+            class="net.tourbook.views.TourChartAnalyzerView"
+            icon="icons/chart-analyzer.gif"
+            id="net.tourbook.views.TourChartAnalyzer"
+            name="Tour Analyzer"/>
+      <view
+            class="net.tourbook.views.tourMap.TourMapView"
+            icon="icons/tourfinder-reference.gif"
+            id="net.tourbook.views.tourMap.TourMapView"
+            name="Tour Map"/>
+      <view
+            class="net.tourbook.views.tourMap.CompareResultView"
+            icon="icons/tourfinder-compare.gif"
+            id="net.tourbook.views.tourMap.CompareResultView"
+            name="Compare Result"/>
+      <view
+            class="net.tourbook.views.tourBook.TourBookView"
+            icon="icons/tour-list.gif"
+            id="net.tourbook.views.tourListView"
+            name="Tour Book"/>
+      <view
+            class="net.tourbook.views.TourMarkerView"
+            icon="icons/marker-editor.gif"
+            id="net.tourbook.views.TourMarkerView"
+            name="Marker"/>
+      <view
+            class="net.tourbook.views.TourSegmenterView"
+            icon="icons/tour-segmenter.gif"
+            id="net.tourbook.views.TourSegmenter"
+            name="Tour Segmenter"/>
+   </extension>
+   <extension
+         id="mytourbook"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="net.tourbook.application"
+            name="Toorbook">
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="net.tourbook.preferences.PrefPageBikes"
+            id="net.tourbook.preferences.PrefPageBikes"
+            name="Bikes"/>
+      <page
+            class="net.tourbook.preferences.PrefPagePeople"
+            id="net.tourbook.preferences.PrefPageClients"
+            name="People"/>
+      <page
+            class="net.tourbook.preferences.PrefPageStatistic"
+            id="net.tourbook.preferences.PrefPageStatistic"
+            name="Statistics"/>
+      <page
+            class="net.tourbook.preferences.PrefPageChartColors"
+            id="net.tourbook.preferences.PrefPageChartColors"
+            name="Colors"/>
+      <page
+            class="net.tourbook.preferences.PrefPageChartGraphs"
+            id="net.tourbook.preferences.PrefPageChartGraphs"
+            name="Graphs"/>
+      <page
+            class="net.tourbook.preferences.PrefPageTourTypes"
+            id="net.tourbook.preferences.PrefPageTourTypes"
+            name="Tour Types"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="net.tourbook.preferences.PreferenceInitializer"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+         <view
+               id="net.tourbook.views.SampleView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.TaskList"/>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         id="net_tourbook_product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="net.tourbook.application"
+            name="Toorbook"/>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="net.tourbook.application"
+            name="MyToorbook">
+         <property
+               name="windowImages"
+               value="icons/tourbook16.gif,icons/tourbook32.gif,icons/tourbook48.gif,icons/tourbook64.gif,icons/tourbook128.gif"/>
+         <property
+               name="aboutText"
+               value="MyTourbook&#x0A;&#x0A;Version: 0.8&#x0A;&#x0A;(c) Copyright Wolfgang Schramm and contributors 2005, 2007.  All rights reserved.&#x0A;&#x0A;Website: http://mytourbook.sourceforge.net"/>
+         <property
+               name="aboutImage"
+               value="icons/tourbook-about.gif"/>
+      </product>
+   </extension>
+
+</plugin>

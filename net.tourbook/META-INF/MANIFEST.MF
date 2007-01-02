@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: MyTourbook Application
+Bundle-SymbolicName: net.tourbook; singleton:=true
+Bundle-Version: 0.0.8
+Bundle-ClassPath: net.tourbook.jar,
+ persistence.jar,
+ lib/derby.jar,
+ lib/derbyclient.jar,
+ lib/derbynet.jar,
+ lib/derbytools.jar
+Bundle-Activator: net.tourbook.plugin.TourbookPlugin
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ net.tourbook.connection,
+ net.tourbook.ejb3
+Eclipse-LazyStart: true
+Eclipse-RegisterBuddy: net.tourbook.ejb3
+Export-Package: net.tourbook.chart,
+ net.tourbook.colors,
+ net.tourbook.data,
+ net.tourbook.dataImport,
+ net.tourbook.database,
+ net.tourbook.device,
+ net.tourbook.plugin,
+ net.tourbook.preferences,
+ net.tourbook.statistic,
+ net.tourbook.tour,
+ net.tourbook.ui,
+ net.tourbook.util
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Vendor: MyTourbook

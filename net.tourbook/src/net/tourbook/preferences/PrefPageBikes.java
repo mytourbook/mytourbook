@@ -1,0 +1,725 @@
+/*******************************************************************************
+ * Copyright (C) 2006, 2007  Wolfgang Schramm
+ *  
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software 
+ * Foundation version 2 of the License.
+ *  
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ *******************************************************************************/
+package net.tourbook.preferences;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
+
+import net.tourbook.data.TourBike;
+import net.tourbook.data.TourPerson;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.InputFieldFloat;
+import net.tourbook.ui.UI;
+import net.tourbook.util.TableLayoutComposite;
+
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
+
+public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferencePage {
+
+	private static final int	COLUMN_IS_MODIFIED	= 0;
+	private static final int	COLUMN_NAME			= 1;
+	private static final int	COLUMN_TYPE			= 2;
+	private static final int	COLUMN_WEIGHT		= 3;
+
+	private TableViewer			fBikeViewer;
+	private Button				fButtonAdd;
+	private Button				fButtonDelete;
+
+	private Text				fTextBikeName;
+	private Text				fTextWeight;
+	private Combo				fComboBikeType;
+	private Combo				fComboFrontTyre;
+	private Combo				fComboRearTyre;
+
+	private ArrayList<TourBike>	fBikes;
+	private TourBike			fCurrentBike;
+	private boolean				fIsBikeModified;
+	private boolean				fIsBikeListModified	= false;
+
+	private boolean				isMetricSystem		= true;
+
+	private class BikeContentProvider implements IStructuredContentProvider {
+
+		public BikeContentProvider() {}
+		public void dispose() {}
+		public Object[] getElements(Object parent) {
+			if (fBikes == null) {
+				fBikes = TourDatabase.getTourBikes();
+			}
+			if (fBikes == null) {
+				return new Object[0];
+			} else {
+				return fBikes.toArray(new TourBike[fBikes.size()]);
+			}
+		}
+
+		public void inputChanged(Viewer v, Object oldInput, Object newInput) {}
+	}
+
+	private class BikeLabelProvider extends LabelProvider implements ITableLabelProvider {
+
+		public Image getColumnImage(Object element, int columnIndex) {
+			return null;
+		}
+
+		public String getColumnText(Object obj, int index) {
+
+			TourBike bike = ((TourBike) obj);
+
+			switch (index) {
+			case COLUMN_IS_MODIFIED:
+				return fIsBikeModified ? "*" : "";
+
+			case COLUMN_NAME:
+				return bike.getName();
+
+			case COLUMN_TYPE:
+				return IBikeDefinitions.bikeType[bike.getTypeId()];
+
+			case COLUMN_WEIGHT:
+				return Float.toString(bike.getWeight());
+			}
+			return "";
+		}
+	}
+
+	private void createBikeDetails(Composite parent) {
+
+		GridLayout gl;
+		GridData gd;
+		Label lbl;
+
+		// group: units for the x-axis
+		Group groupBikeInfo = new Group(parent, SWT.NONE);
+		groupBikeInfo.setText("Bike Data");
+		groupBikeInfo.setLayout(new GridLayout(1, false));
+		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		groupBikeInfo.setLayoutData(gd);
+
+		Composite container = new Composite(groupBikeInfo, SWT.NONE);
+		gl = new GridLayout(2, false);
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		container.setLayout(gl);
+		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		container.setLayoutData(gd);
+
+		/*
+		 * field: bike name
+		 */
+		lbl = new Label(container, SWT.NONE);
+		lbl.setText("&Name:");
+		fTextBikeName = new Text(container, SWT.BORDER);
+		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		fTextBikeName.setLayoutData(gd);
+		fTextBikeName.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				if (fCurrentBike != null) {
+					String name = ((Text) (e.widget)).getText();
+					if (!name.equals(fCurrentBike.getName())) {
+						fIsBikeModified = true;
+
+						fCurrentBike.setName(name);
+						fBikeViewer.update(fCurrentBike, null);
+					}
+				}
+			}
+		});
+
+		/*
+		 * field: bike type
+		 */
+		lbl = new Label(container, SWT.NONE);
+		lbl.setText("&Type:");
+		fComboBikeType = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+		fComboBikeType.setVisibleItemCount(20);
+		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		fComboBikeType.setLayoutData(gd);
+		fComboBikeType.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+
+				int selectedIndex = fComboBikeType.getSelectionIndex();
+
+				// select tyres
+				fComboFrontTyre.select(IBikeDefinitions.i_tireF[selectedIndex]);
+				fComboRearTyre.select(IBikeDefinitions.i_tireR[selectedIndex]);
+
+				// set new weight
+				float weight = IBikeDefinitions.def_mr[selectedIndex] * (isMetricSystem ? 1 : 2.2f);
+				fTextWeight.setText(Float.toString(weight));
+
+				if (fCurrentBike != null) {
+
+					fCurrentBike.setWeight(weight);
+
+					// update viewer
+					fBikeViewer.update(fCurrentBike, null);
+				}
+			}
+		});
+
+		fComboBikeType.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				if (fCurrentBike != null) {
+					int index = ((Combo) (e.widget)).getSelectionIndex();
+					if (index != fCurrentBike.getTypeId()) {
+						fCurrentBike.setTypeId(index);
+						fCurrentBike.setFrontTyreId(fComboFrontTyre.getSelectionIndex());
+						fCurrentBike.setRearTyreId(fComboRearTyre.getSelectionIndex());
+
+						fIsBikeModified = true;
+						fBikeViewer.update(fCurrentBike, null);
+					}
+				}
+			}
+		});
+		for (String bikeType : IBikeDefinitions.bikeType) {
+			fComboBikeType.add(bikeType);
+		}
+
+		/*
+		 * field: weight
+		 */
+		InputFieldFloat floatInput = new InputFieldFloat(
+				container,
+				"&Weight (kg):",
+				convertHorizontalDLUsToPixels(40));
+
+		fTextWeight = floatInput.getTextField();
+		fTextWeight.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				if (fCurrentBike != null) {
+					Text control = (Text) e.widget;
+					try {
+						float value = Float.parseFloat(((Text) (e.widget)).getText());
+						if (value != fCurrentBike.getWeight()) {
+							fCurrentBike.setWeight(value);
+
+							fIsBikeModified = true;
+							fBikeViewer.update(fCurrentBike, null);
+						}
+						UI.setDefaultColor(control);
+					} catch (NumberFormatException e1) {
+						UI.setErrorColor(control);
+					}
+				}
+			}
+		});
+
+		/*
+		 * field: front tyre
+		 */
+		lbl = new Label(container, SWT.NONE);
+		lbl.setText("&Front Tyre:");
+		fComboFrontTyre = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+		fComboFrontTyre.setVisibleItemCount(20);
+		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		fComboFrontTyre.setLayoutData(gd);
+		fComboFrontTyre.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				if (fCurrentBike != null) {
+					int index = ((Combo) (e.widget)).getSelectionIndex();
+					if (index != fCurrentBike.getFrontTyreId()) {
+						fCurrentBike.setFrontTyreId(index);
+
+						fIsBikeModified = true;
+						fBikeViewer.update(fCurrentBike, null);
+					}
+				}
+			}
+		});
+		for (String tyre : IBikeDefinitions.tyreType) {
+			fComboFrontTyre.add(tyre);
+		}
+
+		/*
+		 * field: rear tyre
+		 */
+		lbl = new Label(container, SWT.NONE);
+		lbl.setText("&Rear Tyre:");
+		fComboRearTyre = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+		fComboRearTyre.setVisibleItemCount(20);
+		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		fComboRearTyre.setLayoutData(gd);
+		fComboRearTyre.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				if (fCurrentBike != null) {
+					int index = ((Combo) (e.widget)).getSelectionIndex();
+					if (index != fCurrentBike.getRearTyreId()) {
+						fCurrentBike.setRearTyreId(index);
+
+						fIsBikeModified = true;
+						fBikeViewer.update(fCurrentBike, null);
+					}
+				}
+			}
+		});
+		for (String tyre : IBikeDefinitions.tyreType) {
+			fComboRearTyre.add(tyre);
+		}
+
+		// placeholder
+		lbl = new Label(parent, SWT.NONE);
+		lbl.setText("");
+		lbl = new Label(parent, SWT.NONE);
+		lbl.setText("");
+		lbl = new Label(parent, SWT.NONE);
+		lbl.setText("");
+	}
+
+	private void createBikeViewer(Composite container) {
+
+		TableLayoutComposite layouter = new TableLayoutComposite(container, SWT.NONE);
+		GridData gridData = new GridData(GridData.FILL_BOTH);
+		gridData.widthHint = convertWidthInCharsToPixels(30);
+		layouter.setLayoutData(gridData);
+
+		final Table table = new Table(layouter, (SWT.H_SCROLL
+				| SWT.V_SCROLL
+				| SWT.BORDER
+				| SWT.FULL_SELECTION | SWT.MULTI));
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+
+		TableColumn tc;
+
+		tc = new TableColumn(table, SWT.NONE);
+		layouter.addColumnData(new ColumnWeightData(1, convertWidthInCharsToPixels(1), false));
+
+		tc = new TableColumn(table, SWT.NONE);
+		tc.setText("Name");
+		layouter.addColumnData(new ColumnWeightData(8));
+
+		tc = new TableColumn(table, SWT.NONE);
+		tc.setText("Type");
+		layouter.addColumnData(new ColumnWeightData(16));
+
+		tc = new TableColumn(table, SWT.TRAIL);
+		tc.setText("kg");
+		layouter.addColumnData(new ColumnWeightData(4));
+
+		fBikeViewer = new TableViewer(table);
+
+		fBikeViewer.setContentProvider(new BikeContentProvider());
+		fBikeViewer.setLabelProvider(new BikeLabelProvider());
+
+		fBikeViewer.setSorter(new ViewerSorter() {
+			public int compare(Viewer viewer, Object e1, Object e2) {
+				return collator.compare(((TourBike) e1).getName(), ((TourBike) e2).getName());
+			}
+		});
+
+		fBikeViewer.setComparator(new ViewerComparator() {
+			public int compare(Viewer viewer, Object e1, Object e2) {
+				return ((TourBike) e1).getName().compareTo(((TourBike) e2).getName());
+			}
+
+		});
+
+		fBikeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				selectBike();
+			}
+		});
+
+		fBikeViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(DoubleClickEvent event) {
+				fTextBikeName.setFocus();
+				fTextBikeName.selectAll();
+			}
+		});
+	}
+	private void createBikeViewerButtons(Composite parent) {
+
+		Composite container = new Composite(parent, SWT.NONE);
+		container.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		gridLayout.marginRight = 10;
+		container.setLayout(gridLayout);
+
+		// button: add
+		fButtonAdd = new Button(container, SWT.NONE);
+		fButtonAdd.setText("&Add...");
+		setButtonLayoutData(fButtonAdd);
+		fButtonAdd.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				onAddBike();
+			}
+		});
+
+		// button: delete
+		fButtonDelete = new Button(container, SWT.NONE);
+		fButtonDelete.setText("&Delete");
+		GridData gd = setButtonLayoutData(fButtonDelete);
+		gd.verticalIndent = 10;
+		fButtonDelete.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				onDeleteBike();
+				enableButtons();
+			}
+		});
+
+	}
+
+	protected Control createContents(Composite parent) {
+		Label label = new Label(parent, SWT.WRAP);
+		label.setText("Bikes are used to calculate the power.");
+
+		// container
+		Composite container = new Composite(parent, SWT.NONE);
+		GridLayout gl = new GridLayout(2, false);
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		container.setLayout(gl);
+		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		createBikeViewer(container);
+		createBikeViewerButtons(container);
+		createBikeDetails(container);
+
+		fBikeViewer.setInput(this);
+
+		// select first bike
+		fBikeViewer.getTable().select(0);
+		selectBike();
+
+		// update the bike details
+		// updateBikeInfo();
+
+		return container;
+	}
+
+	/**
+	 * Delete bike from the the database
+	 * 
+	 * @param bike
+	 * @return
+	 */
+	private boolean deleteBike(TourBike bike) {
+
+		if (deleteBikeFromPerson(bike)) {
+			if (deleteBikeFromDb(bike)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean deleteBikeFromDb(TourBike bike) {
+
+		boolean returnResult = false;
+
+		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		EntityTransaction ts = em.getTransaction();
+
+		try {
+			TourBike entity = em.find(TourBike.class, bike.getBikeId());
+
+			if (entity != null) {
+				ts.begin();
+				em.remove(entity);
+				ts.commit();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (ts.isActive()) {
+				ts.rollback();
+			} else {
+				returnResult = true;
+			}
+			em.close();
+		}
+
+		return returnResult;
+	}
+
+	private boolean deleteBikeFromPerson(TourBike bike) {
+
+		boolean returnResult = false;
+
+		EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		if (em != null) {
+
+			Query query = em.createQuery("SELECT TourPerson "
+					+ ("FROM " + TourDatabase.TABLE_TOUR_PERSON + " TourPerson ")
+					+ (" WHERE TourPerson.tourBike.bikeId=" + bike.getBikeId()));
+
+			ArrayList<TourPerson> people = (ArrayList<TourPerson>) query.getResultList();
+
+			if (people.size() > 0) {
+
+				EntityTransaction ts = em.getTransaction();
+
+				try {
+
+					ts.begin();
+
+					// remove bike from all persons
+					for (TourPerson person : people) {
+						person.setTourBike(null);
+						em.merge(person);
+					}
+
+					ts.commit();
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					if (ts.isActive()) {
+						ts.rollback();
+					}
+				}
+			}
+
+			returnResult = true;
+			em.close();
+		}
+
+		return returnResult;
+	}
+
+	private void enableButtons() {
+		IStructuredSelection selection = (IStructuredSelection) fBikeViewer.getSelection();
+		fButtonDelete.setEnabled(!selection.isEmpty());
+	}
+
+	private void fireBikeListModifyEvent() {
+		if (fIsBikeListModified) {
+
+			// fire bike list modify event
+			getPreferenceStore().setValue(
+					ITourbookPreferences.TOUR_BIKE_LIST_IS_MODIFIED,
+					Math.random());
+
+			fIsBikeListModified = false;
+		}
+	}
+
+	public void init(IWorkbench workbench) {
+		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
+	}
+
+	public boolean okToLeave() {
+		saveBike();
+		fireBikeListModifyEvent();
+
+		return super.okToLeave();
+	}
+
+	private void onAddBike() {
+
+		saveBike();
+
+		fCurrentBike = new TourBike();
+		fIsBikeModified = true;
+		fCurrentBike.setName("<name>");
+		fCurrentBike.setWeight(10);
+
+		fBikes.add(fCurrentBike);
+		fIsBikeListModified = true;
+
+		// update ui viewer
+		fBikeViewer.add(fCurrentBike);
+		fBikeViewer.setSelection(new StructuredSelection(fCurrentBike));
+
+		// edit name field
+		fTextBikeName.selectAll();
+		fTextBikeName.setFocus();
+	}
+
+	private void onDeleteBike() {
+
+		final IStructuredSelection selection = (IStructuredSelection) fBikeViewer.getSelection();
+		if (selection.isEmpty()) {
+			return;
+		}
+
+		// ask for the reference tour name
+		String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
+
+		MessageDialog dialog = new MessageDialog(
+				this.getShell(),
+				"Delete Bike",
+				null,
+				"Are you sure to delete the bike(s) and remove them from ALL related persons?",
+				MessageDialog.QUESTION,
+				buttons,
+				1);
+
+		if (dialog.open() != Window.OK) {
+			return;
+		}
+
+		BusyIndicator.showWhile(null, new Runnable() {
+			public void run() {
+
+				Table table = fBikeViewer.getTable();
+				int lastIndex = table.getSelectionIndex();
+
+				for (Iterator iter = selection.iterator(); iter.hasNext();) {
+					TourBike bike = (TourBike) iter.next();
+
+					deleteBike(bike);
+
+					// remove from data model
+					fBikes.remove(bike);
+				}
+
+				// remove from ui
+				fBikeViewer.remove(selection.toArray());
+
+				// select next bike
+				if (lastIndex >= fBikes.size()) {
+					table.setSelection(fBikes.size() - 1);
+				} else {
+					table.setSelection(lastIndex);
+				}
+
+				fCurrentBike = null;
+
+				fIsBikeModified = false;
+				fIsBikeListModified = true;
+
+				updateBikeDetails();
+			}
+		});
+	}
+
+	public boolean performCancel() {
+		fireBikeListModifyEvent();
+		return super.performCancel();
+	}
+
+	public boolean performOk() {
+		saveBike();
+		fireBikeListModifyEvent();
+
+		return super.performOk();
+	}
+	/**
+	 * save current bike when it was modified
+	 */
+	private void saveBike() {
+
+		if (fCurrentBike != null && fIsBikeModified) {
+			fCurrentBike.persist();
+
+			// update modify flag
+			fIsBikeModified = false;
+			fBikeViewer.update(fCurrentBike, null);
+
+			fIsBikeListModified = true;
+		}
+
+		fIsBikeModified = false;
+	}
+
+	private void selectBike() {
+		saveBike();
+		updateBikeDetails();
+		enableButtons();
+	}
+
+	/**
+	 * update bike fields from selected bike in the viewer
+	 */
+	private void updateBikeDetails() {
+
+		IStructuredSelection selection = (IStructuredSelection) fBikeViewer.getSelection();
+
+		Object item = selection.getFirstElement();
+		boolean isEnabled = true;
+
+		if (item instanceof TourBike) {
+			TourBike bike = (TourBike) item;
+			// set the current bike before the fields are updated
+			fCurrentBike = bike;
+
+			fTextBikeName.setText(bike.getName());
+			fTextWeight.setText(Float.toString(bike.getWeight()));
+			UI.setDefaultColor(fTextWeight);
+
+			fComboBikeType.select(bike.getTypeId());
+			fComboFrontTyre.select(bike.getFrontTyreId());
+			fComboRearTyre.select(bike.getRearTyreId());
+
+		} else {
+			isEnabled = false;
+			fCurrentBike = null;
+
+			fTextBikeName.setText("");
+			fTextWeight.setText("");
+			fComboBikeType.select(0);
+			fComboFrontTyre.select(0);
+			fComboRearTyre.select(0);
+		}
+
+		fTextBikeName.setEnabled(isEnabled);
+		fTextWeight.setEnabled(isEnabled);
+		fComboBikeType.setEnabled(isEnabled);
+		fComboFrontTyre.setEnabled(isEnabled);
+		fComboRearTyre.setEnabled(isEnabled);
+	}
+
+}
