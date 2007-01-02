@@ -1,0 +1,281 @@
+/*******************************************************************************
+ * Copyright (C) 2006, 2007  Wolfgang Schramm
+ *  
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software 
+ * Foundation version 2 of the License.
+ *  
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ *******************************************************************************/
+package net.tourbook.statistics;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Formatter;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.ITourChartViewer;
+import net.tourbook.util.ArrayListToArray;
+
+public class ProviderTourTime extends DataProvider implements IMonthProvider {
+
+	private static ProviderTourTime	fInstance;
+
+	private ArrayList<Long>			fTourIds;
+
+	private TourPerson				fActivePerson;
+	private long					fActiveTypeId	= -1;
+
+	private int						fCurrentYear;
+	private int						fCurrentMonth;
+
+	private final Calendar			fCalendar		= GregorianCalendar.getInstance();
+
+	private TourDataTime			fTourTimeData;
+
+	private ProviderTourTime() {}
+
+	public static ProviderTourTime getInstance() {
+		if (fInstance == null) {
+			fInstance = new ProviderTourTime();
+		}
+		return fInstance;
+	}
+
+	public int getSelectedMonth() {
+		return fCurrentMonth;
+	}
+
+	/**
+	 * Retrieve chart data from the database
+	 * 
+	 * @param person
+	 * @param typeId
+	 * @param year
+	 * @return
+	 */
+	TourDataTime getTourTimeData(	final TourPerson person,
+									final long typeId,
+									final int year,
+									final boolean refreshData) {
+
+		// dont reload data which are already here
+		if (fActivePerson == person
+				&& fActiveTypeId == typeId
+				&& fCurrentYear == year
+				&& refreshData == false) {
+			return fTourTimeData;
+		}
+
+		final ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getTourTypes();
+		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+
+		final String sqlString = "SELECT "
+				+ "TOURID, "
+				+ "STARTYEAR, "
+				+ "STARTMONTH, "
+				+ "STARTDAY, "
+				+ "STARTHOUR, "
+				+ "STARTMINUTE, "
+				+ "TOURDISTANCE, "
+				+ "TOURALTUP, "
+				+ "tourRecordingTime, " // 9
+				+ "tourDrivingTime, "// 10
+				+ "tourType_typeId "// 11
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
+				+ (" WHERE STARTYEAR = " + Integer.toString(year))
+				+ getSQLFilter(person, typeId)
+				+ (" ORDER BY StartMonth, StartDay, StartHour, StartMinute");
+
+		try {
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final ResultSet result = statement.executeQuery();
+
+			final ArrayList<Integer> monthList = new ArrayList<Integer>();
+			final ArrayList<Integer> doyList = new ArrayList<Integer>();
+
+			final ArrayList<Integer> startTimeList = new ArrayList<Integer>();
+			final ArrayList<Integer> endTimeList = new ArrayList<Integer>();
+
+			final ArrayList<Integer> distanceList = new ArrayList<Integer>();
+			final ArrayList<Integer> altitudeList = new ArrayList<Integer>();
+			final ArrayList<Integer> durationList = new ArrayList<Integer>();
+
+			final ArrayList<Long> dbTypeIds = new ArrayList<Long>();
+			final ArrayList<Integer> dbTypeColorIndex = new ArrayList<Integer>();
+
+			fTourIds = new ArrayList<Long>();
+
+			while (result.next()) {
+
+				fTourIds.add(result.getLong(1));
+
+				final int tourMonth = result.getShort(3) - 1;
+				final short startHour = result.getShort(5);
+				final short startMinute = result.getShort(6);
+				final int startTime = startHour * 3600 + startMinute * 60;
+
+				final int recordingTime = result.getInt(9);
+				final int drivingTime = result.getInt(10);
+				final int duration = drivingTime == 0 ? recordingTime : drivingTime;
+
+				// get date
+				fCalendar.set(
+						result.getShort(2),
+						tourMonth,
+						result.getShort(4),
+						startHour,
+						startMinute);
+
+				// create data lists for the chart, start with 0
+				doyList.add(fCalendar.get(Calendar.DAY_OF_YEAR) - 1);
+				monthList.add(tourMonth);
+				startTimeList.add(startTime);
+				endTimeList.add((startTime + duration));
+
+				distanceList.add(result.getInt(7) / 1000);
+				altitudeList.add(result.getInt(8));
+				durationList.add(duration);
+
+				/*
+				 * convert type id to the type index in the tour types list
+				 * which is also the color index
+				 */
+				int colorIndex = 0;
+				final Long dbTypeIdObject = (Long) result.getObject(11);
+				if (dbTypeIdObject != null) {
+					final long dbTypeId = result.getLong(11);
+					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
+						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
+							colorIndex = typeIndex;
+							break;
+						}
+					}
+				}
+				dbTypeColorIndex.add(colorIndex);
+
+				dbTypeIds.add(dbTypeIdObject == null
+						? TourType.TOUR_TYPE_ID_NOT_DEFINED
+						: dbTypeIdObject);
+			}
+
+			conn.close();
+
+			/*
+			 * keep the data for the current year
+			 */
+			fTourTimeData = new TourDataTime(year);
+
+			fTourTimeData.fTourIds = ArrayListToArray.toLong(fTourIds);
+			fTourTimeData.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
+			fTourTimeData.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
+
+			fTourTimeData.fTourDOYValues = ArrayListToArray.toInt(doyList);
+			fTourTimeData.fTourMonthValues = ArrayListToArray.toInt(monthList);
+
+			fTourTimeData.fTourTimeStartValues = ArrayListToArray.toInt(startTimeList);
+			fTourTimeData.fTourTimeEndValues = ArrayListToArray.toInt(endTimeList);
+
+			fTourTimeData.fTourTimeDistanceValues = ArrayListToArray.toInt(distanceList);
+			fTourTimeData.fTourTimeAltitudeValues = ArrayListToArray.toInt(altitudeList);
+			fTourTimeData.fTourTimeDurationValues = ArrayListToArray.toInt(durationList);
+
+			fActivePerson = person;
+			fCurrentYear = year;
+			fActiveTypeId = typeId;
+
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
+
+		return fTourTimeData;
+	}
+	void setChartProviders(	final Chart chartWidget,
+							final ChartDataModel chartModel,
+							final ITourChartViewer tourChartViewer) {
+
+		chartModel.setCustomData(
+
+		ChartDataModel.BAR_INFO_PROVIDER, new IChartInfoProvider() {
+			public String getInfo(final int serieIndex, int valueIndex) {
+
+				final int[] tourDateValues = fTourTimeData.fTourDOYValues;
+
+				if (valueIndex >= tourDateValues.length) {
+					valueIndex -= tourDateValues.length;
+				}
+
+				if (tourDateValues == null || valueIndex >= tourDateValues.length) {
+					return "";
+				}
+				fCalendar.set(fCurrentYear, 0, 1);
+				fCalendar.set(Calendar.DAY_OF_YEAR, tourDateValues[valueIndex] + 1);
+
+				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
+
+				/*
+				 * get tour type name
+				 */
+				final long typeId = fTourTimeData.fTypeIds[valueIndex];
+				final ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getTourTypes();
+
+				String tourTypeName = "";
+				for (final Iterator iter = tourTypes.iterator(); iter.hasNext();) {
+					final TourType tourType = (TourType) iter.next();
+					if (tourType.getTypeId() == typeId) {
+						tourTypeName = tourType.getName();
+					}
+				}
+				final int[] startValue = fTourTimeData.fTourTimeStartValues;
+				final int[] endValue = fTourTimeData.fTourTimeEndValues;
+				final int[] durationValue = fTourTimeData.fTourTimeDurationValues;
+
+				final String barInfo = new Formatter().format(
+						" %d.%d.%d - %d:%02d-%d:%02d\n\n"
+								+ " Distance:\t%d km\n"
+								+ " Altitude:\t%d m\n"
+								+ " Duration:\t%d:%02d h\n"
+								+ " Type:\t\t%s",
+						fCalendar.get(Calendar.DAY_OF_MONTH),
+						fCalendar.get(Calendar.MONTH) + 1,
+						fCalendar.get(Calendar.YEAR),
+						startValue[valueIndex] / 3600,
+						(startValue[valueIndex] % 3600) / 60,
+						endValue[valueIndex] / 3600,
+						(endValue[valueIndex] % 3600) / 60,
+						fTourTimeData.fTourTimeDistanceValues[valueIndex],
+						fTourTimeData.fTourTimeAltitudeValues[valueIndex],
+						durationValue[valueIndex] / 3600,
+						(durationValue[valueIndex] % 3600) / 60,
+						tourTypeName).toString();
+
+				return barInfo;
+			}
+		});
+
+		// set the menu context provider
+		chartModel.setCustomData(
+				ChartDataModel.BAR_CONTEXT_PROVIDER,
+				new ContextProviderZoomIntoMonth(chartWidget, this));
+	}
+
+}
