@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.2.1.GA/persistent-provider.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.2.1.GA/lib/ejb3-persistence.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.2.1.GA/lib/hibernate-annotations.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.2.1.GA/lib/javassist.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.2.1.GA/lib/jboss-archive-browsing.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/hibernate3.jar" sourcepath="D:/Java/Hibernate/3.2.1/hibernate-3.2/src"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/ant-1.6.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/ant-antlr-1.6.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/ant-junit-1.6.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/ant-launcher-1.6.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/antlr-2.7.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/ant-swing-1.6.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/asm.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/asm-attrs.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/c3p0-0.9.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/cglib-2.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/checkstyle-all.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/cleanimports.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/commons-collections-2.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/commons-logging-1.0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/concurrent-1.3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/connector.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/dom4j-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/ehcache-1.2.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jaas.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jacc-1_0-fr.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/javassist.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jaxen-1.1-beta-7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jboss-cache.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jboss-common.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jboss-jmx.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jboss-system.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jdbc2_0-stdext.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jgroups-2.2.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jta.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/junit-3.8.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/log4j-1.2.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/oscache-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/proxool-0.8.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/swarmcache-1.0rc2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/syndiag2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/versioncheck.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/xerces-2.6.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/xml-apis.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
