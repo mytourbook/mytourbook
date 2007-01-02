@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Device Reader for HAC5
+Bundle-SymbolicName: net.tourbook.device.hac5;singleton:=true
+Bundle-Version: 0.0.8
+Bundle-Activator: net.tourbook.device.hac5.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ net.tourbook
+Eclipse-LazyStart: true
+Bundle-Vendor: MyTourbook
