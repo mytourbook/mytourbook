@@ -25,6 +25,6 @@ public class ResizeableListDialog extends ListDialog {
 		super(parent);
 
 		// make the dialog resizeable
-		setShellStyle(SWT.SHELL_TRIM);
+		setShellStyle(SWT.SHELL_TRIM | SWT.APPLICATION_MODAL);
 	}
 }

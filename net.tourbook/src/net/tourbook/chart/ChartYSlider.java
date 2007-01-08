@@ -60,9 +60,9 @@ public class ChartYSlider {
 	private ChartDrawingData	drawingData;
 
 	/**
-	 * x-position of the mouse on the slider line
+	 * y-position of the mouse on the slider line
 	 */
-	private int					graphX;
+	private int					graphY;
 
 	/**
 	 * Constructor
@@ -102,7 +102,7 @@ public class ChartYSlider {
 	public void setDevYSliderLine(int graphX, int devYSliderLine) {
 
 		this.devYSliderLine = devYSliderLine;
-		this.graphX = graphX;
+		this.graphY = graphX;
 
 		hitRectangle.y = devYSliderLine - ChartYSlider.halfSliderHitLineHeight;
 	}
@@ -114,7 +114,7 @@ public class ChartYSlider {
 	 * @param devYSliderLine
 	 */
 	public void setDevYSliderLine(int devYSliderLine) {
-		setDevYSliderLine(graphX, devYSliderLine);
+		setDevYSliderLine(graphY, devYSliderLine);
 	}
 
 	/**
@@ -165,6 +165,6 @@ public class ChartYSlider {
 	 * @return Returns the graphX.
 	 */
 	public int getGraphX() {
-		return graphX;
+		return graphY;
 	}
 }

@@ -17,13 +17,15 @@
 package net.tourbook.application;
 
 import net.tourbook.views.TourChartAnalyzerView;
+import net.tourbook.views.TourMarkerView;
+import net.tourbook.views.TourSegmenterView;
 import net.tourbook.views.rawData.RawDataView;
 import net.tourbook.views.tourBook.TourBookView;
 import net.tourbook.views.tourMap.TourMapView;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-
+import org.eclipse.ui.IPlaceholderFolderLayout;
 
 public class Perspective implements IPerspectiveFactory {
 
@@ -32,13 +34,18 @@ public class Perspective implements IPerspectiveFactory {
 		String editorArea = layout.getEditorArea();
 		layout.setEditorAreaVisible(false);
 
-		float ratio = 0.5f;
+		IPlaceholderFolderLayout placeHolderLeft = layout.createPlaceholderFolder(
+				"left", IPageLayout.LEFT, (float) 0.3, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+		placeHolderLeft.addPlaceholder(TourChartAnalyzerView.ID);
+		placeHolderLeft.addPlaceholder(TourSegmenterView.ID);
+		placeHolderLeft.addPlaceholder(TourMarkerView.ID);
+
+		IPlaceholderFolderLayout placeHolderTop = layout.createPlaceholderFolder(
+				"top", IPageLayout.TOP, (float) 0.6, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+		placeHolderTop.addPlaceholder(RawDataView.ID);
+		placeHolderTop.addPlaceholder(TourBookView.ID);
+		placeHolderTop.addPlaceholder(TourMapView.ID);
 		
-		layout.addPlaceholder(RawDataView.ID, IPageLayout.TOP, ratio, editorArea);
-		layout.addPlaceholder(TourChartAnalyzerView.ID, IPageLayout.TOP, ratio, editorArea);
-		layout.addPlaceholder(TourBookView.ID, IPageLayout.TOP, ratio, editorArea);
-		layout.addPlaceholder(TourMapView.ID, IPageLayout.TOP, ratio, editorArea);
 	}
 
-	
 }

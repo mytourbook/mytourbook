@@ -157,6 +157,7 @@ public class TourChart extends Chart {
 
 			chartMarker.serieIndex = tourMarker.getSerieIndex();
 			chartMarker.visualPosition = tourMarker.getVisualPosition();
+			chartMarker.type=tourMarker.getType();
 
 			fMarkerLayer.addMarker(chartMarker);
 		}

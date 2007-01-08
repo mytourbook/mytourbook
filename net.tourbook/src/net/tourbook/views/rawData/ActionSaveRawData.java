@@ -78,7 +78,7 @@ public class ActionSaveRawData extends Action {
 
 		// set default filename to the transfer date
 		dialog.setFileName(new Formatter().format(
-				"%d%02d%02d." + rawDataManager.getDevice().fileExtension,
+				"%d-%02d-%02d." + rawDataManager.getDevice().fileExtension,
 				deviceData.transferYear,
 				deviceData.transferMonth,
 				deviceData.transferDay).toString());

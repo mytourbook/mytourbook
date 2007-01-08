@@ -506,7 +506,7 @@ public class TourMarkerView extends ViewPart {
 			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
 					fTourChart,
 					((TourMarker) segments[0]).getSerieIndex(),
-					((TourMarker) segments[1]).getSerieIndex()));
+					((TourMarker) segments[segments.length-1]).getSerieIndex()));
 
 		} else if (segments.length > 0) {
 

@@ -507,6 +507,9 @@ public class ChartComponentGraph extends Canvas {
 
 		final ChartDataXSerie xData = getXData();
 
+		if (xData == null) {
+			return;
+		}
 		final int[][] xValueSerie = xData.getHighValues();
 
 		if (xValueSerie.length == 0) {
@@ -1232,7 +1235,7 @@ public class ChartComponentGraph extends Canvas {
 
 		drawCustomLayers();
 
-		boolean isLayerImageVisible = isXSliderVisible
+		final boolean isLayerImageVisible = isXSliderVisible
 				|| isYSliderVisible
 				|| fIsXMarkerMoved
 				|| fIsSelectionVisible;
@@ -1496,7 +1499,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void drawHoveredBar(GC gc) {
+	private void drawHoveredBar(final GC gc) {
 
 		// check if hovered bar is disabled
 		if (fHoveredBarSerieIndex == -1) {
@@ -1821,13 +1824,25 @@ public class ChartComponentGraph extends Canvas {
 				 * this is the last point for a filled graph, draw the line to
 				 * the x-axis
 				 */
-				final int lineBottom = graphYBottom > 0 ? graphYBottom : graphYTop < 0
-						? graphYTop
-						: 0;
+
+				int lineBottom;
+				
+				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
+					lineBottom = graphYBottom > 0 ? graphYBottom : graphYTop < 0
+							? graphYTop
+							: graphYBottom;
+
+				} else {
+
+					// case: graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO
+
+					lineBottom = graphYBottom > 0 ? graphYBottom : graphYTop < 0
+							? graphYTop
+							: 0;
+				}
+
 				path.lineTo(xValue, lineBottom);
 				path.moveTo(xValue, lineBottom);
-
-				// System.out.println(yValue + " " + graphYBottom);
 			}
 		}
 
@@ -1895,11 +1910,11 @@ public class ChartComponentGraph extends Canvas {
 		// gc.setAlpha(0xb0);
 		// gc.setAntialias(SWT.ON);
 
-//		if (isXMarker) {
-//			gc.setAlpha(0x60);
-//		} else {
-//			// gc.setAlpha(alphaValue);
-//		}
+		// if (isXMarker) {
+		// gc.setAlpha(0x60);
+		// } else {
+		// // gc.setAlpha(alphaValue);
+		// }
 
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.drawPath(path);
@@ -1919,7 +1934,7 @@ public class ChartComponentGraph extends Canvas {
 
 		fIsSelectionDirty = false;
 
-		int chartType = fChart.getChartDataModel().getChartType();
+		final int chartType = fChart.getChartDataModel().getChartType();
 
 		// loop: all graphs
 		for (final ChartDrawingData drawingData : fDrawingData) {
@@ -2595,7 +2610,11 @@ public class ChartComponentGraph extends Canvas {
 	 * @return Returns the x-Data in the drawing data list
 	 */
 	private ChartDataXSerie getXData() {
-		return fDrawingData.get(0).getXData();
+		if (fDrawingData.size() == 0) {
+			return null;
+		} else {
+			return fDrawingData.get(0).getXData();
+		}
 	}
 
 	private ChartDrawingData getXDrawingData() {
@@ -2691,7 +2710,7 @@ public class ChartComponentGraph extends Canvas {
 
 		addFocusListener(new FocusListener() {
 
-			public void focusGained(FocusEvent e) {
+			public void focusGained(final FocusEvent e) {
 
 				// System.out.println("component graph: focusGained");
 
@@ -2702,7 +2721,7 @@ public class ChartComponentGraph extends Canvas {
 				redraw();
 			}
 
-			public void focusLost(FocusEvent e) {
+			public void focusLost(final FocusEvent e) {
 				fIsFocusActive = false;
 				fIsSelectionDirty = true;
 				redraw();
@@ -2896,10 +2915,10 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param event
 	 */
-	void moveXSlider(Event event) {
+	void moveXSlider(final Event event) {
 
 		if (fSelectedXSlider == null) {
-			ChartXSlider leftSlider = getLeftSlider();
+			final ChartXSlider leftSlider = getLeftSlider();
 			if (leftSlider != null) {
 				// set default slider
 				fSelectedXSlider = leftSlider;
@@ -3094,7 +3113,7 @@ public class ChartComponentGraph extends Canvas {
 					selectedBarItems = null;
 				} else {
 
-					ChartDrawingData chartDrawingData = fDrawingData.get(0);
+					final ChartDrawingData chartDrawingData = fDrawingData.get(0);
 					final ChartDataXSerie xData = chartDrawingData.getXData();
 
 					selectedBarItems = new boolean[xData.fHighValues[0].length];
@@ -3186,6 +3205,7 @@ public class ChartComponentGraph extends Canvas {
 		final int devYMouse = event.y;
 		final int devXGraph = hBarOffset + devXMouse;
 
+		// System.out.println(event.stateMask+" "+event.x+" "+event.y);
 		boolean isChartDirty = false;
 
 		if (isGraphScrolled) {
@@ -3817,7 +3837,7 @@ public class ChartComponentGraph extends Canvas {
 				fSelectedBarItems = null;
 			} else {
 
-				ChartDrawingData chartDrawingData = fDrawingData.get(0);
+				final ChartDrawingData chartDrawingData = fDrawingData.get(0);
 				final ChartDataXSerie xData = chartDrawingData.getXData();
 
 				fSelectedBarItems = new boolean[xData.fHighValues[0].length];
@@ -4130,7 +4150,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void scrollSmoothlyRunnable(Runnable runnable, final int scrollInterval) {
+	private void scrollSmoothlyRunnable(final Runnable runnable, final int scrollInterval) {
 
 		final Display display = Display.getCurrent();
 		final int scrollDiffMax = 5;
@@ -4140,7 +4160,7 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		int scrollDiff = Math.abs(fSmoothScrollEndPosition - fSmoothScrollCurrentPosition);
+		final int scrollDiff = Math.abs(fSmoothScrollEndPosition - fSmoothScrollCurrentPosition);
 
 		// start scrolling again if the position was not
 		// reached
@@ -4560,8 +4580,8 @@ public class ChartComponentGraph extends Canvas {
 	public void resetSliders() {
 
 		// first get the left/right slider
-		ChartXSlider leftSlider = getLeftSlider();
-		ChartXSlider rightSlider = getRightSlider();
+		final ChartXSlider leftSlider = getLeftSlider();
+		final ChartXSlider rightSlider = getRightSlider();
 
 		/*
 		 * reset the sliders, the temp sliders are used so that the same slider

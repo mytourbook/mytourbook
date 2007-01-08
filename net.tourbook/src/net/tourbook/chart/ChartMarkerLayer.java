@@ -90,7 +90,8 @@ public class ChartMarkerLayer implements IChartLayer {
 		final float scaleY = drawingData.getScaleY();
 
 		final Color colorLine = new Color(display, getLineColor());
-
+		final Color colorDevMarker = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+		
 		gc.setClipping(0, devYTop, devGraphWidth, devGraphHeight);
 
 		for (final ChartMarker chartMarker : fChartMarkers) {
@@ -104,8 +105,13 @@ public class ChartMarkerLayer implements IChartLayer {
 			final int visualPosition = chartMarker.visualPosition;
 			final Point labelExtend = gc.textExtent(chartMarker.markerLabel);
 
+			if (chartMarker.type==TourMarker.MARKER_TYPE_DEVICE) {
+				gc.setBackground(colorDevMarker);
+			} else {
+				gc.setBackground(colorLine);
+			}
+			
 			gc.setForeground(colorLine);
-			gc.setBackground(colorLine);
 
 			// draw marker
 			gc.fillRectangle(devXMarker - 2, devYBottom - devYGraph, 4, 4);
@@ -206,6 +212,7 @@ public class ChartMarkerLayer implements IChartLayer {
 		}
 
 		gc.setClipping((Rectangle) null);
+		
 		colorLine.dispose();
 	}
 }

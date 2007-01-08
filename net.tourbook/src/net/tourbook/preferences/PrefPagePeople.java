@@ -623,17 +623,21 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		});
 
 		// button: delete
-		fButtonDelete = new Button(container, SWT.NONE);
-		fButtonDelete.setText("&Delete");
-		GridData gd = setButtonLayoutData(fButtonDelete);
-		gd.verticalIndent = 10;
-		fButtonDelete.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				onDeletePerson();
-				// enableButtons();
-			}
-		});
 
+		/*
+		 * "Delete" button is disabled because the tours don't display the info
+		 * that the person was removed
+		 */
+		// fButtonDelete = new Button(container, SWT.NONE);
+		// fButtonDelete.setText("&Delete");
+		// GridData gd = setButtonLayoutData(fButtonDelete);
+		// gd.verticalIndent = 10;
+		// fButtonDelete.addSelectionListener(new SelectionAdapter() {
+		// public void widgetSelected(SelectionEvent e) {
+		// onDeletePerson();
+		// // enableButtons();
+		// }
+		// });
 	}
 
 	private void createPersonDetails(Composite parent) {
@@ -742,7 +746,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		fButtonAdd.setEnabled(fCurrentPerson == null || (fCurrentPerson != null && isPersonValid));
 
-		fButtonDelete.setEnabled(isPersonSelected);
+		// fButtonDelete.setEnabled(isPersonSelected);
 	}
 
 	private void firePersonListModifyEvent() {
@@ -905,7 +909,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 					ts.begin();
 
-					// remove tour type from all tour data
+					// remove person from all saved tour data for this person
 					for (TourData tourData : tourDataList) {
 						tourData.setTourPerson(null);
 						em.merge(tourData);
@@ -1061,15 +1065,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private boolean validatePerson() {
 
 		boolean isValid = false;
-		int deviceIndex = fComboDevice.getSelectionIndex();
 
 		if (fCurrentPerson == null) {
 			isValid = true;
 		} else if (fTextFirstName.getText().trim().equals("")) {
-			setErrorMessage("Firstname cannot be empty");
+			setErrorMessage("Firstname is required");
 
-		} else if (deviceIndex <= 0) {
-			setErrorMessage("A device is required");
+			// } else if (fComboDevice.getSelectionIndex() <= 0) {
+			// setErrorMessage("A device is required");
 
 		} else if (!fRawDataPathEditor.getStringValue().trim().equals("")
 				&& !fRawDataPathEditor.isValid()) {

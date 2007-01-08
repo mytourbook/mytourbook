@@ -668,9 +668,9 @@ public class TourManager {
 
 		yData.setMaxValue(yData.getMaxValue() + 1);
 
-		if (yData.getMinValue() > 0) {
+//		if (yData.getMinValue() > 0) {
 			yData.setMinValue(yData.getMinValue() - 1);
-		}
+//		}
 	}
 
 	private void createAltiGradiSerieOLD(TourData tourData) {

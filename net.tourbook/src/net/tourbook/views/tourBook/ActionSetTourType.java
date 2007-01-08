@@ -22,6 +22,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ResizeableListDialog;
 
 import org.eclipse.jface.action.Action;
@@ -186,6 +187,11 @@ public class ActionSetTourType extends Action {
 					// reselect the first tour, to force the statistic to reselect the tour
 					fViewPart.getTourViewer().setSelection(
 							new StructuredSelection(selectedTours.getFirstElement()));
+					
+					// update views which display the tour type (raw data view) 
+					TourbookPlugin.getDefault().getPreferenceStore().setValue(
+							ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
+							Math.random());
 				}
 			}
 		};
@@ -200,8 +206,8 @@ public class ActionSetTourType extends Action {
 		dialog.setContentProvider(new TourTypeContentProvider());
 		dialog.setLabelProvider(new TourTypeLabelProvider());
 
-		dialog.setTitle("Save Selected Tour(s)");
-		dialog.setMessage("Tour was made by:");
+		dialog.setTitle("Set Tour Type");
+		dialog.setMessage("Select tour type:");
 		dialog.setDialogBoundsSettings(getDialogSettings(), Dialog.DIALOG_PERSISTLOCATION
 				| Dialog.DIALOG_PERSISTSIZE);
 
@@ -224,6 +230,13 @@ public class ActionSetTourType extends Action {
 		// select the first entry when nothing was selected before
 		if (isSelected == false && fTourTypes.size() > 0) {
 			dialog.setInitialSelections(new Object[] { fTourTypes.get(0) });
+		}
+
+		dialog.create();
+		
+		// disable ok button when no tour types are available
+		if (fTourTypes.size() == 0) {
+			dialog.getOkButton().setEnabled(false);
 		}
 
 		if (dialog.open() != Window.OK) {

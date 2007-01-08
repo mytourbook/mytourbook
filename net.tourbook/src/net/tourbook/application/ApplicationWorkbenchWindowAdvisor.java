@@ -15,19 +15,33 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import net.tourbook.database.TourDatabase;
+import net.tourbook.views.rawData.RawDataView;
+
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private ApplicationActionBarAdvisor	fApplicationActionBarAdvisor;
-
 
 	public ApplicationWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
@@ -54,12 +68,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		activePage.closeAllEditors(false);
 	}
 
-	
 	public void preWindowOpen() {
 
 		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
-		configurer.setInitialSize(new Point(800, 600));
+		configurer.setInitialSize(new Point(900, 700));
 		configurer.setShowCoolBar(true);
 		configurer.setShowStatusLine(true);
 		configurer.setShowProgressIndicator(true);
@@ -72,4 +85,53 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	}
 
+	public void postWindowOpen() {
+
+		String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON;
+
+		try {
+			Connection conn = TourDatabase.getInstance().getConnection();
+			PreparedStatement statement = conn.prepareStatement(sqlString);
+			ResultSet result = statement.executeQuery();
+
+			if (result.next()) {
+				// people are available, nothing more to do
+				return;
+			} else {
+
+				// no people are in the db, open the pref dialog to enter people
+
+				Shell activeShell = Display.getCurrent().getActiveShell();
+
+				MessageDialog.openInformation(
+						activeShell,
+						"MyTourbook Info",
+						"You have not yet created people, but at least one person is required to save the tours in the internal Database. "
+								+ "This is necessary because only saved tours will be used in the available tools "
+								+ "e.g. tourbook view, statistics or tour comparer.\n\n"
+								+ "People can be created in the following preference dialog with the »Add« button.");
+
+				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(
+						activeShell,
+						"net.tourbook.preferences.PrefPageClients",
+						null,
+						null);
+
+				dialog.open();
+				
+				// open raw data view
+				try {
+					getWindowConfigurer().getWindow().getActivePage().showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+				} catch (PartInitException e) {
+					e.printStackTrace();
+				}
+
+			}
+			conn.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
 }

@@ -367,12 +367,6 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		}
 	}
 
-	private class DrawingColors {
-		Color	colorBright;
-		Color	colorDark;
-		Color	colorLine;
-	}
-
 	/**
 	 * create the image for the tour type
 	 * 
@@ -419,7 +413,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 					gc.fillGradientRectangle(
 							offsetWidth + 0,
 							offsetHeight + 0,
-							fColorImageWidth,
+							fColorImageWidth-1,
 							fColorImageHeight - 2,
 							false);
 
@@ -520,14 +514,18 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		fColorTourFg.dispose();
 		fColorTourBg.dispose();
 
+		disposeImages();
+
+		super.dispose();
+	}
+
+	private void disposeImages() {
 		for (Iterator i = fImages.values().iterator(); i.hasNext();) {
 			((Image) i.next()).dispose();
 		}
 		fImages.clear();
 
 		fColorCache.dispose();
-
-		super.dispose();
 	}
 
 	public void createPartControl(Composite parent) {
@@ -738,6 +736,12 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 				}
 
 				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+					
+					// update tourbook viewer
+					disposeImages();
+					fTourViewer.refresh();
+					
+					// update statistics
 					refreshStatistics();
 				}
 			}

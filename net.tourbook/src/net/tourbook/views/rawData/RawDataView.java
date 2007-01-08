@@ -21,11 +21,13 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourType;
 import net.tourbook.dataImport.RawDataManager;
 import net.tourbook.device.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
@@ -35,10 +37,12 @@ import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ColorCache;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TableLayoutComposite;
+import net.tourbook.views.tourBook.DrawingColors;
 import net.tourbook.views.tourBook.SelectionRemovedTours;
 
 import org.eclipse.core.runtime.Preferences;
@@ -73,6 +77,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -97,6 +103,8 @@ import org.eclipse.ui.part.ViewPart;
 public class RawDataView extends ViewPart {
 
 	public static final String			ID							= "net.tourbook.views.rawData.RawDataView";
+
+	private static final String			TOUR_TYPE_PREFIX			= "tourType";
 
 	public static final int				COLUMN_DATE					= 0;
 	public static final int				COLUMN_START_TIME			= 1;
@@ -163,6 +171,12 @@ public class RawDataView extends ViewPart {
 	protected boolean					fIsPartVisible				= false;
 	protected boolean					fIsViewerPersonDataDirty	= false;
 
+	private HashMap<String, Image>		fImages						= new HashMap<String, Image>();
+	private ColorCache					fColorCache					= new ColorCache();
+
+	private int							fColorImageHeight			= -1;
+	private int							fColorImageWidth;
+
 	/**
 	 * device which was used to import the data, it's set to <code>null</code>
 	 * when the import was not successful
@@ -198,6 +212,9 @@ public class RawDataView extends ViewPart {
 						: tourPerson.getPersonId() == activePersonId
 								? imageDatabase
 								: imageDatabaseOtherPerson;
+
+			case COLUMN_START_TIME:
+				return getTourTypeImage(tourData);
 			}
 
 			return null;
@@ -319,12 +336,144 @@ public class RawDataView extends ViewPart {
 					}
 				}
 
+				if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+					actionSaveTour.resetPeopleList();
+				}
+				
+				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+					
+					// update tour type in the raw data
+					RawDataManager.getInstance().updatePersonInRawData();
+					
+					disposeImages();
+					fTourViewer.refresh();
+				}
+
 			}
 		};
 		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(
 				fPrefChangeListener);
 	}
 
+	/**
+	 * Set the size for the tour type images
+	 * 
+	 * @param display
+	 * @return
+	 */
+	private void ensureImageSize(Display display) {
+
+		if (fColorImageHeight == -1) {
+
+			Table table = fTourViewer.getTable();
+
+			// fColorImageHeight = table.getItemHeight();
+			// fColorImageWidth = 10;
+
+			fColorImageWidth = 16;
+			fColorImageHeight = table.getItemHeight();
+		}
+	}
+
+	private Image getTourTypeImage(TourData tourData) {
+
+		TourType tourType = tourData.getTourType();
+
+		if (tourType == null) {
+			return null;
+		}
+
+		long typeId = tourType.getTypeId();
+
+		String colorId = TOUR_TYPE_PREFIX + typeId;
+		Image image = fImages.get(colorId);
+
+		if (image == null) {
+
+			Display display = Display.getCurrent();
+			ensureImageSize(display);
+			image = new Image(display, fColorImageWidth, fColorImageHeight);
+
+			GC gc = new GC(image);
+			{
+				int arcSize = 4;
+
+				DrawingColors drawingColors = getTourTypeDrawingColors(display, typeId);
+
+				Color colorBright = drawingColors.colorBright;
+
+				if (colorBright != null) {
+
+					gc.setForeground(colorBright);
+					gc.setBackground(drawingColors.colorDark);
+
+					gc.fillGradientRectangle(4, 1, 8, fColorImageHeight - 3, false);
+
+					gc.setForeground(drawingColors.colorLine);
+					gc.drawRoundRectangle(4, 0, 7, fColorImageHeight - 2, arcSize, arcSize);
+				}
+			}
+			gc.dispose();
+
+			fImages.put(colorId, image);
+		}
+
+		return image;
+	}
+
+	/**
+	 * @param display
+	 * @param graphColor
+	 * @return return the color for the graph
+	 */
+	private DrawingColors getTourTypeDrawingColors(Display display, long tourTypeId) {
+
+		String colorIdBright = TOUR_TYPE_PREFIX + "bright" + tourTypeId;
+		String colorIdDark = TOUR_TYPE_PREFIX + "dark" + tourTypeId;
+		String colorIdLine = TOUR_TYPE_PREFIX + "line" + tourTypeId;
+
+		DrawingColors drawingColors = new DrawingColors();
+
+		Color colorBright = fColorCache.get(colorIdBright);
+		Color colorDark = fColorCache.get(colorIdDark);
+		Color colorLine = fColorCache.get(colorIdLine);
+
+		if (colorBright == null) {
+
+			ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getTourTypes();
+
+			TourType tourTypeColors = null;
+
+			for (TourType tourType : tourTypes) {
+				if (tourType.getTypeId() == tourTypeId) {
+					tourTypeColors = tourType;
+				}
+			}
+
+			if (tourTypeColors == null
+					|| tourTypeColors.getTypeId() == TourType.TOUR_TYPE_ID_NOT_DEFINED) {
+
+				// tour type was not found
+
+				colorBright = display.getSystemColor(SWT.COLOR_WHITE);
+				colorDark = display.getSystemColor(SWT.COLOR_WHITE);
+				colorLine = display.getSystemColor(SWT.COLOR_DARK_GRAY);
+
+			} else {
+
+				colorBright = fColorCache.put(colorIdBright, tourTypeColors.getRGBBright());
+
+				colorDark = fColorCache.put(colorIdDark, tourTypeColors.getRGBDark());
+				colorLine = fColorCache.put(colorIdLine, tourTypeColors.getRGBLine());
+			}
+		}
+
+		drawingColors.colorBright = colorBright;
+		drawingColors.colorDark = colorDark;
+		drawingColors.colorLine = colorLine;
+
+		return drawingColors;
+	}
 	private void addSelectionListener() {
 		// set the selection listener
 		fPostSelectionListener = new ISelectionListener() {
@@ -338,12 +487,6 @@ public class RawDataView extends ViewPart {
 					if (removedTours.size() == 0) {
 						return;
 					}
-
-					// updateViewer();
-
-					// remove all removed compared tours, so that another
-					// getSelection call does not do this twice
-					// removedTours.clear();
 
 					if (fIsPartVisible) {
 
@@ -374,6 +517,8 @@ public class RawDataView extends ViewPart {
 			public void partClosed(IWorkbenchPartReference partRef) {
 				if (ID.equals(partRef.getId()))
 					saveSettings();
+				
+				RawDataManager.getInstance().resetData();
 			}
 			public void partDeactivated(IWorkbenchPartReference partRef) {
 				if (ID.equals(partRef.getId()))
@@ -542,18 +687,15 @@ public class RawDataView extends ViewPart {
 
 		// parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
-		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		tableLayouter.setLayoutData(gridData);
-
 		// table
-		Table table = new Table(tableLayouter, SWT.H_SCROLL
+		Table table = new Table(parent, SWT.H_SCROLL
 				| SWT.V_SCROLL
 				| SWT.FULL_SELECTION
 				| SWT.MULTI
 				| SWT.BORDER);
+		
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		table.setLayout(new TableLayout());
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
@@ -566,8 +708,8 @@ public class RawDataView extends ViewPart {
 		tc.setText("Date");
 		tc.setToolTipText("Blue icon: the tour is saved for the active person\n"
 				+ "Red icon:  the tour is saved for another person");
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(16), false));
+		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(16));
+
 		tc.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				((DeviceImportSorter) fTourViewer.getSorter()).doSort(COLUMN_DATE);
@@ -578,50 +720,42 @@ public class RawDataView extends ViewPart {
 		tc = new TableColumn(table, SWT.TRAIL);
 		tc.setText("Time");
 		tc.setToolTipText("Start Time");
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(10), false));
+		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
 		tc = new TableColumn(table, SWT.TRAIL);
 		tc.setText("h");
 		tc.setToolTipText("Recording Time");
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(8), false));
+		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		tc = new TableColumn(table, SWT.TRAIL);
 		tc.setText("h");
 		tc.setToolTipText("Driving Time");
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(8), false));
+		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		tc = new TableColumn(table, SWT.TRAIL);
 		tc.setText("km");
 		tc.setToolTipText("Distance");
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(10), false));
+		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 		tc = new TableColumn(table, SWT.TRAIL);
 		tc.setText("km/h");
 		tc.setToolTipText("Speed");
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(9), false));
+		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
 		tc = new TableColumn(table, SWT.TRAIL);
 		tc.setText("m");
 		tc.setToolTipText("Altitude up");
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(8), false));
+		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		tc = new TableColumn(table, SWT.LEAD);
 		tc.setText("Profile");
 		tc.setToolTipText("Profile used for the tour");
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(10), false));
+		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 		tc = new TableColumn(table, SWT.TRAIL);
 		tc.setText("sec");
 		tc.setToolTipText("Time interval");
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(8), false));
+		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		// table viewer
 		fTourViewer = new TableViewer(table);
@@ -666,7 +800,18 @@ public class RawDataView extends ViewPart {
 
 		getSite().setSelectionProvider(null);
 
+		disposeImages();
+
 		super.dispose();
+	}
+
+	private void disposeImages() {
+		for (Iterator i = fImages.values().iterator(); i.hasNext();) {
+			((Image) i.next()).dispose();
+		}
+		fImages.clear();
+
+		fColorCache.dispose();
 	}
 
 	private void fillContextMenu(IMenuManager menuMgr) {
@@ -674,11 +819,11 @@ public class RawDataView extends ViewPart {
 		IStructuredSelection tourSelection = (IStructuredSelection) fTourViewer.getSelection();
 
 		if (!tourSelection.isEmpty()) {
-//			menuMgr.add(new Action("Open the Tour") {
-//				public void run() {
-//					createChart(true);
-//				}
-//			});
+			// menuMgr.add(new Action("Open the Tour") {
+			// public void run() {
+			// createChart(true);
+			// }
+			// });
 		}
 
 		if (tourSelection.isEmpty() == false) {

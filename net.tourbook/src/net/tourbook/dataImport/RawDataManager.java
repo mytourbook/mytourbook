@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.dataImport;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +41,8 @@ public class RawDataManager {
 
 	/**
 	 * contains the device which was used to get the fields:
-	 * <code>fDeviceData</code>, <code>fTourData</code>
+	 * <code>fDeviceData</code>, <code>fTourData</code>, if set to
+	 * <code>null</code> no raw data are available
 	 */
 	private TourbookDevice			fDevice;
 
@@ -227,39 +225,6 @@ public class RawDataManager {
 	}
 
 	/**
-	 * set the status the data has been imported from a file
-	 */
-	// public void setIsFileImport() {
-	// fIsDeviceImport = false;
-	// }
-	/**
-	 * set the status for each tour if it is saved in the database
-	 */
-	public void OLDupdateTourSaveStatus() {
-
-		String sqlString = "SELECT TOURID "
-				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA)
-				+ (" WHERE TOURID = ?");
-
-		try {
-
-			Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement = conn.prepareStatement(sqlString);
-
-			for (TourData tourData : fTourData) {
-
-				statement.setLong(1, tourData.getTourId());
-				// tourData.fIsTourSavedInDb = statement.executeQuery().next();
-			}
-
-			conn.close();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Set the person in the current raw data, which owns the tour data
 	 */
 	public void updatePersonInRawData() {
@@ -284,6 +249,7 @@ public class RawDataManager {
 							tourData.setTourPerson(null);
 						} else {
 							tourData.setTourPerson(((TourData) peopleList.get(0)).getTourPerson());
+							tourData.setTourType(((TourData) peopleList.get(0)).getTourType());
 						}
 					}
 
@@ -299,6 +265,15 @@ public class RawDataManager {
 
 	public void setImportFileName(String fileName) {
 		fImportFileName = fileName;
+	}
+
+	/**
+	 * reset the data, so the next time the data are read from the raw data
+	 * manager, the data must be reimported
+	 */
+	public void resetData() {
+		fDevice = null;
+		fImportFileName = null;
 	}
 
 }

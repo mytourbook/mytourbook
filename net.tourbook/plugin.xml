@@ -127,10 +127,19 @@
                value="icons/tourbook16.gif,icons/tourbook32.gif,icons/tourbook48.gif,icons/tourbook64.gif,icons/tourbook128.gif"/>
          <property
                name="aboutText"
-               value="MyTourbook&#x0A;&#x0A;Version: 0.8&#x0A;&#x0A;(c) Copyright Wolfgang Schramm and contributors 2005, 2007.  All rights reserved.&#x0A;&#x0A;Website: http://mytourbook.sourceforge.net"/>
+               value="MyTourbook&#x0A;&#x0A;Version: 0.8&#x0A;&#x0A;(c) Copyright Wolfgang Schramm 2005, 2007.  All rights reserved.&#x0A;&#x0A;Website: http://mytourbook.sourceforge.net"/>
          <property
                name="aboutImage"
                value="icons/tourbook-about.gif"/>
+         <property
+               name="startupProgressRect"
+               value="0,0,0,0"/>
+         <property
+               name="startupMessageRect"
+               value="0,0,0,0"/>
+         <property
+               name="startupForegroundColor"
+               value="FF8000"/>
       </product>
    </extension>
 

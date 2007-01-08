@@ -116,11 +116,14 @@ public class ActionSaveTourInDatabase extends Action {
 
 		String deviceId = person.getDeviceReaderId();
 
-		for (TourbookDevice device : fDeviceList) {
-			if (deviceId.equals(device.deviceId)) {
-				return device.visibleName;
+		if (deviceId != null) {
+			for (TourbookDevice device : fDeviceList) {
+				if (deviceId.equals(device.deviceId)) {
+					return device.visibleName;
+				}
 			}
 		}
+
 		return "<unknown device>";
 	}
 
@@ -201,8 +204,8 @@ public class ActionSaveTourInDatabase extends Action {
 
 	private TourPerson selectPersonDialog() {
 
-		// read people list
 		if (fPeople == null) {
+			// read people list from the db
 			fPeople = TourDatabase.getTourPeople();
 		}
 
@@ -211,8 +214,8 @@ public class ActionSaveTourInDatabase extends Action {
 		dialog.setContentProvider(new PeopleContentProvider());
 		dialog.setLabelProvider(new PeopleLabelProvider());
 
-		dialog.setTitle("Save Selected Tour(s)");
-		dialog.setMessage("Tour was made by:");
+		dialog.setTitle("Save Tour(s)");
+		dialog.setMessage("Save tour(s) for the selected person:");
 		dialog.setDialogBoundsSettings(getDialogSettings(), Dialog.DIALOG_PERSISTLOCATION
 				| Dialog.DIALOG_PERSISTSIZE);
 
@@ -229,6 +232,12 @@ public class ActionSaveTourInDatabase extends Action {
 		} catch (NumberFormatException e) {}
 
 		dialog.setInput(this);
+		dialog.create();
+
+		// disable ok button when no people are available
+		if (fPeople.size() == 0) {
+			dialog.getOkButton().setEnabled(false);
+		}
 
 		if (dialog.open() != Window.OK) {
 			return null;
@@ -255,6 +264,13 @@ public class ActionSaveTourInDatabase extends Action {
 	 */
 	void setPerson(TourPerson person) {
 		fTourPerson = person;
+	}
+
+	/**
+	 * force the people list to be recreated the next time when it's used
+	 */
+	public void resetPeopleList() {
+		fPeople = null;
 	}
 
 }

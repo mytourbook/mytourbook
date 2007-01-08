@@ -1,47 +1,25 @@
 /*******************************************************************************
  * Copyright (C) 2006, 2007  Wolfgang Schramm
- *  
+ * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
- * Foundation version 2 of the License.
- *  
+ * Foundation; either version 2 of the License, or (at your option) any later 
+ * version.
+ * 
  * This program is distributed in the hope that it will be useful, but WITHOUT 
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License along with 
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-/**
- * Administrator 10.08.2005
- */
+package net.tourbook.views.tourBook;
 
-package net.tourbook.chart;
+import org.eclipse.swt.graphics.Color;
 
-
-public class ChartMarker {
-
-	public String	graphLabel	= "";
-	public String	markerLabel	= "";
-
-	public int		graphX;
-
-	/**
-	 * index in the data serie
-	 */
-	public int		serieIndex;
-
-	/**
-	 * visual position in the chart
-	 */
-	public int		visualPosition;
-
-	/**
-	 * marker type, this can be <code>TourMarker.MARKER_TYPE_DEVICE</code> or
-	 * <code>TourMarker.MARKER_TYPE_CUSTOM</code>
-	 */
-	public int		type;
-
-	public ChartMarker() {}
+public class DrawingColors {
+	public Color	colorBright;
+	public Color	colorDark;
+	public Color	colorLine;
 }
