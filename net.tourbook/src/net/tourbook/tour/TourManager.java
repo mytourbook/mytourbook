@@ -1041,7 +1041,7 @@ public class TourManager {
 	 * @param sliceMin
 	 * @return Returns the number of slices which can be ignored
 	 */
-	private int getIgnoreTimeSlices(final int[] distanceValues,
+	public int getIgnoreTimeSlices(final int[] distanceValues,
 									int valuesIndexLeft,
 									int valuesIndexRight,
 									int sliceMin) {

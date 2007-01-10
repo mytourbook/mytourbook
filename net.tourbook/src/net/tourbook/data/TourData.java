@@ -34,6 +34,8 @@ import javax.persistence.PostLoad;
 import javax.persistence.PostUpdate;
 import javax.persistence.Transient;
 
+import net.tourbook.tour.TourManager;
+
 import org.hibernate.annotations.Cascade;
 
 /**
@@ -936,12 +938,17 @@ public class TourData {
 		this.deviceTimeInterval = deviceTimeInterval;
 	}
 
-	// public int getStatisticTime() {
-	// return statisticTime;
-	// }
-	//
-	// public void setStatisticTime(int statisticTime) {
-	// this.statisticTime = statisticTime;
-	// }
+	public void computeTourDrivingTime() {
+
+		int maxIndex = Math.max(0, timeSerie.length - 1);
+
+		tourDrivingTime = timeSerie[maxIndex]
+				- (TourManager.getInstance().getIgnoreTimeSlices(
+						distanceSerie,
+						0,
+						maxIndex,
+						10 / deviceTimeInterval) * deviceTimeInterval);
+
+	}
 
 }
