@@ -156,7 +156,6 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 	TourPerson							fActivePerson;
 	long								fActiveTourTypeId;
 
-	// private boolean fIsDetailVisible;
 	private boolean						fCanTourChartBeVisible;
 
 	private static IMemento				fSessionMemento;

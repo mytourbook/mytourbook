@@ -65,6 +65,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Item;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -72,6 +73,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourMarkerView extends ViewPart {
@@ -109,6 +111,10 @@ public class TourMarkerView extends ViewPart {
 
 	private ActionDeleteMarker		fActionDeleteMarker;
 	private TextCellEditor			fLabelEditor;
+
+	private PageBook				fPageBook;
+	private Label					fPageNoChart;
+	private Composite				fPageViewer;
 
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -194,8 +200,22 @@ public class TourMarkerView extends ViewPart {
 					// a tour was selected, update the marker viewer
 
 					fTourChart = ((SelectionTourChart) selection).getTourChart();
-					fTourData = fTourChart.getTourData();
-					fMarkerViewer.setInput(this);
+
+					if (fTourChart == null) {
+						
+						// hide the marker editor
+						
+						fPageBook.showPage(fPageNoChart);
+						
+					} else {
+						
+						// show the markers for the given tour
+						
+						fTourData = fTourChart.getTourData();
+						fMarkerViewer.setInput(this);
+						
+						fPageBook.showPage(fPageViewer);
+					}
 				}
 			}
 		};
@@ -226,7 +246,13 @@ public class TourMarkerView extends ViewPart {
 
 	public void createPartControl(Composite parent) {
 
-		createTableViewer(parent);
+		fPageBook = new PageBook(parent, SWT.NONE);
+		fPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		fPageNoChart = new Label(fPageBook, SWT.NONE);
+		fPageNoChart.setText("Not available");
+
+		fPageViewer = createTableViewer(fPageBook);
 
 		createActions();
 		createContextMenu();
@@ -235,7 +261,7 @@ public class TourMarkerView extends ViewPart {
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 	}
 
-	private void createTableViewer(Composite parent) {
+	private Composite createTableViewer(Composite parent) {
 
 		TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -391,6 +417,7 @@ public class TourMarkerView extends ViewPart {
 				}
 			}
 		});
+		return tableLayouter;
 	}
 
 	public void dispose() {
@@ -506,7 +533,7 @@ public class TourMarkerView extends ViewPart {
 			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
 					fTourChart,
 					((TourMarker) segments[0]).getSerieIndex(),
-					((TourMarker) segments[segments.length-1]).getSerieIndex()));
+					((TourMarker) segments[segments.length - 1]).getSerieIndex()));
 
 		} else if (segments.length > 0) {
 

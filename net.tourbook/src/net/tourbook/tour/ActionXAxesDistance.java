@@ -26,7 +26,7 @@ public class ActionXAxesDistance extends Action {
 
 	public ActionXAxesDistance(TourChart tourChart) {
 
-		super("Time", AS_RADIO_BUTTON);
+		super("X-Axis Distance", AS_RADIO_BUTTON);
 
 		this.tourChart = tourChart;
 
@@ -42,8 +42,10 @@ public class ActionXAxesDistance extends Action {
 
 			// show distance on x axes
 
-			TourChartConfiguration tourChartConfig = tourChart.fTourChartConfig;
-			tourChartConfig.showTimeOnXAxis = !tourChartConfig.showTimeOnXAxis;
+			TourChartConfiguration chartConfig = tourChart.fTourChartConfig;
+			
+			chartConfig.showTimeOnXAxis = !chartConfig.showTimeOnXAxis;
+			chartConfig.showTimeOnXAxisBackup = chartConfig.showTimeOnXAxis;
 
 			tourChart.switchSlidersTo2ndXData();
 			tourChart.updateChart();

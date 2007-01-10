@@ -77,8 +77,8 @@ public class TourSegmenterView extends ViewPart {
 	public static final int			COLUMN_ALTITUDE_UP		= 5;
 	public static final int			COLUMN_ALTITUDE_DOWN	= 6;
 
-	private PageBook				fViewPageBook;
-	private Composite				fContainer;
+	private PageBook				fPageBook;
+	private Composite				fPageSegmenter;
 
 	private Button					fChkShowInChart;
 	private Scale					fScaleTolerance;
@@ -98,6 +98,8 @@ public class TourSegmenterView extends ViewPart {
 
 	private DateFormat				fTimeInstance			= DateFormat
 																	.getTimeInstance(DateFormat.DEFAULT);
+
+	private Label	fPageNoChart;
 
 	/**
 	 * The content provider class is responsible for providing objects to the
@@ -322,15 +324,16 @@ public class TourSegmenterView extends ViewPart {
 
 	public void createPartControl(Composite parent) {
 
-		fViewPageBook = new PageBook(parent, SWT.NONE);
+		fPageBook = new PageBook(parent, SWT.NONE);
 
-		fContainer = new Composite(fViewPageBook, SWT.NONE);
-		fContainer.setLayout(new GridLayout());
+		fPageNoChart = new Label(fPageBook, SWT.NONE);
+		fPageNoChart.setText("Not available");
 
-		createSegmenterLayout(fContainer);
-		createTableViewer(fContainer);
+		fPageSegmenter = new Composite(fPageBook, SWT.NONE);
+		fPageSegmenter.setLayout(new GridLayout());
 
-		fViewPageBook.showPage(fContainer);
+		createSegmenterLayout(fPageSegmenter);
+		createTableViewer(fPageSegmenter);
 
 		addSelectionListener();
 		addPartListener();
@@ -580,8 +583,21 @@ public class TourSegmenterView extends ViewPart {
 		saveDPTolerance();
 
 		fTourChart = tourChartSelection.getTourChart();
+		
+		if (fTourChart == null) {
+			// hide the segmenter
+			fPageBook.showPage(fPageNoChart);
+			return;
+		}
+		
+		fPageBook.showPage(fPageSegmenter);
+		
 		fTourData = fTourChart.getTourData();
 
+		if (fTourData == null) {
+			fPageBook.showPage(fPageNoChart);
+			return;
+		}
 		// update segmenter values
 		fSavedDpTolerance = fDpTolerance = fTourData.getDpTolerance();
 

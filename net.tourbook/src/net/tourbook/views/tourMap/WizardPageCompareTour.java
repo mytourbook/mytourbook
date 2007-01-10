@@ -196,7 +196,7 @@ public class WizardPageCompareTour extends WizardPage {
 		fPageBook = new PageBook(fChartGroup, SWT.NONE);
 		fPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		fTourChart = new TourChart(fPageBook, SWT.NONE);
+		fTourChart = new TourChart(fPageBook, SWT.NONE, true);
 		fTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(
 				SWT.COLOR_WIDGET_BACKGROUND));
 

@@ -439,7 +439,7 @@ public class CompareResultView extends SynchedChartView {
 		/*
 		 * reference tour chart
 		 */
-		fRefTourChart = new TourChart(fSashChart, SWT.NONE);
+		fRefTourChart = new TourChart(fSashChart, SWT.NONE, true);
 		fRefTourChart.setShowZoomActions(true);
 		fRefTourChart.setShowSlider(true);
 		fRefTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(
@@ -458,7 +458,7 @@ public class CompareResultView extends SynchedChartView {
 		/*
 		 * compared tour chart
 		 */
-		fCompTourChart = new TourChart(fLowerPageBook, SWT.NONE);
+		fCompTourChart = new TourChart(fLowerPageBook, SWT.NONE, true);
 		fCompTourChart.setShowZoomActions(true);
 		fCompTourChart.setShowSlider(true);
 
@@ -685,7 +685,7 @@ public class CompareResultView extends SynchedChartView {
 		TVICompareResult result = (TVICompareResult) selection.getFirstElement();
 
 		if (result != null) {
-//			TourManager.getInstance().openTourInEditor(result.compTour.getTourId());
+			// TourManager.getInstance().openTourInEditor(result.compTour.getTourId());
 		}
 	}
 
@@ -969,11 +969,12 @@ public class CompareResultView extends SynchedChartView {
 	}
 
 	void synchCharts(boolean isSynched) {
-		
+
 		fRefTourChart.setZoomMarkerPositionListener(isSynched, fCompTourChart);
-		
+
 		// show the compared chart in full size
-		fCompTourChart.zoomOut(false);;
+		fCompTourChart.zoomOut(false);
+		;
 		fCompTourChart.updateChart(false);
 
 	}

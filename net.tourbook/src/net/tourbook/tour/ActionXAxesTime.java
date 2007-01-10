@@ -26,7 +26,7 @@ public class ActionXAxesTime extends Action {
 
 	public ActionXAxesTime(TourChart tourChart) {
 
-		super("Time", AS_RADIO_BUTTON);
+		super("X-Axis Time", AS_RADIO_BUTTON);
 
 		this.tourChart = tourChart;
 
@@ -42,8 +42,10 @@ public class ActionXAxesTime extends Action {
 
 			// show time on x axes
 
-			TourChartConfiguration tourChartConfig = tourChart.fTourChartConfig;
-			tourChartConfig.showTimeOnXAxis = !tourChartConfig.showTimeOnXAxis;
+			TourChartConfiguration chartConfig = tourChart.fTourChartConfig;
+			
+			chartConfig.showTimeOnXAxis = !chartConfig.showTimeOnXAxis;
+			chartConfig.showTimeOnXAxisBackup = chartConfig.showTimeOnXAxis;
 
 			tourChart.switchSlidersTo2ndXData();
 			tourChart.updateChart();

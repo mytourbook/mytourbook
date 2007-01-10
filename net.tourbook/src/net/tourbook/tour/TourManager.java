@@ -19,7 +19,6 @@ package net.tourbook.tour;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -38,43 +37,41 @@ import net.tourbook.views.tourMap.TourDataNormalizer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 public class TourManager {
 
-	public static final String						CUSTOM_DATA_TIME		= "time";
-	public static final String						CUSTOM_DATA_DISTANCE	= "distance";
-	public static final String						CUSTOM_DATA_ALTITUDE	= "altitude";
-	public static final String						CUSTOM_DATA_SPEED		= "speed";
-	public static final String						CUSTOM_DATA_GRADIENT	= "gradient";
-	public static final String						CUSTOM_DATA_ALTIMETER	= "altimeter";
-	public static final String						CUSTOM_DATA_PULSE		= "pulse";
+	public static final String	CUSTOM_DATA_TIME		= "time";
+	public static final String	CUSTOM_DATA_DISTANCE	= "distance";
+	public static final String	CUSTOM_DATA_ALTITUDE	= "altitude";
+	public static final String	CUSTOM_DATA_SPEED		= "speed";
+	public static final String	CUSTOM_DATA_GRADIENT	= "gradient";
+	public static final String	CUSTOM_DATA_ALTIMETER	= "altimeter";
+	public static final String	CUSTOM_DATA_PULSE		= "pulse";
 
-	public static final String						ANALYZER_INFO			= "AnalyzerInfo";
-	public static final String						X_AXIS_TIME				= "time";
-	public static final String						X_AXIS_DISTANCE			= "distance";
+	public static final String	ANALYZER_INFO			= "AnalyzerInfo";
+	public static final String	X_AXIS_TIME				= "time";
+	public static final String	X_AXIS_DISTANCE			= "distance";
 
-	public static final int							GRAPH_ALTITUDE			= 1000;
-	public static final int							GRAPH_SPEED				= 1001;
-	public static final int							GRAPH_ALTIMETER			= 1002;
-	public static final int							GRAPH_PULSE				= 1003;
-	public static final int							GRAPH_TEMPERATURE		= 1004;
-	public static final int							GRAPH_CADENCE			= 1005;
-	public static final int							GRAPH_GRADIENT			= 1006;
-	public static final int							GRAPH_POWER				= 1007;
+	public static final int		GRAPH_ALTITUDE			= 1000;
+	public static final int		GRAPH_SPEED				= 1001;
+	public static final int		GRAPH_ALTIMETER			= 1002;
+	public static final int		GRAPH_PULSE				= 1003;
+	public static final int		GRAPH_TEMPERATURE		= 1004;
+	public static final int		GRAPH_CADENCE			= 1005;
+	public static final int		GRAPH_GRADIENT			= 1006;
+	public static final int		GRAPH_POWER				= 1007;
 
-	private static TourManager						instance;
+	private static TourManager	instance;
 
-	private ComputeChartValue						computeSpeedAvg;
-	private ComputeChartValue						computeAltimeterAvg;
-	private ComputeChartValue						computeGradientAvg;
+	private ComputeChartValue	computeSpeedAvg;
+	private ComputeChartValue	computeAltimeterAvg;
+	private ComputeChartValue	computeGradientAvg;
 
 	/**
 	 * local cache for tour editor inputs
 	 */
-//	private final HashMap<Long, TourEditorInput>	tourCache				= new HashMap<Long, TourEditorInput>();
-
+	// private final HashMap<Long, TourEditorInput> tourCache = new
+	// HashMap<Long, TourEditorInput>();
 	private TourManager() {}
 
 	/**
@@ -103,6 +100,7 @@ public class TourManager {
 		} else {
 			chartConfig.showTimeOnXAxis = false;
 		}
+		chartConfig.showTimeOnXAxisBackup = chartConfig.showTimeOnXAxis;
 
 		// set the starttime from the prefs
 		chartConfig.isStartTime = prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
@@ -335,11 +333,14 @@ public class TourManager {
 							- (getIgnoreTimeSlices(
 									distanceValues,
 									valuesIndexLeft,
-									valuesIndexRight) * timeSlice);
+									valuesIndexRight,
+									10 / timeSlice) * timeSlice);
 
 					final float distance = rightDistance - leftDistance;
 
-					return distance / time * 3.6f;
+					float speed = distance / time * 3.6f;
+
+					return speed;
 				}
 
 			}
@@ -377,7 +378,8 @@ public class TourManager {
 							- (getIgnoreTimeSlices(
 									distanceValues,
 									valuesIndexLeft,
-									valuesIndexRight) * timeSlice);
+									valuesIndexRight,
+									10 / timeSlice) * timeSlice);
 
 					return (((float) (rightAltitude - leftAltitude) / time) * 3600);
 				}
@@ -457,7 +459,19 @@ public class TourManager {
 		xDataTime.setRgbLine(new RGB[] { new RGB(0, 0, 0) });
 		xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_SECOND);
 
-		if (chartConfig.showTimeOnXAxis) {
+		/*
+		 * show the distance axis only when a distance is available
+		 */
+		boolean showTimeOnXAxis;
+		if (tourData.getTourDistance() == 0) {
+			showTimeOnXAxis = true;
+
+		} else {
+			showTimeOnXAxis = chartConfig.showTimeOnXAxisBackup;
+		}
+		chartConfig.showTimeOnXAxis = showTimeOnXAxis;
+
+		if (showTimeOnXAxis) {
 			// time is displayed on the X axis
 			chartDataModel.setXData(xDataTime);
 			chartDataModel.setXData2nd(xDataDistance);
@@ -668,9 +682,9 @@ public class TourManager {
 
 		yData.setMaxValue(yData.getMaxValue() + 1);
 
-//		if (yData.getMinValue() > 0) {
-			yData.setMinValue(yData.getMinValue() - 1);
-//		}
+		// if (yData.getMinValue() > 0) {
+		yData.setMinValue(yData.getMinValue() - 1);
+		// }
 	}
 
 	private void createAltiGradiSerieOLD(TourData tourData) {
@@ -929,68 +943,70 @@ public class TourManager {
 			compareTour(tourData);
 		}
 
-//		openTourEditor(createTourEditorInput(tourData));
+		// openTourEditor(createTourEditorInput(tourData));
 	}
 
-//	/**
-//	 * Creates a new tour context for a given tour data object
-//	 * 
-//	 * @param tourData
-//	 * @return Returns the newly created tour context
-//	 */
-//	private TourEditorInput createTourEditorInput(final TourData tourData) {
-//
-//		final TourChartConfiguration chartConfiguration = createTourChartConfiguration();
-//
-//		// chartConfiguration.setKeepMinMaxValues(true);
-//
-//		// create the tour editor input
-//		final TourEditorInput editorInput = new TourEditorInput(tourData, chartConfiguration);
-//
-//		// keep the tour in a cache
-//		tourCache.put(tourData.getTourId(), editorInput);
-//
-//		return editorInput;
-//	}
-//
-//	/**
-//	 * Opens the tour editor for the the given editor input
-//	 * 
-//	 * @param editorInput
-//	 */
-//	private void openTourEditor(final TourEditorInput editorInput) {
-//
-//		try {
-//			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
-//					editorInput,
-//					TourEditorPart.ID,
-//					true);
-//
-//		} catch (final PartInitException e) {
-//			e.printStackTrace();
-//		}
-//	}
-//
-//	/**
-//	 * Opens the tour for the given tour id
-//	 * 
-//	 * @param tourId
-//	 */
-//	public void openTourInEditor(final long tourId) {
-//
-//		TourEditorInput editorInput;
-//
-//		if (tourCache.containsKey(tourId)) {
-//			// tour is already in the cache
-//			editorInput = tourCache.get(tourId);
-//		} else {
-//			// load tour from database
-//			final TourData tourData = TourDatabase.getTourDataByTourId(tourId);
-//
-//			editorInput = createTourEditorInput(tourData);
-//		}
-//		// openTourEditor(editorInput);
-//	}
+	// /**
+	// * Creates a new tour context for a given tour data object
+	// *
+	// * @param tourData
+	// * @return Returns the newly created tour context
+	// */
+	// private TourEditorInput createTourEditorInput(final TourData tourData) {
+	//
+	// final TourChartConfiguration chartConfiguration =
+	// createTourChartConfiguration();
+	//
+	// // chartConfiguration.setKeepMinMaxValues(true);
+	//
+	// // create the tour editor input
+	// final TourEditorInput editorInput = new TourEditorInput(tourData,
+	// chartConfiguration);
+	//
+	// // keep the tour in a cache
+	// tourCache.put(tourData.getTourId(), editorInput);
+	//
+	// return editorInput;
+	// }
+	//
+	// /**
+	// * Opens the tour editor for the the given editor input
+	// *
+	// * @param editorInput
+	// */
+	// private void openTourEditor(final TourEditorInput editorInput) {
+	//
+	// try {
+	// PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
+	// editorInput,
+	// TourEditorPart.ID,
+	// true);
+	//
+	// } catch (final PartInitException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	//
+	// /**
+	// * Opens the tour for the given tour id
+	// *
+	// * @param tourId
+	// */
+	// public void openTourInEditor(final long tourId) {
+	//
+	// TourEditorInput editorInput;
+	//
+	// if (tourCache.containsKey(tourId)) {
+	// // tour is already in the cache
+	// editorInput = tourCache.get(tourId);
+	// } else {
+	// // load tour from database
+	// final TourData tourData = TourDatabase.getTourDataByTourId(tourId);
+	//
+	// editorInput = createTourEditorInput(tourData);
+	// }
+	// // openTourEditor(editorInput);
+	// }
 
 	/**
 	 * set the graph colors from the pref store
@@ -1016,19 +1032,34 @@ public class TourManager {
 	}
 
 	/**
-	 * calculate the driving time, ignore the time when the distance is 0
+	 * calculate the driving time, ignore the time when the distance is 0 within
+	 * a time period which is defined by <code>sliceMin</code>
+	 * 
+	 * @param distanceValues
+	 * @param valuesIndexLeft
+	 * @param valuesIndexRight
+	 * @param sliceMin
+	 * @return Returns the number of slices which can be ignored
 	 */
 	private int getIgnoreTimeSlices(final int[] distanceValues,
 									int valuesIndexLeft,
-									int valuesIndexRight) {
+									int valuesIndexRight,
+									int sliceMin) {
 		int ignoreTimeCounter = 0;
 		int oldDistance = 0;
+		sliceMin = Math.max(sliceMin, 1);
 
 		for (int valueIndex = valuesIndexLeft; valueIndex <= valuesIndexRight; valueIndex++) {
+
 			if (distanceValues[valueIndex] == oldDistance) {
 				ignoreTimeCounter++;
 			}
-			oldDistance = distanceValues[valueIndex];
+			
+			int oldIndex = valueIndex-sliceMin;
+			if (oldIndex<0) {
+				oldIndex=0;
+			}
+			oldDistance = distanceValues[oldIndex];
 		}
 		return ignoreTimeCounter;
 	}

@@ -37,6 +37,8 @@ public class TourChartConfiguration {
 	 */
 	public boolean				showTimeOnXAxis			= false;
 
+	public boolean				showTimeOnXAxisBackup	= false;
+
 	/**
 	 * true: show the start time of the tour
 	 * <p>

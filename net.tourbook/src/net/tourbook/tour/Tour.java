@@ -52,7 +52,7 @@ public class Tour extends ViewForm {
 	private ToolBarManager						fToolbarMgr;
 	private TourChart							fTourChart;
 
-//	private ActionShowTourInfo					fActionShowTourInfo;
+	// private ActionShowTourInfo fActionShowTourInfo;
 
 	private Composite							fTourInfo;
 	private Combo								fComboTourType;
@@ -108,9 +108,9 @@ public class Tour extends ViewForm {
 
 	private void createActions() {
 
-//		fActionShowTourInfo = new ActionShowTourInfo(this);
-//
-//		fToolbarMgr.add(fActionShowTourInfo);
+	// fActionShowTourInfo = new ActionShowTourInfo(this);
+	//
+	// fToolbarMgr.add(fActionShowTourInfo);
 	}
 
 	private void createContent() {
@@ -152,7 +152,7 @@ public class Tour extends ViewForm {
 		fTourInfo = createTourInfo(fTourSash);
 
 		// tour chart
-		fTourChart = new TourChart(fTourSash, SWT.FLAT);
+		fTourChart = new TourChart(fTourSash, SWT.FLAT, true);
 		fTourChart.setToolBarManager(fToolbarMgr);
 
 		createActions();
@@ -237,9 +237,9 @@ public class Tour extends ViewForm {
 		if (mementoIsVisible != null) {
 
 			// show/hide tour info
-//			boolean isInfoVisible = mementoIsVisible == 1;
-//			fActionShowTourInfo.setChecked(isInfoVisible);
-//			showTourInfo(isInfoVisible);
+			// boolean isInfoVisible = mementoIsVisible == 1;
+			// fActionShowTourInfo.setChecked(isInfoVisible);
+			// showTourInfo(isInfoVisible);
 		}
 	}
 
@@ -253,10 +253,11 @@ public class Tour extends ViewForm {
 		UI.saveSashWeight(fTourSash, memento, MEMENTO_TOUR_SASH_TOURINFO);
 
 		// save tour info status
-//		memento
-//				.putInteger(MEMENTO_TOUR_TOURINFO_ISVISIBLE, fActionShowTourInfo.isChecked()
-//						? 1
-//						: 0);
+		// memento
+		// .putInteger(MEMENTO_TOUR_TOURINFO_ISVISIBLE,
+		// fActionShowTourInfo.isChecked()
+		// ? 1
+		// : 0);
 	}
 
 	/**
@@ -324,7 +325,7 @@ public class Tour extends ViewForm {
 		if (fTourTypes == null) {
 			return;
 		}
-		
+
 		fComboTourType.removeAll();
 		for (TourType tourType : fTourTypes) {
 			fComboTourType.add(tourType.getName());

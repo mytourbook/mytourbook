@@ -399,7 +399,7 @@ public class TourMapView extends SynchedChartView {
 		 * sash content
 		 */
 		// ref tour chart
-		fRefTourChart = new TourChart(fSashCharts, SWT.NONE);
+		fRefTourChart = new TourChart(fSashCharts, SWT.NONE, true);
 		fRefTourChart.setShowZoomActions(true);
 		fRefTourChart.setShowSlider(true);
 		fRefTourChart.addTourChartListener(new ITourChartListener() {
@@ -448,7 +448,7 @@ public class TourMapView extends SynchedChartView {
 		fPageBookCompTourChart.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		// compared tour chart
-		fCompTourChart = new TourChart(fPageBookCompTourChart, SWT.NONE);
+		fCompTourChart = new TourChart(fPageBookCompTourChart, SWT.NONE, true);
 		fCompTourChart.setShowZoomActions(true);
 		fCompTourChart.setShowSlider(true);
 
@@ -591,7 +591,7 @@ public class TourMapView extends SynchedChartView {
 				}
 
 				if (tourId != -1) {
-//					TourManager.getInstance().openTourInEditor(tourId);
+					// TourManager.getInstance().openTourInEditor(tourId);
 				} else {
 					// expand/collapse current item
 					if (fTourViewer.getExpandedState(tourItem)) {
@@ -1228,8 +1228,12 @@ public class TourMapView extends SynchedChartView {
 
 			fCompTourChart.addDataModelListener(dataModelListener);
 
-			fCompTourChart.updateChart(selectedCompTourData, fRefChartDataCache.get(
-					fActiveRefTourId).getCompTourChartConfig());
+			RefTourChartData refTourChartData = fRefChartDataCache.get(fActiveRefTourId);
+
+			if (refTourChartData != null) {
+				fCompTourChart.updateChart(selectedCompTourData, refTourChartData
+						.getCompTourChartConfig());
+			}
 
 			/*
 			 * fire the change event so that the tour markers updated
@@ -1346,7 +1350,7 @@ public class TourMapView extends SynchedChartView {
 			final TVITourMapYear ttiTourMapYear = (TVITourMapYear) ttiComparedTour.getParentItem();
 			final TVTITourMapReferenceTour refItem = ttiTourMapYear.getRefItem();
 			refItem.yearMapMinValue = Integer.MIN_VALUE;
-			
+
 			updateYearChart(ttiTourMapYear);
 		}
 	}

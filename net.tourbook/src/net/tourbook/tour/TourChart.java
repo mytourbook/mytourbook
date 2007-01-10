@@ -81,8 +81,13 @@ public class TourChart extends Chart {
 	private boolean					fIsTourDirty;
 	private boolean					fIsSegmentLayerVisible;
 
-	public TourChart(final Composite parent, final int style) {
+	private boolean					fIsToolActions;
+
+	public TourChart(final Composite parent, final int style, boolean showToolActions) {
+
 		super(parent, style);
+
+		fIsToolActions = showToolActions;
 
 		setPrefListeners();
 
@@ -157,7 +162,7 @@ public class TourChart extends Chart {
 
 			chartMarker.serieIndex = tourMarker.getSerieIndex();
 			chartMarker.visualPosition = tourMarker.getVisualPosition();
-			chartMarker.type=tourMarker.getType();
+			chartMarker.type = tourMarker.getType();
 
 			fMarkerLayer.addMarker(chartMarker);
 		}
@@ -293,13 +298,18 @@ public class TourChart extends Chart {
 		// ///////////////////////////////////////////////////////
 
 		fActionGraphAnalyzer = new ActionGraphAnalyzer(this);
-		fActionTourSegmenter = new ActionTourSegmenter(this);
-		fActionMarkerEditor = new ActionTourMarker(this);
 
 		tbm.add(new Separator());
 		tbm.add(fActionGraphAnalyzer);
-		tbm.add(fActionTourSegmenter);
-		tbm.add(fActionMarkerEditor);
+
+		if (fIsToolActions) {
+			
+			fActionTourSegmenter = new ActionTourSegmenter(this);
+			fActionMarkerEditor = new ActionTourMarker(this);
+
+			tbm.add(fActionTourSegmenter);
+			tbm.add(fActionMarkerEditor);
+		}
 	}
 
 	public void dispose() {
@@ -705,12 +715,12 @@ public class TourChart extends Chart {
 		fTourData = tourData;
 		fTourChartConfig = chartConfig;
 
+		fChartDataModel = TourManager.getInstance().createChartDataModel(tourData, chartConfig);
+		
 		if (fShowZoomActions) {
 			createTourActions();
 			enableActions();
 		}
-
-		fChartDataModel = TourManager.getInstance().createChartDataModel(tourData, chartConfig);
 
 		// restore min/max values from the chart config
 		if (chartConfig.fMinMaxKeeper != null && keepMinMaxValues) {

@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ISliderMoveListener;
+import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -33,7 +35,9 @@ import net.tourbook.device.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
+import net.tourbook.tour.ITourChartListener;
 import net.tourbook.tour.ITourItem;
+import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
@@ -41,7 +45,6 @@ import net.tourbook.ui.ColorCache;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
-import net.tourbook.util.TableLayoutComposite;
 import net.tourbook.views.tourBook.DrawingColors;
 import net.tourbook.views.tourBook.SelectionRemovedTours;
 
@@ -56,7 +59,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.DeviceResourceException;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -67,7 +69,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -146,6 +147,7 @@ public class RawDataView extends ViewPart {
 	private IPartListener2				fPartListener;
 	private ISelectionListener			fPostSelectionListener;
 	private IPropertyChangeListener		fPrefChangeListener;
+	private PostSelectionProvider		fPostSelectionProvider;
 
 	// protected TourEditorPart currentTourEditor;
 
@@ -157,8 +159,6 @@ public class RawDataView extends ViewPart {
 	private ToolBarManager				fTbm;
 
 	private ViewForm					tourForm;
-
-	private PostSelectionProvider		fSelectionProvider;
 
 	/**
 	 * status if the tour chart is displayed
@@ -339,12 +339,12 @@ public class RawDataView extends ViewPart {
 				if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
 					actionSaveTour.resetPeopleList();
 				}
-				
+
 				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-					
+
 					// update tour type in the raw data
 					RawDataManager.getInstance().updatePersonInRawData();
-					
+
 					disposeImages();
 					fTourViewer.refresh();
 				}
@@ -506,18 +506,22 @@ public class RawDataView extends ViewPart {
 	private void addPartListener() {
 		fPartListener = new IPartListener2() {
 			public void partActivated(IWorkbenchPartReference partRef) {
-			// IWorkbenchPart part = partRef.getPart(false);
-			// if (part instanceof TourEditorPart && part != currentTourEditor)
-			// {
-			// currentTourEditor = (TourEditorPart) part;
-			// selectTourInView();
-			// }
+
+				disableTourChartSelection();
+
+				// IWorkbenchPart part = partRef.getPart(false);
+				// if (part instanceof TourEditorPart && part !=
+				// currentTourEditor)
+				// {
+				// currentTourEditor = (TourEditorPart) part;
+				// selectTourInView();
+				// }
 			}
 			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
 			public void partClosed(IWorkbenchPartReference partRef) {
 				if (ID.equals(partRef.getId()))
 					saveSettings();
-				
+
 				RawDataManager.getInstance().resetData();
 			}
 			public void partDeactivated(IWorkbenchPartReference partRef) {
@@ -544,7 +548,6 @@ public class RawDataView extends ViewPart {
 		};
 		getViewSite().getPage().addPartListener(fPartListener);
 	}
-
 	private void createActions() {
 
 		// toolbar: left side
@@ -634,7 +637,7 @@ public class RawDataView extends ViewPart {
 		createTourViewer(partComposite);
 
 		// tour chart
-		fTourChart = new TourChart(fPartSash, SWT.NONE);
+		fTourChart = new TourChart(fPartSash, SWT.NONE, false);
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
 
@@ -649,11 +652,20 @@ public class RawDataView extends ViewPart {
 		addSelectionListener();
 		addPrefListener();
 
+		// set this view part as selection provider
+		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+
+		// fire a slider move selection when a slider was moved in the tour
+		// chart
+		fTourChart.addSliderMoveListener(new ISliderMoveListener() {
+			public void sliderMoved(SelectionChartInfo chartInfoSelection) {
+				fPostSelectionProvider.setSelection(chartInfoSelection);
+			}
+		});
+
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
 		restoreState(fSessionMemento);
 
-		// set this view part as selection provider
-		getSite().setSelectionProvider(fSelectionProvider = new PostSelectionProvider());
 	}
 
 	private void createResources() {
@@ -693,7 +705,7 @@ public class RawDataView extends ViewPart {
 				| SWT.FULL_SELECTION
 				| SWT.MULTI
 				| SWT.BORDER);
-		
+
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		table.setHeaderVisible(true);
@@ -859,7 +871,7 @@ public class RawDataView extends ViewPart {
 	}
 
 	public void fireSelectionEvent(ISelection selection) {
-		fSelectionProvider.setSelection(selection);
+		fPostSelectionProvider.setSelection(selection);
 	}
 
 	public TableViewer getTourViewer() {
@@ -1023,6 +1035,16 @@ public class RawDataView extends ViewPart {
 
 		fTourChart.addDataModelListener(dataModelListener);
 		fTourChart.updateChart(tourData, fTourChartConfig, false);
+
+		disableTourChartSelection();
+	}
+
+	/**
+	 * prevent the marker viewer to show the markers by setting the tour chart
+	 * parameter to null
+	 */
+	private void disableTourChartSelection() {
+		fPostSelectionProvider.setSelection(new SelectionTourChart(null));
 	}
 
 	private void updateDeviceData() {

@@ -17,6 +17,7 @@ package net.tourbook.views;
 
 import java.util.ArrayList;
 
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
@@ -27,6 +28,7 @@ import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.tour.SelectionTourChart;
+import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ColorCache;
 
@@ -226,12 +228,17 @@ public class TourChartAnalyzerView extends ViewPart {
 				}
 
 				if (selection instanceof SelectionChartXSliderPosition) {
-					updateInfo(((SelectionChartXSliderPosition) selection).chart.getChartInfo());
+					Chart tourChart = ((SelectionChartXSliderPosition) selection).chart;
+					if (tourChart != null) {
+						updateInfo(tourChart.getChartInfo());
+					}
 				}
-				
+
 				if (selection instanceof SelectionTourChart) {
-					SelectionTourChart tourChartSelection = (SelectionTourChart) selection;
-					updateInfo(tourChartSelection.getTourChart().getChartInfo());
+					TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
+					if (tourChart != null) {
+						updateInfo(tourChart.getChartInfo());
+					}
 				}
 			}
 		};
@@ -478,7 +485,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		fPartContainer = parent;
 
 		fBgColorData = getColor(new RGB(240, 240, 240));
-//		fBgColorData = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+		// fBgColorData = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 		fBgColorHeader = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 		// fBgColorHeader =
 		// Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
