@@ -318,10 +318,10 @@ public class HAC4DeviceReader extends TourbookDevice {
 						tourData.setTourDistance(tourData.getTourDistance() + timeData.distance);
 
 						// summarize the driving time
-						if (timeData.distance > 0) {
-							tourData.setTourDrivingTime(tourData.getTourDrivingTime()
-									+ timeData.time);
-						}
+						// if (timeData.distance > 0) {
+						// tourData.setTourDrivingTime(tourData.getTourDrivingTime()
+						// + timeData.time);
+						// }
 
 						// adjust pulse from relative to absolute
 						totalPulse += timeData.pulse;
@@ -347,6 +347,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 				tourData.createTimeSeries(timeDataList);
 
 				tourData.setTourType(defaultTourType);
+
+				tourData.computeTourDrivingTime();
 
 				// set week of year
 				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
