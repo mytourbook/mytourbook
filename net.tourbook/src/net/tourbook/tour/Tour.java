@@ -322,7 +322,7 @@ public class Tour extends ViewForm {
 
 		fTourTypes = TourDatabase.getTourTypes();
 
-		if (fTourTypes == null) {
+		if (fTourTypes == null || fComboTourType.isDisposed()) {
 			return;
 		}
 

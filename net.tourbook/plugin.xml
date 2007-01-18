@@ -61,14 +61,6 @@
             name="Tour Segmenter"/>
    </extension>
    <extension
-         id="mytourbook"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="net.tourbook.application"
-            name="Toorbook">
-      </product>
-   </extension>
-   <extension
          point="org.eclipse.ui.preferencePages">
       <page
             class="net.tourbook.preferences.PrefPageBikes"
@@ -100,23 +92,6 @@
       <initializer class="net.tourbook.preferences.PreferenceInitializer"/>
    </extension>
    <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
-         <view
-               id="net.tourbook.views.SampleView"
-               ratio="0.5"
-               relationship="right"
-               relative="org.eclipse.ui.views.TaskList"/>
-      </perspectiveExtension>
-   </extension>
-   <extension
-         id="net_tourbook_product"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="net.tourbook.application"
-            name="Toorbook"/>
-   </extension>
-   <extension
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
@@ -127,20 +102,26 @@
                value="icons/tourbook16.gif,icons/tourbook32.gif,icons/tourbook48.gif,icons/tourbook64.gif,icons/tourbook128.gif"/>
          <property
                name="aboutText"
-               value="MyTourbook&#x0A;&#x0A;Version: 0.8.1&#x0A;&#x0A;(c) Copyright Wolfgang Schramm 2005, 2007.  All rights reserved.&#x0A;&#x0A;Website: http://mytourbook.sourceforge.net"/>
+               value="MyTourbook&#x0A;&#x0A;Version: 0.8.2&#x0A;&#x0A;(c) Copyright Wolfgang Schramm 2005, 2007.  All rights reserved.&#x0A;&#x0A;Website: http://mytourbook.sourceforge.net"/>
          <property
                name="aboutImage"
-               value="icons/tourbook-about.gif"/>
-         <property
-               name="startupProgressRect"
-               value="0,0,0,0"/>
-         <property
-               name="startupMessageRect"
-               value="0,0,0,0"/>
-         <property
-               name="startupForegroundColor"
-               value="FF8000"/>
+               value="icons/tourbook-about-250.gif"/>
       </product>
    </extension>
 
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Update Management"
+            visible="true"
+            id="net.tourbook.update.actionSet">
+         <action
+               class="net.tourbook.update.InstallWizardAction"
+               definitionId="org.eclipse.ui.update.findAndInstallUpdates"
+               id="net.tourbook.update.action_update"
+               label="&amp;Software Updates"
+               menubarPath="file/update">
+         </action>
+      </actionSet>
+   </extension>
 </plugin>

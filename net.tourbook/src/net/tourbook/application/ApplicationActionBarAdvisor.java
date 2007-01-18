@@ -53,10 +53,10 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	private IWorkbenchAction	fActionExit;
-	private IWorkbenchAction	fActionClose;
-	private IWorkbenchAction	fActionSave;
-	private IWorkbenchAction	fActionAbout;
+	// private IWorkbenchAction fActionExit;
+	// private IWorkbenchAction fActionClose;
+	// private IWorkbenchAction fActionSave;
+	// private IWorkbenchAction fActionAbout;
 
 	private ActionDeviceImport	fActionImport;
 	private ActionOpenView		fActionRawDataView;
@@ -87,16 +87,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		personSelector = new PersonContributionItem();
 		tourTypeSelector = new TourTypeContributionItem();
 
-		fActionExit = ActionFactory.QUIT.create(window);
-		register(fActionExit);
+		register(ActionFactory.QUIT.create(window));
 
-		fActionClose = ActionFactory.CLOSE.create(window);
-		register(fActionClose);
+		register(ActionFactory.ABOUT.create(window));
+		getAction(ActionFactory.ABOUT.getId()).setText("&About");
 
-		fActionSave = ActionFactory.SAVE.create(window);
-
-		fActionAbout = ActionFactory.ABOUT.create(window);
-		fActionAbout.setText("About");
+		// register(ActionFactory.CLOSE.create(window));
+		// fActionSave = ActionFactory.SAVE.create(window);
 
 		fActionImport = new ActionDeviceImport(window);
 
@@ -170,14 +167,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		fileMenu.add(fActionImport);
 		fileMenu.add(fActionTourCompareWizard);
+
+		fileMenu.add(new Separator("update"));
+
 		fileMenu.add(new Separator());
+
+		fileMenu.add(getAction(ActionFactory.QUIT.getId()));
 
 		// disabled - it's necesarry when the tour editor is reactivated
 		// fileMenu.add(fActionSave);
 		// fileMenu.add(fActionClose);
 		// fileMenu.add(new Separator());
-
-		fileMenu.add(fActionExit);
 
 		MenuManager viewMenu = new MenuManager("&View", null);
 		menuBar.add(viewMenu);
@@ -189,7 +189,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		viewMenu.add(fActionPreferences);
 
-		menuBar.add(fActionAbout);
+		menuBar.add(getAction(ActionFactory.ABOUT.getId()));
 	}
 
 	protected void fillCoolBar(ICoolBarManager coolBar) {

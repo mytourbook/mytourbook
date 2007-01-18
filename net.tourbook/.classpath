@@ -3,10 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry excluding="src/" kind="src" path=""/>
 	<classpathentry exported="true" kind="lib" path="persistence.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/derby.jar"/>
-	<classpathentry kind="lib" path="lib/derbyclient.jar" sourcepath="E:/Eclipse Install/Derby/10.1/db-derby-10.1.1.0-src/java/client"/>
-	<classpathentry kind="lib" path="lib/derbynet.jar" sourcepath="E:/Eclipse Install/Derby/10.1/db-derby-10.1.1.0-src/java/drda"/>
-	<classpathentry exported="true" kind="lib" path="lib/derbytools.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="bin"/>

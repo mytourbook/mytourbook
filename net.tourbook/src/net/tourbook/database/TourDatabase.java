@@ -37,7 +37,6 @@ import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
-import net.tourbook.plugin.TourbookPlugin;
 
 import org.apache.derby.drda.NetworkServerControl;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -785,11 +784,16 @@ public class TourDatabase {
 
 	private String getDatabasePath() {
 
+//		String pluginPath = Platform
+//				.getStateLocation(TourbookPlugin.getDefault().getBundle())
+//				.removeLastSegments(4)
+//				.toFile()
+//				.getAbsolutePath();
+
 		String pluginPath = Platform
-				.getStateLocation(TourbookPlugin.getDefault().getBundle())
-				.removeLastSegments(4)
-				.toFile()
-				.getAbsolutePath();
+		.getLocation().removeLastSegments(1)
+		.toFile()
+		.getAbsolutePath();
 
 		return pluginPath + "/derby-database";
 	}

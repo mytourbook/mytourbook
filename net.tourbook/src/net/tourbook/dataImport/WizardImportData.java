@@ -198,7 +198,7 @@ public class WizardImportData extends Wizard {
 		// set filename to the transfer date
 		DeviceData deviceData = RawDataManager.getInstance().getDeviceData();
 		String fileName = new Formatter().format(
-				"%d%02d%02d." + fImportDevice.fileExtension,
+				"%d-%02d-%02d." + fImportDevice.fileExtension,
 				deviceData.transferYear,
 				deviceData.transferMonth,
 				deviceData.transferDay).toString();

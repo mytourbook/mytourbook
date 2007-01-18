@@ -2,19 +2,17 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: MyTourbook Application
 Bundle-SymbolicName: net.tourbook; singleton:=true
-Bundle-Version: 0.8.1
+Bundle-Version: 0.8.2
 Bundle-ClassPath: net.tourbook.jar,
- persistence.jar,
- lib/derby.jar,
- lib/derbyclient.jar,
- lib/derbynet.jar,
- lib/derbytools.jar
+ persistence.jar
 Bundle-Activator: net.tourbook.plugin.TourbookPlugin
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.tourbook.connection,
- net.tourbook.ejb3
+ net.tourbook.ejb3,
+ org.apache.derby.core,
+ org.eclipse.update.ui
 Eclipse-LazyStart: true
 Eclipse-RegisterBuddy: net.tourbook.ejb3
 Export-Package: net.tourbook.chart,
