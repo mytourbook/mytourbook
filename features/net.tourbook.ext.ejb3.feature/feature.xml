@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="net.tourbook.ext.ejb3.feature"
+      label="Ejb3 Service"
+      version="0.8.2"
+      provider-name="MyTourbook">
+
+   <description>
+      This feature contains the EBJ3 service for MyTourbook, it contains a modified version than the original Hibernate jar&apos;s.
+   </description>
+
+   <copyright>
+      (c) Copyright Wolfgang Schramm 2005, 2007.  All rights reserved.
+   </copyright>
+
+   <requires>
+      <import feature="net.tourbook.feature" version="0.8.2"/>
+   </requires>
+
+    <plugin
+         id="net.tourbook.ejb3"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
