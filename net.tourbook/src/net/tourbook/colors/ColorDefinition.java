@@ -110,7 +110,7 @@ public class ColorDefinition {
 	}
 
 	public String getGraphPrefName() {
-		return ITourbookPreferences.GRAPH_COLORS + fPrefName + ".";
+		return ITourbookPreferences.GRAPH_COLORS + fPrefName + "."; //$NON-NLS-1$
 	}
 
 	public void setDefaultLineColor(RGB fDefaultLineColor) {

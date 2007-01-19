@@ -148,30 +148,30 @@ public class Chart extends ViewForm {
 
 		IAction action = createAction(
 				ACTION_MOVETO_PREVIOUS_PART,
-				"Previous Month",
-				"Scroll to the previous month",
-				new String[] { "arrow-left.gif", "arrow-left-disabled.gif" });
+				Messages.Chart_Action_previous_month,
+				Messages.Chart_Action_previous_month_tooltip,
+				new String[] { Messages.Chart_Image_arrow_left, Messages.Chart_Image_arrow_left_disabled });
 
 		action = createAction(
 				ACTION_MOVETO_NEXT_PART,
-				"Next Month",
-				"Scroll to the next month",
-				new String[] { "arrow-right.gif", "arrow-right-disabled.gif" });
+				Messages.Chart_Action_next_month,
+				Messages.Chart_Action_next_month_tooltip,
+				new String[] { Messages.Chart_Image_arrow_right, Messages.Chart_Image_arrow_right_disabled });
 
-		action = createAction(ACTION_ZOOM_IN, "Zoom in", "Zoom into the graphic", new String[] {
-				"zoom-in.gif",
-				"zoom-in-disabled.gif" });
+		action = createAction(ACTION_ZOOM_IN, Messages.Chart_Action_zoom_in, Messages.Chart_Action_zoom_in_tooltip, new String[] {
+				Messages.Chart_Image_zoom_in,
+				Messages.Chart_Image_zoom_in_disabled });
 		action.setEnabled(true);
 
-		action = createAction(ACTION_ZOOM_OUT, "Zoom out", "Zoom out of the graphic", new String[] {
-				"zoom-out.gif",
-				"zoom-out-disabled.gif" });
+		action = createAction(ACTION_ZOOM_OUT, Messages.Chart_Action_zoom_out, Messages.Chart_Action_zoom_out_tooltip, new String[] {
+				Messages.Chart_Image_zoom_out,
+				Messages.Chart_Image_zoom_out_disabled });
 
 		action = createAction(
 				ACTION_ZOOM_FIT_GRAPH,
-				"Fit to Graph",
-				"Fit graph to window",
-				new String[] { "zoom-fit-graph.gif", null });
+				Messages.Chart_Action_zoom_fit_to_graph,
+				Messages.Chart_Action_zoom_fit_to_graph_tooltip,
+				new String[] { Messages.Chart_Image_zoom_fit_to_graph, null });
 		action.setEnabled(true);
 
 		showActions(true);

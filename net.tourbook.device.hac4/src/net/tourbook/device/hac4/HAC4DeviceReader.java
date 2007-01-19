@@ -65,7 +65,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 		RandomAccessFile fileRawData = null;
 
 		byte[] buffer = new byte[5];
-		String recordType = "";
+		String recordType = ""; //$NON-NLS-1$
 
 		HAC4DeviceData hac4DeviceData = new HAC4DeviceData();
 
@@ -76,7 +76,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 		try {
 
-			fileRawData = new RandomAccessFile(fileName, "r");
+			fileRawData = new RandomAccessFile(fileName, "r"); //$NON-NLS-1$
 
 			// position file pointer to the device data
 			fileRawData.seek(645);
@@ -118,7 +118,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 				recordType = new String(buffer, 2, 2);
 
 				// make sure we read a AA record
-				if (!recordType.equalsIgnoreCase("AA")) {
+				if (!recordType.equalsIgnoreCase("AA")) { //$NON-NLS-1$
 					break;
 				}
 
@@ -196,7 +196,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 				/*
 				 * read all records of current tour
 				 */
-				while (!recordType.equalsIgnoreCase("CC")) {
+				while (!recordType.equalsIgnoreCase("CC")) { //$NON-NLS-1$
 
 					// if we reached EOF, position file pointer at the beginning
 					if (fileRawData.getFilePointer() == DataUtil.CICLO_CHECKSUM_POS) {
@@ -229,7 +229,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 					 * ends, so we will read only those time slices which
 					 * contains tour data
 					 */
-					if (recordType.equalsIgnoreCase("CC")) {
+					if (recordType.equalsIgnoreCase("CC")) { //$NON-NLS-1$
 
 						iDataMax = (marker / 20) + 1;
 
@@ -282,7 +282,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 						timeData.cadence = cadence;
 
 						// set time/marker
-						if (recordType.equalsIgnoreCase("BB")) {
+						if (recordType.equalsIgnoreCase("BB")) { //$NON-NLS-1$
 
 							// BB record
 
@@ -395,7 +395,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 				recordType = new String(buffer, 2, 2);
 
 				// make sure we read a DD record
-				if (!recordType.equalsIgnoreCase("DD")) {
+				if (!recordType.equalsIgnoreCase("DD")) { //$NON-NLS-1$
 					break;
 				}
 
@@ -511,13 +511,13 @@ public class HAC4DeviceReader extends TourbookDevice {
 		RandomAccessFile file = null;
 		try {
 
-			file = new RandomAccessFile(fileName, "r");
+			file = new RandomAccessFile(fileName, "r"); //$NON-NLS-1$
 
 			byte[] buffer = new byte[5];
 
 			// check header
 			file.read(buffer);
-			if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) {
+			if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
 				return false;
 			}
 
@@ -584,7 +584,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 			inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
 			inStream.read(buffer);
-			if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) {
+			if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
 				return false;
 			}
 
@@ -618,7 +618,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 	}
 
 	public String getDeviceModeName(int modeId) {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 }

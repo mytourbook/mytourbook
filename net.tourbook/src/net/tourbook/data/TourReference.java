@@ -37,7 +37,7 @@ public class TourReference {
 	private int			startIndex;
 	private int			endIndex;
 
-	private String		label	= "";
+	private String		label	= ""; //$NON-NLS-1$
 
 	public TourReference() {}
 

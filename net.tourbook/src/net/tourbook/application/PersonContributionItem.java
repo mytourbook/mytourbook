@@ -18,6 +18,7 @@ package net.tourbook.application;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -39,9 +40,9 @@ import org.eclipse.ui.IMemento;
 
 public class PersonContributionItem extends CustomControlContribution {
 
-	private static final String		ID			= "net.tourbook.clientselector";
+	private static final String		ID			= "net.tourbook.clientselector"; //$NON-NLS-1$
 
-	private static final String		ALL_PEOPLE	= "- All People -";
+	private static final String		ALL_PEOPLE	= Messages.Selection_People_item_all;
 
 	static TourbookPlugin			plugin		= TourbookPlugin.getDefault();
 
@@ -112,7 +113,7 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		fComboPeople = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboPeople.setVisibleItemCount(20);
-		fComboPeople.setToolTipText("Show tours for the select person");
+		fComboPeople.setToolTipText(Messages.Selection_People_tooltip);
 
 		fComboPeople.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
@@ -159,7 +160,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		
 		for (TourPerson person : fPeople) {
 			String lastName = person.getLastName();
-			lastName = lastName.equals("") ? "" : " " + lastName;
+			lastName = lastName.equals("") ? "" : " " + lastName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			fComboPeople.add(person.getFirstName() + lastName);
 		}
 	}

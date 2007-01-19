@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.views.rawData.RawDataView;
 
@@ -76,17 +77,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowStatusLine(true);
 		configurer.setShowProgressIndicator(true);
 
-		configurer.setTitle("MyTourbook");
+		configurer.setTitle(Messages.App_title);
 
 		PlatformUI.getPreferenceStore().putValue(
 				IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
-				"false");
+				"false"); //$NON-NLS-1$
 
 	}
 
 	public void postWindowOpen() {
 
-		String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON;
+		String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
 
 		try {
 			Connection conn = TourDatabase.getInstance().getConnection();
@@ -102,25 +103,26 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 				Shell activeShell = Display.getCurrent().getActiveShell();
 
-				MessageDialog.openInformation(
-						activeShell,
-						"MyTourbook Info",
-						"You have not yet created people, but at least one person is required to save the tours in the internal Database. "
-								+ "This is necessary because only saved tours will be used in the available tools "
-								+ "e.g. tourbook view, statistics or tour comparer.\n\n"
-								+ "People can be created in the following preference dialog with the »Add« button.");
+				MessageDialog
+						.openInformation(
+								activeShell,
+								Messages.App_Dlg_first_startup_title,
+								Messages.App_Dlg_first_startup_msg);
 
 				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(
 						activeShell,
-						"net.tourbook.preferences.PrefPageClients",
+						"net.tourbook.preferences.PrefPageClients", //$NON-NLS-1$
 						null,
 						null);
 
 				dialog.open();
-				
+
 				// open raw data view
 				try {
-					getWindowConfigurer().getWindow().getActivePage().showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+					getWindowConfigurer().getWindow().getActivePage().showView(
+							RawDataView.ID,
+							null,
+							IWorkbenchPage.VIEW_ACTIVATE);
 				} catch (PartInitException e) {
 					e.printStackTrace();
 				}

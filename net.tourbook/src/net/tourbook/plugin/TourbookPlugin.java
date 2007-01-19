@@ -31,10 +31,10 @@ import org.osgi.framework.BundleContext;
  */
 public class TourbookPlugin extends AbstractUIPlugin {
 
-	public static final String		PLUGIN_ID						= "net.tourbook";
+	public static final String		PLUGIN_ID						= "net.tourbook"; //$NON-NLS-1$
 
-	public static final String		EXT_POINT_STATISTIC_YEAR		= "statisticYear";
-	public static final String		EXT_POINT_DEVICE_DATA_READER	= "deviceDataReader";
+	public static final String		EXT_POINT_STATISTIC_YEAR		= "statisticYear"; //$NON-NLS-1$
+	public static final String		EXT_POINT_DEVICE_DATA_READER	= "deviceDataReader"; //$NON-NLS-1$
 
 	// The shared instance.
 	private static TourbookPlugin	plugin;
@@ -74,7 +74,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	 * @return the axisImage descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(TourbookPlugin.PLUGIN_ID, "icons/" + path);
+		return imageDescriptorFromPlugin(TourbookPlugin.PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		try {
 			if (resourceBundle == null)
 				resourceBundle = ResourceBundle
-						.getBundle("net.tourbook.data.TourbookPluginResources");
+						.getBundle("net.tourbook.data.TourbookPluginResources"); //$NON-NLS-1$
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}

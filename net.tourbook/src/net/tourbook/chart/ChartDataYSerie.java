@@ -40,7 +40,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	private int						fChartLayout			= ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE;
 
-	public static final String		YDATA_INFO				= "yDataInfo";
+	public static final String		YDATA_INFO				= "yDataInfo"; //$NON-NLS-1$
 
 	public static final int			FILL_METHOD_NOFILL		= 0;
 	public static final int			FILL_METHOD_FILL_BOTTOM	= 1;

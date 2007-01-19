@@ -74,22 +74,22 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		}
 
 		String pseudo[] = {
-				"0",
-				"1",
-				"2",
-				"3",
-				"4",
-				"5",
-				"6",
-				"7",
-				"8",
-				"9",
-				"A",
-				"B",
-				"C",
-				"D",
-				"E",
-				"F" };
+				"0", //$NON-NLS-1$
+				"1", //$NON-NLS-1$
+				"2", //$NON-NLS-1$
+				"3", //$NON-NLS-1$
+				"4", //$NON-NLS-1$
+				"5", //$NON-NLS-1$
+				"6", //$NON-NLS-1$
+				"7", //$NON-NLS-1$
+				"8", //$NON-NLS-1$
+				"9", //$NON-NLS-1$
+				"A", //$NON-NLS-1$
+				"B", //$NON-NLS-1$
+				"C", //$NON-NLS-1$
+				"D", //$NON-NLS-1$
+				"E", //$NON-NLS-1$
+				"F" }; //$NON-NLS-1$
 
 		StringBuffer out = new StringBuffer(in.length * 2 + in.length);
 
@@ -176,10 +176,10 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		file.read(recordBuffer);
 		file.seek(pos);
 
-		String address = "0000" + Integer.toHexString((int) pos);
+		String address = "0000" + Integer.toHexString((int) pos); //$NON-NLS-1$
 		address = address.substring(address.length() - 4);
 
-		System.out.println((address + ": ") + byteArrayToHexString(recordBuffer));
+		System.out.println((address + ": ") + byteArrayToHexString(recordBuffer)); //$NON-NLS-1$
 	}
 
 	public int getImportDataSize() {
@@ -206,7 +206,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 		try {
 			File fileRaw = new File(fileName);
-			file = new RandomAccessFile(fileRaw, "r");
+			file = new RandomAccessFile(fileRaw, "r"); //$NON-NLS-1$
 
 			long lastModified = fileRaw.lastModified();
 
@@ -628,7 +628,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 			inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
 			inStream.read(bufferHeader);
-			if (!"AFRO".equalsIgnoreCase(new String(bufferHeader, 0, 4))) {
+			if (!"AFRO".equalsIgnoreCase(new String(bufferHeader, 0, 4))) { //$NON-NLS-1$
 				return false;
 			}
 
@@ -674,25 +674,25 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 		switch (profileId) {
 		case 0:
-			return "Bike 1";
+			return Messages.HAC5_profile_bike1;
 
 		case 1:
-			return "Bike 2";
+			return Messages.HAC5_profile_bike2;
 
 		case 2:
-			return "RDS";
+			return Messages.HAC5_profile_rds;
 
 		case 3:
-			return "Alpine";
+			return Messages.HAC5_profile_alpine;
 
 		case 4:
-			return "Run";
+			return Messages.HAC5_profile_run;
 
 		default:
 			break;
 		}
 
-		return "";
+		return Messages.HAC5_profile_none;
 	}
 
 }

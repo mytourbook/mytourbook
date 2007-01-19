@@ -44,7 +44,7 @@ public class ChartUtil {
 										final float divisor,
 										boolean showSeconds) {
 
-		String valueText = "";
+		String valueText = ""; //$NON-NLS-1$
 
 		// format the unit label
 		switch (unitType) {
@@ -61,7 +61,7 @@ public class ChartUtil {
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
 			valueText = new Formatter().format(
-					"%d:%02d",
+					Messages.Chart_format_time_hhmm,
 					(long) (value / 3600),
 					(long) ((value % 3600) / 60)).toString();
 			break;
@@ -70,13 +70,13 @@ public class ChartUtil {
 
 			if (showSeconds) {
 				valueText = new Formatter().format(
-						"%d:%02d:%02d",
+						Messages.Chart_format_time_hhmmss,
 						(long) (value / 3600),
 						(long) ((value % 3600) / 60),
 						(long) ((value % 3600) % 60)).toString();
 			} else {
 				valueText = new Formatter().format(
-						"%d:%02d",
+						Messages.Chart_format_time_hhmm,
 						(long) (value / 3600),
 						(long) ((value % 3600) / 60)).toString();
 			}
@@ -112,9 +112,9 @@ public class ChartUtil {
 
 		float divValue = (float) value / divisor;
 
-		String format = "%1.";
+		String format = Messages.Chart_format_number_float;
 
-		format += (removeDecimalZero && (divValue % 1 == 0)) ? "0f" : Integer
+		format += (removeDecimalZero && (divValue % 1 == 0)) ? "0f" : Integer //$NON-NLS-1$
 				.toString(precision)
 				+ 'f';
 

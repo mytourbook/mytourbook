@@ -189,8 +189,8 @@ public class HAC4DeviceData {
 	 */
 	public HAC4DeviceData() {
 
-		deviceNames.put("B735", "HAC4");
-		deviceNames.put("B723", "CM414M");
+		deviceNames.put("B735", "HAC4"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceNames.put("B723", "CM414M"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 
@@ -301,38 +301,38 @@ public class HAC4DeviceData {
 
 		PrintStream out = System.out;
 
-		out.println("----------------------------------------------------");
-		out.println("DEVICE DATA");
-		out.println("----------------------------------------------------");
-		out.println("Transfer date:			" + transferDay + "." + transferMonth + "." + transferYear);
-		out.println("Device:				" + deviceType);
-		out.println("Wheel perimeter:		" + wheelPerimeter + " mm");
-		out.println("Person weight:			" + personWeight + " kg");
+		out.println("----------------------------------------------------"); //$NON-NLS-1$
+		out.println("DEVICE DATA"); //$NON-NLS-1$
+		out.println("----------------------------------------------------"); //$NON-NLS-1$
+		out.println("Transfer date:			" + transferDay + "." + transferMonth + "." + transferYear); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		out.println("Device:				" + deviceType); //$NON-NLS-1$
+		out.println("Wheel perimeter:		" + wheelPerimeter + " mm"); //$NON-NLS-1$ //$NON-NLS-2$
+		out.println("Person weight:			" + personWeight + " kg"); //$NON-NLS-1$ //$NON-NLS-2$
 		out.println();
-		out.println("Home altitude:			" + homeAltitude + " m");
-		out.println("Altitude error correction:	" + altitudeError);
-		out.println("Max Altitude:			" + maxAltitude + " m");
+		out.println("Home altitude:			" + homeAltitude + " m"); //$NON-NLS-1$ //$NON-NLS-2$
+		out.println("Altitude error correction:	" + altitudeError); //$NON-NLS-1$
+		out.println("Max Altitude:			" + maxAltitude + " m"); //$NON-NLS-1$ //$NON-NLS-2$
 		out.println();
-		out.println("Pulse 1 upper bound		" + pulse1UpperBound + " bpm");
-		out.println("Pulse 1 lower bound:		" + pulse1LowerBound + " bpm");
-		out.println("Pulse 2 upper bound:		" + pulse2UpperBound + " bpm");
-		out.println("Pulse 2 lower bound:		" + pulse2LowerBound + " bpm");
+		out.println("Pulse 1 upper bound		" + pulse1UpperBound + " bpm"); //$NON-NLS-1$ //$NON-NLS-2$
+		out.println("Pulse 1 lower bound:		" + pulse1LowerBound + " bpm"); //$NON-NLS-1$ //$NON-NLS-2$
+		out.println("Pulse 2 upper bound:		" + pulse2UpperBound + " bpm"); //$NON-NLS-1$ //$NON-NLS-2$
+		out.println("Pulse 2 lower bound:		" + pulse2LowerBound + " bpm"); //$NON-NLS-1$ //$NON-NLS-2$
 		out.println();
-		out.println("1. Count down:			" + count1min + ":" + count1sec);
-		out.println("2. Count down:			" + count2min + ":" + count2sec);
+		out.println("1. Count down:			" + count1min + ":" + count1sec); //$NON-NLS-1$ //$NON-NLS-2$
+		out.println("2. Count down:			" + count2min + ":" + count2sec); //$NON-NLS-1$ //$NON-NLS-2$
 		out.println();
-		out.println("Total distance:			" + ((totalDistanceHigh * (2 ^ 16)) + totalDistanceLow)
-				+ " km");
-		out.println("Total altitude up:		" + totalAltitudeUp + " m");
-		out.println("Total altitude down:		" + totalAltitudeDown + " m");
-		out.println("Total travel time: 		"
-				+ ((totalTravelTimeHourHigh * 100) + totalTravelTimeHourLow) + ":"
-				+ totalTravelTimeMin + ":" + totalTravelTimeSec);
+		out.println("Total distance:			" + ((totalDistanceHigh * (2 ^ 16)) + totalDistanceLow) //$NON-NLS-1$
+				+ " km"); //$NON-NLS-1$
+		out.println("Total altitude up:		" + totalAltitudeUp + " m"); //$NON-NLS-1$ //$NON-NLS-2$
+		out.println("Total altitude down:		" + totalAltitudeDown + " m"); //$NON-NLS-1$ //$NON-NLS-2$
+		out.println("Total travel time: 		" //$NON-NLS-1$
+				+ ((totalTravelTimeHourHigh * 100) + totalTravelTimeHourLow) + ":" //$NON-NLS-1$
+				+ totalTravelTimeMin + ":" + totalTravelTimeSec); //$NON-NLS-1$
 		out.println();
-		out.println("Offset last CC record:		" + offsetCCRecord);
-		out.println("Offset last DD record:		" + offsetDDRecord);
-		out.println("Offset next free memory:	" + offsetNextMemory);
-		out.println("Offset compare record:		" + offsetCompareRecord);
+		out.println("Offset last CC record:		" + offsetCCRecord); //$NON-NLS-1$
+		out.println("Offset last DD record:		" + offsetDDRecord); //$NON-NLS-1$
+		out.println("Offset next free memory:	" + offsetNextMemory); //$NON-NLS-1$
+		out.println("Offset compare record:		" + offsetCompareRecord); //$NON-NLS-1$
 
 	}
 

@@ -39,8 +39,8 @@ public class StatisticWeekTourTime extends StatisticWeek {
 				tourWeekData.fTimeLow,
 				tourWeekData.fTimeHigh
 				);
-		yData.setYTitle("Time");
-		yData.setUnitLabel("h");
+		yData.setYTitle(Messages.Statistic_unit_text_driving_time);
+		yData.setUnitLabel(Messages.Statistic_unit_label_time);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
 		yData.setMinValue(0);

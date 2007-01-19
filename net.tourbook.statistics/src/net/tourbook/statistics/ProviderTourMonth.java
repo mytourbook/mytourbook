@@ -71,18 +71,18 @@ public class ProviderTourMonth extends DataProvider {
 		fTourMonthData = new TourDataMonth();
 
 		String sqlString = //
-		"SELECT " //
-				+ "STARTMONTH				, "// 1
-				+ "SUM(TOURDISTANCE)		, "// 2
-				+ "SUM(TOURALTUP)			, "// 3
-				+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END)," // 4
-				+ "tourType_typeId 			\n"// 4
+		"SELECT " // //$NON-NLS-1$
+				+ "STARTMONTH				, "// 1 //$NON-NLS-1$
+				+ "SUM(TOURDISTANCE)		, "// 2 //$NON-NLS-1$
+				+ "SUM(TOURALTUP)			, "// 3 //$NON-NLS-1$
+				+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END)," // 4 //$NON-NLS-1$
+				+ "tourType_typeId 			\n"// 4 //$NON-NLS-1$
 				//
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
-				+ (" WHERE STARTYEAR=" + Integer.toString(year))
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE STARTYEAR=" + Integer.toString(year)) //$NON-NLS-1$
 				+ getSQLFilter(person, typeId)
-				+ (" GROUP BY STARTMONTH, tourType_typeId")
-				+ (" ORDER BY STARTMONTH");
+				+ (" GROUP BY STARTMONTH, tourType_typeId") //$NON-NLS-1$
+				+ (" ORDER BY STARTMONTH"); //$NON-NLS-1$
 
 		final int serieLength = tourTypes.length;
 		final int valueLength = fAllMonths.length;

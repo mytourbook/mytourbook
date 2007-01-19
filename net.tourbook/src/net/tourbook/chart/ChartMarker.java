@@ -22,8 +22,8 @@ package net.tourbook.chart;
 
 public class ChartMarker {
 
-	public String	graphLabel	= "";
-	public String	markerLabel	= "";
+	public String	graphLabel	= ""; //$NON-NLS-1$
+	public String	markerLabel	= ""; //$NON-NLS-1$
 
 	public int		graphX;
 

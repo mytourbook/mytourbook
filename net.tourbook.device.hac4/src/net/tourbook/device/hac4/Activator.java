@@ -24,7 +24,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "net.tourbook.device";
+	public static final String PLUGIN_ID = "net.tourbook.device.hac4"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;

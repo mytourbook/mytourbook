@@ -40,38 +40,38 @@ public interface IBikeDefinitions {
 	 */
 
 	public static String[]	bikeType	= new String[] {
-			"Hollandrad",
-			"Mountain Bike (MTB) ungefedert",
-			"Tandem mit Rennlenkern",
-			"Rennrad Obenlenker-Haltung",
-			"Rennrad Untenlenker-Haltung",
-			"Rennrad Triathlon",
-			"Rennrad Superman-Haltung (Stundenweltrekord)",
-			"Langliegerad mit Untenlenker Alltagsausstattung",
-			"Kurzliegerad mit Untenlenker Alltagsausstattung",
-			"Kurzliegerad mit Obenlenker Rennausstattung",
-			"Tiefliegerad mit Obenlenker Kreuzotter race",
-			"Tieflieger + Heckflosse Kreuzotter race",
-			"Tieflieger vollverschalt White Hawk (Stundenweltrekord)",
-			"Velomobil verschalt",
-			"Handbike 3 Räder, Kurbeln mit Kettenschaltung" };
+			"Hollandrad", //$NON-NLS-1$
+			"Mountain Bike (MTB) ungefedert", //$NON-NLS-1$
+			"Tandem mit Rennlenkern", //$NON-NLS-1$
+			"Rennrad Obenlenker-Haltung", //$NON-NLS-1$
+			"Rennrad Untenlenker-Haltung", //$NON-NLS-1$
+			"Rennrad Triathlon", //$NON-NLS-1$
+			"Rennrad Superman-Haltung (Stundenweltrekord)", //$NON-NLS-1$
+			"Langliegerad mit Untenlenker Alltagsausstattung", //$NON-NLS-1$
+			"Kurzliegerad mit Untenlenker Alltagsausstattung", //$NON-NLS-1$
+			"Kurzliegerad mit Obenlenker Rennausstattung", //$NON-NLS-1$
+			"Tiefliegerad mit Obenlenker Kreuzotter race", //$NON-NLS-1$
+			"Tieflieger + Heckflosse Kreuzotter race", //$NON-NLS-1$
+			"Tieflieger vollverschalt White Hawk (Stundenweltrekord)", //$NON-NLS-1$
+			"Velomobil verschalt", //$NON-NLS-1$
+			"Handbike 3 Räder, Kurbeln mit Kettenschaltung" }; //$NON-NLS-1$
 
 	public static String[]	bikeArr		= new String[] {
-			"roadster",
-			"mtb",
-			"tandem",
-			"racetops",
-			"racedrops",
-			"tria",
-			"superman",
-			"lwbuss",
-			"swbuss",
-			"swbass",
-			"ko4",
-			"ko4tailbox",
-			"whitehawk",
-			"questclosed",
-			"handtrike"				};
+			"roadster", //$NON-NLS-1$
+			"mtb", //$NON-NLS-1$
+			"tandem", //$NON-NLS-1$
+			"racetops", //$NON-NLS-1$
+			"racedrops", //$NON-NLS-1$
+			"tria", //$NON-NLS-1$
+			"superman", //$NON-NLS-1$
+			"lwbuss", //$NON-NLS-1$
+			"swbuss", //$NON-NLS-1$
+			"swbass", //$NON-NLS-1$
+			"ko4", //$NON-NLS-1$
+			"ko4tailbox", //$NON-NLS-1$
+			"whitehawk", //$NON-NLS-1$
+			"questclosed", //$NON-NLS-1$
+			"handtrike"				}; //$NON-NLS-1$
 
 	public static float[]	Cw			= new float[] {
 			0.9f,
@@ -227,12 +227,12 @@ public interface IBikeDefinitions {
 			1.04f						};
 
 	public static String[]	tyreType	= new String[] {
-			"schmaler Rennreifen",
-			"mittelbreiter Hochdruck-Slick",
-			"breiter Hochdruck-Slick",
-			"breiter Tourenreifen (Profil)",
-			"Rinkowski-Gürtelreifen (breit)",
-			"Stollenreifen 1.75'"		};
+			"schmaler Rennreifen", //$NON-NLS-1$
+			"mittelbreiter Hochdruck-Slick", //$NON-NLS-1$
+			"breiter Hochdruck-Slick", //$NON-NLS-1$
+			"breiter Tourenreifen (Profil)", //$NON-NLS-1$
+			"Rinkowski-Gürtelreifen (breit)", //$NON-NLS-1$
+			"Stollenreifen 1.75'"		}; //$NON-NLS-1$
 
 	public static float[]	Cr			= new float[] {
 			.006f,

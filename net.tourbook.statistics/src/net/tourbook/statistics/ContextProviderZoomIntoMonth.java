@@ -50,7 +50,7 @@ class ContextProviderZoomIntoMonth implements ChartContextProvider {
 	}
 
 	public void fillBarChartContextMenu(IMenuManager menuMgr) {
-		menuMgr.add(new ZoomMonth("Zoom into the Month"));
+		menuMgr.add(new ZoomMonth(Messages.Action_zoom_into_month));
 	}
 
 	public void fillXSliderContextMenu(	IMenuManager menuMgr,

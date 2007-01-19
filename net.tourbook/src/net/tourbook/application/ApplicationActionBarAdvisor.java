@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.Messages;
 import net.tourbook.dataImport.ActionDeviceImport;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.PositionedWizardDialog;
@@ -90,7 +91,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(ActionFactory.QUIT.create(window));
 
 		register(ActionFactory.ABOUT.create(window));
-		getAction(ActionFactory.ABOUT.getId()).setText("&About");
+		getAction(ActionFactory.ABOUT.getId()).setText(Messages.Action_About);
 
 		// register(ActionFactory.CLOSE.create(window));
 		// fActionSave = ActionFactory.SAVE.create(window);
@@ -99,46 +100,46 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		fActionRawDataView = new ActionOpenView(
 				window,
-				"Imported Tour Data",
-				"Show imported tours",
+				Messages.Action_openview_rawdata,
+				Messages.Action_openview_rawdata_tooltip,
 				RawDataView.ID,
 				ICommandIds.CMD_OPENVIEW_IMPORTEDDATA,
-				"device.gif");
+				Messages.Image_view_rawdata);
 
 		fActionTourBookView = new ActionOpenView(
 				window,
-				"Tour Overview",
-				"Show all tours by date",
+				Messages.Action_openview_tourbook,
+				Messages.Action_openview_tourbook_tooltip,
 				TourBookView.ID,
 				ICommandIds.CMD_OPENVIEW_TOURLIST,
-				"tour-list.gif");
+				Messages.Image_view_tourbool);
 
 		fActionTourMapView = new ActionOpenView(
 				window,
-				"Reference Tours",
-				"Show the reference tours",
+				Messages.Action_openview_tourmap,
+				Messages.Action_openview_tourmap_tooltip,
 				TourMapView.ID,
 				ICommandIds.CMD_OPENVIEW_TOURMAP,
-				"tourfinder-reference.gif");
+				Messages.Image_view_tourmap);
 
 		fActionTourCompareView = new ActionOpenView(
 				window,
-				"Tour Compare Result",
-				"Show the result for tours which are compared",
+				Messages.Action_openview_compare_result,
+				Messages.Action_openview_compare_result_tooltip,
 				CompareResultView.ID,
 				ICommandIds.CMD_OPENVIEW_TOURCOMPARER,
-				"tourfinder-compare.gif");
+				Messages.Image_view_compare_result);
 
 		fActionPreferences = ActionFactory.PREFERENCES.create(window);
-		fActionPreferences.setText("  Preferences");
+		fActionPreferences.setText(Messages.Action_open_preferences);
 
 		fActionTourCompareWizard = new Action() {
 
 			{
-				setText("Tour Compare Wizard");
-				setToolTipText("Tour Compare Wizard");
+				setText(Messages.Action_open_compare_wizard);
+				setToolTipText(Messages.Action_open_compare_wizard_tooltip);
 				setImageDescriptor(TourbookPlugin
-						.getImageDescriptor("tourfinder-compare-wizard.gif"));
+						.getImageDescriptor(Messages.Image_view_compare_wizard));
 			}
 
 			public void run() {
@@ -162,13 +163,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	protected void fillMenuBar(IMenuManager menuBar) {
 
-		MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
+		MenuManager fileMenu = new MenuManager(Messages.Action_file_menu, IWorkbenchActionConstants.M_FILE);
 		menuBar.add(fileMenu);
 
 		fileMenu.add(fActionImport);
 		fileMenu.add(fActionTourCompareWizard);
 
-		fileMenu.add(new Separator("update"));
+		fileMenu.add(new Separator("update")); //$NON-NLS-1$
 
 		fileMenu.add(new Separator());
 
@@ -179,7 +180,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		// fileMenu.add(fActionClose);
 		// fileMenu.add(new Separator());
 
-		MenuManager viewMenu = new MenuManager("&View", null);
+		MenuManager viewMenu = new MenuManager(Messages.Action_view_menu, null);
 		menuBar.add(viewMenu);
 		viewMenu.add(fActionRawDataView);
 		viewMenu.add(fActionTourBookView);
@@ -197,14 +198,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		IToolBarManager peopleToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 		peopleToolbar.add(personSelector);
 
-		coolBar.add(new ToolBarContributionItem(peopleToolbar, "people"));
+		coolBar.add(new ToolBarContributionItem(peopleToolbar, "people")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 
 		IToolBarManager tourTypeToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 		tourTypeToolbar.add(tourTypeSelector);
 
-		coolBar.add(new ToolBarContributionItem(tourTypeToolbar, "tourtype"));
+		coolBar.add(new ToolBarContributionItem(tourTypeToolbar, "tourtype")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 
@@ -212,7 +213,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		importToolbar.add(fActionImport);
 		importToolbar.add(fActionRawDataView);
 
-		coolBar.add(new ToolBarContributionItem(importToolbar, "import"));
+		coolBar.add(new ToolBarContributionItem(importToolbar, "import")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 
@@ -229,7 +230,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		openToolbar.add(new Separator());
 		openToolbar.add(fActionPreferences);
 
-		coolBar.add(new ToolBarContributionItem(openToolbar, "main"));
+		coolBar.add(new ToolBarContributionItem(openToolbar, "main")); //$NON-NLS-1$
 	}
 
 }

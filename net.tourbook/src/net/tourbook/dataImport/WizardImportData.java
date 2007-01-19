@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.Formatter;
 
+import net.tourbook.Messages;
 import net.tourbook.device.DeviceData;
 import net.tourbook.device.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
@@ -36,6 +37,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchPage;
@@ -44,7 +46,7 @@ import org.eclipse.ui.PlatformUI;
 
 public class WizardImportData extends Wizard {
 
-	public static final String			DIALOG_SETTINGS_SECTION	= "WizardImportData";
+	public static final String			DIALOG_SETTINGS_SECTION	= "WizardImportData";			//$NON-NLS-1$
 
 	private WizardPageImportSettings	fPageImportSettings;
 
@@ -62,7 +64,7 @@ public class WizardImportData extends Wizard {
 
 	public void addPages() {
 
-		fPageImportSettings = new WizardPageImportSettings("import-settings");
+		fPageImportSettings = new WizardPageImportSettings("import-settings"); //$NON-NLS-1$
 		addPage(fPageImportSettings);
 
 	}
@@ -97,10 +99,14 @@ public class WizardImportData extends Wizard {
 			getContainer().run(true, true, new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) {
 
-					monitor.beginTask("Receiving tours from "
-							+ fImportDevice.visibleName
-							+ " on port "
-							+ portName, fImportDevice.getImportDataSize());
+					// NLS.bind(Messages.key_two, "example usage");
+
+					String msg = NLS.bind(
+							Messages.ImportWizard_Monitor_task_msg,
+							fImportDevice.visibleName,
+							portName);
+
+					monitor.beginTask(msg, fImportDevice.getImportDataSize());
 
 					readDeviceData(monitor, portName);
 				}
@@ -181,8 +187,8 @@ public class WizardImportData extends Wizard {
 
 			MessageBox msgBox = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
 
-			msgBox.setMessage(MessageFormat.format(
-					"Data format is not valid for the device {0}",
+			msgBox.setMessage(NLS.bind(
+					Messages.ImportWizard_Error_invalid_data_format,
 					fImportDevice.visibleName));
 			msgBox.open();
 
@@ -197,11 +203,14 @@ public class WizardImportData extends Wizard {
 
 		// set filename to the transfer date
 		DeviceData deviceData = RawDataManager.getInstance().getDeviceData();
-		String fileName = new Formatter().format(
-				"%d-%02d-%02d." + fImportDevice.fileExtension,
-				deviceData.transferYear,
-				deviceData.transferMonth,
-				deviceData.transferDay).toString();
+		String fileName = new Formatter()
+				.format(
+						Messages.ImportWizard_Format_import_filename_yyyymmdd
+								+ fImportDevice.fileExtension,
+						deviceData.transferYear,
+						deviceData.transferMonth,
+						deviceData.transferDay)
+				.toString();
 
 		String importPathName = fPageImportSettings.fAutoSavePathEditor.getStringValue();
 
@@ -211,8 +220,13 @@ public class WizardImportData extends Wizard {
 
 		// check if file already exist, ask for overwriting the file
 		if (fileOut.exists()) {
+
 			MessageBox msgBox = new MessageBox(getShell(), SWT.ICON_WORKING | SWT.OK | SWT.CANCEL);
-			msgBox.setMessage(MessageFormat.format("Overwrite existing file {0} ?", fileName));
+
+			msgBox.setMessage(NLS.bind(
+					Messages.ImportWizard_Message_replace_existing_file,
+					fileName));
+
 			if (msgBox.open() != SWT.OK) {
 				return;
 			}
@@ -281,8 +295,10 @@ public class WizardImportData extends Wizard {
 		boolean isReceiving = false;
 		int importDataSize = fImportDevice.getImportDataSize();
 
-		// start thread which reads data from the com port 
-		Thread portThread = new Thread(new PortThread(this, portName), "Read data from Device");
+		// start thread which reads data from the com port
+		Thread portThread = new Thread(
+				new PortThread(this, portName),
+				Messages.ImportWizard_Thread_name_read_device_data);
 		portThread.start();
 
 		/*
@@ -324,11 +340,10 @@ public class WizardImportData extends Wizard {
 				monitor.worked(fRawDataBuffer.size() - iReceivedData);
 
 				// display the bytes which have been received
-				monitor.subTask(" - "
-						+ Integer.toString(iReceivedData * 100 / importDataSize)
-						+ "% - "
-						+ Integer.toString(iReceivedData)
-						+ " Bytes received");
+				monitor.subTask(NLS.bind(
+						Messages.ImportWizard_Monitor_task_received_bytes,
+						(Integer.toString(iReceivedData * 100 / importDataSize)),
+						(Integer.toString(iReceivedData))));
 			}
 
 			iTimeout++;

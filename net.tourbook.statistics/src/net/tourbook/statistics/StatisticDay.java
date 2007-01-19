@@ -45,9 +45,9 @@ import org.eclipse.ui.dialogs.ListDialog;
 
 public abstract class StatisticDay extends YearStatistic {
 
-	static final String		DISTANCE_DATA	= "distance";
-	static final String		ALTITUDE_DATA	= "altitude";
-	static final String		DURATION_DATA	= "duration";
+	static final String		DISTANCE_DATA	= "distance"; //$NON-NLS-1$
+	static final String		ALTITUDE_DATA	= "altitude"; //$NON-NLS-1$
+	static final String		DURATION_DATA	= "duration"; //$NON-NLS-1$
 
 	int						fCurrentYear;
 	private long			fActiveTypeId;
@@ -122,15 +122,15 @@ public abstract class StatisticDay extends YearStatistic {
 		final int month = fCalendar.get(Calendar.MONTH) + 1;
 		final int day = fCalendar.get(Calendar.DAY_OF_MONTH);
 
-		final String sqlString = "SELECT "
-				+ "TOURID,"
-				+ "STARTHOUR,"
-				+ "STARTMINUTE,"
-				+ "TOURDRIVINGTIME\n"
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
-				+ (" WHERE STARTYEAR=" + Integer.toString(fCurrentYear))
-				+ (" AND STARTMONTH=" + month)
-				+ (" AND STARTDAY=" + day);
+		final String sqlString = "SELECT " //$NON-NLS-1$
+				+ "TOURID," //$NON-NLS-1$
+				+ "STARTHOUR," //$NON-NLS-1$
+				+ "STARTMINUTE," //$NON-NLS-1$
+				+ "TOURDRIVINGTIME\n" //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE STARTYEAR=" + Integer.toString(fCurrentYear)) //$NON-NLS-1$
+				+ (" AND STARTMONTH=" + month) //$NON-NLS-1$
+				+ (" AND STARTDAY=" + day); //$NON-NLS-1$
 
 		try {
 			final Connection conn = TourDatabase.getInstance().getConnection();
@@ -147,7 +147,7 @@ public abstract class StatisticDay extends YearStatistic {
 				final int endTime = startTime + result.getInt(4);
 
 				final String tourTime = new Formatter().format(
-						"%d:%02d-%d:%02d",
+						Messages.Statistic_format_time_hhmm_hhmm,
 						startTime / 3600,
 						(startTime % 3600) / 60,
 						endTime / 3600,
@@ -196,8 +196,8 @@ public abstract class StatisticDay extends YearStatistic {
 					});
 
 					dialog.setInput(tourList);
-					dialog.setTitle("Select Tour");
-					dialog.setMessage("Select the tour which should be opened");
+					dialog.setTitle(Messages.Statistic_dlg_select_tour_title);
+					dialog.setMessage(Messages.Statistic_dlg_select_tour_msg);
 
 					if (dialog.open() == Window.OK) {
 						// get the selected tour

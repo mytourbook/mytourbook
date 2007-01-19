@@ -178,8 +178,8 @@ public class StatisticTourTime extends YearStatistic {
 				ChartDataModel.CHART_TYPE_BAR,
 				new int[][] { fTourTimeData.fTourTimeStartValues },
 				new int[][] { fTourTimeData.fTourTimeEndValues });
-		yData.setYTitle("Daytime");
-		yData.setUnitLabel("h");
+		yData.setYTitle(Messages.Statistic_unit_text_daytime);
+		yData.setUnitLabel(Messages.Statistic_unit_label_time);
 		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_24H);
 		yData.setYAxisDirection(false);
 

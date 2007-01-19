@@ -16,6 +16,7 @@
 
 package net.tourbook.dataImport;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.PositionedWizardDialog;
 
@@ -33,9 +34,9 @@ public class ActionDeviceImport extends Action {
 
 		fWindow = window;
 
-		setText("Import Tours");
-		setToolTipText("Import tours from the device");
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("device-synchronize.gif"));
+		setText(Messages.Action_import_rawdata);
+		setToolTipText(Messages.Action_import_rawdata_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_import_rawdata));
 	}
 
 	public void run() {

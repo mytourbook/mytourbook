@@ -169,7 +169,7 @@ public class ChartComponentAxis extends Canvas {
 				Color colorLine = new Color(Display.getCurrent(), yData.getRgbLine()[0]);
 				gc.setForeground(colorLine);
 
-				String yTitle = title + (unitText.equals("") ? "" : " - " + unitText);
+				String yTitle = title + (unitText.equals("") ? "" : " - " + unitText); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 				Point labelExtend = gc.textExtent(yTitle);
 

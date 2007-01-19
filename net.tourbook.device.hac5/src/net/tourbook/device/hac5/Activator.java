@@ -24,7 +24,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "net.tourbook.device.hac5";
+	public static final String PLUGIN_ID = "net.tourbook.device.hac5"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;

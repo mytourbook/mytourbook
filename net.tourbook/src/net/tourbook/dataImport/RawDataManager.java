@@ -21,6 +21,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.DeviceData;
@@ -28,6 +29,7 @@ import net.tourbook.device.DeviceManager;
 import net.tourbook.device.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
@@ -35,7 +37,7 @@ import org.eclipse.swt.widgets.MessageBox;
 
 public class RawDataManager {
 
-	public static final String		TEMP_RAW_DATA_FILE	= "temp-device-data.txt";
+	public static final String		TEMP_RAW_DATA_FILE	= "temp-device-data.txt";		//$NON-NLS-1$
 
 	private static RawDataManager	instance			= null;
 
@@ -111,7 +113,7 @@ public class RawDataManager {
 		ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 
 		// find the file extension in the filename
-		int dotPos = fileName.lastIndexOf(".");
+		int dotPos = fileName.lastIndexOf("."); //$NON-NLS-1$
 		if (dotPos == -1) {
 			return false;
 		}
@@ -186,13 +188,12 @@ public class RawDataManager {
 	}
 
 	private void showMsgBoxInvalidFormat(String fileName) {
-		{
-			MessageBox msgBox = new MessageBox(
-					Display.getCurrent().getActiveShell(),
-					SWT.ICON_ERROR | SWT.OK);
-			msgBox.setMessage("Data format in \"" + fileName + "\" is not valid");
-			msgBox.open();
-		}
+
+		MessageBox msgBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_ERROR
+				| SWT.OK);
+
+		msgBox.setMessage(NLS.bind(Messages.DataImport_Error_invalid_data_format, fileName));
+		msgBox.open();
 	}
 
 	/**
@@ -236,13 +237,13 @@ public class RawDataManager {
 
 				if (em != null) {
 
-					Query query = em.createQuery("SELECT TourData "
-							+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ")
-							+ (" WHERE tourId = :tourId"));
+					Query query = em.createQuery("SELECT TourData " //$NON-NLS-1$
+							+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ") //$NON-NLS-1$ //$NON-NLS-2$
+							+ (" WHERE tourId = :tourId")); //$NON-NLS-1$
 
 					for (TourData tourData : fTourData) {
 
-						query.setParameter("tourId", tourData.getTourId());
+						query.setParameter("tourId", tourData.getTourId()); //$NON-NLS-1$
 
 						List peopleList = query.getResultList();
 						if (peopleList.size() == 0) {

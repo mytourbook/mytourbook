@@ -162,6 +162,6 @@ public class TourPerson {
 	}
 
 	public String getName() {
-		return firstName + (lastName.equals("") ? "" : " " + lastName);
+		return firstName + (lastName.equals("") ? "" : " " + lastName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

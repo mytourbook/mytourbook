@@ -22,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -145,7 +146,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			switch (index) {
 			case COLUMN_IS_MODIFIED:
-				return fIsPersonModified ? "*" : "";
+				return fIsPersonModified ? "*" : ""; //$NON-NLS-1$ //$NON-NLS-2$
 
 			case COLUMN_FIRSTNAME:
 				return tourPerson.getFirstName();
@@ -172,7 +173,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			case COLUMN_WEIGHT:
 				return Float.toString(tourPerson.getWeight());
 			}
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 	}
 
@@ -245,7 +246,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	protected Control createContents(Composite parent) {
 
 		Label label = new Label(parent, SWT.WRAP);
-		label.setText("People:");
+		label.setText(Messages.Pref_People_Title);
 
 		// container
 		Composite container = new Composite(parent, SWT.NONE);
@@ -279,7 +280,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		 * field: bike
 		 */
 		lbl = new Label(fPersonDetailContainer, SWT.NONE);
-		lbl.setText("&Bike:");
+		lbl.setText(Messages.Pref_People_Label_bike);
 		fComboBike = new Combo(fPersonDetailContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboBike.setVisibleItemCount(10);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
@@ -334,7 +335,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void createFieldDevice() {
 
 		Label lbl = new Label(fPersonDetailContainer, SWT.NONE);
-		lbl.setText("&Device:");
+		lbl.setText(Messages.Pref_People_Label_device);
 
 		fComboDevice = new Combo(fPersonDetailContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboDevice.setVisibleItemCount(10);
@@ -389,7 +390,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void createFieldFirstName() {
 
 		Label lbl = new Label(fPersonDetailContainer, SWT.NONE);
-		lbl.setText("&First Name:");
+		lbl.setText(Messages.Pref_People_Label_first_name);
 
 		fTextFirstName = new Text(fPersonDetailContainer, SWT.BORDER);
 		GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
@@ -419,7 +420,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void createFieldHeight(int floatInputWidth) {
 		InputFieldFloat floatInput = new InputFieldFloat(
 				fPersonDetailContainer,
-				"&Height (m):",
+				Messages.Pref_People_Label_height,
 				floatInputWidth);
 
 		fTextHeight = floatInput.getTextField();
@@ -453,7 +454,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void createFieldLastName() {
 
 		Label lbl = new Label(fPersonDetailContainer, SWT.NONE);
-		lbl.setText("&Last Name:");
+		lbl.setText(Messages.Pref_People_Label_last_name);
 
 		fTextLastName = new Text(fPersonDetailContainer, SWT.BORDER);
 		GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
@@ -482,7 +483,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void createFieldWeight(int floatInputWidth) {
 		InputFieldFloat floatInput = new InputFieldFloat(
 				fPersonDetailContainer,
-				"&Weight (kg):",
+				Messages.Pref_People_Label_weight,
 				floatInputWidth);
 
 		fTextWeight = floatInput.getTextField();
@@ -544,23 +545,23 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		layouter.addColumnData(new ColumnWeightData(1, convertWidthInCharsToPixels(1), false));
 
 		tc = new TableColumn(table, SWT.NONE);
-		tc.setText("First");
+		tc.setText(Messages.Pref_People_Column_first_name);
 		layouter.addColumnData(new ColumnWeightData(5, convertWidthInCharsToPixels(5)));
 
 		tc = new TableColumn(table, SWT.NONE);
-		tc.setText("Last");
+		tc.setText(Messages.Pref_People_Column_last_name);
 		layouter.addColumnData(new ColumnWeightData(5, convertWidthInCharsToPixels(5)));
 
 		tc = new TableColumn(table, SWT.NONE);
-		tc.setText("Device");
+		tc.setText(Messages.Pref_People_Column_device);
 		layouter.addColumnData(new ColumnWeightData(3, convertWidthInCharsToPixels(3)));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("m");
+		tc.setText(Messages.Pref_People_Column_height);
 		layouter.addColumnData(new ColumnWeightData(3, convertWidthInCharsToPixels(3)));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("kg");
+		tc.setText(Messages.Pref_People_Column_weight);
 		layouter.addColumnData(new ColumnWeightData(3, convertWidthInCharsToPixels(3)));
 
 		fPeopleViewer = new TableViewer(table);
@@ -613,7 +614,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		// button: add
 		fButtonAdd = new Button(container, SWT.NONE);
-		fButtonAdd.setText("&Add...");
+		fButtonAdd.setText(Messages.Pref_People_Button_add_person);
 		setButtonLayoutData(fButtonAdd);
 		fButtonAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -648,7 +649,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		// person data group
 		Group groupPersonInfo = new Group(parent, SWT.NONE);
-		groupPersonInfo.setText("Person Data");
+		groupPersonInfo.setText(Messages.Pref_People_Group_person);
 		groupPersonInfo.setLayout(new GridLayout(1, false));
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
 		groupPersonInfo.setLayoutData(gd);
@@ -673,7 +674,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		 */
 		fRawDataPathEditor = new DirectoryFieldEditor(
 				ITourbookPreferences.DUMMY_FIELD,
-				"Tour Raw Data Path:",
+				Messages.Pref_People_Label_rawdata_path,
 				fPersonDetailContainer);
 		fRawDataPathEditor.setEmptyStringAllowed(true);
 
@@ -781,8 +782,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		fCurrentPerson = new TourPerson();
 
-		fCurrentPerson.setLastName("");
-		fCurrentPerson.setFirstName("");
+		fCurrentPerson.setLastName(""); //$NON-NLS-1$
+		fCurrentPerson.setFirstName(""); //$NON-NLS-1$
 		fCurrentPerson.setHeight(1.77f);
 		fCurrentPerson.setWeight(80f);
 
@@ -814,9 +815,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		MessageDialog dialog = new MessageDialog(
 				this.getShell(),
-				"Delete Person",
+				Messages.Pref_People_Dlg_del_person_title,
 				null,
-				"Are you sure to delete the person(s) and remove the person(s) from ALL related tours?",
+				Messages.Pref_People_Dlg_del_person_message,
 				MessageDialog.QUESTION,
 				buttons,
 				1);
@@ -895,9 +896,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		if (em != null) {
 
-			Query query = em.createQuery("SELECT TourData "
-					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ")
-					+ (" WHERE TourData.tourPerson.personId=" + person.getPersonId()));
+			Query query = em.createQuery("SELECT TourData " //$NON-NLS-1$
+					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ") //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" WHERE TourData.tourPerson.personId=" + person.getPersonId())); //$NON-NLS-1$
 
 			ArrayList<TourData> tourDataList = (ArrayList<TourData>) query.getResultList();
 
@@ -1041,10 +1042,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			isEnabled = false;
 			fCurrentPerson = null;
 
-			fTextFirstName.setText("");
-			fTextLastName.setText("");
-			fTextHeight.setText("");
-			fTextWeight.setText("");
+			fTextFirstName.setText(""); //$NON-NLS-1$
+			fTextLastName.setText(""); //$NON-NLS-1$
+			fTextHeight.setText(""); //$NON-NLS-1$
+			fTextWeight.setText(""); //$NON-NLS-1$
 
 			fComboDevice.select(0);
 			fComboBike.select(0);
@@ -1068,15 +1069,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		if (fCurrentPerson == null) {
 			isValid = true;
-		} else if (fTextFirstName.getText().trim().equals("")) {
-			setErrorMessage("Firstname is required");
+		} else if (fTextFirstName.getText().trim().equals("")) { //$NON-NLS-1$
+			setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
 
 			// } else if (fComboDevice.getSelectionIndex() <= 0) {
 			// setErrorMessage("A device is required");
 
-		} else if (!fRawDataPathEditor.getStringValue().trim().equals("")
+		} else if (!fRawDataPathEditor.getStringValue().trim().equals("") //$NON-NLS-1$
 				&& !fRawDataPathEditor.isValid()) {
-			setErrorMessage("Path is invalid");
+			setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
 
 		} else if (true) {
 			try {
@@ -1084,7 +1085,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				Float.parseFloat(fTextWeight.getText());
 				isValid = true;
 			} catch (NumberFormatException e) {
-				setErrorMessage("Invalid number");
+				setErrorMessage(Messages.Pref_People_Error_invalid_number);
 			}
 		}
 

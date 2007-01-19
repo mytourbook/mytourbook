@@ -22,6 +22,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import net.tourbook.Messages;
+
 @Entity
 public class TourMarker {
 
@@ -51,16 +53,16 @@ public class TourMarker {
 
 	@Transient
 	public static final String[]	visualPositionLabels					= new String[] {
-			"v: a     Vert:  above", // 0
-			"v: b     Vert:  below", // 1
-			"v: t     Vert:  chart top", // 2
-			"v: b     Vert:  chart bottom", // 3
-			"h: a-l   Horiz: above  - left", // 4
-			"h: a-c  Horiz: above  - centered", // 5
-			"h: a-r  Horiz: above  - right", // 6
-			"h: b-l   Horiz: below  - left", // 7
-			"h: b-c  Horiz: below  - centered", // 8
-			"h: b-r  Horiz: below  - right" // 9
+			Messages.TourMarker_Position_vertical_above, // 0
+			Messages.TourMarker_Position_vertical_below, // 1
+			Messages.TourMarker_Position_vertical_chart_top, // 2
+			Messages.TourMarker_Position_vertical_chart_bottom, // 3
+			Messages.TourMarker_Position_horizontal_above_left, // 4
+			Messages.TourMarker_Position_horizontal_above_centered, // 5
+			Messages.TourMarker_Position_horizontal_above_right, // 6
+			Messages.TourMarker_Position_horizontal_below_left, // 7
+			Messages.TourMarker_Position_horizontal_below_centered, // 8
+			Messages.TourMarker_Position_horizontal_below_right // 9
 																			};
 
 	@Id
@@ -91,8 +93,8 @@ public class TourMarker {
 	 */
 	private int						serieIndex;
 
-	private String					label									= "";
-	private String					category								= "";
+	private String					label									= ""; //$NON-NLS-1$
+	private String					category								= ""; //$NON-NLS-1$
 
 	public TourMarker() {}
 

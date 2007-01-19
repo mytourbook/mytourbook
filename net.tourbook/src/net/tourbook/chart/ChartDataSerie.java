@@ -240,7 +240,7 @@ public abstract class ChartDataSerie {
 	 *        The measurement to set.
 	 */
 	public void setUnitLabel(String unit) {
-		this.unitLabel = unit == null ? "" : unit;
+		this.unitLabel = unit == null ? "" : unit; //$NON-NLS-1$
 	}
 
 	public void setValueDivisor(int valueDivisor) {

@@ -33,7 +33,7 @@ public class GraphColor {
 	}
 
 	public String getColorId() {
-		return fParent.getPrefName() + "." + fPrefName;
+		return fParent.getPrefName() + "." + fPrefName; //$NON-NLS-1$
 	}
 
 	RGB getDefaultRGB() {

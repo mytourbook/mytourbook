@@ -17,6 +17,7 @@ package net.tourbook.device;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.core.runtime.CoreException;
@@ -27,7 +28,7 @@ import org.eclipse.core.runtime.Platform;
 
 public class DeviceManager {
 
-	public static final String					DEVICE_IS_NOT_SELECTED	= "<Not Selected>";
+	public static final String					DEVICE_IS_NOT_SELECTED	= Messages.DeviceManager_Selection_device_is_not_selected;
 
 	private static ArrayList<TourbookDevice>	fDeviceList;
 
@@ -56,19 +57,19 @@ public class DeviceManager {
 				for (IConfigurationElement configElement : extension
 						.getConfigurationElements()) {
 
-					if (configElement.getName().equalsIgnoreCase("device")) {
+					if (configElement.getName().equalsIgnoreCase("device")) { //$NON-NLS-1$
 
 						Object object;
 						try {
-							object = configElement.createExecutableExtension("class");
+							object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
 							if (object instanceof TourbookDevice) {
 
 								TourbookDevice device = (TourbookDevice) object;
 
-								device.deviceId = configElement.getAttribute("id");
-								device.visibleName = configElement.getAttribute("name");
+								device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
+								device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
 								device.fileExtension = configElement
-										.getAttribute("fileextension");
+										.getAttribute("fileextension"); //$NON-NLS-1$
 
 								fDeviceList.add(device);
 							}

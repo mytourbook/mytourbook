@@ -76,19 +76,19 @@ public class ProviderTourWeek extends DataProvider {
 		final int serieLength = tourTypes.length;
 		final int valueLength = fAllWeeks.length;
 
-		String sqlString = "SELECT " //
+		String sqlString = "SELECT " // //$NON-NLS-1$
 				//
-				+ "StartWeek			, "// 1
-				+ "SUM(TOURDISTANCE)	, "// 2
-				+ "SUM(TOURALTUP)		, "// 3
-				+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END)," // 4
-				+ "tourType_typeId 		\n"// 5
+				+ "StartWeek			, "// 1 //$NON-NLS-1$
+				+ "SUM(TOURDISTANCE)	, "// 2 //$NON-NLS-1$
+				+ "SUM(TOURALTUP)		, "// 3 //$NON-NLS-1$
+				+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END)," // 4 //$NON-NLS-1$
+				+ "tourType_typeId 		\n"// 5 //$NON-NLS-1$
 				//
-				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
-				+ ("WHERE StartYear =" + Integer.toString(year))
+				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("WHERE StartYear =" + Integer.toString(year)) //$NON-NLS-1$
 				+ getSQLFilter(person, typeId)
-				+ " GROUP BY StartWeek, tourType_typeId"
-				+ " ORDER BY StartWeek";
+				+ " GROUP BY StartWeek, tourType_typeId" //$NON-NLS-1$
+				+ " ORDER BY StartWeek"; //$NON-NLS-1$
 
 		try {
 

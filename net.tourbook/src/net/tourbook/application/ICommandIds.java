@@ -24,11 +24,11 @@ package net.tourbook.application;
  */
 public interface ICommandIds {
 
-	public static final String	CMD_OPENVIEW_IMPORTEDDATA	= "Tourbook.openViewImportedData";
-	public static final String	CMD_OPENVIEW_TOURLIST		= "Tourbook.openViewTourList";
-	public static final String	CMD_OPENVIEW_YEARMAP		= "Tourbook.openViewYearMap";
-	public static final String	CMD_OPENVIEW_TOURMAP		= "Tourbook.openViewTourMap";
-	public static final String	CMD_OPENVIEW_TOURCOMPARER	= "Tourbook.openViewTourCompare";
-	public static final String	CMD_OPENVIEW_TOURFINDER		= "Tourbook.openViewTourviewer";
+	public static final String	CMD_OPENVIEW_IMPORTEDDATA	= "Tourbook.openViewImportedData"; //$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURLIST		= "Tourbook.openViewTourList"; //$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_YEARMAP		= "Tourbook.openViewYearMap"; //$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURMAP		= "Tourbook.openViewTourMap"; //$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURCOMPARER	= "Tourbook.openViewTourCompare"; //$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURFINDER		= "Tourbook.openViewTourviewer"; //$NON-NLS-1$
 
 }

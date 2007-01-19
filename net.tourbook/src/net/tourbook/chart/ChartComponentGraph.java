@@ -340,10 +340,10 @@ public class ChartComponentGraph extends Canvas {
 		cursorResizeTopDown = new Cursor(getDisplay(), SWT.CURSOR_SIZENS);
 		cursorMoveXMarker = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
 
-		cursorHand05x = createCursorFromImage("cursor-hand-05x.gif");
-		cursorHand = createCursorFromImage("cursor-hand.gif");
-		cursorHand2x = createCursorFromImage("cursor-hand-2x.gif");
-		cursorHand5x = createCursorFromImage("cursor-hand-5x.gif");
+		cursorHand05x = createCursorFromImage(Messages.Chart_image_cursor_hand_05x);
+		cursorHand = createCursorFromImage(Messages.Chart_image_cursor_hand_10x);
+		cursorHand2x = createCursorFromImage(Messages.Chart_image_cursor_hand_20x);
+		cursorHand5x = createCursorFromImage(Messages.Chart_image_cursor_hand_50x);
 
 		gridColor = new Color(getDisplay(), gridRGB);
 
@@ -2404,7 +2404,7 @@ public class ChartComponentGraph extends Canvas {
 						.getValueDivisor(), true));
 				labelText.append(' ');
 				labelText.append(yData.getUnitLabel());
-				labelText.append("  ");
+				labelText.append("  "); //$NON-NLS-1$
 				final String label = labelText.toString();
 
 				final Point labelExtend = gc.stringExtent(label);

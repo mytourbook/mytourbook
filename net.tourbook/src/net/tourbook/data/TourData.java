@@ -34,6 +34,7 @@ import javax.persistence.PostLoad;
 import javax.persistence.PostUpdate;
 import javax.persistence.Transient;
 
+import net.tourbook.Messages;
 import net.tourbook.tour.TourManager;
 
 import org.hibernate.annotations.Cascade;
@@ -176,15 +177,15 @@ public class TourData {
 	@Basic(optional = false)
 	private SerieData			serieData;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourMarker>		tourMarkers		= new HashSet<TourMarker>();
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourReference>	tourReferences	= new HashSet<TourReference>();
 
-	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)
+	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
 	private Set<TourCategory>	tourCategory	= new HashSet<TourCategory>();
 
 	/**
@@ -419,7 +420,7 @@ public class TourData {
 
 					// create a new marker
 					TourMarker tourMarker = new TourMarker(this, TourMarker.MARKER_TYPE_DEVICE);
-					tourMarker.setLabel("<Device Marker>");
+					tourMarker.setLabel(Messages.TourData_Label_device_marker);
 					tourMarker.setVisualPosition(TourMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					tourMarker.setTime(timeAbsolute + timeItem.marker);
 					tourMarker.setDistance(distanceAbsolute);
@@ -591,54 +592,54 @@ public class TourData {
 
 		PrintStream out = System.out;
 
-		out.println("----------------------------------------------------");
-		out.println("TOUR DATA");
-		out.println("----------------------------------------------------");
-		out.println("Typ:			" + getDeviceTourType());
-		out.println("Date:			" + getStartDay() + "." + getStartMonth() + "." + getStartYear());
-		out.println("Time:			" + getStartHour() + ":" + getStartMinute());
-		out.println("Total distance:		" + getStartDistance());
+		out.println("----------------------------------------------------"); //$NON-NLS-1$
+		out.println("TOUR DATA"); //$NON-NLS-1$
+		out.println("----------------------------------------------------"); //$NON-NLS-1$
+		out.println("Typ:			" + getDeviceTourType()); //$NON-NLS-1$
+		out.println("Date:			" + getStartDay() + "." + getStartMonth() + "." + getStartYear()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		out.println("Time:			" + getStartHour() + ":" + getStartMinute()); //$NON-NLS-1$ //$NON-NLS-2$
+		out.println("Total distance:		" + getStartDistance()); //$NON-NLS-1$
 		// out.println("Distance: " + getDistance());
-		out.println("Altitude:		" + getStartAltitude());
-		out.println("Pulse:			" + getStartPulse());
-		out.println("Offset DD record:	" + offsetDDRecord);
+		out.println("Altitude:		" + getStartAltitude()); //$NON-NLS-1$
+		out.println("Pulse:			" + getStartPulse()); //$NON-NLS-1$
+		out.println("Offset DD record:	" + offsetDDRecord); //$NON-NLS-1$
 	}
 
 	public void dumpTourTotal() {
 
 		PrintStream out = System.out;
 
-		out.println("Tour distance (m):	" + getTourDistance());
+		out.println("Tour distance (m):	" + getTourDistance()); //$NON-NLS-1$
 
-		out.println("Tour time:		"
+		out.println("Tour time:		" //$NON-NLS-1$
 				+ (getTourRecordingTime() / 3600)
-				+ ":"
+				+ ":" //$NON-NLS-1$
 				+ ((getTourRecordingTime() % 3600) / 60)
-				+ ":"
+				+ ":" //$NON-NLS-1$
 				+ (getTourRecordingTime() % 3600)
 				% 60);
 
-		out.println("Driving time:		"
+		out.println("Driving time:		" //$NON-NLS-1$
 				+ (getTourDrivingTime() / 3600)
-				+ ":"
+				+ ":" //$NON-NLS-1$
 				+ ((getTourDrivingTime() % 3600) / 60)
-				+ ":"
+				+ ":" //$NON-NLS-1$
 				+ (getTourDrivingTime() % 3600)
 				% 60);
 
-		out.println("Altitude up (m):	" + getTourAltUp());
-		out.println("Altitude down (m):	" + getTourAltDown());
+		out.println("Altitude up (m):	" + getTourAltUp()); //$NON-NLS-1$
+		out.println("Altitude down (m):	" + getTourAltDown()); //$NON-NLS-1$
 	}
 
 	public void dumpTime() {
 		PrintStream out = System.out;
 
 		out.print((getTourRecordingTime() / 3600)
-				+ ":"
+				+ ":" //$NON-NLS-1$
 				+ ((getTourRecordingTime() % 3600) / 60)
-				+ ":"
+				+ ":" //$NON-NLS-1$
 				+ ((getTourRecordingTime() % 3600) % 60)
-				+ "  ");
+				+ "  "); //$NON-NLS-1$
 		out.print(getTourDistance());
 	}
 
