@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import net.tourbook.Messages;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColor;
 import net.tourbook.colors.GraphColors;
@@ -173,7 +174,7 @@ public class PrefPageChartColors extends PreferencePage implements
 		TreeColumn tc;
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText("Color");
+		tc.setText(Messages.Pref_ChartColors_Column_color);
 		// tc.setWidth(convertHorizontalDLUsToPixels(100));
 		treeLayouter.addColumnData(new ColumnWeightData(3, true));
 
@@ -284,7 +285,7 @@ public class PrefPageChartColors extends PreferencePage implements
 		// container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
 		Label label = new Label(container, SWT.WRAP);
-		label.setText("Chart graph color:");
+		label.setText(Messages.Pref_ChartColors_Label_title);
 		GridData gd = new GridData();
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
@@ -428,7 +429,7 @@ public class PrefPageChartColors extends PreferencePage implements
 
 			String prefGraphName = ITourbookPreferences.GRAPH_COLORS
 					+ graphDefinition.getPrefName()
-					+ ".";
+					+ "."; //$NON-NLS-1$
 
 			PreferenceConverter.setValue(prefStore, prefGraphName
 					+ GraphColors.PREF_COLOR_BRIGHT, graphDefinition

@@ -24,12 +24,12 @@ import net.tourbook.tour.TreeViewerItem;
 
 public abstract class TourBookTreeViewerItem extends TreeViewerItem implements ITourItem {
 
-	static final String	SQL_SUM_COLUMNS	= "SUM(TOURDISTANCE), "
-												+ "SUM(TOURRECORDINGTIME), "
-												+ "SUM(TOURDRIVINGTIME), "
-												+ "SUM(TOURALTUP), "
-												+ "SUM(TOURALTDOWN),"
-												+ "SUM(1)";
+	static final String	SQL_SUM_COLUMNS	= "SUM(TOURDISTANCE), " //$NON-NLS-1$
+												+ "SUM(TOURRECORDINGTIME), " //$NON-NLS-1$
+												+ "SUM(TOURDRIVINGTIME), " //$NON-NLS-1$
+												+ "SUM(TOURALTUP), " //$NON-NLS-1$
+												+ "SUM(TOURALTDOWN)," //$NON-NLS-1$
+												+ "SUM(1)"; //$NON-NLS-1$
 
 	TourBookView		fView;
 
@@ -94,7 +94,7 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 			// select all people
 		} else {
 			// select only one person
-			sqlString.append(" AND tourPerson_personId = " + Long.toString(personId));
+			sqlString.append(" AND tourPerson_personId = " + Long.toString(personId)); //$NON-NLS-1$
 		}
 		return sqlString.toString();
 	}
@@ -111,10 +111,10 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 			// select all tour types
 		} else {
 			// select only one tour type
-			sqlString.append(" AND tourType_typeId "
+			sqlString.append(" AND tourType_typeId " //$NON-NLS-1$
 					+ (tourTypeId == TourType.TOUR_TYPE_ID_NOT_DEFINED
-							? "is null"
-							: ("=" + Long.toString(tourTypeId))));
+							? "is null" //$NON-NLS-1$
+							: ("=" + Long.toString(tourTypeId)))); //$NON-NLS-1$
 		}
 		return sqlString.toString();
 	}

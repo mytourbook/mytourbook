@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.EventObject;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -45,8 +46,8 @@ import org.eclipse.ui.IMemento;
 
 public class Tour extends ViewForm {
 
-	private static final String					MEMENTO_TOUR_SASH_TOURINFO		= "tour.sash.tourInfo";
-	private static final String					MEMENTO_TOUR_TOURINFO_ISVISIBLE	= "tour.tourInfo.visible";
+	private static final String					MEMENTO_TOUR_SASH_TOURINFO		= "tour.sash.tourInfo"; //$NON-NLS-1$
+	private static final String					MEMENTO_TOUR_TOURINFO_ISVISIBLE	= "tour.tourInfo.visible"; //$NON-NLS-1$
 
 	private SashForm							fTourSash;
 	private ToolBarManager						fToolbarMgr;
@@ -173,7 +174,7 @@ public class Tour extends ViewForm {
 		tourInfoContainer.setLayout(gridLayout);
 
 		Label tourInfo = new Label(tourInfoContainer, SWT.NONE);
-		tourInfo.setText("Tour Type:");
+		tourInfo.setText(Messages.Tour_Label_tour_type);
 
 		fComboTourType = new Combo(tourInfoContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboTourType.setVisibleItemCount(10);

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Formatter;
 
+import net.tourbook.Messages;
 import net.tourbook.dataImport.RawDataManager;
 import net.tourbook.device.DeviceData;
 import net.tourbook.plugin.TourbookPlugin;
@@ -53,9 +54,9 @@ public class ActionSaveRawData extends Action {
 
 		this.rawDataView = viewPart;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("floppy_disc.gif"));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("floppy_disc_dis.gif"));
-		setToolTipText("Save tour data to disk");
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.RawData_Image_save_raw_data_to_file));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.RawData_Image_save_raw_data_to_file_disabled));
+		setToolTipText(Messages.RawData_Action_save_raw_data_to_file_tooltip);
 		setEnabled(false);
 	}
 
@@ -78,7 +79,7 @@ public class ActionSaveRawData extends Action {
 
 		// set default filename to the transfer date
 		dialog.setFileName(new Formatter().format(
-				"%d-%02d-%02d." + rawDataManager.getDevice().fileExtension,
+				Messages.RawData_Format_rawdata_file_yyyy_mm_dd + rawDataManager.getDevice().fileExtension,
 				deviceData.transferYear,
 				deviceData.transferMonth,
 				deviceData.transferDay).toString());
@@ -95,7 +96,7 @@ public class ActionSaveRawData extends Action {
 		File fileOut = new File(fileName);
 		if (fileOut.exists()) {
 			MessageBox msgBox = new MessageBox(shell, SWT.ICON_WORKING | SWT.OK | SWT.CANCEL);
-			msgBox.setMessage(MessageFormat.format("Overwrite existing file {0} ?", fileName));
+			msgBox.setMessage(MessageFormat.format(Messages.RawData_Label_confirm_overwrite, fileName));
 			if (msgBox.open() != SWT.OK) {
 				return;
 			}

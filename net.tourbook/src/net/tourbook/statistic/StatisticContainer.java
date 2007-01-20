@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -47,7 +48,7 @@ import org.eclipse.ui.part.PageBook;
 
 public class StatisticContainer extends Composite {
 
-	private static final String				MEMENTO_SELECTED_YEAR_STATISTIC	= "tourbookview.selected.yearstatistic";
+	private static final String				MEMENTO_SELECTED_YEAR_STATISTIC	= "tourbookview.selected.yearstatistic"; //$NON-NLS-1$
 
 	private static final int				SELECTION_TYPE_MONTH			= 1;
 	private static final int				SELECTION_TYPE_DAY				= 2;
@@ -155,7 +156,7 @@ public class StatisticContainer extends Composite {
 		fComboYear = new Combo(fStatContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboYear.setVisibleItemCount(10);
 		fComboYear.setLayoutData(new GridData());
-		fComboYear.setToolTipText("Year for the statistic");
+		fComboYear.setToolTipText(Messages.Statistic_Tooltip_year_combo);
 		fComboYear.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 
@@ -170,7 +171,7 @@ public class StatisticContainer extends Composite {
 		// combo: statistics
 		fComboStatistics = new Combo(fStatContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboStatistics.setVisibleItemCount(20);
-		fComboStatistics.setToolTipText("Tour statistic");
+		fComboStatistics.setToolTipText(Messages.Statistic_Tooltip_statistic_combo);
 		fComboStatistics.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 
@@ -291,18 +292,18 @@ public class StatisticContainer extends Composite {
 
 				for (IConfigurationElement configElement : extension.getConfigurationElements()) {
 
-					if (configElement.getName().equalsIgnoreCase("statistic")) {
+					if (configElement.getName().equalsIgnoreCase("statistic")) { //$NON-NLS-1$
 
 						Object object;
 						try {
-							object = configElement.createExecutableExtension("class");
+							object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
 							if (object instanceof TourbookStatistic) {
 
 								TourbookStatistic yearStatistic = (TourbookStatistic) object;
 
-								yearStatistic.fVisibleName = configElement.getAttribute("name");
+								yearStatistic.fVisibleName = configElement.getAttribute("name"); //$NON-NLS-1$
 
-								yearStatistic.fStatisticId = configElement.getAttribute("id");
+								yearStatistic.fStatisticId = configElement.getAttribute("id"); //$NON-NLS-1$
 
 								fStatistics.add(yearStatistic);
 							}
@@ -365,10 +366,10 @@ public class StatisticContainer extends Composite {
 	 */
 	private void refreshYearCombobox() {
 
-		String sqlString = "SELECT STARTYEAR \n"
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
-				+ (" WHERE 1=1 " + getSQLFilter(fActivePerson, fActiveTypeId))
-				+ (" GROUP BY STARTYEAR ORDER BY STARTYEAR");
+		String sqlString = "SELECT STARTYEAR \n" //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE 1=1 " + getSQLFilter(fActivePerson, fActiveTypeId)) //$NON-NLS-1$
+				+ (" GROUP BY STARTYEAR ORDER BY STARTYEAR"); //$NON-NLS-1$
 
 		fTourYears = new ArrayList<Integer>();
 
@@ -395,14 +396,14 @@ public class StatisticContainer extends Composite {
 
 	private String getSQLFilter(TourPerson person, long typeId) {
 
-		String sqlPerson = person == null ? "" : " AND tourPerson_personId = "
+		String sqlPerson = person == null ? "" : " AND tourPerson_personId = " //$NON-NLS-1$ //$NON-NLS-2$
 				+ Long.toString(person.getPersonId());
 
 		String sqlType = typeId == TourType.TOUR_TYPE_ID_ALL
-				? ""
+				? "" //$NON-NLS-1$
 				: typeId == TourType.TOUR_TYPE_ID_NOT_DEFINED
-						? " AND tourType_typeId is null"
-						: " AND tourType_typeId =" + Long.toString(typeId);
+						? " AND tourType_typeId is null" //$NON-NLS-1$
+						: " AND tourType_typeId =" + Long.toString(typeId); //$NON-NLS-1$
 
 		return sqlPerson + sqlType;
 	}

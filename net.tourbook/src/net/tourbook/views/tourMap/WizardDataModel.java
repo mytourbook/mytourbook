@@ -48,8 +48,8 @@ public class WizardDataModel {
 
 		int childType = 0;
 
-		String sumColumns = "SUM(TOURDISTANCE), SUM(TOURALTUP), SUM(TOURRECORDINGTIME)";
-		String sqlString = "";
+		String sumColumns = "SUM(TOURDISTANCE), SUM(TOURALTUP), SUM(TOURRECORDINGTIME)"; //$NON-NLS-1$
+		String sqlString = ""; //$NON-NLS-1$
 
 		switch (parentItem.getItemType()) {
 
@@ -57,10 +57,10 @@ public class WizardDataModel {
 
 			childType = TourMapTourItem.ITEM_TYPE_YEAR;
 
-			sqlString = ("SELECT STARTYEAR, " + sumColumns + " \n")
-					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
-					+ "GROUP BY STARTYEAR"
-					+ " ORDER BY STARTYEAR";
+			sqlString = ("SELECT STARTYEAR, " + sumColumns + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+					+ "GROUP BY STARTYEAR" //$NON-NLS-1$
+					+ " ORDER BY STARTYEAR"; //$NON-NLS-1$
 
 			break;
 
@@ -68,23 +68,23 @@ public class WizardDataModel {
 
 			childType = TourMapTourItem.ITEM_TYPE_MONTH;
 
-			sqlString = ("SELECT STARTMONTH, " + sumColumns + " \n")
-					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
-					+ ("WHERE STARTYEAR=" + parentItem.getDateValue())
-					+ " GROUP BY STARTMONTH"
-					+ " ORDER BY STARTMONTH";
+			sqlString = ("SELECT STARTMONTH, " + sumColumns + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("WHERE STARTYEAR=" + parentItem.getDateValue()) //$NON-NLS-1$
+					+ " GROUP BY STARTMONTH" //$NON-NLS-1$
+					+ " ORDER BY STARTMONTH"; //$NON-NLS-1$
 			break;
 
 		case TourMapTourItem.ITEM_TYPE_MONTH:
 
 			childType = TourMapTourItem.ITEM_TYPE_TOUR;
 
-			sqlString = ("SELECT STARTDAY, TOURDISTANCE, TOURALTUP, TOURRECORDINGTIME, tourID \n")
-					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
-					+ ("WHERE STARTMONTH = "
+			sqlString = ("SELECT STARTDAY, TOURDISTANCE, TOURALTUP, TOURRECORDINGTIME, tourID \n") //$NON-NLS-1$
+					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("WHERE STARTMONTH = " //$NON-NLS-1$
 							+ parentItem.getDateValue()
-							+ " AND STARTYEAR = " + parentItem.getParent().getDateValue())
-					+ " ORDER BY STARTDAY";
+							+ " AND STARTYEAR = " + parentItem.getParent().getDateValue()) //$NON-NLS-1$
+					+ " ORDER BY STARTDAY"; //$NON-NLS-1$
 
 			break;
 

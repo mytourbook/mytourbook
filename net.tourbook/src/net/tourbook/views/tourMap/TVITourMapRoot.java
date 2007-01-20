@@ -34,10 +34,10 @@ public class TVITourMapRoot extends TreeViewerItem {
 		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		String sqlString = "SELECT label, refId, "
-				+ (TourDatabase.TABLE_TOUR_DATA + "_tourId	\n")
-				+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " \n")
-				+ " ORDER BY label";
+		String sqlString = "SELECT label, refId, " //$NON-NLS-1$
+				+ (TourDatabase.TABLE_TOUR_DATA + "_tourId	\n") //$NON-NLS-1$
+				+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ " ORDER BY label"; //$NON-NLS-1$
 
 		try {
 

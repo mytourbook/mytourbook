@@ -67,7 +67,7 @@ public class ActionOpenView extends Action {
 				window.getActivePage().showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
 			}
 			catch (PartInitException e) {
-				MessageDialog.openError(window.getShell(), "Error", "Error opening view:"
+				MessageDialog.openError(window.getShell(), "Error", "Error opening view:" //$NON-NLS-1$ //$NON-NLS-2$
 						+ e.getMessage());
 			}
 		}

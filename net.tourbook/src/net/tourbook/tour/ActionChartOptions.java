@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -37,7 +38,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 	class ActionStartTimeOption extends Action {
 
 		public ActionStartTimeOption() {
-			super("Show Starttime on X-Axis", AS_CHECK_BOX);
+			super(Messages.Tour_Action_show_start_time_on_x_axis, AS_CHECK_BOX);
 		}
 
 		public void run() {
@@ -49,7 +50,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 	class ActionCanScrollZoomedChart extends Action {
 
 		public ActionCanScrollZoomedChart() {
-			super("Zoomed Chart can be scrolled", AS_CHECK_BOX);
+			super(Messages.Tour_Action_scroll_zoomed_chart, AS_CHECK_BOX);
 		}
 
 		public void run() {
@@ -70,7 +71,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 	class ActionCanAutoZoomToSlider extends Action {
 
 		public ActionCanAutoZoomToSlider() {
-			super("Auto-Zoom to Slider Position", AS_CHECK_BOX);
+			super(Messages.Tour_Action_auto_zoom_to_slider_position, AS_CHECK_BOX);
 		}
 
 		public void run() {
@@ -92,8 +93,8 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 		this.tourChart = tourChart;
 
-		setToolTipText("Chart Options");
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("options.gif"));
+		setToolTipText(Messages.Tour_Action_chart_options_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Image_chart_options));
 
 		actionStartTimeOption = new ActionStartTimeOption();
 		actionCanScrollZoomedChart = new ActionCanScrollZoomedChart();

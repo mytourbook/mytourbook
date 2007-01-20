@@ -22,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
+import net.tourbook.Messages;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColor;
 import net.tourbook.colors.GraphColors;
@@ -52,6 +53,7 @@ import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -148,8 +150,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	protected Control createContents(Composite parent) {
 
 		Label label = new Label(parent, SWT.WRAP);
-		label.setText("Tour type defines the type for a tour, "
-				+ "e.g. Mountain Bike Tour, Inline Scate Tour.");
+		label.setText(Messages.Pref_TourTypes_Title);
 		label.setLayoutData(new GridData(SWT.NONE, SWT.NONE, true, false));
 
 		// container
@@ -173,7 +174,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 				TourTypeColorDefinition colorDefinition = new TourTypeColorDefinition(
 						tourType,
-						"tourtype." + tourType.getTypeId(),
+						"tourtype." + tourType.getTypeId(), //$NON-NLS-1$
 						tourType.getName(),
 						tourType.getRGBBright(),
 						tourType.getRGBDark(),
@@ -255,7 +256,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		TreeColumn tc;
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText("Color");
+		tc.setText(Messages.Pref_TourTypes_Column_Color);
 		treeLayouter.addColumnData(new ColumnWeightData(3, true));
 
 		tc = new TreeColumn(tree, SWT.NONE);
@@ -332,7 +333,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	private Combo createImportCombo(Composite container) {
 
 		Label label = new Label(container, SWT.NONE);
-		label.setText("&Default Tour Type for imported Tours:");
+		label.setText("&Default Tour Type for imported Tours:"); //$NON-NLS-1$
 		GridData gd = new GridData();
 		gd.verticalIndent = 5;
 		// gd.horizontalSpan = 2;
@@ -369,7 +370,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		// button: add
 		fButtonAdd = new Button(container, SWT.NONE);
-		fButtonAdd.setText("&Add...");
+		fButtonAdd.setText(Messages.Pref_TourTypes_Button_add);
 		setButtonLayoutData(fButtonAdd);
 		fButtonAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -380,7 +381,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		// button: rename
 		fButtonRename = new Button(container, SWT.NONE);
-		fButtonRename.setText("Re&name");
+		fButtonRename.setText(Messages.Pref_TourTypes_Button_rename);
 		setButtonLayoutData(fButtonRename);
 		fButtonRename.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -390,7 +391,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		// button: delete
 		fButtonDelete = new Button(container, SWT.NONE);
-		fButtonDelete.setText("&Delete");
+		fButtonDelete.setText(Messages.Pref_TourTypes_Button_delete);
 		GridData gd = setButtonLayoutData(fButtonDelete);
 		gd.verticalIndent = 10;
 		fButtonDelete.addSelectionListener(new SelectionAdapter() {
@@ -451,9 +452,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		if (em != null) {
 
-			Query query = em.createQuery("SELECT TourData "
-					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ")
-					+ (" WHERE TourData.tourType.typeId=" + tourType.getTypeId()));
+			Query query = em.createQuery("SELECT TourData " //$NON-NLS-1$
+					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ") //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" WHERE TourData.tourType.typeId=" + tourType.getTypeId())); //$NON-NLS-1$
 
 			ArrayList<TourData> tourDataList = (ArrayList<TourData>) query.getResultList();
 
@@ -511,9 +512,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		// ask for the reference tour name
 		InputDialog dialog = new InputDialog(
 				this.getShell(),
-				"New Tour Type",
-				"Enter the name for the tour type:",
-				"",
+				Messages.Pref_TourTypes_Dlg_new_tour_type_title,
+				Messages.Pref_TourTypes_Dlg_new_tour_type_msg,
+				"", //$NON-NLS-1$
 				fTourNameValidator);
 
 		if (dialog.open() != Window.OK) {
@@ -627,11 +628,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		MessageDialog dialog = new MessageDialog(
 				this.getShell(),
-				"Delete Tour Type",
+				Messages.Pref_TourTypes_Dlg_delete_tour_type_title,
 				null,
-				"Are you sure to delete the tour type \""
-						+ selectedTourType.getName()
-						+ "\" and reset the tour type in ALL related tours?",
+				NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg, selectedTourType
+						.getName()),
 				MessageDialog.QUESTION,
 				buttons,
 				1);
@@ -664,8 +664,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		// ask for the tour type name
 		InputDialog dialog = new InputDialog(
 				this.getShell(),
-				"Rename Tour Type",
-				"Enter the name for the tour type:",
+				Messages.Pref_TourTypes_Dlg_rename_tour_type_title,
+				Messages.Pref_TourTypes_Dlg_rename_tour_type_msg,
 				selectedTourType.getName(),
 				fTourNameValidator);
 		if (dialog.open() != Window.OK) {

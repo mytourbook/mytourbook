@@ -23,6 +23,7 @@ package net.tourbook.views.rawData;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.dataImport.RawDataManager;
 import net.tourbook.device.DeviceManager;
 import net.tourbook.device.TourbookDevice;
@@ -41,8 +42,8 @@ public class ActionLoad extends Action {
 
 		this.rawDataView = viewPart;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("open_folder.gif"));
-		setToolTipText("Import tour data from file");
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.RawData_Image_open_import_file));
+		setToolTipText(Messages.RawData_Action_open_import_file_tooltip);
 	}
 
 	/**
@@ -63,16 +64,16 @@ public class ActionLoad extends Action {
 		String[] filterNames = new String[deviceLength];
 		int deviceIndex = 0;
 		for (TourbookDevice device : deviceList) {
-			filterExtensions[deviceIndex] = "*." + device.fileExtension;
+			filterExtensions[deviceIndex] = "*." + device.fileExtension; //$NON-NLS-1$
 			filterNames[deviceIndex] = device.visibleName
-					+ (" (*." + device.fileExtension + ")");
+					+ (" (*." + device.fileExtension + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			deviceIndex++;
 		}
 		
 		// add the option to select all files
-		filterExtensions[deviceIndex] = "*.*";
-		filterNames[deviceIndex] = "*.*";
+		filterExtensions[deviceIndex] = "*.*"; //$NON-NLS-1$
+		filterNames[deviceIndex] = "*.*"; //$NON-NLS-1$
 
 		// open file dialog
 		dialog.setFilterExtensions(filterExtensions);

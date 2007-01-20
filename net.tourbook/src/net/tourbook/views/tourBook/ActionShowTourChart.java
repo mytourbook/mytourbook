@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.views.tourBook;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -25,12 +26,12 @@ public class ActionShowTourChart extends Action {
 
 	public ActionShowTourChart(TourBookView view) {
 
-		super("", AS_CHECK_BOX);
+		super("", AS_CHECK_BOX); //$NON-NLS-1$
 
 		fViewer = view;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("graph-altitude.gif"));
-		setToolTipText("Show/Hide tour chart");
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.TourBook_Image_show_tour_chart));
+		setToolTipText(Messages.TourBook_Image_show_tour_chart_tooltip);
 	}
 
 	public void run() {

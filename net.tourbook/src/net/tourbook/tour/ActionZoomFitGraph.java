@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -25,13 +26,13 @@ public class ActionZoomFitGraph extends Action {
 
 	public ActionZoomFitGraph(TourChart tourChart) {
 
-		super("ZoomFitGraph", AS_PUSH_BUTTON);
+		super("ZoomFitGraph", AS_PUSH_BUTTON); //$NON-NLS-1$
 
 		this.tourChart = tourChart;
 
-		setToolTipText("Fit chart to window");
+		setToolTipText(Messages.Tour_Action_zoom_fit_to_window);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("zoom-fit-graph.gif"));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Image_fit_to_window));
 	}
 
 	public void run() {

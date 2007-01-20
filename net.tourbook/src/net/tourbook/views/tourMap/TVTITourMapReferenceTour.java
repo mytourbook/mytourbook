@@ -72,10 +72,10 @@ public class TVTITourMapReferenceTour extends TreeViewerTourItem {
 		 *</code>
 		 */
 
-		String sqlString = "SELECT startYear\n"
-				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n")
-				+ (" WHERE refTourId=" + refId + "\n")
-				+ (" GROUP BY startYear");
+		String sqlString = "SELECT startYear\n" //$NON-NLS-1$
+				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE refTourId=" + refId + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" GROUP BY startYear"); //$NON-NLS-1$
 
 		// System.out.println(sqlString);
 		try {

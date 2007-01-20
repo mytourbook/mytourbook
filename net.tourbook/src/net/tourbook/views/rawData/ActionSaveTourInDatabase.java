@@ -19,6 +19,7 @@ package net.tourbook.views.rawData;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
@@ -42,7 +43,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionSaveTourInDatabase extends Action {
 
-	private static final String			MEMENTO_SELECTED_PERSON	= "action-save-tour.selected-person";
+	private static final String			MEMENTO_SELECTED_PERSON	= "action-save-tour.selected-person"; //$NON-NLS-1$
 
 	private RawDataView					fViewPart;
 
@@ -73,7 +74,7 @@ public class ActionSaveTourInDatabase extends Action {
 			TourPerson person = (TourPerson) element;
 			switch (columnIndex) {
 			case 0:
-				return person.getName() + " (" + getPersonDevice(person) + ")";
+				return person.getName() + " (" + getPersonDevice(person) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return null;
 		}
@@ -83,8 +84,8 @@ public class ActionSaveTourInDatabase extends Action {
 
 		fViewPart = viewPart;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("database.gif"));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("database-disabled.gif"));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.RawData_Image_save_tour));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.RawData_Image_save_tour_disabled));
 
 		// setToolTipText("Save tour(s) in the database so it can be viewed in
 		// other views");
@@ -95,7 +96,7 @@ public class ActionSaveTourInDatabase extends Action {
 
 	public IDialogSettings getDialogSettings() {
 
-		final String DIALOG_SETTINGS_SECTION = "DialogSelectPerson";
+		final String DIALOG_SETTINGS_SECTION = "DialogSelectPerson"; //$NON-NLS-1$
 
 		IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
 		IDialogSettings dialogSettings = pluginSettings.getSection(DIALOG_SETTINGS_SECTION);
@@ -124,7 +125,7 @@ public class ActionSaveTourInDatabase extends Action {
 			}
 		}
 
-		return "<unknown device>";
+		return Messages.RawData_Label_unknown_device;
 	}
 
 	/**
@@ -214,8 +215,8 @@ public class ActionSaveTourInDatabase extends Action {
 		dialog.setContentProvider(new PeopleContentProvider());
 		dialog.setLabelProvider(new PeopleLabelProvider());
 
-		dialog.setTitle("Save Tour(s)");
-		dialog.setMessage("Save tour(s) for the selected person:");
+		dialog.setTitle(Messages.RawData_Dlg_save_tour_title);
+		dialog.setMessage(Messages.RawData_Dlg_save_tour_msg);
 		dialog.setDialogBoundsSettings(getDialogSettings(), Dialog.DIALOG_PERSISTLOCATION
 				| Dialog.DIALOG_PERSISTSIZE);
 

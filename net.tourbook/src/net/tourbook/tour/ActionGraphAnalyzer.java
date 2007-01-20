@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.views.TourChartAnalyzerView;
@@ -34,8 +35,8 @@ public class ActionGraphAnalyzer extends Action {
 
 		super(null, AS_PUSH_BUTTON);
 
-		setToolTipText("Graph Analyzer");
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("chart-analyzer.gif"));
+		setToolTipText(Messages.Tour_Action_graph_analyzer_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Image_chart_analyzer));
 
 		fChart = chart;
 	}
@@ -55,7 +56,7 @@ public class ActionGraphAnalyzer extends Action {
 				fChart.fireSliderMoveEvent();
 
 			} catch (PartInitException e) {
-				MessageDialog.openError(window.getShell(), "Error", "Error opening view:"
+				MessageDialog.openError(window.getShell(), "Error", "Error opening view:" //$NON-NLS-1$ //$NON-NLS-2$
 						+ e.getMessage());
 			}
 		}

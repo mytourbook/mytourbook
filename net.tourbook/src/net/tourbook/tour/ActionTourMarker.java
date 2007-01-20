@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.views.TourMarkerView;
 
@@ -33,8 +34,8 @@ public class ActionTourMarker extends Action {
 
 		super(null, AS_PUSH_BUTTON);
 
-		setToolTipText("Open the tour marker editor");
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("marker-editor.gif"));
+		setToolTipText(Messages.Tour_Action_open_marker_editor);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Image_open_marker_editor));
 
 		fTourChart = chartPanel;
 	}
@@ -58,7 +59,7 @@ public class ActionTourMarker extends Action {
 				fTourChart.fireSelectionTourChart();
 
 			} catch (PartInitException e) {
-				MessageDialog.openError(window.getShell(), "Error", "Error opening view:"
+				MessageDialog.openError(window.getShell(), "Error", "Error opening view:" //$NON-NLS-1$ //$NON-NLS-2$
 						+ e.getMessage());
 			}
 		}

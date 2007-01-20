@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.util;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.dialogs.DialogSettings;
@@ -30,10 +31,10 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class PositionedWizardDialog extends WizardDialog {
 
-	private static final String	WIZARD_X		= "Wizard.x";
-	private static final String	WIZARD_Y		= "Wizard.y";
-	private static final String	WIZARD_WIDTH	= "Wizard.width";
-	private static final String	WIZARD_HEIGHT	= "Wizard.height";
+	private static final String	WIZARD_X		= "Wizard.x"; //$NON-NLS-1$
+	private static final String	WIZARD_Y		= "Wizard.y"; //$NON-NLS-1$
+	private static final String	WIZARD_WIDTH	= "Wizard.width"; //$NON-NLS-1$
+	private static final String	WIZARD_HEIGHT	= "Wizard.height"; //$NON-NLS-1$
 
 	private IDialogSettings		fDialogSettings;
 	private String				fSettingsSection;

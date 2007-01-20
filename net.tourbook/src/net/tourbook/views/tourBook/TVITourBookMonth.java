@@ -48,25 +48,25 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 
 		TVITourBookYear yearItem = (TVITourBookYear) (getParentItem());
 
-		String sqlString = "SELECT "
-				+ "STARTYear, "
-				+ "STARTMonth, "
-				+ "STARTDay, "
-				+ "TOURDISTANCE, "
-				+ "TOURRECORDINGTIME, "
-				+ "TOURDRIVINGTIME, "
-				+ "TOURALTUP, "
-				+ "TOURALTDOWN, "
-				+ "startDistance, "
-				+ "tourID,"
-				+ "tourType_typeId"
-				+ "\n"
-				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
-				+ (" WHERE STARTYEAR = " + yearItem.fTourYear)
-				+ (" AND STARTMONTH = " + fTourMonth)
+		String sqlString = "SELECT " //$NON-NLS-1$
+				+ "STARTYear, " //$NON-NLS-1$
+				+ "STARTMonth, " //$NON-NLS-1$
+				+ "STARTDay, " //$NON-NLS-1$
+				+ "TOURDISTANCE, " //$NON-NLS-1$
+				+ "TOURRECORDINGTIME, " //$NON-NLS-1$
+				+ "TOURDRIVINGTIME, " //$NON-NLS-1$
+				+ "TOURALTUP, " //$NON-NLS-1$
+				+ "TOURALTDOWN, " //$NON-NLS-1$
+				+ "startDistance, " //$NON-NLS-1$
+				+ "tourID," //$NON-NLS-1$
+				+ "tourType_typeId" //$NON-NLS-1$
+				+ "\n" //$NON-NLS-1$
+				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE STARTYEAR = " + yearItem.fTourYear) //$NON-NLS-1$
+				+ (" AND STARTMONTH = " + fTourMonth) //$NON-NLS-1$
 				+ sqlTourPersonId()
 				+ sqlTourTypeId()
-				+ " ORDER BY STARTDAY, StartHour, StartMinute";
+				+ " ORDER BY STARTDAY, StartHour, StartMinute"; //$NON-NLS-1$
 
 		try {
 

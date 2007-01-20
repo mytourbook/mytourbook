@@ -16,6 +16,7 @@
 
 package net.tourbook.tour;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.views.TourSegmenterView;
 
@@ -36,8 +37,8 @@ public class ActionTourSegmenter extends Action {
 
 		fTourChart = tourChart;
 
-		setToolTipText("Tour Segmenter");
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("tour-segmenter.gif"));
+		setToolTipText(Messages.Tour_Action_open_tour_segmenter);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Action_open_tour_segmenter_tooltip));
 
 	}
 
@@ -55,7 +56,7 @@ public class ActionTourSegmenter extends Action {
 				fTourChart.fireSelectionTourChart();
 
 			} catch (PartInitException e) {
-				MessageDialog.openError(window.getShell(), "Error", "Error opening view:"
+				MessageDialog.openError(window.getShell(), "Error", "Error opening view:" //$NON-NLS-1$ //$NON-NLS-2$
 						+ e.getMessage());
 			}
 		}

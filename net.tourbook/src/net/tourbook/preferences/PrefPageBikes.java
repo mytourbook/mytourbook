@@ -123,7 +123,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 			switch (index) {
 			case COLUMN_IS_MODIFIED:
-				return fIsBikeModified ? "*" : "";
+				return fIsBikeModified ? "*" : ""; //$NON-NLS-1$ //$NON-NLS-2$
 
 			case COLUMN_NAME:
 				return bike.getName();
@@ -134,7 +134,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 			case COLUMN_WEIGHT:
 				return Float.toString(bike.getWeight());
 			}
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 	}
 
@@ -146,7 +146,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		// group: units for the x-axis
 		Group groupBikeInfo = new Group(parent, SWT.NONE);
-		groupBikeInfo.setText("Bike Data");
+		groupBikeInfo.setText("Bike Data"); //$NON-NLS-1$
 		groupBikeInfo.setLayout(new GridLayout(1, false));
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
 		groupBikeInfo.setLayoutData(gd);
@@ -163,7 +163,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		 * field: bike name
 		 */
 		lbl = new Label(container, SWT.NONE);
-		lbl.setText("&Name:");
+		lbl.setText("&Name:"); //$NON-NLS-1$
 		fTextBikeName = new Text(container, SWT.BORDER);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
 		fTextBikeName.setLayoutData(gd);
@@ -185,7 +185,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		 * field: bike type
 		 */
 		lbl = new Label(container, SWT.NONE);
-		lbl.setText("&Type:");
+		lbl.setText("&Type:"); //$NON-NLS-1$
 		fComboBikeType = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboBikeType.setVisibleItemCount(20);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
@@ -237,7 +237,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		 */
 		InputFieldFloat floatInput = new InputFieldFloat(
 				container,
-				"&Weight (kg):",
+				"&Weight (kg):", //$NON-NLS-1$
 				convertHorizontalDLUsToPixels(40));
 
 		fTextWeight = floatInput.getTextField();
@@ -265,7 +265,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		 * field: front tyre
 		 */
 		lbl = new Label(container, SWT.NONE);
-		lbl.setText("&Front Tyre:");
+		lbl.setText("&Front Tyre:"); //$NON-NLS-1$
 		fComboFrontTyre = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboFrontTyre.setVisibleItemCount(20);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
@@ -291,7 +291,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		 * field: rear tyre
 		 */
 		lbl = new Label(container, SWT.NONE);
-		lbl.setText("&Rear Tyre:");
+		lbl.setText("&Rear Tyre:"); //$NON-NLS-1$
 		fComboRearTyre = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboRearTyre.setVisibleItemCount(20);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
@@ -315,11 +315,11 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		// placeholder
 		lbl = new Label(parent, SWT.NONE);
-		lbl.setText("");
+		lbl.setText(""); //$NON-NLS-1$
 		lbl = new Label(parent, SWT.NONE);
-		lbl.setText("");
+		lbl.setText(""); //$NON-NLS-1$
 		lbl = new Label(parent, SWT.NONE);
-		lbl.setText("");
+		lbl.setText(""); //$NON-NLS-1$
 	}
 
 	private void createBikeViewer(Composite container) {
@@ -342,15 +342,15 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		layouter.addColumnData(new ColumnWeightData(1, convertWidthInCharsToPixels(1), false));
 
 		tc = new TableColumn(table, SWT.NONE);
-		tc.setText("Name");
+		tc.setText("Name"); //$NON-NLS-1$
 		layouter.addColumnData(new ColumnWeightData(8));
 
 		tc = new TableColumn(table, SWT.NONE);
-		tc.setText("Type");
+		tc.setText("Type"); //$NON-NLS-1$
 		layouter.addColumnData(new ColumnWeightData(16));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("kg");
+		tc.setText("kg"); //$NON-NLS-1$
 		layouter.addColumnData(new ColumnWeightData(4));
 
 		fBikeViewer = new TableViewer(table);
@@ -396,7 +396,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		// button: add
 		fButtonAdd = new Button(container, SWT.NONE);
-		fButtonAdd.setText("&Add...");
+		fButtonAdd.setText("&Add..."); //$NON-NLS-1$
 		setButtonLayoutData(fButtonAdd);
 		fButtonAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -406,7 +406,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		// button: delete
 		fButtonDelete = new Button(container, SWT.NONE);
-		fButtonDelete.setText("&Delete");
+		fButtonDelete.setText("&Delete"); //$NON-NLS-1$
 		GridData gd = setButtonLayoutData(fButtonDelete);
 		gd.verticalIndent = 10;
 		fButtonDelete.addSelectionListener(new SelectionAdapter() {
@@ -420,7 +420,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 	protected Control createContents(Composite parent) {
 		Label label = new Label(parent, SWT.WRAP);
-		label.setText("Bikes are used to calculate the power.");
+		label.setText("Bikes are used to calculate the power."); //$NON-NLS-1$
 
 		// container
 		Composite container = new Composite(parent, SWT.NONE);
@@ -501,9 +501,9 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		if (em != null) {
 
-			Query query = em.createQuery("SELECT TourPerson "
-					+ ("FROM " + TourDatabase.TABLE_TOUR_PERSON + " TourPerson ")
-					+ (" WHERE TourPerson.tourBike.bikeId=" + bike.getBikeId()));
+			Query query = em.createQuery("SELECT TourPerson " //$NON-NLS-1$
+					+ ("FROM " + TourDatabase.TABLE_TOUR_PERSON + " TourPerson ") //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" WHERE TourPerson.tourBike.bikeId=" + bike.getBikeId())); //$NON-NLS-1$
 
 			ArrayList<TourPerson> people = (ArrayList<TourPerson>) query.getResultList();
 
@@ -573,7 +573,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		fCurrentBike = new TourBike();
 		fIsBikeModified = true;
-		fCurrentBike.setName("<name>");
+		fCurrentBike.setName("<name>"); //$NON-NLS-1$
 		fCurrentBike.setWeight(10);
 
 		fBikes.add(fCurrentBike);
@@ -600,9 +600,9 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		MessageDialog dialog = new MessageDialog(
 				this.getShell(),
-				"Delete Bike",
+				"Delete Bike", //$NON-NLS-1$
 				null,
-				"Are you sure to delete the bike(s) and remove them from ALL related persons?",
+				"Are you sure to delete the bike(s) and remove them from ALL related persons?", //$NON-NLS-1$
 				MessageDialog.QUESTION,
 				buttons,
 				1);
@@ -708,8 +708,8 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 			isEnabled = false;
 			fCurrentBike = null;
 
-			fTextBikeName.setText("");
-			fTextWeight.setText("");
+			fTextBikeName.setText(""); //$NON-NLS-1$
+			fTextWeight.setText(""); //$NON-NLS-1$
 			fComboBikeType.select(0);
 			fComboFrontTyre.select(0);
 			fComboRearTyre.select(0);

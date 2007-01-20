@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -78,10 +79,10 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMarkerView extends ViewPart {
 
-	private static final String		MARKER_REMARK			= "remark";
-	private static final String		MARKER_POSITION			= "position";
+	private static final String		MARKER_REMARK			= "remark"; //$NON-NLS-1$
+	private static final String		MARKER_POSITION			= "position"; //$NON-NLS-1$
 
-	public static final String		ID						= "net.tourbook.views.TourMarkerView";
+	public static final String		ID						= "net.tourbook.views.TourMarkerView"; //$NON-NLS-1$
 
 	public static final int			COLUMN_TIME				= 0;
 	public static final int			COLUMN_DISTANCE			= 1;
@@ -89,8 +90,8 @@ public class TourMarkerView extends ViewPart {
 	public static final int			COLUMN_VISUAL_POSITION	= 3;
 
 	private static final String[]	COLUMN_PROPERTIES		= new String[] {
-			"time",
-			"distance",
+			"time", //$NON-NLS-1$
+			"distance", //$NON-NLS-1$
 			MARKER_REMARK,
 			MARKER_POSITION								};
 
@@ -250,7 +251,7 @@ public class TourMarkerView extends ViewPart {
 		fPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		fPageNoChart = new Label(fPageBook, SWT.NONE);
-		fPageNoChart.setText("Not available");
+		fPageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
 		fPageViewer = createTableViewer(fPageBook);
 
@@ -283,22 +284,22 @@ public class TourMarkerView extends ViewPart {
 		PixelConverter pixelConverter = new PixelConverter(table);
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("Time");
+		tc.setText(Messages.TourMarker_Column_time);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
 				.convertWidthInCharsToPixels(12), false));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("km");
-		tc.setToolTipText("Distance");
+		tc.setText(Messages.TourMarker_Column_km);
+		tc.setToolTipText(Messages.TourMarker_Column_km_tooltip);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
 				.convertWidthInCharsToPixels(8), false));
 
 		tc = new TableColumn(table, SWT.LEAD);
-		tc.setText("Remark");
+		tc.setText(Messages.TourMarker_Column_remark);
 		tableLayouter.addColumnData(new ColumnWeightData(50, true));
 
 		tc = new TableColumn(table, SWT.LEAD);
-		tc.setText("Position");
+		tc.setText(Messages.TourMarker_Column_position);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
 				.convertWidthInCharsToPixels(12), false));
 

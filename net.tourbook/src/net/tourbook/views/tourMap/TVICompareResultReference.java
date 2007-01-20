@@ -69,9 +69,9 @@ public class TVICompareResultReference extends TreeViewerItem {
 
 		long refId = refTour.getGeneratedId();
 
-		String sqlString = "SELECT tourId, comparedId  \n"
-				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + " \n")
-				+ ("WHERE refTourId=" + refId);
+		String sqlString = "SELECT tourId, comparedId  \n" //$NON-NLS-1$
+				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("WHERE refTourId=" + refId); //$NON-NLS-1$
 
 		try {
 

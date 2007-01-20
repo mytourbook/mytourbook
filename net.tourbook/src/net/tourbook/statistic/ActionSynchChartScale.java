@@ -16,6 +16,7 @@
 
 package net.tourbook.statistic;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -26,12 +27,12 @@ public class ActionSynchChartScale extends Action {
 
 	public ActionSynchChartScale(StatisticContainer container) {
 
-		super("", AS_CHECK_BOX);
+		super("", AS_CHECK_BOX); //$NON-NLS-1$
 
 		fStatContainer = container;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("zoom-fit-graph.gif"));
-		setToolTipText("Synch the charts to show the same scale for different years");
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.UI_Image_zoom_fit_to_graph));
+		setToolTipText(Messages.UI_Action_synch_charts_tooltip);
 	}
 
 	public void run() {

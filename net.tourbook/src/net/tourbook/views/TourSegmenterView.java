@@ -20,6 +20,7 @@ import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import net.tourbook.Messages;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
 import net.tourbook.algorithm.Point;
 import net.tourbook.chart.SelectionChartXSliderPosition;
@@ -67,7 +68,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourSegmenterView extends ViewPart {
 
-	public static final String		ID						= "net.tourbook.views.TourSegmenter";
+	public static final String		ID						= "net.tourbook.views.TourSegmenter"; //$NON-NLS-1$
 
 	public static final int			COLUMN_TIME				= 0;
 	public static final int			COLUMN_DISTANCE			= 1;
@@ -165,7 +166,7 @@ public class TourSegmenterView extends ViewPart {
 				nf.setMaximumFractionDigits(1);
 
 				if (segment.drivingTime == 0) {
-					return "";
+					return ""; //$NON-NLS-1$
 				} else {
 					return nf.format(segment.speed);
 				}
@@ -176,11 +177,11 @@ public class TourSegmenterView extends ViewPart {
 				nf.setMaximumFractionDigits(0);
 
 				if (segment.drivingTime == 0) {
-					return "";
+					return ""; //$NON-NLS-1$
 				} else {
 					float result = (float) (segment.altitudeUp) / segment.drivingTime * 3600;
 					if (result == 0) {
-						return "";
+						return ""; //$NON-NLS-1$
 					} else {
 						return nf.format(result);
 					}
@@ -192,11 +193,11 @@ public class TourSegmenterView extends ViewPart {
 				nf.setMaximumFractionDigits(0);
 
 				if (segment.drivingTime == 0) {
-					return "";
+					return ""; //$NON-NLS-1$
 				} else {
 					float result = (float) (segment.altitudeDown) / segment.drivingTime * 3600;
 					if (result == 0) {
-						return "";
+						return ""; //$NON-NLS-1$
 					} else {
 						return nf.format(result);
 					}
@@ -327,7 +328,7 @@ public class TourSegmenterView extends ViewPart {
 		fPageBook = new PageBook(parent, SWT.NONE);
 
 		fPageNoChart = new Label(fPageBook, SWT.NONE);
-		fPageNoChart.setText("Not available");
+		fPageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
 		fPageSegmenter = new Composite(fPageBook, SWT.NONE);
 		fPageSegmenter.setLayout(new GridLayout());
@@ -351,7 +352,7 @@ public class TourSegmenterView extends ViewPart {
 		GridData gd;
 
 		fChkShowInChart = new Button(segmentContainer, SWT.CHECK);
-		fChkShowInChart.setText("Show segments in chart");
+		fChkShowInChart.setText(Messages.TourSegmenter_Check_show_segments_in_chart);
 		fChkShowInChart.setSelection(true);
 		gd = new GridData();
 		gd.horizontalSpan = 3;
@@ -366,7 +367,7 @@ public class TourSegmenterView extends ViewPart {
 		});
 
 		Label label = new Label(segmentContainer, SWT.NONE);
-		label.setText("Tolerance");
+		label.setText(Messages.TourSegmenter_Label_tolerance);
 
 		gd = new GridData();
 		gd.horizontalAlignment = GridData.FILL;
@@ -392,7 +393,7 @@ public class TourSegmenterView extends ViewPart {
 		gd.verticalAlignment = GridData.CENTER;
 		gd.widthHint = 30;
 		fLabelToleranceValue = new Label(segmentContainer, SWT.NONE);
-		fLabelToleranceValue.setText("50");
+		fLabelToleranceValue.setText(Messages.TourSegmenter_Label_default_tolerance);
 		fLabelToleranceValue.setLayoutData(gd);
 	}
 
@@ -419,23 +420,23 @@ public class TourSegmenterView extends ViewPart {
 
 		// the first column is always left aligned
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("Time");
-		tc.setToolTipText("Driving Time");
+		tc.setText(Messages.TourSegmenter_Column_time);
+		tc.setToolTipText(Messages.TourSegmenter_Column_time_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 11));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("km");
-		tc.setToolTipText("Distance");
+		tc.setText(Messages.TourSegmenter_Column_distance);
+		tc.setToolTipText(Messages.TourSegmenter_Column_distance_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 10));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("m");
-		tc.setToolTipText("Altitude");
+		tc.setText(Messages.TourSegmenter_Column_altitude);
+		tc.setToolTipText(Messages.TourSegmenter_Column_altitude_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 10));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("km/h");
-		tc.setToolTipText("Speed");
+		tc.setText(Messages.TourSegmenter_Column_speed);
+		tc.setToolTipText(Messages.TourSegmenter_Column_speed_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 9));
 		
 		tc.addSelectionListener(new SelectionAdapter() {
@@ -446,8 +447,8 @@ public class TourSegmenterView extends ViewPart {
 		});
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("%");
-		tc.setToolTipText("Gradient");
+		tc.setText(Messages.TourSegmenter_Column_gradient);
+		tc.setToolTipText(Messages.TourSegmenter_Column_gradient_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 8));
 		tc.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -457,13 +458,13 @@ public class TourSegmenterView extends ViewPart {
 		});
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("+ m/h");
-		tc.setToolTipText("Altimeter up");
+		tc.setText(Messages.TourSegmenter_Column_altimeter_up);
+		tc.setToolTipText(Messages.TourSegmenter_Column_altimeter_up_tooltip);
 		tableLayouter.addColumnData(new ColumnWeightData(5, true));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("- m/h");
-		tc.setToolTipText("Altimeter down");
+		tc.setText(Messages.TourSegmenter_Column_altimeter_down);
+		tc.setToolTipText(Messages.TourSegmenter_Column_altimeter_down_tooltip);
 		tableLayouter.addColumnData(new ColumnWeightData(5, true));
 
 		/*

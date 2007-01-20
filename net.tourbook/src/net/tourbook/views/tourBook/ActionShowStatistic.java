@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.views.tourBook;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -25,12 +26,12 @@ public class ActionShowStatistic extends Action {
 
 	public ActionShowStatistic(TourBookView view) {
 
-		super("", AS_CHECK_BOX);
+		super("", AS_CHECK_BOX); //$NON-NLS-1$
 
 		fViewer = view;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("year-overview.gif"));
-		setToolTipText("Show/Hide year statistic");
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.TourBook_Image_show_statistics));
+		setToolTipText(Messages.TourBook_Action_show_statistics_tooltip);
 	}
 
 	public void run() {

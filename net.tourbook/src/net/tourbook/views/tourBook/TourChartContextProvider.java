@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.views.tourBook;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.ChartContextProvider;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.data.TourData;
@@ -40,7 +41,7 @@ class TourChartContextProvider implements ChartContextProvider {
 	class ActionAddTourReference extends Action {
 
 		ActionAddTourReference() {
-			setText("Create Reference Tour");
+			setText(Messages.TourMap_Action_create_reference_tour);
 		}
 
 		public void run() {
@@ -81,9 +82,9 @@ class TourChartContextProvider implements ChartContextProvider {
 			// get the marker name
 			InputDialog dialog = new InputDialog(
 					Display.getCurrent().getActiveShell(),
-					"Add Marker",
-					"Enter Marker name:",
-					"",
+					Messages.TourMap_Dlg_add_marker_title,
+					Messages.TourMap_Dlg_add_marker_label,
+					"", //$NON-NLS-1$
 					null);
 
 			if (dialog.open() != Window.OK) {
@@ -122,10 +123,10 @@ class TourChartContextProvider implements ChartContextProvider {
 
 			// marker menu
 			if (leftSlider != null && rightSlider == null) {
-				menuMgr.add(new SliderAction("Add &Marker", leftSlider));
+				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_marker, leftSlider));
 			} else {
-				menuMgr.add(new SliderAction("Add &Left Marker", leftSlider));
-				menuMgr.add(new SliderAction("Add &Right Marker", rightSlider));
+				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_left_marker, leftSlider));
+				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_right_marker, rightSlider));
 			}
 
 			// add to chart reference

@@ -133,7 +133,7 @@ public class ChartSegmentLayer implements IChartLayer {
 			gc.setForeground(colorLine);
 
 			// draw marker label
-			if (!chartMarker.markerLabel.equalsIgnoreCase("")) {
+			if (!chartMarker.markerLabel.equalsIgnoreCase("")) { //$NON-NLS-1$
 
 				labelExtend = gc.textExtent(chartMarker.markerLabel);
 

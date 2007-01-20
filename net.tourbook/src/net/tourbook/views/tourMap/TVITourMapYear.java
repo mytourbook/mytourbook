@@ -51,19 +51,19 @@ public class TVITourMapYear extends TreeViewerItem {
 		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		String sqlString = "SELECT "
-				+ "tourDate, "
-				+ "tourSpeed, "
-				+ "comparedId, "
-				+ "tourId , "
-				+ "startIndex, "
-				+ "endIndex, "
-				+ "startYear \n"
-				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + " \n")
-				+ ("WHERE refTourId=" + refId)
-				+ " AND "
-				+ ("startYear=" + year)
-				+ " ORDER BY tourDate";
+		String sqlString = "SELECT " //$NON-NLS-1$
+				+ "tourDate, " //$NON-NLS-1$
+				+ "tourSpeed, " //$NON-NLS-1$
+				+ "comparedId, " //$NON-NLS-1$
+				+ "tourId , " //$NON-NLS-1$
+				+ "startIndex, " //$NON-NLS-1$
+				+ "endIndex, " //$NON-NLS-1$
+				+ "startYear \n" //$NON-NLS-1$
+				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("WHERE refTourId=" + refId) //$NON-NLS-1$
+				+ " AND " //$NON-NLS-1$
+				+ ("startYear=" + year) //$NON-NLS-1$
+				+ " ORDER BY tourDate"; //$NON-NLS-1$
 
 		try {
 

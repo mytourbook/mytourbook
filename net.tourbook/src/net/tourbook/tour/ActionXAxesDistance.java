@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourChartConfiguration;
 
@@ -26,14 +27,14 @@ public class ActionXAxesDistance extends Action {
 
 	public ActionXAxesDistance(TourChart tourChart) {
 
-		super("X-Axis Distance", AS_RADIO_BUTTON);
+		super(Messages.Tour_Action_show_distance_on_x_axis, AS_RADIO_BUTTON);
 
 		this.tourChart = tourChart;
 
-		setToolTipText("Show distance on the x-axis");
+		setToolTipText(Messages.Tour_Action_show_distance_on_x_axis_tooltip);
 
 		setChecked(!tourChart.fTourChartConfig.showTimeOnXAxis);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("x-axes-distance.gif"));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Image_show_distance_on_x_axis));
 	}
 
 	public void run() {

@@ -17,6 +17,7 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.ui.MessageDialogPage;
 import net.tourbook.ui.UI;
@@ -99,12 +100,12 @@ public class AdjustAltitudeDialog extends TrayDialog {
 
 		// group: zoom options
 		Group groupAdjustOptions = new Group(container, SWT.NONE);
-		groupAdjustOptions.setText("Adjust Tour Altitude");
+		groupAdjustOptions.setText(Messages.Tour_Group_adjust_altitude);
 		groupAdjustOptions.setLayout(new GridLayout());
 
 		// radio: adjust the whole tour
 		fAdjustAll = new Button(groupAdjustOptions, SWT.RADIO);
-		fAdjustAll.setText("Adjust the altitude evenly distributed for the whole tour");
+		fAdjustAll.setText(Messages.Tour_Radio_adjust_whole_tour);
 		fAdjustAll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				setupDialog();
@@ -113,7 +114,7 @@ public class AdjustAltitudeDialog extends TrayDialog {
 
 		// radio: adjust end
 		fAdjustEnd = new Button(groupAdjustOptions, SWT.RADIO);
-		fAdjustEnd.setText("Adjust the END altitude and keep the start altitude");
+		fAdjustEnd.setText(Messages.Tour_Radio_adjust_end);
 		fAdjustEnd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				setupDialog();
@@ -123,7 +124,7 @@ public class AdjustAltitudeDialog extends TrayDialog {
 		// radio: adjust max hight
 		fAdjustMaxHight = new Button(groupAdjustOptions, SWT.RADIO);
 		fAdjustMaxHight
-				.setText("Adjust MAX HEIGHT altitude and keep the start altitude");
+				.setText(Messages.Tour_Radio_adjust_height);
 		fAdjustMaxHight.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				setupDialog();
@@ -139,7 +140,7 @@ public class AdjustAltitudeDialog extends TrayDialog {
 		if (fTourChart != null) {
 			// start altitude
 			Label label = new Label(fFieldContainer, SWT.NONE);
-			label.setText("Current Start Altitude:");
+			label.setText(Messages.Tour_Label_start_altitude);
 
 			fOldStartAltitude = new Text(fFieldContainer, SWT.BORDER);
 			fOldStartAltitude.setEnabled(false);
@@ -147,7 +148,7 @@ public class AdjustAltitudeDialog extends TrayDialog {
 
 			// end altitude
 			label = new Label(fFieldContainer, SWT.NONE);
-			label.setText("Current End Altitude:");
+			label.setText(Messages.Tour_Label_end_altitude);
 
 			fOldEndAltitude = new Text(fFieldContainer, SWT.BORDER);
 			fOldEndAltitude.setEnabled(false);
@@ -155,7 +156,7 @@ public class AdjustAltitudeDialog extends TrayDialog {
 
 			// max height altitude
 			label = new Label(fFieldContainer, SWT.NONE);
-			label.setText("Current Max Height Altitude:");
+			label.setText(Messages.Tour_Label_max_height);
 
 			fOldMaxHeightAltitude = new Text(fFieldContainer, SWT.BORDER);
 			fOldMaxHeightAltitude.setEnabled(false);
@@ -164,7 +165,7 @@ public class AdjustAltitudeDialog extends TrayDialog {
 
 		// label: title
 		fNewAltitudeLabel = new Label(fFieldContainer, SWT.NONE);
-		fNewAltitudeLabel.setText("");
+		fNewAltitudeLabel.setText(""); //$NON-NLS-1$
 		gd = new GridData();
 		gd.horizontalSpan = 2;
 		fNewAltitudeLabel.setLayoutData(gd);
@@ -172,7 +173,7 @@ public class AdjustAltitudeDialog extends TrayDialog {
 				JFaceResources.DIALOG_FONT));
 
 		// input: altitude difference
-		fNewAltitudeEditor = new IntegerFieldEditor("", "", fFieldContainer);
+		fNewAltitudeEditor = new IntegerFieldEditor("", "", fFieldContainer); //$NON-NLS-1$ //$NON-NLS-2$
 		fNewAltitudeEditor.setTextLimit(4);
 		fNewAltitudeEditor.setValidRange(0, 6000);
 		UI.setFieldWidth(
@@ -231,14 +232,14 @@ public class AdjustAltitudeDialog extends TrayDialog {
 
 		Label label = fNewAltitudeEditor.getLabelControl(fFieldContainer);
 		if (fAdjustAll.getSelection()) {
-			fNewAltitudeLabel.setText("Evenly distributed");
-			label.setText("New Start Altitude:");
+			fNewAltitudeLabel.setText(Messages.Tour_Label_evenly_distributed);
+			label.setText(Messages.Tour_Label_new_start_altitude);
 		} else if (fAdjustEnd.getSelection()) {
-			fNewAltitudeLabel.setText("Adjust End");
-			label.setText("New End Altitude:");
+			fNewAltitudeLabel.setText(Messages.Tour_Label_adjust_end);
+			label.setText(Messages.Tour_Label_new_end_altitude);
 		} else if (fAdjustMaxHight.getSelection()) {
-			fNewAltitudeLabel.setText("Adjust Max Height");
-			label.setText("New Max Altitude:");
+			fNewAltitudeLabel.setText(Messages.Tour_Label_adjust_height);
+			label.setText(Messages.Tour_Label_new_height);
 		}
 
 		fFieldContainer.layout();

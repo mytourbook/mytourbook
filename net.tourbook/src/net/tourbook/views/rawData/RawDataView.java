@@ -24,6 +24,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
@@ -103,9 +104,9 @@ import org.eclipse.ui.part.ViewPart;
 
 public class RawDataView extends ViewPart {
 
-	public static final String			ID							= "net.tourbook.views.rawData.RawDataView";
+	public static final String			ID							= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 
-	private static final String			TOUR_TYPE_PREFIX			= "tourType";
+	private static final String			TOUR_TYPE_PREFIX			= "tourType"; //$NON-NLS-1$
 
 	public static final int				COLUMN_DATE					= 0;
 	public static final int				COLUMN_START_TIME			= 1;
@@ -117,10 +118,10 @@ public class RawDataView extends ViewPart {
 	public static final int				COLUMN_DEVICE_PROFILE		= 7;
 	public static final int				COLUMN_TIME_INTERVAL		= 8;
 
-	private static final String			MEMENTO_SASH_CONTAINER		= "importview.sash.container.";
-	private static final String			MEMENTO_IMPORT_FILENAME		= "importview.raw-data.filename";
-	private static final String			MEMENTO_SELECTED_TOUR_INDEX	= "importview.selected-tour-index";
-	private static final String			MEMENTO_IS_CHART_VISIBLE	= "importview.is-chart-visible";
+	private static final String			MEMENTO_SASH_CONTAINER		= "importview.sash.container."; //$NON-NLS-1$
+	private static final String			MEMENTO_IMPORT_FILENAME		= "importview.raw-data.filename"; //$NON-NLS-1$
+	private static final String			MEMENTO_SELECTED_TOUR_INDEX	= "importview.selected-tour-index"; //$NON-NLS-1$
+	private static final String			MEMENTO_IS_CHART_VISIBLE	= "importview.is-chart-visible"; //$NON-NLS-1$
 
 	private static IMemento				fSessionMemento;
 
@@ -241,7 +242,7 @@ public class RawDataView extends ViewPart {
 				int recordingTime = tourData.getTourRecordingTime();
 
 				if (recordingTime == 0) {
-					return "";
+					return ""; //$NON-NLS-1$
 				} else {
 					calendar.set(
 							0,
@@ -256,7 +257,7 @@ public class RawDataView extends ViewPart {
 
 			case COLUMN_DRIVING_TIME:
 				if (drivingTime == 0) {
-					return "";
+					return ""; //$NON-NLS-1$
 				} else {
 					calendar.set(
 							0,
@@ -271,7 +272,7 @@ public class RawDataView extends ViewPart {
 
 			case COLUMN_DISTANCE:
 				if (tourDistance == 0) {
-					return "";
+					return ""; //$NON-NLS-1$
 				} else {
 					numberInstance.setMinimumFractionDigits(2);
 					numberInstance.setMaximumFractionDigits(2);
@@ -281,7 +282,7 @@ public class RawDataView extends ViewPart {
 			case COLUMN_AVG_SPEED:
 
 				if (drivingTime == 0) {
-					return "";
+					return ""; //$NON-NLS-1$
 				} else {
 					numberInstance.setMinimumFractionDigits(1);
 					numberInstance.setMaximumFractionDigits(1);
@@ -297,7 +298,7 @@ public class RawDataView extends ViewPart {
 
 			case COLUMN_DEVICE_PROFILE:
 				if (fImportDevice == null) {
-					return "";
+					return ""; //$NON-NLS-1$
 				} else {
 					return fImportDevice.getDeviceModeName(tourData.getDeviceMode());
 				}
@@ -428,9 +429,9 @@ public class RawDataView extends ViewPart {
 	 */
 	private DrawingColors getTourTypeDrawingColors(Display display, long tourTypeId) {
 
-		String colorIdBright = TOUR_TYPE_PREFIX + "bright" + tourTypeId;
-		String colorIdDark = TOUR_TYPE_PREFIX + "dark" + tourTypeId;
-		String colorIdLine = TOUR_TYPE_PREFIX + "line" + tourTypeId;
+		String colorIdBright = TOUR_TYPE_PREFIX + "bright" + tourTypeId; //$NON-NLS-1$
+		String colorIdDark = TOUR_TYPE_PREFIX + "dark" + tourTypeId; //$NON-NLS-1$
+		String colorIdLine = TOUR_TYPE_PREFIX + "line" + tourTypeId; //$NON-NLS-1$
 
 		DrawingColors drawingColors = new DrawingColors();
 
@@ -669,11 +670,11 @@ public class RawDataView extends ViewPart {
 	}
 
 	private void createResources() {
-		imageDatabaseDescriptor = TourbookPlugin.getImageDescriptor("database.gif");
+		imageDatabaseDescriptor = TourbookPlugin.getImageDescriptor(Messages.RawData_Image_database);
 		imageDatabaseOtherPersonDescriptor = TourbookPlugin
-				.getImageDescriptor("database-other-person.gif");
+				.getImageDescriptor(Messages.RawData_Image_database_other_person);
 		imageDatabasePlaceholderDescriptor = TourbookPlugin
-				.getImageDescriptor("database-placeholder.gif");
+				.getImageDescriptor(Messages.RawData_Image_database_placeholder);
 
 		try {
 			Display display = Display.getCurrent();
@@ -717,9 +718,8 @@ public class RawDataView extends ViewPart {
 		TableColumn tc;
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("Date");
-		tc.setToolTipText("Blue icon: the tour is saved for the active person\n"
-				+ "Red icon:  the tour is saved for another person");
+		tc.setText(Messages.RawData_Colum_date);
+		tc.setToolTipText(Messages.RawData_Column_date_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(16));
 
 		tc.addSelectionListener(new SelectionAdapter() {
@@ -730,43 +730,43 @@ public class RawDataView extends ViewPart {
 		});
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("Time");
-		tc.setToolTipText("Start Time");
+		tc.setText(Messages.RawData_Column_time);
+		tc.setToolTipText(Messages.RawData_Column_time_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("h");
-		tc.setToolTipText("Recording Time");
+		tc.setText(Messages.RawData_Column_recording_time);
+		tc.setToolTipText(Messages.RawData_Column_recording_time_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("h");
-		tc.setToolTipText("Driving Time");
+		tc.setText(Messages.RawData_Column_driving_time);
+		tc.setToolTipText(Messages.RawData_Column_driving_time_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("km");
-		tc.setToolTipText("Distance");
+		tc.setText(Messages.RawData_Column_distance);
+		tc.setToolTipText(Messages.RawData_Column_distance_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("km/h");
-		tc.setToolTipText("Speed");
+		tc.setText(Messages.RawData_Column_speed);
+		tc.setToolTipText(Messages.RawData_Column_speed_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("m");
-		tc.setToolTipText("Altitude up");
+		tc.setText(Messages.RawData_Column_altitude_up);
+		tc.setToolTipText(Messages.RawData_Column_altitude_up_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		tc = new TableColumn(table, SWT.LEAD);
-		tc.setText("Profile");
-		tc.setToolTipText("Profile used for the tour");
+		tc.setText(Messages.RawData_Column_profile);
+		tc.setToolTipText(Messages.RawData_Column_profile_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("sec");
-		tc.setToolTipText("Time interval");
+		tc.setText(Messages.RawData_Column_time_interval);
+		tc.setToolTipText(Messages.RawData_Column_time_interval_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		// table viewer
@@ -850,16 +850,16 @@ public class RawDataView extends ViewPart {
 
 			TourPerson person = TourbookPlugin.getDefault().getActivePerson();
 			if (person != null) {
-				actionSaveTourWithPerson.setText("Save Tour for " + person.getName());
+				actionSaveTourWithPerson.setText(Messages.RawData_Action_save_tour_with_person + person.getName());
 				actionSaveTourWithPerson.setPerson(person);
 				actionSaveTourWithPerson.setEnabled(unsavedTours > 0);
 				menuMgr.add(actionSaveTourWithPerson);
 			}
 
 			if (tourSelection.size() == 1) {
-				actionSaveTour.setText("Save Tour ...");
+				actionSaveTour.setText(Messages.RawData_Action_save_tour_for_person);
 			} else {
-				actionSaveTour.setText("Save Tours ...");
+				actionSaveTour.setText(Messages.RawData_Action_save_tours_for_person);
 			}
 			actionSaveTour.setEnabled(unsavedTours > 0);
 			menuMgr.add(actionSaveTour);
@@ -1029,7 +1029,7 @@ public class RawDataView extends ViewPart {
 			public void dataModelChanged(ChartDataModel chartDataModel) {
 
 				// set title
-				chartDataModel.setTitle("Tour: " + TourManager.getTourDate(tourData));
+				chartDataModel.setTitle(Messages.RawData_Chart_title + TourManager.getTourDate(tourData));
 			}
 		};
 
@@ -1055,14 +1055,14 @@ public class RawDataView extends ViewPart {
 		TourbookDevice device = importer.getDevice();
 
 		if (device == null) {
-			fLblRawDataSource.setText("No imported Data");
+			fLblRawDataSource.setText(Messages.RawData_Lable_import_no_data);
 		} else {
 
 			String rawDataSource;
 			if (importer.isDeviceImport()) {
-				rawDataSource = device.visibleName + " - Device Import";
+				rawDataSource = device.visibleName + Messages.RawData_Lable_import_from_device;
 			} else {
-				rawDataSource = device.visibleName + " - " + device.getImportFileName();
+				rawDataSource = device.visibleName + Messages.RawData_Lable_import_from_file + device.getImportFileName();
 			}
 			fLblRawDataSource.setText(Dialog.shortenText(rawDataSource, fLblRawDataSource));
 		}

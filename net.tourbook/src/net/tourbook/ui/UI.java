@@ -127,7 +127,7 @@ public class UI {
 
 		return new VerifyListener() {
 			public void verifyText(VerifyEvent e) {
-				if (e.text.equals("")) {
+				if (e.text.equals("")) { //$NON-NLS-1$
 					return;
 				}
 				try {

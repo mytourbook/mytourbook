@@ -18,6 +18,7 @@ package net.tourbook.tour;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
@@ -41,18 +42,18 @@ public class ActionAdjustAltitude extends Action {
 
 	public ActionAdjustAltitude(TourChart tourChart) {
 
-		super("AdjustAltitude", AS_PUSH_BUTTON);
+		super("AdjustAltitude", AS_PUSH_BUTTON); //$NON-NLS-1$
 
 		this.fTourChart = tourChart;
 
-		setText("Adjust tour altitude");
-		setToolTipText("Adjust the tour altitude");
+		setText(Messages.Tour_Action_adjust_tour_altitude);
+		setToolTipText(Messages.Tour_Action_adjust_tour_altitude_tooltip);
 		//
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("adjust-altitude.gif"));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Image_adjust_altitude));
 	}
 
 	public ActionAdjustAltitude(TreeViewer treeViewer, TourChart treeTourChart) {
-		setText("Adjust tour altitude");
+		setText(Messages.Tour_Action_adjust_tour_altitude);
 		fTreeViewer = treeViewer;
 		fTreeTourChart = treeTourChart;
 	}

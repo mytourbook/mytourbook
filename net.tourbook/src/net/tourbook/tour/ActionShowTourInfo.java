@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -25,12 +26,12 @@ public class ActionShowTourInfo extends Action {
 
 	public ActionShowTourInfo(Tour tour) {
 
-		super("", AS_CHECK_BOX);
+		super("", AS_CHECK_BOX); //$NON-NLS-1$
 
 		fTour = tour;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("navigate-tour-info.gif"));
-		setToolTipText("Show/hide the tour info");
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Image_tour_info));
+		setToolTipText(Messages.Tour_Action_tour_info_tooltip);
 	}
 
 	public void run() {

@@ -17,6 +17,7 @@ package net.tourbook.views;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -52,7 +53,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourChartAnalyzerView extends ViewPart {
 
-	public static final String			ID				= "net.tourbook.views.TourChartAnalyzer";
+	public static final String			ID				= "net.tourbook.views.TourChartAnalyzer"; //$NON-NLS-1$
 
 	private static final int			LAYOUT_SMALL	= 0;
 	private static final int			LAYOUT_MEDIUM	= 1;
@@ -195,7 +196,7 @@ public class TourChartAnalyzerView extends ViewPart {
 			}
 
 			label = new Label(fContainer, SWT.NONE);
-			label.setText(" " + fChartData.getUnitLabel());
+			label.setText(" " + fChartData.getUnitLabel()); //$NON-NLS-1$
 			label.setToolTipText(toolTip);
 			label.setForeground(lineColor);
 			label.setBackground(fBgColorHeader);
@@ -251,7 +252,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		Label label;
 
 		label = new Label(fContainer, SWT.TRAIL);
-		label.setText("Avg");
+		label.setText(Messages.TourAnalyzer_Label_average);
 		label.setFont(fontBold);
 		label.setLayoutData(gd);
 		label.setBackground(fBgColorHeader);
@@ -263,7 +264,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		Label label;
 
 		label = new Label(fContainer, SWT.TRAIL);
-		label.setText("Diff");
+		label.setText(Messages.TourAnalyzer_Label_difference);
 		label.setFont(fontBold);
 		label.setLayoutData(gd);
 		label.setBackground(fBgColorHeader);
@@ -275,13 +276,13 @@ public class TourChartAnalyzerView extends ViewPart {
 		Label label;
 
 		label = new Label(fContainer, SWT.TRAIL);
-		label.setText("Left");
+		label.setText(Messages.TourAnalyzer_Label_left);
 		label.setFont(fontBold);
 		label.setLayoutData(gd);
 		label.setBackground(fBgColorHeader);
 
 		label = new Label(fContainer, SWT.TRAIL);
-		label.setText("Right");
+		label.setText(Messages.TourAnalyzer_Label_right);
 		label.setFont(fontBold);
 		label.setLayoutData(gd);
 		label.setBackground(fBgColorHeader);
@@ -293,13 +294,13 @@ public class TourChartAnalyzerView extends ViewPart {
 		Label label;
 
 		label = new Label(fContainer, SWT.TRAIL);
-		label.setText("Min");
+		label.setText(Messages.TourAnalyzer_Label_minimum);
 		label.setFont(fontBold);
 		label.setLayoutData(gd);
 		label.setBackground(fBgColorHeader);
 
 		label = new Label(fContainer, SWT.TRAIL);
-		label.setText("Max");
+		label.setText(Messages.TourAnalyzer_Label_maximum);
 		label.setFont(fontBold);
 		label.setLayoutData(gd);
 		label.setBackground(fBgColorHeader);
@@ -311,7 +312,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		Label label;
 
 		label = new Label(fContainer, SWT.LEFT);
-		label.setText("");
+		label.setText(""); //$NON-NLS-1$
 		label.setLayoutData(gd);
 		label.setBackground(fBgColorHeader);
 	}
@@ -320,7 +321,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		final GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 		Label label;
 		label = new Label(fContainer, SWT.NONE);
-		label.setText("Value");
+		label.setText(Messages.TourAnalyzer_Label_value);
 		label.setFont(fontBold);
 		label.setLayoutData(gd);
 		label.setBackground(fBgColorHeader);
@@ -509,13 +510,13 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		for (int columnIndex = 0; columnIndex < columns; columnIndex++) {
 			label = new Label(fContainer, SWT.NONE);
-			label.setText(" ");
+			label.setText(" "); //$NON-NLS-1$
 			label.setBackground(fBgColorData);
 			label.setLayoutData(gd);
 		}
 
 		label = new Label(fContainer, SWT.NONE);
-		label.setText(" ");
+		label.setText(" "); //$NON-NLS-1$
 		label.setBackground(fBgColorHeader);
 		label.setLayoutData(gd);
 	}
@@ -669,12 +670,12 @@ public class TourChartAnalyzerView extends ViewPart {
 			}
 
 			graphInfo.left.setText(ChartUtil.formatValue(leftValue, xAxisUnit, valueDivisor, true)
-					+ " ");
+					+ " "); //$NON-NLS-1$
 			graphInfo.right.setText(ChartUtil
 					.formatValue(rightValue, xAxisUnit, valueDivisor, true)
-					+ " ");
-			graphInfo.min.setText(ChartUtil.formatValue(min, xAxisUnit, valueDivisor, true) + " ");
-			graphInfo.max.setText(ChartUtil.formatValue(max, xAxisUnit, valueDivisor, true) + " ");
+					+ " "); //$NON-NLS-1$
+			graphInfo.min.setText(ChartUtil.formatValue(min, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+			graphInfo.max.setText(ChartUtil.formatValue(max, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
 
 			// set average value
 			if (analyzerInfo.isShowAvg()) {
@@ -686,17 +687,17 @@ public class TourChartAnalyzerView extends ViewPart {
 							avgDivisor,
 							analyzerInfo.getAvgDecimals(),
 							false)
-							+ " ");
+							+ " "); //$NON-NLS-1$
 				} else {
 					graphInfo.avg.setText(ChartUtil.formatValue(
 							(int) avg,
 							xAxisUnit,
 							valueDivisor,
 							true)
-							+ " ");
+							+ " "); //$NON-NLS-1$
 				}
 			} else {
-				graphInfo.avg.setText("");
+				graphInfo.avg.setText(""); //$NON-NLS-1$
 			}
 
 			graphInfo.diff.setText(ChartUtil.formatValue(
@@ -704,7 +705,7 @@ public class TourChartAnalyzerView extends ViewPart {
 					xAxisUnit,
 					valueDivisor,
 					true)
-					+ " ");
+					+ " "); //$NON-NLS-1$
 		}
 	}
 }

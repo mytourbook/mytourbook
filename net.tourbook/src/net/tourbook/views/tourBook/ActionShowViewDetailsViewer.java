@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.views.tourBook;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -25,12 +26,12 @@ public class ActionShowViewDetailsViewer extends Action {
 
 	public ActionShowViewDetailsViewer(TourBookView view) {
 
-		super("", AS_CHECK_BOX);
+		super("", AS_CHECK_BOX); //$NON-NLS-1$
 
 		fViewer = view;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("view-detail-viewer.gif"));
-		setToolTipText("Show only the viewer");
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.TourBook_Image_show_tour_viewer));
+		setToolTipText(Messages.TourBook_Image_show_tour_viewer_tooltip);
 	}
 
 	public void run() {

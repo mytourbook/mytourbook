@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartMarker;
@@ -47,7 +48,7 @@ import org.eclipse.swt.widgets.Listener;
 
 public class TourChart extends Chart {
 
-	static final String				SEGMENT_VALUES		= "segmentValues";
+	static final String				SEGMENT_VALUES		= "segmentValues"; //$NON-NLS-1$
 
 	TourData						fTourData;
 	TourChartConfiguration			fTourChartConfig;
@@ -228,45 +229,45 @@ public class TourChart extends Chart {
 
 		createGraphAction(
 				TourManager.GRAPH_ALTITUDE,
-				"Altitude",
-				"Show/Hide the altitude",
-				"graph-altitude.gif");
+				Messages.Graph_Altitude,
+				Messages.Tour_Action_graph_altitude_tooltip,
+				Messages.Tour_Image_graph_altitude);
 
 		createGraphAction(
 				TourManager.GRAPH_SPEED,
-				"Velocity",
-				"Show/Hide the velocity",
-				"graph-speed.gif");
+				Messages.Graph_Speed,
+				Messages.Tour_Action_graph_speed_tooltip,
+				Messages.Tour_Image_graph_speed);
 
 		createGraphAction(
 				TourManager.GRAPH_ALTIMETER,
-				"Altimeter",
-				"Show/Hide the altimeter",
-				"graph-altimeter.gif");
+				Messages.Graph_Altimeter,
+				Messages.Tour_Action_graph_altimeter_tooltip,
+				Messages.Tour_Image_graph_altimeter);
 
 		createGraphAction(
 				TourManager.GRAPH_PULSE,
-				"Heartbeat",
-				"Show/Hide the heartbeat",
-				"graph-pulse.gif");
+				Messages.Graph_Heartbeat,
+				Messages.Tour_Action_graph_heartbeat_tooltip,
+				Messages.Tour_Image_graph_heartbeat);
 
 		createGraphAction(
 				TourManager.GRAPH_TEMPERATURE,
-				"Temperature",
-				"Show/Hide the temperature",
-				"graph-temperature.gif");
+				Messages.Graph_Temperature,
+				Messages.Tour_Action_graph_temperature_tooltip,
+				Messages.Tour_Image_graph_temperature);
 
 		createGraphAction(
 				TourManager.GRAPH_CADENCE,
-				"Cadence",
-				"Show/Hide the cadence",
-				"graph-cadence.gif");
+				Messages.Graph_Cadence,
+				Messages.Tour_Action_graph_cadence_tooltip,
+				Messages.Tour_Image_graph_cadence);
 
 		createGraphAction(
 				TourManager.GRAPH_GRADIENT,
-				"Gradient",
-				"Show/Hide the tour gradient",
-				"graph-gradient.gif");
+				Messages.Graph_Gradiend,
+				Messages.Tour_Action_graph_gradient_tooltip,
+				Messages.Tour_Image_graph_gradient);
 
 		fActionOptions = new ActionChartOptions(this);
 

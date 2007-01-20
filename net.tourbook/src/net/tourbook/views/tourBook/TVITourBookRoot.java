@@ -38,14 +38,14 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		String sqlString = "SELECT STARTYEAR, "
+		String sqlString = "SELECT STARTYEAR, " //$NON-NLS-1$
 				+ SQL_SUM_COLUMNS
-				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
-				+ " WHERE 1=1 "
+				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ " WHERE 1=1 " //$NON-NLS-1$
 				+ sqlTourPersonId()
 				+ sqlTourTypeId()
-				+ " GROUP BY STARTYEAR"
-				+ " ORDER BY STARTYEAR";
+				+ " GROUP BY STARTYEAR" //$NON-NLS-1$
+				+ " ORDER BY STARTYEAR"; //$NON-NLS-1$
 
 		try {
 
