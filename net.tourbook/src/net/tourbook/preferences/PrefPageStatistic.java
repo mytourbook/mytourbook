@@ -327,7 +327,7 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements
 			}
 
 			if (number < numbers - 1) {
-				text.append(Messages.Pref_Statistic_Label_komma);
+				text.append(Messages.Pref_Statistic_Label_separator);
 			}
 		}
 		label.setText(Dialog.shortenText(text.toString() + " " + unit, label)); //$NON-NLS-1$

@@ -42,8 +42,8 @@ public class StatisticDayAltitude extends StatisticDay {
 				ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fAltitudeLow,
 				tourTimeData.fAltitudeHigh);
-		yData.setYTitle("Altitude");
-		yData.setUnitLabel("m");
+		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setMinValue(0);
 		yData.setCustomData(ALTITUDE_DATA, 1);

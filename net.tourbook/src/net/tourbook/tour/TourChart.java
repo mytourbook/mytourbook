@@ -229,45 +229,45 @@ public class TourChart extends Chart {
 
 		createGraphAction(
 				TourManager.GRAPH_ALTITUDE,
-				Messages.Graph_Altitude,
+				Messages.Graph_Label_Altitude,
 				Messages.Tour_Action_graph_altitude_tooltip,
-				Messages.Tour_Image_graph_altitude);
+				Messages.Image_graph_altitude);
 
 		createGraphAction(
 				TourManager.GRAPH_SPEED,
-				Messages.Graph_Speed,
+				Messages.Graph_Label_Speed,
 				Messages.Tour_Action_graph_speed_tooltip,
-				Messages.Tour_Image_graph_speed);
+				Messages.Image_graph_speed);
 
 		createGraphAction(
 				TourManager.GRAPH_ALTIMETER,
-				Messages.Graph_Altimeter,
+				Messages.Graph_Label_Altimeter,
 				Messages.Tour_Action_graph_altimeter_tooltip,
-				Messages.Tour_Image_graph_altimeter);
+				Messages.Image_graph_altimeter);
 
 		createGraphAction(
 				TourManager.GRAPH_PULSE,
-				Messages.Graph_Heartbeat,
+				Messages.Graph_Label_Heartbeat,
 				Messages.Tour_Action_graph_heartbeat_tooltip,
-				Messages.Tour_Image_graph_heartbeat);
+				Messages.Image_graph_heartbeat);
 
 		createGraphAction(
 				TourManager.GRAPH_TEMPERATURE,
-				Messages.Graph_Temperature,
+				Messages.Graph_Label_Temperature,
 				Messages.Tour_Action_graph_temperature_tooltip,
-				Messages.Tour_Image_graph_temperature);
+				Messages.Image_graph_temperature);
 
 		createGraphAction(
 				TourManager.GRAPH_CADENCE,
-				Messages.Graph_Cadence,
+				Messages.Graph_Label_Cadence,
 				Messages.Tour_Action_graph_cadence_tooltip,
-				Messages.Tour_Image_graph_cadence);
+				Messages.Image_graph_cadence);
 
 		createGraphAction(
 				TourManager.GRAPH_GRADIENT,
-				Messages.Graph_Gradiend,
+				Messages.Graph_Label_Gradiend,
 				Messages.Tour_Action_graph_gradient_tooltip,
-				Messages.Tour_Image_graph_gradient);
+				Messages.Image_graph_gradient);
 
 		fActionOptions = new ActionChartOptions(this);
 

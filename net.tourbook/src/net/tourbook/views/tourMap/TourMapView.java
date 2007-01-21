@@ -27,6 +27,7 @@ import java.util.Iterator;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
@@ -82,6 +83,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Color;
@@ -108,10 +110,10 @@ import org.eclipse.ui.part.PageBook;
 
 public class TourMapView extends SynchedChartView {
 
-	public static final String						ID						= "net.tourbook.views.tourMap.TourMapView";
+	public static final String						ID						= "net.tourbook.views.tourMap.TourMapView"; //$NON-NLS-1$
 
-	private static final String						MEMENTO_SASH_CONTAINER	= "tourmapview.sash.container.";
-	private static final String						MEMENTO_SASH_CHART		= "tourmapview.sash.chart.";
+	private static final String						MEMENTO_SASH_CONTAINER	= "tourmapview.sash.container.";			//$NON-NLS-1$
+	private static final String						MEMENTO_SASH_CHART		= "tourmapview.sash.chart.";				//$NON-NLS-1$
 
 	public static final int							COLUMN_LABEL			= 0;
 	public static final int							COLUMN_SPEED			= 1;
@@ -207,7 +209,7 @@ public class TourMapView extends SynchedChartView {
 	private class ActionRenameRefTour extends Action {
 
 		public ActionRenameRefTour() {
-			super("Rename Reference Tour");
+			super(Messages.TourMap_Action_rename_reference_tour);
 		}
 
 		public void run() {
@@ -222,8 +224,8 @@ public class TourMapView extends SynchedChartView {
 				// ask for the reference tour name
 				final InputDialog dialog = new InputDialog(
 						getSite().getShell(),
-						"Rename Reference Tour",
-						"Enter the reference tour name:",
+						Messages.TourMap_Dlg_rename_reference_tour_title,
+						Messages.TourMap_Dlg_rename_reference_tour_msg,
 						ttiRefTour.label,
 						null);
 
@@ -318,7 +320,7 @@ public class TourMapView extends SynchedChartView {
 				case COLUMN_LABEL:
 					return refTour.label;
 				}
-				return "";
+				return ""; //$NON-NLS-1$
 
 			} else if (obj instanceof TVITourMapYear) {
 
@@ -327,7 +329,7 @@ public class TourMapView extends SynchedChartView {
 				case COLUMN_LABEL:
 					return Integer.toString(yearItem.year);
 				}
-				return "";
+				return ""; //$NON-NLS-1$
 
 			} else if (obj instanceof TVTITourMapComparedTour) {
 
@@ -343,7 +345,7 @@ public class TourMapView extends SynchedChartView {
 
 					final float speed = compTour.getTourSpeed();
 					if (speed == 0) {
-						return "";
+						return ""; //$NON-NLS-1$
 					} else {
 						return nf.format(speed);
 					}
@@ -480,7 +482,7 @@ public class TourMapView extends SynchedChartView {
 		});
 
 		fNoSelectedTour = new Label(fPageBookCompTourChart, SWT.NONE);
-		fNoSelectedTour.setText("A tour is not selected");
+		fNoSelectedTour.setText(Messages.TourMap_Label_a_tour_is_not_selected);
 	}
 
 	/**
@@ -488,7 +490,7 @@ public class TourMapView extends SynchedChartView {
 	 */
 	private void createContextMenu() {
 
-		final MenuManager menuMgr = new MenuManager("#PopupMenu");
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(final IMenuManager manager) {
@@ -554,11 +556,11 @@ public class TourMapView extends SynchedChartView {
 		PixelConverter pixelConverter = new PixelConverter(tree);
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText("Tour");
+		tc.setText(Messages.TourMap_Column_tour);
 		treeLayouter.addColumnData(new ColumnWeightData(18, true));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText("km/h");
+		tc.setText(Messages.TourMap_Column_kmh);
 		treeLayouter.addColumnData(new ColumnPixelData(pixelConverter
 				.convertWidthInCharsToPixels(9), false));
 
@@ -894,10 +896,10 @@ public class TourMapView extends SynchedChartView {
 						- xValues[refTour.getStartValueIndex()];
 
 				// set title
-				changedChartDataModel.setTitle("Reference Tour: "
-						+ refTour.getLabel()
-						+ " - "
-						+ TourManager.getTourDate(refTourChartData.getRefTourData()));
+				changedChartDataModel.setTitle(NLS.bind(
+						Messages.TourMap_Label_chart_title_reference_tour,
+						refTour.getLabel(),
+						TourManager.getTourDate(refTourChartData.getRefTourData())));
 
 			}
 		});
@@ -1131,14 +1133,14 @@ public class TourMapView extends SynchedChartView {
 			yData.setMaxValue(refItem.yearMapMaxValue);
 		}
 
-		yData.setYTitle("Speed");
-		yData.setUnitLabel("km/h");
+		yData.setYTitle(Messages.TourMap_Label_year_chart_title);
+		yData.setUnitLabel(Messages.TourMap_Label_year_chart_unit);
 		// yData.setMinValue(0);
 
 		chartModel.addYData(yData);
 
 		// set title
-		chartModel.setTitle("Year Map: " + yearItem.year);
+		chartModel.setTitle(NLS.bind(Messages.TourMap_Label_chart_title_year_map, yearItem.year));
 
 		// set graph minimum width, this is the number of days in the
 		// fSelectedYear
@@ -1221,8 +1223,9 @@ public class TourMapView extends SynchedChartView {
 					xData.setMarkerValueIndex(compItem.getStartIndex(), compItem.getEndIndex());
 
 					// set title
-					changedChartDataModel.setTitle("Compared Tour: "
-							+ TourManager.getTourDate(selectedCompTourData));
+					changedChartDataModel.setTitle(NLS.bind(
+							Messages.TourMap_Label_chart_title_compared_tour,
+							TourManager.getTourDate(selectedCompTourData)));
 				}
 			};
 

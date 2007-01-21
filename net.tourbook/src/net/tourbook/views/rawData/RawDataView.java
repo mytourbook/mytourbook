@@ -670,11 +670,11 @@ public class RawDataView extends ViewPart {
 	}
 
 	private void createResources() {
-		imageDatabaseDescriptor = TourbookPlugin.getImageDescriptor(Messages.RawData_Image_database);
+		imageDatabaseDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image_database);
 		imageDatabaseOtherPersonDescriptor = TourbookPlugin
-				.getImageDescriptor(Messages.RawData_Image_database_other_person);
+				.getImageDescriptor(Messages.Image_database_other_person);
 		imageDatabasePlaceholderDescriptor = TourbookPlugin
-				.getImageDescriptor(Messages.RawData_Image_database_placeholder);
+				.getImageDescriptor(Messages.Image_database_placeholder);
 
 		try {
 			Display display = Display.getCurrent();

@@ -39,7 +39,7 @@ public class StatisticServices {
 
 	static void setChartColors(ChartDataYSerie yData, String graphName) {
 
-		String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphName + ".";
+		String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 
 		yData.setRgbBright(new RGB[] {
 				PreferenceConverter.getColor(fPrefStore, prefGraphName
@@ -69,7 +69,7 @@ public class StatisticServices {
 		/*
 		 * add default color
 		 */
-		String defaultColorName = ITourbookPreferences.GRAPH_COLORS + graphName + ".";
+		String defaultColorName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 		rgbBright.add(PreferenceConverter.getColor(prefStore, defaultColorName
 				+ GraphColors.PREF_COLOR_BRIGHT));
 

@@ -44,8 +44,8 @@ public class StatisticDayCombined extends StatisticDay {
 				ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fAltitudeLow,
 				tourTimeData.fAltitudeHigh);
-		yData.setYTitle("Altitude");
-		yData.setUnitLabel("m");
+		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setMinValue(0);
@@ -61,8 +61,8 @@ public class StatisticDayCombined extends StatisticDay {
 				ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fDistanceLow,
 				tourTimeData.fDistanceHigh);
-		yData.setYTitle("Distance");
-		yData.setUnitLabel("km");
+		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
 		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setMinValue(0);
@@ -78,8 +78,8 @@ public class StatisticDayCombined extends StatisticDay {
 				ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fTimeLow,
 				tourTimeData.fTimeHigh);
-		yData.setYTitle("Time");
-		yData.setUnitLabel("h");
+		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
 		yData.setMinValue(0);

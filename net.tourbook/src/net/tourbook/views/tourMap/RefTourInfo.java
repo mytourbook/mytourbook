@@ -17,6 +17,7 @@ package net.tourbook.views.tourMap;
 
 import java.text.NumberFormat;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 
@@ -53,25 +54,25 @@ public class RefTourInfo extends Composite {
 		Label label;
 
 		label = new Label(this, SWT.NONE);
-		label.setText("Distance:");
+		label.setText(Messages.TourMap_Label_distance);
 		txtDistance = new Label(this, SWT.TRAIL);
 		txtDistance.setLayoutData(gd);
 		label = new Label(this, SWT.NONE);
-		label.setText("km");
+		label.setText(Messages.TourMap_Label_km);
 
 		label = new Label(this, SWT.NONE);
-		label.setText("Altitude Up:");
+		label.setText(Messages.TourMap_Label_altitude_up);
 		txtAltitudeUp = new Label(this, SWT.TRAIL);
 		txtAltitudeUp.setLayoutData(gd);
 		label = new Label(this, SWT.NONE);
-		label.setText("m");
+		label.setText(Messages.TourMap_Label_m);
 
 		label = new Label(this, SWT.NONE);
-		label.setText("Altitude down:");
+		label.setText(Messages.TourMap_Label_altitude_down);
 		txtAltitudeDown = new Label(this, SWT.TRAIL);
 		txtAltitudeDown.setLayoutData(gd);
 		label = new Label(this, SWT.NONE);
-		label.setText("m");
+		label.setText(Messages.TourMap_Label_m);
 
 	}
 

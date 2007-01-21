@@ -42,8 +42,8 @@ public class StatisticDayTourTime extends StatisticDay {
 				ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fTimeLow,
 				tourTimeData.fTimeHigh);
-		yData.setYTitle(Messages.Statistic_unit_text_driving_time);
-		yData.setUnitLabel(Messages.Statistic_unit_label_time);
+		yData.setYTitle(Messages.LABEL_DRIVING_TIME);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
 		yData.setMinValue(0);

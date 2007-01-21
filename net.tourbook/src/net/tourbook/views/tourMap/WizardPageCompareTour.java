@@ -23,10 +23,9 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Formatter;
 
-import net.tourbook.chart.ChartDataModel;
+import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
@@ -44,6 +43,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -65,8 +65,8 @@ import org.eclipse.ui.part.PageBook;
 public class WizardPageCompareTour extends WizardPage {
 
 	// dialog settings
-	private static final String	COMP_TOUR_VIEWER_WIDTH		= "CompTour.viewerWidth";
-	private static final String	COMP_TOUR_SELECT_ALL		= "CompTour.selectAll";
+	private static final String	COMP_TOUR_VIEWER_WIDTH		= "CompTour.viewerWidth";			//$NON-NLS-1$
+	private static final String	COMP_TOUR_SELECT_ALL		= "CompTour.selectAll";			//$NON-NLS-1$
 
 	// tree columns
 	static final int			COLUMN_DATE					= 0;
@@ -137,7 +137,7 @@ public class WizardPageCompareTour extends WizardPage {
 			case COLUMN_RECORDING:
 				long recordingTime = row[COLUMN_RECORDING];
 				return new Formatter().format(
-						"%d:%02d",
+						Messages.Format_hhmm,
 						(recordingTime / 3600),
 						((recordingTime % 3600) / 60)).toString();
 
@@ -156,7 +156,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 	protected WizardPageCompareTour(String pageName) {
 		super(pageName);
-		setTitle("Compare Tours");
+		setTitle(Messages.TourMapWizard_Page_compared_tours_title);
 	}
 
 	public void createControl(Composite parent) {
@@ -165,7 +165,7 @@ public class WizardPageCompareTour extends WizardPage {
 		pageContainer.setLayout(new GridLayout());
 
 		fCheckSelectAll = new Button(pageContainer, SWT.CHECK);
-		fCheckSelectAll.setText("Select all tours");
+		fCheckSelectAll.setText(Messages.TourMapWizard_Action_select_all_tours);
 		fCheckSelectAll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				enableTours(fCheckSelectAll.getSelection());
@@ -185,7 +185,7 @@ public class WizardPageCompareTour extends WizardPage {
 		// chart group
 		fChartGroup = new Group(masterDetailContainer, SWT.NONE);
 		fChartGroup.setLayout(new GridLayout());
-		fChartGroup.setText("Selected Tour");
+		fChartGroup.setText(Messages.TourMapWizard_Group_selected_tour);
 		fChartGroup.setEnabled(false);
 
 		fViewerDetailForm = new ViewerDetailForm(masterDetailContainer, viewer, sash, fChartGroup);
@@ -201,7 +201,7 @@ public class WizardPageCompareTour extends WizardPage {
 				SWT.COLOR_WIDGET_BACKGROUND));
 
 		fPageNoTourIsSelected = new Label(fPageBook, SWT.NONE);
-		fPageNoTourIsSelected.setText("A tour is not selected");
+		fPageNoTourIsSelected.setText(Messages.TourMapWizard_Label_a_tour_is_not_selected);
 		fPageNoTourIsSelected.setEnabled(false);
 
 		restoreDialogSettings();
@@ -259,22 +259,22 @@ public class WizardPageCompareTour extends WizardPage {
 		TreeColumn tc;
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText("Tour");
+		tc.setText(Messages.TourMapWizard_Column_tour);
 		tc.setWidth(convertWidthInCharsToPixels(20));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText("km");
-		tc.setToolTipText("Distance");
+		tc.setText(Messages.TourMapWizard_Column_km);
+		tc.setToolTipText(Messages.TourMapWizard_Column_km_tooltip);
 		tc.setWidth(convertWidthInCharsToPixels(10));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText("m");
-		tc.setToolTipText("Altitude up");
+		tc.setText(Messages.TourMapWizard_Column_m);
+		tc.setToolTipText(Messages.TourMapWizard_Column_m_tooltip);
 		tc.setWidth(convertWidthInCharsToPixels(10));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText("h");
-		tc.setToolTipText("Recording Time");
+		tc.setText(Messages.TourMapWizard_Column_h);
+		tc.setToolTipText(Messages.TourMapWizard_Column_h_tooltip);
 		tc.setWidth(convertWidthInCharsToPixels(10));
 
 		/*
@@ -322,10 +322,12 @@ public class WizardPageCompareTour extends WizardPage {
 
 					fTourChart.updateChart(tourData, chartConfig);
 
-					fChartGroup.setText("Selected Tour: " + TourManager.getTourDate(tourData));
+					fChartGroup.setText(NLS.bind(
+							Messages.TourMapWizard_Group_selected_tour_2,
+							TourManager.getTourDate(tourData)));
 					fPageBook.showPage(fTourChart);
 				} else {
-					fChartGroup.setText("");
+					fChartGroup.setText(""); //$NON-NLS-1$
 					fPageBook.showPage(fPageNoTourIsSelected);
 				}
 			}
@@ -362,7 +364,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 	private boolean validatePage() {
 
-		setMessage("Tours which are compared with the reference tour(s)");
+		setMessage(Messages.TourMapWizard_Label_page_message);
 
 		if (fCheckSelectAll.getSelection()) {
 
@@ -376,7 +378,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 			if (checkedElements.length == 0) {
 				setPageComplete(false);
-				setErrorMessage("One or more tour(s) must be selected");
+				setErrorMessage(Messages.TourMapWizard_Error_tour_must_be_selected);
 				return false;
 
 			} else {
@@ -413,7 +415,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 	private Long[] getAllTourIds() {
 
-		String sqlString = "SELECT TourId FROM " + TourDatabase.TABLE_TOUR_DATA;
+		String sqlString = "SELECT TourId FROM " + TourDatabase.TABLE_TOUR_DATA; //$NON-NLS-1$
 
 		ArrayList<Long> tourIdList = new ArrayList<Long>();
 

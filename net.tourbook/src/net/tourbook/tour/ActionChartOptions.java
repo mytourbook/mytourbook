@@ -94,7 +94,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		this.tourChart = tourChart;
 
 		setToolTipText(Messages.Tour_Action_chart_options_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Image_chart_options));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_chart_options));
 
 		actionStartTimeOption = new ActionStartTimeOption();
 		actionCanScrollZoomedChart = new ActionCanScrollZoomedChart();

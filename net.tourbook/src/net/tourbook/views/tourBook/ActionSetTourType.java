@@ -18,6 +18,7 @@ package net.tourbook.views.tourBook;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -41,7 +42,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionSetTourType extends Action {
 
-	private static final String	MEMENTO_SELECTED_TOUR_TYPE_ID	= "action-save-tour-type.selected-tour-type-id";
+	private static final String	MEMENTO_SELECTED_TOUR_TYPE_ID	= "action-save-tour-type.selected-tour-type-id"; //$NON-NLS-1$
 
 	private TourBookView		fViewPart;
 
@@ -69,7 +70,7 @@ public class ActionSetTourType extends Action {
 			case 0:
 				return tourType.getName();
 			}
-			return "?";
+			return "?"; //$NON-NLS-1$
 		}
 
 		public Image getColumnImage(Object element, int columnIndex) {
@@ -79,7 +80,7 @@ public class ActionSetTourType extends Action {
 
 	public IDialogSettings getDialogSettings() {
 
-		final String DIALOG_SETTINGS_SECTION = "DialogSelectTourType";
+		final String DIALOG_SETTINGS_SECTION = "DialogSelectTourType"; //$NON-NLS-1$
 
 		IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
 		IDialogSettings dialogSettings = pluginSettings.getSection(DIALOG_SETTINGS_SECTION);
@@ -95,7 +96,7 @@ public class ActionSetTourType extends Action {
 		fViewPart = tourBookView;
 		fUseDialog = useDialog;
 
-		setText("Set tour type...");
+		setText(Messages.TourBook_Action_set_tour_type_with_dlg);
 
 		setEnabled(false);
 	}
@@ -206,8 +207,8 @@ public class ActionSetTourType extends Action {
 		dialog.setContentProvider(new TourTypeContentProvider());
 		dialog.setLabelProvider(new TourTypeLabelProvider());
 
-		dialog.setTitle("Set Tour Type");
-		dialog.setMessage("Select tour type:");
+		dialog.setTitle(Messages.TourBook_Dlg_set_tour_type_title);
+		dialog.setMessage(Messages.TourBook_Dlg_set_tour_type_msg);
 		dialog.setDialogBoundsSettings(getDialogSettings(), Dialog.DIALOG_PERSISTLOCATION
 				| Dialog.DIALOG_PERSISTSIZE);
 

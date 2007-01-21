@@ -53,7 +53,7 @@ public class GraphColors {
 
 			new ColorDefinition(
 					PREF_GRAPH_ALTITUDE,
-					Messages.Graph_Altitude,
+					Messages.Graph_Label_Altitude,
 					new RGB(255, 255, 255),
 					new RGB(0, 255, 0),
 					new RGB(45, 188, 45)),
@@ -72,47 +72,47 @@ public class GraphColors {
 
 			new ColorDefinition(
 					PREF_GRAPH_SPEED,
-					Messages.Graph_Speed,
+					Messages.Graph_Label_Speed,
 					new RGB(255, 255, 255),
 					new RGB(0, 113, 229),
 					new RGB(0, 94, 187)),
 
 			new ColorDefinition(
 					PREF_GRAPH_HEARTBEAT,
-					Messages.Graph_Heartbeat,
+					Messages.Graph_Label_Heartbeat,
 					new RGB(255, 255, 255),
 					new RGB(253, 0, 0),
 					new RGB(253, 0, 0)),
 
-			new ColorDefinition(PREF_GRAPH_TEMPTERATURE, Messages.Graph_Temperature, new RGB(
+			new ColorDefinition(PREF_GRAPH_TEMPTERATURE, Messages.Graph_Label_Temperature, new RGB(
 					255,
 					255,
 					255), new RGB(0, 195, 221), new RGB(0, 169, 193)),
 
 			new ColorDefinition(
 					PREF_GRAPH_POWER,
-					Messages.Graph_Power,
+					Messages.Graph_Label_Power,
 					new RGB(255, 255, 255),
 					new RGB(83, 91, 172),
 					new RGB(70, 75, 145)),
 
 			new ColorDefinition(
 					PREF_GRAPH_CADENCE,
-					Messages.Graph_Cadence,
+					Messages.Graph_Label_Cadence,
 					new RGB(255, 255, 255),
 					new RGB(186, 0, 255),
 					new RGB(144, 0, 193)),
 
 			new ColorDefinition(
 					PREF_GRAPH_ALTIMETER,
-					Messages.Graph_Altimeter,
+					Messages.Graph_Label_Altimeter,
 					new RGB(255, 255, 255),
 					new RGB(255, 180, 0),
 					new RGB(244, 132, 0)),
 
 			new ColorDefinition(
 					PREF_GRAPH_GRADIEND,
-					Messages.Graph_Gradiend,
+					Messages.Graph_Label_Gradiend,
 					new RGB(255, 255, 255),
 					new RGB(255, 239, 0),
 					new RGB(198, 188, 0))				};

@@ -35,7 +35,7 @@ public class ActionTourMarker extends Action {
 		super(null, AS_PUSH_BUTTON);
 
 		setToolTipText(Messages.Tour_Action_open_marker_editor);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Image_open_marker_editor));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_open_marker_editor));
 
 		fTourChart = chartPanel;
 	}

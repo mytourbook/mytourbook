@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.ITourItem;
@@ -36,10 +37,10 @@ public class ActionDeleteTour extends Action {
 
 		this.tourView = tourBookView;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("delete.gif"));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("delete-disabled.gif"));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete_disabled));
 
-		setText("Delete selected tours");
+		setText(Messages.TourBook_Action_delete_selected_tours);
 
 		setEnabled(false);
 	}

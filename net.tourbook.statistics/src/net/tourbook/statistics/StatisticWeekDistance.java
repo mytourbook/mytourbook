@@ -38,8 +38,8 @@ public class StatisticWeekDistance extends StatisticWeek {
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourWeekData.fDistanceLow,
 				tourWeekData.fDistanceHigh);
-		yData.setYTitle("Distance");
-		yData.setUnitLabel("km");
+		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setMinValue(0);
 		chartModel.addYData(yData);

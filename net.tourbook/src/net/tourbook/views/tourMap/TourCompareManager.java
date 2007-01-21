@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -30,6 +31,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -82,13 +84,13 @@ public class TourCompareManager {
 		this.refTourContext = refTourContext;
 		refToursData = new TourData[refTourContext.length];
 
-		Job compareJob = new Job("Compare Tours") {
+		Job compareJob = new Job(Messages.TourMap_Compare_job_title) {
 
 			protected IStatus run(IProgressMonitor monitor) {
 
 				final int tours2Compare = compareTours.length * refTourContext.length;
 
-				monitor.beginTask("Compare Task", tours2Compare);
+				monitor.beginTask(Messages.TourMap_Compare_job_task, tours2Compare);
 
 				compareTourJob(refTourContext, compareTours, monitor);
 
@@ -164,7 +166,8 @@ public class TourCompareManager {
 
 							// update the message in the progress monitor
 							tourCounter++;
-							monitor.subTask("Tours compared: " + Integer.toString(tourCounter));
+							monitor.subTask(NLS.bind(Messages.TourMap_Compare_job_subtask, Integer
+									.toString(tourCounter)));
 
 							monitor.worked(1);
 						}
@@ -196,7 +199,7 @@ public class TourCompareManager {
 						tourComparerView.updateViewer();
 
 					} catch (PartInitException e) {
-						ErrorDialog.openError(window.getShell(), "Error", e.getMessage(), e
+						ErrorDialog.openError(window.getShell(), "Error", e.getMessage(), e //$NON-NLS-1$
 								.getStatus());
 					}
 				}

@@ -676,14 +676,14 @@ public class TourDatabase {
 		// confirm update
 		String[] buttons = new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL };
 
-		String message = Messages.Database_Confirm_update_1
-				+ (currentDbVersion + Messages.Database_Confirm_update_2 + TOURBOOK_DB_VERSION + Messages.Database_Confirm_update_3)
-				+ Messages.Database_Confirm_update_4
-				+ Messages.Database_Confirm_update_5
-				+ Messages.Database_Confirm_update_6
-				+ Messages.Database_Confirm_update_7
-				+ (Messages.Database_Confirm_update_8 + getDatabasePath())
-				+ Messages.Database_Confirm_update_9
+		String message = Messages.Database_Confirm_update_01
+				+ (currentDbVersion + Messages.Database_Confirm_update_02 + TOURBOOK_DB_VERSION + Messages.Database_Confirm_update_03)
+				+ Messages.Database_Confirm_update_04
+				+ Messages.Database_Confirm_update_05
+				+ Messages.Database_Confirm_update_06
+				+ Messages.Database_Confirm_update_07
+				+ (Messages.Database_Confirm_update_08 + getDatabasePath())
+				+ Messages.Database_Confirm_update_09
 				+ Messages.Database_Confirm_update_10
 				+ Messages.Database_Confirm_update_11
 				+ Messages.Database_Confirm_update_12

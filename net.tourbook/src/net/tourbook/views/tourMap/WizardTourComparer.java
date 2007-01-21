@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.views.tourMap;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourReference;
 import net.tourbook.plugin.TourbookPlugin;
 
@@ -23,14 +24,14 @@ import org.eclipse.jface.wizard.Wizard;
 
 public class WizardTourComparer extends Wizard {
 
-	public static final String		DIALOG_SETTINGS_SECTION	= "WizardTourComparer";
+	public static final String		DIALOG_SETTINGS_SECTION	= "WizardTourComparer"; //$NON-NLS-1$
 
 	private WizardPageCompareTour	pageCompareTour;
 	private WizardPageReferenceTour	pageReferenceTour;
 
 	public WizardTourComparer() {
 		setDialogSettings();
-		setWindowTitle("Tour Comparer");
+		setWindowTitle(Messages.TourMapWizard_Wizard_title);
 	}
 
 	public boolean performCancel() {
@@ -52,10 +53,10 @@ public class WizardTourComparer extends Wizard {
 
 	public void addPages() {
 
-		pageCompareTour = new WizardPageCompareTour("compare-tour");
+		pageCompareTour = new WizardPageCompareTour("compare-tour"); //$NON-NLS-1$
 		addPage(pageCompareTour);
 
-		pageReferenceTour = new WizardPageReferenceTour("reference-tour");
+		pageReferenceTour = new WizardPageReferenceTour("reference-tour"); //$NON-NLS-1$
 		addPage(pageReferenceTour);
 
 	}

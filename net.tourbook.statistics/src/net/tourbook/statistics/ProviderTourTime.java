@@ -88,22 +88,22 @@ public class ProviderTourTime extends DataProvider implements IMonthProvider {
 		final ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-		final String sqlString = "SELECT "
-				+ "TOURID, "
-				+ "STARTYEAR, "
-				+ "STARTMONTH, "
-				+ "STARTDAY, "
-				+ "STARTHOUR, "
-				+ "STARTMINUTE, "
-				+ "TOURDISTANCE, "
-				+ "TOURALTUP, "
-				+ "tourRecordingTime, " // 9
-				+ "tourDrivingTime, "// 10
-				+ "tourType_typeId "// 11
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
-				+ (" WHERE STARTYEAR = " + Integer.toString(year))
+		final String sqlString = "SELECT " //$NON-NLS-1$
+				+ "TOURID, " //$NON-NLS-1$
+				+ "STARTYEAR, " //$NON-NLS-1$
+				+ "STARTMONTH, " //$NON-NLS-1$
+				+ "STARTDAY, " //$NON-NLS-1$
+				+ "STARTHOUR, " //$NON-NLS-1$
+				+ "STARTMINUTE, " //$NON-NLS-1$
+				+ "TOURDISTANCE, " //$NON-NLS-1$
+				+ "TOURALTUP, " //$NON-NLS-1$
+				+ "tourRecordingTime, " // 9 //$NON-NLS-1$
+				+ "tourDrivingTime, "// 10 //$NON-NLS-1$
+				+ "tourType_typeId "// 11 //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE STARTYEAR = " + Integer.toString(year)) //$NON-NLS-1$
 				+ getSQLFilter(person, typeId)
-				+ (" ORDER BY StartMonth, StartDay, StartHour, StartMinute");
+				+ (" ORDER BY StartMonth, StartDay, StartHour, StartMinute"); //$NON-NLS-1$
 
 		try {
 			final Connection conn = TourDatabase.getInstance().getConnection();
@@ -225,7 +225,7 @@ public class ProviderTourTime extends DataProvider implements IMonthProvider {
 				}
 
 				if (tourDateValues == null || valueIndex >= tourDateValues.length) {
-					return "";
+					return ""; //$NON-NLS-1$
 				}
 				fCalendar.set(fCurrentYear, 0, 1);
 				fCalendar.set(Calendar.DAY_OF_YEAR, tourDateValues[valueIndex] + 1);
@@ -238,7 +238,7 @@ public class ProviderTourTime extends DataProvider implements IMonthProvider {
 				final long typeId = fTourTimeData.fTypeIds[valueIndex];
 				final ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getTourTypes();
 
-				String tourTypeName = "";
+				String tourTypeName = ""; //$NON-NLS-1$
 				for (final Iterator iter = tourTypes.iterator(); iter.hasNext();) {
 					final TourType tourType = (TourType) iter.next();
 					if (tourType.getTypeId() == typeId) {
@@ -250,11 +250,11 @@ public class ProviderTourTime extends DataProvider implements IMonthProvider {
 				final int[] durationValue = fTourTimeData.fTourTimeDurationValues;
 
 				final String barInfo = new Formatter().format(
-						" %d.%d.%d - %d:%02d-%d:%02d\n\n"
-								+ " Distance:\t%d km\n"
-								+ " Altitude:\t%d m\n"
-								+ " Duration:\t%d:%02d h\n"
-								+ " Type:\t\t%s",
+						Messages.TOURTIMEINFO_DATE_FORMAT
+								+ Messages.TOURTIMEINFO_DISTANCE
+								+ Messages.TOURTIMEINFO_ALTITUDE
+								+ Messages.TOURTIMEINFO_DURATION
+								+ Messages.TOURTIMEINFO_TOUR_TYPE,
 						fCalendar.get(Calendar.DAY_OF_MONTH),
 						fCalendar.get(Calendar.MONTH) + 1,
 						fCalendar.get(Calendar.YEAR),

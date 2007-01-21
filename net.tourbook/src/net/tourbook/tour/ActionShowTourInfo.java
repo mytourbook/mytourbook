@@ -30,7 +30,7 @@ public class ActionShowTourInfo extends Action {
 
 		fTour = tour;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Image_tour_info));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_tour_info));
 		setToolTipText(Messages.Tour_Action_tour_info_tooltip);
 	}
 

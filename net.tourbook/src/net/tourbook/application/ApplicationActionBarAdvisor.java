@@ -163,7 +163,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	protected void fillMenuBar(IMenuManager menuBar) {
 
-		MenuManager fileMenu = new MenuManager(Messages.Action_file_menu, IWorkbenchActionConstants.M_FILE);
+		MenuManager fileMenu = new MenuManager(Messages.Action_Menu_file, IWorkbenchActionConstants.M_FILE);
 		menuBar.add(fileMenu);
 
 		fileMenu.add(fActionImport);
@@ -180,7 +180,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		// fileMenu.add(fActionClose);
 		// fileMenu.add(new Separator());
 
-		MenuManager viewMenu = new MenuManager(Messages.Action_view_menu, null);
+		MenuManager viewMenu = new MenuManager(Messages.Action_Menu_view, null);
 		menuBar.add(viewMenu);
 		viewMenu.add(fActionRawDataView);
 		viewMenu.add(fActionTourBookView);

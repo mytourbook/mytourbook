@@ -205,7 +205,7 @@ public class WizardImportData extends Wizard {
 		DeviceData deviceData = RawDataManager.getInstance().getDeviceData();
 		String fileName = new Formatter()
 				.format(
-						Messages.ImportWizard_Format_import_filename_yyyymmdd
+						Messages.Format_import_filename_yyyymmdd
 								+ fImportDevice.fileExtension,
 						deviceData.transferYear,
 						deviceData.transferMonth,

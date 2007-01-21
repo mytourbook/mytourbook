@@ -151,18 +151,18 @@ public class ChartComponents extends Composite {
 	public boolean						useAdvancedGraphics			= true;
 
 	private final String				monthLabels[]				= {
-			Messages.Chart_Month_jan,
-			Messages.Chart_Month_feb,
-			Messages.Chart_Month_mar,
-			Messages.Chart_Month_apr,
-			Messages.Chart_Month_mai,
-			Messages.Chart_Month_jun,
-			Messages.Chart_Month_jul,
-			Messages.Chart_Month_aug,
-			Messages.Chart_Month_sep,
-			Messages.Chart_Month_oct,
-			Messages.Chart_Month_nov,
-			Messages.Chart_Month_dec													};
+			Messages.Month_jan,
+			Messages.Month_feb,
+			Messages.Month_mar,
+			Messages.Month_apr,
+			Messages.Month_mai,
+			Messages.Month_jun,
+			Messages.Month_jul,
+			Messages.Month_aug,
+			Messages.Month_sep,
+			Messages.Month_oct,
+			Messages.Month_nov,
+			Messages.Month_dec													};
 
 	private final int[]					fKeyDownCounter				= new int[1];
 	private final int[]					fLastKeyDownCounter			= new int[1];

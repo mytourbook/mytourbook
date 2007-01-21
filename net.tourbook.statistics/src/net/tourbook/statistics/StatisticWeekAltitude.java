@@ -38,8 +38,8 @@ public class StatisticWeekAltitude extends StatisticWeek {
 				tourWeekData.fAltitudeLow,
 				tourWeekData.fAltitudeHigh
 				);
-		yData.setYTitle("Altitude");
-		yData.setUnitLabel("m");
+		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setMinValue(0);

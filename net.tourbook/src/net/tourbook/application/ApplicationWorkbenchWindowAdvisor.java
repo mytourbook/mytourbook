@@ -77,7 +77,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowStatusLine(true);
 		configurer.setShowProgressIndicator(true);
 
-		configurer.setTitle(Messages.App_title);
+		configurer.setTitle(Messages.App_Title);
 
 		PlatformUI.getPreferenceStore().putValue(
 				IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,

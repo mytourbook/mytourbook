@@ -109,25 +109,25 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		fGraphMap = new HashMap<Integer, Graph>();
 		fGraphMap.put(TourManager.GRAPH_ALTITUDE, new Graph(
 				TourManager.GRAPH_ALTITUDE,
-				Messages.Graph_Altitude));
+				Messages.Graph_Label_Altitude));
 		fGraphMap.put(TourManager.GRAPH_SPEED, new Graph(
 				TourManager.GRAPH_SPEED,
-				Messages.Graph_Speed));
+				Messages.Graph_Label_Speed));
 		fGraphMap.put(TourManager.GRAPH_PULSE, new Graph(
 				TourManager.GRAPH_PULSE,
-				Messages.Graph_Heartbeat));
+				Messages.Graph_Label_Heartbeat));
 		fGraphMap.put(TourManager.GRAPH_TEMPERATURE, new Graph(
 				TourManager.GRAPH_TEMPERATURE,
-				Messages.Graph_Temperature));
+				Messages.Graph_Label_Temperature));
 		fGraphMap.put(TourManager.GRAPH_CADENCE, new Graph(
 				TourManager.GRAPH_CADENCE,
-				Messages.Graph_Cadence));
+				Messages.Graph_Label_Cadence));
 		fGraphMap.put(TourManager.GRAPH_ALTIMETER, new Graph(
 				TourManager.GRAPH_ALTIMETER,
-				Messages.Graph_Altimeter));
+				Messages.Graph_Label_Altimeter));
 		fGraphMap.put(TourManager.GRAPH_GRADIENT, new Graph(
 				TourManager.GRAPH_GRADIENT,
-				Messages.Graph_Gradiend));
+				Messages.Graph_Label_Gradiend));
 
 		// create a list with all available graphs
 		fGraphList = new ArrayList<Graph>();

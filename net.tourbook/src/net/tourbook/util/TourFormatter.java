@@ -25,7 +25,7 @@ public final class TourFormatter {
 
 	public static final String formatSeconds(long value) {
 
-		return new Formatter().format(Messages.Tour_Format_hhmmss, (value / 3600), ((value % 3600) / 60),
+		return new Formatter().format(Messages.Format_hhmmss, (value / 3600), ((value % 3600) / 60),
 			((value % 3600) % 60)).toString();
 
 	}

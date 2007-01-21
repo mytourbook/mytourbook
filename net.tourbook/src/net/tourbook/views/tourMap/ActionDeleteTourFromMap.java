@@ -20,6 +20,7 @@ import java.util.Iterator;
 
 import javax.persistence.EntityManager;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
@@ -41,11 +42,11 @@ public class ActionDeleteTourFromMap extends Action {
 
 		fTourView = view;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("delete.gif"));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete));
 		setDisabledImageDescriptor(TourbookPlugin
-				.getImageDescriptor("delete-disabled.gif"));
+				.getImageDescriptor(Messages.Image_delete_disabled));
 
-		setText("Delete selected tours");
+		setText(Messages.TourMap_Action_delete_tours);
 
 		setEnabled(false);
 
@@ -87,10 +88,9 @@ public class ActionDeleteTourFromMap extends Action {
 
 		MessageDialog dialog = new MessageDialog(
 				fTourView.getSite().getShell(),
-				"Delete Reference Tour",
+				Messages.TourMap_Dlg_delete_tour_title,
 				null,
-				"Are you sure to delete the reference tour(s) "
-						+ " and ALL the contained compared tours?",
+				Messages.TourMap_Dlg_delete_tour_msg,
 				MessageDialog.QUESTION,
 				buttons,
 				1);

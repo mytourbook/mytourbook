@@ -49,7 +49,7 @@ public class ActionAdjustAltitude extends Action {
 		setText(Messages.Tour_Action_adjust_tour_altitude);
 		setToolTipText(Messages.Tour_Action_adjust_tour_altitude_tooltip);
 		//
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Image_adjust_altitude));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_adjust_altitude));
 	}
 
 	public ActionAdjustAltitude(TreeViewer treeViewer, TourChart treeTourChart) {

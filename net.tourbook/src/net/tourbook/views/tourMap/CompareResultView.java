@@ -24,6 +24,7 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartIsEmptyException;
@@ -73,6 +74,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Color;
@@ -97,15 +99,15 @@ import org.eclipse.ui.part.PageBook;
 
 public class CompareResultView extends SynchedChartView {
 
-	public static final String				ID						= "net.tourbook.views.tourMap.CompareResultView";
+	public static final String				ID						= "net.tourbook.views.tourMap.CompareResultView";		//$NON-NLS-1$
 
 	public static final int					COLUMN_REF_TOUR			= 0;
 	public static final int					COLUMN_DIFFERENCE		= 1;
 	public static final int					COLUMN_SPEED			= 2;
 	public static final int					COLUMN_DISTANCE			= 3;
 
-	private static final String				MEMENTO_SASH_CONTAINER	= "resultview.container.";
-	private static final String				MEMENTO_SASH_CHART		= "resultview.chart.";
+	private static final String				MEMENTO_SASH_CONTAINER	= "resultview.container.";								//$NON-NLS-1$
+	private static final String				MEMENTO_SASH_CHART		= "resultview.chart.";									//$NON-NLS-1$
 
 	/**
 	 * This memento allows this view to save and restore state when it is closed
@@ -142,7 +144,7 @@ public class CompareResultView extends SynchedChartView {
 																					.getResources());
 
 	private ImageDescriptor					dbImgDescriptor			= TourbookPlugin
-																			.getImageDescriptor("database.gif");
+																			.getImageDescriptor(Messages.Image_database);
 
 	private PageBook						fLowerPageBook;
 
@@ -160,11 +162,13 @@ public class CompareResultView extends SynchedChartView {
 	private class ActionSaveComparedTours extends Action {
 
 		ActionSaveComparedTours() {
-			setImageDescriptor(TourbookPlugin.getImageDescriptor("floppy_disc.gif"));
-			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("floppy_disc_dis.gif"));
+			setImageDescriptor(TourbookPlugin
+					.getImageDescriptor(Messages.Image_save_raw_data_to_file));
+			setDisabledImageDescriptor(TourbookPlugin
+					.getImageDescriptor(Messages.Image_save_raw_data_to_file_disabled));
 
-			setText("Save checked tours");
-			setToolTipText("Save the checked tours in the database");
+			setText(Messages.CompareResult_Action_save_checked_tours);
+			setToolTipText(Messages.CompareResult_Action_save_checked_tours_tooltip);
 			setEnabled(false);
 		}
 
@@ -230,7 +234,7 @@ public class CompareResultView extends SynchedChartView {
 				if (index == 0) {
 					return refTour.label;
 				} else {
-					return "";
+					return ""; //$NON-NLS-1$
 				}
 
 			} else if (obj instanceof TVICompareResult) {
@@ -258,7 +262,7 @@ public class CompareResultView extends SynchedChartView {
 				}
 			}
 
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 
 		public Color getForeground(Object element) {
@@ -395,7 +399,7 @@ public class CompareResultView extends SynchedChartView {
 	 */
 	private void createContextMenu() {
 
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
@@ -503,26 +507,25 @@ public class CompareResultView extends SynchedChartView {
 
 		// column: reference tour/date
 		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText("Tour");
+		tc.setText(Messages.CompareResult_Column_tour);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(25) + 16);
 
 		// column: altitude difference
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText("Diff");
-		tc
-				.setToolTipText("Difference for the altitude between the reference and the compared tour");
+		tc.setText(Messages.CompareResult_Column_diff);
+		tc.setToolTipText(Messages.CompareResult_Column_diff_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		// column: speed
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText("km/h");
-		tc.setToolTipText("Speed");
+		tc.setText(Messages.CompareResult_Column_kmh);
+		tc.setToolTipText(Messages.CompareResult_Column_kmh_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
 		// column: distance
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText("km");
-		tc.setToolTipText("Distance");
+		tc.setText(Messages.CompareResult_Column_km);
+		tc.setToolTipText(Messages.CompareResult_Column_km_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		fTourViewer = new ContainerCheckedTreeViewer(tree);
@@ -628,7 +631,7 @@ public class CompareResultView extends SynchedChartView {
 
 		selection.getFirstElement();
 		if (!selection.isEmpty()) {
-			menuMgr.add(new Action("Check selected tours") {
+			menuMgr.add(new Action(Messages.CompareResult_Action_check_selected_tours) {
 				public void run() {
 					// check all selected compared tours which are not yet
 					// stored
@@ -645,7 +648,7 @@ public class CompareResultView extends SynchedChartView {
 				}
 			});
 
-			menuMgr.add(new Action("Uncheck selected tours") {
+			menuMgr.add(new Action(Messages.CompareResult_Action_uncheck_selected_tours) {
 				public void run() {
 					// uncheck all selected tours
 					Object[] selectedTours = selection.toArray();
@@ -825,10 +828,12 @@ public class CompareResultView extends SynchedChartView {
 
 				// set title
 
-				changedChartDataModel.setTitle("Reference Tour: "
-						+ refTour.getLabel()
-						+ " - "
-						+ TourManager.getTourDate(refTourChartData.getRefTourData()));
+				changedChartDataModel.setTitle(
+
+				NLS.bind(
+						Messages.CompareResult_Chart_title_reference_tour,
+						refTour.getLabel(),
+						TourManager.getTourDate(refTourChartData.getRefTourData())));
 			}
 		});
 
@@ -937,8 +942,9 @@ public class CompareResultView extends SynchedChartView {
 						compareResult.compareIndexEnd);
 
 				// set title
-				changedChartDataModel.setTitle("Compared Tour: "
-						+ TourManager.getTourDate(compareResult.compTour));
+				changedChartDataModel.setTitle(NLS.bind(
+						Messages.CompareResult_Chart_title_compared_tour,
+						TourManager.getTourDate(compareResult.compTour)));
 			}
 		};
 
@@ -960,7 +966,6 @@ public class CompareResultView extends SynchedChartView {
 
 		fLowerPageBook.showPage(fCompTourChart);
 	}
-
 	/**
 	 * Update the viewer by providing new data
 	 */

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.views.tourMap;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -27,11 +28,11 @@ public class ActionRemoveComparedTourSaveStatus extends Action {
 
 		this.tourView = view;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("delete.gif"));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete));
 		setDisabledImageDescriptor(TourbookPlugin
-				.getImageDescriptor("delete-disabled.gif"));
+				.getImageDescriptor(Messages.Image_delete_disabled));
 
-		setText("Remove Compare Result from Database");
+		setText(Messages.TourMap_Action_delete_compared_tour);
 
 		setEnabled(false);
 	}

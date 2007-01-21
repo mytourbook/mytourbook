@@ -38,8 +38,8 @@ public class StatisticWeekCombined extends StatisticWeek {
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourWeekData.fDistanceLow,
 				tourWeekData.fDistanceHigh);
-		yData.setYTitle("Distance");
-		yData.setUnitLabel("km");
+		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setMinValue(0);
@@ -53,8 +53,8 @@ public class StatisticWeekCombined extends StatisticWeek {
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourWeekData.fAltitudeLow,
 				tourWeekData.fAltitudeHigh);
-		yData.setYTitle("Altitude");
-		yData.setUnitLabel("m");
+		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setMinValue(0);
@@ -68,8 +68,8 @@ public class StatisticWeekCombined extends StatisticWeek {
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourWeekData.fTimeLow,
 				tourWeekData.fTimeHigh);
-		yData.setYTitle("Time");
-		yData.setUnitLabel("h");
+		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
 		yData.setMinValue(0);

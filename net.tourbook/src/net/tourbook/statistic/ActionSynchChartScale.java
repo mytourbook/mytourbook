@@ -31,8 +31,8 @@ public class ActionSynchChartScale extends Action {
 
 		fStatContainer = container;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.UI_Image_zoom_fit_to_graph));
-		setToolTipText(Messages.UI_Action_synch_charts_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_zoom_fit_to_graph));
+		setToolTipText(Messages.TourMap_Action_synch_charts_tooltip);
 	}
 
 	public void run() {

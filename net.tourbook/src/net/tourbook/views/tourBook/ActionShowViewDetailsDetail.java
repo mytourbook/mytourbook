@@ -30,8 +30,8 @@ public class ActionShowViewDetailsDetail extends Action {
 
 		fViewer = view;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.TourBook_Image_show_statistic_and_chart));
-		setToolTipText(Messages.TourBook_Image_show_statistic_and_chart_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_show_statistic_and_chart));
+		setToolTipText(Messages.TourBook_Action_show_statistic_and_chart_tooltip);
 	}
 
 	public void run() {

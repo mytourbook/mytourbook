@@ -41,8 +41,8 @@ public class StatisticDayDistance extends StatisticDay {
 				ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fDistanceLow,
 				tourTimeData.fDistanceHigh);
-		yData.setYTitle("Distance");
-		yData.setUnitLabel("km");
+		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
 		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setMinValue(0);
@@ -58,10 +58,7 @@ public class StatisticDayDistance extends StatisticDay {
 		int yearDays = fCalendar.get(Calendar.DAY_OF_YEAR);
 		chartModel.setChartMinWidth(yearDays);
 
-		ProviderTourDay.getInstance().setChartProviders(
-				fChart,
-				chartModel,
-				fTourChartViewer);
+		ProviderTourDay.getInstance().setChartProviders(fChart, chartModel, fTourChartViewer);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartModel);

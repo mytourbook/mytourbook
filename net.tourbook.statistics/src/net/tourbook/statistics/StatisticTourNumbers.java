@@ -170,8 +170,8 @@ public class StatisticTourNumbers extends YearStatistic {
 						if (valueIndex == 0) {
 							barInfo = new Formatter()
 									.format(
-											" Altitude: <%d m  x %d\n"
-													+ " Total:      %d m",
+											Messages.NUMBERS_ALTITUDE_DOWN
+													+ Messages.NUMBERS_ALTITUDE_UNIT,
 											fStatAltitudeUnits[valueIndex],
 											fStatAltitudeCounterHigh[serieIndex][valueIndex],
 											fStatAltitudeSumHigh[serieIndex][valueIndex])
@@ -181,8 +181,8 @@ public class StatisticTourNumbers extends YearStatistic {
 
 							barInfo = new Formatter()
 									.format(
-											" Altitude: >%d m  x %d\n"
-													+ " Total:      %d m",
+											Messages.NUMBERS_ALTITUDE_UP
+													+ Messages.NUMBERS_ALTITUDE_UNIT,
 											fStatAltitudeUnits[valueIndex - 1],
 											fStatAltitudeCounterHigh[serieIndex][valueIndex],
 											fStatAltitudeSumHigh[serieIndex][valueIndex])
@@ -191,8 +191,8 @@ public class StatisticTourNumbers extends YearStatistic {
 
 							barInfo = new Formatter()
 									.format(
-											" Altitude: %d-%d m  x %d\n"
-													+ " Total:      %d m",
+											Messages.NUMBERS_ALTITUDE_BETWEEN
+													+ Messages.NUMBERS_ALTITUDE_UNIT,
 											fStatAltitudeUnits[valueIndex - 1],
 											fStatAltitudeUnits[valueIndex],
 											fStatAltitudeCounterHigh[serieIndex][valueIndex],
@@ -250,8 +250,8 @@ public class StatisticTourNumbers extends YearStatistic {
 						if (valueIndex == 0) {
 							barInfo = new Formatter()
 									.format(
-											" Distance: < %d km  x %d\n"
-													+ " Total:       %d km",
+											Messages.NUMBERS_DISTANCE_DOWN
+													+ Messages.NUMBERS_DISTANCE_UNIT,
 											fStatDistanceUnits[valueIndex],
 											fStatDistanceCounterHigh[serieIndex][valueIndex],
 											fStatDistanceSumHigh[serieIndex][valueIndex])
@@ -261,8 +261,8 @@ public class StatisticTourNumbers extends YearStatistic {
 
 							barInfo = new Formatter()
 									.format(
-											" Distance: >%d km  x %d\n"
-													+ " Total:       %d km",
+											Messages.NUMBERS_DISTANCE_UP
+													+ Messages.NUMBERS_DISTANCE_UNIT,
 											fStatDistanceUnits[valueIndex - 1],
 											fStatDistanceCounterHigh[serieIndex][valueIndex],
 											fStatDistanceSumHigh[serieIndex][valueIndex])
@@ -271,8 +271,8 @@ public class StatisticTourNumbers extends YearStatistic {
 
 							barInfo = new Formatter()
 									.format(
-											" Distance: %d-%d km  x %d\n"
-													+ " Total:       %d km",
+											Messages.NUMBERS_DISTANCE_BETWEEN
+													+ Messages.NUMBERS_DISTANCE_UNIT,
 											fStatDistanceUnits[valueIndex - 1],
 											fStatDistanceUnits[valueIndex],
 											fStatDistanceCounterHigh[serieIndex][valueIndex],
@@ -297,8 +297,8 @@ public class StatisticTourNumbers extends YearStatistic {
 						if (valueIndex == 0) {
 							barInfo = new Formatter()
 									.format(
-											" Duration: <%s h  x %d\n"
-													+ " Total:       %s h",
+											Messages.NUMBERS_TIME_DOWN
+													+ Messages.NUMBERS_TIME_UNIT,
 											ChartUtil.formatValue(
 													fStatTimeUnits[valueIndex],
 													ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
@@ -312,8 +312,8 @@ public class StatisticTourNumbers extends YearStatistic {
 						} else if (valueIndex == fStatTimeUnits.length - 1) {
 							barInfo = new Formatter()
 									.format(
-											" Duration: >%s h  x %d\n"
-													+ " Total:       %s h",
+											Messages.NUMBERS_TIME_UP
+													+ Messages.NUMBERS_TIME_UNIT,
 											ChartUtil.formatValue(
 													fStatTimeUnits[valueIndex - 1],
 													ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
@@ -328,8 +328,8 @@ public class StatisticTourNumbers extends YearStatistic {
 						} else {
 							barInfo = new Formatter()
 									.format(
-											" Duration: %s-%s h  x %d\n"
-													+ " Total:       %s h",
+											Messages.NUMBERS_TIME_BETWEEN
+													+ Messages.NUMBERS_TIME_UNIT,
 											ChartUtil.formatValue(
 													fStatTimeUnits[valueIndex - 1],
 													ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
@@ -683,8 +683,8 @@ public class StatisticTourNumbers extends YearStatistic {
 				fStatDistanceCounterLow,
 				fStatDistanceCounterHigh,
 				fStatDistanceCounterColorIndex,
-				"#",
-				"Distance");
+				Messages.NUMBERS_UNIT,
+				Messages.LABEL_GRAPH_DISTANCE);
 
 		updateChartDistance(
 				fChartDistanceSum,
@@ -692,8 +692,8 @@ public class StatisticTourNumbers extends YearStatistic {
 				fStatDistanceSumLow,
 				fStatDistanceSumHigh,
 				fStatDistanceSumColorIndex,
-				"km",
-				"Distance");
+				Messages.LABEL_GRAPH_DISTANCE_UNIT,
+				Messages.LABEL_GRAPH_DISTANCE);
 
 		updateChartAltitude(
 				fChartAltitudeCounter,
@@ -701,8 +701,8 @@ public class StatisticTourNumbers extends YearStatistic {
 				fStatAltitudeCounterLow,
 				fStatAltitudeCounterHigh,
 				fStatAltitudeCounterColorIndex,
-				"#",
-				"Altitude");
+				Messages.NUMBERS_UNIT,
+				Messages.LABEL_GRAPH_ALTITUDE);
 
 		updateChartAltitude(
 				fChartAltitudeSum,
@@ -710,8 +710,8 @@ public class StatisticTourNumbers extends YearStatistic {
 				fStatAltitudeSumLow,
 				fStatAltitudeSumHigh,
 				fStatAltitudeSumColorIndex,
-				"m",
-				"Altitude");
+				Messages.LABEL_GRAPH_ALTITUDE_UNIT,
+				Messages.LABEL_GRAPH_ALTITUDE);
 
 		updateChartTime(
 				fChartDurationCounter,
@@ -720,8 +720,8 @@ public class StatisticTourNumbers extends YearStatistic {
 				fStatTimeCounterHigh,
 				fStatTimeCounterColorIndex,
 				ChartDataXSerie.AXIS_UNIT_NUMBER,
-				"#",
-				"Time");
+				Messages.NUMBERS_UNIT,
+				Messages.LABEL_GRAPH_TIME);
 
 		updateChartTime(
 				fChartDurationSum,
@@ -730,8 +730,8 @@ public class StatisticTourNumbers extends YearStatistic {
 				fStatTimeSumHigh,
 				fStatTimeSumColorIndex,
 				ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE,
-				"h",
-				"Time");
+				Messages.LABEL_GRAPH_TIME_UNIT,
+				Messages.LABEL_GRAPH_TIME);
 	}
 
 	private void updateChartTime(	Chart statDurationChart,

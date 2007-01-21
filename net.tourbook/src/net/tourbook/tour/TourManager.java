@@ -499,8 +499,8 @@ public class TourManager {
 		final ChartDataYSerie yDataAltitude = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_LINE,
 				tourData.altitudeSerie);
-		yDataAltitude.setYTitle(Messages.Graph_Altitude);
-		yDataAltitude.setUnitLabel(Messages.Graph_Altitude_unit);
+		yDataAltitude.setYTitle(Messages.Graph_Label_Altitude);
+		yDataAltitude.setUnitLabel(Messages.Graph_Label_Altitude_unit);
 		yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
 		yDataAltitude.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true));
@@ -515,8 +515,8 @@ public class TourManager {
 		final ChartDataYSerie yDataSpeed = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_LINE,
 				tourData.speedSerie);
-		yDataSpeed.setYTitle(Messages.Graph_Speed);
-		yDataSpeed.setUnitLabel(Messages.Graph_Speed_unit);
+		yDataSpeed.setYTitle(Messages.Graph_Label_Speed);
+		yDataSpeed.setUnitLabel(Messages.Graph_Label_Speed_unit);
 		yDataSpeed.setValueDivisor(10);
 		yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
@@ -535,8 +535,8 @@ public class TourManager {
 		final ChartDataYSerie yDataPulse = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_LINE,
 				tourData.pulseSerie);
-		yDataPulse.setYTitle(Messages.Graph_Heartbeat);
-		yDataPulse.setUnitLabel(Messages.Graph_Heartbeat_unit);
+		yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
+		yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
 		yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
 		yDataPulse.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true));
@@ -550,8 +550,8 @@ public class TourManager {
 		final ChartDataYSerie yDataAltimeter = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_LINE,
 				tourData.altimeterSerie);
-		yDataAltimeter.setYTitle(Messages.Graph_Altimeter);
-		yDataAltimeter.setUnitLabel(Messages.Graph_Altimeter_unit);
+		yDataAltimeter.setYTitle(Messages.Graph_Label_Altimeter);
+		yDataAltimeter.setUnitLabel(Messages.Graph_Label_Altimeter_unit);
 		yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 		yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
 		yDataAltimeter.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(
@@ -573,8 +573,8 @@ public class TourManager {
 		final ChartDataYSerie yDataGradient = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_LINE,
 				tourData.gradientSerie);
-		yDataGradient.setYTitle(Messages.Graph_Gradiend);
-		yDataGradient.setUnitLabel(Messages.Graph_Gradiend_unit);
+		yDataGradient.setYTitle(Messages.Graph_Label_Gradiend);
+		yDataGradient.setUnitLabel(Messages.Graph_Label_Gradiend_unit);
 		yDataGradient.setValueDivisor(10);
 		yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 		yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
@@ -599,8 +599,8 @@ public class TourManager {
 		final ChartDataYSerie yDataCadence = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_LINE,
 				tourData.cadenceSerie);
-		yDataCadence.setYTitle(Messages.Graph_Cadence);
-		yDataCadence.setUnitLabel(Messages.Graph_Cadence_unit);
+		yDataCadence.setYTitle(Messages.Graph_Label_Cadence);
+		yDataCadence.setUnitLabel(Messages.Graph_Label_Cadence_unit);
 		yDataCadence.setShowYSlider(true);
 		yDataCadence.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataCadence.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CADENCE);
@@ -614,8 +614,8 @@ public class TourManager {
 		final ChartDataYSerie yDataTemperature = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_LINE,
 				tourData.temperatureSerie);
-		yDataTemperature.setYTitle(Messages.Graph_Temperature);
-		yDataTemperature.setUnitLabel(Messages.Graph_Temperature_unit);
+		yDataTemperature.setYTitle(Messages.Graph_Label_Temperature);
+		yDataTemperature.setUnitLabel(Messages.Graph_Label_Temperature_unit);
 		yDataTemperature.setShowYSlider(true);
 		yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);

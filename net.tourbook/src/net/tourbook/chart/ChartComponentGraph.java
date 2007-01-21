@@ -340,10 +340,10 @@ public class ChartComponentGraph extends Canvas {
 		cursorResizeTopDown = new Cursor(getDisplay(), SWT.CURSOR_SIZENS);
 		cursorMoveXMarker = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
 
-		cursorHand05x = createCursorFromImage(Messages.Chart_image_cursor_hand_05x);
-		cursorHand = createCursorFromImage(Messages.Chart_image_cursor_hand_10x);
-		cursorHand2x = createCursorFromImage(Messages.Chart_image_cursor_hand_20x);
-		cursorHand5x = createCursorFromImage(Messages.Chart_image_cursor_hand_50x);
+		cursorHand05x = createCursorFromImage(Messages.Image_cursor_hand_05x);
+		cursorHand = createCursorFromImage(Messages.Image_cursor_hand_10x);
+		cursorHand2x = createCursorFromImage(Messages.Image_cursor_hand_20x);
+		cursorHand5x = createCursorFromImage(Messages.Image_cursor_hand_50x);
 
 		gridColor = new Color(getDisplay(), gridRGB);
 

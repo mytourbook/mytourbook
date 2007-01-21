@@ -76,21 +76,21 @@ public class ProviderTourDay extends DataProvider implements IMonthProvider {
 		fTourDataTour = new TourDataTour();
 
 		final String sqlString = //
-		"SELECT " //
-				+ "TOURID				, "// 1
-				+ "STARTMONTH			, "// 2
-				+ "STARTDAY				, "// 3
-				+ "STARTHOUR			, "// 4
-				+ "STARTMINUTE			, "// 5
-				+ "TOURDISTANCE			, "// 6
-				+ "TOURALTUP			, "// 7
-				+ "TOURDRIVINGTIME		, "// 8
-				+ "tourRecordingTime	, "// 9
-				+ "tourType_typeId 		\n" // 10
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n")
-				+ (" WHERE STARTYEAR = " + Integer.toString(year))
+		"SELECT " // //$NON-NLS-1$
+				+ "TOURID				, "// 1 //$NON-NLS-1$
+				+ "STARTMONTH			, "// 2 //$NON-NLS-1$
+				+ "STARTDAY				, "// 3 //$NON-NLS-1$
+				+ "STARTHOUR			, "// 4 //$NON-NLS-1$
+				+ "STARTMINUTE			, "// 5 //$NON-NLS-1$
+				+ "TOURDISTANCE			, "// 6 //$NON-NLS-1$
+				+ "TOURALTUP			, "// 7 //$NON-NLS-1$
+				+ "TOURDRIVINGTIME		, "// 8 //$NON-NLS-1$
+				+ "tourRecordingTime	, "// 9 //$NON-NLS-1$
+				+ "tourType_typeId 		\n" // 10 //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE STARTYEAR = " + Integer.toString(year)) //$NON-NLS-1$
 				+ getSQLFilter(person, typeId)
-				+ (" ORDER BY StartMonth, StartDay, StartHour , StartMinute ");
+				+ (" ORDER BY StartMonth, StartDay, StartHour , StartMinute "); //$NON-NLS-1$
 
 		try {
 			final Connection conn = TourDatabase.getInstance().getConnection();
@@ -289,10 +289,10 @@ public class ProviderTourDay extends DataProvider implements IMonthProvider {
 						- fTourDataTour.fTimeLow[valueIndex];
 
 				final String barInfo = new Formatter().format(
-						" Tour:\t\t%d.%d.%d\n\n"
-								+ " Distance:\t%d km\n"
-								+ " Altitude:\t%d m\n"
-								+ " Duration:\t%d:%02d h",
+						Messages.TOURDAYINFO_TOUR_DATE_FORMAT
+								+ Messages.TOURDAYINFO_DISTANCE
+								+ Messages.TOURDAYINFO_ALTITUDE
+								+ Messages.TOURDAYINFO_DURATION,
 						fCalendar.get(Calendar.DAY_OF_MONTH),
 						fCalendar.get(Calendar.MONTH) + 1,
 						fCalendar.get(Calendar.YEAR),

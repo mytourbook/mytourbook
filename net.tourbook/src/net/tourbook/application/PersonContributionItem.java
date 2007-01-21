@@ -42,7 +42,7 @@ public class PersonContributionItem extends CustomControlContribution {
 
 	private static final String		ID			= "net.tourbook.clientselector"; //$NON-NLS-1$
 
-	private static final String		ALL_PEOPLE	= Messages.Selection_People_item_all;
+	private static final String		ALL_PEOPLE	= Messages.App_People_item_all;
 
 	static TourbookPlugin			plugin		= TourbookPlugin.getDefault();
 
@@ -113,7 +113,7 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		fComboPeople = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboPeople.setVisibleItemCount(20);
-		fComboPeople.setToolTipText(Messages.Selection_People_tooltip);
+		fComboPeople.setToolTipText(Messages.App_People_tooltip);
 
 		fComboPeople.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {

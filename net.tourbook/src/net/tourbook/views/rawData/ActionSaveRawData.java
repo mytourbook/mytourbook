@@ -27,7 +27,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Formatter;
 
 import net.tourbook.Messages;
@@ -36,6 +35,7 @@ import net.tourbook.device.DeviceData;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
@@ -54,8 +54,9 @@ public class ActionSaveRawData extends Action {
 
 		this.rawDataView = viewPart;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.RawData_Image_save_raw_data_to_file));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.RawData_Image_save_raw_data_to_file_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_raw_data_to_file));
+		setDisabledImageDescriptor(TourbookPlugin
+				.getImageDescriptor(Messages.Image_save_raw_data_to_file_disabled));
 		setToolTipText(Messages.RawData_Action_save_raw_data_to_file_tooltip);
 		setEnabled(false);
 	}
@@ -79,7 +80,8 @@ public class ActionSaveRawData extends Action {
 
 		// set default filename to the transfer date
 		dialog.setFileName(new Formatter().format(
-				Messages.RawData_Format_rawdata_file_yyyy_mm_dd + rawDataManager.getDevice().fileExtension,
+				Messages.Format_rawdata_file_yyyy_mm_dd
+						+ rawDataManager.getDevice().fileExtension,
 				deviceData.transferYear,
 				deviceData.transferMonth,
 				deviceData.transferDay).toString());
@@ -96,7 +98,7 @@ public class ActionSaveRawData extends Action {
 		File fileOut = new File(fileName);
 		if (fileOut.exists()) {
 			MessageBox msgBox = new MessageBox(shell, SWT.ICON_WORKING | SWT.OK | SWT.CANCEL);
-			msgBox.setMessage(MessageFormat.format(Messages.RawData_Label_confirm_overwrite, fileName));
+			msgBox.setMessage(NLS.bind(Messages.RawData_Label_confirm_overwrite, fileName));
 			if (msgBox.open() != SWT.OK) {
 				return;
 			}

@@ -21,6 +21,7 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
@@ -76,6 +77,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Color;
@@ -105,20 +107,20 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBookView extends ViewPart implements ITourChartViewer {
 
-	private static final String			TOUR_TYPE_PREFIX					= "tourType";
+	private static final String			TOUR_TYPE_PREFIX					= "tourType";									//$NON-NLS-1$
 
-	static public final String			ID									= "net.tourbook.views.tourListView";
+	static public final String			ID									= "net.tourbook.views.tourListView";			//$NON-NLS-1$
 
-	private static final String			MEMENTO_VIEWER_WIDTH				= "tourbookview.sash-weight-container.";
-	private static final String			MEMENTO_SASH_WEIGHT_DETAIL			= "tourbookview.sash-weight-detail.";
+	private static final String			MEMENTO_VIEWER_WIDTH				= "tourbookview.sash-weight-container.";		//$NON-NLS-1$
+	private static final String			MEMENTO_SASH_WEIGHT_DETAIL			= "tourbookview.sash-weight-detail.";			//$NON-NLS-1$
 
-	private static final String			MEMENTO_VISIBLE_STATUS_CONTAINER	= "tourbookview.visible-status-container";
-	private static final String			MEMENTO_VISIBLE_STATUS_DETAIL		= "tourbookview.visible-status-detail";
+	private static final String			MEMENTO_VISIBLE_STATUS_CONTAINER	= "tourbookview.visible-status-container";		//$NON-NLS-1$
+	private static final String			MEMENTO_VISIBLE_STATUS_DETAIL		= "tourbookview.visible-status-detail";		//$NON-NLS-1$
 
-	private static final String			MEMENTO_TOURVIEWER_SELECTED_YEAR	= "tourbookview.tourviewer.selected-year";
-	private static final String			MEMENTO_TOURVIEWER_SELECTED_MONTH	= "tourbookview.tourviewer.selected-month";
+	private static final String			MEMENTO_TOURVIEWER_SELECTED_YEAR	= "tourbookview.tourviewer.selected-year";		//$NON-NLS-1$
+	private static final String			MEMENTO_TOURVIEWER_SELECTED_MONTH	= "tourbookview.tourviewer.selected-month";	//$NON-NLS-1$
 
-	private static final String			MEMENTO_LAST_SELECTED_TOUR_TYPE_ID	= "tourbookview.last-selected-tour-type-id";
+	private static final String			MEMENTO_LAST_SELECTED_TOUR_TYPE_ID	= "tourbookview.last-selected-tour-type-id";	//$NON-NLS-1$
 
 	private static final int			COLUMN_DATE							= 0;
 	private static final int			COLUMN_DISTANCE						= 1;
@@ -252,7 +254,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 				long recordingTime = tourItem.fColumnRecordingTime;
 
 				return new Formatter().format(
-						"%d:%02d",
+						Messages.Format_hhmm,
 						(recordingTime / 3600),
 						((recordingTime % 3600) / 60)).toString();
 
@@ -261,7 +263,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 				long drivingTime = tourItem.fColumnDrivingTime;
 
 				return new Formatter().format(
-						"%d:%02d",
+						Messages.Format_hhmm,
 						(drivingTime / 3600),
 						((drivingTime % 3600) / 60)).toString();
 
@@ -412,7 +414,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 					gc.fillGradientRectangle(
 							offsetWidth + 0,
 							offsetHeight + 0,
-							fColorImageWidth-1,
+							fColorImageWidth - 1,
 							fColorImageHeight - 2,
 							false);
 
@@ -451,9 +453,9 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 	 */
 	private DrawingColors getTourTypeDrawingColors(Display display, long tourTypeId) {
 
-		String colorIdBright = TOUR_TYPE_PREFIX + "bright" + tourTypeId;
-		String colorIdDark = TOUR_TYPE_PREFIX + "dark" + tourTypeId;
-		String colorIdLine = TOUR_TYPE_PREFIX + "line" + tourTypeId;
+		String colorIdBright = TOUR_TYPE_PREFIX + "bright" + tourTypeId; //$NON-NLS-1$
+		String colorIdDark = TOUR_TYPE_PREFIX + "dark" + tourTypeId; //$NON-NLS-1$
+		String colorIdLine = TOUR_TYPE_PREFIX + "line" + tourTypeId; //$NON-NLS-1$
 
 		DrawingColors drawingColors = new DrawingColors();
 
@@ -573,7 +575,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		fStatistics = new StatisticContainer(this, fPageBookDetailStatistic, SWT.NONE);
 
 		fDetailNoStatistic = new Label(fPageBookDetailStatistic, SWT.NONE);
-		fDetailNoStatistic.setText("No statistic");
+		fDetailNoStatistic.setText(Messages.TourBook_Lable_no_statistic_is_selected);
 
 		/*
 		 * pagebook: chart
@@ -582,7 +584,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		fPageBookDetailChart.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		fPageDetailNoChart = new Label(fPageBookDetailChart, SWT.NONE);
-		fPageDetailNoChart.setText("A tour is not selected");
+		fPageDetailNoChart.setText(Messages.TourBook_Label_no_tour_is_selected);
 
 		fTour = new Tour(fPageBookDetailChart, SWT.FLAT);
 		fTour.restoreState(fSessionMemento);
@@ -735,11 +737,11 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 				}
 
 				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-					
+
 					// update tourbook viewer
 					disposeImages();
 					fTourViewer.refresh();
-					
+
 					// update statistics
 					refreshStatistics();
 				}
@@ -760,7 +762,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 	 */
 	private void createContextMenu() {
 
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
@@ -780,7 +782,9 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		if ((selectedTourType = fActionSetTourType.getSelectedTourType()) != null) {
 
 			fActionSetLastTourType.setSelectedTourType(selectedTourType);
-			fActionSetLastTourType.setText("Set tour type to: " + selectedTourType.getName());
+			fActionSetLastTourType.setText(NLS.bind(
+					Messages.TourBook_Action_set_tour_type,
+					selectedTourType.getName()));
 			fActionSetLastTourType.setEnabled(true);
 			menuMgr.add(fActionSetLastTourType);
 		} else {
@@ -840,31 +844,31 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		PixelConverter pixelConverter = new PixelConverter(tree);
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText("Date");
+		tc.setText(Messages.TourBook_Column_date);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(16));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText("km");
-		tc.setToolTipText("Distance");
+		tc.setText(Messages.TourBook_Column_distance);
+		tc.setToolTipText(Messages.TourBook_Column_distance_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText("h");
-		tc.setToolTipText("Recording time");
+		tc.setText(Messages.TourBook_Column_recording_time);
+		tc.setToolTipText(Messages.TourBook_Column_recording_time_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText("h");
-		tc.setToolTipText("Driving time");
+		tc.setText(Messages.TourBook_Column_driving_time);
+		tc.setToolTipText(Messages.TourBook_Column_driving_time_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText("hm");
-		tc.setToolTipText("Altitude up");
+		tc.setText(Messages.TourBook_Column_altitude_up);
+		tc.setToolTipText(Messages.TourBook_Column_altitude_up_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setToolTipText("Number of tours / device start distance");
+		tc.setToolTipText(Messages.TourBook_Column_numbers_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 		fTourViewer = new TreeViewer(tree);
@@ -965,7 +969,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 					// open tour in editor
 
 					TVITourBookTour tourItem = (TVITourBookTour) selection;
-//					TourManager.getInstance().openTourInEditor(tourItem.getTourId());
+					// TourManager.getInstance().openTourInEditor(tourItem.getTourId());
 
 				} else if (selection != null) {
 
@@ -1049,7 +1053,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 				public void dataModelChanged(ChartDataModel changedChartDataModel) {
 
 					// set title
-					changedChartDataModel.setTitle("Tour: "
+					changedChartDataModel.setTitle(Messages.TourBook_Label_chart_title
 							+ TourManager.getTourDate(fTourChartTourData));
 				}
 			});
@@ -1404,7 +1408,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 	}
 
 	public void openTourChart(long tourId) {
-//		TourManager.getInstance().openTourInEditor(tourId);
+	// TourManager.getInstance().openTourInEditor(tourId);
 	}
 
 	TreeViewer getTourViewer() {

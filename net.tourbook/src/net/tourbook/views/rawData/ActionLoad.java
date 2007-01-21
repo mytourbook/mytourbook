@@ -42,7 +42,7 @@ public class ActionLoad extends Action {
 
 		this.rawDataView = viewPart;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.RawData_Image_open_import_file));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_open_import_file));
 		setToolTipText(Messages.RawData_Action_open_import_file_tooltip);
 	}
 

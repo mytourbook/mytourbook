@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -59,9 +60,9 @@ public class ReferenceTourManager {
 		// ask for the reference tour name
 		InputDialog dialog = new InputDialog(
 				Display.getCurrent().getActiveShell(),
-				"Add Reference Tour",
-				"Enter the reference tour name:",
-				"",
+				Messages.TourMap_Dlg_add_reference_tour_title,
+				Messages.TourMap_Dlg_add_reference_tour_msg,
+				"", //$NON-NLS-1$
 				null);
 
 		if (dialog.open() != Window.OK) {
@@ -98,8 +99,8 @@ public class ReferenceTourManager {
 
 			if (em != null) {
 
-				Query query = em.createQuery("SELECT refTour \n"
-						+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " refTour"));
+				Query query = em.createQuery("SELECT refTour \n" //$NON-NLS-1$
+						+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " refTour")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				referenceTours = (ArrayList<TourReference>) query.getResultList();
 

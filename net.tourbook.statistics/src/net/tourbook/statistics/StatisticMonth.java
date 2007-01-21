@@ -122,8 +122,8 @@ public class StatisticMonth extends YearStatistic {
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourMonthData.fDistanceLow,
 				tourMonthData.fDistanceHigh);
-		yData.setYTitle("Distance");
-		yData.setUnitLabel("km");
+		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
@@ -135,8 +135,8 @@ public class StatisticMonth extends YearStatistic {
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourMonthData.fAltitudeLow,
 				tourMonthData.fAltitudeHigh);
-		yData.setYTitle("Altitude");
-		yData.setUnitLabel("m");
+		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_ALTITUDE);
@@ -148,8 +148,8 @@ public class StatisticMonth extends YearStatistic {
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourMonthData.fTimeLow,
 				tourMonthData.fTimeHigh);
-		yData.setYTitle("Time");
-		yData.setUnitLabel("h");
+		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_TIME);

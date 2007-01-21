@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.views.tourMap;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -29,9 +30,9 @@ public class ActionSynchChartHorizontal extends Action {
 
 		this.resultView = resultView;
 
-		setToolTipText("Keep the marked part of the compared tour in synch with the reference tour chart");
+		setToolTipText(Messages.TourMap_Action_synch_graphs_tooltip);
 		setImageDescriptor(TourbookPlugin
-				.getImageDescriptor("synch-graph-horizontal.gif"));
+				.getImageDescriptor(Messages.Image_synch_graph_horizontal));
 	}
 
 	public void run() {

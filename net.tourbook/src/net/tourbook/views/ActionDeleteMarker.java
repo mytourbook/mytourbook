@@ -31,8 +31,8 @@ public class ActionDeleteMarker extends Action {
 
 		fMarkerView = markerView;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.TourMarker_Image_delete));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.TourMarker_Image_delete_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete_disabled));
 
 		setText(Messages.TourMarker_Action_delete_marker);
 

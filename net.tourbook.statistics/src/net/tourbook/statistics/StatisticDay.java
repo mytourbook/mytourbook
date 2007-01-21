@@ -147,7 +147,7 @@ public abstract class StatisticDay extends YearStatistic {
 				final int endTime = startTime + result.getInt(4);
 
 				final String tourTime = new Formatter().format(
-						Messages.Statistic_format_time_hhmm_hhmm,
+						Messages.FORMAT_HHMM_HHMM,
 						startTime / 3600,
 						(startTime % 3600) / 60,
 						endTime / 3600,
@@ -196,8 +196,8 @@ public abstract class StatisticDay extends YearStatistic {
 					});
 
 					dialog.setInput(tourList);
-					dialog.setTitle(Messages.Statistic_dlg_select_tour_title);
-					dialog.setMessage(Messages.Statistic_dlg_select_tour_msg);
+					dialog.setTitle(Messages.DLG_SELECT_TOUR_TITLE);
+					dialog.setMessage(Messages.DLG_SELECT_TOUR_MSG);
 
 					if (dialog.open() == Window.OK) {
 						// get the selected tour
