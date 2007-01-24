@@ -1053,8 +1053,9 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 				public void dataModelChanged(ChartDataModel changedChartDataModel) {
 
 					// set title
-					changedChartDataModel.setTitle(Messages.TourBook_Label_chart_title
-							+ TourManager.getTourDate(fTourChartTourData));
+					changedChartDataModel.setTitle(NLS.bind(
+							Messages.TourBook_Label_chart_title,
+							TourManager.getTourDate(fTourChartTourData)));
 				}
 			});
 

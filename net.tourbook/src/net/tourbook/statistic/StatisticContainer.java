@@ -156,7 +156,7 @@ public class StatisticContainer extends Composite {
 		fComboYear = new Combo(fStatContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboYear.setVisibleItemCount(10);
 		fComboYear.setLayoutData(new GridData());
-		fComboYear.setToolTipText(Messages.Tourbook_Combo_year_tooltip);
+		fComboYear.setToolTipText(Messages.TourBook_Combo_year_tooltip);
 		fComboYear.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 

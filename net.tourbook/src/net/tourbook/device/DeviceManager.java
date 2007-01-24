@@ -54,8 +54,7 @@ public class DeviceManager {
 
 			for (IExtension extension : extPoint.getExtensions()) {
 
-				for (IConfigurationElement configElement : extension
-						.getConfigurationElements()) {
+				for (IConfigurationElement configElement : extension.getConfigurationElements()) {
 
 					if (configElement.getName().equalsIgnoreCase("device")) { //$NON-NLS-1$
 
@@ -68,8 +67,7 @@ public class DeviceManager {
 
 								device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
 								device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
-								device.fileExtension = configElement
-										.getAttribute("fileextension"); //$NON-NLS-1$
+								device.fileExtension = configElement.getAttribute("fileextension"); //$NON-NLS-1$
 
 								fDeviceList.add(device);
 							}

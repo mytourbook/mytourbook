@@ -614,7 +614,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		// button: add
 		fButtonAdd = new Button(container, SWT.NONE);
-		fButtonAdd.setText(Messages.Pref_People_Button_add_person);
+		fButtonAdd.setText(Messages.Pref_People_Action_add_person);
 		setButtonLayoutData(fButtonAdd);
 		fButtonAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {

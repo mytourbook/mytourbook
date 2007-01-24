@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: MyTourbook Application
+Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook; singleton:=true
 Bundle-Version: 0.8.2
 Bundle-ClassPath: net.tourbook.jar,

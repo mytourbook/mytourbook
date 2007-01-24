@@ -319,7 +319,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 		// add placeholder
 		Label label = new Label(editorContainer, SWT.NONE);
-		label.setText(Messages.Pref_Graphs_Label_placeholder);
+		label.setText(""); //$NON-NLS-1$
 
 		/*
 		 * editor: altimeter min value
@@ -359,7 +359,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 		// add placeholder
 		label = new Label(editorContainer, SWT.NONE);
-		label.setText(Messages.Pref_Graphs_Label_placeholder);
+		label.setText(""); //$NON-NLS-1$
 
 		/*
 		 * editor: gradient min value

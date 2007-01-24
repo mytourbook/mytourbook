@@ -58,19 +58,7 @@ public class Messages extends NLS {
 	public static String		CompareResult_Column_kmh_tooltip;
 	public static String		CompareResult_Column_tour;
 
-	public static String		Database_Confirm_update_01;
-	public static String		Database_Confirm_update_02;
-	public static String		Database_Confirm_update_03;
-	public static String		Database_Confirm_update_04;
-	public static String		Database_Confirm_update_05;
-	public static String		Database_Confirm_update_06;
-	public static String		Database_Confirm_update_07;
-	public static String		Database_Confirm_update_08;
-	public static String		Database_Confirm_update_09;
-	public static String		Database_Confirm_update_10;
-	public static String		Database_Confirm_update_11;
-	public static String		Database_Confirm_update_12;
-	public static String		Database_Confirm_update_13;
+	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
 
 	public static String		Database_Exeption_cannot_get_entity_manager;
@@ -85,7 +73,7 @@ public class Messages extends NLS {
 
 	public static String		Format_hhmm;
 	public static String		Format_hhmmss;
-	public static String		Format_import_filename_yyyymmdd;
+//	public static String		Format_import_filename_yyyymmdd;
 	public static String		Format_rawdata_file_yyyy_mm_dd;
 
 	public static String		Graph_Label_Altimeter;
@@ -129,6 +117,8 @@ public class Messages extends NLS {
 	public static String		Image_import_rawdata;
 	public static String		Image_open_import_file;
 	public static String		Image_open_marker_editor;
+
+	public static String	Image_open_tour_segmenter;
 	public static String		Image_save_raw_data_to_file;
 	public static String		Image_save_raw_data_to_file_disabled;
 	public static String		Image_save_tour;
@@ -138,7 +128,6 @@ public class Messages extends NLS {
 	public static String		Image_show_statistics;
 	public static String		Image_show_time_on_x_axis;
 	public static String		Image_show_tour_viewer;
-	public static String		Image_show_tour_viewer_tooltip;
 	public static String		Image_show_view_detail;
 	public static String		Image_synch_graph_horizontal;
 	public static String		Image_tour_info;
@@ -181,7 +170,6 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Error_value_must_be_integer;
 	public static String		Pref_Graphs_Group_units_for_xaxis;
 	public static String		Pref_Graphs_Group_zoom_options;
-	public static String		Pref_Graphs_Label_placeholder;
 	public static String		Pref_Graphs_Label_select_graph;
 	public static String		Pref_Graphs_Radio_show_distance;
 	public static String		Pref_Graphs_Radio_show_time;
@@ -189,7 +177,8 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Tab_graph_defaults;
 	public static String		Pref_Graphs_Text_min_value;
 
-	public static String		Pref_People_Button_add_person;
+	public static String	Pref_People_Action_add_person;
+
 	public static String		Pref_People_Column_device;
 	public static String		Pref_People_Column_first_name;
 	public static String		Pref_People_Column_height;
@@ -290,8 +279,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_temperature_tooltip;
 	public static String		Tour_Action_open_marker_editor;
 
-	public static String		Tour_Action_open_tour_segmenter;
-	public static String		Tour_Action_open_tour_segmenter_tooltip;
+	public static String	Tour_Action_open_tour_segmenter_tooltip;
+
 	public static String		Tour_Action_scroll_zoomed_chart;
 	public static String		Tour_Action_show_distance_on_x_axis;
 	public static String		Tour_Action_show_distance_on_x_axis_tooltip;
@@ -335,7 +324,10 @@ public class Messages extends NLS {
 	public static String		TourBook_Action_set_tour_type_with_dlg;
 	public static String		TourBook_Action_show_statistic_and_chart_tooltip;
 	public static String		TourBook_Action_show_statistics_tooltip;
-	public static String		Tourbook_Action_show_tour_chart_tooltip;
+
+	public static String	TourBook_Action_show_tour_chart_tooltip;
+
+	public static String	TourBook_Action_show_tour_viewer_tooltip;
 	public static String		TourBook_Action_show_view_detail_tooltip;
 
 	public static String		TourBook_Column_altitude_up;
@@ -351,7 +343,7 @@ public class Messages extends NLS {
 
 	public static String		TourBook_Combo_statistic_tooltip;
 
-	public static String		Tourbook_Combo_year_tooltip;
+	public static String	TourBook_Combo_year_tooltip;
 
 	public static String		TourBook_Dlg_set_tour_type_msg;
 	public static String		TourBook_Dlg_set_tour_type_title;
@@ -368,7 +360,6 @@ public class Messages extends NLS {
 	public static String		TourMap_Action_delete_tours;
 	public static String		TourMap_Action_rename_reference_tour;
 	public static String		TourMap_Action_synch_charts_tooltip;
-	public static String		TourMap_Action_synch_graphs_tooltip;
 
 	public static String		TourMap_Column_kmh;
 	public static String		TourMap_Column_tour;

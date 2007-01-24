@@ -37,8 +37,8 @@ public class ActionTourSegmenter extends Action {
 
 		fTourChart = tourChart;
 
-		setToolTipText(Messages.Tour_Action_open_tour_segmenter);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Tour_Action_open_tour_segmenter_tooltip));
+		setToolTipText(Messages.Tour_Action_open_tour_segmenter_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_open_tour_segmenter));
 
 	}
 

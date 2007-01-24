@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="net.tourbook.feature"
-      label="MyTourbook Application"
-      version="0.8.2"
+      label="%Feature_Name"
+      version="0.8.3"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -364,7 +364,7 @@ Public License instead of this License.
       <import plugin="org.apache.derby.core"/>
       <import plugin="org.eclipse.core.runtime" version="3.1.0" match="compatible"/>
       <import plugin="org.eclipse.update.configurator" version="3.1.0" match="compatible"/>
-      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.apache.xerces"/>
       <import plugin="org.eclipse.ui" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.update.core" version="3.1.0" match="compatible"/>
       <import plugin="org.eclipse.ui.forms" version="3.2.0" match="compatible"/>

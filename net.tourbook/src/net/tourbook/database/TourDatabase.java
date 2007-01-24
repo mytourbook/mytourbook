@@ -47,6 +47,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -61,16 +62,16 @@ public class TourDatabase {
 	 */
 	private static final int			TOURBOOK_DB_VERSION		= 3;
 
-	public final static String			TABLE_TOUR_DATA			= "TourData"; //$NON-NLS-1$
-	public final static String			TABLE_TOUR_MARKER		= "TourMarker"; //$NON-NLS-1$
-	public final static String			TABLE_TOUR_REFERENCE	= "TourReference"; //$NON-NLS-1$
-	public final static String			TABLE_TOUR_COMPARED		= "TourCompared"; //$NON-NLS-1$
-	public final static String			TABLE_TOUR_CATEGORY		= "TourCategory"; //$NON-NLS-1$
-	public final static String			TABLE_TOUR_TYPE			= "TourType"; //$NON-NLS-1$
-	public static final String			TABLE_TOUR_PERSON		= "TourPerson"; //$NON-NLS-1$
-	public static final String			TABLE_TOUR_BIKE			= "TourBike"; //$NON-NLS-1$
+	public final static String			TABLE_TOUR_DATA			= "TourData";		//$NON-NLS-1$
+	public final static String			TABLE_TOUR_MARKER		= "TourMarker";	//$NON-NLS-1$
+	public final static String			TABLE_TOUR_REFERENCE	= "TourReference";	//$NON-NLS-1$
+	public final static String			TABLE_TOUR_COMPARED		= "TourCompared";	//$NON-NLS-1$
+	public final static String			TABLE_TOUR_CATEGORY		= "TourCategory";	//$NON-NLS-1$
+	public final static String			TABLE_TOUR_TYPE			= "TourType";		//$NON-NLS-1$
+	public static final String			TABLE_TOUR_PERSON		= "TourPerson";	//$NON-NLS-1$
+	public static final String			TABLE_TOUR_BIKE			= "TourBike";		//$NON-NLS-1$
 
-	private static final String			TABLE_DB_VERSION			= "DbVersion"; //$NON-NLS-1$
+	private static final String			TABLE_DB_VERSION		= "DbVersion";		//$NON-NLS-1$
 
 	private static TourDatabase			instance;
 
@@ -140,9 +141,9 @@ public class TourDatabase {
 			return null;
 		} else {
 			EntityManager em = emFactory.createEntityManager();
-			
-//			System.out.println(em.toString());
-			
+
+			// System.out.println(em.toString());
+
 			return em;
 		}
 	}
@@ -315,7 +316,7 @@ public class TourDatabase {
 								+ "(" //$NON-NLS-1$
 								+ "bikeId	 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
 								+ "name				VARCHAR(255),	\n" //$NON-NLS-1$
-								+ "weight 			FLOAT,			\n" // kg //$NON-NLS-1$
+								+ "weight 			FLOAT,			\n" //$NON-NLS-1$//kg
 								+ "typeId 			INTEGER,		\n" //$NON-NLS-1$
 								+ "frontTyreId 		INTEGER,		\n" //$NON-NLS-1$
 								+ "rearTyreId 		INTEGER			\n" //$NON-NLS-1$
@@ -339,8 +340,8 @@ public class TourDatabase {
 								+ "personId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
 								+ "lastName 		VARCHAR(80),	\n" //$NON-NLS-1$
 								+ "firstName 		VARCHAR(80),	\n" //$NON-NLS-1$
-								+ "weight 			FLOAT,			\n" // kg //$NON-NLS-1$
-								+ "height 			FLOAT,			\n" // m //$NON-NLS-1$
+								+ "weight 			FLOAT,			\n" //$NON-NLS-1$ // kg
+								+ "height 			FLOAT,			\n" //$NON-NLS-1$ // m
 								+ "rawDataPath		VARCHAR(255),	\n" //$NON-NLS-1$
 								+ "deviceReaderId	VARCHAR(255),	\n" //$NON-NLS-1$
 								+ "tourBike_bikeId 	BIGINT			\n" //$NON-NLS-1$
@@ -492,7 +493,7 @@ public class TourDatabase {
 						+ "deviceTotalUp 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
 						+ "deviceTotalDown 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
 						+ "devicePluginId	 	VARCHAR(255),		\n" //$NON-NLS-1$
-						
+
 						// version 3 start
 						+ "deviceMode 			SMALLINT,			\n" //$NON-NLS-1$
 						+ "deviceTimeInterval	SMALLINT,			\n" //$NON-NLS-1$
@@ -551,14 +552,13 @@ public class TourDatabase {
 				 * ALTER TABLE TourData_TourReference ADD CONSTRAINT
 				 * TourData_TourReference_pk PRIMARY KEY (TourData_tourId);
 				 */
-				stmt
-						.addBatch("" //$NON-NLS-1$
-								+ ("ALTER TABLE " + TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE) //$NON-NLS-1$ //$NON-NLS-2$
-								+ (" ADD CONSTRAINT " //$NON-NLS-1$
-										+ TABLE_TOUR_DATA
-										+ "_" //$NON-NLS-1$
-										+ TABLE_TOUR_REFERENCE + "_pk") //$NON-NLS-1$
-								+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
+				stmt.addBatch("" //$NON-NLS-1$
+						+ ("ALTER TABLE " + TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE) //$NON-NLS-1$ //$NON-NLS-2$
+						+ (" ADD CONSTRAINT " //$NON-NLS-1$
+								+ TABLE_TOUR_DATA
+								+ "_" //$NON-NLS-1$
+								+ TABLE_TOUR_REFERENCE + "_pk") //$NON-NLS-1$
+						+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				/*
 				 * ALTER TABLE TourCategory_TourData ADD CONSTRAINT
@@ -647,7 +647,8 @@ public class TourDatabase {
 				// a version record is not available
 
 				/*
-				 * insert the version for the current database design into the database
+				 * insert the version for the current database design into the
+				 * database
 				 */
 				sqlString = ("INSERT INTO " + TABLE_DB_VERSION) //$NON-NLS-1$
 						+ " VALUES (" //$NON-NLS-1$
@@ -676,18 +677,27 @@ public class TourDatabase {
 		// confirm update
 		String[] buttons = new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL };
 
-		String message = Messages.Database_Confirm_update_01
-				+ (currentDbVersion + Messages.Database_Confirm_update_02 + TOURBOOK_DB_VERSION + Messages.Database_Confirm_update_03)
-				+ Messages.Database_Confirm_update_04
-				+ Messages.Database_Confirm_update_05
-				+ Messages.Database_Confirm_update_06
-				+ Messages.Database_Confirm_update_07
-				+ (Messages.Database_Confirm_update_08 + getDatabasePath())
-				+ Messages.Database_Confirm_update_09
-				+ Messages.Database_Confirm_update_10
-				+ Messages.Database_Confirm_update_11
-				+ Messages.Database_Confirm_update_12
-				+ Messages.Database_Confirm_update_13;
+		// String message = Messages.Database_Confirm_update_01
+		// + currentDbVersion
+		// + Messages.Database_Confirm_update_02
+		// + TOURBOOK_DB_VERSION
+		// + Messages.Database_Confirm_update_03
+		// + Messages.Database_Confirm_update_04
+		// + Messages.Database_Confirm_update_05
+		// + Messages.Database_Confirm_update_06
+		// + Messages.Database_Confirm_update_07
+		// + Messages.Database_Confirm_update_08
+		// + getDatabasePath()
+		// + Messages.Database_Confirm_update_09
+		// + Messages.Database_Confirm_update_10
+		// + Messages.Database_Confirm_update_11
+		// + Messages.Database_Confirm_update_12
+		// + Messages.Database_Confirm_update_13;
+
+		String message = NLS.bind(Messages.Database_Confirm_update, new Object[] {
+				currentDbVersion,
+				TOURBOOK_DB_VERSION,
+				getDatabasePath() });
 
 		MessageDialog dialog = new MessageDialog(
 				Display.getCurrent().getActiveShell(),
@@ -754,10 +764,10 @@ public class TourDatabase {
 	}
 
 	private void updateDbDesign_2_3(Connection conn) {
-		
+
 		try {
 			Statement statement = conn.createStatement();
-			
+
 			String sql;
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceMode			SMALLINT DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -765,10 +775,10 @@ public class TourDatabase {
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceTimeInterval	SMALLINT DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
-			
+
 			statement.executeBatch();
 			statement.close();
-			
+
 		} catch (SQLException e) {
 			printSQLException(e);
 		}
@@ -785,16 +795,13 @@ public class TourDatabase {
 
 	private String getDatabasePath() {
 
-//		String pluginPath = Platform
-//				.getStateLocation(TourbookPlugin.getDefault().getBundle())
-//				.removeLastSegments(4)
-//				.toFile()
-//				.getAbsolutePath();
+		// String pluginPath = Platform
+		// .getStateLocation(TourbookPlugin.getDefault().getBundle())
+		// .removeLastSegments(4)
+		// .toFile()
+		// .getAbsolutePath();
 
-		String pluginPath = Platform
-		.getLocation().removeLastSegments(1)
-		.toFile()
-		.getAbsolutePath();
+		String pluginPath = Platform.getLocation().removeLastSegments(1).toFile().getAbsolutePath();
 
 		return pluginPath + "/derby-database"; //$NON-NLS-1$
 	}

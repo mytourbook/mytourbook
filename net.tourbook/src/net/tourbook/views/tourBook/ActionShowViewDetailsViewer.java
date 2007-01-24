@@ -31,7 +31,7 @@ public class ActionShowViewDetailsViewer extends Action {
 		fViewer = view;
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_show_tour_viewer));
-		setToolTipText(Messages.Image_show_tour_viewer_tooltip);
+		setToolTipText(Messages.TourBook_Action_show_tour_viewer_tooltip);
 	}
 
 	public void run() {

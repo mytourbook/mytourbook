@@ -72,6 +72,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ViewForm;
@@ -106,7 +107,7 @@ public class RawDataView extends ViewPart {
 
 	public static final String			ID							= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 
-	private static final String			TOUR_TYPE_PREFIX			= "tourType"; //$NON-NLS-1$
+	private static final String			TOUR_TYPE_PREFIX			= "tourType";								//$NON-NLS-1$
 
 	public static final int				COLUMN_DATE					= 0;
 	public static final int				COLUMN_START_TIME			= 1;
@@ -118,10 +119,10 @@ public class RawDataView extends ViewPart {
 	public static final int				COLUMN_DEVICE_PROFILE		= 7;
 	public static final int				COLUMN_TIME_INTERVAL		= 8;
 
-	private static final String			MEMENTO_SASH_CONTAINER		= "importview.sash.container."; //$NON-NLS-1$
-	private static final String			MEMENTO_IMPORT_FILENAME		= "importview.raw-data.filename"; //$NON-NLS-1$
-	private static final String			MEMENTO_SELECTED_TOUR_INDEX	= "importview.selected-tour-index"; //$NON-NLS-1$
-	private static final String			MEMENTO_IS_CHART_VISIBLE	= "importview.is-chart-visible"; //$NON-NLS-1$
+	private static final String			MEMENTO_SASH_CONTAINER		= "importview.sash.container.";			//$NON-NLS-1$
+	private static final String			MEMENTO_IMPORT_FILENAME		= "importview.raw-data.filename";			//$NON-NLS-1$
+	private static final String			MEMENTO_SELECTED_TOUR_INDEX	= "importview.selected-tour-index";		//$NON-NLS-1$
+	private static final String			MEMENTO_IS_CHART_VISIBLE	= "importview.is-chart-visible";			//$NON-NLS-1$
 
 	private static IMemento				fSessionMemento;
 
@@ -850,7 +851,9 @@ public class RawDataView extends ViewPart {
 
 			TourPerson person = TourbookPlugin.getDefault().getActivePerson();
 			if (person != null) {
-				actionSaveTourWithPerson.setText(Messages.RawData_Action_save_tour_with_person + person.getName());
+				actionSaveTourWithPerson.setText(NLS.bind(
+						Messages.RawData_Action_save_tour_with_person,
+						person.getName()));
 				actionSaveTourWithPerson.setPerson(person);
 				actionSaveTourWithPerson.setEnabled(unsavedTours > 0);
 				menuMgr.add(actionSaveTourWithPerson);
@@ -1029,7 +1032,8 @@ public class RawDataView extends ViewPart {
 			public void dataModelChanged(ChartDataModel chartDataModel) {
 
 				// set title
-				chartDataModel.setTitle(Messages.RawData_Chart_title + TourManager.getTourDate(tourData));
+				chartDataModel.setTitle(NLS.bind(Messages.RawData_Chart_title, TourManager
+						.getTourDate(tourData)));
 			}
 		};
 
@@ -1062,7 +1066,9 @@ public class RawDataView extends ViewPart {
 			if (importer.isDeviceImport()) {
 				rawDataSource = device.visibleName + Messages.RawData_Lable_import_from_device;
 			} else {
-				rawDataSource = device.visibleName + Messages.RawData_Lable_import_from_file + device.getImportFileName();
+				rawDataSource = device.visibleName
+						+ Messages.RawData_Lable_import_from_file
+						+ device.getImportFileName();
 			}
 			fLblRawDataSource.setText(Dialog.shortenText(rawDataSource, fLblRawDataSource));
 		}

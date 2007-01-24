@@ -665,7 +665,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		InputDialog dialog = new InputDialog(
 				this.getShell(),
 				Messages.Pref_TourTypes_Dlg_rename_tour_type_title,
-				Messages.Pref_TourTypes_Dlg_rename_tour_type_msg,
+				NLS.bind(Messages.Pref_TourTypes_Dlg_rename_tour_type_msg, selectedTourType
+						.getName()),
 				selectedTourType.getName(),
 				fTourNameValidator);
 		if (dialog.open() != Window.OK) {

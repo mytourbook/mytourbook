@@ -30,7 +30,7 @@ public class ActionSynchChartHorizontal extends Action {
 
 		this.resultView = resultView;
 
-		setToolTipText(Messages.TourMap_Action_synch_graphs_tooltip);
+		setToolTipText(Messages.TourMap_Action_synch_charts_tooltip);
 		setImageDescriptor(TourbookPlugin
 				.getImageDescriptor(Messages.Image_synch_graph_horizontal));
 	}

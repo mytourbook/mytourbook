@@ -31,7 +31,7 @@ public class ActionShowTourChart extends Action {
 		fViewer = view;
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_graph_altitude));
-		setToolTipText(Messages.Tourbook_Action_show_tour_chart_tooltip);
+		setToolTipText(Messages.TourBook_Action_show_tour_chart_tooltip);
 	}
 
 	public void run() {
