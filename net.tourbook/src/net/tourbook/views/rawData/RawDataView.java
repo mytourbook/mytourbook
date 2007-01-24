@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
@@ -36,7 +37,6 @@ import net.tourbook.device.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
-import net.tourbook.tour.ITourChartListener;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
@@ -156,6 +156,7 @@ public class RawDataView extends ViewPart {
 	public Calendar						calendar;
 	public DateFormat					dateInstance;
 	public DateFormat					timeInstance;
+	private DateFormat	durationInstance;
 	private NumberFormat				numberInstance;
 
 	private ToolBarManager				fTbm;
@@ -184,6 +185,7 @@ public class RawDataView extends ViewPart {
 	 * when the import was not successful
 	 */
 	private TourbookDevice				fImportDevice;
+
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -253,7 +255,7 @@ public class RawDataView extends ViewPart {
 							((recordingTime % 3600) / 60),
 							((recordingTime % 3600) % 60));
 
-					return timeInstance.format(calendar.getTime());
+					return durationInstance.format(calendar.getTime());
 				}
 
 			case COLUMN_DRIVING_TIME:
@@ -268,7 +270,7 @@ public class RawDataView extends ViewPart {
 							((drivingTime % 3600) / 60),
 							((drivingTime % 3600) % 60));
 
-					return timeInstance.format(calendar.getTime());
+					return durationInstance.format(calendar.getTime());
 				}
 
 			case COLUMN_DISTANCE:
@@ -689,8 +691,9 @@ public class RawDataView extends ViewPart {
 		}
 
 		calendar = GregorianCalendar.getInstance();
-		dateInstance = DateFormat.getDateInstance();
+		dateInstance = DateFormat.getDateInstance(DateFormat.SHORT);
 		timeInstance = DateFormat.getTimeInstance(DateFormat.SHORT);
+		durationInstance = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.GERMAN);
 		numberInstance = NumberFormat.getNumberInstance();
 	}
 
@@ -733,7 +736,7 @@ public class RawDataView extends ViewPart {
 		tc = new TableColumn(table, SWT.TRAIL);
 		tc.setText(Messages.RawData_Column_time);
 		tc.setToolTipText(Messages.RawData_Column_time_tooltip);
-		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(12));
+		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(16));
 
 		tc = new TableColumn(table, SWT.TRAIL);
 		tc.setText(Messages.RawData_Column_recording_time);

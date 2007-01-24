@@ -331,7 +331,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					// dump BB block
 					// dumpBlock(file, recordBuffer);
 
-					temperature = (short) (recordBuffer[1] & 0xFF);
+					temperature = (short) (recordBuffer[1]);// & 0xFF);
 					cadence = (short) (recordBuffer[2] & 0xFF);
 					marker = (short) (recordBuffer[3] & 0xFF);
 

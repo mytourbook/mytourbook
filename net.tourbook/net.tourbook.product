@@ -35,7 +35,6 @@
       </win>
    </launcher>
 
-
    <plugins>
       <plugin id="com.ibm.icu"/>
       <plugin id="net.tourbook"/>
@@ -72,6 +71,7 @@
       <feature id="net.tourbook.feature" version="0.8.3"/>
       <feature id="net.tourbook.statistics.feature" version="0.8.2"/>
       <feature id="org.eclipse.rcp" version="3.2.1.r321_v20060801-2ekW2BxmcpPUOoq"/>
+      <feature id="org.eclipse.rcp.nls1" version="3.2.1.v200609270227"/>
    </features>
 
 </product>

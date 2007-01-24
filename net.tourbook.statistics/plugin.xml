@@ -6,47 +6,47 @@
       <statistic
             class="net.tourbook.statistics.StatisticTourTime"
             id="net.tourbook.statistics.StatisticTourTime"
-            name="Tour Time"/>
+            name="%Pref_Tour_Time"/>
       <statistic
             class="net.tourbook.statistics.StatisticDayCombined"
             id="net.tourbook.statistics.StatisticSummaryDayCombined"
-            name="Day Summary"/>
+            name="%Pref_Day_Summary"/>
       <statistic
             class="net.tourbook.statistics.StatisticWeekCombined"
             id="net.tourbook.statistics.StatisticSummaryWeekCombined"
-            name="Week Summary"/>
+            name="%Pref_Week_Summary"/>
       <statistic
             class="net.tourbook.statistics.StatisticMonth"
             id="net.tourbook.statistics.StatisticSummaryMonth"
-            name="Month Summary"/>
+            name="%Pref_Month_Summary"/>
       <statistic
             class="net.tourbook.statistics.StatisticTourNumbers"
             id="net.tourbook.statistics.StatisticTourNumbers"
-            name="Tour Numbers"/>
+            name="%Pref_Tour_Numbers"/>
       <statistic
             class="net.tourbook.statistics.StatisticDayAltitude"
             id="net.tourbook.statistics.StatisticSummaryDayAltitude"
-            name="Day Summary - Altitude"/>
+            name="%Pref_Day_Summary_Altitude"/>
       <statistic
             class="net.tourbook.statistics.StatisticDayDistance"
             id="net.tourbook.statistics.StatisticSummaryDayDistance"
-            name="Day Summary - Distance"/>
+            name="%Pref_Day_Summary_Distance"/>
       <statistic
             class="net.tourbook.statistics.StatisticDayTourTime"
             id="net.tourbook.statistics.StatisticSummaryDayTourTime"
-            name="Day Summary - Duration"/>
-      <statistic
-            class="net.tourbook.statistics.StatisticWeekTourTime"
-            id="net.tourbook.statistics.StatisticSummaryWeekDuration"
-            name="Week Summary - Duration"/>
+            name="%Pref_Day_Summary_Duration"/>
       <statistic
             class="net.tourbook.statistics.StatisticWeekAltitude"
             id="net.tourbook.statistics.StatisticSummaryWeekAltitude"
-            name="Week Summary - Altitude"/>
+            name="%Pref_Week_Summary_Altitude"/>
       <statistic
             class="net.tourbook.statistics.StatisticWeekDistance"
             id="net.tourbook.statistics.StatisticSummaryWeekDistance"
-            name="Week Summary - Distance"/>
+            name="%Pref_Week_Summary_Distance"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticWeekTourTime"
+            id="net.tourbook.statistics.StatisticSummaryWeekDuration"
+            name="%Pref_Week_Summary_Duration"/>
    </extension>
 
 </plugin>

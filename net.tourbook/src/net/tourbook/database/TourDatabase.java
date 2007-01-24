@@ -134,7 +134,7 @@ public class TourDatabase {
 
 		if (emFactory == null) {
 			try {
-				throw new Exception(Messages.Database_Exeption_cannot_get_entity_manager);
+				throw new Exception("Cannot get EntityManagerFactory");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

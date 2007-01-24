@@ -61,7 +61,6 @@ public class Messages extends NLS {
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
 
-	public static String		Database_Exeption_cannot_get_entity_manager;
 	public static String		Database_Monitor_db_service_task;
 	public static String		Database_Monitor_db_service_title;
 	public static String		Database_Monitor_persistent_service_task;
@@ -359,6 +358,9 @@ public class Messages extends NLS {
 	public static String		TourMap_Action_delete_compared_tour;
 	public static String		TourMap_Action_delete_tours;
 	public static String		TourMap_Action_rename_reference_tour;
+
+	public static String	TourMap_Action_synch_chart_years_tooltip;
+
 	public static String		TourMap_Action_synch_charts_tooltip;
 
 	public static String		TourMap_Column_kmh;
