@@ -305,7 +305,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		 */
 		altimeterMinCheckbox = new BooleanFieldEditor(
 				ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
-				Messages.Pref_Graphs_Check_force_minimum_for_altitude,
+				Messages.Pref_Graphs_Check_force_minimum_for_altimeter,
 				editorContainer);
 		altimeterMinCheckbox.setPreferenceStore(getPreferenceStore());
 		altimeterMinCheckbox.setPage(this);

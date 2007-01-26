@@ -458,7 +458,7 @@ Public License instead of this License.
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="net.tourbook"/>
+      <import plugin="net.tourbook" version="0.8.3" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui"/>
    </requires>
 

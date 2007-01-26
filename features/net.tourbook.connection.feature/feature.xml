@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.connection.feature"
       label="Serial Connection Feature"
-      version="0.8.2"
+      version="0.8.3"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 

@@ -161,7 +161,8 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Button_down;
 	public static String		Pref_Graphs_Button_up;
 	public static String		Pref_Graphs_Check_autozoom;
-	public static String		Pref_Graphs_Check_force_minimum_for_altitude;
+
+	public static String	Pref_Graphs_Check_force_minimum_for_altimeter;
 	public static String		Pref_Graphs_Check_force_minimum_for_gradient;
 	public static String		Pref_Graphs_Check_scroll_zoomed_chart;
 	public static String		Pref_Graphs_Check_show_start_time;
