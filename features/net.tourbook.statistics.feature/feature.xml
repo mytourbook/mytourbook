@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="net.tourbook.statistics.feature"
-      label="Tour Statistics"
+      label="%Feature_Name"
       version="0.8.3"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
@@ -355,6 +355,10 @@ consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.
    </license>
+
+   <url>
+      <update label="MyTourbook Update Site" url="http://mytourbook.sourceforge.net/updates/"/>
+   </url>
 
    <requires>
       <import plugin="org.eclipse.ui"/>

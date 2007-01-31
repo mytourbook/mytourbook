@@ -3,6 +3,23 @@
 <plugin>
    <extension-point id="statisticYear" name="Year Statistic" schema="schema/statisticYear.exsd"/>
    <extension-point id="deviceDataReader" name="Device Data Reader" schema="schema/deviceDataReader.exsd"/>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="net.tourbook.application"
+            name="MyToorbook">
+         <property
+               name="windowImages"
+               value="icons/tourbook16.gif,icons/tourbook32.gif,icons/tourbook48.gif,icons/tourbook64.gif,icons/tourbook128.gif"/>
+         <property
+               name="aboutText"
+               value="%Product_about"/>
+         <property
+               name="aboutImage"
+               value="icons/tourbook-about-250.gif"/>
+      </product>
+   </extension>
 
      <extension
          id="application"
@@ -12,6 +29,53 @@
                class="net.tourbook.application.Application">
          </run>
       </application>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            label="Update Management"
+            visible="true"
+            id="net.tourbook.update.actionSet">
+         <action
+               class="net.tourbook.update.InstallWizardAction"
+               definitionId="org.eclipse.ui.update.findAndInstallUpdates"
+               id="net.tourbook.update.action_update"
+               label="%Action_Software_Updates"
+               menubarPath="file/update">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="net.tourbook.preferences.PreferenceInitializer"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="net.tourbook.preferences.PrefPageBikes"
+            id="net.tourbook.preferences.PrefPageBikes"
+            name="%Pref_Bikes"/>
+      <page
+            class="net.tourbook.preferences.PrefPagePeople"
+            id="net.tourbook.preferences.PrefPageClients"
+            name="%Pref_People"/>
+      <page
+            class="net.tourbook.preferences.PrefPageStatistic"
+            id="net.tourbook.preferences.PrefPageStatistic"
+            name="%Pref_Statistics"/>
+      <page
+            class="net.tourbook.preferences.PrefPageChartColors"
+            id="net.tourbook.preferences.PrefPageChartColors"
+            name="%Pref_Chart_Colors"/>
+      <page
+            class="net.tourbook.preferences.PrefPageChartGraphs"
+            id="net.tourbook.preferences.PrefPageChartGraphs"
+            name="%Pref_Graphs"/>
+      <page
+            class="net.tourbook.preferences.PrefPageTourTypes"
+            id="net.tourbook.preferences.PrefPageTourTypes"
+            name="%Pref_Tour_Types"/>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
@@ -23,6 +87,13 @@
    </extension>
    <extension
          point="org.eclipse.ui.views">
+                <view
+            name="Progress View"
+            icon="icons/pview.gif"
+            category="org.eclipse.ui"
+            class="org.eclipse.ui.ExtensionFactory:progressView"
+            id="org.eclipse.ui.views.ProgressView">
+         </view>
       <view
             class="net.tourbook.views.rawData.RawDataView"
             icon="icons/device.gif"
@@ -59,69 +130,5 @@
             icon="icons/tour-segmenter.gif"
             id="net.tourbook.views.TourSegmenter"
             name="%View_Tour_Segmenter"/>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="net.tourbook.preferences.PrefPageBikes"
-            id="net.tourbook.preferences.PrefPageBikes"
-            name="%Pref_Bikes"/>
-      <page
-            class="net.tourbook.preferences.PrefPagePeople"
-            id="net.tourbook.preferences.PrefPageClients"
-            name="%Pref_People"/>
-      <page
-            class="net.tourbook.preferences.PrefPageStatistic"
-            id="net.tourbook.preferences.PrefPageStatistic"
-            name="%Pref_Statistics"/>
-      <page
-            class="net.tourbook.preferences.PrefPageChartColors"
-            id="net.tourbook.preferences.PrefPageChartColors"
-            name="%Pref_Chart_Colors"/>
-      <page
-            class="net.tourbook.preferences.PrefPageChartGraphs"
-            id="net.tourbook.preferences.PrefPageChartGraphs"
-            name="%Pref_Graphs"/>
-      <page
-            class="net.tourbook.preferences.PrefPageTourTypes"
-            id="net.tourbook.preferences.PrefPageTourTypes"
-            name="%Pref_Tour_Types"/>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer class="net.tourbook.preferences.PreferenceInitializer"/>
-   </extension>
-   <extension
-         id="product"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="net.tourbook.application"
-            name="MyToorbook">
-         <property
-               name="windowImages"
-               value="icons/tourbook16.gif,icons/tourbook32.gif,icons/tourbook48.gif,icons/tourbook64.gif,icons/tourbook128.gif"/>
-         <property
-               name="aboutText"
-               value="%Product_about"/>
-         <property
-               name="aboutImage"
-               value="icons/tourbook-about-250.gif"/>
-      </product>
-   </extension>
-
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            label="Update Management"
-            visible="true"
-            id="net.tourbook.update.actionSet">
-         <action
-               class="net.tourbook.update.InstallWizardAction"
-               definitionId="org.eclipse.ui.update.findAndInstallUpdates"
-               id="net.tourbook.update.action_update"
-               label="%Action_Software_Updates"
-               menubarPath="file/update">
-         </action>
-      </actionSet>
    </extension>
 </plugin>

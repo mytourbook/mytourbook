@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.tourbook.derby.feature"
+      id="net.tourbook.ext.derby.feature"
       label="Derby Database"
-      version="10.1.2.1">
+      version="10.1.2.1"
+      plugin="net.tourbook.branding">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
@@ -15,6 +16,10 @@
    <license url="http://www.example.com/license">
       [Enter License Description here.]
    </license>
+
+   <url>
+      <update label="MyTourbook Update Site" url="http://mytourbook.sourceforge.net/updates/"/>
+   </url>
 
    <plugin
          id="org.apache.derby.core"

@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
    <description url="http://mytourbook.sourceforge.net/updates/">
-      MyTourbook Update site
+      MyTourbook Update Site
    </description>
-   <archive path="features/net.tourbook.device.feature_0.7.5.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.feature_0.7.5.jar"/>
-   <archive path="plugins/net.tourbook.device.hac4_0.7.5.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.hac4_0.7.5.jar"/>
-   <archive path="plugins/net.tourbook.device.hac5_0.7.5.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.hac5_0.7.5.jar"/>
-   <category-def name="Persistent Service" label=""/>
-   <category-def name="Application" label=""/>
-   <category-def name="Device Import" label=""/>
-   <category-def name="Eclipse Platform" label=""/>
+   <feature url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.feature_0.8.3.jar" id="net.tourbook.feature" version="0.8.3">
+      <category name="MyTourbook"/>
+   </feature>
+   <feature url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.statistics.feature_0.8.3.jar" id="net.tourbook.statistics.feature" version="0.8.3">
+      <category name="MyTourbook"/>
+   </feature>
+   <feature url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.feature_0.8.3.jar" id="net.tourbook.device.feature" version="0.8.3">
+      <category name="MyTourbook"/>
+   </feature>
+   <feature url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.ext.eclipse_0.8.3.jar" id="net.tourbook.ext.eclipse" version="0.8.3">
+      <category name="MyTourbook"/>
+   </feature>
+   <archive path="net.tourbook.device.feature_0.8.3.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.feature_0.8.3.jar"/>
+   <archive path="net.tourbook.ext.eclipse_0.8.3.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.ext.eclipse_0.8.3.jar"/>
+   <archive path="net.tourbook.feature_0.8.3.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.feature_0.8.3.jar"/>
+   <archive path="net.tourbook.statistics.feature_0.8.3.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.statistics.feature_0.8.3.jar"/>
+   <archive path="plugins/net.tourbook_0.8.3.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook_0.8.3.jar"/>
+   <archive path="plugins/net.tourbook.branding_0.8.3.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.branding_0.8.3.jar"/>
+   <archive path="plugins/net.tourbook.connection_0.8.3.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.connection_0.8.3.jar"/>
+   <archive path="plugins/net.tourbook.device.hac4_0.8.3.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.hac4_0.8.3.jar"/>
+   <archive path="plugins/net.tourbook.device.hac5_0.8.3.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.hac5_0.8.3.jar"/>
+   <archive path="plugins/net.tourbook.statistics_0.8.3.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.statistics_0.8.3.jar"/>
+   <archive path="plugins/org.apache.xerces_2.8.0.v200606131651.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/org.apache.xerces_2.8.0.v200606131651.jar"/>
+   <archive path="plugins/org.eclipse.ui.forms_3.2.0.v20060602.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/org.eclipse.ui.forms_3.2.0.v20060602.jar"/>
+   <archive path="plugins/org.eclipse.update.configurator_3.2.1.v20092006.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/org.eclipse.update.configurator_3.2.1.v20092006.jar"/>
+   <archive path="plugins/org.eclipse.update.configurator.nl1_3.2.1.v200609270227.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/org.eclipse.update.configurator.nl1_3.2.1.v200609270227.jar"/>
+   <archive path="plugins/org.eclipse.update.core_3.2.1.v20092006.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/org.eclipse.update.core_3.2.1.v20092006.jar"/>
+   <archive path="plugins/org.eclipse.update.core.nl1_3.2.1.v200609270227.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/org.eclipse.update.core.nl1_3.2.1.v200609270227.jar"/>
+   <archive path="plugins/org.eclipse.update.core.win32_3.2.1.v20092006.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/org.eclipse.update.core.win32_3.2.1.v20092006.jar"/>
+   <archive path="plugins/org.eclipse.update.ui_3.2.1.v20092006.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/org.eclipse.update.ui_3.2.1.v20092006.jar"/>
+   <archive path="plugins/org.eclipse.update.ui.nl1_3.2.1.v200609270227.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/org.eclipse.update.ui.nl1_3.2.1.v200609270227.jar"/>
+   <category-def name="MyTourbook" label=""/>
 </site>

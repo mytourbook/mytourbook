@@ -16,8 +16,7 @@
       <programArgs>##_enable_debug_mode_by_removing_the_#_character_in_the_next_lines
 #-consolelog 
 #-clean 
-#-debug
--nl de</programArgs>
+#-debug</programArgs>
    </launcherArgs>
 
    <windowImages i16="/net.tourbook/icons/tourbook16.gif" i32="/net.tourbook/icons/tourbook32.gif" i48="/net.tourbook/icons/tourbook48.gif" i64="/net.tourbook/icons/tourbook64.gif" i128="/net.tourbook/icons/tourbook128.gif"/>
@@ -34,7 +33,6 @@
             winLargeHigh="/net.tourbook/icons/tourbook48-32.bmp"/>
       </win>
    </launcher>
-
 
    <plugins>
       <plugin id="com.ibm.icu"/>
@@ -65,9 +63,9 @@
    </plugins>
 
    <features>
-      <feature id="net.tourbook.connection.feature" version="0.8.3"/>
-      <feature id="net.tourbook.derby.feature" version="10.1.2.1"/>
       <feature id="net.tourbook.device.feature" version="0.8.3"/>
+      <feature id="net.tourbook.ext.derby.feature" version="10.1.2.1"/>
+      <feature id="net.tourbook.ext.eclipse" version="0.8.3"/>
       <feature id="net.tourbook.ext.ejb3.feature" version="0.8.2"/>
       <feature id="net.tourbook.feature" version="0.8.3"/>
       <feature id="net.tourbook.statistics.feature" version="0.8.3"/>

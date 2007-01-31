@@ -356,20 +356,16 @@ library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.
    </license>
 
+   <url>
+      <update label="MyTourbook Update Site" url="http://mytourbook.sourceforge.net/updates/"/>
+   </url>
+
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="net.tourbook.connection"/>
       <import plugin="net.tourbook.ejb3"/>
       <import plugin="org.apache.derby.core"/>
-      <import plugin="org.eclipse.core.runtime" version="3.1.0" match="compatible"/>
-      <import plugin="org.eclipse.update.configurator" version="3.1.0" match="compatible"/>
-      <import plugin="org.apache.xerces"/>
-      <import plugin="org.eclipse.ui" version="3.2.0" match="compatible"/>
-      <import plugin="org.eclipse.update.core" version="3.1.0" match="compatible"/>
-      <import plugin="org.eclipse.ui.forms" version="3.2.0" match="compatible"/>
-      <import plugin="org.eclipse.jface" version="3.2.0" match="compatible"/>
-      <import plugin="com.ibm.icu"/>
+      <import plugin="org.eclipse.update.ui"/>
    </requires>
 
    <plugin
@@ -387,80 +383,10 @@ Public License instead of this License.
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.update.core"
+         id="net.tourbook.connection"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ui.forms"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.scheduler"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.configurator"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.core.linux"
-         os="linux"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.core.nl1"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.core.win32"
-         os="win32"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.scheduler.nl1"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.ui.nl1"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
          unpack="false"/>
 
 </feature>
