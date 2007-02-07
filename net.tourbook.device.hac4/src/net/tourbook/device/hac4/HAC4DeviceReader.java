@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.device.hac4;
 
+import gnu.io.SerialPort;
+
 import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -30,14 +32,13 @@ import net.tourbook.data.DataUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
-import net.tourbook.device.DeviceData;
-import net.tourbook.device.TourbookDevice;
+import net.tourbook.dataImport.DeviceData;
+import net.tourbook.dataImport.SerialParameters;
+import net.tourbook.dataImport.TourbookDevice;
 
 public class HAC4DeviceReader extends TourbookDevice {
 
 	private Calendar	fCalendar	= GregorianCalendar.getInstance();
-
-	private String		fImportFileName;
 
 	/**
 	 * constructor is used when the plugin is loaded
@@ -48,10 +49,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 	public int getImportDataSize() {
 		return DataUtil.CICLO_HAC4_DATA_SIZE;
-	}
-
-	public String getImportFileName() {
-		return fImportFileName;
 	}
 
 	private TourType getTourType() {
@@ -431,8 +428,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 		deviceData.transferMonth = hac4DeviceData.transferMonth;
 		deviceData.transferDay = hac4DeviceData.transferDay;
 
-		fImportFileName = fileName;
-
 		return true;
 	}
 
@@ -621,4 +616,42 @@ public class HAC4DeviceReader extends TourbookDevice {
 		return ""; //$NON-NLS-1$
 	}
 
+	public SerialParameters getPortParameters(String portName) {
+
+		SerialParameters hac4PortParameters = new SerialParameters(
+				portName,
+				9600,
+				SerialPort.FLOWCONTROL_NONE,
+				SerialPort.FLOWCONTROL_NONE,
+				SerialPort.DATABITS_8,
+				SerialPort.STOPBITS_1,
+				SerialPort.PARITY_NONE);
+
+		return hac4PortParameters;
+	}
+
+	public boolean checkStartSequence(int byteIndex, int newByte) {
+
+		/*
+		 * check if the first 4 bytes are set to AFRO
+		 */
+		if (byteIndex == 0 & newByte == 'A') {
+			return true;
+		}
+		if (byteIndex == 1 & newByte == 'F') {
+			return true;
+		}
+		if (byteIndex == 2 & newByte == 'R') {
+			return true;
+		}
+		if (byteIndex == 3 & newByte == 'O') {
+			return true;
+		}
+
+		return false;
+	}
+
+	public int getStartSequenceSize() {
+		return 4;
+	}
 }

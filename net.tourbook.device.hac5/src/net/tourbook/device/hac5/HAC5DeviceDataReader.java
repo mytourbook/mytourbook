@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.device.hac5;
 
+import gnu.io.SerialPort;
+
 import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -29,8 +31,9 @@ import java.util.GregorianCalendar;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
-import net.tourbook.device.DeviceData;
-import net.tourbook.device.TourbookDevice;
+import net.tourbook.dataImport.DeviceData;
+import net.tourbook.dataImport.SerialParameters;
+import net.tourbook.dataImport.TourbookDevice;
 
 public class HAC5DeviceDataReader extends TourbookDevice {
 
@@ -45,14 +48,16 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 	private static final int	RECORD_LENGTH			= 0x10;
 
-	private String				fImportFileName;
+	// private String fImportFileName;
 
 	private Calendar			fCalendar				= GregorianCalendar.getInstance();
 
 	private GregorianCalendar	fFileDate;
 
 	// plugin constructor
-	public HAC5DeviceDataReader() {}
+	public HAC5DeviceDataReader() {
+		canReadFromDevice = true;
+	}
 
 	/**
 	 * Convert a byte[] array to readable string format. This makes the "hex"
@@ -73,8 +78,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 			return null;
 		}
 
-		String pseudo[] = {
-				"0", //$NON-NLS-1$
+		String pseudo[] = { "0", //$NON-NLS-1$
 				"1", //$NON-NLS-1$
 				"2", //$NON-NLS-1$
 				"3", //$NON-NLS-1$
@@ -183,12 +187,12 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	}
 
 	public int getImportDataSize() {
-		return 0;
+		return 0xffff;
 	}
 
-	public String getImportFileName() {
-		return fImportFileName;
-	}
+	// public String getImportFileName() {
+	// return fImportFileName;
+	// }
 
 	public boolean processDeviceData(	String fileName,
 										DeviceData deviceData,
@@ -450,7 +454,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				tourData.createTimeSeries(timeDataList);
 
 				tourData.computeTourDrivingTime();
-				
+
 				// set week of year
 				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
 						.getStartDay());
@@ -494,7 +498,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 		if (returnValue) {
 
-			fImportFileName = fileName;
+			// fImportFileName = fileName;
 
 			deviceData.transferYear = (short) fFileDate.get(Calendar.YEAR);
 			deviceData.transferMonth = (short) (fFileDate.get(Calendar.MONTH) + 1);
@@ -693,6 +697,45 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		}
 
 		return Messages.HAC5_profile_none;
+	}
+
+	public SerialParameters getPortParameters(String portName) {
+
+		SerialParameters hac5PortParameters = new SerialParameters(
+				portName,
+				4800,
+				SerialPort.FLOWCONTROL_NONE,
+				SerialPort.FLOWCONTROL_NONE,
+				SerialPort.DATABITS_8,
+				SerialPort.STOPBITS_1,
+				SerialPort.PARITY_NONE);
+
+		return hac5PortParameters;
+	}
+
+	public boolean checkStartSequence(int byteIndex, int newByte) {
+
+		/*
+		 * check if the first 4 bytes are set to AFRO
+		 */
+		if (byteIndex == 0 & newByte == 'A') {
+			return true;
+		}
+		if (byteIndex == 1 & newByte == 'F') {
+			return true;
+		}
+		if (byteIndex == 2 & newByte == 'R') {
+			return true;
+		}
+		if (byteIndex == 3 & newByte == 'O') {
+			return true;
+		}
+
+		return false;
+	}
+
+	public int getStartSequenceSize() {
+		return 4;
 	}
 
 }
