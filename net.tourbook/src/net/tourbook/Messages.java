@@ -66,6 +66,10 @@ public class Messages extends NLS {
 	public static String		Database_Monitor_persistent_service_task;
 	public static String		Database_Monitor_persistent_service_title;
 
+	public static String	DataImport_Error_file_does_not_exist_msg;
+
+	public static String	DataImport_Error_file_does_not_exist_title;
+
 	public static String		DataImport_Error_invalid_data_format;
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
@@ -114,6 +118,8 @@ public class Messages extends NLS {
 	public static String		Image_graph_speed;
 	public static String		Image_graph_temperature;
 	public static String		Image_import_rawdata;
+
+	public static String	Image_import_rawdata_direct;
 	public static String		Image_open_import_file;
 	public static String		Image_open_marker_editor;
 
@@ -151,8 +157,12 @@ public class Messages extends NLS {
 	public static String		ImportWizard_Label_serial_port;
 	public static String		ImportWizard_Label_use_settings;
 	public static String		ImportWizard_Message_replace_existing_file;
+
+	public static String	ImportWizard_Monitor_stop_port;
 	public static String		ImportWizard_Monitor_task_msg;
 	public static String		ImportWizard_Monitor_task_received_bytes;
+
+	public static String	ImportWizard_Monitor_wait_for_data;
 	public static String		ImportWizard_Thread_name_read_device_data;
 
 	public static String		Pref_ChartColors_Column_color;

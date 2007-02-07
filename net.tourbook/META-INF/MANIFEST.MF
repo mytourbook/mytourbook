@@ -2,15 +2,15 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 0.8.3
+Bundle-Version: 0.8.4
 Bundle-ClassPath: net.tourbook.jar,
  persistence.jar
 Bundle-Activator: net.tourbook.plugin.TourbookPlugin
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- net.tourbook.connection,
  net.tourbook.ejb3,
+ net.tourbook.rxtx,
  org.apache.derby.core,
  org.eclipse.update.ui
 Eclipse-LazyStart: true
@@ -20,7 +20,6 @@ Export-Package: net.tourbook.chart,
  net.tourbook.data,
  net.tourbook.dataImport,
  net.tourbook.database,
- net.tourbook.device,
  net.tourbook.plugin,
  net.tourbook.preferences,
  net.tourbook.statistic,

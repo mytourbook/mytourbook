@@ -54,12 +54,8 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	// private IWorkbenchAction fActionExit;
-	// private IWorkbenchAction fActionClose;
-	// private IWorkbenchAction fActionSave;
-	// private IWorkbenchAction fActionAbout;
-
 	private ActionDeviceImport	fActionImport;
+	private ActionDeviceImport	fActionImportDirect;
 	private ActionOpenView		fActionRawDataView;
 
 	private ActionOpenView		fActionTourBookView;
@@ -93,10 +89,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(ActionFactory.ABOUT.create(window));
 		getAction(ActionFactory.ABOUT.getId()).setText(Messages.Action_About);
 
-		// register(ActionFactory.CLOSE.create(window));
-		// fActionSave = ActionFactory.SAVE.create(window);
-
-		fActionImport = new ActionDeviceImport(window);
+		fActionImport = new ActionDeviceImport(window, false,Messages.Image_import_rawdata);
+		fActionImportDirect = new ActionDeviceImport(window, true,Messages.Image_import_rawdata_direct);
 
 		fActionRawDataView = new ActionOpenView(
 				window,
@@ -163,16 +157,21 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	protected void fillMenuBar(IMenuManager menuBar) {
 
-		MenuManager fileMenu = new MenuManager(Messages.Action_Menu_file, IWorkbenchActionConstants.M_FILE);
+		MenuManager fileMenu = new MenuManager(
+				Messages.Action_Menu_file,
+				IWorkbenchActionConstants.M_FILE);
 		menuBar.add(fileMenu);
 
+		fileMenu.add(fActionImportDirect);
 		fileMenu.add(fActionImport);
 		fileMenu.add(fActionTourCompareWizard);
+
+		fileMenu.add(new Separator());
+		fileMenu.add(fActionPreferences);
 
 		fileMenu.add(new Separator("update")); //$NON-NLS-1$
 
 		fileMenu.add(new Separator());
-
 		fileMenu.add(getAction(ActionFactory.QUIT.getId()));
 
 		// disabled - it's necesarry when the tour editor is reactivated
@@ -186,9 +185,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		viewMenu.add(fActionTourBookView);
 		viewMenu.add(fActionTourMapView);
 		viewMenu.add(fActionTourCompareView);
-		viewMenu.add(new Separator());
-
-		viewMenu.add(fActionPreferences);
 
 		menuBar.add(getAction(ActionFactory.ABOUT.getId()));
 	}

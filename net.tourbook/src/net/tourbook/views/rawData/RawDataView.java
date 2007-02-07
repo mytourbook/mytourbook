@@ -33,7 +33,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.dataImport.RawDataManager;
-import net.tourbook.device.TourbookDevice;
+import net.tourbook.dataImport.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
@@ -156,7 +156,7 @@ public class RawDataView extends ViewPart {
 	public Calendar						calendar;
 	public DateFormat					dateInstance;
 	public DateFormat					timeInstance;
-	private DateFormat	durationInstance;
+	private DateFormat					durationInstance;
 	private NumberFormat				numberInstance;
 
 	private ToolBarManager				fTbm;
@@ -185,7 +185,6 @@ public class RawDataView extends ViewPart {
 	 * when the import was not successful
 	 */
 	private TourbookDevice				fImportDevice;
-
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -946,10 +945,13 @@ public class RawDataView extends ViewPart {
 				? 1
 				: 0);
 
+		RawDataManager rawDataMgr = RawDataManager.getInstance();
 		// save import file name
-		TourbookDevice rawDataDevice = RawDataManager.getInstance().getDevice();
+		TourbookDevice rawDataDevice = rawDataMgr.getDevice();
 		if (rawDataDevice != null) {
-			memento.putString(MEMENTO_IMPORT_FILENAME, rawDataDevice.getImportFileName());
+			memento.putString(MEMENTO_IMPORT_FILENAME, rawDataMgr.getImportFileName());
+		} else {
+			memento.putString(MEMENTO_IMPORT_FILENAME, null);
 		}
 
 		// save selected tour in the viewer
@@ -1071,7 +1073,7 @@ public class RawDataView extends ViewPart {
 			} else {
 				rawDataSource = device.visibleName
 						+ Messages.RawData_Lable_import_from_file
-						+ device.getImportFileName();
+						+ importer.getImportFileName();
 			}
 			fLblRawDataSource.setText(Dialog.shortenText(rawDataSource, fLblRawDataSource));
 		}
@@ -1089,6 +1091,7 @@ public class RawDataView extends ViewPart {
 			fTourViewer.setInput(rawDataManager.getTourData().toArray());
 
 			updateDeviceData();
+
 			fTourViewer.getTable().setEnabled(true);
 
 		} else {
