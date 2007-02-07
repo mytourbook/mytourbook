@@ -17,7 +17,7 @@
  * Author: Wolfgang Schramm Created: 23.05.2005
  */
 
-package net.tourbook.rawdataimport;
+package net.tourbook.importdata;
 
 /**
  * Contains device data

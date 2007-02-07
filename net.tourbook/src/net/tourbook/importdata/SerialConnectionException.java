@@ -29,7 +29,7 @@
  * purposes.
  */
 
-package net.tourbook.rawdataimport;
+package net.tourbook.importdata;
 
 public class SerialConnectionException extends Exception {
 

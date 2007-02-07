@@ -16,8 +16,8 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
+import net.tourbook.importdata.ActionDeviceImport;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.rawdataimport.ActionDeviceImport;
 import net.tourbook.util.PositionedWizardDialog;
 import net.tourbook.views.ActionOpenView;
 import net.tourbook.views.rawData.RawDataView;

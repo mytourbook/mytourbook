@@ -29,7 +29,7 @@
  * purposes.
  */
 
-package net.tourbook.rawdataimport;
+package net.tourbook.importdata;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
