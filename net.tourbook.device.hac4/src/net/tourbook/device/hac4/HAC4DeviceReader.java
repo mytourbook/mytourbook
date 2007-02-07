@@ -32,9 +32,9 @@ import net.tourbook.data.DataUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
-import net.tourbook.dataImport.DeviceData;
-import net.tourbook.dataImport.SerialParameters;
-import net.tourbook.dataImport.TourbookDevice;
+import net.tourbook.rawdataimport.DeviceData;
+import net.tourbook.rawdataimport.SerialParameters;
+import net.tourbook.rawdataimport.TourbookDevice;
 
 public class HAC4DeviceReader extends TourbookDevice {
 

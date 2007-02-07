@@ -30,9 +30,9 @@ import java.io.IOException;
 import java.util.Formatter;
 
 import net.tourbook.Messages;
-import net.tourbook.dataImport.DeviceData;
-import net.tourbook.dataImport.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.rawdataimport.DeviceData;
+import net.tourbook.rawdataimport.RawDataManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.osgi.util.NLS;

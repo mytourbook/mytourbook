@@ -24,10 +24,10 @@ package net.tourbook.views.rawData;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.dataImport.DeviceManager;
-import net.tourbook.dataImport.RawDataManager;
-import net.tourbook.dataImport.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.rawdataimport.DeviceManager;
+import net.tourbook.rawdataimport.RawDataManager;
+import net.tourbook.rawdataimport.TourbookDevice;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
