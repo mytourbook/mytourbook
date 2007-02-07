@@ -31,9 +31,9 @@ import java.util.GregorianCalendar;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
-import net.tourbook.rawdataimport.DeviceData;
-import net.tourbook.rawdataimport.SerialParameters;
-import net.tourbook.rawdataimport.TourbookDevice;
+import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.SerialParameters;
+import net.tourbook.importdata.TourbookDevice;
 
 public class HAC5DeviceDataReader extends TourbookDevice {
 

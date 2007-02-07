@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.device.hac4;
 
 import gnu.io.SerialPort;
@@ -32,9 +33,9 @@ import net.tourbook.data.DataUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
-import net.tourbook.rawdataimport.DeviceData;
-import net.tourbook.rawdataimport.SerialParameters;
-import net.tourbook.rawdataimport.TourbookDevice;
+import net.tourbook.importdata.DeviceData;
+import net.tourbook.importdata.SerialParameters;
+import net.tourbook.importdata.TourbookDevice;
 
 public class HAC4DeviceReader extends TourbookDevice {
 
