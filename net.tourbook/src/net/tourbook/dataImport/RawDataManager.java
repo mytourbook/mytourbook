@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.dataImport;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +25,6 @@ import javax.persistence.Query;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.device.DeviceData;
-import net.tourbook.device.DeviceManager;
-import net.tourbook.device.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.osgi.util.NLS;
@@ -110,7 +108,30 @@ public class RawDataManager {
 	 */
 	public boolean importRawData(String fileName) {
 
-		ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
+		File importFile = new File(fileName);
+
+		// check if file exist
+		if (importFile.exists()) {
+
+			MessageBox msgBox = new MessageBox(
+					Display.getCurrent().getActiveShell(),
+					SWT.ICON_ERROR| SWT.OK );
+
+//			msgBox.setText(Messages.DataImport_Error_file_does_not_exist_title);
+//			msgBox.setMessage(NLS.bind(
+//					Messages.DataImport_Error_file_does_not_exist_msg,
+//					fileName));
+			
+			msgBox.setText(Messages.DataImport_Error_file_does_not_exist_title);
+			msgBox.setMessage(NLS.bind(
+					Messages.DataImport_Error_file_does_not_exist_msg,
+					fileName));
+
+			msgBox.open();
+			
+			return false;
+		}
+
 
 		// find the file extension in the filename
 		int dotPos = fileName.lastIndexOf("."); //$NON-NLS-1$
@@ -120,6 +141,8 @@ public class RawDataManager {
 		String extension = fileName.substring(dotPos + 1);
 
 		boolean isDataImported = false;
+
+		ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 
 		/*
 		 * try to import from all devices which have the same extension
@@ -181,6 +204,8 @@ public class RawDataManager {
 				// import was not successful
 				fDevice = null;
 				fImportFileName = null;
+
+				fIsDeviceImport = false;
 			}
 		}
 
@@ -221,8 +246,8 @@ public class RawDataManager {
 	/**
 	 * set the status the data has been imported from a device
 	 */
-	public void setIsDeviceImport() {
-		fIsDeviceImport = true;
+	public void setIsDeviceImport(boolean isDeviceImport) {
+		fIsDeviceImport = isDeviceImport;
 	}
 
 	/**

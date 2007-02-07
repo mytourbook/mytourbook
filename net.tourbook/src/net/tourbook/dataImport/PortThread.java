@@ -16,51 +16,112 @@
 
 package net.tourbook.dataImport;
 
-import net.tourbook.ext.serialport.IDataListener;
-import net.tourbook.ext.serialport.PortListener;
-import net.tourbook.ext.serialport.SerialConnectionException;
-import net.tourbook.ext.serialport.SerialParameters;
 
 public class PortThread implements Runnable, IDataListener {
 
 	private WizardImportData	fImportWizard;
-	private String				portName;
+	private TourbookDevice		fImportDevice;
+	private String				fPortName;
 
-	public PortThread(WizardImportData importWizard, String portName) {
-		this.fImportWizard = importWizard;
-		this.portName = portName;
+	private boolean				fIsDataReceived;
+	private int					fByteIndex;
+	private PortListener		fPortListener;
+
+	public PortThread(WizardImportData importWizard, TourbookDevice importDevice, String portName) {
+		fImportWizard = importWizard;
+		fPortName = portName;
+		fImportDevice = importDevice;
 	}
 
 	public void run() {
 
-		PortListener portListener = null;
-
 		// open connection
 		try {
-			SerialParameters portParameters = new SerialParameters();
-			portParameters.setPortName(portName);
 
-			portListener = new PortListener(portParameters, this);
-			portListener.openConnection();
+			SerialParameters portParameters = fImportDevice.getPortParameters(fPortName);
+
+			fPortListener = new PortListener(portParameters, this);
+
+			fIsDataReceived = false;
+			fByteIndex = 0;
+
+			/*
+			 * open the port and wait until data are received, when new are
+			 * available then the method dataArrived will be called
+			 */
+			fPortListener.openConnection();
 
 		} catch (SerialConnectionException e) {
 			e.printStackTrace();
 		}
 
-		// sleep until this thread gets interrupted
 		try {
 			while (true) {
-				Thread.sleep(100);
+
+				if (fPortListener == null) {
+					break;
+				}
+				
+				// send data when no data has been received yet
+				if (fIsDataReceived == false) {
+					if (fPortListener.sendData(0xD8) == false) {
+						fImportWizard.setCloseDialog();
+						break;
+					}
+				}
+
+				// sleep until this thread gets interrupted
+				Thread.sleep(500);
 			}
+
 		} catch (InterruptedException e2) {
-			if (portListener != null) {
-				// cleanup resources
-				portListener.closeConnection();
-			}
+
+			// e2.printStackTrace();
+
 		}
 	}
 
-	public void dataArrived(StringBuilder newData) {
-		fImportWizard.appendReceivedData(newData.toString().getBytes());
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.tourbook.rxtx.IDataListener#dataArrived(java.lang.StringBuilder)
+	 */
+	public void dataArrived(int newByte) {
+
+		boolean appendData = true;
+
+		if (fIsDataReceived == false) {
+
+			/*
+			 * check if the start sequence is correct for this device
+			 */
+			if (fImportDevice.checkStartSequence(fByteIndex, newByte)) {
+				fByteIndex++;
+
+				/*
+				 * when the start sequence is correct then the bytes will not be
+				 * checked again because these data will change
+				 */
+				if (fByteIndex >= fImportDevice.getStartSequenceSize()) {
+					fIsDataReceived = true;
+				}
+			} else {
+				// don't append wrong data
+				appendData = false;
+			}
+		}
+
+		if (appendData) {
+			// forward the received data to the import wizard
+			fImportWizard.appendReceivedData(newByte);
+		}
+	}
+
+	public void prepareInterrupt() {
+		// cleanup resources
+		if (fPortListener != null) {
+			fPortListener.closeConnection();
+			fPortListener = null;
+		}
 	}
 }

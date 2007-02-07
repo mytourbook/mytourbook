@@ -13,22 +13,19 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.dataImport;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 import java.util.Formatter;
 
 import net.tourbook.Messages;
-import net.tourbook.device.DeviceData;
-import net.tourbook.device.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.views.rawData.RawDataView;
 
@@ -39,6 +36,9 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -46,10 +46,12 @@ import org.eclipse.ui.PlatformUI;
 
 public class WizardImportData extends Wizard {
 
+	// timeout in milliseconds * 100
+	private static final int			RECEIVE_TIMEOUT			= 600;
+
 	public static final String			DIALOG_SETTINGS_SECTION	= "WizardImportData";			//$NON-NLS-1$
 
 	private WizardPageImportSettings	fPageImportSettings;
-
 	private ByteArrayOutputStream		fRawDataBuffer			= new ByteArrayOutputStream();
 
 	/**
@@ -57,7 +59,12 @@ public class WizardImportData extends Wizard {
 	 */
 	private TourbookDevice				fImportDevice;
 
+	private boolean						fCloseDialog;
+
+	private IRunnableWithProgress		fRunnableReceiveData;
+
 	WizardImportData() {
+
 		setDialogSettings();
 		setNeedsProgressMonitor(true);
 	}
@@ -72,57 +79,160 @@ public class WizardImportData extends Wizard {
 	/**
 	 * Append newly received data to the internal data buffer
 	 * 
-	 * @param data
+	 * @param newData
 	 *        data being written into the buffer
 	 */
-	public void appendReceivedData(byte[] data) {
-		try {
-			fRawDataBuffer.write(data);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void appendReceivedData(int newData) {
+		fRawDataBuffer.write(newData);
 	}
 
-	private void importData() {
+	/**
+	 * @param sourceFileName
+	 * @return Returns the path of the saved file or null when it was not saved
+	 */
+	private String autoSaveRawData(String sourceFileName) {
 
-		final String portName = fPageImportSettings.fComboPorts
-				.getItem(fPageImportSettings.fComboPorts.getSelectionIndex());
+		// set filename to the transfer date
+		DeviceData deviceData = RawDataManager.getInstance().getDeviceData();
+		String fileName = new Formatter().format(
+				Messages.Format_rawdata_file_yyyy_mm_dd + fImportDevice.fileExtension,
+				deviceData.transferYear,
+				deviceData.transferMonth,
+				deviceData.transferDay).toString();
 
+		String importPathName = fPageImportSettings.fAutoSavePathEditor.getStringValue();
+
+		String fileOutPath = new Path(importPathName).addTrailingSeparator().toString() + fileName;
+		File fileOut = new File(fileOutPath);
+
+		// check if file already exist, ask for overwriting the file
+		if (fileOut.exists()) {
+
+			MessageBox msgBox = new MessageBox(getShell(), SWT.ICON_WORKING | SWT.OK | SWT.CANCEL);
+
+			msgBox.setMessage(NLS.bind(
+					Messages.ImportWizard_Message_replace_existing_file,
+					fileName));
+
+			if (msgBox.open() != SWT.OK) {
+				return null;
+			}
+		}
+
+		// get source file
+		File fileIn = new File(sourceFileName);
+
+		// copy source file into destination file
+		FileInputStream inReader = null;
+		FileOutputStream outReader = null;
+		try {
+			inReader = new FileInputStream(fileIn);
+			outReader = new FileOutputStream(fileOut);
+			int c;
+
+			while ((c = inReader.read()) != -1)
+				outReader.write(c);
+
+			inReader.close();
+			outReader.close();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			// close the files
+			if (inReader != null) {
+				try {
+					inReader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (outReader != null) {
+				try {
+					outReader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return fileOutPath;
+	}
+
+	public boolean getCloseStatus() {
+		return fCloseDialog;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the import was successful
+	 */
+	private boolean importData() {
+
+		/*
+		 * get port name
+		 */
+		int selectedComPort = fPageImportSettings.fComboPorts.getSelectionIndex();
+		if (selectedComPort == -1) {
+			return false;
+		}
+
+		final String portName = fPageImportSettings.fComboPorts.getItem(selectedComPort);
+
+		/*
+		 * when the Cancel button is pressed multiple times, the app calls this
+		 * function each time
+		 */
+		if (fRunnableReceiveData != null) {
+			return false;
+		}
+		/*
+		 * set the device which is used to read the data
+		 */
 		fImportDevice = fPageImportSettings.getSelectedDevice();
 
 		if (fImportDevice == null) {
-			return;
+			return false;
 		}
 
-		// create/run the import task with a monitor
+		/*
+		 * receive data from the device
+		 */
 		try {
-			getContainer().run(true, true, new IRunnableWithProgress() {
+			fRunnableReceiveData = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) {
 
-					// NLS.bind(Messages.key_two, "example usage");
-
-					String msg = NLS.bind(
-							Messages.ImportWizard_Monitor_task_msg,
+					String msg = NLS.bind(Messages.ImportWizard_Monitor_task_msg, new Object[] {
 							fImportDevice.visibleName,
-							portName);
+							portName,
+							fImportDevice.getPortParameters(portName).getBaudRate() });
 
 					monitor.beginTask(msg, fImportDevice.getImportDataSize());
 
 					readDeviceData(monitor, portName);
 				}
-			});
+			};
+
+			getContainer().run(true, true, fRunnableReceiveData);
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
-		if (fRawDataBuffer.size() == 0) {
-			// data has not been received or the user canceled the import
-			return;
+		if (fCloseDialog) {
+			return true;
 		}
 
-		// data has been received
+		if (fRawDataBuffer.size() == 0) {
+			// data has not been received or the user canceled the import
+			return true;
+		}
+
+		/*
+		 * data has been received, sav the data in a temp file
+		 */
 
 		final String tempDataFileName = RawDataManager.getTempDataFileName();
 
@@ -153,13 +263,26 @@ public class WizardImportData extends Wizard {
 					rawDataManager.getDeviceData(),
 					rawDataManager.getTourData())) {
 
-				rawDataManager.setDevice(fImportDevice);
-				rawDataManager.setImportFileName(tempDataFileName);
-				rawDataManager.setIsDeviceImport();
+				String autoSavedFileName = null;
 
 				// auto save raw data
 				if (fPageImportSettings.fCheckAutoSave.getSelection()) {
-					autoSaveRawData();
+					autoSavedFileName = autoSaveRawData(tempDataFileName);
+				}
+
+				rawDataManager.setDevice(fImportDevice);
+
+				if (autoSavedFileName == null) {
+					// it was not auto saved or the auto save was canceled
+					rawDataManager.setImportFileName(tempDataFileName);
+					rawDataManager.setIsDeviceImport(true);
+				} else {
+					/*
+					 * tell the raw data manager that the data are not received
+					 * they are now from a file
+					 */
+					rawDataManager.setImportFileName(autoSavedFileName);
+					rawDataManager.setIsDeviceImport(false);
 				}
 
 				rawDataManager.updatePersonInRawData();
@@ -174,7 +297,7 @@ public class WizardImportData extends Wizard {
 
 					if (importView != null) {
 						importView.updateViewer();
-						importView.setActionSaveEnabled(true);
+						importView.setActionSaveEnabled(autoSavedFileName == null);
 					}
 				} catch (PartInitException e) {
 					e.printStackTrace();
@@ -192,90 +315,17 @@ public class WizardImportData extends Wizard {
 					fImportDevice.visibleName));
 			msgBox.open();
 
-			return;
-		}
-	}
-
-	/**
-	 * 
-	 */
-	public void autoSaveRawData() {
-
-		// set filename to the transfer date
-		DeviceData deviceData = RawDataManager.getInstance().getDeviceData();
-		String fileName = new Formatter()
-				.format(
-						Messages.Format_rawdata_file_yyyy_mm_dd
-								+ fImportDevice.fileExtension,
-						deviceData.transferYear,
-						deviceData.transferMonth,
-						deviceData.transferDay)
-				.toString();
-
-		String importPathName = fPageImportSettings.fAutoSavePathEditor.getStringValue();
-
-		File fileIn;
-		File fileOut = new File(new Path(importPathName).addTrailingSeparator().toString()
-				+ fileName);
-
-		// check if file already exist, ask for overwriting the file
-		if (fileOut.exists()) {
-
-			MessageBox msgBox = new MessageBox(getShell(), SWT.ICON_WORKING | SWT.OK | SWT.CANCEL);
-
-			msgBox.setMessage(NLS.bind(
-					Messages.ImportWizard_Message_replace_existing_file,
-					fileName));
-
-			if (msgBox.open() != SWT.OK) {
-				return;
-			}
+			return true;
 		}
 
-		// get source file
-		fileIn = new File(fImportDevice.getImportFileName());
-
-		// copy source file into destination file
-		FileReader inReader = null;
-		FileWriter outReader = null;
-		try {
-			inReader = new FileReader(fileIn);
-			outReader = new FileWriter(fileOut);
-			int c;
-
-			while ((c = inReader.read()) != -1)
-				outReader.write(c);
-
-			inReader.close();
-			outReader.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			// close the files
-			if (inReader != null) {
-				try {
-					inReader.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (outReader != null) {
-				try {
-					outReader.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		return true;
 	}
 
 	public boolean performFinish() {
 
-		fPageImportSettings.persistDialogSettings();
-
 		importData();
+
+		fPageImportSettings.persistDialogSettings();
 
 		return true;
 	}
@@ -292,12 +342,22 @@ public class WizardImportData extends Wizard {
 
 		int iTimeout = 0;
 		int iReceivedData = 0;
-		boolean isReceiving = false;
-		int importDataSize = fImportDevice.getImportDataSize();
+		boolean isReceivingStarted = false;
 
-		// start thread which reads data from the com port
+		fCloseDialog = false;
+
+		int importDataSize = fImportDevice.getImportDataSize();
+		// convert baud -> bytes, baud contains startbit + 8 databits + stopbit
+		// int byteRate =
+		// fImportDevice.getPortParameters(portName).getBaudRate() / 10;
+		// int maxSeconds = importDataSize / byteRate;
+		int timer = 0;
+
+		// start the port thread which reads data from the com port
+		PortThread portThreadRunnable = new PortThread(this, fImportDevice, portName);
+
 		Thread portThread = new Thread(
-				new PortThread(this, portName),
+				portThreadRunnable,
 				Messages.ImportWizard_Thread_name_read_device_data);
 		portThread.start();
 
@@ -305,7 +365,8 @@ public class WizardImportData extends Wizard {
 		 * wait for the data thread, terminate after a certain time (300 x 100
 		 * milliseconds = 30 seconds)
 		 */
-		while (iTimeout < 300) {
+
+		while (iTimeout < RECEIVE_TIMEOUT) {
 
 			try {
 				Thread.sleep(100);
@@ -313,45 +374,64 @@ public class WizardImportData extends Wizard {
 				e2.printStackTrace();
 			}
 
-			// if receiving has started and no more data are coming in
-			// stop receiving additional data
-			if (isReceiving && fRawDataBuffer.size() == iReceivedData) {
+			if (isReceivingStarted == false) {
+				monitor.subTask(NLS.bind(
+						Messages.ImportWizard_Monitor_wait_for_data,
+						(RECEIVE_TIMEOUT / 10 - (iTimeout / 10))));
+			}
+
+			int rawDataSize = fRawDataBuffer.size();
+
+			/*
+			 * if receiving data has started and no more data are coming in stop
+			 * receiving additional data
+			 */
+			if (isReceivingStarted && rawDataSize == iReceivedData) {
 				break;
 			}
 
 			// if user pressed the cancel button, exit the import
-			if (monitor.isCanceled()) {
+			if (monitor.isCanceled() || fCloseDialog == true) {
+
+				// close the dialog when the monitor was canceled
+				fCloseDialog = true;
 
 				// reset databuffer to prevent saving the content
 				fRawDataBuffer.reset();
 				break;
 			}
 
-			// check if receiving of data has been started
-			if (fRawDataBuffer.size() > iReceivedData) {
+			// check if new data are arrived
+			if (rawDataSize > iReceivedData) {
 
 				// set status that receiving of the data has been started
-				isReceiving = true;
+				isReceivingStarted = true;
+				timer++;
 
 				// reset timeout if data are being received
 				iTimeout = 0;
 
 				// advance progress monitor
-				monitor.worked(fRawDataBuffer.size() - iReceivedData);
+				monitor.worked(rawDataSize - iReceivedData);
 
 				// display the bytes which have been received
 				monitor.subTask(NLS.bind(
 						Messages.ImportWizard_Monitor_task_received_bytes,
-						(Integer.toString(iReceivedData * 100 / importDataSize)),
-						(Integer.toString(iReceivedData))));
+						new Object[] {
+								Integer.toString(iReceivedData * 100 / importDataSize),
+								Integer.toString(timer / 10),
+								Integer.toString(iReceivedData) }));
 			}
 
 			iTimeout++;
 
-			iReceivedData = fRawDataBuffer.size();
+			iReceivedData = rawDataSize;
 		}
 
-		// tell the thread to stop
+		// tell the port listener thread to stop
+		monitor.subTask(Messages.ImportWizard_Monitor_stop_port);
+		portThreadRunnable.prepareInterrupt();
+
 		portThread.interrupt();
 
 		// wait for the port thread to be terminated
@@ -360,6 +440,32 @@ public class WizardImportData extends Wizard {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	public void setAutoDownload() {
+
+		getContainer().getShell().addShellListener(new ShellAdapter() {
+			public void shellActivated(ShellEvent e) {
+
+				Display.getCurrent().asyncExec(new Runnable() {
+					public void run() {
+
+						// start downloading
+						boolean importResult = importData();
+
+						fPageImportSettings.persistDialogSettings();
+
+						if (importResult) {
+							getContainer().getShell().close();
+						}
+					}
+				});
+			}
+		});
+
+	}
+
+	public void setCloseDialog() {
+		fCloseDialog = true;
 	}
 
 	public void setDialogSettings() {

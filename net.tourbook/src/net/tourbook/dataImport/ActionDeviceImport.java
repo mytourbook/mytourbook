@@ -21,37 +21,40 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.PositionedWizardDialog;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.ui.IWorkbenchWindow;
 
 public class ActionDeviceImport extends Action {
 
 	private IWorkbenchWindow	fWindow;
+	private boolean				fIsDirectSynch;
 
-	public ActionDeviceImport(IWorkbenchWindow window) {
+	public ActionDeviceImport(IWorkbenchWindow window, boolean isDirectSynch, String image) {
 
 		fWindow = window;
+		fIsDirectSynch = isDirectSynch;
 
 		setText(Messages.Action_import_rawdata);
 		setToolTipText(Messages.Action_import_rawdata_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_import_rawdata));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(image));
 	}
 
 	public void run() {
 
-		Wizard importWizard = new WizardImportData();
+		final WizardImportData importWizard = new WizardImportData();
 
 		final WizardDialog dialog = new PositionedWizardDialog(
 				fWindow.getShell(),
 				importWizard,
 				WizardImportData.DIALOG_SETTINGS_SECTION);
 
-		BusyIndicator.showWhile(null, new Runnable() {
-			public void run() {
-				dialog.open();
-			}
-		});
+		// create the dialog that the shell is created which is required in setAutoDownload()
+		dialog.create();
+
+		if (fIsDirectSynch) {
+			importWizard.setAutoDownload();
+		}
+		
+		dialog.open();
 	}
 }

@@ -15,16 +15,14 @@
  *******************************************************************************/
 package net.tourbook.dataImport;
 
+import gnu.io.CommPortIdentifier;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
-
-import javax.comm.CommPortIdentifier;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.device.DeviceManager;
-import net.tourbook.device.TourbookDevice;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -177,7 +175,7 @@ public class WizardPageImportSettings extends WizardPage {
 		}
 
 		// filler
-		final Label label = new Label(fGroupContainer, SWT.NONE);
+		new Label(fGroupContainer, SWT.NONE);
 	}
 
 	/**
