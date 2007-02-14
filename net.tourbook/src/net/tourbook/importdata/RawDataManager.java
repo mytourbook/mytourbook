@@ -112,27 +112,22 @@ public class RawDataManager {
 		File importFile = new File(fileName);
 
 		// check if file exist
-		if (importFile.exists()) {
+		if (importFile.exists() == false) {
 
 			MessageBox msgBox = new MessageBox(
-					Display.getCurrent().getActiveShell(),
-					SWT.ICON_ERROR| SWT.OK );
+					Display.getDefault().getActiveShell(),
+					SWT.ICON_ERROR | SWT.OK);
 
-//			msgBox.setText(Messages.DataImport_Error_file_does_not_exist_title);
-//			msgBox.setMessage(NLS.bind(
-//					Messages.DataImport_Error_file_does_not_exist_msg,
-//					fileName));
-			
 			msgBox.setText(Messages.DataImport_Error_file_does_not_exist_title);
-			msgBox.setMessage(NLS.bind(
-					Messages.DataImport_Error_file_does_not_exist_msg,
-					fileName));
+			msgBox
+					.setMessage(NLS.bind(
+							Messages.DataImport_Error_file_does_not_exist_msg,
+							fileName));
 
 			msgBox.open();
-			
+
 			return false;
 		}
-
 
 		// find the file extension in the filename
 		int dotPos = fileName.lastIndexOf("."); //$NON-NLS-1$

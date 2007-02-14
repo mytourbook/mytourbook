@@ -34,6 +34,7 @@
       </win>
    </launcher>
 
+
    <plugins>
       <plugin id="com.ibm.icu"/>
       <plugin id="net.tourbook"/>

@@ -38,6 +38,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchPage;
@@ -170,15 +171,21 @@ public class WizardImportData extends Wizard {
 	 */
 	private boolean importData() {
 
+		Combo comboPorts = fPageImportSettings.fComboPorts;
+		
+		if (comboPorts.isDisposed()) {
+			return false;
+		}
+		
 		/*
 		 * get port name
 		 */
-		int selectedComPort = fPageImportSettings.fComboPorts.getSelectionIndex();
+		int selectedComPort = comboPorts.getSelectionIndex();
 		if (selectedComPort == -1) {
 			return false;
 		}
 
-		final String portName = fPageImportSettings.fComboPorts.getItem(selectedComPort);
+		final String portName = comboPorts.getItem(selectedComPort);
 
 		/*
 		 * when the Cancel button is pressed multiple times, the app calls this

@@ -206,6 +206,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		// ---------------------------------------------------------
 
 		IToolBarManager importToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		importToolbar.add(fActionImportDirect);
 		importToolbar.add(fActionImport);
 		importToolbar.add(fActionRawDataView);
 

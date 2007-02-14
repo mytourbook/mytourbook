@@ -364,6 +364,7 @@ Public License instead of this License.
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="net.tourbook.ejb3"/>
+      <import plugin="net.tourbook.rxtx"/>
       <import plugin="org.apache.derby.core"/>
       <import plugin="org.eclipse.update.ui"/>
    </requires>
@@ -383,10 +384,37 @@ Public License instead of this License.
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.connection"
+         id="net.tourbook.rxtx.win32"
+         os="win32"
          download-size="0"
          install-size="0"
          version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.rxtx"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.rxtx.linux"
+         os="linux"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.rxtx.macosx"
+         os="macosx"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
          unpack="false"/>
 
 </feature>
