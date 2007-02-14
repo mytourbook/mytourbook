@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: rxtx Win32 Fragment
+Bundle-SymbolicName: net.tourbook.rxtx.win32
+Bundle-Version: 2.1.7
+Fragment-Host: net.tourbook.rxtx;bundle-version="2.1.7"
+Bundle-Localization: plugin
