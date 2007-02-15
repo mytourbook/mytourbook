@@ -158,14 +158,18 @@ public class Chart extends ViewForm {
 				Messages.Action_next_month_tooltip,
 				new String[] { Messages.Image_arrow_right, Messages.Image_arrow_right_disabled });
 
-		action = createAction(ACTION_ZOOM_IN, Messages.Action_zoom_in, Messages.Action_zoom_in_tooltip, new String[] {
-				Messages.Image_zoom_in,
-				Messages.Image_zoom_in_disabled });
+		action = createAction(
+				ACTION_ZOOM_IN,
+				Messages.Action_zoom_in,
+				Messages.Action_zoom_in_tooltip,
+				new String[] { Messages.Image_zoom_in, Messages.Image_zoom_in_disabled });
 		action.setEnabled(true);
 
-		action = createAction(ACTION_ZOOM_OUT, Messages.Action_zoom_out, Messages.Action_zoom_out_tooltip, new String[] {
-				Messages.Image_zoom_out,
-				Messages.Image_zoom_out_disabled });
+		action = createAction(
+				ACTION_ZOOM_OUT,
+				Messages.Action_zoom_out,
+				Messages.Action_zoom_out_tooltip,
+				new String[] { Messages.Image_zoom_out, Messages.Image_zoom_out_disabled });
 
 		action = createAction(
 				ACTION_ZOOM_FIT_GRAPH,
