@@ -38,6 +38,23 @@ public class StatisticDayCombined extends StatisticDay {
 		ChartDataYSerie yData;
 
 		/*
+		 * Distance
+		 */
+		yData = new ChartDataYSerie(
+				ChartDataModel.CHART_TYPE_BAR,
+				tourTimeData.fDistanceLow,
+				tourTimeData.fDistanceHigh);
+		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
+		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+		yData.setAllValueColors(0);
+		yData.setMinValue(0);
+		yData.setCustomData(DISTANCE_DATA, 1);
+		chartModel.addYData(yData);
+		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
+		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
+		
+		/*
 		 * Altitude
 		 */
 		yData = new ChartDataYSerie(
@@ -55,24 +72,7 @@ public class StatisticDayCombined extends StatisticDay {
 		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
 
 		/*
-		 * Distance
-		 */
-		yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
-				tourTimeData.fDistanceLow,
-				tourTimeData.fDistanceHigh);
-		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
-		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
-		yData.setAllValueColors(0);
-		yData.setMinValue(0);
-		yData.setCustomData(DISTANCE_DATA, 1);
-		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
-		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
-
-		/*
-		 * Duration
+		 * Time
 		 */
 		yData = new ChartDataYSerie(
 				ChartDataModel.CHART_TYPE_BAR,
