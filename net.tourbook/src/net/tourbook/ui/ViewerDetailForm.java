@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Listener;
  */
 public class ViewerDetailForm {
 
-	private static final int	MINIMUM_WIDTH	= 20;
+	private static final int	MINIMUM_WIDTH	= 100;
 
 	private Composite			fParent;
 
@@ -118,9 +118,14 @@ public class ViewerDetailForm {
 		fViewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_WIDTH, viewerWidth);
 	}
 
+	/**
+	 * sets the control which is maximized, set <code>null</code> to reset the
+	 * maximized control
+	 * 
+	 * @param control
+	 */
 	public void setMaximizedControl(Control control) {
 		fMaximizedControl = control;
-		// fUpdateSize = true;
 		onResize();
 	}
 
@@ -143,7 +148,10 @@ public class ViewerDetailForm {
 			}
 
 			fSashData.left = new FormAttachment(0, viewerWidth);
+			
 			fParent.layout();
+			
+//			System.out.println("isInit==false: "+viewerWidth);
 
 		} else {
 
@@ -164,14 +172,21 @@ public class ViewerDetailForm {
 				if (fViewerWidth == null) {
 					fSashData.left = new FormAttachment(50, 0);
 				} else {
-					fSashData.left = new FormAttachment(0, fViewerWidth == null
-							? 100
-							: fViewerWidth);
-				}
 
+					Rectangle parentRect = fParent.getClientArea();
+
+					// set the minimum width
+					int viewerWidth = fViewerWidth == null
+							? MINIMUM_WIDTH
+							: fViewerWidth >= parentRect.width ? Math.max(fViewerWidth
+									- MINIMUM_WIDTH, 10) : fViewerWidth;
+
+					fSashData.left = new FormAttachment(0, viewerWidth);
+				}
 				fParent.layout();
 			}
-		}
 
+//			System.out.println("isInit==true: "+fSashData.left);
+		}
 	}
 }

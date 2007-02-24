@@ -35,6 +35,6 @@ public class ActionShowViewDetails extends Action {
 	}
 
 	public void run() {
-		fViewer.manageVisibility(this);
+		fViewer.manageViewerVisibility(this);
 	}
 }

@@ -6,3 +6,4 @@ Bundle-Version: 2.1.7
 Bundle-ClassPath: RXTXcomm.jar
 Bundle-Localization: plugin
 Export-Package: gnu.io
+Bundle-Vendor: MyTourbook

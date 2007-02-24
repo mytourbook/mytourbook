@@ -210,6 +210,8 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 
 	private int							fLastSelectedTourTypeId;
 
+	private int							fViewerWidth;
+
 	private class TourBookContentProvider implements ITreeContentProvider {
 
 		public void dispose() {}
@@ -968,7 +970,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 
 					// open tour in editor
 
-					TVITourBookTour tourItem = (TVITourBookTour) selection;
+					// TVITourBookTour tourItem = (TVITourBookTour) selection;
 					// TourManager.getInstance().openTourInEditor(tourItem.getTourId());
 
 				} else if (selection != null) {
@@ -1073,7 +1075,9 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 
 	public void saveState(IMemento memento) {
 
-		memento.putInteger(MEMENTO_VIEWER_WIDTH, fTourViewer.getTree().getSize().x);
+		// keep viewer width
+		int viewerWidth = fTourViewer.getTree().getSize().x;
+		memento.putInteger(MEMENTO_VIEWER_WIDTH, viewerWidth > 0 ? viewerWidth : fViewerWidth);
 
 		// save sash weights
 		UI.saveSashWeight(fSashDetail, memento, MEMENTO_SASH_WEIGHT_DETAIL);
@@ -1132,14 +1136,14 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 
 			if (containerVisibleStatus == null || containerVisibleStatus == 0) {
 				fActionShowViewDetailsBoth.setChecked(true);
-				manageVisibility(fActionShowViewDetailsBoth);
+				manageViewerVisibility(fActionShowViewDetailsBoth);
 			} else if (containerVisibleStatus == 1) {
 				fActionShowViewDetailsViewer.setChecked(true);
-				manageVisibility(fActionShowViewDetailsViewer);
+				manageViewerVisibility(fActionShowViewDetailsViewer);
 
 			} else {
 				fActionShowViewDetailsDetail.setChecked(true);
-				manageVisibility(fActionShowViewDetailsDetail);
+				manageViewerVisibility(fActionShowViewDetailsDetail);
 			}
 
 			// show/hide tour chart
@@ -1161,7 +1165,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		} else {
 
 			fActionShowViewDetailsBoth.setChecked(true);
-			manageVisibility(fActionShowViewDetailsBoth);
+			manageViewerVisibility(fActionShowViewDetailsBoth);
 
 			fActionShowDetailStatistic.setChecked(true);
 			fActionShowDetailTourChart.setChecked(false);
@@ -1242,7 +1246,13 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 	 * @param action
 	 *        action which was enable/disabled
 	 */
-	public void manageVisibility(IAction action) {
+	public void manageViewerVisibility(IAction action) {
+
+		// keep the width of the tree viewer
+		int viewerWidth = fTourViewer.getTree().getSize().x;
+		if (viewerWidth > 0) {
+			fViewerWidth = viewerWidth;
+		}
 
 		if (action == fActionShowViewDetailsBoth) {
 

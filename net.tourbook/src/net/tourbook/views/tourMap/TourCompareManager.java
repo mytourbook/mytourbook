@@ -394,6 +394,7 @@ public class TourCompareManager {
 
 		compareResult.compareTime = time;
 		compareResult.compareDistance = distance;
+		compareResult.timeIntervall = compareTourData.getDeviceTimeInterval();
 
 		return compareResult;
 	}

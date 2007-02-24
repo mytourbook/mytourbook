@@ -43,6 +43,7 @@ public class TVICompareResult extends TreeViewerItem {
 
 	protected int			compareTime;
 	protected int			compareDistance;
+	protected int			timeIntervall;
 
 	public boolean hasChildren() {
 		/*

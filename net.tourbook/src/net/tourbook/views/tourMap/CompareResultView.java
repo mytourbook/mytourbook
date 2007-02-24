@@ -105,6 +105,7 @@ public class CompareResultView extends SynchedChartView {
 	public static final int					COLUMN_DIFFERENCE		= 1;
 	public static final int					COLUMN_SPEED			= 2;
 	public static final int					COLUMN_DISTANCE			= 3;
+	public static final int					COLUMN_TIME_INTERVAL	= 4;
 
 	private static final String				MEMENTO_SASH_CONTAINER	= "resultview.container.";								//$NON-NLS-1$
 	private static final String				MEMENTO_SASH_CHART		= "resultview.chart.";									//$NON-NLS-1$
@@ -259,6 +260,10 @@ public class CompareResultView extends SynchedChartView {
 					return Integer.toString(result.altitudeDiff
 							* 100
 							/ (result.normIndexEnd - result.normIndexStart));
+
+				case COLUMN_TIME_INTERVAL:
+					return Integer.toString(result.timeIntervall);
+
 				}
 			}
 
@@ -526,6 +531,11 @@ public class CompareResultView extends SynchedChartView {
 		tc = new TreeColumn(tree, SWT.TRAIL);
 		tc.setText(Messages.CompareResult_Column_km);
 		tc.setToolTipText(Messages.CompareResult_Column_km_tooltip);
+		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
+		tc = new TreeColumn(tree, SWT.TRAIL);
+		tc.setText(Messages.RawData_Column_time_interval);
+		tc.setToolTipText(Messages.RawData_Column_time_interval_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		fTourViewer = new ContainerCheckedTreeViewer(tree);

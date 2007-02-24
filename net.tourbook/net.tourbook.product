@@ -13,7 +13,7 @@
    <configIni use="default"/>
 
    <launcherArgs>
-      <programArgs>##_enable_debug_mode_by_removing_the_#_character_in_the_next_lines
+      <programArgs>#_enable_debug_mode_by_removing_the_#_character_in_the_next_lines
 -consolelog 
 -clean 
 -debug</programArgs>
@@ -24,15 +24,18 @@
    <splash
       location="net.tourbook" />
    <launcher name="mytourbook">
-      <linux icon="/net.tourbook/icons/tourbook48-32.xpm"/>
+      <linux icon="/net.tourbook/icons/linux/tourbook48-32.xpm"/>
+      <macosx icon="/net.tourbook/icons/mac/tourbook128.icns"/>
       <solaris/>
       <win useIco="false">
+         <ico path="/net.tourbook/icons/windows/tourbook128.ico"/>
          <bmp
             winSmallHigh="/net.tourbook/icons/tourbook16-32.bmp"
             winMediumHigh="/net.tourbook/icons/tourbook32-32.bmp"
             winLargeHigh="/net.tourbook/icons/tourbook48-32.bmp"/>
       </win>
    </launcher>
+
 
    <plugins>
       <plugin id="com.ibm.icu"/>

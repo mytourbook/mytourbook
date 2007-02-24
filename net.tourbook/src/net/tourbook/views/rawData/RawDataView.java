@@ -43,7 +43,7 @@ import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ColorCache;
-import net.tourbook.ui.UI;
+import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.views.tourBook.DrawingColors;
@@ -74,7 +74,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ViewForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -89,6 +88,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolBar;
@@ -126,18 +126,17 @@ public class RawDataView extends ViewPart {
 
 	private static IMemento				fSessionMemento;
 
-	private SashForm					fPartSash;
-
+	private ViewerDetailForm			fViewerDetailForm;
 	private TableViewer					fTourViewer;
 
 	private TourChart					fTourChart;
 	private TourChartConfiguration		fTourChartConfig;
 
 	private ActionSaveRawData			actionSave;
-	private ActionLoad					actionLoad;
+	private ActionImportFromFile		fActionImportTourFromFile;
 	private ActionSaveTourInDatabase	actionSaveTour;
 	private ActionSaveTourInDatabase	actionSaveTourWithPerson;
-	private ActionShowViewDetails		actionShowTourChart;
+	private ActionShowViewDetails		fActionShowTourChart;
 
 	private ImageDescriptor				imageDatabaseDescriptor;
 	private ImageDescriptor				imageDatabaseOtherPersonDescriptor;
@@ -410,10 +409,15 @@ public class RawDataView extends ViewPart {
 					gc.setForeground(colorBright);
 					gc.setBackground(drawingColors.colorDark);
 
+//					gc.setAlpha(0x0);
+//					gc.fillRectangle(0, 0, fColorImageWidth, fColorImageHeight);
+
+					gc.setAlpha(0xff);
 					gc.fillGradientRectangle(4, 1, 8, fColorImageHeight - 3, false);
 
 					gc.setForeground(drawingColors.colorLine);
 					gc.drawRoundRectangle(4, 0, 7, fColorImageHeight - 2, arcSize, arcSize);
+					
 				}
 			}
 			gc.dispose();
@@ -555,20 +559,19 @@ public class RawDataView extends ViewPart {
 
 		// toolbar: left side
 		actionSave = new ActionSaveRawData(this);
-		actionLoad = new ActionLoad(this);
+		fActionImportTourFromFile = new ActionImportFromFile();
 		actionSaveTour = new ActionSaveTourInDatabase(this);
 		actionSaveTourWithPerson = new ActionSaveTourInDatabase(this);
-		actionShowTourChart = new ActionShowViewDetails(this);
+		fActionShowTourChart = new ActionShowViewDetails(this);
 
 		fTbm.add(actionSave);
-		fTbm.add(actionLoad);
+		fTbm.add(fActionImportTourFromFile);
 
 		fTbm.update(true);
 
 		// view actions
 		IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
-		viewTbm.add(actionShowTourChart);
-
+		viewTbm.add(fActionShowTourChart);
 	}
 
 	/**
@@ -615,12 +618,8 @@ public class RawDataView extends ViewPart {
 
 		createResources();
 
-		fPartSash = new SashForm(parent, SWT.VERTICAL);
-		fPartSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		fPartSash.setOrientation(SWT.HORIZONTAL);
-
 		// device data / tour viewer
-		tourForm = new ViewForm(fPartSash, SWT.NONE);
+		tourForm = new ViewForm(parent, SWT.NONE);
 
 		// create the left toolbar
 		ToolBar tbmLeft = new ToolBar(tourForm, SWT.FLAT | SWT.WRAP);
@@ -639,13 +638,17 @@ public class RawDataView extends ViewPart {
 		createDeviceData(partComposite);
 		createTourViewer(partComposite);
 
+		final Sash sash = new Sash(parent, SWT.VERTICAL);
+
 		// tour chart
-		fTourChart = new TourChart(fPartSash, SWT.NONE, false);
+		fTourChart = new TourChart(parent, SWT.NONE, false);
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
 		fTourChartConfig.setMinMaxKeeper(false);
+
+		fViewerDetailForm = new ViewerDetailForm(parent, tourForm, sash, fTourChart);
 
 		// actions
 		createActions();
@@ -668,9 +671,36 @@ public class RawDataView extends ViewPart {
 
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
 		restoreState(fSessionMemento);
-
 	}
 
+	/*
+	 * public void createPartControlDISABLED(Composite parent) {
+	 * createResources(); fPartSash = new SashForm(parent, SWT.VERTICAL);
+	 * fPartSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+	 * fPartSash.setOrientation(SWT.HORIZONTAL); // device data / tour viewer
+	 * tourForm = new ViewForm(fPartSash, SWT.NONE); // create the left toolbar
+	 * ToolBar tbmLeft = new ToolBar(tourForm, SWT.FLAT | SWT.WRAP); fTbm = new
+	 * ToolBarManager(tbmLeft); Composite partComposite = new
+	 * Composite(tourForm, SWT.NONE); GridLayout gridLayout = new GridLayout();
+	 * gridLayout.marginWidth = 0; gridLayout.marginHeight = 0;
+	 * gridLayout.verticalSpacing = 0; partComposite.setLayout(gridLayout);
+	 * tourForm.setTopLeft(tbmLeft); tourForm.setContent(partComposite);
+	 * createDeviceData(partComposite); createTourViewer(partComposite); // tour
+	 * chart fTourChart = new TourChart(fPartSash, SWT.NONE, false);
+	 * fTourChart.setShowZoomActions(true); fTourChart.setShowSlider(true);
+	 * fTourChartConfig = TourManager.createTourChartConfiguration();
+	 * fTourChartConfig.setMinMaxKeeper(false); // actions createActions();
+	 * createContextMenu(); addPartListener(); addSelectionListener();
+	 * addPrefListener(); // set this view part as selection provider
+	 * getSite().setSelectionProvider(fPostSelectionProvider = new
+	 * PostSelectionProvider()); // fire a slider move selection when a slider
+	 * was moved in the tour // chart fTourChart.addSliderMoveListener(new
+	 * ISliderMoveListener() { public void sliderMoved(SelectionChartInfo
+	 * chartInfoSelection) {
+	 * fPostSelectionProvider.setSelection(chartInfoSelection); } });
+	 * fActivePerson = TourbookPlugin.getDefault().getActivePerson();
+	 * restoreState(fSessionMemento); }
+	 */
 	private void createResources() {
 		imageDatabaseDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image_database);
 		imageDatabaseOtherPersonDescriptor = TourbookPlugin
@@ -896,8 +926,8 @@ public class RawDataView extends ViewPart {
 
 		if (memento != null) {
 
-			// restore sash weights
-			UI.restoreSashWeight(fPartSash, memento, MEMENTO_SASH_CONTAINER, new int[] { 40, 10 });
+			// restore viewer/detail weights
+			fViewerDetailForm.setViewerWidth(memento.getInteger(MEMENTO_SASH_CONTAINER));
 
 			// show/hide chart
 			Integer isMementoChartVisible = memento.getInteger(MEMENTO_IS_CHART_VISIBLE);
@@ -905,7 +935,7 @@ public class RawDataView extends ViewPart {
 					? true
 					: (isMementoChartVisible == 1 ? true : false);
 			showViewerDetails(isChartVisible);
-			actionShowTourChart.setChecked(isChartVisible);
+			fActionShowTourChart.setChecked(isChartVisible);
 
 			// restore imported tours
 			String importFilename = memento.getString(MEMENTO_IMPORT_FILENAME);
@@ -938,12 +968,10 @@ public class RawDataView extends ViewPart {
 	public void saveState(IMemento memento) {
 
 		// save sash weights
-		UI.saveSashWeight(fPartSash, memento, MEMENTO_SASH_CONTAINER);
+		memento.putInteger(MEMENTO_SASH_CONTAINER, fTourViewer.getTable().getSize().x);
 
 		// save: is chart visible
-		memento.putInteger(MEMENTO_IS_CHART_VISIBLE, fPartSash.getMaximizedControl() == null
-				? 1
-				: 0);
+		memento.putInteger(MEMENTO_IS_CHART_VISIBLE, fActionShowTourChart.isChecked() ? 1 : 0);
 
 		RawDataManager rawDataMgr = RawDataManager.getInstance();
 		// save import file name
@@ -991,19 +1019,23 @@ public class RawDataView extends ViewPart {
 		}
 	}
 
-	/**
-	 * select a tour in the table viewer
-	 */
-	private void selectTourInView() {
-
+	// /**
+	// * select a tour in the table viewer
+	// */
+	// private void selectTourInView() {
 	// if (currentTourEditor == null) {
 	// return;
 	// }
 	//
 	// fTourViewer.setSelection(new
 	// StructuredSelection(currentTourEditor.getTourData()), true);
-	}
+	// }
 
+	/**
+	 * enable/disable the save action
+	 * 
+	 * @param enabled
+	 */
 	public void setActionSaveEnabled(boolean enabled) {
 		actionSave.setEnabled(enabled);
 	}
@@ -1016,7 +1048,7 @@ public class RawDataView extends ViewPart {
 	}
 
 	public void showViewerDetails(boolean isVisible) {
-		fPartSash.setMaximizedControl(isVisible ? null : tourForm);
+		fViewerDetailForm.setMaximizedControl(isVisible ? null : tourForm);
 	}
 
 	private void createChart(boolean useNormalizedData) {
@@ -1111,17 +1143,5 @@ public class RawDataView extends ViewPart {
 
 		fTourViewer.refresh();
 	}
-
-	// public void showDetailStatistics(boolean isVisible) {
-	// // no statistics available, nothing to do here
-	// }
-
-	// public void manageDetailVisibility() {
-	//
-	// }
-
-	// public void showTourChart(long tourId) {
-	//
-	// }
 
 }

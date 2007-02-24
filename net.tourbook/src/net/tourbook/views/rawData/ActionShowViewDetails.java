@@ -26,7 +26,7 @@ public class ActionShowViewDetails extends Action {
 
 	public ActionShowViewDetails(RawDataView view) {
 
-		super("", AS_CHECK_BOX); //$NON-NLS-1$
+		super(null, AS_CHECK_BOX);
 
 		fViewer = view;
 
