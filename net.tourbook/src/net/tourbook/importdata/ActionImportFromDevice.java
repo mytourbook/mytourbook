@@ -24,19 +24,17 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 
-public class ActionDeviceImport extends Action {
+public class ActionImportFromDevice extends Action {
 
 	private IWorkbenchWindow	fWindow;
-	private boolean				fIsDirectSynch;
 
-	public ActionDeviceImport(IWorkbenchWindow window, boolean isDirectSynch, String image) {
+	public ActionImportFromDevice(IWorkbenchWindow window) {
 
 		fWindow = window;
-		fIsDirectSynch = isDirectSynch;
 
 		setText(Messages.Action_import_rawdata);
 		setToolTipText(Messages.Action_import_rawdata_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(image));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_import_rawdata));
 	}
 
 	public void run() {
@@ -51,10 +49,6 @@ public class ActionDeviceImport extends Action {
 		// create the dialog that the shell is created which is required in setAutoDownload()
 		dialog.create();
 
-		if (fIsDirectSynch) {
-			importWizard.setAutoDownload();
-		}
-		
 		dialog.open();
 	}
 }
