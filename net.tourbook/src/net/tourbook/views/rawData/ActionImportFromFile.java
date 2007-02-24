@@ -31,17 +31,16 @@ import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
-public class ActionLoad extends Action {
+public class ActionImportFromFile extends Action {
 
-	private RawDataView	rawDataView;
-
-	public ActionLoad(RawDataView viewPart) {
-
-		this.rawDataView = viewPart;
-
+	public ActionImportFromFile() {
+		setText(Messages.RawData_Action_open_import_file);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_open_import_file));
 		setToolTipText(Messages.RawData_Action_open_import_file_tooltip);
 	}
@@ -51,26 +50,40 @@ public class ActionLoad extends Action {
 	 */
 	public void run() {
 
-		Shell shell = rawDataView.getSite().getShell();
+		RawDataView fRawDataView = null;
+
+		try {
+			// show raw data view
+			fRawDataView = (RawDataView) PlatformUI
+					.getWorkbench()
+					.getActiveWorkbenchWindow()
+					.getActivePage()
+					.showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+
+			if (fRawDataView == null) {
+				return;
+			}
+		} catch (PartInitException e) {
+			e.printStackTrace();
+		}
 
 		// setup open dialog
-		FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+		FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
 
 		ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 
-		int deviceLength = deviceList.size()+1;
+		int deviceLength = deviceList.size() + 1;
 		// create file filter list
 		String[] filterExtensions = new String[deviceLength];
 		String[] filterNames = new String[deviceLength];
 		int deviceIndex = 0;
 		for (TourbookDevice device : deviceList) {
 			filterExtensions[deviceIndex] = "*." + device.fileExtension; //$NON-NLS-1$
-			filterNames[deviceIndex] = device.visibleName
-					+ (" (*." + device.fileExtension + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			filterNames[deviceIndex] = device.visibleName + (" (*." + device.fileExtension + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			deviceIndex++;
 		}
-		
+
 		// add the option to select all files
 		filterExtensions[deviceIndex] = "*.*"; //$NON-NLS-1$
 		filterNames[deviceIndex] = "*.*"; //$NON-NLS-1$
@@ -88,8 +101,8 @@ public class ActionLoad extends Action {
 		RawDataManager rawDataManager = RawDataManager.getInstance();
 
 		if (rawDataManager.importRawData(fileName)) {
-			rawDataView.updateViewer();
-			rawDataView.setActionSaveEnabled(rawDataManager.isDeviceImport());
+			fRawDataView.updateViewer();
+			fRawDataView.setActionSaveEnabled(rawDataManager.isDeviceImport());
 		}
 	}
 
