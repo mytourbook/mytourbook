@@ -134,7 +134,7 @@ public class TourDatabase {
 
 		if (emFactory == null) {
 			try {
-				throw new Exception("Cannot get EntityManagerFactory");
+				throw new Exception("Cannot get EntityManagerFactory"); //$NON-NLS-1$
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -212,8 +212,10 @@ public class TourDatabase {
 
 				monitor.beginTask(Messages.Database_Monitor_db_service_task, 5);
 
+				String databasePath = getDatabasePath();
+
 				// set storage location for the database
-				System.setProperty("derby.system.home", getDatabasePath()); //$NON-NLS-1$
+				System.setProperty("derby.system.home", databasePath); //$NON-NLS-1$
 
 				try {
 					server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
@@ -224,6 +226,8 @@ public class TourDatabase {
 				}
 
 				monitor.worked(1);
+				monitor.subTask(Messages.Database_Monitor_db_service_subtask_location
+						+ databasePath);
 
 				try {
 					/*
@@ -677,23 +681,6 @@ public class TourDatabase {
 		// confirm update
 		String[] buttons = new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL };
 
-		// String message = Messages.Database_Confirm_update_01
-		// + currentDbVersion
-		// + Messages.Database_Confirm_update_02
-		// + TOURBOOK_DB_VERSION
-		// + Messages.Database_Confirm_update_03
-		// + Messages.Database_Confirm_update_04
-		// + Messages.Database_Confirm_update_05
-		// + Messages.Database_Confirm_update_06
-		// + Messages.Database_Confirm_update_07
-		// + Messages.Database_Confirm_update_08
-		// + getDatabasePath()
-		// + Messages.Database_Confirm_update_09
-		// + Messages.Database_Confirm_update_10
-		// + Messages.Database_Confirm_update_11
-		// + Messages.Database_Confirm_update_12
-		// + Messages.Database_Confirm_update_13;
-
 		String message = NLS.bind(Messages.Database_Confirm_update, new Object[] {
 				currentDbVersion,
 				TOURBOOK_DB_VERSION,
@@ -788,18 +775,12 @@ public class TourDatabase {
 
 		final Connection conn = DriverManager.getConnection(
 				"jdbc:derby://localhost:1527/tourbook;create=true", //$NON-NLS-1$
-				"User", //$NON-NLS-1$
+				"user", //$NON-NLS-1$
 				"adsf"); //$NON-NLS-1$
 		return conn;
 	}
 
 	private String getDatabasePath() {
-
-		// String pluginPath = Platform
-		// .getStateLocation(TourbookPlugin.getDefault().getBundle())
-		// .removeLastSegments(4)
-		// .toFile()
-		// .getAbsolutePath();
 
 		String pluginPath = Platform.getLocation().removeLastSegments(1).toFile().getAbsolutePath();
 

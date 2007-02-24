@@ -177,15 +177,15 @@ public class TourData {
 	@Basic(optional = false)
 	private SerieData			serieData;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourMarker>		tourMarkers		= new HashSet<TourMarker>();
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourReference>	tourReferences	= new HashSet<TourReference>();
 
-	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
 	private Set<TourCategory>	tourCategory	= new HashSet<TourCategory>();
 
 	/**
@@ -377,7 +377,7 @@ public class TourData {
 	}
 
 	/**
-	 * Convert TimeData from arraylist into the internal structure
+	 * Convert <code>TimeData</code> into <code>TourData</code>
 	 */
 	public void createTimeSeries(ArrayList<TimeData> timeDataList) {
 
@@ -396,7 +396,7 @@ public class TourData {
 			// powerSerie = new int[serieLength];
 
 			int distanceDiff[] = new int[serieLength];
-			int index = 0;
+			int timeIndex = 0;
 
 			int timeAbsolute = 0;
 			int altitudeAbsolute = 0;
@@ -405,16 +405,16 @@ public class TourData {
 			// convert data from the tour format into an interger[]
 			for (TimeData timeItem : timeDataList) {
 
-				timeSerie[index] = timeAbsolute += deviceTimeInterval;
-				distanceSerie[index] = distanceAbsolute += timeItem.distance;
-				altitudeSerie[index] = altitudeAbsolute += timeItem.altitude;
-				pulseSerie[index] = timeItem.pulse;
-				temperatureSerie[index] = timeItem.temperature;
-				cadenceSerie[index] = timeItem.cadence;
+				timeSerie[timeIndex] = timeAbsolute;
+				distanceSerie[timeIndex] = distanceAbsolute += timeItem.distance;
+				altitudeSerie[timeIndex] = altitudeAbsolute += timeItem.altitude;
+				pulseSerie[timeIndex] = timeItem.pulse;
+				temperatureSerie[timeIndex] = timeItem.temperature;
+				cadenceSerie[timeIndex] = timeItem.cadence;
 
 				// powerSerie[index] = 0;
 
-				distanceDiff[index] = timeItem.distance;
+				distanceDiff[timeIndex] = timeItem.distance;
 
 				if (timeItem.marker != 0) {
 
@@ -424,11 +424,13 @@ public class TourData {
 					tourMarker.setVisualPosition(TourMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					tourMarker.setTime(timeAbsolute + timeItem.marker);
 					tourMarker.setDistance(distanceAbsolute);
-					tourMarker.setSerieIndex(index);
+					tourMarker.setSerieIndex(timeIndex);
 
 					getTourMarkers().add(tourMarker);
 				}
-				index++;
+
+				timeAbsolute += deviceTimeInterval;
+				timeIndex++;
 			}
 		}
 	}
@@ -443,7 +445,7 @@ public class TourData {
 				+ Short.toString(getStartDay())
 				+ Short.toString(getStartHour())
 				+ Short.toString(getStartMinute())
-				+ Integer.toString(getStartDistance());
+				+ Integer.toString(Math.abs(getStartDistance()));
 
 		setTourId(Long.parseLong(tourStart));
 	}
@@ -634,8 +636,7 @@ public class TourData {
 	public void dumpTime() {
 		PrintStream out = System.out;
 
-		out.print((getTourRecordingTime() / 3600)
-				+ ":" //$NON-NLS-1$
+		out.print((getTourRecordingTime() / 3600) + ":" //$NON-NLS-1$
 				+ ((getTourRecordingTime() % 3600) / 60)
 				+ ":" //$NON-NLS-1$
 				+ ((getTourRecordingTime() % 3600) % 60)
@@ -943,12 +944,14 @@ public class TourData {
 
 		int maxIndex = Math.max(0, timeSerie.length - 1);
 
-		tourDrivingTime = timeSerie[maxIndex]
-				- (TourManager.getInstance().getIgnoreTimeSlices(
-						distanceSerie,
-						0,
-						maxIndex,
-						10 / deviceTimeInterval) * deviceTimeInterval);
+		int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(
+				distanceSerie,
+				0,
+				maxIndex,
+				10 / deviceTimeInterval);
+
+		tourDrivingTime = Math
+				.max(0, timeSerie[maxIndex] - (ignoreTimeSlices * deviceTimeInterval));
 
 	}
 

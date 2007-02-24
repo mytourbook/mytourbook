@@ -32,10 +32,12 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 
 public class PersonContributionItem extends CustomControlContribution {
@@ -105,13 +107,12 @@ public class PersonContributionItem extends CustomControlContribution {
 	private Composite createPeopleComboBox(Composite parent) {
 
 		Composite container = new Composite(parent, SWT.NONE);
-		final GridLayout gl = new GridLayout();
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		gl.marginTop = 3;
-		container.setLayout(gl);
+		container.setLayout(new GridLayout());
+
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		fComboPeople = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+		fComboPeople.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
 		fComboPeople.setVisibleItemCount(20);
 		fComboPeople.setToolTipText(Messages.App_People_tooltip);
 
@@ -122,6 +123,7 @@ public class PersonContributionItem extends CustomControlContribution {
 			}
 		});
 
+		
 		fComboPeople.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				int selectedIndex = fComboPeople.getSelectionIndex();

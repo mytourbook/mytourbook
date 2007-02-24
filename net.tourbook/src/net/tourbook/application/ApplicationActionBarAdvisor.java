@@ -16,10 +16,12 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
-import net.tourbook.importdata.ActionDeviceImport;
+import net.tourbook.importdata.ActionImportFromDevice;
+import net.tourbook.importdata.ActionImportFromDeviceDirect;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.PositionedWizardDialog;
 import net.tourbook.views.ActionOpenView;
+import net.tourbook.views.rawData.ActionImportFromFile;
 import net.tourbook.views.rawData.RawDataView;
 import net.tourbook.views.tourBook.TourBookView;
 import net.tourbook.views.tourMap.CompareResultView;
@@ -54,20 +56,21 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	private ActionDeviceImport	fActionImport;
-	private ActionDeviceImport	fActionImportDirect;
-	private ActionOpenView		fActionRawDataView;
+	private ActionImportFromFile			fActionImportFromFile;
+	private ActionImportFromDevice			fActionImportFromDevice;
+	private ActionImportFromDeviceDirect	fActionImportFromDeviceDirect;
+	private ActionOpenView					fActionRawDataView;
 
-	private ActionOpenView		fActionTourBookView;
-	private ActionOpenView		fActionTourMapView;
+	private ActionOpenView					fActionTourBookView;
+	private ActionOpenView					fActionTourMapView;
 
-	private ActionOpenView		fActionTourCompareView;
-	private Action				fActionTourCompareWizard;
+	private ActionOpenView					fActionTourCompareView;
+	private Action							fActionTourCompareWizard;
 
-	private IWorkbenchAction	fActionPreferences;
+	private IWorkbenchAction				fActionPreferences;
 
-	PersonContributionItem		personSelector;
-	TourTypeContributionItem	tourTypeSelector;
+	PersonContributionItem					personSelector;
+	TourTypeContributionItem				tourTypeSelector;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -89,8 +92,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(ActionFactory.ABOUT.create(window));
 		getAction(ActionFactory.ABOUT.getId()).setText(Messages.Action_About);
 
-		fActionImport = new ActionDeviceImport(window, false,Messages.Image_import_rawdata);
-		fActionImportDirect = new ActionDeviceImport(window, true,Messages.Image_import_rawdata_direct);
+		fActionImportFromFile = new ActionImportFromFile();
+		fActionImportFromDevice = new ActionImportFromDevice(window);
+		fActionImportFromDeviceDirect = new ActionImportFromDeviceDirect(window);
 
 		fActionRawDataView = new ActionOpenView(
 				window,
@@ -157,21 +161,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	protected void fillMenuBar(IMenuManager menuBar) {
 
+		// file - menu
 		MenuManager fileMenu = new MenuManager(
 				Messages.Action_Menu_file,
 				IWorkbenchActionConstants.M_FILE);
-		menuBar.add(fileMenu);
 
-		fileMenu.add(fActionImportDirect);
-		fileMenu.add(fActionImport);
-		fileMenu.add(fActionTourCompareWizard);
-
-		fileMenu.add(new Separator());
 		fileMenu.add(fActionPreferences);
-
-		fileMenu.add(new Separator("update")); //$NON-NLS-1$
-
 		fileMenu.add(new Separator());
+
 		fileMenu.add(getAction(ActionFactory.QUIT.getId()));
 
 		// disabled - it's necesarry when the tour editor is reactivated
@@ -179,14 +176,36 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		// fileMenu.add(fActionClose);
 		// fileMenu.add(new Separator());
 
-		MenuManager viewMenu = new MenuManager(Messages.Action_Menu_view, null);
-		menuBar.add(viewMenu);
-		viewMenu.add(fActionRawDataView);
-		viewMenu.add(fActionTourBookView);
-		viewMenu.add(fActionTourMapView);
-		viewMenu.add(fActionTourCompareView);
+		// view - menu
+		MenuManager tourMenu = new MenuManager(Messages.Action_Menu_view, null);
+		
+		tourMenu.add(fActionImportFromFile);
+		tourMenu.add(fActionImportFromDevice);
+		tourMenu.add(fActionImportFromDeviceDirect);
+		tourMenu.add(new Separator());
 
-		menuBar.add(getAction(ActionFactory.ABOUT.getId()));
+		tourMenu.add(fActionRawDataView);
+		tourMenu.add(fActionTourBookView);
+		tourMenu.add(fActionTourMapView);
+		tourMenu.add(new Separator());
+
+		tourMenu.add(fActionTourCompareWizard);
+		tourMenu.add(fActionTourCompareView);
+
+		// help - menu
+		MenuManager helpMenu = new MenuManager(
+				Messages.Action_Menu_help,
+				IWorkbenchActionConstants.M_HELP);
+
+		helpMenu.add(new Separator("update")); //$NON-NLS-1$
+		helpMenu.add(new Separator());
+
+		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
+
+		// create menu bar
+		menuBar.add(fileMenu);
+		menuBar.add(tourMenu);
+		menuBar.add(helpMenu);
 	}
 
 	protected void fillCoolBar(ICoolBarManager coolBar) {
@@ -206,9 +225,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		// ---------------------------------------------------------
 
 		IToolBarManager importToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		importToolbar.add(fActionImportDirect);
-		importToolbar.add(fActionImport);
-		importToolbar.add(fActionRawDataView);
+		importToolbar.add(fActionImportFromFile);
+		importToolbar.add(fActionImportFromDevice);
+		importToolbar.add(fActionImportFromDeviceDirect);
 
 		coolBar.add(new ToolBarContributionItem(importToolbar, "import")); //$NON-NLS-1$
 
@@ -217,17 +236,30 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		IToolBarManager openToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 
 		openToolbar.add(new Separator());
+		openToolbar.add(fActionRawDataView);
 		openToolbar.add(fActionTourBookView);
 		openToolbar.add(fActionTourMapView);
 
-		openToolbar.add(new Separator());
-		openToolbar.add(fActionTourCompareWizard);
-		openToolbar.add(fActionTourCompareView);
-
-		openToolbar.add(new Separator());
-		openToolbar.add(fActionPreferences);
-
 		coolBar.add(new ToolBarContributionItem(openToolbar, "main")); //$NON-NLS-1$
+
+		// ---------------------------------------------------------
+		
+		IToolBarManager compareToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		
+		compareToolbar.add(new Separator());
+		compareToolbar.add(fActionTourCompareWizard);
+		compareToolbar.add(fActionTourCompareView);
+
+		coolBar.add(new ToolBarContributionItem(compareToolbar, "compare")); //$NON-NLS-1$
+
+		// ---------------------------------------------------------
+		
+		IToolBarManager prefToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		
+		prefToolbar.add(new Separator());
+		prefToolbar.add(fActionPreferences);
+		
+		coolBar.add(new ToolBarContributionItem(prefToolbar, "pref")); //$NON-NLS-1$
 	}
 
 }

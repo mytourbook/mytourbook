@@ -162,6 +162,9 @@ public class ChartDrawingData {
 		return devXTitelBarHeight;
 	}
 
+	/**
+	 * @return Returns the bottom of the chart in dev units
+	 */
 	public int getDevYBottom() {
 		return devYBottom;
 	}
@@ -183,12 +186,15 @@ public class ChartDrawingData {
 		return devYTop;
 	}
 
+	/**
+	 * @return Returns the bottom of the chart in graph units
+	 */
 	public int getGraphYBottom() {
 		return graphYBottom;
 	}
 
 	/**
-	 * @return Returns the graphYTop.
+	 * @return Returns the top of the chart in graph units
 	 */
 	protected int getGraphYTop() {
 		return graphYTop;

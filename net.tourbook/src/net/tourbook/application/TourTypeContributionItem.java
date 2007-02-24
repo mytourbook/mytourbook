@@ -31,6 +31,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -96,13 +97,10 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private Composite createTourTypeComboBox(Composite parent) {
 
 		Composite container = new Composite(parent, SWT.NONE);
-		final GridLayout gl = new GridLayout();
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		gl.marginTop = 3;
-		container.setLayout(gl);
+		container.setLayout(new GridLayout());
 
 		fComboTourType = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+		fComboTourType.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
 		fComboTourType.setVisibleItemCount(10);
 		fComboTourType.setToolTipText(Messages.App_Tour_type_tooltip);
 

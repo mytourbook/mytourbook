@@ -46,7 +46,6 @@ import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -1769,11 +1768,12 @@ public class ChartComponentGraph extends Canvas {
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 
-		float devChartYBottom = (float) drawingData.getDevYBottom() + (scaleY * graphYBottom);
+		final int devYTop = drawingData.getDevYTop();
+		final int devYBottom = drawingData.getDevYBottom();
+		// virtual 0 line for the y-axis of the chart in dev units
+		final float devChartY0Line = (float) devYBottom + (scaleY * graphYBottom);
 
-		Rectangle chartRectangle = gc.getClipping();
-
-		// final boolean isXMarker = alphaValue == fGraphAlpha;
+		final Rectangle chartRectangle = gc.getClipping();
 
 		// draw the lines into the path
 		for (int xValueIndex = startIndex; xValueIndex < endIndex; xValueIndex++) {
@@ -1804,24 +1804,31 @@ public class ChartComponentGraph extends Canvas {
 
 				// move to the first point
 
+				int devX0Pos;
+				if (xValueIndex == 0) {
+					// force start point
+					devX0Pos = 0;
+				} else {
+					devX0Pos = (int) (xValue * scaleX);
+				}
+
 				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
 
 					// start from the bottom of the chart
-					path.moveTo(xValue * scaleX, devChartYBottom - (graphYBottom * scaleY));
+					path.moveTo(devX0Pos, devChartY0Line - (graphYBottom * scaleY));
 
 				} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
-					final int lineBottom = graphYBottom > 0 ? graphYBottom : graphYTop < 0
+					final int graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0
 							? graphYTop
 							: 0;
 					// start from the x-axis
-					path.moveTo(xValue * scaleX, devChartYBottom - (lineBottom * scaleY));
+					path.moveTo(devX0Pos, devChartY0Line - (graphXAxisLine * scaleY));
 				}
-
 			}
 
 			// draw the line to the next point
-			path.lineTo(xValue * scaleX, devChartYBottom - (yValue * scaleY));
+			path.lineTo(xValue * scaleX, devChartY0Line - (yValue * scaleY));
 
 			// set last point
 			if ((graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM || graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO)
@@ -1831,43 +1838,52 @@ public class ChartComponentGraph extends Canvas {
 				 * the x-axis
 				 */
 
-				int lineBottom;
+				int graphXAxisLine = 0;
 
 				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
-					lineBottom = graphYBottom > 0 ? graphYBottom : graphYTop < 0
+					graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0
 							? graphYTop
 							: graphYBottom;
 
-				} else {
+				} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
-					// case: graphFillMethod ==
-					// ChartDataYSerie.FILL_METHOD_FILL_ZERO
-
-					lineBottom = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
+					graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0
+							? graphYTop
+							: 0;
 				}
 
-				path.lineTo(xValue * scaleX, devChartYBottom - (lineBottom * scaleY));
-				path.moveTo(xValue * scaleX, devChartYBottom - (lineBottom * scaleY));
+				path.lineTo(xValue * scaleX, devChartY0Line - (graphXAxisLine * scaleY));
+				path.moveTo(xValue * scaleX, devChartY0Line - (graphXAxisLine * scaleY));
+
+//				System.out.println(xValue * scaleX);
 			}
 		}
 
+		
 		final Color colorFg = new Color(display, rgbFg);
 		final Color colorBg1 = new Color(display, rgbBg1);
 		final Color colorBg2 = new Color(display, rgbBg2);
 
+		gc.setAntialias(SWT.OFF);
+		gc.setAlpha(alphaValue);
+
 		gc.setForeground(colorBg1);
 		gc.setBackground(colorBg2);
-		gc.setAlpha(alphaValue);
+
+		final int devGraphHeight = drawingData.getDevGraphHeight();
+
+		int graphWidth = xValues[endIndex - 1];
+		if (canScrollZoomedChart == false) {
+			graphWidth -= graphValueOffset;
+		}
+		
+		/*
+		 * force a max width because on linux the fill will not be drawn
+		 */
+		final int devChartWidth = Math.min(0x7fff, (int) (graphWidth * scaleX));
 
 		// fill the graph
 		if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
-
-			int width = xValues[endIndex - 1];
-			final int height = (int) ((float) drawingData.getDevGraphHeight() / scaleY);
-
-			if (canScrollZoomedChart == false) {
-				width -= graphValueOffset;
-			}
 
 			/*
 			 * adjust the fill gradient in the hight, otherwise the fill is not
@@ -1876,58 +1892,46 @@ public class ChartComponentGraph extends Canvas {
 			gc.setClipping(path);
 			gc.fillGradientRectangle(
 					0,
-					(int) (devChartYBottom - ((graphYBottom - 1) * scaleY)),
-					(int) (width * scaleX),
-					-drawingData.getDevGraphHeight(),
+					(int) (devChartY0Line - (graphYBottom * scaleY)),
+					devChartWidth,
+					-devGraphHeight,
 					true);
 			gc.setClipping(chartRectangle);
 
 		} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
-			int width = xValues[endIndex - 1];
-			final int graphHeight = (int) ((float) drawingData.getDevGraphHeight() / scaleY);
-
-			if (canScrollZoomedChart == false) {
-				width -= graphValueOffset;
-			}
-
 			final int graphFillYBottom = graphYBottom > 0 ? graphYBottom : 0;
-			final int graphFillHeight = graphHeight + graphYBottom;
 
 			gc.setClipping(path);
+
+			/*
+			 * fill above 0 line
+			 */
 			gc.fillGradientRectangle(
 					0,
-					(int) (devChartYBottom - (graphFillYBottom * scaleY)),
-					(int) (width * scaleX),
-					-drawingData.getDevGraphHeight(),
+					(int) (devChartY0Line - (graphFillYBottom * scaleY)) + 1,
+					devChartWidth,
+					(int) -Math.min(devGraphHeight, Math.abs(devYTop - devChartY0Line)),
 					true);
-			//
-			// gc.setForeground(colorBg1);
-			// gc.setBackground(colorBg2);
-			// gc.fillGradientRectangle(0, graphYBottom, width, -graphYBottom,
-			// true);
-			//
+
+			/*
+			 * fill below 0 line
+			 */
+			gc.setForeground(colorBg2);
+			gc.setBackground(colorBg1);
+
+			gc.fillGradientRectangle(0, (int) devYBottom, devChartWidth, (int) -Math.min(
+					devGraphHeight,
+					devYBottom - devChartY0Line), true);
+
 			gc.setClipping(chartRectangle);
 		}
 
-		// gc.setForeground(colorFg);
-		// gc.setAlpha(0xb0);
-		// gc.setAntialias(SWT.ON);
-
-		// if (isXMarker) {
-		// gc.setAlpha(0x60);
-		// } else {
-		// // gc.setAlpha(alphaValue);
-		// }
-
+		// draw the line of the graph
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setLineWidth(1);
-		// gc.setAntialias(SWT.ON);
-		// gc.setAntialias(SWT.OFF);
-		// gc.setAlpha(0xff);
-
-		gc.setForeground(colorBg1);
-		gc.setBackground(colorBg1);
+		gc.setForeground(colorFg);
+		// gc.setBackground(colorBg1);
 		gc.drawPath(path);
 
 		colorFg.dispose();
@@ -1938,7 +1942,6 @@ public class ChartComponentGraph extends Canvas {
 
 		gc.setAlpha(0xFF);
 	}
-
 	private void drawSelection(final GC gc) {
 
 		fIsSelectionDirty = false;
@@ -2839,6 +2842,11 @@ public class ChartComponentGraph extends Canvas {
 	private boolean isXMarkerHit(final int devXGraph) {
 
 		final ChartDataXSerie xData = getXData();
+
+		if (xData == null) {
+			return false;
+		}
+
 		final int xMarkerStartIndex = xData.getXMarkerStartIndex();
 		final int xMarkerEndIndex = xData.getXMarkerEndIndex();
 
