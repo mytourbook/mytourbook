@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+             version="1.0">
+
+	<persistence-unit name="tourdatabase" transaction-type="RESOURCE_LOCAL">
+  
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+     
+		<class>net.tourbook.data.TourBike</class>
+		<class>net.tourbook.data.TourCategory</class>
+		<class>net.tourbook.data.TourCompared</class>
+		<class>net.tourbook.data.TourData</class>
+		<class>net.tourbook.data.TourMarker</class>
+		<class>net.tourbook.data.TourPerson</class>
+		<class>net.tourbook.data.TourReference</class>
+		<class>net.tourbook.data.TourType</class>
+
+		<properties>
+			<property name="hibernate.connection.url" value="jdbc:derby://localhost:1527/tourbook;create=true"/>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyDialect"/>
+			<property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.ClientDriver"/>
+
+			<property name="hibernate.connection.password" value="adsf"/>
+			<property name="hibernate.connection.username" value="User"/>
+
+			<property name="hibernate.archive.autodetection" value="none"/>
+
+		</properties>
+
+	</persistence-unit>
+	
+</persistence>
