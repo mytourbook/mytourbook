@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.graphics.RGB;
@@ -48,7 +49,7 @@ import org.eclipse.swt.widgets.Listener;
 
 public class TourChart extends Chart {
 
-	static final String				SEGMENT_VALUES		= "segmentValues"; //$NON-NLS-1$
+	static final String				SEGMENT_VALUES		= "segmentValues";		//$NON-NLS-1$
 
 	TourData						fTourData;
 	TourChartConfiguration			fTourChartConfig;
@@ -220,6 +221,8 @@ public class TourChart extends Chart {
 			return;
 		}
 
+		final IToolBarManager tbm = getToolbarManager();
+
 		fGraphActions = new HashMap<Integer, Action>();
 
 		fActionXAxesTime = new ActionXAxesTime(this);
@@ -269,14 +272,14 @@ public class TourChart extends Chart {
 				Messages.Tour_Action_graph_gradient_tooltip,
 				Messages.Image_graph_gradient);
 
-		fActionOptions = new ActionChartOptions(this);
+		fActionOptions = new ActionChartOptions(this, (ToolBarManager) tbm);
 
 		/*
 		 * add the actions to the toolbar
 		 */
-		final IToolBarManager tbm = getToolbarManager();
 
 		tbm.add(new Separator());
+
 		tbm.add(fGraphActions.get(TourManager.GRAPH_SPEED));
 		tbm.add(fGraphActions.get(TourManager.GRAPH_ALTITUDE));
 		tbm.add(fGraphActions.get(TourManager.GRAPH_PULSE));
@@ -284,27 +287,27 @@ public class TourChart extends Chart {
 		tbm.add(fGraphActions.get(TourManager.GRAPH_CADENCE));
 		tbm.add(fGraphActions.get(TourManager.GRAPH_ALTIMETER));
 		tbm.add(fGraphActions.get(TourManager.GRAPH_GRADIENT));
-
 		tbm.add(new Separator());
+
 		tbm.add(fActionXAxesTime);
 		tbm.add(fActionXAxesDistance);
-
 		tbm.add(new Separator());
+
 		tbm.add(fActionAdjustAltitude);
 		tbm.add(fActionOptions);
-
 		tbm.add(new Separator());
+
 		tbm.add(fActionZoomFitGraph);
+		tbm.add(new Separator());
 
 		// ///////////////////////////////////////////////////////
 
 		fActionGraphAnalyzer = new ActionGraphAnalyzer(this);
 
-		tbm.add(new Separator());
 		tbm.add(fActionGraphAnalyzer);
 
 		if (fIsToolActions) {
-			
+
 			fActionTourSegmenter = new ActionTourSegmenter(this);
 			fActionMarkerEditor = new ActionTourMarker(this);
 
@@ -717,7 +720,7 @@ public class TourChart extends Chart {
 		fTourChartConfig = chartConfig;
 
 		fChartDataModel = TourManager.getInstance().createChartDataModel(tourData, chartConfig);
-		
+
 		if (fShowZoomActions) {
 			createTourActions();
 			enableActions();

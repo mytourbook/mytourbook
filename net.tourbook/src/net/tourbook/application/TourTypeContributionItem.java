@@ -83,9 +83,9 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	protected Control createControl(Composite parent) {
 
 		if (PlatformUI.getWorkbench().isClosing()) {
-			return new Label(parent,SWT.NONE);
+			return new Label(parent, SWT.NONE);
 		}
-		
+
 		Composite container = createTourTypeComboBox(parent);
 
 		addPrefListener();
@@ -97,7 +97,12 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private Composite createTourTypeComboBox(Composite parent) {
 
 		Composite container = new Composite(parent, SWT.NONE);
-		container.setLayout(new GridLayout());
+		GridLayout gl = new GridLayout();
+		gl.marginWidth = 0;
+		gl.marginHeight = 0;
+		gl.horizontalSpacing = 0;
+		gl.verticalSpacing = 0;
+		container.setLayout(gl);
 
 		fComboTourType = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboTourType.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
@@ -138,10 +143,14 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		fTourTypes = new ArrayList<TourType>();
 
 		// add entry where the tour type will be ignored
-		fTourTypes.add(new TourType(Messages.App_Tour_type_item_all_types, TourType.TOUR_TYPE_ID_ALL));
+		fTourTypes.add(new TourType(
+				Messages.App_Tour_type_item_all_types,
+				TourType.TOUR_TYPE_ID_ALL));
 
 		// add tour type for tours where the tour type is not defined
-		fTourTypes.add(new TourType(Messages.App_Tour_type_item_not_defined, TourType.TOUR_TYPE_ID_NOT_DEFINED));
+		fTourTypes.add(new TourType(
+				Messages.App_Tour_type_item_not_defined,
+				TourType.TOUR_TYPE_ID_NOT_DEFINED));
 
 		/*
 		 * get tour types from the db

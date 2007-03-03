@@ -37,12 +37,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 
 public class PersonContributionItem extends CustomControlContribution {
 
-	private static final String		ID			= "net.tourbook.clientselector"; //$NON-NLS-1$
+	private static final String		ID			= "net.tourbook.clientselector";	//$NON-NLS-1$
 
 	private static final String		ALL_PEOPLE	= Messages.App_People_item_all;
 
@@ -107,9 +106,14 @@ public class PersonContributionItem extends CustomControlContribution {
 	private Composite createPeopleComboBox(Composite parent) {
 
 		Composite container = new Composite(parent, SWT.NONE);
-		container.setLayout(new GridLayout());
+		GridLayout gl = new GridLayout();
+		gl.marginWidth = 0;
+		gl.marginHeight = 0;
+		gl.horizontalSpacing = 0;
+		gl.verticalSpacing = 0;
+		container.setLayout(gl);
 
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		// container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		fComboPeople = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboPeople.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
@@ -118,12 +122,10 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		fComboPeople.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
-				plugin.getPluginPreferences().removePropertyChangeListener(
-						fPrefChangeListener);
+				plugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 			}
 		});
 
-		
 		fComboPeople.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				int selectedIndex = fComboPeople.getSelectionIndex();
@@ -144,7 +146,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		});
 
 		fillPeopleComboBox();
-		
+
 		return container;
 	}
 
@@ -155,11 +157,11 @@ public class PersonContributionItem extends CustomControlContribution {
 		fComboPeople.add(ALL_PEOPLE);
 
 		fPeople = TourDatabase.getTourPeople();
-		
-		if (fPeople==null) {
+
+		if (fPeople == null) {
 			return;
 		}
-		
+
 		for (TourPerson person : fPeople) {
 			String lastName = person.getLastName();
 			lastName = lastName.equals("") ? "" : " " + lastName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -238,9 +240,7 @@ public class PersonContributionItem extends CustomControlContribution {
 			personId = fPeople.get(selectedIndex - 1).getPersonId();
 		}
 
-		plugin.getDialogSettings().put(
-				ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID,
-				personId);
+		plugin.getDialogSettings().put(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID, personId);
 	}
 
 	public void saveState(IMemento memento) {

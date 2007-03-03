@@ -10,13 +10,13 @@
       </text>
    </aboutInfo>
 
-   <configIni use="default"/>
+   <configIni use="custom" path="/net.tourbook/install-settings/config.ini"/>
 
    <launcherArgs>
       <programArgs>#_enable_debug_mode_by_removing_the_#_character_in_the_next_lines
--consolelog 
--clean 
--debug</programArgs>
+#-consolelog 
+#-clean 
+#-debug</programArgs>
    </launcherArgs>
 
    <windowImages i16="/net.tourbook/icons/tourbook16.gif" i32="/net.tourbook/icons/tourbook32.gif" i48="/net.tourbook/icons/tourbook48.gif" i64="/net.tourbook/icons/tourbook64.gif" i128="/net.tourbook/icons/tourbook128.gif"/>

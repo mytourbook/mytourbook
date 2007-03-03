@@ -42,7 +42,7 @@
                definitionId="org.eclipse.ui.update.findAndInstallUpdates"
                id="net.tourbook.update.action_update"
                label="%Action_Software_Updates"
-               menubarPath="help/update">
+               menubarPath="file/update">
          </action>
       </actionSet>
    </extension>

@@ -22,8 +22,11 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolBar;
 
 public class ActionChartOptions extends Action implements IMenuCreator {
 
@@ -34,6 +37,8 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 	ActionCanAutoZoomToSlider	actionCanAutoZoomToSlider;
 
 	private TourChart			tourChart;
+
+	private ToolBarManager	fTBM;
 
 	class ActionStartTimeOption extends Action {
 
@@ -89,9 +94,12 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		}
 	}
 
-	public ActionChartOptions(TourChart tourChart) {
+	public ActionChartOptions(TourChart tourChart, ToolBarManager tbm) {
 
+		super(null, Action.AS_DROP_DOWN_MENU);
+		
 		this.tourChart = tourChart;
+		fTBM=tbm;
 
 		setToolTipText(Messages.Tour_Action_chart_options_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_chart_options));
@@ -103,7 +111,40 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		setMenuCreator(this);
 	}
 
-	public void run() {}
+	public void runWithEvent(Event event) {
+		
+		ToolBar tb = fTBM.getControl();
+		Menu ddMenu = getMenuCreator().getMenu(tb);
+		
+//		tb.getItem(0).getControl();
+//		
+//		for (ToolItem toolItem : tb.getItems()) {
+//			toolItem.get
+//		}
+		
+		// position drop down menu
+//        Rectangle rect = tb.getItem(0).getBounds();
+//        Point pt = new Point(rect.x, rect.y + rect.height);
+//        pt = tb.toDisplay(pt);
+//        ddMenu.setLocation(pt.x, pt.y);
+
+		// show the drop-down menu, this only works in the runWithEvent not in the run method
+		ddMenu.setVisible(true);
+		
+        
+//		Widget wi = event.widget;
+////        Menu m = getMenu(event.widget);
+////        if (m != null) {
+////            // position the menu below the drop down item
+////            Rectangle b = ti.getBounds();
+////            Point p = ti.getParent().toDisplay(
+////                    new Point(b.x, b.y + b.height));
+////            m.setLocation(p.x, p.y); // waiting for SWT 0.42
+////            m.setVisible(true);
+////            return; // we don't fire the action
+////        }
+//		run(event);
+	}
 
 	public void dispose() {
 		if (fMenu != null) {
@@ -114,7 +155,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 	public Menu getMenu(Control parent) {
 
-		if (fMenu == null) {
+//		if (fMenu == null) {
 			fMenu = new Menu(parent);
 
 			addItem(actionStartTimeOption);
@@ -122,7 +163,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 			addItem(actionCanScrollZoomedChart);
 			addItem(actionCanAutoZoomToSlider);
-		}
+//		}
 		return fMenu;
 	}
 

@@ -166,7 +166,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				Messages.Action_Menu_file,
 				IWorkbenchActionConstants.M_FILE);
 
+		fileMenu.add(fActionImportFromFile);
+		fileMenu.add(fActionImportFromDevice);
+		fileMenu.add(fActionImportFromDeviceDirect);
+		fileMenu.add(new Separator());
+		
 		fileMenu.add(fActionPreferences);
+		fileMenu.add(new Separator());
+
+		fileMenu.add(new Separator("update")); //$NON-NLS-1$
 		fileMenu.add(new Separator());
 
 		fileMenu.add(getAction(ActionFactory.QUIT.getId()));
@@ -179,11 +187,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		// view - menu
 		MenuManager tourMenu = new MenuManager(Messages.Action_Menu_view, null);
 		
-		tourMenu.add(fActionImportFromFile);
-		tourMenu.add(fActionImportFromDevice);
-		tourMenu.add(fActionImportFromDeviceDirect);
-		tourMenu.add(new Separator());
-
 		tourMenu.add(fActionRawDataView);
 		tourMenu.add(fActionTourBookView);
 		tourMenu.add(fActionTourMapView);
@@ -196,9 +199,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager helpMenu = new MenuManager(
 				Messages.Action_Menu_help,
 				IWorkbenchActionConstants.M_HELP);
-
-		helpMenu.add(new Separator("update")); //$NON-NLS-1$
-		helpMenu.add(new Separator());
 
 		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
 

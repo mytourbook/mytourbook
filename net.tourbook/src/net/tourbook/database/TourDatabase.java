@@ -781,10 +781,7 @@ public class TourDatabase {
 	}
 
 	private String getDatabasePath() {
-
-		String pluginPath = Platform.getLocation().removeLastSegments(1).toFile().getAbsolutePath();
-
-		return pluginPath + "/derby-database"; //$NON-NLS-1$
+		return Platform.getInstanceLocation().getURL().getPath() + "derby-database"; //$NON-NLS-1$
 	}
 
 	public static void printSQLException(SQLException sqle) {

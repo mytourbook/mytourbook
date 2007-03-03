@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="net.tourbook" default="restructure-app-bundle" basedir=".">
+
+	<property name="build2.dir"	location="F:\MyTourbook Product\0.8.4\macosx.carbon.ppc\mytourbook" />
+	<property name="build.dir"	location="F:\MyTourbook Product\0.8.4\macosx.carbon.x86\mytourbook" />
+	
+	<property name="app.dir" location="${build.dir}/mytourbook.app" />
+	<property name="java.dir" location="${app.dir}/Contents/Resources/Java" />
+
+	<target name="restructure-app-bundle">
+		<mkdir dir="${java.dir}" />
+		<move todir="${java.dir}">
+			<fileset dir="${build.dir}">
+				<exclude name="mytourbook.app/**" />
+			</fileset>
+		</move>
+	</target>
+
+</project>
