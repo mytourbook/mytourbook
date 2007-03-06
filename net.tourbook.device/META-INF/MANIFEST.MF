@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Device Plug-in
+Bundle-SymbolicName: net.tourbook.device
+Bundle-Version: 0.8.5
+Bundle-Activator: net.tourbook.device.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ net.tourbook
+Eclipse-LazyStart: true
+Export-Package: net.tourbook.device
