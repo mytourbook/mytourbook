@@ -39,7 +39,9 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class HAC4DeviceReader extends TourbookDevice {
 
-	private Calendar	fCalendar	= GregorianCalendar.getInstance();
+	private static final byte	HAC4_HARDWARE_ID	= 0x00;
+
+	private Calendar			fCalendar			= GregorianCalendar.getInstance();
 
 	/**
 	 * constructor is used when the plugin is loaded
@@ -584,6 +586,11 @@ public class HAC4DeviceReader extends TourbookDevice {
 				return false;
 			}
 
+			// check hardware id
+//			if (buffer[4] != HAC4_HARDWARE_ID) {
+//				return false;
+//			}
+
 			int checksum = 0, lastValue = 0;
 
 			while (inStream.read(buffer) != -1) {
@@ -619,7 +626,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 	public SerialParameters getPortParameters(String portName) {
 
-		SerialParameters hac4PortParameters = new SerialParameters(
+		return new SerialParameters(
 				portName,
 				9600,
 				SerialPort.FLOWCONTROL_NONE,
@@ -627,8 +634,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 				SerialPort.DATABITS_8,
 				SerialPort.STOPBITS_1,
 				SerialPort.PARITY_NONE);
-
-		return hac4PortParameters;
 	}
 
 	public boolean checkStartSequence(int byteIndex, int newByte) {

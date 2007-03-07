@@ -2,12 +2,12 @@
 <feature
       id="net.tourbook.device.feature"
       label="%Feature_Name"
-      version="0.8.4"
+      version="0.8.5"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
    <description>
-      Device importer for HAC4 + HAC5
+      Device importer for HAC4, HAC4Pro and HAC5
    </description>
 
    <copyright>
@@ -362,8 +362,9 @@ Public License instead of this License.
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="net.tourbook" version="0.8.3" match="greaterOrEqual"/>
+      <import plugin="net.tourbook" version="0.8.4" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui"/>
+      <import plugin="net.tourbook.rxtx"/>
    </requires>
 
    <plugin
@@ -375,6 +376,20 @@ Public License instead of this License.
 
    <plugin
          id="net.tourbook.device.hac5"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.hac4pro"
          download-size="0"
          install-size="0"
          version="0.0.0"
