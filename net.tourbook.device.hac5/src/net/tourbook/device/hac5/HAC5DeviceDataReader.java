@@ -18,7 +18,6 @@ package net.tourbook.device.hac5;
 import gnu.io.SerialPort;
 
 import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,11 +30,14 @@ import java.util.GregorianCalendar;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
 public class HAC5DeviceDataReader extends TourbookDevice {
+
+	private static final int	HAC5_HARDWARE_ID		= 0x03;
 
 	/**
 	 * position in the file which skips the header (AFRO..) and the raw data
@@ -48,106 +50,12 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 	private static final int	RECORD_LENGTH			= 0x10;
 
-	// private String fImportFileName;
-
 	private Calendar			fCalendar				= GregorianCalendar.getInstance();
-
 	private GregorianCalendar	fFileDate;
 
 	// plugin constructor
 	public HAC5DeviceDataReader() {
 		canReadFromDevice = true;
-	}
-
-	/**
-	 * Convert a byte[] array to readable string format. This makes the "hex"
-	 * readable!
-	 * 
-	 * @return result String buffer in String format
-	 * @param in
-	 *        byte[] buffer to convert to string format
-	 */
-
-	public static String byteArrayToHexString(byte in[]) {
-
-		byte ch = 0x00;
-
-		int i = 0;
-
-		if (in == null || in.length <= 0) {
-			return null;
-		}
-
-		String pseudo[] = { "0", //$NON-NLS-1$
-				"1", //$NON-NLS-1$
-				"2", //$NON-NLS-1$
-				"3", //$NON-NLS-1$
-				"4", //$NON-NLS-1$
-				"5", //$NON-NLS-1$
-				"6", //$NON-NLS-1$
-				"7", //$NON-NLS-1$
-				"8", //$NON-NLS-1$
-				"9", //$NON-NLS-1$
-				"A", //$NON-NLS-1$
-				"B", //$NON-NLS-1$
-				"C", //$NON-NLS-1$
-				"D", //$NON-NLS-1$
-				"E", //$NON-NLS-1$
-				"F" }; //$NON-NLS-1$
-
-		StringBuffer out = new StringBuffer(in.length * 2 + in.length);
-
-		while (i < in.length) {
-
-			// Strip off high nibble
-			ch = (byte) (in[i] & 0xF0);
-
-			// shift the bits down
-			ch = (byte) (ch >>> 4);
-
-			// must do this is high order bit is on!
-			ch = (byte) (ch & 0x0F);
-
-			// convert the nibble to a String Character
-			out.append(pseudo[(int) ch]);
-
-			// Strip off low nibble
-			ch = (byte) (in[i] & 0x0F);
-
-			// convert the nibble to a String Character
-			out.append(pseudo[(int) ch]);
-
-			// add space between two bytes
-			out.append(' ');
-
-			i++;
-		}
-
-		String rslt = new String(out);
-
-		return rslt;
-	}
-
-	/**
-	 * get a 2 byte value (unsigned integer) from the buffer, by swapping the
-	 * high and low byte
-	 * 
-	 * @param buffer
-	 * @param offset
-	 * @return Returns unsigned integer address
-	 */
-	private static int get2ByteData(byte[] buffer, int offset) {
-		int byte1 = (buffer[offset] & 0xFF) << 0;
-		int byte2 = (buffer[offset + 1] & 0xFF) << 8;
-		return byte2 + byte1;
-	}
-
-	private static long get4ByteData(byte[] buffer, int offset) {
-		long byte1 = (buffer[offset] & 0xFF) << 0;
-		long byte2 = (buffer[offset + 1] & 0xFF) << 8;
-		long byte3 = (buffer[offset + 2] & 0xFF) << 16;
-		long byte4 = (buffer[offset + 3] & 0xFF) << 24;
-		return byte4 + byte3 + byte2 + byte1;
 	}
 
 	/**
@@ -183,16 +91,12 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		String address = "0000" + Integer.toHexString((int) pos); //$NON-NLS-1$
 		address = address.substring(address.length() - 4);
 
-		System.out.println((address + ": ") + byteArrayToHexString(recordBuffer)); //$NON-NLS-1$
+		System.out.println((address + ": ") + DeviceReaderTools.byteArrayToHexString(recordBuffer)); //$NON-NLS-1$
 	}
 
 	public int getImportDataSize() {
 		return 0xffff;
 	}
-
-	// public String getImportFileName() {
-	// return fImportFileName;
-	// }
 
 	public boolean processDeviceData(	String fileName,
 										DeviceData deviceData,
@@ -239,7 +143,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 			 * from this position
 			 */
 			file.seek(OFFSET_RAWDATA + 0x0380 + 2);
-			int offsetNextFreeTour = get2ByteData(file);
+			int offsetNextFreeTour = DeviceReaderTools.get2ByteData(file);
 
 			int offsetDDRecord = adjustDDRecordOffset(offsetNextFreeTour);
 
@@ -256,7 +160,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				}
 
 				// read AA record
-				int offsetAARecordInDDRecord = get2ByteData(recordBuffer, 2);
+				int offsetAARecordInDDRecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
 
 				// dump AA block
 				// file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
@@ -272,7 +176,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				/*
 				 * check if the AA and the DD records point to each other
 				 */
-				int offsetDDRecordInAARecord = get2ByteData(recordBuffer, 2);
+				int offsetDDRecordInAARecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
 				if (offsetDDRecordInAARecord != offsetDDRecord) {
 					returnValue = true;
 					break;
@@ -335,7 +239,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					// dump BB block
 					// dumpBlock(file, recordBuffer);
 
-					temperature = (short) (recordBuffer[1]);// & 0xFF);
+					temperature = (short) (recordBuffer[1]);
 					cadence = (short) (recordBuffer[2] & 0xFF);
 					marker = (short) (recordBuffer[3] & 0xFF);
 
@@ -406,7 +310,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 								+ timeData.time);
 
 						// read data for the current time slice
-						readTimeSlice(get2ByteData(recordBuffer, 4 + (2 * dataIndex)), timeData);
+						DeviceReaderTools.readTimeSlice(DeviceReaderTools.get2ByteData(
+								recordBuffer,
+								4 + (2 * dataIndex)), timeData);
 
 						// set distance
 						tourData.setTourDistance(tourData.getTourDistance() + timeData.distance);
@@ -507,40 +413,6 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 		return returnValue;
 	}
-	/**
-	 * @param timeData
-	 * @param rawData
-	 * @throws IOException
-	 */
-	public void readTimeSlice(int data, TimeData timeData) throws IOException {
-
-		// pulse (4 bits)
-		if ((data & 0x8000) != 0) {
-			// -
-			timeData.pulse = (short) ((0xFFF0 | ((data & 0xF000) >> 12)));
-		} else {
-			// +
-			timeData.pulse = (short) (((data & 0xF000) >> 12));
-		}
-
-		// altitude (6 bits)
-		if ((data & 0x0800) != 0) {
-			// -
-			timeData.altitude = (short) (0xFFC0 | ((data & 0x0FC0) >> 6));
-			if (timeData.altitude < -16) {
-				timeData.altitude = (short) (-16 + ((timeData.altitude + 16) * 7));
-			}
-		} else {
-			// +
-			timeData.altitude = (short) ((data & 0x0FC0) >> 6);
-			if (timeData.altitude > 16) {
-				timeData.altitude = (short) (16 + ((timeData.altitude - 16) * 7));
-			}
-		}
-
-		// distance (6 bits)
-		timeData.distance = (data & 0x003F) * 10;
-	}
 
 	/**
 	 * @param buffer
@@ -570,10 +442,10 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		// 06 1 day
 		// 07 1 month
 		//
-		// 08 4 ? total distance (m)
+		// 08 4 tourstart total distance (m)
 		//
-		// 12 2 initial altitude
-		// 14 1 initial pulse
+		// 12 2 tourstart initial altitude
+		// 14 1 tourstart initial pulse
 		//
 		// 15 1 ? 0xFF
 
@@ -593,29 +465,15 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		tourData.setStartDay(buffer[6]);
 		tourData.setStartMonth(buffer[7]);
 
-		tourData.setStartDistance((int) get4ByteData(buffer, 8));
-		tourData.setStartAltitude((short) get2ByteData(buffer, 12));
+		tourData.setStartDistance((int) DeviceReaderTools.get4ByteData(buffer, 8));
+		tourData.setStartAltitude((short) DeviceReaderTools.get2ByteData(buffer, 12));
 		tourData.setStartPulse(buffer[14]);
 	}
 
-	private int get2ByteData(RandomAccessFile file) throws IOException {
-
-		int ch1 = file.read();
-		int ch2 = file.read();
-		if ((ch1 | ch2) < 0)
-			throw new EOFException();
-		int offset = (ch2 << 8) + (ch1 << 0);
-		return (offset);
-	}
-
-	// public boolean validateRawData(String fileName) {
-	// return false;
-	// }
-
 	/**
-	 * checks if the data file has a valid HAC4 data format
+	 * checks if the data file has a valid HAC5 data format
 	 * 
-	 * @return true for a valid HAC4 data format
+	 * @return true for a valid HAC5 data format
 	 */
 	public boolean validateRawData(String fileName) {
 
@@ -633,6 +491,11 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 			inStream.read(bufferHeader);
 			if (!"AFRO".equalsIgnoreCase(new String(bufferHeader, 0, 4))) { //$NON-NLS-1$
+				return false;
+			}
+
+			// check hardware id
+			if (bufferHeader[4] != HAC5_HARDWARE_ID) {
 				return false;
 			}
 
