@@ -19,9 +19,6 @@ package net.tourbook.chart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.ColorCache;
-
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -639,7 +636,7 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private Cursor createCursorFromImage(final String imageName) {
 
-		final Image cursorImage = TourbookPlugin.getImageDescriptor(imageName).createImage();
+		final Image cursorImage = Activator.getImageDescriptor(imageName).createImage();
 
 		final Cursor cursor = new Cursor(getDisplay(), cursorImage.getImageData(), 0, 0);
 

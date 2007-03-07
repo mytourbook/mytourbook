@@ -13,35 +13,34 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-/**
- * Administrator 10.08.2005
- */
-
 package net.tourbook.chart;
 
+import org.eclipse.jface.action.Action;
 
-public class ChartMarker {
+public class ChartAction extends Action {
 
-	public String	graphLabel	= ""; //$NON-NLS-1$
-	public String	markerLabel	= ""; //$NON-NLS-1$
+	private Chart	chartWidget;
 
-	public int		graphX;
+	private int			actionId;
 
-	/**
-	 * index in the data serie
-	 */
-	public int		serieIndex;
+	public ChartAction(Chart chartWidget, int actionId, String text,
+			String toolTip, String[] image) {
 
-	/**
-	 * visual position in the chart
-	 */
-	public int		visualPosition;
+		super(text);
+		setToolTipText(toolTip);
 
-	/**
-	 * marker type, this can be <code>TourMarker.MARKER_TYPE_DEVICE</code> or
-	 * <code>TourMarker.MARKER_TYPE_CUSTOM</code>
-	 */
-	public int		type;
+		this.chartWidget = chartWidget;
+		this.actionId = actionId;
 
-	public ChartMarker() {}
+		if (image != null && image[0] != null) {
+			setImageDescriptor(Activator.getImageDescriptor(image[0]));
+		}
+		if (image != null && image[1] != null) {
+			setDisabledImageDescriptor(Activator.getImageDescriptor(image[1]));
+		}
+	}
+
+	public void run() {
+		chartWidget.performZoomAction(actionId);
+	}
 }

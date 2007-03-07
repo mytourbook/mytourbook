@@ -27,6 +27,7 @@ import java.util.Locale;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
@@ -42,7 +43,6 @@ import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ColorCache;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;

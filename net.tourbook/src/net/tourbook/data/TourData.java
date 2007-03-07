@@ -35,6 +35,7 @@ import javax.persistence.PostUpdate;
 import javax.persistence.Transient;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.ChartMarker;
 import net.tourbook.tour.TourManager;
 
 import org.hibernate.annotations.Cascade;
@@ -419,9 +420,9 @@ public class TourData {
 				if (timeItem.marker != 0) {
 
 					// create a new marker
-					TourMarker tourMarker = new TourMarker(this, TourMarker.MARKER_TYPE_DEVICE);
+					TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
 					tourMarker.setLabel(Messages.TourData_Label_device_marker);
-					tourMarker.setVisualPosition(TourMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+					tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					tourMarker.setTime(timeAbsolute + timeItem.marker);
 					tourMarker.setDistance(distanceAbsolute);
 					tourMarker.setSerieIndex(timeIndex);

@@ -27,30 +27,6 @@ import net.tourbook.Messages;
 @Entity
 public class TourMarker {
 
-	/**
-	 * marker was created in the device
-	 */
-	public final static int			MARKER_TYPE_DEVICE						= 1;
-
-	/**
-	 * marker was created in the tourbook application
-	 */
-	public final static int			MARKER_TYPE_CUSTOM						= 2;
-
-	/*
-	 * visual position for the markers in the chart
-	 */
-	public final static int			VISUAL_VERTICAL_ABOVE_GRAPH				= 0;
-	public final static int			VISUAL_VERTICAL_BELOW_GRAPH				= 1;
-	public final static int			VISUAL_VERTICAL_TOP_CHART				= 2;
-	public final static int			VISUAL_VERTICAL_BOTTOM_CHART			= 3;
-	public final static int			VISUAL_HORIZONTAL_ABOVE_GRAPH_LEFT		= 4;
-	public final static int			VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED	= 5;
-	public final static int			VISUAL_HORIZONTAL_ABOVE_GRAPH_RIGHT		= 6;
-	public final static int			VISUAL_HORIZONTAL_BELOW_GRAPH_LEFT		= 7;
-	public final static int			VISUAL_HORIZONTAL_BELOW_GRAPH_CENTERED	= 8;
-	public final static int			VISUAL_HORIZONTAL_BELOW_GRAPH_RIGHT		= 9;
-
 	@Transient
 	public static final String[]	visualPositionLabels					= new String[] {
 			Messages.TourMarker_Position_vertical_above, // 0

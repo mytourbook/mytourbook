@@ -17,6 +17,7 @@ package net.tourbook.views.tourBook;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartContextProvider;
+import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -94,15 +95,15 @@ class TourChartContextProvider implements ChartContextProvider {
 			TourChart tourChart = fView.getTourChart();
 			TourData tourData = tourChart.getTourData();
 
-			TourMarker tourMarker = new TourMarker(tourData, TourMarker.MARKER_TYPE_CUSTOM);
+			TourMarker tourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_CUSTOM);
 
 			int serieIndex = fSlider.getValuesIndex();
 			tourMarker.setSerieIndex(serieIndex);
 			tourMarker.setDistance(tourData.distanceSerie[serieIndex]);
 			tourMarker.setTime(tourData.timeSerie[serieIndex]);
 			tourMarker.setLabel(dialog.getValue().trim());
-			tourMarker.setVisualPosition(TourMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-			 
+			tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+
 			// add new marker to the marker list
 			tourData.getTourMarkers().add(tourMarker);
 
@@ -125,8 +126,13 @@ class TourChartContextProvider implements ChartContextProvider {
 			if (leftSlider != null && rightSlider == null) {
 				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_marker, leftSlider));
 			} else {
-				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_left_marker, leftSlider));
-				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_right_marker, rightSlider));
+				menuMgr
+						.add(new SliderAction(
+								Messages.TourMap_Action_create_left_marker,
+								leftSlider));
+				menuMgr.add(new SliderAction(
+						Messages.TourMap_Action_create_right_marker,
+						rightSlider));
 			}
 
 			// add to chart reference

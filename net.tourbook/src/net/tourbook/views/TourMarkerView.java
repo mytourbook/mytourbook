@@ -23,6 +23,7 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -461,7 +462,7 @@ public class TourMarkerView extends ViewPart {
 		boolean isCustomMarker = false;
 		for (Iterator iter = markerSelection.iterator(); iter.hasNext();) {
 			TourMarker tourMarker = (TourMarker) iter.next();
-			if (tourMarker.getType() != TourMarker.MARKER_TYPE_DEVICE) {
+			if (tourMarker.getType() != ChartMarker.MARKER_TYPE_DEVICE) {
 				isCustomMarker = true;
 				break;
 			}
@@ -491,7 +492,7 @@ public class TourMarkerView extends ViewPart {
 		ArrayList<TourMarker> removedMarkers = new ArrayList<TourMarker>();
 		for (Iterator iter = markerSelection.iterator(); iter.hasNext();) {
 			TourMarker tourMarker = (TourMarker) iter.next();
-			if (tourMarker.getType() != TourMarker.MARKER_TYPE_DEVICE) {
+			if (tourMarker.getType() != ChartMarker.MARKER_TYPE_DEVICE) {
 				removedMarkers.add(tourMarker);
 			}
 		}

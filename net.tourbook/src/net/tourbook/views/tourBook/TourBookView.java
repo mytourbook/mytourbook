@@ -23,6 +23,7 @@ import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
@@ -43,7 +44,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.tour.Tour.ITourChangeListener;
 import net.tourbook.tour.Tour.TourChangeEvent;
-import net.tourbook.ui.ColorCache;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;

@@ -9,14 +9,14 @@ Bundle-Activator: net.tourbook.plugin.TourbookPlugin
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
+ net.tourbook.chart,
  net.tourbook.ejb3,
  net.tourbook.rxtx,
  org.apache.derby.core,
  org.eclipse.update.ui
 Eclipse-LazyStart: true
 Eclipse-RegisterBuddy: net.tourbook.ejb3
-Export-Package: net.tourbook.chart,
- net.tourbook.colors,
+Export-Package: net.tourbook.colors,
  net.tourbook.data,
  net.tourbook.database,
  net.tourbook.importdata,

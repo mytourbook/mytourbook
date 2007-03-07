@@ -21,8 +21,6 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
-import net.tourbook.data.TourMarker;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -105,7 +103,7 @@ public class ChartMarkerLayer implements IChartLayer {
 			final int visualPosition = chartMarker.visualPosition;
 			final Point labelExtend = gc.textExtent(chartMarker.markerLabel);
 
-			if (chartMarker.type==TourMarker.MARKER_TYPE_DEVICE) {
+			if (chartMarker.type==ChartMarker.MARKER_TYPE_DEVICE) {
 				gc.setBackground(colorDevMarker);
 			} else {
 				gc.setBackground(colorLine);
@@ -119,51 +117,51 @@ public class ChartMarkerLayer implements IChartLayer {
 			boolean isVertical = true;
 
 			switch (visualPosition) {
-			case TourMarker.VISUAL_VERTICAL_ABOVE_GRAPH:
+			case ChartMarker.VISUAL_VERTICAL_ABOVE_GRAPH:
 				devYMarker -= 5;
 				break;
 
-			case TourMarker.VISUAL_VERTICAL_BELOW_GRAPH:
+			case ChartMarker.VISUAL_VERTICAL_BELOW_GRAPH:
 				devYMarker += MARKER_DISTANCE + labelExtend.x;
 				break;
 
-			case TourMarker.VISUAL_VERTICAL_TOP_CHART:
+			case ChartMarker.VISUAL_VERTICAL_TOP_CHART:
 				devYMarker = devYTop + labelExtend.x;
 				break;
 
-			case TourMarker.VISUAL_VERTICAL_BOTTOM_CHART:
+			case ChartMarker.VISUAL_VERTICAL_BOTTOM_CHART:
 				devYMarker = devYBottom - MARKER_DISTANCE;
 				break;
 
-			case TourMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_RIGHT:
+			case ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_RIGHT:
 				devYMarker -= labelExtend.y + MARKER_DISTANCE;
 				isVertical = false;
 				break;
 
-			case TourMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED:
+			case ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED:
 				devXMarker -= labelExtend.x / 2;
 				devYMarker -= labelExtend.y + MARKER_DISTANCE;
 				isVertical = false;
 				break;
 
-			case TourMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_LEFT:
+			case ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_LEFT:
 				devXMarker -= labelExtend.x;
 				devYMarker -= labelExtend.y + MARKER_DISTANCE;
 				isVertical = false;
 				break;
 
-			case TourMarker.VISUAL_HORIZONTAL_BELOW_GRAPH_RIGHT:
+			case ChartMarker.VISUAL_HORIZONTAL_BELOW_GRAPH_RIGHT:
 				devYMarker += MARKER_DISTANCE;
 				isVertical = false;
 				break;
 
-			case TourMarker.VISUAL_HORIZONTAL_BELOW_GRAPH_CENTERED:
+			case ChartMarker.VISUAL_HORIZONTAL_BELOW_GRAPH_CENTERED:
 				devXMarker -= labelExtend.x / 2;
 				devYMarker += MARKER_DISTANCE;
 				isVertical = false;
 				break;
 
-			case TourMarker.VISUAL_HORIZONTAL_BELOW_GRAPH_LEFT:
+			case ChartMarker.VISUAL_HORIZONTAL_BELOW_GRAPH_LEFT:
 				devXMarker -= labelExtend.x;
 				devYMarker += MARKER_DISTANCE;
 				isVertical = false;
