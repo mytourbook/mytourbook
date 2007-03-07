@@ -1,4 +1,24 @@
+/*******************************************************************************
+ * Copyright (C) 2006, 2007  Wolfgang Schramm
+ *  
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software 
+ * Foundation version 2 of the License.
+ *  
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ *******************************************************************************/
 package net.tourbook.device.hac4pro;
+
+/*
+ * acknowledgement: implementing this device driver was supported by
+ * Hans-Joachim Willi from http://www.bikexperience.de/
+ */
 
 import gnu.io.SerialPort;
 
@@ -180,7 +200,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 					// dump BB block
 					// dumpBlock(file, recordBuffer);
 
-					temperature = (short) (recordBuffer[1]);// & 0xFF);
+					temperature = (short) (recordBuffer[1]);
 					cadence = (short) (recordBuffer[2] & 0xFF);
 					marker = (short) (recordBuffer[3] & 0xFF);
 
@@ -251,7 +271,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 								+ timeData.time);
 
 						// read data for the current time slice
-						DeviceReaderTools.readTimeSlice(DeviceReaderTools.get2ByteData(
+						readTimeSlice(DeviceReaderTools.get2ByteData(
 								recordBuffer,
 								4 + (2 * dataIndex)), timeData);
 
@@ -287,8 +307,6 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 						file.seek(OFFSET_RAWDATA + OFFSET_TOUR_DATA_START);
 					}
 				}
-
-				System.out.println(recordBuffer);
 
 				// read/save DD record
 				offsetDDRecord = (int) file.getFilePointer();
@@ -411,6 +429,40 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		tourData.setStartPulse(buffer[14]);
 	}
 
+	/**
+	 * @param timeData
+	 * @param rawData
+	 * @throws IOException
+	 */
+	public static void readTimeSlice(int data, TimeData timeData) throws IOException {
+
+		// pulse (4 bits)
+		if ((data & 0x8000) != 0) {
+			// -
+			timeData.pulse = (short) ((0xFFF0 | ((data & 0xF000) >> 12)) * 2);
+		} else {
+			// +
+			timeData.pulse = (short) (((data & 0xF000) >> 12) * 2);
+		}
+
+		// altitude (6 bits)
+		if ((data & 0x0800) != 0) {
+			// -
+			timeData.altitude = (short) (0xFFC0 | ((data & 0x0FC0) >> 6));
+			if (timeData.altitude < -16) {
+				timeData.altitude = (short) (-16 + ((timeData.altitude + 16) * 7));
+			}
+		} else {
+			// +
+			timeData.altitude = (short) ((data & 0x0FC0) >> 6);
+			if (timeData.altitude > 16) {
+				timeData.altitude = (short) (16 + ((timeData.altitude - 16) * 7));
+			}
+		}
+
+		// distance (6 bits)
+		timeData.distance = (data & 0x003F) * 10;
+	}
 	public String getDeviceModeName(int profileId) {
 
 		// 1: run
@@ -538,15 +590,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				// System.out.println(streamPointer);
 			}
 
-			// System.out.println(streamPointer);
-			int lastBytes = inStream.read(bufferHeader);
-			// System.out.println(lastBytes);
-
+			inStream.read(bufferHeader);
 			lastValue = Integer.parseInt(new String(bufferHeader, 0, 4), 16);
-			// System.out.println(checksum+" "+lastValue);
-
-			lastBytes = inStream.read(bufferHeader);
-			// System.out.println(lastBytes);
 
 			// if (checksum == lastValue) {
 			isValid = true;
