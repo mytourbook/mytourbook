@@ -240,7 +240,7 @@ public class PortListener implements SerialPortEventListener {
 				try {
 					iData = fInStream.read();
 					if (iData != -1) {
-						fDataListener.dataArrived((byte) iData);
+						fDataListener.dataArrived(iData);
 					}
 
 				} catch (IOException ex) {
