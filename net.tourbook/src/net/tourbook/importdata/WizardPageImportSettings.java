@@ -62,8 +62,8 @@ public class WizardPageImportSettings extends WizardPage {
 
 	private ArrayList<String>			fPortList;
 	private Combo						fComboPerson;
-	DirectoryFieldEditor				fAutoSavePathEditor;
 	Button								fCheckAutoSave;
+	DirectoryFieldEditor				fAutoSavePathEditor;
 	private Composite					fGroupContainer;
 	private Label						fLblDevice;
 	protected boolean					fIsDeviceAvailable;
@@ -273,7 +273,7 @@ public class WizardPageImportSettings extends WizardPage {
 
 		fLblDevice.setEnabled(true);
 		fComboDevice.setEnabled(true);
-		fAutoSavePathEditor.setEnabled(true, fGroupContainer);
+//		fAutoSavePathEditor.setEnabled(true, fGroupContainer);
 
 //		fLblDevice.setEnabled(!fIsDeviceAvailable);
 //		fComboDevice.setEnabled(!fIsDeviceAvailable);
@@ -283,6 +283,8 @@ public class WizardPageImportSettings extends WizardPage {
 //		} else {
 //			fAutoSavePathEditor.setEnabled(fCheckAutoSave.getSelection(), fGroupContainer);
 //		}
+
+		fAutoSavePathEditor.setEnabled(fCheckAutoSave.getSelection(), fGroupContainer);
 	}
 	void persistDialogSettings() {
 

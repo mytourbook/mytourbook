@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 0.8.4
+Bundle-Version: 0.8.6
 Bundle-ClassPath: net.tourbook.jar,
  persistence.jar
 Bundle-Activator: net.tourbook.plugin.TourbookPlugin

@@ -23,10 +23,12 @@
 package net.tourbook.views.rawData;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Formatter;
 
 import net.tourbook.Messages;
@@ -79,73 +81,86 @@ public class ActionSaveRawData extends Action {
 		FileDialog dialog = new FileDialog(shell, SWT.SAVE);
 
 		// set default filename to the transfer date
+		String fileNameFormat = Messages.Format_rawdata_file_yyyy_mm_dd
+				+ rawDataManager.getDevice().fileExtension;
+
 		dialog.setFileName(new Formatter().format(
-				Messages.Format_rawdata_file_yyyy_mm_dd
-						+ rawDataManager.getDevice().fileExtension,
+				fileNameFormat,
 				deviceData.transferYear,
 				deviceData.transferMonth,
 				deviceData.transferDay).toString());
 
 		// open file dialog
-		String fileName = dialog.open();
+		String fileNameOut = dialog.open();
 
 		// check if user canceled the dialog
-		if (fileName == null) {
+		if (fileNameOut == null) {
 			return;
 		}
 
 		// check if file already exist, ask for overwriting the file
-		File fileOut = new File(fileName);
+		File fileOut = new File(fileNameOut);
 		if (fileOut.exists()) {
 			MessageBox msgBox = new MessageBox(shell, SWT.ICON_WORKING | SWT.OK | SWT.CANCEL);
-			msgBox.setMessage(NLS.bind(Messages.RawData_Label_confirm_overwrite, fileName));
+			msgBox.setMessage(NLS.bind(Messages.RawData_Label_confirm_overwrite, fileNameOut));
 			if (msgBox.open() != SWT.OK) {
 				return;
 			}
 		}
 
-		// get source file
-		File fileIn = new File(rawDataManager.getImportFileName());
+		if (copyFile(rawDataManager.getImportFileName(), fileNameOut)) {
 
-		// copy source file into destination file
-		FileReader inReader = null;
-		FileWriter outReader = null;
-		try {
-			inReader = new FileReader(fileIn);
-			outReader = new FileWriter(fileOut);
-			int c;
-
-			while ((c = inReader.read()) != -1) {
-				outReader.write(c);
+			// reload the data from the saved copy
+			if (rawDataManager.importRawData(fileNameOut)) {
+				rawDataView.updateViewer();
+				rawDataView.setActionSaveEnabled(false);
 			}
-			inReader.close();
-			outReader.close();
+		}
+	}
+
+	private boolean copyFile(String src, String fileNameOut) {
+
+		InputStream in = null;
+		OutputStream out = null;
+
+		boolean isCopied = false;
+
+		try {
+
+			in = new FileInputStream(src);
+			out = new FileOutputStream(fileNameOut);
+
+			byte[] buf = new byte[1024];
+			int len;
+
+			// Transfer bytes from in to out
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			// close the files
-			if (inReader != null) {
+			if (in != null) {
 				try {
-					inReader.close();
+					in.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			if (outReader != null) {
+			if (out != null) {
 				try {
-					outReader.close();
+					out.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
+
+			isCopied = true;
 		}
 
-		// reload the data from the saved copy
-		if (RawDataManager.getInstance().importRawData(fileName)) {
-			rawDataView.updateViewer();
-			rawDataView.setActionSaveEnabled(false);
-		}
+		return isCopied;
 	}
 }

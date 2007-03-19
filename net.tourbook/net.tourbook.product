@@ -36,7 +36,6 @@
       </win>
    </launcher>
 
-
    <plugins>
       <plugin id="com.ibm.icu"/>
       <plugin id="net.tourbook"/>
@@ -66,11 +65,11 @@
    </plugins>
 
    <features>
-      <feature id="net.tourbook.device.feature" version="0.8.4"/>
+      <feature id="net.tourbook.device.feature" version="0.8.6"/>
       <feature id="net.tourbook.ext.derby.feature" version="10.1.2.1"/>
       <feature id="net.tourbook.ext.eclipse" version="0.8.3"/>
       <feature id="net.tourbook.ext.ejb3.feature" version="0.8.2"/>
-      <feature id="net.tourbook.feature" version="0.8.4"/>
+      <feature id="net.tourbook.feature" version="0.8.6"/>
       <feature id="net.tourbook.statistics.feature" version="0.8.3"/>
       <feature id="org.eclipse.rcp" version="3.2.1.r321_v20060801-2ekW2BxmcpPUOoq"/>
       <feature id="org.eclipse.rcp.nls1" version="3.2.1.v200609270227"/>

@@ -238,9 +238,11 @@ public class PortListener implements SerialPortEventListener {
 			// Read data until -1 is returned
 			while (iData != -1) {
 				try {
+					
 					iData = fInStream.read();
+					
 					if (iData != -1) {
-						fDataListener.dataArrived(iData);
+						fDataListener.dataArrived(iData & 0xff);
 					}
 
 				} catch (IOException ex) {
