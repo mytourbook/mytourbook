@@ -61,11 +61,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	public void postWindowRestore() {
 
-		// select person/tour type which was selected in the last session
-		fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
-
-		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
-		activePage.closeAllEditors(false);
+//		// select person/tour type which was selected in the last session
+//		fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
+//
+//		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
+//		activePage.closeAllEditors(false);
 	}
 
 	public void preWindowOpen() {
@@ -129,6 +129,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 			}
 			conn.close();
+
+			// select person/tour type which was selected in the last session
+			fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
+
+			IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
+			activePage.closeAllEditors(false);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
