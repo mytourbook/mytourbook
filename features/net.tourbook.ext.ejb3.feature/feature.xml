@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.ext.ejb3.feature"
       label="Ejb3 Service"
-      version="0.8.2"
+      version="0.8.7"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -19,11 +19,11 @@
    </url>
 
    <requires>
-      <import feature="net.tourbook.feature" version="0.8.2"/>
+      <import feature="net.tourbook.feature" version="0.8.7" match="greaterOrEqual"/>
    </requires>
 
    <plugin
-         id="net.tourbook.ejb3"
+         id="net.tourbook.ext.ejb3"
          download-size="0"
          install-size="0"
          version="0.0.0"

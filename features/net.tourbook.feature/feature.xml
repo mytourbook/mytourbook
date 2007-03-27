@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.feature"
       label="%Feature_Name"
-      version="0.8.4"
+      version="0.8.7"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -415,6 +415,13 @@ Public License instead of this License.
          install-size="0"
          version="0.0.0"
          fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.chart"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
