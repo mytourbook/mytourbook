@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 
@@ -31,10 +32,10 @@ import org.osgi.framework.BundleContext;
  */
 public class TourbookPlugin extends AbstractUIPlugin {
 
-	public static final String		PLUGIN_ID						= "net.tourbook"; //$NON-NLS-1$
+	public static final String		PLUGIN_ID						= "net.tourbook";		//$NON-NLS-1$
 
-	public static final String		EXT_POINT_STATISTIC_YEAR		= "statisticYear"; //$NON-NLS-1$
-	public static final String		EXT_POINT_DEVICE_DATA_READER	= "deviceDataReader"; //$NON-NLS-1$
+	public static final String		EXT_POINT_STATISTIC_YEAR		= "statisticYear";		//$NON-NLS-1$
+	public static final String		EXT_POINT_DEVICE_DATA_READER	= "deviceDataReader";	//$NON-NLS-1$
 
 	// The shared instance.
 	private static TourbookPlugin	plugin;
@@ -50,6 +51,8 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
 	private TourType				fActiveTourType;
 	private ArrayList<TourType>		fTourTypes;
+
+	private MyTourbookSplashHandler	fSplashHandler;
 
 	/**
 	 * The constructor.
@@ -149,6 +152,14 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
 		// NetworkServerControl server = new NetworkServerControl();
 		// server.shutdown();
+	}
+
+	public void setSplashHandler(MyTourbookSplashHandler splashHandler) {
+		fSplashHandler = splashHandler;
+	}
+
+	public MyTourbookSplashHandler getSplashHandler() {
+		return fSplashHandler;
 	}
 
 }

@@ -18,6 +18,22 @@
          <property
                name="aboutImage"
                value="icons/tourbook-about-250.gif"/>
+         <property
+               name="appName"
+               value="MyToorbook">
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="BBCBFF">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="8,120,384,15">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="5,135,390,10">
+         </property>
       </product>
    </extension>
 
@@ -130,5 +146,16 @@
             icon="icons/tour-segmenter.gif"
             id="net.tourbook.views.TourSegmenter"
             name="%View_Tour_Segmenter"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.splashHandlers">
+      <splashHandler
+            class="net.tourbook.application.MyTourbookSplashHandler"
+            id="net.tourbook.splashHandler">
+      </splashHandler>
+      <splashHandlerProductBinding
+            productId="net.tourbook.product"
+            splashId="net.tourbook.splashHandler">
+      </splashHandlerProductBinding>
    </extension>
 </plugin>

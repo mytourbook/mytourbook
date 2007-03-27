@@ -61,11 +61,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	public void postWindowRestore() {
 
-//		// select person/tour type which was selected in the last session
-//		fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
-//
-//		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
-//		activePage.closeAllEditors(false);
+	// // select person/tour type which was selected in the last session
+	// fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
+	//
+	// IWorkbenchPage activePage =
+	// getWindowConfigurer().getWindow().getActivePage();
+	// activePage.closeAllEditors(false);
 	}
 
 	public void preWindowOpen() {
@@ -79,9 +80,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		configurer.setTitle(Messages.App_Title);
 
-		PlatformUI.getPreferenceStore().putValue(
+		// PlatformUI.getPreferenceStore().putValue(
+		// IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
+		// "false"); //$NON-NLS-1$
+
+		PlatformUI.getPreferenceStore().setValue(
 				IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
-				"false"); //$NON-NLS-1$
+				true);
+
+		PlatformUI.getPreferenceStore().setValue(
+				IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP,
+				true);
 
 	}
 
@@ -103,11 +112,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 				Shell activeShell = Display.getCurrent().getActiveShell();
 
-				MessageDialog
-						.openInformation(
-								activeShell,
-								Messages.App_Dlg_first_startup_title,
-								Messages.App_Dlg_first_startup_msg);
+				MessageDialog.openInformation(
+						activeShell,
+						Messages.App_Dlg_first_startup_title,
+						Messages.App_Dlg_first_startup_msg);
 
 				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(
 						activeShell,

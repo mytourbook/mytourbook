@@ -34,10 +34,12 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
+import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
+import net.tourbook.plugin.TourbookPlugin;
 
 import org.apache.derby.drda.NetworkServerControl;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -110,21 +112,30 @@ public class TourDatabase {
 		}
 
 		try {
-			IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			IRunnableWithProgress runnableCreateEntityManager = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException,
 						InterruptedException {
 
-					monitor.beginTask(
-							Messages.Database_Monitor_persistent_service_task,
-							IProgressMonitor.UNKNOWN);
+					// monitor.beginTask(
+					// Messages.Database_Monitor_persistent_service_task,
+					// IProgressMonitor.UNKNOWN);
+					monitor.subTask(Messages.Database_Monitor_persistent_service_task);
+
+					// hide 'loading workbench'
+					// monitor.subTask("");
+
 					emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
+
+					monitor.setTaskName("");
 				}
 			};
 
-			CustomMonitor progressMonitorDialog = new CustomMonitor(Display
-					.getCurrent()
-					.getActiveShell(), Messages.Database_Monitor_persistent_service_title);
-			progressMonitorDialog.run(true, false, runnable);
+			IProgressMonitor splashProgressMonitor = TourbookPlugin
+					.getDefault()
+					.getSplashHandler()
+					.getBundleProgressMonitor();
+
+			runnableCreateEntityManager.run(splashProgressMonitor);
 
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
@@ -141,8 +152,6 @@ public class TourDatabase {
 			return null;
 		} else {
 			EntityManager em = emFactory.createEntityManager();
-
-			// System.out.println(em.toString());
 
 			return em;
 		}
@@ -170,15 +179,19 @@ public class TourDatabase {
 			return;
 		}
 
-		final IRunnableWithProgress startServerRunnable = createStartServerRunnable();
+		final IRunnableWithProgress runnableStartServer = createStartServerRunnable();
 
-		if (startServerRunnable != null) {
+		if (runnableStartServer != null) {
 
 			try {
-				CustomMonitor databaseMonitor = new CustomMonitor(Display
-						.getCurrent()
-						.getActiveShell(), Messages.Database_Monitor_db_service_title);
-				databaseMonitor.run(true, false, startServerRunnable);
+
+				IProgressMonitor splashProgressMonitor = TourbookPlugin
+						.getDefault()
+						.getSplashHandler()
+						.getBundleProgressMonitor();
+
+				runnableStartServer.run(splashProgressMonitor);
+
 			} catch (InvocationTargetException e) {
 				e.printStackTrace();
 			} catch (InterruptedException e) {
@@ -210,75 +223,84 @@ public class TourDatabase {
 
 			public void run(IProgressMonitor monitor) {
 
-				monitor.beginTask(Messages.Database_Monitor_db_service_task, 5);
-
-				String databasePath = getDatabasePath();
-
-				// set storage location for the database
-				System.setProperty("derby.system.home", databasePath); //$NON-NLS-1$
-
-				try {
-					server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
-				} catch (UnknownHostException e2) {
-					e2.printStackTrace();
-				} catch (Exception e2) {
-					e2.printStackTrace();
-				}
-
-				monitor.worked(1);
-				monitor.subTask(Messages.Database_Monitor_db_service_subtask_location
-						+ databasePath);
-
-				try {
-					/*
-					 * check if another derby server is already running (this
-					 * can happen during development)
-					 */
-					server.ping();
-					monitor.worked(1);
-
-				} catch (Exception e) {
-
-					try {
-						server.start(null);
-						monitor.worked(1);
-					} catch (Exception e2) {
-						e2.printStackTrace();
-					}
-
-					// wait until the server is started
-					while (true) {
-
-						try {
-							server.ping();
-							monitor.worked(1);
-							break;
-						} catch (Exception e1) {
-							try {
-								Thread.sleep(1);
-								monitor.worked(1);
-							} catch (InterruptedException e2) {
-								e2.printStackTrace();
-							}
-						}
-					}
-
-					// make the first connection, this takes longer as the
-					// subsequent ones
-					try {
-						monitor.worked(1);
-						Connection connection = createConnection();
-						connection.close();
-					} catch (SQLException e1) {
-						e1.printStackTrace();
-					}
-				}
-				monitor.done();
+				runStartServer(monitor);
 			}
 
 		};
 
 		return startServerRunnable;
+	}
+
+	private void runStartServer(IProgressMonitor monitor) {
+
+		// monitor.beginTask(Messages.Database_Monitor_db_service_task, 5);
+		monitor.subTask(Messages.Database_Monitor_db_service_task);
+		// monitor.setTaskName(Messages.Database_Monitor_db_service_task);
+		// monitor.setTaskName("");
+
+		String databasePath = getDatabasePath();
+
+		// set storage location for the database
+		System.setProperty("derby.system.home", databasePath); //$NON-NLS-1$
+
+		try {
+			server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
+		} catch (UnknownHostException e2) {
+			e2.printStackTrace();
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+
+//		monitor.worked(1);
+		// monitor.subTask(Messages.Database_Monitor_db_service_subtask_location
+		// + databasePath);
+
+		try {
+			/*
+			 * check if another derby server is already running (this can happen
+			 * during development)
+			 */
+			server.ping();
+//			monitor.worked(1);
+
+		} catch (Exception e) {
+
+			try {
+				server.start(null);
+//				monitor.worked(1);
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+
+			// wait until the server is started
+			while (true) {
+
+				try {
+					server.ping();
+//					monitor.worked(1);
+					break;
+				} catch (Exception e1) {
+					try {
+						Thread.sleep(1);
+//						monitor.worked(1);
+					} catch (InterruptedException e2) {
+						e2.printStackTrace();
+					}
+				}
+			}
+
+			// make the first connection, this takes longer as the
+			// subsequent ones
+			try {
+//				monitor.worked(1);
+				Connection connection = createConnection();
+				connection.close();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		}
+		// monitor.done();
+//		monitor.worked(1);
 	}
 
 	/**

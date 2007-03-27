@@ -22,7 +22,10 @@
    <windowImages i16="/net.tourbook/icons/tourbook16.gif" i32="/net.tourbook/icons/tourbook32.gif" i48="/net.tourbook/icons/tourbook48.gif" i64="/net.tourbook/icons/tourbook64.gif" i128="/net.tourbook/icons/tourbook128.gif"/>
 
    <splash
-      location="net.tourbook" />
+      location="net.tourbook"
+      startupProgressRect="5,135,390,10"
+      startupMessageRect="8,120,384,15"
+      startupForegroundColor="BBCBFF" />
    <launcher name="mytourbook">
       <linux icon="/net.tourbook/icons/linux/tourbook48-32.xpm"/>
       <macosx icon="/net.tourbook/icons/mac/tourbook128.icns"/>
@@ -35,6 +38,9 @@
             winLargeHigh="/net.tourbook/icons/tourbook48-32.bmp"/>
       </win>
    </launcher>
+
+   <vm>
+   </vm>
 
    <plugins>
       <plugin id="com.ibm.icu"/>
@@ -68,11 +74,10 @@
       <feature id="net.tourbook.device.feature" version="0.8.6"/>
       <feature id="net.tourbook.ext.derby.feature" version="10.1.2.1"/>
       <feature id="net.tourbook.ext.eclipse" version="0.8.3"/>
-      <feature id="net.tourbook.ext.ejb3.feature" version="0.8.2"/>
-      <feature id="net.tourbook.feature" version="0.8.6"/>
+      <feature id="net.tourbook.ext.ejb3.feature" version="0.8.7"/>
+      <feature id="net.tourbook.feature" version="0.8.7"/>
       <feature id="net.tourbook.statistics.feature" version="0.8.3"/>
-      <feature id="org.eclipse.rcp" version="3.2.1.r321_v20060801-2ekW2BxmcpPUOoq"/>
-      <feature id="org.eclipse.rcp.nls1" version="3.2.1.v200609270227"/>
+      <feature id="org.eclipse.rcp" version="3.3.0.v20070316b-8l8VCEYXUPdNkSgt8LpKG"/>
    </features>
 
 </product>
