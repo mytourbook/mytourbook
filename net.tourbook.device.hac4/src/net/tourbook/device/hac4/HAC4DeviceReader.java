@@ -327,10 +327,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 						totalPulse += timeData.pulse;
 						timeData.pulse = totalPulse;
 
-						if (timeData.pulse < 0) {
-							timeData.pulse = 0;
-						}
-
 						// adjust altitude from relative to absolute
 						totalAltitude += timeData.altitude;
 

@@ -320,10 +320,6 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 						// adjust pulse from relative to absolute
 						timeData.pulse = totalPulse += timeData.pulse;
 
-						if (timeData.pulse < 0) {
-							timeData.pulse = 0;
-						}
-
 						// adjust altitude from relative to absolute
 						totalAltitude += timeData.altitude;
 
@@ -467,7 +463,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 		tourData.setStartDistance((int) DeviceReaderTools.get4ByteData(buffer, 8));
 		tourData.setStartAltitude((short) DeviceReaderTools.get2ByteData(buffer, 12));
-		tourData.setStartPulse(buffer[14]);
+		tourData.setStartPulse((short) (buffer[14] & 0xff));
 	}
 
 	/**

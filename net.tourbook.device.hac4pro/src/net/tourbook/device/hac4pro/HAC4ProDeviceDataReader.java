@@ -278,12 +278,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 						// set distance
 						tourData.setTourDistance(tourData.getTourDistance() + timeData.distance);
 
-						// adjust pulse from relative to absolute
+						// adjust pulse from relative to absolute value
 						timeData.pulse = totalPulse += timeData.pulse;
-
-						if (timeData.pulse < 0) {
-							timeData.pulse = 0;
-						}
 
 						// adjust altitude from relative to absolute
 						totalAltitude += timeData.altitude;
@@ -426,7 +422,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 		tourData.setStartDistance((int) DeviceReaderTools.get4ByteData(buffer, 8));
 		tourData.setStartAltitude((short) DeviceReaderTools.get2ByteData(buffer, 12));
-		tourData.setStartPulse(buffer[14]);
+		tourData.setStartPulse((short) (buffer[14] & 0xff));
 	}
 
 	/**
@@ -463,6 +459,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		// distance (6 bits)
 		timeData.distance = (data & 0x003F) * 10;
 	}
+	
 	public String getDeviceModeName(int profileId) {
 
 		// 1: run
