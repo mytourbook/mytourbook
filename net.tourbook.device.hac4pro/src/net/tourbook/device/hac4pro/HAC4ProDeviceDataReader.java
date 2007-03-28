@@ -299,7 +299,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 					 * when the end of the buffer is reached, read from the
 					 * beginning of the ring buffer
 					 */
-					if (file.getFilePointer() > OFFSET_RAWDATA + OFFSET_TOUR_DATA_END) {
+					if (file.getFilePointer() >= OFFSET_RAWDATA + OFFSET_TOUR_DATA_END) {
 						file.seek(OFFSET_RAWDATA + OFFSET_TOUR_DATA_START);
 					}
 				}

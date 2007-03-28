@@ -166,6 +166,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				// file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
 				// dumpBuffer(file, recordBuffer);
 
+				// check AA & DD records if they point to each other
 				file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
 				file.read(recordBuffer);
 				if ((recordBuffer[0] & 0xFF) != 0xAA) {
@@ -338,7 +339,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					 * when the end of the buffer is reached, read from the
 					 * beginning of the ring buffer
 					 */
-					if (file.getFilePointer() > OFFSET_RAWDATA + OFFSET_TOUR_DATA_END) {
+					if (file.getFilePointer() >= OFFSET_RAWDATA + OFFSET_TOUR_DATA_END) {
 						file.seek(OFFSET_RAWDATA + OFFSET_TOUR_DATA_START);
 					}
 				}
