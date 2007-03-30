@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.util;
 
-import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.dialogs.DialogSettings;
@@ -62,8 +61,8 @@ public class PositionedWizardDialog extends WizardDialog {
 
 		IDialogSettings settings = fDialogSettings.getSection(fSettingsSection);
 
-		int width = 700;
-		int height = 500;
+		int width = 500;
+		int height = 400;
 
 		if (settings == null) {
 			final Shell shell = getShell();
