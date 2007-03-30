@@ -22,7 +22,6 @@ package net.tourbook.device.cm4xxm;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
-import java.util.HashMap;
 
 import net.tourbook.data.DataUtil;
 
@@ -36,141 +35,117 @@ public class CM4XXMDeviceData {
 	/**
 	 * cccc (h) "B723"
 	 */
-	public String									deviceType;
+	public String	deviceType;
 
 	/**
 	 * pppp (h) wheel perimeter bike 1 (mm)
 	 */
-	public int										wheelPerimeter1;
+	public int		wheelPerimeter1;
 
 	/**
 	 * qqqq (h) wheel perimeter bike 2 (mm)
 	 */
-	public int										wheelPerimeter2;
+	public int		wheelPerimeter2;
 
 	/**
 	 * ???? (h) unknown Data
 	 */
-	public int										unknownData1;
-	public int										unknownData2;
-	public int										unknownData3;
-	public int										unknownData4;
-	public int										unknownData5;
-	public int										unknownData6;
-	public int										unknownData7;
+	public int		unknownData1;
+	public int		unknownData2;
+	public int		unknownData3;
+	public int		unknownData4;
+	public int		unknownData5;
+	public int		unknownData6;
+	public int		unknownData7;
 
 	/**
 	 * aaaa (h) home altitude (m) "FFFF" not set
 	 */
-	public int										homeAltitude;
+	public int		homeAltitude;
 
 	/**
 	 * wwww (h) weight (kg)
 	 */
-	public int										personWeight;
+	public int		personWeight;
 
 	/**
 	 * llll (h) total distance at end of last tour bike 1 (km)
 	 */
-	public int										totalDistance1;
+	public int		totalDistance1;
 
 	/**
 	 * kkkk (h) total distance at end of last tour bike 2 (km)
 	 */
-	public int										totalDistance2;
+	public int		totalDistance2;
 
 	/**
 	 * uuuu (h) total altitude up at end of last tour (m)
 	 */
-	public int										totalAltitudeUp1;
+	public int		totalAltitudeUp1;
 
 	/**
 	 * dddd (h) total altitude down at end of last tour (m)
 	 */
-	public int										totalAltitudeUp2;
+	public int		totalAltitudeUp2;
 
 	/**
 	 * aaaa (h) max altitude (m)
 	 */
-	public int										maxAltitude;
+	public int		maxAltitude;
 
 	/**
 	 * hh (d) hour of total travel time bike 1
 	 */
-	public short									totalTravelTimeHour1;
+	public short	totalTravelTimeHour1;
 
-	public short									totalTravelTimeHour2;
-
-	/**
-	 * ss (d) seconds of total travel time
-	 */
-	public short									totalTravelTimeSec1;
-
-	/**
-	 * mm (d) minute of total travel time
-	 */
-	public short									totalTravelTimeMin1;
+	public short	totalTravelTimeHour2;
 
 	/**
 	 * ss (d) seconds of total travel time
 	 */
-	public short									totalTravelTimeSec2;
+	public short	totalTravelTimeSec1;
 
 	/**
 	 * mm (d) minute of total travel time
 	 */
-	public short									totalTravelTimeMin2;
+	public short	totalTravelTimeMin1;
+
+	/**
+	 * ss (d) seconds of total travel time
+	 */
+	public short	totalTravelTimeSec2;
+
+	/**
+	 * mm (d) minute of total travel time
+	 */
+	public short	totalTravelTimeMin2;
 
 	/**
 	 * oooo (h) next free memory offset
 	 */
-	public int										offsetNextMemory;
+	public int		offsetNextMemory;
 
 	/**
 	 * dddd (o) offset of last DD-record
 	 */
-	public int										offsetDDRecord;
+	public int		offsetDDRecord;
 
 	/**
 	 * yyyy (d) year of transfer
 	 */
-	public short									transferYear;
+	public short	transferYear;
 
 	/**
 	 * mm (d) month of transfer
 	 */
-	public short									transferMonth;
+	public short	transferMonth;
 
 	/**
 	 * dd (d) day of transfer
 	 */
-	public short									transferDay;
+	public short	transferDay;
 
-	private static final HashMap<String, String>	deviceNames	= new HashMap<String, String>();
-
-	/**
-	 * 
-	 */
-	public CM4XXMDeviceData() {
-
-		deviceNames.put("B735", "HAC4"); //$NON-NLS-1$ //$NON-NLS-2$
-		deviceNames.put("B723", "CM4XXM"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/**
-	 * Converts the decoded device name into the device product name
-	 * 
-	 * @param deviceCodeName
-	 * @return product name
-	 */
-	public static String getDecodedDeviceType(String deviceCodeName) {
-
-		if (deviceNames.containsKey(deviceCodeName)) {
-			return (String) deviceNames.get(deviceCodeName);
-		} else {
-			return (deviceCodeName);
-		}
-	}
+	public CM4XXMDeviceData() {}
 
 	/**
 	 * @param fileRawData
@@ -251,8 +226,6 @@ public class CM4XXMDeviceData {
 		fileRawData.read(buffer);
 		totalTravelTimeHour1 = Short.parseShort(new String(buffer, 0, 2));
 		totalTravelTimeHour2 = Short.parseShort(new String(buffer, 2, 2));
-
-		// dumpData();
 	}
 
 	public void dumpData() {
