@@ -30,12 +30,6 @@ import java.io.RandomAccessFile;
  */
 public class DataUtil {
 
-	public static final int		CICLO_TOUR_DATA_START_POS	= 765;
-	public static final int		CICLO_RECORD_SIZE			= 40;
-	public static final int		CICLO_TOUR_LAST_RECORD_POS	= 81920;
-	public static final int		CICLO_CHECKSUM_POS			= 81925;
-	public static final short	CICLO_TOUR_HAC4_TIMESLICE	= 20;
-	public static final int		CICLO_HAC4_DATA_SIZE		= 81930;
 
 
 	/**
