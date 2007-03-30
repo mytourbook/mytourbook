@@ -39,9 +39,20 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class HAC4DeviceReader extends TourbookDevice {
 
-	private static final byte	HAC4_HARDWARE_ID	= 0x00;
+	private static final int	HARDWARE_ID_HAC4_315	= 0xB735;
+	private static final int	HARDWARE_ID_HAC4_IMP	= 0xB7b4;
 
-	private Calendar			fCalendar			= GregorianCalendar.getInstance();
+	private static final int	RECORD_SIZE				= 40;
+	private static final short	HAC4_TIMESLICE			= 20;
+
+	private static final int	OFFSET_DEVICE_DATA		= 645;
+	private static final int	OFFSET_DATA_START		= 765;
+	private static final int	OFFSET_LAST_RECORD		= 81920;
+	private static final int	OFFSET_CHECKSUM			= 81925;
+
+	private static final int	HAC4_DATA_SIZE			= 81930;
+
+	private Calendar			fCalendar				= GregorianCalendar.getInstance();
 
 	/**
 	 * constructor is used when the plugin is loaded
@@ -51,7 +62,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 	}
 
 	public int getImportDataSize() {
-		return DataUtil.CICLO_HAC4_DATA_SIZE;
+		return HAC4_DATA_SIZE;
 	}
 
 	private TourType getTourType() {
@@ -79,7 +90,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 			fileRawData = new RandomAccessFile(fileName, "r"); //$NON-NLS-1$
 
 			// position file pointer to the device data
-			fileRawData.seek(645);
+			fileRawData.seek(OFFSET_DEVICE_DATA);
 
 			// read device data
 			hac4DeviceData.readFromFile(fileRawData);
@@ -130,7 +141,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 				TourData tourData = new TourData();
 
-				tourData.setDeviceTimeInterval(DataUtil.CICLO_TOUR_HAC4_TIMESLICE);
+				tourData.setDeviceTimeInterval(HAC4_TIMESLICE);
 
 				readStartBlock(fileRawData, tourData);
 
@@ -199,8 +210,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 				while (!recordType.equalsIgnoreCase("CC")) { //$NON-NLS-1$
 
 					// if we reached EOF, position file pointer at the beginning
-					if (fileRawData.getFilePointer() == DataUtil.CICLO_CHECKSUM_POS) {
-						fileRawData.seek(DataUtil.CICLO_TOUR_DATA_START_POS);
+					if (fileRawData.getFilePointer() == OFFSET_CHECKSUM) {
+						fileRawData.seek(OFFSET_DATA_START);
 					}
 
 					// System.out.println(fileRawData.getFilePointer());
@@ -268,10 +279,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 							timeData.altitude = tourData.getStartAltitude();
 							timeData.temperature = temperature;
 							timeData.cadence = cadence;
-
-							// tourData.dumpTime();
-							// timeData.dumpData();
-							// out.println();
 						}
 
 						// add new time slice
@@ -292,7 +299,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 								timeData.marker = marker;
 							}
 
-							timeData.time = DataUtil.CICLO_TOUR_HAC4_TIMESLICE;
+							timeData.time = HAC4_TIMESLICE;
 
 						} else {
 
@@ -300,10 +307,10 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 							if (iData + 1 == iDataMax) {
 								// this is the last time slice
-								timeData.time = (short) (marker % 20);
+								timeData.time = (short) (marker % HAC4_TIMESLICE);
 							} else {
 								// this is a normal time slice
-								timeData.time = DataUtil.CICLO_TOUR_HAC4_TIMESLICE;
+								timeData.time = HAC4_TIMESLICE;
 							}
 						}
 
@@ -316,12 +323,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 						// set distance
 						tourData.setTourDistance(tourData.getTourDistance() + timeData.distance);
-
-						// summarize the driving time
-						// if (timeData.distance > 0) {
-						// tourData.setTourDrivingTime(tourData.getTourDrivingTime()
-						// + timeData.time);
-						// }
 
 						// adjust pulse from relative to absolute
 						totalPulse += timeData.pulse;
@@ -339,11 +340,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 				// after all data are added, the tour id can be created
 				tourData.createTourId();
-
 				tourData.createTimeSeries(timeDataList);
 
 				tourData.setTourType(defaultTourType);
-
 				tourData.computeTourDrivingTime();
 
 				// set week of year
@@ -358,22 +357,22 @@ public class HAC4DeviceReader extends TourbookDevice {
 				 * sure that we get the complete tour with all the records
 				 */
 
-				if (offsetAARecord == DataUtil.CICLO_TOUR_DATA_START_POS) {
+				if (offsetAARecord == OFFSET_DATA_START) {
 					// set position after the end of the tour data
-					offsetAARecord = DataUtil.CICLO_CHECKSUM_POS;
+					offsetAARecord = OFFSET_CHECKSUM;
 				}
 
 				/*
 				 * calculate DD Record of previous tour by starting from the AA
 				 * record of the current tour
 				 */
-				offsetDDRecord = offsetAARecord - DataUtil.CICLO_RECORD_SIZE;
+				offsetDDRecord = offsetAARecord - RECORD_SIZE;
 
 				// make sure we do not advance before the tour data start
 				// position
-				if (offsetDDRecord < DataUtil.CICLO_TOUR_DATA_START_POS) {
+				if (offsetDDRecord < OFFSET_DATA_START) {
 					// set position at the end
-					offsetDDRecord = DataUtil.CICLO_TOUR_LAST_RECORD_POS;
+					offsetDDRecord = OFFSET_LAST_RECORD;
 				}
 
 				// make sure we do not hit the free memory area
@@ -582,21 +581,31 @@ public class HAC4DeviceReader extends TourbookDevice {
 				return false;
 			}
 
-			// check hardware id
-//			if (buffer[4] != HAC4_HARDWARE_ID) {
-//				return false;
-//			}
-
-			int checksum = 0, lastValue = 0;
+			int checksum = 0;
+			int lastValue = 0;
+			int position = buffer.length;
 
 			while (inStream.read(buffer) != -1) {
 				checksum = (checksum + lastValue) & 0xFFFF;
 				lastValue = Integer.parseInt(new String(buffer, 0, 4), 16);
+
+				// check HAC4 device id
+				if (position == OFFSET_DEVICE_DATA) {
+					if ((lastValue == HARDWARE_ID_HAC4_315 || lastValue == HARDWARE_ID_HAC4_IMP) == false) {
+						
+						// file does not contain HAC4 data, force the check sum to be invalid
+						checksum = -1;
+						break;
+					}
+				}
+				position += buffer.length;
+
 			}
 
 			if (checksum == lastValue) {
 				isValid = true;
 			}
+
 		} catch (NumberFormatException nfe) {
 			return false;
 		} catch (FileNotFoundException e) {

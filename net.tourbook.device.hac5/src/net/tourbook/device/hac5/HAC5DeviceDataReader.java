@@ -77,25 +77,78 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return offsetDDRecord;
 	}
 
-	private void dumpBlock(RandomAccessFile file, byte[] recordBuffer) throws IOException {
-		file.seek(file.getFilePointer() - RECORD_LENGTH);
-		dumpBuffer(file, recordBuffer);
-		file.read(recordBuffer);
+	public boolean checkStartSequence(int byteIndex, int newByte) {
+
+		/*
+		 * check if the first 4 bytes are set to AFRO
+		 */
+		if (byteIndex == 0 & newByte == 'A') {
+			return true;
+		}
+		if (byteIndex == 1 & newByte == 'F') {
+			return true;
+		}
+		if (byteIndex == 2 & newByte == 'R') {
+			return true;
+		}
+		if (byteIndex == 3 & newByte == 'O') {
+			return true;
+		}
+
+		return false;
 	}
 
-	private void dumpBuffer(RandomAccessFile file, byte[] recordBuffer) throws IOException {
-		long pos = file.getFilePointer();
-		file.read(recordBuffer);
-		file.seek(pos);
+	public String getDeviceModeName(int profileId) {
 
-		String address = "0000" + Integer.toHexString((int) pos); //$NON-NLS-1$
-		address = address.substring(address.length() - 4);
+		// 0: bike1
+		// 1: bike2
+		// 2: rds
+		// 3: alpine
+		// 4: run
 
-		System.out.println((address + ": ") + DeviceReaderTools.byteArrayToHexString(recordBuffer)); //$NON-NLS-1$
+		switch (profileId) {
+		case 0:
+			return Messages.HAC5_profile_bike1;
+
+		case 1:
+			return Messages.HAC5_profile_bike2;
+
+		case 2:
+			return Messages.HAC5_profile_rds;
+
+		case 3:
+			return Messages.HAC5_profile_alpine;
+
+		case 4:
+			return Messages.HAC5_profile_run;
+
+		default:
+			break;
+		}
+
+		return Messages.HAC5_profile_none;
 	}
 
 	public int getImportDataSize() {
-		return 0xffff;
+		return 0x10007;
+	}
+
+	public SerialParameters getPortParameters(String portName) {
+
+		SerialParameters hac5PortParameters = new SerialParameters(
+				portName,
+				4800,
+				SerialPort.FLOWCONTROL_NONE,
+				SerialPort.FLOWCONTROL_NONE,
+				SerialPort.DATABITS_8,
+				SerialPort.STOPBITS_1,
+				SerialPort.PARITY_NONE);
+
+		return hac5PortParameters;
+	}
+
+	public int getStartSequenceSize() {
+		return 4;
 	}
 
 	public boolean processDeviceData(	String fileName,
@@ -112,18 +165,15 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		// reset tour data list
 		tourDataList.clear();
 
+		boolean isFirstTour = true;
+		short firstTourDay = 1;
+		short firstTourMonth = 1;
+
 		try {
 			File fileRaw = new File(fileName);
 			file = new RandomAccessFile(fileRaw, "r"); //$NON-NLS-1$
 
 			long lastModified = fileRaw.lastModified();
-
-			// dump header
-			// file.seek(OFFSET_RAWDATA + 0x0380);
-			// for (int i = 0; i < 4000; i++) {
-			// dumpBuffer(file, recordBuffer);
-			// file.read(recordBuffer);
-			// }
 
 			/*
 			 * get the year, because the year is not saved in the raw data file,
@@ -149,6 +199,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 			int initialOffsetDDRecord = offsetDDRecord;
 
+			// loop: all tours in the file
 			while (true) {
 
 				// read DD record
@@ -162,11 +213,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				// read AA record
 				int offsetAARecordInDDRecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
 
-				// dump AA block
-				// file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
-				// dumpBuffer(file, recordBuffer);
-
-				// check AA & DD records if they point to each other
+				// check if this is a AA record
 				file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
 				file.read(recordBuffer);
 				if ((recordBuffer[0] & 0xFF) != 0xAA) {
@@ -212,6 +259,15 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				tourData.setStartYear(tourYear);
 
 				/*
+				 * get date from the last tour
+				 */
+				if (isFirstTour) {
+					isFirstTour = false;
+					firstTourDay = tourData.getStartDay();
+					firstTourMonth = tourData.getStartMonth();
+				}
+
+				/*
 				 * read/save BB records
 				 */
 				ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
@@ -228,6 +284,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				boolean isFirstDataRecord = true;
 				boolean isCCRecord = false;
 
+				// loop: all records in current tour
 				while (true) {
 
 					// read BB or CC record
@@ -323,11 +380,6 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 						// adjust altitude from relative to absolute
 						totalAltitude += timeData.altitude;
-
-						tourData.setTourAltUp(tourData.getTourAltUp()
-								+ ((timeData.altitude > 0) ? timeData.altitude : 0));
-						tourData.setTourAltDown(tourData.getTourAltDown()
-								+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
 					}
 
 					// check if the last record was read
@@ -351,12 +403,17 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					break;
 				}
 
-				// after all data are added, the tour id can be created
-				tourData.createTourId();
+				/*
+				 * save DD record data
+				 */
+				readDDRecord(recordBuffer, tourData);
 
+				// after all data are added, create additional data
+				tourData.createTourId();
 				tourData.createTimeSeries(timeDataList);
 
 				tourData.computeTourDrivingTime();
+//				tourData.computeAltitudeUpDown();
 
 				// set week of year
 				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
@@ -400,12 +457,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		}
 
 		if (returnValue) {
-
-			// fImportFileName = fileName;
-
 			deviceData.transferYear = (short) fFileDate.get(Calendar.YEAR);
-			deviceData.transferMonth = (short) (fFileDate.get(Calendar.MONTH) + 1);
-			deviceData.transferDay = (short) fFileDate.get(Calendar.DAY_OF_MONTH);
+			deviceData.transferMonth = firstTourMonth;
+			deviceData.transferDay = firstTourDay;
 		}
 
 		return returnValue;
@@ -467,6 +521,28 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		tourData.setStartPulse((short) (buffer[14] & 0xff));
 	}
 
+	private void readDDRecord(byte[] buffer, TourData tourData) {
+
+		// 00 1 0xDD
+		// 01 1 ?
+		//
+		// 02 2 address of the AA record
+		//
+		// 04 4 ?
+		//
+		// 08 2 tour distance
+		// 10 2 tour altitude up
+		// 12 2 tour altitude down
+		//
+		// 14 1 ?
+		// 15 1 0xFF
+
+		tourData.setTourAltUp(DeviceReaderTools.get2ByteData(buffer, 10));
+		tourData.setTourAltDown(DeviceReaderTools.get2ByteData(buffer, 12));
+		
+		System.out.println("UP: "+DeviceReaderTools.get2ByteData(buffer, 10));
+	}
+
 	/**
 	 * checks if the data file has a valid HAC5 data format
 	 * 
@@ -526,76 +602,6 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		}
 
 		return isValid;
-	}
-
-	public String getDeviceModeName(int profileId) {
-
-		// 0: bike1
-		// 1: bike2
-		// 2: rds
-		// 3: alpine
-		// 4: run
-
-		switch (profileId) {
-		case 0:
-			return Messages.HAC5_profile_bike1;
-
-		case 1:
-			return Messages.HAC5_profile_bike2;
-
-		case 2:
-			return Messages.HAC5_profile_rds;
-
-		case 3:
-			return Messages.HAC5_profile_alpine;
-
-		case 4:
-			return Messages.HAC5_profile_run;
-
-		default:
-			break;
-		}
-
-		return Messages.HAC5_profile_none;
-	}
-
-	public SerialParameters getPortParameters(String portName) {
-
-		SerialParameters hac5PortParameters = new SerialParameters(
-				portName,
-				4800,
-				SerialPort.FLOWCONTROL_NONE,
-				SerialPort.FLOWCONTROL_NONE,
-				SerialPort.DATABITS_8,
-				SerialPort.STOPBITS_1,
-				SerialPort.PARITY_NONE);
-
-		return hac5PortParameters;
-	}
-
-	public boolean checkStartSequence(int byteIndex, int newByte) {
-
-		/*
-		 * check if the first 4 bytes are set to AFRO
-		 */
-		if (byteIndex == 0 & newByte == 'A') {
-			return true;
-		}
-		if (byteIndex == 1 & newByte == 'F') {
-			return true;
-		}
-		if (byteIndex == 2 & newByte == 'R') {
-			return true;
-		}
-		if (byteIndex == 3 & newByte == 'O') {
-			return true;
-		}
-
-		return false;
-	}
-
-	public int getStartSequenceSize() {
-		return 4;
 	}
 
 }

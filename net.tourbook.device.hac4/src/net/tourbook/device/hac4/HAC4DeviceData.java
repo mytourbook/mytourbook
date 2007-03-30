@@ -22,10 +22,8 @@ package net.tourbook.device.hac4;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
-import java.util.HashMap;
 
 import net.tourbook.data.DataUtil;
-
 
 /**
  * Contains all data read from the device except the tour data
@@ -37,178 +35,149 @@ public class HAC4DeviceData {
 	/**
 	 * cccc (h) "B735"
 	 */
-	public String									deviceType;
+	public String	deviceType;
 
 	/**
 	 * pppp (h) wheel perimeter (mm)
 	 */
-	public int										wheelPerimeter;
+	public int		wheelPerimeter;
 
 	/**
 	 * wwww (h) weight (kg)
 	 */
-	public int										personWeight;
+	public int		personWeight;
 
 	/**
 	 * aaaa (h) home altitude (m) "FFFF" not set
-	 * 
 	 */
-	public int										homeAltitude;
+	public int		homeAltitude;
 
 	/**
 	 * bbbb (h) 1. pulse upper bound (bpm)
 	 */
-	public int										pulse1UpperBound;
+	public int		pulse1UpperBound;
 
 	/**
 	 * cccc (h) 1. pulse lower bound (bpm)
 	 */
-	public int										pulse1LowerBound;
+	public int		pulse1LowerBound;
 
 	/**
 	 * dddd (h) 2. pulse upper bound (bpm)
 	 */
-	public int										pulse2UpperBound;
+	public int		pulse2UpperBound;
 
 	/**
 	 * eeee (h) 2. pulse lower bound (bpm)
 	 */
-	public int										pulse2LowerBound;
+	public int		pulse2LowerBound;
 
 	/**
 	 * aa (d) 1. count down minutes
 	 */
-	public short									count1min;
+	public short	count1min;
 
 	/**
 	 * bb (d) 1. count down seconds
 	 */
-	public short									count1sec;
+	public short	count1sec;
 
 	/**
 	 * cc (d) 2. count down minutes
 	 */
-	public short									count2min;
+	public short	count2min;
 
 	/**
 	 * dd (d) 2. count down seconds
 	 */
-	public short									count2sec;
+	public short	count2sec;
 
 	/**
 	 * llll (h) total distance at end of last tour (km) * 2^16
 	 */
-	public int										totalDistanceHigh;
+	public int		totalDistanceHigh;
 
 	/**
 	 * kkkk (h) total distance at end of last tour (km)
 	 */
-	public int										totalDistanceLow;
+	public int		totalDistanceLow;
 
 	/**
 	 * eeee (h) altitude error correction
 	 */
-	public int										altitudeError;
+	public int		altitudeError;
 
 	/**
 	 * uuuu (h) total altitude up at end of last tour (m)
 	 */
-	public int										totalAltitudeUp;
+	public int		totalAltitudeUp;
 
 	/**
 	 * dddd (h) total altitude down at end of last tour (m)
 	 */
-	public int										totalAltitudeDown;
+	public int		totalAltitudeDown;
 
 	/**
 	 * aaaa (h) max altitude (m)
 	 */
-	public int										maxAltitude;
+	public int		maxAltitude;
 
 	/**
 	 * hh (d) hour of total travel time
 	 */
-	public short									totalTravelTimeHourLow;
+	public short	totalTravelTimeHourLow;
 
 	/**
 	 * HH (d) hour of total travel time * 100
 	 */
-	public short									totalTravelTimeHourHigh;
+	public short	totalTravelTimeHourHigh;
 
 	/**
 	 * ss (d) seconds of total travel time
 	 */
-	public short									totalTravelTimeSec;
+	public short	totalTravelTimeSec;
 
 	/**
 	 * mm (d) minute of total travel time
 	 */
-	public short									totalTravelTimeMin;
+	public short	totalTravelTimeMin;
 
 	/**
 	 * oooo (h) next free memory offset
 	 */
-	public int										offsetNextMemory;
+	public int		offsetNextMemory;
 
 	/**
 	 * cccc (o) offset of last CC-record
 	 */
-	public int										offsetCCRecord;
+	public int		offsetCCRecord;
 
 	/**
 	 * dddd (o) offset of last DD-record
 	 */
-	public int										offsetDDRecord;
+	public int		offsetDDRecord;
 
 	/**
 	 * eeee (o) offset of last compare record
 	 */
-	public int										offsetCompareRecord;
+	public int		offsetCompareRecord;
 
 	/**
 	 * yyyy (d) year of transfer
 	 */
-	public short									transferYear;
+	public short	transferYear;
 
 	/**
 	 * mm (d) month of transfer
 	 */
-	public short									transferMonth;
+	public short	transferMonth;
 
 	/**
 	 * dd (d) day of transfer
 	 */
-	public short									transferDay;
+	public short	transferDay;
 
-
-	private static final HashMap<String, String>	deviceNames	= new HashMap<String, String>();
-
-
-	/**
-	 * 
-	 */
-	public HAC4DeviceData() {
-
-		deviceNames.put("B735", "HAC4"); //$NON-NLS-1$ //$NON-NLS-2$
-		deviceNames.put("B723", "CM414M"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-
-	/**
-	 * Converts the decoded device name into the device product name
-	 * 
-	 * @param deviceCodeName
-	 * @return product name
-	 */
-	public static String getDecodedDeviceType(String deviceCodeName) {
-
-		if (deviceNames.containsKey(deviceCodeName)) {
-			return (String) deviceNames.get(deviceCodeName);
-		} else {
-			return (deviceCodeName);
-		}
-	}
-
+	public HAC4DeviceData() {}
 
 	/**
 	 * @param fileRawData
@@ -216,8 +185,7 @@ public class HAC4DeviceData {
 	 * @throws NumberFormatException
 	 */
 	public void readFromFile(RandomAccessFile fileRawData) throws IOException,
-			NumberFormatException
-	{
+			NumberFormatException {
 
 		byte[] buffer = new byte[5];
 
@@ -292,10 +260,9 @@ public class HAC4DeviceData {
 		offsetCCRecord = DataUtil.readFileOffset(fileRawData, buffer);
 		offsetDDRecord = DataUtil.readFileOffset(fileRawData, buffer);
 		offsetCompareRecord = DataUtil.readFileOffset(fileRawData, buffer);
-		
-//		dumpData();
-	}
 
+		// dumpData();
+	}
 
 	public void dumpData() {
 
@@ -326,8 +293,10 @@ public class HAC4DeviceData {
 		out.println("Total altitude up:		" + totalAltitudeUp + " m"); //$NON-NLS-1$ //$NON-NLS-2$
 		out.println("Total altitude down:		" + totalAltitudeDown + " m"); //$NON-NLS-1$ //$NON-NLS-2$
 		out.println("Total travel time: 		" //$NON-NLS-1$
-				+ ((totalTravelTimeHourHigh * 100) + totalTravelTimeHourLow) + ":" //$NON-NLS-1$
-				+ totalTravelTimeMin + ":" + totalTravelTimeSec); //$NON-NLS-1$
+				+ ((totalTravelTimeHourHigh * 100) + totalTravelTimeHourLow)
+				+ ":" //$NON-NLS-1$
+				+ totalTravelTimeMin
+				+ ":" + totalTravelTimeSec); //$NON-NLS-1$
 		out.println();
 		out.println("Offset last CC record:		" + offsetCCRecord); //$NON-NLS-1$
 		out.println("Offset last DD record:		" + offsetDDRecord); //$NON-NLS-1$
@@ -335,6 +304,5 @@ public class HAC4DeviceData {
 		out.println("Offset compare record:		" + offsetCompareRecord); //$NON-NLS-1$
 
 	}
-
 
 }

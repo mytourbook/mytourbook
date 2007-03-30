@@ -125,6 +125,13 @@ public class DeviceReaderTools {
 		return byte2 + byte1;
 	}
 
+	/**
+	 * @param buffer
+	 *        buffer where the data are stored
+	 * @param offset
+	 *        position in the buffer where the data are read
+	 * @return
+	 */
 	public static long get4ByteData(byte[] buffer, int offset) {
 		long byte1 = (buffer[offset] & 0xFF) << 0;
 		long byte2 = (buffer[offset + 1] & 0xFF) << 8;
