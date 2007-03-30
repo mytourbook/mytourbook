@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="net.tourbook.deviceDataReader">
+         <device
+            class="net.tourbook.device.cm4xxm.CM4XXMDeviceReader"
+            fileextension="dat"
+            id="net.tourbook.device.CM4XXMDeviceReader"
+            name="CM4XXM"/>
+   </extension>
+
+</plugin>
