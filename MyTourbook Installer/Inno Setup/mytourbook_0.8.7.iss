@@ -8,9 +8,11 @@ DefaultDirName={pf}\MyTourbook
 OutputBaseFilename=mytourbook_0.8.7_setup
 VersionInfoVersion=0.8.7
 VersionInfoCompany=MyTourbook
+AppCopyright=Wolfgang Schramm
+AppID={{37852811-BC7D-411C-8122-E69CCA892582}
 
 [Files]
-Source: F:\MyTourbook Product\0.8.7\mytourbook_0.8.7.beta1\mytourbook_0.8.7.beta1\*; DestDir: {app}; Flags: recursesubdirs
+Source: F:\MyTourbook Product\0.8.7\mytourbook_0.8.7.beta1\mytourbook_0.8.7.beta1\*; DestDir: {app}; Flags: recursesubdirs nocompression
 
 [InstallDelete]
 Name: {app}\*; Type: files
@@ -19,6 +21,7 @@ Name: {app}\features; Type: filesandordirs
 Name: {app}\plugins; Type: filesandordirs
 Name: {app}\workspace; Type: filesandordirs
 Name: {app}; Type: dirifempty
+Name: {userappdata}\..\mytourbook\org.eclipse.osgi\splash.bmp; Type: files; Tasks: ; Languages: 
 
 [Icons]
 Name: {group}\MyTourbook; Filename: {app}\mytourbook.exe; IconFilename: {app}\mytourbook.exe
@@ -33,8 +36,13 @@ Name: desktopicon\common; Description: {cm:AllUsers}; GroupDescription: {cm:Grou
 Name: desktopicon\user; Description: {cm:CurrentUser}; GroupDescription: {cm:GroupCreateIcons}; Flags: exclusive unchecked
 Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}
 
+
 [Run]
 Filename: {app}\mytourbook.exe; WorkingDir: {app}; Description: {cm:StartMyTourbook}; Flags: postinstall nowait
+
+[UninstallDelete]
+Name: {userappdata}\..\mytourbook\*; Type: filesandordirs
+Name: {userappdata}\..\mytourbook\; Type: dirifempty
 
 [Languages]
 Name: de; MessagesFile: compiler:Languages\German.isl; LicenseFile: M:\home\user081647\mytourbook-workspace-TRUNK\net.tourbook\gpl-de.rtf
