@@ -172,11 +172,11 @@ public class WizardImportData extends Wizard {
 	private boolean importData() {
 
 		Combo comboPorts = fPageImportSettings.fComboPorts;
-		
+
 		if (comboPorts.isDisposed()) {
 			return false;
 		}
-		
+
 		/*
 		 * get port name
 		 */
@@ -347,17 +347,14 @@ public class WizardImportData extends Wizard {
 		// truncate databuffer
 		fRawDataBuffer.reset();
 
-		int iTimeout = 0;
-		int iReceivedData = 0;
+		int receiveTimeout = 0;
+		int receiveTimer = 0;
+		int receivedData = 0;
 		boolean isReceivingStarted = false;
 
 		fCloseDialog = false;
 
 		int importDataSize = fImportDevice.getImportDataSize();
-		// convert baud -> bytes, baud contains startbit + 8 databits + stopbit
-		// int byteRate =
-		// fImportDevice.getPortParameters(portName).getBaudRate() / 10;
-		// int maxSeconds = importDataSize / byteRate;
 		int timer = 0;
 
 		// start the port thread which reads data from the com port
@@ -369,11 +366,11 @@ public class WizardImportData extends Wizard {
 		portThread.start();
 
 		/*
-		 * wait for the data thread, terminate after a certain time (300 x 100
-		 * milliseconds = 30 seconds)
+		 * wait for the data thread, terminate after a certain time (600 x 100
+		 * milliseconds = 60 seconds)
 		 */
 
-		while (iTimeout < RECEIVE_TIMEOUT) {
+		while (receiveTimeout < RECEIVE_TIMEOUT) {
 
 			try {
 				Thread.sleep(100);
@@ -384,16 +381,16 @@ public class WizardImportData extends Wizard {
 			if (isReceivingStarted == false) {
 				monitor.subTask(NLS.bind(
 						Messages.ImportWizard_Monitor_wait_for_data,
-						(RECEIVE_TIMEOUT / 10 - (iTimeout / 10))));
+						(RECEIVE_TIMEOUT / 10 - (receiveTimeout / 10))));
 			}
 
 			int rawDataSize = fRawDataBuffer.size();
 
 			/*
-			 * if receiving data has started and no more data are coming in stop
-			 * receiving additional data
+			 * if receiving data was started and no more data are coming in,
+			 * stop receiving additional data
 			 */
-			if (isReceivingStarted && rawDataSize == iReceivedData) {
+			if (isReceivingStarted && receiveTimer == 10 & rawDataSize == receivedData) {
 				break;
 			}
 
@@ -409,30 +406,32 @@ public class WizardImportData extends Wizard {
 			}
 
 			// check if new data are arrived
-			if (rawDataSize > iReceivedData) {
+			if (rawDataSize > receivedData) {
 
 				// set status that receiving of the data has been started
 				isReceivingStarted = true;
 				timer++;
 
 				// reset timeout if data are being received
-				iTimeout = 0;
+				receiveTimeout = 0;
+				receiveTimer = 0;
 
 				// advance progress monitor
-				monitor.worked(rawDataSize - iReceivedData);
+				monitor.worked(rawDataSize - receivedData);
 
 				// display the bytes which have been received
 				monitor.subTask(NLS.bind(
 						Messages.ImportWizard_Monitor_task_received_bytes,
 						new Object[] {
-								Integer.toString(iReceivedData * 100 / importDataSize),
+								Integer.toString(receivedData * 100 / importDataSize),
 								Integer.toString(timer / 10),
-								Integer.toString(iReceivedData) }));
+								Integer.toString(receivedData) }));
 			}
 
-			iTimeout++;
+			receiveTimeout++;
+			receiveTimer++;
 
-			iReceivedData = rawDataSize;
+			receivedData = rawDataSize;
 		}
 
 		// tell the port listener thread to stop

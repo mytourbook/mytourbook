@@ -252,6 +252,7 @@ public class RawDataManager {
 	public void updatePersonInRawData() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				EntityManager em = TourDatabase.getInstance().getEntityManager();
