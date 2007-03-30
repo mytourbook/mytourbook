@@ -540,7 +540,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		tourData.setTourAltUp(DeviceReaderTools.get2ByteData(buffer, 10));
 		tourData.setTourAltDown(DeviceReaderTools.get2ByteData(buffer, 12));
 		
-		System.out.println("UP: "+DeviceReaderTools.get2ByteData(buffer, 10));
+//		System.out.println("UP: "+DeviceReaderTools.get2ByteData(buffer, 10));
 	}
 
 	/**
