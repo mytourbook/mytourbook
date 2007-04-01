@@ -2,19 +2,32 @@
 
 <project name="net.tourbook" default="restructure-app-bundle" basedir=".">
 
-	<property name="build2.dir"	location="F:\MyTourbook Product\0.8.4\macosx.carbon.ppc\mytourbook" />
-	<property name="build.dir"	location="F:\MyTourbook Product\0.8.4\macosx.carbon.x86\mytourbook" />
+	<property name="build.ppc.dir"	location="F:\MyTourbook Product\0.8.7\mytourbook_0.8.7.macosx.carbon.ppc\mytourbook" />
 	
-	<property name="app.dir" location="${build.dir}/mytourbook.app" />
-	<property name="java.dir" location="${app.dir}/Contents/Resources/Java" />
+	<property name="build.ppc.dir"	location="F:\MyTourbook Product\0.8.7\mytourbook_0.8.7.macosx.carbon.ppc\mytourbook" />	
+	<property name="app.ppc.dir" location="${build.ppc.dir}/mytourbook.app" />
+	<property name="java.ppc.dir" location="${app.ppc.dir}/Contents/Resources/Java" />
+
+	<property name="build.x86.dir"	location="F:\MyTourbook Product\0.8.7\mytourbook_0.8.7.macosx.carbon.x86\mytourbook" />	
+	<property name="app.x86.dir" location="${build.x86.dir}/mytourbook.app" />
+	<property name="java.x86.dir" location="${app.x86.dir}/Contents/Resources/Java" />
 
 	<target name="restructure-app-bundle">
-		<mkdir dir="${java.dir}" />
-		<move todir="${java.dir}">
-			<fileset dir="${build.dir}">
+
+		<mkdir dir="${java.ppc.dir}" />
+		<move todir="${java.ppc.dir}">
+			<fileset dir="${build.ppc.dir}">
 				<exclude name="mytourbook.app/**" />
 			</fileset>
 		</move>
+
+		<mkdir dir="${java.x86.dir}" />
+		<move todir="${java.x86.dir}">
+			<fileset dir="${build.x86.dir}">
+				<exclude name="mytourbook.app/**" />
+			</fileset>
+		</move>
+
 	</target>
 
 </project>

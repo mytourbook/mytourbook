@@ -1,18 +1,27 @@
 [Setup]
-OutputDir=M:\home\user081647\mytourbook-workspace-TRUNK\MyTourbook Installer\Inno Setup
 AppName=MyTourbook
-AppVerName=MyTourbook Version 0.8.7
-LicenseFile=M:\home\user081647\mytourbook-workspace-TRUNK\net.tourbook\gpl.txt
-DefaultGroupName=MyTourbook
-DefaultDirName={pf}\MyTourbook
-OutputBaseFilename=mytourbook_0.8.7_setup
-VersionInfoVersion=0.8.7
-VersionInfoCompany=MyTourbook
-AppCopyright=Wolfgang Schramm
+AppVerName=MyTourbook 0.8.7
+AppCopyright=Wolfgang Schramm 2005, 2007
 AppID={{37852811-BC7D-411C-8122-E69CCA892582}
 
+LicenseFile=M:\home\user081647\mytourbook-workspace-TRUNK\net.tourbook\gpl.txt
+
+OutputDir=F:\MyTourbook Product\0.8.7
+OutputBaseFilename=mytourbook_0.8.7_setup
+
+DefaultGroupName=MyTourbook
+DefaultDirName={pf}\MyTourbook
+
+VersionInfoVersion=0.8.7
+VersionInfoCompany=MyTourbook
+
+WizardImageBackColor=clWhite
+WizardSmallImageFile=M:\home\user081647\mytourbook-workspace-TRUNK\net.tourbook\icons\tourbook48-32-white.bmp
+
+LanguageDetectionMethod=locale
+
 [Files]
-Source: F:\MyTourbook Product\0.8.7\mytourbook_0.8.7.beta1\mytourbook_0.8.7.beta1\*; DestDir: {app}; Flags: recursesubdirs nocompression
+Source: F:\MyTourbook Product\0.8.7\mytourbook_0.8.7.win32.win32.x86\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages: 
 
 [InstallDelete]
 Name: {app}\*; Type: files
@@ -28,7 +37,7 @@ Name: {group}\MyTourbook; Filename: {app}\mytourbook.exe; IconFilename: {app}\my
 Name: {group}\Uninstall MyTourbook; Filename: {app}\{uninstallexe}; IconFilename: {uninstallexe}
 Name: {commondesktop}\MyTourbook; Filename: {app}\mytourbook.exe; IconFilename: {app}\mytourbook.exe; WorkingDir: {app}; Tasks: desktopicon\common
 Name: {userdesktop}\MyTourbook; Filename: {app}\mytourbook.exe; IconFilename: {app}\mytourbook.exe; WorkingDir: {app}; Tasks: desktopicon\user
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\MyTourbook; Filename: {app}\MyTourbook.exe; WorkingDir: {app}; Tasks: 
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\MyTourbook; Filename: {app}\MyTourbook.exe; WorkingDir: {app}; Tasks: " quicklaunchicon"
 
 [Tasks]
 Name: desktopicon; Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:GroupCreateIcons}
@@ -39,10 +48,6 @@ Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}
 
 [Run]
 Filename: {app}\mytourbook.exe; WorkingDir: {app}; Description: {cm:StartMyTourbook}; Flags: postinstall nowait
-
-[UninstallDelete]
-Name: {userappdata}\..\mytourbook\*; Type: filesandordirs
-Name: {userappdata}\..\mytourbook\; Type: dirifempty
 
 [Languages]
 Name: de; MessagesFile: compiler:Languages\German.isl; LicenseFile: M:\home\user081647\mytourbook-workspace-TRUNK\net.tourbook\gpl-de.rtf

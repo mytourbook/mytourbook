@@ -283,6 +283,11 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 						// adjust altitude from relative to absolute
 						totalAltitude += timeData.altitude;
+
+						tourData.setTourAltUp(tourData.getTourAltUp()
+								+ ((timeData.altitude > 0) ? timeData.altitude : 0));
+						tourData.setTourAltDown(tourData.getTourAltDown()
+								+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
 					}
 
 					// check if the last record was read
@@ -311,7 +316,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				tourData.createTimeSeries(timeDataList);
 
 				tourData.computeTourDrivingTime();
-				tourData.computeAltitudeUpDown();
+				computeTourAltitudeUpDown(tourData);
 
 				// set week of year
 				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
@@ -365,6 +370,46 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		return returnValue;
 	}
 
+	public void computeTourAltitudeUpDown(TourData tourData) {
+
+		int[] altitudeSerie = tourData.altitudeSerie;
+		
+		if (altitudeSerie.length < 2) {
+			return;
+		}
+
+		float altUp = 0f;
+		float altDown = 0f;
+
+		int lastAltitude1 = altitudeSerie[0];
+		int lastAltitude2 = altitudeSerie[1];
+
+		int logUp = 0;
+		int logDown = 0;
+
+		for (int altitude : altitudeSerie) {
+
+			if (lastAltitude1 == lastAltitude2 + 1 & altitude == lastAltitude1) {
+				// altUp += 0.5f;
+				logUp++;
+			} else if (lastAltitude1 == lastAltitude2 - 1 & altitude == lastAltitude1) {
+				// altDown += 0.5f;
+				logDown++;
+			} else if (altitude > lastAltitude2) {
+				altUp += altitude - lastAltitude2;
+			} else if (altitude < lastAltitude2) {
+				altDown += lastAltitude2 - altitude;
+			}
+
+			lastAltitude1 = lastAltitude2;
+			lastAltitude2 = altitude;
+		}
+
+		tourData.setTourAltUp((int) altUp);
+		tourData.setTourAltDown((int) altDown);
+
+		//		System.out.println("Up: " + logUp + "  Down: " + logDown);
+	}
 	/**
 	 * @param buffer
 	 * @param tourData

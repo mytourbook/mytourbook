@@ -949,7 +949,7 @@ public class TourData {
 
 	}
 
-	public void computeAltitudeUpDown() {
+	public void computeTourAltitudeUpDown() {
 
 		if (altitudeSerie.length < 2) {
 			return;
@@ -984,7 +984,6 @@ public class TourData {
 
 		tourAltUp = (int) altUp;
 		tourAltDown = (int) altDown;
-
 //		System.out.println("Up: " + logUp + "  Down: " + logDown);
 	}
 

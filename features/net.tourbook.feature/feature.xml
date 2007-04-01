@@ -363,8 +363,7 @@ Public License instead of this License.
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="net.tourbook.ejb3"/>
-      <import plugin="net.tourbook.rxtx"/>
+      <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="org.apache.derby.core"/>
       <import plugin="org.eclipse.update.ui"/>
    </requires>

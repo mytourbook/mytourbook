@@ -7,7 +7,7 @@
             class="net.tourbook.device.cm4xxm.CM4XXMDeviceReader"
             fileextension="dat"
             id="net.tourbook.device.CM4XXMDeviceReader"
-            name="CM4XXM"/>
+            name="CM4xxM"/>
    </extension>
 
 </plugin>
