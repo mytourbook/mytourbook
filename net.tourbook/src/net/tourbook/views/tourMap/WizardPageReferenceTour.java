@@ -260,6 +260,7 @@ public class WizardPageReferenceTour extends WizardPage {
 			xData.setMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
 
 			fChartGroup.setText(NLS.bind(refTour.getLabel()
+					+ ": "
 					+ Messages.TourMapWizard_Group_chart_title, TourManager.getTourDate(tourData)));
 
 			fRefTourChart.setChartDataModel(chartDataModel);

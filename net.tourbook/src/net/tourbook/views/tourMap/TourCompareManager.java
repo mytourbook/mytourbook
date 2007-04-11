@@ -25,6 +25,7 @@ import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -338,7 +339,6 @@ public class TourCompareManager {
 
 		// get the end point in the compare tour
 		int compareIndexEnd = compareIndexStart;
-		int noSpeed = 0;
 		int oldDistance = compareTourDataDistance[compareIndexEnd];
 		for (; compareIndexEnd < compareTourDataDistance.length; compareIndexEnd++) {
 			if (compareTourDataDistance[compareIndexEnd] >= compDistanceEnd) {
@@ -347,13 +347,10 @@ public class TourCompareManager {
 
 			int newDistance = compareTourDataDistance[compareIndexEnd];
 
-			if (oldDistance == newDistance) {
-				noSpeed++;
-			} else {
+			if (oldDistance == newDistance) {} else {
 				oldDistance = newDistance;
 			}
 		}
-
 		compareIndexEnd = Math.min(compareIndexEnd, compareTourDataDistance.length - 1);
 
 		int distance = compareTourDataDistance[compareIndexEnd]
@@ -363,7 +360,12 @@ public class TourCompareManager {
 
 		// remove the breaks from the time
 		int timeInterval = compareTourDataTime[1] - compareTourDataTime[0];
-		time = time - (noSpeed * timeInterval);
+		int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(
+				compareTourDataTime,
+				compareIndexStart,
+				compareIndexEnd,
+				10 / timeInterval);
+		time = time - (ignoreTimeSlices * timeInterval);
 
 		// // overwrite the changed data series
 		// compareTourData.distanceSerie =

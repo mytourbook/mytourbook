@@ -1045,21 +1045,14 @@ public class CompareResultView extends SynchedChartView {
 
 		int time = (timeValues[movedXMarkerEndValueIndex] - timeValues[movedXMarkerStartValueIndex]);
 
-		// find the pauses in the tour
-		int noSpeed = 0;
-		int oldDistance = distanceValues[movedXMarkerStartValueIndex];
-		for (int valueIndex = movedXMarkerStartValueIndex; valueIndex <= movedXMarkerEndValueIndex; valueIndex++) {
-			int newDistance = distanceValues[valueIndex];
-			if (oldDistance == newDistance) {
-				noSpeed++;
-			} else {
-				oldDistance = newDistance;
-			}
-		}
-
 		// adjust the time by removing the breaks
 		int timeInterval = timeValues[1] - timeValues[0];
-		fCurrentTTICompareResult.compareTime = time - (noSpeed * timeInterval);
+		int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(
+				timeValues,
+				movedXMarkerStartValueIndex,
+				movedXMarkerEndValueIndex,
+				10 / timeInterval);
+		fCurrentTTICompareResult.compareTime = time - (ignoreTimeSlices * timeInterval);
 
 		// update the chart
 		ChartDataXSerie xData = chartDataModel.getXData();

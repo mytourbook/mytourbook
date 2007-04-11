@@ -119,9 +119,9 @@ public class TourMapView extends SynchedChartView {
 	public static final int							COLUMN_SPEED			= 1;
 
 	/**
-	 * This memento allows this view to save and restore state when it is closed
-	 * and opened within a session. A different memento is supplied by the
-	 * platform for persistance at workbench shutdown.
+	 * This memento allows this view to save and restore state when it is closed and opened within a
+	 * session. A different memento is supplied by the platform for persistance at workbench
+	 * shutdown.
 	 */
 	private static IMemento							fSessionMemento			= null;
 
@@ -194,8 +194,7 @@ public class TourMapView extends SynchedChartView {
 	private Color									fColorTourBg;
 
 	/**
-	 * contains TVTITourMapComparedTour objects, these are the tours for the
-	 * selected year
+	 * contains TVTITourMapComparedTour objects, these are the tours for the selected year
 	 */
 	private Object[]								fYearMapTours;
 
@@ -671,8 +670,7 @@ public class TourMapView extends SynchedChartView {
 	}
 
 	/**
-	 * Recursive !!! method to walk down the tour tree items and find the
-	 * compared tours
+	 * Recursive !!! method to walk down the tour tree items and find the compared tours
 	 * 
 	 * @param parentItem
 	 * @param findCompIds
@@ -968,8 +966,7 @@ public class TourMapView extends SynchedChartView {
 				if (fActiveTourChart != null) {
 
 					/*
-					 * listen for x-slider position changes which can be done in
-					 * the marker view
+					 * listen for x-slider position changes which can be done in the marker view
 					 */
 					if (selection instanceof SelectionChartXSliderPosition) {
 						fActiveTourChart
@@ -1039,8 +1036,8 @@ public class TourMapView extends SynchedChartView {
 			if (fActiveComparedTour != compItem) {
 
 				/*
-				 * show the ref tour and synch the marked area in the ref chart
-				 * with the compare tour chart
+				 * show the ref tour and synch the marked area in the ref chart with the compare
+				 * tour chart
 				 */
 				refId = compItem.getRefId();
 
@@ -1110,8 +1107,8 @@ public class TourMapView extends SynchedChartView {
 			// min/max values have not yet been saved
 
 			/*
-			 * set the min value 10% below the computed so that the lowest value
-			 * is not at the bottom
+			 * set the min value 10% below the computed so that the lowest value is not at the
+			 * bottom
 			 */
 			yData.setMinValue(dataMinValue);
 			yData.setMaxValue(dataMaxValue);
@@ -1122,8 +1119,8 @@ public class TourMapView extends SynchedChartView {
 		} else {
 
 			/*
-			 * restore min/max values, but make sure min/max values for the
-			 * current graph are visible and not outside of the chart
+			 * restore min/max values, but make sure min/max values for the current graph are
+			 * visible and not outside of the chart
 			 */
 
 			refItem.yearMapMinValue = Math.min(refItem.yearMapMinValue, dataMinValue);
@@ -1288,23 +1285,14 @@ public class TourMapView extends SynchedChartView {
 				int time = timeValues[movedXMarkerEndValueIndex]
 						- timeValues[movedXMarkerStartValueIndex];
 
-				// find the pauses in the tour
-				int noSpeed = 0;
-				int oldDistance = distanceValues[movedXMarkerStartValueIndex];
-				for (int valueIndex = movedXMarkerStartValueIndex; valueIndex <= movedXMarkerEndValueIndex; valueIndex++) {
-
-					final int newDistance = distanceValues[valueIndex];
-
-					if (oldDistance == newDistance) {
-						noSpeed++;
-					} else {
-						oldDistance = newDistance;
-					}
-				}
-
 				// adjust the time by removing the breaks
 				final int timeInterval = timeValues[1] - timeValues[0];
-				time = time - (noSpeed * timeInterval);
+				int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(
+						timeValues,
+						movedXMarkerStartValueIndex,
+						movedXMarkerEndValueIndex,
+						10 / timeInterval);
+				time = time - (ignoreTimeSlices * timeInterval);
 
 				tourSpeed = compTour.setTourSpeed(distance, time);
 
