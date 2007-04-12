@@ -41,17 +41,17 @@ import org.eclipse.swt.graphics.RGB;
 
 public class TourManager {
 
-	public static final String	CUSTOM_DATA_TIME		= "time"; //$NON-NLS-1$
-	public static final String	CUSTOM_DATA_DISTANCE	= "distance"; //$NON-NLS-1$
-	public static final String	CUSTOM_DATA_ALTITUDE	= "altitude"; //$NON-NLS-1$
-	public static final String	CUSTOM_DATA_SPEED		= "speed"; //$NON-NLS-1$
-	public static final String	CUSTOM_DATA_GRADIENT	= "gradient"; //$NON-NLS-1$
-	public static final String	CUSTOM_DATA_ALTIMETER	= "altimeter"; //$NON-NLS-1$
-	public static final String	CUSTOM_DATA_PULSE		= "pulse"; //$NON-NLS-1$
+	public static final String	CUSTOM_DATA_TIME		= "time";			//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_DISTANCE	= "distance";		//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_ALTITUDE	= "altitude";		//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_SPEED		= "speed";			//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_GRADIENT	= "gradient";		//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_ALTIMETER	= "altimeter";		//$NON-NLS-1$
+	public static final String	CUSTOM_DATA_PULSE		= "pulse";			//$NON-NLS-1$
 
-	public static final String	ANALYZER_INFO			= "AnalyzerInfo"; //$NON-NLS-1$
-	public static final String	X_AXIS_TIME				= "time"; //$NON-NLS-1$
-	public static final String	X_AXIS_DISTANCE			= "distance"; //$NON-NLS-1$
+	public static final String	ANALYZER_INFO			= "AnalyzerInfo";	//$NON-NLS-1$
+	public static final String	X_AXIS_TIME				= "time";			//$NON-NLS-1$
+	public static final String	X_AXIS_DISTANCE			= "distance";		//$NON-NLS-1$
 
 	public static final int		GRAPH_ALTITUDE			= 1000;
 	public static final int		GRAPH_SPEED				= 1001;
@@ -76,8 +76,7 @@ public class TourManager {
 	private TourManager() {}
 
 	/**
-	 * create the tour chart configuration by reading the settings from the
-	 * preferences
+	 * create the tour chart configuration by reading the settings from the preferences
 	 * 
 	 * @return
 	 */
@@ -480,8 +479,8 @@ public class TourManager {
 			chartDataModel.addXyData(xDataDistance);
 
 			/*
-			 * when time is displayed, the x-axis can show the start time
-			 * starting from 0 or from the current time of the day
+			 * when time is displayed, the x-axis can show the start time starting from 0 or from
+			 * the current time of the day
 			 */
 			xDataTime.setStartValue(chartConfig.isStartTime ? (tourData.getStartHour() * 3600)
 					+ (tourData.getStartMinute() * 60) : 0);
@@ -625,8 +624,8 @@ public class TourManager {
 		chartDataModel.addXyData(yDataTemperature);
 
 		/*
-		 * all visible graphs are added as y-data to the chart data fDataModel
-		 * in the sequence as they were activated
+		 * all visible graphs are added as y-data to the chart data fDataModel in the sequence as
+		 * they were activated
 		 */
 		for (final int actionId : chartConfig.getVisibleGraphs()) {
 
@@ -676,8 +675,8 @@ public class TourManager {
 	}
 
 	/**
-	 * adjust the min/max values to make them more visible and not at the same
-	 * position as the x-axis or the top of the chart
+	 * adjust the min/max values to make them more visible and not at the same position as the
+	 * x-axis or the top of the chart
 	 */
 	private void adjustMinMax(final ChartDataYSerie yData) {
 
@@ -766,8 +765,7 @@ public class TourManager {
 	}
 
 	/**
-	 * the speed must be interpolated for low time intervals because the
-	 * smallest distance is 10 m
+	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
 	 * 
 	 * @param tourData
 	 */
@@ -836,8 +834,7 @@ public class TourManager {
 	}
 
 	/**
-	 * the speed must be interpolated for low time intervals because the
-	 * smallest distance is 10 m
+	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
 	 * 
 	 * @param tourData
 	 */
@@ -1033,32 +1030,32 @@ public class TourManager {
 	}
 
 	/**
-	 * calculate the driving time, ignore the time when the distance is 0 within
-	 * a time period which is defined by <code>sliceMin</code>
+	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
+	 * is defined by <code>sliceMin</code>
 	 * 
 	 * @param distanceValues
-	 * @param valuesIndexLeft
-	 * @param valuesIndexRight
+	 * @param indexLeft
+	 * @param indexRight
 	 * @param sliceMin
 	 * @return Returns the number of slices which can be ignored
 	 */
-	public int getIgnoreTimeSlices(final int[] distanceValues,
-									int valuesIndexLeft,
-									int valuesIndexRight,
+	public int getIgnoreTimeSlices(	final int[] distanceValues,
+									int indexLeft,
+									int indexRight,
 									int sliceMin) {
 		int ignoreTimeCounter = 0;
 		int oldDistance = 0;
 		sliceMin = Math.max(sliceMin, 1);
 
-		for (int valueIndex = valuesIndexLeft; valueIndex <= valuesIndexRight; valueIndex++) {
+		for (int valueIndex = indexLeft; valueIndex <= indexRight; valueIndex++) {
 
 			if (distanceValues[valueIndex] == oldDistance) {
 				ignoreTimeCounter++;
 			}
-			
-			int oldIndex = valueIndex-sliceMin;
-			if (oldIndex<0) {
-				oldIndex=0;
+
+			int oldIndex = valueIndex - sliceMin;
+			if (oldIndex < 0) {
+				oldIndex = 0;
 			}
 			oldDistance = distanceValues[oldIndex];
 		}

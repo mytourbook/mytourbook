@@ -35,10 +35,9 @@ public class ActionAdjustAltitude extends Action {
 
 	private TreeViewer				fTreeViewer;
 	private TourChart				fTreeTourChart;
+	private long					fTreeTourId;
 
 	private AdjustAltitudeDialog	fDialog;
-
-	private long					fTreeTourId;
 
 	public ActionAdjustAltitude(TourChart tourChart) {
 
@@ -72,22 +71,13 @@ public class ActionAdjustAltitude extends Action {
 			return;
 		}
 
-		if (fDialog.open() == Window.CANCEL) {
-			return;
-		}
+		fDialog.create();
+		fDialog.init();
 
-		if (fTourChart != null) {
-
-			adjustChartAltitude();
+		if (fDialog.open() == Window.OK) {
 			fTourChart.updateChart();
-
-		} else if (fTreeViewer != null) {
-
-			adjustTreeViewerAltitude();
-			fTreeTourChart.updateChart(fTreeTourId);
-
 		} else {
-			return;
+			fDialog.restoreAltitudeValues();
 		}
 	}
 
@@ -99,7 +89,7 @@ public class ActionAdjustAltitude extends Action {
 
 		// loop: all selections in the tree
 		for (Iterator iter = treeSelection.iterator(); iter.hasNext();) {
-			
+
 			Object item = iter.next();
 
 			if (item instanceof TreeViewerTourItem) {
@@ -109,7 +99,7 @@ public class ActionAdjustAltitude extends Action {
 
 				if (tourData != null) {
 
-					adjustAltitude(tourData);
+					// adjustAltitude(tourData);
 
 					/*
 					 * set the tour id for the chart which will be updated
@@ -140,84 +130,7 @@ public class ActionAdjustAltitude extends Action {
 			return;
 		}
 
-		adjustAltitude(fTourChart.fTourData);
+		// adjustAltitude(fTourChart.fTourData);
 	}
 
-	private void adjustAltitude(TourData tourData) {
-
-		if (fDialog.fSelectedAdjustment == AdjustAltitudeDialog.ALTITUDE_ADJUSTMENT_ALL) {
-
-			// adjust evenly
-			adjustEvenly(tourData);
-
-		} else if (fDialog.fSelectedAdjustment == AdjustAltitudeDialog.ALTITUDE_ADJUSTMENT_END) {
-			// adjust end
-			adjustEndAltitude(tourData);
-
-		} else if (fDialog.fSelectedAdjustment == AdjustAltitudeDialog.ALTITUDE_ADJUSTMENT_MAX_HEIGHT) {
-
-			// adjust start
-			adjustMaxHeightAltitude(tourData);
-		}
-
-		TourDatabase.saveTour(tourData);
-	}
-
-	private void adjustMaxHeightAltitude(TourData tourData) {
-
-		int newAltitude = fDialog.fNewAltitude;
-		int[] altitudeSerie = tourData.altitudeSerie;
-		int startAltitude = altitudeSerie[0];
-
-		// calculate max altitude
-		int maxHeight = altitudeSerie[0];
-		for (int altitude : altitudeSerie) {
-			if (altitude > maxHeight) {
-				maxHeight = altitude;
-			}
-		}
-
-		// adjust altitude
-		int maxHeight0 = maxHeight - startAltitude;
-		int newHeight0 = newAltitude - startAltitude;
-		float heightDiff = (float) maxHeight0 / (float) newHeight0;
-
-		for (int serieIndex = 0; serieIndex < altitudeSerie.length; serieIndex++) {
-
-			int altitude = altitudeSerie[serieIndex];
-			int altitude0 = altitude - startAltitude;
-			altitude0 = (int) (altitude0 / heightDiff);
-
-			altitudeSerie[serieIndex] = altitude0 + startAltitude;
-		}
-	}
-
-	private void adjustEndAltitude(TourData tourData) {
-
-		int[] altitudeSerie = tourData.altitudeSerie;
-		int[] distanceSerie = tourData.distanceSerie;
-		int newAltitude = fDialog.fNewAltitude;
-		int endDiff = newAltitude - altitudeSerie[altitudeSerie.length - 1];
-		float tourDistance = distanceSerie[distanceSerie.length - 1];
-
-		// adjust every altitude with the same difference
-		for (int serieIndex = 0; serieIndex < altitudeSerie.length; serieIndex++) {
-			float distance = distanceSerie[serieIndex];
-			int altitudeDiff = (int) (distance / tourDistance * endDiff);
-			altitudeSerie[serieIndex] = altitudeSerie[serieIndex] + altitudeDiff;
-		}
-	}
-
-	private void adjustEvenly(TourData tourData) {
-
-		int newAltitude = fDialog.fNewAltitude;
-		int[] altitudeSerie = tourData.altitudeSerie;
-		int altitudeDiff = newAltitude - altitudeSerie[0];
-
-		// adjust every altitude with the same difference
-		for (int altIndex = 0; altIndex < altitudeSerie.length; altIndex++) {
-			altitudeSerie[altIndex] = altitudeSerie[altIndex] + altitudeDiff;
-		}
-
-	}
 }
