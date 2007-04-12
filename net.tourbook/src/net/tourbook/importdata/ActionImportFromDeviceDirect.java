@@ -44,7 +44,9 @@ public class ActionImportFromDeviceDirect extends Action {
 		final WizardDialog dialog = new PositionedWizardDialog(
 				fWindow.getShell(),
 				importWizard,
-				WizardImportData.DIALOG_SETTINGS_SECTION);
+				WizardImportData.DIALOG_SETTINGS_SECTION,
+				500,
+				400);
 
 		// create the dialog that the shell is created which is required in
 		// setAutoDownload()

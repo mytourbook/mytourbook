@@ -39,14 +39,15 @@ public class ActionImportFromDevice extends Action {
 
 	public void run() {
 
-		final WizardImportData importWizard = new WizardImportData();
-
 		final WizardDialog dialog = new PositionedWizardDialog(
 				fWindow.getShell(),
-				importWizard,
-				WizardImportData.DIALOG_SETTINGS_SECTION);
+				new WizardImportData(),
+				WizardImportData.DIALOG_SETTINGS_SECTION,
+				500,
+				400);
 
-		// create the dialog that the shell is created which is required in setAutoDownload()
+		// create the dialog that the shell is created which is required in
+		// setAutoDownload()
 		dialog.create();
 
 		dialog.open();

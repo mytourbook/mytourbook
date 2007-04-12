@@ -146,7 +146,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				final WizardDialog dialog = new PositionedWizardDialog(
 						window.getShell(),
 						wizard,
-						WizardTourComparer.DIALOG_SETTINGS_SECTION);
+						WizardTourComparer.DIALOG_SETTINGS_SECTION,
+						800,
+						600);
 
 				BusyIndicator.showWhile(null, new Runnable() {
 					public void run() {
@@ -170,7 +172,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileMenu.add(fActionImportFromDevice);
 		fileMenu.add(fActionImportFromDeviceDirect);
 		fileMenu.add(new Separator());
-		
+
 		fileMenu.add(fActionPreferences);
 		fileMenu.add(new Separator());
 
@@ -186,7 +188,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		// view - menu
 		MenuManager tourMenu = new MenuManager(Messages.Action_Menu_view, null);
-		
+
 		tourMenu.add(fActionRawDataView);
 		tourMenu.add(fActionTourBookView);
 		tourMenu.add(fActionTourMapView);
@@ -243,9 +245,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		coolBar.add(new ToolBarContributionItem(openToolbar, "main")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
-		
+
 		IToolBarManager compareToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		
+
 		compareToolbar.add(new Separator());
 		compareToolbar.add(fActionTourCompareWizard);
 		compareToolbar.add(fActionTourCompareView);
@@ -253,12 +255,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		coolBar.add(new ToolBarContributionItem(compareToolbar, "compare")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
-		
+
 		IToolBarManager prefToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		
+
 		prefToolbar.add(new Separator());
 		prefToolbar.add(fActionPreferences);
-		
+
 		coolBar.add(new ToolBarContributionItem(prefToolbar, "pref")); //$NON-NLS-1$
 	}
 
