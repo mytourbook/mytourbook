@@ -77,7 +77,7 @@ public class Messages extends NLS {
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
 
-	public static String	Database_Monitor_db_service_subtask_location;
+	public static String		Database_Monitor_db_service_subtask_location;
 
 	public static String		Database_Monitor_db_service_task;
 	public static String		Database_Monitor_db_service_title;
@@ -89,6 +89,20 @@ public class Messages extends NLS {
 	public static String		DataImport_Error_invalid_data_format;
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
+
+	public static String	Dlg_Adjust_Altitude_adjust_end;
+
+	public static String	Dlg_Adjust_Altitude_adjust_height;
+
+	public static String	Dlg_Adjust_Altitude_adjust_whole_tour;
+
+	public static String	Dlg_Adjust_Altitude_start_and_end;
+
+	public static String	Dlg_Adjust_Altitude_title;
+
+	public static String		Dlg_Adjust_Height_start_altitude;
+	public static String		Dlg_Adjust_Height_end_altitude;
+	public static String		Dlg_Adjust_Height_max_height;
 
 	public static String		Format_hhmm;
 	public static String		Format_hhmmss;
@@ -316,26 +330,17 @@ public class Messages extends NLS {
 	public static String		Tour_Action_tour_info_tooltip;
 	public static String		Tour_Action_zoom_fit_to_window;
 
-	public static String		Tour_Group_adjust_altitude;
-
 	public static String		Tour_Label_adjust_end;
 	public static String		Tour_Label_adjust_height;
 	public static String		Tour_Label_distance;
 	public static String		Tour_Label_distance_unit;
-	public static String		Tour_Label_end_altitude;
 	public static String		Tour_Label_evenly_distributed;
-	public static String		Tour_Label_max_height;
 	public static String		Tour_Label_new_end_altitude;
 	public static String		Tour_Label_new_height;
 	public static String		Tour_Label_new_start_altitude;
-	public static String		Tour_Label_start_altitude;
 	public static String		Tour_Label_time;
 	public static String		Tour_Label_time_unit;
 	public static String		Tour_Label_tour_type;
-
-	public static String		Tour_Radio_adjust_end;
-	public static String		Tour_Radio_adjust_height;
-	public static String		Tour_Radio_adjust_whole_tour;
 
 	public static String		TourAnalyzer_Label_average;
 	public static String		TourAnalyzer_Label_difference;

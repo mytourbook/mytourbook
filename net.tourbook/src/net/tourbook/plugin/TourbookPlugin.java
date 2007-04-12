@@ -23,6 +23,7 @@ import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -162,4 +163,12 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return fSplashHandler;
 	}
 
+	public IDialogSettings getDialogSettingsSection(String name) {
+		IDialogSettings dialogSettings = getDialogSettings();
+		IDialogSettings section = dialogSettings.getSection(name);
+		if (section == null) {
+			section = dialogSettings.addNewSection(name);
+		}
+		return section;
+	}
 }
