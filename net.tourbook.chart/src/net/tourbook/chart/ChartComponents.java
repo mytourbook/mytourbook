@@ -175,7 +175,7 @@ public class ChartComponents extends Composite {
 	 */
 	public ChartComponents(final Chart parent, final int style) {
 
-		super(parent, SWT.FLAT);
+		super(parent, style);
 
 		GridData gd;
 		fChart = parent;

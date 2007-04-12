@@ -80,7 +80,8 @@ public class Chart extends ViewForm {
 	public Chart(Composite parent, int style) {
 
 		super(parent, style);
-
+		setBorderVisible(false);
+		
 		// setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		GridLayout gl = new GridLayout(1, false);
