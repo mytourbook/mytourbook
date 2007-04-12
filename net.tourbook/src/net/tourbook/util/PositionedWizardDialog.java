@@ -30,13 +30,16 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class PositionedWizardDialog extends WizardDialog {
 
-	private static final String	WIZARD_X		= "Wizard.x"; //$NON-NLS-1$
-	private static final String	WIZARD_Y		= "Wizard.y"; //$NON-NLS-1$
-	private static final String	WIZARD_WIDTH	= "Wizard.width"; //$NON-NLS-1$
-	private static final String	WIZARD_HEIGHT	= "Wizard.height"; //$NON-NLS-1$
+	private static final String	WIZARD_X		= "Wizard.x";		//$NON-NLS-1$
+	private static final String	WIZARD_Y		= "Wizard.y";		//$NON-NLS-1$
+	private static final String	WIZARD_WIDTH	= "Wizard.width";	//$NON-NLS-1$
+	private static final String	WIZARD_HEIGHT	= "Wizard.height";	//$NON-NLS-1$
 
 	private IDialogSettings		fDialogSettings;
 	private String				fSettingsSection;
+
+	private int					fDefaultWidth;
+	private int					fDefaultHeight;
 
 	/**
 	 * @param parent
@@ -44,12 +47,16 @@ public class PositionedWizardDialog extends WizardDialog {
 	 * @param fSettingsSection
 	 *        dialog settings section to store the dialog position and size
 	 */
-	public PositionedWizardDialog(Shell parent, Wizard wizard, String settingsSection) {
+	public PositionedWizardDialog(Shell parent, Wizard wizard, String settingsSection,
+			int defaultWidth, int defaultHeight) {
 
 		super(parent, wizard);
 
 		fDialogSettings = TourbookPlugin.getDefault().getDialogSettings();
 		fSettingsSection = settingsSection;
+
+		fDefaultWidth = defaultWidth;
+		fDefaultHeight = defaultHeight;
 
 		Point point = getInitialSize();
 		if (point != null) {
@@ -61,8 +68,8 @@ public class PositionedWizardDialog extends WizardDialog {
 
 		IDialogSettings settings = fDialogSettings.getSection(fSettingsSection);
 
-		int width = 500;
-		int height = 400;
+		int width = fDefaultWidth;
+		int height = fDefaultHeight;
 
 		if (settings == null) {
 			final Shell shell = getShell();
@@ -127,6 +134,5 @@ public class PositionedWizardDialog extends WizardDialog {
 		saveBounds();
 		super.cancelPressed();
 	}
-	
-	
+
 }
