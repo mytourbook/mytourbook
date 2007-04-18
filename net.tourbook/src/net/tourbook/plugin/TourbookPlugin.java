@@ -45,8 +45,8 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	private ResourceBundle			resourceBundle;
 
 	/**
-	 * active person (selected in the combobox), set to <code>null</code> when
-	 * 'All People' are selected
+	 * active person (selected in the combobox), set to <code>null</code> when 'All People' are
+	 * selected
 	 */
 	private TourPerson				fCurrentPerson;
 
@@ -82,8 +82,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns the string from the plugin's resource bundle, or 'key' if not
-	 * found.
+	 * Returns the string from the plugin's resource bundle, or 'key' if not found.
 	 */
 	public static String getResourceString(String key) {
 		ResourceBundle bundle = TourbookPlugin.getDefault().getResourceBundle();
@@ -163,11 +162,15 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return fSplashHandler;
 	}
 
-	public IDialogSettings getDialogSettingsSection(String name) {
+	/**
+	 * @param sectionName
+	 * @return Returns the dialog setting section for the sectionName
+	 */
+	public IDialogSettings getDialogSettingsSection(String sectionName) {
 		IDialogSettings dialogSettings = getDialogSettings();
-		IDialogSettings section = dialogSettings.getSection(name);
+		IDialogSettings section = dialogSettings.getSection(sectionName);
 		if (section == null) {
-			section = dialogSettings.addNewSection(name);
+			section = dialogSettings.addNewSection(sectionName);
 		}
 		return section;
 	}
