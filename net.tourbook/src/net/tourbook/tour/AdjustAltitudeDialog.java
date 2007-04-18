@@ -31,8 +31,11 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -55,22 +58,26 @@ import org.eclipse.swt.widgets.Spinner;
  */
 public class AdjustAltitudeDialog extends TitleAreaDialog {
 
+	private static final String	DIALOG_SETTINGS_ADJUST_TYPE		= "adjust_type";	//$NON-NLS-1$
+	private static final String	DIALOG_SETTINGS_SCALE_YAXIS		= "scale_y-axis";	//$NON-NLS-1$
+	private static final String	DIALOG_SETTINGS_KEEP_START		= "keep_start";	//$NON-NLS-1$
+
 	private static final int	ALTI_ID_START					= 1;
 	private static final int	ALTI_ID_END						= 2;
 	private static final int	ALTI_ID_MAX						= 3;
 
 	static final int			ADJUST_ALTITUDE_NONE			= 0;
-	static final int			ADJUST_ALTITUDE_START_AND_END	= 1;
-	static final int			ADJUST_ALTITUDE_MAX_HEIGHT		= 2;
-	static final int			ADJUST_ALTITUDE_END				= 3;
-	static final int			ADJUST_ALTITUDE_WHOLE_TOUR		= 4;
+	static final int			ADJUST_ALTITUDE_WHOLE_TOUR		= 1;
+	static final int			ADJUST_ALTITUDE_START_AND_END	= 2;
+	static final int			ADJUST_ALTITUDE_MAX_HEIGHT		= 3;
+	static final int			ADJUST_ALTITUDE_END				= 4;
 
 	static final String[]		adjustTypes						= new String[] {
-			"Show original values",
-			Messages.Dlg_Adjust_Altitude_start_and_end,
-			Messages.Dlg_Adjust_Altitude_adjust_height,
-			Messages.Dlg_Adjust_Altitude_adjust_end,
-			Messages.Dlg_Adjust_Altitude_adjust_whole_tour		};
+			Messages.Dlg_Adjust_Altitude_Type_Show_original,
+			Messages.Dlg_Adjust_Altitude_Type_adjust_whole_tour,
+			Messages.Dlg_Adjust_Altitude_Type_start_and_end,
+			Messages.Dlg_Adjust_Altitude_Type_adjust_height,
+			Messages.Dlg_Adjust_Altitude_Type_adjust_end		};
 
 	private TourChart			fSelectedTourChart;
 	private TourChart			fTourChart;
@@ -78,10 +85,6 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	private Composite			fDialogArea;
 
 	private Combo				fComboAdjustType;
-
-	private int					fOldStartAlti;
-	private int					fOldEndAlti;
-	private int					fOldMaxAlti;
 
 	private Label				fLblOldStartAlti;
 	private Label				fLblOldEndAlti;
@@ -91,19 +94,26 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	private Spinner				fSpinnerNewMaxAlti;
 	private Spinner				fSpinnerNewEndAlti;
 
-	private Button				fBtnKeepStart;
-	private Button				fBtnAdjustYAxis;
-	private Button				fBtnKeepBottom;
+	private Button				fChkScaleYAxis;
 	private Button				fBtnReset;
+	private Button				fBtnCompare;
+
+	private Button				fRadioKeepStart;
+	private Button				fRadioKeepBottom;
 
 	private boolean				fIsSpinnerChangedByUser;
+	protected boolean			fIsInitialAltiDisplayed;
 
 	private int[]				fOriginalAltitudes;
 	private int					fInitialAltiStart;
 
 	private int					fInitialAltiMax;
+	private int[]				fInitialAltitude;
+
 	private int					fAltiMaxDiff;
 	private int					fAltiStartDiff;
+
+	private int					fOldStartAlti;
 	private int					fOldAltiInputMax;
 	private int					fOldAltiInputStart;
 
@@ -141,6 +151,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		final int newAltiStart = fSpinnerNewStartAlti.getSelection();
 		final int newAltiMax = fSpinnerNewMaxAlti.getSelection();
 		final int[] altiDest = tourData.altitudeSerie;
+
 		boolean isAltiSetByUser = altiFlag != null;
 
 		// set adjustment type and enable the field(s) which can be modified
@@ -156,7 +167,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			// adjust end alti to start alti
 			adjustEndAltitude(fOriginalAltitudes, tourData, fOriginalAltitudes[0]);
 
-			adjustMaxAndStart(altiDest, altiDest, isAltiSetByUser, newAltiStart, newAltiMax);
+			adjustStartAndMax(altiDest, altiDest, isAltiSetByUser, newAltiStart, newAltiMax);
 
 			break;
 
@@ -176,7 +187,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 			// adjust max
 
-			adjustMaxAndStart(
+			adjustStartAndMax(
 					fOriginalAltitudes,
 					altiDest,
 					isAltiSetByUser,
@@ -186,6 +197,18 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		default:
 			break;
+		}
+
+		/*
+		 * make a backup of the current values
+		 */
+		int[] altitudeSerie = getAltitudeSerie();
+		if (altitudeSerie != null) {
+			fInitialAltitude = new int[altitudeSerie.length];
+
+			for (int altiIndex = 0; altiIndex < altitudeSerie.length; altiIndex++) {
+				fInitialAltitude[altiIndex] = altitudeSerie[altiIndex];
+			}
 		}
 	}
 
@@ -268,7 +291,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 * <p>
 	 * it took me several days to figure out this algorithim, 10.4.2007 Wolfgang
 	 */
-	private void adjustMaxAndStart(	final int[] altiSrc,
+	private void adjustStartAndMax(	final int[] altiSrc,
 									final int[] altiDest,
 									boolean isAltiSetByUser,
 									final int newAltiStart,
@@ -285,7 +308,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 			// adjust start
 			int startDiff;
-			if (fBtnKeepStart.getSelection()) {
+			if (fRadioKeepStart.getSelection()) {
 				startDiff = 0;
 			} else {
 				startDiff = newStart - oldStart;
@@ -311,17 +334,19 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-	 */
+	public boolean close() {
+
+		saveDialogSettings();
+
+		return super.close();
+	}
+
 	protected void configureShell(Shell shell) {
 
 		super.configureShell(shell);
 
 		// set window title
-		shell.setText("Adjust Altitude");
+		shell.setText(Messages.Dlg_Adjust_Altitude_Title_window);
 	}
 
 	/**
@@ -340,6 +365,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		UI.setWidth(spinner, convertWidthInCharsToPixels(6));
 
 		spinner.addMouseWheelListener(new MouseWheelListener() {
+
 			public void mouseScrolled(MouseEvent e) {
 				Spinner widget = (Spinner) e.widget;
 
@@ -351,6 +377,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		});
 
 		spinner.addModifyListener(new ModifyListener() {
+
 			public void modifyText(ModifyEvent e) {
 				if (fIsSpinnerChangedByUser) {
 					onChangeAltitude((Integer) e.widget.getData());
@@ -374,10 +401,11 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		Composite dlgContainer = new Composite(fDialogArea, SWT.NONE);
 		gl = new GridLayout(1, false);
 		gl.marginWidth = 10;
+		gl.verticalSpacing = 0;
 		dlgContainer.setLayout(gl);
 		dlgContainer.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		setTitle("Adjust Altitude");
+		setTitle(Messages.Dlg_Adjust_Altitude_Title_dlg);
 
 		/*
 		 * create adjust type combo
@@ -389,7 +417,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		typeContainer.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 
 		label = new Label(typeContainer, SWT.NONE);
-		label.setText("Adjustment &Type:");
+		label.setText(Messages.Dlg_Adjust_Altitude_Label_adjustment_type);
 
 		fComboAdjustType = new Combo(typeContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboAdjustType.setVisibleItemCount(20);
@@ -398,6 +426,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 				onChangeAdjustType();
 			}
 		});
+
 		// fill combo
 		for (String adjustType : adjustTypes) {
 			fComboAdjustType.add(adjustType);
@@ -419,6 +448,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		final TourData tourData = fSelectedTourChart.getTourData();
 
 		fTourChart.addDataModelListener(new IDataModelListener() {
+
 			public void dataModelChanged(ChartDataModel changedChartDataModel) {
 
 				// set title
@@ -429,11 +459,12 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fTourChart.updateChart(tourData, chartConfig);
 
 		/*
-		 * create altitude controls
+		 * container: altitude controls
 		 */
 		Composite adjustContainer = new Composite(dlgContainer, SWT.NONE);
 		gl = new GridLayout(3, false);
-		gl.marginHeight = 7;
+		gl.marginTop = 0;
+		gl.marginBottom = 0;
 		gl.marginWidth = 0;
 		adjustContainer.setLayout(gl);
 		adjustContainer.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
@@ -442,51 +473,23 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		 * field: start altitude
 		 */
 		Composite startContainer = new Composite(adjustContainer, SWT.NONE);
-		gl = new GridLayout(2, false);
+		gl = new GridLayout(3, false);
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
 		startContainer.setLayout(gl);
 		startContainer.setLayoutData(new GridData(SWT.LEAD, SWT.FILL, true, true));
 
 		label = new Label(startContainer, SWT.NONE);
-		label.setText("Original Value:");
-
-		fLblOldStartAlti = new Label(startContainer, SWT.NONE);
-
-		label = new Label(startContainer, SWT.NONE);
-		label.setText("&Start Altitude:");
+		label.setText(Messages.Dlg_Adjust_Altitude_Label_start_altitude);
+		label.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_start_altitude_tooltip);
 
 		fSpinnerNewStartAlti = createAltiField(startContainer);
 		fSpinnerNewStartAlti.setData(new Integer(ALTI_ID_START));
-		fSpinnerNewStartAlti.setToolTipText("Adjust altitude at the beginning of the tour");
+		fSpinnerNewStartAlti
+				.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_start_altitude_tooltip);
 
-		/*
-		 * checkbox: adjust y-axis scale
-		 */
-		fBtnAdjustYAxis = new Button(startContainer, SWT.CHECK);
-		fBtnAdjustYAxis.setText("Autoadjust s&cale for Y-axis");
-		fBtnAdjustYAxis
-				.setToolTipText("The scale for the y-axis will be automatically adjusted when the altitudes are changed");
-		fBtnAdjustYAxis.setLayoutData(new GridData(SWT.BEGINNING, SWT.END, false, true, 2, 1));
-		fBtnAdjustYAxis.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				onChangeAltitude(new Integer(ALTI_ID_START));
-			}
-		});
-
-		/*
-		 * reset button
-		 */
-		fBtnReset = new Button(startContainer, SWT.NONE);
-		fBtnReset.setText("&Reset Altitudes");
-		fBtnReset
-				.setToolTipText("Resets the altitudes when they are changed in the min/max/end altitude field");
-		fBtnReset.setLayoutData(new GridData(SWT.BEGINNING, SWT.END, false, false, 2, 1));
-		fBtnReset.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				onChangeAdjustType();
-			}
-		});
+		fLblOldStartAlti = new Label(startContainer, SWT.NONE);
+		fLblOldStartAlti.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_original_values);
 
 		/*
 		 * field: max altitude
@@ -496,24 +499,23 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		maxContainer.setLayoutData(new GridData(SWT.CENTER, SWT.DEFAULT, true, false));
 
 		label = new Label(maxContainer, SWT.NONE);
-		label.setText("Original Value:");
-
-		fLblOldMaxAlti = new Label(maxContainer, SWT.NONE);
-
-		label = new Label(maxContainer, SWT.NONE);
-		label.setText("&Max Altitude:");
+		label.setText(Messages.Dlg_Adjust_Altitude_Label_max_altitude);
+		label.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_max_altitude_tooltip);
 
 		fSpinnerNewMaxAlti = createAltiField(maxContainer);
 		fSpinnerNewMaxAlti.setData(new Integer(ALTI_ID_MAX));
-		fSpinnerNewMaxAlti.setToolTipText("Adjust maximum altitude");
+		fSpinnerNewMaxAlti.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_max_altitude_tooltip);
+
+		fLblOldMaxAlti = new Label(maxContainer, SWT.NONE);
+		fLblOldMaxAlti.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_original_values);
 
 		/*
 		 * group: keep start/bottom
 		 */
 		Group keepContainer = new Group(maxContainer, SWT.NONE);
-		keepContainer.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 2, 1));
+		keepContainer.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 3, 1));
 		keepContainer.setLayout(new GridLayout(1, false));
-		keepContainer.setText("Options");
+		keepContainer.setText(Messages.Dlg_Adjust_Altitude_Group_options);
 
 		final SelectionAdapter keepButtonSelectionAdapter = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -521,18 +523,20 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			}
 		};
 
-		fBtnKeepBottom = new Button(keepContainer, SWT.RADIO);
-		fBtnKeepBottom.setText("Keep &bottom altitude");
-		fBtnKeepBottom.setToolTipText("Keep the bottom altitude when the max altitude is changed");
-		fBtnKeepBottom.setLayoutData(new GridData());
-		fBtnKeepBottom.addSelectionListener(keepButtonSelectionAdapter);
-		fBtnKeepBottom.setSelection(true);
+		fRadioKeepBottom = new Button(keepContainer, SWT.RADIO);
+		fRadioKeepBottom.setText(Messages.Dlg_Adjust_Altitude_Radio_keep_bottom_altitude);
+		fRadioKeepBottom
+				.setToolTipText(Messages.Dlg_Adjust_Altitude_Radio_keep_bottom_altitude_tooltip);
+		fRadioKeepBottom.setLayoutData(new GridData());
+		fRadioKeepBottom.addSelectionListener(keepButtonSelectionAdapter);
+		// fRadioKeepBottom.setSelection(true);
 
-		fBtnKeepStart = new Button(keepContainer, SWT.RADIO);
-		fBtnKeepStart.setText("&Keep start altitude");
-		fBtnKeepStart.setToolTipText("Keep the start altitude when the max altitude is changed");
-		fBtnKeepStart.setLayoutData(new GridData());
-		fBtnKeepStart.addSelectionListener(keepButtonSelectionAdapter);
+		fRadioKeepStart = new Button(keepContainer, SWT.RADIO);
+		fRadioKeepStart.setText(Messages.Dlg_Adjust_Altitude_Radio_keep_start_altitude);
+		fRadioKeepStart
+				.setToolTipText(Messages.Dlg_Adjust_Altitude_Radio_keep_start_altitude_tooltip);
+		fRadioKeepStart.setLayoutData(new GridData());
+		fRadioKeepStart.addSelectionListener(keepButtonSelectionAdapter);
 
 		/*
 		 * field: end altitude
@@ -542,21 +546,101 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		endContainer.setLayoutData(new GridData(SWT.TRAIL, SWT.DEFAULT, true, false));
 
 		label = new Label(endContainer, SWT.NONE);
-		label.setText("Original Value:");
-
-		fLblOldEndAlti = new Label(endContainer, SWT.NONE);
-
-		label = new Label(endContainer, SWT.NONE);
-		label.setText("&End Altitude:");
+		label.setText(Messages.Dlg_Adjust_Altitude_Label_end_altitude);
+		label.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_end_altitude_tooltip);
 
 		fSpinnerNewEndAlti = createAltiField(endContainer);
 		fSpinnerNewEndAlti.setData(new Integer(ALTI_ID_END));
-		fSpinnerNewEndAlti.setToolTipText("Adjust altitude at the end of the tour");
+		fSpinnerNewEndAlti.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_end_altitude_tooltip);
+
+		fLblOldEndAlti = new Label(endContainer, SWT.NONE);
+		fLblOldEndAlti.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_original_values);
+
+		/*
+		 * button container
+		 */
+		Composite buttonContainer = new Composite(dlgContainer, SWT.NONE);
+		gl = new GridLayout(3, false);
+		gl.marginTop = 0;
+		gl.marginBottom = 0;
+		gl.marginWidth = 0;
+		buttonContainer.setLayout(gl);
+		gd = new GridData(SWT.FILL, SWT.DEFAULT, true, false);
+		gd.verticalIndent = 30;
+		buttonContainer.setLayoutData(gd);
+
+		/*
+		 * checkbox: adjust y-axis scale
+		 */
+		fChkScaleYAxis = new Button(buttonContainer, SWT.CHECK);
+		fChkScaleYAxis.setText(Messages.Dlg_Adjust_Altitude_Checkbox_autoscale_yaxis);
+		fChkScaleYAxis
+				.setToolTipText(Messages.Dlg_Adjust_Altitude_Checkbox_autoscale_yaxis_tooltip);
+		fChkScaleYAxis.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				onChangeAltitude(new Integer(ALTI_ID_START));
+			}
+		});
+
+		/*
+		 * button: reset
+		 */
+		fBtnReset = new Button(buttonContainer, SWT.NONE);
+		fBtnReset.setText(Messages.Dlg_Adjust_Altitude_Button_reset_altitudes);
+		fBtnReset.setToolTipText(Messages.Dlg_Adjust_Altitude_Button_reset_altitudes_tooltip);
+		fBtnReset.setLayoutData(new GridData(SWT.TRAIL, SWT.DEFAULT, true, false));
+		fBtnReset.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				onChangeAdjustType();
+			}
+		});
+
+		/*
+		 * button: compare values
+		 */
+		fBtnCompare = new Button(buttonContainer, SWT.NONE);
+		fBtnCompare.setText(Messages.Dlg_Adjust_Altitude_Button_show_original_values);
+		fBtnCompare
+				.setToolTipText(Messages.Dlg_Adjust_Altitude_Button_show_original_values_tooltip);
+		fBtnCompare.setLayoutData(new GridData(SWT.TRAIL, SWT.DEFAULT, false, false));
+		fBtnCompare.addKeyListener(new KeyAdapter() {
+
+			public void keyPressed(KeyEvent e) {
+				if (fIsInitialAltiDisplayed == false && e.character == ' ') {
+					fIsInitialAltiDisplayed = true;
+					setOriginalAltitudeValues();
+					fTourChart.updateChart(!fChkScaleYAxis.getSelection());
+				}
+			}
+
+			public void keyReleased(KeyEvent e) {
+				setInitialAltitudeValues();
+				fTourChart.updateChart(!fChkScaleYAxis.getSelection());
+				fIsInitialAltiDisplayed = false;
+			}
+		});
+
+		fBtnCompare.addMouseListener(new MouseAdapter() {
+
+			public void mouseDown(MouseEvent e) {
+				if (fIsInitialAltiDisplayed == false) {
+					fIsInitialAltiDisplayed = true;
+					setOriginalAltitudeValues();
+					fTourChart.updateChart(!fChkScaleYAxis.getSelection());
+				}
+			}
+
+			public void mouseUp(MouseEvent e) {
+				setInitialAltitudeValues();
+				fTourChart.updateChart(!fChkScaleYAxis.getSelection());
+				fIsInitialAltiDisplayed = false;
+			}
+		});
 
 		return fDialogArea;
 	}
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused")//$NON-NLS-1$
 	private void dumpMinMax(int[] altiSrc, String place) {
 
 		int minAltiSrc1 = altiSrc[0];
@@ -570,13 +654,9 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			}
 		}
 
-		System.out.println(place
-				+ " start:"
-				+ altiSrc[0]
-				+ " min:"
-				+ minAltiSrc1
-				+ " max:"
-				+ maxAltiSrc1);
+		System.out.println(place + (" start:" + altiSrc[0]) //$NON-NLS-1$
+				+ (" min:" + minAltiSrc1) //$NON-NLS-1$
+				+ (" max:" + maxAltiSrc1)); //$NON-NLS-1$
 	}
 
 	private void enableFields() {
@@ -586,22 +666,25 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fSpinnerNewEndAlti.setEnabled(false);
 		fSpinnerNewMaxAlti.setEnabled(false);
 
-		fBtnKeepStart.setEnabled(false);
-		fBtnKeepBottom.setEnabled(false);
+		fRadioKeepStart.setEnabled(false);
+		fRadioKeepBottom.setEnabled(false);
 
 		fBtnReset.setEnabled(true);
-		fBtnAdjustYAxis.setEnabled(true);
+		fBtnCompare.setEnabled(true);
+		fChkScaleYAxis.setEnabled(true);
 
 		// set adjustment type and enable the field(s) which can be modified
 		switch (fComboAdjustType.getSelectionIndex()) {
+
 		case ADJUST_ALTITUDE_NONE:
 
 			// in this mode the altitude values are already reset
 			fBtnReset.setEnabled(false);
+			fBtnCompare.setEnabled(false);
 
-			fBtnAdjustYAxis.setEnabled(false);
+			fChkScaleYAxis.setEnabled(false);
 
-			setMessage("Select the adjustment type");
+			setMessage(Messages.Dlg_Adjust_Altitude_Message_select_type);
 			break;
 
 		case ADJUST_ALTITUDE_START_AND_END:
@@ -609,34 +692,34 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			fSpinnerNewStartAlti.setEnabled(true);
 			fSpinnerNewMaxAlti.setEnabled(true);
 
-			fBtnKeepStart.setEnabled(true);
-			fBtnKeepBottom.setEnabled(true);
+			fRadioKeepStart.setEnabled(true);
+			fRadioKeepBottom.setEnabled(true);
 
-			setMessage("START and END altitude are adjusted to the same value");
+			setMessage(Messages.Dlg_Adjust_Altitude_Message_adjust_start_and_end);
 			break;
 
 		case ADJUST_ALTITUDE_WHOLE_TOUR:
 
 			fSpinnerNewStartAlti.setEnabled(true);
 
-			setMessage("The tour can be adjusted evenly for the whole tour");
+			setMessage(Messages.Dlg_Adjust_Altitude_Message_adjust_whole_tour);
 			break;
 
 		case ADJUST_ALTITUDE_END:
 
 			fSpinnerNewEndAlti.setEnabled(true);
 
-			setMessage("The END altitude can be adjusted");
+			setMessage(Messages.Dlg_Adjust_Altitude_Message_adjust_end);
 			break;
 
 		case ADJUST_ALTITUDE_MAX_HEIGHT:
 
 			fSpinnerNewMaxAlti.setEnabled(true);
 
-			fBtnKeepStart.setEnabled(true);
-			fBtnKeepBottom.setEnabled(true);
+			fRadioKeepStart.setEnabled(true);
+			fRadioKeepBottom.setEnabled(true);
 
-			setMessage("The Maximum altitude can be adjusted");
+			setMessage(Messages.Dlg_Adjust_Altitude_Message_adjust_max);
 			break;
 
 		default:
@@ -644,6 +727,9 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		}
 	}
 
+	/**
+	 * @return Returns the altitude serie from the chart
+	 */
 	private int[] getAltitudeSerie() {
 
 		// get altitude data from the data model
@@ -665,21 +751,39 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	}
 
 	/**
+	 * @return Returns the dialog settings for this dialog
+	 */
+	private IDialogSettings getDialogSettings() {
+		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
+	}
+
+	/**
 	 * initialize dialog
 	 */
 	public void init() {
 
-		// select adjustment type
-		fComboAdjustType.select(ADJUST_ALTITUDE_NONE);
+		restoreDialogSettings();
 
 		onChangeAdjustType();
 
 		fSpinnerNewStartAlti.setSelection(fOldStartAlti);
 
-		fBtnAdjustYAxis.setSelection(false);
-
 		// set focus to cancel button
 		getButton(IDialogConstants.CANCEL_ID).setFocus();
+
+		// set button width
+		int btnCompareWidth = fBtnCompare.getBounds().width;
+		int btnResetWidth = fBtnReset.getBounds().width;
+		int newWidth = Math.max(btnCompareWidth, btnResetWidth);
+
+		GridData gd;
+		gd = (GridData) fBtnCompare.getLayoutData();
+		gd.widthHint = newWidth;
+
+		gd = (GridData) fBtnReset.getLayoutData();
+		gd.widthHint = newWidth;
+
+		fDialogArea.layout(true, true);
 	}
 
 	protected void okPressed() {
@@ -688,12 +792,13 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		MessageBox msgBox = new MessageBox(fTourChart.getShell(), SWT.ICON_WORKING
 				| SWT.YES
 				| SWT.NO);
-		msgBox.setText("Altitude was changed");
-		msgBox.setMessage("Save altitude changes and replace the original tour data?");
+		msgBox.setText(Messages.Dlg_Adjust_Altitude_Dlg_save_tour_title);
+		msgBox.setMessage(Messages.Dlg_Adjust_Altitude_Dlg_save_tour_message);
 
 		if (msgBox.open() == SWT.YES) {
 			TourDatabase.saveTour(fTourChart.fTourData);
 			fSelectedTourChart.updateChart();
+
 			super.okPressed();
 		}
 
@@ -719,15 +824,10 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		// calcuate new altitude values
 		adjustAltitude(fTourChart.fTourData, altiFlag);
 
-		// set new values into the fields
+		// set new values into the fields which can change the altitude
 		setAltiFieldValues();
 
-		if (fBtnAdjustYAxis.getSelection()) {
-			// fTourChart.zoomOut(false);
-			fTourChart.updateChart(false);
-		} else {
-			fTourChart.updateChart();
-		}
+		fTourChart.updateChart(!fChkScaleYAxis.getSelection());
 	}
 
 	/**
@@ -735,7 +835,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 */
 	private void resetAltitude() {
 
-		restoreAltitudeValues();
+		restoreOriginalAltitudeValues();
 
 		final int startAlti = fOriginalAltitudes[0];
 		final int endAlti = fOriginalAltitudes[fOriginalAltitudes.length - 1];
@@ -749,8 +849,6 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		}
 
 		fOldStartAlti = startAlti;
-		fOldEndAlti = endAlti;
-		fOldMaxAlti = maxAlti;
 
 		fLblOldStartAlti.setText(Integer.toString(startAlti));
 		fLblOldStartAlti.pack(true);
@@ -770,10 +868,29 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fIsSpinnerChangedByUser = true;
 	}
 
+	private void restoreDialogSettings() {
+
+		IDialogSettings dlgSettings = getDialogSettings();
+
+		try {
+			fComboAdjustType.select(dlgSettings.getInt(DIALOG_SETTINGS_ADJUST_TYPE));
+		} catch (Exception e) {
+			fComboAdjustType.select(ADJUST_ALTITUDE_NONE);
+		}
+
+		fChkScaleYAxis.setSelection(dlgSettings.getBoolean(DIALOG_SETTINGS_SCALE_YAXIS));
+
+		if (dlgSettings.getBoolean(DIALOG_SETTINGS_KEEP_START)) {
+			fRadioKeepStart.setSelection(true);
+		} else {
+			fRadioKeepBottom.setSelection(true);
+		}
+	}
+
 	/**
 	 * copy the old altitude values back into the tourdata altitude serie
 	 */
-	public void restoreAltitudeValues() {
+	public void restoreOriginalAltitudeValues() {
 
 		int[] altitudeSerie = getAltitudeSerie();
 
@@ -784,6 +901,15 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		for (int altiIndex = 0; altiIndex < altitudeSerie.length; altiIndex++) {
 			altitudeSerie[altiIndex] = fOriginalAltitudes[altiIndex];
 		}
+	}
+
+	private void saveDialogSettings() {
+
+		IDialogSettings dlgSettings = getDialogSettings();
+
+		dlgSettings.put(DIALOG_SETTINGS_ADJUST_TYPE, fComboAdjustType.getSelectionIndex());
+		dlgSettings.put(DIALOG_SETTINGS_SCALE_YAXIS, fChkScaleYAxis.getSelection());
+		dlgSettings.put(DIALOG_SETTINGS_KEEP_START, fRadioKeepStart.getSelection());
 	}
 
 	/**
@@ -820,5 +946,33 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fIsSpinnerChangedByUser = true;
 
 		getButton(IDialogConstants.OK_ID).setEnabled(true);
+	}
+
+	private void setInitialAltitudeValues() {
+
+		int[] altitudeSerie = getAltitudeSerie();
+
+		if (altitudeSerie == null || fInitialAltitude == null) {
+			return;
+		}
+
+		// set altitude to the initial values
+		for (int altiIndex = 0; altiIndex < altitudeSerie.length; altiIndex++) {
+			altitudeSerie[altiIndex] = fInitialAltitude[altiIndex];
+		}
+	}
+
+	private void setOriginalAltitudeValues() {
+
+		int[] altitudeSerie = getAltitudeSerie();
+
+		if (altitudeSerie == null || fOriginalAltitudes == null) {
+			return;
+		}
+
+		// set original values
+		for (int altiIndex = 0; altiIndex < altitudeSerie.length; altiIndex++) {
+			altitudeSerie[altiIndex] = fOriginalAltitudes[altiIndex];
+		}
 	}
 }

@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";				//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";						//$NON-NLS-1$
 
 	public static String		Action_About;
 
@@ -90,19 +90,40 @@ public class Messages extends NLS {
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
-	public static String	Dlg_Adjust_Altitude_adjust_end;
-
-	public static String	Dlg_Adjust_Altitude_adjust_height;
-
-	public static String	Dlg_Adjust_Altitude_adjust_whole_tour;
-
-	public static String	Dlg_Adjust_Altitude_start_and_end;
-
-	public static String	Dlg_Adjust_Altitude_title;
-
-	public static String		Dlg_Adjust_Height_start_altitude;
-	public static String		Dlg_Adjust_Height_end_altitude;
-	public static String		Dlg_Adjust_Height_max_height;
+	public static String		Dlg_Adjust_Altitude_Button_reset_altitudes;
+	public static String		Dlg_Adjust_Altitude_Button_reset_altitudes_tooltip;
+	public static String		Dlg_Adjust_Altitude_Button_show_original_values;
+	public static String		Dlg_Adjust_Altitude_Button_show_original_values_tooltip;
+	public static String		Dlg_Adjust_Altitude_Checkbox_autoscale_yaxis;
+	public static String		Dlg_Adjust_Altitude_Checkbox_autoscale_yaxis_tooltip;
+	public static String		Dlg_Adjust_Altitude_Dlg_save_tour_message;
+	public static String		Dlg_Adjust_Altitude_Dlg_save_tour_title;
+	public static String		Dlg_Adjust_Altitude_Group_options;
+	public static String		Dlg_Adjust_Altitude_Label_adjustment_type;
+	public static String		Dlg_Adjust_Altitude_Label_end_altitude;
+	public static String		Dlg_Adjust_Altitude_Label_end_altitude_tooltip;
+	public static String		Dlg_Adjust_Altitude_Label_max_altitude;
+	public static String		Dlg_Adjust_Altitude_Label_max_altitude_tooltip;
+	public static String		Dlg_Adjust_Altitude_Label_original_values;
+	public static String		Dlg_Adjust_Altitude_Label_start_altitude;
+	public static String		Dlg_Adjust_Altitude_Label_start_altitude_tooltip;
+	public static String		Dlg_Adjust_Altitude_Message_adjust_end;
+	public static String		Dlg_Adjust_Altitude_Message_adjust_max;
+	public static String		Dlg_Adjust_Altitude_Message_adjust_start_and_end;
+	public static String		Dlg_Adjust_Altitude_Message_adjust_whole_tour;
+	public static String		Dlg_Adjust_Altitude_Message_select_type;
+	public static String		Dlg_Adjust_Altitude_Radio_keep_bottom_altitude;
+	public static String		Dlg_Adjust_Altitude_Radio_keep_bottom_altitude_tooltip;
+	public static String		Dlg_Adjust_Altitude_Radio_keep_start_altitude;
+	public static String		Dlg_Adjust_Altitude_Radio_keep_start_altitude_tooltip;
+	public static String		Dlg_Adjust_Altitude_title;
+	public static String		Dlg_Adjust_Altitude_Title_dlg;
+	public static String		Dlg_Adjust_Altitude_Title_window;
+	public static String		Dlg_Adjust_Altitude_Type_adjust_end;
+	public static String		Dlg_Adjust_Altitude_Type_adjust_height;
+	public static String		Dlg_Adjust_Altitude_Type_adjust_whole_tour;
+	public static String		Dlg_Adjust_Altitude_Type_Show_original;
+	public static String		Dlg_Adjust_Altitude_Type_start_and_end;
 
 	public static String		Format_hhmm;
 	public static String		Format_hhmmss;
@@ -357,7 +378,6 @@ public class Messages extends NLS {
 	public static String		TourBook_Action_show_statistics_tooltip;
 
 	public static String		TourBook_Action_show_tour_chart_tooltip;
-
 	public static String		TourBook_Action_show_tour_viewer_tooltip;
 	public static String		TourBook_Action_show_view_detail_tooltip;
 

@@ -77,7 +77,7 @@ public class ActionAdjustAltitude extends Action {
 		if (fDialog.open() == Window.OK) {
 			fTourChart.updateChart();
 		} else {
-			fDialog.restoreAltitudeValues();
+			fDialog.restoreOriginalAltitudeValues();
 		}
 	}
 
