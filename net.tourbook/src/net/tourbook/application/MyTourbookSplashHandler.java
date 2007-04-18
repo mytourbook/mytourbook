@@ -21,6 +21,8 @@ import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
@@ -28,8 +30,8 @@ import org.eclipse.ui.branding.IProductConstants;
 import org.eclipse.ui.splash.BasicSplashHandler;
 
 /**
- * This was a copy of EclipseSplashHandler Parses the well known product
- * constants and constructs a splash handler accordingly.
+ * This was a copy of EclipseSplashHandler Parses the well known product constants and constructs a
+ * splash handler accordingly.
  */
 public class MyTourbookSplashHandler extends BasicSplashHandler {
 
@@ -54,14 +56,14 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 		// set progressbar position
 		Rectangle progressRect = parseRect(progressRectString);
 		if (progressRect == null) {
-			progressRect = new Rectangle(10, 10, 300, 15);
+			progressRect = new Rectangle(10, 0, 300, 15);
 		}
 		setProgressRect(progressRect);
 
 		// set message position
 		Rectangle messageRect = parseRect(messageRectString);
 		if (messageRect == null) {
-			messageRect = new Rectangle(10, 35, 300, 15);
+			messageRect = new Rectangle(10, 25, 300, 15);
 		}
 		setMessageRect(messageRect);
 
@@ -83,8 +85,11 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 		getContent().addPaintListener(new PaintListener() {
 
 			public void paintControl(PaintEvent e) {
-				e.gc.setForeground(getForeground());
-				e.gc.drawText(buildId, 319, 77, true);
+				GC gc = e.gc;
+				Point extend = gc.textExtent(buildId);
+
+				gc.setForeground(getForeground());
+				gc.drawText(buildId, 383 - extend.x, 57, true);
 			}
 		});
 	}
