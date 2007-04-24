@@ -71,7 +71,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
@@ -80,21 +79,26 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMarkerView extends ViewPart {
 
-	private static final String		MARKER_REMARK			= "remark"; //$NON-NLS-1$
-	private static final String		MARKER_POSITION			= "position"; //$NON-NLS-1$
+	private static final String		MARKER_REMARK			= "remark";									//$NON-NLS-1$
+	private static final String		MARKER_POSITION			= "position";									//$NON-NLS-1$
+	private static final String		MARKER_X_OFFSET			= "x-offset";
+	private static final String		MARKER_Y_OFFSET			= "y-offset";
 
-	public static final String		ID						= "net.tourbook.views.TourMarkerView"; //$NON-NLS-1$
+	public static final String		ID						= "net.tourbook.views.TourMarkerView";			//$NON-NLS-1$
 
 	public static final int			COLUMN_TIME				= 0;
 	public static final int			COLUMN_DISTANCE			= 1;
 	public static final int			COLUMN_REMARK			= 2;
 	public static final int			COLUMN_VISUAL_POSITION	= 3;
+	public static final int			COLUMN_X_OFFSET			= 4;
+	public static final int			COLUMN_Y_OFFSET			= 5;
 
-	private static final String[]	COLUMN_PROPERTIES		= new String[] {
-			"time", //$NON-NLS-1$
+	private static final String[]	COLUMN_PROPERTIES		= new String[] { "time", //$NON-NLS-1$
 			"distance", //$NON-NLS-1$
 			MARKER_REMARK,
-			MARKER_POSITION								};
+			MARKER_POSITION,
+			MARKER_X_OFFSET,
+			MARKER_Y_OFFSET								};
 
 	private TableViewer				fMarkerViewer;
 
@@ -158,6 +162,12 @@ public class TourMarkerView extends ViewPart {
 			case COLUMN_REMARK:
 				return tourMarker.getLabel();
 
+			case COLUMN_X_OFFSET:
+				return Integer.toString(tourMarker.getLabelXOffset());
+
+			case COLUMN_Y_OFFSET:
+				return Integer.toString(tourMarker.getLabelYOffset());
+
 			case COLUMN_VISUAL_POSITION:
 				int visualPosition = tourMarker.getVisualPosition();
 				if (visualPosition == -1
@@ -191,6 +201,7 @@ public class TourMarkerView extends ViewPart {
 	 * listen for events when a tour is selected
 	 */
 	private void addSelectionListener() {
+
 		fPostSelectionListener = new ISelectionListener() {
 
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
@@ -204,18 +215,18 @@ public class TourMarkerView extends ViewPart {
 					fTourChart = ((SelectionTourChart) selection).getTourChart();
 
 					if (fTourChart == null) {
-						
+
 						// hide the marker editor
-						
+
 						fPageBook.showPage(fPageNoChart);
-						
+
 					} else {
-						
+
 						// show the markers for the given tour
-						
+
 						fTourData = fTourChart.getTourData();
 						fMarkerViewer.setInput(this);
-						
+
 						fPageBook.showPage(fPageViewer);
 					}
 				}
@@ -301,9 +312,20 @@ public class TourMarkerView extends ViewPart {
 
 		tc = new TableColumn(table, SWT.LEAD);
 		tc.setText(Messages.TourMarker_Column_position);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(12), false));
+		tableLayouter.addColumnData(new ColumnWeightData(20, true));
 
+		tc = new TableColumn(table, SWT.TRAIL);
+ 		tc.setText("H");
+		tc.setToolTipText("Horizontal offset");
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
+				.convertWidthInCharsToPixels(8), false));
+		
+		tc = new TableColumn(table, SWT.TRAIL);
+		tc.setText("V");
+		tc.setToolTipText("Vertical offset");
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
+				.convertWidthInCharsToPixels(8), false));
+		
 		/*
 		 * create table viewer
 		 */
@@ -315,6 +337,12 @@ public class TourMarkerView extends ViewPart {
 		fMarkerViewer.setColumnProperties(COLUMN_PROPERTIES);
 
 		fLabelEditor = new TextCellEditor(table);
+
+		fMarkerViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(DoubleClickEvent event) {
+				editMarker();
+			}
+		});
 
 		ComboBoxCellEditor positionEditor = new ComboBoxCellEditor(
 				table,
@@ -332,7 +360,9 @@ public class TourMarkerView extends ViewPart {
 					if (e.keyCode == SWT.CR) {
 						if (e.stateMask == SWT.CONTROL) {
 							// edit visual position
-							fMarkerViewer.editElement(selection.getFirstElement(), 3);
+							fMarkerViewer.editElement(
+									selection.getFirstElement(),
+									COLUMN_VISUAL_POSITION);
 						} else {
 							editMarker();
 						}
@@ -341,13 +371,13 @@ public class TourMarkerView extends ViewPart {
 			}
 		});
 
-		fMarkerViewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				editMarker();
-			}
-		});
-
-		fMarkerViewer.setCellEditors(new CellEditor[] { null, null, fLabelEditor, positionEditor });
+		fMarkerViewer.setCellEditors(new CellEditor[] {
+				null,
+				null,
+				fLabelEditor,
+				positionEditor,
+				null,
+				null, });
 
 		fMarkerViewer.setCellModifier(new ICellModifier() {
 
@@ -441,11 +471,11 @@ public class TourMarkerView extends ViewPart {
 		if (selection.size() > 0) {
 
 			if (fMarkerViewer.isCellEditorActive() == false) {
-				fMarkerViewer.editElement(selection.getFirstElement(), 2);
+				fMarkerViewer.editElement(selection.getFirstElement(), COLUMN_REMARK);
 
 				// unselect text
-				Text textControl = ((Text) fLabelEditor.getControl());
-				textControl.setSelection(textControl.getText().length());
+				// Text textControl = ((Text) fLabelEditor.getControl());
+				// textControl.setSelection(textControl.getText().length());
 			}
 		}
 	}
@@ -486,8 +516,7 @@ public class TourMarkerView extends ViewPart {
 		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();
 
 		/*
-		 * get a list of markers which can be removed, device markers can't be
-		 * removed
+		 * get a list of markers which can be removed, device markers can't be removed
 		 */
 		ArrayList<TourMarker> removedMarkers = new ArrayList<TourMarker>();
 		for (Iterator iter = markerSelection.iterator(); iter.hasNext();) {
@@ -544,15 +573,15 @@ public class TourMarkerView extends ViewPart {
 			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
 					fTourChart,
 					((TourMarker) segments[0]).getSerieIndex(),
-					SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER));
+					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
 		} else {
 			/*
 			 * no markers are selected, move the markers to start/end position
 			 */
 			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
 					fTourChart,
-					SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER,
-					SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER));
+					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
+					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
 		}
 	}
 

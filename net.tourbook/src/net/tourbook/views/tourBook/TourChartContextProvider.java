@@ -17,24 +17,21 @@ package net.tourbook.views.tourBook;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartContextProvider;
-import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartXSlider;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourReference;
-import net.tourbook.tour.TourChart;
 import net.tourbook.views.tourMap.ReferenceTourManager;
 import net.tourbook.views.tourMap.SelectionNewRefTours;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 
 class TourChartContextProvider implements ChartContextProvider {
 
-	private TourBookView	fView;
+	TourBookView	fView;
+
+	public ChartXSlider		fSlider;
+
 
 	/**
 	 * add a new reference tour to all reference tours
@@ -60,15 +57,7 @@ class TourChartContextProvider implements ChartContextProvider {
 		}
 	}
 
-	public TourChartContextProvider(TourBookView view) {
-		fView = view;
-	}
-
-	public void fillBarChartContextMenu(IMenuManager menuMgr) {}
-
-	class SliderAction extends Action {
-
-		private ChartXSlider	fSlider;
+	 class SliderAction extends Action {
 
 		SliderAction(String text, ChartXSlider slider) {
 			super(text);
@@ -79,42 +68,15 @@ class TourChartContextProvider implements ChartContextProvider {
 		public void run() {
 
 			// create a new marker
-
-			// get the marker name
-			InputDialog dialog = new InputDialog(
-					Display.getCurrent().getActiveShell(),
-					Messages.TourMap_Dlg_add_marker_title,
-					Messages.TourMap_Dlg_add_marker_label,
-					"", //$NON-NLS-1$
-					null);
-
-			if (dialog.open() != Window.OK) {
-				return;
-			}
-
-			TourChart tourChart = fView.getTourChart();
-			TourData tourData = tourChart.getTourData();
-
-			TourMarker tourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_CUSTOM);
-
-			int serieIndex = fSlider.getValuesIndex();
-			tourMarker.setSerieIndex(serieIndex);
-			tourMarker.setDistance(tourData.distanceSerie[serieIndex]);
-			tourMarker.setTime(tourData.timeSerie[serieIndex]);
-			tourMarker.setLabel(dialog.getValue().trim());
-			tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-
-			// add new marker to the marker list
-			tourData.getTourMarkers().add(tourMarker);
-
-			tourChart.setTourDirty();
-
-			tourChart.updateMarkerLayer(true);
-
-			// update marker list or other listener
-			tourChart.fireSelectionTourChart();
+			new MarkerDialog(TourChartContextProvider.this, Display.getCurrent().getActiveShell()).open();
 		}
 	}
+
+	public TourChartContextProvider(TourBookView view) {
+		fView = view;
+	}
+
+	public void fillBarChartContextMenu(IMenuManager menuMgr) {}
 
 	public void fillXSliderContextMenu(	IMenuManager menuMgr,
 										ChartXSlider leftSlider,

@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ViewForm;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -81,7 +82,7 @@ public class Chart extends ViewForm {
 
 		super(parent, style);
 		setBorderVisible(false);
-		
+
 		// setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		GridLayout gl = new GridLayout(1, false);
@@ -327,6 +328,10 @@ public class Chart extends ViewForm {
 		return createChartInfo();
 	}
 
+	public Image getChartCoreImage() {
+		return fChartComponents.getChartComponentGraph().fGraphCoreImage;
+	}
+
 	public ChartProperties getChartProperties() {
 		return fChartComponents.getChartProperties();
 	}
@@ -336,9 +341,8 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Returns the toolbar for the chart, if no toolbar manager is set with
-	 * setToolbarManager, the manager will be created and the toolbar is on top
-	 * of the chart
+	 * Returns the toolbar for the chart, if no toolbar manager is set with setToolbarManager, the
+	 * manager will be created and the toolbar is on top of the chart
 	 * 
 	 * @return
 	 */
@@ -472,8 +476,7 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Sets a new data model for the chart and redraws it, NULL will hide the
-	 * chart
+	 * Sets a new data model for the chart and redraws it, NULL will hide the chart
 	 * 
 	 * @param chartDataModel
 	 */
@@ -482,8 +485,7 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Sets a new data model for the chart and redraws it, NULL will hide the
-	 * chart
+	 * Sets a new data model for the chart and redraws it, NULL will hide the chart
 	 * 
 	 * @param chartDataModel
 	 * @param isResetSelection
@@ -547,8 +549,8 @@ public class Chart extends ViewForm {
 	 * Select (highlight) the bar in the bar chart
 	 * 
 	 * @param selectedItems
-	 *        items in the x-data serie which should be selected, can be also
-	 *        <code>null</code> to deselect the bar
+	 *        items in the x-data serie which should be selected, can be also <code>null</code> to
+	 *        deselect the bar
 	 */
 	public void setSelectedBars(boolean[] selectedItems) {
 		fChartComponents.getChartComponentGraph().setSelectedBars(selectedItems);
@@ -592,8 +594,7 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * set the zoom-marker position, this position is used when the chart is
-	 * drawn/resized
+	 * set the zoom-marker position, this position is used when the chart is drawn/resized
 	 * 
 	 * @param zoomMarkerPositionIn
 	 */
@@ -602,10 +603,9 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Set's the zoom-marker position listener, this is a chartwidget which will
-	 * be notified to synchronize the marker position when this chart is
-	 * resized, when set to <code>null</code> this will disable the
-	 * synchronisation
+	 * Set's the zoom-marker position listener, this is a chartwidget which will be notified to
+	 * synchronize the marker position when this chart is resized, when set to <code>null</code>
+	 * this will disable the synchronisation
 	 * 
 	 * @param chartWidget
 	 */
@@ -656,8 +656,8 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Zoom into the chart so that the sliders are positioned on the right and
-	 * left border of the chart
+	 * Zoom into the chart so that the sliders are positioned on the right and left border of the
+	 * chart
 	 */
 	public void zoomIn() {
 		fChartComponents.zoomIn();
@@ -687,8 +687,7 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Zoom the graph, so that the left and right sliders are at the visible
-	 * border
+	 * Zoom the graph, so that the left and right sliders are at the visible border
 	 * 
 	 * @param sliderPosition
 	 */

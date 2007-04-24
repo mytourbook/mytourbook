@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import org.eclipse.swt.graphics.Rectangle;
 
 /**
- * the slider is moved on the x-axis and displays the current position in the
- * slider label
+ * the slider is moved on the x-axis and displays the current position in the slider label
  */
 public class ChartXSlider {
 
@@ -46,8 +45,8 @@ public class ChartXSlider {
 																			0);
 
 	/**
-	 * keep the ratio of sliderpos/clientwidth, this is needed when changing the
-	 * client width, so we don't loose the accuracy for the position
+	 * keep the ratio of sliderpos/clientwidth, this is needed when changing the client width, so we
+	 * don't loose the accuracy for the position
 	 */
 	private float							positionRatio;
 
@@ -57,8 +56,7 @@ public class ChartXSlider {
 	private int								devVirtualSliderLinePos;
 
 	/**
-	 * offset between the left position of the slider hit rectangle and the
-	 * mouse hit within it
+	 * offset between the left position of the slider hit rectangle and the mouse hit within it
 	 */
 	private int								devXClickOffset;
 
@@ -97,9 +95,10 @@ public class ChartXSlider {
 	/**
 	 * @return Returns the slider line position in the graph
 	 */
-	int getDevVirtualSliderLinePos() {
+	public int getDevVirtualSliderLinePos() {
 		return devVirtualSliderLinePos;
 	}
+
 	/**
 	 * @return Returns the devXClickOffset.
 	 */
@@ -123,7 +122,10 @@ public class ChartXSlider {
 		return rect;
 	}
 
-	ArrayList<ChartXSliderLabel> getLabelList() {
+	/**
+	 * @return Returns a list with all slider labels
+	 */
+	public ArrayList<ChartXSliderLabel> getLabelList() {
 		return labelList;
 	}
 
@@ -143,8 +145,7 @@ public class ChartXSlider {
 	}
 
 	/**
-	 * When the width of the graph changed, the slider bar position must be
-	 * adjusted
+	 * When the width of the graph changed, the slider bar position must be adjusted
 	 * 
 	 * @param newWidth
 	 *        new width for the graph
@@ -184,8 +185,7 @@ public class ChartXSlider {
 	}
 
 	/**
-	 * Sets a new position for the sliderLine and also updates the slider/line
-	 * rectangles and value
+	 * Sets a new position for the sliderLine and also updates the slider/line rectangles and value
 	 * 
 	 * @param newDevVirtualSliderLinePos
 	 */
@@ -195,9 +195,8 @@ public class ChartXSlider {
 
 		final int devVirtualGraphImageWidth = chartGraph.getDevVirtualGraphImageWidth();
 		/*
-		 * the slider line can be out of bounds for the graph image, this can
-		 * happen when the graph is auto-zoomed to the slider position in the
-		 * mouse up event
+		 * the slider line can be out of bounds for the graph image, this can happen when the graph
+		 * is auto-zoomed to the slider position in the mouse up event
 		 */
 		if (adjustToImageWidth) {
 			newDevVirtualSliderLinePos = Math.min(devVirtualGraphImageWidth, Math.max(
@@ -221,8 +220,8 @@ public class ChartXSlider {
 			positionRatio = Math.min(positionRatio, 1);
 		}
 
-//		System.out.println(("slider:newDevVirtualSliderLinePos " + newDevVirtualSliderLinePos)
-//				+ ("\tpositionRatio:" + positionRatio));
+		// System.out.println(("slider:newDevVirtualSliderLinePos " + newDevVirtualSliderLinePos)
+		// + ("\tpositionRatio:" + positionRatio));
 
 		// fire change event when the position has changed
 		if (newDevVirtualSliderLinePos != oldPos) {

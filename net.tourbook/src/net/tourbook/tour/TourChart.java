@@ -165,6 +165,9 @@ public class TourChart extends Chart {
 			chartMarker.serieIndex = tourMarker.getSerieIndex();
 			chartMarker.visualPosition = tourMarker.getVisualPosition();
 			chartMarker.type = tourMarker.getType();
+			
+			chartMarker.labelXOffset = tourMarker.getLabelXOffset();
+			chartMarker.labelYOffset = tourMarker.getLabelYOffset();
 
 			fMarkerLayer.addMarker(chartMarker);
 		}
@@ -602,6 +605,9 @@ public class TourChart extends Chart {
 		}
 	}
 
+	/**
+	 * set the tour dirty so it should be saved when the tour is changed
+	 */
 	public void setTourDirty() {
 		fIsTourDirty = true;
 	}

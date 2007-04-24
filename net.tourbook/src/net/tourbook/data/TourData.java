@@ -874,7 +874,7 @@ public class TourData {
 		return serieData;
 	}
 
-	public Collection<TourMarker> getTourMarkers() {
+	public Set<TourMarker> getTourMarkers() {
 		return tourMarkers;
 	}
 
@@ -985,6 +985,10 @@ public class TourData {
 		tourAltUp = (int) altUp;
 		tourAltDown = (int) altDown;
 //		System.out.println("Up: " + logUp + "  Down: " + logDown);
+	}
+
+	public void setTourMarkers(Set<TourMarker> tourMarkers) {
+		this.tourMarkers = tourMarkers;
 	}
 
 }

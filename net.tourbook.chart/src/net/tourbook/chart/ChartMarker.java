@@ -45,6 +45,11 @@ public class ChartMarker {
 	 */
 	public final static int	MARKER_TYPE_CUSTOM						= 2;
 
+	/**
+	 * this is a temp marker
+	 */
+	public static final int	MARKER_TYPE_TEMP						= 3;
+
 	public String			graphLabel								= "";	//$NON-NLS-1$
 	public String			markerLabel								= "";	//$NON-NLS-1$
 
@@ -65,6 +70,9 @@ public class ChartMarker {
 	 * <code>TourMarker.MARKER_TYPE_CUSTOM</code>
 	 */
 	public int				type;
+
+	public int				labelXOffset;
+	public int				labelYOffset;
 
 	public ChartMarker() {}
 }

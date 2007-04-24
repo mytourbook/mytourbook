@@ -67,12 +67,16 @@ public class ChartDrawingData {
 	private int						devSliderBarHeight;
 
 	// graph position
-	// private int devXLeft = 0;
-	private int						devYBottom;
 	private int						devYTop;
+	private int						devYBottom;
 
-	// graph height
+	/**
+	 * virtual graph width in dev (pixel) units
+	 */
+	private int						devGraphWidth;
 	private int						devGraphHeight;
+
+	private int						devSliderHeight;
 
 	/**
 	 * graph value for the bottom of the graph
@@ -81,8 +85,6 @@ public class ChartDrawingData {
 	private int						graphYTop;
 
 	// graph width
-	private int						devGraphWidth;
-	private int						devSliderHeight;
 
 	private int						barPosition				= BAR_POS_LEFT;
 
@@ -94,8 +96,7 @@ public class ChartDrawingData {
 	}
 
 	/**
-	 * @return Returns the barPosition, this can be set to BAR_POS_LEFT,
-	 *         BAR_POS_CENTER
+	 * @return Returns the barPosition, this can be set to BAR_POS_LEFT, BAR_POS_CENTER
 	 */
 	public int getBarPosition() {
 		return barPosition;
@@ -126,6 +127,9 @@ public class ChartDrawingData {
 		return devGraphHeight;
 	}
 
+	/**
+	 * virtual graph width in dev (pixel) units
+	 */
 	public int getDevGraphWidth() {
 		return devGraphWidth;
 	}
@@ -180,7 +184,7 @@ public class ChartDrawingData {
 	}
 
 	/**
-	 * @return Returns the devYTop.
+	 * @return Returns the top of the chart in dev units
 	 */
 	public int getDevYTop() {
 		return devYTop;
@@ -390,8 +394,7 @@ public class ChartDrawingData {
 	}
 
 	/**
-	 * set the position of the unit text, this can be XUNIT_TEXT_POS_LEFT or
-	 * XUNIT_TEXT_POS_CENTER
+	 * set the position of the unit text, this can be XUNIT_TEXT_POS_LEFT or XUNIT_TEXT_POS_CENTER
 	 * 
 	 * @param unitTextPos
 	 *        The xUnitTextPos to set.

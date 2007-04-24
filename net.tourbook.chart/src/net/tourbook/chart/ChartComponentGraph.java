@@ -62,8 +62,8 @@ public class ChartComponentGraph extends Canvas {
 
 	private static final int			BAR_MARKER_WIDTH		= 16;
 	/**
-	 * the factor is multiplied whth the visible graph width, so that the
-	 * sliders are indented from the border to be good visible
+	 * the factor is multiplied whth the visible graph width, so that the sliders are indented from
+	 * the border to be good visible
 	 */
 	private static final double			ZOOM_REDUCING_FACTOR	= 0.1;
 	private static final double			ZOOM_WITH_PARTS_RATIO	= 0.8;
@@ -76,7 +76,7 @@ public class ChartComponentGraph extends Canvas {
 	/*
 	 * images for the chart and slider
 	 */
-	private Image						fGraphCoreImage;
+	Image								fGraphCoreImage;
 	private Image						fGraphLayerImage;
 
 	private Image						fCumstomLayerImage;
@@ -100,30 +100,27 @@ public class ChartComponentGraph extends Canvas {
 	private float						graphZoomRatio			= 1;
 
 	/**
-	 * when the graph is zoomed and <code>canScrollZoomedChart</code> is
-	 * <code>true</code>, the graph can be wider than the visial part. This
-	 * field contains the width for the image when the whole tour would be
-	 * displayed and not only a part
+	 * when the graph is zoomed and <code>canScrollZoomedChart</code> is <code>true</code>, the
+	 * graph can be wider than the visial part. This field contains the width for the image when the
+	 * whole tour would be displayed and not only a part
 	 */
 	private int							devVirtualGraphImageWidth;
 
 	/**
-	 * when the zoomed graph can't be scrolled the chart image could be wider
-	 * than the visible part, this field contains the offset for the start of
-	 * the visible chart
+	 * when the zoomed graph can't be scrolled the chart image could be wider than the visible part,
+	 * this field contains the offset for the start of the visible chart
 	 */
 	private int							devGraphImageXOffset;
 
 	/**
-	 * the zoomed chart can be scrolled when set to <code>true</code>, for a
-	 * zoomed chart, the chart image can be wider than the visible part and can
-	 * be scrolled
+	 * the zoomed chart can be scrolled when set to <code>true</code>, for a zoomed chart, the
+	 * chart image can be wider than the visible part and can be scrolled
 	 */
 	boolean								canScrollZoomedChart;
 
 	/**
-	 * when the slider is dragged and the mouse up event occures, the graph is
-	 * zoomed to the sliders when set to <code>true</code>
+	 * when the slider is dragged and the mouse up event occures, the graph is zoomed to the sliders
+	 * when set to <code>true</code>
 	 */
 	boolean								canAutoZoomToSlider;
 
@@ -138,8 +135,8 @@ public class ChartComponentGraph extends Canvas {
 	private boolean						fIsSliderDirty;
 
 	/**
-	 * when set to <code>true</code> the custom layers above the graph image
-	 * needs a redraw in the next paint event
+	 * when set to <code>true</code> the custom layers above the graph image needs a redraw in the
+	 * next paint event
 	 */
 	private boolean						isCustomLayerDirty;
 
@@ -149,8 +146,7 @@ public class ChartComponentGraph extends Canvas {
 	private boolean						fIsSelectionDirty;
 
 	/**
-	 * status for the x-slider, <code>true</code> indicates, the slider is
-	 * visible
+	 * status for the x-slider, <code>true</code> indicates, the slider is visible
 	 */
 	private boolean						isXSliderVisible;
 
@@ -166,14 +162,13 @@ public class ChartComponentGraph extends Canvas {
 	private ChartXSlider				xSliderB;
 
 	/**
-	 * xSliderDragged is set when the slider is being dragged, otherwise it is
-	 * to <code>null</code>
+	 * xSliderDragged is set when the slider is being dragged, otherwise it is to <code>null</code>
 	 */
 	private ChartXSlider				xSliderDragged;
 
 	/**
-	 * This is the slider which is drawn on top of the other, this is normally
-	 * the last dragged slider
+	 * This is the slider which is drawn on top of the other, this is normally the last dragged
+	 * slider
 	 */
 	private ChartXSlider				xSliderOnTop;
 
@@ -183,8 +178,8 @@ public class ChartComponentGraph extends Canvas {
 	private ChartXSlider				xSliderOnBottom;
 
 	/**
-	 * contains the x-slider when the mouse is over it, or <code>null</code>
-	 * when the mouse is not over it
+	 * contains the x-slider when the mouse is over it, or <code>null</code> when the mouse is not
+	 * over it
 	 */
 	private ChartXSlider				fMouseOverXSlider;
 
@@ -214,14 +209,14 @@ public class ChartComponentGraph extends Canvas {
 	private boolean						fScrollToSelection;
 
 	/**
-	 * contextLeftSlider is set not null when the right mouse button was clicked
-	 * and the left slider was hit
+	 * contextLeftSlider is set not null when the right mouse button was clicked and the left slider
+	 * was hit
 	 */
 	private ChartXSlider				contextLeftSlider;
 
 	/**
-	 * contextRightSlider is set not null when the right mouse button was
-	 * clicked and the right slider was hit
+	 * contextRightSlider is set not null when the right mouse button was clicked and the right
+	 * slider was hit
 	 */
 	private ChartXSlider				contextRightSlider;
 
@@ -537,10 +532,9 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 
 			/*
-			 * The non time value (distance) is not linear, the value is
-			 * increasing steadily but with different distance on the x axis. So
-			 * first we have to find the nearest position in the values array
-			 * and then interpolite from the found position to the slider
+			 * The non time value (distance) is not linear, the value is increasing steadily but
+			 * with different distance on the x axis. So first we have to find the nearest position
+			 * in the values array and then interpolite from the found position to the slider
 			 * position
 			 */
 
@@ -567,9 +561,8 @@ public class ChartComponentGraph extends Canvas {
 			} else if (sliderValue > xValue) {
 
 				/*
-				 * in the value array move towards the end to find the position
-				 * where the value of the slider corresponds with the value in
-				 * the value array
+				 * in the value array move towards the end to find the position where the value of
+				 * the slider corresponds with the value in the value array
 				 */
 
 				while (sliderValue > xValue) {
@@ -716,8 +709,8 @@ public class ChartComponentGraph extends Canvas {
 
 			if (slider == xSliderDragged) {
 				/*
-				 * current slider is the dragged slider, clip the slider label
-				 * position at the viewport
+				 * current slider is the dragged slider, clip the slider label position at the
+				 * viewport
 				 */
 				if (labelXPos < leftPos) {
 					labelXPos += (leftPos - labelXPos);
@@ -727,8 +720,7 @@ public class ChartComponentGraph extends Canvas {
 
 			} else {
 				/*
-				 * current slider is not dragged, clip the slider label position
-				 * at the chart bounds
+				 * current slider is not dragged, clip the slider label position at the chart bounds
 				 */
 				if (labelXPos < 0) {
 
@@ -737,8 +729,7 @@ public class ChartComponentGraph extends Canvas {
 				} else {
 
 					/*
-					 * show the whole label when the slider is on the right
-					 * border
+					 * show the whole label when the slider is on the right border
 					 */
 					if (canScrollZoomedChart) {
 
@@ -764,8 +755,7 @@ public class ChartComponentGraph extends Canvas {
 					- label.getHeight());
 
 			/*
-			 * get the y position of the marker which marks the y value in the
-			 * graph
+			 * get the y position of the marker which marks the y value in the graph
 			 */
 			int yGraph = drawingData.getDevYBottom()
 					- (int) ((float) (yValue - drawingData.getGraphYBottom()) * drawingData
@@ -875,9 +865,8 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues
-	 * does not return null, if null is returned, a line graph will be drawn
-	 * instead
+	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
+	 * if null is returned, a line graph will be drawn instead
 	 * 
 	 * @param gc
 	 * @param drawingData
@@ -1102,8 +1091,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			/*
-			 * keep the selected bar because it will be drawn after all other
-			 * bars are drawn
+			 * keep the selected bar because it will be drawn after all other bars are drawn
 			 */
 			final Rectangle barShapeSelected = new Rectangle(
 					(barRectangle.x - markerWidth2),
@@ -1196,6 +1184,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 	}
+
 	/**
 	 * Paint event handler
 	 * 
@@ -1291,8 +1280,8 @@ public class ChartComponentGraph extends Canvas {
 		final GC gc = new GC(fCumstomLayerImage);
 
 		/*
-		 * copy the graph image into the custom layer image, the custom layers
-		 * are drawn on top of the graphs
+		 * copy the graph image into the custom layer image, the custom layers are drawn on top of
+		 * the graphs
 		 */
 		gc.fillRectangle(graphRect);
 		gc.drawImage(fGraphCoreImage, 0, 0);
@@ -1322,8 +1311,7 @@ public class ChartComponentGraph extends Canvas {
 			public void run() {
 
 				/*
-				 * create the chart image only when a new onPaint event has not
-				 * occured
+				 * create the chart image only when a new onPaint event has not occured
 				 */
 
 				if (fCurrentDrawCounter != fDrawCounter[0]) {
@@ -1343,16 +1331,16 @@ public class ChartComponentGraph extends Canvas {
 						: devNonScrolledImageWidth;
 
 				/*
-				 * the image size is adjusted to the client size but it must be
-				 * within the min/max ranges
+				 * the image size is adjusted to the client size but it must be within the min/max
+				 * ranges
 				 */
 				final int devImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT, Math.min(
 						getVisibleGraphHeight(),
 						ChartComponents.CHART_MAX_HEIGHT));
 
 				/*
-				 * when the image is the same size as the new we will redraw it
-				 * only if it is set to dirty
+				 * when the image is the same size as the new we will redraw it only if it is set to
+				 * dirty
 				 */
 				if (fIsGraphDirty == false && fGraphCoreImage != null) {
 
@@ -1595,8 +1583,8 @@ public class ChartComponentGraph extends Canvas {
 		final Rectangle graphRect = fCumstomLayerImage.getBounds();
 
 		/*
-		 * when the existing slider image has the same size as a new slider
-		 * image, it will redrawn if it's set to dirty
+		 * when the existing slider image has the same size as a new slider image, it will redrawn
+		 * if it's set to dirty
 		 */
 		if (fIsSliderDirty == false
 				&& fIsSelectionDirty == false
@@ -1726,9 +1714,10 @@ public class ChartComponentGraph extends Canvas {
 					graphValueOffset);
 		}
 	}
+
 	/**
-	 * first we draw the graph into a path, the path is then drawn on the device
-	 * with a transformation
+	 * first we draw the graph into a path, the path is then drawn on the device with a
+	 * transformation
 	 * 
 	 * @param gc
 	 * @param drawingData
@@ -1831,8 +1820,7 @@ public class ChartComponentGraph extends Canvas {
 			if ((graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM || graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO)
 					&& (xValueIndex == endIndex - 1)) {
 				/*
-				 * this is the last point for a filled graph, draw the line to
-				 * the x-axis
+				 * this is the last point for a filled graph, draw the line to the x-axis
 				 */
 
 				int graphXAxisLine = 0;
@@ -1852,11 +1840,10 @@ public class ChartComponentGraph extends Canvas {
 				path.lineTo(xValue * scaleX, devChartY0Line - (graphXAxisLine * scaleY));
 				path.moveTo(xValue * scaleX, devChartY0Line - (graphXAxisLine * scaleY));
 
-//				System.out.println(xValue * scaleX);
+				// System.out.println(xValue * scaleX);
 			}
 		}
 
-		
 		final Color colorFg = new Color(display, rgbFg);
 		final Color colorBg1 = new Color(display, rgbBg1);
 		final Color colorBg2 = new Color(display, rgbBg2);
@@ -1873,7 +1860,7 @@ public class ChartComponentGraph extends Canvas {
 		if (canScrollZoomedChart == false) {
 			graphWidth -= graphValueOffset;
 		}
-		
+
 		/*
 		 * force a max width because on linux the fill will not be drawn
 		 */
@@ -1883,8 +1870,8 @@ public class ChartComponentGraph extends Canvas {
 		if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
 
 			/*
-			 * adjust the fill gradient in the hight, otherwise the fill is not
-			 * in the whole rectangle
+			 * adjust the fill gradient in the hight, otherwise the fill is not in the whole
+			 * rectangle
 			 */
 			gc.setClipping(path);
 			gc.fillGradientRectangle(
@@ -1939,6 +1926,7 @@ public class ChartComponentGraph extends Canvas {
 
 		gc.setAlpha(0xFF);
 	}
+
 	private void drawSelection(final GC gc) {
 
 		fIsSelectionDirty = false;
@@ -2012,8 +2000,8 @@ public class ChartComponentGraph extends Canvas {
 			devMovedXEnd = (int) (scaleX * xValues[fMovedXMarkerEndValueIndex] - devGraphImageXOffset);
 
 			/*
-			 * when the moved x-marker is on the right or the left border, make
-			 * sure that the x-markers don't get too small
+			 * when the moved x-marker is on the right or the left border, make sure that the
+			 * x-markers don't get too small
 			 */
 			final int valueMovedDiff = xValues[fMovedXMarkerEndValueIndex]
 					- xValues[fMovedXMarkerStartValueIndex];
@@ -2021,8 +2009,8 @@ public class ChartComponentGraph extends Canvas {
 			if (fMovedXMarkerStartValueIndex == 0 && valueMovedDiff < fForcedXMarkerValueDiff) {
 
 				/*
-				 * the x-marker is moved to the left so the most left x-marker
-				 * is on the first position
+				 * the x-marker is moved to the left so the most left x-marker is on the first
+				 * position
 				 */
 
 				int valueIndex;
@@ -2039,8 +2027,8 @@ public class ChartComponentGraph extends Canvas {
 					&& valueMovedDiff < fForcedXMarkerValueDiff) {
 
 				/*
-				 * the x-marker is moved to the right so the most right x-marker
-				 * is on the last position
+				 * the x-marker is moved to the right so the most right x-marker is on the last
+				 * position
 				 */
 
 				int valueIndex;
@@ -2058,8 +2046,8 @@ public class ChartComponentGraph extends Canvas {
 			if (valueMovedDiff > fForcedXMarkerValueDiff) {
 
 				/*
-				 * force the value diff for the x-marker, the moved value diff
-				 * can't be wider then one value index
+				 * force the value diff for the x-marker, the moved value diff can't be wider then
+				 * one value index
 				 */
 
 				final int valueStart = xValues[fMovedXMarkerStartValueIndex];
@@ -2145,8 +2133,7 @@ public class ChartComponentGraph extends Canvas {
 					&& fMouseOverXSlider == slider;
 
 			/*
-			 * when the mouse is over the slider, the slider is drawn in darker
-			 * color
+			 * when the mouse is over the slider, the slider is drawn in darker color
 			 */
 			// draw slider line
 			if ((fIsFocusActive && fSelectedXSlider == slider) || isSliderHovered) {
@@ -2259,8 +2246,8 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gc
 	 * @param drawingData
 	 * @param drawUnit
-	 *        <code>true</code> indicate to draws the unit tick and unit label
-	 *        additional to the unit grid line
+	 *        <code>true</code> indicate to draws the unit tick and unit label additional to the
+	 *        unit grid line
 	 * @param draw0Unit
 	 *        <code>true</code> indicate to draw the unit at the 0 position
 	 */
@@ -2511,8 +2498,8 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * @param rgb
-	 * @return Returns the color from the color cache, the color must not be
-	 *         disposed this is done when the cache is disposed
+	 * @return Returns the color from the color cache, the color must not be disposed this is done
+	 *         when the cache is disposed
 	 */
 	private Color getColor(final RGB rgb) {
 
@@ -2589,9 +2576,10 @@ public class ChartComponentGraph extends Canvas {
 	private int getVisibleGraphHeight() {
 		return fChartComponents.getDevVisibleChartHeight();
 	}
+
 	/**
-	 * Returns the size of the graph for the given bounds, the size will be
-	 * reduced when the scrollbars are visible
+	 * Returns the size of the graph for the given bounds, the size will be reduced when the
+	 * scrollbars are visible
 	 * 
 	 * @param bounds
 	 *        is the size of the receiver where the chart can be drawn
@@ -2674,11 +2662,13 @@ public class ChartComponentGraph extends Canvas {
 					onMouseDoubleClick(e);
 				}
 			}
+
 			public void mouseDown(final MouseEvent e) {
 				if (fDrawingData != null) {
 					onMouseDown(e);
 				}
 			}
+
 			public void mouseUp(final MouseEvent e) {
 				if (fDrawingData != null) {
 					onMouseUp(e);
@@ -2696,6 +2686,7 @@ public class ChartComponentGraph extends Canvas {
 					onMouseExit(e);
 				}
 			}
+
 			public void mouseHover(final MouseEvent e) {}
 		});
 
@@ -2709,8 +2700,7 @@ public class ChartComponentGraph extends Canvas {
 				}
 				fChartComponents.handleLeftRightEvent(event);
 				/*
-				 * prevent scrolling the scrollbar, scrolling is done by the
-				 * chart itself
+				 * prevent scrolling the scrollbar, scrolling is done by the chart itself
 				 */
 				event.doit = false;
 
@@ -2821,8 +2811,7 @@ public class ChartComponentGraph extends Canvas {
 			if (fHoveredBarSerieIndex != -1) {
 
 				/*
-				 * hide last hovered bar, because the last hovered bar is
-				 * visible
+				 * hide last hovered bar, because the last hovered bar is visible
 				 */
 
 				// set status: no bar is hovered
@@ -2877,6 +2866,7 @@ public class ChartComponentGraph extends Canvas {
 
 		return xSlider;
 	}
+
 	/**
 	 * check if the mouse hit an y-slider and returns the hit slider
 	 * 
@@ -2990,8 +2980,8 @@ public class ChartComponentGraph extends Canvas {
 	 * @param xSlider
 	 *        Current slider
 	 * @param devSliderLinePos
-	 *        x coordinate for the slider line within the graph, this can be
-	 *        outside of the visible graph
+	 *        x coordinate for the slider line within the graph, this can be outside of the visible
+	 *        graph
 	 */
 	private void moveXSlider(final ChartXSlider xSlider, int devSliderLinePos) {
 
@@ -3152,8 +3142,7 @@ public class ChartComponentGraph extends Canvas {
 			} else {
 
 				/*
-				 * start to move the x-marker, when a dragging listener and the
-				 * x-marker is set
+				 * start to move the x-marker, when a dragging listener and the x-marker is set
 				 */
 				if (fChart.fXMarkerDraggingListener != null && isXMarkerHit(devXGraph)) {
 
@@ -3205,6 +3194,7 @@ public class ChartComponentGraph extends Canvas {
 
 		setCursor(null);
 	}
+
 	/**
 	 * Mouse move event handler
 	 * 
@@ -3463,8 +3453,7 @@ public class ChartComponentGraph extends Canvas {
 	private void adjustYSlider() {
 
 		/*
-		 * check if the y slider was outside of the bounds, recompute the chart
-		 * when necessary
+		 * check if the y slider was outside of the bounds, recompute the chart when necessary
 		 */
 
 		final ChartDrawingData drawingData = ySliderDragged.getDrawingData();
@@ -3520,15 +3509,13 @@ public class ChartComponentGraph extends Canvas {
 		setCursor(null);
 
 		/*
-		 * the hited slider could be outsite of the chart, hide the labels on
-		 * the slider
+		 * the hited slider could be outsite of the chart, hide the labels on the slider
 		 */
 		hitYSlider = null;
 
 		/*
-		 * when the zoom in marker is set, it would overwrite the changed
-		 * y-slider position, so we overwrite the zoom in marker y-slider
-		 * positions until the zoom in marker is overwritten
+		 * when the zoom in marker is set, it would overwrite the changed y-slider position, so we
+		 * overwrite the zoom in marker y-slider positions until the zoom in marker is overwritten
 		 */
 		if (fChartComponents.zoomMarkerPositionIn != null) {
 
@@ -3620,8 +3607,7 @@ public class ChartComponentGraph extends Canvas {
 
 			if (selectedIndex == fSelectedBarItems.length - 1) {
 				/*
-				 * last bar item is currently selected, select the first bar
-				 * item
+				 * last bar item is currently selected, select the first bar item
 				 */
 				selectedIndex = 0;
 			} else {
@@ -3671,8 +3657,7 @@ public class ChartComponentGraph extends Canvas {
 
 			if (selectedIndex == 0) {
 				/*
-				 * first bar item is currently selected, select the last bar
-				 * item
+				 * first bar item is currently selected, select the last bar item
 				 */
 				selectedIndex = fSelectedBarItems.length - 1;
 			} else {
@@ -3715,8 +3700,7 @@ public class ChartComponentGraph extends Canvas {
 		this.canScrollZoomedChart = canScrollZoomedGraph;
 
 		/*
-		 * a scrolled chart can't have the option to auto-zoom when the slider
-		 * is dragged
+		 * a scrolled chart can't have the option to auto-zoom when the slider is dragged
 		 */
 		if (canScrollZoomedGraph) {
 			this.canAutoZoomToSlider = false;
@@ -3905,8 +3889,8 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		/*
-		 * when the acceleration has changed, the start positions for scrolling
-		 * the graph must be set to the current location
+		 * when the acceleration has changed, the start positions for scrolling the graph must be
+		 * set to the current location
 		 */
 		if (oldValue != scrollAcceleration) {
 			startPosScrollbar = getHorizontalBar().getSelection();
@@ -3939,8 +3923,8 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * makes the slider visible, a slider is only drawn into the chart if a
-	 * slider was created with createSlider
+	 * makes the slider visible, a slider is only drawn into the chart if a slider was created with
+	 * createSlider
 	 * 
 	 * @param isXSliderVisible
 	 */
@@ -3979,10 +3963,9 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * set the slider to the 2nd x-data and keep the slider on the same xValue
-	 * position as before, this can cause to the situation, that the right
-	 * slider gets unvisible/unhitable or the painted graph can have a white
-	 * space on the right side
+	 * set the slider to the 2nd x-data and keep the slider on the same xValue position as before,
+	 * this can cause to the situation, that the right slider gets unvisible/unhitable or the
+	 * painted graph can have a white space on the right side
 	 * 
 	 * @param slider
 	 *        the slider which gets changed
@@ -4092,8 +4075,8 @@ public class ChartComponentGraph extends Canvas {
 					if (fScrollSmoothly == false) {
 
 						/*
-						 * reset scroll to selection, this is only needed once
-						 * when it's enable or when smooth scrolling is done
+						 * reset scroll to selection, this is only needed once when it's enable or
+						 * when smooth scrolling is done
 						 */
 						fScrollToSelection = false;
 					}
@@ -4115,8 +4098,8 @@ public class ChartComponentGraph extends Canvas {
 		hBar.setVisible(isHBarVisible);
 
 		/*
-		 * scroll bar selection (position of the graph) must be set AFTER the
-		 * scrollbar is set visible/enabled
+		 * scroll bar selection (position of the graph) must be set AFTER the scrollbar is set
+		 * visible/enabled
 		 */
 		if (fHorizontalScrollBarPos >= 0) {
 			hBar.setSelection(fHorizontalScrollBarPos);
@@ -4149,8 +4132,8 @@ public class ChartComponentGraph extends Canvas {
 			fIsSmoothScrollingActive = true;
 
 			/*
-			 * start smooth scrolling after the chart is drawn, because the
-			 * caller for this method is in the paint event
+			 * start smooth scrolling after the chart is drawn, because the caller for this method
+			 * is in the paint event
 			 */
 			display.asyncExec(new Runnable() {
 				public void run() {
@@ -4198,8 +4181,8 @@ public class ChartComponentGraph extends Canvas {
 			fScrollToSelection = false;
 
 			/*
-			 * the else part is being called in the initializing, I don't know
-			 * why then the scrollDiff == 0
+			 * the else part is being called in the initializing, I don't know why then the
+			 * scrollDiff == 0
 			 */
 			if (scrollDiff != 0) {
 				fScrollSmoothly = false;
@@ -4306,17 +4289,15 @@ public class ChartComponentGraph extends Canvas {
 		toolTipShell.pack();
 
 		/*
-		 * On some platforms, there is a minimum size for a shell which may be
-		 * greater than the label size. To avoid having the background of the
-		 * tip shell showing around the label, force the label to fill the
-		 * entire client area.
+		 * On some platforms, there is a minimum size for a shell which may be greater than the
+		 * label size. To avoid having the background of the tip shell showing around the label,
+		 * force the label to fill the entire client area.
 		 */
 		final Rectangle area = toolTipShell.getClientArea();
 		toolTipLabel.setSize(area.width, area.height);
 
 		/*
-		 * Position the tooltip and ensure that it is not located off the
-		 * screen.
+		 * Position the tooltip and ensure that it is not located off the screen.
 		 */
 		final Point cursorLocation = getDisplay().getCursorLocation();
 		// Assuming cursor is 21x21 because this is the size of
@@ -4336,8 +4317,7 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * adjust the y-position for the bottom label when the top label is drawn
-	 * over it
+	 * adjust the y-position for the bottom label when the top label is drawn over it
 	 */
 	private void updateXSliderYPosition() {
 
@@ -4379,8 +4359,8 @@ public class ChartComponentGraph extends Canvas {
 
 			if (graphImageWidth * 2 > maxChartWidth) {
 				/*
-				 * the double zoomed graph would be wider than the max width,
-				 * reduce it to the max width
+				 * the double zoomed graph would be wider than the max width, reduce it to the max
+				 * width
 				 */
 				graphZoomRatio = maxChartWidth / visibleGraphWidth;
 				devVirtualGraphImageWidth = maxChartWidth;
@@ -4395,8 +4375,7 @@ public class ChartComponentGraph extends Canvas {
 			fScrollToSelection = true;
 
 			/*
-			 * scroll smoothly is started when a bar is selected, otherwise it
-			 * is disabled
+			 * scroll smoothly is started when a bar is selected, otherwise it is disabled
 			 */
 			fScrollSmoothly = false;
 		}
@@ -4451,8 +4430,8 @@ public class ChartComponentGraph extends Canvas {
 			} else {
 
 				/*
-				 * the graph image can't be scrolled, show only the zoomed part
-				 * which is defined between the two sliders
+				 * the graph image can't be scrolled, show only the zoomed part which is defined
+				 * between the two sliders
 				 */
 
 				// calculate new graph ratio
@@ -4499,8 +4478,7 @@ public class ChartComponentGraph extends Canvas {
 		graphZoomPartPosition = 0;
 
 		/*
-		 * scroll smoothly is started when a bar is selected, otherwise it is
-		 * disabled
+		 * scroll smoothly is started when a bar is selected, otherwise it is disabled
 		 */
 		fScrollSmoothly = false;
 
@@ -4546,8 +4524,7 @@ public class ChartComponentGraph extends Canvas {
 		final int virtualSlider2Pos = (int) ((float) (devVirtualGraphImageWidth * value2) / maxValue);
 
 		/*
-		 * calculate the offset for the left slider, the graph is drawn starting
-		 * at this position
+		 * calculate the offset for the left slider, the graph is drawn starting at this position
 		 */
 		devGraphImageXOffset = Math.min(virtualSlider1Pos, virtualSlider2Pos);
 		xSliderA.moveToDevPosition(virtualSlider1Pos, true, true);
@@ -4555,8 +4532,8 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * zoom in where parts defines how the width of the graph will be splitted
-	 * and position defines which part is shown
+	 * zoom in where parts defines how the width of the graph will be splitted and position defines
+	 * which part is shown
 	 * 
 	 * @param ratio
 	 */
@@ -4598,8 +4575,7 @@ public class ChartComponentGraph extends Canvas {
 		final ChartXSlider rightSlider = getRightSlider();
 
 		/*
-		 * reset the sliders, the temp sliders are used so that the same slider
-		 * is not reset twice
+		 * reset the sliders, the temp sliders are used so that the same slider is not reset twice
 		 */
 		leftSlider.reset();
 		rightSlider.reset();

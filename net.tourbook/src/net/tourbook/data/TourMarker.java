@@ -28,7 +28,7 @@ import net.tourbook.Messages;
 public class TourMarker {
 
 	@Transient
-	public static final String[]	visualPositionLabels					= new String[] {
+	public static final String[]	visualPositionLabels	= new String[] {
 			Messages.TourMarker_Position_vertical_above, // 0
 			Messages.TourMarker_Position_vertical_below, // 1
 			Messages.TourMarker_Position_vertical_chart_top, // 2
@@ -39,7 +39,7 @@ public class TourMarker {
 			Messages.TourMarker_Position_horizontal_below_left, // 7
 			Messages.TourMarker_Position_horizontal_below_centered, // 8
 			Messages.TourMarker_Position_horizontal_below_right // 9
-																			};
+															};
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +48,9 @@ public class TourMarker {
 	@ManyToOne(optional = false)
 	private TourData				tourData;
 
+	/**
+	 * type contains the marker type which is defined in ChartMarker e.g.<code>ChartMarker.MARKER_TYPE_DEVICE</code>
+	 */
 	private int						type;
 
 	private int						time;
@@ -59,8 +62,7 @@ public class TourMarker {
 	private int						labelYOffset;
 
 	/**
-	 * marker type contains the type of the marker, this can be: crossing,
-	 * hotel, view point
+	 * markerType contains the type of the marker, this can be: crossing, hotel, view point
 	 */
 	private long					markerType;
 
@@ -69,8 +71,8 @@ public class TourMarker {
 	 */
 	private int						serieIndex;
 
-	private String					label									= ""; //$NON-NLS-1$
-	private String					category								= ""; //$NON-NLS-1$
+	private String					label					= "";	//$NON-NLS-1$
+	private String					category				= "";	//$NON-NLS-1$
 
 	public TourMarker() {}
 
@@ -137,6 +139,26 @@ public class TourMarker {
 
 	public void setVisualPosition(int visualPosition) {
 		this.visualPosition = visualPosition;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public int getLabelXOffset() {
+		return labelXOffset;
+	}
+
+	public void setLabelXOffset(int labelXOffset) {
+		this.labelXOffset = labelXOffset;
+	}
+
+	public int getLabelYOffset() {
+		return labelYOffset;
+	}
+
+	public void setLabelYOffset(int labelYOffset) {
+		this.labelYOffset = labelYOffset;
 	}
 
 }
