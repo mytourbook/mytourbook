@@ -39,6 +39,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
@@ -49,20 +50,19 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -70,7 +70,6 @@ import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
@@ -137,48 +136,50 @@ public class TourMarkerView extends ViewPart {
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 	}
 
-	class MarkerViewerLabelProvider extends LabelProvider implements ITableLabelProvider {
+	class MarkerViewerLabelProvider extends CellLabelProvider {
 
-		public Image getColumnImage(Object element, int columnIndex) {
-			return null;
-		}
+		public void update(ViewerCell cell) {
 
-		public String getColumnText(Object element, int columnIndex) {
+			TourMarker tourMarker = (TourMarker) cell.getElement();
 
-			TourMarker tourMarker = (TourMarker) element;
+			switch (cell.getColumnIndex()) {
 
-			switch (columnIndex) {
 			case COLUMN_TIME:
 				int time = tourMarker.getTime();
 				fCalendar.set(0, 0, 0, time / 3600, ((time % 3600) / 60), ((time % 3600) % 60));
-
-				return fDF.format(fCalendar.getTime());
+				cell.setText(fDF.format(fCalendar.getTime()));
+				break;
 
 			case COLUMN_DISTANCE:
 				fNF.setMinimumFractionDigits(1);
 				fNF.setMaximumFractionDigits(1);
-				return fNF.format(((float) tourMarker.getDistance()) / 1000);
+				cell.setText(fNF.format(((float) tourMarker.getDistance()) / 1000));
+				break;
 
 			case COLUMN_REMARK:
-				return tourMarker.getLabel();
+				cell.setText(tourMarker.getLabel());
+				break;
 
 			case COLUMN_X_OFFSET:
-				return Integer.toString(tourMarker.getLabelXOffset());
+				cell.setText(Integer.toString(tourMarker.getLabelXOffset()));
+				break;
 
 			case COLUMN_Y_OFFSET:
-				return Integer.toString(tourMarker.getLabelYOffset());
+				cell.setText(Integer.toString(tourMarker.getLabelYOffset()));
+				break;
 
 			case COLUMN_VISUAL_POSITION:
 				int visualPosition = tourMarker.getVisualPosition();
 				if (visualPosition == -1
 						|| visualPosition >= TourMarker.visualPositionLabels.length) {
-					return TourMarker.visualPositionLabels[0];
+					cell.setText(TourMarker.visualPositionLabels[0]);
 				} else {
-					return TourMarker.visualPositionLabels[visualPosition];
+					cell.setText(TourMarker.visualPositionLabels[visualPosition]);
 				}
+				break;
 
 			default:
-				return (getText(element));
+				break;
 			}
 		}
 	}
@@ -292,47 +293,57 @@ public class TourMarkerView extends ViewPart {
 		/*
 		 * create columns
 		 */
-		TableColumn tc;
+		TableViewerColumn tvc;
 		PixelConverter pixelConverter = new PixelConverter(table);
 
-		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.TourMarker_Column_time);
+		final MarkerViewerLabelProvider labelProvider = new MarkerViewerLabelProvider();
+		fMarkerViewer = new TableViewer(table);
+
+		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
+		// tvc.setEditingSupport(new EditingSupport());
+		tvc.setLabelProvider(labelProvider);
+
+		tvc.getColumn().setText(Messages.TourMarker_Column_time);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
 				.convertWidthInCharsToPixels(12), false));
 
-		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.TourMarker_Column_km);
-		tc.setToolTipText(Messages.TourMarker_Column_km_tooltip);
+		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
+		tvc.getColumn().setText(Messages.TourMarker_Column_km);
+		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_km_tooltip);
+		tvc.setLabelProvider(labelProvider);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
 				.convertWidthInCharsToPixels(8), false));
 
-		tc = new TableColumn(table, SWT.LEAD);
-		tc.setText(Messages.TourMarker_Column_remark);
+		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
+		tvc.getColumn().setText(Messages.TourMarker_Column_remark);
+		tvc.setLabelProvider(labelProvider);
 		tableLayouter.addColumnData(new ColumnWeightData(50, true));
 
-		tc = new TableColumn(table, SWT.LEAD);
-		tc.setText(Messages.TourMarker_Column_position);
+		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
+		tvc.getColumn().setText(Messages.TourMarker_Column_position);
+		tvc.setLabelProvider(labelProvider);
 		tableLayouter.addColumnData(new ColumnWeightData(20, true));
 
-		tc = new TableColumn(table, SWT.TRAIL);
- 		tc.setText("H");
-		tc.setToolTipText("Horizontal offset");
+		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
+		tvc.getColumn().setText("H");
+		tvc.getColumn().setToolTipText("Horizontal offset");
+		tvc.setLabelProvider(labelProvider);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
 				.convertWidthInCharsToPixels(8), false));
-		
-		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText("V");
-		tc.setToolTipText("Vertical offset");
+
+		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
+		tvc.getColumn().setText("V");
+		tvc.getColumn().setToolTipText("Vertical offset");
+		tvc.setLabelProvider(labelProvider);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
 				.convertWidthInCharsToPixels(8), false));
-		
+
 		/*
 		 * create table viewer
 		 */
-		fMarkerViewer = new TableViewer(table);
 
 		fMarkerViewer.setContentProvider(new MarkerViewerContentProvicer());
-		fMarkerViewer.setLabelProvider(new MarkerViewerLabelProvider());
+		fMarkerViewer.setLabelProvider(labelProvider);
 		fMarkerViewer.setSorter(new MarkerViewerSorter());
 		fMarkerViewer.setColumnProperties(COLUMN_PROPERTIES);
 
