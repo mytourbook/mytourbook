@@ -411,41 +411,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		};
 
 		// filler
-		lbl = new Label(fPersonDetailContainer, SWT.NONE);
-	}
-
-	/**
-	 * field: height
-	 */
-	private void createFieldHeight(int floatInputWidth) {
-		InputFieldFloat floatInput = new InputFieldFloat(
-				fPersonDetailContainer,
-				Messages.Pref_People_Label_height,
-				floatInputWidth);
-
-		fTextHeight = floatInput.getTextField();
-		fTextHeightModifyListener = new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				if (fCurrentPerson != null) {
-					Text control = (Text) e.widget;
-					try {
-						float value = Float.parseFloat(((Text) (e.widget)).getText());
-						if (value != fCurrentPerson.getHeight()) {
-							fCurrentPerson.setHeight(value);
-							fPeopleViewer.update(fCurrentPerson, null);
-						}
-						UI.setDefaultColor(control);
-					} catch (NumberFormatException e1) {
-						UI.setErrorColor(control);
-					}
-					fIsPersonModified = true;
-					validatePerson();
-				}
-			}
-		};
-
-		// filler
-		Label lbl = new Label(fPersonDetailContainer, SWT.NONE);
+		new Label(fPersonDetailContainer, SWT.NONE);
 	}
 
 	/**
@@ -474,19 +440,57 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		};
 
 		// filler
-		lbl = new Label(fPersonDetailContainer, SWT.NONE);
+		new Label(fPersonDetailContainer, SWT.NONE);
+	}
+
+	/**
+	 * field: height
+	 */
+	private void createFieldHeight(int floatInputWidth) {
+		
+		InputFieldFloat floatInput = new InputFieldFloat(
+				fPersonDetailContainer,
+				Messages.Pref_People_Label_height,
+				floatInputWidth);
+	
+		fTextHeight = floatInput.getTextField();
+		
+		fTextHeightModifyListener = new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				if (fCurrentPerson != null) {
+					Text control = (Text) e.widget;
+					try {
+						float value = Float.parseFloat(((Text) (e.widget)).getText());
+						if (value != fCurrentPerson.getHeight()) {
+							fCurrentPerson.setHeight(value);
+							fPeopleViewer.update(fCurrentPerson, null);
+						}
+						UI.setDefaultColor(control);
+					} catch (NumberFormatException e1) {
+						UI.setErrorColor(control);
+					}
+					fIsPersonModified = true;
+					validatePerson();
+				}
+			}
+		};
+	
+		// filler
+		new Label(fPersonDetailContainer, SWT.NONE);
 	}
 
 	/**
 	 * field: weight
 	 */
 	private void createFieldWeight(int floatInputWidth) {
+		
 		InputFieldFloat floatInput = new InputFieldFloat(
 				fPersonDetailContainer,
 				Messages.Pref_People_Label_weight,
 				floatInputWidth);
 
 		fTextWeight = floatInput.getTextField();
+		
 		fTextWeightModifyListener = new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				if (fCurrentPerson != null) {
@@ -508,7 +512,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		};
 
 		// filler
-		Label lbl = new Label(fPersonDetailContainer, SWT.NONE);
+		new Label(fPersonDetailContainer, SWT.NONE);
 	}
 
 	// private class PeopleViewer extends TableViewer {
@@ -679,9 +683,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		fRawDataPathEditor.setEmptyStringAllowed(true);
 
 		// placeholder
-		Label lbl;
-		lbl = new Label(parent, SWT.NONE);
-		lbl = new Label(parent, SWT.NONE);
+		new Label(parent, SWT.NONE);
+		new Label(parent, SWT.NONE);
 	}
 
 	/**
@@ -1039,6 +1042,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			addModifyListener();
 
 		} else {
+			
 			isEnabled = false;
 			fCurrentPerson = null;
 
@@ -1068,8 +1072,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		boolean isValid = false;
 
 		if (fCurrentPerson == null) {
+			
 			isValid = true;
+			
 		} else if (fTextFirstName.getText().trim().equals("")) { //$NON-NLS-1$
+			
 			setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
 
 			// } else if (fComboDevice.getSelectionIndex() <= 0) {
@@ -1077,6 +1084,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		} else if (!fRawDataPathEditor.getStringValue().trim().equals("") //$NON-NLS-1$
 				&& !fRawDataPathEditor.isValid()) {
+			
 			setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
 
 		} else if (true) {

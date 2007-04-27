@@ -140,8 +140,8 @@ public class UI {
 	}
 
 	public static void setDefaultColor(Control control) {
-		control.setForeground(null);
-		control.setBackground(null);
+		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+		control.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 	}
 
 	public static void setErrorColor(Text control) {
