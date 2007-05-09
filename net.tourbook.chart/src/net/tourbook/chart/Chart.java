@@ -691,9 +691,9 @@ public class Chart extends ViewForm {
 	 * 
 	 * @param sliderPosition
 	 */
-	public void zoomToXSlider(SelectionChartXSliderPosition sliderPosition) {
-		fChartComponents.zoomToXSlider(sliderPosition);
-	}
+//	public void zoomToXSlider(SelectionChartXSliderPosition sliderPosition) {
+//		fChartComponents.zoomToXSlider(sliderPosition);
+//	}
 
 	/**
 	 * zoom into the chart where the graph is divided into parts (months)

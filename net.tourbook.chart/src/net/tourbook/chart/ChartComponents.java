@@ -32,8 +32,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 /**
- * Chart widget which represents the chart ui The chart consists of these
- * components
+ * Chart widget which represents the chart ui The chart consists of these components
  * <p>
  * The chart widget consists has the following heights: <code>
  *  devMarginTop
@@ -114,8 +113,8 @@ public class ChartComponents extends Composite {
 	private final int					fChartsVerticalDistance		= 15;
 
 	/**
-	 * minimum width in pixel for one unit, this is only an approximate value
-	 * because the pixel is rounded up or down to fit a rounded unit
+	 * minimum width in pixel for one unit, this is only an approximate value because the pixel is
+	 * rounded up or down to fit a rounded unit
 	 */
 
 	private final int					fDevMinXUnit				= 100;
@@ -123,15 +122,13 @@ public class ChartComponents extends Composite {
 	private final int					fDevMinYUnit				= 50;
 
 	/**
-	 * this contains an x-marker position which can be read from outside of the
-	 * current chart
+	 * this contains an zoom marker position which can be read from outside of the current chart
 	 */
 	public ZoomMarkerPosition			zoomMarkerPositionOut		= null;
 
 	/**
-	 * the x-marker position which is set from outside of the current chart.
-	 * When the x-marker is set, the graph will be sized to the width, which is
-	 * stored in the x-marker position
+	 * the zoom marker position which is set from outside of the current chart. When the zoom marker
+	 * is set, the graph will be sized to the width, which is stored in the zoom marker position
 	 */
 	ZoomMarkerPosition					zoomMarkerPositionIn		= null;
 
@@ -162,7 +159,7 @@ public class ChartComponents extends Composite {
 			Messages.Month_sep,
 			Messages.Month_oct,
 			Messages.Month_nov,
-			Messages.Month_dec													};
+			Messages.Month_dec										};
 
 	private final int[]					fKeyDownCounter				= new int[1];
 	private final int[]					fLastKeyDownCounter			= new int[1];
@@ -265,9 +262,8 @@ public class ChartComponents extends Composite {
 		drawingData.setScaleX((float) devGraphWidth / xMaxValue);
 
 		/*
-		 * calculate the number of units which will be visible by dividing the
-		 * visible length by the minimum size which one unit should have in
-		 * pixels
+		 * calculate the number of units which will be visible by dividing the visible length by the
+		 * minimum size which one unit should have in pixels
 		 */
 		final int unitRawNumbers = devGraphWidth / fDevMinXUnit;
 
@@ -391,7 +387,7 @@ public class ChartComponents extends Composite {
 		// all variables starting with graph... contain data values from
 		// the graph which are not scaled to the device
 		int graphMinValue = yData.getMinValue();
-//		int graphMinValue = yData.getOriginalMinValue();
+		// int graphMinValue = yData.getOriginalMinValue();
 		int graphMaxValue = yData.getMaxValue();
 		int graphValueRange = graphMaxValue > 0
 				? (graphMaxValue - graphMinValue)
@@ -438,8 +434,7 @@ public class ChartComponents extends Composite {
 		}
 		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / unit) * unit);
 
-//		System.out.println(graphMinValue +" "+graphMaxValue);
-		
+		// System.out.println(graphMinValue +" "+graphMaxValue);
 
 		if (axisUnit == ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
 
@@ -686,8 +681,8 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * Resize handler for all components, computes the chart when the chart
-	 * data, client area has changed or the chart was zoomed
+	 * Resize handler for all components, computes the chart when the chart data, client area has
+	 * changed or the chart was zoomed
 	 */
 	boolean onResize() {
 
@@ -696,11 +691,12 @@ public class ChartComponents extends Composite {
 		}
 
 		// compute the visual size of the graph
-		setGraphRect();
+		setVisibleGraphRect();
 
 		if (setGraphWidthToZoomMarkerPosition() == false) {
-			// compute the graph width when a x-marker was not set
-			fComponentGraph.enforceChartImageMinMaxWidth();
+
+			// compute the graph width when a zoom marker was not set
+			fComponentGraph.updateImageWidthAndOffset();
 		}
 
 		// compute the chart data
@@ -713,8 +709,6 @@ public class ChartComponents extends Composite {
 		// chart size is saved
 		fComponentGraph.updateSlidersOnResize();
 
-		fComponentGraph.updateSelectionOnResize();
-
 		// resize the axis
 		fComponentAxisLeft.setDrawingData(fChartDrawingData, true);
 		fComponentAxisRight.setDrawingData(fChartDrawingData, false);
@@ -726,7 +720,7 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * set the x-marker position which can be read from outside this chart
+	 * set the zoom marker position which can be read from outside this chart
 	 */
 	private void setAndFireZoomMarkerPositionOut() {
 
@@ -737,12 +731,12 @@ public class ChartComponents extends Composite {
 
 		if (markerValueIndexStart == -1) {
 
-			// no x-marker's is set
+			// no zoom marker's is set
 			zoomMarkerPositionOut = null;
 			return;
 		}
 
-		// x-marker is set
+		// zoom marker is set
 
 		final int[] xValues = xData.getHighValues()[0];
 		final float markerStartValue = xValues[markerValueIndexStart];
@@ -776,14 +770,14 @@ public class ChartComponents extends Composite {
 
 		if (fireEvent) {
 
-			// set a new x-marker position
+			// set a new zoom marker position
 			zoomMarkerPositionOut = newXMarkerPositionOut;
 
 			fChart.fireZoomMarkerPositionListener();
 		}
 	}
 
-	private void setGraphRect() {
+	private void setVisibleGraphRect() {
 
 		final ArrayList<ChartDataYSerie> yDataList = fChartDataModel.getYData();
 		boolean isYTitle = false;
@@ -815,7 +809,7 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * adjust the graph width to the x-marker position
+	 * adjust the graph width and position to the zoom marker position
 	 * 
 	 * @return Returns <code>true</code> when the graph width was set
 	 */
@@ -826,7 +820,7 @@ public class ChartComponents extends Composite {
 		final int markerEndIndex = xData.getXMarkerEndIndex();
 
 		if (zoomMarkerPositionIn == null || markerStartIndex == -1) {
-			// no x-marker is set, nothing more to do
+			// no zoom marker is set
 			return false;
 		}
 
@@ -845,16 +839,16 @@ public class ChartComponents extends Composite {
 		final float graphZoomRatio = devVirtualGraphImageWidth / getDevVisibleChartWidth();
 
 		final int devLeftXMarkerPos = (int) (valueMarkerStart / valueLast * devVirtualGraphImageWidth);
-
 		final int devGraphOffset = devLeftXMarkerPos - xmpinDevMarkerOffset;
 
-		fComponentGraph.adjustWidthToZoomMarker(
+		fComponentGraph.setGraphImageWidth(
 				(int) devVirtualGraphImageWidth,
-				graphZoomRatio,
-				devGraphOffset);
+				devGraphOffset,
+				graphZoomRatio);
 
 		return true;
 	}
+
 	/**
 	 * @param isMarkerVisible
 	 */
@@ -874,8 +868,8 @@ public class ChartComponents extends Composite {
 
 		if (onResize()) {
 			/*
-			 * resetting the sliders require that the drawing data are created,
-			 * this is done in the onResize method
+			 * resetting the sliders require that the drawing data are created, this is done in the
+			 * onResize method
 			 */
 			if (devSliderBarHeight > 0) {
 				fComponentGraph.resetSliders();
@@ -894,8 +888,7 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * set the x-sliders to a new position, this is done from a selection
-	 * provider
+	 * set the x-sliders to a new position, this is done from a selection provider
 	 * 
 	 * @param position
 	 */
@@ -903,8 +896,8 @@ public class ChartComponents extends Composite {
 
 		if (position == null) {
 			/*
-			 * nothing to do when the position was not set, this can happen when
-			 * the chart was not yet created
+			 * nothing to do when the position was not set, this can happen when the chart was not
+			 * yet created
 			 */
 			return;
 		}
@@ -933,8 +926,7 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * Set the zoom-marker position, this is used when the chart is
-	 * drawn/resized
+	 * Set the zoom-marker position, this is used when the chart is drawn/resized
 	 * 
 	 * @param zoomMarkerPositionIn
 	 *        the xMarkerPosition to set
@@ -985,10 +977,10 @@ public class ChartComponents extends Composite {
 		}
 	}
 
-	void zoomToXSlider(final SelectionChartXSliderPosition sliderPosition) {
-		fComponentGraph.zoomToXSliderPosition(sliderPosition);
-		onResize();
-	}
+	// void zoomToXSlider(final SelectionChartXSliderPosition sliderPosition) {
+	// fComponentGraph.zoomToXSliderPosition(sliderPosition);
+	// onResize();
+	// }
 
 	void zoomWithParts(final int parts, final int position) {
 		fComponentGraph.zoomWithParts(parts, position);
@@ -1030,8 +1022,7 @@ public class ChartComponents extends Composite {
 		if (selectedIndex[0] != Chart.NO_BAR_SELECTION) {
 
 			/*
-			 * delay the change event when the key down was pressed several
-			 * times
+			 * delay the change event when the key down was pressed several times
 			 */
 			final Display display = Display.getCurrent();
 			display.asyncExec(new Runnable() {
@@ -1045,9 +1036,8 @@ public class ChartComponents extends Composite {
 									&& fRunnableKeyDownCounter != fLastKeyDownCounter[0]) {
 
 								/*
-								 * prevent redoing it, this happened when the
-								 * selectNext/Previous Method took a long time
-								 * when the chart was drawn
+								 * prevent redoing it, this happened when the selectNext/Previous
+								 * Method took a long time when the chart was drawn
 								 */
 								fLastKeyDownCounter[0] = fRunnableKeyDownCounter;
 

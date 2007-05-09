@@ -21,7 +21,7 @@ package net.tourbook.chart;
 
 public class ChartMarker {
 
-	/*
+	/**
 	 * visual position for the markers in the chart
 	 */
 	public final static int	VISUAL_VERTICAL_ABOVE_GRAPH				= 0;
@@ -34,6 +34,8 @@ public class ChartMarker {
 	public final static int	VISUAL_HORIZONTAL_BELOW_GRAPH_LEFT		= 7;
 	public final static int	VISUAL_HORIZONTAL_BELOW_GRAPH_CENTERED	= 8;
 	public final static int	VISUAL_HORIZONTAL_BELOW_GRAPH_RIGHT		= 9;
+	public final static int	VISUAL_HORIZONTAL_GRAPH_LEFT			= 10;
+	public final static int	VISUAL_HORIZONTAL_GRAPH_RIGHT			= 11;
 
 	/**
 	 * marker was created in the device
@@ -45,10 +47,9 @@ public class ChartMarker {
 	 */
 	public final static int	MARKER_TYPE_CUSTOM						= 2;
 
-	/**
-	 * this is a temp marker
-	 */
-	public static final int	MARKER_TYPE_TEMP						= 3;
+	public static final int	VISIBLE_TYPE_DEFAULT					= 0;
+	public static final int	VISIBLE_TYPE_TYPE_NEW					= 10;
+	public static final int	VISIBLE_TYPE_TYPE_EDIT					= 20;
 
 	public String			graphLabel								= "";	//$NON-NLS-1$
 	public String			markerLabel								= "";	//$NON-NLS-1$
@@ -73,6 +74,8 @@ public class ChartMarker {
 
 	public int				labelXOffset;
 	public int				labelYOffset;
+
+	public int				visualType;
 
 	public ChartMarker() {}
 }
