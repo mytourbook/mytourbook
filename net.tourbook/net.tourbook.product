@@ -23,8 +23,8 @@
 
    <splash
       location="net.tourbook"
-      startupProgressRect="5,135,390,10"
-      startupMessageRect="8,120,384,15"
+      startupProgressRect="5,131,390,10"
+      startupMessageRect="5,116,390,15"
       startupForegroundColor="BBCBFF" />
    <launcher name="mytourbook">
       <linux icon="/net.tourbook/icons/linux/tourbook48-32.xpm"/>
@@ -71,13 +71,13 @@
    </plugins>
 
    <features>
-      <feature id="net.tourbook.ext.derby.feature" version="10.1.2.1"/>
-      <feature id="net.tourbook.ext.eclipse" version="0.8.3"/>
-      <feature id="net.tourbook.ext.ejb3.feature" version="0.8.7"/>
-      <feature id="net.tourbook.feature" version="0.8.7"/>
-      <feature id="net.tourbook.statistics.feature" version="0.8.3"/>
-      <feature id="org.eclipse.rcp" version="3.3.0.v20070316b-8l8VCEYXUPdNkSgt8LpKG"/>
+      <feature id="net.tourbook.feature" version="0.8.8"/>
       <feature id="net.tourbook.device.feature" version="0.8.7"/>
+      <feature id="net.tourbook.statistics.feature" version="0.8.3"/>
+      <feature id="net.tourbook.ext.derby.feature" version="10.1.2.1"/>
+      <feature id="net.tourbook.ext.ejb3.feature" version="0.8.7"/>
+      <feature id="org.eclipse.rcp" version="3.3.0.v20070316b-8l8VCEYXUPdNkSgt8LpKG"/>
+      <feature id="net.tourbook.ext.eclipse" version="0.8.3"/>
    </features>
 
 </product>

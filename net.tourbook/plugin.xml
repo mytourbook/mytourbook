@@ -28,11 +28,11 @@
          </property>
          <property
                name="startupMessageRect"
-               value="8,120,384,15">
+               value="5,116,390,15">
          </property>
          <property
                name="startupProgressRect"
-               value="5,135,390,10">
+               value="5,131,390,10">
          </property>
       </product>
    </extension>
@@ -111,38 +111,38 @@
             id="org.eclipse.ui.views.ProgressView">
          </view>
       <view
-            class="net.tourbook.views.rawData.RawDataView"
+            class="net.tourbook.ui.views.rawData.RawDataView"
             icon="icons/device.gif"
             id="net.tourbook.views.rawData.RawDataView"
             name="%View_Data_Import">
       </view>
      <view
-            class="net.tourbook.views.TourChartAnalyzerView"
+            class="net.tourbook.ui.views.TourChartAnalyzerView"
             icon="icons/chart-analyzer.gif"
             id="net.tourbook.views.TourChartAnalyzer"
             name="%View_Tour_Analyzer"/>
       <view
-            class="net.tourbook.views.tourMap.TourMapView"
+            class="net.tourbook.ui.views.tourMap.TourMapView"
             icon="icons/tourfinder-reference.gif"
             id="net.tourbook.views.tourMap.TourMapView"
             name="%View_Tour_Map"/>
       <view
-            class="net.tourbook.views.tourMap.CompareResultView"
+            class="net.tourbook.ui.views.tourMap.CompareResultView"
             icon="icons/tourfinder-compare.gif"
             id="net.tourbook.views.tourMap.CompareResultView"
             name="%View_Compare_Result"/>
       <view
-            class="net.tourbook.views.tourBook.TourBookView"
+            class="net.tourbook.ui.views.tourBook.TourBookView"
             icon="icons/tour-list.gif"
             id="net.tourbook.views.tourListView"
             name="%View_Tour_Book"/>
       <view
-            class="net.tourbook.views.TourMarkerView"
+            class="net.tourbook.ui.views.TourMarkerView"
             icon="icons/marker-editor.gif"
             id="net.tourbook.views.TourMarkerView"
             name="%View_Marker"/>
       <view
-            class="net.tourbook.views.TourSegmenterView"
+            class="net.tourbook.ui.views.TourSegmenterView"
             icon="icons/tour-segmenter.gif"
             id="net.tourbook.views.TourSegmenter"
             name="%View_Tour_Segmenter"/>
