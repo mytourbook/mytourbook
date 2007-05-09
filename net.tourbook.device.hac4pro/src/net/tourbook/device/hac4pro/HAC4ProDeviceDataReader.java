@@ -348,6 +348,9 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		} catch (IOException e) {
 			e.printStackTrace();
 			returnValue = false;
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			returnValue = false;
 		} finally {
 			if (file != null) {
 				try {
