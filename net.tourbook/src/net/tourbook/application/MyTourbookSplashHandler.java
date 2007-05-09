@@ -80,7 +80,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 				(foregroundColorInteger & 0xFF00) >> 8,
 				foregroundColorInteger & 0xFF));
 
-		final String buildId = "Version " + System.getProperty("eclipse.buildId", "Unknown Version"); //$NON-NLS-1$ //$NON-NLS-2$
+		final String buildId = "Version " + System.getProperty("eclipse.buildId", "Unknown Version"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		getContent().addPaintListener(new PaintListener() {
 

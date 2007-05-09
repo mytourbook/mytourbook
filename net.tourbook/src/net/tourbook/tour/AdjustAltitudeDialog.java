@@ -122,7 +122,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		super(parentShell);
 
 		// make dialog resizable
-		setShellStyle(getShellStyle() | SWT.RESIZE);
+		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 	}
 
 	public AdjustAltitudeDialog(Shell parentShell, TourChart tourChart) {
@@ -130,7 +130,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		super(parentShell);
 
 		// make the dialog resizable
-		setShellStyle(getShellStyle() | SWT.RESIZE);
+		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
 		fSelectedTourChart = tourChart;
 

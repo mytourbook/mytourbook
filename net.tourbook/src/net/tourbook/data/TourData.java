@@ -293,13 +293,12 @@ public class TourData {
 	public TourData() {}
 
 	/**
-	 * Called before this object gets persisted, copy data from the tourdata
-	 * object into the object which gets serialized
+	 * Called before this object gets persisted, copy data from the tourdata object into the object
+	 * which gets serialized
 	 */
 	/*
-	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of
-	 * bug http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921
-	 * 2006-08-11
+	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
+	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
 	 */
 	public void onPrePersist() {
 
@@ -442,14 +441,38 @@ public class TourData {
 	 */
 	public void createTourId() {
 
-		String tourStart = Short.toString(getStartYear())
-				+ Short.toString(getStartMonth())
-				+ Short.toString(getStartDay())
-				+ Short.toString(getStartHour())
-				+ Short.toString(getStartMinute())
-				+ Integer.toString(Math.abs(getStartDistance()));
+		final String startDist4Id = Integer.toString(Math.abs(getStartDistance()));
 
-		setTourId(Long.parseLong(tourStart));
+		String tourStart;
+
+		try {
+			/*
+			 * this is the default implementation to create a tour id, but on the 5.5.2007 a
+			 * NumberFormatException occured so the calculation for the tour id was adjusted
+			 */
+			tourStart = Short.toString(getStartYear())
+					+ Short.toString(getStartMonth())
+					+ Short.toString(getStartDay())
+					+ Short.toString(getStartHour())
+					+ Short.toString(getStartMinute())
+					+ startDist4Id;
+
+			setTourId(Long.parseLong(tourStart));
+
+		} catch (NumberFormatException e) {
+
+			// distance was shorted that the maximum for a Long datatype is not exceeded
+
+			tourStart = Short.toString(getStartYear())
+					+ Short.toString(getStartMonth())
+					+ Short.toString(getStartDay())
+					+ Short.toString(getStartHour())
+					+ Short.toString(getStartMinute())
+					+ startDist4Id.substring(0, Math.min(5, startDist4Id.length()));
+
+			setTourId(Long.parseLong(tourStart));
+		}
+
 	}
 
 	public Object[] getTourSegments() {
@@ -984,7 +1007,7 @@ public class TourData {
 
 		tourAltUp = (int) altUp;
 		tourAltDown = (int) altDown;
-//		System.out.println("Up: " + logUp + "  Down: " + logDown);
+		// System.out.println("Up: " + logUp + " Down: " + logDown);
 	}
 
 	public void setTourMarkers(Set<TourMarker> tourMarkers) {

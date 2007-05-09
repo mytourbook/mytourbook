@@ -16,12 +16,12 @@
 
 package net.tourbook.application;
 
-import net.tourbook.views.TourChartAnalyzerView;
-import net.tourbook.views.TourMarkerView;
-import net.tourbook.views.TourSegmenterView;
-import net.tourbook.views.rawData.RawDataView;
-import net.tourbook.views.tourBook.TourBookView;
-import net.tourbook.views.tourMap.TourMapView;
+import net.tourbook.ui.views.TourChartAnalyzerView;
+import net.tourbook.ui.views.TourMarkerView;
+import net.tourbook.ui.views.TourSegmenterView;
+import net.tourbook.ui.views.rawData.RawDataView;
+import net.tourbook.ui.views.tourBook.TourBookView;
+import net.tourbook.ui.views.tourMap.TourMapView;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;

@@ -259,7 +259,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		} catch (NumberFormatException e) {
 			// last tour type id was not found, select all
-			lastTourTypeId = 0L;
+			lastTourTypeId = Long.valueOf(TourType.TOUR_TYPE_ID_ALL);
 			// fComboTourType.select(0);
 		}
 

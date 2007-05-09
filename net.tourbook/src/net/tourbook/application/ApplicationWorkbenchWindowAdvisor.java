@@ -22,7 +22,7 @@ import java.sql.SQLException;
 
 import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.views.rawData.RawDataView;
+import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceDialog;

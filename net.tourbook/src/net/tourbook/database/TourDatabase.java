@@ -34,7 +34,6 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
-import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -126,7 +125,7 @@ public class TourDatabase {
 
 					emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
-					monitor.setTaskName("");
+					monitor.setTaskName(""); //$NON-NLS-1$
 				}
 			};
 
@@ -840,6 +839,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static ArrayList<TourType> getTourTypes() {
 
 		ArrayList<TourType> tourTypeList = new ArrayList<TourType>();
@@ -863,6 +863,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static ArrayList<TourBike> getTourBikes() {
 
 		ArrayList<TourBike> bikeList = new ArrayList<TourBike>();
@@ -886,6 +887,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour people in the db sorted by last/first name
 	 */
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static ArrayList<TourPerson> getTourPeople() {
 
 		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();

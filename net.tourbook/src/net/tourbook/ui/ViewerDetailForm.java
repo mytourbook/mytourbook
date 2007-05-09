@@ -28,8 +28,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 /**
- * The ViewerDetailForm class provides the ability to keep the viewer width when
- * the parent is resized
+ * The ViewerDetailForm class provides the ability to keep the viewer width when the parent is
+ * resized
  */
 public class ViewerDetailForm {
 
@@ -50,6 +50,11 @@ public class ViewerDetailForm {
 
 	public ViewerDetailForm(final Composite parent, final Control viewer, final Control sash,
 			final Control detail) {
+		this(parent, viewer, sash, detail, 50);
+	}
+
+	public ViewerDetailForm(final Composite parent, final Control viewer, final Control sash,
+			final Control detail, final int leftWidth) {
 
 		fParent = parent;
 		fViewer = viewer;
@@ -68,10 +73,8 @@ public class ViewerDetailForm {
 		fdViewer.bottom = bottomAttachment;
 		viewer.setLayoutData(fdViewer);
 
-		final int percent = 50;
-
 		fSashData = new FormData();
-		fSashData.left = new FormAttachment(percent, 0);
+		fSashData.left = new FormAttachment(leftWidth, 0);
 		fSashData.top = topAttachment;
 		fSashData.bottom = bottomAttachment;
 		sash.setLayoutData(fSashData);
@@ -102,25 +105,27 @@ public class ViewerDetailForm {
 				Rectangle parentRect = parent.getClientArea();
 
 				int right = parentRect.width - sashRect.width - MINIMUM_WIDTH;
-				e.x = Math.max(Math.min(e.x, right), MINIMUM_WIDTH);
+				int sashWidth = Math.max(Math.min(e.x, right), MINIMUM_WIDTH);
 
-				if (e.x != sashRect.x) {
-					fSashData.left = new FormAttachment(0, e.x);
+				if (sashWidth != sashRect.x) {
+					fSashData.left = new FormAttachment(0, sashWidth);
 					parent.layout();
 				}
 
-				fViewerWidth = e.x;
+				fViewerWidth = sashWidth;
 			}
 		});
 	}
 
+	/**
+	 * @param viewerWidth
+	 */
 	public void setViewerWidth(Integer viewerWidth) {
 		fViewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_WIDTH, viewerWidth);
 	}
 
 	/**
-	 * sets the control which is maximized, set <code>null</code> to reset the
-	 * maximized control
+	 * sets the control which is maximized, set <code>null</code> to reset the maximized control
 	 * 
 	 * @param control
 	 */
@@ -134,8 +139,7 @@ public class ViewerDetailForm {
 		if (isInitialResize == false) {
 
 			/*
-			 * set the initial width for the viewer sash, this is a bit of
-			 * hacking but it works
+			 * set the initial width for the viewer sash, this is a bit of hacking but it works
 			 */
 
 			// execute only the first time
@@ -144,14 +148,14 @@ public class ViewerDetailForm {
 			Integer viewerWidth = fViewerWidth;
 
 			if (viewerWidth == null) {
-				viewerWidth = fViewer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+				fViewerWidth = viewerWidth = fViewer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 			}
 
 			fSashData.left = new FormAttachment(0, viewerWidth);
-			
+
 			fParent.layout();
-			
-//			System.out.println("isInit==false: "+viewerWidth);
+
+			// System.out.println("isInit==false: "+viewerWidth);
 
 		} else {
 
@@ -167,7 +171,7 @@ public class ViewerDetailForm {
 					fParent.layout();
 				}
 
-			} else if (fMaximizedControl == null) {
+			} else {
 
 				if (fViewerWidth == null) {
 					fSashData.left = new FormAttachment(50, 0);
@@ -186,7 +190,7 @@ public class ViewerDetailForm {
 				fParent.layout();
 			}
 
-//			System.out.println("isInit==true: "+fSashData.left);
+			// System.out.println("isInit==true: "+fSashData.left);
 		}
 	}
 }

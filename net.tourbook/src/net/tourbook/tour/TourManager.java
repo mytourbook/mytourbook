@@ -31,9 +31,9 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.views.TourChartAnalyzerInfo;
+import net.tourbook.ui.views.tourMap.TourDataNormalizer;
 import net.tourbook.util.StringToArrayConverter;
-import net.tourbook.views.TourChartAnalyzerInfo;
-import net.tourbook.views.tourMap.TourDataNormalizer;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;

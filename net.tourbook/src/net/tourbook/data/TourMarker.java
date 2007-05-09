@@ -27,6 +27,9 @@ import net.tourbook.Messages;
 @Entity
 public class TourMarker {
 
+	/**
+	 * visual position for markers, they must correspond to the position in {@link ChartMarker}
+	 */
 	@Transient
 	public static final String[]	visualPositionLabels	= new String[] {
 			Messages.TourMarker_Position_vertical_above, // 0
@@ -38,7 +41,9 @@ public class TourMarker {
 			Messages.TourMarker_Position_horizontal_above_right, // 6
 			Messages.TourMarker_Position_horizontal_below_left, // 7
 			Messages.TourMarker_Position_horizontal_below_centered, // 8
-			Messages.TourMarker_Position_horizontal_below_right // 9
+			Messages.TourMarker_Position_horizontal_below_right, // 9
+			Messages.TourMarker_Position_horizontal_left, // 10
+			Messages.TourMarker_Position_horizontal_right, // 11
 															};
 
 	@Id
@@ -74,6 +79,12 @@ public class TourMarker {
 	private String					label					= "";	//$NON-NLS-1$
 	private String					category				= "";	//$NON-NLS-1$
 
+	/**
+	 * visibleType is used to show the marker with different visible effects (color) 
+	 */
+	@Transient
+	private int visibleType;
+	
 	public TourMarker() {}
 
 	public TourMarker(TourData tourData, int markerType) {
@@ -81,84 +92,176 @@ public class TourMarker {
 		this.type = markerType;
 	}
 
-	public long getMarkerId() {
-		return markerId;
-	}
+	/**
+	 * compares two markers
+	 * 
+	 * @param comparedMarker
+	 * @param ignoreType
+	 *        set <code>true</code> to not compare the type field
+	 * @return Returns true when the content of the markers are equal
+	 */
+	public boolean compareTo(TourMarker comparedMarker, boolean ignoreType) {
 
-	public TourData getTourData() {
-		return tourData;
-	}
+		if (category.compareTo(comparedMarker.category) != 0) {
+			return false;
+		} else if (label.compareTo(comparedMarker.label) != 0) {
+			return false;
+		} else if (distance != comparedMarker.distance) {
+			return false;
+		} else if (labelXOffset != comparedMarker.labelXOffset) {
+			return false;
+		} else if (labelYOffset != comparedMarker.labelYOffset) {
+			return false;
+		} else if (markerId != comparedMarker.markerId) {
+			return false;
+		} else if (markerType != comparedMarker.markerType) {
+			return false;
+		} else if (serieIndex != comparedMarker.serieIndex) {
+			return false;
+		} else if (time != comparedMarker.time) {
+			return false;
+		} else if (ignoreType == false && type != comparedMarker.type) {
+			return false;
+		} else if (visualPosition != comparedMarker.visualPosition) {
+			return false;
+		} else if (tourData != comparedMarker.tourData) {
+			return false;
+		}
 
-	public void setTime(int time) {
-		this.time = time;
-	}
-
-	public int getTime() {
-		return time;
-	}
-
-	public void setDistance(int distance) {
-		this.distance = distance;
-	}
-
-	public int getDistance() {
-		return distance;
-	}
-
-	public void setSerieIndex(int serieIndex) {
-		this.serieIndex = serieIndex;
-	}
-
-	public int getSerieIndex() {
-		return serieIndex;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
+		return true;
 	}
 
 	public String getCategory() {
 		return category;
 	}
 
-	public int getVisualPosition() {
-		return visualPosition;
+	public int getDistance() {
+		return distance;
 	}
 
-	public void setVisualPosition(int visualPosition) {
-		this.visualPosition = visualPosition;
-	}
-
-	public void setType(int type) {
-		this.type = type;
+	public String getLabel() {
+		return label;
 	}
 
 	public int getLabelXOffset() {
 		return labelXOffset;
 	}
 
-	public void setLabelXOffset(int labelXOffset) {
-		this.labelXOffset = labelXOffset;
-	}
-
 	public int getLabelYOffset() {
 		return labelYOffset;
+	}
+
+	public long getMarkerId() {
+		return markerId;
+	}
+
+	public int getSerieIndex() {
+		return serieIndex;
+	}
+
+	public int getTime() {
+		return time;
+	}
+
+	public TourData getTourData() {
+		return tourData;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public int getVisualPosition() {
+		return visualPosition;
+	}
+
+	/**
+	 * restore marker data from a marker backup
+	 * 
+	 * @param backupMarker
+	 */
+	public void restoreMarkerFromBackup(TourMarker backupMarker) {
+
+		category = backupMarker.category;
+		label = backupMarker.label;
+
+		distance = backupMarker.distance;
+		labelXOffset = backupMarker.labelXOffset;
+		labelYOffset = backupMarker.labelYOffset;
+		markerId = backupMarker.markerId;
+		markerType = backupMarker.markerType;
+		serieIndex = backupMarker.serieIndex;
+		time = backupMarker.time;
+		type = backupMarker.type;
+		visualPosition = backupMarker.visualPosition;
+
+		tourData = backupMarker.tourData;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public void setDistance(int distance) {
+		this.distance = distance;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public void setLabelXOffset(int labelXOffset) {
+		this.labelXOffset = labelXOffset;
 	}
 
 	public void setLabelYOffset(int labelYOffset) {
 		this.labelYOffset = labelYOffset;
 	}
 
+	/**
+	 * copies the current marker into a backup marker
+	 * 
+	 * @param backupMarker
+	 */
+	public void setMarkerBackup(TourMarker backupMarker) {
+
+		backupMarker.category = new String(category);
+		backupMarker.label = new String(label);
+
+		backupMarker.distance = distance;
+		backupMarker.labelXOffset = labelXOffset;
+		backupMarker.labelYOffset = labelYOffset;
+		backupMarker.markerId = markerId;
+		backupMarker.markerType = markerType;
+		backupMarker.serieIndex = serieIndex;
+		backupMarker.time = time;
+		backupMarker.type = type;
+		backupMarker.visualPosition = visualPosition;
+
+		backupMarker.tourData = tourData;
+	}
+
+	public void setSerieIndex(int serieIndex) {
+		this.serieIndex = serieIndex;
+	}
+
+	public void setTime(int time) {
+		this.time = time;
+	}
+
+//	public void setType(int type) {
+//		this.type = type;
+//	}
+
+	public void setVisualPosition(int visualPosition) {
+		this.visualPosition = visualPosition;
+	}
+
+	public int getVisibleType() {
+		return visibleType;
+	}
+
+	public void setVisibleType(int visibleType) {
+		this.visibleType = visibleType;
+	}
 }
