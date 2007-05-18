@@ -31,10 +31,10 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -101,7 +101,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	private Button				fRadioKeepStart;
 	private Button				fRadioKeepBottom;
 
-	private boolean				fIsSpinnerChangedByUser;
+//	private boolean				fIsSpinnerChangedByUser;
 	protected boolean			fIsInitialAltiDisplayed;
 
 	private int[]				fOriginalAltitudes;
@@ -373,17 +373,19 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 				accelerator *= (e.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
 
 				widget.setSelection(widget.getSelection() + ((e.count > 0 ? 1 : -1) * accelerator));
+
+				onChangeAltitude((Integer) e.widget.getData());
 			}
 		});
 
-		spinner.addModifyListener(new ModifyListener() {
+		spinner.addFocusListener(new FocusListener() {
 
-			public void modifyText(ModifyEvent e) {
-				if (fIsSpinnerChangedByUser) {
-					onChangeAltitude((Integer) e.widget.getData());
-				}
+			public void focusGained(FocusEvent e) {
 			}
-		});
+
+			public void focusLost(FocusEvent e) {
+				onChangeAltitude((Integer) e.widget.getData());
+			}});
 
 		return spinner;
 	}
@@ -859,13 +861,13 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fLblOldMaxAlti.setText(Integer.toString(maxAlti));
 		fLblOldMaxAlti.pack(true);
 
-		fIsSpinnerChangedByUser = false;
+//		fIsSpinnerChangedByUser = false;
 		{
 			fSpinnerNewStartAlti.setSelection(startAlti);
 			fSpinnerNewEndAlti.setSelection(endAlti);
 			fSpinnerNewMaxAlti.setSelection(maxAlti);
 		}
-		fIsSpinnerChangedByUser = true;
+//		fIsSpinnerChangedByUser = true;
 	}
 
 	private void restoreDialogSettings() {
@@ -937,13 +939,13 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		 * prevent to fire the selection event in the spinner when a selection is set, this would
 		 * cause endless loops
 		 */
-		fIsSpinnerChangedByUser = false;
+//		fIsSpinnerChangedByUser = false;
 		{
 			fSpinnerNewStartAlti.setSelection(altiStart);
 			fSpinnerNewEndAlti.setSelection(altiEnd);
 			fSpinnerNewMaxAlti.setSelection(altiMax);
 		}
-		fIsSpinnerChangedByUser = true;
+//		fIsSpinnerChangedByUser = true;
 
 		getButton(IDialogConstants.OK_ID).setEnabled(true);
 	}

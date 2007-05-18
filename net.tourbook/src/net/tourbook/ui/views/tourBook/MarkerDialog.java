@@ -22,6 +22,7 @@ import java.util.Iterator;
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartMarker;
+import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
@@ -68,7 +69,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Scale;
@@ -123,12 +123,14 @@ public class MarkerDialog extends TitleAreaDialog {
 	private Composite			fOffsetContainer;
 	private ViewerDetailForm	fViewerDetailForm;
 
-	private NumberFormat		fNF								= NumberFormat.getNumberInstance();
+	private Composite			fMarkerListContainer;
 
 	private Button				fBtnDelete;
 	private Button				fBtnUndo;
-	private Composite			fMarkerListContainer;
 	private Button				fBtnReset;
+	private Button				fBtnClose;
+
+	private NumberFormat		fNF								= NumberFormat.getNumberInstance();
 
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -235,15 +237,30 @@ public class MarkerDialog extends TitleAreaDialog {
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(Messages.MarkerDialog_Dlg_title);
+
+		/*
+		 * don't close the dialog when the enter key is pressed, except when the close button has
+		 * the focus
+		 */
+//		shell.addTraverseListener(new TraverseListener() {
+//			public void keyTraversed(TraverseEvent e) {
+//				if (e.detail == SWT.TRAVERSE_RETURN) {
+//					e.detail = SWT.TRAVERSE_TAB_NEXT;
+//					e.doit = true;
+//				}
+//			}
+//		});
 	}
 
 	protected void createButtonsForButtonBar(Composite parent) {
-		Button btnClose = createButton(
+
+		fBtnClose = createButton(
 				parent,
 				IDialogConstants.CLOSE_ID,
 				IDialogConstants.CLOSE_LABEL,
-				true);
-		btnClose.addSelectionListener(new SelectionAdapter() {
+				false);
+
+		fBtnClose.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				close();
 			}
@@ -253,7 +270,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	protected Control createDialogArea(Composite parent) {
 
 		Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
-		
+
 		createUI(dlgAreaContainer);
 
 		restoreDialogSettings();
@@ -403,7 +420,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		Composite dlgMarginContainer = new Composite(parent, SWT.NONE);
 		dlgMarginContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		dlgMarginContainer.setLayout(new GridLayout());
-		
+
 		Composite dlgContainer = new Composite(dlgMarginContainer, SWT.NONE);
 		dlgContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		// dlgContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -765,6 +782,12 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		updateMarkerUI();
 		onChangeMarkerUI();
+
+		// set slider position
+		fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(
+				fTourChart,
+				newSelectedMarker.getSerieIndex(),
+				SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {});
 	}
 
 	private void restoreDialogSettings() {

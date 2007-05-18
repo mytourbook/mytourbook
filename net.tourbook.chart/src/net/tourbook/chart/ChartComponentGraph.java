@@ -3992,7 +3992,13 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	void setXSliderValueIndex(final ChartXSlider slider, int valueIndex) {
 
-		final int[] xValues = getXData().getHighValues()[0];
+		final ChartDataXSerie xData = getXData();
+		
+		if (xData == null) {
+			return;
+		}
+		
+		final int[] xValues = xData.getHighValues()[0];
 
 		// adjust the slider index to the array bounds
 		valueIndex = valueIndex < 0 ? 0 : valueIndex > (xValues.length - 1)
