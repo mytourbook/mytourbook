@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.device.feature"
       label="%Feature_Name"
-      version="0.8.7"
+      version="0.8.8.v2007-05-15"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -397,6 +397,13 @@ Public License instead of this License.
 
    <plugin
          id="net.tourbook.device.cm4xxm"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.tur"
          download-size="0"
          install-size="0"
          version="0.0.0"

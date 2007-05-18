@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Chart-Engine
 Bundle-SymbolicName: net.tourbook.chart
-Bundle-Version: 0.8.8.beta3
+Bundle-Version: 0.8.8.v2007-05-15
 Bundle-Activator: net.tourbook.chart.Activator
 Bundle-Vendor: MyTourbook
 Bundle-Localization: plugin
