@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Import .CRP files
+Bundle-SymbolicName: net.tourbook.device.crp;singleton:=true
+Bundle-Version: 0.8.9
+Bundle-Activator: net.tourbook.device.crp.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ net.tourbook,
+ net.tourbook.device
+Eclipse-LazyStart: true
+Bundle-Vendor: MyTourbook
