@@ -16,7 +16,6 @@
 
 package net.tourbook.importdata;
 
-
 public abstract class TourbookDevice implements IRawDataReader {
 
 	public TourbookDevice() {}
@@ -41,37 +40,37 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public String	fileExtension;
 
 	/**
-	 * <code>true</code> when this device reader can read from the device,
-	 * <code>false</code> (default) when the device reader can only import
-	 * from a file
+	 * <code>true</code> when this device reader can read from the device, <code>false</code>
+	 * (default) when the device reader can only import from a file
 	 */
-	public boolean	canReadFromDevice	= false;
+	public boolean	canReadFromDevice						= false;
+
+	/**
+	 * when set to <code>true</code>, in the import dialog multiple files can be selected
+	 */
+	public boolean	canSelectMultipleFilesInImportDialog	= false;
 
 	/**
 	 * @param portName
-	 * @return returns the serial port parameters which are use to receive data
-	 *         from the device
+	 * @return returns the serial port parameters which are use to receive data from the device
 	 */
 	public abstract SerialParameters getPortParameters(String portName);
 
 	/**
-	 * Check if the received data are correct for this device, Returns
-	 * <code>true</code> when the received data are correct for this device
+	 * Check if the received data are correct for this device, Returns <code>true</code> when the
+	 * received data are correct for this device
 	 * 
 	 * @param byteIndex
-	 *        index in the byte stream, this will be incremented when the return
-	 *        value is true
+	 *        index in the byte stream, this will be incremented when the return value is true
 	 * @param newByte
 	 *        received byte
-	 * @return Return <code>true</code> when the receice data are correct for
-	 *         this device
+	 * @return Return <code>true</code> when the receice data are correct for this device
 	 */
 	public abstract boolean checkStartSequence(int byteIndex, int newByte);
 
 	/**
-	 * Returns the number of bytes which will be checked in the startsequence.
-	 * For a HAC4/5 this can be set to 4 because the first 4 bytes of the input
-	 * stream are always the characters AFRO
+	 * Returns the number of bytes which will be checked in the startsequence. For a HAC4/5 this can
+	 * be set to 4 because the first 4 bytes of the input stream are always the characters AFRO
 	 * 
 	 * @return
 	 */

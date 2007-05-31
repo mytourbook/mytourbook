@@ -563,15 +563,15 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	 */
 	private void enableUpDownButtons() {
 
-		Table builderTable = fGraphCheckboxList.getTable();
-		TableItem[] items = builderTable.getSelection();
+		Table table = fGraphCheckboxList.getTable();
+		TableItem[] items = table.getSelection();
 		boolean validSelection = items != null && items.length > 0;
 		boolean enableUp = validSelection;
 		boolean enableDown = validSelection;
 
 		if (validSelection) {
-			int indices[] = builderTable.getSelectionIndices();
-			int max = builderTable.getItemCount();
+			int indices[] = table.getSelectionIndices();
+			int max = table.getItemCount();
 			enableUp = indices[0] != 0;
 			enableDown = indices[indices.length - 1] < max - 1;
 		}

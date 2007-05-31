@@ -42,7 +42,7 @@ public class DeviceImportSorter extends ViewerSorter {
 	 * 
 	 * @param column
 	 */
-	public void doSort(int column) {
+	public void doSort(final int column) {
 
 		if (column == this.column) {
 			// Same column as last sort; toggle the direction
@@ -54,10 +54,10 @@ public class DeviceImportSorter extends ViewerSorter {
 		}
 	}
 
-	public int compare(Viewer viewer, Object obj1, Object obj2) {
+	public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
-		TourData tourData1 = ((TourData) obj1);
-		TourData tourData2 = ((TourData) obj2);
+		final TourData tourData1 = ((TourData) obj1);
+		final TourData tourData2 = ((TourData) obj2);
 
 		int result = 0;
 

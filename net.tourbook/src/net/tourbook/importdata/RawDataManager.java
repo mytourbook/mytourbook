@@ -18,6 +18,7 @@ package net.tourbook.importdata;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -36,34 +37,33 @@ import org.eclipse.swt.widgets.MessageBox;
 
 public class RawDataManager {
 
-	public static final String		TEMP_RAW_DATA_FILE	= "temp-device-data.txt";		//$NON-NLS-1$
+	public static final String			TEMP_RAW_DATA_FILE	= "temp-device-data.txt";			//$NON-NLS-1$
 
-	private static RawDataManager	instance			= null;
+	private static RawDataManager		instance			= null;
 
 	/**
-	 * contains the device which was used to get the fields:
-	 * <code>fDeviceData</code>, <code>fTourData</code>, if set to
-	 * <code>null</code> no raw data are available
+	 * contains the device which was used to get the fields: <code>fDeviceData</code>,
+	 * <code>fTourData</code>, if set to <code>null</code> no raw data are available
 	 */
-	private TourbookDevice			fDevice;
+	private TourbookDevice				fDevice;
 
 	/**
 	 * contains the device data imported from the device/file
 	 */
-	private DeviceData				fDeviceData			= new DeviceData();
+	private DeviceData					fDeviceData			= new DeviceData();
 
 	/**
 	 * contains the tour data imported from the device/file
 	 */
-	private ArrayList<TourData>		fTourData			= new ArrayList<TourData>();
+	private HashMap<String, TourData>	fTourDataMap		= new HashMap<String, TourData>();
 
 	/**
-	 * when set to <code>true</code> the data are imported from a device and
-	 * stored in the temp raw data file
+	 * when set to <code>true</code> the data are imported from a device and stored in the temp
+	 * raw data file
 	 */
-	private boolean					fIsDeviceImport;
+	private boolean						fIsDeviceImport;
 
-	private String					fImportFileName;
+	private String						fReceiveDataFileName;
 
 	private RawDataManager() {}
 
@@ -91,8 +91,8 @@ public class RawDataManager {
 		return fDeviceData;
 	}
 
-	public ArrayList<TourData> getTourData() {
-		return fTourData;
+	public HashMap<String, TourData> getTourData() {
+		return fTourDataMap;
 	}
 
 	public TourbookDevice getDevice() {
@@ -108,6 +108,8 @@ public class RawDataManager {
 	 * @return Returns <code>true</code> when the import was successfully
 	 */
 	public boolean importRawData(String fileName) {
+
+		boolean returnValue = false;
 
 		File importFile = new File(fileName);
 
@@ -134,7 +136,7 @@ public class RawDataManager {
 		if (dotPos == -1) {
 			return false;
 		}
-		String extension = fileName.substring(dotPos + 1);
+		String fileExtension = fileName.substring(dotPos + 1);
 
 		boolean isDataImported = false;
 
@@ -145,31 +147,38 @@ public class RawDataManager {
 		 */
 		for (TourbookDevice device : deviceList) {
 
-			if (device.fileExtension.equalsIgnoreCase(extension)) {
+			if (device.fileExtension.equalsIgnoreCase(fileExtension)) {
 
 				// device file extension was found in the filename extension
 
 				if (importRawDataFromFile(device, fileName)) {
-					return true;
+					isDataImported = true;
+					returnValue = true;
+					break;
 				}
 			}
 		}
 
-		/*
-		 * when data has not imported yet, try all available devices without
-		 * checking the file extension
-		 */
-		for (TourbookDevice device : deviceList) {
-			if (importRawDataFromFile(device, fileName)) {
-				return true;
+		if (isDataImported == false) {
+
+			/*
+			 * when data has not imported yet, try all available devices without checking the file
+			 * extension
+			 */
+			for (TourbookDevice device : deviceList) {
+				if (importRawDataFromFile(device, fileName)) {
+					isDataImported = true;
+					returnValue = true;
+					break;
+				}
+			}
+
+			if (isDataImported = false) {
+				showMsgBoxInvalidFormat(fileName);
 			}
 		}
 
-		if (!isDataImported) {
-			showMsgBoxInvalidFormat(fileName);
-		}
-
-		return false;
+		return returnValue;
 	}
 
 	/**
@@ -185,22 +194,21 @@ public class RawDataManager {
 
 			// file contains valid raw data for the raw data reader
 
-			if (device.processDeviceData(fileName, fDeviceData, fTourData)) {
+			if (device.processDeviceData(fileName, fDeviceData, fTourDataMap)) {
 
 				// keep the device and filename for the successful import
 				fDevice = device;
-				fImportFileName = fileName;
 
 				fIsDeviceImport = RawDataManager.getTempDataFileName().equals(fileName);
 
-				updatePersonInRawData();
+// updatePersonInRawData();
 
 				return true;
+
 			} else {
+
 				// import was not successful
 				fDevice = null;
-				fImportFileName = null;
-
 				fIsDeviceImport = false;
 			}
 		}
@@ -210,17 +218,17 @@ public class RawDataManager {
 
 	private void showMsgBoxInvalidFormat(String fileName) {
 
-		MessageBox msgBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_ERROR
-				| SWT.OK);
+		MessageBox msgBox = new MessageBox(
+				Display.getCurrent().getActiveShell(),
+				SWT.ICON_ERROR | SWT.OK);
 
 		msgBox.setMessage(NLS.bind(Messages.DataImport_Error_invalid_data_format, fileName));
 		msgBox.open();
 	}
 
 	/**
-	 * @return Returns <code>true</code> when the device/tour data has been
-	 *         imported from a device, <code>false</code> when the data are
-	 *         imported from a file
+	 * @return Returns <code>true</code> when the device/tour data has been imported from a
+	 *         device, <code>false</code> when the data are imported from a file
 	 */
 	public boolean isDeviceImport() {
 		return fIsDeviceImport;
@@ -252,7 +260,7 @@ public class RawDataManager {
 	public void updatePersonInRawData() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")//$NON-NLS-1$
 			public void run() {
 
 				EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -263,7 +271,7 @@ public class RawDataManager {
 							+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ") //$NON-NLS-1$ //$NON-NLS-2$
 							+ (" WHERE tourId = :tourId")); //$NON-NLS-1$
 
-					for (TourData tourData : fTourData) {
+					for (TourData tourData : fTourDataMap.values()) {
 
 						query.setParameter("tourId", tourData.getTourId()); //$NON-NLS-1$
 
@@ -271,8 +279,9 @@ public class RawDataManager {
 						if (peopleList.size() == 0) {
 							tourData.setTourPerson(null);
 						} else {
-							tourData.setTourPerson(((TourData) peopleList.get(0)).getTourPerson());
-							tourData.setTourType(((TourData) peopleList.get(0)).getTourType());
+							final TourData tourDataFromDB = (TourData) peopleList.get(0);
+							tourData.setTourPerson(tourDataFromDB.getTourPerson());
+							tourData.setTourType(tourDataFromDB.getTourType());
 						}
 					}
 
@@ -282,21 +291,20 @@ public class RawDataManager {
 		});
 	}
 
-	public String getImportFileName() {
-		return fImportFileName;
+	public String getReceiveDataFileName() {
+		return fReceiveDataFileName;
 	}
 
-	public void setImportFileName(String fileName) {
-		fImportFileName = fileName;
+	public void setReceiveDataFileName(String fileName) {
+		fReceiveDataFileName = fileName;
 	}
 
 	/**
-	 * reset the data, so the next time the data are read from the raw data
-	 * manager, the data must be reimported
+	 * reset the data, so the next time the data are read from the raw data manager, the data must
+	 * be reimported
 	 */
 	public void resetData() {
 		fDevice = null;
-		fImportFileName = null;
 	}
 
 }

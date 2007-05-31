@@ -34,6 +34,7 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
+import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -58,8 +59,7 @@ import org.eclipse.ui.PlatformUI;
 public class TourDatabase {
 
 	/**
-	 * version for the database which is required that the tourbook application
-	 * works successfully
+	 * version for the database which is required that the tourbook application works successfully
 	 */
 	private static final int			TOURBOOK_DB_VERSION		= 3;
 
@@ -103,14 +103,14 @@ public class TourDatabase {
 			return emFactory.createEntityManager();
 		}
 
-		checkServer();
-		checkTable();
-
-		if (checkVersion() == false) {
-			return null;
-		}
-
 		try {
+			checkServer();
+			checkTable();
+
+			if (checkVersion() == false) {
+				return null;
+			}
+
 			IRunnableWithProgress runnableCreateEntityManager = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException,
 						InterruptedException {
@@ -129,13 +129,17 @@ public class TourDatabase {
 				}
 			};
 
-			IProgressMonitor splashProgressMonitor = TourbookPlugin
+			final MyTourbookSplashHandler splashHandler = TourbookPlugin
 					.getDefault()
-					.getSplashHandler()
-					.getBundleProgressMonitor();
+					.getSplashHandler();
 
-			runnableCreateEntityManager.run(splashProgressMonitor);
+			if (splashHandler != null) {
+				IProgressMonitor splashProgressMonitor = splashHandler.getBundleProgressMonitor();
 
+				runnableCreateEntityManager.run(splashProgressMonitor);
+			}
+		} catch (MyTourbookException e) {
+			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -171,7 +175,7 @@ public class TourDatabase {
 		}
 	}
 
-	private void checkServer() {
+	private void checkServer() throws MyTourbookException   {
 
 		// when the server is started, nothing is to do here
 		if (server != null) {
@@ -184,12 +188,18 @@ public class TourDatabase {
 
 			try {
 
-				IProgressMonitor splashProgressMonitor = TourbookPlugin
+				final MyTourbookSplashHandler splashHandler = TourbookPlugin
 						.getDefault()
-						.getSplashHandler()
-						.getBundleProgressMonitor();
+						.getSplashHandler();
 
-				runnableStartServer.run(splashProgressMonitor);
+				if (splashHandler == null) {
+					throw new MyTourbookException("Cannot get Splash Handler");
+				} else {
+					IProgressMonitor splashProgressMonitor = splashHandler
+							.getBundleProgressMonitor();
+
+					runnableStartServer.run(splashProgressMonitor);
+				}
 
 			} catch (InvocationTargetException e) {
 				e.printStackTrace();
@@ -200,8 +210,8 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Checks if the database server is running, if not it will start the
-	 * server. startServerJob has a job when the server is not yet started
+	 * Checks if the database server is running, if not it will start the server. startServerJob has
+	 * a job when the server is not yet started
 	 */
 	private IRunnableWithProgress createStartServerRunnable() {
 
@@ -250,23 +260,22 @@ public class TourDatabase {
 			e2.printStackTrace();
 		}
 
-//		monitor.worked(1);
+		// monitor.worked(1);
 		// monitor.subTask(Messages.Database_Monitor_db_service_subtask_location
 		// + databasePath);
 
 		try {
 			/*
-			 * check if another derby server is already running (this can happen
-			 * during development)
+			 * check if another derby server is already running (this can happen during development)
 			 */
 			server.ping();
-//			monitor.worked(1);
+			// monitor.worked(1);
 
 		} catch (Exception e) {
 
 			try {
 				server.start(null);
-//				monitor.worked(1);
+				// monitor.worked(1);
 			} catch (Exception e2) {
 				e2.printStackTrace();
 			}
@@ -276,12 +285,12 @@ public class TourDatabase {
 
 				try {
 					server.ping();
-//					monitor.worked(1);
+					// monitor.worked(1);
 					break;
 				} catch (Exception e1) {
 					try {
 						Thread.sleep(1);
-//						monitor.worked(1);
+						// monitor.worked(1);
 					} catch (InterruptedException e2) {
 						e2.printStackTrace();
 					}
@@ -291,7 +300,7 @@ public class TourDatabase {
 			// make the first connection, this takes longer as the
 			// subsequent ones
 			try {
-//				monitor.worked(1);
+				// monitor.worked(1);
 				Connection connection = createConnection();
 				connection.close();
 			} catch (SQLException e1) {
@@ -299,7 +308,7 @@ public class TourDatabase {
 			}
 		}
 		// monitor.done();
-//		monitor.worked(1);
+		// monitor.worked(1);
 	}
 
 	/**
@@ -555,8 +564,7 @@ public class TourDatabase {
 						+ (" PRIMARY KEY (markerId)")); //$NON-NLS-1$
 
 				/*
-				 * ALTER TABLE TourCategory ADD CONSTRAINT TourCategory_pk
-				 * PRIMARY KEY (categoryId);
+				 * ALTER TABLE TourCategory ADD CONSTRAINT TourCategory_pk PRIMARY KEY (categoryId);
 				 */
 				stmt.addBatch("" //$NON-NLS-1$
 						+ ("ALTER TABLE " + TABLE_TOUR_CATEGORY) //$NON-NLS-1$
@@ -564,8 +572,8 @@ public class TourDatabase {
 						+ (" PRIMARY KEY (categoryId)")); //$NON-NLS-1$
 
 				/*
-				 * ALTER TABLE TourData_TourMarker ADD CONSTRAINT
-				 * TourData_TourMarker_pk PRIMARY KEY (TourData_tourId);
+				 * ALTER TABLE TourData_TourMarker ADD CONSTRAINT TourData_TourMarker_pk PRIMARY KEY
+				 * (TourData_tourId);
 				 */
 				stmt
 						.addBatch("" //$NON-NLS-1$
@@ -574,8 +582,8 @@ public class TourDatabase {
 								+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				/*
-				 * ALTER TABLE TourData_TourReference ADD CONSTRAINT
-				 * TourData_TourReference_pk PRIMARY KEY (TourData_tourId);
+				 * ALTER TABLE TourData_TourReference ADD CONSTRAINT TourData_TourReference_pk
+				 * PRIMARY KEY (TourData_tourId);
 				 */
 				stmt.addBatch("" //$NON-NLS-1$
 						+ ("ALTER TABLE " + TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE) //$NON-NLS-1$ //$NON-NLS-2$
@@ -586,9 +594,8 @@ public class TourDatabase {
 						+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				/*
-				 * ALTER TABLE TourCategory_TourData ADD CONSTRAINT
-				 * TourCategory_TourData_pk PRIMARY KEY
-				 * (tourCategory_categoryId);
+				 * ALTER TABLE TourCategory_TourData ADD CONSTRAINT TourCategory_TourData_pk PRIMARY
+				 * KEY (tourCategory_categoryId);
 				 */
 				stmt
 						.addBatch("" //$NON-NLS-1$
@@ -628,7 +635,12 @@ public class TourDatabase {
 
 	public Connection getConnection() throws SQLException {
 
-		checkServer();
+		try {
+			checkServer();
+		} catch (MyTourbookException e) {
+			e.printStackTrace();
+		}
+
 		checkTable();
 
 		if (checkVersion() == false) {
@@ -672,8 +684,7 @@ public class TourDatabase {
 				// a version record is not available
 
 				/*
-				 * insert the version for the current database design into the
-				 * database
+				 * insert the version for the current database design into the database
 				 */
 				sqlString = ("INSERT INTO " + TABLE_DB_VERSION) //$NON-NLS-1$
 						+ " VALUES (" //$NON-NLS-1$
@@ -695,8 +706,7 @@ public class TourDatabase {
 	private boolean updateDbDesign(Connection conn, int currentDbVersion) {
 
 		/*
-		 * this must be implemented or updated when the database version must be
-		 * updated
+		 * this must be implemented or updated when the database version must be updated
 		 */
 
 		// confirm update
@@ -839,7 +849,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	public static ArrayList<TourType> getTourTypes() {
 
 		ArrayList<TourType> tourTypeList = new ArrayList<TourType>();
@@ -863,7 +873,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	public static ArrayList<TourBike> getTourBikes() {
 
 		ArrayList<TourBike> bikeList = new ArrayList<TourBike>();
@@ -887,7 +897,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour people in the db sorted by last/first name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	public static ArrayList<TourPerson> getTourPeople() {
 
 		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();

@@ -290,6 +290,13 @@ public class TourData {
 	@Transient
 	public float[]				segmentSerieCadence;
 
+	/**
+	 * contains the filename from which the data are imported, when set to <code>null</code> the
+	 * data are not imported they are from the database
+	 */
+	@Transient
+	public String				importRawDataFile;
+
 	public TourData() {}
 
 	/**
@@ -437,40 +444,38 @@ public class TourData {
 	}
 
 	/**
-	 * Creates the unique tour id
+	 * Creates the unique tour id from the tour date/time and distance
 	 */
 	public void createTourId() {
 
-		final String startDist4Id = Integer.toString(Math.abs(getStartDistance()));
+		final String startDistance = Integer.toString(Math.abs(getStartDistance()));
 
-		String tourStart;
+		String tourId;
 
 		try {
 			/*
 			 * this is the default implementation to create a tour id, but on the 5.5.2007 a
 			 * NumberFormatException occured so the calculation for the tour id was adjusted
 			 */
-			tourStart = Short.toString(getStartYear())
-					+ Short.toString(getStartMonth())
+			tourId = Short.toString(getStartYear()) + Short.toString(getStartMonth())
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
-					+ startDist4Id;
+					+ startDistance;
 
-			setTourId(Long.parseLong(tourStart));
+			setTourId(Long.parseLong(tourId));
 
 		} catch (NumberFormatException e) {
 
 			// distance was shorted that the maximum for a Long datatype is not exceeded
 
-			tourStart = Short.toString(getStartYear())
-					+ Short.toString(getStartMonth())
+			tourId = Short.toString(getStartYear()) + Short.toString(getStartMonth())
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
-					+ startDist4Id.substring(0, Math.min(5, startDist4Id.length()));
+					+ startDistance.substring(0, Math.min(5, startDistance.length()));
 
-			setTourId(Long.parseLong(tourStart));
+			setTourId(Long.parseLong(tourId));
 		}
 
 	}
@@ -569,8 +574,7 @@ public class TourData {
 					? 0
 					: (float) ((float) segment.distance / segment.drivingTime * 3.6);
 
-			segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitude
-					* 100
+			segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitude * 100
 					/ segment.distance;
 
 			segmentSerieAltimeter[segmentIndex] = segment.drivingTime == 0
@@ -687,8 +691,8 @@ public class TourData {
 
 		TourData td = (TourData) obj;
 
-		return this.getStartYear() == td.getStartYear()
-				&& this.getStartMonth() == td.getStartMonth()
+		return this.getStartYear() == td.getStartYear() && this.getStartMonth() == td
+				.getStartMonth()
 				&& this.getStartDay() == td.getStartDay()
 				&& this.getStartHour() == td.getStartHour()
 				&& this.getStartMinute() == td.getStartMinute()

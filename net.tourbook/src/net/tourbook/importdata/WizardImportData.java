@@ -169,7 +169,7 @@ public class WizardImportData extends Wizard {
 	/**
 	 * @return Returns <code>true</code> when the import was successful
 	 */
-	private boolean importData() {
+	private boolean receiveData() {
 
 		Combo comboPorts = fPageImportSettings.fComboPorts;
 
@@ -188,8 +188,7 @@ public class WizardImportData extends Wizard {
 		final String portName = comboPorts.getItem(selectedComPort);
 
 		/*
-		 * when the Cancel button is pressed multiple times, the app calls this
-		 * function each time
+		 * when the Cancel button is pressed multiple times, the app calls this function each time
 		 */
 		if (fRunnableReceiveData != null) {
 			return false;
@@ -262,8 +261,7 @@ public class WizardImportData extends Wizard {
 			RawDataManager rawDataManager = RawDataManager.getInstance();
 
 			/*
-			 * convert the data from the device data into the internal data
-			 * structure
+			 * convert the data from the device data into the internal data structure
 			 */
 			if (fImportDevice.processDeviceData(
 					tempDataFileName,
@@ -281,14 +279,14 @@ public class WizardImportData extends Wizard {
 
 				if (autoSavedFileName == null) {
 					// it was not auto saved or the auto save was canceled
-					rawDataManager.setImportFileName(tempDataFileName);
+					rawDataManager.setReceiveDataFileName(tempDataFileName);
 					rawDataManager.setIsDeviceImport(true);
 				} else {
 					/*
-					 * tell the raw data manager that the data are not received
-					 * they are now from a file
+					 * tell the raw data manager that the data are not received they are now from a
+					 * file
 					 */
-					rawDataManager.setImportFileName(autoSavedFileName);
+					rawDataManager.setReceiveDataFileName(autoSavedFileName);
 					rawDataManager.setIsDeviceImport(false);
 				}
 
@@ -330,7 +328,7 @@ public class WizardImportData extends Wizard {
 
 	public boolean performFinish() {
 
-		importData();
+		receiveData();
 
 		fPageImportSettings.persistDialogSettings();
 
@@ -366,8 +364,8 @@ public class WizardImportData extends Wizard {
 		portThread.start();
 
 		/*
-		 * wait for the data thread, terminate after a certain time (600 x 100
-		 * milliseconds = 60 seconds)
+		 * wait for the data thread, terminate after a certain time (600 x 100 milliseconds = 60
+		 * seconds)
 		 */
 
 		while (receiveTimeout < RECEIVE_TIMEOUT) {
@@ -387,8 +385,8 @@ public class WizardImportData extends Wizard {
 			int rawDataSize = fRawDataBuffer.size();
 
 			/*
-			 * if receiving data was started and no more data are coming in,
-			 * stop receiving additional data
+			 * if receiving data was started and no more data are coming in, stop receiving
+			 * additional data
 			 */
 			if (isReceivingStarted && receiveTimer == 10 & rawDataSize == receivedData) {
 				break;
@@ -447,6 +445,7 @@ public class WizardImportData extends Wizard {
 			e.printStackTrace();
 		}
 	}
+
 	public void setAutoDownload() {
 
 		getContainer().getShell().addShellListener(new ShellAdapter() {
@@ -456,7 +455,7 @@ public class WizardImportData extends Wizard {
 					public void run() {
 
 						// start downloading
-						boolean importResult = importData();
+						boolean importResult = receiveData();
 
 						fPageImportSettings.persistDialogSettings();
 

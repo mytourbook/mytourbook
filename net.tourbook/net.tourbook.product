@@ -74,10 +74,10 @@
       <feature id="net.tourbook.statistics.feature" version="0.8.3"/>
       <feature id="net.tourbook.ext.derby.feature" version="10.1.2.1"/>
       <feature id="net.tourbook.ext.ejb3.feature" version="0.8.7"/>
-      <feature id="org.eclipse.rcp" version="3.3.0.v20070316b-8l8VCEYXUPdNkSgt8LpKG"/>
       <feature id="net.tourbook.ext.eclipse" version="0.8.3"/>
       <feature id="net.tourbook.feature" version="0.8.8.v2007-05-15"/>
       <feature id="net.tourbook.device.feature" version="0.8.8.v2007-05-15"/>
+      <feature id="org.eclipse.rcp" version="3.3.0.v20070405a-8w8eDpEbsN3VpGNZ28IQRGc"/>
    </features>
 
 </product>

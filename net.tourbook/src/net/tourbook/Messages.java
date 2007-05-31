@@ -71,7 +71,6 @@ public class Messages extends NLS {
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
 
-
 	public static String		Database_Monitor_db_service_task;
 	public static String		Database_Monitor_persistent_service_task;
 
@@ -207,9 +206,9 @@ public class Messages extends NLS {
 	public static String		MarkerDialog_Button_undo;
 	public static String		MarkerDialog_Button_undo_tooltip;
 
-	public static String	MarkerDialog_Dlg_Message;
+	public static String		MarkerDialog_Dlg_Message;
 
-	public static String	MarkerDialog_Dlg_title;
+	public static String		MarkerDialog_Dlg_title;
 	public static String		MarkerDialog_Label_horizontal_offset;
 	public static String		MarkerDialog_Label_marker_name;
 	public static String		MarkerDialog_Label_markers;
@@ -297,24 +296,38 @@ public class Messages extends NLS {
 	public static String		RawData_Action_show_tour_chart_tooltip;
 
 	public static String		RawData_Chart_title;
-	public static String		RawData_Colum_date;
+
 	public static String		RawData_Column_altitude_up;
+	public static String		RawData_Column_altitude_up_label;
 	public static String		RawData_Column_altitude_up_tooltip;
-	public static String		RawData_Column_date_tooltip;
+
+	public static String		RawData_Column_date;
+	public static String		RawData_Column_date_label;
+	public static String		RawData_Column_db_status_tooltip;
 	public static String		RawData_Column_distance;
+	public static String		RawData_Column_distance_label;
 	public static String		RawData_Column_distance_tooltip;
 	public static String		RawData_Column_driving_time;
+	public static String		RawData_Column_driving_time_label;
 	public static String		RawData_Column_driving_time_tooltip;
 	public static String		RawData_Column_profile;
+	public static String		RawData_Column_profile_label;
 	public static String		RawData_Column_profile_tooltip;
 	public static String		RawData_Column_recording_time;
+	public static String		RawData_Column_recording_time_label;
 	public static String		RawData_Column_recording_time_tooltip;
 	public static String		RawData_Column_speed;
+	public static String		RawData_Column_speed_label;
 	public static String		RawData_Column_speed_tooltip;
 	public static String		RawData_Column_time;
 	public static String		RawData_Column_time_interval;
+	public static String		RawData_Column_time_interval_label;
 	public static String		RawData_Column_time_interval_tooltip;
+	public static String		RawData_Column_time_label;
 	public static String		RawData_Column_time_tooltip;
+	public static String		RawData_Column_tour_type_label;
+	public static String		RawData_Column_tour_type_tooltip;
+
 	public static String		RawData_Dlg_save_tour_msg;
 	public static String		RawData_Dlg_save_tour_title;
 	public static String		RawData_Label_confirm_overwrite;
@@ -348,14 +361,14 @@ public class Messages extends NLS {
 	public static String		Tour_Action_tour_info_tooltip;
 	public static String		Tour_Action_zoom_fit_to_window;
 
-//	public static String		Tour_Label_adjust_end;
-//	public static String		Tour_Label_adjust_height;
+// public static String Tour_Label_adjust_end;
+// public static String Tour_Label_adjust_height;
 	public static String		Tour_Label_distance;
 	public static String		Tour_Label_distance_unit;
-//	public static String		Tour_Label_evenly_distributed;
-//	public static String		Tour_Label_new_end_altitude;
-//	public static String		Tour_Label_new_height;
-//	public static String		Tour_Label_new_start_altitude;
+// public static String Tour_Label_evenly_distributed;
+// public static String Tour_Label_new_end_altitude;
+// public static String Tour_Label_new_height;
+// public static String Tour_Label_new_start_altitude;
 	public static String		Tour_Label_time;
 	public static String		Tour_Label_time_unit;
 	public static String		Tour_Label_tour_type;
@@ -395,7 +408,7 @@ public class Messages extends NLS {
 	public static String		TourBook_Lable_no_statistic_is_selected;
 	public static String		TourData_Label_device_marker;
 
-	public static String	TourData_Label_new_marker;
+	public static String		TourData_Label_new_marker;
 
 	public static String		TourMap_Action_create_left_marker;
 	public static String		TourMap_Action_create_marker;
@@ -454,7 +467,7 @@ public class Messages extends NLS {
 
 	public static String		TourMarker_Action_delete_marker;
 
-	public static String	TourMarker_Action_edit_marker;
+	public static String		TourMarker_Action_edit_marker;
 	public static String		TourMarker_Column_horizontal_offset;
 	public static String		TourMarker_Column_horizontal_offset_tooltip;
 	public static String		TourMarker_Column_km;

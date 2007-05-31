@@ -16,15 +16,14 @@
 
 package net.tourbook.importdata;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import net.tourbook.data.TourData;
 
 public interface IRawDataReader {
 
 	/**
-	 * @return Returns the complete data size which will be received on the COM
-	 *         port for this device
+	 * @return Returns the complete data size which will be received on the COM port for this device
 	 */
 	public int getImportDataSize();
 
@@ -33,22 +32,20 @@ public interface IRawDataReader {
 	 * 
 	 * @param fileName
 	 * @param deviceData
-	 * @param tourData
-	 * @return Returns <code>true</code> when the import was successfull, the
-	 *         parameters <code>deviceData</code> and <code>tourData</code>
-	 *         are set from the imported file.
+	 * @param tourDataMap
+	 * @return Returns <code>true</code> when the import was successfull, the parameters
+	 *         <code>deviceData</code> and <code>tourData</code> are set from the imported file.
 	 */
 	public boolean processDeviceData(	String fileName,
 										DeviceData deviceData,
-										ArrayList<TourData> tourData);
+										HashMap<String, TourData> tourDataMap);
 
 	/**
 	 * Validate data format
 	 * 
 	 * @param fileName
 	 *        file name for the file which is validated
-	 * @return return <code>true</code> when the file has the format for this
-	 *         device reader
+	 * @return return <code>true</code> when the file has the format for this device reader
 	 */
 	public boolean validateRawData(String fileName);
 

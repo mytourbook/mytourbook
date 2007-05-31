@@ -1,16 +1,16 @@
-package net.tourbook.ui.views;
-
-
+package net.tourbook.ui.views.rawData;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import net.tourbook.Messages;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.views.rawData.RawDataView;
 
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -32,17 +32,17 @@ public class ActionImportFromFile extends Action {
 	 */
 	public void run() {
 
-		RawDataView fRawDataView = null;
+		RawDataView rawDataView = null;
 
 		try {
 			// show raw data view
-			fRawDataView = (RawDataView) PlatformUI
+			rawDataView = (RawDataView) PlatformUI
 					.getWorkbench()
 					.getActiveWorkbenchWindow()
 					.getActivePage()
 					.showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
-			if (fRawDataView == null) {
+			if (rawDataView == null) {
 				return;
 			}
 		} catch (PartInitException e) {
@@ -50,41 +50,74 @@ public class ActionImportFromFile extends Action {
 		}
 
 		// setup open dialog
-		FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
+		FileDialog fileDialog = new FileDialog(
+				Display.getCurrent().getActiveShell(),
+				(SWT.OPEN | SWT.MULTI));
 
 		ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 
-		int deviceLength = deviceList.size() + 1;
+		// sort device list alphabetically
+		Collections.sort(deviceList, new Comparator<TourbookDevice>() {
+			public int compare(TourbookDevice o1, TourbookDevice o2) {
+				return o1.visibleName.compareTo(o2.visibleName);
+			}
+		});
+
 		// create file filter list
+		int deviceLength = deviceList.size() + 1;
 		String[] filterExtensions = new String[deviceLength];
 		String[] filterNames = new String[deviceLength];
+		
 		int deviceIndex = 0;
+
+		// add option to show all files
+		filterExtensions[deviceIndex] = "*.*"; //$NON-NLS-1$
+		filterNames[deviceIndex] = "*.*"; //$NON-NLS-1$
+		
+		deviceIndex++;
+		
+		// add option for every file extension
 		for (TourbookDevice device : deviceList) {
 			filterExtensions[deviceIndex] = "*." + device.fileExtension; //$NON-NLS-1$
 			filterNames[deviceIndex] = device.visibleName + (" (*." + device.fileExtension + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-
 			deviceIndex++;
 		}
 
-		// add the option to select all files
-		filterExtensions[deviceIndex] = "*.*"; //$NON-NLS-1$
-		filterNames[deviceIndex] = "*.*"; //$NON-NLS-1$
-
 		// open file dialog
-		dialog.setFilterExtensions(filterExtensions);
-		dialog.setFilterNames(filterNames);
-		String fileName = dialog.open();
+		fileDialog.setFilterExtensions(filterExtensions);
+		fileDialog.setFilterNames(filterNames);
+
+		String firstFileName = fileDialog.open();
 
 		// check if user canceled the dialog
-		if (fileName == null) {
+		if (firstFileName == null) {
 			return;
 		}
 
 		RawDataManager rawDataManager = RawDataManager.getInstance();
+		
+		Path filePath = new Path(firstFileName);
+		final String[] selectedFileNames = fileDialog.getFileNames();
+		boolean isImported = false;
 
-		if (rawDataManager.importRawData(fileName)) {
-			fRawDataView.updateViewer();
-			fRawDataView.setActionSaveEnabled(rawDataManager.isDeviceImport());
+		// loop: import all selected files
+		for (String fileName : selectedFileNames) {
+
+			// replace filename, keep the directory path
+			fileName = filePath.removeLastSegments(1).append(fileName).makeAbsolute().toString();
+
+			if (isImported) {
+				rawDataManager.importRawData(fileName);
+			} else {
+				isImported = rawDataManager.importRawData(fileName);
+			}
+		}
+
+		if (isImported) {
+			rawDataManager.updatePersonInRawData();
+			rawDataView.updateViewer();
+			rawDataView.selectFirstTour();
+			rawDataView.setActionSaveEnabled(rawDataManager.isDeviceImport());
 		}
 	}
 

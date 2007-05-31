@@ -108,7 +108,7 @@ public class ActionSaveRawData extends Action {
 			}
 		}
 
-		if (copyFile(rawDataManager.getImportFileName(), fileNameOut)) {
+		if (copyFile(rawDataManager.getReceiveDataFileName(), fileNameOut)) {
 
 			// reload the data from the saved copy
 			if (rawDataManager.importRawData(fileNameOut)) {
