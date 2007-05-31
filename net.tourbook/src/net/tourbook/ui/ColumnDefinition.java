@@ -60,7 +60,7 @@ public class ColumnDefinition {
 
 	private SelectionAdapter	fColumnSelectionListener;
 
-	private TableColumn	fTableColumn;
+	private TableColumn			fTableColumn;
 
 	/**
 	 * @param columnManager
@@ -120,8 +120,12 @@ public class ColumnDefinition {
 		return fColumnSelectionListener;
 	}
 
-	public void setLabel(String definition) {
-		fLabel = definition;
+	/**
+	 * @param label
+	 *        contains the label which is displayed in the column modify dialog
+	 */
+	public void setLabel(String label) {
+		fLabel = label;
 	}
 
 	public String getLabel() {
@@ -179,7 +183,7 @@ public class ColumnDefinition {
 	}
 
 	public void setTableColumn(TableColumn column) {
-		fTableColumn=column;
+		fTableColumn = column;
 	}
 
 	public TableColumn getTableColumn() {

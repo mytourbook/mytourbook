@@ -130,6 +130,8 @@ public class RawDataView extends ViewPart {
 	public static final int					COLUMN_ID_TIME_INTERVAL		= 90;
 	private static final int				COLUMN_ID_DB_ICON			= 100;
 	private static final int				COLUMN_ID_TOUR_TYPE			= 110;
+	private static final int				COLUMN_ID_IMPORT_FILE		= 120;
+	private static final int				COLUMN_ID_DEVICE_NAME		= 130;
 
 	private static final String				MEMENTO_SASH_CONTAINER		= "importview.sash.container.";			//$NON-NLS-1$
 	private static final String				MEMENTO_IMPORT_FILENAME		= "importview.raw-data.filename";			//$NON-NLS-1$
@@ -878,6 +880,34 @@ public class RawDataView extends ViewPart {
 			}
 		});
 
+		/*
+		 * column: device name
+		 */
+		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_DEVICE_NAME, SWT.LEAD);
+		colDef.setLabel("Device/Dataformat");
+		colDef.setText("Device");
+		colDef.setToolTipText("Device which was used to import the tour");
+		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				cell.setText(((TourData) cell.getElement()).getDeviceId());
+			}
+		});
+
+		/*
+		 * column: import file
+		 */
+		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_IMPORT_FILE, SWT.LEAD);
+		colDef.setLabel("Import File");
+		colDef.setText("Import File");
+		colDef.setToolTipText("Filename from where the tour was imported");
+		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(20));
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				cell.setText(((TourData) cell.getElement()).importRawDataFile);
+			}
+		});
+
 		// table viewer
 		fTourViewer.setContentProvider(new TourDataContentProvider());
 		fTourViewer.setSorter(new DeviceImportSorter());
@@ -1018,7 +1048,7 @@ public class RawDataView extends ViewPart {
 
 				fColumnManager.sortColumns(convertStringToIntArray(mementoColumnSortOrderIds));
 			}
-			
+
 			/*
 			 * create table columns
 			 */
@@ -1036,7 +1066,7 @@ public class RawDataView extends ViewPart {
 			// restore column width
 			final String mementoColumnWidth = memento.getString(MEMENTO_COLUMN_WIDTH);
 			if (mementoColumnWidth != null) {
-				
+
 				fColumnManager.setColumnWidth(convertStringToIntArray(mementoColumnWidth));
 			}
 
@@ -1067,10 +1097,9 @@ public class RawDataView extends ViewPart {
 	}
 
 	private int[] convertStringToIntArray(final String mementoColumnWidth) {
-		String[] columnIdAndWidth = StringToArrayConverter
-		.convertStringToArray(mementoColumnWidth);
+		String[] columnIdAndWidth = StringToArrayConverter.convertStringToArray(mementoColumnWidth);
 		int[] columnIds = new int[columnIdAndWidth.length];
-		
+
 		for (int columnIdx = 0; columnIdx < columnIds.length; columnIdx++) {
 			columnIds[columnIdx] = Integer.valueOf(columnIdAndWidth[columnIdx]);
 		}
@@ -1141,7 +1170,7 @@ public class RawDataView extends ViewPart {
 		columnIds.clear();
 		Table table = fTourViewer.getTable();
 		for (TableColumn column : table.getColumns()) {
-			columnIds.add(Integer.toString(((ColumnDefinition)column.getData()).getColumnId()));
+			columnIds.add(Integer.toString(((ColumnDefinition) column.getData()).getColumnId()));
 			columnIds.add(Integer.toString(column.getWidth()));
 		}
 		memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter

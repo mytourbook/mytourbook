@@ -95,6 +95,8 @@ public class ColumnManager {
 	 */
 	public void createColumns() {
 
+		int[] columnIdAndWidth = getColumnWidths();
+
 		removeAllColumns();
 
 		// add all columns to the table viewer
@@ -103,6 +105,8 @@ public class ColumnManager {
 				createColumn(colDef);
 			}
 		}
+
+		setColumnWidth(columnIdAndWidth);
 	}
 
 	/**
@@ -111,6 +115,8 @@ public class ColumnManager {
 	 * @param columnIds
 	 */
 	public void createColumns(int[] columnIds) {
+
+		int[] columnIdAndWidth = getColumnWidths();
 
 		removeAllColumns();
 
@@ -121,6 +127,8 @@ public class ColumnManager {
 				createColumn(colDef);
 			}
 		}
+
+		setColumnWidth(columnIdAndWidth);
 	}
 
 	/**
@@ -140,6 +148,28 @@ public class ColumnManager {
 
 	public ArrayList<ColumnDefinition> getColumns() {
 		return fColumns;
+	}
+
+	/**
+	 * @return Returns the columnId/columnWidth pair for all columns in the table
+	 */
+	private int[] getColumnWidths() {
+
+		Table table = fTableViewer.getTable();
+		final TableColumn[] columns = table.getColumns();
+
+		int[] columnIdAndWidth = new int[columns.length * 2];
+		int columIdx = 0;
+
+		for (TableColumn column : columns) {
+
+			ColumnDefinition colDef = (ColumnDefinition) column.getData();
+
+			columnIdAndWidth[columIdx++] = colDef.getColumnId();
+			columnIdAndWidth[columIdx++] = column.getWidth();
+		}
+
+		return columnIdAndWidth;
 	}
 
 	public TableViewer getTableViewer() {
@@ -177,6 +207,12 @@ public class ColumnManager {
 		}
 	}
 
+	/**
+	 * Sets the width for columns
+	 * 
+	 * @param columnIdAndWidth
+	 *        contains the data pair: column id/column width,...
+	 */
 	public void setColumnWidth(int[] columnIdAndWidth) {
 
 		for (int columnIdx = 0; columnIdx < columnIdAndWidth.length; columnIdx++) {
