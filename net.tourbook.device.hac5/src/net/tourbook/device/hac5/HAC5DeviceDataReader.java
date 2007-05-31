@@ -417,6 +417,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					tourData.createTimeSeries(timeDataList);
 					tourData.computeTourDrivingTime();
 
+					tourData.setDeviceId(visibleName);
+
 					// set week of year
 					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
 							.getStartDay());

@@ -334,6 +334,8 @@ public class TurDeviceReader extends TourbookDevice {
 				tourData.setTourType(defaultTourType);
 				tourData.computeTourDrivingTime();
 
+				tourData.setDeviceId(visibleName);
+
 				// set week of year
 				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
 						.getStartDay());

@@ -325,6 +325,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 					tourData.computeTourDrivingTime();
 					computeTourAltitudeUpDown(tourData);
 
+					tourData.setDeviceId(visibleName);
+
 					// set week of year
 					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
 							.getStartDay());
