@@ -28,6 +28,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 import net.tourbook.data.DataUtil;
 import net.tourbook.data.TimeData;
@@ -69,9 +70,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 		return null;
 	}
 
-	public boolean processDeviceData(	String fileName,
+	public boolean processDeviceData(	String importFileName,
 										DeviceData deviceData,
-										ArrayList<TourData> tourDataList) {
+										HashMap<String, TourData> tourDataMap) {
 
 		RandomAccessFile fileRawData = null;
 
@@ -79,15 +80,11 @@ public class HAC4DeviceReader extends TourbookDevice {
 		String recordType = ""; //$NON-NLS-1$
 
 		HAC4DeviceData hac4DeviceData = new HAC4DeviceData();
-
-		// reset tour data list
-		tourDataList.clear();
-
 		TourType defaultTourType = getTourType();
 
 		try {
 
-			fileRawData = new RandomAccessFile(fileName, "r"); //$NON-NLS-1$
+			fileRawData = new RandomAccessFile(importFileName, "r"); //$NON-NLS-1$
 
 			// position file pointer to the device data
 			fileRawData.seek(OFFSET_DEVICE_DATA);
@@ -96,9 +93,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 			hac4DeviceData.readFromFile(fileRawData);
 
 			/*
-			 * because the tour year is not available we calculate it from the
-			 * transfer year, this might be not correct but there is no other
-			 * way to get the year
+			 * because the tour year is not available we calculate it from the transfer year, this
+			 * might be not correct but there is no other way to get the year
 			 */
 			short tourYear = hac4DeviceData.transferYear;
 			short lastTourMonth = 0;
@@ -142,21 +138,22 @@ public class HAC4DeviceReader extends TourbookDevice {
 				TourData tourData = new TourData();
 
 				tourData.setDeviceTimeInterval(HAC4_TIMESLICE);
+				tourData.importRawDataFile = importFileName;
 
 				readStartBlock(fileRawData, tourData);
 
 				/*
-				 * add device data to the tour, the last tour is the first which
-				 * is read from the data file
+				 * add device data to the tour, the last tour is the first which is read from the
+				 * data file
 				 */
 				if (isLastTour) {
 					isLastTour = false;
 
 					int deviceTravelTimeHours = ((hac4DeviceData.totalTravelTimeHourHigh * 100) + hac4DeviceData.totalTravelTimeHourLow);
 
-					tourData.setDeviceTravelTime((deviceTravelTimeHours * 3600)
-							+ (hac4DeviceData.totalTravelTimeMin * 60)
-							+ hac4DeviceData.totalTravelTimeSec);
+					tourData
+							.setDeviceTravelTime((deviceTravelTimeHours * 3600) + (hac4DeviceData.totalTravelTimeMin * 60)
+									+ hac4DeviceData.totalTravelTimeSec);
 
 					// tourData.deviceDistance = ((deviceData.totalDistanceHigh
 					// * (2 ^ 16)) + deviceData.totalDistanceLow);
@@ -166,8 +163,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 					tourData.setDeviceTotalDown(hac4DeviceData.totalAltitudeDown);
 				}
 
-				tourDataList.add(tourData);
-
 				/*
 				 * calculate year of the tour
 				 */
@@ -176,10 +171,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 				lastTourMonth = (lastTourMonth == 0) ? tourData.getStartMonth() : lastTourMonth;
 
 				/*
-				 * because we read the tours in decending order (last tour
-				 * first), we check if the month of the current tour is higher
-				 * than from the last tour, if this is the case, we assume to
-				 * have data from the previous year
+				 * because we read the tours in decending order (last tour first), we check if the
+				 * month of the current tour is higher than from the last tour, if this is the case,
+				 * we assume to have data from the previous year
 				 */
 				if (tourData.getStartMonth() > lastTourMonth) {
 					tourYear--;
@@ -236,9 +230,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 					cadence = Short.parseShort(new String(buffer, 2, 2), 16);
 
 					/*
-					 * marker in CC record contains the exact time when the tour
-					 * ends, so we will read only those time slices which
-					 * contains tour data
+					 * marker in CC record contains the exact time when the tour ends, so we will
+					 * read only those time slices which contains tour data
 					 */
 					if (recordType.equalsIgnoreCase("CC")) { //$NON-NLS-1$
 
@@ -265,8 +258,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 						if (isFirstBBRecord) {
 
 							/*
-							 * before we read the first BB record we have to
-							 * create the time slice for the start
+							 * before we read the first BB record we have to create the time slice
+							 * for the start
 							 */
 
 							isFirstBBRecord = false;
@@ -315,8 +308,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 						}
 
 						// summarize the recording time
-						tourData.setTourRecordingTime(tourData.getTourRecordingTime()
-								+ timeData.time);
+						tourData
+								.setTourRecordingTime(tourData.getTourRecordingTime() + timeData.time);
 
 						// read data for this time slice
 						readTimeSlice(fileRawData, timeData);
@@ -331,30 +324,41 @@ public class HAC4DeviceReader extends TourbookDevice {
 						// adjust altitude from relative to absolute
 						totalAltitude += timeData.altitude;
 
-						tourData.setTourAltUp(tourData.getTourAltUp()
-								+ ((timeData.altitude > 0) ? timeData.altitude : 0));
-						tourData.setTourAltDown(tourData.getTourAltDown()
-								+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
+						tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0)
+								? timeData.altitude
+								: 0));
+						tourData
+								.setTourAltDown(tourData.getTourAltDown() + ((timeData.altitude < 0)
+										? -timeData.altitude
+										: 0));
 					}
 				}
 
 				// after all data are added, the tour id can be created
 				tourData.createTourId();
-				tourData.createTimeSeries(timeDataList);
 
-				tourData.setTourType(defaultTourType);
-				tourData.computeTourDrivingTime();
+				// check if the tour is in the tour map
+				final String tourId = tourData.getTourId().toString();
+				if (tourDataMap.containsKey(tourId) == false) {
 
-				// set week of year
-				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
-						.getStartDay());
-				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+					// add new tour to the map
+					tourDataMap.put(tourId, tourData);
+
+					tourData.createTimeSeries(timeDataList);
+					tourData.setTourType(defaultTourType);
+					tourData.computeTourDrivingTime();
+
+					// set week of year
+					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
+							.getStartDay());
+					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+				}
 
 				// tourData.dumpTourTotal();
 
 				/*
-				 * calculate the start of the previous tour, we have to make
-				 * sure that we get the complete tour with all the records
+				 * calculate the start of the previous tour, we have to make sure that we get the
+				 * complete tour with all the records
 				 */
 
 				if (offsetAARecord == OFFSET_DATA_START) {
@@ -363,8 +367,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 				}
 
 				/*
-				 * calculate DD Record of previous tour by starting from the AA
-				 * record of the current tour
+				 * calculate DD Record of previous tour by starting from the AA record of the
+				 * current tour
 				 */
 				offsetDDRecord = offsetAARecord - RECORD_SIZE;
 
@@ -397,10 +401,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 				offsetAARecord = DataUtil.readFileOffset(fileRawData, buffer);
 
 				/*
-				 * make sure to end not in an endless loop where the current AA
-				 * offset is the same as the first AA offset (this seems to be
-				 * unlikely but it happend already 2 Month after the first
-				 * implementation)
+				 * make sure to end not in an endless loop where the current AA offset is the same
+				 * as the first AA offset (this seems to be unlikely but it happend already 2 Month
+				 * after the first implementation)
 				 */
 				if (offsetAARecord == initialOffsetAARecord) {
 					break;
@@ -558,6 +561,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 			throw new EOFException();
 		return ((ch1 << 8) + (ch0 << 0)) + ((ch3 << 8) + (ch2 << 0));
 	}
+
 	/**
 	 * checks if the data file has a valid HAC4 data format
 	 * 
@@ -592,7 +596,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 				// check HAC4 device id
 				if (position == OFFSET_DEVICE_DATA) {
 					if ((lastValue == HARDWARE_ID_HAC4_315 || lastValue == HARDWARE_ID_HAC4_IMP) == false) {
-						
+
 						// file does not contain HAC4 data, force the check sum to be invalid
 						checksum = -1;
 						break;

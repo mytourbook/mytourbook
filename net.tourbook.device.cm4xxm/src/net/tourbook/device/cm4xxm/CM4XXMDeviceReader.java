@@ -28,6 +28,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 import net.tourbook.data.DataUtil;
 import net.tourbook.data.TimeData;
@@ -108,9 +109,10 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 	private TourType getTourType() {
 		return null;
 	}
-	public boolean processDeviceData(	String fileName,
+
+	public boolean processDeviceData(	String importFileName,
 										DeviceData deviceData,
-										ArrayList<TourData> tourDataList) {
+										HashMap<String, TourData> tourDataMap) {
 
 		RandomAccessFile fileRawData = null;
 
@@ -120,13 +122,13 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		CM4XXMDeviceData cm4xxmDeviceData = new CM4XXMDeviceData();
 
 		// reset tour data list
-		tourDataList.clear();
+//		tourDataMap.clear();
 
 		TourType defaultTourType = getTourType();
 
 		try {
 
-			fileRawData = new RandomAccessFile(fileName, "r"); //$NON-NLS-1$
+			fileRawData = new RandomAccessFile(importFileName, "r"); //$NON-NLS-1$
 
 			// position file pointer to the device data
 			fileRawData.seek(OFFSET_DEVICE_DATA);
@@ -135,17 +137,15 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 			cm4xxmDeviceData.readFromFile(fileRawData);
 
 			/*
-			 * because the tour year is not available we calculate it from the
-			 * transfer year, this might be not correct but there is no other
-			 * way to get the year
+			 * because the tour year is not available we calculate it from the transfer year, this
+			 * might be not correct but there is no other way to get the year
 			 */
 			short tourYear = cm4xxmDeviceData.transferYear;
 			short lastTourMonth = 0;
 
 			/*
-			 * move file pointer to the DD record of the last tour and read
-			 * "offset AA record" of the last tour and position file pointer
-			 * there
+			 * move file pointer to the DD record of the last tour and read "offset AA record" of
+			 * the last tour and position file pointer there
 			 */
 			fileRawData.seek(cm4xxmDeviceData.offsetDDRecord + 5);
 			int offsetAARecord = DataUtil.readFileOffset(fileRawData, buffer);
@@ -180,22 +180,24 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				fileRawData.seek(offsetAARecord);
 
 				TourData tourData = new TourData();
+				
 				tourData.setDeviceTimeInterval(CM4XXM_TIMESLICE);
+				tourData.importRawDataFile = importFileName;
 
 				readStartBlock(fileRawData, tourData);
 
 				/*
-				 * add device data to the tour, the last tour is the first which
-				 * is read from the data file
+				 * add device data to the tour, the last tour is the first which is read from the
+				 * data file
 				 */
 				if (isLastTour) {
 					isLastTour = false;
 
 					int deviceTravelTimeHours = (cm4xxmDeviceData.totalTravelTimeHour1);
 
-					tourData.setDeviceTravelTime((deviceTravelTimeHours * 3600)
-							+ (cm4xxmDeviceData.totalTravelTimeMin1 * 60)
-							+ cm4xxmDeviceData.totalTravelTimeSec1);
+					tourData
+							.setDeviceTravelTime((deviceTravelTimeHours * 3600) + (cm4xxmDeviceData.totalTravelTimeMin1 * 60)
+									+ cm4xxmDeviceData.totalTravelTimeSec1);
 
 					// tourData.deviceDistance = ((deviceData.totalDistanceHigh
 					// * (2 ^ 16)) + deviceData.totalDistanceLow);
@@ -205,8 +207,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 					tourData.setDeviceTotalDown(cm4xxmDeviceData.totalAltitudeUp2);
 				}
 
-				tourDataList.add(tourData);
-
 				/*
 				 * calculate year of the tour
 				 */
@@ -215,10 +215,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				lastTourMonth = (lastTourMonth == 0) ? tourData.getStartMonth() : lastTourMonth;
 
 				/*
-				 * because we read the tours in decending order (last tour
-				 * first), we check if the month of the current tour is higher
-				 * than from the last tour, if this is the case, we assume to
-				 * have data from the previous year
+				 * because we read the tours in decending order (last tour first), we check if the
+				 * month of the current tour is higher than from the last tour, if this is the case,
+				 * we assume to have data from the previous year
 				 */
 				if (tourData.getStartMonth() > lastTourMonth) {
 					tourYear--;
@@ -271,9 +270,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 					cadence = Short.parseShort(new String(buffer, 2, 2), 16);
 
 					/*
-					 * marker in CC record contains the exact time when the tour
-					 * ends, so we will read only those time slices which
-					 * contains tour data
+					 * marker in CC record contains the exact time when the tour ends, so we will
+					 * read only those time slices which contains tour data
 					 */
 					if (recordType.equalsIgnoreCase("CC")) { //$NON-NLS-1$
 
@@ -300,8 +298,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 						if (isFirstBBRecord) {
 
 							/*
-							 * before we read the first BB record we have to
-							 * create the time slice for the start
+							 * before we read the first BB record we have to create the time slice
+							 * for the start
 							 */
 
 							isFirstBBRecord = false;
@@ -350,8 +348,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 						}
 
 						// summarize the recording time
-						tourData.setTourRecordingTime(tourData.getTourRecordingTime()
-								+ timeData.time);
+						tourData
+								.setTourRecordingTime(tourData.getTourRecordingTime() + timeData.time);
 
 						// read data for this time slice
 						readTimeSlice(fileRawData, timeData);
@@ -365,28 +363,39 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 						// adjust altitude from relative to absolute
 						totalAltitude += timeData.altitude;
 
-						tourData.setTourAltUp(tourData.getTourAltUp()
-								+ ((timeData.altitude > 0) ? timeData.altitude : 0));
-						tourData.setTourAltDown(tourData.getTourAltDown()
-								+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
+						tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0)
+								? timeData.altitude
+								: 0));
+						tourData
+								.setTourAltDown(tourData.getTourAltDown() + ((timeData.altitude < 0)
+										? -timeData.altitude
+										: 0));
 					}
 				}
 
 				// after all data are added, the tour id can be created
 				tourData.createTourId();
-				tourData.createTimeSeries(timeDataList);
 
-				tourData.setTourType(defaultTourType);
-				tourData.computeTourDrivingTime();
-
-				// set week of year
-				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
-						.getStartDay());
-				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+				// check if the tour is in the tour map
+				final String tourId = tourData.getTourId().toString();
+				if (tourDataMap.containsKey(tourId) == false) {
+					
+					// add new tour to the map
+					tourDataMap.put(tourId, tourData);
+					
+					tourData.createTimeSeries(timeDataList);
+					tourData.setTourType(defaultTourType);
+					tourData.computeTourDrivingTime();
+					
+					// set week of year
+					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
+							.getStartDay());
+					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+				}
 
 				/*
-				 * calculate the start of the previous tour, we have to make
-				 * sure that we get the complete tour with all the records
+				 * calculate the start of the previous tour, we have to make sure that we get the
+				 * complete tour with all the records
 				 */
 
 				if (offsetAARecord == OFFSET_DATA_START) {
@@ -395,8 +404,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				}
 
 				/*
-				 * calculate DD Record of previous tour by starting from the AA
-				 * record of the current tour
+				 * calculate DD Record of previous tour by starting from the AA record of the
+				 * current tour
 				 */
 				offsetDDRecord = offsetAARecord - RECORD_SIZE;
 
@@ -429,10 +438,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				offsetAARecord = DataUtil.readFileOffset(fileRawData, buffer);
 
 				/*
-				 * make sure to end not in an endless loop where the current AA
-				 * offset is the same as the first AA offset (this seems to be
-				 * unlikely but it happend already 2 Month after the first
-				 * implementation)
+				 * make sure to end not in an endless loop where the current AA offset is the same
+				 * as the first AA offset (this seems to be unlikely but it happend already 2 Month
+				 * after the first implementation)
 				 */
 				if (offsetAARecord == initialOffsetAARecord) {
 					break;
@@ -605,5 +613,5 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
 		return isValid;
 	}
-	
+
 }

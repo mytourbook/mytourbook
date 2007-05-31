@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -40,8 +41,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	private static final int	HAC5_HARDWARE_ID		= 0x03;
 
 	/**
-	 * position in the file which skips the header (AFRO..) and the raw data
-	 * begins
+	 * position in the file which skips the header (AFRO..) and the raw data begins
 	 */
 	public static final int		OFFSET_RAWDATA			= 6;
 
@@ -151,9 +151,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return 4;
 	}
 
-	public boolean processDeviceData(	String fileName,
+	public boolean processDeviceData(	String importFileName,
 										DeviceData deviceData,
-										ArrayList<TourData> tourDataList) {
+										HashMap<String, TourData> tourDataMap) {
 		boolean returnValue = false;
 
 		byte[] recordBuffer = new byte[RECORD_LENGTH];
@@ -162,22 +162,19 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 		HAC5DeviceData hac5DeviceData = new HAC5DeviceData();
 
-		// reset tour data list
-		tourDataList.clear();
-
 		boolean isFirstTour = true;
 		short firstTourDay = 1;
 		short firstTourMonth = 1;
 
 		try {
-			File fileRaw = new File(fileName);
+			File fileRaw = new File(importFileName);
 			file = new RandomAccessFile(fileRaw, "r"); //$NON-NLS-1$
 
 			long lastModified = fileRaw.lastModified();
 
 			/*
-			 * get the year, because the year is not saved in the raw data file,
-			 * the modified year of the file is used
+			 * get the year, because the year is not saved in the raw data file, the modified year
+			 * of the file is used
 			 */
 			fFileDate = new GregorianCalendar();
 			fFileDate.setTime(new Date(lastModified));
@@ -189,8 +186,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 			hac5DeviceData.readFromFile(file);
 
 			/*
-			 * get position for the next free tour and get the last dd-record
-			 * from this position
+			 * get position for the next free tour and get the last dd-record from this position
 			 */
 			file.seek(OFFSET_RAWDATA + 0x0380 + 2);
 			int offsetNextFreeTour = DeviceReaderTools.get2ByteData(file);
@@ -231,7 +227,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				}
 
 				TourData tourData = new TourData();
-				tourDataList.add(tourData);
+
+				tourData.importRawDataFile = importFileName;
 
 				/*
 				 * save AA record data
@@ -247,9 +244,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				}
 
 				/*
-				 * the tours are read in decending order (last tour first), if
-				 * the month of the current tour is higher than from the last
-				 * tour, we assume to have data from the previous year
+				 * the tours are read in decending order (last tour first), if the month of the
+				 * current tour is higher than from the last tour, we assume to have data from the
+				 * previous year
 				 */
 				if (tourData.getStartMonth() > lastTourMonth) {
 					tourYear--;
@@ -302,9 +299,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					marker = (short) (recordBuffer[3] & 0xFF);
 
 					/*
-					 * the CC record does not contain the cadence, it contains
-					 * the exact time when the tour ends, so we read only those
-					 * time slices which contain the tour data
+					 * the CC record does not contain the cadence, it contains the exact time when
+					 * the tour ends, so we read only those time slices which contain the tour data
 					 */
 					int dataLength = 0;
 					if (isCCRecord) {
@@ -327,8 +323,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 						if (isFirstDataRecord) {
 
 							/*
-							 * create the START time slice, the current slice is
-							 * the first slice which already contains data
+							 * create the START time slice, the current slice is the first slice
+							 * which already contains data
 							 */
 
 							isFirstDataRecord = false;
@@ -364,8 +360,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 						}
 
 						// summarize the recording time
-						tourData.setTourRecordingTime(tourData.getTourRecordingTime()
-								+ timeData.time);
+						tourData
+								.setTourRecordingTime(tourData.getTourRecordingTime() + timeData.time);
 
 						// read data for the current time slice
 						DeviceReaderTools.readTimeSlice(DeviceReaderTools.get2ByteData(
@@ -388,8 +384,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					}
 
 					/*
-					 * when the end of the buffer is reached, read from the
-					 * beginning of the ring buffer
+					 * when the end of the buffer is reached, read from the beginning of the ring
+					 * buffer
 					 */
 					if (file.getFilePointer() >= OFFSET_RAWDATA + OFFSET_TOUR_DATA_END) {
 						file.seek(OFFSET_RAWDATA + OFFSET_TOUR_DATA_START);
@@ -408,18 +404,24 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				 */
 				readDDRecord(recordBuffer, tourData);
 
-				// after all data are added, create additional data
+				// after all data are added, the tour id can be created
 				tourData.createTourId();
-				tourData.createTimeSeries(timeDataList);
 
-				tourData.computeTourDrivingTime();
-//				tourData.computeAltitudeUpDown();
+				// check if the tour is in the tour map
+				final String tourId = tourData.getTourId().toString();
+				if (tourDataMap.containsKey(tourId) == false) {
 
-				// set week of year
-				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
-						.getStartDay());
-				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+					// add new tour to the map
+					tourDataMap.put(tourId, tourData);
 
+					tourData.createTimeSeries(timeDataList);
+					tourData.computeTourDrivingTime();
+
+					// set week of year
+					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
+							.getStartDay());
+					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+				}
 				// dump DD block
 				// dumpBlock(file, recordBuffer);
 				//
@@ -427,10 +429,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				// System.out.println("");
 
 				/*
-				 * make sure not to end in an endless loop where the current DD
-				 * offset is the same as the first DD offset (this seems to be
-				 * unlikely but it happend already 2 Month after the first
-				 * implementation)
+				 * make sure not to end in an endless loop where the current DD offset is the same
+				 * as the first DD offset (this seems to be unlikely but it happend already 2 Month
+				 * after the first implementation)
 				 */
 				if (offsetDDRecord == initialOffsetDDRecord) {
 					returnValue = true;
@@ -539,8 +540,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 		tourData.setTourAltUp(DeviceReaderTools.get2ByteData(buffer, 10));
 		tourData.setTourAltDown(DeviceReaderTools.get2ByteData(buffer, 12));
-		
-//		System.out.println("UP: "+DeviceReaderTools.get2ByteData(buffer, 10));
+
+// System.out.println("UP: "+DeviceReaderTools.get2ByteData(buffer, 10));
 	}
 
 	/**
