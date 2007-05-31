@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 import net.tourbook.chart.ChartMarker;
 import net.tourbook.data.TimeData;
@@ -166,23 +167,24 @@ public class TurDeviceReader extends TourbookDevice {
 	 * @see net.tourbook.importdata.IRawDataReader#processDeviceData(java.lang.String,
 	 *      net.tourbook.importdata.DeviceData, java.util.ArrayList)
 	 */
-	public boolean processDeviceData(	String fileName,
+	public boolean processDeviceData(	String importFileName,
 										DeviceData deviceData,
-										ArrayList<TourData> tourDataList) {
+										HashMap<String, TourData> tourDataMap) {
 
 		FileInputStream fileTurData = null;
 		TurDeviceData turDeviceData = new TurDeviceData();
 
-		tourDataList.clear();
+// tourDataList.clear();
 
 		TourType defaultTourType = getTourType();
 
 		try {
-			fileTurData = new FileInputStream(fileName);
+			fileTurData = new FileInputStream(importFileName);
 
 			turDeviceData.readFromFile(fileTurData);
 
 			TourData tourData = new TourData();
+			tourData.importRawDataFile = importFileName;
 
 			tourData.setDeviceMode(Short.parseShort(turDeviceData.deviceMode));
 			tourData.setDeviceTotalDown(Integer.parseInt(turDeviceData.deviceAltDown));
@@ -242,8 +244,7 @@ public class TurDeviceReader extends TourbookDevice {
 				TurFileUtil.readByte(fileTurData);
 
 				// Calculate values
-				 int secStart = secStart1
-						+ (256 * secStart2)
+				int secStart = secStart1 + (256 * secStart2)
 						+ (256 * 256 * secStart3)
 						+ (256 * 256 * 256 * secStart4);
 				int seconds = sec1 + (256 * sec2) + (256 * 256 * sec3) + (256 * 256 * 256 * sec4);
@@ -275,10 +276,12 @@ public class TurDeviceReader extends TourbookDevice {
 					timeData.time = (short) tourData.getDeviceTimeInterval();
 					timeData.distance = distance - oldDistance;
 					oldDistance = distance;
-					tourData.setTourAltUp(tourData.getTourAltUp()
-							+ ((timeData.altitude > 0) ? timeData.altitude : 0));
-					tourData.setTourAltDown(tourData.getTourAltDown()
-							+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
+					tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0)
+							? timeData.altitude
+							: 0));
+					tourData.setTourAltDown(tourData.getTourAltDown() + ((timeData.altitude < 0)
+							? -timeData.altitude
+							: 0));
 				}
 				timeDataList.add(timeData);
 
@@ -290,40 +293,52 @@ public class TurDeviceReader extends TourbookDevice {
 					tourData.setTourDistance(distance);
 				}
 			}
-			tourDataList.add(tourData);
+// tourDataList.add(tourData);
 
 			// after all data are added, the tour id can be created
 			tourData.createTourId();
-			tourData.createTimeSeries(timeDataList);
 
-			// Read last 0A from binary block
-			TurFileUtil.readByte(fileTurData);
-			// Read Marker
-			int markerCount = Integer.parseInt(TurFileUtil.readText(fileTurData));
+			// check if the tour is in the tour map
+			final String tourId = tourData.getTourId().toString();
+			if (tourDataMap.containsKey(tourId) == false) {
 
-			// create new markers
-			for (int i = 0; i < markerCount; i++) {
-				TourMarker tourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_DEVICE);
-				tourMarker.setTime(Integer.parseInt(TurFileUtil.readText(fileTurData)));
-				String label = TurFileUtil.readText(fileTurData);
-				tourMarker.setLabel(label.substring(0, label.indexOf(';')));
-				tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-				for (int j = 0; j < tourData.timeSerie.length; j++) {
-					if (tourData.timeSerie[j] > tourMarker.getTime()) {
-						tourMarker.setDistance(tourData.distanceSerie[j - 1]);
-						tourMarker.setSerieIndex(j - 1);
-						break;
+				// add new tour to the map
+				tourDataMap.put(tourId, tourData);
+
+				// after all data are added, the tour id can be created
+// tourData.createTourId();
+				tourData.createTimeSeries(timeDataList);
+
+				// Read last 0A from binary block
+				TurFileUtil.readByte(fileTurData);
+				// Read Marker
+				int markerCount = Integer.parseInt(TurFileUtil.readText(fileTurData));
+
+				// create new markers
+				for (int i = 0; i < markerCount; i++) {
+					TourMarker tourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_DEVICE);
+					tourMarker.setTime(Integer.parseInt(TurFileUtil.readText(fileTurData)));
+					String label = TurFileUtil.readText(fileTurData);
+					tourMarker.setLabel(label.substring(0, label.indexOf(';')));
+					tourMarker
+							.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+					for (int j = 0; j < tourData.timeSerie.length; j++) {
+						if (tourData.timeSerie[j] > tourMarker.getTime()) {
+							tourMarker.setDistance(tourData.distanceSerie[j - 1]);
+							tourMarker.setSerieIndex(j - 1);
+							break;
+						}
 					}
+					tourData.getTourMarkers().add(tourMarker);
 				}
-				tourData.getTourMarkers().add(tourMarker);
-			}
-			tourData.setTourType(defaultTourType);
-			tourData.computeTourDrivingTime();
+				tourData.setTourType(defaultTourType);
+				tourData.computeTourDrivingTime();
 
-			// set week of year
-			fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
-					.getStartDay());
-			tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+				// set week of year
+				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
+						.getStartDay());
+				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+			}
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
