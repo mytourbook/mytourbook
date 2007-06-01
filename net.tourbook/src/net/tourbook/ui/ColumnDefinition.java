@@ -56,11 +56,15 @@ public class ColumnDefinition {
 	private String				fColumnText;
 	private String				fColumnToolTipText;
 	private int					fColumnWidth;
+
 	private boolean				fIsColumnResizable		= true;
+	private boolean				fIsColumnMoveable		= true;
 
 	private SelectionAdapter	fColumnSelectionListener;
 
 	private TableColumn			fTableColumn;
+
+	private int					fCreateIndex;
 
 	/**
 	 * @param columnManager
@@ -188,6 +192,27 @@ public class ColumnDefinition {
 
 	public TableColumn getTableColumn() {
 		return fTableColumn;
+	}
+
+	/**
+	 * Set the number in which the column was created
+	 * 
+	 * @param createIndex
+	 */
+	public void setCreateIndex(int createIndex) {
+		fCreateIndex = createIndex;
+	}
+
+	public int getCreateIndex() {
+		return fCreateIndex;
+	}
+
+	public boolean isColumnMoveable() {
+		return fIsColumnMoveable;
+	}
+
+	public void setIsColumnMoveable(boolean isColumnMovablee) {
+		fIsColumnMoveable = isColumnMovablee;
 	}
 
 }

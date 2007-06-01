@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.TableItem;
 public class ColumnModifyDialog extends TrayDialog {
 
 	private ColumnManager		fColumnManager;
-	private CheckboxTableViewer	fColumnsViewer;
+	private CheckboxTableViewer	fColumnViewer;
 
 	private Button				fBtnMoveUp;
 	private Button				fBtnMoveDown;
@@ -115,7 +115,7 @@ public class ColumnModifyDialog extends TrayDialog {
 				}
 
 				// update viewer
-				fColumnsViewer.setAllChecked(true);
+				fColumnViewer.setAllChecked(true);
 			}
 		});
 		setButtonLayoutData(fBtnSelectAll);
@@ -139,7 +139,7 @@ public class ColumnModifyDialog extends TrayDialog {
 				}
 
 				// update viewer
-				fColumnsViewer.setCheckedElements(checkedElements.toArray());
+				fColumnViewer.setCheckedElements(checkedElements.toArray());
 			}
 		});
 		setButtonLayoutData(fBtnDeselectAll);
@@ -154,11 +154,11 @@ public class ColumnModifyDialog extends TrayDialog {
 		 * create table
 		 */
 		Table table = new Table(tableLayouter, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER);
-		fColumnsViewer = new CheckboxTableViewer(table);
+		fColumnViewer = new CheckboxTableViewer(table);
 
 		TableViewerColumn tvc;
 
-		tvc = new TableViewerColumn(fColumnsViewer, SWT.LEAD);
+		tvc = new TableViewerColumn(fColumnViewer, SWT.LEAD);
 		tableLayouter.addColumnData(new ColumnWeightData(1, true));
 
 		tvc.setLabelProvider(new CellLabelProvider() {
@@ -174,7 +174,7 @@ public class ColumnModifyDialog extends TrayDialog {
 			}
 		});
 
-		fColumnsViewer.setContentProvider(new IStructuredContentProvider() {
+		fColumnViewer.setContentProvider(new IStructuredContentProvider() {
 
 			public void dispose() {}
 
@@ -185,7 +185,7 @@ public class ColumnModifyDialog extends TrayDialog {
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 		});
 
-		fColumnsViewer.addCheckStateListener(new ICheckStateListener() {
+		fColumnViewer.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(CheckStateChangedEvent event) {
 
 				final ColumnDefinition colDef = (ColumnDefinition) event.getElement();
@@ -196,17 +196,17 @@ public class ColumnModifyDialog extends TrayDialog {
 					colDef.setIsVisibleInDialog(event.getChecked());
 
 					// select the checked item
-					fColumnsViewer.setSelection(new StructuredSelection(colDef));
+					fColumnViewer.setSelection(new StructuredSelection(colDef));
 
 				} else {
 
 					// column can't be unchecked
-					fColumnsViewer.setChecked(colDef, true);
+					fColumnViewer.setChecked(colDef, true);
 				}
 			}
 		});
 
-		fColumnsViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		fColumnViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				enableUpDownButtons();
 			}
@@ -219,7 +219,7 @@ public class ColumnModifyDialog extends TrayDialog {
 
 		createUI(dlgAreaContainer);
 
-		fColumnsViewer.setInput(this);
+		fColumnViewer.setInput(this);
 
 		// check visible columns
 		ArrayList<ColumnDefinition> visibleColumns = new ArrayList<ColumnDefinition>();
@@ -232,7 +232,7 @@ public class ColumnModifyDialog extends TrayDialog {
 				visibleColumns.add(colDef);
 			}
 		}
-		fColumnsViewer.setCheckedElements(visibleColumns.toArray());
+		fColumnViewer.setCheckedElements(visibleColumns.toArray());
 
 		enableUpDownButtons();
 
@@ -265,14 +265,15 @@ public class ColumnModifyDialog extends TrayDialog {
 	protected void okPressed() {
 
 		// update column definition with the check state
-		for (Object element : fColumnsViewer.getTable().getItems()) {
+		for (Object element : fColumnViewer.getTable().getItems()) {
 			final TableItem tableItem = (TableItem) element;
 
 			ColumnDefinition colDef = (ColumnDefinition) tableItem.getData();
 			colDef.setIsVisibleInDialog(tableItem.getChecked());
 		}
 
-		fColumnManager.sortColumns(fColumnsViewer.getTable().getItems());
+		fColumnManager.orderColumns(fColumnViewer.getTable().getItems());
+		
 		super.okPressed();
 	}
 
@@ -281,7 +282,7 @@ public class ColumnModifyDialog extends TrayDialog {
 	 */
 	private void enableUpDownButtons() {
 
-		Table table = fColumnsViewer.getTable();
+		Table table = fColumnViewer.getTable();
 		TableItem[] items = table.getSelection();
 		boolean isSelected = items != null && items.length > 0;
 
@@ -314,15 +315,15 @@ public class ColumnModifyDialog extends TrayDialog {
 		item.dispose();
 
 		// create new item
-		fColumnsViewer.insert(colDef, index);
-		fColumnsViewer.setChecked(colDef, colDef.isVisibleInDialog());
+		fColumnViewer.insert(colDef, index);
+		fColumnViewer.setChecked(colDef, colDef.isVisibleInDialog());
 	}
 
 	/**
 	 * Move the current selection in the build list down.
 	 */
 	private void moveSelectionDown() {
-		Table table = fColumnsViewer.getTable();
+		Table table = fColumnViewer.getTable();
 		int indices[] = table.getSelectionIndices();
 		if (indices.length < 1) {
 			return;
@@ -343,7 +344,7 @@ public class ColumnModifyDialog extends TrayDialog {
 	 * Move the current selection in the build list up.
 	 */
 	private void moveSelectionUp() {
-		Table table = fColumnsViewer.getTable();
+		Table table = fColumnViewer.getTable();
 		int indices[] = table.getSelectionIndices();
 		int newSelection[] = new int[indices.length];
 		for (int i = 0; i < indices.length; i++) {
