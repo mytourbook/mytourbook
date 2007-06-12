@@ -200,6 +200,10 @@ public class TurDeviceReader extends TourbookDevice {
 			tourData.setStartDay(Short.parseShort(turDeviceData.tourStartDate.substring(0, 2)));
 
 			tourData.setStartDistance(Integer.parseInt(turDeviceData.deviceDistance));
+			tourData.setTourDescription(turDeviceData.tourDescription);
+			tourData.setTourTitle(turDeviceData.tourTitle);
+			tourData.setTourStartPlace(turDeviceData.tourStartPlace);
+			tourData.setTourEndPlace(turDeviceData.tourEndPlace);
 
 			int entryCount = Integer.parseInt(TurFileUtil.readText(fileTurData));
 
