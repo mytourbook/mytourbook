@@ -454,7 +454,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			public void dataModelChanged(ChartDataModel changedChartDataModel) {
 
 				// set title
-				changedChartDataModel.setTitle(TourManager.getTourDate(tourData));
+				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(tourData));
 			}
 		});
 

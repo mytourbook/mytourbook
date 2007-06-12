@@ -897,7 +897,7 @@ public class TourMapView extends SynchedChartView {
 				changedChartDataModel.setTitle(NLS.bind(
 						Messages.TourMap_Label_chart_title_reference_tour,
 						refTour.getLabel(),
-						TourManager.getTourDate(refTourChartData.getRefTourData())));
+						TourManager.getTourTitleDetailed(refTourChartData.getRefTourData())));
 
 			}
 		});
@@ -1222,7 +1222,7 @@ public class TourMapView extends SynchedChartView {
 					// set title
 					changedChartDataModel.setTitle(NLS.bind(
 							Messages.TourMap_Label_chart_title_compared_tour,
-							TourManager.getTourDate(selectedCompTourData)));
+							TourManager.getTourTitleDetailed(selectedCompTourData)));
 				}
 			};
 

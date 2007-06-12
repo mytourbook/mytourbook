@@ -128,6 +128,7 @@ public class RawDataView extends ViewPart {
 	private static final int				COLUMN_ID_TOUR_TYPE			= 110;
 	private static final int				COLUMN_ID_IMPORT_FILE		= 120;
 	private static final int				COLUMN_ID_DEVICE_NAME		= 130;
+	private static final int                COLUMN_ID_TOUR_TITLE		= 140;
 
 	private static final String				MEMENTO_SASH_CONTAINER		= "importview.sash.container.";			//$NON-NLS-1$
 	private static final String				MEMENTO_IMPORT_FILENAME		= "importview.raw-data.filename";			//$NON-NLS-1$
@@ -724,6 +725,20 @@ public class RawDataView extends ViewPart {
 		});
 
 		/*
+		 * column: tour title
+		 */
+		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_TOUR_TITLE, SWT.LEAD);
+		colDef.setLabel("Title");
+		colDef.setText("Title");
+		colDef.setToolTipText("Title of the tour");
+		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(20));
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				cell.setText(((TourData) cell.getElement()).getTourTitle());
+			}
+		});
+
+		/*
 		 * column: recording time
 		 */
 		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_RECORDING_TIME, SWT.TRAIL);
@@ -1239,7 +1254,7 @@ public class RawDataView extends ViewPart {
 
 				// set title
 				chartDataModel.setTitle(NLS.bind(Messages.RawData_Chart_title, TourManager
-						.getTourDate(tourData)));
+						.getTourTitleDetailed(tourData)));
 			}
 		};
 

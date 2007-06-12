@@ -843,7 +843,7 @@ public class CompareResultView extends SynchedChartView {
 				NLS.bind(
 						Messages.CompareResult_Chart_title_reference_tour,
 						refTour.getLabel(),
-						TourManager.getTourDate(refTourChartData.getRefTourData())));
+						TourManager.getTourTitleDetailed(refTourChartData.getRefTourData())));
 			}
 		});
 
@@ -954,7 +954,7 @@ public class CompareResultView extends SynchedChartView {
 				// set title
 				changedChartDataModel.setTitle(NLS.bind(
 						Messages.CompareResult_Chart_title_compared_tour,
-						TourManager.getTourDate(compareResult.compTour)));
+						TourManager.getTourTitleDetailed(compareResult.compTour)));
 			}
 		};
 

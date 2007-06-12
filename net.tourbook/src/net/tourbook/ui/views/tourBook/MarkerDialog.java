@@ -401,7 +401,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		// set title
 		fTourChart.addDataModelListener(new IDataModelListener() {
 			public void dataModelChanged(ChartDataModel changedChartDataModel) {
-				changedChartDataModel.setTitle(TourManager.getTourDate(fTourData));
+				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
 			}
 		});
 

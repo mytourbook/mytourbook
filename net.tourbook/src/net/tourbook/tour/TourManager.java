@@ -76,7 +76,8 @@ public class TourManager {
 	private TourManager() {}
 
 	/**
-	 * create the tour chart configuration by reading the settings from the preferences
+	 * create the tour chart configuration by reading the settings from the
+	 * preferences
 	 * 
 	 * @return
 	 */
@@ -121,7 +122,7 @@ public class TourManager {
 		return instance;
 	}
 	/**
-	 * @return returns the name of this tour
+	 * @return returns the date of this tour
 	 */
 	public static String getTourDate(final TourData tourData) {
 
@@ -129,6 +130,16 @@ public class TourManager {
 		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 
 		return DateFormat.getDateInstance().format(calendar.getTime());
+	}
+
+	/**
+	 * @return returns the detailed title of this tour (displayed as chart
+	 *         title)
+	 */
+	public static String getTourTitleDetailed(final TourData tourData) {
+
+		return getTourDate(tourData)
+				+ ((tourData.getTourTitle() != null) ? " - " + tourData.getTourTitle() : "");
 	}
 
 	/**
@@ -479,8 +490,8 @@ public class TourManager {
 			chartDataModel.addXyData(xDataDistance);
 
 			/*
-			 * when time is displayed, the x-axis can show the start time starting from 0 or from
-			 * the current time of the day
+			 * when time is displayed, the x-axis can show the start time
+			 * starting from 0 or from the current time of the day
 			 */
 			xDataTime.setStartValue(chartConfig.isStartTime ? (tourData.getStartHour() * 3600)
 					+ (tourData.getStartMinute() * 60) : 0);
@@ -624,8 +635,8 @@ public class TourManager {
 		chartDataModel.addXyData(yDataTemperature);
 
 		/*
-		 * all visible graphs are added as y-data to the chart data fDataModel in the sequence as
-		 * they were activated
+		 * all visible graphs are added as y-data to the chart data fDataModel
+		 * in the sequence as they were activated
 		 */
 		for (final int actionId : chartConfig.getVisibleGraphs()) {
 
@@ -675,8 +686,8 @@ public class TourManager {
 	}
 
 	/**
-	 * adjust the min/max values to make them more visible and not at the same position as the
-	 * x-axis or the top of the chart
+	 * adjust the min/max values to make them more visible and not at the same
+	 * position as the x-axis or the top of the chart
 	 */
 	private void adjustMinMax(final ChartDataYSerie yData) {
 
@@ -765,7 +776,8 @@ public class TourManager {
 	}
 
 	/**
-	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
+	 * the speed must be interpolated for low time intervals because the
+	 * smallest distance is 10 m
 	 * 
 	 * @param tourData
 	 */
@@ -834,7 +846,8 @@ public class TourManager {
 	}
 
 	/**
-	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
+	 * the speed must be interpolated for low time intervals because the
+	 * smallest distance is 10 m
 	 * 
 	 * @param tourData
 	 */
@@ -1030,8 +1043,8 @@ public class TourManager {
 	}
 
 	/**
-	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
-	 * is defined by <code>sliceMin</code>
+	 * calculate the driving time, ignore the time when the distance is 0 within
+	 * a time period which is defined by <code>sliceMin</code>
 	 * 
 	 * @param distanceValues
 	 * @param indexLeft
