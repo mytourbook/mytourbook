@@ -22,6 +22,7 @@ import java.util.Iterator;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourBike;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.TourbookDevice;
@@ -43,7 +44,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionSaveTourInDatabase extends Action {
 
-	private static final String			MEMENTO_SELECTED_PERSON	= "action-save-tour.selected-person"; //$NON-NLS-1$
+	private static final String			MEMENTO_SELECTED_PERSON	= "action-save-tour.selected-person";	//$NON-NLS-1$
 
 	private RawDataView					fViewPart;
 
@@ -85,7 +86,8 @@ public class ActionSaveTourInDatabase extends Action {
 		fViewPart = viewPart;
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_tour));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_tour_disabled));
+		setDisabledImageDescriptor(TourbookPlugin
+				.getImageDescriptor(Messages.Image_save_tour_disabled));
 
 		// setToolTipText("Save tour(s) in the database so it can be viewed in
 		// other views");
@@ -136,6 +138,7 @@ public class ActionSaveTourInDatabase extends Action {
 	public void run() {
 
 		final TourPerson person;
+		final TourBike bike;
 
 		// get the person, when not set
 		if (fTourPerson == null) {
@@ -147,11 +150,15 @@ public class ActionSaveTourInDatabase extends Action {
 			person = fTourPerson;
 		}
 
+		bike = person.getTourBike();
+
 		Runnable runnable = new Runnable() {
 
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				boolean isModified = false;
+				boolean saveInDatabase = false;
 
 				// get selected tours
 				final IStructuredSelection selection = ((IStructuredSelection) fViewPart
@@ -171,7 +178,18 @@ public class ActionSaveTourInDatabase extends Action {
 
 							tourData.setTourPerson(person);
 
-							// save the person when it's not yet set
+							saveInDatabase = true;
+						}
+
+						if (tourData.getTourBike() == null
+								&& tourData.getTourPerson().getTourBike() != null) {
+							tourData.setTourBike(bike);
+
+							saveInDatabase = true;
+						}
+
+						// save the person and or bike when it's not yet set
+						if (saveInDatabase == true) {
 							if (TourDatabase.saveTour(tourData)) {
 								isModified = true;
 							}

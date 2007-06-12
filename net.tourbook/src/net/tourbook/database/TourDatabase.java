@@ -61,7 +61,7 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int			TOURBOOK_DB_VERSION		= 3;
+	private static final int			TOURBOOK_DB_VERSION		= 4;
 
 	public final static String			TABLE_TOUR_DATA			= "TourData";		//$NON-NLS-1$
 	public final static String			TABLE_TOUR_MARKER		= "TourMarker";	//$NON-NLS-1$
@@ -533,6 +533,22 @@ public class TourDatabase {
 						+ "deviceTimeInterval	SMALLINT,			\n" //$NON-NLS-1$
 						// version 3 end
 
+						// version 4 start
+						+ "maxAltitude			INTEGER,			\n" //$NON-NLS-1$
+						+ "maxPulse				INTEGER,			\n" //$NON-NLS-1$
+						+ "avgPulse				INTEGER,			\n" //$NON-NLS-1$
+						+ "avgCadence			INTEGER,			\n" //$NON-NLS-1$
+						+ "avgTemperature		INTEGER,			\n" //$NON-NLS-1$
+						+ "maxSpeed				FLOAT,				\n" //$NON-NLS-1$
+						+ "tourTitle			VARCHAR(255),		\n" //$NON-NLS-1$
+						+ "tourDescription		VARCHAR(4096),		\n" //$NON-NLS-1$
+						+ "tourStartPlace		VARCHAR(255),		\n" //$NON-NLS-1$
+						+ "tourEndPlace			VARCHAR(255),		\n" //$NON-NLS-1$
+						+ "calories				INTEGER,			\n" //$NON-NLS-1$
+						+ "bikerWeight			FLOAT,				\n" //$NON-NLS-1$
+                        + "tourBike_bikeId		BIGINT,				\n" //$NON-NLS-1$
+						// version 4 end
+						
 						+ "tourType_typeId 		BIGINT,				\n" //$NON-NLS-1$
 						+ "tourPerson_personId 	BIGINT,				\n" //$NON-NLS-1$
 						+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
@@ -736,10 +752,17 @@ public class TourDatabase {
 		if (currentDbVersion == 1) {
 			updateDbDesign_1_2(conn);
 			newVersion = 2;
+			currentDbVersion = newVersion;
 		}
 
 		if (currentDbVersion == 2) {
 			updateDbDesign_2_3(conn);
+			newVersion = 3;
+			currentDbVersion = newVersion;
+		}
+
+		if (currentDbVersion == 3) {
+			updateDbDesign_3_4(conn);
 			newVersion = TOURBOOK_DB_VERSION;
 		}
 
@@ -794,6 +817,60 @@ public class TourDatabase {
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceTimeInterval	SMALLINT DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
 
+			statement.executeBatch();
+			statement.close();
+
+		} catch (SQLException e) {
+			printSQLException(e);
+		}
+	}
+
+	private void updateDbDesign_3_4(Connection conn) {
+
+		try {
+			Statement statement = conn.createStatement();
+
+			String sql;
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxAltitude			INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxPulse				INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgPulse				INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgCadence			INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgTemperature		INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxSpeed				FLOAT"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourTitle				VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourDescription		VARCHAR(4096)"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourStartPlace		VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourEndPlace			VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN calories				INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN bikerWeight			FLOAT"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourBike_bikeId		BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+			
 			statement.executeBatch();
 			statement.close();
 

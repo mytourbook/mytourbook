@@ -172,6 +172,33 @@ public class TourData {
 
 	// db-version 3 - end
 
+	// db-version 4 - start
+	private int					maxAltitude;
+
+	private int					maxPulse;
+
+	private int					avgPulse;
+
+	private int					avgCadence;
+
+	private int					avgTemperature;
+
+	private float				maxSpeed;
+
+	private String				tourTitle;
+
+	private String				tourDescription;
+
+	private String				tourStartPlace;
+
+	private String				tourEndPlace;
+
+	private String				calories;
+
+	private float				bikerWeight;
+
+	// db-version 4 - end
+
 	/**
 	 * data series for time, speed, altitude,...
 	 */
@@ -200,6 +227,12 @@ public class TourData {
 	 */
 	@ManyToOne
 	private TourPerson			tourPerson;
+
+	/**
+	 * Bike used for this tour
+	 */
+	@ManyToOne
+	private TourBike			tourBike;
 
 	/**
 	 * Device used for this tour
@@ -291,8 +324,8 @@ public class TourData {
 	public float[]				segmentSerieCadence;
 
 	/**
-	 * contains the filename from which the data are imported, when set to <code>null</code> the
-	 * data are not imported they are from the database
+	 * contains the filename from which the data are imported, when set to
+	 * <code>null</code> the data are not imported they are from the database
 	 */
 	@Transient
 	public String				importRawDataFile;
@@ -300,12 +333,13 @@ public class TourData {
 	public TourData() {}
 
 	/**
-	 * Called before this object gets persisted, copy data from the tourdata object into the object
-	 * which gets serialized
+	 * Called before this object gets persisted, copy data from the tourdata
+	 * object into the object which gets serialized
 	 */
 	/*
-	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
-	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
+	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of
+	 * bug http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921
+	 * 2006-08-11
 	 */
 	public void onPrePersist() {
 
@@ -399,6 +433,13 @@ public class TourData {
 			cadenceSerie = new int[serieLength];
 			temperatureSerie = new int[serieLength];
 
+			int maxAltitude = 0;
+			int maxPulse = 0;
+			float maxSpeed = (float) 0.0;
+			long sumPulse = 0;
+			long sumTemperature = 0;
+			long sumCadence = 0;
+
 			// speedSerie = new int[serieLength];
 			// powerSerie = new int[serieLength];
 
@@ -421,6 +462,23 @@ public class TourData {
 
 				// powerSerie[index] = 0;
 
+				sumPulse += timeItem.pulse;
+				sumTemperature += timeItem.temperature;
+				sumCadence += timeItem.cadence;
+
+				if (maxAltitude < altitudeSerie[timeIndex]) {
+					maxAltitude = altitudeSerie[timeIndex];
+				}
+
+				if (maxPulse < timeItem.pulse) {
+					maxPulse = timeItem.pulse;
+				}
+				
+				float currentSpeed = (timeItem.distance / 1000.0f) / ( (float) this.deviceTimeInterval / 60.0f / 60.0f);
+                if (maxSpeed < currentSpeed) {
+                	maxSpeed = currentSpeed;
+                }
+				
 				distanceDiff[timeIndex] = timeItem.distance;
 
 				if (timeItem.marker != 0) {
@@ -440,6 +498,30 @@ public class TourData {
 				timeAbsolute += deviceTimeInterval;
 				timeIndex++;
 			}
+			
+			if (this.avgCadence == 0) {
+				this.avgCadence = (int) sumCadence / serieLength;
+			}
+			
+			if (this.avgPulse == 0) {
+				this.avgPulse = (int) sumPulse / serieLength;
+			}
+			
+			if (this.avgTemperature == 0) {
+				this.avgTemperature = (int) sumTemperature / serieLength;
+			}
+			
+			if (this.maxAltitude == 0) {
+				this.maxAltitude = maxAltitude;
+			}
+			
+			if (this.maxPulse == 0) {
+				this.maxPulse = maxPulse;
+			}
+			
+			if (this.maxSpeed == 0) {
+				this.maxSpeed = maxSpeed;
+			}
 		}
 	}
 
@@ -454,10 +536,12 @@ public class TourData {
 
 		try {
 			/*
-			 * this is the default implementation to create a tour id, but on the 5.5.2007 a
-			 * NumberFormatException occured so the calculation for the tour id was adjusted
+			 * this is the default implementation to create a tour id, but on
+			 * the 5.5.2007 a NumberFormatException occured so the calculation
+			 * for the tour id was adjusted
 			 */
-			tourId = Short.toString(getStartYear()) + Short.toString(getStartMonth())
+			tourId = Short.toString(getStartYear())
+					+ Short.toString(getStartMonth())
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
@@ -467,9 +551,11 @@ public class TourData {
 
 		} catch (NumberFormatException e) {
 
-			// distance was shorted that the maximum for a Long datatype is not exceeded
+			// distance was shorted that the maximum for a Long datatype is not
+			// exceeded
 
-			tourId = Short.toString(getStartYear()) + Short.toString(getStartMonth())
+			tourId = Short.toString(getStartYear())
+					+ Short.toString(getStartMonth())
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
@@ -574,7 +660,8 @@ public class TourData {
 					? 0
 					: (float) ((float) segment.distance / segment.drivingTime * 3.6);
 
-			segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitude * 100
+			segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitude
+					* 100
 					/ segment.distance;
 
 			segmentSerieAltimeter[segmentIndex] = segment.drivingTime == 0
@@ -691,8 +778,8 @@ public class TourData {
 
 		TourData td = (TourData) obj;
 
-		return this.getStartYear() == td.getStartYear() && this.getStartMonth() == td
-				.getStartMonth()
+		return this.getStartYear() == td.getStartYear()
+				&& this.getStartMonth() == td.getStartMonth()
 				&& this.getStartDay() == td.getStartDay()
 				&& this.getStartHour() == td.getStartHour()
 				&& this.getStartMinute() == td.getStartMinute()
@@ -937,6 +1024,14 @@ public class TourData {
 		this.tourPerson = tourPerson;
 	}
 
+	public TourBike getTourBike() {
+		return tourBike;
+	}
+
+	public void setTourBike(TourBike tourBike) {
+		this.tourBike = tourBike;
+	}
+
 	public String getDeviceId() {
 		return devicePluginId;
 	}
@@ -959,6 +1054,186 @@ public class TourData {
 
 	public void setDeviceTimeInterval(short deviceTimeInterval) {
 		this.deviceTimeInterval = deviceTimeInterval;
+	}
+
+	/**
+	 * @return the maxAltitude
+	 */
+	public int getMaxAltitude() {
+		return maxAltitude;
+	}
+
+	/**
+	 * @param maxAltitude
+	 *        the maxAltitude to set
+	 */
+	public void setMaxAltitude(int maxAltitude) {
+		this.maxAltitude = maxAltitude;
+	}
+
+	/**
+	 * @return the maxPulse
+	 */
+	public int getMaxPulse() {
+		return maxPulse;
+	}
+
+	/**
+	 * @param maxPulse
+	 *        the maxPulse to set
+	 */
+	public void setMaxPulse(int maxPulse) {
+		this.maxPulse = maxPulse;
+	}
+
+	/**
+	 * @return the avgPulse
+	 */
+	public int getAvgPulse() {
+		return avgPulse;
+	}
+
+	/**
+	 * @param avgPulse
+	 *        the avgPulse to set
+	 */
+	public void setAvgPulse(int avgPulse) {
+		this.avgPulse = avgPulse;
+	}
+
+	/**
+	 * @return the avgCadence
+	 */
+	public int getAvgCadence() {
+		return avgCadence;
+	}
+
+	/**
+	 * @param avgCadence
+	 *        the avgCadence to set
+	 */
+	public void setAvgCadence(int avgCadence) {
+		this.avgCadence = avgCadence;
+	}
+
+	/**
+	 * @return the avgTemperature
+	 */
+	public int getAvgTemperature() {
+		return avgTemperature;
+	}
+
+	/**
+	 * @param avgTemperature
+	 *        the avgTemperature to set
+	 */
+	public void setAvgTemperature(int avgTemperature) {
+		this.avgTemperature = avgTemperature;
+	}
+
+	/**
+	 * @return the maxSpeed
+	 */
+	public float getMaxSpeed() {
+		return maxSpeed;
+	}
+
+	/**
+	 * @param maxSpeed
+	 *        the maxSpeed to set
+	 */
+	public void setMaxSpeed(float maxSpeed) {
+		this.maxSpeed = maxSpeed;
+	}
+
+	/**
+	 * @return the tourTitle
+	 */
+	public String getTourTitle() {
+		return tourTitle;
+	}
+
+	/**
+	 * @param tourTitle
+	 *        the tourTitle to set
+	 */
+	public void setTourTitle(String tourTitle) {
+		this.tourTitle = tourTitle;
+	}
+
+	/**
+	 * @return the tourDescription
+	 */
+	public String getTourDescription() {
+		return tourDescription;
+	}
+
+	/**
+	 * @param tourDescription
+	 *        the tourDescription to set
+	 */
+	public void setTourDescription(String tourDescription) {
+		this.tourDescription = tourDescription;
+	}
+
+	/**
+	 * @return the tourStartPlace
+	 */
+	public String getTourStartPlace() {
+		return tourStartPlace;
+	}
+
+	/**
+	 * @param tourStartPlace
+	 *        the tourStartPlace to set
+	 */
+	public void setTourStartPlace(String tourStartPlace) {
+		this.tourStartPlace = tourStartPlace;
+	}
+
+	/**
+	 * @return the tourEndPlace
+	 */
+	public String getTourEndPlace() {
+		return tourEndPlace;
+	}
+
+	/**
+	 * @param tourEndPlace
+	 *        the tourEndPlace to set
+	 */
+	public void setTourEndPlace(String tourEndPlace) {
+		this.tourEndPlace = tourEndPlace;
+	}
+
+	/**
+	 * @return the calories
+	 */
+	public String getCalories() {
+		return calories;
+	}
+
+	/**
+	 * @param calories
+	 *        the calories to set
+	 */
+	public void setCalories(String calories) {
+		this.calories = calories;
+	}
+
+	/**
+	 * @return the bikerWeight
+	 */
+	public float getBikerWeight() {
+		return bikerWeight;
+	}
+
+	/**
+	 * @param bikerWeight
+	 *        the bikerWeight to set
+	 */
+	public void setBikerWeight(float bikerWeight) {
+		this.bikerWeight = bikerWeight;
 	}
 
 	public void computeTourDrivingTime() {
