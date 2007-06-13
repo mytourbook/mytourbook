@@ -42,28 +42,14 @@ public class RawDataManager {
 	private static RawDataManager		instance			= null;
 
 	/**
-	 * contains the device which was used to get the fields: <code>fDeviceData</code>,
-	 * <code>fTourData</code>, if set to <code>null</code> no raw data are available
-	 */
-	private TourbookDevice				fDevice;
-
-	/**
 	 * contains the device data imported from the device/file
 	 */
 	private DeviceData					fDeviceData			= new DeviceData();
 
 	/**
-	 * contains the tour data imported from the device/file
+	 * contains the tour data which were imported or received
 	 */
 	private HashMap<String, TourData>	fTourDataMap		= new HashMap<String, TourData>();
-
-	/**
-	 * when set to <code>true</code> the data are imported from a device and stored in the temp
-	 * raw data file
-	 */
-	private boolean						fIsDeviceImport;
-
-	private String						fReceiveDataFileName;
 
 	private RawDataManager() {}
 
@@ -93,10 +79,6 @@ public class RawDataManager {
 
 	public HashMap<String, TourData> getTourData() {
 		return fTourDataMap;
-	}
-
-	public TourbookDevice getDevice() {
-		return fDevice;
 	}
 
 	/**
@@ -195,21 +177,7 @@ public class RawDataManager {
 			// file contains valid raw data for the raw data reader
 
 			if (device.processDeviceData(fileName, fDeviceData, fTourDataMap)) {
-
-				// keep the device and filename for the successful import
-				fDevice = device;
-
-				fIsDeviceImport = RawDataManager.getTempDataFileName().equals(fileName);
-
-// updatePersonInRawData();
-
 				return true;
-
-			} else {
-
-				// import was not successful
-				fDevice = null;
-				fIsDeviceImport = false;
 			}
 		}
 
@@ -224,34 +192,6 @@ public class RawDataManager {
 
 		msgBox.setMessage(NLS.bind(Messages.DataImport_Error_invalid_data_format, fileName));
 		msgBox.open();
-	}
-
-	/**
-	 * @return Returns <code>true</code> when the device/tour data has been imported from a
-	 *         device, <code>false</code> when the data are imported from a file
-	 */
-	public boolean isDeviceImport() {
-		return fIsDeviceImport;
-	}
-
-	/**
-	 * Set the device from which the tour data has been imported
-	 * 
-	 * @param importDevice
-	 */
-	public void setDevice(TourbookDevice importDevice) {
-		fDevice = importDevice;
-	}
-
-	public void setDeviceData(DeviceData deviceData) {
-		fDeviceData = deviceData;
-	}
-
-	/**
-	 * set the status the data has been imported from a device
-	 */
-	public void setIsDeviceImport(boolean isDeviceImport) {
-		fIsDeviceImport = isDeviceImport;
 	}
 
 	/**
@@ -290,21 +230,4 @@ public class RawDataManager {
 			}
 		});
 	}
-
-	public String getReceiveDataFileName() {
-		return fReceiveDataFileName;
-	}
-
-	public void setReceiveDataFileName(String fileName) {
-		fReceiveDataFileName = fileName;
-	}
-
-	/**
-	 * reset the data, so the next time the data are read from the raw data manager, the data must
-	 * be reimported
-	 */
-	public void resetData() {
-		fDevice = null;
-	}
-
 }

@@ -14,7 +14,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jdbc2_0-stdext.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/log4j-1.2.11.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/hibernate3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/hibernate3.jar" sourcepath="M:/hibernate 3.3.0/REPOSITORY/3.2.2/v322/Hibernate3/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations-3.3.0.GA/lib/ejb3-persistence.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations-3.3.0.GA/lib/hibernate-commons-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations-3.3.0.GA/hibernate-annotations.jar"/>

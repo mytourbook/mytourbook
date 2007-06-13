@@ -21,6 +21,8 @@ import org.eclipse.ui.PlatformUI;
 
 public class ActionImportFromFile extends Action {
 
+	RawDataView	fRawDataView	= null;
+
 	public ActionImportFromFile() {
 		setText(Messages.RawData_Action_open_import_file);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_open_import_file));
@@ -32,52 +34,50 @@ public class ActionImportFromFile extends Action {
 	 */
 	public void run() {
 
-		RawDataView rawDataView = null;
-
 		try {
 			// show raw data view
-			rawDataView = (RawDataView) PlatformUI
+			fRawDataView = (RawDataView) PlatformUI
 					.getWorkbench()
 					.getActiveWorkbenchWindow()
 					.getActivePage()
 					.showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
-			if (rawDataView == null) {
+			if (fRawDataView == null) {
 				return;
 			}
-		} catch (PartInitException e) {
+		} catch (final PartInitException e) {
 			e.printStackTrace();
 		}
 
 		// setup open dialog
-		FileDialog fileDialog = new FileDialog(
+		final FileDialog fileDialog = new FileDialog(
 				Display.getCurrent().getActiveShell(),
 				(SWT.OPEN | SWT.MULTI));
 
-		ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
+		final ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 
 		// sort device list alphabetically
 		Collections.sort(deviceList, new Comparator<TourbookDevice>() {
-			public int compare(TourbookDevice o1, TourbookDevice o2) {
+			public int compare(final TourbookDevice o1, final TourbookDevice o2) {
 				return o1.visibleName.compareTo(o2.visibleName);
 			}
 		});
 
 		// create file filter list
-		int deviceLength = deviceList.size() + 1;
-		String[] filterExtensions = new String[deviceLength];
-		String[] filterNames = new String[deviceLength];
-		
+		final int deviceLength = deviceList.size() + 1;
+		final String[] filterExtensions = new String[deviceLength];
+		final String[] filterNames = new String[deviceLength];
+
 		int deviceIndex = 0;
 
 		// add option to show all files
 		filterExtensions[deviceIndex] = "*.*"; //$NON-NLS-1$
 		filterNames[deviceIndex] = "*.*"; //$NON-NLS-1$
-		
+
 		deviceIndex++;
-		
+
 		// add option for every file extension
-		for (TourbookDevice device : deviceList) {
+		for (final TourbookDevice device : deviceList) {
 			filterExtensions[deviceIndex] = "*." + device.fileExtension; //$NON-NLS-1$
 			filterNames[deviceIndex] = device.visibleName + (" (*." + device.fileExtension + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			deviceIndex++;
@@ -87,38 +87,48 @@ public class ActionImportFromFile extends Action {
 		fileDialog.setFilterExtensions(filterExtensions);
 		fileDialog.setFilterNames(filterNames);
 
-		String firstFileName = fileDialog.open();
+		final String firstFileName = fileDialog.open();
 
 		// check if user canceled the dialog
 		if (firstFileName == null) {
 			return;
 		}
 
-		RawDataManager rawDataManager = RawDataManager.getInstance();
-		
-		Path filePath = new Path(firstFileName);
-		final String[] selectedFileNames = fileDialog.getFileNames();
-		boolean isImported = false;
+		Display.getDefault().asyncExec(new Runnable() {
 
-		// loop: import all selected files
-		for (String fileName : selectedFileNames) {
+			public void run() {
 
-			// replace filename, keep the directory path
-			fileName = filePath.removeLastSegments(1).append(fileName).makeAbsolute().toString();
+				final RawDataManager rawDataManager = RawDataManager.getInstance();
 
-			if (isImported) {
-				rawDataManager.importRawData(fileName);
-			} else {
-				isImported = rawDataManager.importRawData(fileName);
+				final Path filePath = new Path(firstFileName);
+				final String[] selectedFileNames = fileDialog.getFileNames();
+				boolean isImported = false;
+
+				// loop: import all selected files
+				for (String fileName : selectedFileNames) {
+
+					// replace filename, keep the directory path
+					fileName = filePath
+							.removeLastSegments(1)
+							.append(fileName)
+							.makeAbsolute()
+							.toString();
+
+					if (isImported) {
+						rawDataManager.importRawData(fileName);
+					} else {
+						isImported = rawDataManager.importRawData(fileName);
+					}
+				}
+
+				if (isImported) {
+
+					rawDataManager.updatePersonInRawData();
+					fRawDataView.updateViewer();
+					fRawDataView.selectFirstTour();
+				}
 			}
-		}
-
-		if (isImported) {
-			rawDataManager.updatePersonInRawData();
-			rawDataView.updateViewer();
-			rawDataView.selectFirstTour();
-			rawDataView.setActionSaveEnabled(rawDataManager.isDeviceImport());
-		}
+		});
 	}
 
 }

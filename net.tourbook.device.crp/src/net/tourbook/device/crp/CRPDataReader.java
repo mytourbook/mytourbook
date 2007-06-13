@@ -178,6 +178,8 @@ public class CRPDataReader extends TourbookDevice {
 			TourData tourData = new TourData();
 
 			tourData.setDeviceMode((short) (tourMode));
+			tourData.setDeviceModeName(getDeviceModeName(tourMode));
+			
 			tourData.setDeviceTimeInterval((short) interval);
 
 			tourData.setStartMinute((short) tourMin);
@@ -296,8 +298,9 @@ public class CRPDataReader extends TourbookDevice {
 				tourData.setTourAltUp(tourAltUp);
 				tourData.setTourAltDown(tourAltDown);
 
-				tourData.setDeviceId(visibleName);
-
+				tourData.setDeviceId(deviceId);
+				tourData.setDeviceName(visibleName);
+				
 				// set week of year
 				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
 						.getStartDay());

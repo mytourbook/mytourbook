@@ -47,10 +47,9 @@ import org.eclipse.ui.PlatformUI;
 
 public class WizardImportData extends Wizard {
 
-	// timeout in milliseconds * 100
 	private static final int			RECEIVE_TIMEOUT			= 600;
 
-	public static final String			DIALOG_SETTINGS_SECTION	= "WizardImportData";			//$NON-NLS-1$
+	private static final String			DIALOG_SETTINGS_SECTION	= "WizardImportData";			//$NON-NLS-1$
 
 	private WizardPageImportSettings	fPageImportSettings;
 	private ByteArrayOutputStream		fRawDataBuffer			= new ByteArrayOutputStream();
@@ -101,7 +100,7 @@ public class WizardImportData extends Wizard {
 				deviceData.transferMonth,
 				deviceData.transferDay).toString();
 
-		String importPathName = fPageImportSettings.fAutoSavePathEditor.getStringValue();
+		String importPathName = fPageImportSettings.fPathEditor.getStringValue();
 
 		String fileOutPath = new Path(importPathName).addTrailingSeparator().toString() + fileName;
 		File fileOut = new File(fileOutPath);
@@ -268,27 +267,27 @@ public class WizardImportData extends Wizard {
 					rawDataManager.getDeviceData(),
 					rawDataManager.getTourData())) {
 
-				String autoSavedFileName = null;
+//				String autoSavedFileName = null;
+//
+//				// auto save raw data
+//				if (fPageImportSettings.fCheckAutoSave.getSelection()) {
+//				}
+				autoSaveRawData(tempDataFileName);
 
-				// auto save raw data
-				if (fPageImportSettings.fCheckAutoSave.getSelection()) {
-					autoSavedFileName = autoSaveRawData(tempDataFileName);
-				}
-
-				rawDataManager.setDevice(fImportDevice);
-
-				if (autoSavedFileName == null) {
-					// it was not auto saved or the auto save was canceled
-					rawDataManager.setReceiveDataFileName(tempDataFileName);
-					rawDataManager.setIsDeviceImport(true);
-				} else {
-					/*
-					 * tell the raw data manager that the data are not received they are now from a
-					 * file
-					 */
-					rawDataManager.setReceiveDataFileName(autoSavedFileName);
-					rawDataManager.setIsDeviceImport(false);
-				}
+//				rawDataManager.setDevice(fImportDevice);
+//
+//				if (autoSavedFileName == null) {
+//					// it was not auto saved or the auto save was canceled
+//					rawDataManager.setReceiveDataFileName(tempDataFileName);
+//					rawDataManager.setIsDeviceImport(true);
+//				} else {
+//					/*
+//					 * tell the raw data manager that the data are not received they are now from a
+//					 * file
+//					 */
+//					rawDataManager.setReceiveDataFileName(autoSavedFileName);
+//					rawDataManager.setIsDeviceImport(false);
+//				}
 
 				rawDataManager.updatePersonInRawData();
 
@@ -302,7 +301,7 @@ public class WizardImportData extends Wizard {
 
 					if (importView != null) {
 						importView.updateViewer();
-						importView.setActionSaveEnabled(autoSavedFileName == null);
+//						importView.setActionSaveEnabled(autoSavedFileName == null);
 					}
 				} catch (PartInitException e) {
 					e.printStackTrace();
@@ -327,6 +326,10 @@ public class WizardImportData extends Wizard {
 	}
 
 	public boolean performFinish() {
+
+		if (fPageImportSettings.validatePage() == false) {
+			return false;
+		}
 
 		receiveData();
 

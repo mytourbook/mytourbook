@@ -18,6 +18,7 @@ package net.tourbook.importdata;
 
 import gnu.io.CommPortIdentifier;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
@@ -36,7 +37,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -44,12 +44,10 @@ import org.eclipse.swt.widgets.Label;
 public class WizardPageImportSettings extends WizardPage {
 
 	// dialog settings
-	private static final String			COMBO_DEVICE_ID		= "combo.device-id"; //$NON-NLS-1$
-	private static final String			COMBO_PERSON_ID		= "combo.person-id"; //$NON-NLS-1$
-
-	public static final String			COMBO_SERIAL_PORT	= "combo.serial-port"; //$NON-NLS-1$
-	private static final String			CHECK_AUTO_SAVE		= "check.auto-save"; //$NON-NLS-1$
-	private static final String			TEXT_AUTO_SAVE_PATH	= "text.auto-save-path"; //$NON-NLS-1$
+	private static final String			COMBO_DEVICE_ID		= "combo.device-id";		//$NON-NLS-1$
+	private static final String			COMBO_PERSON_ID		= "combo.person-id";		//$NON-NLS-1$
+	private static final String			COMBO_SERIAL_PORT	= "combo.serial-port";		//$NON-NLS-1$
+	private static final String			TEXT_RAW_DATA_PATH	= "text.auto-save-path";	//$NON-NLS-1$
 
 	Combo								fComboDevice;
 	Combo								fComboPorts;
@@ -62,10 +60,8 @@ public class WizardPageImportSettings extends WizardPage {
 
 	private ArrayList<String>			fPortList;
 	private Combo						fComboPerson;
-	Button								fCheckAutoSave;
-	DirectoryFieldEditor				fAutoSavePathEditor;
+	DirectoryFieldEditor				fPathEditor;
 	private Composite					fGroupContainer;
-	private Label						fLblDevice;
 	protected boolean					fIsDeviceAvailable;
 
 	protected WizardPageImportSettings(final String pageName) {
@@ -79,14 +75,12 @@ public class WizardPageImportSettings extends WizardPage {
 		initializeDialogUnits(parent);
 
 		fGroupContainer = new Composite(parent, SWT.NONE);
-		final GridData gdFillHorizontal = new GridData(SWT.FILL, SWT.NONE, true, false);
-		fGroupContainer.setLayoutData(gdFillHorizontal);
-		final GridLayout gl = new GridLayout(3, false);
-		fGroupContainer.setLayout(gl);
+		fGroupContainer.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+		fGroupContainer.setLayout(new GridLayout(3, false));
 
 		createFieldPerson();
 		createFieldDevice();
-		createFieldAutoSave();
+		createFieldRawDataPath();
 		createFieldSerialPort();
 
 		restoreDialogSettings();
@@ -99,57 +93,23 @@ public class WizardPageImportSettings extends WizardPage {
 	}
 
 	/**
-	 * auto save after import
-	 */
-	private void createFieldAutoSave() {
-
-		Label label;
-		fCheckAutoSave = new Button(fGroupContainer, SWT.CHECK);
-		fCheckAutoSave.setText(Messages.ImportWizard_Control_check_auto_save);
-		final GridData gdAutoSave = new GridData(SWT.FILL, SWT.NONE, true, false);
-		gdAutoSave.horizontalSpan = 3;
-		gdAutoSave.verticalIndent = 10;
-		fCheckAutoSave.setLayoutData(gdAutoSave);
-		fCheckAutoSave.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(final SelectionEvent e) {
-				enableControls();
-				validatePage();
-			}
-		});
-
-		/*
-		 * path to save raw tour data
-		 */
-		fAutoSavePathEditor = new DirectoryFieldEditor(
-				ITourbookPreferences.DUMMY_FIELD,
-				Messages.ImportWizard_Label_auto_save_path,
-				fGroupContainer);
-
-		label = fAutoSavePathEditor.getLabelControl(fGroupContainer);
-		final GridData gdPath = new GridData(SWT.NONE, SWT.NONE, false, false);
-		gdPath.horizontalIndent = 20;
-		label.setLayoutData(gdPath);
-
-		fAutoSavePathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				validatePage();
-			}
-		});
-	}
-
-	/**
-	 * device
+	 * create field: device
 	 */
 	private void createFieldDevice() {
 
-		fLblDevice = new Label(fGroupContainer, SWT.NONE);
-		fLblDevice.setText(Messages.ImportWizard_Label_device);
+		GridData gd;
+
+		Label label = new Label(fGroupContainer, SWT.NONE);
+		label.setText(Messages.ImportWizard_Label_device);
+		gd = new GridData(SWT.NONE, SWT.CENTER, false, false);
+		gd.verticalIndent = 10;
+		label.setLayoutData(gd);
 
 		fComboDevice = new Combo(fGroupContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboDevice.setVisibleItemCount(10);
-		final GridData gdDevice = new GridData(SWT.FILL, SWT.NONE, true, false);
-		gdDevice.verticalIndent = 10;
-		fComboDevice.setLayoutData(gdDevice);
+		gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		gd.verticalIndent = 10;
+		fComboDevice.setLayoutData(gd);
 
 		fComboDevice.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(final SelectionEvent e) {
@@ -180,7 +140,7 @@ public class WizardPageImportSettings extends WizardPage {
 	}
 
 	/**
-	 * person
+	 * create field: person
 	 */
 	private void createFieldPerson() {
 		Label label;
@@ -189,8 +149,8 @@ public class WizardPageImportSettings extends WizardPage {
 
 		fComboPerson = new Combo(fGroupContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboPerson.setVisibleItemCount(10);
-		final GridData gdPerson = new GridData(SWT.FILL, SWT.NONE, true, false);
-		fComboPerson.setLayoutData(gdPerson);
+		fComboPerson.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+
 		fComboPerson.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(final SelectionEvent e) {
 				int personIndex = fComboPerson.getSelectionIndex();
@@ -201,9 +161,8 @@ public class WizardPageImportSettings extends WizardPage {
 				} else {
 					final TourPerson person = fPeopleList.get(--personIndex);
 					selectPersonDevice(person);
-					fAutoSavePathEditor.setStringValue(person.getRawDataPath());
+					fPathEditor.setStringValue(person.getRawDataPath());
 				}
-				enableControls();
 				validatePage();
 			}
 		});
@@ -223,19 +182,45 @@ public class WizardPageImportSettings extends WizardPage {
 	}
 
 	/**
-	 * serial port
+	 * create field: raw data path
 	 */
+	private void createFieldRawDataPath() {
+
+		/*
+		 * path to save raw tour data
+		 */
+		fPathEditor = new DirectoryFieldEditor(
+				ITourbookPreferences.DUMMY_FIELD,
+				Messages.ImportWizard_Label_auto_save_path,
+				fGroupContainer);
+
+		fPathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+				validatePage();
+			}
+		});
+	}
+
+	/**
+	 * create field: serial port
+	 */
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	private void createFieldSerialPort() {
+
+		GridData gd;
 
 		final Label label = new Label(fGroupContainer, SWT.NONE);
 		label.setText(Messages.ImportWizard_Label_serial_port);
+		gd = new GridData(SWT.NONE, SWT.CENTER, false, false);
+		gd.verticalIndent = 10;
+		label.setLayoutData(gd);
 
 		fComboPorts = new Combo(fGroupContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboPorts.setVisibleItemCount(10);
-		final GridData gdPorts = new GridData(SWT.NONE, SWT.NONE, false, false);
-		gdPorts.horizontalSpan = 2;
-		gdPorts.verticalIndent = 10;
-		fComboPorts.setLayoutData(gdPorts);
+		gd = new GridData(SWT.NONE, SWT.NONE, false, false);
+		gd.horizontalSpan = 2;
+		gd.verticalIndent = 10;
+		fComboPorts.setLayoutData(gd);
 		fComboPorts.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(final SelectionEvent e) {
 				validatePage();
@@ -245,13 +230,13 @@ public class WizardPageImportSettings extends WizardPage {
 		fPortList = new ArrayList<String>();
 
 		// read serial ports from the system
-		final Enumeration ports = CommPortIdentifier.getPortIdentifiers();
+		final Enumeration<CommPortIdentifier> ports = CommPortIdentifier.getPortIdentifiers();
 		fIsPortListAvailable = ports.hasMoreElements();
 
 		if (fIsPortListAvailable) {
 			// ports are available
 			while (ports.hasMoreElements()) {
-				final CommPortIdentifier port = (CommPortIdentifier) ports.nextElement();
+				final CommPortIdentifier port = ports.nextElement();
 				if (port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
 					final String portName = port.getName();
 					fPortList.add(portName);
@@ -269,23 +254,24 @@ public class WizardPageImportSettings extends WizardPage {
 
 	private void enableControls() {
 
-//		boolean isPersonSelected = fComboPerson.getSelectionIndex() > 0;
-
-		fLblDevice.setEnabled(true);
 		fComboDevice.setEnabled(true);
-//		fAutoSavePathEditor.setEnabled(true, fGroupContainer);
-
-//		fLblDevice.setEnabled(!fIsDeviceAvailable);
-//		fComboDevice.setEnabled(!fIsDeviceAvailable);
-//		
-//		if (fIsDeviceAvailable) {
-//			fAutoSavePathEditor.setEnabled(false, fGroupContainer);
-//		} else {
-//			fAutoSavePathEditor.setEnabled(fCheckAutoSave.getSelection(), fGroupContainer);
-//		}
-
-		fAutoSavePathEditor.setEnabled(fCheckAutoSave.getSelection(), fGroupContainer);
+		fPathEditor.setEnabled(true, fGroupContainer);
 	}
+
+	/**
+	 * @return Return the device which is selected in the device list or <code>null</code> when no
+	 *         device is selected
+	 */
+	public TourbookDevice getSelectedDevice() {
+
+		int deviceIndex = fComboDevice.getSelectionIndex();
+		if (deviceIndex <= 0) {
+			return null;
+		} else {
+			return fDeviceListWithDeviceImport.get(--deviceIndex);
+		}
+	}
+
 	void persistDialogSettings() {
 
 		final IDialogSettings settings = getDialogSettings();
@@ -314,8 +300,7 @@ public class WizardPageImportSettings extends WizardPage {
 		}
 
 		// save auto save settings
-		settings.put(CHECK_AUTO_SAVE, fCheckAutoSave.getSelection());
-		settings.put(TEXT_AUTO_SAVE_PATH, fAutoSavePathEditor.getStringValue());
+		settings.put(TEXT_RAW_DATA_PATH, fPathEditor.getStringValue());
 
 	}
 
@@ -375,9 +360,8 @@ public class WizardPageImportSettings extends WizardPage {
 			}
 		}
 
-		// restore auto save checkbox
-		fCheckAutoSave.setSelection(settings.getBoolean(CHECK_AUTO_SAVE));
-		fAutoSavePathEditor.setStringValue(settings.get(TEXT_AUTO_SAVE_PATH));
+		// restore raw data path
+		fPathEditor.setStringValue(settings.get(TEXT_RAW_DATA_PATH));
 
 	}
 
@@ -406,27 +390,35 @@ public class WizardPageImportSettings extends WizardPage {
 			}
 
 			/*
-			 * when the device was not found or when the data can't be read from
-			 * the device, select the "<Not Selected>" entry
+			 * when the device was not found or when the data can't be read from the device, select
+			 * the "<Not Selected>" entry
 			 */
 			if (selectIndex == 0) {
 				fComboDevice.select(0);
-//				fComboDevice.setEnabled(true);
 				fIsDeviceAvailable = false;
 			} else {
 				fComboDevice.select(selectIndex);
-//				fComboDevice.setEnabled(false);
 				fIsDeviceAvailable = true;
 			}
 		}
 	}
 
-	private boolean validatePage() {
+	boolean validatePage() {
 
 		// validate device
 		if (fComboDevice.getSelectionIndex() <= 0) {
 			setPageComplete(false);
 			setErrorMessage(Messages.ImportWizard_Error_select_a_device);
+			fComboDevice.setFocus();
+			return false;
+		}
+
+		// validate path
+		if (validatePath() == false) {
+			setPageComplete(false);
+			setErrorMessage(Messages.ImportWizard_Error_path_is_invalid);
+			
+			fPathEditor.getTextControl(fGroupContainer).setFocus();
 			return false;
 		}
 
@@ -434,33 +426,24 @@ public class WizardPageImportSettings extends WizardPage {
 		if (!fIsPortListAvailable || fComboPorts.getSelectionIndex() == -1) {
 			setPageComplete(false);
 			setErrorMessage(Messages.ImportWizard_Error_com_port_is_required);
+			
+			fComboPorts.setFocus();
 			return false;
 		}
-
-		// validate autosave path
-		if (fCheckAutoSave.getSelection() && !fAutoSavePathEditor.isValid()) {
-			setPageComplete(false);
-			setErrorMessage(Messages.ImportWizard_Error_path_is_invalid);
-			return false;
-		}
-
+		
 		setPageComplete(true);
 		setErrorMessage(null);
 		return true;
 	}
 
-	/**
-	 * @return Return the device which is selected in the device list or
-	 *         <code>null</code> when no device is selected
-	 */
-	public TourbookDevice getSelectedDevice() {
+	private boolean validatePath() {
 
-		int deviceIndex = fComboDevice.getSelectionIndex();
-		if (deviceIndex <= 0) {
-			return null;
-		} else {
-			return fDeviceListWithDeviceImport.get(--deviceIndex);
+		String fileName = fPathEditor.getTextControl(fGroupContainer).getText();
+		fileName = fileName.trim();
+		if (fileName.length() == 0) {
+			return false;
 		}
+		File file = new File(fileName);
+		return file.isDirectory();
 	}
-
 }

@@ -18,7 +18,6 @@ package net.tourbook.importdata;
 
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.util.PositionedWizardDialog;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -41,15 +40,12 @@ public class ActionImportFromDeviceDirect extends Action {
 
 		final WizardImportData importWizard = new WizardImportData();
 
-		final WizardDialog dialog = new PositionedWizardDialog(
+		final WizardDialog dialog = new WizardImportDialog(
 				fWindow.getShell(),
 				importWizard,
-				WizardImportData.DIALOG_SETTINGS_SECTION,
-				500,
-				400);
+				Messages.ImportWizard_Dlg_title);
 
-		// create the dialog that the shell is created which is required in
-		// setAutoDownload()
+		// create the dialog and shell which is required in setAutoDownload()
 		dialog.create();
 
 		importWizard.setAutoDownload();

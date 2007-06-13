@@ -417,8 +417,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					tourData.createTimeSeries(timeDataList);
 					tourData.computeTourDrivingTime();
 
-					tourData.setDeviceId(visibleName);
-
+					tourData.setDeviceId(deviceId);
+					tourData.setDeviceName(visibleName);
+					
 					// set week of year
 					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
 							.getStartDay());
@@ -512,6 +513,8 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		timeInterval = timeInterval == 0 ? 2 : timeInterval == 1 ? 5 : timeInterval == 2 ? 10 : 20;
 
 		tourData.setDeviceMode((short) (profile));
+		tourData.setDeviceModeName(getDeviceModeName(profile));
+		
 		tourData.setDeviceTimeInterval((short) timeInterval);
 
 		tourData.setStartMinute(buffer[4]);

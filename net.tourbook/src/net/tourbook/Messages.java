@@ -303,13 +303,33 @@ public class Messages extends NLS {
 
 	public static String		RawData_Column_date;
 	public static String		RawData_Column_date_label;
+
+	public static String	RawData_Column_db_status_label;
 	public static String		RawData_Column_db_status_tooltip;
+
+	public static String	RawData_Column_device;
+
+	public static String	RawData_Column_device_label;
+
+	public static String	RawData_Column_device_tooltip;
 	public static String		RawData_Column_distance;
 	public static String		RawData_Column_distance_label;
 	public static String		RawData_Column_distance_tooltip;
 	public static String		RawData_Column_driving_time;
 	public static String		RawData_Column_driving_time_label;
 	public static String		RawData_Column_driving_time_tooltip;
+
+	public static String	RawData_Column_import_filename;
+
+	public static String	RawData_Column_import_filename_label;
+
+	public static String	RawData_Column_import_filename_tooltip;
+
+	public static String	RawData_Column_import_filepath;
+
+	public static String	RawData_Column_import_filepath_label;
+
+	public static String	RawData_Column_import_filepath_tooltip;
 	public static String		RawData_Column_profile;
 	public static String		RawData_Column_profile_label;
 	public static String		RawData_Column_profile_tooltip;

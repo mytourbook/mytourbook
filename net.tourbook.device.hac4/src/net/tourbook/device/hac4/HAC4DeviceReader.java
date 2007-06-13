@@ -348,7 +348,12 @@ public class HAC4DeviceReader extends TourbookDevice {
 					tourData.setTourType(defaultTourType);
 					tourData.computeTourDrivingTime();
 
-					tourData.setDeviceId(visibleName);
+					tourData.setDeviceId(deviceId);
+					tourData.setDeviceName(visibleName);
+
+					final Short profileId = Short.valueOf(tourData.getDeviceTourType(), 16);
+					tourData.setDeviceMode(profileId);
+					tourData.setDeviceModeName(getDeviceModeName(profileId));
 
 					// set week of year
 					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
@@ -631,8 +636,28 @@ public class HAC4DeviceReader extends TourbookDevice {
 		return isValid;
 	}
 
-	public String getDeviceModeName(int modeId) {
-		return ""; //$NON-NLS-1$
+	public String getDeviceModeName(int profileId) {
+
+		// "81" jogging 
+		// "91" ski 
+		// "A1" bike
+		// "B1" ski-bike
+
+		switch (profileId) {
+		case 129: // 0x81
+			return "Jogging";
+
+		case 145: // 0x91
+			return "Ski";
+
+		case 161: // 0xA1
+			return "Bike";
+
+		case 177: // 0xB1
+			return "Ski-Bike";
+		}
+
+		return "HAC4: unknown profile"; //$NON-NLS-1$
 	}
 
 	public SerialParameters getPortParameters(String portName) {

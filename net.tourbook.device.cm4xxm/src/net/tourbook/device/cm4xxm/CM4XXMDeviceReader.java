@@ -82,8 +82,21 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		return false;
 	}
 
-	public String getDeviceModeName(int modeId) {
-		return ""; //$NON-NLS-1$
+	public String getDeviceModeName(int profileId) {
+		
+		// "2E" bike2 (CM414M) 
+		// "3E" bike1 (CM414M) 
+		
+		switch (profileId) {
+		case 46: // 0x2E
+			return "Bike 2";
+
+		case 62: // 0x3E
+			return "Bike 1";
+
+		}
+
+		return "CM4xxM: unknown profile"; //$NON-NLS-1$
 	}
 
 	public int getImportDataSize() {
@@ -387,7 +400,12 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 					tourData.setTourType(defaultTourType);
 					tourData.computeTourDrivingTime();
 					
-					tourData.setDeviceId(visibleName);
+					tourData.setDeviceId(deviceId);
+					tourData.setDeviceName(visibleName);
+
+					final Short profileId = Short.valueOf(tourData.getDeviceTourType(), 16);
+					tourData.setDeviceMode(profileId);
+					tourData.setDeviceModeName(getDeviceModeName(profileId));
 
 					// set week of year
 					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData

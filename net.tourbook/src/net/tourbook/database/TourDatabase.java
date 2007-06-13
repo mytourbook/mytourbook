@@ -175,7 +175,7 @@ public class TourDatabase {
 		}
 	}
 
-	private void checkServer() throws MyTourbookException   {
+	private void checkServer() throws MyTourbookException {
 
 		// when the server is started, nothing is to do here
 		if (server != null) {
@@ -546,9 +546,9 @@ public class TourDatabase {
 						+ "tourEndPlace			VARCHAR(255),		\n" //$NON-NLS-1$
 						+ "calories				INTEGER,			\n" //$NON-NLS-1$
 						+ "bikerWeight			FLOAT,				\n" //$NON-NLS-1$
-                        + "tourBike_bikeId		BIGINT,				\n" //$NON-NLS-1$
+						+ "tourBike_bikeId		BIGINT,				\n" //$NON-NLS-1$
 						// version 4 end
-						
+
 						+ "tourType_typeId 		BIGINT,				\n" //$NON-NLS-1$
 						+ "tourPerson_personId 	BIGINT,				\n" //$NON-NLS-1$
 						+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
@@ -751,14 +751,12 @@ public class TourDatabase {
 
 		if (currentDbVersion == 1) {
 			updateDbDesign_1_2(conn);
-			newVersion = 2;
-			currentDbVersion = newVersion;
+			currentDbVersion = newVersion = 2;
 		}
 
 		if (currentDbVersion == 2) {
 			updateDbDesign_2_3(conn);
-			newVersion = 3;
-			currentDbVersion = newVersion;
+			currentDbVersion = newVersion = 3;
 		}
 
 		if (currentDbVersion == 3) {
@@ -832,22 +830,22 @@ public class TourDatabase {
 
 			String sql;
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxAltitude			INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxAltitude			INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxPulse				INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxPulse				INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgPulse				INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgPulse				INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgCadence			INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgCadence			INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgTemperature		INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgTemperature		INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxSpeed				FLOAT"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxSpeed				FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourTitle				VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -862,15 +860,15 @@ public class TourDatabase {
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourEndPlace			VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN calories				INTEGER"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN calories				INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
 
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN bikerWeight			FLOAT"; //$NON-NLS-1$ //$NON-NLS-2$
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN bikerWeight			FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourBike_bikeId		BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
-			
+
 			statement.executeBatch();
 			statement.close();
 

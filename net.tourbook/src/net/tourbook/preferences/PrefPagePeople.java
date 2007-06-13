@@ -88,7 +88,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private TableViewer					fPeopleViewer;
 	private Button						fButtonAdd;
-	private Button						fButtonDelete;
+//	private Button						fButtonDelete;
 
 	private Composite					fPersonDetailContainer;
 	private Text						fTextFirstName;
@@ -111,7 +111,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private TourPerson					fCurrentPerson;
 	private boolean						fIsPersonModified;
 	private TourBike[]					fBikes;
+
+	/**
+	 * this device list has all the devices which are visible in the device combobox
+	 */
 	private ArrayList<TourbookDevice>	fDeviceList;
+
 	private IPropertyChangeListener		fPrefChangeListener;
 	private boolean						fIsPersonListModified	= false;
 	protected boolean					fIsNewPerson			= false;
@@ -119,7 +124,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private class ClientsContentProvider implements IStructuredContentProvider {
 
 		public ClientsContentProvider() {}
+
 		public void dispose() {}
+
 		public Object[] getElements(Object parent) {
 			if (fPeople == null) {
 				fPeople = TourDatabase.getTourPeople();
@@ -274,7 +281,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	}
 
 	private void createFieldBike() {
-		GridData gd;
 		Label lbl;
 		/*
 		 * field: bike
@@ -283,8 +289,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		lbl.setText(Messages.Pref_People_Label_bike);
 		fComboBike = new Combo(fPersonDetailContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboBike.setVisibleItemCount(10);
-		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-		fComboBike.setLayoutData(gd);
+		fComboBike.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 		fComboBikeModifyListener = new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				if (fCurrentPerson != null) {
@@ -309,8 +314,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 						TourBike selectedBike = fBikes[selectedIndex];
 
-						if (personTourBike == null
-								|| (personTourBike.getBikeId() != selectedBike.getBikeId())) {
+						if (personTourBike == null || (personTourBike.getBikeId() != selectedBike
+								.getBikeId())) {
 
 							fCurrentPerson.setTourBike(selectedBike);
 							fIsPersonModified = true;
@@ -339,42 +344,51 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		fComboDevice = new Combo(fPersonDetailContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboDevice.setVisibleItemCount(10);
-		GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-		fComboDevice.setLayoutData(gd);
+		fComboDevice.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+
 		fComboDeviceModifyListener = new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
+
 				if (fCurrentPerson != null) {
-					int selectedIndex = fComboDevice.getSelectionIndex();
-					if (selectedIndex != -1) {
-						TourbookDevice device = fDeviceList.get(selectedIndex);
-						if (device == null && fCurrentPerson.getDeviceReaderId() == null) {
-							return;
-						}
-						if (device == null
-								|| (device.deviceId != null && !device.deviceId
-										.equals(fCurrentPerson.getDeviceReaderId()))) {
 
-							fCurrentPerson.setDeviceReaderId(device == null
-									? null
-									: device.deviceId);
-							fIsPersonModified = true;
+					TourbookDevice device = getSelectedDevice();
 
-							fPeopleViewer.update(fCurrentPerson, null);
-						}
+					if (device == null && fCurrentPerson.getDeviceReaderId() == null) {
+						return;
+					}
+
+					if (device == null || (device.deviceId != null && !device.deviceId
+							.equals(fCurrentPerson.getDeviceReaderId()))) {
+
+						fCurrentPerson.setDeviceReaderId(device == null ? null : device.deviceId);
+
+						fIsPersonModified = true;
+
+						fPeopleViewer.update(fCurrentPerson, null);
 					}
 				}
 				validatePerson();
 			}
 		};
 
-		// filler
-		lbl = new Label(fPersonDetailContainer, SWT.NONE);
+		// spacer
+		new Label(fPersonDetailContainer, SWT.NONE);
 
 		// create device list
 		fDeviceList = new ArrayList<TourbookDevice>();
-		fDeviceList.add(null);
-		fDeviceList.addAll(DeviceManager.getDeviceList());
 
+		// add special device
+		fDeviceList.add(null);
+
+		// add all devices which can read from a device
+		final ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
+		for (TourbookDevice device : deviceList) {
+			if (device.canReadFromDevice) {
+				fDeviceList.add(device);
+			}
+		}
+
+		// add all devices to the combobox
 		for (TourbookDevice device : fDeviceList) {
 			if (device == null) {
 				fComboDevice.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
@@ -382,6 +396,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				fComboDevice.add(device.visibleName);
 			}
 		}
+	}
+
+	private TourbookDevice getSelectedDevice() {
+
+		int selectedIndex = fComboDevice.getSelectionIndex();
+
+		if (selectedIndex == -1 || selectedIndex == 0) {
+			return null;
+		}
+
+		return fDeviceList.get(selectedIndex);
 	}
 
 	/**
@@ -393,8 +418,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		lbl.setText(Messages.Pref_People_Label_first_name);
 
 		fTextFirstName = new Text(fPersonDetailContainer, SWT.BORDER);
-		GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-		fTextFirstName.setLayoutData(gd);
+		fTextFirstName.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 		fTextFirstNameModifyListener = new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				if (fCurrentPerson != null) {
@@ -410,7 +434,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			}
 		};
 
-		// filler
+		// spacer
 		new Label(fPersonDetailContainer, SWT.NONE);
 	}
 
@@ -447,14 +471,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 * field: height
 	 */
 	private void createFieldHeight(int floatInputWidth) {
-		
+
 		InputFieldFloat floatInput = new InputFieldFloat(
 				fPersonDetailContainer,
 				Messages.Pref_People_Label_height,
 				floatInputWidth);
-	
+
 		fTextHeight = floatInput.getTextField();
-		
+
 		fTextHeightModifyListener = new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				if (fCurrentPerson != null) {
@@ -474,7 +498,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				}
 			}
 		};
-	
+
 		// filler
 		new Label(fPersonDetailContainer, SWT.NONE);
 	}
@@ -483,14 +507,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 * field: weight
 	 */
 	private void createFieldWeight(int floatInputWidth) {
-		
+
 		InputFieldFloat floatInput = new InputFieldFloat(
 				fPersonDetailContainer,
 				Messages.Pref_People_Label_weight,
 				floatInputWidth);
 
 		fTextWeight = floatInput.getTextField();
-		
+
 		fTextWeightModifyListener = new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				if (fCurrentPerson != null) {
@@ -515,20 +539,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		new Label(fPersonDetailContainer, SWT.NONE);
 	}
 
-	// private class PeopleViewer extends TableViewer {
-	//
-	// public PeopleViewer(Table table) {
-	// super(table);
-	// }
-	//
-	// // protected void updateSelection(ISelection selection) {
-	// // if (!fIsPersonModified) {
-	// // super.updateSelection(selection);
-	// // }
-	// // }
-	//
-	// }
-
 	private void createPeopleViewer(Composite container) {
 
 		TableLayoutComposite layouter = new TableLayoutComposite(container, SWT.NONE);
@@ -536,8 +546,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		gridData.widthHint = convertWidthInCharsToPixels(30);
 		layouter.setLayoutData(gridData);
 
-		final Table table = new Table(layouter, (SWT.H_SCROLL
-				| SWT.V_SCROLL
+		final Table table = new Table(layouter, (SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.BORDER
 				| SWT.FULL_SELECTION | SWT.MULTI));
 		table.setHeaderVisible(true);
@@ -630,8 +639,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		// button: delete
 
 		/*
-		 * "Delete" button is disabled because the tours don't display the info
-		 * that the person was removed
+		 * "Delete" button is disabled because the tours don't display the info that the person was
+		 * removed
 		 */
 		// fButtonDelete = new Button(container, SWT.NONE);
 		// fButtonDelete.setText("&Delete");
@@ -744,9 +753,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	private void enableButtons(boolean isPersonValid) {
 
-		IStructuredSelection selection = (IStructuredSelection) fPeopleViewer.getSelection();
+//		IStructuredSelection selection = (IStructuredSelection) fPeopleViewer.getSelection();
 
-		boolean isPersonSelected = !selection.isEmpty();
+//		boolean isPersonSelected = !selection.isEmpty();
 
 		fButtonAdd.setEnabled(fCurrentPerson == null || (fCurrentPerson != null && isPersonValid));
 
@@ -830,13 +839,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 
 		BusyIndicator.showWhile(null, new Runnable() {
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				Table table = fPeopleViewer.getTable();
 				int lastIndex = table.getSelectionIndex();
 
-				for (Iterator iter = selection.iterator(); iter.hasNext();) {
-					TourPerson person = (TourPerson) iter.next();
+				for (Iterator<TourPerson> iter = selection.iterator(); iter.hasNext();) {
+					TourPerson person = iter.next();
 
 					deletePerson(person);
 
@@ -891,6 +901,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		fRawDataPathEditor.setPropertyChangeListener(null);
 	}
 
+	@SuppressWarnings("unchecked")
 	private boolean removePersonFromTourData(TourPerson person) {
 
 		boolean returnResult = false;
@@ -958,10 +969,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	}
 
+	/**
+	 * select bike in the combo box
+	 */
 	private void selectBike(TourPerson person) {
-		/*
-		 * select bike in the combo box
-		 */
 
 		// select default value
 		int bikeIndex = 0;
@@ -986,22 +997,29 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			}
 		}
 	}
-	private void selectDevice(TourPerson person) {
-		/*
-		 * select device in the combo box
-		 */
 
-		int deviceIndex = 0;
+	/**
+	 * select device in the combo box
+	 */
+	private void selectDevice(TourPerson person) {
+
 		String deviceId = person.getDeviceReaderId();
 
 		if (deviceId == null) {
 			fComboDevice.select(0);
 		} else {
+
+			int deviceIndex = 0;
+
 			for (TourbookDevice device : fDeviceList) {
-				if (device != null && deviceId.equals(device.deviceId)) {
-					fComboDevice.select(deviceIndex);
-					break;
+
+				if (device != null) {
+					if (deviceId.equals(device.deviceId)) {
+						fComboDevice.select(deviceIndex);
+						break;
+					}
 				}
+
 				deviceIndex++;
 			}
 
@@ -1042,7 +1060,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			addModifyListener();
 
 		} else {
-			
+
 			isEnabled = false;
 			fCurrentPerson = null;
 
@@ -1072,22 +1090,19 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		boolean isValid = false;
 
 		if (fCurrentPerson == null) {
-			
-			isValid = true;
-			
-		} else if (fTextFirstName.getText().trim().equals("")) { //$NON-NLS-1$
-			
-			setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
 
-			// } else if (fComboDevice.getSelectionIndex() <= 0) {
-			// setErrorMessage("A device is required");
+			isValid = true;
+
+		} else if (fTextFirstName.getText().trim().equals("")) { //$NON-NLS-1$
+
+			setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
 
 		} else if (!fRawDataPathEditor.getStringValue().trim().equals("") //$NON-NLS-1$
 				&& !fRawDataPathEditor.isValid()) {
-			
+
 			setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
 
-		} else if (true) {
+		} else {
 			try {
 				Float.parseFloat(fTextHeight.getText());
 				Float.parseFloat(fTextWeight.getText());

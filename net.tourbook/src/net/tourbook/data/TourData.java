@@ -166,6 +166,9 @@ public class TourData {
 
 	// db-version 3 - start
 
+	/**
+	 * Profile used by the device 
+	 */
 	private short				deviceMode;
 
 	private short				deviceTimeInterval;
@@ -229,15 +232,23 @@ public class TourData {
 	private TourPerson			tourPerson;
 
 	/**
+	 * plugin id for the device which was used for this tour
 	 * Bike used for this tour
 	 */
 	@ManyToOne
 	private TourBike			tourBike;
 
 	/**
-	 * Device used for this tour
+	 * plugin id for the device which was used for this tour
 	 */
 	private String				devicePluginId;
+
+	/**
+	 * visible name for the used plugin to import the data 
+	 * TODO: save in db, remove @Transient
+	 */
+	@Transient
+	private String				devicePluginName;
 
 	/*
 	 * data series from the device
@@ -329,6 +340,13 @@ public class TourData {
 	 */
 	@Transient
 	public String				importRawDataFile;
+
+	/**
+	 * visible name for <code>deviceMode</code>{@code}deviceMode
+	 * TODO: save in db, remove @Transient
+	 */
+	@Transient
+	private String				deviceModeName;
 
 	public TourData() {}
 
@@ -540,8 +558,7 @@ public class TourData {
 			 * the 5.5.2007 a NumberFormatException occured so the calculation
 			 * for the tour id was adjusted
 			 */
-			tourId = Short.toString(getStartYear())
-					+ Short.toString(getStartMonth())
+			tourId = Short.toString(getStartYear()) + Short.toString(getStartMonth())
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
@@ -554,8 +571,7 @@ public class TourData {
 			// distance was shorted that the maximum for a Long datatype is not
 			// exceeded
 
-			tourId = Short.toString(getStartYear())
-					+ Short.toString(getStartMonth())
+			tourId = Short.toString(getStartYear()) + Short.toString(getStartMonth())
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
@@ -713,7 +729,7 @@ public class TourData {
 		out.println("----------------------------------------------------"); //$NON-NLS-1$
 		out.println("TOUR DATA"); //$NON-NLS-1$
 		out.println("----------------------------------------------------"); //$NON-NLS-1$
-		out.println("Typ:			" + getDeviceTourType()); //$NON-NLS-1$
+//		out.println("Typ:			" + getDeviceTourType()); //$NON-NLS-1$
 		out.println("Date:			" + getStartDay() + "." + getStartMonth() + "." + getStartYear()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		out.println("Time:			" + getStartHour() + ":" + getStartMinute()); //$NON-NLS-1$ //$NON-NLS-2$
 		out.println("Total distance:		" + getStartDistance()); //$NON-NLS-1$
@@ -778,8 +794,8 @@ public class TourData {
 
 		TourData td = (TourData) obj;
 
-		return this.getStartYear() == td.getStartYear()
-				&& this.getStartMonth() == td.getStartMonth()
+		return this.getStartYear() == td.getStartYear() && this.getStartMonth() == td
+				.getStartMonth()
 				&& this.getStartDay() == td.getStartDay()
 				&& this.getStartHour() == td.getStartHour()
 				&& this.getStartMinute() == td.getStartMinute()
@@ -1291,6 +1307,22 @@ public class TourData {
 
 	public void setTourMarkers(Set<TourMarker> tourMarkers) {
 		this.tourMarkers = tourMarkers;
+	}
+
+	public String getDeviceModeName() {
+		return deviceModeName;
+	}
+
+	public void setDeviceModeName(String deviceModeName) {
+		this.deviceModeName = deviceModeName;
+	}
+
+	public String getDeviceName() {
+		return devicePluginName;
+	}
+
+	public void setDeviceName(String deviceName) {
+		devicePluginName = deviceName;
 	}
 
 }

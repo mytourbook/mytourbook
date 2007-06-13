@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm
+ * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,33 +13,38 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.importdata;
 
-import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
 
-public class ActionImportFromDevice extends Action {
+public class WizardImportDialog extends WizardDialog {
 
-	private IWorkbenchWindow	fWindow;
+	private String	fWindowTitle;
 
-	public ActionImportFromDevice(IWorkbenchWindow window) {
+	public WizardImportDialog(Shell parentShell, IWizard newWizard, String windowTitle) {
 
-		fWindow = window;
+		super(parentShell, newWizard);
 
-		setText(Messages.Action_import_rawdata);
-		setToolTipText(Messages.Action_import_rawdata_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_import_rawdata));
+		setShellStyle(getShellStyle() | SWT.RESIZE);
+
+		fWindowTitle = windowTitle;
 	}
 
-	public void run() {
+	public void create() {
+		
+		super.create();
 
-		new WizardImportDialog(
-				fWindow.getShell(),
-				new WizardImportData(),
-				Messages.ImportWizard_Dlg_title).open();
+		getShell().setText(fWindowTitle);
+	}
+
+	protected IDialogSettings getDialogBoundsSettings() {
+		return TourbookPlugin.getDefault().getDialogSettingsSection(
+				getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
 	}
 }
