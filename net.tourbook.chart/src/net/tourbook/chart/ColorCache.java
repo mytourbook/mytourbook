@@ -32,24 +32,39 @@ public class ColorCache {
 		fDisplay = Display.getCurrent();
 	}
 
+	/**
+	 * Dispose all colors in the color cache
+	 */
 	public void dispose() {
-		for (Iterator i = fColors.values().iterator(); i.hasNext();) {
+		for (Iterator<Color> i = fColors.values().iterator(); i.hasNext();) {
 			((Color) i.next()).dispose();
 		}
 		fColors.clear();
 	}
 
+	/**
+	 * @param colorKey
+	 * @return Returns the color for the <code>colorKey</code> from the color cache or
+	 *         <code>null</code> when the color is not available
+	 */
 	public Color get(String colorKey) {
 		return fColors.get(colorKey);
 	}
 
-	public Color put(String colorKey, RGB rgb) {
+	/**
+	 * Creates a color in the color cache
+	 * 
+	 * @param colorKey
+	 * @param rgb
+	 * @return Returns the created color
+	 */
+	public Color createColor(String colorKey, RGB rgb) {
 
 		// check if key already exists
 		if (fColors.containsKey(colorKey)) {
 			return fColors.get(colorKey);
 		}
-		
+
 		Color color = new Color(fDisplay, rgb);
 
 		fColors.put(colorKey, color);
