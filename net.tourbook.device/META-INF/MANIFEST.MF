@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Device Reader Tools
+Bundle-Name: Device Reader
 Bundle-SymbolicName: net.tourbook.device
-Bundle-Version: 0.8.7
+Bundle-Version: 0.8.9.v2007-06
 Bundle-Activator: net.tourbook.device.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
