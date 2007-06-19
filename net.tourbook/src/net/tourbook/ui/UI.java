@@ -15,6 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import net.tourbook.data.TourType;
+import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.PixelConverter;
 
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -23,6 +29,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -34,8 +43,25 @@ import org.eclipse.ui.IMemento;
 
 public class UI {
 
+	private static final String				TOUR_TYPE_PREFIX	= "tourType";					//$NON-NLS-1$
+
+	private static UI						instance;
+
+	private final HashMap<String, Image>	fImageCache			= new HashMap<String, Image>();
+
+	private UI() {}
+
 	public static ColumnPixelData getColumnPixelWidth(PixelConverter pixelConverter, int width) {
 		return new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(width), false);
+	}
+
+	public static UI getInstance() {
+
+		if (instance == null) {
+			instance = new UI();
+		}
+
+		return instance;
 	}
 
 	/**
@@ -102,6 +128,16 @@ public class UI {
 		composite.setLayout(gridLayout);
 	}
 
+	public static void setDefaultColor(Control control) {
+		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+		control.setBackground(null);
+	}
+
+	public static void setErrorColor(Text control) {
+		control.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+	}
+
 	public static GridData setFieldWidth(Composite parent, StringFieldEditor field, int width) {
 		GridData gd = new GridData();
 		gd.widthHint = width;
@@ -139,14 +175,122 @@ public class UI {
 		};
 	}
 
-	public static void setDefaultColor(Control control) {
-		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-		control.setBackground(null);
+	public void dispose() {
+		disposeImages();
 	}
 
-	public static void setErrorColor(Text control) {
-		control.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+	private void disposeImages() {
+
+		for (final Iterator<Image> iterator = fImageCache.values().iterator(); iterator.hasNext();) {
+			iterator.next().dispose();
+		}
+		fImageCache.clear();
+	}
+
+	/**
+	 * dispose all tour type images
+	 */
+	public void disposeTourTypeImages() {
+
+		for (Iterator<String> iterator = fImageCache.keySet().iterator(); iterator.hasNext();) {
+
+			final String imageId = iterator.next();
+
+			if (imageId.startsWith(TOUR_TYPE_PREFIX)) {
+				fImageCache.get(imageId).dispose();
+				iterator.remove();
+			}
+		}
+	}
+
+	/**
+	 * @param display
+	 * @param graphColor
+	 * @return return the color for the graph
+	 */
+	private DrawingColors getTourTypeColors(final Display display, final long tourTypeId) {
+
+		final DrawingColors drawingColors = new DrawingColors();
+		final ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getTourTypes();
+
+		TourType colorTourType = null;
+
+		for (final TourType tourType : tourTypes) {
+			if (tourType.getTypeId() == tourTypeId) {
+				colorTourType = tourType;
+			}
+		}
+
+		if (colorTourType == null || colorTourType.getTypeId() == TourType.TOUR_TYPE_ID_NOT_DEFINED) {
+
+			// tour type was not found
+
+			drawingColors.colorBright = display.getSystemColor(SWT.COLOR_WHITE);
+			drawingColors.colorDark = display.getSystemColor(SWT.COLOR_WHITE);
+			drawingColors.colorLine = display.getSystemColor(SWT.COLOR_DARK_GRAY);
+
+			// prevent disposing the colors
+			drawingColors.mustBeDisposed = false;
+
+		} else {
+
+			drawingColors.colorBright = new Color(display, colorTourType.getRGBBright());
+			drawingColors.colorDark = new Color(display, colorTourType.getRGBDark());
+			drawingColors.colorLine = new Color(display, colorTourType.getRGBLine());
+		}
+
+		return drawingColors;
+	}
+
+	public Image getTourTypeImage(final long typeId) {
+
+		final String colorId = TOUR_TYPE_PREFIX + typeId;
+		Image image = fImageCache.get(colorId);
+
+		if (image == null) {
+
+			/*
+			 * create image for the tour type
+			 */
+
+			final Display display = Display.getCurrent();
+
+			final int imageWidth = 16;
+			final int imageHeight = 16;
+
+			image = new Image(display, imageWidth, imageHeight);
+
+			final GC gc = new GC(image);
+			{
+//				final int arcSize = 4;
+
+				final DrawingColors drawingColors = getTourTypeColors(display, typeId);
+
+				gc.setForeground(drawingColors.colorBright);
+				gc.setBackground(drawingColors.colorDark);
+
+//				gc.setAlpha(0x80);
+//				gc.fillRectangle(0, 0, imageWidth, imageHeight);
+//				
+//				gc.setAlpha(0xff);
+//				gc.fillGradientRectangle(4, 1, 8, imageHeight - 3, false);
+//				
+//				gc.setForeground(drawingColors.colorLine);
+//				gc.drawRoundRectangle(4, 0, 7, imageHeight - 2, arcSize, arcSize);
+
+				gc.fillGradientRectangle(4, 4, imageWidth - 8, imageHeight - 8, false);
+
+				gc.setForeground(drawingColors.colorLine);
+				gc.drawRectangle(3, 3, imageWidth - 7, imageHeight - 7);
+
+				drawingColors.dispose();
+			}
+			gc.dispose();
+
+			fImageCache.put(colorId, image);
+		}
+
+		return image;
 	}
 
 }

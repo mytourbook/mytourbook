@@ -15,26 +15,35 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import net.tourbook.plugin.TourbookPlugin;
+import org.eclipse.swt.widgets.TreeColumn;
 
-import org.eclipse.jface.action.Action;
+/**
+ * A ColumnDefinition contains the data for creating a column in a TableViewer
+ */
+public class TreeColumnDefinition extends ColumnDefinition {
 
-public class ActionModifyColumns extends Action {
+	private TreeColumn	fTreeColumn;
 
-	private ColumnManager	fColumnManager;
-
-	public ActionModifyColumns(ColumnManager columnManager) {
-
-		fColumnManager = columnManager;
-
-		setText("Customize &Columns");
-		setToolTipText("Set the columns which are displayed in the table");
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("configure_columns.gif"));
+	/**
+	 * @param columnManager
+	 *        manager which managed the columns
+	 * @param columnId
+	 *        column id which must be unique within the tree
+	 * @param style
+	 *        ui style
+	 */
+	public TreeColumnDefinition(ColumnManager columnManager, String columnId, int style) {
+		columnManager.addColumn(this);
+		fColumnId = columnId;
+		fStyle = style;
 	}
 
-	public void run() {
-		fColumnManager.openColumnDialog();
+	public void setTreeColumn(TreeColumn tableColumn) {
+		fTreeColumn = tableColumn;
+	}
+
+	public TreeColumn getTreeColumn() {
+		return fTreeColumn;
 	}
 
 }

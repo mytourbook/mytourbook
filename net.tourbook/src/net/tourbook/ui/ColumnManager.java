@@ -20,24 +20,27 @@ import java.util.ArrayList;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.TreeColumn;
 
 /**
- * Manages the columns for a table viewer
+ * Manages the columns for a tree/table-viewer
  * <p>
  * created: 2007-05-27 by Wolfgang Schramm
  */
 public class ColumnManager {
 
 	private final TableViewer			fTableViewer;
+	private final TreeViewer			fTreeViewer;
 
 	/**
-	 * contains the column definitions in the order of the table in <code>fTableViewer</code>
+	 * contains the column definitions in the sort order of the table/tree
 	 */
 	private ArrayList<ColumnDefinition>	fColumns			= new ArrayList<ColumnDefinition>();
 
@@ -45,6 +48,12 @@ public class ColumnManager {
 
 	public ColumnManager(final TableViewer tableViewer) {
 		fTableViewer = tableViewer;
+		fTreeViewer = null;
+	}
+
+	public ColumnManager(TreeViewer treeViewer) {
+		fTreeViewer = treeViewer;
+		fTableViewer = null;
 	}
 
 	protected void addColumn(final ColumnDefinition colDef) {
@@ -53,14 +62,35 @@ public class ColumnManager {
 	}
 
 	/**
-	 * Creates a column in the table viewer
+	 * Create columns for all defined columns
+	 */
+	public void createColumns() {
+
+		if (fTableViewer != null) {
+			// create all columns in the table
+			for (final ColumnDefinition colDef : fColumns) {
+				createTableColumn((TableColumnDefinition) colDef);
+			}
+
+		} else {
+			// create all columns in the tree
+			for (final ColumnDefinition colDef : fColumns) {
+				createTreeColumn((TreeColumnDefinition) colDef);
+			}
+		}
+
+		setAllColumnsVisible();
+	}
+
+	/**
+	 * Creates a column in a table viewer
 	 * 
 	 * @param colDef
 	 */
-	private void createColumn(final ColumnDefinition colDef) {
+	private void createTableColumn(final TableColumnDefinition colDef) {
 
 		TableViewerColumn tvc;
-		TableColumn tableColumn;
+		TableColumn tc;
 
 		tvc = new TableViewerColumn(fTableViewer, colDef.getStyle());
 
@@ -69,70 +99,86 @@ public class ColumnManager {
 			tvc.setLabelProvider(cellLabelProvider);
 		}
 
-		tableColumn = tvc.getColumn();
+		tc = tvc.getColumn();
 
 		final String columnText = colDef.getColumnText();
 		if (columnText != null) {
-			tableColumn.setText(columnText);
+			tc.setText(columnText);
 		}
 
 		final String columnToolTipText = colDef.getColumnToolTipText();
 		if (columnToolTipText != null) {
-			tableColumn.setToolTipText(columnToolTipText);
+			tc.setToolTipText(columnToolTipText);
 		}
 
 		// all columns are created, but hidden columns width is 0
 		if (colDef.isVisible()) {
-			tableColumn.setWidth(colDef.getColumnWidth());
+			tc.setWidth(colDef.getColumnWidth());
 		} else {
-			tableColumn.setWidth(0);
+			tc.setWidth(0);
 		}
 
-		tableColumn.setResizable(colDef.isColumnResizable());
-		tableColumn.setMoveable(colDef.isColumnMoveable());
+		tc.setResizable(colDef.isColumnResizable());
+		tc.setMoveable(colDef.isColumnMoveable());
 
 		// keep reference to the column definition
-		tableColumn.setData(colDef);
-		colDef.setTableColumn(tableColumn);
+		tc.setData(colDef);
+		colDef.setTableColumn(tc);
 
 		final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
 		if (columnSelectionListener != null) {
-			tableColumn.addSelectionListener(columnSelectionListener);
+			tc.addSelectionListener(columnSelectionListener);
 		}
-
-//		colDef.setVisible(true);
 	}
 
 	/**
-	 * Create columns for all defined columns
+	 * Creates a column in a tree viewer
+	 * 
+	 * @param colDef
 	 */
-	public void createColumns() {
+	private void createTreeColumn(final TreeColumnDefinition colDef) {
 
-		// create all columns in the table
-		for (final ColumnDefinition colDef : fColumns) {
-			createColumn(colDef);
+		TreeViewerColumn tvc;
+		TreeColumn tc;
+
+		tvc = new TreeViewerColumn(fTreeViewer, colDef.getStyle());
+
+		final CellLabelProvider cellLabelProvider = colDef.getCellLabelProvider();
+		if (cellLabelProvider != null) {
+			tvc.setLabelProvider(cellLabelProvider);
+		}
+
+		tc = tvc.getColumn();
+
+		final String columnText = colDef.getColumnText();
+		if (columnText != null) {
+			tc.setText(columnText);
+		}
+
+		final String columnToolTipText = colDef.getColumnToolTipText();
+		if (columnToolTipText != null) {
+			tc.setToolTipText(columnToolTipText);
+		}
+
+		// all columns are created, but hidden columns width is 0
+		if (colDef.isVisible()) {
+			tc.setWidth(colDef.getColumnWidth());
+		} else {
+			tc.setWidth(0);
+		}
+
+		tc.setResizable(colDef.isColumnResizable());
+		tc.setMoveable(colDef.isColumnMoveable());
+
+		// keep reference to the column definition
+		tc.setData(colDef);
+		colDef.setTreeColumn(tc);
+
+		final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
+		if (columnSelectionListener != null) {
+			tc.addSelectionListener(columnSelectionListener);
 		}
 	}
-
-//	/**
-//	 * Create columns which contain the column id's
-//	 * 
-//	 * @param columnIds
-//	 */
-//	public void createColumns(final int[] columnIds) {
-//
-//		final int[] columnIdAndWidth = getColumnWidths();
-//
-//		// create new columns
-//		for (final int columnId : columnIds) {
-//			final ColumnDefinition colDef = getColumnDefinition(columnId);
-//			if (colDef != null) {
-//				createColumn(colDef);
-//			}
-//		}
-//
-//		setColumnWidth(columnIdAndWidth);
-//	}
 
 	/**
 	 * @param columnId
@@ -140,9 +186,9 @@ public class ColumnManager {
 	 * @return Returns the column definition for the column id, or <code>null</code> when the
 	 *         column for the column id is not available
 	 */
-	private ColumnDefinition getColumnDefinitionByColumnId(final int columnId) {
+	private ColumnDefinition getColumnDefinitionByColumnId(final String columnId) {
 		for (final ColumnDefinition colDef : fColumns) {
-			if (colDef.getColumnId() == columnId) {
+			if (colDef.getColumnId().compareTo(columnId) == 0) {
 				return colDef;
 			}
 		}
@@ -165,33 +211,47 @@ public class ColumnManager {
 	}
 
 	/**
-	 * @return Returns the column which are managed by the <code>ColumnManager</code>
+	 * @return Returns the columns in the format: id/width ...
+	 */
+	public String[] getColumnIdAndWidth() {
+
+		ArrayList<String> columnIds = new ArrayList<String>();
+
+		if (fTableViewer != null) {
+			for (TableColumn column : fTableViewer.getTable().getColumns()) {
+				columnIds.add(((TableColumnDefinition) column.getData()).getColumnId());
+				columnIds.add(Integer.toString(column.getWidth()));
+			}
+		} else {
+			for (TreeColumn column : fTreeViewer.getTree().getColumns()) {
+				columnIds.add(((TreeColumnDefinition) column.getData()).getColumnId());
+				columnIds.add(Integer.toString(column.getWidth()));
+			}
+		}
+
+		return columnIds.toArray(new String[columnIds.size()]);
+	}
+
+	/**
+	 * @return Returns all column id's
+	 */
+	public String[] getColumnIds() {
+
+		ArrayList<String> columnIds = new ArrayList<String>();
+
+		for (ColumnDefinition colDef : fColumns) {
+			columnIds.add(colDef.getColumnId());
+		}
+
+		return columnIds.toArray(new String[columnIds.size()]);
+	}
+
+	/**
+	 * @return Returns the columns which are managed by the <code>ColumnManager</code>
 	 */
 	public ArrayList<ColumnDefinition> getColumns() {
 		return fColumns;
 	}
-
-//	/**
-//	 * @return Returns the columnId/columnWidth pair for all columns in the table
-//	 */
-//	private int[] getColumnWidths() {
-//
-//		final Table table = fTableViewer.getTable();
-//		final TableColumn[] columns = table.getColumns();
-//
-//		final int[] columnIdAndWidth = new int[columns.length * 2];
-//		int columIdx = 0;
-//
-//		for (final TableColumn column : columns) {
-//
-//			final ColumnDefinition colDef = (ColumnDefinition) column.getData();
-//
-//			columnIdAndWidth[columIdx++] = colDef.getColumnId();
-//			columnIdAndWidth[columIdx++] = column.getWidth();
-//		}
-//
-//		return columnIdAndWidth;
-//	}
 
 	public TableViewer getTableViewer() {
 		return fTableViewer;
@@ -203,7 +263,7 @@ public class ColumnManager {
 		 * read the order/width for the columns, this is necessary because the user can have
 		 * rearranged the columns or resize the columns with the mouse
 		 */
-		readColumnsFromTable(fTableViewer.getTable());
+		readColumnsFromTable();
 
 		final int returnValue = (new ColumnModifyDialog(Display.getCurrent().getActiveShell(), this))
 				.open();
@@ -217,28 +277,46 @@ public class ColumnManager {
 				colDef.setVisible(isVisible);
 
 				// show/hide column in the table
-				final TableColumn tableColumn = colDef.getTableColumn();
-				if (isVisible) {
-					tableColumn.setWidth(colDef.getColumnWidth());
-					tableColumn.setResizable(colDef.isColumnResizable());
-				} else {
-					tableColumn.setWidth(0);
-					tableColumn.setResizable(false);
+				if (colDef instanceof TableColumnDefinition) {
+					final TableColumn tableColumn = ((TableColumnDefinition) colDef)
+							.getTableColumn();
+					if (isVisible) {
+						tableColumn.setWidth(colDef.getColumnWidth());
+						tableColumn.setResizable(colDef.isColumnResizable());
+					} else {
+						tableColumn.setWidth(0);
+						tableColumn.setResizable(false);
+					}
+				} else if (colDef instanceof TreeColumnDefinition) {
+					final TreeColumn treeColumn = ((TreeColumnDefinition) colDef).getTreeColumn();
+					if (isVisible) {
+						treeColumn.setWidth(colDef.getColumnWidth());
+						treeColumn.setResizable(colDef.isColumnResizable());
+					} else {
+						treeColumn.setWidth(0);
+						treeColumn.setResizable(false);
+					}
 				}
+
 			}
 			orderColumnsInTable();
 		}
 	}
 
+	/**
+	 * Orders the columns in order of the column id's
+	 * 
+	 * @param columnIds
+	 */
 	@SuppressWarnings("unchecked")
-	public void orderColumns(final int[] columnIds) {
+	public void orderColumns(final String[] columnIds) {
 
 		final ArrayList<ColumnDefinition> orderedColumns = new ArrayList<ColumnDefinition>();
 		final ArrayList<ColumnDefinition> deletedColumns = (ArrayList<ColumnDefinition>) fColumns
 				.clone();
 
 		// create columns in the correct sort order
-		for (final int columnId : columnIds) {
+		for (final String columnId : columnIds) {
 			final ColumnDefinition colDef = getColumnDefinitionByColumnId(columnId);
 			if (colDef != null) {
 				orderedColumns.add(colDef);
@@ -246,7 +324,7 @@ public class ColumnManager {
 			}
 		}
 
-		// add all columns which are not sorted but available
+		// add all columns which are not sorted but are available
 		for (final ColumnDefinition colDef : deletedColumns) {
 			orderedColumns.add(colDef);
 		}
@@ -258,7 +336,7 @@ public class ColumnManager {
 	}
 
 	/**
-	 * Sort the column definition list in the order of the <code>tableItems</code>
+	 * Order the columns in the order of the <code>tableItems</code>
 	 * 
 	 * @param tableItems
 	 */
@@ -300,20 +378,29 @@ public class ColumnManager {
 		for (ColumnDefinition colDef : fColumns) {
 			columnOrder[columnIdx++] = colDef.getCreateIndex();
 		}
-		fTableViewer.getTable().setColumnOrder(columnOrder);
+		if (fTableViewer != null) {
+			fTableViewer.getTable().setColumnOrder(columnOrder);
+		} else {
+			fTreeViewer.getTree().setColumnOrder(columnOrder);
+		}
 	}
 
 	/**
 	 * Read the column order from a table and set <code>fColumn</code> according to this order
-	 * 
-	 * @param table
 	 */
-	private void readColumnsFromTable(Table table) {
+	private void readColumnsFromTable() {
 
 		final ArrayList<ColumnDefinition> orderedColumns = new ArrayList<ColumnDefinition>();
 
+		int[] columnOrder;
+		if (fTableViewer != null) {
+			columnOrder = fTableViewer.getTable().getColumnOrder();
+		} else {
+			columnOrder = fTreeViewer.getTree().getColumnOrder();
+		}
+
 		// create columns in the correct sort order
-		for (final int createIndex : fTableViewer.getTable().getColumnOrder()) {
+		for (final int createIndex : columnOrder) {
 
 			final ColumnDefinition colDef = getColumnDefinitionByCreateIndex(createIndex);
 
@@ -323,9 +410,20 @@ public class ColumnManager {
 				orderedColumns.add(colDef);
 
 				// set width
-				final int columnWidth = colDef.getTableColumn().getWidth();
-				if (columnWidth > 0) {
-					colDef.setWidth(columnWidth);
+				if (colDef instanceof TableColumnDefinition) {
+					final int columnWidth = ((TableColumnDefinition) colDef)
+							.getTableColumn()
+							.getWidth();
+					if (columnWidth > 0) {
+						colDef.setWidth(columnWidth);
+					}
+				} else if (colDef instanceof TreeColumnDefinition) {
+					final int columnWidth = ((TreeColumnDefinition) colDef)
+							.getTreeColumn()
+							.getWidth();
+					if (columnWidth > 0) {
+						colDef.setWidth(columnWidth);
+					}
 				}
 			}
 		}
@@ -338,9 +436,16 @@ public class ColumnManager {
 	 * shows all columns in the table
 	 */
 	public void setAllColumnsVisible() {
+
 		for (ColumnDefinition colDef : fColumns) {
+
 			colDef.setVisible(true);
-			colDef.getTableColumn().setWidth(colDef.getColumnWidth());
+
+			if (colDef instanceof TableColumnDefinition) {
+				((TableColumnDefinition) colDef).getTableColumn().setWidth(colDef.getColumnWidth());
+			} else if (colDef instanceof TreeColumnDefinition) {
+				((TreeColumnDefinition) colDef).getTreeColumn().setWidth(colDef.getColumnWidth());
+			}
 		}
 	}
 
@@ -350,20 +455,23 @@ public class ColumnManager {
 	 * @param columnIdAndWidth
 	 *        contains the data pair: column id/column width,...
 	 */
-	public void setColumnWidth(final int[] columnIdAndWidth) {
+	public void setColumnWidth(final String[] columnIdAndWidth) {
 
 		for (int dataIdx = 0; dataIdx < columnIdAndWidth.length; dataIdx++) {
 
-			final int columnId = columnIdAndWidth[dataIdx++];
-			final int columnWidth = columnIdAndWidth[dataIdx];
+			final String columnId = columnIdAndWidth[dataIdx++];
+			final int columnWidth = Integer.valueOf(columnIdAndWidth[dataIdx]);
 
 			final ColumnDefinition colDef = getColumnDefinitionByColumnId(columnId);
 			if (colDef != null) {
-				colDef.getTableColumn().setWidth(columnWidth);
 
-				if (columnWidth != 0) {
-					colDef.setVisible(true);
+				if (colDef instanceof TableColumnDefinition) {
+					((TableColumnDefinition) colDef).getTableColumn().setWidth(columnWidth);
+				} else if (colDef instanceof TreeColumnDefinition) {
+					((TreeColumnDefinition) colDef).getTreeColumn().setWidth(columnWidth);
 				}
+
+				colDef.setVisible(columnWidth != 0);
 			}
 		}
 	}

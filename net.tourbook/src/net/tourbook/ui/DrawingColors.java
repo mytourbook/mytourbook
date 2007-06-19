@@ -13,12 +13,31 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.ui;
 
 import org.eclipse.swt.graphics.Color;
 
 public class DrawingColors {
+
+	/**
+	 * when <code>true</code> the colors must be disposed, when <code>false</code> the colors
+	 * must not be disposed
+	 * <p>
+	 * default is <code>true</code>
+	 */
+	public boolean	mustBeDisposed	= true;
+
 	public Color	colorBright;
 	public Color	colorDark;
 	public Color	colorLine;
+
+	public void dispose() {
+
+		if (mustBeDisposed) {
+			colorBright.dispose();
+			colorDark.dispose();
+			colorLine.dispose();
+		}
+	}
+
 }

@@ -22,6 +22,7 @@ import java.sql.SQLException;
 
 import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -52,46 +53,15 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		return fApplicationActionBarAdvisor;
 	}
 
+	public void dispose() {
+		UI.getInstance().dispose();
+	}
+
 	public void postWindowCreate() {
 
 		// hide editor area
 		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
 		activePage.setEditorAreaVisible(false);
-	}
-
-	public void postWindowRestore() {
-
-	// // select person/tour type which was selected in the last session
-	// fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
-	//
-	// IWorkbenchPage activePage =
-	// getWindowConfigurer().getWindow().getActivePage();
-	// activePage.closeAllEditors(false);
-	}
-
-	public void preWindowOpen() {
-
-		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
-
-		configurer.setInitialSize(new Point(900, 700));
-		configurer.setShowCoolBar(true);
-		configurer.setShowStatusLine(true);
-		configurer.setShowProgressIndicator(true);
-
-		configurer.setTitle(Messages.App_Title);
-
-		// PlatformUI.getPreferenceStore().putValue(
-		// IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
-		// "false"); //$NON-NLS-1$
-
-		PlatformUI.getPreferenceStore().setValue(
-				IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
-				true);
-
-		PlatformUI.getPreferenceStore().setValue(
-				IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP,
-				true);
-
 	}
 
 	public void postWindowOpen() {
@@ -147,6 +117,41 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	public void postWindowRestore() {
+
+	// // select person/tour type which was selected in the last session
+	// fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
+	//
+	// IWorkbenchPage activePage =
+	// getWindowConfigurer().getWindow().getActivePage();
+	// activePage.closeAllEditors(false);
+	}
+
+	public void preWindowOpen() {
+
+		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+
+		configurer.setInitialSize(new Point(900, 700));
+		configurer.setShowCoolBar(true);
+		configurer.setShowStatusLine(true);
+		configurer.setShowProgressIndicator(true);
+
+		configurer.setTitle(Messages.App_Title);
+
+		// PlatformUI.getPreferenceStore().putValue(
+		// IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
+		// "false"); //$NON-NLS-1$
+
+		PlatformUI.getPreferenceStore().setValue(
+				IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
+				true);
+
+		PlatformUI.getPreferenceStore().setValue(
+				IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP,
+				true);
 
 	}
 }

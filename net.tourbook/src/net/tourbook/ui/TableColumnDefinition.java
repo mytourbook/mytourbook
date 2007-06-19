@@ -15,26 +15,35 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import net.tourbook.plugin.TourbookPlugin;
+import org.eclipse.swt.widgets.TableColumn;
 
-import org.eclipse.jface.action.Action;
+/**
+ * A ColumnDefinition contains the data for creating a column in a TableViewer
+ */
+public class TableColumnDefinition extends ColumnDefinition {
 
-public class ActionModifyColumns extends Action {
+	private TableColumn	fTableColumn;
 
-	private ColumnManager	fColumnManager;
-
-	public ActionModifyColumns(ColumnManager columnManager) {
-
-		fColumnManager = columnManager;
-
-		setText("Customize &Columns");
-		setToolTipText("Set the columns which are displayed in the table");
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("configure_columns.gif"));
+	/**
+	 * @param columnManager
+	 *        manager which managed the columns
+	 * @param columnId
+	 *        column id which must be unique within the table
+	 * @param style
+	 *        ui style
+	 */
+	public TableColumnDefinition(ColumnManager columnManager, String columnId, int style) {
+		columnManager.addColumn(this);
+		fColumnId = columnId;
+		fStyle = style;
 	}
 
-	public void run() {
-		fColumnManager.openColumnDialog();
+	public void setTableColumn(TableColumn tableColumn) {
+		fTableColumn = tableColumn;
+	}
+
+	public TableColumn getTableColumn() {
+		return fTableColumn;
 	}
 
 }

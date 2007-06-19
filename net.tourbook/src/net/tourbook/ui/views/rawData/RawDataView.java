@@ -16,20 +16,17 @@
 
 package net.tourbook.ui.views.rawData;
 
-import java.io.File;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
@@ -45,10 +42,11 @@ import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ActionModifyColumns;
-import net.tourbook.ui.ColumnDefinition;
 import net.tourbook.ui.ColumnManager;
+import net.tourbook.ui.TableColumnDefinition;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
-import net.tourbook.ui.views.tourBook.DrawingColors;
 import net.tourbook.ui.views.tourBook.SelectionRemovedTours;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -81,8 +79,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ViewForm;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -91,7 +87,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
@@ -109,90 +104,62 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class RawDataView extends ViewPart {
 
-	public static final String				ID							= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+	public static final String			ID							= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 
-	private static final String				TOUR_TYPE_PREFIX			= "tourType";								//$NON-NLS-1$
+	public static final int				COLUMN_DATE					= 0;
 
-	public static final int					COLUMN_DATE					= 0;
+	private static final String			MEMENTO_SASH_CONTAINER		= "importview.sash.container.";			//$NON-NLS-1$
+	private static final String			MEMENTO_IMPORT_FILENAME		= "importview.raw-data.filename";			//$NON-NLS-1$
+	private static final String			MEMENTO_SELECTED_TOUR_INDEX	= "importview.selected-tour-index";		//$NON-NLS-1$
+	private static final String			MEMENTO_IS_CHART_VISIBLE	= "importview.is-chart-visible";			//$NON-NLS-1$
+	private static final String			MEMENTO_COLUMN_SORT_ORDER	= "importview.column_sort_order";			//$NON-NLS-1$
+	private static final String			MEMENTO_COLUMN_WIDTH		= "importview.column_width";				//$NON-NLS-1$
 
-	public static final int					COLUMN_ID_DATE				= 10;
-	public static final int					COLUMN_ID_START_TIME		= 20;
-	public static final int					COLUMN_ID_RECORDING_TIME	= 30;
-	public static final int					COLUMN_ID_DRIVING_TIME		= 40;
-	public static final int					COLUMN_ID_DISTANCE			= 50;
-	public static final int					COLUMN_ID_SPEED				= 60;
-	public static final int					COLUMN_ID_ALTITUDE_UP		= 70;
-	private static final int				COLUMN_ID_ALTITUDE_DOWN		= 71;
-	public static final int					COLUMN_ID_DEVICE_PROFILE	= 80;
-	public static final int					COLUMN_ID_TIME_INTERVAL		= 90;
-	private static final int				COLUMN_ID_DB_ICON			= 100;
-	private static final int				COLUMN_ID_TOUR_TYPE			= 110;
-	private static final int				COLUMN_ID_IMPORT_FILE_PATH	= 120;
-	private static final int				COLUMN_ID_IMPORT_FILE_NAME	= 130;
-	private static final int				COLUMN_ID_DEVICE_NAME		= 140;
+	private static IMemento				fSessionMemento;
 
-	private static final String				MEMENTO_SASH_CONTAINER		= "importview.sash.container.";			//$NON-NLS-1$
-	private static final String				MEMENTO_IMPORT_FILENAME		= "importview.raw-data.filename";			//$NON-NLS-1$
-	private static final String				MEMENTO_SELECTED_TOUR_INDEX	= "importview.selected-tour-index";		//$NON-NLS-1$
-	private static final String				MEMENTO_IS_CHART_VISIBLE	= "importview.is-chart-visible";			//$NON-NLS-1$
-	private static final String				MEMENTO_COLUMN_SORT_ORDER	= "importview.column_sort_order";			//$NON-NLS-1$
-	private static final String				MEMENTO_COLUMN_WIDTH		= "importview.column_width";				//$NON-NLS-1$
+	private ViewerDetailForm			fViewerDetailForm;
+	private TableViewer					fTourViewer;
 
-	private static IMemento					fSessionMemento;
+	private TourChart					fTourChart;
+	private TourChartConfiguration		fTourChartConfig;
 
-	private ViewerDetailForm				fViewerDetailForm;
-	private TableViewer						fTourViewer;
+	private ActionImportFromFile		fActionImportTourFromFile;
+	private ActionClearView				fActionClearView;
+	private ActionModifyColumns			fActionModifyColumns;
 
-	private TourChart						fTourChart;
-	private TourChartConfiguration			fTourChartConfig;
+	private ActionSaveTourInDatabase	fActionSaveTour;
+	private ActionSaveTourInDatabase	fActionSaveTourWithPerson;
 
-	private ActionImportFromFile			fActionImportTourFromFile;
-	private ActionClearView					fActionClearView;
-	private ActionModifyColumns				fActionModifyColumns;
+	private ActionShowViewDetails		fActionShowTourChart;
 
-	private ActionSaveTourInDatabase		fActionSaveTour;
-	private ActionSaveTourInDatabase		fActionSaveTourWithPerson;
+	private ImageDescriptor				imageDatabaseDescriptor;
+	private ImageDescriptor				imageDatabaseOtherPersonDescriptor;
+	private ImageDescriptor				imageDatabasePlaceholderDescriptor;
+	private Image						imageDatabase;
+	private Image						imageDatabaseOtherPerson;
+	private Image						imageDatabasePlaceholder;
 
-	private ActionShowViewDetails			fActionShowTourChart;
+	private IPartListener2				fPartListener;
+	private ISelectionListener			fPostSelectionListener;
+	private IPropertyChangeListener		fPrefChangeListener;
+	private PostSelectionProvider		fPostSelectionProvider;
 
-	private ImageDescriptor					imageDatabaseDescriptor;
-	private ImageDescriptor					imageDatabaseOtherPersonDescriptor;
-	private ImageDescriptor					imageDatabasePlaceholderDescriptor;
-	private Image							imageDatabase;
-	private Image							imageDatabaseOtherPerson;
-	private Image							imageDatabasePlaceholder;
+	public Calendar						fCalendar;
+	private DateFormat					fDateFormatter;
+	private DateFormat					fTimeFormatter;
+	private DateFormat					fDurationFormatter;
+	private NumberFormat				fNumberFormatter;
 
-	private IPartListener2					fPartListener;
-	private ISelectionListener				fPostSelectionListener;
-	private IPropertyChangeListener			fPrefChangeListener;
-	private PostSelectionProvider			fPostSelectionProvider;
+	private ToolBarManager				fTbm;
+	private ViewForm					tourForm;
 
-	public Calendar							calendar;
-	public DateFormat						dateInstance;
-	public DateFormat						timeInstance;
-	private DateFormat						durationInstance;
-	private NumberFormat					numberInstance;
+	protected TourPerson				fActivePerson;
+	protected TourPerson				fNewActivePerson;
 
-	private ToolBarManager					fTbm;
+	protected boolean					fIsPartVisible				= false;
+	protected boolean					fIsViewerPersonDataDirty	= false;
 
-	private ViewForm						tourForm;
-
-	/**
-	 * status if the tour chart is displayed
-	 */
-	protected TourPerson					fActivePerson;
-	protected TourPerson					fNewActivePerson;
-
-	protected boolean						fIsPartVisible				= false;
-	protected boolean						fIsViewerPersonDataDirty	= false;
-
-	private final HashMap<String, Image>	fImages						= new HashMap<String, Image>();
-	private final ColorCache				fColorCache					= new ColorCache();
-
-	private int								fColorImageHeight			= -1;
-	private int								fColorImageWidth;
-
-	private ColumnManager					fColumnManager;
+	private ColumnManager				fColumnManager;
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -241,7 +208,6 @@ public class RawDataView extends ViewPart {
 					// update tour type in the raw data
 					RawDataManager.getInstance().updatePersonInRawData();
 
-					disposeImages();
 					fTourViewer.refresh();
 				}
 
@@ -249,127 +215,6 @@ public class RawDataView extends ViewPart {
 		};
 		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(
 				fPrefChangeListener);
-	}
-
-	/**
-	 * Set the size for the tour type images
-	 * 
-	 * @param display
-	 * @return
-	 */
-	private void ensureImageSize(final Display display) {
-
-		if (fColorImageHeight == -1) {
-
-			final Table table = fTourViewer.getTable();
-
-			fColorImageWidth = 16;
-			fColorImageHeight = table.getItemHeight();
-		}
-	}
-
-	private Image getTourTypeImage(final TourData tourData) {
-
-		final TourType tourType = tourData.getTourType();
-
-		if (tourType == null) {
-			return null;
-		}
-
-		final long typeId = tourType.getTypeId();
-
-		final String colorId = TOUR_TYPE_PREFIX + typeId;
-		Image image = fImages.get(colorId);
-
-		if (image == null) {
-
-			final Display display = Display.getCurrent();
-			ensureImageSize(display);
-			image = new Image(display, fColorImageWidth, fColorImageHeight);
-
-			final GC gc = new GC(image);
-			{
-				final int arcSize = 4;
-
-				final DrawingColors drawingColors = getTourTypeDrawingColors(display, typeId);
-
-				final Color colorBright = drawingColors.colorBright;
-
-				if (colorBright != null) {
-
-					gc.setForeground(colorBright);
-					gc.setBackground(drawingColors.colorDark);
-
-					// gc.setAlpha(0x0);
-					// gc.fillRectangle(0, 0, fColorImageWidth, fColorImageHeight);
-
-					gc.setAlpha(0xff);
-					gc.fillGradientRectangle(4, 1, 8, fColorImageHeight - 3, false);
-
-					gc.setForeground(drawingColors.colorLine);
-					gc.drawRoundRectangle(4, 0, 7, fColorImageHeight - 2, arcSize, arcSize);
-
-				}
-			}
-			gc.dispose();
-
-			fImages.put(colorId, image);
-		}
-
-		return image;
-	}
-
-	/**
-	 * @param display
-	 * @param graphColor
-	 * @return return the color for the graph
-	 */
-	private DrawingColors getTourTypeDrawingColors(final Display display, final long tourTypeId) {
-
-		final String colorIdBright = TOUR_TYPE_PREFIX + "bright" + tourTypeId; //$NON-NLS-1$
-		final String colorIdDark = TOUR_TYPE_PREFIX + "dark" + tourTypeId; //$NON-NLS-1$
-		final String colorIdLine = TOUR_TYPE_PREFIX + "line" + tourTypeId; //$NON-NLS-1$
-
-		final DrawingColors drawingColors = new DrawingColors();
-
-		Color colorBright = fColorCache.get(colorIdBright);
-		Color colorDark = fColorCache.get(colorIdDark);
-		Color colorLine = fColorCache.get(colorIdLine);
-
-		if (colorBright == null) {
-
-			final ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getTourTypes();
-
-			TourType tourTypeColors = null;
-
-			for (final TourType tourType : tourTypes) {
-				if (tourType.getTypeId() == tourTypeId) {
-					tourTypeColors = tourType;
-				}
-			}
-
-			if (tourTypeColors == null || tourTypeColors.getTypeId() == TourType.TOUR_TYPE_ID_NOT_DEFINED) {
-
-				// tour type was not found
-
-				colorBright = display.getSystemColor(SWT.COLOR_WHITE);
-				colorDark = display.getSystemColor(SWT.COLOR_WHITE);
-				colorLine = display.getSystemColor(SWT.COLOR_DARK_GRAY);
-
-			} else {
-
-				colorBright = fColorCache.put(colorIdBright, tourTypeColors.getRGBBright());
-
-				colorDark = fColorCache.put(colorIdDark, tourTypeColors.getRGBDark());
-				colorLine = fColorCache.put(colorIdLine, tourTypeColors.getRGBLine());
-			}
-		}
-
-		drawingColors.colorBright = colorBright;
-		drawingColors.colorDark = colorDark;
-		drawingColors.colorLine = colorLine;
-
-		return drawingColors;
 	}
 
 	private void addSelectionListener() {
@@ -478,8 +323,10 @@ public class RawDataView extends ViewPart {
 				fillContextMenu(manager);
 			}
 		});
+
 		final Menu menu = menuMgr.createContextMenu(fTourViewer.getControl());
 		fTourViewer.getControl().setMenu(menu);
+
 		getSite().registerContextMenu(menuMgr, fTourViewer);
 	}
 
@@ -561,11 +408,12 @@ public class RawDataView extends ViewPart {
 			e.printStackTrace();
 		}
 
-		calendar = GregorianCalendar.getInstance();
-		dateInstance = DateFormat.getDateInstance(DateFormat.SHORT);
-		timeInstance = DateFormat.getTimeInstance(DateFormat.SHORT);
-		durationInstance = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.GERMAN);
-		numberInstance = NumberFormat.getNumberInstance();
+		fCalendar = GregorianCalendar.getInstance();
+
+		fDateFormatter = DateFormat.getDateInstance(DateFormat.SHORT);
+		fTimeFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
+		fDurationFormatter = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.GERMAN);
+		fNumberFormatter = NumberFormat.getNumberInstance();
 	}
 
 	/**
@@ -574,9 +422,6 @@ public class RawDataView extends ViewPart {
 	private void createTourViewer(final Composite parent) {
 
 		// parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-
-		final PixelConverter pixelConverter = new PixelConverter(parent);
-		ColumnDefinition colDef;
 
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL
@@ -588,16 +433,45 @@ public class RawDataView extends ViewPart {
 		table.setLinesVisible(true);
 
 		fTourViewer = new TableViewer(table);
+
+		// define and create all columns
 		fColumnManager = new ColumnManager(fTourViewer);
+		defineAllColumns(parent);
+		fColumnManager.createColumns();
+
+		// table viewer
+		fTourViewer.setContentProvider(new TourDataContentProvider());
+		fTourViewer.setSorter(new DeviceImportSorter());
+
+		fTourViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(final DoubleClickEvent event) {
+				createChart(false);
+			}
+		});
+
+		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(final SelectionChangedEvent event) {
+				selectTour((StructuredSelection) event.getSelection());
+			}
+		});
+	}
+
+	/**
+	 * Defines all columns for the table viewer in the column manager
+	 * 
+	 * @param parent
+	 */
+	private void defineAllColumns(final Composite parent) {
+
+		final PixelConverter pixelConverter = new PixelConverter(parent);
+
+		TableColumnDefinition colDef;
 
 		/*
 		 * column: database indicator
 		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_DB_ICON, SWT.CENTER);
-		colDef.setLabel(Messages.RawData_Column_db_status_label);
-		colDef.setToolTipText(Messages.RawData_Column_db_status_tooltip);
-		colDef.setWidth(20);
-		colDef.setColumnResizable(false);
+		colDef = TableColumnFactory.DB_STATUS.createColumn(fColumnManager, pixelConverter);
+//		colDef.setColumnResizable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
 
@@ -617,19 +491,16 @@ public class RawDataView extends ViewPart {
 		/*
 		 * column: date
 		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_DATE, SWT.TRAIL);
-		colDef.setText(Messages.RawData_Column_date);
-		colDef.setLabel(Messages.RawData_Column_date_label);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(12));
+		colDef = TableColumnFactory.TOUR_DATE.createColumn(fColumnManager, pixelConverter);
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
 
 				final TourData tourData = (TourData) cell.getElement();
 
-				calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
+				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
 						.getStartDay());
-				cell.setText(dateInstance.format(calendar.getTime()));
+				cell.setText(fDateFormatter.format(fCalendar.getTime()));
 			}
 		});
 		colDef.addSelectionListener(new SelectionAdapter() {
@@ -642,53 +513,43 @@ public class RawDataView extends ViewPart {
 		/*
 		 * column: time
 		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_START_TIME, SWT.TRAIL);
-		colDef.setLabel(Messages.RawData_Column_time_label);
-		colDef.setText(Messages.RawData_Column_time);
-		colDef.setToolTipText(Messages.RawData_Column_time_tooltip);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		colDef = TableColumnFactory.TOUR_START_TIME.createColumn(fColumnManager, pixelConverter);
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
 
 				final TourData tourData = (TourData) cell.getElement();
-				calendar.set(0, 0, 0, tourData.getStartHour(), tourData.getStartMinute(), 0);
+				fCalendar.set(0, 0, 0, tourData.getStartHour(), tourData.getStartMinute(), 0);
 
-				cell.setText(timeInstance.format(calendar.getTime()));
+				cell.setText(fTimeFormatter.format(fCalendar.getTime()));
 			}
 		});
 
 		/*
 		 * column: tour type
 		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_TOUR_TYPE, SWT.TRAIL);
-		colDef.setLabel(Messages.RawData_Column_tour_type_label);
-		colDef.setToolTipText(Messages.RawData_Column_tour_type_tooltip);
-		colDef.setWidth(18);
-		colDef.setColumnResizable(false);
+		colDef = TableColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
+//		colDef.setColumnResizable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
-				cell.setImage(getTourTypeImage((TourData) cell.getElement()));
+				final TourType tourType = ((TourData) cell.getElement()).getTourType();
+				if (tourType != null) {
+					cell.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+				}
 			}
 		});
 
 		/*
 		 * column: recording time
 		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_RECORDING_TIME, SWT.TRAIL);
-		colDef.setLabel(Messages.RawData_Column_recording_time_label);
-		colDef.setText(Messages.RawData_Column_recording_time);
-		colDef.setToolTipText(Messages.RawData_Column_recording_time_tooltip);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		colDef = TableColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
 
 				final int recordingTime = ((TourData) cell.getElement()).getTourRecordingTime();
 
-				if (recordingTime == 0) {
-					cell.setText(""); //$NON-NLS-1$
-				} else {
-					calendar.set(
+				if (recordingTime != 0) {
+					fCalendar.set(
 							0,
 							0,
 							0,
@@ -696,7 +557,7 @@ public class RawDataView extends ViewPart {
 							((recordingTime % 3600) / 60),
 							((recordingTime % 3600) % 60));
 
-					cell.setText(durationInstance.format(calendar.getTime()));
+					cell.setText(fDurationFormatter.format(fCalendar.getTime()));
 				}
 			}
 		});
@@ -704,20 +565,14 @@ public class RawDataView extends ViewPart {
 		/*
 		 * column: driving time
 		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_DRIVING_TIME, SWT.TRAIL);
-		colDef.setLabel(Messages.RawData_Column_driving_time_label);
-		colDef.setText(Messages.RawData_Column_driving_time);
-		colDef.setToolTipText(Messages.RawData_Column_driving_time_tooltip);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		colDef = TableColumnFactory.DRIVING_TIME.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
 
 				final int drivingTime = ((TourData) cell.getElement()).getTourDrivingTime();
 
-				if (drivingTime == 0) {
-					cell.setText(""); //$NON-NLS-1$
-				} else {
-					calendar.set(
+				if (drivingTime != 0) {
+					fCalendar.set(
 							0,
 							0,
 							0,
@@ -725,7 +580,7 @@ public class RawDataView extends ViewPart {
 							((drivingTime % 3600) / 60),
 							((drivingTime % 3600) % 60));
 
-					cell.setText(durationInstance.format(calendar.getTime()));
+					cell.setText(fDurationFormatter.format(fCalendar.getTime()));
 				}
 			}
 		});
@@ -733,20 +588,14 @@ public class RawDataView extends ViewPart {
 		/*
 		 * column: distance
 		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_DISTANCE, SWT.TRAIL);
-		colDef.setLabel(Messages.RawData_Column_distance_label);
-		colDef.setText(Messages.RawData_Column_distance);
-		colDef.setToolTipText(Messages.RawData_Column_distance_tooltip);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
+		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
 				final int tourDistance = ((TourData) cell.getElement()).getTourDistance();
-				if (tourDistance == 0) {
-					cell.setText(""); //$NON-NLS-1$
-				} else {
-					numberInstance.setMinimumFractionDigits(2);
-					numberInstance.setMaximumFractionDigits(2);
-					cell.setText(numberInstance.format(((float) tourDistance) / 1000));
+				if (tourDistance != 0) {
+					fNumberFormatter.setMinimumFractionDigits(2);
+					fNumberFormatter.setMaximumFractionDigits(2);
+					cell.setText(fNumberFormatter.format(((float) tourDistance) / 1000));
 				}
 			}
 		});
@@ -754,22 +603,17 @@ public class RawDataView extends ViewPart {
 		/*
 		 * column: speed
 		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_SPEED, SWT.TRAIL);
-		colDef.setLabel(Messages.RawData_Column_speed_label);
-		colDef.setText(Messages.RawData_Column_speed);
-		colDef.setToolTipText(Messages.RawData_Column_speed_tooltip);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(9));
+		colDef = TableColumnFactory.SPEED.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
 				final TourData tourData = ((TourData) cell.getElement());
 				final int tourDistance = tourData.getTourDistance();
 				final int drivingTime = tourData.getTourDrivingTime();
-				if (drivingTime == 0) {
-					cell.setText(""); //$NON-NLS-1$
-				} else {
-					numberInstance.setMinimumFractionDigits(1);
-					numberInstance.setMaximumFractionDigits(1);
-					cell.setText(numberInstance.format(((float) tourDistance) / drivingTime * 3.6));
+				if (drivingTime != 0) {
+					fNumberFormatter.setMinimumFractionDigits(1);
+					fNumberFormatter.setMaximumFractionDigits(1);
+					cell.setText(fNumberFormatter
+							.format(((float) tourDistance) / drivingTime * 3.6));
 				}
 			}
 		});
@@ -777,19 +621,13 @@ public class RawDataView extends ViewPart {
 		/*
 		 * column: altitude up
 		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_ALTITUDE_UP, SWT.TRAIL);
-		colDef.setLabel(Messages.RawData_Column_altitude_up_label);
-		colDef.setText(Messages.RawData_Column_altitude_up);
-		colDef.setToolTipText(Messages.RawData_Column_altitude_up_tooltip);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		colDef = TableColumnFactory.ALTITUDE_UP.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
 				final int tourAltUp = ((TourData) cell.getElement()).getTourAltUp();
-				if (tourAltUp == 0) {
-					cell.setText("");
-				} else {
-					numberInstance.setMinimumFractionDigits(0);
-					cell.setText(numberInstance.format(tourAltUp));
+				if (tourAltUp != 0) {
+					fNumberFormatter.setMinimumFractionDigits(0);
+					cell.setText(fNumberFormatter.format(tourAltUp));
 				}
 			}
 		});
@@ -797,114 +635,22 @@ public class RawDataView extends ViewPart {
 		/*
 		 * column: altitude down
 		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_ALTITUDE_DOWN, SWT.TRAIL);
-		colDef.setLabel("Altitude down (m)");
-		colDef.setText("m");
-		colDef.setToolTipText("Altitude up");
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		colDef = TableColumnFactory.ALTITUDE_DOWN.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
 				final int tourAltDown = ((TourData) cell.getElement()).getTourAltDown();
-				if (tourAltDown == 0) {
-					cell.setText("");
-				} else {
-					numberInstance.setMinimumFractionDigits(0);
-					cell.setText(numberInstance.format(tourAltDown));
+				if (tourAltDown != 0) {
+					fNumberFormatter.setMinimumFractionDigits(0);
+					cell.setText(fNumberFormatter.format(tourAltDown));
 				}
 			}
 		});
 
-		/*
-		 * column: profile
-		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_DEVICE_PROFILE, SWT.LEAD);
-		colDef.setLabel(Messages.RawData_Column_profile_label);
-		colDef.setText(Messages.RawData_Column_profile);
-		colDef.setToolTipText(Messages.RawData_Column_profile_tooltip);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
-		colDef.setLabelProvider(new CellLabelProvider() {
-			public void update(ViewerCell cell) {
-				cell.setText(((TourData) cell.getElement()).getDeviceModeName());
-			}
-		});
-
-		/*
-		 * column: interval
-		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_TIME_INTERVAL, SWT.TRAIL);
-		colDef.setLabel(Messages.RawData_Column_time_interval_label);
-		colDef.setText(Messages.RawData_Column_time_interval);
-		colDef.setToolTipText(Messages.RawData_Column_time_interval_tooltip);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
-		colDef.setLabelProvider(new CellLabelProvider() {
-			public void update(ViewerCell cell) {
-				cell.setText(Integer.toString(((TourData) cell.getElement())
-						.getDeviceTimeInterval()));
-			}
-		});
-
-		/*
-		 * column: device name
-		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_DEVICE_NAME, SWT.LEAD);
-		colDef.setLabel(Messages.RawData_Column_device_label);
-		colDef.setText(Messages.RawData_Column_device);
-		colDef.setToolTipText(Messages.RawData_Column_device_tooltip);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
-		colDef.setLabelProvider(new CellLabelProvider() {
-			public void update(ViewerCell cell) {
-				cell.setText(((TourData) cell.getElement()).getDeviceName());
-			}
-		});
-
-		/*
-		 * column: import file path
-		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_IMPORT_FILE_PATH, SWT.LEAD);
-		colDef.setLabel(Messages.RawData_Column_import_filepath_label);
-		colDef.setText(Messages.RawData_Column_import_filepath);
-		colDef.setToolTipText(Messages.RawData_Column_import_filepath_tooltip);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(20));
-		colDef.setLabelProvider(new CellLabelProvider() {
-			public void update(ViewerCell cell) {
-				cell.setText(new File(((TourData) cell.getElement()).importRawDataFile)
-						.getParentFile()
-						.getPath());
-			}
-		});
-
-		/*
-		 * column: import file name
-		 */
-		colDef = new ColumnDefinition(fColumnManager, COLUMN_ID_IMPORT_FILE_NAME, SWT.LEAD);
-		colDef.setLabel(Messages.RawData_Column_import_filename_label);
-		colDef.setText(Messages.RawData_Column_import_filename);
-		colDef.setToolTipText(Messages.RawData_Column_import_filename_tooltip);
-		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(20));
-		colDef.setLabelProvider(new CellLabelProvider() {
-			public void update(ViewerCell cell) {
-				cell.setText(new File(((TourData) cell.getElement()).importRawDataFile).getName());
-			}
-		});
-
-		// create all columns
-		fColumnManager.createColumns();
-
-		// table viewer
-		fTourViewer.setContentProvider(new TourDataContentProvider());
-		fTourViewer.setSorter(new DeviceImportSorter());
-
-		fTourViewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(final DoubleClickEvent event) {
-				createChart(false);
-			}
-		});
-
-		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(final SelectionChangedEvent event) {
-				selectTour((StructuredSelection) event.getSelection());
-			}
-		});
+		TableColumnFactory.DEVICE_PROFILE.createColumn(fColumnManager, pixelConverter);
+		TableColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);
+		TableColumnFactory.DEVICE_NAME.createColumn(fColumnManager, pixelConverter);
+		TableColumnFactory.IMPORT_FILE_PATH.createColumn(fColumnManager, pixelConverter);
+		TableColumnFactory.IMPORT_FILE_NAME.createColumn(fColumnManager, pixelConverter);
 	}
 
 	public void dispose() {
@@ -927,18 +673,7 @@ public class RawDataView extends ViewPart {
 
 		getSite().setSelectionProvider(null);
 
-		disposeImages();
-
 		super.dispose();
-	}
-
-	private void disposeImages() {
-		for (final Iterator<Image> i = fImages.values().iterator(); i.hasNext();) {
-			i.next().dispose();
-		}
-		fImages.clear();
-
-		fColorCache.dispose();
 	}
 
 	@SuppressWarnings("unchecked")//$NON-NLS-1$
@@ -1022,16 +757,18 @@ public class RawDataView extends ViewPart {
 			showViewerDetails(isChartVisible);
 			fActionShowTourChart.setChecked(isChartVisible);
 
-			// sort table columns
+			// restore table columns sort order
 			final String mementoColumnSortOrderIds = memento.getString(MEMENTO_COLUMN_SORT_ORDER);
 			if (mementoColumnSortOrderIds != null) {
-				fColumnManager.orderColumns(convertStringToIntArray(mementoColumnSortOrderIds));
+				fColumnManager.orderColumns(StringToArrayConverter
+						.convertStringToArray(mementoColumnSortOrderIds));
 			}
 
 			// restore column width
 			final String mementoColumnWidth = memento.getString(MEMENTO_COLUMN_WIDTH);
 			if (mementoColumnWidth != null) {
-				fColumnManager.setColumnWidth(convertStringToIntArray(mementoColumnWidth));
+				fColumnManager.setColumnWidth(StringToArrayConverter
+						.convertStringToArray(mementoColumnWidth));
 			}
 
 //			// restore imported tours
@@ -1053,19 +790,7 @@ public class RawDataView extends ViewPart {
 //
 //				selectTour((StructuredSelection) fTourViewer.getSelection());
 //			}
-		} else {
-			fColumnManager.setAllColumnsVisible();
 		}
-	}
-
-	private int[] convertStringToIntArray(final String mementoColumnWidth) {
-		String[] columnIdAndWidth = StringToArrayConverter.convertStringToArray(mementoColumnWidth);
-		int[] columnIds = new int[columnIdAndWidth.length];
-
-		for (int columnIdx = 0; columnIdx < columnIds.length; columnIdx++) {
-			columnIds[columnIdx] = Integer.valueOf(columnIdAndWidth[columnIdx]);
-		}
-		return columnIds;
 	}
 
 	private void saveSettings() {
@@ -1094,38 +819,13 @@ public class RawDataView extends ViewPart {
 		// save selected tour in the viewer
 		memento.putInteger(MEMENTO_SELECTED_TOUR_INDEX, fTourViewer.getTable().getSelectionIndex());
 
-		saveColumns(memento);
-	}
-
-	/**
-	 * save all visible columns in the memento
-	 */
-	private void saveColumns(IMemento memento) {
-
-		// get columnId for all visible columns
-		ArrayList<String> columnIds = new ArrayList<String>();
-
-		/*
-		 * save all columns in the current order
-		 */
-		columnIds.clear();
-		for (ColumnDefinition colDef : fColumnManager.getColumns()) {
-			columnIds.add(Integer.toString(colDef.getColumnId()));
-		}
+		// save column sort order
 		memento.putString(MEMENTO_COLUMN_SORT_ORDER, StringToArrayConverter
-				.convertArrayToString(columnIds.toArray()));
+				.convertArrayToString(fColumnManager.getColumnIds()));
 
-		/*
-		 * save columns width in the format: id/width...
-		 */
-		columnIds.clear();
-		Table table = fTourViewer.getTable();
-		for (TableColumn column : table.getColumns()) {
-			columnIds.add(Integer.toString(((ColumnDefinition) column.getData()).getColumnId()));
-			columnIds.add(Integer.toString(column.getWidth()));
-		}
+		// save columns width
 		memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter
-				.convertArrayToString(columnIds.toArray()));
+				.convertArrayToString(fColumnManager.getColumnIdAndWidth()));
 	}
 
 	/**
