@@ -409,7 +409,6 @@ public class RawDataView extends ViewPart {
 		}
 
 		fCalendar = GregorianCalendar.getInstance();
-
 		fDateFormatter = DateFormat.getDateInstance(DateFormat.SHORT);
 		fTimeFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
 		fDurationFormatter = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.GERMAN);

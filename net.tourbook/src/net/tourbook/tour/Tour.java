@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm
+ * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,325 +15,200 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import java.util.ArrayList;
-import java.util.EventListener;
-import java.util.EventObject;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
-import net.tourbook.Messages;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.UI;
+import net.tourbook.tour.TourOLD.ITourChangeListener;
 
-import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.custom.ViewForm;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IMemento;
 
-public class Tour extends ViewForm {
+public class Tour extends Composite {
 
-	private static final String					MEMENTO_TOUR_SASH_TOURINFO		= "tour.sash.tourInfo"; //$NON-NLS-1$
-	private static final String					MEMENTO_TOUR_TOURINFO_ISVISIBLE	= "tour.tourInfo.visible"; //$NON-NLS-1$
+	private CTabFolder		fTabFolder;
+	private CTabItem		fChartItem;
+	private CTabItem		fTourDataItem;
 
-	private SashForm							fTourSash;
-	private ToolBarManager						fToolbarMgr;
-	private TourChart							fTourChart;
+	private TourChart		fTourChart;
 
-	// private ActionShowTourInfo fActionShowTourInfo;
+	public Calendar			fCalendar			= GregorianCalendar.getInstance();
+	private DateFormat		fDateFormatter		= DateFormat.getDateInstance(DateFormat.SHORT);
+	private DateFormat		fTimeFormatter		= DateFormat.getTimeInstance(DateFormat.SHORT);
+	private DateFormat		fDurationFormatter	= DateFormat.getTimeInstance(
+														DateFormat.SHORT,
+														Locale.GERMAN);
+	private NumberFormat	fNumberFormatter	= NumberFormat.getNumberInstance();
 
-	private Composite							fTourInfo;
-	private Combo								fComboTourType;
-	private ArrayList<TourType>					fTourTypes;
-	private TourData							fTourData;
-	private Preferences.IPropertyChangeListener	fPrefChangeListener;
-
-	protected ListenerList						fPropertyListeners				= new ListenerList();
-
-	/**
-	 * Listener for tour changes
-	 */
-	public interface ITourChangeListener extends EventListener {
-
-		public void tourChanged(TourChangeEvent event);
-	}
-
-	public static class TourChangeEvent extends EventObject {
-
-		private static final long	serialVersionUID	= 1L;
-
-		protected TourChangeEvent(Tour source) {
-			super(source);
-		}
-	}
+	private Label			fLblDate;
+	private Label			fLblStartTime;
+	private Label			fLblRecordingTime;
+	private Label			fLblDrivingTime;
+	private Label			fLblTitle;
+	private Label			fLblStartLocation;
+	private Label			fLblEndLocation;
 
 	public Tour(Composite parent, int style) {
+
 		super(parent, style);
-		createContent();
+
+		createControls();
+
 	}
 
-	private void addPrefListener() {
+	public void addTourChangedListener(ITourChangeListener tourChangeListener) {
 
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(Preferences.PropertyChangeEvent event) {
-
-				final String property = event.getProperty();
-
-				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-					updateTourTypes();
-				}
-			}
-
-		};
-		// register the listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(
-				fPrefChangeListener);
 	}
 
-	public void addTourChangedListener(ITourChangeListener listener) {
-		fPropertyListeners.add(listener);
+	private void createControls() {
+
+		setLayout(new FillLayout());
+
+		fTabFolder = new CTabFolder(this, SWT.FLAT | SWT.BOTTOM);
+
+		fTourChart = new TourChart(fTabFolder, SWT.FLAT, true);
+
+		fChartItem = new CTabItem(fTabFolder, SWT.FLAT);
+		fChartItem.setText("Tour Chart");
+		fChartItem.setControl(fTourChart);
+
+		fTourDataItem = new CTabItem(fTabFolder, SWT.FLAT);
+		fTourDataItem.setText("Tour Data");
+		fTourDataItem.setControl(createTourDataControl());
+
+		// select the tour chart item
+		fTabFolder.setSelection(fChartItem);
 	}
 
-	private void createActions() {
+	private Control createTourDataControl() {
 
-	// fActionShowTourInfo = new ActionShowTourInfo(this);
-	//
-	// fToolbarMgr.add(fActionShowTourInfo);
-	}
+		Composite container = new Composite(fTabFolder, SWT.NONE);
+		container.setLayout(new GridLayout(2, false));
 
-	private void createContent() {
+		Label label;
+		final GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
 
-		// viewform topleft: toolbar
-		final ToolBar toolBarControl = new ToolBar(this, SWT.FLAT | SWT.WRAP);
+		// tour date
+		label = new Label(container, SWT.NONE);
+		label.setText("Tour Date:");
+		fLblDate = new Label(container, SWT.NONE);
+		fLblDate.setLayoutData(gd);
 
-		// wrap the tool bar on resize
-		// toolBarControl.addListener(SWT.Resize, new Listener() {
-		// public void handleEvent(Event e) {
-		//
-		// Rectangle rect = getClientArea();
-		//
-		// Point size = toolBarControl.computeSize(rect.width, SWT.DEFAULT);
-		// toolBarControl.setSize(size);
-		// }
-		// });
+		// start time
+		label = new Label(container, SWT.NONE);
+		label.setText("Start Time:");
+		fLblStartTime = new Label(container, SWT.NONE);
+		fLblStartTime.setLayoutData(gd);
 
-		fToolbarMgr = new ToolBarManager(toolBarControl);
+		// recording time
+		label = new Label(container, SWT.NONE);
+		label.setText("Recording Time:");
+		fLblRecordingTime = new Label(container, SWT.NONE);
+		fLblRecordingTime.setLayoutData(gd);
 
-		// viewform content: sash
-		fTourSash = new SashForm(this, SWT.HORIZONTAL);
-		fTourSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		// driving time
+		label = new Label(container, SWT.NONE);
+		label.setText("Driving Time:");
+		fLblDrivingTime = new Label(container, SWT.NONE);
+		fLblDrivingTime.setLayoutData(gd);
 
-		// fTourSash.addListener(SWT.Resize, new Listener() {
-		// public void handleEvent(Event e) {
-		//
-		// Rectangle rect = getClientArea();
-		//
-		// Point size = toolBarControl.computeSize(rect.width, rect.height);
-		// fTourSash.setSize(size);
-		// }
-		// });
+		// title
+		label = new Label(container, SWT.NONE);
+		label.setText("Title:");
+		fLblTitle = new Label(container, SWT.NONE);
+		fLblTitle.setLayoutData(gd);
 
-		// set view form controls
-		setTopLeft(toolBarControl);
-		setContent(fTourSash);
+		// start location
+		label = new Label(container, SWT.NONE);
+		label.setText("Start Location:");
+		fLblStartLocation = new Label(container, SWT.NONE);
+		fLblStartLocation.setLayoutData(gd);
 
-		fTourInfo = createTourInfo(fTourSash);
+		// end location
+		label = new Label(container, SWT.NONE);
+		label.setText("End Location:");
+		fLblEndLocation = new Label(container, SWT.NONE);
+		fLblEndLocation.setLayoutData(gd);
 
-		// tour chart
-		fTourChart = new TourChart(fTourSash, SWT.FLAT, true);
-		fTourChart.setToolBarManager(fToolbarMgr);
-
-		createActions();
-
-		addPrefListener();
-
-		showTourInfo(false);
-	}
-
-	private Composite createTourInfo(Composite parent) {
-
-		Composite tourInfoContainer = new Composite(parent, SWT.NONE);
-		GridLayout gridLayout = new GridLayout(2, false);
-		gridLayout.marginLeft = 5;
-		gridLayout.marginTop = 5;
-		gridLayout.marginWidth = 0;
-		gridLayout.marginHeight = 0;
-		tourInfoContainer.setLayout(gridLayout);
-
-		Label tourInfo = new Label(tourInfoContainer, SWT.NONE);
-		tourInfo.setText(Messages.Tour_Label_tour_type);
-
-		fComboTourType = new Combo(tourInfoContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-		fComboTourType.setVisibleItemCount(10);
-		fComboTourType.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				updateTourType();
-			}
-		});
-
-		updateTourTypes();
-
-		return tourInfoContainer;
-	}
-
-	public void dispose() {
-
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(
-				fPrefChangeListener);
-
-		super.dispose();
-	}
-
-	private void fireTourChanged() {
-		Object[] listeners = fPropertyListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			final ITourChangeListener listener = (ITourChangeListener) listeners[i];
-			SafeRunnable.run(new SafeRunnable() {
-				public void run() {
-					listener.tourChanged(new TourChangeEvent(Tour.this));
-				}
-			});
-		}
+		return container;
 	}
 
 	public TourChart getTourChart() {
 		return fTourChart;
 	}
 
-	public void removeTourChangedListener(ITourChangeListener listener) {
-		fPropertyListeners.remove(listener);
-	}
-
-	/**
-	 * set the memento and restore saved data
-	 * 
-	 * @param memento
-	 */
-	public void restoreState(IMemento memento) {
-
-		if (memento == null) {
-			return;
-		}
-
-		// restore sash weights
-		UI
-				.restoreSashWeight(fTourSash, memento, MEMENTO_TOUR_SASH_TOURINFO, (new int[] {
-						10,
-						10 }));
-
-		Integer mementoIsVisible = memento.getInteger(MEMENTO_TOUR_TOURINFO_ISVISIBLE);
-		if (mementoIsVisible != null) {
-
-			// show/hide tour info
-			// boolean isInfoVisible = mementoIsVisible == 1;
-			// fActionShowTourInfo.setChecked(isInfoVisible);
-			// showTourInfo(isInfoVisible);
-		}
-	}
-
-	/**
-	 * save the tour settings
-	 * 
-	 * @param memento
-	 */
-	public void saveState(IMemento memento) {
-		// save sash weights
-		UI.saveSashWeight(fTourSash, memento, MEMENTO_TOUR_SASH_TOURINFO);
-
-		// save tour info status
-		// memento
-		// .putInteger(MEMENTO_TOUR_TOURINFO_ISVISIBLE,
-		// fActionShowTourInfo.isChecked()
-		// ? 1
-		// : 0);
-	}
-
-	/**
-	 * @param showTourInfo
-	 *        <code>true</code> to show the sash part for the tour info
-	 */
-	void showTourInfo(boolean showTourInfo) {
-		fTourSash.setMaximizedControl(showTourInfo ? null : fTourChart);
-	}
-
-	/**
-	 * Update the tour data
-	 * 
-	 * @param tourData
-	 */
 	public void refreshTourData(TourData tourData) {
 
-		fTourData = tourData;
+		// tour date
+		fLblDate.setText(TourManager.getTourDate(tourData));
 
-		fComboTourType.deselectAll();
+		// start time
+		fCalendar.set(0, 0, 0, tourData.getStartHour(), tourData.getStartMinute(), 0);
+		fLblStartTime.setText(fTimeFormatter.format(fCalendar.getTime()));
 
-		// select the tour type in the combo box
-		TourType dataTourType = tourData.getTourType();
-		if (dataTourType != null) {
+		// recording time
+		final int recordingTime = tourData.getTourRecordingTime();
+		if (recordingTime == 0) {
+			fLblRecordingTime.setText("");
+		} else {
+			fCalendar.set(
+					0,
+					0,
+					0,
+					recordingTime / 3600,
+					((recordingTime % 3600) / 60),
+					((recordingTime % 3600) % 60));
 
-			long typeId = dataTourType.getTypeId();
-
-			int typeIndex = 0;
-			for (TourType tourType : fTourTypes) {
-				if (tourType.getTypeId() == typeId) {
-					fComboTourType.select(typeIndex);
-					break;
-				}
-				typeIndex++;
-			}
+			fLblRecordingTime.setText(fDurationFormatter.format(fCalendar.getTime()));
 		}
+
+		// driving time
+		final int drivingTime = tourData.getTourDrivingTime();
+		if (drivingTime == 0) {
+			fLblDrivingTime.setText("");
+		} else {
+			fCalendar.set(
+					0,
+					0,
+					0,
+					drivingTime / 3600,
+					((drivingTime % 3600) / 60),
+					((drivingTime % 3600) % 60));
+
+			fLblDrivingTime.setText(fDurationFormatter.format(fCalendar.getTime()));
+		}
+
+		// tour title
+		final String tourTitle = tourData.getTourTitle();
+		fLblTitle.setText(tourTitle == null ? "" : tourTitle);
+
+		// start location
+		final String startLocation = tourData.getTourStartPlace();
+		fLblStartLocation.setText(startLocation == null ? "" : startLocation);
+
+		// end location
+		final String endLocation = tourData.getTourEndPlace();
+		fLblEndLocation.setText(endLocation == null ? "" : endLocation);
+
 	}
 
-	private void updateTourType() {
+	public void restoreState(IMemento memento) {
 
-		if (fTourData == null) {
-			return;
-		}
-
-		int typeIndex = fComboTourType.getSelectionIndex();
-
-		if (typeIndex == -1) {
-			return;
-		}
-
-		fTourData.setTourType(fTourTypes.get(typeIndex));
-
-		TourDatabase.saveTour(fTourData);
-
-		fireTourChanged();
 	}
 
-	/**
-	 * read the tour types from the db and update the ui list
-	 */
-	private void updateTourTypes() {
+	public void saveState(IMemento memento) {
 
-		fTourTypes = TourDatabase.getTourTypes();
-
-		if (fTourTypes == null || fComboTourType.isDisposed()) {
-			return;
-		}
-
-		fComboTourType.removeAll();
-		for (TourType tourType : fTourTypes) {
-			fComboTourType.add(tourType.getName());
-		}
 	}
 
-	public TourData getTourData() {
-		return fTourData;
-	}
 }
