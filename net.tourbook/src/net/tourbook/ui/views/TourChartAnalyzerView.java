@@ -600,7 +600,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		final Color color = fColorCache.get(colorKey);
 
 		if (color == null) {
-			return fColorCache.put(colorKey, rgb);
+			return fColorCache.createColor(colorKey, rgb);
 		} else {
 			return color;
 		}
