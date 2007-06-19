@@ -14,9 +14,9 @@
 
    <launcherArgs>
       <programArgs>#_enable_debug_mode_by_removing_the_#_character_in_the_next_lines
-#-consolelog 
-#-clean 
-#-debug</programArgs>
+-consolelog 
+-debug
+-clean</programArgs>
    </launcherArgs>
 
    <windowImages i16="/net.tourbook/icons/tourbook16.gif" i32="/net.tourbook/icons/tourbook32.gif" i48="/net.tourbook/icons/tourbook48.gif" i64="/net.tourbook/icons/tourbook64.gif" i128="/net.tourbook/icons/tourbook128.gif"/>
@@ -75,9 +75,9 @@
       <feature id="net.tourbook.ext.derby.feature" version="10.1.2.1"/>
       <feature id="net.tourbook.ext.ejb3.feature" version="0.8.7"/>
       <feature id="net.tourbook.ext.eclipse" version="0.8.3"/>
-      <feature id="net.tourbook.feature" version="0.8.8.v2007-05-15"/>
-      <feature id="net.tourbook.device.feature" version="0.8.8.v2007-05-15"/>
-      <feature id="org.eclipse.rcp" version="3.3.0.v20070405a-8w8eDpEbsN3VpGNZ28IQRGc"/>
+      <feature id="net.tourbook.device.feature" version="0.8.9.v2007-06"/>
+      <feature id="net.tourbook.feature" version="0.8.9.v2007-06"/>
+      <feature id="org.eclipse.rcp" version="3.3.0.v20070607-8y8eE8NEbsN3X5PjTaJy8DEsjhiu"/>
    </features>
 
 </product>
