@@ -293,6 +293,7 @@ public class CRPDataReader extends TourbookDevice {
 				tourData.setTourDistance(distance);
 				tourData.createTimeSeries(timeDataList);
 				tourData.computeTourDrivingTime();
+				tourData.computeAvgFields();
 				tourData.setTourRecordingTime(tourRecordingTime);
 
 				tourData.setTourAltUp(tourAltUp);
