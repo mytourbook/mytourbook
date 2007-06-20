@@ -59,7 +59,8 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 				+ "TOURALTDOWN, " //$NON-NLS-1$
 				+ "startDistance, " //$NON-NLS-1$
 				+ "tourID," //$NON-NLS-1$
-				+ "tourType_typeId" //$NON-NLS-1$
+				+ "tourType_typeId," //$NON-NLS-1$
+				+ "tourTitle " //$NON-NLS-1$
 				+ "\n" //$NON-NLS-1$
 				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" WHERE STARTYEAR = " + yearItem.fTourYear) //$NON-NLS-1$
@@ -97,7 +98,8 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 				tourItem.fTourTypeId = (tourTypeId == null
 						? TourType.TOUR_TYPE_ID_NOT_DEFINED
 						: (Long) tourTypeId);
-
+				tourItem.fTourTitle = result.getString(12);
+				
 				children.add(tourItem);
 			}
 

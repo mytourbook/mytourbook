@@ -347,6 +347,9 @@ public class Messages extends NLS {
 	public static String		RawData_Column_time_tooltip;
 	public static String		RawData_Column_tour_type_label;
 	public static String		RawData_Column_tour_type_tooltip;
+	public static String		RawData_Column_tour_title;
+	public static String		RawData_Column_tour_title_label;
+	public static String		RawData_Column_tour_title_tooltip;
 
 	public static String		RawData_Dlg_save_tour_msg;
 	public static String		RawData_Dlg_save_tour_title;
@@ -412,6 +415,8 @@ public class Messages extends NLS {
 	public static String		TourBook_Column_altitude_up;
 	public static String		TourBook_Column_altitude_up_tooltip;
 	public static String		TourBook_Column_date;
+	public static String        TourBook_Column_tour_title;
+	public static String        TourBook_Column_tour_title_tooltip;
 	public static String		TourBook_Column_distance;
 	public static String		TourBook_Column_distance_tooltip;
 	public static String		TourBook_Column_driving_time;

@@ -177,6 +177,7 @@ public class ActionSaveTourInDatabase extends Action {
 						if (tourData.getTourPerson() == null) {
 
 							tourData.setTourPerson(person);
+							tourData.setBikerWeight(person.getWeight());
 
 							saveInDatabase = true;
 						}

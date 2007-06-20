@@ -82,6 +82,20 @@ public abstract class TableColumnFactory {
 		};
 	};
 	
+	public static final TableColumnFactory TOUR_TITLE = new TableColumnFactory() {
+		
+		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+			
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourTitle", SWT.BEGINNING);
+			colDef.setLabel(Messages.RawData_Column_tour_title_label);
+			colDef.setText(Messages.RawData_Column_tour_title);
+			colDef.setToolTipText(Messages.RawData_Column_tour_title_tooltip);
+			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(25));
+
+			return colDef;
+		};
+	};
+	
 	public static final TableColumnFactory RECORDING_TIME = new TableColumnFactory() {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {

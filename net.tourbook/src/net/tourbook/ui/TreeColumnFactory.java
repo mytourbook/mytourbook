@@ -37,6 +37,21 @@ public abstract class TreeColumnFactory {
 		};
 	};
 
+	public static final TreeColumnFactory TITLE = new TreeColumnFactory() {
+		
+		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+			
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourTitle", SWT.BEGINNING);
+			
+			colDef.setLabel(Messages.TourBook_Column_tour_title);
+			colDef.setText(Messages.TourBook_Column_tour_title);
+			colDef.setToolTipText(Messages.TourBook_Column_tour_title_tooltip);
+			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(25));
+			
+			return colDef;
+		};
+	};
+
 	public static final TreeColumnFactory DISTANCE = new TreeColumnFactory() {
 		
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {

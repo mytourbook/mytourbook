@@ -525,6 +525,17 @@ public class RawDataView extends ViewPart {
 		});
 
 		/*
+		 * column: tour title
+		 */
+		colDef = TableColumnFactory.TOUR_TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				final TourData tourData = (TourData) cell.getElement();
+                cell.setText(tourData.getTourTitle());
+			}
+		});
+
+		/*
 		 * column: tour type
 		 */
 		colDef = TableColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);

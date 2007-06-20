@@ -45,6 +45,7 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 	int					fTourDay;
 
 	long				fTourDate;
+	String              fTourTitle;
 
 	long				fColumnDistance;
 	long				fColumnRecordingTime;

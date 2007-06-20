@@ -609,6 +609,21 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		});
 
 		/*
+		 * column: title
+		 */
+		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				final Object element = cell.getElement();
+				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
+				if (element instanceof TVITourBookTour) {
+					cell.setText(tourItem.fTourTitle);
+				} else {
+					setCellColor(cell, element);
+				}			}
+		});
+		
+		/*
 		 * column: distance (km)
 		 */
 		colDef = TreeColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
