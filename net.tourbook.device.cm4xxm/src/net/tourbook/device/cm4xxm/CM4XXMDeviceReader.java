@@ -399,6 +399,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 					tourData.createTimeSeries(timeDataList);
 					tourData.setTourType(defaultTourType);
 					tourData.computeTourDrivingTime();
+					tourData.computeAvgFields();
 					
 					tourData.setDeviceId(deviceId);
 					tourData.setDeviceName(visibleName);
