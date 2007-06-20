@@ -174,8 +174,6 @@ public class TurDeviceReader extends TourbookDevice {
 		FileInputStream fileTurData = null;
 		TurDeviceData turDeviceData = new TurDeviceData();
 
-// tourDataList.clear();
-
 		TourType defaultTourType = getTourType();
 
 		try {
@@ -248,9 +246,10 @@ public class TurDeviceReader extends TourbookDevice {
 				TurFileUtil.readByte(fileTurData);
 
 				// Calculate values
-				int secStart = secStart1 + (256 * secStart2)
-						+ (256 * 256 * secStart3)
-						+ (256 * 256 * 256 * secStart4);
+				int secStart = secStart1 +
+						(256 * secStart2) +
+						(256 * 256 * secStart3) +
+						(256 * 256 * 256 * secStart4);
 				int seconds = sec1 + (256 * sec2) + (256 * 256 * sec3) + (256 * 256 * 256 * sec4);
 				int distance = dst1 + (256 * dst2) + (256 * 256 * dst3) + (256 * 256 * 256 * dst4);
 				distance *= 10; // distance in 10m
@@ -280,12 +279,10 @@ public class TurDeviceReader extends TourbookDevice {
 					timeData.time = (short) tourData.getDeviceTimeInterval();
 					timeData.distance = distance - oldDistance;
 					oldDistance = distance;
-					tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0)
-							? timeData.altitude
-							: 0));
-					tourData.setTourAltDown(tourData.getTourAltDown() + ((timeData.altitude < 0)
-							? -timeData.altitude
-							: 0));
+					tourData.setTourAltUp(tourData.getTourAltUp() +
+							((timeData.altitude > 0) ? timeData.altitude : 0));
+					tourData.setTourAltDown(tourData.getTourAltDown() +
+							((timeData.altitude < 0) ? -timeData.altitude : 0));
 				}
 				timeDataList.add(timeData);
 
@@ -297,7 +294,6 @@ public class TurDeviceReader extends TourbookDevice {
 					tourData.setTourDistance(distance);
 				}
 			}
-// tourDataList.add(tourData);
 
 			// after all data are added, the tour id can be created
 			tourData.createTourId();
@@ -309,9 +305,8 @@ public class TurDeviceReader extends TourbookDevice {
 				// add new tour to the map
 				tourDataMap.put(tourId, tourData);
 
-				// after all data are added, the tour id can be created
-// tourData.createTourId();
 				tourData.createTimeSeries(timeDataList);
+				tourData.computeAvgFields();
 
 				// Read last 0A from binary block
 				TurFileUtil.readByte(fileTurData);
@@ -323,7 +318,13 @@ public class TurDeviceReader extends TourbookDevice {
 					TourMarker tourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_DEVICE);
 					tourMarker.setTime(Integer.parseInt(TurFileUtil.readText(fileTurData)));
 					String label = TurFileUtil.readText(fileTurData);
-					tourMarker.setLabel(label.substring(0, label.indexOf(';')));
+					label = label.substring(0, label.indexOf(';'));
+					int index = label.indexOf(", Type:"); //$NON-NLS-1$
+					if (index > 0)
+						label = label.substring(0, index);
+					else if (index == 0)
+						label = Messages.TourData_Tour_Marker_unnamed; //$NON-NLS-1$
+					tourMarker.setLabel(label);
 					tourMarker
 							.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					for (int j = 0; j < tourData.timeSerie.length; j++) {
@@ -340,7 +341,7 @@ public class TurDeviceReader extends TourbookDevice {
 
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
-				
+
 				// set week of year
 				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
 						.getStartDay());
