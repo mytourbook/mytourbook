@@ -167,7 +167,7 @@ public class TourData {
 	// db-version 3 - start
 
 	/**
-	 * Profile used by the device 
+	 * Profile used by the device
 	 */
 	private short				deviceMode;
 
@@ -232,8 +232,8 @@ public class TourData {
 	private TourPerson			tourPerson;
 
 	/**
-	 * plugin id for the device which was used for this tour
-	 * Bike used for this tour
+	 * plugin id for the device which was used for this tour Bike used for this
+	 * tour
 	 */
 	@ManyToOne
 	private TourBike			tourBike;
@@ -244,8 +244,10 @@ public class TourData {
 	private String				devicePluginId;
 
 	/**
-	 * visible name for the used plugin to import the data 
-	 * TODO: save in db, remove @Transient
+	 * visible name for the used plugin to import the data TODO: save in db,
+	 * remove
+	 * 
+	 * @Transient
 	 */
 	@Transient
 	private String				devicePluginName;
@@ -342,8 +344,10 @@ public class TourData {
 	public String				importRawDataFile;
 
 	/**
-	 * visible name for <code>deviceMode</code>{@code}deviceMode
-	 * TODO: save in db, remove @Transient
+	 * visible name for <code>deviceMode</code>{@code}deviceMode TODO: save
+	 * in db, remove
+	 * 
+	 * @Transient
 	 */
 	@Transient
 	private String				deviceModeName;
@@ -451,13 +455,6 @@ public class TourData {
 			cadenceSerie = new int[serieLength];
 			temperatureSerie = new int[serieLength];
 
-			int maxAltitude = 0;
-			int maxPulse = 0;
-			float maxSpeed = (float) 0.0;
-			long sumPulse = 0;
-			long sumTemperature = 0;
-			long sumCadence = 0;
-
 			// speedSerie = new int[serieLength];
 			// powerSerie = new int[serieLength];
 
@@ -480,23 +477,6 @@ public class TourData {
 
 				// powerSerie[index] = 0;
 
-				sumPulse += timeItem.pulse;
-				sumTemperature += timeItem.temperature;
-				sumCadence += timeItem.cadence;
-
-				if (maxAltitude < altitudeSerie[timeIndex]) {
-					maxAltitude = altitudeSerie[timeIndex];
-				}
-
-				if (maxPulse < timeItem.pulse) {
-					maxPulse = timeItem.pulse;
-				}
-				
-				float currentSpeed = (timeItem.distance / 1000.0f) / ( (float) this.deviceTimeInterval / 60.0f / 60.0f);
-                if (maxSpeed < currentSpeed) {
-                	maxSpeed = currentSpeed;
-                }
-				
 				distanceDiff[timeIndex] = timeItem.distance;
 
 				if (timeItem.marker != 0) {
@@ -516,30 +496,6 @@ public class TourData {
 				timeAbsolute += deviceTimeInterval;
 				timeIndex++;
 			}
-			
-			if (this.avgCadence == 0) {
-				this.avgCadence = (int) sumCadence / serieLength;
-			}
-			
-			if (this.avgPulse == 0) {
-				this.avgPulse = (int) sumPulse / serieLength;
-			}
-			
-			if (this.avgTemperature == 0) {
-				this.avgTemperature = (int) sumTemperature / serieLength;
-			}
-			
-			if (this.maxAltitude == 0) {
-				this.maxAltitude = maxAltitude;
-			}
-			
-			if (this.maxPulse == 0) {
-				this.maxPulse = maxPulse;
-			}
-			
-			if (this.maxSpeed == 0) {
-				this.maxSpeed = maxSpeed;
-			}
 		}
 	}
 
@@ -558,11 +514,12 @@ public class TourData {
 			 * the 5.5.2007 a NumberFormatException occured so the calculation
 			 * for the tour id was adjusted
 			 */
-			tourId = Short.toString(getStartYear()) + Short.toString(getStartMonth())
-					+ Short.toString(getStartDay())
-					+ Short.toString(getStartHour())
-					+ Short.toString(getStartMinute())
-					+ startDistance;
+			tourId = Short.toString(getStartYear()) +
+					Short.toString(getStartMonth()) +
+					Short.toString(getStartDay()) +
+					Short.toString(getStartHour()) +
+					Short.toString(getStartMinute()) +
+					startDistance;
 
 			setTourId(Long.parseLong(tourId));
 
@@ -571,11 +528,12 @@ public class TourData {
 			// distance was shorted that the maximum for a Long datatype is not
 			// exceeded
 
-			tourId = Short.toString(getStartYear()) + Short.toString(getStartMonth())
-					+ Short.toString(getStartDay())
-					+ Short.toString(getStartHour())
-					+ Short.toString(getStartMinute())
-					+ startDistance.substring(0, Math.min(5, startDistance.length()));
+			tourId = Short.toString(getStartYear()) +
+					Short.toString(getStartMonth()) +
+					Short.toString(getStartDay()) +
+					Short.toString(getStartHour()) +
+					Short.toString(getStartMinute()) +
+					startDistance.substring(0, Math.min(5, startDistance.length()));
 
 			setTourId(Long.parseLong(tourId));
 		}
@@ -676,9 +634,9 @@ public class TourData {
 					? 0
 					: (float) ((float) segment.distance / segment.drivingTime * 3.6);
 
-			segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitude
-					* 100
-					/ segment.distance;
+			segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitude *
+					100 /
+					segment.distance;
 
 			segmentSerieAltimeter[segmentIndex] = segment.drivingTime == 0
 					? 0
@@ -729,7 +687,7 @@ public class TourData {
 		out.println("----------------------------------------------------"); //$NON-NLS-1$
 		out.println("TOUR DATA"); //$NON-NLS-1$
 		out.println("----------------------------------------------------"); //$NON-NLS-1$
-//		out.println("Typ:			" + getDeviceTourType()); //$NON-NLS-1$
+// out.println("Typ: " + getDeviceTourType()); //$NON-NLS-1$
 		out.println("Date:			" + getStartDay() + "." + getStartMonth() + "." + getStartYear()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		out.println("Time:			" + getStartHour() + ":" + getStartMinute()); //$NON-NLS-1$ //$NON-NLS-2$
 		out.println("Total distance:		" + getStartDistance()); //$NON-NLS-1$
@@ -746,20 +704,26 @@ public class TourData {
 		out.println("Tour distance (m):	" + getTourDistance()); //$NON-NLS-1$
 
 		out.println("Tour time:		" //$NON-NLS-1$
-				+ (getTourRecordingTime() / 3600)
-				+ ":" //$NON-NLS-1$
-				+ ((getTourRecordingTime() % 3600) / 60)
-				+ ":" //$NON-NLS-1$
-				+ (getTourRecordingTime() % 3600)
-				% 60);
+				+
+				(getTourRecordingTime() / 3600) +
+				":" //$NON-NLS-1$
+				+
+				((getTourRecordingTime() % 3600) / 60) +
+				":" //$NON-NLS-1$
+				+
+				(getTourRecordingTime() % 3600) %
+				60);
 
 		out.println("Driving time:		" //$NON-NLS-1$
-				+ (getTourDrivingTime() / 3600)
-				+ ":" //$NON-NLS-1$
-				+ ((getTourDrivingTime() % 3600) / 60)
-				+ ":" //$NON-NLS-1$
-				+ (getTourDrivingTime() % 3600)
-				% 60);
+				+
+				(getTourDrivingTime() / 3600) +
+				":" //$NON-NLS-1$
+				+
+				((getTourDrivingTime() % 3600) / 60) +
+				":" //$NON-NLS-1$
+				+
+				(getTourDrivingTime() % 3600) %
+				60);
 
 		out.println("Altitude up (m):	" + getTourAltUp()); //$NON-NLS-1$
 		out.println("Altitude down (m):	" + getTourAltDown()); //$NON-NLS-1$
@@ -769,10 +733,12 @@ public class TourData {
 		PrintStream out = System.out;
 
 		out.print((getTourRecordingTime() / 3600) + ":" //$NON-NLS-1$
-				+ ((getTourRecordingTime() % 3600) / 60)
-				+ ":" //$NON-NLS-1$
-				+ ((getTourRecordingTime() % 3600) % 60)
-				+ "  "); //$NON-NLS-1$
+				+
+				((getTourRecordingTime() % 3600) / 60) +
+				":" //$NON-NLS-1$
+				+
+				((getTourRecordingTime() % 3600) % 60) +
+				"  "); //$NON-NLS-1$
 		out.print(getTourDistance());
 	}
 
@@ -794,13 +760,13 @@ public class TourData {
 
 		TourData td = (TourData) obj;
 
-		return this.getStartYear() == td.getStartYear() && this.getStartMonth() == td
-				.getStartMonth()
-				&& this.getStartDay() == td.getStartDay()
-				&& this.getStartHour() == td.getStartHour()
-				&& this.getStartMinute() == td.getStartMinute()
-				&& this.getTourDistance() == td.getTourDistance()
-				&& this.getTourRecordingTime() == td.getTourRecordingTime();
+		return this.getStartYear() == td.getStartYear() &&
+				this.getStartMonth() == td.getStartMonth() &&
+				this.getStartDay() == td.getStartDay() &&
+				this.getStartHour() == td.getStartHour() &&
+				this.getStartMinute() == td.getStartMinute() &&
+				this.getTourDistance() == td.getTourDistance() &&
+				this.getTourRecordingTime() == td.getTourRecordingTime();
 	}
 
 	/**
@@ -1250,6 +1216,78 @@ public class TourData {
 	 */
 	public void setBikerWeight(float bikerWeight) {
 		this.bikerWeight = bikerWeight;
+	}
+/*
+ * private int maxAltitude; private int maxPulse; private int avgPulse; private
+ * int avgCadence; private int avgTemperature; private float maxSpeed;
+ */
+
+	public void computeAvgFields() {
+		computeMaxAltitude();
+		computeMaxPulse();
+		computeAvgPulse();
+		computeAvgCadence();
+		computeAvgTemperature();
+		computeMaxSpeed();
+	}
+
+	public void computeMaxPulse() {
+		int maxPulse = 0;
+
+		for (int pulse : pulseSerie) {
+			if (pulse > maxPulse)
+				maxPulse = pulse;
+		}
+		this.maxPulse = maxPulse;
+	}
+
+	public void computeAvgPulse() {
+		long pulseSum = 0;
+
+		for (int pulse : pulseSerie) {
+			pulseSum += pulse;
+		}
+		this.avgPulse = (int) pulseSum / pulseSerie.length;
+	}
+
+	public void computeAvgCadence() {
+		long cadenceSum = 0;
+
+		for (int cadence : cadenceSerie) {
+			cadenceSum += cadence;
+		}
+		this.avgCadence = (int) cadenceSum / cadenceSerie.length;
+	}
+
+	public void computeAvgTemperature() {
+		long temperatureSum = 0;
+
+		for (int temperature : temperatureSerie) {
+			temperatureSum += temperature;
+		}
+		this.avgTemperature = (int) temperatureSum / temperatureSerie.length;
+	}
+
+	public void computeMaxSpeed() {
+		float maxSpeed = 0;
+		for (int i = 1; i <= distanceSerie.length - 1; i++) {
+			float speed = ((float) distanceSerie[i] - (float) distanceSerie[i - 1]) /
+					((float) timeSerie[i] - (float) timeSerie[i - 1]) *
+					(float) 3.6;
+
+			if (speed > maxSpeed)
+				maxSpeed = speed;
+		}
+		this.maxSpeed = maxSpeed;
+	}
+
+	public void computeMaxAltitude() {
+		int maxAltitude = 0;
+		for (int altitude : altitudeSerie) {
+			if (altitude > maxAltitude)
+				maxAltitude = altitude;
+		}
+		this.maxAltitude = maxAltitude;
 	}
 
 	public void computeTourDrivingTime() {
