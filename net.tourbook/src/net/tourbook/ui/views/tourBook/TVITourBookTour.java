@@ -22,6 +22,7 @@ public class TVITourBookTour extends TourBookTreeViewerItem {
 	long	fColumnStartDistance;
 	long	fTourId;
 	long	fTourTypeId;
+	short	fColumnTimeInterval;
 
 	public TVITourBookTour(TourBookView view, TreeViewerItem parentItem) {
 
@@ -53,6 +54,10 @@ public class TVITourBookTour extends TourBookTreeViewerItem {
 
 	public long getTourTypeId() {
 		return fTourTypeId;
+	}
+
+	public short getColumnTimeInterval() {
+		return fColumnTimeInterval;
 	}
 
 }

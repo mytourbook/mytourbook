@@ -16,8 +16,11 @@
 package net.tourbook.ui;
 
 import net.tourbook.Messages;
+import net.tourbook.data.TourData;
 import net.tourbook.util.PixelConverter;
 
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 
 public abstract class TreeColumnFactory {
@@ -150,15 +153,20 @@ public abstract class TreeColumnFactory {
 		};
 	};
 	
-//	public static final TreeColumnFactory ? = new TreeColumnFactory() {
-//		
-//		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
-//			
-//			
-//			
-//			return colDef;
-//		};
-//	};
+	public static final TreeColumnFactory TIME_INTERVAL = new TreeColumnFactory() {
+		
+		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+			
+			
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "timeInterval", SWT.TRAIL);
+			colDef.setLabel(Messages.RawData_Column_time_interval_label);
+			colDef.setText(Messages.RawData_Column_time_interval);
+			colDef.setToolTipText(Messages.RawData_Column_time_interval_tooltip);
+			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			
+			return colDef;
+		};
+	};
 	
 //	public static final TreeColumnFactory ? = new TreeColumnFactory() {
 //		

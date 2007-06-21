@@ -49,18 +49,19 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 		TVITourBookYear yearItem = (TVITourBookYear) (getParentItem());
 
 		String sqlString = "SELECT " //$NON-NLS-1$
-				+ "STARTYear, " //$NON-NLS-1$
-				+ "STARTMonth, " //$NON-NLS-1$
-				+ "STARTDay, " //$NON-NLS-1$
-				+ "TOURDISTANCE, " //$NON-NLS-1$
-				+ "TOURRECORDINGTIME, " //$NON-NLS-1$
-				+ "TOURDRIVINGTIME, " //$NON-NLS-1$
-				+ "TOURALTUP, " //$NON-NLS-1$
-				+ "TOURALTDOWN, " //$NON-NLS-1$
-				+ "startDistance, " //$NON-NLS-1$
-				+ "tourID," //$NON-NLS-1$
-				+ "tourType_typeId," //$NON-NLS-1$
-				+ "tourTitle " //$NON-NLS-1$
+				+ "STARTYear, " //1			//$NON-NLS-1$
+				+ "STARTMonth, " //2		//$NON-NLS-1$
+				+ "STARTDay, " //3			//$NON-NLS-1$
+				+ "TOURDISTANCE, " //4		//$NON-NLS-1$
+				+ "TOURRECORDINGTIME, " //5	//$NON-NLS-1$
+				+ "TOURDRIVINGTIME, " //6	//$NON-NLS-1$
+				+ "TOURALTUP, " //7			//$NON-NLS-1$
+				+ "TOURALTDOWN, " //8		//$NON-NLS-1$
+				+ "startDistance, " //9		//$NON-NLS-1$
+				+ "tourID," //10			//$NON-NLS-1$
+				+ "tourType_typeId," //11	//$NON-NLS-1$
+				+ "tourTitle," //12			//$NON-NLS-1$
+				+ "deviceTimeInterval" //13	//$NON-NLS-1$
 				+ "\n" //$NON-NLS-1$
 				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" WHERE STARTYEAR = " + yearItem.fTourYear) //$NON-NLS-1$
@@ -98,8 +99,10 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 				tourItem.fTourTypeId = (tourTypeId == null
 						? TourType.TOUR_TYPE_ID_NOT_DEFINED
 						: (Long) tourTypeId);
+
 				tourItem.fTourTitle = result.getString(12);
-				
+				tourItem.fColumnTimeInterval = result.getShort(13);
+
 				children.add(tourItem);
 			}
 
@@ -109,6 +112,7 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 			e.printStackTrace();
 		}
 	}
+
 	protected void remove() {}
 
 }

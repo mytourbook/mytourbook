@@ -733,6 +733,21 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 			}
 		});
 
+		colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+					cell.setText(Long
+							.toString(((TVITourBookTour) element).getColumnTimeInterval()));
+				}
+				setCellColor(cell, element);
+			}
+		});
+
+//		TableColumnFactory.DEVICE_PROFILE.createColumn(fColumnManager, pixelConverter);
+//		TableColumnFactory.DEVICE_NAME.createColumn(fColumnManager, pixelConverter);
+
 	}
 
 	public void dispose() {
