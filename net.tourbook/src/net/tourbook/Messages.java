@@ -171,7 +171,6 @@ public class Messages extends NLS {
 	public static String		Image_show_tour_viewer;
 	public static String		Image_show_view_detail;
 	public static String		Image_synch_graph_horizontal;
-	public static String		Image_tour_info;
 	public static String		Image_view_compare_result;
 	public static String		Image_view_compare_wizard;
 	public static String		Image_view_rawdata;
@@ -179,7 +178,6 @@ public class Messages extends NLS {
 	public static String		Image_view_tourmap;
 	public static String		Image_zoom_fit_to_graph;
 
-	public static String		ImportWizard_Control_check_auto_save;
 	public static String		ImportWizard_Control_combo_person_default_settings;
 	public static String		ImportWizard_Control_combo_ports_not_available;
 	public static String		ImportWizard_Dlg_message;
@@ -289,75 +287,14 @@ public class Messages extends NLS {
 
 	public static String		RawData_Action_open_import_file;
 	public static String		RawData_Action_open_import_file_tooltip;
-	public static String		RawData_Action_save_raw_data_to_file_tooltip;
 	public static String		RawData_Action_save_tour_for_person;
 	public static String		RawData_Action_save_tour_with_person;
 	public static String		RawData_Action_save_tours_for_person;
 	public static String		RawData_Action_show_tour_chart_tooltip;
-
 	public static String		RawData_Chart_title;
-
-	public static String		RawData_Column_altitude_up;
-	public static String		RawData_Column_altitude_up_label;
-	public static String		RawData_Column_altitude_up_tooltip;
-
-	public static String		RawData_Column_date;
-	public static String		RawData_Column_date_label;
-
-	public static String	RawData_Column_db_status_label;
-	public static String		RawData_Column_db_status_tooltip;
-
-	public static String	RawData_Column_device;
-
-	public static String	RawData_Column_device_label;
-
-	public static String	RawData_Column_device_tooltip;
-	public static String		RawData_Column_distance;
-	public static String		RawData_Column_distance_label;
-	public static String		RawData_Column_distance_tooltip;
-	public static String		RawData_Column_driving_time;
-	public static String		RawData_Column_driving_time_label;
-	public static String		RawData_Column_driving_time_tooltip;
-
-	public static String	RawData_Column_import_filename;
-
-	public static String	RawData_Column_import_filename_label;
-
-	public static String	RawData_Column_import_filename_tooltip;
-
-	public static String	RawData_Column_import_filepath;
-
-	public static String	RawData_Column_import_filepath_label;
-
-	public static String	RawData_Column_import_filepath_tooltip;
-	public static String		RawData_Column_profile;
-	public static String		RawData_Column_profile_label;
-	public static String		RawData_Column_profile_tooltip;
-	public static String		RawData_Column_recording_time;
-	public static String		RawData_Column_recording_time_label;
-	public static String		RawData_Column_recording_time_tooltip;
-	public static String		RawData_Column_speed;
-	public static String		RawData_Column_speed_label;
-	public static String		RawData_Column_speed_tooltip;
-	public static String		RawData_Column_time;
-	public static String		RawData_Column_time_interval;
-	public static String		RawData_Column_time_interval_label;
-	public static String		RawData_Column_time_interval_tooltip;
-	public static String		RawData_Column_time_label;
-	public static String		RawData_Column_time_tooltip;
-	public static String		RawData_Column_tour_type_label;
-	public static String		RawData_Column_tour_type_tooltip;
-	public static String		RawData_Column_tour_title;
-	public static String		RawData_Column_tour_title_label;
-	public static String		RawData_Column_tour_title_tooltip;
-
 	public static String		RawData_Dlg_save_tour_msg;
 	public static String		RawData_Dlg_save_tour_title;
-	public static String		RawData_Label_confirm_overwrite;
 	public static String		RawData_Label_unknown_device;
-	public static String		RawData_Lable_import_from_device;
-	public static String		RawData_Lable_import_from_file;
-	public static String		RawData_Lable_import_no_data;
 
 	public static String		Tour_Action_adjust_tour_altitude;
 	public static String		Tour_Action_adjust_tour_altitude_tooltip;
@@ -381,17 +318,10 @@ public class Messages extends NLS {
 	public static String		Tour_Action_show_start_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis_tooltip;
-	public static String		Tour_Action_tour_info_tooltip;
 	public static String		Tour_Action_zoom_fit_to_window;
 
-// public static String Tour_Label_adjust_end;
-// public static String Tour_Label_adjust_height;
 	public static String		Tour_Label_distance;
 	public static String		Tour_Label_distance_unit;
-// public static String Tour_Label_evenly_distributed;
-// public static String Tour_Label_new_end_altitude;
-// public static String Tour_Label_new_height;
-// public static String Tour_Label_new_start_altitude;
 	public static String		Tour_Label_time;
 	public static String		Tour_Label_time_unit;
 	public static String		Tour_Label_tour_type;
@@ -412,18 +342,6 @@ public class Messages extends NLS {
 	public static String		TourBook_Action_show_tour_chart_tooltip;
 	public static String		TourBook_Action_show_tour_viewer_tooltip;
 	public static String		TourBook_Action_show_view_detail_tooltip;
-	public static String		TourBook_Column_altitude_up;
-	public static String		TourBook_Column_altitude_up_tooltip;
-	public static String		TourBook_Column_date;
-	public static String        TourBook_Column_tour_title;
-	public static String        TourBook_Column_tour_title_tooltip;
-	public static String		TourBook_Column_distance;
-	public static String		TourBook_Column_distance_tooltip;
-	public static String		TourBook_Column_driving_time;
-	public static String		TourBook_Column_driving_time_tooltip;
-	public static String		TourBook_Column_numbers_tooltip;
-	public static String		TourBook_Column_recording_time;
-	public static String		TourBook_Column_recording_time_tooltip;
 	public static String		TourBook_Combo_statistic_tooltip;
 	public static String		TourBook_Combo_year_tooltip;
 	public static String		TourBook_Dlg_set_tour_type_msg;
@@ -431,8 +349,8 @@ public class Messages extends NLS {
 	public static String		TourBook_Label_chart_title;
 	public static String		TourBook_Label_no_tour_is_selected;
 	public static String		TourBook_Lable_no_statistic_is_selected;
-	public static String		TourData_Label_device_marker;
 
+	public static String		TourData_Label_device_marker;
 	public static String		TourData_Label_new_marker;
 
 	public static String		TourMap_Action_create_left_marker;
@@ -491,7 +409,6 @@ public class Messages extends NLS {
 	public static String		TourMapWizard_Wizard_title;
 
 	public static String		TourMarker_Action_delete_marker;
-
 	public static String		TourMarker_Action_edit_marker;
 	public static String		TourMarker_Column_horizontal_offset;
 	public static String		TourMarker_Column_horizontal_offset_tooltip;

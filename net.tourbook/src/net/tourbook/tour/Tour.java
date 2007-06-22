@@ -16,13 +16,11 @@
 package net.tourbook.tour;
 
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import net.tourbook.data.TourData;
-import net.tourbook.tour.TourOLD.ITourChangeListener;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -44,12 +42,12 @@ public class Tour extends Composite {
 	private TourChart		fTourChart;
 
 	public Calendar			fCalendar			= GregorianCalendar.getInstance();
-	private DateFormat		fDateFormatter		= DateFormat.getDateInstance(DateFormat.SHORT);
+//	private DateFormat		fDateFormatter		= DateFormat.getDateInstance(DateFormat.SHORT);
 	private DateFormat		fTimeFormatter		= DateFormat.getTimeInstance(DateFormat.SHORT);
 	private DateFormat		fDurationFormatter	= DateFormat.getTimeInstance(
 														DateFormat.SHORT,
 														Locale.GERMAN);
-	private NumberFormat	fNumberFormatter	= NumberFormat.getNumberInstance();
+//	private NumberFormat	fNumberFormatter	= NumberFormat.getNumberInstance();
 
 	private Label			fLblDate;
 	private Label			fLblStartTime;
@@ -59,15 +57,45 @@ public class Tour extends Composite {
 	private Label			fLblStartLocation;
 	private Label			fLblEndLocation;
 
+//	protected ListenerList	fPropertyListeners	= new ListenerList();
+//
+//	/**
+//	 * Listener for tour changes
+//	 */
+//	public interface ITourChangeListener extends EventListener {
+//		public void tourChanged(TourChangeEvent event);
+//	}
+//
+//	public static class TourChangeEvent extends EventObject {
+//
+//		private static final long	serialVersionUID	= 1L;
+//
+//		protected TourChangeEvent(Tour source) {
+//			super(source);
+//		}
+//	}
+//
+//	public void addTourChangedListener(ITourChangeListener listener) {
+//		fPropertyListeners.add(listener);
+//	}
+//
+//	private void fireTourChanged() {
+//		Object[] listeners = fPropertyListeners.getListeners();
+//		for (int i = 0; i < listeners.length; ++i) {
+//			final ITourChangeListener listener = (ITourChangeListener) listeners[i];
+//			SafeRunnable.run(new SafeRunnable() {
+//				public void run() {
+//					listener.tourChanged(new TourChangeEvent(Tour.this));
+//				}
+//			});
+//		}
+//	}
+
 	public Tour(Composite parent, int style) {
 
 		super(parent, style);
 
 		createControls();
-
-	}
-
-	public void addTourChangedListener(ITourChangeListener tourChangeListener) {
 
 	}
 

@@ -17,7 +17,7 @@ package net.tourbook.ui;
 
 import java.io.File;
 
-import net.tourbook.Messages;
+import net.tourbook.ui.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.util.PixelConverter;
 
@@ -33,9 +33,9 @@ public abstract class TableColumnFactory {
 
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "dbStatus", SWT.CENTER);
-			colDef.setLabel(Messages.RawData_Column_db_status_label);
-			colDef.setToolTipText(Messages.RawData_Column_db_status_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "dbStatus", SWT.CENTER); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_db_status_label);
+			colDef.setToolTipText(Messages.ColumnFactory_db_status_tooltip);
 			colDef.setWidth(20);
 
 			return colDef;
@@ -46,9 +46,9 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourdate", SWT.TRAIL);
-			colDef.setText(Messages.RawData_Column_date);
-			colDef.setLabel(Messages.RawData_Column_date_label);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourdate", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setText(Messages.ColumnFactory_date);
+			colDef.setLabel(Messages.ColumnFactory_date_label);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
 			return colDef;
@@ -59,10 +59,10 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "startTime", SWT.TRAIL);
-			colDef.setLabel(Messages.RawData_Column_time_label);
-			colDef.setText(Messages.RawData_Column_time);
-			colDef.setToolTipText(Messages.RawData_Column_time_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "startTime", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_time_label);
+			colDef.setText(Messages.ColumnFactory_time);
+			colDef.setToolTipText(Messages.ColumnFactory_time_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 			return colDef;
@@ -73,9 +73,9 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourType", SWT.TRAIL);
-			colDef.setLabel(Messages.RawData_Column_tour_type_label);
-			colDef.setToolTipText(Messages.RawData_Column_tour_type_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourType", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_tour_type_label);
+			colDef.setToolTipText(Messages.ColumnFactory_tour_type_tooltip);
 			colDef.setWidth(18);
 
 			return colDef;
@@ -86,10 +86,10 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourTitle", SWT.BEGINNING);
-			colDef.setLabel(Messages.RawData_Column_tour_title_label);
-			colDef.setText(Messages.RawData_Column_tour_title);
-			colDef.setToolTipText(Messages.RawData_Column_tour_title_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourTitle", SWT.BEGINNING); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_tour_title_label);
+			colDef.setText(Messages.ColumnFactory_tour_title);
+			colDef.setToolTipText(Messages.ColumnFactory_tour_title_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(25));
 
 			return colDef;
@@ -100,10 +100,10 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "recordingTime", SWT.TRAIL);
-			colDef.setLabel(Messages.RawData_Column_recording_time_label);
-			colDef.setText(Messages.RawData_Column_recording_time);
-			colDef.setToolTipText(Messages.RawData_Column_recording_time_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "recordingTime", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_recording_time_label);
+			colDef.setText(Messages.ColumnFactory_recording_time);
+			colDef.setToolTipText(Messages.ColumnFactory_recording_time_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		
 			return colDef;
@@ -114,10 +114,10 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "drivingTime", SWT.TRAIL);
-			colDef.setLabel(Messages.RawData_Column_driving_time_label);
-			colDef.setText(Messages.RawData_Column_driving_time);
-			colDef.setToolTipText(Messages.RawData_Column_driving_time_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "drivingTime", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_driving_time_label);
+			colDef.setText(Messages.ColumnFactory_driving_time);
+			colDef.setToolTipText(Messages.ColumnFactory_driving_time_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 			return colDef;
@@ -128,10 +128,10 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "distance", SWT.TRAIL);
-			colDef.setLabel(Messages.RawData_Column_distance_label);
-			colDef.setText(Messages.RawData_Column_distance);
-			colDef.setToolTipText(Messages.RawData_Column_distance_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "distance", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_distance_label);
+			colDef.setText(Messages.ColumnFactory_distance);
+			colDef.setToolTipText(Messages.ColumnFactory_distance_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 			return colDef;
@@ -142,10 +142,10 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "speed", SWT.TRAIL);
-			colDef.setLabel(Messages.RawData_Column_speed_label);
-			colDef.setText(Messages.RawData_Column_speed);
-			colDef.setToolTipText(Messages.RawData_Column_speed_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "speed", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_speed_label);
+			colDef.setText(Messages.ColumnFactory_speed);
+			colDef.setToolTipText(Messages.ColumnFactory_speed_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
 			return colDef;
@@ -156,10 +156,10 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL);
-			colDef.setLabel(Messages.RawData_Column_altitude_up_label);
-			colDef.setText(Messages.RawData_Column_altitude_up);
-			colDef.setToolTipText(Messages.RawData_Column_altitude_up_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_altitude_up_label);
+			colDef.setText(Messages.ColumnFactory_altitude_up);
+			colDef.setToolTipText(Messages.ColumnFactory_altitude_up_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		
 			return colDef;
@@ -170,9 +170,9 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDown", SWT.TRAIL);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDown", SWT.TRAIL); //$NON-NLS-1$
 			colDef.setLabel("Altitude down (m)");
-			colDef.setText("m");
+			colDef.setText(Messages.ColumnFactory_altitude_down_title);
 			colDef.setToolTipText("Altitude down");
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		
@@ -184,10 +184,10 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "deviceProfile", SWT.LEAD);
-			colDef.setLabel(Messages.RawData_Column_profile_label);
-			colDef.setText(Messages.RawData_Column_profile);
-			colDef.setToolTipText(Messages.RawData_Column_profile_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "deviceProfile", SWT.LEAD); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_profile_label);
+			colDef.setText(Messages.ColumnFactory_profile);
+			colDef.setToolTipText(Messages.ColumnFactory_profile_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 		
 			colDef.setLabelProvider(new CellLabelProvider() {
@@ -204,10 +204,10 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "timeInterval", SWT.TRAIL);
-			colDef.setLabel(Messages.RawData_Column_time_interval_label);
-			colDef.setText(Messages.RawData_Column_time_interval);
-			colDef.setToolTipText(Messages.RawData_Column_time_interval_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "timeInterval", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_time_interval_label);
+			colDef.setText(Messages.ColumnFactory_time_interval);
+			colDef.setToolTipText(Messages.ColumnFactory_time_interval_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			colDef.setLabelProvider(new CellLabelProvider() {
@@ -225,10 +225,10 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "deviceName", SWT.LEAD);
-			colDef.setLabel(Messages.RawData_Column_device_label);
-			colDef.setText(Messages.RawData_Column_device);
-			colDef.setToolTipText(Messages.RawData_Column_device_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "deviceName", SWT.LEAD); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_device_label);
+			colDef.setText(Messages.ColumnFactory_device);
+			colDef.setToolTipText(Messages.ColumnFactory_device_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			colDef.setLabelProvider(new CellLabelProvider() {
@@ -245,10 +245,10 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "importFilePath", SWT.LEAD);
-			colDef.setLabel(Messages.RawData_Column_import_filepath_label);
-			colDef.setText(Messages.RawData_Column_import_filepath);
-			colDef.setToolTipText(Messages.RawData_Column_import_filepath_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "importFilePath", SWT.LEAD); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_import_filepath_label);
+			colDef.setText(Messages.ColumnFactory_import_filepath);
+			colDef.setToolTipText(Messages.ColumnFactory_import_filepath_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(20));
 			
 			colDef.setLabelProvider(new CellLabelProvider() {
@@ -267,10 +267,11 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "importFileName", SWT.LEAD);
-			colDef.setLabel(Messages.RawData_Column_import_filename_label);
-			colDef.setText(Messages.RawData_Column_import_filename);
-			colDef.setToolTipText(Messages.RawData_Column_import_filename_tooltip);
+			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "importFileName", SWT.LEAD); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_import_filename_label);
+			colDef.setText(Messages.ColumnFactory_import_filename);
+			colDef
+																				.setToolTipText(Messages.ColumnFactory_import_filename_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(20));
 			
 			colDef.setLabelProvider(new CellLabelProvider() {

@@ -40,8 +40,6 @@ import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
-import net.tourbook.tour.TourOLD.ITourChangeListener;
-import net.tourbook.tour.TourOLD.TourChangeEvent;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourChartViewer;
@@ -369,13 +367,13 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		fTour = new Tour(fPageBookDetailChart, SWT.FLAT);
 		fTour.restoreState(fSessionMemento);
 		fTour.setFont(parent.getFont());
-		fTour.addTourChangedListener(new ITourChangeListener() {
-			public void tourChanged(TourChangeEvent event) {
-				TourbookPlugin.getDefault().getPreferenceStore().setValue(
-						ITourbookPreferences.APP_NEW_DATA_FILTER,
-						Math.random());
-			}
-		});
+//		fTour.addTourChangedListener(new ITourChangeListener() {
+//			public void tourChanged(TourChangeEvent event) {
+//				TourbookPlugin.getDefault().getPreferenceStore().setValue(
+//						ITourbookPreferences.APP_NEW_DATA_FILTER,
+//						Math.random());
+//			}
+//		});
 
 		fTourChart = fTour.getTourChart();
 		fTourChart.setShowZoomActions(true);

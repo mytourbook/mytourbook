@@ -534,8 +534,8 @@ public class CompareResultView extends SynchedChartView {
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.RawData_Column_time_interval);
-		tc.setToolTipText(Messages.RawData_Column_time_interval_tooltip);
+		tc.setText(net.tourbook.ui.Messages.ColumnFactory_time_interval);
+		tc.setToolTipText(net.tourbook.ui.Messages.ColumnFactory_time_interval_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		fTourViewer = new ContainerCheckedTreeViewer(tree);

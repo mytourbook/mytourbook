@@ -15,12 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import net.tourbook.Messages;
-import net.tourbook.data.TourData;
 import net.tourbook.util.PixelConverter;
 
-import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 
 public abstract class TreeColumnFactory {
@@ -29,11 +25,11 @@ public abstract class TreeColumnFactory {
 
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 
-			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "date", SWT.TRAIL);
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "date", SWT.TRAIL); //$NON-NLS-1$
 			
-			colDef.setLabel("Date");
-			colDef.setText(Messages.TourBook_Column_date);
-			colDef.setToolTipText("Tourdate");
+			colDef.setLabel(Messages.ColumnFactory_date_label);
+			colDef.setText(Messages.ColumnFactory_date);
+			colDef.setToolTipText(Messages.ColumnFactory_date_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(16));
 			
 			return colDef;
@@ -44,11 +40,11 @@ public abstract class TreeColumnFactory {
 		
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourTitle", SWT.BEGINNING);
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourTitle", SWT.BEGINNING); //$NON-NLS-1$
 			
-			colDef.setLabel(Messages.TourBook_Column_tour_title);
-			colDef.setText(Messages.TourBook_Column_tour_title);
-			colDef.setToolTipText(Messages.TourBook_Column_tour_title_tooltip);
+			colDef.setLabel(Messages.ColumnFactory_tour_title);
+			colDef.setText(Messages.ColumnFactory_tour_title);
+			colDef.setToolTipText(Messages.ColumnFactory_tour_title_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(25));
 			
 			return colDef;
@@ -59,11 +55,11 @@ public abstract class TreeColumnFactory {
 		
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "distance", SWT.TRAIL);
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "distance", SWT.TRAIL); //$NON-NLS-1$
 			
-			colDef.setLabel("Distance (km)");
-			colDef.setText(Messages.TourBook_Column_distance);
-			colDef.setToolTipText(Messages.TourBook_Column_distance_tooltip);
+			colDef.setLabel(Messages.ColumnFactory_distance_label);
+			colDef.setText(Messages.ColumnFactory_distance);
+			colDef.setToolTipText(Messages.ColumnFactory_distance_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
@@ -74,10 +70,10 @@ public abstract class TreeColumnFactory {
 		
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "recordingTime", SWT.TRAIL);
-			colDef.setLabel("Recording Time (h)");
-			colDef.setText(Messages.TourBook_Column_recording_time);
-			colDef.setToolTipText(Messages.TourBook_Column_recording_time_tooltip);
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "recordingTime", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_recording_time_label);
+			colDef.setText(Messages.ColumnFactory_recording_time);
+			colDef.setToolTipText(Messages.ColumnFactory_recording_time_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
@@ -88,10 +84,10 @@ public abstract class TreeColumnFactory {
 		
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "drivingTime", SWT.TRAIL);
-			colDef.setLabel("Driving Time (h)");
-			colDef.setText(Messages.TourBook_Column_driving_time);
-			colDef.setToolTipText(Messages.TourBook_Column_driving_time_tooltip);
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "drivingTime", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_driving_time_label);
+			colDef.setText(Messages.ColumnFactory_driving_time);
+			colDef.setToolTipText(Messages.ColumnFactory_driving_time_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
@@ -102,10 +98,10 @@ public abstract class TreeColumnFactory {
 		
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL);
-			colDef.setLabel("Altitude Up (m)");
-			colDef.setText(Messages.TourBook_Column_altitude_up);
-			colDef.setToolTipText(Messages.TourBook_Column_altitude_up_tooltip);
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_altitude_up_label);
+			colDef.setText(Messages.ColumnFactory_altitude_up);
+			colDef.setToolTipText(Messages.ColumnFactory_altitude_up_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 			
@@ -117,9 +113,9 @@ public abstract class TreeColumnFactory {
 		
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "deviceDistance", SWT.TRAIL);
-			colDef.setLabel("Device start distance");
-			colDef.setToolTipText("Device start distance");
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "deviceDistance", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_device_start_distance_label);
+			colDef.setToolTipText(Messages.ColumnFactory_device_start_distance_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
@@ -130,10 +126,10 @@ public abstract class TreeColumnFactory {
 		
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourCounter", SWT.TRAIL);
-			colDef.setText("#");
-			colDef.setLabel("Number of tours");
-			colDef.setToolTipText("Number of tours");
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourCounter", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setText(Messages.ColumnFactory_tour_numbers);
+			colDef.setLabel(Messages.ColumnFactory_tour_numbers_lable);
+			colDef.setToolTipText(Messages.ColumnFactory_tour_numbers_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(5));
 			
 			return colDef;
@@ -144,9 +140,9 @@ public abstract class TreeColumnFactory {
 		
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourType", SWT.TRAIL);
-			colDef.setLabel(Messages.RawData_Column_tour_type_label);
-			colDef.setToolTipText(Messages.RawData_Column_tour_type_tooltip);
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tourType", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_tour_type_label);
+			colDef.setToolTipText(Messages.ColumnFactory_tour_type_tooltip);
 			colDef.setWidth(18);
 
 			return colDef;
@@ -158,10 +154,10 @@ public abstract class TreeColumnFactory {
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
 			
-			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "timeInterval", SWT.TRAIL);
-			colDef.setLabel(Messages.RawData_Column_time_interval_label);
-			colDef.setText(Messages.RawData_Column_time_interval);
-			colDef.setToolTipText(Messages.RawData_Column_time_interval_tooltip);
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "timeInterval", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_time_interval_label);
+			colDef.setText(Messages.ColumnFactory_time_interval);
+			colDef.setToolTipText(Messages.ColumnFactory_time_interval_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			return colDef;
