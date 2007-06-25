@@ -798,6 +798,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		msgBox.setMessage(Messages.Dlg_Adjust_Altitude_Dlg_save_tour_message);
 
 		if (msgBox.open() == SWT.YES) {
+			fTourChart.fTourData.computeMaxAltitude();
 			TourDatabase.saveTour(fTourChart.fTourData);
 			fSelectedTourChart.updateChart();
 

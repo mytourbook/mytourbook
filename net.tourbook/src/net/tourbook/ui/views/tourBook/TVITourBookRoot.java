@@ -62,7 +62,9 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 
 				tourItem.addSumData(result.getLong(2), result.getLong(3), result
 						.getLong(4), result.getLong(5), result.getLong(6), result
-						.getLong(7));
+						.getLong(7), result.getFloat(8), result.getFloat(9),
+						result.getLong(10), result.getLong(11), result.getLong(12),
+						result.getLong(13), result.getLong(14));
 
 				children.add(tourItem);
 			}

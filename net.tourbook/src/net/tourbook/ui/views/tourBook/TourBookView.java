@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -216,8 +217,6 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 	}
 
-	
-
 	private void addPartListener() {
 
 		// set the part listener
@@ -257,11 +256,12 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 				final String property = event.getProperty();
 
 				/*
-				 * set a new chart configuration when the preferences has changed
+				 * set a new chart configuration when the preferences has
+				 * changed
 				 */
-				if (property.equals(ITourbookPreferences.GRAPH_VISIBLE) || property
-						.equals(ITourbookPreferences.GRAPH_X_AXIS)
-						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
+				if (property.equals(ITourbookPreferences.GRAPH_VISIBLE) ||
+						property.equals(ITourbookPreferences.GRAPH_X_AXIS) ||
+						property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
 
 					fTourChartConfig = TourManager.createTourChartConfiguration();
 				}
@@ -449,11 +449,12 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 	private Control createTourViewer(Composite parent) {
 
 		// tour tree
-		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL
-				| SWT.BORDER
-				| SWT.FLAT
-				| SWT.FULL_SELECTION
-				| SWT.MULTI);
+		final Tree tree = new Tree(parent, SWT.H_SCROLL |
+				SWT.V_SCROLL |
+				SWT.BORDER |
+				SWT.FLAT |
+				SWT.FULL_SELECTION |
+				SWT.MULTI);
 
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		tree.setHeaderVisible(true);
@@ -618,9 +619,10 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 					cell.setText(tourItem.fTourTitle);
 				} else {
 					setCellColor(cell, element);
-				}			}
+				}
+			}
 		});
-		
+
 		/*
 		 * column: distance (km)
 		 */
@@ -640,7 +642,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		 * column: tour type
 		 */
 		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
-//		colDef.setColumnResizable(false);
+// colDef.setColumnResizable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
@@ -736,15 +738,91 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					cell.setText(Long
-							.toString(((TVITourBookTour) element).getColumnTimeInterval()));
+					cell
+							.setText(Long.toString(((TVITourBookTour) element)
+									.getColumnTimeInterval()));
 				}
 				setCellColor(cell, element);
 			}
 		});
 
-//		TableColumnFactory.DEVICE_PROFILE.createColumn(fColumnManager, pixelConverter);
-//		TableColumnFactory.DEVICE_NAME.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.MAX_SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				final Object element = cell.getElement();
+				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
+				fNF.setMinimumFractionDigits(1);
+				fNF.setMaximumFractionDigits(1);
+				cell.setText(fNF.format(tourItem.fColumnMaxSpeed));
+				setCellColor(cell, element);
+			}
+		});
+
+		colDef = TreeColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				final Object element = cell.getElement();
+				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
+				fNF.setMinimumFractionDigits(1);
+				fNF.setMaximumFractionDigits(1);
+				cell.setText(fNF.format(tourItem.fColumnAvgSpeed));
+				setCellColor(cell, element);
+			}
+		});
+
+		colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				final Object element = cell.getElement();
+				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
+				cell.setText(Long.toString(tourItem.fColumnMaxAltitude));
+				setCellColor(cell, element);
+			}
+		});
+
+		colDef = TreeColumnFactory.MAX_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				final Object element = cell.getElement();
+				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
+				cell.setText(Long.toString(tourItem.fColumnMaxPulse));
+				setCellColor(cell, element);
+			}
+		});
+
+		colDef = TreeColumnFactory.AVG_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				final Object element = cell.getElement();
+				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
+				cell.setText(Long.toString(tourItem.fColumnAvgPulse));
+				setCellColor(cell, element);
+			}
+		});
+
+		colDef = TreeColumnFactory.AVG_CADENCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				final Object element = cell.getElement();
+				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
+				cell.setText(Long.toString(tourItem.fColumnAvgCadence));
+				setCellColor(cell, element);
+			}
+		});
+
+		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			public void update(ViewerCell cell) {
+				final Object element = cell.getElement();
+				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
+				cell.setText(Long.toString(tourItem.fColumnAvgTemperature));
+				setCellColor(cell, element);
+			}
+		});
+
+		// TableColumnFactory.DEVICE_PROFILE.createColumn(fColumnManager,
+		// pixelConverter);
+// TableColumnFactory.DEVICE_NAME.createColumn(fColumnManager, pixelConverter);
 
 	}
 
@@ -1114,12 +1192,12 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 			// show/hide tour chart
 			Integer detailVisibleStatus = memento.getInteger(MEMENTO_VISIBLE_STATUS_DETAIL);
 
-			fActionShowDetailStatistic
-					.setChecked(detailVisibleStatus == null || detailVisibleStatus == 0
-							|| detailVisibleStatus == 1);
-			fActionShowDetailTourChart
-					.setChecked(detailVisibleStatus == null || detailVisibleStatus == 0
-							|| detailVisibleStatus == 2);
+			fActionShowDetailStatistic.setChecked(detailVisibleStatus == null ||
+					detailVisibleStatus == 0 ||
+					detailVisibleStatus == 1);
+			fActionShowDetailTourChart.setChecked(detailVisibleStatus == null ||
+					detailVisibleStatus == 0 ||
+					detailVisibleStatus == 2);
 
 			// set tour viewer reselection data
 			Integer selectedYear = memento.getInteger(MEMENTO_TOURVIEWER_SELECTED_YEAR);

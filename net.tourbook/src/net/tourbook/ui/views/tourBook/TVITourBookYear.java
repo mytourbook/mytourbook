@@ -71,7 +71,8 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 
 				tourItem.addSumData(result.getLong(3), result.getLong(4), result
 						.getLong(5), result.getLong(6), result.getLong(7), result
-						.getLong(8));
+						.getLong(8), result.getFloat(9), result.getFloat(10),result.getLong(11),
+						result.getLong(12), result.getLong(13), result.getLong(14), result.getLong(15));
 
 				children.add(tourItem);
 			}

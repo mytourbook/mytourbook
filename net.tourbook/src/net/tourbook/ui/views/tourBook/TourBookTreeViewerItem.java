@@ -29,7 +29,14 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 												+ "SUM(TOURDRIVINGTIME), " //$NON-NLS-1$
 												+ "SUM(TOURALTUP), " //$NON-NLS-1$
 												+ "SUM(TOURALTDOWN)," //$NON-NLS-1$
-												+ "SUM(1)"; //$NON-NLS-1$
+												+ "SUM(1)," //$NON-NLS-1$
+												+ "MAX(MAXSPEED),"	//$NON-NLS-1$
+												+ "3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME),"	//$NON-NLS-1$
+												+ "MAX(MAXALTITUDE),"	//$NON-NLS-1$
+												+ "MAX(MAXPULSE),"	//$NON-NLS-1$
+												+ "AVG(AVGPULSE),"	//$NON-NLS-1$
+												+ "AVG(AVGCADENCE),"	//$NON-NLS-1$
+												+ "AVG(AVGTEMPERATURE)";	//$NON-NLS-1$
 
 	TourBookView		fView;
 
@@ -45,7 +52,7 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 	int					fTourDay;
 
 	long				fTourDate;
-	String              fTourTitle;
+	String				fTourTitle;
 
 	long				fColumnDistance;
 	long				fColumnRecordingTime;
@@ -53,6 +60,13 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 	long				fColumnAltitudeUp;
 	long				fColumnAltitudeDown;
 	long				fColumnCounter;
+	float				fColumnMaxSpeed;
+	float				fColumnAvgSpeed;
+	long				fColumnMaxAltitude;
+	long				fColumnMaxPulse;
+	long				fColumnAvgPulse;
+	long				fColumnAvgCadence;
+	long				fColumnAvgTemperature;
 
 	TourBookTreeViewerItem(TourBookView view) {
 		fView = view;
@@ -63,7 +77,14 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 							long long3,
 							long long4,
 							long long5,
-							long long6) {
+							long long6,
+							float float7,
+							float float8,
+							long long9,
+							long long10,
+							long long11,
+							long long12,
+							long long13) {
 
 		fColumnDistance = long1;
 
@@ -74,6 +95,14 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 		fColumnAltitudeDown = long5;
 
 		fColumnCounter = long6;
+		fColumnMaxSpeed = float7;
+		fColumnAvgSpeed = float8;
+		
+		fColumnMaxAltitude = long9;
+		fColumnMaxPulse = long10;
+		fColumnAvgPulse = long11;
+		fColumnAvgCadence = long12;
+		fColumnAvgTemperature = long13;
 	}
 
 	public Long getTourId() {
@@ -88,8 +117,7 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 
 		StringBuffer sqlString = new StringBuffer();
 
-		long personId = fView.fActivePerson == null ? -1 : fView.fActivePerson
-				.getPersonId();
+		long personId = fView.fActivePerson == null ? -1 : fView.fActivePerson.getPersonId();
 
 		if (personId == -1) {
 			// select all people
@@ -113,8 +141,8 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 		} else {
 			// select only one tour type
 			sqlString.append(" AND tourType_typeId " //$NON-NLS-1$
-					+ (tourTypeId == TourType.TOUR_TYPE_ID_NOT_DEFINED
-							? "is null" //$NON-NLS-1$
+					+
+					(tourTypeId == TourType.TOUR_TYPE_ID_NOT_DEFINED ? "is null" //$NON-NLS-1$
 							: ("=" + Long.toString(tourTypeId)))); //$NON-NLS-1$
 		}
 		return sqlString.toString();

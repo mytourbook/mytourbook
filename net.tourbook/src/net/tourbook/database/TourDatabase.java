@@ -18,6 +18,7 @@ package net.tourbook.database;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -35,6 +36,7 @@ import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.application.MyTourbookSplashHandler;
+import net.tourbook.data.SerieData;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -875,6 +877,25 @@ public class TourDatabase {
 		} catch (SQLException e) {
 			printSQLException(e);
 		}
+		
+		// Create a EntityManagerFactory here, so we can access TourData
+		// with EJB
+		emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
+
+        ArrayList<TourData> tourList = getTours();
+
+        // loop over all tours and calculate and set new columns
+        for (TourData tourData : tourList) {
+			tourData.computeAvgFields();
+			TourPerson person = tourData.getTourPerson();
+			tourData.setTourBike(person.getTourBike());
+			tourData.setBikerWeight(person.getWeight());
+			saveTour(tourData);
+		}
+
+        // cleanup everything as if nothing has happened
+        emFactory.close();
+        emFactory = null;
 	}
 
 	private Connection createConnection() throws SQLException {
@@ -967,6 +988,29 @@ public class TourDatabase {
 		}
 
 		return bikeList;
+	}
+
+	/**
+	 * @return Returns all tours in database
+	 */
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	public static ArrayList<TourData> getTours() {
+
+		ArrayList<TourData> tourList = new ArrayList<TourData>();
+
+		EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		if (em != null) {
+
+			Query query = em.createQuery("SELECT TourData " //$NON-NLS-1$
+					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ")); //$NON-NLS-1$ //$NON-NLS-2$
+
+			tourList = (ArrayList<TourData>) query.getResultList();
+
+			em.close();
+		}
+
+		return tourList;
 	}
 
 	/**

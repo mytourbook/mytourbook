@@ -164,26 +164,117 @@ public abstract class TreeColumnFactory {
 		};
 	};
 	
-//	public static final TreeColumnFactory ? = new TreeColumnFactory() {
-//		
-//		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
-//			
-//			
-//			
-//			return colDef;
-//		};
-//	};
+	public static final TreeColumnFactory MAX_SPEED = new TreeColumnFactory() {
+		
+		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "maxSpeed", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_max_speed_label);
+			colDef.setText(Messages.ColumnFactory_max_speed);
+			colDef.setToolTipText(Messages.ColumnFactory_max_speed_tooltip);
+			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			
+			return colDef;
+		};
+	};
 	
-//	public static final TreeColumnFactory ? = new TreeColumnFactory() {
-//		
-//		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
-//			
-//			
-//			
-//			return colDef;
-//		};
-//	};
+	public static final TreeColumnFactory AVG_SPEED = new TreeColumnFactory() {
 	
+	public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+		TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "avgSpeed", SWT.TRAIL); //$NON-NLS-1$
+		colDef.setLabel(Messages.ColumnFactory_speed_label);
+		colDef.setText(Messages.ColumnFactory_speed);
+		colDef.setToolTipText(Messages.ColumnFactory_speed_tooltip);
+		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		
+		return colDef;
+	};
+};
+
+	public static final TreeColumnFactory MAX_ALTITUDE = new TreeColumnFactory() {
+	
+	public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+		TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "maxAltitude", SWT.TRAIL); //$NON-NLS-1$
+		colDef.setLabel(Messages.ColumnFactory_max_altitude_label);
+		colDef.setText(Messages.ColumnFactory_max_altitude);
+		colDef.setToolTipText(Messages.ColumnFactory_max_altitude_tooltip);
+		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		
+		return colDef;
+	};
+};
+
+	public static final TreeColumnFactory MAX_PULSE = new TreeColumnFactory() {
+	
+	public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+		TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "maxPulse", SWT.TRAIL); //$NON-NLS-1$
+		colDef.setLabel(Messages.ColumnFactory_max_pulse_label);
+		colDef.setText(Messages.ColumnFactory_max_pulse);
+		colDef.setToolTipText(Messages.ColumnFactory_max_pulse_tooltip);
+		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		
+		return colDef;
+	};
+};
+
+	public static final TreeColumnFactory AVG_PULSE = new TreeColumnFactory() {
+	
+	public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+		TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "avgPulse", SWT.TRAIL); //$NON-NLS-1$
+		colDef.setLabel(Messages.ColumnFactory_avg_pulse_label);
+		colDef.setText(Messages.ColumnFactory_avg_pulse);
+		colDef.setToolTipText(Messages.ColumnFactory_avg_pulse_tooltip);
+		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		
+		return colDef;
+	};
+};
+
+	public static final TreeColumnFactory AVG_CADENCE = new TreeColumnFactory() {
+	
+	public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+		TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "avgCadence", SWT.TRAIL); //$NON-NLS-1$
+		colDef.setLabel(Messages.ColumnFactory_avg_cadence_label);
+		colDef.setText(Messages.ColumnFactory_avg_cadence);
+		colDef.setToolTipText(Messages.ColumnFactory_avg_cadence_tooltip);
+		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(6));
+		
+		return colDef;
+	};
+};
+
+	public static final TreeColumnFactory AVG_TEMPERATURE = new TreeColumnFactory() {
+		
+		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+			TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "avgTemperature", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_avg_temperature_label);
+			colDef.setText(Messages.ColumnFactory_avg_temperature);
+			colDef.setToolTipText(Messages.ColumnFactory_avg_temperature_tooltip);
+			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(6));
+			
+			return colDef;
+		};
+	};
+	
+//public static final TreeColumnFactory ? = new TreeColumnFactory() {
+//
+//public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+//	
+//	
+//	
+//	return colDef;
+//};
+//};
+
+//public static final TreeColumnFactory ? = new TreeColumnFactory() {
+//
+//public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+//	
+//	
+//	
+//	return colDef;
+//};
+//};
+
 //	public static final TreeColumnFactory ? = new TreeColumnFactory() {
 //		
 //		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {

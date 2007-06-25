@@ -1252,11 +1252,18 @@ public class TourData {
 
 	public void computeAvgCadence() {
 		long cadenceSum = 0;
+		int cadenceCount = 0;
 
 		for (int cadence : cadenceSerie) {
-			cadenceSum += cadence;
+			if (cadence > 0) {
+				cadenceCount++;
+				cadenceSum += cadence;
+			}
 		}
-		this.avgCadence = (int) cadenceSum / cadenceSerie.length;
+		if (cadenceCount > 0)
+			this.avgCadence = (int) cadenceSum / cadenceCount;
+		else
+			this.avgCadence = 0;
 	}
 
 	public void computeAvgTemperature() {
@@ -1270,13 +1277,15 @@ public class TourData {
 
 	public void computeMaxSpeed() {
 		float maxSpeed = 0;
-		for (int i = 1; i <= distanceSerie.length - 1; i++) {
-			float speed = ((float) distanceSerie[i] - (float) distanceSerie[i - 1]) /
-					((float) timeSerie[i] - (float) timeSerie[i - 1]) *
-					(float) 3.6;
+		if (distanceSerie.length >= 2) {
+			for (int i = 1; i <= distanceSerie.length - 1; i++) {
+				float speed = ((float) distanceSerie[i] - (float) distanceSerie[i - 1]) /
+						((float) timeSerie[i] - (float) timeSerie[i - 1]) *
+						(float) 3.6;
 
-			if (speed > maxSpeed)
-				maxSpeed = speed;
+				if (speed > maxSpeed)
+					maxSpeed = speed;
+			}
 		}
 		this.maxSpeed = maxSpeed;
 	}
