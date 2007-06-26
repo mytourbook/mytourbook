@@ -25,8 +25,10 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+import net.tourbook.chart.ChartMarker;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -46,7 +48,34 @@ public class CRPDataReader extends TourbookDevice {
 	}
 
 	public String getDeviceModeName(int profileId) {
-		return "";
+
+		// 0: Run
+		// 1: Ski
+		// 2: Bike
+		// 3: Ski/Bike
+		// 4: Altitude
+
+		switch (profileId) {
+		case 0:
+			return "Run";
+
+		case 1:
+			return "Ski";
+
+		case 2:
+			return "Bike";
+
+		case 3:
+			return "Ski/Bike";
+
+		case 4:
+			return "Altitude";
+
+		default:
+			break;
+		}
+
+		return "?";
 	}
 
 	public int getImportDataSize() {
@@ -177,9 +206,12 @@ public class CRPDataReader extends TourbookDevice {
 			 */
 			TourData tourData = new TourData();
 
+			tourData.setTourTitle(tourName);
+			tourData.setTourDescription(tourDesc);
+
 			tourData.setDeviceMode((short) (tourMode));
 			tourData.setDeviceModeName(getDeviceModeName(tourMode));
-			
+
 			tourData.setDeviceTimeInterval((short) interval);
 
 			tourData.setStartMinute((short) tourMin);
@@ -254,7 +286,19 @@ public class CRPDataReader extends TourbookDevice {
 
 				// set marker when a comment is set
 				if (tpIndex > 0 && comment.length() > 0) {
+
 					timeData.marker = 1;
+
+					// create a new marker
+					TourMarker tourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_DEVICE);
+					tourMarker.setLabel(comment);
+					tourMarker
+							.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+					tourMarker.setTime(timeData.time);
+					tourMarker.setDistance(timeData.distance);
+					tourMarker.setSerieIndex(tpIndex);
+
+					tourData.getTourMarkers().add(tourMarker);
 				}
 
 				// first altitude contains the start altitude and not the difference
@@ -291,7 +335,7 @@ public class CRPDataReader extends TourbookDevice {
 
 				// create additional data
 				tourData.setTourDistance(distance);
-				tourData.createTimeSeries(timeDataList);
+				tourData.createTimeSeries(timeDataList, false);
 				tourData.computeTourDrivingTime();
 				tourData.computeAvgFields();
 				tourData.setTourRecordingTime(tourRecordingTime);
@@ -301,7 +345,7 @@ public class CRPDataReader extends TourbookDevice {
 
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
-				
+
 				// set week of year
 				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
 						.getStartDay());
