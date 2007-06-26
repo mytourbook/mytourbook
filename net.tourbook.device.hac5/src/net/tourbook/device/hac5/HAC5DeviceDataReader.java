@@ -414,7 +414,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					// add new tour to the map
 					tourDataMap.put(tourId, tourData);
 
-					tourData.createTimeSeries(timeDataList);
+					tourData.createTimeSeries(timeDataList, true);
 					tourData.computeTourDrivingTime();
 					tourData.computeAvgFields();
 

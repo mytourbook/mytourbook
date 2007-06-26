@@ -344,7 +344,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 					// add new tour to the map
 					tourDataMap.put(tourId, tourData);
 
-					tourData.createTimeSeries(timeDataList);
+					tourData.createTimeSeries(timeDataList, true);
 					tourData.setTourType(defaultTourType);
 					tourData.computeTourDrivingTime();
 					tourData.computeAvgFields();
