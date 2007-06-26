@@ -8,6 +8,7 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  net.tourbook,
- net.tourbook.device
+ net.tourbook.device,
+ net.tourbook.chart
 Eclipse-LazyStart: true
 Bundle-Vendor: MyTourbook
