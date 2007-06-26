@@ -499,7 +499,7 @@ public class TourMarkerView extends ViewPart {
 		fMarkerViewer.refresh();
 
 		// update marker list and other listener
-		fTourChart.fireSelectionTourChart();
+		fTourChart.fireTourChartSelection();
 
 		setFocus();
 	}

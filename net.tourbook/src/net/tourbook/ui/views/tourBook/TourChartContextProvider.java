@@ -92,7 +92,7 @@ class TourChartContextProvider implements ChartContextProvider {
 				tourChart.updateMarkerLayer(true);
 
 				// update marker list and other listener
-				tourChart.fireSelectionTourChart();
+				tourChart.fireTourChartSelection();
 
 			} else if (fMarkerDialog != null) {
 

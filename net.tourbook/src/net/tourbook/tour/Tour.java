@@ -22,40 +22,57 @@ import java.util.Locale;
 
 import net.tourbook.data.TourData;
 
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.custom.ViewForm;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IMemento;
 
 public class Tour extends Composite {
 
-	private CTabFolder		fTabFolder;
-	private CTabItem		fChartItem;
-	private CTabItem		fTourDataItem;
+	private static final String	MEMENTO_SELECTED_TAB	= "tour.selected-tab";
 
-	private TourChart		fTourChart;
+	private CTabFolder			fTabFolder;
+	private CTabItem			fChartItem;
+	private CTabItem			fTourDataItem;
 
-	public Calendar			fCalendar			= GregorianCalendar.getInstance();
+	private TourChart			fTourChart;
+	private TourData			fTourData;
+
+	public Calendar				fCalendar				= GregorianCalendar.getInstance();
 //	private DateFormat		fDateFormatter		= DateFormat.getDateInstance(DateFormat.SHORT);
-	private DateFormat		fTimeFormatter		= DateFormat.getTimeInstance(DateFormat.SHORT);
-	private DateFormat		fDurationFormatter	= DateFormat.getTimeInstance(
-														DateFormat.SHORT,
-														Locale.GERMAN);
+	private DateFormat			fTimeFormatter			= DateFormat
+																.getTimeInstance(DateFormat.SHORT);
+	private DateFormat			fDurationFormatter		= DateFormat.getTimeInstance(
+																DateFormat.SHORT,
+																Locale.GERMAN);
 //	private NumberFormat	fNumberFormatter	= NumberFormat.getNumberInstance();
 
-	private Label			fLblDate;
-	private Label			fLblStartTime;
-	private Label			fLblRecordingTime;
-	private Label			fLblDrivingTime;
-	private Label			fLblTitle;
-	private Label			fLblStartLocation;
-	private Label			fLblEndLocation;
+	private Label				fLblDate;
+	private Label				fLblStartTime;
+	private Label				fLblRecordingTime;
+	private Label				fLblDrivingTime;
+	private Label				fLblDatapoints;
+	private Text				fTextTitle;
+	private Text				fTextStartLocation;
+	private Text				fTextEndLocation;
+	private Text				fTextDescription;
+
+	private ToolBarManager		fTbm;
+	private ActionUndoTyping	fActionUndoTyping;
+
+	private TourDataBackup		fTDBackup;
 
 //	protected ListenerList	fPropertyListeners	= new ListenerList();
 //
@@ -91,12 +108,30 @@ public class Tour extends Composite {
 //		}
 //	}
 
+	private class TourDataBackup {
+		String	Title;
+		String	StartLocation;
+		String	EndLocation;
+		String	Description;
+	}
+
 	public Tour(Composite parent, int style) {
 
 		super(parent, style);
 
 		createControls();
+		createActions();
 
+		fTDBackup = new TourDataBackup();
+	}
+
+	private void createActions() {
+
+		fActionUndoTyping = new ActionUndoTyping(this);
+
+		fTbm.add(fActionUndoTyping);
+
+		fTbm.update(true);
 	}
 
 	private void createControls() {
@@ -106,6 +141,11 @@ public class Tour extends Composite {
 		fTabFolder = new CTabFolder(this, SWT.FLAT | SWT.BOTTOM);
 
 		fTourChart = new TourChart(fTabFolder, SWT.FLAT, true);
+		fTourChart.addBeforeSaveListener(new ITourChartSaveListener() {
+			public void beforeSave() {
+				updateTourData();
+			}
+		});
 
 		fChartItem = new CTabItem(fTabFolder, SWT.FLAT);
 		fChartItem.setText("Tour Chart");
@@ -113,63 +153,136 @@ public class Tour extends Composite {
 
 		fTourDataItem = new CTabItem(fTabFolder, SWT.FLAT);
 		fTourDataItem.setText("Tour Data");
-		fTourDataItem.setControl(createTourDataControl());
-
-		// select the tour chart item
-		fTabFolder.setSelection(fChartItem);
+		fTourDataItem.setControl(createTourDataControls(fTabFolder));
 	}
 
-	private Control createTourDataControl() {
+	private void updateTourData() {
+		fTourData.setTourTitle(fTextTitle.getText());
+		fTourData.setTourStartPlace(fTextStartLocation.getText());
+		fTourData.setTourEndPlace(fTextEndLocation.getText());
+		fTourData.setTourDescription(fTextDescription.getText());
+	}
 
-		Composite container = new Composite(fTabFolder, SWT.NONE);
-		container.setLayout(new GridLayout(2, false));
+	private Control createTourDataControls(Composite parent) {
+
+		// device data / tour viewer
+		ViewForm tourForm = new ViewForm(parent, SWT.NONE);
+
+		// create the  toolbar
+		final ToolBar toolBar = new ToolBar(tourForm, SWT.FLAT | SWT.WRAP);
+		fTbm = new ToolBarManager(toolBar);
+
+		Composite detailContainer = createTourDetail(tourForm);
+
+		tourForm.setTopLeft(toolBar);
+		tourForm.setContent(detailContainer);
+
+		return tourForm;
+	}
+
+	private Composite createTourDetail(Composite parent) {
+
+		Composite detailContainer = new Composite(parent, SWT.NONE);
+		detailContainer.setLayout(new GridLayout(2, false));
 
 		Label label;
-		final GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
 
 		// tour date
-		label = new Label(container, SWT.NONE);
+		label = new Label(detailContainer, SWT.NONE);
 		label.setText("Tour Date:");
-		fLblDate = new Label(container, SWT.NONE);
-		fLblDate.setLayoutData(gd);
+		fLblDate = new Label(detailContainer, SWT.NONE);
 
 		// start time
-		label = new Label(container, SWT.NONE);
+		label = new Label(detailContainer, SWT.NONE);
 		label.setText("Start Time:");
-		fLblStartTime = new Label(container, SWT.NONE);
-		fLblStartTime.setLayoutData(gd);
+		fLblStartTime = new Label(detailContainer, SWT.NONE);
 
 		// recording time
-		label = new Label(container, SWT.NONE);
+		label = new Label(detailContainer, SWT.NONE);
 		label.setText("Recording Time:");
-		fLblRecordingTime = new Label(container, SWT.NONE);
-		fLblRecordingTime.setLayoutData(gd);
+		fLblRecordingTime = new Label(detailContainer, SWT.NONE);
 
 		// driving time
-		label = new Label(container, SWT.NONE);
+		label = new Label(detailContainer, SWT.NONE);
 		label.setText("Driving Time:");
-		fLblDrivingTime = new Label(container, SWT.NONE);
-		fLblDrivingTime.setLayoutData(gd);
+		fLblDrivingTime = new Label(detailContainer, SWT.NONE);
+
+		// # data points
+		label = new Label(detailContainer, SWT.NONE);
+		label.setText("Datapoints:");
+		fLblDatapoints = new Label(detailContainer, SWT.NONE);
 
 		// title
-		label = new Label(container, SWT.NONE);
+		label = new Label(detailContainer, SWT.NONE);
 		label.setText("Title:");
-		fLblTitle = new Label(container, SWT.NONE);
-		fLblTitle.setLayoutData(gd);
+		fTextTitle = new Text(detailContainer, SWT.BORDER);
+		fTextTitle.setLayoutData(gd);
+		fTextTitle.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				onChangeContent();
+			}
+		});
 
 		// start location
-		label = new Label(container, SWT.NONE);
+		label = new Label(detailContainer, SWT.NONE);
 		label.setText("Start Location:");
-		fLblStartLocation = new Label(container, SWT.NONE);
-		fLblStartLocation.setLayoutData(gd);
+		fTextStartLocation = new Text(detailContainer, SWT.BORDER);
+		fTextStartLocation.setLayoutData(gd);
+		fTextStartLocation.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				onChangeContent();
+			}
+		});
 
 		// end location
-		label = new Label(container, SWT.NONE);
+		label = new Label(detailContainer, SWT.NONE);
 		label.setText("End Location:");
-		fLblEndLocation = new Label(container, SWT.NONE);
-		fLblEndLocation.setLayoutData(gd);
+		fTextEndLocation = new Text(detailContainer, SWT.BORDER);
+		fTextEndLocation.setLayoutData(gd);
+		fTextEndLocation.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				onChangeContent();
+			}
+		});
 
-		return container;
+		// description
+		label = new Label(detailContainer, SWT.NONE);
+		label.setText("Description:");
+		label.setLayoutData(new GridData(SWT.NONE, SWT.TOP, false, false));
+		fTextDescription = new Text(detailContainer, SWT.BORDER
+				| SWT.WRAP
+				| SWT.MULTI
+				| SWT.V_SCROLL
+				| SWT.H_SCROLL);
+		fTextDescription.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		fTextDescription.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				onChangeContent();
+			}
+		});
+
+		return detailContainer;
+	}
+
+	private void onChangeContent() {
+
+		boolean isTourDirty = false;
+
+		if (fTextTitle.getText().compareTo(fTDBackup.Title) != 0) {
+			isTourDirty = true;
+		} else if (fTextStartLocation.getText().compareTo(fTDBackup.StartLocation) != 0) {
+			isTourDirty = true;
+		} else if (fTextEndLocation.getText().compareTo(fTDBackup.EndLocation) != 0) {
+			isTourDirty = true;
+		} else if (fTextDescription.getText().compareTo(fTDBackup.Description) != 0) {
+			isTourDirty = true;
+		}
+
+		if (isTourDirty) {
+			fTourChart.setTourDirty();
+		}
+		fActionUndoTyping.setEnabled(isTourDirty);
 	}
 
 	public TourChart getTourChart() {
@@ -178,12 +291,17 @@ public class Tour extends Composite {
 
 	public void refreshTourData(TourData tourData) {
 
+		// keep reference
+		fTourData = tourData;
+
 		// tour date
 		fLblDate.setText(TourManager.getTourDate(tourData));
+		fLblDate.pack(true);
 
 		// start time
 		fCalendar.set(0, 0, 0, tourData.getStartHour(), tourData.getStartMinute(), 0);
 		fLblStartTime.setText(fTimeFormatter.format(fCalendar.getTime()));
+		fLblStartTime.pack(true);
 
 		// recording time
 		final int recordingTime = tourData.getTourRecordingTime();
@@ -199,6 +317,7 @@ public class Tour extends Composite {
 					((recordingTime % 3600) % 60));
 
 			fLblRecordingTime.setText(fDurationFormatter.format(fCalendar.getTime()));
+			fLblRecordingTime.pack(true);
 		}
 
 		// driving time
@@ -215,28 +334,71 @@ public class Tour extends Composite {
 					((drivingTime % 3600) % 60));
 
 			fLblDrivingTime.setText(fDurationFormatter.format(fCalendar.getTime()));
+			fLblDrivingTime.pack(true);
 		}
 
+		// data points
+		final int dataPoints = tourData.getSerieData().timeSerie.length;
+		fLblDatapoints.setText(Integer.toString(dataPoints));
+		fLblDatapoints.pack(true);
+		
+		setFields();
+
+		fActionUndoTyping.setEnabled(false);
+	}
+
+	private void setFields() {
+
 		// tour title
-		final String tourTitle = tourData.getTourTitle();
-		fLblTitle.setText(tourTitle == null ? "" : tourTitle);
+		final String tourTitle = fTourData.getTourTitle();
+		fTextTitle.setText(tourTitle);
 
 		// start location
-		final String startLocation = tourData.getTourStartPlace();
-		fLblStartLocation.setText(startLocation == null ? "" : startLocation);
+		final String startLocation = fTourData.getTourStartPlace();
+		fTextStartLocation.setText(startLocation);
 
 		// end location
-		final String endLocation = tourData.getTourEndPlace();
-		fLblEndLocation.setText(endLocation == null ? "" : endLocation);
+		final String endLocation = fTourData.getTourEndPlace();
+		fTextEndLocation.setText(endLocation);
+
+		// description
+		final String description = fTourData.getTourDescription();
+		fTextDescription.setText(description);
+
+		fTDBackup.Title = new String(tourTitle);
+		fTDBackup.StartLocation = new String(startLocation);
+		fTDBackup.EndLocation = new String(endLocation);
+		fTDBackup.Description = new String(description);
 
 	}
 
 	public void restoreState(IMemento memento) {
 
+		if (memento != null) {
+
+			// select tab
+			Integer selectedTab = memento.getInteger(MEMENTO_SELECTED_TAB);
+			if (selectedTab != null) {
+				fTabFolder.setSelection(selectedTab);
+			} else {
+				fTabFolder.setSelection(0);
+			}
+
+		} else {
+			fTabFolder.setSelection(0);
+		}
 	}
 
 	public void saveState(IMemento memento) {
+		memento.putInteger(MEMENTO_SELECTED_TAB, fTabFolder.getSelectionIndex());
+	}
 
+	/**
+	 * set field content to the original values
+	 */
+	void undoTyping() {
+		setFields();
+		fActionUndoTyping.setEnabled(false);
 	}
 
 }

@@ -48,31 +48,31 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 
 		TVITourBookYear yearItem = (TVITourBookYear) (getParentItem());
 
-		String sqlString = "SELECT " //$NON-NLS-1$
-				+ "STARTYear, " //1			//$NON-NLS-1$
-				+ "STARTMonth, " //2		//$NON-NLS-1$
-				+ "STARTDay, " //3			//$NON-NLS-1$
-				+ "TOURDISTANCE, " //4		//$NON-NLS-1$
-				+ "TOURRECORDINGTIME, " //5	//$NON-NLS-1$
-				+ "TOURDRIVINGTIME, " //6	//$NON-NLS-1$
-				+ "TOURALTUP, " //7			//$NON-NLS-1$
-				+ "TOURALTDOWN, " //8		//$NON-NLS-1$
-				+ "startDistance, " //9		//$NON-NLS-1$
-				+ "tourID," //10			//$NON-NLS-1$
-				+ "tourType_typeId," //11	//$NON-NLS-1$
-				+ "tourTitle," //12			//$NON-NLS-1$
+		String sqlString = "SELECT " //			//$NON-NLS-1$
+				+ "STARTYear, " //1				//$NON-NLS-1$
+				+ "STARTMonth, " //2			//$NON-NLS-1$
+				+ "STARTDay, " //3				//$NON-NLS-1$
+				+ "TOURDISTANCE, " //4			//$NON-NLS-1$
+				+ "TOURRECORDINGTIME, " //5		//$NON-NLS-1$
+				+ "TOURDRIVINGTIME, " //6		//$NON-NLS-1$
+				+ "TOURALTUP, " //7				//$NON-NLS-1$
+				+ "TOURALTDOWN, " //8			//$NON-NLS-1$
+				+ "startDistance, " //9			//$NON-NLS-1$
+				+ "tourID," //10				//$NON-NLS-1$
+				+ "tourType_typeId," //11		//$NON-NLS-1$
+				+ "tourTitle," //12				//$NON-NLS-1$
 				+ "deviceTimeInterval," //13	//$NON-NLS-1$
-				+ "maxSpeed," //14			//$NON-NLS-1$
-				+ "3.6 * TOURDISTANCE / TOURDRIVINGTIME," //15			//$NON-NLS-1$
-				+ "maxAltitude," //16		//$NON-NLS-1$
-				+ "maxPulse," //17			//$NON-NLS-1$
-				+ "avgPulse," //18			//$NON-NLS-1$
+				+ "maxSpeed," //14				//$NON-NLS-1$
+				+ "1,"// "3.6 * TOURDISTANCE / TOURDRIVINGTIME," //15 //$NON-NLS-1$
+				+ "maxAltitude," //16			//$NON-NLS-1$
+				+ "maxPulse," //17				//$NON-NLS-1$
+				+ "avgPulse," //18				//$NON-NLS-1$
 				+ "avgCadence," //19			//$NON-NLS-1$
-				+ "avgTemperature" //20		//$NON-NLS-1$
-				+ "\n" //$NON-NLS-1$
-				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE STARTYEAR = " + yearItem.fTourYear) //$NON-NLS-1$
-				+ (" AND STARTMONTH = " + fTourMonth) //$NON-NLS-1$
+				+ "avgTemperature" //20			//$NON-NLS-1$
+				+ "\n" //						//$NON-NLS-1$
+				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //			//$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE STARTYEAR = " + yearItem.fTourYear) //				//$NON-NLS-1$
+				+ (" AND STARTMONTH = " + fTourMonth) //						//$NON-NLS-1$
 				+ sqlTourPersonId()
 				+ sqlTourTypeId()
 				+ " ORDER BY STARTDAY, StartHour, StartMinute"; //$NON-NLS-1$

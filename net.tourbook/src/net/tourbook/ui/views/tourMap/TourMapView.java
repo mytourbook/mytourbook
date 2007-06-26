@@ -45,7 +45,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.ActionAdjustAltitude;
 import net.tourbook.tour.IDataModelListener;
-import net.tourbook.tour.ITourChartListener;
+import net.tourbook.tour.ITourChartSelectionListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
@@ -403,7 +403,7 @@ public class TourMapView extends SynchedChartView {
 		fRefTourChart = new TourChart(fSashCharts, SWT.NONE, true);
 		fRefTourChart.setShowZoomActions(true);
 		fRefTourChart.setShowSlider(true);
-		fRefTourChart.addTourChartListener(new ITourChartListener() {
+		fRefTourChart.addTourChartListener(new ITourChartSelectionListener() {
 			public void selectedTourChart(SelectionTourChart tourChart) {
 				fActiveTourChart = fRefTourChart;
 				fPostSelectionProvider.setSelection(tourChart);
@@ -465,7 +465,7 @@ public class TourMapView extends SynchedChartView {
 			}
 		});
 
-		fCompTourChart.addTourChartListener(new ITourChartListener() {
+		fCompTourChart.addTourChartListener(new ITourChartSelectionListener() {
 			public void selectedTourChart(SelectionTourChart tourChart) {
 				fActiveTourChart = fCompTourChart;
 				fPostSelectionProvider.setSelection(tourChart);

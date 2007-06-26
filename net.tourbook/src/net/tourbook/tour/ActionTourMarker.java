@@ -62,7 +62,7 @@ public class ActionTourMarker extends Action implements IMenuCreator {
 							null,
 							IWorkbenchPage.VIEW_VISIBLE);
 
-					fTourChart.fireSelectionTourChart();
+					fTourChart.fireTourChartSelection();
 
 				} catch (PartInitException e) {
 					MessageDialog.openError(window.getShell(), "Error", "Error opening view:" //$NON-NLS-1$ //$NON-NLS-2$
@@ -125,7 +125,7 @@ public class ActionTourMarker extends Action implements IMenuCreator {
 		fTourChart.updateMarkerLayer(true);
 
 		// update marker list and other listener
-		fTourChart.fireSelectionTourChart();
+		fTourChart.fireTourChartSelection();
 	}
 
 }

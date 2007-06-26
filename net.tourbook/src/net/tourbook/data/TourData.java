@@ -124,20 +124,13 @@ public class TourData {
 	 * data from the device
 	 */
 	private long				deviceTravelTime;
-
 	private int					deviceDistance;
 
 	private int					deviceWheel;
-
 	private int					deviceWeight;
 
 	private int					deviceTotalUp;
-
 	private int					deviceTotalDown;
-
-	/*
-	 * calculated tour data
-	 */
 
 	/**
 	 * total distance (m)
@@ -164,43 +157,43 @@ public class TourData {
 	 */
 	private int					tourAltDown;
 
-	// db-version 3 - start
+	/**
+	 * plugin id for the device which was used for this tour
+	 */
+	private String				devicePluginId;
 
 	/**
 	 * Profile used by the device
 	 */
-	private short				deviceMode;
+	private short				deviceMode;									// db-version 3
 
-	private short				deviceTimeInterval;
+	private short				deviceTimeInterval;							// db-version 3
 
-	// db-version 3 - end
+	private int					maxAltitude;									// db-version 4
+	private int					maxPulse;										// db-version 4
+	private float				maxSpeed;										// db-version 4
 
-	// db-version 4 - start
-	private int					maxAltitude;
+	private int					avgPulse;										// db-version 4
+	private int					avgCadence;									// db-version 4
+	private int					avgTemperature;								// db-version 4
 
-	private int					maxPulse;
+	private String				tourTitle;										// db-version 4
+	private String				tourDescription;								// db-version 4
+	private String				tourStartPlace;								// db-version 4
+	private String				tourEndPlace;									// db-version 4
 
-	private int					avgPulse;
+	private String				calories;										// db-version 4
+	private float				bikerWeight;									// db-version 4
 
-	private int					avgCadence;
+	/**
+	 * visible name for the used plugin to import the data
+	 */
+	private String				devicePluginName;								// db-version 5
 
-	private int					avgTemperature;
-
-	private float				maxSpeed;
-
-	private String				tourTitle;
-
-	private String				tourDescription;
-
-	private String				tourStartPlace;
-
-	private String				tourEndPlace;
-
-	private String				calories;
-
-	private float				bikerWeight;
-
-	// db-version 4 - end
+	/**
+	 * visible name for <code>deviceMode</code>
+	 */
+	private String				deviceModeName;								// db-version 5
 
 	/**
 	 * data series for time, speed, altitude,...
@@ -232,25 +225,10 @@ public class TourData {
 	private TourPerson			tourPerson;
 
 	/**
-	 * plugin id for the device which was used for this tour Bike used for this
-	 * tour
+	 * plugin id for the device which was used for this tour Bike used for this tour
 	 */
 	@ManyToOne
 	private TourBike			tourBike;
-
-	/**
-	 * plugin id for the device which was used for this tour
-	 */
-	private String				devicePluginId;
-
-	/**
-	 * visible name for the used plugin to import the data TODO: save in db,
-	 * remove
-	 * 
-	 * @Transient
-	 */
-	@Transient
-	private String				devicePluginName;
 
 	/*
 	 * data series from the device
@@ -337,31 +315,21 @@ public class TourData {
 	public float[]				segmentSerieCadence;
 
 	/**
-	 * contains the filename from which the data are imported, when set to
-	 * <code>null</code> the data are not imported they are from the database
+	 * contains the filename from which the data are imported, when set to <code>null</code> the
+	 * data are not imported they are from the database
 	 */
 	@Transient
 	public String				importRawDataFile;
 
-	/**
-	 * visible name for <code>deviceMode</code>{@code}deviceMode TODO: save
-	 * in db, remove
-	 * 
-	 * @Transient
-	 */
-	@Transient
-	private String				deviceModeName;
-
 	public TourData() {}
 
 	/**
-	 * Called before this object gets persisted, copy data from the tourdata
-	 * object into the object which gets serialized
+	 * Called before this object gets persisted, copy data from the tourdata object into the object
+	 * which gets serialized
 	 */
 	/*
-	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of
-	 * bug http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921
-	 * 2006-08-11
+	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
+	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
 	 */
 	public void onPrePersist() {
 
@@ -441,8 +409,11 @@ public class TourData {
 
 	/**
 	 * Convert <code>TimeData</code> into <code>TourData</code>
+	 * 
+	 * @param createMarker
+	 *        creates the markers when set to <code>true</code>
 	 */
-	public void createTimeSeries(ArrayList<TimeData> timeDataList) {
+	public void createTimeSeries(ArrayList<TimeData> timeDataList, boolean createMarker) {
 
 		int serieLength = timeDataList.size();
 
@@ -479,7 +450,7 @@ public class TourData {
 
 				distanceDiff[timeIndex] = timeItem.distance;
 
-				if (timeItem.marker != 0) {
+				if (createMarker && timeItem.marker != 0) {
 
 					// create a new marker
 					TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
@@ -510,16 +481,15 @@ public class TourData {
 
 		try {
 			/*
-			 * this is the default implementation to create a tour id, but on
-			 * the 5.5.2007 a NumberFormatException occured so the calculation
-			 * for the tour id was adjusted
+			 * this is the default implementation to create a tour id, but on the 5.5.2007 a
+			 * NumberFormatException occured so the calculation for the tour id was adjusted
 			 */
-			tourId = Short.toString(getStartYear()) +
-					Short.toString(getStartMonth()) +
-					Short.toString(getStartDay()) +
-					Short.toString(getStartHour()) +
-					Short.toString(getStartMinute()) +
-					startDistance;
+			tourId = Short.toString(getStartYear())
+					+ Short.toString(getStartMonth())
+					+ Short.toString(getStartDay())
+					+ Short.toString(getStartHour())
+					+ Short.toString(getStartMinute())
+					+ startDistance;
 
 			setTourId(Long.parseLong(tourId));
 
@@ -528,12 +498,12 @@ public class TourData {
 			// distance was shorted that the maximum for a Long datatype is not
 			// exceeded
 
-			tourId = Short.toString(getStartYear()) +
-					Short.toString(getStartMonth()) +
-					Short.toString(getStartDay()) +
-					Short.toString(getStartHour()) +
-					Short.toString(getStartMinute()) +
-					startDistance.substring(0, Math.min(5, startDistance.length()));
+			tourId = Short.toString(getStartYear())
+					+ Short.toString(getStartMonth())
+					+ Short.toString(getStartDay())
+					+ Short.toString(getStartHour())
+					+ Short.toString(getStartMinute())
+					+ startDistance.substring(0, Math.min(5, startDistance.length()));
 
 			setTourId(Long.parseLong(tourId));
 		}
@@ -634,9 +604,9 @@ public class TourData {
 					? 0
 					: (float) ((float) segment.distance / segment.drivingTime * 3.6);
 
-			segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitude *
-					100 /
-					segment.distance;
+			segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitude
+					* 100
+					/ segment.distance;
 
 			segmentSerieAltimeter[segmentIndex] = segment.drivingTime == 0
 					? 0
@@ -704,26 +674,20 @@ public class TourData {
 		out.println("Tour distance (m):	" + getTourDistance()); //$NON-NLS-1$
 
 		out.println("Tour time:		" //$NON-NLS-1$
-				+
-				(getTourRecordingTime() / 3600) +
-				":" //$NON-NLS-1$
-				+
-				((getTourRecordingTime() % 3600) / 60) +
-				":" //$NON-NLS-1$
-				+
-				(getTourRecordingTime() % 3600) %
-				60);
+				+ (getTourRecordingTime() / 3600)
+				+ ":" //$NON-NLS-1$
+				+ ((getTourRecordingTime() % 3600) / 60)
+				+ ":" //$NON-NLS-1$
+				+ (getTourRecordingTime() % 3600)
+				% 60);
 
 		out.println("Driving time:		" //$NON-NLS-1$
-				+
-				(getTourDrivingTime() / 3600) +
-				":" //$NON-NLS-1$
-				+
-				((getTourDrivingTime() % 3600) / 60) +
-				":" //$NON-NLS-1$
-				+
-				(getTourDrivingTime() % 3600) %
-				60);
+				+ (getTourDrivingTime() / 3600)
+				+ ":" //$NON-NLS-1$
+				+ ((getTourDrivingTime() % 3600) / 60)
+				+ ":" //$NON-NLS-1$
+				+ (getTourDrivingTime() % 3600)
+				% 60);
 
 		out.println("Altitude up (m):	" + getTourAltUp()); //$NON-NLS-1$
 		out.println("Altitude down (m):	" + getTourAltDown()); //$NON-NLS-1$
@@ -733,12 +697,10 @@ public class TourData {
 		PrintStream out = System.out;
 
 		out.print((getTourRecordingTime() / 3600) + ":" //$NON-NLS-1$
-				+
-				((getTourRecordingTime() % 3600) / 60) +
-				":" //$NON-NLS-1$
-				+
-				((getTourRecordingTime() % 3600) % 60) +
-				"  "); //$NON-NLS-1$
+				+ ((getTourRecordingTime() % 3600) / 60)
+				+ ":" //$NON-NLS-1$
+				+ ((getTourRecordingTime() % 3600) % 60)
+				+ "  "); //$NON-NLS-1$
 		out.print(getTourDistance());
 	}
 
@@ -760,13 +722,13 @@ public class TourData {
 
 		TourData td = (TourData) obj;
 
-		return this.getStartYear() == td.getStartYear() &&
-				this.getStartMonth() == td.getStartMonth() &&
-				this.getStartDay() == td.getStartDay() &&
-				this.getStartHour() == td.getStartHour() &&
-				this.getStartMinute() == td.getStartMinute() &&
-				this.getTourDistance() == td.getTourDistance() &&
-				this.getTourRecordingTime() == td.getTourRecordingTime();
+		return this.getStartYear() == td.getStartYear()
+				&& this.getStartMonth() == td.getStartMonth()
+				&& this.getStartDay() == td.getStartDay()
+				&& this.getStartHour() == td.getStartHour()
+				&& this.getStartMinute() == td.getStartMinute()
+				&& this.getTourDistance() == td.getTourDistance()
+				&& this.getTourRecordingTime() == td.getTourRecordingTime();
 	}
 
 	/**
@@ -1132,7 +1094,7 @@ public class TourData {
 	 * @return the tourTitle
 	 */
 	public String getTourTitle() {
-		return tourTitle;
+		return tourTitle == null ? "" : tourTitle;
 	}
 
 	/**
@@ -1147,7 +1109,7 @@ public class TourData {
 	 * @return the tourDescription
 	 */
 	public String getTourDescription() {
-		return tourDescription;
+		return tourDescription == null ? "" : tourDescription;
 	}
 
 	/**
@@ -1162,7 +1124,7 @@ public class TourData {
 	 * @return the tourStartPlace
 	 */
 	public String getTourStartPlace() {
-		return tourStartPlace;
+		return tourStartPlace == null ? "" : tourStartPlace;
 	}
 
 	/**
@@ -1177,7 +1139,7 @@ public class TourData {
 	 * @return the tourEndPlace
 	 */
 	public String getTourEndPlace() {
-		return tourEndPlace;
+		return tourEndPlace == null ? "" : tourEndPlace;
 	}
 
 	/**
@@ -1217,9 +1179,10 @@ public class TourData {
 	public void setBikerWeight(float bikerWeight) {
 		this.bikerWeight = bikerWeight;
 	}
+
 /*
- * private int maxAltitude; private int maxPulse; private int avgPulse; private
- * int avgCadence; private int avgTemperature; private float maxSpeed;
+ * private int maxAltitude; private int maxPulse; private int avgPulse; private int avgCadence;
+ * private int avgTemperature; private float maxSpeed;
  */
 
 	public void computeAvgFields() {
@@ -1247,7 +1210,11 @@ public class TourData {
 		for (int pulse : pulseSerie) {
 			pulseSum += pulse;
 		}
-		this.avgPulse = (int) pulseSum / pulseSerie.length;
+		
+		final int pulseLength = pulseSerie.length;
+		if (pulseLength > 0) {
+			avgPulse = (int) pulseSum / pulseLength;
+		}
 	}
 
 	public void computeAvgCadence() {
@@ -1260,10 +1227,9 @@ public class TourData {
 				cadenceSum += cadence;
 			}
 		}
-		if (cadenceCount > 0)
-			this.avgCadence = (int) cadenceSum / cadenceCount;
-		else
-			this.avgCadence = 0;
+		if (cadenceCount > 0) {
+			avgCadence = (int) cadenceSum / cadenceCount;
+		}
 	}
 
 	public void computeAvgTemperature() {
@@ -1272,16 +1238,20 @@ public class TourData {
 		for (int temperature : temperatureSerie) {
 			temperatureSum += temperature;
 		}
-		this.avgTemperature = (int) temperatureSum / temperatureSerie.length;
+		
+		final int tempLength = temperatureSerie.length;
+		if (tempLength > 0) {
+			avgTemperature = (int) temperatureSum / tempLength;
+		}
 	}
 
 	public void computeMaxSpeed() {
 		float maxSpeed = 0;
 		if (distanceSerie.length >= 2) {
 			for (int i = 1; i <= distanceSerie.length - 1; i++) {
-				float speed = ((float) distanceSerie[i] - (float) distanceSerie[i - 1]) /
-						((float) timeSerie[i] - (float) timeSerie[i - 1]) *
-						(float) 3.6;
+				float speed = ((float) distanceSerie[i] - (float) distanceSerie[i - 1])
+						/ ((float) timeSerie[i] - (float) timeSerie[i - 1])
+						* (float) 3.6;
 
 				if (speed > maxSpeed)
 					maxSpeed = speed;

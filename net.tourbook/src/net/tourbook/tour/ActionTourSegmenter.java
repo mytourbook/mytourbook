@@ -53,7 +53,7 @@ public class ActionTourSegmenter extends Action {
 						null,
 						IWorkbenchPage.VIEW_VISIBLE);
 
-				fTourChart.fireSelectionTourChart();
+				fTourChart.fireTourChartSelection();
 
 			} catch (PartInitException e) {
 				MessageDialog.openError(window.getShell(), "Error", "Error opening view:" //$NON-NLS-1$ //$NON-NLS-2$

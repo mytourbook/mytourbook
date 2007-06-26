@@ -34,7 +34,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContainer;
 import net.tourbook.tour.IDataModelListener;
-import net.tourbook.tour.ITourChartListener;
+import net.tourbook.tour.ITourChartSelectionListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.Tour;
 import net.tourbook.tour.TourChart;
@@ -256,12 +256,11 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 				final String property = event.getProperty();
 
 				/*
-				 * set a new chart configuration when the preferences has
-				 * changed
+				 * set a new chart configuration when the preferences has changed
 				 */
-				if (property.equals(ITourbookPreferences.GRAPH_VISIBLE) ||
-						property.equals(ITourbookPreferences.GRAPH_X_AXIS) ||
-						property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
+				if (property.equals(ITourbookPreferences.GRAPH_VISIBLE) || property
+						.equals(ITourbookPreferences.GRAPH_X_AXIS)
+						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
 
 					fTourChartConfig = TourManager.createTourChartConfiguration();
 				}
@@ -388,7 +387,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 			}
 		});
 
-		fTourChart.addTourChartListener(new ITourChartListener() {
+		fTourChart.addTourChartListener(new ITourChartSelectionListener() {
 			public void selectedTourChart(SelectionTourChart tourChart) {
 				firePostSelection(tourChart);
 			}
@@ -449,12 +448,11 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 	private Control createTourViewer(Composite parent) {
 
 		// tour tree
-		final Tree tree = new Tree(parent, SWT.H_SCROLL |
-				SWT.V_SCROLL |
-				SWT.BORDER |
-				SWT.FLAT |
-				SWT.FULL_SELECTION |
-				SWT.MULTI);
+		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.BORDER
+				| SWT.FLAT
+				| SWT.FULL_SELECTION
+				| SWT.MULTI);
 
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		tree.setHeaderVisible(true);
@@ -642,7 +640,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		 * column: tour type
 		 */
 		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
-// colDef.setColumnResizable(false);
+//		colDef.setColumnResizable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
@@ -738,9 +736,8 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					cell
-							.setText(Long.toString(((TVITourBookTour) element)
-									.getColumnTimeInterval()));
+					cell.setText(Long
+							.toString(((TVITourBookTour) element).getColumnTimeInterval()));
 				}
 				setCellColor(cell, element);
 			}
@@ -1094,6 +1091,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 	}
 
 	void refreshTour(TourData tourData) {
+		fTourChart.updateChart(fTourChartTourData, fTourChartConfig, false);
 		fTour.refreshTourData(tourData);
 	}
 
@@ -1192,12 +1190,12 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 			// show/hide tour chart
 			Integer detailVisibleStatus = memento.getInteger(MEMENTO_VISIBLE_STATUS_DETAIL);
 
-			fActionShowDetailStatistic.setChecked(detailVisibleStatus == null ||
-					detailVisibleStatus == 0 ||
-					detailVisibleStatus == 1);
-			fActionShowDetailTourChart.setChecked(detailVisibleStatus == null ||
-					detailVisibleStatus == 0 ||
-					detailVisibleStatus == 2);
+			fActionShowDetailStatistic
+					.setChecked(detailVisibleStatus == null || detailVisibleStatus == 0
+							|| detailVisibleStatus == 1);
+			fActionShowDetailTourChart
+					.setChecked(detailVisibleStatus == null || detailVisibleStatus == 0
+							|| detailVisibleStatus == 2);
 
 			// set tour viewer reselection data
 			Integer selectedYear = memento.getInteger(MEMENTO_TOURVIEWER_SELECTED_YEAR);

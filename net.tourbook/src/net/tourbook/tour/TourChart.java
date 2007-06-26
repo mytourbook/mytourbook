@@ -66,7 +66,8 @@ public class TourChart extends Chart {
 	private ActionTourSegmenter		fActionTourSegmenter;
 	private ActionTourMarker		fActionMarkerEditor;
 
-	private ListenerList			fTourChartListeners	= new ListenerList();
+	private ListenerList			fSelectionListeners	= new ListenerList();
+	private ListenerList			fSaveListeners		= new ListenerList();
 
 	/**
 	 * the data model listener is called when the chart data was created
@@ -94,12 +95,12 @@ public class TourChart extends Chart {
 		setPrefListeners();
 
 		/*
-		 * when the focus is changed, fire a tour chart selection, this is
-		 * neccesarry to update the tour markers when a tour chart got the focus
+		 * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
+		 * tour markers when a tour chart got the focus
 		 */
 		addFocusListener(new Listener() {
 			public void handleEvent(Event event) {
-				fireSelectionTourChart();
+				fireTourChartSelection();
 			}
 		});
 
@@ -109,8 +110,11 @@ public class TourChart extends Chart {
 		fChartDataModelListener = dataModelListener;
 	}
 
-	public void addTourChartListener(ITourChartListener listener) {
-		fTourChartListeners.add(listener);
+	public void addTourChartListener(ITourChartSelectionListener listener) {
+		fSelectionListeners.add(listener);
+	}
+	public void addBeforeSaveListener(ITourChartSaveListener listener) {
+		fSaveListeners.add(listener);
 	}
 
 	/**
@@ -165,8 +169,8 @@ public class TourChart extends Chart {
 			chartMarker.serieIndex = tourMarker.getSerieIndex();
 			chartMarker.visualPosition = tourMarker.getVisualPosition();
 			chartMarker.type = tourMarker.getType();
-			chartMarker.visualType=tourMarker.getVisibleType();
-			
+			chartMarker.visualType = tourMarker.getVisibleType();
+
 			chartMarker.labelXOffset = tourMarker.getLabelXOffset();
 			chartMarker.labelYOffset = tourMarker.getLabelYOffset();
 
@@ -215,8 +219,7 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * create the tour specific action, they are defined in the chart
-	 * configuration
+	 * create the tour specific action, they are defined in the chart configuration
 	 */
 	private void createTourActions() {
 
@@ -332,8 +335,8 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * Enable/disable the graph buttons, this depends on the visible graphs
-	 * which are defined in the chart config
+	 * Enable/disable the graph buttons, this depends on the visible graphs which are defined in the
+	 * chart config
 	 */
 	void enableActions() {
 
@@ -394,13 +397,28 @@ public class TourChart extends Chart {
 	/**
 	 * fire a selection event for this tour chart
 	 */
-	public void fireSelectionTourChart() {
-		Object[] listeners = fTourChartListeners.getListeners();
+	public void fireTourChartSelection() {
+		Object[] listeners = fSelectionListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
-			final ITourChartListener listener = (ITourChartListener) listeners[i];
+			final ITourChartSelectionListener listener = (ITourChartSelectionListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
 					listener.selectedTourChart(new SelectionTourChart(TourChart.this));
+				}
+			});
+		}
+	}
+	
+	/**
+	 * fire a save event
+	 */
+	private void fireBeforeSave() {
+		Object[] listeners = fSaveListeners.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			final ITourChartSaveListener listener = (ITourChartSaveListener) listeners[i];
+			SafeRunnable.run(new SafeRunnable() {
+				public void run() {
+					listener.beforeSave();
 				}
 			});
 		}
@@ -410,8 +428,8 @@ public class TourChart extends Chart {
 		return fTourData;
 	}
 
-	public void removeTourChartListener(ITourChartListener listener) {
-		fTourChartListeners.remove(listener);
+	public void removeTourChartListener(ITourChartSelectionListener listener) {
+		fSelectionListeners.remove(listener);
 	}
 
 	/**
@@ -420,6 +438,7 @@ public class TourChart extends Chart {
 	private void saveTour() {
 
 		if (fIsTourDirty && fTourData != null) {
+			fireBeforeSave();
 			TourDatabase.saveTour(fTourData);
 		}
 
@@ -548,8 +567,8 @@ public class TourChart extends Chart {
 				boolean isChartChanged = false;
 
 				// test if the zoom preferences has changed
-				if (property.equals(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH)
-						|| property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
+				if (property.equals(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH) || property
+						.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
 
 					final IPreferenceStore prefStore = TourbookPlugin
 							.getDefault()
@@ -563,8 +582,7 @@ public class TourChart extends Chart {
 				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
 					/*
-					 * when the chart is computed, the changed colors are read
-					 * from the preferences
+					 * when the chart is computed, the changed colors are read from the preferences
 					 */
 
 					isChartChanged = true;
@@ -617,8 +635,8 @@ public class TourChart extends Chart {
 	 * set the x-marker position listener
 	 * 
 	 * @param isPositionListenerEnabled
-	 *        <code>true</code> sets the position listener, <code>false</code>
-	 *        disables the listener
+	 *        <code>true</code> sets the position listener, <code>false</code> disables the
+	 *        listener
 	 * @param synchDirection
 	 * @param tourChartListener
 	 */
@@ -629,8 +647,7 @@ public class TourChart extends Chart {
 		super.setZoomMarkerPositionListener(isPositionListenerEnabled ? tourChartListener : null);
 
 		/*
-		 * when the position listener is set, the zoom action will be
-		 * deactivated
+		 * when the position listener is set, the zoom action will be deactivated
 		 */
 		if (isPositionListenerEnabled) {
 
@@ -699,14 +716,13 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * Update the chart by providing new tourdata and chart configuration which
-	 * is used to create the chart data model
+	 * Update the chart by providing new tourdata and chart configuration which is used to create
+	 * the chart data model
 	 * 
 	 * @param tourData
 	 * @param chartConfig
 	 * @param keepMinMaxValues
-	 *        when set to <code>true</code> keep the min/max values from the
-	 *        previous chart
+	 *        when set to <code>true</code> keep the min/max values from the previous chart
 	 */
 	public void updateChart(final TourData tourData,
 							final TourChartConfiguration chartConfig,
@@ -785,8 +801,7 @@ public class TourChart extends Chart {
 		updateChartLayers();
 
 		/*
-		 * the chart needs to be redrawn because the alpha for filling the chart
-		 * has changed
+		 * the chart needs to be redrawn because the alpha for filling the chart has changed
 		 */
 		redrawChart();
 	}

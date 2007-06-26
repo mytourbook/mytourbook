@@ -18,7 +18,6 @@ package net.tourbook.database;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -36,7 +35,6 @@ import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.application.MyTourbookSplashHandler;
-import net.tourbook.data.SerieData;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -219,6 +217,7 @@ public class TourDatabase {
 
 		IRunnableWithProgress startServerRunnable = null;
 
+		// load derby driver
 		try {
 			Class.forName("org.apache.derby.jdbc.ClientDriver"); //$NON-NLS-1$
 		} catch (ClassNotFoundException e) {
@@ -226,14 +225,10 @@ public class TourDatabase {
 			return startServerRunnable;
 		}
 
-		/*
-		 * start derby server
-		 */
-
+		// start derby server
 		startServerRunnable = new IRunnableWithProgress() {
 
 			public void run(IProgressMonitor monitor) {
-
 				runStartServer(monitor);
 			}
 
@@ -244,10 +239,7 @@ public class TourDatabase {
 
 	private void runStartServer(IProgressMonitor monitor) {
 
-		// monitor.beginTask(Messages.Database_Monitor_db_service_task, 5);
 		monitor.subTask(Messages.Database_Monitor_db_service_task);
-		// monitor.setTaskName(Messages.Database_Monitor_db_service_task);
-		// monitor.setTaskName("");
 
 		String databasePath = getDatabasePath();
 
@@ -262,16 +254,11 @@ public class TourDatabase {
 			e2.printStackTrace();
 		}
 
-		// monitor.worked(1);
-		// monitor.subTask(Messages.Database_Monitor_db_service_subtask_location
-		// + databasePath);
-
 		try {
 			/*
 			 * check if another derby server is already running (this can happen during development)
 			 */
 			server.ping();
-			// monitor.worked(1);
 
 		} catch (Exception e) {
 
@@ -287,30 +274,24 @@ public class TourDatabase {
 
 				try {
 					server.ping();
-					// monitor.worked(1);
 					break;
 				} catch (Exception e1) {
 					try {
 						Thread.sleep(1);
-						// monitor.worked(1);
 					} catch (InterruptedException e2) {
 						e2.printStackTrace();
 					}
 				}
 			}
 
-			// make the first connection, this takes longer as the
-			// subsequent ones
+			// make the first connection, this takes longer as the subsequent ones
 			try {
-				// monitor.worked(1);
 				Connection connection = createConnection();
 				connection.close();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
 		}
-		// monitor.done();
-		// monitor.worked(1);
 	}
 
 	/**
@@ -352,7 +333,7 @@ public class TourDatabase {
 								+ "(" //$NON-NLS-1$
 								+ "bikeId	 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
 								+ "name				VARCHAR(255),	\n" //$NON-NLS-1$
-								+ "weight 			FLOAT,			\n" //$NON-NLS-1$//kg
+								+ "weight 			FLOAT,			\n" //$NON-NLS-1$ // kg
 								+ "typeId 			INTEGER,		\n" //$NON-NLS-1$
 								+ "frontTyreId 		INTEGER,		\n" //$NON-NLS-1$
 								+ "rearTyreId 		INTEGER			\n" //$NON-NLS-1$
@@ -488,24 +469,24 @@ public class TourDatabase {
 				// Create Table: TourCompared
 				stmt
 						.addBatch("" //$NON-NLS-1$
-								+ ("CREATE TABLE " + TABLE_TOUR_COMPARED) //$NON-NLS-1$
-								+ "(" //$NON-NLS-1$
+								+ ("CREATE TABLE " + TABLE_TOUR_COMPARED) //	//$NON-NLS-1$
+								+ "(" //										//$NON-NLS-1$
 								+ "comparedId 			BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
-								+ "refTourId			BIGINT," //$NON-NLS-1$
-								+ "tourId				BIGINT," //$NON-NLS-1$
-								+ "startIndex			INTEGER NOT NULL," //$NON-NLS-1$
-								+ "endIndex 			INTEGER NOT NULL," //$NON-NLS-1$
-								+ "tourDate	 			DATE NOT NULL," //$NON-NLS-1$
-								+ "startYear			INTEGER NOT NULL," //$NON-NLS-1$
-								+ "tourSpeed	 		FLOAT" //$NON-NLS-1$
-								+ ")"); //$NON-NLS-1$
+								+ "refTourId			BIGINT," //				//$NON-NLS-1$
+								+ "tourId				BIGINT," //				//$NON-NLS-1$
+								+ "startIndex			INTEGER NOT NULL," //	//$NON-NLS-1$
+								+ "endIndex 			INTEGER NOT NULL," //	//$NON-NLS-1$
+								+ "tourDate	 			DATE NOT NULL," //		//$NON-NLS-1$
+								+ "startYear			INTEGER NOT NULL," //	//$NON-NLS-1$
+								+ "tourSpeed	 		FLOAT" //				//$NON-NLS-1$
+								+ ")"); //										//$NON-NLS-1$
 
 				// Create Table: TourData
 				stmt.addBatch("" //$NON-NLS-1$
 						+ ("CREATE TABLE " + TABLE_TOUR_DATA) //$NON-NLS-1$
 						+ "(" //$NON-NLS-1$
 						+ "tourId 				BIGINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "startYear 			SMALLINT NOT NULL,\n" //$NON-NLS-1$
+						+ "startYear 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
 						+ "startMonth 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
 						+ "startDay 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
 						+ "startHour 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
@@ -549,6 +530,10 @@ public class TourDatabase {
 						+ "calories				INTEGER,			\n" //$NON-NLS-1$
 						+ "bikerWeight			FLOAT,				\n" //$NON-NLS-1$
 						+ "tourBike_bikeId		BIGINT,				\n" //$NON-NLS-1$
+
+						// from wolfgang
+						+ "devicePluginName		VARCHAR(255),		\n" //$NON-NLS-1$
+						+ "deviceModeName		VARCHAR(255),		\n" //$NON-NLS-1$
 						// version 4 end
 
 						+ "tourType_typeId 		BIGINT,				\n" //$NON-NLS-1$
@@ -755,15 +740,13 @@ public class TourDatabase {
 			updateDbDesign_1_2(conn);
 			currentDbVersion = newVersion = 2;
 		}
-
 		if (currentDbVersion == 2) {
 			updateDbDesign_2_3(conn);
 			currentDbVersion = newVersion = 3;
 		}
-
 		if (currentDbVersion == 3) {
 			updateDbDesign_3_4(conn);
-			newVersion = TOURBOOK_DB_VERSION;
+			currentDbVersion = newVersion = TOURBOOK_DB_VERSION;
 		}
 
 		// update the version number
@@ -871,31 +854,48 @@ public class TourDatabase {
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourBike_bikeId		BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$
 			statement.addBatch(sql);
 
+			// from wolfgang
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN devicePluginName		VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			// from wolfgang
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceModeName		VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
 			statement.executeBatch();
 			statement.close();
 
 		} catch (SQLException e) {
 			printSQLException(e);
 		}
-		
-		// Create a EntityManagerFactory here, so we can access TourData
-		// with EJB
+
+		// Create a EntityManagerFactory here, so we can access TourData with EJB
 		emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
-        ArrayList<TourData> tourList = getTours();
+		ArrayList<TourData> tourList = getTours();
 
-        // loop over all tours and calculate and set new columns
-        for (TourData tourData : tourList) {
+//		int idx=0;
+//		System.out.println("size: " + tourList.size());
+
+		// loop over all tours and calculate and set new columns
+		for (TourData tourData : tourList) {
+
+//			System.out.println(idx+ " tourID: " + tourData.getTourId());
+
 			tourData.computeAvgFields();
+			
 			TourPerson person = tourData.getTourPerson();
 			tourData.setTourBike(person.getTourBike());
 			tourData.setBikerWeight(person.getWeight());
+			
 			saveTour(tourData);
+
+//			idx++;
 		}
 
-        // cleanup everything as if nothing has happened
-        emFactory.close();
-        emFactory = null;
+		// cleanup everything as if nothing has happened
+		emFactory.close();
+		emFactory = null;
 	}
 
 	private Connection createConnection() throws SQLException {
