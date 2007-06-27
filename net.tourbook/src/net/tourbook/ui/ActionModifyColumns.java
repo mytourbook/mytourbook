@@ -27,10 +27,10 @@ public class ActionModifyColumns extends Action {
 
 		fColumnManager = columnManager;
 
-		setText("Customize &Columns");
-		setToolTipText("Set the columns which are displayed in the table");
+		setText(Messages.Action_configure_columns);
+		setToolTipText(Messages.Action_configure_columns_tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("configure_columns.gif"));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_configure_columns));
 	}
 
 	public void run() {

@@ -193,7 +193,7 @@ public class TourDatabase {
 						.getSplashHandler();
 
 				if (splashHandler == null) {
-					throw new MyTourbookException("Cannot get Splash Handler");
+					throw new MyTourbookException("Cannot get Splash Handler"); //$NON-NLS-1$
 				} else {
 					IProgressMonitor splashProgressMonitor = splashHandler
 							.getBundleProgressMonitor();

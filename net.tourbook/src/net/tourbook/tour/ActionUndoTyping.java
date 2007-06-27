@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -27,10 +28,10 @@ public class ActionUndoTyping extends Action {
 
 		fTour = tour;
 
-		setText("Undo Typing");
-		setToolTipText("Undo Typing");
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("undo_edit.gif"));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("undo_edit-disabled.gif"));
+		setText(Messages.Tour_Action_undo_typing);
+		setToolTipText(Messages.Tour_Action_undo_typing_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_undo_edit));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_undo_edit_disabled));
 
 		setEnabled(false);
 	}

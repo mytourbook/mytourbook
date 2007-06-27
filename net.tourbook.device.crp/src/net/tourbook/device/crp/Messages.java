@@ -25,4 +25,10 @@ public class Messages extends NLS {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 	private Messages() {}
+	public static String	CRP_Profile_altitude;
+	public static String	CRP_Profile_bike;
+	public static String	CRP_Profile_run;
+	public static String	CRP_Profile_ski;
+	public static String	CRP_Profile_ski_bike;
+	public static String	CRP_Profile_unknown;
 }

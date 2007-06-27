@@ -57,25 +57,25 @@ public class CRPDataReader extends TourbookDevice {
 
 		switch (profileId) {
 		case 0:
-			return "Run";
+			return Messages.CRP_Profile_run;
 
 		case 1:
-			return "Ski";
+			return Messages.CRP_Profile_ski;
 
 		case 2:
-			return "Bike";
+			return Messages.CRP_Profile_bike;
 
 		case 3:
-			return "Ski/Bike";
+			return Messages.CRP_Profile_ski_bike;
 
 		case 4:
-			return "Altitude";
+			return Messages.CRP_Profile_altitude;
 
 		default:
 			break;
 		}
 
-		return "?";
+		return Messages.CRP_Profile_unknown;
 	}
 
 	public int getImportDataSize() {
@@ -114,7 +114,7 @@ public class CRPDataReader extends TourbookDevice {
 			fileReader = new BufferedReader(new FileReader(importFileName));
 
 			String fileHeader = fileReader.readLine();
-			if (fileHeader.startsWith("HRMProfilDatas") == false) {
+			if (fileHeader.startsWith("HRMProfilDatas") == false) { //$NON-NLS-1$
 				return false;
 			}
 
@@ -127,7 +127,7 @@ public class CRPDataReader extends TourbookDevice {
 
 			// get all trackpoints
 			while ((line = fileReader.readLine()) != null) {
-				if (line.equals("***")) {
+				if (line.equals("***")) { //$NON-NLS-1$
 					break;
 				}
 				trackPoints.add(new String(line.toString()));
@@ -168,9 +168,9 @@ public class CRPDataReader extends TourbookDevice {
 			tokenLine.nextToken();
 
 			// tour name
-			String tourName = "";
+			String tourName = ""; //$NON-NLS-1$
 			if (tokenLine.hasMoreTokens()) {
-				tourName = tokenLine.nextToken("\t");
+				tourName = tokenLine.nextToken("\t"); //$NON-NLS-1$
 			}
 
 			// skip lines
@@ -195,9 +195,9 @@ public class CRPDataReader extends TourbookDevice {
 			/*
 			 * lines: tour description
 			 */
-			String tourDesc = "";
+			String tourDesc = ""; //$NON-NLS-1$
 			while ((line = fileReader.readLine()) != null) {
-				tourDesc += line + "\n";
+				tourDesc += line + "\n"; //$NON-NLS-1$
 			}
 			tourDesc = tourDesc.trim();
 
@@ -263,9 +263,9 @@ public class CRPDataReader extends TourbookDevice {
 				trackpointTime = tokenLine.nextToken();
 
 				// get comment for current trackpoint
-				String comment = "";
+				String comment = ""; //$NON-NLS-1$
 				if (tokenLine.hasMoreTokens()) {
-					comment = tokenLine.nextToken("\t");
+					comment = tokenLine.nextToken("\t"); //$NON-NLS-1$
 				}
 
 				timeDataList.add(timeData = new TimeData());
@@ -376,7 +376,7 @@ public class CRPDataReader extends TourbookDevice {
 			fileReader = new BufferedReader(new FileReader(fileName));
 
 			String fileHeader = fileReader.readLine();
-			if (fileHeader.startsWith("HRMProfilDatas") == false) {
+			if (fileHeader.startsWith("HRMProfilDatas") == false) { //$NON-NLS-1$
 				return false;
 			}
 

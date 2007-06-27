@@ -89,7 +89,7 @@ public class PortListener implements SerialPortEventListener {
 		// a different application to reliquish the port if the user
 		// wants to.
 		try {
-			fSerialPort = (SerialPort) portId.open("net.tourbook.data.serial", 5000);
+			fSerialPort = (SerialPort) portId.open("net.tourbook.data.serial", 5000); //$NON-NLS-1$
 		} catch (PortInUseException e) {
 			throw new SerialConnectionException(e.getMessage());
 		}
@@ -111,7 +111,7 @@ public class PortListener implements SerialPortEventListener {
 			// fOutStreamIsOpen=true;
 		} catch (IOException e) {
 			fSerialPort.close();
-			throw new SerialConnectionException("Error opening i/o streams");
+			throw new SerialConnectionException("Error opening i/o streams"); //$NON-NLS-1$
 		}
 
 		// Add this object as an event listener for the serial port.
@@ -119,7 +119,7 @@ public class PortListener implements SerialPortEventListener {
 			fSerialPort.addEventListener(this);
 		} catch (TooManyListenersException e) {
 			fSerialPort.close();
-			throw new SerialConnectionException("too many selectionListeners added");
+			throw new SerialConnectionException("too many selectionListeners added"); //$NON-NLS-1$
 		}
 
 		// Set notifyOnDataAvailable to true to allow event driven input.
@@ -196,7 +196,7 @@ public class PortListener implements SerialPortEventListener {
 			fPortParams.setDatabits(oldDatabits);
 			fPortParams.setStopbits(oldStopbits);
 			fPortParams.setParity(oldParity);
-			throw new SerialConnectionException("Unsupported parameter");
+			throw new SerialConnectionException("Unsupported parameter"); //$NON-NLS-1$
 		}
 
 		// Set flow control.
@@ -204,7 +204,7 @@ public class PortListener implements SerialPortEventListener {
 			fSerialPort.setFlowControlMode(fPortParams.getFlowControlIn()
 					| fPortParams.getFlowControlOut());
 		} catch (UnsupportedCommOperationException e) {
-			throw new SerialConnectionException("Unsupported flow control");
+			throw new SerialConnectionException("Unsupported flow control"); //$NON-NLS-1$
 		}
 	}
 

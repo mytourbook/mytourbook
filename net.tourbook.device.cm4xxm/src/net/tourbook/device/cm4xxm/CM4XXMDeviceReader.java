@@ -89,14 +89,14 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		
 		switch (profileId) {
 		case 46: // 0x2E
-			return "Bike 2";
+			return Messages.CM4XXM_profile_bike2;
 
 		case 62: // 0x3E
-			return "Bike 1";
+			return Messages.CM4XXM_profile_bike1;
 
 		}
 
-		return "CM4xxM: unknown profile"; //$NON-NLS-1$
+		return Messages.CM4XXM_profile_unknown; 
 	}
 
 	public int getImportDataSize() {

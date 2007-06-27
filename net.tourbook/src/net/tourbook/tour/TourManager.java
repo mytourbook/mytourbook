@@ -139,7 +139,7 @@ public class TourManager {
 	public static String getTourTitleDetailed(final TourData tourData) {
 
 		return getTourDate(tourData)
-				+ ((tourData.getTourTitle() != null) ? " - " + tourData.getTourTitle() : "");
+				+ ((tourData.getTourTitle() != null) ? " - " + tourData.getTourTitle() : ""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**

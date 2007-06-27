@@ -33,7 +33,7 @@ public class TurFileUtil {
 	}
 
 	public static String readText(InputStream in) {
-		String buf = "";
+		String buf = ""; //$NON-NLS-1$
 		try {
 			byte cBuf[] = new byte[1];
 			do {
@@ -53,7 +53,7 @@ public class TurFileUtil {
 		for (int i = 0; i < lineCount; i++) {
 			resultStr = resultStr + readText(in);
 			if (i + 1 < lineCount)
-				resultStr = resultStr + "\n";
+				resultStr = resultStr + "\n"; //$NON-NLS-1$
 		}
 
 		return resultStr;

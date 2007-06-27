@@ -70,7 +70,7 @@ public class ColumnModifyDialog extends TrayDialog {
 
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Choose Columns");
+		newShell.setText(Messages.ColumnModifyDialog_Dialog_title);
 	}
 
 	private void createButtons(Composite parent) {
@@ -82,7 +82,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		btnContainer.setLayoutData(gd);
 
 		fBtnMoveUp = new Button(btnContainer, SWT.NONE);
-		fBtnMoveUp.setText("Move &Up");
+		fBtnMoveUp.setText(Messages.ColumnModifyDialog_Button_move_up);
 		fBtnMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveSelectionUp();
@@ -92,7 +92,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		setButtonLayoutData(fBtnMoveUp);
 
 		fBtnMoveDown = new Button(btnContainer, SWT.NONE);
-		fBtnMoveDown.setText("Move &Down");
+		fBtnMoveDown.setText(Messages.ColumnModifyDialog_Button_move_down);
 		fBtnMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveSelectionDown();
@@ -105,7 +105,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		new Label(btnContainer, SWT.NONE);
 
 		fBtnSelectAll = new Button(btnContainer, SWT.NONE);
-		fBtnSelectAll.setText("Select &All");
+		fBtnSelectAll.setText(Messages.ColumnModifyDialog_Button_select_all);
 		fBtnSelectAll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 
@@ -121,7 +121,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		setButtonLayoutData(fBtnSelectAll);
 
 		fBtnDeselectAll = new Button(btnContainer, SWT.NONE);
-		fBtnDeselectAll.setText("D&eselect All");
+		fBtnDeselectAll.setText(Messages.ColumnModifyDialog_Button_deselect_all);
 		fBtnDeselectAll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 
@@ -245,7 +245,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		GridLayout gl;
 
 		label = new Label(parent, SWT.NONE);
-		label.setText("Select the columns you want to diplay in the table");
+		label.setText(Messages.ColumnModifyDialog_Label_info);
 
 		Composite dlgContainer = new Composite(parent, SWT.NONE);
 		dlgContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -253,7 +253,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		dlgContainer.setLayout(gl);
 
 		label = new Label(dlgContainer, SWT.NONE);
-		label.setText("Columns:");
+		label.setText(Messages.ColumnModifyDialog_Label_columns);
 
 		// spacer
 		new Label(dlgContainer, SWT.NONE);

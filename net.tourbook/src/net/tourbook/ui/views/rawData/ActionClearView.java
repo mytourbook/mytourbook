@@ -1,5 +1,6 @@
 package net.tourbook.ui.views.rawData;
 
+import net.tourbook.Messages;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 
@@ -13,11 +14,11 @@ public class ActionClearView extends Action {
 
 		fRawDataView = rawDataView;
 
-		setText("Clear View");
-		setToolTipText("Remove all tours from this view, saved tours will not be touched");
+		setText(Messages.RawData_Action_clear_view);
+		setToolTipText(Messages.RawData_Action_clear_view_tooltip);
 		
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("remove_all.gif"));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("remove_all_disabled.gif"));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_remove_all));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_remove_all_disabled));
 	}
 
 	public void run() {

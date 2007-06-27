@@ -525,22 +525,22 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 		switch (profileId) {
 		case 1:
-			return "Run";
+			return Messages.HAC4_Profile_run;
 
 		case 2:
-			return "Bike 2";
+			return Messages.HAC4_Profile_bike2;
 
 		case 3:
-			return "Bike 1";
+			return Messages.HAC4_Profile_bike1;
 
 		case 4:
-			return "Ski";
+			return Messages.HAC4_Profile_ski;
 
 		default:
 			break;
 		}
 
-		return "";
+		return Messages.HAC4_Profile_unknown;
 	}
 
 	public SerialParameters getPortParameters(String portName) {

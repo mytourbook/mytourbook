@@ -1094,7 +1094,7 @@ public class TourData {
 	 * @return the tourTitle
 	 */
 	public String getTourTitle() {
-		return tourTitle == null ? "" : tourTitle;
+		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
 	}
 
 	/**
@@ -1109,7 +1109,7 @@ public class TourData {
 	 * @return the tourDescription
 	 */
 	public String getTourDescription() {
-		return tourDescription == null ? "" : tourDescription;
+		return tourDescription == null ? "" : tourDescription; //$NON-NLS-1$
 	}
 
 	/**
@@ -1124,7 +1124,7 @@ public class TourData {
 	 * @return the tourStartPlace
 	 */
 	public String getTourStartPlace() {
-		return tourStartPlace == null ? "" : tourStartPlace;
+		return tourStartPlace == null ? "" : tourStartPlace; //$NON-NLS-1$
 	}
 
 	/**
@@ -1139,7 +1139,7 @@ public class TourData {
 	 * @return the tourEndPlace
 	 */
 	public String getTourEndPlace() {
-		return tourEndPlace == null ? "" : tourEndPlace;
+		return tourEndPlace == null ? "" : tourEndPlace; //$NON-NLS-1$
 	}
 
 	/**

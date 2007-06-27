@@ -170,9 +170,9 @@ public abstract class TableColumnFactory {
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
 			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDown", SWT.TRAIL); //$NON-NLS-1$
-			colDef.setLabel("Altitude down (m)");
+			colDef.setLabel(Messages.ColumnFactory_altitude_down_label);
 			colDef.setText(Messages.ColumnFactory_altitude_down_title);
-			colDef.setToolTipText("Altitude down");
+			colDef.setToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		
 			return colDef;

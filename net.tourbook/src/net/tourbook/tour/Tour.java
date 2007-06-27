@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 
 import org.eclipse.jface.action.ToolBarManager;
@@ -41,7 +42,7 @@ import org.eclipse.ui.IMemento;
 
 public class Tour extends Composite {
 
-	private static final String	MEMENTO_SELECTED_TAB	= "tour.selected-tab";
+	private static final String	MEMENTO_SELECTED_TAB	= "tour.selected-tab"; //$NON-NLS-1$
 
 	private CTabFolder			fTabFolder;
 	private CTabItem			fChartItem;
@@ -148,11 +149,11 @@ public class Tour extends Composite {
 		});
 
 		fChartItem = new CTabItem(fTabFolder, SWT.FLAT);
-		fChartItem.setText("Tour Chart");
+		fChartItem.setText(Messages.Tour_Label_tab_tour_chart);
 		fChartItem.setControl(fTourChart);
 
 		fTourDataItem = new CTabItem(fTabFolder, SWT.FLAT);
-		fTourDataItem.setText("Tour Data");
+		fTourDataItem.setText(Messages.Tour_Label_tab_tour_data);
 		fTourDataItem.setControl(createTourDataControls(fTabFolder));
 	}
 
@@ -190,32 +191,32 @@ public class Tour extends Composite {
 
 		// tour date
 		label = new Label(detailContainer, SWT.NONE);
-		label.setText("Tour Date:");
+		label.setText(Messages.Tour_Label_tour_date);
 		fLblDate = new Label(detailContainer, SWT.NONE);
 
 		// start time
 		label = new Label(detailContainer, SWT.NONE);
-		label.setText("Start Time:");
+		label.setText(Messages.Tour_Label_start_time);
 		fLblStartTime = new Label(detailContainer, SWT.NONE);
 
 		// recording time
 		label = new Label(detailContainer, SWT.NONE);
-		label.setText("Recording Time:");
+		label.setText(Messages.Tour_Label_recording_time);
 		fLblRecordingTime = new Label(detailContainer, SWT.NONE);
 
 		// driving time
 		label = new Label(detailContainer, SWT.NONE);
-		label.setText("Driving Time:");
+		label.setText(Messages.Tour_Label_driving_time);
 		fLblDrivingTime = new Label(detailContainer, SWT.NONE);
 
 		// # data points
 		label = new Label(detailContainer, SWT.NONE);
-		label.setText("Datapoints:");
+		label.setText(Messages.Tour_Label_datapoints);
 		fLblDatapoints = new Label(detailContainer, SWT.NONE);
 
 		// title
 		label = new Label(detailContainer, SWT.NONE);
-		label.setText("Title:");
+		label.setText(Messages.Tour_Label_tour_title);
 		fTextTitle = new Text(detailContainer, SWT.BORDER);
 		fTextTitle.setLayoutData(gd);
 		fTextTitle.addKeyListener(new KeyAdapter() {
@@ -226,7 +227,7 @@ public class Tour extends Composite {
 
 		// start location
 		label = new Label(detailContainer, SWT.NONE);
-		label.setText("Start Location:");
+		label.setText(Messages.Tour_Label_start_location);
 		fTextStartLocation = new Text(detailContainer, SWT.BORDER);
 		fTextStartLocation.setLayoutData(gd);
 		fTextStartLocation.addKeyListener(new KeyAdapter() {
@@ -237,7 +238,7 @@ public class Tour extends Composite {
 
 		// end location
 		label = new Label(detailContainer, SWT.NONE);
-		label.setText("End Location:");
+		label.setText(Messages.Tour_Label_end_location);
 		fTextEndLocation = new Text(detailContainer, SWT.BORDER);
 		fTextEndLocation.setLayoutData(gd);
 		fTextEndLocation.addKeyListener(new KeyAdapter() {
@@ -248,7 +249,7 @@ public class Tour extends Composite {
 
 		// description
 		label = new Label(detailContainer, SWT.NONE);
-		label.setText("Description:");
+		label.setText(Messages.Tour_Label_description);
 		label.setLayoutData(new GridData(SWT.NONE, SWT.TOP, false, false));
 		fTextDescription = new Text(detailContainer, SWT.BORDER
 				| SWT.WRAP
@@ -306,7 +307,7 @@ public class Tour extends Composite {
 		// recording time
 		final int recordingTime = tourData.getTourRecordingTime();
 		if (recordingTime == 0) {
-			fLblRecordingTime.setText("");
+			fLblRecordingTime.setText(""); //$NON-NLS-1$
 		} else {
 			fCalendar.set(
 					0,
@@ -323,7 +324,7 @@ public class Tour extends Composite {
 		// driving time
 		final int drivingTime = tourData.getTourDrivingTime();
 		if (drivingTime == 0) {
-			fLblDrivingTime.setText("");
+			fLblDrivingTime.setText(""); //$NON-NLS-1$
 		} else {
 			fCalendar.set(
 					0,

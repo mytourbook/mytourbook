@@ -308,7 +308,7 @@ public class ColumnManager {
 	 * 
 	 * @param columnIds
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public void orderColumns(final String[] columnIds) {
 
 		final ArrayList<ColumnDefinition> orderedColumns = new ArrayList<ColumnDefinition>();
@@ -340,7 +340,7 @@ public class ColumnManager {
 	 * 
 	 * @param tableItems
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	void orderColumns(final TableItem[] tableItems) {
 
 		final ArrayList<ColumnDefinition> sortedColumns = new ArrayList<ColumnDefinition>();

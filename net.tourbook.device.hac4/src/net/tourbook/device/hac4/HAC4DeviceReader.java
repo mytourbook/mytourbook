@@ -646,16 +646,16 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 		switch (profileId) {
 		case 129: // 0x81
-			return "Jogging";
+			return Messages.HAC4_Profile_jogging;
 
 		case 145: // 0x91
-			return "Ski";
+			return Messages.HAC4_Profile_ski;
 
 		case 161: // 0xA1
-			return "Bike";
+			return Messages.HAC4_Profile_bike;
 
 		case 177: // 0xB1
-			return "Ski-Bike";
+			return Messages.HAC4_Profile_ski_bike;
 		}
 
 		return "HAC4: unknown profile"; //$NON-NLS-1$

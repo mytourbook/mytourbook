@@ -154,7 +154,7 @@ public class ActionSaveTourInDatabase extends Action {
 
 		Runnable runnable = new Runnable() {
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void run() {
 
 				boolean isModified = false;

@@ -37,7 +37,7 @@ public class SerialParameters {
 	 */
 	public SerialParameters() {
 		this(
-				"",
+				"", //$NON-NLS-1$
 				9600,
 				SerialPort.FLOWCONTROL_NONE,
 				SerialPort.FLOWCONTROL_NONE,
@@ -227,16 +227,16 @@ public class SerialParameters {
 	 *        New data bits setting.
 	 */
 	public void setDatabits(String databits) {
-		if (databits.equals("5")) {
+		if (databits.equals("5")) { //$NON-NLS-1$
 			this.databits = SerialPort.DATABITS_5;
 		}
-		if (databits.equals("6")) {
+		if (databits.equals("6")) { //$NON-NLS-1$
 			this.databits = SerialPort.DATABITS_6;
 		}
-		if (databits.equals("7")) {
+		if (databits.equals("7")) { //$NON-NLS-1$
 			this.databits = SerialPort.DATABITS_7;
 		}
-		if (databits.equals("8")) {
+		if (databits.equals("8")) { //$NON-NLS-1$
 			this.databits = SerialPort.DATABITS_8;
 		}
 	}
@@ -258,15 +258,15 @@ public class SerialParameters {
 	public String getDatabitsString() {
 		switch (databits) {
 		case SerialPort.DATABITS_5:
-			return "5";
+			return "5"; //$NON-NLS-1$
 		case SerialPort.DATABITS_6:
-			return "6";
+			return "6"; //$NON-NLS-1$
 		case SerialPort.DATABITS_7:
-			return "7";
+			return "7"; //$NON-NLS-1$
 		case SerialPort.DATABITS_8:
-			return "8";
+			return "8"; //$NON-NLS-1$
 		default:
-			return "8";
+			return "8"; //$NON-NLS-1$
 		}
 	}
 
@@ -287,13 +287,13 @@ public class SerialParameters {
 	 *        New stop bits setting.
 	 */
 	public void setStopbits(String stopbits) {
-		if (stopbits.equals("1")) {
+		if (stopbits.equals("1")) { //$NON-NLS-1$
 			this.stopbits = SerialPort.STOPBITS_1;
 		}
-		if (stopbits.equals("1.5")) {
+		if (stopbits.equals("1.5")) { //$NON-NLS-1$
 			this.stopbits = SerialPort.STOPBITS_1_5;
 		}
-		if (stopbits.equals("2")) {
+		if (stopbits.equals("2")) { //$NON-NLS-1$
 			this.stopbits = SerialPort.STOPBITS_2;
 		}
 	}
@@ -315,13 +315,13 @@ public class SerialParameters {
 	public String getStopbitsString() {
 		switch (stopbits) {
 		case SerialPort.STOPBITS_1:
-			return "1";
+			return "1"; //$NON-NLS-1$
 		case SerialPort.STOPBITS_1_5:
-			return "1.5";
+			return "1.5"; //$NON-NLS-1$
 		case SerialPort.STOPBITS_2:
-			return "2";
+			return "2"; //$NON-NLS-1$
 		default:
-			return "1";
+			return "1"; //$NON-NLS-1$
 		}
 	}
 
@@ -342,13 +342,13 @@ public class SerialParameters {
 	 *        New parity setting.
 	 */
 	public void setParity(String parity) {
-		if (parity.equals("None")) {
+		if (parity.equals("None")) { //$NON-NLS-1$
 			this.parity = SerialPort.PARITY_NONE;
 		}
-		if (parity.equals("Even")) {
+		if (parity.equals("Even")) { //$NON-NLS-1$
 			this.parity = SerialPort.PARITY_EVEN;
 		}
-		if (parity.equals("Odd")) {
+		if (parity.equals("Odd")) { //$NON-NLS-1$
 			this.parity = SerialPort.PARITY_ODD;
 		}
 	}
@@ -370,13 +370,13 @@ public class SerialParameters {
 	public String getParityString() {
 		switch (parity) {
 		case SerialPort.PARITY_NONE:
-			return "None";
+			return "None"; //$NON-NLS-1$
 		case SerialPort.PARITY_EVEN:
-			return "Even";
+			return "Even"; //$NON-NLS-1$
 		case SerialPort.PARITY_ODD:
-			return "Odd";
+			return "Odd"; //$NON-NLS-1$
 		default:
-			return "None";
+			return "None"; //$NON-NLS-1$
 		}
 	}
 
@@ -389,19 +389,19 @@ public class SerialParameters {
 	 * @return An <code>int</code> describing a flow control type.
 	 */
 	private int stringToFlow(String flowControl) {
-		if (flowControl.equals("None")) {
+		if (flowControl.equals("None")) { //$NON-NLS-1$
 			return SerialPort.FLOWCONTROL_NONE;
 		}
-		if (flowControl.equals("Xon/Xoff Out")) {
+		if (flowControl.equals("Xon/Xoff Out")) { //$NON-NLS-1$
 			return SerialPort.FLOWCONTROL_XONXOFF_OUT;
 		}
-		if (flowControl.equals("Xon/Xoff In")) {
+		if (flowControl.equals("Xon/Xoff In")) { //$NON-NLS-1$
 			return SerialPort.FLOWCONTROL_XONXOFF_IN;
 		}
-		if (flowControl.equals("RTS/CTS In")) {
+		if (flowControl.equals("RTS/CTS In")) { //$NON-NLS-1$
 			return SerialPort.FLOWCONTROL_RTSCTS_IN;
 		}
-		if (flowControl.equals("RTS/CTS Out")) {
+		if (flowControl.equals("RTS/CTS Out")) { //$NON-NLS-1$
 			return SerialPort.FLOWCONTROL_RTSCTS_OUT;
 		}
 		return SerialPort.FLOWCONTROL_NONE;
@@ -418,17 +418,17 @@ public class SerialParameters {
 	String flowToString(int flowControl) {
 		switch (flowControl) {
 		case SerialPort.FLOWCONTROL_NONE:
-			return "None";
+			return "None"; //$NON-NLS-1$
 		case SerialPort.FLOWCONTROL_XONXOFF_OUT:
-			return "Xon/Xoff Out";
+			return "Xon/Xoff Out"; //$NON-NLS-1$
 		case SerialPort.FLOWCONTROL_XONXOFF_IN:
-			return "Xon/Xoff In";
+			return "Xon/Xoff In"; //$NON-NLS-1$
 		case SerialPort.FLOWCONTROL_RTSCTS_IN:
-			return "RTS/CTS In";
+			return "RTS/CTS In"; //$NON-NLS-1$
 		case SerialPort.FLOWCONTROL_RTSCTS_OUT:
-			return "RTS/CTS Out";
+			return "RTS/CTS Out"; //$NON-NLS-1$
 		default:
-			return "None";
+			return "None"; //$NON-NLS-1$
 		}
 	}
 }
