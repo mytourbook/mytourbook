@@ -63,12 +63,11 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 				+ "tourTitle," //12				//$NON-NLS-1$
 				+ "deviceTimeInterval," //13	//$NON-NLS-1$
 				+ "maxSpeed," //14				//$NON-NLS-1$
-				+ "1,"// "3.6 * TOURDISTANCE / TOURDRIVINGTIME," //15 //$NON-NLS-1$
-				+ "maxAltitude," //16			//$NON-NLS-1$
-				+ "maxPulse," //17				//$NON-NLS-1$
-				+ "avgPulse," //18				//$NON-NLS-1$
-				+ "avgCadence," //19			//$NON-NLS-1$
-				+ "avgTemperature" //20			//$NON-NLS-1$
+				+ "maxAltitude," //15			//$NON-NLS-1$
+				+ "maxPulse," //16				//$NON-NLS-1$
+				+ "avgPulse," //17				//$NON-NLS-1$
+				+ "avgCadence," //18			//$NON-NLS-1$
+				+ "avgTemperature" //19			//$NON-NLS-1$
 				+ "\n" //						//$NON-NLS-1$
 				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //			//$NON-NLS-1$ //$NON-NLS-2$
 				+ (" WHERE STARTYEAR = " + yearItem.fTourYear) //				//$NON-NLS-1$
@@ -110,12 +109,18 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 				tourItem.fTourTitle = result.getString(12);
 				tourItem.fColumnTimeInterval = result.getShort(13);
 				tourItem.fColumnMaxSpeed = result.getFloat(14);
-				tourItem.fColumnAvgSpeed = result.getFloat(15);
-				tourItem.fColumnMaxAltitude = result.getLong(16);
-				tourItem.fColumnMaxPulse = result.getLong(17);
-				tourItem.fColumnAvgPulse = result.getLong(18);
-				tourItem.fColumnAvgCadence = result.getLong(19);
-				tourItem.fColumnAvgTemperature = result.getLong(20);
+
+				if (tourItem.fColumnDrivingTime != 0) {
+					tourItem.fColumnAvgSpeed = (float) tourItem.fColumnDistance
+							/ (float) tourItem.fColumnDrivingTime
+							* 3.6f;
+				}
+
+				tourItem.fColumnMaxAltitude = result.getLong(15);
+				tourItem.fColumnMaxPulse = result.getLong(16);
+				tourItem.fColumnAvgPulse = result.getLong(17);
+				tourItem.fColumnAvgCadence = result.getLong(18);
+				tourItem.fColumnAvgTemperature = result.getLong(19);
 
 				children.add(tourItem);
 			}
