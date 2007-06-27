@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import net.tourbook.Messages;
 
 public interface ITourbookPreferences {
 

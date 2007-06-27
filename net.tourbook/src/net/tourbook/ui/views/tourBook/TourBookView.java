@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Formatter;

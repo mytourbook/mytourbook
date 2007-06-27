@@ -26,8 +26,6 @@ import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
 
-import javax.persistence.Entity;
-
 /**
  * TTI (TreeViewerItem) is used in the tree viewer TourMapView Contains tree items
  * for reference tours

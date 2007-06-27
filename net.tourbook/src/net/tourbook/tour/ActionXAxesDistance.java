@@ -17,7 +17,6 @@ package net.tourbook.tour;
 
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.TourChartConfiguration;
 
 import org.eclipse.jface.action.Action;
 

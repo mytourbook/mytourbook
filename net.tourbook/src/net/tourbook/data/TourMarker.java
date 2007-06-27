@@ -23,6 +23,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.ChartMarker;
 
 @Entity
 public class TourMarker {

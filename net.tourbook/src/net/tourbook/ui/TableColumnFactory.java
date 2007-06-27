@@ -17,7 +17,6 @@ package net.tourbook.ui;
 
 import java.io.File;
 
-import net.tourbook.ui.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.util.PixelConverter;
 
