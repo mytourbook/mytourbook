@@ -47,6 +47,14 @@ import org.hibernate.annotations.Cascade;
 public class TourData {
 
 	/**
+	 * 
+	 */
+	@Transient
+	public static final int		MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
+	@Transient
+	public static final float	MAX_BIKE_SPEED						= 120f;
+
+	/**
 	 * Unique persistence id which identifies the tour
 	 */
 	@Id
@@ -106,7 +114,7 @@ public class TourData {
 	/**
 	 * Tolerance in the Douglas Peucker algorithm when segmenting the tour
 	 */
-	private short				dpTolerance		= 50;
+	private short				dpTolerance						= 50;
 
 	/**
 	 * tt (h) type of tour <br>
@@ -165,35 +173,35 @@ public class TourData {
 	/**
 	 * Profile used by the device
 	 */
-	private short				deviceMode;									// db-version 3
+	private short				deviceMode;													// db-version 3
 
-	private short				deviceTimeInterval;							// db-version 3
+	private short				deviceTimeInterval;											// db-version 3
 
-	private int					maxAltitude;									// db-version 4
-	private int					maxPulse;										// db-version 4
-	private float				maxSpeed;										// db-version 4
+	private int					maxAltitude;													// db-version 4
+	private int					maxPulse;														// db-version 4
+	private float				maxSpeed;														// db-version 4
 
-	private int					avgPulse;										// db-version 4
-	private int					avgCadence;									// db-version 4
-	private int					avgTemperature;								// db-version 4
+	private int					avgPulse;														// db-version 4
+	private int					avgCadence;													// db-version 4
+	private int					avgTemperature;												// db-version 4
 
-	private String				tourTitle;										// db-version 4
-	private String				tourDescription;								// db-version 4
-	private String				tourStartPlace;								// db-version 4
-	private String				tourEndPlace;									// db-version 4
+	private String				tourTitle;														// db-version 4
+	private String				tourDescription;												// db-version 4
+	private String				tourStartPlace;												// db-version 4
+	private String				tourEndPlace;													// db-version 4
 
-	private String				calories;										// db-version 4
-	private float				bikerWeight;									// db-version 4
+	private String				calories;														// db-version 4
+	private float				bikerWeight;													// db-version 4
 
 	/**
 	 * visible name for the used plugin to import the data
 	 */
-	private String				devicePluginName;								// db-version 5
+	private String				devicePluginName;												// db-version 5
 
 	/**
 	 * visible name for <code>deviceMode</code>
 	 */
-	private String				deviceModeName;								// db-version 5
+	private String				deviceModeName;												// db-version 5
 
 	/**
 	 * data series for time, speed, altitude,...
@@ -203,14 +211,14 @@ public class TourData {
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourMarker>		tourMarkers		= new HashSet<TourMarker>();
+	private Set<TourMarker>		tourMarkers						= new HashSet<TourMarker>();
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourReference>	tourReferences	= new HashSet<TourReference>();
+	private Set<TourReference>	tourReferences					= new HashSet<TourReference>();
 
 	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
-	private Set<TourCategory>	tourCategory	= new HashSet<TourCategory>();
+	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
 
 	/**
 	 * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
@@ -1206,14 +1214,17 @@ public class TourData {
 
 	public void computeAvgPulse() {
 		long pulseSum = 0;
+		int  pulseCount = 0;
 
 		for (int pulse : pulseSerie) {
-			pulseSum += pulse;
+			if (pulse > 0) {
+				pulseCount++;
+				pulseSum += pulse;
+			}
 		}
-		
-		final int pulseLength = pulseSerie.length;
-		if (pulseLength > 0) {
-			avgPulse = (int) pulseSum / pulseLength;
+
+		if (pulseCount > 0) {
+			avgPulse = (int) pulseSum / pulseCount;
 		}
 	}
 
@@ -1238,7 +1249,7 @@ public class TourData {
 		for (int temperature : temperatureSerie) {
 			temperatureSum += temperature;
 		}
-		
+
 		final int tempLength = temperatureSerie.length;
 		if (tempLength > 0) {
 			avgTemperature = (int) temperatureSum / tempLength;
@@ -1247,13 +1258,21 @@ public class TourData {
 
 	public void computeMaxSpeed() {
 		float maxSpeed = 0;
+		int anzValuesSum = 1;
 		if (distanceSerie.length >= 2) {
-			for (int i = 1; i <= distanceSerie.length - 1; i++) {
-				float speed = ((float) distanceSerie[i] - (float) distanceSerie[i - 1])
-						/ ((float) timeSerie[i] - (float) timeSerie[i - 1])
-						* (float) 3.6;
+			if (deviceTimeInterval > 0) {
+				anzValuesSum = MIN_TIMEINTERVAL_FOR_MAX_SPEED / deviceTimeInterval;
+				if (anzValuesSum == 0) {
+					anzValuesSum = 1;
+				}
+			}
 
-				if (speed > maxSpeed)
+			for (int i = 0 + anzValuesSum; i <= distanceSerie.length - 1; i++) {
+				float speed = ((float) distanceSerie[i] - (float) distanceSerie[i - anzValuesSum])
+						/ ((float) timeSerie[i] - (float) timeSerie[i - anzValuesSum])
+						* 3.6f;
+
+				if (speed > maxSpeed && speed < MAX_BIKE_SPEED)
 					maxSpeed = speed;
 			}
 		}
