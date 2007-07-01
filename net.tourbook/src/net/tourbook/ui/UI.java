@@ -247,7 +247,7 @@ public class UI {
 		final String colorId = TOUR_TYPE_PREFIX + typeId;
 		Image image = fImageCache.get(colorId);
 
-		if (image == null) {
+		if (image == null || image.isDisposed()) {
 
 			/*
 			 * create image for the tour type
