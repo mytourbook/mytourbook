@@ -151,9 +151,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 					int deviceTravelTimeHours = ((hac4DeviceData.totalTravelTimeHourHigh * 100) + hac4DeviceData.totalTravelTimeHourLow);
 
-					tourData
-							.setDeviceTravelTime((deviceTravelTimeHours * 3600) + (hac4DeviceData.totalTravelTimeMin * 60)
-									+ hac4DeviceData.totalTravelTimeSec);
+					tourData.setDeviceTravelTime((deviceTravelTimeHours * 3600)
+							+ (hac4DeviceData.totalTravelTimeMin * 60)
+							+ hac4DeviceData.totalTravelTimeSec);
 
 					// tourData.deviceDistance = ((deviceData.totalDistanceHigh
 					// * (2 ^ 16)) + deviceData.totalDistanceLow);
@@ -308,8 +308,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 						}
 
 						// summarize the recording time
-						tourData
-								.setTourRecordingTime(tourData.getTourRecordingTime() + timeData.time);
+						tourData.setTourRecordingTime(tourData.getTourRecordingTime()
+								+ timeData.time);
 
 						// read data for this time slice
 						readTimeSlice(fileRawData, timeData);
@@ -324,13 +324,10 @@ public class HAC4DeviceReader extends TourbookDevice {
 						// adjust altitude from relative to absolute
 						totalAltitude += timeData.altitude;
 
-						tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0)
-								? timeData.altitude
-								: 0));
-						tourData
-								.setTourAltDown(tourData.getTourAltDown() + ((timeData.altitude < 0)
-										? -timeData.altitude
-										: 0));
+						tourData.setTourAltUp(tourData.getTourAltUp()
+								+ ((timeData.altitude > 0) ? timeData.altitude : 0));
+						tourData.setTourAltDown(tourData.getTourAltDown()
+								+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
 					}
 				}
 
@@ -339,7 +336,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 				// check if the tour is in the tour map
 				final String tourId = tourData.getTourId().toString();
-				if (tourDataMap.containsKey(tourId) == false) {
+				if (tourDataMap.containsKey(tourId) == false && timeDataList.size() > 0) {
 
 					// add new tour to the map
 					tourDataMap.put(tourId, tourData);
