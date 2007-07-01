@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Device Reader for HAC4pro
 Bundle-SymbolicName: net.tourbook.device.hac4pro;singleton:=true
-Bundle-Version: 0.8.9.v2007-06
+Bundle-Version: 0.8.9.v20070707
 Bundle-Activator: net.tourbook.device.hac4pro.Activator
 Bundle-Vendor: MyTourbook
 Bundle-Localization: plugin

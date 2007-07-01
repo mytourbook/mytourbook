@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.feature"
       label="%Feature_Name"
-      version="0.8.9.v2007-06"
+      version="0.8.9.v20070707"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -11,7 +11,7 @@
    </description>
 
    <copyright>
-      (c) Copyright Wolfgang Schramm 2005, 2007.  All rights reserved.
+      (c) Copyright Wolfgang Schramm and Contributors 2005, 2007.  All rights reserved.
    </copyright>
 
    <license url="http://www.gnu.org/copyleft/gpl.html">
