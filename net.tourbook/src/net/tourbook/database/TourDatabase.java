@@ -104,24 +104,20 @@ public class TourDatabase {
 		}
 
 		try {
-			checkServer();
-			checkTable();
-
-			if (checkVersion() == false) {
-				return null;
-			}
-
-			IRunnableWithProgress runnableCreateEntityManager = new IRunnableWithProgress() {
+			IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException,
 						InterruptedException {
 
-					// monitor.beginTask(
-					// Messages.Database_Monitor_persistent_service_task,
-					// IProgressMonitor.UNKNOWN);
-					monitor.subTask(Messages.Database_Monitor_persistent_service_task);
+					try {
+						checkServer();
+					} catch (MyTourbookException e) {
+						e.printStackTrace();
+						return;
+					}
+					checkTable();
+					checkVersion(monitor);
 
-					// hide 'loading workbench'
-					// monitor.subTask("");
+					monitor.subTask(Messages.Database_Monitor_persistent_service_task);
 
 					emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
@@ -134,12 +130,11 @@ public class TourDatabase {
 					.getSplashHandler();
 
 			if (splashHandler != null) {
-				IProgressMonitor splashProgressMonitor = splashHandler.getBundleProgressMonitor();
-
-				runnableCreateEntityManager.run(splashProgressMonitor);
+				runnableWithProgress.run(splashHandler.getBundleProgressMonitor());
 			}
-		} catch (MyTourbookException e) {
-			e.printStackTrace();
+
+//		} catch (MyTourbookException e) {
+//			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -646,7 +641,7 @@ public class TourDatabase {
 
 		checkTable();
 
-		if (checkVersion() == false) {
+		if (checkVersion(null) == false) {
 			return null;
 		}
 
@@ -655,7 +650,7 @@ public class TourDatabase {
 		return conn;
 	}
 
-	private boolean checkVersion() {
+	private boolean checkVersion(IProgressMonitor monitor) {
 
 		if (fIsVersionChecked) {
 			return true;
@@ -677,7 +672,7 @@ public class TourDatabase {
 
 				// check if the database contains the correct version
 				if (currentDbVersion != TOURBOOK_DB_VERSION) {
-					if (updateDbDesign(conn, currentDbVersion) == false) {
+					if (updateDbDesign(conn, currentDbVersion, monitor) == false) {
 						return false;
 					}
 				}
@@ -706,7 +701,7 @@ public class TourDatabase {
 		return true;
 	}
 
-	private boolean updateDbDesign(Connection conn, int currentDbVersion) {
+	private boolean updateDbDesign(Connection conn, int currentDbVersion, IProgressMonitor monitor) {
 
 		/*
 		 * this must be implemented or updated when the database version must be updated
@@ -745,7 +740,7 @@ public class TourDatabase {
 			currentDbVersion = newVersion = 3;
 		}
 		if (currentDbVersion == 3) {
-			updateDbDesign_3_4(conn);
+			updateDbDesign_3_4(conn, monitor);
 			currentDbVersion = newVersion = TOURBOOK_DB_VERSION;
 		}
 
@@ -808,7 +803,7 @@ public class TourDatabase {
 		}
 	}
 
-	private void updateDbDesign_3_4(Connection conn) {
+	private void updateDbDesign_3_4(Connection conn, IProgressMonitor monitor) {
 
 		try {
 			Statement statement = conn.createStatement();
@@ -870,24 +865,34 @@ public class TourDatabase {
 		}
 
 		// Create a EntityManagerFactory here, so we can access TourData with EJB
+		monitor.subTask(Messages.Database_Monitor_persistent_service_task);
 		emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
-		ArrayList<TourData> tourList = getTours();
+		monitor.subTask("Database update: Loading all tours...");
+		ArrayList<TourData> tourList = getAllTours();
 
 //		int idx=0;
 //		System.out.println("size: " + tourList.size());
 
+		int tourIdx = 1;
 		// loop over all tours and calculate and set new columns
 		for (TourData tourData : tourList) {
 
 //			System.out.println(idx+ " tourID: " + tourData.getTourId());
 
+			if (monitor != null) {
+				String msg = NLS.bind("Database update: Update tour {0} of {1}", new Object[] {
+						tourIdx++,
+						tourList.size() });
+				monitor.subTask(msg);
+			}
+
 			tourData.computeAvgFields();
-			
+
 			TourPerson person = tourData.getTourPerson();
 			tourData.setTourBike(person.getTourBike());
 			tourData.setBikerWeight(person.getWeight());
-			
+
 			saveTour(tourData);
 
 //			idx++;
@@ -994,7 +999,7 @@ public class TourDatabase {
 	 * @return Returns all tours in database
 	 */
 	@SuppressWarnings("unchecked")//$NON-NLS-1$
-	public static ArrayList<TourData> getTours() {
+	public static ArrayList<TourData> getAllTours() {
 
 		ArrayList<TourData> tourList = new ArrayList<TourData>();
 
