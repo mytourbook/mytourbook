@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.device.feature"
       label="%Feature_Name"
-      version="0.8.9.v2007-06"
+      version="0.8.9.v20070707"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -362,10 +362,9 @@ Public License instead of this License.
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="net.tourbook" version="0.8.4" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="net.tourbook.rxtx"/>
-      <import plugin="net.tourbook.chart"/>
+      <import plugin="net.tourbook"/>
    </requires>
 
    <plugin
