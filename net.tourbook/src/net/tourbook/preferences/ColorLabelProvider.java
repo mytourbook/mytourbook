@@ -91,7 +91,7 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 			String colorId = graphColor.getColorId();
 			Image image = fImages.get(colorId);
 
-			if (image == null) {
+			if (image == null || image.isDisposed()) {
 
 				ensureImageSize(display);
 				image = new Image(display, fColorImageWidth, fImageHeight);
@@ -114,11 +114,9 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 							(fUsableColorImageWidth - offsetWidth),
 							fUsableImageHeight - offsetHeight);
 
-					gc.fillRectangle(
-							offsetWidth + 1,
-							offsetHeight + 1,
-							fUsableColorImageWidth - offsetWidth - 1,
-							fUsableImageHeight - offsetHeight - 1);
+					gc.fillRectangle(offsetWidth + 1, offsetHeight + 1, fUsableColorImageWidth
+							- offsetWidth
+							- 1, fUsableImageHeight - offsetHeight - 1);
 				}
 				gc.dispose();
 
@@ -154,8 +152,7 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 						int colorOffset = colorIndex * fDefImageWidth;
 
 						// gc.setForeground(treeControl.getForeground());
-						gc.setForeground(Display.getCurrent().getSystemColor(
-								SWT.COLOR_DARK_GRAY));
+						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
 						gc.setBackground(getGraphColor(display, graphColor));
 
 						int colorOffsetWidth = colorOffset
@@ -176,19 +173,13 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 						// fUsableImageHeight - offsetHeight - 1);
 
 						gc.setAntialias(SWT.ON);
-						gc.fillOval(
-								colorOffsetWidth + 0,
-								offsetHeight + 0,
-								fUsableDefImageWidth - offsetWidth + 3,
-								fUsableImageHeight - offsetHeight + 3);
+						gc.fillOval(colorOffsetWidth + 0, offsetHeight + 0, fUsableDefImageWidth
+								- offsetWidth
+								+ 3, fUsableImageHeight - offsetHeight + 3);
 						gc.setAntialias(SWT.OFF);
 
-						gc
-								.drawOval(
-										colorOffsetWidth,
-										offsetHeight,
-										(fUsableDefImageWidth - offsetWidth + 2),
-										fUsableImageHeight - offsetHeight + 2);
+						gc.drawOval(colorOffsetWidth, offsetHeight, (fUsableDefImageWidth
+								- offsetWidth + 2), fUsableImageHeight - offsetHeight + 2);
 
 						colorIndex++;
 					}
@@ -247,12 +238,12 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 
 	void disposeGraphImages() {
 
-		for (Iterator i = fImages.values().iterator(); i.hasNext();) {
+		for (Iterator<Image> i = fImages.values().iterator(); i.hasNext();) {
 			((Image) i.next()).dispose();
 		}
 		fImages.clear();
 
-		for (Iterator i = fColors.values().iterator(); i.hasNext();) {
+		for (Iterator<Color> i = fColors.values().iterator(); i.hasNext();) {
 			((Color) i.next()).dispose();
 		}
 		fColors.clear();
