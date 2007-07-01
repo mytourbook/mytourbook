@@ -651,7 +651,7 @@ public class RawDataView extends ViewPart {
 				final int tourAltDown = ((TourData) cell.getElement()).getTourAltDown();
 				if (tourAltDown != 0) {
 					fNumberFormatter.setMinimumFractionDigits(0);
-					cell.setText(fNumberFormatter.format(tourAltDown));
+					cell.setText(fNumberFormatter.format(-tourAltDown));
 				}
 			}
 		});
@@ -659,8 +659,8 @@ public class RawDataView extends ViewPart {
 		TableColumnFactory.DEVICE_PROFILE.createColumn(fColumnManager, pixelConverter);
 		TableColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);
 		TableColumnFactory.DEVICE_NAME.createColumn(fColumnManager, pixelConverter);
-		TableColumnFactory.IMPORT_FILE_PATH.createColumn(fColumnManager, pixelConverter);
 		TableColumnFactory.IMPORT_FILE_NAME.createColumn(fColumnManager, pixelConverter);
+		TableColumnFactory.IMPORT_FILE_PATH.createColumn(fColumnManager, pixelConverter);
 	}
 
 	public void dispose() {
@@ -729,6 +729,9 @@ public class RawDataView extends ViewPart {
 			menuMgr.add(fActionSaveTour);
 
 		}
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionModifyColumns);
 
 		// add standard group which allows other plug-ins to contribute here
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
