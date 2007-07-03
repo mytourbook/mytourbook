@@ -869,17 +869,18 @@ public class TourDatabase {
 		emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
 		monitor.subTask("Database update: Loading all tours...");
-		ArrayList<TourData> tourList = getAllTours();
+		ArrayList<Long> tourList = getAllTourIds();
 
 //		int idx=0;
 //		System.out.println("size: " + tourList.size());
 
 		int tourIdx = 1;
 		// loop over all tours and calculate and set new columns
-		for (TourData tourData : tourList) {
+		for (Long tourId : tourList) {
 
 //			System.out.println(idx+ " tourID: " + tourData.getTourId());
-
+            TourData tourData = getTourDataByTourId(tourId);
+			
 			if (monitor != null) {
 				String msg = NLS.bind("Database update: Update tour {0} of {1}", new Object[] {
 						tourIdx++,
@@ -999,18 +1000,18 @@ public class TourDatabase {
 	 * @return Returns all tours in database
 	 */
 	@SuppressWarnings("unchecked")//$NON-NLS-1$
-	public static ArrayList<TourData> getAllTours() {
+	public static ArrayList<Long> getAllTourIds() {
 
-		ArrayList<TourData> tourList = new ArrayList<TourData>();
+		ArrayList<Long> tourList = new ArrayList<Long>();
 
 		EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
 
-			Query query = em.createQuery("SELECT TourData " //$NON-NLS-1$
+			Query query = em.createQuery("SELECT TourData.tourId " //$NON-NLS-1$
 					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ")); //$NON-NLS-1$ //$NON-NLS-2$
 
-			tourList = (ArrayList<TourData>) query.getResultList();
+			tourList = (ArrayList<Long>) query.getResultList();
 
 			em.close();
 		}
