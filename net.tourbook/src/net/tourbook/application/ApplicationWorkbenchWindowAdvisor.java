@@ -59,9 +59,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	public void postWindowCreate() {
 
-		// hide editor area
+		// show editor area
 		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
-		activePage.setEditorAreaVisible(false);
+		activePage.setEditorAreaVisible(true);
 	}
 
 	public void postWindowOpen() {
@@ -111,8 +111,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			// select person/tour type which was selected in the last session
 			fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
 
-			IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
-			activePage.closeAllEditors(false);
+//			IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
+//			activePage.closeAllEditors(false);
 
 		} catch (SQLException e) {
 			e.printStackTrace();

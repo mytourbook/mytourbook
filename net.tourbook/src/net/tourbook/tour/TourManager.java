@@ -38,6 +38,9 @@ import net.tourbook.util.StringToArrayConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 public class TourManager {
 
@@ -76,8 +79,7 @@ public class TourManager {
 	private TourManager() {}
 
 	/**
-	 * create the tour chart configuration by reading the settings from the
-	 * preferences
+	 * create the tour chart configuration by reading the settings from the preferences
 	 * 
 	 * @return
 	 */
@@ -121,6 +123,7 @@ public class TourManager {
 
 		return instance;
 	}
+
 	/**
 	 * @return returns the date of this tour
 	 */
@@ -133,8 +136,7 @@ public class TourManager {
 	}
 
 	/**
-	 * @return returns the detailed title of this tour (displayed as chart
-	 *         title)
+	 * @return returns the detailed title of this tour (displayed as chart title)
 	 */
 	public static String getTourTitleDetailed(final TourData tourData) {
 
@@ -168,6 +170,7 @@ public class TourManager {
 		chartConfig.scrollZoomedGraph = scrollZoomedGraph;
 		chartConfig.autoZoomToSlider = autoZoomToSlider;
 	}
+
 	private int compareTour(final TourData compareTourData) {
 
 		final TourDataNormalizer compareTourNormalizer = new TourDataNormalizer();
@@ -426,6 +429,7 @@ public class TourManager {
 			}
 		};
 	}
+
 	/**
 	 * Creates a chart data fDataModel from the tour data
 	 * 
@@ -490,8 +494,8 @@ public class TourManager {
 			chartDataModel.addXyData(xDataDistance);
 
 			/*
-			 * when time is displayed, the x-axis can show the start time
-			 * starting from 0 or from the current time of the day
+			 * when time is displayed, the x-axis can show the start time starting from 0 or from
+			 * the current time of the day
 			 */
 			xDataTime.setStartValue(chartConfig.isStartTime ? (tourData.getStartHour() * 3600)
 					+ (tourData.getStartMinute() * 60) : 0);
@@ -635,8 +639,8 @@ public class TourManager {
 		chartDataModel.addXyData(yDataTemperature);
 
 		/*
-		 * all visible graphs are added as y-data to the chart data fDataModel
-		 * in the sequence as they were activated
+		 * all visible graphs are added as y-data to the chart data fDataModel in the sequence as
+		 * they were activated
 		 */
 		for (final int actionId : chartConfig.getVisibleGraphs()) {
 
@@ -686,8 +690,8 @@ public class TourManager {
 	}
 
 	/**
-	 * adjust the min/max values to make them more visible and not at the same
-	 * position as the x-axis or the top of the chart
+	 * adjust the min/max values to make them more visible and not at the same position as the
+	 * x-axis or the top of the chart
 	 */
 	private void adjustMinMax(final ChartDataYSerie yData) {
 
@@ -776,8 +780,7 @@ public class TourManager {
 	}
 
 	/**
-	 * the speed must be interpolated for low time intervals because the
-	 * smallest distance is 10 m
+	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
 	 * 
 	 * @param tourData
 	 */
@@ -846,8 +849,7 @@ public class TourManager {
 	}
 
 	/**
-	 * the speed must be interpolated for low time intervals because the
-	 * smallest distance is 10 m
+	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
 	 * 
 	 * @param tourData
 	 */
@@ -957,67 +959,62 @@ public class TourManager {
 		// openTourEditor(createTourEditorInput(tourData));
 	}
 
-	// /**
-	// * Creates a new tour context for a given tour data object
-	// *
-	// * @param tourData
-	// * @return Returns the newly created tour context
-	// */
-	// private TourEditorInput createTourEditorInput(final TourData tourData) {
-	//
-	// final TourChartConfiguration chartConfiguration =
-	// createTourChartConfiguration();
-	//
-	// // chartConfiguration.setKeepMinMaxValues(true);
-	//
-	// // create the tour editor input
-	// final TourEditorInput editorInput = new TourEditorInput(tourData,
-	// chartConfiguration);
-	//
-	// // keep the tour in a cache
-	// tourCache.put(tourData.getTourId(), editorInput);
-	//
-	// return editorInput;
-	// }
-	//
-	// /**
-	// * Opens the tour editor for the the given editor input
-	// *
-	// * @param editorInput
-	// */
-	// private void openTourEditor(final TourEditorInput editorInput) {
-	//
-	// try {
-	// PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
-	// editorInput,
-	// TourEditorPart.ID,
-	// true);
-	//
-	// } catch (final PartInitException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	//
-	// /**
-	// * Opens the tour for the given tour id
-	// *
-	// * @param tourId
-	// */
-	// public void openTourInEditor(final long tourId) {
-	//
-	// TourEditorInput editorInput;
-	//
-	// if (tourCache.containsKey(tourId)) {
-	// // tour is already in the cache
-	// editorInput = tourCache.get(tourId);
-	// } else {
-	// // load tour from database
-	// final TourData tourData = TourDatabase.getTourDataByTourId(tourId);
-	//
-	// editorInput = createTourEditorInput(tourData);
-	// }
-	// // openTourEditor(editorInput);
-	// }
+//	/**
+//	 * Creates a new tour context for a given tour data object
+//	 * 
+//	 * @param tourId
+//	 * @return Returns the newly created tour context
+//	 */
+//	private TourEditorInput createTourEditorInput(final long tourId) {
+//
+//		final TourChartConfiguration chartConfiguration = createTourChartConfiguration();
+//
+////		chartConfiguration.setKeepMinMaxValues(true);
+//
+//		// create the tour editor input
+//		final TourEditorInput editorInput = new TourEditorInput(tourId, chartConfiguration);
+//
+//		// keep the tour in a cache
+////	 tourCache.put(tourData.getTourId(), editorInput);
+//
+//		return editorInput;
+//	}
+
+//	/**
+//	 * Opens the tour editor for the the given editor input
+//	 * 
+//	 * @param editorInput
+//	 */
+//	private void openTourEditor(final TourEditorInput editorInput) {
+//
+//		try {
+//			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
+//					editorInput,
+//					"",//					TourEditorPart.ID,
+//					true);
+//
+//		} catch (final PartInitException e) {
+//			e.printStackTrace();
+//		}
+//	}
+
+	/**
+	 * Opens the tour for the given tour id
+	 * 
+	 * @param tourId
+	 */
+	public void openTourInEditor(final long tourId) {
+
+		try {
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
+					new TourEditorInput(tourId),
+					TourEditor.ID,
+					true);
+
+		} catch (final PartInitException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * set the graph colors from the pref store
@@ -1043,8 +1040,8 @@ public class TourManager {
 	}
 
 	/**
-	 * calculate the driving time, ignore the time when the distance is 0 within
-	 * a time period which is defined by <code>sliceMin</code>
+	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
+	 * is defined by <code>sliceMin</code>
 	 * 
 	 * @param distanceValues
 	 * @param indexLeft

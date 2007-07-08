@@ -171,7 +171,8 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 	public Font							fFontNormal;
 	public Font							fFontBold;
 
-	private ActionDeleteTour			fActionDeleteSelectedTour;
+	private ActionEditTour				fActionEditTour;
+	private ActionDeleteTour			fActionDeleteTour;
 	private ActionSetTourType			fActionSetTourType;
 	private ActionSetTourType			fActionSetLastTourType;
 	private ActionModifyColumns			fActionModifyColumns;
@@ -257,8 +258,8 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 				/*
 				 * set a new chart configuration when the preferences has changed
 				 */
-				if (property.equals(ITourbookPreferences.GRAPH_VISIBLE) || property
-						.equals(ITourbookPreferences.GRAPH_X_AXIS)
+				if (property.equals(ITourbookPreferences.GRAPH_VISIBLE)
+						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS)
 						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
 
 					fTourChartConfig = TourManager.createTourChartConfiguration();
@@ -292,7 +293,8 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 
 	private void createActions() {
 
-		fActionDeleteSelectedTour = new ActionDeleteTour(this);
+		fActionEditTour = new ActionEditTour(this);
+		fActionDeleteTour = new ActionDeleteTour(this);
 		fActionSetLastTourType = new ActionSetTourType(this, false);
 		fActionSetTourType = new ActionSetTourType(this, true);
 		fActionModifyColumns = new ActionModifyColumns(fColumnManager);
@@ -447,7 +449,8 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 	private Control createTourViewer(Composite parent) {
 
 		// tour tree
-		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL
+		final Tree tree = new Tree(parent, SWT.H_SCROLL
+				| SWT.V_SCROLL
 				| SWT.BORDER
 				| SWT.FLAT
 				| SWT.FULL_SELECTION
@@ -559,8 +562,8 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 
 					// open tour in editor
 
-					// TVITourBookTour tourItem = (TVITourBookTour) selection;
-					// TourManager.getInstance().openTourInEditor(tourItem.getTourId());
+					TVITourBookTour tourItem = (TVITourBookTour) selection;
+					TourManager.getInstance().openTourInEditor(tourItem.getTourId());
 
 				} else if (selection != null) {
 
@@ -735,8 +738,9 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					cell.setText(Long
-							.toString(((TVITourBookTour) element).getColumnTimeInterval()));
+					cell
+							.setText(Long.toString(((TVITourBookTour) element)
+									.getColumnTimeInterval()));
 				}
 				setCellColor(cell, element);
 			}
@@ -840,29 +844,32 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	private void enableActions() {
 
 		ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
 
-		int tourItemCounter = 0;
+		// number ob selected tour items
+		int tourItems = 0;
 
 		// count how many tour items are selected
 		for (Iterator iter = selection.iterator(); iter.hasNext();) {
 			if (iter.next() instanceof TVITourBookTour) {
-				tourItemCounter++;
+				tourItems++;
 			}
 		}
 
+		fActionEditTour.setEnabled(tourItems == 1);
+
 		// enable the delete button when only tours are selected
-		if (tourItemCounter > 0 && selection.size() == tourItemCounter) {
-			fActionDeleteSelectedTour.setEnabled(true);
+		if (tourItems > 0 && selection.size() == tourItems) {
+			fActionDeleteTour.setEnabled(true);
 		} else {
-			fActionDeleteSelectedTour.setEnabled(false);
+			fActionDeleteTour.setEnabled(false);
 		}
 
-		fActionSetTourType.setEnabled(tourItemCounter > 0);
-		fActionSetLastTourType.setEnabled(tourItemCounter > 0);
+		fActionSetTourType.setEnabled(tourItems > 0);
+		fActionSetLastTourType.setEnabled(tourItems > 0);
 	}
 
 	private void fillContextMenu(IMenuManager menuMgr) {
@@ -883,7 +890,8 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		menuMgr.add(fActionSetTourType);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionDeleteSelectedTour);
+		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionDeleteTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionModifyColumns);
@@ -1189,12 +1197,12 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 			// show/hide tour chart
 			Integer detailVisibleStatus = memento.getInteger(MEMENTO_VISIBLE_STATUS_DETAIL);
 
-			fActionShowDetailStatistic
-					.setChecked(detailVisibleStatus == null || detailVisibleStatus == 0
-							|| detailVisibleStatus == 1);
-			fActionShowDetailTourChart
-					.setChecked(detailVisibleStatus == null || detailVisibleStatus == 0
-							|| detailVisibleStatus == 2);
+			fActionShowDetailStatistic.setChecked(detailVisibleStatus == null
+					|| detailVisibleStatus == 0
+					|| detailVisibleStatus == 1);
+			fActionShowDetailTourChart.setChecked(detailVisibleStatus == null
+					|| detailVisibleStatus == 0
+					|| detailVisibleStatus == 2);
 
 			// set tour viewer reselection data
 			Integer selectedYear = memento.getInteger(MEMENTO_TOURVIEWER_SELECTED_YEAR);
