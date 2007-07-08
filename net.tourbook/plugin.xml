@@ -162,4 +162,20 @@
             splashId="net.tourbook.splashHandler">
       </splashHandlerProductBinding>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="net.tourbook.tour.TourEditor"
+            icon="icons/tourfinder.gif"
+            id="net.tourbook.tour.TourEditor"
+            name="Tour Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="net.tourbook.tour.TourEditorInputFactory"
+            id="net.tourbook.tour.TourEditorInputFactory">
+      </factory>
+   </extension>
 </plugin>
