@@ -16,19 +16,19 @@
 package net.tourbook.application;
 
 /**
- * Interface defining the application's command IDs. Key bindings can be defined
- * for specific commands. To associate an action with a command, use
- * IAction.setActionDefinitionId(commandId).
+ * Interface defining the application's command IDs. Key bindings can be defined for specific
+ * commands. To associate an action with a command, use IAction.setActionDefinitionId(commandId).
  * 
  * @see org.eclipse.jface.action.IAction#setActionDefinitionId(String)
  */
 public interface ICommandIds {
 
-	public static final String	CMD_OPENVIEW_IMPORTEDDATA	= "Tourbook.openViewImportedData"; //$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_TOURLIST		= "Tourbook.openViewTourList"; //$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_YEARMAP		= "Tourbook.openViewYearMap"; //$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_TOURMAP		= "Tourbook.openViewTourMap"; //$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_TOURCOMPARER	= "Tourbook.openViewTourCompare"; //$NON-NLS-1$
-	public static final String	CMD_OPENVIEW_TOURFINDER		= "Tourbook.openViewTourviewer"; //$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_IMPORTEDDATA	= "Tourbook.openViewImportedData";	//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURLIST		= "Tourbook.openViewTourList";		//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_YEARMAP		= "Tourbook.openViewYearMap";		//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURMAP		= "Tourbook.openViewTourMap";		//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURCOMPARER	= "Tourbook.openViewTourCompare";	//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURFINDER		= "Tourbook.openViewTourviewer";	//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_TOURCHART		= "Tourbook.openViewTourChart";	//$NON-NLS-1$
 
 }

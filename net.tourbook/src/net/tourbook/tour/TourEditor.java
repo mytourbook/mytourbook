@@ -97,7 +97,7 @@ public class TourEditor extends EditorPart {
 		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-		fTourChartConfig.setMinMaxKeeper(true);
+//		fTourChartConfig.setMinMaxKeeper(true);
 
 		// load the tourdata from the database
 		fTourData = TourDatabase.getTourDataByTourId(fEditorInput.fTourId);

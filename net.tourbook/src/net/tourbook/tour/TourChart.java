@@ -709,6 +709,9 @@ public class TourChart extends Chart {
 //		if (fTourData != tourData) {
 //			saveTour();
 //		}
+		if (tourData == null) {
+			return;
+		}
 
 		// keep min/max values for the 'old' chart in the chart config
 		if (fTourChartConfig != null && fTourChartConfig.fMinMaxKeeper != null && keepMinMaxValues) {

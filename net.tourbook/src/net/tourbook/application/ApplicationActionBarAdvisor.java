@@ -20,6 +20,7 @@ import net.tourbook.importdata.ActionImportFromDevice;
 import net.tourbook.importdata.ActionImportFromDeviceDirect;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.views.ActionOpenView;
+import net.tourbook.ui.views.TourChartView;
 import net.tourbook.ui.views.rawData.ActionImportFromFile;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
@@ -50,9 +51,8 @@ import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 
 /**
- * An action bar advisor is responsible for creating, adding, and disposing of
- * the fGraphActions added to a workbench window. Each window will be populated
- * with new fGraphActions.
+ * An action bar advisor is responsible for creating, adding, and disposing of the fGraphActions
+ * added to a workbench window. Each window will be populated with new fGraphActions.
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
@@ -63,6 +63,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private ActionOpenView					fActionTourBookView;
 	private ActionOpenView					fActionTourMapView;
+	private ActionOpenView					fActionTourChartView;
 
 	private ActionOpenView					fActionTourCompareView;
 	private Action							fActionTourCompareWizard;
@@ -95,6 +96,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fActionImportFromFile = new ActionImportFromFile();
 		fActionImportFromDevice = new ActionImportFromDevice(window);
 		fActionImportFromDeviceDirect = new ActionImportFromDeviceDirect(window);
+
+		fActionTourChartView = new ActionOpenView(
+				window,
+				"Tour Chart",
+				"Shows a chart for the currently selected tour",
+				TourChartView.ID,
+				ICommandIds.CMD_OPENVIEW_TOURCHART,
+				"tour-chart.gif");
 
 		fActionRawDataView = new ActionOpenView(
 				window,
@@ -189,6 +198,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		// view - menu
 		MenuManager tourMenu = new MenuManager(Messages.Action_Menu_view, null);
 
+		tourMenu.add(fActionTourChartView);
+		tourMenu.add(new Separator());
+
 		tourMenu.add(fActionRawDataView);
 		tourMenu.add(fActionTourBookView);
 		tourMenu.add(fActionTourMapView);
@@ -236,6 +248,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		// ---------------------------------------------------------
 
 		IToolBarManager openToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+
+		openToolbar.add(new Separator());
+		openToolbar.add(fActionTourChartView);
 
 		openToolbar.add(new Separator());
 		openToolbar.add(fActionRawDataView);
