@@ -15,8 +15,25 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-public interface ITourChartSelectionListener {
+import org.eclipse.jface.viewers.ISelection;
 
-	void selectedTourChart(TourChartSelection tourChart);
+/**
+ * selection is fired when a tour was selected
+ */
+public class TourChartSelection implements ISelection {
+
+	private TourChart	fTourChart;
+
+	public TourChartSelection(TourChart tourChart) {
+		fTourChart = tourChart;
+	}
+
+	public boolean isEmpty() {
+		return false;
+	}
+
+	public TourChart getTourChart() {
+		return fTourChart;
+	}
 
 }

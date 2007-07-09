@@ -20,37 +20,45 @@ package net.tourbook.tour;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.views.SelectionTourSegmentLayer;
+import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 public class TourEditor extends EditorPart {
 
-	public static final String		ID	= "net.tourbook.tour.TourEditor";
+	public static final String		ID				= "net.tourbook.tour.TourEditor";
 
 	private TourEditorInput			fEditorInput;
 
-//	private Tour					fTour;
 	private TourChart				fTourChart;
+	private TourChartConfiguration	fTourChartConfig;
 	private TourData				fTourData;
 
-	private TourChartConfiguration	fTourChartConfig;
+	private boolean					fIsTourDirty	= false;
+
+	private PostSelectionProvider	fPostSelectionProvider;
+	private ISelectionListener		fPostSelectionListener;
 
 	public void doSave(IProgressMonitor monitor) {
-
+		TourDatabase.saveTour(fTourData);
+		fIsTourDirty = false;
 	}
 
-	public void doSaveAs() {
-
-	}
+	public void doSaveAs() {}
 
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 
@@ -59,10 +67,14 @@ public class TourEditor extends EditorPart {
 
 		fEditorInput = (TourEditorInput) input;
 
+		// set selection provider
+		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+
+		setPostSelectionListener();
 	}
 
 	public boolean isDirty() {
-		return false;
+		return fIsTourDirty;
 	}
 
 	public boolean isSaveAsAllowed() {
@@ -75,6 +87,14 @@ public class TourEditor extends EditorPart {
 
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
+		fTourChart.addTourModifyListener(new ITourModifyListener() {
+			public void tourIsModified() {
+
+				fIsTourDirty = true;
+
+				firePropertyChange(PROP_DIRTY);
+			}
+		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
 		fTourChartConfig.setMinMaxKeeper(true);
@@ -99,12 +119,33 @@ public class TourEditor extends EditorPart {
 			fTourChart.updateChart(fTourData, fTourChartConfig, false);
 
 			setPartName(TourManager.getTourDate(fTourData));
-			setTitleToolTip("title tooltip");
+			setTitleToolTip("title tooltip ???");
 		}
 	}
 
 	public void setFocus() {
-		fTourChart.setFocus();
+		fPostSelectionProvider.setSelection(new TourChartSelection(fTourChart));
+	}
+
+	private void setPostSelectionListener() {
+		// this view part is a selection listener
+		fPostSelectionListener = new ISelectionListener() {
+
+			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+
+				if (selection instanceof SelectionTourSegmentLayer) {
+					fTourChart
+							.updateSegmentLayer(((SelectionTourSegmentLayer) selection).isLayerVisible);
+				}
+
+				if (selection instanceof SelectionChartXSliderPosition) {
+					fTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
+				}
+			}
+		};
+
+		// register selection listener in the page
+		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
 }

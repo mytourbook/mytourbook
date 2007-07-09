@@ -34,7 +34,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContainer;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourChartSelectionListener;
-import net.tourbook.tour.SelectionTourChart;
+import net.tourbook.tour.TourChartSelection;
 import net.tourbook.tour.Tour;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
@@ -317,6 +317,12 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		viewTbm.add(new Separator());
 		viewTbm.add(fActionShowDetailStatistic);
 		viewTbm.add(fActionShowDetailTourChart);
+		
+		/*
+		 * fill site menu
+		 */
+		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		menuMgr.add(fActionModifyColumns);
 	}
 
 	/**
@@ -389,7 +395,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		});
 
 		fTourChart.addTourChartListener(new ITourChartSelectionListener() {
-			public void selectedTourChart(SelectionTourChart tourChart) {
+			public void selectedTourChart(TourChartSelection tourChart) {
 				firePostSelection(tourChart);
 			}
 		});
@@ -1328,6 +1334,10 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 					refreshStatistics();
 				}
 
+				if (fTour.getTourChart().getTourData() == null) {
+					return;
+				}
+				
 				if (selection instanceof SelectionTourSegmentLayer) {
 					fTourChart
 							.updateSegmentLayer(((SelectionTourSegmentLayer) selection).isLayerVisible);
@@ -1416,7 +1426,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 			fTourChart.updateChart(fTourChartTourData, fTourChartConfig, false);
 			fTour.refreshTourData(fTourChartTourData);
 
-			firePostSelection(new SelectionTourChart(fTourChart));
+			firePostSelection(new TourChartSelection(fTourChart));
 		}
 	}
 

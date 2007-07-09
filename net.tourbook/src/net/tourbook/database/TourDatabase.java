@@ -283,6 +283,9 @@ public class TourDatabase {
 			try {
 				Connection connection = createConnection();
 				connection.close();
+
+				System.out.println("Database path: " + databasePath); //$NON-NLS-1$
+				
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
@@ -879,8 +882,8 @@ public class TourDatabase {
 		for (Long tourId : tourList) {
 
 //			System.out.println(idx+ " tourID: " + tourData.getTourId());
-            TourData tourData = getTourDataByTourId(tourId);
-			
+			TourData tourData = getTourDataByTourId(tourId);
+
 			if (monitor != null) {
 				String msg = NLS.bind("Database update: Update tour {0} of {1}", new Object[] {
 						tourIdx++,

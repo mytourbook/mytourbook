@@ -86,7 +86,7 @@ class TourChartContextProvider implements ChartContextProvider {
 						.open();
 
 				// force the tour to be saved
-				tourChart.setTourDirty();
+				tourChart.setTourDirty(true);
 
 				// update chart
 				tourChart.updateMarkerLayer(true);

@@ -54,7 +54,7 @@ public class TourChart extends Chart {
 	TourData						fTourData;
 	TourChartConfiguration			fTourChartConfig;
 
-	protected Map<Integer, Action>	fGraphActions		= null;
+	protected Map<Integer, Action>	fGraphActions;
 	protected ActionChartOptions	fActionOptions;
 
 	private Action					fActionXAxesTime;
@@ -67,12 +67,13 @@ public class TourChart extends Chart {
 	private ActionTourMarker		fActionMarkerEditor;
 
 	private ListenerList			fSelectionListeners	= new ListenerList();
-	private ListenerList			fSaveListeners		= new ListenerList();
 
 	/**
-	 * the data model listener is called when the chart data was created
+	 * datamodel listener is called when the chart data is created
 	 */
 	private IDataModelListener		fChartDataModelListener;
+
+	private ITourModifyListener		fTourModifyListener;
 
 	private ChartMarkerLayer		fMarkerLayer;
 	private ChartSegmentLayer		fSegmentLayer;
@@ -110,11 +111,12 @@ public class TourChart extends Chart {
 		fChartDataModelListener = dataModelListener;
 	}
 
+	public void addTourModifyListener(final ITourModifyListener listener) {
+		fTourModifyListener = listener;
+	}
+
 	public void addTourChartListener(ITourChartSelectionListener listener) {
 		fSelectionListeners.add(listener);
-	}
-	public void addBeforeSaveListener(ITourChartSaveListener listener) {
-		fSaveListeners.add(listener);
 	}
 
 	/**
@@ -183,6 +185,10 @@ public class TourChart extends Chart {
 	 */
 	private void createSegmentsLayer() {
 
+		if (fTourData == null) {
+			return;
+		}
+		
 		final int[] segmentSerie = fTourData.segmentSerieIndex;
 
 		if (segmentSerie == null || fIsSegmentLayerVisible == false) {
@@ -325,9 +331,6 @@ public class TourChart extends Chart {
 
 	public void dispose() {
 
-		// save the tour when it was modified
-		saveTour();
-
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(
 				fPrefChangeListener);
 
@@ -403,22 +406,7 @@ public class TourChart extends Chart {
 			final ITourChartSelectionListener listener = (ITourChartSelectionListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
-					listener.selectedTourChart(new SelectionTourChart(TourChart.this));
-				}
-			});
-		}
-	}
-	
-	/**
-	 * fire a save event
-	 */
-	private void fireBeforeSave() {
-		Object[] listeners = fSaveListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			final ITourChartSaveListener listener = (ITourChartSaveListener) listeners[i];
-			SafeRunnable.run(new SafeRunnable() {
-				public void run() {
-					listener.beforeSave();
+					listener.selectedTourChart(new TourChartSelection(TourChart.this));
 				}
 			});
 		}
@@ -433,19 +421,6 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * save the tour when it was modified
-	 */
-	private void saveTour() {
-
-		if (fIsTourDirty && fTourData != null) {
-			fireBeforeSave();
-			TourDatabase.saveTour(fTourData);
-		}
-
-		fIsTourDirty = false;
-	}
-
-	/**
 	 * Enable/disable the zoom options in the tour chart
 	 * 
 	 * @param isEnabled
@@ -457,9 +432,6 @@ public class TourChart extends Chart {
 	}
 
 	// public boolean setFocus() {
-	// int a = 0;
-	//
-	// return a == 0;
 	// }
 
 	/**
@@ -567,8 +539,8 @@ public class TourChart extends Chart {
 				boolean isChartChanged = false;
 
 				// test if the zoom preferences has changed
-				if (property.equals(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH) || property
-						.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
+				if (property.equals(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH)
+						|| property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
 
 					final IPreferenceStore prefStore = TourbookPlugin
 							.getDefault()
@@ -627,8 +599,13 @@ public class TourChart extends Chart {
 	/**
 	 * set the tour dirty that the tour is saved when the tour is closed
 	 */
-	public void setTourDirty() {
-		fIsTourDirty = true;
+	public void setTourDirty(boolean isDirty) {
+
+		fIsTourDirty = isDirty;
+
+		if (fTourModifyListener != null) {
+			fTourModifyListener.tourIsModified();
+		}
 	}
 
 	/**
@@ -729,9 +706,9 @@ public class TourChart extends Chart {
 							final boolean keepMinMaxValues) {
 
 		// save the tour when other tour data are set
-		if (fTourData != tourData) {
-			saveTour();
-		}
+//		if (fTourData != tourData) {
+//			saveTour();
+//		}
 
 		// keep min/max values for the 'old' chart in the chart config
 		if (fTourChartConfig != null && fTourChartConfig.fMinMaxKeeper != null && keepMinMaxValues) {
@@ -804,6 +781,10 @@ public class TourChart extends Chart {
 		 * the chart needs to be redrawn because the alpha for filling the chart has changed
 		 */
 		redrawChart();
+	}
+
+	public boolean isTourDirty() {
+		return fIsTourDirty;
 	}
 
 }

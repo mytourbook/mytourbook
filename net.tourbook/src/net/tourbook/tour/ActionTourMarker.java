@@ -119,7 +119,7 @@ public class ActionTourMarker extends Action implements IMenuCreator {
 				.open();
 
 		// force the tour to be saved
-		fTourChart.setTourDirty();
+		fTourChart.setTourDirty(true);
 
 		// update chart
 		fTourChart.updateMarkerLayer(true);

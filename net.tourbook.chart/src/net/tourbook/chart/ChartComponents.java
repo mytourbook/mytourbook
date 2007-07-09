@@ -902,6 +902,10 @@ public class ChartComponents extends Composite {
 			return;
 		}
 
+		if (fChartDataModel == null) {
+			return;
+		}
+		
 		final ChartXSlider leftSlider = fComponentGraph.getLeftSlider();
 		final ChartXSlider rightSlider = fComponentGraph.getRightSlider();
 

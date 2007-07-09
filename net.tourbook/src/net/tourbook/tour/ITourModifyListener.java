@@ -15,25 +15,11 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import org.eclipse.jface.viewers.ISelection;
+public interface ITourModifyListener {
 
-/**
- * selection is fired when a tour was selected
- */
-public class SelectionTourChart implements ISelection {
-
-	private TourChart	fTourChart;
-
-	public SelectionTourChart(TourChart tourChart) {
-		fTourChart = tourChart;
-	}
-
-	public boolean isEmpty() {
-		return false;
-	}
-
-	public TourChart getTourChart() {
-		return fTourChart;
-	}
+	/**
+	 * Method is called when the tour was modified
+	 */
+	abstract void tourIsModified();
 
 }

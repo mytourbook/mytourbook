@@ -46,7 +46,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.ActionAdjustAltitude;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourChartSelectionListener;
-import net.tourbook.tour.SelectionTourChart;
+import net.tourbook.tour.TourChartSelection;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
@@ -404,7 +404,7 @@ public class TourMapView extends SynchedChartView {
 		fRefTourChart.setShowZoomActions(true);
 		fRefTourChart.setShowSlider(true);
 		fRefTourChart.addTourChartListener(new ITourChartSelectionListener() {
-			public void selectedTourChart(SelectionTourChart tourChart) {
+			public void selectedTourChart(TourChartSelection tourChart) {
 				fActiveTourChart = fRefTourChart;
 				fPostSelectionProvider.setSelection(tourChart);
 			}
@@ -466,7 +466,7 @@ public class TourMapView extends SynchedChartView {
 		});
 
 		fCompTourChart.addTourChartListener(new ITourChartSelectionListener() {
-			public void selectedTourChart(SelectionTourChart tourChart) {
+			public void selectedTourChart(TourChartSelection tourChart) {
 				fActiveTourChart = fCompTourChart;
 				fPostSelectionProvider.setSelection(tourChart);
 			}
@@ -1238,7 +1238,7 @@ public class TourMapView extends SynchedChartView {
 			/*
 			 * fire the change event so that the tour markers updated
 			 */
-			fPostSelectionProvider.setSelection(new SelectionTourChart(fCompTourChart));
+			fPostSelectionProvider.setSelection(new TourChartSelection(fCompTourChart));
 
 			fActiveComparedTour = compItem;
 

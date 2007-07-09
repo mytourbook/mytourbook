@@ -37,7 +37,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourItem;
-import net.tourbook.tour.SelectionTourChart;
+import net.tourbook.tour.TourChartSelection;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
@@ -923,7 +923,7 @@ public class RawDataView extends ViewPart {
 	 * prevent the marker viewer to show the markers by setting the tour chart parameter to null
 	 */
 	private void disableTourChartSelection() {
-		fPostSelectionProvider.setSelection(new SelectionTourChart(null));
+		fPostSelectionProvider.setSelection(new TourChartSelection(null));
 	}
 
 	public void updateViewer() {

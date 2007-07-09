@@ -142,11 +142,11 @@ public class Tour extends Composite {
 		fTabFolder = new CTabFolder(this, SWT.FLAT | SWT.BOTTOM);
 
 		fTourChart = new TourChart(fTabFolder, SWT.FLAT, true);
-		fTourChart.addBeforeSaveListener(new ITourChartSaveListener() {
-			public void beforeSave() {
-				updateTourData();
-			}
-		});
+//		fTourChart.addBeforeSaveListener(new ITourChartSaveListener() {
+//			public void beforeSave() {
+//				updateTourData();
+//			}
+//		});
 
 		fChartItem = new CTabItem(fTabFolder, SWT.FLAT);
 		fChartItem.setText(Messages.Tour_Label_tab_tour_chart);
@@ -157,12 +157,12 @@ public class Tour extends Composite {
 		fTourDataItem.setControl(createTourDataControls(fTabFolder));
 	}
 
-	private void updateTourData() {
-		fTourData.setTourTitle(fTextTitle.getText());
-		fTourData.setTourStartPlace(fTextStartLocation.getText());
-		fTourData.setTourEndPlace(fTextEndLocation.getText());
-		fTourData.setTourDescription(fTextDescription.getText());
-	}
+//	private void updateTourData() {
+//		fTourData.setTourTitle(fTextTitle.getText());
+//		fTourData.setTourStartPlace(fTextStartLocation.getText());
+//		fTourData.setTourEndPlace(fTextEndLocation.getText());
+//		fTourData.setTourDescription(fTextDescription.getText());
+//	}
 
 	private Control createTourDataControls(Composite parent) {
 
@@ -281,7 +281,7 @@ public class Tour extends Composite {
 		}
 
 		if (isTourDirty) {
-			fTourChart.setTourDirty();
+			fTourChart.setTourDirty(true);
 		}
 		fActionUndoTyping.setEnabled(isTourDirty);
 	}

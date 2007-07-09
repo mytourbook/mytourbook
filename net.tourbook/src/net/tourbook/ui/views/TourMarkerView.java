@@ -28,7 +28,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.SelectionTourChart;
+import net.tourbook.tour.TourChartSelection;
 import net.tourbook.tour.TourChart;
 import net.tourbook.ui.views.tourBook.MarkerDialog;
 import net.tourbook.util.PixelConverter;
@@ -276,13 +276,13 @@ public class TourMarkerView extends ViewPart {
 		fPostSelectionListener = new ISelectionListener() {
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 
-				if (selection instanceof SelectionTourChart) {
+				if (selection instanceof TourChartSelection) {
 
 					saveMarker();
 
 					// a tour was selected, get the chart and update the marker viewer
 
-					fTourChart = ((SelectionTourChart) selection).getTourChart();
+					fTourChart = ((TourChartSelection) selection).getTourChart();
 
 					if (fTourChart == null) {
 
@@ -322,9 +322,11 @@ public class TourMarkerView extends ViewPart {
 				fillContextMenu(manager);
 			}
 		});
+		
 		Control viewerControl = fMarkerViewer.getControl();
 		Menu menu = menuMgr.createContextMenu(viewerControl);
 		viewerControl.setMenu(menu);
+		
 		getSite().registerContextMenu(menuMgr, fMarkerViewer);
 	}
 
@@ -490,7 +492,7 @@ public class TourMarkerView extends ViewPart {
 		(new MarkerDialog(Display.getCurrent().getActiveShell(), fTourData, selectedMarker)).open();
 
 		// force the tour to be saved
-		fTourChart.setTourDirty();
+		fTourChart.setTourDirty(true);
 
 		// update chart
 		fTourChart.updateMarkerLayer(true);
