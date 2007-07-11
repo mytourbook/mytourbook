@@ -508,9 +508,6 @@ public class ChartComponentGraph extends Canvas {
 			minValue = graphValue1;
 			maxValue = graphValue2;
 
-			yData.setVisibleMinValue(minValue);
-			yData.setVisibleMaxValue(maxValue);
-
 			// position the lower slider to the bottom of the chart
 			slider1.setDevYSliderLine(devYBottom);
 			slider2.setDevYSliderLine(devYTop);
@@ -522,13 +519,12 @@ public class ChartComponentGraph extends Canvas {
 			minValue = graphValue2;
 			maxValue = graphValue1;
 
-			yData.setVisibleMinValue(minValue);
-			yData.setVisibleMaxValue(maxValue);
-
 			// position the upper slider to the top of the chart
 			slider1.setDevYSliderLine(devYTop);
 			slider2.setDevYSliderLine(devYBottom);
 		}
+		yData.setVisibleMinValue(minValue);
+		yData.setVisibleMaxValue(maxValue);
 
 		ySliderDragged = null;
 

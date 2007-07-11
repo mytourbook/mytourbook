@@ -426,9 +426,10 @@ public class ChartComponents extends Composite {
 		}
 		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / unit) * unit);
 
-		// adjust the min value so that bar graphs start at the bottom of the
-		// chart
-		yData.setVisibleMinValue(graphMinValue);
+		// adjust the min value so that bar graphs start at the bottom of the chart
+		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
+			yData.setVisibleMinValue(graphMinValue);
+		}
 
 		// increase the max value when it does not fit to unit borders
 		float adjustMaxValue = 0;
