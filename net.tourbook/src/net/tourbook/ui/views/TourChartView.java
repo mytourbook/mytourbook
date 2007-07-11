@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.IDataModelListener;
@@ -25,7 +24,6 @@ import net.tourbook.tour.TourChartSelection;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.ISelectionListener;
@@ -53,21 +51,25 @@ public class TourChartView extends ViewPart {
 		fTourChart.setShowSlider(true);
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-//		fTourChartConfig.setMinMaxKeeper(false);
 
 		final IDataModelListener dataModelListener = new IDataModelListener() {
 
 			public void dataModelChanged(ChartDataModel chartDataModel) {
 
 				// set title
-				chartDataModel.setTitle(NLS.bind(Messages.RawData_Chart_title, TourManager
-						.getTourTitleDetailed(fTourData)));
+				chartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
 			}
 		};
 
 		fTourChart.addDataModelListener(dataModelListener);
 
 		addSelectionListener();
+		
+		// show current selected chart if there are any
+		ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+		if (selection != null) {
+			updateChart(selection);
+		}
 	}
 
 	/**
@@ -77,18 +79,7 @@ public class TourChartView extends ViewPart {
 
 		fPostSelectionListener = new ISelectionListener() {
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-
-				if (selection instanceof TourChartSelection) {
-
-					// a tour was selected show the chart
-
-					TourChart tourChart = ((TourChartSelection) selection).getTourChart();
-
-					if (tourChart != null) {
-						fTourData = tourChart.getTourData();
-						fTourChart.updateChart(fTourData, fTourChartConfig, false);
-					}
-				}
+				updateChart(selection);
 			}
 		};
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
@@ -96,6 +87,28 @@ public class TourChartView extends ViewPart {
 
 	public void setFocus() {
 		fTourChart.setFocus();
+	}
+
+	public void dispose() {
+		
+		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+		
+		super.dispose();
+	}
+
+	private void updateChart(ISelection selection) {
+		
+		if (selection instanceof TourChartSelection) {
+
+			// a tour was selected show the chart
+
+			TourChart tourChart = ((TourChartSelection) selection).getTourChart();
+
+			if (tourChart != null) {
+				fTourData = tourChart.getTourData();
+				fTourChart.updateChart(fTourData, fTourChartConfig, false);
+			}
+		}
 	}
 
 }

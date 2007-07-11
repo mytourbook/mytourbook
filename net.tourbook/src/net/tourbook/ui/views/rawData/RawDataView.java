@@ -151,7 +151,7 @@ public class RawDataView extends ViewPart {
 	private NumberFormat				fNumberFormatter;
 
 	private ToolBarManager				fTbm;
-	private ViewForm					tourForm;
+	private ViewForm					fViewForm;
 
 	protected TourPerson				fActivePerson;
 	protected TourPerson				fNewActivePerson;
@@ -335,21 +335,21 @@ public class RawDataView extends ViewPart {
 		createResources();
 
 		// device data / tour viewer
-		tourForm = new ViewForm(parent, SWT.NONE);
+		fViewForm = new ViewForm(parent, SWT.NONE);
 
 		// create the left toolbar
-		final ToolBar tbmLeft = new ToolBar(tourForm, SWT.FLAT | SWT.WRAP);
+		final ToolBar tbmLeft = new ToolBar(fViewForm, SWT.FLAT | SWT.WRAP);
 		fTbm = new ToolBarManager(tbmLeft);
 
-		final Composite contentContainer = new Composite(tourForm, SWT.NONE);
+		final Composite contentContainer = new Composite(fViewForm, SWT.NONE);
 		final GridLayout gl = new GridLayout();
 		gl.marginWidth = 0;
 		gl.marginHeight = 0;
 		gl.verticalSpacing = 0;
 		contentContainer.setLayout(gl);
 
-		tourForm.setTopLeft(tbmLeft);
-		tourForm.setContent(contentContainer);
+		fViewForm.setTopLeft(tbmLeft);
+		fViewForm.setContent(contentContainer);
 
 		createTourViewer(contentContainer);
 
@@ -361,9 +361,8 @@ public class RawDataView extends ViewPart {
 		fTourChart.setShowSlider(true);
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-//		fTourChartConfig.setMinMaxKeeper(false);
 
-		fViewerDetailForm = new ViewerDetailForm(parent, tourForm, sash, fTourChart);
+		fViewerDetailForm = new ViewerDetailForm(parent, fViewForm, sash, fTourChart);
 
 		// actions
 		createActions();
@@ -886,7 +885,7 @@ public class RawDataView extends ViewPart {
 	}
 
 	public void showViewerDetails(final boolean isVisible) {
-		fViewerDetailForm.setMaximizedControl(isVisible ? null : tourForm);
+		fViewerDetailForm.setMaximizedControl(isVisible ? null : fViewForm);
 	}
 
 	private void createChart(final boolean useNormalizedData) {

@@ -28,8 +28,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 /**
- * The ViewerDetailForm class provides the ability to keep the viewer width when the parent is
- * resized
+ * The class provides the ability to keep the width of the viewer when the parent is resized
  */
 public class ViewerDetailForm {
 
@@ -44,7 +43,7 @@ public class ViewerDetailForm {
 	private Control				fDetail;
 
 	private Integer				fViewerWidth;
-	private FormData			fSashData;
+	private FormData			fSashLayoutData;
 
 	private boolean				isInitialResize;
 
@@ -66,25 +65,25 @@ public class ViewerDetailForm {
 		FormAttachment topAttachment = new FormAttachment(0, 0);
 		FormAttachment bottomAttachment = new FormAttachment(100, 0);
 
-		final FormData fdViewer = new FormData();
-		fdViewer.left = new FormAttachment(0, 0);
-		fdViewer.right = new FormAttachment(sash, 0);
-		fdViewer.top = topAttachment;
-		fdViewer.bottom = bottomAttachment;
-		viewer.setLayoutData(fdViewer);
+		final FormData viewerLayoutData = new FormData();
+		viewerLayoutData.left = new FormAttachment(0, 0);
+		viewerLayoutData.right = new FormAttachment(sash, 0);
+		viewerLayoutData.top = topAttachment;
+		viewerLayoutData.bottom = bottomAttachment;
+		viewer.setLayoutData(viewerLayoutData);
 
-		fSashData = new FormData();
-		fSashData.left = new FormAttachment(leftWidth, 0);
-		fSashData.top = topAttachment;
-		fSashData.bottom = bottomAttachment;
-		sash.setLayoutData(fSashData);
+		fSashLayoutData = new FormData();
+		fSashLayoutData.left = new FormAttachment(leftWidth, 0);
+		fSashLayoutData.top = topAttachment;
+		fSashLayoutData.bottom = bottomAttachment;
+		sash.setLayoutData(fSashLayoutData);
 
-		final FormData fdDetail = new FormData();
-		fdDetail.left = new FormAttachment(sash, 0);
-		fdDetail.right = new FormAttachment(100, 0);
-		fdDetail.top = topAttachment;
-		fdDetail.bottom = bottomAttachment;
-		detail.setLayoutData(fdDetail);
+		final FormData detailLayoutData = new FormData();
+		detailLayoutData.left = new FormAttachment(sash, 0);
+		detailLayoutData.right = new FormAttachment(100, 0);
+		detailLayoutData.top = topAttachment;
+		detailLayoutData.bottom = bottomAttachment;
+		detail.setLayoutData(detailLayoutData);
 
 		viewer.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
@@ -108,30 +107,13 @@ public class ViewerDetailForm {
 				int sashWidth = Math.max(Math.min(e.x, right), MINIMUM_WIDTH);
 
 				if (sashWidth != sashRect.x) {
-					fSashData.left = new FormAttachment(0, sashWidth);
+					fSashLayoutData.left = new FormAttachment(0, sashWidth);
 					parent.layout();
 				}
 
 				fViewerWidth = sashWidth;
 			}
 		});
-	}
-
-	/**
-	 * @param viewerWidth
-	 */
-	public void setViewerWidth(Integer viewerWidth) {
-		fViewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_WIDTH, viewerWidth);
-	}
-
-	/**
-	 * sets the control which is maximized, set <code>null</code> to reset the maximized control
-	 * 
-	 * @param control
-	 */
-	public void setMaximizedControl(Control control) {
-		fMaximizedControl = control;
-		onResize();
 	}
 
 	private void onResize() {
@@ -151,7 +133,7 @@ public class ViewerDetailForm {
 				fViewerWidth = viewerWidth = fViewer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 			}
 
-			fSashData.left = new FormAttachment(0, viewerWidth);
+			fSashLayoutData.left = new FormAttachment(0, viewerWidth);
 
 			fParent.layout();
 
@@ -163,34 +145,57 @@ public class ViewerDetailForm {
 
 				if (fMaximizedControl == fViewer) {
 
-					fSashData.left = new FormAttachment(100, 0);
+					fSashLayoutData.left = new FormAttachment(100, 0);
 					fParent.layout();
 
 				} else if (fMaximizedControl == fDetail) {
-					fSashData.left = new FormAttachment(0, -fSash.getSize().x);
+					fSashLayoutData.left = new FormAttachment(0, -fSash.getSize().x);
 					fParent.layout();
 				}
 
 			} else {
 
 				if (fViewerWidth == null) {
-					fSashData.left = new FormAttachment(50, 0);
+					fSashLayoutData.left = new FormAttachment(50, 0);
 				} else {
 
 					Rectangle parentRect = fParent.getClientArea();
 
 					// set the minimum width
-					int viewerWidth = fViewerWidth == null
-							? MINIMUM_WIDTH
-							: fViewerWidth >= parentRect.width ? Math.max(fViewerWidth
-									- MINIMUM_WIDTH, 10) : fViewerWidth;
 
-					fSashData.left = new FormAttachment(0, viewerWidth);
+					int viewerWidth = 0;
+
+					if (fViewerWidth + MINIMUM_WIDTH >= parentRect.width) {
+
+						viewerWidth = Math.max(parentRect.width - MINIMUM_WIDTH, 50);
+
+					} else {
+						viewerWidth = fViewerWidth;
+					}
+
+					fSashLayoutData.left = new FormAttachment(0, viewerWidth);
 				}
 				fParent.layout();
 			}
 
 			// System.out.println("isInit==true: "+fSashData.left);
 		}
+	}
+
+	/**
+	 * sets the control which is maximized, set <code>null</code> to reset the maximized control
+	 * 
+	 * @param control
+	 */
+	public void setMaximizedControl(Control control) {
+		fMaximizedControl = control;
+		onResize();
+	}
+
+	/**
+	 * @param viewerWidth
+	 */
+	public void setViewerWidth(Integer viewerWidth) {
+		fViewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_WIDTH, viewerWidth);
 	}
 }
