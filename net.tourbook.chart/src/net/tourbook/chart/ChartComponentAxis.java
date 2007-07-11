@@ -97,7 +97,7 @@ public class ChartComponentAxis extends Canvas {
 
 		final Rectangle axisRect = getClientArea();
 
-		if (axisRect.width == 0 || axisRect.height == 0) {
+		if (axisRect.width <= 0 || axisRect.height <= 0) {
 			return;
 		}
 

@@ -1161,8 +1161,7 @@ public class ChartComponentGraph extends Canvas {
 
 				final int valueYHigh = yHighValues[valueIndex];
 
-				final int barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(
-						valueYHigh,
+				final int barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh,
 						valueYLow));
 
 				if (barHeight == 0) {
@@ -1211,8 +1210,7 @@ public class ChartComponentGraph extends Canvas {
 				if (devBarWidth > 1) {
 
 					gc.setForeground(colorBright);
-					gc.fillGradientRectangle(
-							barShape.x,
+					gc.fillGradientRectangle(barShape.x,
 							barShape.y,
 							barShape.width,
 							barShape.height,
@@ -1338,8 +1336,7 @@ public class ChartComponentGraph extends Canvas {
 			gc.setForeground(colorDarkSelected);
 			gc.setBackground(colorBrightSelected);
 
-			gc.fillGradientRectangle(
-					barShapeSelected.x + 1,
+			gc.fillGradientRectangle(barShapeSelected.x + 1,
 					barShapeSelected.y + 1,
 					barShapeSelected.width - 1,
 					barShapeSelected.height - 1,
@@ -1355,8 +1352,7 @@ public class ChartComponentGraph extends Canvas {
 			// barShapeSelected.height);
 			// } else {
 
-			gc.drawRoundRectangle(
-					barShapeSelected.x,
+			gc.drawRoundRectangle(barShapeSelected.x,
 					barShapeSelected.y,
 					barShapeSelected.width,
 					barShapeSelected.height,
@@ -1469,6 +1465,11 @@ public class ChartComponentGraph extends Canvas {
 		// the layer above image is the same size as the graph image
 		final Rectangle graphRect = fGraphCoreImage.getBounds();
 
+		// ensure correct image size
+		if (graphRect.width <= 0 || graphRect.height <= 0) {
+			return;
+		}
+
 		// when the existing image is the same size as the new image, we will
 		// redraw it only if it's set to dirty
 		if (fIsCustomLayerDirty == false && fCumstomLayerImage != null) {
@@ -1529,8 +1530,7 @@ public class ChartComponentGraph extends Canvas {
 					return;
 				}
 
-				int devNonScrolledImageWidth = Math.max(
-						ChartComponents.CHART_MIN_WIDTH,
+				int devNonScrolledImageWidth = Math.max(ChartComponents.CHART_MIN_WIDTH,
 						getDevVisibleChartWidth());
 
 				int devImageWidth = canScrollZoomedChart
@@ -1541,9 +1541,8 @@ public class ChartComponentGraph extends Canvas {
 				 * the image size is adjusted to the client size but it must be within the min/max
 				 * ranges
 				 */
-				final int devImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT, Math.min(
-						getVisibleGraphHeight(),
-						ChartComponents.CHART_MAX_HEIGHT));
+				final int devImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT, Math
+						.min(getVisibleGraphHeight(), ChartComponents.CHART_MAX_HEIGHT));
 
 				/*
 				 * when the image is the same size as the new we will redraw it only if it is set to
@@ -1560,6 +1559,11 @@ public class ChartComponentGraph extends Canvas {
 
 				Display display = getDisplay();
 				Rectangle imageRect = new Rectangle(0, 0, devImageWidth, devImageHeight);
+
+				// ensure correct image size
+				if (imageRect.width <= 0 || imageRect.height <= 0) {
+					return;
+				}
 
 				if (ChartUtil.canReuseImage(fGraphCoreImage, imageRect) == false) {
 
@@ -1758,8 +1762,7 @@ public class ChartComponentGraph extends Canvas {
 				gc.setForeground(colorDark);
 				gc.setBackground(colorBright);
 
-				gc.fillGradientRectangle(
-						hoveredBarShape.x + 1,
+				gc.fillGradientRectangle(hoveredBarShape.x + 1,
 						hoveredBarShape.y + 1,
 						hoveredBarShape.width - 1,
 						hoveredBarShape.height - 1,
@@ -1767,8 +1770,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// draw bar border
 				gc.setForeground(colorLine);
-				gc.drawRoundRectangle(
-						hoveredBarShape.x,
+				gc.drawRoundRectangle(hoveredBarShape.x,
 						hoveredBarShape.y,
 						hoveredBarShape.width,
 						hoveredBarShape.height,
@@ -1804,6 +1806,11 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 		// System.out.println("draw layer");
+
+		// ensure correct image size
+		if (graphRect.width <= 0 || graphRect.height <= 0) {
+			return;
+		}
 
 		if (ChartUtil.canReuseImage(fGraphLayerImage, graphRect) == false) {
 			fGraphLayerImage = ChartUtil.createImage(getDisplay(), fGraphLayerImage, graphRect);
@@ -1877,8 +1884,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		if (xData.getXMarkerStartIndex() == -1) {
-			drawLineGraphSegment(
-					gc,
+			drawLineGraphSegment(gc,
 					drawingData,
 					0,
 					xValues.length,
@@ -1897,8 +1903,7 @@ public class ChartComponentGraph extends Canvas {
 					.getXMarkerEndIndex() + 1, rgbFg, rgbBg1, rgbBg2, fGraphAlpha, graphValueOffset);
 
 			// draw segment before the marker
-			drawLineGraphSegment(
-					gc,
+			drawLineGraphSegment(gc,
 					drawingData,
 					0,
 					xData.getXMarkerStartIndex() + 1,
@@ -1909,8 +1914,7 @@ public class ChartComponentGraph extends Canvas {
 					graphValueOffset);
 
 			// draw segment after the marker
-			drawLineGraphSegment(
-					gc,
+			drawLineGraphSegment(gc,
 					drawingData,
 					xData.getXMarkerEndIndex() - 0,
 					xValues.length,
@@ -2081,8 +2085,7 @@ public class ChartComponentGraph extends Canvas {
 			 * rectangle
 			 */
 			gc.setClipping(path);
-			gc.fillGradientRectangle(
-					0,
+			gc.fillGradientRectangle(0,
 					(int) (devChartY0Line - (graphYBottom * scaleY)),
 					devChartWidth,
 					-devGraphHeight,
@@ -2098,8 +2101,7 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * fill above 0 line
 			 */
-			gc.fillGradientRectangle(
-					0,
+			gc.fillGradientRectangle(0,
 					(int) (devChartY0Line - (graphFillYBottom * scaleY)) + 1,
 					devChartWidth,
 					(int) -Math.min(devGraphHeight, Math.abs(devYTop - devChartY0Line)),
@@ -2111,9 +2113,8 @@ public class ChartComponentGraph extends Canvas {
 			gc.setForeground(colorBg2);
 			gc.setBackground(colorBg1);
 
-			gc.fillGradientRectangle(0, (int) devYBottom, devChartWidth, (int) -Math.min(
-					devGraphHeight,
-					devYBottom - devChartY0Line), true);
+			gc.fillGradientRectangle(0, (int) devYBottom, devChartWidth, (int) -Math
+					.min(devGraphHeight, devYBottom - devChartY0Line), true);
 
 			gc.setClipping(chartRectangle);
 		}
@@ -2190,16 +2191,14 @@ public class ChartComponentGraph extends Canvas {
 			final int valueXStartWithOffset = valueXStart + valueDraggingDiff;
 			final int valueXEndWithOffset = valueXEnd + valueDraggingDiff;
 
-			fMovedXMarkerStartValueIndex = computeXMarkerValue(
-					xValues,
+			fMovedXMarkerStartValueIndex = computeXMarkerValue(xValues,
 					xmStartIndex,
 					valueDraggingDiff,
 					valueXStartWithOffset);
 
 			devMovedXStart = (int) (scaleX * xValues[fMovedXMarkerStartValueIndex] - fDevGraphImageXOffset);
 
-			fMovedXMarkerEndValueIndex = computeXMarkerValue(
-					xValues,
+			fMovedXMarkerEndValueIndex = computeXMarkerValue(xValues,
 					xmEndIndex,
 					valueDraggingDiff,
 					valueXEndWithOffset);
@@ -2286,8 +2285,7 @@ public class ChartComponentGraph extends Canvas {
 
 			gc.setAlpha(0x80);
 
-			gc.fillGradientRectangle(
-					devMovedXStart,
+			gc.fillGradientRectangle(devMovedXStart,
 					graphBottom,
 					devMovedXEnd - devMovedXStart,
 					graphTop - graphBottom,
@@ -2520,8 +2518,7 @@ public class ChartComponentGraph extends Canvas {
 
 						// draw the unit text between two units
 
-						final int devXUnitCentered = Math.max(
-								0,
+						final int devXUnitCentered = Math.max(0,
 								((devUnitWidth - unitTextExtend.x) / 2) + 0);
 
 						gc.drawText(unit.label, devXUnitTick + devXUnitCentered, devY + 7, true);
@@ -2535,8 +2532,7 @@ public class ChartComponentGraph extends Canvas {
 							gc.drawText(unit.label, devXUnitTick, devY + 7, true);
 						} else {
 							// center the unit text
-							gc.drawText(
-									unit.label,
+							gc.drawText(unit.label,
 									devXUnitTick - (unitTextExtend.x / 2),
 									devY + 7,
 									true);
@@ -2666,8 +2662,7 @@ public class ChartComponentGraph extends Canvas {
 			if (canScrollZoomedChart) {
 
 				// enforce min/max width for the chart
-				final int devMinWidth = Math.max(
-						Math.max(devVisibleChartWidth, chartMinWidth),
+				final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
 						ChartComponents.CHART_MIN_WIDTH);
 
 				final int devMaxWidth = Math.min(devImageWidth, ChartComponents.CHART_MAX_WIDTH);
@@ -2677,11 +2672,12 @@ public class ChartComponentGraph extends Canvas {
 			} else {
 
 				// enforce min width for the chart
-				final int devMinWidth = Math.max(
-						Math.max(devVisibleChartWidth, chartMinWidth),
+				final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
 						ChartComponents.CHART_MIN_WIDTH);
 
 				fDevVirtualGraphImageWidth = Math.max(devMinWidth, devImageWidth);
+				
+//				System.out.println("fDevVirtualGraphImageWidth: "+fDevVirtualGraphImageWidth);
 			}
 		}
 	}
@@ -3362,8 +3358,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// the graph can't be scrolled
 
-				moveXSlider(
-						xSliderDragged,
+				moveXSlider(xSliderDragged,
 						(devXGraph - xSliderDragged.getDevXClickOffset() + ChartXSlider.halfSliderHitLineHeight));
 
 				fIsSliderDirty = true;
@@ -3514,8 +3509,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// call the listener which is registered for dragged x-marker
 				if (fChart.fXMarkerDraggingListener != null) {
-					fChart.fXMarkerDraggingListener.xMarkerMoved(
-							fMovedXMarkerStartValueIndex,
+					fChart.fXMarkerDraggingListener.xMarkerMoved(fMovedXMarkerStartValueIndex,
 							fMovedXMarkerEndValueIndex);
 				}
 			}
@@ -3989,11 +3983,11 @@ public class ChartComponentGraph extends Canvas {
 	void setXSliderValueIndex(final ChartXSlider slider, int valueIndex) {
 
 		final ChartDataXSerie xData = getXData();
-		
+
 		if (xData == null) {
 			return;
 		}
-		
+
 		final int[] xValues = xData.getHighValues()[0];
 
 		// adjust the slider index to the array bounds
@@ -4465,11 +4459,11 @@ public class ChartComponentGraph extends Canvas {
 
 		// reset the data which influence the computed graph image width
 		fGraphZoomRatio = 1;
-		fXOffsetZoomRatio=0;
+		fXOffsetZoomRatio = 0;
 
 		fDevVirtualGraphImageWidth = visibleGraphWidth;
 		fDevGraphImageXOffset = 0;
-		
+
 		// reset zoom parts
 		graphZoomParts = 1;
 		graphZoomPartPosition = 0;
