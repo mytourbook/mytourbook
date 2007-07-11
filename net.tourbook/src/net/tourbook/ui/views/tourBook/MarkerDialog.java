@@ -405,10 +405,10 @@ public class MarkerDialog extends TitleAreaDialog {
 			}
 		});
 
-		TourChartConfiguration chartConfig = new TourChartConfiguration();
+		TourChartConfiguration chartConfig = new TourChartConfiguration(false);
 		chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-		fTourChart.updateChart(fTourData, chartConfig);
+		fTourChart.updateChart(fTourData, chartConfig, false);
 	}
 
 	private void createUI(Composite parent) {

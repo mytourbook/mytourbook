@@ -361,7 +361,7 @@ public class RawDataView extends ViewPart {
 		fTourChart.setShowSlider(true);
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-		fTourChartConfig.setMinMaxKeeper(false);
+//		fTourChartConfig.setMinMaxKeeper(false);
 
 		fViewerDetailForm = new ViewerDetailForm(parent, tourForm, sash, fTourChart);
 

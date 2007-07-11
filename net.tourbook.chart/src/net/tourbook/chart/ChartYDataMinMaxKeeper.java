@@ -26,15 +26,15 @@ public class ChartYDataMinMaxKeeper {
 	private HashMap<Integer, Integer>	minValues	= null;
 	private HashMap<Integer, Integer>	maxValues	= null;
 
-	public boolean hasMinMaxChanged(){
+	public boolean hasMinMaxChanged() {
 		boolean isEqual = minValues.equals(maxValues);
 		return !isEqual;
 	}
-	
+
 	/**
-	 * save the min/max values from the given chart data fDataModel
+	 * keep the min/max values for all data series from the data model
 	 * 
-	 * @param fChartDataModel
+	 * @param chartDataModel
 	 */
 	public void saveMinMaxValues(ChartDataModel chartDataModel) {
 
@@ -53,24 +53,29 @@ public class ChartYDataMinMaxKeeper {
 			if (chartData instanceof ChartDataYSerie) {
 				ChartDataYSerie yData = (ChartDataYSerie) chartData;
 
-				Integer yDataInfo = (Integer) yData
-						.getCustomData(ChartDataYSerie.YDATA_INFO);
+				Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
 
 				if (yDataInfo != null) {
 
-					minValues.put(yDataInfo, yData.getMinValue());
-					maxValues.put(yDataInfo, yData.getMaxValue());
+					minValues.put(yDataInfo, yData.getVisibleMinValue());
+					maxValues.put(yDataInfo, yData.getVisibleMaxValue());
 				}
 			}
 		}
 	}
 
+	/**
+	 * Restore min/max values for all data series from the data model
+	 * 
+	 * @param chartDataModel
+	 */
 	public void restoreMinMaxValues(ChartDataModel chartDataModel) {
 
 		if (minValues == null) {
-			// min/max values have not yet been save, so nothing can be restored
+			// min/max values have not yet been saved, so nothing can be restored
 			return;
 		}
+
 		ArrayList<ChartDataSerie> xyData = chartDataModel.getXyData();
 
 		// loop: restore min/max values for all data series
@@ -78,19 +83,18 @@ public class ChartYDataMinMaxKeeper {
 			if (chartData instanceof ChartDataYSerie) {
 				ChartDataYSerie yData = (ChartDataYSerie) chartData;
 
-				Integer yDataInfo = (Integer) yData
-						.getCustomData(ChartDataYSerie.YDATA_INFO);
+				Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
 
 				if (yDataInfo != null) {
 
 					Integer minValue = minValues.get(yDataInfo);
 					if (minValue != null) {
-						yData.setMinValue(minValue);
+						yData.setVisibleMinValue(minValue);
 					}
 
 					Integer maxValue = maxValues.get(yDataInfo);
 					if (maxValue != null) {
-						yData.setMaxValue(maxValue);
+						yData.setVisibleMaxValue(maxValue);
 					}
 				}
 			}

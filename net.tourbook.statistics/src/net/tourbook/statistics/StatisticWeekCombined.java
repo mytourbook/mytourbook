@@ -42,7 +42,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
@@ -57,7 +57,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_ALTITUDE);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
@@ -72,7 +72,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_TIME);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);

@@ -41,7 +41,7 @@ public class StatisticWeekDistance extends StatisticWeek {
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);

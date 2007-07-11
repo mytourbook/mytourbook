@@ -32,7 +32,7 @@ public class StatisticDayCombined extends StatisticDay {
 		// set the x-axis
 		ChartDataXSerie xData = new ChartDataXSerie(tourTimeData.fDOYValues);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
-		xData.setMaxValue(fCurrentYear);
+		xData.setVisibleMaxValue(fCurrentYear);
 		chartModel.setXData(xData);
 
 		ChartDataYSerie yData;
@@ -48,7 +48,7 @@ public class StatisticDayCombined extends StatisticDay {
 		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
 		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		yData.setCustomData(DISTANCE_DATA, 1);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
@@ -65,7 +65,7 @@ public class StatisticDayCombined extends StatisticDay {
 		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		yData.setCustomData(ALTITUDE_DATA, 1);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_ALTITUDE);
@@ -82,7 +82,7 @@ public class StatisticDayCombined extends StatisticDay {
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		yData.setCustomData(DURATION_DATA, 1);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_TIME);

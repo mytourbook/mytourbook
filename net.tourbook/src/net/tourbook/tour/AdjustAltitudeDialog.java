@@ -380,12 +380,12 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		spinner.addFocusListener(new FocusListener() {
 
-			public void focusGained(FocusEvent e) {
-			}
+			public void focusGained(FocusEvent e) {}
 
 			public void focusLost(FocusEvent e) {
 				onChangeAltitude((Integer) e.widget.getData());
-			}});
+			}
+		});
 
 		return spinner;
 	}
@@ -444,7 +444,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fTourChart.setLayoutData(gd);
 
 		// set altitude visible
-		TourChartConfiguration chartConfig = new TourChartConfiguration();
+		TourChartConfiguration chartConfig = new TourChartConfiguration(true);
 		chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
 		final TourData tourData = fSelectedTourChart.getTourData();
@@ -458,7 +458,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			}
 		});
 
-		fTourChart.updateChart(tourData, chartConfig);
+		fTourChart.updateChart(tourData, chartConfig, true);
 
 		/*
 		 * container: altitude controls
@@ -800,7 +800,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		if (msgBox.open() == SWT.YES) {
 			fTourChart.fTourData.computeMaxAltitude();
 			TourDatabase.saveTour(fTourChart.fTourData);
-			fSelectedTourChart.updateChart();
+			fSelectedTourChart.updateChart(true);
 
 			super.okPressed();
 		}

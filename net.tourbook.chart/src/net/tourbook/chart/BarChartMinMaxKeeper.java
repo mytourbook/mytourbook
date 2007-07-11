@@ -86,8 +86,8 @@ public class BarChartMinMaxKeeper {
 		fMinValues.put(yDataId, keeperMinValue);
 		fMaxValues.put(yDataId, keeperMaxValue);
 
-		yData.setMinValue(keeperMinValue);
-		yData.setMaxValue(keeperMaxValue);
+		yData.setVisibleMinValue(keeperMinValue);
+		yData.setVisibleMaxValue(keeperMaxValue);
 	}
 
 	public void resetMinMax() {

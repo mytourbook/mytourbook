@@ -111,27 +111,28 @@ public class CompareResultView extends SynchedChartView {
 	private static final String				MEMENTO_SASH_CHART		= "resultview.chart.";									//$NON-NLS-1$
 
 	/**
-	 * This memento allows this view to save and restore state when it is closed
-	 * and opened within a session. A different memento is supplied by the
-	 * platform for persistance at workbench shutdown.
+	 * This memento allows this view to save and restore state when it is closed and opened within a
+	 * session. A different memento is supplied by the platform for persistance at workbench
+	 * shutdown.
 	 */
 	private static IMemento					fSessionMemento			= null;
 
 	private ViewerDetailForm				fViewerDetailForm;
 	CheckboxTreeViewer						fTourViewer;
 
-	private SashForm						fSashChart;
+	private SashForm						fSashCharts;
+
 	private TourChart						fRefTourChart;
 	private TourChart						fCompTourChart;
 
 	private TourReference					fCurrentRefTour;
 
-	private ISelectionListener				selectionListener;
+	private ISelectionListener				fSelectionListener;
 	private IPartListener2					fPartListener;
 
-	private Action							actionSaveComparedTours;
-	private Action							actionSynchChartsHorizontal;
-	private Action							actionRemoveComparedTourSaveStatus;
+	private Action							fActionSaveComparedTours;
+	private Action							fActionRemoveComparedTourSaveStatus;
+	private Action							fActionSynchChartsHorizontal;
 
 	PostSelectionProvider					fPostSelectionProvider;
 
@@ -157,8 +158,6 @@ public class CompareResultView extends SynchedChartView {
 
 	private final NumberFormat				nf						= NumberFormat
 																			.getNumberInstance();
-
-	public CompareResultView() {}
 
 	private class ActionSaveComparedTours extends Action {
 
@@ -199,6 +198,7 @@ public class CompareResultView extends SynchedChartView {
 		public TreeViewerItem getRootItem() {
 			return rootItem;
 		}
+
 		public boolean hasChildren(Object element) {
 			return ((TreeViewerItem) element).hasChildren();
 		}
@@ -280,76 +280,47 @@ public class CompareResultView extends SynchedChartView {
 		}
 	}
 
+	public CompareResultView() {}
+
 	private void addListeners() {
 
 		/*
-		 * set the part listener to save the view settings, the listeners are
-		 * called before the controls are disposed
+		 * set the part listener to save the view settings, the listeners are called before the
+		 * controls are disposed
 		 */
 		fPartListener = new IPartListener2() {
 			public void partActivated(IWorkbenchPartReference partRef) {}
+
 			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
+
 			public void partClosed(IWorkbenchPartReference partRef) {
 				if (ID.equals(partRef.getId()))
 					saveSettings();
 			}
+
 			public void partDeactivated(IWorkbenchPartReference partRef) {
 				if (ID.equals(partRef.getId()))
 					saveSettings();
 			}
+
 			public void partHidden(IWorkbenchPartReference partRef) {}
+
 			public void partInputChanged(IWorkbenchPartReference partRef) {}
+
 			public void partOpened(IWorkbenchPartReference partRef) {}
+
 			public void partVisible(IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(fPartListener);
 
 		// this view part is a selection listener
-		selectionListener = new ISelectionListener() {
+		fSelectionListener = new ISelectionListener() {
 
 			ArrayList<TVICompareResult>	fTTIRemovedComparedTours;
 
-			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-
-				SelectionRemovedComparedTours oldSelection = null;
-
-				if (selection instanceof SelectionRemovedComparedTours) {
-
-					SelectionRemovedComparedTours tourSelection = (SelectionRemovedComparedTours) selection;
-					ArrayList<Long> removedComparedTourCompIds = tourSelection.removedComparedTours;
-
-					/*
-					 * return when there are no removed tours or when the
-					 * selection has not changed
-					 */
-					if (removedComparedTourCompIds.size() == 0 || tourSelection == oldSelection) {
-						return;
-					}
-
-					oldSelection = tourSelection;
-
-					/*
-					 * find/update the removed compared tours in the viewer
-					 */
-
-					fTTIRemovedComparedTours = new ArrayList<TVICompareResult>();
-
-					findTTICompareResult(((ResultContentProvider) fTourViewer.getContentProvider())
-							.getRootItem(), removedComparedTourCompIds);
-
-					// set status for removed compared tours
-					for (TVICompareResult removedCompTour : fTTIRemovedComparedTours) {
-						removedCompTour.compId = -1;
-					}
-
-					// update the viewer
-					fTourViewer.update(fTTIRemovedComparedTours.toArray(), null);
-				}
-			}
-
 			/**
-			 * Recursive method to walk down the tour tree items and find the
-			 * compared tours which have been removed
+			 * Recursive method to walk down the tour tree items and find the compared tours which
+			 * have been removed
 			 * 
 			 * @param parentItem
 			 * @param removedComparedTourCompIds
@@ -382,21 +353,113 @@ public class CompareResultView extends SynchedChartView {
 				}
 			}
 
+			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+
+				SelectionRemovedComparedTours oldSelection = null;
+
+				if (selection instanceof SelectionRemovedComparedTours) {
+
+					SelectionRemovedComparedTours tourSelection = (SelectionRemovedComparedTours) selection;
+					ArrayList<Long> removedComparedTourCompIds = tourSelection.removedComparedTours;
+
+					/*
+					 * return when there are no removed tours or when the selection has not changed
+					 */
+					if (removedComparedTourCompIds.size() == 0 || tourSelection == oldSelection) {
+						return;
+					}
+
+					oldSelection = tourSelection;
+
+					/*
+					 * find/update the removed compared tours in the viewer
+					 */
+
+					fTTIRemovedComparedTours = new ArrayList<TVICompareResult>();
+
+					findTTICompareResult(((ResultContentProvider) fTourViewer.getContentProvider())
+							.getRootItem(), removedComparedTourCompIds);
+
+					// set status for removed compared tours
+					for (TVICompareResult removedCompTour : fTTIRemovedComparedTours) {
+						removedCompTour.compId = -1;
+					}
+
+					// update the viewer
+					fTourViewer.update(fTTIRemovedComparedTours.toArray(), null);
+				}
+			}
+
 		};
 
 		// register selection listener in the page
-		getSite().getPage().addPostSelectionListener(selectionListener);
+		getSite().getPage().addPostSelectionListener(fSelectionListener);
 
 	}
+
 	private void createActions() {
 
-		actionSaveComparedTours = new ActionSaveComparedTours();
-		actionRemoveComparedTourSaveStatus = new ActionRemoveComparedTourSaveStatus(this);
-		actionSynchChartsHorizontal = new ActionSynchChartHorizontal(this);
+		fActionSaveComparedTours = new ActionSaveComparedTours();
+		fActionRemoveComparedTourSaveStatus = new ActionRemoveComparedTourSaveStatus(this);
+		fActionSynchChartsHorizontal = new ActionSynchChartHorizontal(this);
 
 		// extend the toolbar int eht compared tour
 		IToolBarManager tbm = fCompTourChart.getToolbarManager();
-		tbm.add(actionSynchChartsHorizontal);
+		tbm.add(fActionSynchChartsHorizontal);
+	}
+
+	private Control createCharts(Composite parent) {
+
+		fSashCharts = new SashForm(parent, SWT.VERTICAL);
+
+		/*
+		 * reference tour chart
+		 */
+		fRefTourChart = new TourChart(fSashCharts, SWT.NONE, true);
+		fRefTourChart.setShowZoomActions(true);
+		fRefTourChart.setShowSlider(true);
+		fRefTourChart.setBackgroundColor(parent
+				.getDisplay()
+				.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+		fRefTourChart.addSliderMoveListener(new ISliderMoveListener() {
+			public void sliderMoved(SelectionChartInfo chartInfoSelection) {
+				fPostSelectionProvider.setSelection(chartInfoSelection);
+			}
+		});
+
+		// lower part
+		fLowerPageBook = new PageBook(fSashCharts, SWT.NONE);
+		fLowerPageBook.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+
+		/*
+		 * compared tour chart
+		 */
+		fCompTourChart = new TourChart(fLowerPageBook, SWT.NONE, true);
+		fCompTourChart.setShowZoomActions(true);
+		fCompTourChart.setShowSlider(true);
+
+		fCompTourChart.addSliderMoveListener(new ISliderMoveListener() {
+			public void sliderMoved(SelectionChartInfo chartInfoSelection) {
+				fPostSelectionProvider.setSelection(chartInfoSelection);
+			}
+		});
+
+		fCompTourChart.addXMarkerDraggingListener(new IChartListener() {
+
+			public int getXMarkerValueDiff() {
+				return fRefTourXMarkerValue;
+			}
+
+			public void xMarkerMoved(int movedXMarkerStartValueIndex, int movedXMarkerEndValueIndex) {
+				xMarkerMovedInCompTourChart(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
+			}
+		});
+
+		// ref tour info
+		fRefTourInfo = new RefTourInfo(fLowerPageBook, SWT.NONE);
+
+		return fSashCharts;
 	}
 
 	/**
@@ -439,59 +502,6 @@ public class CompareResultView extends SynchedChartView {
 
 		fTourViewer.setInput(((ResultContentProvider) fTourViewer.getContentProvider())
 				.getRootItem());
-	}
-
-	private Control createCharts(Composite parent) {
-
-		fSashChart = new SashForm(parent, SWT.VERTICAL);
-
-		/*
-		 * reference tour chart
-		 */
-		fRefTourChart = new TourChart(fSashChart, SWT.NONE, true);
-		fRefTourChart.setShowZoomActions(true);
-		fRefTourChart.setShowSlider(true);
-		fRefTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(
-				SWT.COLOR_WIDGET_BACKGROUND));
-
-		fRefTourChart.addSliderMoveListener(new ISliderMoveListener() {
-			public void sliderMoved(SelectionChartInfo chartInfoSelection) {
-				fPostSelectionProvider.setSelection(chartInfoSelection);
-			}
-		});
-
-		// lower part
-		fLowerPageBook = new PageBook(fSashChart, SWT.NONE);
-		fLowerPageBook.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-
-		/*
-		 * compared tour chart
-		 */
-		fCompTourChart = new TourChart(fLowerPageBook, SWT.NONE, true);
-		fCompTourChart.setShowZoomActions(true);
-		fCompTourChart.setShowSlider(true);
-
-		fCompTourChart.addSliderMoveListener(new ISliderMoveListener() {
-			public void sliderMoved(SelectionChartInfo chartInfoSelection) {
-				fPostSelectionProvider.setSelection(chartInfoSelection);
-			}
-		});
-
-		fCompTourChart.addXMarkerDraggingListener(new IChartListener() {
-
-			public void xMarkerMoved(int movedXMarkerStartValueIndex, int movedXMarkerEndValueIndex) {
-				xMarkerMovedInCompTourChart(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
-			}
-
-			public int getXMarkerValueDiff() {
-				return fRefTourXMarkerValue;
-			}
-		});
-
-		// ref tour info
-		fRefTourInfo = new RefTourInfo(fLowerPageBook, SWT.NONE);
-
-		return fSashChart;
 	}
 
 	private Control createTourViewer(Composite parent) {
@@ -574,10 +584,9 @@ public class CompareResultView extends SynchedChartView {
 					TVICompareResult compareResult = (TVICompareResult) event.getElement();
 					if (event.getChecked() && compareResult.compId != -1) {
 						/*
-						 * uncheck elements which are already stored for the
-						 * reftour, it would be better to disable them, but this
-						 * is not possible because this is a limitation by the
-						 * OS
+						 * uncheck elements which are already stored for the reftour, it would be
+						 * better to disable them, but this is not possible because this is a
+						 * limitation by the OS
 						 */
 						fTourViewer.setChecked(compareResult, false);
 					} else {
@@ -604,7 +613,7 @@ public class CompareResultView extends SynchedChartView {
 
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(selectionListener);
+		getSite().getPage().removePostSelectionListener(fSelectionListener);
 		getSite().getPage().removePartListener(fPartListener);
 
 		resManager.dispose();
@@ -615,28 +624,27 @@ public class CompareResultView extends SynchedChartView {
 	private void enableActions() {
 
 		// enable/disable save button
-		actionSaveComparedTours.setEnabled(fTourViewer.getCheckedElements().length > 0);
+		fActionSaveComparedTours.setEnabled(fTourViewer.getCheckedElements().length > 0);
 
 		// enable/disable action: remove save status
 		final StructuredSelection selection = (StructuredSelection) fTourViewer.getSelection();
 
 		/*
-		 * currently we only support one tour item were the save status can be
-		 * removed
+		 * currently we only support one tour item were the save status can be removed
 		 */
 		if (selection.size() == 1 && selection.getFirstElement() instanceof TVICompareResult) {
 
 			TVICompareResult ttiCompResult = (TVICompareResult) (selection.getFirstElement());
 
-			actionRemoveComparedTourSaveStatus.setEnabled(ttiCompResult.compId != -1);
+			fActionRemoveComparedTourSaveStatus.setEnabled(ttiCompResult.compId != -1);
 		} else {
-			actionRemoveComparedTourSaveStatus.setEnabled(false);
+			fActionRemoveComparedTourSaveStatus.setEnabled(false);
 		}
 	}
 
 	private void fillContextMenu(IMenuManager menuMgr) {
 
-		menuMgr.add(actionSaveComparedTours);
+		menuMgr.add(fActionSaveComparedTours);
 		final StructuredSelection selection = (StructuredSelection) fTourViewer.getSelection();
 
 		selection.getFirstElement();
@@ -671,9 +679,41 @@ public class CompareResultView extends SynchedChartView {
 		}
 
 		menuMgr.add(new Separator());
-		menuMgr.add(actionRemoveComparedTourSaveStatus);
+		menuMgr.add(fActionRemoveComparedTourSaveStatus);
 
 		enableActions();
+	}
+
+	private RefTourChartData getRefChartData(TourReference refTour) {
+
+		// get the reference chart from the cache
+		RefTourChartData refTourChartData = fRefChartDataCache.get(refTour.getGeneratedId());
+
+		if (refTourChartData != null) {
+			return refTourChartData;
+		}
+
+		// get tour data from the database
+		TourData tourData = refTour.getTourData();
+
+		// set visible graphs: altitude
+		TourChartConfiguration refTourChartConfig = new TourChartConfiguration(false);
+		refTourChartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
+		// refTourChartConfig.setKeepMinMaxValues(true);
+
+		TourChartConfiguration compTourChartConfig = new TourChartConfiguration(true);
+		compTourChartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
+		// compTourChartConfig.setKeepMinMaxValues(true);
+
+		ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(tourData,
+				refTourChartConfig);
+
+		return new RefTourChartData(
+				refTour,
+				chartDataModel,
+				tourData,
+				refTourChartConfig,
+				compTourChartConfig);
 	}
 
 	/**
@@ -702,13 +742,43 @@ public class CompareResultView extends SynchedChartView {
 		}
 	}
 
+	void removeComparedTour() {
+
+		// enable/disable action: remove save status
+		final StructuredSelection selection = (StructuredSelection) fTourViewer.getSelection();
+
+		/*
+		 * currently we only support one tour item were the save status can be removed
+		 */
+		if (selection.size() == 1 && selection.getFirstElement() instanceof TVICompareResult) {
+
+			SelectionRemovedComparedTours removedCompareTours = new SelectionRemovedComparedTours();
+
+			TVICompareResult compareResult = (TVICompareResult) selection.getFirstElement();
+
+			if (TourCompareManager.removeComparedTourFromDb(compareResult.compId)) {
+
+				// update the chart
+				fCompTourChart.setBackgroundColor(Display
+						.getCurrent()
+						.getSystemColor(SWT.COLOR_WHITE));
+				fCompTourChart.redrawChart();
+
+				// create and fire the selection
+				removedCompareTours.removedComparedTours.add(compareResult.compId);
+				fPostSelectionProvider.setSelection(removedCompareTours);
+
+			}
+		}
+	}
+
 	private void restoreSettings(IMemento memento) {
 
 		if (memento != null) {
 
 			fViewerDetailForm.setViewerWidth(fSessionMemento.getInteger(MEMENTO_SASH_CONTAINER));
 
-			UI.restoreSashWeight(fSashChart, memento, MEMENTO_SASH_CHART, new int[] { 20, 40 });
+			UI.restoreSashWeight(fSashCharts, memento, MEMENTO_SASH_CHART, new int[] { 20, 40 });
 		}
 	}
 
@@ -746,16 +816,14 @@ public class CompareResultView extends SynchedChartView {
 						comparedTour.setRefTourId(compareResult.refTour.getGeneratedId());
 
 						Calendar calendar = GregorianCalendar.getInstance();
-						calendar.set(
-								tourData.getStartYear(),
+						calendar.set(tourData.getStartYear(),
 								tourData.getStartMonth() - 1,
 								tourData.getStartDay());
 
 						comparedTour.setTourDate(calendar.getTimeInMillis());
 						comparedTour.setStartYear(tourData.getStartYear());
 
-						comparedTour.setTourSpeed(
-								compareResult.compareDistance,
+						comparedTour.setTourSpeed(compareResult.compareDistance,
 								compareResult.compareTime);
 
 						em.persist(comparedTour);
@@ -763,8 +831,7 @@ public class CompareResultView extends SynchedChartView {
 						ts.commit();
 
 						/*
-						 * uncheck the compared tour and make the persisted
-						 * instance visible
+						 * uncheck the compared tour and make the persisted instance visible
 						 */
 						compareResult.compId = comparedTour.getComparedId();
 						fTourViewer.setChecked(compareResult, false);
@@ -772,8 +839,9 @@ public class CompareResultView extends SynchedChartView {
 						persistedCompareResults.persistedCompareResults.add(compareResult);
 
 						// update the chart
-						fCompTourChart.setBackgroundColor(Display.getCurrent().getSystemColor(
-								SWT.COLOR_WIDGET_BACKGROUND));
+						fCompTourChart.setBackgroundColor(Display
+								.getCurrent()
+								.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 						fCompTourChart.redrawChart();
 
 					}
@@ -795,6 +863,7 @@ public class CompareResultView extends SynchedChartView {
 			}
 		}
 	}
+
 	private void saveSettings() {
 		fSessionMemento = XMLMemento.createWriteRoot("CompareResultView"); //$NON-NLS-1$
 		saveState(fSessionMemento);
@@ -804,11 +873,54 @@ public class CompareResultView extends SynchedChartView {
 
 		memento.putInteger(MEMENTO_SASH_CONTAINER, fTourViewer.getTree().getSize().x);
 
-		UI.saveSashWeight(fSashChart, memento, MEMENTO_SASH_CHART);
+		UI.saveSashWeight(fSashCharts, memento, MEMENTO_SASH_CHART);
 	}
 
 	public void setFocus() {
 		fTourViewer.getControl().setFocus();
+	}
+
+	private void showCompTour(final TVICompareResult compareResult) {
+
+		IDataModelListener dataModelListener = new IDataModelListener() {
+
+			public void dataModelChanged(ChartDataModel changedChartDataModel) {
+
+				ChartDataXSerie xData = changedChartDataModel.getXData();
+
+				// set the x-marker
+				xData.setMarkerValueIndex(compareResult.compareIndexStart,
+						compareResult.compareIndexEnd);
+
+				// set title
+				changedChartDataModel.setTitle(NLS
+						.bind(Messages.CompareResult_Chart_title_compared_tour, TourManager
+								.getTourTitleDetailed(compareResult.compTour)));
+			}
+		};
+
+		// set current selected compared tour
+		fCurrentTTICompareResult = compareResult;
+
+		// show the compared tour chart
+		fCompTourChart.addDataModelListener(dataModelListener);
+
+		// get the tour chart configuration
+		RefTourChartData refTourChartData = fRefChartDataCache
+				.get(fCurrentRefTour.getGeneratedId());
+		TourChartConfiguration compTourChartConfig = refTourChartData.getCompTourChartConfig();
+
+		fCompTourChart.setBackgroundColor(Display
+				.getCurrent()
+				.getSystemColor(compareResult.compId == -1
+						? SWT.COLOR_WHITE
+						: SWT.COLOR_WIDGET_BACKGROUND));
+
+		fCompTourChart.updateChart(compareResult.compTour,
+				compTourChartConfig,
+				fActionSynchChartsHorizontal.isChecked());
+
+		fLowerPageBook.showPage(fCompTourChart);
 	}
 
 	private void showRefTour(final TourReference refTour) throws ChartIsEmptyException {
@@ -840,52 +952,27 @@ public class CompareResultView extends SynchedChartView {
 
 				changedChartDataModel.setTitle(
 
-				NLS.bind(
-						Messages.CompareResult_Chart_title_reference_tour,
+				NLS.bind(Messages.CompareResult_Chart_title_reference_tour,
 						refTour.getLabel(),
 						TourManager.getTourTitleDetailed(refTourChartData.getRefTourData())));
 			}
 		});
 
 		fRefTourChart.updateChart(refTourChartData.getRefTourData(), refTourChartData
-				.getRefTourChartConfig());
+				.getRefTourChartConfig(), false);
 
 		// keep data for current ref tour in the cache
 		fRefChartDataCache.put(refTour.getGeneratedId(), refTourChartData);
 		fCurrentRefTour = refTour;
 	}
 
-	private RefTourChartData getRefChartData(TourReference refTour) {
+	private void showRefTourInfo(long refId) {
 
-		// get the reference chart from the cache
-		RefTourChartData refTourChartData = fRefChartDataCache.get(refTour.getGeneratedId());
+		RefTourChartData refTourChartData = fRefChartDataCache.get(refId);
 
-		if (refTourChartData != null) {
-			return refTourChartData;
-		}
+		fRefTourInfo.updateInfo(refTourChartData);
 
-		// get tour data from the database
-		TourData tourData = refTour.getTourData();
-
-		// set visible graphs: altitude
-		TourChartConfiguration refTourChartConfig = new TourChartConfiguration();
-		refTourChartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
-		// refTourChartConfig.setKeepMinMaxValues(true);
-
-		TourChartConfiguration compTourChartConfig = new TourChartConfiguration();
-		compTourChartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
-		// compTourChartConfig.setKeepMinMaxValues(true);
-
-		ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(
-				tourData,
-				refTourChartConfig);
-
-		return new RefTourChartData(
-				refTour,
-				chartDataModel,
-				tourData,
-				refTourChartConfig,
-				compTourChartConfig);
+		fLowerPageBook.showPage(fRefTourInfo);
 	}
 
 	private void showSelectedTour(SelectionChangedEvent event) {
@@ -901,9 +988,8 @@ public class CompareResultView extends SynchedChartView {
 				final TVICompareResult result = (TVICompareResult) treeItem;
 
 				/*
-				 * show the reference tour chart, this must be done before the
-				 * compared tour chart is displayed, because it set's the
-				 * current ref tour
+				 * show the reference tour chart, this must be done before the compared tour chart
+				 * is displayed, because it set's the current ref tour
 				 */
 				showRefTour(result.refTour);
 
@@ -929,99 +1015,22 @@ public class CompareResultView extends SynchedChartView {
 		}
 	}
 
-	private void showRefTourInfo(long refId) {
-
-		RefTourChartData refTourChartData = fRefChartDataCache.get(refId);
-
-		fRefTourInfo.updateInfo(refTourChartData);
-
-		fLowerPageBook.showPage(fRefTourInfo);
-	}
-
-	private void showCompTour(final TVICompareResult compareResult) {
-
-		IDataModelListener dataModelListener = new IDataModelListener() {
-
-			public void dataModelChanged(ChartDataModel changedChartDataModel) {
-
-				ChartDataXSerie xData = changedChartDataModel.getXData();
-
-				// set the x-marker
-				xData.setMarkerValueIndex(
-						compareResult.compareIndexStart,
-						compareResult.compareIndexEnd);
-
-				// set title
-				changedChartDataModel.setTitle(NLS.bind(
-						Messages.CompareResult_Chart_title_compared_tour,
-						TourManager.getTourTitleDetailed(compareResult.compTour)));
-			}
-		};
-
-		// set current selected compared tour
-		fCurrentTTICompareResult = compareResult;
-
-		// show the compared tour chart
-		fCompTourChart.addDataModelListener(dataModelListener);
-
-		// get the tour chart configuration
-		RefTourChartData refTourChartData = fRefChartDataCache
-				.get(fCurrentRefTour.getGeneratedId());
-		TourChartConfiguration compTourChartConfig = refTourChartData.getCompTourChartConfig();
-
-		fCompTourChart.setBackgroundColor(Display.getCurrent().getSystemColor(
-				compareResult.compId == -1 ? SWT.COLOR_WHITE : SWT.COLOR_WIDGET_BACKGROUND));
-
-		fCompTourChart.updateChart(compareResult.compTour, compTourChartConfig);
-
-		fLowerPageBook.showPage(fCompTourChart);
-	}
-	/**
-	 * Update the viewer by providing new data
-	 */
-	public void updateViewer() {
-		fTourViewer.setContentProvider(new ResultContentProvider());
-	}
-
 	void synchCharts(boolean isSynched) {
 
 		fRefTourChart.setZoomMarkerPositionListener(isSynched, fCompTourChart);
 
 		// show the compared chart in full size
 		fCompTourChart.zoomOut(false);
-		;
+
 		fCompTourChart.updateChart(false);
 
 	}
 
-	void removeComparedTour() {
-
-		// enable/disable action: remove save status
-		final StructuredSelection selection = (StructuredSelection) fTourViewer.getSelection();
-
-		/*
-		 * currently we only support one tour item were the save status can be
-		 * removed
-		 */
-		if (selection.size() == 1 && selection.getFirstElement() instanceof TVICompareResult) {
-
-			SelectionRemovedComparedTours removedCompareTours = new SelectionRemovedComparedTours();
-
-			TVICompareResult compareResult = (TVICompareResult) selection.getFirstElement();
-
-			if (TourCompareManager.removeComparedTourFromDb(compareResult.compId)) {
-
-				// update the chart
-				fCompTourChart.setBackgroundColor(Display.getCurrent().getSystemColor(
-						SWT.COLOR_WHITE));
-				fCompTourChart.redrawChart();
-
-				// create and fire the selection
-				removedCompareTours.removedComparedTours.add(compareResult.compId);
-				fPostSelectionProvider.setSelection(removedCompareTours);
-
-			}
-		}
+	/**
+	 * Update the viewer by providing new data
+	 */
+	public void updateViewer() {
+		fTourViewer.setContentProvider(new ResultContentProvider());
 	}
 
 	private void xMarkerMovedInCompTourChart(	int movedXMarkerStartValueIndex,
@@ -1047,8 +1056,7 @@ public class CompareResultView extends SynchedChartView {
 
 		// adjust the time by removing the breaks
 		int timeInterval = timeValues[1] - timeValues[0];
-		int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(
-				timeValues,
+		int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(timeValues,
 				movedXMarkerStartValueIndex,
 				movedXMarkerEndValueIndex,
 				10 / timeInterval);

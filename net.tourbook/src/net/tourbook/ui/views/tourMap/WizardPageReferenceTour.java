@@ -248,7 +248,7 @@ public class WizardPageReferenceTour extends WizardPage {
 			TourData tourData = refTour.getTourData();
 
 			// set the altitude visible
-			TourChartConfiguration chartConfig = new TourChartConfiguration();
+			TourChartConfiguration chartConfig = new TourChartConfiguration(false);
 			chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
 			ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(

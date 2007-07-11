@@ -285,6 +285,7 @@ public class TourMapView extends SynchedChartView {
 		public TreeViewerItem getRootItem() {
 			return fRootItem;
 		}
+
 		public boolean hasChildren(final Object element) {
 			return ((TreeViewerItem) element).hasChildren();
 		}
@@ -785,6 +786,7 @@ public class TourMapView extends SynchedChartView {
 			// fUpperTabs.setSelection(upperIndex == null ? 0 : upperIndex);
 		}
 	}
+
 	private void saveSettings() {
 		fSessionMemento = XMLMemento.createWriteRoot("TourMapView"); //$NON-NLS-1$
 		saveState(fSessionMemento);
@@ -830,18 +832,25 @@ public class TourMapView extends SynchedChartView {
 	private void setPartListener() {
 		fPartListener = new IPartListener2() {
 			public void partActivated(final IWorkbenchPartReference partRef) {}
+
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (ID.equals(partRef.getId()))
 					saveSettings();
 			}
+
 			public void partDeactivated(final IWorkbenchPartReference partRef) {
 				if (ID.equals(partRef.getId()))
 					saveSettings();
 			}
+
 			public void partHidden(final IWorkbenchPartReference partRef) {}
+
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
 			public void partOpened(final IWorkbenchPartReference partRef) {}
+
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(fPartListener);
@@ -1020,7 +1029,7 @@ public class TourMapView extends SynchedChartView {
 			final TVITourMapYear yearItem = (TVITourMapYear) item;
 
 			if (fYearChartRefId != yearItem.refId || fYearChartYear != yearItem.year) {
-				updateYearChart(yearItem);
+				updateYearBarChart(yearItem);
 			}
 
 			refId = yearItem.refId;
@@ -1043,7 +1052,7 @@ public class TourMapView extends SynchedChartView {
 
 				updateCompTourChart(compItem);
 
-				updateYearChart((TVITourMapYear) compItem.getParentItem());
+				updateYearBarChart((TVITourMapYear) compItem.getParentItem());
 
 				selectYearMapTour(compItem.getTourId());
 			}
@@ -1059,7 +1068,7 @@ public class TourMapView extends SynchedChartView {
 		}
 	}
 
-	private void showYearChart(final Chart yearChart, final TVITourMapYear yearItem) {
+	private void showYearBarChart(final Chart yearChart, final TVITourMapYear yearItem) {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -1096,8 +1105,8 @@ public class TourMapView extends SynchedChartView {
 		 * set/restore min/max values
 		 */
 		final TVTITourMapReferenceTour refItem = yearItem.getRefItem();
-		final int minValue = yData.getMinValue();
-		final int maxValue = yData.getMaxValue();
+		final int minValue = yData.getVisibleMinValue();
+		final int maxValue = yData.getVisibleMaxValue();
 
 		final int dataMinValue = minValue - (minValue / 10);
 		final int dataMaxValue = maxValue;// + (maxValue / 30);
@@ -1110,8 +1119,8 @@ public class TourMapView extends SynchedChartView {
 			 * set the min value 10% below the computed so that the lowest value is not at the
 			 * bottom
 			 */
-			yData.setMinValue(dataMinValue);
-			yData.setMaxValue(dataMaxValue);
+			yData.setVisibleMinValue(dataMinValue);
+			yData.setVisibleMaxValue(dataMaxValue);
 
 			refItem.yearMapMinValue = dataMinValue;
 			refItem.yearMapMaxValue = dataMaxValue;
@@ -1126,8 +1135,8 @@ public class TourMapView extends SynchedChartView {
 			refItem.yearMapMinValue = Math.min(refItem.yearMapMinValue, dataMinValue);
 			refItem.yearMapMaxValue = Math.max(refItem.yearMapMaxValue, dataMaxValue);
 
-			yData.setMinValue(refItem.yearMapMinValue);
-			yData.setMaxValue(refItem.yearMapMaxValue);
+			yData.setVisibleMinValue(refItem.yearMapMinValue);
+			yData.setVisibleMaxValue(refItem.yearMapMaxValue);
 		}
 
 		yData.setYTitle(Messages.TourMap_Label_year_chart_title);
@@ -1232,7 +1241,7 @@ public class TourMapView extends SynchedChartView {
 
 			if (refTourChartData != null) {
 				fCompTourChart.updateChart(selectedCompTourData, refTourChartData
-						.getCompTourChartConfig());
+						.getCompTourChartConfig(), false);
 			}
 
 			/*
@@ -1246,9 +1255,9 @@ public class TourMapView extends SynchedChartView {
 		}
 	}
 
-	private void updateYearChart(final TVITourMapYear yearItem) {
+	private void updateYearBarChart(final TVITourMapYear yearItem) {
 
-		showYearChart(fYearChart, yearItem);
+		showYearBarChart(fYearChart, yearItem);
 
 		fYearChartRefId = yearItem.refId;
 		fYearChartYear = yearItem.year;
@@ -1342,7 +1351,7 @@ public class TourMapView extends SynchedChartView {
 			final TVTITourMapReferenceTour refItem = ttiTourMapYear.getRefItem();
 			refItem.yearMapMinValue = Integer.MIN_VALUE;
 
-			updateYearChart(ttiTourMapYear);
+			updateYearBarChart(ttiTourMapYear);
 		}
 	}
 

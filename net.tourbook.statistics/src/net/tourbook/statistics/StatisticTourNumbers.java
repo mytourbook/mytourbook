@@ -609,7 +609,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setAllValueColors(0);
 		yData.setUnitLabel(unit);
 		yData.setYTitle(title);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
 
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_ALTITUDE);
@@ -659,7 +659,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setAllValueColors(0);
 		yData.setUnitLabel(unit);
 		yData.setYTitle(title);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
 
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
@@ -760,7 +760,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setAllValueColors(0);
 		yData.setUnitLabel(unit);
 		yData.setYTitle(title);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
 
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_TIME);

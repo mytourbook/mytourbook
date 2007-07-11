@@ -155,8 +155,8 @@ public class ChartDataModel {
 	public void resetMinMaxValues() {
 
 		for (ChartDataYSerie ySerie : yData) {
-			ySerie.fMinValue = ySerie.getAdjustedMinValue();
-			ySerie.fMaxValue = ySerie.getAdjustedMaxValue();
+			ySerie.fVisibleMinValue = ySerie.getAdjustedMinValue();
+			ySerie.fVisibleMaxValue = ySerie.getAdjustedMaxValue();
 		}
 	}
 

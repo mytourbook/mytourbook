@@ -48,7 +48,7 @@ public class ActionXAxesTime extends Action {
 			chartConfig.showTimeOnXAxisBackup = chartConfig.showTimeOnXAxis;
 
 			tourChart.switchSlidersTo2ndXData();
-			tourChart.updateChart();
+			tourChart.updateChart(true);
 
 			tourChart.fActionOptions.actionStartTimeOption.setEnabled(true);
 

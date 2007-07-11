@@ -65,7 +65,7 @@ class ActionChangeGraphLayout extends Action {
 		}
 
 		fTourChart.enableActions();
-		fTourChart.updateChart();
+		fTourChart.updateChart(true);
 	}
 
 }

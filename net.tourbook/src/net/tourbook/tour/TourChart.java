@@ -29,7 +29,6 @@ import net.tourbook.chart.ChartMarkerLayer;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -111,12 +110,12 @@ public class TourChart extends Chart {
 		fChartDataModelListener = dataModelListener;
 	}
 
-	public void addTourModifyListener(final ITourModifyListener listener) {
-		fTourModifyListener = listener;
-	}
-
 	public void addTourChartListener(ITourChartSelectionListener listener) {
 		fSelectionListeners.add(listener);
+	}
+
+	public void addTourModifyListener(final ITourModifyListener listener) {
+		fTourModifyListener = listener;
 	}
 
 	/**
@@ -188,7 +187,7 @@ public class TourChart extends Chart {
 		if (fTourData == null) {
 			return;
 		}
-		
+
 		final int[] segmentSerie = fTourData.segmentSerieIndex;
 
 		if (segmentSerie == null || fIsSegmentLayerVisible == false) {
@@ -243,44 +242,37 @@ public class TourChart extends Chart {
 		fActionZoomFitGraph = new ActionZoomFitGraph(this);
 		fActionAdjustAltitude = new ActionAdjustAltitude(this);
 
-		createGraphAction(
-				TourManager.GRAPH_ALTITUDE,
+		createGraphAction(TourManager.GRAPH_ALTITUDE,
 				Messages.Graph_Label_Altitude,
 				Messages.Tour_Action_graph_altitude_tooltip,
 				Messages.Image_graph_altitude);
 
-		createGraphAction(
-				TourManager.GRAPH_SPEED,
+		createGraphAction(TourManager.GRAPH_SPEED,
 				Messages.Graph_Label_Speed,
 				Messages.Tour_Action_graph_speed_tooltip,
 				Messages.Image_graph_speed);
 
-		createGraphAction(
-				TourManager.GRAPH_ALTIMETER,
+		createGraphAction(TourManager.GRAPH_ALTIMETER,
 				Messages.Graph_Label_Altimeter,
 				Messages.Tour_Action_graph_altimeter_tooltip,
 				Messages.Image_graph_altimeter);
 
-		createGraphAction(
-				TourManager.GRAPH_PULSE,
+		createGraphAction(TourManager.GRAPH_PULSE,
 				Messages.Graph_Label_Heartbeat,
 				Messages.Tour_Action_graph_heartbeat_tooltip,
 				Messages.Image_graph_heartbeat);
 
-		createGraphAction(
-				TourManager.GRAPH_TEMPERATURE,
+		createGraphAction(TourManager.GRAPH_TEMPERATURE,
 				Messages.Graph_Label_Temperature,
 				Messages.Tour_Action_graph_temperature_tooltip,
 				Messages.Image_graph_temperature);
 
-		createGraphAction(
-				TourManager.GRAPH_CADENCE,
+		createGraphAction(TourManager.GRAPH_CADENCE,
 				Messages.Graph_Label_Cadence,
 				Messages.Tour_Action_graph_cadence_tooltip,
 				Messages.Image_graph_cadence);
 
-		createGraphAction(
-				TourManager.GRAPH_GRADIENT,
+		createGraphAction(TourManager.GRAPH_GRADIENT,
 				Messages.Graph_Label_Gradiend,
 				Messages.Tour_Action_graph_gradient_tooltip,
 				Messages.Image_graph_gradient);
@@ -331,8 +323,10 @@ public class TourChart extends Chart {
 
 	public void dispose() {
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(
-				fPrefChangeListener);
+		TourbookPlugin
+				.getDefault()
+				.getPluginPreferences()
+				.removePropertyChangeListener(fPrefChangeListener);
 
 		super.dispose();
 	}
@@ -416,9 +410,16 @@ public class TourChart extends Chart {
 		return fTourData;
 	}
 
+	public boolean isTourDirty() {
+		return fIsTourDirty;
+	}
+
 	public void removeTourChartListener(ITourChartSelectionListener listener) {
 		fSelectionListeners.remove(listener);
 	}
+
+	// public boolean setFocus() {
+	// }
 
 	/**
 	 * Enable/disable the zoom options in the tour chart
@@ -430,9 +431,6 @@ public class TourChart extends Chart {
 		fActionOptions.actionCanScrollZoomedChart.setEnabled(isEnabled);
 		fActionOptions.actionCanAutoZoomToSlider.setEnabled(isEnabled);
 	}
-
-	// public boolean setFocus() {
-	// }
 
 	/**
 	 * set the graph layers
@@ -461,38 +459,34 @@ public class TourChart extends Chart {
 			yData.setCustomLayers(customLayers);
 		}
 
-		setSegmentLayer(
-				segmentValueLayers,
+		setSegmentLayer(segmentValueLayers,
 				fTourData.segmentSerieSpeed,
 				TourManager.CUSTOM_DATA_SPEED);
 
-		setSegmentLayer(
-				segmentValueLayers,
+		setSegmentLayer(segmentValueLayers,
 				fTourData.segmentSerieGradient,
 				TourManager.CUSTOM_DATA_GRADIENT);
 
-		setSegmentLayer(
-				segmentValueLayers,
+		setSegmentLayer(segmentValueLayers,
 				fTourData.segmentSerieAltimeter,
 				TourManager.CUSTOM_DATA_ALTIMETER);
 
-		setSegmentLayer(
-				segmentValueLayers,
+		setSegmentLayer(segmentValueLayers,
 				fTourData.segmentSeriePulse,
 				TourManager.CUSTOM_DATA_PULSE);
 	}
 
 	private boolean setMinDefaultValue(	final String property,
-										boolean isChartChanged,
-										final String isMinEnabled,
+										boolean isChartModified,
+										final String tagIsAltiMinEnabled,
 										final String minValue,
 										final int yDataInfoId) {
 
-		if (property.equals(isMinEnabled) || property.equals(minValue)) {
+		if (property.equals(tagIsAltiMinEnabled) || property.equals(minValue)) {
 
 			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-			final boolean isAltMinEnabled = prefStore.getBoolean(isMinEnabled);
+			final boolean isAltMinEnabled = prefStore.getBoolean(tagIsAltiMinEnabled);
 
 			final ArrayList<ChartDataYSerie> yDataList = fChartDataModel.getYData();
 
@@ -514,17 +508,17 @@ public class TourChart extends Chart {
 					final int altMinValue = prefStore
 							.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
 
-					yData.setMinValue(altMinValue);
+					yData.setVisibleMinValue(altMinValue);
 
 				} else {
 					// reset to the original min value
-					yData.setMinValue(yData.getOriginalMinValue());
+					yData.setVisibleMinValue(yData.getOriginalMinValue());
 				}
 
-				isChartChanged = true;
+				isChartModified = true;
 			}
 		}
-		return isChartChanged;
+		return isChartModified;
 	}
 
 	private void setPrefListeners() {
@@ -536,7 +530,7 @@ public class TourChart extends Chart {
 					return;
 				}
 
-				boolean isChartChanged = false;
+				boolean isChartModified = false;
 
 				// test if the zoom preferences has changed
 				if (property.equals(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH)
@@ -548,7 +542,7 @@ public class TourChart extends Chart {
 
 					TourManager.updateZoomOptionsInChartConfig(fTourChartConfig, prefStore);
 
-					isChartChanged = true;
+					isChartModified = true;
 				}
 
 				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
@@ -557,30 +551,30 @@ public class TourChart extends Chart {
 					 * when the chart is computed, the changed colors are read from the preferences
 					 */
 
-					isChartChanged = true;
+					isChartModified = true;
 				}
 
-				isChartChanged = setMinDefaultValue(
-						property,
-						isChartChanged,
+				isChartModified = setMinDefaultValue(property,
+						isChartModified,
 						ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
 						ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
 						TourManager.GRAPH_ALTIMETER);
 
-				isChartChanged = setMinDefaultValue(
-						property,
-						isChartChanged,
+				isChartModified = setMinDefaultValue(property,
+						isChartModified,
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
 						TourManager.GRAPH_GRADIENT);
 
-				if (isChartChanged) {
-					updateChart();
+				if (isChartModified) {
+					updateChart(true);
 				}
 			}
 		};
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(
-				fPrefChangeListener);
+		TourbookPlugin
+				.getDefault()
+				.getPluginPreferences()
+				.addPropertyChangeListener(fPrefChangeListener);
 
 	}
 
@@ -662,34 +656,29 @@ public class TourChart extends Chart {
 		}
 	}
 
+//	/**
+//	 * update the chart by getting the tourdata from the db
+//	 * 
+//	 * @param tourId
+//	 */
+//	void updateChart(final long tourId) {
+//
+//		// load the tourdata from the database
+//		TourData tourData = TourDatabase.getTourDataByTourId(tourId);
+//
+//		if (tourData != null) {
+//			updateChart(tourData, fTourChartConfig, true);
+//		}
+//	}
+
 	/**
 	 * update the chart with the current tour data and chart configuration
+	 * 
+	 * @param keepMinMaxValues
+	 *        <code>true</code> will keep the min/max values from the previous chart
 	 */
-	void updateChart() {
-		updateChart(fTourData, fTourChartConfig);
-	}
-
 	public void updateChart(final boolean keepMinMaxValues) {
 		updateChart(fTourData, fTourChartConfig, keepMinMaxValues);
-	}
-
-	/**
-	 * update the chart by getting the tourdata from the db
-	 * 
-	 * @param tourId
-	 */
-	void updateChart(final long tourId) {
-
-		// load the tourdata from the database
-		TourData tourData = TourDatabase.getTourDataByTourId(tourId);
-
-		if (tourData != null) {
-			updateChart(tourData, fTourChartConfig);
-		}
-	}
-
-	public void updateChart(final TourData tourData, final TourChartConfiguration chartConfig) {
-		updateChart(tourData, chartConfig, true);
 	}
 
 	/**
@@ -705,17 +694,15 @@ public class TourChart extends Chart {
 							final TourChartConfiguration chartConfig,
 							final boolean keepMinMaxValues) {
 
-		// save the tour when other tour data are set
-//		if (fTourData != tourData) {
-//			saveTour();
-//		}
-		if (tourData == null) {
+		if (tourData == null || chartConfig == null) {
 			return;
 		}
 
 		// keep min/max values for the 'old' chart in the chart config
-		if (fTourChartConfig != null && fTourChartConfig.fMinMaxKeeper != null && keepMinMaxValues) {
-			fTourChartConfig.fMinMaxKeeper.saveMinMaxValues(fChartDataModel);
+		if (fTourChartConfig != null
+				&& fTourChartConfig.getMinMaxKeeper() != null
+				&& keepMinMaxValues) {
+			fTourChartConfig.getMinMaxKeeper().saveMinMaxValues(fChartDataModel);
 		}
 
 		// set current tour data and chart config
@@ -730,8 +717,8 @@ public class TourChart extends Chart {
 		}
 
 		// restore min/max values from the chart config
-		if (chartConfig.fMinMaxKeeper != null && keepMinMaxValues) {
-			chartConfig.fMinMaxKeeper.restoreMinMaxValues(fChartDataModel);
+		if (chartConfig.getMinMaxKeeper() != null && keepMinMaxValues) {
+			chartConfig.getMinMaxKeeper().restoreMinMaxValues(fChartDataModel);
 		}
 
 		if (fChartDataModelListener != null) {
@@ -784,10 +771,6 @@ public class TourChart extends Chart {
 		 * the chart needs to be redrawn because the alpha for filling the chart has changed
 		 */
 		redrawChart();
-	}
-
-	public boolean isTourDirty() {
-		return fIsTourDirty;
 	}
 
 }

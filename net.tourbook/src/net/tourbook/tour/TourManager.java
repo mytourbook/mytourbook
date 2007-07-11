@@ -38,7 +38,6 @@ import net.tourbook.util.StringToArrayConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
@@ -85,7 +84,7 @@ public class TourManager {
 	 */
 	public static TourChartConfiguration createTourChartConfiguration() {
 
-		final TourChartConfiguration chartConfig = new TourChartConfiguration();
+		final TourChartConfiguration chartConfig = new TourChartConfiguration(false);
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -695,10 +694,10 @@ public class TourManager {
 	 */
 	private void adjustMinMax(final ChartDataYSerie yData) {
 
-		yData.setMaxValue(yData.getMaxValue() + 1);
+		yData.setVisibleMaxValue(yData.getVisibleMaxValue() + 1);
 
 		// if (yData.getMinValue() > 0) {
-		yData.setMinValue(yData.getMinValue() - 1);
+		yData.setVisibleMinValue(yData.getVisibleMinValue() - 1);
 		// }
 	}
 

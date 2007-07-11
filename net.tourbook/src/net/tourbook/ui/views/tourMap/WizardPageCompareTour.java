@@ -114,6 +114,7 @@ public class WizardPageCompareTour extends WizardPage {
 		}
 
 		public void dispose() {}
+
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
 	}
@@ -317,10 +318,10 @@ public class WizardPageCompareTour extends WizardPage {
 							.getTourDataByTourId(tourItem.getTourId());
 
 					// set the altitude visible
-					TourChartConfiguration chartConfig = new TourChartConfiguration();
+					TourChartConfiguration chartConfig = new TourChartConfiguration(true);
 					chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-					fTourChart.updateChart(tourData, chartConfig);
+					fTourChart.updateChart(tourData, chartConfig, false);
 
 					fChartGroup.setText(NLS.bind(
 							Messages.TourMapWizard_Group_selected_tour_2,

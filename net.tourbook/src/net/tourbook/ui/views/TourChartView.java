@@ -53,7 +53,7 @@ public class TourChartView extends ViewPart {
 		fTourChart.setShowSlider(true);
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-		fTourChartConfig.setMinMaxKeeper(true);
+//		fTourChartConfig.setMinMaxKeeper(false);
 
 		final IDataModelListener dataModelListener = new IDataModelListener() {
 

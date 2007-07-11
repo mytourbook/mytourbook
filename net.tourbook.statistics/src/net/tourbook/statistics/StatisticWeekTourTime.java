@@ -43,7 +43,7 @@ public class StatisticWeekTourTime extends StatisticWeek {
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_TIME);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);

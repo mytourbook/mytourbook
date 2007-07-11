@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm
+ * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -29,9 +29,8 @@ public abstract class ChartDataSerie {
 	public static final int			AXIS_UNIT_YEAR					= 40;
 
 	/**
-	 * contains the values for the chart, highValues contains the upper value,
-	 * lowValues the lower value. When lowValues is null then the low values is
-	 * set to 0
+	 * contains the values for the chart, highValues contains the upper value, lowValues the lower
+	 * value. When lowValues is null then the low values is set to 0
 	 */
 	int[][]							fLowValues;
 
@@ -62,43 +61,33 @@ public abstract class ChartDataSerie {
 	/**
 	 * max value which is used to draw the chart
 	 */
-	protected int					fMaxValue;
+	protected int					fVisibleMaxValue;
 
 	/**
 	 * min value which is used to draw the chart
 	 */
-	protected int					fMinValue;
+	protected int					fVisibleMinValue;
 
-	private RGB						fRgbBright[]					= new RGB[] { new RGB(
-																			255,
-																			0,
-																			0) };
-	private RGB						fRgbDark[]						= new RGB[] { new RGB(
-																			0,
-																			0,
-																			255) };
-	private RGB						fRgbLine[]						= new RGB[] { new RGB(
-																			0,
-																			255,
-																			0) };
+	private RGB						fRgbBright[]					= new RGB[] { new RGB(255, 0, 0) };
+	private RGB						fRgbDark[]						= new RGB[] { new RGB(0, 0, 255) };
+	private RGB						fRgbLine[]						= new RGB[] { new RGB(0, 255, 0) };
 	/**
 	 * minimum value found in the provided values
 	 */
-	int								fSavedMinValue;
-	private int						fOriginalMinValue;
+	int								fOriginalMinValue;
 
 	/**
 	 * maximum value found in the provided values
 	 */
-	int								fSavedMaxValue;
+	int								fOriginalMaxValue;
 
 	public int getAxisUnit() {
 		return axisUnit;
 	}
 
 	/**
-	 * Returns the application defined property of the receiver with the
-	 * specified name, or null if it was not been set.
+	 * Returns the application defined property of the receiver with the specified name, or null if
+	 * it was not been set.
 	 */
 	public Object getCustomData(String key) {
 		if (fCustomData.containsKey(key)) {
@@ -126,20 +115,6 @@ public abstract class ChartDataSerie {
 		return fLowValues;
 	}
 
-	/**
-	 * @return returns the maximum value in the data serie
-	 */
-	public int getMaxValue() {
-		return fMaxValue;
-	}
-
-	/**
-	 * @return returns the minimum value in the data serie
-	 */
-	public int getMinValue() {
-		return fMinValue;
-	}
-
 	public int getOriginalMinValue() {
 		return fOriginalMinValue;
 	}
@@ -155,14 +130,30 @@ public abstract class ChartDataSerie {
 	public RGB[] getRgbLine() {
 		return fRgbLine;
 	}
+
 	/**
 	 * @return Returns the unit label for the data, e.g. m km/h sec h:m
 	 */
 	public String getUnitLabel() {
 		return unitLabel;
 	}
+
 	public int getValueDivisor() {
 		return valueDivisor;
+	}
+
+	/**
+	 * @return returns the maximum value in the data serie
+	 */
+	public int getVisibleMaxValue() {
+		return fVisibleMaxValue;
+	}
+
+	/**
+	 * @return returns the minimum value in the data serie
+	 */
+	public int getVisibleMinValue() {
+		return fVisibleMinValue;
 	}
 
 	public void setAxisUnit(int axisUnit) {
@@ -170,8 +161,8 @@ public abstract class ChartDataSerie {
 	}
 
 	/**
-	 * Sets the application defined property of the receiver with the specified
-	 * name to the given value.
+	 * Sets the application defined property of the receiver with the specified name to the given
+	 * value.
 	 */
 	public void setCustomData(String key, Object value) {
 		fCustomData.put(key, value);
@@ -181,15 +172,11 @@ public abstract class ChartDataSerie {
 		this.label = label;
 	}
 
-	public void setMaxValue(int maxValue) {
-		fMaxValue = maxValue;
-	}
-	
-	void setMinMax(int valueSeries[][]) {
+	void setMinMaxValues(int valueSeries[][]) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0].length == 0) {
-			fMaxValue = fMinValue = 0;
-			fSavedMaxValue = fOriginalMinValue = fSavedMinValue = 0;
+			fVisibleMaxValue = fVisibleMinValue = 0;
+			fOriginalMaxValue = fOriginalMinValue = 0;
 			fHighValues = new int[1][2];
 			fLowValues = new int[1][2];
 		} else {
@@ -197,26 +184,22 @@ public abstract class ChartDataSerie {
 			fHighValues = valueSeries;
 
 			// set initial min/max value
-			fMaxValue = fMinValue = valueSeries[0][0];
+			fVisibleMaxValue = fVisibleMinValue = valueSeries[0][0];
 
 			// calculate min/max highValues
 			for (int[] valueSerie : valueSeries) {
 				for (int value : valueSerie) {
-					fMaxValue = Math.max(fMaxValue, value);
-					fMinValue = Math.min(fMinValue, value);
+					fVisibleMaxValue = Math.max(fVisibleMaxValue, value);
+					fVisibleMinValue = Math.min(fVisibleMinValue, value);
 				}
 			}
 
-			fOriginalMinValue = fSavedMinValue = fMinValue;
-			fSavedMaxValue = fMaxValue;
+			fOriginalMinValue = fVisibleMinValue;
+			fOriginalMaxValue = fVisibleMaxValue;
 		}
 	}
-	
-	abstract void setMinMax(int[][] lowValues, int[][] highValues);
 
-	public void setMinValue(int minValue) {
-		fMinValue = minValue;
-	}
+	abstract void setMinMaxValues(int[][] lowValues, int[][] highValues);
 
 	public void setRgbBright(RGB[] rgbBright) {
 		fRgbBright = rgbBright;
@@ -231,8 +214,8 @@ public abstract class ChartDataSerie {
 	}
 
 	public void setSavedMinValue(int savedMinValue) {
-		fMinValue = savedMinValue;
-		fSavedMinValue = savedMinValue;
+		fVisibleMinValue = savedMinValue;
+		fOriginalMinValue = savedMinValue;
 	}
 
 	/**
@@ -245,6 +228,14 @@ public abstract class ChartDataSerie {
 
 	public void setValueDivisor(int valueDivisor) {
 		this.valueDivisor = valueDivisor;
+	}
+
+	public void setVisibleMaxValue(int maxValue) {
+		fVisibleMaxValue = maxValue;
+	}
+
+	public void setVisibleMinValue(int minValue) {
+		fVisibleMinValue = minValue;
 	}
 
 }

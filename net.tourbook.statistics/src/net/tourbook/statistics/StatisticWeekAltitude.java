@@ -42,7 +42,7 @@ public class StatisticWeekAltitude extends StatisticWeek {
 		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_ALTITUDE);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);

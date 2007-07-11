@@ -42,7 +42,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	private int	xMarkerEndIndex		= -1;
 
 	public ChartDataXSerie(int values[]) {
-		setMinMax(new int[][] { values });
+		setMinMaxValues(new int[][] { values });
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 		return xMarkerStartIndex;
 	}
 
-	void setMinMax(int[][] lowValues, int[][] highValues) {
+	void setMinMaxValues(int[][] lowValues, int[][] highValues) {
 
 	}
 }

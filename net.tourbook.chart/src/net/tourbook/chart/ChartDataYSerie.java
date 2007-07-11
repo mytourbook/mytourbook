@@ -81,41 +81,41 @@ public class ChartDataYSerie extends ChartDataSerie {
 		fChartType = chartType;
 		fChartLayout = chartLayout;
 
-		setMinMax(lowValueSeries, highValueSeries);
+		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
 
 	public ChartDataYSerie(int chartType, int[] valueSerie) {
 		fChartType = chartType;
-		setMinMax(new int[][] { valueSerie });
+		setMinMaxValues(new int[][] { valueSerie });
 	}
 
 	public ChartDataYSerie(int chartType, int[] lowValueSerie, int[] highValueSerie) {
 		fChartType = chartType;
-		setMinMax(new int[][] { lowValueSerie }, new int[][] { highValueSerie });
+		setMinMaxValues(new int[][] { lowValueSerie }, new int[][] { highValueSerie });
 	}
 
 	public ChartDataYSerie(int chartType, int[][] valueSerie) {
 		fChartType = chartType;
-		setMinMax(valueSerie);
+		setMinMaxValues(valueSerie);
 	}
 
 	public ChartDataYSerie(int chartType, int[][] lowValueSeries, int[][] highValueSeries) {
 		fChartType = chartType;
-		setMinMax(lowValueSeries, highValueSeries);
+		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
 
 	int getAdjustedMaxValue() {
 		// return yAxisDirection
 		// ? fSavedMaxValue + (fSavedMaxValue / 10)
 		// : (fSavedMaxValue + (fSavedMaxValue / 100));
-		return fSavedMaxValue;
+		return fOriginalMaxValue;
 	}
 
 	int getAdjustedMinValue() {
 		// return yAxisDirection
 		// ? fSavedMinValue - (fSavedMinValue / 10)
 		// : (fSavedMinValue - (fSavedMinValue / 100));
-		return fSavedMinValue;
+		return fOriginalMinValue;
 	}
 
 	/**
@@ -227,23 +227,23 @@ public class ChartDataYSerie extends ChartDataSerie {
 		fCustomLayers = customLayers;
 	}
 
-	void setMinMax(int[][] valueSeries) {
+	void setMinMaxValues(int[][] valueSeries) {
 
 		if (valueSeries == null || valueSeries.length == 0) {
 			fHighValues = new int[0][0];
-			fMaxValue = fMinValue = 0;
-			fSavedMaxValue = fSavedMinValue = 0;
+			fVisibleMaxValue = fVisibleMinValue = 0;
+			fOriginalMaxValue = fOriginalMinValue = 0;
 
 		} else {
 
 			fHighValues = valueSeries;
 
 			// set initial min/max value
-			fMaxValue = fMinValue = valueSeries[0][0];
+			fVisibleMaxValue = fVisibleMinValue = valueSeries[0][0];
 
 			if (fChartType == ChartDataModel.CHART_TYPE_LINE) {
 
-				super.setMinMax(valueSeries);
+				super.setMinMaxValues(valueSeries);
 
 			} else if (fChartType == ChartDataModel.CHART_TYPE_BAR) {
 
@@ -254,8 +254,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 					// get the min/max highValues for all data
 					for (int[] valuesOuter : valueSeries) {
 						for (int valuesInner : valuesOuter) {
-							fMaxValue = Math.max(fMaxValue, valuesInner);
-							fMinValue = Math.min(fMinValue, valuesInner);
+							fVisibleMaxValue = Math.max(fVisibleMaxValue, valuesInner);
+							fVisibleMinValue = Math.min(fVisibleMinValue, valuesInner);
 						}
 					}
 					break;
@@ -268,30 +268,30 @@ public class ChartDataYSerie extends ChartDataSerie {
 					// other
 					for (int[] valuesOuter : valueSeries) {
 						for (int valueIndex = 0; valueIndex < valuesOuter.length; valueIndex++) {
-							serieMax[valueIndex] = Math.max(fMaxValue, serieMax[valueIndex]
+							serieMax[valueIndex] = Math.max(fVisibleMaxValue, serieMax[valueIndex]
 									+ valuesOuter[valueIndex]);
 
-							fMinValue = Math.min(fMinValue, valuesOuter[valueIndex]);
+							fVisibleMinValue = Math.min(fVisibleMinValue, valuesOuter[valueIndex]);
 						}
 					}
 
 					// get max for all series
-					fMaxValue = 0;
+					fVisibleMaxValue = 0;
 					for (int serieValue : serieMax) {
-						fMaxValue = Math.max(fMaxValue, serieValue);
+						fVisibleMaxValue = Math.max(fVisibleMaxValue, serieValue);
 					}
 
 					break;
 				}
 			}
 
-			fSavedMinValue = fMinValue;
-			fSavedMaxValue = fMaxValue;
+			fOriginalMinValue = fVisibleMinValue;
+			fOriginalMaxValue = fVisibleMaxValue;
 		}
 
 	}
 
-	void setMinMax(int[][] lowValues, int[][] highValues) {
+	void setMinMaxValues(int[][] lowValues, int[][] highValues) {
 
 		if (lowValues == null
 				|| lowValues == null
@@ -304,8 +304,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 				|| highValues[0] == null
 				|| highValues[0].length == 0) {
 
-			fMaxValue = fMinValue = 0;
-			fSavedMaxValue = fSavedMinValue = 0;
+			fVisibleMaxValue = fVisibleMinValue = 0;
+			fOriginalMaxValue = fOriginalMinValue = 0;
 
 			fLowValues = new int[1][2];
 			fHighValues = new int[1][2];
@@ -317,8 +317,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 			fColorIndex = new int[fHighValues.length][fHighValues[0].length];
 
 			// set initial min/max value
-			fMinValue = lowValues[0][0];
-			fMaxValue = highValues[0][0];
+			fVisibleMinValue = lowValues[0][0];
+			fVisibleMaxValue = highValues[0][0];
 
 			if (fChartType == ChartDataModel.CHART_TYPE_LINE
 					|| (fChartType == ChartDataModel.CHART_TYPE_BAR && fChartLayout == ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE)
@@ -327,13 +327,13 @@ public class ChartDataYSerie extends ChartDataSerie {
 				// get the min/max values for all data
 				for (int[] valueSerie : highValues) {
 					for (int value : valueSerie) {
-						fMaxValue = Math.max(fMaxValue, value);
+						fVisibleMaxValue = Math.max(fVisibleMaxValue, value);
 					}
 				}
 
 				for (int[] valueSerie : lowValues) {
 					for (int value : valueSerie) {
-						fMinValue = Math.min(fMinValue, value);
+						fVisibleMinValue = Math.min(fVisibleMinValue, value);
 					}
 				}
 
@@ -354,7 +354,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 				// get max value for the summarized values
 				for (int value : summarizedMaxValues) {
-					fMaxValue = Math.max(fMaxValue, value);
+					fVisibleMaxValue = Math.max(fVisibleMaxValue, value);
 				}
 
 				/*
@@ -362,13 +362,13 @@ public class ChartDataYSerie extends ChartDataSerie {
 				 */
 				for (int[] serieData : lowValues) {
 					for (int value : serieData) {
-						fMinValue = Math.min(fMinValue, value);
+						fVisibleMinValue = Math.min(fVisibleMinValue, value);
 					}
 				}
 			}
 
-			fSavedMinValue = fMinValue;
-			fSavedMaxValue = fMaxValue;
+			fOriginalMinValue = fVisibleMinValue;
+			fOriginalMaxValue = fVisibleMaxValue;
 		}
 	}
 

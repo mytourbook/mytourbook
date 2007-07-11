@@ -31,7 +31,7 @@ public class StatisticDayDistance extends StatisticDay {
 		// set the x-axis
 		ChartDataXSerie xData = new ChartDataXSerie(tourTimeData.fDOYValues);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
-		xData.setMaxValue(fCurrentYear);
+		xData.setVisibleMaxValue(fCurrentYear);
 		chartModel.setXData(xData);
 
 		/*
@@ -45,7 +45,7 @@ public class StatisticDayDistance extends StatisticDay {
 		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
 		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		yData.setCustomData(DISTANCE_DATA, 1);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);

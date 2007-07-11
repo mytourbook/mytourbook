@@ -170,7 +170,7 @@ public class StatisticTourTime extends YearStatistic {
 		final ChartDataXSerie xData = new ChartDataXSerie(fTourTimeData.fTourDOYValues);
 
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
-		xData.setMaxValue(fCurrentYear);
+		xData.setVisibleMaxValue(fCurrentYear);
 		chartModel.setXData(xData);
 
 		// set the bar low/high data

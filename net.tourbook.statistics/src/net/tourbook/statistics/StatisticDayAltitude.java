@@ -32,7 +32,7 @@ public class StatisticDayAltitude extends StatisticDay {
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(tourTimeData.fDOYValues);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
-		xData.setMaxValue(fCurrentYear);
+		xData.setVisibleMaxValue(fCurrentYear);
 		chartModel.setXData(xData);
 
 		/*
@@ -45,7 +45,7 @@ public class StatisticDayAltitude extends StatisticDay {
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		yData.setCustomData(ALTITUDE_DATA, 1);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_ALTITUDE);
 		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });

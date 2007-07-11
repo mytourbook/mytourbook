@@ -36,8 +36,6 @@ public class ZoomMarkerPosition {
 
 	ChartYDataMinMaxKeeper	yDataMinMaxKeeper	= new ChartYDataMinMaxKeeper();
 
-//	public int				synchDirection		= 0;
-
 	/**
 	 * The ZoomMarkerPosition describes the position and width for the x-marker
 	 * in the graph

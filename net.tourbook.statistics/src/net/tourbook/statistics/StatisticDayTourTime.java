@@ -32,7 +32,7 @@ public class StatisticDayTourTime extends StatisticDay {
 		// set the x-axis
 		ChartDataXSerie xData = new ChartDataXSerie(tourTimeData.fDOYValues);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
-		xData.setMaxValue(fCurrentYear);
+		xData.setVisibleMaxValue(fCurrentYear);
 		chartModel.setXData(xData);
 
 		/*
@@ -46,7 +46,7 @@ public class StatisticDayTourTime extends StatisticDay {
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
-		yData.setMinValue(0);
+		yData.setVisibleMinValue(0);
 		yData.setCustomData(DURATION_DATA, 1);
 		chartModel.addYData(yData);
 		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });

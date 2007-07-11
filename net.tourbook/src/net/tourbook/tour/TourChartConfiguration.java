@@ -35,41 +35,46 @@ public class TourChartConfiguration {
 	 * <p>
 	 * false: show distance on the x-axis
 	 */
-	public boolean				showTimeOnXAxis			= false;
+	public boolean					showTimeOnXAxis			= false;
 
-	public boolean				showTimeOnXAxisBackup	= false;
+	public boolean					showTimeOnXAxisBackup	= false;
 
 	/**
 	 * true: show the start time of the tour
 	 * <p>
 	 * false: show the tour time which starts at 0
 	 */
-	public boolean				isStartTime				= false;
+	public boolean					isStartTime				= false;
 
 	/**
 	 * contains a list for all graphs which are displayed, the sequence of the list is the sequence
 	 * in which the graphs will be displayed
 	 */
-	private ArrayList<Integer>	visibleGraphSequence	= new ArrayList<Integer>();
+	private ArrayList<Integer>		visibleGraphSequence	= new ArrayList<Integer>();
 
 	/**
-	 * <code>true</code> indicate to keep the min/max values when the chart data will be changed,
-	 * default is <code>false</code>
+	 * contains the min/max keeper object or <code>null</code> when min/max is not kept
 	 */
-	ChartYDataMinMaxKeeper		fMinMaxKeeper;
+	private ChartYDataMinMaxKeeper	fMinMaxKeeper;
 
 	/**
 	 * the graph can be scrolled when set to <code>true</code>
 	 */
-	public boolean				scrollZoomedGraph		= false;
+	public boolean					scrollZoomedGraph		= false;
 
 	/**
 	 * the graph is automatically zoomed to the slider position when the slider is moved
 	 */
-	public boolean				autoZoomToSlider		= false;
+	public boolean					autoZoomToSlider		= false;
 
-	public TourChartConfiguration() {
-		setMinMaxKeeper(true);
+	/**
+	 * @param keepMinMaxValues
+	 *        set <code>true</code> to keep min/max values when tour data will change
+	 */
+	public TourChartConfiguration(boolean keepMinMaxValues) {
+		if (keepMinMaxValues) {
+			setMinMaxKeeper(true);
+		}
 	}
 
 	public void addVisibleGraph(int visibleGraph) {
@@ -94,9 +99,9 @@ public class TourChartConfiguration {
 	}
 
 	/**
-	 * <code>true</code> indicate to keep the min/max values in the chart configuration when the
-	 * data fDataModel was changed, this has the higher priority than keeping the min/max values in
-	 * the tour chart widget, default is <code>false</code>
+	 * <code>true</code> indicates to keep the min/max values in the chart configuration when the
+	 * data model was changed, this has the higher priority than keeping the min/max values in the
+	 * chart widget
 	 * 
 	 * @param keepMinMaxValues
 	 *        the keepMinMaxValues to set
@@ -107,6 +112,13 @@ public class TourChartConfiguration {
 		} else {
 			fMinMaxKeeper = null;
 		}
+	}
+
+	/**
+	 * @return the min/max keeper
+	 */
+	ChartYDataMinMaxKeeper getMinMaxKeeper() {
+		return fMinMaxKeeper;
 	}
 
 }

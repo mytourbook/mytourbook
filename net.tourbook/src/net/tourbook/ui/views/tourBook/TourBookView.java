@@ -401,7 +401,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-		fTourChartConfig.setMinMaxKeeper(true);
+//		fTourChartConfig.setMinMaxKeeper(true);
 
 		return fSashDetail;
 	}
@@ -961,7 +961,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 		}
 	}
 
-	public void manageDetailVisibility() {
+	private void manageDetailVisibility() {
 
 		boolean isStatVisible = fActionShowDetailStatistic.isChecked();
 		boolean isTourChartVisible = fActionShowDetailTourChart.isChecked();
