@@ -100,9 +100,22 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            name="%Default_Perspective"
-            class="net.tourbook.application.Perspective"
-            id="net.tourbook.perspective">
+            class="net.tourbook.application.PerspectiveFactoryRawData"
+            icon="icons/rawdata-perspective.gif"
+            id="net.tourbook.perspectiveRawData"
+            name="%Perspective_RawData">
+      </perspective>
+      <perspective
+            class="net.tourbook.application.PerspectiveFactoryTourBook"
+            icon="icons/tour-list-perspective.gif"
+            id="net.tourbook.perspectiveTourBook"
+            name="%Perspective_TourBook">
+      </perspective>
+      <perspective
+            class="net.tourbook.application.PerspectiveFactoryTourMap"
+            icon="icons/tour-map-perspective.gif"
+            id="net.tourbook.perspectiveTourMap"
+            name="%Perspective_TourMap">
       </perspective>
    </extension>
    <extension

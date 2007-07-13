@@ -72,6 +72,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	PersonContributionItem					personSelector;
 	TourTypeContributionItem				tourTypeSelector;
+	private IWorkbenchAction				fActionSave;
+	private IWorkbenchAction				fActionSaveAll;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -140,6 +142,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fActionPreferences = ActionFactory.PREFERENCES.create(window);
 		fActionPreferences.setText(Messages.Action_open_preferences);
 
+		fActionSave = ActionFactory.SAVE.create(window);
+		register(fActionSave);
+		fActionSaveAll = ActionFactory.SAVE_ALL.create(window);
+		register(fActionSaveAll);
+
 		fActionTourCompareWizard = new Action() {
 
 			{
@@ -176,6 +183,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager fileMenu = new MenuManager(
 				Messages.Action_Menu_file,
 				IWorkbenchActionConstants.M_FILE);
+
+		fileMenu.add(fActionSave);
+		fileMenu.add(fActionSaveAll);
+		fileMenu.add(new Separator());
 
 		fileMenu.add(fActionImportFromFile);
 		fileMenu.add(fActionImportFromDevice);

@@ -54,8 +54,12 @@ public class TourEditor extends EditorPart {
 	private ISelectionListener		fPostSelectionListener;
 
 	public void doSave(IProgressMonitor monitor) {
+		
 		TourDatabase.saveTour(fTourData);
 		fIsTourDirty = false;
+		
+		// update (hide) the dirty indicator
+		firePropertyChange(PROP_DIRTY);
 	}
 
 	public void doSaveAs() {}
@@ -97,7 +101,6 @@ public class TourEditor extends EditorPart {
 		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-//		fTourChartConfig.setMinMaxKeeper(true);
 
 		// load the tourdata from the database
 		fTourData = TourDatabase.getTourDataByTourId(fEditorInput.fTourId);
