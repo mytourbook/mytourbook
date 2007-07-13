@@ -197,4 +197,43 @@
             id="net.tourbook.tour.TourEditorInputFactory">
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="net.tourbook.perspectiveTourBook">
+         <perspectiveShortcut
+               id="net.tourbook.perspectiveTourBook">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspectiveRawData">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspectiveTourMap">
+         </perspectiveShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="net.tourbook.perspectiveRawData">
+         <perspectiveShortcut
+               id="net.tourbook.perspectiveTourBook">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspectiveRawData">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspectiveTourMap">
+         </perspectiveShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="net.tourbook.perspectiveTourMap">
+         <perspectiveShortcut
+               id="net.tourbook.perspectiveTourBook">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspectiveRawData">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspectiveTourMap">
+         </perspectiveShortcut>
+      </perspectiveExtension>
+   </extension>
 </plugin>
