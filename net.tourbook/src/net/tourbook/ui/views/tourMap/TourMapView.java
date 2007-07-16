@@ -46,9 +46,10 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.ActionAdjustAltitude;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourChartSelectionListener;
-import net.tourbook.tour.TourChartSelection;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
+import net.tourbook.tour.TourChartSelection;
+import net.tourbook.tour.TourDataSelection;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.UI;
@@ -336,8 +337,8 @@ public class TourMapView extends SynchedChartView {
 				final TVTITourMapComparedTour compTour = (TVTITourMapComparedTour) obj;
 				switch (index) {
 				case COLUMN_LABEL:
-					return DateFormat.getDateInstance(DateFormat.SHORT).format(
-							compTour.getTourDate());
+					return DateFormat.getDateInstance(DateFormat.SHORT).format(compTour
+							.getTourDate());
 
 				case COLUMN_SPEED:
 					nf.setMinimumFractionDigits(1);
@@ -746,9 +747,9 @@ public class TourMapView extends SynchedChartView {
 					.createTourChartConfiguration();
 			// compTourchartConfig.setKeepMinMaxValues(true);
 
-			final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(
-					refTourData,
-					refTourChartConfig);
+			final ChartDataModel chartDataModel = TourManager
+					.getInstance()
+					.createChartDataModel(refTourData, refTourChartConfig);
 
 			return new RefTourChartData(
 					refTour,
@@ -903,10 +904,11 @@ public class TourMapView extends SynchedChartView {
 						- xValues[refTour.getStartValueIndex()];
 
 				// set title
-				changedChartDataModel.setTitle(NLS.bind(
-						Messages.TourMap_Label_chart_title_reference_tour,
-						refTour.getLabel(),
-						TourManager.getTourTitleDetailed(refTourChartData.getRefTourData())));
+				changedChartDataModel
+						.setTitle(NLS
+								.bind(Messages.TourMap_Label_chart_title_reference_tour, refTour
+										.getLabel(), TourManager
+										.getTourTitleDetailed(refTourChartData.getRefTourData())));
 
 			}
 		});
@@ -1229,9 +1231,9 @@ public class TourMapView extends SynchedChartView {
 					xData.setMarkerValueIndex(compItem.getStartIndex(), compItem.getEndIndex());
 
 					// set title
-					changedChartDataModel.setTitle(NLS.bind(
-							Messages.TourMap_Label_chart_title_compared_tour,
-							TourManager.getTourTitleDetailed(selectedCompTourData)));
+					changedChartDataModel.setTitle(NLS
+							.bind(Messages.TourMap_Label_chart_title_compared_tour, TourManager
+									.getTourTitleDetailed(selectedCompTourData)));
 				}
 			};
 
@@ -1247,7 +1249,8 @@ public class TourMapView extends SynchedChartView {
 			/*
 			 * fire the change event so that the tour markers updated
 			 */
-			fPostSelectionProvider.setSelection(new TourChartSelection(fCompTourChart));
+			fPostSelectionProvider
+					.setSelection(new TourDataSelection(fCompTourChart.getTourData()));
 
 			fActiveComparedTour = compItem;
 
@@ -1296,8 +1299,7 @@ public class TourMapView extends SynchedChartView {
 
 				// adjust the time by removing the breaks
 				final int timeInterval = timeValues[1] - timeValues[0];
-				int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(
-						timeValues,
+				int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(timeValues,
 						movedXMarkerStartValueIndex,
 						movedXMarkerEndValueIndex,
 						10 / timeInterval);
@@ -1323,8 +1325,7 @@ public class TourMapView extends SynchedChartView {
 		fComparedToursFindResult = new ArrayList<TVTITourMapComparedTour>();
 		final ArrayList<Long> findCompIds = new ArrayList<Long>();
 		findCompIds.add(fActiveComparedTour.getCompId());
-		findComparedTours(
-				((TourContentProvider) fTourViewer.getContentProvider()).getRootItem(),
+		findComparedTours(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem(),
 				findCompIds);
 
 		// update the data in the data model

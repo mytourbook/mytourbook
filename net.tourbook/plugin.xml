@@ -200,7 +200,7 @@
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="net.tourbook.perspectiveTourBook">
+            targetID="net.tourbook.perspectiveRawData">
          <perspectiveShortcut
                id="net.tourbook.perspectiveTourBook">
          </perspectiveShortcut>
@@ -212,7 +212,7 @@
          </perspectiveShortcut>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="net.tourbook.perspectiveRawData">
+            targetID="net.tourbook.perspectiveTourBook">
          <perspectiveShortcut
                id="net.tourbook.perspectiveTourBook">
          </perspectiveShortcut>

@@ -174,7 +174,7 @@ public class PersonContributionItem extends CustomControlContribution {
 	 */
 	void fireEventNewPersonIsSelected() {
 		plugin.getPreferenceStore().setValue(
-				ITourbookPreferences.APP_NEW_DATA_FILTER,
+				ITourbookPreferences.APP_UPDATE_DATA_FILTER,
 				Math.random());
 	}
 

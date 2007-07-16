@@ -122,7 +122,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 				// fire change event
 				plugin.getPreferenceStore().setValue(
-						ITourbookPreferences.APP_NEW_DATA_FILTER,
+						ITourbookPreferences.APP_UPDATE_DATA_FILTER,
 						Math.random());
 
 			}

@@ -60,8 +60,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	public void postWindowCreate() {
 
 		// show editor area
-		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
-		activePage.setEditorAreaVisible(true);
+//		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
+//		activePage.setEditorAreaVisible(true);
 	}
 
 	public void postWindowOpen() {

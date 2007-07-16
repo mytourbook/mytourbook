@@ -15,63 +15,66 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-
 public interface ITourbookPreferences {
 
 	/*
 	 * dummy field used by field editors so they don't assert
 	 */
-	public static final String	DUMMY_FIELD						= ""; //$NON-NLS-1$
+	public static final String	DUMMY_FIELD						= "";										//$NON-NLS-1$
 
 	// hidden preferences
-	public static final String	LAST_RAW_DATA_FILE_PATH			= "data.lastRawDataFilePath"; //$NON-NLS-1$
+	public static final String	LAST_RAW_DATA_FILE_PATH			= "data.lastRawDataFilePath";				//$NON-NLS-1$
 
 	/*
 	 * statistics where the units can be set in the preferences
 	 */
-	public static final String	STAT_DISTANCE_NUMBERS			= "statistic.distance.numbers"; //$NON-NLS-1$
-	public static final String	STAT_DISTANCE_LOW_VALUE			= "statistic.distance.lowvalue"; //$NON-NLS-1$
-	public static final String	STAT_DISTANCE_INTERVAL			= "statistic.distance.interval"; //$NON-NLS-1$
+	public static final String	STAT_DISTANCE_NUMBERS			= "statistic.distance.numbers";			//$NON-NLS-1$
+	public static final String	STAT_DISTANCE_LOW_VALUE			= "statistic.distance.lowvalue";			//$NON-NLS-1$
+	public static final String	STAT_DISTANCE_INTERVAL			= "statistic.distance.interval";			//$NON-NLS-1$
 
-	public static final String	STAT_ALTITUDE_NUMBERS			= "statistic.altitude.numbers"; //$NON-NLS-1$
-	public static final String	STAT_ALTITUDE_LOW_VALUE			= "statistic.altitude.lowvalue"; //$NON-NLS-1$
-	public static final String	STAT_ALTITUDE_INTERVAL			= "statistic.altitude.interval"; //$NON-NLS-1$
+	public static final String	STAT_ALTITUDE_NUMBERS			= "statistic.altitude.numbers";			//$NON-NLS-1$
+	public static final String	STAT_ALTITUDE_LOW_VALUE			= "statistic.altitude.lowvalue";			//$NON-NLS-1$
+	public static final String	STAT_ALTITUDE_INTERVAL			= "statistic.altitude.interval";			//$NON-NLS-1$
 
-	public static final String	STAT_DURATION_NUMBERS			= "statistic.duration.numbers"; //$NON-NLS-1$
-	public static final String	STAT_DURATION_LOW_VALUE			= "statistic.duration.lowvalue"; //$NON-NLS-1$
-	public static final String	STAT_DURATION_INTERVAL			= "statistic.duration.interval"; //$NON-NLS-1$
+	public static final String	STAT_DURATION_NUMBERS			= "statistic.duration.numbers";			//$NON-NLS-1$
+	public static final String	STAT_DURATION_LOW_VALUE			= "statistic.duration.lowvalue";			//$NON-NLS-1$
+	public static final String	STAT_DURATION_INTERVAL			= "statistic.duration.interval";			//$NON-NLS-1$
 
 	/*
 	 * colors
 	 */
-	public static final String	GRAPH_COLORS					= "graph.colors."; //$NON-NLS-1$
-	public static final String	GRAPH_COLORS_HAS_CHANGED		= "graph.colors.has-changed"; //$NON-NLS-1$
+	public static final String	GRAPH_COLORS					= "graph.colors.";							//$NON-NLS-1$
+	public static final String	GRAPH_COLORS_HAS_CHANGED		= "graph.colors.has-changed";				//$NON-NLS-1$
 
 	/*
 	 * Graphs
 	 */
-	public static final String	GRAPH_ALL						= "graphs.all"; //$NON-NLS-1$
-	public static final String	GRAPH_VISIBLE					= "graphs.visible"; //$NON-NLS-1$
-	public static final String	GRAPH_X_AXIS					= "graphs.x-axis"; //$NON-NLS-1$
-	public static final String	GRAPH_X_AXIS_STARTTIME			= "graphs.x-axis.starttime"; //$NON-NLS-1$
+	public static final String	GRAPH_ALL						= "graphs.all";							//$NON-NLS-1$
+	public static final String	GRAPH_VISIBLE					= "graphs.visible";						//$NON-NLS-1$
+	public static final String	GRAPH_X_AXIS					= "graphs.x-axis";							//$NON-NLS-1$
+	public static final String	GRAPH_X_AXIS_STARTTIME			= "graphs.x-axis.starttime";				//$NON-NLS-1$
 
-	public static final String	GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH	= "graphs.zoom.scroll-zoomed-graph"; //$NON-NLS-1$
-	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER	= "graphs.zoom.autozoom-to-slider"; //$NON-NLS-1$
+	public static final String	GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH	= "graphs.zoom.scroll-zoomed-graph";		//$NON-NLS-1$
+	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER	= "graphs.zoom.autozoom-to-slider";		//$NON-NLS-1$
 
-	public static final String	GRAPH_ALTIMETER_MIN_ENABLED		= "graphs.altimeter.is-min-enabled"; //$NON-NLS-1$
-	public static final String	GRAPH_ALTIMETER_MIN_VALUE		= "graphs.altimeter.min-value"; //$NON-NLS-1$
+	public static final String	GRAPH_ALTIMETER_MIN_ENABLED		= "graphs.altimeter.is-min-enabled";		//$NON-NLS-1$
+	public static final String	GRAPH_ALTIMETER_MIN_VALUE		= "graphs.altimeter.min-value";			//$NON-NLS-1$
 
-	public static final String	GRAPH_GRADIENT_MIN_ENABLED		= "graphs.gradient.is-min-enabled"; //$NON-NLS-1$
-	public static final String	GRAPH_GRADIENT_MIN_VALUE		= "graphs.gradient.min-value"; //$NON-NLS-1$
+	public static final String	GRAPH_GRADIENT_MIN_ENABLED		= "graphs.gradient.is-min-enabled";		//$NON-NLS-1$
+	public static final String	GRAPH_GRADIENT_MIN_VALUE		= "graphs.gradient.min-value";				//$NON-NLS-1$
 
-	public static final String	DEFAULT_IMPORT_TOUR_TYPE_ID		= "tourtype.import.default"; //$NON-NLS-1$
+	public static final String	DEFAULT_IMPORT_TOUR_TYPE_ID		= "tourtype.import.default";				//$NON-NLS-1$
 
-	public static final String	TOUR_TYPE_LIST_IS_MODIFIED		= "tourtype.list.is-modified"; //$NON-NLS-1$
-	public static final String	TOUR_BIKE_LIST_IS_MODIFIED		= "tourbike.list.is-modified"; //$NON-NLS-1$
-	public static final String	TOUR_PERSON_LIST_IS_MODIFIED	= "tourperson.list.is-modified"; //$NON-NLS-1$
+	public static final String	TOUR_TYPE_LIST_IS_MODIFIED		= "tourtype.list.is-modified";				//$NON-NLS-1$
+	public static final String	TOUR_BIKE_LIST_IS_MODIFIED		= "tourbike.list.is-modified";				//$NON-NLS-1$
+	public static final String	TOUR_PERSON_LIST_IS_MODIFIED	= "tourperson.list.is-modified";			//$NON-NLS-1$
 
-	public static final String	APP_LAST_SELECTED_PERSON_ID		= "application.last-selected-person-id"; //$NON-NLS-1$
-	public static final String	APP_LAST_SELECTED_TOUR_TYPE_ID	= "application.last-selected-tourtype-id"; //$NON-NLS-1$
-	public static final String	APP_NEW_DATA_FILTER				= "application.new-data-filter"; //$NON-NLS-1$
+	public static final String	APP_LAST_SELECTED_PERSON_ID		= "application.last-selected-person-id";	//$NON-NLS-1$
+	public static final String	APP_LAST_SELECTED_TOUR_TYPE_ID	= "application.last-selected-tourtype-id";	//$NON-NLS-1$
+
+	/**
+	 * event is fired when the person or tourtype was changed
+	 */
+	public static final String	APP_UPDATE_DATA_FILTER			= "application.update-data-filter";		//$NON-NLS-1$
 
 }

@@ -54,10 +54,10 @@ public class TourEditor extends EditorPart {
 	private ISelectionListener		fPostSelectionListener;
 
 	public void doSave(IProgressMonitor monitor) {
-		
+
 		TourDatabase.saveTour(fTourData);
 		fIsTourDirty = false;
-		
+
 		// update (hide) the dirty indicator
 		firePropertyChange(PROP_DIRTY);
 	}
@@ -113,8 +113,7 @@ public class TourEditor extends EditorPart {
 				public void dataModelChanged(ChartDataModel changedChartDataModel) {
 
 					// set title
-					changedChartDataModel.setTitle(NLS.bind(
-							Messages.TourBook_Label_chart_title,
+					changedChartDataModel.setTitle(NLS.bind(Messages.TourBook_Label_chart_title,
 							TourManager.getTourTitleDetailed(fTourData)));
 				}
 			});
@@ -127,7 +126,7 @@ public class TourEditor extends EditorPart {
 	}
 
 	public void setFocus() {
-		fPostSelectionProvider.setSelection(new TourChartSelection(fTourChart));
+		fPostSelectionProvider.setSelection(new TourDataSelection(fTourChart.fTourData));
 	}
 
 	private void setPostSelectionListener() {

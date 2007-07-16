@@ -34,10 +34,11 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContainer;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourChartSelectionListener;
-import net.tourbook.tour.TourChartSelection;
 import net.tourbook.tour.Tour;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
+import net.tourbook.tour.TourChartSelection;
+import net.tourbook.tour.TourDataSelection;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionModifyColumns;
@@ -265,7 +266,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 					fTourChartConfig = TourManager.createTourChartConfiguration();
 				}
 
-				if (property.equals(ITourbookPreferences.APP_NEW_DATA_FILTER)) {
+				if (property.equals(ITourbookPreferences.APP_UPDATE_DATA_FILTER)) {
 
 					fActivePerson = TourbookPlugin.getDefault().getActivePerson();
 					fActiveTourTypeId = TourbookPlugin.getDefault().getActiveTourType().getTypeId();
@@ -1426,7 +1427,7 @@ public class TourBookView extends ViewPart implements ITourChartViewer {
 			fTourChart.updateChart(fTourChartTourData, fTourChartConfig, false);
 			fTour.refreshTourData(fTourChartTourData);
 
-			firePostSelection(new TourChartSelection(fTourChart));
+			firePostSelection(new TourDataSelection(fTourChartTourData));
 		}
 	}
 

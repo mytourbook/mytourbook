@@ -24,12 +24,10 @@ import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartMarker;
-import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourChartSelection;
-import net.tourbook.tour.TourChart;
+import net.tourbook.tour.TourDataSelection;
 import net.tourbook.ui.views.tourBook.MarkerDialog;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -91,7 +89,7 @@ public class TourMarkerView extends ViewPart {
 
 	private TableViewer				fMarkerViewer;
 
-	private TourChart				fTourChart;
+//	private TourChart				fTourChart;
 	private TourData				fTourData;
 
 	private ISelectionListener		fPostSelectionListener;
@@ -275,31 +273,7 @@ public class TourMarkerView extends ViewPart {
 
 		fPostSelectionListener = new ISelectionListener() {
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-
-				if (selection instanceof TourChartSelection) {
-
-					saveMarker();
-
-					// a tour was selected, get the chart and update the marker viewer
-
-					fTourChart = ((TourChartSelection) selection).getTourChart();
-
-					if (fTourChart == null) {
-
-						// hide the marker editor
-
-						fPageBook.showPage(fPageNoChart);
-
-					} else {
-
-						// show the markers for the given tour
-
-						fTourData = fTourChart.getTourData();
-						fMarkerViewer.setInput(this);
-
-						fPageBook.showPage(fPageViewer);
-					}
-				}
+				onSelectionChanged(selection);
 			}
 		};
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
@@ -322,11 +296,11 @@ public class TourMarkerView extends ViewPart {
 				fillContextMenu(manager);
 			}
 		});
-		
+
 		Control viewerControl = fMarkerViewer.getControl();
 		Menu menu = menuMgr.createContextMenu(viewerControl);
 		viewerControl.setMenu(menu);
-		
+
 		getSite().registerContextMenu(menuMgr, fMarkerViewer);
 	}
 
@@ -345,6 +319,13 @@ public class TourMarkerView extends ViewPart {
 		addSelectionListener();
 
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+		
+		// show current selected chart if there are any
+		ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+		if (selection != null) {
+			onSelectionChanged(selection);
+		}
+
 	}
 
 	private Composite createTableViewer(Composite parent) {
@@ -372,13 +353,11 @@ public class TourMarkerView extends ViewPart {
 					if (e.keyCode == SWT.CR) {
 						if (e.stateMask == SWT.CONTROL) {
 							// edit visual position
-							fMarkerViewer.editElement(
-									selection.getFirstElement(),
+							fMarkerViewer.editElement(selection.getFirstElement(),
 									COLUMN_VISUAL_POSITION);
 						} else {
 							if (fMarkerViewer.isCellEditorActive() == false) {
-								fMarkerViewer.editElement(
-										selection.getFirstElement(),
+								fMarkerViewer.editElement(selection.getFirstElement(),
 										COLUMN_REMARK);
 							}
 						}
@@ -492,21 +471,21 @@ public class TourMarkerView extends ViewPart {
 		(new MarkerDialog(Display.getCurrent().getActiveShell(), fTourData, selectedMarker)).open();
 
 		// force the tour to be saved
-		fTourChart.setTourDirty(true);
+//		fTourChart.setTourDirty(true);
 
 		// update chart
-		fTourChart.updateMarkerLayer(true);
+//		fTourChart.updateMarkerLayer(true);
 
 		// update the viewer
 		fMarkerViewer.refresh();
 
 		// update marker list and other listener
-		fTourChart.fireTourChartSelection();
+//		fTourChart.fireTourChartSelection();
 
 		setFocus();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	private void fillContextMenu(IMenuManager menuMgr) {
 
 		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();
@@ -549,27 +528,27 @@ public class TourMarkerView extends ViewPart {
 
 			// two or more markers are selected
 
-			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
-					fTourChart,
-					((TourMarker) segments[0]).getSerieIndex(),
-					((TourMarker) segments[segments.length - 1]).getSerieIndex()));
+//			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
+//					fTourChart,
+//					((TourMarker) segments[0]).getSerieIndex(),
+//					((TourMarker) segments[segments.length - 1]).getSerieIndex()));
 
 		} else if (segments.length > 0) {
 
 			// one marker is selected
 
-			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
-					fTourChart,
-					((TourMarker) segments[0]).getSerieIndex(),
-					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
+//			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
+//					fTourChart,
+//					((TourMarker) segments[0]).getSerieIndex(),
+//					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
 		} else {
 			/*
 			 * no markers are selected, move the markers to start/end position
 			 */
-			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
-					fTourChart,
-					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
-					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
+//			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
+//					fTourChart,
+//					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
+//					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
 		}
 	}
 
@@ -577,10 +556,36 @@ public class TourMarkerView extends ViewPart {
 		return fMarkerViewer;
 	}
 
+	private void onSelectionChanged(ISelection selection) {
+		if (selection instanceof TourDataSelection) {
+
+			saveMarker();
+
+			// a tour was selected, get the chart and update the marker viewer
+
+			fTourData = ((TourDataSelection) selection).getTourData();
+
+			if (fTourData == null) {
+
+				// hide the marker editor
+
+				fPageBook.showPage(fPageNoChart);
+
+			} else {
+
+				// show the markers for the given tour
+
+				fMarkerViewer.setInput(this);
+
+				fPageBook.showPage(fPageViewer);
+			}
+		}
+	}
+
 	/**
 	 * remove selected markers from the view and update dependened structures
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	void removeSelectedMarkers() {
 
 		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();
@@ -603,7 +608,7 @@ public class TourMarkerView extends ViewPart {
 		fMarkerViewer.remove(removedMarkers.toArray());
 
 		// update chart
-		fTourChart.updateMarkerLayer(true);
+//		fTourChart.updateMarkerLayer(true);
 
 		fIsMarkerDirty = true;
 	}
@@ -631,7 +636,7 @@ public class TourMarkerView extends ViewPart {
 		fMarkerViewer.update(tourMarker, null);
 
 		// update chart
-		fTourChart.updateMarkerLayer(true);
+//		fTourChart.updateMarkerLayer(true);
 
 		fIsMarkerDirty = true;
 	}

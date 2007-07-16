@@ -52,7 +52,7 @@ public class TourData {
 	@Transient
 	public static final int		MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
 	@Transient
-	public static final float	MAX_BIKE_SPEED						= 120f;
+	public static final float	MAX_BIKE_SPEED					= 120f;
 
 	/**
 	 * Unique persistence id which identifies the tour
@@ -463,8 +463,7 @@ public class TourData {
 					// create a new marker
 					TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
 					tourMarker.setLabel(Messages.TourData_Label_device_marker);
-					tourMarker
-							.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+					tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					tourMarker.setTime(timeAbsolute + timeItem.marker);
 					tourMarker.setDistance(distanceAbsolute);
 					tourMarker.setSerieIndex(timeIndex);
@@ -578,8 +577,7 @@ public class TourData {
 			segmentSerieAltitude[segmentIndex] = segment.altitude = altitudeEnd - altitudeStart;
 			segmentSerieDistance[segmentIndex] = segment.distance = distanceEnd - distanceStart;
 			segmentSerieTime[segmentIndex] = segment.time = timeEnd - timeStart;
-			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = getDrivingTime(
-					segment,
+			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = getDrivingTime(segment,
 					segmentStartIndex,
 					segmentEndIndex,
 					timeSlice);
@@ -968,6 +966,10 @@ public class TourData {
 		this.startWeek = startWeek;
 	}
 
+	/**
+	 * @return returns the person for who the tour data are saved or <code>null</code> when the
+	 *         tour is not saved in the database
+	 */
 	public TourPerson getTourPerson() {
 		return tourPerson;
 	}
@@ -1214,7 +1216,7 @@ public class TourData {
 
 	public void computeAvgPulse() {
 		long pulseSum = 0;
-		int  pulseCount = 0;
+		int pulseCount = 0;
 
 		for (int pulse : pulseSerie) {
 			if (pulse > 0) {
@@ -1292,14 +1294,12 @@ public class TourData {
 
 		int maxIndex = Math.max(0, timeSerie.length - 1);
 
-		int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(
-				distanceSerie,
+		int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(distanceSerie,
 				0,
 				maxIndex,
 				10 / deviceTimeInterval);
 
-		tourDrivingTime = Math
-				.max(0, timeSerie[maxIndex] - (ignoreTimeSlices * deviceTimeInterval));
+		tourDrivingTime = Math.max(0, timeSerie[maxIndex] - (ignoreTimeSlices * deviceTimeInterval));
 
 	}
 

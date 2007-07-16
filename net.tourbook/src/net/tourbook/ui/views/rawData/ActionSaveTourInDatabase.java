@@ -205,7 +205,7 @@ public class ActionSaveTourInDatabase extends Action {
 					fViewPart.updateViewer();
 
 					/*
-					 * fire event that new tours has been saved in the database
+					 * fire event that new tours have been saved in the database
 					 */
 					SelectionRawData selectionRawData = new SelectionRawData();
 

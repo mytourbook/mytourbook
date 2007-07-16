@@ -13,25 +13,29 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.application;
+package net.tourbook.tour;
 
-import org.eclipse.ui.application.IWorkbenchConfigurer;
-import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
-import org.eclipse.ui.application.WorkbenchAdvisor;
-import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import net.tourbook.data.TourData;
 
-public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
+import org.eclipse.jface.viewers.ISelection;
 
-	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
-		return new ApplicationWorkbenchWindowAdvisor(configurer);
+/**
+ * selection is fired when a tour was selected
+ */
+public class TourDataSelection implements ISelection {
+
+	private TourData	fTourData;
+
+	public TourDataSelection(TourData tourData) {
+		fTourData = tourData;
 	}
 
-	public String getInitialWindowPerspectiveId() {
-		return PerspectiveFactoryRawData.PERSPECTIVE_ID;
+	public boolean isEmpty() {
+		return false;
 	}
 
-	public void initialize(IWorkbenchConfigurer configurer) {
-		configurer.setSaveAndRestore(true);
+	public TourData getTourData() {
+		return fTourData;
 	}
 
 }

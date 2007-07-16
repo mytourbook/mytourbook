@@ -106,6 +106,11 @@ public class TourChart extends Chart {
 
 	}
 
+	/**
+	 * add a data model listener which is fired when the data model has changed
+	 * 
+	 * @param dataModelListener
+	 */
 	public void addDataModelListener(final IDataModelListener dataModelListener) {
 		fChartDataModelListener = dataModelListener;
 	}

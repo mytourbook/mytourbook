@@ -36,8 +36,7 @@ public class ActionImportFromFile extends Action {
 
 		try {
 			// show raw data view
-			fRawDataView = (RawDataView) PlatformUI
-					.getWorkbench()
+			fRawDataView = (RawDataView) PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow()
 					.getActivePage()
 					.showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
@@ -50,8 +49,7 @@ public class ActionImportFromFile extends Action {
 		}
 
 		// setup open dialog
-		final FileDialog fileDialog = new FileDialog(
-				Display.getCurrent().getActiveShell(),
+		final FileDialog fileDialog = new FileDialog(Display.getCurrent().getActiveShell(),
 				(SWT.OPEN | SWT.MULTI));
 
 		final ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
@@ -94,36 +92,36 @@ public class ActionImportFromFile extends Action {
 			return;
 		}
 
+		final String[] selectedFileNames = fileDialog.getFileNames();
+
 		Display.getDefault().asyncExec(new Runnable() {
 
 			public void run() {
 
 				final RawDataManager rawDataManager = RawDataManager.getInstance();
 
+				int importCounter = 0;
+
 				final Path filePath = new Path(firstFileName);
-				final String[] selectedFileNames = fileDialog.getFileNames();
-				boolean isImported = false;
 
 				// loop: import all selected files
 				for (String fileName : selectedFileNames) {
 
 					// replace filename, keep the directory path
-					fileName = filePath
-							.removeLastSegments(1)
+					fileName = filePath.removeLastSegments(1)
 							.append(fileName)
 							.makeAbsolute()
 							.toString();
 
-					if (isImported) {
-						rawDataManager.importRawData(fileName);
-					} else {
-						isImported = rawDataManager.importRawData(fileName);
+					if (rawDataManager.importRawData(fileName)) {
+						importCounter++;
 					}
 				}
 
-				if (isImported) {
+				if (importCounter > 0) {
 
-					rawDataManager.updatePersonInRawData();
+					rawDataManager.updateTourDataFromDb();
+
 					fRawDataView.updateViewer();
 					fRawDataView.selectFirstTour();
 				}

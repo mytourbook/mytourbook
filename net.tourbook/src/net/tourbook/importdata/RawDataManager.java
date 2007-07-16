@@ -19,6 +19,7 @@ package net.tourbook.importdata;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -51,6 +52,11 @@ public class RawDataManager {
 	 */
 	private HashMap<String, TourData>	fTourDataMap		= new HashMap<String, TourData>();
 
+	/**
+	 * contains the filenames for all imported files
+	 */
+	private HashSet<String>				fImportedFiles		= new HashSet<String>();
+
 	private RawDataManager() {}
 
 	public static RawDataManager getInstance() {
@@ -65,8 +71,7 @@ public class RawDataManager {
 	 */
 	public static String getTempDataFileName() {
 
-		return TourbookPlugin
-				.getDefault()
+		return TourbookPlugin.getDefault()
 				.getStateLocation()
 				.append(TEMP_RAW_DATA_FILE)
 				.toFile()
@@ -77,7 +82,11 @@ public class RawDataManager {
 		return fDeviceData;
 	}
 
-	public HashMap<String, TourData> getTourData() {
+	public HashSet<String> getImportedFiles() {
+		return fImportedFiles;
+	}
+
+	public HashMap<String, TourData> getTourDataMap() {
 		return fTourDataMap;
 	}
 
@@ -98,15 +107,11 @@ public class RawDataManager {
 		// check if file exist
 		if (importFile.exists() == false) {
 
-			MessageBox msgBox = new MessageBox(
-					Display.getDefault().getActiveShell(),
+			MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(),
 					SWT.ICON_ERROR | SWT.OK);
 
 			msgBox.setText(Messages.DataImport_Error_file_does_not_exist_title);
-			msgBox
-					.setMessage(NLS.bind(
-							Messages.DataImport_Error_file_does_not_exist_msg,
-							fileName));
+			msgBox.setMessage(NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, fileName));
 
 			msgBox.open();
 
@@ -160,6 +165,10 @@ public class RawDataManager {
 			}
 		}
 
+		if (isDataImported) {
+			fImportedFiles.add(fileName);
+		}
+
 		return returnValue;
 	}
 
@@ -184,20 +193,24 @@ public class RawDataManager {
 		return false;
 	}
 
+	public void removeAllTours() {
+		fTourDataMap.clear();
+		fImportedFiles.clear();
+	}
+
 	private void showMsgBoxInvalidFormat(String fileName) {
 
-		MessageBox msgBox = new MessageBox(
-				Display.getCurrent().getActiveShell(),
-				SWT.ICON_ERROR | SWT.OK);
+		MessageBox msgBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_ERROR
+				| SWT.OK);
 
 		msgBox.setMessage(NLS.bind(Messages.DataImport_Error_invalid_data_format, fileName));
 		msgBox.open();
 	}
 
 	/**
-	 * Set the person in the current raw data, which owns the tour data
+	 * get the tourdata from the database when available 
 	 */
-	public void updatePersonInRawData() {
+	public void updateTourDataFromDb() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			@SuppressWarnings("unchecked")//$NON-NLS-1$
@@ -216,12 +229,15 @@ public class RawDataManager {
 						query.setParameter("tourId", tourData.getTourId()); //$NON-NLS-1$
 
 						List peopleList = query.getResultList();
-						if (peopleList.size() == 0) {
-							tourData.setTourPerson(null);
-						} else {
+						if (peopleList.size() != 0) {
+
+							// tour is in the database
+
 							final TourData tourDataFromDB = (TourData) peopleList.get(0);
-							tourData.setTourPerson(tourDataFromDB.getTourPerson());
-							tourData.setTourType(tourDataFromDB.getTourType());
+
+							tourDataFromDB.importRawDataFile = tourData.importRawDataFile;
+
+							fTourDataMap.put(tourDataFromDB.getTourId().toString(), tourDataFromDB);
 						}
 					}
 

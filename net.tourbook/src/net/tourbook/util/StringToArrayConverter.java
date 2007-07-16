@@ -22,7 +22,11 @@ public class StringToArrayConverter {
 	public static final String	STRING_SEPARATOR	= ",";	//$NON-NLS-1$
 
 	public static String[] convertStringToArray(String str) {
-		StringTokenizer tok = new StringTokenizer(str, STRING_SEPARATOR);
+		return convertStringToArray(str, STRING_SEPARATOR);
+	}
+
+	public static String[] convertStringToArray(String str, String separator) {
+		StringTokenizer tok = new StringTokenizer(str, separator);
 		int nTokens = tok.countTokens();
 		String[] res = new String[nTokens];
 		for (int i = 0; i < nTokens; i++) {
@@ -31,13 +35,18 @@ public class StringToArrayConverter {
 		return res;
 	}
 
-	public static String convertArrayToString(Object[] array) {
+	public static String convertArrayToString(String[] array) {
+		return convertArrayToString(array, STRING_SEPARATOR);
+	}
+
+	public static String convertArrayToString(String[] array, String separator) {
 		StringBuffer buf = new StringBuffer();
 		for (int arrayIndex = 0; arrayIndex < array.length; arrayIndex++) {
 			buf.append(array[arrayIndex]);
-			buf.append(STRING_SEPARATOR);
+			buf.append(separator);
 		}
 		return buf.toString();
+
 	}
-	
+
 }

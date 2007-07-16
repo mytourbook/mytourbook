@@ -16,13 +16,20 @@
 package net.tourbook.ui.views;
 
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ISliderMoveListener;
+import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
-import net.tourbook.tour.TourChartSelection;
+import net.tourbook.tour.TourDataSelection;
 import net.tourbook.tour.TourManager;
+import net.tourbook.util.PostSelectionProvider;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -42,34 +49,36 @@ public class TourChartView extends ViewPart {
 	private TourData				fTourData;
 
 	private ISelectionListener		fPostSelectionListener;
+	private IPropertyChangeListener	fPrefChangeListener;
 
-	public void createPartControl(Composite parent) {
+	private PostSelectionProvider	fPostSelectionProvider;
 
-		fTourChart = new TourChart(parent, SWT.FLAT, true);
+	private void addPrefListener() {
 
-		fTourChart.setShowZoomActions(true);
-		fTourChart.setShowSlider(true);
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
-		fTourChartConfig = TourManager.createTourChartConfiguration();
+				final String property = event.getProperty();
 
-		final IDataModelListener dataModelListener = new IDataModelListener() {
+				/*
+				 * set a new chart configuration when the preferences has changed
+				 */
+				if (property.equals(ITourbookPreferences.GRAPH_VISIBLE)
+						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS)
+						|| property.equals(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME)) {
 
-			public void dataModelChanged(ChartDataModel chartDataModel) {
+					fTourChartConfig = TourManager.createTourChartConfiguration();
 
-				// set title
-				chartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
+					if (fTourChart != null) {
+						fTourChart.updateChart(fTourData, fTourChartConfig, false);
+					}
+				}
 			}
 		};
-
-		fTourChart.addDataModelListener(dataModelListener);
-
-		addSelectionListener();
-		
-		// show current selected chart if there are any
-		ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
-		if (selection != null) {
-			updateChart(selection);
-		}
+		TourbookPlugin
+				.getDefault()
+				.getPluginPreferences()
+				.addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	/**
@@ -85,29 +94,66 @@ public class TourChartView extends ViewPart {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
+	public void createPartControl(Composite parent) {
+
+		fTourChart = new TourChart(parent, SWT.FLAT, true);
+
+		fTourChart.setShowZoomActions(true);
+		fTourChart.setShowSlider(true);
+
+		// set chart title
+		fTourChart.addDataModelListener(new IDataModelListener() {
+			public void dataModelChanged(ChartDataModel chartDataModel) {
+				chartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
+			}
+		});
+
+		// fire a slider move selection when a slider was moved in the tour chart
+		fTourChart.addSliderMoveListener(new ISliderMoveListener() {
+			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
+				fPostSelectionProvider.setSelection(chartInfoSelection);
+			}
+		});
+
+		fTourChartConfig = TourManager.createTourChartConfiguration();
+
+		addSelectionListener();
+		addPrefListener();
+
+		// set this view part as selection provider
+		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+
+		// show current selected chart if there are any
+		ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+		if (selection != null) {
+			updateChart(selection);
+		}
+	}
+
+	public void dispose() {
+
+		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+
+		getSite().setSelectionProvider(null);
+
+		TourbookPlugin
+				.getDefault()
+				.getPluginPreferences()
+				.removePropertyChangeListener(fPrefChangeListener);
+
+		super.dispose();
+	}
+
 	public void setFocus() {
 		fTourChart.setFocus();
 	}
 
-	public void dispose() {
-		
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		
-		super.dispose();
-	}
-
 	private void updateChart(ISelection selection) {
-		
-		if (selection instanceof TourChartSelection) {
 
-			// a tour was selected show the chart
+		if (selection instanceof TourDataSelection) {
 
-			TourChart tourChart = ((TourChartSelection) selection).getTourChart();
-
-			if (tourChart != null) {
-				fTourData = tourChart.getTourData();
-				fTourChart.updateChart(fTourData, fTourChartConfig, false);
-			}
+			fTourData = ((TourDataSelection) selection).getTourData();
+			fTourChart.updateChart(fTourData, fTourChartConfig, false);
 		}
 	}
 

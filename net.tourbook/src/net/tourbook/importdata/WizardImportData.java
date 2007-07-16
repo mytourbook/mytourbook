@@ -24,8 +24,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Formatter;
+import java.util.HashMap;
 
 import net.tourbook.Messages;
+import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.views.rawData.RawDataView;
 
@@ -90,12 +92,12 @@ public class WizardImportData extends Wizard {
 	 * @param sourceFileName
 	 * @return Returns the path of the saved file or null when it was not saved
 	 */
-	private String autoSaveRawData(String sourceFileName) {
+	private String saveRawData(String sourceFileName) {
 
 		// set filename to the transfer date
 		DeviceData deviceData = RawDataManager.getInstance().getDeviceData();
-		String fileName = new Formatter().format(
-				Messages.Format_rawdata_file_yyyy_mm_dd + fImportDevice.fileExtension,
+		String fileName = new Formatter().format(Messages.Format_rawdata_file_yyyy_mm_dd
+				+ fImportDevice.fileExtension,
 				deviceData.transferYear,
 				deviceData.transferMonth,
 				deviceData.transferDay).toString();
@@ -110,8 +112,7 @@ public class WizardImportData extends Wizard {
 
 			MessageBox msgBox = new MessageBox(getShell(), SWT.ICON_WORKING | SWT.OK | SWT.CANCEL);
 
-			msgBox.setMessage(NLS.bind(
-					Messages.ImportWizard_Message_replace_existing_file,
+			msgBox.setMessage(NLS.bind(Messages.ImportWizard_Message_replace_existing_file,
 					fileName));
 
 			if (msgBox.open() != SWT.OK) {
@@ -138,8 +139,10 @@ public class WizardImportData extends Wizard {
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			return null;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		} finally {
 			// close the files
 			if (inReader != null) {
@@ -147,6 +150,7 @@ public class WizardImportData extends Wizard {
 					inReader.close();
 				} catch (IOException e) {
 					e.printStackTrace();
+					return null;
 				}
 			}
 			if (outReader != null) {
@@ -154,6 +158,7 @@ public class WizardImportData extends Wizard {
 					outReader.close();
 				} catch (IOException e) {
 					e.printStackTrace();
+					return null;
 				}
 			}
 		}
@@ -258,50 +263,38 @@ public class WizardImportData extends Wizard {
 			// imported data format is valid
 
 			RawDataManager rawDataManager = RawDataManager.getInstance();
+			final HashMap<String, TourData> tourDataMap = rawDataManager.getTourDataMap();
 
 			/*
 			 * convert the data from the device data into the internal data structure
 			 */
-			if (fImportDevice.processDeviceData(
-					tempDataFileName,
+			if (fImportDevice.processDeviceData(tempDataFileName,
 					rawDataManager.getDeviceData(),
-					rawDataManager.getTourData())) {
+					tourDataMap)) {
 
-//				String autoSavedFileName = null;
-//
-//				// auto save raw data
-//				if (fPageImportSettings.fCheckAutoSave.getSelection()) {
-//				}
-				autoSaveRawData(tempDataFileName);
+				String savedFilePath = saveRawData(tempDataFileName);
+				if (savedFilePath != null) {
 
-//				rawDataManager.setDevice(fImportDevice);
-//
-//				if (autoSavedFileName == null) {
-//					// it was not auto saved or the auto save was canceled
-//					rawDataManager.setReceiveDataFileName(tempDataFileName);
-//					rawDataManager.setIsDeviceImport(true);
-//				} else {
-//					/*
-//					 * tell the raw data manager that the data are not received they are now from a
-//					 * file
-//					 */
-//					rawDataManager.setReceiveDataFileName(autoSavedFileName);
-//					rawDataManager.setIsDeviceImport(false);
-//				}
+					// change the temp filename to the saved filepath
 
-				rawDataManager.updatePersonInRawData();
+					for (TourData tourData : tourDataMap.values()) {
+						if (tourData.importRawDataFile.equalsIgnoreCase(tempDataFileName)) {
+							tourData.importRawDataFile = savedFilePath;
+						}
+					}
+				}
+
+				rawDataManager.updateTourDataFromDb();
 
 				// show imported data in the raw data view
 				try {
-					RawDataView importView = (RawDataView) PlatformUI
-							.getWorkbench()
+					RawDataView importView = (RawDataView) PlatformUI.getWorkbench()
 							.getActiveWorkbenchWindow()
 							.getActivePage()
 							.showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
 					if (importView != null) {
 						importView.updateViewer();
-//						importView.setActionSaveEnabled(autoSavedFileName == null);
 					}
 				} catch (PartInitException e) {
 					e.printStackTrace();
@@ -313,10 +306,9 @@ public class WizardImportData extends Wizard {
 			// data format is invalid
 
 			MessageBox msgBox = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
-
-			msgBox.setMessage(NLS.bind(
-					Messages.ImportWizard_Error_invalid_data_format,
+			msgBox.setMessage(NLS.bind(Messages.ImportWizard_Error_invalid_data_format,
 					fImportDevice.visibleName));
+
 			msgBox.open();
 
 			return true;
@@ -361,8 +353,7 @@ public class WizardImportData extends Wizard {
 		// start the port thread which reads data from the com port
 		PortThread portThreadRunnable = new PortThread(this, fImportDevice, portName);
 
-		Thread portThread = new Thread(
-				portThreadRunnable,
+		Thread portThread = new Thread(portThreadRunnable,
 				Messages.ImportWizard_Thread_name_read_device_data);
 		portThread.start();
 
@@ -380,8 +371,7 @@ public class WizardImportData extends Wizard {
 			}
 
 			if (isReceivingStarted == false) {
-				monitor.subTask(NLS.bind(
-						Messages.ImportWizard_Monitor_wait_for_data,
+				monitor.subTask(NLS.bind(Messages.ImportWizard_Monitor_wait_for_data,
 						(RECEIVE_TIMEOUT / 10 - (receiveTimeout / 10))));
 			}
 
@@ -421,8 +411,7 @@ public class WizardImportData extends Wizard {
 				monitor.worked(rawDataSize - receivedData);
 
 				// display the bytes which have been received
-				monitor.subTask(NLS.bind(
-						Messages.ImportWizard_Monitor_task_received_bytes,
+				monitor.subTask(NLS.bind(Messages.ImportWizard_Monitor_task_received_bytes,
 						new Object[] {
 								Integer.toString(receivedData * 100 / importDataSize),
 								Integer.toString(timer / 10),

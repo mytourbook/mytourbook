@@ -24,7 +24,7 @@ public class ActionClearView extends Action {
 	public void run() {
 
 		// remove all tours
-		RawDataManager.getInstance().getTourData().clear();
+		RawDataManager.getInstance().removeAllTours();
 
 		fRawDataView.updateViewer();
 	}

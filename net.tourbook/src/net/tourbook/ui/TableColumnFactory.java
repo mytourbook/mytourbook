@@ -252,9 +252,10 @@ public abstract class TableColumnFactory {
 			
 			colDef.setLabelProvider(new CellLabelProvider() {
 				public void update(ViewerCell cell) {
-					cell.setText(new File(((TourData) cell.getElement()).importRawDataFile)
-							.getParentFile()
-							.getPath());
+					final String importRawDataFile = ((TourData) cell.getElement()).importRawDataFile;
+					if (importRawDataFile != null) {
+						cell.setText(new File(importRawDataFile).getParentFile().getPath());
+					}
 				}
 			});
 		
@@ -269,13 +270,15 @@ public abstract class TableColumnFactory {
 			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "importFileName", SWT.LEAD); //$NON-NLS-1$
 			colDef.setLabel(Messages.ColumnFactory_import_filename_label);
 			colDef.setText(Messages.ColumnFactory_import_filename);
-			colDef
-																				.setToolTipText(Messages.ColumnFactory_import_filename_tooltip);
+			colDef.setToolTipText(Messages.ColumnFactory_import_filename_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(20));
 			
 			colDef.setLabelProvider(new CellLabelProvider() {
 				public void update(ViewerCell cell) {
-					cell.setText(new File(((TourData) cell.getElement()).importRawDataFile).getName());
+					final String importRawDataFile = ((TourData) cell.getElement()).importRawDataFile;
+					if (importRawDataFile != null) {
+						cell.setText(new File(importRawDataFile).getName());
+					}
 				}
 			});
 	
