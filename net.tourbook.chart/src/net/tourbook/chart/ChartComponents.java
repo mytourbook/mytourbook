@@ -62,8 +62,8 @@ public class ChartComponents extends Composite {
 	/**
 	 * min/max pixel widthDev/heightDev of the chart
 	 */
-	static final int					CHART_MIN_WIDTH				= 100;
-	static final int					CHART_MIN_HEIGHT			= 100;
+	static final int					CHART_MIN_WIDTH				= 1;
+	static final int					CHART_MIN_HEIGHT			= 1;
 	static final int					CHART_MAX_WIDTH				= 0x7fff;
 	static final int					CHART_MAX_HEIGHT			= 5000;
 
@@ -194,7 +194,7 @@ public class ChartComponents extends Composite {
 		// left: create left axis canvas
 		fComponentAxisLeft = new ChartComponentAxis(parent, this, SWT.NONE);
 		gd = new GridData(SWT.NONE, SWT.FILL, false, true);
-//		gd.widthHint = yAxisWidthLeft;
+		gd.widthHint = yAxisWidthLeft;
 		fComponentAxisLeft.setLayoutData(gd);
 
 		// center: create chart canvas
@@ -206,7 +206,7 @@ public class ChartComponents extends Composite {
 		// right: create right axis canvas
 		fComponentAxisRight = new ChartComponentAxis(parent, this, SWT.NONE);
 		gd = new GridData(SWT.NONE, SWT.FILL, false, true);
-//		gd.widthHint = yAxisWidthRight;
+		gd.widthHint = yAxisWidthRight;
 		fComponentAxisRight.setLayoutData(gd);
 
 		addListener();
@@ -386,8 +386,8 @@ public class ChartComponents extends Composite {
 		}
 
 		// enforce minimum chart height
-//		devGraphHeight = Math.max(devGraphHeight, CHART_MIN_HEIGHT);
-		devGraphHeight = Math.max(devGraphHeight, 1);
+		devGraphHeight = Math.max(devGraphHeight, CHART_MIN_HEIGHT);
+//		devGraphHeight = Math.max(devGraphHeight, 1);
 
 		// remove slider bar from graph height
 		devGraphHeight -= devSliderBarHeight;
