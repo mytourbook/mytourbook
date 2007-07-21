@@ -22,11 +22,11 @@ import org.eclipse.jface.viewers.ISelection;
 /**
  * selection is fired when a tour was selected
  */
-public class TourDataSelection implements ISelection {
+public class SelectionTourData implements ISelection {
 
 	private TourData	fTourData;
 
-	public TourDataSelection(TourData tourData) {
+	public SelectionTourData(TourData tourData) {
 		fTourData = tourData;
 	}
 

@@ -22,9 +22,10 @@ import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
-import net.tourbook.tour.TourDataSelection;
 import net.tourbook.tour.TourManager;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -33,8 +34,10 @@ import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 // author: Wolfgang Schramm
@@ -52,6 +55,10 @@ public class TourChartView extends ViewPart {
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	private PostSelectionProvider	fPostSelectionProvider;
+
+	private PageBook				fPageBook;
+
+	private Label					fPageNoChart;
 
 	private void addPrefListener() {
 
@@ -75,8 +82,7 @@ public class TourChartView extends ViewPart {
 				}
 			}
 		};
-		TourbookPlugin
-				.getDefault()
+		TourbookPlugin.getDefault()
 				.getPluginPreferences()
 				.addPropertyChangeListener(fPrefChangeListener);
 	}
@@ -96,11 +102,16 @@ public class TourChartView extends ViewPart {
 
 	public void createPartControl(Composite parent) {
 
-		fTourChart = new TourChart(parent, SWT.FLAT, true);
+		fPageBook = new PageBook(parent, SWT.NONE);
 
+		fPageNoChart = new Label(fPageBook, SWT.NONE);
+		fPageNoChart.setText("A tour is not selected");
+
+		fTourChart = new TourChart(fPageBook, SWT.FLAT, false);
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
-
+		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager());
+		
 		// set chart title
 		fTourChart.addDataModelListener(new IDataModelListener() {
 			public void dataModelChanged(ChartDataModel chartDataModel) {
@@ -127,6 +138,8 @@ public class TourChartView extends ViewPart {
 		ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
 		if (selection != null) {
 			updateChart(selection);
+		} else {
+			fPageBook.showPage(fPageNoChart);
 		}
 	}
 
@@ -136,8 +149,7 @@ public class TourChartView extends ViewPart {
 
 		getSite().setSelectionProvider(null);
 
-		TourbookPlugin
-				.getDefault()
+		TourbookPlugin.getDefault()
 				.getPluginPreferences()
 				.removePropertyChangeListener(fPrefChangeListener);
 
@@ -150,10 +162,23 @@ public class TourChartView extends ViewPart {
 
 	private void updateChart(ISelection selection) {
 
-		if (selection instanceof TourDataSelection) {
+		if (selection instanceof SelectionTourData) {
 
-			fTourData = ((TourDataSelection) selection).getTourData();
+			fTourData = ((SelectionTourData) selection).getTourData();
 			fTourChart.updateChart(fTourData, fTourChartConfig, false);
+			fPageBook.showPage(fTourChart);
+
+		} else if (selection instanceof SelectionTourId) {
+
+			SelectionTourId tourIdSelection = (SelectionTourId) selection;
+
+			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+
+			if (tourData != null) {
+				fTourData = tourData;
+				fTourChart.updateChart(fTourData, fTourChartConfig, false);
+				fPageBook.showPage(fTourChart);
+			}
 		}
 	}
 

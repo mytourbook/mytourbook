@@ -48,8 +48,8 @@ import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourChartSelectionListener;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
-import net.tourbook.tour.TourChartSelection;
-import net.tourbook.tour.TourDataSelection;
+import net.tourbook.tour.SelectionTourChart;
+import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.UI;
@@ -142,8 +142,7 @@ public class TourMapView extends SynchedChartView {
 
 	private SashForm								fSashCharts;
 
-	final NumberFormat								nf						= NumberFormat
-																					.getNumberInstance();
+	final NumberFormat								nf						= NumberFormat.getNumberInstance();
 	/**
 	 * active tourId for the reference tour
 	 */
@@ -214,16 +213,14 @@ public class TourMapView extends SynchedChartView {
 
 		public void run() {
 
-			final Object selectedItem = (((ITreeSelection) fTourViewer.getSelection())
-					.getFirstElement());
+			final Object selectedItem = (((ITreeSelection) fTourViewer.getSelection()).getFirstElement());
 
 			if (selectedItem instanceof TVTITourMapReferenceTour) {
 
 				final TVTITourMapReferenceTour ttiRefTour = (TVTITourMapReferenceTour) selectedItem;
 
 				// ask for the reference tour name
-				final InputDialog dialog = new InputDialog(
-						getSite().getShell(),
+				final InputDialog dialog = new InputDialog(getSite().getShell(),
 						Messages.TourMap_Dlg_rename_reference_tour_title,
 						Messages.TourMap_Dlg_rename_reference_tour_msg,
 						ttiRefTour.label,
@@ -337,8 +334,8 @@ public class TourMapView extends SynchedChartView {
 				final TVTITourMapComparedTour compTour = (TVTITourMapComparedTour) obj;
 				switch (index) {
 				case COLUMN_LABEL:
-					return DateFormat.getDateInstance(DateFormat.SHORT).format(compTour
-							.getTourDate());
+					return DateFormat.getDateInstance(DateFormat.SHORT)
+							.format(compTour.getTourDate());
 
 				case COLUMN_SPEED:
 					nf.setMinimumFractionDigits(1);
@@ -406,7 +403,7 @@ public class TourMapView extends SynchedChartView {
 		fRefTourChart.setShowZoomActions(true);
 		fRefTourChart.setShowSlider(true);
 		fRefTourChart.addTourChartListener(new ITourChartSelectionListener() {
-			public void selectedTourChart(TourChartSelection tourChart) {
+			public void selectedTourChart(SelectionTourChart tourChart) {
 				fActiveTourChart = fRefTourChart;
 				fPostSelectionProvider.setSelection(tourChart);
 			}
@@ -468,7 +465,7 @@ public class TourMapView extends SynchedChartView {
 		});
 
 		fCompTourChart.addTourChartListener(new ITourChartSelectionListener() {
-			public void selectedTourChart(TourChartSelection tourChart) {
+			public void selectedTourChart(SelectionTourChart tourChart) {
 				fActiveTourChart = fCompTourChart;
 				fPostSelectionProvider.setSelection(tourChart);
 			}
@@ -528,8 +525,7 @@ public class TourMapView extends SynchedChartView {
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		fTourViewer
-				.setInput(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem());
+		fTourViewer.setInput(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem());
 	}
 
 	private Control createTourViewer(final Composite parent) {
@@ -562,8 +558,8 @@ public class TourMapView extends SynchedChartView {
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
 		tc.setText(Messages.TourMap_Column_kmh);
-		treeLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(9), false));
+		treeLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(9),
+				false));
 
 		// tour viewer
 		fTourViewer = new TreeViewer(tree);
@@ -739,20 +735,16 @@ public class TourMapView extends SynchedChartView {
 			final TourData refTourData = refTour.getTourData();
 
 			// set visible graphs: altitude
-			final TourChartConfiguration refTourChartConfig = TourManager
-					.createTourChartConfiguration();
+			final TourChartConfiguration refTourChartConfig = TourManager.createTourChartConfiguration();
 			// refTourChartConfig.setKeepMinMaxValues(true);
 
-			final TourChartConfiguration compTourchartConfig = TourManager
-					.createTourChartConfiguration();
+			final TourChartConfiguration compTourchartConfig = TourManager.createTourChartConfiguration();
 			// compTourchartConfig.setKeepMinMaxValues(true);
 
-			final ChartDataModel chartDataModel = TourManager
-					.getInstance()
+			final ChartDataModel chartDataModel = TourManager.getInstance()
 					.createChartDataModel(refTourData, refTourChartConfig);
 
-			return new RefTourChartData(
-					refTour,
+			return new RefTourChartData(refTour,
 					chartDataModel,
 					refTourData,
 					refTourChartConfig,
@@ -876,11 +868,9 @@ public class TourMapView extends SynchedChartView {
 		final RefTourChartData oldRefChartData = fRefChartDataCache.get(fActiveRefTourId);
 		if (oldRefChartData != null) {
 
-			final SelectionChartXSliderPosition oldXSliderPosition = fRefTourChart
-					.getXSliderPosition();
+			final SelectionChartXSliderPosition oldXSliderPosition = fRefTourChart.getXSliderPosition();
 
-			oldRefChartData.setXSliderPosition(new SelectionChartXSliderPosition(
-					fRefTourChart,
+			oldRefChartData.setXSliderPosition(new SelectionChartXSliderPosition(fRefTourChart,
 					oldXSliderPosition.slider1ValueIndex,
 					oldXSliderPosition.slider2ValueIndex));
 		}
@@ -904,11 +894,9 @@ public class TourMapView extends SynchedChartView {
 						- xValues[refTour.getStartValueIndex()];
 
 				// set title
-				changedChartDataModel
-						.setTitle(NLS
-								.bind(Messages.TourMap_Label_chart_title_reference_tour, refTour
-										.getLabel(), TourManager
-										.getTourTitleDetailed(refTourChartData.getRefTourData())));
+				changedChartDataModel.setTitle(NLS.bind(Messages.TourMap_Label_chart_title_reference_tour,
+						refTour.getLabel(),
+						TourManager.getTourTitleDetailed(refTourChartData.getRefTourData())));
 
 			}
 		});
@@ -962,8 +950,8 @@ public class TourMapView extends SynchedChartView {
 					 */
 					fComparedToursFindResult = new ArrayList<TVTITourMapComparedTour>();
 
-					findComparedTours(((TourContentProvider) fTourViewer.getContentProvider())
-							.getRootItem(), removedCompTours.removedComparedTours);
+					findComparedTours(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem(),
+							removedCompTours.removedComparedTours);
 
 					// remove compared tour from the fDataModel
 					for (final TVTITourMapComparedTour comparedTour : fComparedToursFindResult) {
@@ -980,13 +968,11 @@ public class TourMapView extends SynchedChartView {
 					 * listen for x-slider position changes which can be done in the marker view
 					 */
 					if (selection instanceof SelectionChartXSliderPosition) {
-						fActiveTourChart
-								.setXSliderPosition((SelectionChartXSliderPosition) selection);
+						fActiveTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
 					}
 
 					if (selection instanceof SelectionTourSegmentLayer) {
-						fActiveTourChart
-								.updateSegmentLayer(((SelectionTourSegmentLayer) selection).isLayerVisible);
+						fActiveTourChart.updateSegmentLayer(((SelectionTourSegmentLayer) selection).isLayerVisible);
 					}
 				}
 
@@ -1001,8 +987,9 @@ public class TourMapView extends SynchedChartView {
 	private void showRefTourChart(final RefTourChartData refTourChartData) {
 
 		fRefTourChart.zoomOut(false);
-		fRefTourChart.updateChart(refTourChartData.getRefTourData(), refTourChartData
-				.getRefTourChartConfig(), false);
+		fRefTourChart.updateChart(refTourChartData.getRefTourData(),
+				refTourChartData.getRefTourChartConfig(),
+				false);
 	}
 
 	private void showTourMapItem(final IStructuredSelection selection) {
@@ -1175,8 +1162,7 @@ public class TourMapView extends SynchedChartView {
 
 			if (compareResult.getParentItem() instanceof TVICompareResultReference) {
 
-				final long compResultRefId = ((TVICompareResultReference) compareResult
-						.getParentItem()).refTour.getGeneratedId();
+				final long compResultRefId = ((TVICompareResultReference) compareResult.getParentItem()).refTour.getGeneratedId();
 
 				mapViewRefIds.put(compResultRefId, compResultRefId);
 			}
@@ -1212,8 +1198,8 @@ public class TourMapView extends SynchedChartView {
 	private void updateCompTourChart(final TVTITourMapComparedTour compItem) {
 
 		// load the tourdata for the compared tour from the database
-		final TourData selectedCompTourData = TourDatabase
-				.getTourDataByTourId(compItem.getTourId());
+		final TourData selectedCompTourData = TourManager.getInstance()
+				.getTourData(compItem.getTourId());
 
 		if (selectedCompTourData == null) {
 			return;
@@ -1231,9 +1217,8 @@ public class TourMapView extends SynchedChartView {
 					xData.setMarkerValueIndex(compItem.getStartIndex(), compItem.getEndIndex());
 
 					// set title
-					changedChartDataModel.setTitle(NLS
-							.bind(Messages.TourMap_Label_chart_title_compared_tour, TourManager
-									.getTourTitleDetailed(selectedCompTourData)));
+					changedChartDataModel.setTitle(NLS.bind(Messages.TourMap_Label_chart_title_compared_tour,
+							TourManager.getTourTitleDetailed(selectedCompTourData)));
 				}
 			};
 
@@ -1242,15 +1227,15 @@ public class TourMapView extends SynchedChartView {
 			RefTourChartData refTourChartData = fRefChartDataCache.get(fActiveRefTourId);
 
 			if (refTourChartData != null) {
-				fCompTourChart.updateChart(selectedCompTourData, refTourChartData
-						.getCompTourChartConfig(), false);
+				fCompTourChart.updateChart(selectedCompTourData,
+						refTourChartData.getCompTourChartConfig(),
+						false);
 			}
 
 			/*
 			 * fire the change event so that the tour markers updated
 			 */
-			fPostSelectionProvider
-					.setSelection(new TourDataSelection(fCompTourChart.getTourData()));
+			fPostSelectionProvider.setSelection(new SelectionTourData(fCompTourChart.getTourData()));
 
 			fActiveComparedTour = compItem;
 
@@ -1274,8 +1259,8 @@ public class TourMapView extends SynchedChartView {
 		float tourSpeed = 0;
 
 		try {
-			final TourCompared compTour = em.find(TourCompared.class, fActiveComparedTour
-					.getCompId());
+			final TourCompared compTour = em.find(TourCompared.class,
+					fActiveComparedTour.getCompId());
 
 			if (compTour != null) {
 
@@ -1286,11 +1271,9 @@ public class TourMapView extends SynchedChartView {
 				// update the changed tour speed
 				final ChartDataModel chartDataModel = fCompTourChart.getChartDataModel();
 
-				final int[] distanceValues = ((ChartDataXSerie) chartDataModel
-						.getCustomData(TourManager.CUSTOM_DATA_DISTANCE)).getHighValues()[0];
+				final int[] distanceValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE)).getHighValues()[0];
 
-				final int[] timeValues = ((ChartDataXSerie) chartDataModel
-						.getCustomData(TourManager.CUSTOM_DATA_TIME)).getHighValues()[0];
+				final int[] timeValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TIME)).getHighValues()[0];
 
 				final int distance = distanceValues[movedXMarkerEndValueIndex]
 						- distanceValues[movedXMarkerStartValueIndex];

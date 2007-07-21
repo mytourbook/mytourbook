@@ -425,6 +425,14 @@ public class ChartComponentGraph extends Canvas {
 				} else {
 					event.keyCode = SWT.ARROW_LEFT;
 				}
+
+				/*
+				 * set focus when the mouse is over the chart and the mousewheel is scrolled,
+				 */
+				if (isFocusControl() == false) {
+					forceFocus();
+				}
+
 				fChartComponents.handleLeftRightEvent(event);
 				/*
 				 * prevent scrolling the scrollbar, scrolling is done by the chart itself
@@ -965,8 +973,7 @@ public class ChartComponentGraph extends Canvas {
 			 * get the y position of the marker which marks the y value in the graph
 			 */
 			int yGraph = drawingData.getDevYBottom()
-					- (int) ((float) (yValue - drawingData.getGraphYBottom()) * drawingData
-							.getScaleY())
+					- (int) ((float) (yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY())
 					- 0;
 
 			if (yValue < yData.getVisibleMinValue()) {
@@ -1186,8 +1193,7 @@ public class ChartComponentGraph extends Canvas {
 							+ ((int) ((valueYLow - graphYBottom) * scaleY) + devYPreviousHeight);
 				}
 
-				final Rectangle barShape = new Rectangle(
-						devXPos,
+				final Rectangle barShape = new Rectangle(devXPos,
 						devYPos,
 						devBarWidth,
 						devBarHeight);
@@ -1227,8 +1233,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// save the bar position
 				barRecangles[serieIndex][valueIndex] = barShape;
-				barFocusRecangles[serieIndex][valueIndex] = new Rectangle(
-						devXPos - 2,
+				barFocusRecangles[serieIndex][valueIndex] = new Rectangle(devXPos - 2,
 						devYPos - 2,
 						devBarWidth + 4,
 						devBarHeight + 7);
@@ -1298,8 +1303,7 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * keep the selected bar because it will be drawn after all other bars are drawn
 			 */
-			final Rectangle barShapeSelected = new Rectangle(
-					(barRectangle.x - markerWidth2),
+			final Rectangle barShapeSelected = new Rectangle((barRectangle.x - markerWidth2),
 					(barRectangle.y - markerWidth2),
 					(barRectangle.width + markerWidth),
 					(barRectangle.height + markerWidth));
@@ -1541,8 +1545,8 @@ public class ChartComponentGraph extends Canvas {
 				 * the image size is adjusted to the client size but it must be within the min/max
 				 * ranges
 				 */
-				final int devImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT, Math
-						.min(getVisibleGraphHeight(), ChartComponents.CHART_MAX_HEIGHT));
+				final int devImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT,
+						Math.min(getVisibleGraphHeight(), ChartComponents.CHART_MAX_HEIGHT));
 
 				/*
 				 * when the image is the same size as the new we will redraw it only if it is set to
@@ -1746,8 +1750,7 @@ public class ChartComponentGraph extends Canvas {
 				final Color colorDark = getColor(rgbDarkDef);
 				final Color colorLine = getColor(rgbLineDef);
 
-				final Rectangle hoveredBarShape = new Rectangle(
-						(hoveredRectangle.x - markerWidth2),
+				final Rectangle hoveredBarShape = new Rectangle((hoveredRectangle.x - markerWidth2),
 						(hoveredRectangle.y - markerWidth2),
 						(hoveredRectangle.width + markerWidth),
 						(hoveredRectangle.height + markerWidth));
@@ -1899,8 +1902,15 @@ public class ChartComponentGraph extends Canvas {
 			final int alphaXMarker = 0x80;
 
 			// draw the marker
-			drawLineGraphSegment(gc, drawingData, xData.getXMarkerStartIndex(), xData
-					.getXMarkerEndIndex() + 1, rgbFg, rgbBg1, rgbBg2, fGraphAlpha, graphValueOffset);
+			drawLineGraphSegment(gc,
+					drawingData,
+					xData.getXMarkerStartIndex(),
+					xData.getXMarkerEndIndex() + 1,
+					rgbFg,
+					rgbBg1,
+					rgbBg2,
+					fGraphAlpha,
+					graphValueOffset);
 
 			// draw segment before the marker
 			drawLineGraphSegment(gc,
@@ -2113,8 +2123,11 @@ public class ChartComponentGraph extends Canvas {
 			gc.setForeground(colorBg2);
 			gc.setBackground(colorBg1);
 
-			gc.fillGradientRectangle(0, (int) devYBottom, devChartWidth, (int) -Math
-					.min(devGraphHeight, devYBottom - devChartY0Line), true);
+			gc.fillGradientRectangle(0,
+					(int) devYBottom,
+					devChartWidth,
+					(int) -Math.min(devGraphHeight, devYBottom - devChartY0Line),
+					true);
 
 			gc.setClipping(chartRectangle);
 		}
@@ -2470,8 +2483,9 @@ public class ChartComponentGraph extends Canvas {
 		final float scaleX = drawingData.getScaleX();
 
 		// compute the distance between two units
-		final int devUnitWidth = (int) (units.size() > 1 ? ((units.get(1).value * scaleX) - (units
-				.get(0).value * scaleX)) : 0);
+		final int devUnitWidth = (int) (units.size() > 1
+				? ((units.get(1).value * scaleX) - (units.get(0).value * scaleX))
+				: 0);
 
 		int devXOffset = 0;
 		int unitOffset = 0;
@@ -2594,13 +2608,14 @@ public class ChartComponentGraph extends Canvas {
 
 				final StringBuilder labelText = new StringBuilder();
 
-				final int devYValue = (int) ((devYBottom - devYSliderLine) / drawingData
-						.getScaleY())
+				final int devYValue = (int) ((devYBottom - devYSliderLine) / drawingData.getScaleY())
 						+ drawingData.getGraphYBottom();
 
 				// create the slider text
-				labelText.append(ChartUtil.formatValue(devYValue, yData.getAxisUnit(), yData
-						.getValueDivisor(), true));
+				labelText.append(ChartUtil.formatValue(devYValue,
+						yData.getAxisUnit(),
+						yData.getValueDivisor(),
+						true));
 				labelText.append(' ');
 				labelText.append(yData.getUnitLabel());
 				labelText.append("  "); //$NON-NLS-1$
@@ -2676,7 +2691,7 @@ public class ChartComponentGraph extends Canvas {
 						ChartComponents.CHART_MIN_WIDTH);
 
 				fDevVirtualGraphImageWidth = Math.max(devMinWidth, devImageWidth);
-				
+
 //				System.out.println("fDevVirtualGraphImageWidth: "+fDevVirtualGraphImageWidth);
 			}
 		}
@@ -2761,8 +2776,7 @@ public class ChartComponentGraph extends Canvas {
 		if (fHoveredBarSerieIndex != -1) {
 
 			// get the method which computes the bar info
-			final IChartInfoProvider computeBarInfo = (IChartInfoProvider) fChart
-					.getChartDataModel()
+			final IChartInfoProvider computeBarInfo = (IChartInfoProvider) fChart.getChartDataModel()
 					.getCustomData(ChartDataModel.BAR_INFO_PROVIDER);
 
 			if (computeBarInfo != null) {
@@ -3232,8 +3246,7 @@ public class ChartComponentGraph extends Canvas {
 
 						fDevXMarkerDraggedStartPos = devXMouse;
 						fDevXMarkerDraggedPos = devXMouse;
-						fForcedXMarkerValueDiff = fChart.fXMarkerDraggingListener
-								.getXMarkerValueDiff();
+						fForcedXMarkerValueDiff = fChart.fXMarkerDraggingListener.getXMarkerValueDiff();
 
 						fIsSliderDirty = true;
 						redraw();
@@ -4125,8 +4138,8 @@ public class ChartComponentGraph extends Canvas {
 			isHBarVisible = true;
 
 			if (scrollToLeftSlider) {
-				hBarSelection = Math.min(xSliderA.getDevVirtualSliderLinePos(), xSliderB
-						.getDevVirtualSliderLinePos());
+				hBarSelection = Math.min(xSliderA.getDevVirtualSliderLinePos(),
+						xSliderB.getDevVirtualSliderLinePos());
 				hBarSelection -= (float) (((float) clientWidth * ZOOM_REDUCING_FACTOR) / 2.0);
 
 				scrollToLeftSlider = false;

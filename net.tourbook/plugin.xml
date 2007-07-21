@@ -65,6 +65,19 @@
                menubarPath="file/update">
          </action>
       </actionSet>
+      <actionSet
+            id="net.tourbook.tourEditor.actionSet"	
+            label="Tour Editor Action Set">
+         <action
+               id="net.tourbook.action1"
+               label="Edit Tour Markers"
+      		class="net.tourbook.tour.ActionOpenMarkerView"
+      		toolbarPath="Normal/exampleGroup"
+      		icon="icons/marker-editor.gif"
+      		tooltip="Sample toolbar action">
+   		</action>
+         
+      </actionSet>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -169,6 +182,12 @@
             id="net.tourbook.ui.views.TourChartView"
             name="%View_Tour_Chart">
       </view>
+      <view
+            class="net.tourbook.ui.views.TourStatisticsView"
+            icon="icons/year-overview.gif"
+            id="net.tourbook.views.tourStatisticeView"
+            name="%View_Tour_Statistics">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.splashHandlers">
@@ -185,6 +204,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="net.tourbook.tour.TourEditor"
+            contributorClass="net.tourbook.tour.TourEditorActionBarContributor"
             icon="icons/tourfinder.gif"
             id="net.tourbook.tour.TourEditor"
             name="Tour Editor">
@@ -235,5 +255,14 @@
                id="net.tourbook.perspectiveTourMap">
          </perspectiveShortcut>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSetPartAssociations">
+      <actionSetPartAssociation
+            targetID="net.tourbook.tourEditor.actionSet">
+         <part
+               id="net.tourbook.tour.TourEditor">
+         </part>
+      </actionSetPartAssociation>
    </extension>
 </plugin>

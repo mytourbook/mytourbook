@@ -73,8 +73,8 @@ public interface ITourbookPreferences {
 	public static final String	APP_LAST_SELECTED_TOUR_TYPE_ID	= "application.last-selected-tourtype-id";	//$NON-NLS-1$
 
 	/**
-	 * event is fired when the person or tourtype was changed
+	 * event is fired when the person or tourtype where modified
 	 */
-	public static final String	APP_UPDATE_DATA_FILTER			= "application.update-data-filter";		//$NON-NLS-1$
+	public static final String	APP_DATA_FILTER_IS_MODIFIED		= "application.data-filter-is-modified";	//$NON-NLS-1$
 
 }

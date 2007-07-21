@@ -27,7 +27,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourSegment;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourChartSelection;
+import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PixelConverter;
@@ -291,8 +291,8 @@ public class TourSegmenterView extends ViewPart {
 
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 
-				if (!selection.isEmpty() && selection instanceof TourChartSelection) {
-					onTourSelection((TourChartSelection) selection);
+				if (!selection.isEmpty() && selection instanceof SelectionTourChart) {
+					onTourSelection((SelectionTourChart) selection);
 				}
 			}
 		};
@@ -579,7 +579,7 @@ public class TourSegmenterView extends ViewPart {
 	 * 
 	 * @param tourChartSelection
 	 */
-	private void onTourSelection(TourChartSelection tourChartSelection) {
+	private void onTourSelection(SelectionTourChart tourChartSelection) {
 
 		saveDPTolerance();
 

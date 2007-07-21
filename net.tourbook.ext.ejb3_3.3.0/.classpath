@@ -6,7 +6,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/c3p0-0.9.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/cglib-2.1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/commons-collections-2.1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/commons-logging-1.0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/commons-logging-1.0.4.jar" sourcepath="M:/source/commons-logging-1.0.4/commons-logging-1.0.4-src/src/java"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/dom4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/ehcache-1.2.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jacc-1_0-fr.jar"/>
@@ -14,8 +14,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jdbc2_0-stdext.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/jta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/log4j-1.2.11.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/hibernate3.jar" sourcepath="M:/hibernate 3.3.0/REPOSITORY/3.2.2/v322/Hibernate3/src"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations-3.3.0.GA/lib/ejb3-persistence.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/hibernate3.jar" sourcepath="M:/source/v322/Hibernate3/src"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations-3.3.0.GA/lib/ejb3-persistence.jar" sourcepath="M:/source/entitymanager_3_3_0_GA/HibernateExt/jpa-api/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations-3.3.0.GA/lib/hibernate-commons-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations-3.3.0.GA/hibernate-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.3.0.GA/lib/ejb3-persistence.jar"/>
@@ -23,7 +23,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.3.0.GA/lib/hibernate-commons-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.3.0.GA/lib/hibernate-validator.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.3.0.GA/lib/jboss-archive-browsing.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.3.0.GA/hibernate-entitymanager.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.3.0.GA/hibernate-entitymanager.jar" sourcepath="M:/source/entitymanager_3_3_0_GA/HibernateExt/entitymanager/src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="bin"/>

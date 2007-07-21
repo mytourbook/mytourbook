@@ -17,60 +17,23 @@ package net.tourbook.tour;
 
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.views.TourMarkerView;
 import net.tourbook.ui.views.tourBook.MarkerDialog;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 public class ActionTourMarker extends Action implements IMenuCreator {
 
-	private TourChart				fTourChart;
+	TourChart				fTourChart;
 
 	private Menu					fMenu;
 
 	private ActionOpenMarkerView	fActionOpenMarkerView;
 
-
-	private class ActionOpenMarkerView extends Action {
-
-		public ActionOpenMarkerView() {
-			setText(Messages.Tour_Action_open_marker_view);
-		}
-
-		public void run() {
-
-			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
-			if (window != null) {
-				try {
-
-					/*
-					 * the opened view can't be activated otherwise the fire event wouldn't work
-					 */
-					window.getActivePage().showView(
-							TourMarkerView.ID,
-							null,
-							IWorkbenchPage.VIEW_VISIBLE);
-
-					fTourChart.fireTourChartSelection();
-
-				} catch (PartInitException e) {
-					MessageDialog.openError(window.getShell(), "Error", "Error opening view:" //$NON-NLS-1$ //$NON-NLS-2$
-							+ e.getMessage());
-				}
-			}
-		}
-	}
 
 	public ActionTourMarker(TourChart tourChart) {
 
@@ -82,7 +45,7 @@ public class ActionTourMarker extends Action implements IMenuCreator {
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_open_marker_editor));
 
 		// fActionOpenMarkerEditor = new ActionOpenMarkerEditor();
-		fActionOpenMarkerView = new ActionOpenMarkerView();
+		fActionOpenMarkerView = new ActionOpenMarkerView(this);
 
 		setMenuCreator(this);
 	}

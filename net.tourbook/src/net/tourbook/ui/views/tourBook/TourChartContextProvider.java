@@ -49,16 +49,16 @@ class TourChartContextProvider implements ChartContextProvider {
 
 		public void run() {
 
-			TourReference refTour = ReferenceTourManager.getInstance().addReferenceTour(
-					fView.getTourChart());
+//			TourReference refTour = ReferenceTourManager.getInstance().addReferenceTour(
+//					fView.getTourChart());
 
-			if (refTour != null) {
-
-				SelectionNewRefTours selection = new SelectionNewRefTours();
-				selection.newRefTours.add(refTour);
-
-				fView.firePostSelection(selection);
-			}
+//			if (refTour != null) {
+//
+//				SelectionNewRefTours selection = new SelectionNewRefTours();
+//				selection.newRefTours.add(refTour);
+//
+//				fView.firePostSelection(selection);
+//			}
 		}
 	}
 
@@ -74,25 +74,25 @@ class TourChartContextProvider implements ChartContextProvider {
 
 			if (fView != null) {
 
-				final TourChart tourChart = fView.getTourChart();
-				TourData tourData = tourChart.getTourData();
-				TourMarker newTourMarker = createTourMarker(tourData);
-
-				// add new marker to the marker list
-				tourData.getTourMarkers().add(newTourMarker);
-				
-
-				(new MarkerDialog(Display.getCurrent().getActiveShell(), tourData, newTourMarker))
-						.open();
-
-				// force the tour to be saved
-				tourChart.setTourDirty(true);
-
-				// update chart
-				tourChart.updateMarkerLayer(true);
-
-				// update marker list and other listener
-				tourChart.fireTourChartSelection();
+//				final TourChart tourChart = fView.getTourChart();
+//				TourData tourData = tourChart.getTourData();
+//				TourMarker newTourMarker = createTourMarker(tourData);
+//
+//				// add new marker to the marker list
+//				tourData.getTourMarkers().add(newTourMarker);
+//				
+//
+//				(new MarkerDialog(Display.getCurrent().getActiveShell(), tourData, newTourMarker))
+//						.open();
+//
+//				// force the tour to be saved
+//				tourChart.setTourDirty(true);
+//
+//				// update chart
+//				tourChart.updateMarkerLayer(true);
+//
+//				// update marker list and other listener
+//				tourChart.fireTourChartSelection();
 
 			} else if (fMarkerDialog != null) {
 

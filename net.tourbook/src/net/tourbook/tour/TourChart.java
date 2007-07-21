@@ -59,11 +59,11 @@ public class TourChart extends Chart {
 	private Action					fActionXAxesTime;
 	private Action					fActionXAxesDistance;
 	private Action					fActionZoomFitGraph;
-	private Action					fActionAdjustAltitude;
 
-	private ActionGraphAnalyzer		fActionGraphAnalyzer;
-	private ActionTourSegmenter		fActionTourSegmenter;
-	private ActionTourMarker		fActionMarkerEditor;
+//	private Action					fActionAdjustAltitude;
+//	private ActionGraphAnalyzer		fActionGraphAnalyzer;
+//	private ActionTourSegmenter		fActionTourSegmenter;
+//	private ActionTourMarker		fActionMarkerEditor;
 
 	private ListenerList			fSelectionListeners	= new ListenerList();
 
@@ -245,7 +245,6 @@ public class TourChart extends Chart {
 		fActionXAxesTime = new ActionXAxesTime(this);
 		fActionXAxesDistance = new ActionXAxesDistance(this);
 		fActionZoomFitGraph = new ActionZoomFitGraph(this);
-		fActionAdjustAltitude = new ActionAdjustAltitude(this);
 
 		createGraphAction(TourManager.GRAPH_ALTITUDE,
 				Messages.Graph_Label_Altitude,
@@ -303,7 +302,6 @@ public class TourChart extends Chart {
 		tbm.add(fActionXAxesDistance);
 		tbm.add(new Separator());
 
-		tbm.add(fActionAdjustAltitude);
 		tbm.add(fActionOptions);
 		tbm.add(new Separator());
 
@@ -312,18 +310,20 @@ public class TourChart extends Chart {
 
 		// ///////////////////////////////////////////////////////
 
-		fActionGraphAnalyzer = new ActionGraphAnalyzer(this);
-
-		tbm.add(fActionGraphAnalyzer);
-
-		if (fIsToolActions) {
-
-			fActionTourSegmenter = new ActionTourSegmenter(this);
-			fActionMarkerEditor = new ActionTourMarker(this);
-
-			tbm.add(fActionTourSegmenter);
-			tbm.add(fActionMarkerEditor);
-		}
+//		fActionGraphAnalyzer = new ActionGraphAnalyzer(this);
+//
+//		tbm.add(fActionGraphAnalyzer);
+//
+//		if (fIsToolActions) {
+//
+//			fActionTourSegmenter = new ActionTourSegmenter(this);
+//			fActionMarkerEditor = new ActionTourMarker(this);
+//			fActionAdjustAltitude = new ActionAdjustAltitude(this);
+//
+//			tbm.add(fActionAdjustAltitude);
+//			tbm.add(fActionTourSegmenter);
+//			tbm.add(fActionMarkerEditor);
+//		}
 	}
 
 	public void dispose() {
@@ -405,7 +405,7 @@ public class TourChart extends Chart {
 			final ITourChartSelectionListener listener = (ITourChartSelectionListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
-					listener.selectedTourChart(new TourChartSelection(TourChart.this));
+					listener.selectedTourChart(new SelectionTourChart(TourChart.this));
 				}
 			});
 		}

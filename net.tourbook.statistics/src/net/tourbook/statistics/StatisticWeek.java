@@ -21,9 +21,9 @@ import java.util.GregorianCalendar;
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
 import net.tourbook.data.TourPerson;
-import net.tourbook.ui.ITourChartViewer;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -44,8 +44,8 @@ public abstract class StatisticWeek extends YearStatistic {
 	}
 
 	public void createControl(	Composite parent,
-								ITourChartViewer tourChartViewer,
-								ToolBarManager tbm) {
+								ToolBarManager tbm,
+								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -60,17 +60,13 @@ public abstract class StatisticWeek extends YearStatistic {
 		refreshStatistic(fActivePerson, fActiveTypeId, fCurrentYear, false);
 	}
 
-	public void refreshStatistic(	TourPerson person,
-									long typeId,
-									int year,
-									boolean refreshData) {
+	public void refreshStatistic(TourPerson person, long typeId, int year, boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTypeId = typeId;
 		fCurrentYear = year;
 
-		TourDataWeek tourWeekData = ProviderTourWeek.getInstance().getWeekData(
-				person,
+		TourDataWeek tourWeekData = ProviderTourWeek.getInstance().getWeekData(person,
 				typeId,
 				year,
 				isRefreshDataWithReset() || refreshData);
@@ -106,14 +102,12 @@ public abstract class StatisticWeek extends YearStatistic {
 
 		boolean selectedItems[] = new boolean[ProviderTourWeek.YEAR_WEEKS];
 		boolean isSelected = false;
-		
+
 		// select all weeks in the selected month
 		for (int weekIndex = 0; weekIndex < selectedItems.length; weekIndex++) {
 			fCalendar.set(Calendar.WEEK_OF_YEAR, weekIndex + 0);
 
-			boolean isMonthSelected = fCalendar.get(Calendar.MONTH) == selectedMonth
-					? true
-					: false;
+			boolean isMonthSelected = fCalendar.get(Calendar.MONTH) == selectedMonth ? true : false;
 			if (isMonthSelected) {
 				isSelected = true;
 			}

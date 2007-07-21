@@ -37,7 +37,7 @@ import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.IDataModelListener;
-import net.tourbook.tour.TourChartSelection;
+import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
@@ -996,7 +996,7 @@ public class CompareResultView extends SynchedChartView {
 				// show the compared tour chart
 				showCompTour(result);
 
-				fPostSelectionProvider.setSelection(new TourChartSelection(fCompTourChart));
+				fPostSelectionProvider.setSelection(new SelectionTourChart(fCompTourChart));
 
 			} else if (treeItem instanceof TVICompareResultReference) {
 
@@ -1007,7 +1007,7 @@ public class CompareResultView extends SynchedChartView {
 
 				showRefTourInfo(refTour.refTour.getGeneratedId());
 
-				fPostSelectionProvider.setSelection(new TourChartSelection(fRefTourChart));
+				fPostSelectionProvider.setSelection(new SelectionTourChart(fRefTourChart));
 			}
 
 		} catch (ChartIsEmptyException e) {

@@ -15,9 +15,8 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
-import net.tourbook.ui.ITourChartViewer;
-
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.widgets.Composite;
 
 public abstract class TourbookStatistic {
@@ -35,10 +34,11 @@ public abstract class TourbookStatistic {
 	 * 
 	 * @param parent
 	 * @param toolbarManager
+	 * @param postSelectionProvider
 	 */
 	public abstract void createControl(	Composite parent,
-										ITourChartViewer tourChartViewer,
-										ToolBarManager toolbarManager);
+										ToolBarManager toolbarManager,
+										IPostSelectionProvider postSelectionProvider);
 
 	public Composite getControl() {
 		return fContainer;
@@ -56,9 +56,9 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * Select the day in the statistic, this is used to visualize a selected
-	 * tour in the statistic chart. Deselect the day when set to
-	 * <code>null</code>. <code>date</code> is in the format milliseconds
+	 * Select the day in the statistic, this is used to visualize a selected tour in the statistic
+	 * chart. Deselect the day when set to <code>null</code>. <code>date</code> is in the
+	 * format milliseconds
 	 * 
 	 * @param date
 	 *        contains the date value in milliseconds
@@ -69,9 +69,8 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * Select the month in the statistic, this is used to visualize a selected
-	 * tour in the statistic chart. Deselect the month when set to
-	 * <code>null</code>
+	 * Select the month in the statistic, this is used to visualize a selected tour in the statistic
+	 * chart. Deselect the month when set to <code>null</code>
 	 * 
 	 * @param date
 	 *        contains the date value in milliseconds
@@ -82,8 +81,8 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * Select the tour in the statistic, this is used to visualize a selected
-	 * tour in the statistic chart.
+	 * Select the tour in the statistic, this is used to visualize a selected tour in the statistic
+	 * chart.
 	 * 
 	 * @param tourId
 	 * @return <code>true</code> when a tour was selected
@@ -98,28 +97,24 @@ public abstract class TourbookStatistic {
 
 	/**
 	 * @param isRefresh
-	 *        when set to <code>true</code>, the data must be refreshed when
-	 *        the chart is displayed the next time, set to <code>false</code>
-	 *        when the data has been refreshed
+	 *        when set to <code>true</code>, the data must be refreshed when the chart is
+	 *        displayed the next time, set to <code>false</code> when the data has been refreshed
 	 */
 	public void setRefreshData(boolean isRefresh) {
 		fIsRefreshData = isRefresh;
 	}
 
 	/**
-	 * Set the state if the scale for the chart is synched for different data
-	 * (e.g. years)
+	 * Set the state if the scale for the chart is synched for different data (e.g. years)
 	 * 
 	 * @param isEnabled
-	 *        <code>true</code> when the synch is enabled, <code>false</code>
-	 *        when it's disabled
+	 *        <code>true</code> when the synch is enabled, <code>false</code> when it's disabled
 	 */
 	public abstract void setSynchScale(boolean isEnabled);
 
 	/**
-	 * this method is called before the statistic control will be displayed.
-	 * When the toolbar manager is used, this method should put the actions into
-	 * the toolbar manager
+	 * this method is called before the statistic control will be displayed. When the toolbar
+	 * manager is used, this method should put the actions into the toolbar manager
 	 * 
 	 * @param refreshToolbar
 	 *        <code>true</code> will refresh the toolbar

@@ -38,8 +38,7 @@ public class StatisticDayTourTime extends StatisticDay {
 		/*
 		 * Duration
 		 */
-		ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fTimeLow,
 				tourTimeData.fTimeHigh);
 		yData.setYTitle(Messages.LABEL_DRIVING_TIME);
@@ -59,7 +58,7 @@ public class StatisticDayTourTime extends StatisticDay {
 		int yearDays = fCalendar.get(Calendar.DAY_OF_YEAR);
 		chartModel.setChartMinWidth(yearDays);
 
-		ProviderTourDay.getInstance().setChartProviders(fChart, chartModel, fTourChartViewer);
+		ProviderTourDay.getInstance().setChartProviders(fChart, chartModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartModel);

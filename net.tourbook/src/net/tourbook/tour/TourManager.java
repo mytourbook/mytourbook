@@ -19,6 +19,7 @@ package net.tourbook.tour;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
@@ -43,32 +44,34 @@ import org.eclipse.ui.PlatformUI;
 
 public class TourManager {
 
-	public static final String	CUSTOM_DATA_TIME		= "time";			//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_DISTANCE	= "distance";		//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_ALTITUDE	= "altitude";		//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_SPEED		= "speed";			//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_GRADIENT	= "gradient";		//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_ALTIMETER	= "altimeter";		//$NON-NLS-1$
-	public static final String	CUSTOM_DATA_PULSE		= "pulse";			//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_TIME		= "time";							//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_DISTANCE	= "distance";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_ALTITUDE	= "altitude";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_SPEED		= "speed";							//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_GRADIENT	= "gradient";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_ALTIMETER	= "altimeter";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_PULSE		= "pulse";							//$NON-NLS-1$
 
-	public static final String	ANALYZER_INFO			= "AnalyzerInfo";	//$NON-NLS-1$
-	public static final String	X_AXIS_TIME				= "time";			//$NON-NLS-1$
-	public static final String	X_AXIS_DISTANCE			= "distance";		//$NON-NLS-1$
+	public static final String		ANALYZER_INFO			= "AnalyzerInfo";					//$NON-NLS-1$
+	public static final String		X_AXIS_TIME				= "time";							//$NON-NLS-1$
+	public static final String		X_AXIS_DISTANCE			= "distance";						//$NON-NLS-1$
 
-	public static final int		GRAPH_ALTITUDE			= 1000;
-	public static final int		GRAPH_SPEED				= 1001;
-	public static final int		GRAPH_ALTIMETER			= 1002;
-	public static final int		GRAPH_PULSE				= 1003;
-	public static final int		GRAPH_TEMPERATURE		= 1004;
-	public static final int		GRAPH_CADENCE			= 1005;
-	public static final int		GRAPH_GRADIENT			= 1006;
-	public static final int		GRAPH_POWER				= 1007;
+	public static final int			GRAPH_ALTITUDE			= 1000;
+	public static final int			GRAPH_SPEED				= 1001;
+	public static final int			GRAPH_ALTIMETER			= 1002;
+	public static final int			GRAPH_PULSE				= 1003;
+	public static final int			GRAPH_TEMPERATURE		= 1004;
+	public static final int			GRAPH_CADENCE			= 1005;
+	public static final int			GRAPH_GRADIENT			= 1006;
+	public static final int			GRAPH_POWER				= 1007;
 
-	private static TourManager	instance;
+	private static TourManager		instance;
 
-	private ComputeChartValue	computeSpeedAvg;
-	private ComputeChartValue	computeAltimeterAvg;
-	private ComputeChartValue	computeGradientAvg;
+	private ComputeChartValue		computeSpeedAvg;
+	private ComputeChartValue		computeAltimeterAvg;
+	private ComputeChartValue		computeGradientAvg;
+
+	private HashMap<Long, TourData>	fTourDataMap			= new HashMap<Long, TourData>();
 
 	/**
 	 * local cache for tour editor inputs
@@ -90,8 +93,7 @@ public class TourManager {
 
 		// convert the graph ids from the preferences into visible graphs in
 		// the chart panel configuration
-		final String[] prefGraphIds = StringToArrayConverter.convertStringToArray(prefStore
-				.getString(ITourbookPreferences.GRAPH_VISIBLE));
+		final String[] prefGraphIds = StringToArrayConverter.convertStringToArray(prefStore.getString(ITourbookPreferences.GRAPH_VISIBLE));
 		for (final String prefGraphId : prefGraphIds) {
 			chartConfig.addVisibleGraph(Integer.valueOf(prefGraphId));
 		}
@@ -144,6 +146,29 @@ public class TourManager {
 	}
 
 	/**
+	 * set the graph colors from the pref store
+	 * 
+	 * @param prefStore
+	 * @param yDataSerie
+	 * @param graphName
+	 */
+	public static void setChartColors(	final IPreferenceStore prefStore,
+										final ChartDataYSerie yDataSerie,
+										final String graphName) {
+
+		final String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+
+		yDataSerie.setRgbLine(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
+				+ GraphColors.PREF_COLOR_LINE) });
+
+		yDataSerie.setRgbDark(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
+				+ GraphColors.PREF_COLOR_DARK) });
+
+		yDataSerie.setRgbBright(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
+				+ GraphColors.PREF_COLOR_BRIGHT) });
+	}
+
+	/**
 	 * update the zoom options in the chart configuration from the pref store
 	 * 
 	 * @param chartConfig
@@ -153,10 +178,8 @@ public class TourManager {
 												final IPreferenceStore prefStore) {
 
 		// get pref store settings
-		boolean scrollZoomedGraph = prefStore
-				.getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH);
-		boolean autoZoomToSlider = prefStore
-				.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
+		boolean scrollZoomedGraph = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH);
+		boolean autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
 
 		// prevent setting both zoom options to true
 		if (scrollZoomedGraph) {
@@ -170,14 +193,26 @@ public class TourManager {
 		chartConfig.autoZoomToSlider = autoZoomToSlider;
 	}
 
+	/**
+	 * adjust the min/max values to make them more visible and not at the same position as the
+	 * x-axis or the top of the chart
+	 */
+	private void adjustMinMax(final ChartDataYSerie yData) {
+
+		yData.setVisibleMaxValue(yData.getVisibleMaxValue() + 1);
+
+		// if (yData.getMinValue() > 0) {
+		yData.setVisibleMinValue(yData.getVisibleMinValue() - 1);
+		// }
+	}
+
 	private int compareTour(final TourData compareTourData) {
 
 		final TourDataNormalizer compareTourNormalizer = new TourDataNormalizer();
 		final int[] compareTourDataDistance = compareTourData.distanceSerie;
 
 		// normalize the tour which will be compared
-		compareTourNormalizer.normalizeAltitude(
-				compareTourData,
+		compareTourNormalizer.normalizeAltitude(compareTourData,
 				0,
 				compareTourDataDistance.length - 1);
 
@@ -215,7 +250,7 @@ public class TourManager {
 		refMeasureEndIndex = 101;
 
 		// get the reference tour
-		final TourData refTourData = TourDatabase.getTourDataByTourId(refTourId);
+		final TourData refTourData = TourManager.getInstance().getTourData(refTourId);
 		if (refTourData == null) {
 			return -1;
 		}
@@ -282,8 +317,8 @@ public class TourManager {
 		}
 
 		// distance for the reference tour
-		final int refDistance = refTourData.distanceSerie[refMeasureEndIndex]
-				- refTourData.distanceSerie[refMeasureStartIndex];
+//		final int refDistance = refTourData.distanceSerie[refMeasureEndIndex]
+//				- refTourData.distanceSerie[refMeasureStartIndex];
 
 		// get the start point in the compare tour
 		final int distanceStart = normCompDistances[compareIndexStart];
@@ -295,7 +330,7 @@ public class TourManager {
 				break;
 			}
 		}
-		final int compareDistanceStart = compareTourDataDistance[compareIndex];
+//		final int compareDistanceStart = compareTourDataDistance[compareIndex];
 
 		// overwrite the changed data series
 		compareTourData.distanceSerie = compareTourNormalizer.getNormalizedDistance();
@@ -312,6 +347,151 @@ public class TourManager {
 	}
 
 	/**
+	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
+	 * 
+	 * @param tourData
+	 */
+	private void createAltiGradiSerie(TourData tourData) {
+
+		// if (tourData.altimeterSerie != null) {
+		// return;
+		// }
+
+		final int serieLength = tourData.timeSerie.length;
+
+		final int altimeterSerie[] = tourData.altimeterSerie = new int[serieLength];
+		final int gradientSerie[] = tourData.gradientSerie = new int[serieLength];
+
+		int deviceTimeInterval = tourData.getDeviceTimeInterval();
+
+		int indexLowAdjustment;
+		int indexHighAdjustment;
+
+		if (deviceTimeInterval <= 2) {
+			indexLowAdjustment = 15;
+			indexHighAdjustment = 15;
+
+		} else if (deviceTimeInterval <= 5) {
+			indexLowAdjustment = 5;
+			indexHighAdjustment = 6;
+
+		} else if (deviceTimeInterval <= 10) {
+			indexLowAdjustment = 2;
+			indexHighAdjustment = 3;
+		} else {
+			indexLowAdjustment = 1;
+			indexHighAdjustment = 2;
+		}
+
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			// adjust index to the array size
+			int indexLow = Math.min(Math.max(0, serieIndex - indexLowAdjustment), serieLength - 1);
+			int indexHigh = Math.max(0, Math.min(serieIndex + indexHighAdjustment, serieLength - 1));
+
+			final int distance = tourData.distanceSerie[indexHigh]
+					- tourData.distanceSerie[indexLow];
+
+			final int altitude = tourData.altitudeSerie[indexHigh]
+					- tourData.altitudeSerie[indexLow];
+
+			final float timeInterval = deviceTimeInterval * (indexHigh - indexLow);
+
+			// keep altimeter data
+			altimeterSerie[serieIndex] = (int) (3600F * altitude / timeInterval);
+
+			// keep gradient data
+			gradientSerie[serieIndex] = distance == 0 ? 0 : altitude * 1000 / distance;
+
+			// System.out.println(""
+			// + (timeInterval + "\t")
+			// + (distance + "\t")
+			// + (altitude + "\t")
+			// + (tourData.distanceSerie[serieIndex] + "\t")
+			// + (tourData.altitudeSerie[serieIndex] + "\t")
+			// + (tourData.gradientSerie[serieIndex] + "\t")
+			// + "");
+		}
+	}
+
+//	private void createAltiGradiSerieOLD(TourData tourData) {
+//
+//		if (tourData.altimeterSerie != null) {
+//			return;
+//		}
+//
+//		final int[] timeSerie = tourData.timeSerie;
+//		final int[] distanceSerie = tourData.distanceSerie;
+//		final int[] altitudeSerie = tourData.altitudeSerie;
+//
+//		final int altimeterSerie[] = tourData.altimeterSerie = new int[timeSerie.length];
+//		final int gradientSerie[] = tourData.gradientSerie = new int[timeSerie.length];
+//
+//		final int altimeterAvg[] = { 0, 0, 0 };
+//		final int sliceAvg[] = { 0, 0, 0 };
+//
+//		final int distanceSum[] = { 0, 0, 0 };
+//		final int altitudeSum[] = { 0, 0, 0 };
+//
+//		int index = 0;
+//		int altitudeLast = altitudeSerie[index];
+//		int distanceLast = distanceSerie[index];
+//		int timeAbs = altitudeSerie[index];
+//
+//		// convert data from the tour format into an interger[]
+//		for (final int timeSlice : timeSerie) {
+//
+//			// first value is the absolute altitude
+//			final int altitudeDiff = altitudeSerie[index] - altitudeLast;
+//			final int distanceDiff = distanceSerie[index] - distanceLast;
+//			final int timeDiff = timeSlice - timeAbs;
+//
+//			// compute altimeter as an average of multiple values
+//			for (int avgIndex = altimeterAvg.length - 1; avgIndex >= 0; avgIndex--) {
+//				if (avgIndex > 0) {
+//					altimeterAvg[avgIndex] = altimeterAvg[avgIndex - 1] + altitudeDiff;
+//					sliceAvg[avgIndex] = sliceAvg[avgIndex - 1] + timeDiff;
+//				} else {
+//					// set current value
+//					altimeterAvg[avgIndex] = altitudeDiff;
+//					sliceAvg[avgIndex] = timeDiff;
+//				}
+//			}
+//
+//			// compute gradient as an average of multiple values
+//			for (int sumIndex = distanceSum.length - 1; sumIndex >= 0; sumIndex--) {
+//				if (sumIndex > 0) {
+//					distanceSum[sumIndex] = distanceSum[sumIndex - 1] + distanceDiff;
+//					altitudeSum[sumIndex] = altitudeSum[sumIndex - 1] + altitudeDiff;
+//				} else {
+//					// set current value
+//					distanceSum[sumIndex] = distanceDiff;
+//					altitudeSum[sumIndex] = altitudeDiff;
+//				}
+//			}
+//
+//			// keep altimeter data
+//			final float slicePerHour = 3600f / (sliceAvg[sliceAvg.length - 1] / sliceAvg.length);
+//			altimeterSerie[index] = (int) (((float) altimeterAvg[altimeterAvg.length - 1]
+//					/ altimeterAvg.length * slicePerHour));
+//
+//			// keep gradient data
+//			final int distanceSumTotal = distanceSum[distanceSum.length - 1];
+//			final int altitudeSumTotal = altitudeSum[altitudeSum.length - 1];
+//			gradientSerie[index] = distanceSumTotal == 0
+//					? 0
+//					: (altitudeSumTotal * 1000 / distanceSumTotal);
+//
+//			// prepare next iteration
+//			altitudeLast = altitudeSerie[index];
+//			distanceLast = distanceSerie[index];
+//			timeAbs = timeSlice;
+//
+//			index++;
+//		}
+//	}
+
+	/**
 	 * create the callbacks which compute the average
 	 */
 	private void createChartAvgCallbacks() {
@@ -323,11 +503,9 @@ public class TourManager {
 			 */
 			public float compute() {
 
-				final int[] distanceValues = ((ChartDataSerie) (chartModel
-						.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
+				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
 
-				final int[] timeValues = ((ChartDataSerie) (chartModel
-						.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
+				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
 
 				final int leftDistance = distanceValues[valuesIndexLeft];
 				final int rightDistance = distanceValues[valuesIndexRight];
@@ -343,8 +521,7 @@ public class TourManager {
 					int timeSlice = timeValues[1] - timeValues[0];
 					final float time = rightTime
 							- leftTime
-							- (getIgnoreTimeSlices(
-									distanceValues,
+							- (getIgnoreTimeSlices(distanceValues,
 									valuesIndexLeft,
 									valuesIndexRight,
 									10 / timeSlice) * timeSlice);
@@ -366,11 +543,9 @@ public class TourManager {
 			 */
 			public float compute() {
 
-				final int[] altitudeValues = ((ChartDataSerie) (chartModel
-						.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
+				final int[] altitudeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
 
-				final int[] timeValues = ((ChartDataSerie) (chartModel
-						.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
+				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
 
 				final int leftAltitude = altitudeValues[valuesIndexLeft];
 				final int rightAltitude = altitudeValues[valuesIndexRight];
@@ -382,14 +557,12 @@ public class TourManager {
 					return 0;
 				} else {
 
-					final int[] distanceValues = ((ChartDataSerie) (chartModel
-							.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
+					final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
 
 					int timeSlice = timeValues[1] - timeValues[0];
 					final float time = rightTime
 							- leftTime
-							- (getIgnoreTimeSlices(
-									distanceValues,
+							- (getIgnoreTimeSlices(distanceValues,
 									valuesIndexLeft,
 									valuesIndexRight,
 									10 / timeSlice) * timeSlice);
@@ -406,11 +579,9 @@ public class TourManager {
 			 */
 			public float compute() {
 
-				final int[] altitudeValues = ((ChartDataSerie) (chartModel
-						.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
+				final int[] altitudeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
 
-				final int[] distanceValues = ((ChartDataSerie) (chartModel
-						.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
+				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
 
 				final int leftAltitude = altitudeValues[valuesIndexLeft];
 				final int rightAltitude = altitudeValues[valuesIndexRight];
@@ -509,8 +680,7 @@ public class TourManager {
 		/*
 		 * altitude
 		 */
-		final ChartDataYSerie yDataAltitude = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_LINE,
+		final ChartDataYSerie yDataAltitude = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE,
 				tourData.altitudeSerie);
 		yDataAltitude.setYTitle(Messages.Graph_Label_Altitude);
 		yDataAltitude.setUnitLabel(Messages.Graph_Label_Altitude_unit);
@@ -525,16 +695,14 @@ public class TourManager {
 		/*
 		 * speed
 		 */
-		final ChartDataYSerie yDataSpeed = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_LINE,
+		final ChartDataYSerie yDataSpeed = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE,
 				tourData.speedSerie);
 		yDataSpeed.setYTitle(Messages.Graph_Label_Speed);
 		yDataSpeed.setUnitLabel(Messages.Graph_Label_Speed_unit);
 		yDataSpeed.setValueDivisor(10);
 		yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
-		yDataSpeed.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(
-				true,
+		yDataSpeed.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true,
 				true,
 				computeSpeedAvg,
 				2));
@@ -545,8 +713,7 @@ public class TourManager {
 		/*
 		 * heartbeat
 		 */
-		final ChartDataYSerie yDataPulse = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_LINE,
+		final ChartDataYSerie yDataPulse = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE,
 				tourData.pulseSerie);
 		yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
 		yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
@@ -560,15 +727,13 @@ public class TourManager {
 		/*
 		 * altimeter
 		 */
-		final ChartDataYSerie yDataAltimeter = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_LINE,
+		final ChartDataYSerie yDataAltimeter = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE,
 				tourData.altimeterSerie);
 		yDataAltimeter.setYTitle(Messages.Graph_Label_Altimeter);
 		yDataAltimeter.setUnitLabel(Messages.Graph_Label_Altimeter_unit);
 		yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 		yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
-		yDataAltimeter.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(
-				true,
+		yDataAltimeter.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true,
 				computeAltimeterAvg));
 		yDataAltimeter.setShowYSlider(true);
 		setChartColors(prefStore, yDataAltimeter, GraphColors.PREF_GRAPH_ALTIMETER);
@@ -576,23 +741,20 @@ public class TourManager {
 
 		// adjust min altitude when it's defined in the pref store
 		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED)) {
-			yDataAltimeter.setSavedMinValue(prefStore
-					.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE));
+			yDataAltimeter.setSavedMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE));
 		}
 
 		/*
 		 * gradient
 		 */
-		final ChartDataYSerie yDataGradient = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_LINE,
+		final ChartDataYSerie yDataGradient = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE,
 				tourData.gradientSerie);
 		yDataGradient.setYTitle(Messages.Graph_Label_Gradiend);
 		yDataGradient.setUnitLabel(Messages.Graph_Label_Gradiend_unit);
 		yDataGradient.setValueDivisor(10);
 		yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 		yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
-		yDataGradient.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(
-				true,
+		yDataGradient.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true,
 				true,
 				computeGradientAvg,
 				1));
@@ -602,15 +764,13 @@ public class TourManager {
 
 		// adjust min value when defined in the pref store
 		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED)) {
-			yDataGradient.setSavedMinValue(prefStore
-					.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE));
+			yDataGradient.setSavedMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE));
 		}
 
 		/*
 		 * cadence
 		 */
-		final ChartDataYSerie yDataCadence = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_LINE,
+		final ChartDataYSerie yDataCadence = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE,
 				tourData.cadenceSerie);
 		yDataCadence.setYTitle(Messages.Graph_Label_Cadence);
 		yDataCadence.setUnitLabel(Messages.Graph_Label_Cadence_unit);
@@ -624,8 +784,7 @@ public class TourManager {
 		/*
 		 * temperature
 		 */
-		final ChartDataYSerie yDataTemperature = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_LINE,
+		final ChartDataYSerie yDataTemperature = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE,
 				tourData.temperatureSerie);
 		yDataTemperature.setYTitle(Messages.Graph_Label_Temperature);
 		yDataTemperature.setUnitLabel(Messages.Graph_Label_Temperature_unit);
@@ -689,165 +848,6 @@ public class TourManager {
 	}
 
 	/**
-	 * adjust the min/max values to make them more visible and not at the same position as the
-	 * x-axis or the top of the chart
-	 */
-	private void adjustMinMax(final ChartDataYSerie yData) {
-
-		yData.setVisibleMaxValue(yData.getVisibleMaxValue() + 1);
-
-		// if (yData.getMinValue() > 0) {
-		yData.setVisibleMinValue(yData.getVisibleMinValue() - 1);
-		// }
-	}
-
-	private void createAltiGradiSerieOLD(TourData tourData) {
-
-		if (tourData.altimeterSerie != null) {
-			return;
-		}
-
-		final int[] timeSerie = tourData.timeSerie;
-		final int[] distanceSerie = tourData.distanceSerie;
-		final int[] altitudeSerie = tourData.altitudeSerie;
-
-		final int altimeterSerie[] = tourData.altimeterSerie = new int[timeSerie.length];
-		final int gradientSerie[] = tourData.gradientSerie = new int[timeSerie.length];
-
-		final int altimeterAvg[] = { 0, 0, 0 };
-		final int sliceAvg[] = { 0, 0, 0 };
-
-		final int distanceSum[] = { 0, 0, 0 };
-		final int altitudeSum[] = { 0, 0, 0 };
-
-		int index = 0;
-		int altitudeLast = altitudeSerie[index];
-		int distanceLast = distanceSerie[index];
-		int timeAbs = altitudeSerie[index];
-
-		// convert data from the tour format into an interger[]
-		for (final int timeSlice : timeSerie) {
-
-			// first value is the absolute altitude
-			final int altitudeDiff = altitudeSerie[index] - altitudeLast;
-			final int distanceDiff = distanceSerie[index] - distanceLast;
-			final int timeDiff = timeSlice - timeAbs;
-
-			// compute altimeter as an average of multiple values
-			for (int avgIndex = altimeterAvg.length - 1; avgIndex >= 0; avgIndex--) {
-				if (avgIndex > 0) {
-					altimeterAvg[avgIndex] = altimeterAvg[avgIndex - 1] + altitudeDiff;
-					sliceAvg[avgIndex] = sliceAvg[avgIndex - 1] + timeDiff;
-				} else {
-					// set current value
-					altimeterAvg[avgIndex] = altitudeDiff;
-					sliceAvg[avgIndex] = timeDiff;
-				}
-			}
-
-			// compute gradient as an average of multiple values
-			for (int sumIndex = distanceSum.length - 1; sumIndex >= 0; sumIndex--) {
-				if (sumIndex > 0) {
-					distanceSum[sumIndex] = distanceSum[sumIndex - 1] + distanceDiff;
-					altitudeSum[sumIndex] = altitudeSum[sumIndex - 1] + altitudeDiff;
-				} else {
-					// set current value
-					distanceSum[sumIndex] = distanceDiff;
-					altitudeSum[sumIndex] = altitudeDiff;
-				}
-			}
-
-			// keep altimeter data
-			final float slicePerHour = 3600f / (sliceAvg[sliceAvg.length - 1] / sliceAvg.length);
-			altimeterSerie[index] = (int) (((float) altimeterAvg[altimeterAvg.length - 1]
-					/ altimeterAvg.length * slicePerHour));
-
-			// keep gradient data
-			final int distanceSumTotal = distanceSum[distanceSum.length - 1];
-			final int altitudeSumTotal = altitudeSum[altitudeSum.length - 1];
-			gradientSerie[index] = distanceSumTotal == 0
-					? 0
-					: (altitudeSumTotal * 1000 / distanceSumTotal);
-
-			// prepare next iteration
-			altitudeLast = altitudeSerie[index];
-			distanceLast = distanceSerie[index];
-			timeAbs = timeSlice;
-
-			index++;
-		}
-	}
-
-	/**
-	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
-	 * 
-	 * @param tourData
-	 */
-	private void createAltiGradiSerie(TourData tourData) {
-
-		// if (tourData.altimeterSerie != null) {
-		// return;
-		// }
-
-		final int serieLength = tourData.timeSerie.length;
-
-		final int altimeterSerie[] = tourData.altimeterSerie = new int[serieLength];
-		final int gradientSerie[] = tourData.gradientSerie = new int[serieLength];
-
-		int deviceTimeInterval = tourData.getDeviceTimeInterval();
-
-		int indexLowAdjustment;
-		int indexHighAdjustment;
-
-		if (deviceTimeInterval <= 2) {
-			indexLowAdjustment = 15;
-			indexHighAdjustment = 15;
-
-		} else if (deviceTimeInterval <= 5) {
-			indexLowAdjustment = 5;
-			indexHighAdjustment = 6;
-
-		} else if (deviceTimeInterval <= 10) {
-			indexLowAdjustment = 2;
-			indexHighAdjustment = 3;
-		} else {
-			indexLowAdjustment = 1;
-			indexHighAdjustment = 2;
-		}
-
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-
-			// adjust index to the array size
-			int indexLow = Math.min(Math.max(0, serieIndex - indexLowAdjustment), serieLength - 1);
-			int indexHigh = Math
-					.max(0, Math.min(serieIndex + indexHighAdjustment, serieLength - 1));
-
-			final int distance = tourData.distanceSerie[indexHigh]
-					- tourData.distanceSerie[indexLow];
-
-			final int altitude = tourData.altitudeSerie[indexHigh]
-					- tourData.altitudeSerie[indexLow];
-
-			final float timeInterval = deviceTimeInterval * (indexHigh - indexLow);
-
-			// keep altimeter data
-			altimeterSerie[serieIndex] = (int) (3600F * altitude / timeInterval);
-
-			// keep gradient data
-			gradientSerie[serieIndex] = distance == 0 ? 0 : altitude * 1000 / distance;
-
-			// System.out.println(""
-			// + (timeInterval + "\t")
-			// + (distance + "\t")
-			// + (altitude + "\t")
-			// + (tourData.distanceSerie[serieIndex] + "\t")
-			// + (tourData.altitudeSerie[serieIndex] + "\t")
-			// + (tourData.gradientSerie[serieIndex] + "\t")
-			// + "");
-		}
-	}
-
-	/**
 	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
 	 * 
 	 * @param tourData
@@ -885,12 +885,10 @@ public class TourManager {
 		for (int speedIndex = 0; speedIndex < serieLength; speedIndex++) {
 
 			// adjust index to the array size
-			int distIndexLow = Math.min(
-					Math.max(0, speedIndex - lowIndexAdjustmentDefault),
+			int distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustmentDefault),
 					serieLength - 1);
 
-			int distIndexHigh = Math.max(0, Math.min(
-					speedIndex + highIndexAdjustmentDefault,
+			int distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustmentDefault,
 					serieLength - 1));
 
 			int distanceDefault = tourData.distanceSerie[distIndexHigh]
@@ -913,8 +911,7 @@ public class TourManager {
 			// adjust index to the array size
 			distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustment), serieLength - 1);
 
-			distIndexHigh = Math
-					.max(0, Math.min(speedIndex + highIndexAdjustment, serieLength - 1));
+			distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustment, serieLength - 1));
 
 			final int distance = tourData.distanceSerie[distIndexHigh]
 					- tourData.distanceSerie[distIndexLow];
@@ -930,32 +927,6 @@ public class TourManager {
 
 			speedSerie[speedIndex] = speed;
 		}
-	}
-
-	/**
-	 * @param tourData
-	 * @param useNormalizedData
-	 */
-	// public void createTour(final TourData tourData) {
-	//
-	// openTourEditor(createTourEditorInput(tourData));
-	// }
-	/**
-	 * @param tourData
-	 * @param useNormalizedData
-	 */
-	public void createTour(TourData tourData, final boolean useNormalizedData) {
-
-		if (tourData.getTourPerson() != null) {
-			// load tour from database
-			tourData = TourDatabase.getTourDataByTourId(tourData.getTourId());
-		}
-
-		if (useNormalizedData) {
-			compareTour(tourData);
-		}
-
-		// openTourEditor(createTourEditorInput(tourData));
 	}
 
 //	/**
@@ -998,44 +969,29 @@ public class TourManager {
 //	}
 
 	/**
-	 * Opens the tour for the given tour id
-	 * 
-	 * @param tourId
+	 * @param tourData
+	 * @param useNormalizedData
 	 */
-	public void openTourInEditor(final long tourId) {
-
-		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
-					new TourEditorInput(tourId),
-					TourEditor.ID,
-					true);
-
-		} catch (final PartInitException e) {
-			e.printStackTrace();
-		}
-	}
-
+	// public void createTour(final TourData tourData) {
+	//
+	// openTourEditor(createTourEditorInput(tourData));
+	// }
 	/**
-	 * set the graph colors from the pref store
-	 * 
-	 * @param prefStore
-	 * @param yDataSerie
-	 * @param graphName
+	 * @param tourData
+	 * @param useNormalizedData
 	 */
-	public static void setChartColors(	final IPreferenceStore prefStore,
-										final ChartDataYSerie yDataSerie,
-										final String graphName) {
+	public void createTour(TourData tourData, final boolean useNormalizedData) {
 
-		final String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+		if (tourData.getTourPerson() != null) {
+			// load tour from database
+			tourData = TourManager.getInstance().getTourData(tourData.getTourId());
+		}
 
-		yDataSerie.setRgbLine(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
-				+ GraphColors.PREF_COLOR_LINE) });
+		if (useNormalizedData) {
+			compareTour(tourData);
+		}
 
-		yDataSerie.setRgbDark(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
-				+ GraphColors.PREF_COLOR_DARK) });
-
-		yDataSerie.setRgbBright(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
-				+ GraphColors.PREF_COLOR_BRIGHT) });
+		// openTourEditor(createTourEditorInput(tourData));
 	}
 
 	/**
@@ -1069,6 +1025,49 @@ public class TourManager {
 			oldDistance = distanceValues[oldIndex];
 		}
 		return ignoreTimeCounter;
+	}
+
+	/**
+	 * Get a tour from the cache, the cache is necessary because getting a tour from the database
+	 * creates always a new instance
+	 * 
+	 * @param tourId
+	 * @return Returns the tour data for the tour id or <code>null</code> when the tour is not in
+	 *         the database
+	 */
+	public TourData getTourData(Long tourId) {
+
+		if (fTourDataMap.containsKey(tourId)) {
+			return fTourDataMap.get(tourId);
+		}
+
+		TourData tourData = TourDatabase.getTourData(tourId);
+
+		// keep the tour data
+		if (tourData != null) {
+			fTourDataMap.put(tourId, tourData);
+			return tourData;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Opens the tour for the given tour id
+	 * 
+	 * @param tourId
+	 */
+	public void openTourInEditor(final long tourId) {
+
+		try {
+			PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow()
+					.getActivePage()
+					.openEditor(new TourEditorInput(tourId), TourEditor.ID, true);
+
+		} catch (final PartInitException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

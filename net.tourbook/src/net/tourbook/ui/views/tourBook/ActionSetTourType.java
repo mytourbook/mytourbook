@@ -24,6 +24,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ResizeableListDialog;
 
 import org.eclipse.jface.action.Action;
@@ -42,7 +43,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionSetTourType extends Action {
 
-	private static final String	MEMENTO_SELECTED_TOUR_TYPE_ID	= "action-save-tour-type.selected-tour-type-id"; //$NON-NLS-1$
+	private static final String	MEMENTO_SELECTED_TOUR_TYPE_ID	= "action-save-tour-type.selected-tour-type-id";	//$NON-NLS-1$
 
 	private TourBookView		fViewPart;
 
@@ -54,6 +55,7 @@ public class ActionSetTourType extends Action {
 	private class TourTypeContentProvider implements IStructuredContentProvider {
 
 		public void dispose() {}
+
 		public Object[] getElements(Object inputElement) {
 			return fTourTypes.toArray();
 		}
@@ -104,8 +106,7 @@ public class ActionSetTourType extends Action {
 	public void run() {
 
 		/*
-		 * create a list with all tour types which does not contain the fake
-		 * type id's
+		 * create a list with all tour types which does not contain the fake type id's
 		 */
 
 		ArrayList<TourType> pluginTourTypes = TourbookPlugin.getDefault().getTourTypes();
@@ -138,8 +139,7 @@ public class ActionSetTourType extends Action {
 				boolean isModified = false;
 
 				// get selected tours
-				final IStructuredSelection selectedTours = ((IStructuredSelection) fViewPart
-						.getTourViewer()
+				final IStructuredSelection selectedTours = ((IStructuredSelection) fViewPart.getTourViewer()
 						.getSelection());
 
 				TourData firstSelectedTourData = null;
@@ -153,8 +153,8 @@ public class ActionSetTourType extends Action {
 
 						TVITourBookTour tviTour = ((TVITourBookTour) selObject);
 
-						final TourData tourData = TourDatabase.getTourDataByTourId(tviTour
-								.getTourId());
+						final TourData tourData = TourManager.getInstance()
+								.getTourData(tviTour.getTourId());
 
 						if (tourData != null) {
 
@@ -179,20 +179,21 @@ public class ActionSetTourType extends Action {
 					fSelectedTourType = tourType;
 
 					fViewPart.getTourViewer().update(selectedTours.toArray(), null);
-					fViewPart.refreshStatistics();
+//					fViewPart.refreshStatistics();
 
 					if (firstSelectedTourData != null) {
-						fViewPart.refreshTour(firstSelectedTourData);
+//						fViewPart.refreshTour(firstSelectedTourData);
 					}
 
 					// reselect the first tour, to force the statistic to reselect the tour
-					fViewPart.getTourViewer().setSelection(
-							new StructuredSelection(selectedTours.getFirstElement()));
-					
+					fViewPart.getTourViewer()
+							.setSelection(new StructuredSelection(selectedTours.getFirstElement()));
+
 					// update views which display the tour type (raw data view) 
-					TourbookPlugin.getDefault().getPreferenceStore().setValue(
-							ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
-							Math.random());
+					TourbookPlugin.getDefault()
+							.getPreferenceStore()
+							.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
+									Math.random());
 				}
 			}
 		};
@@ -234,7 +235,7 @@ public class ActionSetTourType extends Action {
 		}
 
 		dialog.create();
-		
+
 		// disable ok button when no tour types are available
 		if (fTourTypes.size() == 0) {
 			dialog.getOkButton().setEnabled(false);

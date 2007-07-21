@@ -26,9 +26,9 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourPerson;
-import net.tourbook.ui.ITourChartViewer;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -49,8 +49,8 @@ public class StatisticMonth extends YearStatistic {
 	}
 
 	public void createControl(	Composite parent,
-								ITourChartViewer tourChartViewer,
-								ToolBarManager tbm) {
+								ToolBarManager tbm,
+								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 

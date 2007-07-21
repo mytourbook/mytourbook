@@ -27,7 +27,9 @@ import net.tourbook.chart.ChartMarker;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourDataSelection;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourBook.MarkerDialog;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -78,7 +80,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMarkerView extends ViewPart {
 
-	public static final String		ID						= "net.tourbook.views.TourMarkerView";			//$NON-NLS-1$
+	public static final String		ID						= "net.tourbook.views.TourMarkerView";				//$NON-NLS-1$
 
 	public static final int			COLUMN_TIME				= 0;
 	public static final int			COLUMN_DISTANCE			= 1;
@@ -96,8 +98,7 @@ public class TourMarkerView extends ViewPart {
 	private PostSelectionProvider	fPostSelectionProvider;
 
 	private NumberFormat			fNF						= NumberFormat.getNumberInstance();
-	private final DateFormat		fDF						= DateFormat
-																	.getTimeInstance(DateFormat.DEFAULT);
+	private final DateFormat		fDF						= DateFormat.getTimeInstance(DateFormat.DEFAULT);
 	final Calendar					fCalendar				= GregorianCalendar.getInstance();
 
 	private boolean					fIsMarkerDirty;
@@ -200,8 +201,7 @@ public class TourMarkerView extends ViewPart {
 
 		protected CellEditor getCellEditor(Object element) {
 
-			ComboBoxCellEditor positionEditor = new ComboBoxCellEditor(
-					fMarkerViewer.getTable(),
+			ComboBoxCellEditor positionEditor = new ComboBoxCellEditor(fMarkerViewer.getTable(),
 					TourMarker.visualPositionLabels,
 					SWT.READ_ONLY);
 
@@ -319,7 +319,7 @@ public class TourMarkerView extends ViewPart {
 		addSelectionListener();
 
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
-		
+
 		// show current selected chart if there are any
 		ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
 		if (selection != null) {
@@ -346,8 +346,7 @@ public class TourMarkerView extends ViewPart {
 		table.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 
-				IStructuredSelection selection = (IStructuredSelection) fMarkerViewer
-						.getSelection();
+				IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
 
 				if (selection.size() > 0) {
 					if (e.keyCode == SWT.CR) {
@@ -380,16 +379,16 @@ public class TourMarkerView extends ViewPart {
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
 		tvc.setLabelProvider(labelProvider);
 		tvc.getColumn().setText(Messages.TourMarker_Column_time);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(12), false));
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(12),
+				false));
 
 		// column: km
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
 		tvc.getColumn().setText(Messages.TourMarker_Column_km);
 		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_km_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(8), false));
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8),
+				false));
 
 		// column: remark
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
@@ -410,16 +409,16 @@ public class TourMarkerView extends ViewPart {
 		tvc.getColumn().setText(Messages.TourMarker_Column_horizontal_offset);
 		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_horizontal_offset_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(6), false));
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
+				false));
 
 		// column: vertical offset
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
 		tvc.getColumn().setText(Messages.TourMarker_Column_vertical_offset);
 		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_vertical_offset_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(6), false));
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
+				false));
 
 		/*
 		 * create table viewer
@@ -557,13 +556,14 @@ public class TourMarkerView extends ViewPart {
 	}
 
 	private void onSelectionChanged(ISelection selection) {
-		if (selection instanceof TourDataSelection) {
+
+		if (selection instanceof SelectionTourData) {
 
 			saveMarker();
 
 			// a tour was selected, get the chart and update the marker viewer
 
-			fTourData = ((TourDataSelection) selection).getTourData();
+			fTourData = ((SelectionTourData) selection).getTourData();
 
 			if (fTourData == null) {
 
@@ -577,6 +577,19 @@ public class TourMarkerView extends ViewPart {
 
 				fMarkerViewer.setInput(this);
 
+				fPageBook.showPage(fPageViewer);
+			}
+
+		} else if (selection instanceof SelectionTourId) {
+
+			SelectionTourId tourIdSelection = (SelectionTourId) selection;
+
+			final TourData tourData = TourManager.getInstance()
+					.getTourData(tourIdSelection.getTourId());
+
+			if (tourData != null) {
+				fTourData = tourData;
+				fMarkerViewer.setInput(this);
 				fPageBook.showPage(fPageViewer);
 			}
 		}

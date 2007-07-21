@@ -34,7 +34,7 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourItem;
-import net.tourbook.tour.TourDataSelection;
+import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ColumnManager;
@@ -161,7 +161,7 @@ public class RawDataView extends ViewPart {
 
 				final String property = event.getProperty();
 
-				if (property.equals(ITourbookPreferences.APP_UPDATE_DATA_FILTER)) {
+				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 					if (fIsPartVisible) {
 						updateViewerPersonData();
 					} else {
@@ -385,21 +385,14 @@ public class RawDataView extends ViewPart {
 		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				IStructuredSelection selection = (IStructuredSelection) fTourViewer.getSelection();
-				if (selection != null) {
 
-					final TourData tourData = (TourData) selection.getFirstElement();
+				final TourData tourData = (TourData) selection.getFirstElement();
 
-//					if (tourData == null) {
-//						return;
-//					}
-					fPostSelectionProvider.setSelection(new TourDataSelection(tourData));
-
-//					// reduce functionality when the tour is not saved
-//					if (tourData.getTourPerson() == null) {
-//						fPostSelectionProvider.setSelection(new TourDataSelection(null));
-//					} else {
-//					}
+				if (tourData == null) {
+					return;
 				}
+
+				fPostSelectionProvider.setSelection(new SelectionTourData(tourData));
 			}
 		});
 	}
@@ -751,15 +744,15 @@ public class RawDataView extends ViewPart {
 //
 //				updateViewer();
 //
-				// restore selected tour
-				final Integer selectedTourIndex = memento.getInteger(MEMENTO_SELECTED_TOUR_INDEX);
+					// restore selected tour
+					final Integer selectedTourIndex = memento.getInteger(MEMENTO_SELECTED_TOUR_INDEX);
 //				fTourViewer.getTable().select(selectedTourIndex);
 //				fTourViewer.getTable().showSelection();
-						
-				Object tourData = fTourViewer.getElementAt(selectedTourIndex);
-				fTourViewer.setSelection(new StructuredSelection(tourData), true);
 
-						//				selectTour((StructuredSelection) fTourViewer.getSelection());
+					Object tourData = fTourViewer.getElementAt(selectedTourIndex);
+					fTourViewer.setSelection(new StructuredSelection(tourData), true);
+
+					//				selectTour((StructuredSelection) fTourViewer.getSelection());
 
 //					final TourData firstTourData = (TourData) fTourViewer.getElementAt(0);
 //					if (firstTourData != null) {

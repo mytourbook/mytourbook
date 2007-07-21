@@ -37,8 +37,7 @@ public class StatisticDayDistance extends StatisticDay {
 		/*
 		 * Distance
 		 */
-		ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fDistanceLow,
 				tourTimeData.fDistanceHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
@@ -58,7 +57,7 @@ public class StatisticDayDistance extends StatisticDay {
 		int yearDays = fCalendar.get(Calendar.DAY_OF_YEAR);
 		chartModel.setChartMinWidth(yearDays);
 
-		ProviderTourDay.getInstance().setChartProviders(fChart, chartModel, fTourChartViewer);
+		ProviderTourDay.getInstance().setChartProviders(fChart, chartModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartModel);

@@ -97,8 +97,7 @@ public class StatisticDayCombined extends StatisticDay {
 
 		ProviderTourDay.getInstance().setChartProviders(
 				fChart,
-				chartModel,
-				fTourChartViewer);
+				chartModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartModel);

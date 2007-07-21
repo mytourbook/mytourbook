@@ -29,7 +29,7 @@ import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.tour.TourChartSelection;
+import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourManager;
 
@@ -638,8 +638,8 @@ public class TourChartAnalyzerView extends ViewPart {
 					}
 				}
 
-				if (selection instanceof TourChartSelection) {
-					TourChart tourChart = ((TourChartSelection) selection).getTourChart();
+				if (selection instanceof SelectionTourChart) {
+					TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
 					if (tourChart != null) {
 						updateInfo(tourChart.getChartInfo());
 					}

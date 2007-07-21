@@ -21,6 +21,7 @@ import net.tourbook.importdata.ActionImportFromDeviceDirect;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.views.ActionOpenView;
 import net.tourbook.ui.views.TourChartView;
+import net.tourbook.ui.views.TourStatisticsView;
 import net.tourbook.ui.views.rawData.ActionImportFromFile;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
@@ -59,13 +60,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private ActionImportFromFile			fActionImportFromFile;
 	private ActionImportFromDevice			fActionImportFromDevice;
 	private ActionImportFromDeviceDirect	fActionImportFromDeviceDirect;
-	private ActionOpenView					fActionRawDataView;
 
+	private ActionOpenView					fActionRawDataView;
+	private ActionOpenView					fActionStatisticsView;
 	private ActionOpenView					fActionTourBookView;
 	private ActionOpenView					fActionTourMapView;
 	private ActionOpenView					fActionTourChartView;
-
 	private ActionOpenView					fActionTourCompareView;
+
 	private Action							fActionTourCompareWizard;
 
 	private IWorkbenchAction				fActionPreferences;
@@ -114,6 +116,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				RawDataView.ID,
 				ICommandIds.CMD_OPENVIEW_IMPORTEDDATA,
 				Messages.Image_view_rawdata);
+
+		fActionStatisticsView= new ActionOpenView(
+				window,
+				"",
+				"",
+				TourStatisticsView.ID,
+				ICommandIds.CMD_OPENVIEW_STATISTICS,
+				Messages.Image_show_statistics);
 
 		fActionTourBookView = new ActionOpenView(
 				window,
@@ -215,6 +225,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		tourMenu.add(fActionRawDataView);
 		tourMenu.add(fActionTourBookView);
 		tourMenu.add(fActionTourMapView);
+		tourMenu.add(fActionStatisticsView);
 		tourMenu.add(new Separator());
 
 		tourMenu.add(fActionTourCompareWizard);
@@ -267,6 +278,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		openToolbar.add(fActionRawDataView);
 		openToolbar.add(fActionTourBookView);
 		openToolbar.add(fActionTourMapView);
+		openToolbar.add(fActionStatisticsView);
 
 		coolBar.add(new ToolBarContributionItem(openToolbar, "main")); //$NON-NLS-1$
 

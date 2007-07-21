@@ -103,7 +103,7 @@ public class TourEditor extends EditorPart {
 		fTourChartConfig = TourManager.createTourChartConfiguration();
 
 		// load the tourdata from the database
-		fTourData = TourDatabase.getTourDataByTourId(fEditorInput.fTourId);
+		fTourData = TourManager.getInstance().getTourData(fEditorInput.fTourId);
 
 		if (fTourData != null) {
 
@@ -126,7 +126,7 @@ public class TourEditor extends EditorPart {
 	}
 
 	public void setFocus() {
-		fPostSelectionProvider.setSelection(new TourDataSelection(fTourChart.fTourData));
+		fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart.fTourData));
 	}
 
 	private void setPostSelectionListener() {
@@ -136,8 +136,7 @@ public class TourEditor extends EditorPart {
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 
 				if (selection instanceof SelectionTourSegmentLayer) {
-					fTourChart
-							.updateSegmentLayer(((SelectionTourSegmentLayer) selection).isLayerVisible);
+					fTourChart.updateSegmentLayer(((SelectionTourSegmentLayer) selection).isLayerVisible);
 				}
 
 				if (selection instanceof SelectionChartXSliderPosition) {

@@ -13,28 +13,27 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.tour;
 
-import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
+import org.eclipse.jface.viewers.ISelection;
 
-import org.eclipse.jface.action.Action;
+/**
+ * selection is fired when a tour was selected
+ */
+public class SelectionTourChart implements ISelection {
 
-public class ActionShowViewDetailsDetail extends Action {
+	private TourChart	fTourChart;
 
-	private TourBookView	fViewer;
-
-	public ActionShowViewDetailsDetail(TourBookView view) {
-
-		super("", AS_CHECK_BOX); //$NON-NLS-1$
-
-		fViewer = view;
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_show_statistic_and_chart));
-		setToolTipText(Messages.TourBook_Action_show_statistic_and_chart_tooltip);
+	public SelectionTourChart(TourChart tourChart) {
+		fTourChart = tourChart;
 	}
 
-	public void run() {
-		fViewer.manageViewerVisibility(this);
+	public boolean isEmpty() {
+		return false;
 	}
+
+	public TourChart getTourChart() {
+		return fTourChart;
+	}
+
 }

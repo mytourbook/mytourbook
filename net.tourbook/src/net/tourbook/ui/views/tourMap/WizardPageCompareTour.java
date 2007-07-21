@@ -137,8 +137,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 			case COLUMN_RECORDING:
 				long recordingTime = row[COLUMN_RECORDING];
-				return new Formatter().format(
-						Messages.Format_hhmm,
+				return new Formatter().format(Messages.Format_hhmm,
 						(recordingTime / 3600),
 						((recordingTime % 3600) / 60)).toString();
 
@@ -198,8 +197,8 @@ public class WizardPageCompareTour extends WizardPage {
 		fPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		fTourChart = new TourChart(fPageBook, SWT.NONE, true);
-		fTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(
-				SWT.COLOR_WIDGET_BACKGROUND));
+		fTourChart.setBackgroundColor(parent.getDisplay()
+				.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		fPageNoTourIsSelected = new Label(fPageBook, SWT.NONE);
 		fPageNoTourIsSelected.setText(Messages.TourMapWizard_Label_a_tour_is_not_selected);
@@ -314,8 +313,8 @@ public class WizardPageCompareTour extends WizardPage {
 				if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
 
 					// get tour data from the database
-					final TourData tourData = TourDatabase
-							.getTourDataByTourId(tourItem.getTourId());
+					final TourData tourData = TourManager.getInstance()
+							.getTourData(tourItem.getTourId());
 
 					// set the altitude visible
 					TourChartConfiguration chartConfig = new TourChartConfiguration(true);
@@ -323,8 +322,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 					fTourChart.updateChart(tourData, chartConfig, false);
 
-					fChartGroup.setText(NLS.bind(
-							Messages.TourMapWizard_Group_selected_tour_2,
+					fChartGroup.setText(NLS.bind(Messages.TourMapWizard_Group_selected_tour_2,
 							TourManager.getTourDate(tourData)));
 					fPageBook.showPage(fTourChart);
 				} else {

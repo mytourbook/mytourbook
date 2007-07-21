@@ -26,9 +26,11 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourPerson;
-import net.tourbook.ui.ITourChartViewer;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -38,8 +40,6 @@ public class StatisticTourTime extends YearStatistic {
 	private long						fActiveTypeId;
 	private int							fCurrentYear;
 
-	private ITourChartViewer			fTourChartViewer;
-
 	private final Calendar				fCalendar		= GregorianCalendar.getInstance();
 
 	private Chart						fChart;
@@ -48,17 +48,19 @@ public class StatisticTourTime extends YearStatistic {
 	private final BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
 	private boolean						fIsSynchScaleEnabled;
 
+	private IPostSelectionProvider		fPostSelectionProvider;
+
 	public boolean canTourBeVisible() {
 		return true;
 	}
 
 	public void createControl(	final Composite parent,
-								final ITourChartViewer tourChartViewer,
-								final ToolBarManager toolbarManager) {
+								final ToolBarManager toolbarManager,
+								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
-		fTourChartViewer = tourChartViewer;
+		fPostSelectionProvider = postSelectionProvider;
 
 		// chart widget page
 		fChart = new Chart(parent, SWT.BORDER | SWT.FLAT);
@@ -69,13 +71,15 @@ public class StatisticTourTime extends YearStatistic {
 
 		fChart.addSelectionChangedListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
-				fTourChartViewer.showTourChart(fTourTimeData.fTourIds[valueIndex]);
+				long tourId = fTourTimeData.fTourIds[valueIndex];
+				fPostSelectionProvider.setSelection(new SelectionTourId(tourId));
 			}
 		});
 
 		fChart.addDoubleClickListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
-				fTourChartViewer.openTourChart(fTourTimeData.fTourIds[valueIndex]);
+				long tourId = fTourTimeData.fTourIds[valueIndex];
+				TourManager.getInstance().openTourInEditor(tourId);
 			}
 		});
 	}
@@ -149,8 +153,7 @@ public class StatisticTourTime extends YearStatistic {
 		fActiveTypeId = type;
 		fCurrentYear = year;
 
-		fTourTimeData = ProviderTourTime.getInstance().getTourTimeData(
-				person,
+		fTourTimeData = ProviderTourTime.getInstance().getTourTimeData(person,
 				type,
 				year,
 				isRefreshDataWithReset() || refreshData);
@@ -174,8 +177,7 @@ public class StatisticTourTime extends YearStatistic {
 		chartModel.setXData(xData);
 
 		// set the bar low/high data
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				new int[][] { fTourTimeData.fTourTimeStartValues },
 				new int[][] { fTourTimeData.fTourTimeEndValues });
 		yData.setYTitle(Messages.LABEL_GRAPH_DAYTIME);
@@ -195,7 +197,7 @@ public class StatisticTourTime extends YearStatistic {
 		final int yearDays = fCalendar.get(Calendar.DAY_OF_YEAR);
 		chartModel.setChartMinWidth(yearDays);
 
-		ProviderTourTime.getInstance().setChartProviders(fChart, chartModel, fTourChartViewer);
+		ProviderTourTime.getInstance().setChartProviders(fChart, chartModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartModel);

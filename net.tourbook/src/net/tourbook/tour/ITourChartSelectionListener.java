@@ -17,6 +17,6 @@ package net.tourbook.tour;
 
 public interface ITourChartSelectionListener {
 
-	void selectedTourChart(TourChartSelection tourChart);
+	void selectedTourChart(SelectionTourChart tourChart);
 
 }

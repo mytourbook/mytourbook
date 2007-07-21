@@ -30,5 +30,6 @@ public interface ICommandIds {
 	public static final String	CMD_OPENVIEW_TOURCOMPARER	= "Tourbook.openViewTourCompare";	//$NON-NLS-1$
 	public static final String	CMD_OPENVIEW_TOURFINDER		= "Tourbook.openViewTourviewer";	//$NON-NLS-1$
 	public static final String	CMD_OPENVIEW_TOURCHART		= "Tourbook.openViewTourChart";	//$NON-NLS-1$
+	public static final String	CMD_OPENVIEW_STATISTICS		= "Tourbook.openViewStatistics";	//$NON-NLS-1$
 
 }

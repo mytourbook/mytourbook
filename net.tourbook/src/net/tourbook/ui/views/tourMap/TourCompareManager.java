@@ -139,7 +139,7 @@ public class TourCompareManager {
 					}
 
 					// load compare tour from the database
-					TourData compareTourData = TourDatabase.getTourDataByTourId(tourId);
+					TourData compareTourData = TourManager.getInstance().getTourData(tourId);
 
 					if (compareTourData.timeSerie.length > 0) {
 
@@ -152,8 +152,7 @@ public class TourCompareManager {
 							}
 
 							// compare the tour
-							TVICompareResult compareResult = compareTour(
-									refTourIndex,
+							TVICompareResult compareResult = compareTour(refTourIndex,
 									compareTourData);
 
 							// ignore tours which could not be compared
@@ -167,8 +166,8 @@ public class TourCompareManager {
 
 							// update the message in the progress monitor
 							tourCounter++;
-							monitor.subTask(NLS.bind(Messages.TourMap_Compare_job_subtask, Integer
-									.toString(tourCounter)));
+							monitor.subTask(NLS.bind(Messages.TourMap_Compare_job_subtask,
+									Integer.toString(tourCounter)));
 
 							monitor.worked(1);
 						}
@@ -192,16 +191,14 @@ public class TourCompareManager {
 
 				if (window != null) {
 					try {
-						tourComparerView = (CompareResultView) window.getActivePage().showView(
-								CompareResultView.ID,
-								null,
-								IWorkbenchPage.VIEW_ACTIVATE);
+						tourComparerView = (CompareResultView) window.getActivePage()
+								.showView(CompareResultView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
 						tourComparerView.updateViewer();
 
 					} catch (PartInitException e) {
 						ErrorDialog.openError(window.getShell(), "Error", e.getMessage(), e //$NON-NLS-1$
-								.getStatus());
+						.getStatus());
 					}
 				}
 
@@ -246,8 +243,7 @@ public class TourCompareManager {
 		final int[] compareTourDataTime = compareTourData.timeSerie;
 
 		// normalize the tour which will be compared
-		compareTourNormalizer.normalizeAltitude(
-				compareTourData,
+		compareTourNormalizer.normalizeAltitude(compareTourData,
 				0,
 				compareTourDataDistance.length - 1);
 		int[] normCompDistances = compareTourNormalizer.getNormalizedDistance();
@@ -360,8 +356,7 @@ public class TourCompareManager {
 
 		// remove the breaks from the time
 		int timeInterval = compareTourDataTime[1] - compareTourDataTime[0];
-		int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(
-				compareTourDataTime,
+		int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(compareTourDataTime,
 				compareIndexStart,
 				compareIndexEnd,
 				10 / timeInterval);

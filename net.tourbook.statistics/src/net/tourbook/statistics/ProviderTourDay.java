@@ -274,8 +274,10 @@ public class ProviderTourDay extends DataProvider implements IMonthProvider {
 	}
 
 	public void setChartProviders(	final Chart chartWidget,
-									final ChartDataModel chartModel,
-									final ITourChartViewer tourChartViewer) {
+									final ChartDataModel chartModel
+//									,
+//									final ITourChartViewer tourChartViewer
+									) {
 
 		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, new IChartInfoProvider() {
 			public String getInfo(final int serieIndex, final int valueIndex) {

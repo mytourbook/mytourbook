@@ -15,13 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import net.tourbook.Messages;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -34,8 +28,6 @@ public class ActionAdjustAltitude extends Action {
 	private TourChart				fTourChart;
 
 	private TreeViewer				fTreeViewer;
-	private TourChart				fTreeTourChart;
-	private long					fTreeTourId;
 
 	private AdjustAltitudeDialog	fDialog;
 
@@ -43,7 +35,7 @@ public class ActionAdjustAltitude extends Action {
 
 		super("AdjustAltitude", AS_PUSH_BUTTON); //$NON-NLS-1$
 
-		this.fTourChart = tourChart;
+		fTourChart = tourChart;
 
 		setText(Messages.Tour_Action_adjust_tour_altitude);
 		setToolTipText(Messages.Tour_Action_adjust_tour_altitude_tooltip);
@@ -54,7 +46,6 @@ public class ActionAdjustAltitude extends Action {
 	public ActionAdjustAltitude(TreeViewer treeViewer, TourChart treeTourChart) {
 		setText(Messages.Tour_Action_adjust_tour_altitude);
 		fTreeViewer = treeViewer;
-		fTreeTourChart = treeTourChart;
 	}
 
 	public void run() {
@@ -81,56 +72,56 @@ public class ActionAdjustAltitude extends Action {
 		}
 	}
 
-	private void adjustTreeViewerAltitude() {
+//	private void adjustTreeViewerAltitude() {
+//
+//		IStructuredSelection treeSelection = (IStructuredSelection) fTreeViewer.getSelection();
+//
+//		boolean firstTour = false;
+//
+//		// loop: all selections in the tree
+//		for (Iterator iter = treeSelection.iterator(); iter.hasNext();) {
+//
+//			Object item = iter.next();
+//
+//			if (item instanceof TreeViewerTourItem) {
+//				TreeViewerTourItem tti = (TreeViewerTourItem) item;
+//
+//				TourData tourData = TourManager.getInstance().getTourData(tti.getTourId());
+//
+//				if (tourData != null) {
+//
+//					// adjustAltitude(tourData);
+//
+//					/*
+//					 * set the tour id for the chart which will be updated
+//					 */
+//					if (firstTour == false) {
+//						firstTour = true;
+//						fTreeTourId = tourData.getTourId();
+//					}
+//				}
+//			}
+//		}
+//	}
 
-		IStructuredSelection treeSelection = (IStructuredSelection) fTreeViewer.getSelection();
-
-		boolean firstTour = false;
-
-		// loop: all selections in the tree
-		for (Iterator iter = treeSelection.iterator(); iter.hasNext();) {
-
-			Object item = iter.next();
-
-			if (item instanceof TreeViewerTourItem) {
-				TreeViewerTourItem tti = (TreeViewerTourItem) item;
-
-				TourData tourData = TourDatabase.getTourDataByTourId(tti.getTourId());
-
-				if (tourData != null) {
-
-					// adjustAltitude(tourData);
-
-					/*
-					 * set the tour id for the chart which will be updated
-					 */
-					if (firstTour == false) {
-						firstTour = true;
-						fTreeTourId = tourData.getTourId();
-					}
-				}
-			}
-		}
-	}
-
-	private void adjustChartAltitude() {
-
-		ArrayList<ChartDataYSerie> yDataList = fTourChart.getChartDataModel().getYData();
-		int[][] altitude = null;
-
-		// get altitude data from all y-data
-		for (ChartDataYSerie yData : yDataList) {
-			Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
-			if (yDataInfo == TourManager.GRAPH_ALTITUDE) {
-				altitude = yData.getHighValues();
-			}
-		}
-
-		if (altitude == null || altitude.length == 0) {
-			return;
-		}
-
-		// adjustAltitude(fTourChart.fTourData);
-	}
+//	private void adjustChartAltitude() {
+//
+//		ArrayList<ChartDataYSerie> yDataList = fTourChart.getChartDataModel().getYData();
+//		int[][] altitude = null;
+//
+//		// get altitude data from all y-data
+//		for (ChartDataYSerie yData : yDataList) {
+//			Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+//			if (yDataInfo == TourManager.GRAPH_ALTITUDE) {
+//				altitude = yData.getHighValues();
+//			}
+//		}
+//
+//		if (altitude == null || altitude.length == 0) {
+//			return;
+//		}
+//
+//		// adjustAltitude(fTourChart.fTourData);
+//	}
 
 }

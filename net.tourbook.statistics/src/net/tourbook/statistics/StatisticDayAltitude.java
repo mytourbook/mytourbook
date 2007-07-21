@@ -60,8 +60,10 @@ public class StatisticDayAltitude extends StatisticDay {
 
 		ProviderTourDay.getInstance().setChartProviders(
 				fChart,
-				chartModel,
-				fTourChartViewer);
+				chartModel
+//				,
+//				fTourChartViewer
+				);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartModel);

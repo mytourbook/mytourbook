@@ -32,7 +32,6 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.util.ArrayListToArray;
 
 public class ProviderTourTime extends DataProvider implements IMonthProvider {
@@ -139,8 +138,7 @@ public class ProviderTourTime extends DataProvider implements IMonthProvider {
 				final int duration = drivingTime == 0 ? recordingTime : drivingTime;
 
 				// get date
-				fCalendar.set(
-						result.getShort(2),
+				fCalendar.set(result.getShort(2),
 						tourMonth,
 						result.getShort(4),
 						startHour,
@@ -157,8 +155,8 @@ public class ProviderTourTime extends DataProvider implements IMonthProvider {
 				durationList.add(duration);
 
 				/*
-				 * convert type id to the type index in the tour types list
-				 * which is also the color index
+				 * convert type id to the type index in the tour types list which is also the color
+				 * index
 				 */
 				int colorIndex = 0;
 				final Long dbTypeIdObject = (Long) result.getObject(11);
@@ -209,9 +207,8 @@ public class ProviderTourTime extends DataProvider implements IMonthProvider {
 
 		return fTourTimeData;
 	}
-	void setChartProviders(	final Chart chartWidget,
-							final ChartDataModel chartModel,
-							final ITourChartViewer tourChartViewer) {
+
+	void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
 
 		chartModel.setCustomData(
 
@@ -249,12 +246,11 @@ public class ProviderTourTime extends DataProvider implements IMonthProvider {
 				final int[] endValue = fTourTimeData.fTourTimeEndValues;
 				final int[] durationValue = fTourTimeData.fTourTimeDurationValues;
 
-				final String barInfo = new Formatter().format(
-						Messages.TOURTIMEINFO_DATE_FORMAT
-								+ Messages.TOURTIMEINFO_DISTANCE
-								+ Messages.TOURTIMEINFO_ALTITUDE
-								+ Messages.TOURTIMEINFO_DURATION
-								+ Messages.TOURTIMEINFO_TOUR_TYPE,
+				final String barInfo = new Formatter().format(Messages.TOURTIMEINFO_DATE_FORMAT
+						+ Messages.TOURTIMEINFO_DISTANCE
+						+ Messages.TOURTIMEINFO_ALTITUDE
+						+ Messages.TOURTIMEINFO_DURATION
+						+ Messages.TOURTIMEINFO_TOUR_TYPE,
 						fCalendar.get(Calendar.DAY_OF_MONTH),
 						fCalendar.get(Calendar.MONTH) + 1,
 						fCalendar.get(Calendar.YEAR),
@@ -273,8 +269,7 @@ public class ProviderTourTime extends DataProvider implements IMonthProvider {
 		});
 
 		// set the menu context provider
-		chartModel.setCustomData(
-				ChartDataModel.BAR_CONTEXT_PROVIDER,
+		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER,
 				new ContextProviderZoomIntoMonth(chartWidget, this));
 	}
 
