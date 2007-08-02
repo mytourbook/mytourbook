@@ -1,12 +1,13 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Chart-Engine
-Bundle-SymbolicName: net.tourbook.chart
+Bundle-SymbolicName: net.tourbook.chart;singleton:=true
 Bundle-Version: 0.8.8.v2007-05-15
 Bundle-Activator: net.tourbook.chart.Activator
 Bundle-Vendor: MyTourbook
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.core.expressions
 Eclipse-LazyStart: true
 Export-Package: net.tourbook.chart

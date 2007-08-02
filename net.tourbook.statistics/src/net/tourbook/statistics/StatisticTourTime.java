@@ -29,10 +29,10 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IActionBars;
 
 public class StatisticTourTime extends YearStatistic {
 
@@ -55,7 +55,7 @@ public class StatisticTourTime extends YearStatistic {
 	}
 
 	public void createControl(	final Composite parent,
-								final ToolBarManager toolbarManager,
+								final IActionBars actionBars,
 								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
@@ -64,12 +64,13 @@ public class StatisticTourTime extends YearStatistic {
 
 		// chart widget page
 		fChart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-		fChart.setToolBarManager(toolbarManager);
+		fChart.setActionBars(actionBars);
 		fChart.setShowPartNavigation(true);
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
 
-		fChart.addSelectionChangedListener(new IBarSelectionListener() {
+		
+		fChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 				long tourId = fTourTimeData.fTourIds[valueIndex];
 				fPostSelectionProvider.setSelection(new SelectionTourId(tourId));

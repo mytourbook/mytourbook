@@ -110,8 +110,10 @@ public class TourChartView extends ViewPart {
 		fTourChart = new TourChart(fPageBook, SWT.FLAT, false);
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
-		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager());
-		
+//		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager());
+
+		fTourChart.setActionBars(getViewSite().getActionBars());
+
 		// set chart title
 		fTourChart.addDataModelListener(new IDataModelListener() {
 			public void dataModelChanged(ChartDataModel chartDataModel) {
@@ -172,7 +174,8 @@ public class TourChartView extends ViewPart {
 
 			SelectionTourId tourIdSelection = (SelectionTourId) selection;
 
-			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+			final TourData tourData = TourManager.getInstance()
+					.getTourData(tourIdSelection.getTourId());
 
 			if (tourData != null) {
 				fTourData = tourData;

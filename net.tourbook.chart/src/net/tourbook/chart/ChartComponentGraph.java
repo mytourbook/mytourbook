@@ -3808,18 +3808,21 @@ public class ChartComponentGraph extends Canvas {
 
 	public boolean setFocus() {
 
+		boolean isFocus = false;
+
 		if (setFocusToControl()) {
 
-			// the focus is now visible at the chart
-
-			if (isFocusControl() == false) {
-				forceFocus();
+			// check if the chart has the focus
+			if (isFocusControl()) {
+				isFocus = true;
+			} else {
+				if (forceFocus()) {
+					isFocus = true;
+				}
 			}
-			return true;
-
-		} else {
-			return false;
 		}
+
+		return isFocus;
 	}
 
 	/**
@@ -3898,6 +3901,8 @@ public class ChartComponentGraph extends Canvas {
 			// System.out.println("setFocus");
 			fChart.fireFocusEvent();
 		}
+
+		ChartManager.getInstance().setActiveChart(isFocus ? fChart : null);
 
 		return isFocus;
 	}

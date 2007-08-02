@@ -16,31 +16,53 @@
 package net.tourbook.chart;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.ui.actions.RetargetAction;
 
-public class ChartAction extends Action {
+public class ChartAction {
 
-	private Chart	chartWidget;
+	private Chart	fChartWidget;
 
-	private int			actionId;
+	private Action	fAction;
 
-	public ChartAction(Chart chartWidget, int actionId, String text,
-			String toolTip, String[] image) {
+	public ChartAction(final Chart chartWidget, final int actionMapId, String actionId,
+			String commandId, String text, String toolTip, String[] image) {
 
-		super(text);
-		setToolTipText(toolTip);
+		fChartWidget = chartWidget;
 
-		this.chartWidget = chartWidget;
-		this.actionId = actionId;
+		fAction = new RetargetAction(actionId, text) {
+			public void run() {
+				chartWidget.performZoomAction(actionMapId);
+			}
+
+			public void runWithEvent(Event event) {
+				chartWidget.performZoomAction(actionMapId);
+			}
+		};
+
+		fAction.setToolTipText(toolTip);
 
 		if (image != null && image[0] != null) {
-			setImageDescriptor(Activator.getImageDescriptor(image[0]));
+			fAction.setImageDescriptor(Activator.getImageDescriptor(image[0]));
 		}
 		if (image != null && image[1] != null) {
-			setDisabledImageDescriptor(Activator.getImageDescriptor(image[1]));
+			fAction.setDisabledImageDescriptor(Activator.getImageDescriptor(image[1]));
 		}
+
+		// set the command id for key binding
+		fAction.setActionDefinitionId(commandId);
+
+		// bind the action handler to the action button/menu
+		fChartWidget.getActionBars().setGlobalActionHandler(actionId, fAction);
 	}
 
-	public void run() {
-		chartWidget.performZoomAction(actionId);
+	public IAction getAction() {
+		return fAction;
 	}
+
+	public void setEnabled(boolean isEnabled) {
+		fAction.setEnabled(isEnabled);
+	}
+
 }

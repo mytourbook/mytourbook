@@ -84,13 +84,15 @@ public class TourChart extends Chart {
 	private boolean					fIsTourDirty;
 	private boolean					fIsSegmentLayerVisible;
 
-	private boolean					fIsToolActions;
+	private boolean					fShowActions;
 
-	public TourChart(final Composite parent, final int style, boolean showToolActions) {
+//	private boolean					fIsToolActions;
+
+	public TourChart(final Composite parent, final int style, boolean showActions) {
 
 		super(parent, style);
 
-		fIsToolActions = showToolActions;
+		fShowActions = showActions;
 
 		setPrefListeners();
 
@@ -128,20 +130,23 @@ public class TourChart extends Chart {
 	 * @param label
 	 * @param toolTip
 	 * @param imageName
+	 * @param definitionId
 	 * @param isChecked
 	 * @return
 	 */
 	private ActionChangeGraphLayout createGraphAction(	final int id,
 														final String label,
 														final String toolTip,
-														final String imageName) {
+														final String imageName,
+														String definitionId) {
 
-		final ActionChangeGraphLayout action = new ActionChangeGraphLayout(
-				this,
+		final ActionChangeGraphLayout action = new ActionChangeGraphLayout(this,
 				id,
 				label,
 				toolTip,
 				imageName);
+
+//		action.setActionDefinitionId(definitionId);
 
 		fGraphActions.put(id, action);
 
@@ -169,8 +174,7 @@ public class TourChart extends Chart {
 			chartMarker.graphX = xAxisSerie[tourMarker.getSerieIndex()];
 
 			chartMarker.markerLabel = tourMarker.getLabel();
-			chartMarker.graphLabel = Integer.toString(fTourData.altitudeSerie[tourMarker
-					.getSerieIndex()]);
+			chartMarker.graphLabel = Integer.toString(fTourData.altitudeSerie[tourMarker.getSerieIndex()]);
 
 			chartMarker.serieIndex = tourMarker.getSerieIndex();
 			chartMarker.visualPosition = tourMarker.getVisualPosition();
@@ -249,37 +253,44 @@ public class TourChart extends Chart {
 		createGraphAction(TourManager.GRAPH_ALTITUDE,
 				Messages.Graph_Label_Altitude,
 				Messages.Tour_Action_graph_altitude_tooltip,
-				Messages.Image_graph_altitude);
+				Messages.Image_graph_altitude,
+				"net.tourbook.commands.graphLayout.altitude");
 
 		createGraphAction(TourManager.GRAPH_SPEED,
 				Messages.Graph_Label_Speed,
 				Messages.Tour_Action_graph_speed_tooltip,
-				Messages.Image_graph_speed);
+				Messages.Image_graph_speed,
+				"net.tourbook.commands.graphLayout.speed");
 
 		createGraphAction(TourManager.GRAPH_ALTIMETER,
 				Messages.Graph_Label_Altimeter,
 				Messages.Tour_Action_graph_altimeter_tooltip,
-				Messages.Image_graph_altimeter);
+				Messages.Image_graph_altimeter,
+				"net.tourbook.commands.graphLayout.altimeter");
 
 		createGraphAction(TourManager.GRAPH_PULSE,
 				Messages.Graph_Label_Heartbeat,
 				Messages.Tour_Action_graph_heartbeat_tooltip,
-				Messages.Image_graph_heartbeat);
+				Messages.Image_graph_heartbeat,
+				"net.tourbook.commands.graphLayout.pulse");
 
 		createGraphAction(TourManager.GRAPH_TEMPERATURE,
 				Messages.Graph_Label_Temperature,
 				Messages.Tour_Action_graph_temperature_tooltip,
-				Messages.Image_graph_temperature);
+				Messages.Image_graph_temperature,
+				"net.tourbook.commands.graphLayout.temperature");
 
 		createGraphAction(TourManager.GRAPH_CADENCE,
 				Messages.Graph_Label_Cadence,
 				Messages.Tour_Action_graph_cadence_tooltip,
-				Messages.Image_graph_cadence);
+				Messages.Image_graph_cadence,
+				"net.tourbook.commands.graphLayout.cadence");
 
 		createGraphAction(TourManager.GRAPH_GRADIENT,
 				Messages.Graph_Label_Gradiend,
 				Messages.Tour_Action_graph_gradient_tooltip,
-				Messages.Image_graph_gradient);
+				Messages.Image_graph_gradient,
+				"net.tourbook.commands.graphLayout.gradient");
 
 		fActionOptions = new ActionChartOptions(this, (ToolBarManager) tbm);
 
@@ -328,8 +339,7 @@ public class TourChart extends Chart {
 
 	public void dispose() {
 
-		TourbookPlugin
-				.getDefault()
+		TourbookPlugin.getDefault()
 				.getPluginPreferences()
 				.removePropertyChangeListener(fPrefChangeListener);
 
@@ -498,8 +508,7 @@ public class TourChart extends Chart {
 			// get altimeter data from all y-data
 			ChartDataYSerie yData = null;
 			for (final ChartDataYSerie yDataIterator : yDataList) {
-				final Integer yDataInfo = (Integer) yDataIterator
-						.getCustomData(ChartDataYSerie.YDATA_INFO);
+				final Integer yDataInfo = (Integer) yDataIterator.getCustomData(ChartDataYSerie.YDATA_INFO);
 				if (yDataInfo == yDataInfoId) {
 					yData = yDataIterator;
 				}
@@ -510,8 +519,7 @@ public class TourChart extends Chart {
 				if (isAltMinEnabled) {
 
 					// set to pref store min value
-					final int altMinValue = prefStore
-							.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
+					final int altMinValue = prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
 
 					yData.setVisibleMinValue(altMinValue);
 
@@ -541,8 +549,7 @@ public class TourChart extends Chart {
 				if (property.equals(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH)
 						|| property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
 
-					final IPreferenceStore prefStore = TourbookPlugin
-							.getDefault()
+					final IPreferenceStore prefStore = TourbookPlugin.getDefault()
 							.getPreferenceStore();
 
 					TourManager.updateZoomOptionsInChartConfig(fTourChartConfig, prefStore);
@@ -576,8 +583,7 @@ public class TourChart extends Chart {
 				}
 			}
 		};
-		TourbookPlugin
-				.getDefault()
+		TourbookPlugin.getDefault()
 				.getPluginPreferences()
 				.addPropertyChangeListener(fPrefChangeListener);
 
@@ -644,10 +650,8 @@ public class TourChart extends Chart {
 		} else {
 
 			// enable zoom action
-			tourChartListener.fActionOptions.actionCanScrollZoomedChart
-					.setChecked(tourChartListener.getCanScrollZoomedChart());
-			tourChartListener.fActionOptions.actionCanAutoZoomToSlider.setChecked(tourChartListener
-					.getCanAutoZoomToSlider());
+			tourChartListener.fActionOptions.actionCanScrollZoomedChart.setChecked(tourChartListener.getCanScrollZoomedChart());
+			tourChartListener.fActionOptions.actionCanAutoZoomToSlider.setChecked(tourChartListener.getCanAutoZoomToSlider());
 
 			tourChartListener.setEnabledZoomActions(true);
 			tourChartListener.setEnabledZoomOptions(true);
@@ -716,7 +720,7 @@ public class TourChart extends Chart {
 
 		fChartDataModel = TourManager.getInstance().createChartDataModel(tourData, chartConfig);
 
-		if (fShowZoomActions) {
+		if (fShowActions) {
 			createTourActions();
 			enableActions();
 		}

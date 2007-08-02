@@ -789,8 +789,11 @@ public class RawDataView extends ViewPart {
 				StringToArrayConverter.convertArrayToString(fColumnManager.getColumnIds()));
 
 		// save columns width
-		memento.putString(MEMENTO_COLUMN_WIDTH,
-				StringToArrayConverter.convertArrayToString(fColumnManager.getColumnIdAndWidth()));
+		final String[] columnIdAndWidth = fColumnManager.getColumnIdAndWidth();
+		if (columnIdAndWidth != null) {
+			memento.putString(MEMENTO_COLUMN_WIDTH,
+					StringToArrayConverter.convertArrayToString(columnIdAndWidth));
+		}
 	}
 
 	/**

@@ -65,19 +65,6 @@
                menubarPath="file/update">
          </action>
       </actionSet>
-      <actionSet
-            id="net.tourbook.tourEditor.actionSet"	
-            label="Tour Editor Action Set">
-         <action
-               id="net.tourbook.action1"
-               label="Edit Tour Markers"
-      		class="net.tourbook.tour.ActionOpenMarkerView"
-      		toolbarPath="Normal/exampleGroup"
-      		icon="icons/marker-editor.gif"
-      		tooltip="Sample toolbar action">
-   		</action>
-         
-      </actionSet>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -204,7 +191,6 @@
          point="org.eclipse.ui.editors">
       <editor
             class="net.tourbook.tour.TourEditor"
-            contributorClass="net.tourbook.tour.TourEditorActionBarContributor"
             icon="icons/tourfinder.gif"
             id="net.tourbook.tour.TourEditor"
             name="Tour Editor">
@@ -257,12 +243,145 @@
       </perspectiveExtension>
    </extension>
    <extension
-         point="org.eclipse.ui.actionSetPartAssociations">
-      <actionSetPartAssociation
-            targetID="net.tourbook.tourEditor.actionSet">
-         <part
-               id="net.tourbook.tour.TourEditor">
-         </part>
-      </actionSetPartAssociation>
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="net.tourbook.toolbars.graphs">
+            <command
+                  commandId="net.tourbook.commandId.graph.speed"
+                  disabledIcon="icons/graph-speed-disabled.gif"
+                  icon="icons/graph-speed.gif"
+                  id="net.tourbook.toolbar.graph.speed"
+                  label="Speed"
+                  style="toggle"
+                  tooltip="Show/Hide Speed">
+            </command>
+            <command
+                  commandId="net.tourbook.commandId.graph.altitude"
+                  disabledIcon="icons/graph-altitude-disabled.gif"
+                  icon="icons/graph-altitude.gif"
+                  id="net.tourbook.toolbar.graph.altitude"
+                  label="Altitude"
+                  style="toggle"
+                  tooltip="Show/Hide Altitude">
+            </command>
+            <command
+                  commandId="net.tourbook.commandId.graph.pulse"
+                  disabledIcon="icons/graph-pulse-disabled.gif"
+                  icon="icons/graph-pulse.gif"
+                  id="net.tourbook.toolbar.graph.pulse"
+                  label="Pulse"
+                  style="toggle"
+                  tooltip="Show/Hide Pulse">
+            </command>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="net.tourbook.menus.tourEditor"
+               label="Tour Editor"
+               mnemonic="E">
+            <command
+                  commandId="net.tourbook.commands.openMarkerView"
+                  icon="icons/marker-editor.gif"
+                  label="Open Markers"
+                  mnemonic="M">
+               <visibleWhen>
+                  <reference
+                        definitionId="net.tourbook.definition.activePartId_is_TourEditor">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="net.tourbook.toolbars.graphLayout">
+            <command
+                  commandId="net.tourbook.commandId.graph.altitude"
+                  disabledIcon="icons/graph-altitude-disabled.gif"
+                  icon="icons/graph-altitude.gif"
+                  id="net.tourbook.toolbar.graph.altitude"
+                  label="Altitude"
+                  style="toggle"
+                  tooltip="Show/Hide Altitude">
+            </command>
+         </toolbar>
+      </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="net.tourbook.commands.category.tourEditor"
+            name="Tour Editor">
+      </category>
+      <command
+            id="net.tourbook.commands.openMarkerView"
+            categoryId="net.tourbook.commands.category.tourEditor"
+            name="Open Markers">
+      </command>
+      <command
+            id="net.tourbook.commandId.graph.altitude"
+            categoryId="net.tourbook.commands.category.tourEditor"
+            name="Show/Hide Altitude">
+      </command>
+      <command
+            id="net.tourbook.commandId.graph.speed"
+            categoryId="net.tourbook.commands.category.tourEditor"
+            name="Show/Hide Speed">
+      </command>
+      <command
+            categoryId="net.tourbook.commands.category.tourEditor"
+            id="net.tourbook.commandId.graph.pulse"
+            name="Show/Hide Pulse">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="net.tourbook.tour.HandlerOpenMarkerView"
+            commandId="net.tourbook.commands.openMarkerView">
+      </handler>
+      <handler
+            class="net.tourbook.tour.HandlerGraphLayoutSpeed"
+            commandId="net.tourbook.commands.graphLayout.speed">
+         <activeWhen>
+            <reference
+                  definitionId="net.tourbook.definition.activePartId_contains_tourChart">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="net.tourbook.tour.HandlerGraphLayoutPulse"
+            commandId="net.tourbook.commands.graphLayout.pulse">
+         <activeWhen>
+            <reference
+                  definitionId="net.tourbook.definition.activeEditor">
+            </reference></activeWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="net.tourbook.definition.activePartId_contains_tourChart">
+         <with
+               variable="activePartId">
+            <or>
+               <equals
+                     value="net.tourbook.tour.xTourEditor">
+               </equals>
+               <equals
+                     value="net.tourbook.ui.views.xTourChartView">
+               </equals>
+            </or>
+         </with>
+      </definition>
+   </extension>
+
 </plugin>

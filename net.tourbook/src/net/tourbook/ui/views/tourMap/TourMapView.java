@@ -425,7 +425,7 @@ public class TourMapView extends SynchedChartView {
 
 		// year chart
 		fYearChart = new Chart(fPageBookYearChart, SWT.NONE);
-		fYearChart.addSelectionChangedListener(new IBarSelectionListener() {
+		fYearChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 
 				TVTITourMapComparedTour tourMapComparedTour = (TVTITourMapComparedTour) fYearMapTours[valueIndex];

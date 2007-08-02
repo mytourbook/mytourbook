@@ -18,6 +18,7 @@ package net.tourbook.tour;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Event;
 
 class ActionChangeGraphLayout extends Action {
 
@@ -66,6 +67,10 @@ class ActionChangeGraphLayout extends Action {
 
 		fTourChart.enableActions();
 		fTourChart.updateChart(true);
+	}
+
+	public void runWithEvent(Event event) {
+		super.runWithEvent(event);
 	}
 
 }

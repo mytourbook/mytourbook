@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="net.tourbook.chart.commandId.zoomIn"
+            name="Zoom In">
+      </command>
+      <command
+            id="net.tourbook.chart.commandId.zoomOut"
+            name="Zoom Out">
+      </command>
+   </extension>
+   
+   
+   
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="net.tourbook.chart.actionSet.chartActions"
+            label="Chart Actionset"
+            visible="true">
+         <action
+               definitionId="net.tourbook.chart.commandId.zoomOut"
+               disabledIcon="icons/zoom-out-disabled.gif"
+               icon="icons/zoom-out.gif"
+               id="net.tourbook.chart.actionId.zoomOut"
+               label="Zoom Out"
+               retarget="true"
+               style="push"
+               toolbarPath="normal/chart">
+         </action>
+         <action
+               definitionId="net.tourbook.chart.commandId.zoomIn"
+               disabledIcon="icons/zoom-in-disabled.gif"
+               icon="icons/zoom-in.gif"
+               id="net.tourbook.chart.actionId.zoomIn"
+               label="Zoom In"
+               retarget="true"
+               style="push"
+               toolbarPath="normal/chart">
+         </action>
+         <action
+               definitionId="net.tourbook.chart.commandId.fitGraph"
+               icon="icons/zoom-fit-graph.gif"
+               id="net.tourbook.chart.actionId.fitGraph"
+               label="Fit Graph"
+               retarget="true"
+               style="push"
+               toolbarPath="normal/chart">
+         </action>
+         <action
+               definitionId="net.tourbook.chart.commandId.nextPart"
+               disabledIcon="icons/arrow-right-disabled.gif"
+               icon="icons/arrow-right.gif"
+               id="net.tourbook.chart.actionId.nextPart"
+               label="Next Part"
+               retarget="true"
+               style="push"
+               toolbarPath="normal/chart">
+         </action>
+         <action
+               definitionId="net.tourbook.chart.commandId.previousPart"
+               disabledIcon="icons/arrow-left-disabled.gif"
+               icon="icons/arrow-left.gif"
+               id="net.tourbook.chart.actionId.previousPart"
+               label="Previous Part"
+               retarget="true"
+               style="push"
+               toolbarPath="normal/chart">
+         </action>
+      </actionSet>
+   </extension>
+
+</plugin>

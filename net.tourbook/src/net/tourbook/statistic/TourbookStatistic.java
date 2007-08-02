@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IActionBars;
 
 public abstract class TourbookStatistic {
 
@@ -33,11 +33,11 @@ public abstract class TourbookStatistic {
 	 * Create the statistic component
 	 * 
 	 * @param parent
-	 * @param toolbarManager
+	 * @param actionBars
 	 * @param postSelectionProvider
 	 */
 	public abstract void createControl(	Composite parent,
-										ToolBarManager toolbarManager,
+										IActionBars actionBars,
 										IPostSelectionProvider postSelectionProvider);
 
 	public Composite getControl() {

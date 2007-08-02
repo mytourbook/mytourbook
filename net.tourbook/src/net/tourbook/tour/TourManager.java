@@ -73,11 +73,6 @@ public class TourManager {
 
 	private HashMap<Long, TourData>	fTourDataMap			= new HashMap<Long, TourData>();
 
-	/**
-	 * local cache for tour editor inputs
-	 */
-	// private final HashMap<Long, TourEditorInput> tourCache = new
-	// HashMap<Long, TourEditorInput>();
 	private TourManager() {}
 
 	/**

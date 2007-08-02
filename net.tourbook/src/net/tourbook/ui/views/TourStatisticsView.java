@@ -162,7 +162,7 @@ public class TourStatisticsView extends ViewPart {
 		// set selection provider before the statistic container is created
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		fStatistics = new StatisticContainer(fPostSelectionProvider, parent, SWT.NONE);
+		fStatistics = new StatisticContainer(getViewSite().getActionBars(), fPostSelectionProvider, parent, SWT.NONE);
 
 //		createActions();
 

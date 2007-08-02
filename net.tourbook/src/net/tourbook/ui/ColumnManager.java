@@ -25,8 +25,10 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
 /**
@@ -218,12 +220,25 @@ public class ColumnManager {
 		ArrayList<String> columnIds = new ArrayList<String>();
 
 		if (fTableViewer != null) {
-			for (TableColumn column : fTableViewer.getTable().getColumns()) {
+		
+			final Table table = fTableViewer.getTable();
+			if (table.isDisposed()) {
+				return null;
+			}
+
+			for (TableColumn column : table.getColumns()) {
 				columnIds.add(((TableColumnDefinition) column.getData()).getColumnId());
 				columnIds.add(Integer.toString(column.getWidth()));
 			}
+	
 		} else {
-			for (TreeColumn column : fTreeViewer.getTree().getColumns()) {
+			
+			final Tree tree = fTreeViewer.getTree();
+			if (tree.isDisposed()) {
+				return null;
+			}
+
+			for (TreeColumn column : tree.getColumns()) {
 				columnIds.add(((TreeColumnDefinition) column.getData()).getColumnId());
 				columnIds.add(Integer.toString(column.getWidth()));
 			}
@@ -265,8 +280,7 @@ public class ColumnManager {
 		 */
 		readColumnsFromTable();
 
-		final int returnValue = (new ColumnModifyDialog(Display.getCurrent().getActiveShell(), this))
-				.open();
+		final int returnValue = (new ColumnModifyDialog(Display.getCurrent().getActiveShell(), this)).open();
 
 		if (returnValue == Window.OK) {
 
@@ -278,8 +292,7 @@ public class ColumnManager {
 
 				// show/hide column in the table
 				if (colDef instanceof TableColumnDefinition) {
-					final TableColumn tableColumn = ((TableColumnDefinition) colDef)
-							.getTableColumn();
+					final TableColumn tableColumn = ((TableColumnDefinition) colDef).getTableColumn();
 					if (isVisible) {
 						tableColumn.setWidth(colDef.getColumnWidth());
 						tableColumn.setResizable(colDef.isColumnResizable());
@@ -308,12 +321,11 @@ public class ColumnManager {
 	 * 
 	 * @param columnIds
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	public void orderColumns(final String[] columnIds) {
 
 		final ArrayList<ColumnDefinition> orderedColumns = new ArrayList<ColumnDefinition>();
-		final ArrayList<ColumnDefinition> deletedColumns = (ArrayList<ColumnDefinition>) fColumns
-				.clone();
+		final ArrayList<ColumnDefinition> deletedColumns = (ArrayList<ColumnDefinition>) fColumns.clone();
 
 		// create columns in the correct sort order
 		for (final String columnId : columnIds) {
@@ -340,12 +352,11 @@ public class ColumnManager {
 	 * 
 	 * @param tableItems
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	void orderColumns(final TableItem[] tableItems) {
 
 		final ArrayList<ColumnDefinition> sortedColumns = new ArrayList<ColumnDefinition>();
-		final ArrayList<ColumnDefinition> deletedColumns = (ArrayList<ColumnDefinition>) fColumns
-				.clone();
+		final ArrayList<ColumnDefinition> deletedColumns = (ArrayList<ColumnDefinition>) fColumns.clone();
 
 		// secreate columns in the correct sort order
 		for (final TableItem tableItem : tableItems) {
@@ -411,15 +422,13 @@ public class ColumnManager {
 
 				// set width
 				if (colDef instanceof TableColumnDefinition) {
-					final int columnWidth = ((TableColumnDefinition) colDef)
-							.getTableColumn()
+					final int columnWidth = ((TableColumnDefinition) colDef).getTableColumn()
 							.getWidth();
 					if (columnWidth > 0) {
 						colDef.setWidth(columnWidth);
 					}
 				} else if (colDef instanceof TreeColumnDefinition) {
-					final int columnWidth = ((TreeColumnDefinition) colDef)
-							.getTreeColumn()
+					final int columnWidth = ((TreeColumnDefinition) colDef).getTreeColumn()
 							.getWidth();
 					if (columnWidth > 0) {
 						colDef.setWidth(columnWidth);

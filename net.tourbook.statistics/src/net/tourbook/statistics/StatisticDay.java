@@ -97,7 +97,7 @@ public abstract class StatisticDay extends YearStatistic {
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
 
-		fChart.addSelectionChangedListener(new IBarSelectionListener() {
+		fChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 				long tourId = fTourDataDay.fTourIds[valueIndex];
 				fPostSelectionProvider.setSelection(new SelectionTourId(tourId));

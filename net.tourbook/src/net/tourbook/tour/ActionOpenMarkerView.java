@@ -29,13 +29,13 @@ public class ActionOpenMarkerView extends Action implements IEditorActionDelegat
 	/**
 	 * 
 	 */
-	private final ActionTourMarker	fActionTourMarker;
+//	private final ActionTourMarker	fActionTourMarker;
 
 
-	public ActionOpenMarkerView(ActionTourMarker actionTourMarker) {
-		fActionTourMarker = actionTourMarker;
-		fActionTourMarker.setText(Messages.Tour_Action_open_marker_view);
-	}
+//	public ActionOpenMarkerView(ActionTourMarker actionTourMarker) {
+//		fActionTourMarker = actionTourMarker;
+//		fActionTourMarker.setText(Messages.Tour_Action_open_marker_view);
+//	}
 
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 		int a=0;

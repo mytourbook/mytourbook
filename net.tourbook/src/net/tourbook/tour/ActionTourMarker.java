@@ -44,8 +44,7 @@ public class ActionTourMarker extends Action implements IMenuCreator {
 		setToolTipText(Messages.Tour_Action_open_marker_editor);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_open_marker_editor));
 
-		// fActionOpenMarkerEditor = new ActionOpenMarkerEditor();
-		fActionOpenMarkerView = new ActionOpenMarkerView(this);
+//		fActionOpenMarkerView = new ActionOpenMarkerView(this);
 
 		setMenuCreator(this);
 	}

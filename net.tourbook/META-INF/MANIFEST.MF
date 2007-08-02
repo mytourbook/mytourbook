@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.ext.ejb3,
  net.tourbook.rxtx,
  org.apache.derby.core,
- org.eclipse.update.ui
+ org.eclipse.update.ui,
+ org.eclipse.core.expressions
 Eclipse-LazyStart: true
 Eclipse-RegisterBuddy: net.tourbook.ext.ejb3
 Export-Package: net.tourbook.colors,
