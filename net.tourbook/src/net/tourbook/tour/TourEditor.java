@@ -139,7 +139,7 @@ public class TourEditor extends EditorPart {
 
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
-//		fTourChart.setToolBarManager(getEditorSite().getActionBars().getToolBarManager());
+		fTourChart.setActionBars(getEditorSite().getActionBars());
 
 		fTourChart.addTourModifyListener(new ITourModifyListener() {
 			public void tourIsModified() {

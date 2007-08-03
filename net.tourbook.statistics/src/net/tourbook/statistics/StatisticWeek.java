@@ -22,10 +22,10 @@ import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
 import net.tourbook.data.TourPerson;
 
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IActionBars;
 
 public abstract class StatisticWeek extends YearStatistic {
 
@@ -44,14 +44,14 @@ public abstract class StatisticWeek extends YearStatistic {
 	}
 
 	public void createControl(	Composite parent,
-								ToolBarManager tbm,
+								IActionBars actionBars,
 								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
 		// create chart
 		fChart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-		fChart.setToolBarManager(tbm);
+		fChart.setActionBars(actionBars);
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
 	}
@@ -127,7 +127,7 @@ public abstract class StatisticWeek extends YearStatistic {
 
 	abstract void updateChart(TourDataWeek tourWeekData);
 
-	public void updateToolBar(boolean refreshToolbar) {
-		fChart.showActions(refreshToolbar);
-	}
+//	public void updateToolBar(boolean refreshToolbar) {
+//		fChart.showActions(refreshToolbar);
+//	}
 }

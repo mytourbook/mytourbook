@@ -87,7 +87,7 @@ public abstract class TourbookStatistic {
 	 * @param tourId
 	 * @return <code>true</code> when a tour was selected
 	 */
-	public boolean selectTour(long tourId) {
+	public boolean selectTour(Long tourId) {
 		return false;
 	}
 
@@ -112,14 +112,14 @@ public abstract class TourbookStatistic {
 	 */
 	public abstract void setSynchScale(boolean isEnabled);
 
-	/**
-	 * this method is called before the statistic control will be displayed. When the toolbar
-	 * manager is used, this method should put the actions into the toolbar manager
-	 * 
-	 * @param refreshToolbar
-	 *        <code>true</code> will refresh the toolbar
-	 */
-	public void updateToolBar(boolean refreshToolbar) {}
+//	/**
+//	 * this method is called before the statistic control will be displayed. When the toolbar
+//	 * manager is used, this method should put the actions into the toolbar manager
+//	 * 
+//	 * @param refreshToolbar
+//	 *        <code>true</code> will refresh the toolbar
+//	 */
+//	public void updateToolBar(boolean refreshToolbar) {}
 
 	/**
 	 * reset the selection in the statistic chart

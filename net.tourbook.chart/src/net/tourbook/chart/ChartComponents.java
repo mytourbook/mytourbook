@@ -229,15 +229,16 @@ public class ChartComponents extends Composite {
 		// });
 
 		fComponentGraph.addListener(SWT.Traverse, new Listener() {
-			public void handleEvent(final Event e) {
-				switch (e.detail) {
-				case SWT.TRAVERSE_ESCAPE:
+			public void handleEvent(final Event event) {
+				
+				switch (event.detail) {
 				case SWT.TRAVERSE_RETURN:
+				case SWT.TRAVERSE_ESCAPE:
 				case SWT.TRAVERSE_TAB_NEXT:
 				case SWT.TRAVERSE_TAB_PREVIOUS:
 				case SWT.TRAVERSE_PAGE_NEXT:
 				case SWT.TRAVERSE_PAGE_PREVIOUS:
-					e.doit = true;
+					event.doit = true;
 					break;
 				}
 			}
@@ -1018,7 +1019,6 @@ public class ChartComponents extends Composite {
 		default:
 			break;
 		}
-
 	}
 
 	private void selectBarItem(final Event event) {

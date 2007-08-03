@@ -17,6 +17,9 @@ package net.tourbook.chart;
 
 import org.eclipse.jface.action.IMenuManager;
 
+/**
+ * this interface will fill the context menus in the chart
+ */
 public interface ChartContextProvider {
 
 	/**
@@ -34,8 +37,14 @@ public interface ChartContextProvider {
 	/**
 	 * Will be called when the context menu in a bar chart will be opened
 	 * 
+	 * @param hoveredBarSerieIndex
+	 *        contains the serie index for the hovered bar, contains <code>-1</code> when a bar is
+	 *        not hovered
+	 * @param hoveredBarValueIndex
 	 * @param chartWidget
 	 */
-	public void fillBarChartContextMenu(IMenuManager menuMgr);
+	public void fillBarChartContextMenu(IMenuManager menuMgr,
+										int hoveredBarSerieIndex,
+										int hoveredBarValueIndex);
 
 }

@@ -58,7 +58,7 @@ public class StatisticDayTourTime extends StatisticDay {
 		int yearDays = fCalendar.get(Calendar.DAY_OF_YEAR);
 		chartModel.setChartMinWidth(yearDays);
 
-		ProviderTourDay.getInstance().setChartProviders(fChart, chartModel);
+		setChartProviders(fChart, chartModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartModel);

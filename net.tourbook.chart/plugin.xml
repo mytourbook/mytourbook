@@ -20,8 +20,7 @@
          point="org.eclipse.ui.actionSets">
       <actionSet
             id="net.tourbook.chart.actionSet.chartActions"
-            label="Chart Actionset"
-            visible="true">
+            label="Chart Actions">
          <action
                definitionId="net.tourbook.chart.commandId.zoomOut"
                disabledIcon="icons/zoom-out-disabled.gif"

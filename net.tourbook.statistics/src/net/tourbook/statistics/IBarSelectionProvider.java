@@ -15,6 +15,15 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-interface IMonthProvider {
-	int getSelectedMonth();
+interface IBarSelectionProvider {
+
+	Integer getSelectedMonth();
+
+	/**
+	 * @return Returns the selected tour, this can also be the tour when the mouse is hovered over a
+	 *         bar
+	 */
+	Long getSelectedTourId();
+
+	boolean selectTour(Long tourId);
 }

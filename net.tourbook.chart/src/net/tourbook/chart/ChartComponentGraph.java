@@ -213,14 +213,13 @@ public class ChartComponentGraph extends Canvas {
 	private boolean						fScrollToSelection;
 
 	/**
-	 * contextLeftSlider is set not null when the right mouse button was clicked and the left slider
-	 * was hit
+	 * contextLeftSlider is set when the right mouse button was clicked and the left slider was hit
 	 */
 	private ChartXSlider				contextLeftSlider;
 
 	/**
-	 * contextRightSlider is set not null when the right mouse button was clicked and the right
-	 * slider was hit
+	 * contextRightSlider is set when the right mouse button was clicked and the right slider was
+	 * hit
 	 */
 	private ChartXSlider				contextRightSlider;
 	/**
@@ -268,7 +267,7 @@ public class ChartComponentGraph extends Canvas {
 			SWT.DragDetect										};
 
 	/**
-	 * serie index for the hovered bar, when set to -1, the bar is hidden
+	 * serie index for the hovered bar, the bar is hidden when -1;
 	 */
 	private int							fHoveredBarSerieIndex	= -1;
 	private int							fHoveredBarValueIndex;
@@ -829,7 +828,11 @@ public class ChartComponentGraph extends Canvas {
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(final IMenuManager menuMgr) {
-				fChart.fillMenu(menuMgr, contextLeftSlider, contextRightSlider);
+				fChart.fillMenu(menuMgr,
+						contextLeftSlider,
+						contextRightSlider,
+						fHoveredBarSerieIndex,
+						fHoveredBarValueIndex);
 			}
 		});
 		final Menu menu = menuMgr.createContextMenu(this);

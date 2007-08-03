@@ -95,6 +95,8 @@ public class Chart extends ViewForm {
 	boolean									fUseInternalToolbar			= true;
 
 	private IActionBars						fActionBars;
+	private int								fBarSelectionSerieIndex;
+	private int								fBarSelectionValueIndex;
 
 //	private IPartListener2					fContextPartListener;
 //	private IContextActivation				fActivatedContext;
@@ -259,16 +261,22 @@ public class Chart extends ViewForm {
 		super.dispose();
 	}
 
-	void fillMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider) {
+	void fillMenu(	IMenuManager menuMgr,
+					ChartXSlider leftSlider,
+					ChartXSlider rightSlider,
+					int hoveredBarSerieIndex,
+					int hoveredBarValueIndex) {
 
 		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 
-			// get the method which computes the bar info
+			// get the context provider from the data model
 			ChartContextProvider barChartContextProvider = (ChartContextProvider) fChartDataModel.getCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER);
 
 			// create the menu for bar charts
 			if (barChartContextProvider != null) {
-				barChartContextProvider.fillBarChartContextMenu(menuMgr);
+				barChartContextProvider.fillBarChartContextMenu(menuMgr,
+						hoveredBarSerieIndex,
+						hoveredBarValueIndex);
 			}
 
 		} else {
@@ -280,6 +288,9 @@ public class Chart extends ViewForm {
 	}
 
 	void fireBarSelectionEvent(final int serieIndex, final int valueIndex) {
+
+		fBarSelectionSerieIndex = serieIndex;
+		fBarSelectionValueIndex = valueIndex;
 
 		Object[] listeners = fBarSelectionListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
@@ -293,6 +304,10 @@ public class Chart extends ViewForm {
 	}
 
 	void fireChartDoubleClick(final int serieIndex, final int valueIndex) {
+
+		fBarSelectionSerieIndex = serieIndex;
+		fBarSelectionValueIndex = valueIndex;
+
 		Object[] listeners = fDoubleClickListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final IBarSelectionListener listener = (IBarSelectionListener) listeners[i];
@@ -400,6 +415,18 @@ public class Chart extends ViewForm {
 	}
 
 	public ISelection getSelection() {
+
+		switch (fChartDataModel.getChartType()) {
+		case ChartDataModel.CHART_TYPE_BAR:
+			return new SelectionBarChart(fBarSelectionSerieIndex, fBarSelectionValueIndex);
+
+		case ChartDataModel.CHART_TYPE_LINE:
+			break;
+
+		default:
+			break;
+		}
+
 		return null;
 	}
 
@@ -540,8 +567,7 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * set the chart context for a site, the context is set to {@code net.tourbook.chart.context}
-	 * which can be used in expressions to show/hide the chart toolbar
+	 * set the action bars for the chart, chart actions will be activated when a chart is activated
 	 * 
 	 * @param part.
 	 */
@@ -659,7 +685,7 @@ public class Chart extends ViewForm {
 	 * Select (highlight) the bar in the bar chart
 	 * 
 	 * @param selectedItems
-	 *        items in the x-data serie which should be selected, can be also <code>null</code> to
+	 *        items in the x-data serie which should be selected, can be <code>null</code> to
 	 *        deselect the bar
 	 */
 	public void setSelectedBars(boolean[] selectedItems) {
@@ -757,7 +783,9 @@ public class Chart extends ViewForm {
 				tbm.update(true);
 			}
 		} else {
-			fActionBars.updateActionBars();
+			if (fActionBars != null && refreshToolbar) {
+				fActionBars.updateActionBars();
+			}
 		}
 	}
 

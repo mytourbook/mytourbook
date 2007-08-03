@@ -31,7 +31,7 @@ public class ActionEditTour extends Action {
 		setImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj.gif"));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj_disabled.gif"));
 
-		setText("Open Tour");
+		setText("&Open Tour");
 
 		setEnabled(false);
 	}

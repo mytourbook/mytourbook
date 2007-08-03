@@ -40,8 +40,7 @@ public class StatisticDayCombined extends StatisticDay {
 		/*
 		 * Distance
 		 */
-		yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fDistanceLow,
 				tourTimeData.fDistanceHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
@@ -53,12 +52,11 @@ public class StatisticDayCombined extends StatisticDay {
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
 		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
-		
+
 		/*
 		 * Altitude
 		 */
-		yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fAltitudeLow,
 				tourTimeData.fAltitudeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
@@ -74,8 +72,7 @@ public class StatisticDayCombined extends StatisticDay {
 		/*
 		 * Time
 		 */
-		yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fTimeLow,
 				tourTimeData.fTimeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
@@ -95,9 +92,7 @@ public class StatisticDayCombined extends StatisticDay {
 		int yearDays = fCalendar.get(Calendar.DAY_OF_YEAR);
 		chartModel.setChartMinWidth(yearDays);
 
-		ProviderTourDay.getInstance().setChartProviders(
-				fChart,
-				chartModel);
+		setChartProviders(fChart, chartModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartModel);

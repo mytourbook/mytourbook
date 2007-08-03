@@ -38,8 +38,7 @@ public class StatisticDayAltitude extends StatisticDay {
 		/*
 		 * Altitude
 		 */
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				tourTimeData.fAltitudeLow,
 				tourTimeData.fAltitudeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
@@ -58,12 +57,7 @@ public class StatisticDayAltitude extends StatisticDay {
 		final int yearDays = fCalendar.get(Calendar.DAY_OF_YEAR);
 		chartModel.setChartMinWidth(yearDays);
 
-		ProviderTourDay.getInstance().setChartProviders(
-				fChart,
-				chartModel
-//				,
-//				fTourChartViewer
-				);
+		setChartProviders(fChart, chartModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartModel);

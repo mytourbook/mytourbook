@@ -32,6 +32,7 @@ import net.tourbook.util.PositionedWizardDialog;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -47,6 +48,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
@@ -76,6 +78,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	TourTypeContributionItem				tourTypeSelector;
 	private IWorkbenchAction				fActionSave;
 	private IWorkbenchAction				fActionSaveAll;
+	private IContributionItem				fActionViewShortList;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -101,48 +104,42 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fActionImportFromDevice = new ActionImportFromDevice(window);
 		fActionImportFromDeviceDirect = new ActionImportFromDeviceDirect(window);
 
-		fActionTourChartView = new ActionOpenView(
-				window,
+		fActionTourChartView = new ActionOpenView(window,
 				"Tour Chart",
 				"Shows a chart for the currently selected tour",
 				TourChartView.ID,
 				ICommandIds.CMD_OPENVIEW_TOURCHART,
 				"tour-chart.gif");
 
-		fActionRawDataView = new ActionOpenView(
-				window,
+		fActionRawDataView = new ActionOpenView(window,
 				Messages.Action_openview_rawdata,
 				Messages.Action_openview_rawdata_tooltip,
 				RawDataView.ID,
 				ICommandIds.CMD_OPENVIEW_IMPORTEDDATA,
 				Messages.Image_view_rawdata);
 
-		fActionStatisticsView= new ActionOpenView(
-				window,
+		fActionStatisticsView = new ActionOpenView(window,
 				"",
 				"",
 				TourStatisticsView.ID,
 				ICommandIds.CMD_OPENVIEW_STATISTICS,
 				Messages.Image_show_statistics);
 
-		fActionTourBookView = new ActionOpenView(
-				window,
+		fActionTourBookView = new ActionOpenView(window,
 				Messages.Action_openview_tourbook,
 				Messages.Action_openview_tourbook_tooltip,
 				TourBookView.ID,
 				ICommandIds.CMD_OPENVIEW_TOURLIST,
 				Messages.Image_view_tourbool);
 
-		fActionTourMapView = new ActionOpenView(
-				window,
+		fActionTourMapView = new ActionOpenView(window,
 				Messages.Action_openview_tourmap,
 				Messages.Action_openview_tourmap_tooltip,
 				TourMapView.ID,
 				ICommandIds.CMD_OPENVIEW_TOURMAP,
 				Messages.Image_view_tourmap);
 
-		fActionTourCompareView = new ActionOpenView(
-				window,
+		fActionTourCompareView = new ActionOpenView(window,
 				Messages.Action_openview_compare_result,
 				Messages.Action_openview_compare_result_tooltip,
 				CompareResultView.ID,
@@ -157,20 +154,20 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fActionSaveAll = ActionFactory.SAVE_ALL.create(window);
 		register(fActionSaveAll);
 
+		fActionViewShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
+
 		fActionTourCompareWizard = new Action() {
 
 			{
 				setText(Messages.Action_open_compare_wizard);
 				setToolTipText(Messages.Action_open_compare_wizard_tooltip);
-				setImageDescriptor(TourbookPlugin
-						.getImageDescriptor(Messages.Image_view_compare_wizard));
+				setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_view_compare_wizard));
 			}
 
 			public void run() {
 				Wizard wizard = new WizardTourComparer();
 
-				final WizardDialog dialog = new PositionedWizardDialog(
-						window.getShell(),
+				final WizardDialog dialog = new PositionedWizardDialog(window.getShell(),
 						wizard,
 						WizardTourComparer.DIALOG_SETTINGS_SECTION,
 						800,
@@ -189,9 +186,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	protected void fillMenuBar(IMenuManager menuBar) {
 
-		// file - menu
-		MenuManager fileMenu = new MenuManager(
-				Messages.Action_Menu_file,
+		/*
+		 * file - menu
+		 */
+		MenuManager fileMenu = new MenuManager(Messages.Action_Menu_file,
 				IWorkbenchActionConstants.M_FILE);
 
 		fileMenu.add(fActionSave);
@@ -216,7 +214,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		// fileMenu.add(fActionClose);
 		// fileMenu.add(new Separator());
 
-		// view - menu
+		/*
+		 * view - menu
+		 */
 		MenuManager tourMenu = new MenuManager(Messages.Action_Menu_view, null);
 
 		tourMenu.add(fActionTourChartView);
@@ -231,16 +231,27 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		tourMenu.add(fActionTourCompareWizard);
 		tourMenu.add(fActionTourCompareView);
 
-		// help - menu
-		MenuManager helpMenu = new MenuManager(
-				Messages.Action_Menu_help,
+		/*
+		 * view - menu
+		 */
+		MenuManager windowMenu = new MenuManager("&View", null);
+
+		windowMenu.add(fActionViewShortList);
+
+		/*
+		 * help - menu
+		 */
+		MenuManager helpMenu = new MenuManager(Messages.Action_Menu_help,
 				IWorkbenchActionConstants.M_HELP);
 
 		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
 
-		// create menu bar
+		/*
+		 * create menu bar
+		 */
 		menuBar.add(fileMenu);
 		menuBar.add(tourMenu);
+		menuBar.add(windowMenu);
 		menuBar.add(helpMenu);
 	}
 

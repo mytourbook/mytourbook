@@ -1052,7 +1052,11 @@ public class TourManager {
 	 * 
 	 * @param tourId
 	 */
-	public void openTourInEditor(final long tourId) {
+	public void openTourInEditor(final Long tourId) {
+
+		if (tourId == null) {
+			return;
+		}
 
 		try {
 			PlatformUI.getWorkbench()

@@ -31,10 +31,9 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.util.ArrayListToArray;
 
-public class ProviderTourDay extends DataProvider implements IMonthProvider {
+public class ProviderTourDay extends DataProvider /* implements IBarSelectionProvider */{
 
 	private static ProviderTourDay	fInstance;
 
@@ -46,6 +45,7 @@ public class ProviderTourDay extends DataProvider implements IMonthProvider {
 	private final Calendar			fCalendar	= GregorianCalendar.getInstance();
 
 	private long					fActiveTypeId;
+	private Long					fSelectedTourId;
 
 	private ProviderTourDay() {}
 
@@ -132,8 +132,8 @@ public class ProviderTourDay extends DataProvider implements IMonthProvider {
 				dbTourTime.add(drivingTime == 0 ? recordingTime : drivingTime);
 
 				/*
-				 * convert type id to the type index in the tour types list
-				 * which is also the color index
+				 * convert type id to the type index in the tour types list which is also the color
+				 * index
 				 */
 				int colorIndex = 0;
 				final Object dbTypeIdObject = result.getObject(10);
@@ -190,8 +190,7 @@ public class ProviderTourDay extends DataProvider implements IMonthProvider {
 
 					// current tour is on another day as the tour before
 
-					updateLastTour(
-							tourIndex,
+					updateLastTour(tourIndex,
 							lastTime,
 							lastDistance,
 							lastAltitude,
@@ -210,8 +209,7 @@ public class ProviderTourDay extends DataProvider implements IMonthProvider {
 				}
 			}
 
-			updateLastTour(
-					tourIndex,
+			updateLastTour(tourIndex,
 					lastTime,
 					lastDistance,
 					lastAltitude,
@@ -249,6 +247,58 @@ public class ProviderTourDay extends DataProvider implements IMonthProvider {
 		return fTourDataTour;
 	}
 
+////	public Integer getSelectedMonth() {
+////		return fCurrentMonth;
+////	}
+//////
+////	public Long getSelectedTourId() {
+////		return fSelectedTourId;
+////	}
+//
+//	public void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
+//
+//		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, new IChartInfoProvider() {
+//			public String getInfo(final int serieIndex, final int valueIndex) {
+//
+//				fCalendar.set(fCurrentYear, 0, 1);
+//				fCalendar.set(Calendar.DAY_OF_YEAR, fTourDataTour.fDOYValues[valueIndex] + 1);
+//
+//				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
+//				fSelectedTourId = fTourDataTour.fTourIds[valueIndex];
+//
+//				final int duration = fTourDataTour.fTimeHigh[valueIndex]
+//						- fTourDataTour.fTimeLow[valueIndex];
+//
+//				final String barInfo = new Formatter().format(Messages.TOURDAYINFO_TOUR_DATE_FORMAT
+//						+ Messages.TOURDAYINFO_DISTANCE
+//						+ Messages.TOURDAYINFO_ALTITUDE
+//						+ Messages.TOURDAYINFO_DURATION,
+//						fCalendar.get(Calendar.DAY_OF_MONTH),
+//						fCalendar.get(Calendar.MONTH) + 1,
+//						fCalendar.get(Calendar.YEAR),
+//						fTourDataTour.fDistanceHigh[valueIndex],
+//						fTourDataTour.fAltitudeHigh[valueIndex],
+//						duration / 3600,
+//						(duration % 3600) / 60).toString();
+//
+//				return barInfo;
+//			}
+//		});
+//
+////		// set the menu context provider
+////		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER,
+////				new TourContextProvider(chartWidget, this));
+//	}
+
+//	/**
+//	 * Set the tour id which is selected in the statistic
+//	 * 
+//	 * @param selectedTourId
+//	 */
+//	public void setSelectedTourId(Long selectedTourId) {
+//		fSelectedTourId = selectedTourId;
+//	}
+
 	private final void updateLastTour(	final int tourIndex,
 										final int lastTime,
 										final int lastDistance,
@@ -271,49 +321,5 @@ public class ProviderTourDay extends DataProvider implements IMonthProvider {
 			distanceHigh[lastTourIndex] += lastDistance;
 			altitudeHigh[lastTourIndex] += lastAltitude;
 		}
-	}
-
-	public void setChartProviders(	final Chart chartWidget,
-									final ChartDataModel chartModel
-//									,
-//									final ITourChartViewer tourChartViewer
-									) {
-
-		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, new IChartInfoProvider() {
-			public String getInfo(final int serieIndex, final int valueIndex) {
-
-				fCalendar.set(fCurrentYear, 0, 1);
-				fCalendar.set(Calendar.DAY_OF_YEAR, fTourDataTour.fDOYValues[valueIndex] + 1);
-
-				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
-
-				final int duration = fTourDataTour.fTimeHigh[valueIndex]
-						- fTourDataTour.fTimeLow[valueIndex];
-
-				final String barInfo = new Formatter().format(
-						Messages.TOURDAYINFO_TOUR_DATE_FORMAT
-								+ Messages.TOURDAYINFO_DISTANCE
-								+ Messages.TOURDAYINFO_ALTITUDE
-								+ Messages.TOURDAYINFO_DURATION,
-						fCalendar.get(Calendar.DAY_OF_MONTH),
-						fCalendar.get(Calendar.MONTH) + 1,
-						fCalendar.get(Calendar.YEAR),
-						fTourDataTour.fDistanceHigh[valueIndex],
-						fTourDataTour.fAltitudeHigh[valueIndex],
-						duration / 3600,
-						(duration % 3600) / 60).toString();
-
-				return barInfo;
-			}
-		});
-
-		// set the menu context provider
-		chartModel.setCustomData(
-				ChartDataModel.BAR_CONTEXT_PROVIDER,
-				new ContextProviderZoomIntoMonth(chartWidget, this));
-	}
-
-	public int getSelectedMonth() {
-		return fCurrentMonth;
 	}
 }

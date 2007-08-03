@@ -34,7 +34,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
@@ -44,6 +43,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IActionBars;
 
 public class StatisticTourNumbers extends YearStatistic {
 
@@ -194,7 +194,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	}
 
 	public void createControl(	Composite parent,
-								ToolBarManager tbm,
+								IActionBars actionBars,
 								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
@@ -214,11 +214,22 @@ public class StatisticTourNumbers extends YearStatistic {
 		fStatisticPage.setLayout(gl);
 
 		fChartDistanceCounter = new Chart(fStatisticPage, SWT.NONE);
+		fChartDistanceCounter.setActionBars(actionBars);
+
 		fChartDistanceSum = new Chart(fStatisticPage, SWT.NONE);
+		fChartDistanceSum.setActionBars(actionBars);
+
 		fChartAltitudeCounter = new Chart(fStatisticPage, SWT.NONE);
+		fChartAltitudeCounter.setActionBars(actionBars);
+
 		fChartAltitudeSum = new Chart(fStatisticPage, SWT.NONE);
+		fChartAltitudeSum.setActionBars(actionBars);
+
 		fChartDurationCounter = new Chart(fStatisticPage, SWT.NONE);
+		fChartDurationCounter.setActionBars(actionBars);
+
 		fChartDurationSum = new Chart(fStatisticPage, SWT.NONE);
+		fChartDurationSum.setActionBars(actionBars);
 
 		addPrefListener(parent);
 		getPreferences();

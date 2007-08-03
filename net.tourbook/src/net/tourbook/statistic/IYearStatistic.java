@@ -28,7 +28,7 @@ public interface IYearStatistic {
 	 * @param year
 	 *        year for the statistic
 	 * @param refreshData
-	 *        <code>true</code> when the data should be updated from the
+	 *        when set to <code>true</code> the data should be updated from the
 	 *        database
 	 */
 	public abstract void refreshStatistic(TourPerson person,

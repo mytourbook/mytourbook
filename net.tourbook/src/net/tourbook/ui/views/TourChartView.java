@@ -45,7 +45,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourChartView extends ViewPart {
 
-	public static final String		ID	= "net.tourbook.ui.views.TourChartView";	//$NON-NLS-1$
+	public static final String		ID	= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
 	private TourChart				fTourChart;
 	private TourChartConfiguration	fTourChartConfig;
@@ -108,11 +108,10 @@ public class TourChartView extends ViewPart {
 		fPageNoChart.setText("A tour is not selected");
 
 		fTourChart = new TourChart(fPageBook, SWT.FLAT, false);
+		fTourChart.setActionBars(getViewSite().getActionBars());
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
-//		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager());
 
-		fTourChart.setActionBars(getViewSite().getActionBars());
 
 		// set chart title
 		fTourChart.addDataModelListener(new IDataModelListener() {

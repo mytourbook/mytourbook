@@ -22,14 +22,14 @@ import org.eclipse.ui.actions.RetargetAction;
 
 public class ChartAction {
 
-	private Chart	fChartWidget;
+	private Chart	fTourChart;
 
 	private Action	fAction;
 
 	public ChartAction(final Chart chartWidget, final int actionMapId, String actionId,
 			String commandId, String text, String toolTip, String[] image) {
 
-		fChartWidget = chartWidget;
+		fTourChart = chartWidget;
 
 		fAction = new RetargetAction(actionId, text) {
 			public void run() {
@@ -54,7 +54,7 @@ public class ChartAction {
 		fAction.setActionDefinitionId(commandId);
 
 		// bind the action handler to the action button/menu
-		fChartWidget.getActionBars().setGlobalActionHandler(actionId, fAction);
+		fTourChart.getActionBars().setGlobalActionHandler(actionId, fAction);
 	}
 
 	public IAction getAction() {

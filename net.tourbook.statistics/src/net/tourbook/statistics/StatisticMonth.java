@@ -27,10 +27,10 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourPerson;
 
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IActionBars;
 
 public class StatisticMonth extends YearStatistic {
 
@@ -49,22 +49,21 @@ public class StatisticMonth extends YearStatistic {
 	}
 
 	public void createControl(	Composite parent,
-								ToolBarManager tbm,
+								IActionBars actionBars,
 								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
 		// create chart
 		fChart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-		fChart.setToolBarManager(tbm);
+		fChart.setActionBars(actionBars);
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
 	}
-	
+
 	public void prefColorChanged() {
 		refreshStatistic(fActivePerson, fActiveTypeId, fCurrentYear, false);
 	}
-	
 
 	public void refreshStatistic(TourPerson person, long typeId, int year, boolean refreshData) {
 
@@ -72,8 +71,7 @@ public class StatisticMonth extends YearStatistic {
 		fActiveTypeId = typeId;
 		fCurrentYear = year;
 
-		TourDataMonth tourMonthData = ProviderTourMonth.getInstance().getMonthData(
-				person,
+		TourDataMonth tourMonthData = ProviderTourMonth.getInstance().getMonthData(person,
 				typeId,
 				year,
 				isRefreshDataWithReset() || refreshData);
@@ -99,14 +97,14 @@ public class StatisticMonth extends YearStatistic {
 		selectedItems[selectedMonth] = true;
 
 		fChart.setSelectedBars(selectedItems);
-		
+
 		return true;
 	}
 
 	public void setSynchScale(boolean isSynchScaleEnabled) {
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
-	
+
 	private void updateChart(TourDataMonth tourMonthData) {
 
 		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
@@ -117,8 +115,7 @@ public class StatisticMonth extends YearStatistic {
 		chartModel.setXData(xData);
 
 		// distance
-		ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourMonthData.fDistanceLow,
 				tourMonthData.fDistanceHigh);
@@ -130,8 +127,7 @@ public class StatisticMonth extends YearStatistic {
 		StatisticServices.setTourTypeColorIndex(yData, tourMonthData.fTypeIds);
 
 		// altitude
-		yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourMonthData.fAltitudeLow,
 				tourMonthData.fAltitudeHigh);
@@ -143,8 +139,7 @@ public class StatisticMonth extends YearStatistic {
 		StatisticServices.setTourTypeColorIndex(yData, tourMonthData.fTypeIds);
 
 		// duration
-		yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourMonthData.fTimeLow,
 				tourMonthData.fTimeHigh);
@@ -163,7 +158,7 @@ public class StatisticMonth extends YearStatistic {
 		fChart.setChartDataModel(chartModel);
 	}
 
-	public void updateToolBar(boolean refreshToolbar) {
-		fChart.showActions(refreshToolbar);
-	}
+//	public void updateToolBar(boolean refreshToolbar) {
+//		fChart.showActions(refreshToolbar);
+//	}
 }
