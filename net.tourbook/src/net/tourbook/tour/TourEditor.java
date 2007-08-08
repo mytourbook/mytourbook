@@ -24,7 +24,6 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.views.SelectionTourSegmentLayer;
-import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
@@ -36,17 +35,17 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.handlers.IHandlerActivation;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
 
 public class TourEditor extends EditorPart {
 
-	private static final String		COMMAND_ID_GRAPH_LAYOUT_ALTITUDE	= "net.tourbook.commands.graphLayout.altitude";
-
-	public static final String		ID									= "net.tourbook.tour.TourEditor";
+	public static final String		ID				= "net.tourbook.tour.TourEditor";
 
 	private TourEditorInput			fEditorInput;
 
@@ -54,103 +53,70 @@ public class TourEditor extends EditorPart {
 	private TourChartConfiguration	fTourChartConfig;
 	private TourData				fTourData;
 
-	private boolean					fIsTourDirty						= false;
+	private boolean					fIsTourDirty	= false;
 
-	private PostSelectionProvider	fPostSelectionProvider;
 	private ISelectionListener		fPostSelectionListener;
+	private IPartListener2			fPartListener;
 
-//	private IPartListener2			fPartListener;
+	private void addPartListener() {
 
-	private IHandlerActivation		fHandlerActivationAltitude;
+		// set the part listener
+		fPartListener = new IPartListener2() {
 
-	private IHandlerService			fHandlerService;
+			public void partActivated(IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourEditor.this) {
+					fTourChart.activateHandler();
+				}
+			}
 
-//	private void addPartListener() {
-//
-//		// set the part listener
-//		fPartListener = new IPartListener2() {
-//
-//			public void partActivated(IWorkbenchPartReference partRef) {
-////				if (ID.equals(partRef.getId())) {
-////					enableCommands();
-////				}
-//			}
-//
-//			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
-//
-//			public void partClosed(IWorkbenchPartReference partRef) {}
-//
-//			public void partDeactivated(IWorkbenchPartReference partRef) {
-////				if (ID.equals(partRef.getId())) {
-////					disableCommands();
-////				}
-//			}
-//
-//			public void partHidden(IWorkbenchPartReference partRef) {}
-//
-//			public void partInputChanged(IWorkbenchPartReference partRef) {}
-//
-//			public void partOpened(IWorkbenchPartReference partRef) {}
-//
-//			public void partVisible(IWorkbenchPartReference partRef) {}
-//		};
-//
-//		// register the part listener
-//		getSite().getPage().addPartListener(fPartListener);
-//	}
+			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
 
-	protected void disableCommands() {
+			public void partClosed(IWorkbenchPartReference partRef) {}
 
-		fHandlerService.deactivateHandler(fHandlerActivationAltitude);
+			public void partDeactivated(IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourEditor.this) {
+					fTourChart.deactivateHandler();
+				}
+			}
+
+			public void partHidden(IWorkbenchPartReference partRef) {}
+
+			public void partInputChanged(IWorkbenchPartReference partRef) {}
+
+			public void partOpened(IWorkbenchPartReference partRef) {}
+
+			public void partVisible(IWorkbenchPartReference partRef) {}
+		};
+
+		// register the part listener
+		getSite().getPage().addPartListener(fPartListener);
 	}
-
-//	private void enableCommands() {
-//
-//		IHandler handler = new AbstractHandler() {
-//
-//			public Object execute(ExecutionEvent arg0) throws ExecutionException {
-//				return null;
-//			}
-//
-//			public boolean isEnabled() {
-//				System.out.println("Altitude-Handler:\tisEnabled()");
-//				return super.isEnabled();
-//			}
-//
-//			public boolean isHandled() {
-//				System.out.println("Altitude-Handler:\tisHandled()");
-//				return super.isHandled();
-//			}
-//
-//		};
-//
-//		fHandlerActivationAltitude = fHandlerService.activateHandler(COMMAND_ID_GRAPH_LAYOUT_ALTITUDE,
-//				handler);
-//	}
 
 	public void createPartControl(Composite parent) {
 
-		fHandlerService = (IHandlerService) getSite().getWorkbenchWindow()
-				.getService(IHandlerService.class);
-
-//		addPartListener();
+		addPartListener();
 
 		fTourChart = new TourChart(parent, SWT.FLAT, false);
 
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
-		fTourChart.setActionBars(getEditorSite().getActionBars());
 
 		fTourChart.addTourModifyListener(new ITourModifyListener() {
 			public void tourIsModified() {
-
 				fIsTourDirty = true;
-
 				firePropertyChange(PROP_DIRTY);
 			}
 		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
+
+		final IWorkbenchWindow workbenchWindow = getSite().getWorkbenchWindow();
+
+		fTourChart.createTourActionHandlers((ICommandService) workbenchWindow.getService(ICommandService.class),
+				(IHandlerService) workbenchWindow.getService(IHandlerService.class),
+				fTourChartConfig);
+
+//		fTourChart.activateHandler();
 
 		// load the tourdata from the database
 		fTourData = TourManager.getInstance().getTourData(fEditorInput.fTourId);
@@ -180,14 +146,18 @@ public class TourEditor extends EditorPart {
 		final IWorkbenchPartSite site = getSite();
 
 		if (site != null) {
-//			site.getPage().removePartListener(fPartListener);
+			site.getPage().removePartListener(fPartListener);
 			site.setSelectionProvider(null);
 		}
 
-		if (fHandlerActivationAltitude != null && fHandlerService != null) {
-			fHandlerService.deactivateHandler(fHandlerActivationAltitude);
-		}
+//		if (fHandlerActivationAltitude != null && fHandlerService != null) {
+//			fHandlerService.deactivateHandler(fHandlerActivationAltitude);
+//		}
 
+//	    if (getEditorSite().getActionBarContributor().getActiveEditor() == this)
+//	    {
+//	      getEditorSite().getActionBarContributor().setActiveEditor(null);
+//	    }
 		super.dispose();
 	}
 
@@ -202,6 +172,10 @@ public class TourEditor extends EditorPart {
 
 	public void doSaveAs() {}
 
+	public Object getChartActions() {
+		return fTourChart.getChartActions();
+	}
+
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 
 		setSite(site);
@@ -210,7 +184,7 @@ public class TourEditor extends EditorPart {
 		fEditorInput = (TourEditorInput) input;
 
 		// set selection provider
-		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+//		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		setPostSelectionListener();
 	}
@@ -219,12 +193,22 @@ public class TourEditor extends EditorPart {
 		return fIsTourDirty;
 	}
 
+//	public void setActiveEditor(TourEditor tourEditor) {
+//		fTourChart.updateStatus();
+//	}
+
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
 	public void setFocus() {
-		fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart.fTourData));
+
+		fTourChart.setFocus();
+
+		/*
+		 * fire tour selection
+		 */
+//		fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart.fTourData));
 	}
 
 	private void setPostSelectionListener() {

@@ -108,7 +108,7 @@ public class TourChartView extends ViewPart {
 		fPageNoChart.setText("A tour is not selected");
 
 		fTourChart = new TourChart(fPageBook, SWT.FLAT, false);
-		fTourChart.setActionBars(getViewSite().getActionBars());
+//		fTourChart.setActionBars(getViewSite().getActionBars());
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
 

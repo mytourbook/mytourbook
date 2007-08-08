@@ -10,7 +10,7 @@ import org.eclipse.ui.IPlaceholderFolderLayout;
 
 public class PerspectiveFactoryStatistic implements IPerspectiveFactory {
 
-//	static final String	PERSPECTIVE_ID	= "net.tourbook.perspectiveStatistic";	//$NON-NLS-1$
+	static final String	PERSPECTIVE_ID	= "net.tourbook.perspective.Statistic";	//$NON-NLS-1$
 
 	public void createInitialLayout(IPageLayout layout) {
 

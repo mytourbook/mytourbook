@@ -27,7 +27,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 	}
 
 	public String getInitialWindowPerspectiveId() {
-		return PerspectiveFactoryRawData.PERSPECTIVE_ID;
+		return PerspectiveFactoryTourBook.PERSPECTIVE_ID;
 	}
 
 	public void initialize(IWorkbenchConfigurer configurer) {

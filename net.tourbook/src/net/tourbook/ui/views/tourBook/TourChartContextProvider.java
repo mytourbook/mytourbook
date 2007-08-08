@@ -21,14 +21,9 @@ import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourReference;
-import net.tourbook.tour.TourChart;
-import net.tourbook.ui.views.tourMap.ReferenceTourManager;
-import net.tourbook.ui.views.tourMap.SelectionNewRefTours;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.swt.widgets.Display;
 
 class TourChartContextProvider implements ChartContextProvider {
 
@@ -97,13 +92,13 @@ class TourChartContextProvider implements ChartContextProvider {
 			} else if (fMarkerDialog != null) {
 
 				TourMarker newTourMarker = createTourMarker(fMarkerDialog.getTourData());
-				
+
 				fMarkerDialog.addTourMarker(newTourMarker);
 			}
 		}
 
 		private TourMarker createTourMarker(TourData tourData) {
-			
+
 			int serieIndex = fSlider.getValuesIndex();
 
 			// create a new marker
@@ -125,8 +120,6 @@ class TourChartContextProvider implements ChartContextProvider {
 	public TourChartContextProvider(MarkerDialog markerDialog) {
 		fMarkerDialog = markerDialog;
 	}
-
-	public void fillBarChartContextMenu(IMenuManager menuMgr) {}
 
 	public void fillXSliderContextMenu(	IMenuManager menuMgr,
 										ChartXSlider leftSlider,
@@ -163,15 +156,15 @@ class TourChartContextProvider implements ChartContextProvider {
 			if (leftSlider != null && rightSlider == null) {
 				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_marker, leftSlider));
 			} else {
-				menuMgr
-						.add(new SliderAction(
-								Messages.TourMap_Action_create_left_marker,
-								leftSlider));
-				menuMgr.add(new SliderAction(
-						Messages.TourMap_Action_create_right_marker,
+				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_left_marker, leftSlider));
+				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_right_marker,
 						rightSlider));
 			}
 		}
 	}
+
+	public void fillBarChartContextMenu(IMenuManager menuMgr,
+										int hoveredBarSerieIndex,
+										int hoveredBarValueIndex) {}
 
 }

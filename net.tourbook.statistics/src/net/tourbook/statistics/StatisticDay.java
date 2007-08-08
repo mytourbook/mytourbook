@@ -101,19 +101,20 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 		// create statistic chart
 		fChart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-		fChart.setActionBars(actionBars);
 		fChart.setShowPartNavigation(true);
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
 
 		fChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
-
 				fSelectedTourId = fTourDataTour.fTourIds[valueIndex];
 				fPostSelectionProvider.setSelection(new SelectionTourId(fSelectedTourId));
 			}
 		});
 
+		/*
+		 * open tour with double click on the tour bar
+		 */
 		fChart.addDoubleClickListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 				fSelectedTourId = fTourDataTour.fTourIds[valueIndex];
@@ -122,7 +123,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		});
 
 		/*
-		 * open the tour with the Enter key
+		 * open tour with Enter key
 		 */
 		fChart.addTraverseListener(new TraverseListener() {
 			public void keyTraversed(TraverseEvent event) {
@@ -135,7 +136,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 						if (barChartSelection.serieIndex != -1) {
 
 							long selectedTourId = fTourDataTour.fTourIds[barChartSelection.valueIndex];
-
 							TourManager.getInstance().openTourInEditor(selectedTourId);
 						}
 					}

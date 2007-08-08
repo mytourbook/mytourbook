@@ -57,7 +57,7 @@ class TourContextProvider implements ChartContextProvider {
 
 			if (selectedTourId != null) {
 
-				// select the tour in the chart and open it in the editor
+				// select the tour in the chart and open the tour in the editor
 				
 				fBarSelectionProvider.selectTour(selectedTourId);
 

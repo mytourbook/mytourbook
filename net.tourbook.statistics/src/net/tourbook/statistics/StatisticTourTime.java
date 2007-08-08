@@ -28,6 +28,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -36,7 +37,10 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 
@@ -73,7 +77,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		// chart widget page
 		fChart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-		fChart.setActionBars(actionBars);
+//		fChart.setActionBars(actionBars);
 		fChart.setShowPartNavigation(true);
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
@@ -86,6 +90,9 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			}
 		});
 
+		/*
+		 * open tour with double click on the tour bar
+		 */
 		fChart.addDoubleClickListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 				long selectedTourId = fTourTimeData.fTourIds[valueIndex];
@@ -93,6 +100,28 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				TourManager.getInstance().openTourInEditor(selectedTourId);
 			}
 		});
+
+		/*
+		 * open tour with Enter key
+		 */
+		fChart.addTraverseListener(new TraverseListener() {
+			public void keyTraversed(TraverseEvent event) {
+
+				if (event.detail == SWT.TRAVERSE_RETURN) {
+					ISelection selection = fChart.getSelection();
+					if (selection instanceof SelectionBarChart) {
+						SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+
+						if (barChartSelection.serieIndex != -1) {
+
+							long selectedTourId = fTourTimeData.fTourIds[barChartSelection.valueIndex];
+							TourManager.getInstance().openTourInEditor(selectedTourId);
+						}
+					}
+				}
+			}
+		});
+
 	}
 
 	public Integer getSelectedMonth() {
@@ -163,7 +192,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		return isSelected;
 	}
 
-	public boolean selectTour(final long tourId) {
+	public boolean selectTour(final Long tourId) {
 
 		final long[] tourIds = fTourTimeData.fTourIds;
 		final boolean selectedTours[] = new boolean[tourIds.length];

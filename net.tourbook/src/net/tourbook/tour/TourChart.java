@@ -19,6 +19,7 @@ package net.tourbook.tour;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import net.tourbook.Messages;
@@ -45,48 +46,54 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
 
+/**
+ * The tour chart extends the chart with all the functionality for a tour chart
+ */
 public class TourChart extends Chart {
 
-	static final String				SEGMENT_VALUES		= "segmentValues";		//$NON-NLS-1$
+	static final String							SEGMENT_VALUES		= "segmentValues";		//$NON-NLS-1$
 
-	TourData						fTourData;
-	TourChartConfiguration			fTourChartConfig;
+	TourData									fTourData;
+	TourChartConfiguration						fTourChartConfig;
 
-	protected Map<Integer, Action>	fGraphActions;
-	protected ActionChartOptions	fActionOptions;
+	protected Map<Integer, GraphActionProxy>	fGraphActions;
+	protected ActionChartOptions				fActionOptions;
 
-	private Action					fActionXAxesTime;
-	private Action					fActionXAxesDistance;
-	private Action					fActionZoomFitGraph;
+	private Action								fActionXAxesTime;
+	private Action								fActionXAxesDistance;
+	private Action								fActionZoomFitGraph;
 
 //	private Action					fActionAdjustAltitude;
 //	private ActionGraphAnalyzer		fActionGraphAnalyzer;
 //	private ActionTourSegmenter		fActionTourSegmenter;
 //	private ActionTourMarker		fActionMarkerEditor;
 
-	private ListenerList			fSelectionListeners	= new ListenerList();
+	private ListenerList						fSelectionListeners	= new ListenerList();
 
 	/**
 	 * datamodel listener is called when the chart data is created
 	 */
-	private IDataModelListener		fChartDataModelListener;
+	private IDataModelListener					fChartDataModelListener;
 
-	private ITourModifyListener		fTourModifyListener;
+	private ITourModifyListener					fTourModifyListener;
 
-	private ChartMarkerLayer		fMarkerLayer;
-	private ChartSegmentLayer		fSegmentLayer;
-	private ChartSegmentValueLayer	fSegmentValueLayer;
+	private ChartMarkerLayer					fMarkerLayer;
+	private ChartSegmentLayer					fSegmentLayer;
+	private ChartSegmentValueLayer				fSegmentValueLayer;
 
-	private boolean					fIsXSliderVisible;
+	private boolean								fIsXSliderVisible;
 
-	private IPropertyChangeListener	fPrefChangeListener;
-	private boolean					fIsTourDirty;
-	private boolean					fIsSegmentLayerVisible;
+	private IPropertyChangeListener				fPrefChangeListener;
+	private boolean								fIsTourDirty;
+	private boolean								fIsSegmentLayerVisible;
 
-	private boolean					fShowActions;
+	private boolean								fShowActions;
 
-//	private boolean					fIsToolActions;
+	private IHandlerService						fHandlerService;
+//	private ICommandService						fCommandService;
 
 	public TourChart(final Composite parent, final int style, boolean showActions) {
 
@@ -106,6 +113,26 @@ public class TourChart extends Chart {
 			}
 		});
 
+	}
+
+	/**
+	 * Activate all tour chart action handlers, this is used when the part with a tour chart is
+	 * activated
+	 */
+	public void activateHandler() {
+
+		if (fUseInternalActionBar) {
+			return;
+		}
+
+		// activate the handler for all graph actions
+		for (Iterator<GraphActionProxy> iterator = fGraphActions.values().iterator(); iterator.hasNext();) {
+
+			GraphActionProxy actionProxy = (GraphActionProxy) iterator.next();
+
+			actionProxy.setHandlerActivation(fHandlerService.activateHandler(actionProxy.getCommandId(),
+					actionProxy.getActionHandler()));
+		}
 	}
 
 	/**
@@ -134,21 +161,20 @@ public class TourChart extends Chart {
 	 * @param isChecked
 	 * @return
 	 */
-	private ActionChangeGraphLayout createGraphAction(	final int id,
-														final String label,
-														final String toolTip,
-														final String imageName,
-														String definitionId) {
+	private GraphActionProxy createGraphAction(	final int mapId,
+												final String label,
+												final String toolTip,
+												final String imageName,
+												String commandId) {
 
-		final ActionChangeGraphLayout action = new ActionChangeGraphLayout(this,
-				id,
+		final GraphActionProxy action = new GraphActionProxy(this,
+				mapId,
 				label,
 				toolTip,
-				imageName);
+				imageName,
+				commandId);
 
-//		action.setActionDefinitionId(definitionId);
-
-		fGraphActions.put(id, action);
+		fGraphActions.put(mapId, action);
 
 		return action;
 	}
@@ -233,64 +259,190 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * create the tour specific action, they are defined in the chart configuration
+	 * Creates the handlers for the tour chart actions in the workbench, the internal action bar
+	 * will be disabled
+	 * 
+	 * @param commandService
+	 * @param handlerService
+	 * @param tourChartConfig
 	 */
+	public void createTourActionHandlers(	ICommandService commandService,
+											IHandlerService handlerService,
+											TourChartConfiguration tourChartConfig) {
+
+		fUseInternalActionBar = false;
+		fShowActions = true;
+
+//		fCommandService = commandService;
+		fHandlerService = handlerService;
+
+		fTourChartConfig = tourChartConfig;
+
+		createTourActions();
+	}
+
 	private void createTourActions() {
 
-		// create all actions only once
+		// create actions only once
 		if (fGraphActions != null) {
 			return;
 		}
 
-		final IToolBarManager tbm = getToolbarManager();
-
-		fGraphActions = new HashMap<Integer, Action>();
-
-		fActionXAxesTime = new ActionXAxesTime(this);
-		fActionXAxesDistance = new ActionXAxesDistance(this);
-		fActionZoomFitGraph = new ActionZoomFitGraph(this);
+		fGraphActions = new HashMap<Integer, GraphActionProxy>();
 
 		createGraphAction(TourManager.GRAPH_ALTITUDE,
 				Messages.Graph_Label_Altitude,
 				Messages.Tour_Action_graph_altitude_tooltip,
 				Messages.Image_graph_altitude,
-				"net.tourbook.commands.graphLayout.altitude");
+				"net.tourbook.command.graph.altitude");
 
 		createGraphAction(TourManager.GRAPH_SPEED,
 				Messages.Graph_Label_Speed,
 				Messages.Tour_Action_graph_speed_tooltip,
 				Messages.Image_graph_speed,
-				"net.tourbook.commands.graphLayout.speed");
+				"net.tourbook.command.graph.speed");
 
 		createGraphAction(TourManager.GRAPH_ALTIMETER,
 				Messages.Graph_Label_Altimeter,
 				Messages.Tour_Action_graph_altimeter_tooltip,
 				Messages.Image_graph_altimeter,
-				"net.tourbook.commands.graphLayout.altimeter");
+				"net.tourbook.command.graph.altimeter");
 
 		createGraphAction(TourManager.GRAPH_PULSE,
 				Messages.Graph_Label_Heartbeat,
 				Messages.Tour_Action_graph_heartbeat_tooltip,
 				Messages.Image_graph_heartbeat,
-				"net.tourbook.commands.graphLayout.pulse");
+				"net.tourbook.command.graph.pulse");
 
 		createGraphAction(TourManager.GRAPH_TEMPERATURE,
 				Messages.Graph_Label_Temperature,
 				Messages.Tour_Action_graph_temperature_tooltip,
 				Messages.Image_graph_temperature,
-				"net.tourbook.commands.graphLayout.temperature");
+				"net.tourbook.command.graph.temperature");
 
 		createGraphAction(TourManager.GRAPH_CADENCE,
 				Messages.Graph_Label_Cadence,
 				Messages.Tour_Action_graph_cadence_tooltip,
 				Messages.Image_graph_cadence,
-				"net.tourbook.commands.graphLayout.cadence");
+				"net.tourbook.command.graph.cadence");
 
 		createGraphAction(TourManager.GRAPH_GRADIENT,
 				Messages.Graph_Label_Gradiend,
 				Messages.Tour_Action_graph_gradient_tooltip,
 				Messages.Image_graph_gradient,
-				"net.tourbook.commands.graphLayout.gradient");
+				"net.tourbook.command.graph.gradient");
+
+		fActionXAxesTime = new ActionXAxesTime(this);
+		fActionXAxesDistance = new ActionXAxesDistance(this);
+		fActionZoomFitGraph = new ActionZoomFitGraph(this);
+	}
+
+	/**
+	 * Deactivate all tour chart action handlers, this is used when a part is deactivated
+	 */
+	public void deactivateHandler() {
+
+		if (fUseInternalActionBar) {
+			return;
+		}
+
+		for (Iterator<GraphActionProxy> iterator = fGraphActions.values().iterator(); iterator.hasNext();) {
+
+			GraphActionProxy actionProxy = (GraphActionProxy) iterator.next();
+
+			fHandlerService.deactivateHandler(actionProxy.getHandlerActivation());
+		}
+	}
+
+	public void dispose() {
+
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.removePropertyChangeListener(fPrefChangeListener);
+
+		super.dispose();
+	}
+
+	/**
+	 * Enable/disable the graph buttons, this depends on the visible graphs which are defined in the
+	 * chart config
+	 */
+	void enableActions() {
+
+		final ArrayList<Integer> visibleGraphList = fTourChartConfig.getVisibleGraphs();
+
+		// enable/uncheck all graph action
+		for (final GraphActionProxy graphAction : fGraphActions.values()) {
+			graphAction.setChecked(false);
+			graphAction.setEnabled(true);
+		}
+
+		// check all actions which correspond to visible graphs
+		if (visibleGraphList.size() == 1) {
+			// disable the graph button when only one graph is displayed
+			for (final int actionId : visibleGraphList) {
+				fGraphActions.get(actionId).setChecked(true);
+				fGraphActions.get(actionId).setEnabled(false);
+			}
+		} else {
+			// enable all graph buttons
+			for (final int actionId : visibleGraphList) {
+				fGraphActions.get(actionId).setChecked(true);
+				fGraphActions.get(actionId).setEnabled(true);
+			}
+		}
+
+		if (fUseInternalActionBar == false) {
+
+			// update the enable/check state in the UI
+			for (final GraphActionProxy graphAction : fGraphActions.values()) {
+//				fCommandService.refreshElements(graphAction.getCommandId(), null);
+				graphAction.getActionHandler().fireHandlerChanged();
+
+			}
+		}
+
+//		fActionOptions.actionStartTimeOption.setEnabled(fTourChartConfig.showTimeOnXAxis);
+//		fActionOptions.actionStartTimeOption.setChecked(fTourChartConfig.isStartTime);
+//
+//		fActionXAxesTime.setChecked(fTourChartConfig.showTimeOnXAxis);
+//		fActionXAxesDistance.setChecked(!fTourChartConfig.showTimeOnXAxis);
+
+//		enableZoomOptions();
+	}
+
+	/**
+	 * enable/disable and check/uncheck the zoom options
+	 */
+	private void enableZoomOptions() {
+
+		// get options check status from the configuration
+		final boolean canScrollZoomedChart = fTourChartConfig.scrollZoomedGraph;
+		final boolean canAutoZoomToSlider = fTourChartConfig.autoZoomToSlider;
+
+		// update the chart
+		setCanScrollZoomedChart(canScrollZoomedChart);
+		setCanAutoZoomToSlider(canAutoZoomToSlider);
+
+		// check the options
+		fActionOptions.actionCanScrollZoomedChart.setChecked(canScrollZoomedChart);
+		fActionOptions.actionCanAutoZoomToSlider.setChecked(canAutoZoomToSlider);
+
+		// enable the options
+		fActionOptions.actionCanScrollZoomedChart.setEnabled(true);
+		fActionOptions.actionCanAutoZoomToSlider.setEnabled(true);
+	}
+
+	/**
+	 * create the tour specific action, they are defined in the chart configuration
+	 */
+	private void fillToolbar() {
+
+		if (fGraphActions != null) {
+			return;
+		}
+
+		final IToolBarManager tbm = getToolbarManager();
 
 		fActionOptions = new ActionChartOptions(this, (ToolBarManager) tbm);
 
@@ -300,13 +452,13 @@ public class TourChart extends Chart {
 
 		tbm.add(new Separator());
 
-		tbm.add(fGraphActions.get(TourManager.GRAPH_SPEED));
-		tbm.add(fGraphActions.get(TourManager.GRAPH_ALTITUDE));
-		tbm.add(fGraphActions.get(TourManager.GRAPH_PULSE));
-		tbm.add(fGraphActions.get(TourManager.GRAPH_TEMPERATURE));
-		tbm.add(fGraphActions.get(TourManager.GRAPH_CADENCE));
-		tbm.add(fGraphActions.get(TourManager.GRAPH_ALTIMETER));
-		tbm.add(fGraphActions.get(TourManager.GRAPH_GRADIENT));
+		tbm.add(fGraphActions.get(TourManager.GRAPH_SPEED).getAction());
+		tbm.add(fGraphActions.get(TourManager.GRAPH_ALTITUDE).getAction());
+		tbm.add(fGraphActions.get(TourManager.GRAPH_PULSE).getAction());
+		tbm.add(fGraphActions.get(TourManager.GRAPH_TEMPERATURE).getAction());
+		tbm.add(fGraphActions.get(TourManager.GRAPH_CADENCE).getAction());
+		tbm.add(fGraphActions.get(TourManager.GRAPH_ALTIMETER).getAction());
+		tbm.add(fGraphActions.get(TourManager.GRAPH_GRADIENT).getAction());
 		tbm.add(new Separator());
 
 		tbm.add(fActionXAxesTime);
@@ -337,75 +489,6 @@ public class TourChart extends Chart {
 //		}
 	}
 
-	public void dispose() {
-
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.removePropertyChangeListener(fPrefChangeListener);
-
-		super.dispose();
-	}
-
-	/**
-	 * Enable/disable the graph buttons, this depends on the visible graphs which are defined in the
-	 * chart config
-	 */
-	void enableActions() {
-
-		final ArrayList<Integer> visibleGraphList = fTourChartConfig.getVisibleGraphs();
-
-		// enable/uncheck all graph action
-		for (final Action graphAction : fGraphActions.values()) {
-			graphAction.setChecked(false);
-			graphAction.setEnabled(true);
-		}
-
-		// check all actions which correspond to visible graphs
-		if (visibleGraphList.size() == 1) {
-			// disable the graph button when only one graph is displayed
-			for (final int actionId : visibleGraphList) {
-				fGraphActions.get(actionId).setChecked(true);
-				fGraphActions.get(actionId).setEnabled(false);
-			}
-		} else {
-			// enable all graph buttons
-			for (final int actionId : visibleGraphList) {
-				fGraphActions.get(actionId).setChecked(true);
-				fGraphActions.get(actionId).setEnabled(true);
-			}
-		}
-
-		fActionOptions.actionStartTimeOption.setEnabled(fTourChartConfig.showTimeOnXAxis);
-		fActionOptions.actionStartTimeOption.setChecked(fTourChartConfig.isStartTime);
-
-		fActionXAxesTime.setChecked(fTourChartConfig.showTimeOnXAxis);
-		fActionXAxesDistance.setChecked(!fTourChartConfig.showTimeOnXAxis);
-
-		enableZoomOptions();
-	}
-
-	/**
-	 * enable/disable and check/uncheck the zoom options
-	 */
-	private void enableZoomOptions() {
-
-		// get options check status from the configuration
-		final boolean canScrollZoomedChart = fTourChartConfig.scrollZoomedGraph;
-		final boolean canAutoZoomToSlider = fTourChartConfig.autoZoomToSlider;
-
-		// update the chart
-		setCanScrollZoomedChart(canScrollZoomedChart);
-		setCanAutoZoomToSlider(canAutoZoomToSlider);
-
-		// check the options
-		fActionOptions.actionCanScrollZoomedChart.setChecked(canScrollZoomedChart);
-		fActionOptions.actionCanAutoZoomToSlider.setChecked(canAutoZoomToSlider);
-
-		// enable the options
-		fActionOptions.actionCanScrollZoomedChart.setEnabled(true);
-		fActionOptions.actionCanAutoZoomToSlider.setEnabled(true);
-	}
-
 	/**
 	 * fire a selection event for this tour chart
 	 */
@@ -421,6 +504,9 @@ public class TourChart extends Chart {
 		}
 	}
 
+	// public boolean setFocus() {
+	// }
+
 	public TourData getTourData() {
 		return fTourData;
 	}
@@ -432,9 +518,6 @@ public class TourChart extends Chart {
 	public void removeTourChartListener(ITourChartSelectionListener listener) {
 		fSelectionListeners.remove(listener);
 	}
-
-	// public boolean setFocus() {
-	// }
 
 	/**
 	 * Enable/disable the zoom options in the tour chart
@@ -589,6 +672,21 @@ public class TourChart extends Chart {
 
 	}
 
+//	/**
+//	 * update the chart by getting the tourdata from the db
+//	 * 
+//	 * @param tourId
+//	 */
+//	void updateChart(final long tourId) {
+//
+//		// load the tourdata from the database
+//		TourData tourData = TourDatabase.getTourDataByTourId(tourId);
+//
+//		if (tourData != null) {
+//			updateChart(tourData, fTourChartConfig, true);
+//		}
+//	}
+
 	private void setSegmentLayer(	final ArrayList<IChartLayer> segmentValueLayers,
 									float[] segmentSerie,
 									String customDataKey) {
@@ -665,21 +763,6 @@ public class TourChart extends Chart {
 		}
 	}
 
-//	/**
-//	 * update the chart by getting the tourdata from the db
-//	 * 
-//	 * @param tourId
-//	 */
-//	void updateChart(final long tourId) {
-//
-//		// load the tourdata from the database
-//		TourData tourData = TourDatabase.getTourDataByTourId(tourId);
-//
-//		if (tourData != null) {
-//			updateChart(tourData, fTourChartConfig, true);
-//		}
-//	}
-
 	/**
 	 * update the chart with the current tour data and chart configuration
 	 * 
@@ -722,6 +805,7 @@ public class TourChart extends Chart {
 
 		if (fShowActions) {
 			createTourActions();
+			fillToolbar();
 			enableActions();
 		}
 

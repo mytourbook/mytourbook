@@ -758,8 +758,9 @@ public class ChartComponentGraph extends Canvas {
 
 			final float posIndex = (float) devXSliderLinePosition / fDevVirtualGraphImageWidth;
 
-			// enforce maxIndex
+			// enforce array bounds
 			valueIndex = (int) Math.min((posIndex * valuesLength), maxIndex);
+			valueIndex = Math.max(0, valueIndex);
 
 			// sliderIndex points into the value array for the current slider
 			// position

@@ -40,7 +40,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourStatisticsView extends ViewPart {
 
-	static public final String		ID			= "net.tourbook.views.tourStatisticeView";	//$NON-NLS-1$
+	static public final String		ID			= "net.tourbook.views.StatisticView";	//$NON-NLS-1$
 
 	private static IMemento			fSessionMemento;
 

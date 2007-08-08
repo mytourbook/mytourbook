@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IActionBars;
 
 /**
  * Chart widget
@@ -92,9 +91,9 @@ public class Chart extends ViewForm {
 	 * when set to <code>true</code> the toolbar is within the chart control, otherwise the
 	 * toolbar is outsite of the chart
 	 */
-	boolean									fUseInternalToolbar			= true;
+	protected boolean						fUseInternalActionBar		= true;
 
-	private IActionBars						fActionBars;
+//	private IActionBars						fActionBars;
 	private int								fBarSelectionSerieIndex;
 	private int								fBarSelectionValueIndex;
 
@@ -366,12 +365,12 @@ public class Chart extends ViewForm {
 		});
 	}
 
-	/**
-	 * @return the fActionBars
-	 */
-	IActionBars getActionBars() {
-		return fActionBars;
-	}
+//	/**
+//	 * @return the fActionBars
+//	 */
+//	IActionBars getActionBars() {
+//		return fActionBars;
+//	}
 
 	public boolean getAdvancedGraphics() {
 		return fChartComponents.useAdvancedGraphics;
@@ -458,7 +457,7 @@ public class Chart extends ViewForm {
 			// create toolbar manager
 			fToolbarMgr = new ToolBarManager(toolBarControl);
 
-			fUseInternalToolbar = true;
+			fUseInternalActionBar = true;
 		}
 
 		return fToolbarMgr;
@@ -566,54 +565,54 @@ public class Chart extends ViewForm {
 		fChartComponents.getChartComponentGraph().setCanScrollZoomedChart(canScrollabelZoomedGraph);
 	}
 
-	/**
-	 * set the action bars for the chart, chart actions will be activated when a chart is activated
-	 * 
-	 * @param part.
-	 */
-	public void setActionBars(IActionBars actionBars) {
-
-		fUseInternalToolbar = false;
-
-		fActionBars = actionBars;
-
-//		fContextPartListener = new IPartListener2() {
+//	/**
+//	 * set the action bars for the chart, chart actions will be activated when a chart is activated
+//	 * 
+//	 * @param part.
+//	 */
+//	public void setActionBars(IActionBars actionBars) {
 //
-//			public void partActivated(final IWorkbenchPartReference partRef) {
+//		fUseInternalToolbar = false;
+//
+//		fActionBars = actionBars;
+//
+////		fContextPartListener = new IPartListener2() {
+////
+////			public void partActivated(final IWorkbenchPartReference partRef) {
 ////				if (partRef.getId().equalsIgnoreCase(fServiceSite.getId())) {
 ////					IContextService contextService = (IContextService) fServiceSite.getService(IContextService.class);
 ////					fActivatedContext = contextService.activateContext(CONTEXT_ID);
 ////				}
-//			}
-//
-//			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-//
-//			public void partClosed(final IWorkbenchPartReference partRef) {
+////			}
+////
+////			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+////
+////			public void partClosed(final IWorkbenchPartReference partRef) {
 ////				if (partRef.getId().equalsIgnoreCase(fServiceSite.getId())) {
 ////					if (fContextPartListener != null) {
 ////						fServiceSite.getPage().removePartListener(fContextPartListener);
 ////					}
 ////				}
-//			}
-//
-//			public void partDeactivated(final IWorkbenchPartReference partRef) {
+////			}
+////
+////			public void partDeactivated(final IWorkbenchPartReference partRef) {
 ////				if (partRef.getId().equalsIgnoreCase(fServiceSite.getId())) {
 ////					IContextService contextService = (IContextService) fServiceSite.getService(IContextService.class);
 ////					contextService.deactivateContext(fActivatedContext);
 ////				}
-//			}
+////			}
+////
+////			public void partHidden(final IWorkbenchPartReference partRef) {}
+////
+////			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+////
+////			public void partOpened(final IWorkbenchPartReference partRef) {}
+////
+////			public void partVisible(final IWorkbenchPartReference partRef) {}
+////		};
 //
-//			public void partHidden(final IWorkbenchPartReference partRef) {}
-//
-//			public void partInputChanged(final IWorkbenchPartReference partRef) {}
-//
-//			public void partOpened(final IWorkbenchPartReference partRef) {}
-//
-//			public void partVisible(final IWorkbenchPartReference partRef) {}
-//		};
-
-//		actionBars.getPage().addPartListener(fContextPartListener);
-	}
+////		actionBars.getPage().addPartListener(fContextPartListener);
+//	}
 
 	/**
 	 * Sets a new data model for the chart and redraws it, NULL will hide the chart
@@ -756,7 +755,7 @@ public class Chart extends ViewForm {
 	 */
 	public void showActions(boolean refreshToolbar) {
 
-		if (fUseInternalToolbar
+		if (fUseInternalActionBar
 				&& fChartActions != null
 				&& (showPartNavigation || fShowZoomActions)) {
 
@@ -783,9 +782,9 @@ public class Chart extends ViewForm {
 				tbm.update(true);
 			}
 		} else {
-			if (fActionBars != null && refreshToolbar) {
-				fActionBars.updateActionBars();
-			}
+//			if (fActionBars != null && refreshToolbar) {
+//				fActionBars.updateActionBars();
+//			}
 		}
 	}
 
@@ -853,5 +852,62 @@ public class Chart extends ViewForm {
 
 		fChartComponents.zoomWithParts(parts, position);
 	}
+
+	public boolean setFocus() {
+
+		/*
+		 * set focus to the graph component
+		 */
+		return fChartComponents.getChartComponentGraph().setFocus();
+	}
+
+	public Object getChartActions() {
+//		x
+		return null;
+	}
+
+	public boolean isUseInternalActionBar() {
+		return fUseInternalActionBar;
+	}
+
+//	public void updateStatus() {
+//		if (fActionBars == null) {
+//			return;
+//		}
+//
+//		Collection<ChartAction> chartActions = fChartActions.values();
+//
+//		for (ChartAction chartAction : chartActions) {
+//			chartAction.updateStatus();
+////			if (chartAction.getAction() instanceof RetargetAction) {
+////				RetargetAction retargetAction = (RetargetAction) chartAction.getAction();
+////				retargetAction.partActivated(part);
+////			}
+//		}
+//System.out.println("");
+//		
+//	}
+
+//	/**
+//	 * When a part is activated the retarget actions must be activated for this part
+//	 * 
+//	 * @param part
+//	 */
+//	public void partActivated(IWorkbenchPart part) {
+//
+//		if (fActionBars == null) {
+//			return;
+//		}
+//
+//		Collection<ChartAction> chartActions = fChartActions.values();
+//
+//		for (ChartAction chartAction : chartActions) {
+//			if (chartAction.getAction() instanceof RetargetAction) {
+//				RetargetAction retargetAction = (RetargetAction) chartAction.getAction();
+//				retargetAction.partActivated(part);
+//
+//			}
+//		}
+//	}
 
 }

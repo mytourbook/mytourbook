@@ -18,20 +18,21 @@ package net.tourbook.chart;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.ui.actions.RetargetAction;
 
 public class ChartAction {
 
-	private Chart	fTourChart;
+	private Chart	fChart;
 
 	private Action	fAction;
+
+	private boolean	fIsEnabled;
 
 	public ChartAction(final Chart chartWidget, final int actionMapId, String actionId,
 			String commandId, String text, String toolTip, String[] image) {
 
-		fTourChart = chartWidget;
+		fChart = chartWidget;
 
-		fAction = new RetargetAction(actionId, text) {
+		fAction = new Action(text) {
 			public void run() {
 				chartWidget.performZoomAction(actionMapId);
 			}
@@ -54,7 +55,10 @@ public class ChartAction {
 		fAction.setActionDefinitionId(commandId);
 
 		// bind the action handler to the action button/menu
-		fTourChart.getActionBars().setGlobalActionHandler(actionId, fAction);
+//		final IActionBars actionBars = fChart.getActionBars();
+//		if (actionBars != null) {
+//			actionBars.setGlobalActionHandler(actionId, fAction);
+//		}
 	}
 
 	public IAction getAction() {
@@ -62,7 +66,18 @@ public class ChartAction {
 	}
 
 	public void setEnabled(boolean isEnabled) {
+
+		// keep enablement state
+		fIsEnabled = isEnabled;
+
 		fAction.setEnabled(isEnabled);
+	}
+
+	/**
+	 * restore the enablement status to the last state
+	 */
+	public void updateStatus() {
+		fAction.setEnabled(fIsEnabled);
 	}
 
 }

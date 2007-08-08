@@ -3,22 +3,15 @@
 <plugin>
    <extension-point id="statisticYear" name="Year Statistic" schema="schema/statisticYear.exsd"/>
    <extension-point id="deviceDataReader" name="Device Data Reader" schema="schema/deviceDataReader.exsd"/>
-   <extension
-         point="org.eclipse.core.expressions.definitions">
-      <definition
-            id="net.tourbook.definition.activePartId_contains_tourChart">
-         <with
-               variable="activePartId">
-            <or>
-               <equals
-                     value="net.tourbook.tour.xTourEditor">
-               </equals>
-               <equals
-                     value="net.tourbook.ui.views.xTourChartView">
-               </equals>
-            </or>
-         </with>
-      </definition>
+
+     <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="net.tourbook.application.Application">
+         </run>
+      </application>
    </extension>
    <extension
          id="product"
@@ -57,19 +50,47 @@
          </property>
       </product>
    </extension>
-
-     <extension
-         id="application"
-         point="org.eclipse.core.runtime.applications">
-      <application>
-         <run
-               class="net.tourbook.application.Application">
-         </run>
-      </application>
-   </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer class="net.tourbook.preferences.PreferenceInitializer"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.splashHandlers">
+      <splashHandler
+            class="net.tourbook.application.MyTourbookSplashHandler"
+            id="net.tourbook.splashHandler">
+      </splashHandler>
+      <splashHandlerProductBinding
+            productId="net.tourbook.product"
+            splashId="net.tourbook.splashHandler">
+      </splashHandlerProductBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="net.tourbook.preferences.PrefPageBikes"
+            id="net.tourbook.preferences.PrefPageBikes"
+            name="%Pref_Bikes"/>
+      <page
+            class="net.tourbook.preferences.PrefPagePeople"
+            id="net.tourbook.preferences.PrefPageClients"
+            name="%Pref_People"/>
+      <page
+            class="net.tourbook.preferences.PrefPageStatistic"
+            id="net.tourbook.preferences.PrefPageStatistic"
+            name="%Pref_Statistics"/>
+      <page
+            class="net.tourbook.preferences.PrefPageChartColors"
+            id="net.tourbook.preferences.PrefPageChartColors"
+            name="%Pref_Chart_Colors"/>
+      <page
+            class="net.tourbook.preferences.PrefPageChartGraphs"
+            id="net.tourbook.preferences.PrefPageChartGraphs"
+            name="%Pref_Graphs"/>
+      <page
+            class="net.tourbook.preferences.PrefPageTourTypes"
+            id="net.tourbook.preferences.PrefPageTourTypes"
+            name="%Pref_Tour_Types"/>
    </extension>
 
    <extension
@@ -86,123 +107,6 @@
                menubarPath="file/update">
          </action>
       </actionSet>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="net.tourbook.perspectiveRawData">
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveTourBook">
-         </perspectiveShortcut>
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveTourMap">
-         </perspectiveShortcut>
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveStatistic">
-         </perspectiveShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourChartAnalyzer">
-         </viewShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourChartView">
-         </viewShortcut>
-         <actionSet
-               id="net.tourbook.chart.actionSet.chartActions">
-         </actionSet>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="net.tourbook.perspectiveTourBook">
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveRawData">
-         </perspectiveShortcut>
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveTourMap">
-         </perspectiveShortcut>
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveStatistic">
-         </perspectiveShortcut>
-         <viewShortcut
-               id="net.tourbook.views.tourListView">
-         </viewShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourChartView">
-         </viewShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourSegmenter">
-         </viewShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourChartAnalyzer">
-         </viewShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourMarkerView">
-         </viewShortcut>
-         <actionSet
-               id="net.tourbook.chart.actionSet.chartActions">
-         </actionSet>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="net.tourbook.perspectiveTourMap">
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveTourBook">
-         </perspectiveShortcut>
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveRawData">
-         </perspectiveShortcut>
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveStatistic">
-         </perspectiveShortcut>
-         <viewShortcut
-               id="net.tourbook.views.tourMap.TourMapView">
-         </viewShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourChartView">
-         </viewShortcut>
-         <actionSet
-               id="net.tourbook.chart.actionSet.chartActions">
-         </actionSet>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="net.tourbook.perspectiveStatistic">
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveTourBook">
-         </perspectiveShortcut>
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveRawData">
-         </perspectiveShortcut>
-         <perspectiveShortcut
-               id="net.tourbook.perspectiveTourMap">
-         </perspectiveShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourChartView">
-         </viewShortcut>
-      </perspectiveExtension>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
-            class="net.tourbook.application.PerspectiveFactoryRawData"
-            icon="icons/rawdata-perspective.gif"
-            id="net.tourbook.perspectiveRawData"
-            name="%Perspective_RawData">
-      </perspective>
-      <perspective
-            class="net.tourbook.application.PerspectiveFactoryTourBook"
-            icon="icons/tour-list-perspective.gif"
-            id="net.tourbook.perspectiveTourBook"
-            name="%Perspective_TourBook">
-      </perspective>
-      <perspective
-            class="net.tourbook.application.PerspectiveFactoryTourMap"
-            icon="icons/tour-map-perspective.gif"
-            id="net.tourbook.perspectiveTourMap"
-            name="%Perspective_TourMap">
-      </perspective>
-      <perspective
-            class="net.tourbook.application.PerspectiveFactoryStatistic"
-            icon="icons/statistics-perspective.gif"
-            id="net.tourbook.perspectiveStatistic"
-            name="%Perspective_Statistics">
-      </perspective>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -230,10 +134,10 @@
             id="net.tourbook.views.tourMap.TourMapView"
             name="%View_Tour_Map"/>
       <view
-            category="net.tourbook.category.tourAnalyze"
+            category="net.tourbook.category.tourList"
             class="net.tourbook.ui.views.TourStatisticsView"
             icon="icons/statistics.gif"
-            id="net.tourbook.views.tourStatisticeView"
+            id="net.tourbook.views.StatisticView"
             name="%View_Tour_Statistics">
       </view>
       <category
@@ -288,42 +192,115 @@
          </view>
    </extension>
    <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="net.tourbook.preferences.PrefPageBikes"
-            id="net.tourbook.preferences.PrefPageBikes"
-            name="%Pref_Bikes"/>
-      <page
-            class="net.tourbook.preferences.PrefPagePeople"
-            id="net.tourbook.preferences.PrefPageClients"
-            name="%Pref_People"/>
-      <page
-            class="net.tourbook.preferences.PrefPageStatistic"
-            id="net.tourbook.preferences.PrefPageStatistic"
-            name="%Pref_Statistics"/>
-      <page
-            class="net.tourbook.preferences.PrefPageChartColors"
-            id="net.tourbook.preferences.PrefPageChartColors"
-            name="%Pref_Chart_Colors"/>
-      <page
-            class="net.tourbook.preferences.PrefPageChartGraphs"
-            id="net.tourbook.preferences.PrefPageChartGraphs"
-            name="%Pref_Graphs"/>
-      <page
-            class="net.tourbook.preferences.PrefPageTourTypes"
-            id="net.tourbook.preferences.PrefPageTourTypes"
-            name="%Pref_Tour_Types"/>
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="net.tourbook.application.PerspectiveFactoryTourBook"
+            icon="icons/tour-list-perspective.gif"
+            id="net.tourbook.perspective.TourBook"
+            name="%Perspective_TourBook">
+      </perspective>
+      <perspective
+            class="net.tourbook.application.PerspectiveFactoryRawData"
+            icon="icons/rawdata-perspective.gif"
+            id="net.tourbook.perspective.RawData"
+            name="%Perspective_RawData">
+      </perspective>
+      <perspective
+            class="net.tourbook.application.PerspectiveFactoryTourMap"
+            icon="icons/tour-map-perspective.gif"
+            id="net.tourbook.perspective.TourMap"
+            name="%Perspective_TourMap">
+      </perspective>
+      <perspective
+            class="net.tourbook.application.PerspectiveFactoryStatistic"
+            icon="icons/statistics-perspective.gif"
+            id="net.tourbook.perspective.Statistic"
+            name="%Perspective_Statistics">
+      </perspective>
    </extension>
    <extension
-         point="org.eclipse.ui.splashHandlers">
-      <splashHandler
-            class="net.tourbook.application.MyTourbookSplashHandler"
-            id="net.tourbook.splashHandler">
-      </splashHandler>
-      <splashHandlerProductBinding
-            productId="net.tourbook.product"
-            splashId="net.tourbook.splashHandler">
-      </splashHandlerProductBinding>
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="net.tourbook.perspective.RawData">
+         <perspectiveShortcut
+               id="net.tourbook.perspective.TourBook">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspective.TourMap">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspective.Statistic">
+         </perspectiveShortcut>
+         <viewShortcut
+               id="net.tourbook.views.TourChartAnalyzer">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.TourChartView">
+         </viewShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="net.tourbook.perspective.TourBook">
+         <perspectiveShortcut
+               id="net.tourbook.perspective.RawData">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspective.TourMap">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspective.Statistic">
+         </perspectiveShortcut>
+         <viewShortcut
+               id="net.tourbook.views.tourListView">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.TourChartView">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.TourSegmenter">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.TourChartAnalyzer">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.TourMarkerView">
+         </viewShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="net.tourbook.perspective.TourMap">
+         <perspectiveShortcut
+               id="net.tourbook.perspective.TourBook">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspective.RawData">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspective.Statistic">
+         </perspectiveShortcut>
+         <viewShortcut
+               id="net.tourbook.views.tourMap.TourMapView">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.TourChartView">
+         </viewShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="net.tourbook.perspective.Statistic">
+         <perspectiveShortcut
+               id="net.tourbook.perspective.TourBook">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspective.RawData">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspective.TourMap">
+         </perspectiveShortcut>
+         <viewShortcut
+               id="net.tourbook.views.TourChartView">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.StatisticView">
+         </viewShortcut>
+      </perspectiveExtension>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -342,42 +319,95 @@
       </factory>
    </extension>
    <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="net.tourbook.definition.activePartId_contains_tourChart">
+         <with
+               variable="activePartId">
+            <or>
+               <equals
+                     value="net.tourbook.tour.TourEditor">
+               </equals>
+               <equals
+                     value="net.tourbook.views.TourChartView">
+               </equals>
+            </or>
+         </with>
+      </definition>
+   </extension>
+   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
                id="net.tourbook.toolbars.graphs">
             <command
-                  commandId="net.tourbook.commandId.graph.speed"
-                  disabledIcon="icons/graph-speed-disabled.gif"
-                  icon="icons/graph-speed.gif"
-                  id="net.tourbook.toolbar.graph.speed"
-                  label="Speed"
-                  style="toggle"
-                  tooltip="Show/Hide Speed">
-            </command>
-            <command
-                  commandId="net.tourbook.commandId.graph.altitude"
+                  commandId="net.tourbook.command.graph.altitude"
                   disabledIcon="icons/graph-altitude-disabled.gif"
                   icon="icons/graph-altitude.gif"
                   id="net.tourbook.toolbar.graph.altitude"
-                  label="Altitude"
+                  label="%Command_graph_altitude_label"
                   style="toggle"
-                  tooltip="Show/Hide Altitude">
+                  tooltip="%Command_graph_altitude_tooltip">
             </command>
             <command
-                  commandId="net.tourbook.commandId.graph.pulse"
+                  commandId="net.tourbook.command.graph.speed"
+                  disabledIcon="icons/graph-speed-disabled.gif"
+                  icon="icons/graph-speed.gif"
+                  id="net.tourbook.toolbar.graph.speed"
+                  style="toggle"
+                  label="%Command_graph_speed_label"
+                  tooltip="%Command_graph_speed_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.graph.pulse"
                   disabledIcon="icons/graph-pulse-disabled.gif"
                   icon="icons/graph-pulse.gif"
                   id="net.tourbook.toolbar.graph.pulse"
-                  label="Pulse"
                   style="toggle"
-                  tooltip="Show/Hide Pulse">
+                  label="%Command_graph_pulse_label"
+                  tooltip="%Command_graph_pulse_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.graph.temperature"
+                  disabledIcon="icons/graph-temperature-disabled.gif"
+                  icon="icons/graph-temperature.gif"
+                  id="net.tourbook.toolbar.graph.temperature"
+                  style="toggle"
+                  label="%Command_graph_temperature_label"
+                  tooltip="%Command_graph_temperature_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.graph.cadence"
+                  disabledIcon="icons/graph-cadence-disabled.gif"
+                  icon="icons/graph-cadence.gif"
+                  id="net.tourbook.toolbar.graph.cadence"
+                  style="toggle"
+                  label="%Command_graph_cadence_label"
+                  tooltip="%Command_graph_cadence_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.graph.altimeter"
+                  disabledIcon="icons/graph-altimeter-disabled.gif"
+                  icon="icons/graph-altimeter.gif"
+                  id="net.tourbook.toolbar.graph.altimeter"
+                  style="toggle"
+                  label="%Command_graph_altimeter_label"
+                  tooltip="%Command_graph_altimeter_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.graph.gradient"
+                  disabledIcon="icons/graph-gradient-disabled.gif"
+                  icon="icons/graph-gradient.gif"
+                  id="net.tourbook.toolbar.graph.gradient"
+                  style="toggle"
+                  label="%Command_graph_gradient_label"
+                  tooltip="%Command_graph_gradient_tooltip">
             </command>
          </toolbar>
       </menuContribution>
       <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+            locationURI="xmenu:org.eclipse.ui.main.menu?after=additions">
          <menu
                id="net.tourbook.menus.tourEditor"
                label="Tour Editor"
@@ -396,7 +426,7 @@
          </menu>
       </menuContribution>
       <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+            locationURI="xtoolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
                id="net.tourbook.toolbars.graphLayout">
             <command
@@ -414,52 +444,55 @@
    <extension
          point="org.eclipse.ui.commands">
       <category
-            id="net.tourbook.commands.category.tourEditor"
+            id="net.tourbook.command.category.tourEditor"
             name="Tour Editor">
       </category>
       <command
-            id="net.tourbook.commands.openMarkerView"
-            categoryId="net.tourbook.commands.category.tourEditor"
+            id="net.tourbook.command.openMarkerView"
+            categoryId="net.tourbook.command.category.tourEditor"
             name="Open Markers">
       </command>
       <command
-            id="net.tourbook.commandId.graph.altitude"
-            categoryId="net.tourbook.commands.category.tourEditor"
-            name="Show/Hide Altitude">
+            id="net.tourbook.command.graph.altitude"
+            categoryId="net.tourbook.command.category.tourEditor"
+            name="%Command_graph_altitude_label">
       </command>
       <command
-            id="net.tourbook.commandId.graph.speed"
-            categoryId="net.tourbook.commands.category.tourEditor"
-            name="Show/Hide Speed">
+            id="net.tourbook.command.graph.speed"
+            categoryId="net.tourbook.command.category.tourEditor"
+            name="%Command_graph_speed_label">
       </command>
       <command
-            categoryId="net.tourbook.commands.category.tourEditor"
-            id="net.tourbook.commandId.graph.pulse"
-            name="Show/Hide Pulse">
+            categoryId="net.tourbook.command.category.tourEditor"
+            id="net.tourbook.command.graph.pulse"
+            name="%Command_graph_pulse_label">
+      </command>
+      <command
+            categoryId="net.tourbook.command.category.tourEditor"
+            id="net.tourbook.command.graph.temperature"
+            name="%Command_graph_temperature_label">
+      </command>
+      <command
+            categoryId="net.tourbook.command.category.tourEditor"
+            id="net.tourbook.command.graph.cadence"
+            name="%Command_graph_cadence_label">
+      </command>
+      <command
+            categoryId="net.tourbook.command.category.tourEditor"
+            id="net.tourbook.command.graph.altimeter"
+            name="%Command_graph_altimeter_label">
+      </command>
+      <command
+            categoryId="net.tourbook.command.category.tourEditor"
+            id="net.tourbook.command.graph.gradient"
+            name="%Command_graph_gradient_label">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
             class="net.tourbook.tour.HandlerOpenMarkerView"
-            commandId="net.tourbook.commands.openMarkerView">
-      </handler>
-      <handler
-            class="net.tourbook.tour.HandlerGraphLayoutSpeed"
-            commandId="net.tourbook.commands.graphLayout.speed">
-         <activeWhen>
-            <reference
-                  definitionId="net.tourbook.definition.activePartId_contains_tourChart">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="net.tourbook.tour.HandlerGraphLayoutPulse"
-            commandId="net.tourbook.commands.graphLayout.pulse">
-         <activeWhen>
-            <reference
-                  definitionId="net.tourbook.definition.activeEditor">
-            </reference></activeWhen>
+            commandId="net.tourbook.command.openMarkerView">
       </handler>
    </extension>
    <extension

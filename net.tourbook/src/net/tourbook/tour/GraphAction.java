@@ -18,13 +18,12 @@ package net.tourbook.tour;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.swt.widgets.Event;
 
-class ActionChangeGraphLayout extends Action {
+class GraphAction extends Action {
 
-	private TourChart				fTourChart;
+	private TourChart	fTourChart;
 
-	private int						fGraphId;
+	private int			fMapId;
 
 	/**
 	 * Creates an action for a toggle button
@@ -36,41 +35,35 @@ class ActionChangeGraphLayout extends Action {
 	 * @param image
 	 * @param isChecked
 	 */
-	public ActionChangeGraphLayout(TourChart tourChart,
-			int id, String label, String toolTip,
-			String image) {
+	public GraphAction(TourChart tourChart, int mapId, String label, String toolTip, String image) {
 
 		super(label, AS_CHECK_BOX);
 
 		fTourChart = tourChart;
-		fGraphId = id;
+		fMapId = mapId;
 
 		setToolTipText(toolTip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(image));
 
-		setChecked(tourChart.fTourChartConfig.getVisibleGraphs().contains(id));
+		setChecked(tourChart.fTourChartConfig.getVisibleGraphs().contains(mapId));
 	}
 
 	public void run() {
 
 		TourChartConfiguration chartConfig = fTourChart.fTourChartConfig;
-		
-		boolean graphIsVisible = chartConfig.getVisibleGraphs().contains(fGraphId);
 
-		if (!graphIsVisible) {
+		boolean isGraphVisible = chartConfig.getVisibleGraphs().contains(fMapId);
+
+		if (!isGraphVisible) {
 			// add the graph to the list
-			chartConfig.addVisibleGraph(fGraphId);
+			chartConfig.addVisibleGraph(fMapId);
 		} else {
 			// remove the graph from the list
-			chartConfig.removeVisibleGraph(fGraphId);
+			chartConfig.removeVisibleGraph(fMapId);
 		}
 
 		fTourChart.enableActions();
 		fTourChart.updateChart(true);
-	}
-
-	public void runWithEvent(Event event) {
-		super.runWithEvent(event);
 	}
 
 }

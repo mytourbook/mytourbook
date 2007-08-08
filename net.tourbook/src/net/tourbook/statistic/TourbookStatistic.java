@@ -81,8 +81,9 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * Select the tour in the statistic, this is used to visualize a selected tour in the statistic
-	 * chart.
+	 * Select a tour in the statistic to visualize a selected tour.
+	 * <p>
+	 * This can be overwritten to select a tour in the statistic
 	 * 
 	 * @param tourId
 	 * @return <code>true</code> when a tour was selected
