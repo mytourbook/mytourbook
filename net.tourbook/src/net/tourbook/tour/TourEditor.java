@@ -37,10 +37,7 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
 
 public class TourEditor extends EditorPart {
@@ -65,7 +62,7 @@ public class TourEditor extends EditorPart {
 
 			public void partActivated(IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
-					fTourChart.activateHandler();
+					fTourChart.activateActions();
 				}
 			}
 
@@ -73,11 +70,7 @@ public class TourEditor extends EditorPart {
 
 			public void partClosed(IWorkbenchPartReference partRef) {}
 
-			public void partDeactivated(IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourEditor.this) {
-					fTourChart.deactivateHandler();
-				}
-			}
+			public void partDeactivated(IWorkbenchPartReference partRef) {}
 
 			public void partHidden(IWorkbenchPartReference partRef) {}
 
@@ -109,14 +102,7 @@ public class TourEditor extends EditorPart {
 		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-
-		final IWorkbenchWindow workbenchWindow = getSite().getWorkbenchWindow();
-
-		fTourChart.createTourActionHandlers((ICommandService) workbenchWindow.getService(ICommandService.class),
-				(IHandlerService) workbenchWindow.getService(IHandlerService.class),
-				fTourChartConfig);
-
-//		fTourChart.activateHandler();
+		fTourChart.createTourActionHandlers(getSite().getWorkbenchWindow(), fTourChartConfig);
 
 		// load the tourdata from the database
 		fTourData = TourManager.getInstance().getTourData(fEditorInput.fTourId);

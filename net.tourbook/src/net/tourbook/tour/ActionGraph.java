@@ -15,15 +15,17 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.util.ArrayList;
+
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-class GraphAction extends Action {
+class ActionGraph extends Action {
 
 	private TourChart	fTourChart;
 
-	private int			fMapId;
+	private int			fGraphId;
 
 	/**
 	 * Creates an action for a toggle button
@@ -35,34 +37,45 @@ class GraphAction extends Action {
 	 * @param image
 	 * @param isChecked
 	 */
-	public GraphAction(TourChart tourChart, int mapId, String label, String toolTip, String image) {
+	public ActionGraph(TourChart tourChart, int graphId, String label, String toolTip, String image) {
 
 		super(label, AS_CHECK_BOX);
 
 		fTourChart = tourChart;
-		fMapId = mapId;
+		fGraphId = graphId;
 
 		setToolTipText(toolTip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(image));
 
-		setChecked(tourChart.fTourChartConfig.getVisibleGraphs().contains(mapId));
+		setChecked(tourChart.fTourChartConfig.getVisibleGraphs().contains(graphId));
 	}
 
 	public void run() {
 
 		TourChartConfiguration chartConfig = fTourChart.fTourChartConfig;
+		final ArrayList<Integer> visibleGraphs = chartConfig.getVisibleGraphs();
 
-		boolean isGraphVisible = chartConfig.getVisibleGraphs().contains(fMapId);
+		final boolean isThisGraphVisible = visibleGraphs.contains(fGraphId);
 
-		if (!isGraphVisible) {
-			// add the graph to the list
-			chartConfig.addVisibleGraph(fMapId);
-		} else {
-			// remove the graph from the list
-			chartConfig.removeVisibleGraph(fMapId);
+		// check that at least one graph is visible
+		if (isThisGraphVisible && visibleGraphs.size() == 1) {
+
+			// this is a toggle button so the check status must be reset
+
+			setChecked(true);
+
+			return;
 		}
 
-		fTourChart.enableActions();
+		if (!isThisGraphVisible) {
+			// add the graph to the list
+			chartConfig.addVisibleGraph(fGraphId);
+		} else {
+			// remove the graph from the list
+			chartConfig.removeVisibleGraph(fGraphId);
+		}
+
+		fTourChart.updateActionState();
 		fTourChart.updateChart(true);
 	}
 

@@ -20,41 +20,24 @@ import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionXAxesTime extends Action {
+public class ActionXAxisDistance extends Action {
 
-	private TourChart	tourChart;
+	private TourChart	fTourChart;
 
-	public ActionXAxesTime(TourChart tourChart) {
+	public ActionXAxisDistance(TourChart tourChart) {
 
-		super(Messages.Tour_Action_show_time_on_x_axis, AS_RADIO_BUTTON);
+		super(Messages.Tour_Action_show_distance_on_x_axis, AS_RADIO_BUTTON);
 
-		this.tourChart = tourChart;
+		this.fTourChart = tourChart;
 
-		setToolTipText(Messages.Tour_Action_show_time_on_x_axis_tooltip);
+		setToolTipText(Messages.Tour_Action_show_distance_on_x_axis_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_show_distance_on_x_axis));
 
-		setChecked(tourChart.fTourChartConfig.showTimeOnXAxis);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_show_time_on_x_axis));
+		setChecked(!tourChart.fTourChartConfig.showTimeOnXAxis);
 	}
 
 	public void run() {
-
-		if (isChecked()) {
-
-			// show time on x axes
-
-			TourChartConfiguration chartConfig = tourChart.fTourChartConfig;
-			
-			chartConfig.showTimeOnXAxis = !chartConfig.showTimeOnXAxis;
-			chartConfig.showTimeOnXAxisBackup = chartConfig.showTimeOnXAxis;
-
-			tourChart.switchSlidersTo2ndXData();
-			tourChart.updateChart(true);
-
-			tourChart.fActionOptions.actionStartTimeOption.setEnabled(true);
-
-		} else {
-			// this action got unchecked - keep this state
-			tourChart.fActionOptions.actionStartTimeOption.setEnabled(false);
-		}
+		fTourChart.actionXAxisDistance(isChecked());
 	}
+
 }

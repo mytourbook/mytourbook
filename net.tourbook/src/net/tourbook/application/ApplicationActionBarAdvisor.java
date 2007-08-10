@@ -280,18 +280,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		// ---------------------------------------------------------
 
-		IToolBarManager openToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-
-		openToolbar.add(new Separator());
-		openToolbar.add(fActionTourChartView);
-
-		openToolbar.add(new Separator());
-		openToolbar.add(fActionRawDataView);
-		openToolbar.add(fActionTourBookView);
-		openToolbar.add(fActionTourMapView);
-		openToolbar.add(fActionStatisticsView);
-
-		coolBar.add(new ToolBarContributionItem(openToolbar, "main")); //$NON-NLS-1$
+//		IToolBarManager openToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+//
+//		openToolbar.add(new Separator());
+//		openToolbar.add(fActionTourChartView);
+//
+//		openToolbar.add(new Separator());
+//		openToolbar.add(fActionRawDataView);
+//		openToolbar.add(fActionTourBookView);
+//		openToolbar.add(fActionTourMapView);
+//		openToolbar.add(fActionStatisticsView);
+//
+//		coolBar.add(new ToolBarContributionItem(openToolbar, "main")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 
@@ -305,12 +305,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		// ---------------------------------------------------------
 
-		IToolBarManager prefToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-
-		prefToolbar.add(new Separator());
-		prefToolbar.add(fActionPreferences);
-
-		coolBar.add(new ToolBarContributionItem(prefToolbar, "pref")); //$NON-NLS-1$
+//		IToolBarManager prefToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+//
+//		prefToolbar.add(new Separator());
+//		prefToolbar.add(fActionPreferences);
+//
+//		coolBar.add(new ToolBarContributionItem(prefToolbar, "pref")); //$NON-NLS-1$
 	}
 
 }

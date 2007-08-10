@@ -35,8 +35,10 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -59,6 +61,38 @@ public class TourChartView extends ViewPart {
 	private PageBook				fPageBook;
 
 	private Label					fPageNoChart;
+
+	private IPartListener2			fPartListener;
+
+	private void addPartListener() {
+
+		// set the part listener
+		fPartListener = new IPartListener2() {
+
+			public void partActivated(IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourChartView.this) {
+					fTourChart.activateActions();
+				}
+			}
+
+			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
+
+			public void partClosed(IWorkbenchPartReference partRef) {}
+
+			public void partDeactivated(IWorkbenchPartReference partRef) {}
+
+			public void partHidden(IWorkbenchPartReference partRef) {}
+
+			public void partInputChanged(IWorkbenchPartReference partRef) {}
+
+			public void partOpened(IWorkbenchPartReference partRef) {}
+
+			public void partVisible(IWorkbenchPartReference partRef) {}
+		};
+
+		// register the part listener
+		getSite().getPage().addPartListener(fPartListener);
+	}
 
 	private void addPrefListener() {
 
@@ -108,10 +142,11 @@ public class TourChartView extends ViewPart {
 		fPageNoChart.setText("A tour is not selected");
 
 		fTourChart = new TourChart(fPageBook, SWT.FLAT, false);
-//		fTourChart.setActionBars(getViewSite().getActionBars());
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
 
+		fTourChartConfig = TourManager.createTourChartConfiguration();
+		fTourChart.createTourActionHandlers(getSite().getWorkbenchWindow(), fTourChartConfig);
 
 		// set chart title
 		fTourChart.addDataModelListener(new IDataModelListener() {
@@ -127,10 +162,9 @@ public class TourChartView extends ViewPart {
 			}
 		});
 
-		fTourChartConfig = TourManager.createTourChartConfiguration();
-
 		addSelectionListener();
 		addPrefListener();
+		addPartListener();
 
 		// set this view part as selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
