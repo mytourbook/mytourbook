@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.HandlerEvent;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.menus.UIElement;
@@ -11,18 +12,16 @@ import org.eclipse.ui.menus.UIElement;
 /**
  * Actionhandler for actions in a tour chart
  */
-public abstract class TourChartActionHandler extends AbstractHandler implements IElementUpdater {
+public abstract class TCActionHandler extends AbstractHandler implements IElementUpdater {
 
-	String						fCommandId;
-	TourChart					fTourChart;
+	String			fCommandId;
+	TourChart		fTourChart;
 
-	private boolean				fisEnabled;
-	private boolean				fIsChecked;
-
-//	private IHandlerActivation	fHandlerActivation;
+	private boolean	fisEnabled;
+	private boolean	fIsChecked;
 
 	/**
-	 * Update the UI for the action when the enablement state was changed
+	 * Update the UI enablement state for an action handler
 	 */
 	public void fireHandlerChanged() {
 		fireHandlerChanged(new HandlerEvent(this, true, false));
@@ -37,8 +36,8 @@ public abstract class TourChartActionHandler extends AbstractHandler implements 
 	}
 
 	/**
-	 * Sets the internal check state for the action handler, to update the UI, the ICommandService
-	 * refreshElements(*) method must be called
+	 * Sets the internal check state for the action handler, to update the UI
+	 * {@link ICommandService#refreshElements(String, Map)} method must be called
 	 * 
 	 * @param isEnabled
 	 */
@@ -51,7 +50,7 @@ public abstract class TourChartActionHandler extends AbstractHandler implements 
 
 	/**
 	 * Sets the intenal enablement state for the action handler, to update the UI,
-	 * <code>fireHandlerChanged</code> must be called
+	 * {@link #fireHandlerChanged()} must be called
 	 * 
 	 * @param isEnabled
 	 */
@@ -62,11 +61,18 @@ public abstract class TourChartActionHandler extends AbstractHandler implements 
 		}
 	}
 
+	/**
+	 * keep the handler activation token
+	 * 
+	 * @param handlerActivation
+	 */
 	public void setHandlerActivation(IHandlerActivation handlerActivation) {
 
-// handlerActivation is currently disabled because it's currently not used
+	/*
+	 * handlerActivation is currently disabled because it's currently not used
+	 */
 
-//		fHandlerActivation = handlerActivation;
+	//		fHandlerActivation = handlerActivation;
 	}
 
 	public void setTourChart(TourChart tourChart) {

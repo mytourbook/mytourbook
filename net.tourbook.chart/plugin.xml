@@ -2,75 +2,86 @@
 <?eclipse version="3.2"?>
 <plugin>
    
+   
+   
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="net.tourbook.chart.toolbar.chartOptions">
+            <command
+                  commandId="net.tourbook.chart.command.zoomIn"
+                  disabledIcon="icons/zoom-in-disabled.gif"
+                  icon="icons/zoom-in.gif"
+                  label="%Command_chart_zoom_in"
+                  mnemonic="%Command_chart_zoom_in_mnemonic"
+                  style="push"
+                  tooltip="%Command_chart_zoom_in_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.chart.command.zoomOut"
+                  disabledIcon="icons/zoom-out-disabled.gif"
+                  icon="icons/zoom-out.gif"
+                  label="%Command_chart_zoom_out"
+                  mnemonic="%Command_chart_zoom_out_mnemonic"
+                  style="push"
+                  tooltip="%Command_chart_zoom_out_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.chart.command.fitGraph"
+                  disabledIcon="icons/zoom-fit-graph-disabled.gif"
+                  icon="icons/zoom-fit-graph.gif"
+                  label="%Command_chart_zoom_fit_to_graph"
+                  mnemonic="%Command_chart_zoom_fit_to_graph_mnemonic"
+                  style="push"
+                  tooltip="%Command_chart_zoom_fit_to_graph_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.chart.command.partPrevious"
+                  disabledIcon="icons/arrow-left-disabled.gif"
+                  icon="icons/arrow-left.gif"
+                  label="%Command_chart_next_month"
+                  mnemonic="%Command_chart_next_month_mnemonic"
+                  style="push"
+                  tooltip="%Command_chart_next_month_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.chart.command.partNext"
+                  disabledIcon="icons/arrow-right-disabled.gif"
+                  icon="icons/arrow-right.gif"
+                  label="%Command_chart_next_month"
+                  mnemonic="%Command_chart_next_month_mnemonic"
+                  style="push"
+                  tooltip="%Command_chart_next_month_tooltip">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   
    <extension
          point="org.eclipse.ui.commands">
       <command
-            id="net.tourbook.chart.commandId.zoomIn"
-            name="Zoom In">
+            id="net.tourbook.chart.command.zoomIn"
+            name="%Command_chart_zoom_in">
       </command>
       <command
-            id="net.tourbook.chart.commandId.zoomOut"
-            name="Zoom Out">
+            id="net.tourbook.chart.command.zoomOut"
+            name="%Command_chart_zoom_out">
       </command>
-   </extension>
-   
-   
-   
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="net.tourbook.chart.actionSet.chartActions"
-            label="Chart Actions">
-         <action
-               definitionId="net.tourbook.chart.commandId.zoomOut"
-               disabledIcon="icons/zoom-out-disabled.gif"
-               icon="icons/zoom-out.gif"
-               id="net.tourbook.chart.actionId.zoomOut"
-               label="Zoom Out"
-               retarget="true"
-               style="push"
-               toolbarPath="normal/chart">
-         </action>
-         <action
-               definitionId="net.tourbook.chart.commandId.zoomIn"
-               disabledIcon="icons/zoom-in-disabled.gif"
-               icon="icons/zoom-in.gif"
-               id="net.tourbook.chart.actionId.zoomIn"
-               label="Zoom In"
-               retarget="true"
-               style="push"
-               toolbarPath="normal/chart">
-         </action>
-         <action
-               definitionId="net.tourbook.chart.commandId.fitGraph"
-               icon="icons/zoom-fit-graph.gif"
-               id="net.tourbook.chart.actionId.fitGraph"
-               label="Fit Graph"
-               retarget="true"
-               style="push"
-               toolbarPath="normal/chart">
-         </action>
-         <action
-               definitionId="net.tourbook.chart.commandId.nextPart"
-               disabledIcon="icons/arrow-right-disabled.gif"
-               icon="icons/arrow-right.gif"
-               id="net.tourbook.chart.actionId.nextPart"
-               label="Next Part"
-               retarget="true"
-               style="push"
-               toolbarPath="normal/chart">
-         </action>
-         <action
-               definitionId="net.tourbook.chart.commandId.previousPart"
-               disabledIcon="icons/arrow-left-disabled.gif"
-               icon="icons/arrow-left.gif"
-               id="net.tourbook.chart.actionId.previousPart"
-               label="Previous Part"
-               retarget="true"
-               style="push"
-               toolbarPath="normal/chart">
-         </action>
-      </actionSet>
+      <command
+            id="net.tourbook.chart.command.fitGraph"
+            name="%Command_chart_zoom_fit_to_graph">
+      </command>
+      <command
+            id="net.tourbook.chart.command.partPrevious"
+            name="%Command_chart_previous_month">
+      </command>
+      <command
+            id="net.tourbook.chart.command.partNext"
+            name="%Command_chart_next_month">
+      </command>
+ 
    </extension>
 
 </plugin>

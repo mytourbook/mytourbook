@@ -18,6 +18,7 @@ package net.tourbook.chart;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -34,76 +35,61 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IWorkbenchWindow;
 
 /**
  * Chart widget
  */
 public class Chart extends ViewForm {
 
-	private static final String				ACTION_ID_FIT_GRAPH			= "net.tourbook.chart.actionId.fitGraph";		//$NON-NLS-1$
-	private static final String				ACTION_ID_NEXT_PART			= "net.tourbook.chart.actionId.nextPart";		//$NON-NLS-1$
-	private static final String				ACTION_ID_PREVIOUS_PART		= "net.tourbook.chart.actionId.previousPart";	//$NON-NLS-1$
-	private static final String				ACTION_ID_ZOOM_IN			= "net.tourbook.chart.actionId.zoomIn";		//$NON-NLS-1$
-	private static final String				ACTION_ID_ZOOM_OUT			= "net.tourbook.chart.actionId.zoomOut";		//$NON-NLS-1$
+	static final String				COMMAND_ID_ZOOM_IN			= "net.tourbook.chart.command.zoomIn";			//$NON-NLS-1$
+	static final String				COMMAND_ID_ZOOM_OUT			= "net.tourbook.chart.command.zoomOut";		//$NON-NLS-1$
+	static final String				COMMAND_ID_FIT_GRAPH		= "net.tourbook.chart.command.fitGraph";		//$NON-NLS-1$
+	static final String				COMMAND_ID_PART_NEXT		= "net.tourbook.chart.command.partNext";		//$NON-NLS-1$
+	static final String				COMMAND_ID_PART_PREVIOUS	= "net.tourbook.chart.command.partPrevious";	//$NON-NLS-1$
 
-	private static final String				COMMAND_ID_FIT_GRAPH		= "net.tourbook.chart.commandId.fitGraph";		//$NON-NLS-1$
-	private static final String				COMMAND_ID_NEXT_PART		= "net.tourbook.chart.commandId.nextPart";		//$NON-NLS-1$
-	private static final String				COMMAND_ID_PREVIOUS_PART	= "net.tourbook.chart.commandId.previousPart";	//$NON-NLS-1$
-	private static final String				COMMAND_ID_ZOOM_OUT			= "net.tourbook.chart.commandId.zoomOut";		//$NON-NLS-1$
-	private static final String				COMMAND_ID_ZOOM_IN			= "net.tourbook.chart.commandId.zoomIn";		//$NON-NLS-1$
+	static final String				CONTEXT_ID					= "net.tourbook.chart.context";				//$NON-NLS-1$
 
-	static final String						CONTEXT_ID					= "net.tourbook.chart.context";				//$NON-NLS-1$
+	static final int				NO_BAR_SELECTION			= -1;
 
-	static final int						NO_BAR_SELECTION			= -1;
+	private ListenerList			fFocusListeners				= new ListenerList();
+	private ListenerList			fBarSelectionListeners		= new ListenerList();
+	private ListenerList			fDoubleClickListeners		= new ListenerList();
+	private ListenerList			fSliderMoveListeners		= new ListenerList();
 
-	private static final int				ACTION_MOVETO_PREVIOUS_PART	= 1000;
-	private static final int				ACTION_MOVETO_NEXT_PART		= 1001;
-	protected static final int				ACTION_ZOOM_IN				= 1002;
-	protected static final int				ACTION_ZOOM_OUT				= 1003;
-	private static final int				ACTION_ZOOM_FIT_GRAPH		= 1004;
+	ChartComponents					fChartComponents;
+	private ChartDataModel			fChartDataModel;
+	private IToolBarManager			fToolbarMgr;
+	private ChartContextProvider	fChartContextProvider;
 
-	private ListenerList					fFocusListeners				= new ListenerList();
-	private ListenerList					fBarSelectionListeners		= new ListenerList();
-	private ListenerList					fDoubleClickListeners		= new ListenerList();
-	private ListenerList					fSliderMoveListeners		= new ListenerList();
+	private boolean					fShowZoomActions;
+	private boolean					showPartNavigation;
+	private boolean					showZoomFitGraph;
 
-	protected ChartComponents				fChartComponents;
-	protected ChartDataModel				fChartDataModel;
-	private IToolBarManager					fToolbarMgr;
-	private ChartContextProvider			fChartContextProvider;
+	private Color					backgroundColor;
 
-	private HashMap<Integer, ChartAction>	fChartActions;
-
-	protected boolean						fShowZoomActions;
-	private boolean							showPartNavigation;
-	private boolean							showZoomFitGraph;
-
-	private Color							backgroundColor;
-
-	private Chart							zoomMarkerPositionListener;
+	private Chart					zoomMarkerPositionListener;
 
 	/**
 	 * listener which is called when the x-marker was dragged
 	 */
-	IChartListener							fXMarkerDraggingListener;
+	IChartListener					fXMarkerDraggingListener;
 
 	/**
 	 * when set to <code>true</code> the toolbar is within the chart control, otherwise the
 	 * toolbar is outsite of the chart
 	 */
-	protected boolean						fUseInternalActionBar		= true;
+	boolean							fUseInternalActionBar		= true;
 
-//	private IActionBars						fActionBars;
-	private int								fBarSelectionSerieIndex;
-	private int								fBarSelectionValueIndex;
+	private int						fBarSelectionSerieIndex;
+	private int						fBarSelectionValueIndex;
 
-//	private IPartListener2					fContextPartListener;
-//	private IContextActivation				fActivatedContext;
+	private ActionHandlerManager	fActionHandlerManager		= ActionHandlerManager.getInstance();
+	HashMap<String, ActionProxy>	fActionProxies;
 
 	/**
 	 * This is the ui control which displays the chart
 	 */
-
 	public Chart(Composite parent, int style) {
 
 		super(parent, style);
@@ -127,16 +113,16 @@ public class Chart extends ViewForm {
 		backgroundColor = getDisplay().getSystemColor(SWT.COLOR_WHITE);
 	}
 
+	public void addBarSelectionListener(IBarSelectionListener listener) {
+		fBarSelectionListeners.add(listener);
+	}
+
 	public void addDoubleClickListener(IBarSelectionListener listener) {
 		fDoubleClickListeners.add(listener);
 	}
 
 	public void addFocusListener(Listener listener) {
 		fFocusListeners.add(listener);
-	}
-
-	public void addBarSelectionListener(IBarSelectionListener listener) {
-		fBarSelectionListeners.add(listener);
 	}
 
 	public void addSliderMoveListener(ISliderMoveListener listener) {
@@ -148,84 +134,107 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * @param actionId
-	 * @param text
-	 * @param toolTip
-	 * @param image
-	 * @return
-	 */
-	private ChartAction createChartAction(	int actionMapId,
-											String actionId,
-											String commandId,
-											String text,
-											String toolTip,
-											String[] image) {
-
-		ChartAction action = new ChartAction(this,
-				actionMapId,
-				actionId,
-				commandId,
-				text,
-				toolTip,
-				image);
-		action.setEnabled(false);
-
-		fChartActions.put(actionMapId, action);
-
-		return action;
-	}
-
-	/**
-	 * create zoom/navigation actions which are managed from the chart
+	 * create zoom/navigation actions which are managed by the chart
 	 */
 	private void createActions() {
 
-		if (fChartActions != null) {
+		if (fActionProxies != null) {
 			return;
 		}
 
-		fChartActions = new HashMap<Integer, ChartAction>();
+		createChartActionProxies();
+		fillToolbar(true);
+	}
 
-		ChartAction chartAction;
+	/**
+	 * Creates the handlers for the chart actions, the internal action bar for the chart will be
+	 * disabled
+	 * 
+	 * @param workbenchWindow
+	 */
+	public void createChartActionHandlers(IWorkbenchWindow workbenchWindow) {
 
-		chartAction = createChartAction(ACTION_MOVETO_PREVIOUS_PART,
-				ACTION_ID_PREVIOUS_PART,
-				COMMAND_ID_PREVIOUS_PART,
-				Messages.Action_previous_month,
-				Messages.Action_previous_month_tooltip,
-				new String[] { Messages.Image_arrow_left, Messages.Image_arrow_left_disabled });
+		// use commands defined in the plugin.xml
+		fUseInternalActionBar = false;
 
-		chartAction = createChartAction(ACTION_MOVETO_NEXT_PART,
-				ACTION_ID_NEXT_PART,
-				COMMAND_ID_NEXT_PART,
-				Messages.Action_next_month,
-				Messages.Action_next_month_tooltip,
-				new String[] { Messages.Image_arrow_right, Messages.Image_arrow_right_disabled });
+		fActionHandlerManager.createActionHandlers(workbenchWindow);
 
-		chartAction = createChartAction(ACTION_ZOOM_IN,
-				ACTION_ID_ZOOM_IN,
-				COMMAND_ID_ZOOM_IN,
-				Messages.Action_zoom_in,
-				Messages.Action_zoom_in_tooltip,
-				new String[] { Messages.Image_zoom_in, Messages.Image_zoom_in_disabled });
-		chartAction.setEnabled(true);
+		createChartActionProxies();
+	}
 
-		chartAction = createChartAction(ACTION_ZOOM_OUT,
-				ACTION_ID_ZOOM_OUT,
-				COMMAND_ID_ZOOM_OUT,
-				Messages.Action_zoom_out,
-				Messages.Action_zoom_out_tooltip,
-				new String[] { Messages.Image_zoom_out, Messages.Image_zoom_out_disabled });
+	/**
+	 * Creates the action proxys for all chart actions
+	 */
+	private void createChartActionProxies() {
 
-		chartAction = createChartAction(ACTION_ZOOM_FIT_GRAPH,
-				ACTION_ID_FIT_GRAPH,
-				COMMAND_ID_FIT_GRAPH,
-				Messages.Action_zoom_fit_to_graph,
-				Messages.Action_zoom_fit_to_graph_tooltip,
-				new String[] { Messages.Image_zoom_fit_to_graph, null });
-		chartAction.setEnabled(true);
+		// create actions only once
+		if (fActionProxies != null) {
+			return;
+		}
 
-		showActions(true);
+		fActionProxies = new HashMap<String, ActionProxy>();
+
+		final boolean useInternalActionBar = useInternalActionBar();
+		Action action;
+		ActionProxy actionProxy;
+
+		/*
+		 * Action: zoom in
+		 */
+		if (useInternalActionBar) {
+			action = new ActionZoomIn(this);
+		} else {
+			action = null;
+		}
+		actionProxy = new ActionProxy(COMMAND_ID_ZOOM_IN, action);
+		fActionProxies.put(COMMAND_ID_ZOOM_IN, actionProxy);
+
+		/*
+		 * Action: zoom out
+		 */
+		if (useInternalActionBar) {
+			action = new ActionZoomOut(this);
+		} else {
+			action = null;
+		}
+		actionProxy = new ActionProxy(COMMAND_ID_ZOOM_OUT, action);
+		actionProxy.setEnabled(false);
+		fActionProxies.put(COMMAND_ID_ZOOM_OUT, actionProxy);
+
+		/*
+		 * Action: fit graph to window
+		 */
+		if (useInternalActionBar) {
+			action = new ActionFitGraph(this);
+		} else {
+			action = null;
+		}
+		actionProxy = new ActionProxy(COMMAND_ID_FIT_GRAPH, action);
+		fActionProxies.put(COMMAND_ID_FIT_GRAPH, actionProxy);
+
+		/*
+		 * Action: previous part
+		 */
+		if (useInternalActionBar) {
+			action = new ActionPartPrevious(this);
+		} else {
+			action = null;
+		}
+		actionProxy = new ActionProxy(COMMAND_ID_PART_PREVIOUS, action);
+		actionProxy.setEnabled(false);
+		fActionProxies.put(COMMAND_ID_PART_PREVIOUS, actionProxy);
+
+		/*
+		 * Action: next part
+		 */
+		if (useInternalActionBar) {
+			action = new ActionPartNext(this);
+		} else {
+			action = null;
+		}
+		actionProxy = new ActionProxy(COMMAND_ID_PART_NEXT, action);
+		actionProxy.setEnabled(false);
+		fActionProxies.put(COMMAND_ID_PART_NEXT, actionProxy);
 	}
 
 	/**
@@ -253,10 +262,6 @@ public class Chart extends ViewForm {
 
 		fChartComponents.dispose();
 
-//		if (fContextPartListener != null) {
-//			fServiceSite.getPage().removePartListener(fContextPartListener);
-//		}
-
 		super.dispose();
 	}
 
@@ -282,6 +287,44 @@ public class Chart extends ViewForm {
 			// create the menu for line charts
 			if (fChartContextProvider != null) {
 				fChartContextProvider.fillXSliderContextMenu(menuMgr, leftSlider, rightSlider);
+			}
+		}
+	}
+
+	/**
+	 * put the actions into the internal toolbar
+	 * 
+	 * @param refreshToolbar
+	 */
+	private void fillToolbar(boolean refreshToolbar) {
+
+		if (fActionProxies == null) {
+			return;
+		}
+
+		if (fUseInternalActionBar && (showPartNavigation || fShowZoomActions)) {
+
+			// add the action to the toolbar
+			IToolBarManager tbm = getToolbarManager();
+
+			if (showPartNavigation) {
+				tbm.add(new Separator());
+				tbm.add(fActionProxies.get(COMMAND_ID_PART_PREVIOUS).getAction());
+				tbm.add(fActionProxies.get(COMMAND_ID_PART_NEXT).getAction());
+			}
+
+			if (fShowZoomActions) {
+				tbm.add(new Separator());
+				tbm.add(fActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
+				tbm.add(fActionProxies.get(COMMAND_ID_ZOOM_OUT).getAction());
+			}
+
+			if (showZoomFitGraph) {
+				tbm.add(fActionProxies.get(COMMAND_ID_FIT_GRAPH).getAction());
+			}
+
+			if (refreshToolbar) {
+				tbm.update(true);
 			}
 		}
 	}
@@ -365,13 +408,6 @@ public class Chart extends ViewForm {
 		});
 	}
 
-//	/**
-//	 * @return the fActionBars
-//	 */
-//	IActionBars getActionBars() {
-//		return fActionBars;
-//	}
-
 	public boolean getAdvancedGraphics() {
 		return fChartComponents.useAdvancedGraphics;
 	}
@@ -407,6 +443,10 @@ public class Chart extends ViewForm {
 
 	public ChartProperties getChartProperties() {
 		return fChartComponents.getChartProperties();
+	}
+
+	public ChartDataModel getDataModel() {
+		return fChartDataModel;
 	}
 
 	public int getDevGraphImageXOffset() {
@@ -482,38 +522,33 @@ public class Chart extends ViewForm {
 		return fChartComponents.devSliderBarHeight != 0;
 	}
 
-	void performZoomAction(int actionId) {
+	void onExecuteFitGraph() {
+		fChartDataModel.resetMinMaxValues();
+		zoomOut(true);
+	}
 
-		switch (actionId) {
-		case ACTION_MOVETO_PREVIOUS_PART:
-			fChartComponents.getChartComponentGraph().moveToPrevPart();
-			break;
+	void onExecutePartNext() {
+		fChartComponents.getChartComponentGraph().moveToNextPart();
+	}
 
-		case ACTION_MOVETO_NEXT_PART:
-			fChartComponents.getChartComponentGraph().moveToNextPart();
-			break;
+	void onExecutePartPrevious() {
+		fChartComponents.getChartComponentGraph().moveToPrevPart();
+	}
 
-		case ACTION_ZOOM_IN:
-			fChartActions.get(ACTION_ZOOM_OUT).setEnabled(true);
-			fChartComponents.zoomIn();
-			break;
+	void onExecuteZoomIn() {
+		setCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
+		fChartComponents.zoomIn();
+	}
 
-		case ACTION_ZOOM_OUT:
-			fChartActions.get(ACTION_ZOOM_IN).setEnabled(true);
-			fChartActions.get(ACTION_ZOOM_OUT).setEnabled(false);
-			fChartActions.get(ACTION_MOVETO_PREVIOUS_PART).setEnabled(false);
-			fChartActions.get(ACTION_MOVETO_NEXT_PART).setEnabled(false);
-			fChartComponents.zoomOut(true);
-			break;
+	void onExecuteZoomOut() {
 
-		case ACTION_ZOOM_FIT_GRAPH:
-			fChartDataModel.resetMinMaxValues();
-			zoomOut(true);
-			break;
+		fActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(true);
+		fActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(false);
+		fActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(false);
+		fActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(false);
+		fActionHandlerManager.updateUIState();
 
-		default:
-			break;
-		}
+		fChartComponents.zoomOut(true);
 	}
 
 	/**
@@ -565,55 +600,6 @@ public class Chart extends ViewForm {
 		fChartComponents.getChartComponentGraph().setCanScrollZoomedChart(canScrollabelZoomedGraph);
 	}
 
-//	/**
-//	 * set the action bars for the chart, chart actions will be activated when a chart is activated
-//	 * 
-//	 * @param part.
-//	 */
-//	public void setActionBars(IActionBars actionBars) {
-//
-//		fUseInternalToolbar = false;
-//
-//		fActionBars = actionBars;
-//
-////		fContextPartListener = new IPartListener2() {
-////
-////			public void partActivated(final IWorkbenchPartReference partRef) {
-////				if (partRef.getId().equalsIgnoreCase(fServiceSite.getId())) {
-////					IContextService contextService = (IContextService) fServiceSite.getService(IContextService.class);
-////					fActivatedContext = contextService.activateContext(CONTEXT_ID);
-////				}
-////			}
-////
-////			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-////
-////			public void partClosed(final IWorkbenchPartReference partRef) {
-////				if (partRef.getId().equalsIgnoreCase(fServiceSite.getId())) {
-////					if (fContextPartListener != null) {
-////						fServiceSite.getPage().removePartListener(fContextPartListener);
-////					}
-////				}
-////			}
-////
-////			public void partDeactivated(final IWorkbenchPartReference partRef) {
-////				if (partRef.getId().equalsIgnoreCase(fServiceSite.getId())) {
-////					IContextService contextService = (IContextService) fServiceSite.getService(IContextService.class);
-////					contextService.deactivateContext(fActivatedContext);
-////				}
-////			}
-////
-////			public void partHidden(final IWorkbenchPartReference partRef) {}
-////
-////			public void partInputChanged(final IWorkbenchPartReference partRef) {}
-////
-////			public void partOpened(final IWorkbenchPartReference partRef) {}
-////
-////			public void partVisible(final IWorkbenchPartReference partRef) {}
-////		};
-//
-////		actionBars.getPage().addPartListener(fContextPartListener);
-//	}
-
 	/**
 	 * Sets a new data model for the chart and redraws it, NULL will hide the chart
 	 * 
@@ -624,7 +610,9 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Sets a new data model for the chart and redraws it, NULL will hide the chart
+	 * Set a new data model for the chart and redraws it, NULL will hide the chart.
+	 * <p>
+	 * This method sets the data for the chart and creates it.
 	 * 
 	 * @param chartDataModel
 	 * @param isResetSelection
@@ -657,18 +645,28 @@ public class Chart extends ViewForm {
 		fireSliderMoveEvent();
 	}
 
+	/**
+	 * Set the enable state for a command and update the UI
+	 */
+	public void setCommandEnabled(String commandId, boolean isEnabled) {
+		fActionProxies.get(commandId).setEnabled(isEnabled);
+		fActionHandlerManager.getActionHandler(commandId).fireHandlerChanged();
+	}
+
 	public void setContextProvider(ChartContextProvider chartContextProvider) {
 		fChartContextProvider = chartContextProvider;
 	}
 
-	/**
-	 * Enable/disable the zoom in/out action
-	 * 
-	 * @param isEnabled
-	 */
-	public void setEnabledZoomActions(boolean isEnabled) {
-		fChartActions.get(ACTION_ZOOM_IN).setEnabled(isEnabled);
-		fChartActions.get(ACTION_ZOOM_OUT).setEnabled(isEnabled);
+	public void setDataModel(ChartDataModel fChartDataModel) {
+		this.fChartDataModel = fChartDataModel;
+	}
+
+	public boolean setFocus() {
+
+		/*
+		 * set focus to the graph component
+		 */
+		return fChartComponents.getChartComponentGraph().setFocus();
 	}
 
 	/**
@@ -720,12 +718,34 @@ public class Chart extends ViewForm {
 	}
 
 	/**
+	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
+	 * when the workbench action should be used.
+	 * 
+	 * @param useInternalActionBar
+	 */
+	public void setUseInternalActionBar(boolean useInternalActionBar) {
+		fUseInternalActionBar = useInternalActionBar;
+	}
+
+	/**
 	 * sets the position of the x-sliders
 	 * 
 	 * @param position
 	 */
 	public void setXSliderPosition(SelectionChartXSliderPosition position) {
 		fChartComponents.setXSliderPosition(position);
+	}
+
+	/**
+	 * Enable/disable the zoom in/out action
+	 * 
+	 * @param isEnabled
+	 */
+	public void setZoomActionsEnabled(boolean isEnabled) {
+		fActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(isEnabled);
+		fActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(isEnabled);
+
+		fActionHandlerManager.updateUIState();
 	}
 
 	/**
@@ -748,52 +768,27 @@ public class Chart extends ViewForm {
 		zoomMarkerPositionListener = chartWidget;
 	}
 
-	/**
-	 * put the actions into the toolbar
-	 * 
-	 * @param refreshToolbar
-	 */
-	public void showActions(boolean refreshToolbar) {
-
-		if (fUseInternalActionBar
-				&& fChartActions != null
-				&& (showPartNavigation || fShowZoomActions)) {
-
-			// add the action to the toolbar
-			IToolBarManager tbm = getToolbarManager();
-
-			if (showPartNavigation) {
-				tbm.add(new Separator());
-				tbm.add(fChartActions.get(ACTION_MOVETO_PREVIOUS_PART).getAction());
-				tbm.add(fChartActions.get(ACTION_MOVETO_NEXT_PART).getAction());
-			}
-
-			if (fShowZoomActions) {
-				tbm.add(new Separator());
-				tbm.add(fChartActions.get(ACTION_ZOOM_IN).getAction());
-				tbm.add(fChartActions.get(ACTION_ZOOM_OUT).getAction());
-			}
-
-			if (showZoomFitGraph) {
-				tbm.add(fChartActions.get(ACTION_ZOOM_FIT_GRAPH).getAction());
-			}
-
-			if (refreshToolbar) {
-				tbm.update(true);
-			}
-		} else {
-//			if (fActionBars != null && refreshToolbar) {
-//				fActionBars.updateActionBars();
-//			}
-		}
-	}
-
 	public void switchSlidersTo2ndXData() {
 		fChartComponents.getChartComponentGraph().switchSlidersTo2ndXData();
 	}
 
+	/**
+	 * Update all action handlers from their action proxy and update the UI state
+	 */
+	public void updateActionHandlers() {
+		fActionHandlerManager.updateActionHandlers(this);
+	}
+
 	public void updateChartLayers() {
 		fChartComponents.updateChartLayers();
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the internal action bar is used, returns
+	 *         <code>false</code> when the global action handler are used
+	 */
+	public boolean useInternalActionBar() {
+		return fUseInternalActionBar;
 	}
 
 	/**
@@ -802,7 +797,7 @@ public class Chart extends ViewForm {
 	 */
 	public void zoomIn() {
 		fChartComponents.zoomIn();
-		fChartActions.get(ACTION_ZOOM_OUT).setEnabled(true);
+		setCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
 	}
 
 	/**
@@ -811,10 +806,9 @@ public class Chart extends ViewForm {
 	public void zoomInWithSlider() {
 
 		fChartComponents.getChartComponentGraph().zoomInWithSlider();
-
 		fChartComponents.onResize();
 
-		fChartActions.get(ACTION_ZOOM_OUT).setEnabled(true);
+		setCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
 	}
 
 	public void zoomOut(boolean updateChart) {
@@ -824,7 +818,8 @@ public class Chart extends ViewForm {
 		}
 
 		fChartComponents.zoomOut(updateChart);
-		fChartActions.get(ACTION_ZOOM_OUT).setEnabled(false);
+
+		setCommandEnabled(COMMAND_ID_ZOOM_OUT, false);
 	}
 
 	/**
@@ -845,69 +840,12 @@ public class Chart extends ViewForm {
 	 */
 	public void zoomWithParts(int parts, int position) {
 
-		fChartActions.get(ACTION_ZOOM_IN).setEnabled(false);
-		fChartActions.get(ACTION_ZOOM_OUT).setEnabled(true);
-		fChartActions.get(ACTION_MOVETO_PREVIOUS_PART).setEnabled(true);
-		fChartActions.get(ACTION_MOVETO_NEXT_PART).setEnabled(true);
+		fActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(false);
+		fActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(true);
+		fActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(true);
+		fActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(true);
 
 		fChartComponents.zoomWithParts(parts, position);
 	}
-
-	public boolean setFocus() {
-
-		/*
-		 * set focus to the graph component
-		 */
-		return fChartComponents.getChartComponentGraph().setFocus();
-	}
-
-	public Object getChartActions() {
-//		x
-		return null;
-	}
-
-	public boolean isUseInternalActionBar() {
-		return fUseInternalActionBar;
-	}
-
-//	public void updateStatus() {
-//		if (fActionBars == null) {
-//			return;
-//		}
-//
-//		Collection<ChartAction> chartActions = fChartActions.values();
-//
-//		for (ChartAction chartAction : chartActions) {
-//			chartAction.updateStatus();
-////			if (chartAction.getAction() instanceof RetargetAction) {
-////				RetargetAction retargetAction = (RetargetAction) chartAction.getAction();
-////				retargetAction.partActivated(part);
-////			}
-//		}
-//System.out.println("");
-//		
-//	}
-
-//	/**
-//	 * When a part is activated the retarget actions must be activated for this part
-//	 * 
-//	 * @param part
-//	 */
-//	public void partActivated(IWorkbenchPart part) {
-//
-//		if (fActionBars == null) {
-//			return;
-//		}
-//
-//		Collection<ChartAction> chartActions = fChartActions.values();
-//
-//		for (ChartAction chartAction : chartActions) {
-//			if (chartAction.getAction() instanceof RetargetAction) {
-//				RetargetAction retargetAction = (RetargetAction) chartAction.getAction();
-//				retargetAction.partActivated(part);
-//
-//			}
-//		}
-//	}
 
 }

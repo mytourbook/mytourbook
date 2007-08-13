@@ -9,7 +9,7 @@ import org.eclipse.ui.commands.IElementUpdater;
 /**
  * Handler for graphs in a tour chart
  */
-class ActionHandlerGraph extends TourChartActionHandler implements IElementUpdater {
+class ActionHandlerGraph extends TCActionHandler implements IElementUpdater {
 
 	private int	fGraphId;
 
@@ -31,7 +31,7 @@ class ActionHandlerGraph extends TourChartActionHandler implements IElementUpdat
 
 			// this is a toggle button so the check status must be reset
 
-			TourChartActionHandlerManager.getInstance().updateUICheckState(fCommandId);
+			TCActionHandlerManager.getInstance().updateUICheckState(fCommandId);
 
 			return null;
 		}

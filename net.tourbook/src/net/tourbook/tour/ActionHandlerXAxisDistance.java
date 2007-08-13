@@ -4,9 +4,8 @@ import net.tourbook.ui.HandlerUtil;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionHandlerXAxisDistance extends TourChartActionHandler {
+public class ActionHandlerXAxisDistance extends TCActionHandler {
 
 	public ActionHandlerXAxisDistance() {
 		fCommandId = TourChart.COMMAND_ID_X_AXIS_DISTANCE;
@@ -15,31 +14,19 @@ public class ActionHandlerXAxisDistance extends TourChartActionHandler {
 	@Override
 	public Object execute(ExecutionEvent execEvent) throws ExecutionException {
 
-		ToolItem toolItem = HandlerUtil.getToolItem(execEvent);
+		Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
-		if (toolItem == null) {
+		if (isItemChecked == null) {
 			return null;
 		}
 
-		boolean isChecked = toolItem.getSelection();
-
-		if (fTourChart.actionXAxisDistance(isChecked) == false) {
+		if (fTourChart.onExecuteXAxisDistance(isItemChecked) == false) {
 			return null;
 		}
 
-		/*
-		 * toggle time and distance buttons
-		 */
-		final TourChartActionHandlerManager handlerManager = TourChartActionHandlerManager.getInstance();
-		String commandId;
-
-		commandId = TourChart.COMMAND_ID_X_AXIS_TIME;
-		fTourChart.fActionProxies.get(commandId).setChecked(!isChecked);
-		handlerManager.updateUICheckState(commandId);
-
-		commandId = TourChart.COMMAND_ID_X_AXIS_DISTANCE;
-		fTourChart.fActionProxies.get(commandId).setChecked(isChecked);
-		handlerManager.updateUICheckState(commandId);
+		// toggle time and distance buttons
+		fTourChart.setCommandChecked(TourChart.COMMAND_ID_X_AXIS_TIME, !isItemChecked);
+		fTourChart.setCommandChecked(TourChart.COMMAND_ID_X_AXIS_DISTANCE, isItemChecked);
 
 		return null;
 	}

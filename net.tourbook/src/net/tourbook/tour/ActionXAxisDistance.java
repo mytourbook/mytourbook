@@ -37,7 +37,7 @@ public class ActionXAxisDistance extends Action {
 	}
 
 	public void run() {
-		fTourChart.actionXAxisDistance(isChecked());
+		fTourChart.onExecuteXAxisDistance(isChecked());
 	}
 
 }

@@ -158,10 +158,6 @@ public class TourEditor extends EditorPart {
 
 	public void doSaveAs() {}
 
-	public Object getChartActions() {
-		return fTourChart.getChartActions();
-	}
-
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 
 		setSite(site);
