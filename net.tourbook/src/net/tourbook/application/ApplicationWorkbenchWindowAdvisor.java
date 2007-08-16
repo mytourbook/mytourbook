@@ -25,14 +25,29 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProduct;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IPageListener;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IPropertyListener;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartConstants;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PerspectiveAdapter;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
@@ -44,8 +59,21 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private ApplicationActionBarAdvisor	fApplicationActionBarAdvisor;
 
-	public ApplicationWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
+	private IPerspectiveDescriptor		lastPerspective;
+	private IWorkbenchPage				lastActivePage;
+
+	private IWorkbenchPart				lastActivePart;
+	private String						lastPartTitle	= "";			//$NON-NLS-1$
+
+	private ApplicationWorkbenchAdvisor	wbAdvisor;
+
+	private IPropertyListener			partPropertyListener;
+
+	public ApplicationWorkbenchWindowAdvisor(ApplicationWorkbenchAdvisor wbAdvisor,
+			IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
+		this.wbAdvisor = wbAdvisor;
+
 	}
 
 	public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
@@ -59,7 +87,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	public void postWindowCreate() {
 
-		// show editor area
+	// show editor area
 //		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
 //		activePage.setEditorAreaVisible(true);
 	}
@@ -82,13 +110,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 				Shell activeShell = Display.getCurrent().getActiveShell();
 
-				MessageDialog.openInformation(
-						activeShell,
+				MessageDialog.openInformation(activeShell,
 						Messages.App_Dlg_first_startup_title,
 						Messages.App_Dlg_first_startup_msg);
 
-				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(
-						activeShell,
+				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(activeShell,
 						"net.tourbook.preferences.PrefPageClients", //$NON-NLS-1$
 						null,
 						null);
@@ -97,8 +123,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 				// open raw data view
 				try {
-					getWindowConfigurer().getWindow().getActivePage().showView(
-							RawDataView.ID,
+					getWindowConfigurer().getWindow().getActivePage().showView(RawDataView.ID,
 							null,
 							IWorkbenchPage.VIEW_ACTIVATE);
 				} catch (PartInitException e) {
@@ -111,23 +136,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			// select person/tour type which was selected in the last session
 			fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
 
-//			IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
-//			activePage.closeAllEditors(false);
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-	}
-
-	public void postWindowRestore() {
-
-	// // select person/tour type which was selected in the last session
-	// fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
-	//
-	// IWorkbenchPage activePage =
-	// getWindowConfigurer().getWindow().getActivePage();
-	// activePage.closeAllEditors(false);
 	}
 
 	public void preWindowOpen() {
@@ -142,17 +153,200 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		configurer.setTitle(Messages.App_Title);
 
-		// PlatformUI.getPreferenceStore().putValue(
-		// IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
-		// "false"); //$NON-NLS-1$
+		PlatformUI.getPreferenceStore()
+				.setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, true);
 
-		PlatformUI.getPreferenceStore().setValue(
-				IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
-				true);
+		PlatformUI.getPreferenceStore()
+				.setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
 
-		PlatformUI.getPreferenceStore().setValue(
-				IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP,
-				true);
+		hookTitleUpdateListeners(configurer);
+	}
 
+	/**
+	 * Hooks the listeners needed on the window
+	 * 
+	 * @param configurer
+	 */
+	private void hookTitleUpdateListeners(IWorkbenchWindowConfigurer configurer) {
+
+		// hook up the listeners to update the window title
+
+		configurer.getWindow().addPageListener(new IPageListener() {
+
+			public void pageActivated(IWorkbenchPage page) {
+				updateTitle();
+			}
+
+			public void pageClosed(IWorkbenchPage page) {
+				updateTitle();
+			}
+
+			public void pageOpened(IWorkbenchPage page) {}
+		});
+
+		configurer.getWindow().addPerspectiveListener(new PerspectiveAdapter() {
+
+			public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+				updateTitle();
+			}
+
+			public void perspectiveSavedAs(	IWorkbenchPage page,
+											IPerspectiveDescriptor oldPerspective,
+											IPerspectiveDescriptor newPerspective) {
+				updateTitle();
+			}
+
+			public void perspectiveDeactivated(	IWorkbenchPage page,
+												IPerspectiveDescriptor perspective) {
+				updateTitle();
+			}
+		});
+
+		configurer.getWindow().getPartService().addPartListener(new IPartListener2() {
+
+			public void partActivated(IWorkbenchPartReference ref) {
+				if (ref instanceof IEditorReference || ref instanceof IViewReference) {
+					updateTitle();
+				}
+			}
+
+			public void partBroughtToTop(IWorkbenchPartReference ref) {
+				if (ref instanceof IEditorReference || ref instanceof IViewReference) {
+					updateTitle();
+				}
+			}
+
+			public void partClosed(IWorkbenchPartReference ref) {
+				updateTitle();
+			}
+
+			public void partDeactivated(IWorkbenchPartReference ref) {}
+
+			public void partOpened(IWorkbenchPartReference ref) {}
+
+			public void partHidden(IWorkbenchPartReference ref) {}
+
+			public void partVisible(IWorkbenchPartReference ref) {}
+
+			public void partInputChanged(IWorkbenchPartReference ref) {}
+		});
+
+		partPropertyListener = new IPropertyListener() {
+			public void propertyChanged(Object source, int propId) {
+
+				if (propId == IWorkbenchPartConstants.PROP_TITLE) {
+					if (lastActivePart != null) {
+						String newTitle = lastActivePart.getTitle();
+						if (!lastPartTitle.equals(newTitle)) {
+							recomputeTitle();
+						}
+					}
+				}
+			}
+		};
+
+	}
+
+	/**
+	 * Updates the window title. Format will be:
+	 * <p>
+	 * [pageInput -] [currentPerspective -] [editorInput -] [workspaceLocation -] productName
+	 */
+	private void updateTitle() {
+
+		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+		IWorkbenchWindow window = configurer.getWindow();
+
+		IWorkbenchPart activePart = null;
+		IWorkbenchPage currentPage = window.getActivePage();
+
+		IPerspectiveDescriptor persp = null;
+
+		if (currentPage != null) {
+			persp = currentPage.getPerspective();
+
+			activePart = currentPage.getActivePart();
+		}
+
+		// Nothing to do if the part hasn't changed
+		if (activePart == lastActivePart
+				&& currentPage == lastActivePage
+				&& persp == lastPerspective) {
+			return;
+		}
+
+		if (lastActivePart != null) {
+			lastActivePart.removePropertyListener(partPropertyListener);
+		}
+
+		lastActivePart = activePart;
+		lastActivePage = currentPage;
+		lastPerspective = persp;
+
+		if (activePart != null) {
+			activePart.addPropertyListener(partPropertyListener);
+		}
+
+		recomputeTitle();
+	}
+
+	private String computeTitle() {
+
+		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+		IWorkbenchPage currentPage = configurer.getWindow().getActivePage();
+		IWorkbenchPart activePart = null;
+
+		if (currentPage != null) {
+			activePart = currentPage.getActivePart();
+		}
+
+		String title = null;
+		IProduct product = Platform.getProduct();
+		if (product != null) {
+			title = product.getName();
+		}
+		if (title == null) {
+			title = ""; //$NON-NLS-1$
+		}
+
+		if (currentPage != null) {
+
+			final String shellTitle = "{0} - {1}";
+			
+			if (activePart != null) {
+				lastPartTitle = activePart.getTitleToolTip();
+
+				if (lastPartTitle.length() > 0) {
+					title = NLS.bind(shellTitle, lastPartTitle, title);
+				}
+			}
+			
+			String label = ""; //$NON-NLS-1$
+
+			IPerspectiveDescriptor persp = currentPage.getPerspective();
+			if (persp != null) {
+				label = persp.getLabel();
+			}
+			
+			IAdaptable input = currentPage.getInput();
+			if (input != null && !input.equals(wbAdvisor.getDefaultPageInput())) {
+				label = currentPage.getLabel();
+			}
+			
+			if (label != null && !label.equals("")) { //$NON-NLS-1$ 
+				title = NLS.bind(shellTitle, label, title);
+			}
+		}
+
+		return title;
+	}
+
+	private void recomputeTitle() {
+		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+		String oldTitle = configurer.getTitle();
+		String newTitle = computeTitle();
+		if (!newTitle.equals(oldTitle)) {
+			configurer.setTitle(newTitle);
+		}
 	}
 }

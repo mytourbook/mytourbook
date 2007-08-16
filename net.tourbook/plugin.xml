@@ -452,6 +452,10 @@
                mnemonic="%Command_tourChart_showStartTime_mnemonic"
                style="toggle">
          </command>
+         <separator
+               name="net.tourbook.separator6"
+               visible="true">
+         </separator>
          <command
                commandId="net.tourbook.command.tourChart.canScrollChart"
                label="%Command_tourChart_canScrollChart"
@@ -472,6 +476,27 @@
                label="%Menu_main_tour"
                mnemonic="%Menu_main_tour_mnemonic">
             <command
+                  commandId="net.tourbook.command.tourChart.xAxisTime"
+                  disabledIcon="icons/x-axes-time-disabled.gif"
+                  icon="icons/x-axes-time.gif"
+                  label="%Command_tourChart_xAxisTime"
+                  mnemonic="%Command_tourChart_xAxisTime_mnemonic"
+                  style="radio"
+                  tooltip="%Command_tourChart_xAxisTime_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.tourChart.xAxisDistance"
+                  disabledIcon="icons/x-axes-distance-disabled.gif"
+                  icon="icons/x-axes-distance.gif"
+                  label="%Command_tourChart_xAxisDistance"
+                  mnemonic="%Command_tourChart_xAxisDistance_mnemonic"
+                  style="radio"
+                  tooltip="%Command_tourChart_xAxisDistance_tooltip">
+            </command>
+            <separator
+                  name="net.tourbook.separator"
+                  visible="true">
+            </separator>            <command
                   commandId="net.tourbook.command.graph.altitude"
                   disabledIcon="icons/graph-altitude-disabled.gif"
                   icon="icons/graph-altitude.gif"
@@ -534,30 +559,9 @@
                   style="toggle"
                   tooltip="%Command_graph_gradient_tooltip">
             </command>
+
             <separator
-                  name="net.tourbook.separator"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="net.tourbook.command.tourChart.xAxisTime"
-                  disabledIcon="icons/x-axes-time-disabled.gif"
-                  icon="icons/x-axes-time.gif"
-                  label="%Command_tourChart_xAxisTime"
-                  mnemonic="%Command_tourChart_xAxisTime_mnemonic"
-                  style="radio"
-                  tooltip="%Command_tourChart_xAxisTime_tooltip">
-            </command>
-            <command
-                  commandId="net.tourbook.command.tourChart.xAxisDistance"
-                  disabledIcon="icons/x-axes-distance-disabled.gif"
-                  icon="icons/x-axes-distance.gif"
-                  label="%Command_tourChart_xAxisDistance"
-                  mnemonic="%Command_tourChart_xAxisDistance_mnemonic"
-                  style="radio"
-                  tooltip="%Command_tourChart_xAxisDistance_tooltip">
-            </command>
-            <separator
-                  name="net.tourbook.separator"
+                  name="net.tourbook.chart.additions"
                   visible="true">
             </separator>
             <command
@@ -579,6 +583,31 @@
                   style="toggle">
             </command>
          </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:net.tourbook.views.xTourChartView?after=additions">
+         <command
+               commandId="net.tourbook.command.tourChart.showStartTime"
+               label="%Command_tourChart_showStartTime"
+               mnemonic="%Command_tourChart_showStartTime_mnemonic"
+               style="toggle">
+         </command>
+         <separator
+               name="net.tourbook.separator5"
+               visible="true">
+         </separator>
+         <command
+               commandId="net.tourbook.command.tourChart.canScrollChart"
+               label="%Command_tourChart_canScrollChart"
+               mnemonic="%Command_tourChart_canScrollChart_mnemonic"
+               style="toggle">
+         </command>
+         <command
+               commandId="net.tourbook.command.tourChart.canAutoZoomToSlider"
+               label="%Command_tourChart_canAutoZoomToSlider"
+               mnemonic="%Command_tourChart_canAutoZoomToSlider_mnemonic"
+               style="toggle">
+         </command>
       </menuContribution>
  
    </extension>

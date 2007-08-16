@@ -38,6 +38,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -49,7 +50,8 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.dialogs.ListDialog;
 
 public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider {
@@ -91,8 +93,15 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		return true;
 	}
 
+	public void activateActions(IWorkbenchPartSite partSite) {
+		fChart.updateChartActionHandlers();
+	}
+
+	@Override
+	public void deactivateActions(IWorkbenchPartSite partSite) {}
+
 	public void createControl(	final Composite parent,
-								final IActionBars actionBars,
+								IViewSite viewSite,
 								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
@@ -104,6 +113,9 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		fChart.setShowPartNavigation(true);
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
+		fChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
+
+//		fChart.createChartActionHandlers();
 
 		fChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
@@ -397,4 +409,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	}
 
 	abstract void updateChart(TourDataTour tourDataDay);
+
+	public void updateToolBar(final boolean refreshToolbar) {
+		fChart.fillToolbar(refreshToolbar);
+	}
 }

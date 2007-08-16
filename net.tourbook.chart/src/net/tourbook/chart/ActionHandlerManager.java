@@ -9,10 +9,11 @@ import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.services.IServiceLocator;
 
 // author:  Wolfgang Schramm
 // created: 2007-08-12
@@ -72,7 +73,7 @@ public class ActionHandlerManager {
 					}
 				}
 
-				return EvaluationResult.FALSE;
+				return EvaluationResult.TRUE;
 			}
 		};
 
@@ -93,13 +94,14 @@ public class ActionHandlerManager {
 	 * Creates all action handlers for a chart and activate them in the handler service
 	 * {@link IHandlerService}
 	 */
-	void createActionHandlers(IWorkbenchWindow workbenchWindow) {
+	void createActionHandlers() {
 
 		// check if the handlers are created
 		if (fActionHandlers != null) {
 			return;
 		}
 
+		IServiceLocator workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		fCommandService = ((ICommandService) workbenchWindow.getService(ICommandService.class));
 		fHandlerService = ((IHandlerService) workbenchWindow.getService(IHandlerService.class));
 
@@ -133,6 +135,10 @@ public class ActionHandlerManager {
 	 */
 	void updateActionHandlers(Chart chart) {
 
+		if (fActionHandlers == null) {
+			return;
+		}
+		
 		for (ActionProxy actionProxy : chart.fActionProxies.values()) {
 
 			ActionHandler actionHandler = fActionHandlers.get(actionProxy.getCommandId());

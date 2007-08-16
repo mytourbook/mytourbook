@@ -22,7 +22,6 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";						//$NON-NLS-1$
 
 	public static String		Action_About;
-
 	public static String		Action_import_rawdata;
 	public static String		Action_import_rawdata_direct;
 	public static String		Action_import_rawdata_direct_tooltip;
@@ -160,10 +159,8 @@ public class Messages extends NLS {
 	public static String		Image_open_import_file;
 	public static String		Image_open_marker_editor;
 	public static String		Image_open_tour_segmenter;
-
-	public static String	Image_remove_all;
-
-	public static String	Image_remove_all_disabled;
+	public static String		Image_remove_all;
+	public static String		Image_remove_all_disabled;
 	public static String		Image_save_raw_data_to_file;
 	public static String		Image_save_raw_data_to_file_disabled;
 	public static String		Image_save_tour;
@@ -175,10 +172,9 @@ public class Messages extends NLS {
 	public static String		Image_show_tour_viewer;
 	public static String		Image_show_view_detail;
 	public static String		Image_synch_graph_horizontal;
-
-	public static String	Image_undo_edit;
-
-	public static String	Image_undo_edit_disabled;
+	public static String		Image_synch_graph_vertical;
+	public static String		Image_undo_edit;
+	public static String		Image_undo_edit_disabled;
 	public static String		Image_view_compare_result;
 	public static String		Image_view_compare_wizard;
 	public static String		Image_view_rawdata;
@@ -211,9 +207,7 @@ public class Messages extends NLS {
 	public static String		MarkerDialog_Button_reset_offset_tooltip;
 	public static String		MarkerDialog_Button_undo;
 	public static String		MarkerDialog_Button_undo_tooltip;
-
 	public static String		MarkerDialog_Dlg_Message;
-
 	public static String		MarkerDialog_Dlg_title;
 	public static String		MarkerDialog_Label_horizontal_offset;
 	public static String		MarkerDialog_Label_marker_name;
@@ -222,9 +216,9 @@ public class Messages extends NLS {
 	public static String		MarkerDialog_Label_vertical_offset;
 	public static String		MarkerDialog_MsgBox_delete_marker_message;
 	public static String		MarkerDialog_MsgBox_delete_marker_title;
+
 	public static String		Pref_ChartColors_Column_color;
 	public static String		Pref_ChartColors_Label_title;
-
 	public static String		Pref_Graphs_Button_down;
 	public static String		Pref_Graphs_Button_up;
 	public static String		Pref_Graphs_Check_autozoom;
@@ -293,10 +287,8 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_Dlg_rename_tour_type_title;
 	public static String		Pref_TourTypes_Title;
 
-	public static String	RawData_Action_clear_view;
-
-	public static String	RawData_Action_clear_view_tooltip;
-
+	public static String		RawData_Action_clear_view;
+	public static String		RawData_Action_clear_view_tooltip;
 	public static String		RawData_Action_open_import_file;
 	public static String		RawData_Action_open_import_file_tooltip;
 	public static String		RawData_Action_save_tour_for_person;
@@ -331,37 +323,26 @@ public class Messages extends NLS {
 	public static String		Tour_Action_show_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis_tooltip;
 
-	public static String	Tour_Action_undo_typing;
+	public static String		Tour_Action_undo_typing;
 
-	public static String	Tour_Action_undo_typing_tooltip;
+	public static String		Tour_Action_undo_typing_tooltip;
 	public static String		Tour_Action_zoom_fit_to_window;
 
-	public static String	Tour_Label_datapoints;
-
-	public static String	Tour_Label_description;
-
+	public static String		Tour_Label_datapoints;
+	public static String		Tour_Label_description;
 	public static String		Tour_Label_distance;
 	public static String		Tour_Label_distance_unit;
-
-	public static String	Tour_Label_driving_time;
-
-	public static String	Tour_Label_end_location;
-
-	public static String	Tour_Label_recording_time;
-
-	public static String	Tour_Label_start_location;
-
-	public static String	Tour_Label_start_time;
-
-	public static String	Tour_Label_tab_tour_chart;
-
-	public static String	Tour_Label_tab_tour_data;
+	public static String		Tour_Label_driving_time;
+	public static String		Tour_Label_end_location;
+	public static String		Tour_Label_recording_time;
+	public static String		Tour_Label_start_location;
+	public static String		Tour_Label_start_time;
+	public static String		Tour_Label_tab_tour_chart;
+	public static String		Tour_Label_tab_tour_data;
 	public static String		Tour_Label_time;
 	public static String		Tour_Label_time_unit;
-
-	public static String	Tour_Label_tour_date;
-
-	public static String	Tour_Label_tour_title;
+	public static String		Tour_Label_tour_date;
+	public static String		Tour_Label_tour_title;
 
 	public static String		TourAnalyzer_Label_average;
 	public static String		TourAnalyzer_Label_difference;

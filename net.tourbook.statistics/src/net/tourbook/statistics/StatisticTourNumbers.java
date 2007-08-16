@@ -34,6 +34,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
@@ -43,63 +44,66 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPartSite;
 
 public class StatisticTourNumbers extends YearStatistic {
 
-	private Composite				fStatisticPage;
+	private Composite					fStatisticPage;
 
-	private Chart					fChartDistanceCounter;
-	private Chart					fChartDistanceSum;
-	private Chart					fChartDurationCounter;
-	private Chart					fChartDurationSum;
-	private Chart					fChartAltitudeCounter;
-	private Chart					fChartAltitudeSum;
+	private Chart						fChartDistanceCounter;
+	private Chart						fChartDistanceSum;
+	private Chart						fChartDurationCounter;
+	private Chart						fChartDurationSum;
+	private Chart						fChartAltitudeCounter;
+	private Chart						fChartAltitudeSum;
 
-	private BarChartMinMaxKeeper	fMinMaxKeeperStatAltitudeCounter	= new BarChartMinMaxKeeper();
-	private BarChartMinMaxKeeper	fMinMaxKeeperStatAltitudeSum		= new BarChartMinMaxKeeper();
-	private BarChartMinMaxKeeper	fMinMaxKeeperStatDistanceCounter	= new BarChartMinMaxKeeper();
-	private BarChartMinMaxKeeper	fMinMaxKeeperStatDistanceSum		= new BarChartMinMaxKeeper();
-	private BarChartMinMaxKeeper	fMinMaxKeeperStatDurationCounter	= new BarChartMinMaxKeeper();
-	private BarChartMinMaxKeeper	fMinMaxKeeperStatDurationSum		= new BarChartMinMaxKeeper();
+	private final BarChartMinMaxKeeper	fMinMaxKeeperStatAltitudeCounter	= new BarChartMinMaxKeeper();
+	private final BarChartMinMaxKeeper	fMinMaxKeeperStatAltitudeSum		= new BarChartMinMaxKeeper();
+	private final BarChartMinMaxKeeper	fMinMaxKeeperStatDistanceCounter	= new BarChartMinMaxKeeper();
+	private final BarChartMinMaxKeeper	fMinMaxKeeperStatDistanceSum		= new BarChartMinMaxKeeper();
+	private final BarChartMinMaxKeeper	fMinMaxKeeperStatDurationCounter	= new BarChartMinMaxKeeper();
+	private final BarChartMinMaxKeeper	fMinMaxKeeperStatDurationSum		= new BarChartMinMaxKeeper();
 
-	private int[]					fStatDistanceUnits;
-	private int[]					fStatAltitudeUnits;
-	private int[]					fStatTimeUnits;
+	private int[]						fStatDistanceUnits;
+	private int[]						fStatAltitudeUnits;
+	private int[]						fStatTimeUnits;
 
-	private int[][]					fStatDistanceCounterLow;
-	private int[][]					fStatDistanceCounterHigh;
-	private int[][]					fStatDistanceCounterColorIndex;
+	private int[][]						fStatDistanceCounterLow;
+	private int[][]						fStatDistanceCounterHigh;
+	private int[][]						fStatDistanceCounterColorIndex;
 
-	private int[][]					fStatDistanceSumLow;
-	private int[][]					fStatDistanceSumHigh;
-	private int[][]					fStatDistanceSumColorIndex;
+	private int[][]						fStatDistanceSumLow;
+	private int[][]						fStatDistanceSumHigh;
+	private int[][]						fStatDistanceSumColorIndex;
 
-	private int[][]					fStatAltitudeCounterLow;
-	private int[][]					fStatAltitudeCounterHigh;
-	private int[][]					fStatAltitudeCounterColorIndex;
+	private int[][]						fStatAltitudeCounterLow;
+	private int[][]						fStatAltitudeCounterHigh;
+	private int[][]						fStatAltitudeCounterColorIndex;
 
-	private int[][]					fStatAltitudeSumLow;
-	private int[][]					fStatAltitudeSumHigh;
-	private int[][]					fStatAltitudeSumColorIndex;
+	private int[][]						fStatAltitudeSumLow;
+	private int[][]						fStatAltitudeSumHigh;
+	private int[][]						fStatAltitudeSumColorIndex;
 
-	private int[][]					fStatTimeCounterLow;
-	private int[][]					fStatTimeCounterHigh;
-	private int[][]					fStatTimeCounterColorIndex;
+	private int[][]						fStatTimeCounterLow;
+	private int[][]						fStatTimeCounterHigh;
+	private int[][]						fStatTimeCounterColorIndex;
 
-	private int[][]					fStatTimeSumLow;
-	private int[][]					fStatTimeSumHigh;
-	private int[][]					fStatTimeSumColorIndex;
+	private int[][]						fStatTimeSumLow;
+	private int[][]						fStatTimeSumHigh;
+	private int[][]						fStatTimeSumColorIndex;
 
-	private IPropertyChangeListener	fPrefChangeListener;
+	private IPropertyChangeListener		fPrefChangeListener;
 
-	private int						fCurrentYear;
-	private TourPerson				fActivePerson;
-	protected long					fActiveTypeId;
+	private int							fCurrentYear;
+	private TourPerson					fActivePerson;
+	protected long						fActiveTypeId;
 
-	private boolean					fIsSynchScaleEnabled;
+	private boolean						fIsSynchScaleEnabled;
 
-	private TourDataTour			fTourDataTour;
+	private TourDataTour				fTourDataTour;
+
+	private IViewSite					fViewSite;
 
 	public StatisticTourNumbers() {}
 
@@ -151,10 +155,17 @@ public class StatisticTourNumbers extends YearStatistic {
 		});
 	}
 
+	@Override
+	public void activateActions(IWorkbenchPartSite partSite) {}
+
+	@Override
+	public void deactivateActions(IWorkbenchPartSite partSite) {}
+
 	public boolean canTourBeVisible() {
 		return false;
 	}
 
+	@Override
 	public void resetSelection() {}
 
 	private void createAltitudeStatisticProvider(ChartDataModel chartModel) {
@@ -193,11 +204,14 @@ public class StatisticTourNumbers extends YearStatistic {
 		});
 	}
 
+	@Override
 	public void createControl(	Composite parent,
-								IActionBars actionBars,
+								IViewSite viewSite,
 								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
+
+		fViewSite = viewSite;
 
 		// create statistic page
 		fStatisticPage = new Composite(parent, SWT.BORDER | SWT.FLAT);
@@ -214,22 +228,15 @@ public class StatisticTourNumbers extends YearStatistic {
 		fStatisticPage.setLayout(gl);
 
 		fChartDistanceCounter = new Chart(fStatisticPage, SWT.NONE);
-		fChartDistanceCounter.setActionBars(actionBars);
-
 		fChartDistanceSum = new Chart(fStatisticPage, SWT.NONE);
-		fChartDistanceSum.setActionBars(actionBars);
 
 		fChartAltitudeCounter = new Chart(fStatisticPage, SWT.NONE);
-		fChartAltitudeCounter.setActionBars(actionBars);
-
 		fChartAltitudeSum = new Chart(fStatisticPage, SWT.NONE);
-		fChartAltitudeSum.setActionBars(actionBars);
 
 		fChartDurationCounter = new Chart(fStatisticPage, SWT.NONE);
-		fChartDurationCounter.setActionBars(actionBars);
-
 		fChartDurationSum = new Chart(fStatisticPage, SWT.NONE);
-		fChartDurationSum.setActionBars(actionBars);
+
+		fChartDistanceCounter.setToolBarManager(viewSite.getActionBars().getToolBarManager(), true);
 
 		addPrefListener(parent);
 		getPreferences();
@@ -521,6 +528,11 @@ public class StatisticTourNumbers extends YearStatistic {
 			resetMinMaxKeeper();
 		}
 
+		// hide actions from other statistics
+		final IToolBarManager tbm = fViewSite.getActionBars().getToolBarManager();
+		tbm.removeAll();
+		tbm.update(true);
+
 		createStatisticData(fTourDataTour);
 		updateCharts();
 
@@ -537,6 +549,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		}
 	}
 
+	@Override
 	public void setSynchScale(boolean isSynchScaleEnabled) {
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
@@ -746,4 +759,7 @@ public class StatisticTourNumbers extends YearStatistic {
 			}
 		}
 	}
+
+	@Override
+	public void updateToolBar(final boolean refreshToolbar) {}
 }

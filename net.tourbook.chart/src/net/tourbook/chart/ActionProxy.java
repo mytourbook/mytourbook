@@ -82,6 +82,7 @@ public class ActionProxy {
 		fIsEnabled = isEnabled;
 
 		if (fAction != null) {
+			// use action in the action bar
 			fAction.setEnabled(isEnabled);
 		} else {
 			final ActionHandler actionHandler = ActionHandlerManager.getInstance()

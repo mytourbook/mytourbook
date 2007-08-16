@@ -9,10 +9,12 @@ import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.services.IServiceLocator;
 
 // author:  Wolfgang Schramm
 // created: 2007-08-08
@@ -43,9 +45,59 @@ class TCActionHandlerManager {
 	}
 
 	/**
+	 * Create all action handlers used by the tour chart
+	 */
+	void createActionHandlers() {
+
+		// check if the handlers are created
+		if (fActionHandlers != null) {
+			return;
+		}
+
+		IServiceLocator workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+		fCommandService = ((ICommandService) workbenchWindow.getService(ICommandService.class));
+		fHandlerService = ((IHandlerService) workbenchWindow.getService(IHandlerService.class));
+//		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
+
+		fActionHandlers = new HashMap<String, TCActionHandler>();
+
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTITUDE, new ActionHandlerGraphAltitude());
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_PULSE, new ActionHandlerGraphPulse());
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_SPEED, new ActionHandlerGraphSpeed());
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_TEMPERATURE,
+				new ActionHandlerGraphTemperature());
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_CADENCE, new ActionHandlerGraphCadence());
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTIMETER, new ActionHandlerGraphAltimeter());
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_GRADIENT, new ActionHandlerGraphGradient());
+
+		fActionHandlers.put(TourChart.COMMAND_ID_X_AXIS_TIME, new ActionHandlerXAxisTime());
+		fActionHandlers.put(TourChart.COMMAND_ID_X_AXIS_DISTANCE, new ActionHandlerXAxisDistance());
+
+		fActionHandlers.put(TourChart.COMMAND_ID_CHART_OPTIONS, new ActionHandlerChartOptions());
+		fActionHandlers.put(TourChart.COMMAND_ID_SHOW_START_TIME, new ActionHandlerShowStartTime());
+		fActionHandlers.put(TourChart.COMMAND_ID_CAN_SCROLL_CHART,
+				new ActionHandlerCanScrollChart());
+		fActionHandlers.put(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER,
+				new ActionHandlerCanAutoZoomToSlider());
+
+		setupHandlers();
+	}
+
+	/**
+	 * Get the action handler for the command
+	 * 
+	 * @param commandId
+	 * @return
+	 */
+	TCActionHandler getActionHandler(String commandId) {
+		return fActionHandlers.get(commandId);
+	}
+
+	/**
 	 * Activate all action handlers
 	 */
-	private void activateHandlers() {
+	private void setupHandlers() {
 		/*
 		 * it would be better to define the expression in the
 		 * org.eclipse.core.expressions.definitions extension, but in Eclipse 3.3 the
@@ -75,7 +127,7 @@ class TCActionHandlerManager {
 					}
 				}
 
-				return EvaluationResult.FALSE;
+				return EvaluationResult.TRUE;
 			}
 		};
 
@@ -93,56 +145,11 @@ class TCActionHandlerManager {
 	}
 
 	/**
-	 * Create all action handlers used by the tour chart
-	 */
-	void createActionHandlers(IWorkbenchWindow workbenchWindow) {
-
-		// check if the handlers are created
-		if (fActionHandlers != null) {
-			return;
-		}
-
-		fCommandService = ((ICommandService) workbenchWindow.getService(ICommandService.class));
-		fHandlerService = ((IHandlerService) workbenchWindow.getService(IHandlerService.class));
-
-		fActionHandlers = new HashMap<String, TCActionHandler>();
-
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTITUDE, new ActionHandlerGraphAltitude());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_PULSE, new ActionHandlerGraphPulse());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_SPEED, new ActionHandlerGraphSpeed());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_TEMPERATURE,
-				new ActionHandlerGraphTemperature());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_CADENCE, new ActionHandlerGraphCadence());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTIMETER, new ActionHandlerGraphAltimeter());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_GRADIENT, new ActionHandlerGraphGradient());
-
-		fActionHandlers.put(TourChart.COMMAND_ID_X_AXIS_TIME, new ActionHandlerXAxisTime());
-		fActionHandlers.put(TourChart.COMMAND_ID_X_AXIS_DISTANCE, new ActionHandlerXAxisDistance());
-
-		fActionHandlers.put(TourChart.COMMAND_ID_CHART_OPTIONS, new ActionHandlerChartOptions());
-		fActionHandlers.put(TourChart.COMMAND_ID_SHOW_START_TIME, new ActionHandlerShowStartTime());
-		fActionHandlers.put(TourChart.COMMAND_ID_CAN_SCROLL_CHART,
-				new ActionHandlerCanScrollChart());
-		fActionHandlers.put(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER,
-				new ActionHandlerCanAutoZoomToSlider());
-
-		activateHandlers();
-	}
-
-	/**
-	 * Get the action handler for the command
-	 * 
-	 * @param commandId
-	 * @return
-	 */
-	TCActionHandler getActionHandler(String commandId) {
-		return fActionHandlers.get(commandId);
-	}
-
-	/**
 	 * Set the state for all action handlers from their action proxy and update the UI state
+	 * 
+	 * @param partSite
 	 */
-	void updateActionHandlers(TourChart tourChart) {
+	void updateTourActionHandlers(IWorkbenchPartSite partSite, TourChart tourChart) {
 
 		for (TCActionProxy actionProxy : tourChart.fActionProxies.values()) {
 

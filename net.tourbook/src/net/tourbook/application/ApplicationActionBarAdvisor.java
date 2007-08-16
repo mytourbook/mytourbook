@@ -72,13 +72,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private Action							fActionTourCompareWizard;
 
+	private IWorkbenchAction				fActionSave;
+	private IWorkbenchAction				fActionSaveAll;
+	private IContributionItem				fActionViewShortList;
 	private IWorkbenchAction				fActionPreferences;
 
 	PersonContributionItem					personSelector;
 	TourTypeContributionItem				tourTypeSelector;
-	private IWorkbenchAction				fActionSave;
-	private IWorkbenchAction				fActionSaveAll;
-	private IContributionItem				fActionViewShortList;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -257,26 +257,26 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	protected void fillCoolBar(ICoolBarManager coolBar) {
 
-		IToolBarManager peopleToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		peopleToolbar.add(personSelector);
+		IToolBarManager tbmPeople = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		tbmPeople.add(personSelector);
 
-		coolBar.add(new ToolBarContributionItem(peopleToolbar, "people")); //$NON-NLS-1$
-
-		// ---------------------------------------------------------
-
-		IToolBarManager tourTypeToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		tourTypeToolbar.add(tourTypeSelector);
-
-		coolBar.add(new ToolBarContributionItem(tourTypeToolbar, "tourtype")); //$NON-NLS-1$
+		coolBar.add(new ToolBarContributionItem(tbmPeople, "people")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 
-		IToolBarManager importToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		importToolbar.add(fActionImportFromFile);
-		importToolbar.add(fActionImportFromDevice);
-		importToolbar.add(fActionImportFromDeviceDirect);
+		IToolBarManager tbmTourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		tbmTourType.add(tourTypeSelector);
 
-		coolBar.add(new ToolBarContributionItem(importToolbar, "import")); //$NON-NLS-1$
+		coolBar.add(new ToolBarContributionItem(tbmTourType, "tourtype")); //$NON-NLS-1$
+
+		// ---------------------------------------------------------
+
+		IToolBarManager tbmImport = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		tbmImport.add(fActionImportFromFile);
+		tbmImport.add(fActionImportFromDevice);
+		tbmImport.add(fActionImportFromDeviceDirect);
+
+		coolBar.add(new ToolBarContributionItem(tbmImport, "import")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 
@@ -295,13 +295,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		// ---------------------------------------------------------
 
-		IToolBarManager compareToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		IToolBarManager tbmCompare = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 
-		compareToolbar.add(new Separator());
-		compareToolbar.add(fActionTourCompareWizard);
-		compareToolbar.add(fActionTourCompareView);
+		tbmCompare.add(new Separator());
+		tbmCompare.add(fActionTourCompareWizard);
+		tbmCompare.add(fActionTourCompareView);
 
-		coolBar.add(new ToolBarContributionItem(compareToolbar, "compare")); //$NON-NLS-1$
+		coolBar.add(new ToolBarContributionItem(tbmCompare, "compare")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 

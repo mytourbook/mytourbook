@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -41,8 +42,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.PageBook;
 
 public class StatisticContainer extends Composite {
@@ -64,13 +66,14 @@ public class StatisticContainer extends Composite {
 	private PageBook						fPageBookStatistic;
 	private Composite						fStatContainer;
 
+	private IViewSite						fViewSite;
 //	private ToolBarManager					fTBM;
 //	private ToolBar							fToolBar;
 
 	private ArrayList<Integer>				fTourYears;
 	private ArrayList<TourbookStatistic>	fStatistics;
 
-//	private ActionSynchChartScale			fActionZoomFitGraph;
+	private ActionSynchChartScale			fActionSynchChartScale;
 	private boolean							fIsSynchScaleEnabled;
 
 	private long							fSelectedDate;
@@ -80,15 +83,13 @@ public class StatisticContainer extends Composite {
 	private int								fLastSelectionType;
 	private IPostSelectionProvider			fPostSelectionProvider;
 
-	private IActionBars						fActionBars;
-
-	public StatisticContainer(IActionBars actionBars, IPostSelectionProvider selectionProvider,
+	public StatisticContainer(IViewSite viewSite, IPostSelectionProvider selectionProvider,
 			Composite parent, int style) {
 
 		super(parent, style);
 
+		fViewSite = viewSite;
 		fPostSelectionProvider = selectionProvider;
-		fActionBars = actionBars;
 
 		createControl();
 	}
@@ -106,11 +107,11 @@ public class StatisticContainer extends Composite {
 		}
 	}
 
-//	private void createActions(Composite parent) {
-//
+	private void createActions(Composite parent) {
+
+		fActionSynchChartScale = new ActionSynchChartScale(this);
+
 //		GridData gd;
-//
-////		fActionZoomFitGraph = new ActionSynchChartScale(this);
 //
 //		// create the toolbar manager
 //		fToolBar = new ToolBar(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
@@ -119,7 +120,26 @@ public class StatisticContainer extends Composite {
 //		fToolBar.setLayoutData(gd);
 //
 //		fTBM = new ToolBarManager(fToolBar);
-//	}
+	}
+
+	public void activateActions(IWorkbenchPartSite partSite) {
+//		fPartSite = partSite;
+		fActiveStatistic.activateActions(partSite);
+	}
+
+	private void fillToolbar() {
+
+		IToolBarManager tbm = fViewSite.getActionBars().getToolBarManager();
+//		// update the toolbar
+		tbm.removeAll();
+//
+		tbm.add(fActionSynchChartScale);
+		
+		fActiveStatistic.updateToolBar(true);
+//
+//		fTBM.update(false);
+//		fStatContainer.layout();
+	}
 
 	private void createControl() {
 
@@ -177,24 +197,16 @@ public class StatisticContainer extends Composite {
 		}
 
 		// refreshYears();
-//		createActions(fStatContainer);
+		createActions(fStatContainer);
 
 		// pagebook: statistics
 		fPageBookStatistic = new PageBook(this, SWT.NONE);
 		fPageBookStatistic.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 	}
 
-//	private void fillToolbar() {
-//
-//		// update the toolbar
-//		fTBM.removeAll();
-//
-//		fTBM.add(fActionZoomFitGraph);
-//		fActiveStatistic.updateToolBar(false);
-//
-//		fTBM.update(false);
-//		fStatContainer.layout();
-//	}
+	public void deactivateActions(IWorkbenchPartSite partSite) {
+		fActiveStatistic.deactivateActions(partSite);
+	}
 
 	/**
 	 * Get the selected statistic in the combo box and set it as active statistic
@@ -222,7 +234,7 @@ public class StatisticContainer extends Composite {
 			statControlContainer.setLayout(gl);
 			statControlContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-			statistic.createControl(statControlContainer, fActionBars, fPostSelectionProvider);
+			statistic.createControl(statControlContainer, fViewSite, fPostSelectionProvider);
 			statistic.setContainer(statControlContainer);
 
 			Composite statControl = statistic.getControl();
@@ -428,7 +440,7 @@ public class StatisticContainer extends Composite {
 					year,
 					refreshData);
 		}
-//		fillToolbar();
+		fillToolbar();
 		fPageBookStatistic.showPage(fActiveStatistic.getControl());
 	}
 

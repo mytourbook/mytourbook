@@ -34,7 +34,9 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
@@ -44,11 +46,10 @@ public class TourStatisticsView extends ViewPart {
 
 	private static IMemento			fSessionMemento;
 
-	private StatisticContainer		fStatistics;
+	private StatisticContainer		fStatisticContainer;
 
 	private PostSelectionProvider	fPostSelectionProvider;
-//	private ISelectionListener		fPostSelectionListener;
-//	private IPartListener2			fPartListener;
+	private IPartListener2			fPartListener;
 
 	private IPropertyChangeListener	fPrefChangeListener;
 
@@ -78,36 +79,39 @@ public class TourStatisticsView extends ViewPart {
 
 	protected Long					fActiveTourId;
 
-//	private void addPartListener() {
-//
-//		// set the part listener
-//		fPartListener = new IPartListener2() {
-//			public void partActivated(IWorkbenchPartReference partRef) {}
-//
-//			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
-//
-//			public void partClosed(IWorkbenchPartReference partRef) {
-//				if (ID.equals(partRef.getId()))
-//					saveSettings();
-//			}
-//
-//			public void partDeactivated(IWorkbenchPartReference partRef) {
-//				if (ID.equals(partRef.getId())) {
-//					// saveSettings();
-//				}
-//			}
-//
-//			public void partHidden(IWorkbenchPartReference partRef) {}
-//
-//			public void partInputChanged(IWorkbenchPartReference partRef) {}
-//
-//			public void partOpened(IWorkbenchPartReference partRef) {}
-//
-//			public void partVisible(IWorkbenchPartReference partRef) {}
-//		};
-//		// register the listener in the page
-//		getViewSite().getPage().addPartListener(fPartListener);
-//	}
+	private void addPartListener() {
+
+		// set the part listener
+		fPartListener = new IPartListener2() {
+
+			public void partActivated(IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourStatisticsView.this) {
+					fStatisticContainer.activateActions(getSite());
+				}
+			}
+
+			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
+
+			public void partClosed(IWorkbenchPartReference partRef) {}
+
+			public void partDeactivated(IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourStatisticsView.this) {
+					fStatisticContainer.deactivateActions(getSite());
+				}
+			}
+
+			public void partHidden(IWorkbenchPartReference partRef) {}
+
+			public void partInputChanged(IWorkbenchPartReference partRef) {}
+
+			public void partOpened(IWorkbenchPartReference partRef) {}
+
+			public void partVisible(IWorkbenchPartReference partRef) {}
+		};
+
+		// register the part listener
+		getSite().getPage().addPartListener(fPartListener);
+	}
 
 	private void addPrefListener() {
 
@@ -146,15 +150,6 @@ public class TourStatisticsView extends ViewPart {
 				.addPropertyChangeListener(fPrefChangeListener);
 	}
 
-//	private void createActions() {
-//
-//	/*
-//	 * fill site menu
-//	 */
-////		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-////		menuMgr.add(fActionModifyColumns);
-//	}
-
 	public void createPartControl(Composite parent) {
 
 		createResources();
@@ -162,18 +157,18 @@ public class TourStatisticsView extends ViewPart {
 		// set selection provider before the statistic container is created
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		fStatistics = new StatisticContainer(getViewSite().getActionBars(), fPostSelectionProvider, parent, SWT.NONE);
+		fStatisticContainer = new StatisticContainer(getViewSite(),
+				fPostSelectionProvider,
+				parent,
+				SWT.NONE);
 
-//		createActions();
-
-//		setPostSelectionListener();
-//		addPartListener();
+		addPartListener();
 		addPrefListener();
 
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
 		fActiveTourTypeId = TourbookPlugin.getDefault().getActiveTourType().getTypeId();
 
-		fStatistics.restoreStatistics(fSessionMemento, fActivePerson, fActiveTourTypeId);
+		fStatisticContainer.restoreStatistics(fSessionMemento, fActivePerson, fActiveTourTypeId);
 	}
 
 	private void createResources() {
@@ -193,8 +188,7 @@ public class TourStatisticsView extends ViewPart {
 
 	public void dispose() {
 
-//		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-//		getViewSite().getPage().removePartListener(fPartListener);
+		getViewSite().getPage().removePartListener(fPartListener);
 
 		TourbookPlugin.getDefault()
 				.getPluginPreferences()
@@ -210,15 +204,6 @@ public class TourStatisticsView extends ViewPart {
 		super.dispose();
 	}
 
-//	void firePostSelection(ISelection selection) {
-//
-//		if (selection instanceof SelectionRemovedTours) {
-//			refreshStatistics();
-//		}
-//
-//		fPostSelectionProvider.setSelection(selection);
-//	}
-
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 
 		super.init(site, memento);
@@ -229,40 +214,14 @@ public class TourStatisticsView extends ViewPart {
 		}
 	}
 
-//	public void openTourChart(long tourId) {
-//	// TourManager.getInstance().openTourInEditor(tourId);
-//	}
-
 	private void refreshStatistics() {
-		fStatistics.refreshStatistic(fActivePerson, fActiveTourTypeId);
+		fStatisticContainer.refreshStatistic(fActivePerson, fActiveTourTypeId);
 	}
 
-//	private void saveSettings() {
-//		fSessionMemento = XMLMemento.createWriteRoot("DeviceImportView"); //$NON-NLS-1$
-//		saveState(fSessionMemento);
-//	}
-
 	public void saveState(IMemento memento) {
-
-		fStatistics.saveState(memento);
+		fStatisticContainer.saveState(memento);
 	}
 
 	public void setFocus() {}
-
-//	private void setPostSelectionListener() {
-//		// this view part is a selection listener
-//		fPostSelectionListener = new ISelectionListener() {
-//
-//			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-//
-//				if (!selection.isEmpty() && selection instanceof SelectionRawData) {
-//					refreshStatistics();
-//				}
-//			}
-//		};
-//
-//		// register selection listener in the page
-//		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
-//	}
 
 }

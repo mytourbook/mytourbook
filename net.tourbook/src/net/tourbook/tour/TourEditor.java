@@ -62,7 +62,7 @@ public class TourEditor extends EditorPart {
 
 			public void partActivated(IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
-					fTourChart.activateActions();
+					fTourChart.activateActionHandlers(getSite());
 				}
 			}
 
@@ -102,7 +102,7 @@ public class TourEditor extends EditorPart {
 		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-		fTourChart.createTourActionHandlers(getSite().getWorkbenchWindow(), fTourChartConfig);
+		fTourChart.createTourActionHandlers(fTourChartConfig);
 
 		// load the tourdata from the database
 		fTourData = TourManager.getInstance().getTourData(fEditorInput.fTourId);
@@ -122,7 +122,10 @@ public class TourEditor extends EditorPart {
 
 			fTourChart.updateChart(fTourData, fTourChartConfig, false);
 
-			setPartName(TourManager.getTourDate(fTourData));
+			final String tourTitle = TourManager.getTourDate(fTourData);
+			
+			fEditorInput.fEditorTitle=tourTitle;
+			setPartName(tourTitle);
 			setTitleToolTip("title tooltip ???");
 		}
 	}

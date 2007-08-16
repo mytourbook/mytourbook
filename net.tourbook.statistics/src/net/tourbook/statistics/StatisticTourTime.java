@@ -42,7 +42,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPartSite;
 
 public class StatisticTourTime extends YearStatistic implements IBarSelectionProvider {
 
@@ -63,12 +64,26 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	private Long						fSelectedTourId;
 	protected int						fCurrentMonth;
 
-//	public boolean canTourBeVisible() {
-//		return true;
-//	}
+//	private IContextActivation			fContextBarChart;
+
+	@Override
+	public void activateActions(IWorkbenchPartSite partSite) {
+
+//		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
+//		fContextBarChart = contextService.activateContext(Chart.CONTEXT_ID_BAR_CHART);
+
+//		fChart.updateChartActionHandlers();
+	}
+
+	@Override
+	public void deactivateActions(IWorkbenchPartSite partSite) {
+
+//		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
+//		contextService.deactivateContext(fContextBarChart);
+	}
 
 	public void createControl(	final Composite parent,
-								final IActionBars actionBars,
+								IViewSite viewSite,
 								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
@@ -77,10 +92,12 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		// chart widget page
 		fChart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-//		fChart.setActionBars(actionBars);
 		fChart.setShowPartNavigation(true);
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
+		fChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
+
+//		fChart.createChartActionHandlers();
 
 		fChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
@@ -214,11 +231,9 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		return isSelected;
 	}
 
-	void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
+	private void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
 
-		chartModel.setCustomData(
-
-		ChartDataModel.BAR_INFO_PROVIDER, new IChartInfoProvider() {
+		final IChartInfoProvider chartInfoProvider = new IChartInfoProvider() {
 
 			public String getInfo(final int serieIndex, int valueIndex) {
 
@@ -274,7 +289,9 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 				return barInfo;
 			}
-		});
+		};
+
+		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, chartInfoProvider);
 
 		// set the menu context provider
 		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER,
@@ -324,6 +341,10 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		// show the data in the chart
 		fChart.setChartDataModel(chartModel, isResetSelection);
+	}
+
+	public void updateToolBar(final boolean refreshToolbar) {
+		fChart.fillToolbar(refreshToolbar);
 	}
 
 }

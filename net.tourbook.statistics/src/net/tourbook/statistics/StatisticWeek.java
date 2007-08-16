@@ -25,7 +25,8 @@ import net.tourbook.data.TourPerson;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticWeek extends YearStatistic {
 
@@ -36,24 +37,33 @@ public abstract class StatisticWeek extends YearStatistic {
 	private int				fCurrentYear;
 	private long			fActiveTypeId;
 
-	private Calendar		fCalendar		= GregorianCalendar.getInstance();
+	private final Calendar	fCalendar		= GregorianCalendar.getInstance();
 	boolean					fIsSynchScaleEnabled;
 
 	public boolean canTourBeVisible() {
 		return false;
 	}
 
+	@Override
+	public void activateActions(IWorkbenchPartSite partSite) {
+		fChart.updateChartActionHandlers();
+	}
+
+	@Override
+	public void deactivateActions(IWorkbenchPartSite partSite) {}
+
+	@Override
 	public void createControl(	Composite parent,
-								IActionBars actionBars,
+								IViewSite viewSite,
 								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
 		// create chart
 		fChart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-		fChart.setActionBars(actionBars);
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
+		fChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 	}
 
 	public void prefColorChanged() {
@@ -79,10 +89,12 @@ public abstract class StatisticWeek extends YearStatistic {
 		updateChart(tourWeekData);
 	}
 
+	@Override
 	public void resetSelection() {
 		fChart.setSelectedBars(null);
 	}
 
+	@Override
 	public boolean selectDay(Long date) {
 		fCalendar.setTimeInMillis(date);
 		int selectedWeek = fCalendar.get(Calendar.WEEK_OF_YEAR) - 0;
@@ -95,6 +107,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		return true;
 	}
 
+	@Override
 	public boolean selectMonth(Long date) {
 
 		fCalendar.setTimeInMillis(date);
@@ -121,13 +134,15 @@ public abstract class StatisticWeek extends YearStatistic {
 		return isSelected;
 	}
 
+	@Override
 	public void setSynchScale(boolean isSynchScaleEnabled) {
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
 	abstract void updateChart(TourDataWeek tourWeekData);
 
-//	public void updateToolBar(boolean refreshToolbar) {
-//		fChart.showActions(refreshToolbar);
-//	}
+	@Override
+	public void updateToolBar(final boolean refreshToolbar) {
+		fChart.fillToolbar(refreshToolbar);
+	}
 }

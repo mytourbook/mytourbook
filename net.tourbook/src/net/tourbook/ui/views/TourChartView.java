@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
@@ -56,13 +57,12 @@ public class TourChartView extends ViewPart {
 	private ISelectionListener		fPostSelectionListener;
 	private IPropertyChangeListener	fPrefChangeListener;
 
+	private IPartListener2			fPartListener;
 	private PostSelectionProvider	fPostSelectionProvider;
 
 	private PageBook				fPageBook;
 
 	private Label					fPageNoChart;
-
-	private IPartListener2			fPartListener;
 
 	private void addPartListener() {
 
@@ -71,7 +71,7 @@ public class TourChartView extends ViewPart {
 
 			public void partActivated(IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartView.this) {
-					fTourChart.activateActions();
+//					fTourChart.activateActionHandlers(getSite());
 				}
 			}
 
@@ -79,7 +79,11 @@ public class TourChartView extends ViewPart {
 
 			public void partClosed(IWorkbenchPartReference partRef) {}
 
-			public void partDeactivated(IWorkbenchPartReference partRef) {}
+			public void partDeactivated(IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourChartView.this) {
+//					fTourChart.deactivateActionHandlers();
+				}
+			}
 
 			public void partHidden(IWorkbenchPartReference partRef) {}
 
@@ -141,12 +145,13 @@ public class TourChartView extends ViewPart {
 		fPageNoChart = new Label(fPageBook, SWT.NONE);
 		fPageNoChart.setText("A tour is not selected");
 
-		fTourChart = new TourChart(fPageBook, SWT.FLAT, false);
+		fTourChart = new TourChart(fPageBook, SWT.FLAT, true);
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
+		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-		fTourChart.createTourActionHandlers(getSite().getWorkbenchWindow(), fTourChartConfig);
+//		fTourChart.createTourActionHandlers(fTourChartConfig);
 
 		// set chart title
 		fTourChart.addDataModelListener(new IDataModelListener() {
@@ -180,7 +185,10 @@ public class TourChartView extends ViewPart {
 
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+		final IWorkbenchPage page = getSite().getPage();
+
+		page.removePartListener(fPartListener);
+		page.removePostSelectionListener(fPostSelectionListener);
 
 		getSite().setSelectionProvider(null);
 
@@ -211,9 +219,14 @@ public class TourChartView extends ViewPart {
 					.getTourData(tourIdSelection.getTourId());
 
 			if (tourData != null) {
+
 				fTourData = tourData;
 				fTourChart.updateChart(fTourData, fTourChartConfig, false);
+
 				fPageBook.showPage(fTourChart);
+
+				// set application window title
+				setTitleToolTip(TourManager.getTourDate(fTourData));
 			}
 		}
 	}

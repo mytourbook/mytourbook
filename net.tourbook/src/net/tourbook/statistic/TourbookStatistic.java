@@ -17,7 +17,8 @@ package net.tourbook.statistic;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class TourbookStatistic {
 
@@ -30,15 +31,30 @@ public abstract class TourbookStatistic {
 	private boolean		fIsRefreshData;
 
 	/**
+	 * Activates the actions in the statistic
+	 * 
+	 * @param partSite
+	 */
+	public abstract void activateActions(IWorkbenchPartSite partSite);
+
+	/**
 	 * Create the statistic component
 	 * 
 	 * @param parent
+	 * @param viewSite
 	 * @param actionBars
 	 * @param postSelectionProvider
 	 */
 	public abstract void createControl(	Composite parent,
-										IActionBars actionBars,
+										IViewSite viewSite,
 										IPostSelectionProvider postSelectionProvider);
+
+	/**
+	 * Deactivates the actions in the statistic
+	 * 
+	 * @param partSite
+	 */
+	public abstract void deactivateActions(IWorkbenchPartSite partSite);
 
 	public Composite getControl() {
 		return fContainer;
@@ -54,6 +70,11 @@ public abstract class TourbookStatistic {
 		fIsRefreshData = false;
 		return isRefresh;
 	}
+
+	/**
+	 * reset the selection in the statistic chart
+	 */
+	public abstract void resetSelection();
 
 	/**
 	 * Select the day in the statistic, this is used to visualize a selected tour in the statistic
@@ -113,18 +134,13 @@ public abstract class TourbookStatistic {
 	 */
 	public abstract void setSynchScale(boolean isEnabled);
 
-//	/**
-//	 * this method is called before the statistic control will be displayed. When the toolbar
-//	 * manager is used, this method should put the actions into the toolbar manager
-//	 * 
-//	 * @param refreshToolbar
-//	 *        <code>true</code> will refresh the toolbar
-//	 */
-//	public void updateToolBar(boolean refreshToolbar) {}
-
 	/**
-	 * reset the selection in the statistic chart
+	 * this method is called before the statistic control will be displayed. When the toolbar
+	 * manager is used, this method should put the actions into the toolbar manager
+	 * 
+	 * @param refreshToolbar
+	 *        <code>true</code> will refresh the toolbar
 	 */
-	public abstract void resetSelection();
+	public abstract void updateToolBar(boolean refreshToolbar);
 
 }

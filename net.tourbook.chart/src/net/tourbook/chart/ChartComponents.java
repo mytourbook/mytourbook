@@ -73,7 +73,7 @@ public class ChartComponents extends Composite {
 	static final int					MARGIN_TOP_WITH_TITLE		= 5;
 	static final int					MARGIN_TOP_WITHOUT_TITLE	= 10;
 
-	private Chart						fChart;
+	private final Chart					fChart;
 
 	/**
 	 * top margin of the chart (and all it's components)
@@ -137,9 +137,9 @@ public class ChartComponents extends Composite {
 	 */
 	private Rectangle					fVisibleGraphRect;
 
-	private ChartComponentGraph			fComponentGraph;
-	private ChartComponentAxis			fComponentAxisLeft;
-	private ChartComponentAxis			fComponentAxisRight;
+	private final ChartComponentGraph	fComponentGraph;
+	private final ChartComponentAxis	fComponentAxisLeft;
+	private final ChartComponentAxis	fComponentAxisRight;
 
 	private ChartDataModel				fChartDataModel				= null;
 
@@ -178,7 +178,7 @@ public class ChartComponents extends Composite {
 		fChart = parent;
 
 		// set the layout for the components
-		gd=new GridData(SWT.FILL, SWT.FILL, true, true);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 //		gd.widthHint = CHART_MIN_WIDTH;
 //		gd.heightHint = CHART_MIN_HEIGHT;
 		setLayoutData(gd);
@@ -199,7 +199,7 @@ public class ChartComponents extends Composite {
 
 		// center: create chart canvas
 		fComponentGraph = new ChartComponentGraph(parent, this, SWT.NONE);
-		gd=new GridData(SWT.FILL, SWT.FILL, true, true);
+		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 //		gd.widthHint = CHART_MIN_WIDTH;
 		fComponentGraph.setLayoutData(gd);
 
@@ -216,6 +216,7 @@ public class ChartComponents extends Composite {
 
 		// this is the only resize listener for the whole chart
 		addControlListener(new ControlAdapter() {
+			@Override
 			public void controlResized(final ControlEvent event) {
 				onResize();
 			}
@@ -230,7 +231,7 @@ public class ChartComponents extends Composite {
 
 		fComponentGraph.addListener(SWT.Traverse, new Listener() {
 			public void handleEvent(final Event event) {
-				
+
 				switch (event.detail) {
 				case SWT.TRAVERSE_RETURN:
 				case SWT.TRAVERSE_ESCAPE:
@@ -264,7 +265,7 @@ public class ChartComponents extends Composite {
 		final int xStartValue = xData.getStartValue();
 
 		int devGraphWidth = fComponentGraph.getDevVirtualGraphImageWidth();
-		
+
 		// enforce minimum chart width
 //		devGraphWidth = Math.max(devGraphWidth, CHART_MIN_WIDTH);
 
@@ -383,7 +384,7 @@ public class ChartComponents extends Composite {
 		// graphs
 		if (fChartDataModel.isStackedChart() && graphCount > 1) {
 			final int devGraphHeightSpace = (devGraphHeight - (fChartsVerticalDistance * (graphCount - 1)));
-			devGraphHeight = (int) (devGraphHeightSpace / graphCount);
+			devGraphHeight = (devGraphHeightSpace / graphCount);
 		}
 
 		// enforce minimum chart height
@@ -432,19 +433,19 @@ public class ChartComponents extends Composite {
 		}
 
 		float adjustMinValue = 0;
-		if (((float) graphMinValue % unit) != 0 && graphMinValue < 0) {
+		if ((graphMinValue % unit) != 0 && graphMinValue < 0) {
 			adjustMinValue = unit;
 		}
 		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / unit) * unit);
 
 		// adjust the min value so that bar graphs start at the bottom of the chart
 		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
-			yData.setVisibleMinValue(graphMinValue);
+//			yData.setVisibleMinValue(graphMinValue);
 		}
 
 		// increase the max value when it does not fit to unit borders
 		float adjustMaxValue = 0;
-		if (((float) graphMaxValue % unit) != 0) {
+		if ((graphMaxValue % unit) != 0) {
 			adjustMaxValue = unit;
 		}
 		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / unit) * unit);
@@ -769,8 +770,7 @@ public class ChartComponents extends Composite {
 		final int devMarkerStartPos = (int) (markerStartValue / lastValue * devVirtualGraphImageWidth);
 		final int devXMarkerOffset = (int) (devMarkerStartPos - devVirtualGraphOffset);
 
-		final ZoomMarkerPosition newXMarkerPositionOut = new ZoomMarkerPosition(
-				devXMarkerWidth,
+		final ZoomMarkerPosition newXMarkerPositionOut = new ZoomMarkerPosition(devXMarkerWidth,
 				devXMarkerOffset,
 				fChartDataModel);
 

@@ -27,10 +27,12 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourPerson;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPartSite;
 
 public class StatisticMonth extends YearStatistic {
 
@@ -44,21 +46,30 @@ public class StatisticMonth extends YearStatistic {
 	private Calendar				fCalendar		= GregorianCalendar.getInstance();
 	private boolean					fIsSynchScaleEnabled;
 
+	public void activateActions(IWorkbenchPartSite partSite) {
+		fChart.updateChartActionHandlers();
+	}
+
+	@Override
+	public void deactivateActions(IWorkbenchPartSite partSite) {}
+
 	public boolean canTourBeVisible() {
 		return false;
 	}
 
 	public void createControl(	Composite parent,
-								IActionBars actionBars,
+								IViewSite viewSite,
 								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
 		// create chart
 		fChart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-		fChart.setActionBars(actionBars);
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
+		fChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
+
+//		fChart.createChartActionHandlers();
 	}
 
 	public void prefColorChanged() {
@@ -158,7 +169,7 @@ public class StatisticMonth extends YearStatistic {
 		fChart.setChartDataModel(chartModel);
 	}
 
-//	public void updateToolBar(boolean refreshToolbar) {
-//		fChart.showActions(refreshToolbar);
-//	}
+	public void updateToolBar(final boolean refreshToolbar) {
+		fChart.fillToolbar(refreshToolbar);
+	}
 }

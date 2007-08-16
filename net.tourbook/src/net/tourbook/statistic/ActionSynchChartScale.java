@@ -23,7 +23,7 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSynchChartScale extends Action {
 
-	private StatisticContainer	fStatContainer;
+	private final StatisticContainer	fStatContainer;
 
 	public ActionSynchChartScale(StatisticContainer container) {
 
@@ -31,10 +31,11 @@ public class ActionSynchChartScale extends Action {
 
 		fStatContainer = container;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_zoom_fit_to_graph));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_synch_graph_vertical));
 		setToolTipText(Messages.TourMap_Action_synch_chart_years_tooltip);
 	}
 
+	@Override
 	public void run() {
 		fStatContainer.actionSynchScale(isChecked());
 	}

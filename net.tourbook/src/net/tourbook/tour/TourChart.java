@@ -46,7 +46,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchPartSite;
 
 /**
  * The tour chart extends the chart with all the functionality for a tour chart
@@ -77,7 +77,6 @@ public class TourChart extends Chart {
 	Map<String, TCActionProxy>		fActionProxies;
 
 	private ActionChartOptions		fActionOptions;
-	private Action					fActionZoomFitGraph;
 
 //	private Action					fActionAdjustAltitude;
 //	private ActionGraphAnalyzer		fActionGraphAnalyzer;
@@ -129,18 +128,20 @@ public class TourChart extends Chart {
 	/**
 	 * Activate all tour chart action handlers, this must be done when the part with a tour chart is
 	 * activated
+	 * 
+	 * @param workbenchPartSite
 	 */
-	public void activateActions() {
+	public void activateActionHandlers(IWorkbenchPartSite partSite) {
 
 		if (useInternalActionBar()) {
 			return;
 		}
-
+//x
 		// update tour action handlers
-		fTCActionHandlerManager.updateActionHandlers(this);
+		fTCActionHandlerManager.updateTourActionHandlers(partSite, this);
 
 		// update chart action handlers
-		updateActionHandlers();
+		updateChartActionHandlers();
 	}
 
 	/**
@@ -324,21 +325,20 @@ public class TourChart extends Chart {
 	 * @param workbenchWindow
 	 * @param tourChartConfig
 	 */
-	public void createTourActionHandlers(	IWorkbenchWindow workbenchWindow,
-											TourChartConfiguration tourChartConfig) {
+	public void createTourActionHandlers(TourChartConfiguration tourChartConfig) {
 
 		// use commands defined in the plugin.xml
 		setUseInternalActionBar(false);
 
 		fShowActions = true;
 
-		fTCActionHandlerManager.createActionHandlers(workbenchWindow);
+		fTCActionHandlerManager.createActionHandlers();
 
 		fTourChartConfig = tourChartConfig;
 
 		createTourActionProxies();
 
-		createChartActionHandlers(workbenchWindow);
+		createChartActionHandlers();
 	}
 
 	/**
@@ -386,11 +386,6 @@ public class TourChart extends Chart {
 		fActionProxies.put(COMMAND_ID_X_AXIS_DISTANCE, actionProxy);
 
 		/*
-		 * Action: fit graph to window
-		 */
-		fActionZoomFitGraph = new ActionZoomFitGraph(this);
-
-		/*
 		 * Action: chart options
 		 */
 		actionProxy = new TCActionProxy(COMMAND_ID_CHART_OPTIONS, null);
@@ -416,6 +411,10 @@ public class TourChart extends Chart {
 
 	}
 
+	public void deactivateActionHandlers() {
+//x		
+	}
+
 	public void dispose() {
 
 		TourbookPlugin.getDefault()
@@ -424,6 +423,16 @@ public class TourChart extends Chart {
 
 		super.dispose();
 	}
+
+//	/**
+//	 * Deactivate all tour chart action handlers, this is used when a part is deactivated
+//	 */
+//	public void deactivateHandler() {
+//
+//		if (fUseInternalActionBar) {
+//			return;
+//		}
+//	}
 
 	/**
 	 * create the tour specific action, they are defined in the chart configuration
@@ -448,8 +457,8 @@ public class TourChart extends Chart {
 
 		tbm.add(new Separator());
 
-		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_SPEED)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_ALTITUDE)).getAction());
+		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_SPEED)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_PULSE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_TEMPERATURE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_CADENCE)).getAction());
@@ -462,9 +471,6 @@ public class TourChart extends Chart {
 		tbm.add(new Separator());
 
 		tbm.add(fActionOptions);
-		tbm.add(new Separator());
-
-		tbm.add(fActionZoomFitGraph);
 		tbm.add(new Separator());
 
 		// ///////////////////////////////////////////////////////
@@ -484,16 +490,6 @@ public class TourChart extends Chart {
 //			tbm.add(fActionMarkerEditor);
 //		}
 	}
-
-//	/**
-//	 * Deactivate all tour chart action handlers, this is used when a part is deactivated
-//	 */
-//	public void deactivateHandler() {
-//
-//		if (fUseInternalActionBar) {
-//			return;
-//		}
-//	}
 
 	/**
 	 * fire a selection event for this tour chart
@@ -528,6 +524,9 @@ public class TourChart extends Chart {
 		return fIsTourDirty;
 	}
 
+	// public boolean setFocus() {
+	// }
+
 	/**
 	 * Set the X-axis to distance
 	 * 
@@ -559,9 +558,6 @@ public class TourChart extends Chart {
 		}
 		return true;
 	}
-
-	// public boolean setFocus() {
-	// }
 
 	/**
 	 * @param isChecked
@@ -710,6 +706,21 @@ public class TourChart extends Chart {
 		return isChartModified;
 	}
 
+//	/**
+//	 * update the chart by getting the tourdata from the db
+//	 * 
+//	 * @param tourId
+//	 */
+//	void updateChart(final long tourId) {
+//
+//		// load the tourdata from the database
+//		TourData tourData = TourDatabase.getTourDataByTourId(tourId);
+//
+//		if (tourData != null) {
+//			updateChart(tourData, fTourChartConfig, true);
+//		}
+//	}
+
 	private void setPrefListeners() {
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
@@ -764,21 +775,6 @@ public class TourChart extends Chart {
 				.addPropertyChangeListener(fPrefChangeListener);
 
 	}
-
-//	/**
-//	 * update the chart by getting the tourdata from the db
-//	 * 
-//	 * @param tourId
-//	 */
-//	void updateChart(final long tourId) {
-//
-//		// load the tourdata from the database
-//		TourData tourData = TourDatabase.getTourDataByTourId(tourId);
-//
-//		if (tourData != null) {
-//			updateChart(tourData, fTourChartConfig, true);
-//		}
-//	}
 
 	private void setSegmentLayer(	final ArrayList<IChartLayer> segmentValueLayers,
 									float[] segmentSerie,
@@ -970,8 +966,8 @@ public class TourChart extends Chart {
 
 		createSegmentsLayer();
 		createMarkerLayer();
-
 		setGraphLayers();
+
 		setChartDataModel(dataModel);
 	}
 

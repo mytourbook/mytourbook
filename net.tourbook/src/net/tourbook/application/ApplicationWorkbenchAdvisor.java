@@ -23,7 +23,7 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
-		return new ApplicationWorkbenchWindowAdvisor(configurer);
+		return new ApplicationWorkbenchWindowAdvisor(this, configurer);
 	}
 
 	public String getInitialWindowPerspectiveId() {

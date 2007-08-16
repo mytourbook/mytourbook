@@ -30,6 +30,7 @@ import org.eclipse.ui.IPersistableElement;
 public class TourEditorInput implements IEditorInput, IPersistableElement {
 
 	long	fTourId;
+	String	fEditorTitle;
 
 	public TourEditorInput(long tourId) {
 		fTourId = tourId;
@@ -58,7 +59,7 @@ public class TourEditorInput implements IEditorInput, IPersistableElement {
 	}
 
 	public String getToolTipText() {
-		return "editor tooltip";
+		return fEditorTitle;
 	}
 
 	public boolean equals(Object obj) {

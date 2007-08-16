@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourType;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.PixelConverter;
@@ -38,8 +39,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IWorkbenchWindow;
 
 public class UI {
 
@@ -97,6 +100,41 @@ public class UI {
 		}
 
 		sash.setWeights(newWeights);
+	}
+
+	/**
+	 * Change the title for the application
+	 * 
+	 * @param newTitle
+	 *        new title for the application or <code>null</code> to set the original title
+	 */
+	public static void changeAppTitle(String newTitle) {
+
+		Display display = Display.getDefault();
+
+		if (display != null) {
+
+			// Look at all the shells and pick the first one that is a workbench window.
+			Shell shells[] = display.getShells();
+			for (int shellIdx = 0; shellIdx < shells.length; shellIdx++) {
+
+				Object data = shells[shellIdx].getData();
+
+				// Check whether this shell points to the Application main window's shell:
+				if (data instanceof IWorkbenchWindow) {
+					
+					String title;
+					if (newTitle == null) {
+						title = Messages.App_Title;
+					} else {
+						title = newTitle;
+					}
+
+					shells[shellIdx].setText(title);
+					break;
+				}
+			}
+		}
 	}
 
 	/**

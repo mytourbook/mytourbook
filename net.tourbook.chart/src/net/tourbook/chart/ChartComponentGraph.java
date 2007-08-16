@@ -4374,7 +4374,7 @@ public class ChartComponentGraph extends Canvas {
 		final int minChartWidth = fChart.getChartDataModel().getChartMinWidth();
 		final int maxChartWidth = ChartComponents.CHART_MAX_WIDTH;
 
-		if (graphImageWidth >= minChartWidth && graphImageWidth <= maxChartWidth) {
+		if (/*graphImageWidth >= minChartWidth && */graphImageWidth <= maxChartWidth) {
 
 			// chart is within the range which can be zoomed in
 
