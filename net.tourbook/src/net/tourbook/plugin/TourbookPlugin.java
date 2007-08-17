@@ -102,17 +102,33 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	}
 
 	/**
+	 * @param sectionName
+	 * @return Returns the dialog setting section for the sectionName
+	 */
+	public IDialogSettings getDialogSettingsSection(String sectionName) {
+		IDialogSettings dialogSettings = getDialogSettings();
+		IDialogSettings section = dialogSettings.getSection(sectionName);
+		if (section == null) {
+			section = dialogSettings.addNewSection(sectionName);
+		}
+		return section;
+	}
+
+	/**
 	 * Returns the plugin's resource bundle,
 	 */
 	public ResourceBundle getResourceBundle() {
 		try {
 			if (resourceBundle == null)
-				resourceBundle = ResourceBundle
-						.getBundle("net.tourbook.data.TourbookPluginResources"); //$NON-NLS-1$
+				resourceBundle = ResourceBundle.getBundle("net.tourbook.data.TourbookPluginResources"); //$NON-NLS-1$
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}
 		return resourceBundle;
+	}
+
+	public MyTourbookSplashHandler getSplashHandler() {
+		return fSplashHandler;
 	}
 
 	public ArrayList<TourType> getTourTypes() {
@@ -131,6 +147,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		fActiveTourType = tourType;
 	}
 
+	public void setSplashHandler(MyTourbookSplashHandler splashHandler) {
+		fSplashHandler = splashHandler;
+	}
+
 	public void setTourTypes(ArrayList<TourType> tourTypes) {
 		fTourTypes = tourTypes;
 	}
@@ -138,6 +158,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	/**
 	 * This method is called upon plug-in activation
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 	}
@@ -145,6 +166,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	/**
 	 * This method is called when the plug-in is stopped
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		plugin = null;
@@ -152,26 +174,5 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
 		// NetworkServerControl server = new NetworkServerControl();
 		// server.shutdown();
-	}
-
-	public void setSplashHandler(MyTourbookSplashHandler splashHandler) {
-		fSplashHandler = splashHandler;
-	}
-
-	public MyTourbookSplashHandler getSplashHandler() {
-		return fSplashHandler;
-	}
-
-	/**
-	 * @param sectionName
-	 * @return Returns the dialog setting section for the sectionName
-	 */
-	public IDialogSettings getDialogSettingsSection(String sectionName) {
-		IDialogSettings dialogSettings = getDialogSettings();
-		IDialogSettings section = dialogSettings.getSection(sectionName);
-		if (section == null) {
-			section = dialogSettings.addNewSection(sectionName);
-		}
-		return section;
 	}
 }

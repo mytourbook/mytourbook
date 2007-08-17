@@ -28,12 +28,11 @@ import org.eclipse.swt.widgets.Menu;
 
 public class ActionTourMarker extends Action implements IMenuCreator {
 
-	TourChart				fTourChart;
+	TourChart						fTourChart;
 
 	private Menu					fMenu;
 
 	private ActionOpenMarkerView	fActionOpenMarkerView;
-
 
 	public ActionTourMarker(TourChart tourChart) {
 
@@ -75,10 +74,10 @@ public class ActionTourMarker extends Action implements IMenuCreator {
 		return null;
 	}
 
+	@Override
 	public void run() {
-		
-		(new MarkerDialog(Display.getCurrent().getActiveShell(), fTourChart.fTourData, null))
-				.open();
+
+		(new MarkerDialog(Display.getCurrent().getActiveShell(), fTourChart.fTourData, null)).open();
 
 		// force the tour to be saved
 		fTourChart.setTourDirty(true);

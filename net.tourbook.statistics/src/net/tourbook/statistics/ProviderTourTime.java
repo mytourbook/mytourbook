@@ -21,20 +21,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Formatter;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.ArrayListToArray;
 
-public class ProviderTourTime extends DataProvider /*implements IBarSelectionProvider*/ {
+public class ProviderTourTime extends DataProvider /* implements IBarSelectionProvider */{
 
 	private static ProviderTourTime	fInstance;
 
@@ -140,8 +135,13 @@ public class ProviderTourTime extends DataProvider /*implements IBarSelectionPro
 				final int startTime = startHour * 3600 + startMinute * 60;
 
 				final int recordingTime = result.getInt(9);
-				final int drivingTime = result.getInt(10);
-				final int duration = drivingTime == 0 ? recordingTime : drivingTime;
+
+				/*
+				 * disabled driving time, wolfgang 17.8.07
+				 */
+//				final int drivingTime = result.getInt(10);
+//				final int duration = drivingTime == 0 ? recordingTime : drivingTime;
+				final int duration = recordingTime;
 
 				// get date
 				fCalendar.set(result.getShort(2),

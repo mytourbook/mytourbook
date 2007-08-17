@@ -44,34 +44,34 @@ import org.eclipse.ui.PlatformUI;
 
 public class TourManager {
 
-	public static final String		CUSTOM_DATA_TIME		= "time";							//$NON-NLS-1$
-	public static final String		CUSTOM_DATA_DISTANCE	= "distance";						//$NON-NLS-1$
-	public static final String		CUSTOM_DATA_ALTITUDE	= "altitude";						//$NON-NLS-1$
-	public static final String		CUSTOM_DATA_SPEED		= "speed";							//$NON-NLS-1$
-	public static final String		CUSTOM_DATA_GRADIENT	= "gradient";						//$NON-NLS-1$
-	public static final String		CUSTOM_DATA_ALTIMETER	= "altimeter";						//$NON-NLS-1$
-	public static final String		CUSTOM_DATA_PULSE		= "pulse";							//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TIME		= "time";							//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_DISTANCE	= "distance";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_ALTITUDE	= "altitude";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_SPEED		= "speed";							//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_GRADIENT	= "gradient";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_ALTIMETER	= "altimeter";						//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_PULSE		= "pulse";							//$NON-NLS-1$
 
-	public static final String		ANALYZER_INFO			= "AnalyzerInfo";					//$NON-NLS-1$
-	public static final String		X_AXIS_TIME				= "time";							//$NON-NLS-1$
-	public static final String		X_AXIS_DISTANCE			= "distance";						//$NON-NLS-1$
+	public static final String				ANALYZER_INFO			= "AnalyzerInfo";					//$NON-NLS-1$
+	public static final String				X_AXIS_TIME				= "time";							//$NON-NLS-1$
+	public static final String				X_AXIS_DISTANCE			= "distance";						//$NON-NLS-1$
 
-	public static final int			GRAPH_ALTITUDE			= 1000;
-	public static final int			GRAPH_SPEED				= 1001;
-	public static final int			GRAPH_ALTIMETER			= 1002;
-	public static final int			GRAPH_PULSE				= 1003;
-	public static final int			GRAPH_TEMPERATURE		= 1004;
-	public static final int			GRAPH_CADENCE			= 1005;
-	public static final int			GRAPH_GRADIENT			= 1006;
-	public static final int			GRAPH_POWER				= 1007;
+	public static final int					GRAPH_ALTITUDE			= 1000;
+	public static final int					GRAPH_SPEED				= 1001;
+	public static final int					GRAPH_ALTIMETER			= 1002;
+	public static final int					GRAPH_PULSE				= 1003;
+	public static final int					GRAPH_TEMPERATURE		= 1004;
+	public static final int					GRAPH_CADENCE			= 1005;
+	public static final int					GRAPH_GRADIENT			= 1006;
+	public static final int					GRAPH_POWER				= 1007;
 
-	private static TourManager		instance;
+	private static TourManager				instance;
 
-	private ComputeChartValue		computeSpeedAvg;
-	private ComputeChartValue		computeAltimeterAvg;
-	private ComputeChartValue		computeGradientAvg;
+	private ComputeChartValue				computeSpeedAvg;
+	private ComputeChartValue				computeAltimeterAvg;
+	private ComputeChartValue				computeGradientAvg;
 
-	private HashMap<Long, TourData>	fTourDataMap			= new HashMap<Long, TourData>();
+	private final HashMap<Long, TourData>	fTourDataMap			= new HashMap<Long, TourData>();
 
 	private TourManager() {}
 
@@ -82,7 +82,7 @@ public class TourManager {
 	 */
 	public static TourChartConfiguration createTourChartConfiguration() {
 
-		final TourChartConfiguration chartConfig = new TourChartConfiguration(false);
+		final TourChartConfiguration chartConfig = new TourChartConfiguration(true);
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -105,8 +105,6 @@ public class TourManager {
 		chartConfig.isStartTime = prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
 
 		updateZoomOptionsInChartConfig(chartConfig, prefStore);
-
-		// chartConfig.setMinMaxKeeper(true);
 
 		return chartConfig;
 	}
@@ -496,6 +494,7 @@ public class TourManager {
 			/*
 			 * Compute the average distance speed between the two sliders
 			 */
+			@Override
 			public float compute() {
 
 				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
@@ -536,6 +535,7 @@ public class TourManager {
 			/*
 			 * Compute the average altimeter speed between the two sliders
 			 */
+			@Override
 			public float compute() {
 
 				final int[] altitudeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
@@ -562,7 +562,7 @@ public class TourManager {
 									valuesIndexRight,
 									10 / timeSlice) * timeSlice);
 
-					return (((float) (rightAltitude - leftAltitude) / time) * 3600);
+					return (((rightAltitude - leftAltitude) / time) * 3600);
 				}
 			}
 		};
@@ -572,6 +572,7 @@ public class TourManager {
 			/*
 			 * Compute the average altimeter speed between the two sliders
 			 */
+			@Override
 			public float compute() {
 
 				final int[] altitudeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
@@ -912,7 +913,7 @@ public class TourManager {
 					- tourData.distanceSerie[distIndexLow];
 			final float timeInterval = deviceTimeInterval * (distIndexHigh - distIndexLow);
 
-			final int speed = (int) (((float) distance * 36F) / timeInterval);
+			final int speed = (int) ((distance * 36F) / timeInterval);
 
 			// System.out.println(""
 			// + (timeInterval + "\t")

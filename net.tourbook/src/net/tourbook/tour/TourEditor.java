@@ -51,6 +51,7 @@ public class TourEditor extends EditorPart {
 	private TourData				fTourData;
 
 	private boolean					fIsTourDirty	= false;
+	private boolean					fTourWasDirty	= false;
 
 	private ISelectionListener		fPostSelectionListener;
 	private IPartListener2			fPartListener;
@@ -68,9 +69,15 @@ public class TourEditor extends EditorPart {
 
 			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
 
-			public void partClosed(IWorkbenchPartReference partRef) {}
+			public void partClosed(IWorkbenchPartReference partRef) {
+				reloadTourData();
+			}
 
-			public void partDeactivated(IWorkbenchPartReference partRef) {}
+			public void partDeactivated(IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourEditor.this) {
+					fTourChart.deactivateActionHandlers(getSite());
+				}
+			}
 
 			public void partHidden(IWorkbenchPartReference partRef) {}
 
@@ -85,6 +92,7 @@ public class TourEditor extends EditorPart {
 		getSite().getPage().addPartListener(fPartListener);
 	}
 
+	@Override
 	public void createPartControl(Composite parent) {
 
 		addPartListener();
@@ -123,13 +131,14 @@ public class TourEditor extends EditorPart {
 			fTourChart.updateChart(fTourData, fTourChartConfig, false);
 
 			final String tourTitle = TourManager.getTourDate(fTourData);
-			
-			fEditorInput.fEditorTitle=tourTitle;
+
+			fEditorInput.fEditorTitle = tourTitle;
 			setPartName(tourTitle);
 			setTitleToolTip("title tooltip ???");
 		}
 	}
 
+	@Override
 	public void dispose() {
 
 		final IWorkbenchPartSite site = getSite();
@@ -139,28 +148,29 @@ public class TourEditor extends EditorPart {
 			site.setSelectionProvider(null);
 		}
 
-//		if (fHandlerActivationAltitude != null && fHandlerService != null) {
-//			fHandlerService.deactivateHandler(fHandlerActivationAltitude);
-//		}
-
-//	    if (getEditorSite().getActionBarContributor().getActiveEditor() == this)
-//	    {
-//	      getEditorSite().getActionBarContributor().setActiveEditor(null);
-//	    }
 		super.dispose();
 	}
 
+	@Override
 	public void doSave(IProgressMonitor monitor) {
 
 		TourDatabase.saveTour(fTourData);
-		fIsTourDirty = false;
 
-		// update (hide) the dirty indicator
+		fIsTourDirty = false;
+		fTourWasDirty = true;
+
+		// hide the dirty indicator
 		firePropertyChange(PROP_DIRTY);
 	}
 
+	@Override
 	public void doSaveAs() {}
 
+	TourChart getTourChart() {
+		return fTourChart;
+	}
+
+	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 
 		setSite(site);
@@ -174,18 +184,28 @@ public class TourEditor extends EditorPart {
 		setPostSelectionListener();
 	}
 
+	@Override
 	public boolean isDirty() {
 		return fIsTourDirty;
 	}
 
-//	public void setActiveEditor(TourEditor tourEditor) {
-//		fTourChart.updateStatus();
-//	}
-
+	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
+	private void reloadTourData() {
+
+		if (fTourData == null) {
+			return;
+		}
+
+		if (fTourWasDirty) {
+			TourDatabase.reloadTourData(fTourData);
+		}
+	}
+
+	@Override
 	public void setFocus() {
 
 		fTourChart.setFocus();
@@ -214,6 +234,13 @@ public class TourEditor extends EditorPart {
 
 		// register selection listener in the page
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+	}
+
+	public void setTourDirty() {
+		fIsTourDirty = true;
+		fTourWasDirty = true;
+
+		firePropertyChange(PROP_DIRTY);
 	}
 
 }

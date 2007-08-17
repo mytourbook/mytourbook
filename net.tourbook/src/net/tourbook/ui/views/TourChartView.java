@@ -138,6 +138,7 @@ public class TourChartView extends ViewPart {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
+	@Override
 	public void createPartControl(Composite parent) {
 
 		fPageBook = new PageBook(parent, SWT.NONE);
@@ -183,6 +184,7 @@ public class TourChartView extends ViewPart {
 		}
 	}
 
+	@Override
 	public void dispose() {
 
 		final IWorkbenchPage page = getSite().getPage();
@@ -199,6 +201,7 @@ public class TourChartView extends ViewPart {
 		super.dispose();
 	}
 
+	@Override
 	public void setFocus() {
 		fTourChart.setFocus();
 	}
@@ -214,6 +217,13 @@ public class TourChartView extends ViewPart {
 		} else if (selection instanceof SelectionTourId) {
 
 			SelectionTourId tourIdSelection = (SelectionTourId) selection;
+
+			if (fTourData != null) {
+				if (fTourData.getTourId().equals(tourIdSelection.getTourId())) {
+					// don't reload the same tour
+					return;
+				}
+			}
 
 			final TourData tourData = TourManager.getInstance()
 					.getTourData(tourIdSelection.getTourId());

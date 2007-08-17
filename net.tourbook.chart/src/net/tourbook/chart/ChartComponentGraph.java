@@ -73,7 +73,7 @@ public class ChartComponentGraph extends Canvas {
 	private static final RGB			gridRGB					= new RGB(241, 239, 226);
 	Chart								fChart;
 
-	private ChartComponents				fChartComponents;
+	private final ChartComponents		fChartComponents;
 	/*
 	 * images for the chart and slider
 	 */
@@ -161,9 +161,9 @@ public class ChartComponentGraph extends Canvas {
 	/*
 	 * chart slider
 	 */
-	private ChartXSlider				xSliderA;
+	private final ChartXSlider			xSliderA;
 
-	private ChartXSlider				xSliderB;
+	private final ChartXSlider			xSliderB;
 
 	/**
 	 * xSliderDragged is set when the slider is being dragged, otherwise it is to <code>null</code>
@@ -369,6 +369,7 @@ public class ChartComponentGraph extends Canvas {
 		horizontalBar.setEnabled(false);
 		horizontalBar.setVisible(false);
 		horizontalBar.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				onScroll(event);
 			}
@@ -977,7 +978,7 @@ public class ChartComponentGraph extends Canvas {
 			 * get the y position of the marker which marks the y value in the graph
 			 */
 			int yGraph = drawingData.getDevYBottom()
-					- (int) ((float) (yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY())
+					- (int) ((yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY())
 					- 0;
 
 			if (yValue < yData.getVisibleMinValue()) {
@@ -1130,7 +1131,9 @@ public class ChartComponentGraph extends Canvas {
 		// keep the height for stacked bar charts
 		final int devHeightSummary[] = new int[valueLength];
 
-		final int devBarWidth = Math.max(1, drawingData.getBarRectangleWidth());
+		final int devBarWidthComputed = drawingData.getBarRectangleWidth();
+		final int devBarWidth = Math.max(1, devBarWidthComputed);
+
 		int devBarPos = drawingData.getBarRectanglePos();
 
 		final int serieLayout = yData.getChartLayout();
@@ -1217,7 +1220,7 @@ public class ChartComponentGraph extends Canvas {
 				 * draw bar
 				 */
 
-				if (devBarWidth > 1) {
+				if (devBarWidthComputed > 0) {
 
 					gc.setForeground(colorBright);
 					gc.fillGradientRectangle(barShape.x,
@@ -1676,9 +1679,9 @@ public class ChartComponentGraph extends Canvas {
 
 			int devY;
 			if (yAxisDirection || (unitList.size() == 1)) {
-				devY = yDevBottom - (int) ((float) (unit.value - graphYBottom) * scaleY);
+				devY = yDevBottom - (int) ((unit.value - graphYBottom) * scaleY);
 			} else {
-				devY = yDevTop + (int) ((float) (unit.value - graphYBottom) * scaleY);
+				devY = yDevTop + (int) ((unit.value - graphYBottom) * scaleY);
 			}
 
 			if ((yAxisDirection == false && unitCount == unitList.size() - 1)
@@ -1982,7 +1985,7 @@ public class ChartComponentGraph extends Canvas {
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
 		// virtual 0 line for the y-axis of the chart in dev units
-		final float devChartY0Line = (float) devYBottom + (scaleY * graphYBottom);
+		final float devChartY0Line = devYBottom + (scaleY * graphYBottom);
 
 		final Rectangle chartRectangle = gc.getClipping();
 
@@ -2127,11 +2130,8 @@ public class ChartComponentGraph extends Canvas {
 			gc.setForeground(colorBg2);
 			gc.setBackground(colorBg1);
 
-			gc.fillGradientRectangle(0,
-					(int) devYBottom,
-					devChartWidth,
-					(int) -Math.min(devGraphHeight, devYBottom - devChartY0Line),
-					true);
+			gc.fillGradientRectangle(0, devYBottom, devChartWidth, (int) -Math.min(devGraphHeight,
+					devYBottom - devChartY0Line), true);
 
 			gc.setClipping(chartRectangle);
 		}
@@ -2190,7 +2190,7 @@ public class ChartComponentGraph extends Canvas {
 
 			final ChartDataXSerie xData = drawingData.getXData();
 			final float scaleX = drawingData.getScaleX();
-			final int valueDraggingDiff = (int) ((float) devDraggingDiff / scaleX);
+			final int valueDraggingDiff = (int) (devDraggingDiff / scaleX);
 
 			final int xmStartIndex = xData.getXMarkerStartIndex();
 			final int xmEndIndex = xData.getXMarkerEndIndex();
@@ -3810,6 +3810,7 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 	}
 
+	@Override
 	public boolean setFocus() {
 
 		boolean isFocus = false;
@@ -4087,7 +4088,7 @@ public class ChartComponentGraph extends Canvas {
 		try {
 			slider.setValueX(xValues[valueIndex]);
 
-			final int linePos = (int) (fDevVirtualGraphImageWidth * ((float) ((float) xValues[valueIndex] / xValues[xValues.length - 1])));
+			final int linePos = (int) (fDevVirtualGraphImageWidth * (((float) xValues[valueIndex] / xValues[xValues.length - 1])));
 
 			slider.moveToDevPosition(linePos, true, true);
 
@@ -4149,7 +4150,7 @@ public class ChartComponentGraph extends Canvas {
 			if (scrollToLeftSlider) {
 				hBarSelection = Math.min(xSliderA.getDevVirtualSliderLinePos(),
 						xSliderB.getDevVirtualSliderLinePos());
-				hBarSelection -= (float) (((float) clientWidth * ZOOM_REDUCING_FACTOR) / 2.0);
+				hBarSelection -= (float) ((clientWidth * ZOOM_REDUCING_FACTOR) / 2.0);
 
 				scrollToLeftSlider = false;
 
@@ -4234,7 +4235,7 @@ public class ChartComponentGraph extends Canvas {
 
 			fDevGraphImageXOffset = 0;
 
-			fDevVirtualGraphImageWidth = (int) ((float) devVisibleChartWidth * fGraphZoomRatio);
+			fDevVirtualGraphImageWidth = (int) (devVisibleChartWidth * fGraphZoomRatio);
 
 		} else {
 
@@ -4371,10 +4372,10 @@ public class ChartComponentGraph extends Canvas {
 		final int visibleGraphWidth = getDevVisibleChartWidth();
 		final int graphImageWidth = fDevVirtualGraphImageWidth;
 
-		final int minChartWidth = fChart.getChartDataModel().getChartMinWidth();
+//		final int minChartWidth = fChart.getChartDataModel().getChartMinWidth();
 		final int maxChartWidth = ChartComponents.CHART_MAX_WIDTH;
 
-		if (/*graphImageWidth >= minChartWidth && */graphImageWidth <= maxChartWidth) {
+		if (/* graphImageWidth >= minChartWidth && */graphImageWidth <= maxChartWidth) {
 
 			// chart is within the range which can be zoomed in
 
@@ -4439,7 +4440,7 @@ public class ChartComponentGraph extends Canvas {
 						? devVisibleChartWidth
 						: fDevVirtualGraphImageWidth;
 
-				fGraphZoomRatio = (float) ((float) graphWidth * (1 - ZOOM_REDUCING_FACTOR) / devSliderDiff);
+				fGraphZoomRatio = (float) (graphWidth * (1 - ZOOM_REDUCING_FACTOR) / devSliderDiff);
 
 				scrollToLeftSlider = true;
 
@@ -4451,7 +4452,7 @@ public class ChartComponentGraph extends Canvas {
 				 */
 
 				// calculate new graph ratio
-				fGraphZoomRatio = (float) (fDevVirtualGraphImageWidth) / (devSliderDiff);
+				fGraphZoomRatio = (fDevVirtualGraphImageWidth) / (devSliderDiff);
 
 				// adjust rounding problems
 				fGraphZoomRatio = (fGraphZoomRatio * devVisibleChartWidth) / devVisibleChartWidth;
@@ -4563,7 +4564,7 @@ public class ChartComponentGraph extends Canvas {
 
 		// reduce the width so that more than one part will be visible in the
 		// clientarea
-		fDevVirtualGraphImageWidth = (int) ((float) graphWidth * ZOOM_WITH_PARTS_RATIO);
+		fDevVirtualGraphImageWidth = (int) (graphWidth * ZOOM_WITH_PARTS_RATIO);
 		fGraphZoomRatio = Math.max(1, (float) fDevVirtualGraphImageWidth / devVisibleGraphWidth);
 
 		final int partWidth = fDevVirtualGraphImageWidth / parts;

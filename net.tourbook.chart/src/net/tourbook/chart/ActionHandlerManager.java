@@ -51,10 +51,12 @@ public class ActionHandlerManager {
 		 */
 		Expression partIdExpression = new Expression() {
 
+			@Override
 			public void collectExpressionInfo(ExpressionInfo info) {
 				info.addVariableNameAccess(ISources.ACTIVE_PART_ID_NAME);
 			}
 
+			@Override
 			public EvaluationResult evaluate(IEvaluationContext context) throws CoreException {
 
 				Object var = context.getVariable(ISources.ACTIVE_PART_ID_NAME);
@@ -68,19 +70,19 @@ public class ActionHandlerManager {
 					 */
 					if (stringVar.equalsIgnoreCase("net.tourbook.tour.TourEditor")) {
 						return EvaluationResult.TRUE;
-					} else if (stringVar.equalsIgnoreCase("net.tourbook.views.TourChartView")) {
-						return EvaluationResult.TRUE;
+//					} else if (stringVar.equalsIgnoreCase("net.tourbook.views.TourChartView")) {
+//						return EvaluationResult.TRUE;
 					}
 				}
 
-				return EvaluationResult.TRUE;
+				return EvaluationResult.FALSE;
 			}
 		};
 
 		// activate the handler for all tour chart actions
 		for (Iterator<ActionHandler> iterator = fActionHandlers.values().iterator(); iterator.hasNext();) {
 
-			ActionHandler actionHandler = (ActionHandler) iterator.next();
+			ActionHandler actionHandler = iterator.next();
 
 			final IHandlerActivation handlerActivation = fHandlerService.activateHandler(actionHandler.getCommandId(),
 					actionHandler,
@@ -138,7 +140,7 @@ public class ActionHandlerManager {
 		if (fActionHandlers == null) {
 			return;
 		}
-		
+
 		for (ActionProxy actionProxy : chart.fActionProxies.values()) {
 
 			ActionHandler actionHandler = fActionHandlers.get(actionProxy.getCommandId());

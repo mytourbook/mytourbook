@@ -105,10 +105,12 @@ class TCActionHandlerManager {
 		 */
 		Expression partIdExpression = new Expression() {
 
+			@Override
 			public void collectExpressionInfo(ExpressionInfo info) {
 				info.addVariableNameAccess(ISources.ACTIVE_PART_ID_NAME);
 			}
 
+			@Override
 			public EvaluationResult evaluate(IEvaluationContext context) throws CoreException {
 
 				Object var = context.getVariable(ISources.ACTIVE_PART_ID_NAME);
@@ -122,19 +124,19 @@ class TCActionHandlerManager {
 					 */
 					if (stringVar.equalsIgnoreCase("net.tourbook.tour.TourEditor")) {
 						return EvaluationResult.TRUE;
-					} else if (stringVar.equalsIgnoreCase("net.tourbook.views.TourChartView")) {
-						return EvaluationResult.TRUE;
+//					} else if (stringVar.equalsIgnoreCase("net.tourbook.views.TourChartView")) {
+//						return EvaluationResult.TRUE;
 					}
 				}
 
-				return EvaluationResult.TRUE;
+				return EvaluationResult.FALSE;
 			}
 		};
 
 		// activate the handler for all tour chart actions
 		for (Iterator<TCActionHandler> iterator = fActionHandlers.values().iterator(); iterator.hasNext();) {
 
-			TCActionHandler actionHandler = (TCActionHandler) iterator.next();
+			TCActionHandler actionHandler = iterator.next();
 
 			final IHandlerActivation handlerActivation = fHandlerService.activateHandler(actionHandler.getCommandId(),
 					actionHandler,

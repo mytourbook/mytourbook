@@ -53,57 +53,58 @@ import org.eclipse.ui.IWorkbenchPartSite;
  */
 public class TourChart extends Chart {
 
-	static final String				COMMAND_ID_CHART_OPTIONS			= "net.tourbook.command.tourChart.options";
-	static final String				COMMAND_ID_SHOW_START_TIME			= "net.tourbook.command.tourChart.showStartTime";
-	static final String				COMMAND_ID_CAN_SCROLL_CHART			= "net.tourbook.command.tourChart.canScrollChart";
-	static final String				COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER	= "net.tourbook.command.tourChart.canAutoZoomToSlider";
+	static final String						COMMAND_ID_CHART_OPTIONS			= "net.tourbook.command.tourChart.options";
+	static final String						COMMAND_ID_SHOW_START_TIME			= "net.tourbook.command.tourChart.showStartTime";
+	static final String						COMMAND_ID_CAN_SCROLL_CHART			= "net.tourbook.command.tourChart.canScrollChart";
+	static final String						COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER	= "net.tourbook.command.tourChart.canAutoZoomToSlider";
 
-	static final String				COMMAND_ID_X_AXIS_DISTANCE			= "net.tourbook.command.tourChart.xAxisDistance";
-	static final String				COMMAND_ID_X_AXIS_TIME				= "net.tourbook.command.tourChart.xAxisTime";
+	static final String						COMMAND_ID_X_AXIS_DISTANCE			= "net.tourbook.command.tourChart.xAxisDistance";
+	static final String						COMMAND_ID_X_AXIS_TIME				= "net.tourbook.command.tourChart.xAxisTime";
 
-	static final String				COMMAND_ID_GRAPH_ALTITUDE			= "net.tourbook.command.graph.altitude";
-	static final String				COMMAND_ID_GRAPH_SPEED				= "net.tourbook.command.graph.speed";
-	static final String				COMMAND_ID_GRAPH_PULSE				= "net.tourbook.command.graph.pulse";
-	static final String				COMMAND_ID_GRAPH_TEMPERATURE		= "net.tourbook.command.graph.temperature";
-	static final String				COMMAND_ID_GRAPH_CADENCE			= "net.tourbook.command.graph.cadence";
-	static final String				COMMAND_ID_GRAPH_ALTIMETER			= "net.tourbook.command.graph.altimeter";
-	static final String				COMMAND_ID_GRAPH_GRADIENT			= "net.tourbook.command.graph.gradient";
+	static final String						COMMAND_ID_GRAPH_ALTITUDE			= "net.tourbook.command.graph.altitude";
+	static final String						COMMAND_ID_GRAPH_SPEED				= "net.tourbook.command.graph.speed";
+	static final String						COMMAND_ID_GRAPH_PULSE				= "net.tourbook.command.graph.pulse";
+	static final String						COMMAND_ID_GRAPH_TEMPERATURE		= "net.tourbook.command.graph.temperature";
+	static final String						COMMAND_ID_GRAPH_CADENCE			= "net.tourbook.command.graph.cadence";
+	static final String						COMMAND_ID_GRAPH_ALTIMETER			= "net.tourbook.command.graph.altimeter";
+	static final String						COMMAND_ID_GRAPH_GRADIENT			= "net.tourbook.command.graph.gradient";
 
-	static final String				SEGMENT_VALUES						= "segmentValues";										//$NON-NLS-1$
+	static final String						SEGMENT_VALUES						= "segmentValues";										//$NON-NLS-1$
 
-	TourData						fTourData;
-	TourChartConfiguration			fTourChartConfig;
+	TourData								fTourData;
+	TourChartConfiguration					fTourChartConfig;
 
-	Map<String, TCActionProxy>		fActionProxies;
+	Map<String, TCActionProxy>				fActionProxies;
 
-	private ActionChartOptions		fActionOptions;
+	private boolean							fShowActions;
+	private final TCActionHandlerManager	fTCActionHandlerManager				= TCActionHandlerManager.getInstance();
 
-//	private Action					fActionAdjustAltitude;
-//	private ActionGraphAnalyzer		fActionGraphAnalyzer;
-//	private ActionTourSegmenter		fActionTourSegmenter;
-//	private ActionTourMarker		fActionMarkerEditor;
+	private ActionChartOptions				fActionOptions;
 
-	private ListenerList			fSelectionListeners					= new ListenerList();
+//	private ActionAdjustAltitude			fActionAdjustAltitude;
+//	private ActionTourMarker				fActionMarkerEditor;
+
+//	private ActionGraphAnalyzer				fActionGraphAnalyzer;
+//	private ActionTourSegmenter				fActionTourSegmenter;
+
+	private final ListenerList				fSelectionListeners					= new ListenerList();
 
 	/**
 	 * datamodel listener is called when the chart data is created
 	 */
-	private IDataModelListener		fChartDataModelListener;
+	private IDataModelListener				fChartDataModelListener;
 
-	private ITourModifyListener		fTourModifyListener;
+	private ITourModifyListener				fTourModifyListener;
 
-	private ChartMarkerLayer		fMarkerLayer;
-	private ChartSegmentLayer		fSegmentLayer;
-	private ChartSegmentValueLayer	fSegmentValueLayer;
+	private ChartMarkerLayer				fMarkerLayer;
+	private ChartSegmentLayer				fSegmentLayer;
+	private ChartSegmentValueLayer			fSegmentValueLayer;
 
-	private boolean					fIsXSliderVisible;
+	private boolean							fIsXSliderVisible;
 
-	private IPropertyChangeListener	fPrefChangeListener;
-	private boolean					fIsTourDirty;
-	private boolean					fIsSegmentLayerVisible;
-
-	private TCActionHandlerManager	fTCActionHandlerManager				= TCActionHandlerManager.getInstance();
-	private boolean					fShowActions;
+	private IPropertyChangeListener			fPrefChangeListener;
+	private boolean							fIsTourDirty;
+	private boolean							fIsSegmentLayerVisible;
 
 	public TourChart(final Composite parent, final int style, boolean showActions) {
 
@@ -144,6 +145,21 @@ public class TourChart extends Chart {
 		updateChartActionHandlers();
 	}
 
+//	@Override
+//	public void activateActions(IWorkbenchPartSite partSite) {
+//
+////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
+////		fContextBarChart = contextService.activateContext(Chart.CONTEXT_ID_BAR_CHART);
+////		net.tourbook.chart.context.isTourChart
+////		fChart.updateChartActionHandlers();
+//	}
+//
+//	@Override
+//	public void deactivateActions(IWorkbenchPartSite partSite) {
+//
+////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
+////		contextService.deactivateContext(fContextBarChart);
+//	}
 	/**
 	 * add a data model listener which is fired when the data model has changed
 	 * 
@@ -360,11 +376,12 @@ public class TourChart extends Chart {
 
 		Action action;
 		TCActionProxy actionProxy;
+		final boolean useInternalActionBar = useInternalActionBar();
 
 		/*
 		 * Action: x-axis time
 		 */
-		if (useInternalActionBar()) {
+		if (useInternalActionBar) {
 			action = new ActionXAxisTime(this);
 		} else {
 			action = null;
@@ -376,7 +393,7 @@ public class TourChart extends Chart {
 		/*
 		 * Action: x-axis distance
 		 */
-		if (useInternalActionBar()) {
+		if (useInternalActionBar) {
 			action = new ActionXAxisDistance(this);
 		} else {
 			action = null;
@@ -411,10 +428,11 @@ public class TourChart extends Chart {
 
 	}
 
-	public void deactivateActionHandlers() {
+	public void deactivateActionHandlers(IWorkbenchPartSite partSite) {
 //x		
 	}
 
+	@Override
 	public void dispose() {
 
 		TourbookPlugin.getDefault()
@@ -473,20 +491,21 @@ public class TourChart extends Chart {
 		tbm.add(fActionOptions);
 		tbm.add(new Separator());
 
+		tbm.update(true);
 		// ///////////////////////////////////////////////////////
 
 //		fActionGraphAnalyzer = new ActionGraphAnalyzer(this);
+//		fActionTourSegmenter = new ActionTourSegmenter(this);
 //
 //		tbm.add(fActionGraphAnalyzer);
+//		tbm.add(fActionTourSegmenter);
 //
 //		if (fIsToolActions) {
 //
-//			fActionTourSegmenter = new ActionTourSegmenter(this);
 //			fActionMarkerEditor = new ActionTourMarker(this);
 //			fActionAdjustAltitude = new ActionAdjustAltitude(this);
 //
 //			tbm.add(fActionAdjustAltitude);
-//			tbm.add(fActionTourSegmenter);
 //			tbm.add(fActionMarkerEditor);
 //		}
 	}

@@ -23,9 +23,9 @@ import org.eclipse.jface.action.Action;
 
 class ActionGraph extends Action {
 
-	private TourChart	fTourChart;
+	private final TourChart	fTourChart;
 
-	private int			fGraphId;
+	private final int		fGraphId;
 
 	/**
 	 * Creates an action for a toggle button
@@ -50,6 +50,7 @@ class ActionGraph extends Action {
 		setChecked(tourChart.fTourChartConfig.getVisibleGraphs().contains(graphId));
 	}
 
+	@Override
 	public void run() {
 
 		TourChartConfiguration chartConfig = fTourChart.fTourChartConfig;
@@ -61,7 +62,6 @@ class ActionGraph extends Action {
 		if (isThisGraphVisible && visibleGraphs.size() == 1) {
 
 			// this is a toggle button so the check status must be reset
-
 			setChecked(true);
 
 			return;

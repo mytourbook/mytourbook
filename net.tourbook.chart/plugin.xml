@@ -59,6 +59,11 @@
                   mnemonic="%Command_chart_zoom_in_mnemonic"
                   style="push"
                   tooltip="%Command_chart_zoom_in_tooltip">
+               <visibleWhen>
+                  <reference
+                        definitionId="net.tourbook.definition.isTourChart">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="net.tourbook.chart.command.zoomOut"
@@ -68,6 +73,11 @@
                   mnemonic="%Command_chart_zoom_out_mnemonic"
                   style="push"
                   tooltip="%Command_chart_zoom_out_tooltip">
+               <visibleWhen>
+                  <reference
+                        definitionId="net.tourbook.definition.isTourChart">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="net.tourbook.chart.command.fitGraph"
@@ -77,6 +87,11 @@
                   mnemonic="%Command_chart_zoom_fit_to_graph_mnemonic"
                   style="push"
                   tooltip="%Command_chart_zoom_fit_to_graph_tooltip">
+               <visibleWhen>
+                  <reference
+                        definitionId="net.tourbook.definition.isTourChart">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="net.tourbook.chart.command.partPrevious"
@@ -87,9 +102,14 @@
                   style="push"
                   tooltip="%Command_chart_previous_month_tooltip">
                <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.chart.definition.activeContext_isBarChart">
-                  </reference>
+                  <and>
+                     <reference
+                           definitionId="net.tourbook.definition.activePartId_contains_tourChart">
+                     </reference>
+                     <reference
+                           definitionId="net.tourbook.chart.definition.activeContext_isBarChart">
+                     </reference>
+                  </and>
                </visibleWhen>
             </command>
             <command
@@ -101,9 +121,14 @@
                   style="push"
                   tooltip="%Command_chart_next_month_tooltip">
                <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.chart.definition.activeContext_isBarChart">
-                  </reference>
+                  <and>
+                     <reference
+                           definitionId="net.tourbook.definition.activePartId_contains_tourChart">
+                     </reference>
+                     <reference
+                           definitionId="net.tourbook.chart.definition.activeContext_isBarChart">
+                     </reference>
+                  </and>
                </visibleWhen>
             </command>
          </toolbar>

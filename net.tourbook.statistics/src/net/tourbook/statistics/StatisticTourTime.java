@@ -71,7 +71,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 //		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
 //		fContextBarChart = contextService.activateContext(Chart.CONTEXT_ID_BAR_CHART);
-
+//		net.tourbook.chart.context.isTourChart
 //		fChart.updateChartActionHandlers();
 	}
 
@@ -82,6 +82,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 //		contextService.deactivateContext(fContextBarChart);
 	}
 
+	@Override
 	public void createControl(	final Composite parent,
 								IViewSite viewSite,
 								final IPostSelectionProvider postSelectionProvider) {
@@ -180,10 +181,12 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		updateChart(isResetSelection);
 	}
 
+	@Override
 	public void resetSelection() {
 		fChart.setSelectedBars(null);
 	}
 
+	@Override
 	public boolean selectMonth(final Long date) {
 
 		fCalendar.setTimeInMillis(date);
@@ -209,6 +212,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		return isSelected;
 	}
 
+	@Override
 	public boolean selectTour(final Long tourId) {
 
 		final long[] tourIds = fTourTimeData.fTourIds;
@@ -260,7 +264,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 				String tourTypeName = ""; //$NON-NLS-1$
 				for (final Iterator<TourType> iter = tourTypes.iterator(); iter.hasNext();) {
-					final TourType tourType = (TourType) iter.next();
+					final TourType tourType = iter.next();
 					if (tourType.getTypeId() == typeId) {
 						tourTypeName = tourType.getName();
 					}
@@ -298,6 +302,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				new TourContextProvider(fChart, this));
 	}
 
+	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
@@ -343,6 +348,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		fChart.setChartDataModel(chartModel, isResetSelection);
 	}
 
+	@Override
 	public void updateToolBar(final boolean refreshToolbar) {
 		fChart.fillToolbar(refreshToolbar);
 	}

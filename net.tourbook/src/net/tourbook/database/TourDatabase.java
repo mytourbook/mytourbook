@@ -43,6 +43,7 @@ import net.tourbook.plugin.TourbookPlugin;
 
 import org.apache.derby.drda.NetworkServerControl;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -54,6 +55,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
 
 public class TourDatabase {
@@ -63,16 +65,16 @@ public class TourDatabase {
 	 */
 	private static final int			TOURBOOK_DB_VERSION		= 4;
 
-	public final static String			TABLE_TOUR_DATA			= "TourData";		//$NON-NLS-1$
-	public final static String			TABLE_TOUR_MARKER		= "TourMarker";	//$NON-NLS-1$
-	public final static String			TABLE_TOUR_REFERENCE	= "TourReference";	//$NON-NLS-1$
-	public final static String			TABLE_TOUR_COMPARED		= "TourCompared";	//$NON-NLS-1$
-	public final static String			TABLE_TOUR_CATEGORY		= "TourCategory";	//$NON-NLS-1$
-	public final static String			TABLE_TOUR_TYPE			= "TourType";		//$NON-NLS-1$
-	public static final String			TABLE_TOUR_PERSON		= "TourPerson";	//$NON-NLS-1$
-	public static final String			TABLE_TOUR_BIKE			= "TourBike";		//$NON-NLS-1$
+	public final static String			TABLE_TOUR_DATA			= "TourData";								//$NON-NLS-1$
+	public final static String			TABLE_TOUR_MARKER		= "TourMarker";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_REFERENCE	= "TourReference";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_COMPARED		= "TourCompared";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_CATEGORY		= "TourCategory";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_TYPE			= "TourType";								//$NON-NLS-1$
+	public static final String			TABLE_TOUR_PERSON		= "TourPerson";							//$NON-NLS-1$
+	public static final String			TABLE_TOUR_BIKE			= "TourBike";								//$NON-NLS-1$
 
-	private static final String			TABLE_DB_VERSION		= "DbVersion";		//$NON-NLS-1$
+	private static final String			TABLE_DB_VERSION		= "DbVersion";								//$NON-NLS-1$
 
 	private static TourDatabase			instance;
 
@@ -83,15 +85,18 @@ public class TourDatabase {
 	private boolean						fIsTableChecked;
 	private boolean						fIsVersionChecked;
 
+	private final ListenerList			fListeners				= new ListenerList(ListenerList.IDENTITY);
+
 	class CustomMonitor extends ProgressMonitorDialog {
 
-		private String	fTitle;
+		private final String	fTitle;
 
 		public CustomMonitor(Shell parent, String title) {
 			super(parent);
 			fTitle = title;
 		}
 
+		@Override
 		protected Control createDialogArea(Composite parent) {
 			getShell().setText(fTitle);
 			return super.createDialogArea(parent);
@@ -103,7 +108,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tours in database
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private static ArrayList<Long> getAllTourIds() {
 
 		ArrayList<Long> tourList = new ArrayList<Long>();
@@ -133,7 +138,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourBike> getTourBikes() {
 
 		ArrayList<TourBike> bikeList = new ArrayList<TourBike>();
@@ -174,7 +179,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour people in the db sorted by last/first name
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourPerson> getTourPeople() {
 
 		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
@@ -198,7 +203,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourType> getTourTypes() {
 
 		ArrayList<TourType> tourTypeList = new ArrayList<TourType>();
@@ -228,6 +233,22 @@ public class TourDatabase {
 			sqle.printStackTrace();
 			sqle = sqle.getNextException();
 		}
+	}
+
+	public static void reloadTourData(TourData tourData) {
+
+//		EntityManager em = TourDatabase.getInstance().getEntityManager();
+//
+//		if (em != null) {
+//
+//			try {
+//				em.refresh(tourData);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			} finally {
+//				em.close();
+//			}
+//		}
 	}
 
 	/**
@@ -292,8 +313,6 @@ public class TourDatabase {
 					tourData.onPrePersist();
 					em.persist(tourData);
 
-					ts.commit();
-
 				} else {
 
 					ts.begin();
@@ -316,6 +335,10 @@ public class TourDatabase {
 			}
 		}
 		return isSaved;
+	}
+
+	public void addPropertyListener(IPropertyListener listener) {
+		fListeners.add(listener);
 	}
 
 	/**
@@ -777,6 +800,14 @@ public class TourDatabase {
 		return startServerRunnable;
 	}
 
+	public void firePropertyChange(int propertyId) {
+		Object[] allListeners = fListeners.getListeners();
+		for (int i = 0; i < allListeners.length; i++) {
+			final IPropertyListener listener = (IPropertyListener) allListeners[i];
+			listener.propertyChanged(TourDatabase.this, propertyId);
+		}
+	}
+
 	public Connection getConnection() throws SQLException {
 
 		try {
@@ -860,6 +891,10 @@ public class TourDatabase {
 
 			return em;
 		}
+	}
+
+	public void removePropertyListener(IPropertyListener listener) {
+		fListeners.remove(listener);
 	}
 
 	private void runStartServer(IProgressMonitor monitor) {

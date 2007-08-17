@@ -48,6 +48,7 @@ public class ActionAdjustAltitude extends Action {
 		fTreeViewer = treeViewer;
 	}
 
+	@Override
 	public void run() {
 
 		// open the dialog to adjust the altitude
@@ -55,8 +56,7 @@ public class ActionAdjustAltitude extends Action {
 		if (fTourChart != null) {
 			fDialog = new AdjustAltitudeDialog(fTourChart.getShell(), fTourChart);
 		} else if (fTreeViewer != null) {
-			fDialog = new AdjustAltitudeDialog(
-					fTreeViewer.getTree().getShell(),
+			fDialog = new AdjustAltitudeDialog(fTreeViewer.getTree().getShell(),
 					((IStructuredSelection) fTreeViewer.getSelection()));
 		} else {
 			return;
@@ -65,11 +65,10 @@ public class ActionAdjustAltitude extends Action {
 		fDialog.create();
 		fDialog.init();
 
-		if (fDialog.open() == Window.OK) {
-			fTourChart.updateChart(true);
-		} else {
+		if (fDialog.open() == Window.OK) {} else {
 			fDialog.restoreOriginalAltitudeValues();
 		}
+		fTourChart.updateChart(true);
 	}
 
 //	private void adjustTreeViewerAltitude() {
