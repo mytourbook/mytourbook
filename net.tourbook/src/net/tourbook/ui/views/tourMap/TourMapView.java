@@ -211,6 +211,7 @@ public class TourMapView extends SynchedChartView {
 			super(Messages.TourMap_Action_rename_reference_tour);
 		}
 
+		@Override
 		public void run() {
 
 			final Object selectedItem = (((ITreeSelection) fTourViewer.getSelection()).getFirstElement());
@@ -377,7 +378,7 @@ public class TourMapView extends SynchedChartView {
 
 		fActionSynchCharts = new ActionSynchChartHorizontal(this);
 
-		final IToolBarManager tbm = fCompTourChart.getToolbarManager();
+		final IToolBarManager tbm = fCompTourChart.getToolBarManager();
 		tbm.add(fActionSynchCharts);
 	}
 
@@ -502,6 +503,7 @@ public class TourMapView extends SynchedChartView {
 		tourViewer.setMenu(menu);
 	}
 
+	@Override
 	public void createPartControl(final Composite parent) {
 
 		final Display display = parent.getDisplay();
@@ -605,6 +607,7 @@ public class TourMapView extends SynchedChartView {
 		return treeContainer;
 	}
 
+	@Override
 	public void dispose() {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
@@ -629,7 +632,8 @@ public class TourMapView extends SynchedChartView {
 		int yearItemCounter = 0;
 
 		// count how many different items are selected
-		for (final Iterator iter = selection.iterator(); iter.hasNext();) {
+		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+
 			final Object item = (Object) iter.next();
 
 			if (item instanceof TVTITourMapReferenceTour) {
@@ -756,6 +760,7 @@ public class TourMapView extends SynchedChartView {
 		return fTourViewer;
 	}
 
+	@Override
 	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
 		super.init(site, memento);
 
@@ -785,6 +790,7 @@ public class TourMapView extends SynchedChartView {
 		saveState(fSessionMemento);
 	}
 
+	@Override
 	public void saveState(final IMemento memento) {
 
 		memento.putInteger(MEMENTO_SASH_CONTAINER, fTourViewer.getTree().getSize().x);
@@ -818,6 +824,7 @@ public class TourMapView extends SynchedChartView {
 		fYearChart.setSelectedBars(selectedTours);
 	}
 
+	@Override
 	public void setFocus() {
 		fTourViewer.getTree().setFocus();
 	}
@@ -926,9 +933,8 @@ public class TourMapView extends SynchedChartView {
 					if (persistedCompareResults.size() > 0) {
 						updateCompareResults(persistedCompareResults);
 					}
-				}
 
-				if (selection instanceof SelectionNewRefTours) {
+				} else if (selection instanceof SelectionNewRefTours) {
 
 					final SelectionNewRefTours tourSelection = (SelectionNewRefTours) selection;
 					final ArrayList<TourReference> newRefTours = tourSelection.newRefTours;
@@ -939,9 +945,8 @@ public class TourMapView extends SynchedChartView {
 						fRootItem.fetchChildren();
 						fTourViewer.refresh();
 					}
-				}
 
-				if (selection instanceof SelectionRemovedComparedTours) {
+				} else if (selection instanceof SelectionRemovedComparedTours) {
 
 					final SelectionRemovedComparedTours removedCompTours = (SelectionRemovedComparedTours) selection;
 
@@ -965,13 +970,15 @@ public class TourMapView extends SynchedChartView {
 				if (fActiveTourChart != null) {
 
 					/*
-					 * listen for x-slider position changes which can be done in the marker view
+					 * listen for x-slider position changes, this can be done in the marker or
+					 * segmenter view
 					 */
 					if (selection instanceof SelectionChartXSliderPosition) {
-						fActiveTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
-					}
 
-					if (selection instanceof SelectionTourSegmentLayer) {
+						fActiveTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
+
+					} else if (selection instanceof SelectionTourSegmentLayer) {
+
 						fActiveTourChart.updateSegmentLayer(((SelectionTourSegmentLayer) selection).isLayerVisible);
 					}
 				}
@@ -1147,6 +1154,7 @@ public class TourMapView extends SynchedChartView {
 		yearChart.setChartDataModel(chartModel);
 	}
 
+	@Override
 	void synchCharts(final boolean isSynched) {
 		fRefTourChart.setZoomMarkerPositionListener(isSynched, fCompTourChart);
 	}
@@ -1173,7 +1181,7 @@ public class TourMapView extends SynchedChartView {
 		persistedCompareResults.clear();
 
 		// loop: all ref tours where children has been added
-		for (final Iterator refIdIter = mapViewRefIds.values().iterator(); refIdIter.hasNext();) {
+		for (final Iterator<Long> refIdIter = mapViewRefIds.values().iterator(); refIdIter.hasNext();) {
 
 			final Long refId = (Long) refIdIter.next();
 

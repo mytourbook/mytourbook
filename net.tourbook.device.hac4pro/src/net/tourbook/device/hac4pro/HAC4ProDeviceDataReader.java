@@ -263,17 +263,9 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 							timeData.time = timeInterval;
 						}
 
-						// summarize the recording time
-						tourData
-								.setTourRecordingTime(tourData.getTourRecordingTime() + timeData.time);
-
 						// read data for the current time slice
-						readTimeSlice(DeviceReaderTools.get2ByteData(
-								recordBuffer,
+						readTimeSlice(DeviceReaderTools.get2ByteData(recordBuffer,
 								4 + (2 * dataIndex)), timeData);
-
-						// set distance
-						tourData.setTourDistance(tourData.getTourDistance() + timeData.distance);
 
 						// adjust pulse from relative to absolute value
 						timeData.pulse = totalPulse += timeData.pulse;
@@ -281,13 +273,10 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 						// adjust altitude from relative to absolute
 						totalAltitude += timeData.altitude;
 
-						tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0)
-								? timeData.altitude
-								: 0));
-						tourData
-								.setTourAltDown(tourData.getTourAltDown() + ((timeData.altitude < 0)
-										? -timeData.altitude
-										: 0));
+						tourData.setTourAltUp(tourData.getTourAltUp()
+								+ ((timeData.altitude > 0) ? timeData.altitude : 0));
+						tourData.setTourAltDown(tourData.getTourAltDown()
+								+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
 					}
 
 					// check if the last record was read
@@ -312,7 +301,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				}
 
 				// after all data are added, the tour id can be created
-				tourData.createTourId();
+				tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 				// check if the tour is in the tour map
 				final String tourId = tourData.getTourId().toString();
@@ -328,10 +317,11 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 					tourData.setDeviceId(deviceId);
 					tourData.setDeviceName(visibleName);
-					
+
 					// set week of year
-					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
-							.getStartDay());
+					fCalendar.set(tourData.getStartYear(),
+							tourData.getStartMonth() - 1,
+							tourData.getStartDay());
 					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 				}
 				// dump DD block
@@ -543,10 +533,10 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		return Messages.HAC4_Profile_unknown;
 	}
 
+	@Override
 	public SerialParameters getPortParameters(String portName) {
 
-		return new SerialParameters(
-				portName,
+		return new SerialParameters(portName,
 				9600,
 				SerialPort.FLOWCONTROL_NONE,
 				SerialPort.FLOWCONTROL_NONE,
@@ -578,6 +568,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		return 0x1009A;
 	}
 
+	@Override
 	public boolean checkStartSequence(int byteIndex, int newByte) {
 
 		/*
@@ -599,6 +590,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
+	@Override
 	public int getStartSequenceSize() {
 		return 4;
 	}

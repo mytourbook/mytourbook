@@ -24,19 +24,20 @@ import net.tourbook.tour.TreeViewerItem;
 
 public abstract class TourBookTreeViewerItem extends TreeViewerItem implements ITourItem {
 
-	static final String	SQL_SUM_COLUMNS	= "SUM(TOURDISTANCE), " //$NON-NLS-1$
-												+ "SUM(TOURRECORDINGTIME), " //$NON-NLS-1$
-												+ "SUM(TOURDRIVINGTIME), " //$NON-NLS-1$
-												+ "SUM(TOURALTUP), " //$NON-NLS-1$
-												+ "SUM(TOURALTDOWN)," //$NON-NLS-1$
-												+ "SUM(1)," //$NON-NLS-1$
-												+ "MAX(MAXSPEED),"	//$NON-NLS-1$
-												+ "3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME),"	//$NON-NLS-1$
-												+ "MAX(MAXALTITUDE),"	//$NON-NLS-1$
-												+ "MAX(MAXPULSE),"	//$NON-NLS-1$
-												+ "AVG(AVGPULSE),"	//$NON-NLS-1$
-												+ "AVG(AVGCADENCE),"	//$NON-NLS-1$
-												+ "AVG(AVGTEMPERATURE)";	//$NON-NLS-1$
+	static final String	SQL_SUM_COLUMNS	= "SUM(TOURDISTANCE), " // 				1	//$NON-NLS-1$
+												+ "SUM(TOURRECORDINGTIME), " //	2	//$NON-NLS-1$
+												+ "SUM(TOURDRIVINGTIME), " //	3	//$NON-NLS-1$
+												+ "SUM(TOURALTUP), " //			4	//$NON-NLS-1$
+												+ "SUM(TOURALTDOWN)," //		5	//$NON-NLS-1$
+												+ "SUM(1)," //					6	//$NON-NLS-1$
+												+ "MAX(MAXSPEED)," //			7	//$NON-NLS-1$
+												+ "SUM(TOURDISTANCE)," //		8	//$NON-NLS-1$
+												+ "SUM(TOURDRIVINGTIME)," //	9	//$NON-NLS-1$
+												+ "MAX(MAXALTITUDE)," //		10	//$NON-NLS-1$
+												+ "MAX(MAXPULSE)," //			11	//$NON-NLS-1$
+												+ "AVG(AVGPULSE)," //			12	//$NON-NLS-1$
+												+ "AVG(AVGCADENCE)," //			13	//$NON-NLS-1$
+												+ "AVG(AVGTEMPERATURE)";	//	14	//$NON-NLS-1$
 
 	TourBookView		fView;
 
@@ -79,12 +80,13 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 							long long5,
 							long long6,
 							float float7,
-							float float8,
+							long long8,
 							long long9,
 							long long10,
 							long long11,
 							long long12,
-							long long13) {
+							long long13,
+							long long14) {
 
 		fColumnDistance = long1;
 
@@ -95,14 +97,19 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 		fColumnAltitudeDown = long5;
 
 		fColumnCounter = long6;
+
 		fColumnMaxSpeed = float7;
-		fColumnAvgSpeed = float8;
-		
-		fColumnMaxAltitude = long9;
-		fColumnMaxPulse = long10;
-		fColumnAvgPulse = long11;
-		fColumnAvgCadence = long12;
-		fColumnAvgTemperature = long13;
+
+		// prevent divide by 0
+		// 3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME)	
+		fColumnAvgSpeed = (float) (long9 == 0 ? 0 : 3.6 * (float) long8 / long9);
+
+		fColumnMaxAltitude = long10;
+		fColumnMaxPulse = long11;
+
+		fColumnAvgPulse = long12;
+		fColumnAvgCadence = long13;
+		fColumnAvgTemperature = long14;
 	}
 
 	public Long getTourId() {
@@ -110,8 +117,8 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 	}
 
 	/**
-	 * @return Returns a sql statement string to select only the data which tour
-	 *         type is defined in fTourTypeId
+	 * @return Returns a sql statement string to select only the data which tour type is defined in
+	 *         fTourTypeId
 	 */
 	String sqlTourPersonId() {
 
@@ -127,9 +134,10 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 		}
 		return sqlString.toString();
 	}
+
 	/**
-	 * @return Returns a sql statement string to select only the data which tour
-	 *         type is defined in fTourTypeId
+	 * @return Returns a sql statement string to select only the data which tour type is defined in
+	 *         fTourTypeId
 	 */
 	String sqlTourTypeId() {
 
@@ -141,8 +149,7 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 		} else {
 			// select only one tour type
 			sqlString.append(" AND tourType_typeId " //$NON-NLS-1$
-					+
-					(tourTypeId == TourType.TOUR_TYPE_ID_NOT_DEFINED ? "is null" //$NON-NLS-1$
+					+ (tourTypeId == TourType.TOUR_TYPE_ID_NOT_DEFINED ? "is null" //$NON-NLS-1$
 							: ("=" + Long.toString(tourTypeId)))); //$NON-NLS-1$
 		}
 		return sqlString.toString();

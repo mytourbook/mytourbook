@@ -465,7 +465,7 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		final IToolBarManager tbm = getToolbarManager();
+		final IToolBarManager tbm = getToolBarManager();
 
 		fActionOptions = new ActionChartOptions(this, (ToolBarManager) tbm);
 
@@ -474,7 +474,6 @@ public class TourChart extends Chart {
 		 */
 
 		tbm.add(new Separator());
-
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_ALTITUDE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_SPEED)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_PULSE)).getAction());
@@ -482,14 +481,14 @@ public class TourChart extends Chart {
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_CADENCE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_ALTIMETER)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_GRADIENT)).getAction());
-		tbm.add(new Separator());
 
+		tbm.add(new Separator());
 		tbm.add(fActionProxies.get(COMMAND_ID_X_AXIS_TIME).getAction());
 		tbm.add(fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).getAction());
-		tbm.add(new Separator());
 
-		tbm.add(fActionOptions);
 		tbm.add(new Separator());
+		tbm.add(fActionOptions);
+//		tbm.add(new Separator());
 
 		tbm.update(true);
 		// ///////////////////////////////////////////////////////

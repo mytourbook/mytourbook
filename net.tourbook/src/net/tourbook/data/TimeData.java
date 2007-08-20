@@ -25,8 +25,6 @@ import java.io.Serializable;
 
 /**
  * Contains data for one time slice
- * 
- * @author Wolfgang Schramm
  */
 public class TimeData implements Serializable {
 
@@ -34,13 +32,37 @@ public class TimeData implements Serializable {
 
 	private static final long	serialVersionUID	= -3435859239371853427L;
 
+	/**
+	 * this value is not
+	 */
 	public short				time;
 
+	/**
+	 * absolute value for temperature
+	 */
 	public short				temperature;
-	public short				marker;
+
+	/**
+	 * absolute value for cadence
+	 */
 	public short				cadence;
 
+	/**
+	 * absolute value for pulse
+	 */
 	public short				pulse;
+
+	/**
+	 * relative value for altitude, this is the difference to the altitude of the previous time
+	 * slice
+	 */
 	public short				altitude;
+
+	/**
+	 * realative value for distance, this is the difference to the distance of the previous time
+	 * slice
+	 */
 	public int					distance;
+
+	public short				marker;
 }

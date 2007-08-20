@@ -336,6 +336,32 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
+               id="net.tourbook.toolbars.tourChart.tools">
+            <command
+                  commandId="net.tourbook.command.tourChart.tool.adjustAltitude"
+                  disabledIcon="icons/adjust-altitude-disabled.gif"
+                  icon="icons/adjust-altitude.gif"
+                  label="%Command_tourChart_tool_adjustAltitude"
+                  mnemonic="%Command_tourChart_tool_adjustAltitude_mnemonic"
+                  style="push"
+                  tooltip="%Command_tourChart_tool_adjustAltitude_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.tourChart.tool.tourMarker"
+                  disabledIcon="icons/marker-editor-disabled.gif"
+                  icon="icons/marker-editor.gif"
+                  id="net.tourbook.command.tourChart.tool.tourMarker"
+                  label="%Command_tourChart_tool_tourMarker"
+                  mnemonic="%Command_tourChart_tool_tourMarker_mnemonic"
+                  style="push"
+                  tooltip="%Command_tourChart_tool_tourMarker_tooltip">
+            </command>
+         </toolbar>
+         
+      </menuContribution>
+      <menuContribution
+            locationURI="no toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
                id="net.tourbook.toolbars.tourChart.graphs">
             <command
                   commandId="net.tourbook.command.graph.altitude"
@@ -436,7 +462,6 @@
                </visibleWhen>
             </command>
          </toolbar>
-         
          <toolbar
                id="net.tourbook.toolbars.tourChart">
             <command
@@ -480,22 +505,6 @@
                   mnemonic="%Command_tourChart_options_mnemonic"
                   style="pulldown"
                   tooltip="%Command_tourChart_options_tooltip">
-               <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.definition.isTourChart">
-                  </reference>
-               </visibleWhen>
-            </command>
-         </toolbar>
-         <toolbar
-               id="net.tourbook.toolbars.tourChart.tools">
-            <command
-                  commandId="net.tourbook.command.tourChart.tool.adjustAltitude"
-                  icon="icons/adjust-altitude.gif"
-                  label="%Command_tourChart_tool_adjustAltitude"
-                  mnemonic="%Command_tourChart_tool_adjustAltitude_mnemonic"
-                  style="push"
-                  tooltip="%Command_tourChart_tool_adjustAltitude_tooltip">
                <visibleWhen>
                   <reference
                         definitionId="net.tourbook.definition.isTourChart">
@@ -753,12 +762,25 @@
             id="net.tourbook.command.tourChart.tool.adjustAltitude"
             name="%Command_tourChart_tool_adjustAltitude">
       </command>
+      <command
+            id="net.tourbook.command.tourChart.tool.tourMarker"
+            name="%Command_tourChart_tool_tourMarker">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
             class="net.tourbook.tour.ActionHandlerAdjustAltitude"
             commandId="net.tourbook.command.tourChart.tool.adjustAltitude">
+         <activeWhen>
+            <reference
+                  definitionId="net.tourbook.definition.isTourChart">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="net.tourbook.tour.ActionHandlerTourMarker"
+            commandId="net.tourbook.command.tourChart.tool.tourMarker">
          <activeWhen>
             <reference
                   definitionId="net.tourbook.definition.isTourChart">

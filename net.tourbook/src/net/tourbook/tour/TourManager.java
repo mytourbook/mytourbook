@@ -194,9 +194,9 @@ public class TourManager {
 
 		yData.setVisibleMaxValue(yData.getVisibleMaxValue() + 1);
 
-		// if (yData.getMinValue() > 0) {
-		yData.setVisibleMinValue(yData.getVisibleMinValue() - 1);
-		// }
+		if (yData.getVisibleMinValue() > 0) {
+			yData.setVisibleMinValue(yData.getVisibleMinValue() - 1);
+		}
 	}
 
 	private int compareTour(final TourData compareTourData) {
@@ -1068,6 +1068,10 @@ public class TourManager {
 		} catch (final PartInitException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void removeTourFromCache(Long tourId) {
+		fTourDataMap.remove(tourId);
 	}
 
 }

@@ -24,6 +24,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.views.SelectionTourSegmentLayer;
+import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
@@ -51,8 +52,9 @@ public class TourEditor extends EditorPart {
 	private TourData				fTourData;
 
 	private boolean					fIsTourDirty	= false;
-	private boolean					fTourWasDirty	= false;
+	private boolean					fIsTourChanged	= false;
 
+	private PostSelectionProvider	fPostSelectionProvider;
 	private ISelectionListener		fPostSelectionListener;
 	private IPartListener2			fPartListener;
 
@@ -63,19 +65,22 @@ public class TourEditor extends EditorPart {
 
 			public void partActivated(IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
-					fTourChart.activateActionHandlers(getSite());
+//					fTourChart.activateActionHandlers(getSite());
 				}
 			}
 
 			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
 
 			public void partClosed(IWorkbenchPartReference partRef) {
-				reloadTourData();
+				if (fIsTourChanged) {
+					TourDatabase.getInstance()
+							.firePropertyChange(TourDatabase.PROPERTY_TOUR_IS_CHANGED_AND_PERSISTED);
+				}
 			}
 
 			public void partDeactivated(IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
-					fTourChart.deactivateActionHandlers(getSite());
+//					fTourChart.deactivateActionHandlers(getSite());
 				}
 			}
 
@@ -97,7 +102,7 @@ public class TourEditor extends EditorPart {
 
 		addPartListener();
 
-		fTourChart = new TourChart(parent, SWT.FLAT, false);
+		fTourChart = new TourChart(parent, SWT.FLAT, true);
 
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
@@ -105,12 +110,13 @@ public class TourEditor extends EditorPart {
 		fTourChart.addTourModifyListener(new ITourModifyListener() {
 			public void tourIsModified() {
 				fIsTourDirty = true;
+				fIsTourChanged = true;
 				firePropertyChange(PROP_DIRTY);
 			}
 		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-		fTourChart.createTourActionHandlers(fTourChartConfig);
+//		fTourChart.createTourActionHandlers(fTourChartConfig);
 
 		// load the tourdata from the database
 		fTourData = TourManager.getInstance().getTourData(fEditorInput.fTourId);
@@ -157,7 +163,10 @@ public class TourEditor extends EditorPart {
 		TourDatabase.saveTour(fTourData);
 
 		fIsTourDirty = false;
-		fTourWasDirty = true;
+		fIsTourChanged = false;
+
+		TourDatabase.getInstance()
+				.firePropertyChange(TourDatabase.PROPERTY_TOUR_IS_CHANGED_AND_PERSISTED);
 
 		// hide the dirty indicator
 		firePropertyChange(PROP_DIRTY);
@@ -166,7 +175,7 @@ public class TourEditor extends EditorPart {
 	@Override
 	public void doSaveAs() {}
 
-	TourChart getTourChart() {
+	public TourChart getTourChart() {
 		return fTourChart;
 	}
 
@@ -179,7 +188,7 @@ public class TourEditor extends EditorPart {
 		fEditorInput = (TourEditorInput) input;
 
 		// set selection provider
-//		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		setPostSelectionListener();
 	}
@@ -194,17 +203,6 @@ public class TourEditor extends EditorPart {
 		return false;
 	}
 
-	private void reloadTourData() {
-
-		if (fTourData == null) {
-			return;
-		}
-
-		if (fTourWasDirty) {
-			TourDatabase.reloadTourData(fTourData);
-		}
-	}
-
 	@Override
 	public void setFocus() {
 
@@ -213,7 +211,7 @@ public class TourEditor extends EditorPart {
 		/*
 		 * fire tour selection
 		 */
-//		fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart.fTourData));
+		fPostSelectionProvider.setSelection(new SelectionActiveEditor(TourEditor.this));
 	}
 
 	private void setPostSelectionListener() {
@@ -223,10 +221,11 @@ public class TourEditor extends EditorPart {
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 
 				if (selection instanceof SelectionTourSegmentLayer) {
-					fTourChart.updateSegmentLayer(((SelectionTourSegmentLayer) selection).isLayerVisible);
-				}
 
-				if (selection instanceof SelectionChartXSliderPosition) {
+					fTourChart.updateSegmentLayer(((SelectionTourSegmentLayer) selection).isLayerVisible);
+
+				} else if (selection instanceof SelectionChartXSliderPosition) {
+
 					fTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
 				}
 			}
@@ -237,8 +236,9 @@ public class TourEditor extends EditorPart {
 	}
 
 	public void setTourDirty() {
+
 		fIsTourDirty = true;
-		fTourWasDirty = true;
+		fIsTourChanged = true;
 
 		firePropertyChange(PROP_DIRTY);
 	}

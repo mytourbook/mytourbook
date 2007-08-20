@@ -13,24 +13,27 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-/**
- * Author: Wolfgang Schramm Created: 23.05.2005
- */
+package net.tourbook.tour;
 
-package net.tourbook.importdata;
+import org.eclipse.jface.viewers.ISelection;
 
 /**
- * Contains device data
- * 
- * @author Wolfgang Schramm
+ * selection is fired when a tour editor get's the focus
  */
-public class DeviceData {
+public class SelectionActiveEditor implements ISelection {
 
-	/**
-	 * the transfer date is used to create the filename for the transfered tours
-	 */
-	public short	transferYear	= 1999;
-	public short	transferMonth	= 1;
-	public short	transferDay		= 1;
+	private final TourEditor	fTourEditor;
+
+	public SelectionActiveEditor(TourEditor tourEditor) {
+		fTourEditor = tourEditor;
+	}
+
+	public boolean isEmpty() {
+		return false;
+	}
+
+	public TourEditor getTourEditor() {
+		return fTourEditor;
+	}
 
 }

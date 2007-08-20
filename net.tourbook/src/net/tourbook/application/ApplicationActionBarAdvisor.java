@@ -84,12 +84,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		super(configurer);
 	}
 
+	@Override
 	public IStatus saveState(IMemento memento) {
 		personSelector.saveState(memento);
 		tourTypeSelector.saveState(memento);
 		return super.saveState(memento);
 	}
 
+	@Override
 	protected void makeActions(final IWorkbenchWindow window) {
 
 		personSelector = new PersonContributionItem();
@@ -164,6 +166,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_view_compare_wizard));
 			}
 
+			@Override
 			public void run() {
 				Wizard wizard = new WizardTourComparer();
 
@@ -184,6 +187,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		};
 	}
 
+	@Override
 	protected void fillMenuBar(IMenuManager menuBar) {
 
 		/*
@@ -255,6 +259,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menuBar.add(helpMenu);
 	}
 
+	@Override
 	protected void fillCoolBar(ICoolBarManager coolBar) {
 
 		IToolBarManager tbmPeople = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
@@ -271,12 +276,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		// ---------------------------------------------------------
 
-		IToolBarManager tbmImport = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		tbmImport.add(fActionImportFromFile);
-		tbmImport.add(fActionImportFromDevice);
-		tbmImport.add(fActionImportFromDeviceDirect);
-
-		coolBar.add(new ToolBarContributionItem(tbmImport, "import")); //$NON-NLS-1$
+//		IToolBarManager tbmImport = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+//		tbmImport.add(fActionImportFromFile);
+//		tbmImport.add(fActionImportFromDevice);
+//		tbmImport.add(fActionImportFromDeviceDirect);
+//
+//		coolBar.add(new ToolBarContributionItem(tbmImport, "import")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 
@@ -295,13 +300,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		// ---------------------------------------------------------
 
-		IToolBarManager tbmCompare = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-
-		tbmCompare.add(new Separator());
-		tbmCompare.add(fActionTourCompareWizard);
-		tbmCompare.add(fActionTourCompareView);
-
-		coolBar.add(new ToolBarContributionItem(tbmCompare, "compare")); //$NON-NLS-1$
+//		IToolBarManager tbmCompare = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+//
+//		tbmCompare.add(new Separator());
+//		tbmCompare.add(fActionTourCompareWizard);
+//		tbmCompare.add(fActionTourCompareView);
+//
+//		coolBar.add(new ToolBarContributionItem(tbmCompare, "compare")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 

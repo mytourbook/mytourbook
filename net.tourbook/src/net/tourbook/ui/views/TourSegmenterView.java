@@ -27,6 +27,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourSegment;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
 import net.tourbook.ui.UI;
@@ -68,7 +69,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourSegmenterView extends ViewPart {
 
-	public static final String		ID						= "net.tourbook.views.TourSegmenter"; //$NON-NLS-1$
+	public static final String		ID						= "net.tourbook.views.TourSegmenter";				//$NON-NLS-1$
 
 	public static final int			COLUMN_TIME				= 0;
 	public static final int			COLUMN_DISTANCE			= 1;
@@ -97,17 +98,15 @@ public class TourSegmenterView extends ViewPart {
 	private PostSelectionProvider	fPostSelectionProvider;
 	private IPartListener			fPartListener;
 
-	private DateFormat				fTimeInstance			= DateFormat
-																	.getTimeInstance(DateFormat.DEFAULT);
+	private final DateFormat		fTimeInstance			= DateFormat.getTimeInstance(DateFormat.DEFAULT);
 
-	private Label	fPageNoChart;
+	private Label					fPageNoChart;
 
 	/**
-	 * The content provider class is responsible for providing objects to the
-	 * view. It can wrap existing objects in adapters or simply return objects
-	 * as-is. These objects may be sensitive to the current input of the view,
-	 * or ignore it and always show the same content (like Task List, for
-	 * example).
+	 * The content provider class is responsible for providing objects to the view. It can wrap
+	 * existing objects in adapters or simply return objects as-is. These objects may be sensitive
+	 * to the current input of the view, or ignore it and always show the same content (like Task
+	 * List, for example).
 	 */
 	class ViewContentProvider implements IStructuredContentProvider {
 
@@ -142,8 +141,7 @@ public class TourSegmenterView extends ViewPart {
 			switch (index) {
 
 			case COLUMN_TIME:
-				calendar.set(
-						0,
+				calendar.set(0,
 						0,
 						0,
 						segment.drivingTime / 3600,
@@ -232,9 +230,8 @@ public class TourSegmenterView extends ViewPart {
 		private int					direction;
 
 		/**
-		 * Does the sort. If it's a different column from the previous sort, do
-		 * an ascending sort. If it's the same column as the last sort, toggle
-		 * the sort direction.
+		 * Does the sort. If it's a different column from the previous sort, do an ascending sort.
+		 * If it's the same column as the last sort, toggle the sort direction.
 		 * 
 		 * @param column
 		 */
@@ -253,6 +250,7 @@ public class TourSegmenterView extends ViewPart {
 		/**
 		 * Compares the object for sorting
 		 */
+		@Override
 		public int compare(Viewer viewer, Object obj1, Object obj2) {
 
 			TourSegment segment1 = ((TourSegment) obj1);
@@ -290,10 +288,7 @@ public class TourSegmenterView extends ViewPart {
 		fPostSelectionListener = new ISelectionListener() {
 
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-
-				if (!selection.isEmpty() && selection instanceof SelectionTourChart) {
-					onTourSelection((SelectionTourChart) selection);
-				}
+				onTourSelection(selection);
 			}
 		};
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
@@ -305,8 +300,11 @@ public class TourSegmenterView extends ViewPart {
 		fPartListener = new IPartListener() {
 
 			public void partActivated(IWorkbenchPart part) {}
+
 			public void partBroughtToTop(IWorkbenchPart part) {}
+
 			public void partDeactivated(IWorkbenchPart part) {}
+
 			public void partOpened(IWorkbenchPart part) {}
 
 			public void partClosed(IWorkbenchPart part) {
@@ -323,6 +321,7 @@ public class TourSegmenterView extends ViewPart {
 		getSite().getPage().addPartListener(fPartListener);
 	}
 
+	@Override
 	public void createPartControl(Composite parent) {
 
 		fPageBook = new PageBook(parent, SWT.NONE);
@@ -341,6 +340,8 @@ public class TourSegmenterView extends ViewPart {
 
 		// tell the site that this view is a selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+
+		onTourSelection(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 	}
 
 	private void createSegmenterLayout(Composite parent) {
@@ -377,6 +378,7 @@ public class TourSegmenterView extends ViewPart {
 		fScaleTolerance.setMaximum(100);
 		fScaleTolerance.setLayoutData(gd);
 		fScaleTolerance.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onChangeTolerance(getTolerance(), false);
 			}
@@ -438,8 +440,9 @@ public class TourSegmenterView extends ViewPart {
 		tc.setText(Messages.TourSegmenter_Column_speed);
 		tc.setToolTipText(Messages.TourSegmenter_Column_speed_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 9));
-		
+
 		tc.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				((ViewSorter) fTableViewer.getSorter()).sortColumn(COLUMN_SPEED);
 				fTableViewer.refresh();
@@ -451,6 +454,7 @@ public class TourSegmenterView extends ViewPart {
 		tc.setToolTipText(Messages.TourSegmenter_Column_gradient_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 8));
 		tc.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				((ViewSorter) fTableViewer.getSorter()).sortColumn(COLUMN_GRADIENT);
 				fTableViewer.refresh();
@@ -484,16 +488,14 @@ public class TourSegmenterView extends ViewPart {
 				if (selection != null) {
 
 					/*
-					 * select the chart sliders according to the selected
-					 * segment(s)
+					 * select the chart sliders according to the selected segment(s)
 					 */
 
 					Object[] segments = selection.toArray();
 
 					if (segments.length > 0) {
 
-						fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
-								fTourChart,
+						fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(fTourChart,
 								((TourSegment) (segments[0])).serieIndexStart,
 								((TourSegment) (segments[segments.length - 1])).serieIndexEnd));
 					}
@@ -501,6 +503,7 @@ public class TourSegmenterView extends ViewPart {
 			}
 		});
 	}
+
 	private void onChangeTolerance(int dpTolerance, boolean forceRecalc) {
 
 		// update label in the ui
@@ -524,8 +527,7 @@ public class TourSegmenterView extends ViewPart {
 			graphPoints[iPoint] = new Point(distanceSerie[iPoint], altitudeSerie[iPoint], iPoint);
 		}
 
-		DouglasPeuckerSimplifier dpSimplifier = new DouglasPeuckerSimplifier(
-				dpTolerance,
+		DouglasPeuckerSimplifier dpSimplifier = new DouglasPeuckerSimplifier(dpTolerance,
 				graphPoints);
 		Object[] simplePoints = dpSimplifier.simplify();
 
@@ -554,14 +556,12 @@ public class TourSegmenterView extends ViewPart {
 	private void fireSegmentLayerSelection() {
 
 		// show the segments in the chart
-		fPostSelectionProvider.setSelection(new SelectionTourSegmentLayer(fChkShowInChart
-				.getSelection()));
+		fPostSelectionProvider.setSelection(new SelectionTourSegmentLayer(fChkShowInChart.getSelection()));
 
 		// move the markers to start/end position
-		fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(
-				fTourChart,
-				SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER,
-				SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER));
+//		fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(fTourChart,
+//				SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER,
+//				SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER));
 
 	}
 
@@ -577,22 +577,28 @@ public class TourSegmenterView extends ViewPart {
 	/**
 	 * handle a tour selection event
 	 * 
-	 * @param tourChartSelection
+	 * @param selection
 	 */
-	private void onTourSelection(SelectionTourChart tourChartSelection) {
+	private void onTourSelection(ISelection selection) {
+
+		if (selection instanceof SelectionTourChart) {
+			fTourChart = ((SelectionTourChart) selection).getTourChart();
+		} else if (selection instanceof SelectionActiveEditor) {
+			fTourChart = ((SelectionActiveEditor) selection).getTourEditor().getTourChart();
+		} else {
+			return;
+		}
 
 		saveDPTolerance();
 
-		fTourChart = tourChartSelection.getTourChart();
-		
 		if (fTourChart == null) {
 			// hide the segmenter
 			fPageBook.showPage(fPageNoChart);
 			return;
 		}
-		
+
 		fPageBook.showPage(fPageSegmenter);
-		
+
 		fTourData = fTourChart.getTourData();
 
 		if (fTourData == null) {
@@ -613,8 +619,8 @@ public class TourSegmenterView extends ViewPart {
 		onChangeTolerance(fDpTolerance, true);
 
 		/*
-		 * update the chart, this can't be done in the selectionProvider because
-		 * currently the segmenter part is inactive
+		 * update the chart, this can't be done in the selectionProvider because currently the
+		 * segmenter part is inactive
 		 */
 		fTourChart.updateSegmentLayer(fChkShowInChart.getSelection());
 	}
@@ -628,6 +634,7 @@ public class TourSegmenterView extends ViewPart {
 		}
 	}
 
+	@Override
 	public void dispose() {
 
 		saveDPTolerance();
@@ -639,6 +646,7 @@ public class TourSegmenterView extends ViewPart {
 		super.dispose();
 	}
 
+	@Override
 	public void setFocus() {
 		fScaleTolerance.setFocus();
 	}

@@ -45,52 +45,52 @@ public class Chart extends ViewForm {
 	/**
 	 * context to set the bar chart actions visible
 	 */
-	public static final String		CONTEXT_ID_BAR_CHART		= "net.tourbook.chart.context.barChart";		//$NON-NLS-1$
+	public static final String			CONTEXT_ID_BAR_CHART		= "net.tourbook.chart.context.barChart";		//$NON-NLS-1$
 
-	static final String				COMMAND_ID_ZOOM_IN			= "net.tourbook.chart.command.zoomIn";			//$NON-NLS-1$
-	static final String				COMMAND_ID_ZOOM_OUT			= "net.tourbook.chart.command.zoomOut";		//$NON-NLS-1$
-	static final String				COMMAND_ID_FIT_GRAPH		= "net.tourbook.chart.command.fitGraph";		//$NON-NLS-1$
+	static final String					COMMAND_ID_ZOOM_IN			= "net.tourbook.chart.command.zoomIn";			//$NON-NLS-1$
+	static final String					COMMAND_ID_ZOOM_OUT			= "net.tourbook.chart.command.zoomOut";		//$NON-NLS-1$
+	static final String					COMMAND_ID_FIT_GRAPH		= "net.tourbook.chart.command.fitGraph";		//$NON-NLS-1$
 
-	static final String				COMMAND_ID_PART_NEXT		= "net.tourbook.chart.command.partNext";		//$NON-NLS-1$
-	static final String				COMMAND_ID_PART_PREVIOUS	= "net.tourbook.chart.command.partPrevious";	//$NON-NLS-1$
+	static final String					COMMAND_ID_PART_NEXT		= "net.tourbook.chart.command.partNext";		//$NON-NLS-1$
+	static final String					COMMAND_ID_PART_PREVIOUS	= "net.tourbook.chart.command.partPrevious";	//$NON-NLS-1$
 
-	static final int				NO_BAR_SELECTION			= -1;
+	static final int					NO_BAR_SELECTION			= -1;
 
-	private ListenerList			fFocusListeners				= new ListenerList();
-	private ListenerList			fBarSelectionListeners		= new ListenerList();
-	private ListenerList			fDoubleClickListeners		= new ListenerList();
-	private ListenerList			fSliderMoveListeners		= new ListenerList();
+	private final ListenerList			fFocusListeners				= new ListenerList();
+	private final ListenerList			fBarSelectionListeners		= new ListenerList();
+	private final ListenerList			fDoubleClickListeners		= new ListenerList();
+	private final ListenerList			fSliderMoveListeners		= new ListenerList();
 
-	ChartComponents					fChartComponents;
-	private ChartDataModel			fChartDataModel;
-	private IToolBarManager			fToolbarMgr;
-	private ChartContextProvider	fChartContextProvider;
+	ChartComponents						fChartComponents;
+	private ChartDataModel				fChartDataModel;
+	private IToolBarManager				fToolbarMgr;
+	private ChartContextProvider		fChartContextProvider;
 
-	private boolean					fShowZoomActions;
-	private boolean					fShowPartNavigation;
+	private boolean						fShowZoomActions;
+	private boolean						fShowPartNavigation;
 
-	private Color					backgroundColor;
+	private Color						backgroundColor;
 
-	private Chart					zoomMarkerPositionListener;
+	private Chart						zoomMarkerPositionListener;
 
 	/**
 	 * listener which is called when the x-marker was dragged
 	 */
-	IChartListener					fXMarkerDraggingListener;
+	IChartListener						fXMarkerDraggingListener;
 
 	/**
 	 * when set to <code>true</code> the toolbar is within the chart control, otherwise the
 	 * toolbar is outsite of the chart
 	 */
-	boolean							fUseInternalActionBar		= true;
+	boolean								fUseInternalActionBar		= true;
 
-	private int						fBarSelectionSerieIndex;
-	private int						fBarSelectionValueIndex;
+	private int							fBarSelectionSerieIndex;
+	private int							fBarSelectionValueIndex;
 
-	private ActionHandlerManager	fActionHandlerManager		= ActionHandlerManager.getInstance();
-	HashMap<String, ActionProxy>	fActionProxies;
+	private final ActionHandlerManager	fActionHandlerManager		= ActionHandlerManager.getInstance();
+	HashMap<String, ActionProxy>		fActionProxies;
 
-	private boolean					fIsFillToolbar				= true;
+	private boolean						fIsFillToolbar				= true;
 
 	/**
 	 * This is the ui control which displays the chart
@@ -262,6 +262,7 @@ public class Chart extends ViewForm {
 		return chartInfo;
 	}
 
+	@Override
 	public void dispose() {
 
 		fChartComponents.dispose();
@@ -309,13 +310,12 @@ public class Chart extends ViewForm {
 		if (fUseInternalActionBar && (fShowPartNavigation || fShowZoomActions)) {
 
 			// add the action to the toolbar
-			IToolBarManager tbm = getToolbarManager();
+			IToolBarManager tbm = getToolBarManager();
 
 			if (fShowZoomActions) {
 				tbm.add(new Separator());
 				tbm.add(fActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
 				tbm.add(fActionProxies.get(COMMAND_ID_ZOOM_OUT).getAction());
-
 				tbm.add(fActionProxies.get(COMMAND_ID_FIT_GRAPH).getAction());
 			}
 
@@ -477,12 +477,12 @@ public class Chart extends ViewForm {
 	 * 
 	 * @return
 	 */
-	public IToolBarManager getToolbarManager() {
+	public IToolBarManager getToolBarManager() {
 
 		if (fToolbarMgr == null) {
 
 			// create the toolbar and put it on top of the chart
-			final ToolBar toolBarControl = new ToolBar(this, SWT.FLAT | SWT.WRAP);
+			final ToolBar toolBarControl = new ToolBar(this, SWT.FLAT/* | SWT.WRAP */);
 			setTopLeft(toolBarControl);
 
 			// toolBarControl.addListener(SWT.Resize, new Listener() {
@@ -686,6 +686,7 @@ public class Chart extends ViewForm {
 		fChartDataModel = chartDataModel;
 	}
 
+	@Override
 	public boolean setFocus() {
 
 		/*
@@ -763,10 +764,14 @@ public class Chart extends ViewForm {
 	/**
 	 * sets the position of the x-sliders
 	 * 
-	 * @param position
+	 * @param sliderPosition
 	 */
-	public void setXSliderPosition(SelectionChartXSliderPosition position) {
-		fChartComponents.setXSliderPosition(position);
+	public void setXSliderPosition(SelectionChartXSliderPosition sliderPosition) {
+
+		// check is the position is for this chart
+		if (sliderPosition.chart == this) {
+			fChartComponents.setXSliderPosition(sliderPosition);
+		}
 	}
 
 	/**
@@ -873,8 +878,9 @@ public class Chart extends ViewForm {
 	 *        number of parts into how many parts the chart is devided
 	 * @param position
 	 *        is based on 0
+	 * @param scrollSmoothly
 	 */
-	public void zoomWithParts(int parts, int position) {
+	public void zoomWithParts(int parts, int position, boolean scrollSmoothly) {
 
 		fActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(false);
 		fActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(true);
@@ -886,7 +892,7 @@ public class Chart extends ViewForm {
 			fActionHandlerManager.updateUIEnablementState();
 		}
 
-		fChartComponents.zoomWithParts(parts, position);
+		fChartComponents.zoomWithParts(parts, position, scrollSmoothly);
 	}
 
 }

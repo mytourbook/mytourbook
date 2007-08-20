@@ -40,6 +40,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tour.TourManager;
 
 import org.apache.derby.drda.NetworkServerControl;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -63,18 +64,28 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int			TOURBOOK_DB_VERSION		= 4;
+	private static final int			TOURBOOK_DB_VERSION						= 4;
 
-	public final static String			TABLE_TOUR_DATA			= "TourData";								//$NON-NLS-1$
-	public final static String			TABLE_TOUR_MARKER		= "TourMarker";							//$NON-NLS-1$
-	public final static String			TABLE_TOUR_REFERENCE	= "TourReference";							//$NON-NLS-1$
-	public final static String			TABLE_TOUR_COMPARED		= "TourCompared";							//$NON-NLS-1$
-	public final static String			TABLE_TOUR_CATEGORY		= "TourCategory";							//$NON-NLS-1$
-	public final static String			TABLE_TOUR_TYPE			= "TourType";								//$NON-NLS-1$
-	public static final String			TABLE_TOUR_PERSON		= "TourPerson";							//$NON-NLS-1$
-	public static final String			TABLE_TOUR_BIKE			= "TourBike";								//$NON-NLS-1$
+	public final static String			TABLE_TOUR_DATA							= "TourData";								//$NON-NLS-1$
+	public final static String			TABLE_TOUR_MARKER						= "TourMarker";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_REFERENCE					= "TourReference";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_COMPARED						= "TourCompared";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_CATEGORY						= "TourCategory";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_TYPE							= "TourType";								//$NON-NLS-1$
+	public static final String			TABLE_TOUR_PERSON						= "TourPerson";							//$NON-NLS-1$
+	public static final String			TABLE_TOUR_BIKE							= "TourBike";								//$NON-NLS-1$
 
-	private static final String			TABLE_DB_VERSION		= "DbVersion";								//$NON-NLS-1$
+	private static final String			TABLE_DB_VERSION						= "DbVersion";								//$NON-NLS-1$
+
+	/**
+	 * tour was changed and saved in the database
+	 */
+	public static final int				PROPERTY_TOUR_IS_CHANGED_AND_PERSISTED	= 1;
+
+	/**
+	 * tour was changed but not yet saved in the database
+	 */
+	public static final int				PROPERTY_TOUR_IS_CHANGED				= 2;
 
 	private static TourDatabase			instance;
 
@@ -85,7 +96,7 @@ public class TourDatabase {
 	private boolean						fIsTableChecked;
 	private boolean						fIsVersionChecked;
 
-	private final ListenerList			fListeners				= new ListenerList(ListenerList.IDENTITY);
+	private final ListenerList			fListeners								= new ListenerList(ListenerList.IDENTITY);
 
 	class CustomMonitor extends ProgressMonitorDialog {
 
@@ -235,21 +246,36 @@ public class TourDatabase {
 		}
 	}
 
-	public static void reloadTourData(TourData tourData) {
-
+//	public static void refreshTour(TourData tourData) {
+//
 //		EntityManager em = TourDatabase.getInstance().getEntityManager();
 //
 //		if (em != null) {
 //
+//			EntityTransaction ts = em.getTransaction();
+//
 //			try {
-//				em.refresh(tourData);
+//
+//				TourData tourDataEntity = em.find(TourData.class, tourData.getTourId());
+//
+//				if (tourDataEntity != null) {
+//
+//					ts.begin();
+//
+//em.refresh(tourDataEntity);
+//					ts.commit();
+//				}
+//
 //			} catch (Exception e) {
 //				e.printStackTrace();
 //			} finally {
+//				if (ts.isActive()) {
+//					ts.rollback();
+//				}
 //				em.close();
 //			}
 //		}
-	}
+//	}
 
 	/**
 	 * Remove a tour from the database
@@ -313,6 +339,8 @@ public class TourDatabase {
 					tourData.onPrePersist();
 					em.persist(tourData);
 
+					ts.commit();
+
 				} else {
 
 					ts.begin();
@@ -334,6 +362,11 @@ public class TourDatabase {
 				em.close();
 			}
 		}
+
+		if (isSaved) {
+			TourManager.getInstance().removeTourFromCache(tourData.getTourId());
+		}
+
 		return isSaved;
 	}
 

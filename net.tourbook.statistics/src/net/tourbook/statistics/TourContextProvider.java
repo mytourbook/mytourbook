@@ -36,10 +36,10 @@ class TourContextProvider implements ChartContextProvider {
 	/**
 	 * 
 	 */
-	private Chart					fChart;
-	private IBarSelectionProvider	fBarSelectionProvider;
+	private final Chart					fChart;
+	private final IBarSelectionProvider	fBarSelectionProvider;
 
-	private ActionOpenTour			fActionOpenTour;
+	private final ActionOpenTour		fActionOpenTour;
 
 	private class ActionOpenTour extends Action {
 
@@ -51,6 +51,7 @@ class TourContextProvider implements ChartContextProvider {
 			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj_disabled.gif"));
 		}
 
+		@Override
 		public void run() {
 
 			final Long selectedTourId = fBarSelectionProvider.getSelectedTourId();
@@ -58,7 +59,7 @@ class TourContextProvider implements ChartContextProvider {
 			if (selectedTourId != null) {
 
 				// select the tour in the chart and open the tour in the editor
-				
+
 				fBarSelectionProvider.selectTour(selectedTourId);
 
 				TourManager.getInstance().openTourInEditor(selectedTourId);
@@ -72,8 +73,9 @@ class TourContextProvider implements ChartContextProvider {
 			super(text);
 		}
 
+		@Override
 		public void run() {
-			fChart.zoomWithParts(12, fBarSelectionProvider.getSelectedMonth() - 1);
+			fChart.zoomWithParts(12, fBarSelectionProvider.getSelectedMonth() - 1, false);
 		}
 	}
 

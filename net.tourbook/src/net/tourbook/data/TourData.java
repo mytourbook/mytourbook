@@ -97,8 +97,10 @@ public class TourData {
 
 	/**
 	 * ssss distance msw
+	 * <p>
+	 * is not used any more since 6.12.2006 but is necessary because it's a field in the database
 	 */
-	// is not used any more 6.12.2006
+	@SuppressWarnings("unused")
 	private int					distance;
 
 	/**
@@ -209,15 +211,15 @@ public class TourData {
 	@Basic(optional = false)
 	private SerieData			serieData;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourMarker>		tourMarkers						= new HashSet<TourMarker>();
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourReference>	tourReferences					= new HashSet<TourReference>();
 
-	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
+	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)
 	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
 
 	/**
@@ -260,7 +262,7 @@ public class TourData {
 	public int[]				temperatureSerie;
 
 	/*
-	 * computed series
+	 * computed data series
 	 */
 	@Transient
 	public int[]				speedSerie;
@@ -441,6 +443,7 @@ public class TourData {
 			int timeIndex = 0;
 
 			int timeAbsolute = 0;
+
 			int altitudeAbsolute = 0;
 			int distanceAbsolute = 0;
 
@@ -448,8 +451,10 @@ public class TourData {
 			for (TimeData timeItem : timeDataList) {
 
 				timeSerie[timeIndex] = timeAbsolute;
+
 				distanceSerie[timeIndex] = distanceAbsolute += timeItem.distance;
 				altitudeSerie[timeIndex] = altitudeAbsolute += timeItem.altitude;
+
 				pulseSerie[timeIndex] = timeItem.pulse;
 				temperatureSerie[timeIndex] = timeItem.temperature;
 				cadenceSerie[timeIndex] = timeItem.cadence;
@@ -474,15 +479,21 @@ public class TourData {
 				timeAbsolute += deviceTimeInterval;
 				timeIndex++;
 			}
+
+			tourDistance = distanceAbsolute;
+			tourRecordingTime = timeAbsolute;
 		}
 	}
 
 	/**
 	 * Creates the unique tour id from the tour date/time and distance
+	 * 
+	 * @param uniqueKey
+	 *        unique key to identify a tour
 	 */
-	public void createTourId() {
+	public void createTourId(String uniqueKey) {
 
-		final String startDistance = Integer.toString(Math.abs(getStartDistance()));
+//		final String uniqueKey = Integer.toString(Math.abs(getStartDistance()));
 
 		String tourId;
 
@@ -496,21 +507,22 @@ public class TourData {
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
-					+ startDistance;
+					+ uniqueKey;
 
 			setTourId(Long.parseLong(tourId));
 
 		} catch (NumberFormatException e) {
 
-			// distance was shorted that the maximum for a Long datatype is not
-			// exceeded
+			/*
+			 * the distance was shorted so that the maximum of a Long datatype is not exceeded
+			 */
 
 			tourId = Short.toString(getStartYear())
 					+ Short.toString(getStartMonth())
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
-					+ startDistance.substring(0, Math.min(5, startDistance.length()));
+					+ uniqueKey.substring(0, Math.min(5, uniqueKey.length()));
 
 			setTourId(Long.parseLong(tourId));
 		}
@@ -713,6 +725,7 @@ public class TourData {
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
@@ -740,6 +753,7 @@ public class TourData {
 	/**
 	 * @see java.lang.Object#hashCode()
 	 */
+	@Override
 	public int hashCode() {
 		int result = 17;
 
@@ -890,22 +904,19 @@ public class TourData {
 		return deviceTotalDown;
 	}
 
-	public void setTourDistance(int tourDistance) {
-		this.tourDistance = tourDistance;
-	}
-
 	public int getTourDistance() {
 		return tourDistance;
-	}
-
-	public void setTourRecordingTime(int tourRecordingTime) {
-		this.tourRecordingTime = tourRecordingTime;
 	}
 
 	public int getTourRecordingTime() {
 		return tourRecordingTime;
 	}
 
+	/**
+	 * Set total driving time
+	 * 
+	 * @param tourDrivingTime
+	 */
 	public void setTourDrivingTime(int tourDrivingTime) {
 		this.tourDrivingTime = tourDrivingTime;
 	}
@@ -1006,6 +1017,11 @@ public class TourData {
 		return deviceTimeInterval;
 	}
 
+	/**
+	 * Set the time difference between 2 time slices
+	 * 
+	 * @param deviceTimeInterval
+	 */
 	public void setDeviceTimeInterval(short deviceTimeInterval) {
 		this.deviceTimeInterval = deviceTimeInterval;
 	}
@@ -1208,8 +1224,9 @@ public class TourData {
 		int maxPulse = 0;
 
 		for (int pulse : pulseSerie) {
-			if (pulse > maxPulse)
+			if (pulse > maxPulse) {
 				maxPulse = pulse;
+			}
 		}
 		this.maxPulse = maxPulse;
 	}
@@ -1274,8 +1291,9 @@ public class TourData {
 						/ ((float) timeSerie[i] - (float) timeSerie[i - anzValuesSum])
 						* 3.6f;
 
-				if (speed > maxSpeed && speed < MAX_BIKE_SPEED)
+				if (speed > maxSpeed && speed < MAX_BIKE_SPEED) {
 					maxSpeed = speed;
+				}
 			}
 		}
 		this.maxSpeed = maxSpeed;
@@ -1284,8 +1302,9 @@ public class TourData {
 	public void computeMaxAltitude() {
 		int maxAltitude = 0;
 		for (int altitude : altitudeSerie) {
-			if (altitude > maxAltitude)
+			if (altitude > maxAltitude) {
 				maxAltitude = altitude;
+			}
 		}
 		this.maxAltitude = maxAltitude;
 	}

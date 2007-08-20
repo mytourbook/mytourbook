@@ -404,7 +404,7 @@ public class CompareResultView extends SynchedChartView {
 		fActionSynchChartsHorizontal = new ActionSynchChartHorizontal(this);
 
 		// extend the toolbar int eht compared tour
-		IToolBarManager tbm = fCompTourChart.getToolbarManager();
+		IToolBarManager tbm = fCompTourChart.getToolBarManager();
 		tbm.add(fActionSynchChartsHorizontal);
 	}
 

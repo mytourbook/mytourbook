@@ -433,7 +433,7 @@ public class ChartComponents extends Composite {
 		}
 
 		float adjustMinValue = 0;
-		if ((graphMinValue % unit) != 0 && graphMinValue < 0) {
+		if (((float) graphMinValue % unit) != 0 && graphMinValue < 0) {
 			adjustMinValue = unit;
 		}
 		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / unit) * unit);
@@ -445,7 +445,7 @@ public class ChartComponents extends Composite {
 
 		// increase the max value when it does not fit to unit borders
 		float adjustMaxValue = 0;
-		if ((graphMaxValue % unit) != 0) {
+		if (((float) graphMaxValue % unit) != 0) {
 			adjustMaxValue = unit;
 		}
 		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / unit) * unit);
@@ -904,11 +904,11 @@ public class ChartComponents extends Composite {
 	/**
 	 * set the x-sliders to a new position, this is done from a selection provider
 	 * 
-	 * @param position
+	 * @param sliderPosition
 	 */
-	void setXSliderPosition(final SelectionChartXSliderPosition position) {
+	void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
 
-		if (position == null) {
+		if (sliderPosition == null) {
 			/*
 			 * nothing to do when the position was not set, this can happen when the chart was not
 			 * yet created
@@ -923,8 +923,8 @@ public class ChartComponents extends Composite {
 		final ChartXSlider leftSlider = fComponentGraph.getLeftSlider();
 		final ChartXSlider rightSlider = fComponentGraph.getRightSlider();
 
-		int slider1ValueIndex = position.slider1ValueIndex;
-		int slider2ValueIndex = position.slider2ValueIndex;
+		int slider1ValueIndex = sliderPosition.slider1ValueIndex;
+		int slider2ValueIndex = sliderPosition.slider2ValueIndex;
 
 		int[] xValues = fChartDataModel.getXData().fHighValues[0];
 
@@ -1000,8 +1000,8 @@ public class ChartComponents extends Composite {
 	// onResize();
 	// }
 
-	void zoomWithParts(final int parts, final int position) {
-		fComponentGraph.zoomWithParts(parts, position);
+	void zoomWithParts(final int parts, final int position, boolean scrollSmoothly) {
+		fComponentGraph.zoomWithParts(parts, position, scrollSmoothly);
 		onResize();
 	}
 

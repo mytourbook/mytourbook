@@ -77,6 +77,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return offsetDDRecord;
 	}
 
+	@Override
 	public boolean checkStartSequence(int byteIndex, int newByte) {
 
 		/*
@@ -133,10 +134,10 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return 0x10007;
 	}
 
+	@Override
 	public SerialParameters getPortParameters(String portName) {
 
-		SerialParameters hac5PortParameters = new SerialParameters(
-				portName,
+		SerialParameters hac5PortParameters = new SerialParameters(portName,
 				4800,
 				SerialPort.FLOWCONTROL_NONE,
 				SerialPort.FLOWCONTROL_NONE,
@@ -147,6 +148,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return hac5PortParameters;
 	}
 
+	@Override
 	public int getStartSequenceSize() {
 		return 4;
 	}
@@ -359,17 +361,10 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 							timeData.time = timeInterval;
 						}
 
-						// summarize the recording time
-						tourData
-								.setTourRecordingTime(tourData.getTourRecordingTime() + timeData.time);
-
 						// read data for the current time slice
-						DeviceReaderTools.readTimeSlice(DeviceReaderTools.get2ByteData(
-								recordBuffer,
-								4 + (2 * dataIndex)), timeData);
-
-						// set distance
-						tourData.setTourDistance(tourData.getTourDistance() + timeData.distance);
+						DeviceReaderTools.readTimeSlice(DeviceReaderTools.get2ByteData(recordBuffer,
+								4 + (2 * dataIndex)),
+								timeData);
 
 						// adjust pulse from relative to absolute
 						timeData.pulse = totalPulse += timeData.pulse;
@@ -405,7 +400,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				readDDRecord(recordBuffer, tourData);
 
 				// after all data are added, the tour id can be created
-				tourData.createTourId();
+				tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 				// check if the tour is in the tour map
 				final String tourId = tourData.getTourId().toString();
@@ -420,10 +415,11 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 					tourData.setDeviceId(deviceId);
 					tourData.setDeviceName(visibleName);
-					
+
 					// set week of year
-					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
-							.getStartDay());
+					fCalendar.set(tourData.getStartYear(),
+							tourData.getStartMonth() - 1,
+							tourData.getStartDay());
 					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 				}
 				// dump DD block
@@ -515,7 +511,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 		tourData.setDeviceMode((short) (profile));
 		tourData.setDeviceModeName(getDeviceModeName(profile));
-		
+
 		tourData.setDeviceTimeInterval((short) timeInterval);
 
 		tourData.setStartMinute(buffer[4]);

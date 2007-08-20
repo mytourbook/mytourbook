@@ -30,8 +30,6 @@ public class SelectionChartXSliderPosition implements ISelection {
 
 	public Chart			chart;
 
-	private SelectionChartXSliderPosition() {}
-
 	public SelectionChartXSliderPosition(Chart chart, int valueIndex1, int valueIndex2) {
 
 		this.chart = chart;

@@ -29,6 +29,7 @@ import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourManager;
@@ -315,6 +316,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		fScrolledContainer.setExpandHorizontal(true);
 
 		fScrolledContainer.addControlListener(new ControlAdapter() {
+			@Override
 			public void controlResized(ControlEvent e) {
 				fScrolledContainer.setMinSize(fContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
@@ -535,6 +537,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		}
 	}
 
+	@Override
 	public void createPartControl(final Composite parent) {
 
 		fPartContainer = parent;
@@ -550,6 +553,12 @@ public class TourChartAnalyzerView extends ViewPart {
 		fontBold = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		setListeners();
+
+		// show chart info for the current selection
+		ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+		if (selection != null) {
+
+		}
 	}
 
 	private void createVerticalBorder() {
@@ -579,6 +588,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		label.setLayoutData(gd);
 	}
 
+	@Override
 	public void dispose() {
 
 		getSite().getPage().removePostSelectionListener(fSelectionListener);
@@ -606,6 +616,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		}
 	}
 
+	@Override
 	public void setFocus() {
 		if (fScrolledContainer != null) {
 			fScrolledContainer.setFocus();
@@ -615,6 +626,7 @@ public class TourChartAnalyzerView extends ViewPart {
 	private void setListeners() {
 
 		fPartContainer.addControlListener(new ControlAdapter() {
+			@Override
 			public void controlResized(final ControlEvent event) {
 				if (fChartDataModel == null) {
 					return;
@@ -628,21 +640,28 @@ public class TourChartAnalyzerView extends ViewPart {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (selection instanceof SelectionChartInfo) {
-					updateInfo((SelectionChartInfo) selection);
-				}
 
-				if (selection instanceof SelectionChartXSliderPosition) {
+					updateInfo((SelectionChartInfo) selection);
+
+				} else if (selection instanceof SelectionChartXSliderPosition) {
+
 					Chart tourChart = ((SelectionChartXSliderPosition) selection).chart;
 					if (tourChart != null) {
 						updateInfo(tourChart.getChartInfo());
 					}
-				}
 
-				if (selection instanceof SelectionTourChart) {
+				} else if (selection instanceof SelectionTourChart) {
+
 					TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
 					if (tourChart != null) {
 						updateInfo(tourChart.getChartInfo());
 					}
+
+				} else if (selection instanceof SelectionActiveEditor) {
+
+					updateInfo(((SelectionActiveEditor) selection).getTourEditor()
+							.getTourChart()
+							.getChartInfo());
 				}
 			}
 		};
@@ -661,7 +680,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		boolean isLayoutDirty = false;
 		if (fChartDataModel != chartInfo.chartDataModel) {
 			/*
-			 * there is a different data model than before, a new layout needs to be created
+			 * data model changed, a new layout needs to be created
 			 */
 			isLayoutDirty = true;
 		}
@@ -694,8 +713,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		for (final GraphInfo graphInfo : fGraphInfos) {
 
 			final ChartDataSerie serieData = graphInfo.fChartData;
-			TourChartAnalyzerInfo analyzerInfo = (TourChartAnalyzerInfo) serieData
-					.getCustomData(TourManager.ANALYZER_INFO);
+			TourChartAnalyzerInfo analyzerInfo = (TourChartAnalyzerInfo) serieData.getCustomData(TourManager.ANALYZER_INFO);
 
 			if (analyzerInfo == null) {
 				// create default average object
@@ -765,8 +783,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 			graphInfo.left.setText(ChartUtil.formatValue(leftValue, xAxisUnit, valueDivisor, true)
 					+ " "); //$NON-NLS-1$
-			graphInfo.right.setText(ChartUtil
-					.formatValue(rightValue, xAxisUnit, valueDivisor, true)
+			graphInfo.right.setText(ChartUtil.formatValue(rightValue, xAxisUnit, valueDivisor, true)
 					+ " "); //$NON-NLS-1$
 
 			graphInfo.min.setText(ChartUtil.formatValue(min, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
@@ -777,15 +794,13 @@ public class TourChartAnalyzerView extends ViewPart {
 				if (analyzerInfo.isShowAvgDecimals()) {
 					final int avgDivisor = (int) Math.pow(10, analyzerInfo.getAvgDecimals());
 					avg *= avgDivisor;
-					graphInfo.avg.setText(ChartUtil.formatInteger(
-							(int) avg,
+					graphInfo.avg.setText(ChartUtil.formatInteger((int) avg,
 							avgDivisor,
 							analyzerInfo.getAvgDecimals(),
 							false)
 							+ " "); //$NON-NLS-1$
 				} else {
-					graphInfo.avg.setText(ChartUtil.formatValue(
-							(int) avg,
+					graphInfo.avg.setText(ChartUtil.formatValue((int) avg,
 							xAxisUnit,
 							valueDivisor,
 							true)
@@ -795,8 +810,7 @@ public class TourChartAnalyzerView extends ViewPart {
 				graphInfo.avg.setText(""); //$NON-NLS-1$
 			}
 
-			graphInfo.diff.setText(ChartUtil.formatValue(
-					rightValue - leftValue,
+			graphInfo.diff.setText(ChartUtil.formatValue(rightValue - leftValue,
 					xAxisUnit,
 					valueDivisor,
 					true)

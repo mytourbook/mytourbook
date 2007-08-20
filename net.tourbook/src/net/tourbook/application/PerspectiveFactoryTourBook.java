@@ -9,7 +9,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
-	static final String	PERSPECTIVE_ID	= "net.tourbook.perspective.TourBook"; //$NON-NLS-1$
+	static final String	PERSPECTIVE_ID	= "net.tourbook.perspective.TourBook";	//$NON-NLS-1$
 
 	public void createInitialLayout(IPageLayout layout) {
 
@@ -20,14 +20,14 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
 		leftFolder.addView(TourBookView.ID);
 
-		IFolderLayout topFolder = layout.createFolder("top",
-				IPageLayout.TOP,
+		IFolderLayout bottomFolder = layout.createFolder("bottom",
+				IPageLayout.BOTTOM,
 				0.5f,
 				IPageLayout.ID_EDITOR_AREA);
 
-		topFolder.addView(TourChartView.ID);
+		bottomFolder.addView(TourChartView.ID);
 
-		layout.setEditorAreaVisible(false);
+//		layout.setEditorAreaVisible(false);
 	}
 
 }

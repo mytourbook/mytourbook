@@ -57,17 +57,17 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
-	private ApplicationActionBarAdvisor	fApplicationActionBarAdvisor;
+	private ApplicationActionBarAdvisor			fApplicationActionBarAdvisor;
 
-	private IPerspectiveDescriptor		lastPerspective;
-	private IWorkbenchPage				lastActivePage;
+	private IPerspectiveDescriptor				lastPerspective;
+	private IWorkbenchPage						lastActivePage;
 
-	private IWorkbenchPart				lastActivePart;
-	private String						lastPartTitle	= "";			//$NON-NLS-1$
+	private IWorkbenchPart						lastActivePart;
+	private String								lastPartTitle	= "";			//$NON-NLS-1$
 
-	private ApplicationWorkbenchAdvisor	wbAdvisor;
+	private final ApplicationWorkbenchAdvisor	wbAdvisor;
 
-	private IPropertyListener			partPropertyListener;
+	private IPropertyListener					partPropertyListener;
 
 	public ApplicationWorkbenchWindowAdvisor(ApplicationWorkbenchAdvisor wbAdvisor,
 			IWorkbenchWindowConfigurer configurer) {
@@ -76,15 +76,18 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	}
 
+	@Override
 	public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
 		fApplicationActionBarAdvisor = new ApplicationActionBarAdvisor(configurer);
 		return fApplicationActionBarAdvisor;
 	}
 
+	@Override
 	public void dispose() {
 		UI.getInstance().dispose();
 	}
 
+	@Override
 	public void postWindowCreate() {
 
 	// show editor area
@@ -92,6 +95,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //		activePage.setEditorAreaVisible(true);
 	}
 
+	@Override
 	public void postWindowOpen() {
 
 		String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
@@ -141,6 +145,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		}
 	}
 
+	@Override
 	public void preWindowOpen() {
 
 		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
@@ -186,16 +191,19 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		configurer.getWindow().addPerspectiveListener(new PerspectiveAdapter() {
 
+			@Override
 			public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 				updateTitle();
 			}
 
+			@Override
 			public void perspectiveSavedAs(	IWorkbenchPage page,
 											IPerspectiveDescriptor oldPerspective,
 											IPerspectiveDescriptor newPerspective) {
 				updateTitle();
 			}
 
+			@Override
 			public void perspectiveDeactivated(	IWorkbenchPage page,
 												IPerspectiveDescriptor perspective) {
 				updateTitle();
@@ -312,7 +320,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		if (currentPage != null) {
 
 			final String shellTitle = "{0} - {1}";
-			
+
 			if (activePart != null) {
 				lastPartTitle = activePart.getTitleToolTip();
 
@@ -320,19 +328,19 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 					title = NLS.bind(shellTitle, lastPartTitle, title);
 				}
 			}
-			
+
 			String label = ""; //$NON-NLS-1$
 
 			IPerspectiveDescriptor persp = currentPage.getPerspective();
 			if (persp != null) {
 				label = persp.getLabel();
 			}
-			
+
 			IAdaptable input = currentPage.getInput();
 			if (input != null && !input.equals(wbAdvisor.getDefaultPageInput())) {
 				label = currentPage.getLabel();
 			}
-			
+
 			if (label != null && !label.equals("")) { //$NON-NLS-1$ 
 				title = NLS.bind(shellTitle, label, title);
 			}

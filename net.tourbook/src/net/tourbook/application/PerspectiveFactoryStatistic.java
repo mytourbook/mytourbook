@@ -10,12 +10,9 @@ import org.eclipse.ui.IPlaceholderFolderLayout;
 
 public class PerspectiveFactoryStatistic implements IPerspectiveFactory {
 
-	static final String	PERSPECTIVE_ID	= "net.tourbook.perspective.Statistic";	//$NON-NLS-1$
+	static final String	PERSPECTIVE_ID	= "net.tourbook.perspective.Statistic"; //$NON-NLS-1$
 
 	public void createInitialLayout(IPageLayout layout) {
-
-		// hide editor area
-		layout.setEditorAreaVisible(false);
 
 		IFolderLayout topFolder = layout.createFolder("top",
 				IPageLayout.TOP,
@@ -30,6 +27,9 @@ public class PerspectiveFactoryStatistic implements IPerspectiveFactory {
 				IPageLayout.ID_EDITOR_AREA);
 
 		rightFolder.addPlaceholder(TourChartView.ID);
+
+		// hide editor area
+//		layout.setEditorAreaVisible(false);
 
 	}
 }

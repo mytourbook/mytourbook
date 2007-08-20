@@ -48,7 +48,7 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+            locationURI="no toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
                id="net.tourbook.chart.toolbar.chartOptions">
             <command

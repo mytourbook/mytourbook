@@ -9,7 +9,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
 
-	static final String	PERSPECTIVE_ID	= "net.tourbook.perspective.TourMap"; //$NON-NLS-1$
+	static final String	PERSPECTIVE_ID	= "net.tourbook.perspective.TourMap";	//$NON-NLS-1$
 
 	public void createInitialLayout(IPageLayout layout) {
 		IFolderLayout leftFolder = layout.createFolder("left",
@@ -26,7 +26,7 @@ public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
 
 		topFolder.addView(TourChartView.ID);
 
-		layout.setEditorAreaVisible(false);
+//		layout.setEditorAreaVisible(false);
 
 	}
 

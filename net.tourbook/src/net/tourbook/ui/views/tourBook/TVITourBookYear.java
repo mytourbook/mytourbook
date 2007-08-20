@@ -34,6 +34,7 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 		fTourYear = fFirstColumn = year;
 	}
 
+	@Override
 	protected void fetchChildren() {
 
 		/*
@@ -60,8 +61,7 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 			ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				TourBookTreeViewerItem tourItem = new TVITourBookMonth(
-						fView,
+				TourBookTreeViewerItem tourItem = new TVITourBookMonth(fView,
 						this,
 						result.getInt(1),
 						result.getInt(2));
@@ -69,10 +69,20 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 				fCalendar.set(result.getShort(1), result.getShort(2) - 1, 1);
 				tourItem.fTourDate = fCalendar.getTimeInMillis();
 
-				tourItem.addSumData(result.getLong(3), result.getLong(4), result
-						.getLong(5), result.getLong(6), result.getLong(7), result
-						.getLong(8), result.getFloat(9), result.getFloat(10),result.getLong(11),
-						result.getLong(12), result.getLong(13), result.getLong(14), result.getLong(15));
+				tourItem.addSumData(result.getLong(3),
+						result.getLong(4),
+						result.getLong(5),
+						result.getLong(6),
+						result.getLong(7),
+						result.getLong(8),
+						result.getFloat(9),
+						result.getLong(10),
+						result.getLong(11),
+						result.getLong(12),
+						result.getLong(13),
+						result.getLong(14),
+						result.getLong(15),
+						result.getLong(16));
 
 				children.add(tourItem);
 			}
@@ -84,6 +94,7 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 		}
 	}
 
+	@Override
 	protected void remove() {}
 
 }

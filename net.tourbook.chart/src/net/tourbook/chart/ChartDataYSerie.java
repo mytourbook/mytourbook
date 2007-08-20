@@ -40,7 +40,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	private int						fChartLayout			= ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE;
 
-	public static final String		YDATA_INFO				= "yDataInfo"; //$NON-NLS-1$
+	public static final String		YDATA_INFO				= "yDataInfo";								//$NON-NLS-1$
 
 	public static final int			FILL_METHOD_NOFILL		= 0;
 	public static final int			FILL_METHOD_FILL_BOTTOM	= 1;
@@ -73,7 +73,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	private ChartYSlider			ySliderTop;
 	private ChartYSlider			ySliderBottom;
 
-	private int						fChartType;
+	private final int				fChartType;
 
 	public ChartDataYSerie(int chartType, int chartLayout, int[][] lowValueSeries,
 			int[][] highValueSeries) {
@@ -94,10 +94,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 		setMinMaxValues(new int[][] { lowValueSerie }, new int[][] { highValueSerie });
 	}
 
-	public ChartDataYSerie(int chartType, int[][] valueSerie) {
-		fChartType = chartType;
-		setMinMaxValues(valueSerie);
-	}
+//	public ChartDataYSerie(int chartType, int[][] valueSerie) {
+//		fChartType = chartType;
+//		setMinMaxValues(valueSerie);
+//	}
 
 	public ChartDataYSerie(int chartType, int[][] lowValueSeries, int[][] highValueSeries) {
 		fChartType = chartType;
@@ -137,6 +137,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 		}
 		return fColorIndex;
 	}
+
 	/**
 	 * @return returns true if the graph is filled
 	 */
@@ -216,8 +217,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	/**
 	 * @param fillMethod
-	 *        when set to <tt>true</tt> graph is filled, default is
-	 *        <tt>false</tt>
+	 *        when set to <tt>true</tt> graph is filled, default is <tt>false</tt>
 	 */
 	public void setGraphFillMethod(int fillMethod) {
 		graphFillMethod = fillMethod;
@@ -227,6 +227,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 		fCustomLayers = customLayers;
 	}
 
+	@Override
 	void setMinMaxValues(int[][] valueSeries) {
 
 		if (valueSeries == null || valueSeries.length == 0) {
@@ -291,6 +292,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	}
 
+	@Override
 	void setMinMaxValues(int[][] lowValues, int[][] highValues) {
 
 		if (lowValues == null
@@ -385,6 +387,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 		ySliderTop = new ChartYSlider(this);
 		ySliderBottom = new ChartYSlider(this);
 	}
+
 	/**
 	 * set the direction for the y axis <code>
 	 * true: the direction is from bottom to top by increasing number

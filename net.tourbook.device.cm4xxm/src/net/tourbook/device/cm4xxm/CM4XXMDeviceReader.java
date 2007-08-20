@@ -61,6 +61,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		canReadFromDevice = true;
 	}
 
+	@Override
 	public boolean checkStartSequence(int byteIndex, int newByte) {
 
 		/*
@@ -83,10 +84,10 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 	}
 
 	public String getDeviceModeName(int profileId) {
-		
+
 		// "2E" bike2 (CM414M) 
 		// "3E" bike1 (CM414M) 
-		
+
 		switch (profileId) {
 		case 46: // 0x2E
 			return Messages.CM4XXM_profile_bike2;
@@ -96,17 +97,17 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
 		}
 
-		return Messages.CM4XXM_profile_unknown; 
+		return Messages.CM4XXM_profile_unknown;
 	}
 
 	public int getImportDataSize() {
 		return CM4XXM_DATA_SIZE;
 	}
 
+	@Override
 	public SerialParameters getPortParameters(String portName) {
 
-		return new SerialParameters(
-				portName,
+		return new SerialParameters(portName,
 				9600,
 				SerialPort.FLOWCONTROL_NONE,
 				SerialPort.FLOWCONTROL_NONE,
@@ -115,6 +116,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				SerialPort.PARITY_NONE);
 	}
 
+	@Override
 	public int getStartSequenceSize() {
 		return 4;
 	}
@@ -193,7 +195,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				fileRawData.seek(offsetAARecord);
 
 				TourData tourData = new TourData();
-				
+
 				tourData.setDeviceTimeInterval(CM4XXM_TIMESLICE);
 				tourData.importRawDataFile = importFileName;
 
@@ -208,9 +210,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
 					int deviceTravelTimeHours = (cm4xxmDeviceData.totalTravelTimeHour1);
 
-					tourData
-							.setDeviceTravelTime((deviceTravelTimeHours * 3600) + (cm4xxmDeviceData.totalTravelTimeMin1 * 60)
-									+ cm4xxmDeviceData.totalTravelTimeSec1);
+					tourData.setDeviceTravelTime((deviceTravelTimeHours * 3600)
+							+ (cm4xxmDeviceData.totalTravelTimeMin1 * 60)
+							+ cm4xxmDeviceData.totalTravelTimeSec1);
 
 					// tourData.deviceDistance = ((deviceData.totalDistanceHigh
 					// * (2 ^ 16)) + deviceData.totalDistanceLow);
@@ -360,15 +362,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 							}
 						}
 
-						// summarize the recording time
-						tourData
-								.setTourRecordingTime(tourData.getTourRecordingTime() + timeData.time);
-
 						// read data for this time slice
 						readTimeSlice(fileRawData, timeData);
-
-						// set distance
-						tourData.setTourDistance(tourData.getTourDistance() + timeData.distance);
 
 						// we have no pulse data in CM4xxM
 						timeData.pulse = 0;
@@ -376,31 +371,28 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 						// adjust altitude from relative to absolute
 						totalAltitude += timeData.altitude;
 
-						tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0)
-								? timeData.altitude
-								: 0));
-						tourData
-								.setTourAltDown(tourData.getTourAltDown() + ((timeData.altitude < 0)
-										? -timeData.altitude
-										: 0));
+						tourData.setTourAltUp(tourData.getTourAltUp()
+								+ ((timeData.altitude > 0) ? timeData.altitude : 0));
+						tourData.setTourAltDown(tourData.getTourAltDown()
+								+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
 					}
 				}
 
 				// after all data are added, the tour id can be created
-				tourData.createTourId();
+				tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 				// check if the tour is in the tour map
 				final String tourId = tourData.getTourId().toString();
 				if (tourDataMap.containsKey(tourId) == false) {
-					
+
 					// add new tour to the map
 					tourDataMap.put(tourId, tourData);
-					
+
 					tourData.createTimeSeries(timeDataList, true);
 					tourData.setTourType(defaultTourType);
 					tourData.computeTourDrivingTime();
 					tourData.computeAvgFields();
-					
+
 					tourData.setDeviceId(deviceId);
 					tourData.setDeviceName(visibleName);
 
@@ -409,8 +401,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 					tourData.setDeviceModeName(getDeviceModeName(profileId));
 
 					// set week of year
-					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
-							.getStartDay());
+					fCalendar.set(tourData.getStartYear(),
+							tourData.getStartMonth() - 1,
+							tourData.getStartDay());
 					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 				}
 
@@ -525,8 +518,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		int ch1 = buffer[1];
 		int ch2 = buffer[2];
 		int ch3 = buffer[3];
-		if ((ch0 | ch1 | ch2 | ch3) < 0)
+		if ((ch0 | ch1 | ch2 | ch3) < 0) {
 			throw new EOFException();
+		}
 		return ((ch1 << 8) + (ch0 << 0)) + ((ch3 << 8) + (ch2 << 0));
 	}
 

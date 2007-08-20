@@ -30,6 +30,7 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 		super(view);
 	}
 
+	@Override
 	protected void fetchChildren() {
 
 		/*
@@ -54,17 +55,25 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 			ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				TVITourBookYear tourItem = new TVITourBookYear(fView, this, result
-						.getInt(1));
+				TVITourBookYear tourItem = new TVITourBookYear(fView, this, result.getInt(1));
 
 				fCalendar.set(result.getShort(1), 0, 1);
 				tourItem.fTourDate = fCalendar.getTimeInMillis();
 
-				tourItem.addSumData(result.getLong(2), result.getLong(3), result
-						.getLong(4), result.getLong(5), result.getLong(6), result
-						.getLong(7), result.getFloat(8), result.getFloat(9),
-						result.getLong(10), result.getLong(11), result.getLong(12),
-						result.getLong(13), result.getLong(14));
+				tourItem.addSumData(result.getLong(2),
+						result.getLong(3),
+						result.getLong(4),
+						result.getLong(5),
+						result.getLong(6),
+						result.getLong(7),
+						result.getFloat(8),
+						result.getLong(9),
+						result.getLong(10),
+						result.getLong(11),
+						result.getLong(12),
+						result.getLong(13),
+						result.getLong(14),
+						result.getLong(15));
 
 				children.add(tourItem);
 			}
@@ -76,5 +85,6 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 		}
 	}
 
+	@Override
 	protected void remove() {}
 }

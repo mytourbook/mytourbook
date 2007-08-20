@@ -1,5 +1,7 @@
 package net.tourbook.tour;
 
+import net.tourbook.database.TourDatabase;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -47,6 +49,15 @@ public class ActionHandlerAdjustAltitude extends AbstractHandler {
 			dialog.restoreOriginalAltitudeValues();
 		}
 		tourChart.updateChart(true);
+
+		/*
+		 * when in the tour chart view this tour is visible, another tour is selected and then again
+		 * this tour, the displayed data are from the cache which where changed from this dialog,
+		 * but the tour chart view should show the tour from the database
+		 */
+		TourManager.getInstance().removeTourFromCache(tourChart.fTourData.getTourId());
+
+		TourDatabase.getInstance().firePropertyChange(TourDatabase.PROPERTY_TOUR_IS_CHANGED);
 
 		return null;
 	}

@@ -227,13 +227,15 @@ public class RawDataView extends ViewPart {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId()))
+				if (ID.equals(partRef.getId())) {
 					saveSettings();
+				}
 			}
 
 			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId()))
+				if (ID.equals(partRef.getId())) {
 					saveSettings();
+				}
 			}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {
@@ -305,6 +307,7 @@ public class RawDataView extends ViewPart {
 		getSite().registerContextMenu(menuMgr, fTourViewer);
 	}
 
+	@Override
 	public void createPartControl(final Composite parent) {
 
 		createResources();
@@ -414,6 +417,7 @@ public class RawDataView extends ViewPart {
 		colDef = TableColumnFactory.DB_STATUS.createColumn(fColumnManager, pixelConverter);
 //		colDef.setColumnResizable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 
 				// show the database indicator for the person who owns the tour
@@ -436,6 +440,7 @@ public class RawDataView extends ViewPart {
 		colDef = TableColumnFactory.TOUR_DATE.createColumn(fColumnManager, pixelConverter);
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 
 				final TourData tourData = (TourData) cell.getElement();
@@ -447,6 +452,7 @@ public class RawDataView extends ViewPart {
 			}
 		});
 		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((DeviceImportSorter) fTourViewer.getSorter()).doSort(COLUMN_DATE);
 				fTourViewer.refresh();
@@ -459,6 +465,7 @@ public class RawDataView extends ViewPart {
 		colDef = TableColumnFactory.TOUR_START_TIME.createColumn(fColumnManager, pixelConverter);
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 
 				final TourData tourData = (TourData) cell.getElement();
@@ -473,6 +480,7 @@ public class RawDataView extends ViewPart {
 		 */
 		colDef = TableColumnFactory.TOUR_TITLE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final TourData tourData = (TourData) cell.getElement();
 				cell.setText(tourData.getTourTitle());
@@ -485,6 +493,7 @@ public class RawDataView extends ViewPart {
 		colDef = TableColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
 //		colDef.setColumnResizable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final TourType tourType = ((TourData) cell.getElement()).getTourType();
 				if (tourType != null) {
@@ -498,6 +507,7 @@ public class RawDataView extends ViewPart {
 		 */
 		colDef = TableColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 
 				final int recordingTime = ((TourData) cell.getElement()).getTourRecordingTime();
@@ -520,6 +530,7 @@ public class RawDataView extends ViewPart {
 		 */
 		colDef = TableColumnFactory.DRIVING_TIME.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 
 				final int drivingTime = ((TourData) cell.getElement()).getTourDrivingTime();
@@ -542,6 +553,7 @@ public class RawDataView extends ViewPart {
 		 */
 		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final int tourDistance = ((TourData) cell.getElement()).getTourDistance();
 				if (tourDistance != 0) {
@@ -557,6 +569,7 @@ public class RawDataView extends ViewPart {
 		 */
 		colDef = TableColumnFactory.SPEED.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final TourData tourData = ((TourData) cell.getElement());
 				final int tourDistance = tourData.getTourDistance();
@@ -574,6 +587,7 @@ public class RawDataView extends ViewPart {
 		 */
 		colDef = TableColumnFactory.ALTITUDE_UP.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final int tourAltUp = ((TourData) cell.getElement()).getTourAltUp();
 				if (tourAltUp != 0) {
@@ -588,6 +602,7 @@ public class RawDataView extends ViewPart {
 		 */
 		colDef = TableColumnFactory.ALTITUDE_DOWN.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final int tourAltDown = ((TourData) cell.getElement()).getTourAltDown();
 				if (tourAltDown != 0) {
@@ -604,6 +619,7 @@ public class RawDataView extends ViewPart {
 		TableColumnFactory.IMPORT_FILE_PATH.createColumn(fColumnManager, pixelConverter);
 	}
 
+	@Override
 	public void dispose() {
 
 		if (imageDatabase != null) {
@@ -628,7 +644,7 @@ public class RawDataView extends ViewPart {
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		final IStructuredSelection tourSelection = (IStructuredSelection) fTourViewer.getSelection();
@@ -685,6 +701,7 @@ public class RawDataView extends ViewPart {
 		return fTourViewer;
 	}
 
+	@Override
 	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
 
 		super.init(site, memento);
@@ -750,7 +767,9 @@ public class RawDataView extends ViewPart {
 //				fTourViewer.getTable().showSelection();
 
 					Object tourData = fTourViewer.getElementAt(selectedTourIndex);
-					fTourViewer.setSelection(new StructuredSelection(tourData), true);
+					if (tourData != null) {
+						fTourViewer.setSelection(new StructuredSelection(tourData), true);
+					}
 
 					//				selectTour((StructuredSelection) fTourViewer.getSelection());
 
@@ -768,10 +787,17 @@ public class RawDataView extends ViewPart {
 		saveState(fSessionMemento);
 	}
 
+	@Override
 	public void saveState(final IMemento memento) {
 
 		// save sash weights
-		memento.putInteger(MEMENTO_SASH_CONTAINER, fTourViewer.getTable().getSize().x);
+		final Table table = fTourViewer.getTable();
+
+		if (table.isDisposed()) {
+			return;
+		}
+
+		memento.putInteger(MEMENTO_SASH_CONTAINER, table.getSize().x);
 
 		final RawDataManager rawDataMgr = RawDataManager.getInstance();
 
@@ -782,7 +808,7 @@ public class RawDataView extends ViewPart {
 						FILESTRING_SEPARATOR));
 
 		// save selected tour in the viewer
-		memento.putInteger(MEMENTO_SELECTED_TOUR_INDEX, fTourViewer.getTable().getSelectionIndex());
+		memento.putInteger(MEMENTO_SELECTED_TOUR_INDEX, table.getSelectionIndex());
 
 		// save column sort order
 		memento.putString(MEMENTO_COLUMN_SORT_ORDER,
@@ -825,6 +851,7 @@ public class RawDataView extends ViewPart {
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
+	@Override
 	public void setFocus() {
 		fTourViewer.getControl().setFocus();
 	}

@@ -307,15 +307,8 @@ public class HAC4DeviceReader extends TourbookDevice {
 							}
 						}
 
-						// summarize the recording time
-						tourData.setTourRecordingTime(tourData.getTourRecordingTime()
-								+ timeData.time);
-
 						// read data for this time slice
 						readTimeSlice(fileRawData, timeData);
-
-						// set distance
-						tourData.setTourDistance(tourData.getTourDistance() + timeData.distance);
 
 						// adjust pulse from relative to absolute
 						totalPulse += timeData.pulse;
@@ -332,7 +325,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 				}
 
 				// after all data are added, the tour id can be created
-				tourData.createTourId();
+				tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 				// check if the tour is in the tour map
 				final String tourId = tourData.getTourId().toString();
@@ -354,8 +347,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 					tourData.setDeviceModeName(getDeviceModeName(profileId));
 
 					// set week of year
-					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData
-							.getStartDay());
+					fCalendar.set(tourData.getStartYear(),
+							tourData.getStartMonth() - 1,
+							tourData.getStartDay());
 					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 				}
 
@@ -562,8 +556,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 		int ch1 = buffer[1];
 		int ch2 = buffer[2];
 		int ch3 = buffer[3];
-		if ((ch0 | ch1 | ch2 | ch3) < 0)
+		if ((ch0 | ch1 | ch2 | ch3) < 0) {
 			throw new EOFException();
+		}
 		return ((ch1 << 8) + (ch0 << 0)) + ((ch3 << 8) + (ch2 << 0));
 	}
 
@@ -658,10 +653,10 @@ public class HAC4DeviceReader extends TourbookDevice {
 		return "HAC4: unknown profile"; //$NON-NLS-1$
 	}
 
+	@Override
 	public SerialParameters getPortParameters(String portName) {
 
-		return new SerialParameters(
-				portName,
+		return new SerialParameters(portName,
 				9600,
 				SerialPort.FLOWCONTROL_NONE,
 				SerialPort.FLOWCONTROL_NONE,
@@ -670,6 +665,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 				SerialPort.PARITY_NONE);
 	}
 
+	@Override
 	public boolean checkStartSequence(int byteIndex, int newByte) {
 
 		/*
@@ -691,6 +687,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 		return false;
 	}
 
+	@Override
 	public int getStartSequenceSize() {
 		return 4;
 	}
