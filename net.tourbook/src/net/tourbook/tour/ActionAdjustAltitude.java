@@ -68,7 +68,7 @@ public class ActionAdjustAltitude extends Action {
 		if (fDialog.open() == Window.OK) {} else {
 			fDialog.restoreOriginalAltitudeValues();
 		}
-		fTourChart.updateChart(true);
+		fTourChart.updateTourChart(true);
 	}
 
 //	private void adjustTreeViewerAltitude() {

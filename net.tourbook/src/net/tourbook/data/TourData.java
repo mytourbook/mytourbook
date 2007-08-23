@@ -540,14 +540,14 @@ public class TourData {
 	 */
 	public Object[] createTourSegments() {
 
-		int segmentSerieLength = segmentSerieIndex.length;
+		final int segmentSerieLength = segmentSerieIndex.length;
 
 		if (segmentSerieIndex == null || segmentSerieLength < 2) {
 			// at least two points are required to build a segment
 			return new Object[0];
 		}
 
-		ArrayList<TourSegment> tourSegments = new ArrayList<TourSegment>(segmentSerieLength);
+		final ArrayList<TourSegment> tourSegments = new ArrayList<TourSegment>(segmentSerieLength);
 		final int firstSerieIndex = segmentSerieIndex[0];
 
 		// get start values
@@ -575,24 +575,27 @@ public class TourData {
 			final int segmentStartIndex = segmentSerieIndex[iSegment - 1];
 			final int segmentEndIndex = segmentSerieIndex[iSegment];
 
-			TourSegment segment = new TourSegment();
+			final TourSegment segment = new TourSegment();
 			tourSegments.add(segment);
 
 			segment.serieIndexStart = segmentStartIndex;
 			segment.serieIndexEnd = segmentEndIndex;
 
 			// compute difference values between start and end
-			int altitudeEnd = altitudeSerie[segmentEndIndex];
-			int distanceEnd = distanceSerie[segmentEndIndex];
-			int timeEnd = timeSerie[segmentEndIndex];
+			final int altitudeEnd = altitudeSerie[segmentEndIndex];
+			final int distanceEnd = distanceSerie[segmentEndIndex];
+			final int timeEnd = timeSerie[segmentEndIndex];
+			final int recordingTime = timeEnd - timeStart;
 
 			segmentSerieAltitude[segmentIndex] = segment.altitude = altitudeEnd - altitudeStart;
 			segmentSerieDistance[segmentIndex] = segment.distance = distanceEnd - distanceStart;
-			segmentSerieTime[segmentIndex] = segment.time = timeEnd - timeStart;
-			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = getDrivingTime(segment,
-					segmentStartIndex,
-					segmentEndIndex,
-					timeSlice);
+
+			segmentSerieTime[segmentIndex] = segment.recordingTime = recordingTime;
+			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = (recordingTime - (TourManager.getInstance()
+					.getIgnoreTimeSlices(distanceSerie,
+							segmentStartIndex,
+							segmentEndIndex,
+							10 / timeSlice) * timeSlice));
 
 			int altitudeUp = 0;
 			int altitudeDown = 0;
@@ -601,8 +604,8 @@ public class TourData {
 			// compute altitude up/down for the segment
 			for (int serieIndex = segmentStartIndex + 1; serieIndex <= segmentEndIndex; serieIndex++) {
 
-				int altitude2 = altitudeSerie[serieIndex];
-				int altitudeDiff = altitude2 - altitude1;
+				final int altitude2 = altitudeSerie[serieIndex];
+				final int altitudeDiff = altitude2 - altitude1;
 				altitude1 = altitude2;
 
 				altitudeUp += altitudeDiff >= 0 ? altitudeDiff : 0;
@@ -643,30 +646,30 @@ public class TourData {
 		return fTourSegments;
 	}
 
-	private int getDrivingTime(	TourSegment tourSegment,
-								int valuesIndexLeft,
-								int valuesIndexRight,
-								int timeSlice) {
-
-		/*
-		 * calculate the driving time, ignore the time when the distance is 0
-		 */
-		int ignoreTimeCounter = 0;
-		int oldDistance = 0;
-
-		for (int valueIndex = valuesIndexLeft; valueIndex <= valuesIndexRight; valueIndex++) {
-			if (distanceSerie[valueIndex] == oldDistance) {
-				ignoreTimeCounter++;
-			}
-			oldDistance = distanceSerie[valueIndex];
-		}
-
-		final float time = tourSegment.time - (ignoreTimeCounter * timeSlice);
-		// final float distance = tourSegment.distance;
-		//
-		// return (int) (distance / time * 3.6f);
-		return (int) time;
-	}
+//	private int getDrivingTime(	TourSegment tourSegment,
+//								int valuesIndexLeft,
+//								int valuesIndexRight,
+//								int timeSlice) {
+//
+//		/*
+//		 * calculate the driving time, ignore the time when the distance is 0
+//		 */
+//		int ignoreTimeCounter = 0;
+//		int oldDistance = 0;
+//
+//		for (int valueIndex = valuesIndexLeft; valueIndex <= valuesIndexRight; valueIndex++) {
+//			if (distanceSerie[valueIndex] == oldDistance) {
+//				ignoreTimeCounter++;
+//			}
+//			oldDistance = distanceSerie[valueIndex];
+//		}
+//
+//		final float time = tourSegment.recordingTime - (ignoreTimeCounter * timeSlice);
+//		// final float distance = tourSegment.distance;
+//		//
+//		// return (int) (distance / time * 3.6f);
+//		return (int) time;
+//	}
 
 	public void dumpData() {
 

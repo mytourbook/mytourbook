@@ -167,6 +167,7 @@ public class WizardPageCompareTour extends WizardPage {
 		fCheckSelectAll = new Button(pageContainer, SWT.CHECK);
 		fCheckSelectAll.setText(Messages.TourMapWizard_Action_select_all_tours);
 		fCheckSelectAll.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				enableTours(fCheckSelectAll.getSelection());
 				validatePage();
@@ -320,7 +321,7 @@ public class WizardPageCompareTour extends WizardPage {
 					TourChartConfiguration chartConfig = new TourChartConfiguration(true);
 					chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-					fTourChart.updateChart(tourData, chartConfig, false);
+					fTourChart.updateTourChart(tourData, chartConfig, false);
 
 					fChartGroup.setText(NLS.bind(Messages.TourMapWizard_Group_selected_tour_2,
 							TourManager.getTourDate(tourData)));

@@ -96,7 +96,7 @@ public class TourDatabase {
 	private boolean						fIsTableChecked;
 	private boolean						fIsVersionChecked;
 
-	private final ListenerList			fListeners								= new ListenerList(ListenerList.IDENTITY);
+	private final ListenerList			fPropertyListeners						= new ListenerList(ListenerList.IDENTITY);
 
 	class CustomMonitor extends ProgressMonitorDialog {
 
@@ -371,7 +371,7 @@ public class TourDatabase {
 	}
 
 	public void addPropertyListener(IPropertyListener listener) {
-		fListeners.add(listener);
+		fPropertyListeners.add(listener);
 	}
 
 	/**
@@ -834,7 +834,7 @@ public class TourDatabase {
 	}
 
 	public void firePropertyChange(int propertyId) {
-		Object[] allListeners = fListeners.getListeners();
+		Object[] allListeners = fPropertyListeners.getListeners();
 		for (int i = 0; i < allListeners.length; i++) {
 			final IPropertyListener listener = (IPropertyListener) allListeners[i];
 			listener.propertyChanged(TourDatabase.this, propertyId);
@@ -927,7 +927,7 @@ public class TourDatabase {
 	}
 
 	public void removePropertyListener(IPropertyListener listener) {
-		fListeners.remove(listener);
+		fPropertyListeners.remove(listener);
 	}
 
 	private void runStartServer(IProgressMonitor monitor) {

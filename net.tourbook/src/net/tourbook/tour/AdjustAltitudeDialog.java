@@ -461,7 +461,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			}
 		});
 
-		fTourChart.updateChart(tourData, chartConfig, true);
+		fTourChart.updateTourChart(tourData, chartConfig, true);
 
 		/*
 		 * container: altitude controls
@@ -613,14 +613,14 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 				if (fIsInitialAltiDisplayed == false && e.character == ' ') {
 					fIsInitialAltiDisplayed = true;
 					setOriginalAltitudeValues();
-					fTourChart.updateChart(!fChkScaleYAxis.getSelection());
+					fTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 				}
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
 				setInitialAltitudeValues();
-				fTourChart.updateChart(!fChkScaleYAxis.getSelection());
+				fTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 				fIsInitialAltiDisplayed = false;
 			}
 		});
@@ -632,14 +632,14 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 				if (fIsInitialAltiDisplayed == false) {
 					fIsInitialAltiDisplayed = true;
 					setOriginalAltitudeValues();
-					fTourChart.updateChart(!fChkScaleYAxis.getSelection());
+					fTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 				}
 			}
 
 			@Override
 			public void mouseUp(MouseEvent e) {
 				setInitialAltitudeValues();
-				fTourChart.updateChart(!fChkScaleYAxis.getSelection());
+				fTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 				fIsInitialAltiDisplayed = false;
 			}
 		});
@@ -837,7 +837,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		// set new values into the fields which can change the altitude
 		setAltiFieldValues();
 
-		fTourChart.updateChart(!fChkScaleYAxis.getSelection());
+		fTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 	}
 
 	/**

@@ -47,7 +47,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 		public void run() {
 			fTourChart.fTourChartConfig.isStartTime = isChecked();
-			fTourChart.updateChart(true);
+			fTourChart.updateTourChart(true);
 		}
 	}
 

@@ -149,6 +149,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	class MarkerViewerLabelProvider extends CellLabelProvider {
 
+		@Override
 		public void update(ViewerCell cell) {
 
 			TourMarker tourMarker = (TourMarker) cell.getElement();
@@ -187,6 +188,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	 * Sort the markers by time
 	 */
 	private class MarkerViewerSorter extends ViewerSorter {
+		@Override
 		public int compare(Viewer viewer, Object obj1, Object obj2) {
 			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
 		}
@@ -225,6 +227,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		fTourChart.updateMarkerLayer(true);
 	}
 
+	@Override
 	public boolean close() {
 
 		restoreVisibleType();
@@ -234,6 +237,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		return super.close();
 	}
 
+	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(Messages.MarkerDialog_Dlg_title);
@@ -252,21 +256,23 @@ public class MarkerDialog extends TitleAreaDialog {
 //		});
 	}
 
+	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 
-		fBtnClose = createButton(
-				parent,
+		fBtnClose = createButton(parent,
 				IDialogConstants.CLOSE_ID,
 				IDialogConstants.CLOSE_LABEL,
 				false);
 
 		fBtnClose.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				close();
 			}
 		});
 	}
 
+	@Override
 	protected Control createDialogArea(Composite parent) {
 
 		Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
@@ -330,8 +336,8 @@ public class MarkerDialog extends TitleAreaDialog {
 		tvc.getColumn().setText(Messages.TourMarker_Column_km);
 		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_km_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(8), false));
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8),
+				false));
 
 		// column: marker
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
@@ -344,16 +350,16 @@ public class MarkerDialog extends TitleAreaDialog {
 		tvc.getColumn().setText(Messages.TourMarker_Column_horizontal_offset);
 		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_horizontal_offset_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(6), false));
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
+				false));
 
 		// column: vertical offset
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
 		tvc.getColumn().setText(Messages.TourMarker_Column_vertical_offset);
 		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_vertical_offset_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter
-				.convertWidthInCharsToPixels(6), false));
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
+				false));
 
 		/*
 		 * create table viewer
@@ -408,7 +414,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		TourChartConfiguration chartConfig = new TourChartConfiguration(false);
 		chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-		fTourChart.updateChart(fTourData, chartConfig, false);
+		fTourChart.updateTourChart(fTourData, chartConfig, false);
 	}
 
 	private void createUI(Composite parent) {
@@ -442,8 +448,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		markerDetailContainer.setLayout(gl);
 		// markerDetailContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
-		fViewerDetailForm = new ViewerDetailForm(
-				dlgContainer,
+		fViewerDetailForm = new ViewerDetailForm(dlgContainer,
 				fMarkerListContainer,
 				sash,
 				markerDetailContainer,
@@ -465,6 +470,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		fBtnDelete.setText(Messages.MarkerDialog_Button_delete);
 		fBtnDelete.setToolTipText(Messages.MarkerDialog_Button_delete_tooltip);
 		fBtnDelete.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onDeleteMarker();
 			}
@@ -477,6 +483,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		fBtnUndo.setText(Messages.MarkerDialog_Button_undo);
 		fBtnUndo.setToolTipText(Messages.MarkerDialog_Button_undo_tooltip);
 		fBtnUndo.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				fSelectedTourMarker.restoreMarkerFromBackup(fBackupMarker);
 				updateMarkerUI();
@@ -510,6 +517,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		fTextMarkerName.setLayoutData(gd);
 
 		fTextMarkerName.addKeyListener(new KeyAdapter() {
+			@Override
 			public void keyReleased(KeyEvent e) {
 				onChangeMarkerUI();
 			}
@@ -533,6 +541,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		fComboMarkerPosition.setLayoutData(gd);
 
 		fComboMarkerPosition.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onChangeMarkerUI();
 			}
@@ -571,6 +580,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		gd.widthHint = 100;
 		fScaleX.setLayoutData(gd);
 		fScaleX.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onChangeMarkerUI();
 			}
@@ -603,6 +613,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		gd.widthHint = 100;
 		fScaleY.setLayoutData(gd);
 		fScaleY.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onChangeMarkerUI();
 			}
@@ -629,6 +640,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		fBtnReset.setLayoutData(gd);
 
 		fBtnReset.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 
 				fScaleX.setSelection(OFFSET_0);
@@ -640,7 +652,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		setButtonLayoutData(fBtnReset);
 	}
 
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void enableControls() {
 
 		if (fSelectedTourMarker != null) {
@@ -681,9 +693,10 @@ public class MarkerDialog extends TitleAreaDialog {
 		fScaleY.setEnabled(isMarkerAvailable);
 	}
 
+	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
-		return TourbookPlugin.getDefault().getDialogSettingsSection(
-				getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
+		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName()
+				+ "_DialogBounds"); //$NON-NLS-1$
 	}
 
 	/**
@@ -717,7 +730,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	/**
 	 * remove selected markers from the view and update dependened structures
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void onDeleteMarker() {
 
 		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();
@@ -728,8 +741,7 @@ public class MarkerDialog extends TitleAreaDialog {
 				| SWT.YES
 				| SWT.NO);
 		msgBox.setText(Messages.MarkerDialog_MsgBox_delete_marker_title);
-		msgBox.setMessage(NLS.bind(
-				Messages.MarkerDialog_MsgBox_delete_marker_message,
+		msgBox.setMessage(NLS.bind(Messages.MarkerDialog_MsgBox_delete_marker_message,
 				(selectedMarker).getLabel()));
 
 		if (msgBox.open() == SWT.YES) {
@@ -784,8 +796,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		onChangeMarkerUI();
 
 		// set slider position
-		fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(
-				fTourChart,
+		fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
 				newSelectedMarker.getSerieIndex(),
 				SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {});
 	}

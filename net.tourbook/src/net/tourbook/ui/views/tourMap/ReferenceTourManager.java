@@ -58,8 +58,7 @@ public class ReferenceTourManager {
 	public TourReference addReferenceTour(TourChart tourChart) {
 
 		// ask for the reference tour name
-		InputDialog dialog = new InputDialog(
-				Display.getCurrent().getActiveShell(),
+		InputDialog dialog = new InputDialog(Display.getCurrent().getActiveShell(),
 				Messages.TourMap_Dlg_add_reference_tour_title,
 				Messages.TourMap_Dlg_add_reference_tour_msg,
 				"", //$NON-NLS-1$
@@ -73,11 +72,10 @@ public class ReferenceTourManager {
 		TourData tourData = tourChart.getTourData();
 
 		// create new tour reference
-		TourReference newTourReference = new TourReference(
-				dialog.getValue(),
+		TourReference newTourReference = new TourReference(dialog.getValue(),
 				tourData,
-				chartInfo.leftSlider.getValuesIndex(),
-				chartInfo.rightSlider.getValuesIndex());
+				chartInfo.leftSliderValuesIndex,
+				chartInfo.rightSliderValuesIndex);
 
 		// add the tour reference into the tour data collection
 		tourData.getTourReferences().add(newTourReference);

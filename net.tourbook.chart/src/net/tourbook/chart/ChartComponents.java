@@ -553,7 +553,8 @@ public class ChartComponents extends Composite {
 		// loop all graphs
 		for (final ChartDataYSerie yData : yDataList) {
 
-			final ChartDrawingData drawingData = new ChartDrawingData();
+			final ChartDrawingData drawingData = new ChartDrawingData(yData.getChartType());
+
 			chartDrawingData.add(drawingData);
 
 			// set chart title
@@ -612,7 +613,7 @@ public class ChartComponents extends Composite {
 			// the bar's width is 50% of the width for a month
 			rectangleWidth = Math.max(0, monthWidth / 2);
 			drawingData.setBarRectangleWidth(rectangleWidth);
-			drawingData.setBarRectanglePos(Math.max(0, rectangleWidth / 2) + 2);
+			drawingData.setDevBarRectangleXPos(Math.max(0, rectangleWidth / 2) + 2);
 			break;
 
 		case ChartDataYSerie.BAR_LAYOUT_BESIDE:
@@ -621,7 +622,7 @@ public class ChartComponents extends Composite {
 			// the bar's width is 75% of the width for a month
 			rectangleWidth = Math.max(0, monthWidth / 4 * 3);
 			drawingData.setBarRectangleWidth(Math.max(1, rectangleWidth / serieCount));
-			drawingData.setBarRectanglePos(Math.max(0, (monthWidth - rectangleWidth) / 2) + 2);
+			drawingData.setDevBarRectangleXPos(Math.max(0, (monthWidth - rectangleWidth) / 2) + 2);
 		default:
 			break;
 		}

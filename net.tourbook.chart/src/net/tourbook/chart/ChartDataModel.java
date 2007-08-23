@@ -20,16 +20,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * is the data model which is used by chart to draw it. All data which are
- * required to draw the chart must be contained in this data model.
+ * is the data model which is used by chart to draw it. All data which are required to draw the
+ * chart must be contained in this data model.
  */
 public class ChartDataModel {
 
 	public static final int				CHART_TYPE_LINE			= 10;
 	public static final int				CHART_TYPE_BAR			= 20;
 
-	public static final String			BAR_INFO_PROVIDER		= "BarInfoProvider"; //$NON-NLS-1$
-	public static final String			BAR_CONTEXT_PROVIDER	= "BarContextProvider"; //$NON-NLS-1$
+	public static final String			BAR_INFO_PROVIDER		= "BarInfoProvider";				//$NON-NLS-1$
+	public static final String			BAR_CONTEXT_PROVIDER	= "BarContextProvider";			//$NON-NLS-1$
 
 	private int							fChartType				= CHART_TYPE_LINE;
 
@@ -47,8 +47,8 @@ public class ChartDataModel {
 	private ArrayList<ChartDataYSerie>	yData					= new ArrayList<ChartDataYSerie>();
 
 	/**
-	 * Contains all data series for the x and y axis and also hidden data which
-	 * are not displayed in the chart
+	 * Contains all data series for the x and y axis and also hidden data which are not displayed in
+	 * the chart
 	 */
 	private ArrayList<ChartDataSerie>	xyData					= new ArrayList<ChartDataSerie>();
 
@@ -65,12 +65,10 @@ public class ChartDataModel {
 	private boolean						isStackedChart			= true;
 
 	/**
-	 * minimum width for the chart, this can be overwritten for e.g. to show in
-	 * a year chart for each day at least one pixel
+	 * minimum width for the chart, this can be overwritten for e.g. to show in a year chart for
+	 * each day at least one pixel
 	 */
 	private int							chartMinWidth			= ChartComponents.CHART_MIN_WIDTH;
-
-	private ChartDataModel() {}
 
 	public ChartDataModel(int chartType) {
 		fChartType = chartType;
@@ -92,16 +90,15 @@ public class ChartDataModel {
 	}
 
 	/**
-	 * @return returns the charttype, this can be CHART_TYPE_LINE,
-	 *         CHART_TYPE_BAR
+	 * @return returns the charttype, this can be CHART_TYPE_LINE, CHART_TYPE_BAR
 	 */
 	public int getChartType() {
 		return fChartType;
 	}
 
 	/**
-	 * Returns the application defined property of the receiver with the
-	 * specified name, or null if it has not been set.
+	 * Returns the application defined property of the receiver with the specified name, or null if
+	 * it has not been set.
 	 */
 	public Object getCustomData(String key) {
 		if (customData.containsKey(key)) {
@@ -165,8 +162,8 @@ public class ChartDataModel {
 	}
 
 	/**
-	 * Sets the application defined property of the receiver with the specified
-	 * name to the given value.
+	 * Sets the application defined property of the receiver with the specified name to the given
+	 * value.
 	 */
 	public void setCustomData(String key, Object value) {
 		customData.put(key, value);

@@ -20,6 +20,8 @@ package net.tourbook.tour;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ISliderMoveListener;
+import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
@@ -41,7 +43,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-public class TourEditor extends EditorPart {
+public class TourEditor extends EditorPart implements ITourChartPropertyListener {
 
 	public static final String		ID				= "net.tourbook.tour.TourEditor";
 
@@ -107,6 +109,13 @@ public class TourEditor extends EditorPart {
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
 
+		// fire a slider move selection when a slider was moved in the tour chart
+		fTourChart.addSliderMoveListener(new ISliderMoveListener() {
+			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
+				fPostSelectionProvider.setSelection(chartInfoSelection);
+			}
+		});
+
 		fTourChart.addTourModifyListener(new ITourModifyListener() {
 			public void tourIsModified() {
 				fIsTourDirty = true;
@@ -117,6 +126,8 @@ public class TourEditor extends EditorPart {
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
 //		fTourChart.createTourActionHandlers(fTourChartConfig);
+
+		TourManager.getInstance().addPropertyListener(this);
 
 		// load the tourdata from the database
 		fTourData = TourManager.getInstance().getTourData(fEditorInput.fTourId);
@@ -134,7 +145,7 @@ public class TourEditor extends EditorPart {
 				}
 			});
 
-			fTourChart.updateChart(fTourData, fTourChartConfig, false);
+			fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 
 			final String tourTitle = TourManager.getTourDate(fTourData);
 
@@ -149,10 +160,12 @@ public class TourEditor extends EditorPart {
 
 		final IWorkbenchPartSite site = getSite();
 
-		if (site != null) {
-			site.getPage().removePartListener(fPartListener);
-			site.setSelectionProvider(null);
-		}
+		site.getPage().removePartListener(fPartListener);
+		site.getPage().removePostSelectionListener(fPostSelectionListener);
+
+		TourManager.getInstance().removePropertyListener(this);
+
+		site.setSelectionProvider(null);
 
 		super.dispose();
 	}
@@ -201,6 +214,10 @@ public class TourEditor extends EditorPart {
 	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
+	}
+
+	public void propertyChanged(int propertyId) {
+		fTourChart.updateTourChart(true);
 	}
 
 	@Override

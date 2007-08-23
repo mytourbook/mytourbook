@@ -53,7 +53,7 @@ public class TourChartConfiguration {
 	private ArrayList<Integer>		visibleGraphSequence	= new ArrayList<Integer>();
 
 	/**
-	 * contains the min/max keeper object or <code>null</code> when min/max is not kept
+	 * contains the min/max keeper or <code>null</code> when min/max is not kept
 	 */
 	private ChartYDataMinMaxKeeper	fMinMaxKeeper;
 
@@ -115,7 +115,8 @@ public class TourChartConfiguration {
 	}
 
 	/**
-	 * @return the min/max keeper
+	 * @return Returns the min/max keeper of the chart configuration or <code>null</code> when a
+	 *         min/max keeper is not set
 	 */
 	ChartYDataMinMaxKeeper getMinMaxKeeper() {
 		return fMinMaxKeeper;

@@ -25,6 +25,7 @@ import net.tourbook.colors.GraphColors;
 
 public class StatisticDayAltitude extends StatisticDay {
 
+	@Override
 	void updateChart(final TourDataTour tourTimeData) {
 
 		final ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
@@ -64,6 +65,6 @@ public class StatisticDayAltitude extends StatisticDay {
 		}
 
 		// show the data in the chart
-		fChart.setChartDataModel(chartModel);
+		fChart.updateChart(chartModel);
 	}
 }

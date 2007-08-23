@@ -38,8 +38,7 @@ public class ChartXSlider {
 	public final static int					halfSliderHitLineHeight	= 10;
 	public final static int					sliderHitLineHeight		= 2 * halfSliderHitLineHeight;
 
-	private final Rectangle					hitRectangle			= new Rectangle(
-																			0,
+	private final Rectangle					hitRectangle			= new Rectangle(0,
 																			0,
 																			sliderHitLineHeight,
 																			0);
@@ -111,8 +110,7 @@ public class ChartXSlider {
 	 */
 	Rectangle getHitRectangle() {
 
-		final Rectangle rect = new Rectangle(
-				hitRectangle.x,
+		final Rectangle rect = new Rectangle(hitRectangle.x,
 				hitRectangle.y,
 				hitRectangle.width,
 				hitRectangle.height);
@@ -136,6 +134,9 @@ public class ChartXSlider {
 		return positionRatio;
 	}
 
+	/**
+	 * @return Returns the position of the slider in the values array
+	 */
 	public int getValuesIndex() {
 		return valuesIndex;
 	}
@@ -199,8 +200,7 @@ public class ChartXSlider {
 		 * is auto-zoomed to the slider position in the mouse up event
 		 */
 		if (adjustToImageWidth) {
-			newDevVirtualSliderLinePos = Math.min(devVirtualGraphImageWidth, Math.max(
-					0,
+			newDevVirtualSliderLinePos = Math.min(devVirtualGraphImageWidth, Math.max(0,
 					newDevVirtualSliderLinePos));
 		}
 

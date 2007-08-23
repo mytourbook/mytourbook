@@ -23,6 +23,7 @@ import net.tourbook.colors.GraphColors;
 
 public class StatisticWeekAltitude extends StatisticWeek {
 
+	@Override
 	void updateChart(TourDataWeek tourWeekData) {
 
 		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
@@ -36,8 +37,7 @@ public class StatisticWeekAltitude extends StatisticWeek {
 		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourWeekData.fAltitudeLow,
-				tourWeekData.fAltitudeHigh
-				);
+				tourWeekData.fAltitudeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
@@ -52,6 +52,6 @@ public class StatisticWeekAltitude extends StatisticWeek {
 		}
 
 		// show the fDataModel in the chart
-		fChart.setChartDataModel(chartModel);
+		fChart.updateChart(chartModel);
 	}
 }

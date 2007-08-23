@@ -77,4 +77,8 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	APP_DATA_FILTER_IS_MODIFIED		= "application.data-filter-is-modified";	//$NON-NLS-1$
 
+	public static final String	GRAPH_PROPERTY_USE_CUSTOM		= "graph.property.useCustom";
+	public static final String	GRAPH_PROPERTY_TIMESLICE		= "graph.property.timeslice";
+	public static final String	GRAPH_PROPERTY_SPEED_CHARTTYPE	= "graph.property.speed.chartType";
+
 }

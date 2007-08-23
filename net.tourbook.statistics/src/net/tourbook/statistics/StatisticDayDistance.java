@@ -24,6 +24,7 @@ import net.tourbook.colors.GraphColors;
 
 public class StatisticDayDistance extends StatisticDay {
 
+	@Override
 	void updateChart(TourDataTour tourTimeData) {
 
 		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
@@ -64,6 +65,6 @@ public class StatisticDayDistance extends StatisticDay {
 		}
 
 		// show the data in the chart
-		fChart.setChartDataModel(chartModel);
+		fChart.updateChart(chartModel);
 	}
 }

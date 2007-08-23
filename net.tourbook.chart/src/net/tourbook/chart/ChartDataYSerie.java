@@ -407,4 +407,8 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public void setYTitle(String title) {
 		fYTitle = title;
 	}
+
+	public int getChartType() {
+		return fChartType;
+	}
 }

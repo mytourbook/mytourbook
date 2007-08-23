@@ -87,6 +87,7 @@ public class TourCompareManager {
 
 		Job compareJob = new Job(Messages.TourMap_Compare_job_title) {
 
+			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 
 				final int tours2Compare = compareTours.length * refTourContext.length;
@@ -279,7 +280,7 @@ public class TourCompareManager {
 
 			int altitudeDiff = -1;
 
-			int startAltDiff = Math.abs(normCompAltitudes[normCompareIndex] - normRefAltitudes[0]);
+//			int startAltDiff = Math.abs(normCompAltitudes[normCompareIndex] - normRefAltitudes[0]);
 
 			// loop: all data in the reference tour
 			for (int normRefIndex = 0; normRefIndex < normRefAltitudes.length; normRefIndex++) {

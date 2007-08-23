@@ -23,6 +23,7 @@ import net.tourbook.colors.GraphColors;
 
 public class StatisticWeekCombined extends StatisticWeek {
 
+	@Override
 	void updateChart(TourDataWeek tourWeekData) {
 
 		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
@@ -33,8 +34,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 		chartModel.setXData(xData);
 
 		// distance
-		ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourWeekData.fDistanceLow,
 				tourWeekData.fDistanceHigh);
@@ -48,8 +48,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
 
 		// altitude
-		yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourWeekData.fAltitudeLow,
 				tourWeekData.fAltitudeHigh);
@@ -63,8 +62,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
 
 		// duration
-		yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourWeekData.fTimeLow,
 				tourWeekData.fTimeHigh);
@@ -82,6 +80,6 @@ public class StatisticWeekCombined extends StatisticWeek {
 		}
 
 		// show the fDataModel in the chart
-		fChart.setChartDataModel(chartModel);
+		fChart.updateChart(chartModel);
 	}
 }

@@ -22,7 +22,8 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
 
 public class StatisticWeekTourTime extends StatisticWeek {
-	
+
+	@Override
 	void updateChart(TourDataWeek tourWeekData) {
 
 		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
@@ -33,12 +34,10 @@ public class StatisticWeekTourTime extends StatisticWeek {
 		chartModel.setXData(xData);
 
 		// duration
-		ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourWeekData.fTimeLow,
-				tourWeekData.fTimeHigh
-				);
+				tourWeekData.fTimeHigh);
 		yData.setYTitle(Messages.LABEL_DRIVING_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
@@ -53,6 +52,6 @@ public class StatisticWeekTourTime extends StatisticWeek {
 		}
 
 		// show the fDataModel in the chart
-		fChart.setChartDataModel(chartModel);
+		fChart.updateChart(chartModel);
 	}
 }

@@ -179,6 +179,13 @@
             icon="icons/tourfinder-compare.gif"
             id="net.tourbook.views.tourMap.CompareResultView"
             name="%View_Compare_Result"/>
+                <view
+                      category="net.tourbook.category.tourAnalyze"
+                      class="net.tourbook.ui.views.TourChartPropertyView"
+                      icon="icons/tourchart-properties.gif"
+                      id="&quot;net.tourbook.views.TourChartPropertyView&quot;"
+                      name="%View_TourChartProperty">
+                </view>
       <category
             id="net.tourbook.category.system"
             name="%view_category.system">
@@ -306,7 +313,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="net.tourbook.tour.TourEditor"
-            icon="icons/tourfinder.gif"
+            icon="icons/tour-editor.gif"
             id="net.tourbook.tour.TourEditor"
             name="Tour Editor">
       </editor>
@@ -337,6 +344,26 @@
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
                id="net.tourbook.toolbars.tourChart.tools">
+            <command
+                  commandId="net.tourbook.command.tourChart.tool.chartAnalyzer"
+                  icon="icons/chart-analyzer.gif"
+                  label="%Command_tourChart_tool_chartAnalyzer"
+                  mnemonic="%Command_tourChart_tool_chartAnalyzer_mnemonic"
+                  style="push"
+                  tooltip="%Command_tourChart_tool_chartAnalyzer_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
+                  icon="icons/tour-segmenter.gif"
+                  label="%Command_tourChart_tool_tourSegmenter"
+                  mnemonic="%Command_tourChart_tool_tourSegmenter_mnemonic"
+                  style="push"
+                  tooltip="%Command_tourChart_tool_tourSegmenter_tooltip">
+            </command>
+            <separator
+                  name="net.tourbook.separator"
+                  visible="true">
+            </separator>
             <command
                   commandId="net.tourbook.command.tourChart.tool.adjustAltitude"
                   disabledIcon="icons/adjust-altitude-disabled.gif"
@@ -766,6 +793,14 @@
             id="net.tourbook.command.tourChart.tool.tourMarker"
             name="%Command_tourChart_tool_tourMarker">
       </command>
+      <command
+            id="net.tourbook.command.tourChart.tool.chartAnalyzer"
+            name="%Command_tourChart_tool_chartAnalyzer">
+      </command>
+      <command
+            id="net.tourbook.command.tourChart.tool.tourSegmenter"
+            name="%Command_tourChart_tool_tourSegmenter">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -786,6 +821,14 @@
                   definitionId="net.tourbook.definition.isTourChart">
             </reference>
          </activeWhen>
+      </handler>
+      <handler
+            class="net.tourbook.tour.ActionHandlerGraphAnalyzer"
+            commandId="net.tourbook.command.tourChart.tool.chartAnalyzer">
+      </handler>
+      <handler
+            class="net.tourbook.tour.ActionHandlerTourSegmenter"
+            commandId="net.tourbook.command.tourChart.tool.tourSegmenter">
       </handler>
    </extension>
    <extension

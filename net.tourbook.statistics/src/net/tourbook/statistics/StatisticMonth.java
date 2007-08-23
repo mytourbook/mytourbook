@@ -27,7 +27,6 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourPerson;
 
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -46,6 +45,7 @@ public class StatisticMonth extends YearStatistic {
 	private Calendar				fCalendar		= GregorianCalendar.getInstance();
 	private boolean					fIsSynchScaleEnabled;
 
+	@Override
 	public void activateActions(IWorkbenchPartSite partSite) {
 		fChart.updateChartActionHandlers();
 	}
@@ -57,6 +57,7 @@ public class StatisticMonth extends YearStatistic {
 		return false;
 	}
 
+	@Override
 	public void createControl(	Composite parent,
 								IViewSite viewSite,
 								final IPostSelectionProvider postSelectionProvider) {
@@ -95,10 +96,12 @@ public class StatisticMonth extends YearStatistic {
 		updateChart(tourMonthData);
 	}
 
+	@Override
 	public void resetSelection() {
 		fChart.setSelectedBars(null);
 	}
 
+	@Override
 	public boolean selectMonth(Long date) {
 
 		fCalendar.setTimeInMillis(date);
@@ -112,6 +115,7 @@ public class StatisticMonth extends YearStatistic {
 		return true;
 	}
 
+	@Override
 	public void setSynchScale(boolean isSynchScaleEnabled) {
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
@@ -166,9 +170,10 @@ public class StatisticMonth extends YearStatistic {
 		}
 
 		// show the fDataModel in the chart
-		fChart.setChartDataModel(chartModel);
+		fChart.updateChart(chartModel);
 	}
 
+	@Override
 	public void updateToolBar(final boolean refreshToolbar) {
 		fChart.fillToolbar(refreshToolbar);
 	}

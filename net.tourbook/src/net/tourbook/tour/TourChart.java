@@ -81,12 +81,6 @@ public class TourChart extends Chart {
 
 	private ActionChartOptions				fActionOptions;
 
-//	private ActionAdjustAltitude			fActionAdjustAltitude;
-//	private ActionTourMarker				fActionMarkerEditor;
-
-//	private ActionGraphAnalyzer				fActionGraphAnalyzer;
-//	private ActionTourSegmenter				fActionTourSegmenter;
-
 	private final ListenerList				fSelectionListeners					= new ListenerList();
 
 	/**
@@ -137,7 +131,7 @@ public class TourChart extends Chart {
 		if (useInternalActionBar()) {
 			return;
 		}
-//x
+
 		// update tour action handlers
 		fTCActionHandlerManager.updateTourActionHandlers(partSite, this);
 
@@ -160,6 +154,7 @@ public class TourChart extends Chart {
 ////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
 ////		contextService.deactivateContext(fContextBarChart);
 //	}
+
 	/**
 	 * add a data model listener which is fired when the data model has changed
 	 * 
@@ -488,25 +483,10 @@ public class TourChart extends Chart {
 
 		tbm.add(new Separator());
 		tbm.add(fActionOptions);
-//		tbm.add(new Separator());
 
 		tbm.update(true);
 		// ///////////////////////////////////////////////////////
 
-//		fActionGraphAnalyzer = new ActionGraphAnalyzer(this);
-//		fActionTourSegmenter = new ActionTourSegmenter(this);
-//
-//		tbm.add(fActionGraphAnalyzer);
-//		tbm.add(fActionTourSegmenter);
-//
-//		if (fIsToolActions) {
-//
-//			fActionMarkerEditor = new ActionTourMarker(this);
-//			fActionAdjustAltitude = new ActionAdjustAltitude(this);
-//
-//			tbm.add(fActionAdjustAltitude);
-//			tbm.add(fActionMarkerEditor);
-//		}
 	}
 
 	/**
@@ -566,7 +546,7 @@ public class TourChart extends Chart {
 			fTourChartConfig.showTimeOnXAxisBackup = fTourChartConfig.showTimeOnXAxis;
 
 			switchSlidersTo2ndXData();
-			updateChart(true);
+			updateTourChart(true);
 
 //			fActionOptions.actionStartTimeOption.setEnabled(false);
 
@@ -596,7 +576,7 @@ public class TourChart extends Chart {
 			fTourChartConfig.showTimeOnXAxisBackup = fTourChartConfig.showTimeOnXAxis;
 
 			switchSlidersTo2ndXData();
-			updateChart(true);
+			updateTourChart(true);
 
 //			fActionOptions.actionStartTimeOption.setEnabled(true);
 
@@ -784,7 +764,7 @@ public class TourChart extends Chart {
 						TourManager.GRAPH_GRADIENT);
 
 				if (isChartModified) {
-					updateChart(true);
+					updateTourChart(true);
 				}
 			}
 		};
@@ -925,71 +905,6 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * update the chart with the current tour data and chart configuration
-	 * 
-	 * @param keepMinMaxValues
-	 *        <code>true</code> will keep the min/max values from the previous chart
-	 */
-	public void updateChart(final boolean keepMinMaxValues) {
-		updateChart(fTourData, fTourChartConfig, keepMinMaxValues);
-	}
-
-	/**
-	 * Update the chart by providing new tourdata and chart configuration which is used to create
-	 * the chart data model
-	 * 
-	 * @param tourData
-	 * @param chartConfig
-	 * @param keepMinMaxValues
-	 *        when set to <code>true</code> keep the min/max values from the previous chart
-	 */
-	public void updateChart(final TourData tourData,
-							final TourChartConfiguration chartConfig,
-							final boolean keepMinMaxValues) {
-
-		if (tourData == null || chartConfig == null) {
-			return;
-		}
-
-		// keep min/max values for the 'old' chart in the chart config
-		if (fTourChartConfig != null
-				&& fTourChartConfig.getMinMaxKeeper() != null
-				&& keepMinMaxValues) {
-			fTourChartConfig.getMinMaxKeeper().saveMinMaxValues(getDataModel());
-		}
-
-		// set current tour data and chart config
-		fTourData = tourData;
-		fTourChartConfig = chartConfig;
-
-		final ChartDataModel dataModel = TourManager.getInstance().createChartDataModel(tourData,
-				chartConfig);
-
-		setDataModel(dataModel);
-
-		if (fShowActions) {
-			createTourActionProxies();
-			fillToolbar();
-			updateActionState();
-		}
-
-		// restore min/max values from the chart config
-		if (chartConfig.getMinMaxKeeper() != null && keepMinMaxValues) {
-			chartConfig.getMinMaxKeeper().restoreMinMaxValues(dataModel);
-		}
-
-		if (fChartDataModelListener != null) {
-			fChartDataModelListener.dataModelChanged(dataModel);
-		}
-
-		createSegmentsLayer();
-		createMarkerLayer();
-		setGraphLayers();
-
-		setChartDataModel(dataModel);
-	}
-
-	/**
 	 * Updates the marker layer in the chart
 	 * 
 	 * @param showLayer
@@ -1028,6 +943,91 @@ public class TourChart extends Chart {
 		 * the chart needs to be redrawn because the alpha for filling the chart has changed
 		 */
 		redrawChart();
+	}
+
+	/**
+	 * Update the tour chart with the previous data and configuration
+	 * 
+	 * @param keepMinMaxValues
+	 *        <code>true</code> keeps the min/max values from the previous chart
+	 */
+	public void updateTourChart(final boolean keepMinMaxValues) {
+		updateTourChartInternal(fTourData, fTourChartConfig, keepMinMaxValues, false);
+	}
+
+	/**
+	 * Update the tour chart with the previous data and configuration
+	 * 
+	 * @param keepMinMaxValues
+	 *        <code>true</code> keeps the min/max values from the previous chart
+	 * @param isPropertyChanged
+	 *        when <code>true</code> the properties for the tour chart have changed
+	 */
+	public void updateTourChart(boolean keepMinMaxValues, boolean isPropertyChanged) {
+		updateTourChartInternal(fTourData, fTourChartConfig, keepMinMaxValues, isPropertyChanged);
+	}
+
+	/**
+	 * Update the chart by providing new tourdata and chart configuration which is used to create
+	 * the chart data model
+	 * 
+	 * @param tourData
+	 * @param chartConfig
+	 * @param keepMinMaxValues
+	 *        <code>true</code> keeps the min/max values from the previous chart
+	 */
+	public void updateTourChart(final TourData tourData,
+								final TourChartConfiguration chartConfig,
+								final boolean keepMinMaxValues) {
+
+		updateTourChartInternal(tourData, chartConfig, keepMinMaxValues, false);
+	}
+
+	private void updateTourChartInternal(	final TourData newTourData,
+											final TourChartConfiguration newChartConfig,
+											final boolean keepMinMaxValues,
+											boolean isPropertyChanged) {
+
+		if (newTourData == null || newChartConfig == null) {
+			return;
+		}
+
+		// keep min/max values for the 'old' chart in the chart config
+		if (fTourChartConfig != null
+				&& fTourChartConfig.getMinMaxKeeper() != null
+				&& keepMinMaxValues) {
+			fTourChartConfig.getMinMaxKeeper().saveMinMaxValues(getDataModel());
+		}
+
+		// set current tour data and chart config
+		fTourData = newTourData;
+		fTourChartConfig = newChartConfig;
+
+		final ChartDataModel newDataModel = TourManager.getInstance()
+				.createChartDataModel(newTourData, newChartConfig, isPropertyChanged);
+
+		setDataModel(newDataModel);
+
+		if (fShowActions) {
+			createTourActionProxies();
+			fillToolbar();
+			updateActionState();
+		}
+
+		// restore min/max values from the chart config
+		if (newChartConfig.getMinMaxKeeper() != null && keepMinMaxValues) {
+			newChartConfig.getMinMaxKeeper().restoreMinMaxValues(newDataModel);
+		}
+
+		if (fChartDataModelListener != null) {
+			fChartDataModelListener.dataModelChanged(newDataModel);
+		}
+
+		createSegmentsLayer();
+		createMarkerLayer();
+		setGraphLayers();
+
+		updateChart(newDataModel);
 	}
 
 	/**

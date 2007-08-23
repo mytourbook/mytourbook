@@ -23,6 +23,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
+import net.tourbook.tour.ITourChartPropertyListener;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourChart;
@@ -48,7 +49,7 @@ import org.eclipse.ui.part.ViewPart;
 // author: Wolfgang Schramm
 // create: 09.07.2007
 
-public class TourChartView extends ViewPart {
+public class TourChartView extends ViewPart implements ITourChartPropertyListener {
 
 	public static final String		ID	= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
@@ -118,7 +119,7 @@ public class TourChartView extends ViewPart {
 					fTourChartConfig = TourManager.createTourChartConfiguration();
 
 					if (fTourChart != null) {
-						fTourChart.updateChart(fTourData, fTourChartConfig, false);
+						fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 					}
 				}
 			}
@@ -175,6 +176,7 @@ public class TourChartView extends ViewPart {
 		addPrefListener();
 		addPartListener();
 		addTourChangeListener();
+		TourManager.getInstance().addPropertyListener(this);
 
 		// set this view part as selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -194,6 +196,10 @@ public class TourChartView extends ViewPart {
 
 			public void propertyChanged(Object source, int propId) {
 				if (propId == TourDatabase.PROPERTY_TOUR_IS_CHANGED_AND_PERSISTED) {
+
+					if (fTourData == null) {
+						return;
+					}
 
 					// reload data from the database
 					fTourData = TourDatabase.getTourData(fTourData.getTourId());
@@ -219,6 +225,7 @@ public class TourChartView extends ViewPart {
 		page.removePostSelectionListener(fPostSelectionListener);
 
 		TourDatabase.getInstance().removePropertyListener(fTourChangeListener);
+		TourManager.getInstance().removePropertyListener(this);
 
 		getSite().setSelectionProvider(null);
 
@@ -243,8 +250,15 @@ public class TourChartView extends ViewPart {
 
 		if (selection instanceof SelectionTourData) {
 
-			fTourData = ((SelectionTourData) selection).getTourData();
-			fTourChart.updateChart(fTourData, fTourChartConfig, false);
+			final TourData selectionTourData = ((SelectionTourData) selection).getTourData();
+
+			// check if this tour chart already shows the tour data
+			if (selectionTourData == fTourData) {
+				return;
+			}
+
+			fTourData = selectionTourData;
+			fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 			fPageBook.showPage(fTourChart);
 
 		} else if (selection instanceof SelectionTourId) {
@@ -274,12 +288,16 @@ public class TourChartView extends ViewPart {
 			return;
 		}
 
-		fTourChart.updateChart(fTourData, fTourChartConfig, false);
+		fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 
 		fPageBook.showPage(fTourChart);
 
 		// set application window title
 		setTitleToolTip(TourManager.getTourDate(fTourData));
+	}
+
+	public void propertyChanged(int propertyId) {
+		fTourChart.updateTourChart(true, true);
 	}
 
 }

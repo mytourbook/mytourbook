@@ -44,7 +44,7 @@ public class ChartDrawingData {
 	private Rectangle[][]			barFocusRectangles;
 
 	private int						barRectangleWidth;
-	private int						barRectanglePos;
+	private int						fDevBarRectangleXPos;
 
 	/**
 	 * Contains all unit labels and their positions for the x axis
@@ -84,9 +84,13 @@ public class ChartDrawingData {
 	private int						graphYBottom;
 	private int						graphYTop;
 
-	// graph width
-
 	private int						barPosition				= BAR_POS_LEFT;
+
+	private int						fChartType;
+
+	public ChartDrawingData(int chartType) {
+		fChartType = chartType;
+	}
 
 	/**
 	 * @return Returns the barFocusRectangles.
@@ -105,8 +109,8 @@ public class ChartDrawingData {
 	/**
 	 * @return Returns the barRectanglePos.
 	 */
-	public int getBarRectanglePos() {
-		return barRectanglePos;
+	public int getDevBarRectangleXPos() {
+		return fDevBarRectangleXPos;
 	}
 
 	/**
@@ -121,6 +125,10 @@ public class ChartDrawingData {
 	 */
 	public int getBarRectangleWidth() {
 		return barRectangleWidth;
+	}
+
+	public int getChartType() {
+		return fChartType;
 	}
 
 	public int getDevGraphHeight() {
@@ -226,6 +234,10 @@ public class ChartDrawingData {
 		return xData2nd;
 	}
 
+	public String getXTitle() {
+		return fXTitle;
+	}
+
 	/**
 	 * @return Returns the xUnits.
 	 */
@@ -281,8 +293,8 @@ public class ChartDrawingData {
 	 * @param barRectanglePos
 	 *        The barRectanglePos to set.
 	 */
-	public void setBarRectanglePos(int barRectanglePos) {
-		this.barRectanglePos = barRectanglePos;
+	public void setDevBarRectangleXPos(int barRectanglePos) {
+		fDevBarRectangleXPos = barRectanglePos;
 	}
 
 	/**
@@ -393,6 +405,10 @@ public class ChartDrawingData {
 		xData2nd = data2nd;
 	}
 
+	public void setXTitle(String title) {
+		fXTitle = title;
+	}
+
 	/**
 	 * set the position of the unit text, this can be XUNIT_TEXT_POS_LEFT or XUNIT_TEXT_POS_CENTER
 	 * 
@@ -417,13 +433,5 @@ public class ChartDrawingData {
 	 */
 	public void setYSliderHitRect(Rectangle[] sliderHitRect) {
 		ySliderHitRect = sliderHitRect;
-	}
-
-	public String getXTitle() {
-		return fXTitle;
-	}
-
-	public void setXTitle(String title) {
-		fXTitle = title;
 	}
 }

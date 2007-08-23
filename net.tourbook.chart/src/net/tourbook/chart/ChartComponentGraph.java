@@ -473,8 +473,9 @@ public class ChartComponentGraph extends Canvas {
 				switch (event.type) {
 				case SWT.MouseHover:
 				case SWT.MouseMove:
-					if (updateToolTip(event.x, event.y))
+					if (updateToolTip(event.x, event.y)) {
 						break;
+					}
 					// FALL THROUGH
 				case SWT.MouseExit:
 				case SWT.MouseDown:
@@ -1111,9 +1112,21 @@ public class ChartComponentGraph extends Canvas {
 		final boolean axisDirection = yData.isYAxisDirection();
 		final int barPosition = drawingData.getBarPosition();
 
+		// get the horizontal offset for the graph
+		int graphValueOffset;
+		if (fChartComponents.zoomMarkerPositionIn == null) {
+			// a zoom marker is not set, draw it normally
+			graphValueOffset = (int) (Math.max(0, fDevGraphImageXOffset) / scaleX);
+		} else {
+			// adjust the start position to the zoom marker position
+			graphValueOffset = (int) (fDevGraphImageXOffset / scaleX);
+		}
+
 		// get the top/bottom of the graph
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devYTop = devYBottom - drawingData.getDevGraphHeight();
+
+		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
 
 		final int xValues[] = xData.getHighValues()[0];
 		final int yHighSeries[][] = yData.getHighValues();
@@ -1134,7 +1147,7 @@ public class ChartComponentGraph extends Canvas {
 		final int devBarWidthComputed = drawingData.getBarRectangleWidth();
 		final int devBarWidth = Math.max(1, devBarWidthComputed);
 
-		int devBarPos = drawingData.getBarRectanglePos();
+		int devBarXPos = drawingData.getDevBarRectangleXPos();
 
 		final int serieLayout = yData.getChartLayout();
 
@@ -1149,14 +1162,15 @@ public class ChartComponentGraph extends Canvas {
 
 			// reposition the rectangle when the bars are beside each other
 			if (serieLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE) {
-				devBarPos += serieIndex * devBarWidth;
+				devBarXPos += serieIndex * devBarWidth;
 			}
 
 			// loop: all values in the current serie
 			for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
 
 				// get the x position
-				final int devXPos = (int) (xValues[valueIndex] * scaleX) + devBarPos;
+				final int devXPos = (int) ((xValues[valueIndex] - graphValueOffset) * scaleX)
+						+ devBarXPos;
 
 				final int devBarWidthSelected = devBarWidth;
 				final int devBarWidth2 = devBarWidthSelected / 2;
@@ -1182,7 +1196,8 @@ public class ChartComponentGraph extends Canvas {
 					continue;
 				}
 
-				final int devBarHeight = (int) (barHeight * scaleY);
+				int devBarHeight = (int) (barHeight * scaleY);
+				devBarHeight = 30;
 
 				// get the old y position for stacked bars
 				int devYPreviousHeight = 0;
@@ -1582,7 +1597,7 @@ public class ChartComponentGraph extends Canvas {
 					fGraphCoreImage = ChartUtil.createImage(display, fGraphCoreImage, imageRect);
 				}
 
-				int chartType = fChart.getChartDataModel().getChartType();
+//				int chartType = fChart.getChartDataModel().getChartType();
 
 				// create graphics context
 				GC gc = new GC(fGraphCoreImage);
@@ -1604,7 +1619,7 @@ public class ChartComponentGraph extends Canvas {
 					}
 
 					// draw units and grid on the x and y axis
-					switch (chartType) {
+					switch (drawingData.getChartType()) {
 					case ChartDataModel.CHART_TYPE_LINE:
 						if (graphIndex == fDrawingData.size() - 1) {
 							// draw the unit label and unit tick only on the
@@ -1882,10 +1897,9 @@ public class ChartComponentGraph extends Canvas {
 
 		final float scaleX = drawingData.getScaleX();
 
-		final ZoomMarkerPosition zoomMarkerPositionIn = fChartComponents.zoomMarkerPositionIn;
+		// get the horizontal offset for the graph
 		int graphValueOffset;
-
-		if (zoomMarkerPositionIn == null) {
+		if (fChartComponents.zoomMarkerPositionIn == null) {
 			// a zoom marker is not set, draw it normally
 			graphValueOffset = (int) (Math.max(0, fDevGraphImageXOffset) / scaleX);
 		} else {
@@ -3513,11 +3527,9 @@ public class ChartComponentGraph extends Canvas {
 
 				}
 
-			} else if (ySliderDragged != null)
-
+			} else if (ySliderDragged != null) {
 				adjustYSlider();
-
-			else if (fIsXMarkerMoved) {
+			} else if (fIsXMarkerMoved) {
 
 				fIsXMarkerMoved = false;
 
@@ -4329,8 +4341,9 @@ public class ChartComponentGraph extends Canvas {
 		final Rectangle rect = getMonitor().getBounds();
 		final Point pt = new Point(cursorLocation.x, cursorLocation.y + cursorHeight + 2);
 		pt.x = Math.max(pt.x, rect.x);
-		if (pt.x + size.x > rect.x + rect.width)
+		if (pt.x + size.x > rect.x + rect.width) {
 			pt.x = rect.x + rect.width - size.x;
+		}
 		if (pt.y + size.y > rect.y + rect.height) {
 			pt.y = cursorLocation.y - 2 - size.y;
 		}

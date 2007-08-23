@@ -38,6 +38,6 @@ public class ActionZoomFitGraph extends Action {
 	public void run() {
 
 		tourChart.zoomOut(false);
-		tourChart.updateChart(false);
+		tourChart.updateTourChart(false);
 	}
 }

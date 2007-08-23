@@ -345,7 +345,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		}
 
 		// show the data in the chart
-		fChart.setChartDataModel(chartModel, isResetSelection);
+		fChart.updateChart(chartModel, isResetSelection);
 	}
 
 	@Override

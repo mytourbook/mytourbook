@@ -61,13 +61,14 @@ public class TourChartAnalyzerView extends ViewPart {
 	private static final int			LAYOUT_MEDIUM	= 2;
 	private static final int			LAYOUT_LARGE	= 3;
 
-	private ISelectionListener			fSelectionListener;
+	private ISelectionListener			fPostSelectionListener;
 
 	private Font						fontBold;
 
 	private Color						fBgColorData;
 	private Color						fBgColorHeader;
 
+	private ScrolledComposite			fScrolledContainer;
 	private Composite					fPartContainer;
 	private Composite					fContainer;
 
@@ -81,8 +82,6 @@ public class TourChartAnalyzerView extends ViewPart {
 	private SelectionChartInfo			fChartInfo;
 
 	private int							fLayout;
-
-	private ScrolledComposite			fScrolledContainer;
 
 	/**
 	 * This class generates and contains the labels for one row in the view
@@ -141,6 +140,17 @@ public class TourChartAnalyzerView extends ViewPart {
 			left.setLayoutData(gd);
 		}
 
+		void createInfoMax() {
+
+			max = new Label(fContainer, SWT.TRAIL);
+			max.setForeground(getColor(fChartData.getRgbLine()[0]));
+			max.setBackground(fBgColorData);
+
+			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+			gd.horizontalIndent = 5;
+			max.setLayoutData(gd);
+		}
+
 		void createInfoMin() {
 
 			min = new Label(fContainer, SWT.TRAIL);
@@ -151,17 +161,6 @@ public class TourChartAnalyzerView extends ViewPart {
 			gd.horizontalIndent = 5;
 			min.setLayoutData(gd);
 
-		}
-
-		void createInfoMax() {
-
-			max = new Label(fContainer, SWT.TRAIL);
-			max.setForeground(getColor(fChartData.getRgbLine()[0]));
-			max.setBackground(fBgColorData);
-
-			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-			gd.horizontalIndent = 5;
-			max.setLayoutData(gd);
 		}
 
 		void createInfoRight() {
@@ -218,6 +217,53 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	public TourChartAnalyzerView() {
 		super();
+	}
+
+	private void addListeners() {
+
+		fPartContainer.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent event) {
+				if (fChartDataModel == null) {
+					return;
+				}
+				createLayout();
+				updateInfo(fChartInfo);
+			}
+		});
+
+		fPostSelectionListener = new ISelectionListener() {
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+				if (selection instanceof SelectionChartInfo) {
+
+					updateInfo((SelectionChartInfo) selection);
+
+				} else if (selection instanceof SelectionChartXSliderPosition) {
+
+					/*
+					 * selection is not from a chart, so it's possible that the chart has not yet
+					 * the correct slider positon, we create the chart info from the slider position
+					 */
+					updateInfo(((SelectionChartXSliderPosition) selection));
+
+				} else if (selection instanceof SelectionTourChart) {
+
+					TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
+					if (tourChart != null) {
+						updateInfo(tourChart.getChartInfo());
+					}
+
+				} else if (selection instanceof SelectionActiveEditor) {
+
+					updateInfo(((SelectionActiveEditor) selection).getTourEditor()
+							.getTourChart()
+							.getChartInfo());
+				}
+			}
+		};
+
+		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
 	private void createHeaderAvg() {
@@ -337,203 +383,212 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		fScrolledContainer.setContent(fContainer);
 
-		createLayoutDetails();
-	}
-
-	private void createLayoutDetails() {
-
 		if (fLayout == LAYOUT_TINY) {
-
-			fGraphInfos = new ArrayList<GraphInfo>();
-
-			// create graph info list
-			for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
-				fGraphInfos.add(new GraphInfo(xyData));
-			}
-
-			// ----------------------------------------------------------------
-
-			createHeaderLeft();
-			createHeaderUnitLabel();
-
-			for (GraphInfo graphInfo : fGraphInfos) {
-				graphInfo.createInfoLeft();
-				graphInfo.createValueUnit();
-			}
-
-			// ----------------------------------------------------------------
-
-			createVerticalBorder();
-
-			createHeaderRight();
-			createHeaderUnitLabel();
-
-			for (GraphInfo graphInfo : fGraphInfos) {
-				graphInfo.createInfoRight();
-				graphInfo.createValueUnit();
-			}
-
-			// ----------------------------------------------------------------
-
-			createVerticalBorder();
-
-			createHeaderDiff();
-			createHeaderUnitLabel();
-
-			for (GraphInfo graphInfo : fGraphInfos) {
-				graphInfo.createInfoDiff();
-				graphInfo.createValueUnit();
-			}
-
-			// ----------------------------------------------------------------
-
-			createVerticalBorder();
-
-			createHeaderAvg();
-			createHeaderUnitLabel();
-
-			for (GraphInfo graphInfo : fGraphInfos) {
-				graphInfo.createInfoAvg();
-				graphInfo.createValueUnit();
-			}
-
-			// ----------------------------------------------------------------
-
-			createVerticalBorder();
-
-			createHeaderMin();
-			createHeaderUnitLabel();
-
-			for (GraphInfo graphInfo : fGraphInfos) {
-				graphInfo.createInfoMin();
-				graphInfo.createValueUnit();
-			}
-
-			// ----------------------------------------------------------------
-
-			createVerticalBorder();
-
-			createHeaderMax();
-			createHeaderUnitLabel();
-
-			for (GraphInfo graphInfo : fGraphInfos) {
-				graphInfo.createInfoMax();
-				graphInfo.createValueUnit();
-			}
+			createLayoutTiny();
 
 		} else if (fLayout == LAYOUT_SMALL) {
-
-			createHeaderLeft();
-			createHeaderRight();
-			createHeaderUnitLabel();
-
-			// add all graphs and the x axis to the layout
-			fGraphInfos = new ArrayList<GraphInfo>();
-			for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
-
-				GraphInfo graphInfo = new GraphInfo(xyData);
-
-				graphInfo.createInfoLeft();
-				graphInfo.createInfoRight();
-				graphInfo.createValueUnit();
-
-				fGraphInfos.add(graphInfo);
-			}
-
-			// ----------------------------------------------------------------
-
-			createVerticalBorder();
-
-			createHeaderDiff();
-			createHeaderAvg();
-			createHeaderUnitLabel();
-
-			for (GraphInfo graphInfo : fGraphInfos) {
-				graphInfo.createInfoDiff();
-				graphInfo.createInfoAvg();
-				graphInfo.createValueUnit();
-			}
-
-			// ----------------------------------------------------------------
-
-			createVerticalBorder();
-
-			createHeaderMin();
-			createHeaderMax();
-			createHeaderUnitLabel();
-
-			for (GraphInfo graphInfo : fGraphInfos) {
-				graphInfo.createInfoMin();
-				graphInfo.createInfoMax();
-				graphInfo.createValueUnit();
-			}
+			createLayoutSmall();
 
 		} else if (fLayout == LAYOUT_MEDIUM) {
-
-			createHeaderLeft();
-			createHeaderRight();
-			createHeaderDiff();
-			createHeaderUnitLabel();
-
-			// add all graphs and the x axis to the layout
-			fGraphInfos = new ArrayList<GraphInfo>();
-			for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
-
-				GraphInfo graphInfo = new GraphInfo(xyData);
-
-				graphInfo.createInfoLeft();
-				graphInfo.createInfoRight();
-				graphInfo.createInfoDiff();
-				graphInfo.createValueUnit();
-
-				fGraphInfos.add(graphInfo);
-			}
-
-			createVerticalBorder();
-
-			createHeaderMin();
-			createHeaderMax();
-			createHeaderAvg();
-			createHeaderUnitLabel();
-
-			for (GraphInfo graphInfo : fGraphInfos) {
-				graphInfo.createInfoMin();
-				graphInfo.createInfoMax();
-				graphInfo.createInfoAvg();
-				graphInfo.createValueUnit();
-			}
+			createLayoutMedium();
 
 		} else if (fLayout == LAYOUT_LARGE) {
+			createLayoutLarge();
+		}
+	}
 
-			createHeaderValueLabel();
-			createHeaderLeft();
-			createHeaderRight();
-			createHeaderMin();
-			createHeaderMax();
-			createHeaderDiff();
-			createHeaderAvg();
-			createHeaderUnitLabel();
+	private void createLayoutLarge() {
 
-			// add all graphs and the x axis to the layout
-			fGraphInfos = new ArrayList<GraphInfo>();
-			for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
+		createHeaderValueLabel();
+		createHeaderLeft();
+		createHeaderRight();
+		createHeaderMin();
+		createHeaderMax();
+		createHeaderDiff();
+		createHeaderAvg();
+		createHeaderUnitLabel();
 
-				GraphInfo graphInfo = new GraphInfo(xyData);
+		// add all graphs and the x axis to the layout
+		fGraphInfos = new ArrayList<GraphInfo>();
+		for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
 
-				graphInfo.createValueLabel();
+			GraphInfo graphInfo = new GraphInfo(xyData);
 
-				graphInfo.createInfoLeft();
-				graphInfo.createInfoRight();
-				graphInfo.createInfoMin();
-				graphInfo.createInfoMax();
-				graphInfo.createInfoDiff();
-				graphInfo.createInfoAvg();
+			graphInfo.createValueLabel();
 
-				graphInfo.createValueUnit();
+			graphInfo.createInfoLeft();
+			graphInfo.createInfoRight();
+			graphInfo.createInfoMin();
+			graphInfo.createInfoMax();
+			graphInfo.createInfoDiff();
+			graphInfo.createInfoAvg();
 
-				fGraphInfos.add(graphInfo);
-			}
+			graphInfo.createValueUnit();
 
+			fGraphInfos.add(graphInfo);
+		}
+	}
+
+	private void createLayoutMedium() {
+
+		createHeaderLeft();
+		createHeaderRight();
+		createHeaderDiff();
+		createHeaderUnitLabel();
+
+		// add all graphs and the x axis to the layout
+		fGraphInfos = new ArrayList<GraphInfo>();
+		for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
+
+			GraphInfo graphInfo = new GraphInfo(xyData);
+
+			graphInfo.createInfoLeft();
+			graphInfo.createInfoRight();
+			graphInfo.createInfoDiff();
+			graphInfo.createValueUnit();
+
+			fGraphInfos.add(graphInfo);
+		}
+
+		createVerticalBorder();
+
+		createHeaderMin();
+		createHeaderMax();
+		createHeaderAvg();
+		createHeaderUnitLabel();
+
+		for (GraphInfo graphInfo : fGraphInfos) {
+			graphInfo.createInfoMin();
+			graphInfo.createInfoMax();
+			graphInfo.createInfoAvg();
+			graphInfo.createValueUnit();
+		}
+	}
+
+	private void createLayoutSmall() {
+
+		createHeaderLeft();
+		createHeaderRight();
+		createHeaderUnitLabel();
+
+		// add all graphs and the x axis to the layout
+		fGraphInfos = new ArrayList<GraphInfo>();
+		for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
+
+			GraphInfo graphInfo = new GraphInfo(xyData);
+
+			graphInfo.createInfoLeft();
+			graphInfo.createInfoRight();
+			graphInfo.createValueUnit();
+
+			fGraphInfos.add(graphInfo);
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createHeaderDiff();
+		createHeaderAvg();
+		createHeaderUnitLabel();
+
+		for (GraphInfo graphInfo : fGraphInfos) {
+			graphInfo.createInfoDiff();
+			graphInfo.createInfoAvg();
+			graphInfo.createValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createHeaderMin();
+		createHeaderMax();
+		createHeaderUnitLabel();
+
+		for (GraphInfo graphInfo : fGraphInfos) {
+			graphInfo.createInfoMin();
+			graphInfo.createInfoMax();
+			graphInfo.createValueUnit();
+		}
+	}
+
+	private void createLayoutTiny() {
+		fGraphInfos = new ArrayList<GraphInfo>();
+
+		// create graph info list
+		for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
+			fGraphInfos.add(new GraphInfo(xyData));
+		}
+
+		// ----------------------------------------------------------------
+
+		createHeaderLeft();
+		createHeaderUnitLabel();
+
+		for (GraphInfo graphInfo : fGraphInfos) {
+			graphInfo.createInfoLeft();
+			graphInfo.createValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createHeaderRight();
+		createHeaderUnitLabel();
+
+		for (GraphInfo graphInfo : fGraphInfos) {
+			graphInfo.createInfoRight();
+			graphInfo.createValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createHeaderDiff();
+		createHeaderUnitLabel();
+
+		for (GraphInfo graphInfo : fGraphInfos) {
+			graphInfo.createInfoDiff();
+			graphInfo.createValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createHeaderAvg();
+		createHeaderUnitLabel();
+
+		for (GraphInfo graphInfo : fGraphInfos) {
+			graphInfo.createInfoAvg();
+			graphInfo.createValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createHeaderMin();
+		createHeaderUnitLabel();
+
+		for (GraphInfo graphInfo : fGraphInfos) {
+			graphInfo.createInfoMin();
+			graphInfo.createValueUnit();
+		}
+
+		// ----------------------------------------------------------------
+
+		createVerticalBorder();
+
+		createHeaderMax();
+		createHeaderUnitLabel();
+
+		for (GraphInfo graphInfo : fGraphInfos) {
+			graphInfo.createInfoMax();
+			graphInfo.createValueUnit();
 		}
 	}
 
@@ -552,7 +607,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		fontBold = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
-		setListeners();
+		addListeners();
 
 		// show chart info for the current selection
 		ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
@@ -591,7 +646,7 @@ public class TourChartAnalyzerView extends ViewPart {
 	@Override
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(fSelectionListener);
+		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 
 		fColorCache.dispose();
 
@@ -621,51 +676,6 @@ public class TourChartAnalyzerView extends ViewPart {
 		if (fScrolledContainer != null) {
 			fScrolledContainer.setFocus();
 		}
-	}
-
-	private void setListeners() {
-
-		fPartContainer.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent event) {
-				if (fChartDataModel == null) {
-					return;
-				}
-				createLayout();
-				updateInfo(fChartInfo);
-			}
-		});
-
-		fSelectionListener = new ISelectionListener() {
-			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-
-				if (selection instanceof SelectionChartInfo) {
-
-					updateInfo((SelectionChartInfo) selection);
-
-				} else if (selection instanceof SelectionChartXSliderPosition) {
-
-					Chart tourChart = ((SelectionChartXSliderPosition) selection).chart;
-					if (tourChart != null) {
-						updateInfo(tourChart.getChartInfo());
-					}
-
-				} else if (selection instanceof SelectionTourChart) {
-
-					TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
-					if (tourChart != null) {
-						updateInfo(tourChart.getChartInfo());
-					}
-
-				} else if (selection instanceof SelectionActiveEditor) {
-
-					updateInfo(((SelectionActiveEditor) selection).getTourEditor()
-							.getTourChart()
-							.getChartInfo());
-				}
-			}
-		};
-		getSite().getPage().addPostSelectionListener(fSelectionListener);
 	}
 
 	private void updateInfo(final SelectionChartInfo chartInfo) {
@@ -704,11 +714,29 @@ public class TourChartAnalyzerView extends ViewPart {
 		fPartContainer.layout();
 	}
 
+	private void updateInfo(SelectionChartXSliderPosition sliderPosition) {
+
+		SelectionChartInfo chartInfo = new SelectionChartInfo();
+
+		if (sliderPosition.chart == null) {
+			return;
+		}
+
+		Chart chart = sliderPosition.chart;
+		chartInfo.chartDataModel = chart.getChartDataModel();
+		chartInfo.chartDrawingData = chart.getChartDrawingData();
+
+		chartInfo.leftSliderValuesIndex = sliderPosition.slider1ValueIndex;
+		chartInfo.rightSliderValuesIndex = sliderPosition.slider2ValueIndex;
+
+		updateInfo(chartInfo);
+	}
+
 	private void updateInfoData(final SelectionChartInfo chartInfo) {
 
 		final ChartDataXSerie xData = fDrawingData.get(0).getXData();
-		int valuesIndexLeft = chartInfo.leftSlider.getValuesIndex();
-		int valuesIndexRight = chartInfo.rightSlider.getValuesIndex();
+		int valuesIndexLeft = chartInfo.leftSliderValuesIndex;
+		int valuesIndexRight = chartInfo.rightSliderValuesIndex;
 
 		for (final GraphInfo graphInfo : fGraphInfos) {
 

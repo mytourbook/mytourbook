@@ -21,7 +21,7 @@ public class ActionHandlerShowStartTime extends TCActionHandler {
 		}
 
 		fTourChart.fTourChartConfig.isStartTime = isItemChecked;
-		fTourChart.updateChart(true);
+		fTourChart.updateTourChart(true);
 
 		/*
 		 * update UI check state

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -256,8 +257,8 @@ public class Chart extends ViewForm {
 		chartInfo.chartDrawingData = fChartComponents.getChartDrawingData();
 
 		ChartComponentGraph chartGraph = fChartComponents.getChartComponentGraph();
-		chartInfo.leftSlider = chartGraph.getLeftSlider();
-		chartInfo.rightSlider = chartGraph.getRightSlider();
+		chartInfo.leftSliderValuesIndex = chartGraph.getLeftSlider().getValuesIndex();
+		chartInfo.rightSliderValuesIndex = chartGraph.getRightSlider().getValuesIndex();
 
 		return chartInfo;
 	}
@@ -379,7 +380,7 @@ public class Chart extends ViewForm {
 	public void fireSliderMoveEvent() {
 
 		final SelectionChartInfo chartInfo = createChartInfo();
-
+//		System.out.println("fireSliderMove... " + this);
 		Object[] listeners = fSliderMoveListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final ISliderMoveListener listener = (ISliderMoveListener) listeners[i];
@@ -434,6 +435,10 @@ public class Chart extends ViewForm {
 		return fChartDataModel;
 	}
 
+	public ArrayList<ChartDrawingData> getChartDrawingData() {
+		return fChartComponents.getChartDrawingData();
+	}
+
 	/**
 	 * Return information about the chart
 	 * 
@@ -447,12 +452,23 @@ public class Chart extends ViewForm {
 		return fChartComponents.getChartProperties();
 	}
 
+	/**
+	 * @return Returns the data model for the chart
+	 */
 	public ChartDataModel getDataModel() {
 		return fChartDataModel;
 	}
 
 	public int getDevGraphImageXOffset() {
 		return fChartComponents.getChartComponentGraph().getDevGraphImageXOffset();
+	}
+
+	public ChartXSlider getLeftSlider() {
+		return fChartComponents.getChartComponentGraph().getLeftSlider();
+	}
+
+	public ChartXSlider getRightSlider() {
+		return fChartComponents.getChartComponentGraph().getRightSlider();
 	}
 
 	public ISelection getSelection() {
@@ -607,67 +623,6 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * Sets a new data model for the chart and redraws it, NULL will hide the chart
-	 * 
-	 * @param chartDataModel
-	 */
-	public void setChartDataModel(ChartDataModel chartDataModel) {
-		setChartDataModel(chartDataModel, true);
-	}
-
-	/**
-	 * Set a new data model for the chart and redraws it, NULL will hide the chart.
-	 * <p>
-	 * This method sets the data for the chart and creates it.
-	 * 
-	 * @param chartDataModel
-	 * @param isResetSelection
-	 *        <code>true</code> to reset the last selection in the chart
-	 */
-	public void setChartDataModel(ChartDataModel chartDataModel, boolean isResetSelection) {
-
-		if (chartDataModel == null
-				|| (chartDataModel != null && chartDataModel.getYData().isEmpty())) {
-
-			ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
-
-			fChartDataModel = emptyModel;
-			fChartComponents.setModel(emptyModel);
-
-			return;
-		}
-
-		fChartDataModel = chartDataModel;
-
-		createActions();
-		fChartComponents.setModel(chartDataModel);
-
-		// reset last selected x-data
-		if (isResetSelection) {
-			setSelectedBars(null);
-		}
-
-		// update chart info view
-		fireSliderMoveEvent();
-	}
-
-	private void updateActionState() {
-
-		fActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(false);
-		fActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(false);
-
-		fActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(true);
-		fActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(false);
-
-		fActionProxies.get(COMMAND_ID_FIT_GRAPH).setEnabled(true);
-
-		// update UI state for the action handlers
-		if (useInternalActionBar() == false) {
-			fActionHandlerManager.updateUIState();
-		}
-	}
-
-	/**
 	 * Set the enable state for a command and update the UI
 	 */
 	public void setCommandEnabled(String commandId, boolean isEnabled) {
@@ -807,6 +762,67 @@ public class Chart extends ViewForm {
 
 	public void switchSlidersTo2ndXData() {
 		fChartComponents.getChartComponentGraph().switchSlidersTo2ndXData();
+	}
+
+	private void updateActionState() {
+
+		fActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(false);
+		fActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(false);
+
+		fActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(true);
+		fActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(false);
+
+		fActionProxies.get(COMMAND_ID_FIT_GRAPH).setEnabled(true);
+
+		// update UI state for the action handlers
+		if (useInternalActionBar() == false) {
+			fActionHandlerManager.updateUIState();
+		}
+	}
+
+	/**
+	 * Sets a new data model for the chart and redraws it, NULL will hide the chart
+	 * 
+	 * @param chartDataModel
+	 */
+	public void updateChart(ChartDataModel chartDataModel) {
+		updateChart(chartDataModel, true);
+	}
+
+	/**
+	 * Set a new data model for the chart and redraws it, NULL will hide the chart.
+	 * <p>
+	 * This method sets the data for the chart and creates it.
+	 * 
+	 * @param chartDataModel
+	 * @param isResetSelection
+	 *        <code>true</code> to reset the last selection in the chart
+	 */
+	public void updateChart(ChartDataModel chartDataModel, boolean isResetSelection) {
+
+		if (chartDataModel == null
+				|| (chartDataModel != null && chartDataModel.getYData().isEmpty())) {
+
+			ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
+
+			fChartDataModel = emptyModel;
+			fChartComponents.setModel(emptyModel);
+
+			return;
+		}
+
+		fChartDataModel = chartDataModel;
+
+		createActions();
+		fChartComponents.setModel(chartDataModel);
+
+		// reset last selected x-data
+		if (isResetSelection) {
+			setSelectedBars(null);
+		}
+
+		// update chart info view
+		fireSliderMoveEvent();
 	}
 
 	/**

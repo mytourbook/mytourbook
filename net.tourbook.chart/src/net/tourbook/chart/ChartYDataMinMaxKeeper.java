@@ -39,10 +39,10 @@ public class ChartYDataMinMaxKeeper {
 	public void saveMinMaxValues(ChartDataModel chartDataModel) {
 
 		if (chartDataModel == null) {
-			// not data fDataModel is available
+			// data are not available
 			return;
 		}
-
+		System.out.println("saveMinMaxValues" + chartDataModel);
 		ArrayList<ChartDataSerie> xyData = chartDataModel.getXyData();
 
 		minValues = new HashMap<Integer, Integer>();
@@ -56,7 +56,6 @@ public class ChartYDataMinMaxKeeper {
 				Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
 
 				if (yDataInfo != null) {
-
 					minValues.put(yDataInfo, yData.getVisibleMinValue());
 					maxValues.put(yDataInfo, yData.getVisibleMaxValue());
 				}
@@ -75,7 +74,7 @@ public class ChartYDataMinMaxKeeper {
 			// min/max values have not yet been saved, so nothing can be restored
 			return;
 		}
-
+		System.out.println("restoreMinMaxValues" + chartDataModel);
 		ArrayList<ChartDataSerie> xyData = chartDataModel.getXyData();
 
 		// loop: restore min/max values for all data series

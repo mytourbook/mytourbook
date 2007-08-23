@@ -45,7 +45,7 @@ class ActionHandlerGraph extends TCActionHandler implements IElementUpdater {
 		}
 
 		fTourChart.updateActionState();
-		fTourChart.updateChart(true);
+		fTourChart.updateTourChart(true);
 
 		return null;
 	}

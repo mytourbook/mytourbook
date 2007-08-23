@@ -99,7 +99,7 @@ import org.eclipse.ui.part.PageBook;
 
 public class CompareResultView extends SynchedChartView {
 
-	public static final String				ID						= "net.tourbook.views.tourMap.CompareResultView";		//$NON-NLS-1$
+	public static final String				ID						= "net.tourbook.views.tourMap.CompareResultView";				//$NON-NLS-1$
 
 	public static final int					COLUMN_REF_TOUR			= 0;
 	public static final int					COLUMN_DIFFERENCE		= 1;
@@ -107,8 +107,8 @@ public class CompareResultView extends SynchedChartView {
 	public static final int					COLUMN_DISTANCE			= 3;
 	public static final int					COLUMN_TIME_INTERVAL	= 4;
 
-	private static final String				MEMENTO_SASH_CONTAINER	= "resultview.container.";								//$NON-NLS-1$
-	private static final String				MEMENTO_SASH_CHART		= "resultview.chart.";									//$NON-NLS-1$
+	private static final String				MEMENTO_SASH_CONTAINER	= "resultview.container.";										//$NON-NLS-1$
+	private static final String				MEMENTO_SASH_CHART		= "resultview.chart.";											//$NON-NLS-1$
 
 	/**
 	 * This memento allows this view to save and restore state when it is closed and opened within a
@@ -127,7 +127,7 @@ public class CompareResultView extends SynchedChartView {
 
 	private TourReference					fCurrentRefTour;
 
-	private ISelectionListener				fSelectionListener;
+	private ISelectionListener				fPostSelectionListener;
 	private IPartListener2					fPartListener;
 
 	private Action							fActionSaveComparedTours;
@@ -141,12 +141,9 @@ public class CompareResultView extends SynchedChartView {
 	/**
 	 * resource manager for images
 	 */
-	private final LocalResourceManager		resManager				= new LocalResourceManager(
-																			JFaceResources
-																					.getResources());
+	private final LocalResourceManager		resManager				= new LocalResourceManager(JFaceResources.getResources());
 
-	private ImageDescriptor					dbImgDescriptor			= TourbookPlugin
-																			.getImageDescriptor(Messages.Image_database);
+	private ImageDescriptor					dbImgDescriptor			= TourbookPlugin.getImageDescriptor(Messages.Image_database);
 
 	private PageBook						fLowerPageBook;
 
@@ -156,22 +153,20 @@ public class CompareResultView extends SynchedChartView {
 
 	private TVICompareResult				fCurrentTTICompareResult;
 
-	private final NumberFormat				nf						= NumberFormat
-																			.getNumberInstance();
+	private final NumberFormat				nf						= NumberFormat.getNumberInstance();
 
 	private class ActionSaveComparedTours extends Action {
 
 		ActionSaveComparedTours() {
-			setImageDescriptor(TourbookPlugin
-					.getImageDescriptor(Messages.Image_save_raw_data_to_file));
-			setDisabledImageDescriptor(TourbookPlugin
-					.getImageDescriptor(Messages.Image_save_raw_data_to_file_disabled));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_raw_data_to_file));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_raw_data_to_file_disabled));
 
 			setText(Messages.CompareResult_Action_save_checked_tours);
 			setToolTipText(Messages.CompareResult_Action_save_checked_tours_tooltip);
 			setEnabled(false);
 		}
 
+		@Override
 		public void run() {
 			saveComparedTours();
 		}
@@ -294,13 +289,15 @@ public class CompareResultView extends SynchedChartView {
 			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
 
 			public void partClosed(IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId()))
+				if (ID.equals(partRef.getId())) {
 					saveSettings();
+				}
 			}
 
 			public void partDeactivated(IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId()))
+				if (ID.equals(partRef.getId())) {
 					saveSettings();
+				}
 			}
 
 			public void partHidden(IWorkbenchPartReference partRef) {}
@@ -314,7 +311,7 @@ public class CompareResultView extends SynchedChartView {
 		getViewSite().getPage().addPartListener(fPartListener);
 
 		// this view part is a selection listener
-		fSelectionListener = new ISelectionListener() {
+		fPostSelectionListener = new ISelectionListener() {
 
 			ArrayList<TVICompareResult>	fTTIRemovedComparedTours;
 
@@ -377,8 +374,8 @@ public class CompareResultView extends SynchedChartView {
 
 					fTTIRemovedComparedTours = new ArrayList<TVICompareResult>();
 
-					findTTICompareResult(((ResultContentProvider) fTourViewer.getContentProvider())
-							.getRootItem(), removedComparedTourCompIds);
+					findTTICompareResult(((ResultContentProvider) fTourViewer.getContentProvider()).getRootItem(),
+							removedComparedTourCompIds);
 
 					// set status for removed compared tours
 					for (TVICompareResult removedCompTour : fTTIRemovedComparedTours) {
@@ -393,7 +390,7 @@ public class CompareResultView extends SynchedChartView {
 		};
 
 		// register selection listener in the page
-		getSite().getPage().addPostSelectionListener(fSelectionListener);
+		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 
 	}
 
@@ -418,8 +415,7 @@ public class CompareResultView extends SynchedChartView {
 		fRefTourChart = new TourChart(fSashCharts, SWT.NONE, true);
 		fRefTourChart.setShowZoomActions(true);
 		fRefTourChart.setShowSlider(true);
-		fRefTourChart.setBackgroundColor(parent
-				.getDisplay()
+		fRefTourChart.setBackgroundColor(parent.getDisplay()
 				.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		fRefTourChart.addSliderMoveListener(new ISliderMoveListener() {
@@ -481,6 +477,7 @@ public class CompareResultView extends SynchedChartView {
 		tourViewer.setMenu(menu);
 	}
 
+	@Override
 	public void createPartControl(final Composite parent) {
 
 		final Control tree = createTourViewer(parent);
@@ -500,8 +497,7 @@ public class CompareResultView extends SynchedChartView {
 
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		fTourViewer.setInput(((ResultContentProvider) fTourViewer.getContentProvider())
-				.getRootItem());
+		fTourViewer.setInput(((ResultContentProvider) fTourViewer.getContentProvider()).getRootItem());
 	}
 
 	private Control createTourViewer(Composite parent) {
@@ -554,6 +550,7 @@ public class CompareResultView extends SynchedChartView {
 		fTourViewer.setUseHashlookup(true);
 
 		fTourViewer.setSorter(new ViewerSorter() {
+			@Override
 			public int compare(Viewer viewer, Object obj1, Object obj2) {
 
 				if (obj1 instanceof TVICompareResult) {
@@ -611,9 +608,10 @@ public class CompareResultView extends SynchedChartView {
 		return tree;
 	}
 
+	@Override
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(fSelectionListener);
+		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getSite().getPage().removePartListener(fPartListener);
 
 		resManager.dispose();
@@ -650,6 +648,7 @@ public class CompareResultView extends SynchedChartView {
 		selection.getFirstElement();
 		if (!selection.isEmpty()) {
 			menuMgr.add(new Action(Messages.CompareResult_Action_check_selected_tours) {
+				@Override
 				public void run() {
 					// check all selected compared tours which are not yet
 					// stored
@@ -667,6 +666,7 @@ public class CompareResultView extends SynchedChartView {
 			});
 
 			menuMgr.add(new Action(Messages.CompareResult_Action_uncheck_selected_tours) {
+				@Override
 				public void run() {
 					// uncheck all selected tours
 					Object[] selectedTours = selection.toArray();
@@ -708,8 +708,7 @@ public class CompareResultView extends SynchedChartView {
 		ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(tourData,
 				refTourChartConfig);
 
-		return new RefTourChartData(
-				refTour,
+		return new RefTourChartData(refTour,
 				chartDataModel,
 				tourData,
 				refTourChartConfig,
@@ -723,6 +722,7 @@ public class CompareResultView extends SynchedChartView {
 		return fTourViewer;
 	}
 
+	@Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 		super.init(site, memento);
 
@@ -759,8 +759,7 @@ public class CompareResultView extends SynchedChartView {
 			if (TourCompareManager.removeComparedTourFromDb(compareResult.compId)) {
 
 				// update the chart
-				fCompTourChart.setBackgroundColor(Display
-						.getCurrent()
+				fCompTourChart.setBackgroundColor(Display.getCurrent()
 						.getSystemColor(SWT.COLOR_WHITE));
 				fCompTourChart.redrawChart();
 
@@ -839,8 +838,7 @@ public class CompareResultView extends SynchedChartView {
 						persistedCompareResults.persistedCompareResults.add(compareResult);
 
 						// update the chart
-						fCompTourChart.setBackgroundColor(Display
-								.getCurrent()
+						fCompTourChart.setBackgroundColor(Display.getCurrent()
 								.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 						fCompTourChart.redrawChart();
 
@@ -869,6 +867,7 @@ public class CompareResultView extends SynchedChartView {
 		saveState(fSessionMemento);
 	}
 
+	@Override
 	public void saveState(IMemento memento) {
 
 		memento.putInteger(MEMENTO_SASH_CONTAINER, fTourViewer.getTree().getSize().x);
@@ -876,6 +875,7 @@ public class CompareResultView extends SynchedChartView {
 		UI.saveSashWeight(fSashCharts, memento, MEMENTO_SASH_CHART);
 	}
 
+	@Override
 	public void setFocus() {
 		fTourViewer.getControl().setFocus();
 	}
@@ -893,9 +893,8 @@ public class CompareResultView extends SynchedChartView {
 						compareResult.compareIndexEnd);
 
 				// set title
-				changedChartDataModel.setTitle(NLS
-						.bind(Messages.CompareResult_Chart_title_compared_tour, TourManager
-								.getTourTitleDetailed(compareResult.compTour)));
+				changedChartDataModel.setTitle(NLS.bind(Messages.CompareResult_Chart_title_compared_tour,
+						TourManager.getTourTitleDetailed(compareResult.compTour)));
 			}
 		};
 
@@ -906,17 +905,15 @@ public class CompareResultView extends SynchedChartView {
 		fCompTourChart.addDataModelListener(dataModelListener);
 
 		// get the tour chart configuration
-		RefTourChartData refTourChartData = fRefChartDataCache
-				.get(fCurrentRefTour.getGeneratedId());
+		RefTourChartData refTourChartData = fRefChartDataCache.get(fCurrentRefTour.getGeneratedId());
 		TourChartConfiguration compTourChartConfig = refTourChartData.getCompTourChartConfig();
 
-		fCompTourChart.setBackgroundColor(Display
-				.getCurrent()
+		fCompTourChart.setBackgroundColor(Display.getCurrent()
 				.getSystemColor(compareResult.compId == -1
 						? SWT.COLOR_WHITE
 						: SWT.COLOR_WIDGET_BACKGROUND));
 
-		fCompTourChart.updateChart(compareResult.compTour,
+		fCompTourChart.updateTourChart(compareResult.compTour,
 				compTourChartConfig,
 				fActionSynchChartsHorizontal.isChecked());
 
@@ -958,8 +955,9 @@ public class CompareResultView extends SynchedChartView {
 			}
 		});
 
-		fRefTourChart.updateChart(refTourChartData.getRefTourData(), refTourChartData
-				.getRefTourChartConfig(), false);
+		fRefTourChart.updateTourChart(refTourChartData.getRefTourData(),
+				refTourChartData.getRefTourChartConfig(),
+				false);
 
 		// keep data for current ref tour in the cache
 		fRefChartDataCache.put(refTour.getGeneratedId(), refTourChartData);
@@ -1015,6 +1013,7 @@ public class CompareResultView extends SynchedChartView {
 		}
 	}
 
+	@Override
 	void synchCharts(boolean isSynched) {
 
 		fRefTourChart.setZoomMarkerPositionListener(isSynched, fCompTourChart);
@@ -1022,7 +1021,7 @@ public class CompareResultView extends SynchedChartView {
 		// show the compared chart in full size
 		fCompTourChart.zoomOut(false);
 
-		fCompTourChart.updateChart(false);
+		fCompTourChart.updateTourChart(false);
 
 	}
 
@@ -1045,10 +1044,8 @@ public class CompareResultView extends SynchedChartView {
 		// update the changed tour distance/time
 		ChartDataModel chartDataModel = fCompTourChart.getChartDataModel();
 
-		int[] distanceValues = ((ChartDataXSerie) chartDataModel
-				.getCustomData(TourManager.CUSTOM_DATA_DISTANCE)).getHighValues()[0];
-		int[] timeValues = ((ChartDataXSerie) chartDataModel
-				.getCustomData(TourManager.CUSTOM_DATA_TIME)).getHighValues()[0];
+		int[] distanceValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE)).getHighValues()[0];
+		int[] timeValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TIME)).getHighValues()[0];
 
 		fCurrentTTICompareResult.compareDistance = (distanceValues[movedXMarkerEndValueIndex] - distanceValues[movedXMarkerStartValueIndex]);
 
@@ -1065,7 +1062,7 @@ public class CompareResultView extends SynchedChartView {
 		// update the chart
 		ChartDataXSerie xData = chartDataModel.getXData();
 		xData.setMarkerValueIndex(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
-		fCompTourChart.setChartDataModel(chartDataModel);
+		fCompTourChart.updateChart(chartDataModel);
 
 		// update the tour viewer
 		fTourViewer.update(fCurrentTTICompareResult, null);

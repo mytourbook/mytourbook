@@ -24,10 +24,24 @@ public class SelectionChartInfo implements ISelection {
 	public ChartDataModel				chartDataModel;
 	public ArrayList<ChartDrawingData>	chartDrawingData;
 
-	public ChartXSlider					leftSlider;
-	public ChartXSlider					rightSlider;
+	public int							leftSliderValuesIndex;
+	public int							rightSliderValuesIndex;
+
+//	public ChartXSlider					leftSlider;
+//	public ChartXSlider					rightSlider;
 
 	public boolean isEmpty() {
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		String string = super.toString()
+				+ " l:"
+				+ leftSliderValuesIndex
+				+ " r:"
+				+ rightSliderValuesIndex;
+		return string;
+	}
+
 }

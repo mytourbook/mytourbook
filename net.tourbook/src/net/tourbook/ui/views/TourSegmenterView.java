@@ -26,10 +26,9 @@ import net.tourbook.algorithm.Point;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourSegment;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.SelectionActiveEditor;
-import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
+import net.tourbook.tour.TourEditor;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -101,6 +100,8 @@ public class TourSegmenterView extends ViewPart {
 	private final DateFormat		fTimeInstance			= DateFormat.getTimeInstance(DateFormat.DEFAULT);
 
 	private Label					fPageNoChart;
+
+	private TourEditor				fTourEditor;
 
 	/**
 	 * The content provider class is responsible for providing objects to the view. It can wrap
@@ -270,8 +271,9 @@ public class TourSegmenterView extends ViewPart {
 			}
 
 			// If descending order, flip the direction
-			if (direction == DESCENDING)
+			if (direction == DESCENDING) {
 				rc = -rc;
+			}
 
 			return rc;
 		}
@@ -341,6 +343,8 @@ public class TourSegmenterView extends ViewPart {
 		// tell the site that this view is a selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
+		fPageBook.showPage(fPageNoChart);
+
 		onTourSelection(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 	}
 
@@ -381,12 +385,14 @@ public class TourSegmenterView extends ViewPart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onChangeTolerance(getTolerance(), false);
+				setTourDirty();
 			}
 		});
 
 		fScaleTolerance.addListener(SWT.MouseWheel, new Listener() {
 			public void handleEvent(final Event event) {
 				onChangeTolerance(getTolerance(), false);
+				setTourDirty();
 			}
 		});
 
@@ -494,10 +500,10 @@ public class TourSegmenterView extends ViewPart {
 					Object[] segments = selection.toArray();
 
 					if (segments.length > 0) {
-
-						fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(fTourChart,
+						final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(fTourChart,
 								((TourSegment) (segments[0])).serieIndexStart,
-								((TourSegment) (segments[segments.length - 1])).serieIndexEnd));
+								((TourSegment) (segments[segments.length - 1])).serieIndexEnd);
+						fPostSelectionProvider.setSelection(selectionSliderPosition);
 					}
 				}
 			}
@@ -566,12 +572,7 @@ public class TourSegmenterView extends ViewPart {
 	}
 
 	private void setTableInput() {
-
-		// disposeCustomCellRenderer();
-
 		fTableViewer.setInput(this);
-
-		// setCustomCellRenderer();
 	}
 
 	/**
@@ -581,33 +582,36 @@ public class TourSegmenterView extends ViewPart {
 	 */
 	private void onTourSelection(ISelection selection) {
 
-		if (selection instanceof SelectionTourChart) {
-			fTourChart = ((SelectionTourChart) selection).getTourChart();
-		} else if (selection instanceof SelectionActiveEditor) {
-			fTourChart = ((SelectionActiveEditor) selection).getTourEditor().getTourChart();
+		if (selection instanceof SelectionActiveEditor) {
+			final TourEditor tourEditor = ((SelectionActiveEditor) selection).getTourEditor();
+			if (tourEditor == fTourEditor) {
+				return;
+			}
+			fTourEditor = tourEditor;
 		} else {
 			return;
 		}
 
-		saveDPTolerance();
-
-		if (fTourChart == null) {
-			// hide the segmenter
-			fPageBook.showPage(fPageNoChart);
-			return;
-		}
+//		if (fTourEditor == null) {
+//			// hide the segmenter
+//			fPageBook.showPage(fPageNoChart);
+//			return;
+//		}
 
 		fPageBook.showPage(fPageSegmenter);
 
+		fTourChart = fTourEditor.getTourChart();
 		fTourData = fTourChart.getTourData();
 
 		if (fTourData == null) {
 			fPageBook.showPage(fPageNoChart);
 			return;
 		}
-		// update segmenter values
+
+		// keep original dp tolerance
 		fSavedDpTolerance = fDpTolerance = fTourData.getDpTolerance();
 
+		// update segmenter values
 		float factor = 1 / 2.05f;
 
 		double tolerance = Math.pow(fDpTolerance * 50, factor);
@@ -615,7 +619,7 @@ public class TourSegmenterView extends ViewPart {
 		fScaleTolerance.setSelection((int) tolerance);
 		fLabelToleranceValue.setText(Integer.toString(fTourData.getDpTolerance()));
 
-		// force the segements to be rebuild for the current tour
+		// force the segements to be rebuild for the new tour
 		onChangeTolerance(fDpTolerance, true);
 
 		/*
@@ -626,18 +630,20 @@ public class TourSegmenterView extends ViewPart {
 	}
 
 	/**
-	 * save dp tolerance when it was changed
+	 * when dp tolerance was changed set the tour dirty
 	 */
-	private void saveDPTolerance() {
-		if (fTourData != null && fSavedDpTolerance != fTourData.getDpTolerance()) {
-			TourDatabase.saveTour(fTourData);
+	private void setTourDirty() {
+
+		if (fTourEditor != null
+				&& fTourData != null
+				&& fSavedDpTolerance != fTourData.getDpTolerance()) {
+
+			fTourEditor.setTourDirty();
 		}
 	}
 
 	@Override
 	public void dispose() {
-
-		saveDPTolerance();
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 

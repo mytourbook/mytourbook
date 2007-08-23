@@ -25,6 +25,7 @@ import net.tourbook.colors.GraphColors;
 
 public class StatisticDayCombined extends StatisticDay {
 
+	@Override
 	void updateChart(TourDataTour tourTimeData) {
 
 		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
@@ -99,7 +100,7 @@ public class StatisticDayCombined extends StatisticDay {
 		}
 
 		// show the data in the chart
-		fChart.setChartDataModel(chartModel);
+		fChart.updateChart(chartModel);
 	}
 
 }

@@ -23,7 +23,7 @@ public class TourSegment {
 
 	public int		altitude;
 	public int		distance;
-	public int		time;
+	public int		recordingTime;
 	public int		drivingTime;
 	public int		altitudeUp;
 	public int		altitudeDown;

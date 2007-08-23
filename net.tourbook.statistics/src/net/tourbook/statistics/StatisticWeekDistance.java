@@ -23,6 +23,7 @@ import net.tourbook.colors.GraphColors;
 
 public class StatisticWeekDistance extends StatisticWeek {
 
+	@Override
 	void updateChart(TourDataWeek tourWeekData) {
 
 		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
@@ -33,8 +34,7 @@ public class StatisticWeekDistance extends StatisticWeek {
 		chartModel.setXData(xData);
 
 		// distance
-		ChartDataYSerie yData = new ChartDataYSerie(
-				ChartDataModel.CHART_TYPE_BAR,
+		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				tourWeekData.fDistanceLow,
 				tourWeekData.fDistanceHigh);
@@ -51,6 +51,6 @@ public class StatisticWeekDistance extends StatisticWeek {
 		}
 
 		// show the fDataModel in the chart
-		fChart.setChartDataModel(chartModel);
+		fChart.updateChart(chartModel);
 	}
 }

@@ -48,7 +48,7 @@ public class ActionHandlerAdjustAltitude extends AbstractHandler {
 		} else {
 			dialog.restoreOriginalAltitudeValues();
 		}
-		tourChart.updateChart(true);
+		tourChart.updateTourChart(true);
 
 		/*
 		 * when in the tour chart view this tour is visible, another tour is selected and then again

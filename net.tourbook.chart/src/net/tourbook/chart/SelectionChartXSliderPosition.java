@@ -33,6 +33,7 @@ public class SelectionChartXSliderPosition implements ISelection {
 	public SelectionChartXSliderPosition(Chart chart, int valueIndex1, int valueIndex2) {
 
 		this.chart = chart;
+
 		slider1ValueIndex = valueIndex1;
 		slider2ValueIndex = valueIndex2;
 	}

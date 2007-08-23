@@ -731,7 +731,7 @@ public class TourMapView extends SynchedChartView {
 		em.close();
 
 		if (refTour == null) {
-			fRefTourChart.setChartDataModel(null);
+			fRefTourChart.updateChart(null);
 			return null;
 		} else {
 
@@ -836,13 +836,15 @@ public class TourMapView extends SynchedChartView {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId()))
+				if (ID.equals(partRef.getId())) {
 					saveSettings();
+				}
 			}
 
 			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId()))
+				if (ID.equals(partRef.getId())) {
 					saveSettings();
+				}
 			}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {}
@@ -994,7 +996,7 @@ public class TourMapView extends SynchedChartView {
 	private void showRefTourChart(final RefTourChartData refTourChartData) {
 
 		fRefTourChart.zoomOut(false);
-		fRefTourChart.updateChart(refTourChartData.getRefTourData(),
+		fRefTourChart.updateTourChart(refTourChartData.getRefTourData(),
 				refTourChartData.getRefTourChartConfig(),
 				false);
 	}
@@ -1151,7 +1153,7 @@ public class TourMapView extends SynchedChartView {
 		chartModel.setChartMinWidth(yearDays);
 
 		// show the data fDataModel in the chart
-		yearChart.setChartDataModel(chartModel);
+		yearChart.updateChart(chartModel);
 	}
 
 	@Override
@@ -1235,7 +1237,7 @@ public class TourMapView extends SynchedChartView {
 			RefTourChartData refTourChartData = fRefChartDataCache.get(fActiveRefTourId);
 
 			if (refTourChartData != null) {
-				fCompTourChart.updateChart(selectedCompTourData,
+				fCompTourChart.updateTourChart(selectedCompTourData,
 						refTourChartData.getCompTourChartConfig(),
 						false);
 			}
@@ -1329,7 +1331,7 @@ public class TourMapView extends SynchedChartView {
 		final ChartDataModel chartDataModel = fCompTourChart.getChartDataModel();
 		final ChartDataXSerie xData = chartDataModel.getXData();
 		xData.setMarkerValueIndex(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
-		fCompTourChart.setChartDataModel(chartDataModel);
+		fCompTourChart.updateChart(chartDataModel);
 
 		// update the tour viewer
 		fTourViewer.update(fComparedToursFindResult.toArray(), null);

@@ -591,7 +591,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		}
 
 		// show the new data in the chart
-		statAltitudeChart.setChartDataModel(chartDataModel);
+		statAltitudeChart.updateChart(chartDataModel);
 	}
 
 	/**
@@ -640,7 +640,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		}
 
 		// show the new data fDataModel in the chart
-		statDistanceChart.setChartDataModel(chartDataModel);
+		statDistanceChart.updateChart(chartDataModel);
 	}
 
 	private void updateCharts() {
@@ -734,7 +734,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		}
 
 		// show the new data fDataModel in the chart
-		statDurationChart.setChartDataModel(chartDataModel);
+		statDurationChart.updateChart(chartDataModel);
 	}
 
 	/**

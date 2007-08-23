@@ -76,7 +76,7 @@ class ActionGraph extends Action {
 		}
 
 		fTourChart.updateActionState();
-		fTourChart.updateChart(true);
+		fTourChart.updateTourChart(true);
 	}
 
 }
