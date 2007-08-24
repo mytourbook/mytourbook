@@ -1197,7 +1197,6 @@ public class ChartComponentGraph extends Canvas {
 				}
 
 				int devBarHeight = (int) (barHeight * scaleY);
-				devBarHeight = 30;
 
 				// get the old y position for stacked bars
 				int devYPreviousHeight = 0;
@@ -1264,6 +1263,160 @@ public class ChartComponentGraph extends Canvas {
 				devHeightSummary[valueIndex] += devBarHeight;
 			}
 		}
+
+		// reset clipping
+		gc.setClipping((Rectangle) null);
+	}
+
+	/**
+	 * Draws a bar graph, this requires that drawingData.getChartData2ndValues does not return null,
+	 * if null is returned, a line graph will be drawn instead
+	 * 
+	 * @param gc
+	 * @param drawingData
+	 */
+	private void drawNewBarGraph(final GC gc, final ChartDrawingData drawingData) {
+
+		// get the chart data
+		final ChartDataXSerie xData = drawingData.getXData();
+		final ChartDataYSerie yData = drawingData.getYData();
+		final int[][] colorsIndex = yData.getColorsIndex();
+
+		gc.setLineStyle(SWT.LINE_SOLID);
+
+		// get the colors
+		final RGB[] rgbLine = yData.getRgbLine();
+		final RGB[] rgbDark = yData.getRgbDark();
+		final RGB[] rgbBright = yData.getRgbBright();
+
+		// get the chart values
+		final float scaleX = drawingData.getScaleX();
+		final float scaleY = drawingData.getScaleY();
+		final int graphYBottom = drawingData.getGraphYBottom();
+		final boolean axisDirection = yData.isYAxisDirection();
+		final int barPosition = drawingData.getBarPosition();
+
+		// get the horizontal offset for the graph
+		int graphValueOffset;
+		if (fChartComponents.zoomMarkerPositionIn == null) {
+			// a zoom marker is not set, draw it normally
+			graphValueOffset = (int) (Math.max(0, fDevGraphImageXOffset) / scaleX);
+		} else {
+			// adjust the start position to the zoom marker position
+			graphValueOffset = (int) (fDevGraphImageXOffset / scaleX);
+		}
+
+		// get the top/bottom of the graph
+		final int devYBottom = drawingData.getDevYBottom();
+		final int devYTop = devYBottom - drawingData.getDevGraphHeight();
+
+		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
+
+		final int xValues[] = xData.getHighValues()[0];
+		final int yHighSeries[][] = yData.getHighValues();
+		final int yLowSeries[][] = yData.getLowValues();
+
+		final int serieLength = yHighSeries.length;
+		final int valueLength = xValues.length;
+
+		final int devBarWidthComputed = drawingData.getBarRectangleWidth();
+		final int devBarWidth = Math.max(1, devBarWidthComputed);
+
+		int devBarXPos = drawingData.getDevBarRectangleXPos();
+
+		// loop: all data series
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			final int yHighValues[] = yHighSeries[serieIndex];
+			int yLowValues[] = null;
+			if (yLowSeries != null) {
+				yLowValues = yLowSeries[serieIndex];
+			}
+
+			// loop: all values in the current serie
+			for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
+
+				// get the x position
+				final int devXPos = (int) ((xValues[valueIndex] - graphValueOffset) * scaleX)
+						+ devBarXPos;
+
+				final int devBarWidthSelected = devBarWidth;
+				final int devBarWidth2 = devBarWidthSelected / 2;
+
+				int devXPosSelected = devXPos;
+
+				// center the bar
+				if (devBarWidthSelected > 1 && barPosition == ChartDrawingData.BAR_POS_CENTER) {
+					devXPosSelected -= devBarWidth2;
+				}
+
+				// get the bar height
+				final int valueYLow = yLowValues == null
+						? yData.getVisibleMinValue()
+						: yLowValues[valueIndex];
+
+				final int valueYHigh = yHighValues[valueIndex];
+
+				final int barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh,
+						valueYLow));
+
+				if (barHeight == 0) {
+					continue;
+				}
+
+				int devBarHeight = (int) (barHeight * scaleY);
+//				devBarHeight = 30;
+
+				// get the y position
+				int devYPos;
+				if (axisDirection) {
+					devYPos = devYBottom - ((int) ((valueYHigh - graphYBottom) * scaleY));
+				} else {
+					devYPos = devYTop + ((int) ((valueYLow - graphYBottom) * scaleY));
+				}
+
+				final Rectangle barShape = new Rectangle(devXPos,
+						devYPos,
+						devBarWidth,
+						devBarHeight);
+
+				final int colorIndex = colorsIndex[serieIndex][valueIndex];
+
+				final RGB rgbBrightDef = rgbBright[colorIndex];
+				final RGB rgbDarkDef = rgbDark[colorIndex];
+				final RGB rgbLineDef = rgbLine[colorIndex];
+
+				final Color colorBright = getColor(rgbBrightDef);
+				final Color colorDark = getColor(rgbDarkDef);
+				final Color colorLine = getColor(rgbLineDef);
+
+				gc.setBackground(colorDark);
+
+				/*
+				 * draw bar
+				 */
+				if (devBarWidthComputed > 0) {
+
+					gc.setForeground(colorBright);
+					gc.fillGradientRectangle(barShape.x,
+							barShape.y,
+							barShape.width,
+							barShape.height,
+							false);
+
+					gc.setForeground(colorLine);
+					gc.drawRectangle(barShape);
+
+				} else {
+
+					gc.setForeground(colorLine);
+					gc.drawLine(barShape.x, barShape.y, barShape.x, (barShape.y + barShape.height));
+				}
+			}
+		}
+
+		// reset clipping
+		gc.setClipping((Rectangle) null);
 	}
 
 	private void drawBarSelection(final GC gc, final ChartDrawingData drawingData) {
@@ -1548,6 +1701,7 @@ public class ChartComponentGraph extends Canvas {
 				 * create the chart image only when a new onPaint event has not occured
 				 */
 
+//				long startTime = System.currentTimeMillis();
 				if (fCurrentDrawCounter != fDrawCounter[0]) {
 					return;
 				}
@@ -1597,8 +1751,6 @@ public class ChartComponentGraph extends Canvas {
 					fGraphCoreImage = ChartUtil.createImage(display, fGraphCoreImage, imageRect);
 				}
 
-//				int chartType = fChart.getChartDataModel().getChartType();
-
 				// create graphics context
 				GC gc = new GC(fGraphCoreImage);
 
@@ -1618,30 +1770,28 @@ public class ChartComponentGraph extends Canvas {
 						drawXTitle(gc, drawingData);
 					}
 
+					if (graphIndex == fDrawingData.size() - 1) {
+						// draw the unit label and unit tick only on the
+						// last graph
+						drawXUnits(gc, drawingData, true, true);
+					} else {
+						drawXUnits(gc, drawingData, false, true);
+					}
+
+					drawHorizontalGridlines(gc, drawingData);
+
 					// draw units and grid on the x and y axis
 					switch (drawingData.getChartType()) {
 					case ChartDataModel.CHART_TYPE_LINE:
-						if (graphIndex == fDrawingData.size() - 1) {
-							// draw the unit label and unit tick only on the
-							// last graph
-							drawXUnits(gc, drawingData, true, true);
-						} else {
-							drawXUnits(gc, drawingData, false, true);
-						}
-						drawHorizontalGridlines(gc, drawingData);
 						drawLineGraph(gc, drawingData);
 						break;
 
 					case ChartDataModel.CHART_TYPE_BAR:
-						if (graphIndex == fDrawingData.size() - 1) {
-							// draw the unit label and unit tick only on the
-							// last graph
-							drawXUnits(gc, drawingData, true, true);
-						} else {
-							drawXUnits(gc, drawingData, false, true);
-						}
-						drawHorizontalGridlines(gc, drawingData);
 						drawBarGraph(gc, drawingData);
+						break;
+
+					case ChartDataModel.CHART_TYPE_NEW:
+						drawNewBarGraph(gc, drawingData);
 						break;
 
 					default:
@@ -1661,6 +1811,10 @@ public class ChartComponentGraph extends Canvas {
 				// fIsSelectionDirty = true;
 
 				redraw();
+
+//				long endTime = System.currentTimeMillis();
+//				System.out.println("Execution time : " + (endTime - startTime) + " ms");
+
 			}
 		};
 

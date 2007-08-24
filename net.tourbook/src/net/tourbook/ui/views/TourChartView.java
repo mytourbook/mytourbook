@@ -18,6 +18,7 @@ package net.tourbook.ui.views;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -243,7 +244,7 @@ public class TourChartView extends ViewPart implements ITourChartPropertyListene
 		/*
 		 * fire tour selection
 		 */
-		fPostSelectionProvider.setSelection(new SelectionTourData(fTourData));
+		fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart, fTourData));
 	}
 
 	private void updateChart(ISelection selection) {
@@ -279,6 +280,10 @@ public class TourChartView extends ViewPart implements ITourChartPropertyListene
 				fTourData = tourData;
 				updateChart();
 			}
+
+		} else if (selection instanceof SelectionChartXSliderPosition) {
+
+			fTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
 		}
 	}
 

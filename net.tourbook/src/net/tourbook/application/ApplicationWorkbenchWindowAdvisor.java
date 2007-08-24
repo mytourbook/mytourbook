@@ -323,9 +323,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 			if (activePart != null) {
 				lastPartTitle = activePart.getTitleToolTip();
-
-				if (lastPartTitle.length() > 0) {
-					title = NLS.bind(shellTitle, lastPartTitle, title);
+				if (lastPartTitle != null) {
+					if (lastPartTitle.length() > 0) {
+						title = NLS.bind(shellTitle, lastPartTitle, title);
+					}
 				}
 			}
 

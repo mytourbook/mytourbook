@@ -32,6 +32,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
+import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.resource.JFaceResources;
@@ -48,6 +49,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
@@ -256,9 +258,11 @@ public class TourChartAnalyzerView extends ViewPart {
 
 				} else if (selection instanceof SelectionActiveEditor) {
 
-					updateInfo(((SelectionActiveEditor) selection).getTourEditor()
-							.getTourChart()
-							.getChartInfo());
+					final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
+					if (editor instanceof TourEditor) {
+						TourEditor tourEditor = (TourEditor) editor;
+						updateInfo(tourEditor.getTourChart().getChartInfo());
+					}
 				}
 			}
 		};
@@ -762,6 +766,9 @@ public class TourChartAnalyzerView extends ViewPart {
 			if (valuesIndexRight > values.length) {
 				valuesIndexRight = values.length - 1;
 			}
+
+			valuesIndexLeft = Math.max(0, valuesIndexLeft);
+			valuesIndexRight = Math.max(0, valuesIndexRight);
 
 			// values at the left/right slider
 			final int leftValue = values[valuesIndexLeft];

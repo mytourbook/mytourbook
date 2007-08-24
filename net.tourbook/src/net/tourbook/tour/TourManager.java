@@ -357,7 +357,7 @@ public class TourManager {
 	 * @param tourData
 	 * @param hasPropertyChanged
 	 */
-	private void createAltiGradiSerie(TourData tourData, boolean hasPropertyChanged) {
+	private void computeAltiGradiSerie(TourData tourData, boolean hasPropertyChanged) {
 
 		// check if altimeter was computed
 		if (tourData.altimeterSerie != null && hasPropertyChanged == false) {
@@ -375,10 +375,10 @@ public class TourManager {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_USE_CUSTOM)) {
+		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_COMPUTE_VALUE)) {
 
-			int gradientTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE);
-			final int slices = gradientTimeSlice / deviceTimeInterval;
+			int computeTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE);
+			final int slices = computeTimeSlice / deviceTimeInterval;
 
 			indexHighAdjustment = Math.max(1, slices / 2);
 			indexLowAdjustment = slices / 2;
@@ -405,6 +405,9 @@ public class TourManager {
 			}
 		}
 
+		/*
+		 * compute values
+		 */
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 			// adjust index to the array size
@@ -424,6 +427,189 @@ public class TourManager {
 
 			// keep gradient data
 			gradientSerie[serieIndex] = distance == 0 ? 0 : altitude * 1000 / distance;
+		}
+	}
+
+	/**
+	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
+	 * 
+	 * @param tourData
+	 * @param hasPropertyChanged
+	 * @param tourChartProperty
+	 */
+	private void computeSpeedSerie(TourData tourData, boolean hasPropertyChanged) {
+
+		// check if speed was computed
+		if (tourData.speedSerie != null && hasPropertyChanged == false) {
+			return;
+		}
+
+		final int serieLength = tourData.timeSerie.length;
+
+		final int speedSerie[] = tourData.speedSerie = new int[serieLength];
+
+		int deviceTimeInterval = tourData.getDeviceTimeInterval();
+
+		int lowIndexAdjustment = 0;
+		int highIndexAdjustment = 1;
+
+		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+
+		int speedTimeSlice = store.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE);
+		final int slices = speedTimeSlice / deviceTimeInterval;
+
+		highIndexAdjustment = Math.max(1, slices / 2);
+		lowIndexAdjustment = slices / 2;
+
+		// round up
+		if (lowIndexAdjustment + highIndexAdjustment < slices) {
+			highIndexAdjustment++;
+		}
+
+		for (int speedIndex = 0; speedIndex < serieLength; speedIndex++) {
+
+			// adjust index to the array size
+			int distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustment),
+					serieLength - 1);
+			int distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustment,
+					serieLength - 1));
+
+			final int distance = tourData.distanceSerie[distIndexHigh]
+					- tourData.distanceSerie[distIndexLow];
+
+			final float timeInterval = deviceTimeInterval * (distIndexHigh - distIndexLow);
+
+			final int speed = (int) ((distance * 36F) / timeInterval);
+
+			speedSerie[speedIndex] = speed;
+//			speedSerie[speedIndex] = (int) (distance / timeInterval);
+		}
+	}
+
+	/**
+	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
+	 * 
+	 * @param tourData
+	 * @param hasPropertyChanged
+	 * @param tourChartProperty
+	 */
+	private void computeSpeedSerieInternal(TourData tourData, boolean hasPropertyChanged) {
+
+		// check if speed was computed
+		if (tourData.speedSerie != null && hasPropertyChanged == false) {
+			return;
+		}
+
+		final int serieLength = tourData.timeSerie.length;
+
+		final int speedSerie[] = tourData.speedSerie = new int[serieLength];
+
+		int deviceTimeInterval = tourData.getDeviceTimeInterval();
+
+		int lowIndexAdjustmentDefault = 0;
+		int highIndexAdjustmentDefault = 0;
+		if (deviceTimeInterval <= 2) {
+			lowIndexAdjustmentDefault = 2;
+			highIndexAdjustmentDefault = 3;
+
+		} else if (deviceTimeInterval <= 5) {
+			lowIndexAdjustmentDefault = 1;
+			highIndexAdjustmentDefault = 1;
+
+		} else if (deviceTimeInterval <= 10) {
+			lowIndexAdjustmentDefault = 0;
+			highIndexAdjustmentDefault = 1;
+		} else {
+			lowIndexAdjustmentDefault = 0;
+			highIndexAdjustmentDefault = 1;
+		}
+
+		for (int speedIndex = 0; speedIndex < serieLength; speedIndex++) {
+
+			// adjust index to the array size
+			int distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustmentDefault),
+					serieLength - 1);
+
+			int distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustmentDefault,
+					serieLength - 1));
+
+			int distanceDefault = tourData.distanceSerie[distIndexHigh]
+					- tourData.distanceSerie[distIndexLow];
+
+			// adjust the accuracy for the distance
+			int lowIndexAdjustment = lowIndexAdjustmentDefault;
+			int highIndexAdjustment = highIndexAdjustmentDefault;
+
+			if (distanceDefault < 30) {
+				lowIndexAdjustment = lowIndexAdjustmentDefault + 3;
+				highIndexAdjustment = highIndexAdjustmentDefault + 3;
+			} else if (distanceDefault < 50) {
+				lowIndexAdjustment = lowIndexAdjustmentDefault + 2;
+				highIndexAdjustment = highIndexAdjustmentDefault + 2;
+			} else if (distanceDefault < 100) {
+				lowIndexAdjustment = lowIndexAdjustmentDefault + 1;
+				highIndexAdjustment = highIndexAdjustmentDefault + 1;
+			}
+
+			// adjust index to the array size
+			distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustment), serieLength - 1);
+			distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustment, serieLength - 1));
+
+			final int distance = tourData.distanceSerie[distIndexHigh]
+					- tourData.distanceSerie[distIndexLow];
+
+			final float timeInterval = deviceTimeInterval * (distIndexHigh - distIndexLow);
+
+			final int speed = (int) ((distance * 36F) / timeInterval);
+
+			speedSerie[speedIndex] = speed;
+		}
+	}
+
+	/**
+	 * Clip values when a minimum distance is fallen short of
+	 * 
+	 * @param tourData
+	 */
+	private void computeValueClipping(TourData tourData) {
+
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		final int[] speedSerie = tourData.speedSerie;
+		final int[] altimeterSerie = tourData.altimeterSerie;
+		final int[] gradientSerie = tourData.gradientSerie;
+		final int[] distanceSerie = tourData.distanceSerie;
+
+		final int serieLength = tourData.timeSerie.length;
+		final int deviceTimeInterval = tourData.getDeviceTimeInterval();
+
+		int clipTimeSlice;
+		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_CLIP_VALUE)) {
+			// use custom clipping
+			clipTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_CLIP_VALUE);
+		} else {
+			// use internal clipping, value is evaluated by experiments
+			clipTimeSlice = 15;
+		}
+
+		final int slices = Math.max(1, clipTimeSlice / deviceTimeInterval);
+
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			// adjust index to the array size
+			final int distIndex = Math.min(Math.max(0, serieIndex + slices), serieLength - 1);
+
+			final int distance = distanceSerie[distIndex] - distanceSerie[serieIndex];
+
+			if (distance == 0) {
+				altimeterSerie[serieIndex] = 0;
+				gradientSerie[serieIndex] = 0;
+				speedSerie[serieIndex] = 0;
+
+				altimeterSerie[distIndex] = 0;
+				gradientSerie[distIndex] = 0;
+				speedSerie[distIndex] = 0;
+			}
 		}
 	}
 
@@ -455,7 +641,7 @@ public class TourManager {
 
 				} else {
 
-					int timeSlice = timeValues[1] - timeValues[0];
+					final int timeSlice = timeValues[1] - timeValues[0];
 					final float time = rightTime
 							- leftTime
 							- (getIgnoreTimeSlices(distanceValues,
@@ -464,8 +650,7 @@ public class TourManager {
 									10 / timeSlice) * timeSlice);
 
 					final float distance = rightDistance - leftDistance;
-
-					float speed = distance / time * 3.6f;
+					final float speed = distance / time * 3.6f;
 
 					return speed;
 				}
@@ -564,6 +749,11 @@ public class TourManager {
 	private ChartDataModel createChartDataModelInternal(final TourData tourData,
 														final TourChartConfiguration chartConfig,
 														boolean hasPropertyChanged) {
+//		long startTime = System.currentTimeMillis();
+
+//		long endTime = System.currentTimeMillis();
+//		System.out.println("Execution time : " + (endTime - startTime) + " ms");
+
 		if (computeSpeedAvg == null) {
 			createChartAvgCallbacks();
 		}
@@ -576,13 +766,15 @@ public class TourManager {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-		createAltiGradiSerie(tourData, hasPropertyChanged);
+		computeAltiGradiSerie(tourData, hasPropertyChanged);
 
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_USE_CUSTOM)) {
-			createSpeedSerie(tourData, hasPropertyChanged);
+		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_COMPUTE_VALUE)) {
+			computeSpeedSerie(tourData, hasPropertyChanged);
 		} else {
-			createSpeedSerieInternal(tourData, hasPropertyChanged);
+			computeSpeedSerieInternal(tourData, hasPropertyChanged);
 		}
+
+		computeValueClipping(tourData);
 
 		/*
 		 * distance
@@ -660,7 +852,7 @@ public class TourManager {
 			yDataSpeed = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, tourData.speedSerie);
 
 		} else {
-			yDataSpeed = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+			yDataSpeed = new ChartDataYSerie(ChartDataModel.CHART_TYPE_NEW,
 					new int[tourData.speedSerie.length],
 					tourData.speedSerie);
 		}
@@ -822,141 +1014,6 @@ public class TourManager {
 		chartDataModel.setCustomData(CUSTOM_DATA_PULSE, yDataPulse);
 
 		return chartDataModel;
-	}
-
-	/**
-	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
-	 * 
-	 * @param tourData
-	 * @param hasPropertyChanged
-	 * @param tourChartProperty
-	 */
-	private void createSpeedSerieInternal(TourData tourData, boolean hasPropertyChanged) {
-
-		// check if speed was computed
-		if (tourData.speedSerie != null && hasPropertyChanged == false) {
-			return;
-		}
-
-		final int serieLength = tourData.timeSerie.length;
-
-		final int speedSerie[] = tourData.speedSerie = new int[serieLength];
-
-		int deviceTimeInterval = tourData.getDeviceTimeInterval();
-
-		int lowIndexAdjustmentDefault = 0;
-		int highIndexAdjustmentDefault = 0;
-		if (deviceTimeInterval <= 2) {
-			lowIndexAdjustmentDefault = 2;
-			highIndexAdjustmentDefault = 3;
-
-		} else if (deviceTimeInterval <= 5) {
-			lowIndexAdjustmentDefault = 1;
-			highIndexAdjustmentDefault = 1;
-
-		} else if (deviceTimeInterval <= 10) {
-			lowIndexAdjustmentDefault = 0;
-			highIndexAdjustmentDefault = 1;
-		} else {
-			lowIndexAdjustmentDefault = 0;
-			highIndexAdjustmentDefault = 1;
-		}
-
-		for (int speedIndex = 0; speedIndex < serieLength; speedIndex++) {
-
-			// adjust index to the array size
-			int distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustmentDefault),
-					serieLength - 1);
-
-			int distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustmentDefault,
-					serieLength - 1));
-
-			int distanceDefault = tourData.distanceSerie[distIndexHigh]
-					- tourData.distanceSerie[distIndexLow];
-
-			// adjust the accuracy for the distance
-			int lowIndexAdjustment = lowIndexAdjustmentDefault;
-			int highIndexAdjustment = highIndexAdjustmentDefault;
-
-			if (distanceDefault < 30) {
-				lowIndexAdjustment = lowIndexAdjustmentDefault + 3;
-				highIndexAdjustment = highIndexAdjustmentDefault + 3;
-			} else if (distanceDefault < 50) {
-				lowIndexAdjustment = lowIndexAdjustmentDefault + 2;
-				highIndexAdjustment = highIndexAdjustmentDefault + 2;
-			} else if (distanceDefault < 100) {
-				lowIndexAdjustment = lowIndexAdjustmentDefault + 1;
-				highIndexAdjustment = highIndexAdjustmentDefault + 1;
-			}
-
-			// adjust index to the array size
-			distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustment), serieLength - 1);
-			distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustment, serieLength - 1));
-
-			final int distance = tourData.distanceSerie[distIndexHigh]
-					- tourData.distanceSerie[distIndexLow];
-
-			final float timeInterval = deviceTimeInterval * (distIndexHigh - distIndexLow);
-
-			final int speed = (int) ((distance * 36F) / timeInterval);
-
-			speedSerie[speedIndex] = speed;
-		}
-	}
-
-	/**
-	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
-	 * 
-	 * @param tourData
-	 * @param hasPropertyChanged
-	 * @param tourChartProperty
-	 */
-	private void createSpeedSerie(TourData tourData, boolean hasPropertyChanged) {
-
-		// check if speed was computed
-		if (tourData.speedSerie != null && hasPropertyChanged == false) {
-			return;
-		}
-
-		final int serieLength = tourData.timeSerie.length;
-
-		final int speedSerie[] = tourData.speedSerie = new int[serieLength];
-
-		int deviceTimeInterval = tourData.getDeviceTimeInterval();
-
-		int lowIndexAdjustment = 0;
-		int highIndexAdjustment = 1;
-
-		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-
-		int speedTimeSlice = store.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE);
-		final int slices = speedTimeSlice / deviceTimeInterval;
-
-		highIndexAdjustment = Math.max(1, slices / 2);
-		lowIndexAdjustment = slices / 2;
-
-		// round up
-		if (lowIndexAdjustment + highIndexAdjustment < slices) {
-			highIndexAdjustment++;
-		}
-
-		for (int speedIndex = 0; speedIndex < serieLength; speedIndex++) {
-
-			// adjust index to the array size
-			int distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustment),
-					serieLength - 1);
-			int distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustment,
-					serieLength - 1));
-
-			final int distance = tourData.distanceSerie[distIndexHigh]
-					- tourData.distanceSerie[distIndexLow];
-
-			final float timeInterval = deviceTimeInterval * (distIndexHigh - distIndexLow);
-
-			final int speed = (int) ((distance * 36F) / timeInterval);
-
-			speedSerie[speedIndex] = speed;
-		}
 	}
 
 	/**

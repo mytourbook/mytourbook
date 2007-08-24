@@ -1242,14 +1242,14 @@ public class TourMapView extends SynchedChartView {
 						false);
 			}
 
+			fActiveComparedTour = compItem;
+			fActiveTourChart = fCompTourChart;
 			/*
 			 * fire the change event so that the tour markers updated
 			 */
-			fPostSelectionProvider.setSelection(new SelectionTourData(fCompTourChart.getTourData()));
+			fPostSelectionProvider.setSelection(new SelectionTourData(fActiveTourChart,
+					fCompTourChart.getTourData()));
 
-			fActiveComparedTour = compItem;
-
-			fActiveTourChart = fCompTourChart;
 		}
 	}
 

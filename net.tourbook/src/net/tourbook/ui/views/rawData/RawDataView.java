@@ -395,7 +395,7 @@ public class RawDataView extends ViewPart {
 					return;
 				}
 
-				fPostSelectionProvider.setSelection(new SelectionTourData(tourData));
+				fPostSelectionProvider.setSelection(new SelectionTourData(null, tourData));
 			}
 		});
 	}

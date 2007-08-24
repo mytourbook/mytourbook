@@ -11,6 +11,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -22,17 +23,30 @@ public class TourChartPropertyView extends ViewPart {
 
 	public static final String	ID	= "net.tourbook.views.TourChartPropertyView";	//$NON-NLS-1$
 
-	private Spinner				fSpinnerTimeslice;
+	private Spinner				fSpinnerComputeValues;
+	private Spinner				fSpinnerClipValues;
 
-	private Button				fRadioSpeedLineChart;
+	private Button				fRadioLineChartType;
+	private Button				fRadioBarChartType;
 
-	private Button				fRadioSpeedBarChart;
+	private Button				fChkUseCustomComputeSettings;
+	private Button				fChkUseCustomClipSettings;
 
-	private Button				fChkUseCustomSettings;
+	private void adjustSpinnerValueOnMouseScroll(MouseEvent event) {
+
+		// accelerate with Ctrl + Shift key
+		int accelerator = (event.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
+		accelerator *= (event.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
+
+		Spinner spinner = (Spinner) event.widget;
+		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
+
+		spinner.setSelection(spinner.getSelection() + newValue);
+	}
 
 	private void createLayout(Composite parent) {
 
-//		GridData gd;
+		GridData gd;
 		Label label;
 
 		Composite container = new Composite(parent, SWT.NONE);
@@ -52,9 +66,9 @@ public class TourChartPropertyView extends ViewPart {
 
 		{
 			// radio: line chart
-			fRadioSpeedLineChart = new Button(groupChartType, SWT.RADIO);
-			fRadioSpeedLineChart.setText("Line Chart");
-			fRadioSpeedLineChart.addSelectionListener(new SelectionAdapter() {
+			fRadioLineChartType = new Button(groupChartType, SWT.RADIO);
+			fRadioLineChartType.setText("Line Chart");
+			fRadioLineChartType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent event) {
 					onChangeProperty();
@@ -62,9 +76,9 @@ public class TourChartPropertyView extends ViewPart {
 			});
 
 			// radio: bar chart
-			fRadioSpeedBarChart = new Button(groupChartType, SWT.RADIO);
-			fRadioSpeedBarChart.setText("Bar Chart");
-			fRadioSpeedBarChart.addSelectionListener(new SelectionAdapter() {
+			fRadioBarChartType = new Button(groupChartType, SWT.RADIO);
+			fRadioBarChartType.setText("Bar Chart");
+			fRadioBarChartType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent event) {
 					onChangeProperty();
@@ -72,10 +86,10 @@ public class TourChartPropertyView extends ViewPart {
 			});
 		}
 
-		// check: use custom settings
-		fChkUseCustomSettings = new Button(container, SWT.CHECK);
-		fChkUseCustomSettings.setText("Use custom setting for speed:");
-		fChkUseCustomSettings.addSelectionListener(new SelectionAdapter() {
+		// check: use custom settings to compute values
+		fChkUseCustomComputeSettings = new Button(container, SWT.CHECK);
+		fChkUseCustomComputeSettings.setText("Customize value computing");
+		fChkUseCustomComputeSettings.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				onChangeProperty();
@@ -84,34 +98,67 @@ public class TourChartPropertyView extends ViewPart {
 		label = new Label(container, SWT.NONE);
 
 		/*
-		 * time slice
+		 * computed value time slice
 		 */
 		label = new Label(container, SWT.NONE);
-		label.setText("Timeslices for speed:");
+		label.setText("Timeslices:");
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		label.setLayoutData(gd);
 
-		fSpinnerTimeslice = new Spinner(container, SWT.HORIZONTAL | SWT.BORDER);
-		fSpinnerTimeslice.setMaximum(1000);
+		fSpinnerComputeValues = new Spinner(container, SWT.HORIZONTAL | SWT.BORDER);
+		fSpinnerComputeValues.setMaximum(1000);
 
-		fSpinnerTimeslice.addSelectionListener(new SelectionAdapter() {
+		fSpinnerComputeValues.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onChangeProperty();
 			}
 		});
 
-		fSpinnerTimeslice.addMouseWheelListener(new MouseWheelListener() {
-
+		fSpinnerComputeValues.addMouseWheelListener(new MouseWheelListener() {
 			public void mouseScrolled(MouseEvent event) {
+				adjustSpinnerValueOnMouseScroll(event);
+				onChangeProperty();
+			}
+		});
 
-				// accelerate the change with Ctrl + Shift key
-				int accelerator = (event.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
-				accelerator *= (event.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
+		/*
+		 * value clipping
+		 */
+		fChkUseCustomClipSettings = new Button(container, SWT.CHECK);
+		fChkUseCustomClipSettings.setText("Customize value clipping");
+		fChkUseCustomClipSettings.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				onChangeProperty();
+			}
+		});
+		// spacer
+		new Label(container, SWT.NONE);
 
-				Spinner spinner = (Spinner) event.widget;
-				final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
+		/*
+		 * time slice to clip values
+		 */
+		label = new Label(container, SWT.NONE);
+		label.setText("Timeslices:");
+		gd = new GridData();
+		gd.horizontalIndent = 20;
+		label.setLayoutData(gd);
 
-				spinner.setSelection(spinner.getSelection() + newValue);
+		fSpinnerClipValues = new Spinner(container, SWT.HORIZONTAL | SWT.BORDER);
+		fSpinnerClipValues.setMaximum(1000);
 
+		fSpinnerClipValues.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				onChangeProperty();
+			}
+		});
+
+		fSpinnerClipValues.addMouseWheelListener(new MouseWheelListener() {
+			public void mouseScrolled(MouseEvent event) {
+				adjustSpinnerValueOnMouseScroll(event);
 				onChangeProperty();
 			}
 		});
@@ -124,26 +171,10 @@ public class TourChartPropertyView extends ViewPart {
 		restoreSettings();
 	}
 
-	private void restoreSettings() {
+	private void enableControls() {
 
-		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-
-		// get values from pref store
-
-		// use custom settings
-		boolean isCustom = store.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_USE_CUSTOM);
-		fChkUseCustomSettings.setSelection(isCustom);
-
-		// time slice
-		fSpinnerTimeslice.setSelection(store.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE));
-
-		// speed chart type
-		int speedChartType = store.getInt(ITourbookPreferences.GRAPH_PROPERTY_SPEED_CHARTTYPE);
-		if (speedChartType == 0 || speedChartType == ChartDataModel.CHART_TYPE_LINE) {
-			fRadioSpeedLineChart.setSelection(true);
-		} else {
-			fRadioSpeedBarChart.setSelection(true);
-		}
+		fSpinnerComputeValues.setEnabled(fChkUseCustomComputeSettings.getSelection());
+		fSpinnerClipValues.setEnabled(fChkUseCustomClipSettings.getSelection());
 	}
 
 	/**
@@ -157,31 +188,56 @@ public class TourChartPropertyView extends ViewPart {
 
 		// set new values in the pref store
 
-		// use custom settings
-		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_USE_CUSTOM,
-				fChkUseCustomSettings.getSelection());
+		// checkbox: use custom settings to compute values
+		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_IS_COMPUTE_VALUE,
+				fChkUseCustomComputeSettings.getSelection());
 
-		// time slice
-		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE,
-				fSpinnerTimeslice.getSelection());
+		// spinner: compute value time slice
+		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE,
+				fSpinnerComputeValues.getSelection());
 
-		// speed chart type
-		final int speedChartType = fRadioSpeedLineChart.getSelection()
+		// checkbox: clip values
+		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_IS_CLIP_VALUE,
+				fChkUseCustomClipSettings.getSelection());
+
+		// spinner: clip value time slice
+		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_CLIP_VALUE,
+				fSpinnerClipValues.getSelection());
+
+		// radioo: chart type
+		final int speedChartType = fRadioLineChartType.getSelection()
 				? ChartDataModel.CHART_TYPE_LINE
 				: ChartDataModel.CHART_TYPE_BAR;
 		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_SPEED_CHARTTYPE, speedChartType);
 
+		// fire modify event
 		TourManager.getInstance().firePropertyChange(TourManager.TOURCHART_PROPERTY_IS_MODIFIED);
 	}
 
-	private void enableControls() {
-		boolean useCustomSettings = fChkUseCustomSettings.getSelection();
-		fSpinnerTimeslice.setEnabled(useCustomSettings);
+	private void restoreSettings() {
+
+		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+
+		// get values from pref store
+
+		fChkUseCustomComputeSettings.setSelection(store.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_COMPUTE_VALUE));
+		fSpinnerComputeValues.setSelection(store.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE));
+
+		fChkUseCustomClipSettings.setSelection(store.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_CLIP_VALUE));
+		fSpinnerClipValues.setSelection(store.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_CLIP_VALUE));
+
+		// chart type
+		int speedChartType = store.getInt(ITourbookPreferences.GRAPH_PROPERTY_SPEED_CHARTTYPE);
+		if (speedChartType == 0 || speedChartType == ChartDataModel.CHART_TYPE_LINE) {
+			fRadioLineChartType.setSelection(true);
+		} else {
+			fRadioBarChartType.setSelection(true);
+		}
+
+		enableControls();
 	}
 
 	@Override
-	public void setFocus() {
-
-	}
+	public void setFocus() {}
 
 }

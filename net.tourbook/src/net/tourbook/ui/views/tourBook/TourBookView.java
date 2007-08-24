@@ -69,6 +69,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
@@ -171,8 +172,9 @@ public class TourBookView extends ViewPart {
 			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
 
 			public void partClosed(IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId()))
+				if (ID.equals(partRef.getId())) {
 					saveSettings();
+				}
 			}
 
 			public void partDeactivated(IWorkbenchPartReference partRef) {
@@ -262,6 +264,7 @@ public class TourBookView extends ViewPart {
 		tourViewer.setMenu(menu);
 	}
 
+	@Override
 	public void createPartControl(Composite parent) {
 
 		createResources();
@@ -405,6 +408,7 @@ public class TourBookView extends ViewPart {
 		colDef = TreeColumnFactory.DATE.createColumn(fColumnManager, pixelConverter);
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
@@ -418,6 +422,7 @@ public class TourBookView extends ViewPart {
 		 */
 		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
@@ -434,6 +439,7 @@ public class TourBookView extends ViewPart {
 		 */
 		colDef = TreeColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
@@ -450,6 +456,7 @@ public class TourBookView extends ViewPart {
 		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
 //		colDef.setColumnResizable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
@@ -466,6 +473,7 @@ public class TourBookView extends ViewPart {
 		 */
 		colDef = TreeColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 
 				final Object element = cell.getElement();
@@ -483,6 +491,7 @@ public class TourBookView extends ViewPart {
 		 */
 		colDef = TreeColumnFactory.DRIVING_TIME.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 
 				final Object element = cell.getElement();
@@ -500,6 +509,7 @@ public class TourBookView extends ViewPart {
 		 */
 		colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
@@ -513,6 +523,7 @@ public class TourBookView extends ViewPart {
 		 */
 		colDef = TreeColumnFactory.TOUR_COUNTER.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				if ((element instanceof TVITourBookTour) == false) {
@@ -527,6 +538,7 @@ public class TourBookView extends ViewPart {
 		 */
 		colDef = TreeColumnFactory.DEVICE_DISTANCE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
@@ -538,6 +550,7 @@ public class TourBookView extends ViewPart {
 
 		colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
@@ -549,6 +562,7 @@ public class TourBookView extends ViewPart {
 
 		colDef = TreeColumnFactory.MAX_SPEED.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
@@ -561,6 +575,7 @@ public class TourBookView extends ViewPart {
 
 		colDef = TreeColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
@@ -573,6 +588,7 @@ public class TourBookView extends ViewPart {
 
 		colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
@@ -583,6 +599,7 @@ public class TourBookView extends ViewPart {
 
 		colDef = TreeColumnFactory.MAX_PULSE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
@@ -593,6 +610,7 @@ public class TourBookView extends ViewPart {
 
 		colDef = TreeColumnFactory.AVG_PULSE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
@@ -603,6 +621,7 @@ public class TourBookView extends ViewPart {
 
 		colDef = TreeColumnFactory.AVG_CADENCE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
@@ -613,6 +632,7 @@ public class TourBookView extends ViewPart {
 
 		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
@@ -627,6 +647,7 @@ public class TourBookView extends ViewPart {
 
 	}
 
+	@Override
 	public void dispose() {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
@@ -646,7 +667,7 @@ public class TourBookView extends ViewPart {
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void enableActions() {
 
 		ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
@@ -738,6 +759,7 @@ public class TourBookView extends ViewPart {
 		}
 	}
 
+	@Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 		super.init(site, memento);
 
@@ -791,9 +813,13 @@ public class TourBookView extends ViewPart {
 
 		// select year/month in the viewer
 		if (newMonthItem != null) {
+
 			fTourViewer.setSelection(new StructuredSelection(newMonthItem) {}, false);
+
 		} else if (newYearItem != null) {
+
 			fTourViewer.setSelection(new StructuredSelection(newYearItem) {}, false);
+
 		} else if (yearItems.size() > 0) {
 
 			// the old year was not found, select the newest year
@@ -801,6 +827,12 @@ public class TourBookView extends ViewPart {
 			TreeViewerItem yearItem = yearItems.get(yearItems.size() - 1);
 
 			fTourViewer.setSelection(new StructuredSelection(yearItem) {}, true);
+		}
+
+		// move the horizontal scrollbar to the left border
+		final ScrollBar horizontalBar = fTourViewer.getTree().getHorizontalBar();
+		if (horizontalBar != null) {
+			horizontalBar.setSelection(0);
 		}
 	}
 
@@ -838,6 +870,7 @@ public class TourBookView extends ViewPart {
 		saveState(fSessionMemento);
 	}
 
+	@Override
 	public void saveState(IMemento memento) {
 
 		// save selection in the tour viewer
@@ -872,6 +905,7 @@ public class TourBookView extends ViewPart {
 		}
 	}
 
+	@Override
 	public void setFocus() {
 		fTourViewer.getControl().setFocus();
 	}

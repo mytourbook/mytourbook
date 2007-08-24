@@ -24,9 +24,11 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class SelectionTourData implements ISelection {
 
+	private TourChart	fTourChart;
 	private TourData	fTourData;
 
-	public SelectionTourData(TourData tourData) {
+	public SelectionTourData(TourChart tourChart, TourData tourData) {
+		fTourChart = tourChart;
 		fTourData = tourData;
 	}
 
@@ -36,6 +38,14 @@ public class SelectionTourData implements ISelection {
 
 	public TourData getTourData() {
 		return fTourData;
+	}
+
+	/**
+	 * @return Returns the tour chart for the tour data or <code>null</code> when a tour chart is
+	 *         not available
+	 */
+	public TourChart getTourChart() {
+		return fTourChart;
 	}
 
 }

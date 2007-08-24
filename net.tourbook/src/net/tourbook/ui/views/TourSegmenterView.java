@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -113,8 +114,6 @@ public class TourSegmenterView extends ViewPart {
 
 		public ViewContentProvider() {}
 
-		public void inputChanged(Viewer v, Object oldInput, Object newInput) {}
-
 		public void dispose() {}
 
 		public Object[] getElements(Object parent) {
@@ -124,9 +123,16 @@ public class TourSegmenterView extends ViewPart {
 				return fTourData.createTourSegments();
 			}
 		}
+
+		public void inputChanged(Viewer v, Object oldInput, Object newInput) {}
 	}
 
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+
+		public Image getColumnImage(Object element, int columnIndex) {
+
+			return null;
+		}
 
 		public String getColumnText(Object obj, int index) {
 
@@ -213,11 +219,6 @@ public class TourSegmenterView extends ViewPart {
 
 			return (getText(obj));
 		}
-
-		public Image getColumnImage(Object element, int columnIndex) {
-
-			return null;
-		}
 	}
 
 	private class ViewSorter extends ViewerSorter {
@@ -229,24 +230,6 @@ public class TourSegmenterView extends ViewPart {
 		private int					column;
 
 		private int					direction;
-
-		/**
-		 * Does the sort. If it's a different column from the previous sort, do an ascending sort.
-		 * If it's the same column as the last sort, toggle the sort direction.
-		 * 
-		 * @param column
-		 */
-		public void sortColumn(int column) {
-
-			if (column == this.column) {
-				// Same column as last sort; toggle the direction
-				direction = 1 - direction;
-			} else {
-				// New column; do an descending sort
-				this.column = column;
-				direction = DESCENDING;
-			}
-		}
 
 		/**
 		 * Compares the object for sorting
@@ -277,6 +260,24 @@ public class TourSegmenterView extends ViewPart {
 
 			return rc;
 		}
+
+		/**
+		 * Does the sort. If it's a different column from the previous sort, do an ascending sort.
+		 * If it's the same column as the last sort, toggle the sort direction.
+		 * 
+		 * @param column
+		 */
+		public void sortColumn(int column) {
+
+			if (column == this.column) {
+				// Same column as last sort; toggle the direction
+				direction = 1 - direction;
+			} else {
+				// New column; do an descending sort
+				this.column = column;
+				direction = DESCENDING;
+			}
+		}
 	}
 
 	/**
@@ -284,16 +285,6 @@ public class TourSegmenterView extends ViewPart {
 	 */
 	public TourSegmenterView() {
 		super();
-	}
-
-	private void addSelectionListener() {
-		fPostSelectionListener = new ISelectionListener() {
-
-			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-				onTourSelection(selection);
-			}
-		};
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
 	private void addPartListener() {
@@ -305,10 +296,6 @@ public class TourSegmenterView extends ViewPart {
 
 			public void partBroughtToTop(IWorkbenchPart part) {}
 
-			public void partDeactivated(IWorkbenchPart part) {}
-
-			public void partOpened(IWorkbenchPart part) {}
-
 			public void partClosed(IWorkbenchPart part) {
 
 				if (fTourChart != null) {
@@ -317,10 +304,24 @@ public class TourSegmenterView extends ViewPart {
 				}
 			}
 
+			public void partDeactivated(IWorkbenchPart part) {}
+
+			public void partOpened(IWorkbenchPart part) {}
+
 		};
 
 		// register the listener in the page
 		getSite().getPage().addPartListener(fPartListener);
+	}
+
+	private void addSelectionListener() {
+		fPostSelectionListener = new ISelectionListener() {
+
+			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+				onTourSelection(selection);
+			}
+		};
+		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
 	@Override
@@ -345,7 +346,20 @@ public class TourSegmenterView extends ViewPart {
 
 		fPageBook.showPage(fPageNoChart);
 
-		onTourSelection(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+		/*
+		 * get markers from current selection
+		 */
+		final ISelection curretSelection = getSite().getWorkbenchWindow()
+				.getSelectionService()
+				.getSelection();
+		if (curretSelection instanceof SelectionActiveEditor) {
+			onTourSelection(curretSelection);
+		} else {
+			IEditorPart activeEditor = getSite().getPage().getActiveEditor();
+			if (activeEditor != null) {
+				onTourSelection(new SelectionActiveEditor(activeEditor));
+			}
+		}
 	}
 
 	private void createSegmenterLayout(Composite parent) {
@@ -510,6 +524,32 @@ public class TourSegmenterView extends ViewPart {
 		});
 	}
 
+	@Override
+	public void dispose() {
+
+		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+
+		getSite().setSelectionProvider(null);
+
+		super.dispose();
+	}
+
+	private void fireSegmentLayerSelection() {
+
+		// show the segments in the chart
+		fPostSelectionProvider.setSelection(new SelectionTourSegmentLayer(fChkShowInChart.getSelection()));
+
+		// move the markers to start/end position
+//		fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(fTourChart,
+//				SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER,
+//				SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER));
+
+	}
+
+	private int getTolerance() {
+		return (int) ((Math.pow(fScaleTolerance.getSelection(), 2.05)) / (double) 50.0);
+	}
+
 	private void onChangeTolerance(int dpTolerance, boolean forceRecalc) {
 
 		// update label in the ui
@@ -555,26 +595,6 @@ public class TourSegmenterView extends ViewPart {
 		fireSegmentLayerSelection();
 	}
 
-	private int getTolerance() {
-		return (int) ((Math.pow(fScaleTolerance.getSelection(), 2.05)) / (double) 50.0);
-	}
-
-	private void fireSegmentLayerSelection() {
-
-		// show the segments in the chart
-		fPostSelectionProvider.setSelection(new SelectionTourSegmentLayer(fChkShowInChart.getSelection()));
-
-		// move the markers to start/end position
-//		fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(fTourChart,
-//				SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER,
-//				SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER));
-
-	}
-
-	private void setTableInput() {
-		fTableViewer.setInput(this);
-	}
-
 	/**
 	 * handle a tour selection event
 	 * 
@@ -583,11 +603,20 @@ public class TourSegmenterView extends ViewPart {
 	private void onTourSelection(ISelection selection) {
 
 		if (selection instanceof SelectionActiveEditor) {
-			final TourEditor tourEditor = ((SelectionActiveEditor) selection).getTourEditor();
-			if (tourEditor == fTourEditor) {
+			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
+			TourEditor tourEditor;
+			if (editor instanceof TourEditor) {
+
+				tourEditor = (TourEditor) editor;
+
+				if (tourEditor == fTourEditor) {
+					return;
+				}
+				fTourEditor = tourEditor;
+
+			} else {
 				return;
 			}
-			fTourEditor = tourEditor;
 		} else {
 			return;
 		}
@@ -629,6 +658,15 @@ public class TourSegmenterView extends ViewPart {
 		fTourChart.updateSegmentLayer(fChkShowInChart.getSelection());
 	}
 
+	@Override
+	public void setFocus() {
+		fScaleTolerance.setFocus();
+	}
+
+	private void setTableInput() {
+		fTableViewer.setInput(this);
+	}
+
 	/**
 	 * when dp tolerance was changed set the tour dirty
 	 */
@@ -640,21 +678,6 @@ public class TourSegmenterView extends ViewPart {
 
 			fTourEditor.setTourDirty();
 		}
-	}
-
-	@Override
-	public void dispose() {
-
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-
-		getSite().setSelectionProvider(null);
-
-		super.dispose();
-	}
-
-	@Override
-	public void setFocus() {
-		fScaleTolerance.setFocus();
 	}
 
 	// private void disposeCustomCellRenderer() {

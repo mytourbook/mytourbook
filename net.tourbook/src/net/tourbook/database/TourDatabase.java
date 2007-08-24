@@ -184,6 +184,10 @@ public class TourDatabase {
 
 		em.close();
 
+//		long startTime = System.currentTimeMillis();
+//		long endTime = System.currentTimeMillis();
+//		System.out.println("Execution time : " + (endTime - startTime) + " ms");
+
 		return tourData;
 	}
 

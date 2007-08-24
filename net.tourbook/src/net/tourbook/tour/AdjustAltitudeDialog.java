@@ -445,6 +445,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fTourChart.setLayoutData(gd);
 
 		fTourChart.setShowZoomActions(true);
+		fTourChart.setShowSlider(true);
 
 		// set altitude visible
 		TourChartConfiguration chartConfig = new TourChartConfiguration(true);

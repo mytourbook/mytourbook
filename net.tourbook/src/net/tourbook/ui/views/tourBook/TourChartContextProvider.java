@@ -21,17 +21,22 @@ import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourChart;
+import net.tourbook.tour.TourEditor;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.swt.widgets.Display;
 
-class TourChartContextProvider implements ChartContextProvider {
+public class TourChartContextProvider implements ChartContextProvider {
 
 	TourBookView			fView;
 
 	public ChartXSlider		fSlider;
 
 	private MarkerDialog	fMarkerDialog;
+	private TourEditor		fTourEditor;
 
 	/**
 	 * add a new reference tour to all reference tours
@@ -42,6 +47,7 @@ class TourChartContextProvider implements ChartContextProvider {
 			setText(Messages.TourMap_Action_create_reference_tour);
 		}
 
+		@Override
 		public void run() {
 
 //			TourReference refTour = ReferenceTourManager.getInstance().addReferenceTour(
@@ -65,6 +71,7 @@ class TourChartContextProvider implements ChartContextProvider {
 			fSlider = slider;
 		}
 
+		@Override
 		public void run() {
 
 			if (fView != null) {
@@ -88,6 +95,37 @@ class TourChartContextProvider implements ChartContextProvider {
 //
 //				// update marker list and other listener
 //				tourChart.fireTourChartSelection();
+
+			} else if (fTourEditor != null) {
+
+				final TourChart tourChart = fTourEditor.getTourChart();
+				final TourData tourData = tourChart.getTourData();
+
+				TourMarker newTourMarker = createTourMarker(tourData);
+
+				final MarkerDialog markerDialog = new MarkerDialog(Display.getCurrent()
+						.getActiveShell(), tourData, null);
+
+				markerDialog.create();
+
+				markerDialog.addTourMarker(newTourMarker);
+				markerDialog.open();
+
+				/*
+				 * Currently the dialog works with the markers from the tour editor not with a
+				 * backup, so changes in the dialog are made in the tourdata of the tour editor ->
+				 * the tour will be dirty when this dialog was opened
+				 */
+
+				// force the tour to be saved
+				tourChart.setTourDirty(true);
+
+				// update chart
+				tourChart.updateMarkerLayer(true);
+
+				// update marker list and other listener
+				TourDatabase.getInstance()
+						.firePropertyChange(TourDatabase.PROPERTY_TOUR_IS_CHANGED);
 
 			} else if (fMarkerDialog != null) {
 
@@ -121,11 +159,15 @@ class TourChartContextProvider implements ChartContextProvider {
 		fMarkerDialog = markerDialog;
 	}
 
+	public TourChartContextProvider(TourEditor tourEditor) {
+		fTourEditor = tourEditor;
+	}
+
 	public void fillXSliderContextMenu(	IMenuManager menuMgr,
 										ChartXSlider leftSlider,
 										ChartXSlider rightSlider) {
 
-		if (fView != null) {
+		if (fView != null || fTourEditor != null) {
 
 			// context dialog for the tourbook view
 

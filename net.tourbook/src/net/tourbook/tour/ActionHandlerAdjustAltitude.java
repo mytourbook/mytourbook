@@ -30,12 +30,11 @@ public class ActionHandlerAdjustAltitude extends AbstractHandler {
 
 		AdjustAltitudeDialog dialog;
 
-		if (tourChart != null) {
-			dialog = new AdjustAltitudeDialog(tourChart.getShell(), tourChart);
-		} else {
+		if (tourChart == null) {
 			return null;
 		}
 
+		dialog = new AdjustAltitudeDialog(tourChart.getShell(), tourChart);
 		dialog.create();
 
 		/*

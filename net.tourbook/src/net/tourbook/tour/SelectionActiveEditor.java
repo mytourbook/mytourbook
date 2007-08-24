@@ -16,24 +16,25 @@
 package net.tourbook.tour;
 
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IEditorPart;
 
 /**
  * selection is fired when a tour editor get's the focus
  */
 public class SelectionActiveEditor implements ISelection {
 
-	private final TourEditor	fTourEditor;
+	private final IEditorPart	fEditorPart;
 
-	public SelectionActiveEditor(TourEditor tourEditor) {
-		fTourEditor = tourEditor;
+	public SelectionActiveEditor(IEditorPart activeEditor) {
+		fEditorPart = activeEditor;
 	}
 
 	public boolean isEmpty() {
 		return false;
 	}
 
-	public TourEditor getTourEditor() {
-		return fTourEditor;
+	public IEditorPart getEditor() {
+		return fEditorPart;
 	}
 
 }

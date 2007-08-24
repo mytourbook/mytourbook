@@ -26,6 +26,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.views.SelectionTourSegmentLayer;
+import net.tourbook.ui.views.tourBook.TourChartContextProvider;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -108,6 +109,7 @@ public class TourEditor extends EditorPart implements ITourChartPropertyListener
 
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
+		fTourChart.setContextProvider(new TourChartContextProvider(this));
 
 		// fire a slider move selection when a slider was moved in the tour chart
 		fTourChart.addSliderMoveListener(new ISliderMoveListener() {
