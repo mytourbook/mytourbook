@@ -46,15 +46,15 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.ActionAdjustAltitude;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourChartSelectionListener;
-import net.tourbook.tour.TourChart;
-import net.tourbook.tour.TourChartConfiguration;
+import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.TourChart;
+import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
-import net.tourbook.ui.views.SelectionTourSegmentLayer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnLayout;
@@ -160,7 +160,8 @@ public class TourMapView extends SynchedChartView {
 
 	private ISelectionListener						fPostSelectionListener;
 	private IPartListener2							fPartListener;
-	// PostSelectionProvider fPostSelectionProvider;
+	PostSelectionProvider							fPostSelectionProvider;
+	private ITourPropertyListener					fTourPropertyListener;
 
 	private PageBook								fPageBookYearChart;
 	private PageBook								fPageBookCompTourChart;
@@ -197,8 +198,6 @@ public class TourMapView extends SynchedChartView {
 	 * contains TVTITourMapComparedTour objects, these are the tours for the selected year
 	 */
 	private Object[]								fYearMapTours;
-
-	PostSelectionProvider							fPostSelectionProvider;
 
 	/**
 	 * tour chart which has currently the focus
@@ -370,6 +369,118 @@ public class TourMapView extends SynchedChartView {
 
 	public TourMapView() {}
 
+	private void addPartListener() {
+		fPartListener = new IPartListener2() {
+			public void partActivated(final IWorkbenchPartReference partRef) {}
+
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+			public void partClosed(final IWorkbenchPartReference partRef) {
+				if (ID.equals(partRef.getId())) {
+					saveSettings();
+				}
+			}
+
+			public void partDeactivated(final IWorkbenchPartReference partRef) {
+				if (ID.equals(partRef.getId())) {
+					saveSettings();
+				}
+			}
+
+			public void partHidden(final IWorkbenchPartReference partRef) {}
+
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+			public void partOpened(final IWorkbenchPartReference partRef) {}
+
+			public void partVisible(final IWorkbenchPartReference partRef) {}
+		};
+		getViewSite().getPage().addPartListener(fPartListener);
+	}
+
+	private void addPostSelectionListener() {
+
+		// this view part is a selection listener
+		fPostSelectionListener = new ISelectionListener() {
+
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+				// update the view when a new tour reference was created
+				if (selection instanceof SelectionPersistedCompareResults) {
+
+					final SelectionPersistedCompareResults tourMapUpdate = (SelectionPersistedCompareResults) selection;
+
+					final ArrayList<TVICompareResult> persistedCompareResults = tourMapUpdate.persistedCompareResults;
+
+					if (persistedCompareResults.size() > 0) {
+						updateCompareResults(persistedCompareResults);
+					}
+
+				} else if (selection instanceof SelectionNewRefTours) {
+
+					final SelectionNewRefTours tourSelection = (SelectionNewRefTours) selection;
+					final ArrayList<TourReference> newRefTours = tourSelection.newRefTours;
+
+					if (newRefTours.size() > 0) {
+
+						// refresh the tree viewer and resort the ref tours
+						fRootItem.fetchChildren();
+						fTourViewer.refresh();
+					}
+
+				} else if (selection instanceof SelectionRemovedComparedTours) {
+
+					final SelectionRemovedComparedTours removedCompTours = (SelectionRemovedComparedTours) selection;
+
+					/*
+					 * find/remove the removed compared tours in the viewer
+					 */
+					fComparedToursFindResult = new ArrayList<TVTITourMapComparedTour>();
+
+					findComparedTours(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem(),
+							removedCompTours.removedComparedTours);
+
+					// remove compared tour from the fDataModel
+					for (final TVTITourMapComparedTour comparedTour : fComparedToursFindResult) {
+						comparedTour.remove();
+					}
+
+					// remove compared tour from the tree viewer
+					fTourViewer.remove(fComparedToursFindResult.toArray());
+				}
+
+				if (fActiveTourChart != null) {
+
+					/*
+					 * listen for x-slider position changes, this can be done in the marker or
+					 * segmenter view
+					 */
+					if (selection instanceof SelectionChartXSliderPosition) {
+
+						fActiveTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
+
+					}
+				}
+			}
+		};
+
+		// register selection listener in the page
+		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+	}
+
+	private void addTourPropertyListener() {
+		fTourPropertyListener = new ITourPropertyListener() {
+
+			public void propertyChanged(int propertyId, Object propertyData) {
+				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGE) {
+					fActiveTourChart.updateSegmentLayer((Boolean) propertyData);
+				}
+			}
+		};
+
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+	}
+
 	private void createActions() {
 
 		fActionDeleteSelectedTour = new ActionDeleteTourFromMap(this);
@@ -521,8 +632,9 @@ public class TourMapView extends SynchedChartView {
 
 		restoreSettings(fSessionMemento);
 
-		setPartListener();
-		setPostSelectionListener();
+		addPartListener();
+		addPostSelectionListener();
+		addTourPropertyListener();
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -612,6 +724,7 @@ public class TourMapView extends SynchedChartView {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
+		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
 		fColorYearFg.dispose();
 		fColorMonthFg.dispose();
@@ -829,35 +942,6 @@ public class TourMapView extends SynchedChartView {
 		fTourViewer.getTree().setFocus();
 	}
 
-	private void setPartListener() {
-		fPartListener = new IPartListener2() {
-			public void partActivated(final IWorkbenchPartReference partRef) {}
-
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
-				}
-			}
-
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
-				}
-			}
-
-			public void partHidden(final IWorkbenchPartReference partRef) {}
-
-			public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-			public void partOpened(final IWorkbenchPartReference partRef) {}
-
-			public void partVisible(final IWorkbenchPartReference partRef) {}
-		};
-		getViewSite().getPage().addPartListener(fPartListener);
-	}
-
 	/**
 	 * show the reference tour if it's not yet displayed
 	 * 
@@ -916,81 +1000,6 @@ public class TourMapView extends SynchedChartView {
 		fActiveRefTourChartData = refTourChartData;
 
 		return true;
-	}
-
-	private void setPostSelectionListener() {
-
-		// this view part is a selection listener
-		fPostSelectionListener = new ISelectionListener() {
-
-			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-
-				// update the view when a new tour reference was created
-				if (selection instanceof SelectionPersistedCompareResults) {
-
-					final SelectionPersistedCompareResults tourMapUpdate = (SelectionPersistedCompareResults) selection;
-
-					final ArrayList<TVICompareResult> persistedCompareResults = tourMapUpdate.persistedCompareResults;
-
-					if (persistedCompareResults.size() > 0) {
-						updateCompareResults(persistedCompareResults);
-					}
-
-				} else if (selection instanceof SelectionNewRefTours) {
-
-					final SelectionNewRefTours tourSelection = (SelectionNewRefTours) selection;
-					final ArrayList<TourReference> newRefTours = tourSelection.newRefTours;
-
-					if (newRefTours.size() > 0) {
-
-						// refresh the tree viewer and resort the ref tours
-						fRootItem.fetchChildren();
-						fTourViewer.refresh();
-					}
-
-				} else if (selection instanceof SelectionRemovedComparedTours) {
-
-					final SelectionRemovedComparedTours removedCompTours = (SelectionRemovedComparedTours) selection;
-
-					/*
-					 * find/remove the removed compared tours in the viewer
-					 */
-					fComparedToursFindResult = new ArrayList<TVTITourMapComparedTour>();
-
-					findComparedTours(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem(),
-							removedCompTours.removedComparedTours);
-
-					// remove compared tour from the fDataModel
-					for (final TVTITourMapComparedTour comparedTour : fComparedToursFindResult) {
-						comparedTour.remove();
-					}
-
-					// remove compared tour from the tree viewer
-					fTourViewer.remove(fComparedToursFindResult.toArray());
-				}
-
-				if (fActiveTourChart != null) {
-
-					/*
-					 * listen for x-slider position changes, this can be done in the marker or
-					 * segmenter view
-					 */
-					if (selection instanceof SelectionChartXSliderPosition) {
-
-						fActiveTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
-
-					} else if (selection instanceof SelectionTourSegmentLayer) {
-
-						fActiveTourChart.updateSegmentLayer(((SelectionTourSegmentLayer) selection).isLayerVisible);
-					}
-				}
-
-			}
-
-		};
-
-		// register selection listener in the page
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
 	private void showRefTourChart(final RefTourChartData refTourChartData) {

@@ -21,14 +21,20 @@ import org.eclipse.jface.viewers.ISelection;
 
 public class SelectionChartInfo implements ISelection {
 
+	private Chart						fChart;
+
 	public ChartDataModel				chartDataModel;
 	public ArrayList<ChartDrawingData>	chartDrawingData;
 
 	public int							leftSliderValuesIndex;
 	public int							rightSliderValuesIndex;
 
-//	public ChartXSlider					leftSlider;
-//	public ChartXSlider					rightSlider;
+	@SuppressWarnings("unused")
+	private SelectionChartInfo() {}
+
+	public SelectionChartInfo(Chart chart) {
+		fChart = chart;
+	}
 
 	public boolean isEmpty() {
 		return false;
@@ -42,6 +48,10 @@ public class SelectionChartInfo implements ISelection {
 				+ " r:"
 				+ rightSliderValuesIndex;
 		return string;
+	}
+
+	public Chart getChart() {
+		return fChart;
 	}
 
 }

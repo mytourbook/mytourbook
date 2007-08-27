@@ -211,7 +211,8 @@ public class TourChartPropertyView extends ViewPart {
 		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_SPEED_CHARTTYPE, speedChartType);
 
 		// fire modify event
-		TourManager.getInstance().firePropertyChange(TourManager.TOURCHART_PROPERTY_IS_MODIFIED);
+		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED,
+				null);
 	}
 
 	private void restoreSettings() {

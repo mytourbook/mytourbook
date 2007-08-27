@@ -153,6 +153,13 @@
       </view>
       <view
             category="net.tourbook.category.tour"
+            class="net.tourbook.ui.views.TourPropertiesView"
+            icon="icons/tour-properties.gif"
+            id="net.tourbook.views.TourPropertiesView"
+            name="%Command_view_tourProperies">
+      </view>
+      <view
+            category="net.tourbook.category.tour"
             class="net.tourbook.ui.views.TourMarkerView"
             icon="icons/marker-editor.gif"
             id="net.tourbook.views.TourMarkerView"
@@ -351,6 +358,17 @@
                   mnemonic="%Command_view_selectedTour_mnemonic"
                   tooltip="%Command_view_selectedTour_tooltip">
             </command>
+            <command
+                  commandId="net.tourbook.command.tourProperties"
+                  icon="icons/tour-properties.gif"
+                  label="%Command_view_tourProperies"
+                  mnemonic="%Command_view_tourProperies_mnemonic"
+                  tooltip="%Command_view_tourProperies_tooltip">
+            </command>
+            <separator
+                  name="net.tourbook.separator"
+                  visible="true">
+            </separator>
             <command
                   commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
                   icon="icons/chart-analyzer.gif"
@@ -801,11 +819,6 @@
             name="%Command_tourChart_tool_tourMarker">
       </command>
       <command
-            defaultHandler="net.tourbook.tour.ActionHandlerViewSelectedTour"
-            id="net.tourbook.command.selectedTour"
-            name="%Command_view_selectedTour">
-      </command>
-      <command
             defaultHandler="net.tourbook.tour.ActionHandlerViewGraphAnalyzer"
             id="net.tourbook.command.tourChart.tool.graphAnalyzer"
             name="%Command_tourChart_tool_graphAnalyzer">
@@ -815,6 +828,16 @@
             defaultHandler="net.tourbook.tour.ActionHandlerViewTourSegmenter"
             id="net.tourbook.command.tourChart.tool.tourSegmenter"
             name="%Command_tourChart_tool_tourSegmenter">
+      </command>
+      <command
+            defaultHandler="net.tourbook.tour.ActionHandlerViewSelectedTour"
+            id="net.tourbook.command.selectedTour"
+            name="%Command_view_selectedTour">
+      </command>
+      <command
+            defaultHandler="net.tourbook.tour.ActionHandlerViewTourProperties"
+            id="net.tourbook.command.tourProperties"
+            name="%Command_view_tourProperies">
       </command>
    </extension>
    <extension

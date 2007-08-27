@@ -639,7 +639,13 @@ public class TourChart extends Chart {
 
 		ChartDataYSerie yData;
 
-		yData = (ChartDataYSerie) getDataModel().getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
+		final ChartDataModel dataModel = getDataModel();
+
+		if (dataModel == null) {
+			return;
+		}
+
+		yData = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
 		if (yData != null) {
 			yData.setCustomLayers(customLayers);
 		}
@@ -1006,6 +1012,7 @@ public class TourChart extends Chart {
 		final ChartDataModel newDataModel = TourManager.getInstance()
 				.createChartDataModel(newTourData, newChartConfig, isPropertyChanged);
 
+		// set the model before the actions are created
 		setDataModel(newDataModel);
 
 		if (fShowActions) {

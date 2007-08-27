@@ -48,28 +48,29 @@ public class TourManager {
 	/**
 	 * tour was changed and saved in the database
 	 */
-	public static final int					TOURCHART_PROPERTY_IS_MODIFIED	= 1;
+	public static final int					TOUR_PROPERTY_CHART_IS_MODIFIED		= 10;
+	public static final int					TOUR_PROPERTY_SEGMENT_LAYER_CHANGE	= 20;
 
-	public static final String				CUSTOM_DATA_TIME				= "time";									//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_DISTANCE			= "distance";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_ALTITUDE			= "altitude";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_SPEED				= "speed";									//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_GRADIENT			= "gradient";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_ALTIMETER			= "altimeter";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_PULSE				= "pulse";									//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TIME					= "time";									//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_DISTANCE				= "distance";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_ALTITUDE				= "altitude";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_SPEED					= "speed";									//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_GRADIENT				= "gradient";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_ALTIMETER				= "altimeter";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_PULSE					= "pulse";									//$NON-NLS-1$
 
-	public static final String				ANALYZER_INFO					= "AnalyzerInfo";							//$NON-NLS-1$
-	public static final String				X_AXIS_TIME						= "time";									//$NON-NLS-1$
-	public static final String				X_AXIS_DISTANCE					= "distance";								//$NON-NLS-1$
+	public static final String				ANALYZER_INFO						= "AnalyzerInfo";							//$NON-NLS-1$
+	public static final String				X_AXIS_TIME							= "time";									//$NON-NLS-1$
+	public static final String				X_AXIS_DISTANCE						= "distance";								//$NON-NLS-1$
 
-	public static final int					GRAPH_ALTITUDE					= 1000;
-	public static final int					GRAPH_SPEED						= 1001;
-	public static final int					GRAPH_ALTIMETER					= 1002;
-	public static final int					GRAPH_PULSE						= 1003;
-	public static final int					GRAPH_TEMPERATURE				= 1004;
-	public static final int					GRAPH_CADENCE					= 1005;
-	public static final int					GRAPH_GRADIENT					= 1006;
-	public static final int					GRAPH_POWER						= 1007;
+	public static final int					GRAPH_ALTITUDE						= 1000;
+	public static final int					GRAPH_SPEED							= 1001;
+	public static final int					GRAPH_ALTIMETER						= 1002;
+	public static final int					GRAPH_PULSE							= 1003;
+	public static final int					GRAPH_TEMPERATURE					= 1004;
+	public static final int					GRAPH_CADENCE						= 1005;
+	public static final int					GRAPH_GRADIENT						= 1006;
+	public static final int					GRAPH_POWER							= 1007;
 
 	private static TourManager				instance;
 
@@ -77,9 +78,9 @@ public class TourManager {
 	private ComputeChartValue				computeAltimeterAvg;
 	private ComputeChartValue				computeGradientAvg;
 
-	private final HashMap<Long, TourData>	fTourDataMap					= new HashMap<Long, TourData>();
+	private final HashMap<Long, TourData>	fTourDataMap						= new HashMap<Long, TourData>();
 
-	private final ListenerList				fPropertyListeners				= new ListenerList(ListenerList.IDENTITY);
+	private final ListenerList				fPropertyListeners					= new ListenerList(ListenerList.IDENTITY);
 
 	private TourManager() {}
 
@@ -142,8 +143,9 @@ public class TourManager {
 	 */
 	public static String getTourTitleDetailed(final TourData tourData) {
 
-		return getTourDate(tourData)
-				+ ((tourData.getTourTitle() != null) ? " - " + tourData.getTourTitle() : ""); //$NON-NLS-1$ //$NON-NLS-2$
+		final String tourTitle = tourData.getTourTitle();
+
+		return getTourDate(tourData) + ((tourTitle.length() == 0) ? "" : " - " + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -194,7 +196,7 @@ public class TourManager {
 		chartConfig.autoZoomToSlider = autoZoomToSlider;
 	}
 
-	public void addPropertyListener(ITourChartPropertyListener listener) {
+	public void addPropertyListener(ITourPropertyListener listener) {
 		fPropertyListeners.add(listener);
 	}
 
@@ -1081,11 +1083,11 @@ public class TourManager {
 //		}
 //	}
 
-	public void firePropertyChange(int propertyId) {
+	public void firePropertyChange(int propertyId, Object propertyData) {
 		Object[] allListeners = fPropertyListeners.getListeners();
 		for (int i = 0; i < allListeners.length; i++) {
-			final ITourChartPropertyListener listener = (ITourChartPropertyListener) allListeners[i];
-			listener.propertyChanged(propertyId);
+			final ITourPropertyListener listener = (ITourPropertyListener) allListeners[i];
+			listener.propertyChanged(propertyId, propertyData);
 		}
 	}
 
@@ -1169,7 +1171,7 @@ public class TourManager {
 		}
 	}
 
-	public void removePropertyListener(ITourChartPropertyListener listener) {
+	public void removePropertyListener(ITourPropertyListener listener) {
 		fPropertyListeners.remove(listener);
 	}
 

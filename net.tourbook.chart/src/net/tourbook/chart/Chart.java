@@ -251,7 +251,7 @@ public class Chart extends ViewForm {
 			return null;
 		}
 
-		SelectionChartInfo chartInfo = new SelectionChartInfo();
+		SelectionChartInfo chartInfo = new SelectionChartInfo(this);
 
 		chartInfo.chartDataModel = fChartDataModel;
 		chartInfo.chartDrawingData = fChartComponents.getChartDrawingData();

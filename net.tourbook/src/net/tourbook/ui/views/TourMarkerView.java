@@ -432,28 +432,28 @@ public class TourMarkerView extends ViewPart {
 //		tvc.setEditingSupport(new RemarkEditor(fMarkerViewer));
 		tableLayouter.addColumnData(new ColumnWeightData(50, true));
 
-		// column: position
-		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
-		tvc.getColumn().setText(Messages.TourMarker_Column_position);
-		tvc.setLabelProvider(labelProvider);
-//		tvc.setEditingSupport(new PositionEditor(fMarkerViewer));
-		tableLayouter.addColumnData(new ColumnWeightData(30, true));
-
-		// column: horizontal offset
-		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
-		tvc.getColumn().setText(Messages.TourMarker_Column_horizontal_offset);
-		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_horizontal_offset_tooltip);
-		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
-				false));
-
-		// column: vertical offset
-		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
-		tvc.getColumn().setText(Messages.TourMarker_Column_vertical_offset);
-		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_vertical_offset_tooltip);
-		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
-				false));
+//		// column: position
+//		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
+//		tvc.getColumn().setText(Messages.TourMarker_Column_position);
+//		tvc.setLabelProvider(labelProvider);
+////		tvc.setEditingSupport(new PositionEditor(fMarkerViewer));
+//		tableLayouter.addColumnData(new ColumnWeightData(30, true));
+//
+//		// column: horizontal offset
+//		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
+//		tvc.getColumn().setText(Messages.TourMarker_Column_horizontal_offset);
+//		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_horizontal_offset_tooltip);
+//		tvc.setLabelProvider(labelProvider);
+//		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
+//				false));
+//
+//		// column: vertical offset
+//		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
+//		tvc.getColumn().setText(Messages.TourMarker_Column_vertical_offset);
+//		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_vertical_offset_tooltip);
+//		tvc.setLabelProvider(labelProvider);
+//		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
+//				false));
 
 		/*
 		 * create table viewer

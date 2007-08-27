@@ -393,7 +393,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	 */
 	private void createTourChart(Composite parent) {
 
-		fTourChart = new TourChart(parent, SWT.BORDER, false);
+		fTourChart = new TourChart(parent, SWT.BORDER, true);
 
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
@@ -411,9 +411,10 @@ public class MarkerDialog extends TitleAreaDialog {
 			}
 		});
 
-		TourChartConfiguration chartConfig = new TourChartConfiguration(false);
-		chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
+//		TourChartConfiguration chartConfig = new TourChartConfiguration(false);
+//		chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
+		TourChartConfiguration chartConfig = TourManager.createTourChartConfiguration();
 		fTourChart.updateTourChart(fTourData, chartConfig, false);
 	}
 

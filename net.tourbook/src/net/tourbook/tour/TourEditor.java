@@ -25,7 +25,6 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.views.SelectionTourSegmentLayer;
 import net.tourbook.ui.views.tourBook.TourChartContextProvider;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -44,7 +43,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-public class TourEditor extends EditorPart implements ITourChartPropertyListener {
+public class TourEditor extends EditorPart {
 
 	public static final String		ID				= "net.tourbook.tour.TourEditor";
 
@@ -60,6 +59,7 @@ public class TourEditor extends EditorPart implements ITourChartPropertyListener
 	private PostSelectionProvider	fPostSelectionProvider;
 	private ISelectionListener		fPostSelectionListener;
 	private IPartListener2			fPartListener;
+	private ITourPropertyListener	fTourPropertyListener;
 
 	private void addPartListener() {
 
@@ -100,10 +100,45 @@ public class TourEditor extends EditorPart implements ITourChartPropertyListener
 		getSite().getPage().addPartListener(fPartListener);
 	}
 
+	private void addSelectionListener() {
+
+		fPostSelectionListener = new ISelectionListener() {
+
+			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+
+				if (selection instanceof SelectionChartXSliderPosition) {
+
+					fTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
+				}
+			}
+		};
+
+		// register selection listener in the page
+		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+	}
+
+	private void addTourPropertyListener() {
+
+		fTourPropertyListener = new ITourPropertyListener() {
+			public void propertyChanged(int propertyId, Object propertyData) {
+
+				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGE) {
+					fTourChart.updateSegmentLayer((Boolean) propertyData);
+
+				} else if (propertyId == TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED) {
+					fTourChart.updateTourChart(true);
+				}
+			}
+		};
+
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+	}
+
 	@Override
 	public void createPartControl(Composite parent) {
 
 		addPartListener();
+		addTourPropertyListener();
 
 		fTourChart = new TourChart(parent, SWT.FLAT, true);
 
@@ -128,8 +163,6 @@ public class TourEditor extends EditorPart implements ITourChartPropertyListener
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
 //		fTourChart.createTourActionHandlers(fTourChartConfig);
-
-		TourManager.getInstance().addPropertyListener(this);
 
 		// load the tourdata from the database
 		fTourData = TourManager.getInstance().getTourData(fEditorInput.fTourId);
@@ -165,7 +198,7 @@ public class TourEditor extends EditorPart implements ITourChartPropertyListener
 		site.getPage().removePartListener(fPartListener);
 		site.getPage().removePostSelectionListener(fPostSelectionListener);
 
-		TourManager.getInstance().removePropertyListener(this);
+		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
 		site.setSelectionProvider(null);
 
@@ -190,6 +223,15 @@ public class TourEditor extends EditorPart implements ITourChartPropertyListener
 	@Override
 	public void doSaveAs() {}
 
+	/**
+	 * provides the service to fire post selections
+	 * 
+	 * @param selection
+	 */
+	public void firePostSelection(ISelection selection) {
+		fPostSelectionProvider.setSelection(selection);
+	}
+
 	public TourChart getTourChart() {
 		return fTourChart;
 	}
@@ -205,7 +247,7 @@ public class TourEditor extends EditorPart implements ITourChartPropertyListener
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		setPostSelectionListener();
+		addSelectionListener();
 	}
 
 	@Override
@@ -216,10 +258,6 @@ public class TourEditor extends EditorPart implements ITourChartPropertyListener
 	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
-	}
-
-	public void propertyChanged(int propertyId) {
-		fTourChart.updateTourChart(true);
 	}
 
 	@Override
@@ -233,27 +271,9 @@ public class TourEditor extends EditorPart implements ITourChartPropertyListener
 		fPostSelectionProvider.setSelection(new SelectionActiveEditor(TourEditor.this));
 	}
 
-	private void setPostSelectionListener() {
-		// this view part is a selection listener
-		fPostSelectionListener = new ISelectionListener() {
-
-			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-
-				if (selection instanceof SelectionTourSegmentLayer) {
-
-					fTourChart.updateSegmentLayer(((SelectionTourSegmentLayer) selection).isLayerVisible);
-
-				} else if (selection instanceof SelectionChartXSliderPosition) {
-
-					fTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
-				}
-			}
-		};
-
-		// register selection listener in the page
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
-	}
-
+	/**
+	 * Set the tour dirty
+	 */
 	public void setTourDirty() {
 
 		fIsTourDirty = true;

@@ -21,17 +21,18 @@ import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
+import net.tourbook.ui.views.tourMap.ReferenceTourManager;
+import net.tourbook.ui.views.tourMap.SelectionNewRefTours;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.swt.widgets.Display;
 
 public class TourChartContextProvider implements ChartContextProvider {
-
-	TourBookView			fView;
 
 	public ChartXSlider		fSlider;
 
@@ -50,16 +51,16 @@ public class TourChartContextProvider implements ChartContextProvider {
 		@Override
 		public void run() {
 
-//			TourReference refTour = ReferenceTourManager.getInstance().addReferenceTour(
-//					fView.getTourChart());
+			TourReference refTour = ReferenceTourManager.getInstance()
+					.addReferenceTour(fTourEditor);
 
-//			if (refTour != null) {
-//
-//				SelectionNewRefTours selection = new SelectionNewRefTours();
-//				selection.newRefTours.add(refTour);
-//
-//				fView.firePostSelection(selection);
-//			}
+			if (refTour != null) {
+
+				SelectionNewRefTours selection = new SelectionNewRefTours();
+				selection.newRefTours.add(refTour);
+
+				fTourEditor.firePostSelection(selection);
+			}
 		}
 	}
 
@@ -74,29 +75,7 @@ public class TourChartContextProvider implements ChartContextProvider {
 		@Override
 		public void run() {
 
-			if (fView != null) {
-
-//				final TourChart tourChart = fView.getTourChart();
-//				TourData tourData = tourChart.getTourData();
-//				TourMarker newTourMarker = createTourMarker(tourData);
-//
-//				// add new marker to the marker list
-//				tourData.getTourMarkers().add(newTourMarker);
-//				
-//
-//				(new MarkerDialog(Display.getCurrent().getActiveShell(), tourData, newTourMarker))
-//						.open();
-//
-//				// force the tour to be saved
-//				tourChart.setTourDirty(true);
-//
-//				// update chart
-//				tourChart.updateMarkerLayer(true);
-//
-//				// update marker list and other listener
-//				tourChart.fireTourChartSelection();
-
-			} else if (fTourEditor != null) {
+			if (fTourEditor != null) {
 
 				final TourChart tourChart = fTourEditor.getTourChart();
 				final TourData tourData = tourChart.getTourData();
@@ -151,10 +130,6 @@ public class TourChartContextProvider implements ChartContextProvider {
 		}
 	}
 
-	public TourChartContextProvider(TourBookView view) {
-		fView = view;
-	}
-
 	public TourChartContextProvider(MarkerDialog markerDialog) {
 		fMarkerDialog = markerDialog;
 	}
@@ -167,7 +142,7 @@ public class TourChartContextProvider implements ChartContextProvider {
 										ChartXSlider leftSlider,
 										ChartXSlider rightSlider) {
 
-		if (fView != null || fTourEditor != null) {
+		if (fTourEditor != null) {
 
 			// context dialog for the tourbook view
 

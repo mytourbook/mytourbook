@@ -23,6 +23,7 @@ import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -33,10 +34,10 @@ import org.osgi.framework.BundleContext;
  */
 public class TourbookPlugin extends AbstractUIPlugin {
 
-	public static final String		PLUGIN_ID						= "net.tourbook";		//$NON-NLS-1$
+	public static final String		PLUGIN_ID						= "net.tourbook";							//$NON-NLS-1$
 
-	public static final String		EXT_POINT_STATISTIC_YEAR		= "statisticYear";		//$NON-NLS-1$
-	public static final String		EXT_POINT_DEVICE_DATA_READER	= "deviceDataReader";	//$NON-NLS-1$
+	public static final String		EXT_POINT_STATISTIC_YEAR		= "statisticYear";							//$NON-NLS-1$
+	public static final String		EXT_POINT_DEVICE_DATA_READER	= "deviceDataReader";						//$NON-NLS-1$
 
 	// The shared instance.
 	private static TourbookPlugin	plugin;
@@ -54,6 +55,8 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	private ArrayList<TourType>		fTourTypes;
 
 	private MyTourbookSplashHandler	fSplashHandler;
+
+	private final ListenerList		fPropertyListeners				= new ListenerList(ListenerList.IDENTITY);
 
 	/**
 	 * The constructor.
@@ -93,6 +96,18 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		}
 	}
 
+//	public void addPropertyListener(ITourbookPropertyListener listener) {
+//		fPropertyListeners.add(listener);
+//	}
+
+//	public void firePropertyChange(int propertyId, Object propertyData) {
+//		Object[] allListeners = fPropertyListeners.getListeners();
+//		for (int i = 0; i < allListeners.length; i++) {
+//			final ITourbookPropertyListener listener = (ITourbookPropertyListener) allListeners[i];
+//			listener.propertyChanged(propertyId, propertyData);
+//		}
+//	}
+
 	public TourPerson getActivePerson() {
 		return fCurrentPerson;
 	}
@@ -119,8 +134,9 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	 */
 	public ResourceBundle getResourceBundle() {
 		try {
-			if (resourceBundle == null)
+			if (resourceBundle == null) {
 				resourceBundle = ResourceBundle.getBundle("net.tourbook.data.TourbookPluginResources"); //$NON-NLS-1$
+			}
 		} catch (MissingResourceException x) {
 			resourceBundle = null;
 		}
@@ -138,6 +154,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	public TourType[] getTourTypesArray() {
 		return fTourTypes.toArray(new TourType[fTourTypes.size()]);
 	}
+
+//	public void removePropertyListener(ITourbookPropertyListener listener) {
+//		fPropertyListeners.remove(listener);
+//	}
 
 	public void setActivePerson(TourPerson currentPerson) {
 		fCurrentPerson = currentPerson;

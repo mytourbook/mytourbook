@@ -235,6 +235,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		});
 
 		fPostSelectionListener = new ISelectionListener() {
+
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (selection instanceof SelectionChartInfo) {
@@ -720,13 +721,14 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void updateInfo(SelectionChartXSliderPosition sliderPosition) {
 
-		SelectionChartInfo chartInfo = new SelectionChartInfo();
+		Chart chart = sliderPosition.chart;
 
-		if (sliderPosition.chart == null) {
+		if (chart == null) {
 			return;
 		}
 
-		Chart chart = sliderPosition.chart;
+		SelectionChartInfo chartInfo = new SelectionChartInfo(chart);
+
 		chartInfo.chartDataModel = chart.getChartDataModel();
 		chartInfo.chartDrawingData = chart.getChartDrawingData();
 

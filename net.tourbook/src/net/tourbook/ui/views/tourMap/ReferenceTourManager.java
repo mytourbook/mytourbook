@@ -18,10 +18,9 @@
  */
 package net.tourbook.ui.views.tourMap;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.SelectionChartInfo;
@@ -29,6 +28,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourChart;
+import net.tourbook.tour.TourEditor;
 
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
@@ -53,9 +53,9 @@ public class ReferenceTourManager {
 	/**
 	 * persists a new reference tour
 	 * 
-	 * @param tourChart
+	 * @param tourEditor
 	 */
-	public TourReference addReferenceTour(TourChart tourChart) {
+	public TourReference addReferenceTour(TourEditor tourEditor) {
 
 		// ask for the reference tour name
 		InputDialog dialog = new InputDialog(Display.getCurrent().getActiveShell(),
@@ -67,7 +67,7 @@ public class ReferenceTourManager {
 		if (dialog.open() != Window.OK) {
 			return null;
 		}
-
+		TourChart tourChart = tourEditor.getTourChart();
 		SelectionChartInfo chartInfo = tourChart.getChartInfo();
 		TourData tourData = tourChart.getTourData();
 
@@ -79,7 +79,8 @@ public class ReferenceTourManager {
 
 		// add the tour reference into the tour data collection
 		tourData.getTourReferences().add(newTourReference);
-		TourDatabase.saveTour(tourData);
+
+		tourEditor.setTourDirty();
 
 		return newTourReference;
 	}
@@ -89,21 +90,16 @@ public class ReferenceTourManager {
 	 */
 	public Object[] getReferenceTours() {
 
-		ArrayList<TourReference> referenceTours = null;
+		List<?> referenceTours = null;
 
-		if (referenceTours == null) {
+		EntityManager em = TourDatabase.getInstance().getEntityManager();
 
-			EntityManager em = TourDatabase.getInstance().getEntityManager();
+		if (em != null) {
 
-			if (em != null) {
+			referenceTours = em.createQuery("SELECT refTour \n" //$NON-NLS-1$
+					+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " refTour")).getResultList();
 
-				Query query = em.createQuery("SELECT refTour \n" //$NON-NLS-1$
-						+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " refTour")); //$NON-NLS-1$ //$NON-NLS-2$
-
-				referenceTours = (ArrayList<TourReference>) query.getResultList();
-
-				em.close();
-			}
+			em.close();
 		}
 
 		return referenceTours.toArray();

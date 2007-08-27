@@ -254,7 +254,7 @@ public class TourBookView extends ViewPart {
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
-				TourBookView.this.fillContextMenu(manager);
+				fillContextMenu(manager);
 			}
 		});
 
