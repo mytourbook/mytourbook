@@ -59,13 +59,14 @@ public class Chart extends ViewForm {
 
 	private final ListenerList			fFocusListeners				= new ListenerList();
 	private final ListenerList			fBarSelectionListeners		= new ListenerList();
-	private final ListenerList			fDoubleClickListeners		= new ListenerList();
 	private final ListenerList			fSliderMoveListeners		= new ListenerList();
+	private final ListenerList			fBarDoubleClickListeners	= new ListenerList();
+	private final ListenerList			fDoubleClickListeners		= new ListenerList();
 
 	ChartComponents						fChartComponents;
 	private ChartDataModel				fChartDataModel;
 	private IToolBarManager				fToolbarMgr;
-	private ChartContextProvider		fChartContextProvider;
+	private IChartContextProvider		fChartContextProvider;
 
 	private boolean						fShowZoomActions;
 	private boolean						fShowPartNavigation;
@@ -94,7 +95,7 @@ public class Chart extends ViewForm {
 	private boolean						fIsFillToolbar				= true;
 
 	/**
-	 * This is the ui control which displays the chart
+	 * Chart widget
 	 */
 	public Chart(Composite parent, int style) {
 
@@ -117,6 +118,12 @@ public class Chart extends ViewForm {
 
 		// set the default background color
 		backgroundColor = getDisplay().getSystemColor(SWT.COLOR_WHITE);
+
+//		addDisposeListener(new DisposeListener() {
+//			public void widgetDisposed(DisposeEvent e) {
+//				Widget w = e.widget;
+//			}
+//		});
 	}
 
 	public void addBarSelectionListener(IBarSelectionListener listener) {
@@ -124,6 +131,10 @@ public class Chart extends ViewForm {
 	}
 
 	public void addDoubleClickListener(IBarSelectionListener listener) {
+		fBarDoubleClickListeners.add(listener);
+	}
+
+	public void addDoubleClickListener(Listener listener) {
 		fDoubleClickListeners.add(listener);
 	}
 
@@ -263,12 +274,10 @@ public class Chart extends ViewForm {
 		return chartInfo;
 	}
 
-	@Override
-	public void dispose() {
-
-		fChartComponents.dispose();
-
-		super.dispose();
+	void fillMenu(IMenuManager menuMgr) {
+		if (fChartContextProvider != null) {
+			fChartContextProvider.fillContextMenu(menuMgr);
+		}
 	}
 
 	void fillMenu(	IMenuManager menuMgr,
@@ -277,10 +286,14 @@ public class Chart extends ViewForm {
 					int hoveredBarSerieIndex,
 					int hoveredBarValueIndex) {
 
+		if (fChartContextProvider != null) {
+			fChartContextProvider.fillContextMenu(menuMgr);
+		}
+
 		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 
 			// get the context provider from the data model
-			ChartContextProvider barChartContextProvider = (ChartContextProvider) fChartDataModel.getCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER);
+			IChartContextProvider barChartContextProvider = (IChartContextProvider) fChartDataModel.getCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER);
 
 			// create the menu for bar charts
 			if (barChartContextProvider != null) {
@@ -353,12 +366,25 @@ public class Chart extends ViewForm {
 		fBarSelectionSerieIndex = serieIndex;
 		fBarSelectionValueIndex = valueIndex;
 
-		Object[] listeners = fDoubleClickListeners.getListeners();
+		Object[] listeners = fBarDoubleClickListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final IBarSelectionListener listener = (IBarSelectionListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
 					listener.selectionChanged(serieIndex, valueIndex);
+				}
+			});
+		}
+	}
+
+	void fireDoubleClick() {
+
+		Object[] listeners = fDoubleClickListeners.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			final Listener listener = (Listener) listeners[i];
+			SafeRunnable.run(new SafeRunnable() {
+				public void run() {
+					listener.handleEvent(null);
 				}
 			});
 		}
@@ -581,6 +607,10 @@ public class Chart extends ViewForm {
 	}
 
 	public void removeDoubleClickListener(IBarSelectionListener listener) {
+		fBarDoubleClickListeners.remove(listener);
+	}
+
+	public void removeDoubleClickListener(Listener listener) {
 		fDoubleClickListeners.remove(listener);
 	}
 
@@ -633,7 +663,7 @@ public class Chart extends ViewForm {
 		}
 	}
 
-	public void setContextProvider(ChartContextProvider chartContextProvider) {
+	public void setContextProvider(IChartContextProvider chartContextProvider) {
 		fChartContextProvider = chartContextProvider;
 	}
 

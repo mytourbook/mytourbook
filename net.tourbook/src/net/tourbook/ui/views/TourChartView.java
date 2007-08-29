@@ -16,7 +16,9 @@
 package net.tourbook.ui.views;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
@@ -24,6 +26,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionEditTour;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionTourData;
@@ -35,10 +38,13 @@ import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISelectionListener;
@@ -70,6 +76,25 @@ public class TourChartView extends ViewPart {
 	private PageBook				fPageBook;
 
 	private Label					fPageNoChart;
+
+	private class TourChartContextProvicer implements IChartContextProvider {
+
+		public void fillBarChartContextMenu(IMenuManager menuMgr,
+											int hoveredBarSerieIndex,
+											int hoveredBarValueIndex) {}
+
+		public void fillXSliderContextMenu(	IMenuManager menuMgr,
+											ChartXSlider leftSlider,
+											ChartXSlider rightSlider) {}
+
+		public void fillContextMenu(IMenuManager menuMgr) {
+
+			final ActionEditTour actionEditTour = new ActionEditTour(TourChartView.this);
+			actionEditTour.setEnabled(fTourData != null);
+
+			menuMgr.add(actionEditTour);
+		}
+	}
 
 	private void addPartListener() {
 
@@ -166,7 +191,7 @@ public class TourChartView extends ViewPart {
 		fTourDbListener = new IPropertyListener() {
 
 			public void propertyChanged(Object source, int propId) {
-				if (propId == TourDatabase.PROPERTY_TOUR_IS_CHANGED_AND_PERSISTED) {
+				if (propId == TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED) {
 
 					if (fTourData == null) {
 						return;
@@ -177,7 +202,7 @@ public class TourChartView extends ViewPart {
 
 					updateChart();
 
-				} else if (propId == TourDatabase.PROPERTY_TOUR_IS_CHANGED) {
+				} else if (propId == TourDatabase.TOUR_IS_CHANGED) {
 
 					updateChart();
 				}
@@ -199,6 +224,13 @@ public class TourChartView extends ViewPart {
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
 		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+		fTourChart.setContextProvider(new TourChartContextProvicer());
+
+		fTourChart.addDoubleClickListener(new Listener() {
+			public void handleEvent(Event event) {
+				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
+			}
+		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
 //		fTourChart.createTourActionHandlers(fTourChartConfig);

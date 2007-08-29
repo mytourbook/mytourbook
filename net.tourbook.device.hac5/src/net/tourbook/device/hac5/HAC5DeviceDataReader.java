@@ -50,7 +50,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 	private static final int	RECORD_LENGTH			= 0x10;
 
-	private Calendar			fCalendar				= GregorianCalendar.getInstance();
+	private final Calendar		fCalendar				= GregorianCalendar.getInstance();
 	private GregorianCalendar	fFileDate;
 
 	// plugin constructor
@@ -64,7 +64,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	 * @param offsetNextDDRecord
 	 * @return
 	 */
-	private int adjustDDRecordOffset(int offsetNextDDRecord) {
+	private int adjustDDRecordOffset(final int offsetNextDDRecord) {
 
 		int offsetDDRecord;
 
@@ -78,7 +78,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	}
 
 	@Override
-	public boolean checkStartSequence(int byteIndex, int newByte) {
+	public boolean checkStartSequence(final int byteIndex, final int newByte) {
 
 		/*
 		 * check if the first 4 bytes are set to AFRO
@@ -99,7 +99,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
-	public String getDeviceModeName(int profileId) {
+	public String getDeviceModeName(final int profileId) {
 
 		// 0: bike1
 		// 1: bike2
@@ -135,9 +135,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	}
 
 	@Override
-	public SerialParameters getPortParameters(String portName) {
+	public SerialParameters getPortParameters(final String portName) {
 
-		SerialParameters hac5PortParameters = new SerialParameters(portName,
+		final SerialParameters hac5PortParameters = new SerialParameters(portName,
 				4800,
 				SerialPort.FLOWCONTROL_NONE,
 				SerialPort.FLOWCONTROL_NONE,
@@ -153,26 +153,26 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return 4;
 	}
 
-	public boolean processDeviceData(	String importFileName,
-										DeviceData deviceData,
-										HashMap<String, TourData> tourDataMap) {
+	public boolean processDeviceData(	final String importFileName,
+										final DeviceData deviceData,
+										final HashMap<String, TourData> tourDataMap) {
 		boolean returnValue = false;
 
-		byte[] recordBuffer = new byte[RECORD_LENGTH];
+		final byte[] recordBuffer = new byte[RECORD_LENGTH];
 
 		RandomAccessFile file = null;
 
-		HAC5DeviceData hac5DeviceData = new HAC5DeviceData();
+		final HAC5DeviceData hac5DeviceData = new HAC5DeviceData();
 
 		boolean isFirstTour = true;
 		short firstTourDay = 1;
 		short firstTourMonth = 1;
 
 		try {
-			File fileRaw = new File(importFileName);
+			final File fileRaw = new File(importFileName);
 			file = new RandomAccessFile(fileRaw, "r"); //$NON-NLS-1$
 
-			long lastModified = fileRaw.lastModified();
+			final long lastModified = fileRaw.lastModified();
 
 			/*
 			 * get the year, because the year is not saved in the raw data file, the modified year
@@ -182,6 +182,10 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 			fFileDate.setTime(new Date(lastModified));
 
 			short tourYear = (short) fFileDate.get(Calendar.YEAR);
+			if (importYear != -1) {
+				tourYear = (short) importYear;
+			}
+
 			short lastTourMonth = -1;
 
 			// read device data
@@ -191,11 +195,11 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 			 * get position for the next free tour and get the last dd-record from this position
 			 */
 			file.seek(OFFSET_RAWDATA + 0x0380 + 2);
-			int offsetNextFreeTour = DeviceReaderTools.get2ByteData(file);
+			final int offsetNextFreeTour = DeviceReaderTools.get2ByteData(file);
 
 			int offsetDDRecord = adjustDDRecordOffset(offsetNextFreeTour);
 
-			int initialOffsetDDRecord = offsetDDRecord;
+			final int initialOffsetDDRecord = offsetDDRecord;
 
 			// loop: all tours in the file
 			while (true) {
@@ -209,7 +213,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				}
 
 				// read AA record
-				int offsetAARecordInDDRecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
+				final int offsetAARecordInDDRecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
 
 				// check if this is a AA record
 				file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
@@ -222,13 +226,13 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				/*
 				 * check if the AA and the DD records point to each other
 				 */
-				int offsetDDRecordInAARecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
+				final int offsetDDRecordInAARecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
 				if (offsetDDRecordInAARecord != offsetDDRecord) {
 					returnValue = true;
 					break;
 				}
 
-				TourData tourData = new TourData();
+				final TourData tourData = new TourData();
 
 				tourData.importRawDataFile = importFileName;
 
@@ -269,9 +273,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				/*
 				 * read/save BB records
 				 */
-				ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+				final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
 
-				short timeInterval = tourData.getDeviceTimeInterval();
+				final short timeInterval = tourData.getDeviceTimeInterval();
 
 				short totalPulse = tourData.getStartPulse();
 				short totalAltitude = tourData.getStartAltitude();
@@ -441,17 +445,17 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				offsetDDRecord = adjustDDRecordOffset(offsetAARecordInDDRecord);
 			}
 
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 			returnValue = false;
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 			returnValue = false;
 		} finally {
 			if (file != null) {
 				try {
 					file.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}
@@ -470,7 +474,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	 * @param buffer
 	 * @param tourData
 	 */
-	private void readAARecord(byte[] buffer, TourData tourData) {
+	private void readAARecord(final byte[] buffer, final TourData tourData) {
 
 		// 00 1 0xAA
 		//
@@ -501,10 +505,10 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		//
 		// 15 1 ? 0xFF
 
-		byte byteValue = buffer[1];
+		final byte byteValue = buffer[1];
 
 		int timeInterval = byteValue & 0x0F;
-		int profile = (byteValue & 0xF0) >> 4;
+		final int profile = (byteValue & 0xF0) >> 4;
 
 		// set the timeinterval from the AA record
 		timeInterval = timeInterval == 0 ? 2 : timeInterval == 1 ? 5 : timeInterval == 2 ? 10 : 20;
@@ -524,7 +528,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		tourData.setStartPulse((short) (buffer[14] & 0xff));
 	}
 
-	private void readDDRecord(byte[] buffer, TourData tourData) {
+	private void readDDRecord(final byte[] buffer, final TourData tourData) {
 
 		// 00 1 0xDD
 		// 01 1 ?
@@ -551,7 +555,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	 * 
 	 * @return true for a valid HAC5 data format
 	 */
-	public boolean validateRawData(String fileName) {
+	public boolean validateRawData(final String fileName) {
 
 		boolean isValid = false;
 
@@ -559,10 +563,10 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 		try {
 
-			byte[] bufferHeader = new byte[6];
-			byte[] bufferData = new byte[2];
+			final byte[] bufferHeader = new byte[6];
+			final byte[] bufferData = new byte[2];
 
-			File dataFile = new File(fileName);
+			final File dataFile = new File(fileName);
 			inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
 			inStream.read(bufferHeader);
@@ -588,17 +592,17 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				isValid = true;
 			}
 
-		} catch (NumberFormatException nfe) {
+		} catch (final NumberFormatException nfe) {
 			return false;
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			return false;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (inStream != null) {
 				try {
 					inStream.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}

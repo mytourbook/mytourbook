@@ -13,37 +13,33 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.tour;
 
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.TourChartView;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionEditTour extends Action {
 
-	private TourBookView	fTourView;
+	private TourChartView	fTourChartView;
 
-	public ActionEditTour(TourBookView tourBookView) {
+	public ActionEditTour(TourChartView tourChartView) {
 
-		fTourView = tourBookView;
+		fTourChartView = tourChartView;
 
 		setText(Messages.Action_edit_tour);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_edit_tour));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_edit_tour_disabled));
-
-		setEnabled(false);
 	}
 
 	@Override
 	public void run() {
 
-		Long tourId = fTourView.fActiveTourId;
-
-		if (tourId != null) {
-			TourManager.getInstance().openTourInEditor(tourId);
-		}
+		TourManager.getInstance().openTourInEditor(fTourChartView.getTourChart()
+				.getTourData()
+				.getTourId());
 	}
 
 }

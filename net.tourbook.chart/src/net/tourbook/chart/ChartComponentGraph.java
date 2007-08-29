@@ -49,7 +49,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 
@@ -74,13 +73,12 @@ public class ChartComponentGraph extends Canvas {
 	Chart								fChart;
 
 	private final ChartComponents		fChartComponents;
+
 	/*
 	 * images for the chart and slider
 	 */
 	Image								fGraphCoreImage;
-
 	private Image						fGraphLayerImage;
-
 	private Image						fCumstomLayerImage;
 
 	private int							fHorizontalScrollBarPos;
@@ -89,11 +87,11 @@ public class ChartComponentGraph extends Canvas {
 	 * drawing data which is used to draw the chart
 	 */
 	private ArrayList<ChartDrawingData>	fDrawingData			= new ArrayList<ChartDrawingData>();
+
 	/**
 	 * defines in how many parts the graph is divided
 	 */
 	private int							graphZoomParts			= 1;
-
 	private float						graphZoomPartPosition;
 
 	/**
@@ -343,7 +341,6 @@ public class ChartComponentGraph extends Canvas {
 
 		// setup the x-slider
 		xSliderA = new ChartXSlider(this, Integer.MIN_VALUE, ChartXSlider.SLIDER_TYPE_LEFT);
-
 		xSliderB = new ChartXSlider(this, Integer.MIN_VALUE, ChartXSlider.SLIDER_TYPE_RIGHT);
 
 		xSliderOnTop = xSliderB;
@@ -828,7 +825,9 @@ public class ChartComponentGraph extends Canvas {
 	private void createContextMenu() {
 
 		final MenuManager menuMgr = new MenuManager();
+
 		menuMgr.setRemoveAllWhenShown(true);
+
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(final IMenuManager menuMgr) {
 				fChart.fillMenu(menuMgr,
@@ -838,8 +837,8 @@ public class ChartComponentGraph extends Canvas {
 						fHoveredBarValueIndex);
 			}
 		});
-		final Menu menu = menuMgr.createContextMenu(this);
-		setMenu(menu);
+
+		setMenu(menuMgr.createContextMenu(this));
 	}
 
 	/**
@@ -3307,7 +3306,7 @@ public class ChartComponentGraph extends Canvas {
 		fColorCache.dispose();
 	}
 
-	private void onMouseDoubleClick(final MouseEvent e) {
+	void onMouseDoubleClick(final MouseEvent e) {
 
 		if (fHoveredBarSerieIndex != -1) {
 
@@ -3315,6 +3314,8 @@ public class ChartComponentGraph extends Canvas {
 			// with the left mouse button
 
 			fChart.fireChartDoubleClick(fHoveredBarSerieIndex, fHoveredBarValueIndex);
+		} else {
+			fChart.fireDoubleClick();
 		}
 	}
 

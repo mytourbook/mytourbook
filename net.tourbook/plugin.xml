@@ -246,10 +246,7 @@
                id="net.tourbook.perspective.Statistic">
          </perspectiveShortcut>
          <viewShortcut
-               id="net.tourbook.views.TourChartAnalyzer">
-         </viewShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourChartView">
+               id="net.tourbook.views.rawData.RawDataView">
          </viewShortcut>
       </perspectiveExtension>
       <perspectiveExtension
@@ -265,15 +262,6 @@
          </perspectiveShortcut>
          <viewShortcut
                id="net.tourbook.views.tourListView">
-         </viewShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourChartView">
-         </viewShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourSegmenter">
-         </viewShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourChartAnalyzer">
          </viewShortcut>
          <viewShortcut
                id="net.tourbook.views.TourMarkerView">
@@ -308,9 +296,6 @@
          <perspectiveShortcut
                id="net.tourbook.perspective.TourMap">
          </perspectiveShortcut>
-         <viewShortcut
-               id="net.tourbook.views.TourChartView">
-         </viewShortcut>
          <viewShortcut
                id="net.tourbook.views.StatisticView">
          </viewShortcut>

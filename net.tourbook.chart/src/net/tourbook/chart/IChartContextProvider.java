@@ -20,7 +20,7 @@ import org.eclipse.jface.action.IMenuManager;
 /**
  * this interface will fill the context menus in the chart
  */
-public interface ChartContextProvider {
+public interface IChartContextProvider {
 
 	/**
 	 * Fills the context menu for the chart slider
@@ -46,5 +46,12 @@ public interface ChartContextProvider {
 	public void fillBarChartContextMenu(IMenuManager menuMgr,
 										int hoveredBarSerieIndex,
 										int hoveredBarValueIndex);
+
+	/**
+	 * Fills the context menu for the chart
+	 * 
+	 * @param menuMgr
+	 */
+	public void fillContextMenu(IMenuManager menuMgr);
 
 }

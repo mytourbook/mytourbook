@@ -213,11 +213,6 @@ public abstract class ChartDataSerie {
 		fRgbLine = rgbLine;
 	}
 
-	public void setSavedMinValue(int savedMinValue) {
-		fVisibleMinValue = savedMinValue;
-		fOriginalMinValue = savedMinValue;
-	}
-
 	/**
 	 * @param unit
 	 *        The measurement to set.

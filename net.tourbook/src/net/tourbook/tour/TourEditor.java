@@ -25,7 +25,6 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.views.tourBook.TourChartContextProvider;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -77,7 +76,7 @@ public class TourEditor extends EditorPart {
 			public void partClosed(IWorkbenchPartReference partRef) {
 				if (fIsTourChanged) {
 					TourDatabase.getInstance()
-							.firePropertyChange(TourDatabase.PROPERTY_TOUR_IS_CHANGED_AND_PERSISTED);
+							.firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
 				}
 			}
 
@@ -214,7 +213,7 @@ public class TourEditor extends EditorPart {
 		fIsTourChanged = false;
 
 		TourDatabase.getInstance()
-				.firePropertyChange(TourDatabase.PROPERTY_TOUR_IS_CHANGED_AND_PERSISTED);
+				.firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
 
 		// hide the dirty indicator
 		firePropertyChange(PROP_DIRTY);

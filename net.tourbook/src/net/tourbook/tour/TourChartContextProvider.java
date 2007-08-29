@@ -13,18 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.tour;
 
 import net.tourbook.Messages;
-import net.tourbook.chart.ChartContextProvider;
+import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourChart;
-import net.tourbook.tour.TourEditor;
+import net.tourbook.ui.views.tourBook.MarkerDialog;
 import net.tourbook.ui.views.tourMap.ReferenceTourManager;
 import net.tourbook.ui.views.tourMap.SelectionNewRefTours;
 
@@ -32,7 +31,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.swt.widgets.Display;
 
-public class TourChartContextProvider implements ChartContextProvider {
+public class TourChartContextProvider implements IChartContextProvider {
 
 	public ChartXSlider		fSlider;
 
@@ -103,8 +102,7 @@ public class TourChartContextProvider implements ChartContextProvider {
 				tourChart.updateMarkerLayer(true);
 
 				// update marker list and other listener
-				TourDatabase.getInstance()
-						.firePropertyChange(TourDatabase.PROPERTY_TOUR_IS_CHANGED);
+				TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED);
 
 			} else if (fMarkerDialog != null) {
 
@@ -150,7 +148,7 @@ public class TourChartContextProvider implements ChartContextProvider {
 
 				createMarkerMenu(menuMgr, leftSlider, rightSlider);
 
-				// add to chart reference
+				// action: create chart reference
 				menuMgr.add(new ActionAddTourReference());
 			}
 
@@ -183,5 +181,10 @@ public class TourChartContextProvider implements ChartContextProvider {
 	public void fillBarChartContextMenu(IMenuManager menuMgr,
 										int hoveredBarSerieIndex,
 										int hoveredBarValueIndex) {}
+
+	public void fillContextMenu(IMenuManager menuMgr) {
+	// TODO Auto-generated method stub
+
+	}
 
 }

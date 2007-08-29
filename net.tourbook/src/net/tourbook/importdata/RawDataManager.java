@@ -57,6 +57,8 @@ public class RawDataManager {
 	 */
 	private HashSet<String>				fImportedFiles		= new HashSet<String>();
 
+	private int							fImportYear			= -1;
+
 	private RawDataManager() {}
 
 	public static RawDataManager getInstance() {
@@ -185,6 +187,10 @@ public class RawDataManager {
 
 			// file contains valid raw data for the raw data reader
 
+			if (fImportYear != -1) {
+				device.setImportYear(fImportYear);
+			}
+
 			if (device.processDeviceData(fileName, fDeviceData, fTourDataMap)) {
 				return true;
 			}
@@ -208,12 +214,12 @@ public class RawDataManager {
 	}
 
 	/**
-	 * get the tourdata from the database when available 
+	 * get the tourdata from the database when available
 	 */
 	public void updateTourDataFromDb() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked")//$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -245,5 +251,16 @@ public class RawDataManager {
 				}
 			}
 		});
+	}
+
+	public void setImportYear(int year) {
+		fImportYear = year;
+	}
+
+	/**
+	 * @return Returns the import year or <code>-1</code> when the year was not set
+	 */
+	public int getImportYear() {
+		return fImportYear;
 	}
 }

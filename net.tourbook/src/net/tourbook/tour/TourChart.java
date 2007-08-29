@@ -42,6 +42,8 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -81,24 +83,22 @@ public class TourChart extends Chart {
 
 	private ActionChartOptions				fActionOptions;
 
-	private final ListenerList				fSelectionListeners					= new ListenerList();
-
 	/**
 	 * datamodel listener is called when the chart data is created
 	 */
 	private IDataModelListener				fChartDataModelListener;
 
+	private final ListenerList				fSelectionListeners					= new ListenerList();
 	private ITourModifyListener				fTourModifyListener;
+	private IPropertyChangeListener			fPrefChangeListener;
 
 	private ChartMarkerLayer				fMarkerLayer;
 	private ChartSegmentLayer				fSegmentLayer;
 	private ChartSegmentValueLayer			fSegmentValueLayer;
 
-	private boolean							fIsXSliderVisible;
-
-	private IPropertyChangeListener			fPrefChangeListener;
 	private boolean							fIsTourDirty;
 	private boolean							fIsSegmentLayerVisible;
+	private boolean							fIsXSliderVisible;
 
 	public TourChart(final Composite parent, final int style, boolean showActions) {
 
@@ -118,6 +118,14 @@ public class TourChart extends Chart {
 			}
 		});
 
+		addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+
+				TourbookPlugin.getDefault()
+						.getPluginPreferences()
+						.removePropertyChangeListener(fPrefChangeListener);
+			}
+		});
 	}
 
 	/**
@@ -427,16 +435,6 @@ public class TourChart extends Chart {
 //x		
 	}
 
-	@Override
-	public void dispose() {
-
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.removePropertyChangeListener(fPrefChangeListener);
-
-		super.dispose();
-	}
-
 //	/**
 //	 * Deactivate all tour chart action handlers, this is used when a part is deactivated
 //	 */
@@ -669,15 +667,16 @@ public class TourChart extends Chart {
 
 	private boolean setMinDefaultValue(	final String property,
 										boolean isChartModified,
-										final String tagIsAltiMinEnabled,
-										final String minValue,
-										final int yDataInfoId) {
+										final String tagIsMinEnabled,
+										final String tabMinValue,
+										final int yDataInfoId,
+										int valueDivisor) {
 
-		if (property.equals(tagIsAltiMinEnabled) || property.equals(minValue)) {
+		if (property.equals(tagIsMinEnabled) || property.equals(tabMinValue)) {
 
 			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-			final boolean isAltMinEnabled = prefStore.getBoolean(tagIsAltiMinEnabled);
+			final boolean isAltMinEnabled = prefStore.getBoolean(tagIsMinEnabled);
 
 			final ArrayList<ChartDataYSerie> yDataList = getDataModel().getYData();
 
@@ -693,14 +692,11 @@ public class TourChart extends Chart {
 			if (yData != null) {
 
 				if (isAltMinEnabled) {
-
-					// set to pref store min value
-					final int altMinValue = prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
-
-					yData.setVisibleMinValue(altMinValue);
+					// set visible min value from the preferences
+					yData.setVisibleMinValue(prefStore.getInt(tabMinValue) * valueDivisor);
 
 				} else {
-					// reset to the original min value
+					// reset visible min value to the original min value
 					yData.setVisibleMinValue(yData.getOriginalMinValue());
 				}
 
@@ -761,13 +757,15 @@ public class TourChart extends Chart {
 						isChartModified,
 						ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
 						ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
-						TourManager.GRAPH_ALTIMETER);
+						TourManager.GRAPH_ALTIMETER,
+						0);
 
 				isChartModified = setMinDefaultValue(property,
 						isChartModified,
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
 						ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-						TourManager.GRAPH_GRADIENT);
+						TourManager.GRAPH_GRADIENT,
+						TourManager.GRADIENT_DIVISOR);
 
 				if (isChartModified) {
 					updateTourChart(true);

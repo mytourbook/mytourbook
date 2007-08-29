@@ -21,6 +21,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import net.tourbook.Messages;
+import net.tourbook.data.SerieData;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
@@ -481,8 +482,13 @@ public class TourPropertiesView extends ViewPart {
 		}
 
 		// data points
-		final int dataPoints = tourData.getSerieData().timeSerie.length;
-		fLblDatapoints.setText(Integer.toString(dataPoints));
+		final SerieData serieData = tourData.getSerieData();
+		if (serieData == null) {
+			fLblDatapoints.setText("");
+		} else {
+			final int dataPoints = serieData.timeSerie.length;
+			fLblDatapoints.setText(Integer.toString(dataPoints));
+		}
 		fLblDatapoints.pack(true);
 
 		// tour title

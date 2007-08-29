@@ -293,7 +293,7 @@ public class TourMarkerView extends ViewPart {
 		fTourChangeListener = new IPropertyListener() {
 
 			public void propertyChanged(Object source, int propId) {
-				if (propId == TourDatabase.PROPERTY_TOUR_IS_CHANGED) {
+				if (propId == TourDatabase.TOUR_IS_CHANGED) {
 					fMarkerViewer.setInput(this);
 				}
 			}

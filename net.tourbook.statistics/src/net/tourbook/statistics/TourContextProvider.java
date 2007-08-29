@@ -18,7 +18,7 @@
  */
 package net.tourbook.statistics;
 
-import net.tourbook.chart.ChartContextProvider;
+import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.plugin.TourbookPlugin;
@@ -31,7 +31,7 @@ import org.eclipse.jface.action.Separator;
 /**
  * provides the fill menu methods for the chart context menu
  */
-class TourContextProvider implements ChartContextProvider {
+class TourContextProvider implements IChartContextProvider {
 
 	/**
 	 * 
@@ -102,5 +102,10 @@ class TourContextProvider implements ChartContextProvider {
 	public void fillXSliderContextMenu(	IMenuManager menuMgr,
 										ChartXSlider leftSlider,
 										ChartXSlider rightSlider) {}
+
+	public void fillContextMenu(IMenuManager menuMgr) {
+	// TODO Auto-generated method stub
+
+	}
 
 }

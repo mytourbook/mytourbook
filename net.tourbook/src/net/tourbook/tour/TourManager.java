@@ -72,6 +72,8 @@ public class TourManager {
 	public static final int					GRAPH_GRADIENT						= 1006;
 	public static final int					GRAPH_POWER							= 1007;
 
+	public static final int					GRADIENT_DIVISOR					= 10;
+
 	private static TourManager				instance;
 
 	private ComputeChartValue				computeSpeedAvg;
@@ -903,7 +905,7 @@ public class TourManager {
 
 		// adjust min altitude when it's defined in the pref store
 		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED)) {
-			yDataAltimeter.setSavedMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE));
+			yDataAltimeter.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE));
 		}
 
 		/*
@@ -922,7 +924,7 @@ public class TourManager {
 
 		yDataGradient.setYTitle(Messages.Graph_Label_Gradiend);
 		yDataGradient.setUnitLabel(Messages.Graph_Label_Gradiend_unit);
-		yDataGradient.setValueDivisor(10);
+		yDataGradient.setValueDivisor(GRADIENT_DIVISOR);
 		yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 		yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
 		yDataGradient.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true,
@@ -935,7 +937,8 @@ public class TourManager {
 
 		// adjust min value when defined in the pref store
 		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED)) {
-			yDataGradient.setSavedMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE));
+			yDataGradient.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE)
+					* GRADIENT_DIVISOR);
 		}
 
 		/*

@@ -145,7 +145,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				.getPluginPreferences()
 				.addPropertyChangeListener(fPrefChangeListener);
 
-		// remove pre listener
+		// remove pref listener
 		container.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				TourbookPlugin.getDefault()

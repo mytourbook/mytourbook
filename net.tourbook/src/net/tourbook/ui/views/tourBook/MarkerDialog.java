@@ -29,6 +29,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
+import net.tourbook.tour.TourChartContextProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.PixelConverter;

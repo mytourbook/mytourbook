@@ -64,28 +64,28 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int			TOURBOOK_DB_VERSION						= 4;
+	private static final int			TOURBOOK_DB_VERSION				= 4;
 
-	public final static String			TABLE_TOUR_DATA							= "TourData";								//$NON-NLS-1$
-	public final static String			TABLE_TOUR_MARKER						= "TourMarker";							//$NON-NLS-1$
-	public final static String			TABLE_TOUR_REFERENCE					= "TourReference";							//$NON-NLS-1$
-	public final static String			TABLE_TOUR_COMPARED						= "TourCompared";							//$NON-NLS-1$
-	public final static String			TABLE_TOUR_CATEGORY						= "TourCategory";							//$NON-NLS-1$
-	public final static String			TABLE_TOUR_TYPE							= "TourType";								//$NON-NLS-1$
-	public static final String			TABLE_TOUR_PERSON						= "TourPerson";							//$NON-NLS-1$
-	public static final String			TABLE_TOUR_BIKE							= "TourBike";								//$NON-NLS-1$
+	public final static String			TABLE_TOUR_DATA					= "TourData";								//$NON-NLS-1$
+	public final static String			TABLE_TOUR_MARKER				= "TourMarker";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_REFERENCE			= "TourReference";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_COMPARED				= "TourCompared";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_CATEGORY				= "TourCategory";							//$NON-NLS-1$
+	public final static String			TABLE_TOUR_TYPE					= "TourType";								//$NON-NLS-1$
+	public static final String			TABLE_TOUR_PERSON				= "TourPerson";							//$NON-NLS-1$
+	public static final String			TABLE_TOUR_BIKE					= "TourBike";								//$NON-NLS-1$
 
-	private static final String			TABLE_DB_VERSION						= "DbVersion";								//$NON-NLS-1$
-
-	/**
-	 * tour was changed and saved in the database
-	 */
-	public static final int				PROPERTY_TOUR_IS_CHANGED_AND_PERSISTED	= 1;
+	private static final String			TABLE_DB_VERSION				= "DbVersion";								//$NON-NLS-1$
 
 	/**
-	 * tour was changed but not yet saved in the database
+	 * Db property: tour was changed and saved in the database
 	 */
-	public static final int				PROPERTY_TOUR_IS_CHANGED				= 2;
+	public static final int				TOUR_IS_CHANGED_AND_PERSISTED	= 1;
+
+	/**
+	 * Db property: tour was changed but not yet saved in the database
+	 */
+	public static final int				TOUR_IS_CHANGED					= 2;
 
 	private static TourDatabase			instance;
 
@@ -96,7 +96,7 @@ public class TourDatabase {
 	private boolean						fIsTableChecked;
 	private boolean						fIsVersionChecked;
 
-	private final ListenerList			fPropertyListeners						= new ListenerList(ListenerList.IDENTITY);
+	private final ListenerList			fPropertyListeners				= new ListenerList(ListenerList.IDENTITY);
 
 	class CustomMonitor extends ProgressMonitorDialog {
 

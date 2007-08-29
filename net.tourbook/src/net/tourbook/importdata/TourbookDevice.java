@@ -18,12 +18,6 @@ package net.tourbook.importdata;
 
 public abstract class TourbookDevice implements IRawDataReader {
 
-	public TourbookDevice() {}
-
-	public TourbookDevice(String deviceName) {
-		visibleName = deviceName;
-	}
-
 	/**
 	 * Unique id for each device reader
 	 */
@@ -51,10 +45,15 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public boolean	canSelectMultipleFilesInImportDialog	= false;
 
 	/**
-	 * @param portName
-	 * @return returns the serial port parameters which are use to receive data from the device
+	 * when not <code>-1</code> this year is used as the import year
 	 */
-	public abstract SerialParameters getPortParameters(String portName);
+	public int		importYear								= -1;
+
+	public TourbookDevice() {}
+
+	public TourbookDevice(String deviceName) {
+		visibleName = deviceName;
+	}
 
 	/**
 	 * Check if the received data are correct for this device, Returns <code>true</code> when the
@@ -69,11 +68,21 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public abstract boolean checkStartSequence(int byteIndex, int newByte);
 
 	/**
+	 * @param portName
+	 * @return returns the serial port parameters which are use to receive data from the device
+	 */
+	public abstract SerialParameters getPortParameters(String portName);
+
+	/**
 	 * Returns the number of bytes which will be checked in the startsequence. For a HAC4/5 this can
 	 * be set to 4 because the first 4 bytes of the input stream are always the characters AFRO
 	 * 
 	 * @return
 	 */
 	public abstract int getStartSequenceSize();
+
+	public void setImportYear(int importYear) {
+		this.importYear = importYear;
+	}
 
 }

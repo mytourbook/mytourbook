@@ -22,6 +22,8 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";						//$NON-NLS-1$
 
 	public static String		Action_About;
+
+	public static String	Action_edit_tour;
 	public static String		Action_import_rawdata;
 	public static String		Action_import_rawdata_direct;
 	public static String		Action_import_rawdata_direct_tooltip;
@@ -146,6 +148,10 @@ public class Messages extends NLS {
 	public static String		Image_database_placeholder;
 	public static String		Image_delete;
 	public static String		Image_delete_disabled;
+
+	public static String	Image_edit_tour;
+
+	public static String	Image_edit_tour_disabled;
 	public static String		Image_fit_to_window;
 	public static String		Image_graph_altimeter;
 	public static String		Image_graph_altitude;

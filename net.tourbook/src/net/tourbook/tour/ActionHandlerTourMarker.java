@@ -42,7 +42,7 @@ public class ActionHandlerTourMarker extends AbstractHandler {
 		tourChart.updateMarkerLayer(true);
 
 		// update marker list and other listener
-		TourDatabase.getInstance().firePropertyChange(TourDatabase.PROPERTY_TOUR_IS_CHANGED);
+		TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED);
 
 		return null;
 	}

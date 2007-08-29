@@ -18,6 +18,9 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -48,8 +51,8 @@ public class ChartComponentAxis extends Canvas {
 	private boolean						isAxisDirty;
 
 	/**
-	 * is set to <code>true</code> when the axis is on the left side,
-	 * <code>false</code> when on the right side
+	 * is set to <code>true</code> when the axis is on the left side, <code>false</code> when on
+	 * the right side
 	 */
 	private boolean						fIsLeft;
 
@@ -72,22 +75,37 @@ public class ChartComponentAxis extends Canvas {
 		});
 
 		addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseDown(MouseEvent e) {
 				fChart.fChartComponents.getChartComponentGraph().setFocus();
 			}
+
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				fChart.fChartComponents.getChartComponentGraph().onMouseDoubleClick(e);
+			}
+
 		});
+
+		createContextMenu();
 	}
 
-	void onResize() {
-		isAxisDirty = true;
-		redraw();
-	}
+	/**
+	 * create the context menu
+	 */
+	private void createContextMenu() {
 
-	private void onPaint(GC gc) {
+		final MenuManager menuMgr = new MenuManager();
 
-		drawAxisImage();
+		menuMgr.setRemoveAllWhenShown(true);
 
-		gc.drawImage(axisImage, 0, 0);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager menuMgr) {
+				fChart.fillMenu(menuMgr);
+			}
+		});
+
+		setMenu(menuMgr.createContextMenu(this));
 	}
 
 	/**
@@ -242,9 +260,20 @@ public class ChartComponentAxis extends Canvas {
 		}
 	}
 
+	private void onPaint(GC gc) {
+
+		drawAxisImage();
+
+		gc.drawImage(axisImage, 0, 0);
+	}
+
+	void onResize() {
+		isAxisDirty = true;
+		redraw();
+	}
+
 	/**
-	 * set a new configuration for the axis, this causes a recreation of the
-	 * axis
+	 * set a new configuration for the axis, this causes a recreation of the axis
 	 * 
 	 * @param list
 	 * @param isLeft

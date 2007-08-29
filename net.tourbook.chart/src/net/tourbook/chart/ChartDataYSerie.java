@@ -289,7 +289,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 			fOriginalMinValue = fVisibleMinValue;
 			fOriginalMaxValue = fVisibleMaxValue;
 		}
-
 	}
 
 	@Override

@@ -16,13 +16,10 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
-import net.tourbook.importdata.ActionImportFromDevice;
-import net.tourbook.importdata.ActionImportFromDeviceDirect;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.views.ActionOpenView;
 import net.tourbook.ui.views.TourChartView;
 import net.tourbook.ui.views.TourStatisticsView;
-import net.tourbook.ui.views.rawData.ActionImportFromFile;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourMap.CompareResultView;
@@ -59,26 +56,22 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	private ActionImportFromFile			fActionImportFromFile;
-	private ActionImportFromDevice			fActionImportFromDevice;
-	private ActionImportFromDeviceDirect	fActionImportFromDeviceDirect;
+	private ActionOpenView		fActionRawDataView;
+	private ActionOpenView		fActionStatisticsView;
+	private ActionOpenView		fActionTourBookView;
+	private ActionOpenView		fActionTourMapView;
+	private ActionOpenView		fActionTourChartView;
+	private ActionOpenView		fActionTourCompareView;
 
-	private ActionOpenView					fActionRawDataView;
-	private ActionOpenView					fActionStatisticsView;
-	private ActionOpenView					fActionTourBookView;
-	private ActionOpenView					fActionTourMapView;
-	private ActionOpenView					fActionTourChartView;
-	private ActionOpenView					fActionTourCompareView;
+	private Action				fActionTourCompareWizard;
 
-	private Action							fActionTourCompareWizard;
+	private IWorkbenchAction	fActionSave;
+	private IWorkbenchAction	fActionSaveAll;
+	private IContributionItem	fActionViewShortList;
+	private IWorkbenchAction	fActionPreferences;
 
-	private IWorkbenchAction				fActionSave;
-	private IWorkbenchAction				fActionSaveAll;
-	private IContributionItem				fActionViewShortList;
-	private IWorkbenchAction				fActionPreferences;
-
-	PersonContributionItem					personSelector;
-	TourTypeContributionItem				tourTypeSelector;
+	PersonContributionItem		personSelector;
+	TourTypeContributionItem	tourTypeSelector;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -101,10 +94,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		register(ActionFactory.ABOUT.create(window));
 		getAction(ActionFactory.ABOUT.getId()).setText(Messages.Action_About);
-
-		fActionImportFromFile = new ActionImportFromFile();
-		fActionImportFromDevice = new ActionImportFromDevice(window);
-		fActionImportFromDeviceDirect = new ActionImportFromDeviceDirect(window);
 
 		fActionTourChartView = new ActionOpenView(window,
 				"Tour Chart",
@@ -200,9 +189,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileMenu.add(fActionSaveAll);
 		fileMenu.add(new Separator());
 
-		fileMenu.add(fActionImportFromFile);
-		fileMenu.add(fActionImportFromDevice);
-		fileMenu.add(fActionImportFromDeviceDirect);
 		fileMenu.add(new Separator());
 
 		fileMenu.add(fActionPreferences);

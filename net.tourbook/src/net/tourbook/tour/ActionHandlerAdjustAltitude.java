@@ -56,7 +56,7 @@ public class ActionHandlerAdjustAltitude extends AbstractHandler {
 		 */
 		TourManager.getInstance().removeTourFromCache(tourChart.fTourData.getTourId());
 
-		TourDatabase.getInstance().firePropertyChange(TourDatabase.PROPERTY_TOUR_IS_CHANGED);
+		TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED);
 
 		return null;
 	}

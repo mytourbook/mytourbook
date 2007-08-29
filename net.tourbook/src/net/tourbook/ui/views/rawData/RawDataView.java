@@ -30,6 +30,8 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
+import net.tourbook.importdata.ActionImportFromDevice;
+import net.tourbook.importdata.ActionImportFromDeviceDirect;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -84,6 +86,7 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
@@ -93,54 +96,58 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class RawDataView extends ViewPart {
 
-	private static final String			FILESTRING_SEPARATOR		= "|";
+	private static final String				FILESTRING_SEPARATOR		= "|";
 
-	public static final String			ID							= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+	public static final String				ID							= "net.tourbook.views.rawData.RawDataView";	//$NON-NLS-1$
 
-	public static final int				COLUMN_DATE					= 0;
+	public static final int					COLUMN_DATE					= 0;
 
-	private static final String			MEMENTO_SASH_CONTAINER		= "importview.sash.container.";			//$NON-NLS-1$
-	private static final String			MEMENTO_IMPORT_FILENAME		= "importview.raw-data.filename";			//$NON-NLS-1$
-	private static final String			MEMENTO_SELECTED_TOUR_INDEX	= "importview.selected-tour-index";		//$NON-NLS-1$
-	private static final String			MEMENTO_COLUMN_SORT_ORDER	= "importview.column_sort_order";			//$NON-NLS-1$
-	private static final String			MEMENTO_COLUMN_WIDTH		= "importview.column_width";				//$NON-NLS-1$
+	private static final String				MEMENTO_SASH_CONTAINER		= "importview.sash.container.";				//$NON-NLS-1$
+	private static final String				MEMENTO_IMPORT_FILENAME		= "importview.raw-data.filename";				//$NON-NLS-1$
+	private static final String				MEMENTO_SELECTED_TOUR_INDEX	= "importview.selected-tour-index";			//$NON-NLS-1$
+	private static final String				MEMENTO_COLUMN_SORT_ORDER	= "importview.column_sort_order";				//$NON-NLS-1$
+	private static final String				MEMENTO_COLUMN_WIDTH		= "importview.column_width";					//$NON-NLS-1$
 
-	private static IMemento				fSessionMemento;
+	private static IMemento					fSessionMemento;
 
-	private TableViewer					fTourViewer;
+	private TableViewer						fTourViewer;
 
-	private ActionImportFromFile		fActionImportTourFromFile;
-	private ActionClearView				fActionClearView;
-	private ActionModifyColumns			fActionModifyColumns;
+	private ActionImportFromFile			fActionImportFromFile;
+	private ActionImportFromDevice			fActionImportFromDevice;
+	private ActionImportFromDeviceDirect	fActionImportFromDeviceDirect;
 
-	private ActionSaveTourInDatabase	fActionSaveTour;
-	private ActionSaveTourInDatabase	fActionSaveTourWithPerson;
+	private ActionClearView					fActionClearView;
+	private ActionModifyColumns				fActionModifyColumns;
+	private ActionSaveTourInDatabase		fActionSaveTour;
+	private ActionSaveTourInDatabase		fActionSaveTourWithPerson;
+	private ActionAdjustYear				fActionAdjustImportedYear;
 
-	private ImageDescriptor				imageDatabaseDescriptor;
-	private ImageDescriptor				imageDatabaseOtherPersonDescriptor;
-	private ImageDescriptor				imageDatabasePlaceholderDescriptor;
-	private Image						imageDatabase;
-	private Image						imageDatabaseOtherPerson;
-	private Image						imageDatabasePlaceholder;
+	private ImageDescriptor					imageDatabaseDescriptor;
+	private ImageDescriptor					imageDatabaseOtherPersonDescriptor;
+	private ImageDescriptor					imageDatabasePlaceholderDescriptor;
+	private Image							imageDatabase;
+	private Image							imageDatabaseOtherPerson;
+	private Image							imageDatabasePlaceholder;
 
-	private IPartListener2				fPartListener;
-	private ISelectionListener			fPostSelectionListener;
-	private IPropertyChangeListener		fPrefChangeListener;
-	private PostSelectionProvider		fPostSelectionProvider;
+	private IPartListener2					fPartListener;
+	private ISelectionListener				fPostSelectionListener;
+	private IPropertyChangeListener			fPrefChangeListener;
+	private PostSelectionProvider			fPostSelectionProvider;
 
-	public Calendar						fCalendar;
-	private DateFormat					fDateFormatter;
-	private DateFormat					fTimeFormatter;
-	private DateFormat					fDurationFormatter;
-	private NumberFormat				fNumberFormatter;
+	public Calendar							fCalendar					= GregorianCalendar.getInstance();
+	private DateFormat						fDateFormatter				= DateFormat.getDateInstance(DateFormat.SHORT);
+	private DateFormat						fTimeFormatter				= DateFormat.getTimeInstance(DateFormat.SHORT);
+	private NumberFormat					fNumberFormatter			= NumberFormat.getNumberInstance();
+	private DateFormat						fDurationFormatter			= DateFormat.getTimeInstance(DateFormat.SHORT,
+																				Locale.GERMAN);
 
-	protected TourPerson				fActivePerson;
-	protected TourPerson				fNewActivePerson;
+	protected TourPerson					fActivePerson;
+	protected TourPerson					fNewActivePerson;
 
-	protected boolean					fIsPartVisible				= false;
-	protected boolean					fIsViewerPersonDataDirty	= false;
+	protected boolean						fIsPartVisible				= false;
+	protected boolean						fIsViewerPersonDataDirty	= false;
 
-	private ColumnManager				fColumnManager;
+	private ColumnManager					fColumnManager;
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -265,26 +272,39 @@ public class RawDataView extends ViewPart {
 
 	private void createActions() {
 
+		final IWorkbenchWindow window = getSite().getWorkbenchWindow();
+
 		fActionClearView = new ActionClearView(this);
 		fActionModifyColumns = new ActionModifyColumns(fColumnManager);
-		fActionImportTourFromFile = new ActionImportFromFile();
 		fActionSaveTour = new ActionSaveTourInDatabase(this);
 		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this);
+
+		fActionImportFromFile = new ActionImportFromFile();
+		fActionImportFromDevice = new ActionImportFromDevice(window);
+		fActionImportFromDeviceDirect = new ActionImportFromDeviceDirect(window);
+
+		fActionAdjustImportedYear = new ActionAdjustYear(this);
 
 		/*
 		 * fill view toolbar
 		 */
 		IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
-		viewTbm.add(fActionImportTourFromFile);
+
+		viewTbm.add(fActionImportFromDeviceDirect);
+		viewTbm.add(fActionImportFromDevice);
+		viewTbm.add(fActionImportFromFile);
 		viewTbm.add(fActionClearView);
 
-//		viewTbm.update(true);
+		viewTbm.add(new Separator());
 
 		/*
-		 * fill site menu
+		 * fill view menu
 		 */
 		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(fActionModifyColumns);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionAdjustImportedYear);
 
 	}
 
@@ -313,7 +333,6 @@ public class RawDataView extends ViewPart {
 		createResources();
 		createTourViewer(parent);
 
-		// actions
 		createActions();
 		createContextMenu();
 
@@ -344,11 +363,6 @@ public class RawDataView extends ViewPart {
 			e.printStackTrace();
 		}
 
-		fCalendar = GregorianCalendar.getInstance();
-		fDateFormatter = DateFormat.getDateInstance(DateFormat.SHORT);
-		fTimeFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
-		fDurationFormatter = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.GERMAN);
-		fNumberFormatter = NumberFormat.getNumberInstance();
 	}
 
 	/**
