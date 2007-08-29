@@ -45,6 +45,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 			super(Messages.Tour_Action_show_start_time_on_x_axis, AS_CHECK_BOX);
 		}
 
+		@Override
 		public void run() {
 			fTourChart.fTourChartConfig.isStartTime = isChecked();
 			fTourChart.updateTourChart(true);
@@ -57,6 +58,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 			super(Messages.Tour_Action_scroll_zoomed_chart, AS_CHECK_BOX);
 		}
 
+		@Override
 		public void run() {
 
 			fTourChart.setCanScrollZoomedChart(isChecked());
@@ -78,6 +80,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 			super(Messages.Tour_Action_auto_zoom_to_slider_position, AS_CHECK_BOX);
 		}
 
+		@Override
 		public void run() {
 
 			fTourChart.setCanAutoZoomToSlider(isChecked());
@@ -101,7 +104,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		fTBM = tbm;
 
 		setToolTipText(Messages.Tour_Action_chart_options_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_chart_options));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor("tour-options.gif"));
 
 		fActionShowStartTime = new ActionStartTimeOption();
 		fActionCanScrollZoomedChart = new ActionCanScrollZoomedChart();
@@ -110,6 +113,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		setMenuCreator(this);
 	}
 
+	@Override
 	public void runWithEvent(Event event) {
 
 		// show the drop-down menu, this only works in the runWithEvent not in the run method

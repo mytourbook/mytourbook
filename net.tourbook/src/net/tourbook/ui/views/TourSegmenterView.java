@@ -93,7 +93,6 @@ public class TourSegmenterView extends ViewPart {
 	private PageBook				fPageBook;
 	private Composite				fPageSegmenter;
 
-//	private Button					fChkShowInChart;
 	private Scale					fScaleTolerance;
 	private Label					fLabelToleranceValue;
 

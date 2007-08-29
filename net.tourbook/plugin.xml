@@ -117,7 +117,7 @@
       <view
             category="net.tourbook.category.tourList"
             class="net.tourbook.ui.views.rawData.RawDataView"
-            icon="icons/device.gif"
+            icon="icons/rawdata.gif"
             id="net.tourbook.views.rawData.RawDataView"
             name="%View_Data_Import">
       </view>
@@ -393,6 +393,16 @@
                   style="push"
                   tooltip="%Command_tourChart_tool_tourMarker_tooltip">
             </command>
+            <separator
+                  name="net.tourbook.separator"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
+                  icon="icons/options.gif"
+                  label="MyTourbook Preferences"
+                  style="push">
+            </command>
          </toolbar>
          
       </menuContribution>
@@ -535,8 +545,7 @@
             </separator>
             <command
                   commandId="net.tourbook.command.tourChart.options"
-                  disabledIcon="icons/options-disabled.gif"
-                  icon="icons/options.gif"
+                  icon="icons/tour-options.gif"
                   id="net.tourbook.tourChart.pulldown.optionId"
                   label="%Command_tourChart_options"
                   mnemonic="%Command_tourChart_options_mnemonic"
