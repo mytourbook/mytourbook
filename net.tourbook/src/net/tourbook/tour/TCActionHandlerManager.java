@@ -85,7 +85,8 @@ class TCActionHandlerManager {
 	}
 
 	/**
-	 * Get the action handler for the command
+	 * Get the action handler for the command or <code>null</code> when an action handler is not
+	 * available
 	 * 
 	 * @param commandId
 	 * @return

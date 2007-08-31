@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.util.Map;
+
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
@@ -29,86 +31,21 @@ import org.eclipse.swt.widgets.Menu;
 
 public class ActionChartOptions extends Action implements IMenuCreator {
 
-	private Menu				fMenu	= null;
+	private Menu			fMenu	= null;
 
-	ActionStartTimeOption		fActionShowStartTime;
-	ActionCanScrollZoomedChart	fActionCanScrollZoomedChart;
-	ActionCanAutoZoomToSlider	fActionCanAutoZoomToSlider;
+	private TourChart		fTourChart;
 
-	private TourChart			fTourChart;
-
-	private ToolBarManager		fTBM;
-
-	class ActionStartTimeOption extends Action {
-
-		public ActionStartTimeOption() {
-			super(Messages.Tour_Action_show_start_time_on_x_axis, AS_CHECK_BOX);
-		}
-
-		@Override
-		public void run() {
-			fTourChart.fTourChartConfig.isStartTime = isChecked();
-			fTourChart.updateTourChart(true);
-		}
-	}
-
-	class ActionCanScrollZoomedChart extends Action {
-
-		public ActionCanScrollZoomedChart() {
-			super(Messages.Tour_Action_scroll_zoomed_chart, AS_CHECK_BOX);
-		}
-
-		@Override
-		public void run() {
-
-			fTourChart.setCanScrollZoomedChart(isChecked());
-
-			// update the chart
-			if (isChecked()) {
-				fTourChart.zoomInWithSlider();
-			} else {
-				fTourChart.zoomOut(true);
-			}
-
-			updateZoomOptions();
-		}
-	}
-
-	class ActionCanAutoZoomToSlider extends Action {
-
-		public ActionCanAutoZoomToSlider() {
-			super(Messages.Tour_Action_auto_zoom_to_slider_position, AS_CHECK_BOX);
-		}
-
-		@Override
-		public void run() {
-
-			fTourChart.setCanAutoZoomToSlider(isChecked());
-
-			// update the chart
-			if (isChecked()) {
-				fTourChart.zoomInWithSlider();
-			} else {
-				fTourChart.zoomOut(true);
-			}
-
-			updateZoomOptions();
-		}
-	}
+	private ToolBarManager	fTBM;
 
 	public ActionChartOptions(TourChart tourChart, ToolBarManager tbm) {
 
 		super(null, Action.AS_DROP_DOWN_MENU);
 
-		this.fTourChart = tourChart;
+		fTourChart = tourChart;
 		fTBM = tbm;
 
 		setToolTipText(Messages.Tour_Action_chart_options_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor("tour-options.gif"));
-
-		fActionShowStartTime = new ActionStartTimeOption();
-		fActionCanScrollZoomedChart = new ActionCanScrollZoomedChart();
-		fActionCanAutoZoomToSlider = new ActionCanAutoZoomToSlider();
 
 		setMenuCreator(this);
 	}
@@ -129,13 +66,15 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 	public Menu getMenu(Control parent) {
 
+		final Map<String, TCActionProxy> actionProxies = fTourChart.fActionProxies;
+
 		fMenu = new Menu(parent);
 
-		addItem(fActionShowStartTime);
+		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_START_TIME).getAction());
 		(new Separator()).fill(fMenu, -1);
 
-		addItem(fActionCanScrollZoomedChart);
-		addItem(fActionCanAutoZoomToSlider);
+		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_SCROLL_CHART).getAction());
+		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).getAction());
 
 		return fMenu;
 	}
@@ -149,11 +88,4 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		return null;
 	}
 
-	/**
-	 * the chart decides if the scroll/auto zoom options are available
-	 */
-	private void updateZoomOptions() {
-		fActionCanScrollZoomedChart.setChecked(fTourChart.getCanScrollZoomedChart());
-		fActionCanAutoZoomToSlider.setChecked(fTourChart.getCanAutoZoomToSlider());
-	}
 }

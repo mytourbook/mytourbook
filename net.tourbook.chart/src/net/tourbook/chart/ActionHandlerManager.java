@@ -44,6 +44,7 @@ public class ActionHandlerManager {
 	}
 
 	private void activateHandlers() {
+
 		/*
 		 * it would be better to define the expression in the
 		 * org.eclipse.core.expressions.definitions extension, but in Eclipse 3.3 the

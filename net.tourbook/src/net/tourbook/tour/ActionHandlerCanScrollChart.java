@@ -16,20 +16,9 @@ public class ActionHandlerCanScrollChart extends TCActionHandler {
 
 		Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
-		if (isItemChecked == null) {
-			return null;
+		if (isItemChecked != null) {
+			fTourChart.onExecuteCanScrollChart(isItemChecked);
 		}
-
-		fTourChart.setCanScrollZoomedChart(isItemChecked);
-
-		// apply setting to the chart
-		if (isItemChecked) {
-			fTourChart.zoomInWithSlider();
-		} else {
-			fTourChart.zoomOut(true);
-		}
-
-		fTourChart.updateZoomOptionActionHandlers();
 
 		return null;
 	}

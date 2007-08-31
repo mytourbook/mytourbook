@@ -86,6 +86,8 @@ public class Chart extends ViewForm {
 	 */
 	boolean								fUseInternalActionBar		= true;
 
+	boolean								fUseActionHandlers			= false;
+
 	private int							fBarSelectionSerieIndex;
 	private int							fBarSelectionValueIndex;
 
@@ -93,6 +95,7 @@ public class Chart extends ViewForm {
 	HashMap<String, ActionProxy>		fActionProxies;
 
 	private boolean						fIsFillToolbar				= true;
+	private boolean						fIsToolbarCreated;
 
 	/**
 	 * Chart widget
@@ -155,25 +158,21 @@ public class Chart extends ViewForm {
 	 */
 	private void createActions() {
 
-		if (fActionProxies != null) {
-			return;
-		}
-
 		createChartActionProxies();
 
-		if (fIsFillToolbar) {
+		if (fIsFillToolbar && fIsToolbarCreated == false) {
+			fIsToolbarCreated = true;
 			fillToolbar(true);
 		}
 	}
 
 	/**
-	 * Creates the handlers for the chart actions, the internal action bar for the chart will be
-	 * disabled
+	 * Creates the handlers for the chart actions
 	 */
 	public void createChartActionHandlers() {
 
 		// use the commands defined in plugin.xml
-		fUseInternalActionBar = false;
+		fUseActionHandlers = true;
 
 		fActionHandlerManager.createActionHandlers();
 		createChartActionProxies();
@@ -274,17 +273,17 @@ public class Chart extends ViewForm {
 		return chartInfo;
 	}
 
-	void fillMenu(IMenuManager menuMgr) {
+	void fillContextMenu(IMenuManager menuMgr) {
 		if (fChartContextProvider != null) {
 			fChartContextProvider.fillContextMenu(menuMgr);
 		}
 	}
 
-	void fillMenu(	IMenuManager menuMgr,
-					ChartXSlider leftSlider,
-					ChartXSlider rightSlider,
-					int hoveredBarSerieIndex,
-					int hoveredBarValueIndex) {
+	void fillContextMenu(	IMenuManager menuMgr,
+							ChartXSlider leftSlider,
+							ChartXSlider rightSlider,
+							int hoveredBarSerieIndex,
+							int hoveredBarValueIndex) {
 
 		if (fChartContextProvider != null) {
 			fChartContextProvider.fillContextMenu(menuMgr);
@@ -592,7 +591,7 @@ public class Chart extends ViewForm {
 		fActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(false);
 		fActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(false);
 
-		if (fUseInternalActionBar == false) {
+		if (fUseActionHandlers) {
 			fActionHandlerManager.updateUIState();
 		}
 
@@ -656,9 +655,10 @@ public class Chart extends ViewForm {
 	 * Set the enable state for a command and update the UI
 	 */
 	public void setCommandEnabled(String commandId, boolean isEnabled) {
+
 		fActionProxies.get(commandId).setEnabled(isEnabled);
 
-		if (fUseInternalActionBar == false) {
+		if (fUseActionHandlers) {
 			fActionHandlerManager.getActionHandler(commandId).fireHandlerChanged();
 		}
 	}
@@ -736,15 +736,15 @@ public class Chart extends ViewForm {
 		fIsFillToolbar = isFillToolbar;
 	}
 
-	/**
-	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
-	 * when the workbench action should be used.
-	 * 
-	 * @param useInternalActionBar
-	 */
-	public void setUseInternalActionBar(boolean useInternalActionBar) {
-		fUseInternalActionBar = useInternalActionBar;
-	}
+//	/**
+//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
+//	 * when the workbench action should be used.
+//	 * 
+//	 * @param useInternalActionBar
+//	 */
+//	public void setUseInternalActionBar(boolean useInternalActionBar) {
+//		fUseInternalActionBar = useInternalActionBar;
+//	}
 
 	/**
 	 * sets the position of the x-sliders
@@ -866,6 +866,10 @@ public class Chart extends ViewForm {
 		fChartComponents.updateChartLayers();
 	}
 
+	public boolean useActionHandlers() {
+		return fUseActionHandlers;
+	}
+
 	/**
 	 * @return Returns <code>true</code> when the internal action bar is used, returns
 	 *         <code>false</code> when the global action handler are used
@@ -934,7 +938,7 @@ public class Chart extends ViewForm {
 		fActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(true);
 		fActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(true);
 
-		if (fUseInternalActionBar == false) {
+		if (fUseActionHandlers) {
 			fActionHandlerManager.updateUIEnablementState();
 		}
 

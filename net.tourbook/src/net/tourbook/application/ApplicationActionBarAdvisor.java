@@ -17,18 +17,13 @@ package net.tourbook.application;
 
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.views.ActionOpenView;
-import net.tourbook.ui.views.TourChartView;
-import net.tourbook.ui.views.TourStatisticsView;
-import net.tourbook.ui.views.rawData.RawDataView;
-import net.tourbook.ui.views.tourBook.TourBookView;
-import net.tourbook.ui.views.tourMap.CompareResultView;
-import net.tourbook.ui.views.tourMap.TourMapView;
 import net.tourbook.ui.views.tourMap.WizardTourComparer;
 import net.tourbook.util.PositionedWizardDialog;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
@@ -56,12 +51,12 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	private ActionOpenView		fActionRawDataView;
-	private ActionOpenView		fActionStatisticsView;
-	private ActionOpenView		fActionTourBookView;
-	private ActionOpenView		fActionTourMapView;
-	private ActionOpenView		fActionTourChartView;
-	private ActionOpenView		fActionTourCompareView;
+//	private ActionOpenView		fActionRawDataView;
+//	private ActionOpenView		fActionStatisticsView;
+//	private ActionOpenView		fActionTourBookView;
+//	private ActionOpenView		fActionTourMapView;
+//	private ActionOpenView		fActionTourChartView;
+//	private ActionOpenView		fActionTourCompareView;
 
 	private Action				fActionTourCompareWizard;
 
@@ -72,6 +67,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	PersonContributionItem		personSelector;
 	TourTypeContributionItem	tourTypeSelector;
+	private IWorkbenchAction	fActionAbout;
+	private IWorkbenchAction	fActionQuit;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -79,69 +76,77 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	@Override
 	public IStatus saveState(IMemento memento) {
+
 		personSelector.saveState(memento);
 		tourTypeSelector.saveState(memento);
+
 		return super.saveState(memento);
 	}
 
 	@Override
 	protected void makeActions(final IWorkbenchWindow window) {
 
+//		final IWorkbenchAction action;
+
 		personSelector = new PersonContributionItem();
 		tourTypeSelector = new TourTypeContributionItem();
 
-		register(ActionFactory.QUIT.create(window));
+		fActionQuit = ActionFactory.QUIT.create(window);
+		register(fActionQuit);
 
-		register(ActionFactory.ABOUT.create(window));
-		getAction(ActionFactory.ABOUT.getId()).setText(Messages.Action_About);
+		fActionAbout = ActionFactory.ABOUT.create(window);
+		fActionAbout.setText(Messages.Action_About);
+		register(fActionAbout);
 
-		fActionTourChartView = new ActionOpenView(window,
-				"Tour Chart",
-				"Shows a chart for the currently selected tour",
-				TourChartView.ID,
-				ICommandIds.CMD_OPENVIEW_TOURCHART,
-				"tour-chart.gif");
-
-		fActionRawDataView = new ActionOpenView(window,
-				Messages.Action_openview_rawdata,
-				Messages.Action_openview_rawdata_tooltip,
-				RawDataView.ID,
-				ICommandIds.CMD_OPENVIEW_IMPORTEDDATA,
-				Messages.Image_view_rawdata);
-
-		fActionStatisticsView = new ActionOpenView(window,
-				"",
-				"",
-				TourStatisticsView.ID,
-				ICommandIds.CMD_OPENVIEW_STATISTICS,
-				Messages.Image_show_statistics);
-
-		fActionTourBookView = new ActionOpenView(window,
-				Messages.Action_openview_tourbook,
-				Messages.Action_openview_tourbook_tooltip,
-				TourBookView.ID,
-				ICommandIds.CMD_OPENVIEW_TOURLIST,
-				Messages.Image_view_tourbool);
-
-		fActionTourMapView = new ActionOpenView(window,
-				Messages.Action_openview_tourmap,
-				Messages.Action_openview_tourmap_tooltip,
-				TourMapView.ID,
-				ICommandIds.CMD_OPENVIEW_TOURMAP,
-				Messages.Image_view_tourmap);
-
-		fActionTourCompareView = new ActionOpenView(window,
-				Messages.Action_openview_compare_result,
-				Messages.Action_openview_compare_result_tooltip,
-				CompareResultView.ID,
-				ICommandIds.CMD_OPENVIEW_TOURCOMPARER,
-				Messages.Image_view_compare_result);
+//		fActionTourChartView = new ActionOpenView(window,
+//				"Tour Chart",
+//				"Shows a chart for the currently selected tour",
+//				TourChartView.ID,
+//				ICommandIds.CMD_OPENVIEW_TOURCHART,
+//				"tour-chart.gif");
+//
+//		fActionRawDataView = new ActionOpenView(window,
+//				Messages.Action_openview_rawdata,
+//				Messages.Action_openview_rawdata_tooltip,
+//				RawDataView.ID,
+//				ICommandIds.CMD_OPENVIEW_IMPORTEDDATA,
+//				Messages.Image_view_rawdata);
+//
+//		fActionStatisticsView = new ActionOpenView(window,
+//				"",
+//				"",
+//				TourStatisticsView.ID,
+//				ICommandIds.CMD_OPENVIEW_STATISTICS,
+//				Messages.Image_show_statistics);
+//
+//		fActionTourBookView = new ActionOpenView(window,
+//				Messages.Action_openview_tourbook,
+//				Messages.Action_openview_tourbook_tooltip,
+//				TourBookView.ID,
+//				ICommandIds.CMD_OPENVIEW_TOURLIST,
+//				Messages.Image_view_tourbool);
+//
+//		fActionTourMapView = new ActionOpenView(window,
+//				Messages.Action_openview_tourmap,
+//				Messages.Action_openview_tourmap_tooltip,
+//				TourMapView.ID,
+//				ICommandIds.CMD_OPENVIEW_TOURMAP,
+//				Messages.Image_view_tourmap);
+//
+//		fActionTourCompareView = new ActionOpenView(window,
+//				Messages.Action_openview_compare_result,
+//				Messages.Action_openview_compare_result_tooltip,
+//				CompareResultView.ID,
+//				ICommandIds.CMD_OPENVIEW_TOURCOMPARER,
+//				Messages.Image_view_compare_result);
 
 		fActionPreferences = ActionFactory.PREFERENCES.create(window);
 		fActionPreferences.setText(Messages.Action_open_preferences);
+		register(fActionPreferences);
 
 		fActionSave = ActionFactory.SAVE.create(window);
 		register(fActionSave);
+
 		fActionSaveAll = ActionFactory.SAVE_ALL.create(window);
 		register(fActionSaveAll);
 
@@ -170,9 +175,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 						dialog.open();
 					}
 				});
-
 			}
-
 		};
 	}
 
@@ -180,8 +183,49 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void fillMenuBar(IMenuManager menuBar) {
 
 		/*
-		 * file - menu
+		 * create menu bar
 		 */
+		menuBar.add(createFileMenu());
+		menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+		menuBar.add(createViewMenu());
+		menuBar.add(createHelpMenu());
+	}
+
+	private MenuManager createHelpMenu() {
+		/*
+		 * help - menu
+		 */
+		MenuManager helpMenu = new MenuManager(Messages.Action_Menu_help,
+				IWorkbenchActionConstants.M_HELP);
+
+		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
+
+		return helpMenu;
+	}
+
+	private MenuManager createViewMenu() {
+
+		MenuManager tourMenu = new MenuManager(Messages.Action_Menu_view, null);
+
+		tourMenu.add(fActionViewShortList);
+
+//		tourMenu.add(fActionTourChartView);
+//		tourMenu.add(new Separator());
+//
+//		tourMenu.add(fActionRawDataView);
+//		tourMenu.add(fActionTourBookView);
+//		tourMenu.add(fActionTourMapView);
+//		tourMenu.add(fActionStatisticsView);
+//		tourMenu.add(new Separator());
+
+//		tourMenu.add(fActionTourCompareWizard);
+//		tourMenu.add(fActionTourCompareView);
+
+		return tourMenu;
+	}
+
+	private MenuManager createFileMenu() {
+
 		MenuManager fileMenu = new MenuManager(Messages.Action_Menu_file,
 				IWorkbenchActionConstants.M_FILE);
 
@@ -191,58 +235,28 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		fileMenu.add(new Separator());
 
-		fileMenu.add(fActionPreferences);
-		fileMenu.add(new Separator());
+		// If we're on OS X we shouldn't show this command in the File menu. It
+		// should be invisible to the user. However, we should not remove it -
+		// the carbon UI code will do a search through our menu structure
+		// looking for it when Cmd-Q is invoked (or Quit is chosen from the
+		// application menu.
+		ActionContributionItem prefItem = new ActionContributionItem(fActionPreferences);
+		prefItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
+		fileMenu.add(prefItem);
 
 		fileMenu.add(new Separator("update")); //$NON-NLS-1$
 		fileMenu.add(new Separator());
 
-		fileMenu.add(getAction(ActionFactory.QUIT.getId()));
+		// If we're on OS X we shouldn't show this command in the File menu. It
+		// should be invisible to the user. However, we should not remove it -
+		// the carbon UI code will do a search through our menu structure
+		// looking for it when Cmd-Q is invoked (or Quit is chosen from the
+		// application menu.
+		ActionContributionItem quitItem = new ActionContributionItem(fActionQuit);
+		quitItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
+		fileMenu.add(quitItem);
 
-		// disabled - it's necesarry when the tour editor is reactivated
-		// fileMenu.add(fActionSave);
-		// fileMenu.add(fActionClose);
-		// fileMenu.add(new Separator());
-
-		/*
-		 * view - menu
-		 */
-		MenuManager tourMenu = new MenuManager(Messages.Action_Menu_view, null);
-
-		tourMenu.add(fActionTourChartView);
-		tourMenu.add(new Separator());
-
-		tourMenu.add(fActionRawDataView);
-		tourMenu.add(fActionTourBookView);
-		tourMenu.add(fActionTourMapView);
-		tourMenu.add(fActionStatisticsView);
-		tourMenu.add(new Separator());
-
-		tourMenu.add(fActionTourCompareWizard);
-		tourMenu.add(fActionTourCompareView);
-
-		/*
-		 * view - menu
-		 */
-		MenuManager windowMenu = new MenuManager("&View", null);
-
-		windowMenu.add(fActionViewShortList);
-
-		/*
-		 * help - menu
-		 */
-		MenuManager helpMenu = new MenuManager(Messages.Action_Menu_help,
-				IWorkbenchActionConstants.M_HELP);
-
-		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
-
-		/*
-		 * create menu bar
-		 */
-		menuBar.add(fileMenu);
-		menuBar.add(tourMenu);
-		menuBar.add(windowMenu);
-		menuBar.add(helpMenu);
+		return fileMenu;
 	}
 
 	@Override

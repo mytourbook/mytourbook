@@ -830,7 +830,7 @@ public class ChartComponentGraph extends Canvas {
 
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(final IMenuManager menuMgr) {
-				fChart.fillMenu(menuMgr,
+				fChart.fillContextMenu(menuMgr,
 						contextLeftSlider,
 						contextRightSlider,
 						fHoveredBarSerieIndex,

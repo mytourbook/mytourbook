@@ -62,9 +62,11 @@ public class ActionProxy {
 
 		if (fAction != null) {
 			fAction.setChecked(isChecked);
-		} else {
-			final ActionHandler actionHandler = ActionHandlerManager.getInstance()
-					.getActionHandler(fCommandId);
+		}
+
+		final ActionHandler actionHandler = ActionHandlerManager.getInstance()
+				.getActionHandler(fCommandId);
+		if (actionHandler != null) {
 			actionHandler.setChecked(isChecked);
 		}
 	}
@@ -84,9 +86,11 @@ public class ActionProxy {
 		if (fAction != null) {
 			// use action in the action bar
 			fAction.setEnabled(isEnabled);
-		} else {
-			final ActionHandler actionHandler = ActionHandlerManager.getInstance()
-					.getActionHandler(fCommandId);
+		}
+
+		final ActionHandler actionHandler = ActionHandlerManager.getInstance()
+				.getActionHandler(fCommandId);
+		if (actionHandler != null) {
 			actionHandler.setEnabled(isEnabled);
 		}
 	}

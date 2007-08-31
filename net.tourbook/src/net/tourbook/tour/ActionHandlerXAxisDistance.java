@@ -16,17 +16,9 @@ public class ActionHandlerXAxisDistance extends TCActionHandler {
 
 		Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
-		if (isItemChecked == null) {
-			return null;
+		if (isItemChecked != null) {
+			fTourChart.onExecuteXAxisDistance(isItemChecked);
 		}
-
-		if (fTourChart.onExecuteXAxisDistance(isItemChecked) == false) {
-			return null;
-		}
-
-		// toggle time and distance buttons
-		fTourChart.setCommandChecked(TourChart.COMMAND_ID_X_AXIS_TIME, !isItemChecked);
-		fTourChart.setCommandChecked(TourChart.COMMAND_ID_X_AXIS_DISTANCE, isItemChecked);
 
 		return null;
 	}

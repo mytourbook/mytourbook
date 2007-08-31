@@ -67,7 +67,7 @@ public class TourEditor extends EditorPart {
 
 			public void partActivated(IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
-//					fTourChart.activateActionHandlers(getSite());
+					fTourChart.activateActionHandlers(getSite());
 				}
 			}
 
@@ -81,9 +81,9 @@ public class TourEditor extends EditorPart {
 			}
 
 			public void partDeactivated(IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourEditor.this) {
+//				if (partRef.getPart(false) == TourEditor.this) {
 //					fTourChart.deactivateActionHandlers(getSite());
-				}
+//				}
 			}
 
 			public void partHidden(IWorkbenchPartReference partRef) {}
@@ -161,7 +161,7 @@ public class TourEditor extends EditorPart {
 		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-//		fTourChart.createTourActionHandlers(fTourChartConfig);
+		fTourChart.createTourActionHandlers(fTourChartConfig);
 
 		// load the tourdata from the database
 		fTourData = TourManager.getInstance().getTourData(fEditorInput.fTourId);
@@ -212,8 +212,7 @@ public class TourEditor extends EditorPart {
 		fIsTourDirty = false;
 		fIsTourChanged = false;
 
-		TourDatabase.getInstance()
-				.firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
+		TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
 
 		// hide the dirty indicator
 		firePropertyChange(PROP_DIRTY);

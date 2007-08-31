@@ -136,15 +136,14 @@ public class TourChart extends Chart {
 	 */
 	public void activateActionHandlers(IWorkbenchPartSite partSite) {
 
-		if (useInternalActionBar()) {
-			return;
+		if (useActionHandlers()) {
+
+			// update tour action handlers
+			fTCActionHandlerManager.updateTourActionHandlers(partSite, this);
+
+			// update chart action handlers
+			updateChartActionHandlers();
 		}
-
-		// update tour action handlers
-		fTCActionHandlerManager.updateTourActionHandlers(partSite, this);
-
-		// update chart action handlers
-		updateChartActionHandlers();
 	}
 
 //	@Override
@@ -338,25 +337,17 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * Creates the handlers for the tour chart actions, the internal action bar for the chart will
-	 * be disabled
+	 * Creates the handlers for the tour chart actions
 	 * 
 	 * @param workbenchWindow
 	 * @param tourChartConfig
 	 */
 	public void createTourActionHandlers(TourChartConfiguration tourChartConfig) {
 
-		// use commands defined in the plugin.xml
-		setUseInternalActionBar(false);
-
-		fShowActions = true;
-
-		fTCActionHandlerManager.createActionHandlers();
-
 		fTourChartConfig = tourChartConfig;
 
+		fTCActionHandlerManager.createActionHandlers();
 		createTourActionProxies();
-
 		createChartActionHandlers();
 	}
 
@@ -384,11 +375,7 @@ public class TourChart extends Chart {
 		/*
 		 * Action: x-axis time
 		 */
-		if (useInternalActionBar) {
-			action = new ActionXAxisTime(this);
-		} else {
-			action = null;
-		}
+		action = useInternalActionBar ? new ActionXAxisTime(this) : null;
 		actionProxy = new TCActionProxy(COMMAND_ID_X_AXIS_TIME, action);
 		actionProxy.setChecked(fTourChartConfig.showTimeOnXAxis);
 		fActionProxies.put(COMMAND_ID_X_AXIS_TIME, actionProxy);
@@ -396,11 +383,7 @@ public class TourChart extends Chart {
 		/*
 		 * Action: x-axis distance
 		 */
-		if (useInternalActionBar) {
-			action = new ActionXAxisDistance(this);
-		} else {
-			action = null;
-		}
+		action = useInternalActionBar ? new ActionXAxisDistance(this) : null;
 		actionProxy = new TCActionProxy(COMMAND_ID_X_AXIS_DISTANCE, action);
 		actionProxy.setChecked(!fTourChartConfig.showTimeOnXAxis);
 		fActionProxies.put(COMMAND_ID_X_AXIS_DISTANCE, actionProxy);
@@ -414,42 +397,35 @@ public class TourChart extends Chart {
 		/*
 		 * Action: show start time
 		 */
-		actionProxy = new TCActionProxy(COMMAND_ID_SHOW_START_TIME, null);
-		fActionProxies.put(COMMAND_ID_SHOW_START_TIME, actionProxy);
+		fActionProxies.put(COMMAND_ID_SHOW_START_TIME,
+				new TCActionProxy(COMMAND_ID_SHOW_START_TIME, useInternalActionBar
+						? new ActionShowStartTime(this)
+						: null));
 
 		/*
 		 * Action: can scroll zoomed chart
 		 */
-		actionProxy = new TCActionProxy(COMMAND_ID_CAN_SCROLL_CHART, null);
+		actionProxy = new TCActionProxy(COMMAND_ID_CAN_SCROLL_CHART, useInternalActionBar
+				? new ActionCanScrollZoomedChart(this)
+				: null);
 		fActionProxies.put(COMMAND_ID_CAN_SCROLL_CHART, actionProxy);
 
 		/*
 		 * Action: auto zoom to slider
 		 */
-		actionProxy = new TCActionProxy(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, null);
+		actionProxy = new TCActionProxy(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, useInternalActionBar
+				? new ActionCanAutoZoomToSlider(this)
+				: null);
 		fActionProxies.put(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, actionProxy);
 
 	}
-
-	public void deactivateActionHandlers(IWorkbenchPartSite partSite) {
-//x		
-	}
-
-//	/**
-//	 * Deactivate all tour chart action handlers, this is used when a part is deactivated
-//	 */
-//	public void deactivateHandler() {
-//
-//		if (fUseInternalActionBar) {
-//			return;
-//		}
-//	}
 
 	/**
 	 * create the tour specific action, they are defined in the chart configuration
 	 */
 	private void fillToolbar() {
 
+		// check if toolbar is created
 		if (fActionOptions != null) {
 			return;
 		}
@@ -465,7 +441,6 @@ public class TourChart extends Chart {
 		/*
 		 * add the actions to the toolbar
 		 */
-
 		tbm.add(new Separator());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_ALTITUDE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_SPEED)).getAction());
@@ -483,8 +458,6 @@ public class TourChart extends Chart {
 		tbm.add(fActionOptions);
 
 		tbm.update(true);
-		// ///////////////////////////////////////////////////////
-
 	}
 
 	/**
@@ -523,6 +496,42 @@ public class TourChart extends Chart {
 	// public boolean setFocus() {
 	// }
 
+	void onExecuteCanAutoZoomToSlider(Boolean isItemChecked) {
+
+		setCanAutoZoomToSlider(isItemChecked);
+
+		// apply setting to the chart
+		if (isItemChecked) {
+			zoomInWithSlider();
+		} else {
+			zoomOut(true);
+		}
+
+		updateZoomOptionActionHandlers();
+	}
+
+	void onExecuteCanScrollChart(Boolean isItemChecked) {
+
+		setCanScrollZoomedChart(isItemChecked);
+
+		// apply setting to the chart
+		if (isItemChecked) {
+			zoomInWithSlider();
+		} else {
+			zoomOut(true);
+		}
+
+		updateZoomOptionActionHandlers();
+	}
+
+	void onExecuteShowStartTime(Boolean isItemChecked) {
+
+		fTourChartConfig.isStartTime = isItemChecked;
+		updateTourChart(true);
+
+		setCommandChecked(COMMAND_ID_SHOW_START_TIME, isItemChecked);
+	}
+
 	/**
 	 * Set the X-axis to distance
 	 * 
@@ -545,13 +554,12 @@ public class TourChart extends Chart {
 
 			switchSlidersTo2ndXData();
 			updateTourChart(true);
-
-//			fActionOptions.actionStartTimeOption.setEnabled(false);
-
-		} else {
-			// this action got unchecked
-//			fActionOptions.actionStartTimeOption.setEnabled(true);
 		}
+
+		// toggle time and distance buttons
+		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_TIME, !isChecked);
+		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_DISTANCE, isChecked);
+
 		return true;
 	}
 
@@ -575,13 +583,12 @@ public class TourChart extends Chart {
 
 			switchSlidersTo2ndXData();
 			updateTourChart(true);
-
-//			fActionOptions.actionStartTimeOption.setEnabled(true);
-
-		} else {
-			// this action got unchecked - keep this state
-//			fActionOptions.actionStartTimeOption.setEnabled(false);
 		}
+
+		// toggle time and distance buttons
+		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_TIME, isChecked);
+		setCommandChecked(TourChart.COMMAND_ID_X_AXIS_DISTANCE, !isChecked);
+
 		return true;
 	}
 
@@ -706,21 +713,6 @@ public class TourChart extends Chart {
 		return isChartModified;
 	}
 
-//	/**
-//	 * update the chart by getting the tourdata from the db
-//	 * 
-//	 * @param tourId
-//	 */
-//	void updateChart(final long tourId) {
-//
-//		// load the tourdata from the database
-//		TourData tourData = TourDatabase.getTourDataByTourId(tourId);
-//
-//		if (tourData != null) {
-//			updateChart(tourData, fTourChartConfig, true);
-//		}
-//	}
-
 	private void setPrefListeners() {
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
@@ -839,17 +831,19 @@ public class TourChart extends Chart {
 		} else {
 
 			// enable zoom action
-			if (useInternalActionBar()) {
-				final ActionChartOptions actionOptions = tourChartListener.fActionOptions;
-				actionOptions.fActionCanScrollZoomedChart.setChecked(tourChartListener.getCanScrollZoomedChart());
-				actionOptions.fActionCanAutoZoomToSlider.setChecked(tourChartListener.getCanAutoZoomToSlider());
-			} else {
-				final Map<String, TCActionProxy> actionProxies = tourChartListener.fActionProxies;
-				actionProxies.get(COMMAND_ID_CAN_SCROLL_CHART)
-						.setChecked(tourChartListener.getCanScrollZoomedChart());
-				actionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER)
-						.setChecked(tourChartListener.getCanAutoZoomToSlider());
-			}
+//			if (useInternalActionBar()) {
+//				final ActionChartOptions actionOptions = tourChartListener.fActionOptions;
+//				actionOptions.fActionCanScrollZoomedChart.setChecked(tourChartListener.getCanScrollZoomedChart());
+//				actionOptions.fActionCanAutoZoomToSlider.setChecked(tourChartListener.getCanAutoZoomToSlider());
+//			}
+
+//			if (useActionHandlers()) {
+			final Map<String, TCActionProxy> actionProxies = tourChartListener.fActionProxies;
+			actionProxies.get(COMMAND_ID_CAN_SCROLL_CHART)
+					.setChecked(tourChartListener.getCanScrollZoomedChart());
+			actionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER)
+					.setChecked(tourChartListener.getCanAutoZoomToSlider());
+//			}
 
 			tourChartListener.setZoomActionsEnabled(true);
 			tourChartListener.updateZoomOptions(true);
@@ -887,14 +881,8 @@ public class TourChart extends Chart {
 		}
 
 		// update start time option
-		if (useInternalActionBar()) {
-			fActionOptions.fActionShowStartTime.setEnabled(fTourChartConfig.showTimeOnXAxis);
-			fActionOptions.fActionShowStartTime.setChecked(fTourChartConfig.isStartTime);
-		} else {
-			fActionProxies.get(COMMAND_ID_SHOW_START_TIME)
-					.setEnabled(fTourChartConfig.showTimeOnXAxis);
-			fActionProxies.get(COMMAND_ID_SHOW_START_TIME).setChecked(fTourChartConfig.isStartTime);
-		}
+		fActionProxies.get(COMMAND_ID_SHOW_START_TIME).setEnabled(fTourChartConfig.showTimeOnXAxis);
+		fActionProxies.get(COMMAND_ID_SHOW_START_TIME).setChecked(fTourChartConfig.isStartTime);
 
 		fActionProxies.get(COMMAND_ID_X_AXIS_TIME).setChecked(fTourChartConfig.showTimeOnXAxis);
 		fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE)
@@ -903,7 +891,7 @@ public class TourChart extends Chart {
 		updateZoomOptions();
 
 		// update UI state for the action handlers
-		if (useInternalActionBar() == false) {
+		if (useActionHandlers()) {
 			fTCActionHandlerManager.updateUIState();
 		}
 	}
@@ -1057,19 +1045,21 @@ public class TourChart extends Chart {
 		setCanScrollZoomedChart(canScrollZoomedChart);
 		setCanAutoZoomToSlider(canAutoZoomToSlider);
 
-		if (useInternalActionBar()) {
-			fActionOptions.fActionCanScrollZoomedChart.setEnabled(true);
-			fActionOptions.fActionCanScrollZoomedChart.setChecked(canScrollZoomedChart);
+//		if (useInternalActionBar()) {
+//			fActionOptions.fActionCanScrollZoomedChart.setEnabled(true);
+//			fActionOptions.fActionCanScrollZoomedChart.setChecked(canScrollZoomedChart);
+//
+//			fActionOptions.fActionCanAutoZoomToSlider.setEnabled(true);
+//			fActionOptions.fActionCanAutoZoomToSlider.setChecked(canAutoZoomToSlider);
+//		}
 
-			fActionOptions.fActionCanAutoZoomToSlider.setEnabled(true);
-			fActionOptions.fActionCanAutoZoomToSlider.setChecked(canAutoZoomToSlider);
-		} else {
-			fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setEnabled(true);
-			fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setChecked(canScrollZoomedChart);
+//		if (useActionHandlers()) {
+		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setEnabled(true);
+		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setChecked(canScrollZoomedChart);
 
-			fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(true);
-			fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setChecked(canAutoZoomToSlider);
-		}
+		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(true);
+		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setChecked(canAutoZoomToSlider);
+//		}
 	}
 
 	/**
@@ -1079,13 +1069,15 @@ public class TourChart extends Chart {
 	 */
 	private void updateZoomOptions(final boolean isEnabled) {
 
-		if (useInternalActionBar()) {
-			fActionOptions.fActionCanScrollZoomedChart.setEnabled(isEnabled);
-			fActionOptions.fActionCanAutoZoomToSlider.setEnabled(isEnabled);
-		} else {
-			fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setEnabled(isEnabled);
-			fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(isEnabled);
-		}
+//		if (useInternalActionBar()) {
+//			fActionOptions.fActionCanScrollZoomedChart.setEnabled(isEnabled);
+//			fActionOptions.fActionCanAutoZoomToSlider.setEnabled(isEnabled);
+//		}
+
+//		if (useActionHandlers()) {
+		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setEnabled(isEnabled);
+		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(isEnabled);
+//		}
 	}
 
 }

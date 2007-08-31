@@ -103,7 +103,7 @@ public class TourChartView extends ViewPart {
 
 			public void partActivated(IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourChartView.this) {
-//					fTourChart.activateActionHandlers(getSite());
+					fTourChart.activateActionHandlers(getSite());
 				}
 			}
 
@@ -112,9 +112,9 @@ public class TourChartView extends ViewPart {
 			public void partClosed(IWorkbenchPartReference partRef) {}
 
 			public void partDeactivated(IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourChartView.this) {
+//				if (partRef.getPart(false) == TourChartView.this) {
 //					fTourChart.deactivateActionHandlers();
-				}
+//				}
 			}
 
 			public void partHidden(IWorkbenchPartReference partRef) {}

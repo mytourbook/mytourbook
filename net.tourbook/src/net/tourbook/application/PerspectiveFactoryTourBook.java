@@ -21,7 +21,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 		leftFolder.addView(TourBookView.ID);
 
 		IFolderLayout bottomFolder = layout.createFolder("bottom",
-				IPageLayout.BOTTOM,
+				IPageLayout.TOP,
 				0.5f,
 				IPageLayout.ID_EDITOR_AREA);
 

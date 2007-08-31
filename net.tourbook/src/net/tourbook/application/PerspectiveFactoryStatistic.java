@@ -6,7 +6,6 @@ import net.tourbook.ui.views.TourStatisticsView;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-import org.eclipse.ui.IPlaceholderFolderLayout;
 
 public class PerspectiveFactoryStatistic implements IPerspectiveFactory {
 
@@ -21,12 +20,19 @@ public class PerspectiveFactoryStatistic implements IPerspectiveFactory {
 
 		topFolder.addView(TourStatisticsView.ID);
 
-		IPlaceholderFolderLayout rightFolder = layout.createPlaceholderFolder("right",
-				IPageLayout.RIGHT,
+		IFolderLayout bottomFolder = layout.createFolder("bottom",
+				IPageLayout.LEFT,
 				0.5f,
 				IPageLayout.ID_EDITOR_AREA);
 
-		rightFolder.addPlaceholder(TourChartView.ID);
+		bottomFolder.addView(TourChartView.ID);
+
+//		IPlaceholderFolderLayout rightFolder = layout.createPlaceholderFolder("right",
+//				IPageLayout.RIGHT,
+//				0.5f,
+//				IPageLayout.ID_EDITOR_AREA);
+//
+//		rightFolder.addPlaceholder(TourChartView.ID);
 
 		// hide editor area
 //		layout.setEditorAreaVisible(false);

@@ -70,27 +70,27 @@
       <page
             class="net.tourbook.preferences.PrefPageBikes"
             id="net.tourbook.preferences.PrefPageBikes"
-            name="%Pref_Bikes"/>
+            name="%Pref__Bikes"/>
       <page
             class="net.tourbook.preferences.PrefPagePeople"
             id="net.tourbook.preferences.PrefPageClients"
-            name="%Pref_People"/>
+            name="%Pref__People"/>
       <page
             class="net.tourbook.preferences.PrefPageStatistic"
             id="net.tourbook.preferences.PrefPageStatistic"
-            name="%Pref_Statistics"/>
+            name="%Pref__Statistics"/>
       <page
             class="net.tourbook.preferences.PrefPageChartColors"
             id="net.tourbook.preferences.PrefPageChartColors"
-            name="%Pref_Chart_Colors"/>
+            name="%Pref__Chart_Colors"/>
       <page
             class="net.tourbook.preferences.PrefPageChartGraphs"
             id="net.tourbook.preferences.PrefPageChartGraphs"
-            name="%Pref_Graphs"/>
+            name="%Pref__Graphs"/>
       <page
             class="net.tourbook.preferences.PrefPageTourTypes"
             id="net.tourbook.preferences.PrefPageTourTypes"
-            name="%Pref_Tour_Types"/>
+            name="%Pref__Tour_Types"/>
    </extension>
 
    <extension
@@ -112,14 +112,14 @@
          point="org.eclipse.ui.views">
       <category
             id="net.tourbook.category.tourList"
-            name="%view_category.tourDirectory">
+            name="%view_category_tourDirectory">
       </category>
       <view
             category="net.tourbook.category.tourList"
             class="net.tourbook.ui.views.rawData.RawDataView"
             icon="icons/rawdata.gif"
             id="net.tourbook.views.rawData.RawDataView"
-            name="%View_Data_Import">
+            name="%View_Tour_Data_Import">
       </view>
       <view
             category="net.tourbook.category.tourList"
@@ -142,7 +142,7 @@
       </view>
       <category
             id="net.tourbook.category.tour"
-            name="%view_category.tour">
+            name="%view_category_tour">
       </category>
       <view
             category="net.tourbook.category.tour"
@@ -161,12 +161,12 @@
       <view
             category="net.tourbook.category.tour"
             class="net.tourbook.ui.views.TourMarkerView"
-            icon="icons/marker-editor.gif"
+            icon="icons/marker-list.gif"
             id="net.tourbook.views.TourMarkerView"
-            name="%View_Marker"/>
+            name="%View_Tour_Marker"/>
       <category
             id="net.tourbook.category.tourAnalyze"
-            name="%view_category.analyzeTours">
+            name="%view_category_analyzeTours">
       </category>
      <view
            category="net.tourbook.category.tourAnalyze"
@@ -185,17 +185,17 @@
             class="net.tourbook.ui.views.tourMap.CompareResultView"
             icon="icons/tourfinder-compare.gif"
             id="net.tourbook.views.tourMap.CompareResultView"
-            name="%View_Compare_Result"/>
+            name="%View_Tour_Compare_Result"/>
       <category
             id="net.tourbook.category.system"
-            name="%view_category.system">
+            name="%view_category_system">
       </category>
                 <view
                       category="net.tourbook.category.system"
                       class="net.tourbook.ui.views.TourChartPropertyView"
                       icon="icons/tourchart-properties.gif"
                       id="&quot;net.tourbook.views.TourChartPropertyView&quot;"
-                      name="%View_TourChartProperty">
+                      name="%View_Tour_ChartProperty">
                 </view>
                 <view
             name="Progress View"
@@ -211,25 +211,25 @@
             class="net.tourbook.application.PerspectiveFactoryTourBook"
             icon="icons/tour-list-perspective.gif"
             id="net.tourbook.perspective.TourBook"
-            name="%Perspective_TourBook">
+            name="%Perspective__TourBook">
       </perspective>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryRawData"
             icon="icons/rawdata-perspective.gif"
             id="net.tourbook.perspective.RawData"
-            name="%Perspective_RawData">
+            name="%Perspective__RawData">
       </perspective>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryTourMap"
             icon="icons/tour-map-perspective.gif"
             id="net.tourbook.perspective.TourMap"
-            name="%Perspective_TourMap">
+            name="%Perspective__TourMap">
       </perspective>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryStatistic"
             icon="icons/statistics-perspective.gif"
             id="net.tourbook.perspective.Statistic"
-            name="%Perspective_Statistics">
+            name="%Perspective__Statistics">
       </perspective>
    </extension>
    <extension
@@ -247,6 +247,9 @@
          </perspectiveShortcut>
          <viewShortcut
                id="net.tourbook.views.rawData.RawDataView">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.TourMarkerView">
          </viewShortcut>
       </perspectiveExtension>
       <perspectiveExtension
@@ -298,6 +301,9 @@
          </perspectiveShortcut>
          <viewShortcut
                id="net.tourbook.views.StatisticView">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.TourMarkerView">
          </viewShortcut>
       </perspectiveExtension>
    </extension>
@@ -398,7 +404,7 @@
                   visible="true">
             </separator>
             <command
-                  commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
+                  commandId="net.tourbook.command.preferences"
                   icon="icons/options.gif"
                   label="MyTourbook Preferences"
                   style="push">
@@ -832,6 +838,11 @@
             defaultHandler="net.tourbook.tour.ActionHandlerViewTourProperties"
             id="net.tourbook.command.tourProperties"
             name="%Command_view_tourProperies">
+      </command>
+      <command
+            defaultHandler="net.tourbook.application.ActionHandlerPreferences"
+            id="net.tourbook.command.preferences"
+            name="name">
       </command>
    </extension>
    <extension

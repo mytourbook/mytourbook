@@ -62,9 +62,12 @@ public class TCActionProxy {
 
 		if (fAction != null) {
 			fAction.setChecked(isChecked);
-		} else {
-			final TCActionHandler actionHandler = TCActionHandlerManager.getInstance()
-					.getActionHandler(fCommandId);
+		}
+
+		final TCActionHandler actionHandler = TCActionHandlerManager.getInstance()
+				.getActionHandler(fCommandId);
+
+		if (actionHandler != null) {
 			actionHandler.setChecked(isChecked);
 		}
 	}
@@ -83,9 +86,12 @@ public class TCActionProxy {
 
 		if (fAction != null) {
 			fAction.setEnabled(isEnabled);
-		} else {
-			final TCActionHandler actionHandler = TCActionHandlerManager.getInstance()
-					.getActionHandler(fCommandId);
+		}
+
+		final TCActionHandler actionHandler = TCActionHandlerManager.getInstance()
+				.getActionHandler(fCommandId);
+
+		if (actionHandler != null) {
 			actionHandler.setEnabled(isEnabled);
 		}
 	}
