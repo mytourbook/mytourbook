@@ -70,27 +70,27 @@
       <page
             class="net.tourbook.preferences.PrefPageBikes"
             id="net.tourbook.preferences.PrefPageBikes"
-            name="%Pref__Bikes"/>
+            name="%preference_page_Bikes"/>
       <page
             class="net.tourbook.preferences.PrefPagePeople"
             id="net.tourbook.preferences.PrefPageClients"
-            name="%Pref__People"/>
+            name="%preference_page_People"/>
       <page
             class="net.tourbook.preferences.PrefPageStatistic"
             id="net.tourbook.preferences.PrefPageStatistic"
-            name="%Pref__Statistics"/>
+            name="%preference_page_Statistics"/>
       <page
             class="net.tourbook.preferences.PrefPageChartColors"
             id="net.tourbook.preferences.PrefPageChartColors"
-            name="%Pref__Chart_Colors"/>
+            name="%preference_page_Chart_Colors"/>
       <page
             class="net.tourbook.preferences.PrefPageChartGraphs"
             id="net.tourbook.preferences.PrefPageChartGraphs"
-            name="%Pref__Graphs"/>
+            name="%preference_page_Graphs"/>
       <page
             class="net.tourbook.preferences.PrefPageTourTypes"
             id="net.tourbook.preferences.PrefPageTourTypes"
-            name="%Pref__Tour_Types"/>
+            name="%preference_page_Tour_Types"/>
    </extension>
 
    <extension
@@ -103,7 +103,7 @@
                class="net.tourbook.update.InstallWizardAction"
                definitionId="org.eclipse.ui.update.findAndInstallUpdates"
                id="net.tourbook.update.action_update"
-               label="%Action_Software_Updates"
+               label="%action_software_updates"
                menubarPath="file/update">
          </action>
       </actionSet>
@@ -119,26 +119,26 @@
             class="net.tourbook.ui.views.rawData.RawDataView"
             icon="icons/rawdata.gif"
             id="net.tourbook.views.rawData.RawDataView"
-            name="%View_Tour_Data_Import">
+            name="%view_name_Data_Import">
       </view>
       <view
             category="net.tourbook.category.tourList"
             class="net.tourbook.ui.views.tourBook.TourBookView"
             icon="icons/tour-list.gif"
             id="net.tourbook.views.tourListView"
-            name="%View_Tour_Book"/>
+            name="%view_name_Book"/>
       <view
             category="net.tourbook.category.tourList"
             class="net.tourbook.ui.views.tourMap.TourMapView"
             icon="icons/tourfinder-reference.gif"
             id="net.tourbook.views.tourMap.TourMapView"
-            name="%View_Tour_Map"/>
+            name="%view_name_Map"/>
       <view
             category="net.tourbook.category.tourList"
             class="net.tourbook.ui.views.TourStatisticsView"
             icon="icons/statistics.gif"
             id="net.tourbook.views.StatisticView"
-            name="%View_Tour_Statistics">
+            name="%view_name_Statistics">
       </view>
       <category
             id="net.tourbook.category.tour"
@@ -149,21 +149,21 @@
             class="net.tourbook.ui.views.TourChartView"
             icon="icons/tour-chart.gif"
             id="net.tourbook.views.TourChartView"
-            name="%View_Tour_Chart">
+            name="%view_name_Chart">
       </view>
       <view
             category="net.tourbook.category.tour"
             class="net.tourbook.ui.views.TourPropertiesView"
             icon="icons/tour-properties.gif"
             id="net.tourbook.views.TourPropertiesView"
-            name="%Command_view_tourProperies">
+            name="%command_view_tourProperies">
       </view>
       <view
             category="net.tourbook.category.tour"
             class="net.tourbook.ui.views.TourMarkerView"
             icon="icons/marker-list.gif"
             id="net.tourbook.views.TourMarkerView"
-            name="%View_Tour_Marker"/>
+            name="%view_name_Marker"/>
       <category
             id="net.tourbook.category.tourAnalyze"
             name="%view_category_analyzeTours">
@@ -173,19 +173,19 @@
            class="net.tourbook.ui.views.TourChartAnalyzerView"
            icon="icons/chart-analyzer.gif"
            id="net.tourbook.views.TourChartAnalyzer"
-           name="%View_Tour_Analyzer"/>
+           name="%view_name_Analyzer"/>
       <view
             category="net.tourbook.category.tourAnalyze"
             class="net.tourbook.ui.views.TourSegmenterView"
             icon="icons/tour-segmenter.gif"
             id="net.tourbook.views.TourSegmenter"
-            name="%View_Tour_Segmenter"/>
+            name="%view_name_Segmenter"/>
       <view
             category="net.tourbook.category.tourAnalyze"
             class="net.tourbook.ui.views.tourMap.CompareResultView"
             icon="icons/tourfinder-compare.gif"
             id="net.tourbook.views.tourMap.CompareResultView"
-            name="%View_Tour_Compare_Result"/>
+            name="%view_name_Compare_Result"/>
       <category
             id="net.tourbook.category.system"
             name="%view_category_system">
@@ -195,7 +195,7 @@
                       class="net.tourbook.ui.views.TourChartPropertyView"
                       icon="icons/tourchart-properties.gif"
                       id="&quot;net.tourbook.views.TourChartPropertyView&quot;"
-                      name="%View_Tour_ChartProperty">
+                      name="%view_name_ChartProperty">
                 </view>
                 <view
             name="Progress View"
@@ -211,25 +211,25 @@
             class="net.tourbook.application.PerspectiveFactoryTourBook"
             icon="icons/tour-list-perspective.gif"
             id="net.tourbook.perspective.TourBook"
-            name="%Perspective__TourBook">
+            name="%perspective_name_TourBook">
       </perspective>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryRawData"
             icon="icons/rawdata-perspective.gif"
             id="net.tourbook.perspective.RawData"
-            name="%Perspective__RawData">
+            name="%perspective_name_RawData">
       </perspective>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryTourMap"
             icon="icons/tour-map-perspective.gif"
             id="net.tourbook.perspective.TourMap"
-            name="%Perspective__TourMap">
+            name="%perspective_name_TourMap">
       </perspective>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryStatistic"
             icon="icons/statistics-perspective.gif"
             id="net.tourbook.perspective.Statistic"
-            name="%Perspective__Statistics">
+            name="%perspective_name_Statistics">
       </perspective>
    </extension>
    <extension
@@ -345,16 +345,16 @@
             <command
                   commandId="net.tourbook.command.selectedTour"
                   icon="icons/tour-chart.gif"
-                  label="%Command_view_selectedTour"
-                  mnemonic="%Command_view_selectedTour_mnemonic"
-                  tooltip="%Command_view_selectedTour_tooltip">
+                  label="%command_view_selectedTour"
+                  mnemonic="%command_view_selectedTour_mnemonic"
+                  tooltip="%command_view_selectedTour_tooltip">
             </command>
             <command
                   commandId="net.tourbook.command.tourProperties"
                   icon="icons/tour-properties.gif"
-                  label="%Command_view_tourProperies"
-                  mnemonic="%Command_view_tourProperies_mnemonic"
-                  tooltip="%Command_view_tourProperies_tooltip">
+                  label="%command_view_tourProperies"
+                  mnemonic="%command_view_tourProperies_mnemonic"
+                  tooltip="%command_view_tourProperies_tooltip">
             </command>
             <separator
                   name="net.tourbook.separator"
@@ -363,18 +363,18 @@
             <command
                   commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
                   icon="icons/chart-analyzer.gif"
-                  label="%Command_tourChart_tool_graphAnalyzer"
-                  mnemonic="%Command_tourChart_tool_graphAnalyzer_mnemonic"
+                  label="%command_tourChart_tool_graphAnalyzer"
+                  mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
                   style="push"
-                  tooltip="%Command_tourChart_tool_graphAnalyzer_tooltip">
+                  tooltip="%command_tourChart_tool_graphAnalyzer_tooltip">
             </command>
             <command
                   commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
                   icon="icons/tour-segmenter.gif"
-                  label="%Command_tourChart_tool_tourSegmenter"
-                  mnemonic="%Command_tourChart_tool_tourSegmenter_mnemonic"
+                  label="%command_tourChart_tool_tourSegmenter"
+                  mnemonic="%command_tourChart_tool_tourSegmenter_mnemonic"
                   style="push"
-                  tooltip="%Command_tourChart_tool_tourSegmenter_tooltip">
+                  tooltip="%command_tourChart_tool_tourSegmenter_tooltip">
             </command>
             <separator
                   name="net.tourbook.separator"
@@ -384,20 +384,20 @@
                   commandId="net.tourbook.command.tourChart.tool.adjustAltitude"
                   disabledIcon="icons/adjust-altitude-disabled.gif"
                   icon="icons/adjust-altitude.gif"
-                  label="%Command_tourChart_tool_adjustAltitude"
-                  mnemonic="%Command_tourChart_tool_adjustAltitude_mnemonic"
+                  label="%command_tourChart_tool_adjustAltitude"
+                  mnemonic="%command_tourChart_tool_adjustAltitude_mnemonic"
                   style="push"
-                  tooltip="%Command_tourChart_tool_adjustAltitude_tooltip">
+                  tooltip="%command_tourChart_tool_adjustAltitude_tooltip">
             </command>
             <command
                   commandId="net.tourbook.command.tourChart.tool.tourMarker"
                   disabledIcon="icons/marker-editor-disabled.gif"
                   icon="icons/marker-editor.gif"
                   id="net.tourbook.command.tourChart.tool.tourMarker"
-                  label="%Command_tourChart_tool_tourMarker"
-                  mnemonic="%Command_tourChart_tool_tourMarker_mnemonic"
+                  label="%command_tourChart_tool_tourMarker"
+                  mnemonic="%command_tourChart_tool_tourMarker_mnemonic"
                   style="push"
-                  tooltip="%Command_tourChart_tool_tourMarker_tooltip">
+                  tooltip="%command_tourChart_tool_tourMarker_tooltip">
             </command>
             <separator
                   name="net.tourbook.separator"
@@ -406,24 +406,144 @@
             <command
                   commandId="net.tourbook.command.preferences"
                   icon="icons/options.gif"
-                  label="MyTourbook Preferences"
+                  label="%command_general_preferences"
                   style="push">
             </command>
          </toolbar>
          
       </menuContribution>
       <menuContribution
-            locationURI="no toolbar:org.eclipse.ui.main.toolbar?after=additions">
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="net.tourbook.menu.main.tour"
+               label="%menu_main_tour"
+               mnemonic="%menu_main_tour_mnemonic">
+            <visibleWhen>
+               <reference
+                     definitionId="net.tourbook.definition.isTourChart">
+               </reference>
+            </visibleWhen>
+            <command
+                  commandId="net.tourbook.command.tourChart.xAxisTime"
+                  disabledIcon="icons/x-axes-time-disabled.gif"
+                  icon="icons/x-axes-time.gif"
+                  label="%command_tourChart_xAxisTime"
+                  mnemonic="%command_tourChart_xAxisTime_mnemonic"
+                  style="radio"
+                  tooltip="%command_tourChart_xAxisTime_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.tourChart.xAxisDistance"
+                  disabledIcon="icons/x-axes-distance-disabled.gif"
+                  icon="icons/x-axes-distance.gif"
+                  label="%command_tourChart_xAxisDistance"
+                  mnemonic="%command_tourChart_xAxisDistance_mnemonic"
+                  style="radio"
+                  tooltip="%command_tourChart_xAxisDistance_tooltip">
+            </command>
+            <separator
+                  name="net.tourbook.separator"
+                  visible="true">
+            </separator>            <command
+                  commandId="net.tourbook.command.graph.altitude"
+                  disabledIcon="icons/graph-altitude-disabled.gif"
+                  icon="icons/graph-altitude.gif"
+                  label="%command_graph_altitude"
+                  mnemonic="%command_graph_altitude_mnemonic"
+                  style="toggle"
+                  tooltip="%command_graph_altitude_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.graph.speed"
+                  disabledIcon="icons/graph-speed-disabled.gif"
+                  icon="icons/graph-speed.gif"
+                  label="%command_graph_speed"
+                  mnemonic="%command_graph_speed_mnemonic"
+                  style="toggle"
+                  tooltip="%command_graph_speed_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.graph.pulse"
+                  disabledIcon="icons/graph-pulse-disabled.gif"
+                  icon="icons/graph-pulse.gif"
+                  label="%command_graph_pulse"
+                  mnemonic="%command_graph_pulse_mnemonic"
+                  style="toggle"
+                  tooltip="%command_graph_pulse_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.graph.temperature"
+                  disabledIcon="icons/graph-temperature-disabled.gif"
+                  icon="icons/graph-temperature.gif"
+                  label="%command_graph_temperature"
+                  mnemonic="%command_graph_temperature_mnemonic"
+                  style="toggle"
+                  tooltip="%command_graph_temperature_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.graph.cadence"
+                  disabledIcon="icons/graph-cadence-disabled.gif"
+                  icon="icons/graph-cadence.gif"
+                  label="%command_graph_cadence"
+                  mnemonic="%command_graph_cadence_mnemonic"
+                  style="toggle"
+                  tooltip="%command_graph_cadence_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.graph.altimeter"
+                  disabledIcon="icons/graph-altimeter-disabled.gif"
+                  icon="icons/graph-altimeter.gif"
+                  label="%command_graph_altimeter"
+                  mnemonic="%command_graph_altimeter_mnemonic"
+                  style="toggle"
+                  tooltip="%command_graph_altimeter_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.graph.gradient"
+                  disabledIcon="icons/graph-gradient-disabled.gif"
+                  icon="icons/graph-gradient.gif"
+                  label="%command_graph_gradient"
+                  mnemonic="%command_graph_gradient_mnemonic"
+                  style="toggle"
+                  tooltip="%command_graph_gradient_tooltip">
+            </command>
+
+            <separator
+                  name="net.tourbook.chart.additions"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="net.tourbook.command.tourChart.showStartTime"
+                  label="%command_tourChart_showStartTime"
+                  mnemonic="%command_tourChart_showStartTime_mnemonic"
+                  style="toggle">
+            </command>
+            <command
+                  commandId="net.tourbook.command.tourChart.canScrollChart"
+                  label="%command_tourChart_canScrollChart"
+                  mnemonic="%command_tourChart_canScrollChart_mnemonic"
+                  style="toggle">
+            </command>
+            <command
+                  commandId="net.tourbook.command.tourChart.canAutoZoomToSlider"
+                  label="%command_tourChart_canAutoZoomToSlider"
+                  mnemonic="%command_tourChart_canAutoZoomToSlider_mnemonic"
+                  style="toggle">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="example toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
                id="net.tourbook.toolbars.tourChart.graphs">
             <command
                   commandId="net.tourbook.command.graph.altitude"
                   disabledIcon="icons/graph-altitude-disabled.gif"
                   icon="icons/graph-altitude.gif"
-                  label="%Command_graph_altitude"
-                  mnemonic="%Command_graph_altitude_mnemonic"
+                  label="%command_graph_altitude"
+                  mnemonic="%command_graph_altitude_mnemonic"
                   style="toggle"
-                  tooltip="%Command_graph_altitude_tooltip">
+                  tooltip="%command_graph_altitude_tooltip">
                <visibleWhen>
                   <reference
                         definitionId="net.tourbook.definition.isTourChart">
@@ -434,10 +554,10 @@
                   commandId="net.tourbook.command.graph.speed"
                   disabledIcon="icons/graph-speed-disabled.gif"
                   icon="icons/graph-speed.gif"
-                  label="%Command_graph_speed"
-                  mnemonic="%Command_graph_speed_mnemonic"
+                  label="%command_graph_speed"
+                  mnemonic="%command_graph_speed_mnemonic"
                   style="toggle"
-                  tooltip="%Command_graph_speed_tooltip">
+                  tooltip="%command_graph_speed_tooltip">
                <visibleWhen>
                   <reference
                         definitionId="net.tourbook.definition.isTourChart">
@@ -448,10 +568,10 @@
                   commandId="net.tourbook.command.graph.pulse"
                   disabledIcon="icons/graph-pulse-disabled.gif"
                   icon="icons/graph-pulse.gif"
-                  label="%Command_graph_pulse"
-                  mnemonic="%Command_graph_pulse_mnemonic"
+                  label="%command_graph_pulse"
+                  mnemonic="%command_graph_pulse_mnemonic"
                   style="toggle"
-                  tooltip="%Command_graph_pulse_tooltip">
+                  tooltip="%command_graph_pulse_tooltip">
                <visibleWhen>
                   <reference
                         definitionId="net.tourbook.definition.isTourChart">
@@ -462,10 +582,10 @@
                   commandId="net.tourbook.command.graph.temperature"
                   disabledIcon="icons/graph-temperature-disabled.gif"
                   icon="icons/graph-temperature.gif"
-                  label="%Command_graph_temperature"
-                  mnemonic="%Command_graph_temperature_mnemonic"
+                  label="%command_graph_temperature"
+                  mnemonic="%command_graph_temperature_mnemonic"
                   style="toggle"
-                  tooltip="%Command_graph_temperature_tooltip">
+                  tooltip="%command_graph_temperature_tooltip">
                <visibleWhen>
                   <reference
                         definitionId="net.tourbook.definition.isTourChart">
@@ -476,10 +596,10 @@
                   commandId="net.tourbook.command.graph.cadence"
                   disabledIcon="icons/graph-cadence-disabled.gif"
                   icon="icons/graph-cadence.gif"
-                  label="%Command_graph_cadence"
-                  mnemonic="%Command_graph_cadence_mnemonic"
+                  label="%command_graph_cadence"
+                  mnemonic="%command_graph_cadence_mnemonic"
                   style="toggle"
-                  tooltip="%Command_graph_cadence_tooltip">
+                  tooltip="%command_graph_cadence_tooltip">
                <visibleWhen>
                   <reference
                         definitionId="net.tourbook.definition.isTourChart">
@@ -490,10 +610,10 @@
                   commandId="net.tourbook.command.graph.altimeter"
                   disabledIcon="icons/graph-altimeter-disabled.gif"
                   icon="icons/graph-altimeter.gif"
-                  label="%Command_graph_altimeter"
-                  mnemonic="%Command_graph_altimeter_mnemonic"
+                  label="%command_graph_altimeter"
+                  mnemonic="%command_graph_altimeter_mnemonic"
                   style="toggle"
-                  tooltip="%Command_graph_altimeter_tooltip">
+                  tooltip="%command_graph_altimeter_tooltip">
                <visibleWhen>
                   <reference
                         definitionId="net.tourbook.definition.isTourChart">
@@ -504,10 +624,10 @@
                   commandId="net.tourbook.command.graph.gradient"
                   disabledIcon="icons/graph-gradient-disabled.gif"
                   icon="icons/graph-gradient.gif"
-                  label="%Command_graph_gradient"
-                  mnemonic="%Command_graph_gradient_mnemonic"
+                  label="%command_graph_gradient"
+                  mnemonic="%command_graph_gradient_mnemonic"
                   style="toggle"
-                  tooltip="%Command_graph_gradient_tooltip">
+                  tooltip="%command_graph_gradient_tooltip">
                <visibleWhen>
                   <reference
                         definitionId="net.tourbook.definition.isTourChart">
@@ -521,10 +641,10 @@
                   commandId="net.tourbook.command.tourChart.xAxisTime"
                   disabledIcon="icons/x-axes-time-disabled.gif"
                   icon="icons/x-axes-time.gif"
-                  label="%Command_tourChart_xAxisTime"
-                  mnemonic="%Command_tourChart_xAxisTime_mnemonic"
+                  label="%command_tourChart_xAxisTime"
+                  mnemonic="%command_tourChart_xAxisTime_mnemonic"
                   style="toggle"
-                  tooltip="%Command_tourChart_xAxisTime_tooltip">
+                  tooltip="%command_tourChart_xAxisTime_tooltip">
                <visibleWhen>
                   <reference
                         definitionId="net.tourbook.definition.isTourChart">
@@ -535,10 +655,10 @@
                   commandId="net.tourbook.command.tourChart.xAxisDistance"
                   disabledIcon="icons/x-axes-distance-disabled.gif"
                   icon="icons/x-axes-distance.gif"
-                  label="%Command_tourChart_xAxisDistance"
-                  mnemonic="%Command_tourChart_xAxisDistance_mnemonic"
+                  label="%command_tourChart_xAxisDistance"
+                  mnemonic="%command_tourChart_xAxisDistance_mnemonic"
                   style="toggle"
-                  tooltip="%Command_tourChart_xAxisDistance_tooltip">
+                  tooltip="%command_tourChart_xAxisDistance_tooltip">
                <visibleWhen>
                   <reference
                         definitionId="net.tourbook.definition.isTourChart">
@@ -553,10 +673,10 @@
                   commandId="net.tourbook.command.tourChart.options"
                   icon="icons/tour-options.gif"
                   id="net.tourbook.tourChart.pulldown.optionId"
-                  label="%Command_tourChart_options"
-                  mnemonic="%Command_tourChart_options_mnemonic"
+                  label="%command_tourChart_options"
+                  mnemonic="%command_tourChart_options_mnemonic"
                   style="pulldown"
-                  tooltip="%Command_tourChart_options_tooltip">
+                  tooltip="%command_tourChart_options_tooltip">
                <visibleWhen>
                   <reference
                         definitionId="net.tourbook.definition.isTourChart">
@@ -567,11 +687,11 @@
       </menuContribution>
       
       <menuContribution
-            locationURI="menu:net.tourbook.tourChart.pulldown.optionId">
+            locationURI="example menu:net.tourbook.tourChart.pulldown.optionId">
          <command
                commandId="net.tourbook.command.tourChart.showStartTime"
-               label="%Command_tourChart_showStartTime"
-               mnemonic="%Command_tourChart_showStartTime_mnemonic"
+               label="%command_tourChart_showStartTime"
+               mnemonic="%command_tourChart_showStartTime_mnemonic"
                style="toggle">
          </command>
          <separator
@@ -580,159 +700,14 @@
          </separator>
          <command
                commandId="net.tourbook.command.tourChart.canScrollChart"
-               label="%Command_tourChart_canScrollChart"
-               mnemonic="%Command_tourChart_canScrollChart_mnemonic"
+               label="%command_tourChart_canScrollChart"
+               mnemonic="%command_tourChart_canScrollChart_mnemonic"
                style="toggle">
          </command>
          <command
                commandId="net.tourbook.command.tourChart.canAutoZoomToSlider"
-               label="%Command_tourChart_canAutoZoomToSlider"
-               mnemonic="%Command_tourChart_canAutoZoomToSlider_mnemonic"
-               style="toggle">
-         </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               id="net.tourbook.menu.main.tour"
-               label="%Menu_main_tour"
-               mnemonic="%Menu_main_tour_mnemonic">
-            <visibleWhen>
-               <reference
-                     definitionId="net.tourbook.definition.isTourChart">
-               </reference>
-            </visibleWhen>
-            <command
-                  commandId="net.tourbook.command.tourChart.xAxisTime"
-                  disabledIcon="icons/x-axes-time-disabled.gif"
-                  icon="icons/x-axes-time.gif"
-                  label="%Command_tourChart_xAxisTime"
-                  mnemonic="%Command_tourChart_xAxisTime_mnemonic"
-                  style="radio"
-                  tooltip="%Command_tourChart_xAxisTime_tooltip">
-            </command>
-            <command
-                  commandId="net.tourbook.command.tourChart.xAxisDistance"
-                  disabledIcon="icons/x-axes-distance-disabled.gif"
-                  icon="icons/x-axes-distance.gif"
-                  label="%Command_tourChart_xAxisDistance"
-                  mnemonic="%Command_tourChart_xAxisDistance_mnemonic"
-                  style="radio"
-                  tooltip="%Command_tourChart_xAxisDistance_tooltip">
-            </command>
-            <separator
-                  name="net.tourbook.separator"
-                  visible="true">
-            </separator>            <command
-                  commandId="net.tourbook.command.graph.altitude"
-                  disabledIcon="icons/graph-altitude-disabled.gif"
-                  icon="icons/graph-altitude.gif"
-                  label="%Command_graph_altitude"
-                  mnemonic="%Command_graph_altitude_mnemonic"
-                  style="toggle"
-                  tooltip="%Command_graph_altitude_tooltip">
-            </command>
-            <command
-                  commandId="net.tourbook.command.graph.speed"
-                  disabledIcon="icons/graph-speed-disabled.gif"
-                  icon="icons/graph-speed.gif"
-                  label="%Command_graph_speed"
-                  mnemonic="%Command_graph_speed_mnemonic"
-                  style="toggle"
-                  tooltip="%Command_graph_speed_tooltip">
-            </command>
-            <command
-                  commandId="net.tourbook.command.graph.pulse"
-                  disabledIcon="icons/graph-pulse-disabled.gif"
-                  icon="icons/graph-pulse.gif"
-                  label="%Command_graph_pulse"
-                  mnemonic="%Command_graph_pulse_mnemonic"
-                  style="toggle"
-                  tooltip="%Command_graph_pulse_tooltip">
-            </command>
-            <command
-                  commandId="net.tourbook.command.graph.temperature"
-                  disabledIcon="icons/graph-temperature-disabled.gif"
-                  icon="icons/graph-temperature.gif"
-                  label="%Command_graph_temperature"
-                  mnemonic="%Command_graph_temperature_mnemonic"
-                  style="toggle"
-                  tooltip="%Command_graph_temperature_tooltip">
-            </command>
-            <command
-                  commandId="net.tourbook.command.graph.cadence"
-                  disabledIcon="icons/graph-cadence-disabled.gif"
-                  icon="icons/graph-cadence.gif"
-                  label="%Command_graph_cadence"
-                  mnemonic="%Command_graph_cadence_mnemonic"
-                  style="toggle"
-                  tooltip="%Command_graph_cadence_tooltip">
-            </command>
-            <command
-                  commandId="net.tourbook.command.graph.altimeter"
-                  disabledIcon="icons/graph-altimeter-disabled.gif"
-                  icon="icons/graph-altimeter.gif"
-                  label="%Command_graph_altimeter"
-                  mnemonic="%Command_graph_altimeter_mnemonic"
-                  style="toggle"
-                  tooltip="%Command_graph_altimeter_tooltip">
-            </command>
-            <command
-                  commandId="net.tourbook.command.graph.gradient"
-                  disabledIcon="icons/graph-gradient-disabled.gif"
-                  icon="icons/graph-gradient.gif"
-                  label="%Command_graph_gradient"
-                  mnemonic="%Command_graph_gradient_mnemonic"
-                  style="toggle"
-                  tooltip="%Command_graph_gradient_tooltip">
-            </command>
-
-            <separator
-                  name="net.tourbook.chart.additions"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="net.tourbook.command.tourChart.showStartTime"
-                  label="%Command_tourChart_showStartTime"
-                  mnemonic="%Command_tourChart_showStartTime_mnemonic"
-                  style="toggle">
-            </command>
-            <command
-                  commandId="net.tourbook.command.tourChart.canScrollChart"
-                  label="%Command_tourChart_canScrollChart"
-                  mnemonic="%Command_tourChart_canScrollChart_mnemonic"
-                  style="toggle">
-            </command>
-            <command
-                  commandId="net.tourbook.command.tourChart.canAutoZoomToSlider"
-                  label="%Command_tourChart_canAutoZoomToSlider"
-                  mnemonic="%Command_tourChart_canAutoZoomToSlider_mnemonic"
-                  style="toggle">
-            </command>
-         </menu>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:net.tourbook.views.xTourChartView?after=additions">
-         <command
-               commandId="net.tourbook.command.tourChart.showStartTime"
-               label="%Command_tourChart_showStartTime"
-               mnemonic="%Command_tourChart_showStartTime_mnemonic"
-               style="toggle">
-         </command>
-         <separator
-               name="net.tourbook.separator5"
-               visible="true">
-         </separator>
-         <command
-               commandId="net.tourbook.command.tourChart.canScrollChart"
-               label="%Command_tourChart_canScrollChart"
-               mnemonic="%Command_tourChart_canScrollChart_mnemonic"
-               style="toggle">
-         </command>
-         <command
-               commandId="net.tourbook.command.tourChart.canAutoZoomToSlider"
-               label="%Command_tourChart_canAutoZoomToSlider"
-               mnemonic="%Command_tourChart_canAutoZoomToSlider_mnemonic"
+               label="%command_tourChart_canAutoZoomToSlider"
+               mnemonic="%command_tourChart_canAutoZoomToSlider_mnemonic"
                style="toggle">
          </command>
       </menuContribution>
@@ -752,97 +727,97 @@
       <command
             id="net.tourbook.command.graph.altitude"
             categoryId="net.tourbook.command.category.tourEditor"
-            name="%Command_graph_altitude">
+            name="%command_graph_altitude">
       </command>
       <command
             id="net.tourbook.command.graph.speed"
             categoryId="net.tourbook.command.category.tourEditor"
-            name="%Command_graph_speed">
+            name="%command_graph_speed">
       </command>
       <command
             categoryId="net.tourbook.command.category.tourEditor"
             id="net.tourbook.command.graph.pulse"
-            name="%Command_graph_pulse">
+            name="%command_graph_pulse">
       </command>
       <command
             categoryId="net.tourbook.command.category.tourEditor"
             id="net.tourbook.command.graph.temperature"
-            name="%Command_graph_temperature">
+            name="%command_graph_temperature">
       </command>
       <command
             categoryId="net.tourbook.command.category.tourEditor"
             id="net.tourbook.command.graph.cadence"
-            name="%Command_graph_cadence">
+            name="%command_graph_cadence">
       </command>
       <command
             categoryId="net.tourbook.command.category.tourEditor"
             id="net.tourbook.command.graph.altimeter"
-            name="%Command_graph_altimeter">
+            name="%command_graph_altimeter">
       </command>
       <command
             categoryId="net.tourbook.command.category.tourEditor"
             id="net.tourbook.command.graph.gradient"
-            name="%Command_graph_gradient">
+            name="%command_graph_gradient">
       </command>
       <command
             categoryId="net.tourbook.command.category.tourEditor"
             id="net.tourbook.command.tourChart.xAxisTime"
-            name="%Command_tourChart_xAxisTime">
+            name="%command_tourChart_xAxisTime">
       </command>
       <command
             categoryId="net.tourbook.command.category.tourEditor"
             id="net.tourbook.command.tourChart.xAxisDistance"
-            name="%Command_tourChart_xAxisDistance">
+            name="%command_tourChart_xAxisDistance">
       </command>
       <command
             id="net.tourbook.command.tourChart.options"
-            name="%Command_tourChart_options">
+            name="%command_tourChart_options">
       </command>
       <command
             id="net.tourbook.command.tourChart.showStartTime"
-            name="%Command_tourChart_showStartTime">
+            name="%command_tourChart_showStartTime">
       </command>
       <command
             id="net.tourbook.command.tourChart.canScrollChart"
-            name="%Command_tourChart_canScrollChart">
+            name="%command_tourChart_canScrollChart">
       </command>
       <command
             id="net.tourbook.command.tourChart.canAutoZoomToSlider"
-            name="%Command_tourChart_canAutoZoomToSlider">
+            name="%command_tourChart_canAutoZoomToSlider">
       </command>
       <command
             id="net.tourbook.command.tourChart.tool.adjustAltitude"
-            name="%Command_tourChart_tool_adjustAltitude">
+            name="%command_tourChart_tool_adjustAltitude">
       </command>
       <command
             id="net.tourbook.command.tourChart.tool.tourMarker"
-            name="%Command_tourChart_tool_tourMarker">
+            name="%command_tourChart_tool_tourMarker">
       </command>
       <command
             defaultHandler="net.tourbook.tour.ActionHandlerViewGraphAnalyzer"
             id="net.tourbook.command.tourChart.tool.graphAnalyzer"
-            name="%Command_tourChart_tool_graphAnalyzer">
+            name="%command_tourChart_tool_graphAnalyzer">
          
       </command>
       <command
             defaultHandler="net.tourbook.tour.ActionHandlerViewTourSegmenter"
             id="net.tourbook.command.tourChart.tool.tourSegmenter"
-            name="%Command_tourChart_tool_tourSegmenter">
+            name="%command_tourChart_tool_tourSegmenter">
       </command>
       <command
             defaultHandler="net.tourbook.tour.ActionHandlerViewSelectedTour"
             id="net.tourbook.command.selectedTour"
-            name="%Command_view_selectedTour">
+            name="%command_view_selectedTour">
       </command>
       <command
             defaultHandler="net.tourbook.tour.ActionHandlerViewTourProperties"
             id="net.tourbook.command.tourProperties"
-            name="%Command_view_tourProperies">
+            name="%command_view_tourProperies">
       </command>
       <command
             defaultHandler="net.tourbook.application.ActionHandlerPreferences"
             id="net.tourbook.command.preferences"
-            name="name">
+            name="%command_general_preferences">
       </command>
    </extension>
    <extension
@@ -868,6 +843,41 @@
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
+      <key
+            commandId="net.tourbook.command.graph.altitude"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+1">
+      </key>
+      <key
+            commandId="net.tourbook.command.graph.speed"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+2">
+      </key>
+      <key
+            commandId="net.tourbook.command.graph.pulse"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+3">
+      </key>
+      <key
+            commandId="net.tourbook.command.graph.temperature"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+4">
+      </key>
+      <key
+            commandId="net.tourbook.command.graph.cadence"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+5">
+      </key>
+      <key
+            commandId="net.tourbook.command.graph.altimeter"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+6">
+      </key>
+      <key
+            commandId="net.tourbook.command.graph.gradient"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+7">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">
