@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.ui.views.tourMap;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.IChartContextProvider;
@@ -57,9 +57,9 @@ import org.eclipse.ui.part.ViewPart;
 // author: Wolfgang Schramm
 // create: 09.07.2007
 
-public class TourChartView extends ViewPart {
+public class TourMapReferenceView extends ViewPart {
 
-	public static final String		ID	= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
+	public static final String		ID	= "net.tourbook.views.TourMapReferenceView";	//$NON-NLS-1$
 
 	private TourChart				fTourChart;
 	private TourChartConfiguration	fTourChartConfig;
@@ -89,7 +89,7 @@ public class TourChartView extends ViewPart {
 
 		public void fillContextMenu(IMenuManager menuMgr) {
 
-			final ActionEditTour actionEditTour = new ActionEditTour(TourChartView.this);
+			final ActionEditTour actionEditTour = new ActionEditTour(TourMapReferenceView.this);
 			actionEditTour.setEnabled(fTourData != null);
 
 			menuMgr.add(actionEditTour);
@@ -102,7 +102,7 @@ public class TourChartView extends ViewPart {
 		fPartListener = new IPartListener2() {
 
 			public void partActivated(IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourChartView.this) {
+				if (partRef.getPart(false) == TourMapReferenceView.this) {
 					fTourChart.activateActionHandlers(getSite());
 				}
 			}
@@ -111,7 +111,11 @@ public class TourChartView extends ViewPart {
 
 			public void partClosed(IWorkbenchPartReference partRef) {}
 
-			public void partDeactivated(IWorkbenchPartReference partRef) {}
+			public void partDeactivated(IWorkbenchPartReference partRef) {
+//				if (partRef.getPart(false) == TourChartView.this) {
+//					fTourChart.deactivateActionHandlers();
+//				}
+			}
 
 			public void partHidden(IWorkbenchPartReference partRef) {}
 
@@ -229,6 +233,7 @@ public class TourChartView extends ViewPart {
 		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
+//		fTourChart.createTourActionHandlers(fTourChartConfig);
 
 		// set chart title
 		fTourChart.addDataModelListener(new IDataModelListener() {

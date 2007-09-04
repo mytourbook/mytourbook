@@ -17,8 +17,20 @@ package net.tourbook.device.garmin305;
 
 import gnu.io.SerialPort;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.TimeZone;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -26,7 +38,16 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 public class Garmin305DeviceDataReader extends TourbookDevice {
+
+	private Document		dom;
+
+	private final Calendar	fCalendar	= GregorianCalendar.getInstance();
 
 	// plugin constructor
 	public Garmin305DeviceDataReader() {}
@@ -67,68 +88,30 @@ public class Garmin305DeviceDataReader extends TourbookDevice {
 										DeviceData deviceData,
 										HashMap<String, TourData> tourDataMap) {
 
+		if (parseXmlFile(importFileName) == false) {
+			return false;
+		}
+
 		// create data object for each tour
 		TourData tourData = new TourData();
 
 		tourData.importRawDataFile = importFileName;
 
-		tourData.setStartMinute((short) 0);
-		tourData.setStartHour((short) 18);
-		tourData.setStartDay((short) 20);
-		tourData.setStartMonth((short) 8);
-		tourData.setStartYear((short) 2007);
-		tourData.setStartWeek((short) 33);
-
-		short timeInterval = 20;
-		tourData.setDeviceTimeInterval(timeInterval);
-
 		// create a list which contains all time slices 
 		ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
 
-		TimeData timeData;
+		parseDocument(tourData, timeDataList);
 
-		timeData = new TimeData();
-		timeData.pulse = 140;
-		timeData.altitude = 440;
-		timeData.distance = 0;
-		timeData.temperature = 20;
-		timeDataList.add(timeData);
-
-		timeData = new TimeData();
-		timeData.pulse = 150;
-		timeData.altitude = -10;
-		timeData.distance = 50;
-		timeData.temperature = 20;
-		timeDataList.add(timeData);
-
-		timeData = new TimeData();
-		timeData.pulse = 150;
-		timeData.altitude = 0;
-		timeData.distance = 30;
-		timeData.temperature = 21;
-		timeDataList.add(timeData);
-
-		timeData = new TimeData();
-		timeData.pulse = 160;
-		timeData.altitude = 10;
-		timeData.distance = 50;
-		timeData.temperature = 22;
-		timeDataList.add(timeData);
-
-		timeData = new TimeData();
-		timeData.pulse = 150;
-		timeData.altitude = -20;
-		timeData.distance = 80;
-		timeData.temperature = 21;
-		timeDataList.add(timeData);
+		short timeInterval = 20;
+		tourData.setDeviceTimeInterval(timeInterval);
 
 		tourData.setTourAltUp(10);
 		tourData.setTourAltDown(30);
 
 		/*
 		 * unique key is used to create the tour id, this key is combined with the tour start
-		 * date/time to identify the tour in the database. The key can be the distance of the tour
-		 * or other unique data
+		 * date/time to identify the tour in the database. The unique key can be the distance of the
+		 * tour or any other unique data
 		 */
 		String uniqueKey = "23221";
 
@@ -151,10 +134,10 @@ public class Garmin305DeviceDataReader extends TourbookDevice {
 
 		}
 
-		// set the import date or transfer date
-		deviceData.transferYear = 2008;
-		deviceData.transferMonth = 8;
-		deviceData.transferDay = 30;
+		// set the import or transfer date
+		deviceData.transferYear = tourData.getStartYear();
+		deviceData.transferMonth = tourData.getStartMonth();
+		deviceData.transferDay = tourData.getStartDay();
 
 		return true;
 	}
@@ -163,4 +146,191 @@ public class Garmin305DeviceDataReader extends TourbookDevice {
 		return true;
 	}
 
+	private boolean parseXmlFile(String fileName) {
+
+		//get the factory
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+		try {
+
+			//Using factory get an instance of document builder
+			DocumentBuilder db = dbf.newDocumentBuilder();
+
+			//parse using builder to get DOM representation of the XML file
+			dom = db.parse(fileName);
+			return true;
+
+		} catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		} catch (SAXException se) {
+			se.printStackTrace();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		return false;
+	}
+
+	static TimeZone		utc	= TimeZone.getTimeZone("GMT");
+	static DateFormat	iso	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	{
+		iso.setTimeZone(utc);
+	}
+
+	private void parseDocument(TourData tourData, ArrayList<TimeData> timeDataList) {
+
+		TimeData timeData;
+		long tourDateTime = 0;
+
+		//get the root element
+		Element docEle = dom.getDocumentElement();
+
+		NodeList activityList = docEle.getElementsByTagName("Activity");
+
+		if (activityList != null && activityList.getLength() > 0) {
+			for (int activityIndex = 0; activityIndex < activityList.getLength(); activityIndex++) {
+
+				Element activity = (Element) activityList.item(activityIndex);
+
+				NodeList lapList = activity.getElementsByTagName("Lap");
+
+				if (lapList != null && lapList.getLength() > 0) {
+					for (int lapIndex = 0; lapIndex < lapList.getLength(); lapIndex++) {
+
+						Element lap = (Element) lapList.item(lapIndex);
+
+						NodeList trackList = lap.getElementsByTagName("Track");
+
+						if (trackList != null && trackList.getLength() > 0) {
+							for (int trackIndex = 0; trackIndex < trackList.getLength(); trackIndex++) {
+
+								Element track = (Element) trackList.item(trackIndex);
+
+								NodeList tpList = track.getElementsByTagName("Trackpoint");
+
+								int prevAltitude = 0;
+								int prevDistance = 0;
+								long prevTime = -1;
+								long tourTime = -1;
+
+								if (tpList != null && tpList.getLength() > 0) {
+									for (int tpIndex = 0; tpIndex < tpList.getLength(); tpIndex++) {
+
+										Element tp = (Element) tpList.item(tpIndex);
+
+										timeData = new TimeData();
+
+										final int altitude = (int) getFloatValue(tp,
+												"AltitudeMeters");
+										final int distance = (int) getFloatValue(tp,
+												"DistanceMeters");
+
+										try {
+											String xmlTime = getTextValue(tp, "Time");
+											final Date dtValue = iso.parse(xmlTime);
+											tourTime = dtValue.getTime();
+
+											if (prevTime == -1) {
+												// set initial value;
+												prevTime = tourTime;
+												tourDateTime = tourTime;
+											}
+
+											timeData.time = (short) ((tourTime - prevTime) / 1000);
+
+											prevTime = tourTime;
+
+										} catch (ParseException e) {
+											e.printStackTrace();
+										}
+
+										timeData.altitude = (short) (altitude - prevAltitude);
+										timeData.distance = distance - prevDistance;
+										timeData.pulse = (short) getIntValue(tp,
+												"HeartRateBpm",
+												"Value");
+
+										prevAltitude = altitude;
+										prevDistance = distance;
+
+										timeDataList.add(timeData);
+									}
+								}
+							}
+						}
+					}
+				}
+
+				/*
+				 * set tour date/time
+				 */
+				fCalendar.setTimeInMillis(tourDateTime);
+
+				tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
+				tourData.setStartHour((short) fCalendar.get(Calendar.HOUR_OF_DAY));
+
+				tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
+				tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
+				tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
+
+				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+			}
+		}
+	}
+
+	/**
+	 * I take a xml element and the tag name, look for the tag and get the text content i.e for
+	 * <employee><name>John</name></employee> xml snippet if
+	 * the Element points to employee node and tagName is 'name' I will return John
+	 */
+	private String getTextValue(Element ele, String parentTagName, String tagName) {
+
+		String textVal = null;
+
+		NodeList parentNL = ele.getElementsByTagName(parentTagName);
+
+		if (parentNL != null && parentNL.getLength() > 0) {
+
+			final Element parentElement = (Element) parentNL.item(0);
+
+			textVal = getTextValue(parentElement, tagName);
+		}
+
+		return textVal;
+	}
+
+	/**
+	 * I take a xml element and the tag name, look for the tag and get the text content i.e for
+	 * <employee><name>John</name></employee> xml snippet if
+	 * the Element points to employee node and tagName is 'name' I will return John
+	 */
+	private String getTextValue(Element ele, String tagName) {
+
+		String textVal = null;
+		NodeList nl = ele.getElementsByTagName(tagName);
+
+		if (nl != null && nl.getLength() > 0) {
+			Element el = (Element) nl.item(0);
+			textVal = el.getFirstChild().getNodeValue();
+		}
+
+		return textVal;
+	}
+
+	/**
+	 * Calls getTextValue and returns a int value
+	 */
+	private int getIntValue(Element ele, String tagName) {
+		//in production application you would catch the exception
+		return Integer.parseInt(getTextValue(ele, tagName));
+	}
+
+	private int getIntValue(Element ele, String parentTagName, String tagName) {
+		//in production application you would catch the exception
+		return Integer.parseInt(getTextValue(ele, parentTagName, tagName));
+	}
+
+	private float getFloatValue(Element ele, String tagName) {
+		//in production application you would catch the exception
+		return Float.parseFloat(getTextValue(ele, tagName));
+	}
 }

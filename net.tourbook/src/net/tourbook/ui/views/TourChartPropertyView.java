@@ -208,7 +208,7 @@ public class TourChartPropertyView extends ViewPart {
 		final int speedChartType = fRadioLineChartType.getSelection()
 				? ChartDataModel.CHART_TYPE_LINE
 				: ChartDataModel.CHART_TYPE_BAR;
-		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_SPEED_CHARTTYPE, speedChartType);
+		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE, speedChartType);
 
 		// fire modify event
 		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED,
@@ -228,7 +228,7 @@ public class TourChartPropertyView extends ViewPart {
 		fSpinnerClipValues.setSelection(store.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_CLIP_VALUE));
 
 		// chart type
-		int speedChartType = store.getInt(ITourbookPreferences.GRAPH_PROPERTY_SPEED_CHARTTYPE);
+		int speedChartType = store.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
 		if (speedChartType == 0 || speedChartType == ChartDataModel.CHART_TYPE_LINE) {
 			fRadioLineChartType.setSelection(true);
 		} else {

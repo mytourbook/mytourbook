@@ -128,6 +128,11 @@ public class ActionHandlerManager {
 	 * @return
 	 */
 	ActionHandler getActionHandler(String commandId) {
+
+		if (fActionHandlers == null) {
+			return null;
+		}
+
 		return fActionHandlers.get(commandId);
 	}
 

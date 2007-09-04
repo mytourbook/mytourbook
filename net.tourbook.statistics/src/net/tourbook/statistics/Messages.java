@@ -21,6 +21,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.statistics.messages";	//$NON-NLS-1$
 
+	public static String	action_edit_tour;
+
 	public static String	ACTION_ZOOM_INTO_MONTH;
 
 	public static String	DLG_SELECT_TOUR_MSG;

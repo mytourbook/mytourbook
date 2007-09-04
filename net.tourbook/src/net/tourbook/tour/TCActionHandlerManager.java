@@ -92,6 +92,11 @@ class TCActionHandlerManager {
 	 * @return
 	 */
 	TCActionHandler getActionHandler(String commandId) {
+
+		if (fActionHandlers == null) {
+			return null;
+		}
+
 		return fActionHandlers.get(commandId);
 	}
 
@@ -172,7 +177,9 @@ class TCActionHandlerManager {
 	 * Update the UI check state for one command
 	 */
 	void updateUICheckState(String commandId) {
-		fCommandService.refreshElements(commandId, null);
+		if (fCommandService != null) {
+			fCommandService.refreshElements(commandId, null);
+		}
 	}
 
 	/**

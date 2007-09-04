@@ -51,13 +51,6 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-//	private ActionOpenView		fActionRawDataView;
-//	private ActionOpenView		fActionStatisticsView;
-//	private ActionOpenView		fActionTourBookView;
-//	private ActionOpenView		fActionTourMapView;
-//	private ActionOpenView		fActionTourChartView;
-//	private ActionOpenView		fActionTourCompareView;
-
 	private Action				fActionTourCompareWizard;
 
 	private IWorkbenchAction	fActionSave;
@@ -69,6 +62,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	TourTypeContributionItem	tourTypeSelector;
 	private IWorkbenchAction	fActionAbout;
 	private IWorkbenchAction	fActionQuit;
+
+	private IWorkbenchAction	savePerspectiveAction;
+
+	private IWorkbenchAction	resetPerspectiveAction;
+
+	private IWorkbenchAction	closePerspAction;
+
+	private IWorkbenchAction	closeAllPerspsAction;
+	private IWorkbenchAction	editActionSetAction;
+	private IWorkbenchWindow	fWindow;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -86,6 +89,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	@Override
 	protected void makeActions(final IWorkbenchWindow window) {
 
+		fWindow = window;
 //		final IWorkbenchAction action;
 
 		personSelector = new PersonContributionItem();
@@ -97,48 +101,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fActionAbout = ActionFactory.ABOUT.create(window);
 		fActionAbout.setText(Messages.Action_About);
 		register(fActionAbout);
-
-//		fActionTourChartView = new ActionOpenView(window,
-//				"Tour Chart",
-//				"Shows a chart for the currently selected tour",
-//				TourChartView.ID,
-//				ICommandIds.CMD_OPENVIEW_TOURCHART,
-//				"tour-chart.gif");
-//
-//		fActionRawDataView = new ActionOpenView(window,
-//				Messages.Action_openview_rawdata,
-//				Messages.Action_openview_rawdata_tooltip,
-//				RawDataView.ID,
-//				ICommandIds.CMD_OPENVIEW_IMPORTEDDATA,
-//				Messages.Image_view_rawdata);
-//
-//		fActionStatisticsView = new ActionOpenView(window,
-//				"",
-//				"",
-//				TourStatisticsView.ID,
-//				ICommandIds.CMD_OPENVIEW_STATISTICS,
-//				Messages.Image_show_statistics);
-//
-//		fActionTourBookView = new ActionOpenView(window,
-//				Messages.Action_openview_tourbook,
-//				Messages.Action_openview_tourbook_tooltip,
-//				TourBookView.ID,
-//				ICommandIds.CMD_OPENVIEW_TOURLIST,
-//				Messages.Image_view_tourbool);
-//
-//		fActionTourMapView = new ActionOpenView(window,
-//				Messages.Action_openview_tourmap,
-//				Messages.Action_openview_tourmap_tooltip,
-//				TourMapView.ID,
-//				ICommandIds.CMD_OPENVIEW_TOURMAP,
-//				Messages.Image_view_tourmap);
-//
-//		fActionTourCompareView = new ActionOpenView(window,
-//				Messages.Action_openview_compare_result,
-//				Messages.Action_openview_compare_result_tooltip,
-//				CompareResultView.ID,
-//				ICommandIds.CMD_OPENVIEW_TOURCOMPARER,
-//				Messages.Image_view_compare_result);
 
 		fActionPreferences = ActionFactory.PREFERENCES.create(window);
 		fActionPreferences.setText(Messages.Action_open_preferences);
@@ -177,6 +139,22 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				});
 			}
 		};
+
+		editActionSetAction = ActionFactory.EDIT_ACTION_SETS.create(window);
+		register(editActionSetAction);
+
+		savePerspectiveAction = ActionFactory.SAVE_PERSPECTIVE.create(window);
+		register(savePerspectiveAction);
+
+		resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
+		register(resetPerspectiveAction);
+
+		closePerspAction = ActionFactory.CLOSE_PERSPECTIVE.create(window);
+		register(closePerspAction);
+
+		closeAllPerspsAction = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
+		register(closeAllPerspsAction);
+
 	}
 
 	@Override
@@ -205,23 +183,36 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createViewMenu() {
 
-		MenuManager tourMenu = new MenuManager(Messages.Action_Menu_view, null);
+		MenuManager viewMenu = new MenuManager(Messages.Action_Menu_view, null);
 
-		tourMenu.add(fActionViewShortList);
+		viewMenu.add(fActionViewShortList);
 
-//		tourMenu.add(fActionTourChartView);
-//		tourMenu.add(new Separator());
-//
-//		tourMenu.add(fActionRawDataView);
-//		tourMenu.add(fActionTourBookView);
-//		tourMenu.add(fActionTourMapView);
-//		tourMenu.add(fActionStatisticsView);
-//		tourMenu.add(new Separator());
+		viewMenu.add(new Separator());
+		addPerspectiveActions(viewMenu);
 
-//		tourMenu.add(fActionTourCompareWizard);
+		viewMenu.add(fActionTourCompareWizard);
 //		tourMenu.add(fActionTourCompareView);
 
-		return tourMenu;
+		return viewMenu;
+	}
+
+	/**
+	 * Adds the perspective actions to the specified menu.
+	 */
+	private void addPerspectiveActions(MenuManager menu) {
+
+		{
+			String openText = "Open Perspective...";
+			MenuManager changePerspMenuMgr = new MenuManager(openText, "openPerspective"); //$NON-NLS-1$
+			IContributionItem changePerspMenuItem = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(fWindow);
+			changePerspMenuMgr.add(changePerspMenuItem);
+			menu.add(changePerspMenuMgr);
+		}
+
+		menu.add(savePerspectiveAction);
+		menu.add(resetPerspectiveAction);
+		menu.add(closePerspAction);
+		menu.add(closeAllPerspsAction);
 	}
 
 	private MenuManager createFileMenu() {

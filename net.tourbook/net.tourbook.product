@@ -4,7 +4,7 @@
 <product name="MyToorbook" id="net.tourbook.product" application="net.tourbook.application" useFeatures="true">
 
    <aboutInfo>
-      <image path="/net.tourbook/icons/tourbook-about-250.gif"/>
+      <image path="/net.tourbook/icons/application/tourbook-about-250.gif"/>
       <text>
          %Product_about
       </text>
@@ -19,7 +19,7 @@
 #-clean</programArgs>
    </launcherArgs>
 
-   <windowImages i16="/net.tourbook/icons/tourbook16.gif" i32="/net.tourbook/icons/tourbook32.gif" i48="/net.tourbook/icons/tourbook48.gif" i64="/net.tourbook/icons/tourbook64.gif" i128="/net.tourbook/icons/tourbook128.gif"/>
+   <windowImages i16="/net.tourbook/icons/application/tourbook16.gif" i32="/net.tourbook/icons/application/tourbook32.gif" i48="/net.tourbook/icons/application/tourbook48.gif" i64="/net.tourbook/icons/application/tourbook64.gif" i128="/net.tourbook/icons/application/tourbook128.gif"/>
 
    <splash
       location="net.tourbook"
@@ -33,11 +33,12 @@
       <win useIco="false">
          <ico path="/net.tourbook/icons/windows/tourbook128.ico"/>
          <bmp
-            winSmallHigh="/net.tourbook/icons/tourbook16-32.bmp"
-            winMediumHigh="/net.tourbook/icons/tourbook32-32.bmp"
-            winLargeHigh="/net.tourbook/icons/tourbook48-32.bmp"/>
+            winSmallHigh="/net.tourbook/icons/application/tourbook16-32.bmp"
+            winMediumHigh="/net.tourbook/icons/application/tourbook32-32.bmp"
+            winLargeHigh="/net.tourbook/icons/application/tourbook48-32.bmp"/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>

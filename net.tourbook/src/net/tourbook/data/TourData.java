@@ -476,7 +476,9 @@ public class TourData {
 					getTourMarkers().add(tourMarker);
 				}
 
-				timeAbsolute += deviceTimeInterval;
+//				timeAbsolute += deviceTimeInterval;
+				timeAbsolute += timeItem.time;
+
 				timeIndex++;
 			}
 

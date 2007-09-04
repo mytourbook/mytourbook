@@ -47,8 +47,8 @@ class TourContextProvider implements IChartContextProvider {
 
 			super(text);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj.gif"));
-			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj_disabled.gif"));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj.gif")); //$NON-NLS-1$
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj_disabled.gif")); //$NON-NLS-1$
 		}
 
 		@Override
@@ -84,7 +84,7 @@ class TourContextProvider implements IChartContextProvider {
 		fChart = chart;
 		fBarSelectionProvider = barSelectionProvider;
 
-		fActionOpenTour = new ActionOpenTour("&Open Tour");
+		fActionOpenTour = new ActionOpenTour(Messages.action_edit_tour);
 	}
 
 	public void fillBarChartContextMenu(IMenuManager menuMgr,

@@ -9,7 +9,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 public class PerspectiveFactoryRawData implements IPerspectiveFactory {
 
-	static final String	PERSPECTIVE_ID	= "net.tourbook.perspective.RawData";	//$NON-NLS-1$
+	public static final String	PERSPECTIVE_ID	= "net.tourbook.perspective.RawData";	//$NON-NLS-1$
 
 	public void createInitialLayout(IPageLayout layout) {
 
