@@ -92,52 +92,12 @@ public class Garmin305DeviceDataReader extends TourbookDevice {
 			return false;
 		}
 
-		// create data object for each tour
-		TourData tourData = new TourData();
-
-		tourData.importRawDataFile = importFileName;
-
-		// create a list which contains all time slices 
-		ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
-
-		parseDocument(tourData, timeDataList);
-
-		short timeInterval = 20;
-		tourData.setDeviceTimeInterval(timeInterval);
-
-		tourData.setTourAltUp(10);
-		tourData.setTourAltDown(30);
-
-		/*
-		 * unique key is used to create the tour id, this key is combined with the tour start
-		 * date/time to identify the tour in the database. The unique key can be the distance of the
-		 * tour or any other unique data
-		 */
-		String uniqueKey = "23221";
-
-		// after all data are added, the tour id can be created
-		tourData.createTourId(uniqueKey);
-
-		// check if the tour is already imported
-		final String tourId = tourData.getTourId().toString();
-		if (tourDataMap.containsKey(tourId) == false) {
-
-			// add new tour to other tours
-			tourDataMap.put(tourId, tourData);
-
-			tourData.createTimeSeries(timeDataList, true);
-			tourData.computeTourDrivingTime();
-			tourData.computeAvgFields();
-
-			tourData.setDeviceId(deviceId);
-			tourData.setDeviceName(visibleName);
-
-		}
+		parseDocument(importFileName, tourDataMap);
 
 		// set the import or transfer date
-		deviceData.transferYear = tourData.getStartYear();
-		deviceData.transferMonth = tourData.getStartMonth();
-		deviceData.transferDay = tourData.getStartDay();
+//		deviceData.transferYear = tourData.getStartYear();
+//		deviceData.transferMonth = tourData.getStartMonth();
+//		deviceData.transferDay = tourData.getStartDay();
 
 		return true;
 	}
@@ -176,7 +136,7 @@ public class Garmin305DeviceDataReader extends TourbookDevice {
 		iso.setTimeZone(utc);
 	}
 
-	private void parseDocument(TourData tourData, ArrayList<TimeData> timeDataList) {
+	private void parseDocument(String importFileName, HashMap<String, TourData> tourDataMap) {
 
 		TimeData timeData;
 		long tourDateTime = 0;
@@ -193,11 +153,21 @@ public class Garmin305DeviceDataReader extends TourbookDevice {
 
 				NodeList lapList = activity.getElementsByTagName("Lap");
 
+				// create data object for each tour
+				TourData tourData = new TourData();
+
+				// create a list which contains all time slices 
+				ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+
+				int prevAltitude = 0;
+				int prevDistance = 0;
+				long prevTime = -1;
+				long tourTime = -1;
+
 				if (lapList != null && lapList.getLength() > 0) {
 					for (int lapIndex = 0; lapIndex < lapList.getLength(); lapIndex++) {
 
 						Element lap = (Element) lapList.item(lapIndex);
-
 						NodeList trackList = lap.getElementsByTagName("Track");
 
 						if (trackList != null && trackList.getLength() > 0) {
@@ -206,11 +176,6 @@ public class Garmin305DeviceDataReader extends TourbookDevice {
 								Element track = (Element) trackList.item(trackIndex);
 
 								NodeList tpList = track.getElementsByTagName("Trackpoint");
-
-								int prevAltitude = 0;
-								int prevDistance = 0;
-								long prevTime = -1;
-								long tourTime = -1;
 
 								if (tpList != null && tpList.getLength() > 0) {
 									for (int tpIndex = 0; tpIndex < tpList.getLength(); tpIndex++) {
@@ -223,36 +188,41 @@ public class Garmin305DeviceDataReader extends TourbookDevice {
 												"AltitudeMeters");
 										final int distance = (int) getFloatValue(tp,
 												"DistanceMeters");
+										final int pulse = getIntValue(tp, "HeartRateBpm", "Value");
 
-										try {
-											String xmlTime = getTextValue(tp, "Time");
-											final Date dtValue = iso.parse(xmlTime);
-											tourTime = dtValue.getTime();
+										// ignore imcomplete values
+										if (altitude != Integer.MIN_VALUE
+												&& distance != Integer.MIN_VALUE
+												&& pulse != Integer.MIN_VALUE) {
 
-											if (prevTime == -1) {
-												// set initial value;
+											try {
+												String xmlTime = getTextValue(tp, "Time");
+												final Date dtValue = iso.parse(xmlTime);
+												tourTime = dtValue.getTime();
+
+												if (prevTime == -1) {
+													// set initial value;
+													prevTime = tourTime;
+													tourDateTime = tourTime;
+												}
+
+												timeData.time = (short) ((tourTime - prevTime) / 1000);
+
 												prevTime = tourTime;
-												tourDateTime = tourTime;
+
+											} catch (ParseException e) {
+												e.printStackTrace();
 											}
 
-											timeData.time = (short) ((tourTime - prevTime) / 1000);
+											timeData.altitude = (short) (altitude - prevAltitude);
+											timeData.distance = distance - prevDistance;
+											timeData.pulse = (short) pulse;
 
-											prevTime = tourTime;
+											prevAltitude = altitude;
+											prevDistance = distance;
 
-										} catch (ParseException e) {
-											e.printStackTrace();
+											timeDataList.add(timeData);
 										}
-
-										timeData.altitude = (short) (altitude - prevAltitude);
-										timeData.distance = distance - prevDistance;
-										timeData.pulse = (short) getIntValue(tp,
-												"HeartRateBpm",
-												"Value");
-
-										prevAltitude = altitude;
-										prevDistance = distance;
-
-										timeDataList.add(timeData);
 									}
 								}
 							}
@@ -264,15 +234,45 @@ public class Garmin305DeviceDataReader extends TourbookDevice {
 				 * set tour date/time
 				 */
 				fCalendar.setTimeInMillis(tourDateTime);
-
 				tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
 				tourData.setStartHour((short) fCalendar.get(Calendar.HOUR_OF_DAY));
-
 				tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
 				tourData.setStartMonth((short) (fCalendar.get(Calendar.MONTH) + 1));
 				tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
-
 				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
+
+				short timeInterval = 7;
+				tourData.setDeviceTimeInterval(timeInterval);
+
+				tourData.setTourAltUp(10);
+				tourData.setTourAltDown(30);
+
+				tourData.importRawDataFile = importFileName;
+
+				/*
+				 * unique key is used to create the tour id, this key is combined with the tour
+				 * start date/time to identify the tour in the database. The unique key can be the
+				 * distance of the tour or any other unique data
+				 */
+				String uniqueKey = "23221";
+
+				// after all data are added, the tour id can be created
+				tourData.createTourId(uniqueKey);
+
+				// check if the tour is already imported
+				final String tourId = tourData.getTourId().toString();
+				if (tourDataMap.containsKey(tourId) == false) {
+
+					// add new tour to other tours
+					tourDataMap.put(tourId, tourData);
+
+					tourData.createTimeSeries(timeDataList, true);
+					tourData.computeTourDrivingTime();
+					tourData.computeAvgFields();
+
+					tourData.setDeviceId(deviceId);
+					tourData.setDeviceName(visibleName);
+				}
 			}
 		}
 	}
@@ -319,18 +319,27 @@ public class Garmin305DeviceDataReader extends TourbookDevice {
 	/**
 	 * Calls getTextValue and returns a int value
 	 */
-	private int getIntValue(Element ele, String tagName) {
-		//in production application you would catch the exception
-		return Integer.parseInt(getTextValue(ele, tagName));
-	}
-
+//	private int getIntValue(Element ele, String tagName) {
+//		//in production application you would catch the exception
+//		return Integer.parseInt(getTextValue(ele, tagName));
+//	}
 	private int getIntValue(Element ele, String parentTagName, String tagName) {
 		//in production application you would catch the exception
-		return Integer.parseInt(getTextValue(ele, parentTagName, tagName));
+		final String textValue = getTextValue(ele, parentTagName, tagName);
+		if (textValue != null) {
+			return Integer.parseInt(textValue);
+		} else {
+			return Integer.MIN_VALUE;
+		}
 	}
 
 	private float getFloatValue(Element ele, String tagName) {
 		//in production application you would catch the exception
-		return Float.parseFloat(getTextValue(ele, tagName));
+		final String textValue = getTextValue(ele, tagName);
+		if (textValue != null) {
+			return Float.parseFloat(textValue);
+		} else {
+			return Float.MIN_VALUE;
+		}
 	}
 }

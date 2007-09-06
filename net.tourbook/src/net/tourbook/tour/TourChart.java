@@ -106,7 +106,7 @@ public class TourChart extends Chart {
 
 		fShowActions = showActions;
 
-		setPrefListeners();
+		addPrefListeners();
 
 		/*
 		 * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
@@ -169,6 +169,63 @@ public class TourChart extends Chart {
 	 */
 	public void addDataModelListener(final IDataModelListener dataModelListener) {
 		fChartDataModelListener = dataModelListener;
+	}
+
+	private void addPrefListeners() {
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+				final String property = event.getProperty();
+
+				if (fTourChartConfig == null) {
+					return;
+				}
+
+				boolean isChartModified = false;
+
+				// test if the zoom preferences has changed
+				if (property.equals(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH)
+						|| property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
+
+					final IPreferenceStore prefStore = TourbookPlugin.getDefault()
+							.getPreferenceStore();
+
+					TourManager.updateZoomOptionsInChartConfig(fTourChartConfig, prefStore);
+
+					isChartModified = true;
+				}
+
+				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+					/*
+					 * when the chart is computed, the changed colors are read from the preferences
+					 */
+
+					isChartModified = true;
+				}
+
+				isChartModified = setMinDefaultValue(property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
+						TourManager.GRAPH_ALTIMETER,
+						0);
+
+				isChartModified = setMinDefaultValue(property,
+						isChartModified,
+						ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
+						ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+						TourManager.GRAPH_GRADIENT,
+						TourManager.GRADIENT_DIVISOR);
+
+				if (isChartModified) {
+					updateTourChart(true);
+				}
+			}
+		};
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.addPropertyChangeListener(fPrefChangeListener);
+
 	}
 
 	public void addTourChartListener(ITourChartSelectionListener listener) {
@@ -493,9 +550,6 @@ public class TourChart extends Chart {
 		return fIsTourDirty;
 	}
 
-	// public boolean setFocus() {
-	// }
-
 	void onExecuteCanAutoZoomToSlider(Boolean isItemChecked) {
 
 		setCanAutoZoomToSlider(isItemChecked);
@@ -713,63 +767,6 @@ public class TourChart extends Chart {
 		return isChartModified;
 	}
 
-	private void setPrefListeners() {
-		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(final Preferences.PropertyChangeEvent event) {
-				final String property = event.getProperty();
-
-				if (fTourChartConfig == null) {
-					return;
-				}
-
-				boolean isChartModified = false;
-
-				// test if the zoom preferences has changed
-				if (property.equals(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH)
-						|| property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
-
-					final IPreferenceStore prefStore = TourbookPlugin.getDefault()
-							.getPreferenceStore();
-
-					TourManager.updateZoomOptionsInChartConfig(fTourChartConfig, prefStore);
-
-					isChartModified = true;
-				}
-
-				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
-
-					/*
-					 * when the chart is computed, the changed colors are read from the preferences
-					 */
-
-					isChartModified = true;
-				}
-
-				isChartModified = setMinDefaultValue(property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
-						TourManager.GRAPH_ALTIMETER,
-						0);
-
-				isChartModified = setMinDefaultValue(property,
-						isChartModified,
-						ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
-						ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-						TourManager.GRAPH_GRADIENT,
-						TourManager.GRADIENT_DIVISOR);
-
-				if (isChartModified) {
-					updateTourChart(true);
-				}
-			}
-		};
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.addPropertyChangeListener(fPrefChangeListener);
-
-	}
-
 	private void setSegmentLayer(	final ArrayList<IChartLayer> segmentValueLayers,
 									float[] segmentSerie,
 									String customDataKey) {
@@ -831,19 +828,11 @@ public class TourChart extends Chart {
 		} else {
 
 			// enable zoom action
-//			if (useInternalActionBar()) {
-//				final ActionChartOptions actionOptions = tourChartListener.fActionOptions;
-//				actionOptions.fActionCanScrollZoomedChart.setChecked(tourChartListener.getCanScrollZoomedChart());
-//				actionOptions.fActionCanAutoZoomToSlider.setChecked(tourChartListener.getCanAutoZoomToSlider());
-//			}
-
-//			if (useActionHandlers()) {
 			final Map<String, TCActionProxy> actionProxies = tourChartListener.fActionProxies;
 			actionProxies.get(COMMAND_ID_CAN_SCROLL_CHART)
 					.setChecked(tourChartListener.getCanScrollZoomedChart());
 			actionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER)
 					.setChecked(tourChartListener.getCanAutoZoomToSlider());
-//			}
 
 			tourChartListener.setZoomActionsEnabled(true);
 			tourChartListener.updateZoomOptions(true);
@@ -1045,21 +1034,11 @@ public class TourChart extends Chart {
 		setCanScrollZoomedChart(canScrollZoomedChart);
 		setCanAutoZoomToSlider(canAutoZoomToSlider);
 
-//		if (useInternalActionBar()) {
-//			fActionOptions.fActionCanScrollZoomedChart.setEnabled(true);
-//			fActionOptions.fActionCanScrollZoomedChart.setChecked(canScrollZoomedChart);
-//
-//			fActionOptions.fActionCanAutoZoomToSlider.setEnabled(true);
-//			fActionOptions.fActionCanAutoZoomToSlider.setChecked(canAutoZoomToSlider);
-//		}
-
-//		if (useActionHandlers()) {
 		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setEnabled(true);
 		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setChecked(canScrollZoomedChart);
 
 		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(true);
 		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setChecked(canAutoZoomToSlider);
-//		}
 	}
 
 	/**
@@ -1069,15 +1048,8 @@ public class TourChart extends Chart {
 	 */
 	private void updateZoomOptions(final boolean isEnabled) {
 
-//		if (useInternalActionBar()) {
-//			fActionOptions.fActionCanScrollZoomedChart.setEnabled(isEnabled);
-//			fActionOptions.fActionCanAutoZoomToSlider.setEnabled(isEnabled);
-//		}
-
-//		if (useActionHandlers()) {
 		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setEnabled(isEnabled);
 		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(isEnabled);
-//		}
 	}
 
 }

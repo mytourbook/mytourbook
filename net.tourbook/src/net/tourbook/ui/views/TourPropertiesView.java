@@ -21,7 +21,6 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import net.tourbook.Messages;
-import net.tourbook.data.SerieData;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
@@ -482,11 +481,11 @@ public class TourPropertiesView extends ViewPart {
 		}
 
 		// data points
-		final SerieData serieData = tourData.getSerieData();
-		if (serieData == null) {
+		final int[] timeSerie = tourData.timeSerie;
+		if (timeSerie == null) {
 			fLblDatapoints.setText("");
 		} else {
-			final int dataPoints = serieData.timeSerie.length;
+			final int dataPoints = timeSerie.length;
 			fLblDatapoints.setText(Integer.toString(dataPoints));
 		}
 		fLblDatapoints.pack(true);

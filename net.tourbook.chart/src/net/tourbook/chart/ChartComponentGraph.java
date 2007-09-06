@@ -1274,7 +1274,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gc
 	 * @param drawingData
 	 */
-	private void drawNewBarGraph(final GC gc, final ChartDrawingData drawingData) {
+	private void drawLineWithBarGraph(final GC gc, final ChartDrawingData drawingData) {
 
 		// get the chart data
 		final ChartDataXSerie xData = drawingData.getXData();
@@ -1309,11 +1309,14 @@ public class ChartComponentGraph extends Canvas {
 		final int devYBottom = drawingData.getDevYBottom();
 		final int devYTop = devYBottom - drawingData.getDevGraphHeight();
 
+		// virtual 0 line for the y-axis of the chart in dev units
+//		final float devChartY0Line = (float) devYBottom + (scaleY * graphYBottom);
+
 		gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
 
 		final int xValues[] = xData.getHighValues()[0];
 		final int yHighSeries[][] = yData.getHighValues();
-		final int yLowSeries[][] = yData.getLowValues();
+//		final int yLowSeries[][] = yData.getLowValues();
 
 		final int serieLength = yHighSeries.length;
 		final int valueLength = xValues.length;
@@ -1327,10 +1330,10 @@ public class ChartComponentGraph extends Canvas {
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 			final int yHighValues[] = yHighSeries[serieIndex];
-			int yLowValues[] = null;
-			if (yLowSeries != null) {
-				yLowValues = yLowSeries[serieIndex];
-			}
+//			int yLowValues[] = null;
+//			if (yLowSeries != null) {
+//				yLowValues = yLowSeries[serieIndex];
+//			}
 
 			// loop: all values in the current serie
 			for (int valueIndex = 0; valueIndex < valueLength; valueIndex++) {
@@ -1350,28 +1353,25 @@ public class ChartComponentGraph extends Canvas {
 				}
 
 				// get the bar height
-				final int valueYLow = yLowValues == null
-						? yData.getVisibleMinValue()
-						: yLowValues[valueIndex];
+				final int graphYLow = graphYBottom;
+				final int graphYHigh = yHighValues[valueIndex];
 
-				final int valueYHigh = yHighValues[valueIndex];
+				final int graphBarHeight = (Math.max(graphYHigh, graphYLow) - Math.min(graphYHigh,
+						graphYLow));
 
-				final int barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh,
-						valueYLow));
-
-				if (barHeight == 0) {
+				// skip bars which have no height
+				if (graphBarHeight == 0) {
 					continue;
 				}
 
-				int devBarHeight = (int) (barHeight * scaleY);
-//				devBarHeight = 30;
+				int devBarHeight = (int) (graphBarHeight * scaleY);
 
 				// get the y position
 				int devYPos;
 				if (axisDirection) {
-					devYPos = devYBottom - ((int) ((valueYHigh - graphYBottom) * scaleY));
+					devYPos = devYBottom - ((int) ((graphYHigh - graphYBottom) * scaleY));
 				} else {
-					devYPos = devYTop + ((int) ((valueYLow - graphYBottom) * scaleY));
+					devYPos = devYTop + ((int) ((graphYLow - graphYBottom) * scaleY));
 				}
 
 				final Rectangle barShape = new Rectangle(devXPos,
@@ -1789,8 +1789,8 @@ public class ChartComponentGraph extends Canvas {
 						drawBarGraph(gc, drawingData);
 						break;
 
-					case ChartDataModel.CHART_TYPE_NEW:
-						drawNewBarGraph(gc, drawingData);
+					case ChartDataModel.CHART_TYPE_LINE_WITH_BARS:
+						drawLineWithBarGraph(gc, drawingData);
 						break;
 
 					default:
@@ -1831,10 +1831,10 @@ public class ChartComponentGraph extends Canvas {
 		final Display display = getDisplay();
 
 		final int yDevBottom = drawingData.getDevYBottom();
-
 		final ArrayList<ChartUnit> unitList = drawingData.getYUnits();
 
 		int unitCount = 0;
+
 		final float scaleY = drawingData.getScaleY();
 		final int graphYBottom = drawingData.getGraphYBottom();
 		final int devGraphHeight = drawingData.getDevGraphHeight();
@@ -1847,8 +1847,10 @@ public class ChartComponentGraph extends Canvas {
 
 			int devY;
 			if (yAxisDirection || (unitList.size() == 1)) {
+				// bottom->top
 				devY = yDevBottom - (int) ((float) (unit.value - graphYBottom) * scaleY);
 			} else {
+				// top->bottom
 				devY = yDevTop + (int) ((float) (unit.value - graphYBottom) * scaleY);
 			}
 
@@ -2151,6 +2153,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
+
 		// virtual 0 line for the y-axis of the chart in dev units
 		final float devChartY0Line = (float) devYBottom + (scaleY * graphYBottom);
 

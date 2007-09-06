@@ -808,7 +808,8 @@ public class TourManager {
 		xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_SECOND);
 
 		/*
-		 * show the distance axis only when a distance is available
+		 * show the distance on the x-axis when a distance is available, otherwise the time is
+		 * displayed
 		 */
 		boolean showTimeOnXAxis;
 		if (tourData.getTourDistance() == 0) {
@@ -1024,9 +1025,10 @@ public class TourManager {
 			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
 
 		} else {
-			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_NEW,
-					new int[dataSerie.length],
-					dataSerie);
+//			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_NEW,
+//					new int[dataSerie.length],
+//					dataSerie);
+			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
 		}
 		return chartDataSerie;
 	}

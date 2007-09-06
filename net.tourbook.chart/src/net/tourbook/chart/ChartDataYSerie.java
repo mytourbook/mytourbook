@@ -58,10 +58,9 @@ public class ChartDataYSerie extends ChartDataSerie {
 	private boolean					showYSlider				= false;
 
 	/**
-	 * <code>
-	 *   true: the direction is from bottom to top by increasing number 
-	 *   false: the direction is from top to bottom by increasing number
-	 * </code>
+	 * <p>
+	 * true: the direction is from bottom to top by increasing number <br>
+	 * false: the direction is from top to bottom by increasing number
 	 */
 	private boolean					yAxisDirection			= true;
 
@@ -104,19 +103,19 @@ public class ChartDataYSerie extends ChartDataSerie {
 		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
 
-	int getAdjustedMaxValue() {
-		// return yAxisDirection
-		// ? fSavedMaxValue + (fSavedMaxValue / 10)
-		// : (fSavedMaxValue + (fSavedMaxValue / 100));
-		return fOriginalMaxValue;
-	}
+//	int getAdjustedMaxValue() {
+//		// return yAxisDirection
+//		// ? fSavedMaxValue + (fSavedMaxValue / 10)
+//		// : (fSavedMaxValue + (fSavedMaxValue / 100));
+//		return fOriginalMaxValue;
+//	}
 
-	int getAdjustedMinValue() {
-		// return yAxisDirection
-		// ? fSavedMinValue - (fSavedMinValue / 10)
-		// : (fSavedMinValue - (fSavedMinValue / 100));
-		return fOriginalMinValue;
-	}
+//	int getAdjustedMinValue() {
+//		// return yAxisDirection
+//		// ? fSavedMinValue - (fSavedMinValue / 10)
+//		// : (fSavedMinValue - (fSavedMinValue / 100));
+//		return fOriginalMinValue;
+//	}
 
 	/**
 	 * @return Returns the chartLayout.
@@ -181,6 +180,11 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return showYSlider;
 	}
 
+	/**
+	 * <p>
+	 * true: the direction is from bottom to top by increasing number <br>
+	 * false: the direction is from top to bottom by increasing number
+	 */
 	public boolean isYAxisDirection() {
 		return yAxisDirection;
 	}
@@ -284,6 +288,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 					break;
 				}
+
+			} else if (fChartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS) {
+
+				super.setMinMaxValues(valueSeries);
 			}
 
 			fOriginalMinValue = fVisibleMinValue;
@@ -295,7 +303,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 	void setMinMaxValues(int[][] lowValues, int[][] highValues) {
 
 		if (lowValues == null
-				|| lowValues == null
 				|| lowValues.length == 0
 				|| lowValues[0] == null
 				|| lowValues[0].length == 0

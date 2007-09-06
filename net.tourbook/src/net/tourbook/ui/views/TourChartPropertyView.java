@@ -52,6 +52,7 @@ public class TourChartPropertyView extends ViewPart {
 		Composite container = new Composite(parent, SWT.NONE);
 
 		GridLayout gl = new GridLayout(2, false);
+		gl.marginTop = 0;
 		container.setLayout(gl);
 
 		/*
@@ -62,7 +63,10 @@ public class TourChartPropertyView extends ViewPart {
 
 		// group: units for the x-axis
 		Composite groupChartType = new Composite(container, SWT.NONE);
-		groupChartType.setLayout(new GridLayout(2, false));
+		gl = new GridLayout(2, false);
+		gl.marginTop = 0;
+		gl.marginWidth = 0;
+		groupChartType.setLayout(gl);
 
 		{
 			// radio: line chart
@@ -89,13 +93,18 @@ public class TourChartPropertyView extends ViewPart {
 		// check: use custom settings to compute values
 		fChkUseCustomComputeSettings = new Button(container, SWT.CHECK);
 		fChkUseCustomComputeSettings.setText("Customize value computing");
+		fChkUseCustomComputeSettings.setLayoutData(new GridData(SWT.NONE,
+				SWT.NONE,
+				false,
+				false,
+				2,
+				1));
 		fChkUseCustomComputeSettings.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				onChangeProperty();
 			}
 		});
-		label = new Label(container, SWT.NONE);
 
 		/*
 		 * computed value time slice
@@ -128,14 +137,13 @@ public class TourChartPropertyView extends ViewPart {
 		 */
 		fChkUseCustomClipSettings = new Button(container, SWT.CHECK);
 		fChkUseCustomClipSettings.setText("Customize value clipping");
+		fChkUseCustomClipSettings.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 2, 1));
 		fChkUseCustomClipSettings.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				onChangeProperty();
 			}
 		});
-		// spacer
-		new Label(container, SWT.NONE);
 
 		/*
 		 * time slice to clip values

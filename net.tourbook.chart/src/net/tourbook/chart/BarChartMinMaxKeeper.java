@@ -18,7 +18,6 @@ package net.tourbook.chart;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 public class BarChartMinMaxKeeper {
 
 	/**
@@ -55,8 +54,8 @@ public class BarChartMinMaxKeeper {
 		/*
 		 * set/restore min/max values
 		 */
-		int minValue = yData.getAdjustedMinValue();
-		int maxValue = yData.getAdjustedMaxValue();
+		int minValue = yData.getOriginalMinValue();
+		int maxValue = yData.getOriginalMaxValue();
 
 		Integer keeperMinValue = (Integer) fMinValues.get(yDataId);
 		Integer keeperMaxValue = (Integer) fMaxValues.get(yDataId);
@@ -66,8 +65,8 @@ public class BarChartMinMaxKeeper {
 			// min/max values have not yet been saved
 
 			/*
-			 * set the min value 10% below the computed so that the lowest value
-			 * is not at the bottom
+			 * set the min value 10% below the computed so that the lowest value is not at the
+			 * bottom
 			 */
 			keeperMinValue = minValue;
 			keeperMaxValue = maxValue;
@@ -75,8 +74,8 @@ public class BarChartMinMaxKeeper {
 		} else {
 
 			/*
-			 * restore min/max values, but make sure min/max values for the
-			 * current graph are visible and not outside of the chart
+			 * restore min/max values, but make sure min/max values for the current graph are
+			 * visible and not outside of the chart
 			 */
 			keeperMinValue = Math.min(keeperMinValue, minValue);
 			keeperMaxValue = Math.max(keeperMaxValue, maxValue);
@@ -91,8 +90,8 @@ public class BarChartMinMaxKeeper {
 	}
 
 	public void resetMinMax() {
-		fMinValues	= new HashMap<Integer, Object>();
-		fMaxValues	= new HashMap<Integer, Object>();
+		fMinValues = new HashMap<Integer, Object>();
+		fMaxValues = new HashMap<Integer, Object>();
 
 	}
 

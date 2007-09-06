@@ -115,6 +115,10 @@ public abstract class ChartDataSerie {
 		return fLowValues;
 	}
 
+	public int getOriginalMaxValue() {
+		return fOriginalMaxValue;
+	}
+
 	public int getOriginalMinValue() {
 		return fOriginalMinValue;
 	}
