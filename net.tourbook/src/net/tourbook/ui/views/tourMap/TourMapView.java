@@ -93,8 +93,8 @@ public class TourMapView extends ViewPart {
 
 	private ISelectionListener					fPostSelectionListener;
 	private IPartListener2						fPartListener;
-	PostSelectionProvider						fPostSelectionProvider;
 	private ITourPropertyListener				fTourPropertyListener;
+	PostSelectionProvider						fPostSelectionProvider;
 
 	protected int								fRefTourXMarkerValue;
 
@@ -331,8 +331,10 @@ public class TourMapView extends ViewPart {
 		fTourPropertyListener = new ITourPropertyListener() {
 
 			public void propertyChanged(int propertyId, Object propertyData) {
-				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGE) {
-					fActiveTourChart.updateSegmentLayer((Boolean) propertyData);
+				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
+					if (fActiveTourChart != null) {
+						fActiveTourChart.updateSegmentLayer((Boolean) propertyData);
+					}
 				}
 			}
 		};
@@ -427,7 +429,7 @@ public class TourMapView extends ViewPart {
 
 		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
-//				showTourMapItem((IStructuredSelection) event.getSelection());
+				onSelectionChanged((IStructuredSelection) event.getSelection());
 //				enableActions();
 			}
 		});
@@ -461,6 +463,36 @@ public class TourMapView extends ViewPart {
 		});
 
 		return treeContainer;
+	}
+
+	private void onSelectionChanged(IStructuredSelection selection) {
+
+		// show the reference tour chart
+		final Object item = selection.getFirstElement();
+
+		if (item instanceof TVTITourMapReferenceTour) {
+
+			final TVTITourMapReferenceTour refItem = (TVTITourMapReferenceTour) item;
+
+			fPostSelectionProvider.setSelection(new SelectionComparedTour(refItem.refId));
+
+		} else if (item instanceof TVITourMapYear) {
+
+			final TVITourMapYear yearItem = (TVITourMapYear) item;
+
+			fPostSelectionProvider.setSelection(new SelectionComparedTour(yearItem.refId));
+
+		} else if (item instanceof TVTITourMapComparedTour) {
+
+			final TVTITourMapComparedTour compItem = (TVTITourMapComparedTour) item;
+			final SelectionComparedTour comparedTour = new SelectionComparedTour(compItem.getRefId());
+			comparedTour.setTourCompareData(compItem.getCompId(),
+					compItem.getTourId(),
+					compItem.getStartIndex(),
+					compItem.getEndIndex());
+
+			fPostSelectionProvider.setSelection(comparedTour);
+		}
 	}
 
 	@Override

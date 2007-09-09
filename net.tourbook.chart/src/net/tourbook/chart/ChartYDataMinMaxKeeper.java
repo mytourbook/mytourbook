@@ -23,11 +23,11 @@ public class ChartYDataMinMaxKeeper {
 	/**
 	 * min/max values for the y-axis data
 	 */
-	private HashMap<Integer, Integer>	minValues	= null;
-	private HashMap<Integer, Integer>	maxValues	= null;
+	private HashMap<Integer, Integer>	fMinValues	= null;
+	private HashMap<Integer, Integer>	fMaxValues	= null;
 
 	public boolean hasMinMaxChanged() {
-		boolean isEqual = minValues.equals(maxValues);
+		boolean isEqual = fMinValues.equals(fMaxValues);
 		return !isEqual;
 	}
 
@@ -41,14 +41,13 @@ public class ChartYDataMinMaxKeeper {
 	public void saveMinMaxValues(ChartDataModel chartDataModel) {
 
 		if (chartDataModel == null) {
-			// data are not available
 			return;
 		}
-//		System.out.println("saveMinMaxValues" + chartDataModel);
+
 		ArrayList<ChartDataSerie> xyData = chartDataModel.getXyData();
 
-		minValues = new HashMap<Integer, Integer>();
-		maxValues = new HashMap<Integer, Integer>();
+		fMinValues = new HashMap<Integer, Integer>();
+		fMaxValues = new HashMap<Integer, Integer>();
 
 		// loop: save min/max values for all data series
 		for (ChartDataSerie chartData : xyData) {
@@ -66,8 +65,8 @@ public class ChartYDataMinMaxKeeper {
 						visibleMaxValue++;
 					}
 
-					minValues.put(yDataInfo, visibleMinValue);
-					maxValues.put(yDataInfo, visibleMaxValue);
+					fMinValues.put(yDataInfo, visibleMinValue);
+					fMaxValues.put(yDataInfo, visibleMaxValue);
 				}
 			}
 		}
@@ -80,7 +79,7 @@ public class ChartYDataMinMaxKeeper {
 	 */
 	public void restoreMinMaxValues(ChartDataModel chartDataModel) {
 
-		if (minValues == null) {
+		if (fMinValues == null) {
 			// min/max values have not yet been saved, so nothing can be restored
 			return;
 		}
@@ -96,12 +95,12 @@ public class ChartYDataMinMaxKeeper {
 
 				if (yDataInfo != null) {
 
-					Integer minValue = minValues.get(yDataInfo);
+					Integer minValue = fMinValues.get(yDataInfo);
 					if (minValue != null) {
 						yData.setVisibleMinValue(minValue);
 					}
 
-					Integer maxValue = maxValues.get(yDataInfo);
+					Integer maxValue = fMaxValues.get(yDataInfo);
 					if (maxValue != null) {
 						yData.setVisibleMaxValue(maxValue);
 					}
@@ -111,11 +110,11 @@ public class ChartYDataMinMaxKeeper {
 	}
 
 	HashMap<Integer, Integer> getMaxValues() {
-		return maxValues;
+		return fMaxValues;
 	}
 
 	HashMap<Integer, Integer> getMinValues() {
-		return minValues;
+		return fMinValues;
 	}
 
 }

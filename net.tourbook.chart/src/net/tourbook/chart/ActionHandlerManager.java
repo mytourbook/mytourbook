@@ -147,7 +147,7 @@ public class ActionHandlerManager {
 			return;
 		}
 
-		for (ActionProxy actionProxy : chart.fActionProxies.values()) {
+		for (ActionProxy actionProxy : chart.fChartActionProxies.values()) {
 
 			ActionHandler actionHandler = fActionHandlers.get(actionProxy.getCommandId());
 
@@ -182,6 +182,10 @@ public class ActionHandlerManager {
 	 * Update the UI enablement/checked state for all chart actions
 	 */
 	void updateUIState() {
+
+		if (fActionHandlers == null) {
+			return;
+		}
 
 		for (final ActionHandler actionHandler : fActionHandlers.values()) {
 			actionHandler.fireHandlerChanged();

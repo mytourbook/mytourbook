@@ -22,6 +22,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+/**
+ * This entity contains the data for a tour which is compared with a reference tour
+ */
 @Entity
 public class TourCompared {
 

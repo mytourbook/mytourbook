@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -42,6 +43,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -67,8 +69,8 @@ public class StatisticContainer extends Composite {
 	private Composite						fStatContainer;
 
 	private IViewSite						fViewSite;
-//	private ToolBarManager					fTBM;
-//	private ToolBar							fToolBar;
+	private ToolBarManager					fTBM;
+	private ToolBar							fToolBar;
 
 	private ArrayList<Integer>				fTourYears;
 	private ArrayList<TourbookStatistic>	fStatistics;
@@ -111,15 +113,15 @@ public class StatisticContainer extends Composite {
 
 		fActionSynchChartScale = new ActionSynchChartScale(this);
 
-//		GridData gd;
-//
-//		// create the toolbar manager
-//		fToolBar = new ToolBar(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
-//		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-//		gd.horizontalAlignment = SWT.END;
-//		fToolBar.setLayoutData(gd);
-//
-//		fTBM = new ToolBarManager(fToolBar);
+		GridData gd;
+
+		// create the toolbar manager
+		fToolBar = new ToolBar(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
+		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		gd.horizontalAlignment = SWT.END;
+		fToolBar.setLayoutData(gd);
+
+		fTBM = new ToolBarManager(fToolBar);
 	}
 
 	public void activateActions(IWorkbenchPartSite partSite) {
@@ -132,13 +134,13 @@ public class StatisticContainer extends Composite {
 		IToolBarManager tbm = fViewSite.getActionBars().getToolBarManager();
 //		// update the toolbar
 		tbm.removeAll();
-//
+
 		tbm.add(fActionSynchChartScale);
-		
+
 		fActiveStatistic.updateToolBar(true);
-//
-//		fTBM.update(false);
-//		fStatContainer.layout();
+
+		fTBM.update(false);
+		fStatContainer.layout();
 	}
 
 	private void createControl() {
@@ -176,6 +178,7 @@ public class StatisticContainer extends Composite {
 		fComboYear.setLayoutData(new GridData());
 		fComboYear.setToolTipText(Messages.TourBook_Combo_year_tooltip);
 		fComboYear.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onSelectYear();
 			}
@@ -186,6 +189,7 @@ public class StatisticContainer extends Composite {
 		fComboStatistics.setVisibleItemCount(20);
 		fComboStatistics.setToolTipText(Messages.TourBook_Combo_statistic_tooltip);
 		fComboStatistics.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onSelectStatistic();
 			}
@@ -611,6 +615,7 @@ public class StatisticContainer extends Composite {
 		return isTourSelected;
 	}
 
+	@Override
 	public boolean setFocus() {
 		return super.setFocus();
 	}

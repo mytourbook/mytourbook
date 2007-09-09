@@ -569,7 +569,6 @@ public class TourSegmenterView extends ViewPart {
 	public void dispose() {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		getSite().setSelectionProvider(null);
 
 		super.dispose();
 	}
@@ -581,7 +580,7 @@ public class TourSegmenterView extends ViewPart {
 
 		// show/hide the segments in the chart
 		TourManager.getInstance()
-				.firePropertyChange(TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGE,
+				.firePropertyChange(TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED,
 						fShowSegmentsInChart);
 	}
 

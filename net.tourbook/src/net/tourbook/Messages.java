@@ -178,6 +178,8 @@ public class Messages extends NLS {
 	public static String		Image_show_tour_viewer;
 	public static String		Image_show_view_detail;
 	public static String		Image_synch_graph_horizontal;
+
+	public static String	Image_synch_graph_horizontal_disabled;
 	public static String		Image_synch_graph_vertical;
 	public static String		Image_undo_edit;
 	public static String		Image_undo_edit_disabled;

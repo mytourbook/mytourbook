@@ -65,7 +65,7 @@ public class TVICompareResultReference extends TreeViewerItem {
 				.getInstance()
 				.getComparedTours();
 
-		long refId = refTour.getGeneratedId();
+		long refId = refTour.getRefId();
 
 		String sqlString = "SELECT tourId, comparedId  \n" //$NON-NLS-1$
 				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + " \n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -90,7 +90,7 @@ public class TVICompareResultReference extends TreeViewerItem {
 		// create children for one reference tour
 		for (TVICompareResult compTour : comparedTours) {
 
-			if (compTour.refTour.getGeneratedId() == refId) {
+			if (compTour.refTour.getRefId() == refId) {
 
 				// compared tour belongs to the reference tour
 

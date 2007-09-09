@@ -42,12 +42,6 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class Chart extends ViewForm {
 
-//	public static final String		CONTEXT_ID_DEFAULT			= "net.tourbook.chart.context.default";		//$NON-NLS-1$
-	/**
-	 * context to set the bar chart actions visible
-	 */
-	public static final String			CONTEXT_ID_BAR_CHART		= "net.tourbook.chart.context.barChart";		//$NON-NLS-1$
-
 	static final String					COMMAND_ID_ZOOM_IN			= "net.tourbook.chart.command.zoomIn";			//$NON-NLS-1$
 	static final String					COMMAND_ID_ZOOM_OUT			= "net.tourbook.chart.command.zoomOut";		//$NON-NLS-1$
 	static final String					COMMAND_ID_FIT_GRAPH		= "net.tourbook.chart.command.fitGraph";		//$NON-NLS-1$
@@ -68,12 +62,12 @@ public class Chart extends ViewForm {
 	private IToolBarManager				fToolbarMgr;
 	private IChartContextProvider		fChartContextProvider;
 
+	private Chart						fSynchedChart;
+
 	private boolean						fShowZoomActions;
 	private boolean						fShowPartNavigation;
 
-	private Color						backgroundColor;
-
-	private Chart						zoomMarkerPositionListener;
+	private Color						fBackgroundColor;
 
 	/**
 	 * listener which is called when the x-marker was dragged
@@ -92,7 +86,7 @@ public class Chart extends ViewForm {
 	private int							fBarSelectionValueIndex;
 
 	private final ActionHandlerManager	fActionHandlerManager		= ActionHandlerManager.getInstance();
-	HashMap<String, ActionProxy>		fActionProxies;
+	HashMap<String, ActionProxy>		fChartActionProxies;
 
 	private boolean						fIsFillToolbar				= true;
 	private boolean						fIsToolbarCreated;
@@ -120,13 +114,7 @@ public class Chart extends ViewForm {
 		setContent(fChartComponents);
 
 		// set the default background color
-		backgroundColor = getDisplay().getSystemColor(SWT.COLOR_WHITE);
-
-//		addDisposeListener(new DisposeListener() {
-//			public void widgetDisposed(DisposeEvent e) {
-//				Widget w = e.widget;
-//			}
-//		});
+		fBackgroundColor = getDisplay().getSystemColor(SWT.COLOR_WHITE);
 	}
 
 	public void addBarSelectionListener(IBarSelectionListener listener) {
@@ -184,11 +172,11 @@ public class Chart extends ViewForm {
 	private void createChartActionProxies() {
 
 		// create actions only once
-		if (fActionProxies != null) {
+		if (fChartActionProxies != null) {
 			return;
 		}
 
-		fActionProxies = new HashMap<String, ActionProxy>();
+		fChartActionProxies = new HashMap<String, ActionProxy>();
 
 		final boolean useInternalActionBar = useInternalActionBar();
 		Action action;
@@ -203,7 +191,7 @@ public class Chart extends ViewForm {
 			action = null;
 		}
 		actionProxy = new ActionProxy(COMMAND_ID_ZOOM_IN, action);
-		fActionProxies.put(COMMAND_ID_ZOOM_IN, actionProxy);
+		fChartActionProxies.put(COMMAND_ID_ZOOM_IN, actionProxy);
 
 		/*
 		 * Action: zoom out
@@ -214,7 +202,7 @@ public class Chart extends ViewForm {
 			action = null;
 		}
 		actionProxy = new ActionProxy(COMMAND_ID_ZOOM_OUT, action);
-		fActionProxies.put(COMMAND_ID_ZOOM_OUT, actionProxy);
+		fChartActionProxies.put(COMMAND_ID_ZOOM_OUT, actionProxy);
 
 		/*
 		 * Action: fit graph to window
@@ -225,7 +213,7 @@ public class Chart extends ViewForm {
 			action = null;
 		}
 		actionProxy = new ActionProxy(COMMAND_ID_FIT_GRAPH, action);
-		fActionProxies.put(COMMAND_ID_FIT_GRAPH, actionProxy);
+		fChartActionProxies.put(COMMAND_ID_FIT_GRAPH, actionProxy);
 
 		/*
 		 * Action: previous part
@@ -236,7 +224,7 @@ public class Chart extends ViewForm {
 			action = null;
 		}
 		actionProxy = new ActionProxy(COMMAND_ID_PART_PREVIOUS, action);
-		fActionProxies.put(COMMAND_ID_PART_PREVIOUS, actionProxy);
+		fChartActionProxies.put(COMMAND_ID_PART_PREVIOUS, actionProxy);
 
 		/*
 		 * Action: next part
@@ -247,7 +235,7 @@ public class Chart extends ViewForm {
 			action = null;
 		}
 		actionProxy = new ActionProxy(COMMAND_ID_PART_NEXT, action);
-		fActionProxies.put(COMMAND_ID_PART_NEXT, actionProxy);
+		fChartActionProxies.put(COMMAND_ID_PART_NEXT, actionProxy);
 
 		updateActionState();
 	}
@@ -316,7 +304,7 @@ public class Chart extends ViewForm {
 	 */
 	public void fillToolbar(boolean refreshToolbar) {
 
-		if (fActionProxies == null) {
+		if (fChartActionProxies == null) {
 			return;
 		}
 
@@ -327,15 +315,15 @@ public class Chart extends ViewForm {
 
 			if (fShowZoomActions) {
 				tbm.add(new Separator());
-				tbm.add(fActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
-				tbm.add(fActionProxies.get(COMMAND_ID_ZOOM_OUT).getAction());
-				tbm.add(fActionProxies.get(COMMAND_ID_FIT_GRAPH).getAction());
+				tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
+				tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).getAction());
+				tbm.add(fChartActionProxies.get(COMMAND_ID_FIT_GRAPH).getAction());
 			}
 
 			if (fShowPartNavigation) {
 				tbm.add(new Separator());
-				tbm.add(fActionProxies.get(COMMAND_ID_PART_PREVIOUS).getAction());
-				tbm.add(fActionProxies.get(COMMAND_ID_PART_NEXT).getAction());
+				tbm.add(fChartActionProxies.get(COMMAND_ID_PART_PREVIOUS).getAction());
+				tbm.add(fChartActionProxies.get(COMMAND_ID_PART_NEXT).getAction());
 			}
 
 			if (refreshToolbar) {
@@ -420,18 +408,16 @@ public class Chart extends ViewForm {
 	/**
 	 * fire the current x-marker position which is in
 	 * <code>chartComponents.xMarkerPositionOut</code>
-	 * 
-	 * @param newMarkerPositionOut
 	 */
-	protected void fireZoomMarkerPositionListener() {
+	protected void fireSynchConfigListener() {
 
-		if (zoomMarkerPositionListener == null) {
+		if (fSynchedChart == null) {
 			return;
 		}
 
 		getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				zoomMarkerPositionListener.setZoomMarkerPositionIn(fChartComponents.zoomMarkerPositionOut);
+				fSynchedChart.setSynchConfigIn(fChartComponents.fSynchConfigOut);
 			}
 		});
 	}
@@ -441,7 +427,7 @@ public class Chart extends ViewForm {
 	}
 
 	public Color getBackgroundColor() {
-		return backgroundColor;
+		return fBackgroundColor;
 	}
 
 	public boolean getCanAutoZoomToSlider() {
@@ -586,10 +572,10 @@ public class Chart extends ViewForm {
 
 	void onExecuteZoomOut() {
 
-		fActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(true);
-		fActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(false);
-		fActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(false);
-		fActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(false);
+		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(true);
+		fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(false);
+		fChartActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(false);
+		fChartActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(false);
 
 		if (fUseActionHandlers) {
 			fActionHandlerManager.updateUIState();
@@ -628,7 +614,7 @@ public class Chart extends ViewForm {
 	 *        The backgroundColor to set.
 	 */
 	public void setBackgroundColor(Color backgroundColor) {
-		this.backgroundColor = backgroundColor;
+		this.fBackgroundColor = backgroundColor;
 	}
 
 	/**
@@ -656,7 +642,7 @@ public class Chart extends ViewForm {
 	 */
 	public void setCommandEnabled(String commandId, boolean isEnabled) {
 
-		fActionProxies.get(commandId).setEnabled(isEnabled);
+		fChartActionProxies.get(commandId).setEnabled(isEnabled);
 
 		if (fUseActionHandlers) {
 			fActionHandlerManager.getActionHandler(commandId).fireHandlerChanged();
@@ -765,29 +751,29 @@ public class Chart extends ViewForm {
 	 * @param isEnabled
 	 */
 	public void setZoomActionsEnabled(boolean isEnabled) {
-		fActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(isEnabled);
-		fActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(isEnabled);
+		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(isEnabled);
+		fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(isEnabled);
+		fChartActionProxies.get(COMMAND_ID_FIT_GRAPH).setEnabled(isEnabled);
 		fActionHandlerManager.updateUIState();
 	}
 
 	/**
-	 * set the zoom-marker position, this position is used when the chart is drawn/resized
+	 * set the synch configuration which is used when the chart is drawn/resized
 	 * 
-	 * @param zoomMarkerPositionIn
+	 * @param synchConfigIn
 	 */
-	public void setZoomMarkerPositionIn(ZoomMarkerPosition zoomMarkerPositionIn) {
-		fChartComponents.setZoomMarkerPositionIn(zoomMarkerPositionIn);
+	public void setSynchConfigIn(SynchConfiguration synchConfigIn) {
+		fChartComponents.setSynchConfigIn(synchConfigIn);
 	}
 
 	/**
-	 * Set's the zoom-marker position listener, this is a chartwidget which will be notified to
-	 * synchronize the marker position when this chart is resized, when set to <code>null</code>
-	 * this will disable the synchronisation
+	 * Set's the {@link SynchConfiguration} listener, this is a {@link Chart} which will be notified
+	 * when this chart is resized, <code>null</code> will disable the synchronisation
 	 * 
 	 * @param chartWidget
 	 */
-	public void setZoomMarkerPositionListener(Chart chartWidget) {
-		zoomMarkerPositionListener = chartWidget;
+	public void setSynchedChart(Chart chartWidget) {
+		fSynchedChart = chartWidget;
 	}
 
 	public void switchSlidersTo2ndXData() {
@@ -796,13 +782,13 @@ public class Chart extends ViewForm {
 
 	private void updateActionState() {
 
-		fActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(false);
-		fActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(false);
+		fChartActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(false);
+		fChartActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(false);
 
-		fActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(true);
-		fActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(false);
+		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(true);
+		fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(false);
 
-		fActionProxies.get(COMMAND_ID_FIT_GRAPH).setEnabled(true);
+		fChartActionProxies.get(COMMAND_ID_FIT_GRAPH).setEnabled(true);
 
 		// update UI state for the action handlers
 		if (useInternalActionBar() == false) {
@@ -866,6 +852,9 @@ public class Chart extends ViewForm {
 		fChartComponents.updateChartLayers();
 	}
 
+	/**
+	 * @return Returns <code>true</code> when action handlers are used for this chart
+	 */
 	public boolean useActionHandlers() {
 		return fUseActionHandlers;
 	}
@@ -932,11 +921,11 @@ public class Chart extends ViewForm {
 	 */
 	public void zoomWithParts(int parts, int position, boolean scrollSmoothly) {
 
-		fActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(false);
-		fActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(true);
+		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(false);
+		fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(true);
 
-		fActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(true);
-		fActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(true);
+		fChartActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(true);
+		fChartActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(true);
 
 		if (fUseActionHandlers) {
 			fActionHandlerManager.updateUIEnablementState();

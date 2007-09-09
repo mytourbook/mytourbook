@@ -16,9 +16,9 @@
 package net.tourbook.ui.views;
 
 import net.tourbook.Messages;
-import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartXSlider;
+import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
@@ -50,7 +50,6 @@ import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -94,36 +93,6 @@ public class TourChartView extends ViewPart {
 
 			menuMgr.add(actionEditTour);
 		}
-	}
-
-	private void addPartListener() {
-
-		// set the part listener
-		fPartListener = new IPartListener2() {
-
-			public void partActivated(IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourChartView.this) {
-					fTourChart.activateActionHandlers(getSite());
-				}
-			}
-
-			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
-
-			public void partClosed(IWorkbenchPartReference partRef) {}
-
-			public void partDeactivated(IWorkbenchPartReference partRef) {}
-
-			public void partHidden(IWorkbenchPartReference partRef) {}
-
-			public void partInputChanged(IWorkbenchPartReference partRef) {}
-
-			public void partOpened(IWorkbenchPartReference partRef) {}
-
-			public void partVisible(IWorkbenchPartReference partRef) {}
-		};
-
-		// register the part listener
-		getSite().getPage().addPartListener(fPartListener);
 	}
 
 	private void addPrefListener() {
@@ -170,7 +139,7 @@ public class TourChartView extends ViewPart {
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(int propertyId, Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGE) {
+				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
 
 				} else if (propertyId == TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED) {
@@ -246,7 +215,6 @@ public class TourChartView extends ViewPart {
 
 		addSelectionListener();
 		addPrefListener();
-		addPartListener();
 
 		addTourDbListener();
 		addTourPropertyListener();
@@ -273,8 +241,6 @@ public class TourChartView extends ViewPart {
 
 		TourDatabase.getInstance().removePropertyListener(fTourDbListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
-
-		getSite().setSelectionProvider(null);
 
 		TourbookPlugin.getDefault()
 				.getPluginPreferences()

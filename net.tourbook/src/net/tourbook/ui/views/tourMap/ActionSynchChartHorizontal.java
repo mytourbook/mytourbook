@@ -22,20 +22,22 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSynchChartHorizontal extends Action {
 
-	private SynchedChartView	resultView;
+	private ISynchedChart	synchChart;
 
-	public ActionSynchChartHorizontal(SynchedChartView resultView) {
+	public ActionSynchChartHorizontal(ISynchedChart resultView) {
 
 		super(null, AS_CHECK_BOX);
 
-		this.resultView = resultView;
+		this.synchChart = resultView;
 
 		setToolTipText(Messages.TourMap_Action_synch_charts_tooltip);
-		setImageDescriptor(TourbookPlugin
-				.getImageDescriptor(Messages.Image_synch_graph_horizontal));
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_synch_graph_horizontal));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_synch_graph_horizontal_disabled));
 	}
 
+	@Override
 	public void run() {
-		resultView.synchCharts(isChecked());
+		synchChart.synchCharts(isChecked());
 	}
 }

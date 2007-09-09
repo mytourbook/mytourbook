@@ -27,6 +27,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartMarkerLayer;
+import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -792,57 +793,59 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * set the x-marker position listener
+	 * set's the chart which is synched with this chart
 	 * 
-	 * @param isPositionListenerEnabled
+	 * @param isSynchEnabled
 	 *        <code>true</code> sets the position listener, <code>false</code> disables the
 	 *        listener
-	 * @param synchDirection
-	 * @param tourChartListener
+	 * @param synchedChart
 	 */
-	public void setZoomMarkerPositionListener(	final boolean isPositionListenerEnabled,
-												final TourChart tourChartListener) {
+	public void setSynchedChart(final boolean isSynchEnabled, final TourChart synchedChart) {
 
 		// set/disable the position listener in the listener provider
-		super.setZoomMarkerPositionListener(isPositionListenerEnabled ? tourChartListener : null);
+		super.setSynchedChart(isSynchEnabled ? synchedChart : null);
+
+		final Map<String, TCActionProxy> actionProxies = synchedChart.fActionProxies;
 
 		/*
 		 * when the position listener is set, the zoom actions will be deactivated
 		 */
-		if (isPositionListenerEnabled) {
+		if (isSynchEnabled) {
+
+			// synchronize the synchListener chart with this
 
 			// disable zoom actions
-			tourChartListener.setZoomActionsEnabled(false);
-			tourChartListener.updateZoomOptions(false);
+			synchedChart.setZoomActionsEnabled(false);
+			synchedChart.updateZoomOptions(false);
 
 			// set the synched chart to auto-zoom
-			tourChartListener.setCanScrollZoomedChart(false);
-			tourChartListener.setCanAutoZoomToSlider(true);
+			synchedChart.setCanScrollZoomedChart(false);
+			synchedChart.setCanAutoZoomToSlider(true);
 
 			// hide the x-sliders
-			fIsXSliderVisible = tourChartListener.isXSliderVisible();
-			tourChartListener.setShowSlider(false);
+			fIsXSliderVisible = synchedChart.isXSliderVisible();
+			synchedChart.setShowSlider(false);
 
-			fireZoomMarkerPositionListener();
+			fireSynchConfigListener();
 
 		} else {
 
-			// enable zoom action
-			final Map<String, TCActionProxy> actionProxies = tourChartListener.fActionProxies;
-			actionProxies.get(COMMAND_ID_CAN_SCROLL_CHART)
-					.setChecked(tourChartListener.getCanScrollZoomedChart());
-			actionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER)
-					.setChecked(tourChartListener.getCanAutoZoomToSlider());
+			// disable chart synchronization
 
-			tourChartListener.setZoomActionsEnabled(true);
-			tourChartListener.updateZoomOptions(true);
+			// enable zoom action
+			actionProxies.get(COMMAND_ID_CAN_SCROLL_CHART)
+					.setChecked(synchedChart.getCanScrollZoomedChart());
+			actionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER)
+					.setChecked(synchedChart.getCanAutoZoomToSlider());
+
+			synchedChart.setZoomActionsEnabled(true);
+			synchedChart.updateZoomOptions(true);
 
 			// restore the x-sliders
-			tourChartListener.setShowSlider(fIsXSliderVisible);
+			synchedChart.setShowSlider(fIsXSliderVisible);
 
-			// reset the x-position in the listener
-			tourChartListener.setZoomMarkerPositionIn(null);
-			tourChartListener.zoomOut(true);
+			synchedChart.setSynchConfigIn(null);
+			synchedChart.zoomOut(true);
 		}
 	}
 
@@ -997,8 +1000,9 @@ public class TourChart extends Chart {
 		}
 
 		// restore min/max values from the chart config
-		if (newChartConfig.getMinMaxKeeper() != null && keepMinMaxValues) {
-			newChartConfig.getMinMaxKeeper().restoreMinMaxValues(newDataModel);
+		final ChartYDataMinMaxKeeper chartConfigMinMaxKeeper = newChartConfig.getMinMaxKeeper();
+		if (chartConfigMinMaxKeeper != null && keepMinMaxValues) {
+			chartConfigMinMaxKeeper.restoreMinMaxValues(newDataModel);
 		}
 
 		if (fChartDataModelListener != null) {

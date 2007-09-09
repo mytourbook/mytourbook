@@ -18,6 +18,7 @@
  */
 package net.tourbook.ui.views.tourMap;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -39,7 +40,9 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ReferenceTourManager {
 
-	private static ReferenceTourManager	instance	= null;
+	private static ReferenceTourManager			instance			= null;
+
+	private final HashMap<Long, CompareTourConfig>	fRefChartDataCache	= new HashMap<Long, CompareTourConfig>();
 
 	private ReferenceTourManager() {}
 
@@ -103,5 +106,13 @@ public class ReferenceTourManager {
 		}
 
 		return referenceTours.toArray();
+	}
+
+	public CompareTourConfig getCompareTourConfig(Long refId) {
+		return fRefChartDataCache.get(refId);
+	}
+
+	public void setRefTourConfig(long refId, CompareTourConfig refTourConfig) {
+		fRefChartDataCache.put(refId, refTourConfig);
 	}
 }

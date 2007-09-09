@@ -121,7 +121,7 @@ public class TourEditor extends EditorPart {
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(int propertyId, Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGE) {
+				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
 
 				} else if (propertyId == TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED) {
@@ -198,8 +198,6 @@ public class TourEditor extends EditorPart {
 		site.getPage().removePostSelectionListener(fPostSelectionListener);
 
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
-
-		site.setSelectionProvider(null);
 
 		super.dispose();
 	}

@@ -12,6 +12,7 @@ public class ActionFitGraph extends Action {
 
 		setText(Messages.Action_zoom_fit_to_graph);
 		setToolTipText(Messages.Action_zoom_fit_to_graph_tooltip);
+
 		setImageDescriptor(Activator.getImageDescriptor(Messages.Image_zoom_fit_to_graph));
 		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image_zoom_fit_to_graph_disabled));
 	}

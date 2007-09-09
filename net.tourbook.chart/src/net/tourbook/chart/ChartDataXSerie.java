@@ -25,21 +25,20 @@ package net.tourbook.chart;
 public class ChartDataXSerie extends ChartDataSerie {
 
 	/**
-	 * start value for the serie data, this is use to set the start point for
-	 * time data to the starting time
+	 * start value for the serie data, this is use to set the start point for time data to the
+	 * starting time
 	 */
-	private int	startValue			= 0;
+	private int	startValue				= 0;
 
 	/**
 	 * index in the x-data at which the graph is painted in the marker color
 	 */
-	private int	xMarkerStartIndex	= -1;
+	private int	fSynchMarkerStartIndex	= -1;
 
 	/**
-	 * index in the x-data at which the graph is stoped to painted in the marker
-	 * color
+	 * index in the x-data at which the graph is stoped to painted in the marker color
 	 */
-	private int	xMarkerEndIndex		= -1;
+	private int	fSynchMarkerEndIndex	= -1;
 
 	public ChartDataXSerie(int values[]) {
 		setMinMaxValues(new int[][] { values });
@@ -61,31 +60,31 @@ public class ChartDataXSerie extends ChartDataSerie {
 	}
 
 	/**
-	 * set the start/end value index for the marker which is displayed in a
-	 * different color
+	 * set the start/end value index for the marker which is displayed in a different color
 	 * 
 	 * @param startIndex
 	 * @param endIndex
 	 */
-	public void setMarkerValueIndex(int startIndex, int endIndex) {
-		xMarkerStartIndex = startIndex;
-		xMarkerEndIndex = endIndex;
+	public void setSynchMarkerValueIndex(int startIndex, int endIndex) {
+		fSynchMarkerStartIndex = startIndex;
+		fSynchMarkerEndIndex = endIndex;
 	}
 
 	/**
 	 * @return Returns the xMarkerEndIndex.
 	 */
-	public int getXMarkerEndIndex() {
-		return xMarkerEndIndex;
+	public int getSynchMarkerEndIndex() {
+		return fSynchMarkerEndIndex;
 	}
 
 	/**
 	 * @return Returns the xMarkerStartIndex.
 	 */
-	public int getXMarkerStartIndex() {
-		return xMarkerStartIndex;
+	public int getSynchMarkerStartIndex() {
+		return fSynchMarkerStartIndex;
 	}
 
+	@Override
 	void setMinMaxValues(int[][] lowValues, int[][] highValues) {
 
 	}

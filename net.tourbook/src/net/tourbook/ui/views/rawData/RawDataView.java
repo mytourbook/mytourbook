@@ -653,8 +653,6 @@ public class RawDataView extends ViewPart {
 				.getPluginPreferences()
 				.removePropertyChangeListener(fPrefChangeListener);
 
-		getSite().setSelectionProvider(null);
-
 		super.dispose();
 	}
 

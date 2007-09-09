@@ -17,6 +17,7 @@ package net.tourbook.ui.views.tourMap;
 
 import java.sql.Date;
 
+import net.tourbook.data.TourCompared;
 import net.tourbook.tour.TreeViewerTourItem;
 
 /**
@@ -25,47 +26,47 @@ import net.tourbook.tour.TreeViewerTourItem;
 public class TVTITourMapComparedTour extends TreeViewerTourItem {
 
 	/**
-	 * id for the TourCompared entity
+	 * id for the {@link TourCompared} entity
 	 */
-	private long	compId;
+	private long	fCompareId;
 
 	/**
 	 * 
 	 */
-	private long	refId		= -1;
+	private long	fRefId		= -1;
 
-	private int		startIndex	= -1;
-	private int		endIndex	= -1;
+	private int		fStartIndex	= -1;
+	private int		fEndIndex	= -1;
 
-	private Date	tourDate;
-	private float	tourSpeed;
+	private Date	fTourDate;
+	private float	fTourSpeed;
 
 	/**
 	 * @param parentItem
 	 * @param tourDate
 	 * @param tourSpeed
-	 * @param compId
-	 * @param compId
+	 * @param compareId
+	 * @param compTourId
 	 * @param startIndex
 	 * @param endIndex
 	 * @param refId
 	 */
-	public TVTITourMapComparedTour(TVITourMapYear parentItem, Date tourDate,
-			float tourSpeed, long compId, long compTourId, int startIndex, int endIndex,
-			long refId) {
+	public TVTITourMapComparedTour(TVITourMapYear parentItem, Date tourDate, float tourSpeed,
+			long compareId, long compTourId, int startIndex, int endIndex, long refId) {
 
-		this.setParentItem(parentItem);
-		this.refId = refId;
+		setParentItem(parentItem);
+		fRefId = refId;
 
-		this.tourDate = tourDate;
-		this.tourSpeed = tourSpeed;
-		this.compId = compId;
-		this.startIndex = startIndex;
-		this.endIndex = endIndex;
+		fTourDate = tourDate;
+		fTourSpeed = tourSpeed;
+		fCompareId = compareId;
+		fStartIndex = startIndex;
+		fEndIndex = endIndex;
 
 		setTourId(compTourId);
 	}
 
+	@Override
 	public boolean hasChildren() {
 		/*
 		 * compared tours do not have children
@@ -73,47 +74,52 @@ public class TVTITourMapComparedTour extends TreeViewerTourItem {
 		return false;
 	}
 
+	@Override
 	public void remove() {
 
 		// remove this tour item from the parent
 		getParentItem().getUnfetchedChildren().remove(this);
 	}
 
+	/**
+	 * @return Returns the Id for {@link TourCompared} entity
+	 */
 	public long getCompId() {
-		return compId;
+		return fCompareId;
 	}
 
 	public Date getTourDate() {
-		return tourDate;
+		return fTourDate;
 	}
 
 	public float getTourSpeed() {
-		return tourSpeed;
+		return fTourSpeed;
 	}
 
 	public int getEndIndex() {
-		return endIndex;
+		return fEndIndex;
 	}
 
 	public int getStartIndex() {
-		return startIndex;
+		return fStartIndex;
 	}
 
+	@Override
 	protected void fetchChildren() {}
 
 	public long getRefId() {
-		return refId;
+		return fRefId;
 	}
 
 	void setEndIndex(int endIndex) {
-		this.endIndex = endIndex;
+		this.fEndIndex = endIndex;
 	}
 
 	void setStartIndex(int startIndex) {
-		this.startIndex = startIndex;
+		this.fStartIndex = startIndex;
 	}
 
 	void setTourSpeed(float tourSpeed) {
-		this.tourSpeed = tourSpeed;
+		this.fTourSpeed = tourSpeed;
 	}
 }

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.data.TourData;
+
 /**
  * this contains a tree item which represents a tour
  */
@@ -25,14 +27,26 @@ public abstract class TreeViewerTourItem extends TreeViewerItem {
 	 */
 	private long	tourId;
 
+	/**
+	 * @return Returns the Id for the {@link TourData} entity
+	 */
 	public long getTourId() {
 		return tourId;
 	}
+
+	/**
+	 * Set the tour id for the tour item
+	 * 
+	 * @param tourId
+	 */
 	public void setTourId(long tourId) {
 		this.tourId = tourId;
 	}
 
+	@Override
 	protected abstract void fetchChildren();
+
+	@Override
 	protected abstract void remove();
 
 }

@@ -15,9 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourMap;
 
-import org.eclipse.ui.part.ViewPart;
-
-abstract class SynchedChartView extends ViewPart {
+public interface ISynchedChart {
 
 	public static final int	SYNCH_VERTICAL		= 0x01;
 	public static final int	SYNCH_HORIZONTAL	= 0x02;

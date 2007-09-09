@@ -543,28 +543,32 @@ public class ChartComponentGraph extends Canvas {
 		hitYSlider = null;
 
 		/*
-		 * when the zoom in marker is set, it would overwrite the changed y-slider position, so we
-		 * overwrite the zoom in marker y-slider positions until the zoom in marker is overwritten
+		 * when the chart is synchronized, the y-slider position is modified, so we overwrite the
+		 * synchronized chart y-slider positions until the zoom in marker is overwritten
 		 */
-		if (fChartComponents.zoomMarkerPositionIn != null) {
+		final SynchConfiguration synchedChartConfig = fChartComponents.fSynchedChartConfig;
 
-			final ChartYDataMinMaxKeeper zoomMarkerPositionIn = fChartComponents.zoomMarkerPositionIn.yDataMinMaxKeeper;
+		if (synchedChartConfig != null) {
+
+			final ChartYDataMinMaxKeeper synchedChartMinMaxKeeper = synchedChartConfig.yDataMinMaxKeeper;
 
 			// get the id for the changed y-slider
 			final Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
 
 			// adjust min value for the changed y-slider
-			final Integer inMinValue = zoomMarkerPositionIn.getMinValues().get(yDataInfo);
+			final Integer synchedChartMinValue = synchedChartMinMaxKeeper.getMinValues()
+					.get(yDataInfo);
 
-			if (inMinValue != null) {
-				zoomMarkerPositionIn.getMinValues().put(yDataInfo, minValue);
+			if (synchedChartMinValue != null) {
+				synchedChartMinMaxKeeper.getMinValues().put(yDataInfo, minValue);
 			}
 
 			// adjust max value for the changed y-slider
-			final Integer inMaxValue = zoomMarkerPositionIn.getMaxValues().get(yDataInfo);
+			final Integer synchedChartMaxValue = synchedChartMinMaxKeeper.getMaxValues()
+					.get(yDataInfo);
 
-			if (inMaxValue != null) {
-				zoomMarkerPositionIn.getMaxValues().put(yDataInfo, maxValue);
+			if (synchedChartMaxValue != null) {
+				synchedChartMinMaxKeeper.getMaxValues().put(yDataInfo, maxValue);
 			}
 		}
 
@@ -1113,7 +1117,7 @@ public class ChartComponentGraph extends Canvas {
 
 		// get the horizontal offset for the graph
 		int graphValueOffset;
-		if (fChartComponents.zoomMarkerPositionIn == null) {
+		if (fChartComponents.fSynchedChartConfig == null) {
 			// a zoom marker is not set, draw it normally
 			graphValueOffset = (int) (Math.max(0, fDevGraphImageXOffset) / scaleX);
 		} else {
@@ -1297,7 +1301,7 @@ public class ChartComponentGraph extends Canvas {
 
 		// get the horizontal offset for the graph
 		int graphValueOffset;
-		if (fChartComponents.zoomMarkerPositionIn == null) {
+		if (fChartComponents.fSynchedChartConfig == null) {
 			// a zoom marker is not set, draw it normally
 			graphValueOffset = (int) (Math.max(0, fDevGraphImageXOffset) / scaleX);
 		} else {
@@ -2054,7 +2058,7 @@ public class ChartComponentGraph extends Canvas {
 
 		// get the horizontal offset for the graph
 		int graphValueOffset;
-		if (fChartComponents.zoomMarkerPositionIn == null) {
+		if (fChartComponents.fSynchedChartConfig == null) {
 			// a zoom marker is not set, draw it normally
 			graphValueOffset = (int) (Math.max(0, fDevGraphImageXOffset) / scaleX);
 		} else {
@@ -2062,7 +2066,7 @@ public class ChartComponentGraph extends Canvas {
 			graphValueOffset = (int) (fDevGraphImageXOffset / scaleX);
 		}
 
-		if (xData.getXMarkerStartIndex() == -1) {
+		if (xData.getSynchMarkerStartIndex() == -1) {
 			drawLineGraphSegment(gc,
 					drawingData,
 					0,
@@ -2080,8 +2084,8 @@ public class ChartComponentGraph extends Canvas {
 			// draw the marker
 			drawLineGraphSegment(gc,
 					drawingData,
-					xData.getXMarkerStartIndex(),
-					xData.getXMarkerEndIndex() + 1,
+					xData.getSynchMarkerStartIndex(),
+					xData.getSynchMarkerEndIndex() + 1,
 					rgbFg,
 					rgbBg1,
 					rgbBg2,
@@ -2092,7 +2096,7 @@ public class ChartComponentGraph extends Canvas {
 			drawLineGraphSegment(gc,
 					drawingData,
 					0,
-					xData.getXMarkerStartIndex() + 1,
+					xData.getSynchMarkerStartIndex() + 1,
 					rgbFg,
 					rgbBg1,
 					rgbBg2,
@@ -2102,7 +2106,7 @@ public class ChartComponentGraph extends Canvas {
 			// draw segment after the marker
 			drawLineGraphSegment(gc,
 					drawingData,
-					xData.getXMarkerEndIndex() - 0,
+					xData.getSynchMarkerEndIndex() - 0,
 					xValues.length,
 					rgbFg,
 					rgbBg1,
@@ -2362,12 +2366,12 @@ public class ChartComponentGraph extends Canvas {
 			final float scaleX = drawingData.getScaleX();
 			final int valueDraggingDiff = (int) ((float) devDraggingDiff / scaleX);
 
-			final int xmStartIndex = xData.getXMarkerStartIndex();
-			final int xmEndIndex = xData.getXMarkerEndIndex();
+			final int synchStartIndex = xData.getSynchMarkerStartIndex();
+			final int synchEndIndex = xData.getSynchMarkerEndIndex();
 
 			final int[] xValues = xData.getHighValues()[0];
-			final int valueXStart = xValues[xmStartIndex];
-			final int valueXEnd = xValues[xmEndIndex];
+			final int valueXStart = xValues[synchStartIndex];
+			final int valueXEnd = xValues[synchEndIndex];
 			// fForcedXMarkerValueDiff = valueXEnd - valueXStart;
 
 			final int devXStart = (int) (scaleX * valueXStart - fDevGraphImageXOffset);
@@ -2379,14 +2383,14 @@ public class ChartComponentGraph extends Canvas {
 			final int valueXEndWithOffset = valueXEnd + valueDraggingDiff;
 
 			fMovedXMarkerStartValueIndex = computeXMarkerValue(xValues,
-					xmStartIndex,
+					synchStartIndex,
 					valueDraggingDiff,
 					valueXStartWithOffset);
 
 			devMovedXStart = (int) (scaleX * xValues[fMovedXMarkerStartValueIndex] - fDevGraphImageXOffset);
 
 			fMovedXMarkerEndValueIndex = computeXMarkerValue(xValues,
-					xmEndIndex,
+					synchEndIndex,
 					valueDraggingDiff,
 					valueXEndWithOffset);
 
@@ -3093,7 +3097,7 @@ public class ChartComponentGraph extends Canvas {
 		return isBarHit;
 	}
 
-	private boolean isXMarkerHit(final int devXGraph) {
+	private boolean isSynchMarkerHit(final int devXGraph) {
 
 		final ChartDataXSerie xData = getXData();
 
@@ -3101,10 +3105,10 @@ public class ChartComponentGraph extends Canvas {
 			return false;
 		}
 
-		final int xMarkerStartIndex = xData.getXMarkerStartIndex();
-		final int xMarkerEndIndex = xData.getXMarkerEndIndex();
+		final int synchMarkerStartIndex = xData.getSynchMarkerStartIndex();
+		final int synchMarkerEndIndex = xData.getSynchMarkerEndIndex();
 
-		if (xMarkerStartIndex == -1) {
+		if (synchMarkerStartIndex == -1) {
 			// x-marker is not set
 			return false;
 		}
@@ -3112,8 +3116,8 @@ public class ChartComponentGraph extends Canvas {
 		final int[] xValues = xData.getHighValues()[0];
 		final float scaleX = getXDrawingData().getScaleX();
 
-		final int devXMarkerStart = (int) (xValues[xMarkerStartIndex] * scaleX - fDevGraphImageXOffset);
-		final int devXMarkerEnd = (int) (xValues[xMarkerEndIndex] * scaleX - fDevGraphImageXOffset);
+		final int devXMarkerStart = (int) (xValues[synchMarkerStartIndex] * scaleX - fDevGraphImageXOffset);
+		final int devXMarkerEnd = (int) (xValues[synchMarkerEndIndex] * scaleX - fDevGraphImageXOffset);
 
 		if (devXGraph >= devXMarkerStart && devXGraph <= devXMarkerEnd) {
 			return true;
@@ -3412,11 +3416,11 @@ public class ChartComponentGraph extends Canvas {
 			} else {
 
 				/*
-				 * start to move the x-marker, when a dragging listener and the x-marker is set
+				 * start to move the x-marker, when a dragging listener and x-marker is set
 				 */
-				if (fChart.fXMarkerDraggingListener != null && isXMarkerHit(devXGraph)) {
+				if (fChart.fXMarkerDraggingListener != null && isSynchMarkerHit(devXGraph)) {
 
-					fIsXMarkerMoved = getXData().getXMarkerStartIndex() != -1;
+					fIsXMarkerMoved = getXData().getSynchMarkerStartIndex() != -1;
 
 					if (fIsXMarkerMoved) {
 
@@ -3617,7 +3621,7 @@ public class ChartComponentGraph extends Canvas {
 				fIsSliderDirty = true;
 				isChartDirty = true;
 
-			} else if (fChart.fXMarkerDraggingListener != null && isXMarkerHit(devXGraph)) {
+			} else if (fChart.fXMarkerDraggingListener != null && isSynchMarkerHit(devXGraph)) {
 
 				setCursor(cursorMoveXMarker);
 

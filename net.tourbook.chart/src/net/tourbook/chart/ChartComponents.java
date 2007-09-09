@@ -122,15 +122,15 @@ public class ChartComponents extends Composite {
 	private final int					fDevMinYUnit				= 50;
 
 	/**
-	 * this contains an zoom marker position which can be read from outside of the current chart
+	 * contains the {@link SynchConfiguration} for the current chart and will be used from the chart
+	 * which is synchronized
 	 */
-	public ZoomMarkerPosition			zoomMarkerPositionOut		= null;
+	SynchConfiguration					fSynchConfigOut				= null;
 
 	/**
-	 * the zoom marker position which is set from outside of the current chart. When the zoom marker
-	 * is set, the graph will be sized to the width, which is stored in the zoom marker position
+	 * when set, the current chart will be synchronized with this {@link SynchConfiguration}
 	 */
-	ZoomMarkerPosition					zoomMarkerPositionIn		= null;
+	SynchConfiguration					fSynchedChartConfig				= null;
 
 	/**
 	 * visible chart rectangle
@@ -710,7 +710,7 @@ public class ChartComponents extends Composite {
 		// compute the visual size of the graph
 		setVisibleGraphRect();
 
-		if (setGraphWidthToZoomMarkerPosition() == false) {
+		if (setGraphWidthToSynchedChartWidth() == false) {
 
 			// compute the graph width when a zoom marker was not set
 			fComponentGraph.updateImageWidthAndOffset();
@@ -730,8 +730,7 @@ public class ChartComponents extends Composite {
 		fComponentAxisLeft.setDrawingData(fChartDrawingData, true);
 		fComponentAxisRight.setDrawingData(fChartDrawingData, false);
 
-		// set the zoom marker position and fire the event to the listener
-		setAndFireZoomMarkerPositionOut();
+		fireChartSynchronization();
 
 		return true;
 	}
@@ -739,21 +738,21 @@ public class ChartComponents extends Composite {
 	/**
 	 * set the zoom marker position which can be read from outside this chart
 	 */
-	private void setAndFireZoomMarkerPositionOut() {
+	private void fireChartSynchronization() {
 
 		final ChartDataXSerie xData = fChartDataModel.getXData();
 
-		final int markerValueIndexStart = xData.getXMarkerStartIndex();
-		final int markerValueIndexEnd = xData.getXMarkerEndIndex();
+		final int markerValueIndexStart = xData.getSynchMarkerStartIndex();
+		final int markerValueIndexEnd = xData.getSynchMarkerEndIndex();
 
 		if (markerValueIndexStart == -1) {
 
-			// no zoom marker's is set
-			zoomMarkerPositionOut = null;
+			// disable chart synch
+			fSynchConfigOut = null;
 			return;
 		}
 
-		// zoom marker is set
+		// synchronize chart
 
 		final int[] xValues = xData.getHighValues()[0];
 		final float markerStartValue = xValues[markerValueIndexStart];
@@ -763,33 +762,32 @@ public class ChartComponents extends Composite {
 		final float lastValue = xValues[xValues.length - 1];
 
 		final float devVirtualGraphImageWidth = fComponentGraph.getDevVirtualGraphImageWidth();
-
 		final float devVirtualGraphOffset = fComponentGraph.getDevGraphImageXOffset();
 
 		final int devXMarkerWidth = (int) (devVirtualGraphImageWidth / lastValue * valueDiff);
-
 		final int devMarkerStartPos = (int) (markerStartValue / lastValue * devVirtualGraphImageWidth);
 		final int devXMarkerOffset = (int) (devMarkerStartPos - devVirtualGraphOffset);
 
-		final ZoomMarkerPosition newXMarkerPositionOut = new ZoomMarkerPosition(devXMarkerWidth,
+		final SynchConfiguration newSynchConfigOut = new SynchConfiguration(devXMarkerWidth,
 				devXMarkerOffset,
 				fChartDataModel);
 
 		boolean fireEvent = false;
-		if (zoomMarkerPositionOut == null) {
-			// fire when the position is new
+
+		if (fSynchConfigOut == null) {
+			// fire when synch is new
 			fireEvent = true;
-		} else if (!zoomMarkerPositionOut.isEqual(newXMarkerPositionOut)) {
-			// fire when the position has changed
+		} else if (!fSynchConfigOut.isEqual(newSynchConfigOut)) {
+			// fire when synch has changed
 			fireEvent = true;
 		}
 
 		if (fireEvent) {
 
-			// set a new zoom marker position
-			zoomMarkerPositionOut = newXMarkerPositionOut;
+			// set a new synch config
+			fSynchConfigOut = newSynchConfigOut;
 
-			fChart.fireZoomMarkerPositionListener();
+			fChart.fireSynchConfigListener();
 		}
 	}
 
@@ -825,25 +823,25 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * adjust the graph width and position to the zoom marker position
+	 * adjust the graph width to the synched chart
 	 * 
 	 * @return Returns <code>true</code> when the graph width was set
 	 */
-	private boolean setGraphWidthToZoomMarkerPosition() {
+	private boolean setGraphWidthToSynchedChartWidth() {
 
 		final ChartDataXSerie xData = fChartDataModel.getXData();
-		final int markerStartIndex = xData.getXMarkerStartIndex();
-		final int markerEndIndex = xData.getXMarkerEndIndex();
+		final int markerStartIndex = xData.getSynchMarkerStartIndex();
+		final int markerEndIndex = xData.getSynchMarkerEndIndex();
 
-		if (zoomMarkerPositionIn == null || markerStartIndex == -1) {
-			// no zoom marker is set
+		if (fSynchedChartConfig == null || markerStartIndex == -1) {
+			// synchronization is disabled
 			return false;
 		}
 
-		zoomMarkerPositionIn.yDataMinMaxKeeper.restoreMinMaxValues(fChartDataModel);
+		fSynchedChartConfig.yDataMinMaxKeeper.restoreMinMaxValues(fChartDataModel);
 
-		final float xmpinDevMarkerWidth = zoomMarkerPositionIn.devMarkerWidth;
-		final int xmpinDevMarkerOffset = zoomMarkerPositionIn.devMarkerOffset;
+		final float synchInDevMarkerWidth = fSynchedChartConfig.devMarkerWidth;
+		final int synchInDevMarkerOffset = fSynchedChartConfig.devMarkerOffset;
 
 		final int[] xValues = xData.getHighValues()[0];
 		final float valueMarkerStart = xValues[markerStartIndex];
@@ -851,11 +849,11 @@ public class ChartComponents extends Composite {
 		final float valueDiff = xValues[markerEndIndex] - valueMarkerStart;
 		final float valueLast = xValues[xValues.length - 1];
 
-		final float devVirtualGraphImageWidth = valueLast / valueDiff * xmpinDevMarkerWidth;
+		final float devVirtualGraphImageWidth = valueLast / valueDiff * synchInDevMarkerWidth;
 		final float graphZoomRatio = devVirtualGraphImageWidth / getDevVisibleChartWidth();
 
 		final int devLeftXMarkerPos = (int) (valueMarkerStart / valueLast * devVirtualGraphImageWidth);
-		final int devGraphOffset = devLeftXMarkerPos - xmpinDevMarkerOffset;
+		final int devGraphOffset = devLeftXMarkerPos - synchInDevMarkerOffset;
 
 		fComponentGraph.setGraphImageWidth((int) devVirtualGraphImageWidth,
 				devGraphOffset,
@@ -945,14 +943,14 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * Set the zoom-marker position, this is used when the chart is drawn/resized
+	 * Set {@link SynchConfiguration} this is used when the chart is drawn/resized
 	 * 
-	 * @param zoomMarkerPositionIn
+	 * @param fSynchedChartConfig
 	 *        the xMarkerPosition to set
 	 */
-	void setZoomMarkerPositionIn(final ZoomMarkerPosition xMarkerPositionIn) {
+	void setSynchConfigIn(final SynchConfiguration synchConfigIn) {
 
-		this.zoomMarkerPositionIn = xMarkerPositionIn;
+		fSynchedChartConfig = synchConfigIn;
 
 		onResize();
 	}

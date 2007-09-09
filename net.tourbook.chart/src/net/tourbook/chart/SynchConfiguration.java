@@ -16,11 +16,11 @@
 package net.tourbook.chart;
 
 /**
- * The x-marker position is used to synch 2 charts. Chart A sets the
+ * {@link SynchConfiguration} is used to synch 2 charts. Chart A sets the
  * zoomMarkerPositionOut which can be read (and set to zoomMarkerPositionIn)
  * from the chart B. Chart B will then be synched to chart A
  */
-public class ZoomMarkerPosition {
+public class SynchConfiguration {
 
 	/**
 	 * width for the marker, this can be smaller or wider than the visible part
@@ -42,7 +42,7 @@ public class ZoomMarkerPosition {
 	 * 
 	 * @param chartDataModel
 	 */
-	public ZoomMarkerPosition(int devMarkerWidth, int devMarkerOffset,
+	public SynchConfiguration(int devMarkerWidth, int devMarkerOffset,
 			ChartDataModel chartDataModel) {
 
 		this.devMarkerWidth = devMarkerWidth;
@@ -56,7 +56,7 @@ public class ZoomMarkerPosition {
 	 * @return Returns <code>true</code> when the newXMarkerPosition has the
 	 *         same values as the current object
 	 */
-	public boolean isEqual(ZoomMarkerPosition newXMarkerPosition) {
+	public boolean isEqual(SynchConfiguration newXMarkerPosition) {
 		if (devMarkerWidth == newXMarkerPosition.devMarkerWidth
 				&& devMarkerOffset == newXMarkerPosition.devMarkerOffset
 				&& !yDataMinMaxKeeper.hasMinMaxChanged()) {

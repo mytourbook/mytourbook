@@ -260,7 +260,7 @@ public class WizardPageReferenceTour extends WizardPage {
 
 			ChartDataXSerie xData = chartDataModel.getXData();
 
-			xData.setMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
+			xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
 
 			fChartGroup.setText(NLS.bind(refTour.getLabel() + ": " //$NON-NLS-1$
 					+ Messages.TourMapWizard_Group_chart_title, TourManager.getTourDate(tourData)));
@@ -298,7 +298,7 @@ public class WizardPageReferenceTour extends WizardPage {
 				// .getTourData()
 				// .getTourId());
 
-				final String refId = Long.toString(tourReference.getGeneratedId());
+				final String refId = Long.toString(tourReference.getRefId());
 
 				for (String persistedRefId : persistedTourIds) {
 					if (persistedRefId.compareTo(refId) == 0) {
@@ -322,7 +322,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		String[] refTourIds = new String[checkedElements.length];
 
 		for (int tourIndex = 0; tourIndex < checkedElements.length; tourIndex++) {
-			refTourIds[tourIndex] = Long.toString(((TourReference) (checkedElements[tourIndex])).getGeneratedId()/*
+			refTourIds[tourIndex] = Long.toString(((TourReference) (checkedElements[tourIndex])).getRefId()/*
 			 * .getTourData()
 			 * .getTourId()
 			 */);

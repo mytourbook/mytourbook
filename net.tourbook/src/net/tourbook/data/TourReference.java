@@ -37,7 +37,7 @@ public class TourReference {
 	private int			startIndex;
 	private int			endIndex;
 
-	private String		label	= ""; //$NON-NLS-1$
+	private String		label	= "";	//$NON-NLS-1$
 
 	public TourReference() {}
 
@@ -53,9 +53,9 @@ public class TourReference {
 	}
 
 	/**
-	 * @return Returns the id for the reference tour
+	 * @return Returns the primary key for a {@link TourReference} entity
 	 */
-	public long getGeneratedId() {
+	public long getRefId() {
 		return refId;
 	}
 

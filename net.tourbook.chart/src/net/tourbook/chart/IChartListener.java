@@ -18,18 +18,17 @@ package net.tourbook.chart;
 public interface IChartListener {
 
 	/**
-	 * set the value diff which is forced for the x-marker
-	 * 
-	 * @param valueDiff
+	 * @return Returns the value difference between the left and right border of the x-marker
 	 */
 	int getXMarkerValueDiff();
 
 	/**
-	 * method is called when the x-marker was move, the parameter contain the
-	 * new value index
+	 * this method is called when the x-marker was move, the parameter contain the new value index
 	 * 
 	 * @param movedXMarkerStartValueIndex
+	 *        start index
 	 * @param movedXMarkerEndValueIndex
+	 *        end index
 	 */
 	void xMarkerMoved(int movedXMarkerStartValueIndex, int movedXMarkerEndValueIndex);
 }

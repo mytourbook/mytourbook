@@ -22,26 +22,27 @@ import net.tourbook.data.TourReference;
 import net.tourbook.tour.TourChartConfiguration;
 
 /**
- * contains data/configuration for the current ref chart
+ * contains data and configuration for the compared chart
  */
-public class RefTourChartData {
+public class CompareTourConfig {
 
-	private TourReference			refTour;
-	private ChartDataModel			chartDataModel;
-	private TourData				refTourData;
+	private TourReference					refTour;
+//	private ChartDataModel					refChartDataModel;
+	private TourData						refTourData;
 
-	private TourChartConfiguration	refTourChartConfig;
-	private TourChartConfiguration	compTourChartConfig;
+	private TourChartConfiguration			refTourChartConfig;
+	private TourChartConfiguration			compTourChartConfig;
 
 	private SelectionChartXSliderPosition	xSliderPosition;
 
-	RefTourChartData(TourReference refTour, ChartDataModel chartDataModel, TourData refTourData,
-			TourChartConfiguration refTourChartConfig,
+	CompareTourConfig(TourReference refTour, ChartDataModel refChartDataModel,
+			TourData refTourData, TourChartConfiguration refTourChartConfig,
 			TourChartConfiguration compTourChartConfig) {
 
 		this.refTour = refTour;
-		this.chartDataModel = chartDataModel;
+//		this.refChartDataModel = refChartDataModel;
 		this.refTourData = refTourData;
+
 		this.refTourChartConfig = refTourChartConfig;
 		this.compTourChartConfig = compTourChartConfig;
 	}
@@ -62,9 +63,9 @@ public class RefTourChartData {
 		return compTourChartConfig;
 	}
 
-	ChartDataModel getChartDataModel() {
-		return chartDataModel;
-	}
+//	ChartDataModel getChartDataModel() {
+//		return refChartDataModel;
+//	}
 
 	TourReference getRefTour() {
 		return refTour;

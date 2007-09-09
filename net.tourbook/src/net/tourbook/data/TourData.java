@@ -41,7 +41,7 @@ import net.tourbook.tour.TourManager;
 import org.hibernate.annotations.Cascade;
 
 /**
- * Tour data which will be saved in the database
+ * Tour data contains all data for a tour (except markers), an entity will be saved in the database
  */
 @Entity
 public class TourData {

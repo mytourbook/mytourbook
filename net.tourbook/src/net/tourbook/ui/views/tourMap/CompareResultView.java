@@ -97,7 +97,7 @@ import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.PageBook;
 
-public class CompareResultView extends SynchedChartView {
+public class CompareResultView extends ISynchedChart {
 
 	public static final String				ID						= "net.tourbook.views.tourMap.CompareResultView";				//$NON-NLS-1$
 
@@ -136,7 +136,7 @@ public class CompareResultView extends SynchedChartView {
 
 	PostSelectionProvider					fPostSelectionProvider;
 
-	private HashMap<Long, RefTourChartData>	fRefChartDataCache		= new HashMap<Long, RefTourChartData>();
+	private HashMap<Long, CompareTourConfig>	fRefChartDataCache		= new HashMap<Long, CompareTourConfig>();
 
 	/**
 	 * resource manager for images
@@ -684,10 +684,10 @@ public class CompareResultView extends SynchedChartView {
 		enableActions();
 	}
 
-	private RefTourChartData getRefChartData(TourReference refTour) {
+	private CompareTourConfig getRefChartData(TourReference refTour) {
 
 		// get the reference chart from the cache
-		RefTourChartData refTourChartData = fRefChartDataCache.get(refTour.getGeneratedId());
+		CompareTourConfig refTourChartData = fRefChartDataCache.get(refTour.getRefId());
 
 		if (refTourChartData != null) {
 			return refTourChartData;
@@ -705,11 +705,11 @@ public class CompareResultView extends SynchedChartView {
 		compTourChartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 		// compTourChartConfig.setKeepMinMaxValues(true);
 
-		ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(tourData,
+		ChartDataModel refChartDataModel = TourManager.getInstance().createChartDataModel(tourData,
 				refTourChartConfig);
 
-		return new RefTourChartData(refTour,
-				chartDataModel,
+		return new CompareTourConfig(refTour,
+				refChartDataModel,
 				tourData,
 				refTourChartConfig,
 				compTourChartConfig);
@@ -812,7 +812,7 @@ public class CompareResultView extends SynchedChartView {
 						comparedTour.setStartIndex(compareResult.compareIndexStart);
 						comparedTour.setEndIndex(compareResult.compareIndexEnd);
 						comparedTour.setTourId(tourData.getTourId());
-						comparedTour.setRefTourId(compareResult.refTour.getGeneratedId());
+						comparedTour.setRefTourId(compareResult.refTour.getRefId());
 
 						Calendar calendar = GregorianCalendar.getInstance();
 						calendar.set(tourData.getStartYear(),
@@ -889,7 +889,7 @@ public class CompareResultView extends SynchedChartView {
 				ChartDataXSerie xData = changedChartDataModel.getXData();
 
 				// set the x-marker
-				xData.setMarkerValueIndex(compareResult.compareIndexStart,
+				xData.setSynchMarkerValueIndex(compareResult.compareIndexStart,
 						compareResult.compareIndexEnd);
 
 				// set title
@@ -905,7 +905,7 @@ public class CompareResultView extends SynchedChartView {
 		fCompTourChart.addDataModelListener(dataModelListener);
 
 		// get the tour chart configuration
-		RefTourChartData refTourChartData = fRefChartDataCache.get(fCurrentRefTour.getGeneratedId());
+		CompareTourConfig refTourChartData = fRefChartDataCache.get(fCurrentRefTour.getRefId());
 		TourChartConfiguration compTourChartConfig = refTourChartData.getCompTourChartConfig();
 
 		fCompTourChart.setBackgroundColor(Display.getCurrent()
@@ -927,7 +927,7 @@ public class CompareResultView extends SynchedChartView {
 			return;
 		}
 
-		final RefTourChartData refTourChartData = getRefChartData(refTour);
+		final CompareTourConfig refTourChartData = getRefChartData(refTour);
 
 		fRefTourChart.addDataModelListener(new IDataModelListener() {
 
@@ -936,7 +936,7 @@ public class CompareResultView extends SynchedChartView {
 				ChartDataXSerie xData = changedChartDataModel.getXData();
 
 				// set marker
-				xData.setMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
+				xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
 
 				// set the x-marker value difference
 				int[] xValues = xData.getHighValues()[0];
@@ -960,13 +960,13 @@ public class CompareResultView extends SynchedChartView {
 				false);
 
 		// keep data for current ref tour in the cache
-		fRefChartDataCache.put(refTour.getGeneratedId(), refTourChartData);
+		fRefChartDataCache.put(refTour.getRefId(), refTourChartData);
 		fCurrentRefTour = refTour;
 	}
 
 	private void showRefTourInfo(long refId) {
 
-		RefTourChartData refTourChartData = fRefChartDataCache.get(refId);
+		CompareTourConfig refTourChartData = fRefChartDataCache.get(refId);
 
 		fRefTourInfo.updateInfo(refTourChartData);
 
@@ -1003,7 +1003,7 @@ public class CompareResultView extends SynchedChartView {
 				// show the reference tour chart
 				showRefTour(refTour.refTour);
 
-				showRefTourInfo(refTour.refTour.getGeneratedId());
+				showRefTourInfo(refTour.refTour.getRefId());
 
 				fPostSelectionProvider.setSelection(new SelectionTourChart(fRefTourChart));
 			}
@@ -1016,7 +1016,7 @@ public class CompareResultView extends SynchedChartView {
 	@Override
 	void synchCharts(boolean isSynched) {
 
-		fRefTourChart.setZoomMarkerPositionListener(isSynched, fCompTourChart);
+		fRefTourChart.setSynchedChart(isSynched, fCompTourChart);
 
 		// show the compared chart in full size
 		fCompTourChart.zoomOut(false);
@@ -1061,7 +1061,7 @@ public class CompareResultView extends SynchedChartView {
 
 		// update the chart
 		ChartDataXSerie xData = chartDataModel.getXData();
-		xData.setMarkerValueIndex(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
+		xData.setSynchMarkerValueIndex(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
 		fCompTourChart.updateChart(chartDataModel);
 
 		// update the tour viewer

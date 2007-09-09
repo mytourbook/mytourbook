@@ -48,31 +48,32 @@ public class TourManager {
 	/**
 	 * tour was changed and saved in the database
 	 */
-	public static final int					TOUR_PROPERTY_CHART_IS_MODIFIED		= 10;
-	public static final int					TOUR_PROPERTY_SEGMENT_LAYER_CHANGE	= 20;
+	public static final int					TOUR_PROPERTY_CHART_IS_MODIFIED			= 10;
+	public static final int					TOUR_PROPERTY_SEGMENT_LAYER_CHANGED		= 20;
+	public static final int					TOUR_PROPERTY_REFERENCE_TOUR_CHANGED	= 30;
 
-	public static final String				CUSTOM_DATA_TIME					= "time";									//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_DISTANCE				= "distance";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_ALTITUDE				= "altitude";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_SPEED					= "speed";									//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_GRADIENT				= "gradient";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_ALTIMETER				= "altimeter";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_PULSE					= "pulse";									//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_TIME						= "time";									//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_DISTANCE					= "distance";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_ALTITUDE					= "altitude";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_SPEED						= "speed";									//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_GRADIENT					= "gradient";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_ALTIMETER					= "altimeter";								//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_PULSE						= "pulse";									//$NON-NLS-1$
 
-	public static final String				ANALYZER_INFO						= "AnalyzerInfo";							//$NON-NLS-1$
-	public static final String				X_AXIS_TIME							= "time";									//$NON-NLS-1$
-	public static final String				X_AXIS_DISTANCE						= "distance";								//$NON-NLS-1$
+	public static final String				ANALYZER_INFO							= "AnalyzerInfo";							//$NON-NLS-1$
+	public static final String				X_AXIS_TIME								= "time";									//$NON-NLS-1$
+	public static final String				X_AXIS_DISTANCE							= "distance";								//$NON-NLS-1$
 
-	public static final int					GRAPH_ALTITUDE						= 1000;
-	public static final int					GRAPH_SPEED							= 1001;
-	public static final int					GRAPH_ALTIMETER						= 1002;
-	public static final int					GRAPH_PULSE							= 1003;
-	public static final int					GRAPH_TEMPERATURE					= 1004;
-	public static final int					GRAPH_CADENCE						= 1005;
-	public static final int					GRAPH_GRADIENT						= 1006;
-	public static final int					GRAPH_POWER							= 1007;
+	public static final int					GRAPH_ALTITUDE							= 1000;
+	public static final int					GRAPH_SPEED								= 1001;
+	public static final int					GRAPH_ALTIMETER							= 1002;
+	public static final int					GRAPH_PULSE								= 1003;
+	public static final int					GRAPH_TEMPERATURE						= 1004;
+	public static final int					GRAPH_CADENCE							= 1005;
+	public static final int					GRAPH_GRADIENT							= 1006;
+	public static final int					GRAPH_POWER								= 1007;
 
-	public static final int					GRADIENT_DIVISOR					= 10;
+	public static final int					GRADIENT_DIVISOR						= 10;
 
 	private static TourManager				instance;
 
@@ -80,9 +81,9 @@ public class TourManager {
 	private ComputeChartValue				computeAltimeterAvg;
 	private ComputeChartValue				computeGradientAvg;
 
-	private final HashMap<Long, TourData>	fTourDataMap						= new HashMap<Long, TourData>();
+	private final HashMap<Long, TourData>	fTourDataMap							= new HashMap<Long, TourData>();
 
-	private final ListenerList				fPropertyListeners					= new ListenerList(ListenerList.IDENTITY);
+	private final ListenerList				fPropertyListeners						= new ListenerList(ListenerList.IDENTITY);
 
 	private TourManager() {}
 
@@ -1028,7 +1029,8 @@ public class TourManager {
 //			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_NEW,
 //					new int[dataSerie.length],
 //					dataSerie);
-			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
+			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS,
+					dataSerie);
 		}
 		return chartDataSerie;
 	}
