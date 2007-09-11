@@ -486,6 +486,7 @@ public class TourMapView extends ViewPart {
 
 			final TVTITourMapComparedTour compItem = (TVTITourMapComparedTour) item;
 			final SelectionComparedTour comparedTour = new SelectionComparedTour(compItem.getRefId());
+
 			comparedTour.setTourCompareData(compItem.getCompId(),
 					compItem.getTourId(),
 					compItem.getStartIndex(),

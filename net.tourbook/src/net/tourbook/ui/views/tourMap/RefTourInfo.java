@@ -76,7 +76,7 @@ public class RefTourInfo extends Composite {
 
 	}
 
-	void updateInfo(CompareTourConfig refTourChartData) {
+	void updateInfo(TourCompareConfig refTourChartData) {
 
 		TourReference refTour = refTourChartData.getRefTour();
 

@@ -63,26 +63,26 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 		fPageNoChart = new Label(fPageBook, SWT.NONE);
 		fPageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
-		fTourChart = new TourChart(fPageBook, SWT.FLAT, true);
-		fTourChart.setShowZoomActions(true);
-		fTourChart.setShowSlider(true);
-		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+		fCompareTourChart = new TourChart(fPageBook, SWT.FLAT, true);
+		fCompareTourChart.setShowZoomActions(true);
+		fCompareTourChart.setShowSlider(true);
+		fCompareTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 
-		fTourChart.addDoubleClickListener(new Listener() {
+		fCompareTourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(final Event event) {
 				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
 			}
 		});
 
 		// set chart title
-		fTourChart.addDataModelListener(new IDataModelListener() {
+		fCompareTourChart.addDataModelListener(new IDataModelListener() {
 			public void dataModelChanged(final ChartDataModel chartDataModel) {
 				chartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
 			}
 		});
 
 		// fire a slider move selection when a slider was moved in the tour chart
-		fTourChart.addSliderMoveListener(new ISliderMoveListener() {
+		fCompareTourChart.addSliderMoveListener(new ISliderMoveListener() {
 			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
 				fPostSelectionProvider.setSelection(chartInfoSelection);
 			}
@@ -100,7 +100,7 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 	}
 
 	public TourChart getTourChart() {
-		return fTourChart;
+		return fCompareTourChart;
 	}
 
 	@Override
@@ -120,9 +120,9 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 			return;
 		}
 
-		final CompareTourConfig refTourConfig = createRefTourConfig(refId);
+		final TourCompareConfig tourCompareConfig = createTourCompareConfig(refId);
 
-		if (refTourConfig == null) {
+		if (tourCompareConfig == null) {
 			return;
 		}
 
@@ -130,16 +130,16 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 		 * show new ref tour
 		 */
 
-		fTourData = refTourConfig.getRefTourData();
-		fTourChartConfig = refTourConfig.getRefTourChartConfig();
+		fTourData = tourCompareConfig.getRefTourData();
+		fTourChartConfig = tourCompareConfig.getRefTourChartConfig();
 
-		setRefTourConfig(refTourConfig);
+		setTourCompareConfig(tourCompareConfig);
 
 		// set active ref id after the configuration is set
 		fActiveRefId = refId;
 
 		// ???
-		fTourChart.zoomOut(false);
+		fCompareTourChart.zoomOut(false);
 
 		updateChart();
 
@@ -150,13 +150,13 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 	 *        Reference Id
 	 * @return
 	 */
-	private CompareTourConfig createRefTourConfig(final long refId) {
+	private TourCompareConfig createTourCompareConfig(final long refId) {
 
-		CompareTourConfig refTourConfig = ReferenceTourManager.getInstance()
-				.getCompareTourConfig(refId);
+		TourCompareConfig compareConfig = ReferenceTourManager.getInstance()
+				.getTourCompareConfig(refId);
 
-		if (refTourConfig != null) {
-			return refTourConfig;
+		if (compareConfig != null) {
+			return compareConfig;
 		}
 
 		// load the reference tour from the database
@@ -180,46 +180,46 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 			final ChartDataModel chartDataModel = TourManager.getInstance()
 					.createChartDataModel(refTourData, refTourChartConfig);
 
-			refTourConfig = new CompareTourConfig(refTour,
+			compareConfig = new TourCompareConfig(refTour,
 					chartDataModel,
 					refTourData,
 					refTourChartConfig,
 					compTourchartConfig);
 
 			// keep ref config in the cache
-			ReferenceTourManager.getInstance().setRefTourConfig(refId, refTourConfig);
+			ReferenceTourManager.getInstance().setTourCompareConfig(refId, compareConfig);
 		}
 
-		return refTourConfig;
+		return compareConfig;
 	}
 
 	/**
 	 * set the configuration for a reference tour
 	 * 
-	 * @param refTourConfig
+	 * @param compareConfig
 	 * @return Returns <code>true</code> then the ref tour changed
 	 */
-	private void setRefTourConfig(final CompareTourConfig refTourConfig) {
+	private void setTourCompareConfig(final TourCompareConfig compareConfig) {
 
 		// save the chart slider positions for the old ref tour
-		final CompareTourConfig oldRefTourConfig = ReferenceTourManager.getInstance()
-				.getCompareTourConfig(fActiveRefId);
+		final TourCompareConfig oldRefTourConfig = ReferenceTourManager.getInstance()
+				.getTourCompareConfig(fActiveRefId);
 
 		if (oldRefTourConfig != null) {
 
-			final SelectionChartXSliderPosition oldXSliderPosition = fTourChart.getXSliderPosition();
+			final SelectionChartXSliderPosition oldXSliderPosition = fCompareTourChart.getXSliderPosition();
 
-			oldRefTourConfig.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
+			oldRefTourConfig.setXSliderPosition(new SelectionChartXSliderPosition(fCompareTourChart,
 					oldXSliderPosition.slider1ValueIndex,
 					oldXSliderPosition.slider2ValueIndex));
 		}
 
-		fTourChart.addDataModelListener(new IDataModelListener() {
+		fCompareTourChart.addDataModelListener(new IDataModelListener() {
 
 			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
 				final ChartDataXSerie xData = changedChartDataModel.getXData();
-				final TourReference refTour = refTourConfig.getRefTour();
+				final TourReference refTour = compareConfig.getRefTour();
 
 				// set marker positions
 				xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(),
@@ -232,14 +232,14 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 
 				TourManager.getInstance()
 						.firePropertyChange(TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED,
-								new TourPropertyRefTourChanged(fTourChart,
+								new TourPropertyRefTourChanged(fCompareTourChart,
 										refTour.getRefId(),
 										refTourXMarkerValue));
 
 				// set title
 				changedChartDataModel.setTitle(NLS.bind(Messages.TourMap_Label_chart_title_reference_tour,
 						refTour.getLabel(),
-						TourManager.getTourTitleDetailed(refTourConfig.getRefTourData())));
+						TourManager.getTourTitleDetailed(compareConfig.getRefTourData())));
 
 			}
 		});
@@ -247,7 +247,7 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 
 	@Override
 	public void setFocus() {
-		fTourChart.setFocus();
+		fCompareTourChart.setFocus();
 
 //		/*
 //		 * fire tour selection
@@ -262,9 +262,9 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 			return;
 		}
 
-		fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
+		fCompareTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 
-		fPageBook.showPage(fTourChart);
+		fPageBook.showPage(fCompareTourChart);
 
 		// set application window title
 		setTitleToolTip(TourManager.getTourDate(fTourData));

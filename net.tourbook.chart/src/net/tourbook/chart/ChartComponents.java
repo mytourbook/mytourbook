@@ -128,9 +128,10 @@ public class ChartComponents extends Composite {
 	SynchConfiguration					fSynchConfigOut				= null;
 
 	/**
-	 * when set, the current chart will be synchronized with this {@link SynchConfiguration}
+	 * when a {@link SynchConfiguration} is set, this chart will be synchronized with the chart
+	 * which set's the synch config
 	 */
-	SynchConfiguration					fSynchedChartConfig				= null;
+	SynchConfiguration					fSynchConfigSrc				= null;
 
 	/**
 	 * visible chart rectangle
@@ -697,6 +698,22 @@ public class ChartComponents extends Composite {
 		return fVisibleGraphRect.width;
 	}
 
+	void handleLeftRightEvent(final Event event) {
+
+		switch (fChartDataModel.getChartType()) {
+		case ChartDataModel.CHART_TYPE_BAR:
+			selectBarItem(event);
+			break;
+
+		case ChartDataModel.CHART_TYPE_LINE:
+			fComponentGraph.moveXSlider(event);
+			break;
+
+		default:
+			break;
+		}
+	}
+
 	/**
 	 * Resize handler for all components, computes the chart when the chart data, client area has
 	 * changed or the chart was zoomed
@@ -710,9 +727,15 @@ public class ChartComponents extends Composite {
 		// compute the visual size of the graph
 		setVisibleGraphRect();
 
-		if (setGraphWidthToSynchedChartWidth() == false) {
+		boolean isChartSynched = false;
+		if (fChart.fSynchByScale) {
+//			isChartSynched = setWidthToSynchedChart_AdjustToSameSize();
+			isChartSynched = setWidthToSynchedChart_AdjustToSameScale();
+		} else {}
 
-			// compute the graph width when a zoom marker was not set
+		if (isChartSynched == false) {
+
+			// chart is not synchronized, compute the 'normal' graph width
 			fComponentGraph.updateImageWidthAndOffset();
 		}
 
@@ -730,294 +753,12 @@ public class ChartComponents extends Composite {
 		fComponentAxisLeft.setDrawingData(fChartDrawingData, true);
 		fComponentAxisRight.setDrawingData(fChartDrawingData, false);
 
-		fireChartSynchronization();
-
-		return true;
-	}
-
-	/**
-	 * set the zoom marker position which can be read from outside this chart
-	 */
-	private void fireChartSynchronization() {
-
-		final ChartDataXSerie xData = fChartDataModel.getXData();
-
-		final int markerValueIndexStart = xData.getSynchMarkerStartIndex();
-		final int markerValueIndexEnd = xData.getSynchMarkerEndIndex();
-
-		if (markerValueIndexStart == -1) {
-
-			// disable chart synch
-			fSynchConfigOut = null;
-			return;
-		}
-
 		// synchronize chart
-
-		final int[] xValues = xData.getHighValues()[0];
-		final float markerStartValue = xValues[markerValueIndexStart];
-		final float markerEndValue = xValues[markerValueIndexEnd];
-
-		final float valueDiff = markerEndValue - markerStartValue;
-		final float lastValue = xValues[xValues.length - 1];
-
-		final float devVirtualGraphImageWidth = fComponentGraph.getDevVirtualGraphImageWidth();
-		final float devVirtualGraphOffset = fComponentGraph.getDevGraphImageXOffset();
-
-		final int devXMarkerWidth = (int) (devVirtualGraphImageWidth / lastValue * valueDiff);
-		final int devMarkerStartPos = (int) (markerStartValue / lastValue * devVirtualGraphImageWidth);
-		final int devXMarkerOffset = (int) (devMarkerStartPos - devVirtualGraphOffset);
-
-		final SynchConfiguration newSynchConfigOut = new SynchConfiguration(devXMarkerWidth,
-				devXMarkerOffset,
-				fChartDataModel);
-
-		boolean fireEvent = false;
-
-		if (fSynchConfigOut == null) {
-			// fire when synch is new
-			fireEvent = true;
-		} else if (!fSynchConfigOut.isEqual(newSynchConfigOut)) {
-			// fire when synch has changed
-			fireEvent = true;
-		}
-
-		if (fireEvent) {
-
-			// set a new synch config
-			fSynchConfigOut = newSynchConfigOut;
-
-			fChart.fireSynchConfigListener();
-		}
-	}
-
-	private void setVisibleGraphRect() {
-
-		final ArrayList<ChartDataYSerie> yDataList = fChartDataModel.getYData();
-		boolean isYTitle = false;
-
-		// loop all graphs - find the title for the y-axis
-		for (final ChartDataYSerie yData : yDataList) {
-			if (yData.getYTitle() != null || yData.getUnitLabel() != null) {
-				isYTitle = true;
-				break;
-			}
-		}
-
-		if (isYTitle) {
-
-			yAxisWidthLeftWithTitle = yAxisWidthLeft + TITLE_BAR_HEIGHT;
-
-			final GridData gl = (GridData) fComponentAxisLeft.getLayoutData();
-			gl.widthHint = yAxisWidthLeftWithTitle;
-
-			// relayout after the size was changed
-			layout();
-		}
-
-		final Rectangle clientRect = getClientArea();
-
-		// set the visible graph size
-		fVisibleGraphRect = new Rectangle(yAxisWidthLeftWithTitle, 0, clientRect.width
-				- (yAxisWidthLeftWithTitle + yAxisWidthRight), clientRect.height);
-	}
-
-	/**
-	 * adjust the graph width to the synched chart
-	 * 
-	 * @return Returns <code>true</code> when the graph width was set
-	 */
-	private boolean setGraphWidthToSynchedChartWidth() {
-
-		final ChartDataXSerie xData = fChartDataModel.getXData();
-		final int markerStartIndex = xData.getSynchMarkerStartIndex();
-		final int markerEndIndex = xData.getSynchMarkerEndIndex();
-
-		if (fSynchedChartConfig == null || markerStartIndex == -1) {
-			// synchronization is disabled
-			return false;
-		}
-
-		fSynchedChartConfig.yDataMinMaxKeeper.restoreMinMaxValues(fChartDataModel);
-
-		final float synchInDevMarkerWidth = fSynchedChartConfig.devMarkerWidth;
-		final int synchInDevMarkerOffset = fSynchedChartConfig.devMarkerOffset;
-
-		final int[] xValues = xData.getHighValues()[0];
-		final float valueMarkerStart = xValues[markerStartIndex];
-
-		final float valueDiff = xValues[markerEndIndex] - valueMarkerStart;
-		final float valueLast = xValues[xValues.length - 1];
-
-		final float devVirtualGraphImageWidth = valueLast / valueDiff * synchInDevMarkerWidth;
-		final float graphZoomRatio = devVirtualGraphImageWidth / getDevVisibleChartWidth();
-
-		final int devLeftXMarkerPos = (int) (valueMarkerStart / valueLast * devVirtualGraphImageWidth);
-		final int devGraphOffset = devLeftXMarkerPos - synchInDevMarkerOffset;
-
-		fComponentGraph.setGraphImageWidth((int) devVirtualGraphImageWidth,
-				devGraphOffset,
-				graphZoomRatio);
+		if (fChart.fSynchByScale) {} else {}
+//		synchronizeChart_AdjustToSameSize();
+		synchronizeChart_AdjustToSameScale();
 
 		return true;
-	}
-
-	/**
-	 * @param isMarkerVisible
-	 */
-	void setMarkerVisible(final boolean isMarkerVisible) {
-		devMarkerBarHeight = isMarkerVisible ? MARKER_BAR_HEIGHT : 0;
-	}
-
-	/**
-	 * updates the chart data fDataModel and redraw the chart
-	 * 
-	 * @param fChartDataModel
-	 * @throws ChartIsEmptyException
-	 */
-	void setModel(final ChartDataModel chartModel) {
-
-		fChartDataModel = chartModel;
-
-		if (onResize()) {
-			/*
-			 * resetting the sliders require that the drawing data are created, this is done in the
-			 * onResize method
-			 */
-			if (devSliderBarHeight > 0) {
-				fComponentGraph.resetSliders();
-			}
-		}
-	}
-
-	/**
-	 * @param isSliderVisible
-	 */
-	void setSliderVisible(final boolean isSliderVisible) {
-
-		devSliderBarHeight = isSliderVisible ? SLIDER_BAR_HEIGHT : 0;
-
-		fComponentGraph.setXSliderVisible(isSliderVisible);
-	}
-
-	/**
-	 * set the x-sliders to a new position, this is done from a selection provider
-	 * 
-	 * @param sliderPosition
-	 */
-	void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
-
-		if (sliderPosition == null) {
-			/*
-			 * nothing to do when the position was not set, this can happen when the chart was not
-			 * yet created
-			 */
-			return;
-		}
-
-		if (fChartDataModel == null) {
-			return;
-		}
-
-		final ChartXSlider leftSlider = fComponentGraph.getLeftSlider();
-		final ChartXSlider rightSlider = fComponentGraph.getRightSlider();
-
-		int slider1ValueIndex = sliderPosition.slider1ValueIndex;
-		int slider2ValueIndex = sliderPosition.slider2ValueIndex;
-
-		int[] xValues = fChartDataModel.getXData().fHighValues[0];
-
-		if (slider1ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
-			fComponentGraph.setXSliderValueIndex(leftSlider, 0);
-		} else if (slider1ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
-			fComponentGraph.setXSliderValueIndex(leftSlider, slider1ValueIndex);
-		}
-
-		if (slider2ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
-			fComponentGraph.setXSliderValueIndex(rightSlider, xValues.length - 1);
-		} else if (slider2ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
-			fComponentGraph.setXSliderValueIndex(rightSlider, slider2ValueIndex);
-		}
-
-		fComponentGraph.redraw();
-	}
-
-	/**
-	 * Set {@link SynchConfiguration} this is used when the chart is drawn/resized
-	 * 
-	 * @param fSynchedChartConfig
-	 *        the xMarkerPosition to set
-	 */
-	void setSynchConfigIn(final SynchConfiguration synchConfigIn) {
-
-		fSynchedChartConfig = synchConfigIn;
-
-		onResize();
-	}
-
-	void updateChartLayers() {
-
-		if (fChartDrawingData == null) {
-			return;
-		}
-
-		final ArrayList<ChartDataYSerie> yDataList = fChartDataModel.getYData();
-
-		int iGraph = 0;
-
-		// loop all graphs
-		for (final ChartDataYSerie yData : yDataList) {
-			fChartDrawingData.get(iGraph++).getYData().setCustomLayers(yData.getCustomLayers());
-		}
-
-		fComponentGraph.updateChartLayers();
-	}
-
-	/**
-	 */
-	void zoomIn() {
-
-		if (devSliderBarHeight == 0) {
-			fComponentGraph.zoomInWithoutSlider();
-		} else {
-			fComponentGraph.zoomInWithSlider();
-		}
-		onResize();
-	}
-
-	/**
-	 */
-	void zoomOut(final boolean updateChart) {
-		fComponentGraph.zoomOut();
-		if (updateChart) {
-			onResize();
-		}
-	}
-
-	// void zoomToXSlider(final SelectionChartXSliderPosition sliderPosition) {
-	// fComponentGraph.zoomToXSliderPosition(sliderPosition);
-	// onResize();
-	// }
-
-	void zoomWithParts(final int parts, final int position, boolean scrollSmoothly) {
-		fComponentGraph.zoomWithParts(parts, position, scrollSmoothly);
-		onResize();
-	}
-
-	void handleLeftRightEvent(final Event event) {
-
-		switch (fChartDataModel.getChartType()) {
-		case ChartDataModel.CHART_TYPE_BAR:
-			selectBarItem(event);
-			break;
-
-		case ChartDataModel.CHART_TYPE_LINE:
-			fComponentGraph.moveXSlider(event);
-			break;
-
-		default:
-			break;
-		}
 	}
 
 	private void selectBarItem(final Event event) {
@@ -1064,5 +805,399 @@ public class ChartComponents extends Composite {
 				}
 			});
 		}
+	}
+
+	/**
+	 * @param isMarkerVisible
+	 */
+	void setMarkerVisible(final boolean isMarkerVisible) {
+		devMarkerBarHeight = isMarkerVisible ? MARKER_BAR_HEIGHT : 0;
+	}
+
+	/**
+	 * updates the chart data fDataModel and redraw the chart
+	 * 
+	 * @param fChartDataModel
+	 * @throws ChartIsEmptyException
+	 */
+	void setModel(final ChartDataModel chartModel) {
+
+		fChartDataModel = chartModel;
+
+		if (onResize()) {
+			/*
+			 * resetting the sliders require that the drawing data are created, this is done in the
+			 * onResize method
+			 */
+			if (devSliderBarHeight > 0) {
+				fComponentGraph.resetSliders();
+			}
+		}
+	}
+
+	/**
+	 * @param isSliderVisible
+	 */
+	void setSliderVisible(final boolean isSliderVisible) {
+
+		devSliderBarHeight = isSliderVisible ? SLIDER_BAR_HEIGHT : 0;
+
+		fComponentGraph.setXSliderVisible(isSliderVisible);
+	}
+
+	/**
+	 * Set's a {@link SynchConfiguration}, this chart will then be sychronized with the chart which
+	 * sets the synch config
+	 * 
+	 * @param fSynchConfigSrc
+	 *        the xMarkerPosition to set
+	 */
+	void setSynchConfig(final SynchConfiguration synchConfigIn) {
+
+		fSynchConfigSrc = synchConfigIn;
+
+		onResize();
+	}
+
+	private void setVisibleGraphRect() {
+
+		final ArrayList<ChartDataYSerie> yDataList = fChartDataModel.getYData();
+		boolean isYTitle = false;
+
+		// loop all graphs - find the title for the y-axis
+		for (final ChartDataYSerie yData : yDataList) {
+			if (yData.getYTitle() != null || yData.getUnitLabel() != null) {
+				isYTitle = true;
+				break;
+			}
+		}
+
+		if (isYTitle) {
+
+			yAxisWidthLeftWithTitle = yAxisWidthLeft + TITLE_BAR_HEIGHT;
+
+			final GridData gl = (GridData) fComponentAxisLeft.getLayoutData();
+			gl.widthHint = yAxisWidthLeftWithTitle;
+
+			// relayout after the size was changed
+			layout();
+		}
+
+		final Rectangle clientRect = getClientArea();
+
+		// set the visible graph size
+		fVisibleGraphRect = new Rectangle(yAxisWidthLeftWithTitle, 0, clientRect.width
+				- (yAxisWidthLeftWithTitle + yAxisWidthRight), clientRect.height);
+	}
+
+	/**
+	 * adjust the graph width to the synched chart
+	 * 
+	 * @return Returns <code>true</code> when the graph width was set
+	 */
+	private boolean setWidthToSynchedChart_AdjustToSameScale() {
+
+		final ChartDataXSerie xData = fChartDataModel.getXData();
+		final int markerStartIndex = xData.getSynchMarkerStartIndex();
+		final int markerEndIndex = xData.getSynchMarkerEndIndex();
+
+		// check if synchronization is disabled
+		if (fSynchConfigSrc == null || markerStartIndex == -1) {
+			return false;
+		}
+
+		// set min/max values from the source synched chart into this chart
+		fSynchConfigSrc.yDataMinMaxKeeper.setMinMaxValues(fChartDataModel);
+
+		final float markerWidthRatio = fSynchConfigSrc.devMarkerWidth;
+		final float markerOffsetRatio = fSynchConfigSrc.devMarkerOffset;
+
+		final int[] xValues = xData.getHighValues()[0];
+		final float markerValueStart = xValues[markerStartIndex];
+
+		final float markerValueDiff = xValues[markerEndIndex] - markerValueStart;
+		final float lastValue = xValues[xValues.length - 1];
+
+		final int devVisibleChartWidth = getDevVisibleChartWidth();
+
+		/*
+		 * compute marker width
+		 */
+		float devMarkerWidth = devVisibleChartWidth * markerWidthRatio;
+		float devOneValueSlice = devMarkerWidth / markerValueDiff;
+		float devVirtualGraphImageWidth = devOneValueSlice * lastValue;
+
+		/*
+		 * compute marker offset
+		 */
+		float devMarkerOffset = devVisibleChartWidth * markerOffsetRatio;
+		float devMarkerStart = devOneValueSlice * markerValueStart;
+		float devGraphOffset = devMarkerStart - devMarkerOffset;
+
+		// zoom ratio
+		final float graphZoomRatio = devVirtualGraphImageWidth / devVisibleChartWidth;
+
+		fComponentGraph.setGraphImageWidth((int) devVirtualGraphImageWidth,
+				(int) devGraphOffset,
+				graphZoomRatio);
+
+		return true;
+	}
+
+	/**
+	 * adjust the graph width to the synched chart
+	 * 
+	 * @return Returns <code>true</code> when the graph width was set
+	 */
+	@SuppressWarnings("unused")
+	private boolean setWidthToSynchedChart_AdjustToSameSize() {
+
+		final ChartDataXSerie xData = fChartDataModel.getXData();
+		final int markerStartIndex = xData.getSynchMarkerStartIndex();
+		final int markerEndIndex = xData.getSynchMarkerEndIndex();
+
+		if (fSynchConfigSrc == null || markerStartIndex == -1) {
+			// synchronization is disabled
+			return false;
+		}
+
+		// set min/max values from the source synched chart into this chart
+		fSynchConfigSrc.yDataMinMaxKeeper.setMinMaxValues(fChartDataModel);
+
+		final float synchSrcDevMarkerWidth = fSynchConfigSrc.devMarkerWidth;
+		final float synchSrcDevMarkerOffset = fSynchConfigSrc.devMarkerOffset;
+
+		final int[] xValues = xData.getHighValues()[0];
+		final float valueMarkerStart = xValues[markerStartIndex];
+
+		final float valueDiff = xValues[markerEndIndex] - valueMarkerStart;
+		final float valueLast = xValues[xValues.length - 1];
+
+		final float devVirtualGraphImageWidth = valueLast / valueDiff * synchSrcDevMarkerWidth;
+		final float graphZoomRatio = devVirtualGraphImageWidth / getDevVisibleChartWidth();
+
+		final int devLeftSynchMarkerPos = (int) (valueMarkerStart / valueLast * devVirtualGraphImageWidth);
+		final int devGraphOffset = (int) (devLeftSynchMarkerPos - synchSrcDevMarkerOffset);
+
+		fComponentGraph.setGraphImageWidth((int) devVirtualGraphImageWidth,
+				devGraphOffset,
+				graphZoomRatio);
+
+		return true;
+	}
+
+	/**
+	 * set the x-sliders to a new position, this is done from a selection provider
+	 * 
+	 * @param sliderPosition
+	 */
+	void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
+
+		if (sliderPosition == null) {
+			/*
+			 * nothing to do when the position was not set, this can happen when the chart was not
+			 * yet created
+			 */
+			return;
+		}
+
+		if (fChartDataModel == null) {
+			return;
+		}
+
+		final ChartXSlider leftSlider = fComponentGraph.getLeftSlider();
+		final ChartXSlider rightSlider = fComponentGraph.getRightSlider();
+
+		int slider1ValueIndex = sliderPosition.slider1ValueIndex;
+		int slider2ValueIndex = sliderPosition.slider2ValueIndex;
+
+		int[] xValues = fChartDataModel.getXData().fHighValues[0];
+
+		if (slider1ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
+			fComponentGraph.setXSliderValueIndex(leftSlider, 0);
+		} else if (slider1ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+			fComponentGraph.setXSliderValueIndex(leftSlider, slider1ValueIndex);
+		}
+
+		if (slider2ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
+			fComponentGraph.setXSliderValueIndex(rightSlider, xValues.length - 1);
+		} else if (slider2ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+			fComponentGraph.setXSliderValueIndex(rightSlider, slider2ValueIndex);
+		}
+
+		fComponentGraph.redraw();
+	}
+
+	/**
+	 * set the {@link SynchConfiguration} when this chart is the source for the synched chart
+	 */
+	private void synchronizeChart_AdjustToSameScale() {
+
+		final ChartDataXSerie xData = fChartDataModel.getXData();
+
+		final int markerValueIndexStart = xData.getSynchMarkerStartIndex();
+		final int markerValueIndexEnd = xData.getSynchMarkerEndIndex();
+
+		if (markerValueIndexStart == -1) {
+
+			// disable chart synch
+			fSynchConfigOut = null;
+			return;
+		}
+
+		/*
+		 * create synch configuration data
+		 */
+
+		final int[] xValues = xData.getHighValues()[0];
+		final float markerStartValue = xValues[markerValueIndexStart];
+		final float markerEndValue = xValues[markerValueIndexEnd];
+
+		final float valueDiff = markerEndValue - markerStartValue;
+		final float lastValue = xValues[xValues.length - 1];
+
+		final float devVirtualGraphImageWidth = fComponentGraph.getDevVirtualGraphImageWidth();
+		final float devGraphImageXOffset = fComponentGraph.getDevGraphImageXOffset();
+
+		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
+
+		final float devMarkerWidth = (int) (valueDiff * devOneValueSlice);
+		final float devMarkerStartPos = (int) (markerStartValue * devOneValueSlice);
+		final float devMarkerOffset = (int) (devMarkerStartPos - devGraphImageXOffset);
+
+		final int devVisibleChartWidth = getDevVisibleChartWidth();
+
+		float markerWidthRatio = devMarkerWidth / devVisibleChartWidth;
+		float markerOffsetRatio = devMarkerOffset / devVisibleChartWidth;
+
+		// ---------------------------------------------------------------------------------------
+
+		final SynchConfiguration newSynchConfigOut = new SynchConfiguration(markerWidthRatio,
+				markerOffsetRatio,
+				fChartDataModel);
+
+		boolean fireEvent = false;
+
+		if (fSynchConfigOut == null) {
+			// synch new config
+			fireEvent = true;
+		} else if (fSynchConfigOut.isEqual(newSynchConfigOut) == false) {
+			// synch changed config
+			fireEvent = true;
+		}
+
+		if (fireEvent) {
+
+			// set new synch config
+			fSynchConfigOut = newSynchConfigOut;
+
+			fChart.synchronizeChart();
+		}
+	}
+
+	/**
+	 * set the {@link SynchConfiguration} when this chart is the source for the synched chart
+	 */
+	@SuppressWarnings("unused")
+	private void synchronizeChart_AdjustToSameSize() {
+
+		final ChartDataXSerie xData = fChartDataModel.getXData();
+
+		final int markerValueIndexStart = xData.getSynchMarkerStartIndex();
+		final int markerValueIndexEnd = xData.getSynchMarkerEndIndex();
+
+		if (markerValueIndexStart == -1) {
+
+			// disable chart synch
+			fSynchConfigOut = null;
+			return;
+		}
+
+		final int[] xValues = xData.getHighValues()[0];
+		final float markerStartValue = xValues[markerValueIndexStart];
+		final float markerEndValue = xValues[markerValueIndexEnd];
+
+		final float valueDiff = markerEndValue - markerStartValue;
+		final float lastValue = xValues[xValues.length - 1];
+
+		final float devVirtualGraphImageWidth = fComponentGraph.getDevVirtualGraphImageWidth();
+		final float devGraphImageXOffset = fComponentGraph.getDevGraphImageXOffset();
+
+		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
+
+		final int devMarkerWidth = (int) (valueDiff * devOneValueSlice);
+		final int devMarkerStartPos = (int) (markerStartValue * devOneValueSlice);
+		final int devMarkerOffset = (int) (devMarkerStartPos - devGraphImageXOffset);
+
+		final SynchConfiguration newSynchConfigOut = new SynchConfiguration(devMarkerWidth,
+				devMarkerOffset,
+				fChartDataModel);
+
+		boolean fireEvent = false;
+
+		if (fSynchConfigOut == null) {
+			// synch new config
+			fireEvent = true;
+		} else if (fSynchConfigOut.isEqual(newSynchConfigOut) == false) {
+			// synch changed config
+			fireEvent = true;
+		}
+
+		if (fireEvent) {
+
+			// set new synch config
+			fSynchConfigOut = newSynchConfigOut;
+
+			fChart.synchronizeChart();
+		}
+	}
+
+	void updateChartLayers() {
+
+		if (fChartDrawingData == null) {
+			return;
+		}
+
+		final ArrayList<ChartDataYSerie> yDataList = fChartDataModel.getYData();
+
+		int iGraph = 0;
+
+		// loop all graphs
+		for (final ChartDataYSerie yData : yDataList) {
+			fChartDrawingData.get(iGraph++).getYData().setCustomLayers(yData.getCustomLayers());
+		}
+
+		fComponentGraph.updateChartLayers();
+	}
+
+	// void zoomToXSlider(final SelectionChartXSliderPosition sliderPosition) {
+	// fComponentGraph.zoomToXSliderPosition(sliderPosition);
+	// onResize();
+	// }
+
+	/**
+	 */
+	void zoomIn() {
+
+		if (devSliderBarHeight == 0) {
+			fComponentGraph.zoomInWithoutSlider();
+		} else {
+			fComponentGraph.zoomInWithSlider();
+		}
+		onResize();
+	}
+
+	/**
+	 */
+	void zoomOut(final boolean updateChart) {
+		fComponentGraph.zoomOut();
+		if (updateChart) {
+			onResize();
+		}
+	}
+
+	void zoomWithParts(final int parts, final int position, boolean scrollSmoothly) {
+		fComponentGraph.zoomWithParts(parts, position, scrollSmoothly);
+		onResize();
 	}
 }

@@ -16,33 +16,31 @@
 package net.tourbook.chart;
 
 /**
- * {@link SynchConfiguration} is used to synch 2 charts. Chart A sets the
- * zoomMarkerPositionOut which can be read (and set to zoomMarkerPositionIn)
- * from the chart B. Chart B will then be synched to chart A
+ * {@link SynchConfiguration} is used to synchronize 2 charts. Chart A sets the
+ * zoomMarkerPositionOut which can be read (and set to zoomMarkerPositionIn) from the chart B. Chart
+ * B will then be synched to chart A
  */
 public class SynchConfiguration {
 
 	/**
-	 * width for the marker, this can be smaller or wider than the visible part
-	 * of the chart
+	 * width for the marker, this can be smaller or wider than the visible part of the chart
 	 */
-	int						devMarkerWidth;
+	float					devMarkerWidth;
 
 	/**
-	 * offset for the marker start position, this value starts at the left
-	 * position of the visible graph, this also can be a negative value
+	 * offset for the marker start position, this value starts at the left position of the visible
+	 * graph, this can also be a negative value
 	 */
-	int						devMarkerOffset;
+	float					devMarkerOffset;
 
 	ChartYDataMinMaxKeeper	yDataMinMaxKeeper	= new ChartYDataMinMaxKeeper();
 
 	/**
-	 * The ZoomMarkerPosition describes the position and width for the x-marker
-	 * in the graph
+	 * The ZoomMarkerPosition describes the position and width for the x-marker in the graph
 	 * 
 	 * @param chartDataModel
 	 */
-	public SynchConfiguration(int devMarkerWidth, int devMarkerOffset,
+	public SynchConfiguration(float devMarkerWidth, float devMarkerOffset,
 			ChartDataModel chartDataModel) {
 
 		this.devMarkerWidth = devMarkerWidth;
@@ -53,8 +51,8 @@ public class SynchConfiguration {
 
 	/**
 	 * @param newXMarkerPosition
-	 * @return Returns <code>true</code> when the newXMarkerPosition has the
-	 *         same values as the current object
+	 * @return Returns <code>true</code> when the newXMarkerPosition has the same values as the
+	 *         current object
 	 */
 	public boolean isEqual(SynchConfiguration newXMarkerPosition) {
 		if (devMarkerWidth == newXMarkerPosition.devMarkerWidth

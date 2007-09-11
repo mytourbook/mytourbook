@@ -30,7 +30,7 @@ class ActionGraph extends Action {
 	/**
 	 * Creates an action for a toggle button
 	 * 
-	 * @param fTourChart
+	 * @param fCompareTourChart
 	 * @param fGraphId
 	 * @param label
 	 * @param toolTip

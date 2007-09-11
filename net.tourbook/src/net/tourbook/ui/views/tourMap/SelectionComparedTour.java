@@ -3,7 +3,7 @@ package net.tourbook.ui.views.tourMap;
 import org.eclipse.jface.viewers.ISelection;
 
 /**
- * Selection is a reference tour
+ * This selection contains data for a compared tour
  */
 public class SelectionComparedTour implements ISelection {
 

@@ -40,9 +40,9 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ReferenceTourManager {
 
-	private static ReferenceTourManager			instance			= null;
+	private static ReferenceTourManager				instance			= null;
 
-	private final HashMap<Long, CompareTourConfig>	fRefChartDataCache	= new HashMap<Long, CompareTourConfig>();
+	private final HashMap<Long, TourCompareConfig>	fCompareConfigCache	= new HashMap<Long, TourCompareConfig>();
 
 	private ReferenceTourManager() {}
 
@@ -108,11 +108,21 @@ public class ReferenceTourManager {
 		return referenceTours.toArray();
 	}
 
-	public CompareTourConfig getCompareTourConfig(Long refId) {
-		return fRefChartDataCache.get(refId);
+	/**
+	 * @param refId
+	 * @return Returns the compare configuration for the reference id
+	 */
+	public TourCompareConfig getTourCompareConfig(Long refId) {
+		return fCompareConfigCache.get(refId);
 	}
 
-	public void setRefTourConfig(long refId, CompareTourConfig refTourConfig) {
-		fRefChartDataCache.put(refId, refTourConfig);
+	/**
+	 * Sets the compare configuration for the reference id
+	 * 
+	 * @param refId
+	 * @param refTourConfig
+	 */
+	public void setTourCompareConfig(long refId, TourCompareConfig refTourConfig) {
+		fCompareConfigCache.put(refId, refTourConfig);
 	}
 }

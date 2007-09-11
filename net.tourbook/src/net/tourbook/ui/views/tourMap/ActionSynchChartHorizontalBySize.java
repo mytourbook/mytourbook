@@ -20,11 +20,11 @@ import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSynchChartHorizontal extends Action {
+public class ActionSynchChartHorizontalBySize extends Action {
 
 	private ISynchedChart	synchChart;
 
-	public ActionSynchChartHorizontal(ISynchedChart resultView) {
+	public ActionSynchChartHorizontalBySize(ISynchedChart resultView) {
 
 		super(null, AS_CHECK_BOX);
 
@@ -38,6 +38,6 @@ public class ActionSynchChartHorizontal extends Action {
 
 	@Override
 	public void run() {
-		synchChart.synchCharts(isChecked());
+		synchChart.synchCharts(isChecked(), true);
 	}
 }

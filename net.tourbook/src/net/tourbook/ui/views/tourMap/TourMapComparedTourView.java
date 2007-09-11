@@ -42,39 +42,56 @@ import org.eclipse.ui.part.PageBook;
 
 public class TourMapComparedTourView extends TourChartViewPart implements ISynchedChart {
 
-	public static final String			ID	= "net.tourbook.views.tourMap.comparedTourView";	//$NON-NLS-1$
+	public static final String					ID				= "net.tourbook.views.tourMap.comparedTourView";	//$NON-NLS-1$
 
-	private long						fActiveRefId;
-	private long						fActiveCompTourId;
+	/*
+	 * keep data from the reference tour view
+	 */
+	private long								fRefTourRefId	= -1;
+	private TourChart							fRefTourTourChart;
+	private int									fRefTourXMarkerValueDifference;
 
-	private PageBook					fPageBook;
-	private Label						fPageNoChart;
+	/*
+	 * CT ... (c)ompared (t)our which is displayed in this view
+	 */
 
-	private ITourPropertyListener		fRefTourPropertyListener;
+	/**
+	 * Tour Id for the displayed compared tour
+	 */
+	private long								fCTTourId		= -1;
 
-	private int							fRefTourXMarkerValueDifference;
+	/**
+	 * Reference Id for the displayed compared tour
+	 */
+	private long								fCTRefId		= -1;
 
-	private TourChart					fRefTourChart;
-	private ActionSynchChartHorizontal	fActionSynchCharts;
+	/**
+	 * Reference tour chart for the displayed compared tour
+	 */
+	private TourChart							fCTRefTourChart;
+
+	private PageBook							fPageBook;
+	private Label								fPageNoChart;
+
+	private ITourPropertyListener				fRefTourPropertyListener;
+
+	private ActionSynchChartHorizontalBySize	fActionSynchCharts;
 
 	private void addRefTourPropertyListener() {
 
 		fRefTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(int propertyId, Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED) {
-					if (propertyData instanceof TourPropertyRefTourChanged) {
+				if (propertyId == TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED
+						&& propertyData instanceof TourPropertyRefTourChanged) {
 
-						TourPropertyRefTourChanged tourProperty = (TourPropertyRefTourChanged) propertyData;
+					TourPropertyRefTourChanged tourProperty = (TourPropertyRefTourChanged) propertyData;
 
-						if (fActiveRefId == tourProperty.refId) {
-							fRefTourXMarkerValueDifference = tourProperty.xMarkerValue;
-							fRefTourChart = tourProperty.refTourChart;
+					fRefTourRefId = tourProperty.refId;
+					fRefTourTourChart = tourProperty.refTourChart;
+					fRefTourXMarkerValueDifference = tourProperty.xMarkerValue;
 
-							fActionSynchCharts.setEnabled(true);
-
-						}
-					}
+					synchCharts();
 				}
 			}
 		};
@@ -84,10 +101,9 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 
 	private void createActions() {
 
-		fActionSynchCharts = new ActionSynchChartHorizontal(this);
-		fActionSynchCharts.setEnabled(false);
+		fActionSynchCharts = new ActionSynchChartHorizontalBySize(this);
 
-		final IToolBarManager tbm = fTourChart.getToolBarManager();
+		final IToolBarManager tbm = fCompareTourChart.getToolBarManager();
 		tbm.add(fActionSynchCharts);
 
 		tbm.update(true);
@@ -103,12 +119,12 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 		fPageNoChart = new Label(fPageBook, SWT.NONE);
 		fPageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
-		fTourChart = new TourChart(fPageBook, SWT.FLAT, true);
-		fTourChart.setShowZoomActions(true);
-		fTourChart.setShowSlider(true);
-		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+		fCompareTourChart = new TourChart(fPageBook, SWT.FLAT, true);
+		fCompareTourChart.setShowZoomActions(true);
+		fCompareTourChart.setShowSlider(true);
+		fCompareTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 
-		fTourChart.addDoubleClickListener(new Listener() {
+		fCompareTourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(Event event) {
 				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
 			}
@@ -125,6 +141,8 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 		} else {
 			fPageBook.showPage(fPageNoChart);
 		}
+
+		synchCharts();
 	}
 
 	@Override
@@ -144,35 +162,39 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 
 	@Override
 	public void setFocus() {
-		fTourChart.setFocus();
+		fCompareTourChart.setFocus();
 	}
 
+	/**
+	 * Shows the compared tour which was selected by the user in the {@link TourMapView}
+	 * 
+	 * @param selectionComparedTour
+	 */
 	private void showCompTour(final SelectionComparedTour selectionComparedTour) {
 
-		final Long compTourId = selectionComparedTour.getCompTourId();
+		final Long ctTourId = selectionComparedTour.getCompTourId();
 
 		// check if the ref tour is already displayed
-		if (compTourId == null || compTourId == fActiveCompTourId) {
+		if (ctTourId == null || fCTTourId == ctTourId) {
 			return;
 		}
 
-		// load the tourdata for the compared tour from the database
-		final TourData compTourData = TourManager.getInstance().getTourData(compTourId);
-
+		// load the tourdata of the compared tour from the database
+		final TourData compTourData = TourManager.getInstance().getTourData(ctTourId);
 		if (compTourData == null) {
 			return;
 		}
 
 		// set active id's 
-		fActiveCompTourId = compTourId;
-		fActiveRefId = selectionComparedTour.getRefId();
+		fCTTourId = ctTourId;
+		fCTRefId = selectionComparedTour.getRefId();
 
-		fTourChart.addDataModelListener(new IDataModelListener() {
+		fCompareTourChart.addDataModelListener(new IDataModelListener() {
 			public void dataModelChanged(ChartDataModel changedChartDataModel) {
 
 				ChartDataXSerie xData = changedChartDataModel.getXData();
 
-				// set marker
+				// set synch marker data
 				xData.setSynchMarkerValueIndex(selectionComparedTour.getCompareStartIndex(),
 						selectionComparedTour.getCompareEndIndex());
 
@@ -182,7 +204,7 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 			}
 		});
 
-		fTourChart.addXMarkerDraggingListener(new IChartListener() {
+		fCompareTourChart.addXMarkerDraggingListener(new IChartListener() {
 
 			public int getXMarkerValueDiff() {
 				return fRefTourXMarkerValueDifference;
@@ -194,8 +216,8 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 			}
 		});
 
-		CompareTourConfig tourCompareConfig = ReferenceTourManager.getInstance()
-				.getCompareTourConfig(selectionComparedTour.getRefId());
+		TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance()
+				.getTourCompareConfig(selectionComparedTour.getRefId());
 
 		if (tourCompareConfig != null) {
 
@@ -206,17 +228,58 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 			/*
 			 * fire the change event so that the tour markers updated
 			 */
-			fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart,
-					fTourChart.getTourData()));
+			fPostSelectionProvider.setSelection(new SelectionTourData(fCompareTourChart,
+					fCompareTourChart.getTourData()));
 
 			updateChart();
+
+			synchCharts();
 		}
 
 	}
 
-	public void synchCharts(boolean isSynched) {
-		if (fRefTourChart != null) {
-			fRefTourChart.setSynchedChart(isSynched, fTourChart);
+	private void synchCharts() {
+
+		// check initial value
+		if (fCTRefId == -1) {
+			fActionSynchCharts.setEnabled(false);
+			return;
+		}
+
+		boolean isSynchEnabled = false;
+
+		if (fCTRefId == fRefTourRefId) {
+
+			// reference tour for the compared chart is displayed
+
+			if (fCTRefTourChart != fRefTourTourChart) {
+
+				fCTRefTourChart = fRefTourTourChart;
+			}
+
+			isSynchEnabled = true;
+
+		} else {
+
+			// another ref tour is displayed, disable synchronization
+
+			if (fCTRefTourChart != null) {
+				fCTRefTourChart.setSynchedChart(false, fCompareTourChart, true);
+			}
+			fActionSynchCharts.setChecked(false);
+		}
+
+		fActionSynchCharts.setEnabled(isSynchEnabled);
+
+//		if (fCTRefId == tourProperty.refId) {
+//			fActionSynchCharts.setEnabled(true);
+//
+//		}
+	}
+
+	public void synchCharts(boolean isSynched, boolean synchByScale) {
+		if (fCTRefTourChart != null) {
+			fCTRefTourChart.setSynchedChart(isSynched, fCompareTourChart, synchByScale);
 		}
 	}
 
@@ -227,9 +290,9 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 			return;
 		}
 
-		fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
+		fCompareTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 
-		fPageBook.showPage(fTourChart);
+		fPageBook.showPage(fCompareTourChart);
 
 		// set application window title
 		setTitleToolTip(TourManager.getTourDate(fTourData));

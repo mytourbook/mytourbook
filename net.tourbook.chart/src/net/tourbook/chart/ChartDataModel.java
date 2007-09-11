@@ -25,17 +25,17 @@ import java.util.HashMap;
  */
 public class ChartDataModel {
 
-	public static final int				CHART_TYPE_LINE			= 10;
-	public static final int				CHART_TYPE_BAR			= 20;
-	public static final int				CHART_TYPE_LINE_WITH_BARS			= 30;
+	public static final int				CHART_TYPE_LINE				= 10;
+	public static final int				CHART_TYPE_BAR				= 20;
+	public static final int				CHART_TYPE_LINE_WITH_BARS	= 30;
 
-	public static final String			BAR_INFO_PROVIDER		= "BarInfoProvider";				//$NON-NLS-1$
-	public static final String			BAR_CONTEXT_PROVIDER	= "BarContextProvider";			//$NON-NLS-1$
+	public static final String			BAR_INFO_PROVIDER			= "BarInfoProvider";				//$NON-NLS-1$
+	public static final String			BAR_CONTEXT_PROVIDER		= "BarContextProvider";			//$NON-NLS-1$
 
-	private int							fChartType				= CHART_TYPE_LINE;
+	private int							fChartType					= CHART_TYPE_LINE;
 
-	private ChartDataXSerie				xData					= null;
-	private ChartDataXSerie				xData2nd				= null;
+	private ChartDataXSerie				xData						= null;
+	private ChartDataXSerie				xData2nd					= null;
 
 	/**
 	 * title for the chart, will be positioned on top of the chart
@@ -45,31 +45,31 @@ public class ChartDataModel {
 	/**
 	 * Contains data series for the y axis
 	 */
-	private ArrayList<ChartDataYSerie>	yData					= new ArrayList<ChartDataYSerie>();
+	private ArrayList<ChartDataYSerie>	yData						= new ArrayList<ChartDataYSerie>();
 
 	/**
 	 * Contains all data series for the x and y axis and also hidden data which are not displayed in
 	 * the chart
 	 */
-	private ArrayList<ChartDataSerie>	xyData					= new ArrayList<ChartDataSerie>();
+	private ArrayList<ChartDataSerie>	xyData						= new ArrayList<ChartDataSerie>();
 
 	/**
 	 * storage for custom data
 	 */
-	private HashMap<String, Object>		customData				= new HashMap<String, Object>();
+	private HashMap<String, Object>		customData					= new HashMap<String, Object>();
 
 	/**
 	 * true: the chart graphs are separate drawn vertically
 	 * <p>
 	 * false: the chart graphs are drawn on top of each other
 	 */
-	private boolean						isStackedChart			= true;
+	private boolean						isStackedChart				= true;
 
 	/**
 	 * minimum width for the chart, this can be overwritten for e.g. to show in a year chart for
 	 * each day at least one pixel
 	 */
-	private int							chartMinWidth			= ChartComponents.CHART_MIN_WIDTH;
+	private int							chartMinWidth				= ChartComponents.CHART_MIN_WIDTH;
 
 	public ChartDataModel(int chartType) {
 		fChartType = chartType;
@@ -148,7 +148,7 @@ public class ChartDataModel {
 	}
 
 	/**
-	 * reset the min/max values of the chart to the min/max values in the data
+	 * reset the min/max values of the chart to the min/max values from the original data
 	 */
 	public void resetMinMaxValues() {
 

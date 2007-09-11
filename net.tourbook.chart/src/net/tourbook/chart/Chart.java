@@ -51,6 +51,10 @@ public class Chart extends ViewForm {
 
 	static final int					NO_BAR_SELECTION			= -1;
 
+	public static final int				SYNCH_MODE_NO				= 0;
+	public static final int				SYNCH_MODE_BY_SCALE			= 1;
+	public static final int				SYNCH_MODE_BY_SIZE			= 2;
+
 	private final ListenerList			fFocusListeners				= new ListenerList();
 	private final ListenerList			fBarSelectionListeners		= new ListenerList();
 	private final ListenerList			fSliderMoveListeners		= new ListenerList();
@@ -90,6 +94,8 @@ public class Chart extends ViewForm {
 
 	private boolean						fIsFillToolbar				= true;
 	private boolean						fIsToolbarCreated;
+
+	boolean								fSynchByScale;
 
 	/**
 	 * Chart widget
@@ -405,23 +411,6 @@ public class Chart extends ViewForm {
 		}
 	}
 
-	/**
-	 * fire the current x-marker position which is in
-	 * <code>chartComponents.xMarkerPositionOut</code>
-	 */
-	protected void fireSynchConfigListener() {
-
-		if (fSynchedChart == null) {
-			return;
-		}
-
-		getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				fSynchedChart.setSynchConfigIn(fChartComponents.fSynchConfigOut);
-			}
-		});
-	}
-
 	public boolean getAdvancedGraphics() {
 		return fChartComponents.useAdvancedGraphics;
 	}
@@ -711,15 +700,23 @@ public class Chart extends ViewForm {
 	}
 
 	/**
-	 * @param toolbarMgr
-	 * @param isFillToolbar
-	 *        set <code>false</code> when the toolbar will be filled with
-	 *        {@link Chart#fillToolbar(boolean)} from externally, when <code>true</code> the
-	 *        toolbar will be filled when the chart is updated
+	 * set the synch configuration which is used when the chart is drawn/resized
+	 * 
+	 * @param synchConfigIn
+	 *        set <code>null</code> to disable the synchronization
 	 */
-	public void setToolBarManager(IToolBarManager toolbarMgr, boolean isFillToolbar) {
-		fToolbarMgr = toolbarMgr;
-		fIsFillToolbar = isFillToolbar;
+	public void setSynchConfig(SynchConfiguration synchConfigIn) {
+		fChartComponents.setSynchConfig(synchConfigIn);
+	}
+
+	/**
+	 * Set's the {@link SynchConfiguration} listener, this is a {@link Chart} which will be notified
+	 * when this chart is resized, <code>null</code> will disable the synchronisation
+	 * 
+	 * @param chartWidget
+	 */
+	public void setSynchedChart(Chart chartWidget) {
+		fSynchedChart = chartWidget;
 	}
 
 //	/**
@@ -731,6 +728,18 @@ public class Chart extends ViewForm {
 //	public void setUseInternalActionBar(boolean useInternalActionBar) {
 //		fUseInternalActionBar = useInternalActionBar;
 //	}
+
+	/**
+	 * @param toolbarMgr
+	 * @param isFillToolbar
+	 *        set <code>false</code> when the toolbar will be filled with
+	 *        {@link Chart#fillToolbar(boolean)} from externally, when <code>true</code> the
+	 *        toolbar will be filled when the chart is updated
+	 */
+	public void setToolBarManager(IToolBarManager toolbarMgr, boolean isFillToolbar) {
+		fToolbarMgr = toolbarMgr;
+		fIsFillToolbar = isFillToolbar;
+	}
 
 	/**
 	 * sets the position of the x-sliders
@@ -757,27 +766,24 @@ public class Chart extends ViewForm {
 		fActionHandlerManager.updateUIState();
 	}
 
-	/**
-	 * set the synch configuration which is used when the chart is drawn/resized
-	 * 
-	 * @param synchConfigIn
-	 */
-	public void setSynchConfigIn(SynchConfiguration synchConfigIn) {
-		fChartComponents.setSynchConfigIn(synchConfigIn);
-	}
-
-	/**
-	 * Set's the {@link SynchConfiguration} listener, this is a {@link Chart} which will be notified
-	 * when this chart is resized, <code>null</code> will disable the synchronisation
-	 * 
-	 * @param chartWidget
-	 */
-	public void setSynchedChart(Chart chartWidget) {
-		fSynchedChart = chartWidget;
-	}
-
 	public void switchSlidersTo2ndXData() {
 		fChartComponents.getChartComponentGraph().switchSlidersTo2ndXData();
+	}
+
+	/**
+	 * synchronize the charts
+	 */
+	protected void synchronizeChart() {
+
+		if (fSynchedChart == null) {
+			return;
+		}
+
+		getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				fSynchedChart.setSynchConfig(fChartComponents.fSynchConfigOut);
+			}
+		});
 	}
 
 	private void updateActionState() {
@@ -932,6 +938,10 @@ public class Chart extends ViewForm {
 		}
 
 		fChartComponents.zoomWithParts(parts, position, scrollSmoothly);
+	}
+
+	protected void setSynchByScale(boolean synchByScale) {
+		fSynchByScale = synchByScale;
 	}
 
 }

@@ -73,18 +73,19 @@ public class ChartYDataMinMaxKeeper {
 	}
 
 	/**
-	 * Restore min/max values for all data series from the data model
+	 * Set min/max values from this min/max keeper into a data model
 	 * 
-	 * @param chartDataModel
+	 * @param chartDataModelOut
+	 *        data model which min/max data will be set from this min/max keeper
 	 */
-	public void restoreMinMaxValues(ChartDataModel chartDataModel) {
+	public void setMinMaxValues(ChartDataModel chartDataModelOut) {
 
 		if (fMinValues == null) {
 			// min/max values have not yet been saved, so nothing can be restored
 			return;
 		}
 //		System.out.println("restoreMinMaxValues" + chartDataModel);
-		ArrayList<ChartDataSerie> xyData = chartDataModel.getXyData();
+		ArrayList<ChartDataSerie> xyData = chartDataModelOut.getXyData();
 
 		// loop: restore min/max values for all data series
 		for (ChartDataSerie chartData : xyData) {

@@ -136,7 +136,7 @@ public class CompareResultView extends ISynchedChart {
 
 	PostSelectionProvider					fPostSelectionProvider;
 
-	private HashMap<Long, CompareTourConfig>	fRefChartDataCache		= new HashMap<Long, CompareTourConfig>();
+	private HashMap<Long, TourCompareConfig>	fRefChartDataCache		= new HashMap<Long, TourCompareConfig>();
 
 	/**
 	 * resource manager for images
@@ -398,7 +398,7 @@ public class CompareResultView extends ISynchedChart {
 
 		fActionSaveComparedTours = new ActionSaveComparedTours();
 		fActionRemoveComparedTourSaveStatus = new ActionRemoveComparedTourSaveStatus(this);
-		fActionSynchChartsHorizontal = new ActionSynchChartHorizontal(this);
+		fActionSynchChartsHorizontal = new ActionSynchChartHorizontalBySize(this);
 
 		// extend the toolbar int eht compared tour
 		IToolBarManager tbm = fCompTourChart.getToolBarManager();
@@ -684,10 +684,10 @@ public class CompareResultView extends ISynchedChart {
 		enableActions();
 	}
 
-	private CompareTourConfig getRefChartData(TourReference refTour) {
+	private TourCompareConfig getRefChartData(TourReference refTour) {
 
 		// get the reference chart from the cache
-		CompareTourConfig refTourChartData = fRefChartDataCache.get(refTour.getRefId());
+		TourCompareConfig refTourChartData = fRefChartDataCache.get(refTour.getRefId());
 
 		if (refTourChartData != null) {
 			return refTourChartData;
@@ -708,7 +708,7 @@ public class CompareResultView extends ISynchedChart {
 		ChartDataModel refChartDataModel = TourManager.getInstance().createChartDataModel(tourData,
 				refTourChartConfig);
 
-		return new CompareTourConfig(refTour,
+		return new TourCompareConfig(refTour,
 				refChartDataModel,
 				tourData,
 				refTourChartConfig,
@@ -905,7 +905,7 @@ public class CompareResultView extends ISynchedChart {
 		fCompTourChart.addDataModelListener(dataModelListener);
 
 		// get the tour chart configuration
-		CompareTourConfig refTourChartData = fRefChartDataCache.get(fCurrentRefTour.getRefId());
+		TourCompareConfig refTourChartData = fRefChartDataCache.get(fCurrentRefTour.getRefId());
 		TourChartConfiguration compTourChartConfig = refTourChartData.getCompTourChartConfig();
 
 		fCompTourChart.setBackgroundColor(Display.getCurrent()
@@ -927,7 +927,7 @@ public class CompareResultView extends ISynchedChart {
 			return;
 		}
 
-		final CompareTourConfig refTourChartData = getRefChartData(refTour);
+		final TourCompareConfig refTourChartData = getRefChartData(refTour);
 
 		fRefTourChart.addDataModelListener(new IDataModelListener() {
 
@@ -966,7 +966,7 @@ public class CompareResultView extends ISynchedChart {
 
 	private void showRefTourInfo(long refId) {
 
-		CompareTourConfig refTourChartData = fRefChartDataCache.get(refId);
+		TourCompareConfig refTourChartData = fRefChartDataCache.get(refId);
 
 		fRefTourInfo.updateInfo(refTourChartData);
 

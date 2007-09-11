@@ -15,18 +15,29 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourMap;
 
-public interface ISynchedChart {
+import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
 
-	public static final int	SYNCH_VERTICAL		= 0x01;
-	public static final int	SYNCH_HORIZONTAL	= 0x02;
+import org.eclipse.jface.action.Action;
 
-	/**
-	 * synchronize the reference tour chart with the compared tour chart
-	 * 
-	 * @param isSynched
-	 * @param synchByScale
-	 *        <code>true</code> to synch by scale, <code>false</code> to synch by size
-	 */
-	abstract void synchCharts(boolean isSynched, boolean synchByScale);
+public class ActionSynchChartHorizontalByScale extends Action {
 
+	private ISynchedChart	synchChart;
+
+	public ActionSynchChartHorizontalByScale(ISynchedChart resultView) {
+
+		super(null, AS_CHECK_BOX);
+
+		this.synchChart = resultView;
+
+		setToolTipText(Messages.TourMap_Action_synch_charts_tooltip);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_synch_graph_horizontal));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_synch_graph_horizontal_disabled));
+	}
+
+	@Override
+	public void run() {
+		synchChart.synchCharts(isChecked(), true);
+	}
 }

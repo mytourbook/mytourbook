@@ -546,7 +546,7 @@ public class ChartComponentGraph extends Canvas {
 		 * when the chart is synchronized, the y-slider position is modified, so we overwrite the
 		 * synchronized chart y-slider positions until the zoom in marker is overwritten
 		 */
-		final SynchConfiguration synchedChartConfig = fChartComponents.fSynchedChartConfig;
+		final SynchConfiguration synchedChartConfig = fChartComponents.fSynchConfigSrc;
 
 		if (synchedChartConfig != null) {
 
@@ -1117,7 +1117,7 @@ public class ChartComponentGraph extends Canvas {
 
 		// get the horizontal offset for the graph
 		int graphValueOffset;
-		if (fChartComponents.fSynchedChartConfig == null) {
+		if (fChartComponents.fSynchConfigSrc == null) {
 			// a zoom marker is not set, draw it normally
 			graphValueOffset = (int) (Math.max(0, fDevGraphImageXOffset) / scaleX);
 		} else {
@@ -1301,7 +1301,7 @@ public class ChartComponentGraph extends Canvas {
 
 		// get the horizontal offset for the graph
 		int graphValueOffset;
-		if (fChartComponents.fSynchedChartConfig == null) {
+		if (fChartComponents.fSynchConfigSrc == null) {
 			// a zoom marker is not set, draw it normally
 			graphValueOffset = (int) (Math.max(0, fDevGraphImageXOffset) / scaleX);
 		} else {
@@ -2058,7 +2058,7 @@ public class ChartComponentGraph extends Canvas {
 
 		// get the horizontal offset for the graph
 		int graphValueOffset;
-		if (fChartComponents.fSynchedChartConfig == null) {
+		if (fChartComponents.fSynchConfigSrc == null) {
 			// a zoom marker is not set, draw it normally
 			graphValueOffset = (int) (Math.max(0, fDevGraphImageXOffset) / scaleX);
 		} else {
@@ -2911,14 +2911,16 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * @return
+	 * @return when the zoomed graph can't be scrolled the chart image can be wider than the visible
+	 *         part. It returns the device offset to the start of the visible chart
 	 */
 	int getDevGraphImageXOffset() {
 		return fDevGraphImageXOffset;
 	}
 
 	/**
-	 * @return the devVirtualGraphImageWidth
+	 * @return Returns the virtual graph image width, this is the width of the graph image when the
+	 *         full graph would be displayed
 	 */
 	int getDevVirtualGraphImageWidth() {
 		return fDevVirtualGraphImageWidth;
@@ -3097,6 +3099,10 @@ public class ChartComponentGraph extends Canvas {
 		return isBarHit;
 	}
 
+	/**
+	 * @param devXGraph
+	 * @return Returns <code>true</code> when the synch marker was hit
+	 */
 	private boolean isSynchMarkerHit(final int devXGraph) {
 
 		final ChartDataXSerie xData = getXData();
@@ -3416,7 +3422,7 @@ public class ChartComponentGraph extends Canvas {
 			} else {
 
 				/*
-				 * start to move the x-marker, when a dragging listener and x-marker is set
+				 * start to move the x-marker, when a dragging listener and the x-marker was hit
 				 */
 				if (fChart.fXMarkerDraggingListener != null && isSynchMarkerHit(devXGraph)) {
 
@@ -4086,16 +4092,16 @@ public class ChartComponentGraph extends Canvas {
 		return isFocus;
 	}
 
-	void setGraphImageWidth(final int devChartImageWidth,
-							final int devGraphXOffset,
+	void setGraphImageWidth(final int devVirtualGraphImageWidth,
+							final int devGraphImageXOffset,
 							final float graphZoomRatio) {
 
-		fDevVirtualGraphImageWidth = devChartImageWidth;
-		fDevGraphImageXOffset = devGraphXOffset;
+		fDevVirtualGraphImageWidth = devVirtualGraphImageWidth;
+		fDevGraphImageXOffset = devGraphImageXOffset;
 		fGraphZoomRatio = graphZoomRatio;
 
-		xSliderA.moveToDevPosition(devGraphXOffset, false, true);
-		xSliderB.moveToDevPosition(devChartImageWidth, false, true);
+		xSliderA.moveToDevPosition(devGraphImageXOffset, false, true);
+		xSliderB.moveToDevPosition(devVirtualGraphImageWidth, false, true);
 	}
 
 	void setSelectedBars(final boolean[] selectedItems) {
