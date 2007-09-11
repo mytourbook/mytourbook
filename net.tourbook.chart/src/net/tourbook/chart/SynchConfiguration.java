@@ -25,42 +25,73 @@ public class SynchConfiguration {
 	/**
 	 * width for the marker, this can be smaller or wider than the visible part of the chart
 	 */
-	float					devMarkerWidth;
+	private float					fDevMarkerWidth;
 
 	/**
 	 * offset for the marker start position, this value starts at the left position of the visible
 	 * graph, this can also be a negative value
 	 */
-	float					devMarkerOffset;
+	private float					fDevMarkerOffset;
 
-	ChartYDataMinMaxKeeper	yDataMinMaxKeeper	= new ChartYDataMinMaxKeeper();
+	private float					fMarkerWidthRatio;
+
+	private float					fMarkerOffsetRatio;
+
+	private ChartYDataMinMaxKeeper	fYDataMinMaxKeeper	= new ChartYDataMinMaxKeeper();
 
 	/**
 	 * The ZoomMarkerPosition describes the position and width for the x-marker in the graph
 	 * 
 	 * @param chartDataModel
+	 * @param markerWidthRatio
+	 * @param markerOffsetRatio
 	 */
-	public SynchConfiguration(float devMarkerWidth, float devMarkerOffset,
-			ChartDataModel chartDataModel) {
+	public SynchConfiguration(ChartDataModel chartDataModel, float devMarkerWidth,
+			float devMarkerOffset, float markerWidthRatio, float markerOffsetRatio) {
 
-		this.devMarkerWidth = devMarkerWidth;
-		this.devMarkerOffset = devMarkerOffset;
+		this.fDevMarkerWidth = devMarkerWidth;
+		this.fDevMarkerOffset = devMarkerOffset;
 
-		yDataMinMaxKeeper.saveMinMaxValues(chartDataModel);
+		this.fMarkerWidthRatio = markerWidthRatio;
+		this.fMarkerOffsetRatio = markerOffsetRatio;
+
+		getYDataMinMaxKeeper().saveMinMaxValues(chartDataModel);
+	}
+
+	float getDevMarkerOffset() {
+		return fDevMarkerOffset;
+	}
+
+	float getDevMarkerWidth() {
+		return fDevMarkerWidth;
+	}
+
+	float getMarkerOffsetRatio() {
+		return fMarkerOffsetRatio;
+	}
+
+	float getMarkerWidthRatio() {
+		return fMarkerWidthRatio;
+	}
+
+	ChartYDataMinMaxKeeper getYDataMinMaxKeeper() {
+		return fYDataMinMaxKeeper;
 	}
 
 	/**
-	 * @param newXMarkerPosition
+	 * @param newSynchConfig
 	 * @return Returns <code>true</code> when the newXMarkerPosition has the same values as the
 	 *         current object
 	 */
-	public boolean isEqual(SynchConfiguration newXMarkerPosition) {
-		if (devMarkerWidth == newXMarkerPosition.devMarkerWidth
-				&& devMarkerOffset == newXMarkerPosition.devMarkerOffset
-				&& !yDataMinMaxKeeper.hasMinMaxChanged()) {
+	public boolean isEqual(SynchConfiguration newSynchConfig) {
+
+		if (getDevMarkerWidth() == newSynchConfig.getDevMarkerWidth()
+				&& getDevMarkerOffset() == newSynchConfig.getDevMarkerOffset()
+				&& !getYDataMinMaxKeeper().hasMinMaxChanged()) {
 
 			return true;
 		}
+
 		return false;
 	}
 

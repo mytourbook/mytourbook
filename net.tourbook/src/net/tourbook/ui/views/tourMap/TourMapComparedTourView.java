@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.tourMap;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.IChartListener;
@@ -75,7 +76,8 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 
 	private ITourPropertyListener				fRefTourPropertyListener;
 
-	private ActionSynchChartHorizontalBySize	fActionSynchCharts;
+	private ActionSynchChartHorizontalByScale	fActionSynchChartsByScale;
+	private ActionSynchChartHorizontalBySize	fActionSynchChartsBySize;
 
 	private void addRefTourPropertyListener() {
 
@@ -101,10 +103,12 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 
 	private void createActions() {
 
-		fActionSynchCharts = new ActionSynchChartHorizontalBySize(this);
+		fActionSynchChartsBySize = new ActionSynchChartHorizontalBySize(this);
+		fActionSynchChartsByScale = new ActionSynchChartHorizontalByScale(this);
 
 		final IToolBarManager tbm = fCompareTourChart.getToolBarManager();
-		tbm.add(fActionSynchCharts);
+		tbm.add(fActionSynchChartsByScale);
+		tbm.add(fActionSynchChartsBySize);
 
 		tbm.update(true);
 	}
@@ -242,7 +246,8 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 
 		// check initial value
 		if (fCTRefId == -1) {
-			fActionSynchCharts.setEnabled(false);
+			fActionSynchChartsByScale.setEnabled(false);
+			fActionSynchChartsBySize.setEnabled(false);
 			return;
 		}
 
@@ -264,22 +269,39 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 			// another ref tour is displayed, disable synchronization
 
 			if (fCTRefTourChart != null) {
-				fCTRefTourChart.setSynchedChart(false, fCompareTourChart, true);
+				fCTRefTourChart.synchChart(false, fCompareTourChart, Chart.SYNCH_MODE_NO);
 			}
-			fActionSynchCharts.setChecked(false);
+			fActionSynchChartsByScale.setChecked(false);
+			fActionSynchChartsBySize.setChecked(false);
 		}
 
-		fActionSynchCharts.setEnabled(isSynchEnabled);
-
-//		if (fCTRefId == tourProperty.refId) {
-//			fActionSynchCharts.setEnabled(true);
-//
-//		}
+		fActionSynchChartsByScale.setEnabled(isSynchEnabled);
+		fActionSynchChartsBySize.setEnabled(isSynchEnabled);
 	}
 
-	public void synchCharts(boolean isSynched, boolean synchByScale) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.tourbook.ui.views.tourMap.ISynchedChart#synchCharts(boolean, int)
+	 */
+	public void synchCharts(boolean isSynched, int synchMode) {
 		if (fCTRefTourChart != null) {
-			fCTRefTourChart.setSynchedChart(isSynched, fCompareTourChart, synchByScale);
+
+			// uncheck other synch mode
+			switch (synchMode) {
+			case Chart.SYNCH_MODE_BY_SCALE:
+				fActionSynchChartsBySize.setChecked(false);
+				break;
+
+			case Chart.SYNCH_MODE_BY_SIZE:
+				fActionSynchChartsByScale.setChecked(false);
+				break;
+
+			default:
+				break;
+			}
+
+			fCTRefTourChart.synchChart(isSynched, fCompareTourChart, synchMode);
 		}
 	}
 

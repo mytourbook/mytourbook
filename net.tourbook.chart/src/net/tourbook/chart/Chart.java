@@ -95,7 +95,7 @@ public class Chart extends ViewForm {
 	private boolean						fIsFillToolbar				= true;
 	private boolean						fIsToolbarCreated;
 
-	boolean								fSynchByScale;
+	int									fSynchMode;
 
 	/**
 	 * Chart widget
@@ -940,8 +940,8 @@ public class Chart extends ViewForm {
 		fChartComponents.zoomWithParts(parts, position, scrollSmoothly);
 	}
 
-	protected void setSynchByScale(boolean synchByScale) {
-		fSynchByScale = synchByScale;
+	protected void setSynchMode(int synchMode) {
+		fSynchMode = synchMode;
 	}
 
 }

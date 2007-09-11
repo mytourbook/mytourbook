@@ -727,13 +727,7 @@ public class ChartComponents extends Composite {
 		// compute the visual size of the graph
 		setVisibleGraphRect();
 
-		boolean isChartSynched = false;
-		if (fChart.fSynchByScale) {
-//			isChartSynched = setWidthToSynchedChart_AdjustToSameSize();
-			isChartSynched = setWidthToSynchedChart_AdjustToSameScale();
-		} else {}
-
-		if (isChartSynched == false) {
+		if (setWidthToSynchedChart() == false) {
 
 			// chart is not synchronized, compute the 'normal' graph width
 			fComponentGraph.updateImageWidthAndOffset();
@@ -754,9 +748,10 @@ public class ChartComponents extends Composite {
 		fComponentAxisRight.setDrawingData(fChartDrawingData, false);
 
 		// synchronize chart
-		if (fChart.fSynchByScale) {} else {}
-//		synchronizeChart_AdjustToSameSize();
-		synchronizeChart_AdjustToSameScale();
+		SynchConfiguration synchConfig = createSynchConfig();
+		if (synchConfig != null) {
+			synchronizeChart(synchConfig);
+		}
 
 		return true;
 	}
@@ -895,7 +890,7 @@ public class ChartComponents extends Composite {
 	 * 
 	 * @return Returns <code>true</code> when the graph width was set
 	 */
-	private boolean setWidthToSynchedChart_AdjustToSameScale() {
+	private boolean setWidthToSynchedChart() {
 
 		final ChartDataXSerie xData = fChartDataModel.getXData();
 		final int markerStartIndex = xData.getSynchMarkerStartIndex();
@@ -907,41 +902,73 @@ public class ChartComponents extends Composite {
 		}
 
 		// set min/max values from the source synched chart into this chart
-		fSynchConfigSrc.yDataMinMaxKeeper.setMinMaxValues(fChartDataModel);
-
-		final float markerWidthRatio = fSynchConfigSrc.devMarkerWidth;
-		final float markerOffsetRatio = fSynchConfigSrc.devMarkerOffset;
+		fSynchConfigSrc.getYDataMinMaxKeeper().setMinMaxValues(fChartDataModel);
 
 		final int[] xValues = xData.getHighValues()[0];
 		final float markerValueStart = xValues[markerStartIndex];
 
-		final float markerValueDiff = xValues[markerEndIndex] - markerValueStart;
-		final float lastValue = xValues[xValues.length - 1];
+		final float valueDiff = xValues[markerEndIndex] - markerValueStart;
+		final float valueLast = xValues[xValues.length - 1];
 
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
 
-		/*
-		 * compute marker width
-		 */
-		float devMarkerWidth = devVisibleChartWidth * markerWidthRatio;
-		float devOneValueSlice = devMarkerWidth / markerValueDiff;
-		float devVirtualGraphImageWidth = devOneValueSlice * lastValue;
+		final float devVirtualGraphImageWidth;
+		final float graphZoomRatio;
+		final int devGraphOffset;
 
-		/*
-		 * compute marker offset
-		 */
-		float devMarkerOffset = devVisibleChartWidth * markerOffsetRatio;
-		float devMarkerStart = devOneValueSlice * markerValueStart;
-		float devGraphOffset = devMarkerStart - devMarkerOffset;
+		switch (fChart.fSynchMode) {
+		case Chart.SYNCH_MODE_BY_SCALE:
 
-		// zoom ratio
-		final float graphZoomRatio = devVirtualGraphImageWidth / devVisibleChartWidth;
+			// get marker data from the synch source
+			final float markerWidthRatio = fSynchConfigSrc.getMarkerWidthRatio();
+			final float markerOffsetRatio = fSynchConfigSrc.getMarkerOffsetRatio();
 
-		fComponentGraph.setGraphImageWidth((int) devVirtualGraphImageWidth,
-				(int) devGraphOffset,
-				graphZoomRatio);
+			// virtual graph width
+			float devMarkerWidth = devVisibleChartWidth * markerWidthRatio;
+			float devOneValueSlice = devMarkerWidth / valueDiff;
+			devVirtualGraphImageWidth = devOneValueSlice * valueLast;
 
-		return true;
+			// graph offset
+			float devMarkerOffset = devVisibleChartWidth * markerOffsetRatio;
+			float devMarkerStart = devOneValueSlice * markerValueStart;
+			devGraphOffset = (int) (devMarkerStart - devMarkerOffset);
+
+			// zoom ratio
+			graphZoomRatio = devVirtualGraphImageWidth / devVisibleChartWidth;
+
+			fComponentGraph.setGraphImageWidth((int) devVirtualGraphImageWidth,
+					devGraphOffset,
+					graphZoomRatio);
+
+			return true;
+
+		case Chart.SYNCH_MODE_BY_SIZE:
+
+			// get marker data from the synch source
+			final float synchSrcDevMarkerWidth = fSynchConfigSrc.getDevMarkerWidth();
+			final float synchSrcDevMarkerOffset = fSynchConfigSrc.getDevMarkerOffset();
+
+			// virtual graph width
+			devVirtualGraphImageWidth = valueLast / valueDiff * synchSrcDevMarkerWidth;
+
+			// graph offset
+			final int devLeftSynchMarkerPos = (int) (markerValueStart / valueLast * devVirtualGraphImageWidth);
+			devGraphOffset = (int) (devLeftSynchMarkerPos - synchSrcDevMarkerOffset);
+
+			// zoom ratio
+			graphZoomRatio = devVirtualGraphImageWidth / devVisibleChartWidth;
+
+			fComponentGraph.setGraphImageWidth((int) devVirtualGraphImageWidth,
+					devGraphOffset,
+					graphZoomRatio);
+
+			return true;
+
+		default:
+			break;
+		}
+
+		return false;
 	}
 
 	/**
@@ -949,7 +976,6 @@ public class ChartComponents extends Composite {
 	 * 
 	 * @return Returns <code>true</code> when the graph width was set
 	 */
-	@SuppressWarnings("unused")
 	private boolean setWidthToSynchedChart_AdjustToSameSize() {
 
 		final ChartDataXSerie xData = fChartDataModel.getXData();
@@ -962,10 +988,10 @@ public class ChartComponents extends Composite {
 		}
 
 		// set min/max values from the source synched chart into this chart
-		fSynchConfigSrc.yDataMinMaxKeeper.setMinMaxValues(fChartDataModel);
+		fSynchConfigSrc.getYDataMinMaxKeeper().setMinMaxValues(fChartDataModel);
 
-		final float synchSrcDevMarkerWidth = fSynchConfigSrc.devMarkerWidth;
-		final float synchSrcDevMarkerOffset = fSynchConfigSrc.devMarkerOffset;
+		final float synchSrcDevMarkerWidth = fSynchConfigSrc.getDevMarkerWidth();
+		final float synchSrcDevMarkerOffset = fSynchConfigSrc.getDevMarkerOffset();
 
 		final int[] xValues = xData.getHighValues()[0];
 		final float valueMarkerStart = xValues[markerStartIndex];
@@ -1031,7 +1057,7 @@ public class ChartComponents extends Composite {
 	/**
 	 * set the {@link SynchConfiguration} when this chart is the source for the synched chart
 	 */
-	private void synchronizeChart_AdjustToSameScale() {
+	private SynchConfiguration createSynchConfig() {
 
 		final ChartDataXSerie xData = fChartDataModel.getXData();
 
@@ -1042,7 +1068,7 @@ public class ChartComponents extends Composite {
 
 			// disable chart synch
 			fSynchConfigOut = null;
-			return;
+			return null;
 		}
 
 		/*
@@ -1072,27 +1098,13 @@ public class ChartComponents extends Composite {
 
 		// ---------------------------------------------------------------------------------------
 
-		final SynchConfiguration newSynchConfigOut = new SynchConfiguration(markerWidthRatio,
-				markerOffsetRatio,
-				fChartDataModel);
+		final SynchConfiguration synchConfig = new SynchConfiguration(fChartDataModel,
+				devMarkerWidth,
+				devMarkerOffset,
+				markerWidthRatio,
+				markerOffsetRatio);
 
-		boolean fireEvent = false;
-
-		if (fSynchConfigOut == null) {
-			// synch new config
-			fireEvent = true;
-		} else if (fSynchConfigOut.isEqual(newSynchConfigOut) == false) {
-			// synch changed config
-			fireEvent = true;
-		}
-
-		if (fireEvent) {
-
-			// set new synch config
-			fSynchConfigOut = newSynchConfigOut;
-
-			fChart.synchronizeChart();
-		}
+		return synchConfig;
 	}
 
 	/**
@@ -1101,37 +1113,42 @@ public class ChartComponents extends Composite {
 	@SuppressWarnings("unused")
 	private void synchronizeChart_AdjustToSameSize() {
 
-		final ChartDataXSerie xData = fChartDataModel.getXData();
+//		final ChartDataXSerie xData = fChartDataModel.getXData();
+//
+//		final int markerValueIndexStart = xData.getSynchMarkerStartIndex();
+//		final int markerValueIndexEnd = xData.getSynchMarkerEndIndex();
+//
+//		if (markerValueIndexStart == -1) {
+//
+//			// disable chart synch
+//			fSynchConfigOut = null;
+//			return;
+//		}
+//
+//		final int[] xValues = xData.getHighValues()[0];
+//		final float markerStartValue = xValues[markerValueIndexStart];
+//		final float markerEndValue = xValues[markerValueIndexEnd];
+//
+//		final float valueDiff = markerEndValue - markerStartValue;
+//		final float lastValue = xValues[xValues.length - 1];
+//
+//		final float devVirtualGraphImageWidth = fComponentGraph.getDevVirtualGraphImageWidth();
+//		final float devGraphImageXOffset = fComponentGraph.getDevGraphImageXOffset();
+//
+//		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
+//
+//		final int devMarkerWidth = (int) (valueDiff * devOneValueSlice);
+//		final int devMarkerStartPos = (int) (markerStartValue * devOneValueSlice);
+//		final int devMarkerOffset = (int) (devMarkerStartPos - devGraphImageXOffset);
+//
+//		final SynchConfiguration newSynchConfigOut = new SynchConfiguration(devMarkerWidth,
+//				devMarkerOffset,
+//				fChartDataModel);
+//
+//		synchronizeChart(newSynchConfigOut);
+	}
 
-		final int markerValueIndexStart = xData.getSynchMarkerStartIndex();
-		final int markerValueIndexEnd = xData.getSynchMarkerEndIndex();
-
-		if (markerValueIndexStart == -1) {
-
-			// disable chart synch
-			fSynchConfigOut = null;
-			return;
-		}
-
-		final int[] xValues = xData.getHighValues()[0];
-		final float markerStartValue = xValues[markerValueIndexStart];
-		final float markerEndValue = xValues[markerValueIndexEnd];
-
-		final float valueDiff = markerEndValue - markerStartValue;
-		final float lastValue = xValues[xValues.length - 1];
-
-		final float devVirtualGraphImageWidth = fComponentGraph.getDevVirtualGraphImageWidth();
-		final float devGraphImageXOffset = fComponentGraph.getDevGraphImageXOffset();
-
-		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
-
-		final int devMarkerWidth = (int) (valueDiff * devOneValueSlice);
-		final int devMarkerStartPos = (int) (markerStartValue * devOneValueSlice);
-		final int devMarkerOffset = (int) (devMarkerStartPos - devGraphImageXOffset);
-
-		final SynchConfiguration newSynchConfigOut = new SynchConfiguration(devMarkerWidth,
-				devMarkerOffset,
-				fChartDataModel);
+	private void synchronizeChart(final SynchConfiguration newSynchConfigOut) {
 
 		boolean fireEvent = false;
 
@@ -1139,7 +1156,7 @@ public class ChartComponents extends Composite {
 			// synch new config
 			fireEvent = true;
 		} else if (fSynchConfigOut.isEqual(newSynchConfigOut) == false) {
-			// synch changed config
+			// synch when config changed
 			fireEvent = true;
 		}
 

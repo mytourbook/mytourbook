@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.tourMap;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.Chart;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -30,14 +31,14 @@ public class ActionSynchChartHorizontalByScale extends Action {
 
 		this.synchChart = resultView;
 
-		setToolTipText(Messages.TourMap_Action_synch_charts_tooltip);
+		setToolTipText(Messages.TourMap_Action_synch_charts_byScale_tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_synch_graph_horizontal));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_synch_graph_horizontal_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_synch_graph_byScale));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_synch_graph_byScale_disabled));
 	}
 
 	@Override
 	public void run() {
-		synchChart.synchCharts(isChecked(), true);
+		synchChart.synchCharts(isChecked(), Chart.SYNCH_MODE_BY_SCALE);
 	}
 }

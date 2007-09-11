@@ -177,9 +177,14 @@ public class Messages extends NLS {
 	public static String		Image_show_time_on_x_axis;
 	public static String		Image_show_tour_viewer;
 	public static String		Image_show_view_detail;
-	public static String		Image_synch_graph_horizontal;
 
-	public static String	Image_synch_graph_horizontal_disabled;
+	public static String	Image_synch_graph_byScale;
+
+	public static String	Image_synch_graph_byScale_disabled;
+
+	public static String	Image_synch_graph_bySize;
+
+	public static String	Image_synch_graph_bySize_disabled;
 	public static String		Image_synch_graph_vertical;
 	public static String		Image_undo_edit;
 	public static String		Image_undo_edit_disabled;
@@ -387,7 +392,10 @@ public class Messages extends NLS {
 	public static String		TourMap_Action_delete_tours;
 	public static String		TourMap_Action_rename_reference_tour;
 	public static String		TourMap_Action_synch_chart_years_tooltip;
-	public static String		TourMap_Action_synch_charts_tooltip;
+
+	public static String	TourMap_Action_synch_charts_byScale_tooltip;
+
+	public static String	TourMap_Action_synch_charts_bySize_tooltip;
 	public static String		TourMap_Column_kmh;
 	public static String		TourMap_Column_tour;
 	public static String		TourMap_Compare_job_subtask;

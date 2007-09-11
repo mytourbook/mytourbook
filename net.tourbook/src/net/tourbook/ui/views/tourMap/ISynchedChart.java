@@ -21,12 +21,11 @@ public interface ISynchedChart {
 	public static final int	SYNCH_HORIZONTAL	= 0x02;
 
 	/**
-	 * synchronize the reference tour chart with the compared tour chart
+	 * synchronize the the compared tour with the reference tour
 	 * 
 	 * @param isSynched
-	 * @param synchByScale
-	 *        <code>true</code> to synch by scale, <code>false</code> to synch by size
+	 * @param synchMode
 	 */
-	abstract void synchCharts(boolean isSynched, boolean synchByScale);
+	abstract void synchCharts(boolean isSynched, int synchMode);
 
 }

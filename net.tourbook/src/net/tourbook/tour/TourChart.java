@@ -99,7 +99,8 @@ public class TourChart extends Chart {
 
 	private boolean							fIsTourDirty;
 	private boolean							fIsSegmentLayerVisible;
-	private boolean							fBackupIsXSliderVisible;
+
+//	private boolean							fBackupIsXSliderVisible;
 
 	public TourChart(final Composite parent, final int style, boolean showActions) {
 
@@ -799,11 +800,9 @@ public class TourChart extends Chart {
 	 *        <code>true</code> to enable synch, <code>false</code> to disable synch
 	 * @param synchedChart
 	 *        contains the {@link Chart} which is synched with this chart
-	 * @param synchByScale
+	 * @param synchMode
 	 */
-	public void setSynchedChart(final boolean isSynchEnabled,
-								final TourChart synchedChart,
-								boolean synchByScale) {
+	public void synchChart(final boolean isSynchEnabled, final TourChart synchedChart, int synchMode) {
 
 		// enable/disable synched chart
 		super.setSynchedChart(isSynchEnabled ? synchedChart : null);
@@ -814,7 +813,7 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		synchedChart.setSynchByScale(synchByScale);
+		synchedChart.setSynchMode(synchMode);
 
 		/*
 		 * when the position listener is set, the zoom actions will be deactivated
@@ -832,7 +831,7 @@ public class TourChart extends Chart {
 			synchedChart.setCanAutoZoomToSlider(true);
 
 			// hide the x-sliders
-			fBackupIsXSliderVisible = synchedChart.isXSliderVisible();
+//			fBackupIsXSliderVisible = synchedChart.isXSliderVisible();
 			synchedChart.setShowSlider(false);
 
 			synchronizeChart();
@@ -851,7 +850,8 @@ public class TourChart extends Chart {
 			synchedChart.updateZoomOptions(true);
 
 			// restore the x-sliders
-			synchedChart.setShowSlider(fBackupIsXSliderVisible);
+//			synchedChart.setShowSlider(fBackupIsXSliderVisible);
+			synchedChart.setShowSlider(true);
 
 			synchedChart.setSynchConfig(null);
 
