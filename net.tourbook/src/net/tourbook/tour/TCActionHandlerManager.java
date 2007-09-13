@@ -153,7 +153,8 @@ class TCActionHandlerManager {
 	}
 
 	/**
-	 * Set the state for all action handlers from their action proxy and update the UI state
+	 * Set the check/enable state for all action handlers from their action proxy and update the UI
+	 * state
 	 * 
 	 * @param partSite
 	 */

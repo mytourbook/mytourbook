@@ -134,7 +134,7 @@
          </toolbar>
       </menuContribution>
       <menuContribution
-            locationURI="menu:net.tourbook.menu.main.tour?after=net.tourbook.chart.additions">
+            locationURI="menu:net.tourbook.menu.main.tour?after=net.tourbook.tour.additions">
          <command
                commandId="net.tourbook.chart.command.zoomIn"
                disabledIcon="icons/zoom-in-disabled.gif"

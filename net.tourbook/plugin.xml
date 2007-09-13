@@ -212,7 +212,7 @@
                       category="net.tourbook.category.system"
                       class="net.tourbook.ui.views.TourChartPropertyView"
                       icon="icons/tourchart-properties.gif"
-                      id="&quot;net.tourbook.views.TourChartPropertyView&quot;"
+                      id="net.tourbook.views.TourChartPropertyView"
                       name="%view_name_ChartProperty">
                 </view>
                 <view
@@ -326,7 +326,7 @@
    <extension
          point="org.eclipse.core.expressions.definitions">
       <definition
-            id="net.tourbook.definition.isTourChart">
+            id="net.tourbook.definition.isTourEditor">
          <with
                variable="activePartId">
             <equals
@@ -427,6 +427,12 @@
          </toolbar>
       </menuContribution>
       <menuContribution
+            locationURI="menu:file?after=fileSave">
+         <command
+               commandId="net.tourbook.command.tourEditor.revert">
+         </command>
+      </menuContribution>
+      <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
                id="net.tourbook.menu.main.tour"
@@ -434,7 +440,7 @@
                mnemonic="%menu_main_tour_mnemonic">
             <visibleWhen>
                <reference
-                     definitionId="net.tourbook.definition.isTourChart">
+                     definitionId="net.tourbook.definition.isTourEditor">
                </reference>
             </visibleWhen>
             <command
@@ -514,7 +520,7 @@
             </command>
 
             <separator
-                  name="net.tourbook.chart.additions"
+                  name="net.tourbook.tour.additions"
                   visible="true">
             </separator>
             <command
@@ -550,7 +556,7 @@
                   tooltip="%command_graph_altitude_tooltip">
                <visibleWhen>
                   <reference
-                        definitionId="net.tourbook.definition.isTourChart">
+                        definitionId="net.tourbook.definition.isTourEditor">
                   </reference>
                </visibleWhen>
             </command>
@@ -563,7 +569,7 @@
                   tooltip="%command_graph_speed_tooltip">
                <visibleWhen>
                   <reference
-                        definitionId="net.tourbook.definition.isTourChart">
+                        definitionId="net.tourbook.definition.isTourEditor">
                   </reference>
                </visibleWhen>
             </command>
@@ -576,7 +582,7 @@
                   tooltip="%command_graph_pulse_tooltip">
                <visibleWhen>
                   <reference
-                        definitionId="net.tourbook.definition.isTourChart">
+                        definitionId="net.tourbook.definition.isTourEditor">
                   </reference>
                </visibleWhen>
             </command>
@@ -589,7 +595,7 @@
                   tooltip="%command_graph_temperature_tooltip">
                <visibleWhen>
                   <reference
-                        definitionId="net.tourbook.definition.isTourChart">
+                        definitionId="net.tourbook.definition.isTourEditor">
                   </reference>
                </visibleWhen>
             </command>
@@ -602,7 +608,7 @@
                   tooltip="%command_graph_cadence_tooltip">
                <visibleWhen>
                   <reference
-                        definitionId="net.tourbook.definition.isTourChart">
+                        definitionId="net.tourbook.definition.isTourEditor">
                   </reference>
                </visibleWhen>
             </command>
@@ -615,7 +621,7 @@
                   tooltip="%command_graph_altimeter_tooltip">
                <visibleWhen>
                   <reference
-                        definitionId="net.tourbook.definition.isTourChart">
+                        definitionId="net.tourbook.definition.isTourEditor">
                   </reference>
                </visibleWhen>
             </command>
@@ -628,7 +634,7 @@
                   tooltip="%command_graph_gradient_tooltip">
                <visibleWhen>
                   <reference
-                        definitionId="net.tourbook.definition.isTourChart">
+                        definitionId="net.tourbook.definition.isTourEditor">
                   </reference>
                </visibleWhen>
             </command>
@@ -644,7 +650,7 @@
                   tooltip="%command_tourChart_xAxisTime_tooltip">
                <visibleWhen>
                   <reference
-                        definitionId="net.tourbook.definition.isTourChart">
+                        definitionId="net.tourbook.definition.isTourEditor">
                   </reference>
                </visibleWhen>
             </command>
@@ -657,7 +663,7 @@
                   tooltip="%command_tourChart_xAxisDistance_tooltip">
                <visibleWhen>
                   <reference
-                        definitionId="net.tourbook.definition.isTourChart">
+                        definitionId="net.tourbook.definition.isTourEditor">
                   </reference>
                </visibleWhen>
             </command>
@@ -675,7 +681,7 @@
                   tooltip="%command_tourChart_options_tooltip">
                <visibleWhen>
                   <reference
-                        definitionId="net.tourbook.definition.isTourChart">
+                        definitionId="net.tourbook.definition.isTourEditor">
                   </reference>
                </visibleWhen>
             </command>
@@ -820,6 +826,10 @@
             id="net.tourbook.command.device.synchronize.direct"
             name="%command_device_synchronize_direct">
       </command>
+      <command
+            id="net.tourbook.command.tourEditor.revert"
+            name="%command_tourEditor_revert">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -828,7 +838,7 @@
             commandId="net.tourbook.command.tourChart.tool.adjustAltitude">
          <activeWhen>
             <reference
-                  definitionId="net.tourbook.definition.isTourChart">
+                  definitionId="net.tourbook.definition.isTourEditor">
             </reference>
          </activeWhen>
       </handler>
@@ -837,7 +847,7 @@
             commandId="net.tourbook.command.tourChart.tool.tourMarker">
          <activeWhen>
             <reference
-                  definitionId="net.tourbook.definition.isTourChart">
+                  definitionId="net.tourbook.definition.isTourEditor">
             </reference>
          </activeWhen>
       </handler>

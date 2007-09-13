@@ -123,7 +123,7 @@ public class TourMapView extends ViewPart {
 	 */
 	private TourChart							fActiveTourChart;
 
-	private class TourContentProvider implements ITreeContentProvider {
+	class TourContentProvider implements ITreeContentProvider {
 
 		public void dispose() {}
 
@@ -474,18 +474,21 @@ public class TourMapView extends ViewPart {
 
 			final TVTITourMapReferenceTour refItem = (TVTITourMapReferenceTour) item;
 
-			fPostSelectionProvider.setSelection(new SelectionComparedTour(refItem.refId));
+			fPostSelectionProvider.setSelection(new SelectionComparedTour(fTourViewer,
+					refItem.refId));
 
 		} else if (item instanceof TVITourMapYear) {
 
 			final TVITourMapYear yearItem = (TVITourMapYear) item;
 
-			fPostSelectionProvider.setSelection(new SelectionComparedTour(yearItem.refId));
+			fPostSelectionProvider.setSelection(new SelectionComparedTour(fTourViewer,
+					yearItem.refId));
 
 		} else if (item instanceof TVTITourMapComparedTour) {
 
 			final TVTITourMapComparedTour compItem = (TVTITourMapComparedTour) item;
-			final SelectionComparedTour comparedTour = new SelectionComparedTour(compItem.getRefId());
+			final SelectionComparedTour comparedTour = new SelectionComparedTour(fTourViewer,
+					compItem.getRefId());
 
 			comparedTour.setTourCompareData(compItem.getCompId(),
 					compItem.getTourId(),

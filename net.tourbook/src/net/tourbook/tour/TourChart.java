@@ -143,7 +143,7 @@ public class TourChart extends Chart {
 			// update tour action handlers
 			fTCActionHandlerManager.updateTourActionHandlers(partSite, this);
 
-			// update chart action handlers
+			// update the action handlers in the chart
 			updateChartActionHandlers();
 		}
 	}

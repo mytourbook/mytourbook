@@ -24,7 +24,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public abstract class TourChartViewPart extends ViewPart {
 
-	protected TourChart					fCompareTourChart;
+	protected TourChart					fTourChart;
 	protected TourData					fTourData;
 	protected TourChartConfiguration	fTourChartConfig;
 
@@ -51,8 +51,8 @@ public abstract class TourChartViewPart extends ViewPart {
 
 					fTourChartConfig = TourManager.createTourChartConfiguration();
 
-					if (fCompareTourChart != null) {
-						fCompareTourChart.updateTourChart(fTourData, fTourChartConfig, false);
+					if (fTourChart != null) {
+						fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 					}
 				}
 			}
@@ -107,10 +107,10 @@ public abstract class TourChartViewPart extends ViewPart {
 			public void propertyChanged(int propertyId, Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
-					fCompareTourChart.updateSegmentLayer((Boolean) propertyData);
+					fTourChart.updateSegmentLayer((Boolean) propertyData);
 
 				} else if (propertyId == TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED) {
-					fCompareTourChart.updateTourChart(true, true);
+					fTourChart.updateTourChart(true, true);
 				}
 			}
 		};

@@ -55,6 +55,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private IWorkbenchAction	fActionSave;
 	private IWorkbenchAction	fActionSaveAll;
+	private IWorkbenchAction	fActionRevert;
+
 	private IContributionItem	fActionViewShortList;
 	private IWorkbenchAction	fActionPreferences;
 
@@ -64,7 +66,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IWorkbenchAction	fActionQuit;
 
 	private IWorkbenchAction	savePerspectiveAction;
-
 	private IWorkbenchAction	resetPerspectiveAction;
 
 	private IWorkbenchAction	closePerspAction;
@@ -90,7 +91,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void makeActions(final IWorkbenchWindow window) {
 
 		fWindow = window;
-//		final IWorkbenchAction action;
 
 		personSelector = new PersonContributionItem();
 		tourTypeSelector = new TourTypeContributionItem();
@@ -108,6 +108,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		fActionSave = ActionFactory.SAVE.create(window);
 		register(fActionSave);
+
+		fActionRevert = ActionFactory.REVERT.create(window);
+		register(fActionRevert);
 
 		fActionSaveAll = ActionFactory.SAVE_ALL.create(window);
 		register(fActionSaveAll);
@@ -190,6 +193,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		viewMenu.add(new Separator());
 		addPerspectiveActions(viewMenu);
 
+		viewMenu.add(new Separator());
 		viewMenu.add(fActionTourCompareWizard);
 //		tourMenu.add(fActionTourCompareView);
 
@@ -222,6 +226,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		fileMenu.add(fActionSave);
 		fileMenu.add(fActionSaveAll);
+		fileMenu.add(new GroupMarker("fileSave"));
+
+//		fileMenu.add(fActionRevert);
 		fileMenu.add(new Separator());
 
 		fileMenu.add(new Separator());

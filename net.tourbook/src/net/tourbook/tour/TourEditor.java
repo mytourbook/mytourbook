@@ -40,25 +40,31 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
 
 public class TourEditor extends EditorPart {
 
-	public static final String		ID				= "net.tourbook.tour.TourEditor";
+	public static final String				ID				= "net.tourbook.tour.TourEditor";
 
-	private TourEditorInput			fEditorInput;
+	private TourEditorInput					fEditorInput;
 
-	private TourChart				fTourChart;
-	private TourChartConfiguration	fTourChartConfig;
-	private TourData				fTourData;
+	private TourChart						fTourChart;
+	private TourChartConfiguration			fTourChartConfig;
+	private TourData						fTourData;
 
-	private boolean					fIsTourDirty	= false;
-	private boolean					fIsTourChanged	= false;
+	private boolean							fIsTourDirty	= false;
+	private boolean							fIsTourChanged	= false;
 
-	private PostSelectionProvider	fPostSelectionProvider;
-	private ISelectionListener		fPostSelectionListener;
-	private IPartListener2			fPartListener;
-	private ITourPropertyListener	fTourPropertyListener;
+	private PostSelectionProvider			fPostSelectionProvider;
+	private ISelectionListener				fPostSelectionListener;
+	private IPartListener2					fPartListener;
+	private ITourPropertyListener			fTourPropertyListener;
+
+	private IHandlerService					fHandlerService;
+	private ActionHandlerRevertTourEditor	fRevertActionHandler;
+
+//	private IHandlerActivation				fRevertActivatedHandler;
 
 	private void addPartListener() {
 
@@ -67,7 +73,10 @@ public class TourEditor extends EditorPart {
 
 			public void partActivated(IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
+
 					fTourChart.activateActionHandlers(getSite());
+
+					updateRevertHandler();
 				}
 			}
 
@@ -133,11 +142,23 @@ public class TourEditor extends EditorPart {
 		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
 	}
 
+	private void createActions() {
+
+		fHandlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+
+		fRevertActionHandler = new ActionHandlerRevertTourEditor(this);
+
+//		fRevertActivatedHandler = 
+		fHandlerService.activateHandler("net.tourbook.command.tourEditor.revert", //$NON-NLS-1$
+				fRevertActionHandler);
+	}
+
 	@Override
 	public void createPartControl(Composite parent) {
 
 		addPartListener();
 		addTourPropertyListener();
+		createActions();
 
 		fTourChart = new TourChart(parent, SWT.FLAT, true);
 
@@ -157,36 +178,14 @@ public class TourEditor extends EditorPart {
 				fIsTourDirty = true;
 				fIsTourChanged = true;
 				firePropertyChange(PROP_DIRTY);
+				updateRevertHandler();
 			}
 		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
 		fTourChart.createTourActionHandlers(fTourChartConfig);
 
-		// load the tourdata from the database
-		fTourData = TourManager.getInstance().getTourData(fEditorInput.fTourId);
-
-		if (fTourData != null) {
-
-			// show the tour chart
-
-			fTourChart.addDataModelListener(new IDataModelListener() {
-				public void dataModelChanged(ChartDataModel changedChartDataModel) {
-
-					// set title
-					changedChartDataModel.setTitle(NLS.bind(Messages.TourBook_Label_chart_title,
-							TourManager.getTourTitleDetailed(fTourData)));
-				}
-			});
-
-			fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
-
-			final String tourTitle = TourManager.getTourDate(fTourData);
-
-			fEditorInput.fEditorTitle = tourTitle;
-			setPartName(tourTitle);
-			setTitleToolTip("title tooltip ???");
-		}
+		updateTourChart();
 	}
 
 	@Override
@@ -214,6 +213,7 @@ public class TourEditor extends EditorPart {
 
 		// hide the dirty indicator
 		firePropertyChange(PROP_DIRTY);
+		updateRevertHandler();
 	}
 
 	@Override
@@ -256,6 +256,19 @@ public class TourEditor extends EditorPart {
 		return false;
 	}
 
+	public void revertTourData() {
+
+		TourManager.getInstance().removeTourFromCache(fEditorInput.fTourId);
+
+		fIsTourDirty = false;
+		fIsTourChanged = false;
+
+		firePropertyChange(PROP_DIRTY);
+		updateRevertHandler();
+
+		updateTourChart();
+	}
+
 	@Override
 	public void setFocus() {
 
@@ -276,6 +289,40 @@ public class TourEditor extends EditorPart {
 		fIsTourChanged = true;
 
 		firePropertyChange(PROP_DIRTY);
+		updateRevertHandler();
+	}
+
+	private void updateTourChart() {
+
+		// load the tourdata from the database
+		fTourData = TourManager.getInstance().getTourData(fEditorInput.fTourId);
+
+		if (fTourData != null) {
+
+			// show the tour chart
+
+			fTourChart.addDataModelListener(new IDataModelListener() {
+				public void dataModelChanged(ChartDataModel changedChartDataModel) {
+
+					// set title
+					changedChartDataModel.setTitle(NLS.bind(Messages.TourBook_Label_chart_title,
+							TourManager.getTourTitleDetailed(fTourData)));
+				}
+			});
+
+			fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
+
+			final String tourTitle = TourManager.getTourDate(fTourData);
+
+			fEditorInput.fEditorTitle = tourTitle;
+			setPartName(tourTitle);
+			setTitleToolTip("title tooltip ???");
+		}
+	}
+
+	private void updateRevertHandler() {
+		fRevertActionHandler.setEnabled(fIsTourDirty);
+		fRevertActionHandler.fireHandlerChanged();
 	}
 
 }

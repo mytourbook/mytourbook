@@ -26,11 +26,11 @@ import net.tourbook.tour.TourChartConfiguration;
  */
 public class TourCompareConfig {
 
-	private TourReference					refTour;
-	private TourData						refTourData;
-	private TourChartConfiguration			refTourChartConfig;
+	private TourReference					fRefTour;
+	private TourData						fRefTourData;
+	private TourChartConfiguration			fRefTourChartConfig;
 
-	private TourChartConfiguration			compTourChartConfig;
+	private TourChartConfiguration			fCompareTourChartConfig;
 
 	private SelectionChartXSliderPosition	xSliderPosition;
 
@@ -38,11 +38,11 @@ public class TourCompareConfig {
 			TourData refTourData, TourChartConfiguration refTourChartConfig,
 			TourChartConfiguration compTourChartConfig) {
 
-		this.refTour = refTour;
-		this.refTourData = refTourData;
+		fRefTour = refTour;
+		fRefTourData = refTourData;
 
-		this.refTourChartConfig = refTourChartConfig;
-		this.compTourChartConfig = compTourChartConfig;
+		fRefTourChartConfig = refTourChartConfig;
+		fCompareTourChartConfig = compTourChartConfig;
 	}
 
 	SelectionChartXSliderPosition getXSliderPosition() {
@@ -54,19 +54,19 @@ public class TourCompareConfig {
 	}
 
 	TourChartConfiguration getRefTourChartConfig() {
-		return refTourChartConfig;
+		return fRefTourChartConfig;
 	}
 
 	TourChartConfiguration getCompTourChartConfig() {
-		return compTourChartConfig;
+		return fCompareTourChartConfig;
 	}
 
 	TourReference getRefTour() {
-		return refTour;
+		return fRefTour;
 	}
 
 	TourData getRefTourData() {
-		return refTourData;
+		return fRefTourData;
 	}
 
 }
