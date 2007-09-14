@@ -102,20 +102,29 @@ public class TourMapView extends ViewPart {
 
 	private ActionDeleteTourFromMap				fActionDeleteSelectedTour;
 
-	private final RGB							fRGBYearFg		= new RGB(255, 255, 255);
-	private final RGB							fRGBMonthFg		= new RGB(128, 64, 0);
-	private final RGB							fRGBTourFg		= new RGB(0, 0, 128);
+	private final RGB							fRGBRefFg		= new RGB(37, 37, 94);
+	private final RGB							fRGBRefBg		= new RGB(245, 245, 255);
+//	private final RGB							fRGBRefBg		= new RGB(178, 222, 255);
+//	private final RGB							fRGBYearFg		= new RGB(255, 255, 255);
+//	private final RGB							fRGBYearBg		= new RGB(111, 130, 197);
 
-	private final RGB							fRGBYearBg		= new RGB(111, 130, 197);
-	private final RGB							fRGBMonthBg		= new RGB(220, 220, 255);
-	private final RGB							fRGBTourBg		= new RGB(240, 240, 255);
+	private final RGB							fRGBYearFg		= new RGB(255, 255, 255);
+	private final RGB							fRGBYearBg		= new RGB(235, 235, 255);
+//	private final RGB							fRGBYearBg		= new RGB(204, 233, 255);
+//	private final RGB							fRGBMonthFg		= new RGB(128, 64, 0);
+//	private final RGB							fRGBMonthBg		= new RGB(220, 220, 255);
+
+	private final RGB							fRGBTourFg		= new RGB(0, 0, 128);
+	private final RGB							fRGBTourBg		= new RGB(255, 255, 255);
+//	private final RGB							fRGBTourBg		= new RGB(230, 244, 255);
+
+	private Color								fColorRefFg;
+	private Color								fColorRefBg;
 
 	private Color								fColorYearFg;
-	private Color								fColorMonthFg;
-	private Color								fColorTourFg;
-
 	private Color								fColorYearBg;
-	private Color								fColorMonthBg;
+
+	private Color								fColorTourFg;
 	private Color								fColorTourBg;
 
 	/**
@@ -154,11 +163,14 @@ public class TourMapView extends ViewPart {
 			ITableColorProvider {
 
 		public Color getBackground(final Object element, final int columnIndex) {
-			if (/* columnIndex != 0 && */element instanceof TVTITourMapReferenceTour) {
+			if (/* columnIndex == 0 && */element instanceof TVTITourMapReferenceTour) {
+				return fColorRefBg;
+			}
+			if (/* columnIndex == 0 && */element instanceof TVITourMapYear) {
 				return fColorYearBg;
 			}
-			if (/* columnIndex != 0 && */element instanceof TVITourMapYear) {
-				return fColorMonthBg;
+			if (columnIndex == 0 && element instanceof TVTITourMapComparedTour) {
+				return fColorTourBg;
 			}
 
 			return null;
@@ -213,16 +225,17 @@ public class TourMapView extends ViewPart {
 		}
 
 		public Color getForeground(final Object element, final int columnIndex) {
-			if (/* columnIndex != 0 && */element instanceof TVTITourMapReferenceTour) {
-				return fColorYearFg;
-			}
+//			if (/* columnIndex != 0 && */element instanceof TVTITourMapReferenceTour) {
+//				return fColorRefFg;
+//			}
+			return fColorRefFg;
 			// if (element instanceof TVITourBookTour) {
 			// return fColorTourFg;
 			// }
 			// if (columnIndex != 0 && element instanceof TVITourBookMonth) {
 			// return fColorMonthFg;
 			// }
-			return null;
+//			return null;
 		}
 	}
 
@@ -366,10 +379,10 @@ public class TourMapView extends ViewPart {
 
 		final Display display = parent.getDisplay();
 
+		fColorRefFg = new Color(display, fRGBRefFg);
+		fColorRefBg = new Color(display, fRGBRefBg);
 		fColorYearFg = new Color(display, fRGBYearFg);
 		fColorYearBg = new Color(display, fRGBYearBg);
-		fColorMonthFg = new Color(display, fRGBMonthFg);
-		fColorMonthBg = new Color(display, fRGBMonthBg);
 		fColorTourFg = new Color(display, fRGBTourFg);
 		fColorTourBg = new Color(display, fRGBTourBg);
 
@@ -481,14 +494,24 @@ public class TourMapView extends ViewPart {
 
 			final TVITourMapYear yearItem = (TVITourMapYear) item;
 
-			fPostSelectionProvider.setSelection(new SelectionComparedTour(fTourViewer,
-					yearItem.refId));
+			final SelectionComparedTour comparedTour = new SelectionComparedTour(fTourViewer,
+					yearItem.refId);
+
+			comparedTour.setYearItem(yearItem);
+
+			fPostSelectionProvider.setSelection(comparedTour);
 
 		} else if (item instanceof TVTITourMapComparedTour) {
 
 			final TVTITourMapComparedTour compItem = (TVTITourMapComparedTour) item;
+
 			final SelectionComparedTour comparedTour = new SelectionComparedTour(fTourViewer,
 					compItem.getRefId());
+
+			final TreeViewerItem parentItem = compItem.getParentItem();
+			if (parentItem instanceof TVITourMapYear) {
+				comparedTour.setYearItem((TVITourMapYear) parentItem);
+			}
 
 			comparedTour.setTourCompareData(compItem.getCompId(),
 					compItem.getTourId(),
@@ -506,11 +529,11 @@ public class TourMapView extends ViewPart {
 		getViewSite().getPage().removePartListener(fPartListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
+		fColorRefFg.dispose();
 		fColorYearFg.dispose();
-		fColorMonthFg.dispose();
 		fColorTourFg.dispose();
+		fColorRefBg.dispose();
 		fColorYearBg.dispose();
-		fColorMonthBg.dispose();
 		fColorTourBg.dispose();
 
 		super.dispose();

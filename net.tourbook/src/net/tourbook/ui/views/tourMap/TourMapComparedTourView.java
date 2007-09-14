@@ -125,7 +125,7 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 
 			super(null, AS_PUSH_BUTTON);
 
-			setToolTipText("Save changes in the compared tour (marker was moved)");
+			setToolTipText("Save moved marker in the compared tour");
 
 			setImageDescriptor(TourbookPlugin.getImageDescriptor("floppy_disc.gif"));
 			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("floppy_disc_disabled.gif"));
@@ -433,7 +433,9 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 				| SWT.NO);
 
 		msgBox.setText("Save Compared Tour");
-		msgBox.setMessage("The compared tour was modified, save changes?");
+		msgBox.setMessage("The compared tour '"
+				+ TourManager.getTourTitleDetailed(fTourData)
+				+ "' was modified, save changes?");
 
 		if (msgBox.open() == SWT.YES) {
 			saveComparedTour();
@@ -534,7 +536,7 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 
 				// set title
 				changedChartDataModel.setTitle(NLS.bind(Messages.TourMap_Label_chart_title_compared_tour,
-						TourManager.getTourTitleDetailed(compTourData)));
+						TourManager.getTourTitleDetailed(fTourData)));
 			}
 		});
 

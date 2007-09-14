@@ -1118,10 +1118,10 @@ public class ChartComponentGraph extends Canvas {
 		// get the horizontal offset for the graph
 		int graphValueOffset;
 		if (fChartComponents.fSynchConfigSrc == null) {
-			// a zoom marker is not set, draw it normally
+			// a synch marker is not set, draw it normally
 			graphValueOffset = (int) (Math.max(0, fDevGraphImageXOffset) / scaleX);
 		} else {
-			// adjust the start position to the zoom marker position
+			// adjust the start position to the synch marker position
 			graphValueOffset = (int) (fDevGraphImageXOffset / scaleX);
 		}
 

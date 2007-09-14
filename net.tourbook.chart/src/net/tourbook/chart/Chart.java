@@ -98,6 +98,11 @@ public class Chart extends ViewForm {
 	int									fSynchMode;
 
 	/**
+	 * <code>true</code> to start the bar chart at the bottom of the chart
+	 */
+	private boolean						fDrawBarChartAtBottom		= true;
+
+	/**
 	 * Chart widget
 	 */
 	public Chart(Composite parent, int style) {
@@ -942,6 +947,22 @@ public class Chart extends ViewForm {
 
 	protected void setSynchMode(int synchMode) {
 		fSynchMode = synchMode;
+	}
+
+	/**
+	 * @return Returns <code>true</code> to start the bars at the bottom of the chart
+	 */
+	boolean getStartAtChartBottom() {
+		return fDrawBarChartAtBottom;
+	}
+
+	/**
+	 * Set <code>false</code> to not draw the bars at the bottom of the chart
+	 * 
+	 * @param fDrawBarCharttAtBottom
+	 */
+	public void setDrawBarChartAtBottom(boolean fDrawBarCharttAtBottom) {
+		this.fDrawBarChartAtBottom = fDrawBarCharttAtBottom;
 	}
 
 }

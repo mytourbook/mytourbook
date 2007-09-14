@@ -13,14 +13,16 @@ public class SelectionComparedTour implements ISelection {
 	/**
 	 * Id of the reference tour
 	 */
-	private Long		fRefId;
+	private Long			fRefId;
 
-	private TreeViewer	fTourViewer;
+	private TreeViewer		fTourViewer;
 
-	private Long		fCompTourId;
-	private Long		fCompareId;
-	private int			fCompareStartIndex;
-	private int			fCompareEndIndex;
+	private Long			fCompTourId;
+	private Long			fCompareId;
+	private int				fCompareStartIndex;
+	private int				fCompareEndIndex;
+
+	private TVITourMapYear	fYearItem;
 
 	public SelectionComparedTour(TreeViewer tourViewer, Long refId) {
 		fTourViewer = tourViewer;
@@ -50,6 +52,14 @@ public class SelectionComparedTour implements ISelection {
 		return fRefId;
 	}
 
+	TreeViewer getTourViewer() {
+		return fTourViewer;
+	}
+
+	public TVITourMapYear getYearItem() {
+		return fYearItem;
+	}
+
 	public boolean isEmpty() {
 		return false;
 	}
@@ -77,8 +87,8 @@ public class SelectionComparedTour implements ISelection {
 		fCompareEndIndex = compEndIndex;
 	}
 
-	TreeViewer getTourViewer() {
-		return fTourViewer;
+	public void setYearItem(TVITourMapYear yearItem) {
+		fYearItem = yearItem;
 	}
 
 }

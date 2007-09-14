@@ -204,6 +204,13 @@
             id="net.tourbook.views.tourMap.comparedTourView"
             name="%view_name_tourMap_comparedTour">
       </view>
+      <view
+            category="net.tourbook.category.compareTours"
+            class="net.tourbook.ui.views.tourMap.TourMapYearStatisticView"
+            icon="icons/tour-map-statistic.gif"
+            id="net.tourbook.views.tourMap.yearStatisticView"
+            name="%view_name_tourMap_statistics">
+      </view>
       <category
             id="net.tourbook.category.system"
             name="%view_category_system">
@@ -295,6 +302,9 @@
          </viewShortcut>
          <viewShortcut
                id="net.tourbook.views.tourMap.referenceTourView">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.tourMap.yearStatisticView">
          </viewShortcut>
       </perspectiveExtension>
       <perspectiveExtension

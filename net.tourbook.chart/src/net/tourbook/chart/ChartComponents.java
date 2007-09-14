@@ -22,6 +22,7 @@ import java.util.GregorianCalendar;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -440,8 +441,9 @@ public class ChartComponents extends Composite {
 		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / unit) * unit);
 
 		// adjust the min value so that bar graphs start at the bottom of the chart
-		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
-//			yData.setVisibleMinValue(graphMinValue);
+		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR
+				&& fChart.getStartAtChartBottom()) {
+			yData.setVisibleMinValue(graphMinValue);
 		}
 
 		// increase the max value when it does not fit to unit borders
@@ -594,19 +596,29 @@ public class ChartComponents extends Composite {
 	private void createXValuesMonth(final ChartDrawingData drawingData,
 									final int months,
 									final ArrayList<ChartUnit> units,
-									final int graphWidth,
+									final int devGraphWidth,
 									final ChartDataYSerie yData) {
 
-		drawingData.setScaleX((float) graphWidth / months);
+		drawingData.setScaleX((float) devGraphWidth / months);
+
+		// shorten the unit when there is not enough space to draw the full unit name
+		GC gc = new GC(this);
+		int monthLength = gc.stringExtent(monthLabels[0]).x;
+		boolean isShortUnitLabel = monthLength < (devGraphWidth / months);
+		gc.dispose();
 
 		// create the month units
 		for (int month = 0; month < months; month++) {
-			units.add(new ChartUnit(month, monthLabels[month]));
+			String monthUnit = monthLabels[month];
+			if (isShortUnitLabel) {
+				monthUnit = monthUnit.substring(0, 1);
+			}
+			units.add(new ChartUnit(month, monthUnit));
 		}
 
 		// compute the width and position of the rectangles
 		int rectangleWidth;
-		final int monthWidth = Math.max(0, (graphWidth / months) - 1);
+		final int monthWidth = Math.max(0, (devGraphWidth / months) - 1);
 
 		switch (yData.getChartLayout()) {
 		case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
@@ -634,7 +646,7 @@ public class ChartComponents extends Composite {
 	private void createXValuesYear(	final ChartDrawingData drawingData,
 									final int months,
 									final ArrayList<ChartUnit> units,
-									final int graphWidth,
+									final int devGraphWidth,
 									final int year) {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
@@ -643,18 +655,28 @@ public class ChartComponents extends Composite {
 		calendar.set(year, 11, 31);
 		final int yearDays = calendar.get(Calendar.DAY_OF_YEAR) - 1;
 
-		drawingData.setScaleX((float) graphWidth / yearDays);
+		drawingData.setScaleX((float) devGraphWidth / yearDays);
+
+		// shorten the unit when there is not enough space to draw the full unit name
+		GC gc = new GC(this);
+		int monthLength = gc.stringExtent(monthLabels[0]).x;
+		boolean useShortUnitLabel = monthLength > (devGraphWidth / months) * 0.9;
+		gc.dispose();
 
 		// create the month units
 		for (int month = 0; month < months; month++) {
 			calendar.set(year, month, 1);
 			final int firstMonthDay = calendar.get(Calendar.DAY_OF_YEAR) - 1;
 
-			units.add(new ChartUnit(firstMonthDay, monthLabels[month]));
+			String monthLabel = monthLabels[month];
+			if (useShortUnitLabel) {
+				monthLabel = monthLabel.substring(0, 1);
+			}
+			units.add(new ChartUnit(firstMonthDay, monthLabel));
 		}
 
 		// compute the width of the rectangles
-		drawingData.setBarRectangleWidth(Math.max(0, (graphWidth / yearDays)));
+		drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth / yearDays)));
 		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
 	}
 
@@ -969,47 +991,6 @@ public class ChartComponents extends Composite {
 		}
 
 		return false;
-	}
-
-	/**
-	 * adjust the graph width to the synched chart
-	 * 
-	 * @return Returns <code>true</code> when the graph width was set
-	 */
-	private boolean setWidthToSynchedChart_AdjustToSameSize() {
-
-		final ChartDataXSerie xData = fChartDataModel.getXData();
-		final int markerStartIndex = xData.getSynchMarkerStartIndex();
-		final int markerEndIndex = xData.getSynchMarkerEndIndex();
-
-		if (fSynchConfigSrc == null || markerStartIndex == -1) {
-			// synchronization is disabled
-			return false;
-		}
-
-		// set min/max values from the source synched chart into this chart
-		fSynchConfigSrc.getYDataMinMaxKeeper().setMinMaxValues(fChartDataModel);
-
-		final float synchSrcDevMarkerWidth = fSynchConfigSrc.getDevMarkerWidth();
-		final float synchSrcDevMarkerOffset = fSynchConfigSrc.getDevMarkerOffset();
-
-		final int[] xValues = xData.getHighValues()[0];
-		final float valueMarkerStart = xValues[markerStartIndex];
-
-		final float valueDiff = xValues[markerEndIndex] - valueMarkerStart;
-		final float valueLast = xValues[xValues.length - 1];
-
-		final float devVirtualGraphImageWidth = valueLast / valueDiff * synchSrcDevMarkerWidth;
-		final float graphZoomRatio = devVirtualGraphImageWidth / getDevVisibleChartWidth();
-
-		final int devLeftSynchMarkerPos = (int) (valueMarkerStart / valueLast * devVirtualGraphImageWidth);
-		final int devGraphOffset = (int) (devLeftSynchMarkerPos - synchSrcDevMarkerOffset);
-
-		fComponentGraph.setGraphImageWidth((int) devVirtualGraphImageWidth,
-				devGraphOffset,
-				graphZoomRatio);
-
-		return true;
 	}
 
 	/**
