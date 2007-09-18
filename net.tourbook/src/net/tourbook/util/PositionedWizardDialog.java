@@ -15,12 +15,16 @@
  *******************************************************************************/
 package net.tourbook.util;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
@@ -40,6 +44,7 @@ public class PositionedWizardDialog extends WizardDialog {
 
 	private int					fDefaultWidth;
 	private int					fDefaultHeight;
+	private Image				fWindowIcon;
 
 	/**
 	 * @param parent
@@ -62,8 +67,21 @@ public class PositionedWizardDialog extends WizardDialog {
 		if (point != null) {
 			setMinimumPageSize(point.x, point.y);
 		}
+
+		// set icon for the window 
+		fWindowIcon = TourbookPlugin.getImageDescriptor(Messages.Image_view_compare_wizard)
+				.createImage();
+		setDefaultImage(fWindowIcon);
+
+		parent.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				fWindowIcon.dispose();
+			}
+		});
+
 	}
 
+	@Override
 	protected Point getInitialSize() {
 
 		IDialogSettings settings = fDialogSettings.getSection(fSettingsSection);
@@ -89,6 +107,7 @@ public class PositionedWizardDialog extends WizardDialog {
 
 	}
 
+	@Override
 	protected Point getInitialLocation(Point initialSize) {
 
 		Point location = super.getInitialLocation(initialSize);
@@ -109,6 +128,7 @@ public class PositionedWizardDialog extends WizardDialog {
 		return location;
 	}
 
+	@Override
 	protected void finishPressed() {
 		saveBounds();
 		super.finishPressed();
@@ -130,6 +150,7 @@ public class PositionedWizardDialog extends WizardDialog {
 		settings.put(WIZARD_HEIGHT, bounds.height);
 	}
 
+	@Override
 	protected void cancelPressed() {
 		saveBounds();
 		super.cancelPressed();

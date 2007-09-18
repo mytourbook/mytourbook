@@ -13,25 +13,38 @@ import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
+import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourMapYearStatisticView extends ViewPart {
 
-	public static final String	ID	= "net.tourbook.views.tourMap.yearStatisticView";	//$NON-NLS-1$
+	public static final String		ID	= "net.tourbook.views.tourMap.yearStatisticView";	//$NON-NLS-1$
 
-	private Chart				fYearChart;
+	private Chart					fYearChart;
 
-	private ISelectionListener	fPostSelectionListener;
+	private ISelectionListener		fPostSelectionListener;
+	private PostSelectionProvider	fPostSelectionProvider;
 
-	private Object[]			fYearMapTours;
+	/**
+	 * contains all {@link TVTITourMapComparedTour} tour objects for the current year
+	 */
+	private Object[]				fYearMapTours;
+
+	private TVITourMapYear			fYearItem;
+
+	private PageBook				fPageBook;
+	private Label					fPageNoChart;
 
 	public TourMapYearStatisticView() {}
 
@@ -48,22 +61,107 @@ public class TourMapYearStatisticView extends ViewPart {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
+	@Override
+	public void createPartControl(Composite parent) {
+
+		fPageBook = new PageBook(parent, SWT.NONE);
+
+		fPageNoChart = new Label(fPageBook, SWT.NONE);
+		fPageNoChart.setText("A year is not selected");
+
+		// year chart
+		fYearChart = new Chart(fPageBook, SWT.NONE);
+
+		fYearChart.addBarSelectionListener(new IBarSelectionListener() {
+			public void selectionChanged(final int serieIndex, final int valueIndex) {
+
+				TVTITourMapComparedTour tourMapComparedTour = (TVTITourMapComparedTour) fYearMapTours[valueIndex];
+
+				// select the tour in the tour viewer & show tour in compared tour char
+				fPostSelectionProvider.setSelection(new StructuredSelection(tourMapComparedTour));
+			}
+		});
+
+		addSelectionListener();
+
+		// set selection provider
+		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+
+		fPageBook.showPage(fPageNoChart);
+	}
+
+	@Override
+	public void dispose() {
+
+		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+
+		super.dispose();
+	}
+
 	private void onSelectionChanged(ISelection selection) {
 
 		if (selection instanceof SelectionComparedTour) {
+
 			final SelectionComparedTour selectionComparedTour = (SelectionComparedTour) selection;
 			final TVITourMapYear yearItem = selectionComparedTour.getYearItem();
 			if (yearItem != null) {
-				showYearBarChart(yearItem);
+
+				fYearItem = yearItem;
+				showYearBarChart();
+			}
+
+			final Long compTourId = selectionComparedTour.getCompTourId();
+			if (compTourId != null) {
+				selectTourInYearChart(compTourId);
+			}
+
+		} else if (selection instanceof SelectionRemovedComparedTours) {
+
+			final SelectionRemovedComparedTours removedCompTours = (SelectionRemovedComparedTours) selection;
+
+			if (removedCompTours.removedComparedTours.size() > 0) {
+				showYearBarChart();
 			}
 		}
 	}
 
-	private void showYearBarChart(final TVITourMapYear yearItem) {
+	/**
+	 * select the tour in the year map chart
+	 * 
+	 * @param selectedTourId
+	 *        tour id which should be selected
+	 */
+	private void selectTourInYearChart(long selectedTourId) {
+
+		final int tourLength = fYearMapTours.length;
+		boolean[] selectedTours = new boolean[tourLength];
+
+		for (int tourIndex = 0; tourIndex < tourLength; tourIndex++) {
+			final TVTITourMapComparedTour comparedItem = (TVTITourMapComparedTour) fYearMapTours[tourIndex];
+			if (comparedItem.getTourId() == selectedTourId) {
+				selectedTours[tourIndex] = true;
+			}
+		}
+
+		fYearChart.setSelectedBars(selectedTours);
+	}
+
+	@Override
+	public void setFocus() {
+
+	}
+
+	private void showYearBarChart() {
+
+		if (fYearItem == null) {
+			return;
+		}
+
+		fPageBook.showPage(fYearChart);
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-		fYearMapTours = yearItem.getFetchedChildren();
+		fYearMapTours = fYearItem.getFetchedChildren();
 		final int tourLength = fYearMapTours.length;
 
 		final int[] tourDateValues = new int[tourLength];
@@ -95,7 +193,7 @@ public class TourMapYearStatisticView extends ViewPart {
 		/*
 		 * set/restore min/max values
 		 */
-		final TVTITourMapReferenceTour refItem = yearItem.getRefItem();
+		final TVTITourMapReferenceTour refItem = fYearItem.getRefItem();
 		final int minValue = yData.getVisibleMinValue();
 		final int maxValue = yData.getVisibleMaxValue();
 
@@ -137,51 +235,16 @@ public class TourMapYearStatisticView extends ViewPart {
 		chartModel.addYData(yData);
 
 		// set title
-		chartModel.setTitle(NLS.bind(Messages.TourMap_Label_chart_title_year_map, yearItem.year));
+		chartModel.setTitle(NLS.bind(Messages.TourMap_Label_chart_title_year_map, fYearItem.year));
 
 		// set graph minimum width, this is the number of days in the
 		// fSelectedYear
-		calendar.set(yearItem.year, 11, 31);
+		calendar.set(fYearItem.year, 11, 31);
 		final int yearDays = calendar.get(Calendar.DAY_OF_YEAR);
 		chartModel.setChartMinWidth(yearDays);
 
 		// show the data in the chart
 		fYearChart.updateChart(chartModel);
-	}
-
-	@Override
-	public void createPartControl(Composite parent) {
-
-		// year chart
-		fYearChart = new Chart(parent, SWT.NONE);
-		fYearChart.addBarSelectionListener(new IBarSelectionListener() {
-			public void selectionChanged(final int serieIndex, final int valueIndex) {
-
-//				TVTITourMapComparedTour tourMapComparedTour = (TVTITourMapComparedTour) fYearMapTours[valueIndex];
-//
-//				// show the compared tour
-//				updateCompTourChart(tourMapComparedTour);
-//				fPageBookCompTourChart.showPage(fCompTourChart);
-//
-//				// select the tour in the tour viewer
-//				fTourViewer.setSelection(new StructuredSelection(tourMapComparedTour), true);
-			}
-		});
-
-		addSelectionListener();
-	}
-
-	@Override
-	public void dispose() {
-
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-
-		super.dispose();
-	}
-
-	@Override
-	public void setFocus() {
-
 	}
 
 }

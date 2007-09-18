@@ -1,6 +1,7 @@
 package net.tourbook.ui.views.tourMap;
 
 import net.tourbook.data.TourCompared;
+import net.tourbook.data.TourData;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -44,6 +45,9 @@ public class SelectionComparedTour implements ISelection {
 		return fCompareStartIndex;
 	}
 
+	/**
+	 * @return Returns the tour Id for the {@link TourData} of the compared tour
+	 */
 	public Long getCompTourId() {
 		return fCompTourId;
 	}

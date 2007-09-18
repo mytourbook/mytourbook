@@ -48,6 +48,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -73,64 +74,56 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMapView extends ViewPart {
 
-	public static final String					ID				= "net.tourbook.views.tourMap.TourMapView"; //$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.views.tourMap.TourMapView"; //$NON-NLS-1$
 
-	public static final int						COLUMN_LABEL	= 0;
-	public static final int						COLUMN_SPEED	= 1;
+	public static final int			COLUMN_LABEL	= 0;
+	public static final int			COLUMN_SPEED	= 1;
 
 	/**
 	 * This memento allows this view to save and restore state when it is closed and opened within a
 	 * session. A different memento is supplied by the platform for persistance at workbench
 	 * shutdown.
 	 */
-	private static IMemento						fSessionMemento	= null;
+	private static IMemento			fSessionMemento	= null;
 
-	TVITourMapRoot								fRootItem		= new TVITourMapRoot();
+	TVITourMapRoot					fRootItem		= new TVITourMapRoot();
 
-	private TreeViewer							fTourViewer;
+	private TreeViewer				fTourViewer;
 
-	final NumberFormat							nf				= NumberFormat.getNumberInstance();
+	final NumberFormat				nf				= NumberFormat.getNumberInstance();
 
-	private ISelectionListener					fPostSelectionListener;
-	private IPartListener2						fPartListener;
-	private ITourPropertyListener				fTourPropertyListener;
-	PostSelectionProvider						fPostSelectionProvider;
+	private ISelectionListener		fPostSelectionListener;
+	private IPartListener2			fPartListener;
+	private ITourPropertyListener	fTourPropertyListener;
+	PostSelectionProvider			fPostSelectionProvider;
 
-	protected int								fRefTourXMarkerValue;
+	protected int					fRefTourXMarkerValue;
 
-	private ArrayList<TVTITourMapComparedTour>	fComparedToursFindResult;
+	private ActionDeleteTourFromMap	fActionDeleteSelectedTour;
+	private ActionRenameRefTour		fActionRenameRefTour;
 
-	private ActionDeleteTourFromMap				fActionDeleteSelectedTour;
+	private final RGB				fRGBRefFg		= new RGB(0, 0, 0);
+	private final RGB				fRGBRefBg		= new RGB(255, 233, 178);
 
-	private final RGB							fRGBRefFg		= new RGB(37, 37, 94);
-	private final RGB							fRGBRefBg		= new RGB(245, 245, 255);
-//	private final RGB							fRGBRefBg		= new RGB(178, 222, 255);
-//	private final RGB							fRGBYearFg		= new RGB(255, 255, 255);
-//	private final RGB							fRGBYearBg		= new RGB(111, 130, 197);
+	private final RGB				fRGBYearFg		= new RGB(255, 255, 255);
+	private final RGB				fRGBYearBg		= new RGB(255, 241, 204);
 
-	private final RGB							fRGBYearFg		= new RGB(255, 255, 255);
-	private final RGB							fRGBYearBg		= new RGB(235, 235, 255);
-//	private final RGB							fRGBYearBg		= new RGB(204, 233, 255);
-//	private final RGB							fRGBMonthFg		= new RGB(128, 64, 0);
-//	private final RGB							fRGBMonthBg		= new RGB(220, 220, 255);
+	private final RGB				fRGBTourFg		= new RGB(0, 0, 0);
+	private final RGB				fRGBTourBg		= new RGB(255, 255, 255);
 
-	private final RGB							fRGBTourFg		= new RGB(0, 0, 128);
-	private final RGB							fRGBTourBg		= new RGB(255, 255, 255);
-//	private final RGB							fRGBTourBg		= new RGB(230, 244, 255);
+	private Color					fColorRefFg;
+	private Color					fColorRefBg;
 
-	private Color								fColorRefFg;
-	private Color								fColorRefBg;
+	private Color					fColorYearFg;
+	private Color					fColorYearBg;
 
-	private Color								fColorYearFg;
-	private Color								fColorYearBg;
-
-	private Color								fColorTourFg;
-	private Color								fColorTourBg;
+	private Color					fColorTourFg;
+	private Color					fColorTourBg;
 
 	/**
 	 * tour chart which has currently the focus
 	 */
-	private TourChart							fActiveTourChart;
+	private TourChart				fActiveTourChart;
 
 	class TourContentProvider implements ITreeContentProvider {
 
@@ -307,18 +300,34 @@ public class TourMapView extends ViewPart {
 					/*
 					 * find/remove the removed compared tours in the viewer
 					 */
-					fComparedToursFindResult = new ArrayList<TVTITourMapComparedTour>();
 
-					findComparedTours(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem(),
+					ArrayList<TVTITourMapComparedTour> comparedTours = new ArrayList<TVTITourMapComparedTour>();
+					final TreeViewerItem rootItem = ((TourContentProvider) fTourViewer.getContentProvider()).getRootItem();
+
+					TourCompareManager.getComparedTours(comparedTours,
+							rootItem,
 							removedCompTours.removedComparedTours);
 
 					// remove compared tour from the fDataModel
-					for (final TVTITourMapComparedTour comparedTour : fComparedToursFindResult) {
+					for (final TVTITourMapComparedTour comparedTour : comparedTours) {
 						comparedTour.remove();
 					}
 
 					// remove compared tour from the tree viewer
-					fTourViewer.remove(fComparedToursFindResult.toArray());
+					fTourViewer.remove(comparedTours.toArray());
+
+				} else if (selection instanceof StructuredSelection) {
+
+					StructuredSelection structuredSelection = (StructuredSelection) selection;
+
+					Object firstElement = structuredSelection.getFirstElement();
+
+					if (firstElement instanceof TVTITourMapComparedTour) {
+
+						// select the tour in the tour viewer
+						fTourViewer.setSelection(new StructuredSelection(((TVTITourMapComparedTour) firstElement)),
+								true);
+					}
 				}
 
 				if (fActiveTourChart != null) {
@@ -388,6 +397,7 @@ public class TourMapView extends ViewPart {
 
 		createTourViewer(parent);
 		createContextMenu();
+		createActions();
 
 		restoreSettings(fSessionMemento);
 
@@ -399,6 +409,11 @@ public class TourMapView extends ViewPart {
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		fTourViewer.setInput(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem());
+	}
+
+	private void createActions() {
+		fActionDeleteSelectedTour = new ActionDeleteTourFromMap(this);
+		fActionRenameRefTour = new ActionRenameRefTour(this);
 	}
 
 	private Control createTourViewer(final Composite parent) {
@@ -478,6 +493,11 @@ public class TourMapView extends ViewPart {
 		return treeContainer;
 	}
 
+	/**
+	 * Selection changes in the tour map viewer
+	 * 
+	 * @param selection
+	 */
 	private void onSelectionChanged(IStructuredSelection selection) {
 
 		// show the reference tour chart
@@ -505,20 +525,20 @@ public class TourMapView extends ViewPart {
 
 			final TVTITourMapComparedTour compItem = (TVTITourMapComparedTour) item;
 
-			final SelectionComparedTour comparedTour = new SelectionComparedTour(fTourViewer,
+			final SelectionComparedTour selectionCompTour = new SelectionComparedTour(fTourViewer,
 					compItem.getRefId());
 
 			final TreeViewerItem parentItem = compItem.getParentItem();
 			if (parentItem instanceof TVITourMapYear) {
-				comparedTour.setYearItem((TVITourMapYear) parentItem);
+				selectionCompTour.setYearItem((TVITourMapYear) parentItem);
 			}
 
-			comparedTour.setTourCompareData(compItem.getCompId(),
+			selectionCompTour.setTourCompareData(compItem.getCompId(),
 					compItem.getTourId(),
 					compItem.getStartIndex(),
 					compItem.getEndIndex());
 
-			fPostSelectionProvider.setSelection(comparedTour);
+			fPostSelectionProvider.setSelection(selectionCompTour);
 		}
 	}
 
@@ -570,9 +590,9 @@ public class TourMapView extends ViewPart {
 		}
 
 		// enable: rename ref tour
-//		fActionRenameRefTour.setEnabled(refItemCounter == 1
-//				&& tourItemCounter == 0
-//				&& yearItemCounter == 0);
+		fActionRenameRefTour.setEnabled(refItemCounter == 1
+				&& tourItemCounter == 0
+				&& yearItemCounter == 0);
 //
 //		fActionAdjustAltitude.setEnabled(tourItemCounter > 0);
 	}
@@ -580,49 +600,11 @@ public class TourMapView extends ViewPart {
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 //		menuMgr.add(fActionAdjustAltitude);
-//		menuMgr.add(fActionRenameRefTour);
+		menuMgr.add(fActionRenameRefTour);
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionDeleteSelectedTour);
 
 		enableActions();
-	}
-
-	/**
-	 * Recursive !!! method to walk down the tour tree items and find the compared tours
-	 * 
-	 * @param parentItem
-	 * @param findCompIds
-	 *        comp id's which should be found
-	 */
-	private void findComparedTours(	final TreeViewerItem parentItem,
-									final ArrayList<Long> findCompIds) {
-
-		final ArrayList<TreeViewerItem> unfetchedChildren = parentItem.getUnfetchedChildren();
-
-		if (unfetchedChildren != null) {
-
-			// children are available
-
-			for (final TreeViewerItem tourTreeItem : unfetchedChildren) {
-
-				if (tourTreeItem instanceof TVTITourMapComparedTour) {
-
-					final TVTITourMapComparedTour ttiCompResult = (TVTITourMapComparedTour) tourTreeItem;
-					final long ttiCompId = ttiCompResult.getCompId();
-
-					for (final Long compId : findCompIds) {
-						if (ttiCompId == compId) {
-							fComparedToursFindResult.add(ttiCompResult);
-						}
-					}
-
-				} else {
-					// this is a child which can be the parent for other
-					// childs
-					findComparedTours(tourTreeItem, findCompIds);
-				}
-			}
-		}
 	}
 
 	public TreeViewer getTourViewer() {

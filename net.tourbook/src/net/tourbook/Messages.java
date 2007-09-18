@@ -23,7 +23,7 @@ public class Messages extends NLS {
 
 	public static String		Action_About;
 
-	public static String	Action_edit_tour;
+	public static String		Action_edit_tour;
 	public static String		Action_import_rawdata;
 	public static String		Action_import_rawdata_direct;
 	public static String		Action_import_rawdata_direct_tooltip;
@@ -148,10 +148,8 @@ public class Messages extends NLS {
 	public static String		Image_database_placeholder;
 	public static String		Image_delete;
 	public static String		Image_delete_disabled;
-
-	public static String	Image_edit_tour;
-
-	public static String	Image_edit_tour_disabled;
+	public static String		Image_edit_tour;
+	public static String		Image_edit_tour_disabled;
 	public static String		Image_fit_to_window;
 	public static String		Image_graph_altimeter;
 	public static String		Image_graph_altitude;
@@ -177,14 +175,10 @@ public class Messages extends NLS {
 	public static String		Image_show_time_on_x_axis;
 	public static String		Image_show_tour_viewer;
 	public static String		Image_show_view_detail;
-
-	public static String	Image_synch_graph_byScale;
-
-	public static String	Image_synch_graph_byScale_disabled;
-
-	public static String	Image_synch_graph_bySize;
-
-	public static String	Image_synch_graph_bySize_disabled;
+	public static String		Image_synch_graph_byScale;
+	public static String		Image_synch_graph_byScale_disabled;
+	public static String		Image_synch_graph_bySize;
+	public static String		Image_synch_graph_bySize_disabled;
 	public static String		Image_synch_graph_vertical;
 	public static String		Image_undo_edit;
 	public static String		Image_undo_edit_disabled;
@@ -328,16 +322,13 @@ public class Messages extends NLS {
 	public static String		Tour_Action_open_marker_editor;
 	public static String		Tour_Action_open_marker_view;
 	public static String		Tour_Action_open_tour_segmenter_tooltip;
-
 	public static String		Tour_Action_scroll_zoomed_chart;
 	public static String		Tour_Action_show_distance_on_x_axis;
 	public static String		Tour_Action_show_distance_on_x_axis_tooltip;
 	public static String		Tour_Action_show_start_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis_tooltip;
-
 	public static String		Tour_Action_undo_typing;
-
 	public static String		Tour_Action_undo_typing_tooltip;
 	public static String		Tour_Action_zoom_fit_to_window;
 
@@ -392,10 +383,8 @@ public class Messages extends NLS {
 	public static String		TourMap_Action_delete_tours;
 	public static String		TourMap_Action_rename_reference_tour;
 	public static String		TourMap_Action_synch_chart_years_tooltip;
-
-	public static String	TourMap_Action_synch_charts_byScale_tooltip;
-
-	public static String	TourMap_Action_synch_charts_bySize_tooltip;
+	public static String		TourMap_Action_synch_charts_byScale_tooltip;
+	public static String		TourMap_Action_synch_charts_bySize_tooltip;
 	public static String		TourMap_Column_kmh;
 	public static String		TourMap_Column_tour;
 	public static String		TourMap_Compare_job_subtask;
@@ -403,8 +392,10 @@ public class Messages extends NLS {
 	public static String		TourMap_Compare_job_title;
 	public static String		TourMap_Dlg_add_reference_tour_msg;
 	public static String		TourMap_Dlg_add_reference_tour_title;
-	public static String		TourMap_Dlg_delete_tour_msg;
-	public static String		TourMap_Dlg_delete_tour_title;
+	public static String		TourMap_Dlg_delete_comparedTour_msg;
+	public static String		TourMap_Dlg_delete_comparedTour_title;
+	public static String		TourMap_Dlg_delete_refTour_msg;
+	public static String		TourMap_Dlg_delete_refTour_title;
 	public static String		TourMap_Dlg_rename_reference_tour_msg;
 	public static String		TourMap_Dlg_rename_reference_tour_title;
 	public static String		TourMap_Label_a_tour_is_not_selected;

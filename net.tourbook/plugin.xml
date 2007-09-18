@@ -164,18 +164,14 @@
             icon="icons/marker-list.gif"
             id="net.tourbook.views.TourMarkerView"
             name="%view_name_Marker"/>
-      <category
-            id="net.tourbook.category.tourAnalyze"
-            name="%view_category_analyzeTours">
-      </category>
      <view
-           category="net.tourbook.category.tourAnalyze"
+           category="net.tourbook.category.tour"
            class="net.tourbook.ui.views.TourChartAnalyzerView"
            icon="icons/chart-analyzer.gif"
            id="net.tourbook.views.TourChartAnalyzer"
            name="%view_name_Analyzer"/>
       <view
-            category="net.tourbook.category.tourAnalyze"
+            category="net.tourbook.category.tour"
             class="net.tourbook.ui.views.TourSegmenterView"
             icon="icons/tour-segmenter.gif"
             id="net.tourbook.views.TourSegmenter"
@@ -187,7 +183,7 @@
       <view
             category="net.tourbook.category.compareTours"
             class="net.tourbook.ui.views.tourMap.CompareResultView"
-            icon="icons/tourfinder-compare.gif"
+            icon="icons/tour-map-compare-result.gif"
             id="net.tourbook.views.tourMap.CompareResultView"
             name="%view_name_Compare_Result"/>
       <view
@@ -215,34 +211,36 @@
             id="net.tourbook.category.system"
             name="%view_category_system">
       </category>
-                <view
-                      category="net.tourbook.category.system"
-                      class="net.tourbook.ui.views.TourChartPropertyView"
-                      icon="icons/tourchart-properties.gif"
-                      id="net.tourbook.views.TourChartPropertyView"
-                      name="%view_name_ChartProperty">
-                </view>
-                <view
+        <view
             name="Progress View"
+            id="org.eclipse.ui.views.ProgressView"
             icon="icons/pview.gif"
             category="net.tourbook.category.system"
             class="org.eclipse.ui.ExtensionFactory:progressView"
-            id="net.tourbook.views.tourMap.referenceTourView">
+            >
          </view>
+		<view
+                      name="%view_name_ChartProperty"
+                      id="net.tourbook.views.TourChartPropertyView"
+                      category="net.tourbook.category.system"
+                      class="net.tourbook.ui.views.TourChartPropertyView"
+                      icon="icons/tourchart-properties.gif"
+                      >
+        </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
-      <perspective
-            class="net.tourbook.application.PerspectiveFactoryTourBook"
-            icon="icons/tour-list-perspective.gif"
-            id="net.tourbook.perspective.TourBook"
-            name="%perspective_name_TourBook">
-      </perspective>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryRawData"
             icon="icons/rawdata-perspective.gif"
             id="net.tourbook.perspective.RawData"
             name="%perspective_name_RawData">
+      </perspective>
+      <perspective
+            class="net.tourbook.application.PerspectiveFactoryTourBook"
+            icon="icons/tour-list-perspective.gif"
+            id="net.tourbook.perspective.TourBook"
+            name="%perspective_name_TourBook">
       </perspective>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryTourMap"
@@ -255,6 +253,12 @@
             icon="icons/statistics-perspective.gif"
             id="net.tourbook.perspective.Statistic"
             name="%perspective_name_Statistics">
+      </perspective>
+      <perspective
+            class="net.tourbook.application.PerspectiveFactoryCompareTours"
+            icon="icons/tour-map-compare-result-perspective.gif"
+            id="net.tourbook.perspective.CompareTours"
+            name="%perspective_name_CompareTours">
       </perspective>
    </extension>
    <extension
@@ -272,6 +276,9 @@
          </perspectiveShortcut>
          <perspectiveShortcut
                id="net.tourbook.perspective.RawData">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="net.tourbook.perspective.CompareTours">
          </perspectiveShortcut>
       </perspectiveExtension>
       <perspectiveExtension
@@ -367,14 +374,6 @@
                   tooltip="%command_view_tourProperies_tooltip">
             </command>
             <command
-                  commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
-                  icon="icons/tour-segmenter.gif"
-                  label="%command_tourChart_tool_tourSegmenter"
-                  mnemonic="%command_tourChart_tool_tourSegmenter_mnemonic"
-                  style="push"
-                  tooltip="%command_tourChart_tool_tourSegmenter_tooltip">
-            </command>
-            <command
                   commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
                   icon="icons/chart-analyzer.gif"
                   label="%command_tourChart_tool_graphAnalyzer"
@@ -402,11 +401,18 @@
                   commandId="net.tourbook.command.tourChart.tool.tourMarker"
                   disabledIcon="icons/marker-editor-disabled.gif"
                   icon="icons/marker-editor.gif"
-                  id="net.tourbook.command.tourChart.tool.tourMarker"
                   label="%command_tourChart_tool_tourMarker"
                   mnemonic="%command_tourChart_tool_tourMarker_mnemonic"
                   style="push"
                   tooltip="%command_tourChart_tool_tourMarker_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
+                  icon="icons/tour-segmenter.gif"
+                  label="%command_tourChart_tool_tourSegmenter"
+                  mnemonic="%command_tourChart_tool_tourSegmenter_mnemonic"
+                  style="push"
+                  tooltip="%command_tourChart_tool_tourSegmenter_tooltip">
             </command>
          </toolbar>
       </menuContribution>
@@ -552,177 +558,92 @@
                   style="toggle">
             </command>
          </menu>
-      </menuContribution>
-      <menuContribution
-            locationURI="example toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="net.tourbook.toolbars.tourChart.graphs">
+         <menu
+               id="net.tourbook.menu.main.tools"
+               label="%menu_main_tools"
+               mnemonic="%menu_main_tools_mnemonic">
             <command
-                  commandId="net.tourbook.command.graph.altitude"
-                  icon="icons/graph-altitude.gif"
-                  label="%command_graph_altitude"
-                  mnemonic="%command_graph_altitude_mnemonic"
-                  style="toggle"
-                  tooltip="%command_graph_altitude_tooltip">
-               <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.definition.isTourEditor">
-                  </reference>
-               </visibleWhen>
+                  commandId="net.tourbook.command.tourChart.tool.adjustAltitude"
+                  disabledIcon="icons/adjust-altitude-disabled.gif"
+                  icon="icons/adjust-altitude.gif"
+                  label="%command_tourChart_tool_adjustAltitude"
+                  mnemonic="%command_tourChart_tool_adjustAltitude_mnemonic"
+                  style="push"
+                  tooltip="%command_tourChart_tool_adjustAltitude_tooltip">
             </command>
             <command
-                  commandId="net.tourbook.command.graph.speed"
-                  icon="icons/graph-speed.gif"
-                  label="%command_graph_speed"
-                  mnemonic="%command_graph_speed_mnemonic"
-                  style="toggle"
-                  tooltip="%command_graph_speed_tooltip">
-               <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.definition.isTourEditor">
-                  </reference>
-               </visibleWhen>
+                  commandId="net.tourbook.command.tourChart.tool.tourMarker"
+                  disabledIcon="icons/marker-editor-disabled.gif"
+                  icon="icons/marker-editor.gif"
+                  label="%command_tourChart_tool_tourMarker"
+                  mnemonic="%command_tourChart_tool_tourMarker_mnemonic"
+                  style="push"
+                  tooltip="%command_tourChart_tool_tourMarker_tooltip">
             </command>
             <command
-                  commandId="net.tourbook.command.graph.pulse"
-                  icon="icons/graph-pulse.gif"
-                  label="%command_graph_pulse"
-                  mnemonic="%command_graph_pulse_mnemonic"
-                  style="toggle"
-                  tooltip="%command_graph_pulse_tooltip">
-               <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.definition.isTourEditor">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="net.tourbook.command.graph.temperature"
-                  icon="icons/graph-temperature.gif"
-                  label="%command_graph_temperature"
-                  mnemonic="%command_graph_temperature_mnemonic"
-                  style="toggle"
-                  tooltip="%command_graph_temperature_tooltip">
-               <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.definition.isTourEditor">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="net.tourbook.command.graph.cadence"
-                  icon="icons/graph-cadence.gif"
-                  label="%command_graph_cadence"
-                  mnemonic="%command_graph_cadence_mnemonic"
-                  style="toggle"
-                  tooltip="%command_graph_cadence_tooltip">
-               <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.definition.isTourEditor">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="net.tourbook.command.graph.altimeter"
-                  icon="icons/graph-altimeter.gif"
-                  label="%command_graph_altimeter"
-                  mnemonic="%command_graph_altimeter_mnemonic"
-                  style="toggle"
-                  tooltip="%command_graph_altimeter_tooltip">
-               <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.definition.isTourEditor">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="net.tourbook.command.graph.gradient"
-                  icon="icons/graph-gradient.gif"
-                  label="%command_graph_gradient"
-                  mnemonic="%command_graph_gradient_mnemonic"
-                  style="toggle"
-                  tooltip="%command_graph_gradient_tooltip">
-               <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.definition.isTourEditor">
-                  </reference>
-               </visibleWhen>
-            </command>
-         </toolbar>
-         <toolbar
-               id="net.tourbook.toolbars.tourChart">
-            <command
-                  commandId="net.tourbook.command.tourChart.xAxisTime"
-                  icon="icons/x-axes-time.gif"
-                  label="%command_tourChart_xAxisTime"
-                  mnemonic="%command_tourChart_xAxisTime_mnemonic"
-                  style="toggle"
-                  tooltip="%command_tourChart_xAxisTime_tooltip">
-               <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.definition.isTourEditor">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="net.tourbook.command.tourChart.xAxisDistance"
-                  icon="icons/x-axes-distance.gif"
-                  label="%command_tourChart_xAxisDistance"
-                  mnemonic="%command_tourChart_xAxisDistance_mnemonic"
-                  style="toggle"
-                  tooltip="%command_tourChart_xAxisDistance_tooltip">
-               <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.definition.isTourEditor">
-                  </reference>
-               </visibleWhen>
+                  commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
+                  icon="icons/tour-segmenter.gif"
+                  label="%command_tourChart_tool_tourSegmenter"
+                  mnemonic="%command_tourChart_tool_tourSegmenter_mnemonic"
+                  style="push"
+                  tooltip="%command_tourChart_tool_tourSegmenter_tooltip">
             </command>
             <separator
-                  name="net.tourbook.toolbars.tourChart.separator"
+                  name="net.tourbook.separator"
                   visible="true">
             </separator>
             <command
-                  commandId="net.tourbook.command.tourChart.options"
-                  icon="icons/tour-options.gif"
-                  id="net.tourbook.tourChart.pulldown.optionId"
-                  label="%command_tourChart_options"
-                  mnemonic="%command_tourChart_options_mnemonic"
-                  style="pulldown"
-                  tooltip="%command_tourChart_options_tooltip">
-               <visibleWhen>
-                  <reference
-                        definitionId="net.tourbook.definition.isTourEditor">
-                  </reference>
-               </visibleWhen>
+                  commandId="net.tourbook.command.tourCompareWizard"
+                  icon="icons/tour-map-compare-wizard.gif"
+                  label="%command_tourCompare_wizard"
+                  mnemonic="%command_tourCompare_wizard_mnemonic">
             </command>
-         </toolbar>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:views?before=defaultViews">
+         <command
+               commandId="net.tourbook.command.selectedTour"
+               icon="icons/tour-chart.gif"
+               label="%command_view_selectedTour"
+               mnemonic="%command_view_selectedTour_mnemonic"
+               tooltip="%command_view_selectedTour_tooltip">
+         </command>
+         <command
+               commandId="net.tourbook.command.tourProperties"
+               icon="icons/tour-properties.gif"
+               label="%command_view_tourProperies"
+               mnemonic="%command_view_tourProperies_mnemonic"
+               tooltip="%command_view_tourProperies_tooltip">
+         </command>
+         <command
+               commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
+               icon="icons/chart-analyzer.gif"
+               label="%command_tourChart_tool_graphAnalyzer"
+               mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
+               style="push"
+               tooltip="%command_tourChart_tool_graphAnalyzer_tooltip">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:net.tourbook.views.tourMap.TourMapView?after=additions">
+         <command
+               commandId="net.tourbook.command.tourCompareWizard"
+               icon="icons/tour-map-compare-wizard.gif"
+               label="%command_tourCompare_wizard"
+               mnemonic="%command_tourCompare_wizard_mnemonic">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:net.tourbook.views.tourMap.CompareResultView?after=additions">
+         <command
+               commandId="net.tourbook.command.tourCompareWizard"
+               icon="icons/tour-map-compare-wizard.gif"
+               label="%command_tourCompare_wizard"
+               mnemonic="%command_tourCompare_wizard_mnemonic">
+         </command>
       </menuContribution>
       
-      <menuContribution
-            locationURI="example menu:net.tourbook.tourChart.pulldown.optionId">
-         <command
-               commandId="net.tourbook.command.tourChart.showStartTime"
-               label="%command_tourChart_showStartTime"
-               mnemonic="%command_tourChart_showStartTime_mnemonic"
-               style="toggle">
-         </command>
-         <separator
-               name="net.tourbook.separator6"
-               visible="true">
-         </separator>
-         <command
-               commandId="net.tourbook.command.tourChart.canScrollChart"
-               label="%command_tourChart_canScrollChart"
-               mnemonic="%command_tourChart_canScrollChart_mnemonic"
-               style="toggle">
-         </command>
-         <command
-               commandId="net.tourbook.command.tourChart.canAutoZoomToSlider"
-               label="%command_tourChart_canAutoZoomToSlider"
-               mnemonic="%command_tourChart_canAutoZoomToSlider_mnemonic"
-               style="toggle">
-         </command>
-      </menuContribution>
  
    </extension>
    <extension
@@ -806,6 +727,10 @@
             name="%command_tourChart_tool_tourMarker">
       </command>
       <command
+            id="net.tourbook.command.tourCompareWizard"
+            name="%command_tourCompare_wizard">
+      </command>
+      <command
             defaultHandler="net.tourbook.tour.ActionHandlerViewGraphAnalyzer"
             id="net.tourbook.command.tourChart.tool.graphAnalyzer"
             name="%command_tourChart_tool_graphAnalyzer">
@@ -860,6 +785,10 @@
                   definitionId="net.tourbook.definition.isTourEditor">
             </reference>
          </activeWhen>
+      </handler>
+      <handler
+            class="net.tourbook.ui.views.tourMap.ActionHandlerTourCompareWizard"
+            commandId="net.tourbook.command.tourCompareWizard">
       </handler>
    </extension>
    <extension

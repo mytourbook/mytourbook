@@ -26,6 +26,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TreeViewerItem;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -65,6 +66,46 @@ public class TourCompareManager {
 			fInstance = new TourCompareManager();
 		}
 		return fInstance;
+	}
+
+	/**
+	 * Find the compared tours in the tour map tree viewer<br>
+	 * !!! Recursive !!!
+	 * 
+	 * @param comparedTours
+	 * @param parentItem
+	 * @param findCompIds
+	 *        comp id's which should be found
+	 */
+	static void getComparedTours(	ArrayList<TVTITourMapComparedTour> comparedTours,
+									final TreeViewerItem parentItem,
+									final ArrayList<Long> findCompIds) {
+
+		final ArrayList<TreeViewerItem> unfetchedChildren = parentItem.getUnfetchedChildren();
+
+		if (unfetchedChildren != null) {
+
+			// children are available
+
+			for (final TreeViewerItem tourTreeItem : unfetchedChildren) {
+
+				if (tourTreeItem instanceof TVTITourMapComparedTour) {
+
+					final TVTITourMapComparedTour ttiCompResult = (TVTITourMapComparedTour) tourTreeItem;
+					final long ttiCompId = ttiCompResult.getCompId();
+
+					for (final Long compId : findCompIds) {
+						if (ttiCompId == compId) {
+							comparedTours.add(ttiCompResult);
+						}
+					}
+
+				} else {
+					// this is a child which can be the parent for other childs
+					getComparedTours(comparedTours, tourTreeItem, findCompIds);
+				}
+			}
+		}
 	}
 
 	/**

@@ -16,12 +16,8 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.views.tourMap.WizardTourComparer;
-import net.tourbook.util.PositionedWizardDialog;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
@@ -32,10 +28,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -51,25 +44,21 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	private Action				fActionTourCompareWizard;
-
 	private IWorkbenchAction	fActionSave;
 	private IWorkbenchAction	fActionSaveAll;
-	private IWorkbenchAction	fActionRevert;
 
 	private IContributionItem	fActionViewShortList;
 	private IWorkbenchAction	fActionPreferences;
 
 	PersonContributionItem		personSelector;
 	TourTypeContributionItem	tourTypeSelector;
+
 	private IWorkbenchAction	fActionAbout;
 	private IWorkbenchAction	fActionQuit;
 
 	private IWorkbenchAction	savePerspectiveAction;
 	private IWorkbenchAction	resetPerspectiveAction;
-
 	private IWorkbenchAction	closePerspAction;
-
 	private IWorkbenchAction	closeAllPerspsAction;
 	private IWorkbenchAction	editActionSetAction;
 	private IWorkbenchWindow	fWindow;
@@ -109,39 +98,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fActionSave = ActionFactory.SAVE.create(window);
 		register(fActionSave);
 
-		fActionRevert = ActionFactory.REVERT.create(window);
-		register(fActionRevert);
-
 		fActionSaveAll = ActionFactory.SAVE_ALL.create(window);
 		register(fActionSaveAll);
 
 		fActionViewShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
-
-		fActionTourCompareWizard = new Action() {
-
-			{
-				setText(Messages.Action_open_compare_wizard);
-				setToolTipText(Messages.Action_open_compare_wizard_tooltip);
-				setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_view_compare_wizard));
-			}
-
-			@Override
-			public void run() {
-				Wizard wizard = new WizardTourComparer();
-
-				final WizardDialog dialog = new PositionedWizardDialog(window.getShell(),
-						wizard,
-						WizardTourComparer.DIALOG_SETTINGS_SECTION,
-						800,
-						600);
-
-				BusyIndicator.showWhile(null, new Runnable() {
-					public void run() {
-						dialog.open();
-					}
-				});
-			}
-		};
 
 		editActionSetAction = ActionFactory.EDIT_ACTION_SETS.create(window);
 		register(editActionSetAction);
@@ -186,16 +146,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createViewMenu() {
 
-		MenuManager viewMenu = new MenuManager(Messages.Action_Menu_view, null);
+		MenuManager viewMenu = new MenuManager(Messages.Action_Menu_view, "views");
 
+		viewMenu.add(new Separator("defaultViews"));
 		viewMenu.add(fActionViewShortList);
 
 		viewMenu.add(new Separator());
 		addPerspectiveActions(viewMenu);
-
-		viewMenu.add(new Separator());
-		viewMenu.add(fActionTourCompareWizard);
-//		tourMenu.add(fActionTourCompareView);
 
 		return viewMenu;
 	}
@@ -210,6 +167,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			MenuManager changePerspMenuMgr = new MenuManager(openText, "openPerspective"); //$NON-NLS-1$
 			IContributionItem changePerspMenuItem = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(fWindow);
 			changePerspMenuMgr.add(changePerspMenuItem);
+
 			menu.add(changePerspMenuMgr);
 		}
 
@@ -227,9 +185,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileMenu.add(fActionSave);
 		fileMenu.add(fActionSaveAll);
 		fileMenu.add(new GroupMarker("fileSave"));
-
-//		fileMenu.add(fActionRevert);
-		fileMenu.add(new Separator());
 
 		fileMenu.add(new Separator());
 

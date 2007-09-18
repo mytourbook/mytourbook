@@ -109,13 +109,14 @@ public class TourBookView extends ViewPart {
 
 	public NumberFormat				fNF									= NumberFormat.getNumberInstance();
 
-	private RGB						fRGBYearFg							= new RGB(255, 255, 255);
-	private RGB						fRGBMonthFg							= new RGB(128, 64, 0);
-	private RGB						fRGBTourFg							= new RGB(0, 0, 128);
+	private final RGB				fRGBYearFg							= new RGB(0, 0, 0);
+	private final RGB				fRGBYearBg							= new RGB(255, 252, 178);
 
-	private RGB						fRGBYearBg							= new RGB(111, 130, 197);
-	private RGB						fRGBMonthBg							= new RGB(220, 220, 255);
-	private RGB						fRGBTourBg							= new RGB(240, 240, 255);
+	private final RGB				fRGBMonthFg							= new RGB(0, 0, 0);
+	private final RGB				fRGBMonthBg							= new RGB(255, 253, 204);
+
+	private final RGB				fRGBTourFg							= new RGB(0, 0, 0);
+	private final RGB				fRGBTourBg							= new RGB(255, 255, 255);
 
 	private Color					fColorYearFg;
 	private Color					fColorMonthFg;
