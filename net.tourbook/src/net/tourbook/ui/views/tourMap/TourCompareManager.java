@@ -21,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
 import net.tourbook.Messages;
+import net.tourbook.application.PerspectiveFactoryCompareTours;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -35,10 +36,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 
 /**
  * The TourCompareManager manages the comparision between tours
@@ -229,10 +232,16 @@ public class TourCompareManager {
 
 			public void run() {
 
+				final IWorkbench workbench = PlatformUI.getWorkbench();
 				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
 				if (window != null) {
 					try {
+
+						// show compare result perspective
+						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID,
+								window);
+
 						tourComparerView = (CompareResultView) window.getActivePage()
 								.showView(CompareResultView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
@@ -241,6 +250,9 @@ public class TourCompareManager {
 					} catch (PartInitException e) {
 						ErrorDialog.openError(window.getShell(), "Error", e.getMessage(), e //$NON-NLS-1$
 						.getStatus());
+						e.printStackTrace();
+					} catch (WorkbenchException e) {
+						e.printStackTrace();
 					}
 				}
 

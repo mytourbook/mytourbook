@@ -67,96 +67,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		super(configurer);
 	}
 
-	@Override
-	public IStatus saveState(IMemento memento) {
-
-		personSelector.saveState(memento);
-		tourTypeSelector.saveState(memento);
-
-		return super.saveState(memento);
-	}
-
-	@Override
-	protected void makeActions(final IWorkbenchWindow window) {
-
-		fWindow = window;
-
-		personSelector = new PersonContributionItem();
-		tourTypeSelector = new TourTypeContributionItem();
-
-		fActionQuit = ActionFactory.QUIT.create(window);
-		register(fActionQuit);
-
-		fActionAbout = ActionFactory.ABOUT.create(window);
-		fActionAbout.setText(Messages.Action_About);
-		register(fActionAbout);
-
-		fActionPreferences = ActionFactory.PREFERENCES.create(window);
-		fActionPreferences.setText(Messages.Action_open_preferences);
-		register(fActionPreferences);
-
-		fActionSave = ActionFactory.SAVE.create(window);
-		register(fActionSave);
-
-		fActionSaveAll = ActionFactory.SAVE_ALL.create(window);
-		register(fActionSaveAll);
-
-		fActionViewShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
-
-		editActionSetAction = ActionFactory.EDIT_ACTION_SETS.create(window);
-		register(editActionSetAction);
-
-		savePerspectiveAction = ActionFactory.SAVE_PERSPECTIVE.create(window);
-		register(savePerspectiveAction);
-
-		resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
-		register(resetPerspectiveAction);
-
-		closePerspAction = ActionFactory.CLOSE_PERSPECTIVE.create(window);
-		register(closePerspAction);
-
-		closeAllPerspsAction = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
-		register(closeAllPerspsAction);
-
-	}
-
-	@Override
-	protected void fillMenuBar(IMenuManager menuBar) {
-
-		/*
-		 * create menu bar
-		 */
-		menuBar.add(createFileMenu());
-		menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-		menuBar.add(createViewMenu());
-		menuBar.add(createHelpMenu());
-	}
-
-	private MenuManager createHelpMenu() {
-		/*
-		 * help - menu
-		 */
-		MenuManager helpMenu = new MenuManager(Messages.Action_Menu_help,
-				IWorkbenchActionConstants.M_HELP);
-
-		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
-
-		return helpMenu;
-	}
-
-	private MenuManager createViewMenu() {
-
-		MenuManager viewMenu = new MenuManager(Messages.Action_Menu_view, "views");
-
-		viewMenu.add(new Separator("defaultViews"));
-		viewMenu.add(fActionViewShortList);
-
-		viewMenu.add(new Separator());
-		addPerspectiveActions(viewMenu);
-
-		return viewMenu;
-	}
-
 	/**
 	 * Adds the perspective actions to the specified menu.
 	 */
@@ -182,34 +92,75 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager fileMenu = new MenuManager(Messages.Action_Menu_file,
 				IWorkbenchActionConstants.M_FILE);
 
+		fileMenu.add(new GroupMarker("fileNew"));
+
 		fileMenu.add(fActionSave);
 		fileMenu.add(fActionSaveAll);
+
 		fileMenu.add(new GroupMarker("fileSave"));
-
-		fileMenu.add(new Separator());
-
-		// If we're on OS X we shouldn't show this command in the File menu. It
-		// should be invisible to the user. However, we should not remove it -
-		// the carbon UI code will do a search through our menu structure
-		// looking for it when Cmd-Q is invoked (or Quit is chosen from the
-		// application menu.
-		ActionContributionItem prefItem = new ActionContributionItem(fActionPreferences);
-		prefItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
-		fileMenu.add(prefItem);
 
 		fileMenu.add(new Separator("update")); //$NON-NLS-1$
 		fileMenu.add(new Separator());
 
-		// If we're on OS X we shouldn't show this command in the File menu. It
-		// should be invisible to the user. However, we should not remove it -
-		// the carbon UI code will do a search through our menu structure
-		// looking for it when Cmd-Q is invoked (or Quit is chosen from the
-		// application menu.
+		/*
+		 * If we're on OS X we shouldn't show this command in the File menu. It should be invisible
+		 * to the user. However, we should not remove it - the carbon UI code will do a search
+		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
+		 * the application menu.
+		 */
 		ActionContributionItem quitItem = new ActionContributionItem(fActionQuit);
 		quitItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
 		fileMenu.add(quitItem);
 
 		return fileMenu;
+	}
+
+	private MenuManager createHelpMenu() {
+		/*
+		 * help - menu
+		 */
+		MenuManager helpMenu = new MenuManager(Messages.Action_Menu_help,
+				IWorkbenchActionConstants.M_HELP);
+
+		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
+
+		return helpMenu;
+	}
+
+	private MenuManager createToolMenu() {
+
+		MenuManager toolMenu = new MenuManager(Messages.Action_Menu_tools,
+				"net.tourbook.menu.main.tools");
+
+		toolMenu.add(new GroupMarker("tools"));
+		toolMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+
+		toolMenu.add(new Separator());
+
+		/*
+		 * If we're on OS X we shouldn't show this command in the File menu. It should be invisible
+		 * to the user. However, we should not remove it - the carbon UI code will do a search
+		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
+		 * the application menu.
+		 */
+		ActionContributionItem prefItem = new ActionContributionItem(fActionPreferences);
+		prefItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
+		toolMenu.add(prefItem);
+
+		return toolMenu;
+	}
+
+	private MenuManager createViewMenu() {
+
+		MenuManager viewMenu = new MenuManager(Messages.Action_Menu_view, "views");
+
+		viewMenu.add(new Separator("defaultViews"));
+		viewMenu.add(fActionViewShortList);
+
+		viewMenu.add(new Separator());
+		addPerspectiveActions(viewMenu);
+
+		return viewMenu;
 	}
 
 	@Override
@@ -269,6 +220,72 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 //		prefToolbar.add(fActionPreferences);
 //
 //		coolBar.add(new ToolBarContributionItem(prefToolbar, "pref")); //$NON-NLS-1$
+	}
+
+	@Override
+	protected void fillMenuBar(IMenuManager menuBar) {
+
+		/*
+		 * create menu bar
+		 */
+		menuBar.add(createFileMenu());
+		menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+		menuBar.add(createToolMenu());
+		menuBar.add(createViewMenu());
+		menuBar.add(createHelpMenu());
+	}
+
+	@Override
+	protected void makeActions(final IWorkbenchWindow window) {
+
+		fWindow = window;
+
+		personSelector = new PersonContributionItem();
+		tourTypeSelector = new TourTypeContributionItem();
+
+		fActionQuit = ActionFactory.QUIT.create(window);
+		register(fActionQuit);
+
+		fActionAbout = ActionFactory.ABOUT.create(window);
+		fActionAbout.setText(Messages.Action_About);
+		register(fActionAbout);
+
+		fActionPreferences = ActionFactory.PREFERENCES.create(window);
+		fActionPreferences.setText(Messages.Action_open_preferences);
+		register(fActionPreferences);
+
+		fActionSave = ActionFactory.SAVE.create(window);
+		register(fActionSave);
+
+		fActionSaveAll = ActionFactory.SAVE_ALL.create(window);
+		register(fActionSaveAll);
+
+		fActionViewShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
+
+		editActionSetAction = ActionFactory.EDIT_ACTION_SETS.create(window);
+		register(editActionSetAction);
+
+		savePerspectiveAction = ActionFactory.SAVE_PERSPECTIVE.create(window);
+		register(savePerspectiveAction);
+
+		resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
+		register(resetPerspectiveAction);
+
+		closePerspAction = ActionFactory.CLOSE_PERSPECTIVE.create(window);
+		register(closePerspAction);
+
+		closeAllPerspsAction = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
+		register(closeAllPerspsAction);
+
+	}
+
+	@Override
+	public IStatus saveState(IMemento memento) {
+
+		personSelector.saveState(memento);
+		tourTypeSelector.saveState(memento);
+
+		return super.saveState(memento);
 	}
 
 }

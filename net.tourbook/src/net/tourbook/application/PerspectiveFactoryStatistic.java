@@ -35,7 +35,7 @@ public class PerspectiveFactoryStatistic implements IPerspectiveFactory {
 //		rightFolder.addPlaceholder(TourChartView.ID);
 
 		// hide editor area
-//		layout.setEditorAreaVisible(false);
+		layout.setEditorAreaVisible(false);
 
 	}
 }

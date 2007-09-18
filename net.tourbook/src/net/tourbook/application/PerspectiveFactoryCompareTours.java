@@ -10,7 +10,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 
-	static final String			PERSPECTIVE_ID	= "net.tourbook.perspective.CompareTours";	//$NON-NLS-1$
+	public static final String	PERSPECTIVE_ID	= "net.tourbook.perspective.CompareTours";	//$NON-NLS-1$
 
 	private static final String	FOLDER_ID_LIST	= "list";
 	private static final String	FOLDER_ID_REF	= "ref";

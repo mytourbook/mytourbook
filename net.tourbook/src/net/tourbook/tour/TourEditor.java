@@ -314,7 +314,7 @@ public class TourEditor extends EditorPart {
 
 			final String tourTitle = TourManager.getTourDate(fTourData);
 
-			fEditorInput.fEditorTitle = tourTitle;
+			fEditorInput.fEditorTitle = tourTitle == null ? "" : tourTitle;
 			setPartName(tourTitle);
 			setTitleToolTip("title tooltip ???");
 		}

@@ -4,12 +4,12 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-public class ActionHandlerImportFromDeviceDirect extends AbstractHandler {
+public class ActionHandlerImportFromFile extends AbstractHandler {
 
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(ExecutionEvent arg0) throws ExecutionException {
 
-		RawDataManager.getInstance().executeImportFromDeviceDirect();
+		RawDataManager.getInstance().executeImportFromFile();
 
 		return null;
 	}

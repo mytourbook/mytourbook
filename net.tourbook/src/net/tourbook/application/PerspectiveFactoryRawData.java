@@ -27,7 +27,7 @@ public class PerspectiveFactoryRawData implements IPerspectiveFactory {
 
 		topFolder.addView(TourChartView.ID);
 
-//		layout.setEditorAreaVisible(false);
+		layout.setEditorAreaVisible(false);
 
 	}
 

@@ -18,6 +18,8 @@ package net.tourbook.importdata;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,15 +28,25 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
+import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.views.rawData.RawDataView;
 
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
@@ -59,6 +71,8 @@ public class RawDataManager {
 
 	private int							fImportYear			= -1;
 
+	private RawDataView					fRawDataView;
+
 	private RawDataManager() {}
 
 	public static RawDataManager getInstance() {
@@ -80,12 +94,160 @@ public class RawDataManager {
 				.getAbsolutePath();
 	}
 
+	public void executeImportFromDevice() {
+
+		showRawDataView();
+
+		new WizardImportDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+				new WizardImportData(),
+				Messages.ImportWizard_Dlg_title).open();
+
+	}
+
+	public void executeImportFromDeviceDirect() {
+
+		showRawDataView();
+
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+		final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+
+		final WizardImportData importWizard = new WizardImportData();
+
+		final WizardDialog dialog = new WizardImportDialog(window.getShell(),
+				importWizard,
+				Messages.ImportWizard_Dlg_title);
+
+		// create the dialog and shell which is required in setAutoDownload()
+		dialog.create();
+
+		importWizard.setAutoDownload();
+
+		dialog.open();
+	}
+
+	/**
+	 * import tour data from a file
+	 */
+	public void executeImportFromFile() {
+
+		showRawDataView();
+
+		// setup open dialog
+		final FileDialog fileDialog = new FileDialog(Display.getCurrent().getActiveShell(),
+				(SWT.OPEN | SWT.MULTI));
+
+		final ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
+
+		// sort device list alphabetically
+		Collections.sort(deviceList, new Comparator<TourbookDevice>() {
+			public int compare(final TourbookDevice o1, final TourbookDevice o2) {
+				return o1.visibleName.compareTo(o2.visibleName);
+			}
+		});
+
+		// create file filter list
+		final int deviceLength = deviceList.size() + 1;
+		final String[] filterExtensions = new String[deviceLength];
+		final String[] filterNames = new String[deviceLength];
+
+		int deviceIndex = 0;
+
+		// add option to show all files
+		filterExtensions[deviceIndex] = "*.*"; //$NON-NLS-1$
+		filterNames[deviceIndex] = "*.*"; //$NON-NLS-1$
+
+		deviceIndex++;
+
+		// add option for every file extension
+		for (final TourbookDevice device : deviceList) {
+			filterExtensions[deviceIndex] = "*." + device.fileExtension; //$NON-NLS-1$
+			filterNames[deviceIndex] = device.visibleName + (" (*." + device.fileExtension + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			deviceIndex++;
+		}
+
+		// open file dialog
+		fileDialog.setFilterExtensions(filterExtensions);
+		fileDialog.setFilterNames(filterNames);
+
+		final String firstFileName = fileDialog.open();
+
+		// check if user canceled the dialog
+		if (firstFileName == null) {
+			return;
+		}
+
+		final String[] selectedFileNames = fileDialog.getFileNames();
+
+		Display.getDefault().asyncExec(new Runnable() {
+
+			public void run() {
+
+				final RawDataManager rawDataManager = RawDataManager.getInstance();
+
+				int importCounter = 0;
+
+				final Path filePath = new Path(firstFileName);
+
+				// loop: import all selected files
+				for (String fileName : selectedFileNames) {
+
+					// replace filename, keep the directory path
+					fileName = filePath.removeLastSegments(1)
+							.append(fileName)
+							.makeAbsolute()
+							.toString();
+
+					if (rawDataManager.importRawData(fileName)) {
+						importCounter++;
+					}
+				}
+
+				if (importCounter > 0) {
+
+					rawDataManager.updateTourDataFromDb();
+
+					fRawDataView.updateViewer();
+					fRawDataView.selectFirstTour();
+				}
+			}
+		});
+	}
+
+	private void showRawDataView() {
+
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+		final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+
+		try {
+			// show raw data perspective
+			workbench.showPerspective(PerspectiveFactoryRawData.PERSPECTIVE_ID, window);
+
+			// show raw data view
+			fRawDataView = (RawDataView) window.getActivePage().showView(RawDataView.ID,
+					null,
+					IWorkbenchPage.VIEW_ACTIVATE);
+
+			if (fRawDataView == null) {
+				return;
+			}
+		} catch (WorkbenchException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public DeviceData getDeviceData() {
 		return fDeviceData;
 	}
 
 	public HashSet<String> getImportedFiles() {
 		return fImportedFiles;
+	}
+
+	/**
+	 * @return Returns the import year or <code>-1</code> when the year was not set
+	 */
+	public int getImportYear() {
+		return fImportYear;
 	}
 
 	public HashMap<String, TourData> getTourDataMap() {
@@ -204,6 +366,10 @@ public class RawDataManager {
 		fImportedFiles.clear();
 	}
 
+	public void setImportYear(int year) {
+		fImportYear = year;
+	}
+
 	private void showMsgBoxInvalidFormat(String fileName) {
 
 		MessageBox msgBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_ERROR
@@ -251,16 +417,5 @@ public class RawDataManager {
 				}
 			}
 		});
-	}
-
-	public void setImportYear(int year) {
-		fImportYear = year;
-	}
-
-	/**
-	 * @return Returns the import year or <code>-1</code> when the year was not set
-	 */
-	public int getImportYear() {
-		return fImportYear;
 	}
 }

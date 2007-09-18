@@ -30,6 +30,7 @@ public class Messages extends NLS {
 	public static String		Action_import_rawdata_tooltip;
 	public static String		Action_Menu_file;
 	public static String		Action_Menu_help;
+	public static String		Action_Menu_tools;
 	public static String		Action_Menu_view;
 	public static String		Action_open_compare_wizard;
 	public static String		Action_open_compare_wizard_tooltip;

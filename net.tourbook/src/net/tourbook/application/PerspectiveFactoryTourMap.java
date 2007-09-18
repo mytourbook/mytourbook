@@ -53,6 +53,8 @@ public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
 				FOLDER_ID_REF);
 
 		compFolder.addView(TourMapComparedTourView.ID);
+
+		layout.setEditorAreaVisible(false);
 	}
 
 }
