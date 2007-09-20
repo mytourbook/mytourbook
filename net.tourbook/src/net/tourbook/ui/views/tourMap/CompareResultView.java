@@ -19,22 +19,17 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
 import net.tourbook.Messages;
-import net.tourbook.chart.ChartDataModel;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
-import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -82,58 +77,43 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
-import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class CompareResultView extends ViewPart {
 
-	public static final String					ID						= "net.tourbook.views.tourMap.CompareResultView";				//$NON-NLS-1$
+	public static final String			ID						= "net.tourbook.views.tourMap.CompareResultView";				//$NON-NLS-1$
 
-	public static final int						COLUMN_REF_TOUR			= 0;
-	public static final int						COLUMN_DIFFERENCE		= 1;
-	public static final int						COLUMN_SPEED			= 2;
-	public static final int						COLUMN_DISTANCE			= 3;
-	public static final int						COLUMN_TIME_INTERVAL	= 4;
+	public static final int				COLUMN_REF_TOUR			= 0;
+	public static final int				COLUMN_DIFFERENCE		= 1;
+	public static final int				COLUMN_SPEED			= 2;
+	public static final int				COLUMN_DISTANCE			= 3;
+	public static final int				COLUMN_TIME_INTERVAL	= 4;
 
 	/**
 	 * This memento allows this view to save and restore state when it is closed and opened within a
 	 * session. A different memento is supplied by the platform for persistance at workbench
 	 * shutdown.
 	 */
-	private static IMemento						fSessionMemento			= null;
+	private static IMemento				fSessionMemento			= null;
 
-	private ViewerDetailForm					fViewerDetailForm;
-	CheckboxTreeViewer							fTourViewer;
+	private CheckboxTreeViewer			fTourViewer;
 
-	private TourReference						fCurrentRefTour;
+	private ISelectionListener			fPostSelectionListener;
+	private IPartListener2				fPartListener;
 
-	private ISelectionListener					fPostSelectionListener;
-	private IPartListener2						fPartListener;
+	private Action						fActionSaveComparedTours;
+	private Action						fActionRemoveComparedTourSaveStatus;
 
-	private Action								fActionSaveComparedTours;
-	private Action								fActionRemoveComparedTourSaveStatus;
-	private Action								fActionSynchChartsHorizontal;
-
-	PostSelectionProvider						fPostSelectionProvider;
-
-	private HashMap<Long, TourCompareConfig>	fRefChartDataCache		= new HashMap<Long, TourCompareConfig>();
+	PostSelectionProvider				fPostSelectionProvider;
 
 	/**
 	 * resource manager for images
 	 */
-	private final LocalResourceManager			resManager				= new LocalResourceManager(JFaceResources.getResources());
+	private final LocalResourceManager	resManager				= new LocalResourceManager(JFaceResources.getResources());
 
-	private ImageDescriptor						dbImgDescriptor			= TourbookPlugin.getImageDescriptor(Messages.Image_database);
+	private ImageDescriptor				dbImgDescriptor			= TourbookPlugin.getImageDescriptor(Messages.Image_database);
 
-	private PageBook							fLowerPageBook;
-
-	private RefTourInfo							fRefTourInfo;
-
-	private int									fRefTourXMarkerValue;
-
-	private TVICompareResult					fCurrentTTICompareResult;
-
-	private final NumberFormat					nf						= NumberFormat.getNumberInstance();
+	private final NumberFormat			nf						= NumberFormat.getNumberInstance();
 
 	private class ActionSaveComparedTours extends Action {
 
@@ -152,7 +132,7 @@ public class CompareResultView extends ViewPart {
 		}
 	}
 
-	private class ResultContentProvider implements ITreeContentProvider {
+	class ResultContentProvider implements ITreeContentProvider {
 
 		private TVICompareResultRoot	rootItem	= new TVICompareResultRoot();
 
@@ -600,37 +580,6 @@ public class CompareResultView extends ViewPart {
 		enableActions();
 	}
 
-	private TourCompareConfig getRefChartData(TourReference refTour) {
-
-		// get the reference chart from the cache
-		TourCompareConfig refTourChartData = fRefChartDataCache.get(refTour.getRefId());
-
-		if (refTourChartData != null) {
-			return refTourChartData;
-		}
-
-		// get tour data from the database
-		TourData tourData = refTour.getTourData();
-
-		// set visible graphs: altitude
-		TourChartConfiguration refTourChartConfig = new TourChartConfiguration(false);
-		refTourChartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
-		// refTourChartConfig.setKeepMinMaxValues(true);
-
-		TourChartConfiguration compTourChartConfig = new TourChartConfiguration(true);
-		compTourChartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
-		// compTourChartConfig.setKeepMinMaxValues(true);
-
-		ChartDataModel refChartDataModel = TourManager.getInstance().createChartDataModel(tourData,
-				refTourChartConfig);
-
-		return new TourCompareConfig(refTour,
-				refChartDataModel,
-				tourData,
-				refTourChartConfig,
-				compTourChartConfig);
-	}
-
 	/**
 	 * @return Returns the fCompareTourViewer.
 	 */
@@ -666,7 +615,7 @@ public class CompareResultView extends ViewPart {
 	}
 
 	/**
-	 * Persist the checked tours
+	 * Persist checked tours in the viewer
 	 */
 	private void saveComparedTours() {
 
@@ -706,8 +655,12 @@ public class CompareResultView extends ViewPart {
 						comparedTour.setTourDate(calendar.getTimeInMillis());
 						comparedTour.setStartYear(tourData.getStartYear());
 
-//						comparedTour.setTourSpeed(compareResult.compareDistance,
-//								compareResult.compareTime);
+						float speed = TourManager.computeTourSpeed(tourData.distanceSerie,
+								tourData.timeSerie,
+								compareResult.compareIndexStart,
+								compareResult.compareIndexEnd);
+
+						comparedTour.setTourSpeed(speed);
 
 						em.persist(comparedTour);
 
@@ -763,39 +716,31 @@ public class CompareResultView extends ViewPart {
 
 	private void showSelectedTour(SelectionChangedEvent event) {
 
-//		try {
-
 		IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
 		Object treeItem = selection.getFirstElement();
 
-		if (treeItem instanceof TVICompareResult) {
+		if (treeItem instanceof TVICompareResultReference) {
 
-			final TVICompareResult result = (TVICompareResult) treeItem;
+			TVICompareResultReference refItem = (TVICompareResultReference) treeItem;
 
-			/*
-			 * show the reference tour chart, this must be done before the compared tour chart
-			 * is displayed, because it set's the current ref tour
-			 */
-//				showRefTour(result.refTour);
-			// show the compared tour chart
-//				showCompTour(result);
-//				fPostSelectionProvider.setSelection(new SelectionTourChart(fCompTourChart));
-		} else if (treeItem instanceof TVICompareResultReference) {
+			fPostSelectionProvider.setSelection(new SelectionComparedTour(fTourViewer,
+					refItem.refTour.getRefId()));
 
-			TVICompareResultReference refTour = (TVICompareResultReference) treeItem;
+		} else if (treeItem instanceof TVICompareResult) {
 
-			// show the reference tour chart
-//				showRefTour(refTour.refTour);
+			final TVICompareResult resultItem = (TVICompareResult) treeItem;
 
-//				showRefTourInfo(refTour.refTour.getRefId());
+			final SelectionComparedTour selectionCompTour = new SelectionComparedTour(fTourViewer,
+					resultItem.refTour.getRefId());
 
-//				fPostSelectionProvider.setSelection(new SelectionTourChart(fRefTourChart));
+			selectionCompTour.setTourCompareData(resultItem.compId,
+					resultItem.compTour.getTourId(),
+					resultItem.compareIndexStart,
+					resultItem.compareIndexEnd);
+
+			fPostSelectionProvider.setSelection(selectionCompTour);
 		}
-
-//		} catch (ChartIsEmptyException e) {
-//			e.printStackTrace();
-//		}
 	}
 
 	/**

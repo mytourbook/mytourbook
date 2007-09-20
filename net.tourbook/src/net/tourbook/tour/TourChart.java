@@ -354,7 +354,7 @@ public class TourChart extends Chart {
 	/**
 	 * Creates the layers from the segmented tour data
 	 */
-	private void createSegmentsLayer() {
+	private void createSegmentLayers() {
 
 		if (fTourData == null) {
 			return;
@@ -925,7 +925,7 @@ public class TourChart extends Chart {
 		fIsSegmentLayerVisible = showLayer;
 
 		if (fIsSegmentLayerVisible) {
-			createSegmentsLayer();
+			createSegmentLayers();
 		} else {
 			fSegmentLayer = null;
 			fSegmentValueLayer = null;
@@ -1021,7 +1021,7 @@ public class TourChart extends Chart {
 			fChartDataModelListener.dataModelChanged(newDataModel);
 		}
 
-		createSegmentsLayer();
+		createSegmentLayers();
 		createMarkerLayer();
 		setGraphLayers();
 

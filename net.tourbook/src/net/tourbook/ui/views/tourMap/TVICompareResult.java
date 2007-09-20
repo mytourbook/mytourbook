@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourMap;
 
+import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.tour.TreeViewerItem;
@@ -25,8 +26,8 @@ import net.tourbook.tour.TreeViewerItem;
 public class TVICompareResult extends TreeViewerItem {
 
 	/**
-	 * id for the TourCompared entity, when set to -1 the compared tour is not
-	 * saved in the database
+	 * Unique id for the {@link TourCompared} entity, the compared tour is not saved in the database
+	 * when set to <code>-1</code>
 	 */
 	long					compId				= -1;
 
@@ -45,6 +46,7 @@ public class TVICompareResult extends TreeViewerItem {
 	protected int			compareDistance;
 	protected int			timeIntervall;
 
+	@Override
 	public boolean hasChildren() {
 		/*
 		 * compare result has no children, hide the expand sign
@@ -52,6 +54,9 @@ public class TVICompareResult extends TreeViewerItem {
 		return false;
 	}
 
+	@Override
 	protected void fetchChildren() {}
+
+	@Override
 	protected void remove() {}
 }

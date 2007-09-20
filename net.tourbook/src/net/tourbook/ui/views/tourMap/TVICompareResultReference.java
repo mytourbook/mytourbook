@@ -27,22 +27,21 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
 
 /**
- * TTI (TreeViewerItem) is used in the tree viewer TourMapView Contains tree items
- * for reference tours
+ * TTI (TreeViewerItem) is used in the tree viewer TourMapView, it contains tree items for reference
+ * tours
  */
 public class TVICompareResultReference extends TreeViewerItem {
 
-	String				label;
+	String						label;
 
-	long				tourId;
+	long						tourId;
 
-	TourReference		refTour;
+	TourReference				refTour;
 
 	/**
-	 * keeps the tourId's for all compared tours which have already been stored
-	 * in the db
+	 * keeps the tourId's for all compared tours which have already been stored in the db
 	 */
-	HashMap<Long, Long>	storedComparedTours;
+	private HashMap<Long, Long>	storedComparedTours;
 
 	public TVICompareResultReference(TVICompareResultRoot parentItem, String label,
 			TourReference refTour, long tourId) {
@@ -54,16 +53,15 @@ public class TVICompareResultReference extends TreeViewerItem {
 		this.tourId = tourId;
 	}
 
+	@Override
 	protected void fetchChildren() {
 
 		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
-		
+
 		storedComparedTours = new HashMap<Long, Long>();
 
-		TVICompareResult[] comparedTours = TourCompareManager
-				.getInstance()
-				.getComparedTours();
+		TVICompareResult[] comparedTours = TourCompareManager.getInstance().getComparedTours();
 
 		long refId = refTour.getRefId();
 
@@ -98,8 +96,8 @@ public class TVICompareResultReference extends TreeViewerItem {
 				compTour.setParentItem(this);
 
 				/*
-				 * set the status if the compared tour is already stored in the
-				 * database and set the id for the compared tour
+				 * set the status if the compared tour is already stored in the database and set the
+				 * id for the compared tour
 				 */
 				Long compTourId = compTour.compTour.getTourId();
 				boolean isStoredForRefTour = storedComparedTours.containsKey(compTourId);
@@ -115,6 +113,8 @@ public class TVICompareResultReference extends TreeViewerItem {
 		}
 
 	}
+
+	@Override
 	public void remove() {}
 
 }

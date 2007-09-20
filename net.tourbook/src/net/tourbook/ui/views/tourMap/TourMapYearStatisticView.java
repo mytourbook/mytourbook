@@ -133,6 +133,10 @@ public class TourMapYearStatisticView extends ViewPart {
 	 */
 	private void selectTourInYearChart(long selectedTourId) {
 
+		if (fYearMapTours == null) {
+			return;
+		}
+
 		final int tourLength = fYearMapTours.length;
 		boolean[] selectedTours = new boolean[tourLength];
 

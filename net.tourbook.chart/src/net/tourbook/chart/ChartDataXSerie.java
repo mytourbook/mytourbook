@@ -28,20 +28,35 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * start value for the serie data, this is use to set the start point for time data to the
 	 * starting time
 	 */
-	private int	startValue				= 0;
+	private int		startValue				= 0;
 
 	/**
-	 * index in the x-data at which the graph is painted in the marker color
+	 * index in the x-data at which the graph is painted in the marker color, <code>-1</code>
+	 * disables the synch marker
 	 */
-	private int	fSynchMarkerStartIndex	= -1;
+	private int		fSynchMarkerStartIndex	= -1;
 
 	/**
 	 * index in the x-data at which the graph is stoped to painted in the marker color
 	 */
-	private int	fSynchMarkerEndIndex	= -1;
+	private int		fSynchMarkerEndIndex	= -1;
+
+	/**
+	 * Range marker shows an area with a different color in the graph
+	 */
+	private int[]	fRangeMarkerStartIndex;
+	private int[]	fRangeMarkerEndIndex;
 
 	public ChartDataXSerie(int values[]) {
 		setMinMaxValues(new int[][] { values });
+	}
+
+	public int[] getRangeMarkerEndIndex() {
+		return fRangeMarkerEndIndex;
+	}
+
+	public int[] getRangeMarkerStartIndex() {
+		return fRangeMarkerStartIndex;
 	}
 
 	/**
@@ -49,6 +64,34 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 */
 	public int getStartValue() {
 		return startValue;
+	}
+
+	/**
+	 * @return Returns the xMarkerEndIndex.
+	 */
+	public int getSynchMarkerEndIndex() {
+		return fSynchMarkerEndIndex;
+	}
+
+	/**
+	 * @return Returns the xMarkerStartIndex or <code>-1</code> when the x-marker is not displayed
+	 */
+	public int getSynchMarkerStartIndex() {
+		return fSynchMarkerStartIndex;
+	}
+
+	@Override
+	void setMinMaxValues(int[][] lowValues, int[][] highValues) {}
+
+	/**
+	 * Range markers are an area in the graph which will be displayed in a different color
+	 * 
+	 * @param rangeMarkerStartIndex
+	 * @param rangeMarkerEndIndex
+	 */
+	public void setRangeMarkers(int[] rangeMarkerStartIndex, int[] rangeMarkerEndIndex) {
+		fRangeMarkerStartIndex = rangeMarkerStartIndex;
+		fRangeMarkerEndIndex = rangeMarkerEndIndex;
 	}
 
 	/**
@@ -60,7 +103,8 @@ public class ChartDataXSerie extends ChartDataSerie {
 	}
 
 	/**
-	 * set the start/end value index for the marker which is displayed in a different color
+	 * set the start/end value index for the marker which is displayed in a different color, by
+	 * default the synch marker is disabled
 	 * 
 	 * @param startIndex
 	 * @param endIndex
@@ -68,24 +112,5 @@ public class ChartDataXSerie extends ChartDataSerie {
 	public void setSynchMarkerValueIndex(int startIndex, int endIndex) {
 		fSynchMarkerStartIndex = startIndex;
 		fSynchMarkerEndIndex = endIndex;
-	}
-
-	/**
-	 * @return Returns the xMarkerEndIndex.
-	 */
-	public int getSynchMarkerEndIndex() {
-		return fSynchMarkerEndIndex;
-	}
-
-	/**
-	 * @return Returns the xMarkerStartIndex.
-	 */
-	public int getSynchMarkerStartIndex() {
-		return fSynchMarkerStartIndex;
-	}
-
-	@Override
-	void setMinMaxValues(int[][] lowValues, int[][] highValues) {
-
 	}
 }

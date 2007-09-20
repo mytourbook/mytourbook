@@ -1047,7 +1047,7 @@ public class ChartComponents extends Composite {
 
 		if (markerValueIndexStart == -1) {
 
-			// disable chart synch
+			// disable chart synchronization
 			fSynchConfigOut = null;
 			return null;
 		}

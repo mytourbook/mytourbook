@@ -88,6 +88,43 @@ public class TourManager {
 	private TourManager() {}
 
 	/**
+	 * Compute the speed between start and end index
+	 * 
+	 * @param chartDataModel
+	 * @param startIndex
+	 * @param endIndex
+	 * @return Returns the speed between start and end index
+	 */
+	public static float computeTourSpeed(ChartDataModel chartDataModel, int startIndex, int endIndex) {
+
+		final int[] distanceValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE)).getHighValues()[0];
+		final int[] timeValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TIME)).getHighValues()[0];
+
+		return computeTourSpeed(distanceValues, timeValues, startIndex, endIndex);
+	}
+
+	public static float computeTourSpeed(	int[] distanceSerie,
+											int[] timeSerie,
+											int startIndex,
+											int endIndex) {
+
+		final int distance = distanceSerie[endIndex] - distanceSerie[startIndex];
+		int time = timeSerie[endIndex] - timeSerie[startIndex];
+
+		final int timeInterval = timeSerie[1] - timeSerie[0];
+
+		// remove breaks from the time
+		int ignoreTimeSlices = getIgnoreTimeSlices(timeSerie,
+				startIndex,
+				endIndex,
+				10 / timeInterval);
+
+		time = time - (ignoreTimeSlices * timeInterval);
+
+		return (float) ((float) distance / time * 3.6);
+	}
+
+	/**
 	 * create the tour chart configuration by reading the settings from the preferences
 	 * 
 	 * @return
@@ -119,6 +156,39 @@ public class TourManager {
 		updateZoomOptionsInChartConfig(chartConfig, prefStore);
 
 		return chartConfig;
+	}
+
+	/**
+	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
+	 * is defined by <code>sliceMin</code>
+	 * 
+	 * @param distanceValues
+	 * @param indexLeft
+	 * @param indexRight
+	 * @param sliceMin
+	 * @return Returns the number of slices which can be ignored
+	 */
+	public static int getIgnoreTimeSlices(	final int[] distanceValues,
+											int indexLeft,
+											int indexRight,
+											int sliceMin) {
+		int ignoreTimeCounter = 0;
+		int oldDistance = 0;
+		sliceMin = Math.max(sliceMin, 1);
+
+		for (int valueIndex = indexLeft; valueIndex <= indexRight; valueIndex++) {
+
+			if (distanceValues[valueIndex] == oldDistance) {
+				ignoreTimeCounter++;
+			}
+
+			int oldIndex = valueIndex - sliceMin;
+			if (oldIndex < 0) {
+				oldIndex = 0;
+			}
+			oldDistance = distanceValues[oldIndex];
+		}
+		return ignoreTimeCounter;
 	}
 
 	public static TourManager getInstance() {
@@ -1018,49 +1088,6 @@ public class TourManager {
 		return chartDataModel;
 	}
 
-	private ChartDataYSerie getChartData(final int[] dataSerie, int chartType) {
-
-		ChartDataYSerie chartDataSerie;
-
-		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
-			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
-
-		} else {
-//			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_NEW,
-//					new int[dataSerie.length],
-//					dataSerie);
-			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS,
-					dataSerie);
-		}
-		return chartDataSerie;
-	}
-
-	/**
-	 * @param tourData
-	 * @param useNormalizedData
-	 */
-	// public void createTour(final TourData tourData) {
-	//
-	// openTourEditor(createTourEditorInput(tourData));
-	// }
-	/**
-	 * @param tourData
-	 * @param useNormalizedData
-	 */
-	public void createTour(TourData tourData, final boolean useNormalizedData) {
-
-		if (tourData.getTourPerson() != null) {
-			// load tour from database
-			tourData = TourManager.getInstance().getTourData(tourData.getTourId());
-		}
-
-		if (useNormalizedData) {
-			compareTour(tourData);
-		}
-
-		// openTourEditor(createTourEditorInput(tourData));
-	}
-
 //	/**
 //	 * Creates a new tour context for a given tour data object
 //	 * 
@@ -1100,6 +1127,32 @@ public class TourManager {
 //		}
 //	}
 
+	/**
+	 * @param tourData
+	 * @param useNormalizedData
+	 */
+	// public void createTour(final TourData tourData) {
+	//
+	// openTourEditor(createTourEditorInput(tourData));
+	// }
+	/**
+	 * @param tourData
+	 * @param useNormalizedData
+	 */
+	public void createTour(TourData tourData, final boolean useNormalizedData) {
+
+		if (tourData.getTourPerson() != null) {
+			// load tour from database
+			tourData = TourManager.getInstance().getTourData(tourData.getTourId());
+		}
+
+		if (useNormalizedData) {
+			compareTour(tourData);
+		}
+
+		// openTourEditor(createTourEditorInput(tourData));
+	}
+
 	public void firePropertyChange(int propertyId, Object propertyData) {
 		Object[] allListeners = fPropertyListeners.getListeners();
 		for (int i = 0; i < allListeners.length; i++) {
@@ -1108,37 +1161,21 @@ public class TourManager {
 		}
 	}
 
-	/**
-	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
-	 * is defined by <code>sliceMin</code>
-	 * 
-	 * @param distanceValues
-	 * @param indexLeft
-	 * @param indexRight
-	 * @param sliceMin
-	 * @return Returns the number of slices which can be ignored
-	 */
-	public int getIgnoreTimeSlices(	final int[] distanceValues,
-									int indexLeft,
-									int indexRight,
-									int sliceMin) {
-		int ignoreTimeCounter = 0;
-		int oldDistance = 0;
-		sliceMin = Math.max(sliceMin, 1);
+	private ChartDataYSerie getChartData(final int[] dataSerie, int chartType) {
 
-		for (int valueIndex = indexLeft; valueIndex <= indexRight; valueIndex++) {
+		ChartDataYSerie chartDataSerie;
 
-			if (distanceValues[valueIndex] == oldDistance) {
-				ignoreTimeCounter++;
-			}
+		if (chartType == 0 || chartType == ChartDataModel.CHART_TYPE_LINE) {
+			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
 
-			int oldIndex = valueIndex - sliceMin;
-			if (oldIndex < 0) {
-				oldIndex = 0;
-			}
-			oldDistance = distanceValues[oldIndex];
+		} else {
+//			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_NEW,
+//					new int[dataSerie.length],
+//					dataSerie);
+			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS,
+					dataSerie);
 		}
-		return ignoreTimeCounter;
+		return chartDataSerie;
 	}
 
 	/**

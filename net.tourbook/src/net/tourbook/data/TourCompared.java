@@ -82,7 +82,6 @@ public class TourCompared {
 	}
 
 	public void setTourSpeed(float speed) {
-//		return this.tourSpeed = (float) ((float) distance / time * 3.6);
 		this.tourSpeed = speed;
 	}
 

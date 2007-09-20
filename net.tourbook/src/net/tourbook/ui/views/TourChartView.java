@@ -45,7 +45,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -67,7 +66,6 @@ public class TourChartView extends ViewPart {
 	private ISelectionListener		fPostSelectionListener;
 	private IPropertyChangeListener	fPrefChangeListener;
 
-	private IPartListener2			fPartListener;
 	private PostSelectionProvider	fPostSelectionProvider;
 	private IPropertyListener		fTourDbListener;
 	private ITourPropertyListener	fTourPropertyListener;
@@ -236,7 +234,6 @@ public class TourChartView extends ViewPart {
 
 		final IWorkbenchPage page = getSite().getPage();
 
-		page.removePartListener(fPartListener);
 		page.removePostSelectionListener(fPostSelectionListener);
 
 		TourDatabase.getInstance().removePropertyListener(fTourDbListener);

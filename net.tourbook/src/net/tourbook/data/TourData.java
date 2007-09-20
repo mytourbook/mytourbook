@@ -593,11 +593,10 @@ public class TourData {
 			segmentSerieDistance[segmentIndex] = segment.distance = distanceEnd - distanceStart;
 
 			segmentSerieTime[segmentIndex] = segment.recordingTime = recordingTime;
-			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = (recordingTime - (TourManager.getInstance()
-					.getIgnoreTimeSlices(distanceSerie,
-							segmentStartIndex,
-							segmentEndIndex,
-							10 / timeSlice) * timeSlice));
+			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = (recordingTime - (TourManager.getIgnoreTimeSlices(distanceSerie,
+					segmentStartIndex,
+					segmentEndIndex,
+					10 / timeSlice) * timeSlice));
 
 			int altitudeUp = 0;
 			int altitudeDown = 0;
@@ -1318,7 +1317,7 @@ public class TourData {
 
 		int maxIndex = Math.max(0, timeSerie.length - 1);
 
-		int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(distanceSerie,
+		int ignoreTimeSlices = TourManager.getIgnoreTimeSlices(distanceSerie,
 				0,
 				maxIndex,
 				10 / deviceTimeInterval);
