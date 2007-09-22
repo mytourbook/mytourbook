@@ -52,14 +52,14 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -470,6 +470,15 @@ public class CompareResultView extends ViewPart {
 			}
 		});
 
+		fTourViewer.getTree().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent keyEvent) {
+				if (keyEvent.keyCode == SWT.DEL) {
+					removeComparedTour();
+				}
+			}
+		});
+
 		fTourViewer.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(CheckStateChangedEvent event) {
 
@@ -492,14 +501,14 @@ public class CompareResultView extends ViewPart {
 			}
 		});
 
-		fTourViewer.addTreeListener(new ITreeViewerListener() {
-
-			public void treeCollapsed(TreeExpansionEvent event) {
-			// fTourViewer.getTree().layout(true,true);
-			}
-
-			public void treeExpanded(TreeExpansionEvent event) {}
-		});
+//		fTourViewer.addTreeListener(new ITreeViewerListener() {
+//
+//			public void treeCollapsed(TreeExpansionEvent event) {
+//			// fTourViewer.getTree().layout(true,true);
+//			}
+//
+//			public void treeExpanded(TreeExpansionEvent event) {}
+//		});
 
 		return tree;
 	}
@@ -607,6 +616,32 @@ public class CompareResultView extends ViewPart {
 		}
 	}
 
+	/**
+	 * Remove compared tour from the database
+	 */
+	void removeComparedTour() {
+
+		// enable/disable action: remove save status
+		final StructuredSelection selection = (StructuredSelection) fTourViewer.getSelection();
+
+		/*
+		 * currently only one tour is supported to remove the save status
+		 */
+		if (selection.size() == 1 && selection.getFirstElement() instanceof TVICompareResult) {
+
+			TVICompareResult compareResult = (TVICompareResult) selection.getFirstElement();
+
+			if (TourCompareManager.removeComparedTourFromDb(compareResult.compId)) {
+
+				// update tour map view
+				SelectionRemovedComparedTours removedCompareTours = new SelectionRemovedComparedTours();
+				removedCompareTours.removedComparedTours.add(compareResult.compId);
+
+				fPostSelectionProvider.setSelection(removedCompareTours);
+			}
+		}
+	}
+
 	private void restoreSettings(IMemento memento) {
 
 		if (memento != null) {
@@ -673,19 +708,13 @@ public class CompareResultView extends ViewPart {
 						fTourViewer.setChecked(compareResult, false);
 
 						persistedCompareResults.persistedCompareResults.add(compareResult);
-
-						// update the chart
-//						fCompTourChart.setBackgroundColor(Display.getCurrent()
-//								.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-//						fCompTourChart.redrawChart();
-
 					}
 				}
 
 				// uncheck/disable the persisted tours
 				fTourViewer.update(checkedTours, null);
 
-				// fire selection: update the tourmap view
+				// update tourmap view
 				fPostSelectionProvider.setSelection(persistedCompareResults);
 
 			} catch (Exception e) {
@@ -724,22 +753,22 @@ public class CompareResultView extends ViewPart {
 
 			TVICompareResultReference refItem = (TVICompareResultReference) treeItem;
 
-			fPostSelectionProvider.setSelection(new SelectionComparedTour(fTourViewer,
+			fPostSelectionProvider.setSelection(new SelectionTourMap(fTourViewer,
 					refItem.refTour.getRefId()));
 
 		} else if (treeItem instanceof TVICompareResult) {
 
 			final TVICompareResult resultItem = (TVICompareResult) treeItem;
 
-			final SelectionComparedTour selectionCompTour = new SelectionComparedTour(fTourViewer,
+			final SelectionTourMap tourMapSelection = new SelectionTourMap(fTourViewer,
 					resultItem.refTour.getRefId());
 
-			selectionCompTour.setTourCompareData(resultItem.compId,
+			tourMapSelection.setTourCompareData(resultItem.compId,
 					resultItem.compTour.getTourId(),
 					resultItem.compareIndexStart,
 					resultItem.compareIndexEnd);
 
-			fPostSelectionProvider.setSelection(selectionCompTour);
+			fPostSelectionProvider.setSelection(tourMapSelection);
 		}
 	}
 

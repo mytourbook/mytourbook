@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ViewForm;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -54,6 +53,8 @@ public class Chart extends ViewForm {
 	public static final int				SYNCH_MODE_NO				= 0;
 	public static final int				SYNCH_MODE_BY_SCALE			= 1;
 	public static final int				SYNCH_MODE_BY_SIZE			= 2;
+
+	static final int					GRAPH_ALPHA					= 0xd0;
 
 	private final ListenerList			fFocusListeners				= new ListenerList();
 	private final ListenerList			fBarSelectionListeners		= new ListenerList();
@@ -430,10 +431,6 @@ public class Chart extends ViewForm {
 
 	public boolean getCanScrollZoomedChart() {
 		return fChartComponents.getChartComponentGraph().canScrollZoomedChart;
-	}
-
-	public Image getChartCoreImage() {
-		return fChartComponents.getChartComponentGraph().fGraphCoreImage;
 	}
 
 	public ChartDataModel getChartDataModel() {
@@ -963,6 +960,10 @@ public class Chart extends ViewForm {
 	 */
 	public void setDrawBarChartAtBottom(boolean fDrawBarCharttAtBottom) {
 		this.fDrawBarChartAtBottom = fDrawBarCharttAtBottom;
+	}
+
+	public void resetGraphAlpha() {
+		fChartComponents.getChartComponentGraph().fGraphAlpha = GRAPH_ALPHA;
 	}
 
 }

@@ -929,7 +929,7 @@ public class TourChart extends Chart {
 		} else {
 			fSegmentLayer = null;
 			fSegmentValueLayer = null;
-			setGraphAlpha(0xD0);
+			resetGraphAlpha();
 		}
 
 		setGraphLayers();

@@ -19,26 +19,35 @@ import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 
-public class ActionRemoveComparedTourSaveStatus extends Action {
+public class ActionCollapseAll extends Action {
 
-	private CompareResultView	fResultView;
+	private TourMapView	fTourMapView;
 
-	public ActionRemoveComparedTourSaveStatus(CompareResultView resultView) {
+	public ActionCollapseAll(TourMapView view) {
 
-		fResultView = resultView;
+		super(null, AS_PUSH_BUTTON);
 
-		setText(Messages.TourMap_Action_delete_compared_tour);
+		fTourMapView = view;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete_disabled));
-
-		setEnabled(false);
+		setToolTipText(Messages.TourMap_Action_collapse_all);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_collapse_all));
 	}
 
 	@Override
 	public void run() {
-		fResultView.removeComparedTour();
+
+		final TreeViewer tourViewer = fTourMapView.getTourViewer();
+
+		tourViewer.collapseAll();
+
+		// reveal selected element
+		StructuredSelection selection = (StructuredSelection) tourViewer.getSelection();
+		if (selection != null) {
+			tourViewer.reveal(selection.getFirstElement());
+		}
 	}
 
 }

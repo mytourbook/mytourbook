@@ -18,14 +18,11 @@ package net.tourbook.ui.views.tourMap;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import net.tourbook.Messages;
-import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourReference;
-import net.tourbook.tour.ITourPropertyListener;
-import net.tourbook.tour.TourChart;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -33,6 +30,7 @@ import net.tourbook.util.TreeColumnLayout;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -74,56 +72,71 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMapView extends ViewPart {
 
-	public static final String		ID				= "net.tourbook.views.tourMap.TourMapView"; //$NON-NLS-1$
+	private static final String			MEMENTO_TOUR_MAP_ACTIVE_REF_ID	= "tour.map.active.ref.id";
+	private static final String			MEMENTO_TOUR_MAP_LINK_TOUR		= "tour.map.link.tour";
 
-	public static final int			COLUMN_LABEL	= 0;
-	public static final int			COLUMN_SPEED	= 1;
+	public static final String			ID								= "net.tourbook.views.tourMap.TourMapView"; //$NON-NLS-1$
+
+	public static final int				COLUMN_LABEL					= 0;
+	public static final int				COLUMN_SPEED					= 1;
 
 	/**
 	 * This memento allows this view to save and restore state when it is closed and opened within a
 	 * session. A different memento is supplied by the platform for persistance at workbench
 	 * shutdown.
 	 */
-	private static IMemento			fSessionMemento	= null;
+	private static IMemento				fSessionMemento					= null;
 
-	TVITourMapRoot					fRootItem		= new TVITourMapRoot();
+	TVITourMapRoot						fRootItem						= new TVITourMapRoot();
 
-	private TreeViewer				fTourViewer;
+	private TreeViewer					fTourViewer;
 
-	final NumberFormat				nf				= NumberFormat.getNumberInstance();
+	final NumberFormat					nf								= NumberFormat.getNumberInstance();
 
-	private ISelectionListener		fPostSelectionListener;
-	private IPartListener2			fPartListener;
-	private ITourPropertyListener	fTourPropertyListener;
-	PostSelectionProvider			fPostSelectionProvider;
+	private ISelectionListener			fPostSelectionListener;
+	private IPartListener2				fPartListener;
+//	private ITourPropertyListener		fTourPropertyListener;
+	PostSelectionProvider				fPostSelectionProvider;
 
-	protected int					fRefTourXMarkerValue;
+	protected int						fRefTourXMarkerValue;
 
-	private ActionDeleteTourFromMap	fActionDeleteSelectedTour;
-	private ActionRenameRefTour		fActionRenameRefTour;
+	private ActionDeleteTourFromMap		fActionDeleteSelectedTour;
+	private ActionRenameRefTour			fActionRenameRefTour;
+	private ActionLinkTour				fActionLinkTour;
+	private ActionCollapseAll			fActionCollapseAll;
 
-	private final RGB				fRGBRefFg		= new RGB(0, 0, 0);
-	private final RGB				fRGBRefBg		= new RGB(255, 233, 178);
+	private final RGB					fRGBRefFg						= new RGB(0, 0, 0);
+	private final RGB					fRGBRefBg						= new RGB(255, 233, 178);
 
-	private final RGB				fRGBYearFg		= new RGB(255, 255, 255);
-	private final RGB				fRGBYearBg		= new RGB(255, 241, 204);
+	private final RGB					fRGBYearFg						= new RGB(255, 255, 255);
+	private final RGB					fRGBYearBg						= new RGB(255, 241, 204);
 
-	private final RGB				fRGBTourFg		= new RGB(0, 0, 0);
-	private final RGB				fRGBTourBg		= new RGB(255, 255, 255);
+	private final RGB					fRGBTourFg						= new RGB(0, 0, 0);
+	private final RGB					fRGBTourBg						= new RGB(255, 255, 255);
 
-	private Color					fColorRefFg;
-	private Color					fColorRefBg;
+	private Color						fColorRefFg;
+	private Color						fColorRefBg;
 
-	private Color					fColorYearFg;
-	private Color					fColorYearBg;
+	private Color						fColorYearFg;
+	private Color						fColorYearBg;
 
-	private Color					fColorTourFg;
-	private Color					fColorTourBg;
+	private Color						fColorTourFg;
+	private Color						fColorTourBg;
 
 	/**
-	 * tour chart which has currently the focus
+	 * tour item which is selected by the link tour action
 	 */
-	private TourChart				fActiveTourChart;
+	protected TVTITourMapComparedTour	fLinkedTour;
+
+	/**
+	 * ref id which is currently selected in the tour viewer
+	 */
+	private long						fActiveRefId;
+
+	/**
+	 * flag if actions are added to the toolbar
+	 */
+	private boolean						fIsToolbarCreated				= false;
 
 	class TourContentProvider implements ITreeContentProvider {
 
@@ -235,6 +248,7 @@ public class TourMapView extends ViewPart {
 	public TourMapView() {}
 
 	private void addPartListener() {
+
 		fPartListener = new IPartListener2() {
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
@@ -256,10 +270,17 @@ public class TourMapView extends ViewPart {
 
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+			public void partOpened(final IWorkbenchPartReference partRef) {
+				/*
+				 * add the actions in the part open event that they are appended after the actions
+				 * which are defined in the plugin.xml
+				 */
+				createToolbar();
+			}
 
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
+
 		getViewSite().getPage().addPartListener(fPartListener);
 	}
 
@@ -273,12 +294,12 @@ public class TourMapView extends ViewPart {
 				// update the view when a new tour reference was created
 				if (selection instanceof SelectionPersistedCompareResults) {
 
-					final SelectionPersistedCompareResults tourMapUpdate = (SelectionPersistedCompareResults) selection;
+					final SelectionPersistedCompareResults selectionPersisted = (SelectionPersistedCompareResults) selection;
 
-					final ArrayList<TVICompareResult> persistedCompareResults = tourMapUpdate.persistedCompareResults;
+					final ArrayList<TVICompareResult> persistedCompareResults = selectionPersisted.persistedCompareResults;
 
 					if (persistedCompareResults.size() > 0) {
-//						updateCompareResults(persistedCompareResults);
+						updateTourViewer(persistedCompareResults);
 					}
 
 				} else if (selection instanceof SelectionNewRefTours) {
@@ -324,24 +345,14 @@ public class TourMapView extends ViewPart {
 
 					if (firstElement instanceof TVTITourMapComparedTour) {
 
-						// select the tour in the tour viewer
-						fTourViewer.setSelection(new StructuredSelection(((TVTITourMapComparedTour) firstElement)),
-								true);
+						// select the compared tour in the tour viewer
+
+						fLinkedTour = (TVTITourMapComparedTour) firstElement;
+
+						selectLinkedTour();
 					}
 				}
 
-				if (fActiveTourChart != null) {
-
-					/*
-					 * listen for x-slider position changes, this can be done in the marker or
-					 * segmenter view
-					 */
-					if (selection instanceof SelectionChartXSliderPosition) {
-
-						fActiveTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
-
-					}
-				}
 			}
 		};
 
@@ -349,19 +360,12 @@ public class TourMapView extends ViewPart {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourPropertyListener() {
-		fTourPropertyListener = new ITourPropertyListener() {
+	private void createActions() {
 
-			public void propertyChanged(int propertyId, Object propertyData) {
-				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
-					if (fActiveTourChart != null) {
-						fActiveTourChart.updateSegmentLayer((Boolean) propertyData);
-					}
-				}
-			}
-		};
-
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		fActionDeleteSelectedTour = new ActionDeleteTourFromMap(this);
+		fActionRenameRefTour = new ActionRenameRefTour(this);
+		fActionLinkTour = new ActionLinkTour(this);
+		fActionCollapseAll = new ActionCollapseAll(this);
 	}
 
 	/**
@@ -399,21 +403,32 @@ public class TourMapView extends ViewPart {
 		createContextMenu();
 		createActions();
 
-		restoreSettings(fSessionMemento);
-
 		addPartListener();
 		addPostSelectionListener();
-		addTourPropertyListener();
+//		addTourPropertyListener();
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		fTourViewer.setInput(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem());
+
+		restoreSettings(fSessionMemento);
 	}
 
-	private void createActions() {
-		fActionDeleteSelectedTour = new ActionDeleteTourFromMap(this);
-		fActionRenameRefTour = new ActionRenameRefTour(this);
+	private void createToolbar() {
+
+		// check if toolbar is created
+		if (fIsToolbarCreated) {
+			return;
+		}
+		fIsToolbarCreated = true;
+
+		IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(fActionLinkTour);
+		tbm.add(fActionCollapseAll);
+
+		tbm.update(true);
 	}
 
 	private Control createTourViewer(final Composite parent) {
@@ -493,61 +508,12 @@ public class TourMapView extends ViewPart {
 		return treeContainer;
 	}
 
-	/**
-	 * Selection changes in the tour map viewer
-	 * 
-	 * @param selection
-	 */
-	private void onSelectionChanged(IStructuredSelection selection) {
-
-		// show the reference tour chart
-		final Object item = selection.getFirstElement();
-
-		if (item instanceof TVTITourMapReferenceTour) {
-
-			final TVTITourMapReferenceTour refItem = (TVTITourMapReferenceTour) item;
-
-			fPostSelectionProvider.setSelection(new SelectionComparedTour(fTourViewer,
-					refItem.refId));
-
-		} else if (item instanceof TVITourMapYear) {
-
-			final TVITourMapYear yearItem = (TVITourMapYear) item;
-
-			final SelectionComparedTour comparedTour = new SelectionComparedTour(fTourViewer,
-					yearItem.refId);
-
-			comparedTour.setYearItem(yearItem);
-
-			fPostSelectionProvider.setSelection(comparedTour);
-
-		} else if (item instanceof TVTITourMapComparedTour) {
-
-			final TVTITourMapComparedTour compItem = (TVTITourMapComparedTour) item;
-
-			final SelectionComparedTour selectionCompTour = new SelectionComparedTour(fTourViewer,
-					compItem.getRefId());
-
-			final TreeViewerItem parentItem = compItem.getParentItem();
-			if (parentItem instanceof TVITourMapYear) {
-				selectionCompTour.setYearItem((TVITourMapYear) parentItem);
-			}
-
-			selectionCompTour.setTourCompareData(compItem.getCompId(),
-					compItem.getTourId(),
-					compItem.getStartIndex(),
-					compItem.getEndIndex());
-
-			fPostSelectionProvider.setSelection(selectionCompTour);
-		}
-	}
-
 	@Override
 	public void dispose() {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+//		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
 		fColorRefFg.dispose();
 		fColorYearFg.dispose();
@@ -621,10 +587,87 @@ public class TourMapView extends ViewPart {
 		}
 	}
 
+	/**
+	 * Selection changes in the tour map viewer
+	 * 
+	 * @param selection
+	 */
+	private void onSelectionChanged(IStructuredSelection selection) {
+
+		// show the reference tour chart
+		final Object item = selection.getFirstElement();
+
+		SelectionTourMap newSelection = null;
+
+		if (item instanceof TVTITourMapReferenceTour) {
+
+			final TVTITourMapReferenceTour refItem = (TVTITourMapReferenceTour) item;
+
+			newSelection = new SelectionTourMap(fTourViewer, refItem.refId);
+
+		} else if (item instanceof TVITourMapYear) {
+
+			final TVITourMapYear yearItem = (TVITourMapYear) item;
+
+			newSelection = new SelectionTourMap(fTourViewer, yearItem.refId);
+
+			newSelection.setYearItem(yearItem);
+
+		} else if (item instanceof TVTITourMapComparedTour) {
+
+			final TVTITourMapComparedTour compItem = (TVTITourMapComparedTour) item;
+
+			newSelection = new SelectionTourMap(fTourViewer, compItem.getRefId());
+
+			final TreeViewerItem parentItem = compItem.getParentItem();
+			if (parentItem instanceof TVITourMapYear) {
+				newSelection.setYearItem((TVITourMapYear) parentItem);
+			}
+
+			newSelection.setTourCompareData(compItem.getCompId(),
+					compItem.getTourId(),
+					compItem.getStartIndex(),
+					compItem.getEndIndex());
+		}
+
+		if (newSelection != null) {
+
+			fActiveRefId = newSelection.getRefId();
+
+			fPostSelectionProvider.setSelection(newSelection);
+		}
+	}
+
+	/**
+	 * Restore settings from the last session
+	 * 
+	 * @param memento
+	 */
 	private void restoreSettings(final IMemento memento) {
 
-		if (memento != null) {
+		if (memento == null) {
+			return;
+		}
 
+		/*
+		 * select ref tour in tour viewer
+		 */
+		String mementoRefId = memento.getString(MEMENTO_TOUR_MAP_ACTIVE_REF_ID);
+		if (mementoRefId != null) {
+
+			try {
+				selectRefTour(Long.parseLong(mementoRefId));
+			} catch (NumberFormatException e) {
+				// do nothing
+			}
+		}
+
+		/*
+		 * link tour with statistics
+		 */
+		Integer mementoLinkTour = memento.getInteger(MEMENTO_TOUR_MAP_LINK_TOUR);
+		if (mementoLinkTour != null) {
+			fActionLinkTour.setChecked(mementoLinkTour == 1);
 		}
 	}
 
@@ -636,6 +679,42 @@ public class TourMapView extends ViewPart {
 	@Override
 	public void saveState(final IMemento memento) {
 
+		memento.putString(MEMENTO_TOUR_MAP_ACTIVE_REF_ID, Long.toString(fActiveRefId));
+		memento.putInteger(MEMENTO_TOUR_MAP_LINK_TOUR, fActionLinkTour.isChecked() ? 1 : 0);
+
+	}
+
+	/**
+	 * select the tour which was selected in the year chart
+	 */
+	void selectLinkedTour() {
+		if (fActionLinkTour.isChecked()) {
+			fTourViewer.setSelection(new StructuredSelection((fLinkedTour)), true);
+		}
+	}
+
+	/**
+	 * Select the reference tour in the tour viewer
+	 * 
+	 * @param refId
+	 */
+	private void selectRefTour(long refId) {
+
+		Object[] refTourItems = fRootItem.getFetchedChildren();
+
+		// search ref tour
+		for (Object refTourItem : refTourItems) {
+			if (refTourItem instanceof TVTITourMapReferenceTour) {
+
+				TVTITourMapReferenceTour tvtiRefTour = (TVTITourMapReferenceTour) refTourItem;
+				if (tvtiRefTour.refId == refId) {
+
+					// select ref tour
+					fTourViewer.setSelection(new StructuredSelection(tvtiRefTour), true);
+					break;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -643,4 +722,51 @@ public class TourMapView extends ViewPart {
 		fTourViewer.getTree().setFocus();
 	}
 
+	/**
+	 * Update viewer with new saved compared tours
+	 * 
+	 * @param persistedCompareResults
+	 */
+	private void updateTourViewer(final ArrayList<TVICompareResult> persistedCompareResults) {
+
+		// ref id's which hast new children
+		final HashMap<Long, Long> viewRefIds = new HashMap<Long, Long>();
+
+		// get all ref tours which needs to be updated
+		for (final TVICompareResult compareResult : persistedCompareResults) {
+
+			if (compareResult.getParentItem() instanceof TVICompareResultReference) {
+
+				final long compResultRefId = ((TVICompareResultReference) compareResult.getParentItem()).refTour.getRefId();
+
+				viewRefIds.put(compResultRefId, compResultRefId);
+			}
+		}
+
+		// remove all compare results that from the selection
+		persistedCompareResults.clear();
+
+		// loop: all ref tours where children has been added
+		for (final Iterator<Long> refIdIter = viewRefIds.values().iterator(); refIdIter.hasNext();) {
+
+			final Long refId = (Long) refIdIter.next();
+
+			final ArrayList<TreeViewerItem> unfetchedChildren = fRootItem.getUnfetchedChildren();
+			if (unfetchedChildren != null) {
+
+				for (final TreeViewerItem rootChild : unfetchedChildren) {
+					final TVTITourMapReferenceTour mapRefTour = (TVTITourMapReferenceTour) rootChild;
+
+					if (mapRefTour.refId == refId) {
+
+						// reload the children for the reference tour
+						mapRefTour.fetchChildren();
+						fTourViewer.refresh(mapRefTour, false);
+
+						break;
+					}
+				}
+			}
+		}
+	}
 }

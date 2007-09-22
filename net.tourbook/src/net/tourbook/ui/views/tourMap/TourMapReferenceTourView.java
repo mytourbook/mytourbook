@@ -106,13 +106,13 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 	@Override
 	public void onSelectionChanged(final ISelection selection) {
 
-		if (selection instanceof SelectionComparedTour) {
-			showRefTour((SelectionComparedTour) selection);
+		if (selection instanceof SelectionTourMap) {
+			showRefTour((SelectionTourMap) selection);
 		}
 
 	}
 
-	private void showRefTour(final SelectionComparedTour selectionComparedTour) {
+	private void showRefTour(final SelectionTourMap selectionComparedTour) {
 
 		// check if the ref tour is already displayed
 		final Long refId = selectionComparedTour.getRefId();

@@ -18,7 +18,6 @@ import net.tourbook.util.PostSelectionProvider;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -100,9 +99,11 @@ public class TourMapYearStatisticView extends ViewPart {
 
 	private void onSelectionChanged(ISelection selection) {
 
-		if (selection instanceof SelectionComparedTour) {
+		if (selection instanceof SelectionTourMap) {
 
-			final SelectionComparedTour selectionComparedTour = (SelectionComparedTour) selection;
+			final SelectionTourMap selectionComparedTour = (SelectionTourMap) selection;
+
+			// show year statistic
 			final TVITourMapYear yearItem = selectionComparedTour.getYearItem();
 			if (yearItem != null) {
 
@@ -110,9 +111,15 @@ public class TourMapYearStatisticView extends ViewPart {
 				showYearBarChart();
 			}
 
+			// select tour in the year chart
 			final Long compTourId = selectionComparedTour.getCompTourId();
 			if (compTourId != null) {
 				selectTourInYearChart(compTourId);
+			}
+
+			// hide chart when a different ref tour is selected
+			if (fYearItem != null && selectionComparedTour.getRefId() != fYearItem.refId) {
+				fPageBook.showPage(fPageNoChart);
 			}
 
 		} else if (selection instanceof SelectionRemovedComparedTours) {
@@ -239,10 +246,9 @@ public class TourMapYearStatisticView extends ViewPart {
 		chartModel.addYData(yData);
 
 		// set title
-		chartModel.setTitle(NLS.bind(Messages.TourMap_Label_chart_title_year_map, fYearItem.year));
+		chartModel.setTitle(Integer.toString(fYearItem.year));
 
-		// set graph minimum width, this is the number of days in the
-		// fSelectedYear
+		// set graph minimum width, this is the number of days in the fSelectedYear
 		calendar.set(fYearItem.year, 11, 31);
 		final int yearDays = calendar.get(Calendar.DAY_OF_YEAR);
 		chartModel.setChartMinWidth(yearDays);

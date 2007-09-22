@@ -144,6 +144,8 @@ public class Messages extends NLS {
 	public static String		Image_adjust_altitude;
 	public static String		Image_chart_analyzer;
 	public static String		Image_chart_options;
+
+	public static String	Image_collapse_all;
 	public static String		Image_database;
 	public static String		Image_database_other_person;
 	public static String		Image_database_placeholder;
@@ -161,6 +163,8 @@ public class Messages extends NLS {
 	public static String		Image_graph_temperature;
 	public static String		Image_import_rawdata;
 	public static String		Image_import_rawdata_direct;
+
+	public static String	Image_link;
 	public static String		Image_open_import_file;
 	public static String		Image_open_marker_editor;
 	public static String		Image_open_tour_segmenter;
@@ -376,12 +380,16 @@ public class Messages extends NLS {
 	public static String		TourData_Label_device_marker;
 	public static String		TourData_Label_new_marker;
 
+	public static String	TourMap_Action_collapse_all;
+
 	public static String		TourMap_Action_create_left_marker;
 	public static String		TourMap_Action_create_marker;
 	public static String		TourMap_Action_create_reference_tour;
 	public static String		TourMap_Action_create_right_marker;
 	public static String		TourMap_Action_delete_compared_tour;
 	public static String		TourMap_Action_delete_tours;
+
+	public static String	TourMap_Action_link;
 	public static String		TourMap_Action_rename_reference_tour;
 	public static String		TourMap_Action_synch_chart_years_tooltip;
 	public static String		TourMap_Action_synch_charts_byScale_tooltip;

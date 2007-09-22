@@ -359,9 +359,9 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 	@Override
 	protected void onSelectionChanged(ISelection selection) {
 
-		if (selection instanceof SelectionComparedTour) {
+		if (selection instanceof SelectionTourMap) {
 
-			showComparedTour((SelectionComparedTour) selection);
+			showComparedTour((SelectionTourMap) selection);
 
 		} else if (selection instanceof StructuredSelection) {
 
@@ -500,7 +500,7 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 	 * 
 	 * @param selectionComparedTour
 	 */
-	private void showComparedTour(final SelectionComparedTour selectionComparedTour) {
+	private void showComparedTour(final SelectionTourMap selectionComparedTour) {
 
 		final Long ctTourId = selectionComparedTour.getCompTourId();
 
@@ -525,8 +525,8 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 		fTourData = compTourData;
 		fTourViewer = selectionComparedTour.getTourViewer();
 
-		fOriginalStartIndex = selectionComparedTour.getCompareStartIndex();
-		fOriginalEndIndex = selectionComparedTour.getCompareEndIndex();
+		fMovedMarkerStartIndex = fOriginalStartIndex = selectionComparedTour.getCompareStartIndex();
+		fMovedMarkerEndIndex = fOriginalEndIndex = selectionComparedTour.getCompareEndIndex();
 
 		fTourChart.addDataModelListener(new IDataModelListener() {
 			public void dataModelChanged(ChartDataModel changedChartDataModel) {
@@ -534,7 +534,10 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 				ChartDataXSerie xData = changedChartDataModel.getXData();
 
 				// set initial synch marker position
-				xData.setSynchMarkerValueIndex(fOriginalStartIndex, fOriginalEndIndex);
+				xData.setSynchMarkerValueIndex(fMovedMarkerStartIndex, fMovedMarkerEndIndex);
+
+				xData.setRangeMarkers(new int[] { fOriginalStartIndex },
+						new int[] { fOriginalEndIndex });
 
 				// set title
 				changedChartDataModel.setTitle(NLS.bind(Messages.TourMap_Label_chart_title_compared_tour,
@@ -564,7 +567,7 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 
 		final TVTITourMapComparedTour compItem = (TVTITourMapComparedTour) tvtiComparedTour;
 
-		final SelectionComparedTour comparedTour = new SelectionComparedTour(fTourViewer,
+		final SelectionTourMap comparedTour = new SelectionTourMap(fTourViewer,
 				compItem.getRefId());
 
 		final TreeViewerItem parentItem = compItem.getParentItem();
@@ -647,6 +650,7 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 		// set synch marker to original position
 		final ChartDataModel chartDataModel = fTourChart.getChartDataModel();
 		final ChartDataXSerie xData = chartDataModel.getXData();
+
 		xData.setSynchMarkerValueIndex(fOriginalStartIndex, fOriginalEndIndex);
 
 		fTourChart.updateChart(chartDataModel);

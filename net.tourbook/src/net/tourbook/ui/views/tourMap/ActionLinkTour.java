@@ -20,25 +20,23 @@ import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionRemoveComparedTourSaveStatus extends Action {
+public class ActionLinkTour extends Action {
 
-	private CompareResultView	fResultView;
+	private TourMapView	fTourMapView;
 
-	public ActionRemoveComparedTourSaveStatus(CompareResultView resultView) {
+	public ActionLinkTour(TourMapView view) {
 
-		fResultView = resultView;
+		super(null, AS_CHECK_BOX);
 
-		setText(Messages.TourMap_Action_delete_compared_tour);
+		fTourMapView = view;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete_disabled));
-
-		setEnabled(false);
+		setToolTipText(Messages.TourMap_Action_link);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_link));
 	}
 
 	@Override
 	public void run() {
-		fResultView.removeComparedTour();
+		fTourMapView.selectLinkedTour();
 	}
 
 }
