@@ -20,37 +20,31 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TreeViewerTourItem;
 import net.tourbook.tour.TreeViewerItem;
 
 /**
  * TTI (TreeViewerItem) is used in the tree viewer TourMapView, it contains tree items for reference
  * tours
  */
-public class TVICompareResultReference extends TreeViewerItem {
+public class TourMapItemReferenceTour extends TreeViewerTourItem {
 
-	String						label;
+	String	label;
+	long	refId;
 
-	long						tourId;
+	int		yearMapMinValue	= Integer.MIN_VALUE;
+	int		yearMapMaxValue;
 
-	TourReference				refTour;
-
-	/**
-	 * keeps the tourId's for all compared tours which have already been stored in the db
-	 */
-	private HashMap<Long, Long>	storedComparedTours;
-
-	public TVICompareResultReference(TVICompareResultRoot parentItem, String label,
-			TourReference refTour, long tourId) {
+	public TourMapItemReferenceTour(TourMapItemRoot parentItem, String label, long refId, long tourId) {
 
 		this.setParentItem(parentItem);
 
 		this.label = label;
-		this.refTour = refTour;
-		this.tourId = tourId;
+		this.refId = refId;
+
+		setTourId(tourId);
 	}
 
 	@Override
@@ -59,16 +53,31 @@ public class TVICompareResultReference extends TreeViewerItem {
 		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		storedComparedTours = new HashMap<Long, Long>();
+		/**
+		 * derby does not support expression in "GROUP BY" statements, this is a workaround found
+		 * here:
+		 * http://mail-archives.apache.org/mod_mbox/db-derby-dev/200605.mbox/%3C7415300.1147889647479.JavaMail.jira@brutus%3E
+		 * <code>
+		 *	String subSQLString = "(SELECT YEAR(tourDate)\n"
+		 *		+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n")
+		 *		+ (" WHERE "
+		 *				+ TourDatabase.TABLE_TOUR_REFERENCE
+		 *				+ "_generatedId="
+		 *				+ refId + "\n")
+		 *		+ ")";
+		 *
+		 *	String sqlString = "SELECT years FROM \n"
+		 *		+ subSQLString
+		 *		+ (" REFYEARS(years) GROUP BY years");
+		 *</code>
+		 */
 
-		TVICompareResult[] comparedTours = TourCompareManager.getInstance().getComparedTours();
+		String sqlString = "SELECT startYear\n" //$NON-NLS-1$
+				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE refTourId=" + refId + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" GROUP BY startYear"); //$NON-NLS-1$
 
-		long refId = refTour.getRefId();
-
-		String sqlString = "SELECT tourId, comparedId  \n" //$NON-NLS-1$
-				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("WHERE refTourId=" + refId); //$NON-NLS-1$
-
+		// System.out.println(sqlString);
 		try {
 
 			Connection conn = TourDatabase.getInstance().getConnection();
@@ -76,7 +85,7 @@ public class TVICompareResultReference extends TreeViewerItem {
 			ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				storedComparedTours.put(result.getLong(1), result.getLong(2));
+				children.add(new TourMapItemYear(this, refId, result.getInt(1)));
 			}
 
 			conn.close();
@@ -84,37 +93,18 @@ public class TVICompareResultReference extends TreeViewerItem {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		// create children for one reference tour
-		for (TVICompareResult compTour : comparedTours) {
-
-			if (compTour.refTour.getRefId() == refId) {
-
-				// compared tour belongs to the reference tour
-
-				// keep the ref tour as the parent
-				compTour.setParentItem(this);
-
-				/*
-				 * set the status if the compared tour is already stored in the database and set the
-				 * id for the compared tour
-				 */
-				Long compTourId = compTour.compTour.getTourId();
-				boolean isStoredForRefTour = storedComparedTours.containsKey(compTourId);
-
-				if (isStoredForRefTour) {
-					compTour.compId = storedComparedTours.get(compTourId);
-				} else {
-					compTour.compId = -1;
-				}
-
-				children.add(compTour);
-			}
-		}
-
 	}
 
 	@Override
-	public void remove() {}
+	public void remove() {
+
+		if (getUnfetchedChildren() != null) {
+			// remove all children
+			getUnfetchedChildren().clear();
+		}
+
+		// remove this tour item from the parent
+		getParentItem().getUnfetchedChildren().remove(this);
+	}
 
 }

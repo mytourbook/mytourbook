@@ -27,6 +27,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.IDataModelListener;
+import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
@@ -249,10 +250,7 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 	public void setFocus() {
 		fTourChart.setFocus();
 
-//		/*
-//		 * fire tour selection
-//		 */
-//		fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart, fTourData));
+		fPostSelectionProvider.setSelection(new SelectionTourChart(fTourChart));
 	}
 
 	@Override

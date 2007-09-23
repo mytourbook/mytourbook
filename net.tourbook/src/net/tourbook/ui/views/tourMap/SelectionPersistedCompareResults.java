@@ -24,7 +24,7 @@ public class SelectionPersistedCompareResults implements ISelection {
 	/**
 	 * contains the compare results which are saved in the compare result view
 	 */
-	public ArrayList<TVICompareResult>	persistedCompareResults	= new ArrayList<TVICompareResult>();
+	public ArrayList<CompareResultItemComparedTour>	persistedCompareResults	= new ArrayList<CompareResultItemComparedTour>();
 
 	public boolean isEmpty() {
 		return false;

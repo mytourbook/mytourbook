@@ -21,13 +21,13 @@ import net.tourbook.data.TourReference;
 import net.tourbook.tour.TreeViewerItem;
 
 /**
- * Contains the result for the comparision between two tours
+ * Tree view item with the compare result between the reference and the compared tour
  */
-public class TVICompareResult extends TreeViewerItem {
+public class CompareResultItemComparedTour extends TreeViewerItem {
 
 	/**
-	 * Unique id for the {@link TourCompared} entity, the compared tour is not saved in the database
-	 * when set to <code>-1</code>
+	 * Unique id for the {@link TourCompared} entity, when <code>-1</code> the compared tour is
+	 * not saved in the database
 	 */
 	long					compId				= -1;
 
@@ -42,9 +42,20 @@ public class TVICompareResult extends TreeViewerItem {
 	protected int			normIndexStart		= -1;
 	protected int			normIndexEnd		= -1;
 
-	protected int			compareTime;
+	protected int			compareDrivingTime;
+	protected int			compareRecordingTime;
 	protected int			compareDistance;
+	protected float			compareSpeed;
+
 	protected int			timeIntervall;
+
+	/*
+	 * when a compared tour is stored in the database, the compId is set and the data from the
+	 * database are stored in the field's db...
+	 */
+	int						dbStartIndex;
+	int						dbEndIndex;
+	float					dbSpeed;
 
 	@Override
 	public boolean hasChildren() {

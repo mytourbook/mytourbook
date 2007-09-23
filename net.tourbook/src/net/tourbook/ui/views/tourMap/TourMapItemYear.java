@@ -22,62 +22,50 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TreeViewerTourItem;
 import net.tourbook.tour.TreeViewerItem;
 
 /**
- * TTI (TreeViewerItem) is used in the tree viewer TourMapView, it contains tree
- * items for reference tours
+ * TTI (TreeViewerItem) is used in the tree viewer TourMapView, it contains tree items for reference
+ * tours
  */
-public class TVTITourMapReferenceTour extends TreeViewerTourItem {
+public class TourMapItemYear extends TreeViewerItem {
 
-	String	label;
 	long	refId;
+	int		year;
 
-	int		yearMapMinValue	= Integer.MIN_VALUE;
-	int		yearMapMaxValue;
-
-	public TVTITourMapReferenceTour(TVITourMapRoot parentItem, String label, long refId,
-			long tourId) {
+	/**
+	 * @param parentItem
+	 * @param refId
+	 * @param year
+	 */
+	public TourMapItemYear(TreeViewerItem parentItem, long refId, int year) {
 
 		this.setParentItem(parentItem);
 
-		this.label = label;
 		this.refId = refId;
-		
-		setTourId(tourId);
+		this.year = year;
 	}
 
+	@Override
 	protected void fetchChildren() {
 
 		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		/**
-		 * derby does not support expression in "GROUP BY" statements, this is a
-		 * workaround found here:
-		 * http://mail-archives.apache.org/mod_mbox/db-derby-dev/200605.mbox/%3C7415300.1147889647479.JavaMail.jira@brutus%3E
-		 * <code>
-		 *	String subSQLString = "(SELECT YEAR(tourDate)\n"
-		 *		+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n")
-		 *		+ (" WHERE "
-		 *				+ TourDatabase.TABLE_TOUR_REFERENCE
-		 *				+ "_generatedId="
-		 *				+ refId + "\n")
-		 *		+ ")";
-		 *
-		 *	String sqlString = "SELECT years FROM \n"
-		 *		+ subSQLString
-		 *		+ (" REFYEARS(years) GROUP BY years");
-		 *</code>
-		 */
+		String sqlString = "SELECT " //$NON-NLS-1$
+				+ "tourDate, " //$NON-NLS-1$
+				+ "tourSpeed, " //$NON-NLS-1$
+				+ "comparedId, " //$NON-NLS-1$
+				+ "tourId , " //$NON-NLS-1$
+				+ "startIndex, " //$NON-NLS-1$
+				+ "endIndex, " //$NON-NLS-1$
+				+ "startYear \n" //$NON-NLS-1$
+				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("WHERE refTourId=" + refId) //$NON-NLS-1$
+				+ " AND " //$NON-NLS-1$
+				+ ("startYear=" + year) //$NON-NLS-1$
+				+ " ORDER BY tourDate"; //$NON-NLS-1$
 
-		String sqlString = "SELECT startYear\n" //$NON-NLS-1$
-				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE refTourId=" + refId + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" GROUP BY startYear"); //$NON-NLS-1$
-
-		// System.out.println(sqlString);
 		try {
 
 			Connection conn = TourDatabase.getInstance().getConnection();
@@ -85,7 +73,14 @@ public class TVTITourMapReferenceTour extends TreeViewerTourItem {
 			ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				children.add(new TVITourMapYear(this, refId, result.getInt(1)));
+				children.add(new TourMapItemComparedTour(this,
+						result.getDate(1),
+						result.getFloat(2),
+						result.getLong(3),
+						result.getLong(4),
+						result.getInt(5),
+						result.getInt(6),
+						refId));
 			}
 
 			conn.close();
@@ -94,16 +89,19 @@ public class TVTITourMapReferenceTour extends TreeViewerTourItem {
 			e.printStackTrace();
 		}
 	}
-	
+
+	@Override
 	public void remove() {
 
-		if (getUnfetchedChildren() != null) {
-			// remove all children
-			getUnfetchedChildren().clear();
-		}
+		// remove all children
+		getUnfetchedChildren().clear();
 
 		// remove this tour item from the parent
 		getParentItem().getUnfetchedChildren().remove(this);
+	}
+
+	TourMapItemReferenceTour getRefItem() {
+		return (TourMapItemReferenceTour) getParentItem();
 	}
 
 }

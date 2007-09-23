@@ -23,7 +23,7 @@ import net.tourbook.tour.TreeViewerTourItem;
 /**
  * Represents a compared tour (tree item) in the tour map viewer
  */
-public class TVTITourMapComparedTour extends TreeViewerTourItem {
+public class TourMapItemComparedTour extends TreeViewerTourItem {
 
 	/**
 	 * id for the {@link TourCompared} entity
@@ -51,15 +51,17 @@ public class TVTITourMapComparedTour extends TreeViewerTourItem {
 	 * @param endIndex
 	 * @param refId
 	 */
-	public TVTITourMapComparedTour(TVITourMapYear parentItem, Date tourDate, float tourSpeed,
+	public TourMapItemComparedTour(TourMapItemYear parentItem, Date tourDate, float tourSpeed,
 			long compareId, long compTourId, int startIndex, int endIndex, long refId) {
 
 		setParentItem(parentItem);
+
 		fRefId = refId;
+		fCompareId = compareId;
 
 		fTourDate = tourDate;
 		fTourSpeed = tourSpeed;
-		fCompareId = compareId;
+
 		fStartIndex = startIndex;
 		fEndIndex = endIndex;
 

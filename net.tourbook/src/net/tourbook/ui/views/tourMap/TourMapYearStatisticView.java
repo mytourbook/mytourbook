@@ -36,11 +36,11 @@ public class TourMapYearStatisticView extends ViewPart {
 	private PostSelectionProvider	fPostSelectionProvider;
 
 	/**
-	 * contains all {@link TVTITourMapComparedTour} tour objects for the current year
+	 * contains all {@link TourMapItemComparedTour} tour objects for the current year
 	 */
 	private Object[]				fYearMapTours;
 
-	private TVITourMapYear			fYearItem;
+	private TourMapItemYear			fYearItem;
 
 	private PageBook				fPageBook;
 	private Label					fPageNoChart;
@@ -74,7 +74,7 @@ public class TourMapYearStatisticView extends ViewPart {
 		fYearChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 
-				TVTITourMapComparedTour tourMapComparedTour = (TVTITourMapComparedTour) fYearMapTours[valueIndex];
+				TourMapItemComparedTour tourMapComparedTour = (TourMapItemComparedTour) fYearMapTours[valueIndex];
 
 				// select the tour in the tour viewer & show tour in compared tour char
 				fPostSelectionProvider.setSelection(new StructuredSelection(tourMapComparedTour));
@@ -104,7 +104,7 @@ public class TourMapYearStatisticView extends ViewPart {
 			final SelectionTourMap selectionComparedTour = (SelectionTourMap) selection;
 
 			// show year statistic
-			final TVITourMapYear yearItem = selectionComparedTour.getYearItem();
+			final TourMapItemYear yearItem = selectionComparedTour.getYearItem();
 			if (yearItem != null) {
 
 				fYearItem = yearItem;
@@ -148,7 +148,7 @@ public class TourMapYearStatisticView extends ViewPart {
 		boolean[] selectedTours = new boolean[tourLength];
 
 		for (int tourIndex = 0; tourIndex < tourLength; tourIndex++) {
-			final TVTITourMapComparedTour comparedItem = (TVTITourMapComparedTour) fYearMapTours[tourIndex];
+			final TourMapItemComparedTour comparedItem = (TourMapItemComparedTour) fYearMapTours[tourIndex];
 			if (comparedItem.getTourId() == selectedTourId) {
 				selectedTours[tourIndex] = true;
 			}
@@ -180,7 +180,7 @@ public class TourMapYearStatisticView extends ViewPart {
 		final Calendar calendar = GregorianCalendar.getInstance();
 
 		for (int tourIndex = 0; tourIndex < tourLength; tourIndex++) {
-			final TVTITourMapComparedTour comparedItem = (TVTITourMapComparedTour) fYearMapTours[tourIndex];
+			final TourMapItemComparedTour comparedItem = (TourMapItemComparedTour) fYearMapTours[tourIndex];
 
 			final Date tourDate = comparedItem.getTourDate();
 			calendar.setTime(tourDate);
@@ -204,7 +204,7 @@ public class TourMapYearStatisticView extends ViewPart {
 		/*
 		 * set/restore min/max values
 		 */
-		final TVTITourMapReferenceTour refItem = fYearItem.getRefItem();
+		final TourMapItemReferenceTour refItem = fYearItem.getRefItem();
 		final int minValue = yData.getVisibleMinValue();
 		final int maxValue = yData.getVisibleMaxValue();
 

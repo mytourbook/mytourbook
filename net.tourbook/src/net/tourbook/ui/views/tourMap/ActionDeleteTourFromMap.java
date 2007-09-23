@@ -65,12 +65,12 @@ public class ActionDeleteTourFromMap extends Action {
 		Object item = selection.getFirstElement();
 
 		boolean isDeleted = false;
-		if (item instanceof TVTITourMapReferenceTour) {
+		if (item instanceof TourMapItemReferenceTour) {
 
 			// delete the reference tours and it's children
 			isDeleted = deleteRefTours(selection.iterator(), selectionRemovedTours);
 
-		} else if (item instanceof TVTITourMapComparedTour) {
+		} else if (item instanceof TourMapItemComparedTour) {
 
 			// delete compared tours
 			isDeleted = deleteComparedTours(selection.iterator(), selectionRemovedTours);
@@ -87,7 +87,7 @@ public class ActionDeleteTourFromMap extends Action {
 	 * @param refCompTourSelection
 	 * @return Returns <code>true</code> when the tours are deleted
 	 */
-	private boolean deleteRefTours(	Iterator<TVTITourMapReferenceTour> selection,
+	private boolean deleteRefTours(	Iterator<TourMapItemReferenceTour> selection,
 									SelectionRemovedComparedTours refCompTourSelection) {
 
 		// confirm deletion
@@ -107,9 +107,9 @@ public class ActionDeleteTourFromMap extends Action {
 
 		TreeViewer tourViewer = fTourView.getTourViewer();
 
-		for (Iterator<TVTITourMapReferenceTour> selTour = selection; selTour.hasNext();) {
+		for (Iterator<TourMapItemReferenceTour> selTour = selection; selTour.hasNext();) {
 
-			TVTITourMapReferenceTour refTourItem = selTour.next();
+			TourMapItemReferenceTour refTourItem = selTour.next();
 
 			ArrayList<TreeViewerItem> unfetchedChildren = refTourItem.getUnfetchedChildren();
 
@@ -120,7 +120,7 @@ public class ActionDeleteTourFromMap extends Action {
 				// the database
 				for (Iterator<TreeViewerItem> compTour = unfetchedChildren.iterator(); selTour.hasNext();) {
 
-					long compId = ((TVTITourMapComparedTour) compTour.next()).getCompId();
+					long compId = ((TourMapItemComparedTour) compTour.next()).getCompId();
 
 					TourCompareManager.removeComparedTourFromDb(compId);
 
@@ -164,7 +164,7 @@ public class ActionDeleteTourFromMap extends Action {
 	 * @param selectionRemovedComparedTours
 	 * @return Returns <code>true</code> when the tours are deleted
 	 */
-	private boolean deleteComparedTours(Iterator<TVTITourMapReferenceTour> selection,
+	private boolean deleteComparedTours(Iterator<TourMapItemReferenceTour> selection,
 										SelectionRemovedComparedTours selectionRemovedComparedTours) {
 
 		// confirm deletion
@@ -185,13 +185,13 @@ public class ActionDeleteTourFromMap extends Action {
 		TreeViewer tourViewer = fTourView.getTourViewer();
 
 		// loop: selected tours
-		for (Iterator<TVTITourMapReferenceTour> selTour = selection; selTour.hasNext();) {
+		for (Iterator<TourMapItemReferenceTour> selTour = selection; selTour.hasNext();) {
 
 			Object tourItem = selTour.next();
 
-			if (tourItem instanceof TVTITourMapComparedTour) {
+			if (tourItem instanceof TourMapItemComparedTour) {
 
-				TVTITourMapComparedTour compTourItem = (TVTITourMapComparedTour) tourItem;
+				TourMapItemComparedTour compTourItem = (TourMapItemComparedTour) tourItem;
 				long compId = compTourItem.getCompId();
 
 				if (TourCompareManager.removeComparedTourFromDb(compId)) {

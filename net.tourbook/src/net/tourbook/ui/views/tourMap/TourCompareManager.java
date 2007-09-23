@@ -27,7 +27,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TreeViewerItem;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -57,7 +56,7 @@ public class TourCompareManager {
 
 	protected CompareResultView			tourComparerView;
 
-	private ArrayList<TVICompareResult>	comparedTours	= new ArrayList<TVICompareResult>();
+	private ArrayList<CompareResultItemComparedTour>	comparedTours	= new ArrayList<CompareResultItemComparedTour>();
 
 	/**
 	 * internal constructor
@@ -69,46 +68,6 @@ public class TourCompareManager {
 			fInstance = new TourCompareManager();
 		}
 		return fInstance;
-	}
-
-	/**
-	 * Find the compared tours in the tour map tree viewer<br>
-	 * !!! Recursive !!!
-	 * 
-	 * @param comparedTours
-	 * @param parentItem
-	 * @param findCompIds
-	 *        comp id's which should be found
-	 */
-	static void getComparedTours(	ArrayList<TVTITourMapComparedTour> comparedTours,
-									final TreeViewerItem parentItem,
-									final ArrayList<Long> findCompIds) {
-
-		final ArrayList<TreeViewerItem> unfetchedChildren = parentItem.getUnfetchedChildren();
-
-		if (unfetchedChildren != null) {
-
-			// children are available
-
-			for (final TreeViewerItem tourTreeItem : unfetchedChildren) {
-
-				if (tourTreeItem instanceof TVTITourMapComparedTour) {
-
-					final TVTITourMapComparedTour ttiCompResult = (TVTITourMapComparedTour) tourTreeItem;
-					final long ttiCompId = ttiCompResult.getCompId();
-
-					for (final Long compId : findCompIds) {
-						if (ttiCompId == compId) {
-							comparedTours.add(ttiCompResult);
-						}
-					}
-
-				} else {
-					// this is a child which can be the parent for other childs
-					getComparedTours(comparedTours, tourTreeItem, findCompIds);
-				}
-			}
-		}
 	}
 
 	/**
@@ -152,7 +111,7 @@ public class TourCompareManager {
 										IProgressMonitor monitor) {
 
 				int tourCounter = 0;
-				comparedTours = new ArrayList<TVICompareResult>();
+				comparedTours = new ArrayList<CompareResultItemComparedTour>();
 
 				// get all reference tours
 				getRefToursData();
@@ -197,7 +156,7 @@ public class TourCompareManager {
 							}
 
 							// compare the tour
-							TVICompareResult compareResult = compareTour(refTourIndex,
+							CompareResultItemComparedTour compareResult = compareTour(refTourIndex,
 									compareTourData);
 
 							// ignore tours which could not be compared
@@ -285,9 +244,9 @@ public class TourCompareManager {
 	 *        tour data of the tour which will be compared
 	 * @return returns the start index for the ref tour in the compare tour
 	 */
-	private TVICompareResult compareTour(int refTourIndex, TourData compareTourData) {
+	private CompareResultItemComparedTour compareTour(int refTourIndex, TourData compareTourData) {
 
-		final TVICompareResult compareResult = new TVICompareResult();
+		final CompareResultItemComparedTour compareResult = new CompareResultItemComparedTour();
 
 		/*
 		 * normalize the compare tour
@@ -406,15 +365,17 @@ public class TourCompareManager {
 		int distance = compareTourDataDistance[compareIndexEnd]
 				- compareTourDataDistance[compareIndexStart];
 
-		int time = compareTourDataTime[compareIndexEnd] - compareTourDataTime[compareIndexStart];
-
 		// remove the breaks from the time
 		int timeInterval = compareTourDataTime[1] - compareTourDataTime[0];
 		int ignoreTimeSlices = TourManager.getIgnoreTimeSlices(compareTourDataTime,
 				compareIndexStart,
 				compareIndexEnd,
 				10 / timeInterval);
-		time = time - (ignoreTimeSlices * timeInterval);
+
+		int recordingTime = compareTourDataTime[compareIndexEnd]
+				- compareTourDataTime[compareIndexStart];
+
+		int drivingTime = recordingTime - (ignoreTimeSlices * timeInterval);
 
 		// // overwrite the changed data series
 		// compareTourData.distanceSerie =
@@ -443,8 +404,11 @@ public class TourCompareManager {
 		compareResult.normIndexStart = normCompareIndexStart;
 		compareResult.normIndexEnd = normCompareIndexStart + normIndexDiff;
 
-		compareResult.compareTime = time;
+		compareResult.compareDrivingTime = drivingTime;
+		compareResult.compareRecordingTime = recordingTime;
 		compareResult.compareDistance = distance;
+		compareResult.compareSpeed = ((float) distance) / drivingTime * 3.6f;
+
 		compareResult.timeIntervall = compareTourData.getDeviceTimeInterval();
 
 		return compareResult;
@@ -460,8 +424,8 @@ public class TourCompareManager {
 	/**
 	 * @return Returns the comparedTours.
 	 */
-	public TVICompareResult[] getComparedTours() {
-		return comparedTours.toArray(new TVICompareResult[comparedTours.size()]);
+	public CompareResultItemComparedTour[] getComparedTours() {
+		return comparedTours.toArray(new CompareResultItemComparedTour[comparedTours.size()]);
 	}
 
 	/**

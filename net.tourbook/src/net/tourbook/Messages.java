@@ -67,8 +67,16 @@ public class Messages extends NLS {
 	public static String		CompareResult_Column_km;
 	public static String		CompareResult_Column_km_tooltip;
 	public static String		CompareResult_Column_kmh;
+
+	public static String	CompareResult_Column_kmh_db;
+
+	public static String	CompareResult_Column_kmh_db_tooltip;
 	public static String		CompareResult_Column_kmh_tooltip;
 	public static String		CompareResult_Column_tour;
+
+	public static String	CompareResult_time_interval;
+
+	public static String	CompareResult_time_interval_tooltip;
 
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;

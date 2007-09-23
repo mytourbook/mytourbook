@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourMap;
 
-import java.util.ArrayList;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
@@ -25,28 +23,26 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.IChartListener;
+import net.tourbook.chart.ISliderMoveListener;
+import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.views.TourChartViewPart;
-import net.tourbook.ui.views.tourMap.CompareResultView.ResultContentProvider;
-import net.tourbook.ui.views.tourMap.TourMapView.TourContentProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -119,9 +115,9 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 	private int									fOriginalStartIndex;
 	private int									fOriginalEndIndex;
 
-	private TreeViewer							fTourViewer;
+//	private TreeViewer							fTourViewer;
 
-	private ArrayList<TVTITourMapComparedTour>	fComparedToursFindResult;
+//	private ArrayList<TourMapItemComparedTour>	fComparedToursFindResult;
 
 	private class ActionSaveComparedTour extends Action {
 
@@ -187,29 +183,6 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 		TourManager.getInstance().addPropertyListener(fRefTourPropertyListener);
 	}
 
-//	private float computeTourSpeed(int markerStartIndex, int markerEndIndex) {
-//
-//		// update the changed tour speed
-//		final ChartDataModel chartDataModel = fTourChart.getChartDataModel();
-//
-//		final int[] distanceValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE)).getHighValues()[0];
-//		final int[] timeValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TIME)).getHighValues()[0];
-//
-//		final int distance = distanceValues[markerEndIndex] - distanceValues[markerStartIndex];
-//
-//		int time = timeValues[markerEndIndex] - timeValues[markerStartIndex];
-//
-//		// adjust the time by removing the breaks
-//		final int timeInterval = timeValues[1] - timeValues[0];
-//		int ignoreTimeSlices = TourManager.getInstance().getIgnoreTimeSlices(timeValues,
-//				markerStartIndex,
-//				markerEndIndex,
-//				10 / timeInterval);
-//		time = time - (ignoreTimeSlices * timeInterval);
-//
-//		return (float) ((float) distance / time * 3.6);
-//	}
-
 	private void createActions() {
 
 		fActionSynchChartsBySize = new ActionSynchChartHorizontalBySize(this);
@@ -251,6 +224,13 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 			}
 		});
 
+		// fire a slider move selection when a slider was moved in the tour chart
+		fTourChart.addSliderMoveListener(new ISliderMoveListener() {
+			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
+				fPostSelectionProvider.setSelection(chartInfoSelection);
+			}
+		});
+
 		createActions();
 
 		addRefTourPropertyListener();
@@ -274,45 +254,6 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 		TourManager.getInstance().removePropertyListener(fRefTourPropertyListener);
 
 		super.dispose();
-	}
-
-	/**
-	 * Recursive !!! method to walk down the tour tree items and find the compared tours, the tours
-	 * are saved in fComparedToursFindResult
-	 * 
-	 * @param parentItem
-	 * @param findCompIds
-	 *        comp id's which should be found
-	 */
-	private void findComparedTours(	final TreeViewerItem parentItem,
-									final ArrayList<Long> findCompIds) {
-
-		final ArrayList<TreeViewerItem> unfetchedChildren = parentItem.getUnfetchedChildren();
-
-		if (unfetchedChildren != null) {
-
-			// children are available
-
-			for (final TreeViewerItem tourTreeItem : unfetchedChildren) {
-
-				if (tourTreeItem instanceof TVTITourMapComparedTour) {
-
-					final TVTITourMapComparedTour ttiCompResult = (TVTITourMapComparedTour) tourTreeItem;
-					final long ttiCompId = ttiCompResult.getCompId();
-
-					for (final Long compId : findCompIds) {
-						if (ttiCompId == compId) {
-							fComparedToursFindResult.add(ttiCompResult);
-						}
-					}
-
-				} else {
-					// this is a child which can be the parent for other
-					// childs
-					findComparedTours(tourTreeItem, findCompIds);
-				}
-			}
-		}
 	}
 
 	private void onMoveSynchedMarker(	final int movedSynchMarkerValueIndex,
@@ -369,8 +310,8 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 
 			Object firstElement = structuredSelection.getFirstElement();
 
-			if (firstElement instanceof TVTITourMapComparedTour) {
-				TVTITourMapComparedTour comparedTour = (TVTITourMapComparedTour) firstElement;
+			if (firstElement instanceof TourMapItemComparedTour) {
+				TourMapItemComparedTour comparedTour = (TourMapItemComparedTour) firstElement;
 
 				showComparedTour(comparedTour);
 			}
@@ -395,9 +336,11 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 				comparedTour.setStartIndex(fMovedMarkerStartIndex);
 				comparedTour.setEndIndex(fMovedMarkerEndIndex);
 
-				comparedTour.setTourSpeed(TourManager.computeTourSpeed(fTourChart.getChartDataModel(),
+				final float speed = TourManager.computeTourSpeed(fTourChart.getChartDataModel(),
 						fMovedMarkerStartIndex,
-						fMovedMarkerEndIndex));
+						fMovedMarkerEndIndex);
+
+				comparedTour.setTourSpeed(speed);
 
 				// update the entity
 				ts.begin();
@@ -405,6 +348,8 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 				ts.commit();
 
 				setDataDirty(false);
+
+				updateTourViewer(fMovedMarkerStartIndex, fMovedMarkerEndIndex, speed);
 			}
 		} catch (final Exception e) {
 			e.printStackTrace();
@@ -457,6 +402,8 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 	@Override
 	public void setFocus() {
 		fTourChart.setFocus();
+
+		fPostSelectionProvider.setSelection(new SelectionTourChart(fTourChart));
 	}
 
 	/**
@@ -523,7 +470,6 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 		fCTCompareId = selectionComparedTour.getCompareId();
 
 		fTourData = compTourData;
-		fTourViewer = selectionComparedTour.getTourViewer();
 
 		fMovedMarkerStartIndex = fOriginalStartIndex = selectionComparedTour.getCompareStartIndex();
 		fMovedMarkerEndIndex = fOriginalEndIndex = selectionComparedTour.getCompareEndIndex();
@@ -539,9 +485,8 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 				xData.setRangeMarkers(new int[] { fOriginalStartIndex },
 						new int[] { fOriginalEndIndex });
 
-				// set title
-				changedChartDataModel.setTitle(NLS.bind(Messages.TourMap_Label_chart_title_compared_tour,
-						TourManager.getTourTitleDetailed(fTourData)));
+				// set chart title
+				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
 			}
 		});
 
@@ -563,16 +508,15 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 		showComparedTour();
 	}
 
-	private void showComparedTour(TVTITourMapComparedTour tvtiComparedTour) {
+	private void showComparedTour(TourMapItemComparedTour tvtiComparedTour) {
 
-		final TVTITourMapComparedTour compItem = (TVTITourMapComparedTour) tvtiComparedTour;
+		final TourMapItemComparedTour compItem = (TourMapItemComparedTour) tvtiComparedTour;
 
-		final SelectionTourMap comparedTour = new SelectionTourMap(fTourViewer,
-				compItem.getRefId());
+		final SelectionTourMap comparedTour = new SelectionTourMap(compItem.getRefId());
 
 		final TreeViewerItem parentItem = compItem.getParentItem();
-		if (parentItem instanceof TVITourMapYear) {
-			comparedTour.setYearItem((TVITourMapYear) parentItem);
+		if (parentItem instanceof TourMapItemYear) {
+			comparedTour.setYearItem((TourMapItemYear) parentItem);
 		}
 
 		comparedTour.setTourCompareData(compItem.getCompId(),
@@ -676,43 +620,26 @@ public class TourMapComparedTourView extends TourChartViewPart implements ISynch
 	}
 
 	/**
-	 * update the tour viewer with the modified synch marker (speed changed)
+	 * update tour map and compare result view
 	 */
-	private void updateTourViewer(int markerStartIndex, int markerEndIndex) {
+	private void updateTourViewer(int startIndex, int endIndex) {
 
-		if (fTourViewer == null || fTourViewer.getTree().isDisposed()) {
-			return;
-		}
+		final float speed = TourManager.computeTourSpeed(fTourChart.getChartDataModel(),
+				startIndex,
+				endIndex);
 
-		final IContentProvider contentProvider = fTourViewer.getContentProvider();
+		updateTourViewer(startIndex, endIndex, speed);
+	}
 
-		if (contentProvider instanceof TourContentProvider) {
+	/**
+	 * update tour map and compare result view
+	 */
+	private void updateTourViewer(int startIndex, int endIndex, final float speed) {
 
-			// find the changed compared tour
-			fComparedToursFindResult = new ArrayList<TVTITourMapComparedTour>();
-			final ArrayList<Long> findCompIds = new ArrayList<Long>();
-
-			findCompIds.add(fCTCompareId);
-
-			findComparedTours(((TourContentProvider) contentProvider).getRootItem(), findCompIds);
-
-			// update the data in the tree item
-			final TVTITourMapComparedTour ttiComparedTour = fComparedToursFindResult.get(0);
-//		ttiComparedTour.setStartIndex(movedXMarkerStartValueIndex);
-//		ttiComparedTour.setEndIndex(movedXMarkerEndValueIndex);
-
-			ttiComparedTour.setTourSpeed(TourManager.computeTourSpeed(fTourChart.getChartDataModel(),
-					markerStartIndex,
-					markerEndIndex));
-
-			// update the tour viewer
-			fTourViewer.update(fComparedToursFindResult.toArray(), null);
-
-		} else if (contentProvider instanceof ResultContentProvider) {
-
-			ResultContentProvider resultContentProvider = (ResultContentProvider) contentProvider;
-
-		}
+		fPostSelectionProvider.setSelection(new SelectionComparedTour(fCTCompareId,
+				startIndex,
+				endIndex,
+				speed));
 	}
 
 }

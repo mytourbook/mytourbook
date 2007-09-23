@@ -4,7 +4,6 @@ import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.TreeViewer;
 
 /**
  * This selection contains data for a compared tour
@@ -16,7 +15,7 @@ public class SelectionTourMap implements ISelection {
 	 */
 	private Long			fRefId;
 
-	private TreeViewer		fTreeViewer;
+//	private TreeViewer		fTreeViewer;
 
 	private Long			fCompTourId;
 	private Long			fCompareId;
@@ -24,10 +23,10 @@ public class SelectionTourMap implements ISelection {
 	private int				fCompareStartIndex;
 	private int				fCompareEndIndex;
 
-	private TVITourMapYear	fYearItem;
+	private TourMapItemYear	fYearItem;
 
-	public SelectionTourMap(TreeViewer treeViewer, Long refId) {
-		fTreeViewer = treeViewer;
+	public SelectionTourMap(/* TreeViewer treeViewer, */Long refId) {
+//		fTreeViewer = treeViewer;
 		fRefId = refId;
 	}
 
@@ -59,14 +58,14 @@ public class SelectionTourMap implements ISelection {
 		return fRefId;
 	}
 
-	TreeViewer getTourViewer() {
-		return fTreeViewer;
-	}
+//	TreeViewer getTourViewer() {
+//		return fTreeViewer;
+//	}
 
 	/**
-	 * @return Returns the {@link TVITourMapYear} item or <code>null</code> when it's not set
+	 * @return Returns the {@link TourMapItemYear} item or <code>null</code> when it's not set
 	 */
-	public TVITourMapYear getYearItem() {
+	public TourMapItemYear getYearItem() {
 		return fYearItem;
 	}
 
@@ -97,7 +96,7 @@ public class SelectionTourMap implements ISelection {
 		fCompareEndIndex = compEndIndex;
 	}
 
-	public void setYearItem(TVITourMapYear yearItem) {
+	public void setYearItem(TourMapItemYear yearItem) {
 		fYearItem = yearItem;
 	}
 

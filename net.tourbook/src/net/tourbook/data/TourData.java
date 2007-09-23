@@ -776,6 +776,9 @@ public class TourData {
 		this.tourId = tourId;
 	}
 
+	/**
+	 * @return Returns the unique key in the database for this {@link TourData} entity
+	 */
 	public Long getTourId() {
 		return tourId;
 	}
