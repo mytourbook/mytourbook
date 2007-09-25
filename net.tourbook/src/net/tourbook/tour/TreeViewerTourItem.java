@@ -23,7 +23,7 @@ import net.tourbook.data.TourData;
 public abstract class TreeViewerTourItem extends TreeViewerItem {
 
 	/**
-	 * id for the TourData entity
+	 * id for the {@link TourData} entity
 	 */
 	private long	tourId;
 

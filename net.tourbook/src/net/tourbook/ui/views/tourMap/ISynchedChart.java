@@ -21,7 +21,7 @@ public interface ISynchedChart {
 	public static final int	SYNCH_HORIZONTAL	= 0x02;
 
 	/**
-	 * synchronize the the compared tour with the reference tour
+	 * synchronize the compared tour with the reference tour
 	 * 
 	 * @param isSynched
 	 * @param synchMode

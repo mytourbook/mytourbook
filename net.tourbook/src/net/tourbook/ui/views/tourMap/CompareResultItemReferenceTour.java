@@ -119,7 +119,7 @@ public class CompareResultItemReferenceTour extends TreeViewerItem {
 				 * set the status if the compared tour is already stored in the database and set the
 				 * id for the compared tour
 				 */
-				Long comparedTourId = compTour.compTour.getTourId();
+				Long comparedTourId = compTour.comparedTourData.getTourId();
 				boolean isStoredForRefTour = fStoredComparedTours.containsKey(comparedTourId);
 
 				if (isStoredForRefTour) {

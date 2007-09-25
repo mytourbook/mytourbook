@@ -51,6 +51,7 @@ public class TourManager {
 	public static final int					TOUR_PROPERTY_CHART_IS_MODIFIED			= 10;
 	public static final int					TOUR_PROPERTY_SEGMENT_LAYER_CHANGED		= 20;
 	public static final int					TOUR_PROPERTY_REFERENCE_TOUR_CHANGED	= 30;
+	public static final int					TOUR_PROPERTY_COMPARE_TOUR_CHANGED		= 40;
 
 	public static final String				CUSTOM_DATA_TIME						= "time";									//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_DISTANCE					= "distance";								//$NON-NLS-1$
@@ -830,6 +831,45 @@ public class TourManager {
 		return createChartDataModelInternal(tourData, chartConfig, hasPropertyChanged);
 	}
 
+//	/**
+//	 * Creates a new tour context for a given tour data object
+//	 * 
+//	 * @param tourId
+//	 * @return Returns the newly created tour context
+//	 */
+//	private TourEditorInput createTourEditorInput(final long tourId) {
+//
+//		final TourChartConfiguration chartConfiguration = createTourChartConfiguration();
+//
+////		chartConfiguration.setKeepMinMaxValues(true);
+//
+//		// create the tour editor input
+//		final TourEditorInput editorInput = new TourEditorInput(tourId, chartConfiguration);
+//
+//		// keep the tour in a cache
+////	 tourCache.put(tourData.getTourId(), editorInput);
+//
+//		return editorInput;
+//	}
+
+//	/**
+//	 * Opens the tour editor for the the given editor input
+//	 * 
+//	 * @param editorInput
+//	 */
+//	private void openTourEditor(final TourEditorInput editorInput) {
+//
+//		try {
+//			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
+//					editorInput,
+//					"",//					TourEditorPart.ID,
+//					true);
+//
+//		} catch (final PartInitException e) {
+//			e.printStackTrace();
+//		}
+//	}
+
 	private ChartDataModel createChartDataModelInternal(final TourData tourData,
 														final TourChartConfiguration chartConfig,
 														boolean hasPropertyChanged) {
@@ -1087,45 +1127,6 @@ public class TourManager {
 
 		return chartDataModel;
 	}
-
-//	/**
-//	 * Creates a new tour context for a given tour data object
-//	 * 
-//	 * @param tourId
-//	 * @return Returns the newly created tour context
-//	 */
-//	private TourEditorInput createTourEditorInput(final long tourId) {
-//
-//		final TourChartConfiguration chartConfiguration = createTourChartConfiguration();
-//
-////		chartConfiguration.setKeepMinMaxValues(true);
-//
-//		// create the tour editor input
-//		final TourEditorInput editorInput = new TourEditorInput(tourId, chartConfiguration);
-//
-//		// keep the tour in a cache
-////	 tourCache.put(tourData.getTourId(), editorInput);
-//
-//		return editorInput;
-//	}
-
-//	/**
-//	 * Opens the tour editor for the the given editor input
-//	 * 
-//	 * @param editorInput
-//	 */
-//	private void openTourEditor(final TourEditorInput editorInput) {
-//
-//		try {
-//			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
-//					editorInput,
-//					"",//					TourEditorPart.ID,
-//					true);
-//
-//		} catch (final PartInitException e) {
-//			e.printStackTrace();
-//		}
-//	}
 
 	/**
 	 * @param tourData

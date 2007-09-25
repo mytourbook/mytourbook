@@ -2,31 +2,33 @@ package net.tourbook.ui.views.tourMap;
 
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourReference;
 
 import org.eclipse.jface.viewers.ISelection;
 
 /**
- * This selection contains data for a compared tour
+ * Selection contains data for a compared tour from the {@link TourMapView}
  */
-public class SelectionTourMap implements ISelection {
+public class SelectionTourMapView implements ISelection {
 
 	/**
-	 * Id of the reference tour
+	 * Unique id for a reference tour in {@link TourReference} entity
 	 */
 	private Long			fRefId;
 
-//	private TreeViewer		fTreeViewer;
-
-	private Long			fCompTourId;
+	/**
+	 * unique id for {@link TourCompared} entity or <code>-1</code> when the compared tour is not
+	 * saved in the database
+	 */
 	private Long			fCompareId;
+	private Long			fCompTourId;
 
 	private int				fCompareStartIndex;
 	private int				fCompareEndIndex;
 
 	private TourMapItemYear	fYearItem;
 
-	public SelectionTourMap(/* TreeViewer treeViewer, */Long refId) {
-//		fTreeViewer = treeViewer;
+	public SelectionTourMapView(Long refId) {
 		fRefId = refId;
 	}
 
@@ -47,7 +49,7 @@ public class SelectionTourMap implements ISelection {
 	}
 
 	/**
-	 * @return Returns the tour Id for the {@link TourData} of the compared tour or
+	 * @return Returns the tour Id of the {@link TourData} for the compared tour or
 	 *         <code>null</code> when it's not set
 	 */
 	public Long getCompTourId() {
@@ -57,10 +59,6 @@ public class SelectionTourMap implements ISelection {
 	public Long getRefId() {
 		return fRefId;
 	}
-
-//	TreeViewer getTourViewer() {
-//		return fTreeViewer;
-//	}
 
 	/**
 	 * @return Returns the {@link TourMapItemYear} item or <code>null</code> when it's not set
@@ -92,11 +90,12 @@ public class SelectionTourMap implements ISelection {
 
 		fCompareId = compareId;
 		fCompTourId = compTourId;
+
 		fCompareStartIndex = compStartIndex;
 		fCompareEndIndex = compEndIndex;
 	}
 
-	public void setYearItem(TourMapItemYear yearItem) {
+	public void setYearData(TourMapItemYear yearItem) {
 		fYearItem = yearItem;
 	}
 

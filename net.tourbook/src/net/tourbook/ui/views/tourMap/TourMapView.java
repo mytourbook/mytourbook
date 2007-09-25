@@ -23,6 +23,8 @@ import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourReference;
+import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -95,8 +97,8 @@ public class TourMapView extends ViewPart {
 
 	private ISelectionListener			fPostSelectionListener;
 	private IPartListener2				fPartListener;
-//	private ITourPropertyListener		fTourPropertyListener;
 	PostSelectionProvider				fPostSelectionProvider;
+	private ITourPropertyListener		fCompareTourPropertyListener;
 
 	protected int						fRefTourXMarkerValue;
 
@@ -247,6 +249,48 @@ public class TourMapView extends ViewPart {
 
 	public TourMapView() {}
 
+	private void addCompareTourPropertyListener() {
+
+		fCompareTourPropertyListener = new ITourPropertyListener() {
+			public void propertyChanged(int propertyId, Object propertyData) {
+
+				if (propertyId == TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED
+						&& propertyData instanceof TourPropertyCompareTourChanged) {
+
+					TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
+
+					// check if the compared tour was saved in the database
+					if (compareTourProperty.isDataSaved) {
+
+						ArrayList<Long> compareIds = new ArrayList<Long>();
+						compareIds.add(compareTourProperty.compareId);
+
+						// find the compared tour in the viewer
+						ArrayList<TourMapItemComparedTour> comparedTours = new ArrayList<TourMapItemComparedTour>();
+						final TreeViewerItem rootItem = ((TourContentProvider) fTourViewer.getContentProvider()).getRootItem();
+
+						getComparedTours(comparedTours, rootItem, compareIds);
+
+						if (comparedTours.size() > 0) {
+
+							TourMapItemComparedTour comparedTour = comparedTours.get(0);
+
+							// update entity
+							comparedTour.setStartIndex(compareTourProperty.startIndex);
+							comparedTour.setEndIndex(compareTourProperty.endIndex);
+							comparedTour.setTourSpeed(compareTourProperty.speed);
+
+							// update the viewer
+							fTourViewer.update(comparedTour, null);
+						}
+					}
+				}
+			}
+		};
+
+		TourManager.getInstance().addPropertyListener(fCompareTourPropertyListener);
+	}
+
 	private void addPartListener() {
 
 		fPartListener = new IPartListener2() {
@@ -345,39 +389,15 @@ public class TourMapView extends ViewPart {
 
 						// select the compared tour in the tour viewer
 
-						fLinkedTour = (TourMapItemComparedTour) firstElement;
+						final TourMapItemComparedTour linkedTour = (TourMapItemComparedTour) firstElement;
 
-						selectLinkedTour();
+						// check if the linked tour is already set, prevent recursion
+						if (fLinkedTour != linkedTour) {
+							fLinkedTour = linkedTour;
+							selectLinkedTour();
+						}
 					}
-
-				} else if (selection instanceof SelectionComparedTour) {
-
-					SelectionComparedTour selectionCompareTour = (SelectionComparedTour) selection;
-
-					ArrayList<Long> compareIds = new ArrayList<Long>();
-					compareIds.add(selectionCompareTour.getCompareId());
-
-					// find the compared tour in the viewer
-					ArrayList<TourMapItemComparedTour> comparedTours = new ArrayList<TourMapItemComparedTour>();
-					final TreeViewerItem rootItem = ((TourContentProvider) fTourViewer.getContentProvider()).getRootItem();
-
-					getComparedTours(comparedTours, rootItem, compareIds);
-
-					if (comparedTours.size() > 0) {
-
-						// update the viewer
-
-						TourMapItemComparedTour comparedTour = comparedTours.get(0);
-
-						comparedTour.setStartIndex(selectionCompareTour.getCompareStartIndex());
-						comparedTour.setEndIndex(selectionCompareTour.getCompareEndIndex());
-						comparedTour.setTourSpeed(selectionCompareTour.getSpeed());
-
-						fTourViewer.update(comparedTour, null);
-					}
-
 				}
-
 			}
 		};
 
@@ -470,7 +490,7 @@ public class TourMapView extends ViewPart {
 
 		addPartListener();
 		addPostSelectionListener();
-//		addTourPropertyListener();
+		addCompareTourPropertyListener();
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -578,7 +598,7 @@ public class TourMapView extends ViewPart {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
-//		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
 
 		fColorRefFg.dispose();
 		fColorYearFg.dispose();
@@ -662,44 +682,35 @@ public class TourMapView extends ViewPart {
 		// show the reference tour chart
 		final Object item = selection.getFirstElement();
 
-		SelectionTourMap newSelection = null;
+		ISelection tourMapSelection = null;
 
 		if (item instanceof TourMapItemReferenceTour) {
 
 			final TourMapItemReferenceTour refItem = (TourMapItemReferenceTour) item;
 
-			newSelection = new SelectionTourMap(refItem.refId);
+			tourMapSelection = new SelectionTourMapView(refItem.refId);
+			fActiveRefId = refItem.refId;
 
 		} else if (item instanceof TourMapItemYear) {
 
 			final TourMapItemYear yearItem = (TourMapItemYear) item;
 
-			newSelection = new SelectionTourMap(yearItem.refId);
+			tourMapSelection = new SelectionTourMapView(yearItem.refId);
+			fActiveRefId = yearItem.refId;
 
-			newSelection.setYearItem(yearItem);
+			((SelectionTourMapView) tourMapSelection).setYearData(yearItem);
 
 		} else if (item instanceof TourMapItemComparedTour) {
 
 			final TourMapItemComparedTour compItem = (TourMapItemComparedTour) item;
 
-			newSelection = new SelectionTourMap(compItem.getRefId());
-
-			final TreeViewerItem parentItem = compItem.getParentItem();
-			if (parentItem instanceof TourMapItemYear) {
-				newSelection.setYearItem((TourMapItemYear) parentItem);
-			}
-
-			newSelection.setTourCompareData(compItem.getCompId(),
-					compItem.getTourId(),
-					compItem.getStartIndex(),
-					compItem.getEndIndex());
+			tourMapSelection = new StructuredSelection(compItem);
+			fActiveRefId = compItem.getRefId();
 		}
 
-		if (newSelection != null) {
+		if (tourMapSelection != null) {
 
-			fActiveRefId = newSelection.getRefId();
-
-			fPostSelectionProvider.setSelection(newSelection);
+			fPostSelectionProvider.setSelection(tourMapSelection);
 		}
 	}
 

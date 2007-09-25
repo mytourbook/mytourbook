@@ -26,7 +26,7 @@ import net.tourbook.tour.TreeViewerTourItem;
 public class TourMapItemComparedTour extends TreeViewerTourItem {
 
 	/**
-	 * id for the {@link TourCompared} entity
+	 * unique id for the {@link TourCompared} entity
 	 */
 	private long	fCompareId;
 

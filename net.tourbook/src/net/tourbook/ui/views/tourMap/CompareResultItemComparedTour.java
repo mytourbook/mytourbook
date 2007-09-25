@@ -26,36 +26,48 @@ import net.tourbook.tour.TreeViewerItem;
 public class CompareResultItemComparedTour extends TreeViewerItem {
 
 	/**
-	 * Unique id for the {@link TourCompared} entity, when <code>-1</code> the compared tour is
+	 * Unique key for the {@link TourCompared} entity, when <code>-1</code> the compared tour is
 	 * not saved in the database
 	 */
-	long					compId				= -1;
+	long			compId					= -1;
 
-	protected TourReference	refTour;
-	protected TourData		compTour;
+	TourReference	refTour;
 
-	protected int			altitudeDiff		= 0;
+	/**
+	 * contains the {@link TourData} for the compared tour
+	 */
+	TourData		comparedTourData;
 
-	protected int			compareIndexStart	= -1;
-	protected int			compareIndexEnd		= -1;
+	int				altitudeDiff			= 0;
 
-	protected int			normIndexStart		= -1;
-	protected int			normIndexEnd		= -1;
+	int				computedStartIndex		= -1;
+	int				computedEndIndex		= -1;
 
-	protected int			compareDrivingTime;
-	protected int			compareRecordingTime;
-	protected int			compareDistance;
-	protected float			compareSpeed;
+	int				normalizedStartIndex	= -1;
+	int				normalizedEndIndex		= -1;
 
-	protected int			timeIntervall;
+	int				compareDrivingTime;
+	int				compareRecordingTime;
+	int				compareDistance;
+	float			compareSpeed;
+
+	int				timeIntervall;
 
 	/*
 	 * when a compared tour is stored in the database, the compId is set and the data from the
 	 * database are stored in the field's db...
 	 */
-	int						dbStartIndex;
-	int						dbEndIndex;
-	float					dbSpeed;
+	int				dbStartIndex;
+	int				dbEndIndex;
+	float			dbSpeed;
+
+	/*
+	 * the moved... fields contain the position of the compared tour when the user moved the
+	 * position
+	 */
+	int				movedStartIndex;
+	int				movedEndIndex;
+	float			movedSpeed;
 
 	@Override
 	public boolean hasChildren() {
@@ -70,4 +82,5 @@ public class CompareResultItemComparedTour extends TreeViewerItem {
 
 	@Override
 	protected void remove() {}
+
 }

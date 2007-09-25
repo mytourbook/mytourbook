@@ -16,6 +16,8 @@
 package net.tourbook.ui.views.tourMap;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -47,14 +49,14 @@ import org.eclipse.ui.WorkbenchException;
  */
 public class TourCompareManager {
 
-	private static TourCompareManager	fInstance;
+	private static TourCompareManager					fInstance;
 
-	private boolean						isComparing		= false;
+	private boolean										isComparing		= false;
 
-	private TourReference[]				refTourContext;
-	private TourData[]					refToursData;
+	private TourReference[]								refTourContext;
+	private TourData[]									refToursData;
 
-	protected CompareResultView			tourComparerView;
+	protected CompareResultView							tourComparerView;
 
 	private ArrayList<CompareResultItemComparedTour>	comparedTours	= new ArrayList<CompareResultItemComparedTour>();
 
@@ -68,6 +70,51 @@ public class TourCompareManager {
 			fInstance = new TourCompareManager();
 		}
 		return fInstance;
+	}
+
+	/**
+	 * Saves the {@link CompareResultItemComparedTour} item and updates the item with the saved data
+	 * 
+	 * @param comparedTourItem
+	 * @param em
+	 * @param ts
+	 */
+	public static void saveComparedTourItem(CompareResultItemComparedTour comparedTourItem,
+											EntityManager em,
+											EntityTransaction ts) {
+
+		TourData tourData = comparedTourItem.comparedTourData;
+
+		TourCompared comparedTour = new TourCompared();
+
+		comparedTour.setStartIndex(comparedTourItem.computedStartIndex);
+		comparedTour.setEndIndex(comparedTourItem.computedEndIndex);
+		comparedTour.setTourId(tourData.getTourId());
+		comparedTour.setRefTourId(comparedTourItem.refTour.getRefId());
+
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
+
+		comparedTour.setTourDate(calendar.getTimeInMillis());
+		comparedTour.setStartYear(tourData.getStartYear());
+
+		float speed = TourManager.computeTourSpeed(tourData.distanceSerie,
+				tourData.timeSerie,
+				comparedTourItem.computedStartIndex,
+				comparedTourItem.computedEndIndex);
+
+		comparedTour.setTourSpeed(speed);
+
+		// persist entity
+		ts.begin();
+		em.persist(comparedTour);
+		ts.commit();
+
+		// updata saved data
+		comparedTourItem.compId = comparedTour.getComparedId();
+		comparedTourItem.dbStartIndex = comparedTourItem.computedStartIndex;
+		comparedTourItem.dbEndIndex = comparedTourItem.computedEndIndex;
+		comparedTourItem.dbSpeed = speed;
 	}
 
 	/**
@@ -160,10 +207,10 @@ public class TourCompareManager {
 									compareTourData);
 
 							// ignore tours which could not be compared
-							if (compareResult.compareIndexStart != -1) {
+							if (compareResult.computedStartIndex != -1) {
 
 								compareResult.refTour = refTourContext[refTourIndex];
-								compareResult.compTour = compareTourData;
+								compareResult.comparedTourData = compareTourData;
 
 								comparedTours.add(compareResult);
 							}
@@ -339,41 +386,41 @@ public class TourCompareManager {
 		int compDistanceEnd = compDistanceStart + refDistance;
 
 		// get the start point in the compare tour
-		int compareIndexStart = 0;
-		for (; compareIndexStart < compareTourDataDistance.length; compareIndexStart++) {
-			if (compareTourDataDistance[compareIndexStart] >= compDistanceStart) {
+		int compareStartIndex = 0;
+		for (; compareStartIndex < compareTourDataDistance.length; compareStartIndex++) {
+			if (compareTourDataDistance[compareStartIndex] >= compDistanceStart) {
 				break;
 			}
 		}
 
 		// get the end point in the compare tour
-		int compareIndexEnd = compareIndexStart;
-		int oldDistance = compareTourDataDistance[compareIndexEnd];
-		for (; compareIndexEnd < compareTourDataDistance.length; compareIndexEnd++) {
-			if (compareTourDataDistance[compareIndexEnd] >= compDistanceEnd) {
+		int compareEndIndex = compareStartIndex;
+		int oldDistance = compareTourDataDistance[compareEndIndex];
+		for (; compareEndIndex < compareTourDataDistance.length; compareEndIndex++) {
+			if (compareTourDataDistance[compareEndIndex] >= compDistanceEnd) {
 				break;
 			}
 
-			int newDistance = compareTourDataDistance[compareIndexEnd];
+			int newDistance = compareTourDataDistance[compareEndIndex];
 
 			if (oldDistance == newDistance) {} else {
 				oldDistance = newDistance;
 			}
 		}
-		compareIndexEnd = Math.min(compareIndexEnd, compareTourDataDistance.length - 1);
+		compareEndIndex = Math.min(compareEndIndex, compareTourDataDistance.length - 1);
 
-		int distance = compareTourDataDistance[compareIndexEnd]
-				- compareTourDataDistance[compareIndexStart];
+		int distance = compareTourDataDistance[compareEndIndex]
+				- compareTourDataDistance[compareStartIndex];
 
 		// remove the breaks from the time
 		int timeInterval = compareTourDataTime[1] - compareTourDataTime[0];
 		int ignoreTimeSlices = TourManager.getIgnoreTimeSlices(compareTourDataTime,
-				compareIndexStart,
-				compareIndexEnd,
+				compareStartIndex,
+				compareEndIndex,
 				10 / timeInterval);
 
-		int recordingTime = compareTourDataTime[compareIndexEnd]
-				- compareTourDataTime[compareIndexStart];
+		int recordingTime = compareTourDataTime[compareEndIndex]
+				- compareTourDataTime[compareStartIndex];
 
 		int drivingTime = recordingTime - (ignoreTimeSlices * timeInterval);
 
@@ -397,12 +444,12 @@ public class TourCompareManager {
 		// create the compare result
 		compareResult.altitudeDiff = minAltiDiff;
 
-		compareResult.compareIndexStart = compareIndexStart;
-		compareResult.compareIndexEnd = compareIndexEnd;
+		compareResult.computedStartIndex = compareStartIndex;
+		compareResult.computedEndIndex = compareEndIndex;
 
 		final int normIndexDiff = refDistance / TourDataNormalizer.NORMALIZED_DISTANCE;
-		compareResult.normIndexStart = normCompareIndexStart;
-		compareResult.normIndexEnd = normCompareIndexStart + normIndexDiff;
+		compareResult.normalizedStartIndex = normCompareIndexStart;
+		compareResult.normalizedEndIndex = normCompareIndexStart + normIndexDiff;
 
 		compareResult.compareDrivingTime = drivingTime;
 		compareResult.compareRecordingTime = recordingTime;

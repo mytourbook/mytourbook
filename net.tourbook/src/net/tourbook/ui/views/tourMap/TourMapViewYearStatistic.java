@@ -26,7 +26,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourMapYearStatisticView extends ViewPart {
+public class TourMapViewYearStatistic extends ViewPart {
 
 	public static final String		ID	= "net.tourbook.views.tourMap.yearStatisticView";	//$NON-NLS-1$
 
@@ -45,7 +45,7 @@ public class TourMapYearStatisticView extends ViewPart {
 	private PageBook				fPageBook;
 	private Label					fPageNoChart;
 
-	public TourMapYearStatisticView() {}
+	public TourMapViewYearStatistic() {}
 
 	/**
 	 * listen for events when a tour is selected
@@ -99,9 +99,9 @@ public class TourMapYearStatisticView extends ViewPart {
 
 	private void onSelectionChanged(ISelection selection) {
 
-		if (selection instanceof SelectionTourMap) {
+		if (selection instanceof SelectionTourMapView) {
 
-			final SelectionTourMap selectionComparedTour = (SelectionTourMap) selection;
+			final SelectionTourMapView selectionComparedTour = (SelectionTourMapView) selection;
 
 			// show year statistic
 			final TourMapItemYear yearItem = selectionComparedTour.getYearItem();

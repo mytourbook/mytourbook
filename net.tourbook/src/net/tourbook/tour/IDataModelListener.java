@@ -16,13 +16,14 @@
 package net.tourbook.tour;
 
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.data.TourData;
 
 public interface IDataModelListener {
 
 	/**
-	 * Method is called after the chart data fDataModel was created from the tourdata
-	 * and configuration but before the chart is updated. This can be used to
-	 * set the title or set marker
+	 * Method is called after the chart data model was created from the {@link TourData} and
+	 * configuration <b>but</b> before the chart is updated. This method can be used to set the
+	 * title or markers
 	 * 
 	 * @param fChartDataModel
 	 */

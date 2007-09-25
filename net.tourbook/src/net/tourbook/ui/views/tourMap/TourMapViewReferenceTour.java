@@ -34,6 +34,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.TourChartViewPart;
 
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -45,7 +46,7 @@ import org.eclipse.ui.part.PageBook;
 // author: Wolfgang Schramm
 // create: 09.07.2007
 
-public class TourMapReferenceTourView extends TourChartViewPart {
+public class TourMapViewReferenceTour extends TourChartViewPart {
 
 	public static final String	ID	= "net.tourbook.views.tourMap.referenceTourView";	//$NON-NLS-1$
 
@@ -107,17 +108,29 @@ public class TourMapReferenceTourView extends TourChartViewPart {
 	@Override
 	public void onSelectionChanged(final ISelection selection) {
 
-		if (selection instanceof SelectionTourMap) {
-			showRefTour((SelectionTourMap) selection);
-		}
+		if (selection instanceof SelectionTourMapView) {
 
+			showRefTour(((SelectionTourMapView) selection).getRefId());
+
+		} else if (selection instanceof StructuredSelection) {
+
+			Object firstElement = ((StructuredSelection) selection).getFirstElement();
+
+			if (firstElement instanceof TourMapItemComparedTour) {
+
+				showRefTour(((TourMapItemComparedTour) firstElement).getRefId());
+
+			} else if (firstElement instanceof CompareResultItemComparedTour) {
+
+				showRefTour(((CompareResultItemComparedTour) firstElement).refTour.getRefId());
+			}
+		}
 	}
 
-	private void showRefTour(final SelectionTourMap selectionComparedTour) {
+	private void showRefTour(long refId) {
 
 		// check if the ref tour is already displayed
-		final Long refId = selectionComparedTour.getRefId();
-		if (refId == null || refId == fActiveRefId) {
+		if (refId == fActiveRefId) {
 			return;
 		}
 

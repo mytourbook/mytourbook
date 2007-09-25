@@ -188,21 +188,21 @@
             name="%view_name_Compare_Result"/>
       <view
             category="net.tourbook.category.compareTours"
-            class="net.tourbook.ui.views.tourMap.TourMapReferenceTourView"
+            class="net.tourbook.ui.views.tourMap.TourMapViewReferenceTour"
             icon="icons/tour-map-reftour.gif"
             id="net.tourbook.views.tourMap.referenceTourView"
             name="%view_name_tourMap_referenceTour">
       </view>
       <view
             category="net.tourbook.category.compareTours"
-            class="net.tourbook.ui.views.tourMap.TourMapComparedTourView"
+            class="net.tourbook.ui.views.tourMap.TourMapViewComparedTour"
             icon="icons/tour-map-comparetour.gif"
             id="net.tourbook.views.tourMap.comparedTourView"
             name="%view_name_tourMap_comparedTour">
       </view>
       <view
             category="net.tourbook.category.compareTours"
-            class="net.tourbook.ui.views.tourMap.TourMapYearStatisticView"
+            class="net.tourbook.ui.views.tourMap.TourMapViewYearStatistic"
             icon="icons/tour-map-statistic.gif"
             id="net.tourbook.views.tourMap.yearStatisticView"
             name="%view_name_tourMap_statistics">
