@@ -1057,8 +1057,8 @@ public class ChartComponents extends Composite {
 		 */
 
 		final int[] xValues = xData.getHighValues()[0];
-		final float markerStartValue = xValues[markerValueIndexStart];
-		final float markerEndValue = xValues[markerValueIndexEnd];
+		final float markerStartValue = xValues[Math.min(markerValueIndexStart, xValues.length - 1)];
+		final float markerEndValue = xValues[Math.min(markerValueIndexEnd, xValues.length - 1)];
 
 		final float valueDiff = markerEndValue - markerStartValue;
 		final float lastValue = xValues[xValues.length - 1];

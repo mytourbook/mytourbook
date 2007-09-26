@@ -62,6 +62,9 @@ class TCActionHandlerManager {
 
 		fActionHandlers = new HashMap<String, TCActionHandler>();
 
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_TOUR_COMPARE,
+				new ActionHandlerGraphTourCompare());
+
 		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTITUDE, new ActionHandlerGraphAltitude());
 		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_PULSE, new ActionHandlerGraphPulse());
 		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_SPEED, new ActionHandlerGraphSpeed());

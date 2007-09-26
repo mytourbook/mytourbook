@@ -233,7 +233,7 @@ public class CompareResultView extends ViewPart {
 					return nf.format(((float) result.compareDistance) / 1000);
 
 				case COLUMN_ALTITUDE_DIFFERENCE:
-					return Integer.toString(result.altitudeDiff
+					return Integer.toString(result.minAltitudeDiff
 							* 100
 							/ (result.normalizedEndIndex - result.normalizedStartIndex));
 
@@ -586,8 +586,8 @@ public class CompareResultView extends ViewPart {
 			public int compare(Viewer viewer, Object obj1, Object obj2) {
 
 				if (obj1 instanceof CompareResultItemComparedTour) {
-					return ((CompareResultItemComparedTour) obj1).altitudeDiff
-							- ((CompareResultItemComparedTour) obj2).altitudeDiff;
+					return ((CompareResultItemComparedTour) obj1).minAltitudeDiff
+							- ((CompareResultItemComparedTour) obj2).minAltitudeDiff;
 				}
 
 				return 0;

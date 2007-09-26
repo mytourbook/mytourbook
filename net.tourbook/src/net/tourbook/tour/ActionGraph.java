@@ -34,10 +34,12 @@ class ActionGraph extends Action {
 	 * @param fGraphId
 	 * @param label
 	 * @param toolTip
-	 * @param image
+	 * @param imageEnabled
+	 * @param imageDisabled
 	 * @param isChecked
 	 */
-	public ActionGraph(TourChart tourChart, int graphId, String label, String toolTip, String image) {
+	public ActionGraph(TourChart tourChart, int graphId, String label, String toolTip,
+			String imageEnabled, String imageDisabled) {
 
 		super(label, AS_CHECK_BOX);
 
@@ -45,7 +47,11 @@ class ActionGraph extends Action {
 		fGraphId = graphId;
 
 		setToolTipText(toolTip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(image));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(imageEnabled));
+
+		if (imageDisabled != null) {
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(imageDisabled));
+		}
 
 		setChecked(tourChart.fTourChartConfig.getVisibleGraphs().contains(graphId));
 	}

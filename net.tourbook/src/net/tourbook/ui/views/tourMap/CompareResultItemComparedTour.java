@@ -38,7 +38,15 @@ public class CompareResultItemComparedTour extends TreeViewerItem {
 	 */
 	TourData		comparedTourData;
 
-	int				altitudeDiff			= 0;
+	/**
+	 * contains the minimum value for the altitude differenz
+	 */
+	int				minAltitudeDiff			= 0;
+
+	/**
+	 * contains the minimum data serie for each compared value
+	 */
+	int[]			altitudeDiffSerie;
 
 	int				computedStartIndex		= -1;
 	int				computedEndIndex		= -1;

@@ -3214,8 +3214,11 @@ public class ChartComponentGraph extends Canvas {
 		final int[] xValues = xData.getHighValues()[0];
 		final float scaleX = getXDrawingData().getScaleX();
 
-		final int devXMarkerStart = (int) (xValues[synchMarkerStartIndex] * scaleX - fDevGraphImageXOffset);
-		final int devXMarkerEnd = (int) (xValues[synchMarkerEndIndex] * scaleX - fDevGraphImageXOffset);
+		final int devXMarkerStart = (int) (xValues[Math.min(synchMarkerStartIndex,
+				xValues.length - 1)]
+				* scaleX - fDevGraphImageXOffset);
+		final int devXMarkerEnd = (int) (xValues[Math.min(synchMarkerEndIndex, xValues.length - 1)]
+				* scaleX - fDevGraphImageXOffset);
 
 		if (devXGraph >= devXMarkerStart && devXGraph <= devXMarkerEnd) {
 			return true;

@@ -73,6 +73,7 @@ public class TourManager {
 	public static final int					GRAPH_CADENCE							= 1005;
 	public static final int					GRAPH_GRADIENT							= 1006;
 	public static final int					GRAPH_POWER								= 1007;
+	public static final int					GRAPH_TOUR_COMPARE						= 2000;
 
 	public static final int					GRADIENT_DIVISOR						= 10;
 
@@ -176,6 +177,7 @@ public class TourManager {
 		int ignoreTimeCounter = 0;
 		int oldDistance = 0;
 		sliceMin = Math.max(sliceMin, 1);
+		indexRight = Math.min(indexRight, distanceValues.length - 1);
 
 		for (int valueIndex = indexLeft; valueIndex <= indexRight; valueIndex++) {
 
@@ -1078,8 +1080,23 @@ public class TourManager {
 		chartDataModel.addXyData(yDataTemperature);
 
 		/*
-		 * all visible graphs are added as y-data to the chart data fDataModel in the sequence as
-		 * they were activated
+		 * tour compare altitude difference
+		 */
+		ChartDataYSerie yDataTourCompare = null;
+		if (tourData.tourCompareSerie != null && tourData.tourCompareSerie.length > 0) {
+			yDataTourCompare = getChartData(tourData.tourCompareSerie, chartType);
+			yDataTourCompare.setYTitle(Messages.Graph_Label_Tour_Compare);
+			yDataTourCompare.setUnitLabel(Messages.Graph_Label_Tour_Compare_unit);
+			yDataTourCompare.setShowYSlider(true);
+			yDataTourCompare.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+			yDataTourCompare.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TOUR_COMPARE);
+			setGraphColor(prefStore, yDataTourCompare, GraphColors.PREF_GRAPH_TOUR_COMPARE);
+			chartDataModel.addXyData(yDataTourCompare);
+		}
+
+		/*
+		 * all visible graphs are added as y-data to the chart data model in the sequence as they
+		 * were activated
 		 */
 		for (final int actionId : chartConfig.getVisibleGraphs()) {
 
@@ -1110,6 +1127,12 @@ public class TourManager {
 
 			case GRAPH_TEMPERATURE:
 				chartDataModel.addYData(yDataTemperature);
+				break;
+
+			case GRAPH_TOUR_COMPARE:
+				if (yDataTourCompare != null) {
+					chartDataModel.addYData(yDataTourCompare);
+				}
 				break;
 
 			default:

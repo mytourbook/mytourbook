@@ -635,9 +635,9 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 		return false;
 	}
 
-	private void updateTourChart(CompareResultItemComparedTour itemComparedTour) {
+	private void updateTourChart(CompareResultItemComparedTour compareResultItem) {
 
-		final Long ctTourId = itemComparedTour.comparedTourData.getTourId();
+		final Long ctTourId = compareResultItem.comparedTourData.getTourId();
 
 		// check if the compared tour is already displayed
 		if (fCTTourId == ctTourId && fComparedTourItem instanceof CompareResultItemComparedTour) {
@@ -654,32 +654,39 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 
 		// keep data from the selected compared tour
 		fCTTourId = ctTourId;
-		fCTRefId = itemComparedTour.refTour.getRefId();
-		fCTCompareId = itemComparedTour.compId;
+		fCTRefId = compareResultItem.refTour.getRefId();
+		fCTCompareId = compareResultItem.compId;
 
 		fTourData = compTourData;
+
+		// set tour compare data, this will show the action button to see the graph for this data
+		fTourData.tourCompareSerie = compareResultItem.altitudeDiffSerie;
 
 		if (fCTCompareId == -1) {
 
 			// compared tour is not saved
 
-			fDefaultStartIndex = fComputedStartIndex = fMovedStartIndex = itemComparedTour.computedStartIndex;
-			fDefaultEndIndex = fComputedEndIndex = fMovedEndIndex = itemComparedTour.computedEndIndex;
+			fDefaultStartIndex = fComputedStartIndex = fMovedStartIndex = compareResultItem.computedStartIndex;
+			fDefaultEndIndex = fComputedEndIndex = fMovedEndIndex = compareResultItem.computedEndIndex;
 
 		} else {
 
 			// compared tour is saved
 
-			fDefaultStartIndex = fMovedStartIndex = itemComparedTour.dbStartIndex;
-			fDefaultEndIndex = fMovedEndIndex = itemComparedTour.dbEndIndex;
+			fDefaultStartIndex = fMovedStartIndex = compareResultItem.dbStartIndex;
+			fDefaultEndIndex = fMovedEndIndex = compareResultItem.dbEndIndex;
 
-			fComputedStartIndex = itemComparedTour.computedStartIndex;
-			fComputedEndIndex = itemComparedTour.computedEndIndex;
+			fComputedStartIndex = compareResultItem.computedStartIndex;
+			fComputedEndIndex = compareResultItem.computedEndIndex;
 		}
 
-		fComparedTourItem = itemComparedTour;
+		fComparedTourItem = compareResultItem;
 
 		updateTourChart();
+
+		// enable action after the chart was created
+		fTourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE,
+				true);
 	}
 
 	/**
@@ -711,12 +718,22 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 
 		fTourData = compTourData;
 
+		/*
+		 * remove tour compare data (when there are any), but set dummy object to display the action
+		 * button
+		 */
+		fTourData.tourCompareSerie = new int[0];
+
 		fDefaultStartIndex = fMovedStartIndex = fComputedStartIndex = itemComparedTour.getStartIndex();
 		fDefaultEndIndex = fMovedEndIndex = fComputedEndIndex = itemComparedTour.getEndIndex();
 
 		fComparedTourItem = itemComparedTour;
 
 		updateTourChart();
+
+		// disable action after the chart was created
+		fTourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE,
+				false);
 	}
 
 	/**

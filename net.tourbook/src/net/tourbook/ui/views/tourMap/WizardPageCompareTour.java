@@ -392,7 +392,7 @@ public class WizardPageCompareTour extends WizardPage {
 	/**
 	 * @return return all checked tours
 	 */
-	public Object[] getCompareTours() {
+	public Object[] getComparedTours() {
 
 		TourMapTourItem[] tours = new TourMapTourItem[0];
 

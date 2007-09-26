@@ -34,23 +34,26 @@ public class WizardTourComparer extends Wizard {
 		setWindowTitle(Messages.TourMapWizard_Wizard_title);
 	}
 
+	@Override
 	public boolean performCancel() {
 		persistDialogSettings();
 		return true;
 	}
 
+	@Override
 	public boolean performFinish() {
 
 		persistDialogSettings();
 
 		TourReference[] refTours = pageReferenceTour.getReferenceTours();
-		Object[] compareTours = pageCompareTour.getCompareTours();
-		
-		TourCompareManager.getInstance().compareTours(refTours, compareTours);
+		Object[] comparesTours = pageCompareTour.getComparedTours();
+
+		TourCompareManager.getInstance().compareTours(refTours, comparesTours);
 
 		return true;
 	}
 
+	@Override
 	public void addPages() {
 
 		pageCompareTour = new WizardPageCompareTour("compare-tour"); //$NON-NLS-1$
@@ -64,9 +67,8 @@ public class WizardTourComparer extends Wizard {
 	private void setDialogSettings() {
 
 		IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
-		IDialogSettings wizardSettings = pluginSettings
-				.getSection(DIALOG_SETTINGS_SECTION);
-		
+		IDialogSettings wizardSettings = pluginSettings.getSection(DIALOG_SETTINGS_SECTION);
+
 		if (wizardSettings == null) {
 			wizardSettings = pluginSettings.addNewSection(DIALOG_SETTINGS_SECTION);
 		}

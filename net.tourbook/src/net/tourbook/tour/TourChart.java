@@ -56,21 +56,23 @@ import org.eclipse.ui.IWorkbenchPartSite;
  */
 public class TourChart extends Chart {
 
-	static final String						COMMAND_ID_CHART_OPTIONS			= "net.tourbook.command.tourChart.options";
-	static final String						COMMAND_ID_SHOW_START_TIME			= "net.tourbook.command.tourChart.showStartTime";
-	static final String						COMMAND_ID_CAN_SCROLL_CHART			= "net.tourbook.command.tourChart.canScrollChart";
-	static final String						COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER	= "net.tourbook.command.tourChart.canAutoZoomToSlider";
+	static final String						COMMAND_ID_CHART_OPTIONS			= "net.tourbook.command.tourChart.options";			//$NON-NLS-1$
+	static final String						COMMAND_ID_SHOW_START_TIME			= "net.tourbook.command.tourChart.showStartTime";		//$NON-NLS-1$
+	static final String						COMMAND_ID_CAN_SCROLL_CHART			= "net.tourbook.command.tourChart.canScrollChart";		//$NON-NLS-1$
+	static final String						COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER	= "net.tourbook.command.tourChart.canAutoZoomToSlider"; //$NON-NLS-1$
 
-	static final String						COMMAND_ID_X_AXIS_DISTANCE			= "net.tourbook.command.tourChart.xAxisDistance";
-	static final String						COMMAND_ID_X_AXIS_TIME				= "net.tourbook.command.tourChart.xAxisTime";
+	static final String						COMMAND_ID_X_AXIS_DISTANCE			= "net.tourbook.command.tourChart.xAxisDistance";		//$NON-NLS-1$
+	static final String						COMMAND_ID_X_AXIS_TIME				= "net.tourbook.command.tourChart.xAxisTime";			//$NON-NLS-1$
 
-	static final String						COMMAND_ID_GRAPH_ALTITUDE			= "net.tourbook.command.graph.altitude";
-	static final String						COMMAND_ID_GRAPH_SPEED				= "net.tourbook.command.graph.speed";
-	static final String						COMMAND_ID_GRAPH_PULSE				= "net.tourbook.command.graph.pulse";
-	static final String						COMMAND_ID_GRAPH_TEMPERATURE		= "net.tourbook.command.graph.temperature";
-	static final String						COMMAND_ID_GRAPH_CADENCE			= "net.tourbook.command.graph.cadence";
-	static final String						COMMAND_ID_GRAPH_ALTIMETER			= "net.tourbook.command.graph.altimeter";
-	static final String						COMMAND_ID_GRAPH_GRADIENT			= "net.tourbook.command.graph.gradient";
+	static final String						COMMAND_ID_GRAPH_ALTITUDE			= "net.tourbook.command.graph.altitude";				//$NON-NLS-1$
+	static final String						COMMAND_ID_GRAPH_SPEED				= "net.tourbook.command.graph.speed";					//$NON-NLS-1$
+	static final String						COMMAND_ID_GRAPH_PULSE				= "net.tourbook.command.graph.pulse";					//$NON-NLS-1$
+	static final String						COMMAND_ID_GRAPH_TEMPERATURE		= "net.tourbook.command.graph.temperature";			//$NON-NLS-1$
+	static final String						COMMAND_ID_GRAPH_CADENCE			= "net.tourbook.command.graph.cadence";				//$NON-NLS-1$
+	static final String						COMMAND_ID_GRAPH_ALTIMETER			= "net.tourbook.command.graph.altimeter";				//$NON-NLS-1$
+	static final String						COMMAND_ID_GRAPH_GRADIENT			= "net.tourbook.command.graph.gradient";				//$NON-NLS-1$
+
+	public static final String				COMMAND_ID_GRAPH_TOUR_COMPARE		= "net.tourbook.command.graph.tourCompare";			//$NON-NLS-1$
 
 	static final String						SEGMENT_VALUES						= "segmentValues";										//$NON-NLS-1$
 
@@ -244,69 +246,85 @@ public class TourChart extends Chart {
 	private void createGraphActionProxies() {
 
 		createGraphActionProxy(TourManager.GRAPH_ALTITUDE,
+				COMMAND_ID_GRAPH_ALTITUDE,
 				Messages.Graph_Label_Altitude,
 				Messages.Tour_Action_graph_altitude_tooltip,
 				Messages.Image_graph_altitude,
-				COMMAND_ID_GRAPH_ALTITUDE);
+				null);
 
 		createGraphActionProxy(TourManager.GRAPH_SPEED,
+				COMMAND_ID_GRAPH_SPEED,
 				Messages.Graph_Label_Speed,
 				Messages.Tour_Action_graph_speed_tooltip,
 				Messages.Image_graph_speed,
-				COMMAND_ID_GRAPH_SPEED);
+				null);
 
 		createGraphActionProxy(TourManager.GRAPH_ALTIMETER,
+				COMMAND_ID_GRAPH_ALTIMETER,
 				Messages.Graph_Label_Altimeter,
 				Messages.Tour_Action_graph_altimeter_tooltip,
 				Messages.Image_graph_altimeter,
-				COMMAND_ID_GRAPH_ALTIMETER);
+				null);
 
 		createGraphActionProxy(TourManager.GRAPH_PULSE,
+				COMMAND_ID_GRAPH_PULSE,
 				Messages.Graph_Label_Heartbeat,
 				Messages.Tour_Action_graph_heartbeat_tooltip,
 				Messages.Image_graph_heartbeat,
-				COMMAND_ID_GRAPH_PULSE);
+				null);
 
 		createGraphActionProxy(TourManager.GRAPH_TEMPERATURE,
+				COMMAND_ID_GRAPH_TEMPERATURE,
 				Messages.Graph_Label_Temperature,
 				Messages.Tour_Action_graph_temperature_tooltip,
 				Messages.Image_graph_temperature,
-				COMMAND_ID_GRAPH_TEMPERATURE);
+				null);
 
 		createGraphActionProxy(TourManager.GRAPH_CADENCE,
+				COMMAND_ID_GRAPH_CADENCE,
 				Messages.Graph_Label_Cadence,
 				Messages.Tour_Action_graph_cadence_tooltip,
 				Messages.Image_graph_cadence,
-				COMMAND_ID_GRAPH_CADENCE);
+				null);
 
 		createGraphActionProxy(TourManager.GRAPH_GRADIENT,
+				COMMAND_ID_GRAPH_GRADIENT,
 				Messages.Graph_Label_Gradiend,
 				Messages.Tour_Action_graph_gradient_tooltip,
 				Messages.Image_graph_gradient,
-				COMMAND_ID_GRAPH_GRADIENT);
+				null);
+
+		createGraphActionProxy(TourManager.GRAPH_TOUR_COMPARE,
+				COMMAND_ID_GRAPH_TOUR_COMPARE,
+				Messages.Graph_Label_Tour_Compare,
+				Messages.Tour_Action_graph_tour_compare_tooltip,
+				Messages.Image_graph_tour_compare,
+				Messages.Image_graph_tour_compare_disabled);
 	}
 
 	/**
 	 * Create the action proxy for a graph action
 	 * 
-	 * @param id
 	 * @param label
 	 * @param toolTip
-	 * @param imageName
+	 * @param imageEnabled
+	 * @param imageDisabled
+	 * @param id
 	 * @param definitionId
 	 * @param isChecked
 	 * @return
 	 */
 	private void createGraphActionProxy(final int graphId,
+										String commandId,
 										final String label,
 										final String toolTip,
-										final String imageName,
-										String commandId) {
+										final String imageEnabled,
+										String imageDisabled) {
 
 		Action action = null;
 
 		if (useInternalActionBar()) {
-			action = new ActionGraph(this, graphId, label, toolTip, imageName);
+			action = new ActionGraph(this, graphId, label, toolTip, imageEnabled, imageDisabled);
 		}
 
 		final TCActionProxy actionProxy = new TCActionProxy(commandId, action);
@@ -334,12 +352,13 @@ public class TourChart extends Chart {
 
 			final ChartMarker chartMarker = new ChartMarker();
 
-			chartMarker.graphX = xAxisSerie[tourMarker.getSerieIndex()];
+			final int markerIndex = Math.min(tourMarker.getSerieIndex(), xAxisSerie.length - 1);
+			chartMarker.graphX = xAxisSerie[markerIndex];
 
 			chartMarker.markerLabel = tourMarker.getLabel();
-			chartMarker.graphLabel = Integer.toString(fTourData.altitudeSerie[tourMarker.getSerieIndex()]);
+			chartMarker.graphLabel = Integer.toString(fTourData.altitudeSerie[markerIndex]);
 
-			chartMarker.serieIndex = tourMarker.getSerieIndex();
+			chartMarker.serieIndex = markerIndex;
 			chartMarker.visualPosition = tourMarker.getVisualPosition();
 			chartMarker.type = tourMarker.getType();
 			chartMarker.visualType = tourMarker.getVisibleType();
@@ -415,7 +434,7 @@ public class TourChart extends Chart {
 	 */
 	private void createTourActionProxies() {
 
-		// create actions only once
+		// check if action proxies are created
 		if (fActionProxies != null) {
 			return;
 		}
@@ -479,6 +498,19 @@ public class TourChart extends Chart {
 
 	}
 
+	public void enableGraphAction(int graphId, boolean isEnabled) {
+
+		if (fActionProxies == null) {
+			return;
+		}
+
+		final TCActionProxy actionProxy = fActionProxies.get(getProxyId(graphId));
+		if (actionProxy != null) {
+			actionProxy.setEnabled(isEnabled);
+		}
+
+	}
+
 	/**
 	 * create the tour specific action, they are defined in the chart configuration
 	 */
@@ -500,6 +532,13 @@ public class TourChart extends Chart {
 		/*
 		 * add the actions to the toolbar
 		 */
+		if (fTourData.tourCompareSerie != null) {
+			// show the graph for tour comparision when data are available
+//			tbm.add(new Separator());
+			final TCActionProxy actionProxy = fActionProxies.get(getProxyId(TourManager.GRAPH_TOUR_COMPARE));
+			tbm.add(actionProxy.getAction());
+		}
+
 		tbm.add(new Separator());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_ALTITUDE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_SPEED)).getAction());
@@ -541,7 +580,7 @@ public class TourChart extends Chart {
 	 * @return
 	 */
 	private String getProxyId(int graphId) {
-		return "graphId." + Integer.toString(graphId);
+		return "graphId." + Integer.toString(graphId); //$NON-NLS-1$
 	}
 
 	public TourData getTourData() {

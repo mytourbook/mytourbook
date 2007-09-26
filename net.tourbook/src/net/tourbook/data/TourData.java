@@ -276,6 +276,9 @@ public class TourData {
 	@Transient
 	public int[]				gradientSerie;
 
+	@Transient
+	public int[]				tourCompareSerie;
+
 	/**
 	 * Index of the segmented data in the original serie
 	 */
