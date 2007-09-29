@@ -319,7 +319,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		if (currentPage != null) {
 
-			final String shellTitle = "{0} - {1}";
+			final String shellTitle = Messages.App_Window_Title;
 
 			if (activePart != null) {
 				lastPartTitle = activePart.getTitleToolTip();

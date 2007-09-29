@@ -38,7 +38,6 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
 
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -93,6 +92,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		return true;
 	}
 
+	@Override
 	public void activateActions(IWorkbenchPartSite partSite) {
 		fChart.updateChartActionHandlers();
 	}
@@ -100,6 +100,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	@Override
 	public void deactivateActions(IWorkbenchPartSite partSite) {}
 
+	@Override
 	public void createControl(	final Composite parent,
 								IViewSite viewSite,
 								final IPostSelectionProvider postSelectionProvider) {
@@ -237,6 +238,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 					});
 
 					dialog.setLabelProvider(new LabelProvider() {
+						@Override
 						public String getText(final Object element) {
 							final Tour tour = (Tour) element;
 							return tour.time;
@@ -311,10 +313,12 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		updateChart(fTourDataTour);
 	}
 
+	@Override
 	public void resetSelection() {
 		fChart.setSelectedBars(null);
 	}
 
+	@Override
 	public boolean selectMonth(final Long date) {
 
 		fCalendar.setTimeInMillis(date);
@@ -340,6 +344,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		return isSelected;
 	}
 
+	@Override
 	public boolean selectTour(Long tourId) {
 
 		long[] tourIds = fTourDataTour.fTourIds;
@@ -404,12 +409,14 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	}
 
+	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
 	abstract void updateChart(TourDataTour tourDataDay);
 
+	@Override
 	public void updateToolBar(final boolean refreshToolbar) {
 		fChart.fillToolbar(refreshToolbar);
 	}

@@ -66,8 +66,8 @@ public class WizardPageImportSettings extends WizardPage {
 
 	protected WizardPageImportSettings(final String pageName) {
 		super(pageName);
-		setTitle(Messages.ImportWizard_Dlg_title);
-		setMessage(Messages.ImportWizard_Dlg_message);
+		setTitle(Messages.Import_Wizard_Dlg_title);
+		setMessage(Messages.Import_Wizard_Dlg_message);
 	}
 
 	public void createControl(final Composite parent) {
@@ -100,7 +100,7 @@ public class WizardPageImportSettings extends WizardPage {
 		GridData gd;
 
 		Label label = new Label(fGroupContainer, SWT.NONE);
-		label.setText(Messages.ImportWizard_Label_device);
+		label.setText(Messages.Import_Wizard_Label_device);
 		gd = new GridData(SWT.NONE, SWT.CENTER, false, false);
 		gd.verticalIndent = 10;
 		label.setLayoutData(gd);
@@ -145,7 +145,7 @@ public class WizardPageImportSettings extends WizardPage {
 	private void createFieldPerson() {
 		Label label;
 		label = new Label(fGroupContainer, SWT.NONE);
-		label.setText(Messages.ImportWizard_Label_use_settings);
+		label.setText(Messages.Import_Wizard_Label_use_settings);
 
 		fComboPerson = new Combo(fGroupContainer, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboPerson.setVisibleItemCount(10);
@@ -167,7 +167,7 @@ public class WizardPageImportSettings extends WizardPage {
 			}
 		});
 
-		fComboPerson.add(Messages.ImportWizard_Control_combo_person_default_settings);
+		fComboPerson.add(Messages.Import_Wizard_Control_combo_person_default_settings);
 
 		// add people to list
 		fPeopleList = TourDatabase.getTourPeople();
@@ -191,7 +191,7 @@ public class WizardPageImportSettings extends WizardPage {
 		 */
 		fPathEditor = new DirectoryFieldEditor(
 				ITourbookPreferences.DUMMY_FIELD,
-				Messages.ImportWizard_Label_auto_save_path,
+				Messages.Import_Wizard_Label_auto_save_path,
 				fGroupContainer);
 
 		fPathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
@@ -210,7 +210,7 @@ public class WizardPageImportSettings extends WizardPage {
 		GridData gd;
 
 		final Label label = new Label(fGroupContainer, SWT.NONE);
-		label.setText(Messages.ImportWizard_Label_serial_port);
+		label.setText(Messages.Import_Wizard_Label_serial_port);
 		gd = new GridData(SWT.NONE, SWT.CENTER, false, false);
 		gd.verticalIndent = 10;
 		label.setLayoutData(gd);
@@ -246,7 +246,7 @@ public class WizardPageImportSettings extends WizardPage {
 
 		} else {
 			// no ports are available
-			fComboPorts.add(Messages.ImportWizard_Control_combo_ports_not_available);
+			fComboPorts.add(Messages.Import_Wizard_Control_combo_ports_not_available);
 			fComboPorts.select(0);
 			fComboPorts.setEnabled(false);
 		}
@@ -408,7 +408,7 @@ public class WizardPageImportSettings extends WizardPage {
 		// validate device
 		if (fComboDevice.getSelectionIndex() <= 0) {
 			setPageComplete(false);
-			setErrorMessage(Messages.ImportWizard_Error_select_a_device);
+			setErrorMessage(Messages.Import_Wizard_Error_select_a_device);
 			fComboDevice.setFocus();
 			return false;
 		}
@@ -416,7 +416,7 @@ public class WizardPageImportSettings extends WizardPage {
 		// validate path
 		if (validatePath() == false) {
 			setPageComplete(false);
-			setErrorMessage(Messages.ImportWizard_Error_path_is_invalid);
+			setErrorMessage(Messages.Import_Wizard_Error_path_is_invalid);
 			
 			fPathEditor.getTextControl(fGroupContainer).setFocus();
 			return false;
@@ -425,7 +425,7 @@ public class WizardPageImportSettings extends WizardPage {
 		// validate ports
 		if (!fIsPortListAvailable || fComboPorts.getSelectionIndex() == -1) {
 			setPageComplete(false);
-			setErrorMessage(Messages.ImportWizard_Error_com_port_is_required);
+			setErrorMessage(Messages.Import_Wizard_Error_com_port_is_required);
 			
 			fComboPorts.setFocus();
 			return false;

@@ -12,9 +12,9 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
 	static final String			PERSPECTIVE_ID			= "net.tourbook.perspective.TourBook";	//$NON-NLS-1$
 
-	private static final String	FOLDER_ID_CHART			= "chart";
-	private static final String	FOLDER_ID_STATISTICS	= "stat";
-	private static final String	FOLDER_ID_LIST			= "list";
+	private static final String	FOLDER_ID_CHART			= "chart"; //$NON-NLS-1$
+	private static final String	FOLDER_ID_STATISTICS	= "stat"; //$NON-NLS-1$
+	private static final String	FOLDER_ID_LIST			= "list"; //$NON-NLS-1$
 
 	public void createInitialLayout(IPageLayout layout) {
 

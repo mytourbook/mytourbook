@@ -94,7 +94,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class RawDataView extends ViewPart {
 
-	private static final String			FILESTRING_SEPARATOR		= "|";
+	private static final String			FILESTRING_SEPARATOR		= "|"; //$NON-NLS-1$
 
 	public static final String			ID							= "net.tourbook.views.rawData.RawDataView";	//$NON-NLS-1$
 
@@ -292,7 +292,7 @@ public class RawDataView extends ViewPart {
 //		viewTbm.add(fActionImportFromDevice);
 //		viewTbm.add(fActionImportFromFile);
 
-		viewTbm.add(new GroupMarker("import"));
+		viewTbm.add(new GroupMarker("import")); //$NON-NLS-1$
 
 		viewTbm.add(fActionClearView);
 
@@ -655,7 +655,7 @@ public class RawDataView extends ViewPart {
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		final IStructuredSelection tourSelection = (IStructuredSelection) fTourViewer.getSelection();

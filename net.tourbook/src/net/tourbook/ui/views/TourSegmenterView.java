@@ -381,10 +381,10 @@ public class TourSegmenterView extends ViewPart {
 
 		public ActionShowSegments() {
 
-			super("Show Tour Segments", SWT.TOGGLE);
-			setToolTipText("Show the segments in the tour chart");
+			super(Messages.Action_open_tour_segmenter, SWT.TOGGLE);
+			setToolTipText(Messages.Action_open_tour_segmenter_tooltip);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor("tour-segments.gif"));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_tour_segmenter));
 		}
 
 		@Override

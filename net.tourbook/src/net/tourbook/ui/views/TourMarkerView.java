@@ -519,7 +519,7 @@ public class TourMarkerView extends ViewPart {
 //		setFocus();
 //	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void fillContextMenu(IMenuManager menuMgr) {
 
 //		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();

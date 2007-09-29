@@ -70,7 +70,7 @@ public abstract class TourChartViewPart extends ViewPart {
 
 		fPostSelectionListener = new ISelectionListener() {
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-				onSelectionChanged(selection);
+				onSelectionChanged(part, selection);
 			}
 		};
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
@@ -149,9 +149,10 @@ public abstract class TourChartViewPart extends ViewPart {
 	/**
 	 * A post selection event was received by the selection listener
 	 * 
+	 * @param part
 	 * @param selection
 	 */
-	protected abstract void onSelectionChanged(ISelection selection);
+	protected abstract void onSelectionChanged(IWorkbenchPart part, ISelection selection);
 
 	/**
 	 * Update the chart after the tour data was modified

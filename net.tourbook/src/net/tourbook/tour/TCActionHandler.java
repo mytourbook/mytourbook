@@ -79,7 +79,7 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 		fTourChart = tourChart;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public void updateElement(UIElement element, Map parameters) {
 
 		// update check state in the UI

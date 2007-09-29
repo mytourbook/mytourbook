@@ -196,7 +196,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public void setAllValueColors(int colorIndexValue) {
 
-		if (fHighValues == null || fHighValues[0].length == 0) {
+		if (fHighValues == null || fHighValues.length == 0 || fHighValues[0].length == 0) {
 			return;
 		}
 
@@ -234,7 +234,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	@Override
 	void setMinMaxValues(int[][] valueSeries) {
 
-		if (valueSeries == null || valueSeries.length == 0) {
+		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0].length == 0) {
 			fHighValues = new int[0][0];
 			fVisibleMaxValue = fVisibleMinValue = 0;
 			fOriginalMaxValue = fOriginalMinValue = 0;

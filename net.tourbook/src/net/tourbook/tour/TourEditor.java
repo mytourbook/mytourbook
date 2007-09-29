@@ -45,7 +45,7 @@ import org.eclipse.ui.part.EditorPart;
 
 public class TourEditor extends EditorPart {
 
-	public static final String				ID				= "net.tourbook.tour.TourEditor";
+	public static final String				ID				= "net.tourbook.tour.TourEditor"; //$NON-NLS-1$
 
 	private TourEditorInput					fEditorInput;
 
@@ -314,9 +314,9 @@ public class TourEditor extends EditorPart {
 
 			final String tourTitle = TourManager.getTourDate(fTourData);
 
-			fEditorInput.fEditorTitle = tourTitle == null ? "" : tourTitle;
+			fEditorInput.fEditorTitle = tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
 			setPartName(tourTitle);
-			setTitleToolTip("title tooltip ???");
+			setTitleToolTip("title tooltip ???"); //$NON-NLS-1$
 		}
 	}
 

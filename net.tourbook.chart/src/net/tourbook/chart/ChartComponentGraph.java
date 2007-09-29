@@ -299,7 +299,7 @@ public class ChartComponentGraph extends Canvas {
 
 	private int							fMovedXMarkerStartValueIndex;
 	private int							fMovedXMarkerEndValueIndex;
-	private int							fForcedXMarkerValueDiff;
+	private int							fXMarkerValueDiff;
 
 	private boolean[]					fSelectedBarItems;
 
@@ -314,9 +314,9 @@ public class ChartComponentGraph extends Canvas {
 	protected boolean					fIsSmoothScrollingActive;
 	protected int						fSmoothScrollCurrentPosition;
 
-	int									fGraphAlpha				= 0xa0;
+	int									fGraphAlpha				= 0xc0;
 
-	private boolean						fIsRangeMarkerVisible	= true;
+//	private boolean						fIsRangeMarkerVisible	= true;
 
 	/**
 	 * 
@@ -683,7 +683,7 @@ public class ChartComponentGraph extends Canvas {
 		int valueHalf;
 
 		/*
-		 * get the marker positon to the next value
+		 * get the marker positon for the next value
 		 */
 		if (valueDiff > 0) {
 
@@ -713,6 +713,7 @@ public class ChartComponentGraph extends Canvas {
 				}
 			}
 		}
+
 		return Math.max(0, Math.min(valueIndex, xValues.length - 1));
 	}
 
@@ -2369,7 +2370,7 @@ public class ChartComponentGraph extends Canvas {
 
 	private void drawRangeMarker(GC gc, ChartDrawingData drawingData) {
 
-		final RGB colorRangeMarker = new RGB(0, 200, 200);
+//		final RGB colorRangeMarker = new RGB(0, 200, 200);
 
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
@@ -2451,11 +2452,9 @@ public class ChartComponentGraph extends Canvas {
 		// draw x-marker for each graph
 		for (final ChartDrawingData drawingData : fDrawingData) {
 
-			final int graphTop = drawingData.getDevYBottom() - drawingData.getDevGraphHeight();
-			final int graphBottom = drawingData.getDevYBottom();
-
 			final ChartDataXSerie xData = drawingData.getXData();
 			final float scaleX = drawingData.getScaleX();
+
 			final int valueDraggingDiff = (int) ((float) devDraggingDiff / scaleX);
 
 			final int synchStartIndex = xData.getSynchMarkerStartIndex();
@@ -2464,7 +2463,7 @@ public class ChartComponentGraph extends Canvas {
 			final int[] xValues = xData.getHighValues()[0];
 			final int valueXStart = xValues[synchStartIndex];
 			final int valueXEnd = xValues[synchEndIndex];
-			// fForcedXMarkerValueDiff = valueXEnd - valueXStart;
+			// fXMarkerValueDiff = valueXEnd - valueXStart;
 
 			final int devXStart = (int) (scaleX * valueXStart - fDevGraphImageXOffset);
 			final int devXEnd = (int) (scaleX * valueXEnd - fDevGraphImageXOffset);
@@ -2479,13 +2478,12 @@ public class ChartComponentGraph extends Canvas {
 					valueDraggingDiff,
 					valueXStartWithOffset);
 
-			devMovedXStart = (int) (scaleX * xValues[fMovedXMarkerStartValueIndex] - fDevGraphImageXOffset);
-
 			fMovedXMarkerEndValueIndex = computeXMarkerValue(xValues,
 					synchEndIndex,
 					valueDraggingDiff,
 					valueXEndWithOffset);
 
+			devMovedXStart = (int) (scaleX * xValues[fMovedXMarkerStartValueIndex] - fDevGraphImageXOffset);
 			devMovedXEnd = (int) (scaleX * xValues[fMovedXMarkerEndValueIndex] - fDevGraphImageXOffset);
 
 			/*
@@ -2495,17 +2493,26 @@ public class ChartComponentGraph extends Canvas {
 			final int valueMovedDiff = xValues[fMovedXMarkerEndValueIndex]
 					- xValues[fMovedXMarkerStartValueIndex];
 
-			if (fMovedXMarkerStartValueIndex == 0 && valueMovedDiff < fForcedXMarkerValueDiff) {
+//			System.out.println(fMovedXMarkerStartValueIndex
+//					+ "\t"
+//					+ fMovedXMarkerEndValueIndex
+//					+ "\t"
+//					+ valueMovedDiff);
+
+			/*
+			 * adjust start and end position
+			 */
+			if (fMovedXMarkerStartValueIndex == 0 && valueMovedDiff < fXMarkerValueDiff) {
 
 				/*
-				 * the x-marker is moved to the left so the most left x-marker is on the first
+				 * the x-marker is moved to the left, the most left x-marker is on the first
 				 * position
 				 */
 
 				int valueIndex;
 
 				for (valueIndex = 0; valueIndex < xValues.length; valueIndex++) {
-					if (xValues[valueIndex] >= fForcedXMarkerValueDiff) {
+					if (xValues[valueIndex] >= fXMarkerValueDiff) {
 						break;
 					}
 				}
@@ -2513,17 +2520,17 @@ public class ChartComponentGraph extends Canvas {
 				fMovedXMarkerEndValueIndex = valueIndex;
 
 			} else if (fMovedXMarkerEndValueIndex == xValues.length - 1
-					&& valueMovedDiff < fForcedXMarkerValueDiff) {
+					&& valueMovedDiff < fXMarkerValueDiff) {
 
 				/*
-				 * the x-marker is moved to the right so the most right x-marker is on the last
+				 * the x-marker is moved to the right, the most right x-marker is on the last
 				 * position
 				 */
 
 				int valueIndex;
-				final int valueFirstIndex = xValues[xValues.length - 1] - fForcedXMarkerValueDiff;
+				final int valueFirstIndex = xValues[xValues.length - 1] - fXMarkerValueDiff;
 
-				for (valueIndex = xValues.length - 1; valueIndex >= 0; valueIndex--) {
+				for (valueIndex = xValues.length - 1; valueIndex > 0; valueIndex--) {
 					if (xValues[valueIndex] <= valueFirstIndex) {
 						break;
 					}
@@ -2532,7 +2539,7 @@ public class ChartComponentGraph extends Canvas {
 				fMovedXMarkerStartValueIndex = valueIndex;
 			}
 
-			if (valueMovedDiff > fForcedXMarkerValueDiff) {
+			if (valueMovedDiff > fXMarkerValueDiff) {
 
 				/*
 				 * force the value diff for the x-marker, the moved value diff can't be wider then
@@ -2542,25 +2549,25 @@ public class ChartComponentGraph extends Canvas {
 				final int valueStart = xValues[fMovedXMarkerStartValueIndex];
 				int valueIndex;
 				for (valueIndex = fMovedXMarkerEndValueIndex - 0; valueIndex >= 0; valueIndex--) {
-					if (xValues[valueIndex] - valueStart < fForcedXMarkerValueDiff) {
+					if (xValues[valueIndex] - valueStart < fXMarkerValueDiff) {
 						valueIndex++;
 						break;
 					}
 				}
 				valueIndex = Math.min(valueIndex, xValues.length - 1);
 
-				// System.out.println("old: "
-				// + fMovedXMarkerEndValueIndex
-				// + " new: "
-				// + valueIndex);
-
 				fMovedXMarkerEndValueIndex = valueIndex;
+			} else {
+//				System.out.println(valueMovedDiff + "\t" + fXMarkerValueDiff);
 			}
 
 			fMovedXMarkerEndValueIndex = Math.min(fMovedXMarkerEndValueIndex, xValues.length - 1);
 
 			devMovedXStart = (int) (scaleX * xValues[fMovedXMarkerStartValueIndex] - fDevGraphImageXOffset);
 			devMovedXEnd = (int) (scaleX * xValues[fMovedXMarkerEndValueIndex] - fDevGraphImageXOffset);
+
+			final int graphTop = drawingData.getDevYBottom() - drawingData.getDevGraphHeight();
+			final int graphBottom = drawingData.getDevYBottom();
 
 			// draw moved x-marker
 			gc.setForeground(colorXMarker);
@@ -3527,7 +3534,7 @@ public class ChartComponentGraph extends Canvas {
 
 						fDevXMarkerDraggedStartPos = devXMouse;
 						fDevXMarkerDraggedPos = devXMouse;
-						fForcedXMarkerValueDiff = fChart.fXMarkerDraggingListener.getXMarkerValueDiff();
+						fXMarkerValueDiff = fChart.fXMarkerDraggingListener.getXMarkerValueDiff();
 
 						fIsSliderDirty = true;
 						redraw();

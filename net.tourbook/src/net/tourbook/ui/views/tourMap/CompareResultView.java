@@ -119,11 +119,11 @@ public class CompareResultView extends ViewPart {
 	private class ActionSaveComparedTours extends Action {
 
 		ActionSaveComparedTours() {
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_raw_data_to_file));
-			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_raw_data_to_file_disabled));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_disabled));
 
-			setText(Messages.CompareResult_Action_save_checked_tours);
-			setToolTipText(Messages.CompareResult_Action_save_checked_tours_tooltip);
+			setText(Messages.Compare_Result_Action_save_checked_tours);
+			setToolTipText(Messages.Compare_Result_Action_save_checked_tours_tooltip);
 			setEnabled(false);
 		}
 
@@ -538,42 +538,42 @@ public class CompareResultView extends ViewPart {
 
 		// column: reference tour/date
 		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText(Messages.CompareResult_Column_tour);
+		tc.setText(Messages.Compare_Result_Column_tour);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(25) + 16);
 
 		// column: altitude difference
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.CompareResult_Column_diff);
-		tc.setToolTipText(Messages.CompareResult_Column_diff_tooltip);
+		tc.setText(Messages.Compare_Result_Column_diff);
+		tc.setToolTipText(Messages.Compare_Result_Column_diff_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		// column: speed computed
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.CompareResult_Column_kmh);
-		tc.setToolTipText(Messages.CompareResult_Column_kmh_tooltip);
+		tc.setText(Messages.Compare_Result_Column_kmh);
+		tc.setToolTipText(Messages.Compare_Result_Column_kmh_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		// column: speed saved
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.CompareResult_Column_kmh);
-		tc.setToolTipText(Messages.CompareResult_Column_kmh_db_tooltip);
+		tc.setText(Messages.Compare_Result_Column_kmh);
+		tc.setToolTipText(Messages.Compare_Result_Column_kmh_db_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		// column: speed moved
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.CompareResult_Column_kmh);
-		tc.setToolTipText(Messages.CompareResult_Column_kmh_moved_tooltip);
+		tc.setText(Messages.Compare_Result_Column_kmh);
+		tc.setToolTipText(Messages.Compare_Result_Column_kmh_moved_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		// column: distance
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.CompareResult_Column_km);
-		tc.setToolTipText(Messages.CompareResult_Column_km_tooltip);
+		tc.setText(Messages.Compare_Result_Column_km);
+		tc.setToolTipText(Messages.Compare_Result_Column_km_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.CompareResult_time_interval);
-		tc.setToolTipText(Messages.CompareResult_time_interval_tooltip);
+		tc.setText(Messages.Compare_Result_time_interval);
+		tc.setToolTipText(Messages.Compare_Result_time_interval_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		fTourViewer = new ContainerCheckedTreeViewer(tree);
@@ -602,7 +602,16 @@ public class CompareResultView extends ViewPart {
 
 		fTourViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
-				openComparedTour(event);
+
+				// expand/collapse current item
+
+				final Object treeItem = ((IStructuredSelection) event.getSelection()).getFirstElement();
+
+				if (fTourViewer.getExpandedState(treeItem)) {
+					fTourViewer.collapseToLevel(treeItem, 1);
+				} else {
+					fTourViewer.expandToLevel(treeItem, 1);
+				}
 			}
 		});
 
@@ -690,7 +699,7 @@ public class CompareResultView extends ViewPart {
 
 		selection.getFirstElement();
 		if (!selection.isEmpty()) {
-			menuMgr.add(new Action(Messages.CompareResult_Action_check_selected_tours) {
+			menuMgr.add(new Action(Messages.Compare_Result_Action_check_selected_tours) {
 				@Override
 				public void run() {
 					// check all selected compared tours which are not yet
@@ -708,7 +717,7 @@ public class CompareResultView extends ViewPart {
 				}
 			});
 
-			menuMgr.add(new Action(Messages.CompareResult_Action_uncheck_selected_tours) {
+			menuMgr.add(new Action(Messages.Compare_Result_Action_uncheck_selected_tours) {
 				@Override
 				public void run() {
 					// uncheck all selected tours
@@ -762,16 +771,6 @@ public class CompareResultView extends ViewPart {
 
 			fPostSelectionProvider.setSelection(new StructuredSelection(resultItem));
 		}
-	}
-
-	private void openComparedTour(DoubleClickEvent event) {
-//		IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-//
-//		CompareResultItemComparedTour result = (CompareResultItemComparedTour) selection.getFirstElement();
-//
-//		if (result != null) {
-//			// TourManager.getInstance().openTourInEditor(result.compTour.getTourId());
-//		}
 	}
 
 	/**

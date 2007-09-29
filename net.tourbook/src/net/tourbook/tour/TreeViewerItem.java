@@ -45,6 +45,7 @@ public abstract class TreeViewerItem {
 	public TreeViewerItem getParentItem() {
 		return fParentItem;
 	}
+
 	public ArrayList<TreeViewerItem> getUnfetchedChildren() {
 		return fChildren;
 	}
@@ -53,8 +54,8 @@ public abstract class TreeViewerItem {
 
 		if (fChildren == null) {
 			/*
-			 * if fChildren have not yet been retrieved we assume that
-			 * fChildren can be available to make the tree node expandable
+			 * if fChildren have not yet been retrieved we assume that fChildren can be available to
+			 * make the tree node expandable
 			 */
 			return true;
 		} else {
@@ -65,11 +66,11 @@ public abstract class TreeViewerItem {
 	protected abstract void remove();
 
 	public void setChildren(ArrayList<TreeViewerItem> children) {
-		this.fChildren = children;
+		fChildren = children;
 	}
 
 	public void setParentItem(TreeViewerItem parentItem) {
-		this.fParentItem = parentItem;
+		fParentItem = parentItem;
 	}
 
 }

@@ -411,7 +411,7 @@ public class TourChart extends Chart {
 		fSegmentValueLayer.setXDataSerie(xDataSerie);
 
 		// draw the graph lighter so the segments are more visible
-		setGraphAlpha(0x40);
+		setGraphAlpha(0x60);
 	}
 
 	/**
@@ -532,9 +532,7 @@ public class TourChart extends Chart {
 		/*
 		 * add the actions to the toolbar
 		 */
-		if (fTourData.tourCompareSerie != null) {
-			// show the graph for tour comparision when data are available
-//			tbm.add(new Separator());
+		if (fTourChartConfig.canShowTourCompareGraph) {
 			final TCActionProxy actionProxy = fActionProxies.get(getProxyId(TourManager.GRAPH_TOUR_COMPARE));
 			tbm.add(actionProxy.getAction());
 		}
@@ -1003,8 +1001,7 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * Update the chart by providing new tourdata and chart configuration which is used to create
-	 * the chart data model
+	 * Set {@link TourData} and {@link TourChartConfiguration} to create a new chart data model
 	 * 
 	 * @param tourData
 	 * @param chartConfig

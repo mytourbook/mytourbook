@@ -13,8 +13,10 @@ public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
 
 	static final String			PERSPECTIVE_ID	= "net.tourbook.perspective.TourMap";	//$NON-NLS-1$
 
-	private static final String	FOLDER_ID_LIST	= "list";
-	private static final String	FOLDER_ID_REF	= "ref";
+	private static final String	FOLDER_ID_COMP	= "comp"; //$NON-NLS-1$
+	private static final String	FOLDER_ID_STAT	= "stat"; //$NON-NLS-1$
+	private static final String	FOLDER_ID_LIST	= "list"; //$NON-NLS-1$
+	private static final String	FOLDER_ID_REF	= "ref"; //$NON-NLS-1$
 
 	public void createInitialLayout(IPageLayout layout) {
 
@@ -29,7 +31,7 @@ public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		IFolderLayout statFolder = layout.createFolder("stat",
+		IFolderLayout statFolder = layout.createFolder(FOLDER_ID_STAT,
 				IPageLayout.BOTTOM,
 				0.7f,
 				FOLDER_ID_LIST);
@@ -47,7 +49,7 @@ public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		IFolderLayout compFolder = layout.createFolder("comp",
+		IFolderLayout compFolder = layout.createFolder(FOLDER_ID_COMP,
 				IPageLayout.BOTTOM,
 				0.5f,
 				FOLDER_ID_REF);

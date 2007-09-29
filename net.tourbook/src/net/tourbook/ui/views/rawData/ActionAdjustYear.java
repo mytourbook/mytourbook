@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import net.tourbook.Messages;
 import net.tourbook.importdata.RawDataManager;
 
 import org.eclipse.jface.action.Action;
@@ -40,7 +41,7 @@ public class ActionAdjustYear extends Action implements IMenuCreator {
 
 	public ActionAdjustYear(RawDataView rawDataView) {
 
-		super("Adjust Imported Year", AS_DROP_DOWN_MENU);
+		super(Messages.Action_adjust_imported_year, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
 		fCalendar.setTime(new Date());

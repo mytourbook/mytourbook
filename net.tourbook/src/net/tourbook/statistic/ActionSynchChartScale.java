@@ -31,7 +31,7 @@ public class ActionSynchChartScale extends Action {
 
 		fStatContainer = container;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor("synch-statistics.gif"));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_synch_statistics));
 		setToolTipText(Messages.TourMap_Action_synch_chart_years_tooltip);
 	}
 

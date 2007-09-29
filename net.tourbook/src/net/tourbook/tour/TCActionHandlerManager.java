@@ -131,7 +131,7 @@ class TCActionHandlerManager {
 					/*
 					 * check if the active part ID contains a tour chart
 					 */
-					if (stringVar.equalsIgnoreCase("net.tourbook.tour.TourEditor")) {
+					if (stringVar.equalsIgnoreCase(TourEditor.ID)) {
 						return EvaluationResult.TRUE;
 //					} else if (stringVar.equalsIgnoreCase("net.tourbook.views.TourChartView")) {
 //						return EvaluationResult.TRUE;

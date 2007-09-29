@@ -64,16 +64,17 @@ public class ActionHandlerManager {
 
 				if (var instanceof String) {
 
-					String stringVar = (String) var;
+//					String stringVar = (String) var;
 
 					/*
 					 * check if the active part ID contains a tour chart
 					 */
-					if (stringVar.equalsIgnoreCase("net.tourbook.tour.TourEditor")) {
-						return EvaluationResult.TRUE;
-//					} else if (stringVar.equalsIgnoreCase("net.tourbook.views.TourChartView")) {
+//					if (stringVar.equalsIgnoreCase("net.tourbook.tour.TourEditor")) {
 //						return EvaluationResult.TRUE;
-					}
+////					} else if (stringVar.equalsIgnoreCase("net.tourbook.views.TourChartView")) {
+////						return EvaluationResult.TRUE;
+//					}
+					return EvaluationResult.TRUE;
 				}
 
 				return EvaluationResult.FALSE;

@@ -45,7 +45,7 @@ public class TourEditorInput implements IEditorInput, IPersistableElement {
 	}
 
 	public String getName() {
-		return "editor name";
+		return "editor name"; //$NON-NLS-1$
 	}
 
 	/*
@@ -78,7 +78,7 @@ public class TourEditorInput implements IEditorInput, IPersistableElement {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public Object getAdapter(Class adapter) {
 		return null;
 	}

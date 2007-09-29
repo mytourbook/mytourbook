@@ -100,7 +100,7 @@ public class ReferenceTourManager {
 		if (em != null) {
 
 			referenceTours = em.createQuery("SELECT refTour \n" //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " refTour")).getResultList();
+					+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " refTour")).getResultList(); //$NON-NLS-1$ //$NON-NLS-2$
 
 			em.close();
 		}

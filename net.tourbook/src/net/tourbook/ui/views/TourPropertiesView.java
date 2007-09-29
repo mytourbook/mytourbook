@@ -62,7 +62,7 @@ public class TourPropertiesView extends ViewPart {
 
 	public static final String	ID						= "net.tourbook.views.TourPropertiesView";		//$NON-NLS-1$
 
-	private static final String	MEMENTO_SELECTED_TAB	= "tourProperties.selectedTab";
+	private static final String	MEMENTO_SELECTED_TAB	= "tourProperties.selectedTab"; //$NON-NLS-1$
 
 	private static IMemento		fSessionMemento;
 
@@ -135,11 +135,11 @@ public class TourPropertiesView extends ViewPart {
 		fTabFolder = new CTabFolder(parent, SWT.FLAT | SWT.BOTTOM);
 
 		CTabItem fTabItemLocation = new CTabItem(fTabFolder, SWT.FLAT);
-		fTabItemLocation.setText("Location");
+		fTabItemLocation.setText(Messages.TourProperties_label_location);
 		fTabItemLocation.setControl(createTabLocation(fTabFolder));
 
 		CTabItem fTabItemTime = new CTabItem(fTabFolder, SWT.FLAT);
-		fTabItemTime.setText("Time");
+		fTabItemTime.setText(Messages.TourProperties_label_time);
 		fTabItemTime.setControl(createTabTime(fTabFolder));
 
 	}
@@ -483,7 +483,7 @@ public class TourPropertiesView extends ViewPart {
 		// data points
 		final int[] timeSerie = tourData.timeSerie;
 		if (timeSerie == null) {
-			fLblDatapoints.setText("");
+			fLblDatapoints.setText(""); //$NON-NLS-1$
 		} else {
 			final int dataPoints = timeSerie.length;
 			fLblDatapoints.setText(Integer.toString(dataPoints));

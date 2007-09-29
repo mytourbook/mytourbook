@@ -77,12 +77,12 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	APP_DATA_FILTER_IS_MODIFIED				= "application.data-filter-is-modified";	//$NON-NLS-1$
 
-	public static final String	GRAPH_PROPERTY_CHARTTYPE				= "graph.property.chartType";
+	public static final String	GRAPH_PROPERTY_CHARTTYPE				= "graph.property.chartType"; //$NON-NLS-1$
 
-	public static final String	GRAPH_PROPERTY_IS_COMPUTE_VALUE			= "graph.property.is.compute-value";
-	public static final String	GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE	= "graph.property.timeslice.compute-value";
+	public static final String	GRAPH_PROPERTY_IS_COMPUTE_VALUE			= "graph.property.is.compute-value"; //$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE	= "graph.property.timeslice.compute-value"; //$NON-NLS-1$
 
-	public static final String	GRAPH_PROPERTY_IS_CLIP_VALUE			= "graph.property.is.clip-value";
-	public static final String	GRAPH_PROPERTY_TIMESLICE_CLIP_VALUE		= "graph.property.timeslice.clip-value";
+	public static final String	GRAPH_PROPERTY_IS_CLIP_VALUE			= "graph.property.is.clip-value"; //$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_TIMESLICE_CLIP_VALUE		= "graph.property.timeslice.clip-value"; //$NON-NLS-1$
 
 }

@@ -100,7 +100,7 @@ public class RawDataManager {
 
 		new WizardImportDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 				new WizardImportData(),
-				Messages.ImportWizard_Dlg_title).open();
+				Messages.Import_Wizard_Dlg_title).open();
 
 	}
 
@@ -115,7 +115,7 @@ public class RawDataManager {
 
 		final WizardDialog dialog = new WizardImportDialog(window.getShell(),
 				importWizard,
-				Messages.ImportWizard_Dlg_title);
+				Messages.Import_Wizard_Dlg_title);
 
 		// create the dialog and shell which is required in setAutoDownload()
 		dialog.create();
@@ -385,7 +385,7 @@ public class RawDataManager {
 	public void updateTourDataFromDb() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void run() {
 
 				EntityManager em = TourDatabase.getInstance().getEntityManager();

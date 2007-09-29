@@ -1091,7 +1091,7 @@ public class ChartComponents extends Composite {
 	/**
 	 * set the {@link SynchConfiguration} when this chart is the source for the synched chart
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	private void synchronizeChart_AdjustToSameSize() {
 
 //		final ChartDataXSerie xData = fChartDataModel.getXData();

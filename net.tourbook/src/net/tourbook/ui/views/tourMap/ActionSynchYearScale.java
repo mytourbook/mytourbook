@@ -13,45 +13,30 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.chart;
 
-import java.util.ArrayList;
+package net.tourbook.ui.views.tourMap;
 
-import org.eclipse.jface.viewers.ISelection;
+import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
 
-public class SelectionChartInfo implements ISelection {
+import org.eclipse.jface.action.Action;
 
-	private Chart						fChart;
+public class ActionSynchYearScale extends Action {
 
-	public ChartDataModel				chartDataModel;
-	public ArrayList<ChartDrawingData>	chartDrawingData;
+	private final TourMapViewYearStatistic	fYearStatisticView;
 
-	public int							leftSliderValuesIndex;
-	public int							rightSliderValuesIndex;
+	public ActionSynchYearScale(TourMapViewYearStatistic yearStatisticView) {
 
-	@SuppressWarnings("unused") //$NON-NLS-1$
-	private SelectionChartInfo() {}
+		super("", AS_CHECK_BOX); //$NON-NLS-1$
 
-	public SelectionChartInfo(Chart chart) {
-		fChart = chart;
-	}
+		fYearStatisticView = yearStatisticView;
 
-	public boolean isEmpty() {
-		return false;
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_synch_statistics));
+		setToolTipText(Messages.TourMap_Action_synch_chart_years_tooltip);
 	}
 
 	@Override
-	public String toString() {
-		String string = super.toString()
-				+ " l:" //$NON-NLS-1$
-				+ leftSliderValuesIndex
-				+ " r:" //$NON-NLS-1$
-				+ rightSliderValuesIndex;
-		return string;
+	public void run() {
+		fYearStatisticView.actionSynchScale(isChecked());
 	}
-
-	public Chart getChart() {
-		return fChart;
-	}
-
 }

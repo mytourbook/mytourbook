@@ -119,7 +119,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tours in database
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private static ArrayList<Long> getAllTourIds() {
 
 		ArrayList<Long> tourList = new ArrayList<Long>();
@@ -149,7 +149,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static ArrayList<TourBike> getTourBikes() {
 
 		ArrayList<TourBike> bikeList = new ArrayList<TourBike>();
@@ -194,7 +194,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour people in the db sorted by last/first name
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static ArrayList<TourPerson> getTourPeople() {
 
 		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
@@ -218,7 +218,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static ArrayList<TourType> getTourTypes() {
 
 		ArrayList<TourType> tourTypeList = new ArrayList<TourType>();
@@ -1160,7 +1160,7 @@ public class TourDatabase {
 		monitor.subTask(Messages.Database_Monitor_persistent_service_task);
 		emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
-		monitor.subTask("Database update: Loading all tours...");
+		monitor.subTask(Messages.TourDatabase_load_all_tours);
 		ArrayList<Long> tourList = getAllTourIds();
 
 		// loop over all tours and calculate and set new columns
@@ -1170,7 +1170,7 @@ public class TourDatabase {
 			TourData tourData = getTourData(tourId);
 
 			if (monitor != null) {
-				String msg = NLS.bind("Database update: Update tour {0} of {1}", new Object[] {
+				String msg = NLS.bind(Messages.TourDatabase_update_tour, new Object[] {
 						tourIdx++,
 						tourList.size() });
 				monitor.subTask(msg);

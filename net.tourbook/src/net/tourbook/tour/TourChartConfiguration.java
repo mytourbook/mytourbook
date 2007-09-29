@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 
 /**
- * Configuration how the tour chart is displayed
+ * Contains the configuration how the tour chart is displayed
  */
 public class TourChartConfiguration {
 
@@ -66,6 +66,12 @@ public class TourChartConfiguration {
 	 * the graph is automatically zoomed to the slider position when the slider is moved
 	 */
 	public boolean					autoZoomToSlider		= false;
+
+	/**
+	 * when <code>true</code> the action button is displayed to show/hide the tour compare result
+	 * graph
+	 */
+	public boolean					canShowTourCompareGraph	= false;
 
 	/**
 	 * @param keepMinMaxValues

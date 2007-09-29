@@ -654,7 +654,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		setButtonLayoutData(fBtnReset);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void enableControls() {
 
 		if (fSelectedTourMarker != null) {
@@ -732,7 +732,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	/**
 	 * remove selected markers from the view and update dependened structures
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void onDeleteMarker() {
 
 		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();

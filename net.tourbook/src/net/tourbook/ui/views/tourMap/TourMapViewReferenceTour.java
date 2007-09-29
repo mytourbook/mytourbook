@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 
 // author: Wolfgang Schramm
@@ -105,8 +106,7 @@ public class TourMapViewReferenceTour extends TourChartViewPart {
 		return fTourChart;
 	}
 
-	@Override
-	public void onSelectionChanged(final ISelection selection) {
+	private void onSelectionChanged(ISelection selection) {
 
 		if (selection instanceof SelectionTourMapView) {
 
@@ -125,6 +125,16 @@ public class TourMapViewReferenceTour extends TourChartViewPart {
 				showRefTour(((CompareResultItemComparedTour) firstElement).refTour.getRefId());
 			}
 		}
+	}
+
+	@Override
+	protected void onSelectionChanged(IWorkbenchPart part, ISelection selection) {
+
+//		if (part != TourMapViewReferenceTour.this) {
+//			return;
+//		}
+
+		onSelectionChanged(selection);
 	}
 
 	private void showRefTour(long refId) {

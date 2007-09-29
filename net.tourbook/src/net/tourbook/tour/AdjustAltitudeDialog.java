@@ -648,7 +648,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		return fDialogArea;
 	}
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	private void dumpMinMax(int[] altiSrc, String place) {
 
 		int minAltiSrc1 = altiSrc[0];
@@ -794,26 +794,6 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		fDialogArea.layout(true, true);
 	}
-
-//	@Override
-//	protected void okPressed() {
-//
-//		// confirm to save the changes
-//		MessageBox msgBox = new MessageBox(fTourChart.getShell(), SWT.ICON_WORKING
-//				| SWT.YES
-//				| SWT.NO);
-//		msgBox.setText(Messages.Dlg_Adjust_Altitude_Dlg_save_tour_title);
-//		msgBox.setMessage(Messages.Dlg_Adjust_Altitude_Dlg_save_tour_message);
-//
-//		if (msgBox.open() == SWT.YES) {
-//			fTourChart.fTourData.computeMaxAltitude();
-//			TourDatabase.saveTour(fTourChart.fTourData);
-//			fSelectedTourChart.updateChart(true);
-//
-//			super.okPressed();
-//		}
-//
-//	}
 
 	private void onChangeAdjustType() {
 

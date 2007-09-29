@@ -74,8 +74,8 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMapView extends ViewPart {
 
-	private static final String			MEMENTO_TOUR_MAP_ACTIVE_REF_ID	= "tour.map.active.ref.id";
-	private static final String			MEMENTO_TOUR_MAP_LINK_TOUR		= "tour.map.link.tour";
+	private static final String			MEMENTO_TOUR_MAP_ACTIVE_REF_ID	= "tour.map.active.ref.id"; //$NON-NLS-1$
+	private static final String			MEMENTO_TOUR_MAP_LINK_TOUR		= "tour.map.link.tour"; //$NON-NLS-1$
 
 	public static final String			ID								= "net.tourbook.views.tourMap.TourMapView"; //$NON-NLS-1$
 
@@ -108,10 +108,10 @@ public class TourMapView extends ViewPart {
 	private ActionCollapseAll			fActionCollapseAll;
 
 	private final RGB					fRGBRefFg						= new RGB(0, 0, 0);
-	private final RGB					fRGBRefBg						= new RGB(255, 233, 178);
+	private final RGB					fRGBRefBg						= new RGB(255, 220, 153);
 
 	private final RGB					fRGBYearFg						= new RGB(255, 255, 255);
-	private final RGB					fRGBYearBg						= new RGB(255, 241, 204);
+	private final RGB					fRGBYearBg						= new RGB(255, 233, 191);
 
 	private final RGB					fRGBTourFg						= new RGB(0, 0, 0);
 	private final RGB					fRGBTourBg						= new RGB(255, 255, 255);
@@ -450,7 +450,7 @@ public class TourMapView extends ViewPart {
 		fActionDeleteSelectedTour = new ActionDeleteTourFromMap(this);
 		fActionRenameRefTour = new ActionRenameRefTour(this);
 		fActionLinkTour = new ActionLinkTour(this);
-		fActionCollapseAll = new ActionCollapseAll(this);
+		fActionCollapseAll = new ActionCollapseAll(fTourViewer);
 	}
 
 	/**

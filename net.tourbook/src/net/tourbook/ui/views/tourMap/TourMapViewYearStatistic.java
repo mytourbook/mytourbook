@@ -12,9 +12,12 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.util.PostSelectionProvider;
 
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -40,12 +43,58 @@ public class TourMapViewYearStatistic extends ViewPart {
 	 */
 	private Object[]				fYearMapTours;
 
-	private TourMapItemYear			fYearItem;
+	/**
+	 * year item for the visible statistics
+	 */
+	private TourMapItemYear			fCurrentYearItem;
 
 	private PageBook				fPageBook;
 	private Label					fPageNoChart;
 
+	/**
+	 * selection which is thrown by the this year statistic
+	 */
+	private StructuredSelection		fCurrentSelection;
+
+	private ITourPropertyListener	fCompareTourPropertyListener;
+
+	private IAction					fActionSynchChartScale;
+
+//	private final BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
+	private boolean					fIsSynchMaxValue;
+
 	public TourMapViewYearStatistic() {}
+
+	public void actionSynchScale(boolean isSynchMaxValue) {
+		fIsSynchMaxValue = isSynchMaxValue;
+		updateYearBarChart();
+	}
+
+	private void addCompareTourPropertyListener() {
+
+		fCompareTourPropertyListener = new ITourPropertyListener() {
+			public void propertyChanged(int propertyId, Object propertyData) {
+
+				if (propertyId == TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED
+						&& propertyData instanceof TourPropertyCompareTourChanged) {
+
+					TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
+
+					if (compareTourProperty.isDataSaved) {
+
+						// force the children to be reloaded
+						if (fCurrentYearItem != null) {
+//							fCurrentYearItem.setChildren(null);
+						}
+
+						updateYearBarChart();
+					}
+				}
+			}
+		};
+
+		TourManager.getInstance().addPropertyListener(fCompareTourPropertyListener);
+	}
 
 	/**
 	 * listen for events when a tour is selected
@@ -54,10 +103,22 @@ public class TourMapViewYearStatistic extends ViewPart {
 
 		fPostSelectionListener = new ISelectionListener() {
 			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-				onSelectionChanged(selection);
+				// prevent to listen to a selection which is originated by this year chart
+				if (selection != fCurrentSelection) {
+					onSelectionChanged(selection);
+				}
 			}
 		};
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+	}
+
+	private void createActions() {
+
+		fActionSynchChartScale = new ActionSynchYearScale(this);
+
+		IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(fActionSynchChartScale);
 	}
 
 	@Override
@@ -66,7 +127,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 		fPageBook = new PageBook(parent, SWT.NONE);
 
 		fPageNoChart = new Label(fPageBook, SWT.NONE);
-		fPageNoChart.setText("A year is not selected");
+		fPageNoChart.setText(Messages.TourMap_label_year_not_selected);
 
 		// year chart
 		fYearChart = new Chart(fPageBook, SWT.NONE);
@@ -77,11 +138,15 @@ public class TourMapViewYearStatistic extends ViewPart {
 				TourMapItemComparedTour tourMapComparedTour = (TourMapItemComparedTour) fYearMapTours[valueIndex];
 
 				// select the tour in the tour viewer & show tour in compared tour char
-				fPostSelectionProvider.setSelection(new StructuredSelection(tourMapComparedTour));
+				fCurrentSelection = new StructuredSelection(tourMapComparedTour);
+				fPostSelectionProvider.setSelection(fCurrentSelection);
 			}
 		});
 
 		addSelectionListener();
+		addCompareTourPropertyListener();
+
+		createActions();
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -93,6 +158,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 	public void dispose() {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
 
 		super.dispose();
 	}
@@ -107,8 +173,8 @@ public class TourMapViewYearStatistic extends ViewPart {
 			final TourMapItemYear yearItem = selectionComparedTour.getYearItem();
 			if (yearItem != null) {
 
-				fYearItem = yearItem;
-				showYearBarChart();
+				fCurrentYearItem = yearItem;
+				updateYearBarChart();
 			}
 
 			// select tour in the year chart
@@ -118,8 +184,42 @@ public class TourMapViewYearStatistic extends ViewPart {
 			}
 
 			// hide chart when a different ref tour is selected
-			if (fYearItem != null && selectionComparedTour.getRefId() != fYearItem.refId) {
+			if (fCurrentYearItem != null
+					&& selectionComparedTour.getRefId() != fCurrentYearItem.refId) {
 				fPageBook.showPage(fPageNoChart);
+				fCurrentYearItem = null;
+			}
+
+		} else if (selection instanceof StructuredSelection) {
+
+			StructuredSelection structuredSelection = (StructuredSelection) selection;
+
+			if (structuredSelection.size() > 0) {
+				Object firstElement = structuredSelection.getFirstElement();
+				if (firstElement instanceof TourMapItemComparedTour) {
+
+					TourMapItemComparedTour compareItem = (TourMapItemComparedTour) firstElement;
+					TourMapItemYear yearItem = (TourMapItemYear) compareItem.getParentItem();
+
+					// show year statistic
+					if (yearItem != fCurrentYearItem) {
+						fCurrentYearItem = yearItem;
+						updateYearBarChart();
+					}
+
+					// select tour in the year chart
+					final Long compTourId = compareItem.getTourId();
+					if (compTourId != null) {
+						selectTourInYearChart(compTourId);
+					}
+
+					// hide chart when a different ref tour is selected
+					if (fCurrentYearItem != null
+							&& compareItem.getRefId() != fCurrentYearItem.refId) {
+						fPageBook.showPage(fPageNoChart);
+						fCurrentYearItem = null;
+					}
+				}
 			}
 
 		} else if (selection instanceof SelectionRemovedComparedTours) {
@@ -127,7 +227,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 			final SelectionRemovedComparedTours removedCompTours = (SelectionRemovedComparedTours) selection;
 
 			if (removedCompTours.removedComparedTours.size() > 0) {
-				showYearBarChart();
+				updateYearBarChart();
 			}
 		}
 	}
@@ -159,12 +259,12 @@ public class TourMapViewYearStatistic extends ViewPart {
 
 	@Override
 	public void setFocus() {
-
+		fYearChart.setFocus();
 	}
 
-	private void showYearBarChart() {
+	private void updateYearBarChart() {
 
-		if (fYearItem == null) {
+		if (fCurrentYearItem == null) {
 			return;
 		}
 
@@ -172,7 +272,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-		fYearMapTours = fYearItem.getFetchedChildren();
+		fYearMapTours = fCurrentYearItem.getFetchedChildren();
 		final int tourLength = fYearMapTours.length;
 
 		final int[] tourDateValues = new int[tourLength];
@@ -204,40 +304,49 @@ public class TourMapViewYearStatistic extends ViewPart {
 		/*
 		 * set/restore min/max values
 		 */
-		final TourMapItemReferenceTour refItem = fYearItem.getRefItem();
+		final TourMapItemReferenceTour refItem = fCurrentYearItem.getRefItem();
 		final int minValue = yData.getVisibleMinValue();
 		final int maxValue = yData.getVisibleMaxValue();
 
 		final int dataMinValue = minValue - (minValue / 10);
-		final int dataMaxValue = maxValue;// + (maxValue / 30);
+		final int dataMaxValue = maxValue + (maxValue / 20);
 
-		if (refItem.yearMapMinValue == Integer.MIN_VALUE) {
+		if (fIsSynchMaxValue) {
 
-			// min/max values have not yet been saved
+			if (refItem.yearMapMinValue == Integer.MIN_VALUE) {
 
-			/*
-			 * set the min value 10% below the computed so that the lowest value is not at the
-			 * bottom
-			 */
+				// min/max values have not yet been saved
+
+				/*
+				 * set the min value 10% below the computed so that the lowest value is not at the
+				 * bottom
+				 */
+				yData.setVisibleMinValue(dataMinValue);
+				yData.setVisibleMaxValue(dataMaxValue);
+
+				refItem.yearMapMinValue = dataMinValue;
+				refItem.yearMapMaxValue = dataMaxValue;
+
+			} else {
+
+				/*
+				 * restore min/max values, but make sure min/max values for the current graph are
+				 * visible and not outside of the chart
+				 */
+
+				refItem.yearMapMinValue = Math.min(refItem.yearMapMinValue, dataMinValue);
+				refItem.yearMapMaxValue = Math.max(refItem.yearMapMaxValue, dataMaxValue);
+
+				yData.setVisibleMinValue(refItem.yearMapMinValue);
+				yData.setVisibleMaxValue(refItem.yearMapMaxValue);
+			}
+		} else {
 			yData.setVisibleMinValue(dataMinValue);
 			yData.setVisibleMaxValue(dataMaxValue);
-
-			refItem.yearMapMinValue = dataMinValue;
-			refItem.yearMapMaxValue = dataMaxValue;
-
-		} else {
-
-			/*
-			 * restore min/max values, but make sure min/max values for the current graph are
-			 * visible and not outside of the chart
-			 */
-
-			refItem.yearMapMinValue = Math.min(refItem.yearMapMinValue, dataMinValue);
-			refItem.yearMapMaxValue = Math.max(refItem.yearMapMaxValue, dataMaxValue);
-
-			yData.setVisibleMinValue(refItem.yearMapMinValue);
-			yData.setVisibleMaxValue(refItem.yearMapMaxValue);
 		}
+
+//			fMinMaxKeeper.setMinMaxValues(chartModel);
+//			fMinMaxKeeper.resetMinMax();
 
 		yData.setYTitle(Messages.TourMap_Label_year_chart_title);
 		yData.setUnitLabel(Messages.TourMap_Label_year_chart_unit);
@@ -246,12 +355,17 @@ public class TourMapViewYearStatistic extends ViewPart {
 		chartModel.addYData(yData);
 
 		// set title
-		chartModel.setTitle(Integer.toString(fYearItem.year));
+		chartModel.setTitle(Integer.toString(fCurrentYearItem.year));
 
 		// set graph minimum width, this is the number of days in the fSelectedYear
-		calendar.set(fYearItem.year, 11, 31);
+		calendar.set(fCurrentYearItem.year, 11, 31);
 		final int yearDays = calendar.get(Calendar.DAY_OF_YEAR);
 		chartModel.setChartMinWidth(yearDays);
+
+		// reset min/max values
+//		if (fIsSynchMaxValue == false) {
+//			fMinMaxKeeper.resetMinMax();
+//		}
 
 		// show the data in the chart
 		fYearChart.updateChart(chartModel);

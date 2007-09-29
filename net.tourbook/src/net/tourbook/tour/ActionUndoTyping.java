@@ -22,9 +22,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionUndoTyping extends Action {
 
-	private Tour	fTour;
+	private TourOLD	fTour;
 
-	public ActionUndoTyping(Tour tour) {
+	public ActionUndoTyping(TourOLD tour) {
 
 		fTour = tour;
 

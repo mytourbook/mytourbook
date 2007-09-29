@@ -73,7 +73,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private void addPerspectiveActions(MenuManager menu) {
 
 		{
-			String openText = "Open Perspective...";
+			String openText = Messages.Action_open_perspective;
 			MenuManager changePerspMenuMgr = new MenuManager(openText, "openPerspective"); //$NON-NLS-1$
 			IContributionItem changePerspMenuItem = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(fWindow);
 			changePerspMenuMgr.add(changePerspMenuItem);
@@ -92,12 +92,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager fileMenu = new MenuManager(Messages.Action_Menu_file,
 				IWorkbenchActionConstants.M_FILE);
 
-		fileMenu.add(new GroupMarker("fileNew"));
+		fileMenu.add(new GroupMarker("fileNew")); //$NON-NLS-1$
 
 		fileMenu.add(fActionSave);
 		fileMenu.add(fActionSaveAll);
 
-		fileMenu.add(new GroupMarker("fileSave"));
+		fileMenu.add(new GroupMarker("fileSave")); //$NON-NLS-1$
 
 		fileMenu.add(new Separator("update")); //$NON-NLS-1$
 		fileMenu.add(new Separator());
@@ -130,9 +130,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private MenuManager createToolMenu() {
 
 		MenuManager toolMenu = new MenuManager(Messages.Action_Menu_tools,
-				"net.tourbook.menu.main.tools");
+				"net.tourbook.menu.main.tools"); //$NON-NLS-1$
 
-		toolMenu.add(new GroupMarker("tools"));
+		toolMenu.add(new GroupMarker("tools")); //$NON-NLS-1$
 		toolMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 
 		toolMenu.add(new Separator());
@@ -152,9 +152,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createViewMenu() {
 
-		MenuManager viewMenu = new MenuManager(Messages.Action_Menu_view, "views");
+		MenuManager viewMenu = new MenuManager(Messages.Action_Menu_view, "views"); //$NON-NLS-1$
 
-		viewMenu.add(new Separator("defaultViews"));
+		viewMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
 		viewMenu.add(fActionViewShortList);
 
 		viewMenu.add(new Separator());
@@ -180,12 +180,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		// ---------------------------------------------------------
 
-//		IToolBarManager tbmImport = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-//		tbmImport.add(fActionImportFromFile);
-//		tbmImport.add(fActionImportFromDevice);
-//		tbmImport.add(fActionImportFromDeviceDirect);
-//
-//		coolBar.add(new ToolBarContributionItem(tbmImport, "import")); //$NON-NLS-1$
+		IToolBarManager tbmSave = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		tbmSave.add(fActionSave);
+		tbmSave.add(fActionSaveAll);
+
+		coolBar.add(new ToolBarContributionItem(tbmSave, "save")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 

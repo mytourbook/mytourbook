@@ -34,6 +34,7 @@ import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.SelectionRawData;
+import net.tourbook.ui.views.tourMap.ActionCollapseAll;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
@@ -42,6 +43,7 @@ import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.JFaceResources;
@@ -110,10 +112,10 @@ public class TourBookView extends ViewPart {
 	public NumberFormat				fNF									= NumberFormat.getNumberInstance();
 
 	private final RGB				fRGBYearFg							= new RGB(0, 0, 0);
-	private final RGB				fRGBYearBg							= new RGB(255, 252, 178);
+	private final RGB				fRGBYearBg							= new RGB(255, 251, 153);
 
 	private final RGB				fRGBMonthFg							= new RGB(0, 0, 0);
-	private final RGB				fRGBMonthBg							= new RGB(255, 253, 204);
+	private final RGB				fRGBMonthBg							= new RGB(255, 253, 191);
 
 	private final RGB				fRGBTourFg							= new RGB(0, 0, 0);
 	private final RGB				fRGBTourBg							= new RGB(255, 255, 255);
@@ -140,6 +142,8 @@ public class TourBookView extends ViewPart {
 
 	Long							fActiveTourId;
 	private int						fLastSelectedTourTypeId;
+
+	private ActionCollapseAll		fActionCollapseAll;
 
 	private class TourBookContentProvider implements ITreeContentProvider {
 
@@ -232,18 +236,22 @@ public class TourBookView extends ViewPart {
 		fActionDeleteTour = new ActionDeleteTour(this);
 		fActionSetLastTourType = new ActionSetTourType(this, false);
 		fActionSetTourType = new ActionSetTourType(this, true);
+
 		fActionModifyColumns = new ActionModifyColumns(fColumnManager);
 
+		fActionCollapseAll = new ActionCollapseAll(fTourViewer);
+
 		/*
-		 * fill toolbar
-		 */
-//		IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
-//		viewTbm.add(fActionShowViewDetailsViewer);
-		/*
-		 * fill site menu
+		 * fill view menu
 		 */
 		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(fActionModifyColumns);
+
+		/*
+		 * fill view toolbar
+		 */
+		IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+		tbm.add(fActionCollapseAll);
 	}
 
 	/**
@@ -668,7 +676,7 @@ public class TourBookView extends ViewPart {
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void enableActions() {
 
 		ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();

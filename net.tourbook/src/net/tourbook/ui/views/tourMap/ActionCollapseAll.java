@@ -24,13 +24,13 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class ActionCollapseAll extends Action {
 
-	private TourMapView	fTourMapView;
+	private TreeViewer	fTreeViewer;
 
-	public ActionCollapseAll(TourMapView view) {
+	public ActionCollapseAll(TreeViewer treeViewer) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		fTourMapView = view;
+		fTreeViewer = treeViewer;
 
 		setToolTipText(Messages.TourMap_Action_collapse_all);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_collapse_all));
@@ -39,14 +39,12 @@ public class ActionCollapseAll extends Action {
 	@Override
 	public void run() {
 
-		final TreeViewer tourViewer = fTourMapView.getTourViewer();
-
-		tourViewer.collapseAll();
+		fTreeViewer.collapseAll();
 
 		// reveal selected element
-		StructuredSelection selection = (StructuredSelection) tourViewer.getSelection();
+		StructuredSelection selection = (StructuredSelection) fTreeViewer.getSelection();
 		if (selection != null) {
-			tourViewer.reveal(selection.getFirstElement());
+			fTreeViewer.reveal(selection.getFirstElement());
 		}
 	}
 

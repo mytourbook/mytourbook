@@ -37,7 +37,7 @@ public class _TemplateDeviceDataReader extends TourbookDevice {
 	}
 
 	public String getDeviceModeName(int profileId) {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	public int getImportDataSize() {
@@ -144,7 +144,7 @@ public class _TemplateDeviceDataReader extends TourbookDevice {
 		 * date/time to identify the tour in the database. The key can be the distance of the tour
 		 * or other unique data
 		 */
-		String uniqueKey = "87324";
+		String uniqueKey = "87324"; //$NON-NLS-1$
 
 		// after all data are added, the tour id can be created
 		tourData.createTourId(uniqueKey);

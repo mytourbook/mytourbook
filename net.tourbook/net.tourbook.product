@@ -17,6 +17,7 @@
 #-consolelog 
 #-debug
 #-clean</programArgs>
+      <vmArgs>-Xmx512m</vmArgs>
    </launcherArgs>
 
    <windowImages i16="/net.tourbook/icons/application/tourbook16.gif" i32="/net.tourbook/icons/application/tourbook32.gif" i48="/net.tourbook/icons/application/tourbook48.gif" i64="/net.tourbook/icons/application/tourbook64.gif" i128="/net.tourbook/icons/application/tourbook128.gif"/>
@@ -38,7 +39,6 @@
             winLargeHigh="/net.tourbook/icons/application/tourbook48-32.bmp"/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>

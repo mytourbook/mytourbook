@@ -112,7 +112,7 @@ public class WizardImportData extends Wizard {
 
 			MessageBox msgBox = new MessageBox(getShell(), SWT.ICON_WORKING | SWT.OK | SWT.CANCEL);
 
-			msgBox.setMessage(NLS.bind(Messages.ImportWizard_Message_replace_existing_file,
+			msgBox.setMessage(NLS.bind(Messages.Import_Wizard_Message_replace_existing_file,
 					fileName));
 
 			if (msgBox.open() != SWT.OK) {
@@ -213,7 +213,7 @@ public class WizardImportData extends Wizard {
 			fRunnableReceiveData = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) {
 
-					String msg = NLS.bind(Messages.ImportWizard_Monitor_task_msg, new Object[] {
+					String msg = NLS.bind(Messages.Import_Wizard_Monitor_task_msg, new Object[] {
 							fImportDevice.visibleName,
 							portName,
 							fImportDevice.getPortParameters(portName).getBaudRate() });
@@ -306,7 +306,7 @@ public class WizardImportData extends Wizard {
 			// data format is invalid
 
 			MessageBox msgBox = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
-			msgBox.setMessage(NLS.bind(Messages.ImportWizard_Error_invalid_data_format,
+			msgBox.setMessage(NLS.bind(Messages.Import_Wizard_Error_invalid_data_format,
 					fImportDevice.visibleName));
 
 			msgBox.open();
@@ -354,7 +354,7 @@ public class WizardImportData extends Wizard {
 		PortThread portThreadRunnable = new PortThread(this, fImportDevice, portName);
 
 		Thread portThread = new Thread(portThreadRunnable,
-				Messages.ImportWizard_Thread_name_read_device_data);
+				Messages.Import_Wizard_Thread_name_read_device_data);
 		portThread.start();
 
 		/*
@@ -371,7 +371,7 @@ public class WizardImportData extends Wizard {
 			}
 
 			if (isReceivingStarted == false) {
-				monitor.subTask(NLS.bind(Messages.ImportWizard_Monitor_wait_for_data,
+				monitor.subTask(NLS.bind(Messages.Import_Wizard_Monitor_wait_for_data,
 						(RECEIVE_TIMEOUT / 10 - (receiveTimeout / 10))));
 			}
 
@@ -411,7 +411,7 @@ public class WizardImportData extends Wizard {
 				monitor.worked(rawDataSize - receivedData);
 
 				// display the bytes which have been received
-				monitor.subTask(NLS.bind(Messages.ImportWizard_Monitor_task_received_bytes,
+				monitor.subTask(NLS.bind(Messages.Import_Wizard_Monitor_task_received_bytes,
 						new Object[] {
 								Integer.toString(receivedData * 100 / importDataSize),
 								Integer.toString(timer / 10),
@@ -425,7 +425,7 @@ public class WizardImportData extends Wizard {
 		}
 
 		// tell the port listener thread to stop
-		monitor.subTask(Messages.ImportWizard_Monitor_stop_port);
+		monitor.subTask(Messages.Import_Wizard_Monitor_stop_port);
 		portThreadRunnable.prepareInterrupt();
 
 		portThread.interrupt();
