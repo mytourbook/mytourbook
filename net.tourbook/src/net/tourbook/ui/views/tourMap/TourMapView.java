@@ -541,11 +541,11 @@ public class TourMapView extends ViewPart {
 		PixelConverter pixelConverter = new PixelConverter(tree);
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText(Messages.TourMap_Column_tour);
+		tc.setText(Messages.Tour_Map_Column_tour);
 		treeLayouter.addColumnData(new ColumnWeightData(18, true));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.TourMap_Column_kmh);
+		tc.setText(Messages.Tour_Map_Column_kmh);
 		treeLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(9),
 				false));
 

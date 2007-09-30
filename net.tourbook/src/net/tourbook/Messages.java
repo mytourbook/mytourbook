@@ -26,31 +26,15 @@ public class Messages extends NLS {
 	public static String		Action_adjust_imported_year;
 
 	public static String		Action_edit_tour;
-//	public static String		Action_import_rawdata;
-//	public static String		Action_import_rawdata_direct;
-//	public static String		Action_import_rawdata_direct_tooltip;
-//	public static String		Action_import_rawdata_tooltip;
 	public static String		Action_Menu_file;
 	public static String		Action_Menu_help;
 	public static String		Action_Menu_tools;
 	public static String		Action_Menu_view;
-//	public static String		Action_open_compare_wizard;
-//	public static String		Action_open_compare_wizard_tooltip;
 
 	public static String		Action_open_perspective;
 	public static String		Action_open_preferences;
-
 	public static String		Action_open_tour_segmenter;
-
 	public static String		Action_open_tour_segmenter_tooltip;
-//	public static String		Action_openview_compare_result;
-//	public static String		Action_openview_compare_result_tooltip;
-//	public static String		Action_openview_rawdata;
-//	public static String		Action_openview_rawdata_tooltip;
-//	public static String		Action_openview_tourbook;
-//	public static String		Action_openview_tourbook_tooltip;
-//	public static String		Action_openview_tourmap;
-//	public static String		Action_openview_tourmap_tooltip;
 
 	public static String		App_People_item_all;
 	public static String		App_People_tooltip;
@@ -81,9 +65,6 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Column_tour;
 	public static String		Compare_Result_time_interval;
 	public static String		Compare_Result_time_interval_tooltip;
-	public static String		CompareResult_Chart_title_compared_tour;
-	public static String		CompareResult_Chart_title_reference_tour;
-//	public static String		CompareResult_Column_kmh_db;
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
 
@@ -158,7 +139,6 @@ public class Messages extends NLS {
 
 	public static String		Image_adjust_altitude;
 	public static String		Image_chart_analyzer;
-//	public static String		Image_chart_options;
 	public static String		Image_collapse_all;
 	public static String		Image_database;
 	public static String		Image_database_other_person;
@@ -177,11 +157,7 @@ public class Messages extends NLS {
 	public static String		Image_graph_temperature;
 	public static String		Image_graph_tour_compare;
 	public static String		Image_graph_tour_compare_disabled;
-//	public static String		Image_import_rawdata;
-//	public static String		Image_import_rawdata_direct;
 	public static String		Image_link;
-//	public static String		Image_open_import_file;
-//	public static String		Image_open_marker_editor;
 	public static String		Image_open_tour_segmenter;
 	public static String		Image_remove_all;
 	public static String		Image_remove_all_disabled;
@@ -190,27 +166,17 @@ public class Messages extends NLS {
 	public static String		Image_save_tour;
 	public static String		Image_save_tour_disabled;
 	public static String		Image_show_distance_on_x_axis;
-//	public static String		Image_show_statistic_and_chart;
-//	public static String		Image_show_statistics;
 	public static String		Image_show_time_on_x_axis;
-//	public static String		Image_show_tour_viewer;
-//	public static String		Image_show_view_detail;
 	public static String		Image_synch_graph_byScale;
 	public static String		Image_synch_graph_byScale_disabled;
 	public static String		Image_synch_graph_bySize;
 	public static String		Image_synch_graph_bySize_disabled;
-//	public static String		Image_synch_graph_vertical;
 	public static String		Image_synch_statistics;
 	public static String		Image_tour_options;
 	public static String		Image_tour_segmenter;
 	public static String		Image_undo_edit;
 	public static String		Image_undo_edit_disabled;
-//	public static String		Image_view_compare_result;
 	public static String		Image_view_compare_wizard;
-//	public static String		Image_view_rawdata;
-//	public static String		Image_view_tourbool;
-//	public static String		Image_view_tourmap;
-//	public static String		Image_zoom_fit_to_graph;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
@@ -319,13 +285,9 @@ public class Messages extends NLS {
 
 	public static String		RawData_Action_clear_view;
 	public static String		RawData_Action_clear_view_tooltip;
-//	public static String		RawData_Action_open_import_file;
-//	public static String		RawData_Action_open_import_file_tooltip;
 	public static String		RawData_Action_save_tour_for_person;
 	public static String		RawData_Action_save_tour_with_person;
 	public static String		RawData_Action_save_tours_for_person;
-//	public static String		RawData_Action_show_tour_chart_tooltip;
-//	public static String		RawData_Chart_title;
 	public static String		RawData_Dlg_save_tour_msg;
 	public static String		RawData_Dlg_save_tour_title;
 	public static String		RawData_Label_unknown_device;
@@ -344,8 +306,6 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_temperature_tooltip;
 
 	public static String		Tour_Action_graph_tour_compare_tooltip;
-//	public static String		Tour_Action_open_marker_editor;
-//	public static String		Tour_Action_open_marker_view;
 	public static String		Tour_Action_open_tour_segmenter_tooltip;
 	public static String		Tour_Action_scroll_zoomed_chart;
 	public static String		Tour_Action_show_distance_on_x_axis;
@@ -353,8 +313,6 @@ public class Messages extends NLS {
 	public static String		Tour_Action_show_start_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis_tooltip;
-	public static String		Tour_Action_undo_typing;
-	public static String		Tour_Action_undo_typing_tooltip;
 	public static String		Tour_Action_zoom_fit_to_window;
 
 	public static String		Tour_Label_datapoints;
@@ -366,12 +324,49 @@ public class Messages extends NLS {
 	public static String		Tour_Label_recording_time;
 	public static String		Tour_Label_start_location;
 	public static String		Tour_Label_start_time;
-//	public static String		Tour_Label_tab_tour_chart;
-//	public static String		Tour_Label_tab_tour_data;
 	public static String		Tour_Label_time;
 	public static String		Tour_Label_time_unit;
 	public static String		Tour_Label_tour_date;
 	public static String		Tour_Label_tour_title;
+
+	public static String		Tour_Map_Action_collapse_all;
+	public static String		Tour_Map_Action_create_left_marker;
+	public static String		Tour_Map_Action_create_marker;
+	public static String		Tour_Map_Action_create_reference_tour;
+	public static String		Tour_Map_Action_create_right_marker;
+	public static String		Tour_Map_Action_delete_compared_tour;
+	public static String		Tour_Map_Action_delete_tours;
+	public static String		Tour_Map_Action_link;
+	public static String		Tour_Map_Action_rename_reference_tour;
+	public static String		Tour_Map_action_save_marker;
+	public static String		Tour_Map_Action_synch_chart_years_tooltip;
+	public static String		Tour_Map_Action_synch_charts_byScale_tooltip;
+	public static String		Tour_Map_Action_synch_charts_bySize_tooltip;
+	public static String		Tour_Map_Action_undo_marker_position;
+	public static String		Tour_Map_Column_kmh;
+	public static String		Tour_Map_Column_tour;
+	public static String		Tour_Map_Compare_job_subtask;
+	public static String		Tour_Map_Compare_job_task;
+	public static String		Tour_Map_Compare_job_title;
+	public static String		Tour_Map_dlg_add_reference_tour_msg;
+	public static String		Tour_Map_dlg_add_reference_tour_title;
+	public static String		Tour_Map_Dlg_delete_comparedTour_msg;
+	public static String		Tour_Map_Dlg_delete_comparedTour_title;
+	public static String		Tour_Map_Dlg_delete_refTour_msg;
+	public static String		Tour_Map_Dlg_delete_refTour_title;
+	public static String		Tour_Map_Dlg_rename_reference_tour_msg;
+	public static String		Tour_Map_Dlg_rename_reference_tour_title;
+	public static String		Tour_Map_dlg_save_compared_tour_message;
+	public static String		Tour_Map_dlg_save_compared_tour_title;
+	public static String		Tour_Map_Label_altitude_down;
+	public static String		Tour_Map_Label_altitude_up;
+	public static String		Tour_Map_Label_chart_title_reference_tour;
+	public static String		Tour_Map_Label_distance;
+	public static String		Tour_Map_Label_km;
+	public static String		Tour_Map_Label_m;
+	public static String		Tour_Map_Label_year_chart_title;
+	public static String		Tour_Map_Label_year_chart_unit;
+	public static String		Tour_Map_label_year_not_selected;
 
 	public static String		TourAnalyzer_Label_average;
 	public static String		TourAnalyzer_Label_difference;
@@ -384,11 +379,6 @@ public class Messages extends NLS {
 	public static String		TourBook_Action_delete_selected_tours;
 	public static String		TourBook_Action_set_tour_type;
 	public static String		TourBook_Action_set_tour_type_with_dlg;
-//	public static String		TourBook_Action_show_statistic_and_chart_tooltip;
-//	public static String		TourBook_Action_show_statistics_tooltip;
-//	public static String		TourBook_Action_show_tour_chart_tooltip;
-//	public static String		TourBook_Action_show_tour_viewer_tooltip;
-//	public static String		TourBook_Action_show_view_detail_tooltip;
 	public static String		TourBook_Combo_statistic_tooltip;
 	public static String		TourBook_Combo_year_tooltip;
 	public static String		TourBook_Dlg_set_tour_type_msg;
@@ -409,48 +399,6 @@ public class Messages extends NLS {
 
 	public static String		TourDatabase_load_all_tours;
 	public static String		TourDatabase_update_tour;
-
-	public static String		TourMap_Action_collapse_all;
-	public static String		TourMap_Action_create_left_marker;
-	public static String		TourMap_Action_create_marker;
-	public static String		TourMap_Action_create_reference_tour;
-	public static String		TourMap_Action_create_right_marker;
-	public static String		TourMap_Action_delete_compared_tour;
-	public static String		TourMap_Action_delete_tours;
-	public static String		TourMap_Action_link;
-	public static String		TourMap_Action_rename_reference_tour;
-	public static String		TourMap_action_save_marker;
-	public static String		TourMap_Action_synch_chart_years_tooltip;
-	public static String		TourMap_Action_synch_charts_byScale_tooltip;
-	public static String		TourMap_Action_synch_charts_bySize_tooltip;
-	public static String		TourMap_Action_undo_marker_position;
-	public static String		TourMap_Column_kmh;
-	public static String		TourMap_Column_tour;
-	public static String		TourMap_Compare_job_subtask;
-	public static String		TourMap_Compare_job_task;
-	public static String		TourMap_Compare_job_title;
-	public static String		TourMap_Dlg_add_reference_tour_msg;
-	public static String		TourMap_Dlg_add_reference_tour_title;
-	public static String		TourMap_Dlg_delete_comparedTour_msg;
-	public static String		TourMap_Dlg_delete_comparedTour_title;
-	public static String		TourMap_Dlg_delete_refTour_msg;
-	public static String		TourMap_Dlg_delete_refTour_title;
-	public static String		TourMap_Dlg_rename_reference_tour_msg;
-	public static String		TourMap_Dlg_rename_reference_tour_title;
-	public static String		TourMap_dlg_save_compared_tour_message;
-	public static String		TourMap_dlg_save_compared_tour_title;
-	public static String		TourMap_Label_a_tour_is_not_selected;
-	public static String		TourMap_Label_altitude_down;
-	public static String		TourMap_Label_altitude_up;
-	public static String		TourMap_Label_chart_title_compared_tour;
-	public static String		TourMap_Label_chart_title_reference_tour;
-	public static String		TourMap_Label_chart_title_year_map;
-	public static String		TourMap_Label_distance;
-	public static String		TourMap_Label_km;
-	public static String		TourMap_Label_m;
-	public static String		TourMap_Label_year_chart_title;
-	public static String		TourMap_Label_year_chart_unit;
-	public static String		TourMap_label_year_not_selected;
 
 	public static String		TourMapWizard_Action_deselect_all;
 	public static String		TourMapWizard_Action_select_all;
@@ -475,13 +423,10 @@ public class Messages extends NLS {
 	public static String		TourMapWizard_Page_reference_tour_title;
 	public static String		TourMapWizard_Wizard_title;
 
-//	public static String		TourMarker_Action_delete_marker;
-//	public static String		TourMarker_Action_edit_marker;
 	public static String		TourMarker_Column_horizontal_offset;
 	public static String		TourMarker_Column_horizontal_offset_tooltip;
 	public static String		TourMarker_Column_km;
 	public static String		TourMarker_Column_km_tooltip;
-//	public static String		TourMarker_Column_position;
 	public static String		TourMarker_Column_remark;
 	public static String		TourMarker_Column_time;
 	public static String		TourMarker_Column_vertical_offset;
@@ -502,7 +447,6 @@ public class Messages extends NLS {
 	public static String		TourProperties_label_location;
 	public static String		TourProperties_label_time;
 
-//	public static String		TourSegmenter_Check_show_segments_in_chart;
 	public static String		TourSegmenter_Column_altimeter_down;
 	public static String		TourSegmenter_Column_altimeter_down_tooltip;
 	public static String		TourSegmenter_Column_altimeter_up;

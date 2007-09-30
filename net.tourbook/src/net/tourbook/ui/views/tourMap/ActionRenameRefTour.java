@@ -37,7 +37,7 @@ class ActionRenameRefTour extends Action {
 
 	public ActionRenameRefTour(TourMapView tourMapView) {
 
-		super(Messages.TourMap_Action_rename_reference_tour);
+		super(Messages.Tour_Map_Action_rename_reference_tour);
 		fTourMapView = tourMapView;
 	}
 
@@ -52,8 +52,8 @@ class ActionRenameRefTour extends Action {
 
 			// ask for the reference tour name
 			final InputDialog dialog = new InputDialog(this.fTourMapView.getSite().getShell(),
-					Messages.TourMap_Dlg_rename_reference_tour_title,
-					Messages.TourMap_Dlg_rename_reference_tour_msg,
+					Messages.Tour_Map_Dlg_rename_reference_tour_title,
+					Messages.Tour_Map_Dlg_rename_reference_tour_msg,
 					ttiRefTour.label,
 					null);
 

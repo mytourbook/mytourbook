@@ -135,14 +135,14 @@ public class TourCompareManager {
 		this.refTourContext = refTourContext;
 		refToursData = new TourData[refTourContext.length];
 
-		Job compareJob = new Job(Messages.TourMap_Compare_job_title) {
+		Job compareJob = new Job(Messages.Tour_Map_Compare_job_title) {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 
 				final int tours2Compare = comparedTours.length * refTourContext.length;
 
-				monitor.beginTask(Messages.TourMap_Compare_job_task, tours2Compare);
+				monitor.beginTask(Messages.Tour_Map_Compare_job_task, tours2Compare);
 
 				compareTourJob(refTourContext, comparedTours, monitor);
 
@@ -217,7 +217,7 @@ public class TourCompareManager {
 
 							// update the message in the progress monitor
 							tourCounter++;
-							monitor.subTask(NLS.bind(Messages.TourMap_Compare_job_subtask,
+							monitor.subTask(NLS.bind(Messages.Tour_Map_Compare_job_subtask,
 									Integer.toString(tourCounter)));
 
 							monitor.worked(1);

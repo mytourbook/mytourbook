@@ -261,7 +261,7 @@ public class TourMapViewReferenceTour extends TourChartViewPart {
 										refTourXMarkerValue));
 
 				// set title
-				changedChartDataModel.setTitle(NLS.bind(Messages.TourMap_Label_chart_title_reference_tour,
+				changedChartDataModel.setTitle(NLS.bind(Messages.Tour_Map_Label_chart_title_reference_tour,
 						refTour.getLabel(),
 						TourManager.getTourTitleDetailed(compareConfig.getRefTourData())));
 

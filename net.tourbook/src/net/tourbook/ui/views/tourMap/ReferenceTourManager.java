@@ -62,8 +62,8 @@ public class ReferenceTourManager {
 
 		// ask for the reference tour name
 		InputDialog dialog = new InputDialog(Display.getCurrent().getActiveShell(),
-				Messages.TourMap_Dlg_add_reference_tour_title,
-				Messages.TourMap_Dlg_add_reference_tour_msg,
+				Messages.Tour_Map_dlg_add_reference_tour_title,
+				Messages.Tour_Map_dlg_add_reference_tour_msg,
 				"", //$NON-NLS-1$
 				null);
 

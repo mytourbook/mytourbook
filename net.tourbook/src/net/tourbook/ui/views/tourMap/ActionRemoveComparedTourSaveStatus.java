@@ -28,7 +28,7 @@ public class ActionRemoveComparedTourSaveStatus extends Action {
 
 		fResultView = resultView;
 
-		setText(Messages.TourMap_Action_delete_compared_tour);
+		setText(Messages.Tour_Map_Action_delete_compared_tour);
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete_disabled));

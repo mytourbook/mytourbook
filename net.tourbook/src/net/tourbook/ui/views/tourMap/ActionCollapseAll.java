@@ -32,7 +32,7 @@ public class ActionCollapseAll extends Action {
 
 		fTreeViewer = treeViewer;
 
-		setToolTipText(Messages.TourMap_Action_collapse_all);
+		setToolTipText(Messages.Tour_Map_Action_collapse_all);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_collapse_all));
 	}
 

@@ -127,7 +127,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 		fPageBook = new PageBook(parent, SWT.NONE);
 
 		fPageNoChart = new Label(fPageBook, SWT.NONE);
-		fPageNoChart.setText(Messages.TourMap_label_year_not_selected);
+		fPageNoChart.setText(Messages.Tour_Map_label_year_not_selected);
 
 		// year chart
 		fYearChart = new Chart(fPageBook, SWT.NONE);
@@ -348,8 +348,8 @@ public class TourMapViewYearStatistic extends ViewPart {
 //			fMinMaxKeeper.setMinMaxValues(chartModel);
 //			fMinMaxKeeper.resetMinMax();
 
-		yData.setYTitle(Messages.TourMap_Label_year_chart_title);
-		yData.setUnitLabel(Messages.TourMap_Label_year_chart_unit);
+		yData.setYTitle(Messages.Tour_Map_Label_year_chart_title);
+		yData.setUnitLabel(Messages.Tour_Map_Label_year_chart_unit);
 		// yData.setMinValue(0);
 
 		chartModel.addYData(yData);

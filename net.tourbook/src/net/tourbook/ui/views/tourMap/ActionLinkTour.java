@@ -30,7 +30,7 @@ public class ActionLinkTour extends Action {
 
 		fTourMapView = view;
 
-		setToolTipText(Messages.TourMap_Action_link);
+		setToolTipText(Messages.Tour_Map_Action_link);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_link));
 	}
 

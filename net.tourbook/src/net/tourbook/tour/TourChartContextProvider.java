@@ -44,7 +44,7 @@ public class TourChartContextProvider implements IChartContextProvider {
 	class ActionAddTourReference extends Action {
 
 		ActionAddTourReference() {
-			setText(Messages.TourMap_Action_create_reference_tour);
+			setText(Messages.Tour_Map_Action_create_reference_tour);
 		}
 
 		@Override
@@ -169,10 +169,10 @@ public class TourChartContextProvider implements IChartContextProvider {
 
 			// marker menu
 			if (leftSlider != null && rightSlider == null) {
-				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_marker, leftSlider));
+				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_marker, leftSlider));
 			} else {
-				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_left_marker, leftSlider));
-				menuMgr.add(new SliderAction(Messages.TourMap_Action_create_right_marker,
+				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_left_marker, leftSlider));
+				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_right_marker,
 						rightSlider));
 			}
 		}

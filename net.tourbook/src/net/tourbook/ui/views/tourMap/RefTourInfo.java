@@ -54,25 +54,25 @@ public class RefTourInfo extends Composite {
 		Label label;
 
 		label = new Label(this, SWT.NONE);
-		label.setText(Messages.TourMap_Label_distance);
+		label.setText(Messages.Tour_Map_Label_distance);
 		txtDistance = new Label(this, SWT.TRAIL);
 		txtDistance.setLayoutData(gd);
 		label = new Label(this, SWT.NONE);
-		label.setText(Messages.TourMap_Label_km);
+		label.setText(Messages.Tour_Map_Label_km);
 
 		label = new Label(this, SWT.NONE);
-		label.setText(Messages.TourMap_Label_altitude_up);
+		label.setText(Messages.Tour_Map_Label_altitude_up);
 		txtAltitudeUp = new Label(this, SWT.TRAIL);
 		txtAltitudeUp.setLayoutData(gd);
 		label = new Label(this, SWT.NONE);
-		label.setText(Messages.TourMap_Label_m);
+		label.setText(Messages.Tour_Map_Label_m);
 
 		label = new Label(this, SWT.NONE);
-		label.setText(Messages.TourMap_Label_altitude_down);
+		label.setText(Messages.Tour_Map_Label_altitude_down);
 		txtAltitudeDown = new Label(this, SWT.TRAIL);
 		txtAltitudeDown.setLayoutData(gd);
 		label = new Label(this, SWT.NONE);
-		label.setText(Messages.TourMap_Label_m);
+		label.setText(Messages.Tour_Map_Label_m);
 
 	}
 

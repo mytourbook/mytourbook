@@ -128,7 +128,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 
 			super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.TourMap_action_save_marker);
+			setToolTipText(Messages.Tour_Map_action_save_marker);
 
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save));
 			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_disabled));
@@ -148,7 +148,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 
 			super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.TourMap_Action_undo_marker_position);
+			setToolTipText(Messages.Tour_Map_Action_undo_marker_position);
 
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_undo_edit));
 			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_undo_edit_disabled));
@@ -517,8 +517,8 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 				 * | SWT.CANCEL
 				 */);
 
-		msgBox.setText(Messages.TourMap_dlg_save_compared_tour_title);
-		msgBox.setMessage(NLS.bind(Messages.TourMap_dlg_save_compared_tour_message,
+		msgBox.setText(Messages.Tour_Map_dlg_save_compared_tour_title);
+		msgBox.setMessage(NLS.bind(Messages.Tour_Map_dlg_save_compared_tour_message,
 				TourManager.getTourTitleDetailed(fTourData)));
 
 		final int answer = msgBox.open();
