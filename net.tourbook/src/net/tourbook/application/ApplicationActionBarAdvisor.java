@@ -73,7 +73,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private void addPerspectiveActions(MenuManager menu) {
 
 		{
-			String openText = Messages.Action_open_perspective;
+			String openText = Messages.App_Action_open_perspective;
 			MenuManager changePerspMenuMgr = new MenuManager(openText, "openPerspective"); //$NON-NLS-1$
 			IContributionItem changePerspMenuItem = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(fWindow);
 			changePerspMenuMgr.add(changePerspMenuItem);
@@ -89,7 +89,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createFileMenu() {
 
-		MenuManager fileMenu = new MenuManager(Messages.Action_Menu_file,
+		MenuManager fileMenu = new MenuManager(Messages.App_Action_Menu_file,
 				IWorkbenchActionConstants.M_FILE);
 
 		fileMenu.add(new GroupMarker("fileNew")); //$NON-NLS-1$
@@ -119,7 +119,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		/*
 		 * help - menu
 		 */
-		MenuManager helpMenu = new MenuManager(Messages.Action_Menu_help,
+		MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help,
 				IWorkbenchActionConstants.M_HELP);
 
 		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
@@ -129,7 +129,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createToolMenu() {
 
-		MenuManager toolMenu = new MenuManager(Messages.Action_Menu_tools,
+		MenuManager toolMenu = new MenuManager(Messages.App_Action_Menu_tools,
 				"net.tourbook.menu.main.tools"); //$NON-NLS-1$
 
 		toolMenu.add(new GroupMarker("tools")); //$NON-NLS-1$
@@ -152,7 +152,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createViewMenu() {
 
-		MenuManager viewMenu = new MenuManager(Messages.Action_Menu_view, "views"); //$NON-NLS-1$
+		MenuManager viewMenu = new MenuManager(Messages.App_Action_Menu_view, "views"); //$NON-NLS-1$
 
 		viewMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
 		viewMenu.add(fActionViewShortList);
@@ -246,11 +246,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(fActionQuit);
 
 		fActionAbout = ActionFactory.ABOUT.create(window);
-		fActionAbout.setText(Messages.Action_About);
+		fActionAbout.setText(Messages.App_Action_About);
 		register(fActionAbout);
 
 		fActionPreferences = ActionFactory.PREFERENCES.create(window);
-		fActionPreferences.setText(Messages.Action_open_preferences);
+		fActionPreferences.setText(Messages.App_Action_open_preferences);
 		register(fActionPreferences);
 
 		fActionSave = ActionFactory.SAVE.create(window);

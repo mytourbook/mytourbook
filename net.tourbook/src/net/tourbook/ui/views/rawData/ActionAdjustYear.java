@@ -41,7 +41,7 @@ public class ActionAdjustYear extends Action implements IMenuCreator {
 
 	public ActionAdjustYear(RawDataView rawDataView) {
 
-		super(Messages.Action_adjust_imported_year, AS_DROP_DOWN_MENU);
+		super(Messages.App_Action_adjust_imported_year, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
 		fCalendar.setTime(new Date());

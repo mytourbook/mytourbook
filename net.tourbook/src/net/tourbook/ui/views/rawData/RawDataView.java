@@ -680,7 +680,7 @@ public class RawDataView extends ViewPart {
 
 			final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
 			if (person != null) {
-				fActionSaveTourWithPerson.setText(NLS.bind(Messages.RawData_Action_save_tour_with_person,
+				fActionSaveTourWithPerson.setText(NLS.bind(Messages.Raw_Data_Action_save_tour_with_person,
 						person.getName()));
 				fActionSaveTourWithPerson.setPerson(person);
 				fActionSaveTourWithPerson.setEnabled(unsavedTours > 0);
@@ -688,9 +688,9 @@ public class RawDataView extends ViewPart {
 			}
 
 			if (tourSelection.size() == 1) {
-				fActionSaveTour.setText(Messages.RawData_Action_save_tour_for_person);
+				fActionSaveTour.setText(Messages.Raw_Data_Action_save_tour_for_person);
 			} else {
-				fActionSaveTour.setText(Messages.RawData_Action_save_tours_for_person);
+				fActionSaveTour.setText(Messages.Raw_Data_Action_save_tours_for_person);
 			}
 			fActionSaveTour.setEnabled(unsavedTours > 0);
 			menuMgr.add(fActionSaveTour);

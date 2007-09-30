@@ -381,8 +381,8 @@ public class TourSegmenterView extends ViewPart {
 
 		public ActionShowSegments() {
 
-			super(Messages.Action_open_tour_segmenter, SWT.TOGGLE);
-			setToolTipText(Messages.Action_open_tour_segmenter_tooltip);
+			super(Messages.App_Action_open_tour_segmenter, SWT.TOGGLE);
+			setToolTipText(Messages.App_Action_open_tour_segmenter_tooltip);
 
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_segmenter));
 		}

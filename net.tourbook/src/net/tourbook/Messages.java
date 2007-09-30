@@ -21,20 +21,27 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";					//$NON-NLS-1$
 
-	public static String		Action_About;
+	public static String	App_Action_About;
 
-	public static String		Action_adjust_imported_year;
+	public static String	App_Action_adjust_imported_year;
 
-	public static String		Action_edit_tour;
-	public static String		Action_Menu_file;
-	public static String		Action_Menu_help;
-	public static String		Action_Menu_tools;
-	public static String		Action_Menu_view;
+	public static String	App_Action_edit_tour;
 
-	public static String		Action_open_perspective;
-	public static String		Action_open_preferences;
-	public static String		Action_open_tour_segmenter;
-	public static String		Action_open_tour_segmenter_tooltip;
+	public static String	App_Action_Menu_file;
+
+	public static String	App_Action_Menu_help;
+
+	public static String	App_Action_Menu_tools;
+
+	public static String	App_Action_Menu_view;
+
+	public static String	App_Action_open_perspective;
+
+	public static String	App_Action_open_preferences;
+
+	public static String	App_Action_open_tour_segmenter;
+
+	public static String	App_Action_open_tour_segmenter_tooltip;
 
 	public static String		App_People_item_all;
 	public static String		App_People_tooltip;
@@ -366,14 +373,21 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_Dlg_rename_tour_type_title;
 	public static String		Pref_TourTypes_Title;
 
-	public static String		RawData_Action_clear_view;
-	public static String		RawData_Action_clear_view_tooltip;
-	public static String		RawData_Action_save_tour_for_person;
-	public static String		RawData_Action_save_tour_with_person;
-	public static String		RawData_Action_save_tours_for_person;
-	public static String		RawData_Dlg_save_tour_msg;
-	public static String		RawData_Dlg_save_tour_title;
-	public static String		RawData_Label_unknown_device;
+	public static String	Raw_Data_Action_clear_view;
+
+	public static String	Raw_Data_Action_clear_view_tooltip;
+
+	public static String	Raw_Data_Action_save_tour_for_person;
+
+	public static String	Raw_Data_Action_save_tour_with_person;
+
+	public static String	Raw_Data_Action_save_tours_for_person;
+
+	public static String	Raw_Data_Dlg_save_tour_msg;
+
+	public static String	Raw_Data_Dlg_save_tour_title;
+
+	public static String	Raw_Data_Label_unknown_device;
 
 	public static String		Tour_Action_adjust_tour_altitude;
 	public static String		Tour_Action_adjust_tour_altitude_tooltip;
