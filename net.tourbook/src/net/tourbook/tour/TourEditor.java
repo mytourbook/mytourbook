@@ -305,7 +305,7 @@ public class TourEditor extends EditorPart {
 				public void dataModelChanged(ChartDataModel changedChartDataModel) {
 
 					// set title
-					changedChartDataModel.setTitle(NLS.bind(Messages.TourBook_Label_chart_title,
+					changedChartDataModel.setTitle(NLS.bind(Messages.Tour_Book_Label_chart_title,
 							TourManager.getTourTitleDetailed(fTourData)));
 				}
 			});

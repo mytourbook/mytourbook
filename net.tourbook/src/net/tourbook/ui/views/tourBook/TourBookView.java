@@ -710,7 +710,7 @@ public class TourBookView extends ViewPart {
 		if ((selectedTourType = fActionSetTourType.getSelectedTourType()) != null) {
 
 			fActionSetLastTourType.setSelectedTourType(selectedTourType);
-			fActionSetLastTourType.setText(NLS.bind(Messages.TourBook_Action_set_tour_type,
+			fActionSetLastTourType.setText(NLS.bind(Messages.Tour_Book_Action_set_tour_type,
 					selectedTourType.getName()));
 			fActionSetLastTourType.setEnabled(true);
 			menuMgr.add(fActionSetLastTourType);

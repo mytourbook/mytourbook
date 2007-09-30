@@ -413,21 +413,21 @@ public class TourMarkerView extends ViewPart {
 		// column: time
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
 		tvc.setLabelProvider(labelProvider);
-		tvc.getColumn().setText(Messages.TourMarker_Column_time);
+		tvc.getColumn().setText(Messages.Tour_Marker_Column_time);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(12),
 				false));
 
 		// column: km
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
-		tvc.getColumn().setText(Messages.TourMarker_Column_km);
-		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_km_tooltip);
+		tvc.getColumn().setText(Messages.Tour_Marker_Column_km);
+		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
 		tvc.setLabelProvider(labelProvider);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8),
 				false));
 
 		// column: remark
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
-		tvc.getColumn().setText(Messages.TourMarker_Column_remark);
+		tvc.getColumn().setText(Messages.Tour_Marker_Column_remark);
 		tvc.setLabelProvider(labelProvider);
 //		tvc.setEditingSupport(new RemarkEditor(fMarkerViewer));
 		tableLayouter.addColumnData(new ColumnWeightData(50, true));

@@ -33,18 +33,18 @@ public class TourMarker {
 	 */
 	@Transient
 	public static final String[]	visualPositionLabels	= new String[] {
-			Messages.TourMarker_Position_vertical_above, // 0
-			Messages.TourMarker_Position_vertical_below, // 1
-			Messages.TourMarker_Position_vertical_chart_top, // 2
-			Messages.TourMarker_Position_vertical_chart_bottom, // 3
-			Messages.TourMarker_Position_horizontal_above_left, // 4
-			Messages.TourMarker_Position_horizontal_above_centered, // 5
-			Messages.TourMarker_Position_horizontal_above_right, // 6
-			Messages.TourMarker_Position_horizontal_below_left, // 7
-			Messages.TourMarker_Position_horizontal_below_centered, // 8
-			Messages.TourMarker_Position_horizontal_below_right, // 9
-			Messages.TourMarker_Position_horizontal_left, // 10
-			Messages.TourMarker_Position_horizontal_right, // 11
+			Messages.Tour_Marker_Position_vertical_above, // 0
+			Messages.Tour_Marker_Position_vertical_below, // 1
+			Messages.Tour_Marker_Position_vertical_chart_top, // 2
+			Messages.Tour_Marker_Position_vertical_chart_bottom, // 3
+			Messages.Tour_Marker_Position_horizontal_above_left, // 4
+			Messages.Tour_Marker_Position_horizontal_above_centered, // 5
+			Messages.Tour_Marker_Position_horizontal_above_right, // 6
+			Messages.Tour_Marker_Position_horizontal_below_left, // 7
+			Messages.Tour_Marker_Position_horizontal_below_centered, // 8
+			Messages.Tour_Marker_Position_horizontal_below_right, // 9
+			Messages.Tour_Marker_Position_horizontal_left, // 10
+			Messages.Tour_Marker_Position_horizontal_right, // 11
 															};
 
 	@Id

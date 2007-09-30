@@ -135,11 +135,11 @@ public class TourPropertiesView extends ViewPart {
 		fTabFolder = new CTabFolder(parent, SWT.FLAT | SWT.BOTTOM);
 
 		CTabItem fTabItemLocation = new CTabItem(fTabFolder, SWT.FLAT);
-		fTabItemLocation.setText(Messages.TourProperties_label_location);
+		fTabItemLocation.setText(Messages.Tour_Properties_label_location);
 		fTabItemLocation.setControl(createTabLocation(fTabFolder));
 
 		CTabItem fTabItemTime = new CTabItem(fTabFolder, SWT.FLAT);
-		fTabItemTime.setText(Messages.TourProperties_label_time);
+		fTabItemTime.setText(Messages.Tour_Properties_label_time);
 		fTabItemTime.setControl(createTabTime(fTabFolder));
 
 	}
@@ -191,7 +191,7 @@ public class TourPropertiesView extends ViewPart {
 		{
 			// title
 			label = new Label(locationContainer, SWT.NONE);
-			label.setText(Messages.Tour_Label_tour_title);
+			label.setText(Messages.Tour_Properties_Label_tour_title);
 			fTextTitle = new Text(locationContainer, SWT.BORDER);
 			fTextTitle.setLayoutData(gd);
 			fTextTitle.addKeyListener(new KeyAdapter() {
@@ -203,7 +203,7 @@ public class TourPropertiesView extends ViewPart {
 
 			// start location
 			label = new Label(locationContainer, SWT.NONE);
-			label.setText(Messages.Tour_Label_start_location);
+			label.setText(Messages.Tour_Properties_Label_start_location);
 			fTextStartLocation = new Text(locationContainer, SWT.BORDER);
 			fTextStartLocation.setLayoutData(gd);
 			fTextStartLocation.addKeyListener(new KeyAdapter() {
@@ -215,7 +215,7 @@ public class TourPropertiesView extends ViewPart {
 
 			// end location
 			label = new Label(locationContainer, SWT.NONE);
-			label.setText(Messages.Tour_Label_end_location);
+			label.setText(Messages.Tour_Properties_Label_end_location);
 			fTextEndLocation = new Text(locationContainer, SWT.BORDER);
 			fTextEndLocation.setLayoutData(gd);
 			fTextEndLocation.addKeyListener(new KeyAdapter() {
@@ -227,7 +227,7 @@ public class TourPropertiesView extends ViewPart {
 
 			// description
 			label = new Label(locationContainer, SWT.NONE);
-			label.setText(Messages.Tour_Label_description);
+			label.setText(Messages.Tour_Properties_Label_description);
 			label.setLayoutData(new GridData(SWT.NONE, SWT.TOP, false, false));
 			fTextDescription = new Text(locationContainer, SWT.BORDER
 					| SWT.WRAP
@@ -273,27 +273,27 @@ public class TourPropertiesView extends ViewPart {
 		{
 			// tour date
 			label = new Label(contentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Label_tour_date);
+			label.setText(Messages.Tour_Properties_Label_tour_date);
 			fLblDate = new Label(contentContainer, SWT.NONE);
 
 			// start time
 			label = new Label(contentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Label_start_time);
+			label.setText(Messages.Tour_Properties_Label_start_time);
 			fLblStartTime = new Label(contentContainer, SWT.NONE);
 
 			// recording time
 			label = new Label(contentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Label_recording_time);
+			label.setText(Messages.Tour_Properties_Label_recording_time);
 			fLblRecordingTime = new Label(contentContainer, SWT.NONE);
 
 			// driving time
 			label = new Label(contentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Label_driving_time);
+			label.setText(Messages.Tour_Properties_Label_driving_time);
 			fLblDrivingTime = new Label(contentContainer, SWT.NONE);
 
 			// # data points
 			label = new Label(contentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Label_datapoints);
+			label.setText(Messages.Tour_Properties_Label_datapoints);
 			fLblDatapoints = new Label(contentContainer, SWT.NONE);
 		}
 

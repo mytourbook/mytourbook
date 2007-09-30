@@ -30,8 +30,8 @@ public class ActionEditTour extends Action {
 		fTourChartView = tourChartView;
 
 		setText(Messages.Action_edit_tour);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_edit_tour));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_edit_tour_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
 	}
 
 	@Override

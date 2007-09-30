@@ -156,7 +156,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 	protected WizardPageCompareTour(String pageName) {
 		super(pageName);
-		setTitle(Messages.TourMapWizard_Page_compared_tours_title);
+		setTitle(Messages.TourMap_Wizard_Page_compared_tours_title);
 	}
 
 	public void createControl(Composite parent) {
@@ -165,7 +165,7 @@ public class WizardPageCompareTour extends WizardPage {
 		pageContainer.setLayout(new GridLayout());
 
 		fCheckSelectAll = new Button(pageContainer, SWT.CHECK);
-		fCheckSelectAll.setText(Messages.TourMapWizard_Action_select_all_tours);
+		fCheckSelectAll.setText(Messages.TourMap_Wizard_Action_select_all_tours);
 		fCheckSelectAll.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -186,7 +186,7 @@ public class WizardPageCompareTour extends WizardPage {
 		// chart group
 		fChartGroup = new Group(masterDetailContainer, SWT.NONE);
 		fChartGroup.setLayout(new GridLayout());
-		fChartGroup.setText(Messages.TourMapWizard_Group_selected_tour);
+		fChartGroup.setText(Messages.TourMap_Wizard_Group_selected_tour);
 		fChartGroup.setEnabled(false);
 
 		fViewerDetailForm = new ViewerDetailForm(masterDetailContainer, viewer, sash, fChartGroup);
@@ -202,7 +202,7 @@ public class WizardPageCompareTour extends WizardPage {
 				.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		fPageNoTourIsSelected = new Label(fPageBook, SWT.NONE);
-		fPageNoTourIsSelected.setText(Messages.TourMapWizard_Label_a_tour_is_not_selected);
+		fPageNoTourIsSelected.setText(Messages.TourMap_Wizard_Label_a_tour_is_not_selected);
 		fPageNoTourIsSelected.setEnabled(false);
 
 		restoreDialogSettings();
@@ -260,22 +260,22 @@ public class WizardPageCompareTour extends WizardPage {
 		TreeColumn tc;
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText(Messages.TourMapWizard_Column_tour);
+		tc.setText(Messages.TourMap_Wizard_Column_tour);
 		tc.setWidth(convertWidthInCharsToPixels(20));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.TourMapWizard_Column_km);
-		tc.setToolTipText(Messages.TourMapWizard_Column_km_tooltip);
+		tc.setText(Messages.TourMap_Wizard_Column_km);
+		tc.setToolTipText(Messages.TourMap_Wizard_Column_km_tooltip);
 		tc.setWidth(convertWidthInCharsToPixels(10));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.TourMapWizard_Column_m);
-		tc.setToolTipText(Messages.TourMapWizard_Column_m_tooltip);
+		tc.setText(Messages.TourMap_Wizard_Column_m);
+		tc.setToolTipText(Messages.TourMap_Wizard_Column_m_tooltip);
 		tc.setWidth(convertWidthInCharsToPixels(10));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.TourMapWizard_Column_h);
-		tc.setToolTipText(Messages.TourMapWizard_Column_h_tooltip);
+		tc.setText(Messages.TourMap_Wizard_Column_h);
+		tc.setToolTipText(Messages.TourMap_Wizard_Column_h_tooltip);
 		tc.setWidth(convertWidthInCharsToPixels(10));
 
 		/*
@@ -323,7 +323,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 					fTourChart.updateTourChart(tourData, chartConfig, false);
 
-					fChartGroup.setText(NLS.bind(Messages.TourMapWizard_Group_selected_tour_2,
+					fChartGroup.setText(NLS.bind(Messages.TourMap_Wizard_Group_selected_tour_2,
 							TourManager.getTourDate(tourData)));
 					fPageBook.showPage(fTourChart);
 				} else {
@@ -364,7 +364,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 	private boolean validatePage() {
 
-		setMessage(Messages.TourMapWizard_Label_page_message);
+		setMessage(Messages.TourMap_Wizard_Label_page_message);
 
 		if (fCheckSelectAll.getSelection()) {
 
@@ -378,7 +378,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 			if (checkedElements.length == 0) {
 				setPageComplete(false);
-				setErrorMessage(Messages.TourMapWizard_Error_tour_must_be_selected);
+				setErrorMessage(Messages.TourMap_Wizard_Error_tour_must_be_selected);
 				return false;
 
 			} else {

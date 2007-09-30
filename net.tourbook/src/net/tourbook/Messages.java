@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";						//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";					//$NON-NLS-1$
 
 	public static String		Action_About;
 
@@ -77,37 +77,97 @@ public class Messages extends NLS {
 
 	public static String		DeviceManager_Selection_device_is_not_selected;
 
-	public static String		Dlg_Adjust_Altitude_Button_reset_altitudes;
-	public static String		Dlg_Adjust_Altitude_Button_reset_altitudes_tooltip;
-	public static String		Dlg_Adjust_Altitude_Button_show_original_values;
-	public static String		Dlg_Adjust_Altitude_Button_show_original_values_tooltip;
-	public static String		Dlg_Adjust_Altitude_Checkbox_autoscale_yaxis;
-	public static String		Dlg_Adjust_Altitude_Checkbox_autoscale_yaxis_tooltip;
-	public static String		Dlg_Adjust_Altitude_Group_options;
-	public static String		Dlg_Adjust_Altitude_Label_adjustment_type;
-	public static String		Dlg_Adjust_Altitude_Label_end_altitude;
-	public static String		Dlg_Adjust_Altitude_Label_end_altitude_tooltip;
-	public static String		Dlg_Adjust_Altitude_Label_max_altitude;
-	public static String		Dlg_Adjust_Altitude_Label_max_altitude_tooltip;
-	public static String		Dlg_Adjust_Altitude_Label_original_values;
-	public static String		Dlg_Adjust_Altitude_Label_start_altitude;
-	public static String		Dlg_Adjust_Altitude_Label_start_altitude_tooltip;
-	public static String		Dlg_Adjust_Altitude_Message_adjust_end;
-	public static String		Dlg_Adjust_Altitude_Message_adjust_max;
-	public static String		Dlg_Adjust_Altitude_Message_adjust_start_and_end;
-	public static String		Dlg_Adjust_Altitude_Message_adjust_whole_tour;
-	public static String		Dlg_Adjust_Altitude_Message_select_type;
-	public static String		Dlg_Adjust_Altitude_Radio_keep_bottom_altitude;
-	public static String		Dlg_Adjust_Altitude_Radio_keep_bottom_altitude_tooltip;
-	public static String		Dlg_Adjust_Altitude_Radio_keep_start_altitude;
-	public static String		Dlg_Adjust_Altitude_Radio_keep_start_altitude_tooltip;
-	public static String		Dlg_Adjust_Altitude_Title_dlg;
-	public static String		Dlg_Adjust_Altitude_Title_window;
-	public static String		Dlg_Adjust_Altitude_Type_adjust_end;
-	public static String		Dlg_Adjust_Altitude_Type_adjust_height;
-	public static String		Dlg_Adjust_Altitude_Type_adjust_whole_tour;
-	public static String		Dlg_Adjust_Altitude_Type_Show_original;
-	public static String		Dlg_Adjust_Altitude_Type_start_and_end;
+	public static String		Dlg_AdjustAltitude_Button_reset_altitudes;
+
+	public static String		Dlg_AdjustAltitude_Button_reset_altitudes_tooltip;
+
+	public static String		Dlg_AdjustAltitude_Button_show_original_values;
+
+	public static String		Dlg_AdjustAltitude_Button_show_original_values_tooltip;
+
+	public static String		Dlg_AdjustAltitude_Checkbox_autoscale_yaxis;
+
+	public static String		Dlg_AdjustAltitude_Checkbox_autoscale_yaxis_tooltip;
+
+	public static String		Dlg_AdjustAltitude_Group_options;
+
+	public static String		Dlg_AdjustAltitude_Label_adjustment_type;
+
+	public static String		Dlg_AdjustAltitude_Label_end_altitude;
+
+	public static String		Dlg_AdjustAltitude_Label_end_altitude_tooltip;
+
+	public static String		Dlg_AdjustAltitude_Label_max_altitude;
+
+	public static String		Dlg_AdjustAltitude_Label_max_altitude_tooltip;
+
+	public static String		Dlg_AdjustAltitude_Label_original_values;
+
+	public static String		Dlg_AdjustAltitude_Label_start_altitude;
+
+	public static String		Dlg_AdjustAltitude_Label_start_altitude_tooltip;
+
+	public static String		Dlg_AdjustAltitude_Message_adjust_end;
+
+	public static String		Dlg_AdjustAltitude_Message_adjust_max;
+
+	public static String		Dlg_AdjustAltitude_Message_adjust_start_and_end;
+
+	public static String		Dlg_AdjustAltitude_Message_adjust_whole_tour;
+
+	public static String		Dlg_AdjustAltitude_Message_select_type;
+
+	public static String		Dlg_AdjustAltitude_Radio_keep_bottom_altitude;
+
+	public static String		Dlg_AdjustAltitude_Radio_keep_bottom_altitude_tooltip;
+
+	public static String		Dlg_AdjustAltitude_Radio_keep_start_altitude;
+
+	public static String		Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip;
+
+	public static String		Dlg_AdjustAltitude_Title_dlg;
+
+	public static String		Dlg_AdjustAltitude_Title_window;
+
+	public static String		Dlg_AdjustAltitude_Type_adjust_end;
+
+	public static String		Dlg_AdjustAltitude_Type_adjust_height;
+
+	public static String		Dlg_AdjustAltitude_Type_adjust_whole_tour;
+
+	public static String		Dlg_AdjustAltitude_Type_Show_original;
+
+	public static String		Dlg_AdjustAltitude_Type_start_and_end;
+
+	public static String		Dlg_TourMarker_Button_delete;
+
+	public static String		Dlg_TourMarker_Button_delete_tooltip;
+
+	public static String		Dlg_TourMarker_Button_reset_offset;
+
+	public static String		Dlg_TourMarker_Button_reset_offset_tooltip;
+
+	public static String		Dlg_TourMarker_Button_undo;
+
+	public static String		Dlg_TourMarker_Button_undo_tooltip;
+
+	public static String		Dlg_TourMarker_Dlg_Message;
+
+	public static String		Dlg_TourMarker_Dlg_title;
+
+	public static String		Dlg_TourMarker_Label_horizontal_offset;
+
+	public static String		Dlg_TourMarker_Label_marker_name;
+
+	public static String		Dlg_TourMarker_Label_markers;
+
+	public static String		Dlg_TourMarker_Label_position;
+
+	public static String		Dlg_TourMarker_Label_vertical_offset;
+
+	public static String		Dlg_TourMarker_MsgBox_delete_marker_message;
+
+	public static String		Dlg_TourMarker_MsgBox_delete_marker_title;
 
 	public static String		Format_hhmm;
 	public static String		Format_hhmmss;
@@ -137,46 +197,85 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_statistic_distance;
 	public static String		Graph_Pref_color_statistic_time;
 
-	public static String		Image_adjust_altitude;
-	public static String		Image_chart_analyzer;
-	public static String		Image_collapse_all;
-	public static String		Image_database;
-	public static String		Image_database_other_person;
-	public static String		Image_database_placeholder;
-	public static String		Image_delete;
-	public static String		Image_delete_disabled;
-	public static String		Image_edit_tour;
-	public static String		Image_edit_tour_disabled;
-	public static String		Image_fit_to_window;
-	public static String		Image_graph_altimeter;
-	public static String		Image_graph_altitude;
-	public static String		Image_graph_cadence;
-	public static String		Image_graph_gradient;
-	public static String		Image_graph_heartbeat;
-	public static String		Image_graph_speed;
-	public static String		Image_graph_temperature;
-	public static String		Image_graph_tour_compare;
-	public static String		Image_graph_tour_compare_disabled;
-	public static String		Image_link;
-	public static String		Image_open_tour_segmenter;
-	public static String		Image_remove_all;
-	public static String		Image_remove_all_disabled;
-	public static String		Image_save;
-	public static String		Image_save_disabled;
-	public static String		Image_save_tour;
-	public static String		Image_save_tour_disabled;
-	public static String		Image_show_distance_on_x_axis;
-	public static String		Image_show_time_on_x_axis;
-	public static String		Image_synch_graph_byScale;
-	public static String		Image_synch_graph_byScale_disabled;
-	public static String		Image_synch_graph_bySize;
-	public static String		Image_synch_graph_bySize_disabled;
-	public static String		Image_synch_statistics;
-	public static String		Image_tour_options;
-	public static String		Image_tour_segmenter;
-	public static String		Image_undo_edit;
-	public static String		Image_undo_edit_disabled;
-	public static String		Image_view_compare_wizard;
+	public static String		Image__adjust_altitude;
+
+	public static String		Image__chart_analyzer;
+
+	public static String		Image__collapse_all;
+
+	public static String		Image__database;
+
+	public static String		Image__database_other_person;
+
+	public static String		Image__database_placeholder;
+
+	public static String		Image__delete;
+
+	public static String		Image__delete_disabled;
+
+	public static String		Image__edit_tour;
+
+	public static String		Image__edit_tour_disabled;
+
+	public static String		Image__fit_to_window;
+
+	public static String		Image__graph_altimeter;
+
+	public static String		Image__graph_altitude;
+
+	public static String		Image__graph_cadence;
+
+	public static String		Image__graph_gradient;
+
+	public static String		Image__graph_heartbeat;
+
+	public static String		Image__graph_speed;
+
+	public static String		Image__graph_temperature;
+
+	public static String		Image__graph_tour_compare;
+
+	public static String		Image__graph_tour_compare_disabled;
+
+	public static String		Image__link;
+
+	public static String		Image__open_tour_segmenter;
+
+	public static String		Image__remove_all;
+
+	public static String		Image__remove_all_disabled;
+
+	public static String		Image__save;
+
+	public static String		Image__save_disabled;
+
+	public static String		Image__save_tour;
+
+	public static String		Image__save_tour_disabled;
+
+	public static String		Image__show_distance_on_x_axis;
+
+	public static String		Image__show_time_on_x_axis;
+
+	public static String		Image__synch_graph_byScale;
+
+	public static String		Image__synch_graph_byScale_disabled;
+
+	public static String		Image__synch_graph_bySize;
+
+	public static String		Image__synch_graph_bySize_disabled;
+
+	public static String		Image__synch_statistics;
+
+	public static String		Image__tour_options;
+
+	public static String		Image__tour_segmenter;
+
+	public static String		Image__undo_edit;
+
+	public static String		Image__undo_edit_disabled;
+
+	public static String		Image__view_compare_wizard;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
@@ -196,22 +295,6 @@ public class Messages extends NLS {
 	public static String		Import_Wizard_Monitor_task_received_bytes;
 	public static String		Import_Wizard_Monitor_wait_for_data;
 	public static String		Import_Wizard_Thread_name_read_device_data;
-
-	public static String		MarkerDialog_Button_delete;
-	public static String		MarkerDialog_Button_delete_tooltip;
-	public static String		MarkerDialog_Button_reset_offset;
-	public static String		MarkerDialog_Button_reset_offset_tooltip;
-	public static String		MarkerDialog_Button_undo;
-	public static String		MarkerDialog_Button_undo_tooltip;
-	public static String		MarkerDialog_Dlg_Message;
-	public static String		MarkerDialog_Dlg_title;
-	public static String		MarkerDialog_Label_horizontal_offset;
-	public static String		MarkerDialog_Label_marker_name;
-	public static String		MarkerDialog_Label_markers;
-	public static String		MarkerDialog_Label_position;
-	public static String		MarkerDialog_Label_vertical_offset;
-	public static String		MarkerDialog_MsgBox_delete_marker_message;
-	public static String		MarkerDialog_MsgBox_delete_marker_title;
 
 	public static String		Pref_ChartColors_Column_color;
 	public static String		Pref_ChartColors_Label_title;
@@ -315,20 +398,30 @@ public class Messages extends NLS {
 	public static String		Tour_Action_show_time_on_x_axis_tooltip;
 	public static String		Tour_Action_zoom_fit_to_window;
 
-	public static String		Tour_Label_datapoints;
-	public static String		Tour_Label_description;
-	public static String		Tour_Label_distance;
-	public static String		Tour_Label_distance_unit;
-	public static String		Tour_Label_driving_time;
-	public static String		Tour_Label_end_location;
-	public static String		Tour_Label_recording_time;
-	public static String		Tour_Label_start_location;
-	public static String		Tour_Label_start_time;
-	public static String		Tour_Label_time;
-	public static String		Tour_Label_time_unit;
-	public static String		Tour_Label_tour_date;
-	public static String		Tour_Label_tour_title;
+	public static String		Tour_Book_Action_delete_selected_tours;
 
+	public static String		Tour_Book_Action_set_tour_type;
+
+	public static String		Tour_Book_Action_set_tour_type_with_dlg;
+
+	public static String		Tour_Book_Combo_statistic_tooltip;
+
+	public static String		Tour_Book_Combo_year_tooltip;
+
+	public static String		Tour_Book_Dlg_set_tour_type_msg;
+
+	public static String		Tour_Book_Dlg_set_tour_type_title;
+
+	public static String		Tour_Book_Label_chart_title;
+
+	public static String		Tour_Database_load_all_tours;
+
+	public static String		Tour_Database_update_tour;
+
+	public static String		Tour_Properties_Label_distance;
+	public static String		Tour_Properties_Label_distance_unit;
+	public static String		Tour_Properties_Label_time;
+	public static String		Tour_Properties_Label_time_unit;
 	public static String		Tour_Map_Action_collapse_all;
 	public static String		Tour_Map_Action_create_left_marker;
 	public static String		Tour_Map_Action_create_marker;
@@ -350,10 +443,14 @@ public class Messages extends NLS {
 	public static String		Tour_Map_Compare_job_title;
 	public static String		Tour_Map_dlg_add_reference_tour_msg;
 	public static String		Tour_Map_dlg_add_reference_tour_title;
-	public static String		Tour_Map_Dlg_delete_comparedTour_msg;
-	public static String		Tour_Map_Dlg_delete_comparedTour_title;
-	public static String		Tour_Map_Dlg_delete_refTour_msg;
-	public static String		Tour_Map_Dlg_delete_refTour_title;
+
+	public static String		Tour_Map_dlg_delete_comparedTour_msg;
+	public static String		Tour_Map_dlg_delete_comparedTour_title;
+
+	public static String		Tour_Map_dlg_delete_refTour_msg;
+
+	public static String		Tour_Map_dlg_delete_refTour_title;
+
 	public static String		Tour_Map_Dlg_rename_reference_tour_msg;
 	public static String		Tour_Map_Dlg_rename_reference_tour_title;
 	public static String		Tour_Map_dlg_save_compared_tour_message;
@@ -368,6 +465,100 @@ public class Messages extends NLS {
 	public static String		Tour_Map_Label_year_chart_unit;
 	public static String		Tour_Map_label_year_not_selected;
 
+	public static String		Tour_Marker_Column_horizontal_offset;
+
+	public static String		Tour_Marker_Column_horizontal_offset_tooltip;
+
+	public static String		Tour_Marker_Column_km;
+
+	public static String		Tour_Marker_Column_km_tooltip;
+
+	public static String		Tour_Marker_Column_remark;
+
+	public static String		Tour_Marker_Column_time;
+
+	public static String		Tour_Marker_Column_vertical_offset;
+
+	public static String		Tour_Marker_Column_vertical_offset_tooltip;
+
+	public static String		Tour_Marker_Position_horizontal_above_centered;
+
+	public static String		Tour_Marker_Position_horizontal_above_left;
+
+	public static String		Tour_Marker_Position_horizontal_above_right;
+
+	public static String		Tour_Marker_Position_horizontal_below_centered;
+
+	public static String		Tour_Marker_Position_horizontal_below_left;
+
+	public static String		Tour_Marker_Position_horizontal_below_right;
+
+	public static String		Tour_Marker_Position_horizontal_left;
+
+	public static String		Tour_Marker_Position_horizontal_right;
+
+	public static String		Tour_Marker_Position_vertical_above;
+
+	public static String		Tour_Marker_Position_vertical_below;
+
+	public static String		Tour_Marker_Position_vertical_chart_bottom;
+
+	public static String		Tour_Marker_Position_vertical_chart_top;
+
+	public static String		Tour_Properties_Label_datapoints;
+
+	public static String		Tour_Properties_Label_description;
+
+	public static String		Tour_Properties_Label_driving_time;
+
+	public static String		Tour_Properties_Label_end_location;
+
+	public static String		Tour_Properties_label_location;
+
+	public static String		Tour_Properties_Label_recording_time;
+
+	public static String		Tour_Properties_Label_start_location;
+
+	public static String		Tour_Properties_Label_start_time;
+
+	public static String		Tour_Properties_label_time;
+
+	public static String		Tour_Properties_Label_tour_date;
+
+	public static String		Tour_Properties_Label_tour_title;
+
+	public static String		Tour_Segmenter_Column_altimeter_down;
+
+	public static String		Tour_Segmenter_Column_altimeter_down_tooltip;
+
+	public static String		Tour_Segmenter_Column_altimeter_up;
+
+	public static String		Tour_Segmenter_Column_altimeter_up_tooltip;
+
+	public static String		Tour_Segmenter_Column_altitude;
+
+	public static String		Tour_Segmenter_Column_altitude_tooltip;
+
+	public static String		Tour_Segmenter_Column_distance;
+
+	public static String		Tour_Segmenter_Column_distance_tooltip;
+
+	public static String		Tour_Segmenter_Column_gradient;
+
+	public static String		Tour_Segmenter_Column_gradient_tooltip;
+
+	public static String		Tour_Segmenter_Column_speed;
+
+	public static String		Tour_Segmenter_Column_speed_tooltip;
+
+	public static String		Tour_Segmenter_Column_time;
+
+	public static String		Tour_Segmenter_Column_time_tooltip;
+
+	public static String		Tour_Segmenter_Label_default_tolerance;
+
+	public static String		Tour_Segmenter_Label_tolerance;
+
 	public static String		TourAnalyzer_Label_average;
 	public static String		TourAnalyzer_Label_difference;
 	public static String		TourAnalyzer_Label_left;
@@ -376,93 +567,64 @@ public class Messages extends NLS {
 	public static String		TourAnalyzer_Label_right;
 	public static String		TourAnalyzer_Label_value;
 
-	public static String		TourBook_Action_delete_selected_tours;
-	public static String		TourBook_Action_set_tour_type;
-	public static String		TourBook_Action_set_tour_type_with_dlg;
-	public static String		TourBook_Combo_statistic_tooltip;
-	public static String		TourBook_Combo_year_tooltip;
-	public static String		TourBook_Dlg_set_tour_type_msg;
-	public static String		TourBook_Dlg_set_tour_type_title;
-	public static String		TourBook_Label_chart_title;
-	public static String		TourBook_Label_no_tour_is_selected;
-	public static String		TourBook_Lable_no_statistic_is_selected;
+	public static String		TourChart_Property_chart_type_bar;
 
-	public static String		TourChartProperty_chart_type_bar;
-	public static String		TourChartProperty_chart_type_line;
-	public static String		TourChartProperty_check_customize_value_clipping;
-	public static String		TourChartProperty_check_customize_value_computing;
-	public static String		TourChartProperty_label_chart_type;
-	public static String		TourChartProperty_label_time_slices;
+	public static String		TourChart_Property_chart_type_line;
+
+	public static String		TourChart_Property_check_customize_value_clipping;
+
+	public static String		TourChart_Property_check_customize_value_computing;
+
+	public static String		TourChart_Property_label_chart_type;
+
+	public static String		TourChart_Property_label_time_slices;
 
 	public static String		TourData_Label_device_marker;
 	public static String		TourData_Label_new_marker;
 
-	public static String		TourDatabase_load_all_tours;
-	public static String		TourDatabase_update_tour;
+	public static String		TourMap_Wizard_Action_deselect_all;
 
-	public static String		TourMapWizard_Action_deselect_all;
-	public static String		TourMapWizard_Action_select_all;
-	public static String		TourMapWizard_Action_select_all_tours;
-	public static String		TourMapWizard_Column_h;
-	public static String		TourMapWizard_Column_h_tooltip;
-	public static String		TourMapWizard_Column_km;
-	public static String		TourMapWizard_Column_km_tooltip;
-	public static String		TourMapWizard_Column_m;
-	public static String		TourMapWizard_Column_m_tooltip;
-	public static String		TourMapWizard_Column_tour;
-	public static String		TourMapWizard_Error_select_reference_tours;
-	public static String		TourMapWizard_Error_tour_must_be_selected;
-	public static String		TourMapWizard_Group_chart_title;
-	public static String		TourMapWizard_Group_selected_tour;
-	public static String		TourMapWizard_Group_selected_tour_2;
-	public static String		TourMapWizard_Label_a_tour_is_not_selected;
-	public static String		TourMapWizard_Label_page_message;
-	public static String		TourMapWizard_Label_reference_tour;
-	public static String		TourMapWizard_Msg_select_reference_tour;
-	public static String		TourMapWizard_Page_compared_tours_title;
-	public static String		TourMapWizard_Page_reference_tour_title;
-	public static String		TourMapWizard_Wizard_title;
+	public static String		TourMap_Wizard_Action_select_all;
 
-	public static String		TourMarker_Column_horizontal_offset;
-	public static String		TourMarker_Column_horizontal_offset_tooltip;
-	public static String		TourMarker_Column_km;
-	public static String		TourMarker_Column_km_tooltip;
-	public static String		TourMarker_Column_remark;
-	public static String		TourMarker_Column_time;
-	public static String		TourMarker_Column_vertical_offset;
-	public static String		TourMarker_Column_vertical_offset_tooltip;
-	public static String		TourMarker_Position_horizontal_above_centered;
-	public static String		TourMarker_Position_horizontal_above_left;
-	public static String		TourMarker_Position_horizontal_above_right;
-	public static String		TourMarker_Position_horizontal_below_centered;
-	public static String		TourMarker_Position_horizontal_below_left;
-	public static String		TourMarker_Position_horizontal_below_right;
-	public static String		TourMarker_Position_horizontal_left;
-	public static String		TourMarker_Position_horizontal_right;
-	public static String		TourMarker_Position_vertical_above;
-	public static String		TourMarker_Position_vertical_below;
-	public static String		TourMarker_Position_vertical_chart_bottom;
-	public static String		TourMarker_Position_vertical_chart_top;
+	public static String		TourMap_Wizard_Action_select_all_tours;
 
-	public static String		TourProperties_label_location;
-	public static String		TourProperties_label_time;
+	public static String		TourMap_Wizard_Column_h;
 
-	public static String		TourSegmenter_Column_altimeter_down;
-	public static String		TourSegmenter_Column_altimeter_down_tooltip;
-	public static String		TourSegmenter_Column_altimeter_up;
-	public static String		TourSegmenter_Column_altimeter_up_tooltip;
-	public static String		TourSegmenter_Column_altitude;
-	public static String		TourSegmenter_Column_altitude_tooltip;
-	public static String		TourSegmenter_Column_distance;
-	public static String		TourSegmenter_Column_distance_tooltip;
-	public static String		TourSegmenter_Column_gradient;
-	public static String		TourSegmenter_Column_gradient_tooltip;
-	public static String		TourSegmenter_Column_speed;
-	public static String		TourSegmenter_Column_speed_tooltip;
-	public static String		TourSegmenter_Column_time;
-	public static String		TourSegmenter_Column_time_tooltip;
-	public static String		TourSegmenter_Label_default_tolerance;
-	public static String		TourSegmenter_Label_tolerance;
+	public static String		TourMap_Wizard_Column_h_tooltip;
+
+	public static String		TourMap_Wizard_Column_km;
+
+	public static String		TourMap_Wizard_Column_km_tooltip;
+
+	public static String		TourMap_Wizard_Column_m;
+
+	public static String		TourMap_Wizard_Column_m_tooltip;
+
+	public static String		TourMap_Wizard_Column_tour;
+
+	public static String		TourMap_Wizard_Error_select_reference_tours;
+
+	public static String		TourMap_Wizard_Error_tour_must_be_selected;
+
+	public static String		TourMap_Wizard_Group_chart_title;
+
+	public static String		TourMap_Wizard_Group_selected_tour;
+
+	public static String		TourMap_Wizard_Group_selected_tour_2;
+
+	public static String		TourMap_Wizard_Label_a_tour_is_not_selected;
+
+	public static String		TourMap_Wizard_Label_page_message;
+
+	public static String		TourMap_Wizard_Label_reference_tour;
+
+	public static String		TourMap_Wizard_Msg_select_reference_tour;
+
+	public static String		TourMap_Wizard_Page_compared_tours_title;
+
+	public static String		TourMap_Wizard_Page_reference_tour_title;
+
+	public static String		TourMap_Wizard_Wizard_title;
 
 	public static String		UI_Label_no_chart_is_selected;
 

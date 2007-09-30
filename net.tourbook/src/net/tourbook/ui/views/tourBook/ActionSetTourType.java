@@ -98,7 +98,7 @@ public class ActionSetTourType extends Action {
 		fViewPart = tourBookView;
 		fUseDialog = useDialog;
 
-		setText(Messages.TourBook_Action_set_tour_type_with_dlg);
+		setText(Messages.Tour_Book_Action_set_tour_type_with_dlg);
 
 		setEnabled(false);
 	}
@@ -208,8 +208,8 @@ public class ActionSetTourType extends Action {
 		dialog.setContentProvider(new TourTypeContentProvider());
 		dialog.setLabelProvider(new TourTypeLabelProvider());
 
-		dialog.setTitle(Messages.TourBook_Dlg_set_tour_type_title);
-		dialog.setMessage(Messages.TourBook_Dlg_set_tour_type_msg);
+		dialog.setTitle(Messages.Tour_Book_Dlg_set_tour_type_title);
+		dialog.setMessage(Messages.Tour_Book_Dlg_set_tour_type_msg);
 		dialog.setDialogBoundsSettings(getDialogSettings(), Dialog.DIALOG_PERSISTLOCATION
 				| Dialog.DIALOG_PERSISTSIZE);
 

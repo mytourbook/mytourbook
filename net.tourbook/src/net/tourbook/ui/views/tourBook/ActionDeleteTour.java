@@ -37,10 +37,10 @@ public class ActionDeleteTour extends Action {
 
 		this.tourView = tourBookView;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
 
-		setText(Messages.TourBook_Action_delete_selected_tours);
+		setText(Messages.Tour_Book_Action_delete_selected_tours);
 
 		setEnabled(false);
 	}

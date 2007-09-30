@@ -130,8 +130,8 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 
 			setToolTipText(Messages.Tour_Map_action_save_marker);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save));
-			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_disabled));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
 
 			setEnabled(false);
 		}
@@ -150,8 +150,8 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 
 			setToolTipText(Messages.Tour_Map_Action_undo_marker_position);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_undo_edit));
-			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_undo_edit_disabled));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit_disabled));
 
 			setEnabled(false);
 		}

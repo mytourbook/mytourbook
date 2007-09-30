@@ -241,7 +241,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		shell.setText(Messages.MarkerDialog_Dlg_title);
+		shell.setText(Messages.Dlg_TourMarker_Dlg_title);
 
 		/*
 		 * don't close the dialog when the enter key is pressed, except when the close button has
@@ -282,8 +282,8 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		restoreDialogSettings();
 
-		setTitle(Messages.MarkerDialog_Dlg_title);
-		setMessage(Messages.MarkerDialog_Dlg_Message);
+		setTitle(Messages.Dlg_TourMarker_Dlg_title);
+		setMessage(Messages.Dlg_TourMarker_Dlg_Message);
 
 		// update marker viewer
 		fMarkerViewer.setInput(this);
@@ -334,30 +334,30 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		// column: km
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
-		tvc.getColumn().setText(Messages.TourMarker_Column_km);
-		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_km_tooltip);
+		tvc.getColumn().setText(Messages.Tour_Marker_Column_km);
+		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
 		tvc.setLabelProvider(labelProvider);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8),
 				false));
 
 		// column: marker
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
-		tvc.getColumn().setText(Messages.TourMarker_Column_remark);
+		tvc.getColumn().setText(Messages.Tour_Marker_Column_remark);
 		tvc.setLabelProvider(labelProvider);
 		tableLayouter.addColumnData(new ColumnWeightData(1, true));
 
 		// column: horizontal offset
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
-		tvc.getColumn().setText(Messages.TourMarker_Column_horizontal_offset);
-		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_horizontal_offset_tooltip);
+		tvc.getColumn().setText(Messages.Tour_Marker_Column_horizontal_offset);
+		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_horizontal_offset_tooltip);
 		tvc.setLabelProvider(labelProvider);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
 				false));
 
 		// column: vertical offset
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
-		tvc.getColumn().setText(Messages.TourMarker_Column_vertical_offset);
-		tvc.getColumn().setToolTipText(Messages.TourMarker_Column_vertical_offset_tooltip);
+		tvc.getColumn().setText(Messages.Tour_Marker_Column_vertical_offset);
+		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_vertical_offset_tooltip);
 		tvc.setLabelProvider(labelProvider);
 		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
 				false));
@@ -460,7 +460,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		 * container: marker list
 		 */
 		label = new Label(fMarkerListContainer, SWT.NONE);
-		label.setText(Messages.MarkerDialog_Label_markers);
+		label.setText(Messages.Dlg_TourMarker_Label_markers);
 		gd = new GridData();
 		gd.horizontalSpan = 3;
 		label.setLayoutData(gd);
@@ -469,8 +469,8 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		// button: delete
 		fBtnDelete = new Button(fMarkerListContainer, SWT.NONE);
-		fBtnDelete.setText(Messages.MarkerDialog_Button_delete);
-		fBtnDelete.setToolTipText(Messages.MarkerDialog_Button_delete_tooltip);
+		fBtnDelete.setText(Messages.Dlg_TourMarker_Button_delete);
+		fBtnDelete.setToolTipText(Messages.Dlg_TourMarker_Button_delete_tooltip);
 		fBtnDelete.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -482,8 +482,8 @@ public class MarkerDialog extends TitleAreaDialog {
 		// button: undo
 		fBtnUndo = new Button(fMarkerListContainer, SWT.NONE);
 		fBtnUndo.getLayoutData();
-		fBtnUndo.setText(Messages.MarkerDialog_Button_undo);
-		fBtnUndo.setToolTipText(Messages.MarkerDialog_Button_undo_tooltip);
+		fBtnUndo.setText(Messages.Dlg_TourMarker_Button_undo);
+		fBtnUndo.setToolTipText(Messages.Dlg_TourMarker_Button_undo_tooltip);
 		fBtnUndo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -509,7 +509,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		 * marker name
 		 */
 		label = new Label(markerSettingsContainer, SWT.NONE);
-		label.setText(Messages.MarkerDialog_Label_marker_name);
+		label.setText(Messages.Dlg_TourMarker_Label_marker_name);
 
 		fTextMarkerName = new Text(markerSettingsContainer, SWT.BORDER);
 
@@ -529,7 +529,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		 * marker position
 		 */
 		label = new Label(markerSettingsContainer, SWT.NONE);
-		label.setText(Messages.MarkerDialog_Label_position);
+		label.setText(Messages.Dlg_TourMarker_Label_position);
 		gd = new GridData(SWT.NONE, SWT.CENTER, false, false);
 		gd.horizontalIndent = 10;
 		label.setLayoutData(gd);
@@ -572,7 +572,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		 * x-offset
 		 */
 		label = new Label(fOffsetContainer, SWT.NONE);
-		label.setText(Messages.MarkerDialog_Label_horizontal_offset);
+		label.setText(Messages.Dlg_TourMarker_Label_horizontal_offset);
 
 		fScaleX = new Scale(fOffsetContainer, SWT.NONE);
 		fScaleX.setMinimum(0);
@@ -602,7 +602,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		 * y-offset
 		 */
 		label = new Label(fOffsetContainer, SWT.NONE);
-		label.setText(Messages.MarkerDialog_Label_vertical_offset);
+		label.setText(Messages.Dlg_TourMarker_Label_vertical_offset);
 		gd = new GridData(SWT.NONE, SWT.CENTER, false, false);
 		gd.horizontalIndent = 5;
 		label.setLayoutData(gd);
@@ -635,8 +635,8 @@ public class MarkerDialog extends TitleAreaDialog {
 		 * button: reset offset
 		 */
 		fBtnReset = new Button(fOffsetContainer, SWT.NONE);
-		fBtnReset.setText(Messages.MarkerDialog_Button_reset_offset);
-		fBtnReset.setToolTipText(Messages.MarkerDialog_Button_reset_offset_tooltip);
+		fBtnReset.setText(Messages.Dlg_TourMarker_Button_reset_offset);
+		fBtnReset.setToolTipText(Messages.Dlg_TourMarker_Button_reset_offset_tooltip);
 		gd = new GridData(SWT.NONE, SWT.CENTER, false, false);
 		gd.horizontalIndent = 5;
 		fBtnReset.setLayoutData(gd);
@@ -742,8 +742,8 @@ public class MarkerDialog extends TitleAreaDialog {
 		MessageBox msgBox = new MessageBox(fTourChart.getShell(), SWT.ICON_QUESTION
 				| SWT.YES
 				| SWT.NO);
-		msgBox.setText(Messages.MarkerDialog_MsgBox_delete_marker_title);
-		msgBox.setMessage(NLS.bind(Messages.MarkerDialog_MsgBox_delete_marker_message,
+		msgBox.setText(Messages.Dlg_TourMarker_MsgBox_delete_marker_title);
+		msgBox.setMessage(NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message,
 				(selectedMarker).getLabel()));
 
 		if (msgBox.open() == SWT.YES) {

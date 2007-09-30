@@ -906,8 +906,8 @@ public class TourManager {
 		 * distance
 		 */
 		final ChartDataXSerie xDataDistance = new ChartDataXSerie(tourData.distanceSerie);
-		xDataDistance.setLabel(Messages.Tour_Label_distance);
-		xDataDistance.setUnitLabel(Messages.Tour_Label_distance_unit);
+		xDataDistance.setLabel(Messages.Tour_Properties_Label_distance);
+		xDataDistance.setUnitLabel(Messages.Tour_Properties_Label_distance_unit);
 		xDataDistance.setValueDivisor(1000);
 		xDataDistance.setRgbLine(new RGB[] { new RGB(0, 0, 0) });
 
@@ -915,8 +915,8 @@ public class TourManager {
 		 * time
 		 */
 		final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.timeSerie);
-		xDataTime.setLabel(Messages.Tour_Label_time);
-		xDataTime.setUnitLabel(Messages.Tour_Label_time_unit);
+		xDataTime.setLabel(Messages.Tour_Properties_Label_time);
+		xDataTime.setUnitLabel(Messages.Tour_Properties_Label_time_unit);
 		xDataTime.setRgbLine(new RGB[] { new RGB(0, 0, 0) });
 		xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_SECOND);
 

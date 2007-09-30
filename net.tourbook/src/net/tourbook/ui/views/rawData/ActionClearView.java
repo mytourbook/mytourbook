@@ -17,8 +17,8 @@ public class ActionClearView extends Action {
 		setText(Messages.RawData_Action_clear_view);
 		setToolTipText(Messages.RawData_Action_clear_view_tooltip);
 		
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_remove_all));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_remove_all_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__remove_all));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__remove_all_disabled));
 	}
 
 	public void run() {

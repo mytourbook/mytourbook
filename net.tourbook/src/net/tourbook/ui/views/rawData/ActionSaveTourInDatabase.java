@@ -85,9 +85,9 @@ public class ActionSaveTourInDatabase extends Action {
 
 		fViewPart = viewPart;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_tour));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_tour));
 		setDisabledImageDescriptor(TourbookPlugin
-				.getImageDescriptor(Messages.Image_save_tour_disabled));
+				.getImageDescriptor(Messages.Image__save_tour_disabled));
 
 		// setToolTipText("Save tour(s) in the database so it can be viewed in
 		// other views");

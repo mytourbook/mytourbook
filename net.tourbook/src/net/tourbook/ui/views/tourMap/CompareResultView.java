@@ -110,7 +110,7 @@ public class CompareResultView extends ViewPart {
 	 */
 	private final LocalResourceManager	resManager					= new LocalResourceManager(JFaceResources.getResources());
 
-	private ImageDescriptor				dbImgDescriptor				= TourbookPlugin.getImageDescriptor(Messages.Image_database);
+	private ImageDescriptor				dbImgDescriptor				= TourbookPlugin.getImageDescriptor(Messages.Image__database);
 
 	private final NumberFormat			nf							= NumberFormat.getNumberInstance();
 
@@ -119,8 +119,8 @@ public class CompareResultView extends ViewPart {
 	private class ActionSaveComparedTours extends Action {
 
 		ActionSaveComparedTours() {
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save));
-			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_save_disabled));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
 
 			setText(Messages.Compare_Result_Action_save_checked_tours);
 			setToolTipText(Messages.Compare_Result_Action_save_checked_tours_tooltip);

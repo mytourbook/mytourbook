@@ -36,7 +36,7 @@ public class ActionGraphAnalyzer extends Action {
 		super(null, AS_PUSH_BUTTON);
 
 		setToolTipText(Messages.Tour_Action_graph_analyzer_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_chart_analyzer));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__chart_analyzer));
 
 		fChart = chart;
 	}

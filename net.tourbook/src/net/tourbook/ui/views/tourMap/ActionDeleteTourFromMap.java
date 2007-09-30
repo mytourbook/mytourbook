@@ -42,8 +42,8 @@ public class ActionDeleteTourFromMap extends Action {
 
 		fTourView = view;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_delete_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
 
 		setText(Messages.Tour_Map_Action_delete_tours);
 
@@ -52,7 +52,6 @@ public class ActionDeleteTourFromMap extends Action {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public void run() {
 
 		TreeViewer tourViewer = fTourView.getTourViewer();
@@ -94,9 +93,9 @@ public class ActionDeleteTourFromMap extends Action {
 		String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
 
 		MessageDialog dialog = new MessageDialog(fTourView.getSite().getShell(),
-				Messages.Tour_Map_Dlg_delete_refTour_title,
+				Messages.Tour_Map_dlg_delete_refTour_title,
 				null,
-				Messages.Tour_Map_Dlg_delete_refTour_msg,
+				Messages.Tour_Map_dlg_delete_refTour_msg,
 				MessageDialog.QUESTION,
 				buttons,
 				1);
@@ -171,9 +170,9 @@ public class ActionDeleteTourFromMap extends Action {
 		String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
 
 		MessageDialog dialog = new MessageDialog(fTourView.getSite().getShell(),
-				Messages.Tour_Map_Dlg_delete_comparedTour_title,
+				Messages.Tour_Map_dlg_delete_comparedTour_title,
 				null,
-				Messages.Tour_Map_Dlg_delete_comparedTour_msg,
+				Messages.Tour_Map_dlg_delete_comparedTour_msg,
 				MessageDialog.QUESTION,
 				buttons,
 				1);

@@ -106,7 +106,7 @@ public class WizardPageReferenceTour extends WizardPage {
 
 	protected WizardPageReferenceTour(String pageName) {
 		super(pageName);
-		setTitle(Messages.TourMapWizard_Page_reference_tour_title);
+		setTitle(Messages.TourMap_Wizard_Page_reference_tour_title);
 	}
 
 	public void createControl(Composite parent) {
@@ -117,7 +117,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		pageContainer.setLayout(new GridLayout());
 
 		Label label = new Label(pageContainer, SWT.NONE);
-		label.setText(Messages.TourMapWizard_Label_reference_tour);
+		label.setText(Messages.TourMap_Wizard_Label_reference_tour);
 
 		// fSashContainer = new SashForm(pageContainer, SWT.HORIZONTAL);
 		// fSashContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
@@ -177,7 +177,7 @@ public class WizardPageReferenceTour extends WizardPage {
 
 		TableColumn column;
 		column = new TableColumn(table, SWT.NONE);
-		column.setText(Messages.TourMapWizard_Column_tour);
+		column.setText(Messages.TourMap_Wizard_Column_tour);
 		layouter.addColumnData(new ColumnWeightData(1, false));
 
 		fRefTourViewer = new CheckboxTableViewer(table);
@@ -218,7 +218,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		container.setLayout(gridLayout);
 
 		Button buttonSelectAll = new Button(container, SWT.NONE);
-		buttonSelectAll.setText(Messages.TourMapWizard_Action_select_all);
+		buttonSelectAll.setText(Messages.TourMap_Wizard_Action_select_all);
 		setButtonLayoutData(buttonSelectAll);
 		buttonSelectAll.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -229,7 +229,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		});
 
 		Button buttonDeselectAll = new Button(container, SWT.NONE);
-		buttonDeselectAll.setText(Messages.TourMapWizard_Action_deselect_all);
+		buttonDeselectAll.setText(Messages.TourMap_Wizard_Action_deselect_all);
 		setButtonLayoutData(buttonDeselectAll);
 		buttonDeselectAll.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -263,7 +263,7 @@ public class WizardPageReferenceTour extends WizardPage {
 			xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
 
 			fChartGroup.setText(NLS.bind(refTour.getLabel() + ": " //$NON-NLS-1$
-					+ Messages.TourMapWizard_Group_chart_title, TourManager.getTourDate(tourData)));
+					+ Messages.TourMap_Wizard_Group_chart_title, TourManager.getTourDate(tourData)));
 
 			fRefTourChart.updateChart(chartDataModel);
 
@@ -336,12 +336,12 @@ public class WizardPageReferenceTour extends WizardPage {
 
 		if (checkedElements.length == 0) {
 			setPageComplete(false);
-			setErrorMessage(Messages.TourMapWizard_Error_select_reference_tours);
+			setErrorMessage(Messages.TourMap_Wizard_Error_select_reference_tours);
 			return false;
 		} else {
 			setPageComplete(true);
 			setErrorMessage(null);
-			setMessage(Messages.TourMapWizard_Msg_select_reference_tour);
+			setMessage(Messages.TourMap_Wizard_Msg_select_reference_tour);
 			return true;
 		}
 	}

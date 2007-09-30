@@ -71,11 +71,11 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	static final int			ADJUST_ALTITUDE_END				= 4;
 
 	static final String[]		adjustTypes						= new String[] {
-			Messages.Dlg_Adjust_Altitude_Type_Show_original,
-			Messages.Dlg_Adjust_Altitude_Type_adjust_whole_tour,
-			Messages.Dlg_Adjust_Altitude_Type_start_and_end,
-			Messages.Dlg_Adjust_Altitude_Type_adjust_height,
-			Messages.Dlg_Adjust_Altitude_Type_adjust_end		};
+			Messages.Dlg_AdjustAltitude_Type_Show_original,
+			Messages.Dlg_AdjustAltitude_Type_adjust_whole_tour,
+			Messages.Dlg_AdjustAltitude_Type_start_and_end,
+			Messages.Dlg_AdjustAltitude_Type_adjust_height,
+			Messages.Dlg_AdjustAltitude_Type_adjust_end		};
 
 	private TourChart			fSelectedTourChart;
 	private TourChart			fTourChart;
@@ -345,7 +345,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		super.configureShell(shell);
 
 		// set window title
-		shell.setText(Messages.Dlg_Adjust_Altitude_Title_window);
+		shell.setText(Messages.Dlg_AdjustAltitude_Title_window);
 	}
 
 	/**
@@ -407,7 +407,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		dlgContainer.setLayout(gl);
 		dlgContainer.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		setTitle(Messages.Dlg_Adjust_Altitude_Title_dlg);
+		setTitle(Messages.Dlg_AdjustAltitude_Title_dlg);
 
 		/*
 		 * create adjust type combo
@@ -419,7 +419,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		typeContainer.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 
 		label = new Label(typeContainer, SWT.NONE);
-		label.setText(Messages.Dlg_Adjust_Altitude_Label_adjustment_type);
+		label.setText(Messages.Dlg_AdjustAltitude_Label_adjustment_type);
 
 		fComboAdjustType = new Combo(typeContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboAdjustType.setVisibleItemCount(20);
@@ -486,15 +486,15 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		startContainer.setLayoutData(new GridData(SWT.LEAD, SWT.FILL, true, true));
 
 		label = new Label(startContainer, SWT.NONE);
-		label.setText(Messages.Dlg_Adjust_Altitude_Label_start_altitude);
-		label.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_start_altitude_tooltip);
+		label.setText(Messages.Dlg_AdjustAltitude_Label_start_altitude);
+		label.setToolTipText(Messages.Dlg_AdjustAltitude_Label_start_altitude_tooltip);
 
 		fSpinnerNewStartAlti = createAltiField(startContainer);
 		fSpinnerNewStartAlti.setData(new Integer(ALTI_ID_START));
-		fSpinnerNewStartAlti.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_start_altitude_tooltip);
+		fSpinnerNewStartAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_start_altitude_tooltip);
 
 		fLblOldStartAlti = new Label(startContainer, SWT.NONE);
-		fLblOldStartAlti.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_original_values);
+		fLblOldStartAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_original_values);
 
 		/*
 		 * field: max altitude
@@ -504,15 +504,15 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		maxContainer.setLayoutData(new GridData(SWT.CENTER, SWT.DEFAULT, true, false));
 
 		label = new Label(maxContainer, SWT.NONE);
-		label.setText(Messages.Dlg_Adjust_Altitude_Label_max_altitude);
-		label.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_max_altitude_tooltip);
+		label.setText(Messages.Dlg_AdjustAltitude_Label_max_altitude);
+		label.setToolTipText(Messages.Dlg_AdjustAltitude_Label_max_altitude_tooltip);
 
 		fSpinnerNewMaxAlti = createAltiField(maxContainer);
 		fSpinnerNewMaxAlti.setData(new Integer(ALTI_ID_MAX));
-		fSpinnerNewMaxAlti.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_max_altitude_tooltip);
+		fSpinnerNewMaxAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_max_altitude_tooltip);
 
 		fLblOldMaxAlti = new Label(maxContainer, SWT.NONE);
-		fLblOldMaxAlti.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_original_values);
+		fLblOldMaxAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_original_values);
 
 		/*
 		 * group: keep start/bottom
@@ -520,7 +520,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		Group keepContainer = new Group(maxContainer, SWT.NONE);
 		keepContainer.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 3, 1));
 		keepContainer.setLayout(new GridLayout(1, false));
-		keepContainer.setText(Messages.Dlg_Adjust_Altitude_Group_options);
+		keepContainer.setText(Messages.Dlg_AdjustAltitude_Group_options);
 
 		final SelectionAdapter keepButtonSelectionAdapter = new SelectionAdapter() {
 			@Override
@@ -530,15 +530,15 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		};
 
 		fRadioKeepBottom = new Button(keepContainer, SWT.RADIO);
-		fRadioKeepBottom.setText(Messages.Dlg_Adjust_Altitude_Radio_keep_bottom_altitude);
-		fRadioKeepBottom.setToolTipText(Messages.Dlg_Adjust_Altitude_Radio_keep_bottom_altitude_tooltip);
+		fRadioKeepBottom.setText(Messages.Dlg_AdjustAltitude_Radio_keep_bottom_altitude);
+		fRadioKeepBottom.setToolTipText(Messages.Dlg_AdjustAltitude_Radio_keep_bottom_altitude_tooltip);
 		fRadioKeepBottom.setLayoutData(new GridData());
 		fRadioKeepBottom.addSelectionListener(keepButtonSelectionAdapter);
 		// fRadioKeepBottom.setSelection(true);
 
 		fRadioKeepStart = new Button(keepContainer, SWT.RADIO);
-		fRadioKeepStart.setText(Messages.Dlg_Adjust_Altitude_Radio_keep_start_altitude);
-		fRadioKeepStart.setToolTipText(Messages.Dlg_Adjust_Altitude_Radio_keep_start_altitude_tooltip);
+		fRadioKeepStart.setText(Messages.Dlg_AdjustAltitude_Radio_keep_start_altitude);
+		fRadioKeepStart.setToolTipText(Messages.Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip);
 		fRadioKeepStart.setLayoutData(new GridData());
 		fRadioKeepStart.addSelectionListener(keepButtonSelectionAdapter);
 
@@ -550,15 +550,15 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		endContainer.setLayoutData(new GridData(SWT.TRAIL, SWT.DEFAULT, true, false));
 
 		label = new Label(endContainer, SWT.NONE);
-		label.setText(Messages.Dlg_Adjust_Altitude_Label_end_altitude);
-		label.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_end_altitude_tooltip);
+		label.setText(Messages.Dlg_AdjustAltitude_Label_end_altitude);
+		label.setToolTipText(Messages.Dlg_AdjustAltitude_Label_end_altitude_tooltip);
 
 		fSpinnerNewEndAlti = createAltiField(endContainer);
 		fSpinnerNewEndAlti.setData(new Integer(ALTI_ID_END));
-		fSpinnerNewEndAlti.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_end_altitude_tooltip);
+		fSpinnerNewEndAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_end_altitude_tooltip);
 
 		fLblOldEndAlti = new Label(endContainer, SWT.NONE);
-		fLblOldEndAlti.setToolTipText(Messages.Dlg_Adjust_Altitude_Label_original_values);
+		fLblOldEndAlti.setToolTipText(Messages.Dlg_AdjustAltitude_Label_original_values);
 
 		/*
 		 * button container
@@ -577,8 +577,8 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		 * checkbox: adjust y-axis scale
 		 */
 		fChkScaleYAxis = new Button(buttonContainer, SWT.CHECK);
-		fChkScaleYAxis.setText(Messages.Dlg_Adjust_Altitude_Checkbox_autoscale_yaxis);
-		fChkScaleYAxis.setToolTipText(Messages.Dlg_Adjust_Altitude_Checkbox_autoscale_yaxis_tooltip);
+		fChkScaleYAxis.setText(Messages.Dlg_AdjustAltitude_Checkbox_autoscale_yaxis);
+		fChkScaleYAxis.setToolTipText(Messages.Dlg_AdjustAltitude_Checkbox_autoscale_yaxis_tooltip);
 		fChkScaleYAxis.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -590,8 +590,8 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		 * button: reset
 		 */
 		fBtnReset = new Button(buttonContainer, SWT.NONE);
-		fBtnReset.setText(Messages.Dlg_Adjust_Altitude_Button_reset_altitudes);
-		fBtnReset.setToolTipText(Messages.Dlg_Adjust_Altitude_Button_reset_altitudes_tooltip);
+		fBtnReset.setText(Messages.Dlg_AdjustAltitude_Button_reset_altitudes);
+		fBtnReset.setToolTipText(Messages.Dlg_AdjustAltitude_Button_reset_altitudes_tooltip);
 		fBtnReset.setLayoutData(new GridData(SWT.TRAIL, SWT.DEFAULT, true, false));
 		fBtnReset.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -604,8 +604,8 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		 * button: compare values
 		 */
 		fBtnCompare = new Button(buttonContainer, SWT.NONE);
-		fBtnCompare.setText(Messages.Dlg_Adjust_Altitude_Button_show_original_values);
-		fBtnCompare.setToolTipText(Messages.Dlg_Adjust_Altitude_Button_show_original_values_tooltip);
+		fBtnCompare.setText(Messages.Dlg_AdjustAltitude_Button_show_original_values);
+		fBtnCompare.setToolTipText(Messages.Dlg_AdjustAltitude_Button_show_original_values_tooltip);
 		fBtnCompare.setLayoutData(new GridData(SWT.TRAIL, SWT.DEFAULT, false, false));
 		fBtnCompare.addKeyListener(new KeyAdapter() {
 
@@ -692,7 +692,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 			fChkScaleYAxis.setEnabled(false);
 
-			setMessage(Messages.Dlg_Adjust_Altitude_Message_select_type);
+			setMessage(Messages.Dlg_AdjustAltitude_Message_select_type);
 			break;
 
 		case ADJUST_ALTITUDE_START_AND_END:
@@ -703,21 +703,21 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			fRadioKeepStart.setEnabled(true);
 			fRadioKeepBottom.setEnabled(true);
 
-			setMessage(Messages.Dlg_Adjust_Altitude_Message_adjust_start_and_end);
+			setMessage(Messages.Dlg_AdjustAltitude_Message_adjust_start_and_end);
 			break;
 
 		case ADJUST_ALTITUDE_WHOLE_TOUR:
 
 			fSpinnerNewStartAlti.setEnabled(true);
 
-			setMessage(Messages.Dlg_Adjust_Altitude_Message_adjust_whole_tour);
+			setMessage(Messages.Dlg_AdjustAltitude_Message_adjust_whole_tour);
 			break;
 
 		case ADJUST_ALTITUDE_END:
 
 			fSpinnerNewEndAlti.setEnabled(true);
 
-			setMessage(Messages.Dlg_Adjust_Altitude_Message_adjust_end);
+			setMessage(Messages.Dlg_AdjustAltitude_Message_adjust_end);
 			break;
 
 		case ADJUST_ALTITUDE_MAX_HEIGHT:
@@ -727,7 +727,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			fRadioKeepStart.setEnabled(true);
 			fRadioKeepBottom.setEnabled(true);
 
-			setMessage(Messages.Dlg_Adjust_Altitude_Message_adjust_max);
+			setMessage(Messages.Dlg_AdjustAltitude_Message_adjust_max);
 			break;
 
 		default:

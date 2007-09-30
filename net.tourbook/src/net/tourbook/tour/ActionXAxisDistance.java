@@ -31,7 +31,7 @@ public class ActionXAxisDistance extends Action {
 		this.fTourChart = tourChart;
 
 		setToolTipText(Messages.Tour_Action_show_distance_on_x_axis_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_show_distance_on_x_axis));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__show_distance_on_x_axis));
 
 		setChecked(!tourChart.fTourChartConfig.showTimeOnXAxis);
 	}

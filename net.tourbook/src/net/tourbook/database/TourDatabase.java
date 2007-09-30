@@ -1160,7 +1160,7 @@ public class TourDatabase {
 		monitor.subTask(Messages.Database_Monitor_persistent_service_task);
 		emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
-		monitor.subTask(Messages.TourDatabase_load_all_tours);
+		monitor.subTask(Messages.Tour_Database_load_all_tours);
 		ArrayList<Long> tourList = getAllTourIds();
 
 		// loop over all tours and calculate and set new columns
@@ -1170,7 +1170,7 @@ public class TourDatabase {
 			TourData tourData = getTourData(tourId);
 
 			if (monitor != null) {
-				String msg = NLS.bind(Messages.TourDatabase_update_tour, new Object[] {
+				String msg = NLS.bind(Messages.Tour_Database_update_tour, new Object[] {
 						tourIdx++,
 						tourList.size() });
 				monitor.subTask(msg);

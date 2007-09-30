@@ -384,7 +384,7 @@ public class TourSegmenterView extends ViewPart {
 			super(Messages.Action_open_tour_segmenter, SWT.TOGGLE);
 			setToolTipText(Messages.Action_open_tour_segmenter_tooltip);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_tour_segmenter));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_segmenter));
 		}
 
 		@Override
@@ -430,7 +430,7 @@ public class TourSegmenterView extends ViewPart {
 		 * scale: tolerance
 		 */
 		label = new Label(segmentContainer, SWT.NONE);
-		label.setText(Messages.TourSegmenter_Label_tolerance);
+		label.setText(Messages.Tour_Segmenter_Label_tolerance);
 
 		fScaleTolerance = new Scale(segmentContainer, SWT.HORIZONTAL);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
@@ -456,7 +456,7 @@ public class TourSegmenterView extends ViewPart {
 		gd.verticalAlignment = GridData.CENTER;
 		gd.widthHint = 30;
 		fLabelToleranceValue = new Label(segmentContainer, SWT.NONE);
-		fLabelToleranceValue.setText(Messages.TourSegmenter_Label_default_tolerance);
+		fLabelToleranceValue.setText(Messages.Tour_Segmenter_Label_default_tolerance);
 		fLabelToleranceValue.setLayoutData(gd);
 	}
 
@@ -483,23 +483,23 @@ public class TourSegmenterView extends ViewPart {
 
 		// the first column is always left aligned
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.TourSegmenter_Column_time);
-		tc.setToolTipText(Messages.TourSegmenter_Column_time_tooltip);
+		tc.setText(Messages.Tour_Segmenter_Column_time);
+		tc.setToolTipText(Messages.Tour_Segmenter_Column_time_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 11));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.TourSegmenter_Column_distance);
-		tc.setToolTipText(Messages.TourSegmenter_Column_distance_tooltip);
+		tc.setText(Messages.Tour_Segmenter_Column_distance);
+		tc.setToolTipText(Messages.Tour_Segmenter_Column_distance_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 10));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.TourSegmenter_Column_altitude);
-		tc.setToolTipText(Messages.TourSegmenter_Column_altitude_tooltip);
+		tc.setText(Messages.Tour_Segmenter_Column_altitude);
+		tc.setToolTipText(Messages.Tour_Segmenter_Column_altitude_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 10));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.TourSegmenter_Column_speed);
-		tc.setToolTipText(Messages.TourSegmenter_Column_speed_tooltip);
+		tc.setText(Messages.Tour_Segmenter_Column_speed);
+		tc.setToolTipText(Messages.Tour_Segmenter_Column_speed_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 9));
 
 		tc.addSelectionListener(new SelectionAdapter() {
@@ -511,8 +511,8 @@ public class TourSegmenterView extends ViewPart {
 		});
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.TourSegmenter_Column_gradient);
-		tc.setToolTipText(Messages.TourSegmenter_Column_gradient_tooltip);
+		tc.setText(Messages.Tour_Segmenter_Column_gradient);
+		tc.setToolTipText(Messages.Tour_Segmenter_Column_gradient_tooltip);
 		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 8));
 		tc.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -523,13 +523,13 @@ public class TourSegmenterView extends ViewPart {
 		});
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.TourSegmenter_Column_altimeter_up);
-		tc.setToolTipText(Messages.TourSegmenter_Column_altimeter_up_tooltip);
+		tc.setText(Messages.Tour_Segmenter_Column_altimeter_up);
+		tc.setToolTipText(Messages.Tour_Segmenter_Column_altimeter_up_tooltip);
 		tableLayouter.addColumnData(new ColumnWeightData(5, true));
 
 		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.TourSegmenter_Column_altimeter_down);
-		tc.setToolTipText(Messages.TourSegmenter_Column_altimeter_down_tooltip);
+		tc.setText(Messages.Tour_Segmenter_Column_altimeter_down);
+		tc.setToolTipText(Messages.Tour_Segmenter_Column_altimeter_down_tooltip);
 		tableLayouter.addColumnData(new ColumnWeightData(5, true));
 
 		/*

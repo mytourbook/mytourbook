@@ -249,57 +249,57 @@ public class TourChart extends Chart {
 				COMMAND_ID_GRAPH_ALTITUDE,
 				Messages.Graph_Label_Altitude,
 				Messages.Tour_Action_graph_altitude_tooltip,
-				Messages.Image_graph_altitude,
+				Messages.Image__graph_altitude,
 				null);
 
 		createGraphActionProxy(TourManager.GRAPH_SPEED,
 				COMMAND_ID_GRAPH_SPEED,
 				Messages.Graph_Label_Speed,
 				Messages.Tour_Action_graph_speed_tooltip,
-				Messages.Image_graph_speed,
+				Messages.Image__graph_speed,
 				null);
 
 		createGraphActionProxy(TourManager.GRAPH_ALTIMETER,
 				COMMAND_ID_GRAPH_ALTIMETER,
 				Messages.Graph_Label_Altimeter,
 				Messages.Tour_Action_graph_altimeter_tooltip,
-				Messages.Image_graph_altimeter,
+				Messages.Image__graph_altimeter,
 				null);
 
 		createGraphActionProxy(TourManager.GRAPH_PULSE,
 				COMMAND_ID_GRAPH_PULSE,
 				Messages.Graph_Label_Heartbeat,
 				Messages.Tour_Action_graph_heartbeat_tooltip,
-				Messages.Image_graph_heartbeat,
+				Messages.Image__graph_heartbeat,
 				null);
 
 		createGraphActionProxy(TourManager.GRAPH_TEMPERATURE,
 				COMMAND_ID_GRAPH_TEMPERATURE,
 				Messages.Graph_Label_Temperature,
 				Messages.Tour_Action_graph_temperature_tooltip,
-				Messages.Image_graph_temperature,
+				Messages.Image__graph_temperature,
 				null);
 
 		createGraphActionProxy(TourManager.GRAPH_CADENCE,
 				COMMAND_ID_GRAPH_CADENCE,
 				Messages.Graph_Label_Cadence,
 				Messages.Tour_Action_graph_cadence_tooltip,
-				Messages.Image_graph_cadence,
+				Messages.Image__graph_cadence,
 				null);
 
 		createGraphActionProxy(TourManager.GRAPH_GRADIENT,
 				COMMAND_ID_GRAPH_GRADIENT,
 				Messages.Graph_Label_Gradiend,
 				Messages.Tour_Action_graph_gradient_tooltip,
-				Messages.Image_graph_gradient,
+				Messages.Image__graph_gradient,
 				null);
 
 		createGraphActionProxy(TourManager.GRAPH_TOUR_COMPARE,
 				COMMAND_ID_GRAPH_TOUR_COMPARE,
 				Messages.Graph_Label_Tour_Compare,
 				Messages.Tour_Action_graph_tour_compare_tooltip,
-				Messages.Image_graph_tour_compare,
-				Messages.Image_graph_tour_compare_disabled);
+				Messages.Image__graph_tour_compare,
+				Messages.Image__graph_tour_compare_disabled);
 	}
 
 	/**

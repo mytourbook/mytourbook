@@ -45,7 +45,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		fTBM = tbm;
 
 		setToolTipText(Messages.Tour_Action_chart_options_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_tour_options));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_options));
 
 		setMenuCreator(this);
 	}

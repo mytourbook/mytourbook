@@ -94,7 +94,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class RawDataView extends ViewPart {
 
-	private static final String			FILESTRING_SEPARATOR		= "|"; //$NON-NLS-1$
+	private static final String			FILESTRING_SEPARATOR		= "|";											//$NON-NLS-1$
 
 	public static final String			ID							= "net.tourbook.views.rawData.RawDataView";	//$NON-NLS-1$
 
@@ -349,9 +349,9 @@ public class RawDataView extends ViewPart {
 
 	private void createResources() {
 
-		imageDatabaseDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image_database);
-		imageDatabaseOtherPersonDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image_database_other_person);
-		imageDatabasePlaceholderDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image_database_placeholder);
+		imageDatabaseDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__database);
+		imageDatabaseOtherPersonDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person);
+		imageDatabasePlaceholderDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__database_placeholder);
 
 		try {
 			final Display display = Display.getCurrent();

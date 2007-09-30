@@ -60,7 +60,7 @@ public class TourChartPropertyView extends ViewPart {
 		 * chart type
 		 */
 		label = new Label(container, SWT.NONE);
-		label.setText(Messages.TourChartProperty_label_chart_type);
+		label.setText(Messages.TourChart_Property_label_chart_type);
 
 		// group: units for the x-axis
 		Composite groupChartType = new Composite(container, SWT.NONE);
@@ -72,7 +72,7 @@ public class TourChartPropertyView extends ViewPart {
 		{
 			// radio: line chart
 			fRadioLineChartType = new Button(groupChartType, SWT.RADIO);
-			fRadioLineChartType.setText(Messages.TourChartProperty_chart_type_line);
+			fRadioLineChartType.setText(Messages.TourChart_Property_chart_type_line);
 			fRadioLineChartType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent event) {
@@ -82,7 +82,7 @@ public class TourChartPropertyView extends ViewPart {
 
 			// radio: bar chart
 			fRadioBarChartType = new Button(groupChartType, SWT.RADIO);
-			fRadioBarChartType.setText(Messages.TourChartProperty_chart_type_bar);
+			fRadioBarChartType.setText(Messages.TourChart_Property_chart_type_bar);
 			fRadioBarChartType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent event) {
@@ -93,7 +93,7 @@ public class TourChartPropertyView extends ViewPart {
 
 		// check: use custom settings to compute values
 		fChkUseCustomComputeSettings = new Button(container, SWT.CHECK);
-		fChkUseCustomComputeSettings.setText(Messages.TourChartProperty_check_customize_value_computing);
+		fChkUseCustomComputeSettings.setText(Messages.TourChart_Property_check_customize_value_computing);
 		fChkUseCustomComputeSettings.setLayoutData(new GridData(SWT.NONE,
 				SWT.NONE,
 				false,
@@ -111,7 +111,7 @@ public class TourChartPropertyView extends ViewPart {
 		 * computed value time slice
 		 */
 		label = new Label(container, SWT.NONE);
-		label.setText(Messages.TourChartProperty_label_time_slices);
+		label.setText(Messages.TourChart_Property_label_time_slices);
 		gd = new GridData();
 		gd.horizontalIndent = 20;
 		label.setLayoutData(gd);
@@ -137,7 +137,7 @@ public class TourChartPropertyView extends ViewPart {
 		 * value clipping
 		 */
 		fChkUseCustomClipSettings = new Button(container, SWT.CHECK);
-		fChkUseCustomClipSettings.setText(Messages.TourChartProperty_check_customize_value_clipping);
+		fChkUseCustomClipSettings.setText(Messages.TourChart_Property_check_customize_value_clipping);
 		fChkUseCustomClipSettings.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 2, 1));
 		fChkUseCustomClipSettings.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -150,7 +150,7 @@ public class TourChartPropertyView extends ViewPart {
 		 * time slice to clip values
 		 */
 		label = new Label(container, SWT.NONE);
-		label.setText(Messages.TourChartProperty_label_time_slices);
+		label.setText(Messages.TourChart_Property_label_time_slices);
 		gd = new GridData();
 		gd.horizontalIndent = 20;
 		label.setLayoutData(gd);

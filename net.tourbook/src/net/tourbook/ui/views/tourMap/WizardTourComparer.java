@@ -31,7 +31,7 @@ public class WizardTourComparer extends Wizard {
 
 	public WizardTourComparer() {
 		setDialogSettings();
-		setWindowTitle(Messages.TourMapWizard_Wizard_title);
+		setWindowTitle(Messages.TourMap_Wizard_Wizard_title);
 	}
 
 	@Override

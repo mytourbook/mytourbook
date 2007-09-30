@@ -32,7 +32,7 @@ public class ActionZoomFitGraph extends Action {
 
 		setToolTipText(Messages.Tour_Action_zoom_fit_to_window);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_fit_to_window));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__fit_to_window));
 	}
 
 	public void run() {

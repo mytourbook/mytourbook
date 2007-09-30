@@ -69,7 +69,7 @@ public class PositionedWizardDialog extends WizardDialog {
 		}
 
 		// set icon for the window 
-		fWindowIcon = TourbookPlugin.getImageDescriptor(Messages.Image_view_compare_wizard)
+		fWindowIcon = TourbookPlugin.getImageDescriptor(Messages.Image__view_compare_wizard)
 				.createImage();
 		setDefaultImage(fWindowIcon);
 
