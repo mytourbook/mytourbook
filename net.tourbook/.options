@@ -1,0 +1,12 @@
+#org.eclipse.ui/debug=true
+#org.eclipse.ui/trace/keyBindings=true
+#org.eclipse.ui/trace/keyBindings.verbose=true
+#org.eclipse.ui/trace/sources=true
+#org.eclipse.ui/trace/handlers=true
+#org.eclipse.ui/trace/handlers.verbose=true
+#org.eclipse.ui/trace/handlers.verbose.commandId=org.eclipse.ui.edit.copy
+#org.eclipse.ui/trace/handlers.verbose.commandId=org.eclipse.jdt.ui.navigate.open.type
+#org.eclipse.ui/trace/contexts=true
+#org.eclipse.ui/trace/contexts.verbose=true
+
+org.eclipse.ui/perf/showHeapStatus=true

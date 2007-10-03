@@ -133,6 +133,8 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	private NumberFormat		fNF								= NumberFormat.getNumberInstance();
 
+//	private Image				fWindowIcon;
+
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
 		public void dispose() {}
@@ -208,6 +210,12 @@ public class MarkerDialog extends TitleAreaDialog {
 		fTourData = tourData;
 		fInitialTourMarker = initialTourMarker;
 
+//		// set icon for this dialog window 
+//		fWindowIcon = TourbookPlugin.getImageDescriptor(Messages.Image__marker_editor)
+//				.createImage();
+//
+//		setDefaultImage(fWindowIcon);
+
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 	}
@@ -240,8 +248,17 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	@Override
 	protected void configureShell(Shell shell) {
+
 		super.configureShell(shell);
 		shell.setText(Messages.Dlg_TourMarker_Dlg_title);
+
+//		shell.addDisposeListener(new DisposeListener() {
+//			public void widgetDisposed(DisposeEvent e) {
+//				if (fWindowIcon.isDisposed() == false) {
+//					fWindowIcon.dispose();
+//				}
+//			}
+//		});
 
 		/*
 		 * don't close the dialog when the enter key is pressed, except when the close button has
@@ -654,7 +671,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		setButtonLayoutData(fBtnReset);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void enableControls() {
 
 		if (fSelectedTourMarker != null) {
@@ -732,7 +749,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	/**
 	 * remove selected markers from the view and update dependened structures
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void onDeleteMarker() {
 
 		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();

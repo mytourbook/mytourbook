@@ -117,7 +117,7 @@ public class Garmin305DeviceDataReader extends TourbookDevice {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 
 			//parse using builder to get DOM representation of the XML file
-			dom = db.parse(fileName);
+			dom = db.parse("file:" + fileName);
 			return true;
 
 		} catch (ParserConfigurationException pce) {

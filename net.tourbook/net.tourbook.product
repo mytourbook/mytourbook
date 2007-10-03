@@ -40,6 +40,7 @@
       </win>
    </launcher>
 
+
    <vm>
    </vm>
 
@@ -72,13 +73,13 @@
    </plugins>
 
    <features>
-      <feature id="net.tourbook.statistics.feature" version="0.8.3"/>
       <feature id="net.tourbook.ext.derby.feature" version="10.1.2.1"/>
       <feature id="net.tourbook.ext.ejb3.feature" version="0.8.7"/>
       <feature id="net.tourbook.ext.eclipse" version="0.8.3"/>
       <feature id="org.eclipse.rcp" version="3.3.0.v20070607-8y8eE8NEbsN3X_fjWS8HPNG"/>
-      <feature id="net.tourbook.device.feature" version="0.8.9.v20070707"/>
-      <feature id="net.tourbook.feature" version="0.9.0.dev"/>
+      <feature id="net.tourbook.device.feature" version="1.0.0.v20071005"/>
+      <feature id="net.tourbook.feature" version="1.0.0.v20071005"/>
+      <feature id="net.tourbook.statistics.feature" version="1.0.0.v20071005"/>
    </features>
 
 </product>

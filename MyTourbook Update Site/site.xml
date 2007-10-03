@@ -3,13 +3,16 @@
    <description url="http://mytourbook.sourceforge.net/updates/">
       MyTourbook Update Site
    </description>
-   <feature url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.feature_0.8.5.jar" id="net.tourbook.device.feature" version="0.8.5">
+   <feature url="http://downloads.sourceforge.net/sourceforge/mytourbook/net.tourbook.feature_1.0.0.v20071005.jar" id="net.tourbook.feature" version="1.0.0.v20071005">
       <category name="MyTourbook"/>
    </feature>
-   <archive path="net.tourbook.device.feature_0.8.5.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.feature_0.8.5.jar"/>
-   <archive path="plugins/net.tourbook.device_0.8.5.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device_0.8.5.jar"/>
-   <archive path="plugins/net.tourbook.device.hac4_0.8.5.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.hac4_0.8.5.jar"/>
-   <archive path="plugins/net.tourbook.device.hac4pro_0.8.5.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.hac4pro_0.8.5.jar"/>
-   <archive path="plugins/net.tourbook.device.hac5_0.8.5.jar" url="http://mesh.dl.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.hac5_0.8.5.jar"/>
+   <feature url="http://downloads.sourceforge.net/sourceforge/mytourbook/net.tourbook.device.feature_1.0.0.v20071005.jar" id="net.tourbook.device.feature" version="1.0.0.v20071005">
+      <category name="MyTourbook"/>
+   </feature>
+   <feature url="http://downloads.sourceforge.net/sourceforge/mytourbook/net.tourbook.statistics.feature_1.0.0.v20071005.jar" id="net.tourbook.statistics.feature" version="1.0.0.v20071005">
+      <category name="MyTourbook"/>
+   </feature>
+   <archive path="net.tourbook.feature_1.0.0.v20071005.jar" url="http://downloads.sourceforge.net/sourceforge/mytourbook/net.tourbook.feature_1.0.0.v20071005.jar"/>
+   <archive path="plugins/net.tourbook_1.0.0.v20071005.jar" url="http://downloads.sourceforge.net/sourceforge/mytourbook/net.tourbook_1.0.0.v20071005.jar"/>
    <category-def name="MyTourbook" label=""/>
 </site>

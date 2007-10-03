@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.device.feature"
       label="%Feature_Name"
-      version="0.8.9.v20070707"
+      version="1.0.0.v20071005"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -411,6 +411,13 @@ Public License instead of this License.
 
    <plugin
          id="net.tourbook.device.crp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.device.garmin305"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -115,20 +115,20 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	private int					fOldAltiInputMax;
 	private int					fOldAltiInputStart;
 
+	//	private Image				fWindowIcon;
+
 	public AdjustAltitudeDialog(Shell parentShell, IStructuredSelection selection) {
 
 		super(parentShell);
 
-		// make dialog resizable
-		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
+		setShell();
 	}
 
 	public AdjustAltitudeDialog(Shell parentShell, TourChart tourChart) {
 
 		super(parentShell);
 
-		// make the dialog resizable
-		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
+		setShell();
 
 		fSelectedTourChart = tourChart;
 
@@ -346,6 +346,14 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		// set window title
 		shell.setText(Messages.Dlg_AdjustAltitude_Title_window);
+
+//		shell.addDisposeListener(new DisposeListener() {
+//			public void widgetDisposed(DisposeEvent e) {
+//				if (fWindowIcon.isDisposed() == false) {
+//					fWindowIcon.dispose();
+//				}
+//			}
+//		});
 	}
 
 	/**
@@ -648,7 +656,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		return fDialogArea;
 	}
 
-	@SuppressWarnings("unused") //$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private void dumpMinMax(int[] altiSrc, String place) {
 
 		int minAltiSrc1 = altiSrc[0];
@@ -968,5 +976,17 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		for (int altiIndex = 0; altiIndex < altitudeSerie.length; altiIndex++) {
 			altitudeSerie[altiIndex] = fOriginalAltitudes[altiIndex];
 		}
+	}
+
+	private void setShell() {
+
+//		// set icon for this dialog window 
+//		fWindowIcon = TourbookPlugin.getImageDescriptor(Messages.Image__adjust_altitude)
+//				.createImage();
+//
+//		setDefaultImage(fWindowIcon);
+
+		// make dialog resizable
+		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 	}
 }

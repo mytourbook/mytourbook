@@ -246,6 +246,8 @@ public class Messages extends NLS {
 
 	public static String		Image__link;
 
+	public static String	Image__marker_editor;
+
 	public static String		Image__open_tour_segmenter;
 
 	public static String		Image__remove_all;
