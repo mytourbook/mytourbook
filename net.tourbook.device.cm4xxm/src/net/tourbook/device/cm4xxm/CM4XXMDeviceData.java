@@ -13,11 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-/*
- * Author: Wolfgang Schramm Created: 23.05.2005
- */
 
 package net.tourbook.device.cm4xxm;
+
+/*
+ * author & copyright: Markus Stipp
+ */
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -27,8 +28,6 @@ import net.tourbook.data.DataUtil;
 
 /**
  * Contains all data read from the device except the tour data
- * 
- * @author Wolfgang Schramm
  */
 public class CM4XXMDeviceData {
 
