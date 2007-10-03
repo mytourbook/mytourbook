@@ -18,6 +18,8 @@ package net.tourbook.tour;
 // author:	Wolfgang Schramm 
 // created:	6. July 2007
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ISliderMoveListener;
@@ -25,6 +27,7 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.views.tourBook.SelectionRemovedTours;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,7 +48,7 @@ import org.eclipse.ui.part.EditorPart;
 
 public class TourEditor extends EditorPart {
 
-	public static final String				ID				= "net.tourbook.tour.TourEditor"; //$NON-NLS-1$
+	public static final String				ID				= "net.tourbook.tour.TourEditor";	//$NON-NLS-1$
 
 	private TourEditorInput					fEditorInput;
 
@@ -117,6 +120,21 @@ public class TourEditor extends EditorPart {
 				if (selection instanceof SelectionChartXSliderPosition) {
 
 					fTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
+
+				} else if (!selection.isEmpty() && selection instanceof SelectionRemovedTours) {
+
+					final SelectionRemovedTours tourSelection = (SelectionRemovedTours) selection;
+					final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
+					final long tourId = fTourData.getTourId().longValue();
+
+					// find the current tour id in the removed tour id's
+					for (ITourItem tourItem : removedTours) {
+						if (tourId == tourItem.getTourId().longValue()) {
+
+							// close this editor
+							getSite().getPage().closeEditor(TourEditor.this, false);
+						}
+					}
 				}
 			}
 		};

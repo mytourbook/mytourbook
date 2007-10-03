@@ -45,13 +45,13 @@ public class ActionDeleteTour extends Action {
 		setEnabled(false);
 	}
 
+	@Override
 	public void run() {
 
 		SelectionRemovedTours selectionRemovedTours = new SelectionRemovedTours();
 
 		// get selected reference tours
-		IStructuredSelection selection = (IStructuredSelection) tourView
-				.getTourViewer()
+		IStructuredSelection selection = (IStructuredSelection) tourView.getTourViewer()
 				.getSelection();
 
 		// delete selected tours
@@ -64,7 +64,7 @@ public class ActionDeleteTour extends Action {
 		selectionRemovedTours.removedTours.clear();
 	}
 
-	private void deleteTours(Iterator selection, SelectionRemovedTours selectionRemovedTours) {
+	private void deleteTours(Iterator<?> selection, SelectionRemovedTours selectionRemovedTours) {
 
 		ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
 
@@ -74,7 +74,7 @@ public class ActionDeleteTour extends Action {
 		TreeViewerItem firstSelectedParent = null;
 
 		// loop: selected tours
-		for (Iterator selTour = selection; selTour.hasNext();) {
+		for (Iterator<?> selTour = selection; selTour.hasNext();) {
 
 			Object ttiTourItem = selTour.next();
 
@@ -110,12 +110,12 @@ public class ActionDeleteTour extends Action {
 		}
 
 		// refresh the tree viewer
-		tourView.getTourViewer().remove(
-				removedTours.toArray(new TVITourBookTour[removedTours.size()]));
+		tourView.getTourViewer()
+				.remove(removedTours.toArray(new TVITourBookTour[removedTours.size()]));
 
 		/*
-		 * select the item which is before the removed items, this is not yet
-		 * finished because there are multiple possibilities
+		 * select the item which is before the removed items, this is not yet finished because there
+		 * are multiple possibilities
 		 */
 
 		if (firstSelectedParent != null) {
@@ -138,8 +138,8 @@ public class ActionDeleteTour extends Action {
 			} else {
 
 				/*
-				 * it's possible that the parent does not have any children,
-				 * then also this parent must be removed (to be done later)
+				 * it's possible that the parent does not have any children, then also this parent
+				 * must be removed (to be done later)
 				 */
 				nextSelectedTreeItem = firstSelectedParent;
 				// for (TreeViewerItem tourParent : tourParents) {
@@ -147,8 +147,7 @@ public class ActionDeleteTour extends Action {
 				// }
 			}
 
-			tourView.getTourViewer().setSelection(
-					new StructuredSelection(nextSelectedTreeItem),
+			tourView.getTourViewer().setSelection(new StructuredSelection(nextSelectedTreeItem),
 					true);
 		}
 

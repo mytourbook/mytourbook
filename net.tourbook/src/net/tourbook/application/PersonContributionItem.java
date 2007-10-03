@@ -41,11 +41,9 @@ import org.eclipse.ui.IMemento;
 
 public class PersonContributionItem extends CustomControlContribution {
 
-	private static final String		ID			= "net.tourbook.clientselector";	//$NON-NLS-1$
+	private static final String		ID		= "net.tourbook.clientselector";	//$NON-NLS-1$
 
-	private static final String		ALL_PEOPLE	= Messages.App_People_item_all;
-
-	static TourbookPlugin			plugin		= TourbookPlugin.getDefault();
+	static TourbookPlugin			plugin	= TourbookPlugin.getDefault();
 
 	private Combo					fComboPeople;
 
@@ -93,6 +91,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		plugin.getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
+	@Override
 	protected Control createControl(Composite parent) {
 
 		Composite control = createPeopleComboBox(parent);
@@ -116,7 +115,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		// container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		fComboPeople = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-		fComboPeople.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
+		fComboPeople.setLayoutData(new GridData(SWT.NONE, SWT.TOP, false, false));
 		fComboPeople.setVisibleItemCount(20);
 		fComboPeople.setToolTipText(Messages.App_People_tooltip);
 
@@ -127,6 +126,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		});
 
 		fComboPeople.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				int selectedIndex = fComboPeople.getSelectionIndex();
 				if (selectedIndex == -1) {
@@ -154,7 +154,11 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		fComboPeople.removeAll();
 
-		fComboPeople.add(ALL_PEOPLE);
+		/*
+		 * removed the dash in the "All People" string because the whole item was not displayed on
+		 * mac osx
+		 */
+		fComboPeople.add(Messages.App_People_item_all);
 
 		fPeople = TourDatabase.getTourPeople();
 
@@ -173,8 +177,7 @@ public class PersonContributionItem extends CustomControlContribution {
 	 * fire event that client has changed
 	 */
 	void fireEventNewPersonIsSelected() {
-		plugin.getPreferenceStore().setValue(
-				ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED,
+		plugin.getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED,
 				Math.random());
 	}
 
@@ -214,8 +217,8 @@ public class PersonContributionItem extends CustomControlContribution {
 		Long lastPersonId;
 		try {
 
-			lastPersonId = plugin.getDialogSettings().getLong(
-					ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID);
+			lastPersonId = plugin.getDialogSettings()
+					.getLong(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID);
 
 			// try to reselect the last person
 			reselectPerson(lastPersonId);

@@ -420,10 +420,12 @@ public class TourCompareManager {
 
 		// remove the breaks from the time
 		int timeInterval = compareTourDataTime[1] - compareTourDataTime[0];
-		int ignoreTimeSlices = TourManager.getIgnoreTimeSlices(compareTourDataTime,
-				compareStartIndex,
-				compareEndIndex,
-				10 / timeInterval);
+		int ignoreTimeSlices = timeInterval == 0
+				? 0
+				: TourManager.getIgnoreTimeSlices(compareTourDataTime,
+						compareStartIndex,
+						compareEndIndex,
+						10 / timeInterval);
 
 		int recordingTime = compareTourDataTime[compareEndIndex]
 				- compareTourDataTime[compareStartIndex];

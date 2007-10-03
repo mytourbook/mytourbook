@@ -49,9 +49,9 @@ import org.eclipse.ui.part.PageBook;
 
 public class TourMapViewReferenceTour extends TourChartViewPart {
 
-	public static final String	ID	= "net.tourbook.views.tourMap.referenceTourView";	//$NON-NLS-1$
+	public static final String	ID				= "net.tourbook.views.tourMap.referenceTourView";	//$NON-NLS-1$
 
-	private long				fActiveRefId;
+	private long				fActiveRefId	= -1;
 
 	private PageBook			fPageBook;
 	private Label				fPageNoChart;

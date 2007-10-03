@@ -87,7 +87,7 @@ public class TourChartView extends ViewPart {
 		public void fillContextMenu(IMenuManager menuMgr) {
 
 			final ActionEditTour actionEditTour = new ActionEditTour(TourChartView.this);
-			actionEditTour.setEnabled(fTourData != null);
+			actionEditTour.setEnabled(fTourData != null && fTourData.getTourPerson() != null);
 
 			menuMgr.add(actionEditTour);
 		}
@@ -191,7 +191,9 @@ public class TourChartView extends ViewPart {
 
 		fTourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(Event event) {
-				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
+				if (fTourData.getTourPerson() != null) {
+					TourManager.getInstance().openTourInEditor(fTourData.getTourId());
+				}
 			}
 		});
 

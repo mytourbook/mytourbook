@@ -116,7 +116,7 @@ public class TourManager {
 		final int timeInterval = timeSerie[1] - timeSerie[0];
 
 		// remove breaks from the time
-		int ignoreTimeSlices = getIgnoreTimeSlices(timeSerie,
+		int ignoreTimeSlices = timeInterval == 0 ? 0 : getIgnoreTimeSlices(timeSerie,
 				startIndex,
 				endIndex,
 				10 / timeInterval);
@@ -722,12 +722,13 @@ public class TourManager {
 
 					if (timeSlice > 0) {
 
-						final float time = rightTime
-								- leftTime
-								- (getIgnoreTimeSlices(distanceValues,
+						final int ignoreTimeSlices = timeSlice == 0
+								? 0
+								: getIgnoreTimeSlices(distanceValues,
 										valuesIndexLeft,
 										valuesIndexRight,
-										10 / timeSlice) * timeSlice);
+										10 / timeSlice);
+						final float time = rightTime - leftTime - (ignoreTimeSlices * timeSlice);
 
 						final float distance = rightDistance - leftDistance;
 						final float speed = distance / time * 3.6f;
@@ -767,12 +768,13 @@ public class TourManager {
 
 					int timeSlice = timeValues[1] - timeValues[0];
 					if (timeSlice > 0) {
-						final float time = rightTime
-								- leftTime
-								- (getIgnoreTimeSlices(distanceValues,
+						final int ignoreTimeSlices = timeSlice == 0
+								? 0
+								: getIgnoreTimeSlices(distanceValues,
 										valuesIndexLeft,
 										valuesIndexRight,
-										10 / timeSlice) * timeSlice);
+										10 / timeSlice);
+						final float time = rightTime - leftTime - (ignoreTimeSlices * timeSlice);
 
 						return (((rightAltitude - leftAltitude) / time) * 3600);
 					}

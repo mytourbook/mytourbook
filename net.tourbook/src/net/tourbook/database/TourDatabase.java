@@ -119,7 +119,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tours in database
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private static ArrayList<Long> getAllTourIds() {
 
 		ArrayList<Long> tourList = new ArrayList<Long>();
@@ -149,7 +149,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourBike> getTourBikes() {
 
 		ArrayList<TourBike> bikeList = new ArrayList<TourBike>();
@@ -194,7 +194,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour people in the db sorted by last/first name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourPerson> getTourPeople() {
 
 		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
@@ -218,7 +218,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourType> getTourTypes() {
 
 		ArrayList<TourType> tourTypeList = new ArrayList<TourType>();
@@ -288,7 +288,7 @@ public class TourDatabase {
 	 */
 	public static boolean removeTour(long tourId) {
 
-		boolean returnResult = false;
+		boolean isRemoved = false;
 
 		EntityManager em = TourDatabase.getInstance().getEntityManager();
 		EntityTransaction ts = em.getTransaction();
@@ -308,12 +308,16 @@ public class TourDatabase {
 			if (ts.isActive()) {
 				ts.rollback();
 			} else {
-				returnResult = true;
+				isRemoved = true;
 			}
 			em.close();
 		}
 
-		return returnResult;
+		if (isRemoved) {
+			TourManager.getInstance().removeTourFromCache(tourId);
+		}
+
+		return isRemoved;
 	}
 
 	/**

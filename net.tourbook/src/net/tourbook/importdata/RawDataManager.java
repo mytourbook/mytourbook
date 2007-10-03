@@ -28,7 +28,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
-import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -96,17 +95,14 @@ public class RawDataManager {
 
 	public void executeImportFromDevice() {
 
-		showRawDataView();
-
 		new WizardImportDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 				new WizardImportData(),
 				Messages.Import_Wizard_Dlg_title).open();
 
+		showRawDataView();
 	}
 
 	public void executeImportFromDeviceDirect() {
-
-		showRawDataView();
 
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
@@ -123,14 +119,14 @@ public class RawDataManager {
 		importWizard.setAutoDownload();
 
 		dialog.open();
+
+		showRawDataView();
 	}
 
 	/**
 	 * import tour data from a file
 	 */
 	public void executeImportFromFile() {
-
-		showRawDataView();
 
 		// setup open dialog
 		final FileDialog fileDialog = new FileDialog(Display.getCurrent().getActiveShell(),
@@ -208,9 +204,12 @@ public class RawDataManager {
 
 					fRawDataView.updateViewer();
 					fRawDataView.selectFirstTour();
+
+					showRawDataView();
 				}
 			}
 		});
+
 	}
 
 	private void showRawDataView() {
@@ -220,7 +219,7 @@ public class RawDataManager {
 
 		try {
 			// show raw data perspective
-			workbench.showPerspective(PerspectiveFactoryRawData.PERSPECTIVE_ID, window);
+//			workbench.showPerspective(PerspectiveFactoryRawData.PERSPECTIVE_ID, window);
 
 			// show raw data view
 			fRawDataView = (RawDataView) window.getActivePage().showView(RawDataView.ID,
@@ -385,7 +384,7 @@ public class RawDataManager {
 	public void updateTourDataFromDb() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				EntityManager em = TourDatabase.getInstance().getEntityManager();

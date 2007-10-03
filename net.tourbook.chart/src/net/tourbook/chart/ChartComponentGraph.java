@@ -316,12 +316,8 @@ public class ChartComponentGraph extends Canvas {
 
 	int									fGraphAlpha				= 0xc0;
 
-//	private boolean						fIsRangeMarkerVisible	= true;
+	protected boolean					fIsLayerImageDirty;
 
-	/**
-	 * 
-	 */
-//	private boolean						fIsRangeMarkerDirty;
 	/**
 	 * Constructor
 	 * 
@@ -1324,6 +1320,10 @@ public class ChartComponentGraph extends Canvas {
 		final int devYBottom = drawingData.getDevYBottom();
 		final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
 
+		if (barRectangeleSeries == null) {
+			return;
+		}
+
 		final int markerWidth = BAR_MARKER_WIDTH;
 		final int markerWidth2 = markerWidth / 2;
 
@@ -1446,9 +1446,17 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		if (fIsGraphDirty) {
+
 			drawGraphImage();
 
 			// prevent flickering the graph
+
+			/*
+			 * mac osx is still flickering, added the drawChartImage in version 1.0
+			 */
+			if (fGraphImage != null) {
+				drawChartImage(gc);
+			}
 			return;
 		}
 
@@ -1466,10 +1474,14 @@ public class ChartComponentGraph extends Canvas {
 
 		drawCustomLayers();
 
+		drawChartImage(gc);
+	}
+
+	private void drawChartImage(final GC gc) {
+
 		final boolean isLayerImageVisible = fIsXSliderVisible
 				|| fIsYSliderVisible
 				|| fIsXMarkerMoved
-//				|| fIsRangeMarkerVisible
 				|| fIsSelectionVisible;
 
 		if (isLayerImageVisible) {
@@ -1481,6 +1493,7 @@ public class ChartComponentGraph extends Canvas {
 		int imageScrollPosition = 0;
 
 		if (graphRect.width < getDevVisibleChartWidth()) {
+
 			// image is smaller than client area, the image is drawn in the top
 			// left corner and the free are is painted with background color
 
@@ -1673,10 +1686,12 @@ public class ChartComponentGraph extends Canvas {
 				// force a redraw
 				fIsGraphDirty = false;
 
-				// fIsSliderDirty = true;
-				// isLayerAboveDirty = true;
-				// fIsSelectionDirty = true;
+				/*
+				 * force the layer image to be redrawn
+				 */
+				fIsLayerImageDirty = true;
 
+//				System.out.println("redraw graph image");
 				redraw();
 
 //				long endTime = System.currentTimeMillis();
@@ -1840,10 +1855,10 @@ public class ChartComponentGraph extends Canvas {
 		final Rectangle graphRect = fCumstomLayerImage.getBounds();
 
 		/*
-		 * when the existing slider image has the same size as a new slider image, it will redrawn
-		 * if it's set to dirty
+		 * check if the layer image needs to be redrawn
 		 */
-		if (fIsSliderDirty == false
+		if (fIsLayerImageDirty == false
+				&& fIsSliderDirty == false
 				&& fIsSelectionDirty == false
 				&& fIsHoveredBarDirty == false
 				&& fLayerImage != null) {
@@ -1907,6 +1922,7 @@ public class ChartComponentGraph extends Canvas {
 
 		gc.dispose();
 
+		fIsLayerImageDirty = false;
 	}
 
 	private void drawLineGraph(final GC gc, final ChartDrawingData drawingData) {

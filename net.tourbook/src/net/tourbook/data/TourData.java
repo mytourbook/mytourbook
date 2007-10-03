@@ -100,7 +100,7 @@ public class TourData {
 	 * <p>
 	 * is not used any more since 6.12.2006 but is necessary because it's a field in the database
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private int					distance;
 
 	/**
@@ -211,15 +211,15 @@ public class TourData {
 	@Basic(optional = false)
 	private SerieData			serieData;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourMarker>		tourMarkers						= new HashSet<TourMarker>();
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourReference>	tourReferences					= new HashSet<TourReference>();
 
-	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)
 	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
 
 	/**
@@ -596,10 +596,13 @@ public class TourData {
 			segmentSerieDistance[segmentIndex] = segment.distance = distanceEnd - distanceStart;
 
 			segmentSerieTime[segmentIndex] = segment.recordingTime = recordingTime;
-			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = (recordingTime - (TourManager.getIgnoreTimeSlices(distanceSerie,
-					segmentStartIndex,
-					segmentEndIndex,
-					10 / timeSlice) * timeSlice));
+			final int ignoreTimeSlices = timeSlice == 0
+					? 0
+					: TourManager.getIgnoreTimeSlices(distanceSerie,
+							segmentStartIndex,
+							segmentEndIndex,
+							10 / timeSlice);
+			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = (recordingTime - (ignoreTimeSlices * timeSlice));
 
 			int altitudeUp = 0;
 			int altitudeDown = 0;
@@ -1323,10 +1326,12 @@ public class TourData {
 
 		int maxIndex = Math.max(0, timeSerie.length - 1);
 
-		int ignoreTimeSlices = TourManager.getIgnoreTimeSlices(distanceSerie,
-				0,
-				maxIndex,
-				10 / deviceTimeInterval);
+		int ignoreTimeSlices = deviceTimeInterval == 0
+				? 0
+				: TourManager.getIgnoreTimeSlices(distanceSerie,
+						0,
+						maxIndex,
+						10 / deviceTimeInterval);
 
 		tourDrivingTime = Math.max(0, timeSerie[maxIndex] - (ignoreTimeSlices * deviceTimeInterval));
 

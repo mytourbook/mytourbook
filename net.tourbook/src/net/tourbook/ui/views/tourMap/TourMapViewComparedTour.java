@@ -75,7 +75,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 	 * key for the {@link TourCompared} instance or <code>-1</code> when it's not saved in the
 	 * database
 	 */
-	private long								fCTCompareId;
+	private long								fCTCompareId	= -1;
 
 	/**
 	 * Tour Id for the displayed compared tour
@@ -514,8 +514,8 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 		MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_QUESTION
 				| SWT.YES
 				| SWT.NO/*
-				 * | SWT.CANCEL
-				 */);
+						 * | SWT.CANCEL
+						 */);
 
 		msgBox.setText(Messages.Tour_Map_dlg_save_compared_tour_title);
 		msgBox.setMessage(NLS.bind(Messages.Tour_Map_dlg_save_compared_tour_message,
