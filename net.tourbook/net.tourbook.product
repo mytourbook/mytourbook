@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.1"?>
 
-<product name="MyToorbook" id="net.tourbook.product" application="net.tourbook.application" useFeatures="true">
+<product name="MyTourbook" id="net.tourbook.product" application="net.tourbook.application" useFeatures="true">
 
    <aboutInfo>
       <image path="/net.tourbook/icons/application/tourbook-about-250.gif"/>
@@ -39,7 +39,6 @@
             winLargeHigh="/net.tourbook/icons/application/tourbook48-32.bmp"/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>

@@ -18,7 +18,7 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="net.tourbook.application"
-            name="MyToorbook">
+            name="MyTourbook">
          <property
                name="windowImages"
                value="icons/application/tourbook16.gif,icons/application/tourbook32.gif,icons/application/tourbook48.gif,icons/application/tourbook64.gif,icons/application/tourbook128.gif"/>
@@ -30,7 +30,7 @@
                value="icons/application/tourbook-about-250.gif"/>
          <property
                name="appName"
-               value="MyToorbook">
+               value="MyTourbook">
          </property>
          <property
                name="startupForegroundColor"
