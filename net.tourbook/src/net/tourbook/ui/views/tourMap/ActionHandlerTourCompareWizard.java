@@ -21,6 +21,7 @@ import net.tourbook.util.PositionedWizardDialog;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -36,22 +37,6 @@ public class ActionHandlerTourCompareWizard extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		final IWorkbench workbench = PlatformUI.getWorkbench();
-		final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-
-		try {
-			// show tour compare perspective
-			workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
-
-			// show tour compare view
-			window.getActivePage().showView(CompareResultView.ID,
-					null,
-					IWorkbenchPage.VIEW_ACTIVATE);
-
-		} catch (WorkbenchException e) {
-			e.printStackTrace();
-		}
-
 		Wizard wizard = new WizardTourComparer();
 
 		final WizardDialog dialog = new PositionedWizardDialog(HandlerUtil.getActiveShellChecked(event),
@@ -62,7 +47,29 @@ public class ActionHandlerTourCompareWizard extends AbstractHandler {
 
 		BusyIndicator.showWhile(null, new Runnable() {
 			public void run() {
-				dialog.open();
+
+				if (dialog.open() == Window.OK) {
+
+					/*
+					 * show the compare tour perspective
+					 */
+					final IWorkbench workbench = PlatformUI.getWorkbench();
+					final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+
+					try {
+						// show tour compare perspective
+						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID,
+								window);
+
+						// show tour compare view
+						window.getActivePage().showView(CompareResultView.ID,
+								null,
+								IWorkbenchPage.VIEW_ACTIVATE);
+
+					} catch (WorkbenchException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		});
 

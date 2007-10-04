@@ -19,33 +19,24 @@ import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 
-public class ActionCollapseAll extends Action {
+public class ActionRefreshView extends Action {
 
-	private TreeViewer	fTreeViewer;
+	private TourMapView	fTourMapView;
 
-	public ActionCollapseAll(TreeViewer treeViewer) {
+	public ActionRefreshView(TourMapView view) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		fTreeViewer = treeViewer;
+		fTourMapView = view;
 
-		setToolTipText(Messages.Tour_Map_Action_collapse_all_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
+		setToolTipText(Messages.Tour_Map_Action_refresh_view_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__refresh));
 	}
 
 	@Override
 	public void run() {
-
-		fTreeViewer.collapseAll();
-
-		// reveal selected element
-		StructuredSelection selection = (StructuredSelection) fTreeViewer.getSelection();
-		if (selection != null) {
-			fTreeViewer.reveal(selection.getFirstElement());
-		}
+		fTourMapView.refreshViewer();
 	}
 
 }

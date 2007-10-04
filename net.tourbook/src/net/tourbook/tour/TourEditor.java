@@ -28,6 +28,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.views.tourBook.SelectionRemovedTours;
+import net.tourbook.ui.views.tourMap.SelectionNewRefTours;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -48,7 +49,7 @@ import org.eclipse.ui.part.EditorPart;
 
 public class TourEditor extends EditorPart {
 
-	public static final String				ID				= "net.tourbook.tour.TourEditor";	//$NON-NLS-1$
+	public static final String				ID					= "net.tourbook.tour.TourEditor";	//$NON-NLS-1$
 
 	private TourEditorInput					fEditorInput;
 
@@ -56,8 +57,8 @@ public class TourEditor extends EditorPart {
 	private TourChartConfiguration			fTourChartConfig;
 	private TourData						fTourData;
 
-	private boolean							fIsTourDirty	= false;
-	private boolean							fIsTourChanged	= false;
+	private boolean							fIsTourDirty		= false;
+	private boolean							fIsTourChanged		= false;
 
 	private PostSelectionProvider			fPostSelectionProvider;
 	private ISelectionListener				fPostSelectionListener;
@@ -67,7 +68,7 @@ public class TourEditor extends EditorPart {
 	private IHandlerService					fHandlerService;
 	private ActionHandlerRevertTourEditor	fRevertActionHandler;
 
-//	private IHandlerActivation				fRevertActivatedHandler;
+	private boolean							fIsRefTourCreated	= false;
 
 	private void addPartListener() {
 
@@ -166,7 +167,6 @@ public class TourEditor extends EditorPart {
 
 		fRevertActionHandler = new ActionHandlerRevertTourEditor(this);
 
-//		fRevertActivatedHandler = 
 		fHandlerService.activateHandler("net.tourbook.command.tourEditor.revert", //$NON-NLS-1$
 				fRevertActionHandler);
 	}
@@ -232,6 +232,14 @@ public class TourEditor extends EditorPart {
 		// hide the dirty indicator
 		firePropertyChange(PROP_DIRTY);
 		updateRevertHandler();
+
+		if (fIsRefTourCreated) {
+
+			fIsRefTourCreated = false;
+
+			// update tour map view
+			firePostSelection(new SelectionNewRefTours());
+		}
 	}
 
 	@Override
@@ -341,6 +349,13 @@ public class TourEditor extends EditorPart {
 	private void updateRevertHandler() {
 		fRevertActionHandler.setEnabled(fIsTourDirty);
 		fRevertActionHandler.fireHandlerChanged();
+	}
+
+	/**
+	 * set status a reference tour was created
+	 */
+	public void setRefTourIsCreated() {
+		fIsRefTourCreated = true;
 	}
 
 }

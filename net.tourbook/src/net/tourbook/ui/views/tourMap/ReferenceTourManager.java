@@ -60,7 +60,7 @@ public class ReferenceTourManager {
 	 */
 	public TourReference addReferenceTour(TourEditor tourEditor) {
 
-		// ask for the reference tour name
+		// get the reference tour name
 		InputDialog dialog = new InputDialog(Display.getCurrent().getActiveShell(),
 				Messages.Tour_Map_dlg_add_reference_tour_title,
 				Messages.Tour_Map_dlg_add_reference_tour_msg,
@@ -70,6 +70,7 @@ public class ReferenceTourManager {
 		if (dialog.open() != Window.OK) {
 			return null;
 		}
+
 		TourChart tourChart = tourEditor.getTourChart();
 		SelectionChartInfo chartInfo = tourChart.getChartInfo();
 		TourData tourData = tourChart.getTourData();
@@ -84,6 +85,7 @@ public class ReferenceTourManager {
 		tourData.getTourReferences().add(newTourReference);
 
 		tourEditor.setTourDirty();
+		tourEditor.setRefTourIsCreated();
 
 		return newTourReference;
 	}

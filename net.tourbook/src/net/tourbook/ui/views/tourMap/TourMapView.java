@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import net.tourbook.Messages;
-import net.tourbook.data.TourReference;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
@@ -74,8 +73,8 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMapView extends ViewPart {
 
-	private static final String			MEMENTO_TOUR_MAP_ACTIVE_REF_ID	= "tour.map.active.ref.id"; //$NON-NLS-1$
-	private static final String			MEMENTO_TOUR_MAP_LINK_TOUR		= "tour.map.link.tour"; //$NON-NLS-1$
+	private static final String			MEMENTO_TOUR_MAP_ACTIVE_REF_ID	= "tour.map.active.ref.id";				//$NON-NLS-1$
+	private static final String			MEMENTO_TOUR_MAP_LINK_TOUR		= "tour.map.link.tour";					//$NON-NLS-1$
 
 	public static final String			ID								= "net.tourbook.views.tourMap.TourMapView"; //$NON-NLS-1$
 
@@ -106,6 +105,7 @@ public class TourMapView extends ViewPart {
 	private ActionRenameRefTour			fActionRenameRefTour;
 	private ActionLinkTour				fActionLinkTour;
 	private ActionCollapseAll			fActionCollapseAll;
+	private ActionRefreshView			fActionRefreshView;
 
 	private final RGB					fRGBRefFg						= new RGB(0, 0, 0);
 	private final RGB					fRGBRefBg						= new RGB(255, 220, 153);
@@ -249,6 +249,46 @@ public class TourMapView extends ViewPart {
 
 	public TourMapView() {}
 
+	/**
+	 * Find the compared tours in the tour map tree viewer<br>
+	 * !!! Recursive !!!
+	 * 
+	 * @param comparedTours
+	 * @param parentItem
+	 * @param findCompIds
+	 *        comp id's which should be found
+	 */
+	private static void getComparedTours(	ArrayList<TourMapItemComparedTour> comparedTours,
+											final TreeViewerItem parentItem,
+											final ArrayList<Long> findCompIds) {
+
+		final ArrayList<TreeViewerItem> unfetchedChildren = parentItem.getUnfetchedChildren();
+
+		if (unfetchedChildren != null) {
+
+			// children are available
+
+			for (final TreeViewerItem tourTreeItem : unfetchedChildren) {
+
+				if (tourTreeItem instanceof TourMapItemComparedTour) {
+
+					final TourMapItemComparedTour ttiCompResult = (TourMapItemComparedTour) tourTreeItem;
+					final long ttiCompId = ttiCompResult.getCompId();
+
+					for (final Long compId : findCompIds) {
+						if (ttiCompId == compId) {
+							comparedTours.add(ttiCompResult);
+						}
+					}
+
+				} else {
+					// this is a child which can be the parent for other childs
+					getComparedTours(comparedTours, tourTreeItem, findCompIds);
+				}
+			}
+		}
+	}
+
 	private void addCompareTourPropertyListener() {
 
 		fCompareTourPropertyListener = new ITourPropertyListener() {
@@ -319,7 +359,7 @@ public class TourMapView extends ViewPart {
 				 * add the actions in the part open event so they are appended AFTER the actions
 				 * which are defined in the plugin.xml
 				 */
-				createToolbar();
+				fillToolbar();
 			}
 
 			public void partVisible(final IWorkbenchPartReference partRef) {}
@@ -348,15 +388,14 @@ public class TourMapView extends ViewPart {
 
 				} else if (selection instanceof SelectionNewRefTours) {
 
-					final SelectionNewRefTours tourSelection = (SelectionNewRefTours) selection;
-					final ArrayList<TourReference> newRefTours = tourSelection.newRefTours;
+					refreshViewer();
 
-					if (newRefTours.size() > 0) {
-
-						// refresh the tree viewer and resort the ref tours
-						fRootItem.fetchChildren();
-						fTourViewer.refresh();
-					}
+//					final SelectionNewRefTours tourSelection = (SelectionNewRefTours) selection;
+//					final ArrayList<TourReference> newRefTours = tourSelection.newRefTours;
+//
+//					if (newRefTours.size() > 0) {
+//						refreshView();
+//					}
 
 				} else if (selection instanceof SelectionRemovedComparedTours) {
 
@@ -405,51 +444,12 @@ public class TourMapView extends ViewPart {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	/**
-	 * Find the compared tours in the tour map tree viewer<br>
-	 * !!! Recursive !!!
-	 * 
-	 * @param comparedTours
-	 * @param parentItem
-	 * @param findCompIds
-	 *        comp id's which should be found
-	 */
-	private static void getComparedTours(	ArrayList<TourMapItemComparedTour> comparedTours,
-											final TreeViewerItem parentItem,
-											final ArrayList<Long> findCompIds) {
-
-		final ArrayList<TreeViewerItem> unfetchedChildren = parentItem.getUnfetchedChildren();
-
-		if (unfetchedChildren != null) {
-
-			// children are available
-
-			for (final TreeViewerItem tourTreeItem : unfetchedChildren) {
-
-				if (tourTreeItem instanceof TourMapItemComparedTour) {
-
-					final TourMapItemComparedTour ttiCompResult = (TourMapItemComparedTour) tourTreeItem;
-					final long ttiCompId = ttiCompResult.getCompId();
-
-					for (final Long compId : findCompIds) {
-						if (ttiCompId == compId) {
-							comparedTours.add(ttiCompResult);
-						}
-					}
-
-				} else {
-					// this is a child which can be the parent for other childs
-					getComparedTours(comparedTours, tourTreeItem, findCompIds);
-				}
-			}
-		}
-	}
-
 	private void createActions() {
 
 		fActionDeleteSelectedTour = new ActionDeleteTourFromMap(this);
 		fActionRenameRefTour = new ActionRenameRefTour(this);
 		fActionLinkTour = new ActionLinkTour(this);
+		fActionRefreshView = new ActionRefreshView(this);
 		fActionCollapseAll = new ActionCollapseAll(fTourViewer);
 	}
 
@@ -498,22 +498,6 @@ public class TourMapView extends ViewPart {
 		fTourViewer.setInput(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem());
 
 		restoreSettings(fSessionMemento);
-	}
-
-	private void createToolbar() {
-
-		// check if toolbar is created
-		if (fIsToolbarCreated) {
-			return;
-		}
-		fIsToolbarCreated = true;
-
-		IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-
-		tbm.add(fActionLinkTour);
-		tbm.add(fActionCollapseAll);
-
-		tbm.update(true);
 	}
 
 	private Control createTourViewer(final Composite parent) {
@@ -658,6 +642,23 @@ public class TourMapView extends ViewPart {
 		enableActions();
 	}
 
+	private void fillToolbar() {
+
+		// check if toolbar is created
+		if (fIsToolbarCreated) {
+			return;
+		}
+		fIsToolbarCreated = true;
+
+		IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(fActionLinkTour);
+		tbm.add(fActionCollapseAll);
+		tbm.add(fActionRefreshView);
+
+		tbm.update(true);
+	}
+
 	public TreeViewer getTourViewer() {
 		return fTourViewer;
 	}
@@ -712,6 +713,12 @@ public class TourMapView extends ViewPart {
 
 			fPostSelectionProvider.setSelection(tourMapSelection);
 		}
+	}
+
+	public void refreshViewer() {
+		// refresh the tree viewer and resort the ref tours
+		fRootItem.fetchChildren();
+		fTourViewer.refresh();
 	}
 
 	/**

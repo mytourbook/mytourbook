@@ -16,16 +16,14 @@
 package net.tourbook.tour;
 
 import net.tourbook.Messages;
-import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartXSlider;
+import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.views.tourBook.MarkerDialog;
 import net.tourbook.ui.views.tourMap.ReferenceTourManager;
-import net.tourbook.ui.views.tourMap.SelectionNewRefTours;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -50,16 +48,15 @@ public class TourChartContextProvider implements IChartContextProvider {
 		@Override
 		public void run() {
 
-			TourReference refTour = ReferenceTourManager.getInstance()
-					.addReferenceTour(fTourEditor);
+			ReferenceTourManager.getInstance().addReferenceTour(fTourEditor);
 
-			if (refTour != null) {
-
-				SelectionNewRefTours selection = new SelectionNewRefTours();
-				selection.newRefTours.add(refTour);
-
-				fTourEditor.firePostSelection(selection);
-			}
+//			if (refTour != null) {
+//
+//				SelectionNewRefTours selection = new SelectionNewRefTours();
+//				selection.newRefTours.add(refTour);
+//
+//				fTourEditor.firePostSelection(selection);
+//			}
 		}
 	}
 
@@ -171,7 +168,8 @@ public class TourChartContextProvider implements IChartContextProvider {
 			if (leftSlider != null && rightSlider == null) {
 				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_marker, leftSlider));
 			} else {
-				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_left_marker, leftSlider));
+				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_left_marker,
+						leftSlider));
 				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_right_marker,
 						rightSlider));
 			}

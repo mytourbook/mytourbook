@@ -250,6 +250,8 @@ public class Messages extends NLS {
 
 	public static String		Image__open_tour_segmenter;
 
+	public static String	Image__refresh;
+
 	public static String		Image__remove_all;
 
 	public static String		Image__remove_all_disabled;
@@ -434,11 +436,14 @@ public class Messages extends NLS {
 
 	public static String		Tour_Database_update_tour;
 
+	public static String	Tour_Map_Action_collapse_all_tooltip;
+
+	public static String	Tour_Map_Action_refresh_view_tooltip;
+
 	public static String		Tour_Properties_Label_distance;
 	public static String		Tour_Properties_Label_distance_unit;
 	public static String		Tour_Properties_Label_time;
 	public static String		Tour_Properties_Label_time_unit;
-	public static String		Tour_Map_Action_collapse_all;
 	public static String		Tour_Map_Action_create_left_marker;
 	public static String		Tour_Map_Action_create_marker;
 	public static String		Tour_Map_Action_create_reference_tour;
