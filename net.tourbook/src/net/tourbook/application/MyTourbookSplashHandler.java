@@ -35,6 +35,9 @@ import org.eclipse.ui.splash.BasicSplashHandler;
  */
 public class MyTourbookSplashHandler extends BasicSplashHandler {
 
+	private static final String	APP_BUILD_ID	= "Version 1.0.0.v20071005";
+
+	@Override
 	public void init(Shell splash) {
 
 		super.init(splash);
@@ -75,28 +78,28 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 			foregroundColorInteger = 0xD2D7FF; // off white
 		}
 
-		setForeground(new RGB(
-				(foregroundColorInteger & 0xFF0000) >> 16,
+		setForeground(new RGB((foregroundColorInteger & 0xFF0000) >> 16,
 				(foregroundColorInteger & 0xFF00) >> 8,
 				foregroundColorInteger & 0xFF));
 
-		final String buildId = "Version " + System.getProperty("eclipse.buildId", "Unknown Version"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//		final String buildId = "Version " + System.getProperty("eclipse.buildId", "Unknown Version"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		getContent().addPaintListener(new PaintListener() {
 
 			public void paintControl(PaintEvent e) {
 				GC gc = e.gc;
-				Point extend = gc.textExtent(buildId);
+				Point extend = gc.textExtent(APP_BUILD_ID);
 
 				gc.setForeground(getForeground());
-				gc.drawText(buildId, 383 - extend.x, 57, true);
+				gc.drawText(APP_BUILD_ID, 383 - extend.x, 57, true);
 			}
 		});
 	}
 
 	private Rectangle parseRect(String string) {
-		if (string == null)
+		if (string == null) {
 			return null;
+		}
 		int x, y, w, h;
 		int lastPos = 0;
 		try {

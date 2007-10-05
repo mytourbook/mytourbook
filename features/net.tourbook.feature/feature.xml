@@ -366,6 +366,7 @@ Public License instead of this License.
       <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="org.apache.derby.core"/>
       <import plugin="org.eclipse.update.ui"/>
+      <import plugin="org.eclipse.core.expressions"/>
    </requires>
 
    <plugin

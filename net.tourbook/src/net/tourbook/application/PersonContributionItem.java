@@ -115,7 +115,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		// container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		fComboPeople = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-		fComboPeople.setLayoutData(new GridData(SWT.NONE, SWT.TOP, false, false));
+		fComboPeople.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
 		fComboPeople.setVisibleItemCount(20);
 		fComboPeople.setToolTipText(Messages.App_People_tooltip);
 

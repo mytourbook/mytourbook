@@ -363,8 +363,8 @@ Public License instead of this License.
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="net.tourbook" version="0.8.3" match="greaterOrEqual"/>
-      <import plugin="net.tourbook.chart"/>
+      <import plugin="net.tourbook" version="0.8.9" match="greaterOrEqual"/>
+      <import plugin="net.tourbook.chart" version="0.8.9" match="greaterOrEqual"/>
    </requires>
 
    <plugin
