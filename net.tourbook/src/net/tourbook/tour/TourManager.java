@@ -113,8 +113,10 @@ public class TourManager {
 		final int distance = distanceSerie[endIndex] - distanceSerie[startIndex];
 		int time = timeSerie[endIndex] - timeSerie[startIndex];
 
-		final int timeInterval = timeSerie[1] - timeSerie[0];
-
+		int timeInterval = timeSerie[1] - timeSerie[0];
+		if (timeInterval == 0 && timeSerie.length > 1) {
+			timeInterval = timeSerie[2] - timeSerie[1];
+		}
 		// remove breaks from the time
 		int ignoreTimeSlices = timeInterval == 0 ? 0 : getIgnoreTimeSlices(timeSerie,
 				startIndex,
@@ -718,7 +720,11 @@ public class TourManager {
 
 				} else {
 
-					final int timeSlice = timeValues[1] - timeValues[0];
+					int timeSlice = timeValues[1] - timeValues[0];
+
+					if (timeSlice == 0 && timeValues.length > 1) {
+						timeSlice = timeValues[2] - timeValues[1];
+					}
 
 					if (timeSlice > 0) {
 
@@ -767,6 +773,11 @@ public class TourManager {
 					final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
 
 					int timeSlice = timeValues[1] - timeValues[0];
+
+					if (timeSlice == 0 && timeValues.length > 1) {
+						timeSlice = timeValues[2] - timeValues[1];
+					}
+
 					if (timeSlice > 0) {
 						final int ignoreTimeSlices = timeSlice == 0
 								? 0

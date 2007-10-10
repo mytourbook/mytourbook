@@ -56,7 +56,7 @@ public class TourCompareManager {
 	private TourReference[]								refTourContext;
 	private TourData[]									refToursData;
 
-	protected CompareResultView							tourComparerView;
+//	protected CompareResultView							tourComparerView;
 
 	private ArrayList<CompareResultItemComparedTour>	fComparedTourItems	= new ArrayList<CompareResultItemComparedTour>();
 
@@ -248,10 +248,12 @@ public class TourCompareManager {
 						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID,
 								window);
 
-						tourComparerView = (CompareResultView) window.getActivePage()
+						CompareResultView view = (CompareResultView) window.getActivePage()
 								.showView(CompareResultView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
-						tourComparerView.updateViewer();
+						if (view != null) {
+							view.updateViewer();
+						}
 
 					} catch (PartInitException e) {
 						ErrorDialog.openError(window.getShell(), "Error", e.getMessage(), e //$NON-NLS-1$
@@ -420,6 +422,9 @@ public class TourCompareManager {
 
 		// remove the breaks from the time
 		int timeInterval = compareTourDataTime[1] - compareTourDataTime[0];
+		if (timeInterval == 0 && compareTourDataTime.length > 1) {
+			timeInterval = compareTourDataTime[2] - compareTourDataTime[1];
+		}
 		int ignoreTimeSlices = timeInterval == 0
 				? 0
 				: TourManager.getIgnoreTimeSlices(compareTourDataTime,

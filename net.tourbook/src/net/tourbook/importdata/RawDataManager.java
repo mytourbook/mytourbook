@@ -28,6 +28,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
+import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -70,7 +71,7 @@ public class RawDataManager {
 
 	private int							fImportYear			= -1;
 
-	private RawDataView					fRawDataView;
+//	private RawDataView					fRawDataView;
 
 	private RawDataManager() {}
 
@@ -202,36 +203,36 @@ public class RawDataManager {
 
 					rawDataManager.updateTourDataFromDb();
 
-					fRawDataView.updateViewer();
-					fRawDataView.selectFirstTour();
+					RawDataView view = showRawDataView();
+					if (view != null) {
+						view.updateViewer();
+						view.selectFirstTour();
+					}
 
-					showRawDataView();
 				}
 			}
 		});
 
 	}
 
-	private void showRawDataView() {
+	private RawDataView showRawDataView() {
 
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 
 		try {
 			// show raw data perspective
-//			workbench.showPerspective(PerspectiveFactoryRawData.PERSPECTIVE_ID, window);
+			workbench.showPerspective(PerspectiveFactoryRawData.PERSPECTIVE_ID, window);
 
 			// show raw data view
-			fRawDataView = (RawDataView) window.getActivePage().showView(RawDataView.ID,
+			return (RawDataView) window.getActivePage().showView(RawDataView.ID,
 					null,
 					IWorkbenchPage.VIEW_ACTIVATE);
 
-			if (fRawDataView == null) {
-				return;
-			}
 		} catch (WorkbenchException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 	public DeviceData getDeviceData() {

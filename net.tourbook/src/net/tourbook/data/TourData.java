@@ -559,7 +559,10 @@ public class TourData {
 		int distanceStart = distanceSerie[firstSerieIndex];
 		int altitudeStart = altitudeSerie[firstSerieIndex];
 		int timeStart = timeSerie[firstSerieIndex];
-		final int timeSlice = timeSerie[1] - timeSerie[0];
+		int timeSlice = timeSerie[1] - timeSerie[0];
+		if (timeSlice == 0 && timeSerie.length > 1) {
+			timeSlice = timeSerie[2] - timeSerie[1];
+		}
 
 		segmentSerieAltitude = new int[segmentSerieLength];
 		segmentSerieDistance = new int[segmentSerieLength];
