@@ -1438,10 +1438,12 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void drawChart(final GC gc) {
 
+		final Rectangle clientArea = getClientArea();
+
 		if (fDrawingData == null || fDrawingData.isEmpty()) {
 			// fill the image area when there is no graphic
 			gc.setBackground(fChart.getBackgroundColor());
-			gc.fillRectangle(getClientArea());
+			gc.fillRectangle(clientArea);
 			return;
 		}
 
@@ -1455,7 +1457,19 @@ public class ChartComponentGraph extends Canvas {
 			 * mac osx is still flickering, added the drawChartImage in version 1.0
 			 */
 			if (fGraphImage != null) {
-				drawChartImage(gc);
+				Image image = drawChartImage(gc);
+
+				int gcHeight = clientArea.height;
+				int imageHeight = image.getBounds().height;
+
+				if (gcHeight > imageHeight) {
+
+					// fill the gap between the image and the drawable area
+
+					gc.setBackground(fChart.getBackgroundColor());
+					gc.fillRectangle(0, imageHeight, clientArea.width, clientArea.height
+							- imageHeight);
+				}
 			}
 			return;
 		}
@@ -1465,7 +1479,7 @@ public class ChartComponentGraph extends Canvas {
 		if (fGraphImage == null) {
 			// fill the image area when there is no graphic
 			gc.setBackground(fChart.getBackgroundColor());
-			gc.fillRectangle(getClientArea());
+			gc.fillRectangle(clientArea);
 			return;
 		}
 
@@ -1477,7 +1491,7 @@ public class ChartComponentGraph extends Canvas {
 		drawChartImage(gc);
 	}
 
-	private void drawChartImage(final GC gc) {
+	private Image drawChartImage(final GC gc) {
 
 		final boolean isLayerImageVisible = fIsXSliderVisible
 				|| fIsYSliderVisible
@@ -1512,8 +1526,10 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isLayerImageVisible) {
 			gc.drawImage(fLayerImage, imageScrollPosition, 0);
+			return fLayerImage;
 		} else {
 			gc.drawImage(fGraphImage, imageScrollPosition, 0);
+			return fGraphImage;
 		}
 	}
 
