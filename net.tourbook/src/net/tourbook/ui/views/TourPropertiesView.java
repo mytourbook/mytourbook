@@ -16,12 +16,14 @@
 package net.tourbook.ui.views;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
@@ -60,33 +62,37 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourPropertiesView extends ViewPart {
 
-	public static final String	ID						= "net.tourbook.views.TourPropertiesView";		//$NON-NLS-1$
+	public static final String		ID						= "net.tourbook.views.TourPropertiesView";		//$NON-NLS-1$
 
-	private static final String	MEMENTO_SELECTED_TAB	= "tourProperties.selectedTab"; //$NON-NLS-1$
+	private static final String		MEMENTO_SELECTED_TAB	= "tourProperties.selectedTab";				//$NON-NLS-1$
 
-	private static IMemento		fSessionMemento;
+	private static IMemento			fSessionMemento;
 
-	private CTabFolder			fTabFolder;
-	private Label				fLblDate;
-	private Label				fLblStartTime;
-	private Label				fLblRecordingTime;
-	private Label				fLblDrivingTime;
-	private Label				fLblDatapoints;
-	private Text				fTextTitle;
-	private Text				fTextStartLocation;
-	private Text				fTextEndLocation;
-	private Text				fTextDescription;
+	private CTabFolder				fTabFolder;
+	private Label					fLblDate;
+	private Label					fLblStartTime;
+	private Label					fLblRecordingTime;
+	private Label					fLblDrivingTime;
+	private Label					fLblDatapoints;
+	private Label					fLblTourType;
 
-	private ISelectionListener	fPostSelectionListener;
-	private IPartListener2		fPartListener;
+	private Text					fTextTitle;
+	private Text					fTextStartLocation;
+	private Text					fTextEndLocation;
+	private Text					fTextDescription;
 
-	private TourData			fTourData;
-	public Calendar				fCalendar				= GregorianCalendar.getInstance();
-	private DateFormat			fTimeFormatter			= DateFormat.getTimeInstance(DateFormat.SHORT);
-	private DateFormat			fDurationFormatter		= DateFormat.getTimeInstance(DateFormat.SHORT,
-																Locale.GERMAN);
+	private ISelectionListener		fPostSelectionListener;
+	private IPartListener2			fPartListener;
 
-	private TourEditor			fTourEditor;
+	private TourData				fTourData;
+	public Calendar					fCalendar				= GregorianCalendar.getInstance();
+	private DateFormat				fTimeFormatter			= DateFormat.getTimeInstance(DateFormat.SHORT);
+	private DateFormat				fDurationFormatter		= DateFormat.getTimeInstance(DateFormat.SHORT,
+																	Locale.GERMAN);
+
+	private TourEditor				fTourEditor;
+
+	private ITourPropertyListener	fTourPropertyListener;
 
 	private void addPartListener() {
 
@@ -151,6 +157,7 @@ public class TourPropertiesView extends ViewPart {
 
 		addSelectionListener();
 		addPartListener();
+		addTourPropertyListener();
 
 		restoreState(fSessionMemento);
 
@@ -291,10 +298,15 @@ public class TourPropertiesView extends ViewPart {
 			label.setText(Messages.Tour_Properties_Label_driving_time);
 			fLblDrivingTime = new Label(contentContainer, SWT.NONE);
 
-			// # data points
+			// data points
 			label = new Label(contentContainer, SWT.NONE);
 			label.setText(Messages.Tour_Properties_Label_datapoints);
 			fLblDatapoints = new Label(contentContainer, SWT.NONE);
+
+			// tour type
+			label = new Label(contentContainer, SWT.NONE);
+			label.setText(Messages.Tour_Properties_Label_tour_type);
+			fLblTourType = new Label(contentContainer, SWT.NONE);
 		}
 
 		return scrolledContainer;
@@ -307,6 +319,8 @@ public class TourPropertiesView extends ViewPart {
 
 		page.removePostSelectionListener(fPostSelectionListener);
 		page.removePartListener(fPartListener);
+
+		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
 		super.dispose();
 	}
@@ -393,6 +407,37 @@ public class TourPropertiesView extends ViewPart {
 		}
 	}
 
+	private void addTourPropertyListener() {
+
+		fTourPropertyListener = new ITourPropertyListener() {
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			public void propertyChanged(int propertyId, Object propertyData) {
+
+				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED
+						|| propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED_IN_EDITOR) {
+
+					if (fTourData == null) {
+						return;
+					}
+
+					// get modified tours
+					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					final long tourId = fTourData.getTourId();
+
+					for (TourData tourData : modifiedTours) {
+						if (tourData.getTourId() == tourId) {
+
+							updateTourProperties(tourData);
+							return;
+						}
+					}
+				}
+			}
+		};
+
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+	}
+
 	private void restoreState(IMemento memento) {
 
 		if (memento == null) {
@@ -439,6 +484,9 @@ public class TourPropertiesView extends ViewPart {
 		// keep reference
 		fTourData = tourData;
 
+		/*
+		 * location: time
+		 */
 		// tour date
 		fLblDate.setText(TourManager.getTourDate(tourData));
 		fLblDate.pack(true);
@@ -490,6 +538,13 @@ public class TourPropertiesView extends ViewPart {
 		}
 		fLblDatapoints.pack(true);
 
+		// tour type
+		fLblTourType.setText(tourData.getTourType().getName());
+		fLblTourType.pack(true);
+
+		/*
+		 * tab: location
+		 */
 		// tour title
 		final String tourTitle = fTourData.getTourTitle();
 		fTextTitle.setText(tourTitle);

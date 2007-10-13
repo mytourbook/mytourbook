@@ -28,7 +28,7 @@ public abstract class TourbookStatistic {
 
 	private Composite	fContainer;
 
-	private boolean		fIsRefreshData;
+	private boolean		fIsDataDirty;
 
 	/**
 	 * Activates the actions in the statistic
@@ -61,14 +61,13 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * Returns the refresh status and resets the status to false
-	 * 
-	 * @return current reset status
+	 * @return returns the status if the tour data for the statistic is dirty and resets the status
+	 *         to <code>false</code>
 	 */
-	protected boolean isRefreshDataWithReset() {
-		boolean isRefresh = fIsRefreshData;
-		fIsRefreshData = false;
-		return isRefresh;
+	protected boolean isDataDirtyWithReset() {
+		boolean isDataDirty = fIsDataDirty;
+		fIsDataDirty = false;
+		return isDataDirty;
 	}
 
 	/**
@@ -118,12 +117,11 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * @param isRefresh
-	 *        when set to <code>true</code>, the data must be refreshed when the chart is
-	 *        displayed the next time, set to <code>false</code> when the data has been refreshed
+	 * sets the statistic data dirty, they must be refreshed when the chart is displayed the next
+	 * time
 	 */
-	public void setRefreshData(boolean isRefresh) {
-		fIsRefreshData = isRefresh;
+	public void setDataDirty() {
+		fIsDataDirty = true;
 	}
 
 	/**

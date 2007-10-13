@@ -21,12 +21,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Formatter;
 import java.util.GregorianCalendar;
 
-import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -39,13 +35,14 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 
 	private TourPerson				fActivePerson;
 	private int						fCurrentYear;
-	private int						fCurrentMonth;
+//	private int						fCurrentMonth;
 
 	private TourDataTour			fTourDataTour;
-	private final Calendar			fCalendar	= GregorianCalendar.getInstance();
+//	private final Calendar			fCalendar	= GregorianCalendar.getInstance();
 
 	private long					fActiveTypeId;
-	private Long					fSelectedTourId;
+
+//	private Long					fSelectedTourId;
 
 	private ProviderTourDay() {}
 
@@ -70,7 +67,7 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 		}
 
 		// get the tour types
-		final ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getTourTypes();
+		final ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getAllTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		fTourDataTour = new TourDataTour();

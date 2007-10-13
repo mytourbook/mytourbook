@@ -66,7 +66,7 @@ public class ProviderTourMonth extends DataProvider {
 		}
 
 		// get the tour types
-		TourType[] tourTypes = TourbookPlugin.getDefault().getTourTypesArray();
+		TourType[] tourTypes = TourbookPlugin.getDefault().getAllTourTypesArray();
 
 		fTourMonthData = new TourDataMonth();
 

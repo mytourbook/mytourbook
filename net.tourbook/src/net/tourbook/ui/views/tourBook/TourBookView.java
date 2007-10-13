@@ -21,15 +21,18 @@ import java.util.Formatter;
 import java.util.Iterator;
 
 import net.tourbook.Messages;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourType;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionModifyColumns;
+import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
+import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
@@ -61,7 +64,6 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -83,7 +85,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourBookView extends ViewPart {
+public class TourBookView extends ViewPart implements ISelectedTours {
 
 	static public final String		ID									= "net.tourbook.views.tourListView";			//$NON-NLS-1$
 
@@ -101,6 +103,7 @@ public class TourBookView extends ViewPart {
 	private PostSelectionProvider	fPostSelectionProvider;
 	private ISelectionListener		fPostSelectionListener;
 	private IPartListener2			fPartListener;
+	private ITourPropertyListener	fTourPropertyListener;
 
 	private IPropertyChangeListener	fPrefChangeListener;
 
@@ -134,16 +137,14 @@ public class TourBookView extends ViewPart {
 	private ActionEditTour			fActionEditTour;
 	private ActionDeleteTour		fActionDeleteTour;
 	private ActionSetTourType		fActionSetTourType;
-	private ActionSetTourType		fActionSetLastTourType;
 	private ActionModifyColumns		fActionModifyColumns;
+	private ActionCollapseAll		fActionCollapseAll;
 
 	private int						fTourViewerSelectedYear				= -1;
 	private int						fTourViewerSelectedMonth			= -1;
 
 	Long							fActiveTourId;
 	private int						fLastSelectedTourTypeId;
-
-	private ActionCollapseAll		fActionCollapseAll;
 
 	private class TourBookContentProvider implements ITreeContentProvider {
 
@@ -230,15 +231,84 @@ public class TourBookView extends ViewPart {
 				.addPropertyChangeListener(fPrefChangeListener);
 	}
 
+	private void addTourPropertyListener() {
+
+		fTourPropertyListener = new ITourPropertyListener() {
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			public void propertyChanged(int propertyId, Object propertyData) {
+				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
+
+					// get a copy of the modified tours
+					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) ((ArrayList<TourData>) propertyData).clone();
+
+					updateTourViewer(fRootItem, modifiedTours);
+
+//					fTourViewer.getTree().deselectAll();
+				}
+			}
+		};
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+	}
+
+	/**
+	 * !!!Recursive !!! update all tour items with the new tour type
+	 * 
+	 * @param rootItem
+	 * @param modifiedTours
+	 */
+	private void updateTourViewer(TreeViewerItem parentItem, ArrayList<TourData> modifiedTours) {
+
+		Object[] children = parentItem.getFetchedChildren();
+
+		if (children == null) {
+			return;
+		}
+
+		// loop: all children
+		for (Object object : children) {
+			if (object instanceof TreeViewerItem) {
+
+				TreeViewerItem treeItem = (TreeViewerItem) object;
+				if (treeItem instanceof TVITourBookTour) {
+
+					final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
+					long tourItemId = tourItem.getTourId();
+
+					for (TourData tourData : modifiedTours) {
+						if (tourData.getTourId().longValue() == tourItemId) {
+
+							// update tree item
+							tourItem.fTourTypeId = tourData.getTourType().getTypeId();
+
+							// update tour viewer
+							fTourViewer.update(tourItem, null);
+
+							// remove updated tour
+							modifiedTours.remove(tourData);
+							break;
+						}
+					}
+				} else {
+					// update children
+					updateTourViewer(treeItem, modifiedTours);
+				}
+			}
+
+			// optimize
+			if (modifiedTours.size() == 0) {
+				return;
+			}
+		}
+
+	}
+
 	private void createActions() {
 
 		fActionEditTour = new ActionEditTour(this);
 		fActionDeleteTour = new ActionDeleteTour(this);
-		fActionSetLastTourType = new ActionSetTourType(this, false);
-		fActionSetTourType = new ActionSetTourType(this, true);
+		fActionSetTourType = new ActionSetTourType(this);
 
 		fActionModifyColumns = new ActionModifyColumns(fColumnManager);
-
 		fActionCollapseAll = new ActionCollapseAll(fTourViewer);
 
 		/*
@@ -288,6 +358,7 @@ public class TourBookView extends ViewPart {
 		setPostSelectionListener();
 		addPartListener();
 		addPrefListener();
+		addTourPropertyListener();
 
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
 		fActiveTourTypeId = TourbookPlugin.getDefault().getActiveTourType().getTypeId();
@@ -650,10 +721,6 @@ public class TourBookView extends ViewPart {
 			}
 		});
 
-		// TableColumnFactory.DEVICE_PROFILE.createColumn(fColumnManager,
-		// pixelConverter);
-// TableColumnFactory.DEVICE_NAME.createColumn(fColumnManager, pixelConverter);
-
 	}
 
 	@Override
@@ -661,6 +728,7 @@ public class TourBookView extends ViewPart {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
+		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
 		TourbookPlugin.getDefault()
 				.getPluginPreferences()
@@ -701,22 +769,9 @@ public class TourBookView extends ViewPart {
 		}
 
 		fActionSetTourType.setEnabled(tourItems > 0);
-		fActionSetLastTourType.setEnabled(tourItems > 0);
 	}
 
 	private void fillContextMenu(IMenuManager menuMgr) {
-
-		TourType selectedTourType;
-		if ((selectedTourType = fActionSetTourType.getSelectedTourType()) != null) {
-
-			fActionSetLastTourType.setSelectedTourType(selectedTourType);
-			fActionSetLastTourType.setText(NLS.bind(Messages.Tour_Book_Action_set_tour_type,
-					selectedTourType.getName()));
-			fActionSetLastTourType.setEnabled(true);
-			menuMgr.add(fActionSetLastTourType);
-		} else {
-			fActionSetLastTourType.setEnabled(false);
-		}
 
 		menuMgr.add(fActionSetTourType);
 
@@ -933,6 +988,38 @@ public class TourBookView extends ViewPart {
 
 		// register selection listener in the page
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+	}
+
+	public ArrayList<TourData> getSelectedTours() {
+
+		// get selected tours
+		final IStructuredSelection selectedTours = ((IStructuredSelection) fTourViewer.getSelection());
+
+		ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+
+		// loop: all selected tours
+		for (Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+
+			Object treeItem = iter.next();
+
+			if (treeItem instanceof TVITourBookTour) {
+
+				TVITourBookTour tviTour = ((TVITourBookTour) treeItem);
+
+				final TourData tourData = TourManager.getInstance()
+						.getTourData(tviTour.getTourId());
+
+				if (tourData != null) {
+					selectedTourData.add(tourData);
+				}
+			}
+		}
+
+		return selectedTourData;
+	}
+
+	public boolean isFromTourEditor() {
+		return false;
 	}
 
 }

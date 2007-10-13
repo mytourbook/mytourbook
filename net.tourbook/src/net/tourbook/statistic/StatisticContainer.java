@@ -404,7 +404,7 @@ public class StatisticContainer extends Composite {
 				if (statistic instanceof IYearStatistic) {
 
 					statistic.setSynchScale(fIsSynchScaleEnabled);
-					statistic.setRefreshData(true);
+					statistic.setDataDirty();
 				}
 			}
 		}

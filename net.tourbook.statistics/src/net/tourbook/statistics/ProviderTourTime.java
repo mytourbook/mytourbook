@@ -85,7 +85,7 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 			return fTourTimeData;
 		}
 
-		final ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getTourTypes();
+		final ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getAllTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		final String sqlString = "SELECT " //$NON-NLS-1$

@@ -26,6 +26,7 @@ import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.views.tourBook.SelectionRemovedTours;
 import net.tourbook.ui.views.tourMap.SelectionNewRefTours;
@@ -59,6 +60,7 @@ public class TourEditor extends EditorPart {
 
 	private boolean							fIsTourDirty		= false;
 	private boolean							fIsTourChanged		= false;
+	private boolean							fIsTourTypeChanged	= false;
 
 	private PostSelectionProvider			fPostSelectionProvider;
 	private ISelectionListener				fPostSelectionListener;
@@ -93,11 +95,7 @@ public class TourEditor extends EditorPart {
 				}
 			}
 
-			public void partDeactivated(IWorkbenchPartReference partRef) {
-//				if (partRef.getPart(false) == TourEditor.this) {
-//					fTourChart.deactivateActionHandlers(getSite());
-//				}
-			}
+			public void partDeactivated(IWorkbenchPartReference partRef) {}
 
 			public void partHidden(IWorkbenchPartReference partRef) {}
 
@@ -231,6 +229,7 @@ public class TourEditor extends EditorPart {
 
 		// hide the dirty indicator
 		firePropertyChange(PROP_DIRTY);
+
 		updateRevertHandler();
 
 		if (fIsRefTourCreated) {
@@ -239,6 +238,18 @@ public class TourEditor extends EditorPart {
 
 			// update tour map view
 			firePostSelection(new SelectionNewRefTours());
+		}
+
+		if (fIsTourTypeChanged) {
+
+			fIsTourTypeChanged = false;
+
+			// notify all views which display the tour type
+			final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
+			modifiedTour.add(fTourData);
+
+			TourManager.getInstance()
+					.firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED, modifiedTour);
 		}
 	}
 
@@ -284,7 +295,7 @@ public class TourEditor extends EditorPart {
 
 	public void revertTourData() {
 
-		TourManager.getInstance().removeTourFromCache(fEditorInput.fTourId);
+		TourManager.getInstance().removeTourFromCache(fEditorInput.getTourId());
 
 		fIsTourDirty = false;
 		fIsTourChanged = false;
@@ -307,6 +318,13 @@ public class TourEditor extends EditorPart {
 	}
 
 	/**
+	 * set status a reference tour was created
+	 */
+	public void setRefTourIsCreated() {
+		fIsRefTourCreated = true;
+	}
+
+	/**
 	 * Set the tour dirty
 	 */
 	public void setTourDirty() {
@@ -318,10 +336,28 @@ public class TourEditor extends EditorPart {
 		updateRevertHandler();
 	}
 
+	/**
+	 * Set the tour type for the tour
+	 * 
+	 * @param tourType
+	 */
+	public void setTourType(TourType tourType) {
+
+		fTourData.setTourType(tourType);
+		fIsTourTypeChanged = true;
+
+		setTourDirty();
+	}
+
+	private void updateRevertHandler() {
+		fRevertActionHandler.setEnabled(fIsTourDirty);
+		fRevertActionHandler.fireHandlerChanged();
+	}
+
 	private void updateTourChart() {
 
 		// load the tourdata from the database
-		fTourData = TourManager.getInstance().getTourData(fEditorInput.fTourId);
+		fTourData = TourManager.getInstance().getTourData(fEditorInput.getTourId());
 
 		if (fTourData != null) {
 
@@ -344,18 +380,6 @@ public class TourEditor extends EditorPart {
 			setPartName(tourTitle);
 			setTitleToolTip("title tooltip ???"); //$NON-NLS-1$
 		}
-	}
-
-	private void updateRevertHandler() {
-		fRevertActionHandler.setEnabled(fIsTourDirty);
-		fRevertActionHandler.fireHandlerChanged();
-	}
-
-	/**
-	 * set status a reference tour was created
-	 */
-	public void setRefTourIsCreated() {
-		fIsRefTourCreated = true;
 	}
 
 }

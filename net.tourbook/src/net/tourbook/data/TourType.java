@@ -62,6 +62,9 @@ public class TourType {
 		this.typeId = typeId;
 	}
 
+	/**
+	 * @return Returns the name for the tour type
+	 */
 	public String getName() {
 		return name;
 	}
@@ -80,8 +83,7 @@ public class TourType {
 
 	/**
 	 * @return Returns the type id, this can be the saved type id or it can be
-	 *         <code>TOUR_TYPE_ID_NOT_DEFINED</code> or
-	 *         <code>TOUR_TYPE_ID_ALL</code>.
+	 *         {@link TourType#TOUR_TYPE_ID_ALL} or {@link TourType#TOUR_TYPE_ID_NOT_DEFINED}
 	 */
 	public long getTypeId() {
 		return typeId;

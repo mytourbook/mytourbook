@@ -46,7 +46,12 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	static TourbookPlugin			plugin	= TourbookPlugin.getDefault();
 
-	private ArrayList<TourType>		fTourTypes;
+	/**
+	 * tour types which are displayed in the tour type combobox, this list contains also the pseudo
+	 * tour types
+	 */
+	private ArrayList<TourType>		fAllTourTypes;
+
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	private Combo					fComboTourType;
@@ -80,6 +85,8 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		// register the listener
 		plugin.getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
+
+	@Override
 	protected Control createControl(Composite parent) {
 
 		if (PlatformUI.getWorkbench().isClosing()) {
@@ -116,14 +123,14 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		});
 
 		fComboTourType.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 
 				setActiveTourType();
 
 				// fire change event
-				plugin.getPreferenceStore().setValue(
-						ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED,
-						Math.random());
+				plugin.getPreferenceStore()
+						.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
 
 			}
 		});
@@ -135,50 +142,41 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	}
 
 	/**
-	 * reads the tour types from the db, set the fTourTypes list and fill the
-	 * combo box
+	 * reads the tour types from the db, set the tour type list and fill the combo box
 	 */
 	private void fillTourTypeComboBox() {
 
-		fTourTypes = new ArrayList<TourType>();
+		fAllTourTypes = new ArrayList<TourType>();
 
 		// add entry where the tour type will be ignored
-		fTourTypes.add(new TourType(
-				Messages.App_Tour_type_item_all_types,
+		fAllTourTypes.add(new TourType(Messages.App_Tour_type_item_all_types,
 				TourType.TOUR_TYPE_ID_ALL));
 
 		// add tour type for tours where the tour type is not defined
-		fTourTypes.add(new TourType(
-				Messages.App_Tour_type_item_not_defined,
+		fAllTourTypes.add(new TourType(Messages.App_Tour_type_item_not_defined,
 				TourType.TOUR_TYPE_ID_NOT_DEFINED));
 
 		/*
 		 * get tour types from the db
 		 */
-		ArrayList<TourType> tourTypesFromDb = TourDatabase.getTourTypes();
+		ArrayList<TourType> dbTourTypes = TourDatabase.getTourTypes();
 
-		if (tourTypesFromDb == null) {
-			return;
-		}
+//		if (dbTourTypes == null) {
+//			return;
+//		}
 
-		// sort tour types list
-		// Collections.sort(tourTypesFromDb, new Comparator<TourType>() {
-		// public int compare(TourType tt1, TourType tt2) {
-		// return tt1.getName().compareTo(tt2.getName());
-		// }
-		// });
-
-		for (TourType tourTypeFromDb : tourTypesFromDb) {
-			fTourTypes.add(tourTypeFromDb);
+		for (TourType dbTourType : dbTourTypes) {
+			fAllTourTypes.add(dbTourType);
 		}
 
 		// update combo box
 		fComboTourType.removeAll();
-		for (TourType tourType : fTourTypes) {
+		for (TourType tourType : fAllTourTypes) {
 			fComboTourType.add(tourType.getName());
 		}
 
-		plugin.setTourTypes(fTourTypes);
+		plugin.setAllTourTypes(fAllTourTypes);
+		plugin.setDbTourTypes(dbTourTypes);
 	}
 
 	void saveState(IMemento memento) {
@@ -186,9 +184,8 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		// save: selected tour type
 		int selectionIndex = fComboTourType.getSelectionIndex();
 		if (selectionIndex != -1) {
-			plugin.getDialogSettings().put(
-					ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_ID,
-					fTourTypes.get(selectionIndex).getTypeId());
+			plugin.getDialogSettings().put(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_ID,
+					fAllTourTypes.get(selectionIndex).getTypeId());
 		}
 	}
 
@@ -204,13 +201,12 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			fComboTourType.select(selectionIndex);
 		}
 
-		plugin.setTourTypes(fTourTypes);
-		plugin.setActiveTourType(fTourTypes.get(selectionIndex));
+		plugin.setAllTourTypes(fAllTourTypes);
+		plugin.setActiveTourType(fAllTourTypes.get(selectionIndex));
 	}
 
 	/**
-	 * reselect the tour type in the combo box and set the active tour type in
-	 * the plugin
+	 * reselect the tour type in the combo box and set the active tour type in the plugin
 	 * 
 	 * @param lastTourTypeId
 	 */
@@ -227,7 +223,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		// find the tour type in the combobox
 		int tourTypeIndex = 0;
 
-		for (TourType tourType : fTourTypes) {
+		for (TourType tourType : fAllTourTypes) {
 			if (tourType.getTypeId() == lastTourTypeId) {
 				// reselect last tour type
 				activeTourTypeId = lastTourTypeId;
@@ -241,7 +237,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		if (activeTourTypeId == TourType.TOUR_TYPE_ID_ALL) {
 			// the last tour type was not found, select first entry
 			fComboTourType.select(0);
-			activeTourType = fTourTypes.get(0);
+			activeTourType = fAllTourTypes.get(0);
 		}
 
 		// if (activeTourType != null) {
@@ -254,8 +250,8 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		Long lastTourTypeId;
 		try {
 
-			lastTourTypeId = plugin.getDialogSettings().getLong(
-					ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_ID);
+			lastTourTypeId = plugin.getDialogSettings()
+					.getLong(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_ID);
 
 		} catch (NumberFormatException e) {
 			// last tour type id was not found, select all

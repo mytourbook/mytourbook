@@ -86,7 +86,7 @@ public class StatisticMonth extends YearStatistic {
 		TourDataMonth tourMonthData = ProviderTourMonth.getInstance().getMonthData(person,
 				typeId,
 				year,
-				isRefreshDataWithReset() || refreshData);
+				isDataDirtyWithReset() || refreshData);
 
 		// reset min/max values
 		if (fIsSynchScaleEnabled == false && refreshData) {

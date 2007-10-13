@@ -70,7 +70,7 @@ public class ProviderTourWeek extends DataProvider {
 		fTourWeekData = new TourDataWeek();
 
 		// get the tour types
-		ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getTourTypes();
+		ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getAllTourTypes();
 		TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		final int serieLength = tourTypes.length;

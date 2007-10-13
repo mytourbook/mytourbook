@@ -35,7 +35,7 @@ import org.eclipse.ui.splash.BasicSplashHandler;
  */
 public class MyTourbookSplashHandler extends BasicSplashHandler {
 
-	private static final String	APP_BUILD_ID	= "Version 1.1.0.dev";
+	private static final String	APP_BUILD_ID	= "Version 1.1.0.dev"; //$NON-NLS-1$
 
 	@Override
 	public void init(Shell splash) {

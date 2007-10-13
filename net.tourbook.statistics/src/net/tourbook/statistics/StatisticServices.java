@@ -64,7 +64,7 @@ public class StatisticServices {
 		ArrayList<RGB> rgbLine = new ArrayList<RGB>();
 
 		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getTourTypes();
+		ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getAllTourTypes();
 
 		/*
 		 * add default color
@@ -114,7 +114,7 @@ public class StatisticServices {
 
 	public static void setTourTypeColorIndex(ChartDataYSerie yData, long[][] typeIds) {
 
-		ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getTourTypes();
+		ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getAllTourTypes();
 
 		int[][] colorIndex = new int[typeIds.length][typeIds[0].length];
 		int serieIndex = 0;

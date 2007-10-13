@@ -23,7 +23,6 @@ import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -34,10 +33,10 @@ import org.osgi.framework.BundleContext;
  */
 public class TourbookPlugin extends AbstractUIPlugin {
 
-	public static final String		PLUGIN_ID						= "net.tourbook";							//$NON-NLS-1$
+	public static final String		PLUGIN_ID						= "net.tourbook";		//$NON-NLS-1$
 
-	public static final String		EXT_POINT_STATISTIC_YEAR		= "statisticYear";							//$NON-NLS-1$
-	public static final String		EXT_POINT_DEVICE_DATA_READER	= "deviceDataReader";						//$NON-NLS-1$
+	public static final String		EXT_POINT_STATISTIC_YEAR		= "statisticYear";		//$NON-NLS-1$
+	public static final String		EXT_POINT_DEVICE_DATA_READER	= "deviceDataReader";	//$NON-NLS-1$
 
 	// The shared instance.
 	private static TourbookPlugin	plugin;
@@ -56,7 +55,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
 	private MyTourbookSplashHandler	fSplashHandler;
 
-	private final ListenerList		fPropertyListeners				= new ListenerList(ListenerList.IDENTITY);
+	private ArrayList<TourType>		fDbTourTypes;
 
 	/**
 	 * The constructor.
@@ -96,24 +95,19 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		}
 	}
 
-//	public void addPropertyListener(ITourbookPropertyListener listener) {
-//		fPropertyListeners.add(listener);
-//	}
-
-//	public void firePropertyChange(int propertyId, Object propertyData) {
-//		Object[] allListeners = fPropertyListeners.getListeners();
-//		for (int i = 0; i < allListeners.length; i++) {
-//			final ITourbookPropertyListener listener = (ITourbookPropertyListener) allListeners[i];
-//			listener.propertyChanged(propertyId, propertyData);
-//		}
-//	}
-
 	public TourPerson getActivePerson() {
 		return fCurrentPerson;
 	}
 
 	public TourType getActiveTourType() {
 		return fActiveTourType;
+	}
+
+	/**
+	 * @return Returns the tour types which are stored in the database
+	 */
+	public ArrayList<TourType> getDbTourTypes() {
+		return fDbTourTypes;
 	}
 
 	/**
@@ -147,17 +141,19 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return fSplashHandler;
 	}
 
-	public ArrayList<TourType> getTourTypes() {
+	/**
+	 * @return Returns all tour types which are displayed in the tour type combobox
+	 */
+	public ArrayList<TourType> getAllTourTypes() {
 		return fTourTypes;
 	}
 
-	public TourType[] getTourTypesArray() {
+	/**
+	 * @return Returns all tour types which are displayed in the tour type combobox
+	 */
+	public TourType[] getAllTourTypesArray() {
 		return fTourTypes.toArray(new TourType[fTourTypes.size()]);
 	}
-
-//	public void removePropertyListener(ITourbookPropertyListener listener) {
-//		fPropertyListeners.remove(listener);
-//	}
 
 	public void setActivePerson(TourPerson currentPerson) {
 		fCurrentPerson = currentPerson;
@@ -167,12 +163,26 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		fActiveTourType = tourType;
 	}
 
-	public void setSplashHandler(MyTourbookSplashHandler splashHandler) {
-		fSplashHandler = splashHandler;
+	/**
+	 * Set the tour types which are displayed in the tour type combobox
+	 * 
+	 * @param tourTypes
+	 */
+	public void setAllTourTypes(ArrayList<TourType> tourTypes) {
+		fTourTypes = tourTypes;
 	}
 
-	public void setTourTypes(ArrayList<TourType> tourTypes) {
-		fTourTypes = tourTypes;
+	/**
+	 * Set the tour types which are stored in the database
+	 * 
+	 * @param dbTourTypes
+	 */
+	public void setDbTourTypes(ArrayList<TourType> dbTourTypes) {
+		fDbTourTypes = dbTourTypes;
+	}
+
+	public void setSplashHandler(MyTourbookSplashHandler splashHandler) {
+		fSplashHandler = splashHandler;
 	}
 
 	/**

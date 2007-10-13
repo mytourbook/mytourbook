@@ -1457,6 +1457,7 @@ public class ChartComponentGraph extends Canvas {
 			 * mac osx is still flickering, added the drawChartImage in version 1.0
 			 */
 			if (fGraphImage != null) {
+
 				Image image = drawChartImage(gc);
 
 				int gcHeight = clientArea.height;
@@ -1580,7 +1581,7 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * draw the chart into the image
+	 * draw the graph into the graph image
 	 */
 	private void drawGraphImage() {
 

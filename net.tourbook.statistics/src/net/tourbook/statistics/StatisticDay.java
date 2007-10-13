@@ -303,7 +303,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		fTourDataTour = ProviderTourDay.getInstance().getDayData(person,
 				typeId,
 				year,
-				isRefreshDataWithReset() || refreshData);
+				isDataDirtyWithReset() || refreshData);
 
 		// reset min/max values
 		if (fIsSynchScaleEnabled == false && refreshData) {

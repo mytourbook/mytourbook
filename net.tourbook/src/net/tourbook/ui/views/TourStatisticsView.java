@@ -21,6 +21,8 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContainer;
+import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -78,6 +80,8 @@ public class TourStatisticsView extends ViewPart {
 	public Font						fFontBold;
 
 	protected Long					fActiveTourId;
+
+	private ITourPropertyListener	fTourPropertyListener;
 
 	private void addPartListener() {
 
@@ -150,6 +154,22 @@ public class TourStatisticsView extends ViewPart {
 				.addPropertyChangeListener(fPrefChangeListener);
 	}
 
+	private void addTourPropertyListener() {
+
+		fTourPropertyListener = new ITourPropertyListener() {
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			public void propertyChanged(int propertyId, Object propertyData) {
+				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
+
+					// update statistics
+					refreshStatistics();
+				}
+			}
+		};
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+	}
+
+	@Override
 	public void createPartControl(Composite parent) {
 
 		createResources();
@@ -164,6 +184,7 @@ public class TourStatisticsView extends ViewPart {
 
 		addPartListener();
 		addPrefListener();
+		addTourPropertyListener();
 
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
 		fActiveTourTypeId = TourbookPlugin.getDefault().getActiveTourType().getTypeId();
@@ -186,9 +207,11 @@ public class TourStatisticsView extends ViewPart {
 		fFontBold = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 	}
 
+	@Override
 	public void dispose() {
 
 		getViewSite().getPage().removePartListener(fPartListener);
+		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
 		TourbookPlugin.getDefault()
 				.getPluginPreferences()
@@ -204,6 +227,7 @@ public class TourStatisticsView extends ViewPart {
 		super.dispose();
 	}
 
+	@Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 
 		super.init(site, memento);
@@ -218,10 +242,12 @@ public class TourStatisticsView extends ViewPart {
 		fStatisticContainer.refreshStatistic(fActivePerson, fActiveTourTypeId);
 	}
 
+	@Override
 	public void saveState(IMemento memento) {
 		fStatisticContainer.saveState(memento);
 	}
 
+	@Override
 	public void setFocus() {}
 
 }

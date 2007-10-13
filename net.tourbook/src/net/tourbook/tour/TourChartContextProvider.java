@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartXSlider;
@@ -22,6 +24,8 @@ import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.ActionSetTourType;
+import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.views.tourBook.MarkerDialog;
 import net.tourbook.ui.views.tourMap.ReferenceTourManager;
 
@@ -29,12 +33,14 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.swt.widgets.Display;
 
-public class TourChartContextProvider implements IChartContextProvider {
+public class TourChartContextProvider implements IChartContextProvider, ISelectedTours {
 
-	public ChartXSlider		fSlider;
+	public ChartXSlider			fSlider;
 
-	private MarkerDialog	fMarkerDialog;
-	private TourEditor		fTourEditor;
+	private MarkerDialog		fMarkerDialog;
+	private TourEditor			fTourEditor;
+
+	private ActionSetTourType	fActionSetTourType;
 
 	/**
 	 * add a new reference tour to all reference tours
@@ -66,6 +72,21 @@ public class TourChartContextProvider implements IChartContextProvider {
 			super(text);
 
 			fSlider = slider;
+		}
+
+		private TourMarker createTourMarker(TourData tourData) {
+
+			int serieIndex = fSlider.getValuesIndex();
+
+			// create a new marker
+			TourMarker newTourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_CUSTOM);
+			newTourMarker.setSerieIndex(serieIndex);
+			newTourMarker.setDistance(tourData.distanceSerie[serieIndex]);
+			newTourMarker.setTime(tourData.timeSerie[serieIndex]);
+			newTourMarker.setLabel(Messages.TourData_Label_new_marker);
+			newTourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+
+			return newTourMarker;
 		}
 
 		@Override
@@ -108,21 +129,6 @@ public class TourChartContextProvider implements IChartContextProvider {
 				fMarkerDialog.addTourMarker(newTourMarker);
 			}
 		}
-
-		private TourMarker createTourMarker(TourData tourData) {
-
-			int serieIndex = fSlider.getValuesIndex();
-
-			// create a new marker
-			TourMarker newTourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_CUSTOM);
-			newTourMarker.setSerieIndex(serieIndex);
-			newTourMarker.setDistance(tourData.distanceSerie[serieIndex]);
-			newTourMarker.setTime(tourData.timeSerie[serieIndex]);
-			newTourMarker.setLabel(Messages.TourData_Label_new_marker);
-			newTourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-
-			return newTourMarker;
-		}
 	}
 
 	public TourChartContextProvider(MarkerDialog markerDialog) {
@@ -131,6 +137,37 @@ public class TourChartContextProvider implements IChartContextProvider {
 
 	public TourChartContextProvider(TourEditor tourEditor) {
 		fTourEditor = tourEditor;
+
+		fActionSetTourType = new ActionSetTourType(this);
+	}
+
+	private void createMarkerMenu(	IMenuManager menuMgr,
+									ChartXSlider leftSlider,
+									ChartXSlider rightSlider) {
+
+		if (leftSlider != null || rightSlider != null) {
+
+			// marker menu
+			if (leftSlider != null && rightSlider == null) {
+				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_marker, leftSlider));
+			} else {
+				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_left_marker,
+						leftSlider));
+				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_right_marker,
+						rightSlider));
+			}
+		}
+	}
+
+	public void fillBarChartContextMenu(IMenuManager menuMgr,
+										int hoveredBarSerieIndex,
+										int hoveredBarValueIndex) {}
+
+	public void fillContextMenu(IMenuManager menuMgr) {
+
+		if (fActionSetTourType != null) {
+			menuMgr.add(fActionSetTourType);
+		}
 	}
 
 	public void fillXSliderContextMenu(	IMenuManager menuMgr,
@@ -158,31 +195,16 @@ public class TourChartContextProvider implements IChartContextProvider {
 
 	}
 
-	private void createMarkerMenu(	IMenuManager menuMgr,
-									ChartXSlider leftSlider,
-									ChartXSlider rightSlider) {
+	public ArrayList<TourData> getSelectedTours() {
 
-		if (leftSlider != null || rightSlider != null) {
+		ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+		selectedTourData.add(fTourEditor.getTourChart().fTourData);
+		return selectedTourData;
 
-			// marker menu
-			if (leftSlider != null && rightSlider == null) {
-				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_marker, leftSlider));
-			} else {
-				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_left_marker,
-						leftSlider));
-				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_right_marker,
-						rightSlider));
-			}
-		}
 	}
 
-	public void fillBarChartContextMenu(IMenuManager menuMgr,
-										int hoveredBarSerieIndex,
-										int hoveredBarValueIndex) {}
-
-	public void fillContextMenu(IMenuManager menuMgr) {
-	// TODO Auto-generated method stub
-
+	public boolean isFromTourEditor() {
+		return true;
 	}
 
 }

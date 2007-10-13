@@ -122,7 +122,7 @@ public class UI {
 
 				// Check whether this shell points to the Application main window's shell:
 				if (data instanceof IWorkbenchWindow) {
-					
+
 					String title;
 					if (newTitle == null) {
 						title = Messages.App_Title;
@@ -213,6 +213,9 @@ public class UI {
 		};
 	}
 
+	/**
+	 * dispose resources
+	 */
 	public void dispose() {
 		disposeImages();
 	}
@@ -249,7 +252,7 @@ public class UI {
 	private DrawingColors getTourTypeColors(final Display display, final long tourTypeId) {
 
 		final DrawingColors drawingColors = new DrawingColors();
-		final ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getTourTypes();
+		final ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getAllTourTypes();
 
 		TourType colorTourType = null;
 
@@ -280,6 +283,10 @@ public class UI {
 		return drawingColors;
 	}
 
+	/**
+	 * @param typeId
+	 * @return Returns an image which represents the tour type
+	 */
 	public Image getTourTypeImage(final long typeId) {
 
 		final String colorId = TOUR_TYPE_PREFIX + typeId;

@@ -30,7 +30,7 @@ public class TourEditorInputFactory implements IElementFactory {
 	}
 
 	public static void saveState(IMemento memento, TourEditorInput input) {
-		memento.putString(MEMENTO_TOUR_ID, Long.toString(input.fTourId));
+		memento.putString(MEMENTO_TOUR_ID, Long.toString(input.getTourId()));
 	}
 
 	public IAdaptable createElement(IMemento memento) {

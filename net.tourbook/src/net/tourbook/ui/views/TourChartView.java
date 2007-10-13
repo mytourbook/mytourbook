@@ -76,6 +76,8 @@ public class TourChartView extends ViewPart {
 
 	private class TourChartContextProvicer implements IChartContextProvider {
 
+		final ActionEditTour	actionEditTour	= new ActionEditTour(TourChartView.this);
+
 		public void fillBarChartContextMenu(IMenuManager menuMgr,
 											int hoveredBarSerieIndex,
 											int hoveredBarValueIndex) {}
@@ -86,10 +88,9 @@ public class TourChartView extends ViewPart {
 
 		public void fillContextMenu(IMenuManager menuMgr) {
 
-			final ActionEditTour actionEditTour = new ActionEditTour(TourChartView.this);
-			actionEditTour.setEnabled(fTourData != null && fTourData.getTourPerson() != null);
-
 			menuMgr.add(actionEditTour);
+
+			actionEditTour.setEnabled(fTourData != null && fTourData.getTourPerson() != null);
 		}
 	}
 

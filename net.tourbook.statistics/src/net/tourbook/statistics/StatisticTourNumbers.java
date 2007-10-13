@@ -329,7 +329,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	 */
 	private void createStatisticData(TourDataTour tourDataTour) {
 
-		ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getTourTypes();
+		ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getAllTourTypes();
 		int colorLength = tourTypeList.size();
 
 		int distanceLength = fStatDistanceUnits.length;
@@ -521,7 +521,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		fTourDataTour = ProviderTourDay.getInstance().getDayData(person,
 				typeId,
 				year,
-				isRefreshDataWithReset() || refreshData);
+				isDataDirtyWithReset() || refreshData);
 
 		// reset min/max values
 		if (fIsSynchScaleEnabled == false && refreshData) {

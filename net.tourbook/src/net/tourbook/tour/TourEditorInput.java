@@ -29,15 +29,41 @@ import org.eclipse.ui.IPersistableElement;
  */
 public class TourEditorInput implements IEditorInput, IPersistableElement {
 
-	long	fTourId;
-	String	fEditorTitle;
+	private long	fTourId;
+	String			fEditorTitle;
 
 	public TourEditorInput(long tourId) {
 		fTourId = tourId;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+
+		/*
+		 * check if the tour is already open
+		 */
+
+		if (obj instanceof TourEditorInput) {
+
+			if (((TourEditorInput) obj).fTourId == fTourId) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public boolean exists() {
 		return false;
+	}
+
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	public Object getAdapter(Class adapter) {
+		return null;
+	}
+
+	public String getFactoryId() {
+		return TourEditorInputFactory.getFactoryId();
 	}
 
 	public ImageDescriptor getImageDescriptor() {
@@ -62,29 +88,8 @@ public class TourEditorInput implements IEditorInput, IPersistableElement {
 		return fEditorTitle;
 	}
 
-	public boolean equals(Object obj) {
-
-		/*
-		 * check if the tour is already open
-		 */
-
-		if (obj instanceof TourEditorInput) {
-
-			if (((TourEditorInput) obj).fTourId == fTourId) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
-	public Object getAdapter(Class adapter) {
-		return null;
-	}
-
-	public String getFactoryId() {
-		return TourEditorInputFactory.getFactoryId();
+	public long getTourId() {
+		return fTourId;
 	}
 
 	public void saveState(IMemento memento) {

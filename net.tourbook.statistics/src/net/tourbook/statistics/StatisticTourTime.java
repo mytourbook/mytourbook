@@ -172,7 +172,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		fTourTimeData = ProviderTourTime.getInstance().getTourTimeData(person,
 				type,
 				year,
-				isRefreshDataWithReset() || refreshData);
+				isDataDirtyWithReset() || refreshData);
 
 		// reset min/max values
 		if (fIsSynchScaleEnabled == false && refreshData) {
@@ -261,7 +261,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				 * get tour type name
 				 */
 				final long typeId = fTourTimeData.fTypeIds[valueIndex];
-				final ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getTourTypes();
+				final ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getAllTourTypes();
 
 				String tourTypeName = ""; //$NON-NLS-1$
 				for (final Iterator<TourType> iter = tourTypes.iterator(); iter.hasNext();) {

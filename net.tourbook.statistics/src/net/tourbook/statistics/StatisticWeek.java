@@ -79,7 +79,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		TourDataWeek tourWeekData = ProviderTourWeek.getInstance().getWeekData(person,
 				typeId,
 				year,
-				isRefreshDataWithReset() || refreshData);
+				isDataDirtyWithReset() || refreshData);
 
 		// reset min/max values
 		if (fIsSynchScaleEnabled == false && refreshData) {

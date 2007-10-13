@@ -21,27 +21,33 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";					//$NON-NLS-1$
 
-	public static String	App_Action_About;
+	public static String		App_Action_About;
 
-	public static String	App_Action_adjust_imported_year;
+	public static String		App_Action_adjust_imported_year;
 
-	public static String	App_Action_edit_tour;
+	public static String		App_Action_edit_tour;
 
-	public static String	App_Action_Menu_file;
+	public static String		App_Action_Menu_file;
 
-	public static String	App_Action_Menu_help;
+	public static String		App_Action_Menu_help;
 
-	public static String	App_Action_Menu_tools;
+	public static String		App_Action_Menu_tools;
 
-	public static String	App_Action_Menu_view;
+	public static String		App_Action_Menu_view;
 
-	public static String	App_Action_open_perspective;
+	public static String		App_Action_open_perspective;
 
-	public static String	App_Action_open_preferences;
+	public static String		App_Action_open_preferences;
 
-	public static String	App_Action_open_tour_segmenter;
+	public static String		App_Action_open_tour_segmenter;
 
-	public static String	App_Action_open_tour_segmenter_tooltip;
+	public static String		App_Action_open_tour_segmenter_tooltip;
+
+	public static String		App_Action_set_tour_type;
+
+	public static String		App_Action_set_tour_type_dlg_message;
+
+	public static String		App_Action_set_tour_type_dlg_title;
 
 	public static String		App_People_item_all;
 	public static String		App_People_tooltip;
@@ -246,11 +252,9 @@ public class Messages extends NLS {
 
 	public static String		Image__link;
 
-	public static String	Image__marker_editor;
-
 	public static String		Image__open_tour_segmenter;
 
-	public static String	Image__refresh;
+	public static String		Image__refresh;
 
 	public static String		Image__remove_all;
 
@@ -377,21 +381,21 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_Dlg_rename_tour_type_title;
 	public static String		Pref_TourTypes_Title;
 
-	public static String	Raw_Data_Action_clear_view;
+	public static String		Raw_Data_Action_clear_view;
 
-	public static String	Raw_Data_Action_clear_view_tooltip;
+	public static String		Raw_Data_Action_clear_view_tooltip;
 
-	public static String	Raw_Data_Action_save_tour_for_person;
+	public static String		Raw_Data_Action_save_tour_for_person;
 
-	public static String	Raw_Data_Action_save_tour_with_person;
+	public static String		Raw_Data_Action_save_tour_with_person;
 
-	public static String	Raw_Data_Action_save_tours_for_person;
+	public static String		Raw_Data_Action_save_tours_for_person;
 
-	public static String	Raw_Data_Dlg_save_tour_msg;
+	public static String		Raw_Data_Dlg_save_tour_msg;
 
-	public static String	Raw_Data_Dlg_save_tour_title;
+	public static String		Raw_Data_Dlg_save_tour_title;
 
-	public static String	Raw_Data_Label_unknown_device;
+	public static String		Raw_Data_Label_unknown_device;
 
 	public static String		Tour_Action_adjust_tour_altitude;
 	public static String		Tour_Action_adjust_tour_altitude_tooltip;
@@ -418,17 +422,17 @@ public class Messages extends NLS {
 
 	public static String		Tour_Book_Action_delete_selected_tours;
 
-	public static String		Tour_Book_Action_set_tour_type;
+//	public static String		Tour_Book_Action_set_tour_type;
 
-	public static String		Tour_Book_Action_set_tour_type_with_dlg;
+//	public static String		Tour_Book_Action_set_tour_type_with_dlg;
 
 	public static String		Tour_Book_Combo_statistic_tooltip;
 
 	public static String		Tour_Book_Combo_year_tooltip;
 
-	public static String		Tour_Book_Dlg_set_tour_type_msg;
+//	public static String		Tour_Book_Dlg_set_tour_type_msg;
 
-	public static String		Tour_Book_Dlg_set_tour_type_title;
+//	public static String		Tour_Book_Dlg_set_tour_type_title;
 
 	public static String		Tour_Book_Label_chart_title;
 
@@ -436,9 +440,9 @@ public class Messages extends NLS {
 
 	public static String		Tour_Database_update_tour;
 
-	public static String	Tour_Map_Action_collapse_all_tooltip;
+	public static String		Tour_Map_Action_collapse_all_tooltip;
 
-	public static String	Tour_Map_Action_refresh_view_tooltip;
+	public static String		Tour_Map_Action_refresh_view_tooltip;
 
 	public static String		Tour_Properties_Label_distance;
 	public static String		Tour_Properties_Label_distance_unit;
@@ -547,6 +551,8 @@ public class Messages extends NLS {
 	public static String		Tour_Properties_Label_tour_date;
 
 	public static String		Tour_Properties_Label_tour_title;
+
+	public static String		Tour_Properties_Label_tour_type;
 
 	public static String		Tour_Segmenter_Column_altimeter_down;
 
