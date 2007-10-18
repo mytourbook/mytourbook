@@ -15,10 +15,14 @@
    <feature url="features/net.tourbook.patch_1.0.0.v20071005patch1.jar" id="net.tourbook.patch" version="1.0.0.v20071005patch1" patch="true">
       <category name="MyTourbook 1.0.0 patches"/>
    </feature>
+   <feature url="features/net.tourbook.device.feature_1.0.1.v20071018.jar" id="net.tourbook.device.feature" version="1.0.1.v20071018">
+      <category name="MyTourbook 1.0.1"/>
+   </feature>
    <category-def name="MyTourbook 1.0.0" label="MyTourbook 1.0.0"/>
    <category-def name="MyTourbook 1.0.0 patches" label="MyTourbook 1.0.0 patches">
       <description>
          Patches for MyTourbook 1.0.0
       </description>
    </category-def>
+   <category-def name="MyTourbook 1.0.1" label="MyTourbook 1.0.1"/>
 </site>

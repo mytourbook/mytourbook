@@ -4,10 +4,10 @@
    <extension
          point="net.tourbook.deviceDataReader">
       <device
-            class="net.tourbook.device.garmin305.Garmin305DeviceDataReader"
+            class="net.tourbook.device.garmin.GarminDeviceDataReader"
             fileextension="*"
-            id="net.tourbook.device.Garmin305DeviceReader"
-            name="Garmin Forrunner 305"/>
+            id="net.tourbook.device.GarminDeviceReader"
+            name="Garmin"/>
    </extension>
 
 </plugin>
