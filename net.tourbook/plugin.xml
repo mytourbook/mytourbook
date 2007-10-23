@@ -88,9 +88,15 @@
             id="net.tourbook.preferences.PrefPageChartGraphs"
             name="%preference_page_Graphs"/>
       <page
+            class="net.tourbook.preferences.PrefPageTourTypeFilterList"
+            id="net.tourbook.preferences.PrefPageTourTypeRoot"
+            name="%preference_page_tour_type_root"/>
+      <page
+            category="net.tourbook.preferences.PrefPageTourTypeRoot"
             class="net.tourbook.preferences.PrefPageTourTypes"
             id="net.tourbook.preferences.PrefPageTourTypes"
-            name="%preference_page_Tour_Types"/>
+            name="%preference_page_tour_types">
+      </page>
    </extension>
 
    <extension

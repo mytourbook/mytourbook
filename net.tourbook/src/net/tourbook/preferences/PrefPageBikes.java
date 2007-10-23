@@ -96,7 +96,9 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 	private class BikeContentProvider implements IStructuredContentProvider {
 
 		public BikeContentProvider() {}
+
 		public void dispose() {}
+
 		public Object[] getElements(Object parent) {
 			if (fBikes == null) {
 				fBikes = TourDatabase.getTourBikes();
@@ -189,8 +191,10 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		fComboBikeType = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboBikeType.setVisibleItemCount(20);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		gd.widthHint = 50;
 		fComboBikeType.setLayoutData(gd);
 		fComboBikeType.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 
 				int selectedIndex = fComboBikeType.getSelectionIndex();
@@ -235,9 +239,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		/*
 		 * field: weight
 		 */
-		InputFieldFloat floatInput = new InputFieldFloat(
-				container,
-				"&Weight (kg):", //$NON-NLS-1$
+		InputFieldFloat floatInput = new InputFieldFloat(container, "&Weight (kg):", //$NON-NLS-1$
 				convertHorizontalDLUsToPixels(40));
 
 		fTextWeight = floatInput.getTextField();
@@ -269,6 +271,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		fComboFrontTyre = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboFrontTyre.setVisibleItemCount(20);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		gd.widthHint = 50;
 		fComboFrontTyre.setLayoutData(gd);
 		fComboFrontTyre.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
@@ -295,6 +298,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		fComboRearTyre = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fComboRearTyre.setVisibleItemCount(20);
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		gd.widthHint = 50;
 		fComboRearTyre.setLayoutData(gd);
 		fComboRearTyre.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
@@ -326,7 +330,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		TableLayoutComposite layouter = new TableLayoutComposite(container, SWT.NONE);
 		GridData gridData = new GridData(GridData.FILL_BOTH);
-		gridData.widthHint = convertWidthInCharsToPixels(30);
+		gridData.widthHint = convertWidthInCharsToPixels(20);
 		layouter.setLayoutData(gridData);
 
 		final Table table = new Table(layouter, (SWT.H_SCROLL
@@ -359,12 +363,14 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		fBikeViewer.setLabelProvider(new BikeLabelProvider());
 
 		fBikeViewer.setSorter(new ViewerSorter() {
+			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
 				return collator.compare(((TourBike) e1).getName(), ((TourBike) e2).getName());
 			}
 		});
 
 		fBikeViewer.setComparator(new ViewerComparator() {
+			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
 				return ((TourBike) e1).getName().compareTo(((TourBike) e2).getName());
 			}
@@ -384,6 +390,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 			}
 		});
 	}
+
 	private void createBikeViewerButtons(Composite parent) {
 
 		Composite container = new Composite(parent, SWT.NONE);
@@ -399,6 +406,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		fButtonAdd.setText("&Add..."); //$NON-NLS-1$
 		setButtonLayoutData(fButtonAdd);
 		fButtonAdd.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onAddBike();
 			}
@@ -410,6 +418,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		GridData gd = setButtonLayoutData(fButtonDelete);
 		gd.verticalIndent = 10;
 		fButtonDelete.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onDeleteBike();
 				enableButtons();
@@ -418,6 +427,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 	}
 
+	@Override
 	protected Control createContents(Composite parent) {
 		Label label = new Label(parent, SWT.WRAP);
 		label.setText("Bikes are used to calculate the power."); //$NON-NLS-1$
@@ -428,7 +438,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
 		container.setLayout(gl);
-		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		container.setLayoutData(new GridData(SWT.NONE, SWT.FILL, true, true));
 
 		createBikeViewer(container);
 		createBikeViewerButtons(container);
@@ -548,8 +558,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		if (fIsBikeListModified) {
 
 			// fire bike list modify event
-			getPreferenceStore().setValue(
-					ITourbookPreferences.TOUR_BIKE_LIST_IS_MODIFIED,
+			getPreferenceStore().setValue(ITourbookPreferences.TOUR_BIKE_LIST_IS_MODIFIED,
 					Math.random());
 
 			fIsBikeListModified = false;
@@ -560,6 +569,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
 
+	@Override
 	public boolean okToLeave() {
 		saveBike();
 		fireBikeListModifyEvent();
@@ -598,9 +608,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		// ask for the reference tour name
 		String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
 
-		MessageDialog dialog = new MessageDialog(
-				this.getShell(),
-				"Delete Bike", //$NON-NLS-1$
+		MessageDialog dialog = new MessageDialog(this.getShell(), "Delete Bike", //$NON-NLS-1$
 				null,
 				"Are you sure to delete the bike(s) and remove them from ALL related persons?", //$NON-NLS-1$
 				MessageDialog.QUESTION,
@@ -646,17 +654,20 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		});
 	}
 
+	@Override
 	public boolean performCancel() {
 		fireBikeListModifyEvent();
 		return super.performCancel();
 	}
 
+	@Override
 	public boolean performOk() {
 		saveBike();
 		fireBikeListModifyEvent();
 
 		return super.performOk();
 	}
+
 	/**
 	 * save current bike when it was modified
 	 */

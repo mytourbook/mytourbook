@@ -90,9 +90,14 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	@Override
 	public void postWindowCreate() {
 
-	// show editor area
+		// show editor area
 //		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
 //		activePage.setEditorAreaVisible(true);
+
+		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+
+		configurer.setTitle(Messages.App_Title + " - " + MyTourbookSplashHandler.APP_BUILD_ID);
+
 	}
 
 	@Override
@@ -156,7 +161,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowProgressIndicator(true);
 		configurer.setShowPerspectiveBar(true);
 
-		configurer.setTitle(Messages.App_Title);
+		configurer.setTitle(Messages.App_Title + " - " + MyTourbookSplashHandler.APP_BUILD_ID);
 
 		PlatformUI.getPreferenceStore()
 				.setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, true);

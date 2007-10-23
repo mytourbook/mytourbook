@@ -66,6 +66,8 @@ public interface ITourbookPreferences {
 	public static final String	DEFAULT_IMPORT_TOUR_TYPE_ID				= "tourtype.import.default";				//$NON-NLS-1$
 
 	public static final String	TOUR_TYPE_LIST_IS_MODIFIED				= "tourtype.list.is-modified";				//$NON-NLS-1$
+	public static final String	TOUR_TYPE_FILTER_LIST					= "tourtype.filter.list";					//$NON-NLS-1$
+
 	public static final String	TOUR_BIKE_LIST_IS_MODIFIED				= "tourbike.list.is-modified";				//$NON-NLS-1$
 	public static final String	TOUR_PERSON_LIST_IS_MODIFIED			= "tourperson.list.is-modified";			//$NON-NLS-1$
 
@@ -77,12 +79,12 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	APP_DATA_FILTER_IS_MODIFIED				= "application.data-filter-is-modified";	//$NON-NLS-1$
 
-	public static final String	GRAPH_PROPERTY_CHARTTYPE				= "graph.property.chartType"; //$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_CHARTTYPE				= "graph.property.chartType";				//$NON-NLS-1$
 
-	public static final String	GRAPH_PROPERTY_IS_COMPUTE_VALUE			= "graph.property.is.compute-value"; //$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_IS_COMPUTE_VALUE			= "graph.property.is.compute-value";		//$NON-NLS-1$
 	public static final String	GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE	= "graph.property.timeslice.compute-value"; //$NON-NLS-1$
 
-	public static final String	GRAPH_PROPERTY_IS_CLIP_VALUE			= "graph.property.is.clip-value"; //$NON-NLS-1$
-	public static final String	GRAPH_PROPERTY_TIMESLICE_CLIP_VALUE		= "graph.property.timeslice.clip-value"; //$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_IS_CLIP_VALUE			= "graph.property.is.clip-value";			//$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_TIMESLICE_CLIP_VALUE		= "graph.property.timeslice.clip-value";	//$NON-NLS-1$
 
 }

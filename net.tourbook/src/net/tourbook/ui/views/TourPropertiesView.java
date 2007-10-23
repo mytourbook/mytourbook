@@ -23,6 +23,7 @@ import java.util.Locale;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourType;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
@@ -93,6 +94,10 @@ public class TourPropertiesView extends ViewPart {
 	private TourEditor				fTourEditor;
 
 	private ITourPropertyListener	fTourPropertyListener;
+
+	private ScrolledComposite		scrolledContainer;
+
+	private Composite				contentContainer;
 
 	private void addPartListener() {
 
@@ -259,14 +264,12 @@ public class TourPropertiesView extends ViewPart {
 
 		Label label;
 
-		final ScrolledComposite scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL
-				| SWT.H_SCROLL);
-
+		scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
 		scrolledContainer.setExpandVertical(true);
 		scrolledContainer.setExpandHorizontal(true);
 
-		final Composite contentContainer = new Composite(scrolledContainer, SWT.NONE);
-		contentContainer.setLayout(new GridLayout(4, true));
+		contentContainer = new Composite(scrolledContainer, SWT.NONE);
+		contentContainer.setLayout(new GridLayout(4, false));
 		contentContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		scrolledContainer.setContent(contentContainer);
@@ -410,7 +413,7 @@ public class TourPropertiesView extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED
@@ -494,7 +497,7 @@ public class TourPropertiesView extends ViewPart {
 		// start time
 		fCalendar.set(0, 0, 0, tourData.getStartHour(), tourData.getStartMinute(), 0);
 		fLblStartTime.setText(fTimeFormatter.format(fCalendar.getTime()));
-		fLblStartTime.pack(true);
+//		fLblStartTime.pack(true);
 
 		// recording time
 		final int recordingTime = tourData.getTourRecordingTime();
@@ -509,8 +512,8 @@ public class TourPropertiesView extends ViewPart {
 					((recordingTime % 3600) % 60));
 
 			fLblRecordingTime.setText(fDurationFormatter.format(fCalendar.getTime()));
-			fLblRecordingTime.pack(true);
 		}
+//		fLblRecordingTime.pack(true);
 
 		// driving time
 		final int drivingTime = tourData.getTourDrivingTime();
@@ -525,8 +528,8 @@ public class TourPropertiesView extends ViewPart {
 					((drivingTime % 3600) % 60));
 
 			fLblDrivingTime.setText(fDurationFormatter.format(fCalendar.getTime()));
-			fLblDrivingTime.pack(true);
 		}
+//		fLblDrivingTime.pack(true);
 
 		// data points
 		final int[] timeSerie = tourData.timeSerie;
@@ -536,11 +539,16 @@ public class TourPropertiesView extends ViewPart {
 			final int dataPoints = timeSerie.length;
 			fLblDatapoints.setText(Integer.toString(dataPoints));
 		}
-		fLblDatapoints.pack(true);
+//		fLblDatapoints.pack(true);
 
 		// tour type
-		fLblTourType.setText(tourData.getTourType().getName());
-		fLblTourType.pack(true);
+		final TourType tourType = tourData.getTourType();
+		if (tourType == null) {
+			fLblTourType.setText(""); //$NON-NLS-1$
+		} else {
+			fLblTourType.setText(tourType.getName());
+		}
+//		fLblTourType.pack(true);
 
 		/*
 		 * tab: location
@@ -561,10 +569,8 @@ public class TourPropertiesView extends ViewPart {
 		final String description = fTourData.getTourDescription();
 		fTextDescription.setText(description);
 
-//		fTabItemTourData.getControl().pack(true);
-//		fContainer.layout();
-
-		//		fContainer.pack(true);
+		scrolledContainer.setMinSize(contentContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		contentContainer.pack(true);
 	}
 
 }
