@@ -23,11 +23,10 @@ public class TourDataNormalizer {
 
 	private int[]			normalizedDistance	= null;
 	private int[]			normalizedAltitude	= null;
-	private int[]			normalizedTime		= null;
 
-	public void normalizeAltitude(	TourData tourData,
-									int measureStartIndex,
-									int measureEndIndex) {
+//	private int[]			normalizedTime		= null;
+
+	public void normalizeAltitude(TourData tourData, int measureStartIndex, int measureEndIndex) {
 
 		int[] measureAltitudes = tourData.altitudeSerie;
 		int[] measureDistances = tourData.distanceSerie;
@@ -39,7 +38,7 @@ public class TourDataNormalizer {
 
 		normalizedDistance = new int[normSize];
 		normalizedAltitude = new int[normSize];
-		normalizedTime = new int[normSize];
+//		normalizedTime = new int[normSize];
 
 		int normDistance = normStartDistance * NORMALIZED_DISTANCE;
 		int normAltitude = 0;
@@ -89,8 +88,11 @@ public class TourDataNormalizer {
 				measureAltitudeDiff = measureNextAltitude - measureLastAltitude;
 				distanceDiff = normDistance - measureLastDistance;
 
-				normAltitude = (int) ((float) measureAltitudeDiff
-						/ (float) measureDistanceDiff * distanceDiff);
+				if (measureDistanceDiff == 0 || distanceDiff == 0) {
+					normAltitude = 0;
+				} else {
+					normAltitude = (int) ((float) measureAltitudeDiff / (float) measureDistanceDiff * distanceDiff);
+				}
 			}
 
 			normalizedDistance[normIndex] = normDistance;
@@ -113,12 +115,5 @@ public class TourDataNormalizer {
 	 */
 	public int[] getNormalizedAltitude() {
 		return normalizedAltitude;
-	}
-
-	/**
-	 * @return Returns the normalizedTime.
-	 */
-	public int[] getNormalizedTime() {
-		return normalizedTime;
 	}
 }

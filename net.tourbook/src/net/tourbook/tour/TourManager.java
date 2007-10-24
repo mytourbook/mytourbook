@@ -34,7 +34,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
-import net.tourbook.ui.views.tourMap.TourDataNormalizer;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -298,145 +297,145 @@ public class TourManager {
 		}
 	}
 
-	private int compareTour(final TourData compareTourData) {
-
-		final TourDataNormalizer compareTourNormalizer = new TourDataNormalizer();
-		final int[] compareTourDataDistance = compareTourData.distanceSerie;
-
-		// normalize the tour which will be compared
-		compareTourNormalizer.normalizeAltitude(compareTourData,
-				0,
-				compareTourDataDistance.length - 1);
-
-		final int[] normCompDistances = compareTourNormalizer.getNormalizedDistance();
-		final int[] normCompAltitudes = compareTourNormalizer.getNormalizedAltitude();
-		final int[] normCompAltiDiff = new int[normCompAltitudes.length];
-		final int[] normCompTour = new int[normCompAltitudes.length];
-
-		/*
-		 * reference tour
-		 */
-
-		Long refTourId;
-		int refMeasureStartIndex;
-		int refMeasureEndIndex;
-
-		// Maur - Pfannenstiel
-		// refTourId = 2005102416228826L;
-		// refMeasureStartIndex = 50;
-		// refMeasureEndIndex = 153;
-
-		// Dübendorf - Greifensee
-		// refTourId = 20059301618311L;
-		// refMeasureStartIndex = 23;
-		// refMeasureEndIndex = 132;
-
-		// Egg - Pfannenstiel
-		// refTourId = 2005102416228826L;
-		// refMeasureStartIndex = 121;
-		// refMeasureEndIndex = 167;
-
-		// Maur - Forch
-		refTourId = 200592616168216L;
-		refMeasureStartIndex = 49;
-		refMeasureEndIndex = 101;
-
-		// get the reference tour
-		final TourData refTourData = TourManager.getInstance().getTourData(refTourId);
-		if (refTourData == null) {
-			return -1;
-		}
-
-		// normalize the reference tour
-		final TourDataNormalizer refTourNormalizer = new TourDataNormalizer();
-		refTourNormalizer.normalizeAltitude(refTourData, refMeasureStartIndex, refMeasureEndIndex);
-
-		final int[] refAltitudes = refTourNormalizer.getNormalizedAltitude();
-		int minAltiDiff = Integer.MAX_VALUE;
-
-		// start index of the reference tour in the compare tour
-		int compareIndexStart = -1;
-
-		final int compareLastIndex = normCompAltitudes.length;
-
-		for (int compareIndex = 0; compareIndex < normCompAltitudes.length; compareIndex++) {
-
-			int altitudeDiff = -1;
-
-			// loop: all data in the reference tour
-			for (int refIndex = 0; refIndex < refAltitudes.length; refIndex++) {
-
-				final int compareRefIndex = compareIndex + refIndex;
-
-				// make sure the ref index is not bigger than the compare index,
-				// this can happen when the reference data exeed the compare
-				// data
-				if (compareRefIndex == compareLastIndex) {
-					altitudeDiff = -1;
-					break;
-				}
-
-				// get the altitude difference between the reference and the
-				// measured value
-				final int diffCompareRef = Math.abs(refAltitudes[refIndex]
-						- normCompAltitudes[compareRefIndex]);
-
-				altitudeDiff += diffCompareRef;
-			}
-
-			// save the altitude difference in the pulse data
-			normCompAltiDiff[compareIndex] = altitudeDiff;
-
-			// find the lowest altitude, this will be the start point for the
-			// reference tour
-			if (altitudeDiff < minAltiDiff && altitudeDiff != -1) {
-				minAltiDiff = altitudeDiff;
-				compareIndexStart = compareIndex;
-			}
-		}
-
-		// show the reference tour in the temperature serie
-		for (int refIndex = 0; refIndex < refAltitudes.length; refIndex++) {
-
-			final int compareIndex = compareIndexStart + refIndex;
-
-			// prevent out of bounds error
-			if (compareIndex >= normCompTour.length) {
-				break;
-			}
-
-			normCompTour[compareIndex] = normCompAltitudes[compareIndex];
-		}
-
-		// distance for the reference tour
-//		final int refDistance = refTourData.distanceSerie[refMeasureEndIndex]
-//				- refTourData.distanceSerie[refMeasureStartIndex];
-
-		// get the start point in the compare tour
-		final int distanceStart = normCompDistances[compareIndexStart];
-
-		// find the start distance in the measure data
-		int compareIndex = 0;
-		for (compareIndex = 0; compareIndex < compareTourDataDistance.length; compareIndex++) {
-			if (compareTourDataDistance[compareIndex] >= distanceStart) {
-				break;
-			}
-		}
-//		final int compareDistanceStart = compareTourDataDistance[compareIndex];
-
-		// overwrite the changed data series
-		compareTourData.distanceSerie = compareTourNormalizer.getNormalizedDistance();
-		compareTourData.altitudeSerie = compareTourNormalizer.getNormalizedAltitude();
-		compareTourData.pulseSerie = normCompAltiDiff;
-		compareTourData.temperatureSerie = normCompTour;
-
-		// overwrite all data series, otherwise the chart will not be drawn
-		compareTourData.timeSerie = compareTourNormalizer.getNormalizedTime();
-		compareTourData.speedSerie = compareTourNormalizer.getNormalizedTime();
-		compareTourData.cadenceSerie = compareTourNormalizer.getNormalizedTime();
-
-		return compareIndexStart;
-	}
+//	private int compareTour(final TourData compareTourData) {
+//
+//		final TourDataNormalizer compareTourNormalizer = new TourDataNormalizer();
+//		final int[] compareTourDataDistance = compareTourData.distanceSerie;
+//
+//		// normalize the tour which will be compared
+//		compareTourNormalizer.normalizeAltitude(compareTourData,
+//				0,
+//				compareTourDataDistance.length - 1);
+//
+//		final int[] normCompDistances = compareTourNormalizer.getNormalizedDistance();
+//		final int[] normCompAltitudes = compareTourNormalizer.getNormalizedAltitude();
+//		final int[] normCompAltiDiff = new int[normCompAltitudes.length];
+//		final int[] normCompTour = new int[normCompAltitudes.length];
+//
+//		/*
+//		 * reference tour
+//		 */
+//
+//		Long refTourId;
+//		int refMeasureStartIndex;
+//		int refMeasureEndIndex;
+//
+//		// Maur - Pfannenstiel
+//		// refTourId = 2005102416228826L;
+//		// refMeasureStartIndex = 50;
+//		// refMeasureEndIndex = 153;
+//
+//		// Dübendorf - Greifensee
+//		// refTourId = 20059301618311L;
+//		// refMeasureStartIndex = 23;
+//		// refMeasureEndIndex = 132;
+//
+//		// Egg - Pfannenstiel
+//		// refTourId = 2005102416228826L;
+//		// refMeasureStartIndex = 121;
+//		// refMeasureEndIndex = 167;
+//
+//		// Maur - Forch
+//		refTourId = 200592616168216L;
+//		refMeasureStartIndex = 49;
+//		refMeasureEndIndex = 101;
+//
+//		// get the reference tour
+//		final TourData refTourData = TourManager.getInstance().getTourData(refTourId);
+//		if (refTourData == null) {
+//			return -1;
+//		}
+//
+//		// normalize the reference tour
+//		final TourDataNormalizer refTourNormalizer = new TourDataNormalizer();
+//		refTourNormalizer.normalizeAltitude(refTourData, refMeasureStartIndex, refMeasureEndIndex);
+//
+//		final int[] refAltitudes = refTourNormalizer.getNormalizedAltitude();
+//		int minAltiDiff = Integer.MAX_VALUE;
+//
+//		// start index of the reference tour in the compare tour
+//		int compareIndexStart = -1;
+//
+//		final int compareLastIndex = normCompAltitudes.length;
+//
+//		for (int compareIndex = 0; compareIndex < normCompAltitudes.length; compareIndex++) {
+//
+//			int altitudeDiff = -1;
+//
+//			// loop: all data in the reference tour
+//			for (int refIndex = 0; refIndex < refAltitudes.length; refIndex++) {
+//
+//				final int compareRefIndex = compareIndex + refIndex;
+//
+//				// make sure the ref index is not bigger than the compare index,
+//				// this can happen when the reference data exeed the compare
+//				// data
+//				if (compareRefIndex == compareLastIndex) {
+//					altitudeDiff = -1;
+//					break;
+//				}
+//
+//				// get the altitude difference between the reference and the
+//				// measured value
+//				final int diffCompareRef = Math.abs(refAltitudes[refIndex]
+//						- normCompAltitudes[compareRefIndex]);
+//
+//				altitudeDiff += diffCompareRef;
+//			}
+//
+//			// save the altitude difference in the pulse data
+//			normCompAltiDiff[compareIndex] = altitudeDiff;
+//
+//			// find the lowest altitude, this will be the start point for the
+//			// reference tour
+//			if (altitudeDiff < minAltiDiff && altitudeDiff != -1) {
+//				minAltiDiff = altitudeDiff;
+//				compareIndexStart = compareIndex;
+//			}
+//		}
+//
+//		// show the reference tour in the temperature serie
+//		for (int refIndex = 0; refIndex < refAltitudes.length; refIndex++) {
+//
+//			final int compareIndex = compareIndexStart + refIndex;
+//
+//			// prevent out of bounds error
+//			if (compareIndex >= normCompTour.length) {
+//				break;
+//			}
+//
+//			normCompTour[compareIndex] = normCompAltitudes[compareIndex];
+//		}
+//
+//		// distance for the reference tour
+////		final int refDistance = refTourData.distanceSerie[refMeasureEndIndex]
+////				- refTourData.distanceSerie[refMeasureStartIndex];
+//
+//		// get the start point in the compare tour
+//		final int distanceStart = normCompDistances[compareIndexStart];
+//
+//		// find the start distance in the measure data
+//		int compareIndex = 0;
+//		for (compareIndex = 0; compareIndex < compareTourDataDistance.length; compareIndex++) {
+//			if (compareTourDataDistance[compareIndex] >= distanceStart) {
+//				break;
+//			}
+//		}
+////		final int compareDistanceStart = compareTourDataDistance[compareIndex];
+//
+//		// overwrite the changed data series
+//		compareTourData.distanceSerie = compareTourNormalizer.getNormalizedDistance();
+//		compareTourData.altitudeSerie = compareTourNormalizer.getNormalizedAltitude();
+//		compareTourData.pulseSerie = normCompAltiDiff;
+//		compareTourData.temperatureSerie = normCompTour;
+//
+//		// overwrite all data series, otherwise the chart will not be drawn
+////		compareTourData.timeSerie = compareTourNormalizer.getNormalizedTime();
+////		compareTourData.speedSerie = compareTourNormalizer.getNormalizedTime();
+////		compareTourData.cadenceSerie = compareTourNormalizer.getNormalizedTime();
+//
+//		return compareIndexStart;
+//	}
 
 	/**
 	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
@@ -1181,20 +1180,13 @@ public class TourManager {
 	// }
 	/**
 	 * @param tourData
-	 * @param useNormalizedData
 	 */
-	public void createTour(TourData tourData, final boolean useNormalizedData) {
+	public void createTour(TourData tourData) {
 
 		if (tourData.getTourPerson() != null) {
 			// load tour from database
 			tourData = TourManager.getInstance().getTourData(tourData.getTourId());
 		}
-
-		if (useNormalizedData) {
-			compareTour(tourData);
-		}
-
-		// openTourEditor(createTourEditorInput(tourData));
 	}
 
 	public void firePropertyChange(int propertyId, Object propertyData) {

@@ -394,7 +394,7 @@ public class RawDataView extends ViewPart {
 
 		fTourViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
-				createChart(false);
+				createChart();
 			}
 		});
 
@@ -655,7 +655,7 @@ public class RawDataView extends ViewPart {
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		final IStructuredSelection tourSelection = (IStructuredSelection) fTourViewer.getSelection();
@@ -867,12 +867,12 @@ public class RawDataView extends ViewPart {
 		fTourViewer.getControl().setFocus();
 	}
 
-	private void createChart(final boolean useNormalizedData) {
+	private void createChart() {
 
 		final Object firstElement = ((IStructuredSelection) fTourViewer.getSelection()).getFirstElement();
 
 		if (firstElement != null && firstElement instanceof TourData) {
-			TourManager.getInstance().createTour((TourData) firstElement, useNormalizedData);
+			TourManager.getInstance().createTour((TourData) firstElement);
 		}
 	}
 
