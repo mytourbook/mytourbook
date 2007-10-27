@@ -110,10 +110,6 @@ public class RawDataView extends ViewPart {
 
 	private TableViewer					fTourViewer;
 
-//	private ActionImportFromFile			fActionImportFromFile;
-//	private ActionImportFromDevice			fActionImportFromDevice;
-//	private ActionImportFromDeviceDirect	fActionImportFromDeviceDirect;
-
 	private ActionClearView				fActionClearView;
 	private ActionModifyColumns			fActionModifyColumns;
 	private ActionSaveTourInDatabase	fActionSaveTour;
@@ -270,16 +266,10 @@ public class RawDataView extends ViewPart {
 
 	private void createActions() {
 
-//		final IWorkbenchWindow window = getSite().getWorkbenchWindow();
-
 		fActionClearView = new ActionClearView(this);
 		fActionModifyColumns = new ActionModifyColumns(fColumnManager);
 		fActionSaveTour = new ActionSaveTourInDatabase(this);
 		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this);
-
-//		fActionImportFromFile = new ActionImportFromFile();
-//		fActionImportFromDevice = new ActionImportFromDevice(window);
-//		fActionImportFromDeviceDirect = new ActionImportFromDeviceDirect(window);
 
 		fActionAdjustImportedYear = new ActionAdjustYear(this);
 
@@ -287,10 +277,6 @@ public class RawDataView extends ViewPart {
 		 * fill view toolbar
 		 */
 		IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
-
-//		viewTbm.add(fActionImportFromDeviceDirect);
-//		viewTbm.add(fActionImportFromDevice);
-//		viewTbm.add(fActionImportFromFile);
 
 		viewTbm.add(new GroupMarker("import")); //$NON-NLS-1$
 

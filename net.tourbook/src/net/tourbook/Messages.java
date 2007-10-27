@@ -369,6 +369,26 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Label_m;
 	public static String		Pref_Statistic_Label_separator;
 
+	public static String		Pref_TourTypeFilter_button_new;
+
+	public static String		Pref_TourTypeFilter_button_remove;
+
+	public static String	Pref_TourTypeFilter_button_rename;
+
+	public static String	Pref_TourTypeFilter_dlg_new_message;
+
+	public static String	Pref_TourTypeFilter_dlg_new_title;
+
+	public static String	Pref_TourTypeFilter_dlg_rename_message;
+
+	public static String	Pref_TourTypeFilter_dlg_rename_title;
+
+	public static String	Pref_TourTypeFilter_filter_sets;
+
+	public static String		Pref_TourTypeFilter_title;
+
+	public static String	Pref_TourTypeFilter_tour_types;
+
 	public static String		Pref_TourTypes_Button_add;
 	public static String		Pref_TourTypes_Button_delete;
 	public static String		Pref_TourTypes_Button_rename;
@@ -380,10 +400,12 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_Dlg_rename_tour_type_msg;
 	public static String		Pref_TourTypes_Dlg_rename_tour_type_title;
 
-	public static String	Pref_TourTypes_dnd_hint;
+	public static String		Pref_TourTypes_dnd_hint;
 
-	public static String	Pref_TourTypes_root_title;
+	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
+
+	public static String		PrefPageTourTypeFilterSet_0;
 
 	public static String		Raw_Data_Action_clear_view;
 

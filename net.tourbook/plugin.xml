@@ -97,6 +97,12 @@
             id="net.tourbook.preferences.PrefPageTourTypes"
             name="%preference_page_tour_types">
       </page>
+      <page
+            category="net.tourbook.preferences.PrefPageTourTypeRoot"
+            class="net.tourbook.preferences.PrefPageTourTypeFilterSet"
+            id="net.tourbook.preferences.PrefPageTourTypeFilterSet"
+            name="%preference_page_tour_type_filter_set">
+      </page>
    </extension>
 
    <extension

@@ -25,6 +25,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.PixelConverter;
 
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -46,11 +47,22 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 public class UI {
 
-	private static final String				TOUR_TYPE_PREFIX	= "tourType";					//$NON-NLS-1$
+	private static final String				TOUR_TYPE_PREFIX		= "tourType";					//$NON-NLS-1$
 
 	private static UI						instance;
 
-	private final HashMap<String, Image>	fImageCache			= new HashMap<String, Image>();
+	private final HashMap<String, Image>	fImageCache				= new HashMap<String, Image>();
+
+	// Create image registry
+	public final static ImageRegistry		IMAGE_REGISTRY			= TourbookPlugin.getDefault()
+																			.getImageRegistry();
+
+	public static final String				IMAGE_TOUR_TYPE_FILTER	= "tour_type_filter";
+
+	static {
+		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,
+				TourbookPlugin.getImageDescriptor("tour_type_filter.gif"));
+	}
 
 	private UI() {}
 

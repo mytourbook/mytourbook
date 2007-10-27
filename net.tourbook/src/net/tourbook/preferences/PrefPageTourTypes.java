@@ -677,35 +677,12 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			// update viewer
 			fColorViewer.update(selectedColorDefinition, null);
 
-			// update import combo
-			// fComboImportTourType.setItem(
-			// getTourTypeIndex(selectedTourType),
-			// newTourTypeName);
-
 			fIsTourTypeModified = true;
 		}
 	}
 
-//	/**
-//	 * @param selectedTourType
-//	 * @return Returns the index for the tour type in the tour type list
-//	 */
-//	private int getTourTypeIndex(TourType selectedTourType) {
-//
-//		int tourTypeIndex = 0;
-//
-//		for (Iterator<TourType> iter = fTourTypes.iterator(); iter.hasNext();) {
-//			TourType tourType = (TourType) iter.next();
-//			if (tourType == selectedTourType) {
-//				return tourTypeIndex;
-//			}
-//			tourTypeIndex++;
-//		}
-//		return -1;
-//	}
-
 	/**
-	 * @return the selected color definition in the color viewer
+	 * @return Returns the selected color definition in the color viewer
 	 */
 	private TourTypeColorDefinition getSelectedColorDefinition() {
 
@@ -725,14 +702,21 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	@Override
 	public boolean performOk() {
 
-		if (fIsTourTypeModified) {
+		return super.performOk();
+	}
 
-			// set the change status
+	@Override
+	public boolean okToLeave() {
+
+		if (fIsTourTypeModified) {
+			fIsTourTypeModified = false;
+
+			// fire modify event
 			getPreferenceStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
 					Math.random());
 		}
 
-		return super.performOk();
+		return super.okToLeave();
 	}
 
 	private boolean persistTourType(TourType tourType) {
