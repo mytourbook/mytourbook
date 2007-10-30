@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.PixelConverter;
 
@@ -47,21 +48,24 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 public class UI {
 
-	private static final String				TOUR_TYPE_PREFIX		= "tourType";					//$NON-NLS-1$
+	private static final String				TOUR_TYPE_PREFIX				= "tourType";					//$NON-NLS-1$
 
 	private static UI						instance;
 
-	private final HashMap<String, Image>	fImageCache				= new HashMap<String, Image>();
+	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
 
 	// Create image registry
-	public final static ImageRegistry		IMAGE_REGISTRY			= TourbookPlugin.getDefault()
-																			.getImageRegistry();
+	public final static ImageRegistry		IMAGE_REGISTRY					= TourbookPlugin.getDefault()
+																					.getImageRegistry();
 
-	public static final String				IMAGE_TOUR_TYPE_FILTER	= "tour_type_filter";
+	public static final String				IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";
+	public static final String				IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";
 
 	static {
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,
-				TourbookPlugin.getImageDescriptor("tour_type_filter.gif"));
+				TourbookPlugin.getImageDescriptor("tour-type-filter.gif"));
+		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,
+				TourbookPlugin.getImageDescriptor("tour-type-filter-system.gif"));
 	}
 
 	private UI() {}
@@ -264,7 +268,7 @@ public class UI {
 	private DrawingColors getTourTypeColors(final Display display, final long tourTypeId) {
 
 		final DrawingColors drawingColors = new DrawingColors();
-		final ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getAllTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 
 		TourType colorTourType = null;
 
@@ -276,7 +280,7 @@ public class UI {
 
 		if (colorTourType == null || colorTourType.getTypeId() == TourType.TOUR_TYPE_ID_NOT_DEFINED) {
 
-			// tour type was not found
+			// tour type was not found use default color
 
 			drawingColors.colorBright = display.getSystemColor(SWT.COLOR_WHITE);
 			drawingColors.colorDark = display.getSystemColor(SWT.COLOR_WHITE);

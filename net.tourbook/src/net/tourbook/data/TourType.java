@@ -27,7 +27,6 @@ import org.eclipse.swt.graphics.RGB;
 public class TourType {
 
 	public static final int	TOUR_TYPE_ID_NOT_DEFINED	= -1;
-	public static final int	TOUR_TYPE_ID_ALL			= -2;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,11 +56,6 @@ public class TourType {
 		this.name = name;
 	}
 
-	public TourType(String name, int typeId) {
-		this.name = name;
-		this.typeId = typeId;
-	}
-
 	/**
 	 * @return Returns the name for the tour type
 	 */
@@ -82,8 +76,8 @@ public class TourType {
 	}
 
 	/**
-	 * @return Returns the type id, this can be the saved type id or it can be
-	 *         {@link TourType#TOUR_TYPE_ID_ALL} or {@link TourType#TOUR_TYPE_ID_NOT_DEFINED}
+	 * @return Returns the type id, this can be the saved type id or
+	 *         {@link TourType#TOUR_TYPE_ID_NOT_DEFINED}
 	 */
 	public long getTypeId() {
 		return typeId;

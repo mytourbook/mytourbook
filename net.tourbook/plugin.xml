@@ -89,19 +89,13 @@
             name="%preference_page_Graphs"/>
       <page
             class="net.tourbook.preferences.PrefPageTourTypeFilterList"
-            id="net.tourbook.preferences.PrefPageTourTypeRoot"
+            id="net.tourbook.preferences.PrefPageTourTypes"
             name="%preference_page_tour_type_root"/>
       <page
-            category="net.tourbook.preferences.PrefPageTourTypeRoot"
+            category="net.tourbook.preferences.PrefPageTourTypes"
             class="net.tourbook.preferences.PrefPageTourTypes"
             id="net.tourbook.preferences.PrefPageTourTypes"
             name="%preference_page_tour_types">
-      </page>
-      <page
-            category="net.tourbook.preferences.PrefPageTourTypeRoot"
-            class="net.tourbook.preferences.PrefPageTourTypeFilterSet"
-            id="net.tourbook.preferences.PrefPageTourTypeFilterSet"
-            name="%preference_page_tour_type_filter_set">
       </page>
    </extension>
 

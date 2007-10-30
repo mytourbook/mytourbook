@@ -26,6 +26,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourPerson;
+import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
@@ -40,7 +41,7 @@ public class StatisticMonth extends YearStatistic {
 
 	private Chart					fChart;
 	private BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
-	private long					fActiveTypeId;
+	private TourTypeFilter			fActiveTourType;
 
 	private Calendar				fCalendar		= GregorianCalendar.getInstance();
 	private boolean					fIsSynchScaleEnabled;
@@ -74,17 +75,20 @@ public class StatisticMonth extends YearStatistic {
 	}
 
 	public void prefColorChanged() {
-		refreshStatistic(fActivePerson, fActiveTypeId, fCurrentYear, false);
+		refreshStatistic(fActivePerson, fActiveTourType, fCurrentYear, false);
 	}
 
-	public void refreshStatistic(TourPerson person, long typeId, int year, boolean refreshData) {
+	public void refreshStatistic(	TourPerson person,
+									TourTypeFilter tourTypeFilter,
+									int year,
+									boolean refreshData) {
 
 		fActivePerson = person;
-		fActiveTypeId = typeId;
+		fActiveTourType = tourTypeFilter;
 		fCurrentYear = year;
 
 		TourDataMonth tourMonthData = ProviderTourMonth.getInstance().getMonthData(person,
-				typeId,
+				tourTypeFilter,
 				year,
 				isDataDirtyWithReset() || refreshData);
 

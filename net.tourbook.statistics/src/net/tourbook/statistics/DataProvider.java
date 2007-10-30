@@ -16,21 +16,21 @@
 package net.tourbook.statistics;
 
 import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourType;
+import net.tourbook.ui.TourTypeFilter;
 
 public abstract class DataProvider {
 
-	protected String getSQLFilter(TourPerson person, long typeId) {
-		return getSQLFilterPerson(person) + getSQLFilterTourType(typeId);
+	protected String getSQLFilter(TourPerson person, TourTypeFilter tourTypeFilter) {
+		return getSQLFilterPerson(person) + tourTypeFilter.getSQLString();
 	}
 
-	protected String getSQLFilterTourType(long typeId) {
-		return typeId == TourType.TOUR_TYPE_ID_ALL
-				? "" //$NON-NLS-1$
-				: typeId == TourType.TOUR_TYPE_ID_NOT_DEFINED
-						? " AND tourType_typeId is null" //$NON-NLS-1$
-						: " AND tourType_typeId =" + Long.toString(typeId); //$NON-NLS-1$
-	}
+//	protected String getSQLFilterTourType(TourTypeFilter tourTypeFilter) {
+//		return tourTypeFilter == TourType.TOUR_TYPE_ID_ALL
+//				? "" //$NON-NLS-1$
+//				: tourTypeFilter == TourType.TOUR_TYPE_ID_NOT_DEFINED
+//						? " AND tourType_typeId is null" //$NON-NLS-1$
+//						: " AND tourType_typeId =" + Long.toString(tourTypeFilter); //$NON-NLS-1$
+//	}
 
 	protected String getSQLFilterPerson(TourPerson person) {
 		return person == null ? "" : " AND tourPerson_personId = " //$NON-NLS-1$ //$NON-NLS-2$

@@ -18,7 +18,6 @@ package net.tourbook.ui.views.tourBook;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import net.tourbook.data.TourType;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.TreeViewerItem;
 
@@ -141,18 +140,8 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 	 */
 	String sqlTourTypeId() {
 
-		StringBuffer sqlString = new StringBuffer();
-		long tourTypeId = fView.fActiveTourTypeId;
+		return fView.fActiveTourTypeFilter.getSQLString();
 
-		if (tourTypeId == TourType.TOUR_TYPE_ID_ALL) {
-			// select all tour types
-		} else {
-			// select only one tour type
-			sqlString.append(" AND tourType_typeId " //$NON-NLS-1$
-					+ (tourTypeId == TourType.TOUR_TYPE_ID_NOT_DEFINED ? "is null" //$NON-NLS-1$
-							: ("=" + Long.toString(tourTypeId)))); //$NON-NLS-1$
-		}
-		return sqlString.toString();
 	}
 
 }

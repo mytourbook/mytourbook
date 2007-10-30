@@ -1,27 +1,23 @@
 package net.tourbook.ui;
 
+import net.tourbook.data.TourType;
+
 public class TourTypeFilterSet {
 
-//	private long		fId;
 	private String		fName;
 
 	/**
-	 * contains the tour types for this filter set
+	 * contains the tour types {@link TourType} for this filter
 	 */
 	private Object[]	fTourTypes;
-
-//	public TourTypeFilterSet(long id) {
-//		this.fId = id;
-//	}
-
-//	long getId() {
-//		return fId;
-//	}
 
 	public String getName() {
 		return fName;
 	}
 
+	/**
+	 * @return Returns an array with {@link TourType} objects
+	 */
 	public Object[] getTourTypes() {
 		return fTourTypes;
 	}
@@ -30,6 +26,11 @@ public class TourTypeFilterSet {
 		this.fName = name;
 	}
 
+	/**
+	 * Set tour types {@link TourType} for this filter
+	 * 
+	 * @param objects
+	 */
 	public void setTourTypes(Object[] objects) {
 		fTourTypes = objects;
 	}

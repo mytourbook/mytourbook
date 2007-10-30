@@ -37,6 +37,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
+import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -59,7 +60,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	static final String		ALTITUDE_DATA	= "altitude";						//$NON-NLS-1$
 	static final String		DURATION_DATA	= "duration";						//$NON-NLS-1$
 
-	private long			fActiveTypeId;
+	private TourTypeFilter	fActiveTourTypeFilter;
 	private TourPerson		fActivePerson;
 
 	Long					fSelectedTourId;
@@ -288,20 +289,20 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	// }
 
 	public void prefColorChanged() {
-		refreshStatistic(fActivePerson, fActiveTypeId, fCurrentYear, false);
+		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, false);
 	}
 
 	public void refreshStatistic(	final TourPerson person,
-									final long typeId,
+									final TourTypeFilter tourTypeFilter,
 									final int year,
 									final boolean refreshData) {
 
 		fActivePerson = person;
-		fActiveTypeId = typeId;
+		fActiveTourTypeFilter = tourTypeFilter;
 		fCurrentYear = year;
 
 		fTourDataTour = ProviderTourDay.getInstance().getDayData(person,
-				typeId,
+				tourTypeFilter,
 				year,
 				isDataDirtyWithReset() || refreshData);
 

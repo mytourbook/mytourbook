@@ -15,13 +15,12 @@
  *******************************************************************************/
 package net.tourbook.plugin;
 
-import java.util.ArrayList;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourType;
+import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -50,12 +49,9 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	 */
 	private TourPerson				fCurrentPerson;
 
-	private TourType				fActiveTourType;
-	private ArrayList<TourType>		fTourTypes;
+	private TourTypeFilter			fActiveTourTypeFilter;
 
 	private MyTourbookSplashHandler	fSplashHandler;
-
-	private ArrayList<TourType>		fDbTourTypes;
 
 	/**
 	 * The constructor.
@@ -99,15 +95,8 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return fCurrentPerson;
 	}
 
-	public TourType getActiveTourType() {
-		return fActiveTourType;
-	}
-
-	/**
-	 * @return Returns the tour types which are stored in the database
-	 */
-	public ArrayList<TourType> getDbTourTypes() {
-		return fDbTourTypes;
+	public TourTypeFilter getActiveTourTypeFilter() {
+		return fActiveTourTypeFilter;
 	}
 
 	/**
@@ -141,44 +130,12 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return fSplashHandler;
 	}
 
-	/**
-	 * @return Returns all tour types which are displayed in the tour type combobox
-	 */
-	public ArrayList<TourType> getAllTourTypes() {
-		return fTourTypes;
-	}
-
-	/**
-	 * @return Returns all tour types which are displayed in the tour type combobox
-	 */
-	public TourType[] getAllTourTypesArray() {
-		return fTourTypes.toArray(new TourType[fTourTypes.size()]);
-	}
-
 	public void setActivePerson(TourPerson currentPerson) {
 		fCurrentPerson = currentPerson;
 	}
 
-	public void setActiveTourType(TourType tourType) {
-		fActiveTourType = tourType;
-	}
-
-	/**
-	 * Set the tour types which are displayed in the tour type combobox
-	 * 
-	 * @param tourTypes
-	 */
-	public void setAllTourTypes(ArrayList<TourType> tourTypes) {
-		fTourTypes = tourTypes;
-	}
-
-	/**
-	 * Set the tour types which are stored in the database
-	 * 
-	 * @param dbTourTypes
-	 */
-	public void setDbTourTypes(ArrayList<TourType> dbTourTypes) {
-		fDbTourTypes = dbTourTypes;
+	public void setActiveTourTypeFilter(TourTypeFilter tourTypeFilter) {
+		fActiveTourTypeFilter = tourTypeFilter;
 	}
 
 	public void setSplashHandler(MyTourbookSplashHandler splashHandler) {

@@ -3,32 +3,40 @@ package net.tourbook.preferences;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourTypeContributionItem;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.util.StringToArrayConverter;
+import net.tourbook.ui.TourTypeFilterSet;
+import net.tourbook.ui.UI;
 import net.tourbook.util.TableLayoutComposite;
 
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.viewers.AbstractTableViewer;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
@@ -46,7 +54,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbench;
@@ -54,35 +61,24 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private TableViewer					fFilterViewerLeft;
-	private TableViewer					fFilterViewerRight;
+	private TableViewer					fFilterViewer;
+	private CheckboxTableViewer			fTourTypeViewer;
 
 	private long						fDragStartViewerLeft;
-	private long						fDragStartViewerRight;
-	private long						fRemovedFilterTime	= -1;
 
-	private Button						fBtnMoveRight;
-	private Button						fBtnMoveLeft;
+	private Button						fBtnNew;
+	private Button						fBtnRename;
+	private Button						fBtnRemove;
 	private Button						fBtnUp;
 	private Button						fBtnDown;
-	private Button						fBtnMoveLeftAll;
-	private Button						fBtnMoveRightAll;
-
-	private ArrayList<TourTypeFilter>	fFilterLeft;
-	private ArrayList<TourTypeFilter>	fFilterRight;
 
 	private boolean						fIsModified;
 
-	private class TourTypeLabelProvider extends LabelProvider implements ITableLabelProvider {
+	private ArrayList<TourType>			fTourTypes;
+	private ArrayList<TourTypeFilter>	fFilterList;
 
-		public Image getColumnImage(Object element, int columnIndex) {
-			return null;
-		}
-
-		public String getColumnText(Object element, int index) {
-			return element == null ? "" : ((TourTypeFilter) element).getFilterName(); //$NON-NLS-1$
-		}
-	}
+	private TourTypeFilter				fActiveFilter;
+	private IPropertyChangeListener		fPrefChangeListener;
 
 	public PrefPageTourTypeFilterList() {}
 
@@ -94,6 +90,22 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		super(title, image);
 	}
 
+	private void addPrefListener() {
+
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				if (event.getProperty().equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+					updateViewers();
+				}
+			}
+		};
+
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.addPropertyChangeListener(fPrefChangeListener);
+	}
+
 	private void createButtons(Composite parent) {
 
 		Composite container = new Composite(parent, SWT.NONE);
@@ -103,55 +115,36 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		gl.marginWidth = 0;
 		container.setLayout(gl);
 
-		// button: <
-		fBtnMoveLeft = new Button(container, SWT.NONE);
-		fBtnMoveLeft.setText("<");
-		setButtonLayoutData(fBtnMoveLeft);
-		fBtnMoveLeft.addSelectionListener(new SelectionAdapter() {
+		// button: new
+		fBtnNew = new Button(container, SWT.NONE);
+		fBtnNew.setText(Messages.Pref_TourTypeFilter_button_new);
+		setButtonLayoutData(fBtnNew);
+		fBtnNew.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				onMoveLeft();
-				enableButtons();
-				fBtnMoveLeft.setFocus();
+				onNewFilterSet();
 			}
 		});
 
-		// button: >
-		fBtnMoveRight = new Button(container, SWT.NONE);
-		fBtnMoveRight.setText(">");
-		setButtonLayoutData(fBtnMoveRight);
-		fBtnMoveRight.addSelectionListener(new SelectionAdapter() {
+		// button: rename
+		fBtnRename = new Button(container, SWT.NONE);
+		fBtnRename.setText(Messages.Pref_TourTypeFilter_button_rename);
+		setButtonLayoutData(fBtnRename);
+		fBtnRename.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				onMoveRight();
-				enableButtons();
-				fBtnMoveRight.setFocus();
+				onRenameFilterSet();
 			}
 		});
 
-		// button: <<
-		fBtnMoveLeftAll = new Button(container, SWT.NONE);
-		fBtnMoveLeftAll.setText("<<");
-		setButtonLayoutData(fBtnMoveLeftAll);
-		fBtnMoveLeftAll.addSelectionListener(new SelectionAdapter() {
+		// button: delete
+		fBtnRemove = new Button(container, SWT.NONE);
+		fBtnRemove.setText(Messages.Pref_TourTypeFilter_button_remove);
+		setButtonLayoutData(fBtnRemove);
+		fBtnRemove.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				onMoveLeftAll();
-				enableButtons();
-				fBtnMoveRightAll.setFocus();
-			}
-		});
-
-		// button: >>
-		fBtnMoveRightAll = new Button(container, SWT.NONE);
-		fBtnMoveRightAll.setText(">>");
-		setButtonLayoutData(fBtnMoveRightAll);
-		fBtnMoveRightAll.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				onMoveRightAll();
-				enableButtons();
-				fBtnMoveLeftAll.setFocus();
+				onDeleteFilterSet();
 			}
 		});
 
@@ -185,156 +178,20 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 	@Override
 	protected Control createContents(Composite parent) {
 
-		Label label = new Label(parent, SWT.WRAP);
-		label.setText(Messages.Pref_TourTypes_root_title);
-		label.setLayoutData(new GridData(SWT.NONE, SWT.NONE, true, false));
+		Composite viewerContainer = createUI(parent);
 
-		// container
-		Composite viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayout gl = new GridLayout(3, false);
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		viewerContainer.setLayout(gl);
-		viewerContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		addPrefListener();
 
-		createFilterViewerLeft(viewerContainer);
-		createButtons(viewerContainer);
-		createFilterViewerRight(viewerContainer);
-
-		// hint for drag & drop
-		label = new Label(parent, SWT.WRAP);
-		label.setText(Messages.Pref_TourTypes_dnd_hint);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false, 3, 1));
-
-		// spacer
-		label = new Label(parent, SWT.WRAP);
-
-		createFilterList();
-
-		// show tour types
-		fFilterViewerLeft.setInput(new Object());
-		fFilterViewerRight.setInput(new Object());
-
-		enableButtons();
+		updateViewers();
 
 		return viewerContainer;
 	}
 
-	private void createFilterList() {
-
-		TourTypeFilter filterAllTours = new TourTypeFilter(TourTypeFilter.FILTER_TYPE_SYSTEM,
-				TourTypeFilter.SYSTEM_FILTER_ID_ALL,
-				Messages.App_Tour_type_item_all_types);
-
-		TourTypeFilter filterNoTours = new TourTypeFilter(TourTypeFilter.FILTER_TYPE_SYSTEM,
-				TourTypeFilter.SYSTEM_FILTER_ID_NOT_DEFINED,
-				Messages.App_Tour_type_item_not_defined);
-
-		ArrayList<TourTypeFilter> filterDbTourTypes = new ArrayList<TourTypeFilter>();
-		ArrayList<TourTypeFilter> dbFilterLeft = new ArrayList<TourTypeFilter>();
-
-		ArrayList<TourType> dbTourTypes = TourDatabase.getTourTypes();
-		for (TourType tourType : dbTourTypes) {
-			filterDbTourTypes.add(new TourTypeFilter(TourTypeFilter.FILTER_TYPE_DB, tourType));
-		}
-
-		fFilterLeft = new ArrayList<TourTypeFilter>();
-		fFilterRight = new ArrayList<TourTypeFilter>();
-
-		IPreferenceStore prefStore = getPreferenceStore();
-
-		boolean useDefaultList = true;
-
-		if (prefStore.contains(ITourbookPreferences.TOUR_TYPE_FILTER_LIST)) {
-
-			// get filter list from pref store
-
-			String filterListString = prefStore.getString(ITourbookPreferences.TOUR_TYPE_FILTER_LIST);
-			String[] filterList = StringToArrayConverter.convertStringToArray(filterListString);
-
-			try {
-
-				for (int filterIndex = 0; filterIndex < filterList.length; filterIndex++) {
-
-					final int filterParam1 = Integer.parseInt(filterList[filterIndex]);
-					final long filterParam2 = Long.parseLong(filterList[++filterIndex]);
-
-					switch (filterParam1) {
-					case TourTypeFilter.FILTER_TYPE_SYSTEM:
-
-						// add system filters
-
-						switch ((int) filterParam2) {
-						case TourTypeFilter.SYSTEM_FILTER_ID_ALL:
-							fFilterLeft.add(filterAllTours);
-							break;
-
-						case TourTypeFilter.SYSTEM_FILTER_ID_NOT_DEFINED:
-							fFilterLeft.add(filterNoTours);
-							break;
-
-						default:
-							break;
-						}
-
-						break;
-
-					case TourTypeFilter.FILTER_TYPE_DB:
-
-						for (TourTypeFilter filterItem : filterDbTourTypes) {
-							if (filterParam2 == filterItem.getTourType().getTypeId()) {
-								fFilterLeft.add(filterItem);
-								dbFilterLeft.add(filterItem);
-								break;
-							}
-						}
-
-						break;
-
-					default:
-						break;
-					}
-				}
-
-				useDefaultList = false;
-
-				/*
-				 * when the system filters are not set, something is worng, create default list
-				 */
-				if (fFilterLeft.contains(filterAllTours) == false
-						|| fFilterLeft.contains(filterNoTours) == false) {
-
-					useDefaultList = true;
-
-				} else {
-
-					/*
-					 * add all filters to the right site which are not set on the left site
-					 */
-					fFilterRight.addAll(filterDbTourTypes);
-					fFilterRight.removeAll(dbFilterLeft);
-				}
-
-			} catch (NumberFormatException e) {}
-		}
-
-		if (useDefaultList) {
-
-			// add all available filters
-
-			fFilterLeft.clear();
-
-			fFilterLeft.add(filterAllTours);
-			fFilterLeft.add(filterNoTours);
-			fFilterLeft.addAll(filterDbTourTypes);
-		}
-	}
-
-	private void createFilterViewerLeft(Composite parent) {
+	private void createFilterViewer(Composite parent) {
 
 		final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
 		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.widthHint = 30;
+		gd.widthHint = 20;
 		layouter.setLayoutData(gd);
 
 		final Table table = new Table(layouter,
@@ -342,39 +199,74 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		table.setHeaderVisible(false);
 		table.setLinesVisible(false);
 
-		new TableColumn(table, SWT.NONE);
+		TableViewerColumn tvc;
+
+		fFilterViewer = new TableViewer(table);
+
+		// column: name + image
+		tvc = new TableViewerColumn(fFilterViewer, SWT.NONE);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+
+				final TourTypeFilter filter = ((TourTypeFilter) cell.getElement());
+				int filterType = filter.getFilterType();
+
+				String filterName = null;
+				Image filterImage = null;
+
+				// set filter name/image
+				switch (filterType) {
+				case TourTypeFilter.FILTER_TYPE_DB:
+					final TourType tourType = filter.getTourType();
+					filterName = tourType.getName();
+					filterImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
+					break;
+
+				case TourTypeFilter.FILTER_TYPE_SYSTEM:
+					filterName = filter.getSystemFilterName();
+					filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER_SYSTEM);
+					break;
+
+				case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
+					filterName = filter.getTourTypeSet().getName();
+					filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER);
+					break;
+
+				default:
+					break;
+				}
+
+				cell.setText(filterName);
+				cell.setImage(filterImage);
+			}
+		});
 		layouter.addColumnData(new ColumnWeightData(1));
 
-		// Create list viewer	
-		fFilterViewerLeft = new TableViewer(table);
-
-		fFilterViewerLeft.setContentProvider(new IStructuredContentProvider() {
+		fFilterViewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {}
 
 			public Object[] getElements(Object inputElement) {
-				return fFilterLeft.toArray();
+				return fFilterList.toArray();
 			}
 
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 		});
 
-		fFilterViewerLeft.setLabelProvider(new TourTypeLabelProvider());
-
-		fFilterViewerLeft.addSelectionChangedListener(new ISelectionChangedListener() {
+		fFilterViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
-				enableButtons();
+				onSelectFilter();
 			}
 		});
 
-		fFilterViewerLeft.addDoubleClickListener(new IDoubleClickListener() {
+		fFilterViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
-				onMoveRight();
-				enableButtons();
+				onRenameFilterSet();
 			}
 		});
 
 		// set drag adapter
-		fFilterViewerLeft.addDragSupport(DND.DROP_MOVE,
+		fFilterViewer.addDragSupport(DND.DROP_MOVE,
 				new Transfer[] { LocalSelectionTransfer.getTransfer() },
 				new DragSourceListener() {
 
@@ -384,13 +276,6 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
 						if (event.doit == false) {
 							return;
-						}
-
-						if (event.detail == DND.DROP_MOVE
-								&& transfer.getSelectionSetTime() != fRemovedFilterTime) {
-
-							// drag was removed from the left viewer
-							removeFilterItem(fFilterViewerLeft, transfer);
 						}
 
 						transfer.setSelection(null);
@@ -404,7 +289,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 					public void dragStart(DragSourceEvent event) {
 
 						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
-						final ISelection selection = fFilterViewerLeft.getSelection();
+						final ISelection selection = fFilterViewer.getSelection();
 
 						transfer.setSelection(selection);
 						transfer.setSelectionSetTime(fDragStartViewerLeft = event.time & 0xFFFFFFFFL);
@@ -414,9 +299,18 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 				});
 
 		// set drop adapter
-		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(fFilterViewerLeft) {
+		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(fFilterViewer) {
 
-			private Widget	fLeftTableItem;
+			private Widget	fTableItem;
+
+			@Override
+			public void dragOver(DropTargetEvent event) {
+
+				// keep table item
+				fTableItem = event.item;
+
+				super.dragOver(event);
+			}
 
 			@Override
 			public boolean performDrop(Object data) {
@@ -429,41 +323,40 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 						TourTypeFilter filterItem = (TourTypeFilter) selection.getFirstElement();
 
 						final int location = getCurrentLocation();
-						final Table filterTable = fFilterViewerLeft.getTable();
+						final Table filterTable = fFilterViewer.getTable();
 
 						/*
 						 * check if drag was startet from this filter, remove the filter item before
 						 * the new filter is inserted
 						 */
 						if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == fDragStartViewerLeft) {
-							fFilterViewerLeft.remove(filterItem);
-							fRemovedFilterTime = fDragStartViewerLeft;
+							fFilterViewer.remove(filterItem);
 						}
 
 						int filterIndex;
 
-						if (fLeftTableItem == null) {
+						if (fTableItem == null) {
 
-							fFilterViewerLeft.add(filterItem);
+							fFilterViewer.add(filterItem);
 							filterIndex = filterTable.getItemCount() - 1;
 
 						} else {
 
 							// get index of the target in the table
-							filterIndex = filterTable.indexOf((TableItem) fLeftTableItem);
+							filterIndex = filterTable.indexOf((TableItem) fTableItem);
 							if (filterIndex == -1) {
 								return false;
 							}
 
 							if (location == LOCATION_BEFORE) {
-								fFilterViewerLeft.insert(filterItem, filterIndex);
+								fFilterViewer.insert(filterItem, filterIndex);
 							} else if (location == LOCATION_AFTER || location == LOCATION_ON) {
-								fFilterViewerLeft.insert(filterItem, ++filterIndex);
+								fFilterViewer.insert(filterItem, ++filterIndex);
 							}
 						}
 
 						// reselect filter item
-						fFilterViewerLeft.setSelection(new StructuredSelection(filterItem));
+						fFilterViewer.setSelection(new StructuredSelection(filterItem));
 
 						// set focus to selection
 						filterTable.setSelection(filterIndex);
@@ -481,6 +374,14 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 			@Override
 			public boolean validateDrop(Object target, int operation, TransferData transferType) {
 
+				ISelection selection = LocalSelectionTransfer.getTransfer().getSelection();
+				if (selection instanceof StructuredSelection) {
+					Object dragFilter = ((StructuredSelection) selection).getFirstElement();
+					if (target == dragFilter) {
+						return false;
+					}
+				}
+
 				if (LocalSelectionTransfer.getTransfer().isSupportedType(transferType) == false) {
 					return false;
 				}
@@ -488,213 +389,140 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 				return true;
 			}
 
-			@Override
-			public void dragOver(DropTargetEvent event) {
-
-				// keep table item
-				fLeftTableItem = event.item;
-
-				super.dragOver(event);
-			}
-
 		};
 
-		fFilterViewerLeft.addDropSupport(DND.DROP_MOVE,
+		fFilterViewer.addDropSupport(DND.DROP_MOVE,
 				new Transfer[] { LocalSelectionTransfer.getTransfer() },
 				viewerDropAdapter);
 	}
 
-	private void createFilterViewerRight(Composite parent) {
+	private void createTourTypeViewer(Composite parent) {
 
 		final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
 		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.widthHint = 30;
+		gd.widthHint = 20;
 		layouter.setLayoutData(gd);
 
-		final Table table = new Table(layouter,
-				(SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
+		final Table table = new Table(layouter, (SWT.CHECK
+				| SWT.SINGLE
+				| SWT.H_SCROLL
+				| SWT.V_SCROLL
+				| SWT.BORDER | SWT.FULL_SELECTION));
+
 		table.setHeaderVisible(false);
 		table.setLinesVisible(false);
 
-		new TableColumn(table, SWT.NONE);
+		fTourTypeViewer = new CheckboxTableViewer(table);
+
+		TableViewerColumn tvc;
+
+		// column: name
+		tvc = new TableViewerColumn(fTourTypeViewer, SWT.NONE);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+				final TourType tourType = ((TourType) cell.getElement());
+				cell.setText(tourType.getName());
+				cell.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+			}
+		});
 		layouter.addColumnData(new ColumnWeightData(1));
 
-		// Create list viewer	
-		fFilterViewerRight = new TableViewer(table);
+		fTourTypeViewer.setContentProvider(new IStructuredContentProvider() {
 
-		fFilterViewerRight.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {}
 
 			public Object[] getElements(Object inputElement) {
-				return fFilterRight.toArray();
+				return fTourTypes.toArray();
 			}
 
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 		});
 
-		fFilterViewerRight.setLabelProvider(new TourTypeLabelProvider());
+		fTourTypeViewer.addCheckStateListener(new ICheckStateListener() {
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				fIsModified = true;
+			}
+		});
 
-		fFilterViewerRight.addSelectionChangedListener(new ISelectionChangedListener() {
+		fTourTypeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
-				enableButtons();
+				onSelectTourType();
 			}
 		});
 
-		fFilterViewerRight.addDoubleClickListener(new IDoubleClickListener() {
+		fTourTypeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
-				onMoveLeft();
-				enableButtons();
+
+				/*
+				 * invert check state
+				 */
+				TourType tourType = (TourType) ((StructuredSelection) fTourTypeViewer.getSelection()).getFirstElement();
+
+				boolean isChecked = fTourTypeViewer.getChecked(tourType);
+
+				fTourTypeViewer.setChecked(tourType, !isChecked);
+
+//				getSelectedTourTypes();
 			}
 		});
+	}
 
-		fFilterViewerRight.addDragSupport(DND.DROP_MOVE,
-				new Transfer[] { LocalSelectionTransfer.getTransfer() },
-				new DragSourceListener() {
+	private Composite createUI(Composite parent) {
 
-					public void dragFinished(DragSourceEvent event) {
+		Label label = new Label(parent, SWT.WRAP);
+		label.setText(Messages.Pref_TourTypes_root_title);
+		label.setLayoutData(new GridData(SWT.NONE, SWT.NONE, true, false));
 
-						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+		// container
+		Composite viewerContainer = new Composite(parent, SWT.NONE);
+		GridLayout gl = new GridLayout(3, false);
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		viewerContainer.setLayout(gl);
+		viewerContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-						if (event.doit == false) {
-							return;
-						}
+		createFilterViewer(viewerContainer);
+		createTourTypeViewer(viewerContainer);
+		createButtons(viewerContainer);
 
-						if (event.detail == DND.DROP_MOVE) {
-							removeFilterItem(fFilterViewerRight, transfer);
-						}
+		// hint to use drag & drop
+		label = new Label(parent, SWT.WRAP);
+		label.setText(Messages.Pref_TourTypes_dnd_hint);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 
-						transfer.setSelection(null);
-						transfer.setSelectionSetTime(0);
-					}
+		// spacer
+		new Label(parent, SWT.WRAP);
+		return viewerContainer;
+	}
 
-					public void dragSetData(DragSourceEvent event) {
-					// data are set in LocalSelectionTransfer
-					}
+	@Override
+	public void dispose() {
 
-					public void dragStart(DragSourceEvent event) {
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.removePropertyChangeListener(fPrefChangeListener);
 
-						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
-						final ISelection selection = fFilterViewerRight.getSelection();
-
-						transfer.setSelection(selection);
-						transfer.setSelectionSetTime(fDragStartViewerRight = event.time & 0xFFFFFFFFL);
-
-						event.doit = !selection.isEmpty();
-					}
-				});
-
-		// set drop adapter
-		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(fFilterViewerRight) {
-
-			@Override
-			public boolean performDrop(Object data) {
-
-				if (data instanceof StructuredSelection) {
-					StructuredSelection selection = (StructuredSelection) data;
-
-					if (selection.getFirstElement() instanceof TourTypeFilter) {
-
-						TourTypeFilter filterItem = (TourTypeFilter) selection.getFirstElement();
-
-						// add filter item
-						fFilterViewerRight.add(filterItem);
-
-						// set focus to new filter item
-						fFilterViewerRight.setSelection(new StructuredSelection(filterItem));
-						final Table filterTable = fFilterViewerRight.getTable();
-						filterTable.setSelection(filterTable.getItemCount() - 1);
-						filterTable.setFocus();
-
-						fIsModified = true;
-
-						return true;
-					}
-				}
-
-				return false;
-			}
-
-			@Override
-			public boolean validateDrop(Object target, int operation, TransferData transferType) {
-
-				final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
-
-				/*
-				 * system filters cannot be droped
-				 */
-				ISelection selection = transfer.getSelection();
-				if (selection instanceof StructuredSelection) {
-					Object item = ((StructuredSelection) selection).getFirstElement();
-					if (item instanceof TourTypeFilter) {
-						TourTypeFilter filterItem = (TourTypeFilter) item;
-						if (filterItem.getFilterType() == TourTypeFilter.FILTER_TYPE_SYSTEM) {
-							return false;
-						}
-					}
-
-				}
-
-				if (transfer.isSupportedType(transferType) == false) {
-					return false;
-				}
-
-				/*
-				 * prevent dnd within the right viewer
-				 */
-				if (transfer.getSelectionSetTime() == fDragStartViewerRight) {
-					return false;
-				}
-
-				return true;
-			}
-		};
-
-		viewerDropAdapter.setSelectionFeedbackEnabled(false);
-		viewerDropAdapter.setFeedbackEnabled(false);
-
-		fFilterViewerRight.addDropSupport(DND.DROP_MOVE,
-				new Transfer[] { LocalSelectionTransfer.getTransfer() },
-				viewerDropAdapter);
+		super.dispose();
 	}
 
 	private void enableButtons() {
 
-		final IStructuredSelection selectionLeftViewer = (IStructuredSelection) fFilterViewerLeft.getSelection();
-		final IStructuredSelection selectionRightViewer = (IStructuredSelection) fFilterViewerRight.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) fFilterViewer.getSelection();
 
-		final TourTypeFilter leftFilterItem = (TourTypeFilter) selectionLeftViewer.getFirstElement();
-		final Table leftFilterTable = fFilterViewerLeft.getTable();
+		final TourTypeFilter filterItem = (TourTypeFilter) selection.getFirstElement();
+		final Table filterTable = fFilterViewer.getTable();
 
-		fBtnMoveLeft.setEnabled(selectionRightViewer.getFirstElement() != null);
+		fBtnUp.setEnabled(filterItem != null && filterTable.getSelectionIndex() > 0);
 
-		if (leftFilterItem == null) {
-			fBtnMoveRight.setEnabled(false);
-		} else {
-			if (leftFilterItem.getFilterType() == TourTypeFilter.FILTER_TYPE_SYSTEM) {
-				fBtnMoveRight.setEnabled(false);
-			} else {
-				fBtnMoveRight.setEnabled(true);
-			}
-		}
+		fBtnDown.setEnabled(filterItem != null
+				&& filterTable.getSelectionIndex() < filterTable.getItemCount() - 1);
 
-		/*
-		 * check if in the left filter list is a non system filter
-		 */
-		boolean isMoveRightAll = false;
-		for (int indexList = 0; indexList < leftFilterTable.getItemCount(); indexList++) {
-			TourTypeFilter filterItem = (TourTypeFilter) fFilterViewerLeft.getElementAt(indexList);
-			if (filterItem.getFilterType() != TourTypeFilter.FILTER_TYPE_SYSTEM) {
-				isMoveRightAll = true;
-				break;
-			}
-		}
-		fBtnMoveRightAll.setEnabled(isMoveRightAll);
-		fBtnMoveLeftAll.setEnabled(fFilterViewerRight.getTable().getItemCount() > 0);
+		fBtnRename.setEnabled(filterItem != null
+				&& filterItem.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET);
 
-		fBtnUp.setEnabled(leftFilterItem != null && leftFilterTable.getSelectionIndex() > 0);
-
-		fBtnDown.setEnabled(leftFilterItem != null
-				&& leftFilterTable.getSelectionIndex() < leftFilterTable.getItemCount() - 1);
+		fBtnRemove.setEnabled(filterItem != null
+				&& filterItem.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET);
 	}
 
 	public void init(IWorkbench workbench) {
@@ -704,29 +532,48 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 	@Override
 	public boolean isValid() {
 
-		savePreferences();
+		saveFilterList();
 
-		return super.isValid();
+		return true;
+	}
+
+	private void onDeleteFilterSet() {
+
+		final TourTypeFilter filterItem = (TourTypeFilter) ((IStructuredSelection) fFilterViewer.getSelection()).getFirstElement();
+
+		if (filterItem == null
+				|| filterItem.getFilterType() != TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
+			return;
+		}
+
+		final Table filterTable = fFilterViewer.getTable();
+		final int selectionIndex = filterTable.getSelectionIndex();
+
+		fFilterViewer.remove(filterItem);
+
+		// select next filter item
+		final int nextIndex = Math.min(filterTable.getItemCount() - 1, selectionIndex);
+		fFilterViewer.setSelection(new StructuredSelection(fFilterViewer.getElementAt(nextIndex)));
 	}
 
 	private void onMoveDown() {
 
-		final TourTypeFilter filterItem = (TourTypeFilter) ((IStructuredSelection) fFilterViewerLeft.getSelection()).getFirstElement();
+		final TourTypeFilter filterItem = (TourTypeFilter) ((IStructuredSelection) fFilterViewer.getSelection()).getFirstElement();
 
 		if (filterItem == null) {
 			return;
 		}
 
-		final Table filterTable = fFilterViewerLeft.getTable();
+		final Table filterTable = fFilterViewer.getTable();
 		final int selectionIndex = filterTable.getSelectionIndex();
 
 		if (selectionIndex < filterTable.getItemCount() - 1) {
 
-			fFilterViewerLeft.remove(filterItem);
-			fFilterViewerLeft.insert(filterItem, selectionIndex + 1);
+			fFilterViewer.remove(filterItem);
+			fFilterViewer.insert(filterItem, selectionIndex + 1);
 
 			// reselect moved item
-			fFilterViewerLeft.setSelection(new StructuredSelection(filterItem));
+			fFilterViewer.setSelection(new StructuredSelection(filterItem));
 
 			if (filterTable.getSelectionIndex() == filterTable.getItemCount() - 1) {
 				fBtnUp.setFocus();
@@ -738,103 +585,23 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		}
 	}
 
-	private void onMoveLeft() {
-
-		IStructuredSelection selectionInViewer = (IStructuredSelection) fFilterViewerRight.getSelection();
-		TourTypeFilter filterItem = (TourTypeFilter) selectionInViewer.getFirstElement();
-
-		if (filterItem == null) {
-			return;
-		}
-
-		final Table tableList = fFilterViewerRight.getTable();
-		int lastSelectedIndex = tableList.getSelectionIndex();
-
-		fFilterViewerRight.remove(filterItem);
-		fFilterViewerLeft.add(filterItem);
-
-		// select filter item at the same position
-		tableList.select(Math.min(lastSelectedIndex, tableList.getItemCount() - 1));
-
-		fIsModified = true;
-	}
-
-	private void onMoveLeftAll() {
-
-		Table tableRight = fFilterViewerRight.getTable();
-		ArrayList<TourTypeFilter> removedFilters = new ArrayList<TourTypeFilter>();
-
-		for (int listIndex = 0; listIndex < tableRight.getItemCount(); listIndex++) {
-			final TourTypeFilter filterItem = (TourTypeFilter) fFilterViewerRight.getElementAt(listIndex);
-			fFilterViewerLeft.add(filterItem);
-			removedFilters.add(filterItem);
-		}
-
-		fFilterViewerRight.remove(removedFilters.toArray());
-
-		fIsModified = true;
-	}
-
-	private void onMoveRight() {
-
-		IStructuredSelection selectionOutViewer = (IStructuredSelection) fFilterViewerLeft.getSelection();
-
-		TourTypeFilter filterItem = (TourTypeFilter) selectionOutViewer.getFirstElement();
-
-		if (filterItem == null || filterItem.getFilterType() == TourTypeFilter.FILTER_TYPE_SYSTEM) {
-			return;
-		}
-
-		final Table leftTable = fFilterViewerLeft.getTable();
-		final int lastSelectedIndex = leftTable.getSelectionIndex();
-
-		fFilterViewerLeft.remove(filterItem);
-		fFilterViewerRight.add(filterItem);
-
-		// select filter item at the same position
-		leftTable.select(Math.min(lastSelectedIndex, leftTable.getItemCount() - 1));
-
-		fIsModified = true;
-	}
-
-	private void onMoveRightAll() {
-
-		Table listTable = fFilterViewerLeft.getTable();
-		ArrayList<TourTypeFilter> removedFilters = new ArrayList<TourTypeFilter>();
-
-		for (int listIndex = 0; listIndex < listTable.getItemCount(); listIndex++) {
-			final TourTypeFilter filterItem = (TourTypeFilter) fFilterViewerLeft.getElementAt(listIndex);
-
-			// check for system filters, they cannot be removed
-			if (filterItem.getFilterType() != TourTypeFilter.FILTER_TYPE_SYSTEM) {
-
-				fFilterViewerRight.add(filterItem);
-				removedFilters.add(filterItem);
-			}
-		}
-
-		fFilterViewerLeft.remove(removedFilters.toArray());
-
-		fIsModified = true;
-	}
-
 	private void onMoveUp() {
 
-		final TourTypeFilter filterItem = (TourTypeFilter) ((IStructuredSelection) fFilterViewerLeft.getSelection()).getFirstElement();
+		final TourTypeFilter filterItem = (TourTypeFilter) ((IStructuredSelection) fFilterViewer.getSelection()).getFirstElement();
 
 		if (filterItem == null) {
 			return;
 		}
 
-		Table filterTable = fFilterViewerLeft.getTable();
+		Table filterTable = fFilterViewer.getTable();
 
 		final int selectionIndex = filterTable.getSelectionIndex();
 		if (selectionIndex > 0) {
-			fFilterViewerLeft.remove(filterItem);
-			fFilterViewerLeft.insert(filterItem, selectionIndex - 1);
+			fFilterViewer.remove(filterItem);
+			fFilterViewer.insert(filterItem, selectionIndex - 1);
 
 			// reselect moved item
-			fFilterViewerLeft.setSelection(new StructuredSelection(filterItem));
+			fFilterViewer.setSelection(new StructuredSelection(filterItem));
 
 			if (filterTable.getSelectionIndex() == 0) {
 				fBtnDown.setFocus();
@@ -846,61 +613,147 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 		}
 	}
 
+	private void onNewFilterSet() {
+
+		InputDialog inputDialog = new InputDialog(getShell(),
+				Messages.Pref_TourTypeFilter_dlg_new_title,
+				Messages.Pref_TourTypeFilter_dlg_new_message,
+				"", //$NON-NLS-1$
+				null);
+
+		inputDialog.open();
+
+		if (inputDialog.getReturnCode() != Window.OK) {
+			return;
+		}
+
+		// create new filterset
+		TourTypeFilterSet filterSet = new TourTypeFilterSet();
+		filterSet.setName(inputDialog.getValue().trim());
+
+		TourTypeFilter tourTypeFilter = new TourTypeFilter(filterSet);
+
+		// update model and viewer
+		fFilterViewer.add(tourTypeFilter);
+		fFilterList.add(tourTypeFilter);
+
+		// select new set
+		fFilterViewer.setSelection(new StructuredSelection(tourTypeFilter), true);
+
+		fTourTypeViewer.getTable().setFocus();
+
+		fIsModified = true;
+	}
+
+	private void onRenameFilterSet() {
+
+		TourTypeFilter filter = (TourTypeFilter) ((StructuredSelection) fFilterViewer.getSelection()).getFirstElement();
+
+		InputDialog inputDialog = new InputDialog(getShell(),
+				Messages.Pref_TourTypeFilter_dlg_rename_title,
+				Messages.Pref_TourTypeFilter_dlg_rename_message,
+				filter.getFilterName(),
+				null);
+
+		inputDialog.open();
+
+		if (inputDialog.getReturnCode() != Window.OK) {
+			return;
+		}
+
+		// update model
+		filter.setName(inputDialog.getValue().trim());
+
+		// update viewer
+		fFilterViewer.update(filter, null);
+
+		fIsModified = true;
+	}
+
+	private void onSelectFilter() {
+
+		TourTypeFilter filterItem = (TourTypeFilter) ((StructuredSelection) fFilterViewer.getSelection()).getFirstElement();
+
+		if (filterItem == null) {
+			return;
+		}
+
+		fActiveFilter = filterItem;
+
+		int filterType = filterItem.getFilterType();
+
+		Object[] tourTypes;
+		switch (filterType) {
+		case TourTypeFilter.FILTER_TYPE_SYSTEM:
+			int systemFilter = filterItem.getSystemFilterId();
+			fTourTypeViewer.setAllChecked(systemFilter == TourTypeFilter.SYSTEM_FILTER_ID_ALL);
+			fTourTypeViewer.getTable().setEnabled(false);
+
+			break;
+
+		case TourTypeFilter.FILTER_TYPE_DB:
+			TourType tourType = filterItem.getTourType();
+			fTourTypeViewer.setCheckedElements(new Object[] { tourType });
+			fTourTypeViewer.getTable().setEnabled(false);
+			break;
+
+		case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
+			fTourTypeViewer.getTable().setEnabled(true);
+			tourTypes = filterItem.getTourTypeSet().getTourTypes();
+			if (tourTypes == null) {
+				fTourTypeViewer.setAllChecked(false);
+			} else {
+				fTourTypeViewer.setCheckedElements(tourTypes);
+			}
+			break;
+
+		default:
+			break;
+		}
+
+		enableButtons();
+	}
+
+	private void onSelectTourType() {
+
+		// set tour types for current filter set
+		if (fActiveFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
+			fActiveFilter.getTourTypeSet().setTourTypes(fTourTypeViewer.getCheckedElements());
+		}
+	}
+
 	@Override
 	public boolean performOk() {
 
-		savePreferences();
+		saveFilterList();
 
-		return super.performOk();
+		return true;
 	}
 
-	private void savePreferences() {
+	private void saveFilterList() {
 
 		if (fIsModified) {
 
 			fIsModified = false;
 
-			Table listTable = fFilterViewerLeft.getTable();
-			ArrayList<String> filterList = new ArrayList<String>();
+			TourTypeContributionItem.writeXMLFilterFile(fFilterViewer);
 
-			for (int listIndex = 0; listIndex < listTable.getItemCount(); listIndex++) {
-
-				final TourTypeFilter filterItem = (TourTypeFilter) fFilterViewerLeft.getElementAt(listIndex);
-				final int filterType = filterItem.getFilterType();
-
-				filterList.add(Integer.toString(filterType)); // 1. parameter
-
-				switch (filterType) {
-				case TourTypeFilter.FILTER_TYPE_SYSTEM:
-					filterList.add(Integer.toString(filterItem.getSystemFilterId())); // 2. parameter
-					break;
-
-				case TourTypeFilter.FILTER_TYPE_DB:
-					filterList.add(Long.toString(filterItem.getTourType().getTypeId())); // 2. parameter
-					break;
-
-				default:
-					break;
-				}
-			}
-
-			IPreferenceStore prefStore = getPreferenceStore();
-			String filterListString = StringToArrayConverter.convertArrayToString(filterList.toArray(new String[filterList.size()]));
-
-			prefStore.setValue(ITourbookPreferences.TOUR_TYPE_FILTER_LIST, filterListString);
+			// fire modify event
+			getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED,
+					Math.random());
 		}
 	}
 
-	private void removeFilterItem(AbstractTableViewer viewer, final LocalSelectionTransfer transfer) {
-		ISelection selection = transfer.getSelection();
-		if (selection instanceof StructuredSelection) {
+	private void updateViewers() {
 
-			Object item = ((StructuredSelection) selection).getFirstElement();
-			if (item instanceof TourTypeFilter) {
+		fFilterList = TourTypeContributionItem.getTourTypeFilters();
+		fTourTypes = TourDatabase.getTourTypes();
 
-				TourTypeFilter filterItem = (TourTypeFilter) item;
-				viewer.remove(filterItem);
-			}
-		}
+		// show contents in the viewers
+		fFilterViewer.setInput(new Object());
+		fTourTypeViewer.setInput(new Object());
+
+		enableButtons();
 	}
+
 }

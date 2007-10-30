@@ -33,6 +33,7 @@ import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
@@ -110,7 +111,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 	TVITourBookRoot					fRootItem;
 	TourPerson						fActivePerson;
 
-	long							fActiveTourTypeId;
+	TourTypeFilter					fActiveTourTypeFilter;
 
 	public NumberFormat				fNF									= NumberFormat.getNumberInstance();
 
@@ -211,7 +212,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
 					fActivePerson = TourbookPlugin.getDefault().getActivePerson();
-					fActiveTourTypeId = TourbookPlugin.getDefault().getActiveTourType().getTypeId();
+					fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
 
 					refreshTourViewer();
 				}
@@ -219,7 +220,6 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 					// update tourbook viewer
-					UI.getInstance().disposeTourTypeImages();
 					fTourViewer.refresh();
 				}
 			}
@@ -234,7 +234,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
 
@@ -361,7 +361,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 		addTourPropertyListener();
 
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
-		fActiveTourTypeId = TourbookPlugin.getDefault().getActiveTourType().getTypeId();
+		fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
 		restoreState(fSessionMemento);
 
 		// update the viewer
@@ -744,7 +744,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void enableActions() {
 
 		ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();

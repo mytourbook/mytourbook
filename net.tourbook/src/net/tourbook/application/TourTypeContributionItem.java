@@ -15,7 +15,19 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourType;
@@ -23,9 +35,14 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
+import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.TourTypeFilterSet;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -37,24 +54,39 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.XMLMemento;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class TourTypeContributionItem extends CustomControlContribution {
 
-	private static final String		ID		= "net.tourbook.tourtype-selector"; //$NON-NLS-1$
+	private static final String			ID							= "net.tourbook.tourtypefilter";	//$NON-NLS-1$
 
-	static TourbookPlugin			plugin	= TourbookPlugin.getDefault();
+	private static final String			TAG_NAME					= "name";							//$NON-NLS-1$
+	private static final String			TAG_FILTER_TYPE				= "filterType";					//$NON-NLS-1$
+	private static final String			TAG_SYSTEM_ID				= "systemId";						//$NON-NLS-1$
+	private static final String			TAG_TOUR_TYPE_ID			= "tourTypeId";					//$NON-NLS-1$
+
+	private static final String			MEMENTO_ROOT_FILTER_LIST	= "filterlist";					//$NON-NLS-1$
+	private static final String			MEMENTO_CHILD_FILTER		= "filter";						//$NON-NLS-1$
+	private static final String			MEMENTO_CHILD_TOURTYPE		= "tourtype";						//$NON-NLS-1$
+
+	private static final String			MEMENTO_FILTER_LIST_FILE	= "filterlist.xml";				//$NON-NLS-1$
+
+	static TourbookPlugin				plugin						= TourbookPlugin.getDefault();
+
+	private IPropertyChangeListener		fPrefChangeListener;
+
+	private Combo						fComboTourType;
 
 	/**
-	 * tour types which are displayed in the tour type combobox, this list contains also the pseudo
-	 * tour types
+	 * contains the tour type filters which are displayed in the combobox
 	 */
-	private ArrayList<TourType>		fAllTourTypes;
-
-	private IPropertyChangeListener	fPrefChangeListener;
-
-	private Combo					fComboTourType;
+	private ArrayList<TourTypeFilter>	fTourTypeFilters;
 
 	public TourTypeContributionItem() {
 		this(ID);
@@ -62,6 +94,286 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	protected TourTypeContributionItem(String id) {
 		super(id);
+	}
+
+	/**
+	 * @return Returns a list with all tour type filters
+	 */
+	@SuppressWarnings("unchecked")
+	public static ArrayList<TourTypeFilter> getTourTypeFilters() {
+
+		ArrayList<TourTypeFilter> filterList = readXMLFilterFile();
+
+		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		ArrayList<TourType> tourTypesNotDisplayed = (ArrayList<TourType>) tourTypes.clone();
+
+		/*
+		 * check if all system filters are visible
+		 */
+		boolean isSysFilterAll = false;
+		boolean isSysFilterNotDefined = false;
+
+		for (TourTypeFilter tourTypeFilter : filterList) {
+			if (tourTypeFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_SYSTEM) {
+				switch (tourTypeFilter.getSystemFilterId()) {
+				case TourTypeFilter.SYSTEM_FILTER_ID_ALL:
+					isSysFilterAll = true;
+					break;
+				case TourTypeFilter.SYSTEM_FILTER_ID_NOT_DEFINED:
+					isSysFilterNotDefined = true;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		if (isSysFilterAll == false) {
+			filterList.add(new TourTypeFilter(TourTypeFilter.SYSTEM_FILTER_ID_ALL,
+					Messages.App_Tour_type_item_all_types));
+		}
+		if (isSysFilterNotDefined == false) {
+			filterList.add(new TourTypeFilter(TourTypeFilter.SYSTEM_FILTER_ID_NOT_DEFINED,
+					Messages.App_Tour_type_item_not_defined));
+		}
+
+		/*
+		 * ensure that all available tour types are visible
+		 */
+		for (TourTypeFilter tourTypeFilter : filterList) {
+			final TourType tourType = tourTypeFilter.getTourType();
+			if (tourType != null) {
+				tourTypesNotDisplayed.remove(tourType);
+			}
+		}
+
+		for (TourType tourType : tourTypesNotDisplayed) {
+			filterList.add(new TourTypeFilter(tourType));
+		}
+
+		return filterList;
+	}
+
+	private static XMLMemento getXMLMementoRoot() {
+		Document document;
+		try {
+			document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+			Element element = document.createElement(MEMENTO_ROOT_FILTER_LIST);
+			element.setAttribute("version", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+			document.appendChild(element);
+
+			return new XMLMemento(document, element);
+
+		} catch (ParserConfigurationException e) {
+			throw new Error(e.getMessage());
+		}
+	}
+
+	/**
+	 * Read filter list from xml file
+	 * 
+	 * @return Returns a list with all filters from the xml file
+	 */
+	private static ArrayList<TourTypeFilter> readXMLFilterFile() {
+
+		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		ArrayList<TourTypeFilter> filterList = new ArrayList<TourTypeFilter>();
+
+		IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
+		String filename = stateLocation.append(MEMENTO_FILTER_LIST_FILE).toFile().getAbsolutePath();
+
+		// check if filter file is available
+		File inputFile = new File(filename);
+		if (inputFile.exists() == false) {
+			return filterList;
+		}
+
+		InputStreamReader reader = null;
+		long tourTypeId;
+
+		try {
+			reader = new InputStreamReader(new FileInputStream(inputFile), "UTF-8"); //$NON-NLS-1$
+			XMLMemento mementoFilterList = XMLMemento.createReadRoot(reader);
+
+			IMemento[] mementoFilters = mementoFilterList.getChildren(MEMENTO_CHILD_FILTER);
+
+			for (IMemento mementoFilter : mementoFilters) {
+
+				Integer filterType = mementoFilter.getInteger(TAG_FILTER_TYPE);
+				String filterName = mementoFilter.getString(TAG_NAME);
+
+				if (filterType == null || filterName == null) {
+					continue;
+				}
+
+				switch (filterType) {
+				case TourTypeFilter.FILTER_TYPE_SYSTEM:
+					Integer systemId = mementoFilter.getInteger(TAG_SYSTEM_ID);
+					if (systemId == null) {
+						continue;
+					}
+
+					filterList.add(new TourTypeFilter(systemId, filterName));
+
+					break;
+
+				case TourTypeFilter.FILTER_TYPE_DB:
+
+					String tourTypeIdString = mementoFilter.getString(TAG_TOUR_TYPE_ID);
+
+					if (tourTypeIdString == null) {
+						continue;
+					}
+
+					tourTypeId = Long.parseLong(tourTypeIdString);
+
+					// find the tour type in the available tour types
+					for (TourType tourType : tourTypes) {
+						if (tourType.getTypeId() == tourTypeId) {
+							filterList.add(new TourTypeFilter(tourType));
+							break;
+						}
+					}
+
+					break;
+
+				case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
+
+					ArrayList<TourType> tourTypesInFilter = new ArrayList<TourType>();
+					IMemento[] mementoTourTypes = mementoFilter.getChildren(MEMENTO_CHILD_TOURTYPE);
+
+					// get all tour types
+					for (IMemento mementoTourType : mementoTourTypes) {
+
+						tourTypeIdString = mementoTourType.getString(TAG_TOUR_TYPE_ID);
+						if (tourTypeIdString == null) {
+							continue;
+						}
+
+						tourTypeId = Long.parseLong(tourTypeIdString);
+
+						// find the tour type in the available tour types
+						for (TourType tourType : tourTypes) {
+							if (tourType.getTypeId() == tourTypeId) {
+								tourTypesInFilter.add(tourType);
+								break;
+							}
+						}
+					}
+
+					TourTypeFilterSet filterSet = new TourTypeFilterSet();
+					filterSet.setName(filterName);
+					filterSet.setTourTypes(tourTypesInFilter.toArray());
+
+					filterList.add(new TourTypeFilter(filterSet));
+
+					break;
+
+				default:
+					break;
+				}
+			}
+
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (WorkbenchException e) {
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return filterList;
+	}
+
+	/**
+	 * write the filters from the viewer into an xml file
+	 * 
+	 * @param filterViewer
+	 */
+	public static void writeXMLFilterFile(TableViewer filterViewer) {
+
+		BufferedWriter writer = null;
+
+		try {
+
+			IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
+			File file = stateLocation.append(MEMENTO_FILTER_LIST_FILE).toFile();
+
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+
+			XMLMemento xmlMemento = getXMLMementoRoot();
+
+			for (TableItem tableItem : filterViewer.getTable().getItems()) {
+
+				Object itemData = tableItem.getData();
+				if (itemData instanceof TourTypeFilter) {
+
+					TourTypeFilter filter = (TourTypeFilter) itemData;
+
+					IMemento mementoFilter = xmlMemento.createChild(MEMENTO_CHILD_FILTER);
+
+					final int filterType = filter.getFilterType();
+
+					mementoFilter.putInteger(TAG_FILTER_TYPE, filterType);
+					mementoFilter.putString(TAG_NAME, filter.getFilterName());
+
+					switch (filterType) {
+					case TourTypeFilter.FILTER_TYPE_SYSTEM:
+						mementoFilter.putInteger(TAG_SYSTEM_ID, filter.getSystemFilterId());
+						break;
+
+					case TourTypeFilter.FILTER_TYPE_DB:
+						mementoFilter.putString(TAG_TOUR_TYPE_ID,
+								Long.toString(filter.getTourType().getTypeId()));
+						break;
+
+					case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
+
+						TourTypeFilterSet filterSet = filter.getTourTypeSet();
+
+						final Object[] tourTypes = filterSet.getTourTypes();
+						if (tourTypes != null) {
+							for (Object item : tourTypes) {
+
+								TourType tourType = (TourType) item;
+								IMemento mementoTourType = mementoFilter.createChild(MEMENTO_CHILD_TOURTYPE);
+								{
+									mementoTourType.putString(TAG_TOUR_TYPE_ID,
+											Long.toString(tourType.getTypeId()));
+								}
+							}
+						}
+						break;
+
+					default:
+						break;
+					}
+				}
+			}
+
+			xmlMemento.save(writer);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	/**
@@ -74,10 +386,11 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 				final String property = event.getProperty();
 
-				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-					fillTourTypeComboBox();
+				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-					reselectTourType(plugin.getActiveTourType().getTypeId());
+					fillFilterComboBox();
+
+					reselectTourType(plugin.getActiveTourTypeFilter());
 				}
 			}
 
@@ -93,15 +406,17 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			return new Label(parent, SWT.NONE);
 		}
 
-		Composite container = createTourTypeComboBox(parent);
-
+		Composite container = createUI(parent);
 		addPrefListener();
+
+		fillFilterComboBox();
+
 		reselectLastTourType();
 
 		return container;
 	}
 
-	private Composite createTourTypeComboBox(Composite parent) {
+	private Composite createUI(Composite parent) {
 
 		Composite container = new Composite(parent, SWT.NONE);
 		GridLayout gl = new GridLayout();
@@ -112,9 +427,11 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		container.setLayout(gl);
 
 		fComboTourType = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-		fComboTourType.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
 		fComboTourType.setVisibleItemCount(20);
 		fComboTourType.setToolTipText(Messages.App_Tour_type_tooltip);
+		final GridData gd = new GridData(SWT.NONE, SWT.NONE, false, false);
+		gd.widthHint = 100;
+		fComboTourType.setLayoutData(gd);
 
 		fComboTourType.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
@@ -126,7 +443,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
-				setActiveTourType();
+				setActiveTourTypeFilter();
 
 				// fire change event
 				plugin.getPreferenceStore()
@@ -135,64 +452,101 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			}
 		});
 
-		// add tour type names to the ui list
-		fillTourTypeComboBox();
-
 		return container;
 	}
 
-	/**
-	 * reads the tour types from the db, set the tour type list and fill the combo box
-	 */
-	private void fillTourTypeComboBox() {
+	private void fillFilterComboBox() {
 
-		fAllTourTypes = new ArrayList<TourType>();
+		fTourTypeFilters = getTourTypeFilters();
 
-		// add entry where the tour type will be ignored
-		fAllTourTypes.add(new TourType(Messages.App_Tour_type_item_all_types,
-				TourType.TOUR_TYPE_ID_ALL));
-
-		// add tour type for tours where the tour type is not defined
-		fAllTourTypes.add(new TourType(Messages.App_Tour_type_item_not_defined,
-				TourType.TOUR_TYPE_ID_NOT_DEFINED));
-
-		/*
-		 * get tour types from the db
-		 */
-		ArrayList<TourType> dbTourTypes = TourDatabase.getTourTypes();
-
-//		if (dbTourTypes == null) {
-//			return;
-//		}
-
-		for (TourType dbTourType : dbTourTypes) {
-			fAllTourTypes.add(dbTourType);
-		}
-
-		// update combo box
 		fComboTourType.removeAll();
-		for (TourType tourType : fAllTourTypes) {
-			fComboTourType.add(tourType.getName());
+
+		for (TourTypeFilter tourTypeFilter : fTourTypeFilters) {
+			fComboTourType.add(tourTypeFilter.getFilterName());
+		}
+	}
+
+	private void reselectLastTourType() {
+
+		String lastTourTypeFilterName = plugin.getDialogSettings()
+				.get(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_FILTER);
+
+		TourTypeFilter selectTourTypeFilter = null;
+
+		if (lastTourTypeFilterName != null) {
+
+			// find the name in the filter list
+
+			for (TourTypeFilter tourTypeFilter : fTourTypeFilters) {
+				if (tourTypeFilter.getFilterName().equals(lastTourTypeFilterName)) {
+					selectTourTypeFilter = tourTypeFilter;
+					break;
+				}
+			}
 		}
 
-		plugin.setAllTourTypes(fAllTourTypes);
-		plugin.setDbTourTypes(dbTourTypes);
+		if (selectTourTypeFilter == null) {
+
+			// get the filter which selects all tour types
+
+			for (TourTypeFilter tourTypeFilter : fTourTypeFilters) {
+				if (tourTypeFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_SYSTEM
+						&& tourTypeFilter.getSystemFilterId() == TourTypeFilter.SYSTEM_FILTER_ID_ALL) {
+					selectTourTypeFilter = tourTypeFilter;
+					break;
+				}
+			}
+		}
+
+		// try to reselect the last person
+		reselectTourType(selectTourTypeFilter);
+	}
+
+	/**
+	 * reselect the tour type in the combo box and set the active tour type in the plugin
+	 * 
+	 * @param tourTypeFilter
+	 */
+	private void reselectTourType(TourTypeFilter selectTourTypeFilter) {
+
+		TourTypeFilter activeTourTypeFilter = null;
+
+		// find the tour type filter in the combobox
+		int tourTypeIndex = 0;
+		for (TourTypeFilter tourTypeFilter : fTourTypeFilters) {
+			if (tourTypeFilter.getFilterName().equals(selectTourTypeFilter.getFilterName())) {
+				activeTourTypeFilter = tourTypeFilter;
+				fComboTourType.select(tourTypeIndex);
+				break;
+			}
+
+			tourTypeIndex++;
+		}
+
+		if (activeTourTypeFilter == null) {
+			// filter was not found, set first filter as active filter
+			fComboTourType.select(0);
+			activeTourTypeFilter = fTourTypeFilters.get(0);
+		}
+
+		plugin.setActiveTourTypeFilter(activeTourTypeFilter);
 	}
 
 	void saveState(IMemento memento) {
 
-		// save: selected tour type
+		// save selected tour type filter
 		int selectionIndex = fComboTourType.getSelectionIndex();
+
 		if (selectionIndex != -1) {
-			plugin.getDialogSettings().put(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_ID,
-					fAllTourTypes.get(selectionIndex).getTypeId());
+			plugin.getDialogSettings().put(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_FILTER,
+					fTourTypeFilters.get(selectionIndex).getFilterName());
 		}
 	}
 
 	/**
 	 * set the selected tour type
 	 */
-	private void setActiveTourType() {
+	private void setActiveTourTypeFilter() {
 
 		int selectionIndex = fComboTourType.getSelectionIndex();
 		if (selectionIndex == -1) {
@@ -201,65 +555,6 @@ public class TourTypeContributionItem extends CustomControlContribution {
 			fComboTourType.select(selectionIndex);
 		}
 
-		plugin.setAllTourTypes(fAllTourTypes);
-		plugin.setActiveTourType(fAllTourTypes.get(selectionIndex));
-	}
-
-	/**
-	 * reselect the tour type in the combo box and set the active tour type in the plugin
-	 * 
-	 * @param lastTourTypeId
-	 */
-	private void reselectTourType(Long lastTourTypeId) {
-
-		// if (fTourTypes == null) {
-		// fComboTourType.select(0);
-		// return;
-		// }
-
-		TourType activeTourType = null;
-		long activeTourTypeId = TourType.TOUR_TYPE_ID_ALL;
-
-		// find the tour type in the combobox
-		int tourTypeIndex = 0;
-
-		for (TourType tourType : fAllTourTypes) {
-			if (tourType.getTypeId() == lastTourTypeId) {
-				// reselect last tour type
-				activeTourTypeId = lastTourTypeId;
-				activeTourType = tourType;
-				fComboTourType.select(tourTypeIndex);
-				break;
-			}
-			tourTypeIndex++;
-		}
-
-		if (activeTourTypeId == TourType.TOUR_TYPE_ID_ALL) {
-			// the last tour type was not found, select first entry
-			fComboTourType.select(0);
-			activeTourType = fAllTourTypes.get(0);
-		}
-
-		// if (activeTourType != null) {
-		plugin.setActiveTourType(activeTourType);
-		// }
-	}
-
-	private void reselectLastTourType() {
-
-		Long lastTourTypeId;
-		try {
-
-			lastTourTypeId = plugin.getDialogSettings()
-					.getLong(ITourbookPreferences.APP_LAST_SELECTED_TOUR_TYPE_ID);
-
-		} catch (NumberFormatException e) {
-			// last tour type id was not found, select all
-			lastTourTypeId = Long.valueOf(TourType.TOUR_TYPE_ID_ALL);
-			// fComboTourType.select(0);
-		}
-
-		// try to reselect the last person
-		reselectTourType(lastTourTypeId);
+		plugin.setActiveTourTypeFilter(fTourTypeFilters.get(selectionIndex));
 	}
 }

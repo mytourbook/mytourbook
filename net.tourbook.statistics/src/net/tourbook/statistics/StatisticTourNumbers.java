@@ -29,8 +29,10 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -97,7 +99,7 @@ public class StatisticTourNumbers extends YearStatistic {
 
 	private int							fCurrentYear;
 	private TourPerson					fActivePerson;
-	protected long						fActiveTypeId;
+	protected TourTypeFilter			fActiveTourTypeFilter;
 
 	private boolean						fIsSynchScaleEnabled;
 
@@ -135,7 +137,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					resetMinMaxKeeper();
 
 					// update chart
-					refreshStatistic(fActivePerson, fActiveTypeId, fCurrentYear, false);
+					refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, false);
 				}
 			}
 		};
@@ -329,7 +331,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	 */
 	private void createStatisticData(TourDataTour tourDataTour) {
 
-		ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getAllTourTypes();
+		ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
 		int colorLength = tourTypeList.size();
 
 		int distanceLength = fStatDistanceUnits.length;
@@ -509,13 +511,16 @@ public class StatisticTourNumbers extends YearStatistic {
 	}
 
 	public void prefColorChanged() {
-		refreshStatistic(fActivePerson, fActiveTypeId, fCurrentYear, false);
+		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, false);
 	}
 
-	public void refreshStatistic(TourPerson person, long typeId, int year, boolean refreshData) {
+	public void refreshStatistic(	TourPerson person,
+									TourTypeFilter typeId,
+									int year,
+									boolean refreshData) {
 
 		fActivePerson = person;
-		fActiveTypeId = typeId;
+		fActiveTourTypeFilter = typeId;
 		fCurrentYear = year;
 
 		fTourDataTour = ProviderTourDay.getInstance().getDayData(person,

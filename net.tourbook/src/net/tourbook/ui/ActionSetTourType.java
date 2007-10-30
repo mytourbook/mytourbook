@@ -21,7 +21,6 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourEditorInput;
 import net.tourbook.tour.TourManager;
@@ -220,9 +219,9 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 
 		fMenu = new Menu(parent);
 
-		ArrayList<TourType> dbTourTypes = TourbookPlugin.getDefault().getDbTourTypes();
+		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 
-		for (TourType tourType : dbTourTypes) {
+		for (TourType tourType : tourTypes) {
 			addActionToMenu(new ActionTourType(tourType));
 		}
 

@@ -16,25 +16,24 @@
 package net.tourbook.statistic;
 
 import net.tourbook.data.TourPerson;
+import net.tourbook.ui.TourTypeFilter;
 
 public interface IYearStatistic {
 
 	/**
 	 * @param person
-	 *        active person or <code>null</code> when no person/all people are
-	 *        selected
-	 * @param typeId
+	 *        active person or <code>null</code> when no person/all people are selected
+	 * @param activeTourTypeFilter
 	 *        TourType id
 	 * @param year
 	 *        year for the statistic
 	 * @param refreshData
-	 *        when set to <code>true</code> the data should be updated from the
-	 *        database
+	 *        when set to <code>true</code> the data should be updated from the database
 	 */
-	public abstract void refreshStatistic(TourPerson person,
-									long typeId,
-									int year,
-									boolean refreshData);
+	public abstract void refreshStatistic(	TourPerson person,
+											TourTypeFilter activeTourTypeFilter,
+											int year,
+											boolean refreshData);
 
 	public abstract void prefColorChanged();
 

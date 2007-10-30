@@ -45,13 +45,13 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 		fColorTreeViewer = colorTreeViewer;
 	}
 
-	private int	fImageHeight	= -1;
+	private int	fTreeItemHeight	= -1;
 	private int	fUsableImageHeight;
 
 	private int	fColorImageWidth;
-	private int	fUsableColorImageWidth;
+	private int	fColorImageUsableWidth;
 
-	private int	fDefImageWidth;
+	private int	fImageWidth;
 	private int	fUsableDefImageWidth;
 
 	/**
@@ -59,25 +59,21 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 	 * @return
 	 */
 	private void ensureImageSize(Display display) {
-		if (fImageHeight == -1) {
+		if (fTreeItemHeight == -1) {
 
 			Tree colorTree = fColorTreeViewer.getTreeViewer().getTree();
 
-			fImageHeight = colorTree.getItemHeight();
-			fUsableImageHeight = Math.max(1, fImageHeight - 4);
+			fTreeItemHeight = colorTree.getItemHeight();
+			fUsableImageHeight = Math.max(1, fTreeItemHeight - 4);
 
 			int graphColors = 4;
 			fColorImageWidth = colorTree.getItemHeight() * graphColors;
-			fUsableColorImageWidth = Math.max(1, fColorImageWidth - 4);
+			fColorImageUsableWidth = Math.max(1, fColorImageWidth - 4);
 
-			fDefImageWidth = colorTree.getItemHeight();
-			fUsableDefImageWidth = Math.max(1, fDefImageWidth - 4);
+			fImageWidth = colorTree.getItemHeight();
+			fUsableDefImageWidth = Math.max(1, fImageWidth - 4);
 		}
 	}
-
-	// public Color getBackground(Object element, int columnIndex) {
-	// return null;
-	// }
 
 	public Image getColumnImage(Object element, int columnIndex) {
 
@@ -94,27 +90,26 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 			if (image == null || image.isDisposed()) {
 
 				ensureImageSize(display);
-				image = new Image(display, fColorImageWidth, fImageHeight);
+				image = new Image(display, fColorImageWidth, fTreeItemHeight);
 
 				GC gc = new GC(image);
 				{
 					gc.setBackground(treeControl.getBackground());
 					gc.setForeground(treeControl.getBackground());
-					gc.drawRectangle(0, 0, fColorImageWidth - 1, fImageHeight - 1);
+					gc.drawRectangle(0, 0, fColorImageWidth - 1, fTreeItemHeight - 1);
 
 					gc.setForeground(treeControl.getForeground());
 					gc.setBackground(getGraphColor(display, graphColor));
 
-					int offsetWidth = (fColorImageWidth - fUsableColorImageWidth) / 2;
-					int offsetHeight = (fImageHeight - fUsableImageHeight) / 2;
+					int offsetWidth = (fColorImageWidth - fColorImageUsableWidth) / 2;
+					int offsetHeight = (fTreeItemHeight - fUsableImageHeight) / 2;
 
-					gc.drawRectangle(
-							offsetWidth,
+					gc.drawRectangle(offsetWidth,
 							offsetHeight,
-							(fUsableColorImageWidth - offsetWidth),
+							(fColorImageUsableWidth - offsetWidth),
 							fUsableImageHeight - offsetHeight);
 
-					gc.fillRectangle(offsetWidth + 1, offsetHeight + 1, fUsableColorImageWidth
+					gc.fillRectangle(offsetWidth + 1, offsetHeight + 1, fColorImageUsableWidth
 							- offsetWidth
 							- 1, fUsableImageHeight - offsetHeight - 1);
 				}
@@ -138,10 +133,9 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 
 				ensureImageSize(display);
 
-				definitionImage = new Image(
-						display,
-						graphColors.length * fDefImageWidth,
-						fImageHeight);
+				definitionImage = new Image(display,
+						graphColors.length * fImageWidth,
+						fTreeItemHeight);
 
 				GC gc = new GC(definitionImage);
 				{
@@ -149,37 +143,35 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 					int colorIndex = 0;
 					for (GraphColor graphColor : graphColors) {
 
-						int colorOffset = colorIndex * fDefImageWidth;
+						int colorOffset = colorIndex * fImageWidth;
 
 						// gc.setForeground(treeControl.getForeground());
 						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
 						gc.setBackground(getGraphColor(display, graphColor));
 
 						int colorOffsetWidth = colorOffset
-								+ ((fDefImageWidth - fUsableDefImageWidth) / 2);
-						int offsetWidth = (fDefImageWidth - fUsableDefImageWidth) / 2;
-						int offsetHeight = (fImageHeight - fUsableImageHeight) / 2;
+								+ ((fImageWidth - fUsableDefImageWidth) / 2);
+						int offsetWidth = (fImageWidth - fUsableDefImageWidth) / 2;
+						int offsetHeight = (fTreeItemHeight - fUsableImageHeight) / 2;
 
-						// gc.drawRectangle(
-						// colorOffsetWidth,
-						// offsetHeight,
-						// (fUsableDefImageWidth - offsetWidth),
-						// fUsableImageHeight - offsetHeight);
-						//
-						// gc.fillRectangle(
-						// colorOffsetWidth + 1,
-						// offsetHeight + 1,
-						// fUsableDefImageWidth - offsetWidth - 1,
-						// fUsableImageHeight - offsetHeight - 1);
+						gc.drawRectangle(colorOffsetWidth,
+								offsetHeight,
+								(fUsableDefImageWidth - offsetWidth),
+								fUsableImageHeight - offsetHeight);
 
-						gc.setAntialias(SWT.ON);
-						gc.fillOval(colorOffsetWidth + 0, offsetHeight + 0, fUsableDefImageWidth
-								- offsetWidth
-								+ 3, fUsableImageHeight - offsetHeight + 3);
-						gc.setAntialias(SWT.OFF);
+						gc.fillRectangle(colorOffsetWidth + 1,
+								offsetHeight + 1,
+								fUsableDefImageWidth - offsetWidth - 1,
+								fUsableImageHeight - offsetHeight - 1);
 
-						gc.drawOval(colorOffsetWidth, offsetHeight, (fUsableDefImageWidth
-								- offsetWidth + 2), fUsableImageHeight - offsetHeight + 2);
+//						gc.setAntialias(SWT.ON);
+//						gc.fillOval(colorOffsetWidth + 0, offsetHeight + 0, fUsableDefImageWidth
+//								- offsetWidth
+//								+ 3, fUsableImageHeight - offsetHeight + 3);
+//						gc.setAntialias(SWT.OFF);
+//
+//						gc.drawOval(colorOffsetWidth, offsetHeight, (fUsableDefImageWidth
+//								- offsetWidth + 2), fUsableImageHeight - offsetHeight + 2);
 
 						colorIndex++;
 					}
@@ -229,6 +221,7 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 		return imageColor;
 	}
 
+	@Override
 	public void dispose() {
 
 		super.dispose();

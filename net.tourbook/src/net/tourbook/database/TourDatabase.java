@@ -41,6 +41,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
 import org.apache.derby.drda.NetworkServerControl;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -93,6 +94,8 @@ public class TourDatabase {
 
 	private static EntityManagerFactory	emFactory;
 
+	private static ArrayList<TourType>	fTourTypes;
+
 	private boolean						fIsTableChecked;
 	private boolean						fIsVersionChecked;
 
@@ -115,6 +118,20 @@ public class TourDatabase {
 	}
 
 	private TourDatabase() {}
+
+	/**
+	 * dispose tour types and their images so the next time they have to be loaded from the database
+	 * and the images are recreated
+	 */
+	public static void disposeTourTypes() {
+
+		if (fTourTypes != null) {
+			fTourTypes.clear();
+			fTourTypes = null;
+		}
+
+		UI.getInstance().disposeTourTypeImages();
+	}
 
 	/**
 	 * @return Returns all tours in database
@@ -221,7 +238,11 @@ public class TourDatabase {
 	@SuppressWarnings("unchecked")
 	public static ArrayList<TourType> getTourTypes() {
 
-		ArrayList<TourType> tourTypeList = new ArrayList<TourType>();
+		if (fTourTypes != null) {
+			return fTourTypes;
+		}
+
+		fTourTypes = new ArrayList<TourType>();
 
 		EntityManager em = TourDatabase.getInstance().getEntityManager();
 
@@ -231,12 +252,12 @@ public class TourDatabase {
 					+ ("FROM " + TourDatabase.TABLE_TOUR_TYPE + " TourType ") //$NON-NLS-1$ //$NON-NLS-2$
 					+ (" ORDER  BY TourType.name")); //$NON-NLS-1$
 
-			tourTypeList = (ArrayList<TourType>) query.getResultList();
+			fTourTypes = (ArrayList<TourType>) query.getResultList();
 
 			em.close();
 		}
 
-		return tourTypeList;
+		return fTourTypes;
 	}
 
 	public static void printSQLException(SQLException sqle) {
@@ -249,37 +270,6 @@ public class TourDatabase {
 			sqle = sqle.getNextException();
 		}
 	}
-
-//	public static void refreshTour(TourData tourData) {
-//
-//		EntityManager em = TourDatabase.getInstance().getEntityManager();
-//
-//		if (em != null) {
-//
-//			EntityTransaction ts = em.getTransaction();
-//
-//			try {
-//
-//				TourData tourDataEntity = em.find(TourData.class, tourData.getTourId());
-//
-//				if (tourDataEntity != null) {
-//
-//					ts.begin();
-//
-//em.refresh(tourDataEntity);
-//					ts.commit();
-//				}
-//
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			} finally {
-//				if (ts.isActive()) {
-//					ts.rollback();
-//				}
-//				em.close();
-//			}
-//		}
-//	}
 
 	/**
 	 * Remove a tour from the database

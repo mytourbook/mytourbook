@@ -26,7 +26,7 @@ import java.util.GregorianCalendar;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.util.ArrayListToArray;
 
 public class ProviderTourTime extends DataProvider /* implements IBarSelectionProvider */{
@@ -36,14 +36,14 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 	private ArrayList<Long>			fTourIds;
 
 	private TourPerson				fActivePerson;
-	private long					fActiveTypeId	= -1;
+	private TourTypeFilter			fActiveTourTypeFilter;
 
 	private int						fCurrentYear;
 	private int						fCurrentMonth;
 
 	private Long					fSelectedTourId;
 
-	private final Calendar			fCalendar		= GregorianCalendar.getInstance();
+	private final Calendar			fCalendar	= GregorianCalendar.getInstance();
 
 	private TourDataTime			fTourTimeData;
 
@@ -68,24 +68,24 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 	 * Retrieve chart data from the database
 	 * 
 	 * @param person
-	 * @param typeId
+	 * @param tourTypeFilter
 	 * @param year
 	 * @return
 	 */
 	TourDataTime getTourTimeData(	final TourPerson person,
-									final long typeId,
+									final TourTypeFilter tourTypeFilter,
 									final int year,
 									final boolean refreshData) {
 
 		// dont reload data which are already here
 		if (fActivePerson == person
-				&& fActiveTypeId == typeId
+				&& fActiveTourTypeFilter == tourTypeFilter
 				&& fCurrentYear == year
 				&& refreshData == false) {
 			return fTourTimeData;
 		}
 
-		final ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getAllTourTypes();
+		final ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		final String sqlString = "SELECT " //$NON-NLS-1$
@@ -102,7 +102,7 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 				+ "tourType_typeId "// 11 //$NON-NLS-1$
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" WHERE STARTYEAR = " + Integer.toString(year)) //$NON-NLS-1$
-				+ getSQLFilter(person, typeId)
+				+ getSQLFilter(person, tourTypeFilter)
 				+ (" ORDER BY StartMonth, StartDay, StartHour, StartMinute"); //$NON-NLS-1$
 
 		try {
@@ -205,7 +205,7 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 
 			fActivePerson = person;
 			fCurrentYear = year;
-			fActiveTypeId = typeId;
+			fActiveTourTypeFilter = tourTypeFilter;
 
 		} catch (final SQLException e) {
 			e.printStackTrace();

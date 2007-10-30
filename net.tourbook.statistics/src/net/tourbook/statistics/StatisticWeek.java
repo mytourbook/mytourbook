@@ -21,6 +21,7 @@ import java.util.GregorianCalendar;
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
 import net.tourbook.data.TourPerson;
+import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
@@ -35,7 +36,7 @@ public abstract class StatisticWeek extends YearStatistic {
 
 	private TourPerson		fActivePerson;
 	private int				fCurrentYear;
-	private long			fActiveTypeId;
+	private TourTypeFilter	fActiveTourTypeFilter;
 
 	private final Calendar	fCalendar		= GregorianCalendar.getInstance();
 	boolean					fIsSynchScaleEnabled;
@@ -67,13 +68,16 @@ public abstract class StatisticWeek extends YearStatistic {
 	}
 
 	public void prefColorChanged() {
-		refreshStatistic(fActivePerson, fActiveTypeId, fCurrentYear, false);
+		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, false);
 	}
 
-	public void refreshStatistic(TourPerson person, long typeId, int year, boolean refreshData) {
+	public void refreshStatistic(	TourPerson person,
+									TourTypeFilter typeId,
+									int year,
+									boolean refreshData) {
 
 		fActivePerson = person;
-		fActiveTypeId = typeId;
+		fActiveTourTypeFilter = typeId;
 		fCurrentYear = year;
 
 		TourDataWeek tourWeekData = ProviderTourWeek.getInstance().getWeekData(person,

@@ -32,9 +32,10 @@ import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -48,7 +49,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 public class StatisticTourTime extends YearStatistic implements IBarSelectionProvider {
 
 	private TourPerson					fActivePerson;
-	private long						fActiveTypeId;
+	private TourTypeFilter				fActiveTourTypeFiler;
 	private int							fCurrentYear;
 
 	private final Calendar				fCalendar		= GregorianCalendar.getInstance();
@@ -152,25 +153,25 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	}
 
 	public void prefColorChanged() {
-		refreshStatistic(fActivePerson, fActiveTypeId, fCurrentYear, false);
+		refreshStatistic(fActivePerson, fActiveTourTypeFiler, fCurrentYear, false);
 	}
 
 	public void refreshStatistic(	final TourPerson person,
-									final long type,
+									final TourTypeFilter tourTypeFilter,
 									final int year,
 									final boolean refreshData) {
 
 		// reset the selection in the chart when the data have changed
 		final boolean isResetSelection = fActivePerson != person
-				|| fActiveTypeId != type
+				|| fActiveTourTypeFiler != tourTypeFilter
 				|| fCurrentYear != year;
 
 		fActivePerson = person;
-		fActiveTypeId = type;
+		fActiveTourTypeFiler = tourTypeFilter;
 		fCurrentYear = year;
 
 		fTourTimeData = ProviderTourTime.getInstance().getTourTimeData(person,
-				type,
+				tourTypeFilter,
 				year,
 				isDataDirtyWithReset() || refreshData);
 
@@ -261,7 +262,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				 * get tour type name
 				 */
 				final long typeId = fTourTimeData.fTypeIds[valueIndex];
-				final ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getAllTourTypes();
+				final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 
 				String tourTypeName = ""; //$NON-NLS-1$
 				for (final Iterator<TourType> iter = tourTypes.iterator(); iter.hasNext();) {

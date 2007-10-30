@@ -94,23 +94,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private ColorSelector						fColorSelector;
 
-	private class TourTypeColorDefinition extends ColorDefinition {
-
-		TourType	fTourType;
-
-		TourTypeColorDefinition(TourType tourType, String prefName, String visibleName,
-				RGB defaultGradientBright, RGB defaultGradientDark, RGB defaultLineColor) {
-
-			super(prefName,
-					visibleName,
-					defaultGradientBright,
-					defaultGradientDark,
-					defaultLineColor);
-
-			fTourType = tourType;
-		}
-	}
-
 	private class ColorContentProvider implements ITreeContentProvider {
 
 		public void dispose() {}
@@ -142,22 +125,100 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	}
 
+	private class TourTypeColorDefinition extends ColorDefinition {
+
+		TourType	fTourType;
+
+		TourTypeColorDefinition(TourType tourType, String prefName, String visibleName,
+				RGB defaultGradientBright, RGB defaultGradientDark, RGB defaultLineColor) {
+
+			super(prefName,
+					visibleName,
+					defaultGradientBright,
+					defaultGradientDark,
+					defaultLineColor);
+
+			fTourType = tourType;
+		}
+	}
+
+	private void createButtons(Composite parent) {
+
+		Composite container = new Composite(parent, SWT.NONE);
+		container.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		container.setLayout(gridLayout);
+
+		// button: add
+		fButtonAdd = new Button(container, SWT.NONE);
+		fButtonAdd.setText(Messages.Pref_TourTypes_Button_add);
+		setButtonLayoutData(fButtonAdd);
+		fButtonAdd.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				onAddTourType();
+				enableButtons();
+			}
+		});
+
+		// button: rename
+		fButtonRename = new Button(container, SWT.NONE);
+		fButtonRename.setText(Messages.Pref_TourTypes_Button_rename);
+		setButtonLayoutData(fButtonRename);
+		fButtonRename.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				onRenameTourType();
+			}
+		});
+
+		fColorSelector = new ColorSelector(container);
+		fColorSelector.getButton().setLayoutData(new GridData());
+		fColorSelector.setEnabled(false);
+		setButtonLayoutData(fColorSelector.getButton());
+		fColorSelector.addListener(new IPropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent event) {
+				onChangeColor(event);
+			}
+		});
+
+		// button: delete
+		fButtonDelete = new Button(container, SWT.NONE);
+		fButtonDelete.setText(Messages.Pref_TourTypes_Button_delete);
+		GridData gd = setButtonLayoutData(fButtonDelete);
+		gd.verticalIndent = 10;
+		fButtonDelete.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				onDeleteTourType();
+				enableButtons();
+			}
+		});
+
+	}
+
+	/**
+	 * create the different color names (childs) for the color definition
+	 */
+	private void createColorNames(ColorDefinition colorDefinition) {
+
+		GraphColor[] graphColors = new GraphColor[GraphColors.colorNames.length];
+
+		for (int nameIndex = 0; nameIndex < GraphColors.colorNames.length; nameIndex++) {
+			graphColors[nameIndex] = new GraphColor(colorDefinition,
+					GraphColors.colorNames[nameIndex][0],
+					GraphColors.colorNames[nameIndex][1]);
+		}
+
+		colorDefinition.setColorNames(graphColors);
+	}
+
 	@Override
 	protected Control createContents(Composite parent) {
 
-		Label label = new Label(parent, SWT.WRAP);
-		label.setText(Messages.Pref_TourTypes_Title);
-		label.setLayoutData(new GridData(SWT.NONE, SWT.NONE, true, false));
-
-		// container
-		Composite viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayout gl = new GridLayout(2, false);
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		viewerContainer.setLayout(gl);
-		viewerContainer.setLayoutData(new GridData(SWT.NONE, SWT.FILL, true, true));
-
-		createTreeViewer(viewerContainer);
+		Composite viewerContainer = createUI(parent);
 
 		// read tour typed from the database
 		fTourTypes = TourDatabase.getTourTypes();
@@ -183,14 +244,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		createButtons(viewerContainer);
 
-		// import tour type
-		// fComboImportTourType = createImportCombo(parent);
-
-		// add tour types to the ui list
-		// for (TourType tourType : fTourTypes) {
-		// fComboImportTourType.add(tourType.getName());
-		// }
-
 		fTourNameValidator = new IInputValidator() {
 			public String isValid(String newText) {
 				return null;
@@ -202,22 +255,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		fColorViewer.setInput(this);
 
 		return viewerContainer;
-	}
-
-	/**
-	 * create the different color names (childs) for the color definition
-	 */
-	private void createColorNames(ColorDefinition colorDefinition) {
-
-		GraphColor[] graphColors = new GraphColor[GraphColors.colorNames.length];
-
-		for (int nameIndex = 0; nameIndex < GraphColors.colorNames.length; nameIndex++) {
-			graphColors[nameIndex] = new GraphColor(colorDefinition,
-					GraphColors.colorNames[nameIndex][0],
-					GraphColors.colorNames[nameIndex][1]);
-		}
-
-		colorDefinition.setColorNames(graphColors);
 	}
 
 	private void createTreeViewer(Composite parent) {
@@ -243,8 +280,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				| SWT.BORDER);
 
 		tree.setLinesVisible(false);
-		// gd = new GridData(SWT.FILL, SWT.FILL, false, true);
-		// tree.setLayoutData(gd);
 
 		// tree columns
 		TreeColumn tc;
@@ -323,80 +358,24 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	}
 
-//	private Combo createImportCombo(Composite container) {
-//
-//		Label label = new Label(container, SWT.NONE);
-//		label.setText("&Default Tour Type for imported Tours:"); //$NON-NLS-1$
-//		GridData gd = new GridData();
-//		gd.verticalIndent = 5;
-//		// gd.horizontalSpan = 2;
-//		label.setLayoutData(gd);
-//
-//		Combo combo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-//		combo.setVisibleItemCount(20);
-//		gd = new GridData();
-//		gd.widthHint = convertWidthInCharsToPixels(TOUR_TYPE_WIDTH);
-//		combo.setLayoutData(gd);
-//
-//		return combo;
-//	}
+	private Composite createUI(Composite parent) {
 
-	private void createButtons(Composite parent) {
+		Label label = new Label(parent, SWT.WRAP);
+		label.setText(Messages.Pref_TourTypes_Title);
+		label.setLayoutData(new GridData(SWT.NONE, SWT.NONE, true, false));
 
-		Composite container = new Composite(parent, SWT.NONE);
-		container.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-		final GridLayout gridLayout = new GridLayout();
-		gridLayout.marginHeight = 0;
-		gridLayout.marginWidth = 0;
-		gridLayout.marginRight = 10;
-		container.setLayout(gridLayout);
+		// container
+		Composite viewerContainer = new Composite(parent, SWT.NONE);
+		GridLayout gl = new GridLayout(2, false);
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		viewerContainer.setLayout(gl);
+		viewerContainer.setLayoutData(new GridData(SWT.NONE, SWT.FILL, true, true));
+//		viewerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		fColorSelector = new ColorSelector(container);
-		fColorSelector.getButton().setLayoutData(new GridData());
-		fColorSelector.setEnabled(false);
-		setButtonLayoutData(fColorSelector.getButton());
-		fColorSelector.addListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
-				onChangeColor(event);
-			}
-		});
+		createTreeViewer(viewerContainer);
 
-		// button: add
-		fButtonAdd = new Button(container, SWT.NONE);
-		fButtonAdd.setText(Messages.Pref_TourTypes_Button_add);
-		setButtonLayoutData(fButtonAdd);
-		fButtonAdd.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				onAddTourType();
-				enableButtons();
-			}
-		});
-
-		// button: rename
-		fButtonRename = new Button(container, SWT.NONE);
-		fButtonRename.setText(Messages.Pref_TourTypes_Button_rename);
-		setButtonLayoutData(fButtonRename);
-		fButtonRename.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				onRenameTourType();
-			}
-		});
-
-		// button: delete
-		fButtonDelete = new Button(container, SWT.NONE);
-		fButtonDelete.setText(Messages.Pref_TourTypes_Button_delete);
-		GridData gd = setButtonLayoutData(fButtonDelete);
-		gd.verticalIndent = 10;
-		fButtonDelete.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				onDeleteTourType();
-				enableButtons();
-			}
-		});
-
+		return viewerContainer;
 	}
 
 	private boolean deleteTourType(TourType tourType) {
@@ -500,8 +479,47 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		}
 	}
 
+	/**
+	 * @return Returns the selected color definition in the color viewer
+	 */
+	private TourTypeColorDefinition getSelectedColorDefinition() {
+
+		IStructuredSelection selection = (IStructuredSelection) fColorViewer.getSelection();
+		Object selectedItem = selection.getFirstElement();
+
+		TourTypeColorDefinition selectedColorDefinition = null;
+
+		if (selectedItem instanceof GraphColor) {
+			selectedColorDefinition = ((TourTypeColorDefinition) ((GraphColor) selectedItem).getParent());
+		} else if (selectedItem instanceof TourTypeColorDefinition) {
+			selectedColorDefinition = ((TourTypeColorDefinition) selectedItem);
+		}
+		return selectedColorDefinition;
+	}
+
+	public TreeViewer getTreeViewer() {
+		return fColorViewer;
+	}
+
 	public void init(IWorkbench workbench) {
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
+	}
+
+	@Override
+	public boolean okToLeave() {
+
+		if (fIsTourTypeModified) {
+
+			fIsTourTypeModified = false;
+
+			TourDatabase.disposeTourTypes();
+
+			// fire modify event
+			getPreferenceStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
+					Math.random());
+		}
+
+		return super.okToLeave();
 	}
 
 	private void onAddTourType() {
@@ -595,23 +613,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		}
 	}
 
-	/**
-	 * is called when the color in the color viewer was selected
-	 */
-	private void onSelectColor() {
-
-		IStructuredSelection selection = (IStructuredSelection) fColorViewer.getSelection();
-
-		if (selection.getFirstElement() instanceof GraphColor) {
-			GraphColor graphColor = (GraphColor) selection.getFirstElement();
-			fSelectedColor = graphColor;
-			fColorSelector.setColorValue(graphColor.getNewRGB());
-			fColorSelector.setEnabled(true);
-		} else {
-			fColorSelector.setEnabled(false);
-		}
-	}
-
 	private void onDeleteTourType() {
 
 		TourTypeColorDefinition selectedColorDefinition = getSelectedColorDefinition();
@@ -682,41 +683,26 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	/**
-	 * @return Returns the selected color definition in the color viewer
+	 * is called when the color in the color viewer was selected
 	 */
-	private TourTypeColorDefinition getSelectedColorDefinition() {
+	private void onSelectColor() {
 
 		IStructuredSelection selection = (IStructuredSelection) fColorViewer.getSelection();
-		Object selectedItem = selection.getFirstElement();
 
-		TourTypeColorDefinition selectedColorDefinition = null;
-
-		if (selectedItem instanceof GraphColor) {
-			selectedColorDefinition = ((TourTypeColorDefinition) ((GraphColor) selectedItem).getParent());
-		} else if (selectedItem instanceof TourTypeColorDefinition) {
-			selectedColorDefinition = ((TourTypeColorDefinition) selectedItem);
+		if (selection.getFirstElement() instanceof GraphColor) {
+			GraphColor graphColor = (GraphColor) selection.getFirstElement();
+			fSelectedColor = graphColor;
+			fColorSelector.setColorValue(graphColor.getNewRGB());
+			fColorSelector.setEnabled(true);
+		} else {
+			fColorSelector.setEnabled(false);
 		}
-		return selectedColorDefinition;
 	}
 
 	@Override
 	public boolean performOk() {
 
 		return super.performOk();
-	}
-
-	@Override
-	public boolean okToLeave() {
-
-		if (fIsTourTypeModified) {
-			fIsTourTypeModified = false;
-
-			// fire modify event
-			getPreferenceStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
-					Math.random());
-		}
-
-		return super.okToLeave();
 	}
 
 	private boolean persistTourType(TourType tourType) {
@@ -751,10 +737,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			em.close();
 		}
 		return isSaved;
-	}
-
-	public TreeViewer getTreeViewer() {
-		return fColorViewer;
 	}
 
 }

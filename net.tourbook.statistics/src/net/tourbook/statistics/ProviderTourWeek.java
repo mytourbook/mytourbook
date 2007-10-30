@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.TourTypeFilter;
 
 public class ProviderTourWeek extends DataProvider {
 
@@ -33,11 +33,11 @@ public class ProviderTourWeek extends DataProvider {
 	private static ProviderTourWeek	fInstance;
 
 	private int						fCurrentYear;
+
 	private TourPerson				fActivePerson;
+	private TourTypeFilter			fActiveTourTypeFilter;
 
 	private TourDataWeek			fTourWeekData;
-
-	private long					fActiveTypeId;
 
 	static int[]					fAllWeeks;
 
@@ -57,11 +57,14 @@ public class ProviderTourWeek extends DataProvider {
 		return fInstance;
 	}
 
-	TourDataWeek getWeekData(TourPerson person, long typeId, int year, boolean refreshData) {
+	TourDataWeek getWeekData(	TourPerson person,
+								TourTypeFilter tourTypeFilter,
+								int year,
+								boolean refreshData) {
 
 		// when the data for the year are already loaded, all is done
 		if (fActivePerson == person
-				&& fActiveTypeId == typeId
+				&& fActiveTourTypeFilter == tourTypeFilter
 				&& year == fCurrentYear
 				&& refreshData == false) {
 			return fTourWeekData;
@@ -70,7 +73,7 @@ public class ProviderTourWeek extends DataProvider {
 		fTourWeekData = new TourDataWeek();
 
 		// get the tour types
-		ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getAllTourTypes();
+		ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
 		TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		final int serieLength = tourTypes.length;
@@ -86,7 +89,7 @@ public class ProviderTourWeek extends DataProvider {
 				//
 				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("WHERE StartYear =" + Integer.toString(year)) //$NON-NLS-1$
-				+ getSQLFilter(person, typeId)
+				+ getSQLFilter(person, tourTypeFilter)
 				+ " GROUP BY StartWeek, tourType_typeId" //$NON-NLS-1$
 				+ " ORDER BY StartWeek"; //$NON-NLS-1$
 
@@ -107,8 +110,8 @@ public class ProviderTourWeek extends DataProvider {
 				final int week = result.getInt(1);
 
 				/*
-				 * convert type id to the type index in the tour types list
-				 * which is also the color index
+				 * convert type id to the type index in the tour types list which is also the color
+				 * index
 				 */
 				int colorIndex = 0;
 
@@ -135,7 +138,7 @@ public class ProviderTourWeek extends DataProvider {
 			conn.close();
 
 			fActivePerson = person;
-			fActiveTypeId = typeId;
+			fActiveTourTypeFilter = tourTypeFilter;
 			fCurrentYear = year;
 
 			fTourWeekData.fTypeIds = dbTypeIds;

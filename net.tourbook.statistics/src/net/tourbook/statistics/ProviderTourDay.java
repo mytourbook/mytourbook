@@ -26,7 +26,7 @@ import java.util.GregorianCalendar;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.util.ArrayListToArray;
 
 public class ProviderTourDay extends DataProvider /* implements IBarSelectionProvider */{
@@ -40,7 +40,7 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 	private TourDataTour			fTourDataTour;
 //	private final Calendar			fCalendar	= GregorianCalendar.getInstance();
 
-	private long					fActiveTypeId;
+	private TourTypeFilter			fActiveTourTypeFilter;
 
 //	private Long					fSelectedTourId;
 
@@ -54,20 +54,20 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 	}
 
 	TourDataTour getDayData(final TourPerson person,
-							final long typeId,
+							final TourTypeFilter tourTypeFilter,
 							final int year,
 							final boolean refreshData) {
 
 		// dont reload data which are already here
 		if (person == fActivePerson
-				&& typeId == fActiveTypeId
+				&& tourTypeFilter == fActiveTourTypeFilter
 				&& year == fCurrentYear
 				&& refreshData == false) {
 			return fTourDataTour;
 		}
 
 		// get the tour types
-		final ArrayList<TourType> tourTypeList = TourbookPlugin.getDefault().getAllTourTypes();
+		final ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		fTourDataTour = new TourDataTour();
@@ -86,7 +86,7 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 				+ "tourType_typeId 		\n" // 10 //$NON-NLS-1$
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" WHERE STARTYEAR = " + Integer.toString(year)) //$NON-NLS-1$
-				+ getSQLFilter(person, typeId)
+				+ getSQLFilter(person, tourTypeFilter)
 				+ (" ORDER BY StartMonth, StartDay, StartHour , StartMinute "); //$NON-NLS-1$
 
 		try {
@@ -234,7 +234,7 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 			fTourDataTour.fAltitudeHigh = altitudeHigh;
 
 			fActivePerson = person;
-			fActiveTypeId = typeId;
+			fActiveTourTypeFilter = tourTypeFilter;
 			fCurrentYear = year;
 
 		} catch (final SQLException e) {

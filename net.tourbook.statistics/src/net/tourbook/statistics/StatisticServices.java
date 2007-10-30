@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -29,9 +30,7 @@ import org.eclipse.swt.graphics.RGB;
 
 public class StatisticServices {
 
-	static IPreferenceStore	fPrefStore			= TourbookPlugin
-														.getDefault()
-														.getPreferenceStore();
+	static IPreferenceStore	fPrefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
 	static final RGB		LINECOLOR_MARKER	= new RGB(200, 200, 200);
 	static final RGB		FILLCOLOR_MARKER	= new RGB(216, 216, 216);
@@ -64,7 +63,7 @@ public class StatisticServices {
 		ArrayList<RGB> rgbLine = new ArrayList<RGB>();
 
 		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getAllTourTypes();
+		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 
 		/*
 		 * add default color
@@ -90,12 +89,9 @@ public class StatisticServices {
 		 * add tour type colors
 		 */
 		for (TourType tourType : tourTypes) {
-			if (tourType.getTypeId() >= 0) {
-				// type id is valid
-				rgbBright.add(tourType.getRGBBright());
-				rgbDark.add(tourType.getRGBDark());
-				rgbLine.add(tourType.getRGBLine());
-			}
+			rgbBright.add(tourType.getRGBBright());
+			rgbDark.add(tourType.getRGBDark());
+			rgbLine.add(tourType.getRGBLine());
 		}
 
 		// put the colors into the chart data
@@ -104,17 +100,16 @@ public class StatisticServices {
 		yData.setRgbLine(rgbLine.toArray(new RGB[rgbLine.size()]));
 	}
 
-	/**
-	 * create the color index for every tour type, <code>typeIds</code>
-	 * contains all tour types
-	 */
-	public static void setTourTypeColorIndex(ChartDataYSerie yData, long[] typeIds) {
-		setTourTypeColorIndex(yData, new long[][] { typeIds });
-	}
+//	/**
+//	 * create the color index for every tour type, <code>typeIds</code> contains all tour types
+//	 */
+//	public static void setTourTypeColorIndex(ChartDataYSerie yData, long[] typeIds) {
+//		setTourTypeColorIndex(yData, new long[][] { typeIds });
+//	}
 
 	public static void setTourTypeColorIndex(ChartDataYSerie yData, long[][] typeIds) {
 
-		ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getAllTourTypes();
+		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 
 		int[][] colorIndex = new int[typeIds.length][typeIds[0].length];
 		int serieIndex = 0;

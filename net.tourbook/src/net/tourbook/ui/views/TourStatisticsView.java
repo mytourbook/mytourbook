@@ -23,7 +23,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContainer;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
+import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.Preferences;
@@ -56,7 +56,7 @@ public class TourStatisticsView extends ViewPart {
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	TourPerson						fActivePerson;
-	long							fActiveTourTypeId;
+	TourTypeFilter					fActiveTourTypeFilter;
 
 	public NumberFormat				fNF			= NumberFormat.getNumberInstance();
 
@@ -132,15 +132,12 @@ public class TourStatisticsView extends ViewPart {
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
 					fActivePerson = TourbookPlugin.getDefault().getActivePerson();
-					fActiveTourTypeId = TourbookPlugin.getDefault().getActiveTourType().getTypeId();
+					fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
 
 					refreshStatistics();
 				}
 
 				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-
-					// force the tour type images to be recreated
-					UI.getInstance().disposeTourTypeImages();
 
 					// update statistics
 					refreshStatistics();
@@ -157,7 +154,7 @@ public class TourStatisticsView extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
 
@@ -187,9 +184,9 @@ public class TourStatisticsView extends ViewPart {
 		addTourPropertyListener();
 
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
-		fActiveTourTypeId = TourbookPlugin.getDefault().getActiveTourType().getTypeId();
+		fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
 
-		fStatisticContainer.restoreStatistics(fSessionMemento, fActivePerson, fActiveTourTypeId);
+		fStatisticContainer.restoreStatistics(fSessionMemento, fActivePerson, fActiveTourTypeFilter);
 	}
 
 	private void createResources() {
@@ -239,7 +236,7 @@ public class TourStatisticsView extends ViewPart {
 	}
 
 	private void refreshStatistics() {
-		fStatisticContainer.refreshStatistic(fActivePerson, fActiveTourTypeId);
+		fStatisticContainer.refreshStatistic(fActivePerson, fActiveTourTypeFilter);
 	}
 
 	@Override

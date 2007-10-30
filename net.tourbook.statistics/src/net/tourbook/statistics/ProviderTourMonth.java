@@ -19,11 +19,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.TourTypeFilter;
 
 public class ProviderTourMonth extends DataProvider {
 
@@ -35,7 +36,7 @@ public class ProviderTourMonth extends DataProvider {
 	private int							fCurrentYear;
 	private TourDataMonth				fTourMonthData;
 
-	private long						fActiveTypeId;
+	private TourTypeFilter				fActiveTourTypeFilter;
 
 	static int[]						fAllMonths;
 
@@ -55,18 +56,22 @@ public class ProviderTourMonth extends DataProvider {
 		return fInstance;
 	}
 
-	TourDataMonth getMonthData(TourPerson person, long typeId, int year, boolean refreshData) {
+	TourDataMonth getMonthData(	TourPerson person,
+								TourTypeFilter tourTypeFilter,
+								int year,
+								boolean refreshData) {
 
 		// when the data for the year are already loaded, all is done
 		if (fActivePerson == person
-				&& fActiveTypeId == typeId
+				&& fActiveTourTypeFilter == tourTypeFilter
 				&& year == fCurrentYear
 				&& refreshData == false) {
 			return fTourMonthData;
 		}
 
 		// get the tour types
-		TourType[] tourTypes = TourbookPlugin.getDefault().getAllTourTypesArray();
+		ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
+		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		fTourMonthData = new TourDataMonth();
 
@@ -80,7 +85,7 @@ public class ProviderTourMonth extends DataProvider {
 				//
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" WHERE STARTYEAR=" + Integer.toString(year)) //$NON-NLS-1$
-				+ getSQLFilter(person, typeId)
+				+ getSQLFilter(person, tourTypeFilter)
 				+ (" GROUP BY STARTMONTH, tourType_typeId") //$NON-NLS-1$
 				+ (" ORDER BY STARTMONTH"); //$NON-NLS-1$
 
@@ -103,8 +108,8 @@ public class ProviderTourMonth extends DataProvider {
 				final int month = result.getInt(1) - 1;
 
 				/*
-				 * convert type id to the type index in the tour types list
-				 * which is also the color index
+				 * convert type id to the type index in the tour types list which is also the color
+				 * index
 				 */
 				int colorIndex = 0;
 
@@ -129,7 +134,7 @@ public class ProviderTourMonth extends DataProvider {
 			conn.close();
 
 			fActivePerson = person;
-			fActiveTypeId = typeId;
+			fActiveTourTypeFilter = tourTypeFilter;
 			fCurrentYear = year;
 
 			fTourMonthData.fTypeIds = dbTypeIds;
