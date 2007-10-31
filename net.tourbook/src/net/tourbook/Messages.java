@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";					//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";						//$NON-NLS-1$
 
 	public static String		App_Action_About;
 
@@ -290,6 +290,10 @@ public class Messages extends NLS {
 
 	public static String		Image__undo_edit_disabled;
 
+	public static String		Image__undo_tour_type_filter;
+
+	public static String		Image__undo_tour_type_filter_system;
+
 	public static String		Image__view_compare_wizard;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
@@ -373,21 +377,15 @@ public class Messages extends NLS {
 
 	public static String		Pref_TourTypeFilter_button_remove;
 
-	public static String	Pref_TourTypeFilter_button_rename;
+	public static String		Pref_TourTypeFilter_button_rename;
 
-	public static String	Pref_TourTypeFilter_dlg_new_message;
+	public static String		Pref_TourTypeFilter_dlg_new_message;
 
-	public static String	Pref_TourTypeFilter_dlg_new_title;
+	public static String		Pref_TourTypeFilter_dlg_new_title;
 
-	public static String	Pref_TourTypeFilter_dlg_rename_message;
+	public static String		Pref_TourTypeFilter_dlg_rename_message;
 
-	public static String	Pref_TourTypeFilter_dlg_rename_title;
-
-	public static String	Pref_TourTypeFilter_filter_sets;
-
-	public static String		Pref_TourTypeFilter_title;
-
-	public static String	Pref_TourTypeFilter_tour_types;
+	public static String		Pref_TourTypeFilter_dlg_rename_title;
 
 	public static String		Pref_TourTypes_Button_add;
 	public static String		Pref_TourTypes_Button_delete;
@@ -405,7 +403,9 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 
-	public static String		PrefPageTourTypeFilterSet_0;
+	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
+
+	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
 	public static String		Raw_Data_Action_clear_view;
 

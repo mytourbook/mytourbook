@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.Messages;
 import net.tourbook.ui.views.TourChartView;
 import net.tourbook.ui.views.TourStatisticsView;
 
@@ -27,8 +26,8 @@ public class PerspectiveFactoryStatistic implements IPerspectiveFactory {
 
 	static final String			PERSPECTIVE_ID		= "net.tourbook.perspective.Statistic"; //$NON-NLS-1$
 
-	private static final String	FOLDER_ID_BOTTOM	= "bottom"; //$NON-NLS-1$
-	private static final String	FOLDER_ID_TOP		= "top"; //$NON-NLS-1$
+	private static final String	FOLDER_ID_BOTTOM	= "bottom";							//$NON-NLS-1$
+	private static final String	FOLDER_ID_TOP		= "top";								//$NON-NLS-1$
 
 	public void createInitialLayout(IPageLayout layout) {
 

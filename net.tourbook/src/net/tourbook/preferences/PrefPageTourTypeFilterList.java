@@ -168,7 +168,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
 		// button: up
 		fBtnUp = new Button(container, SWT.NONE);
-		fBtnUp.setText("&Up");
+		fBtnUp.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up);
 		setButtonLayoutData(fBtnUp);
 		fBtnUp.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -179,7 +179,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
 		// button: down
 		fBtnDown = new Button(container, SWT.NONE);
-		fBtnDown.setText("&Down");
+		fBtnDown.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down);
 		setButtonLayoutData(fBtnDown);
 		fBtnDown.addSelectionListener(new SelectionAdapter() {
 			@Override

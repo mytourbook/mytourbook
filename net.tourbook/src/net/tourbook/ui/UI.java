@@ -58,14 +58,14 @@ public class UI {
 	public final static ImageRegistry		IMAGE_REGISTRY					= TourbookPlugin.getDefault()
 																					.getImageRegistry();
 
-	public static final String				IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";
-	public static final String				IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";
+	public static final String				IMAGE_TOUR_TYPE_FILTER			= "tourType-filter"; //$NON-NLS-1$
+	public static final String				IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system"; //$NON-NLS-1$
 
 	static {
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,
-				TourbookPlugin.getImageDescriptor("tour-type-filter.gif"));
+				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,
-				TourbookPlugin.getImageDescriptor("tour-type-filter-system.gif"));
+				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
 	}
 
 	private UI() {}

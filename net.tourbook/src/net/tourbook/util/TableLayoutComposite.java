@@ -27,28 +27,27 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
-import org.eclipse.jface.util.Assert;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 
 /**
- * A special composite to layout columns inside a table. The composite is needed
- * since we have to layout the columns "before" the actual table gets layouted.
- * Hence we can't use a normal layout manager.
+ * A special composite to layout columns inside a table. The composite is needed since we have to
+ * layout the columns "before" the actual table gets layouted. Hence we can't use a normal layout
+ * manager.
  */
 public class TableLayoutComposite extends Composite {
 
 	/**
-	 * The number of extra pixels taken as horizontal trim by the table column.
-	 * To ensure there are N pixels available for the content of the column,
-	 * assign N+COLUMN_TRIM for the column width.
+	 * The number of extra pixels taken as horizontal trim by the table column. To ensure there are
+	 * N pixels available for the content of the column, assign N+COLUMN_TRIM for the column width.
 	 * 
 	 * @since 3.1
 	 */
-	private static int	COLUMN_TRIM	= "carbon".equals(SWT.getPlatform()) ? 24 : 3;	//$NON-NLS-1$
+	private static int				COLUMN_TRIM	= "carbon".equals(SWT.getPlatform()) ? 24 : 3;	//$NON-NLS-1$
 
-	private List		columns		= new ArrayList();
+	private List<ColumnLayoutData>	columns		= new ArrayList<ColumnLayoutData>();
 
 	/**
 	 * Creates a new <code>TableLayoutComposite</code>.
@@ -56,6 +55,7 @@ public class TableLayoutComposite extends Composite {
 	public TableLayoutComposite(Composite parent, int style) {
 		super(parent, style);
 		addControlListener(new ControlAdapter() {
+			@Override
 			public void controlResized(ControlEvent e) {
 				Rectangle area = getClientArea();
 				Table table = (Table) getChildren()[0];
@@ -104,8 +104,9 @@ public class TableLayoutComposite extends Composite {
 				Assert.isTrue(false, "Unknown column layout data"); //$NON-NLS-1$
 			}
 		}
-		if (width > result.x)
+		if (width > result.x) {
 			result.x = width;
+		}
 		return result;
 	}
 
@@ -114,8 +115,9 @@ public class TableLayoutComposite extends Composite {
 		// it is being called on Linux. This method resets the
 		// Layout to null so we make sure we run it only when
 		// the value is OK.
-		if (width <= 1)
+		if (width <= 1) {
 			return;
+		}
 
 		TableColumn[] tableColumns = table.getColumns();
 		int size = Math.min(columns.size(), tableColumns.length);
@@ -163,8 +165,9 @@ public class TableLayoutComposite extends Composite {
 					// tableColumns[i].getWidth();
 					int weight = cw.weight;
 					int pixels = totalWeight == 0 ? 0 : weight * rest / totalWeight;
-					if (pixels < cw.minimumWidth)
+					if (pixels < cw.minimumWidth) {
 						pixels = cw.minimumWidth;
+					}
 					totalDistributed += pixels;
 					widths[i] = pixels;
 				}
@@ -173,8 +176,9 @@ public class TableLayoutComposite extends Composite {
 			// Distribute any remaining pixels to columns with weight.
 			int diff = rest - totalDistributed;
 			for (int i = 0; diff > 0; ++i) {
-				if (i == size)
+				if (i == size) {
 					i = 0;
+				}
 				ColumnLayoutData col = (ColumnLayoutData) columns.get(i);
 				if (col instanceof ColumnWeightData) {
 					++widths[i];

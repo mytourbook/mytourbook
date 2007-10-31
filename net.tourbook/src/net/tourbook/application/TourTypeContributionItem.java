@@ -429,8 +429,8 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		fComboTourType = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboTourType.setVisibleItemCount(20);
 		fComboTourType.setToolTipText(Messages.App_Tour_type_tooltip);
-		final GridData gd = new GridData(SWT.NONE, SWT.NONE, false, false);
-		gd.widthHint = 100;
+
+		final GridData gd = new GridData(SWT.NONE, SWT.CENTER, false, true);
 		fComboTourType.setLayoutData(gd);
 
 		fComboTourType.addDisposeListener(new DisposeListener() {

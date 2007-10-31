@@ -32,7 +32,7 @@ public class ChartImage extends Canvas {
 	private int		fChartPosX;
 	private int		fChartPosY;
 
-	private Text	fText;
+//	private Text	fText;
 
 	public ChartImage(Composite parent, int style) {
 		super(parent, style | SWT.NO_BACKGROUND /* | SWT.BORDER */);
@@ -68,8 +68,7 @@ public class ChartImage extends Canvas {
 		int destX = srcLeft < 0 ? -srcLeft : 0;
 		int destY = srcTop < 0 ? -srcTop : 0;
 
-		gc.drawImage(
-				fChartImage,
+		gc.drawImage(fChartImage,
 				srcX,
 				srcY,
 				srcWidth,
@@ -107,7 +106,7 @@ public class ChartImage extends Canvas {
 
 		fChartPosX = xPos;
 		fChartPosY = yPos;
-		fText = text;
+//		fText = text;
 
 		redraw();
 	}

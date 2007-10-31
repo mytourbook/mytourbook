@@ -136,7 +136,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tours in database
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private static ArrayList<Long> getAllTourIds() {
 
 		ArrayList<Long> tourList = new ArrayList<Long>();
@@ -166,7 +166,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static ArrayList<TourBike> getTourBikes() {
 
 		ArrayList<TourBike> bikeList = new ArrayList<TourBike>();
@@ -211,7 +211,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour people in the db sorted by last/first name
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static ArrayList<TourPerson> getTourPeople() {
 
 		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
@@ -235,7 +235,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types which are stored in the database sorted by name
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static ArrayList<TourType> getTourTypes() {
 
 		if (fTourTypes != null) {

@@ -98,7 +98,7 @@ public class TourTypeFilter {
 		default:
 			break;
 		}
-		return "?";
+		return "?"; //$NON-NLS-1$
 	}
 
 	/**
@@ -163,16 +163,16 @@ public class TourTypeFilter {
 		case FILTER_TYPE_SYSTEM:
 			if (fSystemFilterId == SYSTEM_FILTER_ID_ALL) {
 				// select all tour types
-				sqlString = "";
+				sqlString = ""; //$NON-NLS-1$
 			} else {
 				// select tour types which are not defined
-				sqlString = " AND tourType_typeId is null";
+				sqlString = " AND tourType_typeId is null"; //$NON-NLS-1$
 			}
 			break;
 
 		case FILTER_TYPE_DB:
 
-			sqlString = " AND tourType_typeId =" + Long.toString(fTourType.getTypeId());
+			sqlString = " AND tourType_typeId =" + Long.toString(fTourType.getTypeId()); //$NON-NLS-1$
 			break;
 
 		case FILTER_TYPE_TOURTYPE_SET:
@@ -181,23 +181,23 @@ public class TourTypeFilter {
 
 			if (tourTypes.length == 0) {
 				// select all tour types
-				sqlString = "";
+				sqlString = ""; //$NON-NLS-1$
 			} else {
 
 				int itemIndex = 0;
-				String filter = "";
+				String filter = ""; //$NON-NLS-1$
 
 				for (Object item : tourTypes) {
 
 					if (itemIndex > 0) {
-						filter += " OR ";
+						filter += " OR "; //$NON-NLS-1$
 					}
 
-					filter += " tourType_typeId =" + Long.toString(((TourType) item).getTypeId());
+					filter += " tourType_typeId =" + Long.toString(((TourType) item).getTypeId()); //$NON-NLS-1$
 
 					itemIndex++;
 				}
-				sqlString = " AND (" + filter + ") \n";
+				sqlString = " AND (" + filter + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			break;

@@ -35,7 +35,7 @@ import org.eclipse.ui.splash.BasicSplashHandler;
  */
 public class MyTourbookSplashHandler extends BasicSplashHandler {
 
-	public static final String	APP_BUILD_ID	= "1.1.0.dev";	//$NON-NLS-1$
+	public static final String	APP_BUILD_ID	= "1.1.0.v20071101";	//$NON-NLS-1$
 
 	@Override
 	public void init(Shell splash) {
@@ -88,7 +88,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 
 			public void paintControl(PaintEvent e) {
 				GC gc = e.gc;
-				final String version = "Version " + APP_BUILD_ID;
+				final String version = "Version " + APP_BUILD_ID; //$NON-NLS-1$
 				Point extend = gc.textExtent(version);
 
 				gc.setForeground(getForeground());
