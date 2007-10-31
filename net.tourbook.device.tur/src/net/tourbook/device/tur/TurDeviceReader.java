@@ -206,10 +206,10 @@ public class TurDeviceReader extends TourbookDevice {
 
 			int entryCount = Integer.parseInt(TurFileUtil.readText(fileTurData));
 
-//			int secStart1 = 0;
-//			int secStart2 = 0;
-//			int secStart3 = 0;
-//			int secStart4 = 0;
+			int secStart1 = 0;
+			int secStart2 = 0;
+			int secStart3 = 0;
+			int secStart4 = 0;
 
 			int oldAltimeter = 0;
 			int oldDistance = 0;
@@ -218,10 +218,10 @@ public class TurDeviceReader extends TourbookDevice {
 
 			for (int i = 0; i < entryCount; i++) {
 				if (Integer.parseInt(turDeviceData.fileVersion.substring(0, 1)) >= 3) {
-//					secStart1 = TurFileUtil.readByte(fileTurData); // Byte 1
-//					secStart2 = TurFileUtil.readByte(fileTurData); // Byte 2
-//					secStart3 = TurFileUtil.readByte(fileTurData); // Byte 3
-//					secStart4 = TurFileUtil.readByte(fileTurData); // Byte 4
+					secStart1 = TurFileUtil.readByte(fileTurData); // Byte 1
+					secStart2 = TurFileUtil.readByte(fileTurData); // Byte 2
+					secStart3 = TurFileUtil.readByte(fileTurData); // Byte 3
+					secStart4 = TurFileUtil.readByte(fileTurData); // Byte 4
 				}
 				int sec1 = TurFileUtil.readByte(fileTurData); // Byte 5
 				int sec2 = TurFileUtil.readByte(fileTurData); // Byte 6
@@ -247,10 +247,10 @@ public class TurDeviceReader extends TourbookDevice {
 				TurFileUtil.readByte(fileTurData);
 
 				// Calculate values
-//				int secStart = secStart1
-//						+ (256 * secStart2)
-//						+ (256 * 256 * secStart3)
-//						+ (256 * 256 * 256 * secStart4);
+				int secStart = secStart1
+						+ (256 * secStart2)
+						+ (256 * 256 * secStart3)
+						+ (256 * 256 * 256 * secStart4);
 				int seconds = sec1 + (256 * sec2) + (256 * 256 * sec3) + (256 * 256 * 256 * sec4);
 				int distance = dst1 + (256 * dst2) + (256 * 256 * dst3) + (256 * 256 * 256 * dst4);
 				distance *= 10; // distance in 10m
