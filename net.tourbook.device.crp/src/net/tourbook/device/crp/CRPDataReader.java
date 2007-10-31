@@ -126,7 +126,8 @@ public class CRPDataReader extends TourbookDevice {
 			ArrayList<String> trackPoints = new ArrayList<String>();
 
 			tokenLine = new StringTokenizer(fileReader.readLine());
-//			String fileVersion = tokenLine.nextToken();
+			@SuppressWarnings("unused")
+			String fileVersion = tokenLine.nextToken();
 
 			// get all trackpoints
 			while ((line = fileReader.readLine()) != null) {
@@ -240,12 +241,16 @@ public class CRPDataReader extends TourbookDevice {
 
 			int pulse;
 			int distance = 0;
-//			int speed;
+			@SuppressWarnings("unused")
+			int speed;
 			int altitude;
-//			int color;
-//			int symbol;
+			@SuppressWarnings("unused")
+			int color;
+			@SuppressWarnings("unused")
+			int symbol;
 			int temperature;
-//			String trackpointTime;
+			@SuppressWarnings("unused")
+			String trackpointTime;
 
 			int oldDistance = 0;
 			int oldAltitude = 0;
@@ -257,13 +262,13 @@ public class CRPDataReader extends TourbookDevice {
 				tokenLine = new StringTokenizer(trackPoint);
 
 				pulse = Integer.parseInt(tokenLine.nextToken());
-//				speed = Integer.parseInt(tokenLine.nextToken()); // [0.1 km/h]
+				speed = Integer.parseInt(tokenLine.nextToken()); // [0.1 km/h]
 				distance = Integer.parseInt(tokenLine.nextToken()) * 10; // [m]
 				altitude = Integer.parseInt(tokenLine.nextToken()); // [m]
-//				color = Integer.parseInt(tokenLine.nextToken()); // [0..4]
-//				symbol = Integer.parseInt(tokenLine.nextToken()); // [0..42]
+				color = Integer.parseInt(tokenLine.nextToken()); // [0..4]
+				symbol = Integer.parseInt(tokenLine.nextToken()); // [0..42]
 				temperature = Math.round(Float.parseFloat(tokenLine.nextToken().replace(',', '.'))); // [°C]
-//				trackpointTime = tokenLine.nextToken();
+				trackpointTime = tokenLine.nextToken();
 
 				// get comment for current trackpoint
 				String comment = ""; //$NON-NLS-1$
