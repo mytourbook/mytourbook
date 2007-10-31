@@ -161,22 +161,23 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 				durationList.add(duration);
 
 				/*
-				 * convert type id to the type index in the tour types list which is also the color
-				 * index
+				 * convert type id to the type index in the tour type array, this is also the color
+				 * index for the tour type
 				 */
-				int colorIndex = 0;
+				int tourTypeColorIndex = 0;
 				final Long dbTypeIdObject = (Long) result.getObject(11);
 				if (dbTypeIdObject != null) {
 					final long dbTypeId = result.getLong(11);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
-						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
-							colorIndex = typeIndex;
+						if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
+							tourTypeColorIndex = typeIndex
+									+ StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 							break;
 						}
 					}
 				}
-				dbTypeColorIndex.add(colorIndex);
 
+				dbTypeColorIndex.add(tourTypeColorIndex);
 				dbTypeIds.add(dbTypeIdObject == null
 						? TourType.TOUR_TYPE_ID_NOT_DEFINED
 						: dbTypeIdObject);
@@ -190,6 +191,7 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 			fTourTimeData = new TourDataTime(year);
 
 			fTourTimeData.fTourIds = ArrayListToArray.toLong(fTourIds);
+
 			fTourTimeData.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
 			fTourTimeData.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
 

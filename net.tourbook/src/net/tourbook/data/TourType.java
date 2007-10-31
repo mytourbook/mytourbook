@@ -21,11 +21,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.apache.derby.iapi.types.TypeId;
 import org.eclipse.swt.graphics.RGB;
 
 @Entity
 public class TourType {
 
+	/**
+	 * contains <code>-1</code> which is the {@link TypeId} for the {@link TourType} which is not
+	 * saved in the database
+	 */
 	public static final int	TOUR_TYPE_ID_NOT_DEFINED	= -1;
 
 	@Id

@@ -76,7 +76,7 @@ public class ProviderTourWeek extends DataProvider {
 		ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
 		TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-		final int serieLength = tourTypes.length;
+		final int serieLength = tourTypes.length + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 		final int valueLength = fAllWeeks.length;
 
 		String sqlString = "SELECT " // //$NON-NLS-1$
@@ -120,7 +120,7 @@ public class ProviderTourWeek extends DataProvider {
 					final long dbTypeId = result.getLong(5);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
-							colorIndex = typeIndex;
+							colorIndex = typeIndex + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 							break;
 						}
 					}

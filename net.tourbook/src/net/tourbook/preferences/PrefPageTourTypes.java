@@ -88,7 +88,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private IInputValidator						fTourNameValidator;
 
-	private boolean								fIsTourTypeModified	= false;
+	private boolean								fIsModified	= false;
 
 	private ColorLabelProvider					fColorLabelProvider;
 
@@ -479,6 +479,19 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		}
 	}
 
+	private void fireModifyEvent() {
+		if (fIsModified) {
+
+			fIsModified = false;
+
+			TourDatabase.disposeTourTypes();
+
+			// fire modify event
+			getPreferenceStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
+					Math.random());
+		}
+	}
+
 	/**
 	 * @return Returns the selected color definition in the color viewer
 	 */
@@ -508,16 +521,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	@Override
 	public boolean okToLeave() {
 
-		if (fIsTourTypeModified) {
-
-			fIsTourTypeModified = false;
-
-			TourDatabase.disposeTourTypes();
-
-			// fire modify event
-			getPreferenceStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
-					Math.random());
-		}
+		fireModifyEvent();
 
 		return super.okToLeave();
 	}
@@ -564,7 +568,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			// update internal tour type list
 			fTourTypes.add(newTourType);
 
-			fIsTourTypeModified = true;
+			fIsModified = true;
 		}
 	}
 
@@ -609,7 +613,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 			persistTourType(tourType);
 
-			fIsTourTypeModified = true;
+			fIsModified = true;
 		}
 	}
 
@@ -646,7 +650,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			// update internal list
 			fTourTypes.remove(selectedTourType);
 
-			fIsTourTypeModified = true;
+			fIsModified = true;
 		}
 	}
 
@@ -678,7 +682,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			// update viewer
 			fColorViewer.update(selectedColorDefinition, null);
 
-			fIsTourTypeModified = true;
+			fIsModified = true;
 		}
 	}
 
@@ -701,6 +705,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	@Override
 	public boolean performOk() {
+
+		fireModifyEvent();
 
 		return super.performOk();
 	}

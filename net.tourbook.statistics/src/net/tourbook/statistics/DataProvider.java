@@ -24,14 +24,6 @@ public abstract class DataProvider {
 		return getSQLFilterPerson(person) + tourTypeFilter.getSQLString();
 	}
 
-//	protected String getSQLFilterTourType(TourTypeFilter tourTypeFilter) {
-//		return tourTypeFilter == TourType.TOUR_TYPE_ID_ALL
-//				? "" //$NON-NLS-1$
-//				: tourTypeFilter == TourType.TOUR_TYPE_ID_NOT_DEFINED
-//						? " AND tourType_typeId is null" //$NON-NLS-1$
-//						: " AND tourType_typeId =" + Long.toString(tourTypeFilter); //$NON-NLS-1$
-//	}
-
 	protected String getSQLFilterPerson(TourPerson person) {
 		return person == null ? "" : " AND tourPerson_personId = " //$NON-NLS-1$ //$NON-NLS-2$
 				+ Long.toString(person.getPersonId());

@@ -192,22 +192,4 @@ public class TourTypeFilter {
 		}
 		return sqlString;
 	}
-
-//	StringBuffer sqlString = new StringBuffer();
-//	TourTypeFilter filter = fView.fActiveTourTypeFilter;
-//
-//	if (filter == TourType.TOUR_TYPE_ID_ALL) {
-//		// select all tour types
-//	} else {
-//
-//		String sqlTourType = " AND tourType_typeId "
-//				+ (filter == TourType.TOUR_TYPE_ID_NOT_DEFINED
-//						? "is null"
-//						: ("=" + Long.toString(filter)));
-//
-//		// select only one tour type
-//		sqlString.append(sqlTourType);
-//	}
-//	return sqlString.toString();
-
 }

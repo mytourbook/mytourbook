@@ -31,10 +31,13 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -217,13 +220,29 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 
 	public Menu getMenu(Menu parent) {
 
+		dispose();
 		fMenu = new Menu(parent);
 
-		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		// Add listener to repopulate the menu each time
+		fMenu.addMenuListener(new MenuAdapter() {
+			@Override
+			public void menuShown(MenuEvent e) {
 
-		for (TourType tourType : tourTypes) {
-			addActionToMenu(new ActionTourType(tourType));
-		}
+				Menu menu = (Menu) e.widget;
+
+				// dispose old items
+				MenuItem[] items = menu.getItems();
+				for (int i = 0; i < items.length; i++) {
+					items[i].dispose();
+				}
+
+				ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+
+				for (TourType tourType : tourTypes) {
+					addActionToMenu(new ActionTourType(tourType));
+				}
+			}
+		});
 
 		return fMenu;
 	}

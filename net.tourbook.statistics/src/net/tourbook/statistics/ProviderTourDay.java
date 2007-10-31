@@ -138,11 +138,12 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 					final long dbTypeId = result.getLong(10);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
-							colorIndex = typeIndex;
+							colorIndex = typeIndex + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 							break;
 						}
 					}
 				}
+
 				dbTypeColorIndex.add(colorIndex);
 				dbTypeIds.add((Long) dbTypeIdObject);
 			}

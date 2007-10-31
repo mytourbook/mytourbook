@@ -89,7 +89,7 @@ public class ProviderTourMonth extends DataProvider {
 				+ (" GROUP BY STARTMONTH, tourType_typeId") //$NON-NLS-1$
 				+ (" ORDER BY STARTMONTH"); //$NON-NLS-1$
 
-		final int serieLength = tourTypes.length;
+		final int serieLength = tourTypes.length + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 		final int valueLength = fAllMonths.length;
 
 		try {
@@ -118,7 +118,7 @@ public class ProviderTourMonth extends DataProvider {
 					final long dbTypeId = result.getLong(5);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
-							colorIndex = typeIndex;
+							colorIndex = typeIndex + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 							break;
 						}
 					}

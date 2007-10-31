@@ -332,7 +332,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	private void createStatisticData(TourDataTour tourDataTour) {
 
 		ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
-		int colorLength = tourTypeList.size();
+		int colorLength = tourTypeList.size() + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 
 		int distanceLength = fStatDistanceUnits.length;
 		int altitudeLength = fStatAltitudeUnits.length;
@@ -367,6 +367,7 @@ public class StatisticTourNumbers extends YearStatistic {
 
 			int tourColorIndex = tourDataTour.fTypeColorIndex[tourIndex];
 			int unitIndex;
+//			tourColorIndex -= StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 
 			unitIndex = createTourStatData(tourDataTour.fDistanceHigh[tourIndex]
 					- tourDataTour.fDistanceLow[tourIndex],

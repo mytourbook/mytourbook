@@ -280,11 +280,6 @@ public class StatisticContainer extends Composite {
 		String sqlPerson = person == null ? "" : " AND tourPerson_personId = " //$NON-NLS-1$ //$NON-NLS-2$
 				+ Long.toString(person.getPersonId());
 
-//		String sqlType = activeTourTypeFilter == TourType.TOUR_TYPE_ID_ALL ? "" //$NON-NLS-1$
-//				: activeTourTypeFilter == TourType.TOUR_TYPE_ID_NOT_DEFINED
-//						? " AND tourType_typeId is null" //$NON-NLS-1$
-//						: " AND tourType_typeId =" + Long.toString(activeTourTypeFilter); //$NON-NLS-1$
-
 		String sqlType = activeTourTypeFilter.getSQLString();
 
 		return sqlPerson + sqlType;

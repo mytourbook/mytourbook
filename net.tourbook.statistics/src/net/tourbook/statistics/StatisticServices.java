@@ -30,31 +30,13 @@ import org.eclipse.swt.graphics.RGB;
 
 public class StatisticServices {
 
-	static IPreferenceStore	fPrefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+	static IPreferenceStore	fPrefStore						= TourbookPlugin.getDefault()
+																	.getPreferenceStore();
 
-	static final RGB		LINECOLOR_MARKER	= new RGB(200, 200, 200);
-	static final RGB		FILLCOLOR_MARKER	= new RGB(216, 216, 216);
-	static final RGB		FILLCOLOR2_MARKER	= new RGB(21, 0, 216);
-
-	static void setChartColors(ChartDataYSerie yData, String graphName) {
-
-		String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
-
-		yData.setRgbBright(new RGB[] {
-				PreferenceConverter.getColor(fPrefStore, prefGraphName
-						+ GraphColors.PREF_COLOR_BRIGHT),
-				FILLCOLOR_MARKER });
-
-		yData.setRgbDark(new RGB[] {
-				PreferenceConverter.getColor(fPrefStore, prefGraphName
-						+ GraphColors.PREF_COLOR_DARK),
-				FILLCOLOR2_MARKER });
-
-		yData.setRgbLine(new RGB[] {
-				PreferenceConverter.getColor(fPrefStore, prefGraphName
-						+ GraphColors.PREF_COLOR_LINE),
-				LINECOLOR_MARKER });
-	}
+	/**
+	 * offset for tour types in the color index
+	 */
+	public static int		TOUR_TYPE_COLOR_INDEX_OFFSET	= 1;
 
 	public static void setTourTypeColors(ChartDataYSerie yData, String graphName) {
 
@@ -62,12 +44,10 @@ public class StatisticServices {
 		ArrayList<RGB> rgbDark = new ArrayList<RGB>();
 		ArrayList<RGB> rgbLine = new ArrayList<RGB>();
 
-		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
-
 		/*
-		 * add default color
+		 * color index 0: default color
 		 */
+		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		String defaultColorName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 		rgbBright.add(PreferenceConverter.getColor(prefStore, defaultColorName
 				+ GraphColors.PREF_COLOR_BRIGHT));
@@ -79,15 +59,9 @@ public class StatisticServices {
 				+ GraphColors.PREF_COLOR_LINE));
 
 		/*
-		 * add marker color
+		 * color index 1...n+1: tour type colors
 		 */
-		rgbBright.add(StatisticServices.FILLCOLOR_MARKER);
-		rgbDark.add(StatisticServices.FILLCOLOR2_MARKER);
-		rgbLine.add(StatisticServices.LINECOLOR_MARKER);
-
-		/*
-		 * add tour type colors
-		 */
+		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		for (TourType tourType : tourTypes) {
 			rgbBright.add(tourType.getRGBBright());
 			rgbDark.add(tourType.getRGBDark());
@@ -100,37 +74,34 @@ public class StatisticServices {
 		yData.setRgbLine(rgbLine.toArray(new RGB[rgbLine.size()]));
 	}
 
-//	/**
-//	 * create the color index for every tour type, <code>typeIds</code> contains all tour types
-//	 */
-//	public static void setTourTypeColorIndex(ChartDataYSerie yData, long[] typeIds) {
-//		setTourTypeColorIndex(yData, new long[][] { typeIds });
-//	}
-
+	/**
+	 * create the color index for every tour type, <code>typeIds</code> contain all tour types
+	 */
 	public static void setTourTypeColorIndex(ChartDataYSerie yData, long[][] typeIds) {
 
 		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 
 		int[][] colorIndex = new int[typeIds.length][typeIds[0].length];
-		int serieIndex = 0;
 
+		int serieIndex = 0;
 		for (long[] serieTypeIds : typeIds) {
 
 			final int[] colorIndexSerie = new int[serieTypeIds.length];
 			for (int tourTypeIdIndex = 0; tourTypeIdIndex < serieTypeIds.length; tourTypeIdIndex++) {
 
 				long typeId = serieTypeIds[tourTypeIdIndex];
-				int colorIndexIndex = 0;
+				int tourTypeColorIndex = 0;
 
 				if (typeId != -1) {
 					for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
-						if (typeId == (tourTypes.get(typeIndex)).getTypeId()) {
-							colorIndexIndex = typeIndex;
+						if ((tourTypes.get(typeIndex)).getTypeId() == typeId) {
+							tourTypeColorIndex = typeIndex
+									+ StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 							break;
 						}
 					}
 				}
-				colorIndexSerie[tourTypeIdIndex] = colorIndexIndex;
+				colorIndexSerie[tourTypeIdIndex] = tourTypeColorIndex;
 			}
 
 			colorIndex[serieIndex] = colorIndexSerie;
