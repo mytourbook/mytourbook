@@ -18,6 +18,15 @@
    <feature url="features/net.tourbook.device.feature_1.0.1.v20071018.jar" id="net.tourbook.device.feature" version="1.0.1.v20071018">
       <category name="MyTourbook 1.0.1"/>
    </feature>
+   <feature url="features/net.tourbook.device.feature_1.1.0.v20071101.jar" id="net.tourbook.device.feature" version="1.1.0.v20071101">
+      <category name="MyTourbook 1.1.0"/>
+   </feature>
+   <feature url="features/net.tourbook.feature_1.1.0.v20071101.jar" id="net.tourbook.feature" version="1.1.0.v20071101">
+      <category name="MyTourbook 1.1.0"/>
+   </feature>
+   <feature url="features/net.tourbook.statistics.feature_1.1.0.v20071101.jar" id="net.tourbook.statistics.feature" version="1.1.0.v20071101">
+      <category name="MyTourbook 1.1.0"/>
+   </feature>
    <category-def name="MyTourbook 1.0.0" label="MyTourbook 1.0.0"/>
    <category-def name="MyTourbook 1.0.0 patches" label="MyTourbook 1.0.0 patches">
       <description>
@@ -25,4 +34,5 @@
       </description>
    </category-def>
    <category-def name="MyTourbook 1.0.1" label="MyTourbook 1.0.1"/>
+   <category-def name="MyTourbook 1.1.0" label="MyTourbook 1.1.0"/>
 </site>
