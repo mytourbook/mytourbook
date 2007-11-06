@@ -23,6 +23,7 @@ import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
@@ -166,6 +167,9 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 	public void fillContextMenu(IMenuManager menuMgr) {
 
 		if (fActionSetTourType != null) {
+
+			ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+			fActionSetTourType.setEnabled(tourTypes.size() > 0);
 			menuMgr.add(fActionSetTourType);
 		}
 	}

@@ -30,6 +30,7 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -718,7 +719,8 @@ public class RawDataView extends ViewPart implements ISelectedTours {
 			fActionSaveTour.setEnabled(unsavedTours > 0);
 			menuMgr.add(fActionSaveTour);
 
-			fActionSetTourType.setEnabled(savedTours > 0);
+			ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+			fActionSetTourType.setEnabled(savedTours > 0 && tourTypes.size() > 0);
 			menuMgr.add(fActionSetTourType);
 		}
 

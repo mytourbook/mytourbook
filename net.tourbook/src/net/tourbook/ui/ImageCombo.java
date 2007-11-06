@@ -515,6 +515,7 @@ public final class ImageCombo extends Composite {
 		if (index != -1) {
 			table.setTopIndex(index);
 		}
+
 		Display display = getDisplay();
 		Rectangle listRect = table.getBounds();
 		Rectangle parentRect = display.map(getParent(), null, getBounds());
@@ -1143,7 +1144,9 @@ public final class ImageCombo extends Composite {
 			event.doit = e.doit;
 			break;
 		}
+
 		case SWT.Traverse: {
+
 			switch (event.detail) {
 			case SWT.TRAVERSE_RETURN:
 			case SWT.TRAVERSE_ESCAPE:
@@ -1151,7 +1154,13 @@ public final class ImageCombo extends Composite {
 			case SWT.TRAVERSE_ARROW_NEXT:
 				event.doit = false;
 				break;
+
+			case SWT.TRAVERSE_TAB_NEXT:
+			case SWT.TRAVERSE_TAB_PREVIOUS:
+				dropDown(false);
+				return;
 			}
+
 			Event e = new Event();
 			e.time = event.time;
 			e.detail = event.detail;
@@ -1248,16 +1257,26 @@ public final class ImageCombo extends Composite {
 			handleFocus(SWT.FocusIn);
 			break;
 		}
+
 		case SWT.KeyDown: {
+//			if (event.character == SWT.CR) {
+//				dropDown(false);
+//				Event e = new Event();
+//				e.time = event.time;
+//				e.stateMask = event.stateMask;
+//				notifyListeners(SWT.DefaultSelection, e);
+//			}
+
 			if (event.character == SWT.CR) {
-				dropDown(false);
-				Event e = new Event();
-				e.time = event.time;
-				e.stateMask = event.stateMask;
-				notifyListeners(SWT.DefaultSelection, e);
+				boolean dropped = isDropped();
+				if (!dropped) {
+					setFocus();
+				}
+				dropDown(!dropped);
+				break;
 			}
-			//At this point the widget may have been disposed.
-			// If so, do not continue.
+
+			//At this point the widget may have been disposed. If so, do not continue.
 			if (isDisposed()) {
 				break;
 			}
@@ -1306,6 +1325,7 @@ public final class ImageCombo extends Composite {
 			notifyListeners(SWT.KeyDown, e);
 			break;
 		}
+
 		case SWT.KeyUp: {
 			Event e = new Event();
 			e.time = event.time;

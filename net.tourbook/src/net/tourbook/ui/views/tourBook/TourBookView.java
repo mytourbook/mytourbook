@@ -23,6 +23,8 @@ import java.util.Iterator;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
@@ -766,7 +768,8 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 			fActionDeleteTour.setEnabled(false);
 		}
 
-		fActionSetTourType.setEnabled(tourItems > 0);
+		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		fActionSetTourType.setEnabled(tourItems > 0 && tourTypes.size() > 0);
 	}
 
 	private void fillContextMenu(IMenuManager menuMgr) {

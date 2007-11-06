@@ -24,6 +24,8 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ActionSetTourType;
@@ -101,9 +103,11 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 		final boolean isTourHovered = hoveredBarSerieIndex != -1;
 
 		fActionOpenTour.setEnabled(isTourHovered);
-		fActionSetTourType.setEnabled(isTourHovered);
 
 		menuMgr.add(fActionOpenTour);
+
+		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		fActionSetTourType.setEnabled(isTourHovered && tourTypes.size() > 0);
 		menuMgr.add(fActionSetTourType);
 
 		menuMgr.add(new Separator());
