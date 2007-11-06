@@ -104,9 +104,12 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		fChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
-				long selectedTourId = fTourTimeData.fTourIds[valueIndex];
-				ProviderTourTime.getInstance().setSelectedTourId(selectedTourId);
-				fPostSelectionProvider.setSelection(new SelectionTourId(selectedTourId));
+				final long[] tourIds = fTourTimeData.fTourIds;
+				if (tourIds.length > 0) {
+					long selectedTourId = tourIds[valueIndex];
+					ProviderTourTime.getInstance().setSelectedTourId(selectedTourId);
+					fPostSelectionProvider.setSelection(new SelectionTourId(selectedTourId));
+				}
 			}
 		});
 
@@ -115,9 +118,12 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		 */
 		fChart.addDoubleClickListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
-				long selectedTourId = fTourTimeData.fTourIds[valueIndex];
-				ProviderTourTime.getInstance().setSelectedTourId(selectedTourId);
-				TourManager.getInstance().openTourInEditor(selectedTourId);
+				final long[] tourIds = fTourTimeData.fTourIds;
+				if (tourIds.length > 0) {
+					long selectedTourId = tourIds[valueIndex];
+					ProviderTourTime.getInstance().setSelectedTourId(selectedTourId);
+					TourManager.getInstance().openTourInEditor(selectedTourId);
+				}
 			}
 		});
 
