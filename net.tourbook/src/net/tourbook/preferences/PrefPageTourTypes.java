@@ -39,6 +39,7 @@ import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -289,10 +290,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		treeLayouter.addColumnData(new ColumnWeightData(3, true));
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		treeLayouter.addColumnData(new ColumnWeightData(1, true));
+		treeLayouter.addColumnData(new ColumnPixelData(tree.getItemHeight() * 4, true));
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		treeLayouter.addColumnData(new ColumnWeightData(1, true));
+		treeLayouter.addColumnData(new ColumnPixelData(tree.getItemHeight() * 4, true));
 
 		fColorViewer = new TreeViewer(tree);
 		fColorViewer.setContentProvider(new ColorContentProvider());
@@ -419,7 +420,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		return returnResult;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private boolean deleteTourTypeFromTourData(TourType tourType) {
 
 		boolean returnResult = false;

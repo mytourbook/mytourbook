@@ -100,7 +100,7 @@ public class TourData {
 	 * <p>
 	 * is not used any more since 6.12.2006 but is necessary because it's a field in the database
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private int					distance;
 
 	/**
@@ -211,15 +211,15 @@ public class TourData {
 	@Basic(optional = false)
 	private SerieData			serieData;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourMarker>		tourMarkers						= new HashSet<TourMarker>();
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourReference>	tourReferences					= new HashSet<TourReference>();
 
-	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)
 	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
 
 	/**
@@ -994,7 +994,7 @@ public class TourData {
 	}
 
 	/**
-	 * @return returns the person for who the tour data are saved or <code>null</code> when the
+	 * @return returns the person for whom the tour data is saved or <code>null</code> when the
 	 *         tour is not saved in the database
 	 */
 	public TourPerson getTourPerson() {

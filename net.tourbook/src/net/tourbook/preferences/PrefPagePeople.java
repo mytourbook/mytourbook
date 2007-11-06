@@ -41,6 +41,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -194,18 +195,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		fComboDevice.addModifyListener(fComboDeviceModifyListener);
 		fComboBike.addModifyListener(fComboBikeModifyListener);
 
-		fRawDataPathEditor
-				.setPropertyChangeListener(new org.eclipse.jface.util.IPropertyChangeListener() {
-					public void propertyChange(PropertyChangeEvent event) {
-						if (fCurrentPerson != null) {
+		fRawDataPathEditor.setPropertyChangeListener(new org.eclipse.jface.util.IPropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent event) {
+				if (fCurrentPerson != null) {
 
-							fIsPersonModified = true;
-							fPeopleViewer.update(fCurrentPerson, null);
+					fIsPersonModified = true;
+					fPeopleViewer.update(fCurrentPerson, null);
 
-							validatePerson();
-						}
-					}
-				});
+					validatePerson();
+				}
+			}
+		});
 
 	}
 
@@ -229,8 +229,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		};
 		// register the listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(
-				fPrefChangeListener);
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	private void createBikeList() {
@@ -250,7 +251,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
+	@Override
 	protected Control createContents(Composite parent) {
+
+		initializeDialogUnits(parent);
 
 		Label label = new Label(parent, SWT.WRAP);
 		label.setText(Messages.Pref_People_Title);
@@ -273,7 +277,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		fPeopleViewer.setInput(this);
 
 		// select first person
-		fPeopleViewer.getTable().select(0);
+		fPeopleViewer.getTable().setSelection(0);
 		showSelectedPersonDetails();
 		enableButtons(true);
 
@@ -314,8 +318,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 						TourBike selectedBike = fBikes[selectedIndex];
 
-						if (personTourBike == null || (personTourBike.getBikeId() != selectedBike
-								.getBikeId())) {
+						if (personTourBike == null
+								|| (personTourBike.getBikeId() != selectedBike.getBikeId())) {
 
 							fCurrentPerson.setTourBike(selectedBike);
 							fIsPersonModified = true;
@@ -357,8 +361,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 						return;
 					}
 
-					if (device == null || (device.deviceId != null && !device.deviceId
-							.equals(fCurrentPerson.getDeviceReaderId()))) {
+					if (device == null
+							|| (device.deviceId != null && !device.deviceId.equals(fCurrentPerson.getDeviceReaderId()))) {
 
 						fCurrentPerson.setDeviceReaderId(device == null ? null : device.deviceId);
 
@@ -472,8 +476,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private void createFieldHeight(int floatInputWidth) {
 
-		InputFieldFloat floatInput = new InputFieldFloat(
-				fPersonDetailContainer,
+		InputFieldFloat floatInput = new InputFieldFloat(fPersonDetailContainer,
 				Messages.Pref_People_Label_height,
 				floatInputWidth);
 
@@ -508,8 +511,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private void createFieldWeight(int floatInputWidth) {
 
-		InputFieldFloat floatInput = new InputFieldFloat(
-				fPersonDetailContainer,
+		InputFieldFloat floatInput = new InputFieldFloat(fPersonDetailContainer,
 				Messages.Pref_People_Label_weight,
 				floatInputWidth);
 
@@ -546,7 +548,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		gridData.widthHint = convertWidthInCharsToPixels(30);
 		layouter.setLayoutData(gridData);
 
-		final Table table = new Table(layouter, (SWT.H_SCROLL | SWT.V_SCROLL
+		final Table table = new Table(layouter, (SWT.H_SCROLL
+				| SWT.V_SCROLL
 				| SWT.BORDER
 				| SWT.FULL_SELECTION | SWT.MULTI));
 		table.setHeaderVisible(true);
@@ -555,7 +558,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		TableColumn tc;
 
 		tc = new TableColumn(table, SWT.NONE);
-		layouter.addColumnData(new ColumnWeightData(1, convertWidthInCharsToPixels(1), false));
+		layouter.addColumnData(new ColumnPixelData(convertHorizontalDLUsToPixels(3 * 4), false));
 
 		tc = new TableColumn(table, SWT.NONE);
 		tc.setText(Messages.Pref_People_Column_first_name);
@@ -571,11 +574,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		tc = new TableColumn(table, SWT.TRAIL);
 		tc.setText(Messages.Pref_People_Column_height);
-		layouter.addColumnData(new ColumnWeightData(3, convertWidthInCharsToPixels(3)));
+		layouter.addColumnData(new ColumnPixelData(convertHorizontalDLUsToPixels(8 * 4), true));
 
 		tc = new TableColumn(table, SWT.TRAIL);
 		tc.setText(Messages.Pref_People_Column_weight);
-		layouter.addColumnData(new ColumnWeightData(3, convertWidthInCharsToPixels(3)));
+		layouter.addColumnData(new ColumnPixelData(convertHorizontalDLUsToPixels(8 * 4), true));
 
 		fPeopleViewer = new TableViewer(table);
 
@@ -583,13 +586,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		fPeopleViewer.setLabelProvider(new ClientsLabelProvider());
 
 		fPeopleViewer.setSorter(new ViewerSorter() {
+			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
-				return collator.compare(((TourPerson) e1).getLastName(), ((TourPerson) e2)
-						.getLastName());
+				return collator.compare(((TourPerson) e1).getLastName(),
+						((TourPerson) e2).getLastName());
 			}
 		});
 
 		fPeopleViewer.setComparator(new ViewerComparator() {
+			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
 				return ((TourPerson) e1).getLastName().compareTo(((TourPerson) e2).getLastName());
 			}
@@ -630,6 +635,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		fButtonAdd.setText(Messages.Pref_People_Action_add_person);
 		setButtonLayoutData(fButtonAdd);
 		fButtonAdd.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				onAddPerson();
 				// enableButtons();
@@ -685,8 +691,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		/**
 		 * field: path to save raw tour data
 		 */
-		fRawDataPathEditor = new DirectoryFieldEditor(
-				ITourbookPreferences.DUMMY_FIELD,
+		fRawDataPathEditor = new DirectoryFieldEditor(ITourbookPreferences.DUMMY_FIELD,
 				Messages.Pref_People_Label_rawdata_path,
 				fPersonDetailContainer);
 		fRawDataPathEditor.setEmptyStringAllowed(true);
@@ -743,10 +748,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		return returnResult;
 	}
 
+	@Override
 	public void dispose() {
 
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(
-				fPrefChangeListener);
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.removePropertyChangeListener(fPrefChangeListener);
 
 		super.dispose();
 	}
@@ -766,8 +773,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		if (fIsPersonListModified) {
 
 			// fire bike list modify event
-			getPreferenceStore().setValue(
-					ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED,
+			getPreferenceStore().setValue(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED,
 					Math.random());
 
 			fIsPersonListModified = false;
@@ -778,6 +784,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
 
+	@Override
 	public boolean okToLeave() {
 		if (validatePerson() == false) {
 			return false;
@@ -825,8 +832,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		// ask for the reference tour name
 		String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
 
-		MessageDialog dialog = new MessageDialog(
-				this.getShell(),
+		MessageDialog dialog = new MessageDialog(this.getShell(),
 				Messages.Pref_People_Dlg_del_person_title,
 				null,
 				Messages.Pref_People_Dlg_del_person_message,
@@ -839,7 +845,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 
 		BusyIndicator.showWhile(null, new Runnable() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				Table table = fPeopleViewer.getTable();
@@ -873,11 +879,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		});
 	}
 
+	@Override
 	public boolean performCancel() {
 		firePersonListModifyEvent();
 		return super.performCancel();
 	}
 
+	@Override
 	public boolean performOk() {
 		if (validatePerson() == false) {
 			return false;
@@ -901,7 +909,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		fRawDataPathEditor.setPropertyChangeListener(null);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private boolean removePersonFromTourData(TourPerson person) {
 
 		boolean returnResult = false;

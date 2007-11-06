@@ -35,8 +35,10 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
+import net.tourbook.ui.ImageCombo;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -48,9 +50,9 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -81,12 +83,14 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	private IPropertyChangeListener		fPrefChangeListener;
 
-	private Combo						fComboTourType;
+	private ImageCombo					fComboTourType;
 
 	/**
 	 * contains the tour type filters which are displayed in the combobox
 	 */
 	private ArrayList<TourTypeFilter>	fTourTypeFilters;
+
+	protected double					fPropertyValue;
 
 	public TourTypeContributionItem() {
 		this(ID);
@@ -386,11 +390,18 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 				final String property = event.getProperty();
 
-				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
+						|| property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-					fillFilterComboBox();
+					double propertyValue = Double.valueOf(event.getNewValue().toString())
+							.doubleValue();
 
-					reselectTourType(plugin.getActiveTourTypeFilter());
+					// check if the event was originated from this tour type combobox
+					if (fPropertyValue != propertyValue) {
+
+						fillFilterComboBox();
+						reselectTourType(plugin.getActiveTourTypeFilter());
+					}
 				}
 			}
 
@@ -426,7 +437,11 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		gl.verticalSpacing = 0;
 		container.setLayout(gl);
 
-		fComboTourType = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+		fComboTourType = new ImageCombo(container, SWT.BORDER | SWT.FLAT/*
+																		 * SWT.DROP_DOWN |
+																		 * SWT.BORDER |
+																		 * SWT.READ_ONLY
+																		 */);
 		fComboTourType.setVisibleItemCount(20);
 		fComboTourType.setToolTipText(Messages.App_Tour_type_tooltip);
 
@@ -446,8 +461,9 @@ public class TourTypeContributionItem extends CustomControlContribution {
 				setActiveTourTypeFilter();
 
 				// fire change event
+				fPropertyValue = Math.random();
 				plugin.getPreferenceStore()
-						.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
+						.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, fPropertyValue);
 
 			}
 		});
@@ -462,8 +478,36 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		fComboTourType.removeAll();
 
 		for (TourTypeFilter tourTypeFilter : fTourTypeFilters) {
-			fComboTourType.add(tourTypeFilter.getFilterName());
+			fComboTourType.add(tourTypeFilter.getFilterName(), getFilterImage(tourTypeFilter));
 		}
+	}
+
+	public Image getFilterImage(TourTypeFilter filter) {
+
+		int filterType = filter.getFilterType();
+
+		Image filterImage = null;
+
+		// set filter name/image
+		switch (filterType) {
+		case TourTypeFilter.FILTER_TYPE_DB:
+			final TourType tourType = filter.getTourType();
+			filterImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
+			break;
+
+		case TourTypeFilter.FILTER_TYPE_SYSTEM:
+			filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER_SYSTEM);
+			break;
+
+		case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
+			filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER);
+			break;
+
+		default:
+			break;
+		}
+
+		return filterImage;
 	}
 
 	private void reselectLastTourType() {

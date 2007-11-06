@@ -180,9 +180,12 @@ public class TourTypeFilter {
 			final Object[] tourTypes = fTourTypeSet.getTourTypes();
 
 			if (tourTypes.length == 0) {
-				// select all tour types
-				sqlString = ""; //$NON-NLS-1$
+				// select nothing
+				sqlString = " AND 1=0"; //$NON-NLS-1$
+
 			} else {
+
+				// select all tours were the tour type is defined in the tour type list
 
 				int itemIndex = 0;
 				String filter = ""; //$NON-NLS-1$

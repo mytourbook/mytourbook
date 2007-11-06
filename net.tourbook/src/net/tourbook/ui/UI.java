@@ -35,6 +35,9 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -58,8 +61,11 @@ public class UI {
 	public final static ImageRegistry		IMAGE_REGISTRY					= TourbookPlugin.getDefault()
 																					.getImageRegistry();
 
-	public static final String				IMAGE_TOUR_TYPE_FILTER			= "tourType-filter"; //$NON-NLS-1$
-	public static final String				IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system"; //$NON-NLS-1$
+	public static final String				IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";			//$NON-NLS-1$
+	public static final String				IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";	//$NON-NLS-1$
+
+	private static final int				TOUR_TYPE_IMAGE_WIDTH			= 16;
+	private static final int				TOUR_TYPE_IMAGE_HEIGHT			= 16;
 
 	static {
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,
@@ -70,7 +76,8 @@ public class UI {
 
 	private UI() {}
 
-	public static ColumnPixelData getColumnPixelWidth(PixelConverter pixelConverter, int width) {
+	public static ColumnPixelData getColumnPixelWidth(	final PixelConverter pixelConverter,
+														final int width) {
 		return new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(width), false);
 	}
 
@@ -91,23 +98,24 @@ public class UI {
 	 * @param weightKey
 	 * @param sashDefaultWeight
 	 */
-	public static void restoreSashWeight(	SashForm sash,
-											IMemento fMemento,
-											String weightKey,
-											int[] sashDefaultWeight) {
+	public static void restoreSashWeight(	final SashForm sash,
+											final IMemento fMemento,
+											final String weightKey,
+											final int[] sashDefaultWeight) {
 
-		int[] sashWeights = sash.getWeights();
-		int[] newWeights = new int[sashWeights.length];
+		final int[] sashWeights = sash.getWeights();
+		final int[] newWeights = new int[sashWeights.length];
 
 		for (int weightIndex = 0; weightIndex < sashWeights.length; weightIndex++) {
 
-			Integer mementoWeight = fMemento.getInteger(weightKey + Integer.toString(weightIndex));
+			final Integer mementoWeight = fMemento.getInteger(weightKey
+					+ Integer.toString(weightIndex));
 
 			if (mementoWeight == null) {
 				try {
 					newWeights[weightIndex] = sashDefaultWeight[weightIndex];
 
-				} catch (ArrayIndexOutOfBoundsException e) {
+				} catch (final ArrayIndexOutOfBoundsException e) {
 					newWeights[weightIndex] = 100;
 				}
 			} else {
@@ -124,17 +132,17 @@ public class UI {
 	 * @param newTitle
 	 *        new title for the application or <code>null</code> to set the original title
 	 */
-	public static void changeAppTitle(String newTitle) {
+	public static void changeAppTitle(final String newTitle) {
 
-		Display display = Display.getDefault();
+		final Display display = Display.getDefault();
 
 		if (display != null) {
 
 			// Look at all the shells and pick the first one that is a workbench window.
-			Shell shells[] = display.getShells();
+			final Shell shells[] = display.getShells();
 			for (int shellIdx = 0; shellIdx < shells.length; shellIdx++) {
 
-				Object data = shells[shellIdx].getData();
+				final Object data = shells[shellIdx].getData();
 
 				// Check whether this shell points to the Application main window's shell:
 				if (data instanceof IWorkbenchWindow) {
@@ -160,9 +168,11 @@ public class UI {
 	 * @param memento
 	 * @param weightKey
 	 */
-	public static void saveSashWeight(SashForm sash, IMemento memento, String weightKey) {
+	public static void saveSashWeight(	final SashForm sash,
+										final IMemento memento,
+										final String weightKey) {
 
-		int[] weights = sash.getWeights();
+		final int[] weights = sash.getWeights();
 
 		for (int weightIndex = 0; weightIndex < weights.length; weightIndex++) {
 			memento.putInteger(weightKey + Integer.toString(weightIndex), weights[weightIndex]);
@@ -174,40 +184,42 @@ public class UI {
 	 * 
 	 * @param composite
 	 */
-	public static void set0GridLayout(Composite composite) {
-		GridLayout gridLayout = new GridLayout();
+	public static void set0GridLayout(final Composite composite) {
+		final GridLayout gridLayout = new GridLayout();
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		gridLayout.verticalSpacing = 0;
 		composite.setLayout(gridLayout);
 	}
 
-	public static void setDefaultColor(Control control) {
+	public static void setDefaultColor(final Control control) {
 		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 		control.setBackground(null);
 	}
 
-	public static void setErrorColor(Text control) {
+	public static void setErrorColor(final Text control) {
 		control.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 	}
 
-	public static GridData setFieldWidth(Composite parent, StringFieldEditor field, int width) {
-		GridData gd = new GridData();
+	public static GridData setFieldWidth(	final Composite parent,
+											final StringFieldEditor field,
+											final int width) {
+		final GridData gd = new GridData();
 		gd.widthHint = width;
 		field.getTextControl(parent).setLayoutData(gd);
 		return gd;
 	}
 
-	public static void setHorizontalSpacer(Composite parent, int columns) {
-		Label label = new Label(parent, SWT.NONE);
-		GridData gd = new GridData();
+	public static void setHorizontalSpacer(final Composite parent, final int columns) {
+		final Label label = new Label(parent, SWT.NONE);
+		final GridData gd = new GridData();
 		gd.horizontalSpan = columns;
 		label.setLayoutData(gd);
 	}
 
-	public static GridData setWidth(Control control, int width) {
-		GridData gd = new GridData();
+	public static GridData setWidth(final Control control, final int width) {
+		final GridData gd = new GridData();
 		gd.widthHint = width;
 		control.setLayoutData(gd);
 		return gd;
@@ -216,13 +228,13 @@ public class UI {
 	public static VerifyListener verifyListenerTypeLong() {
 
 		return new VerifyListener() {
-			public void verifyText(VerifyEvent e) {
+			public void verifyText(final VerifyEvent e) {
 				if (e.text.equals("")) { //$NON-NLS-1$
 					return;
 				}
 				try {
 					Long.parseLong(e.text);
-				} catch (NumberFormatException e1) {
+				} catch (final NumberFormatException e1) {
 					e.doit = false;
 				}
 			}
@@ -249,7 +261,7 @@ public class UI {
 	 */
 	public void disposeTourTypeImages() {
 
-		for (Iterator<String> iterator = fImageCache.keySet().iterator(); iterator.hasNext();) {
+		for (final Iterator<String> iterator = fImageCache.keySet().iterator(); iterator.hasNext();) {
 
 			final String imageId = iterator.next();
 
@@ -299,11 +311,20 @@ public class UI {
 		return drawingColors;
 	}
 
+	public Image getTourTypeImage(final long typeId) {
+
+		if (false) {
+			return getTourTypeImageOLD(typeId);
+		} else {
+			return getTourTypeImageNEW(typeId);
+		}
+	}
+
 	/**
 	 * @param typeId
 	 * @return Returns an image which represents the tour type
 	 */
-	public Image getTourTypeImage(final long typeId) {
+	public Image getTourTypeImageOLD(final long typeId) {
 
 		final String colorId = TOUR_TYPE_PREFIX + typeId;
 		Image image = fImageCache.get(colorId);
@@ -319,39 +340,122 @@ public class UI {
 			final int imageWidth = 16;
 			final int imageHeight = 16;
 
-			image = new Image(display, imageWidth, imageHeight);
+			final DrawingColors drawingColors = getTourTypeColors(display, typeId);
+
+			/*
+			 * Use magenta as transparency color since it is used infrequently.
+			 */
+			Color colorTransparent = display.getSystemColor(SWT.COLOR_MAGENTA);
+			Color colorBright = drawingColors.colorBright;
+			Color colorDark = drawingColors.colorDark;
+			Color colorLine = drawingColors.colorLine;
+
+			PaletteData palette = new PaletteData(new RGB[] {
+					colorTransparent.getRGB(),
+					colorDark.getRGB(),
+					colorBright.getRGB(),
+					colorLine.getRGB() });
+
+			ImageData data = new ImageData(imageWidth, imageHeight, 8, palette);
+			data.transparentPixel = 0;
+
+			image = new Image(display, data);
+			image.setBackground(colorTransparent);
 
 			final GC gc = new GC(image);
 			{
-//				final int arcSize = 4;
 
-				final DrawingColors drawingColors = getTourTypeColors(display, typeId);
-
-				gc.setForeground(drawingColors.colorBright);
-				gc.setBackground(drawingColors.colorDark);
-
-//				gc.setAlpha(0x80);
-//				gc.fillRectangle(0, 0, imageWidth, imageHeight);
-//				
-//				gc.setAlpha(0xff);
-//				gc.fillGradientRectangle(4, 1, 8, imageHeight - 3, false);
-//				
-//				gc.setForeground(drawingColors.colorLine);
-//				gc.drawRoundRectangle(4, 0, 7, imageHeight - 2, arcSize, arcSize);
+				gc.setForeground(colorBright);
+				gc.setBackground(colorDark);
 
 				gc.fillGradientRectangle(4, 4, imageWidth - 8, imageHeight - 8, false);
 
-				gc.setForeground(drawingColors.colorLine);
+				gc.setForeground(colorLine);
 				gc.drawRectangle(3, 3, imageWidth - 7, imageHeight - 7);
 
-				drawingColors.dispose();
 			}
+
+			drawingColors.dispose();
 			gc.dispose();
 
 			fImageCache.put(colorId, image);
 		}
 
 		return image;
+	}
+
+	/**
+	 * @param typeId
+	 * @return Returns an image which represents the tour type
+	 */
+	public Image getTourTypeImageNEW(final long typeId) {
+
+		final String colorId = TOUR_TYPE_PREFIX + typeId;
+		Image tourTypeImage = fImageCache.get(colorId);
+
+		if (tourTypeImage != null && tourTypeImage.isDisposed() == false) {
+
+			return tourTypeImage;
+
+		} else {
+
+			// create image for the tour type
+
+			final Display display = Display.getCurrent();
+
+			/*
+			 * create image
+			 */
+			tourTypeImage = new Image(display, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
+			final Image maskImage = new Image(display,
+					TOUR_TYPE_IMAGE_WIDTH,
+					TOUR_TYPE_IMAGE_HEIGHT);
+
+			final GC gcImage = new GC(tourTypeImage);
+			{
+				drawImage(typeId, gcImage);
+			}
+			gcImage.dispose();
+
+			/*
+			 * set transparency
+			 */
+			final ImageData imageData = tourTypeImage.getImageData();
+			final int transparentPixel = imageData.getPixel(0, 0);
+			imageData.transparentPixel = transparentPixel;
+			final Image transparentImage = new Image(display, imageData);
+
+			tourTypeImage.dispose();
+			maskImage.dispose();
+
+			// keep image in cache
+			fImageCache.put(colorId, transparentImage);
+
+			return transparentImage;
+		}
+	}
+
+	private void drawImage(final long typeId, final GC gcImage) {
+
+		final Display display = Display.getCurrent();
+		final DrawingColors drawingColors = getTourTypeColors(display, typeId);
+
+		final Color colorBright = drawingColors.colorBright;
+		final Color colorDark = drawingColors.colorDark;
+		final Color colorLine = drawingColors.colorLine;
+
+		gcImage.setForeground(colorBright);
+		gcImage.setBackground(colorDark);
+		gcImage.fillGradientRectangle(4,
+				4,
+				TOUR_TYPE_IMAGE_WIDTH - 8,
+				TOUR_TYPE_IMAGE_HEIGHT - 8,
+				false);
+
+		gcImage.setForeground(colorLine);
+		gcImage.drawRectangle(3, 3, TOUR_TYPE_IMAGE_WIDTH - 7, TOUR_TYPE_IMAGE_HEIGHT - 7);
+
+		drawingColors.dispose();
 	}
 
 }

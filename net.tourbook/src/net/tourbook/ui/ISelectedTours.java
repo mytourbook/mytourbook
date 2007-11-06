@@ -23,7 +23,7 @@ import net.tourbook.tour.TourEditor;
 public interface ISelectedTours {
 
 	/**
-	 * Returns the tours which are selected or <code>null</code> when no tour is selected
+	 * Returns the tours which are selected or <code>null</code> when a tour is not selected
 	 */
 	ArrayList<TourData> getSelectedTours();
 

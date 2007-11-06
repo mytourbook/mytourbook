@@ -447,7 +447,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		fBikeViewer.setInput(this);
 
 		// select first bike
-		fBikeViewer.getTable().select(0);
+		fBikeViewer.getTable().setSelection(0);
 		selectBike();
 
 		// update the bike details

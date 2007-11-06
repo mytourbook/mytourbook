@@ -731,6 +731,10 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
 	private void onSelectTourType() {
 
+		if (fActiveFilter == null) {
+			return;
+		}
+
 		// set tour types for current filter set
 		if (fActiveFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
 			fActiveFilter.getTourTypeSet().setTourTypes(fTourTypeViewer.getCheckedElements());
