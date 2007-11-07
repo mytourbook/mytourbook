@@ -361,7 +361,7 @@ Public License instead of this License.
    </url>
 
    <requires>
-      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui" version="3.3" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="org.apache.derby.core"/>
