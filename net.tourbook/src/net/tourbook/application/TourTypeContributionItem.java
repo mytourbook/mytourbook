@@ -35,7 +35,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
-import net.tourbook.ui.ImageCombo;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
 import net.tourbook.ui.UI;
@@ -83,7 +82,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 	private IPropertyChangeListener		fPrefChangeListener;
 
-	private ImageCombo					fComboTourType;
+	private TourTypeCombo				fComboTourType;
 
 	/**
 	 * contains the tour type filters which are displayed in the combobox
@@ -437,11 +436,11 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		gl.verticalSpacing = 0;
 		container.setLayout(gl);
 
-		fComboTourType = new ImageCombo(container, SWT.BORDER | SWT.FLAT/*
-																		 * SWT.DROP_DOWN |
-																		 * SWT.BORDER |
-																		 * SWT.READ_ONLY
-																		 */);
+		fComboTourType = new TourTypeCombo(container, SWT.BORDER | SWT.FLAT | SWT.READ_ONLY/*
+		 * SWT.DROP_DOWN |
+		 * SWT.BORDER |
+		 * SWT.READ_ONLY
+		 */);
 		fComboTourType.setVisibleItemCount(20);
 		fComboTourType.setToolTipText(Messages.App_Tour_type_tooltip);
 
@@ -482,7 +481,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		}
 	}
 
-	public Image getFilterImage(TourTypeFilter filter) {
+	private Image getFilterImage(TourTypeFilter filter) {
 
 		int filterType = filter.getFilterType();
 
