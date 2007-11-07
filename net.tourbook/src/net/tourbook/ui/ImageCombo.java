@@ -205,7 +205,7 @@ public final class ImageCombo extends Composite {
 
 	static int checkStyle(int style) {
 		int mask = gtk
-				? SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT
+				? SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT
 				: SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
 		return style & mask;
 	}

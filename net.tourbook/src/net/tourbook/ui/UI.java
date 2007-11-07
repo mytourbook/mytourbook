@@ -443,6 +443,10 @@ public class UI {
 		final Color colorBright = drawingColors.colorBright;
 		final Color colorDark = drawingColors.colorDark;
 		final Color colorLine = drawingColors.colorLine;
+		final Color colorTransparent = new Color(display,0x01,0x00,0x00);
+
+		gcImage.setBackground(colorTransparent);
+		gcImage.fillRectangle(0, 0, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
 
 		gcImage.setForeground(colorBright);
 		gcImage.setBackground(colorDark);
@@ -456,6 +460,7 @@ public class UI {
 		gcImage.drawRectangle(3, 3, TOUR_TYPE_IMAGE_WIDTH - 7, TOUR_TYPE_IMAGE_HEIGHT - 7);
 
 		drawingColors.dispose();
+		colorTransparent.dispose();
 	}
 
 }

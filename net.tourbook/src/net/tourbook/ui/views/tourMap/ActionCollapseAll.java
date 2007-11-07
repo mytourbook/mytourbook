@@ -24,7 +24,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class ActionCollapseAll extends Action {
 
-	private TreeViewer	fTreeViewer;
+	private TreeViewer fTreeViewer;
 
 	public ActionCollapseAll(TreeViewer treeViewer) {
 
@@ -33,7 +33,8 @@ public class ActionCollapseAll extends Action {
 		fTreeViewer = treeViewer;
 
 		setToolTipText(Messages.Tour_Map_Action_collapse_all_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
+		setImageDescriptor(TourbookPlugin
+				.getImageDescriptor(Messages.Image__collapse_all));
 	}
 
 	@Override
@@ -41,10 +42,11 @@ public class ActionCollapseAll extends Action {
 
 		fTreeViewer.collapseAll();
 
-		// reveal selected element
-		StructuredSelection selection = (StructuredSelection) fTreeViewer.getSelection();
-		if (selection != null) {
-			fTreeViewer.reveal(selection.getFirstElement());
+		Object firstElement = ((StructuredSelection) fTreeViewer.getSelection())
+				.getFirstElement();
+		
+		if (firstElement != null) {
+			fTreeViewer.reveal(firstElement);
 		}
 	}
 
