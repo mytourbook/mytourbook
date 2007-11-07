@@ -22,6 +22,7 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 
@@ -33,14 +34,32 @@ public class TourTypeCombo {
 
 	private static final boolean	osx	= "carbon".equals(SWT.getPlatform());
 
+	private Composite				fContainer;
+
 	private Combo					fTourTypeComboOSX;
 	private ImageCombo				fTourTypeCombo;
 
-	TourTypeCombo(Composite container, int style) {
+	TourTypeCombo(Composite parent, int style) {
+
 		if (osx) {
-			fTourTypeComboOSX = new Combo(container, style);
+
+			fTourTypeComboOSX = new Combo(parent, style);
+
 		} else {
-			fTourTypeCombo = new ImageCombo(container, style);
+
+			/*
+			 * wrap the combo into a container to align it vertically to the center
+			 */
+			fContainer = new Composite(parent, SWT.NONE);
+			GridLayout gl = new GridLayout();
+			gl.marginWidth = 0;
+			gl.marginHeight = 0;
+			gl.horizontalSpacing = 0;
+			gl.verticalSpacing = 0;
+			fContainer.setLayout(gl);
+
+			fTourTypeCombo = new ImageCombo(fContainer, style);
+			fTourTypeCombo.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
 		}
 	}
 
@@ -120,7 +139,7 @@ public class TourTypeCombo {
 		if (osx) {
 			return fTourTypeComboOSX;
 		} else {
-			return fTourTypeCombo;
+			return fContainer;
 		}
 	}
 
