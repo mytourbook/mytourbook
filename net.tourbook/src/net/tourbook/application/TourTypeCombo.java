@@ -116,4 +116,12 @@ public class TourTypeCombo {
 		}
 	}
 
+	Composite getControl() {
+		if (osx) {
+			return fTourTypeComboOSX;
+		} else {
+			return fTourTypeCombo;
+		}
+	}
+
 }

@@ -32,8 +32,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -104,18 +102,8 @@ public class PersonContributionItem extends CustomControlContribution {
 
 	private Composite createPeopleComboBox(Composite parent) {
 
-		Composite container = new Composite(parent, SWT.NONE);
-		GridLayout gl = new GridLayout();
-		gl.marginWidth = 0;
-		gl.marginHeight = 0;
-		gl.horizontalSpacing = 0;
-		gl.verticalSpacing = 0;
-		container.setLayout(gl);
+		fComboPeople = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 
-		// container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-
-		fComboPeople = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-		fComboPeople.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
 		fComboPeople.setVisibleItemCount(20);
 		fComboPeople.setToolTipText(Messages.App_People_tooltip);
 
@@ -147,7 +135,7 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		fillPeopleComboBox();
 
-		return container;
+		return fComboPeople;
 	}
 
 	private void fillPeopleComboBox() {
