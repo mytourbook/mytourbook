@@ -835,7 +835,7 @@ public class TourManager {
 
 		final ChartDataXSerie xDataDistance = new ChartDataXSerie(tourData.getDistanceSerie());
 		xDataDistance.setLabel(Messages.Tour_Properties_Label_distance);
-		xDataDistance.setUnitLabel(UI.UNIT_TEXT_DISTANCE);
+		xDataDistance.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		xDataDistance.setValueDivisor(1000);
 		xDataDistance.setRgbLine(new RGB[] { new RGB(0, 0, 0) });
 
@@ -921,7 +921,7 @@ public class TourManager {
 		final ChartDataYSerie yDataAltitude = getChartData(altitudeSerie, chartType);
 
 		yDataAltitude.setYTitle(Messages.Graph_Label_Altitude);
-		yDataAltitude.setUnitLabel(UI.UNIT_TEXT_ALTITUDE);
+		yDataAltitude.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
 		yDataAltitude.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true));
@@ -936,7 +936,7 @@ public class TourManager {
 		final ChartDataYSerie yDataSpeed = getChartData(tourData.getSpeedSerie(), chartType);
 
 		yDataSpeed.setYTitle(Messages.Graph_Label_Speed);
-		yDataSpeed.setUnitLabel(UI.UNIT_TEXT_SPEED);
+		yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
 		yDataSpeed.setValueDivisor(10);
 		yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);

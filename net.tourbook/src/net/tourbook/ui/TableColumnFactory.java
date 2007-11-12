@@ -128,8 +128,8 @@ public abstract class TableColumnFactory {
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
 			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "distance", SWT.TRAIL); //$NON-NLS-1$
-			colDef.setLabel(Messages.ColumnFactory_distance_label);
-			colDef.setText(Messages.ColumnFactory_distance);
+			colDef.setLabel(Messages.ColumnFactory_distance_label + " (" + UI.UNIT_LABEL_DISTANCE + ")");
+			colDef.setText(UI.UNIT_LABEL_DISTANCE);
 			colDef.setToolTipText(Messages.ColumnFactory_distance_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
 

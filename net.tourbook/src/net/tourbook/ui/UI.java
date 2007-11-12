@@ -80,9 +80,9 @@ public class UI {
 	 */
 	public static float						UNIT_VALUE_ALTITUDE				= 1;
 
-	public static String					UNIT_TEXT_DISTANCE;
-	public static String					UNIT_TEXT_ALTITUDE;
-	public static String					UNIT_TEXT_SPEED;
+	public static String					UNIT_LABEL_DISTANCE;
+	public static String					UNIT_LABEL_ALTITUDE;
+	public static String					UNIT_LABEL_SPEED;
 
 	public final static ImageRegistry		IMAGE_REGISTRY;
 
@@ -92,13 +92,13 @@ public class UI {
 	private static final int				TOUR_TYPE_IMAGE_WIDTH			= 16;
 	private static final int				TOUR_TYPE_IMAGE_HEIGHT			= 16;
 
-	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
-
 	private static UI						instance;
+
+	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
 
 	static {
 
-		setUnits();
+		updateUnits();
 
 		/*
 		 * load images into the image registry
@@ -256,10 +256,17 @@ public class UI {
 		label.setLayoutData(gd);
 	}
 
+	public static GridData setWidth(final Control control, final int width) {
+		final GridData gd = new GridData();
+		gd.widthHint = width;
+		control.setLayoutData(gd);
+		return gd;
+	}
+
 	/**
-	 * set units from the pref store
+	 * update units from the pref store into the application variables
 	 */
-	public static void setUnits() {
+	public static void updateUnits() {
 
 		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -271,9 +278,9 @@ public class UI {
 			UNIT_VALUE_DISTANCE = UNIT_MILE;
 			UNIT_VALUE_ALTITUDE = UNIT_FOOT;
 
-			UNIT_TEXT_DISTANCE = UNIT_DISTANCE_MI;
-			UNIT_TEXT_ALTITUDE = UNIT_ALTITUDE_FT;
-			UNIT_TEXT_SPEED = UNIT_SPEED_MPH;
+			UNIT_LABEL_DISTANCE = UNIT_DISTANCE_MI;
+			UNIT_LABEL_ALTITUDE = UNIT_ALTITUDE_FT;
+			UNIT_LABEL_SPEED = UNIT_SPEED_MPH;
 
 		} else {
 
@@ -282,17 +289,10 @@ public class UI {
 			UNIT_VALUE_DISTANCE = 1;
 			UNIT_VALUE_ALTITUDE = 1;
 
-			UNIT_TEXT_DISTANCE = UNIT_DISTANCE_KM;
-			UNIT_TEXT_ALTITUDE = UNIT_ALTITUDE_M;
-			UNIT_TEXT_SPEED = UNIT_SPEED_KM_H;
+			UNIT_LABEL_DISTANCE = UNIT_DISTANCE_KM;
+			UNIT_LABEL_ALTITUDE = UNIT_ALTITUDE_M;
+			UNIT_LABEL_SPEED = UNIT_SPEED_KM_H;
 		}
-	}
-
-	public static GridData setWidth(final Control control, final int width) {
-		final GridData gd = new GridData();
-		gd.widthHint = width;
-		control.setLayoutData(gd);
-		return gd;
 	}
 
 	public static VerifyListener verifyListenerTypeLong() {

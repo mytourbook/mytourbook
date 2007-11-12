@@ -17,7 +17,9 @@ package net.tourbook.ui;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -38,8 +40,7 @@ import org.eclipse.swt.widgets.TreeColumn;
  */
 public class ColumnManager {
 
-	private final TableViewer			fTableViewer;
-	private final TreeViewer			fTreeViewer;
+	private IAdaptable					fviewerAdapter;
 
 	/**
 	 * contains the column definitions in the sort order of the table/tree
@@ -48,14 +49,8 @@ public class ColumnManager {
 
 	private int							columnCreateIndex	= 0;
 
-	public ColumnManager(final TableViewer tableViewer) {
-		fTableViewer = tableViewer;
-		fTreeViewer = null;
-	}
-
-	public ColumnManager(TreeViewer treeViewer) {
-		fTreeViewer = treeViewer;
-		fTableViewer = null;
+	public ColumnManager(IAdaptable viewerAdapter) {
+		fviewerAdapter = viewerAdapter;
 	}
 
 	protected void addColumn(final ColumnDefinition colDef) {
@@ -68,16 +63,22 @@ public class ColumnManager {
 	 */
 	public void createColumns() {
 
-		if (fTableViewer != null) {
+		Object adapter = fviewerAdapter.getAdapter(ColumnViewer.class);
+
+		if (adapter instanceof TableViewer) {
+
 			// create all columns in the table
+
 			for (final ColumnDefinition colDef : fColumns) {
-				createTableColumn((TableColumnDefinition) colDef);
+				createTableColumn((TableColumnDefinition) colDef, (TableViewer) adapter);
 			}
 
-		} else {
+		} else if (adapter instanceof TreeViewer) {
+
 			// create all columns in the tree
+
 			for (final ColumnDefinition colDef : fColumns) {
-				createTreeColumn((TreeColumnDefinition) colDef);
+				createTreeColumn((TreeColumnDefinition) colDef, (TreeViewer) adapter);
 			}
 		}
 
@@ -88,13 +89,14 @@ public class ColumnManager {
 	 * Creates a column in a table viewer
 	 * 
 	 * @param colDef
+	 * @param tableViewer
 	 */
-	private void createTableColumn(final TableColumnDefinition colDef) {
+	private void createTableColumn(final TableColumnDefinition colDef, TableViewer tableViewer) {
 
 		TableViewerColumn tvc;
 		TableColumn tc;
 
-		tvc = new TableViewerColumn(fTableViewer, colDef.getStyle());
+		tvc = new TableViewerColumn(tableViewer, colDef.getStyle());
 
 		final CellLabelProvider cellLabelProvider = colDef.getCellLabelProvider();
 		if (cellLabelProvider != null) {
@@ -137,13 +139,14 @@ public class ColumnManager {
 	 * Creates a column in a tree viewer
 	 * 
 	 * @param colDef
+	 * @param treeViewer
 	 */
-	private void createTreeColumn(final TreeColumnDefinition colDef) {
+	private void createTreeColumn(final TreeColumnDefinition colDef, TreeViewer treeViewer) {
 
 		TreeViewerColumn tvc;
 		TreeColumn tc;
 
-		tvc = new TreeViewerColumn(fTreeViewer, colDef.getStyle());
+		tvc = new TreeViewerColumn(treeViewer, colDef.getStyle());
 
 		final CellLabelProvider cellLabelProvider = colDef.getCellLabelProvider();
 		if (cellLabelProvider != null) {
@@ -180,6 +183,8 @@ public class ColumnManager {
 		if (columnSelectionListener != null) {
 			tc.addSelectionListener(columnSelectionListener);
 		}
+
+		System.out.println("create column: " + tc);
 	}
 
 	/**
@@ -219,9 +224,11 @@ public class ColumnManager {
 
 		ArrayList<String> columnIds = new ArrayList<String>();
 
-		if (fTableViewer != null) {
-		
-			final Table table = fTableViewer.getTable();
+		Object adapter = fviewerAdapter.getAdapter(ColumnViewer.class);
+
+		if (adapter instanceof TableViewer) {
+
+			final Table table = ((TableViewer) adapter).getTable();
 			if (table.isDisposed()) {
 				return null;
 			}
@@ -230,10 +237,10 @@ public class ColumnManager {
 				columnIds.add(((TableColumnDefinition) column.getData()).getColumnId());
 				columnIds.add(Integer.toString(column.getWidth()));
 			}
-	
-		} else {
-			
-			final Tree tree = fTreeViewer.getTree();
+
+		} else if (adapter instanceof TreeViewer) {
+
+			final Tree tree = ((TreeViewer) adapter).getTree();
 			if (tree.isDisposed()) {
 				return null;
 			}
@@ -252,6 +259,8 @@ public class ColumnManager {
 	 */
 	public String[] getColumnIds() {
 
+		readColumnsFromTable();
+
 		ArrayList<String> columnIds = new ArrayList<String>();
 
 		for (ColumnDefinition colDef : fColumns) {
@@ -268,15 +277,11 @@ public class ColumnManager {
 		return fColumns;
 	}
 
-	public TableViewer getTableViewer() {
-		return fTableViewer;
-	}
-
 	public void openColumnDialog() {
 
 		/*
 		 * read the order/width for the columns, this is necessary because the user can have
-		 * rearranged the columns or resize the columns with the mouse
+		 * rearranged the columns and/or resized the columns with the mouse
 		 */
 		readColumnsFromTable();
 
@@ -321,7 +326,7 @@ public class ColumnManager {
 	 * 
 	 * @param columnIds
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public void orderColumns(final String[] columnIds) {
 
 		final ArrayList<ColumnDefinition> orderedColumns = new ArrayList<ColumnDefinition>();
@@ -352,7 +357,7 @@ public class ColumnManager {
 	 * 
 	 * @param tableItems
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	void orderColumns(final TableItem[] tableItems) {
 
 		final ArrayList<ColumnDefinition> sortedColumns = new ArrayList<ColumnDefinition>();
@@ -389,25 +394,32 @@ public class ColumnManager {
 		for (ColumnDefinition colDef : fColumns) {
 			columnOrder[columnIdx++] = colDef.getCreateIndex();
 		}
-		if (fTableViewer != null) {
-			fTableViewer.getTable().setColumnOrder(columnOrder);
-		} else {
-			fTreeViewer.getTree().setColumnOrder(columnOrder);
+
+		Object adapter = fviewerAdapter.getAdapter(ColumnViewer.class);
+
+		if (adapter instanceof TableViewer) {
+			((TableViewer) adapter).getTable().setColumnOrder(columnOrder);
+		} else if (adapter instanceof TreeViewer) {
+			((TreeViewer) adapter).getTree().setColumnOrder(columnOrder);
 		}
+
 	}
 
 	/**
-	 * Read the column order from a table and set <code>fColumn</code> according to this order
+	 * Read the column order from a table and set {@link ColumnManager#fColumns}
 	 */
 	private void readColumnsFromTable() {
 
 		final ArrayList<ColumnDefinition> orderedColumns = new ArrayList<ColumnDefinition>();
 
-		int[] columnOrder;
-		if (fTableViewer != null) {
-			columnOrder = fTableViewer.getTable().getColumnOrder();
-		} else {
-			columnOrder = fTreeViewer.getTree().getColumnOrder();
+		int[] columnOrder = null;
+
+		Object adapter = fviewerAdapter.getAdapter(ColumnViewer.class);
+
+		if (adapter instanceof TableViewer) {
+			columnOrder = ((TableViewer) adapter).getTable().getColumnOrder();
+		} else if (adapter instanceof TreeViewer) {
+			columnOrder = ((TreeViewer) adapter).getTree().getColumnOrder();
 		}
 
 		// create columns in the correct sort order
@@ -427,9 +439,14 @@ public class ColumnManager {
 					if (columnWidth > 0) {
 						colDef.setWidth(columnWidth);
 					}
+
 				} else if (colDef instanceof TreeColumnDefinition) {
-					final int columnWidth = ((TreeColumnDefinition) colDef).getTreeColumn()
-							.getWidth();
+
+					final TreeColumn treeColumn = ((TreeColumnDefinition) colDef).getTreeColumn();
+
+					System.out.println("read column: " + treeColumn);
+					final int columnWidth = treeColumn.getWidth();
+
 					if (columnWidth > 0) {
 						colDef.setWidth(columnWidth);
 					}
@@ -485,4 +502,12 @@ public class ColumnManager {
 		}
 	}
 
+//	Object adapter = fviewerAdapter.getAdapter(ColumnViewer.class);
+//
+//	if (adapter instanceof TableViewer) {
+//
+//
+//	} else if (adapter instanceof TreeViewer) {
+//
+//	}
 }

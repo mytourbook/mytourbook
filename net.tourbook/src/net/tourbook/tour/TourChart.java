@@ -212,7 +212,7 @@ public class TourChart extends Chart {
 
 					// measurement system has changed
 
-					UI.setUnits();
+					UI.updateUnits();
 
 					isChartModified = true;
 					keepMinMax = false;
@@ -237,6 +237,7 @@ public class TourChart extends Chart {
 				}
 			}
 		};
+
 		TourbookPlugin.getDefault()
 				.getPluginPreferences()
 				.addPropertyChangeListener(fPrefChangeListener);

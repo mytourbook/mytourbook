@@ -20,15 +20,12 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";		//$NON-NLS-1$
 
-	public static String	Action_configure_columns;
+	public static String		Action_configure_columns;
+	public static String		Action_configure_columns_tooltip;
 
-	public static String	Action_configure_columns_tooltip;
-
-	public static String	ColumnFactory_altitude_down_label;
-
+	public static String		ColumnFactory_altitude_down_label;
 	public static String		ColumnFactory_altitude_down_title;
-
-	public static String	ColumnFactory_altitude_down_tooltip;
+	public static String		ColumnFactory_altitude_down_tooltip;
 	public static String		ColumnFactory_altitude_up;
 	public static String		ColumnFactory_altitude_up_label;
 	public static String		ColumnFactory_altitude_up_tooltip;
@@ -38,7 +35,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_avg_pulse;
 	public static String		ColumnFactory_avg_pulse_label;
 	public static String		ColumnFactory_avg_pulse_tooltip;
-//	public static String		ColumnFactory_avg_speed_tooltip;
 	public static String		ColumnFactory_avg_temperature;
 	public static String		ColumnFactory_avg_temperature_label;
 	public static String		ColumnFactory_avg_temperature_tooltip;
@@ -52,7 +48,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_device_start_distance_label;
 	public static String		ColumnFactory_device_start_distance_tooltip;
 	public static String		ColumnFactory_device_tooltip;
-	public static String		ColumnFactory_distance;
 	public static String		ColumnFactory_distance_label;
 	public static String		ColumnFactory_distance_tooltip;
 	public static String		ColumnFactory_driving_time;
@@ -97,21 +92,15 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_type_label;
 	public static String		ColumnFactory_tour_type_tooltip;
 
-	public static String	ColumnModifyDialog_Button_deselect_all;
+	public static String		ColumnModifyDialog_Button_deselect_all;
+	public static String		ColumnModifyDialog_Button_move_down;
+	public static String		ColumnModifyDialog_Button_move_up;
+	public static String		ColumnModifyDialog_Button_select_all;
+	public static String		ColumnModifyDialog_Dialog_title;
+	public static String		ColumnModifyDialog_Label_columns;
+	public static String		ColumnModifyDialog_Label_info;
 
-	public static String	ColumnModifyDialog_Button_move_down;
-
-	public static String	ColumnModifyDialog_Button_move_up;
-
-	public static String	ColumnModifyDialog_Button_select_all;
-
-	public static String	ColumnModifyDialog_Dialog_title;
-
-	public static String	ColumnModifyDialog_Label_columns;
-
-	public static String	ColumnModifyDialog_Label_info;
-
-	public static String	Image_configure_columns;
+	public static String		Image_configure_columns;
 
 	static {
 		// initialize resource bundle

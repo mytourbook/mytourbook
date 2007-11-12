@@ -45,6 +45,7 @@ import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
@@ -52,8 +53,10 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -90,13 +93,13 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBookView extends ViewPart implements ISelectedTours {
 
-	static public final String		ID									= "net.tourbook.views.tourListView";			//$NON-NLS-1$
+	static public final String		ID									= "net.tourbook.views.tourListView";		//$NON-NLS-1$
 
-	private static final String		MEMENTO_TOURVIEWER_SELECTED_YEAR	= "tourbookview.tourviewer.selected-year";		//$NON-NLS-1$
-	private static final String		MEMENTO_TOURVIEWER_SELECTED_MONTH	= "tourbookview.tourviewer.selected-month";	//$NON-NLS-1$
-	private static final String		MEMENTO_LAST_SELECTED_TOUR_TYPE_ID	= "tourbookview.last-selected-tour-type-id";	//$NON-NLS-1$
-	private static final String		MEMENTO_COLUMN_SORT_ORDER			= "tourbookview.column_sort_order";			//$NON-NLS-1$
-	private static final String		MEMENTO_COLUMN_WIDTH				= "tourbookview.column_width";					//$NON-NLS-1$
+	private static final String		MEMENTO_TOURVIEWER_SELECTED_YEAR	= "tourbookview.tourviewer.selected-year";	//$NON-NLS-1$
+	private static final String		MEMENTO_TOURVIEWER_SELECTED_MONTH	= "tourbookview.tourviewer.selected-month"; //$NON-NLS-1$
+//	private static final String		MEMENTO_LAST_SELECTED_TOUR_TYPE_ID	= "tourbookview.last-selected-tour-type-id";	//$NON-NLS-1$
+	private static final String		MEMENTO_COLUMN_SORT_ORDER			= "tourbookview.column_sort_order";		//$NON-NLS-1$
+	private static final String		MEMENTO_COLUMN_WIDTH				= "tourbookview.column_width";				//$NON-NLS-1$
 
 	private static IMemento			fSessionMemento;
 
@@ -147,7 +150,9 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 	private int						fTourViewerSelectedMonth			= -1;
 
 	Long							fActiveTourId;
-	private int						fLastSelectedTourTypeId;
+//	private int						fLastSelectedTourTypeId;
+
+	private Composite				fViewerContainer;
 
 	private class TourBookContentProvider implements ITreeContentProvider {
 
@@ -174,7 +179,6 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 
 	private void addPartListener() {
 
-		// set the part listener
 		fPartListener = new IPartListener2() {
 			public void partActivated(IWorkbenchPartReference partRef) {}
 
@@ -182,7 +186,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 
 			public void partClosed(IWorkbenchPartReference partRef) {
 				if (ID.equals(partRef.getId())) {
-					saveSettings();
+//					saveSettings();
 				}
 			}
 
@@ -200,7 +204,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 
 			public void partVisible(IWorkbenchPartReference partRef) {}
 		};
-		// register the listener in the page
+		// register the listener
 		getViewSite().getPage().addPartListener(fPartListener);
 	}
 
@@ -217,12 +221,31 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 					fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
 
 					refreshTourViewer();
-				}
 
-				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 					// update tourbook viewer
 					fTourViewer.refresh();
+
+				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					// measurement system has changed
+
+					UI.updateUnits();
+
+					saveSettings();
+
+					fTourViewer.getTree().dispose();
+					createTourViewer(fViewerContainer);
+					fViewerContainer.layout();
+
+					restoreState(fSessionMemento);
+
+					// update the viewer
+					fTourViewer.setInput(new Object());
+
+					reselectTourViewer();
+//					refreshTourViewer();
 				}
 			}
 		};
@@ -248,58 +271,6 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 			}
 		};
 		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
-	}
-
-	/**
-	 * !!!Recursive !!! update all tour items with the new tour type
-	 * 
-	 * @param rootItem
-	 * @param modifiedTours
-	 */
-	private void updateTourViewer(TreeViewerItem parentItem, ArrayList<TourData> modifiedTours) {
-
-		Object[] children = parentItem.getFetchedChildren();
-
-		if (children == null) {
-			return;
-		}
-
-		// loop: all children
-		for (Object object : children) {
-			if (object instanceof TreeViewerItem) {
-
-				TreeViewerItem treeItem = (TreeViewerItem) object;
-				if (treeItem instanceof TVITourBookTour) {
-
-					final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
-					long tourItemId = tourItem.getTourId();
-
-					for (TourData tourData : modifiedTours) {
-						if (tourData.getTourId().longValue() == tourItemId) {
-
-							// update tree item
-							tourItem.fTourTypeId = tourData.getTourType().getTypeId();
-
-							// update tour viewer
-							fTourViewer.update(tourItem, null);
-
-							// remove updated tour
-							modifiedTours.remove(tourData);
-							break;
-						}
-					}
-				} else {
-					// update children
-					updateTourViewer(treeItem, modifiedTours);
-				}
-			}
-
-			// optimize
-			if (modifiedTours.size() == 0) {
-				return;
-			}
-		}
-
 	}
 
 	private void createActions() {
@@ -348,7 +319,10 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 
 		createResources();
 
-		createTourViewer(parent);
+		fViewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
+
+		createTourViewer(fViewerContainer);
 		createActions();
 		createContextMenu();
 
@@ -391,7 +365,6 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 		// tour tree
 		final Tree tree = new Tree(parent, SWT.H_SCROLL
 				| SWT.V_SCROLL
-				| SWT.BORDER
 				| SWT.FLAT
 				| SWT.FULL_SELECTION
 				| SWT.MULTI);
@@ -403,7 +376,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 		fTourViewer = new TreeViewer(tree);
 
 		// define and create all columns
-		fColumnManager = new ColumnManager(fTourViewer);
+		fColumnManager = new ColumnManager(this);
 		defineAllColumns(parent);
 		fColumnManager.createColumns();
 
@@ -419,19 +392,25 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 
 					// year is selected
 
-//					TVITourBookYear yearItem = ((TVITourBookYear) selectedItem);
+					TVITourBookYear yearItem = ((TVITourBookYear) selectedItem);
+					fTourViewerSelectedYear = yearItem.fTourYear;
 
 				} else if (selectedItem instanceof TVITourBookMonth) {
 
 					// month is selected
 
-//					TVITourBookMonth monthItem = (TVITourBookMonth) selectedItem;
+					TVITourBookMonth monthItem = (TVITourBookMonth) selectedItem;
+					fTourViewerSelectedYear = monthItem.fTourYear;
+					fTourViewerSelectedMonth = monthItem.fTourMonth;
 
 				} else if (selectedItem instanceof TVITourBookTour) {
 
 					// tour is selected
 
 					TVITourBookTour tourItem = (TVITourBookTour) selectedItem;
+
+					fTourViewerSelectedYear = tourItem.fTourYear;
+					fTourViewerSelectedMonth = tourItem.fTourMonth;
 
 					fActiveTourId = tourItem.getTourId();
 					fPostSelectionProvider.setSelection(new SelectionTourId(fActiveTourId));
@@ -515,7 +494,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 		});
 
 		/*
-		 * column: distance (km)
+		 * column: distance (km/miles)
 		 */
 		colDef = TreeColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -525,7 +504,9 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
 				fNF.setMinimumFractionDigits(1);
 				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(((float) tourItem.fColumnDistance) / 1000));
+				cell.setText(fNF.format(((float) tourItem.fColumnDistance)
+						/ 1000
+						/ UI.UNIT_VALUE_DISTANCE));
 				setCellColor(cell, element);
 			}
 		});
@@ -790,6 +771,45 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 		fPostSelectionProvider.setSelection(selection);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object getAdapter(Class adapter) {
+
+		if (adapter == ColumnViewer.class) {
+			return fTourViewer;
+		}
+
+		return Platform.getAdapterManager().getAdapter(this, adapter);
+	}
+
+	public ArrayList<TourData> getSelectedTours() {
+
+		// get selected tours
+		final IStructuredSelection selectedTours = ((IStructuredSelection) fTourViewer.getSelection());
+
+		ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+
+		// loop: all selected tours
+		for (Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+
+			Object treeItem = iter.next();
+
+			if (treeItem instanceof TVITourBookTour) {
+
+				TVITourBookTour tviTour = ((TVITourBookTour) treeItem);
+
+				final TourData tourData = TourManager.getInstance()
+						.getTourData(tviTour.getTourId());
+
+				if (tourData != null) {
+					selectedTourData.add(tourData);
+				}
+			}
+		}
+
+		return selectedTourData;
+	}
+
 	TreeViewer getTourViewer() {
 		return fTourViewer;
 	}
@@ -832,6 +852,10 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 		if (fSessionMemento == null) {
 			fSessionMemento = memento;
 		}
+	}
+
+	public boolean isFromTourEditor() {
+		return false;
 	}
 
 	private void refreshTourViewer() {
@@ -926,7 +950,6 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 			if (mementoColumnWidth != null) {
 				fColumnManager.setColumnWidth(StringToArrayConverter.convertStringToArray(mementoColumnWidth));
 			}
-
 		}
 	}
 
@@ -941,7 +964,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 		// save selection in the tour viewer
 		memento.putInteger(MEMENTO_TOURVIEWER_SELECTED_YEAR, fTourViewerSelectedYear);
 		memento.putInteger(MEMENTO_TOURVIEWER_SELECTED_MONTH, fTourViewerSelectedMonth);
-		memento.putInteger(MEMENTO_LAST_SELECTED_TOUR_TYPE_ID, fLastSelectedTourTypeId);
+//		memento.putInteger(MEMENTO_LAST_SELECTED_TOUR_TYPE_ID, fLastSelectedTourTypeId);
 
 		// save column sort order
 		memento.putString(MEMENTO_COLUMN_SORT_ORDER,
@@ -991,36 +1014,56 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	public ArrayList<TourData> getSelectedTours() {
+	/**
+	 * !!!Recursive !!! update all tour items with the new tour type
+	 * 
+	 * @param rootItem
+	 * @param modifiedTours
+	 */
+	private void updateTourViewer(TreeViewerItem parentItem, ArrayList<TourData> modifiedTours) {
 
-		// get selected tours
-		final IStructuredSelection selectedTours = ((IStructuredSelection) fTourViewer.getSelection());
+		Object[] children = parentItem.getFetchedChildren();
 
-		ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+		if (children == null) {
+			return;
+		}
 
-		// loop: all selected tours
-		for (Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+		// loop: all children
+		for (Object object : children) {
+			if (object instanceof TreeViewerItem) {
 
-			Object treeItem = iter.next();
+				TreeViewerItem treeItem = (TreeViewerItem) object;
+				if (treeItem instanceof TVITourBookTour) {
 
-			if (treeItem instanceof TVITourBookTour) {
+					final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
+					long tourItemId = tourItem.getTourId();
 
-				TVITourBookTour tviTour = ((TVITourBookTour) treeItem);
+					for (TourData tourData : modifiedTours) {
+						if (tourData.getTourId().longValue() == tourItemId) {
 
-				final TourData tourData = TourManager.getInstance()
-						.getTourData(tviTour.getTourId());
+							// update tree item
+							tourItem.fTourTypeId = tourData.getTourType().getTypeId();
 
-				if (tourData != null) {
-					selectedTourData.add(tourData);
+							// update tour viewer
+							fTourViewer.update(tourItem, null);
+
+							// remove updated tour
+							modifiedTours.remove(tourData);
+							break;
+						}
+					}
+				} else {
+					// update children
+					updateTourViewer(treeItem, modifiedTours);
 				}
+			}
+
+			// optimize
+			if (modifiedTours.size() == 0) {
+				return;
 			}
 		}
 
-		return selectedTourData;
-	}
-
-	public boolean isFromTourEditor() {
-		return false;
 	}
 
 }

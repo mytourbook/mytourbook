@@ -33,7 +33,9 @@ public class TreeColumnDefinition extends ColumnDefinition {
 	 *        ui style
 	 */
 	public TreeColumnDefinition(ColumnManager columnManager, String columnId, int style) {
+
 		columnManager.addColumn(this);
+
 		fColumnId = columnId;
 		fStyle = style;
 	}

@@ -50,6 +50,7 @@ import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.GroupMarker;
@@ -61,6 +62,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.DeviceResourceException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -404,7 +406,7 @@ public class RawDataView extends ViewPart implements ISelectedTours {
 		fTourViewer = new TableViewer(table);
 
 		// define and create all columns
-		fColumnManager = new ColumnManager(fTourViewer);
+		fColumnManager = new ColumnManager(this);
 		defineAllColumns(parent);
 		fColumnManager.createColumns();
 
@@ -735,6 +737,17 @@ public class RawDataView extends ViewPart implements ISelectedTours {
 		fPostSelectionProvider.setSelection(selection);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object getAdapter(Class adapter) {
+
+		if (adapter == ColumnViewer.class) {
+			return fTourViewer;
+		}
+
+		return Platform.getAdapterManager().getAdapter(this, adapter);
+	}
+
 	public ArrayList<TourData> getSelectedTours() {
 
 		// get selected tours
@@ -889,17 +902,6 @@ public class RawDataView extends ViewPart implements ISelectedTours {
 		}
 	}
 
-	/**
-	 * select first tour in the viewer
-	 */
-	public void selectFirstTour() {
-
-		final TourData firstTourData = (TourData) fTourViewer.getElementAt(0);
-		if (firstTourData != null) {
-			fTourViewer.setSelection(new StructuredSelection(firstTourData), true);
-		}
-	}
-
 //	/**
 //	 * prevent the marker viewer to show the markers by setting the tour chart parameter to null
 //	 */
@@ -917,6 +919,17 @@ public class RawDataView extends ViewPart implements ISelectedTours {
 //			}
 //		}
 //	}
+
+	/**
+	 * select first tour in the viewer
+	 */
+	public void selectFirstTour() {
+
+		final TourData firstTourData = (TourData) fTourViewer.getElementAt(0);
+		if (firstTourData != null) {
+			fTourViewer.setSelection(new StructuredSelection(firstTourData), true);
+		}
+	}
 
 	void selectLastTour() {
 
@@ -959,5 +972,4 @@ public class RawDataView extends ViewPart implements ISelectedTours {
 
 		fTourViewer.refresh();
 	}
-
 }
