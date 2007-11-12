@@ -68,6 +68,11 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            class="net.tourbook.preferences.PrefPageGeneral"
+            id="net.tourbook.preferences.PrefPageGeneral"
+            name="%preference_page_general">
+      </page>
+      <page
             class="net.tourbook.preferences.PrefPageBikes"
             id="net.tourbook.preferences.PrefPageBikes"
             name="%preference_page_Bikes"/>

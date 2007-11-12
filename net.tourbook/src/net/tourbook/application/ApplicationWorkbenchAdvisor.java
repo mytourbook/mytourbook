@@ -22,14 +22,22 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
+	@Override
 	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
 		return new ApplicationWorkbenchWindowAdvisor(this, configurer);
 	}
 
+	@Override
 	public String getInitialWindowPerspectiveId() {
 		return PerspectiveFactoryTourBook.PERSPECTIVE_ID;
 	}
 
+	@Override
+	public String getMainPreferencePageId() {
+		return "net.tourbook.preferences.PrefPageGeneral"; //$NON-NLS-1$
+	}
+
+	@Override
 	public void initialize(IWorkbenchConfigurer configurer) {
 		configurer.setSaveAndRestore(true);
 	}

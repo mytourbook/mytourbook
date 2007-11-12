@@ -429,8 +429,9 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 	@Override
 	protected Control createContents(Composite parent) {
+
 		Label label = new Label(parent, SWT.WRAP);
-		label.setText("Bikes are used to calculate the power."); //$NON-NLS-1$
+		label.setText("Bikes are used to calculate the power.");
 
 		// container
 		Composite container = new Composite(parent, SWT.NONE);

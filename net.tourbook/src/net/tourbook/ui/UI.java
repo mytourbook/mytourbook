@@ -23,8 +23,10 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.util.PixelConverter;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -51,15 +53,38 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 public class UI {
 
+	/*
+	 * labels for the different measurement systems
+	 */
+	private static final String				UNIT_ALTITUDE_M					= "m";							//$NON-NLS-1$
+	private static final String				UNIT_DISTANCE_KM				= "km";						//$NON-NLS-1$
+	private static final String				UNIT_SPEED_KM_H					= "km/h";						//$NON-NLS-1$
+
+	private static final String				UNIT_ALTITUDE_FT				= "ft";						//$NON-NLS-1$
+	private static final String				UNIT_DISTANCE_MI				= "mi";						//$NON-NLS-1$
+	private static final String				UNIT_SPEED_MPH					= "mph";						//$NON-NLS-1$
+
 	private static final String				TOUR_TYPE_PREFIX				= "tourType";					//$NON-NLS-1$
 
-	private static UI						instance;
+	public static final float				UNIT_MILE						= 1.609344f;
+	public static final float				UNIT_FOOT						= 0.3048f;
 
-	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
+	/**
+	 * contains the system of measurement value for distances relative to the metric system which is
+	 * the value <code>1</code>
+	 */
+	public static float						UNIT_VALUE_DISTANCE				= 1;
+	/**
+	 * contains the system of measurement value for altitudes relative to the metric system which is
+	 * the value <code>1</code>
+	 */
+	public static float						UNIT_VALUE_ALTITUDE				= 1;
 
-	// Create image registry
-	public final static ImageRegistry		IMAGE_REGISTRY					= TourbookPlugin.getDefault()
-																					.getImageRegistry();
+	public static String					UNIT_TEXT_DISTANCE;
+	public static String					UNIT_TEXT_ALTITUDE;
+	public static String					UNIT_TEXT_SPEED;
+
+	public final static ImageRegistry		IMAGE_REGISTRY;
 
 	public static final String				IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";			//$NON-NLS-1$
 	public static final String				IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";	//$NON-NLS-1$
@@ -67,7 +92,20 @@ public class UI {
 	private static final int				TOUR_TYPE_IMAGE_WIDTH			= 16;
 	private static final int				TOUR_TYPE_IMAGE_HEIGHT			= 16;
 
+	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
+
+	private static UI						instance;
+
 	static {
+
+		setUnits();
+
+		/*
+		 * load images into the image registry
+		 */
+
+		IMAGE_REGISTRY = TourbookPlugin.getDefault().getImageRegistry();
+
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,
@@ -75,6 +113,41 @@ public class UI {
 	}
 
 	private UI() {}
+
+	/**
+	 * Change the title for the application
+	 * 
+	 * @param newTitle
+	 *        new title for the application or <code>null</code> to set the original title
+	 */
+	public static void changeAppTitle(final String newTitle) {
+
+		final Display display = Display.getDefault();
+
+		if (display != null) {
+
+			// Look at all the shells and pick the first one that is a workbench window.
+			final Shell shells[] = display.getShells();
+			for (int shellIdx = 0; shellIdx < shells.length; shellIdx++) {
+
+				final Object data = shells[shellIdx].getData();
+
+				// Check whether this shell points to the Application main window's shell:
+				if (data instanceof IWorkbenchWindow) {
+
+					String title;
+					if (newTitle == null) {
+						title = Messages.App_Title;
+					} else {
+						title = newTitle;
+					}
+
+					shells[shellIdx].setText(title);
+					break;
+				}
+			}
+		}
+	}
 
 	public static ColumnPixelData getColumnPixelWidth(	final PixelConverter pixelConverter,
 														final int width) {
@@ -124,41 +197,6 @@ public class UI {
 		}
 
 		sash.setWeights(newWeights);
-	}
-
-	/**
-	 * Change the title for the application
-	 * 
-	 * @param newTitle
-	 *        new title for the application or <code>null</code> to set the original title
-	 */
-	public static void changeAppTitle(final String newTitle) {
-
-		final Display display = Display.getDefault();
-
-		if (display != null) {
-
-			// Look at all the shells and pick the first one that is a workbench window.
-			final Shell shells[] = display.getShells();
-			for (int shellIdx = 0; shellIdx < shells.length; shellIdx++) {
-
-				final Object data = shells[shellIdx].getData();
-
-				// Check whether this shell points to the Application main window's shell:
-				if (data instanceof IWorkbenchWindow) {
-
-					String title;
-					if (newTitle == null) {
-						title = Messages.App_Title;
-					} else {
-						title = newTitle;
-					}
-
-					shells[shellIdx].setText(title);
-					break;
-				}
-			}
-		}
 	}
 
 	/**
@@ -218,6 +256,38 @@ public class UI {
 		label.setLayoutData(gd);
 	}
 
+	/**
+	 * set units from the pref store
+	 */
+	public static void setUnits() {
+
+		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM)
+				.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_IMPERIAL)) {
+
+			// set imperial measure system
+
+			UNIT_VALUE_DISTANCE = UNIT_MILE;
+			UNIT_VALUE_ALTITUDE = UNIT_FOOT;
+
+			UNIT_TEXT_DISTANCE = UNIT_DISTANCE_MI;
+			UNIT_TEXT_ALTITUDE = UNIT_ALTITUDE_FT;
+			UNIT_TEXT_SPEED = UNIT_SPEED_MPH;
+
+		} else {
+
+			// default is the metric measure system
+
+			UNIT_VALUE_DISTANCE = 1;
+			UNIT_VALUE_ALTITUDE = 1;
+
+			UNIT_TEXT_DISTANCE = UNIT_DISTANCE_KM;
+			UNIT_TEXT_ALTITUDE = UNIT_ALTITUDE_M;
+			UNIT_TEXT_SPEED = UNIT_SPEED_KM_H;
+		}
+	}
+
 	public static GridData setWidth(final Control control, final int width) {
 		final GridData gd = new GridData();
 		gd.widthHint = width;
@@ -272,6 +342,34 @@ public class UI {
 		}
 	}
 
+	private void drawImage(final long typeId, final GC gcImage) {
+
+		final Display display = Display.getCurrent();
+		final DrawingColors drawingColors = getTourTypeColors(display, typeId);
+
+		final Color colorBright = drawingColors.colorBright;
+		final Color colorDark = drawingColors.colorDark;
+		final Color colorLine = drawingColors.colorLine;
+		final Color colorTransparent = new Color(display, 0x01, 0x00, 0x00);
+
+		gcImage.setBackground(colorTransparent);
+		gcImage.fillRectangle(0, 0, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
+
+		gcImage.setForeground(colorBright);
+		gcImage.setBackground(colorDark);
+		gcImage.fillGradientRectangle(4,
+				4,
+				TOUR_TYPE_IMAGE_WIDTH - 8,
+				TOUR_TYPE_IMAGE_HEIGHT - 8,
+				false);
+
+		gcImage.setForeground(colorLine);
+		gcImage.drawRectangle(3, 3, TOUR_TYPE_IMAGE_WIDTH - 7, TOUR_TYPE_IMAGE_HEIGHT - 7);
+
+		drawingColors.dispose();
+		colorTransparent.dispose();
+	}
+
 	/**
 	 * @param display
 	 * @param graphColor
@@ -317,6 +415,57 @@ public class UI {
 			return getTourTypeImageOLD(typeId);
 		} else {
 			return getTourTypeImageNEW(typeId);
+		}
+	}
+
+	/**
+	 * @param typeId
+	 * @return Returns an image which represents the tour type
+	 */
+	public Image getTourTypeImageNEW(final long typeId) {
+
+		final String colorId = TOUR_TYPE_PREFIX + typeId;
+		Image tourTypeImage = fImageCache.get(colorId);
+
+		if (tourTypeImage != null && tourTypeImage.isDisposed() == false) {
+
+			return tourTypeImage;
+
+		} else {
+
+			// create image for the tour type
+
+			final Display display = Display.getCurrent();
+
+			/*
+			 * create image
+			 */
+			tourTypeImage = new Image(display, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
+			final Image maskImage = new Image(display,
+					TOUR_TYPE_IMAGE_WIDTH,
+					TOUR_TYPE_IMAGE_HEIGHT);
+
+			final GC gcImage = new GC(tourTypeImage);
+			{
+				drawImage(typeId, gcImage);
+			}
+			gcImage.dispose();
+
+			/*
+			 * set transparency
+			 */
+			final ImageData imageData = tourTypeImage.getImageData();
+			final int transparentPixel = imageData.getPixel(0, 0);
+			imageData.transparentPixel = transparentPixel;
+			final Image transparentImage = new Image(display, imageData);
+
+			tourTypeImage.dispose();
+			maskImage.dispose();
+
+			// keep image in cache
+			fImageCache.put(colorId, transparentImage);
+
+			return transparentImage;
 		}
 	}
 
@@ -382,85 +531,6 @@ public class UI {
 		}
 
 		return image;
-	}
-
-	/**
-	 * @param typeId
-	 * @return Returns an image which represents the tour type
-	 */
-	public Image getTourTypeImageNEW(final long typeId) {
-
-		final String colorId = TOUR_TYPE_PREFIX + typeId;
-		Image tourTypeImage = fImageCache.get(colorId);
-
-		if (tourTypeImage != null && tourTypeImage.isDisposed() == false) {
-
-			return tourTypeImage;
-
-		} else {
-
-			// create image for the tour type
-
-			final Display display = Display.getCurrent();
-
-			/*
-			 * create image
-			 */
-			tourTypeImage = new Image(display, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
-			final Image maskImage = new Image(display,
-					TOUR_TYPE_IMAGE_WIDTH,
-					TOUR_TYPE_IMAGE_HEIGHT);
-
-			final GC gcImage = new GC(tourTypeImage);
-			{
-				drawImage(typeId, gcImage);
-			}
-			gcImage.dispose();
-
-			/*
-			 * set transparency
-			 */
-			final ImageData imageData = tourTypeImage.getImageData();
-			final int transparentPixel = imageData.getPixel(0, 0);
-			imageData.transparentPixel = transparentPixel;
-			final Image transparentImage = new Image(display, imageData);
-
-			tourTypeImage.dispose();
-			maskImage.dispose();
-
-			// keep image in cache
-			fImageCache.put(colorId, transparentImage);
-
-			return transparentImage;
-		}
-	}
-
-	private void drawImage(final long typeId, final GC gcImage) {
-
-		final Display display = Display.getCurrent();
-		final DrawingColors drawingColors = getTourTypeColors(display, typeId);
-
-		final Color colorBright = drawingColors.colorBright;
-		final Color colorDark = drawingColors.colorDark;
-		final Color colorLine = drawingColors.colorLine;
-		final Color colorTransparent = new Color(display,0x01,0x00,0x00);
-
-		gcImage.setBackground(colorTransparent);
-		gcImage.fillRectangle(0, 0, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
-
-		gcImage.setForeground(colorBright);
-		gcImage.setBackground(colorDark);
-		gcImage.fillGradientRectangle(4,
-				4,
-				TOUR_TYPE_IMAGE_WIDTH - 8,
-				TOUR_TYPE_IMAGE_HEIGHT - 8,
-				false);
-
-		gcImage.setForeground(colorLine);
-		gcImage.drawRectangle(3, 3, TOUR_TYPE_IMAGE_WIDTH - 7, TOUR_TYPE_IMAGE_HEIGHT - 7);
-
-		drawingColors.dispose();
-		colorTransparent.dispose();
 	}
 
 }

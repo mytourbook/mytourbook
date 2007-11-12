@@ -82,7 +82,7 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 			// create a new marker
 			TourMarker newTourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_CUSTOM);
 			newTourMarker.setSerieIndex(serieIndex);
-			newTourMarker.setDistance(tourData.distanceSerie[serieIndex]);
+			newTourMarker.setDistance(tourData.getMetricDistanceSerie()[serieIndex]);
 			newTourMarker.setTime(tourData.timeSerie[serieIndex]);
 			newTourMarker.setLabel(Messages.TourData_Label_new_marker);
 			newTourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);

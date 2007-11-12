@@ -33,6 +33,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Preferences;
@@ -185,10 +186,12 @@ public class TourChart extends Chart {
 				}
 
 				boolean isChartModified = false;
+				boolean keepMinMax = true;
 
-				// test if the zoom preferences has changed
 				if (property.equals(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH)
 						|| property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
+
+					// zoom preferences has changed
 
 					final IPreferenceStore prefStore = TourbookPlugin.getDefault()
 							.getPreferenceStore();
@@ -196,15 +199,23 @@ public class TourChart extends Chart {
 					TourManager.updateZoomOptionsInChartConfig(fTourChartConfig, prefStore);
 
 					isChartModified = true;
-				}
 
-				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
 					/*
-					 * when the chart is computed, the changed colors are read from the preferences
+					 * when the chart is computed, the modified colors are read from the preferences
 					 */
 
 					isChartModified = true;
+
+				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					// measurement system has changed
+
+					UI.setUnits();
+
+					isChartModified = true;
+					keepMinMax = false;
 				}
 
 				isChartModified = setMinDefaultValue(property,
@@ -222,7 +233,7 @@ public class TourChart extends Chart {
 						TourManager.GRADIENT_DIVISOR);
 
 				if (isChartModified) {
-					updateTourChart(true);
+					updateTourChart(keepMinMax);
 				}
 			}
 		};
@@ -339,9 +350,10 @@ public class TourChart extends Chart {
 	 */
 	private void createMarkerLayer() {
 
+		// set data serie for the x-axis
 		final int[] xAxisSerie = fTourChartConfig.showTimeOnXAxis
 				? fTourData.timeSerie
-				: fTourData.distanceSerie;
+				: fTourData.getDistanceSerie();
 
 		fMarkerLayer = new ChartMarkerLayer();
 		fMarkerLayer.setLineColor(new RGB(50, 100, 10));
@@ -353,6 +365,7 @@ public class TourChart extends Chart {
 			final ChartMarker chartMarker = new ChartMarker();
 
 			final int markerIndex = Math.min(tourMarker.getSerieIndex(), xAxisSerie.length - 1);
+
 			chartMarker.graphX = xAxisSerie[markerIndex];
 
 			chartMarker.markerLabel = tourMarker.getLabel();
@@ -388,7 +401,7 @@ public class TourChart extends Chart {
 
 		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis
 				? fTourData.timeSerie
-				: fTourData.distanceSerie;
+				: fTourData.getDistanceSerie();
 
 		fSegmentLayer = new ChartSegmentLayer();
 		fSegmentLayer.setLineColor(new RGB(0, 177, 219));
@@ -803,6 +816,7 @@ public class TourChart extends Chart {
 				isChartModified = true;
 			}
 		}
+
 		return isChartModified;
 	}
 

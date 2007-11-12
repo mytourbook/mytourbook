@@ -315,6 +315,8 @@ public class TurDeviceReader extends TourbookDevice {
 				// Read Marker
 				int markerCount = Integer.parseInt(TurFileUtil.readText(fileTurData));
 
+				final int[] distanceSerie = tourData.getMetricDistanceSerie();
+
 				// create new markers
 				for (int i = 0; i < markerCount; i++) {
 					TourMarker tourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_DEVICE);
@@ -331,7 +333,7 @@ public class TurDeviceReader extends TourbookDevice {
 					tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					for (int j = 0; j < tourData.timeSerie.length; j++) {
 						if (tourData.timeSerie[j] > tourMarker.getTime()) {
-							tourMarker.setDistance(tourData.distanceSerie[j - 1]);
+							tourMarker.setDistance(distanceSerie[j - 1]);
 							tourMarker.setSerieIndex(j - 1);
 							break;
 						}

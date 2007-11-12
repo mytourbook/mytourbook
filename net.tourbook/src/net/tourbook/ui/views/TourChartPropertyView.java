@@ -228,11 +228,13 @@ public class TourChartPropertyView extends ViewPart {
 		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_CLIP_VALUE,
 				fSpinnerClipValues.getSelection());
 
-		// radioo: chart type
+		// radio: chart type
 		final int speedChartType = fRadioLineChartType.getSelection()
 				? ChartDataModel.CHART_TYPE_LINE
 				: ChartDataModel.CHART_TYPE_BAR;
 		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE, speedChartType);
+
+		TourManager.getInstance().removeAllToursFromCache();
 
 		// fire modify event
 		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED,

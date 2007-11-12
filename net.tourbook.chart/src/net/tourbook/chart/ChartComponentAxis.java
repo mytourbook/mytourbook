@@ -240,14 +240,14 @@ public class ChartComponentAxis extends Canvas {
 					gc.drawLine(devX, devY, devX + 5, devY);
 				}
 
-				final Point unitExtend = gc.textExtent(yUnit.label);
+				final Point unitExtend = gc.textExtent(yUnit.valueLabel);
 				int devYUnit = devY - unitExtend.y / 2;
 
 				// draw the unit label centered at the unit tick
 				if (fIsLeft) {
-					gc.drawText(yUnit.label, (devX - (unitExtend.x + UNIT_OFFSET)), devYUnit, true);
+					gc.drawText(yUnit.valueLabel, (devX - (unitExtend.x + UNIT_OFFSET)), devYUnit, true);
 				} else {
-					gc.drawText(yUnit.label, (devX + UNIT_OFFSET), devYUnit, true);
+					gc.drawText(yUnit.valueLabel, (devX + UNIT_OFFSET), devYUnit, true);
 				}
 
 				unitCount++;

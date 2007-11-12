@@ -741,7 +741,7 @@ public class TourSegmenterView extends ViewPart {
 		fTourData.setDpTolerance((short) dpTolerance);
 
 		// create points for the simplifier from distance and altitude
-		final int[] distanceSerie = fTourData.distanceSerie;
+		final int[] distanceSerie = fTourData.getMetricDistanceSerie();
 		final int[] altitudeSerie = fTourData.altitudeSerie;
 
 		final Point graphPoints[] = new Point[distanceSerie.length];

@@ -71,6 +71,8 @@ public class RawDataManager {
 
 	private int							fImportYear			= -1;
 
+	private boolean						fIsImported;
+
 //	private RawDataView					fRawDataView;
 
 	private RawDataManager() {}
@@ -262,9 +264,7 @@ public class RawDataManager {
 	 * @param isDeviceImport
 	 * @return Returns <code>true</code> when the import was successfully
 	 */
-	public boolean importRawData(String fileName) {
-
-		boolean returnValue = false;
+	public boolean importRawData(final String fileName) {
 
 		File importFile = new File(fileName);
 
@@ -287,53 +287,60 @@ public class RawDataManager {
 		if (dotPos == -1) {
 			return false;
 		}
-		String fileExtension = fileName.substring(dotPos + 1);
+		final String fileExtension = fileName.substring(dotPos + 1);
 
-		boolean isDataImported = false;
+		final ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
+		fIsImported = false;
 
-		ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
+		BusyIndicator.showWhile(null, new Runnable() {
 
-		/*
-		 * try to import from all devices which have the same extension
-		 */
-		for (TourbookDevice device : deviceList) {
+			public void run() {
 
-			if (device.fileExtension.equalsIgnoreCase(fileExtension)) {
+				boolean isDataImported = false;
 
-				// device file extension was found in the filename extension
+				/*
+				 * try to import from all devices which have the same extension
+				 */
+				for (TourbookDevice device : deviceList) {
 
-				if (importRawDataFromFile(device, fileName)) {
-					isDataImported = true;
-					returnValue = true;
-					break;
+					if (device.fileExtension.equalsIgnoreCase(fileExtension)) {
+
+						// device file extension was found in the filename extension
+
+						if (importRawDataFromFile(device, fileName)) {
+							isDataImported = true;
+							fIsImported = true;
+							break;
+						}
+					}
+				}
+
+				if (isDataImported == false) {
+
+					/*
+					 * when data has not imported yet, try all available devices without checking
+					 * the file extension
+					 */
+					for (TourbookDevice device : deviceList) {
+						if (importRawDataFromFile(device, fileName)) {
+							isDataImported = true;
+							fIsImported = true;
+							break;
+						}
+					}
+
+					if (isDataImported = false) {
+						showMsgBoxInvalidFormat(fileName);
+					}
+				}
+
+				if (isDataImported) {
+					fImportedFiles.add(fileName);
 				}
 			}
-		}
+		});
 
-		if (isDataImported == false) {
-
-			/*
-			 * when data has not imported yet, try all available devices without checking the file
-			 * extension
-			 */
-			for (TourbookDevice device : deviceList) {
-				if (importRawDataFromFile(device, fileName)) {
-					isDataImported = true;
-					returnValue = true;
-					break;
-				}
-			}
-
-			if (isDataImported = false) {
-				showMsgBoxInvalidFormat(fileName);
-			}
-		}
-
-		if (isDataImported) {
-			fImportedFiles.add(fileName);
-		}
-
-		return returnValue;
+		return fIsImported;
 	}
 
 	/**
@@ -385,7 +392,7 @@ public class RawDataManager {
 	public void updateTourDataFromDb() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				EntityManager em = TourDatabase.getInstance().getEntityManager();

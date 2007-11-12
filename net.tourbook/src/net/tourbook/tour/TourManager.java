@@ -19,6 +19,7 @@ package net.tourbook.tour;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
@@ -33,6 +34,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.util.StringToArrayConverter;
 
@@ -103,7 +105,9 @@ public class TourManager {
 	 * @param endIndex
 	 * @return Returns the speed between start and end index
 	 */
-	public static float computeTourSpeed(ChartDataModel chartDataModel, int startIndex, int endIndex) {
+	public static float computeTourSpeed(	final ChartDataModel chartDataModel,
+											final int startIndex,
+											final int endIndex) {
 
 		final int[] distanceValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE)).getHighValues()[0];
 		final int[] timeValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TIME)).getHighValues()[0];
@@ -111,10 +115,10 @@ public class TourManager {
 		return computeTourSpeed(distanceValues, timeValues, startIndex, endIndex);
 	}
 
-	public static float computeTourSpeed(	int[] distanceSerie,
-											int[] timeSerie,
-											int startIndex,
-											int endIndex) {
+	public static float computeTourSpeed(	final int[] distanceSerie,
+											final int[] timeSerie,
+											final int startIndex,
+											final int endIndex) {
 
 		final int distance = distanceSerie[endIndex] - distanceSerie[startIndex];
 		int time = timeSerie[endIndex] - timeSerie[startIndex];
@@ -124,7 +128,7 @@ public class TourManager {
 			timeInterval = timeSerie[2] - timeSerie[1];
 		}
 		// remove breaks from the time
-		int ignoreTimeSlices = timeInterval == 0 ? 0 : getIgnoreTimeSlices(timeSerie,
+		final int ignoreTimeSlices = timeInterval == 0 ? 0 : getIgnoreTimeSlices(timeSerie,
 				startIndex,
 				endIndex,
 				10 / timeInterval);
@@ -179,7 +183,7 @@ public class TourManager {
 	 * @return Returns the number of slices which can be ignored
 	 */
 	public static int getIgnoreTimeSlices(	final int[] distanceValues,
-											int indexLeft,
+											final int indexLeft,
 											int indexRight,
 											int sliceMin) {
 		int ignoreTimeCounter = 0;
@@ -217,9 +221,30 @@ public class TourManager {
 	public static String getTourDate(final TourData tourData) {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
+
 		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 
-		return DateFormat.getDateInstance().format(calendar.getTime());
+		final Date time = calendar.getTime();
+
+		return DateFormat.getDateInstance().format(time);
+	}
+
+	/**
+	 * @return returns the date of this tour
+	 */
+	public static String getTourTime(final TourData tourData) {
+
+		final Calendar calendar = GregorianCalendar.getInstance();
+
+		calendar.set(tourData.getStartYear(),
+				tourData.getStartMonth() - 1,
+				tourData.getStartDay(),
+				tourData.getStartHour(),
+				tourData.getStartMinute());
+
+		final Date time = calendar.getTime();
+
+		return DateFormat.getTimeInstance().format(time);
 	}
 
 	/**
@@ -229,7 +254,8 @@ public class TourManager {
 
 		final String tourTitle = tourData.getTourTitle();
 
-		return getTourDate(tourData) + ((tourTitle.length() == 0) ? "" : " - " + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$
+		return getTourDate(tourData)
+				+ " - " + getTourTime(tourData) + ((tourTitle.length() == 0) ? "" : " - " + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -280,7 +306,7 @@ public class TourManager {
 		chartConfig.autoZoomToSlider = autoZoomToSlider;
 	}
 
-	public void addPropertyListener(ITourPropertyListener listener) {
+	public void addPropertyListener(final ITourPropertyListener listener) {
 		fPropertyListeners.add(listener);
 	}
 
@@ -443,7 +469,7 @@ public class TourManager {
 	 * @param tourData
 	 * @param hasPropertyChanged
 	 */
-	private void computeAltiGradiSerie(TourData tourData, boolean hasPropertyChanged) {
+	private void computeAltiGradiSerie(final TourData tourData, final boolean hasPropertyChanged) {
 
 		// check if altimeter was computed
 		if (tourData.altimeterSerie != null && hasPropertyChanged == false) {
@@ -455,7 +481,7 @@ public class TourManager {
 		final int altimeterSerie[] = tourData.altimeterSerie = new int[serieLength];
 		final int gradientSerie[] = tourData.gradientSerie = new int[serieLength];
 
-		int deviceTimeInterval = tourData.getDeviceTimeInterval();
+		final int deviceTimeInterval = tourData.getDeviceTimeInterval();
 		int indexLowAdjustment;
 		int indexHighAdjustment;
 
@@ -463,7 +489,7 @@ public class TourManager {
 
 		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_COMPUTE_VALUE)) {
 
-			int computeTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE);
+			final int computeTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE);
 			final int slices = computeTimeSlice / deviceTimeInterval;
 
 			indexHighAdjustment = Math.max(1, slices / 2);
@@ -473,7 +499,9 @@ public class TourManager {
 			if (indexLowAdjustment + indexHighAdjustment < slices) {
 				indexHighAdjustment++;
 			}
+
 		} else {
+
 			if (deviceTimeInterval <= 2) {
 				indexLowAdjustment = 15;
 				indexHighAdjustment = 15;
@@ -494,14 +522,17 @@ public class TourManager {
 		/*
 		 * compute values
 		 */
+		final int[] distanceSerie = tourData.getDistanceSerie();
+
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 			// adjust index to the array size
-			int indexLow = Math.min(Math.max(0, serieIndex - indexLowAdjustment), serieLength - 1);
-			int indexHigh = Math.max(0, Math.min(serieIndex + indexHighAdjustment, serieLength - 1));
+			final int indexLow = Math.min(Math.max(0, serieIndex - indexLowAdjustment),
+					serieLength - 1);
+			final int indexHigh = Math.max(0, Math.min(serieIndex + indexHighAdjustment,
+					serieLength - 1));
 
-			final int distance = tourData.distanceSerie[indexHigh]
-					- tourData.distanceSerie[indexLow];
+			final int distance = distanceSerie[indexHigh] - distanceSerie[indexLow];
 
 			final int altitude = tourData.altitudeSerie[indexHigh]
 					- tourData.altitudeSerie[indexLow];
@@ -516,155 +547,59 @@ public class TourManager {
 		}
 	}
 
-	/**
-	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
-	 * 
-	 * @param tourData
-	 * @param hasPropertyChanged
-	 * @param tourChartProperty
-	 */
-	private void computeSpeedSerie(TourData tourData, boolean hasPropertyChanged) {
+//	/**
+//	 * compute the speed serie with custom settings from the {@link TourChartPropertyView}, the
+//	 * speed must be interpolated for low time intervals because the smallest distance is 10 m
+//	 * 
+//	 * @param tourData
+//	 * @param hasPropertyChanged
+//	 * @param tourChartProperty
+//	 */
+//	private void computeCustomSpeedSerie(final TourData tourData, final boolean hasPropertyChanged) {
+//
+//
+//	}
 
-		// check if speed was computed
-		if (tourData.speedSerie != null && hasPropertyChanged == false) {
-			return;
-		}
-
-		final int serieLength = tourData.timeSerie.length;
-
-		final int speedSerie[] = tourData.speedSerie = new int[serieLength];
-
-		int deviceTimeInterval = tourData.getDeviceTimeInterval();
-
-		int lowIndexAdjustment = 0;
-		int highIndexAdjustment = 1;
-
-		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-
-		int speedTimeSlice = store.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE);
-		final int slices = speedTimeSlice / deviceTimeInterval;
-
-		highIndexAdjustment = Math.max(1, slices / 2);
-		lowIndexAdjustment = slices / 2;
-
-		// round up
-		if (lowIndexAdjustment + highIndexAdjustment < slices) {
-			highIndexAdjustment++;
-		}
-
-		for (int speedIndex = 0; speedIndex < serieLength; speedIndex++) {
-
-			// adjust index to the array size
-			int distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustment),
-					serieLength - 1);
-			int distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustment,
-					serieLength - 1));
-
-			final int distance = tourData.distanceSerie[distIndexHigh]
-					- tourData.distanceSerie[distIndexLow];
-
-			final float timeInterval = deviceTimeInterval * (distIndexHigh - distIndexLow);
-
-			final int speed = (int) ((distance * 36F) / timeInterval);
-
-			speedSerie[speedIndex] = speed;
-//			speedSerie[speedIndex] = (int) (distance / timeInterval);
-		}
-	}
-
-	/**
-	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
-	 * 
-	 * @param tourData
-	 * @param hasPropertyChanged
-	 * @param tourChartProperty
-	 */
-	private void computeSpeedSerieInternal(TourData tourData, boolean hasPropertyChanged) {
-
-		// check if speed was computed
-		if (tourData.speedSerie != null && hasPropertyChanged == false) {
-			return;
-		}
-
-		final int serieLength = tourData.timeSerie.length;
-
-		final int speedSerie[] = tourData.speedSerie = new int[serieLength];
-
-		int deviceTimeInterval = tourData.getDeviceTimeInterval();
-
-		int lowIndexAdjustmentDefault = 0;
-		int highIndexAdjustmentDefault = 0;
-		if (deviceTimeInterval <= 2) {
-			lowIndexAdjustmentDefault = 2;
-			highIndexAdjustmentDefault = 3;
-
-		} else if (deviceTimeInterval <= 5) {
-			lowIndexAdjustmentDefault = 1;
-			highIndexAdjustmentDefault = 1;
-
-		} else if (deviceTimeInterval <= 10) {
-			lowIndexAdjustmentDefault = 0;
-			highIndexAdjustmentDefault = 1;
-		} else {
-			lowIndexAdjustmentDefault = 0;
-			highIndexAdjustmentDefault = 1;
-		}
-
-		for (int speedIndex = 0; speedIndex < serieLength; speedIndex++) {
-
-			// adjust index to the array size
-			int distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustmentDefault),
-					serieLength - 1);
-
-			int distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustmentDefault,
-					serieLength - 1));
-
-			int distanceDefault = tourData.distanceSerie[distIndexHigh]
-					- tourData.distanceSerie[distIndexLow];
-
-			// adjust the accuracy for the distance
-			int lowIndexAdjustment = lowIndexAdjustmentDefault;
-			int highIndexAdjustment = highIndexAdjustmentDefault;
-
-			if (distanceDefault < 30) {
-				lowIndexAdjustment = lowIndexAdjustmentDefault + 3;
-				highIndexAdjustment = highIndexAdjustmentDefault + 3;
-			} else if (distanceDefault < 50) {
-				lowIndexAdjustment = lowIndexAdjustmentDefault + 2;
-				highIndexAdjustment = highIndexAdjustmentDefault + 2;
-			} else if (distanceDefault < 100) {
-				lowIndexAdjustment = lowIndexAdjustmentDefault + 1;
-				highIndexAdjustment = highIndexAdjustmentDefault + 1;
-			}
-
-			// adjust index to the array size
-			distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustment), serieLength - 1);
-			distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustment, serieLength - 1));
-
-			final int distance = tourData.distanceSerie[distIndexHigh]
-					- tourData.distanceSerie[distIndexLow];
-
-			final float timeInterval = deviceTimeInterval * (distIndexHigh - distIndexLow);
-
-			final int speed = (int) ((distance * 36F) / timeInterval);
-
-			speedSerie[speedIndex] = speed;
-		}
-	}
+//	private void computeInternalSpeedSerie_SHOW_DISTANCE(	final TourData tourData,
+//															final boolean hasPropertyChanged) {
+//
+//		// check if speed was computed
+//		if (tourData.speedSerie != null && hasPropertyChanged == false) {
+//			return;
+//		}
+//
+//		final int serieLength = tourData.timeSerie.length;
+//
+//		final int speedSerie[] = tourData.speedSerie = new int[serieLength];
+//		final int[] distanceSerie = tourData.getDistanceSerie();
+//
+//		for (int distanceIndex = 0; distanceIndex < serieLength; distanceIndex++) {
+//
+//			int distance;
+//
+//			if (distanceIndex == 0) {
+//				distance = 0;
+//			} else {
+//				distance = distanceSerie[distanceIndex] - distanceSerie[distanceIndex - 1];
+//			}
+//
+//			speedSerie[distanceIndex] = distance;
+//		}
+//	}
 
 	/**
 	 * Clip values when a minimum distance is fallen short of
 	 * 
 	 * @param tourData
 	 */
-	private void computeValueClipping(TourData tourData) {
+	private void computeValueClipping(final TourData tourData) {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-		final int[] speedSerie = tourData.speedSerie;
+		final int[] speedSerie = tourData.getSpeedSerie();
 		final int[] altimeterSerie = tourData.altimeterSerie;
 		final int[] gradientSerie = tourData.gradientSerie;
-		final int[] distanceSerie = tourData.distanceSerie;
+		final int[] distanceSerie = tourData.getDistanceSerie();
 
 		final int serieLength = tourData.timeSerie.length;
 		final int deviceTimeInterval = tourData.getDeviceTimeInterval();
@@ -845,55 +780,16 @@ public class TourManager {
 		return createChartDataModelInternal(tourData, chartConfig, false);
 	}
 
-	public ChartDataModel createChartDataModel(	TourData tourData,
-												TourChartConfiguration chartConfig,
-												boolean hasPropertyChanged) {
+	public ChartDataModel createChartDataModel(	final TourData tourData,
+												final TourChartConfiguration chartConfig,
+												final boolean hasPropertyChanged) {
 
 		return createChartDataModelInternal(tourData, chartConfig, hasPropertyChanged);
 	}
 
-//	/**
-//	 * Creates a new tour context for a given tour data object
-//	 * 
-//	 * @param tourId
-//	 * @return Returns the newly created tour context
-//	 */
-//	private TourEditorInput createTourEditorInput(final long tourId) {
-//
-//		final TourChartConfiguration chartConfiguration = createTourChartConfiguration();
-//
-////		chartConfiguration.setKeepMinMaxValues(true);
-//
-//		// create the tour editor input
-//		final TourEditorInput editorInput = new TourEditorInput(tourId, chartConfiguration);
-//
-//		// keep the tour in a cache
-////	 tourCache.put(tourData.getTourId(), editorInput);
-//
-//		return editorInput;
-//	}
-
-//	/**
-//	 * Opens the tour editor for the the given editor input
-//	 * 
-//	 * @param editorInput
-//	 */
-//	private void openTourEditor(final TourEditorInput editorInput) {
-//
-//		try {
-//			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
-//					editorInput,
-//					"",//					TourEditorPart.ID,
-//					true);
-//
-//		} catch (final PartInitException e) {
-//			e.printStackTrace();
-//		}
-//	}
-
 	private ChartDataModel createChartDataModelInternal(final TourData tourData,
 														final TourChartConfiguration chartConfig,
-														boolean hasPropertyChanged) {
+														final boolean hasPropertyChanged) {
 //		long startTime = System.currentTimeMillis();
 
 //		long endTime = System.currentTimeMillis();
@@ -913,10 +809,22 @@ public class TourManager {
 
 		computeAltiGradiSerie(tourData, hasPropertyChanged);
 
+		if (hasPropertyChanged) {
+			tourData.cleanSpeedSerie();
+		}
+
 		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_COMPUTE_VALUE)) {
-			computeSpeedSerie(tourData, hasPropertyChanged);
+			if (tourData.getDeviceTimeInterval() == -1) {
+				tourData.computeSpeedSerieInternalWithVariableInterval(true);
+			} else {
+				tourData.computeSpeedSerieCustom();
+			}
 		} else {
-			computeSpeedSerieInternal(tourData, hasPropertyChanged);
+			if (tourData.getDeviceTimeInterval() == -1) {
+				tourData.computeSpeedSerieInternalWithVariableInterval(false);
+			} else {
+				tourData.computeSpeedSerieInternal();
+			}
 		}
 
 		computeValueClipping(tourData);
@@ -924,9 +832,10 @@ public class TourManager {
 		/*
 		 * distance
 		 */
-		final ChartDataXSerie xDataDistance = new ChartDataXSerie(tourData.distanceSerie);
+
+		final ChartDataXSerie xDataDistance = new ChartDataXSerie(tourData.getDistanceSerie());
 		xDataDistance.setLabel(Messages.Tour_Properties_Label_distance);
-		xDataDistance.setUnitLabel(Messages.Tour_Properties_Label_distance_unit);
+		xDataDistance.setUnitLabel(UI.UNIT_TEXT_DISTANCE);
 		xDataDistance.setValueDivisor(1000);
 		xDataDistance.setRgbLine(new RGB[] { new RGB(0, 0, 0) });
 
@@ -981,15 +890,38 @@ public class TourManager {
 			chartDataModel.addXyData(xDataTime);
 		}
 
-		int chartType = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
+		final int chartType = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
 
 		/*
 		 * altitude
 		 */
-		ChartDataYSerie yDataAltitude = getChartData(tourData.altitudeSerie, chartType);
+
+		int[] altitudeSerie = tourData.altitudeSerie;
+		final float unitValueAltitude = UI.UNIT_VALUE_ALTITUDE;
+
+		if (unitValueAltitude != 1) {
+
+			// use imperial system
+
+			int[] altitudeSerieImperial = tourData.altitudeSerieImperial;
+
+			if (altitudeSerieImperial == null) {
+
+				// compute imperial data
+
+				tourData.altitudeSerieImperial = altitudeSerieImperial = new int[altitudeSerie.length];
+
+				for (int valueIndex = 0; valueIndex < altitudeSerie.length; valueIndex++) {
+					altitudeSerieImperial[valueIndex] = (int) (altitudeSerie[valueIndex] / unitValueAltitude);
+				}
+			}
+			altitudeSerie = altitudeSerieImperial;
+		}
+
+		final ChartDataYSerie yDataAltitude = getChartData(altitudeSerie, chartType);
 
 		yDataAltitude.setYTitle(Messages.Graph_Label_Altitude);
-		yDataAltitude.setUnitLabel(Messages.Graph_Label_Altitude_unit);
+		yDataAltitude.setUnitLabel(UI.UNIT_TEXT_ALTITUDE);
 		yDataAltitude.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
 		yDataAltitude.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true));
@@ -1001,10 +933,10 @@ public class TourManager {
 		/*
 		 * speed
 		 */
-		ChartDataYSerie yDataSpeed = getChartData(tourData.speedSerie, chartType);
+		final ChartDataYSerie yDataSpeed = getChartData(tourData.getSpeedSerie(), chartType);
 
 		yDataSpeed.setYTitle(Messages.Graph_Label_Speed);
-		yDataSpeed.setUnitLabel(Messages.Graph_Label_Speed_unit);
+		yDataSpeed.setUnitLabel(UI.UNIT_TEXT_SPEED);
 		yDataSpeed.setValueDivisor(10);
 		yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
@@ -1019,7 +951,7 @@ public class TourManager {
 		/*
 		 * heartbeat
 		 */
-		ChartDataYSerie yDataPulse = getChartData(tourData.pulseSerie, chartType);
+		final ChartDataYSerie yDataPulse = getChartData(tourData.pulseSerie, chartType);
 		yDataPulse.setYTitle(Messages.Graph_Label_Heartbeat);
 		yDataPulse.setUnitLabel(Messages.Graph_Label_Heartbeat_unit);
 		yDataPulse.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
@@ -1032,7 +964,7 @@ public class TourManager {
 		/*
 		 * altimeter
 		 */
-		ChartDataYSerie yDataAltimeter = getChartData(tourData.altimeterSerie, chartType);
+		final ChartDataYSerie yDataAltimeter = getChartData(tourData.altimeterSerie, chartType);
 		yDataAltimeter.setYTitle(Messages.Graph_Label_Altimeter);
 		yDataAltimeter.setUnitLabel(Messages.Graph_Label_Altimeter_unit);
 		yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
@@ -1051,7 +983,7 @@ public class TourManager {
 		/*
 		 * gradient
 		 */
-		ChartDataYSerie yDataGradient = getChartData(tourData.gradientSerie, chartType);
+		final ChartDataYSerie yDataGradient = getChartData(tourData.gradientSerie, chartType);
 		yDataGradient.setYTitle(Messages.Graph_Label_Gradiend);
 		yDataGradient.setUnitLabel(Messages.Graph_Label_Gradiend_unit);
 		yDataGradient.setValueDivisor(GRADIENT_DIVISOR);
@@ -1074,7 +1006,7 @@ public class TourManager {
 		/*
 		 * cadence
 		 */
-		ChartDataYSerie yDataCadence = getChartData(tourData.cadenceSerie, chartType);
+		final ChartDataYSerie yDataCadence = getChartData(tourData.cadenceSerie, chartType);
 		yDataCadence.setYTitle(Messages.Graph_Label_Cadence);
 		yDataCadence.setUnitLabel(Messages.Graph_Label_Cadence_unit);
 		yDataCadence.setShowYSlider(true);
@@ -1087,7 +1019,7 @@ public class TourManager {
 		/*
 		 * temperature
 		 */
-		ChartDataYSerie yDataTemperature = getChartData(tourData.temperatureSerie, chartType);
+		final ChartDataYSerie yDataTemperature = getChartData(tourData.temperatureSerie, chartType);
 		yDataTemperature.setYTitle(Messages.Graph_Label_Temperature);
 		yDataTemperature.setUnitLabel(Messages.Graph_Label_Temperature_unit);
 		yDataTemperature.setShowYSlider(true);
@@ -1189,15 +1121,15 @@ public class TourManager {
 		}
 	}
 
-	public void firePropertyChange(int propertyId, Object propertyData) {
-		Object[] allListeners = fPropertyListeners.getListeners();
+	public void firePropertyChange(final int propertyId, final Object propertyData) {
+		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (int i = 0; i < allListeners.length; i++) {
 			final ITourPropertyListener listener = (ITourPropertyListener) allListeners[i];
 			listener.propertyChanged(propertyId, propertyData);
 		}
 	}
 
-	private ChartDataYSerie getChartData(final int[] dataSerie, int chartType) {
+	private ChartDataYSerie getChartData(final int[] dataSerie, final int chartType) {
 
 		ChartDataYSerie chartDataSerie;
 
@@ -1222,13 +1154,13 @@ public class TourManager {
 	 * @return Returns the tour data for the tour id or <code>null</code> when the tour is not in
 	 *         the database
 	 */
-	public TourData getTourData(Long tourId) {
+	public TourData getTourData(final Long tourId) {
 
 		if (fTourDataMap.containsKey(tourId)) {
 			return fTourDataMap.get(tourId);
 		}
 
-		TourData tourData = TourDatabase.getTourData(tourId);
+		final TourData tourData = TourDatabase.getTourData(tourId);
 
 		// keep the tour data
 		if (tourData != null) {
@@ -1261,12 +1193,16 @@ public class TourManager {
 		}
 	}
 
-	public void removePropertyListener(ITourPropertyListener listener) {
+	public void removePropertyListener(final ITourPropertyListener listener) {
 		fPropertyListeners.remove(listener);
 	}
 
-	public void removeTourFromCache(Long tourId) {
+	public void removeTourFromCache(final Long tourId) {
 		fTourDataMap.remove(tourId);
+	}
+
+	public void removeAllToursFromCache() {
+		fTourDataMap.values().clear();
 	}
 
 }

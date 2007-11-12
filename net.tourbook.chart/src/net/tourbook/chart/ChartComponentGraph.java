@@ -2803,14 +2803,16 @@ public class ChartComponentGraph extends Canvas {
 
 		if (canScrollZoomedChart == false && fDevGraphImageXOffset > 0) {
 			// calculate the unit offset
-			unitOffset = fDevGraphImageXOffset / devUnitWidth;
+			unitOffset = (int) (fDevGraphImageXOffset / devUnitWidth);
 			devXOffset -= fDevGraphImageXOffset % devUnitWidth;
 		}
+
+		boolean isUnitLabelPrinted = false;
 
 		for (final ChartUnit unit : units) {
 
 			/*
-			 * skipt the units which are not displayed
+			 * skip units which are not displayed
 			 */
 			if (unitCounter < unitOffset) {
 				devXOffset -= devUnitWidth;
@@ -2818,10 +2820,12 @@ public class ChartComponentGraph extends Canvas {
 				continue;
 			}
 
+//			System.out.println(devXUnitTick + " " + unit.valueLabel);
+
 			// dev x-position for the unit tick
 			final int devXUnitTick = devXOffset + (int) (unit.value * scaleX);
 
-			final Point unitTextExtend = gc.textExtent(unit.label);
+			final Point unitValueExtend = gc.textExtent(unit.valueLabel);
 
 			// the first unit is not drawn because it would be clipped at the
 			// left border of the chart canvas
@@ -2837,29 +2841,71 @@ public class ChartComponentGraph extends Canvas {
 						gc.drawLine(devXUnitTick, devY, devXUnitTick, devY + 5);
 					}
 
-					// draw the unit text
+					// draw the unit value
 					if (devUnitWidth != 0 && unitPos == ChartDrawingData.XUNIT_TEXT_POS_CENTER) {
 
-						// draw the unit text between two units
+						// draw the unit value BETWEEN two units
 
-						final int devXUnitCentered = Math.max(0,
-								((devUnitWidth - unitTextExtend.x) / 2) + 0);
+						final int devXUnitCentered = (int) Math.max(0,
+								((devUnitWidth - unitValueExtend.x) / 2) + 0);
 
-						gc.drawText(unit.label, devXUnitTick + devXUnitCentered, devY + 7, true);
+						gc.drawText(unit.valueLabel,
+								devXUnitTick + devXUnitCentered,
+								devY + 7,
+								true);
 
 					} else {
 
-						// draw the unit text in the middle of the unit tick
+						// draw the unit value in the MIDDLE of the unit tick
 
-						if (unitCounter == 0) {
-							// do not center the unit text
-							gc.drawText(unit.label, devXUnitTick, devY + 7, true);
-						} else {
-							// center the unit text
-							gc.drawText(unit.label,
-									devXUnitTick - (unitTextExtend.x / 2),
-									devY + 7,
-									true);
+						/*
+						 * when the chart is zoomed and not scrolled, prevent to clip the text at
+						 * the left border
+						 */
+						final int unitValueExtend2 = unitValueExtend.x / 2;
+						if (unitCounter == 0 || devXUnitTick >= 0) {
+
+							if (unitCounter == 0) {
+
+								// this is the first unit, do not center it
+
+								if (devXUnitTick == 0) {
+
+									gc.drawText(unit.valueLabel, devXUnitTick, devY + 7, true);
+
+									// draw unit label (km, mi, h)
+									if (isUnitLabelPrinted == false) {
+										isUnitLabelPrinted = true;
+										gc.drawText(drawingData.getXData().getUnitLabel(),
+												devXUnitTick + unitValueExtend.x + 2,
+												devY + 7,
+												true);
+									}
+								}
+
+							} else {
+
+								// center the unit text
+
+								if (devXUnitTick - unitValueExtend2 >= 0) {
+
+									gc.drawText(unit.valueLabel,
+											devXUnitTick - unitValueExtend2,
+											devY + 7,
+											true);
+
+									// draw unit label (km, mi, h)
+									if (isUnitLabelPrinted == false) {
+
+										isUnitLabelPrinted = true;
+
+										gc.drawText(drawingData.getXData().getUnitLabel(),
+												devXUnitTick + unitValueExtend2 + 2,
+												devY + 7,
+												true);
+									}
+								}
+							}
 						}
 					}
 				}

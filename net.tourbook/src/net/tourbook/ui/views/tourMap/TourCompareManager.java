@@ -98,7 +98,7 @@ public class TourCompareManager {
 		comparedTour.setTourDate(calendar.getTimeInMillis());
 		comparedTour.setStartYear(tourData.getStartYear());
 
-		float speed = TourManager.computeTourSpeed(tourData.distanceSerie,
+		float speed = TourManager.computeTourSpeed(tourData.getMetricDistanceSerie(),
 				tourData.timeSerie,
 				comparedTourItem.computedStartIndex,
 				comparedTourItem.computedEndIndex);
@@ -301,7 +301,7 @@ public class TourCompareManager {
 		 * normalize the compare tour
 		 */
 		TourDataNormalizer compareTourNormalizer = new TourDataNormalizer();
-		final int[] compareTourDataDistance = compareTourData.distanceSerie;
+		final int[] compareTourDataDistance = compareTourData.getMetricDistanceSerie();
 		final int[] compareTourDataTime = compareTourData.timeSerie;
 
 		// normalize the tour which will be compared
@@ -382,8 +382,8 @@ public class TourCompareManager {
 		}
 
 		// get distance for the reference tour
-		int refDistance = refTourData.distanceSerie[refMeasureEndIndex]
-				- refTourData.distanceSerie[refMeasureStartIndex];
+		final int[] distanceSerie = refTourData.getMetricDistanceSerie();
+		int refDistance = distanceSerie[refMeasureEndIndex] - distanceSerie[refMeasureStartIndex];
 
 		// get the start/end point in the compared tour
 		int compDistanceStart = normCompDistances[normCompareIndexStart];

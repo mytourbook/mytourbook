@@ -47,52 +47,63 @@ import org.xml.sax.SAXException;
 
 public class GarminDeviceDataReader extends TourbookDevice {
 
-	static TimeZone			utc			= TimeZone.getTimeZone("GMT");
+	private static final String	TAG_ACTIVITY		= "Activity";										//$NON-NLS-1$
+	private static final String	TAG_ALTITUDE_METERS	= "AltitudeMeters";								//$NON-NLS-1$
+	private static final String	TAG_COURSE			= "Course";										//$NON-NLS-1$
+	private static final String	TAG_DISTANCE_METERS	= "DistanceMeters";								//$NON-NLS-1$
+	private static final String	TAG_HEART_RATE_BPM	= "HeartRateBpm";									//$NON-NLS-1$
+	private static final String	TAG_LAP				= "Lap";											//$NON-NLS-1$
+	private static final String	TAG_TIME			= "Time";											//$NON-NLS-1$
+	private static final String	TAG_TRACK			= "Track";											//$NON-NLS-1$
+	private static final String	TAG_TRACKPOINT		= "Trackpoint";									//$NON-NLS-1$
+	private static final String	TAG_VALUE			= "Value";											//$NON-NLS-1$
 
-	static DateFormat		iso			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	static TimeZone				utc					= TimeZone.getTimeZone("GMT");						//$NON-NLS-1$
+
+	static DateFormat			iso					= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
+	private final Calendar		fCalendar			= GregorianCalendar.getInstance();
+
 	{
 		iso.setTimeZone(utc);
 	}
-
-	private final Calendar	fCalendar	= GregorianCalendar.getInstance();
 
 	// plugin constructor
 	public GarminDeviceDataReader() {}
 
 	@Override
-	public boolean checkStartSequence(int byteIndex, int newByte) {
+	public boolean checkStartSequence(final int byteIndex, final int newByte) {
 		return true;
 	}
 
-	public String getDeviceModeName(int profileId) {
-		return "";
+	public String getDeviceModeName(final int profileId) {
+		return ""; //$NON-NLS-1$
 	}
 
-	private Document getDOMDocument(String fileName) {
+	private Document getDOMDocument(final String fileName) {
 
 		//get the factory
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
 		try {
 
 			//Using factory get an instance of document builder
-			DocumentBuilder db = dbf.newDocumentBuilder();
+			final DocumentBuilder db = dbf.newDocumentBuilder();
 
 			//parse using builder to get DOM representation of the XML file
-			return db.parse("file:" + fileName);
+			return db.parse("file:" + fileName); //$NON-NLS-1$
 
-		} catch (ParserConfigurationException pce) {
+		} catch (final ParserConfigurationException pce) {
 			pce.printStackTrace();
-		} catch (SAXException se) {
+		} catch (final SAXException se) {
 			se.printStackTrace();
-		} catch (IOException ioe) {
+		} catch (final IOException ioe) {
 			ioe.printStackTrace();
 		}
 
 		return null;
 	}
 
-	private float getFloatValue(Element ele, String tagName) {
+	private float getFloatValue(final Element ele, final String tagName) {
 		//in production application you would catch the exception
 		final String textValue = getTextValue(ele, tagName);
 		if (textValue != null) {
@@ -109,7 +120,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
 	/**
 	 * Calls getTextValue and returns a int value
 	 */
-	private int getIntValue(Element ele, String parentTagName, String tagName) {
+	private int getIntValue(final Element ele, final String parentTagName, final String tagName) {
 		//in production application you would catch the exception
 		final String textValue = getTextValue(ele, parentTagName, tagName);
 		if (textValue != null) {
@@ -120,9 +131,9 @@ public class GarminDeviceDataReader extends TourbookDevice {
 	}
 
 	@Override
-	public SerialParameters getPortParameters(String portName) {
+	public SerialParameters getPortParameters(final String portName) {
 
-		SerialParameters portParameters = new SerialParameters(portName,
+		final SerialParameters portParameters = new SerialParameters(portName,
 				4800,
 				SerialPort.FLOWCONTROL_NONE,
 				SerialPort.FLOWCONTROL_NONE,
@@ -143,13 +154,13 @@ public class GarminDeviceDataReader extends TourbookDevice {
 	 * <employee><name>John</name></employee> xml snippet if
 	 * the Element points to employee node and tagName is 'name' I will return John
 	 */
-	private String getTextValue(Element ele, String tagName) {
+	private String getTextValue(final Element ele, final String tagName) {
 
 		String textValue = null;
-		NodeList nl = ele.getElementsByTagName(tagName);
+		final NodeList nl = ele.getElementsByTagName(tagName);
 
 		if (nl != null && nl.getLength() > 0) {
-			Element el = (Element) nl.item(0);
+			final Element el = (Element) nl.item(0);
 			textValue = el.getFirstChild().getNodeValue();
 		}
 
@@ -161,11 +172,11 @@ public class GarminDeviceDataReader extends TourbookDevice {
 	 * <employee><name>John</name></employee> xml snippet if
 	 * the Element points to employee node and tagName is 'name' I will return John
 	 */
-	private String getTextValue(Element ele, String parentTagName, String tagName) {
+	private String getTextValue(final Element ele, final String parentTagName, final String tagName) {
 
 		String textVal = null;
 
-		NodeList parentNL = ele.getElementsByTagName(parentTagName);
+		final NodeList parentNL = ele.getElementsByTagName(parentTagName);
 
 		if (parentNL != null && parentNL.getLength() > 0) {
 
@@ -183,22 +194,22 @@ public class GarminDeviceDataReader extends TourbookDevice {
 	 * @param tourDataMap
 	 * @return Returns <code>true</code> when the tours are imported
 	 */
-	private boolean getToursV1(	Element docElement,
-								String importFileName,
-								HashMap<String, TourData> tourDataMap) {
+	private boolean getToursV1(	final Element docElement,
+								final String importFileName,
+								final HashMap<String, TourData> tourDataMap) {
 
-		NodeList courseList = docElement.getElementsByTagName("Course");
+		final NodeList courseList = docElement.getElementsByTagName(TAG_COURSE);
 		if (courseList != null && courseList.getLength() > 0) {
 
 			for (int courseIndex = 0; courseIndex < courseList.getLength(); courseIndex++) {
 
-				Element course = (Element) courseList.item(courseIndex);
+				final Element course = (Element) courseList.item(courseIndex);
 
 				// create data object for each tour
-				TourData tourData = new TourData();
+				final TourData tourData = new TourData();
 
 				// create a list which contains all time slices 
-				ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+				final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
 				TimeData timeData;
 
 				int prevAltitude = 0;
@@ -208,31 +219,34 @@ public class GarminDeviceDataReader extends TourbookDevice {
 
 				long tourDateTime = 0;
 
-				NodeList trackList = course.getElementsByTagName("Track");
+				final NodeList trackList = course.getElementsByTagName(TAG_TRACK);
+
 				if (trackList != null && trackList.getLength() > 0) {
 
 					for (int trackIndex = 0; trackIndex < trackList.getLength(); trackIndex++) {
 
-						Element track = (Element) trackList.item(trackIndex);
+						final Element track = (Element) trackList.item(trackIndex);
 
-						NodeList tpList = track.getElementsByTagName("Trackpoint");
+						final NodeList tpList = track.getElementsByTagName(TAG_TRACKPOINT);
 						if (tpList != null && tpList.getLength() > 0) {
 
 							for (int tpIndex = 0; tpIndex < tpList.getLength(); tpIndex++) {
 
-								Element tp = (Element) tpList.item(tpIndex);
+								final Element tp = (Element) tpList.item(tpIndex);
 
 								timeData = new TimeData();
 
-								final int altitude = (int) getFloatValue(tp, "AltitudeMeters");
-								final int distance = (int) getFloatValue(tp, "DistanceMeters");
-								final int pulse = getIntValue(tp, "HeartRateBpm", "Value");
+								final int absoluteAltitude = (int) getFloatValue(tp,
+										TAG_ALTITUDE_METERS);
+								final int distance = (int) getFloatValue(tp, TAG_DISTANCE_METERS);
+								final int pulse = getIntValue(tp, TAG_HEART_RATE_BPM, TAG_VALUE);
 
 								// ignore incomplete values
-								if (altitude != Integer.MIN_VALUE && distance != Integer.MIN_VALUE) {
+								if (absoluteAltitude != Integer.MIN_VALUE
+										&& distance != Integer.MIN_VALUE) {
 
 									try {
-										String xmlTime = getTextValue(tp, "Time");
+										final String xmlTime = getTextValue(tp, TAG_TIME);
 										final Date dtValue = iso.parse(xmlTime);
 										tourTime = dtValue.getTime();
 
@@ -246,17 +260,17 @@ public class GarminDeviceDataReader extends TourbookDevice {
 
 										prevTime = tourTime;
 
-									} catch (ParseException e) {
+									} catch (final ParseException e) {
 										e.printStackTrace();
 									}
 
-									timeData.altitude = (short) (altitude - prevAltitude);
-									timeData.distance = distance - prevDistance;
-									timeData.pulse = (short) (pulse == Integer.MIN_VALUE
-											? 0
-											: pulse);
+									final int altitudeDiff = absoluteAltitude - prevAltitude;
 
-									prevAltitude = altitude;
+									timeData.altitude = (short) (altitudeDiff);
+									timeData.distance = distance - prevDistance;
+									timeData.pulse = (short) pulse;
+
+									prevAltitude = absoluteAltitude;
 									prevDistance = distance;
 
 									timeDataList.add(timeData);
@@ -279,11 +293,11 @@ public class GarminDeviceDataReader extends TourbookDevice {
 	 * @param tourDataMap
 	 * @return Returns <code>true</code> when the tours are imported
 	 */
-	private boolean getToursV2(	Element docElement,
-								String importFileName,
-								HashMap<String, TourData> tourDataMap) {
+	private boolean getToursV2(	final Element docElement,
+								final String importFileName,
+								final HashMap<String, TourData> tourDataMap) {
 
-		NodeList activityList = docElement.getElementsByTagName("Activity");
+		final NodeList activityList = docElement.getElementsByTagName(TAG_ACTIVITY);
 
 		if (activityList == null && activityList.getLength() == 0) {
 			return false;
@@ -291,15 +305,15 @@ public class GarminDeviceDataReader extends TourbookDevice {
 
 		for (int activityIndex = 0; activityIndex < activityList.getLength(); activityIndex++) {
 
-			Element activity = (Element) activityList.item(activityIndex);
+			final Element activity = (Element) activityList.item(activityIndex);
 
-			NodeList lapList = activity.getElementsByTagName("Lap");
+			final NodeList lapList = activity.getElementsByTagName(TAG_LAP);
 
 			// create data object for each tour
-			TourData tourData = new TourData();
+			final TourData tourData = new TourData();
 
 			// create a list which contains all time slices 
-			ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+			final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
 			TimeData timeData;
 
 			int prevAltitude = 0;
@@ -312,26 +326,28 @@ public class GarminDeviceDataReader extends TourbookDevice {
 			if (lapList != null && lapList.getLength() > 0) {
 				for (int lapIndex = 0; lapIndex < lapList.getLength(); lapIndex++) {
 
-					Element lap = (Element) lapList.item(lapIndex);
-					NodeList trackList = lap.getElementsByTagName("Track");
+					final Element lap = (Element) lapList.item(lapIndex);
+					final NodeList trackList = lap.getElementsByTagName(TAG_TRACK);
 
 					if (trackList != null && trackList.getLength() > 0) {
 						for (int trackIndex = 0; trackIndex < trackList.getLength(); trackIndex++) {
 
-							Element track = (Element) trackList.item(trackIndex);
+							final Element track = (Element) trackList.item(trackIndex);
 
-							NodeList tpList = track.getElementsByTagName("Trackpoint");
+							final NodeList tpList = track.getElementsByTagName(TAG_TRACKPOINT);
 
 							if (tpList != null && tpList.getLength() > 0) {
 								for (int tpIndex = 0; tpIndex < tpList.getLength(); tpIndex++) {
 
-									Element tp = (Element) tpList.item(tpIndex);
+									final Element tp = (Element) tpList.item(tpIndex);
 
 									timeData = new TimeData();
 
-									final int altitude = (int) getFloatValue(tp, "AltitudeMeters");
-									final int distance = (int) getFloatValue(tp, "DistanceMeters");
-									final int pulse = getIntValue(tp, "HeartRateBpm", "Value");
+									final int altitude = (int) getFloatValue(tp,
+											TAG_ALTITUDE_METERS);
+									final int distance = (int) getFloatValue(tp,
+											TAG_DISTANCE_METERS);
+									final int pulse = getIntValue(tp, TAG_HEART_RATE_BPM, TAG_VALUE);
 
 									// ignore incomplete values
 									if (altitude != Integer.MIN_VALUE
@@ -339,7 +355,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
 											&& pulse != Integer.MIN_VALUE) {
 
 										try {
-											String xmlTime = getTextValue(tp, "Time");
+											final String xmlTime = getTextValue(tp, TAG_TIME);
 											final Date dtValue = iso.parse(xmlTime);
 											tourTime = dtValue.getTime();
 
@@ -353,13 +369,15 @@ public class GarminDeviceDataReader extends TourbookDevice {
 
 											prevTime = tourTime;
 
-										} catch (ParseException e) {
+										} catch (final ParseException e) {
 											e.printStackTrace();
 										}
 
-										timeData.altitude = (short) (altitude - prevAltitude);
+										timeData.altitude = (short) ((altitude - prevAltitude));
 										timeData.distance = distance - prevDistance;
-										timeData.pulse = (short) pulse;
+										timeData.pulse = (short) (pulse == Integer.MIN_VALUE
+												? 0
+												: pulse);
 
 										prevAltitude = altitude;
 										prevDistance = distance;
@@ -379,21 +397,70 @@ public class GarminDeviceDataReader extends TourbookDevice {
 		return true;
 	}
 
-	private int getVersion(Element docEle) {
+	/**
+	 */
+	private void computeAltitudeUpDown(TourData tourData) {
 
-		NamedNodeMap docAttributes = docEle.getAttributes();
+		final int[] timeSerie = tourData.timeSerie;
+		final int[] altitudeSerie = tourData.altitudeSerie;
+
+		final int serieLength = timeSerie.length;
+
+		if (serieLength == 0) {
+			return;
+		}
+
+		int lastTime = 0;
+		int currentAltitude = altitudeSerie[0];
+		int lastAltitude = currentAltitude;
+
+		int altitudeUp = 0;
+		int altitudeDown = 0;
+
+		int minTimeInterval = 1;
+
+		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
+
+			final int currentTime = timeSerie[timeIndex];
+
+			int timeDiff = currentTime - lastTime;
+
+			currentAltitude = altitudeSerie[timeIndex];
+
+			if (timeDiff >= minTimeInterval) {
+
+				int altitudeDiff = lastAltitude - currentAltitude;
+
+				if (altitudeDiff < 0) {
+					altitudeUp += altitudeDiff;
+				} else {
+					altitudeDown += altitudeDiff;
+				}
+
+				lastTime = currentTime;
+				lastAltitude = currentAltitude;
+			}
+		}
+
+		tourData.setTourAltUp(altitudeUp);
+		tourData.setTourAltDown(altitudeDown);
+	}
+
+	private int getVersion(final Element docEle) {
+
+		final NamedNodeMap docAttributes = docEle.getAttributes();
 		if (docAttributes == null) {
 			return -1;
 		}
 
 		for (int attrIndex = 0; attrIndex < docAttributes.getLength(); attrIndex++) {
-			Node attribute = docAttributes.item(attrIndex);
+			final Node attribute = docAttributes.item(attrIndex);
 
-			if (attribute.getNodeName().equalsIgnoreCase("xmlns")) {
-				String nodeValue = attribute.getNodeValue();
-				if (nodeValue.equalsIgnoreCase("http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1")) {
+			if (attribute.getNodeName().equalsIgnoreCase("xmlns")) { //$NON-NLS-1$
+				final String nodeValue = attribute.getNodeValue();
+				if (nodeValue.equalsIgnoreCase("http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1")) { //$NON-NLS-1$
 					return 1;
-				} else if (nodeValue.equalsIgnoreCase("http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2")) {
+				} else if (nodeValue.equalsIgnoreCase("http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2")) { //$NON-NLS-1$
 					return 2;
 				}
 			}
@@ -402,14 +469,14 @@ public class GarminDeviceDataReader extends TourbookDevice {
 		return -1;
 	}
 
-	private void parseDocument(	Document domDocument,
-								String importFileName,
-								HashMap<String, TourData> tourDataMap) {
+	private void parseDocument(	final Document domDocument,
+								final String importFileName,
+								final HashMap<String, TourData> tourDataMap) {
 
 		//get the root element
-		Element docElement = domDocument.getDocumentElement();
+		final Element docElement = domDocument.getDocumentElement();
 
-		int version = getVersion(docElement);
+		final int version = getVersion(docElement);
 		if (version == -1) {
 			return;
 		}
@@ -429,9 +496,9 @@ public class GarminDeviceDataReader extends TourbookDevice {
 
 	}
 
-	public boolean processDeviceData(	String importFileName,
-										DeviceData deviceData,
-										HashMap<String, TourData> tourDataMap) {
+	public boolean processDeviceData(	final String importFileName,
+										final DeviceData deviceData,
+										final HashMap<String, TourData> tourDataMap) {
 
 		final Document domDocument = getDOMDocument(importFileName);
 		if (domDocument == null) {
@@ -443,11 +510,11 @@ public class GarminDeviceDataReader extends TourbookDevice {
 		return true;
 	}
 
-	private void setTourData(	String importFileName,
-								HashMap<String, TourData> tourDataMap,
-								TourData tourData,
-								ArrayList<TimeData> timeDataList,
-								long tourDateTime) {
+	private void setTourData(	final String importFileName,
+								final HashMap<String, TourData> tourDataMap,
+								final TourData tourData,
+								final ArrayList<TimeData> timeDataList,
+								final long tourDateTime) {
 
 		if (timeDataList.size() == 0) {
 			return;
@@ -464,23 +531,21 @@ public class GarminDeviceDataReader extends TourbookDevice {
 		tourData.setStartYear((short) fCalendar.get(Calendar.YEAR));
 		tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 
-		short timeInterval = 7;
-		tourData.setDeviceTimeInterval(timeInterval);
-
-		tourData.setTourAltUp(10);
-		tourData.setTourAltDown(30);
+		tourData.setDeviceTimeInterval((short) -1);
 
 		tourData.importRawDataFile = importFileName;
 
 		tourData.createTimeSeries(timeDataList, true);
 
+		computeAltitudeUpDown(tourData);
+
 		// after all data are added, the tour id can be created
-		int[] distance = tourData.distanceSerie;
+		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
-		if (distance == null) {
+		if (distanceSerie == null) {
 			uniqueKey = "42984";
 		} else {
-			uniqueKey = Integer.toString(distance[distance.length - 1]);
+			uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
 		}
 		tourData.createTourId(uniqueKey);
 
@@ -499,7 +564,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
 		}
 	}
 
-	public boolean validateRawData(String fileName) {
+	public boolean validateRawData(final String fileName) {
 		return true;
 	}
 }

@@ -21,16 +21,14 @@
 
 package net.tourbook.chart;
 
-
 public class ChartUnit {
 
-	String	label;
+	String	valueLabel;
 	int		value;
 
+	public ChartUnit(int value, String valueLabel) {
 
-	public ChartUnit(int unitPos, String unitLabel) {
-
-		this.value = unitPos;
-		this.label = unitLabel;
+		this.value = value;
+		this.valueLabel = valueLabel;
 	}
 }

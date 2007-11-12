@@ -84,8 +84,8 @@ public class RefTourInfo extends Composite {
 		int startValueIndex = refTour.getStartValueIndex();
 		int endValueIndex = refTour.getEndValueIndex();
 
-		int distance = refTourData.distanceSerie[endValueIndex]
-				- refTourData.distanceSerie[startValueIndex];
+		final int[] distanceSerie = refTourData.getDistanceSerie();
+		int distance = distanceSerie[endValueIndex] - distanceSerie[startValueIndex];
 
 		nf.setMinimumFractionDigits(2);
 		txtDistance.setText(nf.format((float) distance / 1000));

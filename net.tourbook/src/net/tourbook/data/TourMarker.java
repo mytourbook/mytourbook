@@ -60,6 +60,10 @@ public class TourMarker {
 	private int						type;
 
 	private int						time;
+
+	/**
+	 * distance in metric system
+	 */
 	private int						distance;
 
 	private int						visualPosition;
@@ -81,11 +85,11 @@ public class TourMarker {
 	private String					category				= "";	//$NON-NLS-1$
 
 	/**
-	 * visibleType is used to show the marker with different visible effects (color) 
+	 * visibleType is used to show the marker with different visible effects (color)
 	 */
 	@Transient
-	private int visibleType;
-	
+	private int						visibleType;
+
 	public TourMarker() {}
 
 	public TourMarker(TourData tourData, int markerType) {
@@ -136,6 +140,9 @@ public class TourMarker {
 		return category;
 	}
 
+	/**
+	 * @return Returns the distance of the marker in metric system
+	 */
 	public int getDistance() {
 		return distance;
 	}
@@ -203,6 +210,11 @@ public class TourMarker {
 		this.category = category;
 	}
 
+	/**
+	 * Sets the distance with the metric system
+	 * 
+	 * @param distance
+	 */
 	public void setDistance(int distance) {
 		this.distance = distance;
 	}

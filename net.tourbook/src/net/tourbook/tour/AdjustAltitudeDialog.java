@@ -219,7 +219,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	private void adjustEndAltitude(int[] altiSrc, TourData tourData, int newEndAlti) {
 
 		int[] altiDest = tourData.altitudeSerie;
-		int[] distanceSerie = tourData.distanceSerie;
+		int[] distanceSerie = tourData.getDistanceSerie();
 
 		int altiEndDiff = newEndAlti - altiSrc[altiDest.length - 1];
 		float tourDistance = distanceSerie[distanceSerie.length - 1];
@@ -656,7 +656,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		return fDialogArea;
 	}
 
-	@SuppressWarnings("unused") //$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private void dumpMinMax(int[] altiSrc, String place) {
 
 		int minAltiSrc1 = altiSrc[0];

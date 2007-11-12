@@ -272,11 +272,6 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 						// adjust altitude from relative to absolute
 						totalAltitude += timeData.altitude;
-
-						tourData.setTourAltUp(tourData.getTourAltUp()
-								+ ((timeData.altitude > 0) ? timeData.altitude : 0));
-						tourData.setTourAltDown(tourData.getTourAltDown()
-								+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
 					}
 
 					// check if the last record was read

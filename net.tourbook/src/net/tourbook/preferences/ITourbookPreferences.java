@@ -22,8 +22,12 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	DUMMY_FIELD								= "";											//$NON-NLS-1$
 
-	// hidden preferences
-	public static final String	LAST_RAW_DATA_FILE_PATH					= "data.lastRawDataFilePath";					//$NON-NLS-1$
+	/*
+	 * general page
+	 */
+	public static final String	MEASUREMENT_SYSTEM						= "system.of.measurement";						//$NON-NLS-1$
+	public static final String	MEASUREMENT_SYSTEM_METRIC				= "metric";									//$NON-NLS-1$
+	public static final String	MEASUREMENT_SYSTEM_IMPERIAL				= "imperial";									//$NON-NLS-1$
 
 	/*
 	 * statistics where the units can be set in the preferences
