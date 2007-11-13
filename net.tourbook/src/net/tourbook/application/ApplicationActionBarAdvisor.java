@@ -16,6 +16,8 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -44,24 +46,25 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	private IWorkbenchAction	fActionSave;
-	private IWorkbenchAction	fActionSaveAll;
+	private IWorkbenchAction					fActionSave;
+	private IWorkbenchAction					fActionSaveAll;
 
-	private IContributionItem	fActionViewShortList;
-	private IWorkbenchAction	fActionPreferences;
+	private IContributionItem					fActionViewShortList;
+	private IWorkbenchAction					fActionPreferences;
 
-	PersonContributionItem		personSelector;
-	TourTypeContributionItem	tourTypeSelector;
+	PersonContributionItem						personSelector;
+	TourTypeContributionItem					tourTypeSelector;
+	private MeasurementSystemContributionItem	measurementSelector;
 
-	private IWorkbenchAction	fActionAbout;
-	private IWorkbenchAction	fActionQuit;
+	private IWorkbenchAction					fActionAbout;
+	private IWorkbenchAction					fActionQuit;
 
-	private IWorkbenchAction	savePerspectiveAction;
-	private IWorkbenchAction	resetPerspectiveAction;
-	private IWorkbenchAction	closePerspAction;
-	private IWorkbenchAction	closeAllPerspsAction;
-	private IWorkbenchAction	editActionSetAction;
-	private IWorkbenchWindow	fWindow;
+	private IWorkbenchAction					savePerspectiveAction;
+	private IWorkbenchAction					resetPerspectiveAction;
+	private IWorkbenchAction					closePerspAction;
+	private IWorkbenchAction					closeAllPerspsAction;
+	private IWorkbenchAction					editActionSetAction;
+	private IWorkbenchWindow					fWindow;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -180,6 +183,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		// ---------------------------------------------------------
 
+		if (TourbookPlugin.getDefault()
+				.getPreferenceStore()
+				.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI)) {
+
+			IToolBarManager tbmSystem = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+			tbmSystem.add(measurementSelector);
+
+			coolBar.add(new ToolBarContributionItem(tbmSystem, "measurementSystem")); //$NON-NLS-1$
+		}
+
+		// ---------------------------------------------------------
+
 		IToolBarManager tbmSave = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 		tbmSave.add(fActionSave);
 		tbmSave.add(fActionSaveAll);
@@ -241,6 +256,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		personSelector = new PersonContributionItem();
 		tourTypeSelector = new TourTypeContributionItem();
+		measurementSelector = new MeasurementSystemContributionItem();
 
 		fActionQuit = ActionFactory.QUIT.create(window);
 		register(fActionQuit);

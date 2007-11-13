@@ -25,6 +25,8 @@ import net.tourbook.Messages;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.ColumnManager;
+import net.tourbook.ui.ITourViewer;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.TreeColumnLayout;
@@ -71,7 +73,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourMapView extends ViewPart {
+public class TourMapView extends ViewPart implements ITourViewer {
 
 	private static final String			MEMENTO_TOUR_MAP_ACTIVE_REF_ID	= "tour.map.active.ref.id";				//$NON-NLS-1$
 	private static final String			MEMENTO_TOUR_MAP_LINK_TOUR		= "tour.map.link.tour";					//$NON-NLS-1$
@@ -450,7 +452,7 @@ public class TourMapView extends ViewPart {
 		fActionRenameRefTour = new ActionRenameRefTour(this);
 		fActionLinkTour = new ActionLinkTour(this);
 		fActionRefreshView = new ActionRefreshView(this);
-		fActionCollapseAll = new ActionCollapseAll(fTourViewer);
+		fActionCollapseAll = new ActionCollapseAll(this);
 	}
 
 	/**
@@ -659,7 +661,15 @@ public class TourMapView extends ViewPart {
 		tbm.update(true);
 	}
 
+	public ColumnManager getColumnManager() {
+		return null;
+	}
+
 	public TreeViewer getTourViewer() {
+		return fTourViewer;
+	}
+
+	public TreeViewer getTreeViewer() {
 		return fTourViewer;
 	}
 

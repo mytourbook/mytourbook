@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.TreeColumn;
  */
 public class ColumnManager {
 
-	private IAdaptable					fviewerAdapter;
+	private IAdaptable					fViewerAdapter;
 
 	/**
 	 * contains the column definitions in the sort order of the table/tree
@@ -50,7 +50,7 @@ public class ColumnManager {
 	private int							columnCreateIndex	= 0;
 
 	public ColumnManager(IAdaptable viewerAdapter) {
-		fviewerAdapter = viewerAdapter;
+		fViewerAdapter = viewerAdapter;
 	}
 
 	protected void addColumn(final ColumnDefinition colDef) {
@@ -63,7 +63,7 @@ public class ColumnManager {
 	 */
 	public void createColumns() {
 
-		Object adapter = fviewerAdapter.getAdapter(ColumnViewer.class);
+		Object adapter = fViewerAdapter.getAdapter(ColumnViewer.class);
 
 		if (adapter instanceof TableViewer) {
 
@@ -184,7 +184,7 @@ public class ColumnManager {
 			tc.addSelectionListener(columnSelectionListener);
 		}
 
-		System.out.println("create column: " + tc);
+//		System.out.println("create column: " + tc);
 	}
 
 	/**
@@ -224,7 +224,7 @@ public class ColumnManager {
 
 		ArrayList<String> columnIds = new ArrayList<String>();
 
-		Object adapter = fviewerAdapter.getAdapter(ColumnViewer.class);
+		Object adapter = fViewerAdapter.getAdapter(ColumnViewer.class);
 
 		if (adapter instanceof TableViewer) {
 
@@ -395,7 +395,7 @@ public class ColumnManager {
 			columnOrder[columnIdx++] = colDef.getCreateIndex();
 		}
 
-		Object adapter = fviewerAdapter.getAdapter(ColumnViewer.class);
+		Object adapter = fViewerAdapter.getAdapter(ColumnViewer.class);
 
 		if (adapter instanceof TableViewer) {
 			((TableViewer) adapter).getTable().setColumnOrder(columnOrder);
@@ -414,7 +414,7 @@ public class ColumnManager {
 
 		int[] columnOrder = null;
 
-		Object adapter = fviewerAdapter.getAdapter(ColumnViewer.class);
+		Object adapter = fViewerAdapter.getAdapter(ColumnViewer.class);
 
 		if (adapter instanceof TableViewer) {
 			columnOrder = ((TableViewer) adapter).getTable().getColumnOrder();
@@ -444,7 +444,7 @@ public class ColumnManager {
 
 					final TreeColumn treeColumn = ((TreeColumnDefinition) colDef).getTreeColumn();
 
-					System.out.println("read column: " + treeColumn);
+//					System.out.println("read column: " + treeColumn);
 					final int columnWidth = treeColumn.getWidth();
 
 					if (columnWidth > 0) {

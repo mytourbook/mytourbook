@@ -271,6 +271,8 @@ public class TourData {
 
 	@Transient
 	public int[]				temperatureSerie;
+	@Transient
+	public int[]				temperatureSerieImperial;
 
 	/*
 	 * computed data series
@@ -285,6 +287,8 @@ public class TourData {
 
 	@Transient
 	public int[]				altimeterSerie;
+	@Transient
+	public int[]				altimeterSerieImperial;
 
 	@Transient
 	public int[]				gradientSerie;
@@ -350,11 +354,15 @@ public class TourData {
 	public TourData() {}
 
 	/**
-	 * remove speed data series so the next time when they are used they will recomputed
+	 * clear computed data series
 	 */
-	public void cleanSpeedSerie() {
+	public void cleanComputedSeries() {
+
 		speedSerie = null;
 		speedSerieImperial = null;
+
+		altimeterSerie = null;
+		altimeterSerieImperial = null;
 	}
 
 	public void computeAvgCadence() {
@@ -408,6 +416,100 @@ public class TourData {
 		if (tempLength > 0) {
 			avgTemperature = (int) temperatureSum / tempLength;
 		}
+	}
+
+	/**
+	 * Computes the data serie for altimeters with the internal algorithm for a fix time interval
+	 */
+	public void computeGradientSerie() {
+
+//		final float altitudeMeasurementFactor = UI.UNIT_VALUE_ALTITUDE;
+
+		final int serieLength = timeSerie.length;
+
+		final int dataSerieAltimeter[] = new int[serieLength];
+		final int dataSerieGradient[] = new int[serieLength];
+
+		final int deviceTimeInterval = getDeviceTimeInterval();
+		int indexLowAdjustment;
+		int indexHighAdjustment;
+
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_COMPUTE_VALUE)) {
+
+			// use custom settings to compute altimeter and gradient
+
+			final int computeTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE);
+			final int slices = computeTimeSlice / deviceTimeInterval;
+
+			indexHighAdjustment = Math.max(1, slices / 2);
+			indexLowAdjustment = slices / 2;
+
+			// round up
+			if (indexLowAdjustment + indexHighAdjustment < slices) {
+				indexHighAdjustment++;
+			}
+
+		} else {
+
+			// use internal algorithm to compute altimeter and gradient
+
+			if (deviceTimeInterval <= 2) {
+				indexLowAdjustment = 15;
+				indexHighAdjustment = 15;
+
+			} else if (deviceTimeInterval <= 5) {
+				indexLowAdjustment = 5;
+				indexHighAdjustment = 6;
+
+			} else if (deviceTimeInterval <= 10) {
+				indexLowAdjustment = 2;
+				indexHighAdjustment = 3;
+			} else {
+				indexLowAdjustment = 1;
+				indexHighAdjustment = 2;
+			}
+		}
+
+		/*
+		 * compute values
+		 */
+
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			// adjust index to the array size
+			final int indexLow = Math.min(Math.max(0, serieIndex - indexLowAdjustment),
+					serieLength - 1);
+			final int indexHigh = Math.max(0, Math.min(serieIndex + indexHighAdjustment,
+					serieLength - 1));
+
+			final int distance = distanceSerie[indexHigh] - distanceSerie[indexLow];
+			final int altitude = altitudeSerie[indexHigh] - altitudeSerie[indexLow];
+
+			final float timeInterval = deviceTimeInterval * (indexHigh - indexLow);
+
+			// keep altimeter data
+			dataSerieAltimeter[serieIndex] = (int) (3600F * altitude / timeInterval / UI.UNIT_VALUE_ALTITUDE);
+
+			// keep gradient data
+			dataSerieGradient[serieIndex] = distance == 0 ? 0 : altitude * 1000 / distance;
+		}
+
+		if (UI.UNIT_VALUE_ALTITUDE != 1) {
+
+			// set imperial system
+
+			altimeterSerieImperial = dataSerieAltimeter;
+
+		} else {
+
+			// set metric system
+
+			altimeterSerie = dataSerieAltimeter;
+		}
+
+		gradientSerie = dataSerieGradient;
 	}
 
 	public void computeMaxAltitude() {
@@ -1030,6 +1132,28 @@ public class TourData {
 				&& this.getTourRecordingTime() == td.getTourRecordingTime();
 	}
 
+	public int[] getAltimeterSerie() {
+
+		if (UI.UNIT_VALUE_ALTITUDE != 1) {
+
+			// use imperial system
+
+			if (altimeterSerieImperial == null) {
+				computeGradientSerie();
+			}
+			return altimeterSerieImperial;
+
+		} else {
+
+			// use metric system
+
+			if (altimeterSerie == null) {
+				computeGradientSerie();
+			}
+			return altimeterSerie;
+		}
+	}
+
 	/**
 	 * @return the avgCadence
 	 */
@@ -1246,6 +1370,41 @@ public class TourData {
 
 	public short getStartYear() {
 		return startYear;
+	}
+
+	public int[] getTemperatureSerie() {
+
+		int[] serie;
+
+		final float unitValueTempterature = UI.UNIT_VALUE_TEMPERATURE;
+		float fahrenheitMulti = UI.UNIT_FAHRENHEIT_MULTI;
+		float fahrenheitAdd = UI.UNIT_FAHRENHEIT_ADD;
+
+		if (unitValueTempterature != 1) {
+
+			// use imperial system
+
+			if (temperatureSerieImperial == null) {
+
+				// compute imperial data
+
+				temperatureSerieImperial = new int[temperatureSerie.length];
+
+				for (int valueIndex = 0; valueIndex < temperatureSerie.length; valueIndex++) {
+					temperatureSerieImperial[valueIndex] = (int) (temperatureSerie[valueIndex]
+							* fahrenheitMulti + fahrenheitAdd);
+				}
+			}
+			serie = temperatureSerieImperial;
+
+		} else {
+
+			// use metric system
+
+			serie = temperatureSerie;
+		}
+
+		return serie;
 	}
 
 	public int getTourAltDown() {
@@ -1533,6 +1692,11 @@ public class TourData {
 		this.maxPulse = maxPulse;
 	}
 
+/*
+ * private int maxAltitude; private int maxPulse; private int avgPulse; private int avgCadence;
+ * private int avgTemperature; private float maxSpeed;
+ */
+
 	/**
 	 * @param maxSpeed
 	 *        the maxSpeed to set
@@ -1544,11 +1708,6 @@ public class TourData {
 	public void setSerieData(SerieData serieData) {
 		this.serieData = serieData;
 	}
-
-/*
- * private int maxAltitude; private int maxPulse; private int avgPulse; private int avgCadence;
- * private int avgTemperature; private float maxSpeed;
- */
 
 	public void setStartAltitude(short startAltitude) {
 		this.startAltitude = startAltitude;

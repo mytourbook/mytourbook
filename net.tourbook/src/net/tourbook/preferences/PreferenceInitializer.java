@@ -41,8 +41,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * general
 		 */
-		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM,
-				ITourbookPreferences.MEASUREMENT_SYSTEM_METRIC);
+		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
+				ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
+
+		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
+				ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M);
+
+		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
+				ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
+
+		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, true);
 
 		/*
 		 * statistics

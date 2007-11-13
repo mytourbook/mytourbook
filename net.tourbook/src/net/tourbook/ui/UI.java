@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,46 +54,66 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 public class UI {
 
+	private static final String				TOUR_TYPE_PREFIX				= "tourType";									//$NON-NLS-1$
+
 	/*
 	 * labels for the different measurement systems
 	 */
-	private static final String				UNIT_ALTITUDE_M					= "m";							//$NON-NLS-1$
-	private static final String				UNIT_DISTANCE_KM				= "km";						//$NON-NLS-1$
-	private static final String				UNIT_SPEED_KM_H					= "km/h";						//$NON-NLS-1$
+	private static final String				UNIT_ALTITUDE_M					= "m";											//$NON-NLS-1$
+	public static final String				UNIT_DISTANCE_KM				= "km";										//$NON-NLS-1$
+	private static final String				UNIT_SPEED_KM_H					= "km/h";										//$NON-NLS-1$
+	private static final String				UNIT_FAHRENHEIT_C				= "°C";										//$NON-NLS-1$
+	private static final String				UNIT_ALTIMETER_M_H				= "m/h";										//$NON-NLS-1$
 
-	private static final String				UNIT_ALTITUDE_FT				= "ft";						//$NON-NLS-1$
-	private static final String				UNIT_DISTANCE_MI				= "mi";						//$NON-NLS-1$
-	private static final String				UNIT_SPEED_MPH					= "mph";						//$NON-NLS-1$
+	private static final String				UNIT_ALTITUDE_FT				= "ft";										//$NON-NLS-1$
+	public static final String				UNIT_DISTANCE_MI				= "mi";										//$NON-NLS-1$
+	private static final String				UNIT_SPEED_MPH					= "mph";										//$NON-NLS-1$
+	private static final String				UNIT_FAHRENHEIT_F				= "°F";										//$NON-NLS-1$
+	private static final String				UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
 
-	private static final String				TOUR_TYPE_PREFIX				= "tourType";					//$NON-NLS-1$
-
-	public static final float				UNIT_MILE						= 1.609344f;
-	public static final float				UNIT_FOOT						= 0.3048f;
+	private static final float				UNIT_MILE						= 1.609344f;
+	private static final float				UNIT_FOOT						= 0.3048f;
 
 	/**
-	 * contains the system of measurement value for distances relative to the metric system which is
-	 * the value <code>1</code>
+	 * contains the system of measurement value for distances relative to the metric system, the
+	 * metric systemis <code>1</code>
 	 */
 	public static float						UNIT_VALUE_DISTANCE				= 1;
+
 	/**
-	 * contains the system of measurement value for altitudes relative to the metric system which is
-	 * the value <code>1</code>
+	 * contains the system of measurement value for altitudes relative to the metric system, the
+	 * metric system is <code>1</code>
 	 */
 	public static float						UNIT_VALUE_ALTITUDE				= 1;
 
+	/**
+	 * contains the system of measurement value for the temperature, is set to <code>1</code> for
+	 * the metric system
+	 */
+	public static float						UNIT_VALUE_TEMPERATURE			= 1;
+
+	// (°C × 9/5) + 32 = °F
+	public static final float				UNIT_FAHRENHEIT_MULTI			= 1.8f;
+	public static final float				UNIT_FAHRENHEIT_ADD				= 32;
+
 	public static String					UNIT_LABEL_DISTANCE;
 	public static String					UNIT_LABEL_ALTITUDE;
+	public static String					UNIT_LABEL_ALTIMETER;
+	public static String					UNIT_LABEL_FAHRENHEIT;
 	public static String					UNIT_LABEL_SPEED;
 
 	public final static ImageRegistry		IMAGE_REGISTRY;
 
-	public static final String				IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";			//$NON-NLS-1$
-	public static final String				IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";	//$NON-NLS-1$
+	public static final String				IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";							//$NON-NLS-1$
+	public static final String				IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";					//$NON-NLS-1$
 
 	private static final int				TOUR_TYPE_IMAGE_WIDTH			= 16;
 	private static final int				TOUR_TYPE_IMAGE_HEIGHT			= 16;
 
 	private static UI						instance;
+
+	public static final DateFormat			TimeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
+	public static final DateFormat			DateFormatter					= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
 
@@ -270,16 +291,16 @@ public class UI {
 
 		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-		if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM)
-				.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_IMPERIAL)) {
+		/*
+		 * distance
+		 */
+		if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE)
+				.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
 
 			// set imperial measure system
 
 			UNIT_VALUE_DISTANCE = UNIT_MILE;
-			UNIT_VALUE_ALTITUDE = UNIT_FOOT;
-
 			UNIT_LABEL_DISTANCE = UNIT_DISTANCE_MI;
-			UNIT_LABEL_ALTITUDE = UNIT_ALTITUDE_FT;
 			UNIT_LABEL_SPEED = UNIT_SPEED_MPH;
 
 		} else {
@@ -287,11 +308,48 @@ public class UI {
 			// default is the metric measure system
 
 			UNIT_VALUE_DISTANCE = 1;
-			UNIT_VALUE_ALTITUDE = 1;
-
 			UNIT_LABEL_DISTANCE = UNIT_DISTANCE_KM;
-			UNIT_LABEL_ALTITUDE = UNIT_ALTITUDE_M;
 			UNIT_LABEL_SPEED = UNIT_SPEED_KM_H;
+		}
+
+		/*
+		 * altitude
+		 */
+		if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE)
+				.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT)) {
+
+			// set imperial measure system
+
+			UNIT_VALUE_ALTITUDE = UNIT_FOOT;
+			UNIT_LABEL_ALTITUDE = UNIT_ALTITUDE_FT;
+			UNIT_LABEL_ALTIMETER = UNIT_ALTIMETER_FT_H;
+
+		} else {
+
+			// default is the metric measure system
+
+			UNIT_VALUE_ALTITUDE = 1;
+			UNIT_LABEL_ALTITUDE = UNIT_ALTITUDE_M;
+			UNIT_LABEL_ALTIMETER = UNIT_ALTIMETER_M_H;
+		}
+
+		/*
+		 * temperature
+		 */
+		if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE)
+				.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F)) {
+
+			// set imperial measure system
+
+			UNIT_VALUE_TEMPERATURE = UNIT_FAHRENHEIT_ADD;
+			UNIT_LABEL_FAHRENHEIT = UNIT_FAHRENHEIT_F;
+
+		} else {
+
+			// default is the metric measure system
+
+			UNIT_VALUE_TEMPERATURE = 1;
+			UNIT_LABEL_FAHRENHEIT = UNIT_FAHRENHEIT_C;
 		}
 	}
 

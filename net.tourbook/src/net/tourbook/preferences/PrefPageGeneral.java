@@ -18,51 +18,31 @@ package net.tourbook.preferences;
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	private RadioGroupFieldEditor	fEditorSystemOfMeasurement;
-
-//	private Button	fRadioMetric;
-//	private Button	fRadioImperial;
-
-	@Override
-	protected Control createContents(Composite parent) {
-
-		Control container = createUI(parent);
-
-		return container;
-	}
-
-	private Control createUI(Composite parent) {
-
-		Control container = super.createContents(parent);
-
-//		Point margins = LayoutConstants.getMargins();
+//	@Override
+//	protected Control createContents(Composite parent) {
 //
-//		Composite container = new Composite(parent, SWT.NONE);
-//		GridLayoutFactory.fillDefaults().applyTo(container);
+//		Control container = createUI(parent);
 //
-//		Group group = new Group(container, SWT.NONE);
-//		group.setText("System of Measurement");
-//		GridLayoutFactory.fillDefaults().margins(margins).applyTo(group);
+//		return container;
+//	}
 //
-//		fRadioMetric = new Button(group, SWT.RADIO);
-//		fRadioMetric.setText("Metric Units");
-//		fRadioMetric.setToolTipText("m, km");
+//	private Control createUI(Composite parent) {
 //
-//		fRadioImperial = new Button(group, SWT.RADIO);
-//		fRadioImperial.setText("Imperial Units");
-//		fRadioImperial.setToolTipText("feet, miles");
-
-		return container;
-	}
+//		Control container = super.createContents(parent);
+//
+//		return container;
+//	}
 
 	public void init(IWorkbench workbench) {
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
@@ -71,18 +51,59 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	@Override
 	protected void createFieldEditors() {
 
-		fEditorSystemOfMeasurement = new RadioGroupFieldEditor(ITourbookPreferences.MEASUREMENT_SYSTEM,
-				Messages.Pref_general_system_of_measurement,
-				1,
-				new String[][] {
-						new String[] { Messages.Pref_general_metric_units,//"Metric Units (m, km)",
-								ITourbookPreferences.MEASUREMENT_SYSTEM_METRIC },
-						new String[] { Messages.Pref_general_metric_imperial,//"Imperial Units (feet, mile)",
-								ITourbookPreferences.MEASUREMENT_SYSTEM_IMPERIAL }, },
-				getFieldEditorParent(),
-				true);
+		final Composite parent = getFieldEditorParent();
+//
+//		Group group = new Group(parent, SWT.NONE);
+//		group.setText(Messages.Pref_general_system_of_measurement);
+////		GridLayoutFactory.fillDefaults().applyTo(group);
+//		GridDataFactory.fillDefaults().applyTo(group);
 
-		addField(fEditorSystemOfMeasurement);
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Pref_general_system_measurement);
+
+		addField(new RadioGroupFieldEditor(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
+				Messages.Pref_general_system_distance,
+				2,
+				new String[][] {
+						new String[] {
+								Messages.Pref_general_metric_unit_km,
+								ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM },
+						new String[] {
+								Messages.Pref_general_imperial_unit_mi,
+								ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI }, },
+				parent,
+				true));
+
+		addField(new RadioGroupFieldEditor(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
+				Messages.Pref_general_system_altitude,
+				2,
+				new String[][] {
+						new String[] {
+								Messages.Pref_general_metric_unit_m,
+								ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M },
+						new String[] {
+								Messages.Pref_general_imperial_unit_feet,
+								ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT }, },
+				parent,
+				true));
+
+		addField(new RadioGroupFieldEditor(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
+				Messages.Pref_general_system_temperature,
+				2,
+				new String[][] {
+						new String[] {
+								Messages.Pref_general_metric_unit_celcius,
+								ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C },
+						new String[] {
+								Messages.Pref_general_imperial_unit_fahrenheit,
+								ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F }, },
+				parent,
+				true));
+
+		BooleanFieldEditor showInUI = new BooleanFieldEditor(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI,
+				Messages.Pref_general_show_system_in_ui,
+				parent);
+		addField(showInUI);
 
 //		fEditorSystemOfMeasurement.setPropertyChangeListener(new IPropertyChangeListener() {
 //			public void propertyChange(PropertyChangeEvent event) {
@@ -94,16 +115,19 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 //		});
 	}
 
-//	@Override
-//	public boolean performOk() {
-//
-//		final boolean isOK = super.performOk();
-//
-//		if (isOK) {
-//			UI.setUnits();
-//		}
-//
-//		return isOK;
-//	}
+	@Override
+	public boolean performOk() {
+
+		final boolean isOK = super.performOk();
+
+		if (isOK) {
+			// fire one event for all modified measurement values
+			TourbookPlugin.getDefault()
+					.getPreferenceStore()
+					.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
+		}
+
+		return isOK;
+	}
 
 }

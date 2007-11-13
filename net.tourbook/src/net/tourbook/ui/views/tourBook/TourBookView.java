@@ -35,6 +35,7 @@ import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
@@ -91,7 +92,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourBookView extends ViewPart implements ISelectedTours {
+public class TourBookView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	static public final String		ID									= "net.tourbook.views.tourListView";		//$NON-NLS-1$
 
@@ -245,7 +246,6 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 					fTourViewer.setInput(new Object());
 
 					reselectTourViewer();
-//					refreshTourViewer();
 				}
 			}
 		};
@@ -279,8 +279,8 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 		fActionDeleteTour = new ActionDeleteTour(this);
 		fActionSetTourType = new ActionSetTourType(this);
 
-		fActionModifyColumns = new ActionModifyColumns(fColumnManager);
-		fActionCollapseAll = new ActionCollapseAll(fTourViewer);
+		fActionModifyColumns = new ActionModifyColumns(this);
+		fActionCollapseAll = new ActionCollapseAll(this);
 
 		/*
 		 * fill view menu
@@ -574,7 +574,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
-				cell.setText(Long.toString(tourItem.fColumnAltitudeUp));
+				cell.setText(Long.toString((long) (tourItem.fColumnAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
 				setCellColor(cell, element);
 			}
 		});
@@ -603,7 +603,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					cell.setText(Long.toString(((TVITourBookTour) element).getColumnStartDistance()));
+					cell.setText(Long.toString((long) (((TVITourBookTour) element).getColumnStartDistance() / UI.UNIT_VALUE_DISTANCE)));
 				}
 				setCellColor(cell, element);
 			}
@@ -629,7 +629,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
 				fNF.setMinimumFractionDigits(1);
 				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(tourItem.fColumnMaxSpeed));
+				cell.setText(fNF.format(tourItem.fColumnMaxSpeed / UI.UNIT_VALUE_DISTANCE));
 				setCellColor(cell, element);
 			}
 		});
@@ -642,7 +642,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
 				fNF.setMinimumFractionDigits(1);
 				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(tourItem.fColumnAvgSpeed));
+				cell.setText(fNF.format(tourItem.fColumnAvgSpeed / UI.UNIT_VALUE_DISTANCE));
 				setCellColor(cell, element);
 			}
 		});
@@ -653,7 +653,7 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
-				cell.setText(Long.toString(tourItem.fColumnMaxAltitude));
+				cell.setText(Long.toString((long) (tourItem.fColumnMaxAltitude / UI.UNIT_VALUE_ALTITUDE)));
 				setCellColor(cell, element);
 			}
 		});
@@ -782,6 +782,10 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
+	public ColumnManager getColumnManager() {
+		return fColumnManager;
+	}
+
 	public ArrayList<TourData> getSelectedTours() {
 
 		// get selected tours
@@ -842,6 +846,10 @@ public class TourBookView extends ViewPart implements ISelectedTours {
 			// currently only the first selected entry is supported
 			break;
 		}
+	}
+
+	public TreeViewer getTreeViewer() {
+		return fTourViewer;
 	}
 
 	@Override

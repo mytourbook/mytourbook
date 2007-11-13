@@ -27,11 +27,13 @@ import net.tourbook.ui.CustomControlContribution;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -39,9 +41,11 @@ import org.eclipse.ui.IMemento;
 
 public class PersonContributionItem extends CustomControlContribution {
 
-	private static final String		ID		= "net.tourbook.clientselector";	//$NON-NLS-1$
+	private static final String		ID		= "net.tourbook.clientselector";		//$NON-NLS-1$
 
 	static TourbookPlugin			plugin	= TourbookPlugin.getDefault();
+
+	private static final boolean	osx		= "carbon".equals(SWT.getPlatform()); //$NON-NLS-1$
 
 	private Combo					fComboPeople;
 
@@ -89,15 +93,43 @@ public class PersonContributionItem extends CustomControlContribution {
 		plugin.getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
+//	@Override
+//	protected Control createControl(Composite parent) {
+//
+//		Composite control = createPeopleComboBox(parent);
+//
+//		addPrefListener();
+//		reselectLastPerson();
+//
+//		return control;
+//	}
+
 	@Override
 	protected Control createControl(Composite parent) {
 
-		Composite control = createPeopleComboBox(parent);
+		Composite content;
+
+		if (osx) {
+
+			content = createPeopleComboBox(parent);
+
+		} else {
+
+			/*
+			 * on win32 a few pixel above and below the combobox are drawn, wrapping it into a
+			 * composite removes the pixels
+			 */
+			content = new Composite(parent, SWT.NONE);
+			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(content);
+
+			Composite control = createPeopleComboBox(content);
+			control.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
+		}
 
 		addPrefListener();
 		reselectLastPerson();
 
-		return control;
+		return content;
 	}
 
 	private Composite createPeopleComboBox(Composite parent) {

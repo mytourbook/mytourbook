@@ -899,7 +899,7 @@ public class ChartComponentGraph extends Canvas {
 			// final ChartDataXSerie xData = drawingData.getXData();
 			final ChartDataYSerie yData = drawingData.getYData();
 			final int valueDivisor = yData.getValueDivisor();
-			if (valueDivisor == 0) {
+			if (valueDivisor == 1) {
 				nf.setMinimumFractionDigits(0);
 			} else if (valueDivisor == 10) {
 				nf.setMinimumFractionDigits(1);
@@ -927,7 +927,11 @@ public class ChartComponentGraph extends Canvas {
 			// labelText.append(xData.getUnitLabel());
 			// labelText.append(" ");
 
-			labelText.append(nf.format((float) yValue / valueDivisor));
+			if (valueDivisor == 1) {
+				labelText.append(nf.format(yValue));
+			} else {
+				labelText.append(nf.format((float) yValue / valueDivisor));
+			}
 			labelText.append(' ');
 			labelText.append(yData.getUnitLabel());
 			labelText.append(' ');

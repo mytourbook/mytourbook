@@ -16,10 +16,8 @@
 
 package net.tourbook.tour;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
@@ -224,9 +222,7 @@ public class TourManager {
 
 		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 
-		final Date time = calendar.getTime();
-
-		return DateFormat.getDateInstance().format(time);
+		return UI.DateFormatter.format(calendar.getTime());
 	}
 
 	/**
@@ -242,9 +238,7 @@ public class TourManager {
 				tourData.getStartHour(),
 				tourData.getStartMinute());
 
-		final Date time = calendar.getTime();
-
-		return DateFormat.getTimeInstance().format(time);
+		return UI.TimeFormatter.format(calendar.getTime());
 	}
 
 	/**
@@ -463,90 +457,6 @@ public class TourManager {
 //		return compareIndexStart;
 //	}
 
-	/**
-	 * the speed must be interpolated for low time intervals because the smallest distance is 10 m
-	 * 
-	 * @param tourData
-	 * @param hasPropertyChanged
-	 */
-	private void computeAltiGradiSerie(final TourData tourData, final boolean hasPropertyChanged) {
-
-		// check if altimeter was computed
-		if (tourData.altimeterSerie != null && hasPropertyChanged == false) {
-			return;
-		}
-
-		final int serieLength = tourData.timeSerie.length;
-
-		final int altimeterSerie[] = tourData.altimeterSerie = new int[serieLength];
-		final int gradientSerie[] = tourData.gradientSerie = new int[serieLength];
-
-		final int deviceTimeInterval = tourData.getDeviceTimeInterval();
-		int indexLowAdjustment;
-		int indexHighAdjustment;
-
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_COMPUTE_VALUE)) {
-
-			final int computeTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE);
-			final int slices = computeTimeSlice / deviceTimeInterval;
-
-			indexHighAdjustment = Math.max(1, slices / 2);
-			indexLowAdjustment = slices / 2;
-
-			// round up
-			if (indexLowAdjustment + indexHighAdjustment < slices) {
-				indexHighAdjustment++;
-			}
-
-		} else {
-
-			if (deviceTimeInterval <= 2) {
-				indexLowAdjustment = 15;
-				indexHighAdjustment = 15;
-
-			} else if (deviceTimeInterval <= 5) {
-				indexLowAdjustment = 5;
-				indexHighAdjustment = 6;
-
-			} else if (deviceTimeInterval <= 10) {
-				indexLowAdjustment = 2;
-				indexHighAdjustment = 3;
-			} else {
-				indexLowAdjustment = 1;
-				indexHighAdjustment = 2;
-			}
-		}
-
-		/*
-		 * compute values
-		 */
-		final int[] distanceSerie = tourData.getDistanceSerie();
-
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-
-			// adjust index to the array size
-			final int indexLow = Math.min(Math.max(0, serieIndex - indexLowAdjustment),
-					serieLength - 1);
-			final int indexHigh = Math.max(0, Math.min(serieIndex + indexHighAdjustment,
-					serieLength - 1));
-
-			final int distance = distanceSerie[indexHigh] - distanceSerie[indexLow];
-
-			final int altitude = tourData.altitudeSerie[indexHigh]
-					- tourData.altitudeSerie[indexLow];
-
-			final float timeInterval = deviceTimeInterval * (indexHigh - indexLow);
-
-			// keep altimeter data
-			altimeterSerie[serieIndex] = (int) (3600F * altitude / timeInterval);
-
-			// keep gradient data
-			gradientSerie[serieIndex] = distance == 0 ? 0 : altitude * 1000 / distance;
-		}
-	}
-
 //	/**
 //	 * compute the speed serie with custom settings from the {@link TourChartPropertyView}, the
 //	 * speed must be interpolated for low time intervals because the smallest distance is 10 m
@@ -597,7 +507,7 @@ public class TourManager {
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		final int[] speedSerie = tourData.getSpeedSerie();
-		final int[] altimeterSerie = tourData.altimeterSerie;
+		final int[] altimeterSerie = tourData.getAltimeterSerie();
 		final int[] gradientSerie = tourData.gradientSerie;
 		final int[] distanceSerie = tourData.getDistanceSerie();
 
@@ -807,19 +717,25 @@ public class TourManager {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-		computeAltiGradiSerie(tourData, hasPropertyChanged);
-
 		if (hasPropertyChanged) {
-			tourData.cleanSpeedSerie();
+			tourData.cleanComputedSeries();
 		}
 
+		tourData.computeGradientSerie();
+
 		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_COMPUTE_VALUE)) {
+
+			// compute speed for custom settings
+
 			if (tourData.getDeviceTimeInterval() == -1) {
 				tourData.computeSpeedSerieInternalWithVariableInterval(true);
 			} else {
 				tourData.computeSpeedSerieCustom();
 			}
 		} else {
+
+			// compute speed with internal algorithm
+
 			if (tourData.getDeviceTimeInterval() == -1) {
 				tourData.computeSpeedSerieInternalWithVariableInterval(false);
 			} else {
@@ -964,9 +880,9 @@ public class TourManager {
 		/*
 		 * altimeter
 		 */
-		final ChartDataYSerie yDataAltimeter = getChartData(tourData.altimeterSerie, chartType);
+		final ChartDataYSerie yDataAltimeter = getChartData(tourData.getAltimeterSerie(), chartType);
 		yDataAltimeter.setYTitle(Messages.Graph_Label_Altimeter);
-		yDataAltimeter.setUnitLabel(Messages.Graph_Label_Altimeter_unit);
+		yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
 		yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 		yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
 		yDataAltimeter.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true,
@@ -1019,9 +935,10 @@ public class TourManager {
 		/*
 		 * temperature
 		 */
-		final ChartDataYSerie yDataTemperature = getChartData(tourData.temperatureSerie, chartType);
+		final ChartDataYSerie yDataTemperature = getChartData(tourData.getTemperatureSerie(),
+				chartType);
 		yDataTemperature.setYTitle(Messages.Graph_Label_Temperature);
-		yDataTemperature.setUnitLabel(Messages.Graph_Label_Temperature_unit);
+		yDataTemperature.setUnitLabel(UI.UNIT_LABEL_FAHRENHEIT);
 		yDataTemperature.setShowYSlider(true);
 		yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);

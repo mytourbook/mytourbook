@@ -25,16 +25,12 @@ public class TreeColumnDefinition extends ColumnDefinition {
 	private TreeColumn	fTreeColumn;
 
 	/**
-	 * @param columnManager
-	 *        manager which managed the columns
 	 * @param columnId
 	 *        column id which must be unique within the tree
 	 * @param style
 	 *        ui style
 	 */
-	public TreeColumnDefinition(ColumnManager columnManager, String columnId, int style) {
-
-		columnManager.addColumn(this);
+	public TreeColumnDefinition(String columnId, int style) {
 
 		fColumnId = columnId;
 		fStyle = style;

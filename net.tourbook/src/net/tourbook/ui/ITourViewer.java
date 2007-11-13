@@ -13,45 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views.tourMap;
+package net.tourbook.ui;
 
-import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.ITourViewer;
-
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
-public class ActionCollapseAll extends Action {
+/**
+ * This interface provides acces to different parts in a viewer which displays tours
+ * 
+ * @author Wolfgang Schramm
+ * @since version 1.2.0 / 2007-11-12
+ */
+public interface ITourViewer {
 
-	private ITourViewer	fTourViewer;
+	/**
+	 * @return Returns the {@link ColumnManager} for the tour viewer or <code>null</code> when a
+	 *         column manager is not available
+	 */
+	ColumnManager getColumnManager();
 
-	public ActionCollapseAll(ITourViewer tourViewer) {
-
-		super(null, AS_PUSH_BUTTON);
-
-		fTourViewer = tourViewer;
-
-		setToolTipText(Messages.Tour_Map_Action_collapse_all_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
-	}
-
-	@Override
-	public void run() {
-
-		TreeViewer treeViewer = fTourViewer.getTreeViewer();
-
-		if (treeViewer != null) {
-
-			treeViewer.collapseAll();
-
-			Object firstElement = ((StructuredSelection) treeViewer.getSelection()).getFirstElement();
-
-			if (firstElement != null) {
-				treeViewer.reveal(firstElement);
-			}
-		}
-	}
+	/**
+	 * @return Returns the {@link TreeViewer} or <code>null</code> when a tree viewer is not
+	 *         available
+	 */
+	TreeViewer getTreeViewer();
 
 }

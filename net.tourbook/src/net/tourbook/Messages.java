@@ -36,6 +36,8 @@ public class Messages extends NLS {
 	public static String		App_Action_set_tour_type_dlg_message;
 	public static String		App_Action_set_tour_type_dlg_title;
 
+	public static String		App_measurement_tooltip;
+
 	public static String		App_People_item_all;
 	public static String		App_People_tooltip;
 
@@ -217,9 +219,20 @@ public class Messages extends NLS {
 	public static String		Pref_ChartColors_Column_color;
 	public static String		Pref_ChartColors_Label_title;
 
-	public static String		Pref_general_metric_imperial;
+	public static String		Pref_general_imperial_unit_fahrenheit;
+	public static String		Pref_general_imperial_unit_feet;
+	public static String		Pref_general_imperial_unit_mi;
+	public static String		Pref_general_imperial_units;
+	public static String		Pref_general_metric_unit_celcius;
+	public static String		Pref_general_metric_unit_km;
+	public static String		Pref_general_metric_unit_m;
 	public static String		Pref_general_metric_units;
+	public static String		Pref_general_show_system_in_ui;
+	public static String		Pref_general_system_altitude;
+	public static String		Pref_general_system_distance;
+	public static String		Pref_general_system_measurement;
 	public static String		Pref_general_system_of_measurement;
+	public static String		Pref_general_system_temperature;
 
 	public static String		Pref_Graphs_Button_down;
 	public static String		Pref_Graphs_Button_up;

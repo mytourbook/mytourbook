@@ -21,11 +21,11 @@ import org.eclipse.jface.action.Action;
 
 public class ActionModifyColumns extends Action {
 
-	private ColumnManager	fColumnManager;
+	private ITourViewer	fTourViewer;
 
-	public ActionModifyColumns(ColumnManager columnManager) {
+	public ActionModifyColumns(ITourViewer tourViewer) {
 
-		fColumnManager = columnManager;
+		fTourViewer = tourViewer;
 
 		setText(Messages.Action_configure_columns);
 		setToolTipText(Messages.Action_configure_columns_tooltip);
@@ -33,8 +33,13 @@ public class ActionModifyColumns extends Action {
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_configure_columns));
 	}
 
+	@Override
 	public void run() {
-		fColumnManager.openColumnDialog();
+
+		ColumnManager columnManager = fTourViewer.getColumnManager();
+		if (columnManager != null) {
+			columnManager.openColumnDialog();
+		}
 	}
 
 }

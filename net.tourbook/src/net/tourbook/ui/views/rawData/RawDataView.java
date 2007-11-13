@@ -42,6 +42,7 @@ import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TableColumnDefinition;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
@@ -72,6 +73,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
@@ -98,7 +100,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * 
  */
-public class RawDataView extends ViewPart implements ISelectedTours {
+public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	private static final String			FILESTRING_SEPARATOR		= "|";											//$NON-NLS-1$
 
@@ -292,11 +294,10 @@ public class RawDataView extends ViewPart implements ISelectedTours {
 	private void createActions() {
 
 		fActionClearView = new ActionClearView(this);
-		fActionModifyColumns = new ActionModifyColumns(fColumnManager);
+		fActionModifyColumns = new ActionModifyColumns(this);
 		fActionSaveTour = new ActionSaveTourInDatabase(this);
 		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this);
 		fActionSetTourType = new ActionSetTourType(this);
-
 		fActionAdjustImportedYear = new ActionAdjustYear(this);
 
 		/*
@@ -748,6 +749,10 @@ public class RawDataView extends ViewPart implements ISelectedTours {
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
+	public ColumnManager getColumnManager() {
+		return fColumnManager;
+	}
+
 	public ArrayList<TourData> getSelectedTours() {
 
 		// get selected tours
@@ -775,6 +780,10 @@ public class RawDataView extends ViewPart implements ISelectedTours {
 
 	public TableViewer getTourViewer() {
 		return fTourViewer;
+	}
+
+	public TreeViewer getTreeViewer() {
+		return null;
 	}
 
 	@Override
@@ -862,6 +871,24 @@ public class RawDataView extends ViewPart implements ISelectedTours {
 		}
 	}
 
+//	/**
+//	 * prevent the marker viewer to show the markers by setting the tour chart parameter to null
+//	 */
+//	private void disableTourChartSelection() {
+//
+//		final Object firstElement = ((IStructuredSelection) fTourViewer.getSelection()).getFirstElement();
+//
+//		if (firstElement != null && firstElement instanceof TourData) {
+//
+//			TourData tourData = (TourData) firstElement;
+//
+//			// reduce functionality when the tour is not saved
+//			if (tourData.getTourPerson() == null) {
+//				fPostSelectionProvider.setSelection(new TourDataSelection(null));
+//			}
+//		}
+//	}
+
 	private void saveSettings() {
 		fSessionMemento = XMLMemento.createWriteRoot("DeviceImportView"); //$NON-NLS-1$
 		saveState(fSessionMemento);
@@ -901,24 +928,6 @@ public class RawDataView extends ViewPart implements ISelectedTours {
 					StringToArrayConverter.convertArrayToString(columnIdAndWidth));
 		}
 	}
-
-//	/**
-//	 * prevent the marker viewer to show the markers by setting the tour chart parameter to null
-//	 */
-//	private void disableTourChartSelection() {
-//
-//		final Object firstElement = ((IStructuredSelection) fTourViewer.getSelection()).getFirstElement();
-//
-//		if (firstElement != null && firstElement instanceof TourData) {
-//
-//			TourData tourData = (TourData) firstElement;
-//
-//			// reduce functionality when the tour is not saved
-//			if (tourData.getTourPerson() == null) {
-//				fPostSelectionProvider.setSelection(new TourDataSelection(null));
-//			}
-//		}
-//	}
 
 	/**
 	 * select first tour in the viewer
