@@ -22,6 +22,7 @@
 package net.tourbook.data;
 
 import java.io.Serializable;
+import java.sql.Date;
 
 /**
  * Contains data for one time slice
@@ -33,9 +34,14 @@ public class TimeData implements Serializable {
 	private static final long	serialVersionUID	= -3435859239371853427L;
 
 	/**
-	 * this value is not
+	 * contains the difference to the previous time in seconds
 	 */
 	public short				time;
+
+	/**
+	 * contains the time value from {@link Date#getTime()}
+	 */
+	public long					absoluteTime		= Long.MIN_VALUE;
 
 	/**
 	 * absolute value for temperature
@@ -53,16 +59,26 @@ public class TimeData implements Serializable {
 	public short				pulse;
 
 	/**
-	 * relative value for altitude, this is the difference to the altitude of the previous time
+	 * relative value for altitude, this is the difference for the altitude with the previous time
 	 * slice
 	 */
 	public short				altitude;
+	public short				absoluteAltitude	= Short.MIN_VALUE;
 
 	/**
-	 * realative value for distance, this is the difference to the distance of the previous time
+	 * realative value for distance, this is the difference for the distance with the previous time
 	 * slice
 	 */
 	public int					distance;
+	public int					absoluteDistance	= Integer.MIN_VALUE;
 
+	public double				latitude;
+	public double				longitude;
+
+	/**
+	 * a marker is set when {@link TimeData#marker} is not 0
+	 */
 	public short				marker;
+
+	public String				markerLabel;
 }

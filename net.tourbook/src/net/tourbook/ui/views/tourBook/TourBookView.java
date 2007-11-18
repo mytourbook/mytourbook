@@ -28,6 +28,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
@@ -40,7 +41,6 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.rawData.SelectionRawData;
 import net.tourbook.ui.views.tourMap.ActionCollapseAll;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -256,6 +256,22 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 				.addPropertyChangeListener(fPrefChangeListener);
 	}
 
+	private void addSelectionListener() {
+		// this view part is a selection listener
+		fPostSelectionListener = new ISelectionListener() {
+
+			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+
+				if (!selection.isEmpty() && selection instanceof SelectionNewTours) {
+					refreshTourViewer();
+				}
+			}
+		};
+
+		// register selection listener in the page
+		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+	}
+
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
@@ -329,7 +345,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		setPostSelectionListener();
+		addSelectionListener();
 		addPartListener();
 		addPrefListener();
 		addTourPropertyListener();
@@ -1004,22 +1020,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	@Override
 	public void setFocus() {
 		fTourViewer.getControl().setFocus();
-	}
-
-	private void setPostSelectionListener() {
-		// this view part is a selection listener
-		fPostSelectionListener = new ISelectionListener() {
-
-			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-
-				if (!selection.isEmpty() && selection instanceof SelectionRawData) {
-					refreshTourViewer();
-				}
-			}
-		};
-
-		// register selection listener in the page
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
 	/**

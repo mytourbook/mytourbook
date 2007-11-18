@@ -103,36 +103,33 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
 
+	@Override
 	protected Control createContents(Composite parent) {
 
 		// create a map with all available graphs
 		fGraphMap = new HashMap<Integer, Graph>();
-		fGraphMap.put(TourManager.GRAPH_ALTITUDE, new Graph(
-				TourManager.GRAPH_ALTITUDE,
+		fGraphMap.put(TourManager.GRAPH_ALTITUDE, new Graph(TourManager.GRAPH_ALTITUDE,
 				Messages.Graph_Label_Altitude));
-		fGraphMap.put(TourManager.GRAPH_SPEED, new Graph(
-				TourManager.GRAPH_SPEED,
+		fGraphMap.put(TourManager.GRAPH_SPEED, new Graph(TourManager.GRAPH_SPEED,
 				Messages.Graph_Label_Speed));
-		fGraphMap.put(TourManager.GRAPH_PULSE, new Graph(
-				TourManager.GRAPH_PULSE,
+		fGraphMap.put(TourManager.GRAPH_PACE, new Graph(TourManager.GRAPH_PACE,
+				Messages.Graph_Label_Pace));
+		fGraphMap.put(TourManager.GRAPH_PULSE, new Graph(TourManager.GRAPH_PULSE,
 				Messages.Graph_Label_Heartbeat));
-		fGraphMap.put(TourManager.GRAPH_TEMPERATURE, new Graph(
-				TourManager.GRAPH_TEMPERATURE,
+		fGraphMap.put(TourManager.GRAPH_TEMPERATURE, new Graph(TourManager.GRAPH_TEMPERATURE,
 				Messages.Graph_Label_Temperature));
-		fGraphMap.put(TourManager.GRAPH_CADENCE, new Graph(
-				TourManager.GRAPH_CADENCE,
+		fGraphMap.put(TourManager.GRAPH_CADENCE, new Graph(TourManager.GRAPH_CADENCE,
 				Messages.Graph_Label_Cadence));
-		fGraphMap.put(TourManager.GRAPH_ALTIMETER, new Graph(
-				TourManager.GRAPH_ALTIMETER,
+		fGraphMap.put(TourManager.GRAPH_ALTIMETER, new Graph(TourManager.GRAPH_ALTIMETER,
 				Messages.Graph_Label_Altimeter));
-		fGraphMap.put(TourManager.GRAPH_GRADIENT, new Graph(
-				TourManager.GRAPH_GRADIENT,
+		fGraphMap.put(TourManager.GRAPH_GRADIENT, new Graph(TourManager.GRAPH_GRADIENT,
 				Messages.Graph_Label_Gradiend));
 
 		// create a list with all available graphs
 		fGraphList = new ArrayList<Graph>();
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_ALTITUDE));
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_SPEED));
+		fGraphList.add(fGraphMap.get(TourManager.GRAPH_PACE));
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_PULSE));
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_TEMPERATURE));
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_CADENCE));
@@ -190,6 +187,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 				moveSelectionUp();
 				enableUpDownButtons();
 			}
+
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 
@@ -203,6 +201,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 				moveSelectionDown();
 				enableUpDownButtons();
 			}
+
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 
@@ -221,6 +220,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		radioShowDistance = new Button(group, SWT.RADIO);
 		radioShowDistance.setText(Messages.Pref_Graphs_Radio_show_distance);
 		radioShowDistance.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				enableTabGraphControls();
 			}
@@ -237,16 +237,15 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		checkShowStartTime.setLayoutData(gd);
 
 		// initialize the radio button
-		if (getPreferenceStore().getString(ITourbookPreferences.GRAPH_X_AXIS).equals(
-				TourManager.X_AXIS_TIME)) {
+		if (getPreferenceStore().getString(ITourbookPreferences.GRAPH_X_AXIS)
+				.equals(TourManager.X_AXIS_TIME)) {
 			radioShowTime.setSelection(true);
 		} else {
 			radioShowDistance.setSelection(true);
 		}
 
 		// checkbox: starttime
-		checkShowStartTime.setSelection(getPreferenceStore().getBoolean(
-				ITourbookPreferences.GRAPH_X_AXIS_STARTTIME));
+		checkShowStartTime.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME));
 
 		// group: zoom options
 		Group groupZoomOptions = new Group(container, SWT.NONE);
@@ -259,9 +258,9 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		// checkbox: scroll zoomed chart
 		checkScrollZoomedChart = new Button(groupZoomOptions, SWT.CHECK);
 		checkScrollZoomedChart.setText(Messages.Pref_Graphs_Check_scroll_zoomed_chart);
-		checkScrollZoomedChart.setSelection(getPreferenceStore().getBoolean(
-				ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH));
+		checkScrollZoomedChart.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH));
 		checkScrollZoomedChart.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (checkScrollZoomedChart.getSelection()) {
 					checkZoomToSlider.setSelection(false);
@@ -272,9 +271,9 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		// checkbox: auto zoom to moved slider
 		checkZoomToSlider = new Button(groupZoomOptions, SWT.CHECK);
 		checkZoomToSlider.setText(Messages.Pref_Graphs_Check_autozoom);
-		checkZoomToSlider.setSelection(getPreferenceStore().getBoolean(
-				ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
+		checkZoomToSlider.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
 		checkZoomToSlider.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (checkZoomToSlider.getSelection()) {
 					checkScrollZoomedChart.setSelection(false);
@@ -303,8 +302,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		/*
 		 * checkbox: altimeter min value
 		 */
-		altimeterMinCheckbox = new BooleanFieldEditor(
-				ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
+		altimeterMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
 				Messages.Pref_Graphs_Check_force_minimum_for_altimeter,
 				editorContainer);
 		altimeterMinCheckbox.setPreferenceStore(getPreferenceStore());
@@ -324,8 +322,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		/*
 		 * editor: altimeter min value
 		 */
-		altimeterMinEditor = new IntegerFieldEditor(
-				ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
+		altimeterMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
 				Messages.Pref_Graphs_Text_min_value,
 				editorContainer);
 		altimeterMinEditor.setPreferenceStore(getPreferenceStore());
@@ -343,8 +340,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		/*
 		 * checkbox: gradient min value
 		 */
-		gradientMinCheckbox = new BooleanFieldEditor(
-				ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
+		gradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
 				Messages.Pref_Graphs_Check_force_minimum_for_gradient,
 				editorContainer);
 		gradientMinCheckbox.setPreferenceStore(getPreferenceStore());
@@ -364,8 +360,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		/*
 		 * editor: gradient min value
 		 */
-		gradientMinEditor = new IntegerFieldEditor(
-				ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+		gradientMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
 				Messages.Pref_Graphs_Text_min_value,
 				editorContainer);
 		gradientMinEditor.setPreferenceStore(getPreferenceStore());
@@ -389,8 +384,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 	private CheckboxTableViewer createGraphCheckBoxList(Composite parent) {
 
-		final CheckboxTableViewer checkboxList = CheckboxTableViewer.newCheckList(
-				parent,
+		final CheckboxTableViewer checkboxList = CheckboxTableViewer.newCheckList(parent,
 				SWT.SINGLE | SWT.TOP | SWT.BORDER);
 
 		checkboxList.setContentProvider(new IStructuredContentProvider() {
@@ -399,10 +393,12 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 			}
 
 			public void dispose() {}
+
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 		});
 
 		checkboxList.setLabelProvider(new LabelProvider() {
+			@Override
 			public String getText(Object element) {
 				Graph graph = (Graph) element;
 				return graph.graphLabel;
@@ -433,8 +429,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		createGraphList();
 		checkboxList.setInput(this);
 
-		String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(getPreferenceStore()
-				.getString(ITourbookPreferences.GRAPH_VISIBLE));
+		String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(getPreferenceStore().getString(ITourbookPreferences.GRAPH_VISIBLE));
 
 		// check all graphs which are defined in the prefs
 		ArrayList<Graph> checkedGraphs = new ArrayList<Graph>();
@@ -458,8 +453,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	 */
 	private void createGraphList() {
 
-		String[] prefAllIds = StringToArrayConverter.convertStringToArray(getPreferenceStore()
-				.getString(ITourbookPreferences.GRAPH_ALL));
+		String[] prefAllIds = StringToArrayConverter.convertStringToArray(getPreferenceStore().getString(ITourbookPreferences.GRAPH_ALL));
 
 		fViewerGraphs = new ArrayList<Graph>();
 
@@ -483,6 +477,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	/*
 	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performOk()
 	 */
+	@Override
 	public boolean performOk() {
 
 		saveGraphs();
@@ -495,15 +490,14 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
 		}
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, checkShowStartTime
-				.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME,
+				checkShowStartTime.getSelection());
 
-		prefStore.setValue(
-				ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH,
+		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH,
 				checkScrollZoomedChart.getSelection());
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, checkZoomToSlider
-				.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER,
+				checkZoomToSlider.getSelection());
 
 		altimeterMinCheckbox.store();
 		altimeterMinEditor.store();
@@ -526,8 +520,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 			Graph graph = (Graph) graphs[graphIndex];
 			prefGraphsChecked[graphIndex] = Integer.toString(graph.graphId);
 		}
-		getPreferenceStore().setValue(
-				ITourbookPreferences.GRAPH_VISIBLE,
+		getPreferenceStore().setValue(ITourbookPreferences.GRAPH_VISIBLE,
 				StringToArrayConverter.convertArrayToString(prefGraphsChecked));
 
 		// convert the array of all table items into a string which is store in
@@ -538,8 +531,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 			prefGraphs[itemIndex] = Integer.toString(((Graph) items[itemIndex].getData()).graphId);
 		}
 
-		getPreferenceStore().setValue(
-				ITourbookPreferences.GRAPH_ALL,
+		getPreferenceStore().setValue(ITourbookPreferences.GRAPH_ALL,
 				StringToArrayConverter.convertArrayToString(prefGraphs));
 	}
 

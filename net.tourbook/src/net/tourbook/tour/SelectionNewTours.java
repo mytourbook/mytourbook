@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views.rawData;
+package net.tourbook.tour;
 
 import org.eclipse.jface.viewers.ISelection;
 
@@ -21,7 +21,7 @@ import org.eclipse.jface.viewers.ISelection;
  * When the selection is set by this type and is not empty, the raw tour data
  * has changed (added, removed)
  */
-public class SelectionRawData implements ISelection {
+public class SelectionNewTours implements ISelection {
 
 	private boolean	fIsEmpty;
 

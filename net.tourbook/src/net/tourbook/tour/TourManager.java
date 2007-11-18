@@ -79,6 +79,7 @@ public class TourManager {
 	public static final int					GRAPH_CADENCE								= 1005;
 	public static final int					GRAPH_GRADIENT								= 1006;
 	public static final int					GRAPH_POWER									= 1007;
+	public static final int					GRAPH_PACE									= 1008;
 	public static final int					GRAPH_TOUR_COMPARE							= 2000;
 
 	public static final int					GRADIENT_DIVISOR							= 10;
@@ -86,6 +87,7 @@ public class TourManager {
 	private static TourManager				instance;
 
 	private ComputeChartValue				computeSpeedAvg;
+	private ComputeChartValue				computePaceAvg;
 	private ComputeChartValue				computeAltimeterAvg;
 	private ComputeChartValue				computeGradientAvg;
 
@@ -317,186 +319,6 @@ public class TourManager {
 		}
 	}
 
-//	private int compareTour(final TourData compareTourData) {
-//
-//		final TourDataNormalizer compareTourNormalizer = new TourDataNormalizer();
-//		final int[] compareTourDataDistance = compareTourData.distanceSerie;
-//
-//		// normalize the tour which will be compared
-//		compareTourNormalizer.normalizeAltitude(compareTourData,
-//				0,
-//				compareTourDataDistance.length - 1);
-//
-//		final int[] normCompDistances = compareTourNormalizer.getNormalizedDistance();
-//		final int[] normCompAltitudes = compareTourNormalizer.getNormalizedAltitude();
-//		final int[] normCompAltiDiff = new int[normCompAltitudes.length];
-//		final int[] normCompTour = new int[normCompAltitudes.length];
-//
-//		/*
-//		 * reference tour
-//		 */
-//
-//		Long refTourId;
-//		int refMeasureStartIndex;
-//		int refMeasureEndIndex;
-//
-//		// Maur - Pfannenstiel
-//		// refTourId = 2005102416228826L;
-//		// refMeasureStartIndex = 50;
-//		// refMeasureEndIndex = 153;
-//
-//		// Dübendorf - Greifensee
-//		// refTourId = 20059301618311L;
-//		// refMeasureStartIndex = 23;
-//		// refMeasureEndIndex = 132;
-//
-//		// Egg - Pfannenstiel
-//		// refTourId = 2005102416228826L;
-//		// refMeasureStartIndex = 121;
-//		// refMeasureEndIndex = 167;
-//
-//		// Maur - Forch
-//		refTourId = 200592616168216L;
-//		refMeasureStartIndex = 49;
-//		refMeasureEndIndex = 101;
-//
-//		// get the reference tour
-//		final TourData refTourData = TourManager.getInstance().getTourData(refTourId);
-//		if (refTourData == null) {
-//			return -1;
-//		}
-//
-//		// normalize the reference tour
-//		final TourDataNormalizer refTourNormalizer = new TourDataNormalizer();
-//		refTourNormalizer.normalizeAltitude(refTourData, refMeasureStartIndex, refMeasureEndIndex);
-//
-//		final int[] refAltitudes = refTourNormalizer.getNormalizedAltitude();
-//		int minAltiDiff = Integer.MAX_VALUE;
-//
-//		// start index of the reference tour in the compare tour
-//		int compareIndexStart = -1;
-//
-//		final int compareLastIndex = normCompAltitudes.length;
-//
-//		for (int compareIndex = 0; compareIndex < normCompAltitudes.length; compareIndex++) {
-//
-//			int altitudeDiff = -1;
-//
-//			// loop: all data in the reference tour
-//			for (int refIndex = 0; refIndex < refAltitudes.length; refIndex++) {
-//
-//				final int compareRefIndex = compareIndex + refIndex;
-//
-//				// make sure the ref index is not bigger than the compare index,
-//				// this can happen when the reference data exeed the compare
-//				// data
-//				if (compareRefIndex == compareLastIndex) {
-//					altitudeDiff = -1;
-//					break;
-//				}
-//
-//				// get the altitude difference between the reference and the
-//				// measured value
-//				final int diffCompareRef = Math.abs(refAltitudes[refIndex]
-//						- normCompAltitudes[compareRefIndex]);
-//
-//				altitudeDiff += diffCompareRef;
-//			}
-//
-//			// save the altitude difference in the pulse data
-//			normCompAltiDiff[compareIndex] = altitudeDiff;
-//
-//			// find the lowest altitude, this will be the start point for the
-//			// reference tour
-//			if (altitudeDiff < minAltiDiff && altitudeDiff != -1) {
-//				minAltiDiff = altitudeDiff;
-//				compareIndexStart = compareIndex;
-//			}
-//		}
-//
-//		// show the reference tour in the temperature serie
-//		for (int refIndex = 0; refIndex < refAltitudes.length; refIndex++) {
-//
-//			final int compareIndex = compareIndexStart + refIndex;
-//
-//			// prevent out of bounds error
-//			if (compareIndex >= normCompTour.length) {
-//				break;
-//			}
-//
-//			normCompTour[compareIndex] = normCompAltitudes[compareIndex];
-//		}
-//
-//		// distance for the reference tour
-////		final int refDistance = refTourData.distanceSerie[refMeasureEndIndex]
-////				- refTourData.distanceSerie[refMeasureStartIndex];
-//
-//		// get the start point in the compare tour
-//		final int distanceStart = normCompDistances[compareIndexStart];
-//
-//		// find the start distance in the measure data
-//		int compareIndex = 0;
-//		for (compareIndex = 0; compareIndex < compareTourDataDistance.length; compareIndex++) {
-//			if (compareTourDataDistance[compareIndex] >= distanceStart) {
-//				break;
-//			}
-//		}
-////		final int compareDistanceStart = compareTourDataDistance[compareIndex];
-//
-//		// overwrite the changed data series
-//		compareTourData.distanceSerie = compareTourNormalizer.getNormalizedDistance();
-//		compareTourData.altitudeSerie = compareTourNormalizer.getNormalizedAltitude();
-//		compareTourData.pulseSerie = normCompAltiDiff;
-//		compareTourData.temperatureSerie = normCompTour;
-//
-//		// overwrite all data series, otherwise the chart will not be drawn
-////		compareTourData.timeSerie = compareTourNormalizer.getNormalizedTime();
-////		compareTourData.speedSerie = compareTourNormalizer.getNormalizedTime();
-////		compareTourData.cadenceSerie = compareTourNormalizer.getNormalizedTime();
-//
-//		return compareIndexStart;
-//	}
-
-//	/**
-//	 * compute the speed serie with custom settings from the {@link TourChartPropertyView}, the
-//	 * speed must be interpolated for low time intervals because the smallest distance is 10 m
-//	 * 
-//	 * @param tourData
-//	 * @param hasPropertyChanged
-//	 * @param tourChartProperty
-//	 */
-//	private void computeCustomSpeedSerie(final TourData tourData, final boolean hasPropertyChanged) {
-//
-//
-//	}
-
-//	private void computeInternalSpeedSerie_SHOW_DISTANCE(	final TourData tourData,
-//															final boolean hasPropertyChanged) {
-//
-//		// check if speed was computed
-//		if (tourData.speedSerie != null && hasPropertyChanged == false) {
-//			return;
-//		}
-//
-//		final int serieLength = tourData.timeSerie.length;
-//
-//		final int speedSerie[] = tourData.speedSerie = new int[serieLength];
-//		final int[] distanceSerie = tourData.getDistanceSerie();
-//
-//		for (int distanceIndex = 0; distanceIndex < serieLength; distanceIndex++) {
-//
-//			int distance;
-//
-//			if (distanceIndex == 0) {
-//				distance = 0;
-//			} else {
-//				distance = distanceSerie[distanceIndex] - distanceSerie[distanceIndex - 1];
-//			}
-//
-//			speedSerie[distanceIndex] = distance;
-//		}
-//	}
-
 	/**
 	 * Clip values when a minimum distance is fallen short of
 	 * 
@@ -506,40 +328,103 @@ public class TourManager {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-		final int[] speedSerie = tourData.getSpeedSerie();
-		final int[] altimeterSerie = tourData.getAltimeterSerie();
-		final int[] gradientSerie = tourData.gradientSerie;
-		final int[] distanceSerie = tourData.getDistanceSerie();
-
-		final int serieLength = tourData.timeSerie.length;
-		final int deviceTimeInterval = tourData.getDeviceTimeInterval();
-
-		int clipTimeSlice;
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_CLIP_VALUE)) {
+		int clippingTime;
+		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING)) {
 			// use custom clipping
-			clipTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_TIMESLICE_CLIP_VALUE);
+			clippingTime = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE);
 		} else {
-			// use internal clipping, value is evaluated by experiments
-			clipTimeSlice = 15;
+			// use internal clipping, value was evaluated with experiments
+			clippingTime = 15;
 		}
 
-		final int slices = Math.max(1, clipTimeSlice / deviceTimeInterval);
+		int paceClipping;
+		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING)) {
+			// use custom clipping
+			paceClipping = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE);
+		} else {
+			// use internal clipping, value was evaluated with experiments
+			paceClipping = 15;
+		}
 
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+		final int[] timeSerie = tourData.timeSerie;
+		final int[] gradientSerie = tourData.gradientSerie;
 
-			// adjust index to the array size
-			final int distIndex = Math.min(Math.max(0, serieIndex + slices), serieLength - 1);
+		final int[] speedSerie = tourData.getSpeedSerie();
+		final int[] paceSerie = tourData.getPaceSerie();
+		final int[] altimeterSerie = tourData.getAltimeterSerie();
+		final int[] distanceSerie = tourData.getDistanceSerie();
 
-			final int distance = distanceSerie[distIndex] - distanceSerie[serieIndex];
+		final int serieLength = timeSerie.length;
 
-			if (distance == 0) {
-				altimeterSerie[serieIndex] = 0;
-				gradientSerie[serieIndex] = 0;
-				speedSerie[serieIndex] = 0;
+		int deviceTimeInterval = tourData.getDeviceTimeInterval();
+		if (deviceTimeInterval > 0) {
 
-				altimeterSerie[distIndex] = 0;
-				gradientSerie[distIndex] = 0;
-				speedSerie[distIndex] = 0;
+			/*
+			 * clipping for constanct time intervals
+			 */
+
+			final int slices = Math.max(1, clippingTime / deviceTimeInterval);
+
+			for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+				// adjust index to the array size
+				int sliceIndex = serieIndex + slices;
+				sliceIndex = Math.min(Math.max(0, sliceIndex), serieLength - 1);
+
+				final int distance = distanceSerie[sliceIndex] - distanceSerie[serieIndex];
+
+				if (distance == 0) {
+					altimeterSerie[serieIndex] = 0;
+					gradientSerie[serieIndex] = 0;
+					speedSerie[serieIndex] = 0;
+				}
+
+				// remove peaks in pace
+				if (speedSerie[serieIndex] <= paceClipping) {
+					paceSerie[serieIndex] = 0;
+				}
+			}
+
+		} else {
+
+			/*
+			 * clipping for variable time intervals
+			 */
+
+			for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+				// adjust index to the array size
+				int lowIndex = Math.max(0, serieIndex - 1);
+
+				int timeDiff = timeSerie[serieIndex] - timeSerie[lowIndex];
+				int distDiff = 0;
+
+				if (timeDiff < clippingTime) {
+					while (timeDiff < clippingTime) {
+
+						// make sure to be in the array range
+						if (lowIndex < 1) {
+							break;
+						}
+
+						lowIndex--;
+
+						timeDiff = timeSerie[serieIndex] - timeSerie[lowIndex];
+					}
+				}
+
+				distDiff = distanceSerie[serieIndex] - distanceSerie[lowIndex];
+
+				if (distDiff == 0) {
+					altimeterSerie[serieIndex] = 0;
+					gradientSerie[serieIndex] = 0;
+					speedSerie[serieIndex] = 0;
+				}
+
+				// remove peaks in pace
+				if (speedSerie[serieIndex] <= paceClipping) {
+					paceSerie[serieIndex] = 0;
+				}
 			}
 		}
 	}
@@ -553,6 +438,56 @@ public class TourManager {
 
 			/*
 			 * Compute the average distance speed between the two sliders
+			 */
+			@Override
+			public float compute() {
+
+				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
+				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
+
+				final int leftDistance = distanceValues[valuesIndexLeft];
+				final int rightDistance = distanceValues[valuesIndexRight];
+				final int leftTime = timeValues[valuesIndexLeft];
+				final int rightTime = timeValues[valuesIndexRight];
+
+				if (leftTime == rightTime) {
+					// left and right slider are at the same position
+					return 0;
+
+				} else {
+
+					int timeSlice = timeValues[1] - timeValues[0];
+
+					if (timeSlice == 0 && timeValues.length > 1) {
+						timeSlice = timeValues[2] - timeValues[1];
+					}
+
+					if (timeSlice > 0) {
+
+						final int ignoreTimeSlices = timeSlice == 0
+								? 0
+								: getIgnoreTimeSlices(distanceValues,
+										valuesIndexLeft,
+										valuesIndexRight,
+										10 / timeSlice);
+						final float time = rightTime - leftTime - (ignoreTimeSlices * timeSlice);
+
+						final float distance = rightDistance - leftDistance;
+						final float speed = distance / time * 3.6f;
+
+						return speed;
+					}
+
+					return 0;
+				}
+
+			}
+		};
+
+		computePaceAvg = new ComputeChartValue() {
+
+			/*
+			 * Compute the average pace between two sliders
 			 */
 			@Override
 			public float compute() {
@@ -705,6 +640,7 @@ public class TourManager {
 //		long endTime = System.currentTimeMillis();
 //		System.out.println("Execution time : " + (endTime - startTime) + " ms");
 
+		// check if the callbacks are created
 		if (computeSpeedAvg == null) {
 			createChartAvgCallbacks();
 		}
@@ -721,27 +657,8 @@ public class TourManager {
 			tourData.cleanComputedSeries();
 		}
 
-		tourData.computeGradientSerie();
-
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_COMPUTE_VALUE)) {
-
-			// compute speed for custom settings
-
-			if (tourData.getDeviceTimeInterval() == -1) {
-				tourData.computeSpeedSerieInternalWithVariableInterval(true);
-			} else {
-				tourData.computeSpeedSerieCustom();
-			}
-		} else {
-
-			// compute speed with internal algorithm
-
-			if (tourData.getDeviceTimeInterval() == -1) {
-				tourData.computeSpeedSerieInternalWithVariableInterval(false);
-			} else {
-				tourData.computeSpeedSerieInternal();
-			}
-		}
+		tourData.computeAltimeterGradientSerie();
+		tourData.computeSpeedSerie();
 
 		computeValueClipping(tourData);
 
@@ -865,6 +782,24 @@ public class TourManager {
 		chartDataModel.addXyData(yDataSpeed);
 
 		/*
+		 * pace
+		 */
+		final ChartDataYSerie yDataPace = getChartData(tourData.getPaceSerie(), chartType);
+
+		yDataPace.setYTitle(Messages.Graph_Label_Pace);
+		yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
+		yDataPace.setValueDivisor(10);
+		yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+		yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
+		yDataPace.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true,
+				true,
+				computePaceAvg,
+				2));
+		yDataPace.setShowYSlider(true);
+		setGraphColor(prefStore, yDataPace, GraphColors.PREF_GRAPH_PACE);
+		chartDataModel.addXyData(yDataPace);
+
+		/*
 		 * heartbeat
 		 */
 		final ChartDataYSerie yDataPulse = getChartData(tourData.pulseSerie, chartType);
@@ -977,6 +912,10 @@ public class TourManager {
 				chartDataModel.addYData(yDataSpeed);
 				break;
 
+			case GRAPH_PACE:
+				chartDataModel.addYData(yDataPace);
+				break;
+
 			case GRAPH_ALTIMETER:
 				chartDataModel.addYData(yDataAltimeter);
 				break;
@@ -1054,9 +993,6 @@ public class TourManager {
 			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
 
 		} else {
-//			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_NEW,
-//					new int[dataSerie.length],
-//					dataSerie);
 			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS,
 					dataSerie);
 		}

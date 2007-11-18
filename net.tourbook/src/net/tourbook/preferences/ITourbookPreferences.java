@@ -78,11 +78,14 @@ public interface ITourbookPreferences {
 
 	public static final String	GRAPH_PROPERTY_CHARTTYPE				= "graph.property.chartType";					//$NON-NLS-1$
 
-	public static final String	GRAPH_PROPERTY_IS_COMPUTE_VALUE			= "graph.property.is.compute-value";			//$NON-NLS-1$
-	public static final String	GRAPH_PROPERTY_TIMESLICE_COMPUTE_VALUE	= "graph.property.timeslice.compute-value";	//$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_IS_VALUE_COMPUTING		= "graph.property.is.value_computing";			//$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE	= "graph.property.timeslice.value_computing";	//$NON-NLS-1$
 
-	public static final String	GRAPH_PROPERTY_IS_CLIP_VALUE			= "graph.property.is.clip-value";				//$NON-NLS-1$
-	public static final String	GRAPH_PROPERTY_TIMESLICE_CLIP_VALUE		= "graph.property.timeslice.clip-value";		//$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_IS_VALUE_CLIPPING		= "graph.property.is.value_clipping";			//$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE	= "graph.property.timeslice.value_clipping";	//$NON-NLS-1$
+
+	public static final String	GRAPH_PROPERTY_IS_PACE_CLIPPING			= "graph.property.is.pace_clipping";			//$NON-NLS-1$
+	public static final String	GRAPH_PROPERTY_PACE_CLIPPING_VALUE		= "graph.property.is.pace_clipping.value";		//$NON-NLS-1$
 
 	/*
 	 * measurement system
@@ -102,4 +105,5 @@ public interface ITourbookPreferences {
 	public static final String	MEASUREMENT_SYSTEM_TEMPTERATURE_F		= "metric.fahrenheit";
 
 	public static final String	MEASUREMENT_SYSTEM_SHOW_IN_UI			= "system.of.measurement.show.in.ui";			//$NON-NLS-1$
+
 }

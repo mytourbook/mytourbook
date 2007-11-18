@@ -136,7 +136,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tours in database
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private static ArrayList<Long> getAllTourIds() {
 
 		ArrayList<Long> tourList = new ArrayList<Long>();
@@ -166,7 +166,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourBike> getTourBikes() {
 
 		ArrayList<TourBike> bikeList = new ArrayList<TourBike>();
@@ -211,7 +211,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour people in the db sorted by last/first name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourPerson> getTourPeople() {
 
 		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
@@ -235,7 +235,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types which are stored in the database sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourType> getTourTypes() {
 
 		if (fTourTypes != null) {
@@ -328,26 +328,40 @@ public class TourDatabase {
 
 			try {
 
-				TourData tourDataEntity = em.find(TourData.class, tourData.getTourId());
+				tourData.onPrePersist();
 
-				if (tourDataEntity == null) {
-					// tour is not yet persisted
-					ts.begin();
+				ts.begin();
+				{
+					TourData tourDataEntity = em.find(TourData.class, tourData.getTourId());
 
-					tourData.onPrePersist();
-					em.persist(tourData);
+					if (tourDataEntity == null) {
 
-					ts.commit();
+						// tour is not yet persisted
 
-				} else {
+						em.persist(tourData);
 
-					ts.begin();
+					} else {
 
-					tourData.onPrePersist();
-					em.merge(tourData);
-
-					ts.commit();
+						em.merge(tourData);
+					}
 				}
+				ts.commit();
+
+//			} catch (PersistenceException e) {
+//
+//				try {
+//					em.refresh(tourData);
+//				} catch (Exception e2) {
+//					e.printStackTrace();
+//				}
+//
+//				if (em.contains(tourData)) {
+//
+//					em.merge(tourData);
+//
+//				} else {
+//
+//				}
 
 			} catch (Exception e) {
 				e.printStackTrace();

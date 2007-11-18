@@ -36,6 +36,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ActionModifyColumns;
@@ -46,7 +47,6 @@ import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TableColumnDefinition;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourBook.SelectionRemovedTours;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
@@ -250,9 +250,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fPostSelectionListener = new ISelectionListener() {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-				if (!selection.isEmpty() && selection instanceof SelectionRemovedTours) {
+				if (!selection.isEmpty() && selection instanceof SelectionDeletedTours) {
 
-					final SelectionRemovedTours tourSelection = (SelectionRemovedTours) selection;
+					final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
 					final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
 
 					if (removedTours.size() == 0) {
@@ -840,54 +840,17 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 					rawDataManager.updateTourDataFromDb();
 					updateViewer();
 
-//					String mementoSelectedTourId = memento.getString(MEMENTO_SELECTED_TOUR_ID);
-//
-//					if (mementoSelectedTourId == null) {
-//						selectFirstTour();
-//					} else {
-//
-//					}
-//
-//				updateViewer();
-//
 					// restore selected tour
 					final Integer selectedTourIndex = memento.getInteger(MEMENTO_SELECTED_TOUR_INDEX);
-//				fTourViewer.getTable().select(selectedTourIndex);
-//				fTourViewer.getTable().showSelection();
 
 					Object tourData = fTourViewer.getElementAt(selectedTourIndex);
 					if (tourData != null) {
 						fTourViewer.setSelection(new StructuredSelection(tourData), true);
 					}
-
-					//				selectTour((StructuredSelection) fTourViewer.getSelection());
-
-//					final TourData firstTourData = (TourData) fTourViewer.getElementAt(0);
-//					if (firstTourData != null) {
-//						fTourViewer.setSelection(new StructuredSelection(firstTourData), true);
-//					}
 				}
 			}
 		}
 	}
-
-//	/**
-//	 * prevent the marker viewer to show the markers by setting the tour chart parameter to null
-//	 */
-//	private void disableTourChartSelection() {
-//
-//		final Object firstElement = ((IStructuredSelection) fTourViewer.getSelection()).getFirstElement();
-//
-//		if (firstElement != null && firstElement instanceof TourData) {
-//
-//			TourData tourData = (TourData) firstElement;
-//
-//			// reduce functionality when the tour is not saved
-//			if (tourData.getTourPerson() == null) {
-//				fPostSelectionProvider.setSelection(new TourDataSelection(null));
-//			}
-//		}
-//	}
 
 	private void saveSettings() {
 		fSessionMemento = XMLMemento.createWriteRoot("DeviceImportView"); //$NON-NLS-1$

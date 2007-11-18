@@ -13,15 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.tour;
 
 import java.util.ArrayList;
 
-import net.tourbook.tour.ITourItem;
 
 import org.eclipse.jface.viewers.ISelection;
 
-public class SelectionRemovedTours implements ISelection {
+public class SelectionDeletedTours implements ISelection {
 
 	/**
 	 * contains tours which has been deleted in the database

@@ -94,21 +94,17 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_VISIBLE,
 				Integer.toString(TourManager.GRAPH_ALTITUDE));
 
+		final String separator = StringToArrayConverter.STRING_SEPARATOR;
+
 		store.setDefault(ITourbookPreferences.GRAPH_ALL,
-				Integer.toString(TourManager.GRAPH_ALTITUDE)
-						+ StringToArrayConverter.STRING_SEPARATOR
-						+ Integer.toString(TourManager.GRAPH_SPEED)
-						+ StringToArrayConverter.STRING_SEPARATOR
-						+ Integer.toString(TourManager.GRAPH_PULSE)
-						+ StringToArrayConverter.STRING_SEPARATOR
-						+ Integer.toString(TourManager.GRAPH_TEMPERATURE)
-						+ StringToArrayConverter.STRING_SEPARATOR
-						+ Integer.toString(TourManager.GRAPH_CADENCE)
-						+ StringToArrayConverter.STRING_SEPARATOR
-						+ Integer.toString(TourManager.GRAPH_ALTIMETER)
-						+ StringToArrayConverter.STRING_SEPARATOR
-						+ Integer.toString(TourManager.GRAPH_GRADIENT)
-						+ StringToArrayConverter.STRING_SEPARATOR
+				(Integer.toString(TourManager.GRAPH_ALTITUDE) + separator)
+						+ (Integer.toString(TourManager.GRAPH_SPEED) + separator)
+						+ (Integer.toString(TourManager.GRAPH_PACE) + separator)
+						+ (Integer.toString(TourManager.GRAPH_PULSE) + separator)
+						+ (Integer.toString(TourManager.GRAPH_TEMPERATURE) + separator)
+						+ (Integer.toString(TourManager.GRAPH_CADENCE) + separator)
+						+ (Integer.toString(TourManager.GRAPH_ALTIMETER) + separator)
+						+ (Integer.toString(TourManager.GRAPH_GRADIENT) + separator)
 						+ Integer.toString(TourManager.GRAPH_POWER));
 
 		// define which unit is shown on the x-axis

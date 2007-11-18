@@ -28,7 +28,6 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.views.tourBook.SelectionRemovedTours;
 import net.tourbook.ui.views.tourMap.SelectionNewRefTours;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -120,9 +119,9 @@ public class TourEditor extends EditorPart {
 
 					fTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
 
-				} else if (!selection.isEmpty() && selection instanceof SelectionRemovedTours) {
+				} else if (!selection.isEmpty() && selection instanceof SelectionDeletedTours) {
 
-					final SelectionRemovedTours tourSelection = (SelectionRemovedTours) selection;
+					final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
 					final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
 					final long tourId = fTourData.getTourId().longValue();
 

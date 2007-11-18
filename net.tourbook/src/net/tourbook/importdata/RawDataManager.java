@@ -73,8 +73,6 @@ public class RawDataManager {
 
 	private boolean						fIsImported;
 
-//	private RawDataView					fRawDataView;
-
 	private RawDataManager() {}
 
 	public static RawDataManager getInstance() {
@@ -329,7 +327,7 @@ public class RawDataManager {
 						}
 					}
 
-					if (isDataImported = false) {
+					if (isDataImported == false) {
 						showMsgBoxInvalidFormat(fileName);
 					}
 				}
@@ -410,13 +408,19 @@ public class RawDataManager {
 						List peopleList = query.getResultList();
 						if (peopleList.size() != 0) {
 
-							// tour is in the database
+							// tour is in the database, replace the imported tour with the tour from the database
 
 							final TourData tourDataFromDB = (TourData) peopleList.get(0);
 
 							tourDataFromDB.importRawDataFile = tourData.importRawDataFile;
 
 							fTourDataMap.put(tourDataFromDB.getTourId().toString(), tourDataFromDB);
+
+						} else {
+
+							// when a tour was deleted the person in the tour data must be removed
+
+							tourData.setTourPerson(null);
 						}
 					}
 

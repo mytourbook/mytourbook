@@ -22,6 +22,8 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContainer;
 import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.util.PostSelectionProvider;
@@ -29,6 +31,7 @@ import net.tourbook.util.PostSelectionProvider;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -37,7 +40,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
@@ -82,6 +87,8 @@ public class TourStatisticsView extends ViewPart {
 	protected Long					fActiveTourId;
 
 	private ITourPropertyListener	fTourPropertyListener;
+
+	private ISelectionListener		fPostSelectionListener;
 
 	private void addPartListener() {
 
@@ -151,10 +158,33 @@ public class TourStatisticsView extends ViewPart {
 				.addPropertyChangeListener(fPrefChangeListener);
 	}
 
+	private void addSelectionListener() {
+
+		// this view part is a selection listener
+		fPostSelectionListener = new ISelectionListener() {
+
+			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+
+				if (selection instanceof SelectionNewTours && selection.isEmpty() == false) {
+
+					refreshStatistics();
+
+				} else if (selection instanceof SelectionDeletedTours
+						&& selection.isEmpty() == false) {
+
+					refreshStatistics();
+				}
+			}
+		};
+
+		// register selection listener in the page
+		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+	}
+
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
 
@@ -171,7 +201,7 @@ public class TourStatisticsView extends ViewPart {
 
 		createResources();
 
-		// set selection provider before the statistic container is created
+		// this view is a selection provider, set it before the statistics container is created
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		fStatisticContainer = new StatisticContainer(getViewSite(),
@@ -181,6 +211,7 @@ public class TourStatisticsView extends ViewPart {
 
 		addPartListener();
 		addPrefListener();
+		addSelectionListener();
 		addTourPropertyListener();
 
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
@@ -208,6 +239,7 @@ public class TourStatisticsView extends ViewPart {
 	public void dispose() {
 
 		getViewSite().getPage().removePartListener(fPartListener);
+		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
 		TourbookPlugin.getDefault()

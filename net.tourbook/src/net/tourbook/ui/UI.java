@@ -64,12 +64,14 @@ public class UI {
 	private static final String				UNIT_SPEED_KM_H					= "km/h";										//$NON-NLS-1$
 	private static final String				UNIT_FAHRENHEIT_C				= "°C";										//$NON-NLS-1$
 	private static final String				UNIT_ALTIMETER_M_H				= "m/h";										//$NON-NLS-1$
+	private static final String				UNIT_PACE_MIN_P_KM				= "min/km";
 
 	private static final String				UNIT_ALTITUDE_FT				= "ft";										//$NON-NLS-1$
 	public static final String				UNIT_DISTANCE_MI				= "mi";										//$NON-NLS-1$
 	private static final String				UNIT_SPEED_MPH					= "mph";										//$NON-NLS-1$
 	private static final String				UNIT_FAHRENHEIT_F				= "°F";										//$NON-NLS-1$
 	private static final String				UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
+	private static final String				UNIT_PACE_MIN_P_MILE			= "min/mi";
 
 	private static final float				UNIT_MILE						= 1.609344f;
 	private static final float				UNIT_FOOT						= 0.3048f;
@@ -101,6 +103,7 @@ public class UI {
 	public static String					UNIT_LABEL_ALTIMETER;
 	public static String					UNIT_LABEL_FAHRENHEIT;
 	public static String					UNIT_LABEL_SPEED;
+	public static String					UNIT_LABEL_PACE;
 
 	public final static ImageRegistry		IMAGE_REGISTRY;
 
@@ -300,16 +303,20 @@ public class UI {
 			// set imperial measure system
 
 			UNIT_VALUE_DISTANCE = UNIT_MILE;
+
 			UNIT_LABEL_DISTANCE = UNIT_DISTANCE_MI;
 			UNIT_LABEL_SPEED = UNIT_SPEED_MPH;
+			UNIT_LABEL_PACE = UNIT_PACE_MIN_P_MILE;
 
 		} else {
 
 			// default is the metric measure system
 
 			UNIT_VALUE_DISTANCE = 1;
+
 			UNIT_LABEL_DISTANCE = UNIT_DISTANCE_KM;
 			UNIT_LABEL_SPEED = UNIT_SPEED_KM_H;
+			UNIT_LABEL_PACE = UNIT_PACE_MIN_P_KM;
 		}
 
 		/*
@@ -321,6 +328,7 @@ public class UI {
 			// set imperial measure system
 
 			UNIT_VALUE_ALTITUDE = UNIT_FOOT;
+
 			UNIT_LABEL_ALTITUDE = UNIT_ALTITUDE_FT;
 			UNIT_LABEL_ALTIMETER = UNIT_ALTIMETER_FT_H;
 
@@ -329,6 +337,7 @@ public class UI {
 			// default is the metric measure system
 
 			UNIT_VALUE_ALTITUDE = 1;
+
 			UNIT_LABEL_ALTITUDE = UNIT_ALTITUDE_M;
 			UNIT_LABEL_ALTIMETER = UNIT_ALTIMETER_M_H;
 		}

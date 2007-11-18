@@ -67,6 +67,7 @@ public class TourChart extends Chart {
 
 	static final String						COMMAND_ID_GRAPH_ALTITUDE			= "net.tourbook.command.graph.altitude";				//$NON-NLS-1$
 	static final String						COMMAND_ID_GRAPH_SPEED				= "net.tourbook.command.graph.speed";					//$NON-NLS-1$
+	static final String						COMMAND_ID_GRAPH_PACE				= "net.tourbook.command.graph.pace";					//$NON-NLS-1$
 	static final String						COMMAND_ID_GRAPH_PULSE				= "net.tourbook.command.graph.pulse";					//$NON-NLS-1$
 	static final String						COMMAND_ID_GRAPH_TEMPERATURE		= "net.tourbook.command.graph.temperature";			//$NON-NLS-1$
 	static final String						COMMAND_ID_GRAPH_CADENCE			= "net.tourbook.command.graph.cadence";				//$NON-NLS-1$
@@ -269,6 +270,13 @@ public class TourChart extends Chart {
 				Messages.Graph_Label_Speed,
 				Messages.Tour_Action_graph_speed_tooltip,
 				Messages.Image__graph_speed,
+				null);
+
+		createGraphActionProxy(TourManager.GRAPH_PACE,
+				COMMAND_ID_GRAPH_PACE,
+				Messages.Graph_Label_Pace,
+				Messages.Tour_Action_graph_pace_tooltip,
+				Messages.Image__graph_pace,
 				null);
 
 		createGraphActionProxy(TourManager.GRAPH_ALTIMETER,
@@ -554,6 +562,7 @@ public class TourChart extends Chart {
 		tbm.add(new Separator());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_ALTITUDE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_SPEED)).getAction());
+		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_PACE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_PULSE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_TEMPERATURE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_CADENCE)).getAction());

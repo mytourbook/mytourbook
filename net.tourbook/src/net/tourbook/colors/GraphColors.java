@@ -37,6 +37,7 @@ public class GraphColors {
 	public static final String	PREF_GRAPH_ALTIMETER	= "altimeter";		//$NON-NLS-1$
 	public static final String	PREF_GRAPH_CADENCE		= "cadence";		//$NON-NLS-1$
 	public static final String	PREF_GRAPH_TOUR_COMPARE	= "tourCompare";	//$NON-NLS-1$
+	public static final String	PREF_GRAPH_PACE			= "pace";
 
 	public static final String	PREF_COLOR_BRIGHT		= "bright";		//$NON-NLS-1$
 	public static final String	PREF_COLOR_DARK			= "dark";			//$NON-NLS-1$ 
@@ -72,6 +73,12 @@ public class GraphColors {
 					new RGB(255, 255, 255),
 					new RGB(0, 113, 229),
 					new RGB(0, 94, 187)),
+
+			new ColorDefinition(PREF_GRAPH_PACE,
+					Messages.Graph_Label_Pace,
+					new RGB(255, 255, 255),
+					new RGB(149, 119, 223),
+					new RGB(142, 113, 212)),
 
 			new ColorDefinition(PREF_GRAPH_HEARTBEAT, Messages.Graph_Label_Heartbeat, new RGB(255,
 					255,

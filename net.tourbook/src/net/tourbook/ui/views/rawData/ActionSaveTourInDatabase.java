@@ -27,6 +27,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.ui.ResizeableListDialog;
 
 import org.eclipse.jface.action.Action;
@@ -57,6 +58,7 @@ public class ActionSaveTourInDatabase extends Action {
 	private class PeopleContentProvider implements IStructuredContentProvider {
 
 		public void dispose() {}
+
 		public Object[] getElements(Object inputElement) {
 			return fPeople.toArray();
 		}
@@ -86,8 +88,7 @@ public class ActionSaveTourInDatabase extends Action {
 		fViewPart = viewPart;
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_tour));
-		setDisabledImageDescriptor(TourbookPlugin
-				.getImageDescriptor(Messages.Image__save_tour_disabled));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_tour_disabled));
 
 		// setToolTipText("Save tour(s) in the database so it can be viewed in
 		// other views");
@@ -135,6 +136,7 @@ public class ActionSaveTourInDatabase extends Action {
 	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
+	@Override
 	public void run() {
 
 		final TourPerson person;
@@ -154,15 +156,14 @@ public class ActionSaveTourInDatabase extends Action {
 
 		Runnable runnable = new Runnable() {
 
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				boolean isModified = false;
 				boolean saveInDatabase = false;
 
 				// get selected tours
-				final IStructuredSelection selection = ((IStructuredSelection) fViewPart
-						.getTourViewer()
+				final IStructuredSelection selection = ((IStructuredSelection) fViewPart.getTourViewer()
 						.getSelection());
 
 				// loop: all selected tours
@@ -207,15 +208,15 @@ public class ActionSaveTourInDatabase extends Action {
 					/*
 					 * fire event that new tours have been saved in the database
 					 */
-					SelectionRawData selectionRawData = new SelectionRawData();
+					SelectionNewTours selectionNewTours = new SelectionNewTours();
 
 					// activate selection
-					selectionRawData.setEmpty(false);
+					selectionNewTours.setEmpty(false);
 
-					fViewPart.fireSelectionEvent(selectionRawData);
+					fViewPart.fireSelectionEvent(selectionNewTours);
 
 					// deactivate selection
-					selectionRawData.setEmpty(true);
+					selectionNewTours.setEmpty(true);
 				}
 			}
 		};
@@ -276,9 +277,8 @@ public class ActionSaveTourInDatabase extends Action {
 	}
 
 	/**
-	 * Sets the person for which the tour should be saved, when set to
-	 * <code>null</code>, the person needs to be selected before the tour is
-	 * saved.
+	 * Sets the person for which the tour should be saved, when set to <code>null</code>, the
+	 * person needs to be selected before the tour is saved.
 	 * 
 	 * @param person
 	 */

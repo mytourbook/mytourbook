@@ -23,6 +23,7 @@ import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.ITourItem;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TreeViewerItem;
 
 import org.eclipse.jface.action.Action;
@@ -32,6 +33,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 public class ActionDeleteTour extends Action {
 
 	private TourBookView	tourView;
+	private TreeViewerItem	fNextSelectedTreeItem;
 
 	public ActionDeleteTour(TourBookView tourBookView) {
 
@@ -48,7 +50,7 @@ public class ActionDeleteTour extends Action {
 	@Override
 	public void run() {
 
-		SelectionRemovedTours selectionRemovedTours = new SelectionRemovedTours();
+		SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
 
 		// get selected reference tours
 		IStructuredSelection selection = (IStructuredSelection) tourView.getTourViewer()
@@ -62,9 +64,15 @@ public class ActionDeleteTour extends Action {
 
 		// set selection empty
 		selectionRemovedTours.removedTours.clear();
+
+		if (fNextSelectedTreeItem != null) {
+			tourView.getTourViewer().setSelection(new StructuredSelection(fNextSelectedTreeItem),
+					true);
+		}
+
 	}
 
-	private void deleteTours(Iterator<?> selection, SelectionRemovedTours selectionRemovedTours) {
+	private void deleteTours(Iterator<?> selection, SelectionDeletedTours selectionRemovedTours) {
 
 		ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
 
@@ -118,9 +126,9 @@ public class ActionDeleteTour extends Action {
 		 * are multiple possibilities
 		 */
 
-		if (firstSelectedParent != null) {
+		fNextSelectedTreeItem = null;
 
-			TreeViewerItem nextSelectedTreeItem = null;
+		if (firstSelectedParent != null) {
 
 			ArrayList<TreeViewerItem> firstSelectedChildren = firstSelectedParent.getChildren();
 			int remainingChildren = firstSelectedChildren.size();
@@ -130,9 +138,9 @@ public class ActionDeleteTour extends Action {
 				// there are children still available
 
 				if (firstSelectedTourIndex < remainingChildren) {
-					nextSelectedTreeItem = firstSelectedChildren.get(firstSelectedTourIndex);
+					fNextSelectedTreeItem = firstSelectedChildren.get(firstSelectedTourIndex);
 				} else {
-					nextSelectedTreeItem = firstSelectedChildren.get(remainingChildren - 1);
+					fNextSelectedTreeItem = firstSelectedChildren.get(remainingChildren - 1);
 				}
 
 			} else {
@@ -141,16 +149,12 @@ public class ActionDeleteTour extends Action {
 				 * it's possible that the parent does not have any children, then also this parent
 				 * must be removed (to be done later)
 				 */
-				nextSelectedTreeItem = firstSelectedParent;
+				fNextSelectedTreeItem = firstSelectedParent;
 				// for (TreeViewerItem tourParent : tourParents) {
 				//					
 				// }
 			}
-
-			tourView.getTourViewer().setSelection(new StructuredSelection(nextSelectedTreeItem),
-					true);
 		}
-
 	}
 
 }

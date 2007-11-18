@@ -140,6 +140,8 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Gradiend_unit;
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
+
+	public static String	Graph_Label_Pace;
 	public static String		Graph_Label_Power;
 	public static String		Graph_Label_Speed;
 	public static String		Graph_Label_Temperature;
@@ -169,6 +171,8 @@ public class Messages extends NLS {
 	public static String		Image__graph_cadence;
 	public static String		Image__graph_gradient;
 	public static String		Image__graph_heartbeat;
+
+	public static String	Image__graph_pace;
 	public static String		Image__graph_speed;
 	public static String		Image__graph_temperature;
 	public static String		Image__graph_tour_compare;
@@ -334,6 +338,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_cadence_tooltip;
 	public static String		Tour_Action_graph_gradient_tooltip;
 	public static String		Tour_Action_graph_heartbeat_tooltip;
+
+	public static String	Tour_Action_graph_pace_tooltip;
 	public static String		Tour_Action_graph_speed_tooltip;
 	public static String		Tour_Action_graph_temperature_tooltip;
 	public static String		Tour_Action_graph_tour_compare_tooltip;
@@ -461,9 +467,13 @@ public class Messages extends NLS {
 
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;
+
+	public static String	TourChart_Property_check_customize_pace_clipping;
 	public static String		TourChart_Property_check_customize_value_clipping;
 	public static String		TourChart_Property_check_customize_value_computing;
 	public static String		TourChart_Property_label_chart_type;
+
+	public static String	TourChart_Property_label_pace_speed;
 	public static String		TourChart_Property_label_time_slices;
 
 	public static String		TourData_Label_device_marker;

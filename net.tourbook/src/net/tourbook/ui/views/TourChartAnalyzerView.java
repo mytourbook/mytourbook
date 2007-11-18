@@ -836,6 +836,7 @@ public class TourChartAnalyzerView extends ViewPart {
 							analyzerInfo.getAvgDecimals(),
 							false)
 							+ " "); //$NON-NLS-1$
+//					graphInfo.avg.setText(valuesIndexLeft + " "); //$NON-NLS-1$
 				} else {
 					graphInfo.avg.setText(ChartUtil.formatValue((int) avg,
 							xAxisUnit,
