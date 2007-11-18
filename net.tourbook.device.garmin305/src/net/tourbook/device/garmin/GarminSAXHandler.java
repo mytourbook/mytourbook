@@ -383,7 +383,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 				prevTimeData.distance = currentDistance - prevDistance;
 
-				System.out.println(prevTimeData.distance);
+//				System.out.println(prevTimeData.distance);
 
 				prevAltitude = currentAltitude;
 			}
