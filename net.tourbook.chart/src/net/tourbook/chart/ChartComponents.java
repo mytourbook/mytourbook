@@ -519,7 +519,8 @@ public class ChartComponents extends Composite {
 		final ArrayList<ChartUnit> unitList = drawingData.getYUnits();
 
 		int graphValue = graphMinValue;
-
+		int maxUnits = 0;
+		
 		// loop: create unit label for all units
 		while (graphValue <= graphMaxValue) {
 			unitList.add(new ChartUnit(graphValue, ChartUtil.formatValue(graphValue,
@@ -528,11 +529,12 @@ public class ChartComponents extends Composite {
 					false)));
 
 			// prevent endless loops when the unit is 0
-			if (graphValue == graphMaxValue) {
+			if (graphValue == graphMaxValue || maxUnits  >1000) {
 				break;
 			}
 
 			graphValue += unit;
+			maxUnits++;
 		}
 	}
 

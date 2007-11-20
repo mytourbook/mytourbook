@@ -57,8 +57,13 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final String			TAG_VALUE					= "Value";														//$NON-NLS-1$
 
 	private static final Calendar		fCalendar					= GregorianCalendar.getInstance();
-	private static final DateFormat		iso							= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
-
+	private static final DateFormat		iso							= 
+		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
+		
+//		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");			//$NON-NLS-1$
+	
+//	SimpleDateFormat("yyyy-MM-dd'T'H:mm:ssZ")
+	
 	private int							fDataVersion				= -1;
 	private boolean						fIsInActivity				= false;
 	private boolean						fIsInCourse					= false;
@@ -91,6 +96,8 @@ public class GarminSAXHandler extends DefaultHandler {
 	private boolean						fIsImported;
 	private long						fCurrentTime;
 
+	private StringBuilder fCharacters=new StringBuilder();
+
 	{
 		iso.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
@@ -113,48 +120,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				|| fIsInAltitude
 				|| fIsInHeartRateValue) {
 
-			String dataString = new String(chars, startIndex, length).trim();
-
-			try {
-
-				if (fIsInTime) {
-
-					fCurrentTime = iso.parse(dataString).getTime();
-
-					fTimeData.absoluteTime = fCurrentTime;
-
-				} else if (fIsInLatitude) {
-
-					fTimeData.latitude = getDoubleValue(dataString);
-
-				} else if (fIsInLongitude) {
-
-					fTimeData.longitude = getDoubleValue(dataString);
-
-				} else if (fIsInDistance) {
-
-					fTimeData.absoluteDistance = getFloatValue(dataString);
-
-				} else if (fIsInAltitude) {
-
-					fTimeData.absoluteAltitude = getFloatValue(dataString);
-
-				} else if (fDataVersion == 1 && fIsInHeartRate) {
-
-					final short pulse = getShortValue(dataString);
-					fTimeData.pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
-
-				} else if (fDataVersion == 2 && fIsInHeartRateValue) {
-
-					final short pulse = getShortValue(dataString);
-					fTimeData.pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
-				}
-
-			} catch (final NumberFormatException e) {
-				e.printStackTrace();
-			} catch (final ParseException e) {
-				e.printStackTrace();
-			}
+			fCharacters.append( chars, startIndex, length );
 		}
 	}
 
@@ -456,72 +422,128 @@ public class GarminSAXHandler extends DefaultHandler {
 	@Override
 	public void endElement(String uri, String localName, String name) throws SAXException {
 
-		if (fIsInHeartRateValue && name.equals(TAG_VALUE)) {
-			fIsInHeartRateValue = false;
-		} else if (name.equals(TAG_HEART_RATE_BPM)) {
-			fIsInHeartRate = false;
-		} else if (name.equals(TAG_ALTITUDE_METERS)) {
-			fIsInAltitude = false;
-		} else if (name.equals(TAG_DISTANCE_METERS)) {
-			fIsInDistance = false;
-		} else if (name.equals(TAG_LATITUDE_DEGREES)) {
-			fIsInLatitude = false;
-		} else if (name.equals(TAG_LONGITUDE_DEGREES)) {
-			fIsInLongitude = false;
-		} else if (name.equals(TAG_TIME)) {
-			fIsInTime = false;
+		try {
 
-		} else if (name.equals(TAG_TRACKPOINT)) {
+			if (fIsInTrackpoint) {
 
-			/*
-			 * keep trackpoint data
-			 */
-			fIsInTrackpoint = false;
+				if (fIsInHeartRateValue && name.equals(TAG_VALUE)) {
 
-			// ignore corrupt values, time and altitude must be set
-			if (fTimeData != null
-					&& fTimeData.absoluteTime != Long.MIN_VALUE
-					&& fTimeData.absoluteAltitude != Float.MIN_VALUE) {
+					fIsInHeartRateValue = false;
 
-				if (fSetLapMarker) {
-					fSetLapMarker = false;
+					if (fDataVersion == 2) {
+						final short pulse = getShortValue(fCharacters
+								.toString());
+						fTimeData.pulse = pulse == Integer.MIN_VALUE ? 0
+								: pulse;
+					}
 
-					fTimeData.marker = 1;
-					fTimeData.markerLabel = Integer.toString(fLapCounter - 1);
+				} else if (name.equals(TAG_HEART_RATE_BPM)) {
+
+					fIsInHeartRate = false;
+
+					if (fDataVersion == 1) {
+						final short pulse = getShortValue(fCharacters
+								.toString());
+						fTimeData.pulse = pulse == Integer.MIN_VALUE ? 0
+								: pulse;
+					}
+
+				} else if (name.equals(TAG_ALTITUDE_METERS)) {
+
+					fIsInAltitude = false;
+
+					fTimeData.absoluteAltitude = getFloatValue(fCharacters
+							.toString());
+
+				} else if (name.equals(TAG_DISTANCE_METERS)) {
+
+					fIsInDistance = false;
+
+					fTimeData.absoluteDistance = getFloatValue(fCharacters
+							.toString());
+
+				} else if (name.equals(TAG_LATITUDE_DEGREES)) {
+
+					fIsInLatitude = false;
+
+					fTimeData.latitude = getDoubleValue(fCharacters.toString());
+
+				} else if (name.equals(TAG_LONGITUDE_DEGREES)) {
+
+					fIsInLongitude = false;
+
+					fTimeData.longitude = getDoubleValue(fCharacters.toString());
+
+				} else if (name.equals(TAG_TIME)) {
+
+					fIsInTime = false;
+
+					fCurrentTime = iso.parse(fCharacters.toString()).getTime();
+
+					fTimeData.absoluteTime = fCurrentTime;
+
+				}
+			} 
+			
+			if (name.equals(TAG_TRACKPOINT)) {
+
+				/*
+				 * keep trackpoint data
+				 */
+				fIsInTrackpoint = false;
+
+				// ignore corrupt values, time and altitude must be set
+				if (fTimeData != null
+						&& fTimeData.absoluteTime != Long.MIN_VALUE
+						&& fTimeData.absoluteAltitude != Float.MIN_VALUE) {
+
+					if (fSetLapMarker) {
+						fSetLapMarker = false;
+
+						fTimeData.marker = 1;
+						fTimeData.markerLabel = Integer
+								.toString(fLapCounter - 1);
+					}
+
+					fTimeDataList.add(fTimeData);
 				}
 
-				fTimeDataList.add(fTimeData);
+				if (fSetLapStartTime) {
+					fSetLapStartTime = false;
+					fLapStart.add(fCurrentTime);
+				}
+
+			} else if (name.equals(TAG_LAP)) {
+
+				fIsInLap = false;
+
+			} else if (name.equals(TAG_ACTIVITY)) {
+
+				/*
+				 * version 2: activity and tour ends
+				 */
+
+				fIsInActivity = false;
+
+				setTourData();
+
+			} else if (name.equals(TAG_COURSE)) {
+
+				/*
+				 * version 1: course and tour ends
+				 */
+
+				fIsInCourse = false;
+
+				setTourData();
 			}
 
-			if (fSetLapStartTime) {
-				fSetLapStartTime = false;
-				fLapStart.add(fCurrentTime);
-			}
-
-		} else if (name.equals(TAG_LAP)) {
-
-			fIsInLap = false;
-
-		} else if (name.equals(TAG_ACTIVITY)) {
-
-			/*
-			 * version 2: activity and tour ends
-			 */
-
-			fIsInActivity = false;
-
-			setTourData();
-
-		} else if (name.equals(TAG_COURSE)) {
-
-			/*
-			 * version 1: course and tour ends
-			 */
-
-			fIsInCourse = false;
-
-			setTourData();
+		} catch (final NumberFormatException e) {
+			e.printStackTrace();
+		} catch (final ParseException e) {
+			e.printStackTrace();
 		}
+
 	}
 
 	private double getDoubleValue(String textValue) {
@@ -647,18 +669,31 @@ public class GarminSAXHandler extends DefaultHandler {
 
 						if (name.equals(TAG_HEART_RATE_BPM)) {
 							fIsInHeartRate = true;
+							fCharacters.delete(0, fCharacters.length());
+							
 						} else if (name.equals(TAG_ALTITUDE_METERS)) {
 							fIsInAltitude = true;
+							fCharacters.delete(0, fCharacters.length());
+							
 						} else if (name.equals(TAG_DISTANCE_METERS)) {
 							fIsInDistance = true;
+							fCharacters.delete(0, fCharacters.length());
+							
 						} else if (name.equals(TAG_TIME)) {
 							fIsInTime = true;
+							fCharacters.delete(0, fCharacters.length());
+							
 						} else if (name.equals(TAG_LATITUDE_DEGREES)) {
 							fIsInLatitude = true;
+							fCharacters.delete(0, fCharacters.length());
+							
 						} else if (name.equals(TAG_LONGITUDE_DEGREES)) {
 							fIsInLongitude = true;
+							fCharacters.delete(0, fCharacters.length());
+							
 						} else if (fIsInHeartRate && name.equals(TAG_VALUE)) {
 							fIsInHeartRateValue = true;
+							fCharacters.delete(0, fCharacters.length());
 						}
 
 					} else if (name.equals(TAG_TRACKPOINT)) {
@@ -709,18 +744,31 @@ public class GarminSAXHandler extends DefaultHandler {
 
 							if (name.equals(TAG_HEART_RATE_BPM)) {
 								fIsInHeartRate = true;
+								fCharacters.delete(0, fCharacters.length());
+								
 							} else if (name.equals(TAG_ALTITUDE_METERS)) {
 								fIsInAltitude = true;
+								fCharacters.delete(0, fCharacters.length());
+								
 							} else if (name.equals(TAG_DISTANCE_METERS)) {
 								fIsInDistance = true;
+								fCharacters.delete(0, fCharacters.length());
+								
 							} else if (name.equals(TAG_TIME)) {
 								fIsInTime = true;
+								fCharacters.delete(0, fCharacters.length());
+								
 							} else if (name.equals(TAG_LATITUDE_DEGREES)) {
 								fIsInLatitude = true;
+								fCharacters.delete(0, fCharacters.length());
+								
 							} else if (name.equals(TAG_LONGITUDE_DEGREES)) {
 								fIsInLongitude = true;
+								fCharacters.delete(0, fCharacters.length());
+								
 							} else if (fIsInHeartRate && name.equals(TAG_VALUE)) {
 								fIsInHeartRateValue = true;
+								fCharacters.delete(0, fCharacters.length());
 							}
 
 						} else if (name.equals(TAG_TRACKPOINT)) {
