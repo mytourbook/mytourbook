@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.feature"
       label="%Feature_Name"
-      version="1.1.0.v20071107"
+      version="1.2.0.v2007"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 

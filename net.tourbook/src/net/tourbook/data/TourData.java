@@ -218,6 +218,8 @@ public class TourData {
 	@Basic(optional = false)
 	private SerieData			serieData;
 
+	private GPSData				gpsData;
+
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourMarker>		tourMarkers						= new HashSet<TourMarker>();
@@ -304,6 +306,14 @@ public class TourData {
 
 	@Transient
 	public int[]				tourCompareSerie;
+
+	/*
+	 * GPS data
+	 */
+	@Transient
+	public double[]				latitudeSerie;
+	@Transient
+	public double[]				longitudeSerie;
 
 	/**
 	 * Index of the segmented data in the original serie
@@ -1006,16 +1016,22 @@ public class TourData {
 	}
 
 	/**
-	 * Convert <code>TimeData</code> into <code>TourData</code>
+	 * Convert {@link TimeData} into {@link TourData}
 	 * 
-	 * @param createMarker
-	 *        creates the markers when set to <code>true</code>
+	 * @param isCreateMarker
+	 *        creates markers when <code>true</code>
 	 */
-	public void createTimeSeries(ArrayList<TimeData> timeDataList, boolean createMarker) {
+	public void createTimeSeries(ArrayList<TimeData> timeDataList, boolean isCreateMarker) {
 
 		int serieLength = timeDataList.size();
 
 		if (serieLength > 0) {
+
+			// check if gps data are available
+			if (timeDataList.get(0).latitude != Double.MIN_VALUE) {
+				latitudeSerie = new double[serieLength];
+				longitudeSerie = new double[serieLength];
+			}
 
 			timeSerie = new int[serieLength];
 			distanceSerie = new int[serieLength];
@@ -1027,58 +1043,121 @@ public class TourData {
 			// speedSerie = new int[serieLength];
 			// powerSerie = new int[serieLength];
 
-			int distanceDiff[] = new int[serieLength];
 			int timeIndex = 0;
 
 			int timeAbsolute = 0;
-
 			int altitudeAbsolute = 0;
 			int distanceAbsolute = 0;
 
-			// convert data from the tour format into an interger[]
-			for (TimeData timeData : timeDataList) {
+			if (timeDataList.get(0).absoluteTime != Long.MIN_VALUE) {
 
-				timeSerie[timeIndex] = timeAbsolute;
+				/*
+				 * absolute data are available, normally from GPS devices
+				 */
 
-				distanceSerie[timeIndex] = distanceAbsolute += timeData.distance;
-				altitudeSerie[timeIndex] = altitudeAbsolute += timeData.altitude;
+				long firstTime = 0;
+				TimeData prevTimeData = null;
 
-				pulseSerie[timeIndex] = timeData.pulse;
-				temperatureSerie[timeIndex] = timeData.temperature;
-				cadenceSerie[timeIndex] = timeData.cadence;
+				// convert data from the tour format into an interger[]
+				for (TimeData timeData : timeDataList) {
 
-				// powerSerie[index] = 0;
+					if (prevTimeData == null) {
 
-				distanceDiff[timeIndex] = timeData.distance;
+						// first trackpoint
 
-				if (createMarker && timeData.marker != 0) {
+						prevTimeData = timeData;
 
-					// create a new marker
-					TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
+						firstTime = timeData.absoluteTime;
 
-					tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-					tourMarker.setTime(timeAbsolute + timeData.marker);
-					tourMarker.setDistance(distanceAbsolute);
-					tourMarker.setSerieIndex(timeIndex);
+						altitudeSerie[timeIndex] = altitudeAbsolute = (int) timeData.absoluteAltitude;
 
-					if (timeData.markerLabel == null) {
-						tourMarker.setLabel(Messages.TourData_Label_device_marker);
 					} else {
-						tourMarker.setLabel(timeData.markerLabel);
+
+						timeAbsolute = (int) ((timeData.absoluteTime - firstTime) / 1000);
+						timeSerie[timeIndex] = timeAbsolute;
+
+						int distanceDiff = (int) (timeData.absoluteDistance - distanceAbsolute);
+						int altitudeDiff = (int) (timeData.absoluteAltitude - altitudeAbsolute);
+
+						distanceSerie[timeIndex] = distanceAbsolute += distanceDiff;
+						altitudeSerie[timeIndex] = altitudeAbsolute += altitudeDiff;
 					}
 
-					getTourMarkers().add(tourMarker);
+					latitudeSerie[timeIndex] = timeData.latitude;
+					longitudeSerie[timeIndex] = timeData.longitude;
+
+					pulseSerie[timeIndex] = timeData.pulse;
+					temperatureSerie[timeIndex] = timeData.temperature;
+					cadenceSerie[timeIndex] = timeData.cadence;
+
+					if (isCreateMarker && timeData.marker != 0) {
+						createMarker(timeData, timeIndex, timeAbsolute, distanceAbsolute);
+					}
+
+					timeIndex++;
 				}
 
-//				timeAbsolute += deviceTimeInterval;
-				timeAbsolute += timeData.time;
+			} else {
 
-				timeIndex++;
+				/*
+				 * relativ data are available, these data are from non GPS devices
+				 */
+
+				// convert data from the tour format into an interger[]
+				for (TimeData timeData : timeDataList) {
+
+					timeSerie[timeIndex] = timeAbsolute;
+
+					distanceSerie[timeIndex] = distanceAbsolute += timeData.distance;
+					altitudeSerie[timeIndex] = altitudeAbsolute += timeData.altitude;
+
+					pulseSerie[timeIndex] = timeData.pulse;
+					temperatureSerie[timeIndex] = timeData.temperature;
+					cadenceSerie[timeIndex] = timeData.cadence;
+
+					if (isCreateMarker && timeData.marker != 0) {
+						createMarker(timeData, timeIndex, timeAbsolute, distanceAbsolute);
+					}
+
+					timeAbsolute += timeData.time;
+
+					timeIndex++;
+				}
 			}
 
 			tourDistance = distanceAbsolute;
 			tourRecordingTime = timeAbsolute;
 		}
+	}
+
+	/**
+	 * Create a device marker at the current position
+	 * 
+	 * @param timeData
+	 * @param timeIndex
+	 * @param timeAbsolute
+	 * @param distanceAbsolute
+	 */
+	private void createMarker(	TimeData timeData,
+								int timeIndex,
+								int timeAbsolute,
+								int distanceAbsolute) {
+
+		// create a new marker
+		TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
+
+		tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+		tourMarker.setTime(timeAbsolute + timeData.marker);
+		tourMarker.setDistance(distanceAbsolute);
+		tourMarker.setSerieIndex(timeIndex);
+
+		if (timeData.markerLabel == null) {
+			tourMarker.setLabel(Messages.TourData_Label_device_marker);
+		} else {
+			tourMarker.setLabel(timeData.markerLabel);
+		}
+
+		getTourMarkers().add(tourMarker);
 	}
 
 	/**
@@ -1768,6 +1847,15 @@ public class TourData {
 		// serieLength);
 		// System.arraycopy(serieData.powerSerie, 0, powerSerie, 0,
 		// serieLength);
+
+		if (gpsData != null) {
+
+			latitudeSerie = new double[serieLength];
+			longitudeSerie = new double[serieLength];
+
+			System.arraycopy(gpsData.latitude, 0, latitudeSerie, 0, serieLength);
+			System.arraycopy(gpsData.longitude, 0, longitudeSerie, 0, serieLength);
+		}
 	}
 
 	/**
@@ -1800,6 +1888,14 @@ public class TourData {
 		// serieLength);
 		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
 		// serieLength);
+
+		if (latitudeSerie != null) {
+
+			gpsData = new GPSData(serieLength);
+
+			System.arraycopy(latitudeSerie, 0, gpsData.latitude, 0, serieLength);
+			System.arraycopy(longitudeSerie, 0, gpsData.longitude, 0, serieLength);
+		}
 	}
 
 	/**
@@ -2043,20 +2139,20 @@ public class TourData {
 		this.tourType = tourType;
 	}
 
-	public void updateSerieData() {
-
-		final int serieLength = timeSerie.length;
-
-		System.arraycopy(altitudeSerie, 0, serieData.altitudeSerie, 0, serieLength);
-		System.arraycopy(cadenceSerie, 0, serieData.cadenceSerie, 0, serieLength);
-		System.arraycopy(distanceSerie, 0, serieData.distanceSerie, 0, serieLength);
-		System.arraycopy(pulseSerie, 0, serieData.pulseSerie, 0, serieLength);
-		System.arraycopy(temperatureSerie, 0, serieData.temperatureSerie, 0, serieLength);
-		System.arraycopy(timeSerie, 0, serieData.timeSerie, 0, serieLength);
-
-		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0,
-		// serieLength);
-		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
-		// serieLength);
-	}
+//	public void updateSerieData() {
+//
+//		final int serieLength = timeSerie.length;
+//
+//		System.arraycopy(altitudeSerie, 0, serieData.altitudeSerie, 0, serieLength);
+//		System.arraycopy(cadenceSerie, 0, serieData.cadenceSerie, 0, serieLength);
+//		System.arraycopy(distanceSerie, 0, serieData.distanceSerie, 0, serieLength);
+//		System.arraycopy(pulseSerie, 0, serieData.pulseSerie, 0, serieLength);
+//		System.arraycopy(temperatureSerie, 0, serieData.temperatureSerie, 0, serieLength);
+//		System.arraycopy(timeSerie, 0, serieData.timeSerie, 0, serieLength);
+//
+//		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0,
+//		// serieLength);
+//		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
+//		// serieLength);
+//	}
 }

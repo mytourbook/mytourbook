@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Import .CRP files
 Bundle-SymbolicName: net.tourbook.device.crp;singleton:=true
-Bundle-Version: 1.1.0.v20071107
+Bundle-Version: 1.2.0.v2007
 Bundle-Activator: net.tourbook.device.crp.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,

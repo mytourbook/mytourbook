@@ -65,7 +65,7 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int			TOURBOOK_DB_VERSION				= 4;
+	private static final int			TOURBOOK_DB_VERSION				= 5;
 
 	public final static String			TABLE_TOUR_DATA					= "TourData";								//$NON-NLS-1$
 	public final static String			TABLE_TOUR_MARKER				= "TourMarker";							//$NON-NLS-1$
@@ -659,8 +659,13 @@ public class TourDatabase {
 						+ "deviceModeName		VARCHAR(255),		\n" //$NON-NLS-1$
 						// version 4 end
 
+						// version 5 start
+						+ "gpsData 				BLOB,				\n" //$NON-NLS-1$
+						// version 5 end
+
 						+ "tourType_typeId 		BIGINT,				\n" //$NON-NLS-1$
 						+ "tourPerson_personId 	BIGINT,				\n" //$NON-NLS-1$
+
 						+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
 
 						+ ")"); //$NON-NLS-1$
@@ -1041,7 +1046,11 @@ public class TourDatabase {
 		}
 		if (currentDbVersion == 3) {
 			updateDbDesign_3_4(conn, monitor);
-			currentDbVersion = newVersion = TOURBOOK_DB_VERSION;
+			currentDbVersion = newVersion = 4;
+		}
+		if (currentDbVersion == 4) {
+			updateDbDesign_4_5(conn);
+			currentDbVersion = newVersion = 5;
 		}
 
 		// update the version number
@@ -1196,5 +1205,23 @@ public class TourDatabase {
 		// cleanup everything as if nothing has happened
 		emFactory.close();
 		emFactory = null;
+	}
+
+	private void updateDbDesign_4_5(Connection conn) {
+
+		try {
+			Statement statement = conn.createStatement();
+
+			String sql;
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN gpsData BLOB DEFAULT NULL"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			statement.executeBatch();
+			statement.close();
+
+		} catch (SQLException e) {
+			printSQLException(e);
+		}
 	}
 }

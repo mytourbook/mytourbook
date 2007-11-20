@@ -39,11 +39,6 @@ public class TimeData implements Serializable {
 	public short				time;
 
 	/**
-	 * contains the time value from {@link Date#getTime()}
-	 */
-	public long					absoluteTime		= Long.MIN_VALUE;
-
-	/**
 	 * absolute value for temperature
 	 */
 	public short				temperature;
@@ -63,17 +58,31 @@ public class TimeData implements Serializable {
 	 * slice
 	 */
 	public short				altitude;
-	public short				absoluteAltitude	= Short.MIN_VALUE;
 
 	/**
 	 * realative value for distance, this is the difference for the distance with the previous time
 	 * slice
 	 */
 	public int					distance;
-	public int					absoluteDistance	= Integer.MIN_VALUE;
 
-	public double				latitude;
-	public double				longitude;
+	/**
+	 * contains the time value from {@link Date#getTime()} or {@link Long#MIN_VALUE} when the time
+	 * is not set
+	 */
+	public long					absoluteTime		= Long.MIN_VALUE;
+
+	public float				absoluteAltitude	= Float.MIN_VALUE;
+	public float				absoluteDistance	= Float.MIN_VALUE;
+
+	/**
+	 * absolute value for latituce
+	 */
+	public double				latitude			= Double.MIN_VALUE;
+
+	/**
+	 * absolute value for longitude
+	 */
+	public double				longitude			= Double.MIN_VALUE;
 
 	/**
 	 * a marker is set when {@link TimeData#marker} is not 0
