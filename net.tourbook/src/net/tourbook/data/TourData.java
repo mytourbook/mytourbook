@@ -496,8 +496,7 @@ public class TourData {
 
 		final int[] dataSerieDistance = distanceSerie;
 		final int[] dataSerieAltitude = altitudeSerie;
-//		final int[] dataSerieDiff = distanceSerie;//timeSerie;
-		final int[] dataSerieDiff = timeSerie;
+		final int[] timeSerieDiff = timeSerie;
 
 		final int dataSerieAltimeter[] = new int[serieLength];
 		final int dataSerieGradient[] = new int[serieLength];
@@ -521,26 +520,26 @@ public class TourData {
 
 			// get index for the low value
 			int indexLow = Math.max(0, serieIndex - 1);
-			int dataDiffLow = dataSerieDiff[serieIndex] - dataSerieDiff[indexLow];
+			int dataDiffLow = timeSerieDiff[serieIndex] - timeSerieDiff[indexLow];
 			while (dataDiffLow < minDataDiff) {
 				// make sure to be in the array bounds
 				if (indexLow < 1) {
 					break;
 				}
-				dataDiffLow = dataSerieDiff[serieIndex] - dataSerieDiff[--indexLow];
+				dataDiffLow = timeSerieDiff[serieIndex] - timeSerieDiff[--indexLow];
 			}
 			// remove lowest index
 			indexLow = Math.min(serieLength - 1, ++indexLow);
 
 			// get index for the high value
 			int indexHigh = Math.min(serieLength - 1, serieIndex + 1);
-			int dataDiffHigh = dataSerieDiff[serieIndex] - dataSerieDiff[indexHigh];
+			int dataDiffHigh = timeSerieDiff[serieIndex] - timeSerieDiff[indexHigh];
 			while (dataDiffHigh < minDataDiff) {
 				// make sure to be in the array bounds
 				if (indexHigh > serieLength - 2) {
 					break;
 				}
-				dataDiffHigh = dataSerieDiff[indexHigh++] + -dataSerieDiff[serieIndex];
+				dataDiffHigh = timeSerieDiff[indexHigh++] + -timeSerieDiff[serieIndex];
 			}
 			// remove highest index
 			indexHigh = Math.max(0, --indexHigh);
@@ -887,32 +886,42 @@ public class TourData {
 
 			// adjust index to the array size
 			int lowIndex = Math.max(0, serieIndex - 1);
+			int highIndex = Math.min(serieIndex, serieLength - 1);
 
-			int timeDiff = timeSerie[serieIndex] - timeSerie[lowIndex];
-			int distDiff = 0;
+			int timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
+			int distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
 
-			if (timeDiff < minTimeDiff) {
-				while (timeDiff < minTimeDiff) {
+			boolean adjustHighIndex = true;
 
-					// make sure to be in the array range
-					if (lowIndex < 1) {
-						break;
-					}
+			while (timeDiff < minTimeDiff) {
 
+				// toggle to adjust low or high index
+				if (adjustHighIndex) {
+					highIndex++;
+				} else {
 					lowIndex--;
-
-					timeDiff = timeSerie[serieIndex] - timeSerie[lowIndex];
 				}
-			}
+				adjustHighIndex = !adjustHighIndex;
 
-			distDiff = distanceSerie[serieIndex] - distanceSerie[lowIndex];
+				// check array scope
+				if (lowIndex < 0 || highIndex >= serieLength) {
+					break;
+				}
+
+				timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
+				distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
+			}
 
 			int speed;
 			if (timeDiff == 0) {
 				speed = 0;
 			} else {
-				speed = (int) ((distDiff * 36f) / timeDiff / distanceMeasurementFactor);
-				speed = speed < 0 ? 0 : speed;
+				if (timeDiff > 20 && distDiff < 5) {
+					speed = 0;
+				} else {
+					speed = (int) ((distDiff * 36f) / timeDiff / distanceMeasurementFactor);
+					speed = speed < 0 ? 0 : speed;
+				}
 			}
 
 			int pace;
@@ -926,6 +935,9 @@ public class TourData {
 			paceDataSerie[serieIndex] = pace;
 		}
 
+		/*
+		 * save data
+		 */
 		if (distanceMeasurementFactor == 1) {
 
 			// use metric system

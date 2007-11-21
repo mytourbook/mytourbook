@@ -399,18 +399,16 @@ public class TourManager {
 				int timeDiff = timeSerie[serieIndex] - timeSerie[lowIndex];
 				int distDiff = 0;
 
-				if (timeDiff < clippingTime) {
-					while (timeDiff < clippingTime) {
+				while (timeDiff < clippingTime) {
 
-						// make sure to be in the array range
-						if (lowIndex < 1) {
-							break;
-						}
-
-						lowIndex--;
-
-						timeDiff = timeSerie[serieIndex] - timeSerie[lowIndex];
+					// make sure to be in the array range
+					if (lowIndex < 1) {
+						break;
 					}
+
+					lowIndex--;
+
+					timeDiff = timeSerie[serieIndex] - timeSerie[lowIndex];
 				}
 
 				distDiff = distanceSerie[serieIndex] - distanceSerie[lowIndex];

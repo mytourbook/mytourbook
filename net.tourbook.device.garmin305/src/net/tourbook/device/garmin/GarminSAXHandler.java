@@ -57,13 +57,11 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final String			TAG_VALUE					= "Value";														//$NON-NLS-1$
 
 	private static final Calendar		fCalendar					= GregorianCalendar.getInstance();
-	private static final DateFormat		iso							= 
-		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
-		
-//		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");			//$NON-NLS-1$
-	
+	private static final DateFormat		iso							= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
+
+//	new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");			//$NON-NLS-1$
 //	SimpleDateFormat("yyyy-MM-dd'T'H:mm:ssZ")
-	
+
 	private int							fDataVersion				= -1;
 	private boolean						fIsInActivity				= false;
 	private boolean						fIsInCourse					= false;
@@ -96,7 +94,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private boolean						fIsImported;
 	private long						fCurrentTime;
 
-	private StringBuilder fCharacters=new StringBuilder();
+	private StringBuilder				fCharacters					= new StringBuilder();
 
 	{
 		iso.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -120,7 +118,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				|| fIsInAltitude
 				|| fIsInHeartRateValue) {
 
-			fCharacters.append( chars, startIndex, length );
+			fCharacters.append(chars, startIndex, length);
 		}
 	}
 
@@ -431,10 +429,8 @@ public class GarminSAXHandler extends DefaultHandler {
 					fIsInHeartRateValue = false;
 
 					if (fDataVersion == 2) {
-						final short pulse = getShortValue(fCharacters
-								.toString());
-						fTimeData.pulse = pulse == Integer.MIN_VALUE ? 0
-								: pulse;
+						final short pulse = getShortValue(fCharacters.toString());
+						fTimeData.pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
 					}
 
 				} else if (name.equals(TAG_HEART_RATE_BPM)) {
@@ -442,25 +438,21 @@ public class GarminSAXHandler extends DefaultHandler {
 					fIsInHeartRate = false;
 
 					if (fDataVersion == 1) {
-						final short pulse = getShortValue(fCharacters
-								.toString());
-						fTimeData.pulse = pulse == Integer.MIN_VALUE ? 0
-								: pulse;
+						final short pulse = getShortValue(fCharacters.toString());
+						fTimeData.pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
 					}
 
 				} else if (name.equals(TAG_ALTITUDE_METERS)) {
 
 					fIsInAltitude = false;
 
-					fTimeData.absoluteAltitude = getFloatValue(fCharacters
-							.toString());
+					fTimeData.absoluteAltitude = getFloatValue(fCharacters.toString());
 
 				} else if (name.equals(TAG_DISTANCE_METERS)) {
 
 					fIsInDistance = false;
 
-					fTimeData.absoluteDistance = getFloatValue(fCharacters
-							.toString());
+					fTimeData.absoluteDistance = getFloatValue(fCharacters.toString());
 
 				} else if (name.equals(TAG_LATITUDE_DEGREES)) {
 
@@ -483,8 +475,8 @@ public class GarminSAXHandler extends DefaultHandler {
 					fTimeData.absoluteTime = fCurrentTime;
 
 				}
-			} 
-			
+			}
+
 			if (name.equals(TAG_TRACKPOINT)) {
 
 				/*
@@ -501,8 +493,7 @@ public class GarminSAXHandler extends DefaultHandler {
 						fSetLapMarker = false;
 
 						fTimeData.marker = 1;
-						fTimeData.markerLabel = Integer
-								.toString(fLapCounter - 1);
+						fTimeData.markerLabel = Integer.toString(fLapCounter - 1);
 					}
 
 					fTimeDataList.add(fTimeData);
@@ -670,27 +661,27 @@ public class GarminSAXHandler extends DefaultHandler {
 						if (name.equals(TAG_HEART_RATE_BPM)) {
 							fIsInHeartRate = true;
 							fCharacters.delete(0, fCharacters.length());
-							
+
 						} else if (name.equals(TAG_ALTITUDE_METERS)) {
 							fIsInAltitude = true;
 							fCharacters.delete(0, fCharacters.length());
-							
+
 						} else if (name.equals(TAG_DISTANCE_METERS)) {
 							fIsInDistance = true;
 							fCharacters.delete(0, fCharacters.length());
-							
+
 						} else if (name.equals(TAG_TIME)) {
 							fIsInTime = true;
 							fCharacters.delete(0, fCharacters.length());
-							
+
 						} else if (name.equals(TAG_LATITUDE_DEGREES)) {
 							fIsInLatitude = true;
 							fCharacters.delete(0, fCharacters.length());
-							
+
 						} else if (name.equals(TAG_LONGITUDE_DEGREES)) {
 							fIsInLongitude = true;
 							fCharacters.delete(0, fCharacters.length());
-							
+
 						} else if (fIsInHeartRate && name.equals(TAG_VALUE)) {
 							fIsInHeartRateValue = true;
 							fCharacters.delete(0, fCharacters.length());
@@ -745,27 +736,27 @@ public class GarminSAXHandler extends DefaultHandler {
 							if (name.equals(TAG_HEART_RATE_BPM)) {
 								fIsInHeartRate = true;
 								fCharacters.delete(0, fCharacters.length());
-								
+
 							} else if (name.equals(TAG_ALTITUDE_METERS)) {
 								fIsInAltitude = true;
 								fCharacters.delete(0, fCharacters.length());
-								
+
 							} else if (name.equals(TAG_DISTANCE_METERS)) {
 								fIsInDistance = true;
 								fCharacters.delete(0, fCharacters.length());
-								
+
 							} else if (name.equals(TAG_TIME)) {
 								fIsInTime = true;
 								fCharacters.delete(0, fCharacters.length());
-								
+
 							} else if (name.equals(TAG_LATITUDE_DEGREES)) {
 								fIsInLatitude = true;
 								fCharacters.delete(0, fCharacters.length());
-								
+
 							} else if (name.equals(TAG_LONGITUDE_DEGREES)) {
 								fIsInLongitude = true;
 								fCharacters.delete(0, fCharacters.length());
-								
+
 							} else if (fIsInHeartRate && name.equals(TAG_VALUE)) {
 								fIsInHeartRateValue = true;
 								fCharacters.delete(0, fCharacters.length());
