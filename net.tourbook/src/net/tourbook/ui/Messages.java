@@ -24,9 +24,7 @@ public class Messages extends NLS {
 	public static String		Action_configure_columns_tooltip;
 
 	public static String		ColumnFactory_altitude_down_label;
-	public static String		ColumnFactory_altitude_down_title;
 	public static String		ColumnFactory_altitude_down_tooltip;
-	public static String		ColumnFactory_altitude_up;
 	public static String		ColumnFactory_altitude_up_label;
 	public static String		ColumnFactory_altitude_up_tooltip;
 	public static String		ColumnFactory_avg_cadence;
@@ -35,7 +33,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_avg_pulse;
 	public static String		ColumnFactory_avg_pulse_label;
 	public static String		ColumnFactory_avg_pulse_tooltip;
-	public static String		ColumnFactory_avg_temperature;
 	public static String		ColumnFactory_avg_temperature_label;
 	public static String		ColumnFactory_avg_temperature_tooltip;
 	public static String		ColumnFactory_date;
@@ -59,13 +56,11 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_import_filepath;
 	public static String		ColumnFactory_import_filepath_label;
 	public static String		ColumnFactory_import_filepath_tooltip;
-	public static String		ColumnFactory_max_altitude;
 	public static String		ColumnFactory_max_altitude_label;
 	public static String		ColumnFactory_max_altitude_tooltip;
 	public static String		ColumnFactory_max_pulse;
 	public static String		ColumnFactory_max_pulse_label;
 	public static String		ColumnFactory_max_pulse_tooltip;
-	public static String		ColumnFactory_max_speed;
 	public static String		ColumnFactory_max_speed_label;
 	public static String		ColumnFactory_max_speed_tooltip;
 	public static String		ColumnFactory_profile;
@@ -74,7 +69,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_recording_time;
 	public static String		ColumnFactory_recording_time_label;
 	public static String		ColumnFactory_recording_time_tooltip;
-	public static String		ColumnFactory_speed;
 	public static String		ColumnFactory_speed_label;
 	public static String		ColumnFactory_speed_tooltip;
 	public static String		ColumnFactory_time;

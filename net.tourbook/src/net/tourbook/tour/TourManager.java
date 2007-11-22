@@ -871,7 +871,7 @@ public class TourManager {
 		final ChartDataYSerie yDataTemperature = getChartData(tourData.getTemperatureSerie(),
 				chartType);
 		yDataTemperature.setYTitle(Messages.Graph_Label_Temperature);
-		yDataTemperature.setUnitLabel(UI.UNIT_LABEL_FAHRENHEIT);
+		yDataTemperature.setUnitLabel(UI.UNIT_LABEL_TEMPERATURE);
 		yDataTemperature.setShowYSlider(true);
 		yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataTemperature.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TEMPERATURE);

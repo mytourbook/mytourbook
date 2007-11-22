@@ -143,7 +143,7 @@ public abstract class TableColumnFactory {
 			
 			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "speed", SWT.TRAIL); //$NON-NLS-1$
 			colDef.setLabel(Messages.ColumnFactory_speed_label);
-			colDef.setText(Messages.ColumnFactory_speed);
+			colDef.setText(UI.UNIT_LABEL_SPEED);
 			colDef.setToolTipText(Messages.ColumnFactory_speed_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
@@ -156,8 +156,8 @@ public abstract class TableColumnFactory {
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
 			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL); //$NON-NLS-1$
-			colDef.setLabel(Messages.ColumnFactory_altitude_up_label);
-			colDef.setText(Messages.ColumnFactory_altitude_up);
+			colDef.setLabel(Messages.ColumnFactory_altitude_up_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")");
+			colDef.setText(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setToolTipText(Messages.ColumnFactory_altitude_up_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		
@@ -170,8 +170,8 @@ public abstract class TableColumnFactory {
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
 			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDown", SWT.TRAIL); //$NON-NLS-1$
-			colDef.setLabel(Messages.ColumnFactory_altitude_down_label);
-			colDef.setText(Messages.ColumnFactory_altitude_down_title);
+			colDef.setLabel(Messages.ColumnFactory_altitude_down_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")");
+			colDef.setText(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		

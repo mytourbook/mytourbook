@@ -650,6 +650,9 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 			}
 		});
 
+		/*
+		 * column: speed km/h - mph
+		 */
 		colDef = TreeColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -709,11 +712,19 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
+
 			@Override
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
-				cell.setText(Long.toString(tourItem.fColumnAvgTemperature));
+
+				long temperature = tourItem.fColumnAvgTemperature;
+
+				if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+					temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+				}
+				cell.setText(Long.toString(temperature));
+
 				setCellColor(cell, element);
 			}
 		});

@@ -132,7 +132,6 @@ public class Messages extends NLS {
 	public static String		Format_rawdata_file_yyyy_mm_dd;
 
 	public static String		Graph_Label_Altimeter;
-	public static String		Graph_Label_Altimeter_unit;
 	public static String		Graph_Label_Altitude;
 	public static String		Graph_Label_Cadence;
 	public static String		Graph_Label_Cadence_unit;
@@ -141,11 +140,10 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
 
-	public static String	Graph_Label_Pace;
+	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;
 	public static String		Graph_Label_Speed;
 	public static String		Graph_Label_Temperature;
-	public static String		Graph_Label_Temperature_unit;
 	public static String		Graph_Label_Tour_Compare;
 	public static String		Graph_Label_Tour_Compare_unit;
 
@@ -172,7 +170,7 @@ public class Messages extends NLS {
 	public static String		Image__graph_gradient;
 	public static String		Image__graph_heartbeat;
 
-	public static String	Image__graph_pace;
+	public static String		Image__graph_pace;
 	public static String		Image__graph_speed;
 	public static String		Image__graph_temperature;
 	public static String		Image__graph_tour_compare;
@@ -226,16 +224,13 @@ public class Messages extends NLS {
 	public static String		Pref_general_imperial_unit_fahrenheit;
 	public static String		Pref_general_imperial_unit_feet;
 	public static String		Pref_general_imperial_unit_mi;
-	public static String		Pref_general_imperial_units;
 	public static String		Pref_general_metric_unit_celcius;
 	public static String		Pref_general_metric_unit_km;
 	public static String		Pref_general_metric_unit_m;
-	public static String		Pref_general_metric_units;
 	public static String		Pref_general_show_system_in_ui;
 	public static String		Pref_general_system_altitude;
 	public static String		Pref_general_system_distance;
 	public static String		Pref_general_system_measurement;
-	public static String		Pref_general_system_of_measurement;
 	public static String		Pref_general_system_temperature;
 
 	public static String		Pref_Graphs_Button_down;
@@ -339,7 +334,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_gradient_tooltip;
 	public static String		Tour_Action_graph_heartbeat_tooltip;
 
-	public static String	Tour_Action_graph_pace_tooltip;
+	public static String		Tour_Action_graph_pace_tooltip;
 	public static String		Tour_Action_graph_speed_tooltip;
 	public static String		Tour_Action_graph_temperature_tooltip;
 	public static String		Tour_Action_graph_tour_compare_tooltip;
@@ -361,7 +356,6 @@ public class Messages extends NLS {
 	public static String		Tour_Database_update_tour;
 
 	public static String		Tour_Properties_Label_distance;
-	public static String		Tour_Properties_Label_distance_unit;
 	public static String		Tour_Properties_Label_time;
 	public static String		Tour_Properties_Label_time_unit;
 	public static String		Tour_Map_Action_collapse_all_tooltip;
@@ -468,12 +462,12 @@ public class Messages extends NLS {
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;
 
-	public static String	TourChart_Property_check_customize_pace_clipping;
+	public static String		TourChart_Property_check_customize_pace_clipping;
 	public static String		TourChart_Property_check_customize_value_clipping;
 	public static String		TourChart_Property_check_customize_value_computing;
 	public static String		TourChart_Property_label_chart_type;
 
-	public static String	TourChart_Property_label_pace_speed;
+	public static String		TourChart_Property_label_pace_speed;
 	public static String		TourChart_Property_label_time_slices;
 
 	public static String		TourData_Label_device_marker;

@@ -60,6 +60,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.DeviceResourceException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -153,6 +154,8 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 	private ColumnManager				fColumnManager;
 
+	private Composite					fViewerContainer;
+
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
 		public TourDataContentProvider() {}
@@ -224,18 +227,35 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 						// keep new active person until the view is visible
 						fNewActivePerson = TourbookPlugin.getDefault().getActivePerson();
 					}
-				}
 
-				if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+				} else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
 					fActionSaveTour.resetPeopleList();
-				}
 
-				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 					// update tour type in the raw data
 					RawDataManager.getInstance().updateTourDataFromDb();
 
 					fTourViewer.refresh();
+
+				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					// measurement system has changed
+
+					UI.updateUnits();
+
+					saveSettings();
+
+					fTourViewer.getTable().dispose();
+					createTourViewer(fViewerContainer);
+					fViewerContainer.layout();
+
+					restoreState(fSessionMemento);
+
+					// update the viewer
+					updateViewer();
+
+//					reselectTourViewer();
 				}
 
 			}
@@ -255,9 +275,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 					final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
 					final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
 
-					if (removedTours.size() == 0) {
-						return;
-					}
+					if (removedTours.size() == 0) { return; }
 
 					if (fIsPartVisible) {
 
@@ -352,7 +370,11 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	public void createPartControl(final Composite parent) {
 
 		createResources();
-		createTourViewer(parent);
+
+		fViewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
+
+		createTourViewer(fViewerContainer);
 
 		createActions();
 		createContextMenu();
@@ -381,7 +403,8 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			imageDatabase = (Image) imageDatabaseDescriptor.createResource(display);
 			imageDatabaseOtherPerson = (Image) imageDatabaseOtherPersonDescriptor.createResource(display);
 			imageDatabasePlaceholder = (Image) imageDatabasePlaceholderDescriptor.createResource(display);
-		} catch (final DeviceResourceException e) {
+		}
+		catch (final DeviceResourceException e) {
 			e.printStackTrace();
 		}
 
@@ -427,9 +450,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 				final TourData tourData = (TourData) selection.getFirstElement();
 
-				if (tourData == null) {
-					return;
-				}
+				if (tourData == null) { return; }
 
 				fPostSelectionProvider.setSelection(new SelectionTourData(null, tourData));
 			}
@@ -585,7 +606,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		});
 
 		/*
-		 * column: distance
+		 * column: distance (km/mile)
 		 */
 		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -595,7 +616,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				if (tourDistance != 0) {
 					fNumberFormatter.setMinimumFractionDigits(2);
 					fNumberFormatter.setMaximumFractionDigits(2);
-					cell.setText(fNumberFormatter.format(((float) tourDistance) / 1000));
+					cell.setText(fNumberFormatter.format(((float) tourDistance)
+							/ 1000
+							/ UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});
@@ -613,7 +636,10 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				if (drivingTime != 0) {
 					fNumberFormatter.setMinimumFractionDigits(1);
 					fNumberFormatter.setMaximumFractionDigits(1);
-					cell.setText(fNumberFormatter.format(((float) tourDistance) / drivingTime * 3.6));
+					cell.setText(fNumberFormatter.format(((float) tourDistance)
+							/ drivingTime
+							* 3.6
+							/ UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});
@@ -627,8 +653,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			public void update(ViewerCell cell) {
 				final int tourAltUp = ((TourData) cell.getElement()).getTourAltUp();
 				if (tourAltUp != 0) {
-					fNumberFormatter.setMinimumFractionDigits(0);
-					cell.setText(fNumberFormatter.format(tourAltUp));
+					cell.setText(Long.toString((long) (tourAltUp / UI.UNIT_VALUE_ALTITUDE)));
 				}
 			}
 		});
@@ -642,8 +667,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			public void update(ViewerCell cell) {
 				final int tourAltDown = ((TourData) cell.getElement()).getTourAltDown();
 				if (tourAltDown != 0) {
-					fNumberFormatter.setMinimumFractionDigits(0);
-					cell.setText(fNumberFormatter.format(-tourAltDown));
+					cell.setText(Long.toString((long) (-tourAltDown / UI.UNIT_VALUE_ALTITUDE)));
 				}
 			}
 		});
@@ -742,9 +766,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	@Override
 	public Object getAdapter(Class adapter) {
 
-		if (adapter == ColumnViewer.class) {
-			return fTourViewer;
-		}
+		if (adapter == ColumnViewer.class) { return fTourViewer; }
 
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
@@ -863,9 +885,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		// save sash weights
 		final Table table = fTourViewer.getTable();
 
-		if (table.isDisposed()) {
-			return;
-		}
+		if (table.isDisposed()) { return; }
 
 		memento.putInteger(MEMENTO_SASH_CONTAINER, table.getSize().x);
 

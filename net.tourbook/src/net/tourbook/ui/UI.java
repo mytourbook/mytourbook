@@ -101,7 +101,7 @@ public class UI {
 	public static String					UNIT_LABEL_DISTANCE;
 	public static String					UNIT_LABEL_ALTITUDE;
 	public static String					UNIT_LABEL_ALTIMETER;
-	public static String					UNIT_LABEL_FAHRENHEIT;
+	public static String					UNIT_LABEL_TEMPERATURE;
 	public static String					UNIT_LABEL_SPEED;
 	public static String					UNIT_LABEL_PACE;
 
@@ -351,14 +351,14 @@ public class UI {
 			// set imperial measure system
 
 			UNIT_VALUE_TEMPERATURE = UNIT_FAHRENHEIT_ADD;
-			UNIT_LABEL_FAHRENHEIT = UNIT_FAHRENHEIT_F;
+			UNIT_LABEL_TEMPERATURE = UNIT_FAHRENHEIT_F;
 
 		} else {
 
 			// default is the metric measure system
 
 			UNIT_VALUE_TEMPERATURE = 1;
-			UNIT_LABEL_FAHRENHEIT = UNIT_FAHRENHEIT_C;
+			UNIT_LABEL_TEMPERATURE = UNIT_FAHRENHEIT_C;
 		}
 	}
 
