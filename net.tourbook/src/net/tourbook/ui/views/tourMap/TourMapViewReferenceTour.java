@@ -15,21 +15,16 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourMap;
 
-import javax.persistence.EntityManager;
-
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
-import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.TourChartViewPart;
 
@@ -144,7 +139,8 @@ public class TourMapViewReferenceTour extends TourChartViewPart {
 			return;
 		}
 
-		final TourCompareConfig tourCompareConfig = createTourCompareConfig(refId);
+		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance()
+				.getTourCompareConfig(refId);
 
 		if (tourCompareConfig == null) {
 			return;
@@ -169,53 +165,54 @@ public class TourMapViewReferenceTour extends TourChartViewPart {
 
 	}
 
-	/**
-	 * @param refId
-	 *        Reference Id
-	 * @return
-	 */
-	private TourCompareConfig createTourCompareConfig(final long refId) {
-
-		TourCompareConfig compareConfig = ReferenceTourManager.getInstance()
-				.getTourCompareConfig(refId);
-
-		if (compareConfig != null) {
-			return compareConfig;
-		}
-
-		// load the reference tour from the database
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		final TourReference refTour = em.find(TourReference.class, refId);
-		em.close();
-
-		if (refTour == null) {
-			return null;
-		} else {
-
-			/*
-			 * create a new reference tour configuration
-			 */
-
-			final TourData refTourData = refTour.getTourData();
-			final TourChartConfiguration refTourChartConfig = TourManager.createTourChartConfiguration();
-
-			final TourChartConfiguration compTourchartConfig = TourManager.createTourChartConfiguration();
-
-			final ChartDataModel chartDataModel = TourManager.getInstance()
-					.createChartDataModel(refTourData, refTourChartConfig);
-
-			compareConfig = new TourCompareConfig(refTour,
-					chartDataModel,
-					refTourData,
-					refTourChartConfig,
-					compTourchartConfig);
-
-			// keep ref config in the cache
-			ReferenceTourManager.getInstance().setTourCompareConfig(refId, compareConfig);
-		}
-
-		return compareConfig;
-	}
+//	/**
+//	 * @param refId
+//	 *        Reference Id
+//	 * @return
+//	 */
+//	private TourCompareConfig createTourCompareConfig(final long refId) {
+//
+//		final ReferenceTourManager refTourManager = ReferenceTourManager.getInstance();
+//
+//		TourCompareConfig compareConfig = refTourManager.getTourCompareConfig(refId);
+//
+//		if (compareConfig != null) {
+//			return compareConfig;
+//		}
+//
+//		// load the reference tour from the database
+//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+//		final TourReference refTour = em.find(TourReference.class, refId);
+//		em.close();
+//
+//		if (refTour == null) {
+//			return null;
+//		} else {
+//
+//			/*
+//			 * create a new reference tour configuration
+//			 */
+//
+//			final TourData refTourData = refTour.getTourData();
+//			final TourChartConfiguration refTourChartConfig = TourManager.createTourChartConfiguration();
+//
+//			final TourChartConfiguration compTourchartConfig = TourManager.createTourChartConfiguration();
+//
+//			final ChartDataModel chartDataModel = TourManager.getInstance()
+//					.createChartDataModel(refTourData, refTourChartConfig);
+//
+//			compareConfig = new TourCompareConfig(refTour,
+//					chartDataModel,
+//					refTourData,
+//					refTourChartConfig,
+//					compTourchartConfig);
+//
+//			// keep ref config in the cache
+//			refTourManager.setTourCompareConfig(refId, compareConfig);
+//		}
+//
+//		return compareConfig;
+//	}
 
 	/**
 	 * set the configuration for a reference tour

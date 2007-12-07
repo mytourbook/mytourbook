@@ -24,12 +24,15 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourChart;
+import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourEditor;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
@@ -91,6 +94,56 @@ public class ReferenceTourManager {
 	}
 
 	/**
+	 * Returns a {@link TourCompareConfig} or <code>null</code> when the reference tour cannot be
+	 * loaded from the database
+	 * 
+	 * @param refId
+	 *        Reference Id
+	 * @return
+	 */
+	public TourCompareConfig getTourCompareConfig(final long refId) {
+
+		TourCompareConfig compareConfig = fCompareConfigCache.get(refId);
+
+		if (compareConfig != null) {
+			return compareConfig;
+		}
+
+		// load the reference tour from the database
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final TourReference refTour = em.find(TourReference.class, refId);
+		em.close();
+
+		if (refTour == null) {
+			return null;
+		} else {
+
+			/*
+			 * create a new reference tour configuration
+			 */
+
+			final TourData refTourData = refTour.getTourData();
+			final TourChartConfiguration refTourChartConfig = TourManager.createTourChartConfiguration();
+
+			final TourChartConfiguration compTourchartConfig = TourManager.createTourChartConfiguration();
+
+			final ChartDataModel chartDataModel = TourManager.getInstance()
+					.createChartDataModel(refTourData, refTourChartConfig);
+
+			compareConfig = new TourCompareConfig(refTour,
+					chartDataModel,
+					refTourData,
+					refTourChartConfig,
+					compTourchartConfig);
+
+			// keep ref config in the cache
+			fCompareConfigCache.put(refId, compareConfig);
+		}
+
+		return compareConfig;
+	}
+
+	/**
 	 * @return Returns an array with all reference tours
 	 */
 	public Object[] getReferenceTours() {
@@ -108,23 +161,5 @@ public class ReferenceTourManager {
 		}
 
 		return referenceTours.toArray();
-	}
-
-	/**
-	 * @param refId
-	 * @return Returns the compare configuration for the reference id
-	 */
-	public TourCompareConfig getTourCompareConfig(Long refId) {
-		return fCompareConfigCache.get(refId);
-	}
-
-	/**
-	 * Sets the compare configuration for the reference id
-	 * 
-	 * @param refId
-	 * @param refTourConfig
-	 */
-	public void setTourCompareConfig(long refId, TourCompareConfig refTourConfig) {
-		fCompareConfigCache.put(refId, refTourConfig);
 	}
 }

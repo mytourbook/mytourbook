@@ -38,7 +38,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -184,10 +184,11 @@ public class WizardPageReferenceTour extends WizardPage {
 		fRefTourViewer.setContentProvider(new RefTourContentProvider());
 		fRefTourViewer.setLabelProvider(new RefTourLabelProvider());
 
-		fRefTourViewer.setSorter(new ViewerSorter() {
+		fRefTourViewer.setComparator(new ViewerComparator() {
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
-				return collator.compare(((TourReference) e1).getLabel(),
+				return getComparator().compare(((TourReference) e1).getLabel(),
 						((TourReference) e2).getLabel());
 			}
 		});
@@ -283,7 +284,8 @@ public class WizardPageReferenceTour extends WizardPage {
 		Integer viewerWidth = null;
 		try {
 			viewerWidth = wizardSettings.getInt(REF_TOUR_VIEWER_WIDTH);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			viewerWidth = 200;
 		}
 		fViewerDetailForm.setViewerWidth(viewerWidth);
@@ -323,9 +325,9 @@ public class WizardPageReferenceTour extends WizardPage {
 
 		for (int tourIndex = 0; tourIndex < checkedElements.length; tourIndex++) {
 			refTourIds[tourIndex] = Long.toString(((TourReference) (checkedElements[tourIndex])).getRefId()/*
-			 * .getTourData()
-			 * .getTourId()
-			 */);
+																											 * .getTourData()
+																											 * .getTourId()
+																											 */);
 		}
 		wizardSettings.put(REF_TOUR_CHECKED, refTourIds);
 	}

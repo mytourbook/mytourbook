@@ -29,12 +29,20 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -131,18 +139,31 @@ public class WizardPageCompareTour extends WizardPage {
 				return Long.toString(row[COLUMN_DATE]);
 
 			case COLUMN_DISTANCE:
-				nf.setMinimumFractionDigits(1);
-				nf.setMaximumFractionDigits(1);
-				return nf.format(((float) row[COLUMN_DISTANCE]) / 1000);
+				if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
+					nf.setMinimumFractionDigits(1);
+					nf.setMaximumFractionDigits(1);
+					return nf.format(((float) row[COLUMN_DISTANCE])
+							/ (1000 * UI.UNIT_VALUE_DISTANCE));
+				} else {
+					return "";
+				}
 
 			case COLUMN_RECORDING:
-				long recordingTime = row[COLUMN_RECORDING];
-				return new Formatter().format(Messages.Format_hhmm,
-						(recordingTime / 3600),
-						((recordingTime % 3600) / 60)).toString();
+				if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
+					long recordingTime = row[COLUMN_RECORDING];
+					return new Formatter().format(Messages.Format_hhmm,
+							(recordingTime / 3600),
+							((recordingTime % 3600) / 60)).toString();
+				} else {
+					return "";
+				}
 
 			case COLUMN_UP:
-				return Long.toString(row[COLUMN_UP]);
+				if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
+					return Long.toString((long) (row[COLUMN_UP] / UI.UNIT_VALUE_ALTITUDE));
+				} else {
+					return "";
+				}
 
 			default:
 				return (getText(obj));
@@ -162,7 +183,7 @@ public class WizardPageCompareTour extends WizardPage {
 	public void createControl(Composite parent) {
 
 		Composite pageContainer = new Composite(parent, SWT.NONE);
-		pageContainer.setLayout(new GridLayout());
+		GridLayoutFactory.fillDefaults().applyTo(pageContainer);
 
 		fCheckSelectAll = new Button(pageContainer, SWT.CHECK);
 		fCheckSelectAll.setText(Messages.TourMap_Wizard_Action_select_all_tours);
@@ -178,9 +199,10 @@ public class WizardPageCompareTour extends WizardPage {
 		 * create master detail layout
 		 */
 		Composite masterDetailContainer = new Composite(pageContainer, SWT.NONE);
-		masterDetailContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
 
 		final Control viewer = createTourViewer(masterDetailContainer);
+
 		final Sash sash = new Sash(masterDetailContainer, SWT.VERTICAL);
 
 		// chart group
@@ -197,7 +219,7 @@ public class WizardPageCompareTour extends WizardPage {
 		fPageBook = new PageBook(fChartGroup, SWT.NONE);
 		fPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		fTourChart = new TourChart(fPageBook, SWT.NONE, true);
+		fTourChart = new TourChart(fPageBook, SWT.NONE, false);
 		fTourChart.setBackgroundColor(parent.getDisplay()
 				.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
@@ -244,7 +266,13 @@ public class WizardPageCompareTour extends WizardPage {
 
 		initializeDialogUnits(parent);
 
-		final Tree tree = new Tree(parent, SWT.H_SCROLL
+		final TreeColumnLayout treeLayout = new TreeColumnLayout();
+
+		Composite layoutContainer = new Composite(parent, SWT.NONE);
+		layoutContainer.setLayout(treeLayout);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
+
+		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL
 				| SWT.V_SCROLL
 				| SWT.MULTI
 				| SWT.BORDER
@@ -261,22 +289,22 @@ public class WizardPageCompareTour extends WizardPage {
 
 		tc = new TreeColumn(tree, SWT.NONE);
 		tc.setText(Messages.TourMap_Wizard_Column_tour);
-		tc.setWidth(convertWidthInCharsToPixels(20));
+		treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(20)));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.TourMap_Wizard_Column_km);
-		tc.setToolTipText(Messages.TourMap_Wizard_Column_km_tooltip);
-		tc.setWidth(convertWidthInCharsToPixels(10));
+		tc.setText(UI.UNIT_LABEL_DISTANCE);
+		tc.setToolTipText(Messages.TourMap_Wizard_Column_distance_tooltip);
+		treeLayout.setColumnData(tc, new ColumnWeightData(10));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.TourMap_Wizard_Column_m);
-		tc.setToolTipText(Messages.TourMap_Wizard_Column_m_tooltip);
-		tc.setWidth(convertWidthInCharsToPixels(10));
+		tc.setText(UI.UNIT_LABEL_ALTITUDE);
+		tc.setToolTipText(Messages.TourMap_Wizard_Column_altitude_up_tooltip);
+		treeLayout.setColumnData(tc, new ColumnWeightData(10));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
 		tc.setText(Messages.TourMap_Wizard_Column_h);
 		tc.setToolTipText(Messages.TourMap_Wizard_Column_h_tooltip);
-		tc.setWidth(convertWidthInCharsToPixels(10));
+		treeLayout.setColumnData(tc, new ColumnWeightData(10));
 
 		/*
 		 * tree viewer
@@ -298,7 +326,26 @@ public class WizardPageCompareTour extends WizardPage {
 			}
 		});
 
-		return tree;
+		fTourViewer.addDoubleClickListener(new IDoubleClickListener() {
+
+			public void doubleClick(DoubleClickEvent event) {
+
+				Object selection = ((IStructuredSelection) fTourViewer.getSelection()).getFirstElement();
+
+				if (selection != null) {
+
+					// expand/collapse current item
+
+					if (fTourViewer.getExpandedState(selection)) {
+						fTourViewer.collapseToLevel(selection, 1);
+					} else {
+						fTourViewer.expandToLevel(selection, 1);
+					}
+				}
+			}
+		});
+
+		return layoutContainer;
 	}
 
 	private void showCompareTour(SelectionChangedEvent event) {
@@ -317,7 +364,7 @@ public class WizardPageCompareTour extends WizardPage {
 					final TourData tourData = TourManager.getInstance()
 							.getTourData(tourItem.getTourId());
 
-					// set the altitude visible
+					// set altitude visible
 					TourChartConfiguration chartConfig = new TourChartConfiguration(true);
 					chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
@@ -342,7 +389,8 @@ public class WizardPageCompareTour extends WizardPage {
 		Integer viewerWidth = null;
 		try {
 			viewerWidth = wizardSettings.getInt(COMP_TOUR_VIEWER_WIDTH);
-		} catch (NumberFormatException e) {}
+		}
+		catch (NumberFormatException e) {}
 		fViewerDetailForm.setViewerWidth(viewerWidth);
 
 		// restore checkbox: select all tours
@@ -432,7 +480,8 @@ public class WizardPageCompareTour extends WizardPage {
 
 			conn.close();
 
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 

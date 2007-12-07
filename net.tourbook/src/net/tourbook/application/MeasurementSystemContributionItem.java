@@ -20,7 +20,6 @@ import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.CustomControlContribution;
-import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -124,14 +123,10 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
-				if (fFireSelectionEvent == false) {
-					return;
-				}
+				if (fFireSelectionEvent == false) { return; }
 
 				int selectedIndex = fCombo.getSelectionIndex();
-				if (selectedIndex == -1) {
-					return;
-				}
+				if (selectedIndex == -1) { return; }
 
 				if (selectedIndex == 0) {
 
@@ -166,8 +161,8 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 		});
 
 		// fill combo box
-		fCombo.add(UI.UNIT_DISTANCE_KM); // metric system
-		fCombo.add(UI.UNIT_DISTANCE_MI); // imperial system
+		fCombo.add(Messages.App_measurement_metric); // metric system
+		fCombo.add(Messages.App_measurement_imperial); // imperial system
 
 		// select previous value
 		selectSystem();

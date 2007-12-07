@@ -27,10 +27,14 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -77,6 +81,8 @@ public class TourMapViewYearStatistic extends ViewPart {
 
 //	private final BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
 	private boolean					fIsSynchMaxValue;
+
+	private IPropertyChangeListener	fPrefChangeListener;
 
 	public TourMapViewYearStatistic() {}
 
@@ -127,6 +133,32 @@ public class TourMapViewYearStatistic extends ViewPart {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
+	private void addPrefListener() {
+
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					// measurement system has changed
+
+					UI.updateUnits();
+
+					// recreate the chart
+					fYearChart.dispose();
+					createYearChart();
+
+					updateYearBarChart();
+				}
+			}
+		};
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.addPropertyChangeListener(fPrefChangeListener);
+	}
+
 	private void createActions() {
 
 		fActionSynchChartScale = new ActionSynchYearScale(this);
@@ -144,6 +176,22 @@ public class TourMapViewYearStatistic extends ViewPart {
 		fPageNoChart = new Label(fPageBook, SWT.NONE);
 		fPageNoChart.setText(Messages.Tour_Map_label_year_not_selected);
 
+		createYearChart();
+
+		addSelectionListener();
+		addCompareTourPropertyListener();
+		addPrefListener();
+
+		createActions();
+
+		// set selection provider
+		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+
+		fPageBook.showPage(fPageNoChart);
+	}
+
+	private void createYearChart() {
+
 		// year chart
 		fYearChart = new Chart(fPageBook, SWT.NONE);
 
@@ -157,16 +205,6 @@ public class TourMapViewYearStatistic extends ViewPart {
 				fPostSelectionProvider.setSelection(fCurrentSelection);
 			}
 		});
-
-		addSelectionListener();
-		addCompareTourPropertyListener();
-
-		createActions();
-
-		// set selection provider
-		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
-
-		fPageBook.showPage(fPageNoChart);
 	}
 
 	@Override
@@ -174,6 +212,10 @@ public class TourMapViewYearStatistic extends ViewPart {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
+
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.removePropertyChangeListener(fPrefChangeListener);
 
 		super.dispose();
 	}
@@ -255,9 +297,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 	 */
 	private void selectTourInYearChart(long selectedTourId) {
 
-		if (fYearMapTours == null) {
-			return;
-		}
+		if (fYearMapTours == null) { return; }
 
 		final int tourLength = fYearMapTours.length;
 		boolean[] selectedTours = new boolean[tourLength];
@@ -279,9 +319,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 
 	private void updateYearBarChart() {
 
-		if (fCurrentYearItem == null) {
-			return;
-		}
+		if (fCurrentYearItem == null) { return; }
 
 		fPageBook.showPage(fYearChart);
 
@@ -301,7 +339,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 			calendar.setTime(tourDate);
 
 			tourDateValues[tourIndex] = calendar.get(Calendar.DAY_OF_YEAR) - 1;
-			tourSpeed[tourIndex] = (int) (comparedItem.getTourSpeed() * 10);
+			tourSpeed[tourIndex] = (int) (comparedItem.getTourSpeed() * 10 / UI.UNIT_VALUE_DISTANCE);
 		}
 
 		final ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
@@ -312,7 +350,6 @@ public class TourMapViewYearStatistic extends ViewPart {
 
 		// set the bar low/high data
 		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR, tourSpeed);
-
 		yData.setValueDivisor(10);
 		TourManager.setGraphColor(prefStore, yData, GraphColors.PREF_GRAPH_SPEED);
 
@@ -355,17 +392,14 @@ public class TourMapViewYearStatistic extends ViewPart {
 				yData.setVisibleMinValue(refItem.yearMapMinValue);
 				yData.setVisibleMaxValue(refItem.yearMapMaxValue);
 			}
+
 		} else {
 			yData.setVisibleMinValue(dataMinValue);
 			yData.setVisibleMaxValue(dataMaxValue);
 		}
 
-//			fMinMaxKeeper.setMinMaxValues(chartModel);
-//			fMinMaxKeeper.resetMinMax();
-
 		yData.setYTitle(Messages.Tour_Map_Label_year_chart_title);
-		yData.setUnitLabel(Messages.Tour_Map_Label_year_chart_unit);
-		// yData.setMinValue(0);
+		yData.setUnitLabel(UI.UNIT_LABEL_SPEED);
 
 		chartModel.addYData(yData);
 
@@ -376,11 +410,6 @@ public class TourMapViewYearStatistic extends ViewPart {
 		calendar.set(fCurrentYearItem.year, 11, 31);
 		final int yearDays = calendar.get(Calendar.DAY_OF_YEAR);
 		chartModel.setChartMinWidth(yearDays);
-
-		// reset min/max values
-//		if (fIsSynchMaxValue == false) {
-//			fMinMaxKeeper.resetMinMax();
-//		}
 
 		// show the data in the chart
 		fYearChart.updateChart(chartModel);

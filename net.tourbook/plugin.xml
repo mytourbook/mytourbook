@@ -406,16 +406,6 @@
                name="net.tourbook.separator"
                visible="true">
          </separator>
-         <command
-               commandId="net.tourbook.command.tourCompareWizard"
-               icon="icons/tour-map-compare-wizard.gif"
-               label="%command_tourCompare_wizard"
-               mnemonic="%command_tourCompare_wizard_mnemonic">
-         </command>
-         <separator
-               name="net.tourbook.separator"
-               visible="true">
-         </separator>
       </menuContribution>
       <menuContribution
             locationURI="menu:file?after=fileSave">
@@ -595,6 +585,18 @@
                style="push"
                tooltip="%command_tourChart_tool_tourSegmenter_tooltip">
          </command>
+         <separator
+               name="net.tourbook.separator"
+               visible="true">
+         </separator>
+         <command
+               commandId="net.tourbook.command.tourCompareWizard"
+               icon="icons/tour-map-compare-wizard.gif"
+               label="%command_tourCompare_wizard"
+               mnemonic="%command_tourCompare_wizard_mnemonic">
+         </command>
+      
+      
       </menuContribution>
 
       <menuContribution

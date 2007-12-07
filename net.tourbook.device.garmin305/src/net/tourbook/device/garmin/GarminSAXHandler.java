@@ -35,11 +35,11 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class GarminSAXHandler extends DefaultHandler {
 
-	private static final String			TRAINING_CENTER_DATABASE_V1	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1";
-	private static final String			TRAINING_CENTER_DATABASE_V2	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2";
+	private static final String			TRAINING_CENTER_DATABASE_V1	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1"; //$NON-NLS-1$
+	private static final String			TRAINING_CENTER_DATABASE_V2	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"; //$NON-NLS-1$
 
 //	private static double				MATH_PI2				= Math.PI / 2;
-	private static double				DEGREE_TO_RAD				= Math.PI / 180;
+//	private static double				DEGREE_TO_RAD				= Math.PI / 180;
 
 	private static final String			TAG_DATABASE				= "TrainingCenterDatabase";									//$NON-NLS-1$
 	private static final String			TAG_ACTIVITY				= "Activity";													//$NON-NLS-1$
@@ -58,9 +58,6 @@ public class GarminSAXHandler extends DefaultHandler {
 
 	private static final Calendar		fCalendar					= GregorianCalendar.getInstance();
 	private static final DateFormat		iso							= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
-
-//	new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");			//$NON-NLS-1$
-//	SimpleDateFormat("yyyy-MM-dd'T'H:mm:ssZ")
 
 	private int							fDataVersion				= -1;
 	private boolean						fIsInActivity				= false;
@@ -89,7 +86,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private boolean						fSetLapMarker				= false;
 	private boolean						fSetLapStartTime			= false;
 	private ArrayList<Long>				fLapStart;
-	private ArrayList<Long>				fLapEnd;
+//	private ArrayList<Long>				fLapEnd;
 
 	private boolean						fIsImported;
 	private long						fCurrentTime;
@@ -97,7 +94,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private StringBuilder				fCharacters					= new StringBuilder();
 
 	{
-		iso.setTimeZone(TimeZone.getTimeZone("GMT"));
+		iso.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
 	}
 
 	public GarminSAXHandler(TourbookDevice deviceDataReader, String importFileName,
@@ -116,6 +113,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				|| fIsInLongitude
 				|| fIsInDistance
 				|| fIsInAltitude
+				|| fIsInHeartRate
 				|| fIsInHeartRateValue) {
 
 			fCharacters.append(chars, startIndex, length);
@@ -129,9 +127,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 		final int serieLength = timeSerie.length;
 
-		if (serieLength == 0) {
-			return;
-		}
+		if (serieLength == 0) { return; }
 
 		int lastTime = 0;
 		int currentAltitude = altitudeSerie[0];
@@ -279,72 +275,72 @@ public class GarminSAXHandler extends DefaultHandler {
 //		}
 //	}
 
-	/**
-	 * Polar Coordinate Flat-Earth Formula
-	 * 
-	 * <pre>
-	 * dlon = lon2 - lon1
-	 * dlat = lat2 - lat1
-	 * a = (sin(dlat/2))&circ;2 + cos(lat1) * cos(lat2) * (sin(dlon/2))&circ;2
-	 * c = 2 * arcsin(min(1,sqrt(a)))
-	 * d = R * c
-	 * 
-	 * with R = 6,378.8 km or 3,963.0 mi
-	 * </pre>
-	 * 
-	 * @param td2
-	 * @param td1
-	 */
-	private void computeDistanceFromLatLon() {
-
-		TimeData prevTimeData = null;
-		float totalDistance = 0;
-
-		final boolean adjustDistance = fTimeDataList.get(0).absoluteAltitude != Float.MIN_VALUE;
-
-		for (TimeData currentTimeData : fTimeDataList) {
-
-			if (prevTimeData == null) {
-
-				// set first timedata
-
-				prevTimeData = currentTimeData;
-				continue;
-			}
-
-			final double lat1 = prevTimeData.latitude / DEGREE_TO_RAD;
-			final double lat2 = currentTimeData.latitude / DEGREE_TO_RAD;
-			final double lon1 = prevTimeData.longitude / DEGREE_TO_RAD;
-			final double lon2 = currentTimeData.longitude / DEGREE_TO_RAD;
-
-			final double dlon = lon2 - lon1;
-			final double dlat = lat2 - lat1;
-
-			final double sinDlat = Math.sin(dlat / 2);
-			final double sinDlon = Math.sin(dlon / 2);
-
-			final double a = (sinDlat * sinDlat)
-					+ Math.cos(lat1)
-					* Math.cos(lat2)
-					* (sinDlon * sinDlon);
-
-			final double c = 2 * Math.asin(Math.min(1, Math.sqrt(a))) / Math.PI;
-
-			double distance = 6378.8f * c;
-
-			if (adjustDistance) {
-
-//				Strecke = SQRT(DIST² + ALT²))
-
-				double altitude = currentTimeData.absoluteAltitude - prevTimeData.absoluteAltitude;
-				distance = Math.sqrt(distance * distance + altitude * altitude);
-			}
-
-			currentTimeData.absoluteDistance = (int) (totalDistance += distance);
-
-			prevTimeData = currentTimeData;
-		}
-	}
+//	/**
+//	 * Polar Coordinate Flat-Earth Formula
+//	 * 
+//	 * <pre>
+//	 * dlon = lon2 - lon1
+//	 * dlat = lat2 - lat1
+//	 * a = (sin(dlat/2))&circ;2 + cos(lat1) * cos(lat2) * (sin(dlon/2))&circ;2
+//	 * c = 2 * arcsin(min(1,sqrt(a)))
+//	 * d = R * c
+//	 * 
+//	 * with R = 6,378.8 km or 3,963.0 mi
+//	 * </pre>
+//	 * 
+//	 * @param td2
+//	 * @param td1
+//	 */
+//	private void computeDistanceFromLatLon() {
+//
+//		TimeData prevTimeData = null;
+//		float totalDistance = 0;
+//
+//		final boolean adjustDistance = fTimeDataList.get(0).absoluteAltitude != Float.MIN_VALUE;
+//
+//		for (TimeData currentTimeData : fTimeDataList) {
+//
+//			if (prevTimeData == null) {
+//
+//				// set first timedata
+//
+//				prevTimeData = currentTimeData;
+//				continue;
+//			}
+//
+//			final double lat1 = prevTimeData.latitude / DEGREE_TO_RAD;
+//			final double lat2 = currentTimeData.latitude / DEGREE_TO_RAD;
+//			final double lon1 = prevTimeData.longitude / DEGREE_TO_RAD;
+//			final double lon2 = currentTimeData.longitude / DEGREE_TO_RAD;
+//
+//			final double dlon = lon2 - lon1;
+//			final double dlat = lat2 - lat1;
+//
+//			final double sinDlat = Math.sin(dlat / 2);
+//			final double sinDlon = Math.sin(dlon / 2);
+//
+//			final double a = (sinDlat * sinDlat)
+//					+ Math.cos(lat1)
+//					* Math.cos(lat2)
+//					* (sinDlon * sinDlon);
+//
+//			final double c = 2 * Math.asin(Math.min(1, Math.sqrt(a))) / Math.PI;
+//
+//			double distance = 6378.8f * c;
+//
+//			if (adjustDistance) {
+//
+////				Strecke = SQRT(DIST² + ALT²))
+//
+//				double altitude = currentTimeData.absoluteAltitude - prevTimeData.absoluteAltitude;
+//				distance = Math.sqrt(distance * distance + altitude * altitude);
+//			}
+//
+//			currentTimeData.absoluteDistance = (int) (totalDistance += distance) / 1000;
+//
+//			prevTimeData = currentTimeData;
+//		}
+//	}
 
 //	/**
 //	 * Polar Coordinate Flat-Earth Formula
@@ -429,8 +425,9 @@ public class GarminSAXHandler extends DefaultHandler {
 					fIsInHeartRateValue = false;
 
 					if (fDataVersion == 2) {
-						final short pulse = getShortValue(fCharacters.toString());
-						fTimeData.pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
+						short pulse = getShortValue(fCharacters.toString());
+						pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
+						fTimeData.pulse = pulse;
 					}
 
 				} else if (name.equals(TAG_HEART_RATE_BPM)) {
@@ -438,8 +435,9 @@ public class GarminSAXHandler extends DefaultHandler {
 					fIsInHeartRate = false;
 
 					if (fDataVersion == 1) {
-						final short pulse = getShortValue(fCharacters.toString());
-						fTimeData.pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
+						short pulse = getShortValue(fCharacters.toString());
+						pulse = pulse == Integer.MIN_VALUE ? 0 : pulse;
+						fTimeData.pulse = pulse;
 					}
 
 				} else if (name.equals(TAG_ALTITUDE_METERS)) {
@@ -451,7 +449,6 @@ public class GarminSAXHandler extends DefaultHandler {
 				} else if (name.equals(TAG_DISTANCE_METERS)) {
 
 					fIsInDistance = false;
-
 					fTimeData.absoluteDistance = getFloatValue(fCharacters.toString());
 
 				} else if (name.equals(TAG_LATITUDE_DEGREES)) {
@@ -485,9 +482,9 @@ public class GarminSAXHandler extends DefaultHandler {
 				fIsInTrackpoint = false;
 
 				// ignore corrupt values, time and altitude must be set
-				if (fTimeData != null
-						&& fTimeData.absoluteTime != Long.MIN_VALUE
-						&& fTimeData.absoluteAltitude != Float.MIN_VALUE) {
+				if (fTimeData != null && fTimeData.absoluteTime != Long.MIN_VALUE
+//						&& fTimeData.absoluteAltitude != Float.MIN_VALUE
+				) {
 
 					if (fSetLapMarker) {
 						fSetLapMarker = false;
@@ -529,9 +526,11 @@ public class GarminSAXHandler extends DefaultHandler {
 				setTourData();
 			}
 
-		} catch (final NumberFormatException e) {
+		}
+		catch (final NumberFormatException e) {
 			e.printStackTrace();
-		} catch (final ParseException e) {
+		}
+		catch (final ParseException e) {
 			e.printStackTrace();
 		}
 
@@ -546,7 +545,8 @@ public class GarminSAXHandler extends DefaultHandler {
 				return Double.MIN_VALUE;
 			}
 
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			return Double.MIN_VALUE;
 		}
 	}
@@ -560,7 +560,8 @@ public class GarminSAXHandler extends DefaultHandler {
 				return Float.MIN_VALUE;
 			}
 
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			return Float.MIN_VALUE;
 		}
 	}
@@ -573,7 +574,8 @@ public class GarminSAXHandler extends DefaultHandler {
 			} else {
 				return Short.MIN_VALUE;
 			}
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			return Short.MIN_VALUE;
 		}
 	}
@@ -587,14 +589,12 @@ public class GarminSAXHandler extends DefaultHandler {
 
 	private void setTourData() {
 
-		if (fTimeDataList == null || fTimeDataList.size() == 0) {
-			return;
-		}
+		if (fTimeDataList == null || fTimeDataList.size() == 0) { return; }
 
 		// check if the distance is set
-		if (fTimeDataList.get(0).absoluteDistance == Float.MIN_VALUE) {
-			computeDistanceFromLatLon();
-		}
+//		if (fTimeDataList.get(0).absoluteDistance == Float.MIN_VALUE) {
+//		computeDistanceFromLatLon();
+//		}
 
 		// create data object for each tour
 		final TourData tourData = new TourData();
@@ -620,7 +620,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		String uniqueKey;
 		if (distanceSerie == null) {
-			uniqueKey = "42984";
+			uniqueKey = "42984"; //$NON-NLS-1$
 		} else {
 			uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
 		}
@@ -716,7 +716,7 @@ public class GarminSAXHandler extends DefaultHandler {
 					fLapCounter = 0;
 					fSetLapMarker = false;
 					fLapStart = new ArrayList<Long>();
-					fLapEnd = new ArrayList<Long>();
+//					fLapEnd = new ArrayList<Long>();
 
 					fTimeDataList = new ArrayList<TimeData>();
 				}
@@ -792,7 +792,7 @@ public class GarminSAXHandler extends DefaultHandler {
 					fLapCounter = 0;
 					fSetLapMarker = false;
 					fLapStart = new ArrayList<Long>();
-					fLapEnd = new ArrayList<Long>();
+//					fLapEnd = new ArrayList<Long>();
 
 					fTimeDataList = new ArrayList<TimeData>();
 				}

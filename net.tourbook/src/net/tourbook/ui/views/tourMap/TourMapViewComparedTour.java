@@ -423,9 +423,11 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 					fPostSelectionProvider.setSelection(persistedCompareResults);
 				}
 
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				e.printStackTrace();
-			} finally {
+			}
+			finally {
 				if (ts.isActive()) {
 					ts.rollback();
 				}
@@ -487,9 +489,11 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 
 				updateTourViewer(fDefaultStartIndex, fDefaultEndIndex, speed, true);
 			}
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			if (ts.isActive()) {
 				ts.rollback();
 			}
@@ -514,8 +518,8 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 		MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_QUESTION
 				| SWT.YES
 				| SWT.NO/*
-						 * | SWT.CANCEL
-						 */);
+				 * | SWT.CANCEL
+				 */);
 
 		msgBox.setText(Messages.Tour_Map_dlg_save_compared_tour_title);
 		msgBox.setMessage(NLS.bind(Messages.Tour_Map_dlg_save_compared_tour_message,
@@ -729,7 +733,8 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 		final Long ctTourId = itemComparedTour.getTourId();
 
 		// check if the compared tour is already displayed
-		if (fCTTourId == ctTourId && fComparedTourItem instanceof TourMapItemComparedTour) {
+		if (fCTTourId == ctTourId.longValue()
+				&& fComparedTourItem instanceof TourMapItemComparedTour) {
 			return;
 		}
 

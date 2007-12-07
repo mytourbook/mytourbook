@@ -36,6 +36,10 @@ public class Messages extends NLS {
 	public static String		App_Action_set_tour_type_dlg_message;
 	public static String		App_Action_set_tour_type_dlg_title;
 
+	public static String	App_measurement_imperial;
+
+	public static String	App_measurement_metric;
+
 	public static String		App_measurement_tooltip;
 
 	public static String		App_People_item_all;
@@ -476,12 +480,14 @@ public class Messages extends NLS {
 	public static String		TourMap_Wizard_Action_deselect_all;
 	public static String		TourMap_Wizard_Action_select_all;
 	public static String		TourMap_Wizard_Action_select_all_tours;
+
+	public static String	TourMap_Wizard_Column_altitude_up_tooltip;
+
+	public static String	TourMap_Wizard_Column_distance_tooltip;
 	public static String		TourMap_Wizard_Column_h;
 	public static String		TourMap_Wizard_Column_h_tooltip;
 	public static String		TourMap_Wizard_Column_km;
-	public static String		TourMap_Wizard_Column_km_tooltip;
 	public static String		TourMap_Wizard_Column_m;
-	public static String		TourMap_Wizard_Column_m_tooltip;
 	public static String		TourMap_Wizard_Column_tour;
 	public static String		TourMap_Wizard_Error_select_reference_tours;
 	public static String		TourMap_Wizard_Error_tour_must_be_selected;

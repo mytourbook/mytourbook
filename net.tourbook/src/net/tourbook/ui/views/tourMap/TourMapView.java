@@ -22,20 +22,27 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourViewer;
+import net.tourbook.ui.UI;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
-import net.tourbook.util.TreeColumnLayout;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -56,7 +63,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -92,6 +98,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 	TourMapItemRoot						fRootItem						= new TourMapItemRoot();
 
+	private Composite					fViewerContainer;
 	private TreeViewer					fTourViewer;
 
 	final NumberFormat					nf								= NumberFormat.getNumberInstance();
@@ -100,6 +107,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 	private IPartListener2				fPartListener;
 	PostSelectionProvider				fPostSelectionProvider;
 	private ITourPropertyListener		fCompareTourPropertyListener;
+	private IPropertyChangeListener		fPrefChangeListener;
 
 	protected int						fRefTourXMarkerValue;
 
@@ -219,6 +227,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 							.format(compTour.getTourDate());
 
 				case COLUMN_SPEED:
+
 					nf.setMinimumFractionDigits(1);
 					nf.setMaximumFractionDigits(1);
 
@@ -226,7 +235,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 					if (speed == 0) {
 						return ""; //$NON-NLS-1$
 					} else {
-						return nf.format(speed);
+						return nf.format(speed / UI.UNIT_VALUE_DISTANCE);
 					}
 				}
 
@@ -446,6 +455,42 @@ public class TourMapView extends ViewPart implements ITourViewer {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
+	private void addPrefListener() {
+
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					// measurement system has changed
+
+					UI.updateUnits();
+
+					saveSettings();
+
+					// dispose viewer
+					Control[] children = fViewerContainer.getChildren();
+					for (int childIndex = 0; childIndex < children.length; childIndex++) {
+						children[childIndex].dispose();
+					}
+
+					createTourViewer(fViewerContainer);
+					fViewerContainer.layout();
+
+					// update the viewer
+					fTourViewer.setInput(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem());
+
+					restoreState(fSessionMemento);
+				}
+			}
+		};
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.addPropertyChangeListener(fPrefChangeListener);
+	}
+
 	private void createActions() {
 
 		fActionDeleteSelectedTour = new ActionDeleteTourFromMap(this);
@@ -486,34 +531,44 @@ public class TourMapView extends ViewPart implements ITourViewer {
 		fColorTourFg = new Color(display, fRGBTourFg);
 		fColorTourBg = new Color(display, fRGBTourBg);
 
-		createTourViewer(parent);
+		fViewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
+
+		createTourViewer(fViewerContainer);
 		createContextMenu();
 		createActions();
 
 		addPartListener();
 		addPostSelectionListener();
 		addCompareTourPropertyListener();
+		addPrefListener();
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		fTourViewer.setInput(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem());
 
-		restoreSettings(fSessionMemento);
+		restoreState(fSessionMemento);
 	}
 
 	private Control createTourViewer(final Composite parent) {
 
-		// viewer container
-		final Composite treeContainer = new Composite(parent, SWT.NONE);
-		final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		treeContainer.setLayoutData(gridData);
+		final TreeColumnLayout treeLayout = new TreeColumnLayout();
 
-		final TreeColumnLayout treeLayouter = new TreeColumnLayout();
-		treeContainer.setLayout(treeLayouter);
+		Composite layoutContainer = new Composite(parent, SWT.NONE);
+		layoutContainer.setLayout(treeLayout);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
+
+//		// viewer container
+//		final Composite layoutContainer = new Composite(parent, SWT.NONE);
+//		final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+//		layoutContainer.setLayoutData(gridData);
+//
+//		final TreeColumnLayout treeLayouter = new TreeColumnLayout();
+//		layoutContainer.setLayout(treeLayouter);
 
 		// tour tree
-		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL
+		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL
 				| SWT.V_SCROLL
 				| SWT.BORDER
 				| SWT.MULTI
@@ -528,12 +583,12 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 		tc = new TreeColumn(tree, SWT.NONE);
 		tc.setText(Messages.Tour_Map_Column_tour);
-		treeLayouter.addColumnData(new ColumnWeightData(18, true));
+		treeLayout.setColumnData(tc, new ColumnWeightData(18, true));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.Tour_Map_Column_kmh);
-		treeLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(9),
-				false));
+		tc.setText(UI.UNIT_LABEL_SPEED);
+		treeLayout.setColumnData(tc,
+				new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10), false));
 
 		// tour viewer
 		fTourViewer = new TreeViewer(tree);
@@ -576,7 +631,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 			}
 		});
 
-		return treeContainer;
+		return layoutContainer;
 	}
 
 	@Override
@@ -585,6 +640,10 @@ public class TourMapView extends ViewPart implements ITourViewer {
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
 		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
+
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.removePropertyChangeListener(fPrefChangeListener);
 
 		fColorRefFg.dispose();
 		fColorYearFg.dispose();
@@ -720,7 +779,6 @@ public class TourMapView extends ViewPart implements ITourViewer {
 		}
 
 		if (tourMapSelection != null) {
-
 			fPostSelectionProvider.setSelection(tourMapSelection);
 		}
 	}
@@ -736,7 +794,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 	 * 
 	 * @param memento
 	 */
-	private void restoreSettings(final IMemento memento) {
+	private void restoreState(final IMemento memento) {
 
 		if (memento == null) {
 			return;
@@ -750,13 +808,14 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 			try {
 				selectRefTour(Long.parseLong(mementoRefId));
-			} catch (NumberFormatException e) {
+			}
+			catch (NumberFormatException e) {
 				// do nothing
 			}
 		}
 
 		/*
-		 * link tour with statistics
+		 * action: link tour with statistics
 		 */
 		Integer mementoLinkTour = memento.getInteger(MEMENTO_TOUR_MAP_LINK_TOUR);
 		if (mementoLinkTour != null) {

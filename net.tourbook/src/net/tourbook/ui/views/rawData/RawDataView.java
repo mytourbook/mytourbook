@@ -254,10 +254,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 					// update the viewer
 					updateViewer();
-
-//					reselectTourViewer();
 				}
-
 			}
 		};
 		TourbookPlugin.getDefault()

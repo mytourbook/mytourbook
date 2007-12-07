@@ -182,7 +182,8 @@ public class TourData {
 	private short				deviceMode;													// db-version 3
 
 	/**
-	 * time difference between 2 time slices or <code>-1</code> when the time slices are unequally
+	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time
+	 * slices are unequally
 	 */
 	private short				deviceTimeInterval;											// db-version 3
 
@@ -1033,113 +1034,141 @@ public class TourData {
 	 * @param isCreateMarker
 	 *        creates markers when <code>true</code>
 	 */
-	public void createTimeSeries(ArrayList<TimeData> timeDataList, boolean isCreateMarker) {
+	public void createTimeSeries(	final ArrayList<TimeData> timeDataList,
+									final boolean isCreateMarker) {
 
-		int serieLength = timeDataList.size();
+		final int serieLength = timeDataList.size();
 
-		if (serieLength > 0) {
+		if (serieLength == 0) { return; }
 
-			// check if gps data are available
-			if (timeDataList.get(0).latitude != Double.MIN_VALUE) {
-				latitudeSerie = new double[serieLength];
-				longitudeSerie = new double[serieLength];
-			}
+		// check if _GPS data are available
+		if (deviceTimeInterval == -1) {
+			latitudeSerie = new double[serieLength];
+			longitudeSerie = new double[serieLength];
+		}
 
-			timeSerie = new int[serieLength];
-			distanceSerie = new int[serieLength];
-			altitudeSerie = new int[serieLength];
-			pulseSerie = new int[serieLength];
-			cadenceSerie = new int[serieLength];
-			temperatureSerie = new int[serieLength];
+		timeSerie = new int[serieLength];
+		distanceSerie = new int[serieLength];
+		altitudeSerie = new int[serieLength];
+		pulseSerie = new int[serieLength];
+		cadenceSerie = new int[serieLength];
+		temperatureSerie = new int[serieLength];
 
-			// speedSerie = new int[serieLength];
-			// powerSerie = new int[serieLength];
+		int timeIndex = 0;
 
-			int timeIndex = 0;
+		int timeAbsolute = 0;
+		int altitudeAbsolute = 0;
+		int distanceAbsolute = 0;
 
-			int timeAbsolute = 0;
-			int altitudeAbsolute = 0;
-			int distanceAbsolute = 0;
+		if (timeDataList.get(0).absoluteTime != Long.MIN_VALUE) {
 
-			if (timeDataList.get(0).absoluteTime != Long.MIN_VALUE) {
+			/*
+			 * absolute data are available these data are normally from GPS devices
+			 */
 
-				/*
-				 * absolute data are available, normally from GPS devices
-				 */
+			long firstTime = 0;
 
-				long firstTime = 0;
-				TimeData prevTimeData = null;
+			// index when altitude is available in the time data list
+			int altitudeStartIndex = -1;
 
-				// convert data from the tour format into an interger[]
-				for (TimeData timeData : timeDataList) {
+			int distanceDiff;
+			int altitudeDiff;
 
-					if (prevTimeData == null) {
+			// convert data from the tour format into an interger[]
+			for (final TimeData timeData : timeDataList) {
 
-						// first trackpoint
-
-						prevTimeData = timeData;
-
-						firstTime = timeData.absoluteTime;
-
-						altitudeSerie[timeIndex] = altitudeAbsolute = (int) timeData.absoluteAltitude;
-
-					} else {
-
-						timeAbsolute = (int) ((timeData.absoluteTime - firstTime) / 1000);
-						timeSerie[timeIndex] = timeAbsolute;
-
-						int distanceDiff = (int) (timeData.absoluteDistance - distanceAbsolute);
-						int altitudeDiff = (int) (timeData.absoluteAltitude - altitudeAbsolute);
-
-						distanceSerie[timeIndex] = distanceAbsolute += distanceDiff;
-						altitudeSerie[timeIndex] = altitudeAbsolute += altitudeDiff;
-					}
-
-					latitudeSerie[timeIndex] = timeData.latitude;
-					longitudeSerie[timeIndex] = timeData.longitude;
-
-					pulseSerie[timeIndex] = timeData.pulse;
-					temperatureSerie[timeIndex] = timeData.temperature;
-					cadenceSerie[timeIndex] = timeData.cadence;
-
-					if (isCreateMarker && timeData.marker != 0) {
-						createMarker(timeData, timeIndex, timeAbsolute, distanceAbsolute);
-					}
-
-					timeIndex++;
+				if (altitudeStartIndex == -1 && timeData.absoluteAltitude != Float.MIN_VALUE) {
+					altitudeStartIndex = timeIndex;
+					altitudeAbsolute = (int) timeData.absoluteAltitude;
 				}
 
-			} else {
+				if (timeIndex == 0) {
 
-				/*
-				 * relativ data are available, these data are from non GPS devices
-				 */
+					// first trackpoint
 
-				// convert data from the tour format into an interger[]
-				for (TimeData timeData : timeDataList) {
+					firstTime = timeData.absoluteTime;
 
+				} else {
+
+					// 1..n trackpoint
+
+					/*
+					 * set time
+					 */
+					timeAbsolute = (int) ((timeData.absoluteTime - firstTime) / 1000);
 					timeSerie[timeIndex] = timeAbsolute;
 
-					distanceSerie[timeIndex] = distanceAbsolute += timeData.distance;
-					altitudeSerie[timeIndex] = altitudeAbsolute += timeData.altitude;
-
-					pulseSerie[timeIndex] = timeData.pulse;
-					temperatureSerie[timeIndex] = timeData.temperature;
-					cadenceSerie[timeIndex] = timeData.cadence;
-
-					if (isCreateMarker && timeData.marker != 0) {
-						createMarker(timeData, timeIndex, timeAbsolute, distanceAbsolute);
+					/*
+					 * set distance
+					 */
+					float tdDistance = timeData.absoluteDistance;
+					if (tdDistance == Float.MIN_VALUE) {
+						distanceDiff = 0;
+					} else {
+						distanceDiff = (int) (tdDistance - distanceAbsolute);
 					}
+					distanceSerie[timeIndex] = distanceAbsolute += distanceDiff;
 
-					timeAbsolute += timeData.time;
-
-					timeIndex++;
+					/*
+					 * set altitude
+					 */
+					if (altitudeStartIndex == -1) {
+						altitudeDiff = 0;
+					} else {
+						final float tdAltitude = timeData.absoluteAltitude;
+						if (tdAltitude == Float.MIN_VALUE) {
+							altitudeDiff = 0;
+						} else {
+							altitudeDiff = (int) (tdAltitude - altitudeAbsolute);
+						}
+					}
+					altitudeSerie[timeIndex] = altitudeAbsolute += altitudeDiff;
 				}
+
+				latitudeSerie[timeIndex] = timeData.latitude;
+				longitudeSerie[timeIndex] = timeData.longitude;
+
+				pulseSerie[timeIndex] = timeData.pulse;
+				temperatureSerie[timeIndex] = timeData.temperature;
+				cadenceSerie[timeIndex] = timeData.cadence;
+
+				if (isCreateMarker && timeData.marker != 0) {
+					createMarker(timeData, timeIndex, timeAbsolute, distanceAbsolute);
+				}
+
+				timeIndex++;
 			}
 
-			tourDistance = distanceAbsolute;
-			tourRecordingTime = timeAbsolute;
+		} else {
+
+			/*
+			 * relativ data are available, these data are from non GPS devices
+			 */
+
+			// convert data from the tour format into an interger[]
+			for (final TimeData timeData : timeDataList) {
+
+				timeSerie[timeIndex] = timeAbsolute;
+
+				distanceSerie[timeIndex] = distanceAbsolute += timeData.distance;
+				altitudeSerie[timeIndex] = altitudeAbsolute += timeData.altitude;
+
+				pulseSerie[timeIndex] = timeData.pulse;
+				temperatureSerie[timeIndex] = timeData.temperature;
+				cadenceSerie[timeIndex] = timeData.cadence;
+
+				if (isCreateMarker && timeData.marker != 0) {
+					createMarker(timeData, timeIndex, timeAbsolute, distanceAbsolute);
+				}
+
+				timeAbsolute += timeData.time;
+
+				timeIndex++;
+			}
 		}
+
+		tourDistance = distanceAbsolute;
+		tourRecordingTime = timeAbsolute;
 	}
 
 	/**
@@ -1198,7 +1227,8 @@ public class TourData {
 
 			setTourId(Long.parseLong(tourId));
 
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 
 			/*
 			 * the distance was shorted so that the maximum of a Long datatype is not exceeded
@@ -1393,17 +1423,11 @@ public class TourData {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
+		if (obj == null) { return false; }
 
-		if (this == obj) {
-			return true;
-		}
+		if (this == obj) { return true; }
 
-		if (!this.getClass().equals(obj.getClass())) {
-			return false;
-		}
+		if (!this.getClass().equals(obj.getClass())) { return false; }
 
 		TourData td = (TourData) obj;
 
@@ -1971,7 +1995,8 @@ public class TourData {
 	}
 
 	/**
-	 * time difference between 2 time slices or <code>-1</code> when the time slices are unequally
+	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time
+	 * slices are unequally
 	 * 
 	 * @param deviceTimeInterval
 	 */

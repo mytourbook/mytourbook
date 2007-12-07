@@ -24,17 +24,23 @@ import javax.persistence.EntityTransaction;
 import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.UI;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -95,15 +101,17 @@ public class CompareResultView extends ViewPart {
 	 */
 	private static IMemento				fSessionMemento				= null;
 
+	private Composite					fViewerContainer;
 	private CheckboxTreeViewer			fTourViewer;
 
 	private ISelectionListener			fPostSelectionListener;
 	private IPartListener2				fPartListener;
+	private IPropertyChangeListener		fPrefChangeListener;
+
+	PostSelectionProvider				fPostSelectionProvider;
 
 	private Action						fActionSaveComparedTours;
 	private Action						fActionRemoveComparedTourSaveStatus;
-
-	PostSelectionProvider				fPostSelectionProvider;
 
 	/**
 	 * resource manager for images
@@ -205,7 +213,7 @@ public class CompareResultView extends ViewPart {
 				case COLUMN_SPEED_COMPUTED:
 					nf.setMinimumFractionDigits(1);
 					nf.setMaximumFractionDigits(1);
-					return nf.format(result.compareSpeed);
+					return nf.format(result.compareSpeed / UI.UNIT_VALUE_DISTANCE);
 
 				case COLUMN_SPEED_SAVED:
 					final float speedSaved = result.dbSpeed;
@@ -214,7 +222,7 @@ public class CompareResultView extends ViewPart {
 					} else {
 						nf.setMinimumFractionDigits(1);
 						nf.setMaximumFractionDigits(1);
-						return nf.format(speedSaved);
+						return nf.format(speedSaved / UI.UNIT_VALUE_DISTANCE);
 					}
 
 				case COLUMN_SPEED_MOVED:
@@ -224,13 +232,14 @@ public class CompareResultView extends ViewPart {
 					} else {
 						nf.setMinimumFractionDigits(1);
 						nf.setMaximumFractionDigits(1);
-						return nf.format(speedMoved);
+						return nf.format(speedMoved / UI.UNIT_VALUE_DISTANCE);
 					}
 
 				case COLUMN_DISTANCE:
 					nf.setMinimumFractionDigits(2);
 					nf.setMaximumFractionDigits(2);
-					return nf.format(((float) result.compareDistance) / 1000);
+					return nf.format(((float) result.compareDistance)
+							/ (1000 * UI.UNIT_VALUE_DISTANCE));
 
 				case COLUMN_ALTITUDE_DIFFERENCE:
 					return Integer.toString(result.minAltitudeDiff
@@ -399,6 +408,42 @@ public class CompareResultView extends ViewPart {
 		getViewSite().getPage().addPartListener(fPartListener);
 	}
 
+	private void addPrefListener() {
+
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					// measurement system has changed
+
+					UI.updateUnits();
+
+					saveSettings();
+
+					// dispose viewer
+					Control[] children = fViewerContainer.getChildren();
+					for (int childIndex = 0; childIndex < children.length; childIndex++) {
+						children[childIndex].dispose();
+					}
+
+					createTourViewer(fViewerContainer);
+					fViewerContainer.layout();
+
+					// update the viewer
+					fTourViewer.setInput(((ResultContentProvider) fTourViewer.getContentProvider()).getRootItem());
+
+					restoreState(fSessionMemento);
+				}
+			}
+		};
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.addPropertyChangeListener(fPrefChangeListener);
+	}
+
 	/**
 	 * Listen to post selections
 	 */
@@ -504,13 +549,17 @@ public class CompareResultView extends ViewPart {
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		createTourViewer(parent);
+		fViewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
 
-		restoreSettings(fSessionMemento);
+		createTourViewer(fViewerContainer);
+
+		restoreState(fSessionMemento);
 
 		addPartListeners();
 		addSelectionListeners();
 		addCompareTourPropertyListener();
+		addPrefListener();
 
 		createActions();
 		createContextMenu();
@@ -528,6 +577,8 @@ public class CompareResultView extends ViewPart {
 				| SWT.MULTI
 				| SWT.FULL_SELECTION
 				| SWT.CHECK);
+
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
@@ -549,25 +600,25 @@ public class CompareResultView extends ViewPart {
 
 		// column: speed computed
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.Compare_Result_Column_kmh);
+		tc.setText(UI.UNIT_LABEL_SPEED);
 		tc.setToolTipText(Messages.Compare_Result_Column_kmh_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		// column: speed saved
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.Compare_Result_Column_kmh);
+		tc.setText(UI.UNIT_LABEL_SPEED);
 		tc.setToolTipText(Messages.Compare_Result_Column_kmh_db_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		// column: speed moved
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.Compare_Result_Column_kmh);
+		tc.setText(UI.UNIT_LABEL_SPEED);
 		tc.setToolTipText(Messages.Compare_Result_Column_kmh_moved_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 		// column: distance
 		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(Messages.Compare_Result_Column_km);
+		tc.setText(UI.UNIT_LABEL_DISTANCE);
 		tc.setToolTipText(Messages.Compare_Result_Column_km_tooltip);
 		tc.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -664,6 +715,9 @@ public class CompareResultView extends ViewPart {
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getSite().getPage().removePartListener(fPartListener);
 		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
+		TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.removePropertyChangeListener(fPrefChangeListener);
 
 		resManager.dispose();
 
@@ -800,7 +854,7 @@ public class CompareResultView extends ViewPart {
 		}
 	}
 
-	private void restoreSettings(IMemento memento) {
+	private void restoreState(IMemento memento) {
 
 		if (memento != null) {
 
@@ -844,9 +898,11 @@ public class CompareResultView extends ViewPart {
 				// update tour map view
 				fPostSelectionProvider.setSelection(persistedCompareResults);
 
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				e.printStackTrace();
-			} finally {
+			}
+			finally {
 				if (ts.isActive()) {
 					ts.rollback();
 				}

@@ -445,18 +445,12 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		fMarkerListContainer = new Composite(dlgContainer, SWT.NONE);
 		gl = new GridLayout(3, false);
-		// gl.marginHeight = 10;
-		// gl.marginWidth = 10;
-		// gl.marginRight = 0;
 		fMarkerListContainer.setLayout(gl);
 
 		final Sash sash = new Sash(dlgContainer, SWT.VERTICAL);
 
 		final Composite markerDetailContainer = new Composite(dlgContainer, SWT.NONE);
 		gl = new GridLayout();
-		// gl.marginHeight = 10;
-		// gl.marginWidth = 10;
-		// gl.marginLeft = 0;
 		markerDetailContainer.setLayout(gl);
 		// markerDetailContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
@@ -664,7 +658,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		setButtonLayoutData(fBtnReset);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void enableControls() {
 
 		if (fSelectedTourMarker != null) {
@@ -742,7 +736,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	/**
 	 * remove selected markers from the view and update dependened structures
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void onDeleteMarker() {
 
 		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();
@@ -788,9 +782,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	private void onSelectMarker(TourMarker newSelectedMarker) {
 
-		if (newSelectedMarker == null) {
-			return;
-		}
+		if (newSelectedMarker == null) { return; }
 
 		// save values for previous marker
 		if (fSelectedTourMarker != null && newSelectedMarker != fSelectedTourMarker) {
@@ -820,7 +812,8 @@ public class MarkerDialog extends TitleAreaDialog {
 		// restore width for the marker list when the width is available
 		try {
 			fViewerDetailForm.setViewerWidth(dlgSettings.getInt(DIALOG_SETTINGS_VIEWER_WIDTH));
-		} catch (NumberFormatException e) {}
+		}
+		catch (NumberFormatException e) {}
 	}
 
 	/**
@@ -828,9 +821,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	 */
 	private void restoreVisibleType() {
 
-		if (fSelectedTourMarker == null) {
-			return;
-		}
+		if (fSelectedTourMarker == null) { return; }
 
 		fSelectedTourMarker.setVisibleType(ChartMarker.VISIBLE_TYPE_DEFAULT);
 	}
@@ -845,9 +836,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	private void saveMarkerValuesFromUI(TourMarker tourMarker) {
 
-		if (tourMarker == null) {
-			return;
-		}
+		if (tourMarker == null) { return; }
 
 		tourMarker.setLabel(fTextMarkerName.getText().trim());
 		tourMarker.setVisualPosition(fComboMarkerPosition.getSelectionIndex());

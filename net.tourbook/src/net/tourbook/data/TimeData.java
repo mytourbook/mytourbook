@@ -71,11 +71,18 @@ public class TimeData implements Serializable {
 	 */
 	public long					absoluteTime		= Long.MIN_VALUE;
 
+	/**
+	 * contains the absolute altitude in meters or {@link Float#MIN_VALUE} when altitude is not set
+	 */
 	public float				absoluteAltitude	= Float.MIN_VALUE;
+
+	/**
+	 * contains the absolute distance in meters or {@link Float#MIN_VALUE} when distance is not set
+	 */
 	public float				absoluteDistance	= Float.MIN_VALUE;
 
 	/**
-	 * absolute value for latituce
+	 * absolute value for latitude
 	 */
 	public double				latitude			= Double.MIN_VALUE;
 
