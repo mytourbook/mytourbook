@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class TourTypeCombo {
 
-	private static final boolean	osx	= "carbon".equals(SWT.getPlatform());
+	private static final boolean	osx	= "carbon".equals(SWT.getPlatform()); //$NON-NLS-1$
 
 	private Composite				fContainer;
 

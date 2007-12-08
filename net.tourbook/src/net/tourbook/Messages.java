@@ -36,10 +36,8 @@ public class Messages extends NLS {
 	public static String		App_Action_set_tour_type_dlg_message;
 	public static String		App_Action_set_tour_type_dlg_title;
 
-	public static String	App_measurement_imperial;
-
-	public static String	App_measurement_metric;
-
+	public static String		App_measurement_imperial;
+	public static String		App_measurement_metric;
 	public static String		App_measurement_tooltip;
 
 	public static String		App_People_item_all;
@@ -62,18 +60,16 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Action_uncheck_selected_tours;
 	public static String		Compare_Result_Column_diff;
 	public static String		Compare_Result_Column_diff_tooltip;
-	public static String		Compare_Result_Column_km;
 	public static String		Compare_Result_Column_km_tooltip;
-	public static String		Compare_Result_Column_kmh;
 	public static String		Compare_Result_Column_kmh_db_tooltip;
 	public static String		Compare_Result_Column_kmh_moved_tooltip;
 	public static String		Compare_Result_Column_kmh_tooltip;
 	public static String		Compare_Result_Column_tour;
 	public static String		Compare_Result_time_interval;
 	public static String		Compare_Result_time_interval_tooltip;
+
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
-
 	public static String		Database_Monitor_db_service_task;
 	public static String		Database_Monitor_persistent_service_task;
 
@@ -143,7 +139,6 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Gradiend_unit;
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
-
 	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;
 	public static String		Graph_Label_Speed;
@@ -337,7 +332,6 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_cadence_tooltip;
 	public static String		Tour_Action_graph_gradient_tooltip;
 	public static String		Tour_Action_graph_heartbeat_tooltip;
-
 	public static String		Tour_Action_graph_pace_tooltip;
 	public static String		Tour_Action_graph_speed_tooltip;
 	public static String		Tour_Action_graph_temperature_tooltip;
@@ -377,7 +371,6 @@ public class Messages extends NLS {
 	public static String		Tour_Map_Action_synch_charts_byScale_tooltip;
 	public static String		Tour_Map_Action_synch_charts_bySize_tooltip;
 	public static String		Tour_Map_Action_undo_marker_position;
-	public static String		Tour_Map_Column_kmh;
 	public static String		Tour_Map_Column_tour;
 	public static String		Tour_Map_Compare_job_subtask;
 	public static String		Tour_Map_Compare_job_task;
@@ -400,7 +393,6 @@ public class Messages extends NLS {
 	public static String		Tour_Map_Label_km;
 	public static String		Tour_Map_Label_m;
 	public static String		Tour_Map_Label_year_chart_title;
-	public static String		Tour_Map_Label_year_chart_unit;
 	public static String		Tour_Map_label_year_not_selected;
 
 	public static String		Tour_Marker_Column_horizontal_offset;
@@ -465,12 +457,10 @@ public class Messages extends NLS {
 
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;
-
 	public static String		TourChart_Property_check_customize_pace_clipping;
 	public static String		TourChart_Property_check_customize_value_clipping;
 	public static String		TourChart_Property_check_customize_value_computing;
 	public static String		TourChart_Property_label_chart_type;
-
 	public static String		TourChart_Property_label_pace_speed;
 	public static String		TourChart_Property_label_time_slices;
 
@@ -486,8 +476,6 @@ public class Messages extends NLS {
 	public static String	TourMap_Wizard_Column_distance_tooltip;
 	public static String		TourMap_Wizard_Column_h;
 	public static String		TourMap_Wizard_Column_h_tooltip;
-	public static String		TourMap_Wizard_Column_km;
-	public static String		TourMap_Wizard_Column_m;
 	public static String		TourMap_Wizard_Column_tour;
 	public static String		TourMap_Wizard_Error_select_reference_tours;
 	public static String		TourMap_Wizard_Error_tour_must_be_selected;

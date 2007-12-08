@@ -81,7 +81,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
 			parser.parse("file:" + importFileName, handler);//$NON-NLS-1$
 
 		} catch (Exception e) {
-			System.err.println("Error parsing " + importFileName + ": " + e);
+			System.err.println("Error parsing " + importFileName + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			e.printStackTrace();
 			return false;
 		}

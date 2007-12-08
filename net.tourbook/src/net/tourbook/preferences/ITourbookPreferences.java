@@ -92,17 +92,17 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	MEASUREMENT_SYSTEM						= "system.of.measurement";						//$NON-NLS-1$
 
-	public static final String	MEASUREMENT_SYSTEM_DISTANCE				= "system.of.measurement.distance";
+	public static final String	MEASUREMENT_SYSTEM_DISTANCE				= "system.of.measurement.distance"; //$NON-NLS-1$
 	public static final String	MEASUREMENT_SYSTEM_DISTANCE_KM			= "metric.km";									//$NON-NLS-1$
 	public static final String	MEASUREMENT_SYSTEM_DISTANCE_MI			= "imperial.mi";								//$NON-NLS-1$
 
-	public static final String	MEASUREMENT_SYSTEM_ALTITUDE				= "system.of.measurement.altitude";
+	public static final String	MEASUREMENT_SYSTEM_ALTITUDE				= "system.of.measurement.altitude"; //$NON-NLS-1$
 	public static final String	MEASUREMENT_SYSTEM_ALTITUDE_M			= "metric.m";									//$NON-NLS-1$
 	public static final String	MEASUREMENT_SYSTEM_ALTITUDE_FOOT		= "imperial.foot";								//$NON-NLS-1$
 
-	public static final String	MEASUREMENT_SYSTEM_TEMPERATURE			= "system.of.measurement.temperature";
-	public static final String	MEASUREMENT_SYSTEM_TEMPERATURE_C		= "metric.celcius";
-	public static final String	MEASUREMENT_SYSTEM_TEMPTERATURE_F		= "metric.fahrenheit";
+	public static final String	MEASUREMENT_SYSTEM_TEMPERATURE			= "system.of.measurement.temperature"; //$NON-NLS-1$
+	public static final String	MEASUREMENT_SYSTEM_TEMPERATURE_C		= "metric.celcius"; //$NON-NLS-1$
+	public static final String	MEASUREMENT_SYSTEM_TEMPTERATURE_F		= "metric.fahrenheit"; //$NON-NLS-1$
 
 	public static final String	MEASUREMENT_SYSTEM_SHOW_IN_UI			= "system.of.measurement.show.in.ui";			//$NON-NLS-1$
 

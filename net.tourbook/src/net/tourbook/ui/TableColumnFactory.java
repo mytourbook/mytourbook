@@ -128,7 +128,7 @@ public abstract class TableColumnFactory {
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
 			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "distance", SWT.TRAIL); //$NON-NLS-1$
-			colDef.setLabel(Messages.ColumnFactory_distance_label + " (" + UI.UNIT_LABEL_DISTANCE + ")");
+			colDef.setLabel(Messages.ColumnFactory_distance_label + " (" + UI.UNIT_LABEL_DISTANCE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setText(UI.UNIT_LABEL_DISTANCE);
 			colDef.setToolTipText(Messages.ColumnFactory_distance_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
@@ -156,7 +156,7 @@ public abstract class TableColumnFactory {
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
 			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL); //$NON-NLS-1$
-			colDef.setLabel(Messages.ColumnFactory_altitude_up_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")");
+			colDef.setLabel(Messages.ColumnFactory_altitude_up_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setText(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setToolTipText(Messages.ColumnFactory_altitude_up_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
@@ -170,7 +170,7 @@ public abstract class TableColumnFactory {
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
 			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDown", SWT.TRAIL); //$NON-NLS-1$
-			colDef.setLabel(Messages.ColumnFactory_altitude_down_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")");
+			colDef.setLabel(Messages.ColumnFactory_altitude_down_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setText(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));

@@ -37,7 +37,7 @@ public class GraphColors {
 	public static final String	PREF_GRAPH_ALTIMETER	= "altimeter";		//$NON-NLS-1$
 	public static final String	PREF_GRAPH_CADENCE		= "cadence";		//$NON-NLS-1$
 	public static final String	PREF_GRAPH_TOUR_COMPARE	= "tourCompare";	//$NON-NLS-1$
-	public static final String	PREF_GRAPH_PACE			= "pace";
+	public static final String	PREF_GRAPH_PACE			= "pace"; //$NON-NLS-1$
 
 	public static final String	PREF_COLOR_BRIGHT		= "bright";		//$NON-NLS-1$
 	public static final String	PREF_COLOR_DARK			= "dark";			//$NON-NLS-1$ 

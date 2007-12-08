@@ -126,7 +126,7 @@ public class CRPDataReader extends TourbookDevice {
 			ArrayList<String> trackPoints = new ArrayList<String>();
 
 			tokenLine = new StringTokenizer(fileReader.readLine());
-			@SuppressWarnings("unused")
+			@SuppressWarnings("unused") //$NON-NLS-1$
 			String fileVersion = tokenLine.nextToken();
 
 			// get all trackpoints
@@ -241,15 +241,15 @@ public class CRPDataReader extends TourbookDevice {
 
 			int pulse;
 			int distance = 0;
-			@SuppressWarnings("unused")
+			@SuppressWarnings("unused") //$NON-NLS-1$
 			int speed;
 			int altitude;
-			@SuppressWarnings("unused")
+			@SuppressWarnings("unused") //$NON-NLS-1$
 			int color;
-			@SuppressWarnings("unused")
+			@SuppressWarnings("unused") //$NON-NLS-1$
 			int symbol;
 			int temperature;
-			@SuppressWarnings("unused")
+			@SuppressWarnings("unused") //$NON-NLS-1$
 			String trackpointTime;
 
 			int oldDistance = 0;

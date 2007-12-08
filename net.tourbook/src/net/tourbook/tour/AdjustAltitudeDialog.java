@@ -656,7 +656,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		return fDialogArea;
 	}
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	private void dumpMinMax(int[] altiSrc, String place) {
 
 		int minAltiSrc1 = altiSrc[0];

@@ -232,7 +232,7 @@ public abstract class TreeColumnFactory {
 	public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 		TreeColumnDefinition colDef = new TreeColumnDefinition("maxAltitude", SWT.TRAIL); //$NON-NLS-1$
 		colDef.setLabel(Messages.ColumnFactory_max_altitude_label);
-		colDef.setText("^" + UI.UNIT_LABEL_ALTITUDE);
+		colDef.setText("^" + UI.UNIT_LABEL_ALTITUDE); //$NON-NLS-1$
 		colDef.setToolTipText(Messages.ColumnFactory_max_altitude_tooltip);
 		colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -295,7 +295,7 @@ public abstract class TreeColumnFactory {
 		@Override
 		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			TreeColumnDefinition colDef = new TreeColumnDefinition("avgTemperature", SWT.TRAIL); //$NON-NLS-1$
-			colDef.setLabel(Messages.ColumnFactory_avg_temperature_label + " (" + UI.UNIT_LABEL_TEMPERATURE + ")");
+			colDef.setLabel(Messages.ColumnFactory_avg_temperature_label + " (" + UI.UNIT_LABEL_TEMPERATURE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setText(UI.UNIT_LABEL_TEMPERATURE);
 			colDef.setToolTipText(Messages.ColumnFactory_avg_temperature_tooltip);
 			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(6));

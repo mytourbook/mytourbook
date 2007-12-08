@@ -73,7 +73,7 @@ import org.eclipse.swt.widgets.Widget;
  */
 public final class ImageCombo extends Composite {
 
-	private static final boolean	gtk					= "gtk".equals(SWT.getPlatform());
+	private static final boolean	gtk					= "gtk".equals(SWT.getPlatform()); //$NON-NLS-1$
 	private boolean					dontDrop			= false;
 
 	ImageComboLabel					fLabel;

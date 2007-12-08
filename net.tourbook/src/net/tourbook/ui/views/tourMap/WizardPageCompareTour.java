@@ -145,7 +145,7 @@ public class WizardPageCompareTour extends WizardPage {
 					return nf.format(((float) row[COLUMN_DISTANCE])
 							/ (1000 * UI.UNIT_VALUE_DISTANCE));
 				} else {
-					return "";
+					return ""; //$NON-NLS-1$
 				}
 
 			case COLUMN_RECORDING:
@@ -155,14 +155,14 @@ public class WizardPageCompareTour extends WizardPage {
 							(recordingTime / 3600),
 							((recordingTime % 3600) / 60)).toString();
 				} else {
-					return "";
+					return ""; //$NON-NLS-1$
 				}
 
 			case COLUMN_UP:
 				if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
 					return Long.toString((long) (row[COLUMN_UP] / UI.UNIT_VALUE_ALTITUDE));
 				} else {
-					return "";
+					return ""; //$NON-NLS-1$
 				}
 
 			default:

@@ -30,6 +30,7 @@ import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourChartContextProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.TableLayoutComposite;
@@ -161,7 +162,8 @@ public class MarkerDialog extends TitleAreaDialog {
 			case COLUMN_DISTANCE:
 				fNF.setMinimumFractionDigits(1);
 				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(((float) tourMarker.getDistance()) / 1000));
+				cell.setText(fNF.format(((float) tourMarker.getDistance())
+						/ (1000 * UI.UNIT_VALUE_DISTANCE)));
 
 				if (tourMarker.getType() == ChartMarker.MARKER_TYPE_DEVICE) {
 					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -658,7 +660,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		setButtonLayoutData(fBtnReset);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void enableControls() {
 
 		if (fSelectedTourMarker != null) {
@@ -736,7 +738,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	/**
 	 * remove selected markers from the view and update dependened structures
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void onDeleteMarker() {
 
 		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();
@@ -782,7 +784,9 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	private void onSelectMarker(TourMarker newSelectedMarker) {
 
-		if (newSelectedMarker == null) { return; }
+		if (newSelectedMarker == null) {
+			return;
+		}
 
 		// save values for previous marker
 		if (fSelectedTourMarker != null && newSelectedMarker != fSelectedTourMarker) {
@@ -821,7 +825,9 @@ public class MarkerDialog extends TitleAreaDialog {
 	 */
 	private void restoreVisibleType() {
 
-		if (fSelectedTourMarker == null) { return; }
+		if (fSelectedTourMarker == null) {
+			return;
+		}
 
 		fSelectedTourMarker.setVisibleType(ChartMarker.VISIBLE_TYPE_DEFAULT);
 	}
@@ -836,7 +842,9 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	private void saveMarkerValuesFromUI(TourMarker tourMarker) {
 
-		if (tourMarker == null) { return; }
+		if (tourMarker == null) {
+			return;
+		}
 
 		tourMarker.setLabel(fTextMarkerName.getText().trim());
 		tourMarker.setVisualPosition(fComboMarkerPosition.getSelectionIndex());

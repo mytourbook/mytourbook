@@ -22,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
@@ -431,7 +432,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 	protected Control createContents(Composite parent) {
 
 		Label label = new Label(parent, SWT.WRAP);
-		label.setText("Bikes are used to calculate the power.");
+		label.setText("Bikes are used to calculate the power."); //$NON-NLS-1$
 
 		// container
 		Composite container = new Composite(parent, SWT.NONE);
