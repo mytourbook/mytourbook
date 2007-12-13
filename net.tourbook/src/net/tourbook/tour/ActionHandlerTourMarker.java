@@ -16,7 +16,6 @@
 package net.tourbook.tour;
 
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.views.tourBook.MarkerDialog;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -42,7 +41,7 @@ public class ActionHandlerTourMarker extends AbstractHandler {
 			return null;
 		}
 
-		(new MarkerDialog(Display.getCurrent().getActiveShell(), tourChart.fTourData, null)).open();
+		(new MarkerDialog(Display.getCurrent().getActiveShell(), tourChart.getTourData(), null)).open();
 
 		/*
 		 * Currently the dialog works with the markers from the tour editor not with a backup, so

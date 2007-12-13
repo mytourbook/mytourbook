@@ -16,11 +16,8 @@
 
 package net.tourbook.tour;
 
-import java.util.ArrayList;
-
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.UI;
@@ -77,8 +74,9 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			Messages.Dlg_AdjustAltitude_Type_adjust_height,
 			Messages.Dlg_AdjustAltitude_Type_adjust_end		};
 
-	private TourChart			fSelectedTourChart;
-	private TourChart			fTourChart;
+//	private TourChart			fParentTourChart;
+	private TourChart			fDialogTourChart;
+	private TourData			fTourData;
 
 	private Composite			fDialogArea;
 
@@ -99,14 +97,13 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	private Button				fRadioKeepStart;
 	private Button				fRadioKeepBottom;
 
-//	private boolean				fIsSpinnerChangedByUser;
 	protected boolean			fIsInitialAltiDisplayed;
 
-	private int[]				fOriginalAltitudes;
-	private int					fInitialAltiStart;
+	private int[]				fAltitudeSerieOriginal;
+	private int[]				fAltitudeSerieModified;
 
+	private int					fInitialAltiStart;
 	private int					fInitialAltiMax;
-	private int[]				fInitialAltitude;
 
 	private int					fAltiMaxDiff;
 	private int					fAltiStartDiff;
@@ -130,17 +127,16 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		setShell();
 
-		fSelectedTourChart = tourChart;
+		fTourData = tourChart.getTourData();
 
 		/*
-		 * keep a backup for the altitude data because they will be changed, they are saved when the
-		 * user presses the OK button
+		 * keep a backup of the altitude data because these data will be changed in the tourChart
 		 */
-		int[] altitudeSerie = getAltitudeSerie();
-		if (altitudeSerie != null) {
-			final int serieLength = altitudeSerie.length;
-			fOriginalAltitudes = new int[serieLength];
-			System.arraycopy(altitudeSerie, 0, fOriginalAltitudes, 0, serieLength);
+		int[] originalAltitudeSerie = getChartAltitudeSerie();
+		if (originalAltitudeSerie != null) {
+			final int serieLength = originalAltitudeSerie.length;
+			fAltitudeSerieOriginal = new int[serieLength];
+			System.arraycopy(originalAltitudeSerie, 0, fAltitudeSerieOriginal, 0, serieLength);
 		}
 	}
 
@@ -163,7 +159,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			// adjust start, end and max
 
 			// adjust end alti to start alti
-			adjustEndAltitude(fOriginalAltitudes, tourData, fOriginalAltitudes[0]);
+			adjustEndAltitude(fAltitudeSerieOriginal, tourData, fAltitudeSerieOriginal[0]);
 
 			adjustStartAndMax(altiDest, altiDest, isAltiSetByUser, newAltiStart, newAltiMax);
 
@@ -172,24 +168,20 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		case ADJUST_ALTITUDE_WHOLE_TOUR:
 
 			// adjust evenly
-			adjustEvenly(fOriginalAltitudes, altiDest, newAltiStart);
+			adjustEvenly(fAltitudeSerieOriginal, altiDest, newAltiStart);
 			break;
 
 		case ADJUST_ALTITUDE_END:
 
 			// adjust end
-			adjustEndAltitude(fOriginalAltitudes, tourData, fSpinnerNewEndAlti.getSelection());
+			adjustEndAltitude(fAltitudeSerieOriginal, tourData, fSpinnerNewEndAlti.getSelection());
 			break;
 
 		case ADJUST_ALTITUDE_MAX_HEIGHT:
 
 			// adjust max
 
-			adjustStartAndMax(fOriginalAltitudes,
-					altiDest,
-					isAltiSetByUser,
-					newAltiStart,
-					newAltiMax);
+			adjustStartAndMax(fAltitudeSerieOriginal, altiDest, isAltiSetByUser, newAltiStart, newAltiMax);
 			break;
 
 		default:
@@ -199,12 +191,12 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		/*
 		 * make a backup of the current values
 		 */
-		int[] altitudeSerie = getAltitudeSerie();
+		int[] altitudeSerie = getChartAltitudeSerie();
 		if (altitudeSerie != null) {
-			fInitialAltitude = new int[altitudeSerie.length];
+			fAltitudeSerieModified = new int[altitudeSerie.length];
 
 			for (int altiIndex = 0; altiIndex < altitudeSerie.length; altiIndex++) {
-				fInitialAltitude[altiIndex] = altitudeSerie[altiIndex];
+				fAltitudeSerieModified[altiIndex] = altitudeSerie[altiIndex];
 			}
 		}
 	}
@@ -418,7 +410,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		setTitle(Messages.Dlg_AdjustAltitude_Title_dlg);
 
 		/*
-		 * create adjust type combo
+		 * combo: adjust type
 		 */
 		Composite typeContainer = new Composite(dlgContainer, SWT.NONE);
 		gl = new GridLayout(2, false);
@@ -444,33 +436,31 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		}
 
 		/*
-		 * create tour chart
+		 * tour chart
 		 */
-		fTourChart = new TourChart(dlgContainer, SWT.BORDER, true);
+		fDialogTourChart = new TourChart(dlgContainer, SWT.BORDER, true);
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.minimumWidth = 500;
 		gd.minimumHeight = 300;
-		fTourChart.setLayoutData(gd);
+		fDialogTourChart.setLayoutData(gd);
 
-		fTourChart.setShowZoomActions(true);
-		fTourChart.setShowSlider(true);
+		fDialogTourChart.setShowZoomActions(true);
+		fDialogTourChart.setShowSlider(true);
 
 		// set altitude visible
 		TourChartConfiguration chartConfig = new TourChartConfiguration(true);
 		chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-		final TourData tourData = fSelectedTourChart.getTourData();
-
-		fTourChart.addDataModelListener(new IDataModelListener() {
+		fDialogTourChart.addDataModelListener(new IDataModelListener() {
 
 			public void dataModelChanged(ChartDataModel changedChartDataModel) {
 
 				// set title
-				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(tourData));
+				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
 			}
 		});
 
-		fTourChart.updateTourChart(tourData, chartConfig, true);
+		fDialogTourChart.updateTourChart(fTourData, chartConfig, true);
 
 		/*
 		 * container: altitude controls
@@ -622,14 +612,14 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 				if (fIsInitialAltiDisplayed == false && e.character == ' ') {
 					fIsInitialAltiDisplayed = true;
 					setOriginalAltitudeValues();
-					fTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
+					fDialogTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 				}
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
 				setInitialAltitudeValues();
-				fTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
+				fDialogTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 				fIsInitialAltiDisplayed = false;
 			}
 		});
@@ -641,14 +631,14 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 				if (fIsInitialAltiDisplayed == false) {
 					fIsInitialAltiDisplayed = true;
 					setOriginalAltitudeValues();
-					fTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
+					fDialogTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 				}
 			}
 
 			@Override
 			public void mouseUp(MouseEvent e) {
 				setInitialAltitudeValues();
-				fTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
+				fDialogTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 				fIsInitialAltiDisplayed = false;
 			}
 		});
@@ -656,7 +646,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		return fDialogArea;
 	}
 
-	@SuppressWarnings("unused") //$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private void dumpMinMax(int[] altiSrc, String place) {
 
 		int minAltiSrc1 = altiSrc[0];
@@ -746,25 +736,14 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	/**
 	 * @return Returns the altitude serie from the chart
 	 */
-	private int[] getAltitudeSerie() {
+	private int[] getChartAltitudeSerie() {
 
-		// get altitude data from the data model
-		ArrayList<ChartDataYSerie> yDataList = fSelectedTourChart.getChartDataModel().getYData();
-		int[] altitudeSerie = null;
-		for (ChartDataYSerie yData : yDataList) {
-			Integer yDataInfo = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
-			if (yDataInfo == TourManager.GRAPH_ALTITUDE) {
-				altitudeSerie = yData.getHighValues()[0];
-				break;
-			}
-		}
-		return altitudeSerie;
+		return fTourData.getAltitudeSerie();
 	}
 
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
-		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName()
-				+ "_DialogBounds"); //$NON-NLS-1$
+		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
 	}
 
 	/**
@@ -805,7 +784,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 	private void onChangeAdjustType() {
 
-		int[] altitudeSerie = getAltitudeSerie();
+		int[] altitudeSerie = getChartAltitudeSerie();
 
 		if (altitudeSerie == null) {
 			return;
@@ -821,12 +800,12 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	private void onChangeAltitude(Integer altiFlag) {
 
 		// calcuate new altitude values
-		adjustAltitude(fTourChart.fTourData, altiFlag);
+		adjustAltitude(fDialogTourChart.getTourData(), altiFlag);
 
 		// set new values into the fields which can change the altitude
 		setAltiFieldValues();
 
-		fTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
+		fDialogTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 	}
 
 	/**
@@ -836,12 +815,12 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		restoreOriginalAltitudeValues();
 
-		final int startAlti = fOriginalAltitudes[0];
-		final int endAlti = fOriginalAltitudes[fOriginalAltitudes.length - 1];
+		final int startAlti = fAltitudeSerieOriginal[0];
+		final int endAlti = fAltitudeSerieOriginal[fAltitudeSerieOriginal.length - 1];
 
 		// calculate max altitude
 		int maxAlti = startAlti;
-		for (int altitude : fOriginalAltitudes) {
+		for (int altitude : fAltitudeSerieOriginal) {
 			if (altitude > maxAlti) {
 				maxAlti = altitude;
 			}
@@ -876,7 +855,8 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		try {
 			fComboAdjustType.select(dlgSettings.getInt(DIALOG_SETTINGS_ADJUST_TYPE));
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			fComboAdjustType.select(ADJUST_ALTITUDE_NONE);
 		}
 
@@ -894,15 +874,17 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 */
 	public void restoreOriginalAltitudeValues() {
 
-		int[] altitudeSerie = getAltitudeSerie();
+		int[] altitudeSerie = getChartAltitudeSerie();
 
-		if (altitudeSerie == null | fOriginalAltitudes == null) {
+		if (altitudeSerie == null | fAltitudeSerieOriginal == null) {
 			return;
 		}
 
 		for (int altiIndex = 0; altiIndex < altitudeSerie.length; altiIndex++) {
-			altitudeSerie[altiIndex] = fOriginalAltitudes[altiIndex];
+			altitudeSerie[altiIndex] = fAltitudeSerieOriginal[altiIndex];
 		}
+
+//		System.arraycopy(fOriginalAltitudes, 0, altitudeSerie, 0, altitudeSerie.length);
 	}
 
 	private void saveDialogSettings() {
@@ -919,7 +901,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 */
 	private void setAltiFieldValues() {
 
-		int[] altiSerie = fTourChart.fTourData.altitudeSerie;
+		int[] altiSerie = fDialogTourChart.getTourData().altitudeSerie;
 		int altiStart = altiSerie[0];
 		int altiEnd = altiSerie[altiSerie.length - 1];
 
@@ -952,29 +934,29 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 	private void setInitialAltitudeValues() {
 
-		int[] altitudeSerie = getAltitudeSerie();
+		int[] altitudeSerie = getChartAltitudeSerie();
 
-		if (altitudeSerie == null || fInitialAltitude == null) {
+		if (altitudeSerie == null || fAltitudeSerieModified == null) {
 			return;
 		}
 
 		// set altitude to the initial values
 		for (int altiIndex = 0; altiIndex < altitudeSerie.length; altiIndex++) {
-			altitudeSerie[altiIndex] = fInitialAltitude[altiIndex];
+			altitudeSerie[altiIndex] = fAltitudeSerieModified[altiIndex];
 		}
 	}
 
 	private void setOriginalAltitudeValues() {
 
-		int[] altitudeSerie = getAltitudeSerie();
+		int[] altitudeSerie = getChartAltitudeSerie();
 
-		if (altitudeSerie == null || fOriginalAltitudes == null) {
+		if (altitudeSerie == null || fAltitudeSerieOriginal == null) {
 			return;
 		}
 
 		// set original values
 		for (int altiIndex = 0; altiIndex < altitudeSerie.length; altiIndex++) {
-			altitudeSerie[altiIndex] = fOriginalAltitudes[altiIndex];
+			altitudeSerie[altiIndex] = fAltitudeSerieOriginal[altiIndex];
 		}
 	}
 

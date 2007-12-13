@@ -71,6 +71,7 @@ public class WizardImportData extends Wizard {
 		setNeedsProgressMonitor(true);
 	}
 
+	@Override
 	public void addPages() {
 
 		fPageImportSettings = new WizardPageImportSettings("import-settings"); //$NON-NLS-1$
@@ -96,8 +97,7 @@ public class WizardImportData extends Wizard {
 
 		// set filename to the transfer date
 		DeviceData deviceData = RawDataManager.getInstance().getDeviceData();
-		String fileName = new Formatter().format(Messages.Format_rawdata_file_yyyy_mm_dd
-				+ fImportDevice.fileExtension,
+		String fileName = new Formatter().format(Messages.Format_rawdata_file_yyyy_mm_dd + fImportDevice.fileExtension,
 				deviceData.transferYear,
 				deviceData.transferMonth,
 				deviceData.transferDay).toString();
@@ -112,8 +112,7 @@ public class WizardImportData extends Wizard {
 
 			MessageBox msgBox = new MessageBox(getShell(), SWT.ICON_WORKING | SWT.OK | SWT.CANCEL);
 
-			msgBox.setMessage(NLS.bind(Messages.Import_Wizard_Message_replace_existing_file,
-					fileName));
+			msgBox.setMessage(NLS.bind(Messages.Import_Wizard_Message_replace_existing_file, fileName));
 
 			if (msgBox.open() != SWT.OK) {
 				return null;
@@ -131,24 +130,29 @@ public class WizardImportData extends Wizard {
 			outReader = new FileOutputStream(fileOut);
 			int c;
 
-			while ((c = inReader.read()) != -1)
+			while ((c = inReader.read()) != -1) {
 				outReader.write(c);
+			}
 
 			inReader.close();
 			outReader.close();
 
-		} catch (FileNotFoundException e) {
+		}
+		catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 			return null;
-		} finally {
+		}
+		finally {
 			// close the files
 			if (inReader != null) {
 				try {
 					inReader.close();
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					e.printStackTrace();
 					return null;
 				}
@@ -156,7 +160,8 @@ public class WizardImportData extends Wizard {
 			if (outReader != null) {
 				try {
 					outReader.close();
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					e.printStackTrace();
 					return null;
 				}
@@ -225,9 +230,11 @@ public class WizardImportData extends Wizard {
 			};
 
 			getContainer().run(true, true, fRunnableReceiveData);
-		} catch (InvocationTargetException e) {
+		}
+		catch (InvocationTargetException e) {
 			e.printStackTrace();
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
@@ -252,9 +259,11 @@ public class WizardImportData extends Wizard {
 			fileStream = new FileOutputStream(tempDataFileName);
 			fileStream.write(fRawDataBuffer.toByteArray());
 			fileStream.close();
-		} catch (FileNotFoundException e) {
+		}
+		catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 
@@ -268,9 +277,7 @@ public class WizardImportData extends Wizard {
 			/*
 			 * convert the data from the device data into the internal data structure
 			 */
-			if (fImportDevice.processDeviceData(tempDataFileName,
-					rawDataManager.getDeviceData(),
-					tourDataMap)) {
+			if (fImportDevice.processDeviceData(tempDataFileName, rawDataManager.getDeviceData(), tourDataMap)) {
 
 				String savedFilePath = saveRawData(tempDataFileName);
 				if (savedFilePath != null) {
@@ -296,7 +303,8 @@ public class WizardImportData extends Wizard {
 					if (importView != null) {
 						importView.updateViewer();
 					}
-				} catch (PartInitException e) {
+				}
+				catch (PartInitException e) {
 					e.printStackTrace();
 				}
 			}
@@ -306,8 +314,7 @@ public class WizardImportData extends Wizard {
 			// data format is invalid
 
 			MessageBox msgBox = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
-			msgBox.setMessage(NLS.bind(Messages.Import_Wizard_Error_invalid_data_format,
-					fImportDevice.visibleName));
+			msgBox.setMessage(NLS.bind(Messages.Import_Wizard_Error_invalid_data_format, fImportDevice.visibleName));
 
 			msgBox.open();
 
@@ -317,6 +324,7 @@ public class WizardImportData extends Wizard {
 		return true;
 	}
 
+	@Override
 	public boolean performFinish() {
 
 		if (fPageImportSettings.validatePage() == false) {
@@ -353,8 +361,7 @@ public class WizardImportData extends Wizard {
 		// start the port thread which reads data from the com port
 		PortThread portThreadRunnable = new PortThread(this, fImportDevice, portName);
 
-		Thread portThread = new Thread(portThreadRunnable,
-				Messages.Import_Wizard_Thread_name_read_device_data);
+		Thread portThread = new Thread(portThreadRunnable, Messages.Import_Wizard_Thread_name_read_device_data);
 		portThread.start();
 
 		/*
@@ -366,7 +373,8 @@ public class WizardImportData extends Wizard {
 
 			try {
 				Thread.sleep(100);
-			} catch (InterruptedException e2) {
+			}
+			catch (InterruptedException e2) {
 				e2.printStackTrace();
 			}
 
@@ -411,11 +419,10 @@ public class WizardImportData extends Wizard {
 				monitor.worked(rawDataSize - receivedData);
 
 				// display the bytes which have been received
-				monitor.subTask(NLS.bind(Messages.Import_Wizard_Monitor_task_received_bytes,
-						new Object[] {
-								Integer.toString(receivedData * 100 / importDataSize),
-								Integer.toString(timer / 10),
-								Integer.toString(receivedData) }));
+				monitor.subTask(NLS.bind(Messages.Import_Wizard_Monitor_task_received_bytes, new Object[] {
+						Integer.toString(receivedData * 100 / importDataSize),
+						Integer.toString(timer / 10),
+						Integer.toString(receivedData) }));
 			}
 
 			receiveTimeout++;
@@ -433,7 +440,8 @@ public class WizardImportData extends Wizard {
 		// wait for the port thread to be terminated
 		try {
 			portThread.join();
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -441,6 +449,7 @@ public class WizardImportData extends Wizard {
 	public void setAutoDownload() {
 
 		getContainer().getShell().addShellListener(new ShellAdapter() {
+			@Override
 			public void shellActivated(ShellEvent e) {
 
 				Display.getCurrent().asyncExec(new Runnable() {

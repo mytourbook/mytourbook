@@ -141,6 +141,8 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Heartbeat_unit;
 	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;
+
+	public static String	Graph_Label_Power_unit;
 	public static String		Graph_Label_Speed;
 	public static String		Graph_Label_Temperature;
 	public static String		Graph_Label_Tour_Compare;
@@ -170,6 +172,8 @@ public class Messages extends NLS {
 	public static String		Image__graph_heartbeat;
 
 	public static String		Image__graph_pace;
+
+	public static String	Image__graph_power;
 	public static String		Image__graph_speed;
 	public static String		Image__graph_temperature;
 	public static String		Image__graph_tour_compare;
@@ -333,6 +337,8 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_gradient_tooltip;
 	public static String		Tour_Action_graph_heartbeat_tooltip;
 	public static String		Tour_Action_graph_pace_tooltip;
+
+	public static String	Tour_Action_graph_power_tooltip;
 	public static String		Tour_Action_graph_speed_tooltip;
 	public static String		Tour_Action_graph_temperature_tooltip;
 	public static String		Tour_Action_graph_tour_compare_tooltip;

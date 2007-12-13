@@ -104,7 +104,7 @@ public class TourData {
 	 * <p>
 	 * is not used any more since 6.12.2006 but is necessary because it's a field in the database
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private int					distance;
 
 	/**
@@ -221,15 +221,15 @@ public class TourData {
 
 	private GPSData				gpsData;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourMarker>		tourMarkers						= new HashSet<TourMarker>();
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourReference>	tourReferences					= new HashSet<TourReference>();
 
-	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)
 	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
 
 	/**
@@ -262,13 +262,21 @@ public class TourData {
 	 */
 	@Transient
 	public int[]				distanceSerie;
-	@Transient
-	public int[]				distanceSerieImperial;
 
 	@Transient
-	public int[]				altitudeSerie;
+	private int[]				distanceSerieImperial;
+
+	/**
+	 * contains the altitude in the metric measurement system
+	 */
 	@Transient
-	public int[]				altitudeSerieImperial;
+	public int[]				altitudeSerie;
+
+	/**
+	 * contains the altitude in the imperial measurement system
+	 */
+	@Transient
+	private int[]				altitudeSerieImperial;
 
 	@Transient
 	public int[]				cadenceSerie;
@@ -278,16 +286,20 @@ public class TourData {
 
 	@Transient
 	public int[]				temperatureSerie;
+
+	/**
+	 * contains the temperature in the imperial measurement system
+	 */
 	@Transient
-	public int[]				temperatureSerieImperial;
+	private int[]				temperatureSerieImperial;
 
 	/*
 	 * computed data series
 	 */
 	@Transient
-	public int[]				speedSerie;
+	private int[]				speedSerie;
 	@Transient
-	public int[]				speedSerieImperial;
+	private int[]				speedSerieImperial;
 
 	@Transient
 	private int[]				paceSerie;
@@ -295,7 +307,7 @@ public class TourData {
 	private int[]				paceSerieImperial;
 
 	@Transient
-	public int[]				powerSerie;
+	private int[]				powerSerie;
 
 	@Transient
 	public int[]				altimeterSerie;
@@ -389,6 +401,7 @@ public class TourData {
 	}
 
 	public void computeAltimeterGradientSerie() {
+
 		if (deviceTimeInterval == -1) {
 			computeAltimeterGradientSerieWithVariableInterval();
 		} else {
@@ -455,8 +468,7 @@ public class TourData {
 
 			// adjust index to the array size
 			final int indexLow = Math.min(Math.max(0, serieIndex - adjustIndexLow), serieLength - 1);
-			final int indexHigh = Math.max(0, Math.min(serieIndex + adjustmentIndexHigh,
-					serieLength - 1));
+			final int indexHigh = Math.max(0, Math.min(serieIndex + adjustmentIndexHigh, serieLength - 1));
 
 			final int distanceDiff = distanceSerie[indexHigh] - distanceSerie[indexLow];
 			final int altitudeDiff = altitudeSerie[indexHigh] - altitudeSerie[indexLow];
@@ -467,9 +479,7 @@ public class TourData {
 			dataSerieAltimeter[serieIndex] = (int) (3600F * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE);
 
 			// keep gradient data
-			dataSerieGradient[serieIndex] = distanceDiff == 0 ? 0 : altitudeDiff
-					* 1000
-					/ distanceDiff;
+			dataSerieGradient[serieIndex] = distanceDiff == 0 ? 0 : altitudeDiff * 1000 / distanceDiff;
 		}
 
 		if (UI.UNIT_VALUE_ALTITUDE != 1) {
@@ -678,6 +688,9 @@ public class TourData {
 		this.maxSpeed = maxSpeed;
 	}
 
+	/**
+	 * computes the speed data serie which can be retrieved with {@link TourData#getSpeedSerie()}
+	 */
 	public void computeSpeedSerie() {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
@@ -731,10 +744,8 @@ public class TourData {
 		for (int speedIndex = 0; speedIndex < serieLength; speedIndex++) {
 
 			// adjust index to the array size
-			final int distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustment),
-					serieLength - 1);
-			final int distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustment,
-					serieLength - 1));
+			final int distIndexLow = Math.min(Math.max(0, speedIndex - lowIndexAdjustment), serieLength - 1);
+			final int distIndexHigh = Math.max(0, Math.min(speedIndex + highIndexAdjustment, serieLength - 1));
 
 			final int distance = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
 			final float time = deviceTimeInterval * (distIndexHigh - distIndexLow);
@@ -803,11 +814,9 @@ public class TourData {
 		for (int dataIndex = 0; dataIndex < serieLength; dataIndex++) {
 
 			// adjust index to the array size
-			int distIndexLow = Math.min(Math.max(0, dataIndex - lowIndexAdjustmentDefault),
-					serieLength - 1);
+			int distIndexLow = Math.min(Math.max(0, dataIndex - lowIndexAdjustmentDefault), serieLength - 1);
 
-			int distIndexHigh = Math.max(0, Math.min(dataIndex + highIndexAdjustmentDefault,
-					serieLength - 1));
+			int distIndexHigh = Math.max(0, Math.min(dataIndex + highIndexAdjustmentDefault, serieLength - 1));
 
 			final int distanceDefault = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
 
@@ -1017,15 +1026,41 @@ public class TourData {
 
 			// fixed time slices
 
-			int ignoreTimeSlices = deviceTimeInterval == 0
-					? 0
-					: TourManager.getIgnoreTimeSlices(distanceSerie, 0, maxIndex, minStopTime
-							/ deviceTimeInterval);
+			int ignoreTimeSlices = deviceTimeInterval == 0 ? 0 : TourManager.getIgnoreTimeSlices(distanceSerie,
+					0,
+					maxIndex,
+					minStopTime / deviceTimeInterval);
 
-			tourDrivingTime = Math.max(0, timeSerie[maxIndex]
-					- (ignoreTimeSlices * deviceTimeInterval));
+			tourDrivingTime = Math.max(0, timeSerie[maxIndex] - (ignoreTimeSlices * deviceTimeInterval));
 		}
 
+	}
+
+	/**
+	 * Create a device marker at the current position
+	 * 
+	 * @param timeData
+	 * @param timeIndex
+	 * @param timeAbsolute
+	 * @param distanceAbsolute
+	 */
+	private void createMarker(TimeData timeData, int timeIndex, int timeAbsolute, int distanceAbsolute) {
+
+		// create a new marker
+		TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
+
+		tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+		tourMarker.setTime(timeAbsolute + timeData.marker);
+		tourMarker.setDistance(distanceAbsolute);
+		tourMarker.setSerieIndex(timeIndex);
+
+		if (timeData.markerLabel == null) {
+			tourMarker.setLabel(Messages.TourData_Label_device_marker);
+		} else {
+			tourMarker.setLabel(timeData.markerLabel);
+		}
+
+		getTourMarkers().add(tourMarker);
 	}
 
 	/**
@@ -1034,12 +1069,13 @@ public class TourData {
 	 * @param isCreateMarker
 	 *        creates markers when <code>true</code>
 	 */
-	public void createTimeSeries(	final ArrayList<TimeData> timeDataList,
-									final boolean isCreateMarker) {
+	public void createTimeSeries(final ArrayList<TimeData> timeDataList, final boolean isCreateMarker) {
 
 		final int serieLength = timeDataList.size();
 
-		if (serieLength == 0) { return; }
+		if (serieLength == 0) {
+			return;
+		}
 
 		// check if _GPS data are available
 		if (deviceTimeInterval == -1) {
@@ -1172,36 +1208,6 @@ public class TourData {
 	}
 
 	/**
-	 * Create a device marker at the current position
-	 * 
-	 * @param timeData
-	 * @param timeIndex
-	 * @param timeAbsolute
-	 * @param distanceAbsolute
-	 */
-	private void createMarker(	TimeData timeData,
-								int timeIndex,
-								int timeAbsolute,
-								int distanceAbsolute) {
-
-		// create a new marker
-		TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
-
-		tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-		tourMarker.setTime(timeAbsolute + timeData.marker);
-		tourMarker.setDistance(distanceAbsolute);
-		tourMarker.setSerieIndex(timeIndex);
-
-		if (timeData.markerLabel == null) {
-			tourMarker.setLabel(Messages.TourData_Label_device_marker);
-		} else {
-			tourMarker.setLabel(timeData.markerLabel);
-		}
-
-		getTourMarkers().add(tourMarker);
-	}
-
-	/**
 	 * Creates the unique tour id from the tour date/time and the unique key
 	 * 
 	 * @param uniqueKey
@@ -1307,12 +1313,10 @@ public class TourData {
 			segmentSerieDistance[segmentIndex] = segment.distance = distanceEnd - distanceStart;
 
 			segmentSerieTime[segmentIndex] = segment.recordingTime = recordingTime;
-			final int ignoreTimeSlices = timeSlice == 0
-					? 0
-					: TourManager.getIgnoreTimeSlices(distanceSerie,
-							segmentStartIndex,
-							segmentEndIndex,
-							10 / timeSlice);
+			final int ignoreTimeSlices = timeSlice == 0 ? 0 : TourManager.getIgnoreTimeSlices(distanceSerie,
+					segmentStartIndex,
+					segmentEndIndex,
+					10 / timeSlice);
 			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = (recordingTime - (ignoreTimeSlices * timeSlice));
 
 			int altitudeUp = 0;
@@ -1343,13 +1347,11 @@ public class TourData {
 					? 0
 					: (float) ((float) segment.distance / segment.drivingTime * 3.6);
 
-			segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitude
-					* 100
-					/ segment.distance;
+			segmentSerieGradient[segmentIndex] = segment.gradient = (float) segment.altitude * 100 / segment.distance;
 
-			segmentSerieAltimeter[segmentIndex] = segment.drivingTime == 0
-					? 0
-					: (float) (segment.altitudeUp) / segment.drivingTime * 3600;
+			segmentSerieAltimeter[segmentIndex] = segment.drivingTime == 0 ? 0 : (float) (segment.altitudeUp)
+					/ segment.drivingTime
+					* 3600;
 
 			segmentSeriePulse[segmentIndex] = pulseSum / (segmentEndIndex - segmentStartIndex);
 
@@ -1423,11 +1425,17 @@ public class TourData {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) { return false; }
+		if (obj == null) {
+			return false;
+		}
 
-		if (this == obj) { return true; }
+		if (this == obj) {
+			return true;
+		}
 
-		if (!this.getClass().equals(obj.getClass())) { return false; }
+		if (!this.getClass().equals(obj.getClass())) {
+			return false;
+		}
 
 		TourData td = (TourData) obj;
 
@@ -1440,6 +1448,9 @@ public class TourData {
 				&& this.getTourRecordingTime() == td.getTourRecordingTime();
 	}
 
+	/**
+	 * @return Returns the metric or imperial altimeter serie depending on the active measurement
+	 */
 	public int[] getAltimeterSerie() {
 
 		if (UI.UNIT_VALUE_ALTITUDE != 1) {
@@ -1459,6 +1470,33 @@ public class TourData {
 				computeAltimeterGradientSerie();
 			}
 			return altimeterSerie;
+		}
+	}
+
+	/**
+	 * @return Returns the metric or imperial altitude serie depending on the active measurement
+	 */
+	public int[] getAltitudeSerie() {
+
+		if (UI.UNIT_VALUE_ALTITUDE != 1) {
+
+			// imperial system is used
+
+			if (altitudeSerieImperial == null) {
+
+				// compute imperial altitude
+
+				altitudeSerieImperial = new int[altitudeSerie.length];
+
+				for (int valueIndex = 0; valueIndex < altitudeSerie.length; valueIndex++) {
+					altitudeSerieImperial[valueIndex] = (int) (altitudeSerie[valueIndex] / UI.UNIT_VALUE_ALTITUDE);
+				}
+			}
+			return altitudeSerieImperial;
+
+		} else {
+
+			return altitudeSerie;
 		}
 	}
 
@@ -1642,6 +1680,70 @@ public class TourData {
 		}
 	}
 
+	public int[] getPowerSerie() {
+
+//		if (powerSerie != null) {
+//			return powerSerie;
+//		}
+
+		powerSerie = new int[timeSerie.length];
+
+		if (speedSerie == null) {
+			computeSpeedSerie();
+		}
+
+		if (gradientSerie == null) {
+			computeAltimeterGradientSerie();
+		}
+
+		int weightBody = 75;
+		int weightBike = 10;
+		int bodyHeight = 188;
+
+		float cR = 0.008f; // Rollreibungskoeffizient Asphalt
+		float cD = 0.8f;// Strömungskoeffizient
+		float p = 1.145f; // 20C / 400m
+//		float p = 0.968f; // 10C / 2000m
+
+		float weightTotal = weightBody + weightBike;
+		float bsa = (float) (0.007184f * Math.pow(weightBody, 0.425) * Math.pow(bodyHeight, 0.725));
+		float aP = bsa * 0.185f;
+
+		float fRoll = weightTotal * 9.81f * cR;
+		float fSlope = weightTotal * 9.81f; // * gradient/100
+		float fAir = 0.5f * p * cD * aP;// * v2;
+
+		for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
+
+			float speed = (float) speedSerie[timeIndex] / 36; // speed (m/s) /10
+			float gradient = (float) gradientSerie[timeIndex] / 1000; // gradient (%) /10 /100
+
+			// adjust computed errors
+			if (gradient < 0.02 && gradient > 0) {
+				gradient *= 0.5;
+//				gradient = 0;
+			}
+
+			if (gradient < 0) {
+				gradient *= 1.5;
+			}
+
+			final float fSlopeTotal = fSlope * gradient;
+			final float fAirTotal = fAir * speed * speed;
+
+			float fTotal = fRoll + fAirTotal + fSlopeTotal;
+
+			int pTotal = (int) (fTotal * speed);
+
+			if (pTotal > 600) {
+				pTotal = pTotal * 1;
+			}
+			powerSerie[timeIndex] = pTotal < 0 ? 0 : pTotal;
+		}
+
+		return powerSerie;
+	}
+
 	public SerieData getSerieData() {
 		return serieData;
 	}
@@ -1729,8 +1831,7 @@ public class TourData {
 				temperatureSerieImperial = new int[temperatureSerie.length];
 
 				for (int valueIndex = 0; valueIndex < temperatureSerie.length; valueIndex++) {
-					temperatureSerieImperial[valueIndex] = (int) (temperatureSerie[valueIndex]
-							* fahrenheitMulti + fahrenheitAdd);
+					temperatureSerieImperial[valueIndex] = (int) (temperatureSerie[valueIndex] * fahrenheitMulti + fahrenheitAdd);
 				}
 			}
 			serie = temperatureSerieImperial;
@@ -2020,6 +2121,11 @@ public class TourData {
 		this.deviceTravelTime = deviceTravelTime;
 	}
 
+/*
+ * private int maxAltitude; private int maxPulse; private int avgPulse; private int avgCadence;
+ * private int avgTemperature; private float maxSpeed;
+ */
+
 	public void setDeviceWeight(int deviceWeight) {
 		this.deviceWeight = deviceWeight;
 	}
@@ -2027,11 +2133,6 @@ public class TourData {
 	public void setDeviceWheel(int deviceWheel) {
 		this.deviceWheel = deviceWheel;
 	}
-
-/*
- * private int maxAltitude; private int maxPulse; private int avgPulse; private int avgCadence;
- * private int avgTemperature; private float maxSpeed;
- */
 
 	public void setDpTolerance(short dpTolerance) {
 		this.dpTolerance = dpTolerance;

@@ -306,8 +306,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, chartInfoProvider);
 
 		// set the menu context provider
-		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER,
-				new TourContextProvider(fChart, this));
+		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourContextProvider(fChart, this));
 	}
 
 	@Override

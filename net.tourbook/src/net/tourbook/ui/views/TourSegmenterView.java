@@ -15,10 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
@@ -27,6 +24,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourSegment;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
@@ -36,29 +34,33 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
-import net.tourbook.util.TableLayoutComposite;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -80,23 +82,26 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourSegmenterView extends ViewPart {
 
-	public static final String		ID						= "net.tourbook.views.TourSegmenter";				//$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.views.TourSegmenter";	//$NON-NLS-1$
 
-	public static final int			COLUMN_TIME				= 0;
-	public static final int			COLUMN_DISTANCE			= 1;
-	public static final int			COLUMN_ALTITUDE			= 2;
-	public static final int			COLUMN_SPEED			= 3;
-	public static final int			COLUMN_GRADIENT			= 4;
-	public static final int			COLUMN_ALTITUDE_UP		= 5;
-	public static final int			COLUMN_ALTITUDE_DOWN	= 6;
+//	public static final int			COLUMN_TIME				= 0;
+//	public static final int			COLUMN_DISTANCE			= 1;
+//	public static final int			COLUMN_ALTITUDE			= 2;
+	public static final int			COLUMN_SPEED	= 3;
+	public static final int			COLUMN_GRADIENT	= 4;
+//	public static final int			COLUMN_ALTITUDE_UP		= 5;
+//	public static final int			COLUMN_ALTITUDE_DOWN	= 6;
 
 	private PageBook				fPageBook;
 	private Composite				fPageSegmenter;
+	private Composite				fViewerContainer;
 
 	private Scale					fScaleTolerance;
 	private Label					fLabelToleranceValue;
+	private Label					fPageNoChart;
+	private Label					fLblTitle;
 
-	private TableViewer				fTableViewer;
+	private TableViewer				fSegmentViewer;
 
 	private TourChart				fTourChart;
 	private TourData				fTourData;
@@ -105,20 +110,20 @@ public class TourSegmenterView extends ViewPart {
 	private int						fSavedDpTolerance;
 
 	private ISelectionListener		fPostSelectionListener;
-	private PostSelectionProvider	fPostSelectionProvider;
 	private IPartListener			fPartListener;
+	private IPropertyChangeListener	fPrefChangeListener;
 
-	private final DateFormat		fTimeInstance			= DateFormat.getTimeInstance(DateFormat.DEFAULT);
+	private PostSelectionProvider	fPostSelectionProvider;
 
-	private Label					fPageNoChart;
+	private final NumberFormat		fNf				= NumberFormat.getNumberInstance();
+//	private final DateFormat		fTimeInstance	= DateFormat.getTimeInstance(DateFormat.DEFAULT);
+//	private final Calendar			fCalendar		= GregorianCalendar.getInstance();
 
 	private TourEditor				fTourEditor;
 
 	private boolean					fShowSegmentsInChart;
 
 	private ActionShowSegments		fActionShowSegments;
-
-	private Label					fLblTitle;
 
 	/**
 	 * The content provider class is responsible for providing objects to the view. It can wrap
@@ -143,101 +148,96 @@ public class TourSegmenterView extends ViewPart {
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
-	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
-
-		public Image getColumnImage(final Object element, final int columnIndex) {
-
-			return null;
-		}
-
-		public String getColumnText(final Object obj, final int index) {
-
-			if (obj == null) {
-				return null;
-			}
-
-			final TourSegment segment = (TourSegment) obj;
-
-			final NumberFormat nf = NumberFormat.getNumberInstance();
-			final Calendar calendar = GregorianCalendar.getInstance();
-
-			switch (index) {
-
-			case COLUMN_TIME:
-				calendar.set(0,
-						0,
-						0,
-						segment.drivingTime / 3600,
-						((segment.drivingTime % 3600) / 60),
-						((segment.drivingTime % 3600) % 60));
-
-				return fTimeInstance.format(calendar.getTime());
-
-			case COLUMN_DISTANCE:
-				nf.setMinimumFractionDigits(2);
-				nf.setMaximumFractionDigits(2);
-				return nf.format(((float) segment.distance) / 1000);
-
-			case COLUMN_ALTITUDE:
-				nf.setMinimumFractionDigits(0);
-				return nf.format(segment.altitude);
-
-			case COLUMN_SPEED:
-				nf.setMinimumFractionDigits(1);
-				nf.setMaximumFractionDigits(1);
-
-				if (segment.drivingTime == 0) {
-					return ""; //$NON-NLS-1$
-				} else {
-					return nf.format(segment.speed);
-				}
-
-			case COLUMN_ALTITUDE_UP:
-
-				nf.setMinimumFractionDigits(1);
-				nf.setMaximumFractionDigits(0);
-
-				if (segment.drivingTime == 0) {
-					return ""; //$NON-NLS-1$
-				} else {
-					final float result = (float) (segment.altitudeUp) / segment.drivingTime * 3600;
-					if (result == 0) {
-						return ""; //$NON-NLS-1$
-					} else {
-						return nf.format(result);
-					}
-				}
-
-			case COLUMN_ALTITUDE_DOWN:
-
-				nf.setMinimumFractionDigits(1);
-				nf.setMaximumFractionDigits(0);
-
-				if (segment.drivingTime == 0) {
-					return ""; //$NON-NLS-1$
-				} else {
-					final float result = (float) (segment.altitudeDown)
-							/ segment.drivingTime
-							* 3600;
-					if (result == 0) {
-						return ""; //$NON-NLS-1$
-					} else {
-						return nf.format(result);
-					}
-				}
-
-			case COLUMN_GRADIENT:
-				nf.setMinimumFractionDigits(1);
-				nf.setMaximumFractionDigits(1);
-				return nf.format(segment.gradient);
-
-			default:
-				break;
-			}
-
-			return (getText(obj));
-		}
-	}
+//	private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+//
+//		public Image getColumnImage(final Object element, final int columnIndex) {
+//
+//			return null;
+//		}
+//
+//		public String getColumnText(final Object obj, final int index) {
+//
+//			if (obj == null) {
+//				return null;
+//			}
+//
+//			final TourSegment segment = (TourSegment) obj;
+//
+//			switch (index) {
+//
+//			case COLUMN_TIME:
+//				fCalendar.set(0,
+//						0,
+//						0,
+//						segment.drivingTime / 3600,
+//						((segment.drivingTime % 3600) / 60),
+//						((segment.drivingTime % 3600) % 60));
+//
+//				return fTimeInstance.format(fCalendar.getTime());
+//
+//			case COLUMN_DISTANCE:
+//				fNf.setMinimumFractionDigits(2);
+//				fNf.setMaximumFractionDigits(2);
+//				return fNf.format(((float) segment.distance) / 1000);
+//
+//			case COLUMN_ALTITUDE:
+//				fNf.setMinimumFractionDigits(0);
+//				return fNf.format(segment.altitude);
+//
+//			case COLUMN_SPEED:
+//				fNf.setMinimumFractionDigits(1);
+//				fNf.setMaximumFractionDigits(1);
+//
+//				if (segment.drivingTime == 0) {
+//					return ""; //$NON-NLS-1$
+//				} else {
+//					return fNf.format(segment.speed);
+//				}
+//
+//			case COLUMN_ALTITUDE_UP:
+//
+//				fNf.setMinimumFractionDigits(1);
+//				fNf.setMaximumFractionDigits(0);
+//
+//				if (segment.drivingTime == 0) {
+//					return ""; //$NON-NLS-1$
+//				} else {
+//					final float result = (float) (segment.altitudeUp) / segment.drivingTime * 3600;
+//					if (result == 0) {
+//						return ""; //$NON-NLS-1$
+//					} else {
+//						return fNf.format(result);
+//					}
+//				}
+//
+//			case COLUMN_ALTITUDE_DOWN:
+//
+//				fNf.setMinimumFractionDigits(1);
+//				fNf.setMaximumFractionDigits(0);
+//
+//				if (segment.drivingTime == 0) {
+//					return ""; //$NON-NLS-1$
+//				} else {
+//					final float result = (float) (segment.altitudeDown) / segment.drivingTime * 3600;
+//					if (result == 0) {
+//						return ""; //$NON-NLS-1$
+//					} else {
+//						return fNf.format(result);
+//					}
+//				}
+//
+//			case COLUMN_GRADIENT:
+//				fNf.setMinimumFractionDigits(1);
+//				fNf.setMaximumFractionDigits(1);
+//				return fNf.format(segment.gradient);
+//
+//			default:
+//				break;
+//			}
+//
+//			return (getText(obj));
+//		}
+//	}
 
 	private class ViewSorter extends ViewerSorter {
 
@@ -285,7 +285,7 @@ public class TourSegmenterView extends ViewPart {
 		 * 
 		 * @param column
 		 */
-		public void sortColumn(final int column) {
+		public void setSortColumn(final int column) {
 
 			if (column == this.column) {
 				// Same column as last sort; toggle the direction
@@ -333,6 +333,36 @@ public class TourSegmenterView extends ViewPart {
 		getSite().getPage().addPartListener(fPartListener);
 	}
 
+	private void addPrefListener() {
+
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					// measurement system has changed
+
+					UI.updateUnits();
+
+					// dispose viewer
+					Control[] children = fViewerContainer.getChildren();
+					for (int childIndex = 0; childIndex < children.length; childIndex++) {
+						children[childIndex].dispose();
+					}
+
+					createTableViewer(fViewerContainer);
+					fViewerContainer.layout();
+
+					// update the viewer
+					setTableInput();
+				}
+			}
+		};
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+	}
+
 	private void addSelectionListener() {
 		fPostSelectionListener = new ISelectionListener() {
 
@@ -352,17 +382,20 @@ public class TourSegmenterView extends ViewPart {
 		fPageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
 
 		fPageSegmenter = new Composite(fPageBook, SWT.NONE);
-		final GridLayout gl = new GridLayout();
-		gl.marginWidth = 0;
-		gl.marginHeight = 0;
-		fPageSegmenter.setLayout(gl);
+		GridLayoutFactory.fillDefaults().spacing(0, 1).applyTo(fPageSegmenter);
 
 		createSegmenterLayout(fPageSegmenter);
-		createTableViewer(fPageSegmenter);
+
+		fViewerContainer = new Composite(fPageSegmenter, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(fViewerContainer);
+		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
+		createTableViewer(fViewerContainer);
+
 		createMenus();
 
 		addSelectionListener();
 		addPartListener();
+		addPrefListener();
 
 		// tell the site that this view is a selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -413,10 +446,7 @@ public class TourSegmenterView extends ViewPart {
 
 		final Composite segmentContainer = new Composite(parent, SWT.NONE);
 		segmentContainer.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
-		final GridLayout gl = new GridLayout(3, false);
-		gl.marginTop = 3;
-		gl.marginBottom = 0;
-		segmentContainer.setLayout(gl);
+		GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(segmentContainer);
 
 		/*
 		 * tour title
@@ -462,86 +492,225 @@ public class TourSegmenterView extends ViewPart {
 
 	private void createTableViewer(final Composite parent) {
 
-		final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
-		final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		tableLayouter.setLayoutData(gridData);
+		final TableColumnLayout tableLayout = new TableColumnLayout();
+
+		Composite layoutContainer = new Composite(parent, SWT.NONE);
+		layoutContainer.setLayout(tableLayout);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
 
 		/*
 		 * create table
 		 */
-		final Table table = new Table(tableLayouter, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
+		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
 
 		table.setLayout(new TableLayout());
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-		/*
-		 * create columns
-		 */
-		TableColumn tc;
+		fSegmentViewer = new TableViewer(table);
+
+		TableViewerColumn tvc;
+		TableColumn tvcColumn;
 		final PixelConverter pixelConverter = new PixelConverter(table);
 
+		/*
+		 * column: time
+		 */
 		// the first column is always left aligned
-		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.Tour_Segmenter_Column_time);
-		tc.setToolTipText(Messages.Tour_Segmenter_Column_time_tooltip);
-		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 11));
-
-		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.Tour_Segmenter_Column_distance);
-		tc.setToolTipText(Messages.Tour_Segmenter_Column_distance_tooltip);
-		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 10));
-
-		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.Tour_Segmenter_Column_altitude);
-		tc.setToolTipText(Messages.Tour_Segmenter_Column_altitude_tooltip);
-		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 10));
-
-		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.Tour_Segmenter_Column_speed);
-		tc.setToolTipText(Messages.Tour_Segmenter_Column_speed_tooltip);
-		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 9));
-
-		tc.addSelectionListener(new SelectionAdapter() {
+		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
+		tvcColumn = tvc.getColumn();
+		tvcColumn.setText(Messages.Tour_Segmenter_Column_time);
+		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_time_tooltip);
+		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) fTableViewer.getSorter()).sortColumn(COLUMN_SPEED);
-				fTableViewer.refresh();
+			public void update(ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+//		case COLUMN_TIME:
+//		fCalendar.set(0,
+//				0,
+//				0,
+//				segment.drivingTime / 3600,
+//				((segment.drivingTime % 3600) / 60),
+//				((segment.drivingTime % 3600) % 60));
+//
+//		return fTimeInstance.format(fCalendar.getTime());
+
+				cell.setText(UI.formatSeconds(segment.drivingTime));
+			}
+		});
+		tableLayout.setColumnData(tvcColumn, UI.getColumnPixelWidth(pixelConverter, 11));
+
+		/*
+		 * column: distance
+		 */
+		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
+		tvcColumn = tvc.getColumn();
+		tvcColumn.setText(UI.UNIT_LABEL_DISTANCE);
+		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_distance_tooltip);
+		tableLayout.setColumnData(tvcColumn, UI.getColumnPixelWidth(pixelConverter, 10));
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				fNf.setMinimumFractionDigits(2);
+				fNf.setMaximumFractionDigits(2);
+
+				cell.setText(fNf.format(((float) segment.distance) / (1000 * UI.UNIT_VALUE_DISTANCE)));
 			}
 		});
 
-		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.Tour_Segmenter_Column_gradient);
-		tc.setToolTipText(Messages.Tour_Segmenter_Column_gradient_tooltip);
-		tableLayouter.addColumnData(UI.getColumnPixelWidth(pixelConverter, 8));
-		tc.addSelectionListener(new SelectionAdapter() {
+		/*
+		 * column: altitude
+		 */
+		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
+		tvcColumn = tvc.getColumn();
+		tvcColumn.setText(UI.UNIT_LABEL_ALTITUDE);
+		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_altitude_tooltip);
+		tableLayout.setColumnData(tvcColumn, UI.getColumnPixelWidth(pixelConverter, 10));
+		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) fTableViewer.getSorter()).sortColumn(COLUMN_GRADIENT);
-				fTableViewer.refresh();
+			public void update(ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				fNf.setMinimumFractionDigits(0);
+				fNf.setMaximumFractionDigits(0);
+
+				cell.setText(fNf.format(segment.altitude / UI.UNIT_VALUE_ALTITUDE));
 			}
 		});
 
-		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.Tour_Segmenter_Column_altimeter_up);
-		tc.setToolTipText(Messages.Tour_Segmenter_Column_altimeter_up_tooltip);
-		tableLayouter.addColumnData(new ColumnWeightData(5, true));
+		/*
+		 * column: speed
+		 */
+		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
+		tvcColumn = tvc.getColumn();
+		tvcColumn.setText(UI.UNIT_LABEL_SPEED);
+		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_speed_tooltip);
+		tableLayout.setColumnData(tvcColumn, UI.getColumnPixelWidth(pixelConverter, 9));
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
 
-		tc = new TableColumn(table, SWT.TRAIL);
-		tc.setText(Messages.Tour_Segmenter_Column_altimeter_down);
-		tc.setToolTipText(Messages.Tour_Segmenter_Column_altimeter_down_tooltip);
-		tableLayouter.addColumnData(new ColumnWeightData(5, true));
+				final TourSegment segment = (TourSegment) cell.getElement();
+				if (segment.drivingTime == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					fNf.setMinimumFractionDigits(1);
+					fNf.setMaximumFractionDigits(1);
+					cell.setText(fNf.format(segment.speed / UI.UNIT_VALUE_DISTANCE));
+				}
+				//
+
+			}
+		});
+
+		tvcColumn.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_SPEED);
+				fSegmentViewer.refresh();
+			}
+		});
+
+		/*
+		 * column: gradient
+		 */
+		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
+		tvcColumn = tvc.getColumn();
+		tvcColumn.setText(Messages.Tour_Segmenter_Column_gradient);
+		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_gradient_tooltip);
+		tableLayout.setColumnData(tvcColumn, UI.getColumnPixelWidth(pixelConverter, 8));
+		tvcColumn.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
+				fSegmentViewer.refresh();
+			}
+		});
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				fNf.setMinimumFractionDigits(1);
+				fNf.setMaximumFractionDigits(1);
+
+				cell.setText(fNf.format(segment.gradient));
+			}
+		});
+
+		/*
+		 * column: altimeter up
+		 */
+		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
+		tvcColumn = tvc.getColumn();
+		tvcColumn.setText("+ " + UI.UNIT_LABEL_ALTIMETER);
+		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_altimeter_up_tooltip);
+		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(5, true));
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				if (segment.drivingTime == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					final float result = (float) (segment.altitudeUp / UI.UNIT_VALUE_ALTITUDE)
+							/ segment.drivingTime
+							* 3600;
+					if (result == 0) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						fNf.setMinimumFractionDigits(1);
+						fNf.setMaximumFractionDigits(0);
+						cell.setText(fNf.format(result));
+					}
+				}
+			}
+		});
+
+		/*
+		 * column: altimeter down
+		 */
+		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
+		tvcColumn = tvc.getColumn();
+		tvcColumn.setText("- " + UI.UNIT_LABEL_ALTIMETER);
+		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_altimeter_down_tooltip);
+		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(5, true));
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				if (segment.drivingTime == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					final float result = (float) (segment.altitudeDown / UI.UNIT_VALUE_ALTITUDE)
+							/ segment.drivingTime
+							* 3600;
+					if (result == 0) {
+						cell.setText(UI.EMPTY_STRING);
+					} else {
+						fNf.setMinimumFractionDigits(1);
+						fNf.setMaximumFractionDigits(0);
+						cell.setText(fNf.format(result));
+					}
+				}
+			}
+		});
 
 		/*
 		 * create table viewer
 		 */
-		fTableViewer = new TableViewer(table);
 
-		fTableViewer.setContentProvider(new ViewContentProvider());
-		fTableViewer.setLabelProvider(new ViewLabelProvider());
-		fTableViewer.setSorter(new ViewSorter());
+		fSegmentViewer.setContentProvider(new ViewContentProvider());
+		fSegmentViewer.setSorter(new ViewSorter());
 
-		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		fSegmentViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 
 				final StructuredSelection selection = (StructuredSelection) event.getSelection();
@@ -569,6 +738,7 @@ public class TourSegmenterView extends ViewPart {
 	public void dispose() {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		super.dispose();
 	}
@@ -579,9 +749,8 @@ public class TourSegmenterView extends ViewPart {
 	private void fireSegmentLayerChanged() {
 
 		// show/hide the segments in the chart
-		TourManager.getInstance()
-				.firePropertyChange(TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED,
-						fShowSegmentsInChart);
+		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED,
+				fShowSegmentsInChart);
 	}
 
 	/**
@@ -685,8 +854,7 @@ public class TourSegmenterView extends ViewPart {
 				}
 			}
 
-			final TourData tourData = TourManager.getInstance()
-					.getTourData(tourIdSelection.getTourId());
+			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
 			if (tourData != null) {
 
@@ -749,8 +917,7 @@ public class TourSegmenterView extends ViewPart {
 			graphPoints[iPoint] = new Point(distanceSerie[iPoint], altitudeSerie[iPoint], iPoint);
 		}
 
-		final DouglasPeuckerSimplifier dpSimplifier = new DouglasPeuckerSimplifier(dpTolerance,
-				graphPoints);
+		final DouglasPeuckerSimplifier dpSimplifier = new DouglasPeuckerSimplifier(dpTolerance, graphPoints);
 		final Object[] simplePoints = dpSimplifier.simplify();
 
 		/*
@@ -777,7 +944,7 @@ public class TourSegmenterView extends ViewPart {
 	}
 
 	private void setTableInput() {
-		fTableViewer.setInput(this);
+		fSegmentViewer.setInput(this);
 	}
 
 	/**
@@ -785,9 +952,7 @@ public class TourSegmenterView extends ViewPart {
 	 */
 	private void setTourDirty() {
 
-		if (fTourEditor != null
-				&& fTourData != null
-				&& fSavedDpTolerance != fTourData.getDpTolerance()) {
+		if (fTourEditor != null && fTourData != null && fSavedDpTolerance != fTourData.getDpTolerance()) {
 
 			fTourEditor.setTourDirty();
 		}

@@ -17,6 +17,7 @@ package net.tourbook.ui;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -54,7 +55,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 public class UI {
 
-	private static final String				TOUR_TYPE_PREFIX				= "tourType";									//$NON-NLS-1$
+	public static final String				EMPTY_STRING					= "";											//$NON-NLS-1$
 
 	/*
 	 * labels for the different measurement systems
@@ -64,14 +65,14 @@ public class UI {
 	private static final String				UNIT_SPEED_KM_H					= "km/h";										//$NON-NLS-1$
 	private static final String				UNIT_FAHRENHEIT_C				= "°C";										//$NON-NLS-1$
 	private static final String				UNIT_ALTIMETER_M_H				= "m/h";										//$NON-NLS-1$
-	private static final String				UNIT_PACE_MIN_P_KM				= "min/km"; //$NON-NLS-1$
+	private static final String				UNIT_PACE_MIN_P_KM				= "min/km";									//$NON-NLS-1$
 
 	private static final String				UNIT_ALTITUDE_FT				= "ft";										//$NON-NLS-1$
 	public static final String				UNIT_DISTANCE_MI				= "mi";										//$NON-NLS-1$
 	private static final String				UNIT_SPEED_MPH					= "mph";										//$NON-NLS-1$
 	private static final String				UNIT_FAHRENHEIT_F				= "°F";										//$NON-NLS-1$
 	private static final String				UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
-	private static final String				UNIT_PACE_MIN_P_MILE			= "min/mi"; //$NON-NLS-1$
+	private static final String				UNIT_PACE_MIN_P_MILE			= "min/mi";									//$NON-NLS-1$
 
 	private static final float				UNIT_MILE						= 1.609344f;
 	private static final float				UNIT_FOOT						= 0.3048f;
@@ -105,6 +106,7 @@ public class UI {
 	public static String					UNIT_LABEL_SPEED;
 	public static String					UNIT_LABEL_PACE;
 
+	private static final String				TOUR_TYPE_PREFIX				= "tourType";									//$NON-NLS-1$
 	public final static ImageRegistry		IMAGE_REGISTRY;
 
 	public static final String				IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";							//$NON-NLS-1$
@@ -173,8 +175,7 @@ public class UI {
 		}
 	}
 
-	public static ColumnPixelData getColumnPixelWidth(	final PixelConverter pixelConverter,
-														final int width) {
+	public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {
 		return new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(width), false);
 	}
 
@@ -205,14 +206,14 @@ public class UI {
 
 		for (int weightIndex = 0; weightIndex < sashWeights.length; weightIndex++) {
 
-			final Integer mementoWeight = fMemento.getInteger(weightKey
-					+ Integer.toString(weightIndex));
+			final Integer mementoWeight = fMemento.getInteger(weightKey + Integer.toString(weightIndex));
 
 			if (mementoWeight == null) {
 				try {
 					newWeights[weightIndex] = sashDefaultWeight[weightIndex];
 
-				} catch (final ArrayIndexOutOfBoundsException e) {
+				}
+				catch (final ArrayIndexOutOfBoundsException e) {
 					newWeights[weightIndex] = 100;
 				}
 			} else {
@@ -230,9 +231,7 @@ public class UI {
 	 * @param memento
 	 * @param weightKey
 	 */
-	public static void saveSashWeight(	final SashForm sash,
-										final IMemento memento,
-										final String weightKey) {
+	public static void saveSashWeight(final SashForm sash, final IMemento memento, final String weightKey) {
 
 		final int[] weights = sash.getWeights();
 
@@ -264,9 +263,7 @@ public class UI {
 		control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 	}
 
-	public static GridData setFieldWidth(	final Composite parent,
-											final StringFieldEditor field,
-											final int width) {
+	public static GridData setFieldWidth(final Composite parent, final StringFieldEditor field, final int width) {
 		final GridData gd = new GridData();
 		gd.widthHint = width;
 		field.getTextControl(parent).setLayoutData(gd);
@@ -371,7 +368,8 @@ public class UI {
 				}
 				try {
 					Long.parseLong(e.text);
-				} catch (final NumberFormatException e1) {
+				}
+				catch (final NumberFormatException e1) {
 					e.doit = false;
 				}
 			}
@@ -424,11 +422,7 @@ public class UI {
 
 		gcImage.setForeground(colorBright);
 		gcImage.setBackground(colorDark);
-		gcImage.fillGradientRectangle(4,
-				4,
-				TOUR_TYPE_IMAGE_WIDTH - 8,
-				TOUR_TYPE_IMAGE_HEIGHT - 8,
-				false);
+		gcImage.fillGradientRectangle(4, 4, TOUR_TYPE_IMAGE_WIDTH - 8, TOUR_TYPE_IMAGE_HEIGHT - 8, false);
 
 		gcImage.setForeground(colorLine);
 		gcImage.drawRectangle(3, 3, TOUR_TYPE_IMAGE_WIDTH - 7, TOUR_TYPE_IMAGE_HEIGHT - 7);
@@ -508,9 +502,7 @@ public class UI {
 			 * create image
 			 */
 			tourTypeImage = new Image(display, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
-			final Image maskImage = new Image(display,
-					TOUR_TYPE_IMAGE_WIDTH,
-					TOUR_TYPE_IMAGE_HEIGHT);
+			final Image maskImage = new Image(display, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
 
 			final GC gcImage = new GC(tourTypeImage);
 			{
@@ -598,6 +590,15 @@ public class UI {
 		}
 
 		return image;
+	}
+
+	public static final String formatSeconds(long value) {
+
+		return new Formatter().format(Messages.Format_hhmmss,
+				(value / 3600),
+				((value % 3600) / 60),
+				((value % 3600) % 60)).toString();
+
 	}
 
 }

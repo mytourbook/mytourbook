@@ -67,6 +67,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	int						fCurrentYear;
 	int						fCurrentMonth;
+
 	Calendar				fCalendar		= GregorianCalendar.getInstance();
 
 	IPostSelectionProvider	fPostSelectionProvider;
@@ -166,9 +167,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		return fSelectedTourId;
 	}
 
-	void OLDopenTour(	final ITourChartViewer tourChartViewer,
-						final int valueIndex,
-						final int[] dayValues) {
+	void OLDopenTour(final ITourChartViewer tourChartViewer, final int valueIndex, final int[] dayValues) {
 
 		fCalendar.set(fCurrentYear, 0, 1);
 		fCalendar.set(Calendar.DAY_OF_YEAR, dayValues[valueIndex] + 1);
@@ -233,9 +232,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 							return tourList.toArray();
 						}
 
-						public void inputChanged(	final Viewer viewer,
-													final Object oldInput,
-													final Object newInput) {}
+						public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 					});
 
 					dialog.setLabelProvider(new LabelProvider() {
@@ -266,7 +263,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				// TourManager.getInstance().openTourInEditor(tourId);
 			}
 
-		} catch (final SQLException e) {
+		}
+		catch (final SQLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -385,8 +383,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
 				fSelectedTourId = fTourDataTour.fTourIds[valueIndex];
 
-				final int duration = fTourDataTour.fTimeHigh[valueIndex]
-						- fTourDataTour.fTimeLow[valueIndex];
+				final int duration = fTourDataTour.fTimeHigh[valueIndex] - fTourDataTour.fTimeLow[valueIndex];
 
 				final String barInfo = new Formatter().format(Messages.TOURDAYINFO_TOUR_DATE_FORMAT
 						+ Messages.TOURDAYINFO_DISTANCE
@@ -405,8 +402,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		});
 
 		// set the menu context provider
-		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER,
-				new TourContextProvider(fChart, this));
+		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourContextProvider(fChart, this));
 
 	}
 

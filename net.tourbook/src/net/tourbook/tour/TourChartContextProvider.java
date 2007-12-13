@@ -27,7 +27,6 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
-import net.tourbook.ui.views.tourBook.MarkerDialog;
 import net.tourbook.ui.views.tourMap.ReferenceTourManager;
 
 import org.eclipse.jface.action.Action;
@@ -100,8 +99,9 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 
 				TourMarker newTourMarker = createTourMarker(tourData);
 
-				final MarkerDialog markerDialog = new MarkerDialog(Display.getCurrent()
-						.getActiveShell(), tourData, null);
+				final MarkerDialog markerDialog = new MarkerDialog(Display.getCurrent().getActiveShell(),
+						tourData,
+						null);
 
 				markerDialog.create();
 
@@ -142,9 +142,7 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 		fActionSetTourType = new ActionSetTourType(this);
 	}
 
-	private void createMarkerMenu(	IMenuManager menuMgr,
-									ChartXSlider leftSlider,
-									ChartXSlider rightSlider) {
+	private void createMarkerMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider) {
 
 		if (leftSlider != null || rightSlider != null) {
 
@@ -152,17 +150,13 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 			if (leftSlider != null && rightSlider == null) {
 				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_marker, leftSlider));
 			} else {
-				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_left_marker,
-						leftSlider));
-				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_right_marker,
-						rightSlider));
+				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_left_marker, leftSlider));
+				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_right_marker, rightSlider));
 			}
 		}
 	}
 
-	public void fillBarChartContextMenu(IMenuManager menuMgr,
-										int hoveredBarSerieIndex,
-										int hoveredBarValueIndex) {}
+	public void fillBarChartContextMenu(IMenuManager menuMgr, int hoveredBarSerieIndex, int hoveredBarValueIndex) {}
 
 	public void fillContextMenu(IMenuManager menuMgr) {
 
@@ -174,9 +168,7 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 		}
 	}
 
-	public void fillXSliderContextMenu(	IMenuManager menuMgr,
-										ChartXSlider leftSlider,
-										ChartXSlider rightSlider) {
+	public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider) {
 
 		if (fTourEditor != null) {
 
@@ -202,7 +194,7 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 	public ArrayList<TourData> getSelectedTours() {
 
 		ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
-		selectedTourData.add(fTourEditor.getTourChart().fTourData);
+		selectedTourData.add(fTourEditor.getTourChart().getTourData());
 		return selectedTourData;
 
 	}

@@ -51,10 +51,6 @@ public class ActionHandlerAdjustAltitude extends AbstractHandler {
 
 		dialog = new AdjustAltitudeDialog(tourChart.getShell(), tourChart);
 		dialog.create();
-
-		/*
-		 * initialize the dialog
-		 */
 		dialog.init();
 
 		if (dialog.open() == Window.OK) {
@@ -69,7 +65,7 @@ public class ActionHandlerAdjustAltitude extends AbstractHandler {
 		 * this tour, the displayed data are from the cache which where changed from this dialog,
 		 * but the tour chart view should show the tour from the database
 		 */
-		TourManager.getInstance().removeTourFromCache(tourChart.fTourData.getTourId());
+		TourManager.getInstance().removeTourFromCache(tourChart.getTourData().getTourId());
 
 		TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED);
 

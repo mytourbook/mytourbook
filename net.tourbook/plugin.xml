@@ -452,6 +452,14 @@
                   tooltip="%command_graph_altitude_tooltip">
             </command>
             <command
+                  commandId="net.tourbook.command.graph.pulse"
+                  icon="icons/graph-pulse.gif"
+                  label="%command_graph_pulse"
+                  mnemonic="%command_graph_pulse_mnemonic"
+                  style="toggle"
+                  tooltip="%command_graph_pulse_tooltip">
+            </command>
+            <command
                   commandId="net.tourbook.command.graph.speed"
                   icon="icons/graph-speed.gif"
                   label="%command_graph_speed"
@@ -468,12 +476,12 @@
                   tooltip="%command_graph_pace_tooltip">
             </command>
             <command
-                  commandId="net.tourbook.command.graph.pulse"
-                  icon="icons/graph-pulse.gif"
-                  label="%command_graph_pulse"
-                  mnemonic="%command_graph_pulse_mnemonic"
+                  commandId="net.tourbook.command.graph.power"
+                  icon="icons/graph-power.gif"
+                  label="%command_graph_power"
+                  mnemonic="%command_graph_power_mnemonic"
                   style="toggle"
-                  tooltip="%command_graph_pulse_tooltip">
+                  tooltip="%command_graph_power_tooltip">
             </command>
             <command
                   commandId="net.tourbook.command.graph.temperature"
@@ -745,6 +753,11 @@
             name="%command_graph_altitude">
       </command>
       <command
+            categoryId="net.tourbook.command.category.tourEditor"
+            id="net.tourbook.command.graph.pulse"
+            name="%command_graph_pulse">
+      </command>
+      <command
             id="net.tourbook.command.graph.speed"
             categoryId="net.tourbook.command.category.tourEditor"
             name="%command_graph_speed">
@@ -755,13 +768,33 @@
             name="%command_graph_pace">
       </command>
       <command
+            id="net.tourbook.command.graph.cadence"
             categoryId="net.tourbook.command.category.tourEditor"
+            name="%command_graph_cadence">
+      </command>
+      <command
+            id="net.tourbook.command.graph.power"
+            categoryId="net.tourbook.command.category.tourEditor"
+            name="%command_graph_power">
+      </command>
+      <command
             id="net.tourbook.command.graph.temperature"
+            categoryId="net.tourbook.command.category.tourEditor"
             name="%command_graph_temperature">
       </command>
       <command
+            id="net.tourbook.command.graph.gradient"
             categoryId="net.tourbook.command.category.tourEditor"
+            name="%command_graph_gradient">
+      </command>
+      <command
+            id="net.tourbook.command.graph.altimeter"
+            categoryId="net.tourbook.command.category.tourEditor"
+            name="%command_graph_altimeter">
+      </command>
+      <command
             id="net.tourbook.command.tourChart.xAxisDistance"
+            categoryId="net.tourbook.command.category.tourEditor"
             name="%command_tourChart_xAxisDistance">
       </command>
       <command
@@ -770,8 +803,8 @@
             name="Open Markers">
       </command>
       <command
-            categoryId="net.tourbook.command.category.tourEditor"
             id="net.tourbook.command.tourChart.xAxisTime"
+            categoryId="net.tourbook.command.category.tourEditor"
             name="%command_tourChart_xAxisTime">
       </command>
       <category
@@ -779,23 +812,8 @@
             name="Tour Editor">
       </category>
       <command
-            categoryId="net.tourbook.command.category.tourEditor"
-            id="net.tourbook.command.graph.gradient"
-            name="%command_graph_gradient">
-      </command>
-      <command
-            categoryId="net.tourbook.command.category.tourEditor"
-            id="net.tourbook.command.graph.altimeter"
-            name="%command_graph_altimeter">
-      </command>
-      <command
             id="net.tourbook.command.tourChart.tool.adjustAltitude"
             name="%command_tourChart_tool_adjustAltitude">
-      </command>
-      <command
-            categoryId="net.tourbook.command.category.tourEditor"
-            id="net.tourbook.command.graph.pulse"
-            name="%command_graph_pulse">
       </command>
       <command
             id="net.tourbook.command.tourChart.showStartTime"
@@ -837,11 +855,6 @@
       <command
             id="net.tourbook.command.tourChart.canAutoZoomToSlider"
             name="%command_tourChart_canAutoZoomToSlider">
-      </command>
-      <command
-            categoryId="net.tourbook.command.category.tourEditor"
-            id="net.tourbook.command.graph.cadence"
-            name="%command_graph_cadence">
       </command>
       <command
             id="net.tourbook.command.tourEditor.revert"
@@ -905,39 +918,44 @@
             sequence="M1+1">
       </key>
       <key
-            commandId="net.tourbook.command.graph.speed"
+            commandId="net.tourbook.command.graph.pulse"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+2">
       </key>
       <key
-            commandId="net.tourbook.command.graph.pace"
+            commandId="net.tourbook.command.graph.speed"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+3">
       </key>
       <key
-            commandId="net.tourbook.command.graph.pulse"
+            commandId="net.tourbook.command.graph.pace"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+4">
       </key>
       <key
-            commandId="net.tourbook.command.graph.temperature"
+            commandId="net.tourbook.command.graph.power"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+5">
       </key>
       <key
-            commandId="net.tourbook.command.graph.cadence"
+            commandId="net.tourbook.command.graph.temperature"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+6">
       </key>
       <key
-            commandId="net.tourbook.command.graph.altimeter"
+            commandId="net.tourbook.command.graph.cadence"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+7">
       </key>
       <key
-            commandId="net.tourbook.command.graph.gradient"
+            commandId="net.tourbook.command.graph.altimeter"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+8">
+      </key>
+      <key
+            commandId="net.tourbook.command.graph.gradient"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+9">
       </key>
    </extension>
    <extension

@@ -18,7 +18,7 @@ package net.tourbook.tour;
 public class ActionHandlerGraphPace extends ActionHandlerGraph {
 
 	public ActionHandlerGraphPace() {
-		super(TourManager.GRAPH_SPEED, TourChart.COMMAND_ID_GRAPH_PACE);
+		super(TourManager.GRAPH_PACE, TourChart.COMMAND_ID_GRAPH_PACE);
 	}
 
 }

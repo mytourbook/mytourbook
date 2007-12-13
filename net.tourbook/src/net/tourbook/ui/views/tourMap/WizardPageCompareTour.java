@@ -93,7 +93,8 @@ public class WizardPageCompareTour extends WizardPage {
 	private WizardDataModel		fWizardDataModel			= new WizardDataModel();
 	private boolean				fIsTourViewerInitialized	= false;
 
-	private NumberFormat		nf							= NumberFormat.getNumberInstance();
+	private NumberFormat		fNf							= NumberFormat.getNumberInstance();
+
 	private Group				fChartGroup;
 
 	public class TourContentProvider implements ITreeContentProvider {
@@ -140,10 +141,9 @@ public class WizardPageCompareTour extends WizardPage {
 
 			case COLUMN_DISTANCE:
 				if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
-					nf.setMinimumFractionDigits(1);
-					nf.setMaximumFractionDigits(1);
-					return nf.format(((float) row[COLUMN_DISTANCE])
-							/ (1000 * UI.UNIT_VALUE_DISTANCE));
+					fNf.setMinimumFractionDigits(1);
+					fNf.setMaximumFractionDigits(1);
+					return fNf.format(((float) row[COLUMN_DISTANCE]) / (1000 * UI.UNIT_VALUE_DISTANCE));
 				} else {
 					return ""; //$NON-NLS-1$
 				}
@@ -220,8 +220,7 @@ public class WizardPageCompareTour extends WizardPage {
 		fPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		fTourChart = new TourChart(fPageBook, SWT.NONE, false);
-		fTourChart.setBackgroundColor(parent.getDisplay()
-				.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		fTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		fPageNoTourIsSelected = new Label(fPageBook, SWT.NONE);
 		fPageNoTourIsSelected.setText(Messages.TourMap_Wizard_Label_a_tour_is_not_selected);
@@ -361,8 +360,7 @@ public class WizardPageCompareTour extends WizardPage {
 				if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
 
 					// get tour data from the database
-					final TourData tourData = TourManager.getInstance()
-							.getTourData(tourItem.getTourId());
+					final TourData tourData = TourManager.getInstance().getTourData(tourItem.getTourId());
 
 					// set altitude visible
 					TourChartConfiguration chartConfig = new TourChartConfiguration(true);

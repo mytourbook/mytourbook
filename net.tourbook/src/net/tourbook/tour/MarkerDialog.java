@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.tour;
 
 import java.text.NumberFormat;
 import java.util.Iterator;
@@ -25,11 +25,6 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.IDataModelListener;
-import net.tourbook.tour.TourChart;
-import net.tourbook.tour.TourChartConfiguration;
-import net.tourbook.tour.TourChartContextProvider;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.util.PixelConverter;
@@ -162,8 +157,7 @@ public class MarkerDialog extends TitleAreaDialog {
 			case COLUMN_DISTANCE:
 				fNF.setMinimumFractionDigits(1);
 				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(((float) tourMarker.getDistance())
-						/ (1000 * UI.UNIT_VALUE_DISTANCE)));
+				cell.setText(fNF.format(((float) tourMarker.getDistance()) / (1000 * UI.UNIT_VALUE_DISTANCE)));
 
 				if (tourMarker.getType() == ChartMarker.MARKER_TYPE_DEVICE) {
 					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -272,10 +266,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 
-		fBtnClose = createButton(parent,
-				IDialogConstants.CLOSE_ID,
-				IDialogConstants.CLOSE_LABEL,
-				false);
+		fBtnClose = createButton(parent, IDialogConstants.CLOSE_ID, IDialogConstants.CLOSE_LABEL, false);
 
 		fBtnClose.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -344,13 +335,12 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		final MarkerViewerLabelProvider labelProvider = new MarkerViewerLabelProvider();
 
-		// column: km
+		// column: distance km/mi
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
-		tvc.getColumn().setText(Messages.Tour_Marker_Column_km);
+		tvc.getColumn().setText(UI.UNIT_LABEL_DISTANCE);
 		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8),
-				false));
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), false));
 
 		// column: marker
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
@@ -363,16 +353,14 @@ public class MarkerDialog extends TitleAreaDialog {
 		tvc.getColumn().setText(Messages.Tour_Marker_Column_horizontal_offset);
 		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_horizontal_offset_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
-				false));
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6), false));
 
 		// column: vertical offset
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
 		tvc.getColumn().setText(Messages.Tour_Marker_Column_vertical_offset);
 		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_vertical_offset_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6),
-				false));
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(6), false));
 
 		/*
 		 * create table viewer
@@ -456,11 +444,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		markerDetailContainer.setLayout(gl);
 		// markerDetailContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
-		fViewerDetailForm = new ViewerDetailForm(dlgContainer,
-				fMarkerListContainer,
-				sash,
-				markerDetailContainer,
-				30);
+		fViewerDetailForm = new ViewerDetailForm(dlgContainer, fMarkerListContainer, sash, markerDetailContainer, 30);
 
 		/*
 		 * container: marker list
@@ -660,7 +644,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		setButtonLayoutData(fBtnReset);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void enableControls() {
 
 		if (fSelectedTourMarker != null) {
@@ -688,8 +672,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		boolean isMarkerAvailable = fMarkerViewer.getTable().getItemCount() != 0;
 
 		if (isMarkerAvailable) {
-			boolean isScale0 = (fScaleX.getSelection() - OFFSET_0) == 0
-					&& (fScaleY.getSelection() - OFFSET_0) == 0;
+			boolean isScale0 = (fScaleX.getSelection() - OFFSET_0) == 0 && (fScaleY.getSelection() - OFFSET_0) == 0;
 			fBtnReset.setEnabled(!isScale0);
 		} else {
 			fBtnReset.setEnabled(false);
@@ -703,8 +686,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
-		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName()
-				+ "_DialogBounds"); //$NON-NLS-1$
+		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
 	}
 
 	/**
@@ -738,19 +720,16 @@ public class MarkerDialog extends TitleAreaDialog {
 	/**
 	 * remove selected markers from the view and update dependened structures
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void onDeleteMarker() {
 
 		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();
 		final TourMarker selectedMarker = (TourMarker) markerSelection.getFirstElement();
 
 		// confirm to save the changes
-		MessageBox msgBox = new MessageBox(fTourChart.getShell(), SWT.ICON_QUESTION
-				| SWT.YES
-				| SWT.NO);
+		MessageBox msgBox = new MessageBox(fTourChart.getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 		msgBox.setText(Messages.Dlg_TourMarker_MsgBox_delete_marker_title);
-		msgBox.setMessage(NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message,
-				(selectedMarker).getLabel()));
+		msgBox.setMessage(NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (selectedMarker).getLabel()));
 
 		if (msgBox.open() == SWT.YES) {
 

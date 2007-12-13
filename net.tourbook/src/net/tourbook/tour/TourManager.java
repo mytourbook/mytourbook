@@ -80,6 +80,7 @@ public class TourManager {
 	public static final int					GRAPH_GRADIENT								= 1006;
 	public static final int					GRAPH_POWER									= 1007;
 	public static final int					GRAPH_PACE									= 1008;
+
 	public static final int					GRAPH_TOUR_COMPARE							= 2000;
 
 	public static final int					GRADIENT_DIVISOR							= 10;
@@ -105,9 +106,7 @@ public class TourManager {
 	 * @param endIndex
 	 * @return Returns the speed between start and end index
 	 */
-	public static float computeTourSpeed(	final ChartDataModel chartDataModel,
-											final int startIndex,
-											final int endIndex) {
+	public static float computeTourSpeed(final ChartDataModel chartDataModel, final int startIndex, final int endIndex) {
 
 		final int[] distanceValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE)).getHighValues()[0];
 		final int[] timeValues = ((ChartDataXSerie) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TIME)).getHighValues()[0];
@@ -182,10 +181,7 @@ public class TourManager {
 	 * @param sliceMin
 	 * @return Returns the number of slices which can be ignored
 	 */
-	public static int getIgnoreTimeSlices(	final int[] distanceValues,
-											final int indexLeft,
-											int indexRight,
-											int sliceMin) {
+	public static int getIgnoreTimeSlices(final int[] distanceValues, final int indexLeft, int indexRight, int sliceMin) {
 		int ignoreTimeCounter = 0;
 		int oldDistance = 0;
 		sliceMin = Math.max(sliceMin, 1);
@@ -462,12 +458,10 @@ public class TourManager {
 
 					if (timeSlice > 0) {
 
-						final int ignoreTimeSlices = timeSlice == 0
-								? 0
-								: getIgnoreTimeSlices(distanceValues,
-										valuesIndexLeft,
-										valuesIndexRight,
-										10 / timeSlice);
+						final int ignoreTimeSlices = timeSlice == 0 ? 0 : getIgnoreTimeSlices(distanceValues,
+								valuesIndexLeft,
+								valuesIndexRight,
+								10 / timeSlice);
 						final float time = rightTime - leftTime - (ignoreTimeSlices * timeSlice);
 
 						final float distance = rightDistance - leftDistance;
@@ -512,12 +506,10 @@ public class TourManager {
 
 					if (timeSlice > 0) {
 
-						final int ignoreTimeSlices = timeSlice == 0
-								? 0
-								: getIgnoreTimeSlices(distanceValues,
-										valuesIndexLeft,
-										valuesIndexRight,
-										10 / timeSlice);
+						final int ignoreTimeSlices = timeSlice == 0 ? 0 : getIgnoreTimeSlices(distanceValues,
+								valuesIndexLeft,
+								valuesIndexRight,
+								10 / timeSlice);
 						final float time = rightTime - leftTime - (ignoreTimeSlices * timeSlice);
 
 						final float distance = rightDistance - leftDistance;
@@ -563,12 +555,10 @@ public class TourManager {
 					}
 
 					if (timeSlice > 0) {
-						final int ignoreTimeSlices = timeSlice == 0
-								? 0
-								: getIgnoreTimeSlices(distanceValues,
-										valuesIndexLeft,
-										valuesIndexRight,
-										10 / timeSlice);
+						final int ignoreTimeSlices = timeSlice == 0 ? 0 : getIgnoreTimeSlices(distanceValues,
+								valuesIndexLeft,
+								valuesIndexRight,
+								10 / timeSlice);
 						final float time = rightTime - leftTime - (ignoreTimeSlices * timeSlice);
 
 						return (((rightAltitude - leftAltitude) / time) * 3600);
@@ -600,9 +590,7 @@ public class TourManager {
 					// left and right slider are at the same position
 					return 0;
 				} else {
-					return (float) ((rightAltitude - leftAltitude))
-							/ (rightDistance - leftDistance)
-							* 100;
+					return (float) ((rightAltitude - leftAltitude)) / (rightDistance - leftDistance) * 100;
 				}
 			}
 		};
@@ -617,8 +605,7 @@ public class TourManager {
 	 * @param fTourChartConfig
 	 * @return
 	 */
-	public ChartDataModel createChartDataModel(	final TourData tourData,
-												final TourChartConfiguration chartConfig) {
+	public ChartDataModel createChartDataModel(final TourData tourData, final TourChartConfiguration chartConfig) {
 
 		return createChartDataModelInternal(tourData, chartConfig, false);
 	}
@@ -723,33 +710,7 @@ public class TourManager {
 
 		final int chartType = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
 
-		/*
-		 * altitude
-		 */
-
-		int[] altitudeSerie = tourData.altitudeSerie;
-		final float unitValueAltitude = UI.UNIT_VALUE_ALTITUDE;
-
-		if (unitValueAltitude != 1) {
-
-			// use imperial system
-
-			int[] altitudeSerieImperial = tourData.altitudeSerieImperial;
-
-			if (altitudeSerieImperial == null) {
-
-				// compute imperial data
-
-				tourData.altitudeSerieImperial = altitudeSerieImperial = new int[altitudeSerie.length];
-
-				for (int valueIndex = 0; valueIndex < altitudeSerie.length; valueIndex++) {
-					altitudeSerieImperial[valueIndex] = (int) (altitudeSerie[valueIndex] / unitValueAltitude);
-				}
-			}
-			altitudeSerie = altitudeSerieImperial;
-		}
-
-		final ChartDataYSerie yDataAltitude = getChartData(altitudeSerie, chartType);
+		final ChartDataYSerie yDataAltitude = getChartData(tourData.getAltitudeSerie(), chartType);
 
 		yDataAltitude.setYTitle(Messages.Graph_Label_Altitude);
 		yDataAltitude.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
@@ -757,6 +718,7 @@ public class TourManager {
 		yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
 		yDataAltitude.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true));
 		yDataAltitude.setShowYSlider(true);
+
 		setGraphColor(prefStore, yDataAltitude, GraphColors.PREF_GRAPH_ALTITUDE);
 		adjustMinMax(yDataAltitude);
 		chartDataModel.addXyData(yDataAltitude);
@@ -771,13 +733,26 @@ public class TourManager {
 		yDataSpeed.setValueDivisor(10);
 		yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
-		yDataSpeed.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true,
-				true,
-				computeSpeedAvg,
-				2));
+		yDataSpeed.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, computeSpeedAvg, 2));
 		yDataSpeed.setShowYSlider(true);
+
 		setGraphColor(prefStore, yDataSpeed, GraphColors.PREF_GRAPH_SPEED);
 		chartDataModel.addXyData(yDataSpeed);
+
+		/*
+		 * power
+		 */
+		final ChartDataYSerie yDataPower = getChartData(tourData.getPowerSerie(), chartType);
+
+		yDataPower.setYTitle(Messages.Graph_Label_Power);
+		yDataPower.setUnitLabel(Messages.Graph_Label_Power_unit);
+		yDataPower.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+		yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
+		yDataPower.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true));
+		yDataPower.setShowYSlider(true);
+
+		setGraphColor(prefStore, yDataPower, GraphColors.PREF_GRAPH_POWER);
+		chartDataModel.addXyData(yDataPower);
 
 		/*
 		 * pace
@@ -789,11 +764,9 @@ public class TourManager {
 		yDataPace.setValueDivisor(10);
 		yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
 		yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
-		yDataPace.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true,
-				true,
-				computePaceAvg,
-				2));
+		yDataPace.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, computePaceAvg, 2));
 		yDataPace.setShowYSlider(true);
+
 		setGraphColor(prefStore, yDataPace, GraphColors.PREF_GRAPH_PACE);
 		chartDataModel.addXyData(yDataPace);
 
@@ -807,6 +780,7 @@ public class TourManager {
 		yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
 		yDataPulse.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true));
 		yDataPulse.setShowYSlider(true);
+
 		setGraphColor(prefStore, yDataPulse, GraphColors.PREF_GRAPH_HEARTBEAT);
 		chartDataModel.addXyData(yDataPulse);
 
@@ -818,8 +792,7 @@ public class TourManager {
 		yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
 		yDataAltimeter.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 		yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
-		yDataAltimeter.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true,
-				computeAltimeterAvg));
+		yDataAltimeter.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true, computeAltimeterAvg));
 		yDataAltimeter.setShowYSlider(true);
 		setGraphColor(prefStore, yDataAltimeter, GraphColors.PREF_GRAPH_ALTIMETER);
 		chartDataModel.addXyData(yDataAltimeter);
@@ -838,10 +811,7 @@ public class TourManager {
 		yDataGradient.setValueDivisor(GRADIENT_DIVISOR);
 		yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 		yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
-		yDataGradient.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true,
-				true,
-				computeGradientAvg,
-				1));
+		yDataGradient.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, computeGradientAvg, 1));
 		yDataGradient.setShowYSlider(true);
 		setGraphColor(prefStore, yDataGradient, GraphColors.PREF_GRAPH_GRADIEND);
 		chartDataModel.addXyData(yDataGradient);
@@ -868,8 +838,7 @@ public class TourManager {
 		/*
 		 * temperature
 		 */
-		final ChartDataYSerie yDataTemperature = getChartData(tourData.getTemperatureSerie(),
-				chartType);
+		final ChartDataYSerie yDataTemperature = getChartData(tourData.getTemperatureSerie(), chartType);
 		yDataTemperature.setYTitle(Messages.Graph_Label_Temperature);
 		yDataTemperature.setUnitLabel(UI.UNIT_LABEL_TEMPERATURE);
 		yDataTemperature.setShowYSlider(true);
@@ -912,6 +881,10 @@ public class TourManager {
 
 			case GRAPH_PACE:
 				chartDataModel.addYData(yDataPace);
+				break;
+
+			case GRAPH_POWER:
+				chartDataModel.addYData(yDataPower);
 				break;
 
 			case GRAPH_ALTIMETER:
@@ -991,8 +964,7 @@ public class TourManager {
 			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE, dataSerie);
 
 		} else {
-			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS,
-					dataSerie);
+			chartDataSerie = new ChartDataYSerie(ChartDataModel.CHART_TYPE_LINE_WITH_BARS, dataSerie);
 		}
 		return chartDataSerie;
 	}
@@ -1039,7 +1011,8 @@ public class TourManager {
 					.getActivePage()
 					.openEditor(new TourEditorInput(tourId), TourEditor.ID, true);
 
-		} catch (final PartInitException e) {
+		}
+		catch (final PartInitException e) {
 			e.printStackTrace();
 		}
 	}

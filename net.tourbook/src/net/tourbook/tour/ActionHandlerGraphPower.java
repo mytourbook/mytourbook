@@ -13,20 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+package net.tourbook.tour;
 
-package net.tourbook.util;
+public class ActionHandlerGraphPower extends ActionHandlerGraph {
 
-import java.util.Formatter;
-
-import net.tourbook.Messages;
-
-
-public final class TourFormatter {
-
-	public static final String formatSeconds(long value) {
-
-		return new Formatter().format(Messages.Format_hhmmss, (value / 3600), ((value % 3600) / 60),
-			((value % 3600) % 60)).toString();
-
+	public ActionHandlerGraphPower() {
+		super(TourManager.GRAPH_POWER, TourChart.COMMAND_ID_GRAPH_POWER);
 	}
+
 }

@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
@@ -135,7 +136,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 					getWindowConfigurer().getWindow().getActivePage().showView(RawDataView.ID,
 							null,
 							IWorkbenchPage.VIEW_ACTIVATE);
-				} catch (PartInitException e) {
+				}
+				catch (PartInitException e) {
 					e.printStackTrace();
 				}
 
@@ -145,7 +147,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			// select person/tour type which was selected in the last session
 			fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
 
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -163,11 +166,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		configurer.setTitle(Messages.App_Title + " - " + MyTourbookSplashHandler.APP_BUILD_ID); //$NON-NLS-1$
 
-		PlatformUI.getPreferenceStore()
-				.setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, true);
+		final IPreferenceStore preferenceStore = PlatformUI.getPreferenceStore();
 
-		PlatformUI.getPreferenceStore()
-				.setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
+		preferenceStore.setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, true);
+		preferenceStore.setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, true);
+		preferenceStore.setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
 
 		hookTitleUpdateListeners(configurer);
 	}
@@ -209,8 +212,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			}
 
 			@Override
-			public void perspectiveDeactivated(	IWorkbenchPage page,
-												IPerspectiveDescriptor perspective) {
+			public void perspectiveDeactivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 				updateTitle();
 			}
 		});
@@ -282,9 +284,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		}
 
 		// Nothing to do if the part hasn't changed
-		if (activePart == lastActivePart
-				&& currentPage == lastActivePage
-				&& persp == lastPerspective) {
+		if (activePart == lastActivePart && currentPage == lastActivePage && persp == lastPerspective) {
 			return;
 		}
 

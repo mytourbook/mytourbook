@@ -31,11 +31,13 @@ import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.services.IServiceLocator;
 
-// author:  Wolfgang Schramm
-// created: 2007-08-08
-
 /**
  * This manager aktivates/deactivates tour chart action handlers (TC = TourChart)
+ * 
+ * <pre>
+ * author:  Wolfgang Schramm
+ * created: 2007-08-08
+ * </pre>
  */
 class TCActionHandlerManager {
 
@@ -77,14 +79,14 @@ class TCActionHandlerManager {
 
 		fActionHandlers = new HashMap<String, TCActionHandler>();
 
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_TOUR_COMPARE,
-				new ActionHandlerGraphTourCompare());
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_TOUR_COMPARE, new ActionHandlerGraphTourCompare());
 
 		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTITUDE, new ActionHandlerGraphAltitude());
 		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_PULSE, new ActionHandlerGraphPulse());
 		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_SPEED, new ActionHandlerGraphSpeed());
-		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_TEMPERATURE,
-				new ActionHandlerGraphTemperature());
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_PACE, new ActionHandlerGraphPace());
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_POWER, new ActionHandlerGraphPower());
+		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_TEMPERATURE, new ActionHandlerGraphTemperature());
 		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_CADENCE, new ActionHandlerGraphCadence());
 		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_ALTIMETER, new ActionHandlerGraphAltimeter());
 		fActionHandlers.put(TourChart.COMMAND_ID_GRAPH_GRADIENT, new ActionHandlerGraphGradient());
@@ -94,10 +96,8 @@ class TCActionHandlerManager {
 
 		fActionHandlers.put(TourChart.COMMAND_ID_CHART_OPTIONS, new ActionHandlerChartOptions());
 		fActionHandlers.put(TourChart.COMMAND_ID_SHOW_START_TIME, new ActionHandlerShowStartTime());
-		fActionHandlers.put(TourChart.COMMAND_ID_CAN_SCROLL_CHART,
-				new ActionHandlerCanScrollChart());
-		fActionHandlers.put(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER,
-				new ActionHandlerCanAutoZoomToSlider());
+		fActionHandlers.put(TourChart.COMMAND_ID_CAN_SCROLL_CHART, new ActionHandlerCanScrollChart());
+		fActionHandlers.put(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionHandlerCanAutoZoomToSlider());
 
 		setupHandlers();
 	}

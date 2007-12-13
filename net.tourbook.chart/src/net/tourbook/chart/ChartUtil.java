@@ -26,8 +26,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class ChartUtil {
 
-	final static NumberFormat nf = NumberFormat.getNumberInstance();
-	
+	private final static NumberFormat	fNf	= NumberFormat.getNumberInstance();
+
 	/**
 	 * Formats a value according to the defined unit
 	 * 
@@ -39,10 +39,7 @@ public class ChartUtil {
 		return formatValue(value, unitType, 1, false);
 	}
 
-	public static String formatValue(	final int value,
-										final int unitType,
-										final float divisor,
-										boolean showSeconds) {
+	public static String formatValue(final int value, final int unitType, final float divisor, boolean showSeconds) {
 
 		String valueText = ""; //$NON-NLS-1$
 
@@ -51,17 +48,16 @@ public class ChartUtil {
 		case ChartDataSerie.AXIS_UNIT_NUMBER:
 			float divValue = (float) value / divisor;
 			if (divValue % 1 == 0) {
-				nf.setMinimumFractionDigits(0);
+				fNf.setMinimumFractionDigits(0);
 			} else {
-				nf.setMinimumFractionDigits(1);
+				fNf.setMinimumFractionDigits(1);
 			}
-			valueText = nf.format(divValue);
+			valueText = fNf.format(divValue);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
-			valueText = new Formatter().format(
-					Messages.Format_time_hhmm,
+			valueText = new Formatter().format(Messages.Format_time_hhmm,
 					(long) (value / 3600),
 					(long) ((value % 3600) / 60)).toString();
 			break;
@@ -69,22 +65,20 @@ public class ChartUtil {
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
 
 			if (showSeconds) {
-				valueText = new Formatter().format(
-						Messages.Format_time_hhmmss,
+				valueText = new Formatter().format(Messages.Format_time_hhmmss,
 						(long) (value / 3600),
 						(long) ((value % 3600) / 60),
 						(long) ((value % 3600) % 60)).toString();
 			} else {
-				valueText = new Formatter().format(
-						Messages.Format_time_hhmm,
+				valueText = new Formatter().format(Messages.Format_time_hhmm,
 						(long) (value / 3600),
 						(long) ((value % 3600) / 60)).toString();
 			}
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_YEAR:
-			nf.setMinimumFractionDigits(1);
-			valueText = nf.format(value);
+			fNf.setMinimumFractionDigits(1);
+			valueText = fNf.format(value);
 			break;
 
 		default:
@@ -105,18 +99,14 @@ public class ChartUtil {
 	 *        True removes trailing zeros after a decimal point
 	 * @return
 	 */
-	public static String formatInteger(	final int value,
-										int divisor,
-										int precision,
-										boolean removeDecimalZero) {
+	public static String formatInteger(final int value, int divisor, int precision, boolean removeDecimalZero) {
 
 		float divValue = (float) value / divisor;
 
 		String format = Messages.Format_number_float;
 
 		format += (removeDecimalZero && (divValue % 1 == 0)) ? "0f" : Integer //$NON-NLS-1$
-				.toString(precision)
-				+ 'f';
+		.toString(precision) + 'f';
 
 		return new Formatter().format(format, divValue).toString();
 	}
@@ -136,9 +126,7 @@ public class ChartUtil {
 		}
 
 //		unit = (float) unitValue / multiplier;
-		unit = unit > 60 ? 60 : unit > 30 ? 30 : unit > 20 ? 20 : unit > 10
-				? 10
-				: unit > 5 ? 5 : unit > 2 ? 2 : 1;
+		unit = unit > 60 ? 60 : unit > 30 ? 30 : unit > 20 ? 20 : unit > 10 ? 10 : unit > 5 ? 5 : unit > 2 ? 2 : 1;
 		unit *= multiplier;
 
 		return unit;
@@ -159,9 +147,7 @@ public class ChartUtil {
 		}
 
 		unit = (float) unitValue / multiplier;
-		unit = unit > 50 ? 50 : unit > 20 ? 20 : unit > 10 ? 10 : unit > 5 ? 5 : unit > 2
-				? 2
-				: 1;
+		unit = unit > 50 ? 50 : unit > 20 ? 20 : unit > 10 ? 10 : unit > 5 ? 5 : unit > 2 ? 2 : 1;
 		unit *= multiplier;
 
 		return unit;
@@ -213,8 +199,7 @@ public class ChartUtil {
 	}
 
 	/**
-	 * Checks if an image can be reused, this is true if the image exists and
-	 * has the same size
+	 * Checks if an image can be reused, this is true if the image exists and has the same size
 	 * 
 	 * @param newWidth
 	 * @param newHeight

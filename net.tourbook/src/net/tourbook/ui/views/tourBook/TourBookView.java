@@ -251,9 +251,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		};
 
 		// register the listener
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	private void addSelectionListener() {
@@ -275,7 +273,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
 
@@ -379,11 +377,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private Control createTourViewer(Composite parent) {
 
 		// tour tree
-		final Tree tree = new Tree(parent, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.FLAT
-				| SWT.FULL_SELECTION
-				| SWT.MULTI);
+		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.FULL_SELECTION | SWT.MULTI);
 
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		tree.setHeaderVisible(true);
@@ -520,9 +514,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
 				fNF.setMinimumFractionDigits(1);
 				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(((float) tourItem.fColumnDistance)
-						/ 1000
-						/ UI.UNIT_VALUE_DISTANCE));
+				cell.setText(fNF.format(((float) tourItem.fColumnDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
 				setCellColor(cell, element);
 			}
 		});
@@ -537,8 +529,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 			public void update(ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					cell.setImage(UI.getInstance()
-							.getTourTypeImage(((TVITourBookTour) element).getTourTypeId()));
+					cell.setImage(UI.getInstance().getTourTypeImage(((TVITourBookTour) element).getTourTypeId()));
 				} else {
 					setCellColor(cell, element);
 				}
@@ -738,9 +729,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		getViewSite().getPage().removePartListener(fPartListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		fColorYearFg.dispose();
 		fColorYearBg.dispose();
@@ -752,7 +741,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void enableActions() {
 
 		ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
@@ -798,7 +787,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fPostSelectionProvider.setSelection(selection);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 
@@ -829,8 +818,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 				TVITourBookTour tviTour = ((TVITourBookTour) treeItem);
 
-				final TourData tourData = TourManager.getInstance()
-						.getTourData(tviTour.getTourId());
+				final TourData tourData = TourManager.getInstance().getTourData(tviTour.getTourId());
 
 				if (tourData != null) {
 					selectedTourData.add(tourData);
@@ -1008,8 +996,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		// save columns width
 		final String[] columnIdAndWidth = fColumnManager.getColumnIdAndWidth();
 		if (columnIdAndWidth != null) {
-			memento.putString(MEMENTO_COLUMN_WIDTH,
-					StringToArrayConverter.convertArrayToString(columnIdAndWidth));
+			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(columnIdAndWidth));
 		}
 	}
 

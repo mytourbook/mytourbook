@@ -177,8 +177,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	private class TourLabelProvider extends LabelProvider implements ITableLabelProvider,
-			ITableColorProvider {
+	private class TourLabelProvider extends LabelProvider implements ITableLabelProvider, ITableColorProvider {
 
 		public Color getBackground(final Object element, final int columnIndex) {
 			if (/* columnIndex == 0 && */element instanceof TourMapItemReferenceTour) {
@@ -223,8 +222,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 				final TourMapItemComparedTour compTour = (TourMapItemComparedTour) obj;
 				switch (index) {
 				case COLUMN_LABEL:
-					return DateFormat.getDateInstance(DateFormat.SHORT)
-							.format(compTour.getTourDate());
+					return DateFormat.getDateInstance(DateFormat.SHORT).format(compTour.getTourDate());
 
 				case COLUMN_SPEED:
 
@@ -486,9 +484,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 				}
 			}
 		};
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	private void createActions() {
@@ -533,8 +529,8 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 		fViewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
-
 		createTourViewer(fViewerContainer);
+
 		createContextMenu();
 		createActions();
 
@@ -559,14 +555,6 @@ public class TourMapView extends ViewPart implements ITourViewer {
 		layoutContainer.setLayout(treeLayout);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
 
-//		// viewer container
-//		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-//		final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-//		layoutContainer.setLayoutData(gridData);
-//
-//		final TreeColumnLayout treeLayouter = new TreeColumnLayout();
-//		layoutContainer.setLayout(treeLayouter);
-
 		// tour tree
 		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL
 				| SWT.V_SCROLL
@@ -587,8 +575,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
 		tc.setText(UI.UNIT_LABEL_SPEED);
-		treeLayout.setColumnData(tc,
-				new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10), false));
+		treeLayout.setColumnData(tc, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10), false));
 
 		// tour viewer
 		fTourViewer = new TreeViewer(tree);
@@ -641,9 +628,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 		getViewSite().getPage().removePartListener(fPartListener);
 		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
 
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		fColorRefFg.dispose();
 		fColorYearFg.dispose();
@@ -686,9 +671,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 		}
 
 		// enable: rename ref tour
-		fActionRenameRefTour.setEnabled(refItemCounter == 1
-				&& tourItemCounter == 0
-				&& yearItemCounter == 0);
+		fActionRenameRefTour.setEnabled(refItemCounter == 1 && tourItemCounter == 0 && yearItemCounter == 0);
 //
 //		fActionAdjustAltitude.setEnabled(tourItemCounter > 0);
 	}

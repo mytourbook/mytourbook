@@ -143,16 +143,12 @@ public class StatisticTourNumbers extends YearStatistic {
 		};
 
 		// add pref listener
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 
 		// remove pref listener
 		container.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
-				TourbookPlugin.getDefault()
-						.getPluginPreferences()
-						.removePropertyChangeListener(fPrefChangeListener);
+				TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 			}
 		});
 	}
@@ -178,27 +174,25 @@ public class StatisticTourNumbers extends YearStatistic {
 				String barInfo;
 
 				if (valueIndex == 0) {
-					barInfo = new Formatter().format(Messages.NUMBERS_ALTITUDE_DOWN
-							+ Messages.NUMBERS_ALTITUDE_UNIT,
+					barInfo = new Formatter().format(Messages.NUMBERS_ALTITUDE_DOWN + Messages.NUMBERS_ALTITUDE_UNIT,
 							fStatAltitudeUnits[valueIndex],
 							fStatAltitudeCounterHigh[serieIndex][valueIndex],
 							fStatAltitudeSumHigh[serieIndex][valueIndex]).toString();
 
 				} else if (valueIndex == fStatAltitudeUnits.length - 1) {
 
-					barInfo = new Formatter().format(Messages.NUMBERS_ALTITUDE_UP
-							+ Messages.NUMBERS_ALTITUDE_UNIT,
+					barInfo = new Formatter().format(Messages.NUMBERS_ALTITUDE_UP + Messages.NUMBERS_ALTITUDE_UNIT,
 							fStatAltitudeUnits[valueIndex - 1],
 							fStatAltitudeCounterHigh[serieIndex][valueIndex],
 							fStatAltitudeSumHigh[serieIndex][valueIndex]).toString();
 				} else {
 
-					barInfo = new Formatter().format(Messages.NUMBERS_ALTITUDE_BETWEEN
-							+ Messages.NUMBERS_ALTITUDE_UNIT,
+					barInfo = new Formatter().format(Messages.NUMBERS_ALTITUDE_BETWEEN + Messages.NUMBERS_ALTITUDE_UNIT,
 							fStatAltitudeUnits[valueIndex - 1],
 							fStatAltitudeUnits[valueIndex],
 							fStatAltitudeCounterHigh[serieIndex][valueIndex],
-							fStatAltitudeSumHigh[serieIndex][valueIndex]).toString();
+							fStatAltitudeSumHigh[serieIndex][valueIndex])
+							.toString();
 				}
 
 				return barInfo;
@@ -207,9 +201,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	}
 
 	@Override
-	public void createControl(	Composite parent,
-								IViewSite viewSite,
-								final IPostSelectionProvider postSelectionProvider) {
+	public void createControl(Composite parent, IViewSite viewSite, final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -253,27 +245,25 @@ public class StatisticTourNumbers extends YearStatistic {
 				String barInfo;
 
 				if (valueIndex == 0) {
-					barInfo = new Formatter().format(Messages.NUMBERS_DISTANCE_DOWN
-							+ Messages.NUMBERS_DISTANCE_UNIT,
+					barInfo = new Formatter().format(Messages.NUMBERS_DISTANCE_DOWN + Messages.NUMBERS_DISTANCE_UNIT,
 							fStatDistanceUnits[valueIndex],
 							fStatDistanceCounterHigh[serieIndex][valueIndex],
 							fStatDistanceSumHigh[serieIndex][valueIndex]).toString();
 
 				} else if (valueIndex == fStatDistanceUnits.length - 1) {
 
-					barInfo = new Formatter().format(Messages.NUMBERS_DISTANCE_UP
-							+ Messages.NUMBERS_DISTANCE_UNIT,
+					barInfo = new Formatter().format(Messages.NUMBERS_DISTANCE_UP + Messages.NUMBERS_DISTANCE_UNIT,
 							fStatDistanceUnits[valueIndex - 1],
 							fStatDistanceCounterHigh[serieIndex][valueIndex],
 							fStatDistanceSumHigh[serieIndex][valueIndex]).toString();
 				} else {
 
-					barInfo = new Formatter().format(Messages.NUMBERS_DISTANCE_BETWEEN
-							+ Messages.NUMBERS_DISTANCE_UNIT,
+					barInfo = new Formatter().format(Messages.NUMBERS_DISTANCE_BETWEEN + Messages.NUMBERS_DISTANCE_UNIT,
 							fStatDistanceUnits[valueIndex - 1],
 							fStatDistanceUnits[valueIndex],
 							fStatDistanceCounterHigh[serieIndex][valueIndex],
-							fStatDistanceSumHigh[serieIndex][valueIndex]).toString();
+							fStatDistanceSumHigh[serieIndex][valueIndex])
+							.toString();
 				}
 
 				return barInfo;
@@ -289,34 +279,29 @@ public class StatisticTourNumbers extends YearStatistic {
 				String barInfo;
 
 				if (valueIndex == 0) {
-					barInfo = new Formatter().format(Messages.NUMBERS_TIME_DOWN
-							+ Messages.NUMBERS_TIME_UNIT,
-							ChartUtil.formatValue(fStatTimeUnits[valueIndex],
-									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+					barInfo = new Formatter().format(Messages.NUMBERS_TIME_DOWN + Messages.NUMBERS_TIME_UNIT,
+							ChartUtil.formatValue(fStatTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
 							fStatTimeCounterHigh[serieIndex][valueIndex],
 							ChartUtil.formatValue(fStatTimeSumHigh[serieIndex][valueIndex],
 									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
 
 				} else if (valueIndex == fStatTimeUnits.length - 1) {
-					barInfo = new Formatter().format(Messages.NUMBERS_TIME_UP
-							+ Messages.NUMBERS_TIME_UNIT,
-							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1],
-									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+					barInfo = new Formatter().format(Messages.NUMBERS_TIME_UP + Messages.NUMBERS_TIME_UNIT,
+							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
 
 							fStatTimeCounterHigh[serieIndex][valueIndex],
 
 							ChartUtil.formatValue(fStatTimeSumHigh[serieIndex][valueIndex],
-									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
+									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE))
+							.toString();
 				} else {
-					barInfo = new Formatter().format(Messages.NUMBERS_TIME_BETWEEN
-							+ Messages.NUMBERS_TIME_UNIT,
-							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1],
-									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-							ChartUtil.formatValue(fStatTimeUnits[valueIndex],
-									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+					barInfo = new Formatter().format(Messages.NUMBERS_TIME_BETWEEN + Messages.NUMBERS_TIME_UNIT,
+							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+							ChartUtil.formatValue(fStatTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
 							fStatTimeCounterHigh[serieIndex][valueIndex],
 							ChartUtil.formatValue(fStatTimeSumHigh[serieIndex][valueIndex],
-									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
+									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE))
+							.toString();
 				}
 
 				return barInfo;
@@ -369,8 +354,7 @@ public class StatisticTourNumbers extends YearStatistic {
 			int unitIndex;
 //			tourColorIndex -= StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 
-			unitIndex = createTourStatData(tourDataTour.fDistanceHigh[tourIndex]
-					- tourDataTour.fDistanceLow[tourIndex],
+			unitIndex = createTourStatData(tourDataTour.fDistanceHigh[tourIndex] - tourDataTour.fDistanceLow[tourIndex],
 					fStatDistanceUnits,
 					fStatDistanceCounterHigh[tourColorIndex],
 					fStatDistanceSumHigh[tourColorIndex]);
@@ -378,8 +362,7 @@ public class StatisticTourNumbers extends YearStatistic {
 			fStatDistanceCounterColorIndex[tourColorIndex][unitIndex] = tourColorIndex;
 			fStatDistanceSumColorIndex[tourColorIndex][unitIndex] = tourColorIndex;
 
-			unitIndex = createTourStatData(tourDataTour.fAltitudeHigh[tourIndex]
-					- tourDataTour.fAltitudeLow[tourIndex],
+			unitIndex = createTourStatData(tourDataTour.fAltitudeHigh[tourIndex] - tourDataTour.fAltitudeLow[tourIndex],
 					fStatAltitudeUnits,
 					fStatAltitudeCounterHigh[tourColorIndex],
 					fStatAltitudeSumHigh[tourColorIndex]);
@@ -387,8 +370,7 @@ public class StatisticTourNumbers extends YearStatistic {
 			fStatAltitudeCounterColorIndex[tourColorIndex][unitIndex] = tourColorIndex;
 			fStatAltitudeSumColorIndex[tourColorIndex][unitIndex] = tourColorIndex;
 
-			unitIndex = createTourStatData(tourDataTour.fTimeHigh[tourIndex]
-					- tourDataTour.fTimeLow[tourIndex],
+			unitIndex = createTourStatData(tourDataTour.fTimeHigh[tourIndex] - tourDataTour.fTimeLow[tourIndex],
 					fStatTimeUnits,
 					fStatTimeCounterHigh[tourColorIndex],
 					fStatTimeSumHigh[tourColorIndex]);
@@ -515,10 +497,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, false);
 	}
 
-	public void refreshStatistic(	TourPerson person,
-									TourTypeFilter typeId,
-									int year,
-									boolean refreshData) {
+	public void refreshStatistic(TourPerson person, TourTypeFilter typeId, int year, boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourTypeFilter = typeId;

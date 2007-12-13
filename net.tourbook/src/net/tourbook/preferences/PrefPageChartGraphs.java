@@ -108,28 +108,24 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 		// create a map with all available graphs
 		fGraphMap = new HashMap<Integer, Graph>();
-		fGraphMap.put(TourManager.GRAPH_ALTITUDE, new Graph(TourManager.GRAPH_ALTITUDE,
-				Messages.Graph_Label_Altitude));
-		fGraphMap.put(TourManager.GRAPH_SPEED, new Graph(TourManager.GRAPH_SPEED,
-				Messages.Graph_Label_Speed));
-		fGraphMap.put(TourManager.GRAPH_PACE, new Graph(TourManager.GRAPH_PACE,
-				Messages.Graph_Label_Pace));
-		fGraphMap.put(TourManager.GRAPH_PULSE, new Graph(TourManager.GRAPH_PULSE,
-				Messages.Graph_Label_Heartbeat));
+		fGraphMap.put(TourManager.GRAPH_ALTITUDE, new Graph(TourManager.GRAPH_ALTITUDE, Messages.Graph_Label_Altitude));
+		fGraphMap.put(TourManager.GRAPH_SPEED, new Graph(TourManager.GRAPH_SPEED, Messages.Graph_Label_Speed));
+		fGraphMap.put(TourManager.GRAPH_PACE, new Graph(TourManager.GRAPH_PACE, Messages.Graph_Label_Pace));
+		fGraphMap.put(TourManager.GRAPH_POWER, new Graph(TourManager.GRAPH_POWER, Messages.Graph_Label_Power));
+		fGraphMap.put(TourManager.GRAPH_PULSE, new Graph(TourManager.GRAPH_PULSE, Messages.Graph_Label_Heartbeat));
 		fGraphMap.put(TourManager.GRAPH_TEMPERATURE, new Graph(TourManager.GRAPH_TEMPERATURE,
 				Messages.Graph_Label_Temperature));
-		fGraphMap.put(TourManager.GRAPH_CADENCE, new Graph(TourManager.GRAPH_CADENCE,
-				Messages.Graph_Label_Cadence));
+		fGraphMap.put(TourManager.GRAPH_CADENCE, new Graph(TourManager.GRAPH_CADENCE, Messages.Graph_Label_Cadence));
 		fGraphMap.put(TourManager.GRAPH_ALTIMETER, new Graph(TourManager.GRAPH_ALTIMETER,
 				Messages.Graph_Label_Altimeter));
-		fGraphMap.put(TourManager.GRAPH_GRADIENT, new Graph(TourManager.GRAPH_GRADIENT,
-				Messages.Graph_Label_Gradiend));
+		fGraphMap.put(TourManager.GRAPH_GRADIENT, new Graph(TourManager.GRAPH_GRADIENT, Messages.Graph_Label_Gradiend));
 
 		// create a list with all available graphs
 		fGraphList = new ArrayList<Graph>();
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_ALTITUDE));
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_SPEED));
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_PACE));
+		fGraphList.add(fGraphMap.get(TourManager.GRAPH_POWER));
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_PULSE));
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_TEMPERATURE));
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_CADENCE));
@@ -237,8 +233,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		checkShowStartTime.setLayoutData(gd);
 
 		// initialize the radio button
-		if (getPreferenceStore().getString(ITourbookPreferences.GRAPH_X_AXIS)
-				.equals(TourManager.X_AXIS_TIME)) {
+		if (getPreferenceStore().getString(ITourbookPreferences.GRAPH_X_AXIS).equals(TourManager.X_AXIS_TIME)) {
 			radioShowTime.setSelection(true);
 		} else {
 			radioShowDistance.setSelection(true);
@@ -384,8 +379,9 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 	private CheckboxTableViewer createGraphCheckBoxList(Composite parent) {
 
-		final CheckboxTableViewer checkboxList = CheckboxTableViewer.newCheckList(parent,
-				SWT.SINGLE | SWT.TOP | SWT.BORDER);
+		final CheckboxTableViewer checkboxList = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE
+				| SWT.TOP
+				| SWT.BORDER);
 
 		checkboxList.setContentProvider(new IStructuredContentProvider() {
 			public Object[] getElements(Object inputElement) {
@@ -490,14 +486,11 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
 		}
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME,
-				checkShowStartTime.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, checkShowStartTime.getSelection());
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH,
-				checkScrollZoomedChart.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH, checkScrollZoomedChart.getSelection());
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER,
-				checkZoomToSlider.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, checkZoomToSlider.getSelection());
 
 		altimeterMinCheckbox.store();
 		altimeterMinEditor.store();

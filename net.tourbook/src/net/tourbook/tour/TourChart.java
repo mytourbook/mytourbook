@@ -68,6 +68,7 @@ public class TourChart extends Chart {
 	static final String						COMMAND_ID_GRAPH_ALTITUDE			= "net.tourbook.command.graph.altitude";				//$NON-NLS-1$
 	static final String						COMMAND_ID_GRAPH_SPEED				= "net.tourbook.command.graph.speed";					//$NON-NLS-1$
 	static final String						COMMAND_ID_GRAPH_PACE				= "net.tourbook.command.graph.pace";					//$NON-NLS-1$
+	static final String						COMMAND_ID_GRAPH_POWER				= "net.tourbook.command.graph.power";					//$NON-NLS-1$
 	static final String						COMMAND_ID_GRAPH_PULSE				= "net.tourbook.command.graph.pulse";					//$NON-NLS-1$
 	static final String						COMMAND_ID_GRAPH_TEMPERATURE		= "net.tourbook.command.graph.temperature";			//$NON-NLS-1$
 	static final String						COMMAND_ID_GRAPH_CADENCE			= "net.tourbook.command.graph.cadence";				//$NON-NLS-1$
@@ -78,7 +79,7 @@ public class TourChart extends Chart {
 
 	static final String						SEGMENT_VALUES						= "segmentValues";										//$NON-NLS-1$
 
-	TourData								fTourData;
+	private TourData						fTourData;
 	TourChartConfiguration					fTourChartConfig;
 
 	Map<String, TCActionProxy>				fActionProxies;
@@ -127,9 +128,7 @@ public class TourChart extends Chart {
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 
-				TourbookPlugin.getDefault()
-						.getPluginPreferences()
-						.removePropertyChangeListener(fPrefChangeListener);
+				TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 			}
 		});
 	}
@@ -194,8 +193,7 @@ public class TourChart extends Chart {
 
 					// zoom preferences has changed
 
-					final IPreferenceStore prefStore = TourbookPlugin.getDefault()
-							.getPreferenceStore();
+					final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 					TourManager.updateZoomOptionsInChartConfig(fTourChartConfig, prefStore);
 
@@ -239,9 +237,7 @@ public class TourChart extends Chart {
 			}
 		};
 
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 
 	}
 
@@ -277,6 +273,13 @@ public class TourChart extends Chart {
 				Messages.Graph_Label_Pace,
 				Messages.Tour_Action_graph_pace_tooltip,
 				Messages.Image__graph_pace,
+				null);
+
+		createGraphActionProxy(TourManager.GRAPH_POWER,
+				COMMAND_ID_GRAPH_POWER,
+				Messages.Graph_Label_Power,
+				Messages.Tour_Action_graph_power_tooltip,
+				Messages.Image__graph_power,
 				null);
 
 		createGraphActionProxy(TourManager.GRAPH_ALTIMETER,
@@ -360,9 +363,7 @@ public class TourChart extends Chart {
 	private void createMarkerLayer() {
 
 		// set data serie for the x-axis
-		final int[] xAxisSerie = fTourChartConfig.showTimeOnXAxis
-				? fTourData.timeSerie
-				: fTourData.getDistanceSerie();
+		final int[] xAxisSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
 
 		fMarkerLayer = new ChartMarkerLayer();
 		fMarkerLayer.setLineColor(new RGB(50, 100, 10));
@@ -408,9 +409,7 @@ public class TourChart extends Chart {
 			return;
 		}
 
-		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis
-				? fTourData.timeSerie
-				: fTourData.getDistanceSerie();
+		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
 
 		fSegmentLayer = new ChartSegmentLayer();
 		fSegmentLayer.setLineColor(new RGB(0, 177, 219));
@@ -497,10 +496,8 @@ public class TourChart extends Chart {
 		/*
 		 * Action: show start time
 		 */
-		fActionProxies.put(COMMAND_ID_SHOW_START_TIME,
-				new TCActionProxy(COMMAND_ID_SHOW_START_TIME, useInternalActionBar
-						? new ActionShowStartTime(this)
-						: null));
+		fActionProxies.put(COMMAND_ID_SHOW_START_TIME, new TCActionProxy(COMMAND_ID_SHOW_START_TIME,
+				useInternalActionBar ? new ActionShowStartTime(this) : null));
 
 		/*
 		 * Action: can scroll zoomed chart
@@ -561,9 +558,10 @@ public class TourChart extends Chart {
 
 		tbm.add(new Separator());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_ALTITUDE)).getAction());
+		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_PULSE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_SPEED)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_PACE)).getAction());
-		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_PULSE)).getAction());
+		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_POWER)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_TEMPERATURE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_CADENCE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_ALTIMETER)).getAction());
@@ -771,21 +769,13 @@ public class TourChart extends Chart {
 			yData.setCustomLayers(customLayers);
 		}
 
-		setSegmentLayer(segmentValueLayers,
-				fTourData.segmentSerieSpeed,
-				TourManager.CUSTOM_DATA_SPEED);
+		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieSpeed, TourManager.CUSTOM_DATA_SPEED);
 
-		setSegmentLayer(segmentValueLayers,
-				fTourData.segmentSerieGradient,
-				TourManager.CUSTOM_DATA_GRADIENT);
+		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieGradient, TourManager.CUSTOM_DATA_GRADIENT);
 
-		setSegmentLayer(segmentValueLayers,
-				fTourData.segmentSerieAltimeter,
-				TourManager.CUSTOM_DATA_ALTIMETER);
+		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieAltimeter, TourManager.CUSTOM_DATA_ALTIMETER);
 
-		setSegmentLayer(segmentValueLayers,
-				fTourData.segmentSeriePulse,
-				TourManager.CUSTOM_DATA_PULSE);
+		setSegmentLayer(segmentValueLayers, fTourData.segmentSeriePulse, TourManager.CUSTOM_DATA_PULSE);
 	}
 
 	private boolean setMinDefaultValue(	final String property,
@@ -902,10 +892,8 @@ public class TourChart extends Chart {
 			// disable chart synchronization
 
 			// enable zoom action
-			actionProxies.get(COMMAND_ID_CAN_SCROLL_CHART)
-					.setChecked(synchedChart.getCanScrollZoomedChart());
-			actionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER)
-					.setChecked(synchedChart.getCanAutoZoomToSlider());
+			actionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setChecked(synchedChart.getCanScrollZoomedChart());
+			actionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setChecked(synchedChart.getCanAutoZoomToSlider());
 
 			synchedChart.setZoomActionsEnabled(true);
 			synchedChart.updateZoomOptions(true);
@@ -950,8 +938,7 @@ public class TourChart extends Chart {
 		fActionProxies.get(COMMAND_ID_SHOW_START_TIME).setChecked(fTourChartConfig.isStartTime);
 
 		fActionProxies.get(COMMAND_ID_X_AXIS_TIME).setChecked(fTourChartConfig.showTimeOnXAxis);
-		fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE)
-				.setChecked(!fTourChartConfig.showTimeOnXAxis);
+		fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setChecked(!fTourChartConfig.showTimeOnXAxis);
 
 		updateZoomOptions();
 
@@ -1049,9 +1036,7 @@ public class TourChart extends Chart {
 		}
 
 		// keep min/max values for the 'old' chart in the chart config
-		if (fTourChartConfig != null
-				&& fTourChartConfig.getMinMaxKeeper() != null
-				&& keepMinMaxValues) {
+		if (fTourChartConfig != null && fTourChartConfig.getMinMaxKeeper() != null && keepMinMaxValues) {
 			fTourChartConfig.getMinMaxKeeper().saveMinMaxValues(getDataModel());
 		}
 
@@ -1059,8 +1044,9 @@ public class TourChart extends Chart {
 		fTourData = newTourData;
 		fTourChartConfig = newChartConfig;
 
-		final ChartDataModel newDataModel = TourManager.getInstance()
-				.createChartDataModel(newTourData, newChartConfig, isPropertyChanged);
+		final ChartDataModel newDataModel = TourManager.getInstance().createChartDataModel(newTourData,
+				newChartConfig,
+				isPropertyChanged);
 
 		// set the model before the actions are created
 		setDataModel(newDataModel);
