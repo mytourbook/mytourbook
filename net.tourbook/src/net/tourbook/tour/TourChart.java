@@ -770,11 +770,8 @@ public class TourChart extends Chart {
 		}
 
 		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieSpeed, TourManager.CUSTOM_DATA_SPEED);
-
 		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieGradient, TourManager.CUSTOM_DATA_GRADIENT);
-
 		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieAltimeter, TourManager.CUSTOM_DATA_ALTIMETER);
-
 		setSegmentLayer(segmentValueLayers, fTourData.segmentSeriePulse, TourManager.CUSTOM_DATA_PULSE);
 	}
 

@@ -280,8 +280,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 				return fRefTourXMarkerValueDifference;
 			}
 
-			public void xMarkerMoved(	final int movedXMarkerStartValueIndex,
-										final int movedXMarkerEndValueIndex) {
+			public void xMarkerMoved(final int movedXMarkerStartValueIndex, final int movedXMarkerEndValueIndex) {
 				onMoveSynchedMarker(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
 			}
 		});
@@ -299,8 +298,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 
 	private void enableSaveAction() {
 
-		boolean isNotMoved = fDefaultStartIndex == fMovedStartIndex
-				&& fDefaultEndIndex == fMovedEndIndex;
+		boolean isNotMoved = fDefaultStartIndex == fMovedStartIndex && fDefaultEndIndex == fMovedEndIndex;
 
 		fActionSaveComparedTour.setEnabled(isNotMoved == false || fCTCompareId == -1);
 	}
@@ -456,9 +454,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 
 				final ChartDataModel chartDataModel = fTourChart.getChartDataModel();
 
-				final float speed = TourManager.computeTourSpeed(chartDataModel,
-						fMovedStartIndex,
-						fMovedEndIndex);
+				final float speed = TourManager.computeTourSpeed(fTourData, fMovedStartIndex, fMovedEndIndex);
 
 				// set new data in entity
 				comparedTour.setStartIndex(fMovedStartIndex);
@@ -515,11 +511,10 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 			return true;
 		}
 
-		MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_QUESTION
-				| SWT.YES
-				| SWT.NO/*
-				 * | SWT.CANCEL
-				 */);
+		MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO/*
+		 * |
+		 * SWT.CANCEL
+		 */);
 
 		msgBox.setText(Messages.Tour_Map_dlg_save_compared_tour_title);
 		msgBox.setMessage(NLS.bind(Messages.Tour_Map_dlg_save_compared_tour_message,
@@ -636,8 +631,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 //			return false;
 //		}
 
-		TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance()
-				.getTourCompareConfig(fCTRefId);
+		TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(fCTRefId);
 
 		if (tourCompareConfig != null) {
 
@@ -655,8 +649,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 			/*
 			 * fire change event to update tour markers
 			 */
-			fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart,
-					fTourChart.getTourData()));
+			fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart, fTourChart.getTourData()));
 
 			return true;
 		}
@@ -733,8 +726,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 		final Long ctTourId = itemComparedTour.getTourId();
 
 		// check if the compared tour is already displayed
-		if (fCTTourId == ctTourId.longValue()
-				&& fComparedTourItem instanceof TourMapItemComparedTour) {
+		if (fCTTourId == ctTourId.longValue() && fComparedTourItem instanceof TourMapItemComparedTour) {
 			return;
 		}
 
@@ -773,9 +765,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 	 */
 	private void updateTourViewer(int startIndex, int endIndex) {
 
-		final float speed = TourManager.computeTourSpeed(fTourChart.getChartDataModel(),
-				startIndex,
-				endIndex);
+		final float speed = TourManager.computeTourSpeed(fTourData, startIndex, endIndex);
 
 		updateTourViewer(startIndex, endIndex, speed, false);
 	}
@@ -788,19 +778,15 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 	 * @param speed
 	 * @param isDataSaved
 	 */
-	private void updateTourViewer(	final int startIndex,
-									final int endIndex,
-									final float speed,
-									final boolean isDataSaved) {
+	private void updateTourViewer(final int startIndex, final int endIndex, final float speed, final boolean isDataSaved) {
 
-		TourManager.getInstance()
-				.firePropertyChange(TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED,
-						new TourPropertyCompareTourChanged(fCTCompareId,
-								startIndex,
-								endIndex,
-								speed,
-								isDataSaved,
-								fComparedTourItem));
+		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED,
+				new TourPropertyCompareTourChanged(fCTCompareId,
+						startIndex,
+						endIndex,
+						speed,
+						isDataSaved,
+						fComparedTourItem));
 	}
 
 }

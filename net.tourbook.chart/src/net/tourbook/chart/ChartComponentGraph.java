@@ -2066,37 +2066,34 @@ public class ChartComponentGraph extends Canvas {
 				yValue = graphYTop;
 			}
 
-			// set first point
+			final float devXValue = xValue * scaleX;
+
+			/*
+			 * set first point
+			 */
 			if (xValueIndex == startIndex) {
 
 				// move to the first point
 
-				float devStartPos;
-//				if (xValueIndex == 0) {
-//					// force start point
-//					devX0Pos = 0;
-//				} else {
-//					devX0Pos = (int) (xValue * scaleX);
-//				}
-				devStartPos = xValue * scaleX;
-
 				if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
 
 					// start from the bottom of the chart
-					path.moveTo(devStartPos, devChartY0Line - (graphYBottom * scaleY));
+					path.moveTo(devXValue, devChartY0Line - (graphYBottom * scaleY));
 
 				} else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
 					final int graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
 					// start from the x-axis
-					path.moveTo(devStartPos, devChartY0Line - (graphXAxisLine * scaleY));
+					path.moveTo(devXValue, devChartY0Line - (graphXAxisLine * scaleY));
 				}
 			}
 
-			// draw the line to the next point
-			path.lineTo(xValue * scaleX, devChartY0Line - (yValue * scaleY));
+			// draw line to the next point
+			path.lineTo(devXValue, devChartY0Line - (yValue * scaleY));
 
-			// set last point
+			/*
+			 * set last point
+			 */
 			if ((xValueIndex == endIndex - 1 && //
 			(graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM || //
 			graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO))) {
@@ -2115,8 +2112,8 @@ public class ChartComponentGraph extends Canvas {
 					graphXAxisLine = graphYBottom > 0 ? graphYBottom : graphYTop < 0 ? graphYTop : 0;
 				}
 
-				path.lineTo(xValue * scaleX, devChartY0Line - (graphXAxisLine * scaleY));
-				path.moveTo(xValue * scaleX, devChartY0Line - (graphXAxisLine * scaleY));
+				path.lineTo(devXValue, devChartY0Line - (graphXAxisLine * scaleY));
+				path.moveTo(devXValue, devChartY0Line - (graphXAxisLine * scaleY));
 			}
 		}
 

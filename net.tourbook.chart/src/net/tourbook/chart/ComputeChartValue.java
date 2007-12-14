@@ -17,8 +17,8 @@ package net.tourbook.chart;
 
 public abstract class ComputeChartValue {
 
-	public int				valuesIndexLeft;
-	public int				valuesIndexRight;
+	public int				valueIndexLeft;
+	public int				valueIndexRight;
 	public ChartDataXSerie	xData;
 	public ChartDataYSerie	yData;
 	public ChartDataModel	chartModel;

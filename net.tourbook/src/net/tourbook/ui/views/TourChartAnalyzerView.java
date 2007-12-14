@@ -34,6 +34,7 @@ import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
@@ -85,6 +86,8 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private int							fLayout;
 
+//	private int							fCounter;
+
 	/**
 	 * This class generates and contains the labels for one row in the view
 	 */
@@ -93,11 +96,20 @@ public class TourChartAnalyzerView extends ViewPart {
 		Label			left;
 		Label			right;
 
+		int				leftValue	= Integer.MIN_VALUE;
+		int				rightValue	= Integer.MIN_VALUE;
+
 		Label			min;
 		Label			max;
 
+		int				minValue	= Integer.MIN_VALUE;
+		int				maxValue	= Integer.MIN_VALUE;
+
 		Label			avg;
 		Label			diff;
+
+		int				avgValue	= Integer.MIN_VALUE;
+		int				diffValue	= Integer.MIN_VALUE;
 
 		ChartDataSerie	fChartData;
 
@@ -357,9 +369,9 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		// define the layout which is being used
 		int clientWidth = fPartContainer.getClientArea().width;
-		fLayout = clientWidth < 110 ? LAYOUT_TINY : clientWidth < 150
-				? LAYOUT_SMALL
-				: clientWidth < 370 ? LAYOUT_MEDIUM : LAYOUT_LARGE;
+		fLayout = clientWidth < 110 ? LAYOUT_TINY : clientWidth < 150 ? LAYOUT_SMALL : clientWidth < 370
+				? LAYOUT_MEDIUM
+				: LAYOUT_LARGE;
 
 		// create scrolled container
 		fScrolledContainer = new ScrolledComposite(fPartContainer, SWT.V_SCROLL | SWT.H_SCROLL);
@@ -625,9 +637,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		GridData gd;
 
-		int columns = fLayout == LAYOUT_TINY ? 1 : fLayout == LAYOUT_SMALL
-				? 2
-				: fLayout == LAYOUT_MEDIUM ? 3 : 8;
+		int columns = fLayout == LAYOUT_TINY ? 1 : fLayout == LAYOUT_SMALL ? 2 : fLayout == LAYOUT_MEDIUM ? 3 : 8;
 
 		gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 		gd.heightHint = 5;
@@ -685,6 +695,8 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void updateInfo(final SelectionChartInfo chartInfo) {
 
+//		long startTime = System.currentTimeMillis();
+
 		if (chartInfo == null) {
 			return;
 		}
@@ -717,6 +729,9 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		// refresh the layout after the data has changed
 		fPartContainer.layout();
+
+//		long endTime = System.currentTimeMillis();
+//		System.out.println(++fCounter + "  " + (endTime - startTime) + " ms");
 	}
 
 	private void updateInfo(SelectionChartXSliderPosition sliderPosition) {
@@ -740,28 +755,32 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void updateInfoData(final SelectionChartInfo chartInfo) {
 
+//		long startTime = System.currentTimeMillis();
+
 		final ChartDataXSerie xData = fDrawingData.get(0).getXData();
 		int valuesIndexLeft = chartInfo.leftSliderValuesIndex;
 		int valuesIndexRight = chartInfo.rightSliderValuesIndex;
 
+		int outCounter = 0;
+
 		for (final GraphInfo graphInfo : fGraphInfos) {
 
 			final ChartDataSerie serieData = graphInfo.fChartData;
-			TourChartAnalyzerInfo analyzerInfo = (TourChartAnalyzerInfo) serieData.getCustomData(TourManager.ANALYZER_INFO);
 
+			TourChartAnalyzerInfo analyzerInfo = (TourChartAnalyzerInfo) serieData.getCustomData(TourManager.ANALYZER_INFO);
 			if (analyzerInfo == null) {
 				// create default average object
 				analyzerInfo = new TourChartAnalyzerInfo();
 			}
 
 			final int xAxisUnit = serieData.getAxisUnit();
-
 			final int valueDivisor = serieData.getValueDivisor();
-			final int[] values = serieData.getHighValues()[0];
 
+			final int[] values = serieData.getHighValues()[0];
 			if (values == null) {
 				break;
 			}
+
 			if (valuesIndexLeft > values.length) {
 				valuesIndexLeft = values.length - 1;
 			}
@@ -803,56 +822,98 @@ public class TourChartAnalyzerView extends ViewPart {
 			}
 
 			final ComputeChartValue computeAvg = analyzerInfo.getComputeChartValue();
-
 			if (computeAvg != null) {
+
 				// average is computed by a callback method
-				computeAvg.valuesIndexLeft = valuesIndexLeft;
-				computeAvg.valuesIndexRight = valuesIndexRight;
+
+				computeAvg.valueIndexLeft = valuesIndexLeft;
+				computeAvg.valueIndexRight = valuesIndexRight;
 				computeAvg.xData = xData;
 				computeAvg.yData = (ChartDataYSerie) serieData;
 				computeAvg.chartModel = fChartDataModel;
+
 				avg = computeAvg.compute();
+
 			} else {
 				if (avgDiv != 0) {
 					avg = avg / avgDiv;
 				}
 			}
 
-			graphInfo.left.setText(ChartUtil.formatValue(leftValue, xAxisUnit, valueDivisor, true)
-					+ " "); //$NON-NLS-1$
-			graphInfo.right.setText(ChartUtil.formatValue(rightValue, xAxisUnit, valueDivisor, true)
-					+ " "); //$NON-NLS-1$
+			/*
+			 * optimize performance by displaying only changed values
+			 */
+			if (graphInfo.leftValue != leftValue) {
+				graphInfo.leftValue = leftValue;
+				graphInfo.left.setText(ChartUtil.formatValue(leftValue, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+				outCounter++;
+			}
 
-			graphInfo.min.setText(ChartUtil.formatValue(min, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
-			graphInfo.max.setText(ChartUtil.formatValue(max, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+			if (graphInfo.rightValue != rightValue) {
+				graphInfo.rightValue = rightValue;
+				graphInfo.right.setText(ChartUtil.formatValue(rightValue, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+				outCounter++;
+			}
+
+			if (graphInfo.minValue != min) {
+				graphInfo.minValue = min;
+				graphInfo.min.setText(ChartUtil.formatValue(min, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+				outCounter++;
+			}
+
+			if (graphInfo.maxValue != max) {
+				graphInfo.maxValue = max;
+				graphInfo.max.setText(ChartUtil.formatValue(max, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+				outCounter++;
+			}
 
 			// set average value
 			if (analyzerInfo.isShowAvg()) {
+
+				float avgValue = avg;
+
 				if (analyzerInfo.isShowAvgDecimals()) {
+
 					final int avgDivisor = (int) Math.pow(10, analyzerInfo.getAvgDecimals());
-					avg *= avgDivisor;
-					graphInfo.avg.setText(ChartUtil.formatInteger((int) avg,
-							avgDivisor,
-							analyzerInfo.getAvgDecimals(),
-							false)
-							+ " "); //$NON-NLS-1$
-//					graphInfo.avg.setText(valuesIndexLeft + " "); //$NON-NLS-1$
+
+					avgValue *= avgDivisor;
+
+					if (graphInfo.avgValue != avgValue) {
+						graphInfo.avgValue = (int) avgValue;
+						graphInfo.avg.setText(ChartUtil.formatInteger((int) avgValue,
+								avgDivisor,
+								analyzerInfo.getAvgDecimals(),
+								false)
+								+ " "); //$NON-NLS-1$
+						outCounter++;
+					}
+
 				} else {
-					graphInfo.avg.setText(ChartUtil.formatValue((int) avg,
-							xAxisUnit,
-							valueDivisor,
-							true)
-							+ " "); //$NON-NLS-1$
+					if (graphInfo.avgValue != avgValue) {
+						graphInfo.avgValue = (int) avgValue;
+						graphInfo.avg.setText(ChartUtil.formatValue((int) avgValue, xAxisUnit, valueDivisor, true)
+								+ " "); //$NON-NLS-1$
+						outCounter++;
+					}
 				}
+
 			} else {
-				graphInfo.avg.setText(""); //$NON-NLS-1$
+				graphInfo.avg.setText(UI.EMPTY_STRING);
+				outCounter++;
 			}
 
-			graphInfo.diff.setText(ChartUtil.formatValue(rightValue - leftValue,
-					xAxisUnit,
-					valueDivisor,
-					true)
-					+ " "); //$NON-NLS-1$
+			final int diffValue = rightValue - leftValue;
+			if (graphInfo.diffValue != diffValue) {
+				graphInfo.diffValue = diffValue;
+				graphInfo.diff.setText(ChartUtil.formatValue(diffValue, xAxisUnit, valueDivisor, true) + " "); //$NON-NLS-1$
+				outCounter++;
+			}
 		}
+
+//		System.out.print(outCounter);
+//
+//		long endTime = System.currentTimeMillis();
+//		System.out.println(" - " + (endTime - startTime) + " ms");
+
 	}
 }

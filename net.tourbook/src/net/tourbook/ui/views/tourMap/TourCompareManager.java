@@ -56,8 +56,6 @@ public class TourCompareManager {
 	private TourReference[]								refTourContext;
 	private TourData[]									refToursData;
 
-//	protected CompareResultView							tourComparerView;
-
 	private ArrayList<CompareResultItemComparedTour>	fComparedTourItems	= new ArrayList<CompareResultItemComparedTour>();
 
 	/**
@@ -98,8 +96,11 @@ public class TourCompareManager {
 		comparedTour.setTourDate(calendar.getTimeInMillis());
 		comparedTour.setStartYear(tourData.getStartYear());
 
-		float speed = TourManager.computeTourSpeed(tourData.getMetricDistanceSerie(),
-				tourData.timeSerie,
+//		float speed = TourManager.computeTourSpeed(tourData.getMetricDistanceSerie(),
+//				tourData.timeSerie,
+//				comparedTourItem.computedStartIndex,
+//				comparedTourItem.computedEndIndex);
+		float speed = TourManager.computeTourSpeed(tourData,
 				comparedTourItem.computedStartIndex,
 				comparedTourItem.computedEndIndex);
 
@@ -203,8 +204,7 @@ public class TourCompareManager {
 							}
 
 							// compare the tour
-							CompareResultItemComparedTour compareResult = compareTour(refTourIndex,
-									compareTourData);
+							CompareResultItemComparedTour compareResult = compareTour(refTourIndex, compareTourData);
 
 							// ignore tours which could not be compared
 							if (compareResult.computedStartIndex != -1) {
@@ -245,8 +245,7 @@ public class TourCompareManager {
 					try {
 
 						// show compare result perspective
-						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID,
-								window);
+						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
 
 						CompareResultView view = (CompareResultView) window.getActivePage()
 								.showView(CompareResultView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
@@ -255,11 +254,13 @@ public class TourCompareManager {
 							view.updateViewer();
 						}
 
-					} catch (PartInitException e) {
+					}
+					catch (PartInitException e) {
 						ErrorDialog.openError(window.getShell(), "Error", e.getMessage(), e //$NON-NLS-1$
 						.getStatus());
 						e.printStackTrace();
-					} catch (WorkbenchException e) {
+					}
+					catch (WorkbenchException e) {
 						e.printStackTrace();
 					}
 				}
@@ -305,9 +306,7 @@ public class TourCompareManager {
 		final int[] compareTourDataTime = compareTourData.timeSerie;
 
 		// normalize the tour which will be compared
-		compareTourNormalizer.normalizeAltitude(compareTourData,
-				0,
-				compareTourDataDistance.length - 1);
+		compareTourNormalizer.normalizeAltitude(compareTourData, 0, compareTourDataDistance.length - 1);
 
 		int[] normCompDistances = compareTourNormalizer.getNormalizedDistance();
 		int[] normCompAltitudes = compareTourNormalizer.getNormalizedAltitude();
@@ -342,25 +341,22 @@ public class TourCompareManager {
 
 			int altitudeDiff = -1;
 
-//			int startAltDiff = Math.abs(normCompAltitudes[normCompareIndex] - normRefAltitudes[0]);
-
 			// loop: all data in the reference tour
 			for (int normRefIndex = 0; normRefIndex < normRefAltitudes.length; normRefIndex++) {
 
 				int compareRefIndex = normCompareIndex + normRefIndex;
 
-				// make sure the ref index is not bigger than the compare index,
-				// this can happen when the reference data exeed the compare
-				// data
+				/*
+				 * make sure the ref index is not bigger than the compare index, this can happen
+				 * when the reference data exeed the compare data
+				 */
 				if (compareRefIndex == compareLastIndex) {
 					altitudeDiff = -1;
 					break;
 				}
 
 				// get the altitude difference between the reference and the compared value
-				altitudeDiff += Math.abs(normRefAltitudes[normRefIndex]
-						- normCompAltitudes[compareRefIndex]);
-				// - startAltDiff);
+				altitudeDiff += Math.abs(normRefAltitudes[normRefIndex] - normCompAltitudes[compareRefIndex]);
 			}
 
 			// keep altitude difference
@@ -417,37 +413,6 @@ public class TourCompareManager {
 		}
 		compareEndIndex = Math.min(compareEndIndex, compareTourDataDistance.length - 1);
 
-		int compareDistance = compareTourDataDistance[compareEndIndex]
-				- compareTourDataDistance[compareStartIndex];
-
-		// remove the breaks from the time
-		int timeInterval = compareTourDataTime[1] - compareTourDataTime[0];
-		if (timeInterval == 0 && compareTourDataTime.length > 1) {
-			timeInterval = compareTourDataTime[2] - compareTourDataTime[1];
-		}
-		int ignoreTimeSlices = timeInterval == 0
-				? 0
-				: TourManager.getIgnoreTimeSlices(compareTourDataTime,
-						compareStartIndex,
-						compareEndIndex,
-						10 / timeInterval);
-
-		int recordingTime = compareTourDataTime[compareEndIndex]
-				- compareTourDataTime[compareStartIndex];
-
-		int drivingTime = recordingTime - (ignoreTimeSlices * timeInterval);
-
-//		// overwrite the changed data series
-//		compareTourData.distanceSerie = compareTourNormalizer.getNormalizedDistance();
-//		compareTourData.altitudeSerie = compareTourNormalizer.getNormalizedAltitude();
-//		compareTourData.pulseSerie = normCompAltiDiff;
-//
-//		// set the same array size for each data serie
-//		compareTourData.timeSerie = compareTourNormalizer.getNormalizedTime();
-//		compareTourData.speedSerie = compareTourNormalizer.getNormalizedTime();
-//		compareTourData.cadenceSerie = compareTourNormalizer.getNormalizedTime();
-//		compareTourData.temperatureSerie = compareTourNormalizer.getNormalizedTime();
-
 		/*
 		 * create data serie for altitude difference
 		 */
@@ -480,6 +445,9 @@ public class TourCompareManager {
 		compareResultItem.normalizedStartIndex = normCompareIndexStart;
 		compareResultItem.normalizedEndIndex = normCompareIndexStart + normIndexDiff;
 
+		int compareDistance = compareTourDataDistance[compareEndIndex] - compareTourDataDistance[compareStartIndex];
+		int recordingTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
+		int drivingTime = recordingTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex);
 		compareResultItem.compareDrivingTime = drivingTime;
 		compareResultItem.compareRecordingTime = recordingTime;
 		compareResultItem.compareDistance = compareDistance;
@@ -525,9 +493,11 @@ public class TourCompareManager {
 				ts.commit();
 			}
 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			if (ts.isActive()) {
 				ts.rollback();
 			} else {

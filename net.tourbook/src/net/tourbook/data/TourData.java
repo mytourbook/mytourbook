@@ -38,7 +38,6 @@ import net.tourbook.Messages;
 import net.tourbook.chart.ChartMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -341,7 +340,7 @@ public class TourData {
 	public int					offsetDDRecord;
 
 	@Transient
-	private Object[]			fTourSegments;
+	protected Object[]			fTourSegments;
 
 	/*
 	 * data for the tour segments
@@ -398,6 +397,8 @@ public class TourData {
 
 		altimeterSerie = null;
 		altimeterSerieImperial = null;
+
+		powerSerie = null;
 	}
 
 	public void computeAltimeterGradientSerie() {
@@ -443,13 +444,29 @@ public class TourData {
 
 			// use internal algorithm to compute altimeter and gradient
 
+//			if (deviceTimeInterval <= 2) {
+//				adjustIndexLow = 15;
+//				adjustmentIndexHigh = 15;
+//				
+//			} else if (deviceTimeInterval <= 5) {
+//				adjustIndexLow = 5;
+//				adjustmentIndexHigh = 6;
+//				
+//			} else if (deviceTimeInterval <= 10) {
+//				adjustIndexLow = 2;
+//				adjustmentIndexHigh = 3;
+//			} else {
+//				adjustIndexLow = 1;
+//				adjustmentIndexHigh = 2;
+//			}
+
 			if (deviceTimeInterval <= 2) {
 				adjustIndexLow = 15;
 				adjustmentIndexHigh = 15;
 
 			} else if (deviceTimeInterval <= 5) {
-				adjustIndexLow = 5;
-				adjustmentIndexHigh = 6;
+				adjustIndexLow = 4;
+				adjustmentIndexHigh = 4;
 
 			} else if (deviceTimeInterval <= 10) {
 				adjustIndexLow = 2;
@@ -643,6 +660,56 @@ public class TourData {
 		}
 	}
 
+	private int computeBreakTimeVariable(final int minStopTime, int startIndex, int endIndex) {
+
+		endIndex = Math.min(endIndex, timeSerie.length - 1);
+
+		int lastMovingDistance = 0;
+		int lastMovingTime = 0;
+
+		int totalBreakTime = 0;
+		int breakTime = 0;
+		int currentBreakTime = 0;
+
+		for (int serieIndex = startIndex; serieIndex <= endIndex; serieIndex++) {
+
+			final int currentDistance = distanceSerie[serieIndex];
+			final int currentTime = timeSerie[serieIndex];
+
+			final int timeDiff = currentTime - lastMovingTime;
+			final int distDiff = currentDistance - lastMovingDistance;
+
+			if (distDiff == 0 || timeDiff > 20 && distDiff < 5) {
+
+				// distance has not changed, check if a longer stop is done
+
+				final int breakDiff = currentTime - currentBreakTime;
+
+				breakTime += breakDiff;
+
+				if (timeDiff > minStopTime) {
+
+					// person has stopped for a break
+					totalBreakTime += breakTime;
+
+					breakTime = 0;
+					currentBreakTime = currentTime;
+				}
+
+			} else {
+
+				// keep time and distance when the distance is changing
+				lastMovingTime = currentTime;
+				lastMovingDistance = currentDistance;
+
+				breakTime = 0;
+				currentBreakTime = currentTime;
+			}
+		}
+
+		return totalBreakTime;
+	}
+
 	public void computeMaxAltitude() {
 		int maxAltitude = 0;
 		for (int altitude : altitudeSerie) {
@@ -665,8 +732,10 @@ public class TourData {
 	}
 
 	public void computeMaxSpeed() {
+
 		float maxSpeed = 0;
 		int anzValuesSum = 1;
+
 		if (distanceSerie.length >= 2) {
 			if (deviceTimeInterval > 0) {
 				anzValuesSum = MIN_TIMEINTERVAL_FOR_MAX_SPEED / deviceTimeInterval;
@@ -796,7 +865,7 @@ public class TourData {
 		int highIndexAdjustmentDefault = 0;
 
 		if (deviceTimeInterval <= 2) {
-			lowIndexAdjustmentDefault = 2;
+			lowIndexAdjustmentDefault = 3;
 			highIndexAdjustmentDefault = 3;
 
 		} else if (deviceTimeInterval <= 5) {
@@ -969,71 +1038,7 @@ public class TourData {
 	}
 
 	public void computeTourDrivingTime() {
-
-		int maxIndex = Math.max(0, timeSerie.length - 1);
-		final int minStopTime = 10;
-
-		if (deviceTimeInterval == -1) {
-
-			// variable time slices
-
-			int lastMovingDistance = 0;
-			int lastMovingTime = 0;
-
-			int totalBreakTime = 0;
-			int breakTime = 0;
-			int currentBreakTime = 0;
-
-			for (int serieIndex = 0; serieIndex < distanceSerie.length; serieIndex++) {
-
-				final int currentDistance = distanceSerie[serieIndex];
-				final int currentTime = timeSerie[serieIndex];
-
-				final int timeDiff = currentTime - lastMovingTime;
-				final int distDiff = currentDistance - lastMovingDistance;
-
-				if (distDiff == 0 || timeDiff > 20 && distDiff < 5) {
-
-					// distance has not changed, check if a longer stop is done
-
-					final int breakDiff = currentTime - currentBreakTime;
-
-					breakTime += breakDiff;
-
-					if (timeDiff > minStopTime) {
-
-						// person has stopped for a break
-						totalBreakTime += breakTime;
-
-						breakTime = 0;
-						currentBreakTime = currentTime;
-					}
-
-				} else {
-
-					// keep time and distance when the distance is changing
-					lastMovingTime = currentTime;
-					lastMovingDistance = currentDistance;
-
-					breakTime = 0;
-					currentBreakTime = currentTime;
-				}
-			}
-
-			tourDrivingTime = timeSerie[maxIndex] - totalBreakTime;
-
-		} else {
-
-			// fixed time slices
-
-			int ignoreTimeSlices = deviceTimeInterval == 0 ? 0 : TourManager.getIgnoreTimeSlices(distanceSerie,
-					0,
-					maxIndex,
-					minStopTime / deviceTimeInterval);
-
-			tourDrivingTime = Math.max(0, timeSerie[maxIndex] - (ignoreTimeSlices * deviceTimeInterval));
-		}
-
+		tourDrivingTime = timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length);
 	}
 
 	/**
@@ -1313,7 +1318,7 @@ public class TourData {
 			segmentSerieDistance[segmentIndex] = segment.distance = distanceEnd - distanceStart;
 
 			segmentSerieTime[segmentIndex] = segment.recordingTime = recordingTime;
-			final int ignoreTimeSlices = timeSlice == 0 ? 0 : TourManager.getIgnoreTimeSlices(distanceSerie,
+			final int ignoreTimeSlices = timeSlice == 0 ? 0 : getBreakTimeSlices(distanceSerie,
 					segmentStartIndex,
 					segmentEndIndex,
 					10 / timeSlice);
@@ -1529,6 +1534,68 @@ public class TourData {
 	}
 
 	/**
+	 * Computes the time between start index and end index when the speed is <code>0</code>
+	 * 
+	 * @param startIndex
+	 * @param endIndex
+	 * @return Returns the break time in seconds
+	 */
+	public int getBreakTime(int startIndex, int endIndex) {
+
+		final int minBreakTime = 10;
+
+		if (deviceTimeInterval == -1) {
+
+			// variable time slices
+
+			return computeBreakTimeVariable(minBreakTime, startIndex, endIndex);
+
+		} else {
+
+			// fixed time slices
+
+			int ignoreTimeSlices = deviceTimeInterval == 0 ? //
+					0
+					: getBreakTimeSlices(distanceSerie, startIndex, endIndex, minBreakTime / deviceTimeInterval);
+
+			return ignoreTimeSlices * deviceTimeInterval;
+		}
+	}
+
+	/**
+	 * calculate the driving time, ignore the time when the distance is 0 within a time period which
+	 * is defined by <code>sliceMin</code>
+	 * 
+	 * @param distanceValues
+	 * @param indexLeft
+	 * @param indexRight
+	 * @param sliceMin
+	 * @return Returns the number of slices which can be ignored
+	 */
+	private int getBreakTimeSlices(final int[] distanceValues, final int indexLeft, int indexRight, int sliceMin) {
+
+		int ignoreTimeCounter = 0;
+		int oldDistance = 0;
+
+		sliceMin = Math.max(sliceMin, 1);
+		indexRight = Math.min(indexRight, distanceValues.length - 1);
+
+		for (int valueIndex = indexLeft; valueIndex <= indexRight; valueIndex++) {
+
+			if (distanceValues[valueIndex] == oldDistance) {
+				ignoreTimeCounter++;
+			}
+
+			int oldIndex = valueIndex - sliceMin;
+			if (oldIndex < 0) {
+				oldIndex = 0;
+			}
+			oldDistance = distanceValues[oldIndex];
+		}
+		return ignoreTimeCounter;
+	}
+
+	/**
 	 * @return the calories
 	 */
 	public String getCalories() {
@@ -1649,8 +1716,8 @@ public class TourData {
 	}
 
 	/**
-	 * @return Returns the distance serie in the metric system, the distance serie is saved in the
-	 *         database <b>always</b> in the metric system
+	 * @return Returns the distance serie from the metric system, the distance serie is <b>always</b>
+	 *         saved in the database in the metric system
 	 */
 	public int[] getMetricDistanceSerie() {
 		return distanceSerie;
@@ -1682,9 +1749,9 @@ public class TourData {
 
 	public int[] getPowerSerie() {
 
-//		if (powerSerie != null) {
-//			return powerSerie;
-//		}
+		if (powerSerie != null) {
+			return powerSerie;
+		}
 
 		powerSerie = new int[timeSerie.length];
 
@@ -1719,13 +1786,17 @@ public class TourData {
 			float gradient = (float) gradientSerie[timeIndex] / 1000; // gradient (%) /10 /100
 
 			// adjust computed errors
-			if (gradient < 0.02 && gradient > 0) {
-				gradient *= 0.5;
-//				gradient = 0;
-			}
+//			if (gradient < 0.04 && gradient > 0) {
+//				gradient *= 0.5;
+////				gradient = 0;
+//			}
 
 			if (gradient < 0) {
-				gradient *= 1.5;
+				if (gradient < -0.02) {
+					gradient *= 3;
+				} else {
+					gradient *= 1.5;
+				}
 			}
 
 			final float fSlopeTotal = fSlope * gradient;
@@ -2113,6 +2184,11 @@ public class TourData {
 		this.deviceTotalUp = deviceTotalUp;
 	}
 
+/*
+ * private int maxAltitude; private int maxPulse; private int avgPulse; private int avgCadence;
+ * private int avgTemperature; private float maxSpeed;
+ */
+
 	public void setDeviceTourType(String tourType) {
 		this.deviceTourType = tourType;
 	}
@@ -2120,11 +2196,6 @@ public class TourData {
 	public void setDeviceTravelTime(long deviceTravelTime) {
 		this.deviceTravelTime = deviceTravelTime;
 	}
-
-/*
- * private int maxAltitude; private int maxPulse; private int avgPulse; private int avgCadence;
- * private int avgTemperature; private float maxSpeed;
- */
 
 	public void setDeviceWeight(int deviceWeight) {
 		this.deviceWeight = deviceWeight;
