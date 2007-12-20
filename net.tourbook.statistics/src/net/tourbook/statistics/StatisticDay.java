@@ -122,8 +122,10 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 		fChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
-				fSelectedTourId = fTourDataTour.fTourIds[valueIndex];
-				fPostSelectionProvider.setSelection(new SelectionTourId(fSelectedTourId));
+				if (fTourDataTour.fTypeIds.length > 0) {
+					fSelectedTourId = fTourDataTour.fTourIds[valueIndex];
+					fPostSelectionProvider.setSelection(new SelectionTourId(fSelectedTourId));
+				}
 			}
 		});
 

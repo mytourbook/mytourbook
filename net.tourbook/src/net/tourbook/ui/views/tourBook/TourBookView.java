@@ -487,23 +487,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		});
 
 		/*
-		 * column: title
-		 */
-		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(ViewerCell cell) {
-				final Object element = cell.getElement();
-				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
-				if (element instanceof TVITourBookTour) {
-					cell.setText(tourItem.fTourTitle);
-				} else {
-					setCellColor(cell, element);
-				}
-			}
-		});
-
-		/*
 		 * column: distance (km/miles)
 		 */
 		colDef = TreeColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
@@ -583,6 +566,23 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
 				cell.setText(Long.toString((long) (tourItem.fColumnAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
 				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: title
+		 */
+		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+				final Object element = cell.getElement();
+				TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
+				if (element instanceof TVITourBookTour) {
+					cell.setText(tourItem.fTourTitle);
+				} else {
+					setCellColor(cell, element);
+				}
 			}
 		});
 
@@ -777,8 +777,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		menuMgr.add(fActionEditTour);
 		menuMgr.add(fActionDeleteTour);
 
-		menuMgr.add(new Separator());
-		menuMgr.add(fActionModifyColumns);
+//		menuMgr.add(new Separator());
+//		menuMgr.add(fActionModifyColumns);
 
 		enableActions();
 	}

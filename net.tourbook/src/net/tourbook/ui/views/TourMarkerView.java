@@ -411,12 +411,6 @@ public class TourMarkerView extends ViewPart {
 		fMarkerViewer.setContentProvider(new MarkerViewerContentProvicer());
 		fMarkerViewer.setSorter(new MarkerViewerSorter());
 
-//		fMarkerViewer.addDoubleClickListener(new IDoubleClickListener() {
-//			public void doubleClick(DoubleClickEvent event) {
-//				editMarker();
-//			}
-//		});
-
 		fMarkerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				StructuredSelection selection = (StructuredSelection) event.getSelection();

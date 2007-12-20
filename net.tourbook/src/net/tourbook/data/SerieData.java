@@ -20,40 +20,23 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 
-/**
- * @author Administrator
- * 
- */
 public class SerieData implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long	serialVersionUID	= 1L;
 
-	public int timeSerie[];
-	public int distanceSerie[];
+	public int					timeSerie[];
+	public int					distanceSerie[];
 
-	public int altitudeSerie[];
-	public int cadenceSerie[];
-	public int pulseSerie[];
-	public int temperatureSerie[];
+	public int					altitudeSerie[];
+	public int					cadenceSerie[];
+	public int					pulseSerie[];
+	public int					temperatureSerie[];
 
-	public int speedSerie[];
-	public int powerSerie[];
+	public int					speedSerie[];
+	public int					powerSerie[];
 
-	public int deviceMarker[];
+	public int					deviceMarker[];
 
-	public SerieData(int length) {
-	
-		timeSerie = new int[length];
-		distanceSerie = new int[length];
-		altitudeSerie = new int[length];
-		cadenceSerie = new int[length];
-		pulseSerie = new int[length];
-		temperatureSerie = new int[length];
-
-		speedSerie = new int[length];
-		powerSerie = new int[length];
-	}
+	public double				longitude[];
+	public double				latitude[];
 }

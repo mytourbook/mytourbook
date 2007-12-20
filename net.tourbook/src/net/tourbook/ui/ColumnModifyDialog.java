@@ -68,6 +68,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
 
+	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(Messages.ColumnModifyDialog_Dialog_title);
@@ -84,6 +85,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		fBtnMoveUp = new Button(btnContainer, SWT.NONE);
 		fBtnMoveUp.setText(Messages.ColumnModifyDialog_Button_move_up);
 		fBtnMoveUp.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				moveSelectionUp();
 				enableUpDownButtons();
@@ -94,6 +96,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		fBtnMoveDown = new Button(btnContainer, SWT.NONE);
 		fBtnMoveDown.setText(Messages.ColumnModifyDialog_Button_move_down);
 		fBtnMoveDown.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				moveSelectionDown();
 				enableUpDownButtons();
@@ -107,6 +110,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		fBtnSelectAll = new Button(btnContainer, SWT.NONE);
 		fBtnSelectAll.setText(Messages.ColumnModifyDialog_Button_select_all);
 		fBtnSelectAll.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 
 				// update model
@@ -123,6 +127,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		fBtnDeselectAll = new Button(btnContainer, SWT.NONE);
 		fBtnDeselectAll.setText(Messages.ColumnModifyDialog_Button_deselect_all);
 		fBtnDeselectAll.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 
 				// list with all columns which must be checked
@@ -162,14 +167,14 @@ public class ColumnModifyDialog extends TrayDialog {
 		tableLayouter.addColumnData(new ColumnWeightData(1, true));
 
 		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
 			public void update(ViewerCell cell) {
 				ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
 				cell.setText(colDef.getLabel());
 
 				// paint columns in a different color which can't be hidden
 				if (colDef.canModifyVisibility() == false) {
-					cell.setForeground(Display.getCurrent().getSystemColor(
-							SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 				}
 			}
 		});
@@ -213,6 +218,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		});
 	}
 
+	@Override
 	protected Control createDialogArea(Composite parent) {
 
 		Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
@@ -224,10 +230,10 @@ public class ColumnModifyDialog extends TrayDialog {
 		// check visible columns
 		ArrayList<ColumnDefinition> visibleColumns = new ArrayList<ColumnDefinition>();
 		for (ColumnDefinition colDef : fColumnManager.getColumns()) {
-			
+
 			final boolean isVisible = colDef.isVisible();
 			colDef.setIsVisibleInDialog(isVisible);
-			
+
 			if (isVisible) {
 				visibleColumns.add(colDef);
 			}
@@ -262,6 +268,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		createButtons(dlgContainer);
 	}
 
+	@Override
 	protected void okPressed() {
 
 		// update column definition with the check state
@@ -273,7 +280,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		}
 
 		fColumnManager.orderColumns(fColumnViewer.getTable().getItems());
-		
+
 		super.okPressed();
 	}
 
@@ -284,24 +291,28 @@ public class ColumnModifyDialog extends TrayDialog {
 
 		Table table = fColumnViewer.getTable();
 		TableItem[] items = table.getSelection();
+
 		boolean isSelected = items != null && items.length > 0;
 
 		boolean isUpEnabled = isSelected;
 		boolean isDownEnabled = isSelected;
 
 		if (isSelected) {
+
 			int indices[] = table.getSelectionIndices();
 			int max = table.getItemCount();
+
 			isUpEnabled = indices[0] != 0;
 			isDownEnabled = indices[indices.length - 1] < max - 1;
 		}
+
 		fBtnMoveUp.setEnabled(isUpEnabled);
 		fBtnMoveDown.setEnabled(isDownEnabled);
 	}
 
+	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
-		return TourbookPlugin.getDefault().getDialogSettingsSection(
-				getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
+		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
 	}
 
 	/**

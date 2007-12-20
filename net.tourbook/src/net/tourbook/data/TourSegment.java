@@ -31,5 +31,7 @@ public class TourSegment {
 	// computed values
 	public float	speed;
 	public float	gradient;
+	public float	pace;
+	public int		power;
 
 }

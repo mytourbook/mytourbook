@@ -432,6 +432,8 @@ public class Messages extends NLS {
 	public static String		Tour_Properties_Label_start_location;
 	public static String		Tour_Properties_Label_start_time;
 	public static String		Tour_Properties_label_time;
+
+	public static String	Tour_Properties_label_tour_data;
 	public static String		Tour_Properties_Label_tour_date;
 	public static String		Tour_Properties_Label_tour_title;
 	public static String		Tour_Properties_Label_tour_type;

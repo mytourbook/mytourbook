@@ -769,10 +769,12 @@ public class TourChart extends Chart {
 			yData.setCustomLayers(customLayers);
 		}
 
+		setSegmentLayer(segmentValueLayers, fTourData.segmentSeriePulse, TourManager.CUSTOM_DATA_PULSE);
 		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieSpeed, TourManager.CUSTOM_DATA_SPEED);
+		setSegmentLayer(segmentValueLayers, fTourData.segmentSeriePace, TourManager.CUSTOM_DATA_PACE);
+		setSegmentLayer(segmentValueLayers, fTourData.segmentSeriePower, TourManager.CUSTOM_DATA_POWER);
 		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieGradient, TourManager.CUSTOM_DATA_GRADIENT);
 		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieAltimeter, TourManager.CUSTOM_DATA_ALTIMETER);
-		setSegmentLayer(segmentValueLayers, fTourData.segmentSeriePulse, TourManager.CUSTOM_DATA_PULSE);
 	}
 
 	private boolean setMinDefaultValue(	final String property,

@@ -785,7 +785,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		// set slider position
 		fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
 				newSelectedMarker.getSerieIndex(),
-				SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {});
+				SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
 	}
 
 	private void restoreDialogSettings() {

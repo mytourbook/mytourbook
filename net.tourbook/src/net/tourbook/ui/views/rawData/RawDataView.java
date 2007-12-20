@@ -257,9 +257,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				}
 			}
 		};
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	private void addSelectionListener() {
@@ -272,7 +270,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 					final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
 					final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
 
-					if (removedTours.size() == 0) { return; }
+					if (removedTours.size() == 0) {
+						return;
+					}
 
 					if (fIsPartVisible) {
 
@@ -292,7 +292,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
 
@@ -415,10 +415,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		// parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		// table
-		final Table table = new Table(parent, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.FULL_SELECTION
-				| SWT.MULTI);
+		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
 
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		table.setHeaderVisible(true);
@@ -447,7 +444,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 				final TourData tourData = (TourData) selection.getFirstElement();
 
-				if (tourData == null) { return; }
+				if (tourData == null) {
+					return;
+				}
 
 				fPostSelectionProvider.setSelection(new SelectionTourData(null, tourData));
 			}
@@ -476,15 +475,11 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 				// show the database indicator for the person who owns the tour
 				final TourPerson tourPerson = ((TourData) cell.getElement()).getTourPerson();
-				final long activePersonId = fActivePerson == null
-						? -1
-						: fActivePerson.getPersonId();
+				final long activePersonId = fActivePerson == null ? -1 : fActivePerson.getPersonId();
 
 				cell.setImage(tourPerson == null
 						? imageDatabasePlaceholder
-						: tourPerson.getPersonId() == activePersonId
-								? imageDatabase
-								: imageDatabaseOtherPerson);
+						: tourPerson.getPersonId() == activePersonId ? imageDatabase : imageDatabaseOtherPerson);
 			}
 		});
 
@@ -499,9 +494,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 				final TourData tourData = (TourData) cell.getElement();
 
-				fCalendar.set(tourData.getStartYear(),
-						tourData.getStartMonth() - 1,
-						tourData.getStartDay());
+				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 				cell.setText(fDateFormatter.format(fCalendar.getTime()));
 			}
 		});
@@ -526,18 +519,6 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				fCalendar.set(0, 0, 0, tourData.getStartHour(), tourData.getStartMinute(), 0);
 
 				cell.setText(fTimeFormatter.format(fCalendar.getTime()));
-			}
-		});
-
-		/*
-		 * column: tour title
-		 */
-		colDef = TableColumnFactory.TOUR_TITLE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(ViewerCell cell) {
-				final TourData tourData = (TourData) cell.getElement();
-				cell.setText(tourData.getTourTitle());
 			}
 		});
 
@@ -590,12 +571,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				final int drivingTime = ((TourData) cell.getElement()).getTourDrivingTime();
 
 				if (drivingTime != 0) {
-					fCalendar.set(0,
-							0,
-							0,
-							drivingTime / 3600,
-							((drivingTime % 3600) / 60),
-							((drivingTime % 3600) % 60));
+					fCalendar.set(0, 0, 0, drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
 
 					cell.setText(fDurationFormatter.format(fCalendar.getTime()));
 				}
@@ -613,9 +589,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				if (tourDistance != 0) {
 					fNumberFormatter.setMinimumFractionDigits(2);
 					fNumberFormatter.setMaximumFractionDigits(2);
-					cell.setText(fNumberFormatter.format(((float) tourDistance)
-							/ 1000
-							/ UI.UNIT_VALUE_DISTANCE));
+					cell.setText(fNumberFormatter.format(((float) tourDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
 			}
 		});
@@ -669,6 +643,18 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			}
 		});
 
+		/*
+		 * column: tour title
+		 */
+		colDef = TableColumnFactory.TOUR_TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+				final TourData tourData = (TourData) cell.getElement();
+				cell.setText(tourData.getTourTitle());
+			}
+		});
+
 		TableColumnFactory.DEVICE_PROFILE.createColumn(fColumnManager, pixelConverter);
 		TableColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);
 		TableColumnFactory.DEVICE_NAME.createColumn(fColumnManager, pixelConverter);
@@ -693,14 +679,12 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		getSite().getPage().removeSelectionListener(fPostSelectionListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		final IStructuredSelection tourSelection = (IStructuredSelection) fTourViewer.getSelection();
@@ -759,11 +743,13 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fPostSelectionProvider.setSelection(selection);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 
-		if (adapter == ColumnViewer.class) { return fTourViewer; }
+		if (adapter == ColumnViewer.class) {
+			return fTourViewer;
+		}
 
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
@@ -842,8 +828,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 				final RawDataManager rawDataManager = RawDataManager.getInstance();
 
-				String[] files = StringToArrayConverter.convertStringToArray(mementoImportedFiles,
-						FILESTRING_SEPARATOR);
+				String[] files = StringToArrayConverter.convertStringToArray(mementoImportedFiles, FILESTRING_SEPARATOR);
 				int importCounter = 0;
 
 				// loop: import all files
@@ -882,7 +867,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		// save sash weights
 		final Table table = fTourViewer.getTable();
 
-		if (table.isDisposed()) { return; }
+		if (table.isDisposed()) {
+			return;
+		}
 
 		memento.putInteger(MEMENTO_SASH_CONTAINER, table.getSize().x);
 
@@ -904,8 +891,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		// save columns width
 		final String[] columnIdAndWidth = fColumnManager.getColumnIdAndWidth();
 		if (columnIdAndWidth != null) {
-			memento.putString(MEMENTO_COLUMN_WIDTH,
-					StringToArrayConverter.convertArrayToString(columnIdAndWidth));
+			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(columnIdAndWidth));
 		}
 	}
 
@@ -922,9 +908,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 	void selectLastTour() {
 
-		final Collection<TourData> tourDataCollection = RawDataManager.getInstance()
-				.getTourDataMap()
-				.values();
+		final Collection<TourData> tourDataCollection = RawDataManager.getInstance().getTourDataMap().values();
 
 		final TourData[] tourList = tourDataCollection.toArray(new TourData[tourDataCollection.size()]);
 

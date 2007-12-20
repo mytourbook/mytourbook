@@ -65,7 +65,7 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int			TOURBOOK_DB_VERSION				= 5;
+	private static final int			TOURBOOK_DB_VERSION				= 4;
 
 	public final static String			TABLE_TOUR_DATA					= "TourData";								//$NON-NLS-1$
 	public final static String			TABLE_TOUR_MARKER				= "TourMarker";							//$NON-NLS-1$
@@ -136,7 +136,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tours in database
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private static ArrayList<Long> getAllTourIds() {
 
 		ArrayList<Long> tourList = new ArrayList<Long>();
@@ -166,7 +166,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourBike> getTourBikes() {
 
 		ArrayList<TourBike> bikeList = new ArrayList<TourBike>();
@@ -211,7 +211,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour people in the db sorted by last/first name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourPerson> getTourPeople() {
 
 		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
@@ -235,7 +235,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types which are stored in the database sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourType> getTourTypes() {
 
 		if (fTourTypes != null) {
@@ -292,9 +292,11 @@ public class TourDatabase {
 				ts.commit();
 			}
 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			if (ts.isActive()) {
 				ts.rollback();
 			} else {
@@ -363,9 +365,11 @@ public class TourDatabase {
 //
 //				}
 
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				e.printStackTrace();
-			} finally {
+			}
+			finally {
 				if (ts.isActive()) {
 					ts.rollback();
 				} else {
@@ -404,8 +408,7 @@ public class TourDatabase {
 
 			try {
 
-				final MyTourbookSplashHandler splashHandler = TourbookPlugin.getDefault()
-						.getSplashHandler();
+				final MyTourbookSplashHandler splashHandler = TourbookPlugin.getDefault().getSplashHandler();
 
 				if (splashHandler == null) {
 					throw new MyTourbookException("Cannot get Splash Handler"); //$NON-NLS-1$
@@ -415,9 +418,11 @@ public class TourDatabase {
 					runnableStartServer.run(splashProgressMonitor);
 				}
 
-			} catch (InvocationTargetException e) {
+			}
+			catch (InvocationTargetException e) {
 				e.printStackTrace();
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
@@ -660,9 +665,16 @@ public class TourDatabase {
 						// version 4 end
 
 						// version 5 start
-						+ "gpsData 				BLOB,				\n" //$NON-NLS-1$
+						/**
+						 * disabled because when two blob object's are deserialized then the error
+						 * occures:
+						 * <p>
+						 * java.io.StreamCorruptedException: invalid stream header: 00ACED00
+						 * <p>
+						 * therefor the gpsData are put into the serieData object
+						 */
+//						+ "gpsData 				BLOB,				\n" //$NON-NLS-1$
 						// version 5 end
-
 						+ "tourType_typeId 		BIGINT,				\n" //$NON-NLS-1$
 						+ "tourPerson_personId 	BIGINT,				\n" //$NON-NLS-1$
 
@@ -746,11 +758,13 @@ public class TourDatabase {
 
 				fIsTableChecked = true;
 
-			} finally {
+			}
+			finally {
 				if (stmt != null) {
 					try {
 						stmt.close();
-					} catch (SQLException e) {
+					}
+					catch (SQLException e) {
 						e.printStackTrace();
 					}
 				}
@@ -758,7 +772,8 @@ public class TourDatabase {
 
 			conn.close();
 
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -808,7 +823,8 @@ public class TourDatabase {
 			fIsVersionChecked = true;
 			conn.close();
 
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return true;
@@ -833,7 +849,8 @@ public class TourDatabase {
 		// load derby driver
 		try {
 			Class.forName("org.apache.derby.jdbc.ClientDriver"); //$NON-NLS-1$
-		} catch (ClassNotFoundException e) {
+		}
+		catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			return startServerRunnable;
 		}
@@ -862,7 +879,8 @@ public class TourDatabase {
 
 		try {
 			checkServer();
-		} catch (MyTourbookException e) {
+		}
+		catch (MyTourbookException e) {
 			e.printStackTrace();
 		}
 
@@ -894,12 +912,12 @@ public class TourDatabase {
 
 		try {
 			IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) throws InvocationTargetException,
-						InterruptedException {
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 					try {
 						checkServer();
-					} catch (MyTourbookException e) {
+					}
+					catch (MyTourbookException e) {
 						e.printStackTrace();
 						return;
 					}
@@ -914,8 +932,7 @@ public class TourDatabase {
 				}
 			};
 
-			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getDefault()
-					.getSplashHandler();
+			final MyTourbookSplashHandler splashHandler = TourbookPlugin.getDefault().getSplashHandler();
 
 			if (splashHandler != null) {
 				runnableWithProgress.run(splashHandler.getBundleProgressMonitor());
@@ -923,16 +940,19 @@ public class TourDatabase {
 
 //		} catch (MyTourbookException e) {
 //			e.printStackTrace();
-		} catch (InvocationTargetException e) {
+		}
+		catch (InvocationTargetException e) {
 			e.printStackTrace();
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
 		if (emFactory == null) {
 			try {
 				throw new Exception("Cannot get EntityManagerFactory"); //$NON-NLS-1$
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				e.printStackTrace();
 			}
 			return null;
@@ -958,9 +978,11 @@ public class TourDatabase {
 
 		try {
 			server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
-		} catch (UnknownHostException e2) {
+		}
+		catch (UnknownHostException e2) {
 			e2.printStackTrace();
-		} catch (Exception e2) {
+		}
+		catch (Exception e2) {
 			e2.printStackTrace();
 		}
 
@@ -970,12 +992,14 @@ public class TourDatabase {
 			 */
 			server.ping();
 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 
 			try {
 				server.start(null);
 				// monitor.worked(1);
-			} catch (Exception e2) {
+			}
+			catch (Exception e2) {
 				e2.printStackTrace();
 			}
 
@@ -985,10 +1009,12 @@ public class TourDatabase {
 				try {
 					server.ping();
 					break;
-				} catch (Exception e1) {
+				}
+				catch (Exception e1) {
 					try {
 						Thread.sleep(1);
-					} catch (InterruptedException e2) {
+					}
+					catch (InterruptedException e2) {
 						e2.printStackTrace();
 					}
 				}
@@ -1001,7 +1027,8 @@ public class TourDatabase {
 
 				System.out.println("Database path: " + databasePath); //$NON-NLS-1$
 
-			} catch (SQLException e1) {
+			}
+			catch (SQLException e1) {
 				e1.printStackTrace();
 			}
 		}
@@ -1048,10 +1075,10 @@ public class TourDatabase {
 			updateDbDesign_3_4(conn, monitor);
 			currentDbVersion = newVersion = 4;
 		}
-		if (currentDbVersion == 4) {
-			updateDbDesign_4_5(conn);
-			currentDbVersion = newVersion = 5;
-		}
+//		if (currentDbVersion == 4) {
+//			updateDbDesign_4_5(conn);
+//			currentDbVersion = newVersion = 5;
+//		}
 
 		// update the version number
 		try {
@@ -1060,7 +1087,8 @@ public class TourDatabase {
 					+ (" set VERSION=" + newVersion) //$NON-NLS-1$
 					+ (" where 1=1"); //$NON-NLS-1$
 			conn.createStatement().executeUpdate(sqlString);
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 
@@ -1086,7 +1114,8 @@ public class TourDatabase {
 			statement.executeBatch();
 			statement.close();
 
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			printSQLException(e);
 		}
 	}
@@ -1107,7 +1136,8 @@ public class TourDatabase {
 			statement.executeBatch();
 			statement.close();
 
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			printSQLException(e);
 		}
 	}
@@ -1169,7 +1199,8 @@ public class TourDatabase {
 			statement.executeBatch();
 			statement.close();
 
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			printSQLException(e);
 		}
 
@@ -1187,9 +1218,7 @@ public class TourDatabase {
 			TourData tourData = getTourData(tourId);
 
 			if (monitor != null) {
-				String msg = NLS.bind(Messages.Tour_Database_update_tour, new Object[] {
-						tourIdx++,
-						tourList.size() });
+				String msg = NLS.bind(Messages.Tour_Database_update_tour, new Object[] { tourIdx++, tourList.size() });
 				monitor.subTask(msg);
 			}
 
@@ -1207,21 +1236,21 @@ public class TourDatabase {
 		emFactory = null;
 	}
 
-	private void updateDbDesign_4_5(Connection conn) {
-
-		try {
-			Statement statement = conn.createStatement();
-
-			String sql;
-
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN gpsData BLOB DEFAULT NULL"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
-
-			statement.executeBatch();
-			statement.close();
-
-		} catch (SQLException e) {
-			printSQLException(e);
-		}
-	}
+//	private void updateDbDesign_4_5(Connection conn) {
+//
+//		try {
+//			Statement statement = conn.createStatement();
+//
+//			String sql;
+//
+//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN gpsData BLOB DEFAULT NULL"; //$NON-NLS-1$ //$NON-NLS-2$
+//			statement.addBatch(sql);
+//
+//			statement.executeBatch();
+//			statement.close();
+//
+//		} catch (SQLException e) {
+//			printSQLException(e);
+//		}
+//	}
 }

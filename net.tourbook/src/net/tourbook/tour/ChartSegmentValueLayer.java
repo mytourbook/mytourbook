@@ -34,27 +34,12 @@ import org.eclipse.swt.widgets.Display;
 
 public class ChartSegmentValueLayer implements IChartLayer {
 
-	// private ArrayList<ChartMarker> fChartMarkers = new
-	// ArrayList<ChartMarker>();
-
 	private RGB			lineColor	= new RGB(255, 0, 0);
 
 	private TourData	fTourData;
 
 	private int[]		fXDataSerie;
 
-	/**
-	 * Adds a new marker to the internal marker list, the list can be retrieved
-	 * with getMarkerList()
-	 * 
-	 * @param marker
-	 * @param xCoord
-	 *        Position of the marker on the x axis
-	 * @param label
-	 */
-	// public void addMarker(ChartMarker marker) {
-	// fChartMarkers.add(marker);
-	// }
 	public void setLineColor(final RGB lineColor) {
 		this.lineColor = lineColor;
 	}
@@ -99,7 +84,6 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		for (int segmentIndex = 0; segmentIndex < segmentSerie.length; segmentIndex++) {
 
 			final int serieIndex = segmentSerie[segmentIndex];
-
 			final int xDevOffset = (int) (fXDataSerie[serieIndex] * scaleX) - devGraphImageXOffset;
 
 			final float graphYValue = segmentValues[segmentIndex] * valueDivisor;

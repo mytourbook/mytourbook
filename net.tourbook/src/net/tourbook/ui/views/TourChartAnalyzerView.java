@@ -31,6 +31,7 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourChart;
+import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
@@ -86,7 +87,8 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private int							fLayout;
 
-//	private int							fCounter;
+	private int							fValueIndexLeftBackup;
+	private int							fValueIndexRightBackup;
 
 	/**
 	 * This class generates and contains the labels for one row in the view
@@ -261,6 +263,14 @@ public class TourChartAnalyzerView extends ViewPart {
 					 * the correct slider positon, we create the chart info from the slider position
 					 */
 					updateInfo(((SelectionChartXSliderPosition) selection));
+
+				} else if (selection instanceof SelectionTourData) {
+
+					TourChart tourChart = ((SelectionTourData) selection).getTourChart();
+
+					if (tourChart != null) {
+						updateInfo(tourChart.getChartInfo());
+					}
 
 				} else if (selection instanceof SelectionTourChart) {
 
@@ -758,8 +768,20 @@ public class TourChartAnalyzerView extends ViewPart {
 //		long startTime = System.currentTimeMillis();
 
 		final ChartDataXSerie xData = fDrawingData.get(0).getXData();
+
 		int valuesIndexLeft = chartInfo.leftSliderValuesIndex;
 		int valuesIndexRight = chartInfo.rightSliderValuesIndex;
+
+		if (valuesIndexLeft == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+			valuesIndexLeft = fValueIndexLeftBackup;
+		} else {
+			fValueIndexLeftBackup = valuesIndexLeft;
+		}
+		if (valuesIndexRight == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+			valuesIndexRight = fValueIndexRightBackup;
+		} else {
+			fValueIndexRightBackup = valuesIndexRight;
+		}
 
 		int outCounter = 0;
 

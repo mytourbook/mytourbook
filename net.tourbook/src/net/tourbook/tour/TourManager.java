@@ -63,6 +63,8 @@ public class TourManager {
 	public static final String				CUSTOM_DATA_DISTANCE						= "distance";								//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_ALTITUDE						= "altitude";								//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_SPEED							= "speed";									//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_PACE							= "pace";									//$NON-NLS-1$
+	public static final String				CUSTOM_DATA_POWER							= "power";									//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_GRADIENT						= "gradient";								//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_ALTIMETER						= "altimeter";								//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_PULSE							= "pulse";									//$NON-NLS-1$
@@ -109,141 +111,6 @@ public class TourManager {
 		final int time = timeSerie[endIndex] - timeSerie[startIndex] - tourData.getBreakTime(startIndex, endIndex);
 
 		return (float) ((float) distance / time * 3.6);
-	}
-
-	/**
-	 * create the callbacks which compute the average
-	 */
-	private void createAvgCallbacks() {
-
-		computeSpeedAvg = new ComputeChartValue() {
-
-			/*
-			 * Compute the average distance speed between the two sliders
-			 */
-			@Override
-			public float compute() {
-
-				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
-				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
-				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-
-				final int leftDistance = distanceValues[valueIndexLeft];
-				final int rightDistance = distanceValues[valueIndexRight];
-				final int leftTime = timeValues[valueIndexLeft];
-				final int rightTime = timeValues[valueIndexRight];
-
-				if (leftTime == rightTime) {
-
-					// left and right slider are at the same position
-					return 0;
-
-				} else {
-
-					final float time = rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight);
-					final float distance = rightDistance - leftDistance;
-
-					final float speed = distance / time * 3.6f;
-
-					return speed;
-				}
-
-			}
-		};
-
-		computePaceAvg = new ComputeChartValue() {
-
-			/*
-			 * Compute the average pace between two sliders
-			 */
-			@Override
-			public float compute() {
-
-				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
-				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
-				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-
-				final int leftDistance = distanceValues[valueIndexLeft];
-				final int rightDistance = distanceValues[valueIndexRight];
-				final int leftTime = timeValues[valueIndexLeft];
-				final int rightTime = timeValues[valueIndexRight];
-
-				if (leftTime == rightTime) {
-
-					// left and right slider are at the same position
-					return 0;
-
-				} else {
-
-					final float distanceMeasurementFactor = UI.UNIT_VALUE_DISTANCE;
-
-					final float time = rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight);
-					final float distance = rightDistance - leftDistance;
-
-					if (distance == 0) {
-						return 0;
-					} else {
-						return (float) (time * 16.666 / distance * distanceMeasurementFactor);
-					}
-				}
-			}
-		};
-
-		computeAltimeterAvg = new ComputeChartValue() {
-
-			/*
-			 * Compute the average altimeter speed between the two sliders
-			 */
-			@Override
-			public float compute() {
-
-				final int[] altitudeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
-				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
-				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-
-				final int leftAltitude = altitudeValues[valueIndexLeft];
-				final int rightAltitude = altitudeValues[valueIndexRight];
-				final int leftTime = timeValues[valueIndexLeft];
-				final int rightTime = timeValues[valueIndexRight];
-
-				if (leftTime == rightTime) {
-
-					// left and right slider are at the same position
-					return 0;
-
-				} else {
-
-					final float time = rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight);
-
-					return (((rightAltitude - leftAltitude) / time) * 3600);
-				}
-			}
-		};
-
-		computeGradientAvg = new ComputeChartValue() {
-
-			/*
-			 * Compute the average altimeter speed between the two sliders
-			 */
-			@Override
-			public float compute() {
-
-				final int[] altitudeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
-				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
-
-				final int leftAltitude = altitudeValues[valueIndexLeft];
-				final int rightAltitude = altitudeValues[valueIndexRight];
-				final int leftDistance = distanceValues[valueIndexLeft];
-				final int rightDistance = distanceValues[valueIndexRight];
-
-				if (leftDistance == rightDistance) {
-					// left and right slider are at the same position
-					return 0;
-				} else {
-					return (float) ((rightAltitude - leftAltitude)) / (rightDistance - leftDistance) * 100;
-				}
-			}
-		};
 	}
 
 	/**
@@ -502,6 +369,143 @@ public class TourManager {
 	}
 
 	/**
+	 * create the callbacks which compute the average
+	 */
+	private void createAvgCallbacks() {
+
+		computeSpeedAvg = new ComputeChartValue() {
+
+			/*
+			 * Compute the average speed in km/h between the two sliders
+			 */
+			@Override
+			public float compute() {
+
+				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
+				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
+				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+
+				final int leftDistance = distanceValues[valueIndexLeft];
+				final int rightDistance = distanceValues[valueIndexRight];
+				final int leftTime = timeValues[valueIndexLeft];
+				final int rightTime = timeValues[valueIndexRight];
+
+				if (leftTime == rightTime) {
+
+					// left and right slider are at the same position
+					return 0;
+
+				} else {
+
+					final float time = rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight);
+					final float distance = rightDistance - leftDistance;
+
+					final float speed = distance / time * 3.6f;
+
+					return speed;
+				}
+
+			}
+		};
+
+		computePaceAvg = new ComputeChartValue() {
+
+			/*
+			 * Compute the average pace between two sliders
+			 */
+			@Override
+			public float compute() {
+
+				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
+				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
+				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+
+				final int leftDistance = distanceValues[valueIndexLeft];
+				final int rightDistance = distanceValues[valueIndexRight];
+				final int leftTime = timeValues[valueIndexLeft];
+				final int rightTime = timeValues[valueIndexRight];
+
+				if (leftTime == rightTime) {
+
+					// left and right slider are at the same position
+					return 0;
+
+				} else {
+
+					final float time = rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight);
+					final float distance = rightDistance - leftDistance;
+
+					if (distance == 0) {
+						return 0;
+					} else {
+
+						final float pace = (float) (time * 16.666 / distance);
+						// * UI.UNIT_VALUE_DISTANCE);
+
+						return pace;
+					}
+				}
+			}
+		};
+
+		computeAltimeterAvg = new ComputeChartValue() {
+
+			/*
+			 * Compute the average altimeter speed between the two sliders
+			 */
+			@Override
+			public float compute() {
+
+				final int[] altitudeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
+				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
+				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+
+				final int leftAltitude = altitudeValues[valueIndexLeft];
+				final int rightAltitude = altitudeValues[valueIndexRight];
+				final int leftTime = timeValues[valueIndexLeft];
+				final int rightTime = timeValues[valueIndexRight];
+
+				if (leftTime == rightTime) {
+
+					// left and right slider are at the same position
+					return 0;
+
+				} else {
+
+					final float time = rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight);
+
+					return (((rightAltitude - leftAltitude) / time) * 3600);
+				}
+			}
+		};
+
+		computeGradientAvg = new ComputeChartValue() {
+
+			/*
+			 * Compute the average altimeter speed between the two sliders
+			 */
+			@Override
+			public float compute() {
+
+				final int[] altitudeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
+				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
+
+				final int leftAltitude = altitudeValues[valueIndexLeft];
+				final int rightAltitude = altitudeValues[valueIndexRight];
+				final int leftDistance = distanceValues[valueIndexLeft];
+				final int rightDistance = distanceValues[valueIndexRight];
+
+				if (leftDistance == rightDistance) {
+					// left and right slider are at the same position
+					return 0;
+				} else {
+					return (float) ((rightAltitude - leftAltitude)) / (rightDistance - leftDistance) * 100;
+				}
+			}
+		};
+	}
+
+	/**
 	 * Creates a chart data fDataModel from the tour data
 	 * 
 	 * @param tourData
@@ -544,7 +548,7 @@ public class TourManager {
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		if (hasPropertyChanged) {
-			tourData.cleanComputedSeries();
+			tourData.clearComputedSeries();
 		}
 
 		tourData.computeAltimeterGradientSerie();
@@ -827,6 +831,8 @@ public class TourManager {
 		chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
 		chartDataModel.setCustomData(CUSTOM_DATA_ALTITUDE, yDataAltitude);
 		chartDataModel.setCustomData(CUSTOM_DATA_SPEED, yDataSpeed);
+		chartDataModel.setCustomData(CUSTOM_DATA_PACE, yDataPace);
+		chartDataModel.setCustomData(CUSTOM_DATA_POWER, yDataPower);
 		chartDataModel.setCustomData(CUSTOM_DATA_GRADIENT, yDataGradient);
 		chartDataModel.setCustomData(CUSTOM_DATA_ALTIMETER, yDataAltimeter);
 		chartDataModel.setCustomData(CUSTOM_DATA_PULSE, yDataPulse);

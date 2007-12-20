@@ -75,8 +75,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
 
 		try {
 
-			SAXParserFactory factory = SAXParserFactory.newInstance();
-			SAXParser parser = factory.newSAXParser();
+			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 
 			parser.parse("file:" + importFileName, handler);//$NON-NLS-1$
 

@@ -50,8 +50,10 @@ public class ColumnDefinition {
 	private String				fColumnText;
 	private String				fColumnToolTipText;
 	private int					fColumnWidth;
+
 	private boolean				fIsColumnResizable		= true;
 	private boolean				fIsColumnMoveable		= true;
+
 	private SelectionAdapter	fColumnSelectionListener;
 	private int					fCreateIndex;
 
@@ -128,7 +130,7 @@ public class ColumnDefinition {
 
 	/**
 	 * Set status, if the visibility can be changed, when set to <code>false</code> the column is
-	 * always visible and can't be hidden
+	 * always visible and can't be hidden, default is <code>true</code>
 	 * 
 	 * @param canModifyVisibility
 	 */

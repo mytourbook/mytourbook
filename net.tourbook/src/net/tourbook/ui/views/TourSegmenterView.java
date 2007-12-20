@@ -31,27 +31,33 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ActionModifyColumns;
+import net.tourbook.ui.ColumnManager;
+import net.tourbook.ui.ITourViewer;
+import net.tourbook.ui.TableColumnDefinition;
+import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
+import net.tourbook.util.StringToArrayConverter;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerSorter;
@@ -66,31 +72,37 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 /**
  *
  */
-public class TourSegmenterView extends ViewPart {
+public class TourSegmenterView extends ViewPart implements ITourViewer {
 
-	public static final String		ID				= "net.tourbook.views.TourSegmenter";	//$NON-NLS-1$
+	public static final String		ID							= "net.tourbook.views.TourSegmenter";	//$NON-NLS-1$
 
-//	public static final int			COLUMN_TIME				= 0;
-//	public static final int			COLUMN_DISTANCE			= 1;
-//	public static final int			COLUMN_ALTITUDE			= 2;
-	public static final int			COLUMN_SPEED	= 3;
-	public static final int			COLUMN_GRADIENT	= 4;
-//	public static final int			COLUMN_ALTITUDE_UP		= 5;
-//	public static final int			COLUMN_ALTITUDE_DOWN	= 6;
+	private static final String		MEMENTO_COLUMN_SORT_ORDER	= "tourSegmenter.column_sort_order";	//$NON-NLS-1$
+	private static final String		MEMENTO_COLUMN_WIDTH		= "tourSegmenter.column_width";		//$NON-NLS-1$
+
+	private static final int		COLUMN_DEFAULT				= 0;									// sort by time
+	private static final int		COLUMN_SPEED				= 10;
+	private static final int		COLUMN_PACE					= 20;
+	private static final int		COLUMN_GRADIENT				= 30;
+
+	private static IMemento			fSessionMemento;
 
 	private PageBook				fPageBook;
 	private Composite				fPageSegmenter;
@@ -102,6 +114,7 @@ public class TourSegmenterView extends ViewPart {
 	private Label					fLblTitle;
 
 	private TableViewer				fSegmentViewer;
+	private ColumnManager			fColumnManager;
 
 	private TourChart				fTourChart;
 	private TourData				fTourData;
@@ -110,20 +123,35 @@ public class TourSegmenterView extends ViewPart {
 	private int						fSavedDpTolerance;
 
 	private ISelectionListener		fPostSelectionListener;
-	private IPartListener			fPartListener;
+	private IPartListener2			fPartListener;
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	private PostSelectionProvider	fPostSelectionProvider;
 
-	private final NumberFormat		fNf				= NumberFormat.getNumberInstance();
-//	private final DateFormat		fTimeInstance	= DateFormat.getTimeInstance(DateFormat.DEFAULT);
-//	private final Calendar			fCalendar		= GregorianCalendar.getInstance();
+	private final NumberFormat		fNf							= NumberFormat.getNumberInstance();
 
 	private TourEditor				fTourEditor;
 
 	private boolean					fShowSegmentsInChart;
 
 	private ActionShowSegments		fActionShowSegments;
+
+	private class ActionShowSegments extends Action {
+
+		public ActionShowSegments() {
+
+			super(Messages.App_Action_open_tour_segmenter, SWT.TOGGLE);
+			setToolTipText(Messages.App_Action_open_tour_segmenter_tooltip);
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_segmenter));
+		}
+
+		@Override
+		public void run() {
+			fShowSegmentsInChart = !fShowSegmentsInChart;
+			fireSegmentLayerChanged();
+		}
+	}
 
 	/**
 	 * The content provider class is responsible for providing objects to the view. It can wrap
@@ -148,97 +176,6 @@ public class TourSegmenterView extends ViewPart {
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
-//	private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
-//
-//		public Image getColumnImage(final Object element, final int columnIndex) {
-//
-//			return null;
-//		}
-//
-//		public String getColumnText(final Object obj, final int index) {
-//
-//			if (obj == null) {
-//				return null;
-//			}
-//
-//			final TourSegment segment = (TourSegment) obj;
-//
-//			switch (index) {
-//
-//			case COLUMN_TIME:
-//				fCalendar.set(0,
-//						0,
-//						0,
-//						segment.drivingTime / 3600,
-//						((segment.drivingTime % 3600) / 60),
-//						((segment.drivingTime % 3600) % 60));
-//
-//				return fTimeInstance.format(fCalendar.getTime());
-//
-//			case COLUMN_DISTANCE:
-//				fNf.setMinimumFractionDigits(2);
-//				fNf.setMaximumFractionDigits(2);
-//				return fNf.format(((float) segment.distance) / 1000);
-//
-//			case COLUMN_ALTITUDE:
-//				fNf.setMinimumFractionDigits(0);
-//				return fNf.format(segment.altitude);
-//
-//			case COLUMN_SPEED:
-//				fNf.setMinimumFractionDigits(1);
-//				fNf.setMaximumFractionDigits(1);
-//
-//				if (segment.drivingTime == 0) {
-//					return ""; //$NON-NLS-1$
-//				} else {
-//					return fNf.format(segment.speed);
-//				}
-//
-//			case COLUMN_ALTITUDE_UP:
-//
-//				fNf.setMinimumFractionDigits(1);
-//				fNf.setMaximumFractionDigits(0);
-//
-//				if (segment.drivingTime == 0) {
-//					return ""; //$NON-NLS-1$
-//				} else {
-//					final float result = (float) (segment.altitudeUp) / segment.drivingTime * 3600;
-//					if (result == 0) {
-//						return ""; //$NON-NLS-1$
-//					} else {
-//						return fNf.format(result);
-//					}
-//				}
-//
-//			case COLUMN_ALTITUDE_DOWN:
-//
-//				fNf.setMinimumFractionDigits(1);
-//				fNf.setMaximumFractionDigits(0);
-//
-//				if (segment.drivingTime == 0) {
-//					return ""; //$NON-NLS-1$
-//				} else {
-//					final float result = (float) (segment.altitudeDown) / segment.drivingTime * 3600;
-//					if (result == 0) {
-//						return ""; //$NON-NLS-1$
-//					} else {
-//						return fNf.format(result);
-//					}
-//				}
-//
-//			case COLUMN_GRADIENT:
-//				fNf.setMinimumFractionDigits(1);
-//				fNf.setMaximumFractionDigits(1);
-//				return fNf.format(segment.gradient);
-//
-//			default:
-//				break;
-//			}
-//
-//			return (getText(obj));
-//		}
-//	}
-
 	private class ViewSorter extends ViewerSorter {
 
 		// private static final int ASCENDING = 0;
@@ -262,12 +199,23 @@ public class TourSegmenterView extends ViewPart {
 
 			// Determine which column and do the appropriate sort
 			switch (column) {
-			case COLUMN_GRADIENT:
-				rc = (int) ((segment1.gradient - segment2.gradient) * 100);
+			case COLUMN_DEFAULT:
+				rc = segment1.serieIndexStart - segment2.serieIndexStart;
+				if (direction == DESCENDING) {
+					rc = -rc;
+				}
 				break;
 
 			case COLUMN_SPEED:
 				rc = (int) ((segment1.speed - segment2.speed) * 100);
+				break;
+
+			case COLUMN_PACE:
+				rc = (int) ((segment1.pace - segment2.pace) * 100);
+				break;
+
+			case COLUMN_GRADIENT:
+				rc = (int) ((segment1.gradient - segment2.gradient) * 100);
 				break;
 			}
 
@@ -307,14 +255,18 @@ public class TourSegmenterView extends ViewPart {
 
 	private void addPartListener() {
 
-		// listen to part events
-		fPartListener = new IPartListener() {
+		// set the part listener
+		fPartListener = new IPartListener2() {
+			public void partActivated(IWorkbenchPartReference partRef) {}
 
-			public void partActivated(final IWorkbenchPart part) {}
+			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
 
-			public void partBroughtToTop(final IWorkbenchPart part) {}
+			public void partClosed(IWorkbenchPartReference partRef) {
 
-			public void partClosed(final IWorkbenchPart part) {
+				if (ID.equals(partRef.getId())) {
+					// keep settings for this part
+					savePartSettings();
+				}
 
 				if (fTourChart != null) {
 					// hide the tour segments
@@ -323,13 +275,17 @@ public class TourSegmenterView extends ViewPart {
 				}
 			}
 
-			public void partDeactivated(final IWorkbenchPart part) {}
+			public void partDeactivated(IWorkbenchPartReference partRef) {}
 
-			public void partOpened(final IWorkbenchPart part) {}
+			public void partHidden(IWorkbenchPartReference partRef) {}
 
+			public void partInputChanged(IWorkbenchPartReference partRef) {}
+
+			public void partOpened(IWorkbenchPartReference partRef) {}
+
+			public void partVisible(IWorkbenchPartReference partRef) {}
 		};
 
-		// register the listener in the page
 		getSite().getPage().addPartListener(fPartListener);
 	}
 
@@ -347,30 +303,63 @@ public class TourSegmenterView extends ViewPart {
 					UI.updateUnits();
 
 					// dispose viewer
+					saveViewerSettings(fSessionMemento);
 					Control[] children = fViewerContainer.getChildren();
 					for (int childIndex = 0; childIndex < children.length; childIndex++) {
 						children[childIndex].dispose();
 					}
 
+					// recreate viewer
 					createTableViewer(fViewerContainer);
+					restoreViewerSettings(fSessionMemento);
+
 					fViewerContainer.layout();
 
-					// update the viewer
+					// update viewer content
 					setTableInput();
+
+					// refresh tour with the new measurement system
+					fireSegmentLayerChanged();
 				}
 			}
 		};
+
 		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	private void addSelectionListener() {
+
 		fPostSelectionListener = new ISelectionListener() {
 
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				onSelectionChanged(selection);
 			}
 		};
+
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+	}
+
+	private void createActions() {
+
+		ActionModifyColumns actionModifyColumns = new ActionModifyColumns(this);
+
+		/*
+		 * fill view menu
+		 */
+		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		menuMgr.add(actionModifyColumns);
+	}
+
+	/**
+	 * create view menu
+	 */
+	private void createMenus() {
+
+		fActionShowSegments = new ActionShowSegments();
+
+		IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+		tbm.add(fActionShowSegments);
+
 	}
 
 	@Override
@@ -392,6 +381,7 @@ public class TourSegmenterView extends ViewPart {
 		createTableViewer(fViewerContainer);
 
 		createMenus();
+		createActions();
 
 		addSelectionListener();
 		addPartListener();
@@ -406,37 +396,10 @@ public class TourSegmenterView extends ViewPart {
 		fShowSegmentsInChart = true;
 		fActionShowSegments.setChecked(fShowSegmentsInChart);
 
+		restoreViewerSettings(fSessionMemento);
+
 		// update viewer with current selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
-	}
-
-	private class ActionShowSegments extends Action {
-
-		public ActionShowSegments() {
-
-			super(Messages.App_Action_open_tour_segmenter, SWT.TOGGLE);
-			setToolTipText(Messages.App_Action_open_tour_segmenter_tooltip);
-
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_segmenter));
-		}
-
-		@Override
-		public void run() {
-			fShowSegmentsInChart = !fShowSegmentsInChart;
-			fireSegmentLayerChanged();
-		}
-	}
-
-	/**
-	 * create view menu
-	 */
-	private void createMenus() {
-
-		fActionShowSegments = new ActionShowSegments();
-
-		IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-		tbm.add(fActionShowSegments);
-
 	}
 
 	private void createSegmenterLayout(final Composite parent) {
@@ -490,66 +453,38 @@ public class TourSegmenterView extends ViewPart {
 		fLabelToleranceValue.setLayoutData(gd);
 	}
 
-	private void createTableViewer(final Composite parent) {
+	private void createTableColumns(Composite parent) {
 
-		final TableColumnLayout tableLayout = new TableColumnLayout();
+		final PixelConverter pixelConverter = new PixelConverter(parent);
+		TableColumnDefinition colDef;
 
-		Composite layoutContainer = new Composite(parent, SWT.NONE);
-		layoutContainer.setLayout(tableLayout);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
-
-		/*
-		 * create table
-		 */
-		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
-
-		table.setLayout(new TableLayout());
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
-
-		fSegmentViewer = new TableViewer(table);
-
-		TableViewerColumn tvc;
-		TableColumn tvcColumn;
-		final PixelConverter pixelConverter = new PixelConverter(table);
+		SelectionAdapter defaultColumnSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_DEFAULT);
+				fSegmentViewer.refresh();
+			}
+		};
 
 		/*
-		 * column: time
+		 * column: driving time
 		 */
-		// the first column is always left aligned
-		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(Messages.Tour_Segmenter_Column_time);
-		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_time_tooltip);
-		tvc.setLabelProvider(new CellLabelProvider() {
+		colDef = TableColumnFactory.DRIVING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
-
 				final TourSegment segment = (TourSegment) cell.getElement();
-//		case COLUMN_TIME:
-//		fCalendar.set(0,
-//				0,
-//				0,
-//				segment.drivingTime / 3600,
-//				((segment.drivingTime % 3600) / 60),
-//				((segment.drivingTime % 3600) % 60));
-//
-//		return fTimeInstance.format(fCalendar.getTime());
-
 				cell.setText(UI.formatSeconds(segment.drivingTime));
 			}
 		});
-		tableLayout.setColumnData(tvcColumn, UI.getColumnPixelWidth(pixelConverter, 11));
 
 		/*
-		 * column: distance
+		 * column: distance (km/mile)
 		 */
-		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(UI.UNIT_LABEL_DISTANCE);
-		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_distance_tooltip);
-		tableLayout.setColumnData(tvcColumn, UI.getColumnPixelWidth(pixelConverter, 10));
-		tvc.setLabelProvider(new CellLabelProvider() {
+		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
 
@@ -563,14 +498,11 @@ public class TourSegmenterView extends ViewPart {
 		});
 
 		/*
-		 * column: altitude
+		 * column: altitude (m/ft)
 		 */
-		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(UI.UNIT_LABEL_ALTITUDE);
-		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_altitude_tooltip);
-		tableLayout.setColumnData(tvcColumn, UI.getColumnPixelWidth(pixelConverter, 10));
-		tvc.setLabelProvider(new CellLabelProvider() {
+		colDef = TableColumnFactory.ALTITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
 
@@ -586,12 +518,9 @@ public class TourSegmenterView extends ViewPart {
 		/*
 		 * column: speed
 		 */
-		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(UI.UNIT_LABEL_SPEED);
-		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_speed_tooltip);
-		tableLayout.setColumnData(tvcColumn, UI.getColumnPixelWidth(pixelConverter, 9));
-		tvc.setLabelProvider(new CellLabelProvider() {
+		colDef = TableColumnFactory.SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
 
@@ -601,14 +530,12 @@ public class TourSegmenterView extends ViewPart {
 				} else {
 					fNf.setMinimumFractionDigits(1);
 					fNf.setMaximumFractionDigits(1);
-					cell.setText(fNf.format(segment.speed / UI.UNIT_VALUE_DISTANCE));
+					cell.setText(fNf.format(segment.speed));
 				}
-				//
-
 			}
 		});
 
-		tvcColumn.addSelectionListener(new SelectionAdapter() {
+		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_SPEED);
@@ -617,21 +544,39 @@ public class TourSegmenterView extends ViewPart {
 		});
 
 		/*
-		 * column: gradient
+		 * column: pace
 		 */
-		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText(Messages.Tour_Segmenter_Column_gradient);
-		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_gradient_tooltip);
-		tableLayout.setColumnData(tvcColumn, UI.getColumnPixelWidth(pixelConverter, 8));
-		tvcColumn.addSelectionListener(new SelectionAdapter() {
+		colDef = TableColumnFactory.PACE.createColumn(fColumnManager, pixelConverter);
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				if (segment.drivingTime == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					fNf.setMinimumFractionDigits(1);
+					fNf.setMaximumFractionDigits(1);
+					cell.setText(fNf.format(segment.pace));
+				}
+			}
+		});
+
+		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
+				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_PACE);
 				fSegmentViewer.refresh();
 			}
 		});
-		tvc.setLabelProvider(new CellLabelProvider() {
+
+		/*
+		 * column: gradient
+		 */
+		colDef = TableColumnFactory.GRADIENT.createColumn(fColumnManager, pixelConverter);
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
 
@@ -642,16 +587,20 @@ public class TourSegmenterView extends ViewPart {
 				cell.setText(fNf.format(segment.gradient));
 			}
 		});
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
+				fSegmentViewer.refresh();
+			}
+		});
 
 		/*
-		 * column: altimeter up
+		 * column: altitude up m/h
 		 */
-		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText("+ " + UI.UNIT_LABEL_ALTIMETER);
-		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_altimeter_up_tooltip);
-		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(5, true));
-		tvc.setLabelProvider(new CellLabelProvider() {
+		colDef = TableColumnFactory.ALTITUDE_UP_H.createColumn(fColumnManager, pixelConverter);
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
 
@@ -674,14 +623,11 @@ public class TourSegmenterView extends ViewPart {
 		});
 
 		/*
-		 * column: altimeter down
+		 * column: altitude down m/h
 		 */
-		tvc = new TableViewerColumn(fSegmentViewer, SWT.TRAIL);
-		tvcColumn = tvc.getColumn();
-		tvcColumn.setText("- " + UI.UNIT_LABEL_ALTIMETER);
-		tvcColumn.setToolTipText(Messages.Tour_Segmenter_Column_altimeter_down_tooltip);
-		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(5, true));
-		tvc.setLabelProvider(new CellLabelProvider() {
+		colDef = TableColumnFactory.ALTITUDE_DOWN_H.createColumn(fColumnManager, pixelConverter);
+		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
 
@@ -703,9 +649,23 @@ public class TourSegmenterView extends ViewPart {
 			}
 		});
 
-		/*
-		 * create table viewer
-		 */
+	}
+
+	private void createTableViewer(final Composite parent) {
+
+		// table
+		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
+
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+
+		fSegmentViewer = new TableViewer(table);
+
+		// define and create all columns
+		fColumnManager = new ColumnManager(this);
+		createTableColumns(parent);
+		fColumnManager.createColumns();
 
 		fSegmentViewer.setContentProvider(new ViewContentProvider());
 		fSegmentViewer.setSorter(new ViewSorter());
@@ -794,8 +754,38 @@ public class TourSegmenterView extends ViewPart {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object getAdapter(Class adapter) {
+
+		if (adapter == ColumnViewer.class) {
+			return fSegmentViewer;
+		}
+
+		return Platform.getAdapterManager().getAdapter(this, adapter);
+	}
+
+	public ColumnManager getColumnManager() {
+		return fColumnManager;
+	}
+
 	private int getTolerance() {
 		return (int) ((Math.pow(fScaleTolerance.getSelection(), 2.05)) / (double) 50.0);
+	}
+
+	public TreeViewer getTreeViewer() {
+		return null;
+	}
+
+	@Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
+
+		super.init(site, memento);
+
+		// set the session memento if it's not yet set
+		if (fSessionMemento == null) {
+			fSessionMemento = memento;
+		}
 	}
 
 	/**
@@ -936,6 +926,55 @@ public class TourSegmenterView extends ViewPart {
 		setTableInput();
 
 		fireSegmentLayerChanged();
+	}
+
+	private void restoreViewerSettings(IMemento memento) {
+
+		if (memento == null) {
+			return;
+		}
+
+		// restore table columns sort order
+		final String mementoColumnSortOrderIds = memento.getString(MEMENTO_COLUMN_SORT_ORDER);
+		if (mementoColumnSortOrderIds != null) {
+			fColumnManager.orderColumns(StringToArrayConverter.convertStringToArray(mementoColumnSortOrderIds));
+		}
+
+		// restore column width
+		final String mementoColumnWidth = memento.getString(MEMENTO_COLUMN_WIDTH);
+		if (mementoColumnWidth != null) {
+			fColumnManager.setColumnWidth(StringToArrayConverter.convertStringToArray(mementoColumnWidth));
+		}
+	}
+
+	private void savePartSettings() {
+
+		fSessionMemento = XMLMemento.createWriteRoot("TourPropertiesView"); //$NON-NLS-1$
+
+		saveState(fSessionMemento);
+	}
+
+	@Override
+	public void saveState(IMemento memento) {
+
+		saveViewerSettings(memento);
+	}
+
+	private void saveViewerSettings(IMemento memento) {
+
+		if (memento == null) {
+			return;
+		}
+
+		// save column sort order
+		memento.putString(MEMENTO_COLUMN_SORT_ORDER,
+				StringToArrayConverter.convertArrayToString(fColumnManager.getColumnIds()));
+
+		// save columns width
+		final String[] columnIdAndWidth = fColumnManager.getColumnIdAndWidth();
+		if (columnIdAndWidth != null) {
+			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(columnIdAndWidth));
+		}
 	}
 
 	@Override

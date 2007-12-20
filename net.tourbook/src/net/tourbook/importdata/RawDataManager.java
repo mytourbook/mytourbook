@@ -87,11 +87,7 @@ public class RawDataManager {
 	 */
 	public static String getTempDataFileName() {
 
-		return TourbookPlugin.getDefault()
-				.getStateLocation()
-				.append(TEMP_RAW_DATA_FILE)
-				.toFile()
-				.getAbsolutePath();
+		return TourbookPlugin.getDefault().getStateLocation().append(TEMP_RAW_DATA_FILE).toFile().getAbsolutePath();
 	}
 
 	public void executeImportFromDevice() {
@@ -130,8 +126,7 @@ public class RawDataManager {
 	public void executeImportFromFile() {
 
 		// setup open dialog
-		final FileDialog fileDialog = new FileDialog(Display.getCurrent().getActiveShell(),
-				(SWT.OPEN | SWT.MULTI));
+		final FileDialog fileDialog = new FileDialog(Display.getCurrent().getActiveShell(), (SWT.OPEN | SWT.MULTI));
 
 		final ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 
@@ -189,10 +184,7 @@ public class RawDataManager {
 				for (String fileName : selectedFileNames) {
 
 					// replace filename, keep the directory path
-					fileName = filePath.removeLastSegments(1)
-							.append(fileName)
-							.makeAbsolute()
-							.toString();
+					fileName = filePath.removeLastSegments(1).append(fileName).makeAbsolute().toString();
 
 					if (rawDataManager.importRawData(fileName)) {
 						importCounter++;
@@ -225,11 +217,10 @@ public class RawDataManager {
 			workbench.showPerspective(PerspectiveFactoryRawData.PERSPECTIVE_ID, window);
 
 			// show raw data view
-			return (RawDataView) window.getActivePage().showView(RawDataView.ID,
-					null,
-					IWorkbenchPage.VIEW_ACTIVATE);
+			return (RawDataView) window.getActivePage().showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
-		} catch (WorkbenchException e) {
+		}
+		catch (WorkbenchException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -269,8 +260,7 @@ public class RawDataManager {
 		// check if file exist
 		if (importFile.exists() == false) {
 
-			MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(),
-					SWT.ICON_ERROR | SWT.OK);
+			MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_ERROR | SWT.OK);
 
 			msgBox.setText(Messages.DataImport_Error_file_does_not_exist_title);
 			msgBox.setMessage(NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, fileName));
@@ -377,8 +367,7 @@ public class RawDataManager {
 
 	private void showMsgBoxInvalidFormat(String fileName) {
 
-		MessageBox msgBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_ERROR
-				| SWT.OK);
+		MessageBox msgBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_ERROR | SWT.OK);
 
 		msgBox.setMessage(NLS.bind(Messages.DataImport_Error_invalid_data_format, fileName));
 		msgBox.open();
@@ -387,43 +376,156 @@ public class RawDataManager {
 	/**
 	 * get the tourdata from the database when available
 	 */
+	public void updateTourDataFromDb_NOTWORKING() {
+
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@SuppressWarnings("unchecked")
+			public void run() {
+
+				if (fTourDataMap.size() == 0) {
+					// nothing to do
+					return;
+				}
+
+				/*
+				 * get tour id's in a list
+				 */
+				ArrayList<Long> tourIdList = new ArrayList<Long>();
+				for (TourData tourData : fTourDataMap.values()) {
+					tourIdList.add(tourData.getTourId());
+				}
+
+//				// Named parameter list
+//				List names = new ArrayList();
+//				names.add("Izi");
+//				names.add("Fritz");
+//				Query q = em.createQuery("select cat from DomesticCat cat where cat.name in (:namesList)");
+//				q.setParameter("namesList", names);
+//				List cats = q.list();
+
+				EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+				final String sqlQuery = "SELECT TourData " //$NON-NLS-1$
+						+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " tourdata ") //$NON-NLS-1$ //$NON-NLS-2$
+						+ (" WHERE tourdata.tourId IN (:tourIdList)");//$NON-NLS-1$
+
+				try {
+
+					if (em != null) {
+
+						Query query = em.createQuery(sqlQuery);
+
+						query.setParameter("tourIdList", tourIdList);
+
+						List tourDataList = query.getResultList();
+
+						for (TourData tourDataFromMap : fTourDataMap.values()) {
+
+							final long tourIdFromMap = tourDataFromMap.getTourId().longValue();
+							boolean isFound = false;
+
+							for (Object dbObject : tourDataList) {
+
+								TourData tourDataFromDb = (TourData) dbObject;
+
+								if (tourDataFromDb.getTourId().longValue() == tourIdFromMap) {
+
+									/*
+									 * tour is available in the database, replace the imported tour
+									 * with the tour from the database
+									 */
+
+									final TourData tourDataFromDB = (TourData) tourDataList.get(0);
+
+									tourDataFromDB.importRawDataFile = tourDataFromMap.importRawDataFile;
+
+									fTourDataMap.put(tourDataFromDB.getTourId().toString(), tourDataFromDB);
+
+									isFound = true;
+									break;
+								}
+							}
+
+							if (isFound == false) {
+
+								/*
+								 * tour is not in the databse, therefore the tour was deleted and
+								 * the person in the tour data must be removed
+								 */
+
+								tourDataFromMap.setTourPerson(null);
+							}
+						}
+					}
+				}
+				catch (Exception e) {
+					System.err.println(sqlQuery);
+//					System.err.println("tourIdList=" + tourIdList.toString());
+					e.printStackTrace();
+				}
+				finally {
+					em.close();
+				}
+			}
+		});
+	}
+
+	/**
+	 * get the tourdata from the database when available
+	 */
 	public void updateTourDataFromDb() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				EntityManager em = TourDatabase.getInstance().getEntityManager();
 
-				if (em != null) {
+				final String sqlQuery = "SELECT TourData " //$NON-NLS-1$
+						+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ") //$NON-NLS-1$ //$NON-NLS-2$
+						+ (" WHERE tourId = :tourId");
 
-					Query query = em.createQuery("SELECT TourData " //$NON-NLS-1$
-							+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ") //$NON-NLS-1$ //$NON-NLS-2$
-							+ (" WHERE tourId = :tourId")); //$NON-NLS-1$
+				long tourId = -1;
 
-					for (TourData tourData : fTourDataMap.values()) {
+				try {
 
-						query.setParameter("tourId", tourData.getTourId()); //$NON-NLS-1$
+					if (em != null) {
 
-						List peopleList = query.getResultList();
-						if (peopleList.size() != 0) {
+						Query query = em.createQuery(sqlQuery);
 
-							// tour is in the database, replace the imported tour with the tour from the database
+						for (TourData tourDataFromMap : fTourDataMap.values()) {
 
-							final TourData tourDataFromDB = (TourData) peopleList.get(0);
+							tourId = tourDataFromMap.getTourId();
+							query.setParameter("tourId", tourId); //$NON-NLS-1$
 
-							tourDataFromDB.importRawDataFile = tourData.importRawDataFile;
+							List peopleList = query.getResultList();
 
-							fTourDataMap.put(tourDataFromDB.getTourId().toString(), tourDataFromDB);
+							if (peopleList.size() != 0) {
 
-						} else {
+								// tour is in the database, replace the imported tour with the tour from the database
 
-							// when a tour was deleted the person in the tour data must be removed
+								final TourData tourDataFromDB = (TourData) peopleList.get(0);
 
-							tourData.setTourPerson(null);
+								tourDataFromDB.importRawDataFile = tourDataFromMap.importRawDataFile;
+
+								fTourDataMap.put(tourDataFromDB.getTourId().toString(), tourDataFromDB);
+
+							} else {
+
+								// when a tour was deleted the person in the tour data must be removed
+
+								tourDataFromMap.setTourPerson(null);
+							}
 						}
-					}
 
+					}
+				}
+				catch (Exception e) {
+					System.err.println(sqlQuery);
+					System.err.println("tourId=" + tourId);
+					e.printStackTrace();
+				}
+				finally {
 					em.close();
 				}
 			}

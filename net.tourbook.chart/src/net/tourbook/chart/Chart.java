@@ -296,9 +296,7 @@ public class Chart extends ViewForm {
 
 			// create the menu for bar charts
 			if (barChartContextProvider != null) {
-				barChartContextProvider.fillBarChartContextMenu(menuMgr,
-						hoveredBarSerieIndex,
-						hoveredBarValueIndex);
+				barChartContextProvider.fillBarChartContextMenu(menuMgr, hoveredBarSerieIndex, hoveredBarValueIndex);
 			}
 
 		} else {
@@ -750,7 +748,7 @@ public class Chart extends ViewForm {
 	 */
 	public void setXSliderPosition(SelectionChartXSliderPosition sliderPosition) {
 
-		// check is the position is for this chart
+		// check if the position is for this chart
 		if (sliderPosition.chart == this) {
 			fChartComponents.setXSliderPosition(sliderPosition);
 		}
@@ -824,8 +822,7 @@ public class Chart extends ViewForm {
 	 */
 	public void updateChart(ChartDataModel chartDataModel, boolean isResetSelection) {
 
-		if (chartDataModel == null
-				|| (chartDataModel != null && chartDataModel.getYData().isEmpty())) {
+		if (chartDataModel == null || (chartDataModel != null && chartDataModel.getYData().isEmpty())) {
 
 			ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
 
