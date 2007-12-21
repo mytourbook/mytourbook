@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.Spinner;
  */
 public class AdjustAltitudeDialog extends TitleAreaDialog {
 
-	private static final String	WIDGET_DATA_ALTI_ID				= "altiId";
+	private static final String	WIDGET_DATA_ALTI_ID				= "altiId"; //$NON-NLS-1$
 
 	private static final String	WIDGET_DATA_METRIC_ALTITUDE		= "metricAltitude"; //$NON-NLS-1$
 
@@ -712,7 +712,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		return fDialogArea;
 	}
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //$NON-NLS-1$
 	private void dumpMinMax(int[] altiSrc, String place) {
 
 		int minAltiSrc1 = altiSrc[0];

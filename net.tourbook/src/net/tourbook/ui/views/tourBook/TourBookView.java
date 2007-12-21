@@ -273,7 +273,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
 
@@ -741,7 +741,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void enableActions() {
 
 		ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
@@ -787,7 +787,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fPostSelectionProvider.setSelection(selection);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
 	public Object getAdapter(Class adapter) {
 

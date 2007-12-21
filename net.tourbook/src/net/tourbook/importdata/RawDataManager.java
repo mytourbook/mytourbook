@@ -379,7 +379,7 @@ public class RawDataManager {
 	public void updateTourDataFromDb_NOTWORKING() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void run() {
 
 				if (fTourDataMap.size() == 0) {
@@ -415,7 +415,7 @@ public class RawDataManager {
 
 						Query query = em.createQuery(sqlQuery);
 
-						query.setParameter("tourIdList", tourIdList);
+						query.setParameter("tourIdList", tourIdList); //$NON-NLS-1$
 
 						List tourDataList = query.getResultList();
 
@@ -476,14 +476,14 @@ public class RawDataManager {
 	public void updateTourDataFromDb() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void run() {
 
 				EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 				final String sqlQuery = "SELECT TourData " //$NON-NLS-1$
 						+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ") //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" WHERE tourId = :tourId");
+						+ (" WHERE tourId = :tourId"); //$NON-NLS-1$
 
 				long tourId = -1;
 
@@ -522,7 +522,7 @@ public class RawDataManager {
 				}
 				catch (Exception e) {
 					System.err.println(sqlQuery);
-					System.err.println("tourId=" + tourId);
+					System.err.println("tourId=" + tourId); //$NON-NLS-1$
 					e.printStackTrace();
 				}
 				finally {

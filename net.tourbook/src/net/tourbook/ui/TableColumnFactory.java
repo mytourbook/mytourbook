@@ -238,7 +238,7 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 			
-			String unitLabel =UI.UNIT_LABEL_ALTITUDE+"/h";
+			String unitLabel =UI.UNIT_LABEL_ALTITUDE+"/h"; //$NON-NLS-1$
 
 			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUpH", SWT.TRAIL); //$NON-NLS-1$
 			colDef.setLabel(Messages.ColumnFactory_altitude_up_label  + " (" + unitLabel + ")"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -268,7 +268,7 @@ public abstract class TableColumnFactory {
 		
 		public TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
 
-			String unitLabel =UI.UNIT_LABEL_ALTITUDE+"/h";
+			String unitLabel =UI.UNIT_LABEL_ALTITUDE+"/h"; //$NON-NLS-1$
 			
 			TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDownH", SWT.TRAIL); //$NON-NLS-1$
 			colDef.setLabel(Messages.ColumnFactory_altitude_down_label  + " (" + unitLabel + ")"); //$NON-NLS-1$ //$NON-NLS-2$
