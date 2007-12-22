@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Import .CVS files
+Bundle-SymbolicName: net.tourbook.device.cvs;singleton:=true
+Bundle-Version: 1.2.0.v20071231
+Bundle-Activator: net.tourbook.device.csv.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ net.tourbook,
+ net.tourbook.device,
+ net.tourbook.chart
+Eclipse-LazyStart: true
+Bundle-Vendor: MyTourbook

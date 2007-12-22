@@ -167,9 +167,7 @@ public class TurDeviceReader extends TourbookDevice {
 	 * @see net.tourbook.importdata.IRawDataReader#processDeviceData(java.lang.String,
 	 *      net.tourbook.importdata.DeviceData, java.util.ArrayList)
 	 */
-	public boolean processDeviceData(	String importFileName,
-										DeviceData deviceData,
-										HashMap<String, TourData> tourDataMap) {
+	public boolean processDeviceData(String importFileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
 
 		FileInputStream fileTurData = null;
 		TurDeviceData turDeviceData = new TurDeviceData();
@@ -216,7 +214,7 @@ public class TurDeviceReader extends TourbookDevice {
 
 			ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
 
-			for (int i = 0; i < entryCount; i++) {
+			for (int dataIndex = 0; dataIndex < entryCount; dataIndex++) {
 				if (Integer.parseInt(turDeviceData.fileVersion.substring(0, 1)) >= 3) {
 					secStart1 = TurFileUtil.readByte(fileTurData); // Byte 1
 					secStart2 = TurFileUtil.readByte(fileTurData); // Byte 2
@@ -247,10 +245,7 @@ public class TurDeviceReader extends TourbookDevice {
 				TurFileUtil.readByte(fileTurData);
 
 				// Calculate values
-				int secStart = secStart1
-						+ (256 * secStart2)
-						+ (256 * 256 * secStart3)
-						+ (256 * 256 * 256 * secStart4);
+				int secStart = secStart1 + (256 * secStart2) + (256 * 256 * secStart3) + (256 * 256 * 256 * secStart4);
 				int seconds = sec1 + (256 * sec2) + (256 * 256 * sec3) + (256 * 256 * 256 * sec4);
 				int distance = dst1 + (256 * dst2) + (256 * 256 * dst3) + (256 * 256 * 256 * dst4);
 				distance *= 10; // distance in 10m
@@ -260,29 +255,33 @@ public class TurDeviceReader extends TourbookDevice {
 					altimeter = altimeter - MAX_INT;
 				}
 
-				if (i == 0) {
+				if (dataIndex == 0) {
 					tourData.setStartAltitude((short) altimeter);
 					tourData.setStartPulse((short) puls);
 				}
 
-				if (i == 1) {
+				if (dataIndex == 1) {
 					tourData.setDeviceTimeInterval((short) seconds);
 				}
 
-				TimeData timeData;
-				timeData = new TimeData();
+				TimeData timeData = new TimeData();
 
-				timeData.altitude = (short) (altimeter - oldAltimeter);
+				timeData.altitude = altimeter - oldAltimeter;
 				oldAltimeter = altimeter;
-				timeData.cadence = (short) cadence;
-				timeData.pulse = (short) puls;
-				timeData.temperature = (short) temp;
-				if (i != 0) {
-					timeData.time = (short) tourData.getDeviceTimeInterval();
+
+				timeData.cadence = cadence;
+				timeData.pulse = puls;
+				timeData.temperature = temp;
+
+				if (dataIndex == 0) {
+					timeData.distance = 0;
+				} else {
+					timeData.time = tourData.getDeviceTimeInterval();
+
 					timeData.distance = distance - oldDistance;
 					oldDistance = distance;
-					tourData.setTourAltUp(tourData.getTourAltUp()
-							+ ((timeData.altitude > 0) ? timeData.altitude : 0));
+
+					tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0));
 					tourData.setTourAltDown(tourData.getTourAltDown()
 							+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
 				}
@@ -333,7 +332,9 @@ public class TurDeviceReader extends TourbookDevice {
 					tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					for (int j = 0; j < tourData.timeSerie.length; j++) {
 						if (tourData.timeSerie[j] > tourMarker.getTime()) {
-							tourMarker.setDistance(distanceSerie[j - 1]);
+							if (distanceSerie != null) {
+								tourMarker.setDistance(distanceSerie[j - 1]);
+							}
 							tourMarker.setSerieIndex(j - 1);
 							break;
 						}
@@ -347,9 +348,7 @@ public class TurDeviceReader extends TourbookDevice {
 				tourData.setDeviceName(visibleName);
 
 				// set week of year
-				fCalendar.set(tourData.getStartYear(),
-						tourData.getStartMonth() - 1,
-						tourData.getStartDay());
+				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 			}
 

@@ -36,34 +36,45 @@ public class TimeData implements Serializable {
 	/**
 	 * contains the difference to the previous time in seconds
 	 */
-	public short				time;
+	public int					time;
 
 	/**
 	 * absolute value for temperature
 	 */
-	public short				temperature;
+	public int					temperature			= Integer.MIN_VALUE;
 
 	/**
 	 * absolute value for cadence
 	 */
-	public short				cadence;
+	public int					cadence				= Integer.MIN_VALUE;
 
 	/**
 	 * absolute value for pulse
 	 */
-	public short				pulse;
+	public int					pulse				= Integer.MIN_VALUE;
 
 	/**
 	 * relative value for altitude, this is the difference for the altitude with the previous time
 	 * slice
 	 */
-	public short				altitude;
+	public int					altitude			= Integer.MIN_VALUE;
 
 	/**
-	 * realative value for distance, this is the difference for the distance with the previous time
+	 * relative value for distance, this is the difference for the distance with the previous time
 	 * slice
 	 */
-	public int					distance;
+	public int					distance			= Integer.MIN_VALUE;
+
+	/**
+	 * absolute value for power, power is typically provided by an ergo trainer
+	 */
+	public int					power				= Integer.MIN_VALUE;
+
+	/**
+	 * speed in km/h multiplied by 10, speed is typically provided by an ergo trainer not from a
+	 * bike computer
+	 */
+	public int					speed				= Integer.MIN_VALUE;
 
 	/**
 	 * contains the time value from {@link Date#getTime()} or {@link Long#MIN_VALUE} when the time
@@ -94,7 +105,8 @@ public class TimeData implements Serializable {
 	/**
 	 * a marker is set when {@link TimeData#marker} is not 0
 	 */
-	public short				marker;
+	public int					marker				= 0;
 
 	public String				markerLabel;
+
 }

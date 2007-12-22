@@ -103,7 +103,7 @@ public class TourData {
 	 * <p>
 	 * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private int					distance;
 
 	/**
@@ -218,15 +218,15 @@ public class TourData {
 	@Basic(optional = false)
 	private SerieData			serieData;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourMarker>		tourMarkers						= new HashSet<TourMarker>();
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourReference>	tourReferences					= new HashSet<TourReference>();
 
-	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)
 	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
 
 	/**
@@ -303,6 +303,14 @@ public class TourData {
 	@Transient
 	private int[]				speedSerieImperial;
 
+	/**
+	 * Is <code>true</code> when the data for the {@link TourData#speedSerie} are from the device
+	 * and not computed. Speed data are normally available from an ergometer and not from a bike
+	 * computer
+	 */
+	@Transient
+	private boolean				isSpeedSerieFromDevice			= false;
+
 	@Transient
 	private int[]				paceSerie;
 	@Transient
@@ -310,6 +318,14 @@ public class TourData {
 
 	@Transient
 	private int[]				powerSerie;
+
+	/**
+	 * Is <code>true</code> when the data for the {@link TourData#powerSerie} are from the device
+	 * and not computed. Power data are normally available from an ergometer and not from a bike
+	 * computer
+	 */
+	@Transient
+	private boolean				isPowerSerieFromDevice			= false;
 
 	@Transient
 	private int[]				altimeterSerie;
@@ -421,6 +437,7 @@ public class TourData {
 
 	public void computeAltimeterGradientSerie() {
 
+		// optimization: don't recreate the data series when they are available
 		if (altimeterSerie != null && altimeterSerieImperial != null && gradientSerie != null) {
 			return;
 		}
@@ -436,6 +453,10 @@ public class TourData {
 	 * Computes the data serie for altimeters with the internal algorithm for a fix time interval
 	 */
 	private void computeAltimeterGradientSerieWithFixedInterval() {
+
+		if (distanceSerie == null || altitudeSerie == null) {
+			return;
+		}
 
 		final int serieLength = timeSerie.length;
 
@@ -542,6 +563,10 @@ public class TourData {
 	 */
 	private void computeAltimeterGradientSerieWithVariableInterval() {
 
+		if (distanceSerie == null || altitudeSerie == null) {
+			return;
+		}
+
 		final int serieLength = timeSerie.length;
 
 		final int[] dataSerieDistance = distanceSerie;
@@ -630,6 +655,11 @@ public class TourData {
 	}
 
 	public void computeAvgCadence() {
+
+		if (cadenceSerie == null) {
+			return;
+		}
+
 		long cadenceSum = 0;
 		int cadenceCount = 0;
 
@@ -654,6 +684,11 @@ public class TourData {
 	}
 
 	public void computeAvgPulse() {
+
+		if (pulseSerie == null) {
+			return;
+		}
+
 		long pulseSum = 0;
 		int pulseCount = 0;
 
@@ -670,6 +705,11 @@ public class TourData {
 	}
 
 	public void computeAvgTemperature() {
+
+		if (temperatureSerie == null) {
+			return;
+		}
+
 		long temperatureSum = 0;
 
 		for (int temperature : temperatureSerie) {
@@ -733,6 +773,11 @@ public class TourData {
 	}
 
 	public void computeMaxAltitude() {
+
+		if (altitudeSerie == null) {
+			return;
+		}
+
 		int maxAltitude = 0;
 		for (int altitude : altitudeSerie) {
 			if (altitude > maxAltitude) {
@@ -743,6 +788,11 @@ public class TourData {
 	}
 
 	public void computeMaxPulse() {
+
+		if (pulseSerie == null) {
+			return;
+		}
+
 		int maxPulse = 0;
 
 		for (int pulse : pulseSerie) {
@@ -754,6 +804,10 @@ public class TourData {
 	}
 
 	public void computeMaxSpeed() {
+
+		if (distanceSerie == null) {
+			return;
+		}
 
 		float maxSpeed = 0;
 		int anzValuesSum = 1;
@@ -885,6 +939,10 @@ public class TourData {
 	 */
 	private void computeSpeedSerieInternal() {
 
+		if (distanceSerie == null) {
+			return;
+		}
+
 		final int serieLength = timeSerie.length;
 
 		speedSerie = new int[serieLength];
@@ -977,6 +1035,10 @@ public class TourData {
 	 */
 	private void computeSpeedSerieInternalWithVariableInterval() {
 
+		if (distanceSerie == null) {
+			return;
+		}
+
 		int minTimeDiff;
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -1061,7 +1123,7 @@ public class TourData {
 	}
 
 	public void computeTourDrivingTime() {
-		tourDrivingTime = timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length);
+		tourDrivingTime = Math.max(0, timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length));
 	}
 
 //	/**
@@ -1214,12 +1276,59 @@ public class TourData {
 			longitudeSerie = new double[serieLength];
 		}
 
+		final TimeData firstTimeDataItem = timeDataList.get(0);
+
 		timeSerie = new int[serieLength];
-		distanceSerie = new int[serieLength];
-		altitudeSerie = new int[serieLength];
-		pulseSerie = new int[serieLength];
-		cadenceSerie = new int[serieLength];
-		temperatureSerie = new int[serieLength];
+
+		boolean isDistance = false;
+		boolean isAltitude = false;
+		boolean isPulse = false;
+		boolean isCadence = false;
+		boolean isTemperature = false;
+		boolean isSpeed = false;
+		boolean isPower = false;
+
+		final boolean isAbsoluteData = firstTimeDataItem.absoluteTime != Long.MIN_VALUE;
+
+		/*
+		 * create data series only when data are available
+		 */
+		if (firstTimeDataItem.distance != Integer.MIN_VALUE || isAbsoluteData) {
+			distanceSerie = new int[serieLength];
+			isDistance = true;
+		}
+
+		if (firstTimeDataItem.altitude != Integer.MIN_VALUE || isAbsoluteData) {
+			altitudeSerie = new int[serieLength];
+			isAltitude = true;
+		}
+
+		if (firstTimeDataItem.pulse != Integer.MIN_VALUE || isAbsoluteData) {
+			pulseSerie = new int[serieLength];
+			isPulse = true;
+		}
+
+		if (firstTimeDataItem.cadence != Integer.MIN_VALUE) {
+			cadenceSerie = new int[serieLength];
+			isCadence = true;
+		}
+
+		if (firstTimeDataItem.temperature != Integer.MIN_VALUE) {
+			temperatureSerie = new int[serieLength];
+			isTemperature = true;
+		}
+
+		if (firstTimeDataItem.speed != Integer.MIN_VALUE) {
+			speedSerie = new int[serieLength];
+			isSpeed = true;
+			isSpeedSerieFromDevice = true;
+		}
+
+		if (firstTimeDataItem.power != Integer.MIN_VALUE) {
+			powerSerie = new int[serieLength];
+			isPower = true;
+			isPowerSerieFromDevice = true;
+		}
 
 		int timeIndex = 0;
 
@@ -1227,7 +1336,7 @@ public class TourData {
 		int altitudeAbsolute = 0;
 		int distanceAbsolute = 0;
 
-		if (timeDataList.get(0).absoluteTime != Long.MIN_VALUE) {
+		if (isAbsoluteData) {
 
 			/*
 			 * absolute data are available these data are normally from GPS devices
@@ -1241,10 +1350,12 @@ public class TourData {
 			int distanceDiff;
 			int altitudeDiff;
 
+			int pulseCounter = 0;
+
 			// convert data from the tour format into an interger[]
 			for (final TimeData timeData : timeDataList) {
 
-				if (altitudeStartIndex == -1 && timeData.absoluteAltitude != Float.MIN_VALUE) {
+				if (altitudeStartIndex == -1 && isAltitude) {
 					altitudeStartIndex = timeIndex;
 					altitudeAbsolute = (int) timeData.absoluteAltitude;
 				}
@@ -1254,20 +1365,23 @@ public class TourData {
 					// first trackpoint
 
 					firstTime = timeData.absoluteTime;
-					altitudeSerie[timeIndex] = altitudeAbsolute;
+
+					if (isAltitude) {
+						altitudeSerie[timeIndex] = altitudeAbsolute;
+					}
 
 				} else {
 
 					// 1..n trackpoint
 
 					/*
-					 * set time
+					 * time
 					 */
 					timeAbsolute = (int) ((timeData.absoluteTime - firstTime) / 1000);
 					timeSerie[timeIndex] = timeAbsolute;
 
 					/*
-					 * set distance
+					 * distance
 					 */
 					float tdDistance = timeData.absoluteDistance;
 					if (tdDistance == Float.MIN_VALUE) {
@@ -1278,7 +1392,7 @@ public class TourData {
 					distanceSerie[timeIndex] = distanceAbsolute += distanceDiff;
 
 					/*
-					 * set altitude
+					 * altitude
 					 */
 					if (altitudeStartIndex == -1) {
 						altitudeDiff = 0;
@@ -1296,15 +1410,37 @@ public class TourData {
 				latitudeSerie[timeIndex] = timeData.latitude;
 				longitudeSerie[timeIndex] = timeData.longitude;
 
-				pulseSerie[timeIndex] = timeData.pulse;
-				temperatureSerie[timeIndex] = timeData.temperature;
-				cadenceSerie[timeIndex] = timeData.cadence;
+				/*
+				 * pulse
+				 */
+				final int pulse = timeData.pulse;
+				pulseSerie[timeIndex] = pulse;
+				if (pulse >= 0) {
+					pulseCounter++;
+				}
 
+				/*
+				 * marker
+				 */
 				if (isCreateMarker && timeData.marker != 0) {
 					createMarker(timeData, timeIndex, timeAbsolute, distanceAbsolute);
 				}
 
 				timeIndex++;
+			}
+
+			/*
+			 * make sure that all pulse data points have a valid value
+			 */
+			if (pulseCounter > 0) {
+				for (int pulseIndex = 0; pulseIndex < pulseSerie.length; pulseIndex++) {
+					final int pulse = pulseSerie[pulseIndex];
+					if (pulse <= 0) {
+						pulseSerie[pulseIndex] = 0;
+					}
+				}
+			} else {
+				pulseSerie = null;
 			}
 
 		} else {
@@ -1318,19 +1454,39 @@ public class TourData {
 
 				timeSerie[timeIndex] = timeAbsolute;
 
-				distanceSerie[timeIndex] = distanceAbsolute += timeData.distance;
-				altitudeSerie[timeIndex] = altitudeAbsolute += timeData.altitude;
+				if (isDistance) {
+					distanceSerie[timeIndex] = distanceAbsolute += timeData.distance;
+				}
 
-				pulseSerie[timeIndex] = timeData.pulse;
-				temperatureSerie[timeIndex] = timeData.temperature;
-				cadenceSerie[timeIndex] = timeData.cadence;
+				if (isAltitude) {
+					altitudeSerie[timeIndex] = altitudeAbsolute += timeData.altitude;
+				}
+
+				if (isPulse) {
+					pulseSerie[timeIndex] = timeData.pulse;
+				}
+
+				if (isTemperature) {
+					temperatureSerie[timeIndex] = timeData.temperature;
+				}
+
+				if (isCadence) {
+					cadenceSerie[timeIndex] = timeData.cadence;
+				}
+
+				if (isPower) {
+					powerSerie[timeIndex] = timeData.power;
+				}
+
+				if (isSpeed) {
+					speedSerie[timeIndex] = timeData.speed;
+				}
 
 				if (isCreateMarker && timeData.marker != 0) {
 					createMarker(timeData, timeIndex, timeAbsolute, distanceAbsolute);
 				}
 
 				timeAbsolute += timeData.time;
-
 				timeIndex++;
 			}
 		}
@@ -1365,8 +1521,7 @@ public class TourData {
 
 			setTourId(Long.parseLong(tourId));
 
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 
 			/*
 			 * the distance was shorted so that the maximum of a Long datatype is not exceeded
@@ -1593,6 +1748,10 @@ public class TourData {
 	 */
 	public int[] getAltimeterSerie() {
 
+		if (altimeterSerie == null) {
+			return null;
+		}
+
 		if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
 			// use imperial system
@@ -1617,6 +1776,10 @@ public class TourData {
 	 * @return Returns the metric or imperial altitude serie depending on the active measurement
 	 */
 	public int[] getAltitudeSerie() {
+
+		if (altitudeSerie == null) {
+			return null;
+		}
 
 		if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
@@ -1676,6 +1839,10 @@ public class TourData {
 	 * @return Returns the break time in seconds
 	 */
 	public int getBreakTime(int startIndex, int endIndex) {
+
+		if (distanceSerie == null) {
+			return 0;
+		}
 
 		final int minBreakTime = 10;
 
@@ -1795,6 +1962,10 @@ public class TourData {
 	 */
 	public int[] getDistanceSerie() {
 
+		if (distanceSerie == null) {
+			return null;
+		}
+
 		int[] serie;
 
 		final float unitValueDistance = UI.UNIT_VALUE_DISTANCE;
@@ -1884,11 +2055,9 @@ public class TourData {
 
 	public int[] getPowerSerie() {
 
-		if (powerSerie != null) {
+		if (powerSerie != null || isPowerSerieFromDevice) {
 			return powerSerie;
 		}
-
-		powerSerie = new int[timeSerie.length];
 
 		if (speedSerie == null) {
 			computeSpeedSerie();
@@ -1897,6 +2066,13 @@ public class TourData {
 		if (gradientSerie == null) {
 			computeAltimeterGradientSerie();
 		}
+
+		// check if the necessary series are available 
+		if (speedSerie == null || gradientSerie == null) {
+			return null;
+		}
+
+		powerSerie = new int[timeSerie.length];
 
 		int weightBody = 75;
 		int weightBike = 10;
@@ -1955,6 +2131,18 @@ public class TourData {
 	}
 
 	public int[] getSpeedSerie() {
+
+		if (isSpeedSerieFromDevice) {
+			return getSpeedSerieInternal();
+		}
+		if (distanceSerie == null) {
+			return null;
+		}
+
+		return getSpeedSerieInternal();
+	}
+
+	private int[] getSpeedSerieInternal() {
 
 		/*
 		 * when the speed series are not computed, the internal algorithm will be used to create the
@@ -2019,6 +2207,10 @@ public class TourData {
 	}
 
 	public int[] getTemperatureSerie() {
+
+		if (temperatureSerie == null) {
+			return null;
+		}
 
 		int[] serie;
 
@@ -2170,6 +2362,8 @@ public class TourData {
 		pulseSerie = serieData.pulseSerie;
 		temperatureSerie = serieData.temperatureSerie;
 		timeSerie = serieData.timeSerie;
+		powerSerie = serieData.powerSerie;
+		speedSerie = serieData.speedSerie;
 
 		latitudeSerie = serieData.latitude;
 		longitudeSerie = serieData.longitude;
@@ -2241,6 +2435,17 @@ public class TourData {
 		serieData.pulseSerie = pulseSerie;
 		serieData.temperatureSerie = temperatureSerie;
 		serieData.timeSerie = timeSerie;
+
+		/*
+		 * don't save computed data series
+		 */
+		if (isSpeedSerieFromDevice) {
+			serieData.speedSerie = speedSerie;
+		}
+
+		if (isPowerSerieFromDevice) {
+			serieData.powerSerie = powerSerie;
+		}
 
 		serieData.latitude = latitudeSerie;
 		serieData.longitude = longitudeSerie;

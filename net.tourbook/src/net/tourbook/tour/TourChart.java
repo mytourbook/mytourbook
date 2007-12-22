@@ -24,6 +24,7 @@ import java.util.Map;
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartMarkerLayer;
@@ -369,6 +370,7 @@ public class TourChart extends Chart {
 		fMarkerLayer.setLineColor(new RGB(50, 100, 10));
 
 		final Collection<TourMarker> tourMarkerList = fTourData.getTourMarkers();
+		final int[] altitudeSerie = fTourData.altitudeSerie;
 
 		for (final TourMarker tourMarker : tourMarkerList) {
 
@@ -379,7 +381,9 @@ public class TourChart extends Chart {
 			chartMarker.graphX = xAxisSerie[markerIndex];
 
 			chartMarker.markerLabel = tourMarker.getLabel();
-			chartMarker.graphLabel = Integer.toString(fTourData.altitudeSerie[markerIndex]);
+			if (altitudeSerie != null) {
+				chartMarker.graphLabel = Integer.toString(altitudeSerie[markerIndex]);
+			}
 
 			chartMarker.serieIndex = markerIndex;
 			chartMarker.visualPosition = tourMarker.getVisualPosition();
@@ -441,7 +445,7 @@ public class TourChart extends Chart {
 	 * @param workbenchWindow
 	 * @param tourChartConfig
 	 */
-	public void createTourActionHandlers(TourChartConfiguration tourChartConfig) {
+	public void createTourEditorActionHandlers(TourChartConfiguration tourChartConfig) {
 
 		fTourChartConfig = tourChartConfig;
 
@@ -531,7 +535,7 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * create the tour specific action, they are defined in the chart configuration
+	 * create the tour specific action bar, they are defined in the chart configuration
 	 */
 	private void fillToolbar() {
 
@@ -730,10 +734,30 @@ public class TourChart extends Chart {
 		final TCActionProxy actionProxy = fActionProxies.get(commandId);
 
 		actionProxy.setEnabled(isEnabled);
-		fTCActionHandlerManager.getActionHandler(commandId).fireHandlerChanged();
+		final TCActionHandler actionHandler = fTCActionHandlerManager.getActionHandler(commandId);
+		if (actionHandler != null) {
+			actionHandler.fireHandlerChanged();
+		}
 
 		actionProxy.setChecked(isChecked);
 		fTCActionHandlerManager.updateUICheckState(commandId);
+	}
+
+	/**
+	 * Set the enable state for a command and update the UI
+	 */
+	@Override
+	public void setCommandEnabled(String commandId, boolean isEnabled) {
+
+		final TCActionProxy actionProxy = fActionProxies.get(commandId);
+
+		if (actionProxy != null) {
+			actionProxy.setEnabled(isEnabled);
+			final TCActionHandler actionHandler = fTCActionHandlerManager.getActionHandler(commandId);
+			if (actionHandler != null) {
+				actionHandler.fireHandlerChanged();
+			}
+		}
 	}
 
 	/**
@@ -1043,12 +1067,12 @@ public class TourChart extends Chart {
 		fTourData = newTourData;
 		fTourChartConfig = newChartConfig;
 
-		final ChartDataModel newDataModel = TourManager.getInstance().createChartDataModel(newTourData,
+		final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(newTourData,
 				newChartConfig,
 				isPropertyChanged);
 
 		// set the model before the actions are created
-		setDataModel(newDataModel);
+		setDataModel(newChartDataModel);
 
 		if (fShowActions) {
 			createTourActionProxies();
@@ -1056,21 +1080,49 @@ public class TourChart extends Chart {
 			updateActionState();
 		}
 
+// ####################
+
+		/*
+		 * enable/disable graph commands
+		 */
+
+		// enable all graph actions which are displayed
+		ArrayList<Integer> enabledGraphIds = new ArrayList<Integer>();
+		for (final ChartDataSerie xyDataIterator : newChartDataModel.getXyData()) {
+
+			if (xyDataIterator instanceof ChartDataYSerie) {
+				ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
+				final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+
+				setCommandEnabled(getProxyId(graphId), true);
+				enabledGraphIds.add(graphId);
+			}
+		}
+
+		// disable all graph actions which are not displayed
+		for (Integer graphId : TourManager.allGraphIDs) {
+			if (enabledGraphIds.contains(graphId) == false) {
+				setCommandEnabled(getProxyId(graphId), false);
+			}
+		}
+
+// ####################
+
 		// restore min/max values from the chart config
 		final ChartYDataMinMaxKeeper chartConfigMinMaxKeeper = newChartConfig.getMinMaxKeeper();
 		if (chartConfigMinMaxKeeper != null && keepMinMaxValues) {
-			chartConfigMinMaxKeeper.setMinMaxValues(newDataModel);
+			chartConfigMinMaxKeeper.setMinMaxValues(newChartDataModel);
 		}
 
 		if (fChartDataModelListener != null) {
-			fChartDataModelListener.dataModelChanged(newDataModel);
+			fChartDataModelListener.dataModelChanged(newChartDataModel);
 		}
 
 		createSegmentLayers();
 		createMarkerLayer();
 		setGraphLayers();
 
-		updateChart(newDataModel);
+		updateChart(newChartDataModel);
 	}
 
 	/**

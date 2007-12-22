@@ -172,11 +172,22 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 				tourElement.sequence = serieIndex;
 
 				tourElement.time = timeSerie[serieIndex];
-				tourElement.distance = distanceSerie[serieIndex];
-				tourElement.altitude = altitudeSerie[serieIndex];
-				tourElement.temperature = temperatureSerie[serieIndex];
-				tourElement.cadence = cadenceSerie[serieIndex];
-				tourElement.pulse = pulseSerie[serieIndex];
+
+				if (distanceSerie != null) {
+					tourElement.distance = distanceSerie[serieIndex];
+				}
+				if (altitudeSerie != null) {
+					tourElement.altitude = altitudeSerie[serieIndex];
+				}
+				if (temperatureSerie != null) {
+					tourElement.temperature = temperatureSerie[serieIndex];
+				}
+				if (cadenceSerie != null) {
+					tourElement.cadence = cadenceSerie[serieIndex];
+				}
+				if (pulseSerie != null) {
+					tourElement.pulse = pulseSerie[serieIndex];
+				}
 
 				if (longitudeSerie != null) {
 					tourElement.longitude = longitudeSerie[serieIndex];
@@ -286,7 +297,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED
@@ -728,7 +739,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 

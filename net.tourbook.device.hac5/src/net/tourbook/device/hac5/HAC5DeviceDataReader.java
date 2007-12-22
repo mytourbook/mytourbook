@@ -277,8 +277,13 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 				final short timeInterval = tourData.getDeviceTimeInterval();
 
-				short totalPulse = tourData.getStartPulse();
-				short totalAltitude = tourData.getStartAltitude();
+				short absolutePulse = tourData.getStartPulse();
+				short absoluteAltitude = tourData.getStartAltitude();
+
+				int sumDistance = 0;
+				int sumPulse = 0;
+				int sumAltitude = 0;
+				int sumCadence = 0;
 
 				short temperature;
 				short marker;
@@ -321,10 +326,10 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 						dataLength = 6;
 					}
 
+					TimeData timeData;
+
 					// get all slices in the current record (BB or CC)
 					for (int dataIndex = 0; dataIndex < dataLength; dataIndex++) {
-
-						TimeData timeData;
 
 						if (isFirstDataRecord) {
 
@@ -341,6 +346,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 							timeData.altitude = tourData.getStartAltitude();
 							timeData.temperature = temperature;
 							timeData.cadence = cadence;
+							timeData.distance = 0;
 						}
 
 						timeDataList.add(timeData = new TimeData());
@@ -360,21 +366,25 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 							/*
 							 * this is the last time slice within the whole tour
 							 */
-							timeData.time = (short) (cadence % 20);
+							timeData.time = cadence % 20;
 						} else {
 							timeData.time = timeInterval;
 						}
 
 						// read data for the current time slice
 						DeviceReaderTools.readTimeSlice(DeviceReaderTools.get2ByteData(recordBuffer,
-								4 + (2 * dataIndex)),
-								timeData);
+								4 + (2 * dataIndex)), timeData);
 
 						// adjust pulse from relative to absolute
-						timeData.pulse = totalPulse += timeData.pulse;
+						timeData.pulse = absolutePulse += timeData.pulse;
 
 						// adjust altitude from relative to absolute
-						totalAltitude += timeData.altitude;
+						absoluteAltitude += timeData.altitude;
+
+						sumDistance += timeData.distance;
+						sumAltitude += absoluteAltitude;
+						sumPulse += absolutePulse;
+						sumCadence += cadence;
 					}
 
 					// check if the last record was read
@@ -413,6 +423,23 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					// add new tour to the map
 					tourDataMap.put(tourId, tourData);
 
+					/*
+					 * disable data series when there are no data available
+					 */
+					TimeData firstTimeData = timeDataList.get(0);
+					if (sumDistance == 0) {
+						firstTimeData.distance = Integer.MIN_VALUE;
+					}
+					if (sumAltitude == 0) {
+						firstTimeData.altitude = Integer.MIN_VALUE;
+					}
+					if (sumPulse == 0) {
+						firstTimeData.pulse = Integer.MIN_VALUE;
+					}
+					if (sumCadence == 0) {
+						firstTimeData.cadence = Integer.MIN_VALUE;
+					}
+
 					tourData.createTimeSeries(timeDataList, true);
 					tourData.computeTourDrivingTime();
 					tourData.computeAvgFields();
@@ -421,9 +448,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					tourData.setDeviceName(visibleName);
 
 					// set week of year
-					fCalendar.set(tourData.getStartYear(),
-							tourData.getStartMonth() - 1,
-							tourData.getStartDay());
+					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 				}
 				// dump DD block

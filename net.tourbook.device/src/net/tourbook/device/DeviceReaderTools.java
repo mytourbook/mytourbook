@@ -24,8 +24,7 @@ import net.tourbook.data.TimeData;
 public class DeviceReaderTools {
 
 	/**
-	 * Convert a byte[] array to readable string format. This makes the "hex"
-	 * readable!
+	 * Convert a byte[] array to readable string format. This makes the "hex" readable!
 	 * 
 	 * @return result String buffer in String format
 	 * @param in
@@ -91,12 +90,14 @@ public class DeviceReaderTools {
 
 		return rslt;
 	}
+
 	public static int get2ByteData(RandomAccessFile file) throws IOException {
 
 		int ch1 = file.read();
 		int ch2 = file.read();
-		if ((ch1 | ch2) < 0)
+		if ((ch1 | ch2) < 0) {
 			throw new EOFException();
+		}
 		int offset = (ch2 << 8) + (ch1 << 0);
 		return (offset);
 	}
@@ -112,8 +113,7 @@ public class DeviceReaderTools {
 	}
 
 	/**
-	 * get a 2 byte value (unsigned integer) from the buffer, by swapping the
-	 * high and low byte
+	 * get a 2 byte value (unsigned integer) from the buffer, by swapping the high and low byte
 	 * 
 	 * @param buffer
 	 * @param offset
@@ -161,17 +161,17 @@ public class DeviceReaderTools {
 			// -
 			timeData.altitude = (short) (0xFFC0 | ((data & 0x0FC0) >> 6));
 			if (timeData.altitude < -16) {
-				timeData.altitude = (short) (-16 + ((timeData.altitude + 16) * 7));
+				timeData.altitude = (-16 + ((timeData.altitude + 16) * 7));
 			}
 		} else {
 			// +
 			timeData.altitude = (short) ((data & 0x0FC0) >> 6);
 			if (timeData.altitude > 16) {
-				timeData.altitude = (short) (16 + ((timeData.altitude - 16) * 7));
+				timeData.altitude = (16 + ((timeData.altitude - 16) * 7));
 			}
 		}
 
 		// distance (6 bits)
-		timeData.distance = (data & 0x003F) * 10;
+		timeData.distance = (short) (data & 0x003F) * 10;
 	}
 }

@@ -97,8 +97,8 @@ public class GarminSAXHandler extends DefaultHandler {
 		iso.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
 	}
 
-	public GarminSAXHandler(TourbookDevice deviceDataReader, String importFileName,
-			DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
+	public GarminSAXHandler(TourbookDevice deviceDataReader, String importFileName, DeviceData deviceData,
+			HashMap<String, TourData> tourDataMap) {
 
 		fDeviceDataReader = deviceDataReader;
 		fImportFileName = importFileName;
@@ -125,9 +125,15 @@ public class GarminSAXHandler extends DefaultHandler {
 		final int[] timeSerie = tourData.timeSerie;
 		final int[] altitudeSerie = tourData.altitudeSerie;
 
+		if (altitudeSerie == null) {
+			return;
+		}
+
 		final int serieLength = timeSerie.length;
 
-		if (serieLength == 0) { return; }
+		if (serieLength == 0) {
+			return;
+		}
 
 		int lastTime = 0;
 		int currentAltitude = altitudeSerie[0];
@@ -526,11 +532,9 @@ public class GarminSAXHandler extends DefaultHandler {
 				setTourData();
 			}
 
-		}
-		catch (final NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			e.printStackTrace();
-		}
-		catch (final ParseException e) {
+		} catch (final ParseException e) {
 			e.printStackTrace();
 		}
 
@@ -545,8 +549,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				return Double.MIN_VALUE;
 			}
 
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return Double.MIN_VALUE;
 		}
 	}
@@ -560,8 +563,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				return Float.MIN_VALUE;
 			}
 
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return Float.MIN_VALUE;
 		}
 	}
@@ -574,8 +576,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			} else {
 				return Short.MIN_VALUE;
 			}
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return Short.MIN_VALUE;
 		}
 	}
@@ -589,7 +590,9 @@ public class GarminSAXHandler extends DefaultHandler {
 
 	private void setTourData() {
 
-		if (fTimeDataList == null || fTimeDataList.size() == 0) { return; }
+		if (fTimeDataList == null || fTimeDataList.size() == 0) {
+			return;
+		}
 
 		// check if the distance is set
 //		if (fTimeDataList.get(0).absoluteDistance == Float.MIN_VALUE) {
@@ -644,8 +647,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	}
 
 	@Override
-	public void startElement(String uri, String localName, String name, Attributes attributes)
-			throws SAXException {
+	public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
 
 		if (fDataVersion > 0) {
 

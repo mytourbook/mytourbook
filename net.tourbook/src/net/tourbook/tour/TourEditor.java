@@ -89,8 +89,7 @@ public class TourEditor extends EditorPart {
 
 			public void partClosed(IWorkbenchPartReference partRef) {
 				if (fIsTourChanged) {
-					TourDatabase.getInstance()
-							.firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
+					TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
 				}
 			}
 
@@ -198,7 +197,7 @@ public class TourEditor extends EditorPart {
 		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
-		fTourChart.createTourActionHandlers(fTourChartConfig);
+		fTourChart.createTourEditorActionHandlers(fTourChartConfig);
 
 		updateTourChart();
 	}
@@ -247,8 +246,7 @@ public class TourEditor extends EditorPart {
 			final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 			modifiedTour.add(fTourData);
 
-			TourManager.getInstance()
-					.firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED, modifiedTour);
+			TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED, modifiedTour);
 		}
 	}
 

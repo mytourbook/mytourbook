@@ -70,9 +70,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 		return null;
 	}
 
-	public boolean processDeviceData(	String importFileName,
-										DeviceData deviceData,
-										HashMap<String, TourData> tourDataMap) {
+	public boolean processDeviceData(String importFileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
 
 		RandomAccessFile fileRawData = null;
 
@@ -300,7 +298,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 							if (iData + 1 == iDataMax) {
 								// this is the last time slice
-								timeData.time = (short) (marker % HAC4_TIMESLICE);
+								timeData.time = marker % HAC4_TIMESLICE;
 							} else {
 								// this is a normal time slice
 								timeData.time = HAC4_TIMESLICE;
@@ -347,9 +345,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 					tourData.setDeviceModeName(getDeviceModeName(profileId));
 
 					// set week of year
-					fCalendar.set(tourData.getStartYear(),
-							tourData.getStartMonth() - 1,
-							tourData.getStartDay());
+					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 				}
 
@@ -485,17 +481,17 @@ public class HAC4DeviceReader extends TourbookDevice {
 		if ((data & 0x0800) != 0) {
 			timeData.altitude = (short) (0xFFC0 | ((data & 0x0FC0) >> 6));
 			if (timeData.altitude < -16) {
-				timeData.altitude = (short) (-16 + ((timeData.altitude + 16) * 7));
+				timeData.altitude = (-16 + ((timeData.altitude + 16) * 7));
 			}
 		} else {
 			timeData.altitude = (short) ((data & 0x0FC0) >> 6);
 			if (timeData.altitude > 16) {
-				timeData.altitude = (short) (16 + ((timeData.altitude - 16) * 7));
+				timeData.altitude = (16 + ((timeData.altitude - 16) * 7));
 			}
 		}
 
 		// decode distance (6 bits)
-		timeData.distance = (data & 0x003F) * 10;
+		timeData.distance = (short) (data & 0x003F) * 10;
 
 	}
 

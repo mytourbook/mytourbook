@@ -4361,7 +4361,18 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void switchSliderTo2ndXData(final ChartXSlider slider) {
 
-		final int[] xValues = fDrawingData.get(0).getXData2nd().getHighValues()[0];
+		final ChartDrawingData chartDrawingData = fDrawingData.get(0);
+		if (chartDrawingData == null) {
+			return;
+		}
+
+		final ChartDataXSerie data2nd = chartDrawingData.getXData2nd();
+
+		if (data2nd == null) {
+			return;
+		}
+
+		final int[] xValues = data2nd.getHighValues()[0];
 		int valueIndex = slider.getValuesIndex();
 
 		if (valueIndex >= xValues.length) {
@@ -4376,8 +4387,7 @@ public class ChartComponentGraph extends Canvas {
 
 			slider.moveToDevPosition(linePos, true, true);
 
-		}
-		catch (final ArrayIndexOutOfBoundsException e) {
+		} catch (final ArrayIndexOutOfBoundsException e) {
 			// ignore
 		}
 	}

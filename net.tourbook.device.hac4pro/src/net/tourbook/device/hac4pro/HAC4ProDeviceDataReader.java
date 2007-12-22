@@ -61,9 +61,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		canReadFromDevice = true;
 	}
 
-	public boolean processDeviceData(	String importFileName,
-										DeviceData deviceData,
-										HashMap<String, TourData> tourDataMap) {
+	public boolean processDeviceData(String importFileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
 		boolean returnValue = false;
 
 		byte[] recordBuffer = new byte[RECORD_LENGTH];
@@ -258,14 +256,13 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 							/*
 							 * this is the last time slice within the whole tour
 							 */
-							timeData.time = (short) (cadence % 20);
+							timeData.time = cadence % 20;
 						} else {
 							timeData.time = timeInterval;
 						}
 
 						// read data for the current time slice
-						readTimeSlice(DeviceReaderTools.get2ByteData(recordBuffer,
-								4 + (2 * dataIndex)), timeData);
+						readTimeSlice(DeviceReaderTools.get2ByteData(recordBuffer, 4 + (2 * dataIndex)), timeData);
 
 						// adjust pulse from relative to absolute value
 						timeData.pulse = totalPulse += timeData.pulse;
@@ -314,9 +311,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 					tourData.setDeviceName(visibleName);
 
 					// set week of year
-					fCalendar.set(tourData.getStartYear(),
-							tourData.getStartMonth() - 1,
-							tourData.getStartDay());
+					fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 					tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 				}
 				// dump DD block
@@ -487,18 +482,18 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 			// -
 			timeData.altitude = (short) (0xFFC0 | ((data & 0x0FC0) >> 6));
 			if (timeData.altitude < -16) {
-				timeData.altitude = (short) (-16 + ((timeData.altitude + 16) * 7));
+				timeData.altitude = (-16 + ((timeData.altitude + 16) * 7));
 			}
 		} else {
 			// +
 			timeData.altitude = (short) ((data & 0x0FC0) >> 6);
 			if (timeData.altitude > 16) {
-				timeData.altitude = (short) (16 + ((timeData.altitude - 16) * 7));
+				timeData.altitude = (16 + ((timeData.altitude - 16) * 7));
 			}
 		}
 
 		// distance (6 bits)
-		timeData.distance = (data & 0x003F) * 10;
+		timeData.distance = (short) (data & 0x003F) * 10;
 	}
 
 	public String getDeviceModeName(int profileId) {

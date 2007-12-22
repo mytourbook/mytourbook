@@ -292,7 +292,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
 
@@ -400,8 +400,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			imageDatabase = (Image) imageDatabaseDescriptor.createResource(display);
 			imageDatabaseOtherPerson = (Image) imageDatabaseOtherPersonDescriptor.createResource(display);
 			imageDatabasePlaceholder = (Image) imageDatabasePlaceholderDescriptor.createResource(display);
-		}
-		catch (final DeviceResourceException e) {
+		} catch (final DeviceResourceException e) {
 			e.printStackTrace();
 		}
 
@@ -425,7 +424,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 		// define and create all columns
 		fColumnManager = new ColumnManager(this);
-		defineAllColumns(parent);
+		createTourViewerColumns(parent);
 		fColumnManager.createColumns();
 
 		// table viewer
@@ -458,7 +457,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	 * 
 	 * @param parent
 	 */
-	private void defineAllColumns(final Composite parent) {
+	private void createTourViewerColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 
@@ -684,7 +683,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		final IStructuredSelection tourSelection = (IStructuredSelection) fTourViewer.getSelection();
@@ -743,7 +742,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fPostSelectionProvider.setSelection(selection);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 
@@ -827,6 +826,8 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			if (mementoImportedFiles != null) {
 
 				final RawDataManager rawDataManager = RawDataManager.getInstance();
+
+				rawDataManager.getTourDataMap().clear();
 
 				String[] files = StringToArrayConverter.convertStringToArray(mementoImportedFiles, FILESTRING_SEPARATOR);
 				int importCounter = 0;
