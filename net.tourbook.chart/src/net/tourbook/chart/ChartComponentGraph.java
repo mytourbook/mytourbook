@@ -314,7 +314,7 @@ public class ChartComponentGraph extends Canvas {
 	protected boolean					fIsSmoothScrollingActive;
 	protected int						fSmoothScrollCurrentPosition;
 
-	int									fGraphAlpha				= 0xc0;
+	int									fGraphAlpha				= 0xe0;
 
 	protected boolean					fIsLayerImageDirty;
 

@@ -198,6 +198,19 @@ public abstract class ChartDataSerie {
 				}
 			}
 
+			/*
+			 * force the min/max values to have not the same value this is necessary to display a
+			 * visible line in the chart
+			 */
+			if (fVisibleMinValue == fVisibleMaxValue) {
+
+				fVisibleMaxValue++;
+
+				if (fVisibleMinValue > 0) {
+					fVisibleMinValue--;
+				}
+			}
+
 			fOriginalMinValue = fVisibleMinValue;
 			fOriginalMaxValue = fVisibleMaxValue;
 		}

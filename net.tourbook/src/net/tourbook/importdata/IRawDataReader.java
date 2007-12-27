@@ -25,7 +25,7 @@ public interface IRawDataReader {
 	/**
 	 * @return Returns the complete data size which will be received on the COM port for this device
 	 */
-	public int getImportDataSize();
+	public int getTransferDataSize();
 
 	/**
 	 * Read the data from the raw data file and create the device and tour data
@@ -36,9 +36,7 @@ public interface IRawDataReader {
 	 * @return Returns <code>true</code> when the import was successfull, the parameters
 	 *         <code>deviceData</code> and <code>tourData</code> are set from the imported file.
 	 */
-	public boolean processDeviceData(	String fileName,
-										DeviceData deviceData,
-										HashMap<String, TourData> tourDataMap);
+	public boolean processDeviceData(String fileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap);
 
 	/**
 	 * Validate data format

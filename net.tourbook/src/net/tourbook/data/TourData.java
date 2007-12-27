@@ -813,6 +813,7 @@ public class TourData {
 		int anzValuesSum = 1;
 
 		if (distanceSerie.length >= 2) {
+
 			if (deviceTimeInterval > 0) {
 				anzValuesSum = MIN_TIMEINTERVAL_FOR_MAX_SPEED / deviceTimeInterval;
 				if (anzValuesSum == 0) {
@@ -851,7 +852,7 @@ public class TourData {
 			if (deviceTimeInterval == -1) {
 				computeSpeedSerieInternalWithVariableInterval();
 			} else {
-				computeSpeedSerieCustom();
+				computeSpeedSerieCustomWithFixedInterval();
 			}
 		} else {
 
@@ -860,14 +861,14 @@ public class TourData {
 			if (deviceTimeInterval == -1) {
 				computeSpeedSerieInternalWithVariableInterval();
 			} else {
-				computeSpeedSerieInternal();
+				computeSpeedSerieInternalWithFixedInterval();
 			}
 		}
 
 //		computeValueClipping();
 	}
 
-	private void computeSpeedSerieCustom() {
+	private void computeSpeedSerieCustomWithFixedInterval() {
 
 		final int serieLength = timeSerie.length;
 
@@ -937,7 +938,7 @@ public class TourData {
 	 * 
 	 * @return
 	 */
-	private void computeSpeedSerieInternal() {
+	private void computeSpeedSerieInternalWithFixedInterval() {
 
 		if (distanceSerie == null) {
 			return;
@@ -1270,12 +1271,6 @@ public class TourData {
 			return;
 		}
 
-		// check if _GPS data are available
-		if (deviceTimeInterval == -1) {
-			latitudeSerie = new double[serieLength];
-			longitudeSerie = new double[serieLength];
-		}
-
 		final TimeData firstTimeDataItem = timeDataList.get(0);
 
 		timeSerie = new int[serieLength];
@@ -1328,6 +1323,12 @@ public class TourData {
 			powerSerie = new int[serieLength];
 			isPower = true;
 			isPowerSerieFromDevice = true;
+		}
+
+		// check if _GPS data are available
+		if (firstTimeDataItem.latitude != Integer.MIN_VALUE) {
+			latitudeSerie = new double[serieLength];
+			longitudeSerie = new double[serieLength];
 		}
 
 		int timeIndex = 0;
@@ -1452,7 +1453,7 @@ public class TourData {
 			// convert data from the tour format into an interger[]
 			for (final TimeData timeData : timeDataList) {
 
-				timeSerie[timeIndex] = timeAbsolute;
+				timeSerie[timeIndex] = timeAbsolute += timeData.time;
 
 				if (isDistance) {
 					distanceSerie[timeIndex] = distanceAbsolute += timeData.distance;
@@ -1486,7 +1487,6 @@ public class TourData {
 					createMarker(timeData, timeIndex, timeAbsolute, distanceAbsolute);
 				}
 
-				timeAbsolute += timeData.time;
 				timeIndex++;
 			}
 		}
@@ -1546,12 +1546,12 @@ public class TourData {
 	 */
 	public Object[] createTourSegments() {
 
-		final int segmentSerieLength = segmentSerieIndex.length;
-
-		if (segmentSerieIndex == null || segmentSerieLength < 2) {
+		if (segmentSerieIndex == null || segmentSerieIndex.length < 2) {
 			// at least two points are required to build a segment
 			return new Object[0];
 		}
+
+		final int segmentSerieLength = segmentSerieIndex.length;
 
 		final ArrayList<TourSegment> tourSegments = new ArrayList<TourSegment>(segmentSerieLength);
 		final int firstSerieIndex = segmentSerieIndex[0];
@@ -1560,10 +1560,6 @@ public class TourData {
 		int distanceStart = distanceSerie[firstSerieIndex];
 		int altitudeStart = altitudeSerie[firstSerieIndex];
 		int timeStart = timeSerie[firstSerieIndex];
-		int timeSlice = timeSerie[1] - timeSerie[0];
-		if (timeSlice == 0 && timeSerie.length > 1) {
-			timeSlice = timeSerie[2] - timeSerie[1];
-		}
 
 		segmentSerieAltitude = new int[segmentSerieLength];
 		segmentSerieDistance = new int[segmentSerieLength];
@@ -1603,8 +1599,11 @@ public class TourData {
 			segmentSerieDistance[segmentIndex] = segment.distance = distanceEnd - distanceStart;
 
 			segmentSerieTime[segmentIndex] = segment.recordingTime = recordingTime;
-			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = drivingTime//
-			= recordingTime - getBreakTime(segmentStartIndex, segmentEndIndex);
+
+			segmentSerieDrivingTime[segmentIndex] = //
+			segment.drivingTime = //
+			drivingTime = //
+			Math.max(0, recordingTime - getBreakTime(segmentStartIndex, segmentEndIndex));
 
 			int[] localPowerSerie = getPowerSerie();
 			int altitudeUp = 0;
@@ -1624,8 +1623,11 @@ public class TourData {
 				altitudeUp += altitudeDiff >= 0 ? altitudeDiff : 0;
 				altitudeDown += altitudeDiff < 0 ? altitudeDiff : 0;
 
-				pulseSum += pulseSerie[serieIndex];
 				powerSum += localPowerSerie[serieIndex];
+
+				if (pulseSerie != null) {
+					pulseSum += pulseSerie[serieIndex];
+				}
 			}
 
 			segment.altitudeUp = altitudeUp;
@@ -1637,8 +1639,6 @@ public class TourData {
 			segmentSeriePace[segmentIndex] = segment.pace //
 			= drivingTime == 0 ? 0 : (float) ((float) drivingTime * 16.666 / segment.distance * UI.UNIT_VALUE_DISTANCE);
 
-//			final float pace = (float) (time * 16.666 / distance);
-
 			segmentSerieGradient[segmentIndex] = segment.gradient //
 			= (float) segment.altitude * 100 / segment.distance;
 
@@ -1647,8 +1647,11 @@ public class TourData {
 					* 3600
 					/ UI.UNIT_VALUE_ALTITUDE;
 
-			segmentSeriePulse[segmentIndex] = pulseSum / (segmentEndIndex - segmentStartIndex);
 			segmentSeriePower[segmentIndex] = segment.power = powerSum / (segmentEndIndex - segmentStartIndex);
+
+			if (segmentSeriePulse != null) {
+				segmentSeriePulse[segmentIndex] = pulseSum / (segmentEndIndex - segmentStartIndex);
+			}
 
 			// end point of current segment is the start of the next segment
 			altitudeStart = altitudeEnd;
@@ -1748,9 +1751,9 @@ public class TourData {
 	 */
 	public int[] getAltimeterSerie() {
 
-		if (altimeterSerie == null) {
-			return null;
-		}
+//		if (altimeterSerie == null) {
+//			return null;
+//		}
 
 		if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
@@ -2153,7 +2156,7 @@ public class TourData {
 			// use metric system
 
 			if (speedSerie == null) {
-				computeSpeedSerieInternal();
+				computeSpeedSerieInternalWithFixedInterval();
 			}
 
 			return speedSerie;
@@ -2163,7 +2166,7 @@ public class TourData {
 			// use imperial system
 
 			if (speedSerieImperial == null) {
-				computeSpeedSerieInternal();
+				computeSpeedSerieInternalWithFixedInterval();
 			}
 
 			return speedSerieImperial;
@@ -2362,8 +2365,16 @@ public class TourData {
 		pulseSerie = serieData.pulseSerie;
 		temperatureSerie = serieData.temperatureSerie;
 		timeSerie = serieData.timeSerie;
+
 		powerSerie = serieData.powerSerie;
+		if (powerSerie != null) {
+			isPowerSerieFromDevice = true;
+		}
+
 		speedSerie = serieData.speedSerie;
+		if (speedSerie != null) {
+			isSpeedSerieFromDevice = true;
+		}
 
 		latitudeSerie = serieData.latitude;
 		longitudeSerie = serieData.longitude;
@@ -2555,8 +2566,8 @@ public class TourData {
 	}
 
 	/**
-	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time
-	 * slices are unequally
+	 * time difference between 2 time slices or <code>-1</code> for GPS devices or ergometer when
+	 * the time slices are not equally
 	 * 
 	 * @param deviceTimeInterval
 	 */

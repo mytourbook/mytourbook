@@ -368,7 +368,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fPageBook = new PageBook(parent, SWT.NONE);
 
 		fPageNoChart = new Label(fPageBook, SWT.NONE);
-		fPageNoChart.setText(Messages.UI_Label_no_chart_is_selected);
+		fPageNoChart.setText(Messages.Tour_Segmenter_Label_no_chart);
 
 		fPageSegmenter = new Composite(fPageBook, SWT.NONE);
 		GridLayoutFactory.fillDefaults().spacing(0, 1).applyTo(fPageSegmenter);
@@ -862,6 +862,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		if (fTourData == null) {
 			fPageBook.showPage(fPageNoChart);
 			return;
+		} else {
+			if (fTourData.getMetricDistanceSerie() == null || fTourData.altitudeSerie == null) {
+				fPageBook.showPage(fPageNoChart);
+				return;
+			}
 		}
 
 		fPageBook.showPage(fPageSegmenter);
@@ -901,6 +906,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// create points for the simplifier from distance and altitude
 		final int[] distanceSerie = fTourData.getMetricDistanceSerie();
 		final int[] altitudeSerie = fTourData.altitudeSerie;
+
+//		if (distanceSerie == null || altitudeSerie == null) {
+//			fPageBook.showPage(fPageNoChart);
+//			return;
+//		} else {
+//			fPageBook.showPage(fPageSegmenter);
+//		}
 
 		final Point graphPoints[] = new Point[distanceSerie.length];
 		for (int iPoint = 0; iPoint < graphPoints.length; iPoint++) {

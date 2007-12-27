@@ -29,6 +29,10 @@ public class TourDataNormalizer {
 		int[] measureAltitudes = tourData.altitudeSerie;
 		int[] measureDistances = tourData.getMetricDistanceSerie();
 
+		if (measureAltitudes == null || measureDistances == null) {
+			return;
+		}
+
 		// create normalized data, the distance will be normalized to 100m
 		int normStartDistance = measureDistances[measureStartIndex] / NORMALIZED_DISTANCE;
 		int normEndDistance = measureDistances[measureEndIndex] / NORMALIZED_DISTANCE;
@@ -54,8 +58,7 @@ public class TourDataNormalizer {
 		for (int normIndex = 0; normIndex < normSize; normIndex++) {
 
 			// get the last measure point before the next normalized distance
-			while (measureNextDistance <= normDistance
-					&& measureIndex < measureDistances.length - 1) {
+			while (measureNextDistance <= normDistance && measureIndex < measureDistances.length - 1) {
 
 				// set the index to the next measure point
 				measureIndex++;

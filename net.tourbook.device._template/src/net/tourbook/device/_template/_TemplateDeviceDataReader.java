@@ -40,7 +40,7 @@ public class _TemplateDeviceDataReader extends TourbookDevice {
 		return ""; //$NON-NLS-1$
 	}
 
-	public int getImportDataSize() {
+	public int getTransferDataSize() {
 		return 0x10000;
 	}
 

@@ -62,6 +62,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 	}
 
 	public boolean processDeviceData(String importFileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
+
 		boolean returnValue = false;
 
 		byte[] recordBuffer = new byte[RECORD_LENGTH];
@@ -174,8 +175,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 				short timeInterval = tourData.getDeviceTimeInterval();
 
-				short totalPulse = tourData.getStartPulse();
-				short totalAltitude = tourData.getStartAltitude();
+				short absolutePulse = tourData.getStartPulse();
+				short absoluteAltitude = tourData.getStartAltitude();
 
 				short temperature;
 				short marker;
@@ -183,6 +184,11 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 				boolean isFirstDataRecord = true;
 				boolean isCCRecord = false;
+
+				int sumDistance = 0;
+				int sumPulse = 0;
+				int sumAltitude = 0;
+				int sumCadence = 0;
 
 				while (true) {
 
@@ -233,6 +239,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 							timeDataList.add(timeData = new TimeData());
 
+							timeData.distance = 0;
 							timeData.pulse = tourData.getStartPulse();
 							timeData.altitude = tourData.getStartAltitude();
 							timeData.temperature = temperature;
@@ -265,10 +272,15 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 						readTimeSlice(DeviceReaderTools.get2ByteData(recordBuffer, 4 + (2 * dataIndex)), timeData);
 
 						// adjust pulse from relative to absolute value
-						timeData.pulse = totalPulse += timeData.pulse;
+						timeData.pulse = absolutePulse += timeData.pulse;
 
 						// adjust altitude from relative to absolute
-						totalAltitude += timeData.altitude;
+						absoluteAltitude += timeData.altitude;
+
+						sumDistance += timeData.distance;
+						sumAltitude += Math.abs(absoluteAltitude);
+						sumPulse += absolutePulse;
+						sumCadence += cadence;
 					}
 
 					// check if the last record was read
@@ -301,6 +313,23 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 					// add new tour to the map
 					tourDataMap.put(tourId, tourData);
+
+					/*
+					 * disable data series when no data are available
+					 */
+					TimeData firstTimeData = timeDataList.get(0);
+					if (sumDistance == 0) {
+						firstTimeData.distance = Integer.MIN_VALUE;
+					}
+					if (sumAltitude == 0) {
+						firstTimeData.altitude = Integer.MIN_VALUE;
+					}
+					if (sumPulse == 0) {
+						firstTimeData.pulse = Integer.MIN_VALUE;
+					}
+					if (sumCadence == 0) {
+						firstTimeData.cadence = Integer.MIN_VALUE;
+					}
 
 					tourData.createTimeSeries(timeDataList, true);
 					tourData.computeTourDrivingTime();
@@ -554,7 +583,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		return offsetDDRecord;
 	}
 
-	public int getImportDataSize() {
+	public int getTransferDataSize() {
 		return 0x1009A;
 	}
 

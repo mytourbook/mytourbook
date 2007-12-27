@@ -30,13 +30,8 @@ public class TCActionProxy {
 
 	private String	fCommandId;
 
-	private boolean	fIsEnabled		= true;
+	private boolean	fIsEnabled	= true;
 	private boolean	fIsChecked;
-
-	/**
-	 * when <code>true</code> this proxy contains a graph action
-	 */
-	private boolean	fIsGraphAction	= false;
 
 	public TCActionProxy(String commandId, Action action) {
 
@@ -60,10 +55,6 @@ public class TCActionProxy {
 		return fIsEnabled;
 	}
 
-	public boolean isGraphAction() {
-		return fIsGraphAction;
-	}
-
 	/**
 	 * Set check state in the proxy and action/handler,this does not update the UÎ when the handler
 	 * is used. To update the UI {@link ICommandService#refreshElements(*)} method must be called
@@ -79,8 +70,7 @@ public class TCActionProxy {
 			fAction.setChecked(isChecked);
 		}
 
-		final TCActionHandler actionHandler = TCActionHandlerManager.getInstance()
-				.getActionHandler(fCommandId);
+		final TCActionHandler actionHandler = TCActionHandlerManager.getInstance().getActionHandler(fCommandId);
 
 		if (actionHandler != null) {
 			actionHandler.setChecked(isChecked);
@@ -103,16 +93,11 @@ public class TCActionProxy {
 			fAction.setEnabled(isEnabled);
 		}
 
-		final TCActionHandler actionHandler = TCActionHandlerManager.getInstance()
-				.getActionHandler(fCommandId);
+		final TCActionHandler actionHandler = TCActionHandlerManager.getInstance().getActionHandler(fCommandId);
 
 		if (actionHandler != null) {
 			actionHandler.setEnabled(isEnabled);
 		}
-	}
-
-	public void setIsGraphAction() {
-		fIsGraphAction = true;
 	}
 
 }

@@ -16,7 +16,6 @@
 
 package net.tourbook.importdata;
 
-
 public class PortThread implements Runnable, IDataListener {
 
 	private WizardImportData	fImportWizard;
@@ -40,14 +39,18 @@ public class PortThread implements Runnable, IDataListener {
 
 			SerialParameters portParameters = fImportDevice.getPortParameters(fPortName);
 
+			if (portParameters == null) {
+				return;
+			}
+
 			fPortListener = new PortListener(portParameters, this);
 
 			fIsDataReceived = false;
 			fByteIndex = 0;
 
 			/*
-			 * open the port and wait until data are received, when new are
-			 * available then the method dataArrived will be called
+			 * open the port and wait until data are received, when new are available then the
+			 * method dataArrived will be called
 			 */
 			fPortListener.openConnection();
 
@@ -61,7 +64,7 @@ public class PortThread implements Runnable, IDataListener {
 				if (fPortListener == null) {
 					break;
 				}
-				
+
 				// send data when no data has been received yet
 				if (fIsDataReceived == false) {
 					if (fPortListener.sendData(0xD8) == false) {
@@ -99,8 +102,8 @@ public class PortThread implements Runnable, IDataListener {
 				fByteIndex++;
 
 				/*
-				 * when the start sequence is correct then the bytes will not be
-				 * checked again because these data will change
+				 * when the start sequence is correct then the bytes will not be checked again
+				 * because these data will change
 				 */
 				if (fByteIndex >= fImportDevice.getStartSequenceSize()) {
 					fIsDataReceived = true;

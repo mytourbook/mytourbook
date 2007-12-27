@@ -79,7 +79,7 @@ public class CRPDataReader extends TourbookDevice {
 		return Messages.CRP_Profile_unknown;
 	}
 
-	public int getImportDataSize() {
+	public int getTransferDataSize() {
 		return -1;
 	}
 
@@ -94,6 +94,7 @@ public class CRPDataReader extends TourbookDevice {
 	}
 
 	public boolean processDeviceData(String importFileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
+
 		boolean returnValue = false;
 
 		// reset tour data list
@@ -124,7 +125,7 @@ public class CRPDataReader extends TourbookDevice {
 			ArrayList<String> trackPoints = new ArrayList<String>();
 
 			tokenLine = new StringTokenizer(fileReader.readLine());
-			@SuppressWarnings("unused")
+			@SuppressWarnings("unused") //$NON-NLS-1$
 			String fileVersion = tokenLine.nextToken();
 
 			// get all trackpoints
@@ -240,21 +241,26 @@ public class CRPDataReader extends TourbookDevice {
 
 			int pulse;
 			int distance = 0;
-			@SuppressWarnings("unused")
+			@SuppressWarnings("unused") //$NON-NLS-1$
 			int speed;
 			int altitude;
-			@SuppressWarnings("unused")
+			@SuppressWarnings("unused") //$NON-NLS-1$
 			int color;
-			@SuppressWarnings("unused")
+			@SuppressWarnings("unused") //$NON-NLS-1$
 			int symbol;
 			int temperature;
-			@SuppressWarnings("unused")
+			@SuppressWarnings("unused") //$NON-NLS-1$
 			String trackpointTime;
 
 			int oldDistance = 0;
 			int oldAltitude = 0;
 			int tourAltUp = 0;
 			int tourAltDown = 0;
+
+			int sumAltitude = 0;
+			int sumDistance = 0;
+			int sumPulse = 0;
+			int sumTemperature = 0;
 
 			for (String trackPoint : trackPoints) {
 
@@ -279,12 +285,14 @@ public class CRPDataReader extends TourbookDevice {
 
 				final short altitudeDiff = (short) (altitude - oldAltitude);
 				timeData.altitude = altitudeDiff;
-				timeData.cadence = 0;
 				timeData.distance = distance - oldDistance;
 				timeData.pulse = pulse;
 				timeData.temperature = temperature;
 
-				if (tpIndex == trackPoints.size() - 1) {
+				if (tpIndex == 0) {
+					// first trackpoint
+					timeData.time = 0;
+				} else if (tpIndex == trackPoints.size() - 1) {
 					// last track point
 					timeData.time = tourRecordingTime - tourTime;
 				} else {
@@ -319,6 +327,11 @@ public class CRPDataReader extends TourbookDevice {
 				// prepare next interval
 				tourTime += interval;
 				tpIndex++;
+
+				sumDistance += timeData.distance;
+				sumAltitude += Math.abs(altitude);
+				sumPulse += pulse;
+				sumTemperature += Math.abs(temperature);
 			}
 
 			fileReader.close();
@@ -339,6 +352,23 @@ public class CRPDataReader extends TourbookDevice {
 				// add new tour to the map
 				tourDataMap.put(tourId, tourData);
 
+				/*
+				 * disable data series when no data are available
+				 */
+				TimeData firstTimeData = timeDataList.get(0);
+				if (sumDistance == 0) {
+					firstTimeData.distance = Integer.MIN_VALUE;
+				}
+				if (sumAltitude == 0) {
+					firstTimeData.altitude = Integer.MIN_VALUE;
+				}
+				if (sumPulse == 0) {
+					firstTimeData.pulse = Integer.MIN_VALUE;
+				}
+				if (sumTemperature == 0) {
+					firstTimeData.temperature = Integer.MIN_VALUE;
+				}
+
 				// create additional data
 				tourData.createTimeSeries(timeDataList, false);
 				tourData.computeTourDrivingTime();
@@ -353,9 +383,9 @@ public class CRPDataReader extends TourbookDevice {
 				// set week of year
 				fCalendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
-
-				returnValue = true;
 			}
+
+			returnValue = true;
 
 		} catch (Exception e) {
 			e.printStackTrace();

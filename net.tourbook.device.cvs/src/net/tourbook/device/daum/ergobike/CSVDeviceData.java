@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.device.csv;
+package net.tourbook.device.daum.ergobike;
 
 import java.io.RandomAccessFile;
 

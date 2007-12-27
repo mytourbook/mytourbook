@@ -25,6 +25,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 
 public class ProviderTourMonth extends DataProvider {
 
@@ -56,10 +57,7 @@ public class ProviderTourMonth extends DataProvider {
 		return fInstance;
 	}
 
-	TourDataMonth getMonthData(	TourPerson person,
-								TourTypeFilter tourTypeFilter,
-								int year,
-								boolean refreshData) {
+	TourDataMonth getMonthData(TourPerson person, TourTypeFilter tourTypeFilter, int year, boolean refreshData) {
 
 		// when the data for the year are already loaded, all is done
 		if (fActivePerson == person
@@ -126,8 +124,8 @@ public class ProviderTourMonth extends DataProvider {
 
 				dbTypeIds[colorIndex][month] = dbTypeIdObject == null ? -1 : dbTypeIdObject;
 
-				dbDistance[colorIndex][month] = result.getInt(2) / 1000;
-				dbAltitude[colorIndex][month] = result.getInt(3);
+				dbDistance[colorIndex][month] = (int) (result.getInt(2) / 1000 / UI.UNIT_VALUE_DISTANCE);
+				dbAltitude[colorIndex][month] = (int) (result.getInt(3) / UI.UNIT_VALUE_ALTITUDE);
 				dbTime[colorIndex][month] = result.getInt(4);
 			}
 

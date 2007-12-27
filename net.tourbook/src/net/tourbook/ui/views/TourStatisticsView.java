@@ -26,6 +26,7 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.Preferences;
@@ -142,20 +143,25 @@ public class TourStatisticsView extends ViewPart {
 					fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
 
 					refreshStatistics();
-				}
 
-				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 					// update statistics
+					refreshStatistics();
+
+				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					// measurement system has changed
+
+					UI.updateUnits();
+
 					refreshStatistics();
 				}
 			}
 		};
 
 		// register the listener
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	private void addSelectionListener() {
@@ -169,8 +175,7 @@ public class TourStatisticsView extends ViewPart {
 
 					refreshStatistics();
 
-				} else if (selection instanceof SelectionDeletedTours
-						&& selection.isEmpty() == false) {
+				} else if (selection instanceof SelectionDeletedTours && selection.isEmpty() == false) {
 
 					refreshStatistics();
 				}
@@ -204,10 +209,7 @@ public class TourStatisticsView extends ViewPart {
 		// this view is a selection provider, set it before the statistics container is created
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		fStatisticContainer = new StatisticContainer(getViewSite(),
-				fPostSelectionProvider,
-				parent,
-				SWT.NONE);
+		fStatisticContainer = new StatisticContainer(getViewSite(), fPostSelectionProvider, parent, SWT.NONE);
 
 		addPartListener();
 		addPrefListener();
@@ -242,9 +244,7 @@ public class TourStatisticsView extends ViewPart {
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		fColorYearFg.dispose();
 		fColorYearBg.dispose();

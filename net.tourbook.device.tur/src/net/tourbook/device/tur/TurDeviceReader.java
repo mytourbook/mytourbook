@@ -152,7 +152,7 @@ public class TurDeviceReader extends TourbookDevice {
 	 * 
 	 * @see net.tourbook.importdata.IRawDataReader#getImportDataSize()
 	 */
-	public int getImportDataSize() {
+	public int getTransferDataSize() {
 		// We dont't have a com-port device so this is not neccessary
 		return 0;
 	}
@@ -209,18 +209,26 @@ public class TurDeviceReader extends TourbookDevice {
 			int secStart3 = 0;
 			int secStart4 = 0;
 
-			int oldAltimeter = 0;
+			int oldAltitude = 0;
 			int oldDistance = 0;
+
+			int sumDistance = 0;
+			int sumAltitude = 0;
+			int sumCadence = 0;
+			int sumPulse = 0;
+			int sumTemperature = 0;
 
 			ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
 
 			for (int dataIndex = 0; dataIndex < entryCount; dataIndex++) {
+
 				if (Integer.parseInt(turDeviceData.fileVersion.substring(0, 1)) >= 3) {
 					secStart1 = TurFileUtil.readByte(fileTurData); // Byte 1
 					secStart2 = TurFileUtil.readByte(fileTurData); // Byte 2
 					secStart3 = TurFileUtil.readByte(fileTurData); // Byte 3
 					secStart4 = TurFileUtil.readByte(fileTurData); // Byte 4
 				}
+
 				int sec1 = TurFileUtil.readByte(fileTurData); // Byte 5
 				int sec2 = TurFileUtil.readByte(fileTurData); // Byte 6
 				int sec3 = TurFileUtil.readByte(fileTurData); // Byte 7
@@ -234,10 +242,10 @@ public class TurDeviceReader extends TourbookDevice {
 				int hm1 = TurFileUtil.readByte(fileTurData); // Byte 13
 				int hm2 = TurFileUtil.readByte(fileTurData); // Byte 14
 
-				int puls = TurFileUtil.readByte(fileTurData); // Byte 15
+				int pulse = TurFileUtil.readByte(fileTurData); // Byte 15
 				int cadence = TurFileUtil.readByte(fileTurData); // Byte 16
 
-				int temp = TurFileUtil.readByte(fileTurData); // Byte 17
+				int temperature = TurFileUtil.readByte(fileTurData); // Byte 17
 
 				// Read last 3 Byte of binary data (not used)
 				TurFileUtil.readByte(fileTurData);
@@ -249,15 +257,15 @@ public class TurDeviceReader extends TourbookDevice {
 				int seconds = sec1 + (256 * sec2) + (256 * 256 * sec3) + (256 * 256 * 256 * sec4);
 				int distance = dst1 + (256 * dst2) + (256 * 256 * dst3) + (256 * 256 * 256 * dst4);
 				distance *= 10; // distance in 10m
-				int altimeter = hm1 + (256 * hm2);
+				int altitude = hm1 + (256 * hm2);
 
-				if (altimeter > 6000) { // negative
-					altimeter = altimeter - MAX_INT;
+				if (altitude > 6000) { // negative
+					altitude = altitude - MAX_INT;
 				}
 
 				if (dataIndex == 0) {
-					tourData.setStartAltitude((short) altimeter);
-					tourData.setStartPulse((short) puls);
+					tourData.setStartAltitude((short) altitude);
+					tourData.setStartPulse((short) pulse);
 				}
 
 				if (dataIndex == 1) {
@@ -266,12 +274,12 @@ public class TurDeviceReader extends TourbookDevice {
 
 				TimeData timeData = new TimeData();
 
-				timeData.altitude = altimeter - oldAltimeter;
-				oldAltimeter = altimeter;
+				timeData.altitude = altitude - oldAltitude;
+				oldAltitude = altitude;
 
 				timeData.cadence = cadence;
-				timeData.pulse = puls;
-				timeData.temperature = temp;
+				timeData.pulse = pulse;
+				timeData.temperature = temperature;
 
 				if (dataIndex == 0) {
 					timeData.distance = 0;
@@ -286,6 +294,12 @@ public class TurDeviceReader extends TourbookDevice {
 							+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
 				}
 				timeDataList.add(timeData);
+
+				sumDistance += timeData.distance;
+				sumAltitude += Math.abs(altitude);
+				sumCadence += cadence;
+				sumPulse += pulse;
+				sumTemperature += Math.abs(temperature);
 
 //				if (i == entryCount - 1) {
 //					// summarize the recording time
@@ -305,6 +319,26 @@ public class TurDeviceReader extends TourbookDevice {
 
 				// add new tour to the map
 				tourDataMap.put(tourId, tourData);
+
+				/*
+				 * disable data series when no data are available
+				 */
+				TimeData firstTimeData = timeDataList.get(0);
+				if (sumDistance == 0) {
+					firstTimeData.distance = Integer.MIN_VALUE;
+				}
+				if (sumAltitude == 0) {
+					firstTimeData.altitude = Integer.MIN_VALUE;
+				}
+				if (sumCadence == 0) {
+					firstTimeData.cadence = Integer.MIN_VALUE;
+				}
+				if (sumPulse == 0) {
+					firstTimeData.pulse = Integer.MIN_VALUE;
+				}
+				if (sumTemperature == 0) {
+					firstTimeData.temperature = Integer.MIN_VALUE;
+				}
 
 				tourData.createTimeSeries(timeDataList, true);
 				tourData.computeAvgFields();
@@ -354,10 +388,13 @@ public class TurDeviceReader extends TourbookDevice {
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			return false;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
 		} finally {
 			if (fileTurData != null) {
 				try {

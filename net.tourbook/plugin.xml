@@ -426,7 +426,7 @@
             </visibleWhen>
             <command
                   commandId="net.tourbook.command.tourChart.xAxisTime"
-                  icon="icons/x-axes-time.gif"
+                  icon="icons/x-axis-time.gif"
                   label="%command_tourChart_xAxisTime"
                   mnemonic="%command_tourChart_xAxisTime_mnemonic"
                   style="radio"
@@ -434,7 +434,7 @@
             </command>
             <command
                   commandId="net.tourbook.command.tourChart.xAxisDistance"
-                  icon="icons/x-axes-distance.gif"
+                  icon="icons/x-axis-distance.gif"
                   label="%command_tourChart_xAxisDistance"
                   mnemonic="%command_tourChart_xAxisDistance_mnemonic"
                   style="radio"
@@ -444,15 +444,17 @@
                   name="net.tourbook.separator"
                   visible="true">
             </separator>            <command
-                  commandId="net.tourbook.command.graph.altitude"
-                  icon="icons/graph-altitude.gif"
-                  label="%command_graph_altitude"
-                  mnemonic="%command_graph_altitude_mnemonic"
-                  style="toggle"
-                  tooltip="%command_graph_altitude_tooltip">
+                                          commandId="net.tourbook.command.graph.altitude"
+                                          disabledIcon="icons/graph-altitude-disabled.gif"
+                                          icon="icons/graph-altitude.gif"
+                                          label="%command_graph_altitude"
+                                          mnemonic="%command_graph_altitude_mnemonic"
+                                          style="toggle"
+                                          tooltip="%command_graph_altitude_tooltip">
             </command>
             <command
                   commandId="net.tourbook.command.graph.pulse"
+                  disabledIcon="icons/graph-pulse-disabled.gif"
                   icon="icons/graph-pulse.gif"
                   label="%command_graph_pulse"
                   mnemonic="%command_graph_pulse_mnemonic"
@@ -461,6 +463,7 @@
             </command>
             <command
                   commandId="net.tourbook.command.graph.speed"
+                  disabledIcon="icons/graph-speed-disabled.gif"
                   icon="icons/graph-speed.gif"
                   label="%command_graph_speed"
                   mnemonic="%command_graph_speed_mnemonic"
@@ -469,6 +472,7 @@
             </command>
             <command
                   commandId="net.tourbook.command.graph.pace"
+                  disabledIcon="icons/graph-pace-disabled.gif"
                   icon="icons/graph-pace.gif"
                   label="%command_graph_pace"
                   mnemonic="%command_graph_pace_mnemonic"
@@ -477,6 +481,7 @@
             </command>
             <command
                   commandId="net.tourbook.command.graph.power"
+                  disabledIcon="icons/graph-power-disabled.gif"
                   icon="icons/graph-power.gif"
                   label="%command_graph_power"
                   mnemonic="%command_graph_power_mnemonic"
@@ -485,6 +490,7 @@
             </command>
             <command
                   commandId="net.tourbook.command.graph.temperature"
+                  disabledIcon="icons/graph-temperature-disabled.gif"
                   icon="icons/graph-temperature.gif"
                   label="%command_graph_temperature"
                   mnemonic="%command_graph_temperature_mnemonic"
@@ -493,6 +499,7 @@
             </command>
             <command
                   commandId="net.tourbook.command.graph.cadence"
+                  disabledIcon="icons/graph-cadence-disabled.gif"
                   icon="icons/graph-cadence.gif"
                   label="%command_graph_cadence"
                   mnemonic="%command_graph_cadence_mnemonic"
@@ -501,6 +508,7 @@
             </command>
             <command
                   commandId="net.tourbook.command.graph.altimeter"
+                  disabledIcon="icons/graph-altimeter-disabled.gif"
                   icon="icons/graph-altimeter.gif"
                   label="%command_graph_altimeter"
                   mnemonic="%command_graph_altimeter_mnemonic"
@@ -509,6 +517,7 @@
             </command>
             <command
                   commandId="net.tourbook.command.graph.gradient"
+                  disabledIcon="icons/graph-gradient-disabled.gif"
                   icon="icons/graph-gradient.gif"
                   label="%command_graph_gradient"
                   mnemonic="%command_graph_gradient_mnemonic"

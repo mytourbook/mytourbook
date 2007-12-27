@@ -27,6 +27,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 import net.tourbook.util.ArrayListToArray;
 
 public class ProviderTourTime extends DataProvider /* implements IBarSelectionProvider */{
@@ -144,11 +145,7 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 				final int duration = recordingTime;
 
 				// get date
-				fCalendar.set(result.getShort(2),
-						tourMonth,
-						result.getShort(4),
-						startHour,
-						startMinute);
+				fCalendar.set(result.getShort(2), tourMonth, result.getShort(4), startHour, startMinute);
 
 				// create data lists for the chart, start with 0
 				doyList.add(fCalendar.get(Calendar.DAY_OF_YEAR) - 1);
@@ -156,8 +153,8 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 				startTimeList.add(startTime);
 				endTimeList.add((startTime + duration));
 
-				distanceList.add(result.getInt(7) / 1000);
-				altitudeList.add(result.getInt(8));
+				distanceList.add((int) (result.getInt(7) / 1000 / UI.UNIT_VALUE_DISTANCE));
+				altitudeList.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
 				durationList.add(duration);
 
 				/*
@@ -170,17 +167,14 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 					final long dbTypeId = result.getLong(11);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
-							tourTypeColorIndex = typeIndex
-									+ StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+							tourTypeColorIndex = typeIndex + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 							break;
 						}
 					}
 				}
 
 				dbTypeColorIndex.add(tourTypeColorIndex);
-				dbTypeIds.add(dbTypeIdObject == null
-						? TourType.TOUR_TYPE_ID_NOT_DEFINED
-						: dbTypeIdObject);
+				dbTypeIds.add(dbTypeIdObject == null ? TourType.TOUR_TYPE_ID_NOT_DEFINED : dbTypeIdObject);
 			}
 
 			conn.close();

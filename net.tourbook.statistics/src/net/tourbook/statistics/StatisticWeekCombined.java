@@ -20,6 +20,7 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
+import net.tourbook.ui.UI;
 
 public class StatisticWeekCombined extends StatisticWeek {
 
@@ -39,7 +40,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 				tourWeekData.fDistanceLow,
 				tourWeekData.fDistanceHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
+		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
@@ -53,7 +54,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 				tourWeekData.fAltitudeLow,
 				tourWeekData.fAltitudeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
+		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);

@@ -130,7 +130,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return Messages.HAC5_profile_none;
 	}
 
-	public int getImportDataSize() {
+	public int getTransferDataSize() {
 		return 0x10007;
 	}
 
@@ -342,6 +342,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 							timeDataList.add(timeData = new TimeData());
 
+							timeData.time = 0;
 							timeData.pulse = tourData.getStartPulse();
 							timeData.altitude = tourData.getStartAltitude();
 							timeData.temperature = temperature;
@@ -363,9 +364,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 						// set time
 						if (isCCRecord && (dataIndex + 1 == dataLength)) {
-							/*
-							 * this is the last time slice within the whole tour
-							 */
+							// this is the last time slice within the whole tour
 							timeData.time = cadence % 20;
 						} else {
 							timeData.time = timeInterval;
@@ -382,7 +381,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 						absoluteAltitude += timeData.altitude;
 
 						sumDistance += timeData.distance;
-						sumAltitude += absoluteAltitude;
+						sumAltitude += Math.abs(absoluteAltitude);
 						sumPulse += absolutePulse;
 						sumCadence += cadence;
 					}
@@ -424,7 +423,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					tourDataMap.put(tourId, tourData);
 
 					/*
-					 * disable data series when there are no data available
+					 * disable data series when no data are available
 					 */
 					TimeData firstTimeData = timeDataList.get(0);
 					if (sumDistance == 0) {

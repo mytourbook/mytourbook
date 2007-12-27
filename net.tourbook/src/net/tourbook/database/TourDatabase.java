@@ -136,7 +136,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tours in database
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private static ArrayList<Long> getAllTourIds() {
 
 		ArrayList<Long> tourList = new ArrayList<Long>();
@@ -166,7 +166,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourBike> getTourBikes() {
 
 		ArrayList<TourBike> bikeList = new ArrayList<TourBike>();
@@ -211,7 +211,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour people in the db sorted by last/first name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourPerson> getTourPeople() {
 
 		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
@@ -235,7 +235,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types which are stored in the database sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourType> getTourTypes() {
 
 		if (fTourTypes != null) {
@@ -292,11 +292,9 @@ public class TourDatabase {
 				ts.commit();
 			}
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			if (ts.isActive()) {
 				ts.rollback();
 			} else {
@@ -365,11 +363,9 @@ public class TourDatabase {
 //
 //				}
 
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-			}
-			finally {
+			} finally {
 				if (ts.isActive()) {
 					ts.rollback();
 				} else {
@@ -418,11 +414,9 @@ public class TourDatabase {
 					runnableStartServer.run(splashProgressMonitor);
 				}
 
-			}
-			catch (InvocationTargetException e) {
+			} catch (InvocationTargetException e) {
 				e.printStackTrace();
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
@@ -758,13 +752,11 @@ public class TourDatabase {
 
 				fIsTableChecked = true;
 
-			}
-			finally {
+			} finally {
 				if (stmt != null) {
 					try {
 						stmt.close();
-					}
-					catch (SQLException e) {
+					} catch (SQLException e) {
 						e.printStackTrace();
 					}
 				}
@@ -772,8 +764,7 @@ public class TourDatabase {
 
 			conn.close();
 
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -823,8 +814,7 @@ public class TourDatabase {
 			fIsVersionChecked = true;
 			conn.close();
 
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return true;
@@ -849,8 +839,7 @@ public class TourDatabase {
 		// load derby driver
 		try {
 			Class.forName("org.apache.derby.jdbc.ClientDriver"); //$NON-NLS-1$
-		}
-		catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			return startServerRunnable;
 		}
@@ -879,8 +868,7 @@ public class TourDatabase {
 
 		try {
 			checkServer();
-		}
-		catch (MyTourbookException e) {
+		} catch (MyTourbookException e) {
 			e.printStackTrace();
 		}
 
@@ -916,8 +904,7 @@ public class TourDatabase {
 
 					try {
 						checkServer();
-					}
-					catch (MyTourbookException e) {
+					} catch (MyTourbookException e) {
 						e.printStackTrace();
 						return;
 					}
@@ -940,19 +927,16 @@ public class TourDatabase {
 
 //		} catch (MyTourbookException e) {
 //			e.printStackTrace();
-		}
-		catch (InvocationTargetException e) {
+		} catch (InvocationTargetException e) {
 			e.printStackTrace();
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
 		if (emFactory == null) {
 			try {
 				throw new Exception("Cannot get EntityManagerFactory"); //$NON-NLS-1$
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return null;
@@ -978,11 +962,9 @@ public class TourDatabase {
 
 		try {
 			server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
-		}
-		catch (UnknownHostException e2) {
+		} catch (UnknownHostException e2) {
 			e2.printStackTrace();
-		}
-		catch (Exception e2) {
+		} catch (Exception e2) {
 			e2.printStackTrace();
 		}
 
@@ -992,14 +974,12 @@ public class TourDatabase {
 			 */
 			server.ping();
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 
 			try {
 				server.start(null);
 				// monitor.worked(1);
-			}
-			catch (Exception e2) {
+			} catch (Exception e2) {
 				e2.printStackTrace();
 			}
 
@@ -1009,12 +989,10 @@ public class TourDatabase {
 				try {
 					server.ping();
 					break;
-				}
-				catch (Exception e1) {
+				} catch (Exception e1) {
 					try {
 						Thread.sleep(1);
-					}
-					catch (InterruptedException e2) {
+					} catch (InterruptedException e2) {
 						e2.printStackTrace();
 					}
 				}
@@ -1027,8 +1005,7 @@ public class TourDatabase {
 
 				System.out.println("Database path: " + databasePath); //$NON-NLS-1$
 
-			}
-			catch (SQLException e1) {
+			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
 		}
@@ -1087,8 +1064,7 @@ public class TourDatabase {
 					+ (" set VERSION=" + newVersion) //$NON-NLS-1$
 					+ (" where 1=1"); //$NON-NLS-1$
 			conn.createStatement().executeUpdate(sqlString);
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
@@ -1114,8 +1090,7 @@ public class TourDatabase {
 			statement.executeBatch();
 			statement.close();
 
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			printSQLException(e);
 		}
 	}
@@ -1136,8 +1111,7 @@ public class TourDatabase {
 			statement.executeBatch();
 			statement.close();
 
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			printSQLException(e);
 		}
 	}
@@ -1199,8 +1173,7 @@ public class TourDatabase {
 			statement.executeBatch();
 			statement.close();
 
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			printSQLException(e);
 		}
 
@@ -1234,6 +1207,20 @@ public class TourDatabase {
 		// cleanup everything as if nothing has happened
 		emFactory.close();
 		emFactory = null;
+	}
+
+	public static String getTourTypeName(long typeId) {
+
+		String tourTypeName = UI.EMPTY_STRING;
+
+		for (TourType tourType : getTourTypes()) {
+			if (tourType.getTypeId() == typeId) {
+				tourTypeName = tourType.getName();
+				break;
+			}
+		}
+
+		return tourTypeName;
 	}
 
 //	private void updateDbDesign_4_5(Connection conn) {

@@ -164,6 +164,7 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour;
 	public static String		Image__edit_tour_disabled;
 	public static String		Image__fit_to_window;
+
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;
@@ -173,8 +174,18 @@ public class Messages extends NLS {
 	public static String		Image__graph_power;
 	public static String		Image__graph_speed;
 	public static String		Image__graph_temperature;
+	public static String		Image__graph_altimeter_disabled;
+	public static String		Image__graph_altitude_disabled;
+	public static String		Image__graph_cadence_disabled;
+	public static String		Image__graph_gradient_disabled;
+	public static String		Image__graph_heartbeat_disabled;
+	public static String		Image__graph_pace_disabled;
+	public static String		Image__graph_power_disabled;
+	public static String		Image__graph_speed_disabled;
+	public static String		Image__graph_temperature_disabled;
 	public static String		Image__graph_tour_compare;
 	public static String		Image__graph_tour_compare_disabled;
+
 	public static String		Image__link;
 	public static String		Image__open_tour_segmenter;
 	public static String		Image__refresh;
@@ -185,6 +196,8 @@ public class Messages extends NLS {
 	public static String		Image__save_tour;
 	public static String		Image__save_tour_disabled;
 	public static String		Image__show_distance_on_x_axis;
+
+	public static String	Image__show_distance_on_x_axis_disabled;
 	public static String		Image__show_time_on_x_axis;
 	public static String		Image__synch_graph_byScale;
 	public static String		Image__synch_graph_byScale_disabled;
@@ -353,6 +366,8 @@ public class Messages extends NLS {
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_update_tour;
 
+	public static String	Tour_Properties_Label_device_name;
+
 	public static String		Tour_Properties_Label_distance;
 	public static String		Tour_Properties_Label_time;
 	public static String		Tour_Properties_Label_time_unit;
@@ -431,6 +446,8 @@ public class Messages extends NLS {
 	public static String		Tour_Properties_Label_tour_type;
 
 	public static String		Tour_Segmenter_Label_default_tolerance;
+
+	public static String	Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;
 
 	public static String		TourAnalyzer_Label_average;

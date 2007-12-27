@@ -20,6 +20,7 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
+import net.tourbook.ui.UI;
 
 public class StatisticWeekDistance extends StatisticWeek {
 
@@ -39,7 +40,7 @@ public class StatisticWeekDistance extends StatisticWeek {
 				tourWeekData.fDistanceLow,
 				tourWeekData.fDistanceHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
+		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);

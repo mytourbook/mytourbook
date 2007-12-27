@@ -33,6 +33,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -172,27 +173,43 @@ public class StatisticTourNumbers extends YearStatistic {
 			public String getInfo(int serieIndex, int valueIndex) {
 
 				String barInfo;
+				StringBuilder infoText = new StringBuilder();
 
 				if (valueIndex == 0) {
-					barInfo = new Formatter().format(Messages.NUMBERS_ALTITUDE_DOWN + Messages.NUMBERS_ALTITUDE_UNIT,
+
+					infoText.append(Messages.NUMBERS_ALTITUDE_DOWN);
+					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
+
+					barInfo = new Formatter().format(infoText.toString(),
 							fStatAltitudeUnits[valueIndex],
+							UI.UNIT_LABEL_ALTITUDE,
 							fStatAltitudeCounterHigh[serieIndex][valueIndex],
-							fStatAltitudeSumHigh[serieIndex][valueIndex]).toString();
+							fStatAltitudeSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_ALTITUDE).toString();
 
 				} else if (valueIndex == fStatAltitudeUnits.length - 1) {
 
-					barInfo = new Formatter().format(Messages.NUMBERS_ALTITUDE_UP + Messages.NUMBERS_ALTITUDE_UNIT,
+					infoText.append(Messages.NUMBERS_ALTITUDE_UP);
+					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
+
+					barInfo = new Formatter().format(infoText.toString(),
 							fStatAltitudeUnits[valueIndex - 1],
+							UI.UNIT_LABEL_ALTITUDE,
 							fStatAltitudeCounterHigh[serieIndex][valueIndex],
-							fStatAltitudeSumHigh[serieIndex][valueIndex]).toString();
+							fStatAltitudeSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_ALTITUDE).toString();
 				} else {
 
-					barInfo = new Formatter().format(Messages.NUMBERS_ALTITUDE_BETWEEN + Messages.NUMBERS_ALTITUDE_UNIT,
+					infoText.append(Messages.NUMBERS_ALTITUDE_BETWEEN);
+					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
+
+					barInfo = new Formatter().format(infoText.toString(),
 							fStatAltitudeUnits[valueIndex - 1],
 							fStatAltitudeUnits[valueIndex],
+							UI.UNIT_LABEL_ALTITUDE,
 							fStatAltitudeCounterHigh[serieIndex][valueIndex],
-							fStatAltitudeSumHigh[serieIndex][valueIndex])
-							.toString();
+							fStatAltitudeSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_ALTITUDE).toString();
 				}
 
 				return barInfo;
@@ -243,27 +260,43 @@ public class StatisticTourNumbers extends YearStatistic {
 			public String getInfo(int serieIndex, int valueIndex) {
 
 				String barInfo;
+				StringBuilder infoText = new StringBuilder();
 
 				if (valueIndex == 0) {
-					barInfo = new Formatter().format(Messages.NUMBERS_DISTANCE_DOWN + Messages.NUMBERS_DISTANCE_UNIT,
+
+					infoText.append(Messages.NUMBERS_DISTANCE_DOWN);
+					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
+
+					barInfo = new Formatter().format(infoText.toString(),
 							fStatDistanceUnits[valueIndex],
+							UI.UNIT_LABEL_DISTANCE,
 							fStatDistanceCounterHigh[serieIndex][valueIndex],
-							fStatDistanceSumHigh[serieIndex][valueIndex]).toString();
+							fStatDistanceSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_DISTANCE).toString();
 
 				} else if (valueIndex == fStatDistanceUnits.length - 1) {
 
-					barInfo = new Formatter().format(Messages.NUMBERS_DISTANCE_UP + Messages.NUMBERS_DISTANCE_UNIT,
+					infoText.append(Messages.NUMBERS_DISTANCE_UP);
+					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
+
+					barInfo = new Formatter().format(infoText.toString(),
 							fStatDistanceUnits[valueIndex - 1],
+							UI.UNIT_LABEL_DISTANCE,
 							fStatDistanceCounterHigh[serieIndex][valueIndex],
-							fStatDistanceSumHigh[serieIndex][valueIndex]).toString();
+							fStatDistanceSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_DISTANCE).toString();
 				} else {
 
-					barInfo = new Formatter().format(Messages.NUMBERS_DISTANCE_BETWEEN + Messages.NUMBERS_DISTANCE_UNIT,
+					infoText.append(Messages.NUMBERS_DISTANCE_BETWEEN);
+					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
+
+					barInfo = new Formatter().format(infoText.toString(),
 							fStatDistanceUnits[valueIndex - 1],
 							fStatDistanceUnits[valueIndex],
+							UI.UNIT_LABEL_DISTANCE,
 							fStatDistanceCounterHigh[serieIndex][valueIndex],
-							fStatDistanceSumHigh[serieIndex][valueIndex])
-							.toString();
+							fStatDistanceSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_DISTANCE).toString();
 				}
 
 				return barInfo;
@@ -277,25 +310,36 @@ public class StatisticTourNumbers extends YearStatistic {
 			public String getInfo(int serieIndex, int valueIndex) {
 
 				String barInfo;
+				StringBuilder infoText = new StringBuilder();
 
 				if (valueIndex == 0) {
-					barInfo = new Formatter().format(Messages.NUMBERS_TIME_DOWN + Messages.NUMBERS_TIME_UNIT,
+
+					infoText.append(Messages.NUMBERS_TIME_DOWN);
+					infoText.append(Messages.NUMBERS_TIME_TOTAL);
+
+					barInfo = new Formatter().format(infoText.toString(),
 							ChartUtil.formatValue(fStatTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
 							fStatTimeCounterHigh[serieIndex][valueIndex],
 							ChartUtil.formatValue(fStatTimeSumHigh[serieIndex][valueIndex],
 									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
 
 				} else if (valueIndex == fStatTimeUnits.length - 1) {
-					barInfo = new Formatter().format(Messages.NUMBERS_TIME_UP + Messages.NUMBERS_TIME_UNIT,
+
+					infoText.append(Messages.NUMBERS_TIME_UP);
+					infoText.append(Messages.NUMBERS_TIME_TOTAL);
+
+					barInfo = new Formatter().format(infoText.toString(),
 							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-
 							fStatTimeCounterHigh[serieIndex][valueIndex],
-
 							ChartUtil.formatValue(fStatTimeSumHigh[serieIndex][valueIndex],
 									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE))
 							.toString();
 				} else {
-					barInfo = new Formatter().format(Messages.NUMBERS_TIME_BETWEEN + Messages.NUMBERS_TIME_UNIT,
+
+					infoText.append(Messages.NUMBERS_TIME_BETWEEN);
+					infoText.append(Messages.NUMBERS_TIME_TOTAL);
+
+					barInfo = new Formatter().format(infoText.toString(),
 							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
 							ChartUtil.formatValue(fStatTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
 							fStatTimeCounterHigh[serieIndex][valueIndex],
@@ -643,7 +687,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				fStatDistanceSumLow,
 				fStatDistanceSumHigh,
 				fStatDistanceSumColorIndex,
-				Messages.LABEL_GRAPH_DISTANCE_UNIT,
+				UI.UNIT_LABEL_DISTANCE,
 				Messages.LABEL_GRAPH_DISTANCE);
 
 		updateChartAltitude(fChartAltitudeCounter,
@@ -659,7 +703,7 @@ public class StatisticTourNumbers extends YearStatistic {
 				fStatAltitudeSumLow,
 				fStatAltitudeSumHigh,
 				fStatAltitudeSumColorIndex,
-				Messages.LABEL_GRAPH_ALTITUDE_UNIT,
+				UI.UNIT_LABEL_ALTITUDE,
 				Messages.LABEL_GRAPH_ALTITUDE);
 
 		updateChartTime(fChartDurationCounter,

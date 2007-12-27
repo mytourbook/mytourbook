@@ -69,7 +69,8 @@ public abstract class TourbookDevice implements IRawDataReader {
 
 	/**
 	 * @param portName
-	 * @return returns the serial port parameters which are use to receive data from the device
+	 * @return returns the serial port parameters which are use to receive data from the device or
+	 *         <code>null</code> when data transfer from a device is not supported
 	 */
 	public abstract SerialParameters getPortParameters(String portName);
 

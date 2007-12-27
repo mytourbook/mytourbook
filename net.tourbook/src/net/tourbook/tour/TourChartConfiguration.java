@@ -40,6 +40,12 @@ public class TourChartConfiguration {
 	public boolean					showTimeOnXAxisBackup	= false;
 
 	/**
+	 * is <code>true</code> when the distance is not available and the time must be displayed on
+	 * the x-axis
+	 */
+	public boolean					isForceTimeOnXAxis;
+
+	/**
 	 * true: show the start time of the tour
 	 * <p>
 	 * false: show the tour time which starts at 0
@@ -100,6 +106,10 @@ public class TourChartConfiguration {
 		}
 	}
 
+	/**
+	 * @return Returns all graph id's which are displayed in the chart, the list is in the sequence
+	 *         in which the graphs are displayed
+	 */
 	public ArrayList<Integer> getVisibleGraphs() {
 		return visibleGraphSequence;
 	}

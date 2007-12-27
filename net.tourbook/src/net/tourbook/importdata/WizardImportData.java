@@ -137,22 +137,18 @@ public class WizardImportData extends Wizard {
 			inReader.close();
 			outReader.close();
 
-		}
-		catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
-		}
-		finally {
+		} finally {
 			// close the files
 			if (inReader != null) {
 				try {
 					inReader.close();
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					e.printStackTrace();
 					return null;
 				}
@@ -160,8 +156,7 @@ public class WizardImportData extends Wizard {
 			if (outReader != null) {
 				try {
 					outReader.close();
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					e.printStackTrace();
 					return null;
 				}
@@ -218,23 +213,27 @@ public class WizardImportData extends Wizard {
 			fRunnableReceiveData = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) {
 
+					final SerialParameters portParameters = fImportDevice.getPortParameters(portName);
+
+					if (portParameters == null) {
+						return;
+					}
+
 					String msg = NLS.bind(Messages.Import_Wizard_Monitor_task_msg, new Object[] {
 							fImportDevice.visibleName,
 							portName,
-							fImportDevice.getPortParameters(portName).getBaudRate() });
+							portParameters.getBaudRate() });
 
-					monitor.beginTask(msg, fImportDevice.getImportDataSize());
+					monitor.beginTask(msg, fImportDevice.getTransferDataSize());
 
 					readDeviceData(monitor, portName);
 				}
 			};
 
 			getContainer().run(true, true, fRunnableReceiveData);
-		}
-		catch (InvocationTargetException e) {
+		} catch (InvocationTargetException e) {
 			e.printStackTrace();
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
@@ -259,11 +258,9 @@ public class WizardImportData extends Wizard {
 			fileStream = new FileOutputStream(tempDataFileName);
 			fileStream.write(fRawDataBuffer.toByteArray());
 			fileStream.close();
-		}
-		catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
@@ -303,8 +300,7 @@ public class WizardImportData extends Wizard {
 					if (importView != null) {
 						importView.updateViewer();
 					}
-				}
-				catch (PartInitException e) {
+				} catch (PartInitException e) {
 					e.printStackTrace();
 				}
 			}
@@ -355,7 +351,7 @@ public class WizardImportData extends Wizard {
 
 		fCloseDialog = false;
 
-		int importDataSize = fImportDevice.getImportDataSize();
+		int importDataSize = fImportDevice.getTransferDataSize();
 		int timer = 0;
 
 		// start the port thread which reads data from the com port
@@ -373,8 +369,7 @@ public class WizardImportData extends Wizard {
 
 			try {
 				Thread.sleep(100);
-			}
-			catch (InterruptedException e2) {
+			} catch (InterruptedException e2) {
 				e2.printStackTrace();
 			}
 
@@ -440,8 +435,7 @@ public class WizardImportData extends Wizard {
 		// wait for the port thread to be terminated
 		try {
 			portThread.join();
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}

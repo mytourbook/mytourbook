@@ -21,6 +21,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
+import net.tourbook.ui.UI;
 
 public class StatisticDayDistance extends StatisticDay {
 
@@ -42,7 +43,7 @@ public class StatisticDayDistance extends StatisticDay {
 				tourTimeData.fDistanceLow,
 				tourTimeData.fDistanceHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
+		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);

@@ -36,9 +36,8 @@ public class DeviceImportSorter extends ViewerSorter {
 	private int					direction;
 
 	/**
-	 * Does the sort. If it's a different column from the previous sort, do an
-	 * ascending sort. If it's the same column as the last sort, toggle the sort
-	 * direction.
+	 * Does the sort. If it's a different column from the previous sort, do an ascending sort. If
+	 * it's the same column as the last sort, toggle the sort direction.
 	 * 
 	 * @param column
 	 */
@@ -54,6 +53,7 @@ public class DeviceImportSorter extends ViewerSorter {
 		}
 	}
 
+	@Override
 	public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
 		final TourData tourData1 = ((TourData) obj1);
@@ -65,23 +65,49 @@ public class DeviceImportSorter extends ViewerSorter {
 		switch (column) {
 		case RawDataView.COLUMN_DATE:
 
-			// sort on date
-			result = (tourData1.getStartYear() * 10000 + tourData1.getStartMonth() * 100 + tourData1.getStartDay())
-					- (tourData2.getStartYear() * 10000 + tourData2.getStartMonth() * 100 + tourData2.getStartDay());
+			result = compareDateTime(tourData1, tourData2);
 
-			// sort on time if date is the same
+			break;
+
+		case RawDataView.COLUMN_TITLE:
+
+			// sort by title
+			result = tourData1.getTourTitle().compareTo(tourData2.getTourTitle());
+
+			break;
+
+		case RawDataView.COLUMN_DATA_FORMAT:
+
+			// sort by data format
+			result = tourData1.getDeviceName().compareTo(tourData2.getDeviceName());
+
 			if (result == 0) {
-				result = (tourData1.getStartHour() * 100 + tourData1.getStartMinute())
-						- (tourData2.getStartHour() * 100 + tourData2.getStartMinute());
+				result = compareDateTime(tourData1, tourData2);
 			}
-
 			break;
 		}
 
 		// If descending order, flip the direction
-		if (direction == DESCENDING)
+		if (direction == DESCENDING) {
 			result = -result;
+		}
 
+		return result;
+	}
+
+	private int compareDateTime(final TourData tourData1, final TourData tourData2) {
+
+		int result;
+
+		// sort on date
+		result = (tourData1.getStartYear() * 10000 + tourData1.getStartMonth() * 100 + tourData1.getStartDay())
+				- (tourData2.getStartYear() * 10000 + tourData2.getStartMonth() * 100 + tourData2.getStartDay());
+
+		// sort on time if date is the same
+		if (result == 0) {
+			result = (tourData1.getStartHour() * 100 + tourData1.getStartMinute())
+					- (tourData2.getStartHour() * 100 + tourData2.getStartMinute());
+		}
 		return result;
 	}
 }

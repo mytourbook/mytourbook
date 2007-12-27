@@ -22,6 +22,7 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
+import net.tourbook.ui.UI;
 
 public class StatisticDayAltitude extends StatisticDay {
 
@@ -43,7 +44,7 @@ public class StatisticDayAltitude extends StatisticDay {
 				tourTimeData.fAltitudeLow,
 				tourTimeData.fAltitudeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
+		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setVisibleMinValue(0);
 		yData.setCustomData(ALTITUDE_DATA, 1);

@@ -260,63 +260,63 @@ public class TourChart extends Chart {
 				Messages.Graph_Label_Altitude,
 				Messages.Tour_Action_graph_altitude_tooltip,
 				Messages.Image__graph_altitude,
-				null);
+				Messages.Image__graph_altitude_disabled);
 
 		createGraphActionProxy(TourManager.GRAPH_SPEED,
 				COMMAND_ID_GRAPH_SPEED,
 				Messages.Graph_Label_Speed,
 				Messages.Tour_Action_graph_speed_tooltip,
 				Messages.Image__graph_speed,
-				null);
+				Messages.Image__graph_speed_disabled);
 
 		createGraphActionProxy(TourManager.GRAPH_PACE,
 				COMMAND_ID_GRAPH_PACE,
 				Messages.Graph_Label_Pace,
 				Messages.Tour_Action_graph_pace_tooltip,
 				Messages.Image__graph_pace,
-				null);
+				Messages.Image__graph_pace_disabled);
 
 		createGraphActionProxy(TourManager.GRAPH_POWER,
 				COMMAND_ID_GRAPH_POWER,
 				Messages.Graph_Label_Power,
 				Messages.Tour_Action_graph_power_tooltip,
 				Messages.Image__graph_power,
-				null);
+				Messages.Image__graph_power_disabled);
 
 		createGraphActionProxy(TourManager.GRAPH_ALTIMETER,
 				COMMAND_ID_GRAPH_ALTIMETER,
 				Messages.Graph_Label_Altimeter,
 				Messages.Tour_Action_graph_altimeter_tooltip,
 				Messages.Image__graph_altimeter,
-				null);
+				Messages.Image__graph_altimeter_disabled);
 
 		createGraphActionProxy(TourManager.GRAPH_PULSE,
 				COMMAND_ID_GRAPH_PULSE,
 				Messages.Graph_Label_Heartbeat,
 				Messages.Tour_Action_graph_heartbeat_tooltip,
 				Messages.Image__graph_heartbeat,
-				null);
+				Messages.Image__graph_heartbeat_disabled);
 
 		createGraphActionProxy(TourManager.GRAPH_TEMPERATURE,
 				COMMAND_ID_GRAPH_TEMPERATURE,
 				Messages.Graph_Label_Temperature,
 				Messages.Tour_Action_graph_temperature_tooltip,
 				Messages.Image__graph_temperature,
-				null);
+				Messages.Image__graph_temperature_disabled);
 
 		createGraphActionProxy(TourManager.GRAPH_CADENCE,
 				COMMAND_ID_GRAPH_CADENCE,
 				Messages.Graph_Label_Cadence,
 				Messages.Tour_Action_graph_cadence_tooltip,
 				Messages.Image__graph_cadence,
-				null);
+				Messages.Image__graph_cadence_disabled);
 
 		createGraphActionProxy(TourManager.GRAPH_GRADIENT,
 				COMMAND_ID_GRAPH_GRADIENT,
 				Messages.Graph_Label_Gradiend,
 				Messages.Tour_Action_graph_gradient_tooltip,
 				Messages.Image__graph_gradient,
-				null);
+				Messages.Image__graph_gradient_disabled);
 
 		createGraphActionProxy(TourManager.GRAPH_TOUR_COMPARE,
 				COMMAND_ID_GRAPH_TOUR_COMPARE,
@@ -353,7 +353,7 @@ public class TourChart extends Chart {
 
 		final TCActionProxy actionProxy = new TCActionProxy(commandId, action);
 
-		actionProxy.setIsGraphAction();
+//		actionProxy.setIsGraphAction();
 
 		fActionProxies.put(getProxyId(graphId), actionProxy);
 	}
@@ -567,9 +567,9 @@ public class TourChart extends Chart {
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_PACE)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_POWER)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_TEMPERATURE)).getAction());
-		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_CADENCE)).getAction());
-		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_ALTIMETER)).getAction());
 		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_GRADIENT)).getAction());
+		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_ALTIMETER)).getAction());
+		tbm.add(fActionProxies.get(getProxyId(TourManager.GRAPH_CADENCE)).getAction());
 
 		tbm.add(new Separator());
 		tbm.add(fActionProxies.get(COMMAND_ID_X_AXIS_TIME).getAction());
@@ -665,7 +665,7 @@ public class TourChart extends Chart {
 
 		if (isChecked) {
 
-			// show distance on x axes
+			// show distance on x axis
 
 			fTourChartConfig.showTimeOnXAxis = !fTourChartConfig.showTimeOnXAxis;
 			fTourChartConfig.showTimeOnXAxisBackup = fTourChartConfig.showTimeOnXAxis;
@@ -746,7 +746,6 @@ public class TourChart extends Chart {
 	/**
 	 * Set the enable state for a command and update the UI
 	 */
-	@Override
 	public void setCommandEnabled(String commandId, boolean isEnabled) {
 
 		final TCActionProxy actionProxy = fActionProxies.get(commandId);
@@ -939,21 +938,26 @@ public class TourChart extends Chart {
 	 */
 	void updateActionState() {
 
-		final ArrayList<Integer> visibleGraphs = fTourChartConfig.getVisibleGraphs();
+		int[] allGraphIds = TourManager.allGraphIDs;
+		ArrayList<Integer> checkedGraphIds = fTourChartConfig.getVisibleGraphs();
+		ArrayList<Integer> enabledGraphIds = new ArrayList<Integer>();
 
-		// enable/uncheck all GRAPH action
-		for (final TCActionProxy actionProxy : fActionProxies.values()) {
-			if (actionProxy.isGraphAction()) {
-				actionProxy.setChecked(false);
-				actionProxy.setEnabled(true);
+		// get all graph ids which can be displayed
+		for (final ChartDataSerie xyDataIterator : getChartDataModel().getXyData()) {
+
+			if (xyDataIterator instanceof ChartDataYSerie) {
+				final ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
+				final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+				enabledGraphIds.add(graphId);
 			}
 		}
 
-		// check visible graph buttons
-		for (final int graphId : visibleGraphs) {
-			String proxyId = getProxyId(graphId);
-			fActionProxies.get(proxyId).setChecked(true);
-			fActionProxies.get(proxyId).setEnabled(true);
+		for (int graphId : allGraphIds) {
+
+			final TCActionProxy actionProxy = fActionProxies.get(getProxyId(graphId));
+
+			actionProxy.setChecked(checkedGraphIds.contains(graphId));
+			actionProxy.setEnabled(enabledGraphIds.contains(graphId));
 		}
 
 		// update start time option
@@ -962,6 +966,7 @@ public class TourChart extends Chart {
 
 		fActionProxies.get(COMMAND_ID_X_AXIS_TIME).setChecked(fTourChartConfig.showTimeOnXAxis);
 		fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setChecked(!fTourChartConfig.showTimeOnXAxis);
+		fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setEnabled(!fTourChartConfig.isForceTimeOnXAxis);
 
 		updateZoomOptions();
 
@@ -970,6 +975,43 @@ public class TourChart extends Chart {
 			fTCActionHandlerManager.updateUIState();
 		}
 	}
+
+//	/**
+//	 * Enable/disable the graph action buttons, the visible state of a graph is defined in the chart
+//	 * config
+//	 */
+//	void updateActionStateOLD() {
+//
+//		// enable/uncheck all GRAPH action
+//		for (final TCActionProxy actionProxy : fActionProxies.values()) {
+////			if (actionProxy.isGraphAction()) {
+////				actionProxy.setChecked(false);
+////				actionProxy.setEnabled(true);
+////			}
+//		}
+//
+//		// check visible graph buttons
+//		final ArrayList<Integer> visibleGraphs = fTourChartConfig.getVisibleGraphs();
+//		for (final int graphId : visibleGraphs) {
+//			String proxyId = getProxyId(graphId);
+//			fActionProxies.get(proxyId).setChecked(true);
+//			fActionProxies.get(proxyId).setEnabled(true);
+//		}
+//
+//		// update start time option
+//		fActionProxies.get(COMMAND_ID_SHOW_START_TIME).setEnabled(fTourChartConfig.showTimeOnXAxis);
+//		fActionProxies.get(COMMAND_ID_SHOW_START_TIME).setChecked(fTourChartConfig.isStartTime);
+//
+//		fActionProxies.get(COMMAND_ID_X_AXIS_TIME).setChecked(fTourChartConfig.showTimeOnXAxis);
+//		fActionProxies.get(COMMAND_ID_X_AXIS_DISTANCE).setChecked(!fTourChartConfig.showTimeOnXAxis);
+//
+//		updateZoomOptions();
+//
+//		// update UI state for the action handlers
+//		if (useActionHandlers()) {
+//			fTCActionHandlerManager.updateUIState();
+//		}
+//	}
 
 	/**
 	 * Updates the marker layer in the chart
@@ -1071,7 +1113,7 @@ public class TourChart extends Chart {
 				newChartConfig,
 				isPropertyChanged);
 
-		// set the model before the actions are created
+		// set the model BEFORE the actions are created/enabled/checked
 		setDataModel(newChartDataModel);
 
 		if (fShowActions) {
@@ -1079,34 +1121,6 @@ public class TourChart extends Chart {
 			fillToolbar();
 			updateActionState();
 		}
-
-// ####################
-
-		/*
-		 * enable/disable graph commands
-		 */
-
-		// enable all graph actions which are displayed
-		ArrayList<Integer> enabledGraphIds = new ArrayList<Integer>();
-		for (final ChartDataSerie xyDataIterator : newChartDataModel.getXyData()) {
-
-			if (xyDataIterator instanceof ChartDataYSerie) {
-				ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
-				final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
-
-				setCommandEnabled(getProxyId(graphId), true);
-				enabledGraphIds.add(graphId);
-			}
-		}
-
-		// disable all graph actions which are not displayed
-		for (Integer graphId : TourManager.allGraphIDs) {
-			if (enabledGraphIds.contains(graphId) == false) {
-				setCommandEnabled(getProxyId(graphId), false);
-			}
-		}
-
-// ####################
 
 		// restore min/max values from the chart config
 		final ChartYDataMinMaxKeeper chartConfigMinMaxKeeper = newChartConfig.getMinMaxKeeper();

@@ -15,11 +15,9 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
@@ -31,11 +29,11 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -264,28 +262,20 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
 				fSelectedTourId = fTourTimeData.fTourIds[valueIndex];
 
-				/*
-				 * get tour type name
-				 */
-				final long typeId = fTourTimeData.fTypeIds[valueIndex];
-				final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+				String tourTypeName = TourDatabase.getTourTypeName(fTourTimeData.fTypeIds[valueIndex]);
 
-				String tourTypeName = ""; //$NON-NLS-1$
-				for (final Iterator<TourType> iter = tourTypes.iterator(); iter.hasNext();) {
-					final TourType tourType = iter.next();
-					if (tourType.getTypeId() == typeId) {
-						tourTypeName = tourType.getName();
-					}
-				}
 				final int[] startValue = fTourTimeData.fTourTimeStartValues;
 				final int[] endValue = fTourTimeData.fTourTimeEndValues;
 				final int[] durationValue = fTourTimeData.fTourTimeDurationValues;
 
-				final String barInfo = new Formatter().format(Messages.TOURTIMEINFO_DATE_FORMAT
-						+ Messages.TOURTIMEINFO_DISTANCE
-						+ Messages.TOURTIMEINFO_ALTITUDE
-						+ Messages.TOURTIMEINFO_DURATION
-						+ Messages.TOURTIMEINFO_TOUR_TYPE,
+				StringBuilder infoText = new StringBuilder();
+				infoText.append(Messages.TOURTIMEINFO_DATE_FORMAT);
+				infoText.append(Messages.TOURTIMEINFO_DISTANCE);
+				infoText.append(Messages.TOURTIMEINFO_ALTITUDE);
+				infoText.append(Messages.TOURTIMEINFO_DURATION);
+				infoText.append(Messages.TOURTIMEINFO_TOUR_TYPE);
+
+				final String barInfo = new Formatter().format(infoText.toString(),
 						fCalendar.get(Calendar.DAY_OF_MONTH),
 						fCalendar.get(Calendar.MONTH) + 1,
 						fCalendar.get(Calendar.YEAR),
@@ -294,7 +284,9 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 						endValue[valueIndex] / 3600,
 						(endValue[valueIndex] % 3600) / 60,
 						fTourTimeData.fTourTimeDistanceValues[valueIndex],
+						UI.UNIT_LABEL_DISTANCE,
 						fTourTimeData.fTourTimeAltitudeValues[valueIndex],
+						UI.UNIT_LABEL_ALTITUDE,
 						durationValue[valueIndex] / 3600,
 						(durationValue[valueIndex] % 3600) / 60,
 						tourTypeName).toString();

@@ -159,7 +159,7 @@ public class ActionHandlerManager {
 	 */
 	void updateActionHandlers(Chart chart) {
 
-		if (fActionHandlers == null) {
+		if (fActionHandlers == null || chart.fChartActionProxies == null) {
 			return;
 		}
 

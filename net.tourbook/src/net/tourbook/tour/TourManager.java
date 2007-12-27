@@ -259,8 +259,8 @@ public class TourManager {
 	}
 
 	/**
-	 * adjust the min/max values to make them more visible and not at the same position as the
-	 * x-axis or the top of the chart
+	 * adjust the min/max values to make them more visible and not at the same vertical position as
+	 * the x-axis or the top of the chart
 	 */
 	private void adjustMinMax(final ChartDataYSerie yData) {
 
@@ -400,7 +400,12 @@ public class TourManager {
 			@Override
 			public float compute() {
 
-				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
+				final Object customDataDistance = chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE);
+				if (customDataDistance == null) {
+					return 0;
+				}
+
+				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
 				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
 				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 
@@ -435,7 +440,12 @@ public class TourManager {
 			@Override
 			public float compute() {
 
-				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
+				final Object customDataDistance = chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE);
+				if (customDataDistance == null) {
+					return 0;
+				}
+
+				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
 				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
 				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 
@@ -475,7 +485,12 @@ public class TourManager {
 			@Override
 			public float compute() {
 
-				final int[] altitudeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
+				final Object customDataAltitude = chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
+				if (customDataAltitude == null) {
+					return 0;
+				}
+
+				final int[] altitudeValues = ((ChartDataSerie) (customDataAltitude)).getHighValues()[0];
 				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
 				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 
@@ -506,8 +521,14 @@ public class TourManager {
 			@Override
 			public float compute() {
 
-				final int[] altitudeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE))).getHighValues()[0];
-				final int[] distanceValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE))).getHighValues()[0];
+				final Object customDataAltitude = chartModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
+				final Object customDataDistance = chartModel.getCustomData(TourManager.CUSTOM_DATA_DISTANCE);
+				if (customDataAltitude == null || customDataDistance == null) {
+					return 0;
+				}
+
+				final int[] altitudeValues = ((ChartDataSerie) (customDataAltitude)).getHighValues()[0];
+				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
 
 				final int leftAltitude = altitudeValues[valueIndexLeft];
 				final int rightAltitude = altitudeValues[valueIndexRight];
@@ -605,8 +626,10 @@ public class TourManager {
 		boolean showTimeOnXAxis;
 		if (xDataDistance == null) {
 			showTimeOnXAxis = true;
+			chartConfig.isForceTimeOnXAxis = true;
 		} else {
 			showTimeOnXAxis = chartConfig.showTimeOnXAxisBackup;
+			chartConfig.isForceTimeOnXAxis = false;
 		}
 		chartConfig.showTimeOnXAxis = showTimeOnXAxis;
 
@@ -935,7 +958,6 @@ public class TourManager {
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
 		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDistance);
-
 		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_DATA, tourData);
 
 		return chartDataModel;

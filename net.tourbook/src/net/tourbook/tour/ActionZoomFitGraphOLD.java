@@ -20,11 +20,11 @@ import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionZoomFitGraph extends Action {
+public class ActionZoomFitGraphOLD extends Action {
 
 	private TourChart	tourChart;
 
-	public ActionZoomFitGraph(TourChart tourChart) {
+	public ActionZoomFitGraphOLD(TourChart tourChart) {
 
 		super("ZoomFitGraph", AS_PUSH_BUTTON); //$NON-NLS-1$
 
@@ -35,6 +35,7 @@ public class ActionZoomFitGraph extends Action {
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__fit_to_window));
 	}
 
+	@Override
 	public void run() {
 
 		tourChart.zoomOut(false);

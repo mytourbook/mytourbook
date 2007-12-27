@@ -38,6 +38,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -265,8 +266,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				// TourManager.getInstance().openTourInEditor(tourId);
 			}
 
-		}
-		catch (final SQLException e) {
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -387,15 +387,20 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 				final int duration = fTourDataTour.fTimeHigh[valueIndex] - fTourDataTour.fTimeLow[valueIndex];
 
-				final String barInfo = new Formatter().format(Messages.TOURDAYINFO_TOUR_DATE_FORMAT
-						+ Messages.TOURDAYINFO_DISTANCE
-						+ Messages.TOURDAYINFO_ALTITUDE
-						+ Messages.TOURDAYINFO_DURATION,
+				StringBuilder infoText = new StringBuilder();
+				infoText.append(Messages.TOURDAYINFO_TOUR_DATE_FORMAT);
+				infoText.append(Messages.TOURDAYINFO_DISTANCE);
+				infoText.append(Messages.TOURDAYINFO_ALTITUDE);
+				infoText.append(Messages.TOURDAYINFO_DURATION);
+
+				final String barInfo = new Formatter().format(infoText.toString(),
 						fCalendar.get(Calendar.DAY_OF_MONTH),
 						fCalendar.get(Calendar.MONTH) + 1,
 						fCalendar.get(Calendar.YEAR),
 						fTourDataTour.fDistanceHigh[valueIndex],
+						UI.UNIT_LABEL_DISTANCE,
 						fTourDataTour.fAltitudeHigh[valueIndex],
+						UI.UNIT_LABEL_ALTITUDE,
 						duration / 3600,
 						(duration % 3600) / 60).toString();
 

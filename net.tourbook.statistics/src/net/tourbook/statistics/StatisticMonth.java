@@ -27,6 +27,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColors;
 import net.tourbook.data.TourPerson;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
@@ -59,9 +60,7 @@ public class StatisticMonth extends YearStatistic {
 	}
 
 	@Override
-	public void createControl(	Composite parent,
-								IViewSite viewSite,
-								final IPostSelectionProvider postSelectionProvider) {
+	public void createControl(Composite parent, IViewSite viewSite, final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -78,10 +77,7 @@ public class StatisticMonth extends YearStatistic {
 		refreshStatistic(fActivePerson, fActiveTourType, fCurrentYear, false);
 	}
 
-	public void refreshStatistic(	TourPerson person,
-									TourTypeFilter tourTypeFilter,
-									int year,
-									boolean refreshData) {
+	public void refreshStatistic(TourPerson person, TourTypeFilter tourTypeFilter, int year, boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourType = tourTypeFilter;
@@ -139,7 +135,7 @@ public class StatisticMonth extends YearStatistic {
 				tourMonthData.fDistanceLow,
 				tourMonthData.fDistanceHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_DISTANCE_UNIT);
+		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
@@ -151,7 +147,7 @@ public class StatisticMonth extends YearStatistic {
 				tourMonthData.fAltitudeLow,
 				tourMonthData.fAltitudeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_ALTITUDE_UNIT);
+		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		chartModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_ALTITUDE);

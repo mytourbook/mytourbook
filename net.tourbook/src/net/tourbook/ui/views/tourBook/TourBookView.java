@@ -338,7 +338,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		createTourViewer(fViewerContainer);
 		createActions();
-		createContextMenu();
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -457,6 +456,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 				}
 			}
 		});
+
+		createContextMenu();
 
 		return tree;
 	}

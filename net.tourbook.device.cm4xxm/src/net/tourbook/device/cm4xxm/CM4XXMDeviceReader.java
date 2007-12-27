@@ -103,7 +103,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		return Messages.CM4XXM_profile_unknown;
 	}
 
-	public int getImportDataSize() {
+	public int getTransferDataSize() {
 		return CM4XXM_DATA_SIZE;
 	}
 
@@ -250,10 +250,15 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				short cadence;
 
 				// short totalPulse = tourData.getStartPulse();
-				short totalAltitude = tourData.getStartAltitude();
+				short absoluteAltitude = tourData.getStartAltitude();
 
 				int iDataMax; // number of time slices in a BB record
 				boolean isFirstBBRecord = true;
+				boolean isFirstTime = true;
+
+				int sumDistance = 0;
+				int sumAltitude = 0;
+				int sumCadence = 0;
 
 				/*
 				 * read all records of current tour
@@ -324,7 +329,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 							timeData = new TimeData();
 							timeDataList.add(timeData);
 
-							timeData.pulse = tourData.getStartPulse();
+							timeData.distance = 0;
 							timeData.altitude = tourData.getStartAltitude();
 							timeData.temperature = temperature;
 							timeData.cadence = cadence;
@@ -362,20 +367,29 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 								timeData.time = CM4XXM_TIMESLICE;
 							}
 						}
+						if (isFirstTime) {
+							// first data point
+							isFirstTime = false;
+							timeData.time = 0;
+						}
 
 						// read data for this time slice
 						readTimeSlice(fileRawData, timeData);
 
 						// we have no pulse data in CM4xxM
-						timeData.pulse = 0;
+//						timeData.pulse = 0;
 
 						// adjust altitude from relative to absolute
-						totalAltitude += timeData.altitude;
+						absoluteAltitude += timeData.altitude;
 
 						tourData.setTourAltUp(tourData.getTourAltUp()
 								+ ((timeData.altitude > 0) ? timeData.altitude : 0));
 						tourData.setTourAltDown(tourData.getTourAltDown()
 								+ ((timeData.altitude < 0) ? -timeData.altitude : 0));
+
+						sumDistance += timeData.distance;
+						sumAltitude += Math.abs(absoluteAltitude);
+						sumCadence += cadence;
 					}
 				}
 
@@ -388,6 +402,20 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
 					// add new tour to the map
 					tourDataMap.put(tourId, tourData);
+
+					/*
+					 * disable data series when no data are available
+					 */
+					TimeData firstTimeData = timeDataList.get(0);
+					if (sumDistance == 0) {
+						firstTimeData.distance = Integer.MIN_VALUE;
+					}
+					if (sumAltitude == 0) {
+						firstTimeData.altitude = Integer.MIN_VALUE;
+					}
+					if (sumCadence == 0) {
+						firstTimeData.cadence = Integer.MIN_VALUE;
+					}
 
 					tourData.createTimeSeries(timeDataList, true);
 					tourData.setTourType(defaultTourType);

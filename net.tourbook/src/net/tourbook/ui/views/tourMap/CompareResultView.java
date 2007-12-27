@@ -170,8 +170,7 @@ public class CompareResultView extends ViewPart {
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 	}
 
-	private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider,
-			IColorProvider {
+	private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider, IColorProvider {
 
 		public Color getBackground(Object element) {
 			return null;
@@ -238,8 +237,7 @@ public class CompareResultView extends ViewPart {
 				case COLUMN_DISTANCE:
 					nf.setMinimumFractionDigits(2);
 					nf.setMaximumFractionDigits(2);
-					return nf.format(((float) result.compareDistance)
-							/ (1000 * UI.UNIT_VALUE_DISTANCE));
+					return nf.format(((float) result.compareDistance) / (1000 * UI.UNIT_VALUE_DISTANCE));
 
 				case COLUMN_ALTITUDE_DIFFERENCE:
 					return Integer.toString(result.minAltitudeDiff
@@ -439,9 +437,7 @@ public class CompareResultView extends ViewPart {
 				}
 			}
 		};
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	/**
@@ -562,7 +558,6 @@ public class CompareResultView extends ViewPart {
 		addPrefListener();
 
 		createActions();
-		createContextMenu();
 
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
@@ -706,6 +701,8 @@ public class CompareResultView extends ViewPart {
 //			public void treeExpanded(TreeExpansionEvent event) {}
 //		});
 
+		createContextMenu();
+
 		return tree;
 	}
 
@@ -715,9 +712,7 @@ public class CompareResultView extends ViewPart {
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getSite().getPage().removePartListener(fPartListener);
 		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		resManager.dispose();
 
@@ -735,8 +730,7 @@ public class CompareResultView extends ViewPart {
 		/*
 		 * currently we only support one tour item were the save status can be removed
 		 */
-		if (selection.size() == 1
-				&& selection.getFirstElement() instanceof CompareResultItemComparedTour) {
+		if (selection.size() == 1 && selection.getFirstElement() instanceof CompareResultItemComparedTour) {
 
 			CompareResultItemComparedTour tviCompResult = (CompareResultItemComparedTour) (selection.getFirstElement());
 
@@ -838,8 +832,7 @@ public class CompareResultView extends ViewPart {
 		/*
 		 * currently only one tour is supported to remove the save status
 		 */
-		if (selection.size() == 1
-				&& selection.getFirstElement() instanceof CompareResultItemComparedTour) {
+		if (selection.size() == 1 && selection.getFirstElement() instanceof CompareResultItemComparedTour) {
 
 			CompareResultItemComparedTour compareResult = (CompareResultItemComparedTour) selection.getFirstElement();
 
@@ -898,11 +891,9 @@ public class CompareResultView extends ViewPart {
 				// update tour map view
 				fPostSelectionProvider.setSelection(persistedCompareResults);
 
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-			}
-			finally {
+			} finally {
 				if (ts.isActive()) {
 					ts.rollback();
 				}

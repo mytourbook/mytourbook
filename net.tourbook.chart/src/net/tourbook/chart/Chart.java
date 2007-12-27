@@ -554,9 +554,8 @@ public class Chart extends ViewForm {
 	}
 
 	void onExecuteZoomIn() {
-		setCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
-
 		fChartComponents.zoomIn();
+		setChartCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
 	}
 
 	void onExecuteZoomOut() {
@@ -629,7 +628,7 @@ public class Chart extends ViewForm {
 	/**
 	 * Set the enable state for a command and update the UI
 	 */
-	public void setCommandEnabled(String commandId, boolean isEnabled) {
+	public void setChartCommandEnabled(String commandId, boolean isEnabled) {
 
 		fChartActionProxies.get(commandId).setEnabled(isEnabled);
 
@@ -878,7 +877,7 @@ public class Chart extends ViewForm {
 	 */
 	public void zoomIn() {
 		fChartComponents.zoomIn();
-		setCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
+		setChartCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
 	}
 
 	/**
@@ -889,7 +888,7 @@ public class Chart extends ViewForm {
 		fChartComponents.getChartComponentGraph().zoomInWithSlider();
 		fChartComponents.onResize();
 
-		setCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
+		setChartCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
 	}
 
 	public void zoomOut(boolean updateChart) {
@@ -900,11 +899,11 @@ public class Chart extends ViewForm {
 
 		fChartComponents.zoomOut(updateChart);
 
-		setCommandEnabled(COMMAND_ID_ZOOM_IN, true);
-		setCommandEnabled(COMMAND_ID_ZOOM_OUT, false);
+		setChartCommandEnabled(COMMAND_ID_ZOOM_IN, true);
+		setChartCommandEnabled(COMMAND_ID_ZOOM_OUT, false);
 
-		setCommandEnabled(COMMAND_ID_PART_PREVIOUS, false);
-		setCommandEnabled(COMMAND_ID_PART_NEXT, false);
+		setChartCommandEnabled(COMMAND_ID_PART_PREVIOUS, false);
+		setChartCommandEnabled(COMMAND_ID_PART_NEXT, false);
 	}
 
 	/**

@@ -32,10 +32,12 @@ public class ActionXAxisDistance extends Action {
 
 		setToolTipText(Messages.Tour_Action_show_distance_on_x_axis_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__show_distance_on_x_axis));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__show_distance_on_x_axis_disabled));
 
 		setChecked(!tourChart.fTourChartConfig.showTimeOnXAxis);
 	}
 
+	@Override
 	public void run() {
 		fTourChart.onExecuteXAxisDistance(isChecked());
 	}

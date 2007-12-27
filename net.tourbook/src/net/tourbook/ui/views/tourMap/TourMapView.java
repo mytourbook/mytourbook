@@ -531,7 +531,6 @@ public class TourMapView extends ViewPart implements ITourViewer {
 		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
 		createTourViewer(fViewerContainer);
 
-		createContextMenu();
 		createActions();
 
 		addPartListener();
@@ -617,6 +616,8 @@ public class TourMapView extends ViewPart implements ITourViewer {
 				}
 			}
 		});
+
+		createContextMenu();
 
 		return layoutContainer;
 	}
@@ -791,8 +792,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 			try {
 				selectRefTour(Long.parseLong(mementoRefId));
-			}
-			catch (NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				// do nothing
 			}
 		}

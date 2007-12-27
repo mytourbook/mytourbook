@@ -254,13 +254,11 @@ public class TourCompareManager {
 							view.updateViewer();
 						}
 
-					}
-					catch (PartInitException e) {
+					} catch (PartInitException e) {
 						ErrorDialog.openError(window.getShell(), "Error", e.getMessage(), e //$NON-NLS-1$
 						.getStatus());
 						e.printStackTrace();
-					}
-					catch (WorkbenchException e) {
+					} catch (WorkbenchException e) {
 						e.printStackTrace();
 					}
 				}
@@ -305,11 +303,19 @@ public class TourCompareManager {
 		final int[] compareTourDataDistance = compareTourData.getMetricDistanceSerie();
 		final int[] compareTourDataTime = compareTourData.timeSerie;
 
+		if (compareTourDataDistance == null) {
+			return compareResultItem;
+		}
 		// normalize the tour which will be compared
 		compareTourNormalizer.normalizeAltitude(compareTourData, 0, compareTourDataDistance.length - 1);
 
 		int[] normCompDistances = compareTourNormalizer.getNormalizedDistance();
 		int[] normCompAltitudes = compareTourNormalizer.getNormalizedAltitude();
+
+		if (normCompAltitudes == null || normCompDistances == null) {
+			return compareResultItem;
+		}
+
 		int[] normCompAltiDiff = new int[normCompAltitudes.length];
 
 		/*
@@ -328,7 +334,11 @@ public class TourCompareManager {
 		// normalize the reference tour
 		TourDataNormalizer refTourNormalizer = new TourDataNormalizer();
 		refTourNormalizer.normalizeAltitude(refTourData, refMeasureStartIndex, refMeasureEndIndex);
+
 		int[] normRefAltitudes = refTourNormalizer.getNormalizedAltitude();
+		if (normRefAltitudes == null) {
+			return compareResultItem;
+		}
 
 		int minAltiDiff = Integer.MAX_VALUE;
 
@@ -493,11 +503,9 @@ public class TourCompareManager {
 				ts.commit();
 			}
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			if (ts.isActive()) {
 				ts.rollback();
 			} else {

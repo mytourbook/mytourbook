@@ -108,6 +108,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private Label					fLblDrivingTime;
 	private Label					fLblDatapoints;
 	private Label					fLblTourType;
+	private Label					fLblDeviceName;
 
 	private Text					fTextTitle;
 	private Text					fTextStartLocation;
@@ -297,7 +298,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void propertyChanged(int propertyId, Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED
@@ -640,15 +641,20 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			label.setText(Messages.Tour_Properties_Label_driving_time);
 			fLblDrivingTime = new Label(fContentContainer, SWT.NONE);
 
-			// data points
+			// tour type
 			label = new Label(fContentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_datapoints);
-			fLblDatapoints = new Label(fContentContainer, SWT.NONE);
+			label.setText(Messages.Tour_Properties_Label_device_name);
+			fLblDeviceName = new Label(fContentContainer, SWT.NONE);
 
 			// tour type
 			label = new Label(fContentContainer, SWT.NONE);
 			label.setText(Messages.Tour_Properties_Label_tour_type);
 			fLblTourType = new Label(fContentContainer, SWT.NONE);
+
+			// data points
+			label = new Label(fContentContainer, SWT.NONE);
+			label.setText(Messages.Tour_Properties_Label_datapoints);
+			fLblDatapoints = new Label(fContentContainer, SWT.NONE);
 		}
 
 		return fScrolledContainer;
@@ -739,7 +745,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
 	public Object getAdapter(Class adapter) {
 
@@ -967,6 +973,9 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		} else {
 			fLblTourType.setText(tourType.getName());
 		}
+
+		// device name
+		fLblDeviceName.setText(tourData.getDeviceName());
 
 		/*
 		 * tab: location

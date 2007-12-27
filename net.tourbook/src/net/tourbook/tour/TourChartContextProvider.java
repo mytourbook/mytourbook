@@ -172,14 +172,20 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 
 		if (fTourEditor != null) {
 
-			// context dialog for the tourbook view
+			// context dialog for the tour editor
 
 			if (leftSlider != null || rightSlider != null) {
 
 				createMarkerMenu(menuMgr, leftSlider, rightSlider);
 
 				// action: create chart reference
-				menuMgr.add(new ActionAddTourReference());
+				final TourData tourData = fTourEditor.getTourChart().getTourData();
+				final boolean isEnabled = tourData.altitudeSerie != null && tourData.distanceSerie != null;
+
+				final ActionAddTourReference actionAddTourReference = new ActionAddTourReference();
+				actionAddTourReference.setEnabled(isEnabled);
+
+				menuMgr.add(actionAddTourReference);
 			}
 
 		} else if (fMarkerDialog != null) {

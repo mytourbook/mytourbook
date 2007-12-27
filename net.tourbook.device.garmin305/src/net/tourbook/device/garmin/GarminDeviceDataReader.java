@@ -15,8 +15,10 @@
  *******************************************************************************/
 package net.tourbook.device.garmin;
 
-import gnu.io.SerialPort;
-
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 
 import javax.xml.parsers.SAXParser;
@@ -28,6 +30,8 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
 public class GarminDeviceDataReader extends TourbookDevice {
+
+	private static final String	XML_START_ID	= "<?xml"; //$NON-NLS-1$
 
 	// plugin constructor
 	public GarminDeviceDataReader() {}
@@ -41,22 +45,13 @@ public class GarminDeviceDataReader extends TourbookDevice {
 		return ""; //$NON-NLS-1$
 	}
 
-	public int getImportDataSize() {
-		return 0x10000;
+	public int getTransferDataSize() {
+		return -1;
 	}
 
 	@Override
 	public SerialParameters getPortParameters(final String portName) {
-
-		final SerialParameters portParameters = new SerialParameters(portName,
-				4800,
-				SerialPort.FLOWCONTROL_NONE,
-				SerialPort.FLOWCONTROL_NONE,
-				SerialPort.DATABITS_8,
-				SerialPort.STOPBITS_1,
-				SerialPort.PARITY_NONE);
-
-		return portParameters;
+		return null;
 	}
 
 	@Override
@@ -64,23 +59,46 @@ public class GarminDeviceDataReader extends TourbookDevice {
 		return 0;
 	}
 
-	public boolean processDeviceData(	final String importFileName,
+	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
 										final HashMap<String, TourData> tourDataMap) {
 
-		GarminSAXHandler handler = new GarminSAXHandler(this,
-				importFileName,
-				deviceData,
-				tourDataMap);
+		/*
+		 * check if the file is a xml file
+		 */
+		BufferedReader fileReader = null;
+		try {
+			fileReader = new BufferedReader(new FileReader(importFilePath));
+			String fileHeader = fileReader.readLine();
+			if (fileHeader == null || fileHeader.startsWith(XML_START_ID) == false) {
+				fileReader.close();
+				return false;
+			}
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (fileReader != null) {
+					fileReader.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		GarminSAXHandler handler = new GarminSAXHandler(this, importFilePath, deviceData, tourDataMap);
 
 		try {
 
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 
-			parser.parse("file:" + importFileName, handler);//$NON-NLS-1$
+			parser.parse("file:" + importFilePath, handler);//$NON-NLS-1$
 
 		} catch (Exception e) {
-			System.err.println("Error parsing " + importFileName + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			System.err.println("Error parsing file: " + importFilePath); //$NON-NLS-1$ 
+//			System.err.println(e);
 			e.printStackTrace();
 			return false;
 		}

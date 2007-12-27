@@ -27,6 +27,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 import net.tourbook.util.ArrayListToArray;
 
 public class ProviderTourDay extends DataProvider /* implements IBarSelectionProvider */{
@@ -118,8 +119,8 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 				dbDOY.add(tourDOY);
 				dbMonths.add(tourMonth);
 
-				dbDistance.add(result.getInt(6) / 1000);
-				dbAltitude.add(result.getInt(7));
+				dbDistance.add((int) (result.getInt(6) / 1000 / UI.UNIT_VALUE_DISTANCE));
+				dbAltitude.add((int) (result.getInt(7) / UI.UNIT_VALUE_ALTITUDE));
 
 				/*
 				 * set the tour time
