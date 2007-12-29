@@ -99,6 +99,7 @@ public class UI {
 	public static final float				UNIT_FAHRENHEIT_MULTI			= 1.8f;
 	public static final float				UNIT_FAHRENHEIT_ADD				= 32;
 
+	public static final String				UNIT_LABEL_TIME					= "h";											//$NON-NLS-1$
 	public static String					UNIT_LABEL_DISTANCE;
 	public static String					UNIT_LABEL_ALTITUDE;
 	public static String					UNIT_LABEL_ALTIMETER;
@@ -212,8 +213,7 @@ public class UI {
 				try {
 					newWeights[weightIndex] = sashDefaultWeight[weightIndex];
 
-				}
-				catch (final ArrayIndexOutOfBoundsException e) {
+				} catch (final ArrayIndexOutOfBoundsException e) {
 					newWeights[weightIndex] = 100;
 				}
 			} else {
@@ -368,8 +368,7 @@ public class UI {
 				}
 				try {
 					Long.parseLong(e.text);
-				}
-				catch (final NumberFormatException e1) {
+				} catch (final NumberFormatException e1) {
 					e.doit = false;
 				}
 			}

@@ -104,15 +104,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				Messages.Pref_general_show_system_in_ui,
 				parent);
 		addField(showInUI);
-
-//		fEditorSystemOfMeasurement.setPropertyChangeListener(new IPropertyChangeListener() {
-//			public void propertyChange(PropertyChangeEvent event) {
-//				Object newValue = event.getNewValue();
-//				if (newValue == null) {
-//
-//				}
-//			}
-//		});
 	}
 
 	@Override
@@ -122,9 +113,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		if (isOK) {
 			// fire one event for all modified measurement values
-			TourbookPlugin.getDefault()
-					.getPreferenceStore()
-					.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
+			/* TourbookPlugin.getDefault(). */
+			getPreferenceStore().setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
 		}
 
 		return isOK;

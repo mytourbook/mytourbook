@@ -69,8 +69,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage,
-		IColorTreeViewer {
+public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
 	/**
 	 * width for the tour type combo box
@@ -130,14 +129,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		TourType	fTourType;
 
-		TourTypeColorDefinition(TourType tourType, String prefName, String visibleName,
-				RGB defaultGradientBright, RGB defaultGradientDark, RGB defaultLineColor) {
+		TourTypeColorDefinition(TourType tourType, String prefName, String visibleName, RGB defaultGradientBright,
+				RGB defaultGradientDark, RGB defaultLineColor) {
 
-			super(prefName,
-					visibleName,
-					defaultGradientBright,
-					defaultGradientDark,
-					defaultLineColor);
+			super(prefName, visibleName, defaultGradientBright, defaultGradientDark, defaultLineColor);
 
 			fTourType = tourType;
 		}
@@ -275,10 +270,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		treeContainer.setLayout(treeLayouter);
 
 		// tour tree
-		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.H_SCROLL
-				| SWT.BORDER);
+		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER);
 
 		tree.setLinesVisible(false);
 
@@ -420,7 +412,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		return returnResult;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private boolean deleteTourTypeFromTourData(TourType tourType) {
 
 		boolean returnResult = false;
@@ -481,6 +473,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	private void fireModifyEvent() {
+
 		if (fIsModified) {
 
 			fIsModified = false;
@@ -488,8 +481,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			TourDatabase.disposeTourTypes();
 
 			// fire modify event
-			getPreferenceStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED,
-					Math.random());
+			getPreferenceStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
 		}
 	}
 
@@ -594,8 +586,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			/*
 			 * dispose the old color/image from the graph
 			 */
-			fColorLabelProvider.disposeColor(fSelectedColor.getColorId(),
-					colorDefinition.getImageId());
+			fColorLabelProvider.disposeColor(fSelectedColor.getColorId(), colorDefinition.getImageId());
 
 			/*
 			 * update the tree viewer, the color images will be recreated in the label provider
@@ -629,8 +620,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		MessageDialog dialog = new MessageDialog(this.getShell(),
 				Messages.Pref_TourTypes_Dlg_delete_tour_type_title,
 				null,
-				NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg,
-						selectedTourType.getName()),
+				NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg, selectedTourType.getName()),
 				MessageDialog.QUESTION,
 				buttons,
 				1);
@@ -663,8 +653,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		// ask for the tour type name
 		InputDialog dialog = new InputDialog(this.getShell(),
 				Messages.Pref_TourTypes_Dlg_rename_tour_type_title,
-				NLS.bind(Messages.Pref_TourTypes_Dlg_rename_tour_type_msg,
-						selectedTourType.getName()),
+				NLS.bind(Messages.Pref_TourTypes_Dlg_rename_tour_type_msg, selectedTourType.getName()),
 				selectedTourType.getName(),
 				fTourNameValidator);
 		if (dialog.open() != Window.OK) {

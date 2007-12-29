@@ -21,6 +21,7 @@ import net.tourbook.chart.ChartUtil;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.UI;
 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -28,6 +29,7 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -38,30 +40,33 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageStatistic extends FieldEditorPreferencePage implements
-		IWorkbenchPreferencePage, IPropertyChangeListener {
+public class PrefPageStatistic extends FieldEditorPreferencePage implements IWorkbenchPreferencePage,
+		IPropertyChangeListener {
 
-	private static final int	DEFAULT_FIELD_WIDTH	= 40;
+	private static final int												DEFAULT_FIELD_WIDTH	= 40;
 
-	private IntegerFieldEditor	distanceLowValue;
-	private IntegerFieldEditor	distanceInterval;
-	private IntegerFieldEditor	distanceNumbers;
-	private Label				distanceExampleLabel;
+	private IntegerFieldEditor												fEditorDistanceLowValue;
+	private IntegerFieldEditor												fEditorDistanceInterval;
+	private IntegerFieldEditor												fEditorDistanceNumbers;
+	private Label															fLblDistanceExampleLabel;
 
-	private IntegerFieldEditor	altitudeLowValue;
-	private IntegerFieldEditor	altitudeInterval;
-	private IntegerFieldEditor	altitudeNumbers;
-	private Label				altitudeExampleLabel;
+	private IntegerFieldEditor												fEditorAltitudeLowValue;
+	private IntegerFieldEditor												fEditorAltitudeInterval;
+	private IntegerFieldEditor												fEditorAltitudeNumbers;
+	private Label															fLblAltitudeExampleLabel;
 
-	private IntegerFieldEditor	durationLowValue;
-	private IntegerFieldEditor	durationInterval;
-	private IntegerFieldEditor	durationNumbers;
-	private Label				durationExampleLabel;
+	private IntegerFieldEditor												fEditorDurationLowValue;
+	private IntegerFieldEditor												fEditorDurationInterval;
+	private IntegerFieldEditor												fEditorDurationNumbers;
+	private Label															fLblDurationExampleLabel;
+
+	private org.eclipse.core.runtime.Preferences.IPropertyChangeListener	fPrefChangeListener;
 
 	public PrefPageStatistic() {
 		super(GRID);
 	}
 
+	@Override
 	protected void createFieldEditors() {
 
 		Composite parent = getFieldEditorParent();
@@ -90,47 +95,42 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements
 
 		// title
 		label = new Label(parent, SWT.NONE);
-		label.setFont(JFaceResources
-				.getFontRegistry()
-				.getBold(JFaceResources.DIALOG_FONT));
+		label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 		label.setText(Messages.Pref_Statistic_Label_distance);
 
-		// example
-		distanceExampleLabel = new Label(parent, SWT.NONE);
+		// distance example
+		fLblDistanceExampleLabel = new Label(parent, SWT.NONE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.widthHint = 200;
-		distanceExampleLabel.setLayoutData(gridData);
+		fLblDistanceExampleLabel.setLayoutData(gridData);
 
 		// low value
-		distanceLowValue = new IntegerFieldEditor(
-				ITourbookPreferences.STAT_DISTANCE_LOW_VALUE,
+		fEditorDistanceLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_LOW_VALUE,
 				Messages.Pref_Statistic_Label_distance_low_value,
 				parent,
 				4);
-		UI.setFieldWidth(parent, distanceLowValue, DEFAULT_FIELD_WIDTH);
-		addField(distanceLowValue);
+		UI.setFieldWidth(parent, fEditorDistanceLowValue, DEFAULT_FIELD_WIDTH);
+		addField(fEditorDistanceLowValue);
 
 		// interval
-		distanceInterval = new IntegerFieldEditor(
-				ITourbookPreferences.STAT_DISTANCE_INTERVAL,
-				Messages.Pref_Statistic_Label_distance_interval,
+		fEditorDistanceInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_INTERVAL,
+				Messages.Pref_Statistic_Label_interval,
 				parent,
 				4);
-		UI.setFieldWidth(parent, distanceInterval, DEFAULT_FIELD_WIDTH);
-		addField(distanceInterval);
+		UI.setFieldWidth(parent, fEditorDistanceInterval, DEFAULT_FIELD_WIDTH);
+		addField(fEditorDistanceInterval);
 
 		// numbers
-		distanceNumbers = new IntegerFieldEditor(
-				ITourbookPreferences.STAT_DISTANCE_NUMBERS,
+		fEditorDistanceNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_NUMBERS,
 				Messages.Pref_Statistic_Label_distance_quantity,
 				parent,
 				2);
-		UI.setFieldWidth(parent, distanceNumbers, DEFAULT_FIELD_WIDTH);
-		addField(distanceNumbers);
+		UI.setFieldWidth(parent, fEditorDistanceNumbers, DEFAULT_FIELD_WIDTH);
+		addField(fEditorDistanceNumbers);
 
-		distanceLowValue.setPropertyChangeListener(this);
-		distanceInterval.setPropertyChangeListener(this);
-		distanceNumbers.setPropertyChangeListener(this);
+		fEditorDistanceLowValue.setPropertyChangeListener(this);
+		fEditorDistanceInterval.setPropertyChangeListener(this);
+		fEditorDistanceNumbers.setPropertyChangeListener(this);
 	}
 
 	private void createAltitudePreferences(Composite parent) {
@@ -140,50 +140,45 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements
 
 		// title
 		label = new Label(parent, SWT.NONE);
-		label.setFont(JFaceResources
-				.getFontRegistry()
-				.getBold(JFaceResources.DIALOG_FONT));
+		label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 		gridData = new GridData();
 		label.setLayoutData(gridData);
 		label.setText(Messages.Pref_Statistic_Label_altitude);
 
-		// example
-		altitudeExampleLabel = new Label(parent, SWT.NONE);
+		// altitude example
+		fLblAltitudeExampleLabel = new Label(parent, SWT.NONE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.widthHint = 200;
-		altitudeExampleLabel.setLayoutData(gridData);
+		fLblAltitudeExampleLabel.setLayoutData(gridData);
 
 		// low value
-		altitudeLowValue = new IntegerFieldEditor(
-				ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE,
+		fEditorAltitudeLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE,
 				Messages.Pref_Statistic_Label_altitude_low_value,
 				parent,
 				4);
-		UI.setFieldWidth(parent, altitudeLowValue, DEFAULT_FIELD_WIDTH);
-		addField(altitudeLowValue);
+		UI.setFieldWidth(parent, fEditorAltitudeLowValue, DEFAULT_FIELD_WIDTH);
+		addField(fEditorAltitudeLowValue);
 
 		// interval
-		altitudeInterval = new IntegerFieldEditor(
-				ITourbookPreferences.STAT_ALTITUDE_INTERVAL,
-				Messages.Pref_Statistic_Label_altitude_interval,
+		fEditorAltitudeInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_INTERVAL,
+				Messages.Pref_Statistic_Label_interval,
 				parent,
 				4);
-		UI.setFieldWidth(parent, altitudeInterval, DEFAULT_FIELD_WIDTH);
-		addField(altitudeInterval);
+		UI.setFieldWidth(parent, fEditorAltitudeInterval, DEFAULT_FIELD_WIDTH);
+		addField(fEditorAltitudeInterval);
 
 		// numbers
-		altitudeNumbers = new IntegerFieldEditor(
-				ITourbookPreferences.STAT_ALTITUDE_NUMBERS,
+		fEditorAltitudeNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_NUMBERS,
 				Messages.Pref_Statistic_Label_altitude_quantity,
 				parent,
 				2);
-		altitudeNumbers.setValidRange(2, 99);
-		UI.setFieldWidth(parent, altitudeNumbers, DEFAULT_FIELD_WIDTH);
-		addField(altitudeNumbers);
+		fEditorAltitudeNumbers.setValidRange(2, 99);
+		UI.setFieldWidth(parent, fEditorAltitudeNumbers, DEFAULT_FIELD_WIDTH);
+		addField(fEditorAltitudeNumbers);
 
-		altitudeLowValue.setPropertyChangeListener(this);
-		altitudeInterval.setPropertyChangeListener(this);
-		altitudeNumbers.setPropertyChangeListener(this);
+		fEditorAltitudeLowValue.setPropertyChangeListener(this);
+		fEditorAltitudeInterval.setPropertyChangeListener(this);
+		fEditorAltitudeNumbers.setPropertyChangeListener(this);
 	}
 
 	private void createDurationPreferences(Composite parent) {
@@ -193,64 +188,83 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements
 
 		// title
 		label = new Label(parent, SWT.NONE);
-		label.setFont(JFaceResources
-				.getFontRegistry()
-				.getBold(JFaceResources.DIALOG_FONT));
+		label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 		gridData = new GridData();
 		label.setLayoutData(gridData);
 		label.setText(Messages.Pref_Statistic_Label_duration);
 
-		// example
-		durationExampleLabel = new Label(parent, SWT.NONE);
+		// duration example
+		fLblDurationExampleLabel = new Label(parent, SWT.NONE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.widthHint = 200;
-		durationExampleLabel.setLayoutData(gridData);
+		fLblDurationExampleLabel.setLayoutData(gridData);
 
 		// low value
-		durationLowValue = new IntegerFieldEditor(
-				ITourbookPreferences.STAT_DURATION_LOW_VALUE,
+		fEditorDurationLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_LOW_VALUE,
 				Messages.Pref_Statistic_Label_duration_low_value,
 				parent,
 				4);
-		UI.setFieldWidth(parent, durationLowValue, DEFAULT_FIELD_WIDTH);
-		addField(durationLowValue);
+		UI.setFieldWidth(parent, fEditorDurationLowValue, DEFAULT_FIELD_WIDTH);
+		addField(fEditorDurationLowValue);
 
 		// interval
-		durationInterval = new IntegerFieldEditor(
-				ITourbookPreferences.STAT_DURATION_INTERVAL,
+		fEditorDurationInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_INTERVAL,
 				Messages.Pref_Statistic_Label_duration_interval,
 				parent,
 				4);
-		UI.setFieldWidth(parent, durationInterval, DEFAULT_FIELD_WIDTH);
-		addField(durationInterval);
+		UI.setFieldWidth(parent, fEditorDurationInterval, DEFAULT_FIELD_WIDTH);
+		addField(fEditorDurationInterval);
 
 		// numbers
-		durationNumbers = new IntegerFieldEditor(
-				ITourbookPreferences.STAT_DURATION_NUMBERS,
+		fEditorDurationNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_NUMBERS,
 				Messages.Pref_Statistic_Label_duration_quantity,
 				parent,
 				2);
-		UI.setFieldWidth(parent, durationNumbers, DEFAULT_FIELD_WIDTH);
-		addField(durationNumbers);
+		UI.setFieldWidth(parent, fEditorDurationNumbers, DEFAULT_FIELD_WIDTH);
+		addField(fEditorDurationNumbers);
 
-		durationLowValue.setPropertyChangeListener(this);
-		durationInterval.setPropertyChangeListener(this);
-		durationNumbers.setPropertyChangeListener(this);
+		fEditorDurationLowValue.setPropertyChangeListener(this);
+		fEditorDurationInterval.setPropertyChangeListener(this);
+		fEditorDurationNumbers.setPropertyChangeListener(this);
+	}
+
+	private void addPrefListener() {
+
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				if (event.getProperty().equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+					computeAllExamples();
+				}
+			}
+		};
+
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	/**
 	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	protected Control createContents(Composite parent) {
 
 		Control control = super.createContents(parent);
 
-		// the example can only be computed when the fields have been
-		// initialized
+		addPrefListener();
+
+		// the example can only be computed when the fields have been initialized
 		parent.layout(true);
 		computeAllExamples();
 
 		return control;
+	}
+
+	@Override
+	public void dispose() {
+
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+
+		super.dispose();
 	}
 
 	public void init(IWorkbench workbench) {
@@ -260,18 +274,19 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements
 	/*
 	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 	 */
+	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		if (event.getProperty().equals(FieldEditor.VALUE)) {
-			if (!altitudeLowValue.isValid()
-					|| !distanceLowValue.isValid()
-					|| !distanceInterval.isValid()
-					|| !distanceNumbers.isValid()
-					|| !altitudeLowValue.isValid()
-					|| !altitudeInterval.isValid()
-					|| !altitudeNumbers.isValid()
-					|| !durationLowValue.isValid()
-					|| !durationInterval.isValid()
-					|| !durationNumbers.isValid()) {
+			if (!fEditorAltitudeLowValue.isValid()
+					|| !fEditorDistanceLowValue.isValid()
+					|| !fEditorDistanceInterval.isValid()
+					|| !fEditorDistanceNumbers.isValid()
+					|| !fEditorAltitudeLowValue.isValid()
+					|| !fEditorAltitudeInterval.isValid()
+					|| !fEditorAltitudeNumbers.isValid()
+					|| !fEditorDurationLowValue.isValid()
+					|| !fEditorDurationInterval.isValid()
+					|| !fEditorDurationNumbers.isValid()) {
 				return;
 			}
 
@@ -281,27 +296,27 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements
 
 	private void computeAllExamples() {
 
-		computeExample(
-				distanceExampleLabel,
-				distanceLowValue.getIntValue(),
-				distanceInterval.getIntValue(),
-				distanceNumbers.getIntValue(),
-				Messages.Pref_Statistic_Label_km,
+		fEditorDistanceInterval.setLabelText(NLS.bind(Messages.Pref_Statistic_Label_interval, UI.UNIT_LABEL_DISTANCE));
+
+		computeExample(fLblDistanceExampleLabel,
+				fEditorDistanceLowValue.getIntValue(),
+				fEditorDistanceInterval.getIntValue(),
+				fEditorDistanceNumbers.getIntValue(),
+				UI.UNIT_LABEL_DISTANCE,
 				ChartDataSerie.AXIS_UNIT_NUMBER);
 
-		computeExample(
-				altitudeExampleLabel,
-				altitudeLowValue.getIntValue(),
-				altitudeInterval.getIntValue(),
-				altitudeNumbers.getIntValue(),
-				Messages.Pref_Statistic_Label_m,
+		fEditorAltitudeInterval.setLabelText(NLS.bind(Messages.Pref_Statistic_Label_interval, UI.UNIT_LABEL_ALTITUDE));
+		computeExample(fLblAltitudeExampleLabel,
+				fEditorAltitudeLowValue.getIntValue(),
+				fEditorAltitudeInterval.getIntValue(),
+				fEditorAltitudeNumbers.getIntValue(),
+				UI.UNIT_LABEL_ALTITUDE,
 				ChartDataSerie.AXIS_UNIT_NUMBER);
 
-		computeExample(
-				durationExampleLabel,
-				durationLowValue.getIntValue(),
-				durationInterval.getIntValue(),
-				durationNumbers.getIntValue(),
+		computeExample(fLblDurationExampleLabel,
+				fEditorDurationLowValue.getIntValue(),
+				fEditorDurationInterval.getIntValue(),
+				fEditorDurationNumbers.getIntValue(),
 				Messages.Pref_Statistic_Label_h,
 				ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 	}
@@ -309,19 +324,13 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements
 	/**
 	 * show an example of the entered values
 	 */
-	private void computeExample(Label label,
-								int lowValue,
-								int interval,
-								int numbers,
-								String unit,
-								int unitType) {
+	private void computeExample(Label label, int lowValue, int interval, int numbers, String unit, int unitType) {
 
 		StringBuilder text = new StringBuilder();
 		for (int number = 0; number < numbers; number++) {
 
 			if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
-				text.append(ChartUtil.formatValue((lowValue * 60)
-						+ (interval * number * 60), unitType));
+				text.append(ChartUtil.formatValue((lowValue * 60) + (interval * number * 60), unitType));
 			} else {
 				text.append(lowValue + (interval * number));
 			}
@@ -331,5 +340,6 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements
 			}
 		}
 		label.setText(Dialog.shortenText(text.toString() + " " + unit, label)); //$NON-NLS-1$
+//		label.pack(true);
 	}
 }

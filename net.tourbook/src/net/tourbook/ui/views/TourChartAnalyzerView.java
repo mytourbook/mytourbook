@@ -726,7 +726,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		fChartDataModel = chartInfo.chartDataModel;
 		fDrawingData = chartInfo.chartDrawingData;
 
-		if (fDrawingData == null || fDrawingData.get(0) == null) {
+		if (fDrawingData == null || fDrawingData.size() == 0 || fDrawingData.get(0) == null) {
 			// this happened
 			return;
 		}

@@ -596,6 +596,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		// set the x-axis
 		ChartDataXSerie xData = new ChartDataXSerie(fStatAltitudeUnits);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+		xData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		chartDataModel.setXData(xData);
 
 		// y-axis: altitude
@@ -604,8 +605,8 @@ public class StatisticTourNumbers extends YearStatistic {
 				lowValues,
 				highValues);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setAllValueColors(0);
 		yData.setUnitLabel(unit);
+		yData.setAllValueColors(0);
 		yData.setYTitle(title);
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
@@ -645,6 +646,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		// set the x-axis
 		ChartDataXSerie xData = new ChartDataXSerie(fStatDistanceUnits);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+		xData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		chartDataModel.setXData(xData);
 
 		// y-axis: distance
@@ -653,8 +655,8 @@ public class StatisticTourNumbers extends YearStatistic {
 				lowValues,
 				highValues);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setAllValueColors(0);
 		yData.setUnitLabel(unit);
+		yData.setAllValueColors(0);
 		yData.setYTitle(title);
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
@@ -739,6 +741,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		// set the x-axis
 		ChartDataXSerie xData = new ChartDataXSerie(fStatTimeUnits);
 		xData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+		xData.setUnitLabel(UI.UNIT_LABEL_TIME);
 		chartDataModel.setXData(xData);
 
 		// y-axis: altitude
@@ -747,8 +750,8 @@ public class StatisticTourNumbers extends YearStatistic {
 				lowValues,
 				highValues);
 		yData.setAxisUnit(yUnit);
-		yData.setAllValueColors(0);
 		yData.setUnitLabel(unit);
+		yData.setAllValueColors(0);
 		yData.setYTitle(title);
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
