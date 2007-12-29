@@ -457,7 +457,8 @@ public class TourCompareManager {
 
 		int compareDistance = compareTourDataDistance[compareEndIndex] - compareTourDataDistance[compareStartIndex];
 		int recordingTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
-		int drivingTime = recordingTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex);
+		int drivingTime = Math.max(0, recordingTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
+
 		compareResultItem.compareDrivingTime = drivingTime;
 		compareResultItem.compareRecordingTime = recordingTime;
 		compareResultItem.compareDistance = compareDistance;

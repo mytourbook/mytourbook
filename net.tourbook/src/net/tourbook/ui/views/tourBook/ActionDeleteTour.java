@@ -53,8 +53,7 @@ public class ActionDeleteTour extends Action {
 		SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
 
 		// get selected reference tours
-		IStructuredSelection selection = (IStructuredSelection) tourView.getTourViewer()
-				.getSelection();
+		IStructuredSelection selection = (IStructuredSelection) tourView.getTourViewer().getSelection();
 
 		// delete selected tours
 		deleteTours(selection.iterator(), selectionRemovedTours);
@@ -66,13 +65,12 @@ public class ActionDeleteTour extends Action {
 		selectionRemovedTours.removedTours.clear();
 
 		if (fNextSelectedTreeItem != null) {
-			tourView.getTourViewer().setSelection(new StructuredSelection(fNextSelectedTreeItem),
-					true);
+			tourView.getTourViewer().setSelection(new StructuredSelection(fNextSelectedTreeItem), true);
 		}
 
 	}
 
-	private void deleteTours(Iterator<?> selection, SelectionDeletedTours selectionRemovedTours) {
+	private void deleteTours(Iterator<?> selectedTreeItems, SelectionDeletedTours selectionRemovedTours) {
 
 		ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
 
@@ -82,9 +80,9 @@ public class ActionDeleteTour extends Action {
 		TreeViewerItem firstSelectedParent = null;
 
 		// loop: selected tours
-		for (Iterator<?> selTour = selection; selTour.hasNext();) {
+		for (Iterator<?> treeItem = selectedTreeItems; treeItem.hasNext();) {
 
-			Object ttiTourItem = selTour.next();
+			Object ttiTourItem = treeItem.next();
 
 			if (ttiTourItem instanceof TVITourBookTour) {
 
@@ -118,8 +116,7 @@ public class ActionDeleteTour extends Action {
 		}
 
 		// refresh the tree viewer
-		tourView.getTourViewer()
-				.remove(removedTours.toArray(new TVITourBookTour[removedTours.size()]));
+		tourView.getTourViewer().remove(removedTours.toArray(new TVITourBookTour[removedTours.size()]));
 
 		/*
 		 * select the item which is before the removed items, this is not yet finished because there

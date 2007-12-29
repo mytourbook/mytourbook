@@ -1845,6 +1845,10 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void drawLayerImage() {
 
+		if (fCumstomLayerImage == null) {
+			return;
+		}
+
 		// the slider image is the same size as the graph image
 		final Rectangle graphRect = fCumstomLayerImage.getBounds();
 

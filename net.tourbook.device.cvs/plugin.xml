@@ -4,7 +4,7 @@
    <extension
          point="net.tourbook.deviceDataReader">
       <device
-            class="net.tourbook.device.daum.ergobike.CSVDataReader"
+            class="net.tourbook.device.daum.ergobike.DaumErgoBikeDataReader"
             fileextension="csv"
             id="net.tourbook.device.CSVDataReader"
             name="Daum Ergometer"/>

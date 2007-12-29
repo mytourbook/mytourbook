@@ -119,7 +119,9 @@ public class TourManager {
 		final int[] timeSerie = tourData.timeSerie;
 
 		final int distance = distanceSerie[endIndex] - distanceSerie[startIndex];
-		final int time = timeSerie[endIndex] - timeSerie[startIndex] - tourData.getBreakTime(startIndex, endIndex);
+		final int time = Math.max(0, timeSerie[endIndex]
+				- timeSerie[startIndex]
+				- tourData.getBreakTime(startIndex, endIndex));
 
 		return (float) ((float) distance / time * 3.6);
 	}
@@ -421,7 +423,9 @@ public class TourManager {
 
 				} else {
 
-					final float time = rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight);
+					final float time = Math.max(0, rightTime
+							- leftTime
+							- tourData.getBreakTime(valueIndexLeft, valueIndexRight));
 					final float distance = rightDistance - leftDistance;
 
 					final float speed = distance / time * 3.6f;
@@ -461,7 +465,9 @@ public class TourManager {
 
 				} else {
 
-					final float time = rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight);
+					final float time = Math.max(0, rightTime
+							- leftTime
+							- tourData.getBreakTime(valueIndexLeft, valueIndexRight));
 					final float distance = rightDistance - leftDistance;
 
 					if (distance == 0) {
@@ -506,7 +512,9 @@ public class TourManager {
 
 				} else {
 
-					final float time = rightTime - leftTime - tourData.getBreakTime(valueIndexLeft, valueIndexRight);
+					final float time = Math.max(0, rightTime
+							- leftTime
+							- tourData.getBreakTime(valueIndexLeft, valueIndexRight));
 
 					return (((rightAltitude - leftAltitude) / time) * 3600);
 				}

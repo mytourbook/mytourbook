@@ -273,7 +273,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
 
@@ -742,15 +742,13 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void enableActions() {
 
 		ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
 
-		// number ob selected tour items
+		// count number of selected tour items
 		int tourItems = 0;
-
-		// count how many tour items are selected
 		for (Iterator iter = selection.iterator(); iter.hasNext();) {
 			if (iter.next() instanceof TVITourBookTour) {
 				tourItems++;
@@ -759,8 +757,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		fActionEditTour.setEnabled(tourItems == 1);
 
-		// enable the delete button when only tours are selected
-		if (tourItems > 0 && selection.size() == tourItems) {
+		// enable delete ation when at least one tour is selected
+		if (tourItems > 0) {
 			fActionDeleteTour.setEnabled(true);
 		} else {
 			fActionDeleteTour.setEnabled(false);
@@ -788,7 +786,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fPostSelectionProvider.setSelection(selection);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 

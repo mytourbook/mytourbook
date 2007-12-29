@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -32,16 +32,16 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
-public class CSVDataReader extends TourbookDevice {
+public class DaumErgoBikeDataReader extends TourbookDevice {
 
-	private static final String	DAUM_ERGO_BIKE_CSV_ID	= "Elapsed Time (s);Distance (km);Phys. kJoule;Slope (%);NM;RPM;Speed (km/h);Watt;Gear;Device Active;Pulse;Pulse Type;"; //$NON-NLS-1$
+	private static final String	DAUM_ERGO_BIKE_CSV_ID	= "Elapsed Time (s);Distance (km);Phys. kJoule;Slope (%);NM;RPM;Speed (km/h);Watt;Gear;Device Active;Pulse;Pulse Type;";	//$NON-NLS-1$
 
-	private static final String	CSV_STRING_TOKEN		= ";"; //$NON-NLS-1$
+	private static final String	CSV_STRING_TOKEN		= ";";																														//$NON-NLS-1$
 
 	private Calendar			fCalendar				= GregorianCalendar.getInstance();
 
 	// plugin constructor
-	public CSVDataReader() {
+	public DaumErgoBikeDataReader() {
 		canReadFromDevice = false;
 		canSelectMultipleFilesInImportDialog = true;
 	}
@@ -99,7 +99,7 @@ public class CSVDataReader extends TourbookDevice {
 			//
 			// 0026  12_12_2007 20_35_02    1min    0_3km  Manuelles Training (Watt).csv
 			// 0031  19_12_2007 19_11_37   35min   13_5km  Coaching - 003 - 2_5.csv
-			// 0032  19_12_2007 19_46_44    1min    0_3km  Manuelles Training (Watt).cvs
+			// 0032  19_12_2007 19_46_44    1min    0_3km  Manuelles Training (Watt).csv
 
 			// start date
 			int tourDay = Integer.parseInt(fileName.substring(6, 8));

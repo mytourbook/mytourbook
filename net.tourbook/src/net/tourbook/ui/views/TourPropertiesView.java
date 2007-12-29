@@ -16,6 +16,7 @@
 package net.tourbook.ui.views;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -48,6 +49,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -123,6 +125,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private TourData				fTourData;
 	public Calendar					fCalendar					= GregorianCalendar.getInstance();
 	private DateFormat				fTimeFormatter				= DateFormat.getTimeInstance(DateFormat.SHORT);
+	private NumberFormat			fNumberFormatter			= NumberFormat.getNumberInstance();
 	private DateFormat				fDurationFormatter			= DateFormat.getTimeInstance(DateFormat.SHORT,
 																		Locale.GERMAN);
 
@@ -274,8 +277,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 					fTourDataContainer.layout();
 
-					// update the viewer
-					fDataViewer.setInput(this);
+					updateViewer();
 				}
 			}
 		};
@@ -298,7 +300,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED
@@ -421,7 +423,9 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
-				cell.setText(Integer.toString(((TourElement) cell.getElement()).distance));
+
+				final int distance = ((TourElement) cell.getElement()).distance;
+				cell.setText(fNumberFormatter.format((float) distance / 1000));
 			}
 		});
 
@@ -609,8 +613,8 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		fScrolledContainer.setExpandHorizontal(true);
 
 		fContentContainer = new Composite(fScrolledContainer, SWT.NONE);
-		fContentContainer.setLayout(new GridLayout(4, false));
-		fContentContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		GridLayoutFactory.swtDefaults().numColumns(2).spacing(10, 5).applyTo(fContentContainer);
+		GridDataFactory.fillDefaults().applyTo(fContentContainer);
 
 		fScrolledContainer.setContent(fContentContainer);
 		fScrolledContainer.addControlListener(new ControlAdapter() {
@@ -745,7 +749,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 
@@ -1002,8 +1006,16 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		/*
 		 * tab: tour data
 		 */
-		fDataViewer.setInput(new Object());
+		updateViewer();
+	}
 
+	private void updateViewer() {
+
+		// update the viewer
+		fNumberFormatter.setMinimumFractionDigits(3);
+		fNumberFormatter.setMaximumFractionDigits(3);
+
+		fDataViewer.setInput(new Object());
 	}
 
 }

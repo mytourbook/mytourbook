@@ -1600,9 +1600,7 @@ public class TourData {
 
 			segmentSerieTime[segmentIndex] = segment.recordingTime = recordingTime;
 
-			segmentSerieDrivingTime[segmentIndex] = //
-			segment.drivingTime = //
-			drivingTime = //
+			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = drivingTime = //
 			Math.max(0, recordingTime - getBreakTime(segmentStartIndex, segmentEndIndex));
 
 			int[] localPowerSerie = getPowerSerie();
@@ -1924,7 +1922,11 @@ public class TourData {
 	}
 
 	public String getDeviceName() {
-		return devicePluginName;
+		if (devicePluginName == null) {
+			return UI.EMPTY_STRING;
+		} else {
+			return devicePluginName;
+		}
 	}
 
 	/**
@@ -2359,19 +2361,79 @@ public class TourData {
 	@PostUpdate
 	public void onPostLoad() {
 
+		timeSerie = serieData.timeSerie;
+
 		altitudeSerie = serieData.altitudeSerie;
 		cadenceSerie = serieData.cadenceSerie;
 		distanceSerie = serieData.distanceSerie;
 		pulseSerie = serieData.pulseSerie;
 		temperatureSerie = serieData.temperatureSerie;
-		timeSerie = serieData.timeSerie;
-
 		powerSerie = serieData.powerSerie;
+		speedSerie = serieData.speedSerie;
+
+		/*
+		 * cleanup dataseries because dataseries has been saved before version 1.3 even when no data
+		 * are available
+		 */
+		int sumAltitude = 0;
+		int sumCadence = 0;
+		int sumDistance = 0;
+		int sumPulse = 0;
+		int sumTemperature = 0;
+		int sumPower = 0;
+		int sumSpeed = 0;
+
+		for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
+
+			if (altitudeSerie != null) {
+				sumAltitude += altitudeSerie[timeIndex];
+			}
+			if (cadenceSerie != null) {
+				sumCadence += cadenceSerie[timeIndex];
+			}
+			if (distanceSerie != null) {
+				sumDistance += distanceSerie[timeIndex];
+			}
+			if (pulseSerie != null) {
+				sumPulse += pulseSerie[timeIndex];
+			}
+			if (temperatureSerie != null) {
+				sumTemperature += temperatureSerie[timeIndex];
+			}
+			if (powerSerie != null) {
+				sumPower += powerSerie[timeIndex];
+			}
+			if (speedSerie != null) {
+				sumSpeed += speedSerie[timeIndex];
+			}
+		}
+
+		if (sumAltitude == 0) {
+			altitudeSerie = null;
+		}
+		if (sumCadence == 0) {
+			cadenceSerie = null;
+		}
+		if (sumDistance == 0) {
+			distanceSerie = null;
+		}
+		if (sumPulse == 0) {
+			pulseSerie = null;
+		}
+		if (sumTemperature == 0) {
+			temperatureSerie = null;
+		}
+		if (sumPower == 0) {
+			powerSerie = null;
+		}
+		if (sumSpeed == 0) {
+			speedSerie = null;
+		}
+
 		if (powerSerie != null) {
 			isPowerSerieFromDevice = true;
 		}
 
-		speedSerie = serieData.speedSerie;
 		if (speedSerie != null) {
 			isSpeedSerieFromDevice = true;
 		}
@@ -2460,9 +2522,6 @@ public class TourData {
 
 		serieData.latitude = latitudeSerie;
 		serieData.longitude = longitudeSerie;
-
-		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0, serieLength);
-		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0, serieLength);
 	}
 
 //	/**
