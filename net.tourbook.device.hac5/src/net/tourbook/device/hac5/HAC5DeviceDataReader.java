@@ -282,7 +282,6 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 				int sumDistance = 0;
 				int sumPulse = 0;
-				int sumAltitude = 0;
 				int sumCadence = 0;
 
 				short temperature;
@@ -381,7 +380,6 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 						absoluteAltitude += timeData.altitude;
 
 						sumDistance += timeData.distance;
-						sumAltitude += Math.abs(absoluteAltitude);
 						sumPulse += absolutePulse;
 						sumCadence += cadence;
 					}
@@ -428,9 +426,6 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					TimeData firstTimeData = timeDataList.get(0);
 					if (sumDistance == 0) {
 						firstTimeData.distance = Integer.MIN_VALUE;
-					}
-					if (sumAltitude == 0) {
-						firstTimeData.altitude = Integer.MIN_VALUE;
 					}
 					if (sumPulse == 0) {
 						firstTimeData.pulse = Integer.MIN_VALUE;

@@ -638,6 +638,7 @@ public class TourDatabase {
 						// version 3 end
 
 						// version 4 start
+
 						// from markus
 						+ "maxAltitude			INTEGER,			\n" //$NON-NLS-1$
 						+ "maxPulse				INTEGER,			\n" //$NON-NLS-1$
@@ -656,6 +657,7 @@ public class TourDatabase {
 						// from wolfgang
 						+ "devicePluginName		VARCHAR(255),		\n" //$NON-NLS-1$
 						+ "deviceModeName		VARCHAR(255),		\n" //$NON-NLS-1$
+
 						// version 4 end
 
 						// version 5 start

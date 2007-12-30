@@ -205,12 +205,12 @@ public class TourData {
 	/**
 	 * visible name for the used plugin to import the data
 	 */
-	private String				devicePluginName;												// db-version 5
+	private String				devicePluginName;												// db-version 4
 
 	/**
-	 * visible name for <code>deviceMode</code>
+	 * visible name for {@link #deviceMode}
 	 */
-	private String				deviceModeName;												// db-version 5
+	private String				deviceModeName;												// db-version 4
 
 	/**
 	 * data series for time, speed, altitude,...
@@ -304,9 +304,8 @@ public class TourData {
 	private int[]				speedSerieImperial;
 
 	/**
-	 * Is <code>true</code> when the data for the {@link TourData#speedSerie} are from the device
-	 * and not computed. Speed data are normally available from an ergometer and not from a bike
-	 * computer
+	 * Is <code>true</code> when the data in {@link #speedSerie} are from the device and not
+	 * computed. Speed data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
 	private boolean				isSpeedSerieFromDevice			= false;
@@ -320,9 +319,8 @@ public class TourData {
 	private int[]				powerSerie;
 
 	/**
-	 * Is <code>true</code> when the data for the {@link TourData#powerSerie} are from the device
-	 * and not computed. Power data are normally available from an ergometer and not from a bike
-	 * computer
+	 * Is <code>true</code> when the data in {@link #powerSerie} are from the device and not
+	 * computed. Power data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
 	private boolean				isPowerSerieFromDevice			= false;
@@ -421,17 +419,19 @@ public class TourData {
 	 */
 	public void clearComputedSeries() {
 
-		speedSerie = null;
-		speedSerieImperial = null;
+		if (isSpeedSerieFromDevice == false) {
+			speedSerie = null;
+		}
+		if (isPowerSerieFromDevice == false) {
+			powerSerie = null;
+		}
 
 		paceSerie = null;
-		paceSerieImperial = null;
-
 		altimeterSerie = null;
+
+		speedSerieImperial = null;
+		paceSerieImperial = null;
 		altimeterSerieImperial = null;
-
-		powerSerie = null;
-
 		altitudeSerieImperial = null;
 	}
 
@@ -1325,7 +1325,7 @@ public class TourData {
 			isPowerSerieFromDevice = true;
 		}
 
-		// check if _GPS data are available
+		// check if GPS data are available
 		if (firstTimeDataItem.latitude != Integer.MIN_VALUE) {
 			latitudeSerie = new double[serieLength];
 			longitudeSerie = new double[serieLength];
@@ -1611,7 +1611,7 @@ public class TourData {
 
 			int altitude1 = altitudeSerie[segmentStartIndex];
 
-			// compute altitude up/down for the segment
+			// compute altitude up/down, pulse and power for a segment
 			for (int serieIndex = segmentStartIndex + 1; serieIndex <= segmentEndIndex; serieIndex++) {
 
 				final int altitude2 = altitudeSerie[serieIndex];
@@ -2072,7 +2072,7 @@ public class TourData {
 			computeAltimeterGradientSerie();
 		}
 
-		// check if the necessary series are available 
+		// check if required data series are available 
 		if (speedSerie == null || gradientSerie == null) {
 			return null;
 		}
@@ -2122,9 +2122,9 @@ public class TourData {
 
 			int pTotal = (int) (fTotal * speed);
 
-			if (pTotal > 600) {
-				pTotal = pTotal * 1;
-			}
+//			if (pTotal > 600) {
+//				pTotal = pTotal * 1;
+//			}
 			powerSerie[timeIndex] = pTotal < 0 ? 0 : pTotal;
 		}
 
@@ -2398,7 +2398,8 @@ public class TourData {
 				sumPulse += pulseSerie[timeIndex];
 			}
 			if (temperatureSerie != null) {
-				sumTemperature += temperatureSerie[timeIndex];
+				final int temp = temperatureSerie[timeIndex];
+				sumTemperature += (temp < 0) ? -temp : temp;
 			}
 			if (powerSerie != null) {
 				sumPower += powerSerie[timeIndex];
@@ -2408,6 +2409,10 @@ public class TourData {
 			}
 		}
 
+		/*
+		 * remove data series when the summary of the values is 0, for temperature this can be a
+		 * problem but for a longer tour the temperature varies
+		 */
 		if (sumAltitude == 0) {
 			altitudeSerie = null;
 		}
@@ -2440,10 +2445,6 @@ public class TourData {
 
 		latitudeSerie = serieData.latitude;
 		longitudeSerie = serieData.longitude;
-
-		// System.arraycopy(serieData.speedSerie, 0, speedSerie, 0, serieLength);
-		// System.arraycopy(serieData.powerSerie, 0, powerSerie, 0, serieLength);
-
 	}
 
 //	/**
@@ -2806,20 +2807,4 @@ public class TourData {
 		this.tourType = tourType;
 	}
 
-//	public void updateSerieData() {
-//
-//		final int serieLength = timeSerie.length;
-//
-//		System.arraycopy(altitudeSerie, 0, serieData.altitudeSerie, 0, serieLength);
-//		System.arraycopy(cadenceSerie, 0, serieData.cadenceSerie, 0, serieLength);
-//		System.arraycopy(distanceSerie, 0, serieData.distanceSerie, 0, serieLength);
-//		System.arraycopy(pulseSerie, 0, serieData.pulseSerie, 0, serieLength);
-//		System.arraycopy(temperatureSerie, 0, serieData.temperatureSerie, 0, serieLength);
-//		System.arraycopy(timeSerie, 0, serieData.timeSerie, 0, serieLength);
-//
-//		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0,
-//		// serieLength);
-//		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
-//		// serieLength);
-//	}
 }

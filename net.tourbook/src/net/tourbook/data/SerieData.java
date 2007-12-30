@@ -20,6 +20,10 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 
+/**
+ * All time serie data from a device are stored in the database with this class, when data are not
+ * available the value is set to <code>null</code>
+ */
 public class SerieData implements Serializable {
 
 	private static final long	serialVersionUID	= 1L;
