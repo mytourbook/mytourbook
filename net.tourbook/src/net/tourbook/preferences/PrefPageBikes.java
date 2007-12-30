@@ -22,7 +22,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
-import net.tourbook.Messages;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
@@ -79,8 +78,12 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 	private TableViewer			fBikeViewer;
 	private Button				fButtonAdd;
-	private Button				fButtonDelete;
 
+	/*
+	 * disabled 30.12.2007 because deleted bikes causes errors then the tourbike is stored in
+	 * TourData
+	 */
+//	private Button				fButtonDelete;
 	private Text				fTextBikeName;
 	private Text				fTextWeight;
 	private Combo				fComboBikeType;
@@ -334,10 +337,8 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		gridData.widthHint = convertWidthInCharsToPixels(20);
 		layouter.setLayoutData(gridData);
 
-		final Table table = new Table(layouter, (SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.BORDER
-				| SWT.FULL_SELECTION | SWT.MULTI));
+		final Table table = new Table(layouter,
+				(SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI));
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
@@ -414,18 +415,17 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		});
 
 		// button: delete
-		fButtonDelete = new Button(container, SWT.NONE);
-		fButtonDelete.setText("&Delete"); //$NON-NLS-1$
-		GridData gd = setButtonLayoutData(fButtonDelete);
-		gd.verticalIndent = 10;
-		fButtonDelete.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				onDeleteBike();
-				enableButtons();
-			}
-		});
-
+//		fButtonDelete = new Button(container, SWT.NONE);
+//		fButtonDelete.setText("&Delete"); //$NON-NLS-1$
+//		GridData gd = setButtonLayoutData(fButtonDelete);
+//		gd.verticalIndent = 10;
+//		fButtonDelete.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//				onDeleteBike();
+//				enableButtons();
+//			}
+//		});
 	}
 
 	@Override
@@ -553,15 +553,14 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 	private void enableButtons() {
 		IStructuredSelection selection = (IStructuredSelection) fBikeViewer.getSelection();
-		fButtonDelete.setEnabled(!selection.isEmpty());
+//		fButtonDelete.setEnabled(!selection.isEmpty());
 	}
 
 	private void fireBikeListModifyEvent() {
 		if (fIsBikeListModified) {
 
 			// fire bike list modify event
-			getPreferenceStore().setValue(ITourbookPreferences.TOUR_BIKE_LIST_IS_MODIFIED,
-					Math.random());
+			getPreferenceStore().setValue(ITourbookPreferences.TOUR_BIKE_LIST_IS_MODIFIED, Math.random());
 
 			fIsBikeListModified = false;
 		}
