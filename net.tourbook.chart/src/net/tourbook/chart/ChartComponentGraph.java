@@ -1322,12 +1322,18 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			/*
-			 * keep the selected bar because it will be drawn after all other bars are drawn
+			 * current bar is selected, draw the selected bar
 			 */
+
 			final Rectangle barShapeSelected = new Rectangle((barRectangle.x - markerWidth2),
 					(barRectangle.y - markerWidth2),
 					(barRectangle.width + markerWidth),
 					(barRectangle.height + markerWidth));
+
+			final Rectangle barBarSelected = new Rectangle(barRectangle.x - 1,
+					barRectangle.y - 2,
+					barRectangle.width + 2,
+					barRectangle.height + 4);
 
 			final int colorIndex = colorsIndex[serieIndex][selectedIndex];
 			final RGB rgbBrightDef = rgbBright[colorIndex];
@@ -1338,10 +1344,6 @@ public class ChartComponentGraph extends Canvas {
 			final Color colorDarkSelected = getColor(rgbDarkDef);
 			final Color colorLineSelected = getColor(rgbLineDef);
 
-			/*
-			 * bar was selected, draw the selected bar
-			 */
-
 			// do't write into the x-axis units which also contains the
 			// selection marker
 			if (barShapeSelected.y + barShapeSelected.height > devYBottom) {
@@ -1350,14 +1352,14 @@ public class ChartComponentGraph extends Canvas {
 
 			// draw the selection darker when the focus is set
 			if (fIsFocusActive) {
-				gc.setAlpha(0xb0);
+//				gc.setAlpha(0xb0);
+				gc.setAlpha(0xf0);
 			} else {
-				gc.setAlpha(0x70);
+//				gc.setAlpha(0x70);
+				gc.setAlpha(0xa0);
 			}
 
 			// fill bar background
-			// gc.setForeground(colorBrightSelected);
-			// gc.setBackground(colorDarkSelected);
 			gc.setForeground(colorDarkSelected);
 			gc.setBackground(colorBrightSelected);
 
@@ -1369,21 +1371,16 @@ public class ChartComponentGraph extends Canvas {
 
 			// draw bar border
 			gc.setForeground(colorLineSelected);
-			// if (fIsFocusActive) {
-			// gc.drawFocus(
-			// barShapeSelected.x,
-			// barShapeSelected.y,
-			// barShapeSelected.width,
-			// barShapeSelected.height);
-			// } else {
-
 			gc.drawRoundRectangle(barShapeSelected.x,
 					barShapeSelected.y,
 					barShapeSelected.width,
 					barShapeSelected.height,
 					4,
 					4);
-			// }
+
+			// draw bar thicker
+			gc.setBackground(colorDarkSelected);
+			gc.fillRoundRectangle(barBarSelected.x, barBarSelected.y, barBarSelected.width, barBarSelected.height, 2, 2);
 
 			/*
 			 * draw a marker below the x-axis to make the selection more visible
