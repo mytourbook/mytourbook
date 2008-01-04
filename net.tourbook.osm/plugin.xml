@@ -5,11 +5,15 @@
          point="org.eclipse.ui.views">
       <view
             category="net.tourbook.osm"
-            class="net.tourbook.osm.views.OSMView"
+            class="net.tourbook.osm.OSMView"
             icon="icons/sample.gif"
-            id="net.tourbook.osm.views.OSMViewID"
+            id="net.tourbook.osm.OSMViewID"
             name="OpenSteetMap">
       </view>
+   </extension>
+   <extension
+         point="de.byteholder.geoclipse.mapOverlay">
+      <painter class="net.tourbook.osm.TourPainter"/>
    </extension>
 
 </plugin>

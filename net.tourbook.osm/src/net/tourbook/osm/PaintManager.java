@@ -13,18 +13,40 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.osm.views;
+package net.tourbook.osm;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.part.ViewPart;
+import net.tourbook.data.TourData;
 
-public class OSMView extends ViewPart {
+public class PaintManager {
 
-	public OSMView() {}
+	private static PaintManager	fInstance;
 
-	@Override
-	public void createPartControl(Composite parent) {}
+	private TourData			fTourData;
 
-	@Override
-	public void setFocus() {}
+	private PaintManager() {}
+
+	public static PaintManager getInstance() {
+
+		if (fInstance == null) {
+			fInstance = new PaintManager();
+		}
+
+		return fInstance;
+	}
+
+	/**
+	 * Set the tour data which is used for the next painting
+	 * 
+	 * @param tourData
+	 */
+	public void setTourData(TourData tourData) {
+		fTourData = tourData;
+	}
+
+	/**
+	 * @return Returns the current {@link TourData} which is selected in a view or editor
+	 */
+	public TourData getTourData() {
+		return fTourData;
+	}
 }

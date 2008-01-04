@@ -5,6 +5,10 @@ Bundle-SymbolicName: net.tourbook.osm;singleton:=true
 Bundle-Version: 0.0.1
 Bundle-Activator: net.tourbook.osm.Activator
 Bundle-Vendor: MyTourbook
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+Require-Bundle: net.tourbook,
+ org.eclipse.ui,
+ org.eclipse.core.runtime,
+ de.byteholder.geoclipse,
+ de.byteholder.geoclipse.libraries,
+ de.byteholder.geoclipse.tilefactory.osm
 Eclipse-LazyStart: true
