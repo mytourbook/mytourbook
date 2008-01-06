@@ -15,13 +15,21 @@
  *******************************************************************************/
 package net.tourbook.osm;
 
+import java.util.Set;
+
 import net.tourbook.data.TourData;
+import de.byteholder.gpx.GeoPosition;
 
 public class PaintManager {
 
 	private static PaintManager	fInstance;
 
 	private TourData			fTourData;
+
+	/**
+	 * contains the upper left and lower right position for a tour
+	 */
+	private Set<GeoPosition>	fTourMaxPosition;
 
 	private PaintManager() {}
 
@@ -48,5 +56,13 @@ public class PaintManager {
 	 */
 	public TourData getTourData() {
 		return fTourData;
+	}
+
+	public void setTourBounds(Set<GeoPosition> mapPositions) {
+		fTourMaxPosition = mapPositions;
+	}
+
+	public Set<GeoPosition> getTourBounds() {
+		return fTourMaxPosition;
 	}
 }

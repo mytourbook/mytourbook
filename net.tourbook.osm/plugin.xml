@@ -3,10 +3,14 @@
 <plugin>
    <extension
          point="org.eclipse.ui.views">
+      <category
+            id="net.tourbook.category.tourMaps"
+            name="TourMaps">
+      </category>
       <view
-            category="net.tourbook.osm"
+            category="net.tourbook.category.tourMaps"
             class="net.tourbook.osm.OSMView"
-            icon="icons/sample.gif"
+            icon="icons/earth-globe-abstract.png"
             id="net.tourbook.osm.OSMViewID"
             name="OpenSteetMap">
       </view>

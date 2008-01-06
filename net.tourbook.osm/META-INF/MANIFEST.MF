@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: OpenStreetMap Plug-in
 Bundle-SymbolicName: net.tourbook.osm;singleton:=true
-Bundle-Version: 0.0.1
+Bundle-Version: 1.2.1.v20080106
 Bundle-Activator: net.tourbook.osm.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: net.tourbook,

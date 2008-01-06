@@ -367,7 +367,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		fPageBook = new PageBook(parent, SWT.NONE);
 
-		fPageNoChart = new Label(fPageBook, SWT.NONE);
+		fPageNoChart = new Label(fPageBook, SWT.WRAP);
 		fPageNoChart.setText(Messages.Tour_Segmenter_Label_no_chart);
 
 		fPageSegmenter = new Composite(fPageBook, SWT.NONE);
@@ -754,7 +754,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 

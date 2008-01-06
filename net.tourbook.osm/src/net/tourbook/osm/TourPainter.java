@@ -20,6 +20,9 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Set;
 
 import net.tourbook.data.TourData;
 import de.byteholder.geoclipse.map.TileFactory;
@@ -61,14 +64,53 @@ public class TourPainter extends MapPainter {
 			if (viewport.contains(pixel)) {
 				pixel = map.getRelativePixel(pixel);
 				g2d.setColor(Color.RED);
-//				g2d.setClip(pixel.x - 2, pixel.y - 2, 4, 4);
-//				g2d.fillOval(pixel.x - 2, pixel.y - 2, 4, 4);
-				g2d.setClip(pixel.x - 1, pixel.y - 1, 2, 2);
-				g2d.fillOval(pixel.x - 1, pixel.y - 1, 2, 2);
+				g2d.setClip(pixel.x - 2, pixel.y - 2, 4, 4);
+				g2d.fillOval(pixel.x - 2, pixel.y - 2, 4, 4);
+//				g2d.setClip(pixel.x - 1, pixel.y - 1, 2, 2);
+//				g2d.fillOval(pixel.x - 1, pixel.y - 1, 2, 2);
+			}
+		}
+
+		// paint a marker when the tour is not easy to detect
+		if (longitudeSerie.length > 0) {
+
+			Rectangle2D tourBounds = getPositionRect(PaintManager.getInstance().getTourBounds(), map);
+			Point pixel = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[0], longitudeSerie[0]), map.getZoom());
+
+			if (tourBounds.getWidth() < 3 || tourBounds.getHeight() < 3) {
+
+				pixel = map.getRelativePixel(pixel);
+
+				g2d.setColor(Color.BLUE);
+//				g2d.setBackground(Color.GREEN);
+
+//				g2d.fillOval(pixel.x, pixel.y, 20, 20);
+				int radius = 30;
+				int radius2 = radius / 2;
+
+				g2d.setClip(pixel.x - radius2, pixel.y - radius2, radius + 1, radius + 1);
+				g2d.drawOval(pixel.x - radius2, pixel.y - radius2, radius, radius);
 			}
 
 		}
 
 		g2d.dispose();
 	}
+
+	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, Map map) {
+
+		final TileFactory tileFactory = map.getTileFactory();
+		final int zoom = map.getZoom();
+
+		Point2D point1 = tileFactory.geoToPixel(positions.iterator().next(), zoom);
+		Rectangle2D rect = new Rectangle2D.Double(point1.getX(), point1.getY(), 0, 0);
+
+		for (GeoPosition pos : positions) {
+			Point2D point = tileFactory.geoToPixel(pos, zoom);
+			rect.add(point);
+		}
+
+		return rect;
+	}
+
 }

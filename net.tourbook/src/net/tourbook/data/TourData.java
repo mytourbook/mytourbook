@@ -103,7 +103,7 @@ public class TourData {
 	 * <p>
 	 * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private int					distance;
 
 	/**
@@ -218,15 +218,15 @@ public class TourData {
 	@Basic(optional = false)
 	private SerieData			serieData;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourMarker>		tourMarkers						= new HashSet<TourMarker>();
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourReference>	tourReferences					= new HashSet<TourReference>();
 
-	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)
 	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
 
 	/**
@@ -404,6 +404,26 @@ public class TourData {
 	 */
 	@Transient
 	public String				importRawDataFile;
+
+	/**
+	 * Latitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
+	 * not set
+	 */
+	@Transient
+	public double				mapCenterPositionLatitude		= Double.MIN_VALUE;
+
+	/**
+	 * Longitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
+	 * not set
+	 */
+	@Transient
+	public double				mapCenterPositionLongitude		= Double.MIN_VALUE;
+
+	/**
+	 * Zoomlevel in the map
+	 */
+	@Transient
+	public int					mapZoomLevel;
 
 	public TourData() {}
 
@@ -1353,6 +1373,9 @@ public class TourData {
 
 			int pulseCounter = 0;
 
+			double lastValidLatitude = 0;
+			double lastValidlongitude = 0;
+
 			// convert data from the tour format into an interger[]
 			for (final TimeData timeData : timeDataList) {
 
@@ -1408,8 +1431,16 @@ public class TourData {
 					altitudeSerie[timeIndex] = altitudeAbsolute += altitudeDiff;
 				}
 
-				latitudeSerie[timeIndex] = timeData.latitude;
-				longitudeSerie[timeIndex] = timeData.longitude;
+				final double latitude = timeData.latitude;
+				final double longitude = timeData.longitude;
+
+				if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
+					latitudeSerie[timeIndex] = lastValidLatitude;
+					longitudeSerie[timeIndex] = lastValidlongitude;
+				} else {
+					latitudeSerie[timeIndex] = lastValidLatitude = latitude;
+					longitudeSerie[timeIndex] = lastValidlongitude = longitude;
+				}
 
 				/*
 				 * pulse
@@ -2371,6 +2402,9 @@ public class TourData {
 		powerSerie = serieData.powerSerie;
 		speedSerie = serieData.speedSerie;
 
+		latitudeSerie = serieData.latitude;
+		longitudeSerie = serieData.longitude;
+
 		/*
 		 * cleanup dataseries because dataseries has been saved before version 1.3 even when no data
 		 * are available
@@ -2382,6 +2416,9 @@ public class TourData {
 		int sumTemperature = 0;
 		int sumPower = 0;
 		int sumSpeed = 0;
+
+		double lastValidLatitude = 0;
+		double lastValidlongitude = 0;
 
 		for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
 
@@ -2407,6 +2444,21 @@ public class TourData {
 			if (speedSerie != null) {
 				sumSpeed += speedSerie[timeIndex];
 			}
+
+			if (latitudeSerie != null && longitudeSerie != null) {
+
+				final double latitude = latitudeSerie[timeIndex];
+				final double longitude = longitudeSerie[timeIndex];
+
+				if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
+					latitudeSerie[timeIndex] = lastValidLatitude;
+					longitudeSerie[timeIndex] = lastValidlongitude;
+				} else {
+					latitudeSerie[timeIndex] = lastValidLatitude = latitude;
+					longitudeSerie[timeIndex] = lastValidlongitude = longitude;
+				}
+			}
+
 		}
 
 		/*
@@ -2443,8 +2495,6 @@ public class TourData {
 			isSpeedSerieFromDevice = true;
 		}
 
-		latitudeSerie = serieData.latitude;
-		longitudeSerie = serieData.longitude;
 	}
 
 //	/**
