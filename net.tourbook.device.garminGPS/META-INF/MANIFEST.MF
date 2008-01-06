@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Device Reader for Garmin Devices
 Bundle-SymbolicName: net.tourbook.device.garmin;singleton:=true
-Bundle-Version: 1.2.0.v20071231
+Bundle-Version: 1.2.1.v20080106
 Bundle-Activator: net.tourbook.device.garmin.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
