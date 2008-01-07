@@ -32,9 +32,9 @@ class ActionRenameRefTour extends Action {
 	/**
 	 * 
 	 */
-	private final TourMapView	fTourMapView;
+	private final TourCatalogView	fTourMapView;
 
-	public ActionRenameRefTour(TourMapView tourMapView) {
+	public ActionRenameRefTour(TourCatalogView tourMapView) {
 
 		super(Messages.Tour_Map_Action_rename_reference_tour);
 		fTourMapView = tourMapView;
@@ -45,9 +45,9 @@ class ActionRenameRefTour extends Action {
 
 		final Object selectedItem = (((ITreeSelection) fTourMapView.getTourViewer().getSelection()).getFirstElement());
 
-		if (selectedItem instanceof TourMapItemReferenceTour) {
+		if (selectedItem instanceof TourCatalogItemReferenceTour) {
 
-			final TourMapItemReferenceTour ttiRefTour = (TourMapItemReferenceTour) selectedItem;
+			final TourCatalogItemReferenceTour ttiRefTour = (TourCatalogItemReferenceTour) selectedItem;
 
 			// ask for the reference tour name
 			final InputDialog dialog = new InputDialog(this.fTourMapView.getSite().getShell(),

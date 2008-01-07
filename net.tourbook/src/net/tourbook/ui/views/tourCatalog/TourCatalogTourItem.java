@@ -17,15 +17,15 @@ package net.tourbook.ui.views.tourCatalog;
 
 import java.util.ArrayList;
 
-public class TourMapTourItem extends Object {
+public class TourCatalogTourItem extends Object {
 
 	static final int					ITEM_TYPE_ROOT			= 0;
 	static final int					ITEM_TYPE_YEAR			= 20;
 	static final int					ITEM_TYPE_MONTH			= 30;
 	static final int					ITEM_TYPE_TOUR			= 40;
 
-	private TourMapTourItem				parent					= null;
-	private ArrayList<TourMapTourItem>	children				= null;
+	private TourCatalogTourItem				parent					= null;
+	private ArrayList<TourCatalogTourItem>	children				= null;
 
 	long[]								fTourItemData;
 	private long						dateValue;
@@ -43,7 +43,7 @@ public class TourMapTourItem extends Object {
 	 */
 	private long						fTourId;
 
-	public TourMapTourItem(int itemType, long[] itemData, Long tourTypeId) {
+	public TourCatalogTourItem(int itemType, long[] itemData, Long tourTypeId) {
 
 		fItemType = itemType;
 		fTourItemData = itemData;
@@ -61,7 +61,7 @@ public class TourMapTourItem extends Object {
 
 	}
 
-	public TourMapTourItem(int itemType, long[] itemData) {
+	public TourCatalogTourItem(int itemType, long[] itemData) {
 		this.fItemType = itemType;
 		this.fTourItemData = itemData;
 
@@ -95,25 +95,25 @@ public class TourMapTourItem extends Object {
 
 	}
 
-	public TourMapTourItem[] getChildren() {
+	public TourCatalogTourItem[] getChildren() {
 		if (children == null) {
-			return new TourMapTourItem[0];
+			return new TourCatalogTourItem[0];
 		}
-		return children.toArray(new TourMapTourItem[children.size()]);
+		return children.toArray(new TourCatalogTourItem[children.size()]);
 	}
 
-	public ArrayList<TourMapTourItem> getChildrenList() {
+	public ArrayList<TourCatalogTourItem> getChildrenList() {
 		if (children == null) {
-			return new ArrayList<TourMapTourItem>();
+			return new ArrayList<TourCatalogTourItem>();
 		}
 		return children;
 	}
 
-	public TourMapTourItem getParent() {
+	public TourCatalogTourItem getParent() {
 		return parent;
 	}
 
-	void setParent(TourMapTourItem parent) {
+	void setParent(TourCatalogTourItem parent) {
 		this.parent = parent;
 	}
 
@@ -131,9 +131,9 @@ public class TourMapTourItem extends Object {
 		this.fItemType = type;
 	}
 
-	public void addChild(TourMapTourItem child) {
+	public void addChild(TourCatalogTourItem child) {
 		if (children == null) {
-			children = new ArrayList<TourMapTourItem>();
+			children = new ArrayList<TourCatalogTourItem>();
 			childrenStatus = CHILDREN_STATUS_FETCHED;
 		}
 		children.add(child);

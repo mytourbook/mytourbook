@@ -42,7 +42,7 @@ import org.eclipse.ui.part.PageBook;
 // author: Wolfgang Schramm
 // create: 09.07.2007
 
-public class TourMapViewReferenceTour extends TourChartViewPart {
+public class TourCatalogViewReferenceTour extends TourChartViewPart {
 
 	public static final String	ID				= "net.tourbook.views.tourMap.referenceTourView";	//$NON-NLS-1$
 
@@ -111,9 +111,9 @@ public class TourMapViewReferenceTour extends TourChartViewPart {
 
 			Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-			if (firstElement instanceof TourMapItemComparedTour) {
+			if (firstElement instanceof TourCatalogItemComparedTour) {
 
-				showRefTour(((TourMapItemComparedTour) firstElement).getRefId());
+				showRefTour(((TourCatalogItemComparedTour) firstElement).getRefId());
 
 			} else if (firstElement instanceof CompareResultItemComparedTour) {
 

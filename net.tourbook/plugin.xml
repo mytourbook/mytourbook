@@ -140,7 +140,7 @@
             name="%view_name_Book"/>
       <view
             category="net.tourbook.category.tourList"
-            class="net.tourbook.ui.views.tourCatalog.TourMapView"
+            class="net.tourbook.ui.views.tourCatalog.TourCatalogView"
             icon="icons/tour-map.gif"
             id="net.tourbook.views.tourMap.TourMapView"
             name="%view_name_tourMap"/>
@@ -199,21 +199,21 @@
             name="%view_name_Compare_Result"/>
       <view
             category="net.tourbook.category.compareTours"
-            class="net.tourbook.ui.views.tourCatalog.TourMapViewReferenceTour"
+            class="net.tourbook.ui.views.tourCatalog.TourCatalogViewReferenceTour"
             icon="icons/tour-map-reftour.gif"
             id="net.tourbook.views.tourMap.referenceTourView"
             name="%view_name_tourMap_referenceTour">
       </view>
       <view
             category="net.tourbook.category.compareTours"
-            class="net.tourbook.ui.views.tourCatalog.TourMapViewComparedTour"
+            class="net.tourbook.ui.views.tourCatalog.TourCatalogViewComparedTour"
             icon="icons/tour-map-comparetour.gif"
             id="net.tourbook.views.tourMap.comparedTourView"
             name="%view_name_tourMap_comparedTour">
       </view>
       <view
             category="net.tourbook.category.compareTours"
-            class="net.tourbook.ui.views.tourCatalog.TourMapViewYearStatistic"
+            class="net.tourbook.ui.views.tourCatalog.TourCatalogViewYearStatistic"
             icon="icons/tour-map-statistic.gif"
             id="net.tourbook.views.tourMap.yearStatisticView"
             name="%view_name_tourMap_statistics">

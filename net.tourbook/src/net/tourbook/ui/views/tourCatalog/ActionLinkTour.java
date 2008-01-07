@@ -22,9 +22,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionLinkTour extends Action {
 
-	private TourMapView	fTourMapView;
+	private TourCatalogView	fTourMapView;
 
-	public ActionLinkTour(TourMapView view) {
+	public ActionLinkTour(TourCatalogView view) {
 
 		super(null, AS_CHECK_BOX);
 

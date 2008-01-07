@@ -29,7 +29,7 @@ import net.tourbook.tour.TreeViewerItem;
  * TTI (TreeViewerItem) is used in the tree viewer TourMapView, it contains tree items for reference
  * tours
  */
-public class TourMapItemReferenceTour extends TreeViewerTourItem {
+public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
 
 	String	label;
 	long	refId;
@@ -37,7 +37,7 @@ public class TourMapItemReferenceTour extends TreeViewerTourItem {
 	int		yearMapMinValue	= Integer.MIN_VALUE;
 	int		yearMapMaxValue;
 
-	public TourMapItemReferenceTour(TourMapItemRoot parentItem, String label, long refId, long tourId) {
+	public TourCatalogItemReferenceTour(TourCatalogItemRoot parentItem, String label, long refId, long tourId) {
 
 		this.setParentItem(parentItem);
 
@@ -85,7 +85,7 @@ public class TourMapItemReferenceTour extends TreeViewerTourItem {
 			ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				children.add(new TourMapItemYear(this, refId, result.getInt(1)));
+				children.add(new TourCatalogItemYear(this, refId, result.getInt(1)));
 			}
 
 			conn.close();

@@ -16,8 +16,8 @@
 package net.tourbook.application;
 
 import net.tourbook.ui.views.tourCatalog.CompareResultView;
-import net.tourbook.ui.views.tourCatalog.TourMapViewComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourMapViewReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TourCatalogViewComparedTour;
+import net.tourbook.ui.views.tourCatalog.TourCatalogViewReferenceTour;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -49,7 +49,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 				0.7f,
 				IPageLayout.ID_EDITOR_AREA);
 
-		refFolder.addView(TourMapViewReferenceTour.ID);
+		refFolder.addView(TourCatalogViewReferenceTour.ID);
 
 		//--------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 				0.5f,
 				FOLDER_ID_REF);
 
-		compFolder.addView(TourMapViewComparedTour.ID);
+		compFolder.addView(TourCatalogViewComparedTour.ID);
 
 		layout.setEditorAreaVisible(false);
 	}

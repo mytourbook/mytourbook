@@ -48,7 +48,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourMapViewYearStatistic extends ViewPart {
+public class TourCatalogViewYearStatistic extends ViewPart {
 
 	public static final String		ID	= "net.tourbook.views.tourMap.yearStatisticView";	//$NON-NLS-1$
 
@@ -58,14 +58,14 @@ public class TourMapViewYearStatistic extends ViewPart {
 	private PostSelectionProvider	fPostSelectionProvider;
 
 	/**
-	 * contains all {@link TourMapItemComparedTour} tour objects for the current year
+	 * contains all {@link TourCatalogItemComparedTour} tour objects for the current year
 	 */
 	private Object[]				fYearMapTours;
 
 	/**
 	 * year item for the visible statistics
 	 */
-	private TourMapItemYear			fCurrentYearItem;
+	private TourCatalogItemYear			fCurrentYearItem;
 
 	private PageBook				fPageBook;
 	private Label					fPageNoChart;
@@ -84,7 +84,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 
 	private IPropertyChangeListener	fPrefChangeListener;
 
-	public TourMapViewYearStatistic() {}
+	public TourCatalogViewYearStatistic() {}
 
 	public void actionSynchScale(boolean isSynchMaxValue) {
 		fIsSynchMaxValue = isSynchMaxValue;
@@ -198,7 +198,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 		fYearChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 
-				TourMapItemComparedTour tourMapComparedTour = (TourMapItemComparedTour) fYearMapTours[valueIndex];
+				TourCatalogItemComparedTour tourMapComparedTour = (TourCatalogItemComparedTour) fYearMapTours[valueIndex];
 
 				// select the tour in the tour viewer & show tour in compared tour char
 				fCurrentSelection = new StructuredSelection(tourMapComparedTour);
@@ -227,7 +227,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 			final SelectionTourMapView selectionComparedTour = (SelectionTourMapView) selection;
 
 			// show year statistic
-			final TourMapItemYear yearItem = selectionComparedTour.getYearItem();
+			final TourCatalogItemYear yearItem = selectionComparedTour.getYearItem();
 			if (yearItem != null) {
 
 				fCurrentYearItem = yearItem;
@@ -253,10 +253,10 @@ public class TourMapViewYearStatistic extends ViewPart {
 
 			if (structuredSelection.size() > 0) {
 				Object firstElement = structuredSelection.getFirstElement();
-				if (firstElement instanceof TourMapItemComparedTour) {
+				if (firstElement instanceof TourCatalogItemComparedTour) {
 
-					TourMapItemComparedTour compareItem = (TourMapItemComparedTour) firstElement;
-					TourMapItemYear yearItem = (TourMapItemYear) compareItem.getParentItem();
+					TourCatalogItemComparedTour compareItem = (TourCatalogItemComparedTour) firstElement;
+					TourCatalogItemYear yearItem = (TourCatalogItemYear) compareItem.getParentItem();
 
 					// show year statistic
 					if (yearItem != fCurrentYearItem) {
@@ -303,7 +303,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 		boolean[] selectedTours = new boolean[tourLength];
 
 		for (int tourIndex = 0; tourIndex < tourLength; tourIndex++) {
-			final TourMapItemComparedTour comparedItem = (TourMapItemComparedTour) fYearMapTours[tourIndex];
+			final TourCatalogItemComparedTour comparedItem = (TourCatalogItemComparedTour) fYearMapTours[tourIndex];
 			if (comparedItem.getTourId() == selectedTourId) {
 				selectedTours[tourIndex] = true;
 			}
@@ -333,7 +333,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 		final Calendar calendar = GregorianCalendar.getInstance();
 
 		for (int tourIndex = 0; tourIndex < tourLength; tourIndex++) {
-			final TourMapItemComparedTour comparedItem = (TourMapItemComparedTour) fYearMapTours[tourIndex];
+			final TourCatalogItemComparedTour comparedItem = (TourCatalogItemComparedTour) fYearMapTours[tourIndex];
 
 			final Date tourDate = comparedItem.getTourDate();
 			calendar.setTime(tourDate);
@@ -356,7 +356,7 @@ public class TourMapViewYearStatistic extends ViewPart {
 		/*
 		 * set/restore min/max values
 		 */
-		final TourMapItemReferenceTour refItem = fCurrentYearItem.getRefItem();
+		final TourCatalogItemReferenceTour refItem = fCurrentYearItem.getRefItem();
 		final int minValue = yData.getVisibleMinValue();
 		final int maxValue = yData.getVisibleMaxValue();
 

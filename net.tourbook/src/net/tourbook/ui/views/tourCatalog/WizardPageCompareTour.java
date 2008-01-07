@@ -101,7 +101,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 		public Object[] getChildren(Object parentElement) {
 
-			TourMapTourItem tourItem = ((TourMapTourItem) parentElement);
+			TourCatalogTourItem tourItem = ((TourCatalogTourItem) parentElement);
 
 			// fetch the children if not yet done
 			if (!tourItem.hasChildrenBeenFetched()) {
@@ -111,11 +111,11 @@ public class WizardPageCompareTour extends WizardPage {
 		}
 
 		public Object getParent(Object element) {
-			return ((TourMapTourItem) element).getParent();
+			return ((TourCatalogTourItem) element).getParent();
 		}
 
 		public boolean hasChildren(Object element) {
-			return ((TourMapTourItem) element).hasChildren();
+			return ((TourCatalogTourItem) element).hasChildren();
 		}
 
 		public Object[] getElements(Object inputElement) {
@@ -132,7 +132,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 		public String getColumnText(Object obj, int index) {
 
-			TourMapTourItem tourItem = (TourMapTourItem) obj;
+			TourCatalogTourItem tourItem = (TourCatalogTourItem) obj;
 			long[] row = tourItem.fTourItemData;
 
 			switch (index) {
@@ -140,7 +140,7 @@ public class WizardPageCompareTour extends WizardPage {
 				return Long.toString(row[COLUMN_DATE]);
 
 			case COLUMN_DISTANCE:
-				if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
+				if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
 					fNf.setMinimumFractionDigits(1);
 					fNf.setMaximumFractionDigits(1);
 					return fNf.format(((float) row[COLUMN_DISTANCE]) / (1000 * UI.UNIT_VALUE_DISTANCE));
@@ -149,7 +149,7 @@ public class WizardPageCompareTour extends WizardPage {
 				}
 
 			case COLUMN_RECORDING:
-				if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
+				if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
 					long recordingTime = row[COLUMN_RECORDING];
 					return new Formatter().format(Messages.Format_hhmm,
 							(recordingTime / 3600),
@@ -159,7 +159,7 @@ public class WizardPageCompareTour extends WizardPage {
 				}
 
 			case COLUMN_UP:
-				if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
+				if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
 					return Long.toString((long) (row[COLUMN_UP] / UI.UNIT_VALUE_ALTITUDE));
 				} else {
 					return ""; //$NON-NLS-1$
@@ -353,11 +353,11 @@ public class WizardPageCompareTour extends WizardPage {
 
 		if (selection != null) {
 
-			if (selection.getFirstElement() instanceof TourMapTourItem) {
+			if (selection.getFirstElement() instanceof TourCatalogTourItem) {
 
-				TourMapTourItem tourItem = (TourMapTourItem) selection.getFirstElement();
+				TourCatalogTourItem tourItem = (TourCatalogTourItem) selection.getFirstElement();
 
-				if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
+				if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
 
 					// get tour data from the database
 					final TourData tourData = TourManager.getInstance().getTourData(tourItem.getTourId());
@@ -440,7 +440,7 @@ public class WizardPageCompareTour extends WizardPage {
 	 */
 	public Object[] getComparedTours() {
 
-		TourMapTourItem[] tours = new TourMapTourItem[0];
+		TourCatalogTourItem[] tours = new TourCatalogTourItem[0];
 
 		if (fCheckSelectAll.getSelection()) {
 
@@ -452,7 +452,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 			// convert the Object[] into a TreeViewerItem[]
 			Object[] checked = fTourViewer.getCheckedElements();
-			tours = new TourMapTourItem[checked.length];
+			tours = new TourCatalogTourItem[checked.length];
 			System.arraycopy(checked, 0, tours, 0, checked.length);
 		}
 

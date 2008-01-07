@@ -79,7 +79,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourMapView extends ViewPart implements ITourViewer {
+public class TourCatalogView extends ViewPart implements ITourViewer {
 
 	private static final String			MEMENTO_TOUR_MAP_ACTIVE_REF_ID	= "tour.map.active.ref.id";				//$NON-NLS-1$
 	private static final String			MEMENTO_TOUR_MAP_LINK_TOUR		= "tour.map.link.tour";					//$NON-NLS-1$
@@ -96,7 +96,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 	 */
 	private static IMemento				fSessionMemento					= null;
 
-	TourMapItemRoot						fRootItem						= new TourMapItemRoot();
+	TourCatalogItemRoot						fRootItem						= new TourCatalogItemRoot();
 
 	private Composite					fViewerContainer;
 	private TreeViewer					fTourViewer;
@@ -138,7 +138,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 	/**
 	 * tour item which is selected by the link tour action
 	 */
-	protected TourMapItemComparedTour	fLinkedTour;
+	protected TourCatalogItemComparedTour	fLinkedTour;
 
 	/**
 	 * ref id which is currently selected in the tour viewer
@@ -180,13 +180,13 @@ public class TourMapView extends ViewPart implements ITourViewer {
 	private class TourLabelProvider extends LabelProvider implements ITableLabelProvider, ITableColorProvider {
 
 		public Color getBackground(final Object element, final int columnIndex) {
-			if (/* columnIndex == 0 && */element instanceof TourMapItemReferenceTour) {
+			if (/* columnIndex == 0 && */element instanceof TourCatalogItemReferenceTour) {
 				return fColorRefBg;
 			}
-			if (/* columnIndex == 0 && */element instanceof TourMapItemYear) {
+			if (/* columnIndex == 0 && */element instanceof TourCatalogItemYear) {
 				return fColorYearBg;
 			}
-			if (columnIndex == 0 && element instanceof TourMapItemComparedTour) {
+			if (columnIndex == 0 && element instanceof TourCatalogItemComparedTour) {
 				return fColorTourBg;
 			}
 
@@ -199,27 +199,27 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 		public String getColumnText(final Object obj, final int index) {
 
-			if (obj instanceof TourMapItemReferenceTour) {
+			if (obj instanceof TourCatalogItemReferenceTour) {
 
-				final TourMapItemReferenceTour refTour = (TourMapItemReferenceTour) obj;
+				final TourCatalogItemReferenceTour refTour = (TourCatalogItemReferenceTour) obj;
 				switch (index) {
 				case COLUMN_LABEL:
 					return refTour.label;
 				}
 				return ""; //$NON-NLS-1$
 
-			} else if (obj instanceof TourMapItemYear) {
+			} else if (obj instanceof TourCatalogItemYear) {
 
-				final TourMapItemYear yearItem = (TourMapItemYear) obj;
+				final TourCatalogItemYear yearItem = (TourCatalogItemYear) obj;
 				switch (index) {
 				case COLUMN_LABEL:
 					return Integer.toString(yearItem.year);
 				}
 				return ""; //$NON-NLS-1$
 
-			} else if (obj instanceof TourMapItemComparedTour) {
+			} else if (obj instanceof TourCatalogItemComparedTour) {
 
-				final TourMapItemComparedTour compTour = (TourMapItemComparedTour) obj;
+				final TourCatalogItemComparedTour compTour = (TourCatalogItemComparedTour) obj;
 				switch (index) {
 				case COLUMN_LABEL:
 					return DateFormat.getDateInstance(DateFormat.SHORT).format(compTour.getTourDate());
@@ -256,7 +256,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	public TourMapView() {}
+	public TourCatalogView() {}
 
 	/**
 	 * Find the compared tours in the tour map tree viewer<br>
@@ -267,7 +267,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 	 * @param findCompIds
 	 *        comp id's which should be found
 	 */
-	private static void getComparedTours(	ArrayList<TourMapItemComparedTour> comparedTours,
+	private static void getComparedTours(	ArrayList<TourCatalogItemComparedTour> comparedTours,
 											final TreeViewerItem parentItem,
 											final ArrayList<Long> findCompIds) {
 
@@ -279,9 +279,9 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 			for (final TreeViewerItem tourTreeItem : unfetchedChildren) {
 
-				if (tourTreeItem instanceof TourMapItemComparedTour) {
+				if (tourTreeItem instanceof TourCatalogItemComparedTour) {
 
-					final TourMapItemComparedTour ttiCompResult = (TourMapItemComparedTour) tourTreeItem;
+					final TourCatalogItemComparedTour ttiCompResult = (TourCatalogItemComparedTour) tourTreeItem;
 					final long ttiCompId = ttiCompResult.getCompId();
 
 					for (final Long compId : findCompIds) {
@@ -315,14 +315,14 @@ public class TourMapView extends ViewPart implements ITourViewer {
 						compareIds.add(compareTourProperty.compareId);
 
 						// find the compared tour in the viewer
-						ArrayList<TourMapItemComparedTour> comparedTours = new ArrayList<TourMapItemComparedTour>();
+						ArrayList<TourCatalogItemComparedTour> comparedTours = new ArrayList<TourCatalogItemComparedTour>();
 						final TreeViewerItem rootItem = ((TourContentProvider) fTourViewer.getContentProvider()).getRootItem();
 
 						getComparedTours(comparedTours, rootItem, compareIds);
 
 						if (comparedTours.size() > 0) {
 
-							TourMapItemComparedTour comparedTour = comparedTours.get(0);
+							TourCatalogItemComparedTour comparedTour = comparedTours.get(0);
 
 							// update entity
 							comparedTour.setStartIndex(compareTourProperty.startIndex);
@@ -414,13 +414,13 @@ public class TourMapView extends ViewPart implements ITourViewer {
 					 * find/remove the removed compared tours in the viewer
 					 */
 
-					ArrayList<TourMapItemComparedTour> comparedTours = new ArrayList<TourMapItemComparedTour>();
+					ArrayList<TourCatalogItemComparedTour> comparedTours = new ArrayList<TourCatalogItemComparedTour>();
 					final TreeViewerItem rootItem = ((TourContentProvider) fTourViewer.getContentProvider()).getRootItem();
 
 					getComparedTours(comparedTours, rootItem, removedCompTours.removedComparedTours);
 
 					// remove compared tour from the data model
-					for (final TourMapItemComparedTour comparedTour : comparedTours) {
+					for (final TourCatalogItemComparedTour comparedTour : comparedTours) {
 						comparedTour.remove();
 					}
 
@@ -433,11 +433,11 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 					Object firstElement = structuredSelection.getFirstElement();
 
-					if (firstElement instanceof TourMapItemComparedTour) {
+					if (firstElement instanceof TourCatalogItemComparedTour) {
 
 						// select the compared tour in the tour viewer
 
-						final TourMapItemComparedTour linkedTour = (TourMapItemComparedTour) firstElement;
+						final TourCatalogItemComparedTour linkedTour = (TourCatalogItemComparedTour) firstElement;
 
 						// check if the linked tour is already set, prevent recursion
 						if (fLinkedTour != linkedTour) {
@@ -505,7 +505,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(final IMenuManager manager) {
-				TourMapView.this.fillContextMenu(manager);
+				TourCatalogView.this.fillContextMenu(manager);
 			}
 		});
 
@@ -600,8 +600,8 @@ public class TourMapView extends ViewPart implements ITourViewer {
 				 * get tour id
 				 */
 				long tourId = -1;
-				if (tourItem instanceof TourMapItemComparedTour) {
-					tourId = ((TourMapItemComparedTour) tourItem).getTourId();
+				if (tourItem instanceof TourCatalogItemComparedTour) {
+					tourId = ((TourCatalogItemComparedTour) tourItem).getTourId();
 				}
 
 				if (tourId != -1) {
@@ -654,11 +654,11 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 			final Object item = (Object) iter.next();
 
-			if (item instanceof TourMapItemReferenceTour) {
+			if (item instanceof TourCatalogItemReferenceTour) {
 				refItemCounter++;
-			} else if (item instanceof TourMapItemComparedTour) {
+			} else if (item instanceof TourCatalogItemComparedTour) {
 				tourItemCounter++;
-			} else if (item instanceof TourMapItemYear) {
+			} else if (item instanceof TourCatalogItemYear) {
 				yearItemCounter++;
 			}
 		}
@@ -738,25 +738,25 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 		ISelection tourMapSelection = null;
 
-		if (item instanceof TourMapItemReferenceTour) {
+		if (item instanceof TourCatalogItemReferenceTour) {
 
-			final TourMapItemReferenceTour refItem = (TourMapItemReferenceTour) item;
+			final TourCatalogItemReferenceTour refItem = (TourCatalogItemReferenceTour) item;
 
 			tourMapSelection = new SelectionTourMapView(refItem.refId);
 			fActiveRefId = refItem.refId;
 
-		} else if (item instanceof TourMapItemYear) {
+		} else if (item instanceof TourCatalogItemYear) {
 
-			final TourMapItemYear yearItem = (TourMapItemYear) item;
+			final TourCatalogItemYear yearItem = (TourCatalogItemYear) item;
 
 			tourMapSelection = new SelectionTourMapView(yearItem.refId);
 			fActiveRefId = yearItem.refId;
 
 			((SelectionTourMapView) tourMapSelection).setYearData(yearItem);
 
-		} else if (item instanceof TourMapItemComparedTour) {
+		} else if (item instanceof TourCatalogItemComparedTour) {
 
-			final TourMapItemComparedTour compItem = (TourMapItemComparedTour) item;
+			final TourCatalogItemComparedTour compItem = (TourCatalogItemComparedTour) item;
 
 			tourMapSelection = new StructuredSelection(compItem);
 			fActiveRefId = compItem.getRefId();
@@ -839,9 +839,9 @@ public class TourMapView extends ViewPart implements ITourViewer {
 
 		// search ref tour
 		for (Object refTourItem : refTourItems) {
-			if (refTourItem instanceof TourMapItemReferenceTour) {
+			if (refTourItem instanceof TourCatalogItemReferenceTour) {
 
-				TourMapItemReferenceTour tvtiRefTour = (TourMapItemReferenceTour) refTourItem;
+				TourCatalogItemReferenceTour tvtiRefTour = (TourCatalogItemReferenceTour) refTourItem;
 				if (tvtiRefTour.refId == refId) {
 
 					// select ref tour
@@ -890,7 +890,7 @@ public class TourMapView extends ViewPart implements ITourViewer {
 			if (unfetchedChildren != null) {
 
 				for (final TreeViewerItem rootChild : unfetchedChildren) {
-					final TourMapItemReferenceTour mapRefTour = (TourMapItemReferenceTour) rootChild;
+					final TourCatalogItemReferenceTour mapRefTour = (TourCatalogItemReferenceTour) rootChild;
 
 					if (mapRefTour.refId == refId) {
 

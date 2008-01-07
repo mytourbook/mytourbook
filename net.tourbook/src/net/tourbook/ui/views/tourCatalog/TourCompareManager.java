@@ -171,11 +171,11 @@ public class TourCompareManager {
 
 					Object tour = compareTourIDs[compareIndex];
 
-					if (tour instanceof TourMapTourItem) {
-						TourMapTourItem tourItem = (TourMapTourItem) tour;
+					if (tour instanceof TourCatalogTourItem) {
+						TourCatalogTourItem tourItem = (TourCatalogTourItem) tour;
 
 						// ignore none tour items
-						if (tourItem.getItemType() == TourMapTourItem.ITEM_TYPE_TOUR) {
+						if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
 
 							// load compare tour from database
 							tourId = tourItem.getTourId();

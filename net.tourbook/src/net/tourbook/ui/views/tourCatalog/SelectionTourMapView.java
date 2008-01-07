@@ -22,7 +22,7 @@ import net.tourbook.data.TourReference;
 import org.eclipse.jface.viewers.ISelection;
 
 /**
- * Selection contains data for a compared tour from the {@link TourMapView}
+ * Selection contains data for a compared tour from the {@link TourCatalogView}
  */
 public class SelectionTourMapView implements ISelection {
 
@@ -41,7 +41,7 @@ public class SelectionTourMapView implements ISelection {
 	private int				fCompareStartIndex;
 	private int				fCompareEndIndex;
 
-	private TourMapItemYear	fYearItem;
+	private TourCatalogItemYear	fYearItem;
 
 	public SelectionTourMapView(Long refId) {
 		fRefId = refId;
@@ -76,9 +76,9 @@ public class SelectionTourMapView implements ISelection {
 	}
 
 	/**
-	 * @return Returns the {@link TourMapItemYear} item or <code>null</code> when it's not set
+	 * @return Returns the {@link TourCatalogItemYear} item or <code>null</code> when it's not set
 	 */
-	public TourMapItemYear getYearItem() {
+	public TourCatalogItemYear getYearItem() {
 		return fYearItem;
 	}
 
@@ -110,7 +110,7 @@ public class SelectionTourMapView implements ISelection {
 		fCompareEndIndex = compEndIndex;
 	}
 
-	public void setYearData(TourMapItemYear yearItem) {
+	public void setYearData(TourCatalogItemYear yearItem) {
 		fYearItem = yearItem;
 	}
 

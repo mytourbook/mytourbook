@@ -56,7 +56,7 @@ import org.eclipse.ui.part.PageBook;
 // author: Wolfgang Schramm
 // create: 06.09.2007
 
-public class TourMapViewComparedTour extends TourChartViewPart implements ISynchedChart {
+public class TourCatalogViewComparedTour extends TourChartViewPart implements ISynchedChart {
 
 	public static final String					ID				= "net.tourbook.views.tourMap.comparedTourView";	//$NON-NLS-1$
 
@@ -372,9 +372,9 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 
 			Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-			if (firstElement instanceof TourMapItemComparedTour) {
+			if (firstElement instanceof TourCatalogItemComparedTour) {
 
-				updateTourChart((TourMapItemComparedTour) firstElement);
+				updateTourChart((TourCatalogItemComparedTour) firstElement);
 
 			} else if (firstElement instanceof CompareResultItemComparedTour) {
 
@@ -554,7 +554,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 
 	private void setRangeMarkers(ChartDataXSerie xData) {
 
-		if (fComparedTourItem instanceof TourMapItemComparedTour) {
+		if (fComparedTourItem instanceof TourCatalogItemComparedTour) {
 
 			xData.setRangeMarkers(new int[] { fDefaultStartIndex }, new int[] { fDefaultEndIndex });
 
@@ -713,11 +713,11 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 	}
 
 	/**
-	 * Shows the compared tour which was selected by the user in the {@link TourMapView}
+	 * Shows the compared tour which was selected by the user in the {@link TourCatalogView}
 	 * 
 	 * @param selectionComparedTour
 	 */
-	private void updateTourChart(TourMapItemComparedTour itemComparedTour) {
+	private void updateTourChart(TourCatalogItemComparedTour itemComparedTour) {
 
 		if (saveComparedTourDialog() == false) {
 			return;
@@ -726,7 +726,7 @@ public class TourMapViewComparedTour extends TourChartViewPart implements ISynch
 		final Long ctTourId = itemComparedTour.getTourId();
 
 		// check if the compared tour is already displayed
-		if (fCTTourId == ctTourId.longValue() && fComparedTourItem instanceof TourMapItemComparedTour) {
+		if (fCTTourId == ctTourId.longValue() && fComparedTourItem instanceof TourCatalogItemComparedTour) {
 			return;
 		}
 

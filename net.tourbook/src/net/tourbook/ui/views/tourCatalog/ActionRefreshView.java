@@ -22,9 +22,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionRefreshView extends Action {
 
-	private TourMapView	fTourMapView;
+	private TourCatalogView	fTourMapView;
 
-	public ActionRefreshView(TourMapView view) {
+	public ActionRefreshView(TourCatalogView view) {
 
 		super(null, AS_PUSH_BUTTON);
 

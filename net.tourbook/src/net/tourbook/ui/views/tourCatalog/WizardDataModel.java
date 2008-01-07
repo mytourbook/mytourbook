@@ -30,11 +30,11 @@ import net.tourbook.database.TourDatabase;
  */
 public class WizardDataModel {
 
-	private TourMapTourItem	rootItem;
+	private TourCatalogTourItem	rootItem;
 
 	public void setRootItem() {
 
-		rootItem = new TourMapTourItem(TourMapTourItem.ITEM_TYPE_ROOT, new long[0]);
+		rootItem = new TourCatalogTourItem(TourCatalogTourItem.ITEM_TYPE_ROOT, new long[0]);
 
 		fetchChildren(rootItem);
 	}
@@ -44,7 +44,7 @@ public class WizardDataModel {
 		return rootItem.getChildren();
 	}
 
-	public void fetchChildren(TourMapTourItem parentItem) {
+	public void fetchChildren(TourCatalogTourItem parentItem) {
 
 		int childType = 0;
 
@@ -53,9 +53,9 @@ public class WizardDataModel {
 
 		switch (parentItem.getItemType()) {
 
-		case TourMapTourItem.ITEM_TYPE_ROOT:
+		case TourCatalogTourItem.ITEM_TYPE_ROOT:
 
-			childType = TourMapTourItem.ITEM_TYPE_YEAR;
+			childType = TourCatalogTourItem.ITEM_TYPE_YEAR;
 
 			sqlString = ("SELECT STARTYEAR, " + sumColumns + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -64,9 +64,9 @@ public class WizardDataModel {
 
 			break;
 
-		case TourMapTourItem.ITEM_TYPE_YEAR:
+		case TourCatalogTourItem.ITEM_TYPE_YEAR:
 
-			childType = TourMapTourItem.ITEM_TYPE_MONTH;
+			childType = TourCatalogTourItem.ITEM_TYPE_MONTH;
 
 			sqlString = ("SELECT STARTMONTH, " + sumColumns + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -75,9 +75,9 @@ public class WizardDataModel {
 					+ " ORDER BY STARTMONTH"; //$NON-NLS-1$
 			break;
 
-		case TourMapTourItem.ITEM_TYPE_MONTH:
+		case TourCatalogTourItem.ITEM_TYPE_MONTH:
 
-			childType = TourMapTourItem.ITEM_TYPE_TOUR;
+			childType = TourCatalogTourItem.ITEM_TYPE_TOUR;
 
 			sqlString = ("SELECT STARTDAY, TOURDISTANCE, TOURALTUP, TOURRECORDINGTIME, tourID \n") //$NON-NLS-1$
 					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -106,13 +106,13 @@ public class WizardDataModel {
 					row[col] = result.getLong(col + 1);
 				}
 
-				TourMapTourItem childItem = new TourMapTourItem(childType, row);
+				TourCatalogTourItem childItem = new TourCatalogTourItem(childType, row);
 
 				/*
 				 * when a tour item does not have children, it's set to be a
 				 * leaf
 				 */
-				if (childType == TourMapTourItem.ITEM_TYPE_TOUR) {
+				if (childType == TourCatalogTourItem.ITEM_TYPE_TOUR) {
 					childItem.setLeaf();
 				}
 

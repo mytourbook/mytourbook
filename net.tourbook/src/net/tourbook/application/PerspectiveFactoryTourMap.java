@@ -15,10 +15,10 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.ui.views.tourCatalog.TourMapView;
-import net.tourbook.ui.views.tourCatalog.TourMapViewComparedTour;
-import net.tourbook.ui.views.tourCatalog.TourMapViewReferenceTour;
-import net.tourbook.ui.views.tourCatalog.TourMapViewYearStatistic;
+import net.tourbook.ui.views.tourCatalog.TourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TourCatalogViewComparedTour;
+import net.tourbook.ui.views.tourCatalog.TourCatalogViewReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TourCatalogViewYearStatistic;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -42,7 +42,7 @@ public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
 				0.3f,
 				IPageLayout.ID_EDITOR_AREA);
 
-		listFolder.addView(TourMapView.ID);
+		listFolder.addView(TourCatalogView.ID);
 
 		//--------------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
 				0.7f,
 				FOLDER_ID_LIST);
 
-		statFolder.addView(TourMapViewYearStatistic.ID);
+		statFolder.addView(TourCatalogViewYearStatistic.ID);
 
 		//--------------------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
 				0.7f,
 				IPageLayout.ID_EDITOR_AREA);
 
-		refFolder.addView(TourMapViewReferenceTour.ID);
+		refFolder.addView(TourCatalogViewReferenceTour.ID);
 
 		//--------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
 				0.5f,
 				FOLDER_ID_REF);
 
-		compFolder.addView(TourMapViewComparedTour.ID);
+		compFolder.addView(TourCatalogViewComparedTour.ID);
 
 		layout.setEditorAreaVisible(false);
 	}

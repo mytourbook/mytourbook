@@ -18,7 +18,7 @@ package net.tourbook.ui.views.tourCatalog;
 import org.eclipse.jface.viewers.ISelection;
 
 /**
- * This selection contains data for a compared tour from the view {@link TourMapViewComparedTour}
+ * This selection contains data for a compared tour from the view {@link TourCatalogViewComparedTour}
  */
 public class SelectionCompareResultView implements ISelection {
 

@@ -23,9 +23,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSynchYearScale extends Action {
 
-	private final TourMapViewYearStatistic	fYearStatisticView;
+	private final TourCatalogViewYearStatistic	fYearStatisticView;
 
-	public ActionSynchYearScale(TourMapViewYearStatistic yearStatisticView) {
+	public ActionSynchYearScale(TourCatalogViewYearStatistic yearStatisticView) {
 
 		super("", AS_CHECK_BOX); //$NON-NLS-1$
 

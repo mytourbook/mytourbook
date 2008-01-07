@@ -24,47 +24,21 @@ import java.util.ArrayList;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
 
-/**
- * TTI (TreeViewerItem) is used in the tree viewer TourMapView, it contains tree items for reference
- * tours
- */
-public class TourMapItemYear extends TreeViewerItem {
-
-	long	refId;
-	int		year;
-
-	/**
-	 * @param parentItem
-	 * @param refId
-	 * @param year
-	 */
-	public TourMapItemYear(TreeViewerItem parentItem, long refId, int year) {
-
-		this.setParentItem(parentItem);
-
-		this.refId = refId;
-		this.year = year;
-	}
+public class TourCatalogItemRoot extends TreeViewerItem {
 
 	@Override
 	protected void fetchChildren() {
 
+		/*
+		 * set the children for the root item, these are reference tours
+		 */
 		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		String sqlString = "SELECT " //$NON-NLS-1$
-				+ "tourDate, " //$NON-NLS-1$
-				+ "tourSpeed, " //$NON-NLS-1$
-				+ "comparedId, " //$NON-NLS-1$
-				+ "tourId , " //$NON-NLS-1$
-				+ "startIndex, " //$NON-NLS-1$
-				+ "endIndex, " //$NON-NLS-1$
-				+ "startYear \n" //$NON-NLS-1$
-				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("WHERE refTourId=" + refId) //$NON-NLS-1$
-				+ " AND " //$NON-NLS-1$
-				+ ("startYear=" + year) //$NON-NLS-1$
-				+ " ORDER BY tourDate"; //$NON-NLS-1$
+		String sqlString = "SELECT label, refId, " //$NON-NLS-1$
+				+ (TourDatabase.TABLE_TOUR_DATA + "_tourId	\n") //$NON-NLS-1$
+				+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ " ORDER BY label"; //$NON-NLS-1$
 
 		try {
 
@@ -73,14 +47,10 @@ public class TourMapItemYear extends TreeViewerItem {
 			ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				children.add(new TourMapItemComparedTour(this,
-						result.getDate(1),
-						result.getFloat(2),
-						result.getLong(3),
-						result.getLong(4),
-						result.getInt(5),
-						result.getInt(6),
-						refId));
+				children.add(new TourCatalogItemReferenceTour(this,
+						result.getString(1),
+						result.getLong(2),
+						result.getLong(3)));
 			}
 
 			conn.close();
@@ -91,17 +61,5 @@ public class TourMapItemYear extends TreeViewerItem {
 	}
 
 	@Override
-	public void remove() {
-
-		// remove all children
-		getUnfetchedChildren().clear();
-
-		// remove this tour item from the parent
-		getParentItem().getUnfetchedChildren().remove(this);
-	}
-
-	TourMapItemReferenceTour getRefItem() {
-		return (TourMapItemReferenceTour) getParentItem();
-	}
-
+	protected void remove() {}
 }
