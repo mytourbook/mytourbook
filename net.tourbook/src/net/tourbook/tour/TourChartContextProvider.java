@@ -27,7 +27,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
-import net.tourbook.ui.views.tourMap.ReferenceTourManager;
+import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;

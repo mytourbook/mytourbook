@@ -15,10 +15,10 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.ui.views.tourMap.TourMapViewComparedTour;
-import net.tourbook.ui.views.tourMap.TourMapViewReferenceTour;
-import net.tourbook.ui.views.tourMap.TourMapView;
-import net.tourbook.ui.views.tourMap.TourMapViewYearStatistic;
+import net.tourbook.ui.views.tourCatalog.TourMapView;
+import net.tourbook.ui.views.tourCatalog.TourMapViewComparedTour;
+import net.tourbook.ui.views.tourCatalog.TourMapViewReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TourMapViewYearStatistic;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;

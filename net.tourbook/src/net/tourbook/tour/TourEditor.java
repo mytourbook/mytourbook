@@ -28,7 +28,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.views.tourMap.SelectionNewRefTours;
+import net.tourbook.ui.views.tourCatalog.SelectionNewRefTours;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;

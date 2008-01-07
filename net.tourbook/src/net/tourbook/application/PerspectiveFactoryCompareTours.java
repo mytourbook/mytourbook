@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.ui.views.tourMap.CompareResultView;
-import net.tourbook.ui.views.tourMap.TourMapViewComparedTour;
-import net.tourbook.ui.views.tourMap.TourMapViewReferenceTour;
+import net.tourbook.ui.views.tourCatalog.CompareResultView;
+import net.tourbook.ui.views.tourCatalog.TourMapViewComparedTour;
+import net.tourbook.ui.views.tourCatalog.TourMapViewReferenceTour;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;

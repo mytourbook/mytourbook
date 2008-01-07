@@ -41,7 +41,7 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourMap.ActionCollapseAll;
+import net.tourbook.ui.views.tourCatalog.ActionCollapseAll;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
