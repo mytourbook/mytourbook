@@ -32,7 +32,7 @@ public class ActionSynchYearScale extends Action {
 		fYearStatisticView = yearStatisticView;
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics));
-		setToolTipText(Messages.Tour_Map_Action_synch_chart_years_tooltip);
+		setToolTipText(Messages.tourCatalog_view_action_synch_chart_years_tooltip);
 	}
 
 	@Override

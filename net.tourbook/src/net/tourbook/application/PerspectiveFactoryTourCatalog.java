@@ -24,14 +24,14 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
-public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
+public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 
-	static final String			PERSPECTIVE_ID	= "net.tourbook.perspective.TourMap";	//$NON-NLS-1$
+	static final String			PERSPECTIVE_ID	= "net.tourbook.perspective.TourCatalog";	//$NON-NLS-1$
 
-	private static final String	FOLDER_ID_COMP	= "comp"; //$NON-NLS-1$
-	private static final String	FOLDER_ID_STAT	= "stat"; //$NON-NLS-1$
-	private static final String	FOLDER_ID_LIST	= "list"; //$NON-NLS-1$
-	private static final String	FOLDER_ID_REF	= "ref"; //$NON-NLS-1$
+	private static final String	FOLDER_ID_COMP	= "comp";									//$NON-NLS-1$
+	private static final String	FOLDER_ID_STAT	= "stat";									//$NON-NLS-1$
+	private static final String	FOLDER_ID_LIST	= "list";									//$NON-NLS-1$
+	private static final String	FOLDER_ID_REF	= "ref";									//$NON-NLS-1$
 
 	public void createInitialLayout(IPageLayout layout) {
 
@@ -46,28 +46,19 @@ public class PerspectiveFactoryTourMap implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		IFolderLayout statFolder = layout.createFolder(FOLDER_ID_STAT,
-				IPageLayout.BOTTOM,
-				0.7f,
-				FOLDER_ID_LIST);
+		IFolderLayout statFolder = layout.createFolder(FOLDER_ID_STAT, IPageLayout.BOTTOM, 0.7f, FOLDER_ID_LIST);
 
 		statFolder.addView(TourCatalogViewYearStatistic.ID);
 
 		//--------------------------------------------------------------------------------
 
-		IFolderLayout refFolder = layout.createFolder(FOLDER_ID_REF,
-				IPageLayout.TOP,
-				0.7f,
-				IPageLayout.ID_EDITOR_AREA);
+		IFolderLayout refFolder = layout.createFolder(FOLDER_ID_REF, IPageLayout.TOP, 0.7f, IPageLayout.ID_EDITOR_AREA);
 
 		refFolder.addView(TourCatalogViewReferenceTour.ID);
 
 		//--------------------------------------------------------------------------------
 
-		IFolderLayout compFolder = layout.createFolder(FOLDER_ID_COMP,
-				IPageLayout.BOTTOM,
-				0.5f,
-				FOLDER_ID_REF);
+		IFolderLayout compFolder = layout.createFolder(FOLDER_ID_COMP, IPageLayout.BOTTOM, 0.5f, FOLDER_ID_REF);
 
 		compFolder.addView(TourCatalogViewComparedTour.ID);
 

@@ -81,59 +81,59 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourCatalogView extends ViewPart implements ITourViewer {
 
-	private static final String			MEMENTO_TOUR_MAP_ACTIVE_REF_ID	= "tour.map.active.ref.id";				//$NON-NLS-1$
-	private static final String			MEMENTO_TOUR_MAP_LINK_TOUR		= "tour.map.link.tour";					//$NON-NLS-1$
+	private static final String				MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";					//$NON-NLS-1$
+	private static final String				MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";						//$NON-NLS-1$
 
-	public static final String			ID								= "net.tourbook.views.tourMap.TourMapView"; //$NON-NLS-1$
+	public static final String				ID									= "net.tourbook.views.tourCatalog.TourCatalogView"; //$NON-NLS-1$
 
-	public static final int				COLUMN_LABEL					= 0;
-	public static final int				COLUMN_SPEED					= 1;
+	public static final int					COLUMN_LABEL						= 0;
+	public static final int					COLUMN_SPEED						= 1;
 
 	/**
 	 * This memento allows this view to save and restore state when it is closed and opened within a
 	 * session. A different memento is supplied by the platform for persistance at workbench
 	 * shutdown.
 	 */
-	private static IMemento				fSessionMemento					= null;
+	private static IMemento					fSessionMemento						= null;
 
-	TourCatalogItemRoot						fRootItem						= new TourCatalogItemRoot();
+	TourCatalogItemRoot						fRootItem							= new TourCatalogItemRoot();
 
-	private Composite					fViewerContainer;
-	private TreeViewer					fTourViewer;
+	private Composite						fViewerContainer;
+	private TreeViewer						fTourViewer;
 
-	final NumberFormat					nf								= NumberFormat.getNumberInstance();
+	final NumberFormat						nf									= NumberFormat.getNumberInstance();
 
-	private ISelectionListener			fPostSelectionListener;
-	private IPartListener2				fPartListener;
-	PostSelectionProvider				fPostSelectionProvider;
-	private ITourPropertyListener		fCompareTourPropertyListener;
-	private IPropertyChangeListener		fPrefChangeListener;
+	private ISelectionListener				fPostSelectionListener;
+	private IPartListener2					fPartListener;
+	PostSelectionProvider					fPostSelectionProvider;
+	private ITourPropertyListener			fCompareTourPropertyListener;
+	private IPropertyChangeListener			fPrefChangeListener;
 
-	protected int						fRefTourXMarkerValue;
+	protected int							fRefTourXMarkerValue;
 
-	private ActionDeleteTourFromMap		fActionDeleteSelectedTour;
-	private ActionRenameRefTour			fActionRenameRefTour;
-	private ActionLinkTour				fActionLinkTour;
-	private ActionCollapseAll			fActionCollapseAll;
-	private ActionRefreshView			fActionRefreshView;
+	private ActionDeleteTourFromMap			fActionDeleteSelectedTour;
+	private ActionRenameRefTour				fActionRenameRefTour;
+	private ActionLinkTour					fActionLinkTour;
+	private ActionCollapseAll				fActionCollapseAll;
+	private ActionRefreshView				fActionRefreshView;
 
-	private final RGB					fRGBRefFg						= new RGB(0, 0, 0);
-	private final RGB					fRGBRefBg						= new RGB(255, 220, 153);
+	private final RGB						fRGBRefFg							= new RGB(0, 0, 0);
+	private final RGB						fRGBRefBg							= new RGB(255, 220, 153);
 
-	private final RGB					fRGBYearFg						= new RGB(255, 255, 255);
-	private final RGB					fRGBYearBg						= new RGB(255, 233, 191);
+	private final RGB						fRGBYearFg							= new RGB(255, 255, 255);
+	private final RGB						fRGBYearBg							= new RGB(255, 233, 191);
 
-	private final RGB					fRGBTourFg						= new RGB(0, 0, 0);
-	private final RGB					fRGBTourBg						= new RGB(255, 255, 255);
+	private final RGB						fRGBTourFg							= new RGB(0, 0, 0);
+	private final RGB						fRGBTourBg							= new RGB(255, 255, 255);
 
-	private Color						fColorRefFg;
-	private Color						fColorRefBg;
+	private Color							fColorRefFg;
+	private Color							fColorRefBg;
 
-	private Color						fColorYearFg;
-	private Color						fColorYearBg;
+	private Color							fColorYearFg;
+	private Color							fColorYearBg;
 
-	private Color						fColorTourFg;
-	private Color						fColorTourBg;
+	private Color							fColorTourFg;
+	private Color							fColorTourBg;
 
 	/**
 	 * tour item which is selected by the link tour action
@@ -143,12 +143,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 	/**
 	 * ref id which is currently selected in the tour viewer
 	 */
-	private long						fActiveRefId;
+	private long							fActiveRefId;
 
 	/**
 	 * flag if actions are added to the toolbar
 	 */
-	private boolean						fIsToolbarCreated				= false;
+	private boolean							fIsToolbarCreated					= false;
 
 	class TourContentProvider implements ITreeContentProvider {
 
@@ -242,7 +242,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		}
 
 		public Color getForeground(final Object element, final int columnIndex) {
-//			if (/* columnIndex != 0 && */element instanceof TVTITourMapReferenceTour) {
+//			if (/* columnIndex != 0 && */element instanceof TVTITourCatalogReferenceTour) {
 //				return fColorRefFg;
 //			}
 			return fColorRefFg;
@@ -569,7 +569,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		PixelConverter pixelConverter = new PixelConverter(tree);
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText(Messages.Tour_Map_Column_tour);
+		tc.setText(Messages.tourCatalog_view_column_tour);
 		treeLayout.setColumnData(tc, new ColumnWeightData(18, true));
 
 		tc = new TreeColumn(tree, SWT.TRAIL);
@@ -736,34 +736,34 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		// show the reference tour chart
 		final Object item = selection.getFirstElement();
 
-		ISelection tourMapSelection = null;
+		ISelection tourCatalogSelection = null;
 
 		if (item instanceof TourCatalogItemReferenceTour) {
 
 			final TourCatalogItemReferenceTour refItem = (TourCatalogItemReferenceTour) item;
 
-			tourMapSelection = new SelectionTourMapView(refItem.refId);
+			tourCatalogSelection = new SelectionTourCatalogView(refItem.refId);
 			fActiveRefId = refItem.refId;
 
 		} else if (item instanceof TourCatalogItemYear) {
 
 			final TourCatalogItemYear yearItem = (TourCatalogItemYear) item;
 
-			tourMapSelection = new SelectionTourMapView(yearItem.refId);
+			tourCatalogSelection = new SelectionTourCatalogView(yearItem.refId);
 			fActiveRefId = yearItem.refId;
 
-			((SelectionTourMapView) tourMapSelection).setYearData(yearItem);
+			((SelectionTourCatalogView) tourCatalogSelection).setYearData(yearItem);
 
 		} else if (item instanceof TourCatalogItemComparedTour) {
 
 			final TourCatalogItemComparedTour compItem = (TourCatalogItemComparedTour) item;
 
-			tourMapSelection = new StructuredSelection(compItem);
+			tourCatalogSelection = new StructuredSelection(compItem);
 			fActiveRefId = compItem.getRefId();
 		}
 
-		if (tourMapSelection != null) {
-			fPostSelectionProvider.setSelection(tourMapSelection);
+		if (tourCatalogSelection != null) {
+			fPostSelectionProvider.setSelection(tourCatalogSelection);
 		}
 	}
 
@@ -787,7 +787,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		/*
 		 * select ref tour in tour viewer
 		 */
-		String mementoRefId = memento.getString(MEMENTO_TOUR_MAP_ACTIVE_REF_ID);
+		String mementoRefId = memento.getString(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID);
 		if (mementoRefId != null) {
 
 			try {
@@ -800,22 +800,22 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		/*
 		 * action: link tour with statistics
 		 */
-		Integer mementoLinkTour = memento.getInteger(MEMENTO_TOUR_MAP_LINK_TOUR);
+		Integer mementoLinkTour = memento.getInteger(MEMENTO_TOUR_CATALOG_LINK_TOUR);
 		if (mementoLinkTour != null) {
 			fActionLinkTour.setChecked(mementoLinkTour == 1);
 		}
 	}
 
 	private void saveSettings() {
-		fSessionMemento = XMLMemento.createWriteRoot("TourMapView"); //$NON-NLS-1$
+		fSessionMemento = XMLMemento.createWriteRoot("TourCatalogView"); //$NON-NLS-1$
 		saveState(fSessionMemento);
 	}
 
 	@Override
 	public void saveState(final IMemento memento) {
 
-		memento.putString(MEMENTO_TOUR_MAP_ACTIVE_REF_ID, Long.toString(fActiveRefId));
-		memento.putInteger(MEMENTO_TOUR_MAP_LINK_TOUR, fActionLinkTour.isChecked() ? 1 : 0);
+		memento.putString(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID, Long.toString(fActiveRefId));
+		memento.putInteger(MEMENTO_TOUR_CATALOG_LINK_TOUR, fActionLinkTour.isChecked() ? 1 : 0);
 
 	}
 

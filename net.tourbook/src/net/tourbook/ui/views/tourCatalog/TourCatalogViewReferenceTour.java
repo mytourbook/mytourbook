@@ -44,7 +44,7 @@ import org.eclipse.ui.part.PageBook;
 
 public class TourCatalogViewReferenceTour extends TourChartViewPart {
 
-	public static final String	ID				= "net.tourbook.views.tourMap.referenceTourView";	//$NON-NLS-1$
+	public static final String	ID				= "net.tourbook.views.tourCatalog.referenceTourView";	//$NON-NLS-1$
 
 	private long				fActiveRefId	= -1;
 
@@ -87,9 +87,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 		});
 
 		// show current selected tour
-		final ISelection selection = getSite().getWorkbenchWindow()
-				.getSelectionService()
-				.getSelection();
+		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
 		if (selection != null) {
 			onSelectionChanged(selection);
 		} else {
@@ -103,9 +101,9 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 
 	private void onSelectionChanged(ISelection selection) {
 
-		if (selection instanceof SelectionTourMapView) {
+		if (selection instanceof SelectionTourCatalogView) {
 
-			showRefTour(((SelectionTourMapView) selection).getRefId());
+			showRefTour(((SelectionTourCatalogView) selection).getRefId());
 
 		} else if (selection instanceof StructuredSelection) {
 
@@ -125,7 +123,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 	@Override
 	protected void onSelectionChanged(IWorkbenchPart part, ISelection selection) {
 
-//		if (part != TourMapViewReferenceTour.this) {
+//		if (part != TourCatalogViewReferenceTour.this) {
 //			return;
 //		}
 
@@ -139,8 +137,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 			return;
 		}
 
-		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance()
-				.getTourCompareConfig(refId);
+		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(refId);
 
 		if (tourCompareConfig == null) {
 			return;
@@ -243,22 +240,18 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 				final TourReference refTour = compareConfig.getRefTour();
 
 				// set marker positions
-				xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(),
-						refTour.getEndValueIndex());
+				xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
 
 				// set the value difference of the synch marker
 				final int[] xValues = xData.getHighValues()[0];
 				final int refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
 						- xValues[refTour.getStartValueIndex()];
 
-				TourManager.getInstance()
-						.firePropertyChange(TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED,
-								new TourPropertyRefTourChanged(fTourChart,
-										refTour.getRefId(),
-										refTourXMarkerValue));
+				TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED,
+						new TourPropertyRefTourChanged(fTourChart, refTour.getRefId(), refTourXMarkerValue));
 
 				// set title
-				changedChartDataModel.setTitle(NLS.bind(Messages.Tour_Map_Label_chart_title_reference_tour,
+				changedChartDataModel.setTitle(NLS.bind(Messages.tourCatalog_view_label_chart_title_reference_tour,
 						refTour.getLabel(),
 						TourManager.getTourTitleDetailed(compareConfig.getRefTourData())));
 

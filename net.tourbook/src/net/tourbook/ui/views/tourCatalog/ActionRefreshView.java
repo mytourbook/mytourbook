@@ -22,21 +22,21 @@ import org.eclipse.jface.action.Action;
 
 public class ActionRefreshView extends Action {
 
-	private TourCatalogView	fTourMapView;
+	private TourCatalogView	fTourCatalogView;
 
 	public ActionRefreshView(TourCatalogView view) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		fTourMapView = view;
+		fTourCatalogView = view;
 
-		setToolTipText(Messages.Tour_Map_Action_refresh_view_tooltip);
+		setToolTipText(Messages.tourCatalog_view_action_refresh_view_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__refresh));
 	}
 
 	@Override
 	public void run() {
-		fTourMapView.refreshViewer();
+		fTourCatalogView.refreshViewer();
 	}
 
 }

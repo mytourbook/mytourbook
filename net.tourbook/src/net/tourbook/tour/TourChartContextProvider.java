@@ -48,7 +48,7 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 	class ActionAddTourReference extends Action {
 
 		ActionAddTourReference() {
-			setText(Messages.Tour_Map_Action_create_reference_tour);
+			setText(Messages.tourCatalog_view_action_create_reference_tour);
 		}
 
 		@Override
@@ -148,10 +148,10 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 
 			// marker menu
 			if (leftSlider != null && rightSlider == null) {
-				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_marker, leftSlider));
+				menuMgr.add(new SliderAction(Messages.tourCatalog_view_action_create_marker, leftSlider));
 			} else {
-				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_left_marker, leftSlider));
-				menuMgr.add(new SliderAction(Messages.Tour_Map_Action_create_right_marker, rightSlider));
+				menuMgr.add(new SliderAction(Messages.tourCatalog_view_action_create_left_marker, leftSlider));
+				menuMgr.add(new SliderAction(Messages.tourCatalog_view_action_create_right_marker, rightSlider));
 			}
 		}
 	}

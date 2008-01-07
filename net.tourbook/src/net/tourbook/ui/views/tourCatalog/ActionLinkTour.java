@@ -22,21 +22,21 @@ import org.eclipse.jface.action.Action;
 
 public class ActionLinkTour extends Action {
 
-	private TourCatalogView	fTourMapView;
+	private TourCatalogView	fTourCatalogView;
 
 	public ActionLinkTour(TourCatalogView view) {
 
 		super(null, AS_CHECK_BOX);
 
-		fTourMapView = view;
+		fTourCatalogView = view;
 
-		setToolTipText(Messages.Tour_Map_Action_link);
+		setToolTipText(Messages.tourCatalog_view_action_link);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__link));
 	}
 
 	@Override
 	public void run() {
-		fTourMapView.selectLinkedTour();
+		fTourCatalogView.selectLinkedTour();
 	}
 
 }

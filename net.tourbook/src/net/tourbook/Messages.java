@@ -368,39 +368,6 @@ public class Messages extends NLS {
 	public static String		Tour_Properties_Label_time;
 	public static String		Tour_Properties_Label_time_unit;
 
-	public static String		Tour_Map_Action_collapse_all_tooltip;
-	public static String		Tour_Map_Action_create_left_marker;
-	public static String		Tour_Map_Action_create_marker;
-	public static String		Tour_Map_Action_create_reference_tour;
-	public static String		Tour_Map_Action_create_right_marker;
-	public static String		Tour_Map_Action_delete_compared_tour;
-	public static String		Tour_Map_Action_delete_tours;
-	public static String		Tour_Map_Action_link;
-	public static String		Tour_Map_Action_refresh_view_tooltip;
-	public static String		Tour_Map_Action_rename_reference_tour;
-	public static String		Tour_Map_action_save_marker;
-	public static String		Tour_Map_Action_synch_chart_years_tooltip;
-	public static String		Tour_Map_Action_synch_charts_byScale_tooltip;
-	public static String		Tour_Map_Action_synch_charts_bySize_tooltip;
-	public static String		Tour_Map_Action_undo_marker_position;
-	public static String		Tour_Map_Column_tour;
-	public static String		Tour_Map_Compare_job_subtask;
-	public static String		Tour_Map_Compare_job_task;
-	public static String		Tour_Map_Compare_job_title;
-	public static String		Tour_Map_dlg_add_reference_tour_msg;
-	public static String		Tour_Map_dlg_add_reference_tour_title;
-	public static String		Tour_Map_dlg_delete_comparedTour_msg;
-	public static String		Tour_Map_dlg_delete_comparedTour_title;
-	public static String		Tour_Map_dlg_delete_refTour_msg;
-	public static String		Tour_Map_dlg_delete_refTour_title;
-	public static String		Tour_Map_Dlg_rename_reference_tour_msg;
-	public static String		Tour_Map_Dlg_rename_reference_tour_title;
-	public static String		Tour_Map_dlg_save_compared_tour_message;
-	public static String		Tour_Map_dlg_save_compared_tour_title;
-	public static String		Tour_Map_Label_chart_title_reference_tour;
-	public static String		Tour_Map_Label_year_chart_title;
-	public static String		Tour_Map_label_year_not_selected;
-
 	public static String		Tour_Marker_Column_horizontal_offset;
 	public static String		Tour_Marker_Column_horizontal_offset_tooltip;
 	public static String		Tour_Marker_Column_km_tooltip;
@@ -408,7 +375,6 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Column_time;
 	public static String		Tour_Marker_Column_vertical_offset;
 	public static String		Tour_Marker_Column_vertical_offset_tooltip;
-
 	public static String		Tour_Marker_Position_horizontal_above_centered;
 	public static String		Tour_Marker_Position_horizontal_above_left;
 	public static String		Tour_Marker_Position_horizontal_above_right;
@@ -448,6 +414,59 @@ public class Messages extends NLS {
 	public static String		TourAnalyzer_Label_right;
 	public static String		TourAnalyzer_Label_value;
 
+	public static String		tourCatalog_view_action_collapse_all_tooltip;
+	public static String		tourCatalog_view_action_create_left_marker;
+	public static String		tourCatalog_view_action_create_marker;
+	public static String		tourCatalog_view_action_create_reference_tour;
+	public static String		tourCatalog_view_action_create_right_marker;
+	public static String		tourCatalog_view_action_delete_compared_tour;
+	public static String		tourCatalog_view_action_delete_tours;
+	public static String		tourCatalog_view_action_link;
+	public static String		tourCatalog_view_action_refresh_view_tooltip;
+	public static String		tourCatalog_view_action_rename_reference_tour;
+	public static String		tourCatalog_view_action_save_marker;
+	public static String		tourCatalog_view_action_synch_chart_years_tooltip;
+	public static String		tourCatalog_view_action_synch_charts_byScale_tooltip;
+	public static String		tourCatalog_view_action_synch_charts_bySize_tooltip;
+	public static String		tourCatalog_view_action_undo_marker_position;
+	public static String		tourCatalog_view_column_tour;
+	public static String		tourCatalog_view_compare_job_subtask;
+	public static String		tourCatalog_view_compare_job_task;
+	public static String		tourCatalog_view_compare_job_title;
+	public static String		tourCatalog_view_dlg_add_reference_tour_msg;
+	public static String		tourCatalog_view_dlg_add_reference_tour_title;
+	public static String		tourCatalog_view_dlg_delete_comparedTour_msg;
+	public static String		tourCatalog_view_dlg_delete_comparedTour_title;
+	public static String		tourCatalog_view_dlg_delete_refTour_msg;
+	public static String		tourCatalog_view_dlg_delete_refTour_title;
+	public static String		tourCatalog_view_dlg_rename_reference_tour_msg;
+	public static String		tourCatalog_view_dlg_rename_reference_tour_title;
+	public static String		tourCatalog_view_dlg_save_compared_tour_message;
+	public static String		tourCatalog_view_dlg_save_compared_tour_title;
+	public static String		tourCatalog_view_label_chart_title_reference_tour;
+	public static String		tourCatalog_view_label_year_chart_title;
+	public static String		tourCatalog_view_label_year_not_selected;
+	public static String		tourCatalog_wizard_Action_deselect_all;
+	public static String		tourCatalog_wizard_Action_select_all;
+	public static String		tourCatalog_wizard_Action_select_all_tours;
+	public static String		tourCatalog_wizard_Column_altitude_up_tooltip;
+	public static String		tourCatalog_wizard_Column_distance_tooltip;
+	public static String		tourCatalog_wizard_Column_h;
+	public static String		tourCatalog_wizard_Column_h_tooltip;
+	public static String		tourCatalog_wizard_Column_tour;
+	public static String		tourCatalog_wizard_Error_select_reference_tours;
+	public static String		tourCatalog_wizard_Error_tour_must_be_selected;
+	public static String		tourCatalog_wizard_Group_chart_title;
+	public static String		tourCatalog_wizard_Group_selected_tour;
+	public static String		tourCatalog_wizard_Group_selected_tour_2;
+	public static String		tourCatalog_wizard_Label_a_tour_is_not_selected;
+	public static String		tourCatalog_wizard_Label_page_message;
+	public static String		tourCatalog_wizard_Label_reference_tour;
+	public static String		tourCatalog_wizard_Msg_select_reference_tour;
+	public static String		tourCatalog_wizard_Page_compared_tours_title;
+	public static String		tourCatalog_wizard_Page_reference_tour_title;
+	public static String		tourCatalog_wizard_Wizard_title;
+
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;
 	public static String		TourChart_Property_check_customize_pace_clipping;
@@ -459,27 +478,6 @@ public class Messages extends NLS {
 
 	public static String		TourData_Label_device_marker;
 	public static String		TourData_Label_new_marker;
-
-	public static String		TourMap_Wizard_Action_deselect_all;
-	public static String		TourMap_Wizard_Action_select_all;
-	public static String		TourMap_Wizard_Action_select_all_tours;
-	public static String		TourMap_Wizard_Column_altitude_up_tooltip;
-	public static String		TourMap_Wizard_Column_distance_tooltip;
-	public static String		TourMap_Wizard_Column_h;
-	public static String		TourMap_Wizard_Column_h_tooltip;
-	public static String		TourMap_Wizard_Column_tour;
-	public static String		TourMap_Wizard_Error_select_reference_tours;
-	public static String		TourMap_Wizard_Error_tour_must_be_selected;
-	public static String		TourMap_Wizard_Group_chart_title;
-	public static String		TourMap_Wizard_Group_selected_tour;
-	public static String		TourMap_Wizard_Group_selected_tour_2;
-	public static String		TourMap_Wizard_Label_a_tour_is_not_selected;
-	public static String		TourMap_Wizard_Label_page_message;
-	public static String		TourMap_Wizard_Label_reference_tour;
-	public static String		TourMap_Wizard_Msg_select_reference_tour;
-	public static String		TourMap_Wizard_Page_compared_tours_title;
-	public static String		TourMap_Wizard_Page_reference_tour_title;
-	public static String		TourMap_Wizard_Wizard_title;
 
 	public static String		UI_Label_no_chart_is_selected;
 

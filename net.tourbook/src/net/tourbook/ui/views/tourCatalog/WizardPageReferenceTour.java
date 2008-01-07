@@ -106,7 +106,7 @@ public class WizardPageReferenceTour extends WizardPage {
 
 	protected WizardPageReferenceTour(String pageName) {
 		super(pageName);
-		setTitle(Messages.TourMap_Wizard_Page_reference_tour_title);
+		setTitle(Messages.tourCatalog_wizard_Page_reference_tour_title);
 	}
 
 	public void createControl(Composite parent) {
@@ -117,7 +117,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		pageContainer.setLayout(new GridLayout());
 
 		Label label = new Label(pageContainer, SWT.NONE);
-		label.setText(Messages.TourMap_Wizard_Label_reference_tour);
+		label.setText(Messages.tourCatalog_wizard_Label_reference_tour);
 
 		// fSashContainer = new SashForm(pageContainer, SWT.HORIZONTAL);
 		// fSashContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
@@ -144,13 +144,9 @@ public class WizardPageReferenceTour extends WizardPage {
 		fChartGroup.setEnabled(false);
 
 		fRefTourChart = new Chart(fChartGroup, SWT.NONE);
-		fRefTourChart.setBackgroundColor(parent.getDisplay()
-				.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		fRefTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-		fViewerDetailForm = new ViewerDetailForm(masterDetailContainer,
-				fRefContainer,
-				sash,
-				fChartGroup);
+		fViewerDetailForm = new ViewerDetailForm(masterDetailContainer, fRefContainer, sash, fChartGroup);
 
 		restoreDialogSettings();
 
@@ -177,7 +173,7 @@ public class WizardPageReferenceTour extends WizardPage {
 
 		TableColumn column;
 		column = new TableColumn(table, SWT.NONE);
-		column.setText(Messages.TourMap_Wizard_Column_tour);
+		column.setText(Messages.tourCatalog_wizard_Column_tour);
 		layouter.addColumnData(new ColumnWeightData(1, false));
 
 		fRefTourViewer = new CheckboxTableViewer(table);
@@ -185,11 +181,10 @@ public class WizardPageReferenceTour extends WizardPage {
 		fRefTourViewer.setLabelProvider(new RefTourLabelProvider());
 
 		fRefTourViewer.setComparator(new ViewerComparator() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
-				return getComparator().compare(((TourReference) e1).getLabel(),
-						((TourReference) e2).getLabel());
+				return getComparator().compare(((TourReference) e1).getLabel(), ((TourReference) e2).getLabel());
 			}
 		});
 
@@ -219,7 +214,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		container.setLayout(gridLayout);
 
 		Button buttonSelectAll = new Button(container, SWT.NONE);
-		buttonSelectAll.setText(Messages.TourMap_Wizard_Action_select_all);
+		buttonSelectAll.setText(Messages.tourCatalog_wizard_Action_select_all);
 		setButtonLayoutData(buttonSelectAll);
 		buttonSelectAll.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -230,7 +225,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		});
 
 		Button buttonDeselectAll = new Button(container, SWT.NONE);
-		buttonDeselectAll.setText(Messages.TourMap_Wizard_Action_deselect_all);
+		buttonDeselectAll.setText(Messages.tourCatalog_wizard_Action_deselect_all);
 		setButtonLayoutData(buttonDeselectAll);
 		buttonDeselectAll.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -256,15 +251,14 @@ public class WizardPageReferenceTour extends WizardPage {
 			TourChartConfiguration chartConfig = new TourChartConfiguration(false);
 			chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-			ChartDataModel chartDataModel = TourManager.getInstance()
-					.createChartDataModel(tourData, chartConfig);
+			ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(tourData, chartConfig);
 
 			ChartDataXSerie xData = chartDataModel.getXData();
 
 			xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
 
 			fChartGroup.setText(NLS.bind(refTour.getLabel() + ": " //$NON-NLS-1$
-					+ Messages.TourMap_Wizard_Group_chart_title, TourManager.getTourDate(tourData)));
+					+ Messages.tourCatalog_wizard_Group_chart_title, TourManager.getTourDate(tourData)));
 
 			fRefTourChart.updateChart(chartDataModel);
 
@@ -284,8 +278,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		Integer viewerWidth = null;
 		try {
 			viewerWidth = wizardSettings.getInt(REF_TOUR_VIEWER_WIDTH);
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			viewerWidth = 200;
 		}
 		fViewerDetailForm.setViewerWidth(viewerWidth);
@@ -325,9 +318,9 @@ public class WizardPageReferenceTour extends WizardPage {
 
 		for (int tourIndex = 0; tourIndex < checkedElements.length; tourIndex++) {
 			refTourIds[tourIndex] = Long.toString(((TourReference) (checkedElements[tourIndex])).getRefId()/*
-																											 * .getTourData()
-																											 * .getTourId()
-																											 */);
+			 * .getTourData()
+			 * .getTourId()
+			 */);
 		}
 		wizardSettings.put(REF_TOUR_CHECKED, refTourIds);
 	}
@@ -338,12 +331,12 @@ public class WizardPageReferenceTour extends WizardPage {
 
 		if (checkedElements.length == 0) {
 			setPageComplete(false);
-			setErrorMessage(Messages.TourMap_Wizard_Error_select_reference_tours);
+			setErrorMessage(Messages.tourCatalog_wizard_Error_select_reference_tours);
 			return false;
 		} else {
 			setPageComplete(true);
 			setErrorMessage(null);
-			setMessage(Messages.TourMap_Wizard_Msg_select_reference_tour);
+			setMessage(Messages.tourCatalog_wizard_Msg_select_reference_tour);
 			return true;
 		}
 	}

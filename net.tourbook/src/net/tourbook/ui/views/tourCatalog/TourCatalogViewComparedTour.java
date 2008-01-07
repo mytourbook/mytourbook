@@ -58,7 +58,7 @@ import org.eclipse.ui.part.PageBook;
 
 public class TourCatalogViewComparedTour extends TourChartViewPart implements ISynchedChart {
 
-	public static final String					ID				= "net.tourbook.views.tourMap.comparedTourView";	//$NON-NLS-1$
+	public static final String					ID				= "net.tourbook.views.tourCatalog.comparedTourView";	//$NON-NLS-1$
 
 	/*
 	 * keep data from the reference tour view
@@ -128,7 +128,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 			super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.Tour_Map_action_save_marker);
+			setToolTipText(Messages.tourCatalog_view_action_save_marker);
 
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
 			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
@@ -148,7 +148,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 			super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.Tour_Map_Action_undo_marker_position);
+			setToolTipText(Messages.tourCatalog_view_action_undo_marker_position);
 
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit));
 			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit_disabled));
@@ -386,7 +386,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	@Override
 	protected void onSelectionChanged(IWorkbenchPart part, ISelection selection) {
 
-//		if (fIsDataDirty && part != TourMapViewComparedTour.this) {
+//		if (fIsDataDirty && part != TourCatalogViewComparedTour.this) {
 //			return;
 //		}
 
@@ -421,11 +421,9 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 					fPostSelectionProvider.setSelection(persistedCompareResults);
 				}
 
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-			}
-			finally {
+			} finally {
 				if (ts.isActive()) {
 					ts.rollback();
 				}
@@ -485,11 +483,9 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 				updateTourViewer(fDefaultStartIndex, fDefaultEndIndex, speed, true);
 			}
-		}
-		catch (final Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			if (ts.isActive()) {
 				ts.rollback();
 			}
@@ -516,8 +512,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		 * SWT.CANCEL
 		 */);
 
-		msgBox.setText(Messages.Tour_Map_dlg_save_compared_tour_title);
-		msgBox.setMessage(NLS.bind(Messages.Tour_Map_dlg_save_compared_tour_message,
+		msgBox.setText(Messages.tourCatalog_view_dlg_save_compared_tour_title);
+		msgBox.setMessage(NLS.bind(Messages.tourCatalog_view_dlg_save_compared_tour_message,
 				TourManager.getTourTitleDetailed(fTourData)));
 
 		final int answer = msgBox.open();

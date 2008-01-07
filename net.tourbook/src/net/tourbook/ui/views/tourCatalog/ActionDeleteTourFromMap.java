@@ -45,7 +45,7 @@ public class ActionDeleteTourFromMap extends Action {
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
 
-		setText(Messages.Tour_Map_Action_delete_tours);
+		setText(Messages.tourCatalog_view_action_delete_tours);
 
 		setEnabled(false);
 
@@ -93,9 +93,9 @@ public class ActionDeleteTourFromMap extends Action {
 		String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
 
 		MessageDialog dialog = new MessageDialog(fTourView.getSite().getShell(),
-				Messages.Tour_Map_dlg_delete_refTour_title,
+				Messages.tourCatalog_view_dlg_delete_refTour_title,
 				null,
-				Messages.Tour_Map_dlg_delete_refTour_msg,
+				Messages.tourCatalog_view_dlg_delete_refTour_msg,
 				MessageDialog.QUESTION,
 				buttons,
 				1);
@@ -170,9 +170,9 @@ public class ActionDeleteTourFromMap extends Action {
 		String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
 
 		MessageDialog dialog = new MessageDialog(fTourView.getSite().getShell(),
-				Messages.Tour_Map_dlg_delete_comparedTour_title,
+				Messages.tourCatalog_view_dlg_delete_comparedTour_title,
 				null,
-				Messages.Tour_Map_dlg_delete_comparedTour_msg,
+				Messages.tourCatalog_view_dlg_delete_comparedTour_msg,
 				MessageDialog.QUESTION,
 				buttons,
 				1);

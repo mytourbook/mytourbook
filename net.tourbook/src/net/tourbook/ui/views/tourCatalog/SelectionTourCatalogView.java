@@ -24,7 +24,7 @@ import org.eclipse.jface.viewers.ISelection;
 /**
  * Selection contains data for a compared tour from the {@link TourCatalogView}
  */
-public class SelectionTourMapView implements ISelection {
+public class SelectionTourCatalogView implements ISelection {
 
 	/**
 	 * Unique id for a reference tour in {@link TourReference} entity
@@ -43,7 +43,7 @@ public class SelectionTourMapView implements ISelection {
 
 	private TourCatalogItemYear	fYearItem;
 
-	public SelectionTourMapView(Long refId) {
+	public SelectionTourCatalogView(Long refId) {
 		fRefId = refId;
 	}
 

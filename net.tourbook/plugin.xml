@@ -142,8 +142,8 @@
             category="net.tourbook.category.tourList"
             class="net.tourbook.ui.views.tourCatalog.TourCatalogView"
             icon="icons/tour-map.gif"
-            id="net.tourbook.views.tourMap.TourMapView"
-            name="%view_name_tourMap"/>
+            id="net.tourbook.views.tourCatalog.TourCatalogView"
+            name="%view_name_tourCatalog"/>
       <view
             category="net.tourbook.category.tourList"
             class="net.tourbook.ui.views.TourStatisticsView"
@@ -189,34 +189,34 @@
             name="%view_name_Segmenter"/>
       <category
             id="net.tourbook.category.compareTours"
-            name="%view_category_tour_map">
+            name="%view_category_compare_tours">
       </category>
       <view
             category="net.tourbook.category.compareTours"
             class="net.tourbook.ui.views.tourCatalog.CompareResultView"
             icon="icons/tour-map-compare-result.gif"
-            id="net.tourbook.views.tourMap.CompareResultView"
+            id="net.tourbook.views.tourCatalog.CompareResultView"
             name="%view_name_Compare_Result"/>
       <view
             category="net.tourbook.category.compareTours"
             class="net.tourbook.ui.views.tourCatalog.TourCatalogViewReferenceTour"
             icon="icons/tour-map-reftour.gif"
-            id="net.tourbook.views.tourMap.referenceTourView"
-            name="%view_name_tourMap_referenceTour">
+            id="net.tourbook.views.tourCatalog.referenceTourView"
+            name="%view_name_tourCatalog_referenceTour">
       </view>
       <view
             category="net.tourbook.category.compareTours"
             class="net.tourbook.ui.views.tourCatalog.TourCatalogViewComparedTour"
             icon="icons/tour-map-comparetour.gif"
-            id="net.tourbook.views.tourMap.comparedTourView"
-            name="%view_name_tourMap_comparedTour">
+            id="net.tourbook.views.tourCatalog.comparedTourView"
+            name="%view_name_tourCatalog_comparedTour">
       </view>
       <view
             category="net.tourbook.category.compareTours"
             class="net.tourbook.ui.views.tourCatalog.TourCatalogViewYearStatistic"
             icon="icons/tour-map-statistic.gif"
-            id="net.tourbook.views.tourMap.yearStatisticView"
-            name="%view_name_tourMap_statistics">
+            id="net.tourbook.views.tourCatalog.yearStatisticView"
+            name="%view_name_tourCatalog_statistics">
       </view>
       <category
             id="net.tourbook.category.system"
@@ -254,10 +254,10 @@
             name="%perspective_name_TourBook">
       </perspective>
       <perspective
-            class="net.tourbook.application.PerspectiveFactoryTourMap"
+            class="net.tourbook.application.PerspectiveFactoryTourCatalog"
             icon="icons/tour-map-perspective.gif"
-            id="net.tourbook.perspective.TourMap"
-            name="%perspective_name_TourMap">
+            id="net.tourbook.perspective.TourCatalog"
+            name="%perspective_name_tourCatalog">
       </perspective>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryStatistic"
@@ -280,7 +280,7 @@
                id="net.tourbook.perspective.TourBook">
          </perspectiveShortcut>
          <perspectiveShortcut
-               id="net.tourbook.perspective.TourMap">
+               id="net.tourbook.perspective.TourCatalog">
          </perspectiveShortcut>
          <perspectiveShortcut
                id="net.tourbook.perspective.Statistic">
@@ -311,18 +311,18 @@
          </viewShortcut>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="net.tourbook.perspective.TourMap">
+            targetID="net.tourbook.perspective.TourCatalog">
          <viewShortcut
-               id="net.tourbook.views.tourMap.TourMapView">
+               id="net.tourbook.views.tourCatalog.TourCatalogView">
          </viewShortcut>
          <viewShortcut
-               id="net.tourbook.views.tourMap.comparedTourView">
+               id="net.tourbook.views.tourCatalog.comparedTourView">
          </viewShortcut>
          <viewShortcut
-               id="net.tourbook.views.tourMap.referenceTourView">
+               id="net.tourbook.views.tourCatalog.referenceTourView">
          </viewShortcut>
          <viewShortcut
-               id="net.tourbook.views.tourMap.yearStatisticView">
+               id="net.tourbook.views.tourCatalog.yearStatisticView">
          </viewShortcut>
       </perspectiveExtension>
       <perspectiveExtension
@@ -337,13 +337,13 @@
       <perspectiveExtension
             targetID="net.tourbook.perspective.CompareTours">
          <viewShortcut
-               id="net.tourbook.views.tourMap.CompareResultView">
+               id="net.tourbook.views.tourCatalog.CompareResultView">
          </viewShortcut>
          <viewShortcut
-               id="net.tourbook.views.tourMap.referenceTourView">
+               id="net.tourbook.views.tourCatalog.referenceTourView">
          </viewShortcut>
          <viewShortcut
-               id="net.tourbook.views.tourMap.comparedTourView">
+               id="net.tourbook.views.tourCatalog.comparedTourView">
          </viewShortcut>
       </perspectiveExtension>
    </extension>
@@ -705,7 +705,7 @@
       </menuContribution>
 
       <menuContribution
-            locationURI="toolbar:net.tourbook.views.tourMap.TourMapView?after=additions">
+            locationURI="toolbar:net.tourbook.views.tourCatalog.TourCatalogView?after=additions">
          <command
                commandId="net.tourbook.command.tourCompareWizard"
                icon="icons/tour-map-compare-wizard.gif"
@@ -719,7 +719,7 @@
          </separator>
       </menuContribution>
       <menuContribution
-            locationURI="toolbar:net.tourbook.views.tourMap.CompareResultView?after=additions">
+            locationURI="toolbar:net.tourbook.views.tourCatalog.CompareResultView?after=additions">
          <command
                commandId="net.tourbook.command.tourCompareWizard"
                icon="icons/tour-map-compare-wizard.gif"

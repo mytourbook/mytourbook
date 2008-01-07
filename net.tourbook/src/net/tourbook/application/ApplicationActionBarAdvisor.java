@@ -92,8 +92,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createFileMenu() {
 
-		MenuManager fileMenu = new MenuManager(Messages.App_Action_Menu_file,
-				IWorkbenchActionConstants.M_FILE);
+		MenuManager fileMenu = new MenuManager(Messages.App_Action_Menu_file, IWorkbenchActionConstants.M_FILE);
 
 		fileMenu.add(new GroupMarker("fileNew")); //$NON-NLS-1$
 
@@ -122,8 +121,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		/*
 		 * help - menu
 		 */
-		MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help,
-				IWorkbenchActionConstants.M_HELP);
+		MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help, IWorkbenchActionConstants.M_HELP);
 
 		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
 
@@ -132,8 +130,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createToolMenu() {
 
-		MenuManager toolMenu = new MenuManager(Messages.App_Action_Menu_tools,
-				"net.tourbook.menu.main.tools"); //$NON-NLS-1$
+		MenuManager toolMenu = new MenuManager(Messages.App_Action_Menu_tools, "net.tourbook.menu.main.tools"); //$NON-NLS-1$
 
 		toolMenu.add(new GroupMarker("tools")); //$NON-NLS-1$
 		toolMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -211,7 +208,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 //		openToolbar.add(new Separator());
 //		openToolbar.add(fActionRawDataView);
 //		openToolbar.add(fActionTourBookView);
-//		openToolbar.add(fActionTourMapView);
+//		openToolbar.add(fActionTourCatalogView);
 //		openToolbar.add(fActionStatisticsView);
 //
 //		coolBar.add(new ToolBarContributionItem(openToolbar, "main")); //$NON-NLS-1$

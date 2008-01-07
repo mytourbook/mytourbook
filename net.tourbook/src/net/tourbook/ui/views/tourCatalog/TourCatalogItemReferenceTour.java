@@ -22,12 +22,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TreeViewerTourItem;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.tour.TreeViewerTourItem;
 
 /**
- * TTI (TreeViewerItem) is used in the tree viewer TourMapView, it contains tree items for reference
- * tours
+ * TTI (TreeViewerItem) is used in the tree viewer {@link TourCatalogView}, it contains tree items
+ * for reference tours
  */
 public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
 

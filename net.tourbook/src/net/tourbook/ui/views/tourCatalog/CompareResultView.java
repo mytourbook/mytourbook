@@ -84,7 +84,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class CompareResultView extends ViewPart {
 
-	public static final String			ID							= "net.tourbook.views.tourMap.CompareResultView";				//$NON-NLS-1$
+	public static final String			ID							= "net.tourbook.views.tourCatalog.CompareResultView";			//$NON-NLS-1$
 
 	public static final int				COLUMN_REF_TOUR				= 0;
 	public static final int				COLUMN_ALTITUDE_DIFFERENCE	= 1;
@@ -811,7 +811,7 @@ public class CompareResultView extends ViewPart {
 
 			CompareResultItemReferenceTour refItem = (CompareResultItemReferenceTour) treeItem;
 
-			fPostSelectionProvider.setSelection(new SelectionTourMapView(refItem.refTour.getRefId()));
+			fPostSelectionProvider.setSelection(new SelectionTourCatalogView(refItem.refTour.getRefId()));
 
 		} else if (treeItem instanceof CompareResultItemComparedTour) {
 

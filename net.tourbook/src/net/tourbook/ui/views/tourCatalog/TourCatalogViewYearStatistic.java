@@ -50,7 +50,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourCatalogViewYearStatistic extends ViewPart {
 
-	public static final String		ID	= "net.tourbook.views.tourMap.yearStatisticView";	//$NON-NLS-1$
+	public static final String		ID	= "net.tourbook.views.tourCatalog.yearStatisticView";	//$NON-NLS-1$
 
 	private Chart					fYearChart;
 
@@ -65,7 +65,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	/**
 	 * year item for the visible statistics
 	 */
-	private TourCatalogItemYear			fCurrentYearItem;
+	private TourCatalogItemYear		fCurrentYearItem;
 
 	private PageBook				fPageBook;
 	private Label					fPageNoChart;
@@ -154,9 +154,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 				}
 			}
 		};
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	private void createActions() {
@@ -174,7 +172,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		fPageBook = new PageBook(parent, SWT.NONE);
 
 		fPageNoChart = new Label(fPageBook, SWT.NONE);
-		fPageNoChart.setText(Messages.Tour_Map_label_year_not_selected);
+		fPageNoChart.setText(Messages.tourCatalog_view_label_year_not_selected);
 
 		createYearChart();
 
@@ -198,10 +196,10 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		fYearChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 
-				TourCatalogItemComparedTour tourMapComparedTour = (TourCatalogItemComparedTour) fYearMapTours[valueIndex];
+				TourCatalogItemComparedTour tourCatalogComparedTour = (TourCatalogItemComparedTour) fYearMapTours[valueIndex];
 
 				// select the tour in the tour viewer & show tour in compared tour char
-				fCurrentSelection = new StructuredSelection(tourMapComparedTour);
+				fCurrentSelection = new StructuredSelection(tourCatalogComparedTour);
 				fPostSelectionProvider.setSelection(fCurrentSelection);
 			}
 		});
@@ -213,18 +211,16 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
 
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		super.dispose();
 	}
 
 	private void onSelectionChanged(ISelection selection) {
 
-		if (selection instanceof SelectionTourMapView) {
+		if (selection instanceof SelectionTourCatalogView) {
 
-			final SelectionTourMapView selectionComparedTour = (SelectionTourMapView) selection;
+			final SelectionTourCatalogView selectionComparedTour = (SelectionTourCatalogView) selection;
 
 			// show year statistic
 			final TourCatalogItemYear yearItem = selectionComparedTour.getYearItem();
@@ -241,8 +237,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 			}
 
 			// hide chart when a different ref tour is selected
-			if (fCurrentYearItem != null
-					&& selectionComparedTour.getRefId() != fCurrentYearItem.refId) {
+			if (fCurrentYearItem != null && selectionComparedTour.getRefId() != fCurrentYearItem.refId) {
 				fPageBook.showPage(fPageNoChart);
 				fCurrentYearItem = null;
 			}
@@ -271,8 +266,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 					}
 
 					// hide chart when a different ref tour is selected
-					if (fCurrentYearItem != null
-							&& compareItem.getRefId() != fCurrentYearItem.refId) {
+					if (fCurrentYearItem != null && compareItem.getRefId() != fCurrentYearItem.refId) {
 						fPageBook.showPage(fPageNoChart);
 						fCurrentYearItem = null;
 					}
@@ -297,7 +291,9 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	 */
 	private void selectTourInYearChart(long selectedTourId) {
 
-		if (fYearMapTours == null) { return; }
+		if (fYearMapTours == null) {
+			return;
+		}
 
 		final int tourLength = fYearMapTours.length;
 		boolean[] selectedTours = new boolean[tourLength];
@@ -319,7 +315,9 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 	private void updateYearBarChart() {
 
-		if (fCurrentYearItem == null) { return; }
+		if (fCurrentYearItem == null) {
+			return;
+		}
 
 		fPageBook.showPage(fYearChart);
 
@@ -398,7 +396,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 			yData.setVisibleMaxValue(dataMaxValue);
 		}
 
-		yData.setYTitle(Messages.Tour_Map_Label_year_chart_title);
+		yData.setYTitle(Messages.tourCatalog_view_label_year_chart_title);
 		yData.setUnitLabel(UI.UNIT_LABEL_SPEED);
 
 		chartModel.addYData(yData);

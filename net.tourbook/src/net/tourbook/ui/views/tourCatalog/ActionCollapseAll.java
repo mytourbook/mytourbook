@@ -33,7 +33,7 @@ public class ActionCollapseAll extends Action {
 
 		fTourViewer = tourViewer;
 
-		setToolTipText(Messages.Tour_Map_Action_collapse_all_tooltip);
+		setToolTipText(Messages.tourCatalog_view_action_collapse_all_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
 	}
 
