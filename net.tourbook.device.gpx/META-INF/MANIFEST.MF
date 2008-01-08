@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Importer for gpx data
+Bundle-SymbolicName: net.tourbook.device.gpx;singleton:=true
+Bundle-Version: 1.3.0.v2008
+Bundle-Activator: net.tourbook.device.gpx.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ net.tourbook,
+ net.tourbook.device,
+ net.tourbook.rxtx
+Eclipse-LazyStart: true
+Bundle-Vendor: MyTourbook
