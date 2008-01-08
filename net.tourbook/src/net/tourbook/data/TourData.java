@@ -1113,15 +1113,34 @@ public class TourData {
 			int speedMetric = 0;
 			int speedImperial = 0;
 
-			if (timeDiff != 0) {
-				if (timeDiff > 20 && distDiff < 5) {
-					speedMetric = 0;
-				} else {
-					speedMetric = (int) ((distDiff * 36f) / timeDiff);
-					speedMetric = speedMetric < 0 ? 0 : speedMetric;
+			/*
+			 * check if a time difference is available between 2 time data, this can happen in gps
+			 * data that lat+long is available but no time
+			 */
+			highIndex = Math.min(highIndex, serieLength - 1);
+			lowIndex = Math.max(lowIndex, 0);
+			boolean isTimeValid = true;
+			int prevTime = timeSerie[lowIndex];
+			for (int timeIndex = lowIndex + 1; timeIndex <= highIndex; timeIndex++) {
+				int currentTime = timeSerie[timeIndex];
+				if (prevTime == currentTime) {
+					isTimeValid = false;
+					break;
+				}
+				prevTime = currentTime;
+			}
 
-					speedImperial = (int) ((distDiff * 36f) / (timeDiff * UI.UNIT_MILE));
-					speedImperial = speedImperial < 0 ? 0 : speedImperial;
+			if (isTimeValid && serieIndex > 0) {
+				if (timeDiff != 0) {
+					if (timeDiff > 20 && distDiff < 5) {
+						speedMetric = 0;
+					} else {
+						speedMetric = (int) ((distDiff * 36f) / timeDiff);
+						speedMetric = speedMetric < 0 ? 0 : speedMetric;
+
+						speedImperial = (int) ((distDiff * 36f) / (timeDiff * UI.UNIT_MILE));
+						speedImperial = speedImperial < 0 ? 0 : speedImperial;
+					}
 				}
 			}
 			speedSerie[serieIndex] = speedMetric;
@@ -1353,7 +1372,7 @@ public class TourData {
 
 		int timeIndex = 0;
 
-		int timeAbsolute = 0;
+		int timeAbsolute = 0; // time in seconds
 		int altitudeAbsolute = 0;
 		int distanceAbsolute = 0;
 
@@ -1373,10 +1392,11 @@ public class TourData {
 
 			int pulseCounter = 0;
 
+			int lastValidTime = 0;
 			double lastValidLatitude = 0;
 			double lastValidlongitude = 0;
 
-			// convert data from the tour format into an interger[]
+			// convert data from the tour format into interger[] arrays
 			for (final TimeData timeData : timeDataList) {
 
 				if (altitudeStartIndex == -1 && isAltitude) {
@@ -1384,11 +1404,18 @@ public class TourData {
 					altitudeAbsolute = (int) timeData.absoluteAltitude;
 				}
 
+				final long absoluteTime = timeData.absoluteTime;
+
 				if (timeIndex == 0) {
 
 					// first trackpoint
 
-					firstTime = timeData.absoluteTime;
+					if (absoluteTime == Long.MIN_VALUE) {
+						firstTime = 0;
+					} else {
+						firstTime = absoluteTime;
+					}
+					lastValidTime = 0;
 
 					if (isAltitude) {
 						altitudeSerie[timeIndex] = altitudeAbsolute;
@@ -1401,8 +1428,12 @@ public class TourData {
 					/*
 					 * time
 					 */
-					timeAbsolute = (int) ((timeData.absoluteTime - firstTime) / 1000);
-					timeSerie[timeIndex] = timeAbsolute;
+					if (absoluteTime == Long.MIN_VALUE) {
+						timeAbsolute = lastValidTime;
+					} else {
+						timeAbsolute = (int) ((absoluteTime - firstTime) / 1000);
+					}
+					timeSerie[timeIndex] = lastValidTime = timeAbsolute;
 
 					/*
 					 * distance
@@ -1431,6 +1462,9 @@ public class TourData {
 					altitudeSerie[timeIndex] = altitudeAbsolute += altitudeDiff;
 				}
 
+				/*
+				 * latitude & longitude
+				 */
 				final double latitude = timeData.latitude;
 				final double longitude = timeData.longitude;
 

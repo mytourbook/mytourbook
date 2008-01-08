@@ -61,8 +61,11 @@ public class OSMView extends ViewPart {
 	private ActionZoomIn		fActionZoomIn;
 	private ActionZoomOut		fActionZoomOut;
 	private ActionZoomShowAll	fActionZoomShowAll;
+	private ActionZoomCentered	fActionZoomCentered;
 
 	private boolean				fIsMapSynchedWithTour;
+
+	private boolean				fIsTourCentered;
 
 	public OSMView() {}
 
@@ -79,12 +82,32 @@ public class OSMView extends ViewPart {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
+	/**
+	 * Center the tour in the map when action is enabled
+	 */
+	private void centerTour() {
+
+		if (fIsTourCentered) {
+
+			int zoom = fMap.getZoom();
+
+			Rectangle2D positionRect = getPositionRect(PaintManager.getInstance().getTourBounds(), zoom);
+			Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2, positionRect.getY()
+					+ positionRect.getHeight()
+					/ 2);
+			GeoPosition px = fMap.getTileFactory().pixelToGeo(center, zoom);
+
+			fMap.setCenterPosition(px);
+		}
+	}
+
 	private void createActions() {
 
 		fActionSynchWithTour = new ActionSynchWithTour(this);
 		fActionZoomIn = new ActionZoomIn(this);
 		fActionZoomOut = new ActionZoomOut(this);
 		fActionZoomShowAll = new ActionZoomShowAll(this);
+		fActionZoomCentered = new ActionZoomCentered(this);
 
 		/*
 		 * fill view toolbar
@@ -93,6 +116,7 @@ public class OSMView extends ViewPart {
 
 		viewTbm.add(fActionSynchWithTour);
 		viewTbm.add(new Separator());
+		viewTbm.add(fActionZoomCentered);
 		viewTbm.add(fActionZoomIn);
 		viewTbm.add(fActionZoomOut);
 		viewTbm.add(fActionZoomShowAll);
@@ -244,6 +268,10 @@ public class OSMView extends ViewPart {
 	@Override
 	public void setFocus() {}
 
+	void setZoomCentered() {
+		fIsTourCentered = fActionZoomCentered.isChecked();
+	}
+
 	/**
 	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
 	 * This is useful if you have a bunch of points in an area like a city and you want to zoom out
@@ -319,23 +347,14 @@ public class OSMView extends ViewPart {
 	}
 
 	void zoomIn() {
-
-		final int zoom = fMap.getZoom() + 1;
-		fMap.setZoom(zoom);
-
-		// center position in the map 
-		Rectangle2D positionRect = getPositionRect(PaintManager.getInstance().getTourBounds(), zoom);
-		Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2, positionRect.getY()
-				+ positionRect.getHeight()
-				/ 2);
-		GeoPosition px = fMap.getTileFactory().pixelToGeo(center, zoom);
-		fMap.setCenterPosition(px);
-
+		fMap.setZoom(fMap.getZoom() + 1);
+		centerTour();
 		fMap.queueRedraw();
 	}
 
 	void zoomOut() {
 		fMap.setZoom(fMap.getZoom() - 1);
+		centerTour();
 		fMap.queueRedraw();
 	}
 
@@ -343,5 +362,4 @@ public class OSMView extends ViewPart {
 		fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
 		fMap.queueRedraw();
 	}
-
 }

@@ -175,6 +175,7 @@ public class RawDataManager {
 			public void run() {
 
 				final RawDataManager rawDataManager = RawDataManager.getInstance();
+				final ArrayList<String> notImportedFiles = new ArrayList<String>();
 
 				int importCounter = 0;
 
@@ -188,6 +189,8 @@ public class RawDataManager {
 
 					if (rawDataManager.importRawData(fileName)) {
 						importCounter++;
+					} else {
+						notImportedFiles.add(fileName);
 					}
 				}
 
@@ -200,7 +203,10 @@ public class RawDataManager {
 						view.updateViewer();
 						view.selectFirstTour();
 					}
+				}
 
+				if (notImportedFiles.size() > 0) {
+					showMsgBoxInvalidFormat(notImportedFiles);
 				}
 			}
 		});
@@ -219,8 +225,7 @@ public class RawDataManager {
 			// show raw data view
 			return (RawDataView) window.getActivePage().showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
-		}
-		catch (WorkbenchException e) {
+		} catch (WorkbenchException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -316,10 +321,6 @@ public class RawDataManager {
 							break;
 						}
 					}
-
-					if (isDataImported == false) {
-						showMsgBoxInvalidFormat(fileName);
-					}
 				}
 
 				if (isDataImported) {
@@ -365,11 +366,17 @@ public class RawDataManager {
 		fImportYear = year;
 	}
 
-	private void showMsgBoxInvalidFormat(String fileName) {
+	public static void showMsgBoxInvalidFormat(ArrayList<String> notImportedFiles) {
 
 		MessageBox msgBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_ERROR | SWT.OK);
 
-		msgBox.setMessage(NLS.bind(Messages.DataImport_Error_invalid_data_format, fileName));
+		StringBuilder fileText = new StringBuilder();
+		for (String fileName : notImportedFiles) {
+			fileText.append('\n');
+			fileText.append(fileName);
+		}
+
+		msgBox.setMessage(NLS.bind(Messages.DataImport_Error_invalid_data_format, fileText.toString()));
 		msgBox.open();
 	}
 
@@ -379,7 +386,7 @@ public class RawDataManager {
 	public void updateTourDataFromDb_NOTWORKING() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				if (fTourDataMap.size() == 0) {
@@ -457,13 +464,11 @@ public class RawDataManager {
 							}
 						}
 					}
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					System.err.println(sqlQuery);
 //					System.err.println("tourIdList=" + tourIdList.toString());
 					e.printStackTrace();
-				}
-				finally {
+				} finally {
 					em.close();
 				}
 			}
@@ -476,7 +481,7 @@ public class RawDataManager {
 	public void updateTourDataFromDb() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -519,13 +524,11 @@ public class RawDataManager {
 						}
 
 					}
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					System.err.println(sqlQuery);
 					System.err.println("tourId=" + tourId); //$NON-NLS-1$
 					e.printStackTrace();
-				}
-				finally {
+				} finally {
 					em.close();
 				}
 			}

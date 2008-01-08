@@ -17,25 +17,24 @@ package net.tourbook.osm;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSynchWithTour extends Action {
+public class ActionZoomCentered extends Action {
 
 	private OSMView	fMapView;
 
-	public ActionSynchWithTour(OSMView mapView) {
+	public ActionZoomCentered(OSMView mapView) {
 
 		super(null, AS_CHECK_BOX);
 
 		fMapView = mapView;
 
-		setToolTipText(Messages.map_action_synch_with_tour);
+		setToolTipText(Messages.map_action_zoom_centered);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.image_action_synch_with_tour));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.image_action_synch_with_tour_disabled));
+		setImageDescriptor(Activator.getImageDescriptor(Messages.image_action_zoom_centered));
 	}
 
 	@Override
 	public void run() {
-		fMapView.synchWithTour();
+		fMapView.setZoomCentered();
 	}
 
 }

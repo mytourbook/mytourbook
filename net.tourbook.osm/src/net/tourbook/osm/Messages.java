@@ -19,15 +19,17 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.osm.messages";	//$NON-NLS-1$
-	public static String		image__synch_with_tour;
-	public static String		image__synch_with_tour_disabled;
-	public static String	image__zoom_in;
-	public static String	image__zoom_in_disabled;
-	public static String	image__zoom_out;
-	public static String	image__zoom_out_disabled;
-	public static String	image__zoom_show_all;
-	public static String	image__zoom_show_all_disabled;
+	public static String	image_action_synch_with_tour;
+	public static String	image_action_synch_with_tour_disabled;
+	public static String	image_action_zoom_centered;
+	public static String	image_action_zoom_in;
+	public static String	image_action_zoom_in_disabled;
+	public static String	image_action_zoom_out;
+	public static String	image_action_zoom_out_disabled;
+	public static String	image_action_zoom_show_all;
+	public static String	image_action_zoom_show_all_disabled;
 	public static String		map_action_synch_with_tour;
+	public static String	map_action_zoom_centered;
 	public static String	map_action_zoom_in;
 	public static String	map_action_zoom_out;
 	public static String	map_action_zoom_show_all;

@@ -29,8 +29,8 @@ public class ActionZoomIn extends Action {
 
 		setToolTipText(Messages.map_action_zoom_in);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.image__zoom_in));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.image__zoom_in_disabled));
+		setImageDescriptor(Activator.getImageDescriptor(Messages.image_action_zoom_in));
+		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.image_action_zoom_in_disabled));
 	}
 
 	@Override

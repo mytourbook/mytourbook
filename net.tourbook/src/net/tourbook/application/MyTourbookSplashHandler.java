@@ -35,7 +35,8 @@ import org.eclipse.ui.splash.BasicSplashHandler;
  */
 public class MyTourbookSplashHandler extends BasicSplashHandler {
 
-	public static final String	APP_BUILD_ID	= "1.2.0.v20071231";	//$NON-NLS-1$
+	public static final String	APP_BUILD_ID	= "1.3.0.v2008";	//$NON-NLS-1$
+//	public static final String	APP_BUILD_ID	= "1.2.0.v20071231";	//$NON-NLS-1$
 //	public static final String	APP_BUILD_ID	= "1.1.0.v20071107";	//$NON-NLS-1$
 
 	@Override
@@ -75,8 +76,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 		int foregroundColorInteger;
 		try {
 			foregroundColorInteger = Integer.parseInt(foregroundColorString, 16);
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			foregroundColorInteger = 0xD2D7FF; // off white
 		}
 
@@ -116,8 +116,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 			w = Integer.parseInt(string.substring(lastPos, i));
 			lastPos = i + 1;
 			h = Integer.parseInt(string.substring(lastPos));
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			// sloppy error handling
 			return null;
 		}

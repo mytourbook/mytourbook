@@ -66,19 +66,27 @@ public class DeviceImportSorter extends ViewerSorter {
 		case RawDataView.COLUMN_DATE:
 
 			result = compareDateTime(tourData1, tourData2);
-
 			break;
 
 		case RawDataView.COLUMN_TITLE:
 
 			// sort by title
 			result = tourData1.getTourTitle().compareTo(tourData2.getTourTitle());
+			break;
 
+		case RawDataView.COLUMN_FILE_NAME:
+
+			// sort by file name
+			result = tourData1.importRawDataFile.compareTo(tourData2.importRawDataFile);
+
+			if (result == 0) {
+				result = compareDateTime(tourData1, tourData2);
+			}
 			break;
 
 		case RawDataView.COLUMN_DATA_FORMAT:
 
-			// sort by data format
+			// sort by import data format
 			result = tourData1.getDeviceName().compareTo(tourData2.getDeviceName());
 
 			if (result == 0) {

@@ -110,6 +110,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	public static final int				COLUMN_DATE					= 0;
 	public static final int				COLUMN_TITLE				= 1;
 	public static final int				COLUMN_DATA_FORMAT			= 2;
+	public static final int				COLUMN_FILE_NAME			= 3;
 
 	private static final String			MEMENTO_SASH_CONTAINER		= "importview.sash.container.";				//$NON-NLS-1$
 	private static final String			MEMENTO_IMPORT_FILENAME		= "importview.raw-data.filename";				//$NON-NLS-1$
@@ -294,7 +295,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
 
@@ -682,7 +683,16 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 		TableColumnFactory.DEVICE_PROFILE.createColumn(fColumnManager, pixelConverter);
 		TableColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);
-		TableColumnFactory.IMPORT_FILE_NAME.createColumn(fColumnManager, pixelConverter);
+
+		colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(fColumnManager, pixelConverter);
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((DeviceImportSorter) fTourViewer.getSorter()).doSort(COLUMN_FILE_NAME);
+				fTourViewer.refresh();
+			}
+		});
+
 		TableColumnFactory.IMPORT_FILE_PATH.createColumn(fColumnManager, pixelConverter);
 	}
 
@@ -708,7 +718,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		final IStructuredSelection tourSelection = (IStructuredSelection) fTourViewer.getSelection();
@@ -767,7 +777,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fPostSelectionProvider.setSelection(selection);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 
@@ -846,8 +856,10 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				fColumnManager.setColumnWidth(StringToArrayConverter.convertStringToArray(mementoColumnWidth));
 			}
 
+			final ArrayList<String> notImportedFiles = new ArrayList<String>();
 			// restore imported tours
 			final String mementoImportedFiles = memento.getString(MEMENTO_IMPORT_FILENAME);
+
 			if (mementoImportedFiles != null) {
 
 				final RawDataManager rawDataManager = RawDataManager.getInstance();
@@ -862,6 +874,8 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 					if (rawDataManager.importRawData(fileName)) {
 						importCounter++;
+					} else {
+						notImportedFiles.add(fileName);
 					}
 				}
 
@@ -878,6 +892,10 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 						fTourViewer.setSelection(new StructuredSelection(tourData), true);
 					}
 				}
+			}
+
+			if (notImportedFiles.size() > 0) {
+				RawDataManager.showMsgBoxInvalidFormat(notImportedFiles);
 			}
 		}
 	}
