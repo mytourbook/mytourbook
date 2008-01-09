@@ -258,10 +258,6 @@ public class TourChartAnalyzerView extends ViewPart {
 
 				} else if (selection instanceof SelectionChartXSliderPosition) {
 
-					/*
-					 * selection is not from a chart, so it's possible that the chart has not yet
-					 * the correct slider positon, we create the chart info from the slider position
-					 */
 					updateInfo(((SelectionChartXSliderPosition) selection));
 
 				} else if (selection instanceof SelectionTourData) {
@@ -744,12 +740,23 @@ public class TourChartAnalyzerView extends ViewPart {
 //		System.out.println(++fCounter + "  " + (endTime - startTime) + " ms");
 	}
 
+	/**
+	 * selection is not from a chart, so it's possible that the chart has not yet the correct slider
+	 * positon, we create the chart info from the slider position
+	 */
 	private void updateInfo(SelectionChartXSliderPosition sliderPosition) {
 
-		Chart chart = sliderPosition.chart;
+		Chart chart = sliderPosition.getChart();
 
 		if (chart == null) {
-			return;
+
+			TourChart tourChart = TourManager.getInstance().getActiveTourChart();
+
+			if (tourChart == null || tourChart.isDisposed()) {
+				return;
+			} else {
+				chart = tourChart;
+			}
 		}
 
 		SelectionChartInfo chartInfo = new SelectionChartInfo(chart);
@@ -757,8 +764,8 @@ public class TourChartAnalyzerView extends ViewPart {
 		chartInfo.chartDataModel = chart.getChartDataModel();
 		chartInfo.chartDrawingData = chart.getChartDrawingData();
 
-		chartInfo.leftSliderValuesIndex = sliderPosition.slider1ValueIndex;
-		chartInfo.rightSliderValuesIndex = sliderPosition.slider2ValueIndex;
+		chartInfo.leftSliderValuesIndex = sliderPosition.getSlider1ValueIndex();
+		chartInfo.rightSliderValuesIndex = sliderPosition.getSlider2ValueIndex();
 
 		updateInfo(chartInfo);
 	}

@@ -68,7 +68,8 @@ public class TourManager {
 	public static final String				CUSTOM_DATA_GRADIENT						= "gradient";								//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_ALTIMETER						= "altimeter";								//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_PULSE							= "pulse";									//$NON-NLS-1$
-	private static final String				CUSTOM_DATA_TOUR_DATA						= "timeinterval";							//$NON-NLS-1$
+
+	public static final String				CUSTOM_DATA_TOUR_DATA						= "tourdata";								//$NON-NLS-1$
 
 	public static final String				ANALYZER_INFO								= "AnalyzerInfo";							//$NON-NLS-1$
 	public static final String				X_AXIS_TIME									= "time";									//$NON-NLS-1$
@@ -110,6 +111,11 @@ public class TourManager {
 	private final HashMap<Long, TourData>	fTourDataMap								= new HashMap<Long, TourData>();
 
 	private final ListenerList				fPropertyListeners							= new ListenerList(ListenerList.IDENTITY);
+
+	/**
+	 * tour chart which shows the selected tour
+	 */
+	private TourChart						fActiveTourChart;
 
 	private TourManager() {}
 
@@ -998,6 +1004,10 @@ public class TourManager {
 		}
 	}
 
+	public TourChart getActiveTourChart() {
+		return fActiveTourChart;
+	}
+
 	private ChartDataYSerie getChartData(final int[] dataSerie, final int chartType) {
 
 		ChartDataYSerie chartDataSerie;
@@ -1068,6 +1078,10 @@ public class TourManager {
 
 	public void removeTourFromCache(final Long tourId) {
 		fTourDataMap.remove(tourId);
+	}
+
+	public void setActiveTourChart(TourChart tourChart) {
+		fActiveTourChart = tourChart;
 	}
 
 }

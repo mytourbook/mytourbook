@@ -6,6 +6,7 @@ Bundle-Version: 1.2.1.v20080106
 Bundle-Activator: net.tourbook.osm.Activator
 Bundle-Vendor: MyTourbook
 Require-Bundle: net.tourbook,
+ net.tourbook.chart,
  org.eclipse.ui,
  org.eclipse.core.runtime,
  de.byteholder.geoclipse,

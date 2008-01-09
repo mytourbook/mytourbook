@@ -748,7 +748,7 @@ public class Chart extends ViewForm {
 	public void setXSliderPosition(SelectionChartXSliderPosition sliderPosition) {
 
 		// check if the position is for this chart
-		if (sliderPosition.chart == this) {
+		if (sliderPosition.getChart() == this) {
 			fChartComponents.setXSliderPosition(sliderPosition);
 		}
 	}

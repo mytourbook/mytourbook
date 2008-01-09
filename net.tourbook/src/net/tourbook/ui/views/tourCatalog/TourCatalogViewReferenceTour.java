@@ -228,8 +228,8 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 			final SelectionChartXSliderPosition oldXSliderPosition = fTourChart.getXSliderPosition();
 
 			oldRefTourConfig.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
-					oldXSliderPosition.slider1ValueIndex,
-					oldXSliderPosition.slider2ValueIndex));
+					oldXSliderPosition.getSlider1ValueIndex(),
+					oldXSliderPosition.getSlider2ValueIndex()));
 		}
 
 		fTourChart.addDataModelListener(new IDataModelListener() {

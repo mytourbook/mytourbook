@@ -78,13 +78,9 @@ public class TourChartView extends ViewPart {
 
 		final ActionEditTour	actionEditTour	= new ActionEditTour(TourChartView.this);
 
-		public void fillBarChartContextMenu(IMenuManager menuMgr,
-											int hoveredBarSerieIndex,
-											int hoveredBarValueIndex) {}
+		public void fillBarChartContextMenu(IMenuManager menuMgr, int hoveredBarSerieIndex, int hoveredBarValueIndex) {}
 
-		public void fillXSliderContextMenu(	IMenuManager menuMgr,
-											ChartXSlider leftSlider,
-											ChartXSlider rightSlider) {}
+		public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider) {}
 
 		public void fillContextMenu(IMenuManager menuMgr) {
 
@@ -116,9 +112,7 @@ public class TourChartView extends ViewPart {
 				}
 			}
 		};
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	/**
@@ -242,9 +236,7 @@ public class TourChartView extends ViewPart {
 		TourDatabase.getInstance().removePropertyListener(fTourDbListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		super.dispose();
 	}
@@ -278,8 +270,7 @@ public class TourChartView extends ViewPart {
 				}
 			}
 
-			final TourData tourData = TourManager.getInstance()
-					.getTourData(tourIdSelection.getTourId());
+			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
 			if (tourData != null) {
 				fTourData = tourData;
@@ -308,6 +299,8 @@ public class TourChartView extends ViewPart {
 		if (fTourData == null) {
 			return;
 		}
+
+		TourManager.getInstance().setActiveTourChart(fTourChart);
 
 		fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 

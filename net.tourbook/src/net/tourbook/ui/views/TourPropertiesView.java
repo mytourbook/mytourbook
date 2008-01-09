@@ -300,7 +300,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED
@@ -726,7 +726,14 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private void fireSliderPosition(StructuredSelection selection) {
 
 		if (fTourChart == null) {
-			return;
+
+			TourChart tourChart = TourManager.getInstance().getActiveTourChart();
+
+			if (tourChart == null || tourChart.isDisposed()) {
+				return;
+			} else {
+				fTourChart = tourChart;
+			}
 		}
 
 		Object[] selectedData = selection.toArray();
@@ -749,7 +756,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 

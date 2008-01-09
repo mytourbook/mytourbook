@@ -21,6 +21,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
@@ -56,6 +58,7 @@ public class OSMView extends ViewPart {
 	private Map					fMap;
 
 	private TourData			fCurrentTourData;
+	private TourData			fPreviousTourData;
 
 	private ActionSynchWithTour	fActionSynchWithTour;
 	private ActionZoomIn		fActionZoomIn;
@@ -89,13 +92,12 @@ public class OSMView extends ViewPart {
 
 		if (fIsTourCentered) {
 
-			int zoom = fMap.getZoom();
+			final int zoom = fMap.getZoom();
 
-			Rectangle2D positionRect = getPositionRect(PaintManager.getInstance().getTourBounds(), zoom);
-			Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2, positionRect.getY()
-					+ positionRect.getHeight()
-					/ 2);
-			GeoPosition px = fMap.getTileFactory().pixelToGeo(center, zoom);
+			final Rectangle2D positionRect = getPositionRect(PaintManager.getInstance().getTourBounds(), zoom);
+			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
+					positionRect.getY() + positionRect.getHeight() / 2);
+			final GeoPosition px = fMap.getTileFactory().pixelToGeo(center, zoom);
 
 			fMap.setCenterPosition(px);
 		}
@@ -112,7 +114,7 @@ public class OSMView extends ViewPart {
 		/*
 		 * fill view toolbar
 		 */
-		IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
+		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
 
 		viewTbm.add(fActionSynchWithTour);
 		viewTbm.add(new Separator());
@@ -141,14 +143,14 @@ public class OSMView extends ViewPart {
 		super.dispose();
 	}
 
-	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, int zoom) {
+	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final int zoom) {
 
 		final TileFactory tileFactory = fMap.getTileFactory();
-		Point2D point1 = tileFactory.geoToPixel(positions.iterator().next(), zoom);
-		Rectangle2D rect = new Rectangle2D.Double(point1.getX(), point1.getY(), 0, 0);
+		final Point2D point1 = tileFactory.geoToPixel(positions.iterator().next(), zoom);
+		final Rectangle2D rect = new Rectangle2D.Double(point1.getX(), point1.getY(), 0, 0);
 
-		for (GeoPosition pos : positions) {
-			Point2D point = tileFactory.geoToPixel(pos, zoom);
+		for (final GeoPosition pos : positions) {
+			final Point2D point = tileFactory.geoToPixel(pos, zoom);
 			rect.add(point);
 		}
 
@@ -169,7 +171,7 @@ public class OSMView extends ViewPart {
 		double maxLongitude = longitudeSerie[0];
 
 		for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++) {
-			double latitude = latitudeSerie[serieIndex];
+			final double latitude = latitudeSerie[serieIndex];
 			final double longitude = longitudeSerie[serieIndex];
 
 			minLatitude = Math.min(minLatitude, latitude);
@@ -183,7 +185,7 @@ public class OSMView extends ViewPart {
 			}
 		}
 
-		Set<GeoPosition> mapPositions = new HashSet<GeoPosition>();
+		final Set<GeoPosition> mapPositions = new HashSet<GeoPosition>();
 		mapPositions.add(new GeoPosition(minLatitude, minLongitude));
 		mapPositions.add(new GeoPosition(maxLatitude, maxLongitude));
 
@@ -215,7 +217,22 @@ public class OSMView extends ViewPart {
 				final TourChart fTourChart = fTourEditor.getTourChart();
 				paintTour(fTourChart.getTourData());
 			}
+
+		} else if (selection instanceof SelectionChartInfo) {
+
+			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
+			final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+			paintTour(tourData, chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
 		}
+	}
+
+	private void paintTour(final TourData tourData, final int leftSliderValuesIndex, final int rightSliderValuesIndex) {
+
+		final PaintManager paintManager = PaintManager.getInstance();
+		paintManager.setSliderValueIndex(leftSliderValuesIndex, rightSliderValuesIndex);
+
+		fMap.queueRedraw();
 	}
 
 	private void paintTour(final TourData tourData) {
@@ -238,26 +255,27 @@ public class OSMView extends ViewPart {
 
 		if (fIsMapSynchedWithTour) {
 
-//		if (fPreviousTourData != null) { 
-//
-//			/*
-//			 * keep map configuration for the prvious tour
-//			 */
-//			fPreviousTourData.mapZoomLevel = fMap.getZoom();
-//
-//			final GeoPosition centerPosition = fMap.getCenterPosition();
-//			fPreviousTourData.mapCenterPositionLatitude = centerPosition.getLatitude();
-//			fPreviousTourData.mapCenterPositionLongitude = centerPosition.getLongitude();
-//		}
+			if (fPreviousTourData != null) {
+
+				/*
+				 * keep map configuration for the prvious tour
+				 */
+				fPreviousTourData.mapZoomLevel = fMap.getZoom();
+
+				final GeoPosition centerPosition = fMap.getCenterPosition();
+				fPreviousTourData.mapCenterPositionLatitude = centerPosition.getLatitude();
+				fPreviousTourData.mapCenterPositionLongitude = centerPosition.getLongitude();
+			}
+			fPreviousTourData = tourData;
 
 			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
 				// position tour to the default position
 				showTourInMap(tourBounds);
 			} else {
 				// position tour to the previous or position
-//			fMap.setZoom(tourData.mapZoomLevel);
-//			fMap.setCenterPosition(new GeoPosition(tourData.mapCenterPositionLatitude,
-//					tourData.mapCenterPositionLongitude));
+				fMap.setZoom(tourData.mapZoomLevel);
+				fMap.setCenterPosition(new GeoPosition(tourData.mapCenterPositionLatitude,
+						tourData.mapCenterPositionLongitude));
 			}
 		}
 		fCurrentTourData = tourData;
@@ -280,7 +298,7 @@ public class OSMView extends ViewPart {
 	 * @param positions
 	 *        A set of GeoPositions to calculate the new zoom from
 	 */
-	public void showTourInMap(Set<GeoPosition> positions) {
+	public void showTourInMap(final Set<GeoPosition> positions) {
 
 		if (positions.size() < 2) {
 			return;
@@ -298,10 +316,9 @@ public class OSMView extends ViewPart {
 		while (!viewport.contains(positionRect)) {
 
 			// center position in the map 
-			Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2, positionRect.getY()
-					+ positionRect.getHeight()
-					/ 2);
-			GeoPosition px = tileFactory.pixelToGeo(center, zoom);
+			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
+					positionRect.getY() + positionRect.getHeight() / 2);
+			final GeoPosition px = tileFactory.pixelToGeo(center, zoom);
 			fMap.setCenterPosition(px);
 
 			// check zoom level
@@ -317,10 +334,9 @@ public class OSMView extends ViewPart {
 		while (positionRect.getWidth() < viewport.width && positionRect.getHeight() < viewport.height) {
 
 			// center position in the map 
-			Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2, positionRect.getY()
-					+ positionRect.getHeight()
-					/ 2);
-			GeoPosition px = tileFactory.pixelToGeo(center, zoom);
+			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
+					positionRect.getY() + positionRect.getHeight() / 2);
+			final GeoPosition px = tileFactory.pixelToGeo(center, zoom);
 			fMap.setCenterPosition(px);
 
 			// check zoom level

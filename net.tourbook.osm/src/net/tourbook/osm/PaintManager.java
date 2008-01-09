@@ -29,7 +29,10 @@ public class PaintManager {
 	/**
 	 * contains the upper left and lower right position for a tour
 	 */
-	private Set<GeoPosition>	fTourMaxPosition;
+	private Set<GeoPosition>	fTourBounds;
+
+	private int					fLeftSliderValueIndex;
+	private int					fRightSliderValueIndex;
 
 	private PaintManager() {}
 
@@ -42,13 +45,16 @@ public class PaintManager {
 		return fInstance;
 	}
 
-	/**
-	 * Set the tour data which is used for the next painting
-	 * 
-	 * @param tourData
-	 */
-	public void setTourData(TourData tourData) {
-		fTourData = tourData;
+	public int getLeftSliderValueIndex() {
+		return fLeftSliderValueIndex;
+	}
+
+	public int getRightSliderValueIndex() {
+		return fRightSliderValueIndex;
+	}
+
+	public Set<GeoPosition> getTourBounds() {
+		return fTourBounds;
 	}
 
 	/**
@@ -58,11 +64,25 @@ public class PaintManager {
 		return fTourData;
 	}
 
-	public void setTourBounds(Set<GeoPosition> mapPositions) {
-		fTourMaxPosition = mapPositions;
+	public void setLeftSliderValueIndex(int fLeftSliderValueIndex) {
+		this.fLeftSliderValueIndex = fLeftSliderValueIndex;
 	}
 
-	public Set<GeoPosition> getTourBounds() {
-		return fTourMaxPosition;
+	public void setSliderValueIndex(int leftSliderValuesIndex, int rightSliderValuesIndex) {
+		setLeftSliderValueIndex(leftSliderValuesIndex);
+		fRightSliderValueIndex = rightSliderValuesIndex;
+	}
+
+	public void setTourBounds(Set<GeoPosition> mapPositions) {
+		fTourBounds = mapPositions;
+	}
+
+	/**
+	 * Set the tour data which is used for the next painting
+	 * 
+	 * @param tourData
+	 */
+	public void setTourData(TourData tourData) {
+		fTourData = tourData;
 	}
 }

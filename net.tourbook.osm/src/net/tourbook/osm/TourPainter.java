@@ -20,9 +20,12 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Set;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.imageio.ImageIO;
 
 import net.tourbook.data.TourData;
 import de.byteholder.geoclipse.map.TileFactory;
@@ -30,7 +33,18 @@ import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.geoclipse.swt.MapPainter;
 import de.byteholder.gpx.GeoPosition;
 
+/**
+ * Paints the tour into the map
+ */
 public class TourPainter extends MapPainter {
+
+	private static final String	IMAGE_PATH			= "icons/";
+
+	private static final String	IMAGE_START_MARKER	= "map-marker-start.png";
+	private static final String	IMAGE_END_MARKER	= "map-marker-end.png";
+
+	private BufferedImage		fImageStartMarker;
+	private BufferedImage		fImageEndMarker;
 
 	public TourPainter() {
 		super();
@@ -45,14 +59,58 @@ public class TourPainter extends MapPainter {
 			return;
 		}
 
-		final TileFactory tileFactory = map.getTileFactory();
-		final Rectangle viewport = map.getViewport();
-
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 
 		g2d = (Graphics2D) g2d.create();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		drawTour(g2d, map, latitudeSerie, longitudeSerie);
+
+		drawMarker(g2d,
+				map,
+				latitudeSerie[latitudeSerie.length - 1],
+				longitudeSerie[longitudeSerie.length - 1],
+				getImage(fImageEndMarker, IMAGE_END_MARKER));
+		drawMarker(g2d, map, latitudeSerie[0], longitudeSerie[0], getImage(fImageStartMarker, IMAGE_START_MARKER));
+
+		g2d.dispose();
+	}
+
+	private void drawMarker(Graphics2D g2d, Map map, double latitude, double longitude, BufferedImage bufferedImage) {
+
+		if (bufferedImage == null) {
+			return;
+		}
+
+		Rectangle viewport = map.getViewport();
+		TileFactory tileFactory = map.getTileFactory();
+
+		Point position = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), map.getZoom());
+
+		if (viewport.contains(position)) {
+
+			position = map.getRelativePixel(position);
+
+			final int imageWidth = bufferedImage.getWidth();
+			final int imageHeight = bufferedImage.getHeight();
+
+			g2d.drawImage(bufferedImage,
+					position.x - imageWidth / 2,
+					position.y - imageHeight,
+					imageWidth,
+					imageHeight,
+					null);
+		}
+	}
+
+	private void drawTour(Graphics2D g2d, final Map map, final double[] latitudeSerie, final double[] longitudeSerie) {
+
+		Rectangle viewport = map.getViewport();
+		TileFactory tileFactory = map.getTileFactory();
+
+		int leftSliderIndex = PaintManager.getInstance().getLeftSliderValueIndex();
+		int rightSliderIndex = PaintManager.getInstance().getRightSliderValueIndex();
 
 		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
@@ -63,54 +121,103 @@ public class TourPainter extends MapPainter {
 
 			if (viewport.contains(pixel)) {
 				pixel = map.getRelativePixel(pixel);
-				g2d.setColor(Color.RED);
-				g2d.setClip(pixel.x - 2, pixel.y - 2, 4, 4);
+
+				if (serieIndex < leftSliderIndex || serieIndex > rightSliderIndex) {
+					g2d.setColor(Color.BLUE);
+				} else {
+					g2d.setColor(Color.RED);
+				}
+
+//				g2d.setClip(pixel.x - 2, pixel.y - 2, 4, 4);
 				g2d.fillOval(pixel.x - 2, pixel.y - 2, 4, 4);
+
 //				g2d.setClip(pixel.x - 1, pixel.y - 1, 2, 2);
 //				g2d.fillOval(pixel.x - 1, pixel.y - 1, 2, 2);
 			}
 		}
+	}
 
-		// paint a marker when the tour is not easy to detect
-		if (longitudeSerie.length > 0) {
+	private BufferedImage getImage(BufferedImage bufferedImage, String imagePath) {
 
-			Rectangle2D tourBounds = getPositionRect(PaintManager.getInstance().getTourBounds(), map);
-			Point pixel = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[0], longitudeSerie[0]), map.getZoom());
+		if (bufferedImage != null) {
+			return bufferedImage;
+		}
 
-			if (tourBounds.getWidth() < 3 || tourBounds.getHeight() < 3) {
+		return bufferedImage = loadImage(IMAGE_PATH + imagePath);
+	}
 
-				pixel = map.getRelativePixel(pixel);
+	/**
+	 * Load image resouce
+	 * 
+	 * @param imagePath
+	 * @return Returns loaded image
+	 */
+	private BufferedImage loadImage(String imagePath) {
 
-				g2d.setColor(Color.BLUE);
-//				g2d.setBackground(Color.GREEN);
-
-//				g2d.fillOval(pixel.x, pixel.y, 20, 20);
-				int radius = 30;
-				int radius2 = radius / 2;
-
-				g2d.setClip(pixel.x - radius2, pixel.y - radius2, radius + 1, radius + 1);
-				g2d.drawOval(pixel.x - radius2, pixel.y - radius2, radius, radius);
+		try {
+			if (this.getClass().getResource("/" + imagePath) != null) {
+				//when its inside a jar, does this
+				InputStream imageStream = this.getClass().getResourceAsStream("/" + imagePath);
+				return ImageIO.read(imageStream);
+			} else {
+				//when its running from eclipse, does this
+				return ImageIO.read(new File(imagePath));
 			}
-
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
-		g2d.dispose();
+		return null;
 	}
 
-	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, Map map) {
-
-		final TileFactory tileFactory = map.getTileFactory();
-		final int zoom = map.getZoom();
-
-		Point2D point1 = tileFactory.geoToPixel(positions.iterator().next(), zoom);
-		Rectangle2D rect = new Rectangle2D.Double(point1.getX(), point1.getY(), 0, 0);
-
-		for (GeoPosition pos : positions) {
-			Point2D point = tileFactory.geoToPixel(pos, zoom);
-			rect.add(point);
-		}
-
-		return rect;
-	}
+//	/**
+//	 * paint a marker when the tour is drawn in a small size
+//	 */
+//	private void drawTourVisualizer(final Graphics2D g2d,
+//									final Map map,
+//									final double[] latitudeSerie,
+//									final double[] longitudeSerie) {
+//
+//		if (longitudeSerie.length == 0) {
+//			return;
+//		}
+//
+//		final Rectangle2D tourBounds = getPositionRect(PaintManager.getInstance().getTourBounds(), map);
+//		Point pixel = map.getTileFactory().geoToPixel(new GeoPosition(latitudeSerie[0], longitudeSerie[0]),
+//				map.getZoom());
+//
+//		if (tourBounds.getWidth() < 3 || tourBounds.getHeight() < 3) {
+//
+//			pixel = map.getRelativePixel(pixel);
+//
+//			g2d.setColor(Color.BLUE);
+//
+////			g2d.setBackground(Color.GREEN);
+////			g2d.fillOval(pixel.x, pixel.y, 20, 20);
+//
+//			final int radius = 30;
+//			final int radius2 = radius / 2;
+//
+////			g2d.setClip(pixel.x - radius2, pixel.y - radius2, radius + 1, radius + 1);
+//			g2d.drawOval(pixel.x - radius2, pixel.y - radius2, radius, radius);
+//		}
+//
+//	}
+//
+//	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final Map map) {
+//
+//		final TileFactory tileFactory = map.getTileFactory();
+//		final int zoom = map.getZoom();
+//
+//		final Point2D point1 = tileFactory.geoToPixel(positions.iterator().next(), zoom);
+//		final Rectangle2D rect = new Rectangle2D.Double(point1.getX(), point1.getY(), 0, 0);
+//
+//		for (final GeoPosition pos : positions) {
+//			final Point2D point = tileFactory.geoToPixel(pos, zoom);
+//			rect.add(point);
+//		}
+//
+//		return rect;
+//	}
 
 }

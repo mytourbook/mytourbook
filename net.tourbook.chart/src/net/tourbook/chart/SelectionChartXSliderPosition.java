@@ -25,10 +25,10 @@ public class SelectionChartXSliderPosition implements ISelection {
 	public static final int	IGNORE_SLIDER_POSITION			= -1;
 	public static final int	SLIDER_POSITION_AT_CHART_BORDER	= -2;
 
-	public int				slider1ValueIndex				= IGNORE_SLIDER_POSITION;
-	public int				slider2ValueIndex				= IGNORE_SLIDER_POSITION;
+	private int				slider1ValueIndex				= IGNORE_SLIDER_POSITION;
+	private int				slider2ValueIndex				= IGNORE_SLIDER_POSITION;
 
-	public Chart			chart;
+	private Chart			chart;
 
 	public SelectionChartXSliderPosition(Chart chart, int valueIndex1, int valueIndex2) {
 
@@ -40,5 +40,17 @@ public class SelectionChartXSliderPosition implements ISelection {
 
 	public boolean isEmpty() {
 		return false;
+	}
+
+	public int getSlider1ValueIndex() {
+		return slider1ValueIndex;
+	}
+
+	public int getSlider2ValueIndex() {
+		return slider2ValueIndex;
+	}
+
+	public Chart getChart() {
+		return chart;
 	}
 }
