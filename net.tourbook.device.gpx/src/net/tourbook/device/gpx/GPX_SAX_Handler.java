@@ -34,7 +34,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class GPX_SAXHandler extends DefaultHandler {
+public class GPX_SAX_Handler extends DefaultHandler {
 
 	/**
 	 * Earth radius is 6367 km.
@@ -52,7 +52,7 @@ public class GPX_SAXHandler extends DefaultHandler {
 
 	private static final String				TAG_GPX					= "gpx";											//$NON-NLS-1$
 
-	private static final String				TAG_WPT					= "wpt";											//$NON-NLS-1$
+//	private static final String				TAG_WPT					= "wpt";											//$NON-NLS-1$
 	private static final String				TAG_TRK					= "trk";											//$NON-NLS-1$
 //	private static final String				TAG_TRKSEG				= "trkseg";										//$NON-NLS-1$
 	private static final String				TAG_TRKPT				= "trkpt";											//$NON-NLS-1$
@@ -63,50 +63,50 @@ public class GPX_SAXHandler extends DefaultHandler {
 	private static final String				ATTR_LATITUDE			= "lat";
 	private static final String				ATTR_LONGITUDE			= "lon";
 
-	private int								fGpxVersion				= -1;
-
-	private boolean							fInWpt					= false;
-	private boolean							fInTrk					= false;
-//	private boolean							fInTrkSeg				= false;
-	private boolean							fInTrkPt				= false;
-
-	private boolean							fIsInTime				= false;
-	private boolean							fIsInEle				= false;
-	private boolean							fIsInName				= false;
-
-	private ArrayList<TimeData>				fTimeDataList;
-	private TimeData						fTimeData;
-	private TimeData						fPrevTimeData;
-	private TourbookDevice					fDeviceDataReader;
-
-	private String							fImportFileName;
-
-	private HashMap<String, TourData>		fTourDataMap;
-
-	private int								fLapCounter;
-	private boolean							fSetLapMarker			= false;
-	private boolean							fSetLapStartTime		= false;
-	private ArrayList<Long>					fLapStart;
-
-	private boolean							fIsImported;
-	private long							fCurrentTime;
-
-	private StringBuilder					fCharacters				= new StringBuilder();
-
-	private int								fAbsoluteDistance;
-
 	private static final Calendar			fCalendar				= GregorianCalendar.getInstance();
 
 	private static final SimpleDateFormat	GPX_TIME_FORMAT			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
 	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");	//$NON-NLS-1$
 
+	private int								fGpxVersion				= -1;
+	//	private boolean							fInWpt					= false;
+	private boolean							fInTrk					= false;
+	//	private boolean							fInTrkSeg				= false;
+	private boolean							fInTrkPt				= false;
+
+	private boolean							fIsInTime				= false;
+	private boolean							fIsInEle				= false;
+	private boolean							fIsInName				= false;
+	private ArrayList<TimeData>				fTimeDataList;
+
+	private TimeData						fTimeData;
+
+	private TimeData						fPrevTimeData;
+
+	private TourbookDevice					fDeviceDataReader;
+	private String							fImportFileName;
+	private HashMap<String, TourData>		fTourDataMap;
+	private int								fLapCounter;
+
+	private boolean							fSetLapMarker			= false;
+	private boolean							fSetLapStartTime		= false;
+
+	private ArrayList<Long>					fLapStart;
+
+	private boolean							fIsImported;
+
+	private long							fCurrentTime;
+
+	private StringBuilder					fCharacters				= new StringBuilder();
+	private int								fAbsoluteDistance;
+
+	private boolean							fIsError				= false;
+
 	{
 		GPX_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
 	}
 
-	private boolean							fIsError				= false;
-
-	public GPX_SAXHandler(TourbookDevice deviceDataReader, String importFileName, DeviceData deviceData,
+	public GPX_SAX_Handler(TourbookDevice deviceDataReader, String importFileName, DeviceData deviceData,
 			HashMap<String, TourData> tourDataMap) {
 
 		fDeviceDataReader = deviceDataReader;
@@ -212,7 +212,7 @@ public class GPX_SAXHandler extends DefaultHandler {
 			if (name.equals(TAG_TRKPT)) {
 
 				/*
-				 * complete trackpoint data
+				 * trackpoint ends
 				 */
 
 				fInTrkPt = false;
@@ -227,7 +227,9 @@ public class GPX_SAXHandler extends DefaultHandler {
 
 				fInTrk = false;
 
-				setTourData();
+				if (fDeviceDataReader.isMergeTracks == false) {
+					setTourData();
+				}
 
 			} else if (name.equals(TAG_GPX)) {
 
@@ -235,7 +237,9 @@ public class GPX_SAXHandler extends DefaultHandler {
 				 * file end
 				 */
 
-//				setTourData();
+				if (fDeviceDataReader.isMergeTracks) {
+					setTourData();
+				}
 			}
 
 		} catch (final NumberFormatException e) {
@@ -330,17 +334,22 @@ public class GPX_SAXHandler extends DefaultHandler {
 		}
 	}
 
-	private short getShortValue(String textValue) {
+//	private short getShortValue(String textValue) {
+//
+//		try {
+//			if (textValue != null) {
+//				return Short.parseShort(textValue);
+//			} else {
+//				return Short.MIN_VALUE;
+//			}
+//		} catch (NumberFormatException e) {
+//			return Short.MIN_VALUE;
+//		}
+//	}
 
-		try {
-			if (textValue != null) {
-				return Short.parseShort(textValue);
-			} else {
-				return Short.MIN_VALUE;
-			}
-		} catch (NumberFormatException e) {
-			return Short.MIN_VALUE;
-		}
+	private void initNewTrack() {
+		fTimeDataList = new ArrayList<TimeData>();
+		fAbsoluteDistance = 0;
 	}
 
 	/**
@@ -432,7 +441,9 @@ public class GPX_SAXHandler extends DefaultHandler {
 
 						fGpxVersion = GPX_VERSION_1_0;
 
-//						fTimeDataList = new ArrayList<TimeData>();
+						if (fDeviceDataReader.isMergeTracks) {
+							initNewTrack();
+						}
 
 						break;
 
@@ -440,7 +451,9 @@ public class GPX_SAXHandler extends DefaultHandler {
 
 						fGpxVersion = GPX_VERSION_1_1;
 
-//						fTimeDataList = new ArrayList<TimeData>();
+						if (fDeviceDataReader.isMergeTracks) {
+							initNewTrack();
+						}
 
 						break;
 					}
@@ -494,7 +507,9 @@ public class GPX_SAXHandler extends DefaultHandler {
 //				fSetLapMarker = false;
 //				fLapStart = new ArrayList<Long>();
 
-				fTimeDataList = new ArrayList<TimeData>();
+				if (fDeviceDataReader.isMergeTracks == false) {
+					initNewTrack();
+				}
 			}
 		}
 	}

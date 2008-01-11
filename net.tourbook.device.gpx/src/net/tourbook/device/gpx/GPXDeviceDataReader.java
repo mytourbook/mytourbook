@@ -87,7 +87,7 @@ public class GPXDeviceDataReader extends TourbookDevice {
 			}
 		}
 
-		GPX_SAXHandler handler = new GPX_SAXHandler(this, importFilePath, deviceData, tourDataMap);
+		GPX_SAX_Handler handler = new GPX_SAX_Handler(this, importFilePath, deviceData, tourDataMap);
 
 		try {
 
