@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: OpenStreetMap
+Bundle-SymbolicName: net.tourbook.mapping;singleton:=true
+Bundle-Version: 1.3.0.v2008
+Bundle-Activator: net.tourbook.mapping.Activator
+Bundle-Localization: plugin
+Bundle-Vendor: MyTourbook
+Require-Bundle: net.tourbook,
+ net.tourbook.chart,
+ org.eclipse.ui,
+ org.eclipse.core.runtime,
+ de.byteholder.geoclipse,
+ de.byteholder.geoclipse.libraries,
+ de.byteholder.geoclipse.tilefactory.osm
+Eclipse-LazyStart: true
