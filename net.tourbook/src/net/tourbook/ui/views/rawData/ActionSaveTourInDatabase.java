@@ -128,7 +128,7 @@ public class ActionSaveTourInDatabase extends Action {
 			}
 		}
 
-		return Messages.Raw_Data_Label_unknown_device;
+		return Messages.import_data_label_unknown_device;
 	}
 
 	/**
@@ -235,8 +235,8 @@ public class ActionSaveTourInDatabase extends Action {
 		dialog.setContentProvider(new PeopleContentProvider());
 		dialog.setLabelProvider(new PeopleLabelProvider());
 
-		dialog.setTitle(Messages.Raw_Data_Dlg_save_tour_title);
-		dialog.setMessage(Messages.Raw_Data_Dlg_save_tour_msg);
+		dialog.setTitle(Messages.import_data_dlg_save_tour_title);
+		dialog.setMessage(Messages.import_data_dlg_save_tour_msg);
 		dialog.setDialogBoundsSettings(getDialogSettings(), Dialog.DIALOG_PERSISTLOCATION
 				| Dialog.DIALOG_PERSISTSIZE);
 

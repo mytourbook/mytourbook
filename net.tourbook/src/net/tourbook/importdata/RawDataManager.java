@@ -73,6 +73,8 @@ public class RawDataManager {
 
 	private boolean						fIsImported;
 
+	private boolean						fIsMergeTracks;
+
 	private RawDataManager() {}
 
 	public static RawDataManager getInstance() {
@@ -349,6 +351,8 @@ public class RawDataManager {
 				device.setImportYear(fImportYear);
 			}
 
+			device.setMergeTracks(fIsMergeTracks);
+
 			if (device.processDeviceData(fileName, fDeviceData, fTourDataMap)) {
 				return true;
 			}
@@ -533,5 +537,9 @@ public class RawDataManager {
 				}
 			}
 		});
+	}
+
+	public void setMergeTracks(boolean checked) {
+		fIsMergeTracks = checked;
 	}
 }

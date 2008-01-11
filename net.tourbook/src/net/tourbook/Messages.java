@@ -22,7 +22,6 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";						//$NON-NLS-1$
 
 	public static String		App_Action_About;
-	public static String		App_Action_adjust_imported_year;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_Menu_file;
 	public static String		App_Action_Menu_help;
@@ -212,6 +211,26 @@ public class Messages extends NLS {
 	public static String		Image__undo_tour_type_filter_system;
 	public static String		Image__view_compare_wizard;
 
+	public static String	import_data_action_adjust_imported_year;
+
+	public static String	import_data_action_clear_view;
+
+	public static String	import_data_action_clear_view_tooltip;
+
+	public static String	import_data_action_merge_tracks;
+
+	public static String	import_data_action_save_tour_for_person;
+
+	public static String	import_data_action_save_tour_with_person;
+
+	public static String	import_data_action_save_tours_for_person;
+
+	public static String	import_data_dlg_save_tour_msg;
+
+	public static String	import_data_dlg_save_tour_title;
+
+	public static String	import_data_label_unknown_device;
+
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;
 	public static String		Import_Wizard_Dlg_message;
@@ -323,15 +342,6 @@ public class Messages extends NLS {
 
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
-
-	public static String		Raw_Data_Action_clear_view;
-	public static String		Raw_Data_Action_clear_view_tooltip;
-	public static String		Raw_Data_Action_save_tour_for_person;
-	public static String		Raw_Data_Action_save_tour_with_person;
-	public static String		Raw_Data_Action_save_tours_for_person;
-	public static String		Raw_Data_Dlg_save_tour_msg;
-	public static String		Raw_Data_Dlg_save_tour_title;
-	public static String		Raw_Data_Label_unknown_device;
 
 	public static String		Tour_Action_auto_zoom_to_slider_position;
 	public static String		Tour_Action_chart_options_tooltip;

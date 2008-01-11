@@ -117,6 +117,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private static final String			MEMENTO_SELECTED_TOUR_INDEX	= "importview.selected-tour-index";			//$NON-NLS-1$
 	private static final String			MEMENTO_COLUMN_SORT_ORDER	= "importview.column_sort_order";				//$NON-NLS-1$
 	private static final String			MEMENTO_COLUMN_WIDTH		= "importview.column_width";					//$NON-NLS-1$
+	private static final String			MEMENTO_MERGE_TRACKS		= "importview.action.merge-tracks";
 
 	private static IMemento				fSessionMemento;
 
@@ -127,6 +128,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private ActionSaveTourInDatabase	fActionSaveTour;
 	private ActionSaveTourInDatabase	fActionSaveTourWithPerson;
 	private ActionAdjustYear			fActionAdjustImportedYear;
+	private ActionMergeTours			fActionMergeTours;
 	private ActionSetTourType			fActionSetTourType;
 
 	private ImageDescriptor				imageDatabaseDescriptor;
@@ -317,6 +319,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this);
 		fActionSetTourType = new ActionSetTourType(this);
 		fActionAdjustImportedYear = new ActionAdjustYear(this);
+		fActionMergeTours = new ActionMergeTours(this);
 
 		/*
 		 * fill view toolbar
@@ -334,6 +337,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		menuMgr.add(fActionModifyColumns);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(fActionMergeTours);
 		menuMgr.add(fActionAdjustImportedYear);
 
 	}
@@ -746,7 +750,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 			final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
 			if (person != null) {
-				fActionSaveTourWithPerson.setText(NLS.bind(Messages.Raw_Data_Action_save_tour_with_person,
+				fActionSaveTourWithPerson.setText(NLS.bind(Messages.import_data_action_save_tour_with_person,
 						person.getName()));
 				fActionSaveTourWithPerson.setPerson(person);
 				fActionSaveTourWithPerson.setEnabled(unsavedTours > 0);
@@ -754,9 +758,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			}
 
 			if (tourSelection.size() == 1) {
-				fActionSaveTour.setText(Messages.Raw_Data_Action_save_tour_for_person);
+				fActionSaveTour.setText(Messages.import_data_action_save_tour_for_person);
 			} else {
-				fActionSaveTour.setText(Messages.Raw_Data_Action_save_tours_for_person);
+				fActionSaveTour.setText(Messages.import_data_action_save_tours_for_person);
 			}
 			fActionSaveTour.setEnabled(unsavedTours > 0);
 			menuMgr.add(fActionSaveTour);
@@ -842,7 +846,18 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 	private void restoreState(final IMemento memento) {
 
+		final RawDataManager rawDataManager = RawDataManager.getInstance();
+
 		if (memento != null) {
+
+			// restore: set merge tracks status befor the tours are imported
+			Integer mergeTracks = memento.getInteger(MEMENTO_MERGE_TRACKS);
+			if (mergeTracks == null) {
+				fActionMergeTours.setChecked(false);
+			} else {
+				fActionMergeTours.setChecked(mergeTracks == 1 ? true : false);
+			}
+			rawDataManager.setMergeTracks(fActionMergeTours.isChecked());
 
 			// restore table columns sort order
 			final String mementoColumnSortOrderIds = memento.getString(MEMENTO_COLUMN_SORT_ORDER);
@@ -856,13 +871,11 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				fColumnManager.setColumnWidth(StringToArrayConverter.convertStringToArray(mementoColumnWidth));
 			}
 
-			final ArrayList<String> notImportedFiles = new ArrayList<String>();
 			// restore imported tours
 			final String mementoImportedFiles = memento.getString(MEMENTO_IMPORT_FILENAME);
+			final ArrayList<String> notImportedFiles = new ArrayList<String>();
 
 			if (mementoImportedFiles != null) {
-
-				final RawDataManager rawDataManager = RawDataManager.getInstance();
 
 				rawDataManager.getTourDataMap().clear();
 
@@ -897,7 +910,11 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			if (notImportedFiles.size() > 0) {
 				RawDataManager.showMsgBoxInvalidFormat(notImportedFiles);
 			}
+
+		} else {
+			rawDataManager.setMergeTracks(fActionMergeTours.isChecked());
 		}
+
 	}
 
 	private void saveSettings() {
@@ -927,6 +944,8 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 		// save selected tour in the viewer
 		memento.putInteger(MEMENTO_SELECTED_TOUR_INDEX, table.getSelectionIndex());
+
+		memento.putInteger(MEMENTO_MERGE_TRACKS, fActionMergeTours.isChecked() ? 1 : 0);
 
 		// save column sort order
 		memento.putString(MEMENTO_COLUMN_SORT_ORDER,

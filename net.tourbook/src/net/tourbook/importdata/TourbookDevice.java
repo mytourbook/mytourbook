@@ -45,9 +45,14 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public boolean	canSelectMultipleFilesInImportDialog	= false;
 
 	/**
-	 * when not <code>-1</code> this year is used as the import year
+	 * when set to <code>-1</code> this is ignored otherwise this year is used as the import year
 	 */
 	public int		importYear								= -1;
+
+	/**
+	 * when <code>true</code> the tracks in one file will be merged to one track
+	 */
+	public boolean	isMergeTracks							= false;
 
 	public TourbookDevice() {}
 
@@ -84,6 +89,10 @@ public abstract class TourbookDevice implements IRawDataReader {
 
 	public void setImportYear(int importYear) {
 		this.importYear = importYear;
+	}
+
+	public void setMergeTracks(boolean isMergeTracks) {
+		this.isMergeTracks = isMergeTracks;
 	}
 
 }

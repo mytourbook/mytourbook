@@ -23,6 +23,7 @@ import java.util.Set;
 
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
@@ -198,12 +199,12 @@ public class OSMView extends ViewPart {
 
 			final SelectionTourData selectionTourData = (SelectionTourData) selection;
 			final TourData tourData = selectionTourData.getTourData();
+
 			paintTour(tourData);
 
 		} else if (selection instanceof SelectionTourId) {
 
 			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
-
 			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
 			paintTour(tourData);
@@ -213,9 +214,12 @@ public class OSMView extends ViewPart {
 			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
 
 			if (editor instanceof TourEditor) {
+
 				final TourEditor fTourEditor = (TourEditor) editor;
 				final TourChart fTourChart = fTourEditor.getTourChart();
-				paintTour(fTourChart.getTourData());
+				final TourData tourData = fTourChart.getTourData();
+
+				paintTour(tourData);
 			}
 
 		} else if (selection instanceof SelectionChartInfo) {
@@ -223,7 +227,23 @@ public class OSMView extends ViewPart {
 			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
 			final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
 			paintTour(tourData, chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+
+		} else if (selection instanceof SelectionChartXSliderPosition) {
+
+			SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
+
+			final ChartDataModel chartDataModel = xSliderPos.getChart().getChartDataModel();
+			final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+
+			final int leftSliderValueIndex = xSliderPos.getSlider1ValueIndex();
+			int rightSliderValueIndex = xSliderPos.getSlider2ValueIndex();
+			rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+					? leftSliderValueIndex
+					: rightSliderValueIndex;
+
+			paintTour(tourData, leftSliderValueIndex, rightSliderValueIndex);
 		}
 	}
 
@@ -241,6 +261,13 @@ public class OSMView extends ViewPart {
 			return;
 		}
 
+		// prevent loading the same tour
+		if (tourData == fCurrentTourData) {
+			return;
+		}
+
+		fCurrentTourData = tourData;
+
 		final double[] longitudeSerie = tourData.longitudeSerie;
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		if (longitudeSerie == null || longitudeSerie.length == 0 || latitudeSerie == null || latitudeSerie.length == 0) {
@@ -249,6 +276,9 @@ public class OSMView extends ViewPart {
 
 		final PaintManager paintManager = PaintManager.getInstance();
 		paintManager.setTourData(tourData);
+
+		// set initial slider position
+		paintManager.setSliderValueIndex(0, longitudeSerie.length - 1);
 
 		final Set<GeoPosition> tourBounds = getTourBounds(tourData);
 		paintManager.setTourBounds(tourBounds);
@@ -278,7 +308,6 @@ public class OSMView extends ViewPart {
 						tourData.mapCenterPositionLongitude));
 			}
 		}
-		fCurrentTourData = tourData;
 
 		fMap.queueRedraw();
 	}

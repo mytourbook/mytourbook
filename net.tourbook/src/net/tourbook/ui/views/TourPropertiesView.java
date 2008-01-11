@@ -812,8 +812,16 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 				fTourEditor = null;
 				fTourChart = null;
 			} else {
+
+				final TourChart tourChart = selectionTourData.getTourChart();
+
+				// prevent loading the same tour
+				if (fTourChart != null && fTourChart.getTourData() == tourData) {
+					return;
+				}
+
 				fTourEditor = null;
-				fTourChart = selectionTourData.getTourChart();
+				fTourChart = tourChart;
 				updateTourProperties(tourData);
 			}
 
@@ -821,9 +829,9 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 			SelectionTourId tourIdSelection = (SelectionTourId) selection;
 
+			// don't reload the same tour
 			if (fTourData != null) {
 				if (fTourData.getTourId().equals(tourIdSelection.getTourId())) {
-					// don't reload the same tour
 					return;
 				}
 			}
@@ -841,7 +849,14 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
 
 			if (editor instanceof TourEditor) {
-				fTourEditor = (TourEditor) editor;
+
+				// prevent loading the same tour
+				final TourEditor tourEditor = (TourEditor) editor;
+				if (tourEditor == fTourEditor) {
+					return;
+				}
+
+				fTourEditor = tourEditor;
 				fTourChart = fTourEditor.getTourChart();
 				updateTourProperties(fTourChart.getTourData());
 			}

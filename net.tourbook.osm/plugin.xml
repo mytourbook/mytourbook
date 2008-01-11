@@ -12,7 +12,7 @@
             class="net.tourbook.osm.OSMView"
             icon="icons/earth-globe-abstract.png"
             id="net.tourbook.osm.OSMViewID"
-            name="OpenSteetMap">
+            name="%tour_map_name">
       </view>
    </extension>
    <extension
