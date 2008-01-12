@@ -816,7 +816,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 				final TourChart tourChart = selectionTourData.getTourChart();
 
 				// prevent loading the same tour
-				if (fTourChart != null && fTourChart.getTourData() == tourData) {
+				if (tourChart != null && fTourChart != null && fTourChart.getTourData() == tourData) {
 					return;
 				}
 

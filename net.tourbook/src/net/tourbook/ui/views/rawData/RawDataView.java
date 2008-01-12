@@ -326,6 +326,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		 */
 		IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
 
+		// place for import and transfer actions
 		viewTbm.add(new GroupMarker("import")); //$NON-NLS-1$
 
 		viewTbm.add(fActionClearView);
@@ -900,10 +901,15 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 					// restore selected tour
 					final Integer selectedTourIndex = memento.getInteger(MEMENTO_SELECTED_TOUR_INDEX);
 
-					Object tourData = fTourViewer.getElementAt(selectedTourIndex);
-					if (tourData != null) {
-						fTourViewer.setSelection(new StructuredSelection(tourData), true);
-					}
+					final Object tourData = fTourViewer.getElementAt(selectedTourIndex);
+
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							if (tourData != null) {
+								fTourViewer.setSelection(new StructuredSelection(tourData), true);
+							}
+						}
+					});
 				}
 			}
 

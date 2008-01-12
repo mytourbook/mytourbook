@@ -13,29 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.mapping;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionZoomShowAll extends Action {
+public class ActionZoomShowEntireTour extends Action {
 
 	private OSMView	fMapView;
 
-	public ActionZoomShowAll(OSMView mapView) {
+	public ActionZoomShowEntireTour(OSMView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 
 		fMapView = mapView;
 
-		setToolTipText(Messages.map_action_zoom_show_all);
-
-		setImageDescriptor(Activator.getImageDescriptor(Messages.image_action_zoom_show_all));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.image_action_zoom_show_all_disabled));
+		setToolTipText(Messages.map_action_zoom_show_entire_tour);
+		setImageDescriptor(Activator.getImageDescriptor(Messages.image_action_zoom_show_entire_tour));
 	}
 
 	@Override
 	public void run() {
-		fMapView.zoomShowEntireMap();
+		fMapView.zoomShowEntireTour();
 	}
 
 }

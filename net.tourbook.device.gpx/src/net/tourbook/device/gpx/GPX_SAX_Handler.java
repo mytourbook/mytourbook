@@ -350,6 +350,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private void initNewTrack() {
 		fTimeDataList = new ArrayList<TimeData>();
 		fAbsoluteDistance = 0;
+		fPrevTimeData = null;
 	}
 
 	/**

@@ -35,6 +35,8 @@ public class PaintManager {
 	private int					fLeftSliderValueIndex;
 	private int					fRightSliderValueIndex;
 
+	private int					fSynchTourToomLevel;
+
 	private PaintManager() {}
 
 	public static PaintManager getInstance() {
@@ -52,6 +54,10 @@ public class PaintManager {
 
 	public int getRightSliderValueIndex() {
 		return fRightSliderValueIndex;
+	}
+
+	int getSynchTourZoomLevel() {
+		return fSynchTourToomLevel;
 	}
 
 	public Set<GeoPosition> getTourBounds() {
@@ -72,6 +78,10 @@ public class PaintManager {
 	public void setSliderValueIndex(int leftSliderValuesIndex, int rightSliderValuesIndex) {
 		setLeftSliderValueIndex(leftSliderValuesIndex);
 		fRightSliderValueIndex = rightSliderValuesIndex;
+	}
+
+	public void setSynchTourZoomLevel(int zoomLevel) {
+		fSynchTourToomLevel = zoomLevel;
 	}
 
 	public void setTourBounds(Set<GeoPosition> mapPositions) {

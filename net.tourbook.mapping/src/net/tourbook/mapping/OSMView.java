@@ -33,13 +33,20 @@ import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
 import de.byteholder.geoclipse.map.TileFactory;
@@ -53,26 +60,64 @@ import de.byteholder.gpx.GeoPosition;
  */
 public class OSMView extends ViewPart {
 
-	final public static String	ID	= "net.tourbook.mapping.OSMViewID"; //$NON-NLS-1$
+	final public static String			ID									= "net.tourbook.mapping.OSMViewID";	//$NON-NLS-1$
 
-	private ISelectionListener	fPostSelectionListener;
+	private static final String			MEMENTO_ZOOM_CENTERED				= "osmview.zoom-centered";
+	private static final String			MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "osmview.synch-with-selected-tour";
+	private static final String			MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "osmview.synch-tour-zoom-level";
 
-	private Map					fMap;
+	private static IMemento				fSessionMemento;
 
-	private TourData			fCurrentTourData;
-	private TourData			fPreviousTourData;
+	private Map							fMap;
 
-	private ActionSynchWithTour	fActionSynchWithTour;
-	private ActionZoomIn		fActionZoomIn;
-	private ActionZoomOut		fActionZoomOut;
-	private ActionZoomShowAll	fActionZoomShowAll;
-	private ActionZoomCentered	fActionZoomCentered;
+	private ISelectionListener			fPostSelectionListener;
+	private IPartListener2				fPartListener;
 
-	private boolean				fIsMapSynchedWithTour;
+	private TourData					fTourData;
+	private TourData					fPreviousTourData;
 
-	private boolean				fIsTourCentered;
+	private ActionZoomIn				fActionZoomIn;
+	private ActionZoomOut				fActionZoomOut;
+	private ActionZoomCentered			fActionZoomCentered;
+	private ActionZoomShowAll			fActionZoomShowAll;
+	private ActionZoomShowEntireTour	fActionZoomShowEntireTour;
+	private ActionSynchWithTour			fActionSynchWithTour;
+	private ActionSynchTourZoomLevel	fActionSynchTourZoomLevel;
+
+	private boolean						fIsMapSynchedWithTour;
+
+	private boolean						fIsTourCentered;
 
 	public OSMView() {}
+
+	private void addPartListener() {
+		fPartListener = new IPartListener2() {
+			public void partActivated(final IWorkbenchPartReference partRef) {}
+
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+			public void partClosed(final IWorkbenchPartReference partRef) {
+				if (ID.equals(partRef.getId())) {
+					saveSettings();
+				}
+			}
+
+			public void partDeactivated(final IWorkbenchPartReference partRef) {
+				if (ID.equals(partRef.getId())) {
+					saveSettings();
+				}
+			}
+
+			public void partHidden(final IWorkbenchPartReference partRef) {}
+
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+			public void partOpened(final IWorkbenchPartReference partRef) {}
+
+			public void partVisible(final IWorkbenchPartReference partRef) {}
+		};
+		getViewSite().getPage().addPartListener(fPartListener);
+	}
 
 	/**
 	 * listen for events when a tour is selected
@@ -84,7 +129,7 @@ public class OSMView extends ViewPart {
 				onChangeSelection(selection);
 			}
 		};
-		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+		getViewSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
 	/**
@@ -107,11 +152,13 @@ public class OSMView extends ViewPart {
 
 	private void createActions() {
 
-		fActionSynchWithTour = new ActionSynchWithTour(this);
 		fActionZoomIn = new ActionZoomIn(this);
 		fActionZoomOut = new ActionZoomOut(this);
-		fActionZoomShowAll = new ActionZoomShowAll(this);
 		fActionZoomCentered = new ActionZoomCentered(this);
+		fActionZoomShowAll = new ActionZoomShowAll(this);
+		fActionZoomShowEntireTour = new ActionZoomShowEntireTour(this);
+		fActionSynchWithTour = new ActionSynchWithTour(this);
+		fActionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
 
 		/*
 		 * fill view toolbar
@@ -120,10 +167,20 @@ public class OSMView extends ViewPart {
 
 		viewTbm.add(fActionSynchWithTour);
 		viewTbm.add(new Separator());
+		viewTbm.add(fActionZoomShowAll);
+		viewTbm.add(fActionZoomShowEntireTour);
+		viewTbm.add(new Separator());
 		viewTbm.add(fActionZoomCentered);
 		viewTbm.add(fActionZoomIn);
 		viewTbm.add(fActionZoomOut);
-		viewTbm.add(fActionZoomShowAll);
+
+		/*
+		 * fill view menu
+		 */
+		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+
+		menuMgr.add(fActionSynchTourZoomLevel);
+
 	}
 
 	@Override
@@ -134,7 +191,11 @@ public class OSMView extends ViewPart {
 		GeoClipseExtensions.getInstance().readExtensions(fMap);
 
 		createActions();
+
+		addPartListener();
 		addSelectionListener();
+
+		restoreState(fSessionMemento);
 
 		// show map from last selection
 		onChangeSelection(getSite().getWorkbenchWindow().getSelectionService().getSelection());
@@ -143,7 +204,8 @@ public class OSMView extends ViewPart {
 	@Override
 	public void dispose() {
 
-		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
+		getViewSite().getPage().removePostSelectionListener(fPostSelectionListener);
+		getViewSite().getPage().removePartListener(fPartListener);
 
 		super.dispose();
 	}
@@ -195,6 +257,17 @@ public class OSMView extends ViewPart {
 		mapPositions.add(new GeoPosition(maxLatitude, maxLongitude));
 
 		return mapPositions;
+	}
+
+	@Override
+	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
+
+		super.init(site, memento);
+
+		// set session memento
+		if (fSessionMemento == null) {
+			fSessionMemento = memento;
+		}
 	}
 
 	private void onChangeSelection(final ISelection selection) {
@@ -251,38 +324,24 @@ public class OSMView extends ViewPart {
 		}
 	}
 
-	private void paintTour(final TourData tourData, final int leftSliderValuesIndex, final int rightSliderValuesIndex) {
-
-		final PaintManager paintManager = PaintManager.getInstance();
-		paintManager.setSliderValueIndex(leftSliderValuesIndex, rightSliderValuesIndex);
-
-		fMap.queueRedraw();
-	}
-
 	private void paintTour(final TourData tourData, boolean forceRedraw) {
 
-		if (tourData == null) {
+		if (checkPaintData(tourData) == false) {
 			return;
 		}
 
 		// prevent loading the same tour
-		if (forceRedraw == false && tourData == fCurrentTourData) {
+		if (forceRedraw == false && tourData == fTourData) {
 			return;
 		}
 
-		fCurrentTourData = tourData;
-
-		final double[] longitudeSerie = tourData.longitudeSerie;
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		if (longitudeSerie == null || longitudeSerie.length == 0 || latitudeSerie == null || latitudeSerie.length == 0) {
-			return;
-		}
+		fTourData = tourData;
 
 		final PaintManager paintManager = PaintManager.getInstance();
 		paintManager.setTourData(tourData);
 
 		// set initial slider position
-		paintManager.setSliderValueIndex(0, longitudeSerie.length - 1);
+		paintManager.setSliderValueIndex(0, tourData.longitudeSerie.length - 1);
 
 		final Set<GeoPosition> tourBounds = getTourBounds(tourData);
 		paintManager.setTourBounds(tourBounds);
@@ -304,7 +363,7 @@ public class OSMView extends ViewPart {
 
 			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
 				// position tour to the default position
-				showTourInMap(tourBounds);
+				setTourZoomLevel(tourBounds, true);
 			} else {
 				// position tour to the previous or position
 				fMap.setZoom(tourData.mapZoomLevel);
@@ -316,12 +375,98 @@ public class OSMView extends ViewPart {
 		fMap.queueRedraw();
 	}
 
+	private void paintEntireTour() {
+
+		if (checkPaintData(fTourData) == false) {
+			return;
+		}
+
+		final PaintManager paintManager = PaintManager.getInstance();
+		paintManager.setTourData(fTourData);
+
+		// set initial slider position
+		paintManager.setSliderValueIndex(0, fTourData.longitudeSerie.length - 1);
+
+		final Set<GeoPosition> tourBounds = getTourBounds(fTourData);
+		paintManager.setTourBounds(tourBounds);
+
+		setTourZoomLevel(tourBounds, false);
+		fMap.queueRedraw();
+	}
+
+	/**
+	 * Checks if {@link TourData} can be painted
+	 * 
+	 * @param tourData
+	 * @return <code>true</code> when the {@link TourData} can be painted
+	 */
+	private boolean checkPaintData(final TourData tourData) {
+
+		if (tourData == null) {
+			return false;
+		}
+
+		// check if coordinates are available
+		final double[] longitudeSerie = tourData.longitudeSerie;
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		if (longitudeSerie == null || longitudeSerie.length == 0 || latitudeSerie == null || latitudeSerie.length == 0) {
+			return false;
+		}
+
+		return true;
+	}
+
+	private void paintTour(final TourData tourData, final int leftSliderValuesIndex, final int rightSliderValuesIndex) {
+
+		final PaintManager paintManager = PaintManager.getInstance();
+		paintManager.setSliderValueIndex(leftSliderValuesIndex, rightSliderValuesIndex);
+
+		fMap.queueRedraw();
+	}
+
+	private void restoreState(final IMemento memento) {
+
+		if (memento != null) {
+
+			Integer mementoZoomCentered = memento.getInteger(MEMENTO_ZOOM_CENTERED);
+			if (mementoZoomCentered != null) {
+				final boolean isTourCentered = mementoZoomCentered == 1 ? true : false;
+				fActionZoomCentered.setChecked(isTourCentered);
+				fIsTourCentered = isTourCentered;
+			}
+
+			Integer mementoSynchTour = memento.getInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR);
+			if (mementoSynchTour != null) {
+
+				final boolean isSynchTour = mementoSynchTour == 1 ? true : false;
+
+				fActionSynchWithTour.setChecked(isSynchTour);
+				fIsMapSynchedWithTour = isSynchTour;
+			}
+
+			Integer zoomLevel = memento.getInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL);
+			if (zoomLevel != null) {
+				fActionSynchTourZoomLevel.setZoomLevel(zoomLevel);
+			}
+		}
+	}
+
+	private void saveSettings() {
+		fSessionMemento = XMLMemento.createWriteRoot("DeviceImportView"); //$NON-NLS-1$
+		saveState(fSessionMemento);
+	}
+
+	@Override
+	public void saveState(final IMemento memento) {
+
+		// save checked actions
+		memento.putInteger(MEMENTO_ZOOM_CENTERED, fActionZoomCentered.isChecked() ? 1 : 0);
+		memento.putInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR, fActionSynchWithTour.isChecked() ? 1 : 0);
+		memento.putInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, fActionSynchTourZoomLevel.getZoomLevel());
+	}
+
 	@Override
 	public void setFocus() {}
-
-	void setZoomCentered() {
-		fIsTourCentered = fActionZoomCentered.isChecked();
-	}
 
 	/**
 	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
@@ -330,8 +475,10 @@ public class OSMView extends ViewPart {
 	 * 
 	 * @param positions
 	 *        A set of GeoPositions to calculate the new zoom from
+	 * @param adjustZoomLevel
+	 *        when <code>true</code> the zoom level will be adjusted to user settings
 	 */
-	public void showTourInMap(final Set<GeoPosition> positions) {
+	private void setTourZoomLevel(final Set<GeoPosition> positions, boolean isAdjustZoomLevel) {
 
 		if (positions.size() < 2) {
 			return;
@@ -346,6 +493,7 @@ public class OSMView extends ViewPart {
 		Rectangle2D positionRect = getPositionRect(positions, zoom);
 		Rectangle viewport = fMap.getViewport();
 
+		// zoom until the tour is visible in the map
 		while (!viewport.contains(positionRect)) {
 
 			// center position in the map 
@@ -364,6 +512,7 @@ public class OSMView extends ViewPart {
 			viewport = fMap.getViewport();
 		}
 
+		// zoom in until the tour is larger than the viewport
 		while (positionRect.getWidth() < viewport.width && positionRect.getHeight() < viewport.height) {
 
 			// center position in the map 
@@ -382,8 +531,19 @@ public class OSMView extends ViewPart {
 			viewport = fMap.getViewport();
 		}
 
-		// the algorithm generated a larger zoom level as needed
-		fMap.setZoom(--zoom);
+		// the algorithm generated a larger zoom level as necessary
+		zoom--;
+
+		int adjustedZoomLevel = 0;
+		if (isAdjustZoomLevel) {
+			adjustedZoomLevel = PaintManager.getInstance().getSynchTourZoomLevel();
+		}
+
+		fMap.setZoom(zoom + adjustedZoomLevel);
+	}
+
+	void setZoomCentered() {
+		fIsTourCentered = fActionZoomCentered.isChecked();
 	}
 
 	void synchWithTour() {
@@ -391,7 +551,7 @@ public class OSMView extends ViewPart {
 		fIsMapSynchedWithTour = fActionSynchWithTour.isChecked();
 
 		if (fIsMapSynchedWithTour) {
-			paintTour(fCurrentTourData, true);
+			paintTour(fTourData, true);
 		}
 	}
 
@@ -407,8 +567,12 @@ public class OSMView extends ViewPart {
 		fMap.queueRedraw();
 	}
 
-	void zoomShowAll() {
+	void zoomShowEntireMap() {
 		fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
 		fMap.queueRedraw();
+	}
+
+	void zoomShowEntireTour() {
+		paintEntireTour();
 	}
 }

@@ -32,11 +32,21 @@ public class Messages extends NLS {
 	public static String		image_action_zoom_show_all;
 	public static String		image_action_zoom_show_all_disabled;
 
+	public static String	image_action_zoom_show_entire_tour;
+
 	public static String		map_action_synch_with_tour;
 	public static String		map_action_zoom_centered;
 	public static String		map_action_zoom_in;
+
+	public static String	map_action_zoom_level_centered_tour;
+
+	public static String	map_action_zoom_level_default;
+
+	public static String	map_action_zoom_level_x_value;
 	public static String		map_action_zoom_out;
 	public static String		map_action_zoom_show_all;
+
+	public static String	map_action_zoom_show_entire_tour;
 
 	static {
 		// initialize resource bundle
