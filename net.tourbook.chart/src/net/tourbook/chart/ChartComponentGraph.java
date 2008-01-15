@@ -721,35 +721,41 @@ public class ChartComponentGraph extends Canvas {
 		if (xData == null) {
 			return;
 		}
+
 		final int[][] xValueSerie = xData.getHighValues();
 
 		if (xValueSerie.length == 0) {
-			// no data are available
+			// data are not available
 			return;
 		}
 
 		final int[] xValues = xValueSerie[0];
-		final int valuesLength = xValues.length;
-		final int maxIndex = Math.max(0, valuesLength - 1);
+		final int serieLength = xValues.length;
+		final int maxIndex = Math.max(0, serieLength - 1);
 
 		int valueIndex;
 		int xValue;
-		final int xAxisUnit = xData.getAxisUnit();
 
-		if (xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND) {
-
-			/*
-			 * For a linear x axis the slider value is also linear
-			 */
-
-			final float widthScale = (float) (maxIndex) / fDevVirtualGraphImageWidth;
-
-			// ensure the index is not out of bounds
-			valueIndex = (int) Math.max(0, Math.min(devXSliderLinePosition * widthScale, maxIndex));
-
-			xValue = xValues[valueIndex];
-
-		} else {
+		/*
+		 * disabled because gps data can have non-linear time, 15.01.2008 Wolfgang
+		 */
+//		final int xAxisUnit = xData.getAxisUnit();
+//
+//		if (xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND) {
+//
+//			/*
+//			 * For a linear x axis the slider value is also linear
+//			 */
+//
+//			final float widthScale = (float) (maxIndex) / fDevVirtualGraphImageWidth;
+//
+//			// ensure the index is not out of bounds
+//			valueIndex = (int) Math.max(0, Math.min(devXSliderLinePosition * widthScale, maxIndex));
+//
+//			xValue = xValues[valueIndex];
+//
+//		} else
+		{
 
 			/*
 			 * The non time value (distance) is not linear, the value is increasing steadily but
@@ -763,16 +769,17 @@ public class ChartComponentGraph extends Canvas {
 			final int valueRange = maxValue > 0 ? (maxValue - minValue) : -(minValue - maxValue);
 
 			final float posIndex = (float) devXSliderLinePosition / fDevVirtualGraphImageWidth;
+			valueIndex = (int) (posIndex * serieLength);
 
 			// enforce array bounds
-			valueIndex = (int) Math.min((posIndex * valuesLength), maxIndex);
-			valueIndex = Math.max(0, valueIndex);
+			valueIndex = Math.min(valueIndex, maxIndex);
+			valueIndex = Math.max(valueIndex, 0);
 
 			// sliderIndex points into the value array for the current slider
 			// position
 			xValue = xValues[valueIndex];
 
-			// sliderValue contains the value for the slider on the x-axis
+			// compute the value for the slider on the x-axis
 			final int sliderValue = (int) (posIndex * valueRange);
 
 			if (xValue == sliderValue) {
@@ -791,7 +798,7 @@ public class ChartComponentGraph extends Canvas {
 					xValue = xValues[valueIndex++];
 
 					// check if end of the x-data are reached
-					if (valueIndex == valuesLength) {
+					if (valueIndex == serieLength) {
 						break;
 					}
 				}
@@ -3667,8 +3674,9 @@ public class ChartComponentGraph extends Canvas {
 
 				// the graph can't be scrolled
 
-				moveXSlider(xSliderDragged,
-						(devXGraph - xSliderDragged.getDevXClickOffset() + ChartXSlider.halfSliderHitLineHeight));
+				moveXSlider(xSliderDragged, devXGraph
+						- xSliderDragged.getDevXClickOffset()
+						+ ChartXSlider.halfSliderHitLineHeight);
 
 				fIsSliderDirty = true;
 				isChartDirty = true;
