@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.mapping;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -68,12 +69,15 @@ public class Activator extends AbstractUIPlugin {
 
 	/**
 	 * Returns an image descriptor for images in the plug-in path.
-	 * 
-	 * @param path
-	 *        the path
-	 * @return the axisImage descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
+		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+
+	/**
+	 * Returns an image descriptor for images from the icon plug-in path.
+	 */
+	public static ImageDescriptor getIconImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
 	}
 

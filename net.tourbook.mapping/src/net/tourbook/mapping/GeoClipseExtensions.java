@@ -13,11 +13,8 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.mapping;
-
-import java.net.URL;
-
-import javax.imageio.ImageIO;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -34,7 +31,6 @@ import de.byteholder.geoclipse.map.EmptyTileFactory;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.geoclipse.swt.MapPainter;
-import de.byteholder.geoclipse.util.Images;
 import de.byteholder.gpx.GeoPosition;
 
 public class GeoClipseExtensions {
@@ -57,41 +53,33 @@ public class GeoClipseExtensions {
 		return fInstance;
 	}
 
-	private void makeErrorImage(Map map) {
+	private Image getImage(Map map, String imagePath, String messageText) {
+
+		int tileSize = map.getTileFactory().getTileSize();
+		Image image = null;
+
 		try {
-			URL url = this.getClass().getResource("mapviewer/resources/failed.png");
-			map.setFailedImage(new Image(Display.getCurrent(), url.openStream()));
-		} catch (Exception ex) {
-			int tileSize = map.getTileFactory().getTileSize();
-			map.setFailedImage(new Image(Display.getCurrent(), tileSize, tileSize));
-			GC gc = new GC(map.getFailedImage());
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-			gc.drawString("Failed!", 5, 5);
+
+			image = Activator.getImageDescriptor(imagePath).createImage(false);
+
+		} catch (Exception e) {}
+
+		if (image == null) {
+
+			image = new Image(Display.getCurrent(), tileSize, tileSize);
+
+			GC gc = new GC(image);
+			{
+				gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+				gc.drawString(messageText, 5, 5);
+			}
 			gc.dispose();
 		}
+
+		return image;
 	}
 
-	private void makeLoadingImage(Map map) {
-		try {
-			URL url = this.getClass().getResource("mapviewer/resources/loading.png");
-			map.setLoadingImage(ImageIO.read(url));
-		} catch (Exception ex) {
-			int tileSize = map.getTileFactory().getTileSize();
-
-			Image img = new Image(Display.getCurrent(), tileSize, tileSize);
-			GC gc = new GC(img);
-
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-			gc.drawString("Loading ...", 5, 5);
-			gc.dispose();
-
-			map.setLoadingImage(Images.convertToAWT(img.getImageData()));
-
-			img.dispose();
-		}
-	}
-
-	public void readExtensions(Map map) {
+	public void readMapExtensions(Map map) {
 
 		// read all registered Extensions here
 		// and TODO instantiate the one, the user configured to use
@@ -111,7 +99,6 @@ public class GeoClipseExtensions {
 			try {
 				o = element.createExecutableExtension("class");
 			} catch (CoreException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -132,18 +119,20 @@ public class GeoClipseExtensions {
 
 		// create the tile factory
 		if (tf != null) {
+
 			map.setTileFactory(tf);
 			map.setCenterPosition(startPosition);
 			map.setZoom(startZoom);
 
-			makeErrorImage(map);
-			makeLoadingImage(map);
+			map.setFailedImage(getImage(map, "mapviewer/resources/failed.png", "Failed!"));
+			map.setLoadingImage(getImage(map, "mapviewer/resources/loading.png", "Loading ..."));
 		}
 
 		registerOverlays(map);
 	}
 
 	private void registerOverlays(Map map) {
+
 		IExtensionRegistry registry = RegistryFactory.getRegistry();
 		IExtensionPoint point = registry.getExtensionPoint("de.byteholder.geoclipse.mapOverlay");
 		IExtension[] extensions = point.getExtensions();
@@ -157,7 +146,6 @@ public class GeoClipseExtensions {
 			try {
 				o = element.createExecutableExtension("class");
 			} catch (CoreException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 

@@ -29,8 +29,8 @@ public class ActionSynchWithTour extends Action {
 
 		setToolTipText(Messages.map_action_synch_with_tour);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.image_action_synch_with_tour));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.image_action_synch_with_tour_disabled));
+		setImageDescriptor(Activator.getIconImageDescriptor(Messages.image_action_synch_with_tour));
+		setDisabledImageDescriptor(Activator.getIconImageDescriptor(Messages.image_action_synch_with_tour_disabled));
 	}
 
 	@Override

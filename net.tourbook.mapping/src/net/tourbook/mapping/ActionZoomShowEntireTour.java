@@ -29,7 +29,7 @@ public class ActionZoomShowEntireTour extends Action {
 		fMapView = mapView;
 
 		setToolTipText(Messages.map_action_zoom_show_entire_tour);
-		setImageDescriptor(Activator.getImageDescriptor(Messages.image_action_zoom_show_entire_tour));
+		setImageDescriptor(Activator.getIconImageDescriptor(Messages.image_action_zoom_show_entire_tour));
 	}
 
 	@Override

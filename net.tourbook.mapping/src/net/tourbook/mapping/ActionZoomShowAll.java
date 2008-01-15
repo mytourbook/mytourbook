@@ -29,8 +29,8 @@ public class ActionZoomShowAll extends Action {
 
 		setToolTipText(Messages.map_action_zoom_show_all);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.image_action_zoom_show_all));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.image_action_zoom_show_all_disabled));
+		setImageDescriptor(Activator.getIconImageDescriptor(Messages.image_action_zoom_show_all));
+		setDisabledImageDescriptor(Activator.getIconImageDescriptor(Messages.image_action_zoom_show_all_disabled));
 	}
 
 	@Override

@@ -29,7 +29,7 @@ public class ActionZoomCentered extends Action {
 
 		setToolTipText(Messages.map_action_zoom_centered);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.image_action_zoom_centered));
+		setImageDescriptor(Activator.getIconImageDescriptor(Messages.image_action_zoom_centered));
 	}
 
 	@Override

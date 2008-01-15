@@ -188,7 +188,8 @@ public class OSMView extends ViewPart {
 
 		fMap = new Map(parent);
 
-		GeoClipseExtensions.getInstance().readExtensions(fMap);
+		GeoClipseExtensions.getInstance().readMapExtensions(fMap);
+//		fMap.setDrawTileBorders(true);
 
 		createActions();
 

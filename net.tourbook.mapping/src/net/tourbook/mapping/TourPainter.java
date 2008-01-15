@@ -13,21 +13,19 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.mapping;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.imageio.ImageIO;
 
 import net.tourbook.data.TourData;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
+
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.geoclipse.swt.MapPainter;
@@ -38,20 +36,22 @@ import de.byteholder.gpx.GeoPosition;
  */
 public class TourPainter extends MapPainter {
 
-	private static final String	IMAGE_PATH			= "icons/";				//$NON-NLS-1$
-
 	private static final String	IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
 	private static final String	IMAGE_END_MARKER	= "map-marker-end.png";	//$NON-NLS-1$
 
-	private BufferedImage		fImageStartMarker;
-	private BufferedImage		fImageEndMarker;
+	private Image				fImageStartMarker;
+	private Image				fImageEndMarker;
 
 	public TourPainter() {
+
 		super();
+
+		getImage(fImageStartMarker, IMAGE_START_MARKER);
+		getImage(fImageEndMarker, IMAGE_END_MARKER);
 	}
 
 	@Override
-	protected void doPaint(Graphics2D g2d, final Map map) {
+	protected void doPaint(GC gc, Map map) {
 
 		final TourData tourData = PaintManager.getInstance().getTourData();
 
@@ -62,28 +62,25 @@ public class TourPainter extends MapPainter {
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 
-		g2d = (Graphics2D) g2d.create();
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		drawTour(gc, map, latitudeSerie, longitudeSerie);
 
-		drawTour(g2d, map, latitudeSerie, longitudeSerie);
-
-		drawMarker(g2d,
+		drawMarker(gc,
 				map,
 				latitudeSerie[latitudeSerie.length - 1],
 				longitudeSerie[longitudeSerie.length - 1],
-				getImage(fImageEndMarker, IMAGE_END_MARKER));
-		drawMarker(g2d, map, latitudeSerie[0], longitudeSerie[0], getImage(fImageStartMarker, IMAGE_START_MARKER));
+				fImageEndMarker);
 
-		g2d.dispose();
+		drawMarker(gc, map, latitudeSerie[0], longitudeSerie[0], fImageStartMarker);
+
 	}
 
-	private void drawMarker(Graphics2D g2d, Map map, double latitude, double longitude, BufferedImage bufferedImage) {
+	private void drawMarker(GC gc, Map map, double latitude, double longitude, Image markerImage) {
 
-		if (bufferedImage == null) {
+		if (markerImage == null) {
 			return;
 		}
 
-		Rectangle viewport = map.getViewport();
+		java.awt.Rectangle viewport = map.getViewport();
 		TileFactory tileFactory = map.getTileFactory();
 
 		Point position = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), map.getZoom());
@@ -92,21 +89,17 @@ public class TourPainter extends MapPainter {
 
 			position = map.getRelativePixel(position);
 
-			final int imageWidth = bufferedImage.getWidth();
-			final int imageHeight = bufferedImage.getHeight();
+			final Rectangle bounds = markerImage.getBounds();
+			final int imageWidth = bounds.width;
+			final int imageHeight = bounds.height;
 
-			g2d.drawImage(bufferedImage,
-					position.x - imageWidth / 2,
-					position.y - imageHeight,
-					imageWidth,
-					imageHeight,
-					null);
+			gc.drawImage(markerImage, position.x - imageWidth / 2, position.y - imageHeight);
 		}
 	}
 
-	private void drawTour(Graphics2D g2d, final Map map, final double[] latitudeSerie, final double[] longitudeSerie) {
+	private void drawTour(GC gc, final Map map, final double[] latitudeSerie, final double[] longitudeSerie) {
 
-		Rectangle viewport = map.getViewport();
+		java.awt.Rectangle viewport = map.getViewport();
 		TileFactory tileFactory = map.getTileFactory();
 
 		int leftSliderIndex = PaintManager.getInstance().getLeftSliderValueIndex();
@@ -123,51 +116,61 @@ public class TourPainter extends MapPainter {
 				pixel = map.getRelativePixel(pixel);
 
 				if (serieIndex < leftSliderIndex || serieIndex > rightSliderIndex) {
-					g2d.setColor(Color.BLUE);
+					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 				} else {
-					g2d.setColor(Color.RED);
+					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 				}
 
 //				g2d.setClip(pixel.x - 2, pixel.y - 2, 4, 4);
-				g2d.fillOval(pixel.x - 2, pixel.y - 2, 4, 4);
-
-//				g2d.setClip(pixel.x - 1, pixel.y - 1, 2, 2);
-//				g2d.fillOval(pixel.x - 1, pixel.y - 1, 2, 2);
+				gc.fillOval(pixel.x - 2, pixel.y - 2, 4, 4);
 			}
 		}
 	}
 
-	private BufferedImage getImage(BufferedImage bufferedImage, String imagePath) {
+	private Image getImage(Image image, String imagePath) {
 
-		if (bufferedImage != null) {
-			return bufferedImage;
+		if (image != null) {
+			return image;
 		}
 
-		return bufferedImage = loadImage(IMAGE_PATH + imagePath);
+		return image = Activator.getIconImageDescriptor(imagePath).createImage();
 	}
 
-	/**
-	 * Load image resouce
-	 * 
-	 * @param imagePath
-	 * @return Returns loaded image
-	 */
-	private BufferedImage loadImage(String imagePath) {
+	@Override
+	protected void dispose() {
 
-		try {
-			if (this.getClass().getResource("/" + imagePath) != null) { //$NON-NLS-1$
-				//when its inside a jar, does this
-				InputStream imageStream = this.getClass().getResourceAsStream("/" + imagePath); //$NON-NLS-1$
-				return ImageIO.read(imageStream);
-			} else {
-				//when its running from eclipse, does this
-				return ImageIO.read(new File(imagePath));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (fImageStartMarker != null && !fImageStartMarker.isDisposed()) {
+			fImageStartMarker.dispose();
 		}
-
-		return null;
+		if (fImageEndMarker != null && !fImageEndMarker.isDisposed()) {
+			fImageEndMarker.dispose();
+		}
 	}
+
+//	/**
+//	 * Load image resouce from jar or plugin
+//	 * 
+//	 * @param imagePath
+//	 * @return Returns loaded image
+//	 */
+//	private BufferedImage loadImage(String imagePath) {
+//		
+//		try {
+//			if (this.getClass().getResource("/" + imagePath) != null) { //$NON-NLS-1$
+//				//when its inside a jar, does this
+//				InputStream imageStream = this.getClass().getResourceAsStream("/" + imagePath); //$NON-NLS-1$
+//				return ImageIO.read(imageStream);
+//			} else {
+//				//when its running from eclipse, does this
+//				return ImageIO.read(new File(imagePath));
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return null;
+//	}
 
 }
