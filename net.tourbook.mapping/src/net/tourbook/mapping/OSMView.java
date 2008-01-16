@@ -33,9 +33,12 @@ import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
@@ -71,6 +74,7 @@ public class OSMView extends ViewPart {
 	private Map							fMap;
 
 	private ISelectionListener			fPostSelectionListener;
+	private IPropertyChangeListener		fPrefChangeListener;
 	private IPartListener2				fPartListener;
 
 	private TourData					fTourData;
@@ -91,6 +95,7 @@ public class OSMView extends ViewPart {
 	public OSMView() {}
 
 	private void addPartListener() {
+
 		fPartListener = new IPartListener2() {
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
@@ -117,6 +122,30 @@ public class OSMView extends ViewPart {
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(fPartListener);
+	}
+
+	private void addPrefListener() {
+
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(IMappingPreferences.SHOW_TILE_INFO)) {
+
+					// map properties has changed
+
+					IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+
+					boolean isShowTileInfo = store.getBoolean(IMappingPreferences.SHOW_TILE_INFO);
+
+					fMap.setDrawTileBorders(isShowTileInfo);
+					fMap.queueRedraw();
+
+				}
+			}
+		};
+		Activator.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	/**
@@ -189,14 +218,14 @@ public class OSMView extends ViewPart {
 		fMap = new Map(parent);
 
 		GeoClipseExtensions.getInstance().readMapExtensions(fMap);
-//		fMap.setDrawTileBorders(true);
 
 		createActions();
 
 		addPartListener();
+		addPrefListener();
 		addSelectionListener();
 
-		restoreState(fSessionMemento);
+		restoreSettings();
 
 		// show map from last selection
 		onChangeSelection(getSite().getWorkbenchWindow().getSelectionService().getSelection());
@@ -425,7 +454,9 @@ public class OSMView extends ViewPart {
 		fMap.queueRedraw();
 	}
 
-	private void restoreState(final IMemento memento) {
+	private void restoreSettings() {
+
+		IMemento memento = fSessionMemento;
 
 		if (memento != null) {
 
@@ -450,6 +481,13 @@ public class OSMView extends ViewPart {
 				fActionSynchTourZoomLevel.setZoomLevel(zoomLevel);
 			}
 		}
+
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+
+		boolean isShowTileInfo = store.getBoolean(IMappingPreferences.SHOW_TILE_INFO);
+
+		fMap.setDrawTileBorders(isShowTileInfo);
+
 	}
 
 	private void saveSettings() {

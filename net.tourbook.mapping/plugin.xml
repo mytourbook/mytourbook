@@ -3,6 +3,10 @@
 <plugin>
    <extension
          point="org.eclipse.ui.views">
+      <category
+            id="net.tourbook.category.tourMaps"
+            name="%view_category_tour_map">
+      </category>
       <view
             category="net.tourbook.category.tourMaps"
             class="net.tourbook.mapping.OSMView"
@@ -10,10 +14,13 @@
             id="net.tourbook.mapping.OSMViewID"
             name="%command_tour_map_name" >
       </view>
-      <category
-            id="net.tourbook.category.tourMaps"
-            name="%view_category_tour_map">
-      </category>
+      <view
+            category="net.tourbook.category.tourMaps"
+            class="net.tourbook.mapping.TourMapPropertyView"
+            icon="icons/tour-map-properties.gif"
+            id="net.tourbook.mapping.TourMapPropertyView"
+            name="%command_view_tour_properties_name">
+      </view>
    </extension>
    <extension
          point="de.byteholder.geoclipse.mapOverlay">
@@ -47,6 +54,14 @@
             id="net.tourbook.mapping.command.tourMap"
             name="%command_tour_map_name">
       </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="net.tourbook.mapping.PrefPageCache"
+            id="net.tourbook.mapping.PrefPageCache"
+            name="%pref_page_cache">
+      </page>
    </extension>
 
 

@@ -48,6 +48,22 @@ public class Messages extends NLS {
 
 	public static String	map_action_zoom_show_entire_tour;
 
+	public static String	map_properties_show_tile_info;
+
+	public static String	map_properties_show_tile_info_no;
+
+	public static String	map_properties_show_tile_info_yes;
+
+	public static String	pref_cache_location;
+
+	public static String	pref_cache_location_default;
+
+	public static String	pref_cache_location_selected_path;
+
+	public static String	pref_cache_selected_location;
+
+	public static String	pref_cache_use_offline_cache;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
