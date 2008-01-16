@@ -432,7 +432,7 @@ public class TourMarkerView extends ViewPart {
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void fillContextMenu(IMenuManager menuMgr) {
 
 		// add standard group which allows other plug-ins to contribute here
@@ -446,7 +446,14 @@ public class TourMarkerView extends ViewPart {
 
 		// a chart must be available
 		if (fTourChart == null) {
-			return;
+
+			TourChart tourChart = TourManager.getInstance().getActiveTourChart();
+
+			if (tourChart == null || tourChart.isDisposed()) {
+				return;
+			} else {
+				fTourChart = tourChart;
+			}
 		}
 
 		Object[] segments = selection.toArray();
