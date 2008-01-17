@@ -10,7 +10,8 @@ Require-Bundle: net.tourbook,
  net.tourbook.chart,
  org.eclipse.ui,
  org.eclipse.core.runtime,
- de.byteholder.geoclipse,
- de.byteholder.geoclipse.libraries,
- de.byteholder.geoclipse.tilefactory.osm
+ de.byteholder.geoclipse.poi
 Eclipse-LazyStart: true
+Import-Package: de.byteholder.geoclipse.map,
+ de.byteholder.geoclipse.swt,
+ de.byteholder.gpx

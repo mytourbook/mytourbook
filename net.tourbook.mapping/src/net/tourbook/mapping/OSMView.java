@@ -54,6 +54,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
+import de.byteholder.geoclipse.poi.PointOfInterest;
 import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.gpx.GeoPosition;
 
@@ -351,7 +352,16 @@ public class OSMView extends ViewPart {
 					: rightSliderValueIndex;
 
 			paintTour(tourData, leftSliderValueIndex, rightSliderValueIndex);
+
+		} else if (selection instanceof PointOfInterest) {
+
+			PointOfInterest poi = (PointOfInterest) selection;
+
+			fMap.setZoom(poi.getRecommendedZoom());
+			fMap.setCenterPosition(poi.getPosition());
+			fMap.queueRedraw();
 		}
+
 	}
 
 	private void paintTour(final TourData tourData, boolean forceRedraw) {
