@@ -16,14 +16,38 @@
 
 package net.tourbook.mapping;
 
-public interface IMappingPreferences {
+import java.util.List;
 
-	final String	SHOW_TILE_INFO						= "show.tile-info";
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
 
-	final String	OFFLINE_CACH_IS_USED				= "offLineCache.isUsed";
-	final String	OFFLINE_CACH_USE_SELECTED_LOCATION	= "offLineCache.useSelectedLocation";
-	final String	OFFLINE_CACHE_PATH					= "offLineCache.path";
+import de.byteholder.geoclipse.map.TileFactory;
 
-	final String	OFFLINE_CACHE_PERIOD_OF_VALIDITY	= "offLineCache.periodOfValidit";
+public class ActionChangeTileFactory extends Action {
 
+	private static int	fFactoryCounter	= 0;
+
+	private OSMView		fMapView;
+
+	public ActionChangeTileFactory(OSMView mapView) {
+
+		super(null, AS_PUSH_BUTTON);
+
+		fMapView = mapView;
+
+		setToolTipText(Messages.map_action_change_tile_factory_tooltip);
+		setImageDescriptor(Activator.getIconImageDescriptor(Messages.image_action_change_tile_factory));
+	}
+
+	@Override
+	public void run() {
+
+		final List<TileFactory> mapFactories = fMapView.getFactories();
+
+		TileFactory factory = mapFactories.get(fFactoryCounter++ % mapFactories.size());
+		fMapView.getMap().setTileFactory(factory);
+	}
+
+	public void selectionChanged(IAction action, ISelection selection) {}
 }

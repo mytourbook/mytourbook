@@ -20,6 +20,7 @@ import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.chart.ChartDataModel;
@@ -52,11 +53,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
+import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
-import de.byteholder.geoclipse.poi.PointOfInterest;
 import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.gpx.GeoPosition;
+import de.byteholder.gpx.ext.PointOfInterest;
 
 /**
  * @author Wolfgang Schramm
@@ -88,10 +90,13 @@ public class OSMView extends ViewPart {
 	private ActionZoomShowEntireTour	fActionZoomShowEntireTour;
 	private ActionSynchWithTour			fActionSynchWithTour;
 	private ActionSynchTourZoomLevel	fActionSynchTourZoomLevel;
+	private ActionChangeTileFactory		fActionChangeTileFactory;
 
 	private boolean						fIsMapSynchedWithTour;
 
 	private boolean						fIsTourCentered;
+
+	private List<TileFactory>			fTileFactories;
 
 	public OSMView() {}
 
@@ -180,6 +185,28 @@ public class OSMView extends ViewPart {
 		}
 	}
 
+	/**
+	 * Checks if {@link TourData} can be painted
+	 * 
+	 * @param tourData
+	 * @return <code>true</code> when the {@link TourData} can be painted
+	 */
+	private boolean checkPaintData(final TourData tourData) {
+
+		if (tourData == null) {
+			return false;
+		}
+
+		// check if coordinates are available
+		final double[] longitudeSerie = tourData.longitudeSerie;
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		if (longitudeSerie == null || longitudeSerie.length == 0 || latitudeSerie == null || latitudeSerie.length == 0) {
+			return false;
+		}
+
+		return true;
+	}
+
 	private void createActions() {
 
 		fActionZoomIn = new ActionZoomIn(this);
@@ -189,6 +216,7 @@ public class OSMView extends ViewPart {
 		fActionZoomShowEntireTour = new ActionZoomShowEntireTour(this);
 		fActionSynchWithTour = new ActionSynchWithTour(this);
 		fActionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
+		fActionChangeTileFactory = new ActionChangeTileFactory(this);
 
 		/*
 		 * fill view toolbar
@@ -203,6 +231,8 @@ public class OSMView extends ViewPart {
 		viewTbm.add(fActionZoomCentered);
 		viewTbm.add(fActionZoomIn);
 		viewTbm.add(fActionZoomOut);
+		viewTbm.add(new Separator());
+		viewTbm.add(fActionChangeTileFactory);
 
 		/*
 		 * fill view menu
@@ -217,8 +247,9 @@ public class OSMView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 
 		fMap = new Map(parent);
+		fTileFactories = GeoclipseExtensions.getInstance().readExtensions(fMap);
 
-		GeoClipseExtensions.getInstance().readMapExtensions(fMap);
+		GeoclipseExtensions.getInstance().readExtensions(fMap);
 
 		createActions();
 
@@ -239,6 +270,14 @@ public class OSMView extends ViewPart {
 		getViewSite().getPage().removePartListener(fPartListener);
 
 		super.dispose();
+	}
+
+	public List<TileFactory> getFactories() {
+		return fTileFactories;
+	}
+
+	public Map getMap() {
+		return fMap;
 	}
 
 	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final int zoom) {
@@ -364,6 +403,25 @@ public class OSMView extends ViewPart {
 
 	}
 
+	private void paintEntireTour() {
+
+		if (checkPaintData(fTourData) == false) {
+			return;
+		}
+
+		final PaintManager paintManager = PaintManager.getInstance();
+		paintManager.setTourData(fTourData);
+
+		// set initial slider position
+		paintManager.setSliderValueIndex(0, fTourData.longitudeSerie.length - 1);
+
+		final Set<GeoPosition> tourBounds = getTourBounds(fTourData);
+		paintManager.setTourBounds(tourBounds);
+
+		setTourZoomLevel(tourBounds, false);
+		fMap.queueRedraw();
+	}
+
 	private void paintTour(final TourData tourData, boolean forceRedraw) {
 
 		if (checkPaintData(tourData) == false) {
@@ -413,47 +471,6 @@ public class OSMView extends ViewPart {
 		}
 
 		fMap.queueRedraw();
-	}
-
-	private void paintEntireTour() {
-
-		if (checkPaintData(fTourData) == false) {
-			return;
-		}
-
-		final PaintManager paintManager = PaintManager.getInstance();
-		paintManager.setTourData(fTourData);
-
-		// set initial slider position
-		paintManager.setSliderValueIndex(0, fTourData.longitudeSerie.length - 1);
-
-		final Set<GeoPosition> tourBounds = getTourBounds(fTourData);
-		paintManager.setTourBounds(tourBounds);
-
-		setTourZoomLevel(tourBounds, false);
-		fMap.queueRedraw();
-	}
-
-	/**
-	 * Checks if {@link TourData} can be painted
-	 * 
-	 * @param tourData
-	 * @return <code>true</code> when the {@link TourData} can be painted
-	 */
-	private boolean checkPaintData(final TourData tourData) {
-
-		if (tourData == null) {
-			return false;
-		}
-
-		// check if coordinates are available
-		final double[] longitudeSerie = tourData.longitudeSerie;
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		if (longitudeSerie == null || longitudeSerie.length == 0 || latitudeSerie == null || latitudeSerie.length == 0) {
-			return false;
-		}
-
-		return true;
 	}
 
 	private void paintTour(final TourData tourData, final int leftSliderValuesIndex, final int rightSliderValuesIndex) {

@@ -16,14 +16,23 @@
 
 package net.tourbook.mapping;
 
-public interface IMappingPreferences {
+import net.tourbook.plugin.TourbookPlugin;
 
-	final String	SHOW_TILE_INFO						= "show.tile-info";
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
 
-	final String	OFFLINE_CACH_IS_USED				= "offLineCache.isUsed";
-	final String	OFFLINE_CACH_USE_SELECTED_LOCATION	= "offLineCache.useSelectedLocation";
-	final String	OFFLINE_CACHE_PATH					= "offLineCache.path";
+/**
+ * Initialize preferences for the mapping plugin
+ */
+public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-	final String	OFFLINE_CACHE_PERIOD_OF_VALIDITY	= "offLineCache.periodOfValidit";
+	@Override
+	public void initializeDefaultPreferences() {
 
+		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+
+		store.setDefault(IMappingPreferences.OFFLINE_CACH_IS_USED, false);
+		store.setDefault(IMappingPreferences.OFFLINE_CACH_USE_SELECTED_LOCATION, false);
+
+	}
 }

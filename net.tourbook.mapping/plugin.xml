@@ -63,6 +63,12 @@
             name="%pref_page_cache">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.tourbook.mapping.PreferenceInitializer">
+      </initializer>
+   </extension>
 
 
 </plugin>

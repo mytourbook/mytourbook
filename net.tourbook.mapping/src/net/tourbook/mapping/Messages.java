@@ -22,6 +22,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.mapping.messages";	//$NON-NLS-1$
 
+	public static String	image_action_change_tile_factory;
+
 	public static String		image_action_synch_with_tour;
 	public static String		image_action_synch_with_tour_disabled;
 	public static String		image_action_zoom_centered;
@@ -33,6 +35,8 @@ public class Messages extends NLS {
 	public static String		image_action_zoom_show_all_disabled;
 
 	public static String	image_action_zoom_show_entire_tour;
+
+	public static String	map_action_change_tile_factory_tooltip;
 
 	public static String		map_action_synch_with_tour;
 	public static String		map_action_zoom_centered;
@@ -54,11 +58,17 @@ public class Messages extends NLS {
 
 	public static String	map_properties_show_tile_info_yes;
 
+	public static String	pref_cache_clear_cache;
+
 	public static String	pref_cache_location;
 
 	public static String	pref_cache_location_default;
 
 	public static String	pref_cache_location_selected_path;
+
+	public static String	pref_cache_period_of_validity;
+
+	public static String	pref_cache_period_of_validity_tooltip;
 
 	public static String	pref_cache_selected_location;
 
