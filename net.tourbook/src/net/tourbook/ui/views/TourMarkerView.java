@@ -94,8 +94,8 @@ public class TourMarkerView extends ViewPart {
 	private TourData				fTourData;
 
 	private ISelectionListener		fPostSelectionListener;
-	private PostSelectionProvider	fPostSelectionProvider;
 	private IPropertyChangeListener	fPrefChangeListener;
+	private PostSelectionProvider	fPostSelectionProvider;
 
 	private final NumberFormat		fNF						= NumberFormat.getNumberInstance();
 
