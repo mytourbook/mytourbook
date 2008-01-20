@@ -72,6 +72,8 @@ public class OSMView extends ViewPart {
 	private static final String			MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "osmview.synch-with-selected-tour";
 	private static final String			MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "osmview.synch-tour-zoom-level";
 
+	final static String					SHOW_TILE_INFO						= "show.tile-info";
+
 	private static IMemento				fSessionMemento;
 
 	private Map							fMap;
@@ -137,13 +139,13 @@ public class OSMView extends ViewPart {
 
 				final String property = event.getProperty();
 
-				if (property.equals(IMappingPreferences.SHOW_TILE_INFO)) {
+				if (property.equals(SHOW_TILE_INFO)) {
 
 					// map properties has changed
 
 					IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
-					boolean isShowTileInfo = store.getBoolean(IMappingPreferences.SHOW_TILE_INFO);
+					boolean isShowTileInfo = store.getBoolean(SHOW_TILE_INFO);
 
 					fMap.setDrawTileBorders(isShowTileInfo);
 					fMap.queueRedraw();
@@ -176,7 +178,12 @@ public class OSMView extends ViewPart {
 
 			final int zoom = fMap.getZoom();
 
-			final Rectangle2D positionRect = getPositionRect(PaintManager.getInstance().getTourBounds(), zoom);
+			final Set<GeoPosition> tourBounds = PaintManager.getInstance().getTourBounds();
+			if (tourBounds == null) {
+				return;
+			}
+
+			final Rectangle2D positionRect = getPositionRect(tourBounds, zoom);
 			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
 			final GeoPosition px = fMap.getTileFactory().pixelToGeo(center, zoom);
@@ -265,6 +272,11 @@ public class OSMView extends ViewPart {
 
 	@Override
 	public void dispose() {
+
+		// dispose tilefactory resources
+		for (TileFactory tileFactory : fTileFactories) {
+			tileFactory.dispose();
+		}
 
 		getViewSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
@@ -511,7 +523,7 @@ public class OSMView extends ViewPart {
 
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
-		boolean isShowTileInfo = store.getBoolean(IMappingPreferences.SHOW_TILE_INFO);
+		boolean isShowTileInfo = store.getBoolean(OSMView.SHOW_TILE_INFO);
 
 		fMap.setDrawTileBorders(isShowTileInfo);
 

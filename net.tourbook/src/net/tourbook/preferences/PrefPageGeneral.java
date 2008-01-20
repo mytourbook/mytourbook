@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.preferences;
 
 import net.tourbook.Messages;
@@ -29,21 +30,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-//	@Override
-//	protected Control createContents(Composite parent) {
-//
-//		Control container = createUI(parent);
-//
-//		return container;
-//	}
-//
-//	private Control createUI(Composite parent) {
-//
-//		Control container = super.createContents(parent);
-//
-//		return container;
-//	}
-
 	public void init(IWorkbench workbench) {
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
@@ -52,11 +38,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	protected void createFieldEditors() {
 
 		final Composite parent = getFieldEditorParent();
-//
-//		Group group = new Group(parent, SWT.NONE);
-//		group.setText(Messages.Pref_general_system_of_measurement);
-////		GridLayoutFactory.fillDefaults().applyTo(group);
-//		GridDataFactory.fillDefaults().applyTo(group);
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_general_system_measurement);
@@ -113,7 +94,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		if (isOK) {
 			// fire one event for all modified measurement values
-			/* TourbookPlugin.getDefault(). */
 			getPreferenceStore().setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
 		}
 

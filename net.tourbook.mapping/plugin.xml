@@ -55,20 +55,7 @@
             name="%command_tour_map_name">
       </command>
    </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="net.tourbook.mapping.PrefPageCache"
-            id="net.tourbook.mapping.PrefPageCache"
-            name="%pref_page_cache">
-      </page>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="net.tourbook.mapping.PreferenceInitializer">
-      </initializer>
-   </extension>
+ 
 
 
 </plugin>

@@ -60,6 +60,9 @@ public class PaintManager {
 		return fSynchTourToomLevel;
 	}
 
+	/**
+	 * @return Returns the tour bounds or <code>null</code> when a tour is not set
+	 */
 	public Set<GeoPosition> getTourBounds() {
 		return fTourBounds;
 	}

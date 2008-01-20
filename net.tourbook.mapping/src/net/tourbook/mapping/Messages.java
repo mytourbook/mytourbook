@@ -22,8 +22,7 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.mapping.messages";	//$NON-NLS-1$
 
-	public static String	image_action_change_tile_factory;
-
+	public static String		image_action_change_tile_factory;
 	public static String		image_action_synch_with_tour;
 	public static String		image_action_synch_with_tour_disabled;
 	public static String		image_action_zoom_centered;
@@ -33,46 +32,22 @@ public class Messages extends NLS {
 	public static String		image_action_zoom_out_disabled;
 	public static String		image_action_zoom_show_all;
 	public static String		image_action_zoom_show_all_disabled;
+	public static String		image_action_zoom_show_entire_tour;
 
-	public static String	image_action_zoom_show_entire_tour;
-
-	public static String	map_action_change_tile_factory_tooltip;
-
+	public static String		map_action_change_tile_factory_tooltip;
 	public static String		map_action_synch_with_tour;
 	public static String		map_action_zoom_centered;
 	public static String		map_action_zoom_in;
-
-	public static String	map_action_zoom_level_centered_tour;
-
-	public static String	map_action_zoom_level_default;
-
-	public static String	map_action_zoom_level_x_value;
+	public static String		map_action_zoom_level_centered_tour;
+	public static String		map_action_zoom_level_default;
+	public static String		map_action_zoom_level_x_value;
 	public static String		map_action_zoom_out;
 	public static String		map_action_zoom_show_all;
+	public static String		map_action_zoom_show_entire_tour;
 
-	public static String	map_action_zoom_show_entire_tour;
-
-	public static String	map_properties_show_tile_info;
-
-	public static String	map_properties_show_tile_info_no;
-
-	public static String	map_properties_show_tile_info_yes;
-
-	public static String	pref_cache_clear_cache;
-
-	public static String	pref_cache_location;
-
-	public static String	pref_cache_location_default;
-
-	public static String	pref_cache_location_selected_path;
-
-	public static String	pref_cache_period_of_validity;
-
-	public static String	pref_cache_period_of_validity_tooltip;
-
-	public static String	pref_cache_selected_location;
-
-	public static String	pref_cache_use_offline_cache;
+	public static String		map_properties_show_tile_info;
+	public static String		map_properties_show_tile_info_no;
+	public static String		map_properties_show_tile_info_yes;
 
 	static {
 		// initialize resource bundle
