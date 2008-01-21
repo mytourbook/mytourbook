@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: OpenStreetMap
+Bundle-Name: Tour Mapping
 Bundle-SymbolicName: net.tourbook.mapping;singleton:=true
 Bundle-Version: 1.3.0.v2008
 Bundle-Activator: net.tourbook.mapping.Activator
