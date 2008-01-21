@@ -64,13 +64,18 @@ import de.byteholder.gpx.ext.PointOfInterest;
  * @author Wolfgang Schramm
  * @since 1.3
  */
-public class OSMView extends ViewPart {
+public class MappingView extends ViewPart {
 
-	final public static String			ID									= "net.tourbook.mapping.OSMViewID";	//$NON-NLS-1$
+	final public static String			ID									= "net.tourbook.mapping.mappingViewID";		//$NON-NLS-1$
 
-	private static final String			MEMENTO_ZOOM_CENTERED				= "osmview.zoom-centered";
-	private static final String			MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "osmview.synch-with-selected-tour";
-	private static final String			MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "osmview.synch-tour-zoom-level";
+	private static final String			MEMENTO_ZOOM_CENTERED				= "mapping.view.zoom-centered";
+	private static final String			MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "mapping.view.synch-with-selected-tour";
+	private static final String			MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "mapping.view.synch-tour-zoom-level";
+	private static final String			MEMENTO_CURRENT_FACTORY_ID			= "mapping.view.current.factory-id";
+
+	private static final String			MEMENTO_DEFAULT_POSITION_ZOOM		= "mapping.view.default.position.zoom-level";
+	private static final String			MEMENTO_DEFAULT_POSITION_LATITUDE	= "mapping.view.default.position.latitude";
+	private static final String			MEMENTO_DEFAULT_POSITION_LONGITUDE	= "mapping.view.default.position.longitude";
 
 	final static String					SHOW_TILE_INFO						= "show.tile-info";
 
@@ -93,6 +98,8 @@ public class OSMView extends ViewPart {
 	private ActionSynchWithTour			fActionSynchWithTour;
 	private ActionSynchTourZoomLevel	fActionSynchTourZoomLevel;
 	private ActionChangeTileFactory		fActionChangeTileFactory;
+	private ActionSaveDefaultPosition	fActionSaveDefaultPosition;
+	private ActionSetDefaultPosition	fActionSetDefaultPosition;
 
 	private boolean						fIsMapSynchedWithTour;
 
@@ -100,7 +107,10 @@ public class OSMView extends ViewPart {
 
 	private List<TileFactory>			fTileFactories;
 
-	public OSMView() {}
+	private int							fDefaultZoom;
+	private GeoPosition					fDefaultPosition					= null;
+
+	public MappingView() {}
 
 	private void addPartListener() {
 
@@ -186,9 +196,9 @@ public class OSMView extends ViewPart {
 			final Rectangle2D positionRect = getPositionRect(tourBounds, zoom);
 			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
-			final GeoPosition px = fMap.getTileFactory().pixelToGeo(center, zoom);
+			final GeoPosition geoPosition = fMap.getTileFactory().pixelToGeo(center, zoom);
 
-			fMap.setCenterPosition(px);
+			fMap.setCenterPosition(geoPosition);
 		}
 	}
 
@@ -224,6 +234,8 @@ public class OSMView extends ViewPart {
 		fActionSynchWithTour = new ActionSynchWithTour(this);
 		fActionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
 		fActionChangeTileFactory = new ActionChangeTileFactory(this);
+		fActionSetDefaultPosition = new ActionSetDefaultPosition(this);
+		fActionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
 
 		/*
 		 * fill view toolbar
@@ -246,6 +258,9 @@ public class OSMView extends ViewPart {
 		 */
 		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
+		menuMgr.add(fActionSetDefaultPosition);
+		menuMgr.add(fActionSaveDefaultPosition);
+		menuMgr.add(new Separator());
 		menuMgr.add(fActionSynchTourZoomLevel);
 
 	}
@@ -255,8 +270,6 @@ public class OSMView extends ViewPart {
 
 		fMap = new Map(parent);
 		fTileFactories = GeoclipseExtensions.getInstance().readExtensions(fMap);
-
-		GeoclipseExtensions.getInstance().readExtensions(fMap);
 
 		createActions();
 
@@ -519,14 +532,39 @@ public class OSMView extends ViewPart {
 			if (zoomLevel != null) {
 				fActionSynchTourZoomLevel.setZoomLevel(zoomLevel);
 			}
+
+			// restore: factory ID
+			fActionChangeTileFactory.setSelectedFactory(memento.getString(MEMENTO_CURRENT_FACTORY_ID));
+
+			// restore: default position
+			Integer mementoZoom = memento.getInteger(MEMENTO_DEFAULT_POSITION_ZOOM);
+			if (mementoZoom != null) {
+				fDefaultZoom = mementoZoom;
+			}
+			Float mementoLatitude = memento.getFloat(MEMENTO_DEFAULT_POSITION_LATITUDE);
+			Float mementoLongitude = memento.getFloat(MEMENTO_DEFAULT_POSITION_LONGITUDE);
+			if (mementoLatitude != null && mementoLongitude != null) {
+				fDefaultPosition = new GeoPosition(mementoLatitude, mementoLongitude);
+			} else {
+				fDefaultPosition = new GeoPosition(0, 0);
+			}
+
+		} else {
+			fActionChangeTileFactory.setSelectedFactory(null);
 		}
 
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
-		boolean isShowTileInfo = store.getBoolean(OSMView.SHOW_TILE_INFO);
+		boolean isShowTileInfo = store.getBoolean(MappingView.SHOW_TILE_INFO);
 
 		fMap.setDrawTileBorders(isShowTileInfo);
+		setDefaultPosition();
 
+	}
+
+	void saveDefaultPosition() {
+		fDefaultZoom = fMap.getZoom();
+		fDefaultPosition = fMap.getCenterPosition();
 	}
 
 	private void saveSettings() {
@@ -541,6 +579,32 @@ public class OSMView extends ViewPart {
 		memento.putInteger(MEMENTO_ZOOM_CENTERED, fActionZoomCentered.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR, fActionSynchWithTour.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, fActionSynchTourZoomLevel.getZoomLevel());
+
+		memento.putString(MEMENTO_CURRENT_FACTORY_ID, fActionChangeTileFactory.getSelectedFactory()
+				.getInfo()
+				.getFactoryID());
+
+		if (fDefaultPosition == null) {
+			memento.putInteger(MEMENTO_DEFAULT_POSITION_ZOOM, fMap.getTileFactory().getInfo().getMinimumZoomLevel());
+			memento.putFloat(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
+			memento.putFloat(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
+		} else {
+			memento.putInteger(MEMENTO_DEFAULT_POSITION_ZOOM, fDefaultZoom);
+			memento.putFloat(MEMENTO_DEFAULT_POSITION_LATITUDE, (float) fDefaultPosition.getLatitude());
+			memento.putFloat(MEMENTO_DEFAULT_POSITION_LONGITUDE, (float) fDefaultPosition.getLongitude());
+		}
+
+	}
+
+	void setDefaultPosition() {
+		if (fDefaultPosition == null) {
+			fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
+			fMap.setCenterPosition(new GeoPosition(0, 0));
+		} else {
+			fMap.setZoom(fDefaultZoom);
+			fMap.setCenterPosition(fDefaultPosition);
+		}
+		fMap.queueRedraw();
 	}
 
 	@Override

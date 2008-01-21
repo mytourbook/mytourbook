@@ -19,9 +19,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomCentered extends Action {
 
-	private OSMView	fMapView;
+	private MappingView	fMapView;
 
-	public ActionZoomCentered(OSMView mapView) {
+	public ActionZoomCentered(MappingView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

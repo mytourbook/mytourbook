@@ -17,25 +17,20 @@ package net.tourbook.mapping;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionZoomShowAll extends Action {
+public class ActionSetDefaultPosition extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionZoomShowAll(MappingView mapView) {
+	public ActionSetDefaultPosition(MappingView mapView) {
 
-		super(null, AS_PUSH_BUTTON);
+		super(Messages.map_action_set_default_position, AS_PUSH_BUTTON);
 
 		fMapView = mapView;
-
-		setToolTipText(Messages.map_action_zoom_show_all);
-
-		setImageDescriptor(Activator.getIconImageDescriptor(Messages.image_action_zoom_show_all));
-		setDisabledImageDescriptor(Activator.getIconImageDescriptor(Messages.image_action_zoom_show_all_disabled));
 	}
 
 	@Override
 	public void run() {
-		fMapView.zoomShowEntireMap();
+		fMapView.setDefaultPosition();
 	}
 
 }

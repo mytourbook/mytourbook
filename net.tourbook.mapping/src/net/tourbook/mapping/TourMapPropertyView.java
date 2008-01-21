@@ -117,7 +117,7 @@ public class TourMapPropertyView extends ViewPart {
 
 		// radio: tile info
 		final boolean isShowTileInfo = fRadioTileInfoYes.getSelection();
-		store.setValue(OSMView.SHOW_TILE_INFO, isShowTileInfo);
+		store.setValue(MappingView.SHOW_TILE_INFO, isShowTileInfo);
 
 	}
 
@@ -128,7 +128,7 @@ public class TourMapPropertyView extends ViewPart {
 		// get values from pref store
 
 		// tile info
-		boolean isShowTileInfo = store.getBoolean(OSMView.SHOW_TILE_INFO);
+		boolean isShowTileInfo = store.getBoolean(MappingView.SHOW_TILE_INFO);
 		if (isShowTileInfo) {
 			fRadioTileInfoYes.setSelection(true);
 		} else {

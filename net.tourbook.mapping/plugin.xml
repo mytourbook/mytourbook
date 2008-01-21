@@ -9,9 +9,9 @@
       </category>
       <view
             category="net.tourbook.category.tourMaps"
-            class="net.tourbook.mapping.OSMView"
+            class="net.tourbook.mapping.MappingView"
             icon="icons/earth-globe-abstract.png"
-            id="net.tourbook.mapping.OSMViewID"
+            id="net.tourbook.mapping.mappingViewID"
             name="%command_tour_map_name" >
       </view>
       <view

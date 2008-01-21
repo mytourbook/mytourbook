@@ -35,6 +35,10 @@ public class Messages extends NLS {
 	public static String		image_action_zoom_show_entire_tour;
 
 	public static String		map_action_change_tile_factory_tooltip;
+
+	public static String	map_action_save_default_position;
+
+	public static String	map_action_set_default_position;
 	public static String		map_action_synch_with_tour;
 	public static String		map_action_zoom_centered;
 	public static String		map_action_zoom_in;

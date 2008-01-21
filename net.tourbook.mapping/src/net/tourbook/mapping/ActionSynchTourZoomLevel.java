@@ -49,10 +49,9 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 			fZoomLevel = fActionZoomLevel;
 			PaintManager.getInstance().setSynchTourZoomLevel(fActionZoomLevel);
 		}
-
 	}
 
-	public ActionSynchTourZoomLevel(OSMView osmView) {
+	public ActionSynchTourZoomLevel(MappingView osmView) {
 
 		super(Messages.map_action_zoom_level_centered_tour, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);

@@ -19,9 +19,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomIn extends Action {
 
-	private OSMView	fMapView;
+	private MappingView	fMapView;
 
-	public ActionZoomIn(OSMView mapView) {
+	public ActionZoomIn(MappingView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 

@@ -29,7 +29,7 @@ public class ActionHandlerOpenTourMapView extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(OSMView.ID,
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(MappingView.ID,
 					null,
 					IWorkbenchPage.VIEW_VISIBLE);
 
