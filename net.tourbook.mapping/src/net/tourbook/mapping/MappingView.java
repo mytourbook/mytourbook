@@ -103,12 +103,19 @@ public class MappingView extends ViewPart {
 
 	private boolean						fIsMapSynchedWithTour;
 
-	private boolean						fIsTourCentered;
+	private boolean						fIsPositionCentered;
 
 	private List<TileFactory>			fTileFactories;
 
 	private int							fDefaultZoom;
 	private GeoPosition					fDefaultPosition					= null;
+
+	private boolean						fIsTour;
+
+	/**
+	 * Position for the current point of interest
+	 */
+	private GeoPosition					fPOIPosition;
 
 	public MappingView() {}
 
@@ -184,16 +191,25 @@ public class MappingView extends ViewPart {
 	 */
 	private void centerTour() {
 
-		if (fIsTourCentered) {
+		if (fIsPositionCentered) {
 
 			final int zoom = fMap.getZoom();
 
-			final Set<GeoPosition> tourBounds = PaintManager.getInstance().getTourBounds();
-			if (tourBounds == null) {
-				return;
+			Set<GeoPosition> positionBounds = null;
+			if (fIsTour) {
+				positionBounds = PaintManager.getInstance().getTourBounds();
+				if (positionBounds == null) {
+					return;
+				}
+			} else {
+				if (fPOIPosition == null) {
+					return;
+				}
+				positionBounds = new HashSet<GeoPosition>();
+				positionBounds.add(fPOIPosition);
 			}
 
-			final Rectangle2D positionRect = getPositionRect(tourBounds, zoom);
+			final Rectangle2D positionRect = getPositionRect(positionBounds, zoom);
 			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
 			final GeoPosition geoPosition = fMap.getTileFactory().pixelToGeo(center, zoom);
@@ -295,6 +311,14 @@ public class MappingView extends ViewPart {
 		getViewSite().getPage().removePartListener(fPartListener);
 
 		super.dispose();
+	}
+
+	private void enableActions() {
+
+		fActionZoomShowEntireTour.setEnabled(fIsTour);
+		fActionSynchTourZoomLevel.setEnabled(fIsTour);
+		fActionSynchWithTour.setEnabled(fIsTour);
+//		fActionZoomCentered.setEnabled(fIsTour);
 	}
 
 	public List<TileFactory> getFactories() {
@@ -419,13 +443,22 @@ public class MappingView extends ViewPart {
 
 		} else if (selection instanceof PointOfInterest) {
 
+			fIsTour = false;
+
+			// disable tour data
+			fTourData = null;
+			fPreviousTourData = null;
+			PaintManager.getInstance().setTourData(null);
+
 			PointOfInterest poi = (PointOfInterest) selection;
+			fPOIPosition = poi.getPosition();
 
 			fMap.setZoom(poi.getRecommendedZoom());
-			fMap.setCenterPosition(poi.getPosition());
+			fMap.setCenterPosition(fPOIPosition);
 			fMap.queueRedraw();
 		}
 
+		enableActions();
 	}
 
 	private void paintEntireTour() {
@@ -448,6 +481,8 @@ public class MappingView extends ViewPart {
 	}
 
 	private void paintTour(final TourData tourData, boolean forceRedraw) {
+
+		fIsTour = true;
 
 		if (checkPaintData(tourData) == false) {
 			return;
@@ -474,7 +509,7 @@ public class MappingView extends ViewPart {
 			if (forceRedraw == false && fPreviousTourData != null) {
 
 				/*
-				 * keep map configuration for the prvious tour
+				 * keep map configuration for the previous tour
 				 */
 				fPreviousTourData.mapZoomLevel = fMap.getZoom();
 
@@ -500,8 +535,9 @@ public class MappingView extends ViewPart {
 
 	private void paintTour(final TourData tourData, final int leftSliderValuesIndex, final int rightSliderValuesIndex) {
 
-		final PaintManager paintManager = PaintManager.getInstance();
-		paintManager.setSliderValueIndex(leftSliderValuesIndex, rightSliderValuesIndex);
+		fIsTour = true;
+
+		PaintManager.getInstance().setSliderValueIndex(leftSliderValuesIndex, rightSliderValuesIndex);
 
 		fMap.queueRedraw();
 	}
@@ -516,7 +552,7 @@ public class MappingView extends ViewPart {
 			if (mementoZoomCentered != null) {
 				final boolean isTourCentered = mementoZoomCentered == 1 ? true : false;
 				fActionZoomCentered.setChecked(isTourCentered);
-				fIsTourCentered = isTourCentered;
+				fIsPositionCentered = isTourCentered;
 			}
 
 			Integer mementoSynchTour = memento.getInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR);
@@ -685,7 +721,7 @@ public class MappingView extends ViewPart {
 	}
 
 	void setZoomCentered() {
-		fIsTourCentered = fActionZoomCentered.isChecked();
+		fIsPositionCentered = fActionZoomCentered.isChecked();
 	}
 
 	void synchWithTour() {

@@ -21,8 +21,10 @@ import java.awt.Point;
 import net.tourbook.data.TourData;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
@@ -46,8 +48,19 @@ public class TourPainter extends MapPainter {
 
 		super();
 
-		getImage(fImageStartMarker, IMAGE_START_MARKER);
-		getImage(fImageEndMarker, IMAGE_END_MARKER);
+		fImageStartMarker = Activator.getIconImageDescriptor(IMAGE_START_MARKER).createImage();
+		fImageEndMarker = Activator.getIconImageDescriptor(IMAGE_END_MARKER).createImage();
+	}
+
+	@Override
+	protected void dispose() {
+
+		if (fImageStartMarker != null && !fImageStartMarker.isDisposed()) {
+			fImageStartMarker.dispose();
+		}
+		if (fImageEndMarker != null && !fImageEndMarker.isDisposed()) {
+			fImageEndMarker.dispose();
+		}
 	}
 
 	@Override
@@ -105,48 +118,91 @@ public class TourPainter extends MapPainter {
 		int leftSliderIndex = PaintManager.getInstance().getLeftSliderValueIndex();
 		int rightSliderIndex = PaintManager.getInstance().getRightSliderValueIndex();
 
+		Point prevPixel = null;
+		Point absolutePixel = null;
+		Point relativePixel = null;
+		gc.setLineWidth(2);
+
+		final Display display = Display.getCurrent();
+		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
+		final Color systemColorRed = display.getSystemColor(SWT.COLOR_RED);
+
+		Image positionImage = getPositionImage(systemColorBlue);
+		Image markerImage = getPositionImage(systemColorRed);
+		int posImageWidth = positionImage.getBounds().width / 2;
+		int posImageHeight = positionImage.getBounds().height / 2;
+
+//		gc.setAntialias(SWT.ON);
+
 		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
 			// Pixel zu Koordinaten abfragen
-//			Point pixel = map.getTileFactory().geoToPixel(new GeoPosition(48.139722, 11.574444), map.getZoom());
-			Point pixel = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
-					map.getZoom());
+			absolutePixel = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[serieIndex],
+					longitudeSerie[serieIndex]), map.getZoom());
 
-			if (viewport.contains(pixel)) {
-				pixel = map.getRelativePixel(pixel);
+			relativePixel = map.getRelativePixel(absolutePixel);
+
+			// initialize previous pixel
+			if (prevPixel == null) {
+				prevPixel = relativePixel;
+			}
+
+			if (viewport.contains(absolutePixel)) {
 
 				if (serieIndex < leftSliderIndex || serieIndex > rightSliderIndex) {
-					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+					gc.setForeground(systemColorBlue);
+					gc.drawImage(positionImage, relativePixel.x - posImageWidth, relativePixel.y - posImageHeight);
 				} else {
-					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+					gc.setForeground(systemColorRed);
+					gc.drawImage(markerImage, relativePixel.x - posImageWidth, relativePixel.y - posImageHeight);
 				}
 
-//				g2d.setClip(pixel.x - 2, pixel.y - 2, 4, 4);
-				gc.fillOval(pixel.x - 2, pixel.y - 2, 4, 4);
+				gc.drawLine(prevPixel.x, prevPixel.y, relativePixel.x, relativePixel.y);
 			}
+
+			prevPixel = relativePixel;
 		}
+
+//		gc.setAntialias(SWT.OFF);
+
+		positionImage.dispose();
+		markerImage.dispose();
 	}
 
-	private Image getImage(Image image, String imagePath) {
+	private Image getPositionImage(Color positionColor) {
 
-		if (image != null) {
-			return image;
-		}
+		final Display display = Display.getCurrent();
 
-		return image = Activator.getIconImageDescriptor(imagePath).createImage();
-	}
+		int width = 7;
+		int height = 7;
 
-	@Override
-	protected void dispose() {
+		Image positionImage = new Image(display, width, height);
+		final Color colorTransparent = new Color(display, 0xff, 0xff, 0xfe);
 
-		if (fImageStartMarker != null && !fImageStartMarker.isDisposed()) {
-			fImageStartMarker.dispose();
-		}
-		if (fImageEndMarker != null && !fImageEndMarker.isDisposed()) {
-			fImageEndMarker.dispose();
-		}
+		GC gcImage = new GC(positionImage);
+
+//		gcImage.setAntialias(SWT.ON);
+
+		gcImage.setBackground(colorTransparent);
+		gcImage.fillRectangle(0, 0, width, height);
+
+		gcImage.setBackground(positionColor);
+		gcImage.fillOval(1, 1, width - 2, height - 2);
+
+		/*
+		 * set transparency
+		 */
+		final ImageData imageData = positionImage.getImageData();
+		imageData.transparentPixel = imageData.getPixel(0, 0);
+		final Image transparentImage = new Image(display, imageData);
+
+//		gcImage.setAntialias(SWT.OFF);
+
+		gcImage.dispose();
+		positionImage.dispose();
+		colorTransparent.dispose();
+
+		return transparentImage;
 	}
 
 //	/**

@@ -92,7 +92,8 @@ public class PaintManager {
 	}
 
 	/**
-	 * Set the tour data which is used for the next painting
+	 * Set {@link TourData} which is used for the next painting or <code>null</code> to not draw
+	 * the tour
 	 * 
 	 * @param tourData
 	 */

@@ -15,7 +15,7 @@
             name="%command_tour_map_name" >
       </view>
       <view
-            category="net.tourbook.category.tourMaps"
+            category="net.tourbook.category.system"
             class="net.tourbook.mapping.TourMapPropertyView"
             icon="icons/tour-map-properties.gif"
             id="net.tourbook.mapping.TourMapPropertyView"
