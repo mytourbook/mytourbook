@@ -29,11 +29,13 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 
 	public void setSelection(ISelection selection) {
 
+		if (selection == null) {
+			return;
+		}
+
 		currentSelection = selection;
 
-		final SelectionChangedEvent event = new SelectionChangedEvent(
-				this,
-				currentSelection);
+		final SelectionChangedEvent event = new SelectionChangedEvent(this, currentSelection);
 
 		Object[] listeners = postSelectionListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
@@ -59,5 +61,6 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 	}
 
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {}
+
 	public void removeSelectionChangedListener(ISelectionChangedListener listener) {}
 }
