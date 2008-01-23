@@ -69,7 +69,7 @@ public class GPXDeviceDataReader extends TourbookDevice {
 		try {
 			fileReader = new BufferedReader(new FileReader(importFilePath));
 			String fileHeader = fileReader.readLine();
-			if (fileHeader == null || fileHeader.startsWith(XML_START_ID) == false) {
+			if (fileHeader == null || fileHeader.contains(XML_START_ID) == false) {
 				fileReader.close();
 				return false;
 			}
