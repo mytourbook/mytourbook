@@ -117,7 +117,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private static final String			MEMENTO_SELECTED_TOUR_INDEX	= "importview.selected-tour-index";			//$NON-NLS-1$
 	private static final String			MEMENTO_COLUMN_SORT_ORDER	= "importview.column_sort_order";				//$NON-NLS-1$
 	private static final String			MEMENTO_COLUMN_WIDTH		= "importview.column_width";					//$NON-NLS-1$
-	private static final String			MEMENTO_MERGE_TRACKS		= "importview.action.merge-tracks";
+	private static final String			MEMENTO_MERGE_TRACKS		= "importview.action.merge-tracks"; //$NON-NLS-1$
 
 	private static IMemento				fSessionMemento;
 
