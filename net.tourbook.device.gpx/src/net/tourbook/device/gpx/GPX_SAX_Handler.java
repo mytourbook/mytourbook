@@ -60,8 +60,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				TAG_TIME				= "time";											//$NON-NLS-1$
 	private static final String				TAG_ELE					= "ele";											//$NON-NLS-1$
 
-	private static final String				ATTR_LATITUDE			= "lat";
-	private static final String				ATTR_LONGITUDE			= "lon";
+	private static final String				ATTR_LATITUDE			= "lat"; //$NON-NLS-1$
+	private static final String				ATTR_LONGITUDE			= "lon"; //$NON-NLS-1$
 
 	private static final Calendar			fCalendar				= GregorianCalendar.getInstance();
 
@@ -201,9 +201,9 @@ public class GPX_SAX_Handler extends DefaultHandler {
 							fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_RFC822.parse(fCharacters.toString())
 									.getTime();
 						} catch (ParseException e2) {
-							MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
+							MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage()); //$NON-NLS-1$
 //							e2.printStackTrace();
-							System.err.println(e.getMessage() + " in " + fImportFileName);
+							System.err.println(e.getMessage() + " in " + fImportFileName); //$NON-NLS-1$
 							fIsError = true;
 						}
 					}

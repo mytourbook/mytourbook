@@ -68,16 +68,16 @@ public class MappingView extends ViewPart {
 
 	final public static String			ID									= "net.tourbook.mapping.mappingViewID";		//$NON-NLS-1$
 
-	private static final String			MEMENTO_ZOOM_CENTERED				= "mapping.view.zoom-centered";
-	private static final String			MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "mapping.view.synch-with-selected-tour";
-	private static final String			MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "mapping.view.synch-tour-zoom-level";
-	private static final String			MEMENTO_CURRENT_FACTORY_ID			= "mapping.view.current.factory-id";
+	private static final String			MEMENTO_ZOOM_CENTERED				= "mapping.view.zoom-centered"; //$NON-NLS-1$
+	private static final String			MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "mapping.view.synch-with-selected-tour"; //$NON-NLS-1$
+	private static final String			MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "mapping.view.synch-tour-zoom-level"; //$NON-NLS-1$
+	private static final String			MEMENTO_CURRENT_FACTORY_ID			= "mapping.view.current.factory-id"; //$NON-NLS-1$
 
-	private static final String			MEMENTO_DEFAULT_POSITION_ZOOM		= "mapping.view.default.position.zoom-level";
-	private static final String			MEMENTO_DEFAULT_POSITION_LATITUDE	= "mapping.view.default.position.latitude";
-	private static final String			MEMENTO_DEFAULT_POSITION_LONGITUDE	= "mapping.view.default.position.longitude";
+	private static final String			MEMENTO_DEFAULT_POSITION_ZOOM		= "mapping.view.default.position.zoom-level"; //$NON-NLS-1$
+	private static final String			MEMENTO_DEFAULT_POSITION_LATITUDE	= "mapping.view.default.position.latitude"; //$NON-NLS-1$
+	private static final String			MEMENTO_DEFAULT_POSITION_LONGITUDE	= "mapping.view.default.position.longitude"; //$NON-NLS-1$
 
-	final static String					SHOW_TILE_INFO						= "show.tile-info";
+	final static String					SHOW_TILE_INFO						= "show.tile-info"; //$NON-NLS-1$
 
 	private static IMemento				fSessionMemento;
 
