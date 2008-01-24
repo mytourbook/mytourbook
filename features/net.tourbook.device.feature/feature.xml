@@ -8,11 +8,12 @@
 
    <description>
       Transfers and import tours from HAC5, HAC4Pro, HAC4 and CM4xxM.
-Import tours from .tur and .crp files
+Import tours from .gpx, .tcx, .crs, .csv, .tur, .crp files
    </description>
 
    <copyright>
-      (c) Copyright Wolfgang Schramm 2005, 2007.  All rights reserved.
+      (c) Copyright Wolfgang Schramm and Contributors 2005, 2008. 
+All rights reserved.
    </copyright>
 
    <license url="http://www.gnu.org/copyleft/gpl.html">
@@ -463,7 +464,7 @@ Public License instead of this License.
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="net.tourbook" version="1.2" match="greaterOrEqual"/>
+      <import plugin="net.tourbook" version="1.3" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui" version="3.3" match="greaterOrEqual"/>
       <import plugin="net.tourbook.rxtx"/>
       <import plugin="net.tourbook.chart" version="1.2" match="greaterOrEqual"/>
