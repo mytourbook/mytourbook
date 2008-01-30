@@ -68,16 +68,17 @@ public class MappingView extends ViewPart {
 
 	final public static String			ID									= "net.tourbook.mapping.mappingViewID";		//$NON-NLS-1$
 
-	private static final String			MEMENTO_ZOOM_CENTERED				= "mapping.view.zoom-centered"; //$NON-NLS-1$
-	private static final String			MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "mapping.view.synch-with-selected-tour"; //$NON-NLS-1$
-	private static final String			MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "mapping.view.synch-tour-zoom-level"; //$NON-NLS-1$
-	private static final String			MEMENTO_CURRENT_FACTORY_ID			= "mapping.view.current.factory-id"; //$NON-NLS-1$
+	private static final String			MEMENTO_ZOOM_CENTERED				= "mapping.view.zoom-centered";				//$NON-NLS-1$
+	private static final String			MEMENTO_SHOW_TOUR_IN_MAP			= "mapping.view.show-tour-in-map";
+	private static final String			MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "mapping.view.synch-with-selected-tour";		//$NON-NLS-1$
+	private static final String			MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "mapping.view.synch-tour-zoom-level";		//$NON-NLS-1$
+	private static final String			MEMENTO_CURRENT_FACTORY_ID			= "mapping.view.current.factory-id";			//$NON-NLS-1$
 
-	private static final String			MEMENTO_DEFAULT_POSITION_ZOOM		= "mapping.view.default.position.zoom-level"; //$NON-NLS-1$
-	private static final String			MEMENTO_DEFAULT_POSITION_LATITUDE	= "mapping.view.default.position.latitude"; //$NON-NLS-1$
-	private static final String			MEMENTO_DEFAULT_POSITION_LONGITUDE	= "mapping.view.default.position.longitude"; //$NON-NLS-1$
+	private static final String			MEMENTO_DEFAULT_POSITION_ZOOM		= "mapping.view.default.position.zoom-level";	//$NON-NLS-1$
+	private static final String			MEMENTO_DEFAULT_POSITION_LATITUDE	= "mapping.view.default.position.latitude";	//$NON-NLS-1$
+	private static final String			MEMENTO_DEFAULT_POSITION_LONGITUDE	= "mapping.view.default.position.longitude";	//$NON-NLS-1$
 
-	final static String					SHOW_TILE_INFO						= "show.tile-info"; //$NON-NLS-1$
+	final static String					SHOW_TILE_INFO						= "show.tile-info";							//$NON-NLS-1$
 
 	private static IMemento				fSessionMemento;
 
@@ -95,6 +96,7 @@ public class MappingView extends ViewPart {
 	private ActionZoomCentered			fActionZoomCentered;
 	private ActionZoomShowAll			fActionZoomShowAll;
 	private ActionZoomShowEntireTour	fActionZoomShowEntireTour;
+	private ActionShowTourInMap			fActionShowTourInMap;
 	private ActionSynchWithTour			fActionSynchWithTour;
 	private ActionSynchTourZoomLevel	fActionSynchTourZoomLevel;
 	private ActionChangeTileFactory		fActionChangeTileFactory;
@@ -102,6 +104,7 @@ public class MappingView extends ViewPart {
 	private ActionSetDefaultPosition	fActionSetDefaultPosition;
 
 	private boolean						fIsMapSynchedWithTour;
+	private boolean						fIsShowTourInMap;
 
 	private boolean						fIsPositionCentered;
 
@@ -248,6 +251,7 @@ public class MappingView extends ViewPart {
 		fActionZoomShowAll = new ActionZoomShowAll(this);
 		fActionZoomShowEntireTour = new ActionZoomShowEntireTour(this);
 		fActionSynchWithTour = new ActionSynchWithTour(this);
+		fActionShowTourInMap = new ActionShowTourInMap(this);
 		fActionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
 		fActionChangeTileFactory = new ActionChangeTileFactory(this);
 		fActionSetDefaultPosition = new ActionSetDefaultPosition(this);
@@ -258,16 +262,16 @@ public class MappingView extends ViewPart {
 		 */
 		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
 
-		viewTbm.add(fActionSynchWithTour);
-		viewTbm.add(new Separator());
-		viewTbm.add(fActionZoomShowAll);
+		viewTbm.add(fActionShowTourInMap);
 		viewTbm.add(fActionZoomShowEntireTour);
+		viewTbm.add(fActionSynchWithTour);
 		viewTbm.add(new Separator());
 		viewTbm.add(fActionZoomCentered);
 		viewTbm.add(fActionZoomIn);
 		viewTbm.add(fActionZoomOut);
 		viewTbm.add(new Separator());
 		viewTbm.add(fActionChangeTileFactory);
+		viewTbm.add(fActionZoomShowAll);
 
 		/*
 		 * fill view menu
@@ -317,8 +321,8 @@ public class MappingView extends ViewPart {
 
 		fActionZoomShowEntireTour.setEnabled(fIsTour);
 		fActionSynchTourZoomLevel.setEnabled(fIsTour);
+		fActionShowTourInMap.setEnabled(fIsTour);
 		fActionSynchWithTour.setEnabled(fIsTour);
-//		fActionZoomCentered.setEnabled(fIsTour);
 	}
 
 	public List<TileFactory> getFactories() {
@@ -476,7 +480,10 @@ public class MappingView extends ViewPart {
 		final Set<GeoPosition> tourBounds = getTourBounds(fTourData);
 		paintManager.setTourBounds(tourBounds);
 
+		paintManager.setShowTourInMap(fIsShowTourInMap);
+
 		setTourZoomLevel(tourBounds, false);
+
 		fMap.queueRedraw();
 	}
 
@@ -503,6 +510,8 @@ public class MappingView extends ViewPart {
 
 		final Set<GeoPosition> tourBounds = getTourBounds(tourData);
 		paintManager.setTourBounds(tourBounds);
+
+		paintManager.setShowTourInMap(fIsShowTourInMap);
 
 		if (fIsMapSynchedWithTour) {
 
@@ -564,6 +573,15 @@ public class MappingView extends ViewPart {
 				fIsMapSynchedWithTour = isSynchTour;
 			}
 
+			Integer mementoShowTour = memento.getInteger(MEMENTO_SHOW_TOUR_IN_MAP);
+			if (mementoShowTour != null) {
+
+				final boolean isShowTour = mementoShowTour == 1 ? true : false;
+
+				fActionShowTourInMap.setChecked(isShowTour);
+				fIsShowTourInMap = isShowTour;
+			}
+
 			Integer zoomLevel = memento.getInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL);
 			if (zoomLevel != null) {
 				fActionSynchTourZoomLevel.setZoomLevel(zoomLevel);
@@ -613,6 +631,7 @@ public class MappingView extends ViewPart {
 
 		// save checked actions
 		memento.putInteger(MEMENTO_ZOOM_CENTERED, fActionZoomCentered.isChecked() ? 1 : 0);
+		memento.putInteger(MEMENTO_SHOW_TOUR_IN_MAP, fActionShowTourInMap.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR, fActionSynchWithTour.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, fActionSynchTourZoomLevel.getZoomLevel());
 
@@ -645,6 +664,11 @@ public class MappingView extends ViewPart {
 
 	@Override
 	public void setFocus() {}
+
+	void setShowTourInMap() {
+		fIsShowTourInMap = fActionShowTourInMap.isChecked();
+		paintTour(fTourData, true);
+	}
 
 	/**
 	 * Calculates a zoom level so that all points in the specified set will be visible on screen.
@@ -729,6 +753,10 @@ public class MappingView extends ViewPart {
 		fIsMapSynchedWithTour = fActionSynchWithTour.isChecked();
 
 		if (fIsMapSynchedWithTour) {
+
+			fActionShowTourInMap.setChecked(true);
+			fIsShowTourInMap = true;
+
 			paintTour(fTourData, true);
 		}
 	}
@@ -751,6 +779,10 @@ public class MappingView extends ViewPart {
 	}
 
 	void zoomShowEntireTour() {
+
+		fActionShowTourInMap.setChecked(true);
+		fIsShowTourInMap = true;
+
 		paintEntireTour();
 	}
 }

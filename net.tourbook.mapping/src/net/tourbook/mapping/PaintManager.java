@@ -37,6 +37,8 @@ public class PaintManager {
 
 	private int					fSynchTourToomLevel;
 
+	private boolean				fIsShowTourInMap;
+
 	private PaintManager() {}
 
 	public static PaintManager getInstance() {
@@ -60,6 +62,10 @@ public class PaintManager {
 		return fSynchTourToomLevel;
 	}
 
+	boolean isShowTourInMap() {
+		return fIsShowTourInMap;
+	}
+
 	/**
 	 * @return Returns the tour bounds or <code>null</code> when a tour is not set
 	 */
@@ -74,8 +80,12 @@ public class PaintManager {
 		return fTourData;
 	}
 
-	public void setLeftSliderValueIndex(int fLeftSliderValueIndex) {
-		this.fLeftSliderValueIndex = fLeftSliderValueIndex;
+	public void setLeftSliderValueIndex(int leftSliderValueIndex) {
+		fLeftSliderValueIndex = leftSliderValueIndex;
+	}
+
+	public void setShowTourInMap(boolean isShowTourInMap) {
+		fIsShowTourInMap = isShowTourInMap;
 	}
 
 	public void setSliderValueIndex(int leftSliderValuesIndex, int rightSliderValuesIndex) {

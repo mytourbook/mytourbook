@@ -41,32 +41,52 @@ public class TourPainter extends MapPainter {
 	private static final String	IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
 	private static final String	IMAGE_END_MARKER	= "map-marker-end.png";	//$NON-NLS-1$
 
-	private Image				fImageStartMarker;
-	private Image				fImageEndMarker;
+	private final Image			fImageStartMarker;
+	private final Image			fImageEndMarker;
+	private final Image			fPositionImage;
+	private final Image			fMarkerImage;
 
 	public TourPainter() {
 
 		super();
 
+		final Display display = Display.getCurrent();
+		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
+		final Color systemColorRed = display.getSystemColor(SWT.COLOR_RED);
+		fPositionImage = createPositionImage(systemColorBlue);
+		fMarkerImage = createPositionImage(systemColorRed);
+
 		fImageStartMarker = Activator.getIconImageDescriptor(IMAGE_START_MARKER).createImage();
 		fImageEndMarker = Activator.getIconImageDescriptor(IMAGE_END_MARKER).createImage();
+
 	}
 
 	@Override
 	protected void dispose() {
 
-		if (fImageStartMarker != null && !fImageStartMarker.isDisposed()) {
-			fImageStartMarker.dispose();
-		}
-		if (fImageEndMarker != null && !fImageEndMarker.isDisposed()) {
-			fImageEndMarker.dispose();
+		disposeImage(fImageStartMarker);
+		disposeImage(fImageEndMarker);
+		disposeImage(fPositionImage);
+		disposeImage(fMarkerImage);
+
+	}
+
+	private void disposeImage(final Image image) {
+		if (image != null && !image.isDisposed()) {
+			image.dispose();
 		}
 	}
 
 	@Override
-	protected void doPaint(GC gc, Map map) {
+	protected void doPaint(final GC gc, final Map map) {
 
-		final TourData tourData = PaintManager.getInstance().getTourData();
+		final PaintManager paintManager = PaintManager.getInstance();
+
+		if (paintManager.isShowTourInMap() == false) {
+			return;
+		}
+
+		final TourData tourData = paintManager.getTourData();
 
 		if (tourData == null || tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
 			return;
@@ -87,20 +107,25 @@ public class TourPainter extends MapPainter {
 
 	}
 
-	private void drawMarker(GC gc, Map map, double latitude, double longitude, Image markerImage) {
+	private void drawMarker(final GC gc,
+							final Map map,
+							final double latitude,
+							final double longitude,
+							final Image markerImage) {
 
 		if (markerImage == null) {
 			return;
 		}
 
-		java.awt.Rectangle viewport = map.getViewport();
-		TileFactory tileFactory = map.getTileFactory();
+		final java.awt.Rectangle viewport = map.getViewport();
+		final TileFactory tileFactory = map.getTileFactory();
 
 		Point position = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), map.getZoom());
 
 		if (viewport.contains(position)) {
 
-			position = map.getRelativePixel(position);
+			// create relative pixel
+			position = new java.awt.Point(position.x - viewport.x, position.y - viewport.y);
 
 			final Rectangle bounds = markerImage.getBounds();
 			final int imageWidth = bounds.width;
@@ -110,13 +135,16 @@ public class TourPainter extends MapPainter {
 		}
 	}
 
-	private void drawTour(GC gc, final Map map, final double[] latitudeSerie, final double[] longitudeSerie) {
+	private void drawTour(final GC gc, final Map map, final double[] latitudeSerie, final double[] longitudeSerie) {
 
-		java.awt.Rectangle viewport = map.getViewport();
-		TileFactory tileFactory = map.getTileFactory();
+		final PaintManager paintManager = PaintManager.getInstance();
 
-		int leftSliderIndex = PaintManager.getInstance().getLeftSliderValueIndex();
-		int rightSliderIndex = PaintManager.getInstance().getRightSliderValueIndex();
+		final java.awt.Rectangle viewport = map.getViewport();
+		final TileFactory tileFactory = map.getTileFactory();
+		final int zoomLevel = map.getZoom();
+
+		final int leftSliderIndex = paintManager.getLeftSliderValueIndex();
+		final int rightSliderIndex = paintManager.getRightSliderValueIndex();
 
 		Point prevPixel = null;
 		Point absolutePixel = null;
@@ -127,59 +155,60 @@ public class TourPainter extends MapPainter {
 		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
 		final Color systemColorRed = display.getSystemColor(SWT.COLOR_RED);
 
-		Image positionImage = getPositionImage(systemColorBlue);
-		Image markerImage = getPositionImage(systemColorRed);
-		int posImageWidth = positionImage.getBounds().width / 2;
-		int posImageHeight = positionImage.getBounds().height / 2;
+		final int posImageWidth = fPositionImage.getBounds().width / 2;
+		final int posImageHeight = fPositionImage.getBounds().height / 2;
 
 //		gc.setAntialias(SWT.ON);
-
+		int counter = 0;
 		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
 			// Pixel zu Koordinaten abfragen
-			absolutePixel = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[serieIndex],
-					longitudeSerie[serieIndex]), map.getZoom());
+			absolutePixel = tileFactory.geoToPixel(//
+			new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
+					zoomLevel);
 
-			relativePixel = map.getRelativePixel(absolutePixel);
+			// get relative pixel
+			relativePixel = new java.awt.Point(absolutePixel.x - viewport.x, absolutePixel.y - viewport.y);
 
 			// initialize previous pixel
 			if (prevPixel == null) {
 				prevPixel = relativePixel;
 			}
 
-			if (viewport.contains(absolutePixel)) {
+			// check if position is in the viewport or position has changed
+			if (viewport.contains(absolutePixel) && relativePixel.equals(prevPixel) == false) {
 
 				if (serieIndex < leftSliderIndex || serieIndex > rightSliderIndex) {
 					gc.setForeground(systemColorBlue);
-					gc.drawImage(positionImage, relativePixel.x - posImageWidth, relativePixel.y - posImageHeight);
+					gc.drawImage(fPositionImage, relativePixel.x - posImageWidth, relativePixel.y - posImageHeight);
 				} else {
 					gc.setForeground(systemColorRed);
-					gc.drawImage(markerImage, relativePixel.x - posImageWidth, relativePixel.y - posImageHeight);
+					gc.drawImage(fMarkerImage, relativePixel.x - posImageWidth, relativePixel.y - posImageHeight);
 				}
 
 				gc.drawLine(prevPixel.x, prevPixel.y, relativePixel.x, relativePixel.y);
+				counter++;
 			}
 
 			prevPixel = relativePixel;
 		}
 
+//		System.out.println(counter);
 //		gc.setAntialias(SWT.OFF);
 
-		positionImage.dispose();
-		markerImage.dispose();
 	}
 
-	private Image getPositionImage(Color positionColor) {
+	private Image createPositionImage(final Color positionColor) {
 
 		final Display display = Display.getCurrent();
 
-		int width = 7;
-		int height = 7;
+		final int width = 7;
+		final int height = 7;
 
-		Image positionImage = new Image(display, width, height);
+		final Image positionImage = new Image(display, width, height);
 		final Color colorTransparent = new Color(display, 0xff, 0xff, 0xfe);
 
-		GC gcImage = new GC(positionImage);
+		final GC gcImage = new GC(positionImage);
 
 //		gcImage.setAntialias(SWT.ON);
 
