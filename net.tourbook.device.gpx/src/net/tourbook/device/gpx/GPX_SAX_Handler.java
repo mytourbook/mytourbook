@@ -60,8 +60,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				TAG_TIME				= "time";											//$NON-NLS-1$
 	private static final String				TAG_ELE					= "ele";											//$NON-NLS-1$
 
-	private static final String				ATTR_LATITUDE			= "lat"; //$NON-NLS-1$
-	private static final String				ATTR_LONGITUDE			= "lon"; //$NON-NLS-1$
+	private static final String				ATTR_LATITUDE			= "lat";											//$NON-NLS-1$
+	private static final String				ATTR_LONGITUDE			= "lon";											//$NON-NLS-1$
 
 	private static final Calendar			fCalendar				= GregorianCalendar.getInstance();
 
@@ -88,7 +88,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private HashMap<String, TourData>		fTourDataMap;
 	private int								fLapCounter;
 
-	private boolean							fSetLapMarker			= false;
+	private boolean							fIsSetLapMarker			= false;
 	private boolean							fSetLapStartTime		= false;
 
 	private ArrayList<Long>					fLapStart;
@@ -255,8 +255,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			return;
 		}
 
-		if (fSetLapMarker) {
-			fSetLapMarker = false;
+		if (fIsSetLapMarker) {
+			fIsSetLapMarker = false;
 
 			fTimeData.marker = 1;
 			fTimeData.markerLabel = Integer.toString(fLapCounter - 1);
@@ -281,7 +281,9 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		// set virtual time if time is not available
 		if (fTimeData.absoluteTime == Long.MIN_VALUE) {
-			fTimeData.absoluteTime = 1;
+
+			fCalendar.set(2000, 0, 1, 0, 0, 0);
+			fTimeData.absoluteTime = fCalendar.getTimeInMillis();
 		}
 
 		fPrevTimeData = fTimeData;

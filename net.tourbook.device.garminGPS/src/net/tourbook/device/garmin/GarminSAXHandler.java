@@ -487,10 +487,13 @@ public class GarminSAXHandler extends DefaultHandler {
 				 */
 				fIsInTrackpoint = false;
 
-				// ignore corrupt values, time and altitude must be set
-				if (fTimeData != null && fTimeData.absoluteTime != Long.MIN_VALUE
-//						&& fTimeData.absoluteAltitude != Float.MIN_VALUE
-				) {
+				if (fTimeData != null) {
+
+					// set virtual time if time is not available
+					if (fTimeData.absoluteTime == Long.MIN_VALUE) {
+						fCalendar.set(2000, 0, 1, 0, 0, 0);
+						fTimeData.absoluteTime = fCalendar.getTimeInMillis();
+					}
 
 					if (fSetLapMarker) {
 						fSetLapMarker = false;
