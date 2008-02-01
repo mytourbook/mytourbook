@@ -168,7 +168,7 @@ public class MappingView extends ViewPart {
 					boolean isShowTileInfo = store.getBoolean(SHOW_TILE_INFO);
 
 					fMap.setDrawTileBorders(isShowTileInfo);
-					fMap.queueRedraw();
+					fMap.queueRedrawMap();
 
 				}
 			}
@@ -459,7 +459,7 @@ public class MappingView extends ViewPart {
 
 			fMap.setZoom(poi.getRecommendedZoom());
 			fMap.setCenterPosition(fPOIPosition);
-			fMap.queueRedraw();
+			fMap.queueRedrawMap();
 		}
 
 		enableActions();
@@ -484,7 +484,7 @@ public class MappingView extends ViewPart {
 
 		setTourZoomLevel(tourBounds, false);
 
-		fMap.queueRedraw();
+		fMap.queueRedrawMap();
 	}
 
 	private void paintTour(final TourData tourData, boolean forceRedraw) {
@@ -539,7 +539,7 @@ public class MappingView extends ViewPart {
 			}
 		}
 
-		fMap.queueRedraw();
+		fMap.queueRedrawMap();
 	}
 
 	private void paintTour(final TourData tourData, final int leftSliderValuesIndex, final int rightSliderValuesIndex) {
@@ -548,7 +548,7 @@ public class MappingView extends ViewPart {
 
 		PaintManager.getInstance().setSliderValueIndex(leftSliderValuesIndex, rightSliderValuesIndex);
 
-		fMap.queueRedraw();
+		fMap.queueRedrawMap();
 	}
 
 	private void restoreSettings() {
@@ -659,7 +659,7 @@ public class MappingView extends ViewPart {
 			fMap.setZoom(fDefaultZoom);
 			fMap.setCenterPosition(fDefaultPosition);
 		}
-		fMap.queueRedraw();
+		fMap.queueRedrawMap();
 	}
 
 	@Override
@@ -764,18 +764,18 @@ public class MappingView extends ViewPart {
 	void zoomIn() {
 		fMap.setZoom(fMap.getZoom() + 1);
 		centerTour();
-		fMap.queueRedraw();
+		fMap.queueRedrawMap();
 	}
 
 	void zoomOut() {
 		fMap.setZoom(fMap.getZoom() - 1);
 		centerTour();
-		fMap.queueRedraw();
+		fMap.queueRedrawMap();
 	}
 
 	void zoomShowEntireMap() {
 		fMap.setZoom(fMap.getTileFactory().getInfo().getMinimumZoomLevel());
-		fMap.queueRedraw();
+		fMap.queueRedrawMap();
 	}
 
 	void zoomShowEntireTour() {

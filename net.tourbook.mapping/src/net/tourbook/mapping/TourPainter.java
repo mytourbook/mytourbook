@@ -61,6 +61,42 @@ public class TourPainter extends MapPainter {
 
 	}
 
+	private Image createPositionImage(final Color positionColor) {
+
+		final Display display = Display.getCurrent();
+
+		final int width = 7;
+		final int height = 7;
+
+		final Image positionImage = new Image(display, width, height);
+		final Color colorTransparent = new Color(display, 0xff, 0xff, 0xfe);
+
+		final GC gcImage = new GC(positionImage);
+
+//		gcImage.setAntialias(SWT.ON);
+
+		gcImage.setBackground(colorTransparent);
+		gcImage.fillRectangle(0, 0, width, height);
+
+		gcImage.setBackground(positionColor);
+		gcImage.fillOval(1, 1, width - 2, height - 2);
+
+		/*
+		 * set transparency
+		 */
+		final ImageData imageData = positionImage.getImageData();
+		imageData.transparentPixel = imageData.getPixel(0, 0);
+		final Image transparentImage = new Image(display, imageData);
+
+//		gcImage.setAntialias(SWT.OFF);
+
+		gcImage.dispose();
+		positionImage.dispose();
+		colorTransparent.dispose();
+
+		return transparentImage;
+	}
+
 	@Override
 	protected void dispose() {
 
@@ -95,7 +131,7 @@ public class TourPainter extends MapPainter {
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 
-		drawTour(gc, map, latitudeSerie, longitudeSerie);
+		drawTour(gc, map, tourData);
 
 		drawMarker(gc,
 				map,
@@ -135,7 +171,8 @@ public class TourPainter extends MapPainter {
 		}
 	}
 
-	private void drawTour(final GC gc, final Map map, final double[] latitudeSerie, final double[] longitudeSerie) {
+//	private void drawTour(final GC gc, final Map map, final double[] latitudeSerie, final double[] longitudeSerie) {
+	private void drawTour(GC gc, Map map, TourData tourData) {
 
 		final PaintManager paintManager = PaintManager.getInstance();
 
@@ -143,6 +180,22 @@ public class TourPainter extends MapPainter {
 		final TileFactory tileFactory = map.getTileFactory();
 		final int zoomLevel = map.getZoom();
 
+		/*
+		 * check if tour is visible in the viewport
+		 */
+//		Point posMin = tileFactory.geoToPixel(new GeoPosition(tourData.mapMinLatitude, tourData.mapMinLongitude),
+//				zoomLevel);
+//		Point posMax = tileFactory.geoToPixel(new GeoPosition(tourData.mapMaxLatitude, tourData.mapMaxLongitude),
+//				zoomLevel);
+//
+//		final java.awt.Rectangle tourRect = new java.awt.Rectangle(posMin.x, posMin.y, //
+//				posMax.x - posMin.x,
+//				posMin.y - posMax.y);
+//		if (viewport.contains(tourRect) == false) {
+//			return;
+//		}
+		double[] latitudeSerie = tourData.latitudeSerie;
+		double[] longitudeSerie = tourData.longitudeSerie;
 		final int leftSliderIndex = paintManager.getLeftSliderValueIndex();
 		final int rightSliderIndex = paintManager.getRightSliderValueIndex();
 
@@ -159,13 +212,11 @@ public class TourPainter extends MapPainter {
 		final int posImageHeight = fPositionImage.getBounds().height / 2;
 
 //		gc.setAntialias(SWT.ON);
-		int counter = 0;
 		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
 			// Pixel zu Koordinaten abfragen
-			absolutePixel = tileFactory.geoToPixel(//
-			new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
-					zoomLevel);
+			absolutePixel = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[serieIndex],
+					longitudeSerie[serieIndex]), zoomLevel);
 
 			// get relative pixel
 			relativePixel = new java.awt.Point(absolutePixel.x - viewport.x, absolutePixel.y - viewport.y);
@@ -187,7 +238,6 @@ public class TourPainter extends MapPainter {
 				}
 
 				gc.drawLine(prevPixel.x, prevPixel.y, relativePixel.x, relativePixel.y);
-				counter++;
 			}
 
 			prevPixel = relativePixel;
@@ -196,42 +246,6 @@ public class TourPainter extends MapPainter {
 //		System.out.println(counter);
 //		gc.setAntialias(SWT.OFF);
 
-	}
-
-	private Image createPositionImage(final Color positionColor) {
-
-		final Display display = Display.getCurrent();
-
-		final int width = 7;
-		final int height = 7;
-
-		final Image positionImage = new Image(display, width, height);
-		final Color colorTransparent = new Color(display, 0xff, 0xff, 0xfe);
-
-		final GC gcImage = new GC(positionImage);
-
-//		gcImage.setAntialias(SWT.ON);
-
-		gcImage.setBackground(colorTransparent);
-		gcImage.fillRectangle(0, 0, width, height);
-
-		gcImage.setBackground(positionColor);
-		gcImage.fillOval(1, 1, width - 2, height - 2);
-
-		/*
-		 * set transparency
-		 */
-		final ImageData imageData = positionImage.getImageData();
-		imageData.transparentPixel = imageData.getPixel(0, 0);
-		final Image transparentImage = new Image(display, imageData);
-
-//		gcImage.setAntialias(SWT.OFF);
-
-		gcImage.dispose();
-		positionImage.dispose();
-		colorTransparent.dispose();
-
-		return transparentImage;
 	}
 
 //	/**

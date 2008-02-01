@@ -41,6 +41,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.graphics.Rectangle;
 import org.hibernate.annotations.Cascade;
 
 /**
@@ -345,6 +346,12 @@ public class TourData {
 	public double[]				longitudeSerie;
 
 	/**
+	 * contains the bounds of the tour in latitude/longitude
+	 */
+	@Transient
+	public Rectangle			gpsBounds;
+
+	/**
 	 * Index of the segmented data in the original serie
 	 */
 	@Transient
@@ -424,6 +431,15 @@ public class TourData {
 	 */
 	@Transient
 	public int					mapZoomLevel;
+
+	@Transient
+	public double				mapMinLatitude;
+	@Transient
+	public double				mapMaxLatitude;
+	@Transient
+	public double				mapMinLongitude;
+	@Transient
+	public double				mapMaxLongitude;
 
 	public TourData() {}
 
@@ -994,7 +1010,6 @@ public class TourData {
 
 			// adjust index to the array size
 			int distIndexLow = Math.min(Math.max(0, serieIndex - lowIndexAdjustmentDefault), serieLength - 1);
-
 			int distIndexHigh = Math.max(0, Math.min(serieIndex + highIndexAdjustmentDefault, serieLength - 1));
 
 			final int distanceDefault = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
@@ -1379,7 +1394,7 @@ public class TourData {
 		if (isAbsoluteData) {
 
 			/*
-			 * absolute data are available these data are normally from GPS devices
+			 * absolute data are available when data are from GPS devices
 			 */
 
 			long firstTime = 0;
@@ -1391,10 +1406,29 @@ public class TourData {
 			int altitudeDiff;
 
 			int pulseCounter = 0;
-
 			int lastValidTime = 0;
-			double lastValidLatitude = 0;
-			double lastValidlongitude = 0;
+
+			// set initial min/max latitude/longitude
+			if (firstTimeDataItem.latitude == Double.MIN_VALUE || firstTimeDataItem.longitude == Double.MIN_VALUE) {
+
+				// find first valid latitude/longitude
+				for (TimeData timeData : timeDataList) {
+					if (timeData.latitude != Double.MIN_VALUE && timeData.longitude != Double.MIN_VALUE) {
+						mapMinLatitude = timeData.latitude + 90;
+						mapMaxLatitude = timeData.latitude + 90;
+						mapMinLongitude = timeData.longitude + 180;
+						mapMaxLongitude = timeData.longitude + 180;
+						break;
+					}
+				}
+			} else {
+				mapMinLatitude = firstTimeDataItem.latitude + 90;
+				mapMaxLatitude = firstTimeDataItem.latitude + 90;
+				mapMinLongitude = firstTimeDataItem.longitude + 180;
+				mapMaxLongitude = firstTimeDataItem.longitude + 180;
+			}
+			double lastValidLatitude = mapMinLatitude - 90;
+			double lastValidLongitude = mapMinLongitude - 180;
 
 			// convert data from the tour format into interger[] arrays
 			for (final TimeData timeData : timeDataList) {
@@ -1470,11 +1504,17 @@ public class TourData {
 
 				if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
 					latitudeSerie[timeIndex] = lastValidLatitude;
-					longitudeSerie[timeIndex] = lastValidlongitude;
+					longitudeSerie[timeIndex] = lastValidLongitude;
 				} else {
+
 					latitudeSerie[timeIndex] = lastValidLatitude = latitude;
-					longitudeSerie[timeIndex] = lastValidlongitude = longitude;
+					longitudeSerie[timeIndex] = lastValidLongitude = longitude;
 				}
+
+				mapMinLatitude = Math.min(mapMinLatitude, lastValidLatitude + 90);
+				mapMaxLatitude = Math.max(mapMaxLatitude, lastValidLatitude + 90);
+				mapMinLongitude = Math.min(mapMinLongitude, lastValidLongitude + 180);
+				mapMaxLongitude = Math.max(mapMaxLongitude, lastValidLongitude + 180);
 
 				/*
 				 * pulse
@@ -1494,6 +1534,11 @@ public class TourData {
 
 				timeIndex++;
 			}
+
+			mapMinLatitude -= 90;
+			mapMaxLatitude -= 90;
+			mapMinLongitude -= 180;
+			mapMaxLongitude -= 180;
 
 			/*
 			 * make sure that all pulse data points have a valid value
@@ -1558,6 +1603,7 @@ public class TourData {
 
 		tourDistance = distanceAbsolute;
 		tourRecordingTime = timeAbsolute;
+
 	}
 
 	/**
@@ -2451,8 +2497,19 @@ public class TourData {
 		int sumPower = 0;
 		int sumSpeed = 0;
 
-		double lastValidLatitude = 0;
-		double lastValidlongitude = 0;
+		// get first valid latitude/longitude
+		if (latitudeSerie != null && longitudeSerie != null) {
+
+			for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
+				if (latitudeSerie[timeIndex] != Double.MIN_VALUE && longitudeSerie[timeIndex] != Double.MIN_VALUE) {
+					mapMinLatitude = mapMaxLatitude = latitudeSerie[timeIndex] + 90;
+					mapMinLongitude = mapMaxLongitude = longitudeSerie[timeIndex] + 180;
+					break;
+				}
+			}
+		}
+		double lastValidLatitude = mapMinLatitude - 90;
+		double lastValidLongitude = mapMinLongitude - 180;
 
 		for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
 
@@ -2486,14 +2543,23 @@ public class TourData {
 
 				if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
 					latitudeSerie[timeIndex] = lastValidLatitude;
-					longitudeSerie[timeIndex] = lastValidlongitude;
+					longitudeSerie[timeIndex] = lastValidLongitude;
 				} else {
 					latitudeSerie[timeIndex] = lastValidLatitude = latitude;
-					longitudeSerie[timeIndex] = lastValidlongitude = longitude;
+					longitudeSerie[timeIndex] = lastValidLongitude = longitude;
 				}
-			}
 
+				mapMinLatitude = Math.min(mapMinLatitude, lastValidLatitude + 90);
+				mapMaxLatitude = Math.max(mapMaxLatitude, lastValidLatitude + 90);
+				mapMinLongitude = Math.min(mapMinLongitude, lastValidLongitude + 180);
+				mapMaxLongitude = Math.max(mapMaxLongitude, lastValidLongitude + 180);
+			}
 		}
+
+		mapMinLatitude -= 90;
+		mapMaxLatitude -= 90;
+		mapMinLongitude -= 180;
+		mapMaxLongitude -= 180;
 
 		/*
 		 * remove data series when the summary of the values is 0, for temperature this can be a
@@ -2530,50 +2596,6 @@ public class TourData {
 		}
 
 	}
-
-//	/**
-//	 * Called after the object was loaded from the persistence store
-//	 */
-//	@PostLoad
-//	@PostUpdate
-//	public void onPostLoadOLD() {
-//		/*
-//		 * create tourdata from the serialized data
-//		 */
-//		
-//		int serieLength = serieData.timeSerie.length;
-//		
-//		altitudeSerie = new int[serieLength];
-//		cadenceSerie = new int[serieLength];
-//		distanceSerie = new int[serieLength];
-//		pulseSerie = new int[serieLength];
-//		temperatureSerie = new int[serieLength];
-//		timeSerie = new int[serieLength];
-//		
-//		// speedSerie = new int[serieLength];
-//		// powerSerie = new int[serieLength];
-//		
-//		System.arraycopy(serieData.altitudeSerie, 0, altitudeSerie, 0, serieLength);
-//		System.arraycopy(serieData.cadenceSerie, 0, cadenceSerie, 0, serieLength);
-//		System.arraycopy(serieData.distanceSerie, 0, distanceSerie, 0, serieLength);
-//		System.arraycopy(serieData.pulseSerie, 0, pulseSerie, 0, serieLength);
-//		System.arraycopy(serieData.temperatureSerie, 0, temperatureSerie, 0, serieLength);
-//		System.arraycopy(serieData.timeSerie, 0, timeSerie, 0, serieLength);
-//		
-//		// System.arraycopy(serieData.speedSerie, 0, speedSerie, 0,
-//		// serieLength);
-//		// System.arraycopy(serieData.powerSerie, 0, powerSerie, 0,
-//		// serieLength);
-//		
-//		if (gpsData != null) {
-//			
-//			latitudeSerie = new double[serieLength];
-//			longitudeSerie = new double[serieLength];
-//			
-//			System.arraycopy(gpsData.latitude, 0, latitudeSerie, 0, serieLength);
-//			System.arraycopy(gpsData.longitude, 0, longitudeSerie, 0, serieLength);
-//		}
-//	}
 
 	/**
 	 * Called before this object gets persisted, copy data from the tourdata object into the object
