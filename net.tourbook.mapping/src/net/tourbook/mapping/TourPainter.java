@@ -28,6 +28,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
+import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.swt.Map;
 import de.byteholder.geoclipse.swt.MapPainter;
@@ -65,21 +66,21 @@ public class TourPainter extends MapPainter {
 
 		final Display display = Display.getCurrent();
 
-		final int width = 7;
-		final int height = 7;
+		final int width = 8;
+		final int height = 8;
 
 		final Image positionImage = new Image(display, width, height);
 		final Color colorTransparent = new Color(display, 0xff, 0xff, 0xfe);
 
-		final GC gcImage = new GC(positionImage);
+		final GC gc = new GC(positionImage);
 
-//		gcImage.setAntialias(SWT.ON);
+//		gc.setAntialias(SWT.ON);
 
-		gcImage.setBackground(colorTransparent);
-		gcImage.fillRectangle(0, 0, width, height);
+		gc.setBackground(colorTransparent);
+		gc.fillRectangle(0, 0, width, height);
 
-		gcImage.setBackground(positionColor);
-		gcImage.fillOval(1, 1, width - 2, height - 2);
+		gc.setBackground(positionColor);
+		gc.fillOval(1, 1, width - 2, height - 2);
 
 		/*
 		 * set transparency
@@ -88,9 +89,9 @@ public class TourPainter extends MapPainter {
 		imageData.transparentPixel = imageData.getPixel(0, 0);
 		final Image transparentImage = new Image(display, imageData);
 
-//		gcImage.setAntialias(SWT.OFF);
+//		gc.setAntialias(SWT.OFF);
 
-		gcImage.dispose();
+		gc.dispose();
 		positionImage.dispose();
 		colorTransparent.dispose();
 
@@ -114,162 +115,215 @@ public class TourPainter extends MapPainter {
 	}
 
 	@Override
-	protected void doPaint(final GC gc, final Map map) {
+	protected void doPaint(final GC gc, final Map map) {}
+
+	@Override
+	protected boolean doPaint(final GC gc, final Map map, final Tile tile) {
 
 		final PaintManager paintManager = PaintManager.getInstance();
 
 		if (paintManager.isShowTourInMap() == false) {
-			return;
+			return false;
 		}
 
 		final TourData tourData = paintManager.getTourData();
 
-		if (tourData == null || tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
-			return;
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
+
+		if (tourData == null || latitudeSerie == null || longitudeSerie == null) {
+			return false;
 		}
+
+		// draw tour
+		boolean isOverlayInTile = drawTourInTile(gc, map, tile, tourData);
+
+		boolean isMarkerInTile = false;
+
+		// draw end marker
+		isMarkerInTile = drawMarker(gc,
+				map,
+				tile,
+				latitudeSerie[latitudeSerie.length - 1],
+				longitudeSerie[longitudeSerie.length - 1],
+				fImageEndMarker);
+		isOverlayInTile = isOverlayInTile || isMarkerInTile;
+
+		// draw start marker
+		isMarkerInTile = drawMarker(gc, map, tile, latitudeSerie[0], longitudeSerie[0], fImageStartMarker);
+		isOverlayInTile = isOverlayInTile || isMarkerInTile;
+
+		return isOverlayInTile;
+	}
+
+	private boolean drawMarker(	final GC gc,
+								final Map map,
+								Tile tile,
+								final double latitude,
+								final double longitude,
+								final Image markerImage) {
+
+		if (markerImage == null) {
+			return false;
+		}
+
+		final TileFactory tileFactory = map.getTileFactory();
+		final int zoomLevel = map.getZoom();
+		int tileSize = tileFactory.getInfo().getTileSize();
+
+		// get world viewport for the current tile
+		final int worldTileX = tile.getX() * tileSize;
+		final int worldTileY = tile.getY() * tileSize;
+//		final java.awt.Rectangle tileViewport = new java.awt.Rectangle(worldTileX, worldTileY, tileSize, tileSize);
+
+		// convert lat/long into world pixels
+		Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+
+		// convert world position into device position
+		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
+		final int devMarkerPosY = worldMarkerPos.y - worldTileY;
+
+		boolean isMarkerInTile = isMarkerInTile(markerImage.getBounds(), devMarkerPosX, devMarkerPosY, tileSize);
+		if (isMarkerInTile) {
+
+			// get marker size
+			final Rectangle bounds = markerImage.getBounds();
+			final int markerWidth = bounds.width;
+			final int markerWidth2 = markerWidth / 2;
+			final int markerHeight = bounds.height;
+
+			gc.drawImage(markerImage, devMarkerPosX - markerWidth2, devMarkerPosY - markerHeight);
+		}
+
+		return isMarkerInTile;
+	}
+
+	private boolean drawTourInTile(final GC gc, final Map map, final Tile tile, final TourData tourData) {
+
+		final TileFactory tileFactory = map.getTileFactory();
+		final int zoomLevel = map.getZoom();
+		int tileSize = tileFactory.getInfo().getTileSize();
+
+		// get viewport for the current tile
+		final int worldTileX = tile.getX() * tileSize;
+		final int worldTileY = tile.getY() * tileSize;
+		final java.awt.Rectangle tileViewport = new java.awt.Rectangle(worldTileX, worldTileY, tileSize, tileSize);
+
+		Point worldPosition = null;
+		Point devPosition = null;
+		Point devPreviousPosition = null;
 
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 
-		drawTour(gc, map, tourData);
-
-		drawMarker(gc,
-				map,
-				latitudeSerie[latitudeSerie.length - 1],
-				longitudeSerie[longitudeSerie.length - 1],
-				fImageEndMarker);
-
-		drawMarker(gc, map, latitudeSerie[0], longitudeSerie[0], fImageStartMarker);
-
-	}
-
-	private void drawMarker(final GC gc,
-							final Map map,
-							final double latitude,
-							final double longitude,
-							final Image markerImage) {
-
-		if (markerImage == null) {
-			return;
-		}
-
-		final java.awt.Rectangle viewport = map.getViewport();
-		final TileFactory tileFactory = map.getTileFactory();
-
-		Point position = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), map.getZoom());
-
-		if (viewport.contains(position)) {
-
-			// create relative pixel
-			position = new java.awt.Point(position.x - viewport.x, position.y - viewport.y);
-
-			final Rectangle bounds = markerImage.getBounds();
-			final int imageWidth = bounds.width;
-			final int imageHeight = bounds.height;
-
-			gc.drawImage(markerImage, position.x - imageWidth / 2, position.y - imageHeight);
-		}
-	}
-
-//	private void drawTour(final GC gc, final Map map, final double[] latitudeSerie, final double[] longitudeSerie) {
-	private void drawTour(GC gc, Map map, TourData tourData) {
-
-		final PaintManager paintManager = PaintManager.getInstance();
-
-		final java.awt.Rectangle viewport = map.getViewport();
-		final TileFactory tileFactory = map.getTileFactory();
-		final int zoomLevel = map.getZoom();
-
-		/*
-		 * check if tour is visible in the viewport
-		 */
-//		Point posMin = tileFactory.geoToPixel(new GeoPosition(tourData.mapMinLatitude, tourData.mapMinLongitude),
-//				zoomLevel);
-//		Point posMax = tileFactory.geoToPixel(new GeoPosition(tourData.mapMaxLatitude, tourData.mapMaxLongitude),
-//				zoomLevel);
-//
-//		final java.awt.Rectangle tourRect = new java.awt.Rectangle(posMin.x, posMin.y, //
-//				posMax.x - posMin.x,
-//				posMin.y - posMax.y);
-//		if (viewport.contains(tourRect) == false) {
-//			return;
-//		}
-		double[] latitudeSerie = tourData.latitudeSerie;
-		double[] longitudeSerie = tourData.longitudeSerie;
-		final int leftSliderIndex = paintManager.getLeftSliderValueIndex();
-		final int rightSliderIndex = paintManager.getRightSliderValueIndex();
-
-		Point prevPixel = null;
-		Point absolutePixel = null;
-		Point relativePixel = null;
-		gc.setLineWidth(2);
-
-		final Display display = Display.getCurrent();
-		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
-		final Color systemColorRed = display.getSystemColor(SWT.COLOR_RED);
-
 		final int posImageWidth = fPositionImage.getBounds().width / 2;
 		final int posImageHeight = fPositionImage.getBounds().height / 2;
 
+		final Display display = Display.getCurrent();
+		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
+
+		boolean isTourInTile = false;
+		int lastInsideIndex = -99;
+		Point lastInsidePosition = null;
+
+		gc.setForeground(systemColorBlue);
+		gc.setLineWidth(2);
 //		gc.setAntialias(SWT.ON);
+
 		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
-			// Pixel zu Koordinaten abfragen
-			absolutePixel = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[serieIndex],
+			// convert lat/long into world pixels
+			worldPosition = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[serieIndex],
 					longitudeSerie[serieIndex]), zoomLevel);
 
-			// get relative pixel
-			relativePixel = new java.awt.Point(absolutePixel.x - viewport.x, absolutePixel.y - viewport.y);
+			// convert world position into device position
+			devPosition = new java.awt.Point(worldPosition.x - worldTileX, worldPosition.y - worldTileY);
 
 			// initialize previous pixel
-			if (prevPixel == null) {
-				prevPixel = relativePixel;
+			if (devPreviousPosition == null) {
+				devPreviousPosition = devPosition;
 			}
 
 			// check if position is in the viewport or position has changed
-			if (viewport.contains(absolutePixel) && relativePixel.equals(prevPixel) == false) {
+			if (tileViewport.contains(worldPosition)) {
 
-				if (serieIndex < leftSliderIndex || serieIndex > rightSliderIndex) {
-					gc.setForeground(systemColorBlue);
-					gc.drawImage(fPositionImage, relativePixel.x - posImageWidth, relativePixel.y - posImageHeight);
-				} else {
-					gc.setForeground(systemColorRed);
-					gc.drawImage(fMarkerImage, relativePixel.x - posImageWidth, relativePixel.y - posImageHeight);
+				// current position is inside the tile
+
+				if (devPosition.equals(devPreviousPosition) == false) {
+
+					isTourInTile = true;
+
+					gc.drawImage(fPositionImage, devPosition.x - posImageWidth, devPosition.y - posImageHeight);
+
+					gc.drawLine(devPreviousPosition.x, devPreviousPosition.y, devPosition.x, devPosition.y);
 				}
 
-				gc.drawLine(prevPixel.x, prevPixel.y, relativePixel.x, relativePixel.y);
+				lastInsideIndex = serieIndex;
+				lastInsidePosition = devPosition;
+
+			} else {
+
+				// current position is outside the tile
+
+				if (serieIndex == lastInsideIndex + 1) {
+
+					/*
+					 * this position is the first which is outside of the tile, draw a line to from
+					 * the last inside to the first outside position
+					 */
+
+					gc.drawLine(lastInsidePosition.x, lastInsidePosition.y, devPosition.x, devPosition.y);
+
+				}
 			}
 
-			prevPixel = relativePixel;
+			devPreviousPosition = devPosition;
 		}
 
-//		System.out.println(counter);
 //		gc.setAntialias(SWT.OFF);
 
+		return isTourInTile;
 	}
 
-//	/**
-//	 * Load image resouce from jar or plugin
-//	 * 
-//	 * @param imagePath
-//	 * @return Returns loaded image
-//	 */
-//	private BufferedImage loadImage(String imagePath) {
-//		
-//		try {
-//			if (this.getClass().getResource("/" + imagePath) != null) { //$NON-NLS-1$
-//				//when its inside a jar, does this
-//				InputStream imageStream = this.getClass().getResourceAsStream("/" + imagePath); //$NON-NLS-1$
-//				return ImageIO.read(imageStream);
-//			} else {
-//				//when its running from eclipse, does this
-//				return ImageIO.read(new File(imagePath));
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return null;
-//	}
+	/**
+	 * Checks if the marker position is within the tile. The marker is above the marker position and
+	 * one half to the left and right side
+	 * 
+	 * @param markerBounds
+	 *        marker bounds
+	 * @param devMarkerPosX
+	 *        x position for the marker
+	 * @param devMarkerPosY
+	 *        y position for the marker
+	 * @param tileSize
+	 *        width and height of the tile
+	 * @return Returns <code>true</code> when the marker is visible in the tile
+	 */
+	private boolean isMarkerInTile(	Rectangle markerBounds,
+									final int devMarkerPosX,
+									final int devMarkerPosY,
+									int tileSize) {
+
+		// get marker size
+		final int markerWidth = markerBounds.width;
+		final int markerWidth2 = markerWidth / 2;
+		final int markerHeight = markerBounds.height;
+
+		final int devMarkerPosLeft = devMarkerPosX - markerWidth2;
+		final int devMarkerPosRight = devMarkerPosX + markerWidth2;
+
+		// marker position top is in the opposite direction
+		final int devMarkerPosTop = devMarkerPosY - markerHeight;
+
+		if ((devMarkerPosLeft >= 0 && devMarkerPosLeft <= tileSize)
+				|| (devMarkerPosRight >= 0 && devMarkerPosRight <= tileSize)) {
+
+			if (devMarkerPosY >= 0 && devMarkerPosY <= tileSize || devMarkerPosTop >= 0 && devMarkerPosTop <= tileSize) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 }

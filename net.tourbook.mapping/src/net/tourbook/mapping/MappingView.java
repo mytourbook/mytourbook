@@ -500,6 +500,12 @@ public class MappingView extends ViewPart {
 			return;
 		}
 
+		// check if this is a new tour
+		boolean isNewTour = true;
+		if (fPreviousTourData != null && fPreviousTourData.getTourId().longValue() == tourData.getTourId().longValue()) {
+			isNewTour = false;
+		}
+
 		fTourData = tourData;
 
 		final PaintManager paintManager = PaintManager.getInstance();
@@ -539,6 +545,13 @@ public class MappingView extends ViewPart {
 			}
 		}
 
+		if (isNewTour) {
+
+			// a new tour is selected
+
+			fMap.setOverlayKey(tourData.getTourId().toString());
+			fMap.resetOverlays();
+		}
 		fMap.queueRedrawMap();
 	}
 
