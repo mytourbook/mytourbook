@@ -25,6 +25,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
@@ -46,6 +47,9 @@ public class TourPainter extends MapPainter {
 	private final Image			fImageEndMarker;
 	private final Image			fPositionImage;
 	private final Image			fMarkerImage;
+
+	private int					fTourColorId;
+	private int[]				fTourDataSerie;
 
 	public TourPainter() {
 
@@ -122,18 +126,18 @@ public class TourPainter extends MapPainter {
 
 		final PaintManager paintManager = PaintManager.getInstance();
 
-		if (paintManager.isShowTourInMap() == false) {
+		final TourData tourData = paintManager.getTourData();
+		if (tourData == null) {
 			return false;
 		}
-
-		final TourData tourData = paintManager.getTourData();
 
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
-
-		if (tourData == null || latitudeSerie == null || longitudeSerie == null) {
+		if (latitudeSerie == null || longitudeSerie == null) {
 			return false;
 		}
+
+		inizializeTourColor(tourData);
 
 		// draw tour
 		boolean isOverlayInTile = drawTourInTile(gc, map, tile, tourData);
@@ -158,7 +162,7 @@ public class TourPainter extends MapPainter {
 
 	private boolean drawMarker(	final GC gc,
 								final Map map,
-								Tile tile,
+								final Tile tile,
 								final double latitude,
 								final double longitude,
 								final Image markerImage) {
@@ -169,21 +173,20 @@ public class TourPainter extends MapPainter {
 
 		final TileFactory tileFactory = map.getTileFactory();
 		final int zoomLevel = map.getZoom();
-		int tileSize = tileFactory.getInfo().getTileSize();
+		final int tileSize = tileFactory.getInfo().getTileSize();
 
 		// get world viewport for the current tile
 		final int worldTileX = tile.getX() * tileSize;
 		final int worldTileY = tile.getY() * tileSize;
-//		final java.awt.Rectangle tileViewport = new java.awt.Rectangle(worldTileX, worldTileY, tileSize, tileSize);
 
 		// convert lat/long into world pixels
-		Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+		final Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
 
 		// convert world position into device position
 		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
 		final int devMarkerPosY = worldMarkerPos.y - worldTileY;
 
-		boolean isMarkerInTile = isMarkerInTile(markerImage.getBounds(), devMarkerPosX, devMarkerPosY, tileSize);
+		final boolean isMarkerInTile = isMarkerInTile(markerImage.getBounds(), devMarkerPosX, devMarkerPosY, tileSize);
 		if (isMarkerInTile) {
 
 			// get marker size
@@ -200,9 +203,11 @@ public class TourPainter extends MapPainter {
 
 	private boolean drawTourInTile(final GC gc, final Map map, final Tile tile, final TourData tourData) {
 
+		final int lineWidth = 7;
+
 		final TileFactory tileFactory = map.getTileFactory();
 		final int zoomLevel = map.getZoom();
-		int tileSize = tileFactory.getInfo().getTileSize();
+		final int tileSize = tileFactory.getInfo().getTileSize();
 
 		// get viewport for the current tile
 		final int worldTileX = tile.getX() * tileSize;
@@ -216,18 +221,15 @@ public class TourPainter extends MapPainter {
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 
-		final int posImageWidth = fPositionImage.getBounds().width / 2;
-		final int posImageHeight = fPositionImage.getBounds().height / 2;
-
 		final Display display = Display.getCurrent();
 		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
+		gc.setForeground(systemColorBlue);
+		gc.setLineWidth(lineWidth);
 
 		boolean isTourInTile = false;
 		int lastInsideIndex = -99;
 		Point lastInsidePosition = null;
 
-		gc.setForeground(systemColorBlue);
-		gc.setLineWidth(2);
 //		gc.setAntialias(SWT.ON);
 
 		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
@@ -253,9 +255,9 @@ public class TourPainter extends MapPainter {
 
 					isTourInTile = true;
 
-					gc.drawImage(fPositionImage, devPosition.x - posImageWidth, devPosition.y - posImageHeight);
+//					gc.drawImage(fPositionImage, devPosition.x - posImageWidth, devPosition.y - posImageHeight);
 
-					gc.drawLine(devPreviousPosition.x, devPreviousPosition.y, devPosition.x, devPosition.y);
+					drawTourLine(gc, serieIndex, devPosition, devPreviousPosition);
 				}
 
 				lastInsideIndex = serieIndex;
@@ -268,12 +270,11 @@ public class TourPainter extends MapPainter {
 				if (serieIndex == lastInsideIndex + 1) {
 
 					/*
-					 * this position is the first which is outside of the tile, draw a line to from
-					 * the last inside to the first outside position
+					 * this position is the first which is outside of the tile, draw a line from the
+					 * last inside to the first outside position
 					 */
 
-					gc.drawLine(lastInsidePosition.x, lastInsidePosition.y, devPosition.x, devPosition.y);
-
+					drawTourLine(gc, serieIndex, devPosition, lastInsidePosition);
 				}
 			}
 
@@ -283,6 +284,178 @@ public class TourPainter extends MapPainter {
 //		gc.setAntialias(SWT.OFF);
 
 		return isTourInTile;
+	}
+
+	private void drawTourLine(	final GC gc,
+								final int serieIndex,
+								final Point devPosition,
+								final Point devPreviousPosition) {
+
+		if (fTourDataSerie == null) {
+
+			gc.drawLine(devPreviousPosition.x, devPreviousPosition.y, devPosition.x, devPosition.y);
+
+		} else {
+
+			Color lineColor = null;
+			switch (fTourColorId) {
+			case MappingView.TOUR_COLOR_GRADIENT:
+				lineColor = getGradientColor(fTourDataSerie[serieIndex]);
+				break;
+
+			case MappingView.TOUR_COLOR_PULSE:
+				lineColor = getPulseColor(fTourDataSerie[serieIndex]);
+				break;
+
+			case MappingView.TOUR_COLOR_SPEED:
+				lineColor = getSpeedColor(fTourDataSerie[serieIndex]);
+				break;
+
+			case MappingView.TOUR_COLOR_PACE:
+				lineColor = getPaceColor(fTourDataSerie[serieIndex]);
+				break;
+			default:
+				break;
+			}
+
+			{
+				gc.setForeground(lineColor);
+				gc.drawLine(devPreviousPosition.x, devPreviousPosition.y, devPosition.x, devPosition.y);
+			}
+			lineColor.dispose();
+		}
+
+	}
+
+	/**
+	 * Get the color for the gradient value
+	 * 
+	 * @param value
+	 *        current gradient in the tour
+	 * @return Returns the color for the gradient which is red>25.5%, blue<25.5%, green==0 and
+	 *         gradient colors between these gradient values
+	 */
+	private Color getGradientColor(final int value) {
+
+		final int highValue = 30;
+		final float accelerate = 1.3F;
+
+		final int maxRed = 255;
+		final int maxGreen = 200;
+		final int maxBlue = 255;
+
+		final int accelaratedValue = Math.min(255, Math.abs((int) (value * accelerate)));
+
+		final int red = value < 0 ? 0 : value > highValue ? maxRed : Math.min(maxRed, accelaratedValue);
+		final int green = value > -highValue && value < highValue ? maxGreen : accelaratedValue;
+		final int blue = value > 0 ? 0 : value < -highValue ? maxBlue : accelaratedValue;
+
+//		System.out.println(value + "\t" + accelaratedValue + "\t" + red + "\t" + green + "\t" + blue);
+
+		return new Color(Display.getCurrent(), new RGB(red, green, blue));
+	}
+
+	private Color getPaceColor(int paceValue) {
+
+		int red = 0;
+		int green = 0;
+		int blue = 0;
+
+		return new Color(Display.getCurrent(), new RGB(red, green, blue));
+	}
+
+	private Color getPulseColor(int pulseValue) {
+
+		// green/blue
+		//   0 bpm = 128
+		//  50 bpm = 128
+		// 100 bpm = 0
+		// 200 bpm = 0
+		float percent = pulseValue / 100F;
+		float value = 128 - 128 * percent * 100 / 40;
+		float greenBlue = pulseValue > 100 ? 0 : pulseValue < 40 ? 128 : value + 128;
+
+		// red
+		//   0 bpm = 255
+		// 100 bpm = 255;
+		// 200 bpm = 200;
+		int redValue = pulseValue < 100 ? 255 : pulseValue > 200 ? 200 : pulseValue;
+
+		int red = Math.max(0, Math.min(255, (int) redValue));
+		int green = Math.max(0, Math.min(255, (int) greenBlue));
+		int blue = green;
+
+//		System.out.println(pulseValue + "\t" + red + "\t" + green + "\t" + blue);
+
+		return new Color(Display.getCurrent(), new RGB(red, green, blue));
+	}
+
+	private Color getSpeedColor(int speedValue) {
+
+		int red = 0;
+		int green = 0;
+		int blue = 0;
+
+		return new Color(Display.getCurrent(), new RGB(red, green, blue));
+	}
+
+	private void inizializeTourColor(final TourData tourData) {
+
+		fTourColorId = PaintManager.getInstance().getTourColorId();
+
+		switch (fTourColorId) {
+		case MappingView.TOUR_COLOR_DEFAULT:
+
+			fTourDataSerie = null;
+			break;
+
+		case MappingView.TOUR_COLOR_GRADIENT:
+
+			final int[] gradientSerie = tourData.getGradientSerie();
+			if (gradientSerie == null) {
+				fTourColorId = MappingView.TOUR_COLOR_DEFAULT;
+				fTourDataSerie = null;
+			} else {
+				fTourDataSerie = gradientSerie;
+			}
+			break;
+
+		case MappingView.TOUR_COLOR_PULSE:
+
+			final int[] pulseSerie = tourData.pulseSerie;
+			if (pulseSerie == null) {
+				fTourColorId = MappingView.TOUR_COLOR_DEFAULT;
+				fTourDataSerie = null;
+			} else {
+				fTourDataSerie = pulseSerie;
+			}
+			break;
+
+		case MappingView.TOUR_COLOR_SPEED:
+
+			final int[] speedSerie = tourData.getSpeedSerie();
+			if (speedSerie == null) {
+				fTourColorId = MappingView.TOUR_COLOR_DEFAULT;
+				fTourDataSerie = null;
+			} else {
+				fTourDataSerie = speedSerie;
+			}
+			break;
+
+		case MappingView.TOUR_COLOR_PACE:
+
+			final int[] paceSerie = tourData.getPaceSerie();
+			if (paceSerie == null) {
+				fTourColorId = MappingView.TOUR_COLOR_DEFAULT;
+				fTourDataSerie = null;
+			} else {
+				fTourDataSerie = paceSerie;
+			}
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	/**
@@ -299,10 +472,10 @@ public class TourPainter extends MapPainter {
 	 *        width and height of the tile
 	 * @return Returns <code>true</code> when the marker is visible in the tile
 	 */
-	private boolean isMarkerInTile(	Rectangle markerBounds,
+	private boolean isMarkerInTile(	final Rectangle markerBounds,
 									final int devMarkerPosX,
 									final int devMarkerPosY,
-									int tileSize) {
+									final int tileSize) {
 
 		// get marker size
 		final int markerWidth = markerBounds.width;

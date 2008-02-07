@@ -35,7 +35,7 @@ public class ActionZoomOut extends Action {
 
 	@Override
 	public void run() {
-		fMapView.zoomOut();
+		fMapView.actionZoomOut();
 	}
 
 }

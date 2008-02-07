@@ -27,6 +27,26 @@ public class Messages extends NLS {
 	public static String		image_action_show_tour_in_map_disabled;
 	public static String		image_action_synch_with_tour;
 	public static String		image_action_synch_with_tour_disabled;
+
+	public static String	image_action_tour_color_default;
+
+	public static String	image_action_tour_color_default_disabled;
+
+	public static String	image_action_tour_color_gradient;
+
+	public static String	image_action_tour_color_gradient_disabled;
+
+	public static String	image_action_tour_color_pace;
+
+	public static String	image_action_tour_color_pace_disabled;
+
+	public static String	image_action_tour_color_pulse;
+
+	public static String	image_action_tour_color_pulse_disabled;
+
+	public static String	image_action_tour_color_speed;
+
+	public static String	image_action_tour_color_speed_disabled;
 	public static String		image_action_zoom_centered;
 	public static String		image_action_zoom_in;
 	public static String		image_action_zoom_in_disabled;
@@ -41,6 +61,16 @@ public class Messages extends NLS {
 	public static String		map_action_set_default_position;
 	public static String		map_action_show_tour_in_map;
 	public static String		map_action_synch_with_tour;
+
+	public static String	map_action_tour_color_default_tooltip;
+
+	public static String	map_action_tour_color_gradient_tooltip;
+
+	public static String	map_action_tour_color_pase_tooltip;
+
+	public static String	map_action_tour_color_pulse_tooltip;
+
+	public static String	map_action_tour_color_speed_tooltip;
 	public static String		map_action_zoom_centered;
 	public static String		map_action_zoom_in;
 	public static String		map_action_zoom_level_centered_tour;

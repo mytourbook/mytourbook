@@ -34,7 +34,7 @@ public class ActionZoomCentered extends Action {
 
 	@Override
 	public void run() {
-		fMapView.setZoomCentered();
+		fMapView.actionSetZoomCentered();
 	}
 
 }

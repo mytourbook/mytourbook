@@ -17,25 +17,28 @@ package net.tourbook.mapping;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowTourInMap extends Action {
+public class ActionTourColor extends Action {
 
 	private MappingView	fMapView;
+	private int			fColorId;
 
-	public ActionShowTourInMap(MappingView mapView) {
+	public ActionTourColor(MappingView mapView, int colorId, String toolTipText, String imageEnabled,
+			String imageDisabled) {
 
-		super(null, AS_CHECK_BOX);
+		super(null, AS_RADIO_BUTTON);
 
 		fMapView = mapView;
+		fColorId = colorId;
 
-		setToolTipText(Messages.map_action_show_tour_in_map);
+		setToolTipText(toolTipText);
 
-		setImageDescriptor(Activator.getIconImageDescriptor(Messages.image_action_show_tour_in_map));
-		setDisabledImageDescriptor(Activator.getIconImageDescriptor(Messages.image_action_show_tour_in_map_disabled));
+		setImageDescriptor(Activator.getIconImageDescriptor(imageEnabled));
+		setDisabledImageDescriptor(Activator.getIconImageDescriptor(imageDisabled));
 	}
 
 	@Override
 	public void run() {
-		fMapView.actionSetShowTourInMap();
+		fMapView.actionSetTourColor(fColorId);
 	}
 
 }

@@ -30,7 +30,7 @@ public class ActionSetDefaultPosition extends Action {
 
 	@Override
 	public void run() {
-		fMapView.setDefaultPosition();
+		fMapView.actionSetDefaultPosition();
 	}
 
 }

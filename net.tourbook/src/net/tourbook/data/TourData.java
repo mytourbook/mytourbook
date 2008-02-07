@@ -1860,10 +1860,6 @@ public class TourData {
 	 */
 	public int[] getAltimeterSerie() {
 
-//		if (altimeterSerie == null) {
-//			return null;
-//		}
-
 		if (UI.UNIT_VALUE_ALTITUDE != 1) {
 
 			// use imperial system
@@ -1882,6 +1878,18 @@ public class TourData {
 			}
 			return altimeterSerie;
 		}
+	}
+
+	/**
+	 * @return Returns the metric or imperial altimeter serie depending on the active measurement
+	 */
+	public int[] getGradientSerie() {
+
+		if (gradientSerie == null) {
+			computeAltimeterGradientSerie();
+		}
+
+		return gradientSerie;
 	}
 
 	/**

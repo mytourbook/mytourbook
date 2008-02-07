@@ -35,7 +35,7 @@ public class ActionZoomShowAll extends Action {
 
 	@Override
 	public void run() {
-		fMapView.zoomShowEntireMap();
+		fMapView.actionZoomShowEntireMap();
 	}
 
 }

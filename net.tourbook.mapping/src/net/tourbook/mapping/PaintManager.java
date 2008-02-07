@@ -32,12 +32,9 @@ public class PaintManager {
 	 */
 	private Set<GeoPosition>	fTourBounds;
 
-	private int					fLeftSliderValueIndex;
-	private int					fRightSliderValueIndex;
+	private int					fSynchTourZoomLevel;
 
-	private int					fSynchTourToomLevel;
-
-	private boolean				fIsShowTourInMap;
+	private int					fTourColorId;
 
 	private PaintManager() {}
 
@@ -50,20 +47,8 @@ public class PaintManager {
 		return fInstance;
 	}
 
-	public int getLeftSliderValueIndex() {
-		return fLeftSliderValueIndex;
-	}
-
-	public int getRightSliderValueIndex() {
-		return fRightSliderValueIndex;
-	}
-
-	int getSynchTourZoomLevel() {
-		return fSynchTourToomLevel;
-	}
-
-	boolean isShowTourInMap() {
-		return fIsShowTourInMap;
+	public int getSynchTourZoomLevel() {
+		return fSynchTourZoomLevel;
 	}
 
 	/**
@@ -73,6 +58,10 @@ public class PaintManager {
 		return fTourBounds;
 	}
 
+	public int getTourColorId() {
+		return fTourColorId;
+	}
+
 	/**
 	 * @return Returns the current {@link TourData} which is selected in a view or editor
 	 */
@@ -80,25 +69,16 @@ public class PaintManager {
 		return fTourData;
 	}
 
-	public void setLeftSliderValueIndex(int leftSliderValueIndex) {
-		fLeftSliderValueIndex = leftSliderValueIndex;
-	}
-
-	public void setShowTourInMap(boolean isShowTourInMap) {
-		fIsShowTourInMap = isShowTourInMap;
-	}
-
-	public void setSliderValueIndex(int leftSliderValuesIndex, int rightSliderValuesIndex) {
-		setLeftSliderValueIndex(leftSliderValuesIndex);
-		fRightSliderValueIndex = rightSliderValuesIndex;
-	}
-
 	public void setSynchTourZoomLevel(int zoomLevel) {
-		fSynchTourToomLevel = zoomLevel;
+		fSynchTourZoomLevel = zoomLevel;
 	}
 
 	public void setTourBounds(Set<GeoPosition> mapPositions) {
 		fTourBounds = mapPositions;
+	}
+
+	public void setTourColorId(int colorId) {
+		fTourColorId = colorId;
 	}
 
 	/**
