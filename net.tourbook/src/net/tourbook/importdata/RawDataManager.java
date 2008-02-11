@@ -35,6 +35,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -50,26 +51,28 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-	public static final String			TEMP_RAW_DATA_FILE	= "temp-device-data.txt";			//$NON-NLS-1$
+	public static final String			TEMP_RAW_DATA_FILE			= "temp-device-data.txt";						//$NON-NLS-1$
 
-	private static RawDataManager		instance			= null;
+	protected static final String		RAW_DATA_LAST_SELECTED_PATH	= "raw-data-view.last-selected-import-path";
+
+	private static RawDataManager		instance					= null;
 
 	/**
 	 * contains the device data imported from the device/file
 	 */
-	private DeviceData					fDeviceData			= new DeviceData();
+	private DeviceData					fDeviceData					= new DeviceData();
 
 	/**
 	 * contains the tour data which were imported or received
 	 */
-	private HashMap<String, TourData>	fTourDataMap		= new HashMap<String, TourData>();
+	private HashMap<String, TourData>	fTourDataMap				= new HashMap<String, TourData>();
 
 	/**
 	 * contains the filenames for all imported files
 	 */
-	private HashSet<String>				fImportedFiles		= new HashSet<String>();
+	private HashSet<String>				fImportedFiles				= new HashSet<String>();
 
-	private int							fImportYear			= -1;
+	private int							fImportYear					= -1;
 
 	private boolean						fIsImported;
 
@@ -127,9 +130,6 @@ public class RawDataManager {
 	 */
 	public void executeImportFromFile() {
 
-		// setup open dialog
-		final FileDialog fileDialog = new FileDialog(Display.getCurrent().getActiveShell(), (SWT.OPEN | SWT.MULTI));
-
 		final ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 
 		// sort device list alphabetically
@@ -159,10 +159,16 @@ public class RawDataManager {
 			deviceIndex++;
 		}
 
-		// open file dialog
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		String lastSelectedPath = prefStore.getString(RAW_DATA_LAST_SELECTED_PATH);
+
+		// setup open dialog
+		final FileDialog fileDialog = new FileDialog(Display.getCurrent().getActiveShell(), (SWT.OPEN | SWT.MULTI));
 		fileDialog.setFilterExtensions(filterExtensions);
 		fileDialog.setFilterNames(filterNames);
+		fileDialog.setFilterPath(lastSelectedPath);
 
+		// open file dialog
 		final String firstFileName = fileDialog.open();
 
 		// check if user canceled the dialog
@@ -182,6 +188,10 @@ public class RawDataManager {
 				int importCounter = 0;
 
 				final Path filePath = new Path(firstFileName);
+
+				// keep last selected path
+				String selectedPath = filePath.removeLastSegments(1).makeAbsolute().toString();
+				prefStore.putValue(RAW_DATA_LAST_SELECTED_PATH, selectedPath);
 
 				// loop: import all selected files
 				for (String fileName : selectedFileNames) {
