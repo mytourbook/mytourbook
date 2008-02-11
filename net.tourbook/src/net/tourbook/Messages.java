@@ -211,25 +211,16 @@ public class Messages extends NLS {
 	public static String		Image__undo_tour_type_filter_system;
 	public static String		Image__view_compare_wizard;
 
-	public static String	import_data_action_adjust_imported_year;
-
-	public static String	import_data_action_clear_view;
-
-	public static String	import_data_action_clear_view_tooltip;
-
-	public static String	import_data_action_merge_tracks;
-
-	public static String	import_data_action_save_tour_for_person;
-
-	public static String	import_data_action_save_tour_with_person;
-
-	public static String	import_data_action_save_tours_for_person;
-
-	public static String	import_data_dlg_save_tour_msg;
-
-	public static String	import_data_dlg_save_tour_title;
-
-	public static String	import_data_label_unknown_device;
+	public static String		import_data_action_adjust_imported_year;
+	public static String		import_data_action_clear_view;
+	public static String		import_data_action_clear_view_tooltip;
+	public static String		import_data_action_merge_tracks;
+	public static String		import_data_action_save_tour_for_person;
+	public static String		import_data_action_save_tour_with_person;
+	public static String		import_data_action_save_tours_for_person;
+	public static String		import_data_dlg_save_tour_msg;
+	public static String		import_data_dlg_save_tour_title;
+	public static String		import_data_label_unknown_device;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;

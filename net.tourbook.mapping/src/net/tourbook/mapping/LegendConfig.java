@@ -15,34 +15,18 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
-import org.eclipse.jface.action.Action;
+import java.util.List;
 
-public class ActionTourColor extends Action {
+/**
+ * Configuration for the map legend to visualize one unit in a tour
+ */
+public class LegendConfig {
 
-	private MappingView	fMapView;
-	private int			fColorId;
+	int				legendMinValue;
+	int				legendMaxValue;
 
-	public ActionTourColor(MappingView mapView, int colorId, String toolTipText, String imageEnabled,
-			String imageDisabled) {
+	List<Integer>	units;
+	int				unitFactor	= 1;
 
-		super(null, AS_RADIO_BUTTON);
-
-		fMapView = mapView;
-		fColorId = colorId;
-
-		setToolTipText(toolTipText);
-
-		setImageDescriptor(Activator.getIconImageDescriptor(imageEnabled));
-		setDisabledImageDescriptor(Activator.getIconImageDescriptor(imageDisabled));
-	}
-
-	@Override
-	public void run() {
-
-		// !!! this method is also called when the button is unchecked !!!
-		if (isChecked()) {
-			fMapView.actionSetTourColor(fColorId);
-		}
-	}
-
+	String			unitText;
 }

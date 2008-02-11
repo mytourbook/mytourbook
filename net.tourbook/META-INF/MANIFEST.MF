@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions
 Eclipse-LazyStart: true
 Eclipse-RegisterBuddy: net.tourbook.ext.ejb3
-Export-Package: net.tourbook.colors;uses:="org.eclipse.swt.graphics",
+Export-Package: net.tourbook,
+ net.tourbook.colors;uses:="org.eclipse.swt.graphics",
  net.tourbook.data;uses:="org.eclipse.swt.graphics",
  net.tourbook.database;
   uses:="net.tourbook.data,

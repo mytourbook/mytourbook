@@ -15,34 +15,36 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
-import org.eclipse.jface.action.Action;
+public class LegendColor {
 
-public class ActionTourColor extends Action {
+	public static final int	COLOR_RED	= 1;
+	public static final int	COLOR_GREEN	= 2;
+	public static final int	COLOR_BLUE	= 3;
 
-	private MappingView	fMapView;
-	private int			fColorId;
+	public int				maxColor1	= 255;
+	public int				maxColor2	= 255;
+	public int				maxColor3	= 255;
 
-	public ActionTourColor(MappingView mapView, int colorId, String toolTipText, String imageEnabled,
-			String imageDisabled) {
+	/*
+	 * set default values to prevent a division by 0
+	 */
+	public int				minValue	= 0;
+	public int				lowValue	= 1;
+	public int				midValue	= 2;
+	public int				highValue	= 3;
+	public int				maxValue	= 4;
 
-		super(null, AS_RADIO_BUTTON);
+	/**
+	 * min and max value is painted black when {@link #dimmFactor}==1, a value below 1 will dimm
+	 * the color
+	 */
+	public float			dimmFactor	= 1.0F;
 
-		fMapView = mapView;
-		fColorId = colorId;
-
-		setToolTipText(toolTipText);
-
-		setImageDescriptor(Activator.getIconImageDescriptor(imageEnabled));
-		setDisabledImageDescriptor(Activator.getIconImageDescriptor(imageDisabled));
-	}
-
-	@Override
-	public void run() {
-
-		// !!! this method is also called when the button is unchecked !!!
-		if (isChecked()) {
-			fMapView.actionSetTourColor(fColorId);
-		}
-	}
+	/*
+	 * defines which color (red/green/blue) should be used for color1/2/3
+	 */
+	public int				color1;
+	public int				color2;
+	public int				color3;
 
 }

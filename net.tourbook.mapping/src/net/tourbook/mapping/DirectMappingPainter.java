@@ -34,6 +34,7 @@ public class DirectMappingPainter implements IDirectPainter {
 	private static final String	IMAGE_RIGHT_SLIDER	= "map-marker-slider-right.png";	//$NON-NLS-1$
 
 	private Map					fMap;
+	private boolean				fIsTourVisible;
 	private TourData			fTourData;
 
 	private int					fLeftSliderValueIndex;
@@ -92,7 +93,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
 	public void paint(final DirectPainterContext painterContext) {
 
-		if (fMap == null || fTourData == null) {
+		if (fMap == null || fTourData == null || fIsTourVisible == false) {
 			return;
 		}
 
@@ -101,10 +102,12 @@ public class DirectMappingPainter implements IDirectPainter {
 	}
 
 	public void setPaintContext(Map map,
+								boolean isTourVisible,
 								final TourData tourData,
 								final int leftSliderValuesIndex,
 								final int rightSliderValuesIndex) {
 		fMap = map;
+		fIsTourVisible = isTourVisible;
 		fTourData = tourData;
 		fLeftSliderValueIndex = leftSliderValuesIndex;
 		fRightSliderValueIndex = rightSliderValuesIndex;

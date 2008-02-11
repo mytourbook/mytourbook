@@ -19,20 +19,27 @@ package net.tourbook.mapping;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartUtil;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -41,7 +48,14 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
@@ -57,6 +71,7 @@ import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.map.TileFactoryInfo;
 import de.byteholder.geoclipse.swt.Map;
+import de.byteholder.geoclipse.swt.MapLegend;
 import de.byteholder.gpx.GeoPosition;
 import de.byteholder.gpx.ext.PointOfInterest;
 
@@ -66,11 +81,13 @@ import de.byteholder.gpx.ext.PointOfInterest;
  */
 public class MappingView extends ViewPart {
 
+	private static final String			EMPTY_STRING						= "";											//$NON-NLS-1$
 	public static final int				TOUR_COLOR_DEFAULT					= 0;
-	public static final int				TOUR_COLOR_GRADIENT					= 10;
-	public static final int				TOUR_COLOR_PULSE					= 20;
-	public static final int				TOUR_COLOR_SPEED					= 30;
-	public static final int				TOUR_COLOR_PACE						= 40;
+	public static final int				TOUR_COLOR_ALTITUDE					= 10;
+	public static final int				TOUR_COLOR_GRADIENT					= 20;
+	public static final int				TOUR_COLOR_PULSE					= 30;
+	public static final int				TOUR_COLOR_SPEED					= 40;
+	public static final int				TOUR_COLOR_PACE						= 50;
 
 	final public static String			ID									= "net.tourbook.mapping.mappingViewID";		//$NON-NLS-1$
 
@@ -88,18 +105,23 @@ public class MappingView extends ViewPart {
 
 	final static String					SHOW_TILE_INFO						= "show.tile-info";							//$NON-NLS-1$
 
+	public static final int				LEGEND_MARGIN						= 20;
+	private static final int			LEGEND_UNIT_DISTANCE				= 60;
+
 	private static IMemento				fSessionMemento;
 
 	private Map							fMap;
 
 	private ISelectionListener			fPostSelectionListener;
 	private IPropertyChangeListener		fPrefChangeListener;
+	private IPropertyChangeListener		fTourbookPrefChangeListener;
 	private IPartListener2				fPartListener;
+	private ITourPropertyListener		fTourPropertyListener;
 
 	private TourData					fTourData;
 	private TourData					fPreviousTourData;
 
-	private ActionTourColor				fActionTourColorDefault;
+	private ActionTourColor				fActionTourColorAltitude;
 	private ActionTourColor				fActionTourColorGradient;
 	private ActionTourColor				fActionTourColorPulse;
 	private ActionTourColor				fActionTourColorSpeed;
@@ -131,13 +153,15 @@ public class MappingView extends ViewPart {
 	 */
 	private GeoPosition					fPOIPosition;
 
-	private DirectMappingPainter		fDirectMappingPainter				= new DirectMappingPainter();
+	private final DirectMappingPainter	fDirectMappingPainter				= new DirectMappingPainter();
 
 	/**
 	 * current position for the x-slider
 	 */
 	private int							fCurrentLeftSliderValueIndex;
 	private int							fCurrentRightSliderValueIndex;
+
+	private MapLegend					fMapLegend;
 
 	public MappingView() {}
 
@@ -158,16 +182,18 @@ public class MappingView extends ViewPart {
 	}
 
 	void actionSetShowTourInMap() {
-		/*
-		 * the status if an overlay painted or not is checked in the painTour method
-		 */
-		paintTour(fTourData, true);
+
+		// show/hide legend
+		fMap.setLegendVisibility(fActionShowTourInMap.isChecked());
+
+		paintTour(fTourData, true, true);
 	}
 
-	void actionSetTourColor(int colorId) {
+	void actionSetTourColor(final int colorId) {
 		PaintManager.getInstance().setTourColorId(colorId);
 		fMap.resetOverlayImageCache();
 		fMap.queueRedrawMap();
+		createTourLegendImage(colorId);
 	}
 
 	void actionSetZoomCentered() {
@@ -183,7 +209,7 @@ public class MappingView extends ViewPart {
 			fActionShowTourInMap.setChecked(true);
 			fMap.setShowOverlays(true);
 
-			paintTour(fTourData, true);
+			paintTour(fTourData, true, false);
 		}
 	}
 
@@ -253,13 +279,11 @@ public class MappingView extends ViewPart {
 
 					// map properties has changed
 
-					IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-
-					boolean isShowTileInfo = store.getBoolean(SHOW_TILE_INFO);
+					final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+					final boolean isShowTileInfo = store.getBoolean(SHOW_TILE_INFO);
 
 					fMap.setDrawTileBorders(isShowTileInfo);
 					fMap.queueRedrawMap();
-
 				}
 			}
 		};
@@ -277,6 +301,47 @@ public class MappingView extends ViewPart {
 			}
 		};
 		getViewSite().getPage().addPostSelectionListener(fPostSelectionListener);
+	}
+
+	private void addTourbookPrefListener() {
+
+		fTourbookPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					// measurement system has changed
+
+					UI.updateUnits();
+
+					createTourLegendImage(PaintManager.getInstance().getTourColorId());
+
+					fMap.queueRedrawMap();
+				}
+			}
+		};
+
+		// register the listener
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fTourbookPrefChangeListener);
+	}
+
+	private void addTourPropertyListener() {
+
+		fTourPropertyListener = new ITourPropertyListener() {
+			public void propertyChanged(final int propertyId, final Object propertyData) {
+
+				if (propertyId == TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED) {
+					fTourData.clearComputedSeries();
+					paintTour(fTourData, true, true);
+					fMap.resetOverlayImageCache();
+					fMap.queueRedrawMap();
+				}
+			}
+		};
+
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
 	}
 
 	/**
@@ -313,11 +378,11 @@ public class MappingView extends ViewPart {
 
 	private void createActions() {
 
-		fActionTourColorDefault = new ActionTourColor(this,
-				TOUR_COLOR_DEFAULT,
-				Messages.map_action_tour_color_default_tooltip,
-				Messages.image_action_tour_color_default,
-				Messages.image_action_tour_color_default_disabled);
+		fActionTourColorAltitude = new ActionTourColor(this,
+				TOUR_COLOR_ALTITUDE,
+				Messages.map_action_tour_color_altitude_tooltip,
+				Messages.image_action_tour_color_altitude,
+				Messages.image_action_tour_color_altitude_disabled);
 
 		fActionTourColorGradient = new ActionTourColor(this,
 				TOUR_COLOR_GRADIENT,
@@ -360,7 +425,7 @@ public class MappingView extends ViewPart {
 		 */
 		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
 
-		viewTbm.add(fActionTourColorDefault);
+		viewTbm.add(fActionTourColorAltitude);
 		viewTbm.add(fActionTourColorPulse);
 		viewTbm.add(fActionTourColorSpeed);
 		viewTbm.add(fActionTourColorPace);
@@ -380,7 +445,7 @@ public class MappingView extends ViewPart {
 		/*
 		 * fill view menu
 		 */
-		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
 		menuMgr.add(fActionSetDefaultPosition);
 		menuMgr.add(fActionSaveDefaultPosition);
@@ -389,11 +454,139 @@ public class MappingView extends ViewPart {
 
 	}
 
+	private LegendConfig createLegendConfig(final int colorId, final org.eclipse.swt.graphics.Rectangle legendBounds) {
+
+		final LegendConfig config = new LegendConfig();
+		LegendColor legendColor;
+
+		switch (colorId) {
+
+		case MappingView.TOUR_COLOR_ALTITUDE:
+
+			if (fTourData == null) {
+				break;
+			}
+
+			int[] altitudeSerie = fTourData.getAltitudeSerie();
+			if (altitudeSerie == null) {
+				break;
+			}
+
+			/*
+			 * get min/max altitude
+			 */
+			int minValue = 0;
+			int maxValue = 0;
+			for (int valueIndex = 0; valueIndex < altitudeSerie.length; valueIndex++) {
+				if (valueIndex == 0) {
+					minValue = altitudeSerie[valueIndex];
+					maxValue = altitudeSerie[valueIndex];
+				} else {
+					minValue = Math.min(minValue, altitudeSerie[valueIndex]);
+					maxValue = Math.max(maxValue, altitudeSerie[valueIndex]);
+				}
+			}
+
+			final List<Integer> legendUnits = getLegendUnits(legendBounds, minValue, maxValue);
+			final Integer legendMinValue = legendUnits.get(0);
+			final Integer legendMaxValue = legendUnits.get(legendUnits.size() - 1);
+
+			config.units = legendUnits;
+			config.legendMinValue = legendMinValue;
+			config.legendMaxValue = legendMaxValue;
+			config.unitText = UI.UNIT_LABEL_ALTITUDE;
+
+			/*
+			 * set color configuration, each tour has a different config
+			 */
+			legendColor = TourPainter.getInstance().getAltitudeLegendColor();
+
+			final int midValueRelative = (legendMaxValue - legendMinValue) / 2;
+			final int midValue = legendMinValue + midValueRelative;
+
+			legendColor.minValue = legendMinValue;
+			legendColor.lowValue = legendMinValue + midValueRelative / 3;
+			legendColor.midValue = midValue;
+			legendColor.highValue = legendMaxValue - midValueRelative / 3;
+			legendColor.maxValue = legendMaxValue;
+
+			legendColor.dimmFactor = 0.5F;
+
+			legendColor.maxColor1 = 255;
+			legendColor.maxColor2 = 200;
+			legendColor.maxColor3 = 0;
+			legendColor.color1 = LegendColor.COLOR_BLUE;
+			legendColor.color2 = LegendColor.COLOR_GREEN;
+			legendColor.color3 = LegendColor.COLOR_RED;
+			break;
+
+		case MappingView.TOUR_COLOR_GRADIENT:
+
+			config.units = Arrays.asList(-200, -100, 0, 100, 200);
+			config.legendMinValue = -250;
+			config.legendMaxValue = 250;
+			config.unitFactor = 10;
+			config.unitText = Messages.graph_label_gradiend_unit;
+			break;
+
+		case MappingView.TOUR_COLOR_PULSE:
+
+			config.units = Arrays.asList(50, 75, 100, 125, 150, 175, 200);
+			config.legendMinValue = 50;
+			config.legendMaxValue = 200;
+			config.unitText = Messages.graph_label_heartbeat_unit;
+
+			legendColor = TourPainter.getInstance().getPulseLegendColor();
+
+			legendColor.dimmFactor = 0.5F;
+
+			legendColor.maxColor1 = 255;
+			legendColor.maxColor2 = 200;
+			legendColor.maxColor3 = 0;
+			legendColor.color1 = LegendColor.COLOR_RED;
+			legendColor.color2 = LegendColor.COLOR_GREEN;
+			legendColor.color3 = LegendColor.COLOR_BLUE;
+			break;
+
+		case MappingView.TOUR_COLOR_SPEED:
+
+			config.units = Arrays.asList(0, 10, 20, 30, 40, 50, 60, 70, 80);
+			config.legendMinValue = 0;
+			config.legendMaxValue = 60;
+			config.unitText = UI.UNIT_LABEL_SPEED;
+			break;
+
+		case MappingView.TOUR_COLOR_PACE:
+
+			config.units = Arrays.asList(0, 5, 10, 15, 20);
+			config.legendMinValue = 0;
+			config.legendMaxValue = 20;
+			config.unitText = UI.UNIT_LABEL_PACE;
+			break;
+
+		default:
+			break;
+		}
+
+		if (config.units == null || config.unitText == null) {
+			// set default values
+			config.units = Arrays.asList(0);
+			config.unitText = EMPTY_STRING;
+		}
+
+		return config;
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
 		fMap = new Map(parent);
 		fMap.setDirectPainter(fDirectMappingPainter);
+
+		fMapLegend = new MapLegend();
+		fMap.setLegend(fMapLegend);
+		fMap.setLegendVisibility(true);
+
 		fTileFactories = GeoclipseExtensions.getInstance().readExtensions(fMap);
 
 		createActions();
@@ -401,6 +594,8 @@ public class MappingView extends ViewPart {
 		addPartListener();
 		addPrefListener();
 		addSelectionListener();
+		addTourPropertyListener();
+		addTourbookPrefListener();
 
 		restoreSettings();
 
@@ -408,16 +603,63 @@ public class MappingView extends ViewPart {
 		onChangeSelection(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 	}
 
+	/**
+	 * Creates a new map legend image and disposes the old image
+	 * 
+	 * @param colorId
+	 *        Color ID for which the legend is created
+	 */
+	private void createTourLegendImage(final int colorId) {
+
+		Image legendImage = fMapLegend.getImage();
+
+		// dispose old legend image
+		if (legendImage != null && !legendImage.isDisposed()) {
+			legendImage.dispose();
+		}
+
+		final int legendWidth = 150;
+		final int legendHeight = 300;
+		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
+
+		final ImageData overlayImageData = new ImageData(legendWidth, legendHeight, 24, //
+				new PaletteData(0xff, 0xff00, 0xff00000));
+
+		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
+
+		final Display display = Display.getCurrent();
+		legendImage = new Image(display, overlayImageData);
+		final org.eclipse.swt.graphics.Rectangle imageBounds = legendImage.getBounds();
+		final LegendConfig legendConfig = createLegendConfig(colorId, imageBounds);
+
+		final Color transparentColor = new Color(display, rgbTransparent);
+		final GC gc = new GC(legendImage);
+		{
+			gc.setBackground(transparentColor);
+			gc.fillRectangle(imageBounds);
+
+			TourPainter.drawLegendColors(gc, imageBounds, legendConfig, colorId);
+		}
+		gc.dispose();
+		transparentColor.dispose();
+
+		fMapLegend.setImage(legendImage);
+	}
+
 	@Override
 	public void dispose() {
 
 		// dispose tilefactory resources
-		for (TileFactory tileFactory : fTileFactories) {
+		for (final TileFactory tileFactory : fTileFactories) {
 			tileFactory.dispose();
 		}
 
 		getViewSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
+
+		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		Activator.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fTourbookPrefChangeListener);
 
 		super.dispose();
 	}
@@ -429,14 +671,14 @@ public class MappingView extends ViewPart {
 		fActionShowTourInMap.setEnabled(fIsTour);
 		fActionSynchWithTour.setEnabled(fIsTour);
 
-		if (fIsTour) {
-			fActionTourColorDefault.setEnabled(true);
+		if (fIsTour && fTourData != null) {
+			fActionTourColorAltitude.setEnabled(true);
 			fActionTourColorGradient.setEnabled(fTourData.getGradientSerie() != null);
 			fActionTourColorPulse.setEnabled(fTourData.pulseSerie != null);
 			fActionTourColorSpeed.setEnabled(fTourData.getSpeedSerie() != null);
 			fActionTourColorPace.setEnabled(fTourData.getPaceSerie() != null);
 		} else {
-			fActionTourColorDefault.setEnabled(false);
+			fActionTourColorAltitude.setEnabled(false);
 			fActionTourColorGradient.setEnabled(false);
 			fActionTourColorPulse.setEnabled(false);
 			fActionTourColorSpeed.setEnabled(false);
@@ -447,6 +689,236 @@ public class MappingView extends ViewPart {
 	public List<TileFactory> getFactories() {
 		return fTileFactories;
 	}
+
+	private List<Integer> getLegendUnits(	final org.eclipse.swt.graphics.Rectangle legendBounds,
+											int graphMinValue,
+											int graphMaxValue) {
+
+		final int legendHeight = legendBounds.height - LEGEND_MARGIN;
+
+		/*
+		 * !!! value range does currently NOT provide negative altitudes
+		 */
+		final int graphRange = graphMaxValue - graphMinValue;
+
+		final int unitCount = legendHeight / LEGEND_UNIT_DISTANCE;
+
+		// get altitude range for one unit
+		final int graphUnitValue = graphRange / Math.max(1, unitCount);
+
+		// round the unit
+		float graphUnit = ChartUtil.roundDecimalValue(graphUnitValue);
+
+		/*
+		 * adjust min value
+		 */
+		float adjustMinValue = 0;
+		if (((float) graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
+			adjustMinValue = graphUnit;
+		}
+		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / graphUnit) * graphUnit);
+
+		/*
+		 * adjust max value
+		 */
+		// increase the max value when it does not fit to unit borders
+		float adjustMaxValue = 0;
+		if (((float) graphMaxValue % graphUnit) != 0) {
+			adjustMaxValue = graphUnit;
+		}
+		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / graphUnit) * graphUnit);
+
+		/*
+		 * create a list with all units
+		 */
+		final ArrayList<Integer> unitList = new ArrayList<Integer>();
+
+		int graphValue = graphMinValue;
+		int unitCounter = 0;
+
+		// loop: create unit label for all units
+		while (graphValue <= graphMaxValue) {
+
+			unitList.add(graphValue);
+
+			// prevent endless loops 
+			if (graphValue >= graphMaxValue || unitCounter > 100) {
+				break;
+			}
+
+			graphValue += graphUnit;
+			unitCounter++;
+		}
+
+		return unitList;
+	}
+
+//	/**
+//	 * computes data for the y axis
+//	 * 
+//	 * @param drawingData
+//	 * @param graphCount
+//	 * @param currentGraph
+//	 */
+//	private void computeYValues(final ChartDrawingData drawingData, final int graphCount, final int currentGraph) {
+//
+//		final ChartDataYSerie yData = drawingData.getYData();
+//
+//		final Point graphSize = fComponentGraph.getVisibleSizeWithHBar(fVisibleGraphRect.width,
+//				fVisibleGraphRect.height);
+//
+//		// height of one chart graph including the slider bar
+//		int devGraphHeight = graphSize.y - devMarginTop - devMarkerBarHeight - fDevXTitleBarHeight - xAxisHeight;
+//
+//		// adjust graph device height for stacked graphs, a gap is between two
+//		// graphs
+//		if (fChartDataModel.isStackedChart() && graphCount > 1) {
+//			final int devGraphHeightSpace = (devGraphHeight - (fChartsVerticalDistance * (graphCount - 1)));
+//			devGraphHeight = (devGraphHeightSpace / graphCount);
+//		}
+//
+//		// enforce minimum chart height
+//		devGraphHeight = Math.max(devGraphHeight, CHART_MIN_HEIGHT);
+////		devGraphHeight = Math.max(devGraphHeight, 1);
+//
+//		// remove slider bar from graph height
+//		devGraphHeight -= devSliderBarHeight;
+//
+//		/*
+//		 * all variables starting with graph... contain data values from the graph which are not
+//		 * scaled to the device
+//		 */
+//
+//		int graphMinValue = yData.getVisibleMinValue();
+//		// int graphMinValue = yData.getOriginalMinValue();
+//		int graphMaxValue = yData.getVisibleMaxValue();
+//
+//		int graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
+//
+//		/*
+//		 * calculate the number of units which will be visible by dividing the available height by
+//		 * the minimum size which one unit should have in pixels
+//		 */
+//		final int unitCount = devGraphHeight / fDevMinYUnit;
+//
+//		// unitValue is the number in data values for one unit
+//		final int graphUnitValue = graphValueRange / Math.max(1, unitCount);
+//
+//		// round the unit
+//		float unit = 0;
+//		final int axisUnit = yData.getAxisUnit();
+//		switch (axisUnit) {
+//		case ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE:
+//		case ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE_24H:
+//		case ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
+//			unit = ChartUtil.roundTimeValue(graphUnitValue);
+//			break;
+//
+//		case ChartDataYSerie.AXIS_UNIT_NUMBER:
+//			// unit is a decimal number
+//			unit = ChartUtil.roundDecimalValue(graphUnitValue);
+//			break;
+//		}
+//
+//		float adjustMinValue = 0;
+//		if (((float) graphMinValue % unit) != 0 && graphMinValue < 0) {
+//			adjustMinValue = unit;
+//		}
+//		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / unit) * unit);
+//
+//		// adjust the min value so that bar graphs start at the bottom of the chart
+//		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR && fChart.getStartAtChartBottom()) {
+//			yData.setVisibleMinValue(graphMinValue);
+//		}
+//
+//		// increase the max value when it does not fit to unit borders
+//		float adjustMaxValue = 0;
+//		if (((float) graphMaxValue % unit) != 0) {
+//			adjustMaxValue = unit;
+//		}
+//		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / unit) * unit);
+//
+//		// System.out.println(graphMinValue +" "+graphMaxValue);
+//
+//		if (axisUnit == ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
+//
+//			// max value exeeds 24h
+//
+//			// count number of units
+//			int unitCounter = 0;
+//			int graphValue = graphMinValue;
+//			while (graphValue <= graphMaxValue) {
+//
+//				// prevent endless loops when the unit is 0
+//				if (graphValue == graphMaxValue) {
+//					break;
+//				}
+//				unitCounter++;
+//				graphValue += unit;
+//			}
+//
+//			// adjust to 24h
+//			graphMaxValue = 24 * 3600;
+//			graphMaxValue = Math.min(24 * 3600, (((yData.getVisibleMaxValue()) / 3600) * 3600) + 3600);
+//
+//			// adjust to the whole hour
+//			graphMinValue = Math.max(0, (((yData.getVisibleMinValue() / 3600) * 3600)));
+//
+//			unit = (graphMaxValue - graphMinValue) / unitCounter;
+//			unit = ChartUtil.roundTimeValue((int) unit);
+//		}
+//
+//		graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
+//
+//		// calculate the vertical scaling between graph and device
+//		final float graphScaleY = (float) (devGraphHeight) / graphValueRange;
+//
+//		// calculate the vertical device offset
+//		int devYTop = devMarginTop + devMarkerBarHeight + fDevXTitleBarHeight;
+//
+//		if (fChartDataModel.isStackedChart()) {
+//			// each chart has its own drawing rectangle which are stacked on
+//			// top of each other
+//			devYTop += (currentGraph * (devGraphHeight + devSliderBarHeight))
+//					+ ((currentGraph - 1) * fChartsVerticalDistance);
+//
+//		} else {
+//			// all charts are drawn on the same rectangle
+//			devYTop += devGraphHeight;
+//		}
+//
+//		drawingData.setScaleY(graphScaleY);
+//
+//		drawingData.setDevYBottom(devYTop);
+//		drawingData.setDevYTop(devYTop - devGraphHeight);
+//
+//		drawingData.setGraphYBottom(graphMinValue);
+//		drawingData.setGraphYTop(graphMaxValue);
+//
+//		drawingData.setDevGraphHeight(devGraphHeight);
+//		drawingData.setDevSliderHeight(devSliderBarHeight);
+//
+//		final ArrayList<ChartUnit> unitList = drawingData.getYUnits();
+//
+//		int graphValue = graphMinValue;
+//		int maxUnits = 0;
+//
+//		// loop: create unit label for all units
+//		while (graphValue <= graphMaxValue) {
+//			unitList.add(new ChartUnit(graphValue, ChartUtil.formatValue(graphValue,
+//					axisUnit,
+//					yData.getValueDivisor(),
+//					false)));
+//
+//			// prevent endless loops when the unit is 0
+//			if (graphValue == graphMaxValue || maxUnits > 1000) {
+//				break;
+//			}
+//
+//			graphValue += unit;
+//			maxUnits++;
+//		}
+//	}
 
 	public Map getMap() {
 		return fMap;
@@ -541,14 +1013,14 @@ public class MappingView extends ViewPart {
 			final SelectionTourData selectionTourData = (SelectionTourData) selection;
 			final TourData tourData = selectionTourData.getTourData();
 
-			paintTour(tourData, false);
+			paintTour(tourData, false, false);
 
 		} else if (selection instanceof SelectionTourId) {
 
 			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
-			paintTour(tourData, false);
+			paintTour(tourData, false, false);
 
 		} else if (selection instanceof SelectionActiveEditor) {
 
@@ -560,7 +1032,7 @@ public class MappingView extends ViewPart {
 				final TourChart fTourChart = fTourEditor.getTourChart();
 				final TourData tourData = fTourChart.getTourData();
 
-				paintTour(tourData, false);
+				paintTour(tourData, false, false);
 			}
 
 		} else if (selection instanceof SelectionChartInfo) {
@@ -573,7 +1045,7 @@ public class MappingView extends ViewPart {
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
 
-			SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
+			final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
 
 			final ChartDataModel chartDataModel = xSliderPos.getChart().getChartDataModel();
 			final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
@@ -595,7 +1067,7 @@ public class MappingView extends ViewPart {
 			fPreviousTourData = null;
 			PaintManager.getInstance().setTourData(null);
 
-			PointOfInterest poi = (PointOfInterest) selection;
+			final PointOfInterest poi = (PointOfInterest) selection;
 			fPOIPosition = poi.getPosition();
 
 			fMap.setZoom(poi.getRecommendedZoom());
@@ -617,6 +1089,7 @@ public class MappingView extends ViewPart {
 
 		// set slider position
 		fDirectMappingPainter.setPaintContext(fMap,
+				fActionShowTourInMap.isChecked(),
 				fTourData,
 				fCurrentLeftSliderValueIndex,
 				fCurrentRightSliderValueIndex);
@@ -631,7 +1104,7 @@ public class MappingView extends ViewPart {
 		fMap.queueRedrawMap();
 	}
 
-	private void paintTour(final TourData tourData, boolean forceRedraw) {
+	private void paintTour(final TourData tourData, final boolean forceRedraw, final boolean ignoreSynch) {
 
 		fIsTour = true;
 
@@ -650,13 +1123,13 @@ public class MappingView extends ViewPart {
 			isNewTour = false;
 		}
 
-		fTourData = tourData;
-
 		final PaintManager paintManager = PaintManager.getInstance();
 		paintManager.setTourData(tourData);
+		fTourData = tourData;
 
-		// set  slider position
+		// set slider position
 		fDirectMappingPainter.setPaintContext(fMap,
+				fActionShowTourInMap.isChecked(),
 				tourData,
 				fCurrentLeftSliderValueIndex,
 				fCurrentRightSliderValueIndex);
@@ -666,7 +1139,7 @@ public class MappingView extends ViewPart {
 
 		fMap.setShowOverlays(fActionShowTourInMap.isChecked());
 
-		if (fIsMapSynchedWithTour) {
+		if (fIsMapSynchedWithTour && ignoreSynch == false) {
 
 			if (forceRedraw == false && fPreviousTourData != null) {
 
@@ -679,10 +1152,9 @@ public class MappingView extends ViewPart {
 				fPreviousTourData.mapCenterPositionLatitude = centerPosition.getLatitude();
 				fPreviousTourData.mapCenterPositionLongitude = centerPosition.getLongitude();
 			}
-			fPreviousTourData = tourData;
 
 			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
-				// position tour to the default position
+				// use default position for the tour
 				setTourZoomLevel(tourBounds, true);
 			} else {
 				// position tour to the previous or position
@@ -692,12 +1164,22 @@ public class MappingView extends ViewPart {
 			}
 		}
 
+		// keep tour data
+		fPreviousTourData = tourData;
+
 		if (isNewTour) {
 
 			// a new tour is selected
 
+			int colorId = PaintManager.getInstance().getTourColorId();
+			if (colorId == TOUR_COLOR_ALTITUDE) {
+				// adjust legend according the tour altitude
+				createTourLegendImage(colorId);
+			}
+
 			fMap.setOverlayKey(tourData.getTourId().toString());
 			fMap.resetOverlays();
+
 			enableActions();
 		}
 
@@ -714,24 +1196,29 @@ public class MappingView extends ViewPart {
 		fCurrentLeftSliderValueIndex = leftSliderValuesIndex;
 		fCurrentRightSliderValueIndex = rightSliderValuesIndex;
 
-		fDirectMappingPainter.setPaintContext(fMap, tourData, leftSliderValuesIndex, rightSliderValuesIndex);
+		fDirectMappingPainter.setPaintContext(fMap,
+				fActionShowTourInMap.isChecked(),
+				tourData,
+				leftSliderValuesIndex,
+				rightSliderValuesIndex);
+
 		fMap.redraw();
 	}
 
 	private void restoreSettings() {
 
-		IMemento memento = fSessionMemento;
+		final IMemento memento = fSessionMemento;
 
 		if (memento != null) {
 
-			Integer mementoZoomCentered = memento.getInteger(MEMENTO_ZOOM_CENTERED);
+			final Integer mementoZoomCentered = memento.getInteger(MEMENTO_ZOOM_CENTERED);
 			if (mementoZoomCentered != null) {
 				final boolean isTourCentered = mementoZoomCentered == 1 ? true : false;
 				fActionZoomCentered.setChecked(isTourCentered);
 				fIsPositionCentered = isTourCentered;
 			}
 
-			Integer mementoSynchTour = memento.getInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR);
+			final Integer mementoSynchTour = memento.getInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR);
 			if (mementoSynchTour != null) {
 
 				final boolean isSynchTour = mementoSynchTour == 1 ? true : false;
@@ -740,17 +1227,17 @@ public class MappingView extends ViewPart {
 				fIsMapSynchedWithTour = isSynchTour;
 			}
 
-			Integer mementoShowTour = memento.getInteger(MEMENTO_SHOW_TOUR_IN_MAP);
+			final Integer mementoShowTour = memento.getInteger(MEMENTO_SHOW_TOUR_IN_MAP);
 			if (mementoShowTour != null) {
 
 				final boolean isShowTour = mementoShowTour == 1 ? true : false;
 
 				fActionShowTourInMap.setChecked(isShowTour);
 				fMap.setShowOverlays(isShowTour);
-
+				fMap.setLegendVisibility(isShowTour);
 			}
 
-			Integer zoomLevel = memento.getInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL);
+			final Integer zoomLevel = memento.getInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL);
 			if (zoomLevel != null) {
 				fActionSynchTourZoomLevel.setZoomLevel(zoomLevel);
 			}
@@ -759,12 +1246,12 @@ public class MappingView extends ViewPart {
 			fActionChangeTileFactory.setSelectedFactory(memento.getString(MEMENTO_CURRENT_FACTORY_ID));
 
 			// restore: default position
-			Integer mementoZoom = memento.getInteger(MEMENTO_DEFAULT_POSITION_ZOOM);
+			final Integer mementoZoom = memento.getInteger(MEMENTO_DEFAULT_POSITION_ZOOM);
 			if (mementoZoom != null) {
 				fDefaultZoom = mementoZoom;
 			}
-			Float mementoLatitude = memento.getFloat(MEMENTO_DEFAULT_POSITION_LATITUDE);
-			Float mementoLongitude = memento.getFloat(MEMENTO_DEFAULT_POSITION_LONGITUDE);
+			final Float mementoLatitude = memento.getFloat(MEMENTO_DEFAULT_POSITION_LATITUDE);
+			final Float mementoLongitude = memento.getFloat(MEMENTO_DEFAULT_POSITION_LONGITUDE);
 			if (mementoLatitude != null && mementoLongitude != null) {
 				fDefaultPosition = new GeoPosition(mementoLatitude, mementoLongitude);
 			} else {
@@ -772,7 +1259,7 @@ public class MappingView extends ViewPart {
 			}
 
 			// tour color
-			Integer colorId = memento.getInteger(MEMENTO_TOUR_COLOR_ID);
+			final Integer colorId = memento.getInteger(MEMENTO_TOUR_COLOR_ID);
 			if (colorId != null) {
 
 				PaintManager.getInstance().setTourColorId(colorId);
@@ -795,9 +1282,11 @@ public class MappingView extends ViewPart {
 					break;
 
 				default:
-					fActionTourColorDefault.setChecked(true);
+					fActionTourColorAltitude.setChecked(true);
 					break;
 				}
+
+				createTourLegendImage(colorId);
 			}
 
 		} else {
@@ -805,12 +1294,17 @@ public class MappingView extends ViewPart {
 			// memento is not available, set default values
 
 			fActionChangeTileFactory.setSelectedFactory(null);
-			fActionTourColorDefault.setChecked(true);
+
+			// draw tour with default color
+			fActionTourColorAltitude.setChecked(true);
+
+			// hide legend
+			fMap.setLegendVisibility(false);
 		}
 
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
-		boolean isShowTileInfo = store.getBoolean(MappingView.SHOW_TILE_INFO);
+		final boolean isShowTileInfo = store.getBoolean(MappingView.SHOW_TILE_INFO);
 
 		fMap.setDrawTileBorders(isShowTileInfo);
 		actionSetDefaultPosition();
@@ -857,7 +1351,7 @@ public class MappingView extends ViewPart {
 		} else if (fActionTourColorPace.isChecked()) {
 			colorId = TOUR_COLOR_PACE;
 		} else {
-			colorId = TOUR_COLOR_DEFAULT;
+			colorId = TOUR_COLOR_ALTITUDE;
 		}
 		memento.putInteger(MEMENTO_TOUR_COLOR_ID, colorId);
 	}
@@ -875,7 +1369,7 @@ public class MappingView extends ViewPart {
 	 * @param adjustZoomLevel
 	 *        when <code>true</code> the zoom level will be adjusted to user settings
 	 */
-	private void setTourZoomLevel(final Set<GeoPosition> positions, boolean isAdjustZoomLevel) {
+	private void setTourZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
 
 		if (positions.size() < 2) {
 			return;

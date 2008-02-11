@@ -73,8 +73,7 @@ public class TourChartPropertyView extends ViewPart {
 		GridData gd;
 		Label label;
 
-		final ScrolledComposite scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL
-				| SWT.H_SCROLL);
+		final ScrolledComposite scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
 		scrolledContainer.setExpandVertical(true);
 		scrolledContainer.setExpandHorizontal(true);
 
@@ -121,21 +120,12 @@ public class TourChartPropertyView extends ViewPart {
 		}
 
 		Composite subContainer2 = new Composite(container, SWT.NONE);
-		GridLayoutFactory.fillDefaults()
-				.numColumns(2)
-				.margins(5, 0)
-				.spacing(0, 0)
-				.applyTo(subContainer2);
+		GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 0).spacing(0, 0).applyTo(subContainer2);
 
 		// check: use custom settings to compute values
 		fChkUseCustomComputeSettings = new Button(subContainer2, SWT.CHECK);
 		fChkUseCustomComputeSettings.setText(Messages.TourChart_Property_check_customize_value_computing);
-		fChkUseCustomComputeSettings.setLayoutData(new GridData(SWT.NONE,
-				SWT.NONE,
-				false,
-				false,
-				2,
-				1));
+		fChkUseCustomComputeSettings.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 2, 1));
 		fChkUseCustomComputeSettings.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
@@ -295,24 +285,19 @@ public class TourChartPropertyView extends ViewPart {
 				fChkUseCustomComputeSettings.getSelection());
 
 		// spinner: compute value time slice
-		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE,
-				fSpinnerComputeValues.getSelection());
+		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE, fSpinnerComputeValues.getSelection());
 
 		// checkbox: clip values
-		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING,
-				fChkUseCustomClipSettings.getSelection());
+		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING, fChkUseCustomClipSettings.getSelection());
 
 		// spinner: clip value time slice
-		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE,
-				fSpinnerClipValues.getSelection());
+		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE, fSpinnerClipValues.getSelection());
 
 		// checkbox: pace clipping
-		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING,
-				fChkUseCustomPaceClipping.getSelection());
+		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING, fChkUseCustomPaceClipping.getSelection());
 
 		// spinner: pace clipping value in 0.1 km/h-mph
-		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE,
-				fSpinnerPaceClipping.getSelection());
+		store.setValue(ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE, fSpinnerPaceClipping.getSelection());
 
 		// radio: chart type
 		final int speedChartType = fRadioLineChartType.getSelection()
@@ -322,9 +307,8 @@ public class TourChartPropertyView extends ViewPart {
 
 		TourManager.getInstance().removeAllToursFromCache();
 
-		// fire modify event
-		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED,
-				null);
+		// fire unique event for all changes
+		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED, null);
 	}
 
 	private void restoreSettings() {

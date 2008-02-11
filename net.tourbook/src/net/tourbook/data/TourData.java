@@ -270,6 +270,14 @@ public class TourData {
 	@Transient
 	public int[]				altitudeSerie;
 
+//	/**
+//	 * min/max values for the altitude
+//	 */
+//	@Transient
+//	public int					altitudeSerieMin;
+//	@Transient
+//	public int					altitudeSerieMax;
+
 	/**
 	 * contains the absolute altitude in the imperial measurement system
 	 */
@@ -1312,7 +1320,8 @@ public class TourData {
 	}
 
 	/**
-	 * Convert {@link TimeData} into {@link TourData}
+	 * Convert {@link TimeData} into {@link TourData} this will be done after data are imported or
+	 * transfered
 	 * 
 	 * @param isCreateMarker
 	 *        creates markers when <code>true</code>
@@ -1452,6 +1461,7 @@ public class TourData {
 					lastValidTime = 0;
 
 					if (isAltitude) {
+
 						altitudeSerie[timeIndex] = altitudeAbsolute;
 					}
 
@@ -2494,8 +2504,8 @@ public class TourData {
 		longitudeSerie = serieData.longitude;
 
 		/*
-		 * cleanup dataseries because dataseries has been saved before version 1.3 even when no data
-		 * are available
+		 * cleanup dataseries because dataseries has been saved before version 1.3.0 even when no
+		 * data are available
 		 */
 		int sumAltitude = 0;
 		int sumCadence = 0;
@@ -2519,42 +2529,56 @@ public class TourData {
 		double lastValidLatitude = mapMinLatitude - 90;
 		double lastValidLongitude = mapMinLongitude - 180;
 
-		for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
+		int minAltitude = 0;
+		int maxAltitude = 0;
+
+		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
 			if (altitudeSerie != null) {
-				sumAltitude += altitudeSerie[timeIndex];
+
+				sumAltitude += altitudeSerie[serieIndex];
+
+				// get altitude min/max values
+				if (serieIndex == 0) {
+					minAltitude = altitudeSerie[serieIndex];
+					maxAltitude = altitudeSerie[serieIndex];
+				} else {
+					minAltitude = Math.min(minAltitude, altitudeSerie[serieIndex]);
+					maxAltitude = Math.max(maxAltitude, altitudeSerie[serieIndex]);
+				}
 			}
+
 			if (cadenceSerie != null) {
-				sumCadence += cadenceSerie[timeIndex];
+				sumCadence += cadenceSerie[serieIndex];
 			}
 			if (distanceSerie != null) {
-				sumDistance += distanceSerie[timeIndex];
+				sumDistance += distanceSerie[serieIndex];
 			}
 			if (pulseSerie != null) {
-				sumPulse += pulseSerie[timeIndex];
+				sumPulse += pulseSerie[serieIndex];
 			}
 			if (temperatureSerie != null) {
-				final int temp = temperatureSerie[timeIndex];
+				final int temp = temperatureSerie[serieIndex];
 				sumTemperature += (temp < 0) ? -temp : temp;
 			}
 			if (powerSerie != null) {
-				sumPower += powerSerie[timeIndex];
+				sumPower += powerSerie[serieIndex];
 			}
 			if (speedSerie != null) {
-				sumSpeed += speedSerie[timeIndex];
+				sumSpeed += speedSerie[serieIndex];
 			}
 
 			if (latitudeSerie != null && longitudeSerie != null) {
 
-				final double latitude = latitudeSerie[timeIndex];
-				final double longitude = longitudeSerie[timeIndex];
+				final double latitude = latitudeSerie[serieIndex];
+				final double longitude = longitudeSerie[serieIndex];
 
 				if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
-					latitudeSerie[timeIndex] = lastValidLatitude;
-					longitudeSerie[timeIndex] = lastValidLongitude;
+					latitudeSerie[serieIndex] = lastValidLatitude;
+					longitudeSerie[serieIndex] = lastValidLongitude;
 				} else {
-					latitudeSerie[timeIndex] = lastValidLatitude = latitude;
-					longitudeSerie[timeIndex] = lastValidLongitude = longitude;
+					latitudeSerie[serieIndex] = lastValidLatitude = latitude;
+					longitudeSerie[serieIndex] = lastValidLongitude = longitude;
 				}
 
 				mapMinLatitude = Math.min(mapMinLatitude, lastValidLatitude + 90);
@@ -2573,6 +2597,7 @@ public class TourData {
 		 * remove data series when the summary of the values is 0, for temperature this can be a
 		 * problem but for a longer tour the temperature varies
 		 */
+
 		if (sumAltitude == 0) {
 			altitudeSerie = null;
 		}

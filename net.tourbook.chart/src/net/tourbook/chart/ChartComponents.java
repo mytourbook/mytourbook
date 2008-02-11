@@ -475,7 +475,7 @@ public class ChartComponents extends Composite {
 
 		graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
 
-		// calculate the device vertical scaling
+		// calculate the vertical scaling between graph and device
 		final float graphScaleY = (float) (devGraphHeight) / graphValueRange;
 
 		// calculate the vertical device offset
