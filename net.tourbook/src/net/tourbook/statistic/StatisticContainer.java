@@ -85,8 +85,7 @@ public class StatisticContainer extends Composite {
 	private int								fLastSelectionType;
 	private IPostSelectionProvider			fPostSelectionProvider;
 
-	public StatisticContainer(IViewSite viewSite, IPostSelectionProvider selectionProvider,
-			Composite parent, int style) {
+	public StatisticContainer(IViewSite viewSite, IPostSelectionProvider selectionProvider, Composite parent, int style) {
 
 		super(parent, style);
 
@@ -125,7 +124,11 @@ public class StatisticContainer extends Composite {
 	}
 
 	public void activateActions(IWorkbenchPartSite partSite) {
-//		fPartSite = partSite;
+
+		if (fActiveStatistic == null) {
+			return;
+		}
+
 		fActiveStatistic.activateActions(partSite);
 	}
 
@@ -341,9 +344,8 @@ public class StatisticContainer extends Composite {
 
 		fStatistics = new ArrayList<TourbookStatistic>();
 
-		IExtensionPoint extPoint = Platform.getExtensionRegistry()
-				.getExtensionPoint(TourbookPlugin.PLUGIN_ID,
-						TourbookPlugin.EXT_POINT_STATISTIC_YEAR);
+		IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
+				TourbookPlugin.EXT_POINT_STATISTIC_YEAR);
 
 		if (extPoint != null) {
 
@@ -408,18 +410,12 @@ public class StatisticContainer extends Composite {
 		}
 
 		// refresh current statistic
-		((IYearStatistic) fActiveStatistic).refreshStatistic(fActivePerson,
-				fActiveTourTypeFilter,
-				fActiveYear,
-				true);
+		((IYearStatistic) fActiveStatistic).refreshStatistic(fActivePerson, fActiveTourTypeFilter, fActiveYear, true);
 
 		resetSelection();
 	}
 
-	public void refreshStatistic(	TourPerson person,
-									TourTypeFilter activeTourTypeFilter,
-									int year,
-									boolean refreshData) {
+	public void refreshStatistic(TourPerson person, TourTypeFilter activeTourTypeFilter, int year, boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourTypeFilter = activeTourTypeFilter;
@@ -503,9 +499,7 @@ public class StatisticContainer extends Composite {
 	 * @param activeTourTypeFilter
 	 * @param activePerson
 	 */
-	public void restoreStatistics(	IMemento memento,
-									TourPerson activePerson,
-									TourTypeFilter activeTourTypeFilter) {
+	public void restoreStatistics(IMemento memento, TourPerson activePerson, TourTypeFilter activeTourTypeFilter) {
 
 		fActivePerson = activePerson;
 		fActiveTourTypeFilter = activeTourTypeFilter;
@@ -549,8 +543,7 @@ public class StatisticContainer extends Composite {
 		// keep statistic id for the selected statistic
 		int selectionIndex = fComboStatistics.getSelectionIndex();
 		if (selectionIndex != -1) {
-			memento.putString(MEMENTO_SELECTED_STATISTIC,
-					getStatistics().get(selectionIndex).fStatisticId);
+			memento.putString(MEMENTO_SELECTED_STATISTIC, getStatistics().get(selectionIndex).fStatisticId);
 		}
 
 	}

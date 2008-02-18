@@ -24,7 +24,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColors;
+import net.tourbook.colors.GraphColorDefaults;
 import net.tourbook.data.TourPerson;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
@@ -138,7 +138,7 @@ public class StatisticMonth extends YearStatistic {
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColorIndex(yData, tourMonthData.fTypeIds);
 
 		// altitude
@@ -150,7 +150,7 @@ public class StatisticMonth extends YearStatistic {
 		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_ALTITUDE);
 		StatisticServices.setTourTypeColorIndex(yData, tourMonthData.fTypeIds);
 
 		// duration
@@ -162,7 +162,7 @@ public class StatisticMonth extends YearStatistic {
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_TIME);
 		StatisticServices.setTourTypeColorIndex(yData, tourMonthData.fTypeIds);
 
 		if (fIsSynchScaleEnabled) {

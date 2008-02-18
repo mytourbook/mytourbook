@@ -26,7 +26,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartUtil;
 import net.tourbook.chart.IChartInfoProvider;
-import net.tourbook.colors.GraphColors;
+import net.tourbook.colors.GraphColorDefaults;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -611,7 +611,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
 
-		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_ALTITUDE);
 		yData.setColorIndex(colorIndex);
 
 		createAltitudeStatisticProvider(chartDataModel);
@@ -661,7 +661,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
 
-		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_DISTANCE);
 		yData.setColorIndex(colorIndex);
 
 		createDistanceStatisticProvider(chartDataModel);
@@ -756,7 +756,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
 
-		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_TIME);
 		yData.setColorIndex(colorIndex);
 
 		createDurationStatisticProvider(chartDataModel);

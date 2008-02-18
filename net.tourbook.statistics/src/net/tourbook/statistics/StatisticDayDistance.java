@@ -20,7 +20,7 @@ import java.util.Calendar;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColors;
+import net.tourbook.colors.GraphColorDefaults;
 import net.tourbook.ui.UI;
 
 public class StatisticDayDistance extends StatisticDay {
@@ -49,7 +49,7 @@ public class StatisticDayDistance extends StatisticDay {
 		yData.setVisibleMinValue(0);
 		yData.setCustomData(DISTANCE_DATA, 1);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_DISTANCE);
 		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
 
 		/*

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.colors;
 
+import net.tourbook.mapping.LegendColor;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -27,7 +28,7 @@ public class ColorDefinition {
 	private String			fPrefName;
 	private String			fVisibleName;
 
-	private GraphColor[]	fChildren;
+	private GraphColor[]	fColorParts;
 
 	private RGB				fDefaultLineColor;
 	private RGB				fDefaultGradientDark;
@@ -40,6 +41,8 @@ public class ColorDefinition {
 	private RGB				fNewLineColor;
 	private RGB				fNewGradientDark;
 	private RGB				fNewGradientBright;
+
+	private LegendColor		fLegendColor;
 
 	/**
 	 * Sets the color for the default, current and changes
@@ -54,16 +57,20 @@ public class ColorDefinition {
 	 *        default dark gradient color
 	 * @param defaultLineColor
 	 *        default line color
+	 * @param legendColor
+	 *        legend color configuration or <code>null</code> when legend is not available
 	 */
-	protected ColorDefinition(String prefName, String visibleName,
-			RGB defaultGradientBright, RGB defaultGradientDark, RGB defaultLineColor) {
+	protected ColorDefinition(String prefName, String visibleName, RGB defaultGradientBright, RGB defaultGradientDark,
+			RGB defaultLineColor, LegendColor legendColor) {
 
 		fPrefName = prefName;
 		fVisibleName = visibleName;
 
-		setDefaultGradientBright(defaultGradientBright);
-		setDefaultGradientDark(defaultGradientDark);
-		setDefaultLineColor(defaultLineColor);
+		fDefaultGradientBright = defaultGradientBright;
+		fDefaultGradientDark = defaultGradientDark;
+		fDefaultLineColor = defaultLineColor;
+
+		fLegendColor = legendColor;
 
 		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		String graphPrefName = getGraphPrefName();
@@ -71,145 +78,135 @@ public class ColorDefinition {
 		/*
 		 * gradient bright
 		 */
-		String prefColorGradientBright = graphPrefName + GraphColors.PREF_COLOR_BRIGHT;
+		String prefColorGradientBright = graphPrefName + GraphColorDefaults.PREF_COLOR_BRIGHT;
 		if (prefStore.contains(prefColorGradientBright)) {
-			setGradientBright(PreferenceConverter.getColor(
-					prefStore,
-					prefColorGradientBright));
+			fGradientBright = PreferenceConverter.getColor(prefStore, prefColorGradientBright);
 		} else {
-			setGradientBright(getDefaultGradientBright());
+			fGradientBright = getDefaultGradientBright();
 		}
-		setNewGradientBright(getGradientBright());
+		fNewGradientBright = getGradientBright();
 
 		/*
 		 * gradient dark
 		 */
-		String prefColorGradientDark = graphPrefName + GraphColors.PREF_COLOR_DARK;
+		String prefColorGradientDark = graphPrefName + GraphColorDefaults.PREF_COLOR_DARK;
 		if (prefStore.contains(prefColorGradientDark)) {
-			setGradientDark(PreferenceConverter
-					.getColor(prefStore, prefColorGradientDark));
+			fGradientDark = PreferenceConverter.getColor(prefStore, prefColorGradientDark);
 		} else {
-			setGradientDark(getDefaultGradientDark());
+			fGradientDark = getDefaultGradientDark();
 		}
-		setNewGradientDark(getGradientDark());
+		fNewGradientDark = getGradientDark();
 
 		/*
 		 * line color
 		 */
-		String prefColorLine = graphPrefName + GraphColors.PREF_COLOR_LINE;
+		String prefColorLine = graphPrefName + GraphColorDefaults.PREF_COLOR_LINE;
 		if (prefStore.contains(prefColorLine)) {
-			setLineColor(PreferenceConverter.getColor(prefStore, prefColorLine));
+			fLineColor = PreferenceConverter.getColor(prefStore, prefColorLine);
 		} else {
-			setLineColor(getDefaultLineColor());
+			fLineColor = getDefaultLineColor();
 		}
-		setNewLineColor(getLineColor());
+		fNewLineColor = getLineColor();
 	}
 
-	public void setColorNames(GraphColor[] children) {
-		fChildren = children;
-	}
-
-	public String getGraphPrefName() {
-		return ITourbookPreferences.GRAPH_COLORS + fPrefName + "."; //$NON-NLS-1$
-	}
-
-	public void setDefaultLineColor(RGB fDefaultLineColor) {
-		this.fDefaultLineColor = fDefaultLineColor;
-	}
-
-	public RGB getDefaultLineColor() {
-		return fDefaultLineColor;
-	}
-
-	public void setDefaultGradientDark(RGB fDefaultGradientDark) {
-		this.fDefaultGradientDark = fDefaultGradientDark;
-	}
-
-	public RGB getDefaultGradientDark() {
-		return fDefaultGradientDark;
-	}
-
-	public void setDefaultGradientBright(RGB fDefaultGradientBright) {
-		this.fDefaultGradientBright = fDefaultGradientBright;
+	public GraphColor[] getGraphColorParts() {
+		return fColorParts;
 	}
 
 	public RGB getDefaultGradientBright() {
 		return fDefaultGradientBright;
 	}
 
-	public void setLineColor(RGB fLineColor) {
-		this.fLineColor = fLineColor;
+	public RGB getDefaultGradientDark() {
+		return fDefaultGradientDark;
 	}
 
-	public RGB getLineColor() {
-		return fLineColor;
-	}
-
-	public void setGradientDark(RGB fGradientDark) {
-		this.fGradientDark = fGradientDark;
-	}
-
-	public RGB getGradientDark() {
-		return fGradientDark;
-	}
-
-	public void setGradientBright(RGB fGradientBright) {
-		this.fGradientBright = fGradientBright;
+	public RGB getDefaultLineColor() {
+		return fDefaultLineColor;
 	}
 
 	public RGB getGradientBright() {
 		return fGradientBright;
 	}
 
-	public void setNewLineColor(RGB fNewLineColor) {
-		this.fNewLineColor = fNewLineColor;
+	public RGB getGradientDark() {
+		return fGradientDark;
 	}
 
-	public RGB getNewLineColor() {
-		return fNewLineColor;
-	}
-
-	public void setNewGradientDark(RGB fNewGradientDark) {
-		this.fNewGradientDark = fNewGradientDark;
-	}
-
-	public RGB getNewGradientDark() {
-		return fNewGradientDark;
-	}
-
-	public void setNewGradientBright(RGB fNewGradientBright) {
-		this.fNewGradientBright = fNewGradientBright;
-	}
-
-	public RGB getNewGradientBright() {
-		return fNewGradientBright;
+	public String getGraphPrefName() {
+		return ITourbookPreferences.GRAPH_COLORS + fPrefName + "."; //$NON-NLS-1$
 	}
 
 	public String getImageId() {
 		return fPrefName;
 	}
 
-	public void setPrefName(String fPrefName) {
-		this.fPrefName = fPrefName;
+	public LegendColor getLegendColor() {
+		return fLegendColor;
+	}
+
+	public RGB getLineColor() {
+		return fLineColor;
+	}
+
+	public RGB getNewGradientBright() {
+		return fNewGradientBright;
+	}
+
+	public RGB getNewGradientDark() {
+		return fNewGradientDark;
+	}
+
+	public RGB getNewLineColor() {
+		return fNewLineColor;
 	}
 
 	public String getPrefName() {
 		return fPrefName;
 	}
 
-	public void setVisibleName(String fVisibleName) {
-		this.fVisibleName = fVisibleName;
-	}
-
 	public String getVisibleName() {
 		return fVisibleName;
 	}
 
-	public void setChildren(GraphColor[] fChildren) {
-		this.fChildren = fChildren;
+	/**
+	 * set color names for this color definition, the color names are children in the tree
+	 * 
+	 * @param children
+	 */
+	public void setColorNames(GraphColor[] children) {
+		fColorParts = children;
 	}
 
-	public GraphColor[] getChildren() {
-		return fChildren;
+	public void setGradientBright(RGB fGradientBright) {
+		this.fGradientBright = fGradientBright;
+	}
+
+	public void setGradientDark(RGB fGradientDark) {
+		this.fGradientDark = fGradientDark;
+	}
+
+	public void setLineColor(RGB fLineColor) {
+		this.fLineColor = fLineColor;
+	}
+
+	public void setNewGradientBright(RGB fNewGradientBright) {
+		this.fNewGradientBright = fNewGradientBright;
+	}
+
+	public void setNewGradientDark(RGB fNewGradientDark) {
+		this.fNewGradientDark = fNewGradientDark;
+	}
+
+	public void setNewLineColor(RGB fNewLineColor) {
+		this.fNewLineColor = fNewLineColor;
+	}
+
+	public void setPrefName(String fPrefName) {
+		this.fPrefName = fPrefName;
+	}
+
+	public void setVisibleName(String fVisibleName) {
+		this.fVisibleName = fVisibleName;
 	}
 }

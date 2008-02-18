@@ -19,7 +19,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColors;
+import net.tourbook.colors.GraphColorDefaults;
 
 public class StatisticWeekTourTime extends StatisticWeek {
 
@@ -44,7 +44,7 @@ public class StatisticWeekTourTime extends StatisticWeek {
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_TIME);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
 
 		if (fIsSynchScaleEnabled) {

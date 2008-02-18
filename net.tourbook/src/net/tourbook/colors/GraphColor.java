@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,79 +15,76 @@
  *******************************************************************************/
 package net.tourbook.colors;
 
+import net.tourbook.mapping.LegendColor;
+
 import org.eclipse.swt.graphics.RGB;
 
 public class GraphColor {
 
-	private ColorDefinition	fParent;
+	private ColorDefinition	fColorDefinition;
 
 	private String			fPrefName;
 	private String			fName;
 
-	public GraphColor(ColorDefinition parent, String prefName, String name) {
+	private boolean			fIsLegend;
 
-		fParent = parent;
+	public GraphColor(ColorDefinition parent, String prefName, String name, boolean isLegend) {
+
+		fColorDefinition = parent;
 
 		fPrefName = prefName;
 		fName = name;
+
+		fIsLegend = isLegend;
+	}
+
+	public ColorDefinition getColorDefinition() {
+		return fColorDefinition;
 	}
 
 	public String getColorId() {
-		return fParent.getPrefName() + "." + fPrefName; //$NON-NLS-1$
+		return fColorDefinition.getPrefName() + "." + fPrefName; //$NON-NLS-1$
 	}
 
-	RGB getDefaultRGB() {
-		return fPrefName.compareTo(GraphColors.PREF_COLOR_LINE) == 0
-				? fParent.getDefaultLineColor()
-				: fPrefName.compareTo(GraphColors.PREF_COLOR_DARK) == 0 ? fParent
-						.getDefaultGradientDark() : fParent.getDefaultGradientBright();
-	}
-
-	RGB getRGB() {
-		return fPrefName.compareTo(GraphColors.PREF_COLOR_LINE) == 0 ? fParent
-				.getLineColor() : fPrefName.compareTo(GraphColors.PREF_COLOR_DARK) == 0
-				? fParent.getGradientDark()
-				: fParent.getGradientBright();
+	public String getName() {
+		return fName;
 	}
 
 	public RGB getNewRGB() {
-		return fPrefName.compareTo(GraphColors.PREF_COLOR_LINE) == 0
-				? fParent.getNewLineColor()
-				: fPrefName.compareTo(GraphColors.PREF_COLOR_DARK) == 0 ? fParent
-						.getNewGradientDark() : fParent.getNewGradientBright();
-	}
-
-	public void setNewRGB(RGB rgb) {
-		if (fPrefName.compareTo(GraphColors.PREF_COLOR_LINE) == 0) {
-			fParent.setNewLineColor(rgb);
-		} else if (fPrefName.compareTo(GraphColors.PREF_COLOR_DARK) == 0) {
-			fParent.setNewGradientDark(rgb);
-		} else {
-			fParent.setNewGradientBright(rgb);
-		}
-	}
-
-	public void setParent(ColorDefinition fParent) {
-		this.fParent = fParent;
-	}
-
-	public ColorDefinition getParent() {
-		return fParent;
-	}
-
-	void setPrefName(String fPrefName) {
-		this.fPrefName = fPrefName;
+		return fPrefName.compareTo(GraphColorDefaults.PREF_COLOR_LINE) == 0
+				? fColorDefinition.getNewLineColor()
+				: fPrefName.compareTo(GraphColorDefaults.PREF_COLOR_DARK) == 0
+						? fColorDefinition.getNewGradientDark()
+						: fColorDefinition.getNewGradientBright();
 	}
 
 	String getPrefName() {
 		return fPrefName;
 	}
 
+	/**
+	 * @return Returns <code>true</code> when this {@link GraphColor} represents a
+	 *         {@link LegendColor}
+	 */
+	public boolean isLegend() {
+		return fIsLegend;
+	}
+
 	public void setName(String fName) {
 		this.fName = fName;
 	}
 
-	public String getName() {
-		return fName;
+	public void setNewRGB(RGB rgb) {
+		if (fPrefName.compareTo(GraphColorDefaults.PREF_COLOR_LINE) == 0) {
+			fColorDefinition.setNewLineColor(rgb);
+		} else if (fPrefName.compareTo(GraphColorDefaults.PREF_COLOR_DARK) == 0) {
+			fColorDefinition.setNewGradientDark(rgb);
+		} else {
+			fColorDefinition.setNewGradientBright(rgb);
+		}
+	}
+
+	void setPrefName(String fPrefName) {
+		this.fPrefName = fPrefName;
 	}
 }

@@ -24,7 +24,7 @@ import javax.persistence.Query;
 import net.tourbook.Messages;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColor;
-import net.tourbook.colors.GraphColors;
+import net.tourbook.colors.GraphColorDefaults;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -101,7 +101,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof ColorDefinition) {
 				ColorDefinition graphDefinition = (ColorDefinition) parentElement;
-				return graphDefinition.getChildren();
+				return graphDefinition.getGraphColorParts();
 			}
 			return null;
 		}
@@ -132,7 +132,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		TourTypeColorDefinition(TourType tourType, String prefName, String visibleName, RGB defaultGradientBright,
 				RGB defaultGradientDark, RGB defaultLineColor) {
 
-			super(prefName, visibleName, defaultGradientBright, defaultGradientDark, defaultLineColor);
+			super(prefName, visibleName, defaultGradientBright, defaultGradientDark, defaultLineColor, null);
 
 			fTourType = tourType;
 		}
@@ -200,12 +200,16 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private void createColorNames(ColorDefinition colorDefinition) {
 
-		GraphColor[] graphColors = new GraphColor[GraphColors.colorNames.length];
+		// use the first three color, mapping color is not used in tour types
+		final int graphNamesLength = GraphColorDefaults.colorNames.length - 1;
 
-		for (int nameIndex = 0; nameIndex < GraphColors.colorNames.length; nameIndex++) {
+		GraphColor[] graphColors = new GraphColor[graphNamesLength];
+
+		for (int nameIndex = 0; nameIndex < graphNamesLength; nameIndex++) {
 			graphColors[nameIndex] = new GraphColor(colorDefinition,
-					GraphColors.colorNames[nameIndex][0],
-					GraphColors.colorNames[nameIndex][1]);
+					GraphColorDefaults.colorNames[nameIndex][0],
+					GraphColorDefaults.colorNames[nameIndex][1],
+					false);
 		}
 
 		colorDefinition.setColorNames(graphColors);
@@ -412,7 +416,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		return returnResult;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private boolean deleteTourTypeFromTourData(TourType tourType) {
 
 		boolean returnResult = false;
@@ -496,7 +500,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		TourTypeColorDefinition selectedColorDefinition = null;
 
 		if (selectedItem instanceof GraphColor) {
-			selectedColorDefinition = ((TourTypeColorDefinition) ((GraphColor) selectedItem).getParent());
+			selectedColorDefinition = ((TourTypeColorDefinition) ((GraphColor) selectedItem).getColorDefinition());
 		} else if (selectedItem instanceof TourTypeColorDefinition) {
 			selectedColorDefinition = ((TourTypeColorDefinition) selectedItem);
 		}
@@ -582,7 +586,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			// update the data model
 			fSelectedColor.setNewRGB(newValue);
 
-			ColorDefinition colorDefinition = fSelectedColor.getParent();
+			ColorDefinition colorDefinition = fSelectedColor.getColorDefinition();
 			/*
 			 * dispose the old color/image from the graph
 			 */

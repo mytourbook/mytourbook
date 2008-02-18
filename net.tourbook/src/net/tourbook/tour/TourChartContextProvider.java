@@ -104,7 +104,6 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 						null);
 
 				markerDialog.create();
-
 				markerDialog.addTourMarker(newTourMarker);
 				markerDialog.open();
 

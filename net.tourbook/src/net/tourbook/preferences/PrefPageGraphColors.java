@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,10 +15,13 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColor;
-import net.tourbook.colors.GraphColors;
+import net.tourbook.colors.GraphColorDefaults;
+import net.tourbook.colors.LegendColorDialog;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.TreeColumnLayout;
 
@@ -45,14 +48,14 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageChartColors extends PreferencePage implements
-		IWorkbenchPreferencePage, IColorTreeViewer {
+public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
 	TreeViewer					fColorViewer;
 
@@ -65,6 +68,27 @@ public class PrefPageChartColors extends PreferencePage implements
 
 	private ColorLabelProvider	fColorLabelProvider;
 
+	private LegendColorDialog	fLegendColorDialog;
+
+	/**
+	 * the color content provider has the following structure<br>
+	 * 
+	 * <pre>
+	 * {@link ColorDefinition}
+	 *    {@link GraphColor}
+	 *    {@link GraphColor}
+	 *    ...
+	 *    {@link GraphColor}
+	 *    
+	 *    ...
+	 *    
+	 * {@link ColorDefinition}
+	 *    {@link GraphColor}
+	 *    {@link GraphColor}
+	 *    ...
+	 *    {@link GraphColor}
+	 * </pre>
+	 */
 	private class ColorContentProvider implements ITreeContentProvider {
 
 		public void dispose() {}
@@ -72,14 +96,14 @@ public class PrefPageChartColors extends PreferencePage implements
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof ColorDefinition) {
 				ColorDefinition graphDefinition = (ColorDefinition) parentElement;
-				return graphDefinition.getChildren();
+				return graphDefinition.getGraphColorParts();
 			}
 			return null;
 		}
 
 		public Object[] getElements(Object inputElement) {
-			if (inputElement instanceof PrefPageChartColors) {
-				return GraphColors.getInstance().getGraphDefinitionList();
+			if (inputElement instanceof PrefPageGraphColors) {
+				return GraphColorDefaults.getInstance().getGraphDefinitionList();
 			}
 			return null;
 		}
@@ -94,6 +118,7 @@ public class PrefPageChartColors extends PreferencePage implements
 			}
 			return false;
 		}
+
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
 	}
@@ -125,9 +150,42 @@ public class PrefPageChartColors extends PreferencePage implements
 		setButtonLayoutData(fColorSelector.getButton());
 		fColorSelector.addListener(new IPropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent event) {
-				onChangeColor(event);
+				onColorSelectorSelectColor(event);
 			}
 		});
+	}
+
+	/**
+	 * create color objects for every graph definition
+	 */
+	private void createColorDefinitions() {
+
+		for (ColorDefinition colorDefinition : GraphColorDefaults.getInstance().getGraphDefinitionList()) {
+
+			ArrayList<GraphColor> graphColors = new ArrayList<GraphColor>();
+
+			boolean isLegendColorAvailable = colorDefinition.getLegendColor() != null;
+
+			for (int nameIndex = 0; nameIndex < GraphColorDefaults.colorNames.length; nameIndex++) {
+
+				if (nameIndex == 3) {
+					if (isLegendColorAvailable) {
+						// create legend color
+						graphColors.add(new GraphColor(colorDefinition,
+								GraphColorDefaults.colorNames[nameIndex][0],
+								GraphColorDefaults.colorNames[nameIndex][1],
+								true));
+					}
+				} else {
+					graphColors.add(new GraphColor(colorDefinition,
+							GraphColorDefaults.colorNames[nameIndex][0],
+							GraphColorDefaults.colorNames[nameIndex][1],
+							false));
+				}
+			}
+
+			colorDefinition.setColorNames(graphColors.toArray(new GraphColor[graphColors.size()]));
+		}
 	}
 
 	private void createColorViewer(Composite parent) {
@@ -160,31 +218,25 @@ public class PrefPageChartColors extends PreferencePage implements
 		TreeColumnLayout treeLayouter = new TreeColumnLayout();
 		treeContainer.setLayout(treeLayouter);
 
-		// tour tree
-		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.H_SCROLL
-				| SWT.BORDER);
-
+		// color tree
+		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER);
 		tree.setLinesVisible(false);
-		// gd = new GridData(SWT.FILL, SWT.FILL, false, true);
-		// tree.setLayoutData(gd);
 
 		// tree columns
 		TreeColumn tc;
 
 		tc = new TreeColumn(tree, SWT.NONE);
 		tc.setText(Messages.Pref_ChartColors_Column_color);
-		// tc.setWidth(convertHorizontalDLUsToPixels(100));
-		treeLayouter.addColumnData(new ColumnWeightData(3, true));
+		treeLayouter.addColumnData(new ColumnWeightData(30, true));
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		// tc.setWidth(convertHorizontalDLUsToPixels(40));
-		treeLayouter.addColumnData(new ColumnWeightData(1, true));
+		treeLayouter.addColumnData(new ColumnWeightData(10, true));
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		// tc.setWidth(convertHorizontalDLUsToPixels(40));
-		treeLayouter.addColumnData(new ColumnWeightData(1, true));
+		treeLayouter.addColumnData(new ColumnWeightData(10, true));
+
+		tc = new TreeColumn(tree, SWT.NONE);
+		treeLayouter.addColumnData(new ColumnWeightData(5, true));
 
 		fColorViewer = new TreeViewer(tree);
 		fColorViewer.setContentProvider(new ColorContentProvider());
@@ -194,17 +246,17 @@ public class PrefPageChartColors extends PreferencePage implements
 
 		fColorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
-				onSelectColor();
+				onColorViewerSelectColor();
 			}
 		});
 
 		fColorViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
 
-				Object selection = ((IStructuredSelection) fColorViewer.getSelection())
-						.getFirstElement();
+				Object selection = ((IStructuredSelection) fColorViewer.getSelection()).getFirstElement();
 
 				if (selection instanceof ColorDefinition) {
+
 					// expand/collapse current item
 					ColorDefinition treeItem = (ColorDefinition) selection;
 
@@ -218,7 +270,14 @@ public class PrefPageChartColors extends PreferencePage implements
 						fExpandedItem = treeItem;
 					}
 				} else if (selection instanceof GraphColor) {
-					fColorSelector.open();
+
+					GraphColor graphColor = (GraphColor) selection;
+
+					if (graphColor.isLegend()) {
+						fLegendColorDialog.open();
+					} else {
+						fColorSelector.open();
+					}
 				}
 			}
 		});
@@ -249,26 +308,7 @@ public class PrefPageChartColors extends PreferencePage implements
 		});
 	}
 
-	private void createColorDefinitions() {
-		
-		// create color objects for every graph definition
-		for (ColorDefinition colorDefinition : GraphColors
-				.getInstance()
-				.getGraphDefinitionList()) {
-
-			GraphColor[] graphColors = new GraphColor[GraphColors.colorNames.length];
-
-			for (int nameIndex = 0; nameIndex < GraphColors.colorNames.length; nameIndex++) {
-				graphColors[nameIndex] = new GraphColor(
-						colorDefinition,
-						GraphColors.colorNames[nameIndex][0],
-						GraphColors.colorNames[nameIndex][1]);
-			}
-
-			colorDefinition.setColorNames(graphColors);
-		}
-	}
-
+	@Override
 	protected Control createContents(Composite parent) {
 
 		createColorDefinitions();
@@ -280,10 +320,6 @@ public class PrefPageChartColors extends PreferencePage implements
 		gridLayout.marginWidth = 0;
 		container.setLayout(gridLayout);
 
-		// GridData gd = new GridData(SWT.FILL, SWT.FILL, false, true);
-		// container.setLayoutData(gd);
-		// container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-
 		Label label = new Label(container, SWT.WRAP);
 		label.setText(Messages.Pref_ChartColors_Label_title);
 		GridData gd = new GridData();
@@ -293,9 +329,15 @@ public class PrefPageChartColors extends PreferencePage implements
 		createColorViewer(container);
 		createColorControl(container);
 
+		fLegendColorDialog = new LegendColorDialog(Display.getCurrent().getActiveShell());
+
 		fColorViewer.setInput(this);
 
 		return container;
+	}
+
+	public TreeViewer getTreeViewer() {
+		return fColorViewer;
 	}
 
 	public void init(IWorkbench workbench) {
@@ -307,7 +349,7 @@ public class PrefPageChartColors extends PreferencePage implements
 	 * 
 	 * @param event
 	 */
-	private void onChangeColor(PropertyChangeEvent event) {
+	private void onColorSelectorSelectColor(PropertyChangeEvent event) {
 
 		RGB oldValue = (RGB) event.getOldValue();
 		RGB newValue = (RGB) event.getNewValue();
@@ -322,15 +364,14 @@ public class PrefPageChartColors extends PreferencePage implements
 			/*
 			 * dispose the old color/image from the graph
 			 */
-			fColorLabelProvider.disposeColor(
-					fSelectedColor.getColorId(),
-					fSelectedColor.getParent().getImageId());
+			fColorLabelProvider.disposeColor(fSelectedColor.getColorId(), fSelectedColor.getColorDefinition()
+					.getImageId());
 
 			/*
 			 * update the tree viewer, the color images will then be recreated
 			 */
 			fColorViewer.update(fSelectedColor, null);
-			fColorViewer.update(fSelectedColor.getParent(), null);
+			fColorViewer.update(fSelectedColor.getColorDefinition(), null);
 
 			fIsColorChanged = true;
 		}
@@ -339,35 +380,51 @@ public class PrefPageChartColors extends PreferencePage implements
 	/**
 	 * is called when the color in the color viewer was selected
 	 */
-	private void onSelectColor() {
+	private void onColorViewerSelectColor() {
 
-		IStructuredSelection selection = (IStructuredSelection) fColorViewer
-				.getSelection();
+		IStructuredSelection selection = (IStructuredSelection) fColorViewer.getSelection();
 
 		if (selection.getFirstElement() instanceof GraphColor) {
+
+			// graph color is selected
+
 			GraphColor graphColor = (GraphColor) selection.getFirstElement();
 			fSelectedColor = graphColor;
-			fColorSelector.setColorValue(graphColor.getNewRGB());
-			fColorSelector.setEnabled(true);
+
+			if (graphColor.isLegend()) {
+
+				// legend color is selected
+
+			} else {
+
+				// 'normal' color is selected
+
+				// prepare color selector
+				fColorSelector.setColorValue(graphColor.getNewRGB());
+				fColorSelector.setEnabled(true);
+			}
+
 		} else {
+
+			// color definition is selected
+
 			fColorSelector.setEnabled(false);
 		}
 	}
 
+	@Override
 	public boolean performCancel() {
 		resetColors();
 		return super.performCancel();
 	}
 
+	@Override
 	protected void performDefaults() {
 
 		// update current colors
-		for (ColorDefinition graphDefinition : GraphColors
-				.getInstance()
-				.getGraphDefinitionList()) {
+		for (ColorDefinition graphDefinition : GraphColorDefaults.getInstance().getGraphDefinitionList()) {
 
-			graphDefinition.setNewGradientBright(graphDefinition
-					.getDefaultGradientBright());
+			graphDefinition.setNewGradientBright(graphDefinition.getDefaultGradientBright());
 			graphDefinition.setNewGradientDark(graphDefinition.getDefaultGradientDark());
 			graphDefinition.setNewLineColor(graphDefinition.getDefaultLineColor());
 		}
@@ -380,6 +437,7 @@ public class PrefPageChartColors extends PreferencePage implements
 		super.performDefaults();
 	}
 
+	@Override
 	public boolean performOk() {
 
 		if (fIsColorChanged) {
@@ -387,9 +445,7 @@ public class PrefPageChartColors extends PreferencePage implements
 			updatePrefColors();
 
 			// update current colors
-			for (ColorDefinition graphDefinition : GraphColors
-					.getInstance()
-					.getGraphDefinitionList()) {
+			for (ColorDefinition graphDefinition : GraphColorDefaults.getInstance().getGraphDefinitionList()) {
 
 				graphDefinition.setGradientBright(graphDefinition.getNewGradientBright());
 				graphDefinition.setGradientDark(graphDefinition.getNewGradientDark());
@@ -397,18 +453,15 @@ public class PrefPageChartColors extends PreferencePage implements
 			}
 
 			// force to change the status
-			getPreferenceStore().setValue(
-					ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED,
-					Math.random());
+			getPreferenceStore().setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
 		}
 
 		return super.performOk();
 	}
+
 	private void resetColors() {
 
-		for (ColorDefinition graphDefinition : GraphColors
-				.getInstance()
-				.getGraphDefinitionList()) {
+		for (ColorDefinition graphDefinition : GraphColorDefaults.getInstance().getGraphDefinitionList()) {
 
 			graphDefinition.setNewGradientBright(graphDefinition.getGradientBright());
 			graphDefinition.setNewGradientDark(graphDefinition.getGradientDark());
@@ -423,29 +476,22 @@ public class PrefPageChartColors extends PreferencePage implements
 
 		IPreferenceStore prefStore = getPreferenceStore();
 
-		for (ColorDefinition graphDefinition : GraphColors
-				.getInstance()
-				.getGraphDefinitionList()) {
+		for (ColorDefinition graphDefinition : GraphColorDefaults.getInstance().getGraphDefinitionList()) {
 
-			String prefGraphName = ITourbookPreferences.GRAPH_COLORS
-					+ graphDefinition.getPrefName()
-					+ "."; //$NON-NLS-1$
+			String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphDefinition.getPrefName() + "."; //$NON-NLS-1$
 
-			PreferenceConverter.setValue(prefStore, prefGraphName
-					+ GraphColors.PREF_COLOR_BRIGHT, graphDefinition
-					.getNewGradientBright());
+			PreferenceConverter.setValue(prefStore,
+					prefGraphName + GraphColorDefaults.PREF_COLOR_BRIGHT,
+					graphDefinition.getNewGradientBright());
 
-			PreferenceConverter.setValue(prefStore, prefGraphName
-					+ GraphColors.PREF_COLOR_DARK, graphDefinition
-					.getNewGradientDark());
+			PreferenceConverter.setValue(prefStore,
+					prefGraphName + GraphColorDefaults.PREF_COLOR_DARK,
+					graphDefinition.getNewGradientDark());
 
-			PreferenceConverter.setValue(prefStore, prefGraphName
-					+ GraphColors.PREF_COLOR_LINE, graphDefinition.getNewLineColor());
+			PreferenceConverter.setValue(prefStore,
+					prefGraphName + GraphColorDefaults.PREF_COLOR_LINE,
+					graphDefinition.getNewLineColor());
 		}
-	}
-
-	public TreeViewer getTreeViewer() {
-		return fColorViewer;
 	}
 
 }

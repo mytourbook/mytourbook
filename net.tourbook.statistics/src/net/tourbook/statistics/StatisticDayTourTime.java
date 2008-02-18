@@ -21,7 +21,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColors;
+import net.tourbook.colors.GraphColorDefaults;
 
 public class StatisticDayTourTime extends StatisticDay {
 
@@ -50,7 +50,7 @@ public class StatisticDayTourTime extends StatisticDay {
 		yData.setCustomData(DURATION_DATA, 1);
 		chartModel.addYData(yData);
 		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
-		StatisticServices.setTourTypeColors(yData, GraphColors.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_TIME);
 
 		/*
 		 * set graph minimum width, these is the number of days in the year

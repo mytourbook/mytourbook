@@ -16,7 +16,7 @@
 package net.tourbook.preferences;
 
 import net.tourbook.colors.ColorDefinition;
-import net.tourbook.colors.GraphColors;
+import net.tourbook.colors.GraphColorDefaults;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.util.StringToArrayConverter;
@@ -71,20 +71,20 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * graph color preferences
 		 */
 
-		for (ColorDefinition graphDefinition : GraphColors.getInstance().getGraphDefinitionList()) {
+		for (ColorDefinition graphDefinition : GraphColorDefaults.getInstance().getGraphDefinitionList()) {
 
 			String graphName = graphDefinition.getGraphPrefName();
 
 			PreferenceConverter.setDefault(store,
-					graphName + GraphColors.PREF_COLOR_BRIGHT,
+					graphName + GraphColorDefaults.PREF_COLOR_BRIGHT,
 					graphDefinition.getDefaultGradientBright());
 
 			PreferenceConverter.setDefault(store,
-					graphName + GraphColors.PREF_COLOR_DARK,
+					graphName + GraphColorDefaults.PREF_COLOR_DARK,
 					graphDefinition.getDefaultGradientDark());
 
 			PreferenceConverter.setDefault(store,
-					graphName + GraphColors.PREF_COLOR_LINE,
+					graphName + GraphColorDefaults.PREF_COLOR_LINE,
 					graphDefinition.getDefaultLineColor());
 		}
 

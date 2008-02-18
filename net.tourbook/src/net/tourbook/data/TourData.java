@@ -1389,7 +1389,7 @@ public class TourData {
 		}
 
 		// check if GPS data are available
-		if (firstTimeDataItem.latitude != Integer.MIN_VALUE) {
+		if (firstTimeDataItem.latitude != Double.MIN_VALUE) {
 			latitudeSerie = new double[serieLength];
 			longitudeSerie = new double[serieLength];
 		}
@@ -2528,24 +2528,12 @@ public class TourData {
 		}
 		double lastValidLatitude = mapMinLatitude - 90;
 		double lastValidLongitude = mapMinLongitude - 180;
-
-		int minAltitude = 0;
-		int maxAltitude = 0;
+		boolean isLatitudeValid = false;
 
 		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
 			if (altitudeSerie != null) {
-
 				sumAltitude += altitudeSerie[serieIndex];
-
-				// get altitude min/max values
-				if (serieIndex == 0) {
-					minAltitude = altitudeSerie[serieIndex];
-					maxAltitude = altitudeSerie[serieIndex];
-				} else {
-					minAltitude = Math.min(minAltitude, altitudeSerie[serieIndex]);
-					maxAltitude = Math.max(maxAltitude, altitudeSerie[serieIndex]);
-				}
 			}
 
 			if (cadenceSerie != null) {
@@ -2585,6 +2573,14 @@ public class TourData {
 				mapMaxLatitude = Math.max(mapMaxLatitude, lastValidLatitude + 90);
 				mapMinLongitude = Math.min(mapMinLongitude, lastValidLongitude + 180);
 				mapMaxLongitude = Math.max(mapMaxLongitude, lastValidLongitude + 180);
+
+				/*
+				 * check if latitude is not 0, there was a bug until version 1.3.0 where latitude
+				 * and longitude has been saved with 0 values
+				 */
+				if (isLatitudeValid == false && lastValidLatitude != 0) {
+					isLatitudeValid = true;
+				}
 			}
 		}
 
@@ -2626,6 +2622,11 @@ public class TourData {
 
 		if (speedSerie != null) {
 			isSpeedSerieFromDevice = true;
+		}
+
+		if (isLatitudeValid == false) {
+			latitudeSerie = null;
+			longitudeSerie = null;
 		}
 
 	}
