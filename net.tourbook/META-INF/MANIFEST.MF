@@ -7,11 +7,13 @@ Bundle-ClassPath: net.tourbook.jar,
  persistence.jar
 Bundle-Activator: net.tourbook.plugin.TourbookPlugin
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- net.tourbook.chart,
+Require-Bundle: net.tourbook.chart,
  net.tourbook.ext.ejb3,
  net.tourbook.rxtx,
+ de.byteholder.geoclipse,
+ de.byteholder.gpx,
+ org.eclipse.core.runtime,
+ org.eclipse.ui,
  org.apache.derby.core,
  org.eclipse.update.ui,
  org.eclipse.core.expressions
@@ -33,6 +35,7 @@ Export-Package: net.tourbook,
    gnu.io,
    org.eclipse.swt.widgets,
    org.eclipse.jface.dialogs",
+ net.tourbook.mapping,
  net.tourbook.plugin;
   uses:="net.tourbook.application,
    net.tourbook.data,

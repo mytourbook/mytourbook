@@ -150,6 +150,8 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_gradient_bright;
 	public static String		Graph_Pref_color_gradient_dark;
 	public static String		Graph_Pref_color_line;
+
+	public static String	Graph_Pref_color_mapping;
 	public static String		Graph_Pref_color_statistic_distance;
 	public static String		Graph_Pref_color_statistic_time;
 

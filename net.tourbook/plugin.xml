@@ -85,7 +85,7 @@
             id="net.tourbook.preferences.PrefPageStatistic"
             name="%preference_page_Statistics"/>
       <page
-            class="net.tourbook.preferences.PrefPageChartColors"
+            class="net.tourbook.preferences.PrefPageGraphColors"
             id="net.tourbook.preferences.PrefPageChartColors"
             name="%preference_page_Chart_Colors"/>
       <page
@@ -238,6 +238,25 @@
                       icon="icons/tourchart-properties.gif"
                       >
         </view>
+        
+              <category
+            id="net.tourbook.category.tourMaps"
+            name="%view_category_tour_map">
+      </category>
+      <view
+            category="net.tourbook.category.tourMaps"
+            class="net.tourbook.mapping.MappingView"
+            icon="icons/earth-globe-abstract.png"
+            id="net.tourbook.mapping.mappingViewID"
+            name="%command_tour_map_name" >
+      </view>
+      <view
+            category="net.tourbook.category.system"
+            class="net.tourbook.mapping.TourMapPropertyView"
+            icon="icons/tour-map-properties.gif"
+            id="net.tourbook.mapping.TourMapPropertyView"
+            name="%command_view_tour_properties_name">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
@@ -752,6 +771,24 @@
          </command>
       </menuContribution>
       
+      <menuContribution
+            locationURI="toolbar:net.tourbook.toolbars.tourViews?after=additions">
+         <command
+               commandId="net.tourbook.mapping.command.tourMap"
+               icon="icons/earth-globe-abstract.png"
+               label="%command_tour_map_name"
+               tooltip="%command_tour_map_name_tooltip">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:views?before=defaultViews">
+         <command
+               commandId="net.tourbook.mapping.command.tourMap"
+               icon="icons/earth-globe-abstract.png"
+               label="%command_tour_map_name"
+               tooltip="%command_tour_map_name_tooltip">
+         </command>
+      </menuContribution>
  
    </extension>
    <extension
@@ -893,7 +930,18 @@
             id="net.tourbook.command.tourProperties"
             name="%command_view_tourProperies">
       </command>
+      <command
+            defaultHandler="net.tourbook.mapping.ActionHandlerOpenTourMapView"
+            id="net.tourbook.mapping.command.tourMap"
+            name="%command_tour_map_name">
+      </command>
    </extension>
+   
+   <extension
+         point="de.byteholder.geoclipse.mapOverlay">
+      <painter class="net.tourbook.mapping.TourPainter"/>
+   </extension>
+   
    <extension
          point="org.eclipse.ui.handlers">
       <handler
