@@ -15,22 +15,34 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
-import java.util.List;
+import org.eclipse.swt.graphics.Color;
 
-/**
- * Configuration for the map legend to visualize one unit in a tour
- */
-public class LegendConfig {
+public class LegendProvider implements ILegendProvider {
 
-	private static final String	EMPTY_STRING	= "";
+	private LegendConfig	fLegendConfig;
+	private LegendColor		fLegendColor;
+	private int				fColorId;
 
-	public int					legendMinValue;
-	public int					legendMaxValue;
+	public LegendProvider(LegendConfig legendConfig, LegendColor legendColor, int colorId) {
+		fLegendConfig = legendConfig;
+		fLegendColor = legendColor;
+		fColorId = colorId;
+	}
 
-	public List<Integer>		units;
-	public List<String>			unitLabels;
+	public LegendColor getLegendColor() {
+		return fLegendColor;
+	}
 
-	public int					unitFactor		= 1;
+	public LegendConfig getLegendConfig() {
+		return fLegendConfig;
+	}
 
-	public String				unitText		= EMPTY_STRING;
+	public int getTourColorId() {
+		return fColorId;
+	}
+
+	public Color getValueColor(int legendValue) {
+		return TourPainter.getLegendColor(fLegendColor, legendValue);
+	}
+
 }

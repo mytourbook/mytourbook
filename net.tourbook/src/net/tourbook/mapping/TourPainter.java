@@ -16,9 +16,8 @@
 
 package net.tourbook.mapping;
 
-import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
@@ -28,6 +27,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -49,19 +49,13 @@ public class TourPainter extends MapPainter {
 
 	private static TourPainter	fInstance;
 
-	private static LegendColor	fAltitudeLegendColor;
-	private static LegendColor	fGradientLegendColor;
-	private static LegendColor	fPulseLegendColor;
-
-	private LegendConfig		fGradientLegendConfig;
-
 	private final Image			fImageStartMarker;
 	private final Image			fImageEndMarker;
 	private final Image			fPositionImage;
 	private final Image			fMarkerImage;
 
-	private int					fTourColorId;
 	private int[]				fDataSerie;
+	private ILegendProvider		fLegendProvider;
 
 	public TourPainter() {
 
@@ -77,23 +71,6 @@ public class TourPainter extends MapPainter {
 
 		fImageStartMarker = TourbookPlugin.getImageDescriptor(IMAGE_START_MARKER).createImage();
 		fImageEndMarker = TourbookPlugin.getImageDescriptor(IMAGE_END_MARKER).createImage();
-
-		// altitude legend color, min/max values will be set when a new tour is displayed
-		fAltitudeLegendColor = new LegendColor();
-		fAltitudeLegendColor.maxColor1 = 255;
-		fAltitudeLegendColor.maxColor2 = 220;
-
-		// pulse legend color
-		fPulseLegendColor = new LegendColor();
-
-		fPulseLegendColor.maxColor2 = 220;
-
-		fPulseLegendColor.minValue = 50;
-		fPulseLegendColor.lowValue = 70;
-		fPulseLegendColor.midValue = 125;
-		fPulseLegendColor.highValue = 150;
-		fPulseLegendColor.maxValue = 200;
-
 	}
 
 	/**
@@ -103,10 +80,9 @@ public class TourPainter extends MapPainter {
 	 * @param legendBounds
 	 * @param colorId
 	 */
-	public static void drawLegendColors(final GC gc,
-										final Rectangle legendBounds,
-										final LegendConfig config,
-										final int colorId) {
+	public static void drawLegendColors(final GC gc, final Rectangle legendBounds, final ILegendProvider legendProvider) {
+
+		final LegendConfig config = legendProvider.getLegendConfig();
 
 		// get configuration for the legend 
 		final ArrayList<Integer> legendUnits = new ArrayList<Integer>(config.units);
@@ -114,6 +90,7 @@ public class TourPainter extends MapPainter {
 		final int legendMaxValue = config.legendMaxValue;
 		final int legendMinValue = config.legendMinValue;
 		final String unitText = config.unitText;
+		final List<String> unitLabels = config.unitLabels;
 
 		final int legendWidth = 20;
 		final int legendHeight = legendBounds.height - MappingView.LEGEND_MARGIN;
@@ -136,6 +113,8 @@ public class TourPainter extends MapPainter {
 		// pixelValue contains the value for ONE pixel
 		final float pixelValue = (float) legendDiffValue / legendHeight;
 
+		int unitLabelIndex = 0;
+
 		for (int heightIndex = 0; heightIndex <= legendHeight; heightIndex++) {
 
 			legendValue = (int) (legendMinValue + pixelValue * heightIndex);
@@ -150,9 +129,17 @@ public class TourPainter extends MapPainter {
 			for (final Integer unitValue : legendUnits) {
 				if (legendValue >= unitValue) {
 
-					final int unit = unitValue / unitFactor;
-					final String valueText = Integer.toString(unit) + SPACER + unitText;
-					final org.eclipse.swt.graphics.Point valueTextExtent = gc.textExtent(valueText);
+					/*
+					 * get unit label
+					 */
+					String valueText;
+					if (unitLabels == null) {
+						final int unit = unitValue / unitFactor;
+						valueText = Integer.toString(unit) + SPACER + unitText;
+					} else {
+						valueText = unitLabels.get(unitLabelIndex++);
+					}
+					final Point valueTextExtent = gc.textExtent(valueText);
 
 					gc.setForeground(legendTextColor);
 					gc.setBackground(legendTextBackgroundColor);
@@ -184,30 +171,8 @@ public class TourPainter extends MapPainter {
 			/*
 			 * draw legend color line
 			 */
-			switch (colorId) {
-			case MappingView.TOUR_COLOR_ALTITUDE:
-				lineColor = getLegendColor(fAltitudeLegendColor, legendValue);
-				break;
 
-			case MappingView.TOUR_COLOR_GRADIENT:
-//				lineColor = getGradientColor(legendValue);
-				lineColor = getLegendColor(fGradientLegendColor, legendValue);
-				break;
-
-			case MappingView.TOUR_COLOR_PULSE:
-				lineColor = getLegendColor(fPulseLegendColor, legendValue);
-				break;
-
-			case MappingView.TOUR_COLOR_SPEED:
-				lineColor = getSpeedColor(legendValue);
-				break;
-
-			case MappingView.TOUR_COLOR_PACE:
-				lineColor = getPaceColor(legendValue);
-				break;
-			default:
-				break;
-			}
+			lineColor = legendProvider.getValueColor(legendValue);
 
 			if (lineColor != null) {
 				gc.setForeground(lineColor);
@@ -222,80 +187,85 @@ public class TourPainter extends MapPainter {
 
 	}
 
-	/**
-	 * Get the color for the gradient value
-	 * 
-	 * @param value
-	 *        current gradient in the tour
-	 * @return Returns the color for the gradient which is red>25.5%, blue<25.5%, green==0 and
-	 *         gradient colors between these gradient values
-	 */
-	private static Color getGradientColor(final int value) {
-
-		final int highValue = 100;
-		final int highValue2 = 2 * highValue;
-
-		final int maxRed = 255;
-		final int maxGreen = 200;
-		final int maxBlue = 255;
-
-		final int absValue = Math.min(255, Math.abs((int) (value)));
-
-		// red
-		// -10% = 0  
-		//   0% = 0
-		//  10% = 255
-		//  20% = 255
-		//  25% = 128
-		//
-		int red = //
-		value > highValue2 ? maxRed - (value - highValue2) : //
-				value < 0 ? 0 : value > highValue ? maxRed : //
-						Math.min(maxRed, absValue * maxRed / highValue)//
-		;
-
-		// green
-		// -25% = 0
-		// -20% = 0
-		// -10% = 200
-		//  10% = 200
-		//  16% = 80 = 200 - 0.6*200 (120)
-		//  20% = 0
-		//  25% = 0
-
-		final float green2 = maxGreen - ((absValue - highValue) / (float) highValue * maxGreen);
-		int green = //
-		value > -highValue && value < highValue ? maxGreen : //
-				value < -2 * highValue || value > highValue2 ? 0 : //
-						(int) green2;
-
-		// blue
-		// -20% = 0
-		//   0% = 0
-		//   6% = 0.6 * 255
-		//  10% = 255
-		//  20% = 255
-		final float blue2 = absValue * maxBlue / highValue;
-		int blue = //
-		value < -highValue2 ? maxBlue - (-value - highValue2) : //
-				value > 0 ? 0 : //
-						value < -highValue ? maxBlue : //
-								(int) blue2;
-
-		red = Math.min(255, Math.abs(red));
-		green = Math.min(255, Math.abs(green));
-		blue = Math.min(255, Math.abs(blue));
-
-		//		System.out.println(value + "\t" + absValue + "\t" + red + "\t" + green + "\t" + blue);
-
-		return new Color(Display.getCurrent(), new RGB(red, green, blue));
-	}
+//	/**
+//	 * Get the color for the gradient value
+//	 * 
+//	 * @param value
+//	 *        current gradient in the tour
+//	 * @return Returns the color for the gradient which is red>25.5%, blue<25.5%, green==0 and
+//	 *         gradient colors between these gradient values
+//	 */
+//	private static Color getGradientColor(final int value) {
+//
+//		final int highValue = 100;
+//		final int highValue2 = 2 * highValue;
+//
+//		final int maxRed = 255;
+//		final int maxGreen = 200;
+//		final int maxBlue = 255;
+//
+//		final int absValue = Math.min(255, Math.abs((int) (value)));
+//
+//		// red
+//		// -10% = 0  
+//		//   0% = 0
+//		//  10% = 255
+//		//  20% = 255
+//		//  25% = 128
+//		//
+//		int red = //
+//		value > highValue2 ? maxRed - (value - highValue2) : //
+//				value < 0 ? 0 : value > highValue ? maxRed : //
+//						Math.min(maxRed, absValue * maxRed / highValue)//
+//		;
+//
+//		// green
+//		// -25% = 0
+//		// -20% = 0
+//		// -10% = 200
+//		//  10% = 200
+//		//  16% = 80 = 200 - 0.6*200 (120)
+//		//  20% = 0
+//		//  25% = 0
+//
+//		final float green2 = maxGreen - ((absValue - highValue) / (float) highValue * maxGreen);
+//		int green = //
+//		value > -highValue && value < highValue ? maxGreen : //
+//				value < -2 * highValue || value > highValue2 ? 0 : //
+//						(int) green2;
+//
+//		// blue
+//		// -20% = 0
+//		//   0% = 0
+//		//   6% = 0.6 * 255
+//		//  10% = 255
+//		//  20% = 255
+//		final float blue2 = absValue * maxBlue / highValue;
+//		int blue = //
+//		value < -highValue2 ? maxBlue - (-value - highValue2) : //
+//				value > 0 ? 0 : //
+//						value < -highValue ? maxBlue : //
+//								(int) blue2;
+//
+//		red = Math.min(255, Math.abs(red));
+//		green = Math.min(255, Math.abs(green));
+//		blue = Math.min(255, Math.abs(blue));
+//
+//		//		System.out.println(value + "\t" + absValue + "\t" + red + "\t" + green + "\t" + blue);
+//
+//		return new Color(Display.getCurrent(), new RGB(red, green, blue));
+//	}
 
 	public static TourPainter getInstance() {
+
+		if (fInstance == null) {
+			fInstance = new TourPainter();
+		}
+
 		return fInstance;
 	}
 
-	private static Color getLegendColor(LegendColor legendColor, final int value) {
+	static Color getLegendColor(LegendColor legendColor, final int value) {
 
 		// 50, 75, 100, 125, 150, 175, 200
 
@@ -377,24 +347,6 @@ public class TourPainter extends MapPainter {
 		return new Color(Display.getCurrent(), new RGB(red, green, blue));
 	}
 
-	private static Color getPaceColor(final int paceValue) {
-
-		final int red = 0;
-		final int green = 0;
-		final int blue = 0;
-
-		return new Color(Display.getCurrent(), new RGB(red, green, blue));
-	}
-
-	private static Color getSpeedColor(final int speedValue) {
-
-		final int red = 0;
-		final int green = 0;
-		final int blue = 0;
-
-		return new Color(Display.getCurrent(), new RGB(red, green, blue));
-	}
-
 	private Image createPositionImage(final Color positionColor) {
 
 		final Display display = Display.getCurrent();
@@ -466,7 +418,7 @@ public class TourPainter extends MapPainter {
 			return false;
 		}
 
-		inizializeTourColor(tourData);
+		inizializeLegendData(tourData);
 
 		// draw tour
 		boolean isOverlayInTile = drawTourInTile(gc, map, tile, tourData);
@@ -509,7 +461,7 @@ public class TourPainter extends MapPainter {
 		final int worldTileY = tile.getY() * tileSize;
 
 		// convert lat/long into world pixels
-		final Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+		final java.awt.Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
 
 		// convert world position into device position
 		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
@@ -543,9 +495,9 @@ public class TourPainter extends MapPainter {
 		final int worldTileY = tile.getY() * tileSize;
 		final java.awt.Rectangle tileViewport = new java.awt.Rectangle(worldTileX, worldTileY, tileSize, tileSize);
 
-		Point worldPosition = null;
-		Point devPosition = null;
-		Point devPreviousPosition = null;
+		java.awt.Point worldPosition = null;
+		java.awt.Point devPosition = null;
+		java.awt.Point devPreviousPosition = null;
 
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
@@ -557,9 +509,7 @@ public class TourPainter extends MapPainter {
 
 		boolean isTourInTile = false;
 		int lastInsideIndex = -99;
-		Point lastInsidePosition = null;
-
-//		gc.setAntialias(SWT.ON);
+		java.awt.Point lastInsidePosition = null;
 
 		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
@@ -610,15 +560,13 @@ public class TourPainter extends MapPainter {
 			devPreviousPosition = devPosition;
 		}
 
-//		gc.setAntialias(SWT.OFF);
-
 		return isTourInTile;
 	}
 
 	private void drawTourLine(	final GC gc,
 								final int serieIndex,
-								final Point devPosition,
-								final Point devPreviousPosition) {
+								final java.awt.Point devPosition,
+								final java.awt.Point devPreviousPosition) {
 
 		if (fDataSerie == null) {
 
@@ -626,31 +574,7 @@ public class TourPainter extends MapPainter {
 
 		} else {
 
-			Color lineColor = null;
-			switch (fTourColorId) {
-			case MappingView.TOUR_COLOR_ALTITUDE:
-				lineColor = getLegendColor(fAltitudeLegendColor, fDataSerie[serieIndex]);
-				break;
-
-			case MappingView.TOUR_COLOR_GRADIENT:
-//				lineColor = getGradientColor(fDataSerie[serieIndex]);
-				lineColor = getLegendColor(fGradientLegendColor, fDataSerie[serieIndex]);
-				break;
-
-			case MappingView.TOUR_COLOR_PULSE:
-				lineColor = getLegendColor(fPulseLegendColor, fDataSerie[serieIndex]);
-				break;
-
-			case MappingView.TOUR_COLOR_SPEED:
-				lineColor = getSpeedColor(fDataSerie[serieIndex]);
-				break;
-
-			case MappingView.TOUR_COLOR_PACE:
-				lineColor = getPaceColor(fDataSerie[serieIndex]);
-				break;
-			default:
-				break;
-			}
+			Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
 
 			{
 				gc.setForeground(lineColor);
@@ -662,61 +586,15 @@ public class TourPainter extends MapPainter {
 
 	}
 
-	LegendColor getAltitudeLegendColor() {
-		return fAltitudeLegendColor;
-	}
+	private void inizializeLegendData(final TourData tourData) {
 
-	LegendConfig getGradientLegendConfig() {
+		fLegendProvider = PaintManager.getInstance().getLegendProvider();
 
-//		if (fGradientLegendConfig != null) {
-//			return fGradientLegendConfig;
-//		}
-
-		fGradientLegendConfig = new LegendConfig();
-
-		fGradientLegendConfig.units = Arrays.asList(-200, -100, 0, 100, 200);
-		fGradientLegendConfig.legendMinValue = -250;
-		fGradientLegendConfig.legendMaxValue = 250;
-		fGradientLegendConfig.unitFactor = 10;
-		fGradientLegendConfig.unitText = Messages.graph_label_gradiend_unit;
-
-		/*
-		 * gradient legend color
-		 */
-		fGradientLegendColor = new LegendColor();
-
-		fGradientLegendColor.minValue = -300;
-		fGradientLegendColor.lowValue = -100;
-		fGradientLegendColor.midValue = 0;
-		fGradientLegendColor.highValue = 100;
-		fGradientLegendColor.maxValue = 300;
-
-		fGradientLegendColor.dimmFactor = 0.5F;
-
-		fGradientLegendColor.maxColor1 = 255;
-		fGradientLegendColor.maxColor2 = 255;
-		fGradientLegendColor.maxColor3 = 255;
-		fGradientLegendColor.color1 = LegendColor.COLOR_RED;
-		fGradientLegendColor.color2 = LegendColor.COLOR_GREEN;
-		fGradientLegendColor.color3 = LegendColor.COLOR_BLUE;
-
-		return fGradientLegendConfig;
-	}
-
-	LegendColor getPulseLegendColor() {
-		return fPulseLegendColor;
-	}
-
-	private void inizializeTourColor(final TourData tourData) {
-
-		fTourColorId = PaintManager.getInstance().getTourColorId();
-
-		switch (fTourColorId) {
+		switch (fLegendProvider.getTourColorId()) {
 		case MappingView.TOUR_COLOR_ALTITUDE:
 
 			final int[] altitudeSerie = tourData.getAltitudeSerie();
 			if (altitudeSerie == null) {
-				fTourColorId = MappingView.TOUR_COLOR_ALTITUDE;
 				fDataSerie = null;
 			} else {
 				fDataSerie = altitudeSerie;
@@ -727,7 +605,6 @@ public class TourPainter extends MapPainter {
 
 			final int[] gradientSerie = tourData.getGradientSerie();
 			if (gradientSerie == null) {
-				fTourColorId = MappingView.TOUR_COLOR_ALTITUDE;
 				fDataSerie = null;
 			} else {
 				fDataSerie = gradientSerie;
@@ -738,7 +615,6 @@ public class TourPainter extends MapPainter {
 
 			final int[] pulseSerie = tourData.pulseSerie;
 			if (pulseSerie == null) {
-				fTourColorId = MappingView.TOUR_COLOR_ALTITUDE;
 				fDataSerie = null;
 			} else {
 				fDataSerie = pulseSerie;
@@ -749,7 +625,6 @@ public class TourPainter extends MapPainter {
 
 			final int[] speedSerie = tourData.getSpeedSerie();
 			if (speedSerie == null) {
-				fTourColorId = MappingView.TOUR_COLOR_ALTITUDE;
 				fDataSerie = null;
 			} else {
 				fDataSerie = speedSerie;
@@ -760,7 +635,6 @@ public class TourPainter extends MapPainter {
 
 			final int[] paceSerie = tourData.getPaceSerie();
 			if (paceSerie == null) {
-				fTourColorId = MappingView.TOUR_COLOR_ALTITUDE;
 				fDataSerie = null;
 			} else {
 				fDataSerie = paceSerie;

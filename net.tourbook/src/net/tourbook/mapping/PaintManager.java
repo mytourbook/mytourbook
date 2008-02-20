@@ -34,7 +34,7 @@ public class PaintManager {
 
 	private int					fSynchTourZoomLevel;
 
-	private int					fTourColorId;
+	private ILegendProvider		fLegendProvider;
 
 	private PaintManager() {}
 
@@ -45,6 +45,10 @@ public class PaintManager {
 		}
 
 		return fInstance;
+	}
+
+	public ILegendProvider getLegendProvider() {
+		return fLegendProvider;
 	}
 
 	public int getSynchTourZoomLevel() {
@@ -58,15 +62,15 @@ public class PaintManager {
 		return fTourBounds;
 	}
 
-	public int getTourColorId() {
-		return fTourColorId;
-	}
-
 	/**
 	 * @return Returns the current {@link TourData} which is selected in a view or editor
 	 */
 	public TourData getTourData() {
 		return fTourData;
+	}
+
+	public void setLegendProvider(ILegendProvider legendProvider) {
+		fLegendProvider = legendProvider;
 	}
 
 	public void setSynchTourZoomLevel(int zoomLevel) {
@@ -75,10 +79,6 @@ public class PaintManager {
 
 	public void setTourBounds(Set<GeoPosition> mapPositions) {
 		fTourBounds = mapPositions;
-	}
-
-	public void setTourColorId(int colorId) {
-		fTourColorId = colorId;
 	}
 
 	/**

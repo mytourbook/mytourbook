@@ -43,8 +43,8 @@ public class LegendColor {
 	/*
 	 * defines which color (red/green/blue) should be used for color1/2/3
 	 */
-	public int				color1;
-	public int				color2;
-	public int				color3;
+	public int				color1		= COLOR_RED;
+	public int				color2		= COLOR_GREEN;
+	public int				color3		= COLOR_BLUE;
 
 }
