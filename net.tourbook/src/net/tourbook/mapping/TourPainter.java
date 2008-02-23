@@ -78,9 +78,19 @@ public class TourPainter extends MapPainter {
 	 * 
 	 * @param gc
 	 * @param legendBounds
+	 * @param isVertical
+	 *        when <code>true</code> the legend is drawn vertical, when false the legend is drawn
+	 *        horizontal
 	 * @param colorId
 	 */
-	public static void drawLegendColors(final GC gc, final Rectangle legendBounds, final ILegendProvider legendProvider) {
+	public static void drawLegendColors(final GC gc,
+										final Rectangle legendBounds,
+										final ILegendProvider legendProvider,
+										final boolean isVertical) {
+
+		if (legendProvider == null) {
+			return;
+		}
 
 		final LegendConfig config = legendProvider.getLegendConfig();
 
@@ -89,82 +99,123 @@ public class TourPainter extends MapPainter {
 		final Integer unitFactor = config.unitFactor;
 		final int legendMaxValue = config.legendMaxValue;
 		final int legendMinValue = config.legendMinValue;
+		final int legendDiffValue = legendMaxValue - legendMinValue;
 		final String unitText = config.unitText;
 		final List<String> unitLabels = config.unitLabels;
 
-		final int legendWidth = 20;
-		final int legendHeight = legendBounds.height - MappingView.LEGEND_MARGIN;
-		final int legendPositionX = legendBounds.x + 1;
-		final int legendPositionY = legendBounds.y + 10;
+		int legendWidth;
+		int legendHeight;
+		int legendPositionX;
+		int legendPositionY;
+		int availableLegendPixels;
+
+		Rectangle legendBorder;
+
+		if (isVertical) {
+
+			// vertical legend
+
+			legendPositionX = legendBounds.x + 1;
+			legendPositionY = legendBounds.y + MappingView.LEGEND_MARGIN_TOP_BOTTOM;
+			legendWidth = 20;
+			legendHeight = legendBounds.height - 2 * MappingView.LEGEND_MARGIN_TOP_BOTTOM;
+
+			availableLegendPixels = legendHeight - 1;
+
+			legendBorder = new Rectangle(legendPositionX - 1, legendPositionY - 1, legendWidth + 1, legendHeight + 1);
+
+		} else {
+
+			// horizontal legend
+
+			legendPositionX = legendBounds.x + 1;
+			legendPositionY = legendBounds.y + 1;
+			legendWidth = legendBounds.width - 1;
+			legendHeight = legendBounds.height;
+
+			availableLegendPixels = legendWidth - 1;
+
+			legendBorder = legendBounds;
+		}
+
+		// pixelValue contains the value for ONE pixel
+		final float pixelValue = (float) legendDiffValue / availableLegendPixels;
 
 		// draw border around the colors
-		final Color borderColor = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
+		final Color borderColor = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
+//		final Color borderColor = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 		gc.setForeground(borderColor);
-		gc.drawRectangle(legendPositionX - 1, legendPositionY - 1, legendWidth + 1, legendHeight + 2);
+		gc.drawRectangle(legendBorder);
 
 		final Color legendTextColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
 		final Color legendTextBackgroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+
 		Color lineColor = null;
-
 		int legendValue = 0;
-
-		final int legendDiffValue = legendMaxValue - legendMinValue;
-
-		// pixelValue contains the value for ONE pixel
-		final float pixelValue = (float) legendDiffValue / legendHeight;
 
 		int unitLabelIndex = 0;
 
-		for (int heightIndex = 0; heightIndex <= legendHeight; heightIndex++) {
+		for (int pixelIndex = 0; pixelIndex <= availableLegendPixels; pixelIndex++) {
 
-			legendValue = (int) (legendMinValue + pixelValue * heightIndex);
+			legendValue = (int) (legendMinValue + pixelValue * pixelIndex);
 
-			final int legendValuePositionY = legendPositionY + legendHeight - heightIndex;
+			int valuePosition;
+			if (isVertical) {
+				valuePosition = legendPositionY + availableLegendPixels - pixelIndex;
+			} else {
+				valuePosition = legendPositionX + availableLegendPixels - pixelIndex;
+			}
 
 			/*
 			 * draw legend unit
 			 */
 
-			// find a unit which corresponds to the current legend value
-			for (final Integer unitValue : legendUnits) {
-				if (legendValue >= unitValue) {
+			if (isVertical) {
 
-					/*
-					 * get unit label
-					 */
-					String valueText;
-					if (unitLabels == null) {
-						final int unit = unitValue / unitFactor;
-						valueText = Integer.toString(unit) + SPACER + unitText;
-					} else {
-						valueText = unitLabels.get(unitLabelIndex++);
-					}
-					final Point valueTextExtent = gc.textExtent(valueText);
+				// find a unit which corresponds to the current legend value
 
-					gc.setForeground(legendTextColor);
-					gc.setBackground(legendTextBackgroundColor);
+				for (final Integer unitValue : legendUnits) {
+					if (legendValue >= unitValue) {
 
-					gc.drawLine(legendWidth, // 
-							legendValuePositionY, //
-							legendWidth + 5,
-							legendValuePositionY);
+						/*
+						 * get unit label
+						 */
+						String valueText;
+						if (unitLabels == null) {
+							final int unit = unitValue / unitFactor;
+							valueText = Integer.toString(unit) + SPACER + unitText;
+						} else {
+							valueText = unitLabels.get(unitLabelIndex++);
+						}
+						final Point valueTextExtent = gc.textExtent(valueText);
 
-					// draw unit value and text
+						gc.setForeground(legendTextColor);
+						gc.setBackground(legendTextBackgroundColor);
+
+						gc.drawLine(legendWidth, // 
+								valuePosition, //
+								legendWidth + 5,
+								valuePosition);
+
+						// draw unit value and text
+						if (unitLabels == null) {
 //					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-					gc.fillRectangle(legendWidth + 5,
-							legendValuePositionY - valueTextExtent.y / 2,
-							valueTextExtent.x,
-							valueTextExtent.y);
+							gc.fillRectangle(legendWidth + 5,
+									valuePosition - valueTextExtent.y / 2,
+									valueTextExtent.x,
+									valueTextExtent.y);
+						}
 
-					gc.drawText(valueText, //
-							legendWidth + 5, //
-							legendValuePositionY - valueTextExtent.y / 2, //
-							true);
+						gc.drawText(valueText, //
+								legendWidth + 5, //
+								valuePosition - valueTextExtent.y / 2, //
+								true);
 
-					// prevent to draw this unit again
-					legendUnits.remove(unitValue);
+						// prevent to draw this unit again
+						legendUnits.remove(unitValue);
 
-					break;
+						break;
+					}
 				}
 			}
 
@@ -178,7 +229,11 @@ public class TourPainter extends MapPainter {
 				gc.setForeground(lineColor);
 			}
 
-			gc.drawLine(legendPositionX, legendValuePositionY, legendWidth, legendValuePositionY);
+			if (isVertical) {
+				gc.drawLine(legendPositionX, valuePosition, legendWidth, valuePosition);
+			} else {
+				gc.drawLine(valuePosition, legendPositionY, valuePosition, legendHeight);
+			}
 
 			if (lineColor != null) {
 				lineColor.dispose();
@@ -186,75 +241,6 @@ public class TourPainter extends MapPainter {
 		}
 
 	}
-
-//	/**
-//	 * Get the color for the gradient value
-//	 * 
-//	 * @param value
-//	 *        current gradient in the tour
-//	 * @return Returns the color for the gradient which is red>25.5%, blue<25.5%, green==0 and
-//	 *         gradient colors between these gradient values
-//	 */
-//	private static Color getGradientColor(final int value) {
-//
-//		final int highValue = 100;
-//		final int highValue2 = 2 * highValue;
-//
-//		final int maxRed = 255;
-//		final int maxGreen = 200;
-//		final int maxBlue = 255;
-//
-//		final int absValue = Math.min(255, Math.abs((int) (value)));
-//
-//		// red
-//		// -10% = 0  
-//		//   0% = 0
-//		//  10% = 255
-//		//  20% = 255
-//		//  25% = 128
-//		//
-//		int red = //
-//		value > highValue2 ? maxRed - (value - highValue2) : //
-//				value < 0 ? 0 : value > highValue ? maxRed : //
-//						Math.min(maxRed, absValue * maxRed / highValue)//
-//		;
-//
-//		// green
-//		// -25% = 0
-//		// -20% = 0
-//		// -10% = 200
-//		//  10% = 200
-//		//  16% = 80 = 200 - 0.6*200 (120)
-//		//  20% = 0
-//		//  25% = 0
-//
-//		final float green2 = maxGreen - ((absValue - highValue) / (float) highValue * maxGreen);
-//		int green = //
-//		value > -highValue && value < highValue ? maxGreen : //
-//				value < -2 * highValue || value > highValue2 ? 0 : //
-//						(int) green2;
-//
-//		// blue
-//		// -20% = 0
-//		//   0% = 0
-//		//   6% = 0.6 * 255
-//		//  10% = 255
-//		//  20% = 255
-//		final float blue2 = absValue * maxBlue / highValue;
-//		int blue = //
-//		value < -highValue2 ? maxBlue - (-value - highValue2) : //
-//				value > 0 ? 0 : //
-//						value < -highValue ? maxBlue : //
-//								(int) blue2;
-//
-//		red = Math.min(255, Math.abs(red));
-//		green = Math.min(255, Math.abs(green));
-//		blue = Math.min(255, Math.abs(blue));
-//
-//		//		System.out.println(value + "\t" + absValue + "\t" + red + "\t" + green + "\t" + blue);
-//
-//		return new Color(Display.getCurrent(), new RGB(red, green, blue));
-//	}
 
 	public static TourPainter getInstance() {
 
@@ -265,84 +251,121 @@ public class TourPainter extends MapPainter {
 		return fInstance;
 	}
 
-	static Color getLegendColor(LegendColor legendColor, final int value) {
+	static Color getLegendColor(final LegendConfig legendConfig, final LegendColor legendColor, final int legendValue) {
 
-		// 50, 75, 100, 125, 150, 175, 200
+		int red = 0;
+		int green = 0;
+		int blue = 0;
 
-		final int maxColor1 = legendColor.maxColor1;
-		final int maxColor2 = legendColor.maxColor2;
-		final int maxColor3 = legendColor.maxColor3;
+		final ValueColor[] valueColors = legendColor.valueColors;
+		final float minBrightnessFactor = legendColor.minBrightnessFactor / (float) 100;
+		final float maxBrightnessFactor = legendColor.maxBrightnessFactor / (float) 100;
+		ValueColor valueColor;
 
-		final int minValue = legendColor.minValue;
-		final int lowValue = legendColor.lowValue;
-		final int midValue = legendColor.midValue;
-		final int highValue = legendColor.highValue;
-		final int maxValue = legendColor.maxValue;
+		/*
+		 * find the valueColor for the current value
+		 */
+		ValueColor minValueColor = null;
+		ValueColor maxValueColor = null;
 
-		final float dimmFactor = legendColor.dimmFactor;
+		for (int colorIndex = 0; colorIndex < valueColors.length; colorIndex++) {
 
-		// red
-		// minValue	  50 bpm = 0
-		// value     100 bpm = 170 = 50/75 * 255 
-		// midValue	 125 bpm = 255
-		// highValue 150 bpm = 255
-		// value     170 bpm = 153 = 255 -(255 * 20/50)
-		// maxValue	 200 bpm = 0
+			valueColor = valueColors[colorIndex];
+			if (legendValue > valueColor.value) {
+				minValueColor = valueColor;
+			}
+			if (legendValue <= valueColor.value) {
+				maxValueColor = valueColor;
+			}
 
-		final float color1_min = (value - minValue) / (float) (midValue - minValue);
-		int color1 = //
-		value > highValue
-				? maxColor1 - (int) (dimmFactor * (maxColor1 * (value - highValue) / (maxValue - highValue)))
-				: //
-				value > midValue ? maxColor1 : //
-						(int) (maxColor1 * color1_min);
+			if (minValueColor != null && maxValueColor != null) {
+				break;
+			}
+		}
 
-//		int color1 = //
-//		value < lowValue ? maxColor1 - (int) (dimmFactor * (maxColor1 * (lowValue - value) / (lowValue - minValue))) : //
-//				value < midValue ? maxColor1 : //
-//						value > highValue ? 0 : //
-//								maxColor1 - (int) (maxColor1 * (value - midValue) / (highValue - midValue));
+		if (minValueColor == null) {
 
-		// minValue  50  bpm = 0
-		// value     70  bpm = ? = 255 - (255 * 10/30)
-		// lowValue  80  bpm = 255
-		// midValue 125  bpm = 255
-		// value    180  bpm = 68 = 255 - (255 * 55/75)  
-		// highValue 190 bpm = 0
-		// maxValue 200  bpm = 0
+			// legend value is smaller than minimum value, dimm the color
 
-		int color2 = //
-		value < lowValue ? maxColor2 - (int) (dimmFactor * (maxColor2 * (lowValue - value) / (lowValue - minValue))) : //
-				value < midValue ? maxColor2 : //
-						value > highValue ? 0 : //
-								maxColor2 - (int) (maxColor2 * (value - midValue) / (highValue - midValue));
+			valueColor = valueColors[0];
+			red = valueColor.red;
+			green = valueColor.green;
+			blue = valueColor.blue;
 
-		int color3 = //
-		value < lowValue ? maxColor3 - (int) (dimmFactor * (maxColor3 * (lowValue - value) / (lowValue - minValue))) : //
-				value < midValue ? maxColor3 : //
-						value > highValue ? 0 : //
-								maxColor3 - (int) (maxColor3 * (value - midValue) / (highValue - midValue));
+			final int minValue = valueColor.value;
+			final int minDiff = legendConfig.legendMinValue - minValue;
 
-//		System.out.println(value + "\t" + red + "\t" + green + "\t" + blue + "\t" + green2);
+			final float ratio = minDiff == 0 ? 1 : (legendValue - minValue) / (float) minDiff;
+			final float dimmRatio = minBrightnessFactor * ratio;
 
-		color1 = Math.min(255, Math.abs(color1));
-		color2 = Math.min(255, Math.abs(color2));
-		color3 = Math.min(255, Math.abs(color3));
+			if (legendColor.minBrightness == LegendColor.BRIGHTNESS_DIMMING) {
 
-		final int red = //
-		legendColor.color1 == LegendColor.COLOR_RED ? color1 : //
-				legendColor.color1 == LegendColor.COLOR_GREEN ? color2 : //
-						color3;
+				red = red - (int) (dimmRatio * red);
+				green = green - (int) (dimmRatio * green);
+				blue = blue - (int) (dimmRatio * blue);
 
-		final int green = //
-		legendColor.color2 == LegendColor.COLOR_RED ? color1 : //
-				legendColor.color2 == LegendColor.COLOR_GREEN ? color2 : //
-						color3;
+			} else if (legendColor.minBrightness == LegendColor.BRIGHTNESS_LIGHTNING) {
 
-		final int blue = //
-		legendColor.color3 == LegendColor.COLOR_BLUE ? color3 : //
-				legendColor.color3 == LegendColor.COLOR_RED ? color1 : //
-						color2;
+				red = red + (int) (dimmRatio * (255 - red));
+				green = green + (int) (dimmRatio * (255 - green));
+				blue = blue + (int) (dimmRatio * (255 - blue));
+			}
+
+		} else if (maxValueColor == null) {
+
+			// legend value is larger than maximum value, dimm the color
+
+			valueColor = valueColors[valueColors.length - 1];
+			red = valueColor.red;
+			green = valueColor.green;
+			blue = valueColor.blue;
+
+			final int maxValue = valueColor.value;
+			final int maxDiff = legendConfig.legendMaxValue - maxValue;
+
+			final float ratio = maxDiff == 0 ? 1 : (legendValue - maxValue) / (float) maxDiff;
+			final float dimmRatio = maxBrightnessFactor * ratio;
+
+			if (legendColor.maxBrightness == LegendColor.BRIGHTNESS_DIMMING) {
+
+				red = red - (int) (dimmRatio * red);
+				green = green - (int) (dimmRatio * green);
+				blue = blue - (int) (dimmRatio * blue);
+
+			} else if (legendColor.maxBrightness == LegendColor.BRIGHTNESS_LIGHTNING) {
+
+				red = red + (int) (dimmRatio * (255 - red));
+				green = green + (int) (dimmRatio * (255 - green));
+				blue = blue + (int) (dimmRatio * (255 - blue));
+			}
+
+		} else {
+
+			// legend value is in the min/max range
+
+			final int maxValue = maxValueColor.value;
+			final int minValue = minValueColor.value;
+			final int minRed = minValueColor.red;
+			final int minGreen = minValueColor.green;
+			final int minBlue = minValueColor.blue;
+
+			final int redDiff = maxValueColor.red - minRed;
+			final int greenDiff = maxValueColor.green - minGreen;
+			final int blueDiff = maxValueColor.blue - minBlue;
+
+			final int ratioDiff = maxValue - minValue;
+			final float ratio = ratioDiff == 0 ? 1 : (legendValue - minValue) / (float) (ratioDiff);
+
+			red = (int) (minRed + redDiff * ratio);
+			green = (int) (minGreen + greenDiff * ratio);
+			blue = (int) (minBlue + blueDiff * ratio);
+		}
+
+//		System.out.println(legendValue + "\t" + red + "\t" + green + "\t" + blue);
+
+		red = Math.min(255, Math.max(0, red));
+		green = Math.min(255, Math.max(0, green));
+		blue = Math.min(255, Math.max(0, blue));
 
 		return new Color(Display.getCurrent(), new RGB(red, green, blue));
 	}
@@ -574,7 +597,7 @@ public class TourPainter extends MapPainter {
 
 		} else {
 
-			Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
+			final Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
 
 			{
 				gc.setForeground(lineColor);

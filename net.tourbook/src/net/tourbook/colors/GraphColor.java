@@ -23,17 +23,20 @@ public class GraphColor {
 
 	private ColorDefinition	fColorDefinition;
 
-	private String			fPrefName;
-	private String			fName;
+	private String			fColorPrefName;
+	private String			fVisibleName;
 
+	/**
+	 * <code>true</code> when this {@link GraphColor} is used as for a legend
+	 */
 	private boolean			fIsLegend;
 
-	public GraphColor(ColorDefinition parent, String prefName, String name, boolean isLegend) {
+	public GraphColor(ColorDefinition parent, String colorPrefName, String visibleName, boolean isLegend) {
 
 		fColorDefinition = parent;
 
-		fPrefName = prefName;
-		fName = name;
+		fColorPrefName = colorPrefName;
+		fVisibleName = visibleName;
 
 		fIsLegend = isLegend;
 	}
@@ -43,23 +46,23 @@ public class GraphColor {
 	}
 
 	public String getColorId() {
-		return fColorDefinition.getPrefName() + "." + fPrefName; //$NON-NLS-1$
+		return fColorDefinition.getPrefName() + "." + fColorPrefName; //$NON-NLS-1$
 	}
 
 	public String getName() {
-		return fName;
+		return fVisibleName;
 	}
 
 	public RGB getNewRGB() {
-		return fPrefName.compareTo(GraphColorDefaults.PREF_COLOR_LINE) == 0
+		return fColorPrefName.compareTo(GraphColorDefaults.PREF_COLOR_LINE) == 0
 				? fColorDefinition.getNewLineColor()
-				: fPrefName.compareTo(GraphColorDefaults.PREF_COLOR_DARK) == 0
+				: fColorPrefName.compareTo(GraphColorDefaults.PREF_COLOR_DARK) == 0
 						? fColorDefinition.getNewGradientDark()
 						: fColorDefinition.getNewGradientBright();
 	}
 
 	String getPrefName() {
-		return fPrefName;
+		return fColorPrefName;
 	}
 
 	/**
@@ -71,13 +74,13 @@ public class GraphColor {
 	}
 
 	public void setName(String fName) {
-		this.fName = fName;
+		this.fVisibleName = fName;
 	}
 
 	public void setNewRGB(RGB rgb) {
-		if (fPrefName.compareTo(GraphColorDefaults.PREF_COLOR_LINE) == 0) {
+		if (fColorPrefName.compareTo(GraphColorDefaults.PREF_COLOR_LINE) == 0) {
 			fColorDefinition.setNewLineColor(rgb);
-		} else if (fPrefName.compareTo(GraphColorDefaults.PREF_COLOR_DARK) == 0) {
+		} else if (fColorPrefName.compareTo(GraphColorDefaults.PREF_COLOR_DARK) == 0) {
 			fColorDefinition.setNewGradientDark(rgb);
 		} else {
 			fColorDefinition.setNewGradientBright(rgb);
@@ -85,6 +88,6 @@ public class GraphColor {
 	}
 
 	void setPrefName(String fPrefName) {
-		this.fPrefName = fPrefName;
+		this.fColorPrefName = fPrefName;
 	}
 }

@@ -15,10 +15,14 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import net.tourbook.mapping.ILegendProvider;
+
 import org.eclipse.jface.viewers.TreeViewer;
 
 public interface IColorTreeViewer {
 
 	TreeViewer getTreeViewer();
+
+	ILegendProvider getLegendProvider();
 
 }

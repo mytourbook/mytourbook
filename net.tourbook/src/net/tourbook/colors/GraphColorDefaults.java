@@ -17,7 +17,6 @@ package net.tourbook.colors;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import net.tourbook.Messages;
@@ -53,11 +52,11 @@ public class GraphColorDefaults {
 			{ PREF_COLOR_LINE, Messages.Graph_Pref_color_line },
 			{ PREF_COLOR_MAPPING, Messages.Graph_Pref_color_mapping } };
 
+	private static LegendColor			fLegendColorAltitude	= new LegendColor();
 	private static LegendColor			fLegendColorGradient	= new LegendColor();
-	private static LegendColor			fLegendColorSpeed		= new LegendColor();
 	private static LegendColor			fLegendColorPace		= new LegendColor();
 	private static LegendColor			fLegendColorPulse		= new LegendColor();
-	private static LegendColor			fLegendColorAltitude	= new LegendColor();
+	private static LegendColor			fLegendColorSpeed		= new LegendColor();
 
 	private static ColorDefinition[]	fGraphDefinitions		= new ColorDefinition[] {
 
@@ -68,19 +67,12 @@ public class GraphColorDefaults {
 					new RGB(45, 188, 45),
 					fLegendColorAltitude),
 
-			new ColorDefinition(PREF_GRAPH_DISTANCE,//
-					Messages.Graph_Pref_color_statistic_distance,
+			new ColorDefinition(PREF_GRAPH_HEARTBEAT,
+					Messages.Graph_Label_Heartbeat,
 					new RGB(255, 255, 255),
-					new RGB(239, 167, 16),
-					new RGB(203, 141, 14),
-					null),
-
-			new ColorDefinition(PREF_GRAPH_TIME,//
-					Messages.Graph_Pref_color_statistic_time,
-					new RGB(255, 255, 255),
-					new RGB(187, 187, 140),
-					new RGB(170, 170, 127),
-					null),
+					new RGB(253, 0, 0),
+					new RGB(253, 0, 0),
+					fLegendColorPulse),
 
 			new ColorDefinition(PREF_GRAPH_SPEED,//
 					Messages.Graph_Label_Speed,
@@ -96,12 +88,12 @@ public class GraphColorDefaults {
 					new RGB(0, 43, 210),
 					fLegendColorPace),
 
-			new ColorDefinition(PREF_GRAPH_HEARTBEAT,
-					Messages.Graph_Label_Heartbeat,
+			new ColorDefinition(PREF_GRAPH_POWER,//
+					Messages.Graph_Label_Power,
 					new RGB(255, 255, 255),
-					new RGB(253, 0, 0),
-					new RGB(253, 0, 0),
-					fLegendColorPulse),
+					new RGB(240, 0, 150),
+					new RGB(240, 0, 150),
+					null),
 
 			new ColorDefinition(PREF_GRAPH_TEMPTERATURE,
 					Messages.Graph_Label_Temperature,
@@ -110,11 +102,18 @@ public class GraphColorDefaults {
 					new RGB(0, 216, 240),
 					null),
 
-			new ColorDefinition(PREF_GRAPH_POWER,//
-					Messages.Graph_Label_Power,
+			new ColorDefinition(PREF_GRAPH_GRADIEND,
+					Messages.Graph_Label_Gradiend,
 					new RGB(255, 255, 255),
-					new RGB(240, 0, 150),
-					new RGB(240, 0, 150),
+					new RGB(249, 231, 0),
+					new RGB(236, 206, 0),
+					fLegendColorGradient),
+
+			new ColorDefinition(PREF_GRAPH_ALTIMETER,
+					Messages.Graph_Label_Altimeter,
+					new RGB(255, 255, 255),
+					new RGB(255, 180, 0),
+					new RGB(249, 174, 0),
 					null),
 
 			new ColorDefinition(PREF_GRAPH_CADENCE,//
@@ -124,13 +123,6 @@ public class GraphColorDefaults {
 					new RGB(228, 106, 16),
 					null),
 
-			new ColorDefinition(PREF_GRAPH_ALTIMETER,
-					Messages.Graph_Label_Altimeter,
-					new RGB(255, 255, 255),
-					new RGB(255, 180, 0),
-					new RGB(249, 174, 0),
-					null),
-
 			new ColorDefinition(PREF_GRAPH_TOUR_COMPARE,
 					Messages.Graph_Label_Tour_Compare,
 					new RGB(255, 255, 255),
@@ -138,12 +130,18 @@ public class GraphColorDefaults {
 					new RGB(242, 135, 22),
 					null),
 
-			new ColorDefinition(PREF_GRAPH_GRADIEND,
-					Messages.Graph_Label_Gradiend,
+			new ColorDefinition(PREF_GRAPH_DISTANCE,//
+					Messages.Graph_Pref_color_statistic_distance,
 					new RGB(255, 255, 255),
-					new RGB(249, 231, 0),
-					new RGB(236, 206, 0),
-					fLegendColorGradient)						};
+					new RGB(239, 167, 16),
+					new RGB(203, 141, 14),
+					null),
+			new ColorDefinition(PREF_GRAPH_TIME,//
+					Messages.Graph_Pref_color_statistic_time,
+					new RGB(255, 255, 255),
+					new RGB(187, 187, 140),
+					new RGB(170, 170, 127),
+					null)										};
 
 	private static GraphColorDefaults	instance;
 
@@ -166,11 +164,11 @@ public class GraphColorDefaults {
 
 		// sort list by name
 		Collections.addAll(list, fGraphDefinitions);
-		Collections.sort(list, new Comparator<ColorDefinition>() {
-			public int compare(ColorDefinition def1, ColorDefinition def2) {
-				return def1.getVisibleName().compareTo(def2.getVisibleName());
-			}
-		});
+//		Collections.sort(list, new Comparator<ColorDefinition>() {
+//			public int compare(ColorDefinition def1, ColorDefinition def2) {
+//				return def1.getVisibleName().compareTo(def2.getVisibleName());
+//			}
+//		});
 
 		return fGraphDefinitionMap = list.toArray(new ColorDefinition[list.size()]);
 	}

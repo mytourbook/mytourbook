@@ -42,7 +42,7 @@ public class LegendProvider implements ILegendProvider {
 	}
 
 	public Color getValueColor(int legendValue) {
-		return TourPainter.getLegendColor(fLegendColor, legendValue);
+		return TourPainter.getLegendColor(fLegendConfig, fLegendColor, legendValue);
 	}
 
 }

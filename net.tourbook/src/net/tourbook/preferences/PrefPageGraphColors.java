@@ -16,12 +16,19 @@
 package net.tourbook.preferences;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColor;
 import net.tourbook.colors.GraphColorDefaults;
-import net.tourbook.colors.LegendColorDialog;
+import net.tourbook.mapping.ILegendProvider;
+import net.tourbook.mapping.LegendColor;
+import net.tourbook.mapping.LegendColorDialog;
+import net.tourbook.mapping.LegendConfig;
+import net.tourbook.mapping.LegendProvider;
+import net.tourbook.mapping.ValueColor;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.TreeColumnLayout;
 
@@ -42,10 +49,14 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -57,18 +68,30 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
-	TreeViewer					fColorViewer;
+	private static final List<Integer>	fUnitValues		= Arrays.asList(10, 50, 100, 150, 190);
+	private static final List<String>	fUnitLabels		= Arrays.asList("min", "low", "mid", "high", "max");
 
-	private ColorSelector		fColorSelector;
+	private ValueColor[]				fValueColors	= new ValueColor[] {
+			new ValueColor(10, 255, 0, 0),
+			new ValueColor(50, 100, 100, 0),
+			new ValueColor(100, 0, 255, 0),
+			new ValueColor(150, 0, 100, 100),
+			new ValueColor(190, 0, 0, 255)				};
 
-	private GraphColor			fSelectedColor;
-	private boolean				fIsColorChanged;
+	TreeViewer							fColorViewer;
 
-	private ColorDefinition		fExpandedItem;
+	private ColorSelector				fColorSelector;
+	private Button						fBtnLegend;
 
-	private ColorLabelProvider	fColorLabelProvider;
+	private GraphColor					fSelectedColor;
+	private boolean						fIsColorChanged;
 
-	private LegendColorDialog	fLegendColorDialog;
+	private ColorDefinition				fExpandedItem;
+
+	private ColorLabelProvider			fColorLabelProvider;
+
+	private LegendProvider				fLegendProvider;
+	private LegendColorDialog			fLegendColorDialog;
 
 	/**
 	 * the color content provider has the following structure<br>
@@ -150,9 +173,25 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		setButtonLayoutData(fColorSelector.getButton());
 		fColorSelector.addListener(new IPropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent event) {
-				onColorSelectorSelectColor(event);
+				onSelectColorInColorSelector(event);
 			}
 		});
+
+		/*
+		 * button: legend selector
+		 */
+		fBtnLegend = new Button(container, SWT.NONE);
+		fBtnLegend.setText("&Legend");
+		setButtonLayoutData(fBtnLegend);
+
+		fBtnLegend.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				modifyLegendColor();
+			}
+		});
+		fBtnLegend.setEnabled(false);
+//		fBtnLegend.setSize(fColorSelector.getButton().getSize().x, fBtnLegend.getSize().y);
 	}
 
 	/**
@@ -246,7 +285,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 
 		fColorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
-				onColorViewerSelectColor();
+				onSelectColorInColorViewer();
 			}
 		});
 
@@ -274,8 +313,13 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 					GraphColor graphColor = (GraphColor) selection;
 
 					if (graphColor.isLegend()) {
-						fLegendColorDialog.open();
+
+						// legend color is selected
+
+						modifyLegendColor();
+
 					} else {
+						// open color selection dialog
 						fColorSelector.open();
 					}
 				}
@@ -329,11 +373,15 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		createColorViewer(container);
 		createColorControl(container);
 
-		fLegendColorDialog = new LegendColorDialog(Display.getCurrent().getActiveShell());
+		initializeLegend();
 
 		fColorViewer.setInput(this);
 
 		return container;
+	}
+
+	public ILegendProvider getLegendProvider() {
+		return fLegendProvider;
 	}
 
 	public TreeViewer getTreeViewer() {
@@ -345,11 +393,62 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 	}
 
 	/**
+	 * setup legend
+	 */
+	private void initializeLegend() {
+
+		LegendConfig legendConfig = new LegendConfig();
+		legendConfig.units = fUnitValues;
+		legendConfig.unitLabels = fUnitLabels;
+		legendConfig.legendMinValue = 0;
+		legendConfig.legendMaxValue = 200;
+		legendConfig.unitText = "";
+
+		LegendColor legendColor = new LegendColor();
+		legendColor.valueColors = fValueColors;
+
+		fLegendProvider = new LegendProvider(legendConfig, legendColor, 0);
+		fLegendColorDialog = new LegendColorDialog(Display.getCurrent().getActiveShell(), fLegendProvider);
+	}
+
+	/**
+	 * modify the colors of the legend
+	 */
+	private void modifyLegendColor() {
+
+		fLegendColorDialog.setLegendColor(fSelectedColor.getColorDefinition().getLegendColor());
+		int returnValue = fLegendColorDialog.open();
+
+		if (returnValue != Window.OK) {
+			return;
+		}
+
+		// set new legend color
+		fSelectedColor.getColorDefinition().setNewLegendColor(fLegendColorDialog.getLegendColor());
+
+		System.out.println(fSelectedColor.getColorDefinition().getLegendColor().toString());
+
+		/*
+		 * dispose old color and image for the graph
+		 */
+		fColorLabelProvider.disposeResources(fSelectedColor.getColorId(), fSelectedColor.getColorDefinition()
+				.getImageId());
+
+		/*
+		 * update the tree viewer, the color images will be recreated
+		 */
+		fColorViewer.update(fSelectedColor, null);
+		fColorViewer.update(fSelectedColor.getColorDefinition(), null);
+
+		fIsColorChanged = true;
+	}
+
+	/**
 	 * is called when the color in the color selector has changed
 	 * 
 	 * @param event
 	 */
-	private void onColorSelectorSelectColor(PropertyChangeEvent event) {
+	private void onSelectColorInColorSelector(PropertyChangeEvent event) {
 
 		RGB oldValue = (RGB) event.getOldValue();
 		RGB newValue = (RGB) event.getNewValue();
@@ -364,7 +463,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 			/*
 			 * dispose the old color/image from the graph
 			 */
-			fColorLabelProvider.disposeColor(fSelectedColor.getColorId(), fSelectedColor.getColorDefinition()
+			fColorLabelProvider.disposeResources(fSelectedColor.getColorId(), fSelectedColor.getColorDefinition()
 					.getImageId());
 
 			/*
@@ -380,20 +479,27 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 	/**
 	 * is called when the color in the color viewer was selected
 	 */
-	private void onColorViewerSelectColor() {
+	private void onSelectColorInColorViewer() {
 
 		IStructuredSelection selection = (IStructuredSelection) fColorViewer.getSelection();
+
+		fBtnLegend.setEnabled(false);
+		fColorSelector.setEnabled(false);
 
 		if (selection.getFirstElement() instanceof GraphColor) {
 
 			// graph color is selected
 
 			GraphColor graphColor = (GraphColor) selection.getFirstElement();
+
+			// keep selected color
 			fSelectedColor = graphColor;
 
 			if (graphColor.isLegend()) {
 
 				// legend color is selected
+
+				fBtnLegend.setEnabled(true);
 
 			} else {
 
@@ -408,7 +514,6 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 
 			// color definition is selected
 
-			fColorSelector.setEnabled(false);
 		}
 	}
 

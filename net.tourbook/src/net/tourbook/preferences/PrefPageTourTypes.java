@@ -28,6 +28,7 @@ import net.tourbook.colors.GraphColorDefaults;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.mapping.ILegendProvider;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.TreeColumnLayout;
 
@@ -489,6 +490,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		}
 	}
 
+	public ILegendProvider getLegendProvider() {
+		return null;
+	}
+
 	/**
 	 * @return Returns the selected color definition in the color viewer
 	 */
@@ -590,7 +595,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			/*
 			 * dispose the old color/image from the graph
 			 */
-			fColorLabelProvider.disposeColor(fSelectedColor.getColorId(), colorDefinition.getImageId());
+			fColorLabelProvider.disposeResources(fSelectedColor.getColorId(), colorDefinition.getImageId());
 
 			/*
 			 * update the tree viewer, the color images will be recreated in the label provider

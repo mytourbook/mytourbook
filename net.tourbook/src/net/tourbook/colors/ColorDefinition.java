@@ -60,8 +60,12 @@ public class ColorDefinition {
 	 * @param legendColor
 	 *        legend color configuration or <code>null</code> when legend is not available
 	 */
-	protected ColorDefinition(String prefName, String visibleName, RGB defaultGradientBright, RGB defaultGradientDark,
-			RGB defaultLineColor, LegendColor legendColor) {
+	protected ColorDefinition(	String prefName,
+								String visibleName,
+								RGB defaultGradientBright,
+								RGB defaultGradientDark,
+								RGB defaultLineColor,
+								LegendColor legendColor) {
 
 		fPrefName = prefName;
 		fVisibleName = visibleName;
@@ -109,10 +113,6 @@ public class ColorDefinition {
 		fNewLineColor = getLineColor();
 	}
 
-	public GraphColor[] getGraphColorParts() {
-		return fColorParts;
-	}
-
 	public RGB getDefaultGradientBright() {
 		return fDefaultGradientBright;
 	}
@@ -131,6 +131,10 @@ public class ColorDefinition {
 
 	public RGB getGradientDark() {
 		return fGradientDark;
+	}
+
+	public GraphColor[] getGraphColorParts() {
+		return fColorParts;
 	}
 
 	public String getGraphPrefName() {
@@ -196,6 +200,10 @@ public class ColorDefinition {
 
 	public void setNewGradientDark(RGB fNewGradientDark) {
 		this.fNewGradientDark = fNewGradientDark;
+	}
+
+	public void setNewLegendColor(LegendColor newLegendColor) {
+		fLegendColor = newLegendColor;
 	}
 
 	public void setNewLineColor(RGB fNewLineColor) {

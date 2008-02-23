@@ -106,7 +106,7 @@ public class MappingView extends ViewPart {
 
 	final static String							SHOW_TILE_INFO						= "show.tile-info";							//$NON-NLS-1$
 
-	public static final int						LEGEND_MARGIN						= 20;
+	public static final int						LEGEND_MARGIN_TOP_BOTTOM			= 10;
 	private static final int					LEGEND_UNIT_DISTANCE				= 60;
 
 	private static IMemento						fSessionMemento;
@@ -169,7 +169,7 @@ public class MappingView extends ViewPart {
 
 	private static List<Integer> getLegendUnits(final Rectangle legendBounds, int graphMinValue, int graphMaxValue) {
 
-		final int legendHeight = legendBounds.height - LEGEND_MARGIN;
+		final int legendHeight = legendBounds.height - 2 * LEGEND_MARGIN_TOP_BOTTOM;
 
 		/*
 		 * !!! value range does currently NOT provide negative altitudes
@@ -533,20 +533,20 @@ public class MappingView extends ViewPart {
 		legendConfig.unitText = Messages.graph_label_heartbeat_unit;
 
 		legendColor = new LegendColor();
-		legendColor.minValue = 50;
-		legendColor.lowValue = 70;
-		legendColor.midValue = 125;
-		legendColor.highValue = 150;
-		legendColor.maxValue = 200;
-
-		legendColor.dimmFactor = 0.5F;
-
-		legendColor.maxColor1 = 255;
-		legendColor.maxColor2 = 220;
-		legendColor.maxColor3 = 0;
-		legendColor.color1 = LegendColor.COLOR_RED;
-		legendColor.color2 = LegendColor.COLOR_GREEN;
-		legendColor.color3 = LegendColor.COLOR_BLUE;
+//		legendColor.minValue = 50;
+//		legendColor.lowValue = 70;
+//		legendColor.midValue = 125;
+//		legendColor.highValue = 150;
+//		legendColor.maxValue = 200;
+//
+//		legendColor.dimmFactor = 0.5F;
+//
+//		legendColor.maxColor1 = 255;
+//		legendColor.maxColor2 = 220;
+//		legendColor.maxColor3 = 0;
+//		legendColor.color1 = LegendColor.COLOR_RED;
+//		legendColor.color2 = LegendColor.COLOR_GREEN;
+//		legendColor.color3 = LegendColor.COLOR_BLUE;
 
 		fLegendProviders.put(MappingView.TOUR_COLOR_PULSE, //
 				new LegendProvider(legendConfig, legendColor, MappingView.TOUR_COLOR_PULSE));
@@ -563,20 +563,20 @@ public class MappingView extends ViewPart {
 		legendConfig.unitText = Messages.graph_label_gradiend_unit;
 
 		legendColor = new LegendColor();
-		legendColor.minValue = -300;
-		legendColor.lowValue = -100;
-		legendColor.midValue = 0;
-		legendColor.highValue = 100;
-		legendColor.maxValue = 300;
-
-		legendColor.dimmFactor = 0.5F;
-
-		legendColor.maxColor1 = 255;
-		legendColor.maxColor2 = 255;
-		legendColor.maxColor3 = 255;
-		legendColor.color1 = LegendColor.COLOR_RED;
-		legendColor.color2 = LegendColor.COLOR_GREEN;
-		legendColor.color3 = LegendColor.COLOR_BLUE;
+//		legendColor.minValue = -300;
+//		legendColor.lowValue = -100;
+//		legendColor.midValue = 0;
+//		legendColor.highValue = 100;
+//		legendColor.maxValue = 300;
+//
+//		legendColor.dimmFactor = 0.5F;
+//
+//		legendColor.maxColor1 = 255;
+//		legendColor.maxColor2 = 255;
+//		legendColor.maxColor3 = 255;
+//		legendColor.color1 = LegendColor.COLOR_RED;
+//		legendColor.color2 = LegendColor.COLOR_GREEN;
+//		legendColor.color3 = LegendColor.COLOR_BLUE;
 
 		fLegendProviders.put(MappingView.TOUR_COLOR_GRADIENT, //
 				new LegendProvider(legendConfig, legendColor, MappingView.TOUR_COLOR_GRADIENT));
@@ -589,14 +589,8 @@ public class MappingView extends ViewPart {
 		// altitude legend color, min/max values will be set when a new tour is displayed
 		legendColor = new LegendColor();
 
-		legendColor.dimmFactor = 0.5F;
-
-		legendColor.maxColor1 = 255;
-		legendColor.maxColor2 = 200;
-		legendColor.maxColor3 = 0;
-		legendColor.color1 = LegendColor.COLOR_BLUE;
-		legendColor.color2 = LegendColor.COLOR_GREEN;
-		legendColor.color3 = LegendColor.COLOR_RED;
+//		legendColor.minBrightnessFactor = 50;
+//		legendColor.maxBrightnessFactor = 50;
 
 		fLegendProviders.put(MappingView.TOUR_COLOR_ALTITUDE, //
 				new LegendProvider(legendConfig, legendColor, MappingView.TOUR_COLOR_ALTITUDE));
@@ -836,7 +830,7 @@ public class MappingView extends ViewPart {
 			gc.setBackground(transparentColor);
 			gc.fillRectangle(imageBounds);
 
-			TourPainter.drawLegendColors(gc, imageBounds, legendColorProvider);
+			TourPainter.drawLegendColors(gc, imageBounds, legendColorProvider, true);
 		}
 		gc.dispose();
 		transparentColor.dispose();
@@ -1466,11 +1460,11 @@ public class MappingView extends ViewPart {
 		final int midValueRelative = (legendMaxValue - legendMinValue) / 2;
 		final int midValueAbsolute = legendMinValue + midValueRelative;
 
-		legendColor.minValue = legendMinValue;
-		legendColor.lowValue = legendMinValue + midValueRelative / 3;
-		legendColor.midValue = midValueAbsolute;
-		legendColor.highValue = legendMaxValue - midValueRelative / 3;
-		legendColor.maxValue = legendMaxValue;
+//		legendColor.minValue = legendMinValue;
+//		legendColor.lowValue = legendMinValue + midValueRelative / 3;
+//		legendColor.midValue = midValueAbsolute;
+//		legendColor.highValue = legendMaxValue - midValueRelative / 3;
+//		legendColor.maxValue = legendMaxValue;
 
 	}
 

@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.preferences;
 
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import java.util.Iterator;
 
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColor;
+import net.tourbook.mapping.ILegendProvider;
+import net.tourbook.mapping.TourPainter;
 
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -27,179 +30,25 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Tree;
 
 public class ColorLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-	private final IColorTreeViewer	fColorTreeViewer;
+	private final IColorTreeViewer			fColorTreeViewer;
 
-	private HashMap<String, Image>	fImageCache	= new HashMap<String, Image>();
-	private HashMap<String, Color>	fColorCache	= new HashMap<String, Color>();
+	private final HashMap<String, Image>	fImageCache	= new HashMap<String, Image>();
+	private final HashMap<String, Color>	fColorCache	= new HashMap<String, Color>();
+
+	private final int						fTreeItemHeight;
 
 	/**
 	 * @param colorTree
 	 */
-	ColorLabelProvider(IColorTreeViewer colorTreeViewer) {
+	ColorLabelProvider(final IColorTreeViewer colorTreeViewer) {
+
 		fColorTreeViewer = colorTreeViewer;
-	}
-
-	private int	fTreeItemHeight	= -1;
-	private int	fUsableImageHeight;
-
-	private int	fColorImageWidth;
-	private int	fUsableImageWidth;
-
-	private int	fDefinitionImageWidth;
-
-	/**
-	 * @param display
-	 * @return
-	 */
-	private void ensureImageSize(Display display) {
-
-		Tree colorTree = fColorTreeViewer.getTreeViewer().getTree();
-
-		fTreeItemHeight = colorTree.getItemHeight();
-		fUsableImageHeight = Math.max(1, fTreeItemHeight - 4);
-
-		fColorImageWidth = fTreeItemHeight * 4;
-		fUsableImageWidth = Math.max(1, fColorImageWidth - 4);
-
-		fDefinitionImageWidth = Math.max(1, fTreeItemHeight - 4);
-	}
-
-	public Image getColumnImage(Object element, int columnIndex) {
-
-		Control treeControl = fColorTreeViewer.getTreeViewer().getControl();
-		Display display = treeControl.getDisplay();
-
-		if (columnIndex == 1 && element instanceof ColorDefinition) {
-
-			ColorDefinition colorDefinition = (ColorDefinition) element;
-
-			GraphColor[] graphColors = colorDefinition.getGraphColorParts();
-
-			String imageId = colorDefinition.getImageId();
-			Image definitionImage = fImageCache.get(imageId);
-
-			if (definitionImage == null) {
-
-				ensureImageSize(display);
-
-				definitionImage = new Image(display, 4 * fTreeItemHeight, fTreeItemHeight);
-
-				GC gc = new GC(definitionImage);
-				{
-
-					int colorIndex = 0;
-					for (GraphColor graphColor : graphColors) {
-
-						int colorOffset = colorIndex * fTreeItemHeight;
-
-						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-						gc.setBackground(getGraphColor(display, graphColor));
-
-						int colorOffsetWidth = colorOffset + ((fTreeItemHeight - fDefinitionImageWidth) / 2);
-						int offsetWidth = (fTreeItemHeight - fDefinitionImageWidth) / 2;
-						int offsetHeight = (fTreeItemHeight - fUsableImageHeight) / 2;
-
-						gc.drawRectangle(colorOffsetWidth,
-								offsetHeight,
-								(fDefinitionImageWidth - offsetWidth),
-								fUsableImageHeight - offsetHeight);
-
-						gc.fillRectangle(colorOffsetWidth + 1, offsetHeight + 1, fDefinitionImageWidth
-								- offsetWidth
-								- 1, fUsableImageHeight - offsetHeight - 1);
-
-						colorIndex++;
-					}
-				}
-				gc.dispose();
-
-				fImageCache.put(imageId, definitionImage);
-			}
-
-			return definitionImage;
-
-		} else if (columnIndex == 2 && element instanceof GraphColor) {
-
-			GraphColor graphColor = (GraphColor) element;
-
-			String colorId = graphColor.getColorId();
-			Image image = fImageCache.get(colorId);
-
-			if (image == null || image.isDisposed()) {
-
-				ensureImageSize(display);
-
-				image = new Image(display, fColorImageWidth, fTreeItemHeight);
-
-				GC gc = new GC(image);
-				{
-					gc.setBackground(treeControl.getBackground());
-					gc.setForeground(treeControl.getBackground());
-					gc.drawRectangle(0, 0, fColorImageWidth - 1, fTreeItemHeight - 1);
-
-					gc.setForeground(treeControl.getForeground());
-					gc.setBackground(getGraphColor(display, graphColor));
-
-					int offsetWidth = (fColorImageWidth - fUsableImageWidth) / 2;
-					int offsetHeight = (fTreeItemHeight - fUsableImageHeight) / 2;
-
-					gc.drawRectangle(offsetWidth, offsetHeight, (fUsableImageWidth - offsetWidth), fUsableImageHeight
-							- offsetHeight);
-
-					gc.fillRectangle(offsetWidth + 1,
-							offsetHeight + 1,
-							fUsableImageWidth - offsetWidth - 1,
-							fUsableImageHeight - offsetHeight - 1);
-				}
-				gc.dispose();
-
-				fImageCache.put(colorId, image);
-			}
-
-			return image;
-		}
-
-		return null;
-	}
-
-	public String getColumnText(Object element, int columnIndex) {
-
-		if (columnIndex == 0 && element instanceof ColorDefinition) {
-			return ((ColorDefinition) (element)).getVisibleName();
-		}
-
-		if (columnIndex == 0 && element instanceof GraphColor) {
-			return ((GraphColor) (element)).getName();
-		}
-		return null;
-	}
-
-	// public Color getForeground(Object element, int columnIndex) {
-	// return null;
-	// }
-
-	/**
-	 * @param display
-	 * @param graphColor
-	 * @return return the color for the graph
-	 */
-	private Color getGraphColor(Display display, GraphColor graphColor) {
-
-		String colorId = graphColor.getColorId();
-
-		Color imageColor = fColorCache.get(colorId);
-
-		if (imageColor == null) {
-			imageColor = new Color(display, graphColor.getNewRGB());
-			fColorCache.put(colorId, imageColor);
-		}
-		return imageColor;
+		fTreeItemHeight = fColorTreeViewer.getTreeViewer().getTree().getItemHeight();
 	}
 
 	@Override
@@ -212,26 +61,26 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 
 	void disposeGraphImages() {
 
-		for (Iterator<Image> i = fImageCache.values().iterator(); i.hasNext();) {
+		for (final Iterator<Image> i = fImageCache.values().iterator(); i.hasNext();) {
 			((Image) i.next()).dispose();
 		}
 		fImageCache.clear();
 
-		for (Iterator<Color> i = fColorCache.values().iterator(); i.hasNext();) {
+		for (final Iterator<Color> i = fColorCache.values().iterator(); i.hasNext();) {
 			((Color) i.next()).dispose();
 		}
 		fColorCache.clear();
 	}
 
-	public void disposeColor(String colorId, String imageId) {
+	public void disposeResources(final String colorId, final String imageId) {
 
-		Image image = fImageCache.get(colorId);
+		final Image image = fImageCache.get(colorId);
 		if (image != null && !image.isDisposed()) {
 			image.dispose();
 		}
 		fImageCache.remove(colorId);
 
-		Color color = fColorCache.get(colorId);
+		final Color color = fColorCache.get(colorId);
 		if (color != null && !color.isDisposed()) {
 			color.dispose();
 		}
@@ -241,6 +90,165 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 		 * dispose color image for the graph definition
 		 */
 		fImageCache.remove(imageId);
+	}
+
+	private Image drawColorImage(final GraphColor graphColor) {
+
+		final Display display = Display.getCurrent();
+
+		final String colorId = graphColor.getColorId();
+		Image image = fImageCache.get(colorId);
+
+		if (image == null || image.isDisposed()) {
+
+			final int imageHeight = fTreeItemHeight;
+			final int imageWidth = imageHeight * 4;
+
+			final Rectangle borderRect = new Rectangle(0, 1, imageWidth - 1, imageHeight - 2);
+
+			image = new Image(display, imageWidth, imageHeight);
+
+			final GC gc = new GC(image);
+			{
+				if (graphColor.isLegend()) {
+
+					// draw legend image
+
+					/*
+					 * tell the legend provider with which color the legend should be painted
+					 */
+					final ILegendProvider legendProvider = fColorTreeViewer.getLegendProvider();
+					legendProvider.getLegendColor().valueColors = graphColor.getColorDefinition().getLegendColor().valueColors;
+
+					TourPainter.drawLegendColors(gc, borderRect, legendProvider, false);
+
+				} else {
+
+					// draw 'normal' image
+
+					gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+					gc.drawRectangle(borderRect);
+
+					gc.setBackground(getGraphColor(display, graphColor));
+					gc.fillRectangle(borderRect.x + 1, borderRect.y + 1, borderRect.width - 1, borderRect.height - 1);
+				}
+			}
+			gc.dispose();
+
+			fImageCache.put(colorId, image);
+		}
+
+		return image;
+	}
+
+	private Image drawDefinitionImage(final ColorDefinition colorDefinition) {
+
+		final Display display = Display.getCurrent();
+		final GraphColor[] graphColors = colorDefinition.getGraphColorParts();
+
+		final String imageId = colorDefinition.getImageId();
+		Image definitionImage = fImageCache.get(imageId);
+
+		if (definitionImage == null) {
+
+			final int imageHeight = fTreeItemHeight;
+			final int imageWidth = 4 * imageHeight;
+
+			final int colorHeight = imageHeight - 2;
+			final int colorWidth = imageHeight - 2;
+
+			definitionImage = new Image(display, imageWidth, imageHeight);
+
+			final GC gc = new GC(definitionImage);
+			{
+//				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+//				gc.fillRectangle(definitionImage.getBounds());
+
+				int colorIndex = 0;
+				for (final GraphColor graphColor : graphColors) {
+
+					final int xPosition = colorIndex * imageHeight;
+					final int yPosition = 0;
+
+					final Rectangle borderRect = new Rectangle(xPosition, //
+							yPosition,
+							colorHeight,
+							colorWidth);
+
+					if (graphColor.isLegend()) {
+
+						final ILegendProvider legendProvider = fColorTreeViewer.getLegendProvider();
+						legendProvider.getLegendColor().valueColors = graphColor.getColorDefinition().getLegendColor().valueColors;
+
+						TourPainter.drawLegendColors(gc, borderRect, legendProvider, false);
+
+					} else {
+
+						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+						gc.setBackground(getGraphColor(display, graphColor));
+
+						gc.drawRectangle(borderRect);
+
+						gc.fillRectangle(xPosition + 1, //
+								yPosition + 1,
+								colorHeight - 1,
+								colorWidth - 1);
+					}
+
+					colorIndex++;
+				}
+			}
+			gc.dispose();
+
+			fImageCache.put(imageId, definitionImage);
+		}
+
+		return definitionImage;
+	}
+
+	public Image getColumnImage(final Object element, final int columnIndex) {
+
+		if (columnIndex == 1 && element instanceof ColorDefinition) {
+
+			return drawDefinitionImage((ColorDefinition) element);
+
+		} else if (columnIndex == 2 && element instanceof GraphColor) {
+
+			return drawColorImage((GraphColor) element);
+		}
+
+		return null;
+	}
+
+	public String getColumnText(final Object element, final int columnIndex) {
+
+		if (columnIndex == 0 && element instanceof ColorDefinition) {
+			return ((ColorDefinition) (element)).getVisibleName();
+		}
+
+		if (columnIndex == 0 && element instanceof GraphColor) {
+			return ((GraphColor) (element)).getName();
+		}
+		return null;
+	}
+
+	/**
+	 * @param display
+	 * @param graphColor
+	 * @return return the {@link Color} for the graph
+	 */
+	private Color getGraphColor(final Display display, final GraphColor graphColor) {
+
+		final String colorId = graphColor.getColorId();
+
+		Color imageColor = fColorCache.get(colorId);
+
+		if (imageColor == null) {
+			imageColor = new Color(display, graphColor.getNewRGB());
+			fColorCache.put(colorId, imageColor);
+		}
+
+		return imageColor;
 	}
 
 }
