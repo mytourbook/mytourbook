@@ -445,17 +445,18 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	}
 
 	/**
-	 * create a list with the available graphs
+	 * create a list with all available graphs
 	 */
 	private void createGraphList() {
 
-		String[] prefAllIds = StringToArrayConverter.convertStringToArray(getPreferenceStore().getString(ITourbookPreferences.GRAPH_ALL));
+		String[] allGraphIds = StringToArrayConverter.convertStringToArray(//
+		getPreferenceStore().getString(ITourbookPreferences.GRAPH_ALL));
 
 		fViewerGraphs = new ArrayList<Graph>();
 
 		// put all graphs in the viewer which are defined in the prefs
-		for (int graphIndex = 0; graphIndex < prefAllIds.length; graphIndex++) {
-			final int graphId = Integer.valueOf(prefAllIds[graphIndex]);
+		for (int graphIndex = 0; graphIndex < allGraphIds.length; graphIndex++) {
+			final int graphId = Integer.valueOf(allGraphIds[graphIndex]);
 			if (fGraphMap.containsKey(graphId)) {
 				fViewerGraphs.add(fGraphMap.get(graphId));
 			}
@@ -489,7 +490,6 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, checkShowStartTime.getSelection());
 
 		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH, checkScrollZoomedChart.getSelection());
-
 		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, checkZoomToSlider.getSelection());
 
 		altimeterMinCheckbox.store();

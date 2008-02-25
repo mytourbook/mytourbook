@@ -46,7 +46,10 @@ public class ValueColor {
 
 	@Override
 	public String toString() {
-		return value + "\t" + red + "\t" + green + "\t" + blue;
+
+//		return value + "\t" + red + "\t" + green + "\t" + blue;
+
+		return "new ValueColor(" + value + ", " + red + ", " + green + ", " + blue + ")";
 	}
 
 }

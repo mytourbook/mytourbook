@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import net.tourbook.colors.ColorDefinition;
-import net.tourbook.colors.GraphColor;
+import net.tourbook.colors.GraphColorItem;
 import net.tourbook.mapping.ILegendProvider;
 import net.tourbook.mapping.TourPainter;
 
@@ -92,7 +92,7 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 		fImageCache.remove(imageId);
 	}
 
-	private Image drawColorImage(final GraphColor graphColor) {
+	private Image drawColorImage(final GraphColorItem graphColor) {
 
 		final Display display = Display.getCurrent();
 
@@ -118,7 +118,7 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 					 * tell the legend provider with which color the legend should be painted
 					 */
 					final ILegendProvider legendProvider = fColorTreeViewer.getLegendProvider();
-					legendProvider.getLegendColor().valueColors = graphColor.getColorDefinition().getLegendColor().valueColors;
+					legendProvider.setLegendColor(graphColor.getColorDefinition().getNewLegendColor());
 
 					TourPainter.drawLegendColors(gc, borderRect, legendProvider, false);
 
@@ -144,7 +144,7 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 	private Image drawDefinitionImage(final ColorDefinition colorDefinition) {
 
 		final Display display = Display.getCurrent();
-		final GraphColor[] graphColors = colorDefinition.getGraphColorParts();
+		final GraphColorItem[] graphColors = colorDefinition.getGraphColorParts();
 
 		final String imageId = colorDefinition.getImageId();
 		Image definitionImage = fImageCache.get(imageId);
@@ -165,7 +165,7 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 //				gc.fillRectangle(definitionImage.getBounds());
 
 				int colorIndex = 0;
-				for (final GraphColor graphColor : graphColors) {
+				for (final GraphColorItem graphColorItem : graphColors) {
 
 					final int xPosition = colorIndex * imageHeight;
 					final int yPosition = 0;
@@ -175,17 +175,18 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 							colorHeight,
 							colorWidth);
 
-					if (graphColor.isLegend()) {
+					if (graphColorItem.isLegend()) {
 
+						// tell the legend provider how to draw the legend
 						final ILegendProvider legendProvider = fColorTreeViewer.getLegendProvider();
-						legendProvider.getLegendColor().valueColors = graphColor.getColorDefinition().getLegendColor().valueColors;
+						legendProvider.setLegendColor(graphColorItem.getColorDefinition().getNewLegendColor());
 
 						TourPainter.drawLegendColors(gc, borderRect, legendProvider, false);
 
 					} else {
 
 						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-						gc.setBackground(getGraphColor(display, graphColor));
+						gc.setBackground(getGraphColor(display, graphColorItem));
 
 						gc.drawRectangle(borderRect);
 
@@ -212,9 +213,9 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 
 			return drawDefinitionImage((ColorDefinition) element);
 
-		} else if (columnIndex == 2 && element instanceof GraphColor) {
+		} else if (columnIndex == 2 && element instanceof GraphColorItem) {
 
-			return drawColorImage((GraphColor) element);
+			return drawColorImage((GraphColorItem) element);
 		}
 
 		return null;
@@ -226,8 +227,8 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 			return ((ColorDefinition) (element)).getVisibleName();
 		}
 
-		if (columnIndex == 0 && element instanceof GraphColor) {
-			return ((GraphColor) (element)).getName();
+		if (columnIndex == 0 && element instanceof GraphColorItem) {
+			return ((GraphColorItem) (element)).getName();
 		}
 		return null;
 	}
@@ -237,7 +238,7 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 	 * @param graphColor
 	 * @return return the {@link Color} for the graph
 	 */
-	private Color getGraphColor(final Display display, final GraphColor graphColor) {
+	private Color getGraphColor(final Display display, final GraphColorItem graphColor) {
 
 		final String colorId = graphColor.getColorId();
 

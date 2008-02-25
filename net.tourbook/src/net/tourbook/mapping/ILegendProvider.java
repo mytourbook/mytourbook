@@ -16,4 +16,6 @@ public interface ILegendProvider {
 	 */
 	abstract Color getValueColor(int legendValue);
 
+	abstract void setLegendColor(LegendColor newLegendColor);
+
 }

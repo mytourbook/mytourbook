@@ -252,7 +252,7 @@ public class LegendColorDialog extends Dialog {
 
 		fComboMaxBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboMaxBrightness.addSelectionListener(fDefaultSelectionAdapter);
-		for (String comboLabel : LegendColor.BrightnessLabels) {
+		for (String comboLabel : LegendColor.BRIGHTNESS_LABELS) {
 			fComboMaxBrightness.add(comboLabel);
 		}
 
@@ -285,7 +285,7 @@ public class LegendColorDialog extends Dialog {
 
 		fComboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboMinBrightness.addSelectionListener(fDefaultSelectionAdapter);
-		for (String comboLabel : LegendColor.BrightnessLabels) {
+		for (String comboLabel : LegendColor.BRIGHTNESS_LABELS) {
 			fComboMinBrightness.add(comboLabel);
 		}
 
@@ -419,7 +419,8 @@ public class LegendColorDialog extends Dialog {
 	}
 
 	/**
-	 * Set the {@link LegendColor} which will be displayed in this dialog
+	 * Set the {@link LegendColor} which will be displayed in this dialog, it will use a copy of the
+	 * supplied {@link LegendColor}
 	 * 
 	 * @param legendColor
 	 */

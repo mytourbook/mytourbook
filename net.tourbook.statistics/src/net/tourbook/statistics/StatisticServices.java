@@ -18,7 +18,7 @@ package net.tourbook.statistics;
 import java.util.ArrayList;
 
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColorDefaults;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -50,13 +50,13 @@ public class StatisticServices {
 		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		String defaultColorName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 		rgbBright.add(PreferenceConverter.getColor(prefStore, defaultColorName
-				+ GraphColorDefaults.PREF_COLOR_BRIGHT));
+				+ GraphColorProvider.PREF_COLOR_BRIGHT));
 
 		rgbDark.add(PreferenceConverter.getColor(prefStore, defaultColorName
-				+ GraphColorDefaults.PREF_COLOR_DARK));
+				+ GraphColorProvider.PREF_COLOR_DARK));
 
 		rgbLine.add(PreferenceConverter.getColor(prefStore, defaultColorName
-				+ GraphColorDefaults.PREF_COLOR_LINE));
+				+ GraphColorProvider.PREF_COLOR_LINE));
 
 		/*
 		 * color index 1...n+1: tour type colors

@@ -19,7 +19,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColorDefaults;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.ui.UI;
 
 public class StatisticWeekDistance extends StatisticWeek {
@@ -44,7 +44,7 @@ public class StatisticWeekDistance extends StatisticWeek {
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
 
 		if (fIsSynchScaleEnabled) {

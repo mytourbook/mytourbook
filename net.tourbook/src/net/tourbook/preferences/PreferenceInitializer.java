@@ -16,7 +16,7 @@
 package net.tourbook.preferences;
 
 import net.tourbook.colors.ColorDefinition;
-import net.tourbook.colors.GraphColorDefaults;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.util.StringToArrayConverter;
@@ -70,42 +70,40 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * graph color preferences
 		 */
+		for (ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
 
-		for (ColorDefinition graphDefinition : GraphColorDefaults.getInstance().getGraphDefinitionList()) {
-
-			String graphName = graphDefinition.getGraphPrefName();
+			String graphPrefName = graphDefinition.getGraphPrefName();
 
 			PreferenceConverter.setDefault(store,
-					graphName + GraphColorDefaults.PREF_COLOR_BRIGHT,
+					graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT,
 					graphDefinition.getDefaultGradientBright());
 
 			PreferenceConverter.setDefault(store,
-					graphName + GraphColorDefaults.PREF_COLOR_DARK,
+					graphPrefName + GraphColorProvider.PREF_COLOR_DARK,
 					graphDefinition.getDefaultGradientDark());
 
 			PreferenceConverter.setDefault(store,
-					graphName + GraphColorDefaults.PREF_COLOR_LINE,
+					graphPrefName + GraphColorProvider.PREF_COLOR_LINE,
 					graphDefinition.getDefaultLineColor());
+
 		}
 
 		/*
 		 * graph preferences
 		 */
-		store.setDefault(ITourbookPreferences.GRAPH_VISIBLE,
-				Integer.toString(TourManager.GRAPH_ALTITUDE));
+		store.setDefault(ITourbookPreferences.GRAPH_VISIBLE, Integer.toString(TourManager.GRAPH_ALTITUDE));
 
 		final String separator = StringToArrayConverter.STRING_SEPARATOR;
 
-		store.setDefault(ITourbookPreferences.GRAPH_ALL,
-				(Integer.toString(TourManager.GRAPH_ALTITUDE) + separator)
-						+ (Integer.toString(TourManager.GRAPH_SPEED) + separator)
-						+ (Integer.toString(TourManager.GRAPH_PACE) + separator)
-						+ (Integer.toString(TourManager.GRAPH_PULSE) + separator)
-						+ (Integer.toString(TourManager.GRAPH_TEMPERATURE) + separator)
-						+ (Integer.toString(TourManager.GRAPH_CADENCE) + separator)
-						+ (Integer.toString(TourManager.GRAPH_ALTIMETER) + separator)
-						+ (Integer.toString(TourManager.GRAPH_GRADIENT) + separator)
-						+ Integer.toString(TourManager.GRAPH_POWER));
+		store.setDefault(ITourbookPreferences.GRAPH_ALL, (Integer.toString(TourManager.GRAPH_ALTITUDE) + separator)
+				+ (Integer.toString(TourManager.GRAPH_PULSE) + separator)
+				+ (Integer.toString(TourManager.GRAPH_SPEED) + separator)
+				+ (Integer.toString(TourManager.GRAPH_PACE) + separator)
+				+ (Integer.toString(TourManager.GRAPH_TEMPERATURE) + separator)
+				+ (Integer.toString(TourManager.GRAPH_CADENCE) + separator)
+				+ (Integer.toString(TourManager.GRAPH_ALTIMETER) + separator)
+				+ (Integer.toString(TourManager.GRAPH_GRADIENT) + separator)
+				+ Integer.toString(TourManager.GRAPH_POWER));
 
 		// define which unit is shown on the x-axis
 		store.setDefault(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);

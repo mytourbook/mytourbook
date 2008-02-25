@@ -25,7 +25,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.IBarSelectionListener;
-import net.tourbook.colors.GraphColorDefaults;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
@@ -349,7 +349,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		// set the bar low/high data
 		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR, tourSpeed);
 		yData.setValueDivisor(10);
-		TourManager.setGraphColor(prefStore, yData, GraphColorDefaults.PREF_GRAPH_SPEED);
+		TourManager.setGraphColor(prefStore, yData, GraphColorProvider.PREF_GRAPH_SPEED);
 
 		/*
 		 * set/restore min/max values

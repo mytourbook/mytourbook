@@ -45,4 +45,8 @@ public class LegendProvider implements ILegendProvider {
 		return TourPainter.getLegendColor(fLegendConfig, fLegendColor, legendValue);
 	}
 
+	public void setLegendColor(LegendColor legendColor) {
+		fLegendColor = legendColor;
+	}
+
 }

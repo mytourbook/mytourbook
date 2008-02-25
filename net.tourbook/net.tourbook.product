@@ -72,13 +72,13 @@
    </plugins>
 
    <features>
+      <feature id="de.byteholder.geoclipse.feature" version="0.0.0"/>
       <feature id="net.tourbook.ext.derby.feature" version="10.3.2.1"/>
       <feature id="net.tourbook.ext.ejb3.feature" version="3.3.0"/>
       <feature id="org.eclipse.rcp" version="3.3.2.R33x_r20071022-8y8eE9CEV3FspP8HJrY1M2dS"/>
       <feature id="net.tourbook.ext.eclipse" version="1.2.0.v20071231"/>
       <feature id="net.tourbook.device.feature" version="1.4.0.v2008"/>
       <feature id="net.tourbook.feature" version="1.4.0.v2008"/>
-      <feature id="net.tourbook.mapping.feature" version="1.4.0.v2008"/>
       <feature id="net.tourbook.statistics.feature" version="1.2.0.v20071231"/>
    </features>
 

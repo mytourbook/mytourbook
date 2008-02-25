@@ -25,24 +25,26 @@ import org.eclipse.swt.graphics.RGB;
 
 public class ColorDefinition {
 
-	private String			fPrefName;
-	private String			fVisibleName;
+	private String				fPrefName;
+	private String				fVisibleName;
 
-	private GraphColor[]	fColorParts;
+	private GraphColorItem[]	fColorParts;
 
-	private RGB				fDefaultLineColor;
-	private RGB				fDefaultGradientDark;
-	private RGB				fDefaultGradientBright;
+	private RGB					fLineColor;
+	private RGB					fDefaultLineColor;
+	private RGB					fNewLineColor;
 
-	private RGB				fLineColor;
-	private RGB				fGradientDark;
-	private RGB				fGradientBright;
+	private RGB					fGradientBright;
+	private RGB					fDefaultGradientBright;
+	private RGB					fNewGradientBright;
 
-	private RGB				fNewLineColor;
-	private RGB				fNewGradientDark;
-	private RGB				fNewGradientBright;
+	private RGB					fGradientDark;
+	private RGB					fDefaultGradientDark;
+	private RGB					fNewGradientDark;
 
-	private LegendColor		fLegendColor;
+	private LegendColor			fLegendColor;
+	private LegendColor			fDefaultLegendColor;
+	private LegendColor			fNewLegendColor;
 
 	/**
 	 * Sets the color for the default, current and changes
@@ -57,7 +59,7 @@ public class ColorDefinition {
 	 *        default dark gradient color
 	 * @param defaultLineColor
 	 *        default line color
-	 * @param legendColor
+	 * @param defaultLegendColor
 	 *        legend color configuration or <code>null</code> when legend is not available
 	 */
 	protected ColorDefinition(	String prefName,
@@ -65,7 +67,7 @@ public class ColorDefinition {
 								RGB defaultGradientBright,
 								RGB defaultGradientDark,
 								RGB defaultLineColor,
-								LegendColor legendColor) {
+								LegendColor defaultLegendColor) {
 
 		fPrefName = prefName;
 		fVisibleName = visibleName;
@@ -74,43 +76,43 @@ public class ColorDefinition {
 		fDefaultGradientDark = defaultGradientDark;
 		fDefaultLineColor = defaultLineColor;
 
-		fLegendColor = legendColor;
+		fDefaultLegendColor = defaultLegendColor;
 
 		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		String graphPrefName = getGraphPrefName();
 
 		/*
-		 * gradient bright
+		 * set gradient bright from pref store or default
 		 */
-		String prefColorGradientBright = graphPrefName + GraphColorDefaults.PREF_COLOR_BRIGHT;
+		String prefColorGradientBright = graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT;
 		if (prefStore.contains(prefColorGradientBright)) {
 			fGradientBright = PreferenceConverter.getColor(prefStore, prefColorGradientBright);
 		} else {
-			fGradientBright = getDefaultGradientBright();
+			fGradientBright = fDefaultGradientBright;
 		}
-		fNewGradientBright = getGradientBright();
+		fNewGradientBright = fGradientBright;
 
 		/*
 		 * gradient dark
 		 */
-		String prefColorGradientDark = graphPrefName + GraphColorDefaults.PREF_COLOR_DARK;
+		String prefColorGradientDark = graphPrefName + GraphColorProvider.PREF_COLOR_DARK;
 		if (prefStore.contains(prefColorGradientDark)) {
 			fGradientDark = PreferenceConverter.getColor(prefStore, prefColorGradientDark);
 		} else {
-			fGradientDark = getDefaultGradientDark();
+			fGradientDark = fDefaultGradientDark;
 		}
-		fNewGradientDark = getGradientDark();
+		fNewGradientDark = fGradientDark;
 
 		/*
 		 * line color
 		 */
-		String prefColorLine = graphPrefName + GraphColorDefaults.PREF_COLOR_LINE;
+		String prefColorLine = graphPrefName + GraphColorProvider.PREF_COLOR_LINE;
 		if (prefStore.contains(prefColorLine)) {
 			fLineColor = PreferenceConverter.getColor(prefStore, prefColorLine);
 		} else {
-			fLineColor = getDefaultLineColor();
+			fLineColor = fDefaultLineColor;
 		}
-		fNewLineColor = getLineColor();
+		fNewLineColor = fLineColor;
 	}
 
 	public RGB getDefaultGradientBright() {
@@ -119,6 +121,10 @@ public class ColorDefinition {
 
 	public RGB getDefaultGradientDark() {
 		return fDefaultGradientDark;
+	}
+
+	public LegendColor getDefaultLegendColor() {
+		return fDefaultLegendColor;
 	}
 
 	public RGB getDefaultLineColor() {
@@ -133,7 +139,7 @@ public class ColorDefinition {
 		return fGradientDark;
 	}
 
-	public GraphColor[] getGraphColorParts() {
+	public GraphColorItem[] getGraphColorParts() {
 		return fColorParts;
 	}
 
@@ -161,6 +167,10 @@ public class ColorDefinition {
 		return fNewGradientDark;
 	}
 
+	public LegendColor getNewLegendColor() {
+		return fNewLegendColor;
+	}
+
 	public RGB getNewLineColor() {
 		return fNewLineColor;
 	}
@@ -178,43 +188,47 @@ public class ColorDefinition {
 	 * 
 	 * @param children
 	 */
-	public void setColorNames(GraphColor[] children) {
+	public void setColorNames(GraphColorItem[] children) {
 		fColorParts = children;
 	}
 
-	public void setGradientBright(RGB fGradientBright) {
-		this.fGradientBright = fGradientBright;
+	public void setGradientBright(RGB gradientBright) {
+		fGradientBright = gradientBright;
 	}
 
-	public void setGradientDark(RGB fGradientDark) {
-		this.fGradientDark = fGradientDark;
+	public void setGradientDark(RGB gradientDark) {
+		fGradientDark = gradientDark;
 	}
 
-	public void setLineColor(RGB fLineColor) {
-		this.fLineColor = fLineColor;
+	public void setLegendColor(LegendColor legendColor) {
+		fLegendColor = legendColor;
 	}
 
-	public void setNewGradientBright(RGB fNewGradientBright) {
-		this.fNewGradientBright = fNewGradientBright;
+	public void setLineColor(RGB lineColor) {
+		fLineColor = lineColor;
 	}
 
-	public void setNewGradientDark(RGB fNewGradientDark) {
-		this.fNewGradientDark = fNewGradientDark;
+	public void setNewGradientBright(RGB newGradientBright) {
+		fNewGradientBright = newGradientBright;
+	}
+
+	public void setNewGradientDark(RGB newGradientDark) {
+		fNewGradientDark = newGradientDark;
 	}
 
 	public void setNewLegendColor(LegendColor newLegendColor) {
-		fLegendColor = newLegendColor;
+		fNewLegendColor = newLegendColor;
 	}
 
-	public void setNewLineColor(RGB fNewLineColor) {
-		this.fNewLineColor = fNewLineColor;
+	public void setNewLineColor(RGB newLineColor) {
+		fNewLineColor = newLineColor;
 	}
 
-	public void setPrefName(String fPrefName) {
-		this.fPrefName = fPrefName;
+	public void setPrefName(String prefName) {
+		fPrefName = prefName;
 	}
 
-	public void setVisibleName(String fVisibleName) {
-		this.fVisibleName = fVisibleName;
+	public void setVisibleName(String visibleName) {
+		fVisibleName = visibleName;
 	}
 }

@@ -19,7 +19,7 @@ import net.tourbook.mapping.LegendColor;
 
 import org.eclipse.swt.graphics.RGB;
 
-public class GraphColor {
+public class GraphColorItem {
 
 	private ColorDefinition	fColorDefinition;
 
@@ -27,11 +27,11 @@ public class GraphColor {
 	private String			fVisibleName;
 
 	/**
-	 * <code>true</code> when this {@link GraphColor} is used as for a legend
+	 * <code>true</code> when this {@link GraphColorItem} is used as for a legend
 	 */
 	private boolean			fIsLegend;
 
-	public GraphColor(ColorDefinition parent, String colorPrefName, String visibleName, boolean isLegend) {
+	public GraphColorItem(ColorDefinition parent, String colorPrefName, String visibleName, boolean isLegend) {
 
 		fColorDefinition = parent;
 
@@ -54,9 +54,9 @@ public class GraphColor {
 	}
 
 	public RGB getNewRGB() {
-		return fColorPrefName.compareTo(GraphColorDefaults.PREF_COLOR_LINE) == 0
+		return fColorPrefName.compareTo(GraphColorProvider.PREF_COLOR_LINE) == 0
 				? fColorDefinition.getNewLineColor()
-				: fColorPrefName.compareTo(GraphColorDefaults.PREF_COLOR_DARK) == 0
+				: fColorPrefName.compareTo(GraphColorProvider.PREF_COLOR_DARK) == 0
 						? fColorDefinition.getNewGradientDark()
 						: fColorDefinition.getNewGradientBright();
 	}
@@ -66,7 +66,7 @@ public class GraphColor {
 	}
 
 	/**
-	 * @return Returns <code>true</code> when this {@link GraphColor} represents a
+	 * @return Returns <code>true</code> when this {@link GraphColorItem} represents a
 	 *         {@link LegendColor}
 	 */
 	public boolean isLegend() {
@@ -78,9 +78,9 @@ public class GraphColor {
 	}
 
 	public void setNewRGB(RGB rgb) {
-		if (fColorPrefName.compareTo(GraphColorDefaults.PREF_COLOR_LINE) == 0) {
+		if (fColorPrefName.compareTo(GraphColorProvider.PREF_COLOR_LINE) == 0) {
 			fColorDefinition.setNewLineColor(rgb);
-		} else if (fColorPrefName.compareTo(GraphColorDefaults.PREF_COLOR_DARK) == 0) {
+		} else if (fColorPrefName.compareTo(GraphColorProvider.PREF_COLOR_DARK) == 0) {
 			fColorDefinition.setNewGradientDark(rgb);
 		} else {
 			fColorDefinition.setNewGradientBright(rgb);

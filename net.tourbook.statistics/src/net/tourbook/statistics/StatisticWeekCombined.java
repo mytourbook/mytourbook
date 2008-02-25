@@ -19,7 +19,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColorDefaults;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.ui.UI;
 
 public class StatisticWeekCombined extends StatisticWeek {
@@ -45,7 +45,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
 
 		// altitude
@@ -59,7 +59,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
 
 		// duration
@@ -73,7 +73,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorDefaults.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
 
 		if (fIsSynchScaleEnabled) {
