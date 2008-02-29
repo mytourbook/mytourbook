@@ -43,8 +43,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PrefPageStatistic extends FieldEditorPreferencePage implements IWorkbenchPreferencePage,
 		IPropertyChangeListener {
 
-	private static final int												DEFAULT_FIELD_WIDTH	= 40;
-
 	private IntegerFieldEditor												fEditorDistanceLowValue;
 	private IntegerFieldEditor												fEditorDistanceInterval;
 	private IntegerFieldEditor												fEditorDistanceNumbers;
@@ -109,7 +107,7 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 				Messages.Pref_Statistic_Label_distance_low_value,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorDistanceLowValue, DEFAULT_FIELD_WIDTH);
+		UI.setFieldWidth(parent, fEditorDistanceLowValue, UI.DEFAULT_FIELD_WIDTH);
 		addField(fEditorDistanceLowValue);
 
 		// interval
@@ -117,7 +115,7 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 				Messages.Pref_Statistic_Label_interval,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorDistanceInterval, DEFAULT_FIELD_WIDTH);
+		UI.setFieldWidth(parent, fEditorDistanceInterval, UI.DEFAULT_FIELD_WIDTH);
 		addField(fEditorDistanceInterval);
 
 		// numbers
@@ -125,7 +123,7 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 				Messages.Pref_Statistic_Label_distance_quantity,
 				parent,
 				2);
-		UI.setFieldWidth(parent, fEditorDistanceNumbers, DEFAULT_FIELD_WIDTH);
+		UI.setFieldWidth(parent, fEditorDistanceNumbers, UI.DEFAULT_FIELD_WIDTH);
 		addField(fEditorDistanceNumbers);
 
 		fEditorDistanceLowValue.setPropertyChangeListener(this);
@@ -156,7 +154,7 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 				Messages.Pref_Statistic_Label_altitude_low_value,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorAltitudeLowValue, DEFAULT_FIELD_WIDTH);
+		UI.setFieldWidth(parent, fEditorAltitudeLowValue, UI.DEFAULT_FIELD_WIDTH);
 		addField(fEditorAltitudeLowValue);
 
 		// interval
@@ -164,7 +162,7 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 				Messages.Pref_Statistic_Label_interval,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorAltitudeInterval, DEFAULT_FIELD_WIDTH);
+		UI.setFieldWidth(parent, fEditorAltitudeInterval, UI.DEFAULT_FIELD_WIDTH);
 		addField(fEditorAltitudeInterval);
 
 		// numbers
@@ -173,7 +171,7 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 				parent,
 				2);
 		fEditorAltitudeNumbers.setValidRange(2, 99);
-		UI.setFieldWidth(parent, fEditorAltitudeNumbers, DEFAULT_FIELD_WIDTH);
+		UI.setFieldWidth(parent, fEditorAltitudeNumbers, UI.DEFAULT_FIELD_WIDTH);
 		addField(fEditorAltitudeNumbers);
 
 		fEditorAltitudeLowValue.setPropertyChangeListener(this);
@@ -204,7 +202,7 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 				Messages.Pref_Statistic_Label_duration_low_value,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorDurationLowValue, DEFAULT_FIELD_WIDTH);
+		UI.setFieldWidth(parent, fEditorDurationLowValue, UI.DEFAULT_FIELD_WIDTH);
 		addField(fEditorDurationLowValue);
 
 		// interval
@@ -212,7 +210,7 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 				Messages.Pref_Statistic_Label_duration_interval,
 				parent,
 				4);
-		UI.setFieldWidth(parent, fEditorDurationInterval, DEFAULT_FIELD_WIDTH);
+		UI.setFieldWidth(parent, fEditorDurationInterval, UI.DEFAULT_FIELD_WIDTH);
 		addField(fEditorDurationInterval);
 
 		// numbers
@@ -220,7 +218,7 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 				Messages.Pref_Statistic_Label_duration_quantity,
 				parent,
 				2);
-		UI.setFieldWidth(parent, fEditorDurationNumbers, DEFAULT_FIELD_WIDTH);
+		UI.setFieldWidth(parent, fEditorDurationNumbers, UI.DEFAULT_FIELD_WIDTH);
 		addField(fEditorDurationNumbers);
 
 		fEditorDurationLowValue.setPropertyChangeListener(this);

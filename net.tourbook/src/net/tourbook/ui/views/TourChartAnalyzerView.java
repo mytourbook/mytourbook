@@ -383,7 +383,6 @@ public class TourChartAnalyzerView extends ViewPart {
 		fScrolledContainer = new ScrolledComposite(fPartContainer, SWT.V_SCROLL | SWT.H_SCROLL);
 		fScrolledContainer.setExpandVertical(true);
 		fScrolledContainer.setExpandHorizontal(true);
-
 		fScrolledContainer.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent e) {

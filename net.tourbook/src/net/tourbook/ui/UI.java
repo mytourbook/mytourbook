@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.ui;
 
 import java.text.DateFormat;
@@ -56,6 +57,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 public class UI {
 
 	public static final String				EMPTY_STRING					= "";											//$NON-NLS-1$
+	public static final int					DEFAULT_FIELD_WIDTH				= 40;
 
 	/*
 	 * labels for the different measurement systems

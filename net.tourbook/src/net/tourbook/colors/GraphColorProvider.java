@@ -54,7 +54,7 @@ public class GraphColorProvider {
 	public static final String				PREF_GRAPH_HEARTBEAT		= "heartbeat";			//$NON-NLS-1$
 	public static final String				PREF_GRAPH_TEMPTERATURE		= "tempterature";		//$NON-NLS-1$
 	public static final String				PREF_GRAPH_POWER			= "power";				//$NON-NLS-1$
-	public static final String				PREF_GRAPH_GRADIEND			= "gradiend";			//$NON-NLS-1$
+	public static final String				PREF_GRAPH_GRADIENT			= "gradient";			//$NON-NLS-1$
 	public static final String				PREF_GRAPH_ALTIMETER		= "altimeter";			//$NON-NLS-1$
 	public static final String				PREF_GRAPH_CADENCE			= "cadence";			//$NON-NLS-1$
 	public static final String				PREF_GRAPH_TOUR_COMPARE		= "tourCompare";		//$NON-NLS-1$
@@ -66,22 +66,28 @@ public class GraphColorProvider {
 	public static final String				PREF_COLOR_MAPPING			= "mapping";			//$NON-NLS-1$
 
 	private static final String				MEMENTO_LEGEND_COLOR_FILE	= "legendcolor.xml";	//$NON-NLS-1$
+	private static final String				MEMENTO_ROOT				= "legendcolorlist";	//$NON-NLS-1$
 
-	private static final String				MEMENTO_ROOT				= "legendcolorlist";
-	private static final String				MEMENTO_CHILD_LEGEND_COLOR	= "legendcolor";
-	private static final String				MEMENTO_CHILD_VALUE_COLOR	= "valuecolor";
-	private static final String				MEMENTO_CHILD_BRIGHTNESS	= "brightness";
+	private static final String				MEMENTO_CHILD_LEGEND_COLOR	= "legendcolor";		//$NON-NLS-1$
+	private static final String				TAG_LEGEND_COLOR_PREF_NAME	= "prefname";			//$NON-NLS-1$
 
-	private static final String				TAG_LEGEND_COLOR_PREF_NAME	= "prefname";
-	private static final String				TAG_VALUE_COLOR_VALUE		= "value";
-	private static final String				TAG_VALUE_COLOR_RED			= "red";
-	private static final String				TAG_VALUE_COLOR_GREEN		= "green";
-	private static final String				TAG_VALUE_COLOR_BLUE		= "blue";
+	private static final String				MEMENTO_CHILD_VALUE_COLOR	= "valuecolor";		//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_VALUE		= "value";				//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_RED			= "red";				//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_GREEN		= "green";				//$NON-NLS-1$
+	private static final String				TAG_VALUE_COLOR_BLUE		= "blue";				//$NON-NLS-1$
 
-	private static final String				TAG_BRIGHTNESS_MIN			= "min";
-	private static final String				TAG_BRIGHTNESS_MIN_FACTOR	= "minFactor";
-	private static final String				TAG_BRIGHTNESS_MAX			= "max";
-	private static final String				TAG_BRIGHTNESS_MAX_FACTOR	= "maxFactor";
+	private static final String				MEMENTO_CHILD_BRIGHTNESS	= "brightness";		//$NON-NLS-1$
+	private static final String				TAG_BRIGHTNESS_MIN			= "min";				//$NON-NLS-1$
+	private static final String				TAG_BRIGHTNESS_MIN_FACTOR	= "minFactor";			//$NON-NLS-1$
+	private static final String				TAG_BRIGHTNESS_MAX			= "max";				//$NON-NLS-1$
+	private static final String				TAG_BRIGHTNESS_MAX_FACTOR	= "maxFactor";			//$NON-NLS-1$
+
+	private static final String				MEMENTO_CHILD_MIN_MAX_VALUE	= "minmaxValue";		//$NON-NLS-1$
+	private static final String				TAG_IS_MIN_VALUE_OVERWRITE	= "isMinOverwrite";	//$NON-NLS-1$
+	private static final String				TAG_MIN_VALUE_OVERWRITE		= "minValueOverwrite";	//$NON-NLS-1$
+	private static final String				TAG_IS_MAX_VALUE_OVERWRITE	= "isMaxOverwrite";	//$NON-NLS-1$
+	private static final String				TAG_MAX_VALUE_OVERWRITE		= "maxValueOverwrite";	//$NON-NLS-1$
 
 	public static String[][]				colorNames					= new String[][] {
 			{ PREF_COLOR_BRIGHT, Messages.Graph_Pref_color_gradient_bright },
@@ -93,12 +99,14 @@ public class GraphColorProvider {
 			new ValueColor(10, 161, 85, 0),
 			new ValueColor(50, 232, 169, 0),
 			new ValueColor(100, 0, 241, 0),
-			new ValueColor(150, 0, 158, 255),
-			new ValueColor(190, 205, 234, 255)							},
+			new ValueColor(150, 0, 154, 255),
+			new ValueColor(190, 144, 219, 255)							},
 																				LegendColor.BRIGHTNESS_DIMMING,
 																				15,
 																				LegendColor.BRIGHTNESS_LIGHTNING,
-																				100);
+																				39)
+
+																		;
 
 	private static final LegendColor		LEGEND_COLOR_PULSE			= new LegendColor(new ValueColor[] {
 			new ValueColor(10, 0, 203, 0),
@@ -107,9 +115,9 @@ public class GraphColorProvider {
 			new ValueColor(150, 255, 0, 0),
 			new ValueColor(190, 255, 0, 247)							},
 																				LegendColor.BRIGHTNESS_DIMMING,
-																				34,
+																				11,
 																				LegendColor.BRIGHTNESS_DIMMING,
-																				38);
+																				10);
 
 	private static final LegendColor		LEGEND_COLOR_GRADIENT		= new LegendColor(new ValueColor[] {
 			new ValueColor(10, 0, 0, 255),
@@ -118,33 +126,37 @@ public class GraphColorProvider {
 			new ValueColor(150, 255, 255, 0),
 			new ValueColor(190, 255, 0, 0)								},
 																				LegendColor.BRIGHTNESS_DIMMING,
-																				59,
+																				23,
 																				LegendColor.BRIGHTNESS_DIMMING,
-																				27);
+																				10,
+																				true,
+																				-20,
+																				true,
+																				20);
 
 	private static final LegendColor		LEGEND_COLOR_PACE			= new LegendColor(new ValueColor[] {
 			new ValueColor(10, 255, 0, 0),
-			new ValueColor(50, 255, 0, 128),
-			new ValueColor(100, 255, 0, 255),
-			new ValueColor(150, 126, 0, 255),
+			new ValueColor(50, 255, 255, 0),
+			new ValueColor(100, 0, 169, 0),
+			new ValueColor(150, 0, 255, 255),
 			new ValueColor(190, 0, 0, 255)								},
 																				LegendColor.BRIGHTNESS_DIMMING,
-																				54,
+																				17,
 																				LegendColor.BRIGHTNESS_DIMMING,
-																				18)
+																				8)
 
 																		;
 
 	private static final LegendColor		LEGEND_COLOR_SPEED			= new LegendColor(new ValueColor[] {
 			new ValueColor(10, 0, 0, 255),
-			new ValueColor(50, 135, 0, 255),
-			new ValueColor(100, 255, 0, 255),
-			new ValueColor(150, 255, 0, 124),
+			new ValueColor(50, 0, 255, 255),
+			new ValueColor(100, 0, 169, 0),
+			new ValueColor(150, 255, 255, 0),
 			new ValueColor(190, 255, 0, 0)								},
 																				LegendColor.BRIGHTNESS_DIMMING,
-																				54,
+																				17,
 																				LegendColor.BRIGHTNESS_DIMMING,
-																				18);
+																				8);
 
 	/**
 	 * 
@@ -193,8 +205,8 @@ public class GraphColorProvider {
 					new RGB(0, 216, 240),
 					null),
 
-			new ColorDefinition(PREF_GRAPH_GRADIEND,
-					Messages.Graph_Label_Gradiend,
+			new ColorDefinition(PREF_GRAPH_GRADIENT,
+					Messages.Graph_Label_Gradient,
 					new RGB(255, 255, 255),
 					new RGB(249, 231, 0),
 					new RGB(236, 206, 0),
@@ -263,7 +275,7 @@ public class GraphColorProvider {
 	}
 
 	/**
-	 * write the legend data into a xml file
+	 * write the legend color data into a xml file
 	 */
 	public static void saveLegendData() {
 
@@ -305,6 +317,12 @@ public class GraphColorProvider {
 				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN_FACTOR, legendColor.minBrightnessFactor);
 				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX, legendColor.maxBrightness);
 				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX_FACTOR, legendColor.maxBrightnessFactor);
+
+				IMemento mementoMinMaxValue = mementoLegendColor.createChild(MEMENTO_CHILD_MIN_MAX_VALUE);
+				mementoMinMaxValue.putInteger(TAG_IS_MIN_VALUE_OVERWRITE, legendColor.isMinValueOverwrite ? 1 : 0);
+				mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, legendColor.overwriteMinValue);
+				mementoMinMaxValue.putInteger(TAG_IS_MAX_VALUE_OVERWRITE, legendColor.isMaxValueOverwrite ? 1 : 0);
+				mementoMinMaxValue.putInteger(TAG_MAX_VALUE_OVERWRITE, legendColor.overwriteMaxValue);
 			}
 
 			xmlMemento.save(writer);
@@ -320,6 +338,23 @@ public class GraphColorProvider {
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param preferenceName
+	 *        preference name PREF_GRAPH_...
+	 * @return Returns the {@link ColorDefinition} for the preference name
+	 */
+	public ColorDefinition getGraphColorDefinition(String preferenceName) {
+
+		ColorDefinition[] colorDefinitions = getGraphColorDefinitions();
+		for (ColorDefinition colorDefinition : colorDefinitions) {
+			if (colorDefinition.getPrefName().equals(preferenceName)) {
+				return colorDefinition;
+			}
+		}
+
+		return null;
 	}
 
 	public ColorDefinition[] getGraphColorDefinitions() {
@@ -371,14 +406,14 @@ public class GraphColorProvider {
 			// loop: all legend colors
 			for (IMemento mementoLegendColor : mementoLegendColors) {
 
+				// check pref name
 				String prefName = mementoLegendColor.getString(TAG_LEGEND_COLOR_PREF_NAME);
-
 				if (prefName == null) {
 					continue;
 				}
 
+				// check value colors
 				IMemento[] mementoValueColors = mementoLegendColor.getChildren(MEMENTO_CHILD_VALUE_COLOR);
-
 				if (mementoLegendColors == null) {
 					continue;
 				}
@@ -386,7 +421,7 @@ public class GraphColorProvider {
 				LegendColor legendColor = new LegendColor();
 
 				/*
-				 * read value colors
+				 * value colors
 				 */
 				ArrayList<ValueColor> valueColors = new ArrayList<ValueColor>();
 
@@ -402,41 +437,64 @@ public class GraphColorProvider {
 						valueColors.add(new ValueColor(value, red, green, blue));
 					}
 				}
-
 				legendColor.valueColors = valueColors.toArray(new ValueColor[valueColors.size()]);
 
 				/*
-				 * read brightness
+				 * min/max brightness
 				 */
 				IMemento[] mementoBrightness = mementoLegendColor.getChildren(MEMENTO_CHILD_BRIGHTNESS);
+				if (mementoBrightness.length > 0) {
 
-				if (mementoBrightness.length == 0) {
-					continue;
-				}
+					IMemento mementoBrightness0 = mementoBrightness[0];
 
-				IMemento mementoBrightness0 = mementoBrightness[0];
-
-				Integer minBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN);
-				if (minBrightness != null) {
-					legendColor.minBrightness = minBrightness;
-				}
-				Integer minBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN_FACTOR);
-				if (minBrightness != null) {
-					legendColor.minBrightnessFactor = minBrightnessFactor;
-				}
-				Integer maxBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX);
-				if (maxBrightness != null) {
-					legendColor.maxBrightness = maxBrightness;
-				}
-				Integer maxBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX_FACTOR);
-				if (minBrightness != null) {
-					legendColor.maxBrightnessFactor = maxBrightnessFactor;
+					Integer minBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN);
+					if (minBrightness != null) {
+						legendColor.minBrightness = minBrightness;
+					}
+					Integer minBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN_FACTOR);
+					if (minBrightness != null) {
+						legendColor.minBrightnessFactor = minBrightnessFactor;
+					}
+					Integer maxBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX);
+					if (maxBrightness != null) {
+						legendColor.maxBrightness = maxBrightness;
+					}
+					Integer maxBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX_FACTOR);
+					if (minBrightness != null) {
+						legendColor.maxBrightnessFactor = maxBrightnessFactor;
+					}
 				}
 
 				/*
-				 * put the legend color into the color definition
+				 * min/max overwrite
 				 */
+				IMemento[] mementoMinMaxValue = mementoLegendColor.getChildren(MEMENTO_CHILD_MIN_MAX_VALUE);
+				if (mementoMinMaxValue.length > 0) {
 
+					IMemento mementoMinMaxValue0 = mementoMinMaxValue[0];
+
+					Integer isMinOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MIN_VALUE_OVERWRITE);
+					if (isMinOverwrite != null) {
+						legendColor.isMinValueOverwrite = isMinOverwrite == 1;
+					}
+					Integer minValue = mementoMinMaxValue0.getInteger(TAG_MIN_VALUE_OVERWRITE);
+					if (minValue != null) {
+						legendColor.overwriteMinValue = minValue;
+					}
+
+					Integer isMaxOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MAX_VALUE_OVERWRITE);
+					if (isMaxOverwrite != null) {
+						legendColor.isMaxValueOverwrite = isMaxOverwrite == 1;
+					}
+					Integer maxValue = mementoMinMaxValue0.getInteger(TAG_MAX_VALUE_OVERWRITE);
+					if (maxValue != null) {
+						legendColor.overwriteMaxValue = maxValue;
+					}
+				}
+
+				/*
+				 * update color definition with the read data
+				 */
 				for (ColorDefinition colorDefinition : fGraphColorDefinitions) {
 
 					if (colorDefinition.getPrefName().equals(prefName)) {

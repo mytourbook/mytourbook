@@ -22,7 +22,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.mapping.messages";	//$NON-NLS-1$
 
-	public static String		graph_label_gradiend_unit;
+	public static String	graph_label_gradient_unit;
+
 	public static String		graph_label_heartbeat_unit;
 
 	public static String		image_action_change_tile_factory;
@@ -54,6 +55,10 @@ public class Messages extends NLS {
 	public static String		map_action_change_tile_factory_tooltip;
 	public static String		map_action_save_default_position;
 	public static String		map_action_set_default_position;
+
+	public static String	map_action_show_slider_in_legend;
+
+	public static String	map_action_show_slider_in_map;
 	public static String		map_action_show_tour_in_map;
 	public static String		map_action_synch_with_tour;
 

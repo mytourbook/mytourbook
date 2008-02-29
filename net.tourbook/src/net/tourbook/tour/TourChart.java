@@ -313,7 +313,7 @@ public class TourChart extends Chart {
 
 		createGraphActionProxy(TourManager.GRAPH_GRADIENT,
 				COMMAND_ID_GRAPH_GRADIENT,
-				Messages.Graph_Label_Gradiend,
+				Messages.Graph_Label_Gradient,
 				Messages.Tour_Action_graph_gradient_tooltip,
 				Messages.Image__graph_gradient,
 				Messages.Image__graph_gradient_disabled);

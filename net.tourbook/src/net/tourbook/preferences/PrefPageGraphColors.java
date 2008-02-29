@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.preferences;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -88,7 +90,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 
 	private ColorDefinition				fExpandedItem;
 
-	private ColorLabelProvider			fColorLabelProvider;
+	private GraphColorLabelProvider		fColorLabelProvider;
 
 	private LegendProvider				fLegendProvider;
 	private LegendColorDialog			fLegendColorDialog;
@@ -191,7 +193,6 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 			}
 		});
 		fBtnLegend.setEnabled(false);
-//		fBtnLegend.setSize(fColorSelector.getButton().getSize().x, fBtnLegend.getSize().y);
 	}
 
 	/**
@@ -277,12 +278,12 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		treeLayouter.addColumnData(new ColumnWeightData(10, true));
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		treeLayouter.addColumnData(new ColumnWeightData(5, true));
+		treeLayouter.addColumnData(new ColumnPixelData(10, false));
 
 		fColorViewer = new TreeViewer(tree);
 		fColorViewer.setContentProvider(new ColorContentProvider());
 
-		fColorLabelProvider = new ColorLabelProvider(this);
+		fColorLabelProvider = new GraphColorLabelProvider(this);
 		fColorViewer.setLabelProvider(fColorLabelProvider);
 
 		fColorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -420,8 +421,8 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 
 		final ColorDefinition selectedColorDefinition = fSelectedColor.getColorDefinition();
 
-		// set the color for the dialog
-		fLegendColorDialog.setLegendColor(selectedColorDefinition.getNewLegendColor());
+		// set the color which should be modified in the dialog
+		fLegendColorDialog.setLegendColor(selectedColorDefinition);
 
 		int returnValue = fLegendColorDialog.open();
 
@@ -435,7 +436,8 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		/*
 		 * show java code for the selected color, this code can copy/pasted into GraphColorProvider
 		 */
-//		System.out.println(fSelectedColor.getColorDefinition().getLegendColor().createConstructor());
+		System.out.println(fSelectedColor.getColorDefinition().getLegendColor().createConstructorString());
+//
 		/*
 		 * dispose old color and image for the graph
 		 */

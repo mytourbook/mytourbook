@@ -58,7 +58,7 @@ public class ChartComponentAxis extends Canvas {
 
 	ChartComponentAxis(Chart chart, Composite parent, int style) {
 
-		super(parent, SWT.NO_BACKGROUND);
+		super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
 		fChart = chart;
 

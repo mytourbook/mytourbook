@@ -33,7 +33,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
-public class ColorLabelProvider extends LabelProvider implements ITableLabelProvider {
+public class GraphColorLabelProvider extends LabelProvider implements ITableLabelProvider {
 
 	private final IColorTreeViewer			fColorTreeViewer;
 
@@ -45,7 +45,7 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 	/**
 	 * @param colorTree
 	 */
-	ColorLabelProvider(final IColorTreeViewer colorTreeViewer) {
+	GraphColorLabelProvider(final IColorTreeViewer colorTreeViewer) {
 
 		fColorTreeViewer = colorTreeViewer;
 		fTreeItemHeight = fColorTreeViewer.getTreeViewer().getTree().getItemHeight();
@@ -118,7 +118,7 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 					 * tell the legend provider with which color the legend should be painted
 					 */
 					final ILegendProvider legendProvider = fColorTreeViewer.getLegendProvider();
-					legendProvider.setLegendColor(graphColor.getColorDefinition().getNewLegendColor());
+					legendProvider.setLegendColorColors(graphColor.getColorDefinition().getNewLegendColor());
 
 					TourPainter.drawLegendColors(gc, borderRect, legendProvider, false);
 
@@ -179,7 +179,7 @@ public class ColorLabelProvider extends LabelProvider implements ITableLabelProv
 
 						// tell the legend provider how to draw the legend
 						final ILegendProvider legendProvider = fColorTreeViewer.getLegendProvider();
-						legendProvider.setLegendColor(graphColorItem.getColorDefinition().getNewLegendColor());
+						legendProvider.setLegendColorColors(graphColorItem.getColorDefinition().getNewLegendColor());
 
 						TourPainter.drawLegendColors(gc, borderRect, legendProvider, false);
 

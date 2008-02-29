@@ -817,14 +817,14 @@ public class TourManager {
 
 			yDataGradient = getChartData(gradientSerie, chartType);
 
-			yDataGradient.setYTitle(Messages.Graph_Label_Gradiend);
+			yDataGradient.setYTitle(Messages.Graph_Label_Gradient);
 			yDataGradient.setUnitLabel(Messages.Graph_Label_Gradiend_unit);
 			yDataGradient.setValueDivisor(GRADIENT_DIVISOR);
 			yDataGradient.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_ZERO);
 			yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
 			yDataGradient.setCustomData(ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, computeGradientAvg, 1));
 			yDataGradient.setShowYSlider(true);
-			setGraphColor(prefStore, yDataGradient, GraphColorProvider.PREF_GRAPH_GRADIEND);
+			setGraphColor(prefStore, yDataGradient, GraphColorProvider.PREF_GRAPH_GRADIENT);
 			chartDataModel.addXyData(yDataGradient);
 
 			// adjust min value when defined in the pref store

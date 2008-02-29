@@ -57,6 +57,17 @@ public class TourPainter extends MapPainter {
 	private int[]				fDataSerie;
 	private ILegendProvider		fLegendProvider;
 
+//	public static class LegendPosition {
+//
+//		int				legendWidth;
+//		int				legendHeight;
+//		int				legendPositionX;
+//		int				legendPositionY;
+//
+//		int				availableLegendPixels;
+//		public boolean	isVertical;
+//	}
+
 	public TourPainter() {
 
 		super();
@@ -82,6 +93,7 @@ public class TourPainter extends MapPainter {
 	 *        when <code>true</code> the legend is drawn vertical, when false the legend is drawn
 	 *        horizontal
 	 * @param colorId
+	 * @return
 	 */
 	public static void drawLegendColors(final GC gc,
 										final Rectangle legendBounds,
@@ -103,13 +115,13 @@ public class TourPainter extends MapPainter {
 		final String unitText = config.unitText;
 		final List<String> unitLabels = config.unitLabels;
 
-		int legendWidth;
-		int legendHeight;
+		Rectangle legendBorder;
+
 		int legendPositionX;
 		int legendPositionY;
+		int legendWidth;
+		int legendHeight;
 		int availableLegendPixels;
-
-		Rectangle legendBorder;
 
 		if (isVertical) {
 
@@ -122,7 +134,10 @@ public class TourPainter extends MapPainter {
 
 			availableLegendPixels = legendHeight - 1;
 
-			legendBorder = new Rectangle(legendPositionX - 1, legendPositionY - 1, legendWidth + 1, legendHeight + 1);
+			legendBorder = new Rectangle(legendPositionX - 1, //
+					legendPositionY - 1,
+					legendWidth + 1,
+					legendHeight + 1);
 
 		} else {
 
@@ -182,9 +197,11 @@ public class TourPainter extends MapPainter {
 						 */
 						String valueText;
 						if (unitLabels == null) {
+							// set default unit label
 							final int unit = unitValue / unitFactor;
 							valueText = Integer.toString(unit) + SPACER + unitText;
 						} else {
+							// when unitLabels are available, they will overwrite the default labeling
 							valueText = unitLabels.get(unitLabelIndex++);
 						}
 						final Point valueTextExtent = gc.textExtent(valueText);
@@ -230,8 +247,15 @@ public class TourPainter extends MapPainter {
 			}
 
 			if (isVertical) {
+
+				// vertial legend
+
 				gc.drawLine(legendPositionX, valuePosition, legendWidth, valuePosition);
+
 			} else {
+
+				// horizontal legend
+
 				gc.drawLine(valuePosition, legendPositionY, valuePosition, legendHeight);
 			}
 
@@ -239,7 +263,6 @@ public class TourPainter extends MapPainter {
 				lineColor.dispose();
 			}
 		}
-
 	}
 
 	public static TourPainter getInstance() {
@@ -251,6 +274,12 @@ public class TourPainter extends MapPainter {
 		return fInstance;
 	}
 
+	/**
+	 * @param legendConfig
+	 * @param legendColor
+	 * @param legendValue
+	 * @return Returns a {@link Color} which corresponst to the legend value
+	 */
 	static Color getLegendColor(final LegendConfig legendConfig, final LegendColor legendColor, final int legendValue) {
 
 		int red = 0;
@@ -285,7 +314,7 @@ public class TourPainter extends MapPainter {
 
 		if (minValueColor == null) {
 
-			// legend value is smaller than minimum value, dimm the color
+			// legend value is smaller than minimum value
 
 			valueColor = valueColors[0];
 			red = valueColor.red;
@@ -313,7 +342,7 @@ public class TourPainter extends MapPainter {
 
 		} else if (maxValueColor == null) {
 
-			// legend value is larger than maximum value, dimm the color
+			// legend value is larger than maximum value
 
 			valueColor = valueColors[valueColors.length - 1];
 			red = valueColor.red;
@@ -459,6 +488,7 @@ public class TourPainter extends MapPainter {
 
 		// draw start marker
 		isMarkerInTile = drawMarker(gc, map, tile, latitudeSerie[0], longitudeSerie[0], fImageStartMarker);
+
 		isOverlayInTile = isOverlayInTile || isMarkerInTile;
 
 		return isOverlayInTile;
@@ -609,6 +639,68 @@ public class TourPainter extends MapPainter {
 
 	}
 
+	/**
+	 * @param legendBounds
+	 * @param valueIndex
+	 * @return Returns the position for the value according to the value index in the legend,
+	 *         {@link Integer#MIN_VALUE} when data are not initialized
+	 */
+	public int getLegendValuePosition(Rectangle legendBounds, int valueIndex) {
+
+		if (fDataSerie == null || valueIndex >= fDataSerie.length) {
+			return Integer.MIN_VALUE;
+		}
+
+		/*
+		 * ONLY VERTICAL LEGENDS ARE SUPPORTED
+		 */
+
+		int dataValue = fDataSerie[valueIndex];
+
+		int valuePosition = 0;
+
+		final LegendConfig config = fLegendProvider.getLegendConfig();
+
+		final Integer unitFactor = config.unitFactor;
+//		dataValue /= unitFactor;
+
+		final int legendMaxValue = config.legendMaxValue;
+		final int legendMinValue = config.legendMinValue;
+		final int legendDiffValue = legendMaxValue - legendMinValue;
+
+		if (dataValue >= legendMaxValue) {
+
+			// value >= max
+
+		} else if (dataValue <= legendMinValue) {
+
+			// value <= min
+
+		} else {
+
+			// min < value < max
+
+//			int legendPositionX = legendBounds.x + 1;
+			int legendPositionY = legendBounds.y + MappingView.LEGEND_MARGIN_TOP_BOTTOM;
+//			int legendWidth = 20;
+			int legendHeight = legendBounds.height - 2 * MappingView.LEGEND_MARGIN_TOP_BOTTOM;
+
+			int pixelDiff = legendHeight - 1;
+
+			// pixelValue contains the value for ONE pixel
+//			final float pixelValue = (float) legendDiffValue / availableLegendPixels;
+
+//			valuePosition = legendPositionY + availableLegendPixels - pixelIndex;
+
+			int dataValue0 = dataValue - legendMinValue;
+			float ratio = pixelDiff / (float) legendDiffValue;
+
+			valuePosition = legendPositionY + (int) (dataValue0 * ratio);
+		}
+
+		return valuePosition;
+	}
+
 	private void inizializeLegendData(final TourData tourData) {
 
 		fLegendProvider = PaintManager.getInstance().getLegendProvider();
@@ -709,4 +801,5 @@ public class TourPainter extends MapPainter {
 
 		return false;
 	}
+
 }

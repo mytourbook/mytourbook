@@ -18,17 +18,24 @@ package net.tourbook.mapping;
 
 import java.util.List;
 
+import net.tourbook.Messages;
+import net.tourbook.colors.ColorDefinition;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.UI;
 
-import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -41,21 +48,25 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
-public class LegendColorDialog extends Dialog {
+public class LegendColorDialog extends TitleAreaDialog {
 
-	private static final String		DIALOG_SETTINGS_SELECTED_VALUE_POINT	= "selected.value.point";
+	private static final String		DIALOG_SETTINGS_SELECTED_VALUE_POINT	= "selected.value.point";	//$NON-NLS-1$
 
-	private static final String		VALUE_SPACER							= "999";
+	private static final String		VALUE_SPACER							= "999";					//$NON-NLS-1$
 
 	private Scale					fScaleRed;
 	private Scale					fScaleGreen;
@@ -76,27 +87,41 @@ public class LegendColorDialog extends Dialog {
 	private Scale					fScaleMaxBrightness;
 	private Label					fLblMaxBrightnessValue;
 
-	private ILegendProvider			fLegendProvider;
+	private Button					fChkForceMinValue;
+	private Label					fLblMinValue;
+	private Text					fTxtMinValue;
+//	private Label					fLblMinValueUnit;
+
+	private Button					fChkForceMaxValue;
+	private Label					fLblMaxValue;
+	private Text					fTxtMaxValue;
+//	private Label					fLblMaxValueUnit;
+
+	private final ILegendProvider	fLegendProvider;
 	private ValueColor[]			fValueColors;
 
 	private LegendColor				fLegendColorWorkingCopy;
 
 	private final SelectionAdapter	fDefaultSelectionAdapter;
+	private final IDialogSettings	dialogSettings;
+
+	private ColorDefinition			fColorDefinition;
+
+	private boolean					fInizilizeControls;
+
 	{
 		fDefaultSelectionAdapter = new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				updateLegendData();
 			}
 		};
 	}
-
-	private final IDialogSettings	dialogSettings;
 	{
 		dialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
 
-	public LegendColorDialog(Shell parentShell, LegendProvider legendProvider) {
+	public LegendColorDialog(final Shell parentShell, final LegendProvider legendProvider) {
 
 		super(parentShell);
 
@@ -129,19 +154,24 @@ public class LegendColorDialog extends Dialog {
 		// selecte previous value point
 		try {
 			fComboValuePoint.select(dialogSettings.getInt(DIALOG_SETTINGS_SELECTED_VALUE_POINT));
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			fComboValuePoint.select(0);
 		}
 
+		fInizilizeControls = true;
 		updateUI();
+		fInizilizeControls = false;
 	}
 
 	@Override
-	protected Control createDialogArea(Composite parent) {
+	protected Control createDialogArea(final Composite parent) {
 
-		Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
+		final Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
 
 		createUI(dlgAreaContainer);
+
+		setTitle(Messages.dlg_legend_color_title);
+		setMessage(NLS.bind("Set legend color for the {0}", fColorDefinition.getVisibleName()));
 
 		return dlgAreaContainer;
 	}
@@ -182,65 +212,38 @@ public class LegendColorDialog extends Dialog {
 		transparentColor.dispose();
 	}
 
-	private void createUI(Composite parent) {
+	private void createUI(final Composite parent) {
 
 		/*
 		 * dialog container
 		 */
-		Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		final Composite dlgContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.swtDefaults().extendedMargins(10, 10, 5, 5).numColumns(2).applyTo(dlgContainer);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(dlgContainer);
 
-		/*
-		 * legend
-		 */
-		fLegendCanvas = new Canvas(container, SWT.DOUBLE_BUFFERED);
-		GridDataFactory.fillDefaults().grab(false, true).applyTo(fLegendCanvas);
-		fLegendCanvas.addPaintListener(new PaintListener() {
-			public void paintControl(PaintEvent e) {
-				if (fLegendImage == null || fLegendImage.isDisposed()) {
-					return;
-				}
+		createUILegend(dlgContainer);
 
-				e.gc.drawImage(fLegendImage, 0, 0);
-			}
-		});
-		fLegendCanvas.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				// update image when the dialog is created
-				updateLegendImage();
-			}
-		});
-		fLegendCanvas.addDisposeListener(new DisposeListener() {
-
-			public void widgetDisposed(DisposeEvent e) {
-				if (fLegendImage != null) {
-					fLegendImage.dispose();
-				}
-
-			}
-		});
 		/*
 		 * value container
 		 */
-		Composite valueContainer = new Composite(container, SWT.NONE);
+		final Composite valueContainer = new Composite(dlgContainer, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(valueContainer);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
 
 		createUIValuePointColor(valueContainer);
 		createUIBrightness(valueContainer);
+		createUIMinMaxValue(valueContainer);
 
 	}
 
-	private void createUIBrightness(Composite parent) {
+	private void createUIBrightness(final Composite parent) {
 
 		Label label;
 
-		Group group = new Group(parent, SWT.NONE);
+		final Group group = new Group(parent, SWT.NONE);
 		group.setText("Min/Max Brightness");
 		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
-		GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(group);
+		GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(group);
 
 		/*
 		 * combobox: max brightness
@@ -252,7 +255,7 @@ public class LegendColorDialog extends Dialog {
 
 		fComboMaxBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboMaxBrightness.addSelectionListener(fDefaultSelectionAdapter);
-		for (String comboLabel : LegendColor.BRIGHTNESS_LABELS) {
+		for (final String comboLabel : LegendColor.BRIGHTNESS_LABELS) {
 			fComboMaxBrightness.add(comboLabel);
 		}
 
@@ -285,7 +288,7 @@ public class LegendColorDialog extends Dialog {
 
 		fComboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboMinBrightness.addSelectionListener(fDefaultSelectionAdapter);
-		for (String comboLabel : LegendColor.BRIGHTNESS_LABELS) {
+		for (final String comboLabel : LegendColor.BRIGHTNESS_LABELS) {
 			fComboMinBrightness.add(comboLabel);
 		}
 
@@ -310,11 +313,126 @@ public class LegendColorDialog extends Dialog {
 
 	}
 
-	private void createUIValuePointColor(Composite parent) {
+	private void createUILegend(final Composite parent) {
+		/*
+		 * legend
+		 */
+		fLegendCanvas = new Canvas(parent, SWT.DOUBLE_BUFFERED);
+		GridDataFactory.fillDefaults().grab(false, true).applyTo(fLegendCanvas);
+		fLegendCanvas.addPaintListener(new PaintListener() {
+			public void paintControl(final PaintEvent e) {
+				if (fLegendImage == null || fLegendImage.isDisposed()) {
+					return;
+				}
+
+				e.gc.drawImage(fLegendImage, 0, 0);
+			}
+		});
+		fLegendCanvas.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				// update image when the dialog is created
+				updateLegendImage();
+			}
+		});
+		fLegendCanvas.addDisposeListener(new DisposeListener() {
+
+			public void widgetDisposed(final DisposeEvent e) {
+				if (fLegendImage != null) {
+					fLegendImage.dispose();
+				}
+
+			}
+		});
+	}
+
+	private void createUIMinMaxValue(final Composite parent) {
+
+		final ModifyListener validateFieldOnModify = new ModifyListener() {
+			public void modifyText(final ModifyEvent e) {
+				validateFields();
+			}
+		};
+
+		final Listener validateFieldOnVerify = new Listener() {
+			public void handleEvent(final Event e) {
+				verifyIntegerEvent(e);
+			}
+		};
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText("Min/Max Value");
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+		GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(group);
+
+		/*
+		 * checkbox: overwrite min value
+		 */
+
+		fChkForceMinValue = new Button(group, SWT.CHECK);
+		fChkForceMinValue.setText("Overwrite Min Value");
+		fChkForceMinValue.setToolTipText("Use this minimum value when the value is below this minimum");
+		GridDataFactory.swtDefaults().applyTo(fChkForceMinValue);
+		fChkForceMinValue.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				enableControls();
+				validateFields();
+			}
+		});
+
+		/*
+		 * input: min value
+		 */
+		fLblMinValue = new Label(group, SWT.NONE);
+		fLblMinValue.setText("Min Value:");
+		GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(fLblMinValue);
+
+		fTxtMinValue = new Text(group, SWT.BORDER);
+		GridDataFactory.swtDefaults().hint(UI.DEFAULT_FIELD_WIDTH, SWT.DEFAULT).applyTo(fTxtMinValue);
+		fTxtMinValue.addModifyListener(validateFieldOnModify);
+		fTxtMinValue.addListener(SWT.Verify, validateFieldOnVerify);
+
+//		fLblMinValueUnit = new Label(group, SWT.NONE);
+//		fLblMinValueUnit.setText(fLegendProvider.getLegendConfig().unitText);
+
+		/*
+		 * checkbox: overwrite max value
+		 */
+
+		fChkForceMaxValue = new Button(group, SWT.CHECK);
+		fChkForceMaxValue.setText("Overwrite Max Value");
+		fChkForceMaxValue.setToolTipText("Use this maximum value when the value is above this maximum");
+		GridDataFactory.swtDefaults().applyTo(fChkForceMaxValue);
+		fChkForceMaxValue.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				enableControls();
+				validateFields();
+			}
+		});
+
+		/*
+		 * input: max value
+		 */
+		fLblMaxValue = new Label(group, SWT.NONE);
+		fLblMaxValue.setText("Max Value:");
+		GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(fLblMaxValue);
+
+		fTxtMaxValue = new Text(group, SWT.BORDER);
+		GridDataFactory.swtDefaults().hint(UI.DEFAULT_FIELD_WIDTH, SWT.DEFAULT).applyTo(fTxtMaxValue);
+		fTxtMaxValue.addModifyListener(validateFieldOnModify);
+		fTxtMaxValue.addListener(SWT.Verify, validateFieldOnVerify);
+
+//		fLblMaxValueUnit = new Label(group, SWT.NONE);
+//		fLblMaxValueUnit.setText(fLegendProvider.getLegendConfig().unitText);
+	}
+
+	private void createUIValuePointColor(final Composite parent) {
 
 		Label label;
 
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 
@@ -328,12 +446,12 @@ public class LegendColorDialog extends Dialog {
 		fComboValuePoint = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboValuePoint.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				updateUI();
 			}
 		});
 		// revert sequence so that max is on top
-		List<String> unitLabels = fLegendProvider.getLegendConfig().unitLabels;
+		final List<String> unitLabels = fLegendProvider.getLegendConfig().unitLabels;
 		for (int unitIndex = unitLabels.size() - 1; unitIndex >= 0; unitIndex--) {
 			fComboValuePoint.add(unitLabels.get(unitIndex));
 		}
@@ -341,7 +459,7 @@ public class LegendColorDialog extends Dialog {
 		/*
 		 * group: value point color
 		 */
-		Group group = new Group(parent, SWT.NONE);
+		final Group group = new Group(parent, SWT.NONE);
 		group.setText("Value Point Color");
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 		GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(group);
@@ -397,14 +515,32 @@ public class LegendColorDialog extends Dialog {
 
 	private void enableControls() {
 
+		// min brightness
 		final int minBrightness = fComboMinBrightness.getSelectionIndex();
-		final int maxBrightness = fComboMaxBrightness.getSelectionIndex();
-
 		fScaleMinBrightness.setEnabled(minBrightness != 0);
 		fLblMinBrightnessValue.setEnabled(minBrightness != 0);
 
+		// max brightness
+		final int maxBrightness = fComboMaxBrightness.getSelectionIndex();
 		fScaleMaxBrightness.setEnabled(maxBrightness != 0);
 		fLblMaxBrightnessValue.setEnabled(maxBrightness != 0);
+
+		// min value
+		boolean isChecked = fChkForceMinValue.getSelection();
+		fLblMinValue.setEnabled(isChecked);
+		fTxtMinValue.setEnabled(isChecked);
+
+		// max value
+		isChecked = fChkForceMaxValue.getSelection();
+		fLblMaxValue.setEnabled(isChecked);
+		fTxtMaxValue.setEnabled(isChecked);
+	}
+
+	private void enableOK(final boolean isEnabled) {
+		final Button okButton = getButton(IDialogConstants.OK_ID);
+		if (okButton != null) {
+			okButton.setEnabled(isEnabled);
+		}
 	}
 
 	@Override
@@ -422,21 +558,23 @@ public class LegendColorDialog extends Dialog {
 	 * Set the {@link LegendColor} which will be displayed in this dialog, it will use a copy of the
 	 * supplied {@link LegendColor}
 	 * 
-	 * @param legendColor
+	 * @param colorDefinition
 	 */
-	public void setLegendColor(LegendColor legendColor) {
+	public void setLegendColor(final ColorDefinition colorDefinition) {
+
+		fColorDefinition = colorDefinition;
 
 		/*
 		 * use a copy of the legendColor to support the cancel feature
 		 */
-		fLegendColorWorkingCopy = legendColor.getCopy();
+		fLegendColorWorkingCopy = colorDefinition.getNewLegendColor().getCopy();
 		fValueColors = fLegendColorWorkingCopy.valueColors;
 	}
 
 	/**
-	 * update color labels from the scale value
+	 * update labels from the scale value
 	 */
-	private void updateColorLabels() {
+	private void updateLabels() {
 
 		fLblRedValue.setText(Integer.toString(fScaleRed.getSelection() / 10));
 		fLblRedValue.pack(true);
@@ -459,13 +597,13 @@ public class LegendColorDialog extends Dialog {
 	 */
 	private void updateLegendData() {
 
-		int selectedRange = fComboValuePoint.getSelectionIndex();
+		final int selectedRange = fComboValuePoint.getSelectionIndex();
 		if (selectedRange == -1) {
 			return;
 		}
 
-		int items = fComboValuePoint.getItemCount() - 1;
-		ValueColor rangeColor = fValueColors[items - selectedRange];
+		final int items = fComboValuePoint.getItemCount() - 1;
+		final ValueColor rangeColor = fValueColors[items - selectedRange];
 
 		// update red/green/blue in the legend provider
 		rangeColor.red = 255 * fScaleRed.getSelection() / 1000;
@@ -477,8 +615,18 @@ public class LegendColorDialog extends Dialog {
 		fLegendColorWorkingCopy.maxBrightness = fComboMaxBrightness.getSelectionIndex();
 		fLegendColorWorkingCopy.maxBrightnessFactor = fScaleMaxBrightness.getSelection();
 
+		fLegendColorWorkingCopy.isMinValueOverwrite = fChkForceMinValue.getSelection();
+		try {
+			fLegendColorWorkingCopy.overwriteMinValue = Integer.parseInt(fTxtMinValue.getText());
+		} catch (NumberFormatException e) {}
+
+		fLegendColorWorkingCopy.isMaxValueOverwrite = fChkForceMaxValue.getSelection();
+		try {
+			fLegendColorWorkingCopy.overwriteMaxValue = Integer.parseInt(fTxtMaxValue.getText());
+		} catch (NumberFormatException e) {}
+
 		enableControls();
-		updateColorLabels();
+		updateLabels();
 		updateLegendImage();
 	}
 
@@ -491,6 +639,11 @@ public class LegendColorDialog extends Dialog {
 		legendColor.minBrightness = fLegendColorWorkingCopy.minBrightness;
 		legendColor.maxBrightness = fLegendColorWorkingCopy.maxBrightness;
 
+		legendColor.isMinValueOverwrite = fLegendColorWorkingCopy.isMinValueOverwrite;
+		legendColor.overwriteMinValue = fLegendColorWorkingCopy.overwriteMinValue;
+		legendColor.isMaxValueOverwrite = fLegendColorWorkingCopy.isMaxValueOverwrite;
+		legendColor.overwriteMaxValue = fLegendColorWorkingCopy.overwriteMaxValue;
+
 		createLegendImage();
 		fLegendCanvas.redraw();
 	}
@@ -500,27 +653,106 @@ public class LegendColorDialog extends Dialog {
 	 */
 	private void updateUI() {
 
-		int selectedRange = fComboValuePoint.getSelectionIndex();
+		final int selectedRange = fComboValuePoint.getSelectionIndex();
 		if (selectedRange == -1) {
 			return;
 		}
 
-		int items = fComboValuePoint.getItemCount() - 1;
-		ValueColor rangeColor = fValueColors[items - selectedRange];
+		final int items = fComboValuePoint.getItemCount() - 1;
+		final ValueColor rangeColor = fValueColors[items - selectedRange];
 
 		// update red/green/blue scale from range color
 		fScaleRed.setSelection(1000 * rangeColor.red / 255);
 		fScaleGreen.setSelection(1000 * rangeColor.green / 255);
 		fScaleBlue.setSelection(1000 * rangeColor.blue / 255);
 
-		// update brightness
+		// update min/max brightness
 		fComboMinBrightness.select(fLegendColorWorkingCopy.minBrightness);
-		fComboMaxBrightness.select(fLegendColorWorkingCopy.maxBrightness);
 		fScaleMinBrightness.setSelection(fLegendColorWorkingCopy.minBrightnessFactor);
+		fComboMaxBrightness.select(fLegendColorWorkingCopy.maxBrightness);
 		fScaleMaxBrightness.setSelection(fLegendColorWorkingCopy.maxBrightnessFactor);
 
-		updateColorLabels();
+		// update min/max value
+		fChkForceMinValue.setSelection(fLegendColorWorkingCopy.isMinValueOverwrite);
+		fTxtMinValue.setText(Integer.toString(fLegendColorWorkingCopy.overwriteMinValue));
+		fChkForceMaxValue.setSelection(fLegendColorWorkingCopy.isMaxValueOverwrite);
+		fTxtMaxValue.setText(Integer.toString(fLegendColorWorkingCopy.overwriteMaxValue));
+
+		updateLabels();
 		enableControls();
 	}
 
+	private void validateFields() {
+
+		if (fInizilizeControls) {
+			return;
+		}
+
+		setErrorMessage(null);
+
+		final boolean isMinEnabled = fChkForceMinValue.getSelection();
+		if (isMinEnabled) {
+
+			// validate min value
+
+			if (verifyIntegerValue(fTxtMinValue.getText()) == false) {
+				setErrorMessage("Min Value is required.");
+				enableOK(false);
+				fTxtMinValue.setFocus();
+				return;
+			}
+		}
+
+		final boolean isMaxEnabled = fChkForceMaxValue.getSelection();
+		if (isMaxEnabled) {
+
+			if (verifyIntegerValue(fTxtMaxValue.getText()) == false) {
+				setErrorMessage("Max Value is required.");
+				enableOK(false);
+				fTxtMaxValue.setFocus();
+				return;
+			}
+		}
+
+		if (isMinEnabled
+				&& isMaxEnabled
+				&& (Integer.parseInt(fTxtMaxValue.getText()) <= Integer.parseInt(fTxtMinValue.getText()))) {
+
+			setErrorMessage("Maximum value must be greater than the minimum value.");
+			enableOK(false);
+			return;
+		}
+
+		updateLegendData();
+
+		enableOK(true);
+	}
+
+	private void verifyIntegerEvent(final Event e) {
+
+		// allow backspace, del and - key
+		if (e.character == SWT.BS || e.character == SWT.DEL || e.character == '-') {
+			return;
+		}
+
+		try {
+			Integer.parseInt(e.text);
+		} catch (final NumberFormatException ex) {
+			e.doit = false;
+		}
+	}
+
+	private boolean verifyIntegerValue(String valueString) {
+
+		if (valueString.trim().length() == 0) {
+			return false;
+		}
+
+		try {
+			Integer.parseInt(valueString);
+			return true;
+		} catch (final NumberFormatException ex) {
+			return false;
+		}
+	}
 }

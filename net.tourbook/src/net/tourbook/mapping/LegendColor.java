@@ -16,10 +16,10 @@
 
 package net.tourbook.mapping;
 
-
 public class LegendColor {
 
-	public static final String[]	BRIGHTNESS_LABELS		= new String[] { "Keep Color", "Dim Color", "Lighten Color" };
+	public static final String[]	BRIGHTNESS_LABELS		= new String[] //
+															{ "Keep Color", "Dim Color", "Lighten Color" };
 
 	public static final int			BRIGHTNESS_DEFAULT		= 0;
 	public static final int			BRIGHTNESS_DIMMING		= 1;
@@ -42,6 +42,12 @@ public class LegendColor {
 	public int						maxBrightness			= BRIGHTNESS_DEFAULT;
 	public int						maxBrightnessFactor		= 100;
 
+	public boolean					isMaxValueOverwrite		= false;
+	public int						overwriteMaxValue;
+
+	public boolean					isMinValueOverwrite		= false;
+	public int						overwriteMinValue;
+
 	public LegendColor() {}
 
 	public LegendColor(	ValueColor[] valueColors,
@@ -57,131 +63,27 @@ public class LegendColor {
 		this.maxBrightnessFactor = maxBrightnessFactor;
 	}
 
-//	/**
-//	 * Read filter list from xml file
-//	 * 
-//	 * @return Returns a list with all filters from the xml file
-//	 */
-//	private static ArrayList<TourTypeFilter> readXMLData() {
-//
-//		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
-//		ArrayList<TourTypeFilter> filterList = new ArrayList<TourTypeFilter>();
-//
-//		IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
-//		String filename = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile().getAbsolutePath();
-//
-//		// check if filter file is available
-//		File inputFile = new File(filename);
-//		if (inputFile.exists() == false) {
-//			return filterList;
-//		}
-//
-//		InputStreamReader reader = null;
-//		long tourTypeId;
-//
-////		try {
-////			reader = new InputStreamReader(new FileInputStream(inputFile), "UTF-8"); //$NON-NLS-1$
-////			XMLMemento mementoFilterList = XMLMemento.createReadRoot(reader);
-////
-////			IMemento[] mementoFilters = mementoFilterList.getChildren(MEMENTO_CHILD_FILTER);
-////
-////			for (IMemento mementoFilter : mementoFilters) {
-////
-////				Integer filterType = mementoFilter.getInteger(TAG_FILTER_TYPE);
-////				String filterName = mementoFilter.getString(TAG_NAME);
-////
-////				if (filterType == null || filterName == null) {
-////					continue;
-////				}
-////
-////				switch (filterType) {
-////				case TourTypeFilter.FILTER_TYPE_SYSTEM:
-////					Integer systemId = mementoFilter.getInteger(TAG_SYSTEM_ID);
-////					if (systemId == null) {
-////						continue;
-////					}
-////
-////					filterList.add(new TourTypeFilter(systemId, filterName));
-////
-////					break;
-////
-////				case TourTypeFilter.FILTER_TYPE_DB:
-////
-////					String tourTypeIdString = mementoFilter.getString(TAG_TOUR_TYPE_ID);
-////
-////					if (tourTypeIdString == null) {
-////						continue;
-////					}
-////
-////					tourTypeId = Long.parseLong(tourTypeIdString);
-////
-////					// find the tour type in the available tour types
-////					for (TourType tourType : tourTypes) {
-////						if (tourType.getTypeId() == tourTypeId) {
-////							filterList.add(new TourTypeFilter(tourType));
-////							break;
-////						}
-////					}
-////
-////					break;
-////
-////				case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
-////
-////					ArrayList<TourType> tourTypesInFilter = new ArrayList<TourType>();
-////					IMemento[] mementoTourTypes = mementoFilter.getChildren(MEMENTO_CHILD_TOURTYPE);
-////
-////					// get all tour types
-////					for (IMemento mementoTourType : mementoTourTypes) {
-////
-////						tourTypeIdString = mementoTourType.getString(TAG_TOUR_TYPE_ID);
-////						if (tourTypeIdString == null) {
-////							continue;
-////						}
-////
-////						tourTypeId = Long.parseLong(tourTypeIdString);
-////
-////						// find the tour type in the available tour types
-////						for (TourType tourType : tourTypes) {
-////							if (tourType.getTypeId() == tourTypeId) {
-////								tourTypesInFilter.add(tourType);
-////								break;
-////							}
-////						}
-////					}
-////
-////					TourTypeFilterSet filterSet = new TourTypeFilterSet();
-////					filterSet.setName(filterName);
-////					filterSet.setTourTypes(tourTypesInFilter.toArray());
-////
-////					filterList.add(new TourTypeFilter(filterSet));
-////
-////					break;
-////
-////				default:
-////					break;
-////				}
-////			}
-////
-////		} catch (UnsupportedEncodingException e) {
-////			e.printStackTrace();
-////		} catch (FileNotFoundException e) {
-////			e.printStackTrace();
-////		} catch (WorkbenchException e) {
-////			e.printStackTrace();
-////		} catch (NumberFormatException e) {
-////			e.printStackTrace();
-////		} finally {
-////			if (reader != null) {
-////				try {
-////					reader.close();
-////				} catch (IOException e) {
-////					e.printStackTrace();
-////				}
-////			}
-////		}
-//
-//		return filterList;
-//	}
+	public LegendColor(	ValueColor[] valueColors,
+						int minBrightness,
+						int minBrightnessFactor,
+						int maxBrightness,
+						int maxBrightnessFactor,
+						boolean isMinOverwrite,
+						int minOverwrite,
+						boolean isMaxOverwrite,
+						int maxOverwrite) {
+
+		this.valueColors = valueColors;
+		this.minBrightness = minBrightness;
+		this.minBrightnessFactor = minBrightnessFactor;
+		this.maxBrightness = maxBrightness;
+		this.maxBrightnessFactor = maxBrightnessFactor;
+
+		this.isMinValueOverwrite = isMinOverwrite;
+		this.overwriteMinValue = minOverwrite;
+		this.isMaxValueOverwrite = isMaxOverwrite;
+		this.overwriteMaxValue = maxOverwrite;
+	}
 
 	/**
 	 * create a string which is a java contructor for the {@link LegendColor}
@@ -197,13 +99,13 @@ public class LegendColor {
 	 * 
 	 * </pre>
 	 */
-	public String createConstructor() {
+	public String createConstructorString() {
 
 		StringBuffer buffer = new StringBuffer();
 
 		buffer.append('\n');
 		buffer.append('\n');
-		buffer.append("new LegendColor(new ValueColor[] {");
+		buffer.append("new LegendColor(new ValueColor[] {"); //$NON-NLS-1$
 		buffer.append('\n');
 
 		int index = 0;
@@ -215,41 +117,41 @@ public class LegendColor {
 			}
 			buffer.append('\n');
 		}
-		buffer.append("}, ");
+		buffer.append("}, "); //$NON-NLS-1$
 		buffer.append('\n');
 
-		buffer.append("LegendColor.");
-		buffer.append(getBrightnessText(minBrightness));
-		buffer.append(",\n");
+		buffer.append("LegendColor."); //$NON-NLS-1$
+		buffer.append(getBrightnessJavaText(minBrightness));
+		buffer.append(",\n"); //$NON-NLS-1$
 
 		buffer.append(minBrightnessFactor);
-		buffer.append(",\n");
+		buffer.append(",\n"); //$NON-NLS-1$
 
-		buffer.append("LegendColor.");
-		buffer.append(getBrightnessText(maxBrightness));
-		buffer.append(",\n");
+		buffer.append("LegendColor."); //$NON-NLS-1$
+		buffer.append(getBrightnessJavaText(maxBrightness));
+		buffer.append(",\n"); //$NON-NLS-1$
 
 		buffer.append(maxBrightnessFactor);
-		buffer.append(")\n");
+		buffer.append(")\n"); //$NON-NLS-1$
 
 		return buffer.toString();
 	}
 
-	private String getBrightnessText(int brightness) {
+	private String getBrightnessJavaText(int brightness) {
 
 		switch (brightness) {
 		case BRIGHTNESS_DEFAULT:
-			return "BRIGHTNESS_DEFAULT";
+			return "BRIGHTNESS_DEFAULT"; //$NON-NLS-1$
 		case BRIGHTNESS_DIMMING:
-			return "BRIGHTNESS_DIMMING";
+			return "BRIGHTNESS_DIMMING"; //$NON-NLS-1$
 		case BRIGHTNESS_LIGHTNING:
-			return "BRIGHTNESS_LIGHTNING";
+			return "BRIGHTNESS_LIGHTNING"; //$NON-NLS-1$
 
 		default:
 			break;
 		}
 
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -271,6 +173,12 @@ public class LegendColor {
 
 		copy.maxBrightness = maxBrightness;
 		copy.maxBrightnessFactor = maxBrightnessFactor;
+
+		copy.isMinValueOverwrite = isMinValueOverwrite;
+		copy.overwriteMinValue = overwriteMinValue;
+
+		copy.isMaxValueOverwrite = isMaxValueOverwrite;
+		copy.overwriteMaxValue = overwriteMaxValue;
 
 		return copy;
 	}

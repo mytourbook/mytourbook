@@ -113,12 +113,18 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		fGraphMap.put(TourManager.GRAPH_PACE, new Graph(TourManager.GRAPH_PACE, Messages.Graph_Label_Pace));
 		fGraphMap.put(TourManager.GRAPH_POWER, new Graph(TourManager.GRAPH_POWER, Messages.Graph_Label_Power));
 		fGraphMap.put(TourManager.GRAPH_PULSE, new Graph(TourManager.GRAPH_PULSE, Messages.Graph_Label_Heartbeat));
-		fGraphMap.put(TourManager.GRAPH_TEMPERATURE, new Graph(TourManager.GRAPH_TEMPERATURE,
-				Messages.Graph_Label_Temperature));
-		fGraphMap.put(TourManager.GRAPH_CADENCE, new Graph(TourManager.GRAPH_CADENCE, Messages.Graph_Label_Cadence));
-		fGraphMap.put(TourManager.GRAPH_ALTIMETER, new Graph(TourManager.GRAPH_ALTIMETER,
-				Messages.Graph_Label_Altimeter));
-		fGraphMap.put(TourManager.GRAPH_GRADIENT, new Graph(TourManager.GRAPH_GRADIENT, Messages.Graph_Label_Gradiend));
+
+		fGraphMap.put(TourManager.GRAPH_TEMPERATURE, //
+				new Graph(TourManager.GRAPH_TEMPERATURE, Messages.Graph_Label_Temperature));
+
+		fGraphMap.put(TourManager.GRAPH_CADENCE, //
+				new Graph(TourManager.GRAPH_CADENCE, Messages.Graph_Label_Cadence));
+
+		fGraphMap.put(TourManager.GRAPH_ALTIMETER, //
+				new Graph(TourManager.GRAPH_ALTIMETER, Messages.Graph_Label_Altimeter));
+
+		fGraphMap.put(TourManager.GRAPH_GRADIENT, //
+				new Graph(TourManager.GRAPH_GRADIENT, Messages.Graph_Label_Gradient));
 
 		// create a list with all available graphs
 		fGraphList = new ArrayList<Graph>();

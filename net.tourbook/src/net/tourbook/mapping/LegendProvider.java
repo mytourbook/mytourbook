@@ -15,7 +15,13 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.tourbook.chart.ChartUtil;
+
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Rectangle;
 
 public class LegendProvider implements ILegendProvider {
 
@@ -27,6 +33,67 @@ public class LegendProvider implements ILegendProvider {
 		fLegendConfig = legendConfig;
 		fLegendColor = legendColor;
 		fColorId = colorId;
+	}
+
+	private static List<Integer> getLegendUnits(final Rectangle legendBounds, int graphMinValue, int graphMaxValue) {
+
+		final int legendHeight = legendBounds.height - 2 * MappingView.LEGEND_MARGIN_TOP_BOTTOM;
+
+		/*
+		 * !!! value range does currently NOT provide negative altitudes
+		 */
+		final int graphRange = graphMaxValue - graphMinValue;
+
+		final int unitCount = legendHeight / MappingView.LEGEND_UNIT_DISTANCE;
+
+		// get altitude range for one unit
+		final int graphUnitValue = graphRange / Math.max(1, unitCount);
+
+		// round the unit
+		final float graphUnit = ChartUtil.roundDecimalValue(graphUnitValue);
+
+		/*
+		 * adjust min value
+		 */
+		float adjustMinValue = 0;
+		if (((float) graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
+			adjustMinValue = graphUnit;
+		}
+		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / graphUnit) * graphUnit);
+
+		/*
+		 * adjust max value
+		 */
+		// increase the max value when it does not fit to unit borders
+		float adjustMaxValue = 0;
+		if (((float) graphMaxValue % graphUnit) != 0) {
+			adjustMaxValue = graphUnit;
+		}
+		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / graphUnit) * graphUnit);
+
+		/*
+		 * create a list with all units
+		 */
+		final ArrayList<Integer> unitList = new ArrayList<Integer>();
+
+		int graphValue = graphMinValue;
+		int unitCounter = 0;
+
+		// loop: create unit label for all units
+		while (graphValue <= graphMaxValue) {
+
+			unitList.add(graphValue);
+
+			// prevent endless loops 
+			if (graphValue >= graphMaxValue || unitCounter > 100) {
+				break;
+			}
+
+			graphValue += graphUnit;
+			unitCounter++;
+		}
+
+		return unitList;
 	}
 
 	public LegendColor getLegendColor() {
@@ -45,8 +112,91 @@ public class LegendProvider implements ILegendProvider {
 		return TourPainter.getLegendColor(fLegendConfig, fLegendColor, legendValue);
 	}
 
-	public void setLegendColor(LegendColor legendColor) {
-		fLegendColor = legendColor;
+	public void setLegendColorColors(LegendColor legendColor) {
+
+		ValueColor[] valueColors = fLegendColor.valueColors;
+		ValueColor[] newValueColors = legendColor.valueColors;
+
+		// copy new colors into current legend colors
+		for (int valueIndex = 0; valueIndex < valueColors.length; valueIndex++) {
+
+			ValueColor valueColor = valueColors[valueIndex];
+			ValueColor newValueColor = newValueColors[valueIndex];
+
+			valueColor.red = newValueColor.red;
+			valueColor.green = newValueColor.green;
+			valueColor.blue = newValueColor.blue;
+		}
+
+		fLegendColor.minBrightness = legendColor.minBrightness;
+		fLegendColor.minBrightnessFactor = legendColor.minBrightnessFactor;
+		fLegendColor.maxBrightness = legendColor.maxBrightness;
+		fLegendColor.maxBrightnessFactor = legendColor.maxBrightnessFactor;
+
+		fLegendColor.isMinValueOverwrite = legendColor.isMinValueOverwrite;
+		fLegendColor.overwriteMinValue = legendColor.overwriteMinValue;
+		fLegendColor.isMaxValueOverwrite = legendColor.isMaxValueOverwrite;
+		fLegendColor.overwriteMaxValue = legendColor.overwriteMaxValue;
 	}
 
+	/**
+	 * Set legend values from a dataserie
+	 * 
+	 * @param legendBounds
+	 * @param dataSerie
+	 * @param legendProvider
+	 * @param unitText
+	 */
+	public void setLegendColorValues(final Rectangle legendBounds, final int[] dataSerie, final String unitText) {
+
+		/*
+		 * get min/max value
+		 */
+		int minValue = 0;
+		int maxValue = 0;
+		for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
+			if (valueIndex == 0) {
+				minValue = dataSerie[valueIndex];
+				maxValue = dataSerie[valueIndex];
+			} else {
+				minValue = Math.min(minValue, dataSerie[valueIndex]);
+				maxValue = Math.max(maxValue, dataSerie[valueIndex]);
+			}
+		}
+
+		int unitFactor = fLegendConfig.unitFactor;
+
+		if (fLegendColor.isMinValueOverwrite && minValue < fLegendColor.overwriteMinValue * unitFactor) {
+			minValue = fLegendColor.overwriteMinValue * unitFactor;
+		}
+		if (fLegendColor.isMaxValueOverwrite && maxValue > fLegendColor.overwriteMaxValue * unitFactor) {
+			maxValue = fLegendColor.overwriteMaxValue * unitFactor;
+		}
+
+		final List<Integer> legendUnits = getLegendUnits(legendBounds, minValue, maxValue);
+
+		final Integer legendMinValue = legendUnits.get(0);
+		final Integer legendMaxValue = legendUnits.get(legendUnits.size() - 1);
+
+		fLegendConfig.units = legendUnits;
+		fLegendConfig.unitText = unitText;
+		fLegendConfig.legendMinValue = legendMinValue;
+		fLegendConfig.legendMaxValue = legendMaxValue;
+
+		/*
+		 * set color configuration, each tour has a different altitude config
+		 */
+
+		final int diffMinMax = legendMaxValue - legendMinValue;
+		final int diffMinMax2 = diffMinMax / 2;
+		final int diffMinMax10 = diffMinMax / 10;
+		final int midValueAbsolute = legendMinValue + diffMinMax2;
+
+		final ValueColor[] valueColors = fLegendColor.valueColors;
+		valueColors[0].value = legendMinValue + diffMinMax10;
+		valueColors[1].value = legendMinValue + diffMinMax2 / 2;
+		valueColors[2].value = midValueAbsolute;
+		valueColors[3].value = legendMaxValue - diffMinMax2 / 2;
+		valueColors[4].value = legendMaxValue - diffMinMax10;
+	}
 }

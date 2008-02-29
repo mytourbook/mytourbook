@@ -110,6 +110,8 @@ public class Messages extends NLS {
 	public static String		Dlg_AdjustAltitude_Type_Show_original;
 	public static String		Dlg_AdjustAltitude_Type_start_and_end;
 
+	public static String	dlg_legend_color_title;
+
 	public static String		Dlg_TourMarker_Button_delete;
 	public static String		Dlg_TourMarker_Button_delete_tooltip;
 	public static String		Dlg_TourMarker_Button_reset_offset;
@@ -134,8 +136,9 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Altitude;
 	public static String		Graph_Label_Cadence;
 	public static String		Graph_Label_Cadence_unit;
-	public static String		Graph_Label_Gradiend;
 	public static String		Graph_Label_Gradiend_unit;
+
+	public static String	Graph_Label_Gradient;
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
 	public static String		Graph_Label_Pace;

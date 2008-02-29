@@ -15,18 +15,21 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
-import java.awt.Point;
-
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 import de.byteholder.geoclipse.map.TileFactory;
 import de.byteholder.geoclipse.swt.DirectPainterContext;
 import de.byteholder.geoclipse.swt.IDirectPainter;
 import de.byteholder.geoclipse.swt.Map;
+import de.byteholder.geoclipse.swt.MapLegend;
 import de.byteholder.gpx.GeoPosition;
 
 public class DirectMappingPainter implements IDirectPainter {
@@ -40,6 +43,9 @@ public class DirectMappingPainter implements IDirectPainter {
 
 	private int					fLeftSliderValueIndex;
 	private int					fRightSliderValueIndex;
+
+	private boolean				fIsShowSliderInMap;
+	private boolean				fIsShowSliderInLegend;
 
 	private final Image			fImageLeftSlider;
 	private final Image			fImageRightSlider;
@@ -71,10 +77,12 @@ public class DirectMappingPainter implements IDirectPainter {
 		final double[] latitudeSerie = fTourData.latitudeSerie;
 		final double[] longitudeSerie = fTourData.longitudeSerie;
 
+		// get world position for the slider coordinates
 		sliderValueIndex = Math.min(sliderValueIndex, latitudeSerie.length - 1);
-		final Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[sliderValueIndex],
+		final java.awt.Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[sliderValueIndex],
 				longitudeSerie[sliderValueIndex]), zoomLevel);
 
+		// check if slider is visible
 		final java.awt.Rectangle viewport = painterContext.viewport;
 		if (viewport.contains(worldMarkerPos)) {
 
@@ -88,8 +96,51 @@ public class DirectMappingPainter implements IDirectPainter {
 			final int markerWidth2 = markerWidth / 2;
 			final int markerHeight = bounds.height;
 
+			// draw marker for the slider
 			painterContext.gc.drawImage(markerImage, devMarkerPosX - markerWidth2, devMarkerPosY - markerHeight);
 		}
+	}
+
+	private void drawValueMarkerInLegend(DirectPainterContext painterContext) {
+
+		final MapLegend mapLegend = fMap.getLegend();
+
+		if (mapLegend == null) {
+			return;
+		}
+
+		final Image legendImage = mapLegend.getImage();
+		if (legendImage == null || legendImage.isDisposed()) {
+			return;
+		}
+
+		final Rectangle legendImageBounds = legendImage.getBounds();
+
+		int leftValueInlegendPosition = TourPainter.getInstance().getLegendValuePosition(legendImageBounds,
+				fLeftSliderValueIndex);
+		if (leftValueInlegendPosition == Integer.MIN_VALUE) {
+			return;
+		}
+
+		int rightValueInlegendPosition = TourPainter.getInstance().getLegendValuePosition(legendImageBounds,
+				fRightSliderValueIndex);
+		if (rightValueInlegendPosition == Integer.MIN_VALUE) {
+			return;
+		}
+
+		Point legendInMapPosition = mapLegend.getLegendPosition();
+		final int positionX = legendInMapPosition.x;
+		final int positionY = legendInMapPosition.y + legendImageBounds.height - 2;
+
+		GC gc = painterContext.gc;
+
+		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+
+		int linePositionY = positionY - leftValueInlegendPosition;
+		gc.drawLine(positionX + 1, linePositionY, positionX + 20, linePositionY);
+
+		linePositionY = positionY - rightValueInlegendPosition;
+		gc.drawLine(positionX + 1, linePositionY, positionX + 20, linePositionY);
 	}
 
 	public void paint(final DirectPainterContext painterContext) {
@@ -98,8 +149,14 @@ public class DirectMappingPainter implements IDirectPainter {
 			return;
 		}
 
-		drawSliderMarker(painterContext, fRightSliderValueIndex, fImageRightSlider);
-		drawSliderMarker(painterContext, fLeftSliderValueIndex, fImageLeftSlider);
+		if (fIsShowSliderInMap) {
+			drawSliderMarker(painterContext, fRightSliderValueIndex, fImageRightSlider);
+			drawSliderMarker(painterContext, fLeftSliderValueIndex, fImageLeftSlider);
+		}
+
+		if (fIsShowSliderInLegend) {
+			drawValueMarkerInLegend(painterContext);
+		}
 	}
 
 	/**
@@ -109,17 +166,24 @@ public class DirectMappingPainter implements IDirectPainter {
 	 * @param tourData
 	 * @param leftSliderValuesIndex
 	 * @param rightSliderValuesIndex
+	 * @param isShowSliderInLegend
+	 * @param isShowSliderInMap
+	 * @param legendImageBounds
 	 */
 	public void setPaintContext(Map map,
 								boolean isTourVisible,
 								final TourData tourData,
 								final int leftSliderValuesIndex,
-								final int rightSliderValuesIndex) {
+								final int rightSliderValuesIndex,
+								boolean isShowSliderInMap,
+								boolean isShowSliderInLegend) {
 		fMap = map;
 		fIsTourVisible = isTourVisible;
 		fTourData = tourData;
 		fLeftSliderValueIndex = leftSliderValuesIndex;
 		fRightSliderValueIndex = rightSliderValuesIndex;
+		fIsShowSliderInMap = isShowSliderInMap;
+		fIsShowSliderInLegend = isShowSliderInLegend;
 	}
 
 }

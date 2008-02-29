@@ -239,7 +239,7 @@
                       >
         </view>
         
-              <category
+      <category
             id="net.tourbook.category.tourMaps"
             name="%view_category_tour_map">
       </category>
@@ -257,6 +257,7 @@
             id="net.tourbook.mapping.TourMapPropertyView"
             name="%command_view_tour_properties_name">
       </view>
+      
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">

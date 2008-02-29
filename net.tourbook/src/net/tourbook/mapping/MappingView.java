@@ -18,17 +18,16 @@ package net.tourbook.mapping;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartUtil;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.colors.ColorDefinition;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -82,151 +81,93 @@ import de.byteholder.gpx.ext.PointOfInterest;
  */
 public class MappingView extends ViewPart {
 
-//	private static final String					EMPTY_STRING						= "";											//$NON-NLS-1$
-	public static final int						TOUR_COLOR_DEFAULT					= 0;
-	public static final int						TOUR_COLOR_ALTITUDE					= 10;
-	public static final int						TOUR_COLOR_GRADIENT					= 20;
-	public static final int						TOUR_COLOR_PULSE					= 30;
-	public static final int						TOUR_COLOR_SPEED					= 40;
-	public static final int						TOUR_COLOR_PACE						= 50;
+	public static final String						ID									= "net.tourbook.mapping.mappingViewID";	//$NON-NLS-1$
 
-	final public static String					ID									= "net.tourbook.mapping.mappingViewID";		//$NON-NLS-1$
+	public static final int							TOUR_COLOR_DEFAULT					= 0;
+	public static final int							TOUR_COLOR_ALTITUDE					= 10;
+	public static final int							TOUR_COLOR_GRADIENT					= 20;
+	public static final int							TOUR_COLOR_PULSE					= 30;
+	public static final int							TOUR_COLOR_SPEED					= 40;
+	public static final int							TOUR_COLOR_PACE						= 50;
 
-	private static final String					MEMENTO_ZOOM_CENTERED				= "mapping.view.zoom-centered";				//$NON-NLS-1$
-	private static final String					MEMENTO_SHOW_TOUR_IN_MAP			= "mapping.view.show-tour-in-map";				//$NON-NLS-1$
-	private static final String					MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "mapping.view.synch-with-selected-tour";		//$NON-NLS-1$
-	private static final String					MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "mapping.view.synch-tour-zoom-level";		//$NON-NLS-1$
-	private static final String					MEMENTO_CURRENT_FACTORY_ID			= "mapping.view.current.factory-id";			//$NON-NLS-1$
+	private static final String						MEMENTO_SHOW_SLIDER_IN_MAP			= "action.show-slider-in-map";				//$NON-NLS-1$
+	private static final String						MEMENTO_SHOW_SLIDER_IN_LEGEND		= "action.show-slider-in-legend";			//$NON-NLS-1$
+	private static final String						MEMENTO_ZOOM_CENTERED				= "action.zoom-centered";					//$NON-NLS-1$
+	private static final String						MEMENTO_SHOW_TOUR_IN_MAP			= "action.show-tour-in-map";				//$NON-NLS-1$
+	private static final String						MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "action.synch-with-selected-tour";		//$NON-NLS-1$
+	private static final String						MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "synch-tour-zoom-level";					//$NON-NLS-1$
+	private static final String						MEMENTO_CURRENT_FACTORY_ID			= "current.factory-id";					//$NON-NLS-1$
 
-	private static final String					MEMENTO_DEFAULT_POSITION_ZOOM		= "mapping.view.default.position.zoom-level";	//$NON-NLS-1$
-	private static final String					MEMENTO_DEFAULT_POSITION_LATITUDE	= "mapping.view.default.position.latitude";	//$NON-NLS-1$
-	private static final String					MEMENTO_DEFAULT_POSITION_LONGITUDE	= "mapping.view.default.position.longitude";	//$NON-NLS-1$
+	private static final String						MEMENTO_DEFAULT_POSITION_ZOOM		= "default.position.zoom-level";			//$NON-NLS-1$
+	private static final String						MEMENTO_DEFAULT_POSITION_LATITUDE	= "default.position.latitude";				//$NON-NLS-1$
+	private static final String						MEMENTO_DEFAULT_POSITION_LONGITUDE	= "default.position.longitude";			//$NON-NLS-1$
 
-	private static final String					MEMENTO_TOUR_COLOR_ID				= "mapping.view.tour-color-id";				//$NON-NLS-1$
+	private static final String						MEMENTO_TOUR_COLOR_ID				= "tour-color-id";							//$NON-NLS-1$
 
-	final static String							SHOW_TILE_INFO						= "show.tile-info";							//$NON-NLS-1$
+	final static String								SHOW_TILE_INFO						= "show.tile-info";						//$NON-NLS-1$
 
-	public static final int						LEGEND_MARGIN_TOP_BOTTOM			= 10;
-	private static final int					LEGEND_UNIT_DISTANCE				= 60;
+	public static final int							LEGEND_MARGIN_TOP_BOTTOM			= 10;
+	public static final int							LEGEND_UNIT_DISTANCE				= 60;
 
-	private static IMemento						fSessionMemento;
+	private static IMemento							fSessionMemento;
 
-	private Map									fMap;
+	private Map										fMap;
 
-	private ISelectionListener					fPostSelectionListener;
-	private IPropertyChangeListener				fPrefChangeListener;
-	private IPropertyChangeListener				fTourbookPrefChangeListener;
-	private IPartListener2						fPartListener;
-	private ITourPropertyListener				fTourPropertyListener;
+	private ISelectionListener						fPostSelectionListener;
+	private IPropertyChangeListener					fPrefChangeListener;
+	private IPropertyChangeListener					fTourbookPrefChangeListener;
+	private IPartListener2							fPartListener;
+	private ITourPropertyListener					fTourPropertyListener;
 
-	private TourData							fTourData;
-	private TourData							fPreviousTourData;
+	private TourData								fTourData;
+	private TourData								fPreviousTourData;
 
-	private ActionTourColor						fActionTourColorAltitude;
-	private ActionTourColor						fActionTourColorGradient;
-	private ActionTourColor						fActionTourColorPulse;
-	private ActionTourColor						fActionTourColorSpeed;
-	private ActionTourColor						fActionTourColorPace;
-	private ActionZoomIn						fActionZoomIn;
-	private ActionZoomOut						fActionZoomOut;
-	private ActionZoomCentered					fActionZoomCentered;
-	private ActionZoomShowAll					fActionZoomShowAll;
-	private ActionZoomShowEntireTour			fActionZoomShowEntireTour;
-	private ActionShowTourInMap					fActionShowTourInMap;
-	private ActionSynchWithTour					fActionSynchWithTour;
-	private ActionSynchTourZoomLevel			fActionSynchTourZoomLevel;
-	private ActionChangeTileFactory				fActionChangeTileFactory;
-	private ActionSaveDefaultPosition			fActionSaveDefaultPosition;
-	private ActionSetDefaultPosition			fActionSetDefaultPosition;
+	private ActionChangeTileFactory					fActionChangeTileFactory;
+	private ActionSaveDefaultPosition				fActionSaveDefaultPosition;
+	private ActionSetDefaultPosition				fActionSetDefaultPosition;
+	private ActionShowTourInMap						fActionShowTourInMap;
+	private ActionShowSliderInMap					fActionShowSliderInMap;
+	private ActionShowSliderInLegend				fActionShowSliderInLegend;
+	private ActionSynchWithTour						fActionSynchWithTour;
+	private ActionSynchTourZoomLevel				fActionSynchTourZoomLevel;
+	private ActionTourColor							fActionTourColorAltitude;
+	private ActionTourColor							fActionTourColorGradient;
+	private ActionTourColor							fActionTourColorPulse;
+	private ActionTourColor							fActionTourColorSpeed;
+	private ActionTourColor							fActionTourColorPace;
+	private ActionZoomIn							fActionZoomIn;
+	private ActionZoomOut							fActionZoomOut;
+	private ActionZoomCentered						fActionZoomCentered;
+	private ActionZoomShowAll						fActionZoomShowAll;
+	private ActionZoomShowEntireTour				fActionZoomShowEntireTour;
 
-	private boolean								fIsMapSynchedWithTour;
-	private boolean								fIsPositionCentered;
+	private boolean									fIsMapSynchedWithTour;
+	private boolean									fIsPositionCentered;
 
-	private List<TileFactory>					fTileFactories;
+	private List<TileFactory>						fTileFactories;
 
-	private int									fDefaultZoom;
-	private GeoPosition							fDefaultPosition					= null;
+	private int										fDefaultZoom;
+	private GeoPosition								fDefaultPosition					= null;
 
-	private boolean								fIsTour;
+	private boolean									fIsTour;
 
 	/**
 	 * Position for the current point of interest
 	 */
-	private GeoPosition							fPOIPosition;
+	private GeoPosition								fPOIPosition;
 
-	private final DirectMappingPainter			fDirectMappingPainter				= new DirectMappingPainter();
+	private final DirectMappingPainter				fDirectMappingPainter				= new DirectMappingPainter();
 
 	/**
 	 * current position for the x-slider
 	 */
-	private int									fCurrentLeftSliderValueIndex;
-	private int									fCurrentRightSliderValueIndex;
+	private int										fCurrentLeftSliderValueIndex;
+	private int										fCurrentRightSliderValueIndex;
 
-	private MapLegend							fMapLegend;
-	private HashMap<Integer, ILegendProvider>	fLegendProviders					= new HashMap<Integer, ILegendProvider>();
+	private MapLegend								fMapLegend;
+	private final HashMap<Integer, ILegendProvider>	fLegendProviders					= new HashMap<Integer, ILegendProvider>();
 
 	public MappingView() {}
-
-	private static List<Integer> getLegendUnits(final Rectangle legendBounds, int graphMinValue, int graphMaxValue) {
-
-		final int legendHeight = legendBounds.height - 2 * LEGEND_MARGIN_TOP_BOTTOM;
-
-		/*
-		 * !!! value range does currently NOT provide negative altitudes
-		 */
-		final int graphRange = graphMaxValue - graphMinValue;
-
-		final int unitCount = legendHeight / LEGEND_UNIT_DISTANCE;
-
-		// get altitude range for one unit
-		final int graphUnitValue = graphRange / Math.max(1, unitCount);
-
-		// round the unit
-		final float graphUnit = ChartUtil.roundDecimalValue(graphUnitValue);
-
-		/*
-		 * adjust min value
-		 */
-		float adjustMinValue = 0;
-		if (((float) graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
-			adjustMinValue = graphUnit;
-		}
-		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / graphUnit) * graphUnit);
-
-		/*
-		 * adjust max value
-		 */
-		// increase the max value when it does not fit to unit borders
-		float adjustMaxValue = 0;
-		if (((float) graphMaxValue % graphUnit) != 0) {
-			adjustMaxValue = graphUnit;
-		}
-		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / graphUnit) * graphUnit);
-
-		/*
-		 * create a list with all units
-		 */
-		final ArrayList<Integer> unitList = new ArrayList<Integer>();
-
-		int graphValue = graphMinValue;
-		int unitCounter = 0;
-
-		// loop: create unit label for all units
-		while (graphValue <= graphMaxValue) {
-
-			unitList.add(graphValue);
-
-			// prevent endless loops 
-			if (graphValue >= graphMaxValue || unitCounter > 100) {
-				break;
-			}
-
-			graphValue += graphUnit;
-			unitCounter++;
-		}
-
-		return unitList;
-	}
 
 	void actionSaveDefaultPosition() {
 		fDefaultZoom = fMap.getZoom();
@@ -261,6 +202,20 @@ public class MappingView extends ViewPart {
 
 	void actionSetZoomCentered() {
 		fIsPositionCentered = fActionZoomCentered.isChecked();
+	}
+
+	void actionShowSlider() {
+
+		// repaint map
+		fDirectMappingPainter.setPaintContext(fMap,
+				fActionShowTourInMap.isChecked(),
+				fTourData,
+				fCurrentLeftSliderValueIndex,
+				fCurrentRightSliderValueIndex,
+				fActionShowSliderInMap.isChecked(),
+				fActionShowSliderInLegend.isChecked());
+
+		fMap.redraw();
 	}
 
 	void actionSynchWithTour() {
@@ -346,6 +301,15 @@ public class MappingView extends ViewPart {
 					final boolean isShowTileInfo = store.getBoolean(SHOW_TILE_INFO);
 
 					fMap.setDrawTileBorders(isShowTileInfo);
+					fMap.queueRedrawMap();
+
+				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+					// update tour and legend
+
+					createLegendImage(PaintManager.getInstance().getLegendProvider());
+
+					fMap.resetOverlayImageCache();
 					fMap.queueRedrawMap();
 				}
 			}
@@ -482,6 +446,8 @@ public class MappingView extends ViewPart {
 		fActionChangeTileFactory = new ActionChangeTileFactory(this);
 		fActionSetDefaultPosition = new ActionSetDefaultPosition(this);
 		fActionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
+		fActionShowSliderInMap = new ActionShowSliderInMap(this);
+		fActionShowSliderInLegend = new ActionShowSliderInLegend(this);
 
 		/*
 		 * fill view toolbar
@@ -510,6 +476,9 @@ public class MappingView extends ViewPart {
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
+		menuMgr.add(fActionShowSliderInMap);
+		menuMgr.add(fActionShowSliderInLegend);
+		menuMgr.add(new Separator());
 		menuMgr.add(fActionSetDefaultPosition);
 		menuMgr.add(fActionSaveDefaultPosition);
 		menuMgr.add(new Separator());
@@ -517,231 +486,72 @@ public class MappingView extends ViewPart {
 
 	}
 
-	private void createLegendProviders() {
+	/**
+	 * Creates a new legend image and disposes the old image
+	 * 
+	 * @param legendProvider
+	 */
+	private void createLegendImage(final ILegendProvider legendProvider) {
 
-		LegendConfig legendConfig;
-		LegendColor legendColor;
+		// legend requires a tour with coordinates
+		if (legendProvider == null || isPaintDataValid(fTourData) == false) {
+			showDefaultMap();
+			return;
+		}
 
-		/*
-		 * legend provider: heartbeat
-		 */
+		Image legendImage = fMapLegend.getImage();
 
-		legendConfig = new LegendConfig();
-		legendConfig.units = Arrays.asList(50, 75, 100, 125, 150, 175, 200);
-		legendConfig.legendMinValue = 50;
-		legendConfig.legendMaxValue = 200;
-		legendConfig.unitText = Messages.graph_label_heartbeat_unit;
+		// dispose old legend image
+		if (legendImage != null && !legendImage.isDisposed()) {
+			legendImage.dispose();
+		}
+		final int legendWidth = 150;
+		final int legendHeight = 300;
 
-		legendColor = new LegendColor();
-//		legendColor.minValue = 50;
-//		legendColor.lowValue = 70;
-//		legendColor.midValue = 125;
-//		legendColor.highValue = 150;
-//		legendColor.maxValue = 200;
-//
-//		legendColor.dimmFactor = 0.5F;
-//
-//		legendColor.maxColor1 = 255;
-//		legendColor.maxColor2 = 220;
-//		legendColor.maxColor3 = 0;
-//		legendColor.color1 = LegendColor.COLOR_RED;
-//		legendColor.color2 = LegendColor.COLOR_GREEN;
-//		legendColor.color3 = LegendColor.COLOR_BLUE;
+		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
-		fLegendProviders.put(MappingView.TOUR_COLOR_PULSE, //
-				new LegendProvider(legendConfig, legendColor, MappingView.TOUR_COLOR_PULSE));
+		final ImageData overlayImageData = new ImageData(legendWidth, legendHeight, 24, //
+				new PaletteData(0xff, 0xff00, 0xff00000));
 
-		/*
-		 * legend provider: gradient
-		 */
+		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
 
-		legendConfig = new LegendConfig();
-		legendConfig.units = Arrays.asList(-200, -100, 0, 100, 200);
-		legendConfig.legendMinValue = -250;
-		legendConfig.legendMaxValue = 250;
-		legendConfig.unitFactor = 10;
-		legendConfig.unitText = Messages.graph_label_gradiend_unit;
+		final Display display = Display.getCurrent();
+		legendImage = new Image(display, overlayImageData);
+		Rectangle legendImageBounds = legendImage.getBounds();
 
-		legendColor = new LegendColor();
-//		legendColor.minValue = -300;
-//		legendColor.lowValue = -100;
-//		legendColor.midValue = 0;
-//		legendColor.highValue = 100;
-//		legendColor.maxValue = 300;
-//
-//		legendColor.dimmFactor = 0.5F;
-//
-//		legendColor.maxColor1 = 255;
-//		legendColor.maxColor2 = 255;
-//		legendColor.maxColor3 = 255;
-//		legendColor.color1 = LegendColor.COLOR_RED;
-//		legendColor.color2 = LegendColor.COLOR_GREEN;
-//		legendColor.color3 = LegendColor.COLOR_BLUE;
+		updateLegendValues(legendProvider, legendImageBounds);
 
-		fLegendProviders.put(MappingView.TOUR_COLOR_GRADIENT, //
-				new LegendProvider(legendConfig, legendColor, MappingView.TOUR_COLOR_GRADIENT));
+		final Color transparentColor = new Color(display, rgbTransparent);
+		final GC gc = new GC(legendImage);
+		{
+			gc.setBackground(transparentColor);
+			gc.fillRectangle(legendImageBounds);
+			TourPainter.drawLegendColors(gc, legendImageBounds, legendProvider, true);
+		}
+		gc.dispose();
+		transparentColor.dispose();
 
-		/*
-		 * legend provider: altitude
-		 */
-		legendConfig = new LegendConfig();
-
-		// altitude legend color, min/max values will be set when a new tour is displayed
-		legendColor = new LegendColor();
-
-//		legendColor.minBrightnessFactor = 50;
-//		legendColor.maxBrightnessFactor = 50;
-
-		fLegendProviders.put(MappingView.TOUR_COLOR_ALTITUDE, //
-				new LegendProvider(legendConfig, legendColor, MappingView.TOUR_COLOR_ALTITUDE));
-
-		/*
-		 * legend provider: speed
-		 */
-
-		legendConfig = new LegendConfig();
-		legendConfig.units = Arrays.asList(0, 10, 20, 30, 40, 50, 60, 70, 80);
-		legendConfig.legendMinValue = 0;
-		legendConfig.legendMaxValue = 60;
-		legendConfig.unitText = UI.UNIT_LABEL_SPEED;
-
-		legendColor = new LegendColor();
-
-		fLegendProviders.put(MappingView.TOUR_COLOR_SPEED, //
-				new LegendProvider(legendConfig, legendColor, MappingView.TOUR_COLOR_SPEED));
-
-		/*
-		 * legend provider: pace
-		 */
-
-		legendConfig = new LegendConfig();
-		legendConfig.units = Arrays.asList(0, 5, 10, 15, 20);
-		legendConfig.legendMinValue = 0;
-		legendConfig.legendMaxValue = 20;
-		legendConfig.unitText = UI.UNIT_LABEL_PACE;
-
-		legendColor = new LegendColor();
-
-		fLegendProviders.put(MappingView.TOUR_COLOR_PACE, //
-				new LegendProvider(legendConfig, legendColor, MappingView.TOUR_COLOR_PACE));
-
+		fMapLegend.setImage(legendImage);
 	}
 
-//	private LegendConfig createLegendConfig(final int colorId, final Rectangle legendBounds) {
-//
-//		LegendConfig legendConfig = new LegendConfig();
-//		LegendColor legendColor;
-//
-//		switch (colorId) {
-//
-//		case MappingView.TOUR_COLOR_ALTITUDE:
-//
-////			if (fTourData == null) {
-////				break;
-////			}
-////
-////			final int[] altitudeSerie = fTourData.getAltitudeSerie();
-////			if (altitudeSerie == null) {
-////				break;
-////			}
-////
-////			/*
-////			 * get min/max altitude
-////			 */
-////			int minValue = 0;
-////			int maxValue = 0;
-////			for (int valueIndex = 0; valueIndex < altitudeSerie.length; valueIndex++) {
-////				if (valueIndex == 0) {
-////					minValue = altitudeSerie[valueIndex];
-////					maxValue = altitudeSerie[valueIndex];
-////				} else {
-////					minValue = Math.min(minValue, altitudeSerie[valueIndex]);
-////					maxValue = Math.max(maxValue, altitudeSerie[valueIndex]);
-////				}
-////			}
-////
-////			final List<Integer> legendUnits = getLegendUnits(legendBounds, minValue, maxValue);
-////			final Integer legendMinValue = legendUnits.get(0);
-////			final Integer legendMaxValue = legendUnits.get(legendUnits.size() - 1);
-////
-////			legendConfig.units = legendUnits;
-////			legendConfig.legendMinValue = legendMinValue;
-////			legendConfig.legendMaxValue = legendMaxValue;
-////			legendConfig.unitText = UI.UNIT_LABEL_ALTITUDE;
-////
-////			/*
-////			 * set color configuration, each tour has a different altitude config
-////			 */
-////			legendColor = TourPainter.getInstance().getAltitudeLegendColor();
-////
-////			final int midValueRelative = (legendMaxValue - legendMinValue) / 2;
-////			final int midValueAbsolute = legendMinValue + midValueRelative;
-////
-////			legendColor.minValue = legendMinValue;
-////			legendColor.lowValue = legendMinValue + midValueRelative / 3;
-////			legendColor.midValue = midValueAbsolute;
-////			legendColor.highValue = legendMaxValue - midValueRelative / 3;
-////			legendColor.maxValue = legendMaxValue;
-////
-////			legendColor.dimmFactor = 0.5F;
-////
-////			legendColor.maxColor1 = 255;
-////			legendColor.maxColor2 = 200;
-////			legendColor.maxColor3 = 0;
-////			legendColor.color1 = LegendColor.COLOR_BLUE;
-////			legendColor.color2 = LegendColor.COLOR_GREEN;
-////			legendColor.color3 = LegendColor.COLOR_RED;
-//			break;
-//
-////		case MappingView.TOUR_COLOR_GRADIENT:
-////			legendConfig = TourPainter.getInstance().getGradientLegendConfig();
-////			break;
-//
-////		case MappingView.TOUR_COLOR_PULSE:
-////
-////			legendConfig.units = Arrays.asList(50, 75, 100, 125, 150, 175, 200);
-////			legendConfig.legendMinValue = 50;
-////			legendConfig.legendMaxValue = 200;
-////			legendConfig.unitText = Messages.graph_label_heartbeat_unit;
-////
-////			legendColor = TourPainter.getInstance().getPulseLegendColor();
-////			legendColor.dimmFactor = 0.5F;
-////			legendColor.maxColor1 = 255;
-////			legendColor.maxColor2 = 200;
-////			legendColor.maxColor3 = 0;
-////			legendColor.color1 = LegendColor.COLOR_RED;
-////			legendColor.color2 = LegendColor.COLOR_GREEN;
-////			legendColor.color3 = LegendColor.COLOR_BLUE;
-////			break;
-//
-////		case MappingView.TOUR_COLOR_SPEED:
-////
-////			legendConfig.units = Arrays.asList(0, 10, 20, 30, 40, 50, 60, 70, 80);
-////			legendConfig.legendMinValue = 0;
-////			legendConfig.legendMaxValue = 60;
-////			legendConfig.unitText = UI.UNIT_LABEL_SPEED;
-////			break;
-//
-////		case MappingView.TOUR_COLOR_PACE:
-////
-////			legendConfig.units = Arrays.asList(0, 5, 10, 15, 20);
-////			legendConfig.legendMinValue = 0;
-////			legendConfig.legendMaxValue = 20;
-////			legendConfig.unitText = UI.UNIT_LABEL_PACE;
-////			break;
-//
-//		default:
-//			break;
-//		}
-//
-//		if (legendConfig.units == null || legendConfig.unitText == null) {
-//			// set default values
-//			legendConfig.units = Arrays.asList(0);
-//			legendConfig.unitText = EMPTY_STRING;
-//		}
-//
-//		return legendConfig;
-//	}
+	private void createLegendProviders() {
+
+		fLegendProviders.put(MappingView.TOUR_COLOR_PULSE, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), MappingView.TOUR_COLOR_PULSE));
+
+		fLegendProviders.put(MappingView.TOUR_COLOR_ALTITUDE, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), MappingView.TOUR_COLOR_ALTITUDE));
+
+		fLegendProviders.put(MappingView.TOUR_COLOR_SPEED, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), MappingView.TOUR_COLOR_SPEED));
+
+		fLegendProviders.put(MappingView.TOUR_COLOR_PACE, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), MappingView.TOUR_COLOR_PACE));
+
+		fLegendProviders.put(MappingView.TOUR_COLOR_GRADIENT, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), MappingView.TOUR_COLOR_GRADIENT));
+
+	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
@@ -788,56 +598,6 @@ public class MappingView extends ViewPart {
 		super.dispose();
 	}
 
-	/**
-	 * Creates a new map legend image and disposes the old image
-	 * 
-	 * @param legendColorProvider
-	 * @param updateLegendValues
-	 */
-	private void createLegendImage(final ILegendProvider legendColorProvider) {
-
-		// legend requires a tour with coordinates
-		if (isPaintDataValid(fTourData) == false) {
-			showDefaultMap();
-			return;
-		}
-
-		Image legendImage = fMapLegend.getImage();
-
-		// dispose old legend image
-		if (legendImage != null && !legendImage.isDisposed()) {
-			legendImage.dispose();
-		}
-		final int legendWidth = 150;
-		final int legendHeight = 300;
-
-		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
-
-		final ImageData overlayImageData = new ImageData(legendWidth, legendHeight, 24, //
-				new PaletteData(0xff, 0xff00, 0xff00000));
-
-		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
-
-		final Display display = Display.getCurrent();
-		legendImage = new Image(display, overlayImageData);
-		final Rectangle imageBounds = legendImage.getBounds();
-
-		updateLegendValues(legendColorProvider, imageBounds);
-
-		final Color transparentColor = new Color(display, rgbTransparent);
-		final GC gc = new GC(legendImage);
-		{
-			gc.setBackground(transparentColor);
-			gc.fillRectangle(imageBounds);
-
-			TourPainter.drawLegendColors(gc, imageBounds, legendColorProvider, true);
-		}
-		gc.dispose();
-		transparentColor.dispose();
-
-		fMapLegend.setImage(legendImage);
-	}
-
 	private void enableActions() {
 
 		fActionZoomShowEntireTour.setEnabled(fIsTour);
@@ -864,7 +624,7 @@ public class MappingView extends ViewPart {
 		return fTileFactories;
 	}
 
-	private ILegendProvider getLegendProvider(int colorId) {
+	private ILegendProvider getLegendProvider(final int colorId) {
 		return fLegendProviders.get(colorId);
 	}
 
@@ -886,6 +646,12 @@ public class MappingView extends ViewPart {
 		return rect;
 	}
 
+	/**
+	 * Calculate the bounds for the tour in latitude and longitude values
+	 * 
+	 * @param tourData
+	 * @return
+	 */
 	private Set<GeoPosition> getTourBounds(final TourData tourData) {
 
 		final double[] latitudeSerie = tourData.latitudeSerie;
@@ -1041,7 +807,9 @@ public class MappingView extends ViewPart {
 				fActionShowTourInMap.isChecked(),
 				fTourData,
 				fCurrentLeftSliderValueIndex,
-				fCurrentRightSliderValueIndex);
+				fCurrentRightSliderValueIndex,
+				fActionShowSliderInMap.isChecked(),
+				fActionShowSliderInLegend.isChecked());
 
 		final Set<GeoPosition> tourBounds = getTourBounds(fTourData);
 		paintManager.setTourBounds(tourBounds);
@@ -1053,6 +821,13 @@ public class MappingView extends ViewPart {
 		fMap.queueRedrawMap();
 	}
 
+	/**
+	 * Paint the currently selected tour in the map
+	 * 
+	 * @param tourData
+	 * @param forceRedraw
+	 * @param ignoreSynch
+	 */
 	private void paintTour(final TourData tourData, final boolean forceRedraw, final boolean ignoreSynch) {
 
 		if (isPaintDataValid(tourData) == false) {
@@ -1078,19 +853,23 @@ public class MappingView extends ViewPart {
 		paintManager.setTourData(tourData);
 		fTourData = tourData;
 
-		// set slider position
+		// set the paint context (slider position) for the direct mapping painter
 		fDirectMappingPainter.setPaintContext(fMap,
 				isShowTour,
 				tourData,
 				fCurrentLeftSliderValueIndex,
-				fCurrentRightSliderValueIndex);
+				fCurrentRightSliderValueIndex,
+				fActionShowSliderInMap.isChecked(),
+				fActionShowSliderInLegend.isChecked());
 
+		// set the tour bounds
 		final Set<GeoPosition> tourBounds = getTourBounds(tourData);
 		paintManager.setTourBounds(tourBounds);
 
 		fMap.setShowOverlays(isShowTour);
 		fMap.setShowLegend(isShowTour);
 
+		// set position and zoom level for the tour
 		if (fIsMapSynchedWithTour && ignoreSynch == false) {
 
 			if (forceRedraw == false && fPreviousTourData != null) {
@@ -1109,7 +888,7 @@ public class MappingView extends ViewPart {
 				// use default position for the tour
 				setTourZoomLevel(tourBounds, true);
 			} else {
-				// position tour to the previous or position
+				// position tour to the previous position
 				fMap.setZoom(tourData.mapZoomLevel);
 				fMap.setCenterPosition(new GeoPosition(tourData.mapCenterPositionLatitude,
 						tourData.mapCenterPositionLongitude));
@@ -1121,14 +900,8 @@ public class MappingView extends ViewPart {
 
 		if (isNewTour) {
 
-			// a new tour is selected
-
-			final ILegendProvider legendProvider = PaintManager.getInstance().getLegendProvider();
-			if (legendProvider.getTourColorId() == TOUR_COLOR_ALTITUDE) {
-
-				// adjust legend according the tour altitude
-				createLegendImage(legendProvider);
-			}
+			// adjust legend for the new tour
+			createLegendImage(PaintManager.getInstance().getLegendProvider());
 
 			fMap.setOverlayKey(tourData.getTourId().toString());
 			fMap.resetOverlays();
@@ -1156,7 +929,9 @@ public class MappingView extends ViewPart {
 				fActionShowTourInMap.isChecked(),
 				tourData,
 				leftSliderValuesIndex,
-				rightSliderValuesIndex);
+				rightSliderValuesIndex,
+				fActionShowSliderInMap.isChecked(),
+				fActionShowSliderInLegend.isChecked());
 
 		fMap.redraw();
 	}
@@ -1198,6 +973,18 @@ public class MappingView extends ViewPart {
 				fActionSynchTourZoomLevel.setZoomLevel(zoomLevel);
 			}
 
+			// action: show slider in map
+			Integer mementoShowSliderInMap = memento.getInteger(MEMENTO_SHOW_SLIDER_IN_MAP);
+			if (mementoShowSliderInMap != null) {
+				fActionShowSliderInMap.setChecked(mementoShowSliderInMap == 1);
+			}
+
+			// action: show slider in legend
+			Integer mementoShowSliderInLegend = memento.getInteger(MEMENTO_SHOW_SLIDER_IN_LEGEND);
+			if (mementoShowSliderInLegend != null) {
+				fActionShowSliderInLegend.setChecked(mementoShowSliderInLegend == 1);
+			}
+
 			// restore: factory ID
 			fActionChangeTileFactory.setSelectedFactory(memento.getString(MEMENTO_CURRENT_FACTORY_ID));
 
@@ -1217,8 +1004,6 @@ public class MappingView extends ViewPart {
 			// tour color
 			final Integer colorId = memento.getInteger(MEMENTO_TOUR_COLOR_ID);
 			if (colorId != null) {
-
-				PaintManager.getInstance().setLegendProvider(getLegendProvider(colorId));
 
 				switch (colorId) {
 				case TOUR_COLOR_ALTITUDE:
@@ -1246,7 +1031,9 @@ public class MappingView extends ViewPart {
 					break;
 				}
 
-				createLegendImage(getLegendProvider(colorId));
+				final ILegendProvider legendProvider = getLegendProvider(colorId);
+				PaintManager.getInstance().setLegendProvider(legendProvider);
+//				createLegendImage(legendProvider);
 			}
 
 		} else {
@@ -1286,6 +1073,9 @@ public class MappingView extends ViewPart {
 		memento.putInteger(MEMENTO_SHOW_TOUR_IN_MAP, fActionShowTourInMap.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR, fActionSynchWithTour.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, fActionSynchTourZoomLevel.getZoomLevel());
+
+		memento.putInteger(MEMENTO_SHOW_SLIDER_IN_MAP, fActionShowSliderInMap.isChecked() ? 1 : 0);
+		memento.putInteger(MEMENTO_SHOW_SLIDER_IN_LEGEND, fActionShowSliderInLegend.isChecked() ? 1 : 0);
 
 		memento.putString(MEMENTO_CURRENT_FACTORY_ID, fActionChangeTileFactory.getSelectedFactory()
 				.getInfo()
@@ -1405,74 +1195,105 @@ public class MappingView extends ViewPart {
 		fPreviousTourData = null;
 
 		// update direct painter to draw nothing
-		fDirectMappingPainter.setPaintContext(fMap, false, null, 0, 0);
+		fDirectMappingPainter.setPaintContext(fMap, false, null, 0, 0, false, false);
 
 		fMap.setShowOverlays(false);
 		fMap.setShowLegend(false);
-//		fMap.setZoom(1);
 
 		fMap.queueRedrawMap();
 	}
 
-	private void updateAltitudeLegend(Rectangle legendBounds) {
+	/**
+	 * Update the min/max values in the {@link ILegendProvider} for the currently displayed legend
+	 * 
+	 * @param legendProvider
+	 * @param legendBounds
+	 */
+	private void updateLegendValues(final ILegendProvider legendProvider, final Rectangle legendBounds) {
 
 		if (fTourData == null) {
 			return;
 		}
 
-		final int[] altitudeSerie = fTourData.getAltitudeSerie();
-		if (altitudeSerie == null) {
-			return;
-		}
+		final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
 
-		ILegendProvider legendProvider = getLegendProvider(TOUR_COLOR_ALTITUDE);
+		ColorDefinition colorDefinition = null;
 		LegendConfig legendConfig = legendProvider.getLegendConfig();
 
-		/*
-		 * get min/max altitude
-		 */
-		int minValue = 0;
-		int maxValue = 0;
-		for (int valueIndex = 0; valueIndex < altitudeSerie.length; valueIndex++) {
-			if (valueIndex == 0) {
-				minValue = altitudeSerie[valueIndex];
-				maxValue = altitudeSerie[valueIndex];
-			} else {
-				minValue = Math.min(minValue, altitudeSerie[valueIndex]);
-				maxValue = Math.max(maxValue, altitudeSerie[valueIndex]);
-			}
-		}
+		// tell the legend provider how to draw the legend
+		switch (legendProvider.getTourColorId()) {
 
-		final List<Integer> legendUnits = getLegendUnits(legendBounds, minValue, maxValue);
-		final Integer legendMinValue = legendUnits.get(0);
-		final Integer legendMaxValue = legendUnits.get(legendUnits.size() - 1);
-
-		legendConfig.units = legendUnits;
-		legendConfig.legendMinValue = legendMinValue;
-		legendConfig.legendMaxValue = legendMaxValue;
-		legendConfig.unitText = UI.UNIT_LABEL_ALTITUDE;
-
-		/*
-		 * set color configuration, each tour has a different altitude config
-		 */
-		LegendColor legendColor = legendProvider.getLegendColor();
-
-		final int midValueRelative = (legendMaxValue - legendMinValue) / 2;
-		final int midValueAbsolute = legendMinValue + midValueRelative;
-
-//		legendColor.minValue = legendMinValue;
-//		legendColor.lowValue = legendMinValue + midValueRelative / 3;
-//		legendColor.midValue = midValueAbsolute;
-//		legendColor.highValue = legendMaxValue - midValueRelative / 3;
-//		legendColor.maxValue = legendMaxValue;
-
-	}
-
-	private void updateLegendValues(ILegendProvider legendColorProvider, Rectangle legendBounds) {
-
-		switch (legendColorProvider.getTourColorId()) {
 		case TOUR_COLOR_ALTITUDE:
-			updateAltitudeLegend(legendBounds);
+
+			final int[] altitudeSerie = fTourData.getAltitudeSerie();
+			if (altitudeSerie == null) {
+				return;
+			}
+
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_ALTITUDE);
+
+			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			legendProvider.setLegendColorValues(legendBounds, altitudeSerie, UI.UNIT_LABEL_ALTITUDE);
+
+			break;
+
+		case TOUR_COLOR_PULSE:
+
+			final int[] pulseSerie = fTourData.pulseSerie;
+			if (pulseSerie == null) {
+				return;
+			}
+
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HEARTBEAT);
+
+			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			legendProvider.setLegendColorValues(legendBounds, pulseSerie, Messages.graph_label_heartbeat_unit);
+
+			break;
+
+		case TOUR_COLOR_SPEED:
+
+			final int[] speedSerie = fTourData.getSpeedSerie();
+			if (speedSerie == null) {
+				return;
+			}
+
+			legendConfig.unitFactor = 10;
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_SPEED);
+
+			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			legendProvider.setLegendColorValues(legendBounds, speedSerie, UI.UNIT_LABEL_SPEED);
+
+			break;
+
+		case TOUR_COLOR_PACE:
+
+			final int[] paceSerie = fTourData.getPaceSerie();
+			if (paceSerie == null) {
+				return;
+			}
+
+			legendConfig.unitFactor = 10;
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_PACE);
+
+			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			legendProvider.setLegendColorValues(legendBounds, paceSerie, UI.UNIT_LABEL_PACE);
+
+			break;
+
+		case TOUR_COLOR_GRADIENT:
+
+			final int[] gradientSerie = fTourData.getGradientSerie();
+			if (gradientSerie == null) {
+				return;
+			}
+
+			legendConfig.unitFactor = 10;
+			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_GRADIENT);
+
+			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
+			legendProvider.setLegendColorValues(legendBounds, gradientSerie, Messages.graph_label_gradient_unit);
+
 			break;
 
 		default:

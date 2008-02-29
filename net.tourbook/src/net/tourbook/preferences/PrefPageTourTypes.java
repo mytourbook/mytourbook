@@ -91,7 +91,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private boolean								fIsModified	= false;
 
-	private ColorLabelProvider					fColorLabelProvider;
+	private GraphColorLabelProvider					fColorLabelProvider;
 
 	private ColorSelector						fColorSelector;
 
@@ -295,7 +295,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		fColorViewer = new TreeViewer(tree);
 		fColorViewer.setContentProvider(new ColorContentProvider());
 
-		fColorLabelProvider = new ColorLabelProvider(this);
+		fColorLabelProvider = new GraphColorLabelProvider(this);
 		fColorViewer.setLabelProvider(fColorLabelProvider);
 
 		fColorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
