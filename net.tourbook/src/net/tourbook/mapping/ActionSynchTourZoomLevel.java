@@ -35,11 +35,13 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 
 	private class ActionZoomLevel extends Action {
 
+		private static final String OSX_SPACER_STRING = " ";
 		private int	fActionZoomLevel;
 
 		public ActionZoomLevel(int zoomLevel, String label) {
 
-			super(NLS.bind(label, Integer.toString(zoomLevel)), AS_RADIO_BUTTON);
+			// add space before the label otherwise OSX will not display the menu item,
+			super(OSX_SPACER_STRING+NLS.bind(label, Integer.toString(zoomLevel)), AS_RADIO_BUTTON);
 
 			fActionZoomLevel = zoomLevel;
 		}
