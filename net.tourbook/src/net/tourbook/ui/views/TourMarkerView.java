@@ -432,7 +432,7 @@ public class TourMarkerView extends ViewPart {
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void fillContextMenu(IMenuManager menuMgr) {
 
 		// add standard group which allows other plug-ins to contribute here

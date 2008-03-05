@@ -181,7 +181,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		fRefTourViewer.setLabelProvider(new RefTourLabelProvider());
 
 		fRefTourViewer.setComparator(new ViewerComparator() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
 				return getComparator().compare(((TourReference) e1).getLabel(), ((TourReference) e2).getLabel());

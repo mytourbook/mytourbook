@@ -71,7 +71,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
 	private static final List<Integer>	fUnitValues		= Arrays.asList(10, 50, 100, 150, 190);
-	private static final List<String>	fUnitLabels		= Arrays.asList("min", "low", "mid", "high", "max");
+	private static final List<String>	fUnitLabels		= Arrays.asList(Messages.Pref_ChartColors_unit_min, Messages.Pref_ChartColors_unit_low, Messages.Pref_ChartColors_unit_mid, Messages.Pref_ChartColors_unit_high, Messages.Pref_ChartColors_unit_max);
 
 	private ValueColor[]				fValueColors	= new ValueColor[] {
 			new ValueColor(10, 255, 0, 0),
@@ -183,7 +183,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		 * button: legend selector
 		 */
 		fBtnLegend = new Button(container, SWT.NONE);
-		fBtnLegend.setText("&Legend");
+		fBtnLegend.setText(Messages.Pref_ChartColors_btn_legend);
 		setButtonLayoutData(fBtnLegend);
 
 		fBtnLegend.addSelectionListener(new SelectionAdapter() {
@@ -405,7 +405,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		legendConfig.unitLabels = fUnitLabels;
 		legendConfig.legendMinValue = 0;
 		legendConfig.legendMaxValue = 200;
-		legendConfig.unitText = "";
+		legendConfig.unitText = ""; //$NON-NLS-1$
 
 		LegendColor legendColor = new LegendColor();
 		legendColor.valueColors = fValueColors;
@@ -436,7 +436,8 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		/*
 		 * show java code for the selected color, this code can copy/pasted into GraphColorProvider
 		 */
-		System.out.println(fSelectedColor.getColorDefinition().getLegendColor().createConstructorString());
+//		System.out.println(fSelectedColor.getColorDefinition().getLegendColor().createConstructorString());
+//
 //
 		/*
 		 * dispose old color and image for the graph

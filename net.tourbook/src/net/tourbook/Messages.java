@@ -110,8 +110,6 @@ public class Messages extends NLS {
 	public static String		Dlg_AdjustAltitude_Type_Show_original;
 	public static String		Dlg_AdjustAltitude_Type_start_and_end;
 
-	public static String	dlg_legend_color_title;
-
 	public static String		Dlg_TourMarker_Button_delete;
 	public static String		Dlg_TourMarker_Button_delete_tooltip;
 	public static String		Dlg_TourMarker_Button_reset_offset;
@@ -138,7 +136,7 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Cadence_unit;
 	public static String		Graph_Label_Gradiend_unit;
 
-	public static String	Graph_Label_Gradient;
+	public static String		Graph_Label_Gradient;
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
 	public static String		Graph_Label_Pace;
@@ -153,8 +151,7 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_color_gradient_bright;
 	public static String		Graph_Pref_color_gradient_dark;
 	public static String		Graph_Pref_color_line;
-
-	public static String	Graph_Pref_color_mapping;
+	public static String		Graph_Pref_color_mapping;
 	public static String		Graph_Pref_color_statistic_distance;
 	public static String		Graph_Pref_color_statistic_time;
 
@@ -246,8 +243,14 @@ public class Messages extends NLS {
 	public static String		Import_Wizard_Monitor_wait_for_data;
 	public static String		Import_Wizard_Thread_name_read_device_data;
 
+	public static String		Pref_ChartColors_btn_legend;
 	public static String		Pref_ChartColors_Column_color;
 	public static String		Pref_ChartColors_Label_title;
+	public static String		Pref_ChartColors_unit_high;
+	public static String		Pref_ChartColors_unit_low;
+	public static String		Pref_ChartColors_unit_max;
+	public static String		Pref_ChartColors_unit_mid;
+	public static String		Pref_ChartColors_unit_min;
 
 	public static String		Pref_general_imperial_unit_fahrenheit;
 	public static String		Pref_general_imperial_unit_feet;

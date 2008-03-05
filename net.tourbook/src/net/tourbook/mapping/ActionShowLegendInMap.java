@@ -15,22 +15,24 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
-import java.util.List;
+import org.eclipse.jface.action.Action;
 
-/**
- * Configuration for the map legend to visualize one unit in a tour
- */
-public class LegendConfig {
+public class ActionShowLegendInMap extends Action {
 
-	private static final String	EMPTY_STRING	= ""; //$NON-NLS-1$
+	private MappingView	fMapView;
 
-	public int					legendMinValue;
-	public int					legendMaxValue;
+	public ActionShowLegendInMap(MappingView mapView) {
 
-	public List<Integer>		units;
-	public List<String>			unitLabels;
+		super(null, AS_CHECK_BOX);
 
-	public int					unitFactor		= 1;
+		fMapView = mapView;
 
-	public String				unitText		= EMPTY_STRING;
+		setText(Messages.map_action_show_legend_in_map);
+	}
+
+	@Override
+	public void run() {
+		fMapView.actionSetShowLegendInMap();
+	}
+
 }

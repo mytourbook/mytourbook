@@ -90,8 +90,10 @@ public class MappingView extends ViewPart {
 	public static final int							TOUR_COLOR_SPEED					= 40;
 	public static final int							TOUR_COLOR_PACE						= 50;
 
+	private static final String						MEMENTO_SHOW_START_END_IN_MAP		= "action.show-start-end-in-map";
 	private static final String						MEMENTO_SHOW_SLIDER_IN_MAP			= "action.show-slider-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_SLIDER_IN_LEGEND		= "action.show-slider-in-legend";			//$NON-NLS-1$
+	private static final String						MEMENTO_SHOW_LEGEND_IN_MAP			= "action.show-legend-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_ZOOM_CENTERED				= "action.zoom-centered";					//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_IN_MAP			= "action.show-tour-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "action.synch-with-selected-tour";		//$NON-NLS-1$
@@ -126,8 +128,10 @@ public class MappingView extends ViewPart {
 	private ActionSaveDefaultPosition				fActionSaveDefaultPosition;
 	private ActionSetDefaultPosition				fActionSetDefaultPosition;
 	private ActionShowTourInMap						fActionShowTourInMap;
+	private ActionShowLegendInMap					fActionShowLegendInMap;
 	private ActionShowSliderInMap					fActionShowSliderInMap;
 	private ActionShowSliderInLegend				fActionShowSliderInLegend;
+	private ActionShowStartEndInMap					fActionShowStartEndInMap;
 	private ActionSynchWithTour						fActionSynchWithTour;
 	private ActionSynchTourZoomLevel				fActionSynchTourZoomLevel;
 	private ActionTourColor							fActionTourColorAltitude;
@@ -182,6 +186,31 @@ public class MappingView extends ViewPart {
 			fMap.setZoom(fDefaultZoom);
 			fMap.setCenterPosition(fDefaultPosition);
 		}
+		fMap.queueRedrawMap();
+	}
+
+	void actionSetShowLegendInMap() {
+
+		final boolean isLegendVisible = fActionShowLegendInMap.isChecked();
+
+		fMap.setShowLegend(isLegendVisible);
+
+		fActionShowSliderInLegend.setEnabled(isLegendVisible);
+		if (isLegendVisible == false) {
+			fActionShowSliderInLegend.setChecked(false);
+		}
+
+		// update legend
+		actionShowSlider();
+
+		fMap.queueRedrawMap();
+	}
+
+	void actionSetShowStartEndInMap() {
+
+		PaintManager.getInstance().setShowStartEnd(fActionShowStartEndInMap.isChecked());
+
+		fMap.resetOverlayImageCache();
 		fMap.queueRedrawMap();
 	}
 
@@ -448,6 +477,8 @@ public class MappingView extends ViewPart {
 		fActionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
 		fActionShowSliderInMap = new ActionShowSliderInMap(this);
 		fActionShowSliderInLegend = new ActionShowSliderInLegend(this);
+		fActionShowLegendInMap = new ActionShowLegendInMap(this);
+		fActionShowStartEndInMap = new ActionShowStartEndInMap(this);
 
 		/*
 		 * fill view toolbar
@@ -476,6 +507,8 @@ public class MappingView extends ViewPart {
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
+		menuMgr.add(fActionShowStartEndInMap);
+		menuMgr.add(fActionShowLegendInMap);
 		menuMgr.add(fActionShowSliderInMap);
 		menuMgr.add(fActionShowSliderInLegend);
 		menuMgr.add(new Separator());
@@ -493,13 +526,13 @@ public class MappingView extends ViewPart {
 	 */
 	private void createLegendImage(final ILegendProvider legendProvider) {
 
+		Image legendImage = fMapLegend.getImage();
+
 		// legend requires a tour with coordinates
 		if (legendProvider == null || isPaintDataValid(fTourData) == false) {
 			showDefaultMap();
 			return;
 		}
-
-		Image legendImage = fMapLegend.getImage();
 
 		// dispose old legend image
 		if (legendImage != null && !legendImage.isDisposed()) {
@@ -519,14 +552,17 @@ public class MappingView extends ViewPart {
 		legendImage = new Image(display, overlayImageData);
 		Rectangle legendImageBounds = legendImage.getBounds();
 
-		updateLegendValues(legendProvider, legendImageBounds);
+		boolean isDataAvailable = updateLegendValues(legendProvider, legendImageBounds);
 
 		final Color transparentColor = new Color(display, rgbTransparent);
 		final GC gc = new GC(legendImage);
 		{
 			gc.setBackground(transparentColor);
 			gc.fillRectangle(legendImageBounds);
-			TourPainter.drawLegendColors(gc, legendImageBounds, legendProvider, true);
+
+			if (isDataAvailable) {
+				TourPainter.drawLegendColors(gc, legendImageBounds, legendProvider, true);
+			}
 		}
 		gc.dispose();
 		transparentColor.dispose();
@@ -618,6 +654,17 @@ public class MappingView extends ViewPart {
 			fActionTourColorSpeed.setEnabled(false);
 			fActionTourColorPace.setEnabled(false);
 		}
+
+		// update legend actions
+		final boolean isLegendVisible = fActionShowLegendInMap.isChecked();
+
+		fMap.setShowLegend(isLegendVisible);
+
+		fActionShowSliderInLegend.setEnabled(isLegendVisible);
+		if (isLegendVisible == false) {
+			fActionShowSliderInLegend.setChecked(false);
+		}
+
 	}
 
 	public List<TileFactory> getFactories() {
@@ -867,7 +914,7 @@ public class MappingView extends ViewPart {
 		paintManager.setTourBounds(tourBounds);
 
 		fMap.setShowOverlays(isShowTour);
-		fMap.setShowLegend(isShowTour);
+		fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
 
 		// set position and zoom level for the tour
 		if (fIsMapSynchedWithTour && ignoreSynch == false) {
@@ -939,6 +986,7 @@ public class MappingView extends ViewPart {
 	private void restoreSettings() {
 
 		final IMemento memento = fSessionMemento;
+		final PaintManager paintManager = PaintManager.getInstance();
 
 		if (memento != null) {
 
@@ -971,6 +1019,18 @@ public class MappingView extends ViewPart {
 			final Integer zoomLevel = memento.getInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL);
 			if (zoomLevel != null) {
 				fActionSynchTourZoomLevel.setZoomLevel(zoomLevel);
+			}
+
+			// action: show start/end in map
+			Integer mementoShowStartEndInMap = memento.getInteger(MEMENTO_SHOW_START_END_IN_MAP);
+			if (mementoShowStartEndInMap != null) {
+				fActionShowStartEndInMap.setChecked(mementoShowStartEndInMap == 1);
+			}
+
+			// action: show legend in map
+			Integer mementoShowLegendInMap = memento.getInteger(MEMENTO_SHOW_LEGEND_IN_MAP);
+			if (mementoShowLegendInMap != null) {
+				fActionShowLegendInMap.setChecked(mementoShowLegendInMap == 1);
 			}
 
 			// action: show slider in map
@@ -1032,8 +1092,7 @@ public class MappingView extends ViewPart {
 				}
 
 				final ILegendProvider legendProvider = getLegendProvider(colorId);
-				PaintManager.getInstance().setLegendProvider(legendProvider);
-//				createLegendImage(legendProvider);
+				paintManager.setLegendProvider(legendProvider);
 			}
 
 		} else {
@@ -1044,20 +1103,27 @@ public class MappingView extends ViewPart {
 
 			// draw tour with default color
 			fActionTourColorAltitude.setChecked(true);
+		}
 
-			PaintManager.getInstance().setLegendProvider(getLegendProvider(TOUR_COLOR_ALTITUDE));
+		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+
+		// check legend provider
+		ILegendProvider legendProvider = paintManager.getLegendProvider();
+		if (legendProvider == null) {
+
+			// set default legend provider
+			paintManager.setLegendProvider(getLegendProvider(TOUR_COLOR_ALTITUDE));
 
 			// hide legend
 			fMap.setShowLegend(false);
 		}
 
-		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-
+		// debug info
 		final boolean isShowTileInfo = store.getBoolean(MappingView.SHOW_TILE_INFO);
-
 		fMap.setDrawTileBorders(isShowTileInfo);
-		actionSetDefaultPosition();
 
+		// show map with the default position
+		actionSetDefaultPosition();
 	}
 
 	private void saveSettings() {
@@ -1074,6 +1140,8 @@ public class MappingView extends ViewPart {
 		memento.putInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR, fActionSynchWithTour.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, fActionSynchTourZoomLevel.getZoomLevel());
 
+		memento.putInteger(MEMENTO_SHOW_START_END_IN_MAP, fActionShowStartEndInMap.isChecked() ? 1 : 0);
+		memento.putInteger(MEMENTO_SHOW_LEGEND_IN_MAP, fActionShowLegendInMap.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SHOW_SLIDER_IN_MAP, fActionShowSliderInMap.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SHOW_SLIDER_IN_LEGEND, fActionShowSliderInLegend.isChecked() ? 1 : 0);
 
@@ -1208,11 +1276,13 @@ public class MappingView extends ViewPart {
 	 * 
 	 * @param legendProvider
 	 * @param legendBounds
+	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
+	 *         when data are not available
 	 */
-	private void updateLegendValues(final ILegendProvider legendProvider, final Rectangle legendBounds) {
+	private boolean updateLegendValues(final ILegendProvider legendProvider, final Rectangle legendBounds) {
 
 		if (fTourData == null) {
-			return;
+			return false;
 		}
 
 		final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
@@ -1227,7 +1297,7 @@ public class MappingView extends ViewPart {
 
 			final int[] altitudeSerie = fTourData.getAltitudeSerie();
 			if (altitudeSerie == null) {
-				return;
+				return false;
 			}
 
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_ALTITUDE);
@@ -1241,7 +1311,7 @@ public class MappingView extends ViewPart {
 
 			final int[] pulseSerie = fTourData.pulseSerie;
 			if (pulseSerie == null) {
-				return;
+				return false;
 			}
 
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HEARTBEAT);
@@ -1255,7 +1325,7 @@ public class MappingView extends ViewPart {
 
 			final int[] speedSerie = fTourData.getSpeedSerie();
 			if (speedSerie == null) {
-				return;
+				return false;
 			}
 
 			legendConfig.unitFactor = 10;
@@ -1270,7 +1340,7 @@ public class MappingView extends ViewPart {
 
 			final int[] paceSerie = fTourData.getPaceSerie();
 			if (paceSerie == null) {
-				return;
+				return false;
 			}
 
 			legendConfig.unitFactor = 10;
@@ -1285,7 +1355,7 @@ public class MappingView extends ViewPart {
 
 			final int[] gradientSerie = fTourData.getGradientSerie();
 			if (gradientSerie == null) {
-				return;
+				return false;
 			}
 
 			legendConfig.unitFactor = 10;
@@ -1300,5 +1370,6 @@ public class MappingView extends ViewPart {
 			break;
 		}
 
+		return true;
 	}
 }

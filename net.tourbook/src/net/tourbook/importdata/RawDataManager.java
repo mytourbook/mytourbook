@@ -53,7 +53,7 @@ public class RawDataManager {
 
 	public static final String			TEMP_RAW_DATA_FILE			= "temp-device-data.txt";						//$NON-NLS-1$
 
-	protected static final String		RAW_DATA_LAST_SELECTED_PATH	= "raw-data-view.last-selected-import-path";
+	protected static final String		RAW_DATA_LAST_SELECTED_PATH	= "raw-data-view.last-selected-import-path"; //$NON-NLS-1$
 
 	private static RawDataManager		instance					= null;
 
@@ -400,7 +400,7 @@ public class RawDataManager {
 	public void updateTourDataFromDb_NOTWORKING() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void run() {
 
 				if (fTourDataMap.size() == 0) {
@@ -495,7 +495,7 @@ public class RawDataManager {
 	public void updateTourDataFromDb() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void run() {
 
 				EntityManager em = TourDatabase.getInstance().getEntityManager();

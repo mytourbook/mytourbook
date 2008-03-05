@@ -18,7 +18,6 @@ package net.tourbook.mapping;
 
 import java.util.List;
 
-import net.tourbook.Messages;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.UI;
@@ -145,7 +144,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 
 		super.create();
 
-		getShell().setText("Legend Color");
+		getShell().setText(Messages.legendcolor_dialog_title_name);
 
 		/*
 		 * initialize dialog by selecting select first value point
@@ -159,8 +158,12 @@ public class LegendColorDialog extends TitleAreaDialog {
 		}
 
 		fInizilizeControls = true;
-		updateUI();
+		{
+			updateUI();
+		}
 		fInizilizeControls = false;
+
+		setTitle(Messages.legendcolor_dialog_title);
 	}
 
 	@Override
@@ -170,8 +173,9 @@ public class LegendColorDialog extends TitleAreaDialog {
 
 		createUI(dlgAreaContainer);
 
-		setTitle(Messages.dlg_legend_color_title);
-		setMessage(NLS.bind("Set legend color for the {0}", fColorDefinition.getVisibleName()));
+		// trick to show the message
+		setMessage("");
+		setMessage(NLS.bind(Messages.legendcolor_dialog_title_message, fColorDefinition.getVisibleName()));
 
 		return dlgAreaContainer;
 	}
@@ -241,7 +245,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		Label label;
 
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText("Min/Max Brightness");
+		group.setText(Messages.legendcolor_dialog_group_minmax_brightness);
 		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
 		GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(group);
 
@@ -250,8 +254,8 @@ public class LegendColorDialog extends TitleAreaDialog {
 		 */
 
 		label = new Label(group, SWT.NONE);
-		label.setText("Max Brightness:");
-		label.setToolTipText("Set the brightness from the max value point to infinity");
+		label.setText(Messages.legendcolor_dialog_max_brightness_label);
+		label.setToolTipText(Messages.legendcolor_dialog_max_brightness_tooltip);
 
 		fComboMaxBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboMaxBrightness.addSelectionListener(fDefaultSelectionAdapter);
@@ -283,8 +287,8 @@ public class LegendColorDialog extends TitleAreaDialog {
 		 */
 
 		label = new Label(group, SWT.NONE);
-		label.setText("Min Brightness:");
-		label.setToolTipText("Set the brightness from the min value point to infinity");
+		label.setText(Messages.legendcolor_dialog_min_brightness_label);
+		label.setToolTipText(Messages.legendcolor_dialog_min_brightness_tooltip);
 
 		fComboMinBrightness = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboMinBrightness.addSelectionListener(fDefaultSelectionAdapter);
@@ -361,7 +365,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		};
 
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText("Min/Max Value");
+		group.setText(Messages.legendcolor_dialog_group_minmax_value);
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 		GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(group);
 
@@ -370,8 +374,8 @@ public class LegendColorDialog extends TitleAreaDialog {
 		 */
 
 		fChkForceMinValue = new Button(group, SWT.CHECK);
-		fChkForceMinValue.setText("Overwrite Min Value");
-		fChkForceMinValue.setToolTipText("Use this minimum value when the value is below this minimum");
+		fChkForceMinValue.setText(Messages.legendcolor_dialog_chk_min_value_text);
+		fChkForceMinValue.setToolTipText(Messages.legendcolor_dialog_chk_min_value_tooltip);
 		GridDataFactory.swtDefaults().applyTo(fChkForceMinValue);
 		fChkForceMinValue.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -385,7 +389,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		 * input: min value
 		 */
 		fLblMinValue = new Label(group, SWT.NONE);
-		fLblMinValue.setText("Min Value:");
+		fLblMinValue.setText(Messages.legendcolor_dialog_txt_min_value);
 		GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(fLblMinValue);
 
 		fTxtMinValue = new Text(group, SWT.BORDER);
@@ -401,8 +405,8 @@ public class LegendColorDialog extends TitleAreaDialog {
 		 */
 
 		fChkForceMaxValue = new Button(group, SWT.CHECK);
-		fChkForceMaxValue.setText("Overwrite Max Value");
-		fChkForceMaxValue.setToolTipText("Use this maximum value when the value is above this maximum");
+		fChkForceMaxValue.setText(Messages.legendcolor_dialog_chk_max_value_text);
+		fChkForceMaxValue.setToolTipText(Messages.legendcolor_dialog_chk_max_value_tooltip);
 		GridDataFactory.swtDefaults().applyTo(fChkForceMaxValue);
 		fChkForceMaxValue.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -416,7 +420,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		 * input: max value
 		 */
 		fLblMaxValue = new Label(group, SWT.NONE);
-		fLblMaxValue.setText("Max Value:");
+		fLblMaxValue.setText(Messages.legendcolor_dialog_txt_max_value);
 		GridDataFactory.fillDefaults().indent(20, 0).align(SWT.FILL, SWT.CENTER).applyTo(fLblMaxValue);
 
 		fTxtMaxValue = new Text(group, SWT.BORDER);
@@ -441,7 +445,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		 */
 
 		label = new Label(container, SWT.NONE);
-		label.setText("Value Point:");
+		label.setText(Messages.legendcolor_dialog_lbl_value_point);
 
 		fComboValuePoint = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 		fComboValuePoint.addSelectionListener(new SelectionAdapter() {
@@ -460,7 +464,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		 * group: value point color
 		 */
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText("Value Point Color");
+		group.setText(Messages.legendcolor_dialog_group_value_point_color);
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 		GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(group);
 
@@ -468,7 +472,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		 * red
 		 */
 		label = new Label(group, SWT.NONE);
-		label.setText("Red:");
+		label.setText(Messages.legendcolor_dialog_lbl_red);
 
 		fScaleRed = new Scale(group, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleRed);
@@ -484,7 +488,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		 * green
 		 */
 		label = new Label(group, SWT.NONE);
-		label.setText("Green:");
+		label.setText(Messages.legendcolor_dialog_lbl_green);
 
 		fScaleGreen = new Scale(group, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleGreen);
@@ -500,7 +504,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		 * blue
 		 */
 		label = new Label(group, SWT.NONE);
-		label.setText("Blue:");
+		label.setText(Messages.legendcolor_dialog_lbl_blue);
 
 		fScaleBlue = new Scale(group, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(fScaleBlue);
@@ -696,7 +700,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 			// validate min value
 
 			if (verifyIntegerValue(fTxtMinValue.getText()) == false) {
-				setErrorMessage("Min Value is required.");
+				setErrorMessage(Messages.legendcolor_dialog_error_min_value_is_required);
 				enableOK(false);
 				fTxtMinValue.setFocus();
 				return;
@@ -707,7 +711,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		if (isMaxEnabled) {
 
 			if (verifyIntegerValue(fTxtMaxValue.getText()) == false) {
-				setErrorMessage("Max Value is required.");
+				setErrorMessage(Messages.legendcolor_dialog_error_max_value_is_required);
 				enableOK(false);
 				fTxtMaxValue.setFocus();
 				return;
@@ -718,13 +722,14 @@ public class LegendColorDialog extends TitleAreaDialog {
 				&& isMaxEnabled
 				&& (Integer.parseInt(fTxtMaxValue.getText()) <= Integer.parseInt(fTxtMinValue.getText()))) {
 
-			setErrorMessage("Maximum value must be greater than the minimum value.");
+			setErrorMessage(Messages.legendcolor_dialog_error_max_greater_min);
 			enableOK(false);
 			return;
 		}
 
-		updateLegendData();
+		setMessage(NLS.bind(Messages.legendcolor_dialog_title_message, fColorDefinition.getVisibleName()));
 
+		updateLegendData();
 		enableOK(true);
 	}
 

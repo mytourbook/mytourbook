@@ -49,7 +49,7 @@ public class ValueColor {
 
 //		return value + "\t" + red + "\t" + green + "\t" + blue;
 
-		return "new ValueColor(" + value + ", " + red + ", " + green + ", " + blue + ")";
+		return "new ValueColor(" + value + ", " + red + ", " + green + ", " + blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 	}
 
 }

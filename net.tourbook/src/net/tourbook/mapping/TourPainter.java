@@ -43,7 +43,9 @@ import de.byteholder.gpx.GeoPosition;
  */
 public class TourPainter extends MapPainter {
 
-	private static final String	SPACER				= " ";
+	private static final int	LINE_WIDTH			= 7;
+
+	private static final String	SPACER				= " ";						//$NON-NLS-1$
 	private static final String	IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
 	private static final String	IMAGE_END_MARKER	= "map-marker-end.png";	//$NON-NLS-1$
 
@@ -56,17 +58,6 @@ public class TourPainter extends MapPainter {
 
 	private int[]				fDataSerie;
 	private ILegendProvider		fLegendProvider;
-
-//	public static class LegendPosition {
-//
-//		int				legendWidth;
-//		int				legendHeight;
-//		int				legendPositionX;
-//		int				legendPositionY;
-//
-//		int				availableLegendPixels;
-//		public boolean	isVertical;
-//	}
 
 	public TourPainter() {
 
@@ -475,19 +466,30 @@ public class TourPainter extends MapPainter {
 		// draw tour
 		boolean isOverlayInTile = drawTourInTile(gc, map, tile, tourData);
 
+		// status if a marker is drawn
 		boolean isMarkerInTile = false;
 
-		// draw end marker
-		isMarkerInTile = drawMarker(gc,
-				map,
-				tile,
-				latitudeSerie[latitudeSerie.length - 1],
-				longitudeSerie[longitudeSerie.length - 1],
-				fImageEndMarker);
-		isOverlayInTile = isOverlayInTile || isMarkerInTile;
+		// draw start/end marker
+		if (paintManager.isShowStartEndInMap()) {
 
-		// draw start marker
-		isMarkerInTile = drawMarker(gc, map, tile, latitudeSerie[0], longitudeSerie[0], fImageStartMarker);
+			// draw end marker
+			isMarkerInTile = drawMarker(gc,
+					map,
+					tile,
+					latitudeSerie[latitudeSerie.length - 1],
+					longitudeSerie[longitudeSerie.length - 1],
+					fImageEndMarker);
+
+			isOverlayInTile = isOverlayInTile || isMarkerInTile;
+
+			// draw start marker
+			isMarkerInTile = drawMarker(gc,//
+					map,
+					tile,
+					latitudeSerie[0],
+					longitudeSerie[0],
+					fImageStartMarker);
+		}
 
 		isOverlayInTile = isOverlayInTile || isMarkerInTile;
 
@@ -537,8 +539,6 @@ public class TourPainter extends MapPainter {
 
 	private boolean drawTourInTile(final GC gc, final Map map, final Tile tile, final TourData tourData) {
 
-		final int lineWidth = 7;
-
 		final TileFactory tileFactory = map.getTileFactory();
 		final int zoomLevel = map.getZoom();
 		final int tileSize = tileFactory.getInfo().getTileSize();
@@ -557,8 +557,9 @@ public class TourPainter extends MapPainter {
 
 		final Display display = Display.getCurrent();
 		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
+
 		gc.setForeground(systemColorBlue);
-		gc.setLineWidth(lineWidth);
+		gc.setBackground(systemColorBlue);
 
 		boolean isTourInTile = false;
 		int lastInsideIndex = -99;
@@ -586,8 +587,6 @@ public class TourPainter extends MapPainter {
 				if (devPosition.equals(devPreviousPosition) == false) {
 
 					isTourInTile = true;
-
-//					gc.drawImage(fPositionImage, devPosition.x - posImageWidth, devPosition.y - posImageHeight);
 
 					drawTourLine(gc, serieIndex, devPosition, devPreviousPosition);
 				}
@@ -621,17 +620,30 @@ public class TourPainter extends MapPainter {
 								final java.awt.Point devPosition,
 								final java.awt.Point devPreviousPosition) {
 
+		gc.setLineWidth(LINE_WIDTH);
+
 		if (fDataSerie == null) {
+
+			// draw default line when data are not available
 
 			gc.drawLine(devPreviousPosition.x, devPreviousPosition.y, devPosition.x, devPosition.y);
 
+//			gc.setLineWidth(0);
+//			gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH - 1, LINE_WIDTH - 1);
+
 		} else {
+
+			// draw line with the color from the legend provider
 
 			final Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
 
 			{
 				gc.setForeground(lineColor);
 				gc.drawLine(devPreviousPosition.x, devPreviousPosition.y, devPosition.x, devPosition.y);
+
+//				gc.setLineWidth(0);
+//				gc.setBackground(lineColor);
+//				gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH - 3, LINE_WIDTH - 3);
 			}
 
 			lineColor.dispose();
@@ -661,7 +673,7 @@ public class TourPainter extends MapPainter {
 
 		final LegendConfig config = fLegendProvider.getLegendConfig();
 
-		final Integer unitFactor = config.unitFactor;
+//		final Integer unitFactor = config.unitFactor;
 //		dataValue /= unitFactor;
 
 		final int legendMaxValue = config.legendMaxValue;

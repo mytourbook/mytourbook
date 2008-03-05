@@ -19,7 +19,7 @@ package net.tourbook.mapping;
 public class LegendColor {
 
 	public static final String[]	BRIGHTNESS_LABELS		= new String[] //
-															{ "Keep Color", "Dim Color", "Lighten Color" };
+															{ Messages.legend_color_keep_color, Messages.legend_color_dim_color, Messages.legend_color_lighten_color };
 
 	public static final int			BRIGHTNESS_DEFAULT		= 0;
 	public static final int			BRIGHTNESS_DIMMING		= 1;

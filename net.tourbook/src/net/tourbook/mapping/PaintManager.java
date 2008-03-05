@@ -36,6 +36,8 @@ public class PaintManager {
 
 	private ILegendProvider		fLegendProvider;
 
+	private boolean				fShowStartEndInMap;
+
 	private PaintManager() {}
 
 	public static PaintManager getInstance() {
@@ -69,8 +71,16 @@ public class PaintManager {
 		return fTourData;
 	}
 
+	public boolean isShowStartEndInMap() {
+		return fShowStartEndInMap;
+	}
+
 	public void setLegendProvider(ILegendProvider legendProvider) {
 		fLegendProvider = legendProvider;
+	}
+
+	public void setShowStartEnd(boolean isVisible) {
+		fShowStartEndInMap = isVisible;
 	}
 
 	public void setSynchTourZoomLevel(int zoomLevel) {

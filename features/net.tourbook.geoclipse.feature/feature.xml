@@ -59,4 +59,25 @@
          version="0.0.0"
          unpack="false"/>
 
+   <plugin
+         id="de.byteholder.geoclipse.tilefactory.empty"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.byteholder.geoclipse.tilefactory.osm.cycle"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.byteholder.geoclipse.tilefactory.osm.tile.at.home"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>
