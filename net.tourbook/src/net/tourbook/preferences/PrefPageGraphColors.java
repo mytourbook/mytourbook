@@ -267,15 +267,17 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		// tree columns
 		TreeColumn tc;
 
+		int colorWidth=(tree.getItemHeight() + 5) * 4 + 0;
+		
 		tc = new TreeColumn(tree, SWT.NONE);
 		tc.setText(Messages.Pref_ChartColors_Column_color);
 		treeLayouter.addColumnData(new ColumnWeightData(30, true));
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		treeLayouter.addColumnData(new ColumnWeightData(10, true));
+		treeLayouter.addColumnData(new ColumnPixelData(colorWidth, true));
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		treeLayouter.addColumnData(new ColumnWeightData(10, true));
+		treeLayouter.addColumnData(new ColumnPixelData(colorWidth, true));
 
 		tc = new TreeColumn(tree, SWT.NONE);
 		treeLayouter.addColumnData(new ColumnPixelData(10, false));
