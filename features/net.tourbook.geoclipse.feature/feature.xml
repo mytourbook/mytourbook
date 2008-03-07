@@ -2,8 +2,8 @@
 <feature
       id="net.tourbook.geoclipse.feature"
       label="Geoclipse Feature"
-      version="1.4.0"
-      provider-name="MyTourbook">
+      version="0.0.1.v20080312"
+      provider-name="de.byteholder.geoclipse">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
