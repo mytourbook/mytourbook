@@ -56,11 +56,8 @@ public interface ITourbookPreferences {
 
 	public static final String	GRAPH_ALTIMETER_MIN_ENABLED				= "graphs.altimeter.is-min-enabled";			//$NON-NLS-1$
 	public static final String	GRAPH_ALTIMETER_MIN_VALUE				= "graphs.altimeter.min-value";				//$NON-NLS-1$
-
 	public static final String	GRAPH_GRADIENT_MIN_ENABLED				= "graphs.gradient.is-min-enabled";			//$NON-NLS-1$
 	public static final String	GRAPH_GRADIENT_MIN_VALUE				= "graphs.gradient.min-value";					//$NON-NLS-1$
-
-//	public static final String	GRAPH_LEGEND_COLOR						= "graph.legend.color";						//$NON-NLS-1$
 
 	public static final String	DEFAULT_IMPORT_TOUR_TYPE_ID				= "tourtype.import.default";					//$NON-NLS-1$
 
@@ -107,5 +104,11 @@ public interface ITourbookPreferences {
 	public static final String	MEASUREMENT_SYSTEM_TEMPTERATURE_F		= "metric.fahrenheit";							//$NON-NLS-1$
 
 	public static final String	MEASUREMENT_SYSTEM_SHOW_IN_UI			= "system.of.measurement.show.in.ui";			//$NON-NLS-1$
+
+	/*
+	 * map settings
+	 */
+	public static final String	MAP_PROVIDERS_SORT_ORDER				= "map.provider.sort.order";
+	public static final String	MAP_PROVIDERS_TOGGLE_LIST				= "map.provider.toggle.list";
 
 }

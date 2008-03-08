@@ -105,6 +105,8 @@ public class Messages extends NLS {
 	public static String	legendcolor_dialog_txt_min_value;
 
 	public static String		map_action_change_tile_factory_tooltip;
+
+	public static String	map_action_modify_map_provider;
 	public static String		map_action_save_default_position;
 	public static String		map_action_set_default_position;
 
@@ -136,6 +138,18 @@ public class Messages extends NLS {
 	public static String		map_properties_show_tile_info;
 	public static String		map_properties_show_tile_info_no;
 	public static String		map_properties_show_tile_info_yes;
+
+	public static String	modify_mapprovider_btn_down;
+
+	public static String	modify_mapprovider_btn_up;
+
+	public static String	modify_mapprovider_dialog_area_message;
+
+	public static String	modify_mapprovider_dialog_area_title;
+
+	public static String	modify_mapprovider_dialog_title;
+
+	public static String	ModifyMapProviderDialog_modify_mapprovider_lbl_toggle_info;
 
 	static {
 		// initialize resource bundle

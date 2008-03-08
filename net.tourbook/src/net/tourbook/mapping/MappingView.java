@@ -18,6 +18,7 @@ package net.tourbook.mapping;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +48,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -124,7 +126,7 @@ public class MappingView extends ViewPart {
 	private TourData								fTourData;
 	private TourData								fPreviousTourData;
 
-	private ActionChangeTileFactory					fActionChangeTileFactory;
+	private ActionSelectMapProvider					fActionSelectMapProvider;
 	private ActionSaveDefaultPosition				fActionSaveDefaultPosition;
 	private ActionSetDefaultPosition				fActionSetDefaultPosition;
 	private ActionShowTourInMap						fActionShowTourInMap;
@@ -148,7 +150,7 @@ public class MappingView extends ViewPart {
 	private boolean									fIsMapSynchedWithTour;
 	private boolean									fIsPositionCentered;
 
-	private List<TileFactory>						fTileFactories;
+	private List<MapProvider>					fTileFactories;
 
 	private int										fDefaultZoom;
 	private GeoPosition								fDefaultPosition					= null;
@@ -172,6 +174,17 @@ public class MappingView extends ViewPart {
 	private final HashMap<Integer, ILegendProvider>	fLegendProviders					= new HashMap<Integer, ILegendProvider>();
 
 	public MappingView() {}
+
+	public void actionOpenMapProviderDialog() {
+
+		final ModifyMapProviderDialog dialog = new ModifyMapProviderDialog(Display.getCurrent().getActiveShell(), this);
+
+		final int returnValue = dialog.open();
+
+		if (returnValue == Window.OK) {
+			fActionSelectMapProvider.updateMapProviders();
+		}
+	}
 
 	void actionSaveDefaultPosition() {
 		fDefaultZoom = fMap.getZoom();
@@ -472,7 +485,7 @@ public class MappingView extends ViewPart {
 		fActionSynchWithTour = new ActionSynchWithTour(this);
 		fActionShowTourInMap = new ActionShowTourInMap(this);
 		fActionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
-		fActionChangeTileFactory = new ActionChangeTileFactory(this);
+		fActionSelectMapProvider = new ActionSelectMapProvider(this);
 		fActionSetDefaultPosition = new ActionSetDefaultPosition(this);
 		fActionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
 		fActionShowSliderInMap = new ActionShowSliderInMap(this);
@@ -499,7 +512,7 @@ public class MappingView extends ViewPart {
 		viewTbm.add(fActionZoomIn);
 		viewTbm.add(fActionZoomOut);
 		viewTbm.add(new Separator());
-		viewTbm.add(fActionChangeTileFactory);
+		viewTbm.add(fActionSelectMapProvider);
 		viewTbm.add(fActionZoomShowAll);
 
 		/*
@@ -599,7 +612,12 @@ public class MappingView extends ViewPart {
 		fMap.setLegend(fMapLegend);
 		fMap.setShowLegend(true);
 
-		fTileFactories = GeoclipseExtensions.getInstance().readExtensions(fMap);
+		// create list with all map factories
+		fTileFactories = new ArrayList<MapProvider>();
+		List<TileFactory> tileFactories = GeoclipseExtensions.getInstance().readExtensions(fMap);
+		for (TileFactory tileFactory : tileFactories) {
+			fTileFactories.add(new MapProvider(tileFactory));
+		}
 
 		createActions();
 		createLegendProviders();
@@ -636,10 +654,31 @@ public class MappingView extends ViewPart {
 
 	private void enableActions() {
 
+		// update legend action
+		if (fIsTour) {
+
+			final boolean isLegendVisible = fActionShowLegendInMap.isChecked();
+
+			fMap.setShowLegend(isLegendVisible);
+
+			fActionShowSliderInLegend.setEnabled(isLegendVisible);
+			if (isLegendVisible == false) {
+				fActionShowSliderInLegend.setChecked(false);
+			}
+		}
+
+		/*
+		 * enable/disable tour actions
+		 */
 		fActionZoomShowEntireTour.setEnabled(fIsTour);
 		fActionSynchTourZoomLevel.setEnabled(fIsTour);
 		fActionShowTourInMap.setEnabled(fIsTour);
 		fActionSynchWithTour.setEnabled(fIsTour);
+
+		fActionShowStartEndInMap.setEnabled(fIsTour);
+		fActionShowLegendInMap.setEnabled(fIsTour);
+		fActionShowSliderInMap.setEnabled(fIsTour);
+		fActionShowSliderInLegend.setEnabled(fIsTour);
 
 		if (fIsTour && fTourData != null) {
 			fActionTourColorAltitude.setEnabled(true);
@@ -654,20 +693,9 @@ public class MappingView extends ViewPart {
 			fActionTourColorSpeed.setEnabled(false);
 			fActionTourColorPace.setEnabled(false);
 		}
-
-		// update legend actions
-		final boolean isLegendVisible = fActionShowLegendInMap.isChecked();
-
-		fMap.setShowLegend(isLegendVisible);
-
-		fActionShowSliderInLegend.setEnabled(isLegendVisible);
-		if (isLegendVisible == false) {
-			fActionShowSliderInLegend.setChecked(false);
-		}
-
 	}
 
-	public List<TileFactory> getFactories() {
+	public List<MapProvider> getFactories() {
 		return fTileFactories;
 	}
 
@@ -1046,7 +1074,7 @@ public class MappingView extends ViewPart {
 			}
 
 			// restore: factory ID
-			fActionChangeTileFactory.setSelectedFactory(memento.getString(MEMENTO_CURRENT_FACTORY_ID));
+			fActionSelectMapProvider.setSelectedFactory(memento.getString(MEMENTO_CURRENT_FACTORY_ID));
 
 			// restore: default position
 			final Integer mementoZoom = memento.getInteger(MEMENTO_DEFAULT_POSITION_ZOOM);
@@ -1099,7 +1127,7 @@ public class MappingView extends ViewPart {
 
 			// memento is not available, set default values
 
-			fActionChangeTileFactory.setSelectedFactory(null);
+			fActionSelectMapProvider.setSelectedFactory(null);
 
 			// draw tour with default color
 			fActionTourColorAltitude.setChecked(true);
@@ -1145,7 +1173,7 @@ public class MappingView extends ViewPart {
 		memento.putInteger(MEMENTO_SHOW_SLIDER_IN_MAP, fActionShowSliderInMap.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SHOW_SLIDER_IN_LEGEND, fActionShowSliderInLegend.isChecked() ? 1 : 0);
 
-		memento.putString(MEMENTO_CURRENT_FACTORY_ID, fActionChangeTileFactory.getSelectedFactory()
+		memento.putString(MEMENTO_CURRENT_FACTORY_ID, fActionSelectMapProvider.getSelectedFactory()
 				.getInfo()
 				.getFactoryID());
 
