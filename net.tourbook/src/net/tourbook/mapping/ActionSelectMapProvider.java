@@ -36,7 +36,7 @@ import de.byteholder.geoclipse.map.TileFactory;
 
 public class ActionSelectMapProvider extends Action implements IMenuCreator {
 
-	private static final String							TOGGLE_MARKER	= " (x)";
+	private static final String							TOGGLE_MARKER	= " (x)";						//$NON-NLS-1$
 
 	private static int									fFactoryCounter	= 0;
 
@@ -195,9 +195,9 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 			mapProvider = mapFactories.get(fFactoryCounter++ % mapFactories.size());
 		}
 
-		// check map provider action for the new map provider
+		// check map provider action for the selected map provider
 		for (final MapProviderAction factoryAction : fSortedMapProviderActions) {
-			if (factoryAction.mapProvider == mapProvider) {
+			if (factoryAction.mapProvider.getInfo().getFactoryID().equals(mapProvider.getInfo().getFactoryID())) {
 				factoryAction.setChecked(true);
 			} else {
 				factoryAction.setChecked(false);
@@ -206,6 +206,9 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 
 		// select map provider in the map
 		selectMapProviderInTheMap(mapProvider);
+
+		// update tooltip, show selected map provider
+		setToolTipText(mapProvider.getInfo().getFactoryName() + " - " + Messages.map_action_change_tile_factory_tooltip); //$NON-NLS-1$
 	}
 
 	private void selectMapProviderInTheMap(final TileFactory mapProvider) {

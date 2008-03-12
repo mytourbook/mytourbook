@@ -147,7 +147,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		createUIButtons(dlgContainer);
 
 		Label label = new Label(dlgContainer, SWT.WRAP);
-		label.setText(Messages.ModifyMapProviderDialog_modify_mapprovider_lbl_toggle_info);
+		label.setText(Messages.modify_mapprovider_lbl_toggle_info);
 		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(label);
 
 		// spacer

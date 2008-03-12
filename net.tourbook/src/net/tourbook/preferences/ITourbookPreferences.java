@@ -108,7 +108,7 @@ public interface ITourbookPreferences {
 	/*
 	 * map settings
 	 */
-	public static final String	MAP_PROVIDERS_SORT_ORDER				= "map.provider.sort.order";
-	public static final String	MAP_PROVIDERS_TOGGLE_LIST				= "map.provider.toggle.list";
+	public static final String	MAP_PROVIDERS_SORT_ORDER				= "map.provider.sort.order"; //$NON-NLS-1$
+	public static final String	MAP_PROVIDERS_TOGGLE_LIST				= "map.provider.toggle.list"; //$NON-NLS-1$
 
 }

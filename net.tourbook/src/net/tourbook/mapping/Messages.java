@@ -22,8 +22,7 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.mapping.messages";	//$NON-NLS-1$
 
-	public static String	graph_label_gradient_unit;
-
+	public static String		graph_label_gradient_unit;
 	public static String		graph_label_heartbeat_unit;
 
 	public static String		image_action_change_tile_factory;
@@ -52,79 +51,43 @@ public class Messages extends NLS {
 	public static String		image_action_zoom_show_all_disabled;
 	public static String		image_action_zoom_show_entire_tour;
 
-	public static String	legend_color_dim_color;
+	public static String		legend_color_dim_color;
+	public static String		legend_color_keep_color;
+	public static String		legend_color_lighten_color;
 
-	public static String	legend_color_keep_color;
-
-	public static String	legend_color_lighten_color;
-
-	public static String	legendcolor_dialog_chk_max_value_text;
-
-	public static String	legendcolor_dialog_chk_max_value_tooltip;
-
-	public static String	legendcolor_dialog_chk_min_value_text;
-
-	public static String	legendcolor_dialog_chk_min_value_tooltip;
-
-	public static String	legendcolor_dialog_error_max_greater_min;
-
-	public static String	legendcolor_dialog_error_max_value_is_required;
-
-	public static String	legendcolor_dialog_error_min_value_is_required;
-
-	public static String	legendcolor_dialog_group_minmax_brightness;
-
-	public static String	legendcolor_dialog_group_minmax_value;
-
-	public static String	legendcolor_dialog_group_value_point_color;
-
-	public static String	legendcolor_dialog_lbl_blue;
-
-	public static String	legendcolor_dialog_lbl_green;
-
-	public static String	legendcolor_dialog_lbl_red;
-
-	public static String	legendcolor_dialog_lbl_value_point;
-
-	public static String	legendcolor_dialog_max_brightness_label;
-
-	public static String	legendcolor_dialog_max_brightness_tooltip;
-
-	public static String	legendcolor_dialog_min_brightness_label;
-
-	public static String	legendcolor_dialog_min_brightness_tooltip;
-
-	public static String	legendcolor_dialog_title;
-
-	public static String	legendcolor_dialog_title_message;
-
-	public static String	legendcolor_dialog_title_name;
-
-	public static String	legendcolor_dialog_txt_max_value;
-
-	public static String	legendcolor_dialog_txt_min_value;
+	public static String		legendcolor_dialog_chk_max_value_text;
+	public static String		legendcolor_dialog_chk_max_value_tooltip;
+	public static String		legendcolor_dialog_chk_min_value_text;
+	public static String		legendcolor_dialog_chk_min_value_tooltip;
+	public static String		legendcolor_dialog_error_max_greater_min;
+	public static String		legendcolor_dialog_error_max_value_is_required;
+	public static String		legendcolor_dialog_error_min_value_is_required;
+	public static String		legendcolor_dialog_group_minmax_brightness;
+	public static String		legendcolor_dialog_group_minmax_value;
+	public static String		legendcolor_dialog_max_brightness_label;
+	public static String		legendcolor_dialog_max_brightness_tooltip;
+	public static String		legendcolor_dialog_min_brightness_label;
+	public static String		legendcolor_dialog_min_brightness_tooltip;
+	public static String		legendcolor_dialog_title;
+	public static String		legendcolor_dialog_title_message;
+	public static String		legendcolor_dialog_title_name;
+	public static String		legendcolor_dialog_txt_max_value;
+	public static String		legendcolor_dialog_txt_min_value;
 
 	public static String		map_action_change_tile_factory_tooltip;
-
-	public static String	map_action_modify_map_provider;
+	public static String		map_action_modify_map_provider;
 	public static String		map_action_save_default_position;
 	public static String		map_action_set_default_position;
-
-	public static String	map_action_show_legend_in_map;
-
-	public static String	map_action_show_slider_in_legend;
-
-	public static String	map_action_show_slider_in_map;
-
-	public static String	map_action_show_start_finish_in_map;
+	public static String		map_action_show_legend_in_map;
+	public static String		map_action_show_slider_in_legend;
+	public static String		map_action_show_slider_in_map;
+	public static String		map_action_show_start_finish_in_map;
 	public static String		map_action_show_tour_in_map;
 	public static String		map_action_synch_with_tour;
-
 	public static String		map_action_tour_color_altitude_tooltip;
 	public static String		map_action_tour_color_gradient_tooltip;
 	public static String		map_action_tour_color_pase_tooltip;
 	public static String		map_action_tour_color_pulse_tooltip;
-
 	public static String		map_action_tour_color_speed_tooltip;
 	public static String		map_action_zoom_centered;
 	public static String		map_action_zoom_in;
@@ -139,17 +102,12 @@ public class Messages extends NLS {
 	public static String		map_properties_show_tile_info_no;
 	public static String		map_properties_show_tile_info_yes;
 
-	public static String	modify_mapprovider_btn_down;
-
-	public static String	modify_mapprovider_btn_up;
-
-	public static String	modify_mapprovider_dialog_area_message;
-
-	public static String	modify_mapprovider_dialog_area_title;
-
-	public static String	modify_mapprovider_dialog_title;
-
-	public static String	ModifyMapProviderDialog_modify_mapprovider_lbl_toggle_info;
+	public static String		modify_mapprovider_btn_down;
+	public static String		modify_mapprovider_btn_up;
+	public static String		modify_mapprovider_dialog_area_message;
+	public static String		modify_mapprovider_dialog_area_title;
+	public static String		modify_mapprovider_dialog_title;
+	public static String		modify_mapprovider_lbl_toggle_info;
 
 	static {
 		// initialize resource bundle
