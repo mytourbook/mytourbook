@@ -18,6 +18,7 @@ package net.tourbook.mapping;
 
 import de.byteholder.geoclipse.map.DefaultTileFactory;
 import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.util.Projection;
 
 public class MapProvider extends DefaultTileFactory {
 
@@ -26,8 +27,9 @@ public class MapProvider extends DefaultTileFactory {
 	 */
 	private boolean	fCanBeToggled	= false;
 
-	public MapProvider(TileFactory tileFactory) {
+	public MapProvider(TileFactory tileFactory, Projection projection) {
 		super(tileFactory.getInfo());
+		this.projection = projection;
 	}
 
 	boolean canBeToggled() {

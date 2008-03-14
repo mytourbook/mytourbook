@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
 import de.byteholder.geoclipse.map.TileFactory;
+import de.byteholder.geoclipse.swt.Map;
 
 public class ActionSelectMapProvider extends Action implements IMenuCreator {
 
@@ -107,7 +108,8 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 
 		for (final TileFactory tileFactory : factories) {
 			fMapProviderActions.put(tileFactory.getInfo().getFactoryID(),
-					new MapProviderAction(new MapProvider(tileFactory), tileFactory.getInfo().getFactoryName()));
+					new MapProviderAction(new MapProvider(tileFactory, tileFactory.getProjection()),
+							tileFactory.getInfo().getFactoryName()));
 		}
 
 		fActionModifyMapProvider = new ActionModifyMapProvider(mapView);
@@ -212,8 +214,12 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 	}
 
 	private void selectMapProviderInTheMap(final TileFactory mapProvider) {
+
 		fSelectedTileFactory = mapProvider;
-		fMappingView.getMap().setTileFactory(mapProvider);
+
+		final Map map = fMappingView.getMap();
+		map.resetOverlayImageCache();
+		map.setTileFactory(mapProvider);
 	}
 
 	/**

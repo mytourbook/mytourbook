@@ -92,7 +92,7 @@ public class MappingView extends ViewPart {
 	public static final int							TOUR_COLOR_SPEED					= 40;
 	public static final int							TOUR_COLOR_PACE						= 50;
 
-	private static final String						MEMENTO_SHOW_START_END_IN_MAP		= "action.show-start-end-in-map"; //$NON-NLS-1$
+	private static final String						MEMENTO_SHOW_START_END_IN_MAP		= "action.show-start-end-in-map";			//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_SLIDER_IN_MAP			= "action.show-slider-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_SLIDER_IN_LEGEND		= "action.show-slider-in-legend";			//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_LEGEND_IN_MAP			= "action.show-legend-in-map";				//$NON-NLS-1$
@@ -175,7 +175,7 @@ public class MappingView extends ViewPart {
 
 	public MappingView() {}
 
-	public void actionOpenMapProviderDialog() {
+	void actionOpenMapProviderDialog() {
 
 		final ModifyMapProviderDialog dialog = new ModifyMapProviderDialog(Display.getCurrent().getActiveShell(), this);
 
@@ -616,7 +616,9 @@ public class MappingView extends ViewPart {
 		fTileFactories = new ArrayList<MapProvider>();
 		List<TileFactory> tileFactories = GeoclipseExtensions.getInstance().readExtensions(fMap);
 		for (TileFactory tileFactory : tileFactories) {
-			fTileFactories.add(new MapProvider(tileFactory));
+
+			final MapProvider mapProvider = new MapProvider(tileFactory, tileFactory.getProjection());
+			fTileFactories.add(mapProvider);
 		}
 
 		createActions();
