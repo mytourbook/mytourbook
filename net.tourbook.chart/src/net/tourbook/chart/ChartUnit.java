@@ -26,6 +26,12 @@ public class ChartUnit {
 	String	valueLabel;
 	int		value;
 
+	/**
+	 * alternate background color is used for statistics when more than one year is displayed to
+	 * identify a year easier
+	 */
+	boolean	isAlternateBgColor	= false;
+
 	public ChartUnit(int value, String valueLabel) {
 
 		this.value = value;

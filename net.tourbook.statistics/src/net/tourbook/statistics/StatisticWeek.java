@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -35,7 +35,8 @@ public abstract class StatisticWeek extends YearStatistic {
 	BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
 
 	private TourPerson		fActivePerson;
-	private int				fCurrentYear;
+	int						fCurrentYear;
+	int						fNumberOfYears;
 	private TourTypeFilter	fActiveTourTypeFilter;
 
 	private final Calendar	fCalendar		= GregorianCalendar.getInstance();
@@ -54,9 +55,7 @@ public abstract class StatisticWeek extends YearStatistic {
 	public void deactivateActions(IWorkbenchPartSite partSite) {}
 
 	@Override
-	public void createControl(	Composite parent,
-								IViewSite viewSite,
-								final IPostSelectionProvider postSelectionProvider) {
+	public void createControl(Composite parent, IViewSite viewSite, final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -68,21 +67,24 @@ public abstract class StatisticWeek extends YearStatistic {
 	}
 
 	public void prefColorChanged() {
-		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, false);
+		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, fNumberOfYears, false);
 	}
 
 	public void refreshStatistic(	TourPerson person,
 									TourTypeFilter typeId,
-									int year,
+									int currentYear,
+									int numberOfYears,
 									boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourTypeFilter = typeId;
-		fCurrentYear = year;
+		fCurrentYear = currentYear;
+		fNumberOfYears = numberOfYears;
 
 		TourDataWeek tourWeekData = ProviderTourWeek.getInstance().getWeekData(person,
 				typeId,
-				year,
+				currentYear,
+				numberOfYears,
 				isDataDirtyWithReset() || refreshData);
 
 		// reset min/max values

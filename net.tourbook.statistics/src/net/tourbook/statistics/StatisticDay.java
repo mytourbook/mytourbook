@@ -289,13 +289,13 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	// }
 
 	public void prefColorChanged() {
-		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, false);
+		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, 1, false);
 	}
 
 	public void refreshStatistic(	final TourPerson person,
 									final TourTypeFilter tourTypeFilter,
 									final int year,
-									final boolean refreshData) {
+									int numberOfYears, final boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourTypeFilter = tourTypeFilter;

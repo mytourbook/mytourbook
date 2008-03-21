@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -1200,7 +1200,6 @@ public class ChartComponentGraph extends Canvas {
 				final int valueYHigh = yHighValues[valueIndex];
 
 				final int barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh, valueYLow));
-
 				if (barHeight == 0) {
 					continue;
 				}
@@ -1237,7 +1236,6 @@ public class ChartComponentGraph extends Canvas {
 				/*
 				 * draw bar
 				 */
-
 				if (devBarWidthComputed > 0) {
 
 					gc.setForeground(colorBright);
@@ -1649,8 +1647,7 @@ public class ChartComponentGraph extends Canvas {
 					}
 
 					if (graphIndex == fDrawingData.size() - 1) {
-						// draw the unit label and unit tick only on the
-						// last graph
+						// draw the unit label and unit tick for the last graph
 						drawXUnits(gc, drawingData, true, true);
 					} else {
 						drawXUnits(gc, drawingData, false, true);
@@ -1712,7 +1709,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final Display display = getDisplay();
 
-		final int yDevBottom = drawingData.getDevYBottom();
+		final int devYBottom = drawingData.getDevYBottom();
 		final ArrayList<ChartUnit> unitList = drawingData.getYUnits();
 
 		int unitCount = 0;
@@ -1722,7 +1719,7 @@ public class ChartComponentGraph extends Canvas {
 		final int devGraphHeight = drawingData.getDevGraphHeight();
 		final boolean yAxisDirection = drawingData.getYData().isYAxisDirection();
 
-		final int yDevTop = yDevBottom - devGraphHeight;
+		final int devYTop = devYBottom - devGraphHeight;
 
 		// loop: all units
 		for (final ChartUnit unit : unitList) {
@@ -1730,10 +1727,10 @@ public class ChartComponentGraph extends Canvas {
 			int devY;
 			if (yAxisDirection || (unitList.size() == 1)) {
 				// bottom->top
-				devY = yDevBottom - (int) ((float) (unit.value - graphYBottom) * scaleY);
+				devY = devYBottom - (int) ((float) (unit.value - graphYBottom) * scaleY);
 			} else {
 				// top->bottom
-				devY = yDevTop + (int) ((float) (unit.value - graphYBottom) * scaleY);
+				devY = devYTop + (int) ((float) (unit.value - graphYBottom) * scaleY);
 			}
 
 			if ((yAxisDirection == false && unitCount == unitList.size() - 1) || (yAxisDirection && unitCount == 0)) {
@@ -2719,11 +2716,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final Point titleExtend = gc.textExtent(title);
 
-		gc.drawText(title, (devGraphWidth / 2) - (titleExtend.x / 2), (devYTitle),// +
-				// (titleExtend.y
-				// /
-				// 2)),
-				true);
+		gc.drawText(title, (devGraphWidth / 2) - (titleExtend.x / 2), (devYTitle), true);
 	}
 
 	/**
@@ -2743,17 +2736,19 @@ public class ChartComponentGraph extends Canvas {
 							final boolean draw0Unit) {
 
 		final Display display = getDisplay();
+		Color alternateColor = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5); // efefef
 
 		final ArrayList<ChartUnit> units = drawingData.getXUnits();
 
-		final int devY = drawingData.getDevYBottom();
+		final int devYBottom = drawingData.getDevYBottom();
+		final int devYTop = drawingData.getDevYTop();
 		final int unitPos = drawingData.getXUnitTextPos();
 		final float scaleX = drawingData.getScaleX();
 
 		// compute the distance between two units
-		final int devUnitWidth = (int) (units.size() > 1
-				? ((units.get(1).value * scaleX) - (units.get(0).value * scaleX))
-				: 0);
+		final float devUnitWidth = units.size() > 1 ? //
+				((units.get(1).value * scaleX) - (units.get(0).value * scaleX))
+				: 0;
 
 		int devXOffset = 0;
 		int unitOffset = 0;
@@ -2766,6 +2761,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		boolean isUnitLabelPrinted = false;
+		int devNextXUnitTick;
 
 		for (final ChartUnit unit : units) {
 
@@ -2778,15 +2774,36 @@ public class ChartComponentGraph extends Canvas {
 				continue;
 			}
 
-//			System.out.println(devXUnitTick + " " + unit.valueLabel);
-
 			// dev x-position for the unit tick
 			final int devXUnitTick = devXOffset + (int) (unit.value * scaleX);
 
-			final Point unitValueExtend = gc.textExtent(unit.valueLabel);
+			// get position for the next unit
+			if (unitCounter < units.size() - 1) {
+				devNextXUnitTick = devXOffset + (int) (units.get(unitCounter + 1).value * scaleX);
+			} else {
+				// get last segment 
+				devNextXUnitTick = devXUnitTick + (int) devUnitWidth + 10;
+			}
 
-			// the first unit is not drawn because it would be clipped at the
-			// left border of the chart canvas
+			/*
+			 * draw alternate color
+			 */
+			if (devNextXUnitTick != -1 && unit.isAlternateBgColor) {
+
+				gc.setBackground(alternateColor);
+				gc.fillRectangle(devXUnitTick, //
+						devYTop,
+						devNextXUnitTick - devXUnitTick,
+						devYBottom - devYTop);
+
+//				gc.drawLine(devXUnitTick, devY, devXUnitTick, devY - drawingData.getDevGraphHeight());
+
+			}
+
+			/*
+			 * the first unit is not painted because it would clip at the left border of the chart
+			 * canvas
+			 */
 			if (unitCounter > 0 || (unitCounter == 0 && draw0Unit)) {
 
 				if (drawUnit) {
@@ -2796,8 +2813,10 @@ public class ChartComponentGraph extends Canvas {
 					// draw the unit tick
 					if (unitCounter > 0) {
 						gc.setLineStyle(SWT.LINE_SOLID);
-						gc.drawLine(devXUnitTick, devY, devXUnitTick, devY + 5);
+						gc.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom + 5);
 					}
+
+					final Point unitValueExtend = gc.textExtent(unit.valueLabel);
 
 					// draw the unit value
 					if (devUnitWidth != 0 && unitPos == ChartDrawingData.XUNIT_TEXT_POS_CENTER) {
@@ -2806,7 +2825,7 @@ public class ChartComponentGraph extends Canvas {
 
 						final int devXUnitCentered = (int) Math.max(0, ((devUnitWidth - unitValueExtend.x) / 2) + 0);
 
-						gc.drawText(unit.valueLabel, devXUnitTick + devXUnitCentered, devY + 7, true);
+						gc.drawText(unit.valueLabel, devXUnitTick + devXUnitCentered, devYBottom + 7, true);
 
 					} else {
 
@@ -2825,14 +2844,15 @@ public class ChartComponentGraph extends Canvas {
 
 								if (devXUnitTick == 0) {
 
-									gc.drawText(unit.valueLabel, devXUnitTick, devY + 7, true);
+									gc.drawText(unit.valueLabel, devXUnitTick, devYBottom + 7, true);
 
 									// draw unit label (km, mi, h)
 									if (isUnitLabelPrinted == false) {
 										isUnitLabelPrinted = true;
-										gc.drawText(drawingData.getXData().getUnitLabel(), devXUnitTick
-												+ unitValueExtend.x
-												+ 2, devY + 7, true);
+										gc.drawText(drawingData.getXData().getUnitLabel(),//
+												devXUnitTick + unitValueExtend.x + 2,
+												devYBottom + 7,
+												true);
 									}
 								}
 
@@ -2842,16 +2862,17 @@ public class ChartComponentGraph extends Canvas {
 
 								if (devXUnitTick - unitValueExtend2 >= 0) {
 
-									gc.drawText(unit.valueLabel, devXUnitTick - unitValueExtend2, devY + 7, true);
+									gc.drawText(unit.valueLabel, devXUnitTick - unitValueExtend2, devYBottom + 7, true);
 
 									// draw unit label (km, mi, h)
 									if (isUnitLabelPrinted == false) {
 
 										isUnitLabelPrinted = true;
 
-										gc.drawText(drawingData.getXData().getUnitLabel(), devXUnitTick
-												+ unitValueExtend2
-												+ 2, devY + 7, true);
+										gc.drawText(drawingData.getXData().getUnitLabel(),//
+												devXUnitTick + unitValueExtend2 + 2,
+												devYBottom + 7,
+												true);
 									}
 								}
 							}
@@ -2863,12 +2884,14 @@ public class ChartComponentGraph extends Canvas {
 				if (unitCounter > 0) {
 
 					gc.setForeground(gridColor);
-					gc.drawLine(devXUnitTick, devY, devXUnitTick, devY - drawingData.getDevGraphHeight());
+					gc.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom - drawingData.getDevGraphHeight());
 				}
 			}
 
 			unitCounter++;
 		}
+
+		alternateColor.dispose();
 	}
 
 	/**

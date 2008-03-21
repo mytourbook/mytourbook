@@ -28,4 +28,25 @@ public abstract class DataProvider {
 		return person == null ? "" : " AND tourPerson_personId = " //$NON-NLS-1$ //$NON-NLS-2$
 				+ Long.toString(person.getPersonId());
 	}
+
+	/**
+	 * @param finalYear
+	 * @param numberOfYears
+	 * @return Returns a list with all years
+	 */
+	static String getYearList(final int finalYear, final int numberOfYears) {
+
+		final StringBuffer buffer = new StringBuffer();
+
+		for (int currentYear = finalYear; currentYear >= finalYear - numberOfYears + 1; currentYear--) {
+
+			if (currentYear != finalYear) {
+				buffer.append(',');
+			}
+
+			buffer.append(Integer.toString(currentYear));
+		}
+
+		return buffer.toString();
+	}
 }

@@ -260,13 +260,12 @@ public class ChartComponents extends Composite {
 	private void computeXValues(final ChartDrawingData drawingData) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
-		final ChartDataYSerie yData = drawingData.getYData();
 
 		final int xMaxValue = xData.getVisibleMaxValue();
 		final int xAxisUnit = xData.getAxisUnit();
 		final int xStartValue = xData.getStartValue();
 
-		int devGraphWidth = fComponentGraph.getDevVirtualGraphImageWidth();
+		final int devGraphWidth = fComponentGraph.getDevVirtualGraphImageWidth();
 
 		// enforce minimum chart width
 //		devGraphWidth = Math.max(devGraphWidth, CHART_MIN_WIDTH);
@@ -302,7 +301,7 @@ public class ChartComponents extends Composite {
 			break;
 
 		case ChartDataYSerie.AXIS_UNIT_MONTH:
-			createXValuesMonth(drawingData, monthLength, units, devGraphWidth, yData);
+			createXValuesMonth(drawingData, units, devGraphWidth);
 			break;
 
 		case ChartDataYSerie.AXIS_UNIT_YEAR:
@@ -351,7 +350,7 @@ public class ChartComponents extends Composite {
 			// xData
 			// .getHighValues()[0].length) / 2));
 
-			int barWidth = (devGraphWidth / xData.getHighValues()[0].length) / 2;
+			final int barWidth = (devGraphWidth / xData.getHighValues()[0].length) / 2;
 
 			drawingData.setBarRectangleWidth(Math.max(0, barWidth));
 			drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
@@ -583,48 +582,63 @@ public class ChartComponents extends Composite {
 	}
 
 	private void createXValuesMonth(final ChartDrawingData drawingData,
-									final int months,
 									final ArrayList<ChartUnit> units,
-									final int devGraphWidth,
-									final ChartDataYSerie yData) {
+									final int devGraphWidth) {
 
-		drawingData.setScaleX((float) devGraphWidth / months);
+		final ChartDataYSerie yData = drawingData.getYData();
+		final ChartDataXSerie xData = drawingData.getXData();
+
+		final int months = xData.fHighValues[0].length;
+		final float scaleX = (float) devGraphWidth / months;
+		drawingData.setScaleX(scaleX);
 
 		// shorten the unit when there is not enough space to draw the full unit name
-		GC gc = new GC(this);
-		int monthLength = gc.stringExtent(monthLabels[0]).x;
-		boolean isShortUnitLabel = monthLength < (devGraphWidth / months);
+		final GC gc = new GC(this);
+		final int monthLength = gc.stringExtent(monthLabels[0]).x + 2;
+		final boolean isShortUnitLabel = monthLength > (devGraphWidth / months);
 		gc.dispose();
 
-		// create the month units
+		// create the month labels
 		for (int month = 0; month < months; month++) {
-			String monthUnit = monthLabels[month];
+
+			String monthLabel = monthLabels[month % 12];
 			if (isShortUnitLabel) {
-				monthUnit = monthUnit.substring(0, 1);
+				monthLabel = monthLabel.substring(0, 1);
 			}
-			units.add(new ChartUnit(month, monthUnit));
+
+			final ChartUnit chartUnit = new ChartUnit(month, monthLabel);
+			units.add(chartUnit);
+
+			if (months > 12) {
+
+				// more than one year is displayed, show the years with alternate background color
+				int year = month / 12;
+				if (year % 2 == 1) {
+					chartUnit.isAlternateBgColor = true;
+				}
+			}
 		}
 
 		// compute the width and position of the rectangles
-		int rectangleWidth;
-		final int monthWidth = Math.max(0, (devGraphWidth / months) - 1);
+		int barWidth;
+		final int monthWidth = (int) Math.max(0, (scaleX) - 1);
 
 		switch (yData.getChartLayout()) {
 		case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
 		case ChartDataYSerie.BAR_LAYOUT_STACKED:
 			// the bar's width is 50% of the width for a month
-			rectangleWidth = Math.max(0, monthWidth / 2);
-			drawingData.setBarRectangleWidth(rectangleWidth);
-			drawingData.setDevBarRectangleXPos(Math.max(0, rectangleWidth / 2) + 2);
+			barWidth = (int) Math.max(0, (monthWidth * 0.90f));
+			drawingData.setBarRectangleWidth(barWidth);
+			drawingData.setDevBarRectangleXPos((int) (Math.max(0, (monthWidth - barWidth) / 2) + 1));
 			break;
 
 		case ChartDataYSerie.BAR_LAYOUT_BESIDE:
 			final int serieCount = yData.getHighValues()[0].length;
 
 			// the bar's width is 75% of the width for a month
-			rectangleWidth = Math.max(0, monthWidth / 4 * 3);
-			drawingData.setBarRectangleWidth(Math.max(1, rectangleWidth / serieCount));
-			drawingData.setDevBarRectangleXPos(Math.max(0, (monthWidth - rectangleWidth) / 2) + 2);
+			barWidth = (int) Math.max(0, monthWidth / 4 * 3);
+			drawingData.setBarRectangleWidth(Math.max(1, barWidth / serieCount));
+			drawingData.setDevBarRectangleXPos((int) (Math.max(0, (monthWidth - barWidth) / 2) + 2));
 		default:
 			break;
 		}
@@ -647,9 +661,9 @@ public class ChartComponents extends Composite {
 		drawingData.setScaleX((float) devGraphWidth / yearDays);
 
 		// shorten the unit when there is not enough space to draw the full unit name
-		GC gc = new GC(this);
-		int monthLength = gc.stringExtent(monthLabels[0]).x;
-		boolean useShortUnitLabel = monthLength > (devGraphWidth / months) * 0.9;
+		final GC gc = new GC(this);
+		final int monthLength = gc.stringExtent(monthLabels[0]).x;
+		final boolean useShortUnitLabel = monthLength > (devGraphWidth / months) * 0.9;
 		gc.dispose();
 
 		// create the month units
@@ -759,7 +773,7 @@ public class ChartComponents extends Composite {
 		fComponentAxisRight.setDrawingData(fChartDrawingData, false);
 
 		// synchronize chart
-		SynchConfiguration synchConfig = createSynchConfig();
+		final SynchConfiguration synchConfig = createSynchConfig();
 		if (synchConfig != null) {
 			synchronizeChart(synchConfig);
 		}
@@ -935,13 +949,13 @@ public class ChartComponents extends Composite {
 			final float markerOffsetRatio = fSynchConfigSrc.getMarkerOffsetRatio();
 
 			// virtual graph width
-			float devMarkerWidth = devVisibleChartWidth * markerWidthRatio;
-			float devOneValueSlice = devMarkerWidth / valueDiff;
+			final float devMarkerWidth = devVisibleChartWidth * markerWidthRatio;
+			final float devOneValueSlice = devMarkerWidth / valueDiff;
 			devVirtualGraphImageWidth = devOneValueSlice * valueLast;
 
 			// graph offset
-			float devMarkerOffset = devVisibleChartWidth * markerOffsetRatio;
-			float devMarkerStart = devOneValueSlice * markerValueStart;
+			final float devMarkerOffset = devVisibleChartWidth * markerOffsetRatio;
+			final float devMarkerStart = devOneValueSlice * markerValueStart;
 			devGraphOffset = (int) (devMarkerStart - devMarkerOffset);
 
 			// zoom ratio
@@ -1000,10 +1014,10 @@ public class ChartComponents extends Composite {
 		final ChartXSlider leftSlider = fComponentGraph.getLeftSlider();
 		final ChartXSlider rightSlider = fComponentGraph.getRightSlider();
 
-		int slider1ValueIndex = sliderPosition.getSlider1ValueIndex();
-		int slider2ValueIndex = sliderPosition.getSlider2ValueIndex();
+		final int slider1ValueIndex = sliderPosition.getSlider1ValueIndex();
+		final int slider2ValueIndex = sliderPosition.getSlider2ValueIndex();
 
-		int[] xValues = fChartDataModel.getXData().fHighValues[0];
+		final int[] xValues = fChartDataModel.getXData().fHighValues[0];
 
 		if (slider1ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
 			fComponentGraph.setXSliderValueIndex(leftSlider, 0);
@@ -1059,8 +1073,8 @@ public class ChartComponents extends Composite {
 
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
 
-		float markerWidthRatio = devMarkerWidth / devVisibleChartWidth;
-		float markerOffsetRatio = devMarkerOffset / devVisibleChartWidth;
+		final float markerWidthRatio = devMarkerWidth / devVisibleChartWidth;
+		final float markerOffsetRatio = devMarkerOffset / devVisibleChartWidth;
 
 		// ---------------------------------------------------------------------------------------
 
@@ -1073,46 +1087,46 @@ public class ChartComponents extends Composite {
 		return synchConfig;
 	}
 
-	/**
-	 * set the {@link SynchConfiguration} when this chart is the source for the synched chart
-	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
-	private void synchronizeChart_AdjustToSameSize() {
-
-//		final ChartDataXSerie xData = fChartDataModel.getXData();
+//	/**
+//	 * set the {@link SynchConfiguration} when this chart is the source for the synched chart
+//	 */
+//	@SuppressWarnings("unused")
+//	private void synchronizeChart_AdjustToSameSize() {
 //
-//		final int markerValueIndexStart = xData.getSynchMarkerStartIndex();
-//		final int markerValueIndexEnd = xData.getSynchMarkerEndIndex();
-//
-//		if (markerValueIndexStart == -1) {
-//
-//			// disable chart synch
-//			fSynchConfigOut = null;
-//			return;
-//		}
-//
-//		final int[] xValues = xData.getHighValues()[0];
-//		final float markerStartValue = xValues[markerValueIndexStart];
-//		final float markerEndValue = xValues[markerValueIndexEnd];
-//
-//		final float valueDiff = markerEndValue - markerStartValue;
-//		final float lastValue = xValues[xValues.length - 1];
-//
-//		final float devVirtualGraphImageWidth = fComponentGraph.getDevVirtualGraphImageWidth();
-//		final float devGraphImageXOffset = fComponentGraph.getDevGraphImageXOffset();
-//
-//		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
-//
-//		final int devMarkerWidth = (int) (valueDiff * devOneValueSlice);
-//		final int devMarkerStartPos = (int) (markerStartValue * devOneValueSlice);
-//		final int devMarkerOffset = (int) (devMarkerStartPos - devGraphImageXOffset);
-//
-//		final SynchConfiguration newSynchConfigOut = new SynchConfiguration(devMarkerWidth,
-//				devMarkerOffset,
-//				fChartDataModel);
-//
-//		synchronizeChart(newSynchConfigOut);
-	}
+////		final ChartDataXSerie xData = fChartDataModel.getXData();
+////
+////		final int markerValueIndexStart = xData.getSynchMarkerStartIndex();
+////		final int markerValueIndexEnd = xData.getSynchMarkerEndIndex();
+////
+////		if (markerValueIndexStart == -1) {
+////
+////			// disable chart synch
+////			fSynchConfigOut = null;
+////			return;
+////		}
+////
+////		final int[] xValues = xData.getHighValues()[0];
+////		final float markerStartValue = xValues[markerValueIndexStart];
+////		final float markerEndValue = xValues[markerValueIndexEnd];
+////
+////		final float valueDiff = markerEndValue - markerStartValue;
+////		final float lastValue = xValues[xValues.length - 1];
+////
+////		final float devVirtualGraphImageWidth = fComponentGraph.getDevVirtualGraphImageWidth();
+////		final float devGraphImageXOffset = fComponentGraph.getDevGraphImageXOffset();
+////
+////		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
+////
+////		final int devMarkerWidth = (int) (valueDiff * devOneValueSlice);
+////		final int devMarkerStartPos = (int) (markerStartValue * devOneValueSlice);
+////		final int devMarkerOffset = (int) (devMarkerStartPos - devGraphImageXOffset);
+////
+////		final SynchConfiguration newSynchConfigOut = new SynchConfiguration(devMarkerWidth,
+////				devMarkerOffset,
+////				fChartDataModel);
+////
+////		synchronizeChart(newSynchConfigOut);
+//	}
 
 	private void synchronizeChart(final SynchConfiguration newSynchConfigOut) {
 
@@ -1179,7 +1193,7 @@ public class ChartComponents extends Composite {
 		}
 	}
 
-	void zoomWithParts(final int parts, final int position, boolean scrollSmoothly) {
+	void zoomWithParts(final int parts, final int position, final boolean scrollSmoothly) {
 		fComponentGraph.zoomWithParts(parts, position, scrollSmoothly);
 		onResize();
 	}

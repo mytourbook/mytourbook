@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -35,6 +35,8 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -43,6 +45,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
@@ -51,7 +54,8 @@ import org.eclipse.ui.part.PageBook;
 
 public class StatisticContainer extends Composite {
 
-	private static final String				MEMENTO_SELECTED_STATISTIC	= "tourbookview.selected.statistic";	//$NON-NLS-1$
+	private static final String				MEMENTO_SELECTED_STATISTIC	= "statistic.container.selected_statistic"; //$NON-NLS-1$
+	private static final String				MEMENTO_NUMBER_OF_YEARS		= "statistic.container.number_of_years";	//$NON-NLS-1$
 
 	private static final int				SELECTION_TYPE_MONTH		= 1;
 	private static final int				SELECTION_TYPE_DAY			= 2;
@@ -65,6 +69,7 @@ public class StatisticContainer extends Composite {
 
 	private Combo							fComboYear;
 	private Combo							fComboStatistics;
+	private Combo							fComboNumberOfYears;
 	private PageBook						fPageBookStatistic;
 	private Composite						fStatContainer;
 
@@ -104,8 +109,18 @@ public class StatisticContainer extends Composite {
 			((IYearStatistic) fActiveStatistic).refreshStatistic(fActivePerson,
 					fActiveTourTypeFilter,
 					fActiveYear,
+					getNumberOfYears(),
 					false);
 		}
+	}
+
+	public void activateActions(IWorkbenchPartSite partSite) {
+
+		if (fActiveStatistic == null) {
+			return;
+		}
+
+		fActiveStatistic.activateActions(partSite);
 	}
 
 	private void createActions(Composite parent) {
@@ -123,29 +138,6 @@ public class StatisticContainer extends Composite {
 		fTBM = new ToolBarManager(fToolBar);
 	}
 
-	public void activateActions(IWorkbenchPartSite partSite) {
-
-		if (fActiveStatistic == null) {
-			return;
-		}
-
-		fActiveStatistic.activateActions(partSite);
-	}
-
-	private void fillToolbar() {
-
-		IToolBarManager tbm = fViewSite.getActionBars().getToolBarManager();
-//		// update the toolbar
-		tbm.removeAll();
-
-		tbm.add(fActionSynchChartScale);
-
-		fActiveStatistic.updateToolBar(true);
-
-		fTBM.update(false);
-		fStatContainer.layout();
-	}
-
 	private void createControl() {
 
 		GridLayout gl;
@@ -160,20 +152,8 @@ public class StatisticContainer extends Composite {
 		 * container: statistic combo
 		 */
 		fStatContainer = new Composite(this, SWT.NONE);
-		GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-		fStatContainer.setLayoutData(gd);
-
-		// fStatContainer.setBackground(Display
-		// .getCurrent()
-		// .getSystemColor(SWT.COLOR_YELLOW));
-
-		gl = new GridLayout(4, false);
-		gl.marginWidth = 0;
-		gl.marginHeight = 0;
-		gl.marginTop = 1;
-		gl.marginBottom = 1;
-		gl.verticalSpacing = 0;
-		fStatContainer.setLayout(gl);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fStatContainer);
+		GridLayoutFactory.fillDefaults().numColumns(5).extendedMargins(0, 0, 1, 0).applyTo(fStatContainer);
 
 		// combo: year
 		fComboYear = new Combo(fStatContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -203,6 +183,28 @@ public class StatisticContainer extends Composite {
 			fComboStatistics.add(statistic.fVisibleName);
 		}
 
+		/*
+		 * number of years
+		 */
+		Label label = new Label(fStatContainer, SWT.NONE);
+		label.setText(Messages.tour_statistic_label_years);
+
+		// combo: year numbers
+		fComboNumberOfYears = new Combo(fStatContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+		fComboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
+		fComboNumberOfYears.setVisibleItemCount(20);
+		fComboNumberOfYears.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				onSelectYear();
+			}
+		});
+
+		// fill combobox with number of years
+		for (int years = 1; years < 11; years++) {
+			fComboNumberOfYears.add(Integer.toString(years));
+		}
+
 		// refreshYears();
 		createActions(fStatContainer);
 
@@ -213,6 +215,20 @@ public class StatisticContainer extends Composite {
 
 	public void deactivateActions(IWorkbenchPartSite partSite) {
 		fActiveStatistic.deactivateActions(partSite);
+	}
+
+	private void fillToolbar() {
+
+		IToolBarManager tbm = fViewSite.getActionBars().getToolBarManager();
+//		// update the toolbar
+		tbm.removeAll();
+
+		tbm.add(fActionSynchChartScale);
+
+		fActiveStatistic.updateToolBar(true);
+
+		fTBM.update(false);
+		fStatContainer.layout();
 	}
 
 	/**
@@ -251,9 +267,12 @@ public class StatisticContainer extends Composite {
 		fActiveStatistic = statistic;
 	}
 
-	public int getActiveYear() {
-		return fActiveYear;
-	}
+//	/**
+//	 * @return Returns the currently selected year
+//	 */
+//	public int getActiveYear() {
+//		return fActiveYear;
+//	}
 
 	/**
 	 * @return Returns the index for the active year or <code>-1</code> when there are no years
@@ -410,21 +429,28 @@ public class StatisticContainer extends Composite {
 		}
 
 		// refresh current statistic
-		((IYearStatistic) fActiveStatistic).refreshStatistic(fActivePerson, fActiveTourTypeFilter, fActiveYear, true);
+		((IYearStatistic) fActiveStatistic).refreshStatistic(fActivePerson,
+				fActiveTourTypeFilter,
+				fActiveYear,
+				getNumberOfYears(),
+				true);
 
 		resetSelection();
 	}
 
-	public void refreshStatistic(TourPerson person, TourTypeFilter activeTourTypeFilter, int year, boolean refreshData) {
+	private void refreshStatistic(	TourPerson person,
+									TourTypeFilter activeTourTypeFilter,
+									int selectedYear,
+									boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourTypeFilter = activeTourTypeFilter;
 
 		// keep current year
-		if (year == -1) {
+		if (selectedYear == -1) {
 			return;
 		}
-		fActiveYear = year;
+		fActiveYear = selectedYear;
 
 		getActiveStatistic();
 		selectActiveYear();
@@ -438,11 +464,22 @@ public class StatisticContainer extends Composite {
 		if (fActiveStatistic instanceof IYearStatistic) {
 			((IYearStatistic) fActiveStatistic).refreshStatistic(fActivePerson,
 					fActiveTourTypeFilter,
-					year,
+					selectedYear,
+					getNumberOfYears(),
 					refreshData);
 		}
 		fillToolbar();
 		fPageBookStatistic.showPage(fActiveStatistic.getControl());
+	}
+
+	private int getNumberOfYears() {
+		// get number of years
+		int numberOfYears = 1;
+		int selectedIndex = fComboNumberOfYears.getSelectionIndex();
+		if (selectedIndex != -1) {
+			numberOfYears = selectedIndex + 1;
+		}
+		return numberOfYears;
 	}
 
 	/**
@@ -509,7 +546,7 @@ public class StatisticContainer extends Composite {
 		if (memento != null) {
 
 			/*
-			 * get previous statistic
+			 * select statistic
 			 */
 
 			final String mementoStatisticId = memento.getString(MEMENTO_SELECTED_STATISTIC);
@@ -523,6 +560,19 @@ public class StatisticContainer extends Composite {
 					statisticIndex++;
 				}
 			}
+
+			/*
+			 * number of years
+			 */
+			Integer numberOfYears = memento.getInteger(MEMENTO_NUMBER_OF_YEARS);
+			if (numberOfYears != null) {
+				fComboNumberOfYears.select(numberOfYears);
+			} else {
+				fComboNumberOfYears.select(0);
+			}
+
+		} else {
+			fComboNumberOfYears.select(0);
 		}
 
 		// select year
@@ -546,6 +596,7 @@ public class StatisticContainer extends Composite {
 			memento.putString(MEMENTO_SELECTED_STATISTIC, getStatistics().get(selectionIndex).fStatisticId);
 		}
 
+		memento.putInteger(MEMENTO_NUMBER_OF_YEARS, fComboNumberOfYears.getSelectionIndex());
 	}
 
 	private void selectActiveYear() {

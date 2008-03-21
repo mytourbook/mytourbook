@@ -27,12 +27,33 @@ public class StatisticWeekCombined extends StatisticWeek {
 	@Override
 	void updateChart(TourDataWeek tourWeekData) {
 
-		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+
+		/*
+		 * chart title
+		 */
+		String title = "";
+		if (fNumberOfYears > 1) {
+			title = Integer.toString(fCurrentYear - fNumberOfYears + 1) + "-" + Integer.toString(fCurrentYear);
+		} else {
+			// one year
+			title = Integer.toString(fCurrentYear);
+		}
+		chartDataModel.setTitle(title);
+
+		/*
+		 * create week array
+		 */
+		int weekCounter = tourWeekData.fAltitudeHigh[0].length;
+		int weekValues[] = new int[weekCounter];
+		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
+			weekValues[weekIndex] = weekIndex;
+		}
 
 		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(ProviderTourWeek.fAllWeeks);
+		ChartDataXSerie xData = new ChartDataXSerie(weekValues);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
-		chartModel.setXData(xData);
+		chartDataModel.setXData(xData);
 
 		// distance
 		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
@@ -44,7 +65,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
-		chartModel.addYData(yData);
+		chartDataModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
 
@@ -58,7 +79,7 @@ public class StatisticWeekCombined extends StatisticWeek {
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
-		chartModel.addYData(yData);
+		chartDataModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
 
@@ -72,15 +93,15 @@ public class StatisticWeekCombined extends StatisticWeek {
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
-		chartModel.addYData(yData);
+		chartDataModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
 		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
 
 		if (fIsSynchScaleEnabled) {
-			fMinMaxKeeper.setMinMaxValues(chartModel);
+			fMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
 		// show the fDataModel in the chart
-		fChart.updateChart(chartModel);
+		fChart.updateChart(chartDataModel);
 	}
 }

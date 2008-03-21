@@ -30,8 +30,7 @@ import org.eclipse.swt.graphics.RGB;
 
 public class StatisticServices {
 
-	static IPreferenceStore	fPrefStore						= TourbookPlugin.getDefault()
-																	.getPreferenceStore();
+	static IPreferenceStore	fPrefStore						= TourbookPlugin.getDefault().getPreferenceStore();
 
 	/**
 	 * offset for tour types in the color index
@@ -49,14 +48,10 @@ public class StatisticServices {
 		 */
 		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		String defaultColorName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
-		rgbBright.add(PreferenceConverter.getColor(prefStore, defaultColorName
-				+ GraphColorProvider.PREF_COLOR_BRIGHT));
 
-		rgbDark.add(PreferenceConverter.getColor(prefStore, defaultColorName
-				+ GraphColorProvider.PREF_COLOR_DARK));
-
-		rgbLine.add(PreferenceConverter.getColor(prefStore, defaultColorName
-				+ GraphColorProvider.PREF_COLOR_LINE));
+		rgbBright.add(PreferenceConverter.getColor(prefStore, defaultColorName + GraphColorProvider.PREF_COLOR_BRIGHT));
+		rgbDark.add(PreferenceConverter.getColor(prefStore, defaultColorName + GraphColorProvider.PREF_COLOR_DARK));
+		rgbLine.add(PreferenceConverter.getColor(prefStore, defaultColorName + GraphColorProvider.PREF_COLOR_LINE));
 
 		/*
 		 * color index 1...n+1: tour type colors
@@ -95,8 +90,7 @@ public class StatisticServices {
 				if (typeId != -1) {
 					for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
 						if ((tourTypes.get(typeIndex)).getTypeId() == typeId) {
-							tourTypeColorIndex = typeIndex
-									+ StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+							tourTypeColorIndex = typeIndex + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 							break;
 						}
 					}

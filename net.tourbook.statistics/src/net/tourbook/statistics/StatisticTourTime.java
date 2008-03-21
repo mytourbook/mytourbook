@@ -157,13 +157,13 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	}
 
 	public void prefColorChanged() {
-		refreshStatistic(fActivePerson, fActiveTourTypeFiler, fCurrentYear, false);
+		refreshStatistic(fActivePerson, fActiveTourTypeFiler, fCurrentYear, 1, false);
 	}
 
 	public void refreshStatistic(	final TourPerson person,
 									final TourTypeFilter tourTypeFilter,
 									final int year,
-									final boolean refreshData) {
+									int numberOfYears, final boolean refreshData) {
 
 		// reset the selection in the chart when the data have changed
 		final boolean isResetSelection = fActivePerson != person

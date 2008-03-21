@@ -27,14 +27,20 @@ public interface IYearStatistic {
 	 *        TourType id
 	 * @param year
 	 *        year for the statistic
+	 * @param numberOfYears
+	 *        number of year which the statistic should display
 	 * @param refreshData
 	 *        when set to <code>true</code> the data should be updated from the database
 	 */
 	public abstract void refreshStatistic(	TourPerson person,
 											TourTypeFilter activeTourTypeFilter,
 											int year,
+											int numberOfYears,
 											boolean refreshData);
 
+	/**
+	 * color have changed for the graphs
+	 */
 	public abstract void prefColorChanged();
 
 }

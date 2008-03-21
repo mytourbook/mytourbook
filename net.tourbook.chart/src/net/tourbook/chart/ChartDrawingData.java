@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -43,7 +43,7 @@ public class ChartDrawingData {
 	private Rectangle[][]			barRectangles;
 	private Rectangle[][]			barFocusRectangles;
 
-	private int						barRectangleWidth;
+	private int						fBarRectangleWidth;
 	private int						fDevBarRectangleXPos;
 
 	/**
@@ -124,7 +124,7 @@ public class ChartDrawingData {
 	 * @return Returns the barRectangleWidth.
 	 */
 	public int getBarRectangleWidth() {
-		return barRectangleWidth;
+		return fBarRectangleWidth;
 	}
 
 	public int getChartType() {
@@ -185,10 +185,7 @@ public class ChartDrawingData {
 	 * @return Returns the y position for the title
 	 */
 	public int getDevYTitle() {
-		return getDevYBottom()
-				- getDevGraphHeight()
-				- getDevSliderBarHeight()
-				- getDevXTitelBarHeight();
+		return getDevYBottom() - getDevGraphHeight() - getDevSliderBarHeight() - getDevXTitelBarHeight();
 	}
 
 	/**
@@ -239,7 +236,7 @@ public class ChartDrawingData {
 	}
 
 	/**
-	 * @return Returns the xUnits.
+	 * @return Returns the units for the x-axis.
 	 */
 	public ArrayList<ChartUnit> getXUnits() {
 		return xUnits;
@@ -310,7 +307,7 @@ public class ChartDrawingData {
 	 *        The barRectangleWidth to set.
 	 */
 	public void setBarRectangleWidth(int barRectangleWidth) {
-		this.barRectangleWidth = barRectangleWidth;
+		this.fBarRectangleWidth = barRectangleWidth;
 	}
 
 	public void setDevGraphHeight(int heightDev) {

@@ -415,6 +415,9 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;
 
+	public static String		tour_statistic_label_years;
+	public static String		tour_statistic_number_of_years;
+
 	public static String		TourAnalyzer_Label_average;
 	public static String		TourAnalyzer_Label_difference;
 	public static String		TourAnalyzer_Label_left;

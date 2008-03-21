@@ -34,36 +34,33 @@ public class ProviderTourWeek extends DataProvider {
 	private static ProviderTourWeek	fInstance;
 
 	private int						fCurrentYear;
+	private int						fNumberOfYears;
 
 	private TourPerson				fActivePerson;
 	private TourTypeFilter			fActiveTourTypeFilter;
 
 	private TourDataWeek			fTourWeekData;
 
-	static int[]					fAllWeeks;
-
 	private ProviderTourWeek() {}
 
 	public static ProviderTourWeek getInstance() {
 		if (fInstance == null) {
-
 			fInstance = new ProviderTourWeek();
-
-			// create month array
-			fAllWeeks = new int[YEAR_WEEKS];
-			for (int week = 0; week < YEAR_WEEKS; week++) {
-				fAllWeeks[week] = week;
-			}
 		}
 		return fInstance;
 	}
 
-	TourDataWeek getWeekData(TourPerson person, TourTypeFilter tourTypeFilter, int year, boolean refreshData) {
+	TourDataWeek getWeekData(	TourPerson person,
+								TourTypeFilter tourTypeFilter,
+								int lastYear,
+								int numberOfYears,
+								boolean refreshData) {
 
 		// when the data for the year are already loaded, all is done
 		if (fActivePerson == person
 				&& fActiveTourTypeFilter == tourTypeFilter
-				&& year == fCurrentYear
+				&& lastYear == fCurrentYear
+				&& numberOfYears == fNumberOfYears
 				&& refreshData == false) {
 			return fTourWeekData;
 		}
@@ -75,21 +72,21 @@ public class ProviderTourWeek extends DataProvider {
 		TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		final int serieLength = tourTypes.length + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-		final int valueLength = fAllWeeks.length;
+		final int valueLength = YEAR_WEEKS * numberOfYears;
 
-		String sqlString = "SELECT " // //$NON-NLS-1$
-				//
-				+ "StartWeek			, "// 1 //$NON-NLS-1$
-				+ "SUM(TOURDISTANCE)	, "// 2 //$NON-NLS-1$
-				+ "SUM(TOURALTUP)		, "// 3 //$NON-NLS-1$
-				+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END)," // 4 //$NON-NLS-1$
-				+ "tourType_typeId 		\n"// 5 //$NON-NLS-1$
+		String sqlString = "SELECT " //$NON-NLS-1$
+				+ "StartYear			, " // 1 //$NON-NLS-1$
+				+ "StartWeek			, " // 2 //$NON-NLS-1$
+				+ "SUM(TourDistance)	, " // 3 //$NON-NLS-1$
+				+ "SUM(TourAltUp)		, " // 4 //$NON-NLS-1$
+				+ "SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END)," // 5 //$NON-NLS-1$
+				+ "TourType_TypeId 		\n" // 6 //$NON-NLS-1$
 				//
 				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("WHERE StartYear =" + Integer.toString(year)) //$NON-NLS-1$
+				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$
 				+ getSQLFilter(person, tourTypeFilter)
-				+ " GROUP BY StartWeek, tourType_typeId" //$NON-NLS-1$
-				+ " ORDER BY StartWeek"; //$NON-NLS-1$
+				+ (" GROUP BY StartYear, StartWeek, tourType_typeId") //$NON-NLS-1$
+				+ (" ORDER BY StartYear, StartWeek"); //$NON-NLS-1$
 
 		try {
 
@@ -104,8 +101,11 @@ public class ProviderTourWeek extends DataProvider {
 
 			while (result.next()) {
 
-				// first week is 0
-				final int week = result.getInt(1);
+				final int resultYear = result.getInt(1);
+				final int resultWeek = result.getInt(2);
+
+				final int yearIndex = numberOfYears - (lastYear - resultYear + 1);
+				final int weekIndex = resultWeek + yearIndex * 53;
 
 				/*
 				 * convert type id to the type index in the tour types list which is also the color
@@ -113,9 +113,9 @@ public class ProviderTourWeek extends DataProvider {
 				 */
 				int colorIndex = 0;
 
-				final Long dbTypeIdObject = (Long) result.getObject(5);
+				final Long dbTypeIdObject = (Long) result.getObject(6);
 				if (dbTypeIdObject != null) {
-					final long dbTypeId = result.getLong(5);
+					final long dbTypeId = result.getLong(6);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
 							colorIndex = typeIndex + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
@@ -124,20 +124,21 @@ public class ProviderTourWeek extends DataProvider {
 					}
 				}
 
-				dbTypeIds[colorIndex][week] = dbTypeIdObject == null
+				dbTypeIds[colorIndex][weekIndex] = dbTypeIdObject == null
 						? TourType.TOUR_TYPE_ID_NOT_DEFINED
 						: dbTypeIdObject;
 
-				dbDistance[colorIndex][week] = (int) (result.getInt(2) / 1000 / UI.UNIT_VALUE_DISTANCE);
-				dbAltitude[colorIndex][week] = (int) (result.getInt(3) / UI.UNIT_VALUE_ALTITUDE);
-				dbTime[colorIndex][week] = result.getInt(4);
+				dbDistance[colorIndex][weekIndex] = (int) (result.getInt(3) / 1000 / UI.UNIT_VALUE_DISTANCE);
+				dbAltitude[colorIndex][weekIndex] = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
+				dbTime[colorIndex][weekIndex] = result.getInt(5);
 			}
 
 			conn.close();
 
 			fActivePerson = person;
 			fActiveTourTypeFilter = tourTypeFilter;
-			fCurrentYear = year;
+			fCurrentYear = lastYear;
+			fNumberOfYears = numberOfYears;
 
 			fTourWeekData.fTypeIds = dbTypeIds;
 

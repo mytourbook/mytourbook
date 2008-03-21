@@ -138,7 +138,7 @@ public class StatisticTourNumbers extends YearStatistic {
 					resetMinMaxKeeper();
 
 					// update chart
-					refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, false);
+					refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, 1, false);
 				}
 			}
 		};
@@ -538,10 +538,10 @@ public class StatisticTourNumbers extends YearStatistic {
 	}
 
 	public void prefColorChanged() {
-		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, false);
+		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, 1, false);
 	}
 
-	public void refreshStatistic(TourPerson person, TourTypeFilter typeId, int year, boolean refreshData) {
+	public void refreshStatistic(TourPerson person, TourTypeFilter typeId, int year, int numberOfYears, boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourTypeFilter = typeId;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -39,6 +39,7 @@ public class StatisticMonth extends YearStatistic {
 
 	private TourPerson				fActivePerson;
 	private int						fCurrentYear;
+	private int						fNumberOfYears;
 
 	private Chart					fChart;
 	private BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
@@ -69,23 +70,27 @@ public class StatisticMonth extends YearStatistic {
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
 		fChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
-
-//		fChart.createChartActionHandlers();
 	}
 
 	public void prefColorChanged() {
-		refreshStatistic(fActivePerson, fActiveTourType, fCurrentYear, false);
+		refreshStatistic(fActivePerson, fActiveTourType, fCurrentYear, fNumberOfYears, false);
 	}
 
-	public void refreshStatistic(TourPerson person, TourTypeFilter tourTypeFilter, int year, boolean refreshData) {
+	public void refreshStatistic(	TourPerson person,
+									TourTypeFilter tourTypeFilter,
+									int currentYear,
+									int numberOfYears,
+									boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourType = tourTypeFilter;
-		fCurrentYear = year;
+		fCurrentYear = currentYear;
+		fNumberOfYears = numberOfYears;
 
 		TourDataMonth tourMonthData = ProviderTourMonth.getInstance().getMonthData(person,
 				tourTypeFilter,
-				year,
+				currentYear,
+				numberOfYears,
 				isDataDirtyWithReset() || refreshData);
 
 		// reset min/max values
@@ -122,12 +127,33 @@ public class StatisticMonth extends YearStatistic {
 
 	private void updateChart(TourDataMonth tourMonthData) {
 
-		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+
+		/*
+		 * create month array
+		 */
+		int monthCounter = tourMonthData.fAltitudeHigh[0].length;
+		int monthValues[] = new int[monthCounter];
+		for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
+			monthValues[monthIndex] = monthIndex;
+		}
+
+		/*
+		 * chart title
+		 */
+		String title = "";
+		if (fNumberOfYears > 1) {
+			title = Integer.toString(fCurrentYear - fNumberOfYears + 1) + "-" + Integer.toString(fCurrentYear);
+		} else {
+			// one year
+			title = Integer.toString(fCurrentYear);
+		}
+		chartDataModel.setTitle(title);
 
 		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(ProviderTourMonth.fAllMonths);
+		ChartDataXSerie xData = new ChartDataXSerie(monthValues);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_MONTH);
-		chartModel.setXData(xData);
+		chartDataModel.setXData(xData);
 
 		// distance
 		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
@@ -137,7 +163,7 @@ public class StatisticMonth extends YearStatistic {
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		chartModel.addYData(yData);
+		chartDataModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColorIndex(yData, tourMonthData.fTypeIds);
 
@@ -149,7 +175,7 @@ public class StatisticMonth extends YearStatistic {
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
 		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		chartModel.addYData(yData);
+		chartDataModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
 		StatisticServices.setTourTypeColorIndex(yData, tourMonthData.fTypeIds);
 
@@ -161,16 +187,16 @@ public class StatisticMonth extends YearStatistic {
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-		chartModel.addYData(yData);
+		chartDataModel.addYData(yData);
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
 		StatisticServices.setTourTypeColorIndex(yData, tourMonthData.fTypeIds);
 
 		if (fIsSynchScaleEnabled) {
-			fMinMaxKeeper.setMinMaxValues(chartModel);
+			fMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
 		// show the fDataModel in the chart
-		fChart.updateChart(chartModel);
+		fChart.updateChart(chartDataModel);
 	}
 
 	@Override
