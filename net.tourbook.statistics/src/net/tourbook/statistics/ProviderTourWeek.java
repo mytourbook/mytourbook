@@ -29,6 +29,10 @@ import net.tourbook.ui.UI;
 
 public class ProviderTourWeek extends DataProvider {
 
+	/**
+	 * Contains the number of weeks in one year, to simplify the calculation one year has always 53
+	 * weeks
+	 */
 	static final int				YEAR_WEEKS	= 53;
 
 	private static ProviderTourWeek	fInstance;
@@ -105,7 +109,7 @@ public class ProviderTourWeek extends DataProvider {
 				final int resultWeek = result.getInt(2);
 
 				final int yearIndex = numberOfYears - (lastYear - resultYear + 1);
-				final int weekIndex = resultWeek + yearIndex * 53;
+				final int weekIndex = resultWeek - 1 + yearIndex * 53;
 
 				/*
 				 * convert type id to the type index in the tour types list which is also the color

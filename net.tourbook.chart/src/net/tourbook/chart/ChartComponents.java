@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -291,21 +291,25 @@ public class ChartComponents extends Composite {
 		final int monthLength = monthLabels.length;
 
 		switch (xAxisUnit) {
-		case ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
-		case ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE:
+		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
+		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
 			unitValue = ChartUtil.roundTimeValue(unitRawValue);
 			break;
 
-		case ChartDataYSerie.AXIS_UNIT_NUMBER:
+		case ChartDataSerie.AXIS_UNIT_NUMBER:
 			unitValue = ChartUtil.roundDecimalValue(unitRawValue);
 			break;
 
-		case ChartDataYSerie.AXIS_UNIT_MONTH:
+		case ChartDataSerie.X_AXIS_UNIT_WEEK:
+			createXValuesWeek(drawingData, units, devGraphWidth);
+			break;
+
+		case ChartDataSerie.AXIS_UNIT_MONTH:
 			createXValuesMonth(drawingData, units, devGraphWidth);
 			break;
 
-		case ChartDataYSerie.AXIS_UNIT_YEAR:
-			// the maxValue contains the year which is displayed
+		case ChartDataSerie.AXIS_UNIT_YEAR:
+			// maxValue contains the year which is displayed
 			createXValuesYear(drawingData, monthLength, units, devGraphWidth, xMaxValue);
 			break;
 
@@ -314,7 +318,9 @@ public class ChartComponents extends Composite {
 		}
 
 		// create the units for the x-axis
-		if (xAxisUnit != ChartDataYSerie.AXIS_UNIT_YEAR && xAxisUnit != ChartDataYSerie.AXIS_UNIT_MONTH) {
+		if (xAxisUnit != ChartDataSerie.AXIS_UNIT_YEAR
+				&& xAxisUnit != ChartDataSerie.AXIS_UNIT_MONTH
+				&& xAxisUnit != ChartDataSerie.X_AXIS_UNIT_WEEK) {
 
 			// get the unitOffset when a startValue is set
 			int unitOffset = 0;
@@ -339,16 +345,10 @@ public class ChartComponents extends Composite {
 
 		}
 
-		// configure the bar in bar charts
-		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR
-				&& (xAxisUnit == ChartDataYSerie.AXIS_UNIT_NUMBER || xAxisUnit == ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE)) {
-
-			// if (axisUnit))) {
-			//				
-			// }
-			// drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth /
-			// xData
-			// .getHighValues()[0].length) / 2));
+		// configure the bar in the bar charts
+		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR && // 
+				(xAxisUnit == ChartDataSerie.AXIS_UNIT_NUMBER //
+				|| xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)) {
 
 			final int barWidth = (devGraphWidth / xData.getHighValues()[0].length) / 2;
 
@@ -366,7 +366,7 @@ public class ChartComponents extends Composite {
 	 */
 	private void computeYValues(final ChartDrawingData drawingData, final int graphCount, final int currentGraph) {
 
-		final ChartDataYSerie yData = drawingData.getYData();
+		final ChartDataSerie yData = drawingData.getYData();
 
 		final Point graphSize = fComponentGraph.getVisibleSizeWithHBar(fVisibleGraphRect.width,
 				fVisibleGraphRect.height);
@@ -412,13 +412,13 @@ public class ChartComponents extends Composite {
 		float unit = 0;
 		final int axisUnit = yData.getAxisUnit();
 		switch (axisUnit) {
-		case ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE:
-		case ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE_24H:
-		case ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
+		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
+		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
+		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
 			unit = ChartUtil.roundTimeValue(graphUnitValue);
 			break;
 
-		case ChartDataYSerie.AXIS_UNIT_NUMBER:
+		case ChartDataSerie.AXIS_UNIT_NUMBER:
 			// unit is a decimal number
 			unit = ChartUtil.roundDecimalValue(graphUnitValue);
 			break;
@@ -444,7 +444,7 @@ public class ChartComponents extends Composite {
 
 		// System.out.println(graphMinValue +" "+graphMaxValue);
 
-		if (axisUnit == ChartDataYSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
+		if (axisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
 
 			// max value exeeds 24h
 
@@ -554,7 +554,11 @@ public class ChartComponents extends Composite {
 
 				// set the chart title height and margin
 				final String title = drawingData.getXTitle();
-				if (title != null && title.length() > 0) {
+				ChartSegments chartSegments = xData.getSegmentMarker();
+
+				if (title != null && title.length() > 0 || //
+						(chartSegments != null && chartSegments.segmentTitle != null)) {
+
 					fDevXTitleBarHeight = TITLE_BAR_HEIGHT;
 					devMarginTop = MARGIN_TOP_WITH_TITLE;
 				}
@@ -579,6 +583,59 @@ public class ChartComponents extends Composite {
 		}
 
 		return chartDrawingData;
+	}
+
+	/**
+	 * set the {@link SynchConfiguration} when this chart is the source for the synched chart
+	 */
+	private SynchConfiguration createSynchConfig() {
+
+		final ChartDataXSerie xData = fChartDataModel.getXData();
+
+		final int markerValueIndexStart = xData.getSynchMarkerStartIndex();
+		final int markerValueIndexEnd = xData.getSynchMarkerEndIndex();
+
+		if (markerValueIndexStart == -1) {
+
+			// disable chart synchronization
+			fSynchConfigOut = null;
+			return null;
+		}
+
+		/*
+		 * create synch configuration data
+		 */
+
+		final int[] xValues = xData.getHighValues()[0];
+		final float markerStartValue = xValues[Math.min(markerValueIndexStart, xValues.length - 1)];
+		final float markerEndValue = xValues[Math.min(markerValueIndexEnd, xValues.length - 1)];
+
+		final float valueDiff = markerEndValue - markerStartValue;
+		final float lastValue = xValues[xValues.length - 1];
+
+		final float devVirtualGraphImageWidth = fComponentGraph.getDevVirtualGraphImageWidth();
+		final float devGraphImageXOffset = fComponentGraph.getDevGraphImageXOffset();
+
+		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
+
+		final float devMarkerWidth = (int) (valueDiff * devOneValueSlice);
+		final float devMarkerStartPos = (int) (markerStartValue * devOneValueSlice);
+		final float devMarkerOffset = (int) (devMarkerStartPos - devGraphImageXOffset);
+
+		final int devVisibleChartWidth = getDevVisibleChartWidth();
+
+		final float markerWidthRatio = devMarkerWidth / devVisibleChartWidth;
+		final float markerOffsetRatio = devMarkerOffset / devVisibleChartWidth;
+
+		// ---------------------------------------------------------------------------------------
+
+		final SynchConfiguration synchConfig = new SynchConfiguration(fChartDataModel,
+				devMarkerWidth,
+				devMarkerOffset,
+				markerWidthRatio,
+				markerOffsetRatio);
+
+		return synchConfig;
 	}
 
 	private void createXValuesMonth(final ChartDrawingData drawingData,
@@ -608,15 +665,6 @@ public class ChartComponents extends Composite {
 
 			final ChartUnit chartUnit = new ChartUnit(month, monthLabel);
 			units.add(chartUnit);
-
-			if (months > 12) {
-
-				// more than one year is displayed, show the years with alternate background color
-				int year = month / 12;
-				if (year % 2 == 1) {
-					chartUnit.isAlternateBgColor = true;
-				}
-			}
 		}
 
 		// compute the width and position of the rectangles
@@ -643,6 +691,42 @@ public class ChartComponents extends Composite {
 			break;
 		}
 
+		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+	}
+
+	private void createXValuesWeek(ChartDrawingData drawingData, ArrayList<ChartUnit> units, int devGraphWidth) {
+
+		final ChartDataXSerie xData = drawingData.getXData();
+		final int[] xValues = xData.getHighValues()[0];
+
+		final int weeks = xValues.length;
+		final int monthsInChart = weeks / 53 * 12;
+
+		// shorten the unit when there is not enough space to draw the full unit name
+		final GC gc = new GC(this);
+		final int monthLabelLength = gc.stringExtent(monthLabels[0]).x + 2;
+		final boolean isShortUnitLabel = monthLabelLength > (devGraphWidth / monthsInChart);
+		gc.dispose();
+
+		// create the month labels
+		for (int month = 0; month < monthsInChart; month++) {
+
+			String monthLabel = monthLabels[month % 12];
+			if (isShortUnitLabel) {
+				monthLabel = monthLabel.substring(0, 1);
+			}
+
+			final ChartUnit chartUnit = new ChartUnit(month, monthLabel);
+			units.add(chartUnit);
+		}
+
+		// compute the width and position of the rectangles
+		final int barWidth = (devGraphWidth / xValues.length) / 2;
+		drawingData.setBarRectangleWidth(Math.max(0, barWidth));
+		drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
+
+		drawingData.setScaleX((float) devGraphWidth / weeks);
+		drawingData.setScaleUnitX((float) devGraphWidth / weeks * 53 / 12);
 		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
 	}
 
@@ -1032,59 +1116,6 @@ public class ChartComponents extends Composite {
 		}
 
 		fComponentGraph.redraw();
-	}
-
-	/**
-	 * set the {@link SynchConfiguration} when this chart is the source for the synched chart
-	 */
-	private SynchConfiguration createSynchConfig() {
-
-		final ChartDataXSerie xData = fChartDataModel.getXData();
-
-		final int markerValueIndexStart = xData.getSynchMarkerStartIndex();
-		final int markerValueIndexEnd = xData.getSynchMarkerEndIndex();
-
-		if (markerValueIndexStart == -1) {
-
-			// disable chart synchronization
-			fSynchConfigOut = null;
-			return null;
-		}
-
-		/*
-		 * create synch configuration data
-		 */
-
-		final int[] xValues = xData.getHighValues()[0];
-		final float markerStartValue = xValues[Math.min(markerValueIndexStart, xValues.length - 1)];
-		final float markerEndValue = xValues[Math.min(markerValueIndexEnd, xValues.length - 1)];
-
-		final float valueDiff = markerEndValue - markerStartValue;
-		final float lastValue = xValues[xValues.length - 1];
-
-		final float devVirtualGraphImageWidth = fComponentGraph.getDevVirtualGraphImageWidth();
-		final float devGraphImageXOffset = fComponentGraph.getDevGraphImageXOffset();
-
-		final float devOneValueSlice = devVirtualGraphImageWidth / lastValue;
-
-		final float devMarkerWidth = (int) (valueDiff * devOneValueSlice);
-		final float devMarkerStartPos = (int) (markerStartValue * devOneValueSlice);
-		final float devMarkerOffset = (int) (devMarkerStartPos - devGraphImageXOffset);
-
-		final int devVisibleChartWidth = getDevVisibleChartWidth();
-
-		final float markerWidthRatio = devMarkerWidth / devVisibleChartWidth;
-		final float markerOffsetRatio = devMarkerOffset / devVisibleChartWidth;
-
-		// ---------------------------------------------------------------------------------------
-
-		final SynchConfiguration synchConfig = new SynchConfiguration(fChartDataModel,
-				devMarkerWidth,
-				devMarkerOffset,
-				markerWidthRatio,
-				markerOffsetRatio);
-
-		return synchConfig;
 	}
 
 //	/**

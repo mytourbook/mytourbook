@@ -24,6 +24,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartSegments;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.ui.TourTypeFilter;
@@ -37,31 +38,33 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public class StatisticMonth extends YearStatistic {
 
-	private TourPerson				fActivePerson;
-	private int						fCurrentYear;
-	private int						fNumberOfYears;
+	private TourPerson					fActivePerson;
+	private int							fCurrentYear;
+	private int							fNumberOfYears;
 
-	private Chart					fChart;
-	private BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
-	private TourTypeFilter			fActiveTourType;
+	private Chart						fChart;
+	private final BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
+	private TourTypeFilter				fActiveTourType;
 
-	private Calendar				fCalendar		= GregorianCalendar.getInstance();
-	private boolean					fIsSynchScaleEnabled;
+	private final Calendar				fCalendar		= GregorianCalendar.getInstance();
+	private boolean						fIsSynchScaleEnabled;
 
 	@Override
-	public void activateActions(IWorkbenchPartSite partSite) {
+	public void activateActions(final IWorkbenchPartSite partSite) {
 		fChart.updateChartActionHandlers();
 	}
 
 	@Override
-	public void deactivateActions(IWorkbenchPartSite partSite) {}
+	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
 	public boolean canTourBeVisible() {
 		return false;
 	}
 
 	@Override
-	public void createControl(Composite parent, IViewSite viewSite, final IPostSelectionProvider postSelectionProvider) {
+	public void createControl(	final Composite parent,
+								final IViewSite viewSite,
+								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -76,18 +79,18 @@ public class StatisticMonth extends YearStatistic {
 		refreshStatistic(fActivePerson, fActiveTourType, fCurrentYear, fNumberOfYears, false);
 	}
 
-	public void refreshStatistic(	TourPerson person,
-									TourTypeFilter tourTypeFilter,
-									int currentYear,
-									int numberOfYears,
-									boolean refreshData) {
+	public void refreshStatistic(	final TourPerson person,
+									final TourTypeFilter tourTypeFilter,
+									final int currentYear,
+									final int numberOfYears,
+									final boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourType = tourTypeFilter;
 		fCurrentYear = currentYear;
 		fNumberOfYears = numberOfYears;
 
-		TourDataMonth tourMonthData = ProviderTourMonth.getInstance().getMonthData(person,
+		final TourDataMonth tourMonthData = ProviderTourMonth.getInstance().getMonthData(person,
 				tourTypeFilter,
 				currentYear,
 				numberOfYears,
@@ -107,12 +110,12 @@ public class StatisticMonth extends YearStatistic {
 	}
 
 	@Override
-	public boolean selectMonth(Long date) {
+	public boolean selectMonth(final Long date) {
 
 		fCalendar.setTimeInMillis(date);
-		int selectedMonth = fCalendar.get(Calendar.MONTH);
+		final int selectedMonth = fCalendar.get(Calendar.MONTH);
 
-		boolean selectedItems[] = new boolean[12];
+		final boolean selectedItems[] = new boolean[12];
 		selectedItems[selectedMonth] = true;
 
 		fChart.setSelectedBars(selectedItems);
@@ -121,38 +124,72 @@ public class StatisticMonth extends YearStatistic {
 	}
 
 	@Override
-	public void setSynchScale(boolean isSynchScaleEnabled) {
+	public void setSynchScale(final boolean isSynchScaleEnabled) {
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
-	private void updateChart(TourDataMonth tourMonthData) {
+	private void updateChart(final TourDataMonth tourMonthData) {
 
-		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		/*
 		 * create month array
 		 */
-		int monthCounter = tourMonthData.fAltitudeHigh[0].length;
-		int monthValues[] = new int[monthCounter];
+//		int monthCounter = tourMonthData.fAltitudeHigh[0].length;
+//		int monthValues[] = new int[monthCounter];
+//		for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
+//			monthValues[monthIndex] = monthIndex;
+//		}
+		/*
+		 * create segments for each year
+		 */
+		final int monthCounter = tourMonthData.fAltitudeHigh[0].length;
+		final int allMonths[] = new int[monthCounter];
+		final int segmentStart[] = new int[fNumberOfYears];
+		final int segmentEnd[] = new int[fNumberOfYears];
+		final String[] segmentTitle = new String[fNumberOfYears];
+
+		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
+
+		// get start/end and title for each segment
 		for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
-			monthValues[monthIndex] = monthIndex;
+
+			allMonths[monthIndex] = monthIndex;
+
+			int yearIndex = monthIndex / 12;
+
+			if (monthIndex % 12 == 0) {
+
+				// first month in a year
+				segmentStart[yearIndex] = monthIndex;
+				segmentTitle[yearIndex] = Integer.toString(oldestYear + yearIndex);
+
+			} else if (monthIndex % 12 == 11) {
+
+				// last month in a year
+				segmentEnd[yearIndex] = monthIndex;
+			}
 		}
+		ChartSegments monthSegments = new ChartSegments();
+		monthSegments.valueStart = segmentStart;
+		monthSegments.valueEnd = segmentEnd;
+		monthSegments.segmentTitle = segmentTitle;
 
 		/*
 		 * chart title
 		 */
-		String title = "";
-		if (fNumberOfYears > 1) {
-			title = Integer.toString(fCurrentYear - fNumberOfYears + 1) + "-" + Integer.toString(fCurrentYear);
-		} else {
-			// one year
-			title = Integer.toString(fCurrentYear);
-		}
-		chartDataModel.setTitle(title);
-
+//		String title = "";
+//		if (fNumberOfYears > 1) {
+//			title = Integer.toString(fCurrentYear - fNumberOfYears + 1) + "-" + Integer.toString(fCurrentYear);
+//		} else {
+//			// one year
+//			title = Integer.toString(fCurrentYear);
+//		}
+//		chartDataModel.setTitle(title);
 		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(monthValues);
+		final ChartDataXSerie xData = new ChartDataXSerie(allMonths);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_MONTH);
+		xData.setSegmentMarker(monthSegments);
 		chartDataModel.setXData(xData);
 
 		// distance

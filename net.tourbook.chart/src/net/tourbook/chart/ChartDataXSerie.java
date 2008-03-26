@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 /**
  * Author: Wolfgang Schramm Created: 21.06.2005
  */
@@ -20,7 +21,7 @@
 package net.tourbook.chart;
 
 /**
- * Contains the data values for the x-axis
+ * Contains data values for the x-axis
  */
 public class ChartDataXSerie extends ChartDataSerie {
 
@@ -28,24 +29,29 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * start value for the serie data, this is use to set the start point for time data to the
 	 * starting time
 	 */
-	private int		startValue				= 0;
+	private int				startValue				= 0;
 
 	/**
 	 * index in the x-data at which the graph is painted in the marker color, <code>-1</code>
 	 * disables the synch marker
 	 */
-	private int		fSynchMarkerStartIndex	= -1;
+	private int				fSynchMarkerStartIndex	= -1;
 
 	/**
 	 * index in the x-data at which the graph is stoped to painted in the marker color
 	 */
-	private int		fSynchMarkerEndIndex	= -1;
+	private int				fSynchMarkerEndIndex	= -1;
 
 	/**
 	 * Range marker shows an area with a different color in the graph
 	 */
-	private int[]	fRangeMarkerStartIndex;
-	private int[]	fRangeMarkerEndIndex;
+	private int[]			fRangeMarkerStartIndex;
+	private int[]			fRangeMarkerEndIndex;
+
+	/**
+	 * Segment contains information to show statistics for several years
+	 */
+	private ChartSegments	fSegmentMarker;
 
 	public ChartDataXSerie(int values[]) {
 		setMinMaxValues(new int[][] { values });
@@ -57,6 +63,10 @@ public class ChartDataXSerie extends ChartDataSerie {
 
 	public int[] getRangeMarkerStartIndex() {
 		return fRangeMarkerStartIndex;
+	}
+
+	public ChartSegments getSegmentMarker() {
+		return fSegmentMarker;
 	}
 
 	/**
@@ -92,6 +102,10 @@ public class ChartDataXSerie extends ChartDataSerie {
 	public void setRangeMarkers(int[] rangeMarkerStartIndex, int[] rangeMarkerEndIndex) {
 		fRangeMarkerStartIndex = rangeMarkerStartIndex;
 		fRangeMarkerEndIndex = rangeMarkerEndIndex;
+	}
+
+	public void setSegmentMarker(ChartSegments segmentMarker) {
+		fSegmentMarker = segmentMarker;
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,12 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.statistics;
 
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartSegments;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.ui.UI;
 
@@ -30,29 +32,48 @@ public class StatisticWeekCombined extends StatisticWeek {
 		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		/*
-		 * chart title
+		 * create segments for each year
 		 */
-		String title = "";
-		if (fNumberOfYears > 1) {
-			title = Integer.toString(fCurrentYear - fNumberOfYears + 1) + "-" + Integer.toString(fCurrentYear);
-		} else {
-			// one year
-			title = Integer.toString(fCurrentYear);
-		}
-		chartDataModel.setTitle(title);
+		int yearWeeks = ProviderTourWeek.YEAR_WEEKS;
+		int segmentStart[] = new int[fNumberOfYears];
+		int segmentEnd[] = new int[fNumberOfYears];
+		String[] segmentTitle = new String[fNumberOfYears];
 
-		/*
-		 * create week array
-		 */
 		int weekCounter = tourWeekData.fAltitudeHigh[0].length;
-		int weekValues[] = new int[weekCounter];
+		int allWeeks[] = new int[weekCounter];
+
+		int oldestYear = fCurrentYear - fNumberOfYears + 1;
+
+		// get start/end and title for each segment
 		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
-			weekValues[weekIndex] = weekIndex;
+
+			allWeeks[weekIndex] = weekIndex;
+			int currentYearIndex = weekIndex / yearWeeks;
+
+			if (weekIndex % yearWeeks == 0) {
+
+				// first week in a year
+
+				segmentStart[currentYearIndex] = weekIndex;
+				segmentTitle[currentYearIndex] = Integer.toString(oldestYear + currentYearIndex);
+
+			} else if (weekIndex % yearWeeks == yearWeeks - 1) {
+
+				// last week in a year
+
+				segmentEnd[currentYearIndex] = weekIndex;
+			}
 		}
+
+		ChartSegments weekSegments = new ChartSegments();
+		weekSegments.valueStart = segmentStart;
+		weekSegments.valueEnd = segmentEnd;
+		weekSegments.segmentTitle = segmentTitle;
 
 		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(weekValues);
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+		ChartDataXSerie xData = new ChartDataXSerie(allWeeks);
+		xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_WEEK);
+		xData.setSegmentMarker(weekSegments);
 		chartDataModel.setXData(xData);
 
 		// distance

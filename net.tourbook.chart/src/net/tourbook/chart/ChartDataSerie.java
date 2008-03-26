@@ -28,6 +28,8 @@ public abstract class ChartDataSerie {
 	public static final int			AXIS_UNIT_MONTH					= 30;
 	public static final int			AXIS_UNIT_YEAR					= 40;
 
+	public static final int			X_AXIS_UNIT_WEEK				= 100;
+
 	/**
 	 * contains the values for the chart, highValues contains the upper value, lowValues the lower
 	 * value. When lowValues is null then the low values is set to 0

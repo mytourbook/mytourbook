@@ -13,21 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-/**
- * @author Wolfgang Schramm
- * 
- * 06.07.2005
- */
 
 package net.tourbook.chart;
 
-public class ChartUnit {
+/**
+ * {@link ChartSegments} contains information to display a statistic for several years in the chart.
+ */
+public class ChartSegments {
 
-	String	valueLabel;
-	int		value;
+	public int[]	valueStart;
+	public int[]	valueEnd;
 
-	public ChartUnit(int value, String valueLabel) {
-		this.value = value;
-		this.valueLabel = valueLabel;
-	}
+	public String[]	segmentTitle;
+
 }

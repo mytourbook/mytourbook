@@ -61,6 +61,11 @@ public class ChartDrawingData {
 	private float					scaleX;
 	private float					scaleY;
 
+	/**
+	 * scaling the the x unit
+	 */
+	private float					scaleUnitX				= Float.MIN_VALUE;
+
 	private int						devMarginTop;
 	private int						devXTitelBarHeight;
 	private int						devMarkerBarHeight;
@@ -107,13 +112,6 @@ public class ChartDrawingData {
 	}
 
 	/**
-	 * @return Returns the barRectanglePos.
-	 */
-	public int getDevBarRectangleXPos() {
-		return fDevBarRectangleXPos;
-	}
-
-	/**
 	 * @return Returns the barRectangles.
 	 */
 	public Rectangle[][] getBarRectangles() {
@@ -129,6 +127,13 @@ public class ChartDrawingData {
 
 	public int getChartType() {
 		return fChartType;
+	}
+
+	/**
+	 * @return Returns the barRectanglePos.
+	 */
+	public int getDevBarRectangleXPos() {
+		return fDevBarRectangleXPos;
 	}
 
 	public int getDevGraphHeight() {
@@ -209,6 +214,10 @@ public class ChartDrawingData {
 		return graphYTop;
 	}
 
+	public float getScaleUnitX() {
+		return scaleUnitX;
+	}
+
 	public float getScaleX() {
 		return scaleX;
 	}
@@ -287,14 +296,6 @@ public class ChartDrawingData {
 	}
 
 	/**
-	 * @param barRectanglePos
-	 *        The barRectanglePos to set.
-	 */
-	public void setDevBarRectangleXPos(int barRectanglePos) {
-		fDevBarRectangleXPos = barRectanglePos;
-	}
-
-	/**
 	 * @param barRectangles
 	 *        The barRectangles to set.
 	 */
@@ -308,6 +309,14 @@ public class ChartDrawingData {
 	 */
 	public void setBarRectangleWidth(int barRectangleWidth) {
 		this.fBarRectangleWidth = barRectangleWidth;
+	}
+
+	/**
+	 * @param barRectanglePos
+	 *        The barRectanglePos to set.
+	 */
+	public void setDevBarRectangleXPos(int barRectanglePos) {
+		fDevBarRectangleXPos = barRectanglePos;
 	}
 
 	public void setDevGraphHeight(int heightDev) {
@@ -378,6 +387,20 @@ public class ChartDrawingData {
 		this.graphYTop = graphYTop;
 	}
 
+	/**
+	 * Set scaling for the x-axis unit
+	 * 
+	 * @param scaleXUnit
+	 */
+	public void setScaleUnitX(float scaleXUnit) {
+		this.scaleUnitX = scaleXUnit;
+	}
+
+	/**
+	 * Set scaling for the x-axis values
+	 * 
+	 * @param scaleX
+	 */
 	public void setScaleX(float scaleX) {
 		this.scaleX = scaleX;
 	}

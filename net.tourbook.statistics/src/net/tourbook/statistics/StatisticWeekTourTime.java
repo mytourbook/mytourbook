@@ -15,43 +15,38 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataSerie;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColorProvider;
 
 public class StatisticWeekTourTime extends StatisticWeek {
 
 	@Override
 	void updateChart(TourDataWeek tourWeekData) {
 
-		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
-
-		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(ProviderTourWeek.fAllWeeks);
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
-		chartModel.setXData(xData);
-
-		// duration
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				tourWeekData.fTimeLow,
-				tourWeekData.fTimeHigh);
-		yData.setYTitle(Messages.LABEL_DRIVING_TIME);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-		yData.setAllValueColors(0);
-		yData.setVisibleMinValue(0);
-		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
-		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
-
-		if (fIsSynchScaleEnabled) {
-			fMinMaxKeeper.setMinMaxValues(chartModel);
-		}
-
-		// show the fDataModel in the chart
-		fChart.updateChart(chartModel);
+//		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+//
+//		// set the x-axis
+//		ChartDataXSerie xData = new ChartDataXSerie(ProviderTourWeek.fAllWeeks);
+//		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+//		chartModel.setXData(xData);
+//
+//		// duration
+//		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+//				ChartDataYSerie.BAR_LAYOUT_STACKED,
+//				tourWeekData.fTimeLow,
+//				tourWeekData.fTimeHigh);
+//		yData.setYTitle(Messages.LABEL_DRIVING_TIME);
+//		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
+//		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+//		yData.setAllValueColors(0);
+//		yData.setVisibleMinValue(0);
+//		chartModel.addYData(yData);
+//		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
+//		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
+//
+//		if (fIsSynchScaleEnabled) {
+//			fMinMaxKeeper.setMinMaxValues(chartModel);
+//		}
+//
+//		// show the fDataModel in the chart
+//		fChart.updateChart(chartModel);
 	}
 }

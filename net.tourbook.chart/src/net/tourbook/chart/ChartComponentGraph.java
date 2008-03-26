@@ -1204,7 +1204,7 @@ public class ChartComponentGraph extends Canvas {
 					continue;
 				}
 
-				int devBarHeight = (int) (barHeight * scaleY);
+				final int devBarHeight = (int) (barHeight * scaleY);
 
 				// get the old y position for stacked bars
 				int devYPreviousHeight = 0;
@@ -1442,10 +1442,10 @@ public class ChartComponentGraph extends Canvas {
 			 */
 			if (fGraphImage != null) {
 
-				Image image = drawChartImage(gc);
+				final Image image = drawChartImage(gc);
 
-				int gcHeight = clientArea.height;
-				int imageHeight = image.getBounds().height;
+				final int gcHeight = clientArea.height;
+				final int imageHeight = image.getBounds().height;
 
 				if (gcHeight > imageHeight) {
 
@@ -1645,6 +1645,8 @@ public class ChartComponentGraph extends Canvas {
 					if (graphIndex == 0) {
 						drawXTitle(gc, drawingData);
 					}
+
+					drawSegments(gc, drawingData);
 
 					if (graphIndex == fDrawingData.size() - 1) {
 						// draw the unit label and unit tick for the last graph
@@ -2280,7 +2282,7 @@ public class ChartComponentGraph extends Canvas {
 		final int devBarWidthComputed = drawingData.getBarRectangleWidth();
 		final int devBarWidth = Math.max(1, devBarWidthComputed);
 
-		int devBarXPos = drawingData.getDevBarRectangleXPos();
+		final int devBarXPos = drawingData.getDevBarRectangleXPos();
 
 		// loop: all data series
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
@@ -2318,7 +2320,7 @@ public class ChartComponentGraph extends Canvas {
 					continue;
 				}
 
-				int devBarHeight = (int) (graphBarHeight * scaleY);
+				final int devBarHeight = (int) (graphBarHeight * scaleY);
 
 				// get the y position
 				int devYPos;
@@ -2365,15 +2367,15 @@ public class ChartComponentGraph extends Canvas {
 		gc.setClipping((Rectangle) null);
 	}
 
-	private void drawRangeMarker(GC gc, ChartDrawingData drawingData) {
+	private void drawRangeMarker(final GC gc, final ChartDrawingData drawingData) {
 
 //		final RGB colorRangeMarker = new RGB(0, 200, 200);
 
 		final ChartDataXSerie xData = drawingData.getXData();
 		final ChartDataYSerie yData = drawingData.getYData();
 
-		int[] startIndex = xData.getRangeMarkerStartIndex();
-		int[] endIndex = xData.getRangeMarkerEndIndex();
+		final int[] startIndex = xData.getRangeMarkerStartIndex();
+		final int[] endIndex = xData.getRangeMarkerEndIndex();
 
 		if (startIndex == null) {
 			return;
@@ -2396,12 +2398,15 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		int runningIndex = 0;
-		for (int markerStartIndex : startIndex) {
+		for (final int markerStartIndex : startIndex) {
 
 			// draw range marker
-			drawLineGraphSegment(gc, drawingData, markerStartIndex, endIndex[runningIndex] + 1, rgbFg, rgbBg1,
-//					colorRangeMarker,
-//					rgbBg2,
+			drawLineGraphSegment(gc, //
+					drawingData,
+					markerStartIndex,
+					endIndex[runningIndex] + 1,
+					rgbFg,
+					rgbBg1,
 					rgbBg2,
 					0x40,
 					graphValueOffset);
@@ -2409,6 +2414,48 @@ public class ChartComponentGraph extends Canvas {
 			runningIndex++;
 		}
 
+	}
+
+	private void drawSegments(final GC gc, final ChartDrawingData drawingData) {
+
+		final ChartSegments segmentMarker = drawingData.getXData().getSegmentMarker();
+
+		if (segmentMarker == null) {
+			return;
+		}
+
+		final int devYBottom = drawingData.getDevYBottom();
+		final int devYTop = drawingData.getDevYTop();
+		final float scaleX = drawingData.getScaleX();
+
+		final int[] startValues = segmentMarker.valueStart;
+		final int[] endValues = segmentMarker.valueEnd;
+
+		final Color alternateColor = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5); // efefef
+
+		for (int segmentIndex = 0; segmentIndex < startValues.length; segmentIndex++) {
+
+			if (segmentIndex % 2 == 1) {
+
+				// draw segment background color
+
+				final int startValue = startValues[segmentIndex];
+				final int endValue = endValues[segmentIndex];
+
+				final int devValueStart = (int) (scaleX * startValue - fDevGraphImageXOffset);
+
+				// adjust endValue to fill the last part of the segment
+				final int devValueEnd = (int) (scaleX * (endValue + 1) - fDevGraphImageXOffset);
+
+				gc.setBackground(alternateColor);
+				gc.fillRectangle(devValueStart, //
+						devYTop,
+						devValueEnd - devValueStart,
+						devYBottom - devYTop);
+			}
+		}
+
+		alternateColor.dispose();
 	}
 
 	private void drawSelection(final GC gc) {
@@ -2702,21 +2749,58 @@ public class ChartComponentGraph extends Canvas {
 
 	private void drawXTitle(final GC gc, final ChartDrawingData drawingData) {
 
-		final String title = drawingData.getXTitle();
-
-		if (title == null || title.length() == 0) {
-			return;
-		}
-
+		final ChartSegments segmentMarker = drawingData.getXData().getSegmentMarker();
 		final int devYTitle = drawingData.getDevMarginTop();
 
 		final int devGraphWidth = canScrollZoomedChart
 				? drawingData.getDevGraphWidth()
 				: fChartComponents.getDevVisibleChartWidth();
 
-		final Point titleExtend = gc.textExtent(title);
+		if (segmentMarker == null) {
 
-		gc.drawText(title, (devGraphWidth / 2) - (titleExtend.x / 2), (devYTitle), true);
+			/*
+			 * draw default title, center within the chart
+			 */
+
+			final String title = drawingData.getXTitle();
+
+			if (title == null || title.length() == 0) {
+				return;
+			}
+
+			gc.drawText(title, //
+					(devGraphWidth / 2) - (gc.textExtent(title).x / 2),
+					(devYTitle),
+					true);
+
+		} else {
+
+			/*
+			 * draw title for each segment
+			 */
+
+			final float scaleX = drawingData.getScaleX();
+
+			final int[] valueStart = segmentMarker.valueStart;
+			final int[] valueEnd = segmentMarker.valueEnd;
+			final String[] segmentTitles = segmentMarker.segmentTitle;
+
+			for (int segmentIndex = 0; segmentIndex < valueStart.length; segmentIndex++) {
+
+				final int devValueStart = (int) (scaleX * valueStart[segmentIndex] - fDevGraphImageXOffset);
+				final int devValueEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1) - fDevGraphImageXOffset);
+				final String segmentTitle = segmentTitles[segmentIndex];
+
+//				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+
+				// draw the title in the center of the segment 
+				gc.drawText(segmentTitle, //
+						devValueEnd - ((devValueEnd - devValueStart) / 2) - (gc.textExtent(segmentTitle).x / 2),
+						devYTitle,
+						false);
+			}
+		}
+
 	}
 
 	/**
@@ -2736,15 +2820,18 @@ public class ChartComponentGraph extends Canvas {
 							final boolean draw0Unit) {
 
 		final Display display = getDisplay();
-		Color alternateColor = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5); // efefef
 
 		final ArrayList<ChartUnit> units = drawingData.getXUnits();
 
 		final int devYBottom = drawingData.getDevYBottom();
-		final int devYTop = drawingData.getDevYTop();
 		final int unitPos = drawingData.getXUnitTextPos();
-		final float scaleX = drawingData.getScaleX();
+		float scaleX = drawingData.getScaleX();
 
+		// check if the x-units has a special scaling
+		final float scaleUnitX = drawingData.getScaleUnitX();
+		if (scaleUnitX != Float.MIN_VALUE) {
+			scaleX = scaleUnitX;
+		}
 		// compute the distance between two units
 		final float devUnitWidth = units.size() > 1 ? //
 				((units.get(1).value * scaleX) - (units.get(0).value * scaleX))
@@ -2761,7 +2848,6 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		boolean isUnitLabelPrinted = false;
-		int devNextXUnitTick;
 
 		for (final ChartUnit unit : units) {
 
@@ -2776,29 +2862,6 @@ public class ChartComponentGraph extends Canvas {
 
 			// dev x-position for the unit tick
 			final int devXUnitTick = devXOffset + (int) (unit.value * scaleX);
-
-			// get position for the next unit
-			if (unitCounter < units.size() - 1) {
-				devNextXUnitTick = devXOffset + (int) (units.get(unitCounter + 1).value * scaleX);
-			} else {
-				// get last segment 
-				devNextXUnitTick = devXUnitTick + (int) devUnitWidth + 10;
-			}
-
-			/*
-			 * draw alternate color
-			 */
-			if (devNextXUnitTick != -1 && unit.isAlternateBgColor) {
-
-				gc.setBackground(alternateColor);
-				gc.fillRectangle(devXUnitTick, //
-						devYTop,
-						devNextXUnitTick - devXUnitTick,
-						devYBottom - devYTop);
-
-//				gc.drawLine(devXUnitTick, devY, devXUnitTick, devY - drawingData.getDevGraphHeight());
-
-			}
 
 			/*
 			 * the first unit is not painted because it would clip at the left border of the chart
@@ -2891,7 +2954,6 @@ public class ChartComponentGraph extends Canvas {
 			unitCounter++;
 		}
 
-		alternateColor.dispose();
 	}
 
 	/**
@@ -4877,7 +4939,7 @@ public class ChartComponentGraph extends Canvas {
 	 * @param scrollSmoothly
 	 * @param ratio
 	 */
-	void zoomWithParts(final int parts, final float position, boolean scrollSmoothly) {
+	void zoomWithParts(final int parts, final float position, final boolean scrollSmoothly) {
 
 		canScrollZoomedChart = true;
 

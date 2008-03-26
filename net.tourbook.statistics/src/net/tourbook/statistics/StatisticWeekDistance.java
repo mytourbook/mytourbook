@@ -15,43 +15,37 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataSerie;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColorProvider;
-import net.tourbook.ui.UI;
 
 public class StatisticWeekDistance extends StatisticWeek {
 
 	@Override
 	void updateChart(TourDataWeek tourWeekData) {
 
-		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
-
-		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(ProviderTourWeek.fAllWeeks);
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
-		chartModel.setXData(xData);
-
-		// distance
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				tourWeekData.fDistanceLow,
-				tourWeekData.fDistanceHigh);
-		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setVisibleMinValue(0);
-		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
-		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
-
-		if (fIsSynchScaleEnabled) {
-			fMinMaxKeeper.setMinMaxValues(chartModel);
-		}
-
-		// show the fDataModel in the chart
-		fChart.updateChart(chartModel);
+//		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+//
+//		// set the x-axis
+//		ChartDataXSerie xData = new ChartDataXSerie(ProviderTourWeek.fAllWeeks);
+//		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+//		chartModel.setXData(xData);
+//
+//		// distance
+//		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+//				ChartDataYSerie.BAR_LAYOUT_STACKED,
+//				tourWeekData.fDistanceLow,
+//				tourWeekData.fDistanceHigh);
+//		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
+//		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
+//		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+//		yData.setVisibleMinValue(0);
+//		chartModel.addYData(yData);
+//		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
+//		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
+//
+//		if (fIsSynchScaleEnabled) {
+//			fMinMaxKeeper.setMinMaxValues(chartModel);
+//		}
+//
+//		// show the fDataModel in the chart
+//		fChart.updateChart(chartModel);
 	}
 }

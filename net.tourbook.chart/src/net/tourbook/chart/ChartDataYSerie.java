@@ -38,14 +38,13 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public static final int			BAR_LAYOUT_BESIDE		= 3;
 
-	private int						fChartLayout			= ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE;
-
 	public static final String		YDATA_INFO				= "yDataInfo";								//$NON-NLS-1$
 
 	public static final int			FILL_METHOD_NOFILL		= 0;
 	public static final int			FILL_METHOD_FILL_BOTTOM	= 1;
 	public static final int			FILL_METHOD_FILL_ZERO	= 2;
 
+	private int						fChartLayout			= ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE;
 	private String					fYTitle;
 
 	/**
@@ -74,8 +73,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	private final int				fChartType;
 
-	public ChartDataYSerie(int chartType, int chartLayout, int[][] lowValueSeries,
-			int[][] highValueSeries) {
+	public ChartDataYSerie(int chartType, int chartLayout, int[][] lowValueSeries, int[][] highValueSeries) {
 
 		fChartType = chartType;
 		fChartLayout = chartLayout;
@@ -128,10 +126,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 * @return Returns the valueColors.
 	 */
 	public int[][] getColorsIndex() {
-		if (fColorIndex == null
-				|| fColorIndex.length == 0
-				|| fColorIndex[0] == null
-				|| fColorIndex[0].length == 0) {
+		if (fColorIndex == null || fColorIndex.length == 0 || fColorIndex[0] == null || fColorIndex[0].length == 0) {
 			setAllValueColors(0);
 		}
 		return fColorIndex;
@@ -302,15 +297,9 @@ public class ChartDataYSerie extends ChartDataSerie {
 	@Override
 	void setMinMaxValues(int[][] lowValues, int[][] highValues) {
 
-		if (lowValues == null
-				|| lowValues.length == 0
-				|| lowValues[0] == null
-				|| lowValues[0].length == 0
+		if (lowValues == null || lowValues.length == 0 || lowValues[0] == null || lowValues[0].length == 0
 
-				|| highValues == null
-				|| highValues.length == 0
-				|| highValues[0] == null
-				|| highValues[0].length == 0) {
+		|| highValues == null || highValues.length == 0 || highValues[0] == null || highValues[0].length == 0) {
 
 			fVisibleMaxValue = fVisibleMinValue = 0;
 			fOriginalMaxValue = fOriginalMinValue = 0;
