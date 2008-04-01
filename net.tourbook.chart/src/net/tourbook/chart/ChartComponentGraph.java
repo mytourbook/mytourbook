@@ -1320,8 +1320,12 @@ public class ChartComponentGraph extends Canvas {
 		for (int serieIndex = 0; serieIndex < barRectangeleSeries.length; serieIndex++) {
 
 			// get selected rectangle
-			final Rectangle barRectangle = barRectangeleSeries[serieIndex][selectedIndex];
+			final Rectangle[] barRectangles = barRectangeleSeries[serieIndex];
+			if (barRectangles == null || selectedIndex >= barRectangles.length) {
+				continue;
+			}
 
+			final Rectangle barRectangle = barRectangles[selectedIndex];
 			if (barRectangle == null) {
 				continue;
 			}
@@ -2418,9 +2422,9 @@ public class ChartComponentGraph extends Canvas {
 
 	private void drawSegments(final GC gc, final ChartDrawingData drawingData) {
 
-		final ChartSegments segmentMarker = drawingData.getXData().getSegmentMarker();
+		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 
-		if (segmentMarker == null) {
+		if (chartSegments == null) {
 			return;
 		}
 
@@ -2428,8 +2432,8 @@ public class ChartComponentGraph extends Canvas {
 		final int devYTop = drawingData.getDevYTop();
 		final float scaleX = drawingData.getScaleX();
 
-		final int[] startValues = segmentMarker.valueStart;
-		final int[] endValues = segmentMarker.valueEnd;
+		final int[] startValues = chartSegments.valueStart;
+		final int[] endValues = chartSegments.valueEnd;
 
 		final Color alternateColor = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5); // efefef
 
@@ -2749,7 +2753,7 @@ public class ChartComponentGraph extends Canvas {
 
 	private void drawXTitle(final GC gc, final ChartDrawingData drawingData) {
 
-		final ChartSegments segmentMarker = drawingData.getXData().getSegmentMarker();
+		final ChartSegments segmentMarker = drawingData.getXData().getChartSegments();
 		final int devYTitle = drawingData.getDevMarginTop();
 
 		final int devGraphWidth = canScrollZoomedChart
@@ -2794,10 +2798,12 @@ public class ChartComponentGraph extends Canvas {
 //				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 				// draw the title in the center of the segment 
-				gc.drawText(segmentTitle, //
-						devValueEnd - ((devValueEnd - devValueStart) / 2) - (gc.textExtent(segmentTitle).x / 2),
-						devYTitle,
-						false);
+				if (segmentTitle != null) {
+					gc.drawText(segmentTitle, //
+							devValueEnd - ((devValueEnd - devValueStart) / 2) - (gc.textExtent(segmentTitle).x / 2),
+							devYTitle,
+							false);
+				}
 			}
 		}
 
@@ -4320,7 +4326,6 @@ public class ChartComponentGraph extends Canvas {
 				final ChartDataXSerie xData = chartDrawingData.getXData();
 
 				fSelectedBarItems = new boolean[xData.fHighValues[0].length];
-				// fSelectedXData[0] = true;
 			}
 
 		} else {

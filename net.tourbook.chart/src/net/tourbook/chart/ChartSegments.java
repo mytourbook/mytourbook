@@ -26,4 +26,9 @@ public class ChartSegments {
 
 	public String[]	segmentTitle;
 
+	public int		allValues;
+
+	public int[]	years;
+	public int[]	yearDays;
+
 }

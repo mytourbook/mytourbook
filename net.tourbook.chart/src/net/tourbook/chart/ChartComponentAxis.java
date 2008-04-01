@@ -232,22 +232,31 @@ public class ChartComponentAxis extends Canvas {
 
 				gc.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
 
-				// draw the unit tick
-				gc.setLineStyle(SWT.LINE_SOLID);
-				if (fIsLeft) {
-					gc.drawLine(devX - 5, devY, devX, devY);
-				} else {
-					gc.drawLine(devX, devY, devX + 5, devY);
+				final String valueLabel = yUnit.valueLabel;
+
+				/*
+				 * hide unit tick when label is not set
+				 */
+				if (valueLabel.length() > 0) {
+
+					// draw the unit tick
+
+					gc.setLineStyle(SWT.LINE_SOLID);
+					if (fIsLeft) {
+						gc.drawLine(devX - 5, devY, devX, devY);
+					} else {
+						gc.drawLine(devX, devY, devX + 5, devY);
+					}
 				}
 
-				final Point unitExtend = gc.textExtent(yUnit.valueLabel);
+				final Point unitExtend = gc.textExtent(valueLabel);
 				int devYUnit = devY - unitExtend.y / 2;
 
 				// draw the unit label centered at the unit tick
 				if (fIsLeft) {
-					gc.drawText(yUnit.valueLabel, (devX - (unitExtend.x + UNIT_OFFSET)), devYUnit, true);
+					gc.drawText(valueLabel, (devX - (unitExtend.x + UNIT_OFFSET)), devYUnit, true);
 				} else {
-					gc.drawText(yUnit.valueLabel, (devX + UNIT_OFFSET), devYUnit, true);
+					gc.drawText(valueLabel, (devX + UNIT_OFFSET), devYUnit, true);
 				}
 
 				unitCount++;

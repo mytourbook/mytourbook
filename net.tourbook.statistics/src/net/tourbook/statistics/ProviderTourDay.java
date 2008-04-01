@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.statistics;
 
 import java.sql.Connection;
@@ -21,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -30,20 +30,11 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.ArrayListToArray;
 
-public class ProviderTourDay extends DataProvider /* implements IBarSelectionProvider */{
+public class ProviderTourDay extends DataProvider {
 
 	private static ProviderTourDay	fInstance;
 
-	private TourPerson				fActivePerson;
-	private int						fCurrentYear;
-//	private int						fCurrentMonth;
-
 	private TourDataTour			fTourDataTour;
-//	private final Calendar			fCalendar	= GregorianCalendar.getInstance();
-
-	private TourTypeFilter			fActiveTourTypeFilter;
-
-//	private Long					fSelectedTourId;
 
 	private ProviderTourDay() {}
 
@@ -56,16 +47,26 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 
 	TourDataTour getDayData(final TourPerson person,
 							final TourTypeFilter tourTypeFilter,
-							final int year,
+							final int lastYear,
+							int numberOfYears,
 							final boolean refreshData) {
 
 		// dont reload data which are already here
 		if (person == fActivePerson
 				&& tourTypeFilter == fActiveTourTypeFilter
-				&& year == fCurrentYear
+				&& lastYear == fLastYear
+				&& numberOfYears == fNumberOfYears
 				&& refreshData == false) {
 			return fTourDataTour;
 		}
+
+		fActivePerson = person;
+		fActiveTourTypeFilter = tourTypeFilter;
+
+		fLastYear = lastYear;
+		fNumberOfYears = numberOfYears;
+
+		initYearDOYs();
 
 		// get the tour types
 		final ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
@@ -75,30 +76,31 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 
 		final String sqlString = //
 		"SELECT " // //$NON-NLS-1$
-				+ "TOURID				, "// 1 //$NON-NLS-1$
-				+ "STARTMONTH			, "// 2 //$NON-NLS-1$
-				+ "STARTDAY				, "// 3 //$NON-NLS-1$
-				+ "STARTHOUR			, "// 4 //$NON-NLS-1$
-				+ "STARTMINUTE			, "// 5 //$NON-NLS-1$
-				+ "TOURDISTANCE			, "// 6 //$NON-NLS-1$
-				+ "TOURALTUP			, "// 7 //$NON-NLS-1$
-				+ "TOURDRIVINGTIME		, "// 8 //$NON-NLS-1$
-				+ "tourRecordingTime	, "// 9 //$NON-NLS-1$
-				+ "tourType_typeId 		\n" // 10 //$NON-NLS-1$
+				+ "TourId, " //				// 1 //$NON-NLS-1$
+				+ "StartYear, " // 			// 2 //$NON-NLS-1$
+				+ "StartMonth, " // 		// 3 //$NON-NLS-1$
+				+ "StartDay, " // 			// 4 //$NON-NLS-1$
+				+ "StartHour, " // 			// 5 //$NON-NLS-1$
+				+ "StartMinute, " // 		// 6 //$NON-NLS-1$
+				+ "TourDistance, " // 		// 7 //$NON-NLS-1$
+				+ "TourAltUp, " // 			// 8 //$NON-NLS-1$
+				+ "TourDrivingTime, " // 	// 9 //$NON-NLS-1$
+				+ "TourRecordingTime, " // 	// 10 //$NON-NLS-1$
+				+ "TourType_typeId \n" // 	// 11 //$NON-NLS-1$
+				//
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE STARTYEAR = " + Integer.toString(year)) //$NON-NLS-1$
+				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$
 				+ getSQLFilter(person, tourTypeFilter)
-				+ (" ORDER BY StartMonth, StartDay, StartHour , StartMinute "); //$NON-NLS-1$
+				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute "); //$NON-NLS-1$
 
 		try {
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 			final ResultSet result = statement.executeQuery();
 
-			final Calendar calendar = GregorianCalendar.getInstance();
-
 			final ArrayList<Long> dbTourIds = new ArrayList<Long>();
-			final ArrayList<Integer> dbDOY = new ArrayList<Integer>();
+			final ArrayList<Integer> dbYear = new ArrayList<Integer>();
+			final ArrayList<Integer> dbAllYearsDOY = new ArrayList<Integer>(); // DOY...Day Of Year
 			final ArrayList<Integer> dbMonths = new ArrayList<Integer>();
 
 			final ArrayList<Integer> dbDistance = new ArrayList<Integer>();
@@ -110,23 +112,26 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 
 			while (result.next()) {
 
-				final int tourMonth = result.getInt(2) - 1;
+				final int tourYear = result.getInt(2);
+				final int tourMonth = result.getInt(3) - 1;
 
-				calendar.set(year, tourMonth, result.getShort(3));
-				final int tourDOY = calendar.get(Calendar.DAY_OF_YEAR) - 1;
+				// get number of days for the year, start with 0
+				fCalendar.set(tourYear, tourMonth, result.getShort(4));
+				final int tourDOY = fCalendar.get(Calendar.DAY_OF_YEAR) - 1;
 
 				dbTourIds.add(result.getLong(1));
-				dbDOY.add(tourDOY);
+				dbYear.add(tourYear);
 				dbMonths.add(tourMonth);
+				dbAllYearsDOY.add(getYearDOYs(tourYear) + tourDOY);
 
-				dbDistance.add((int) (result.getInt(6) / 1000 / UI.UNIT_VALUE_DISTANCE));
-				dbAltitude.add((int) (result.getInt(7) / UI.UNIT_VALUE_ALTITUDE));
+				dbDistance.add((int) (result.getInt(7) / 1000 / UI.UNIT_VALUE_DISTANCE));
+				dbAltitude.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
 
 				/*
 				 * set the tour time
 				 */
-				final int drivingTime = result.getInt(8);
-				final int recordingTime = result.getInt(9);
+				final int drivingTime = result.getInt(9);
+				final int recordingTime = result.getInt(10);
 				dbTourTime.add(drivingTime == 0 ? recordingTime : drivingTime);
 
 				/*
@@ -134,9 +139,9 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 				 * index
 				 */
 				int colorIndex = 0;
-				final Object dbTypeIdObject = result.getObject(10);
+				final Object dbTypeIdObject = result.getObject(11);
 				if (dbTypeIdObject != null) {
-					final long dbTypeId = result.getLong(10);
+					final long dbTypeId = result.getLong(11);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
 							colorIndex = typeIndex + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
@@ -151,16 +156,17 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 
 			conn.close();
 
-			final int[] tourDOYs = ArrayListToArray.toInt(dbDOY);
+			final int[] tourYear = ArrayListToArray.toInt(dbYear);
+			final int[] tourAllYearsDOY = ArrayListToArray.toInt(dbAllYearsDOY);
 
 			final int[] timeHigh = ArrayListToArray.toInt(dbTourTime);
 			final int[] distanceHigh = ArrayListToArray.toInt(dbDistance);
 			final int[] altitudeHigh = ArrayListToArray.toInt(dbAltitude);
 
-			final int valueLength = timeHigh.length;
-			final int[] timeLow = new int[valueLength];
-			final int[] distanceLow = new int[valueLength];
-			final int[] altitudeLow = new int[valueLength];
+			final int serieLength = timeHigh.length;
+			final int[] timeLow = new int[serieLength];
+			final int[] distanceLow = new int[serieLength];
+			final int[] altitudeLow = new int[serieLength];
 
 			int lastDOY = -1;
 			int lastTime = 0;
@@ -171,11 +177,11 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 			 * set the low/high values when different tours have the same day
 			 */
 			int tourIndex = 0;
-			for (; tourIndex < tourDOYs.length; tourIndex++) {
+			for (; tourIndex < tourAllYearsDOY.length; tourIndex++) {
 
-				if (lastDOY == tourDOYs[tourIndex]) {
+				if (lastDOY == tourAllYearsDOY[tourIndex]) {
 
-					// current tour is on the same day as the tour before
+					// current tour is at the same day as the tour before
 
 					timeLow[tourIndex] = lastTime;
 					distanceLow[tourIndex] = lastDistance;
@@ -204,7 +210,7 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 					lastDistance = 0;
 					lastAltitude = 0;
 
-					lastDOY = tourDOYs[tourIndex];
+					lastDOY = tourAllYearsDOY[tourIndex];
 				}
 			}
 
@@ -219,8 +225,19 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 					distanceHigh,
 					altitudeHigh);
 
+			// get number of days for all years
+			int yearDays = 0;
+			for (int doy : fYearDays) {
+				yearDays += doy;
+			}
+
 			fTourDataTour.fTourIds = ArrayListToArray.toLong(dbTourIds);
-			fTourDataTour.fDOYValues = tourDOYs;
+
+			fTourDataTour.fYearValues = tourYear;
+			fTourDataTour.fDOYValues = tourAllYearsDOY;
+			fTourDataTour.allDaysInAllYears = yearDays;
+			fTourDataTour.yearDays = fYearDays;
+			fTourDataTour.years = fYears;
 
 			fTourDataTour.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
 			fTourDataTour.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
@@ -235,68 +252,12 @@ public class ProviderTourDay extends DataProvider /* implements IBarSelectionPro
 			fTourDataTour.fDistanceHigh = distanceHigh;
 			fTourDataTour.fAltitudeHigh = altitudeHigh;
 
-			fActivePerson = person;
-			fActiveTourTypeFilter = tourTypeFilter;
-			fCurrentYear = year;
-
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 
 		return fTourDataTour;
 	}
-
-////	public Integer getSelectedMonth() {
-////		return fCurrentMonth;
-////	}
-//////
-////	public Long getSelectedTourId() {
-////		return fSelectedTourId;
-////	}
-//
-//	public void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
-//
-//		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, new IChartInfoProvider() {
-//			public String getInfo(final int serieIndex, final int valueIndex) {
-//
-//				fCalendar.set(fCurrentYear, 0, 1);
-//				fCalendar.set(Calendar.DAY_OF_YEAR, fTourDataTour.fDOYValues[valueIndex] + 1);
-//
-//				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
-//				fSelectedTourId = fTourDataTour.fTourIds[valueIndex];
-//
-//				final int duration = fTourDataTour.fTimeHigh[valueIndex]
-//						- fTourDataTour.fTimeLow[valueIndex];
-//
-//				final String barInfo = new Formatter().format(Messages.TOURDAYINFO_TOUR_DATE_FORMAT
-//						+ Messages.TOURDAYINFO_DISTANCE
-//						+ Messages.TOURDAYINFO_ALTITUDE
-//						+ Messages.TOURDAYINFO_DURATION,
-//						fCalendar.get(Calendar.DAY_OF_MONTH),
-//						fCalendar.get(Calendar.MONTH) + 1,
-//						fCalendar.get(Calendar.YEAR),
-//						fTourDataTour.fDistanceHigh[valueIndex],
-//						fTourDataTour.fAltitudeHigh[valueIndex],
-//						duration / 3600,
-//						(duration % 3600) / 60).toString();
-//
-//				return barInfo;
-//			}
-//		});
-//
-////		// set the menu context provider
-////		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER,
-////				new TourContextProvider(chartWidget, this));
-//	}
-
-//	/**
-//	 * Set the tour id which is selected in the statistic
-//	 * 
-//	 * @param selectedTourId
-//	 */
-//	public void setSelectedTourId(Long selectedTourId) {
-//		fSelectedTourId = selectedTourId;
-//	}
 
 	private final void updateLastTour(	final int tourIndex,
 										final int lastTime,

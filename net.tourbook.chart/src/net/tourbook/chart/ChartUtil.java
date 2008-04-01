@@ -125,8 +125,13 @@ public class ChartUtil {
 			unit /= 60;
 		}
 
-//		unit = (float) unitValue / multiplier;
-		unit = unit > 60 ? 60 : unit > 30 ? 30 : unit > 20 ? 20 : unit > 10 ? 10 : unit > 5 ? 5 : unit > 2 ? 2 : 1;
+		unit = unit > 120 ? 120 : //
+				unit > 60 ? 60 : //
+						unit > 30 ? 30 : //
+								unit > 20 ? 20 : //
+										unit > 10 ? 10 : //
+												unit > 5 ? 5 : //
+														unit > 2 ? 2 : 1;
 		unit *= multiplier;
 
 		return unit;

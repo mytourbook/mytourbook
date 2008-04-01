@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.statistics;
 
 import java.sql.Connection;
@@ -31,12 +32,7 @@ public class ProviderTourMonth extends DataProvider {
 
 	private static ProviderTourMonth	fInstance;
 
-	private TourPerson					fActivePerson;
 	private TourDataMonth				fTourMonthData;
-	private int							fCurrentYear;
-	private int							fNumberOfYears;
-
-	private TourTypeFilter				fActiveTourTypeFilter;
 
 	private ProviderTourMonth() {}
 
@@ -58,11 +54,16 @@ public class ProviderTourMonth extends DataProvider {
 		 */
 		if (fActivePerson == person
 				&& fActiveTourTypeFilter == tourTypeFilter
-				&& lastYear == fCurrentYear
+				&& lastYear == fLastYear
 				&& numberOfYears == fNumberOfYears
 				&& refreshData == false) {
 			return fTourMonthData;
 		}
+
+		fActivePerson = person;
+		fActiveTourTypeFilter = tourTypeFilter;
+		fLastYear = lastYear;
+		fNumberOfYears = numberOfYears;
 
 		// get the tour types
 		final ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
@@ -133,11 +134,6 @@ public class ProviderTourMonth extends DataProvider {
 			}
 
 			conn.close();
-
-			fActivePerson = person;
-			fActiveTourTypeFilter = tourTypeFilter;
-			fCurrentYear = lastYear;
-			fNumberOfYears = numberOfYears;
 
 			fTourMonthData.fTypeIds = dbTypeIds;
 

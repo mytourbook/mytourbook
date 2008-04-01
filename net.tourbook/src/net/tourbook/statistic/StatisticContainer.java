@@ -201,7 +201,7 @@ public class StatisticContainer extends Composite {
 		});
 
 		// fill combobox with number of years
-		for (int years = 1; years < 11; years++) {
+		for (int years = 1; years < 21; years++) {
 			fComboNumberOfYears.add(Integer.toString(years));
 		}
 
@@ -435,7 +435,7 @@ public class StatisticContainer extends Composite {
 				getNumberOfYears(),
 				true);
 
-		resetSelection();
+//		resetSelection();
 	}
 
 	private void refreshStatistic(	TourPerson person,

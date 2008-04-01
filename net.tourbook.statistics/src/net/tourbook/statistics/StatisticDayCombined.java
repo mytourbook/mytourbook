@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.statistics;
 
 import java.util.Calendar;
@@ -27,7 +28,7 @@ import net.tourbook.ui.UI;
 public class StatisticDayCombined extends StatisticDay {
 
 	@Override
-	void updateChart(TourDataTour tourTimeData) {
+	void updateChart(TourDataTour tourTimeData, long lastSelectedTourId) {
 
 		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
@@ -35,6 +36,7 @@ public class StatisticDayCombined extends StatisticDay {
 		ChartDataXSerie xData = new ChartDataXSerie(tourTimeData.fDOYValues);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
 		xData.setVisibleMaxValue(fCurrentYear);
+		xData.setChartSegments(createChartSegments(tourTimeData));
 		chartModel.setXData(xData);
 
 		ChartDataYSerie yData;
@@ -89,8 +91,7 @@ public class StatisticDayCombined extends StatisticDay {
 		 * set graph minimum width, these is the number of days in the year
 		 */
 		fCalendar.set(fCurrentYear, 11, 31);
-		int yearDays = fCalendar.get(Calendar.DAY_OF_YEAR);
-		chartModel.setChartMinWidth(yearDays);
+		chartModel.setChartMinWidth(fCalendar.get(Calendar.DAY_OF_YEAR));
 
 		setChartProviders(fChart, chartModel);
 
@@ -99,7 +100,9 @@ public class StatisticDayCombined extends StatisticDay {
 		}
 
 		// show the data in the chart
-		fChart.updateChart(chartModel);
-	}
+		fChart.updateChart(chartModel, false);
 
+		// try to select the previous selected tour
+		selectTour(lastSelectedTourId);
+	}
 }

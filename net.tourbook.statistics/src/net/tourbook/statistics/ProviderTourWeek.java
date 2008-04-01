@@ -37,12 +37,6 @@ public class ProviderTourWeek extends DataProvider {
 
 	private static ProviderTourWeek	fInstance;
 
-	private int						fCurrentYear;
-	private int						fNumberOfYears;
-
-	private TourPerson				fActivePerson;
-	private TourTypeFilter			fActiveTourTypeFilter;
-
 	private TourDataWeek			fTourWeekData;
 
 	private ProviderTourWeek() {}
@@ -63,11 +57,17 @@ public class ProviderTourWeek extends DataProvider {
 		// when the data for the year are already loaded, all is done
 		if (fActivePerson == person
 				&& fActiveTourTypeFilter == tourTypeFilter
-				&& lastYear == fCurrentYear
+				&& lastYear == fLastYear
 				&& numberOfYears == fNumberOfYears
 				&& refreshData == false) {
 			return fTourWeekData;
 		}
+
+		fActivePerson = person;
+		fActiveTourTypeFilter = tourTypeFilter;
+
+		fLastYear = lastYear;
+		fNumberOfYears = numberOfYears;
 
 		fTourWeekData = new TourDataWeek();
 
@@ -138,11 +138,6 @@ public class ProviderTourWeek extends DataProvider {
 			}
 
 			conn.close();
-
-			fActivePerson = person;
-			fActiveTourTypeFilter = tourTypeFilter;
-			fCurrentYear = lastYear;
-			fNumberOfYears = numberOfYears;
 
 			fTourWeekData.fTypeIds = dbTypeIds;
 

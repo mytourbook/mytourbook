@@ -180,7 +180,7 @@ public abstract class ChartDataSerie {
 
 	void setMinMaxValues(int valueSeries[][]) {
 
-		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0].length == 0) {
+		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
 			fVisibleMaxValue = fVisibleMinValue = 0;
 			fOriginalMaxValue = fOriginalMinValue = 0;
 			fHighValues = new int[1][2];

@@ -117,7 +117,6 @@ public class ChartComponents extends Composite {
 	 * minimum width in pixel for one unit, this is only an approximate value because the pixel is
 	 * rounded up or down to fit a rounded unit
 	 */
-
 	private final int					fDevMinXUnit				= 100;
 
 	private final int					fDevMinYUnit				= 50;
@@ -288,8 +287,6 @@ public class ChartComponents extends Composite {
 		// get the unit list from the configuration
 		final ArrayList<ChartUnit> units = drawingData.getXUnits();
 
-		final int monthLength = monthLabels.length;
-
 		switch (xAxisUnit) {
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
@@ -309,8 +306,7 @@ public class ChartComponents extends Composite {
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_YEAR:
-			// maxValue contains the year which is displayed
-			createXValuesYear(drawingData, monthLength, units, devGraphWidth, xMaxValue);
+			createXValuesYear(drawingData, units, devGraphWidth);
 			break;
 
 		default:
@@ -383,7 +379,6 @@ public class ChartComponents extends Composite {
 
 		// enforce minimum chart height
 		devGraphHeight = Math.max(devGraphHeight, CHART_MIN_HEIGHT);
-//		devGraphHeight = Math.max(devGraphHeight, 1);
 
 		// remove slider bar from graph height
 		devGraphHeight -= devSliderBarHeight;
@@ -393,9 +388,15 @@ public class ChartComponents extends Composite {
 		 * scaled to the device
 		 */
 
+		final int axisUnit = yData.getAxisUnit();
 		int graphMinValue = yData.getVisibleMinValue();
-		// int graphMinValue = yData.getOriginalMinValue();
 		int graphMaxValue = yData.getVisibleMaxValue();
+
+		boolean adjustGraphUnit = false;
+		if (axisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
+			graphMaxValue = 24 * 3600;
+			adjustGraphUnit = true;
+		}
 
 		int graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
 
@@ -403,32 +404,31 @@ public class ChartComponents extends Composite {
 		 * calculate the number of units which will be visible by dividing the available height by
 		 * the minimum size which one unit should have in pixels
 		 */
-		final int unitCount = devGraphHeight / fDevMinYUnit;
+		final int unitCount = devGraphHeight / (fDevMinYUnit + 15);
 
 		// unitValue is the number in data values for one unit
 		final int graphUnitValue = graphValueRange / Math.max(1, unitCount);
 
 		// round the unit
-		float unit = 0;
-		final int axisUnit = yData.getAxisUnit();
+		float graphUnit = 0;
 		switch (axisUnit) {
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H:
 		case ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND:
-			unit = ChartUtil.roundTimeValue(graphUnitValue);
+			graphUnit = ChartUtil.roundTimeValue(graphUnitValue);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_NUMBER:
 			// unit is a decimal number
-			unit = ChartUtil.roundDecimalValue(graphUnitValue);
+			graphUnit = ChartUtil.roundDecimalValue(graphUnitValue);
 			break;
 		}
 
 		float adjustMinValue = 0;
-		if (((float) graphMinValue % unit) != 0 && graphMinValue < 0) {
-			adjustMinValue = unit;
+		if (((float) graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
+			adjustMinValue = graphUnit;
 		}
-		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / unit) * unit);
+		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / graphUnit) * graphUnit);
 
 		// adjust the min value so that bar graphs start at the bottom of the chart
 		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR && fChart.getStartAtChartBottom()) {
@@ -437,14 +437,12 @@ public class ChartComponents extends Composite {
 
 		// increase the max value when it does not fit to unit borders
 		float adjustMaxValue = 0;
-		if (((float) graphMaxValue % unit) != 0) {
-			adjustMaxValue = unit;
+		if (((float) graphMaxValue % graphUnit) != 0) {
+			adjustMaxValue = graphUnit;
 		}
-		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / unit) * unit);
+		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / graphUnit) * graphUnit);
 
-		// System.out.println(graphMinValue +" "+graphMaxValue);
-
-		if (axisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
+		if (adjustGraphUnit || axisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
 
 			// max value exeeds 24h
 
@@ -458,7 +456,7 @@ public class ChartComponents extends Composite {
 					break;
 				}
 				unitCounter++;
-				graphValue += unit;
+				graphValue += graphUnit;
 			}
 
 			// adjust to 24h
@@ -468,8 +466,8 @@ public class ChartComponents extends Composite {
 			// adjust to the whole hour
 			graphMinValue = Math.max(0, (((yData.getVisibleMinValue() / 3600) * 3600)));
 
-			unit = (graphMaxValue - graphMinValue) / unitCounter;
-			unit = ChartUtil.roundTimeValue((int) unit);
+			graphUnit = (graphMaxValue - graphMinValue) / unitCounter;
+			graphUnit = ChartUtil.roundTimeValue((int) graphUnit);
 		}
 
 		graphValueRange = graphMaxValue > 0 ? (graphMaxValue - graphMinValue) : -(graphMinValue - graphMaxValue);
@@ -519,8 +517,13 @@ public class ChartComponents extends Composite {
 				break;
 			}
 
-			graphValue += unit;
+			graphValue += graphUnit;
 			maxUnits++;
+		}
+
+		if (axisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && graphValue > graphMaxValue) {
+
+			unitList.add(new ChartUnit(graphMaxValue, ""));
 		}
 	}
 
@@ -554,7 +557,7 @@ public class ChartComponents extends Composite {
 
 				// set the chart title height and margin
 				final String title = drawingData.getXTitle();
-				ChartSegments chartSegments = xData.getSegmentMarker();
+				final ChartSegments chartSegments = xData.getChartSegments();
 
 				if (title != null && title.length() > 0 || //
 						(chartSegments != null && chartSegments.segmentTitle != null)) {
@@ -694,13 +697,15 @@ public class ChartComponents extends Composite {
 		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
 	}
 
-	private void createXValuesWeek(ChartDrawingData drawingData, ArrayList<ChartUnit> units, int devGraphWidth) {
+	private void createXValuesWeek(	final ChartDrawingData drawingData,
+									final ArrayList<ChartUnit> units,
+									final int devGraphWidth) {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 		final int[] xValues = xData.getHighValues()[0];
 
-		final int weeks = xValues.length;
-		final int monthsInChart = weeks / 53 * 12;
+		final int allWeeks = xValues.length;
+		final int monthsInChart = allWeeks / 53 * 12;
 
 		// shorten the unit when there is not enough space to draw the full unit name
 		final GC gc = new GC(this);
@@ -725,46 +730,59 @@ public class ChartComponents extends Composite {
 		drawingData.setBarRectangleWidth(Math.max(0, barWidth));
 		drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
 
-		drawingData.setScaleX((float) devGraphWidth / weeks);
-		drawingData.setScaleUnitX((float) devGraphWidth / weeks * 53 / 12);
+		drawingData.setScaleX((float) devGraphWidth / allWeeks);
+		drawingData.setScaleUnitX((float) devGraphWidth / allWeeks * 53 / 12);
 		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
 	}
 
 	private void createXValuesYear(	final ChartDrawingData drawingData,
-									final int months,
 									final ArrayList<ChartUnit> units,
-									final int devGraphWidth,
-									final int year) {
+									final int devGraphWidth) {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
+		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 
-		// get number of days for the year, start with 0
-		calendar.set(year, 11, 31);
-		final int yearDays = calendar.get(Calendar.DAY_OF_YEAR) - 1;
-
-		drawingData.setScaleX((float) devGraphWidth / yearDays);
+		// get number of days for all years
+		final int allValues = chartSegments.allValues;
+		final int[] years = chartSegments.years;
+		final int[] yearDays = chartSegments.yearDays;
 
 		// shorten the unit when there is not enough space to draw the full unit name
 		final GC gc = new GC(this);
 		final int monthLength = gc.stringExtent(monthLabels[0]).x;
-		final boolean useShortUnitLabel = monthLength > (devGraphWidth / months) * 0.9;
+		final boolean useShortUnitLabel = monthLength > (devGraphWidth / (years.length * 12)) * 0.9;
 		gc.dispose();
 
-		// create the month units
-		for (int month = 0; month < months; month++) {
-			calendar.set(year, month, 1);
-			final int firstMonthDay = calendar.get(Calendar.DAY_OF_YEAR) - 1;
+		int yearIndex = 0;
+		int allDays = 0;
 
-			String monthLabel = monthLabels[month];
-			if (useShortUnitLabel) {
-				monthLabel = monthLabel.substring(0, 1);
+		/*
+		 * create month units for all years
+		 */
+		for (final int year : years) {
+
+			// create month units
+			for (int month = 0; month < 12; month++) {
+
+				calendar.set(year, month, 1);
+				final int firstMonthDay = calendar.get(Calendar.DAY_OF_YEAR) - 1;
+
+				String monthLabel = monthLabels[month];
+				if (useShortUnitLabel) {
+					monthLabel = monthLabel.substring(0, 1);
+				}
+
+				units.add(new ChartUnit(allDays + firstMonthDay, monthLabel));
 			}
-			units.add(new ChartUnit(firstMonthDay, monthLabel));
+
+			allDays += yearDays[yearIndex++];
 		}
 
 		// compute the width of the rectangles
-		drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth / yearDays)));
+		drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth / allValues)));
 		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+
+		drawingData.setScaleX((float) devGraphWidth / allValues);
 	}
 
 	ChartComponentAxis getAxisLeft() {

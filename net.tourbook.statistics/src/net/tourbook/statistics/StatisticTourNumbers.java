@@ -541,7 +541,11 @@ public class StatisticTourNumbers extends YearStatistic {
 		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, 1, false);
 	}
 
-	public void refreshStatistic(TourPerson person, TourTypeFilter typeId, int year, int numberOfYears, boolean refreshData) {
+	public void refreshStatistic(	TourPerson person,
+									TourTypeFilter typeId,
+									int year,
+									int numberOfYears,
+									boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourTypeFilter = typeId;
@@ -550,6 +554,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		fTourDataTour = ProviderTourDay.getInstance().getDayData(person,
 				typeId,
 				year,
+				numberOfYears,
 				isDataDirtyWithReset() || refreshData);
 
 		// reset min/max values

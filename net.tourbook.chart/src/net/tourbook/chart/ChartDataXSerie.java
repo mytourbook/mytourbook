@@ -51,10 +51,14 @@ public class ChartDataXSerie extends ChartDataSerie {
 	/**
 	 * Segment contains information to show statistics for several years
 	 */
-	private ChartSegments	fSegmentMarker;
+	private ChartSegments	fChartSegments;
 
 	public ChartDataXSerie(int values[]) {
 		setMinMaxValues(new int[][] { values });
+	}
+
+	public ChartSegments getChartSegments() {
+		return fChartSegments;
 	}
 
 	public int[] getRangeMarkerEndIndex() {
@@ -63,10 +67,6 @@ public class ChartDataXSerie extends ChartDataSerie {
 
 	public int[] getRangeMarkerStartIndex() {
 		return fRangeMarkerStartIndex;
-	}
-
-	public ChartSegments getSegmentMarker() {
-		return fSegmentMarker;
 	}
 
 	/**
@@ -90,6 +90,10 @@ public class ChartDataXSerie extends ChartDataSerie {
 		return fSynchMarkerStartIndex;
 	}
 
+	public void setChartSegments(ChartSegments chartSegments) {
+		fChartSegments = chartSegments;
+	}
+
 	@Override
 	void setMinMaxValues(int[][] lowValues, int[][] highValues) {}
 
@@ -102,10 +106,6 @@ public class ChartDataXSerie extends ChartDataSerie {
 	public void setRangeMarkers(int[] rangeMarkerStartIndex, int[] rangeMarkerEndIndex) {
 		fRangeMarkerStartIndex = rangeMarkerStartIndex;
 		fRangeMarkerEndIndex = rangeMarkerEndIndex;
-	}
-
-	public void setSegmentMarker(ChartSegments segmentMarker) {
-		fSegmentMarker = segmentMarker;
 	}
 
 	/**

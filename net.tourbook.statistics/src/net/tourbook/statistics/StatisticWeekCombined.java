@@ -20,7 +20,6 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartSegments;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.ui.UI;
 
@@ -31,49 +30,10 @@ public class StatisticWeekCombined extends StatisticWeek {
 
 		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
-		/*
-		 * create segments for each year
-		 */
-		int yearWeeks = ProviderTourWeek.YEAR_WEEKS;
-		int segmentStart[] = new int[fNumberOfYears];
-		int segmentEnd[] = new int[fNumberOfYears];
-		String[] segmentTitle = new String[fNumberOfYears];
-
-		int weekCounter = tourWeekData.fAltitudeHigh[0].length;
-		int allWeeks[] = new int[weekCounter];
-
-		int oldestYear = fCurrentYear - fNumberOfYears + 1;
-
-		// get start/end and title for each segment
-		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
-
-			allWeeks[weekIndex] = weekIndex;
-			int currentYearIndex = weekIndex / yearWeeks;
-
-			if (weekIndex % yearWeeks == 0) {
-
-				// first week in a year
-
-				segmentStart[currentYearIndex] = weekIndex;
-				segmentTitle[currentYearIndex] = Integer.toString(oldestYear + currentYearIndex);
-
-			} else if (weekIndex % yearWeeks == yearWeeks - 1) {
-
-				// last week in a year
-
-				segmentEnd[currentYearIndex] = weekIndex;
-			}
-		}
-
-		ChartSegments weekSegments = new ChartSegments();
-		weekSegments.valueStart = segmentStart;
-		weekSegments.valueEnd = segmentEnd;
-		weekSegments.segmentTitle = segmentTitle;
-
 		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(allWeeks);
+		ChartDataXSerie xData = new ChartDataXSerie(createWeekData(tourWeekData));
 		xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_WEEK);
-		xData.setSegmentMarker(weekSegments);
+		xData.setChartSegments(createChartSegments(tourWeekData));
 		chartDataModel.setXData(xData);
 
 		// distance

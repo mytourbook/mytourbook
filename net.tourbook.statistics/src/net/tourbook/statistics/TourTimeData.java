@@ -15,14 +15,17 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-public class TourDataTime {
-
-	int		fYear;
+public class TourTimeData {
 
 	long[]	fTourIds;
 	long[]	fTypeIds;
 
 	int[]	fTypeColorIndex;
+
+	int[]	yearDays;
+	int[]	years;
+	int[]	fYearValues;
+	int		allDaysInAllYears;
 
 	int[]	fTourDOYValues;
 	int[]	fTourMonthValues;
@@ -31,12 +34,7 @@ public class TourDataTime {
 	int[]	fTourTimeEndValues;
 
 	int[]	fTourTimeAltitudeValues;
-
 	int[]	fTourTimeDistanceValues;
 	int[]	fTourTimeDurationValues;
-
-	public TourDataTime(int year) {
-		fYear = year;
-	}
 
 }

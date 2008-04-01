@@ -20,6 +20,7 @@ import java.util.GregorianCalendar;
 
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartSegments;
 import net.tourbook.data.TourPerson;
 import net.tourbook.ui.TourTypeFilter;
 
@@ -150,5 +151,54 @@ public abstract class StatisticWeek extends YearStatistic {
 	@Override
 	public void updateToolBar(final boolean refreshToolbar) {
 		fChart.fillToolbar(refreshToolbar);
+	}
+
+	protected int[] createWeekData(TourDataWeek tourWeekData) {
+		int weekCounter = tourWeekData.fAltitudeHigh[0].length;
+		int allWeeks[] = new int[weekCounter];
+		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
+			allWeeks[weekIndex] = weekIndex;
+		}
+		return allWeeks;
+	}
+
+	protected ChartSegments createChartSegments(TourDataWeek tourWeekData) {
+		/*
+		 * create segments for each year
+		 */
+		int yearWeeks = ProviderTourWeek.YEAR_WEEKS;
+		int segmentStart[] = new int[fNumberOfYears];
+		int segmentEnd[] = new int[fNumberOfYears];
+		String[] segmentTitle = new String[fNumberOfYears];
+	
+		int weekCounter = tourWeekData.fAltitudeHigh[0].length;
+	
+		int oldestYear = fCurrentYear - fNumberOfYears + 1;
+	
+		// get start/end and title for each segment
+		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
+	
+			int currentYearIndex = weekIndex / yearWeeks;
+	
+			if (weekIndex % yearWeeks == 0) {
+	
+				// first week in a year
+	
+				segmentStart[currentYearIndex] = weekIndex;
+				segmentTitle[currentYearIndex] = Integer.toString(oldestYear + currentYearIndex);
+	
+			} else if (weekIndex % yearWeeks == yearWeeks - 1) {
+	
+				// last week in a year
+	
+				segmentEnd[currentYearIndex] = weekIndex;
+			}
+		}
+	
+		ChartSegments weekSegments = new ChartSegments();
+		weekSegments.valueStart = segmentStart;
+		weekSegments.valueEnd = segmentEnd;
+		weekSegments.segmentTitle = segmentTitle;
+		return weekSegments;
 	}
 }

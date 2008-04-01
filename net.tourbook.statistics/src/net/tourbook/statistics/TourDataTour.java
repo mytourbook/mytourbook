@@ -21,6 +21,11 @@ public class TourDataTour {
 
 	int[]	fDOYValues;
 	int[]	fMonthValues;
+	int[]	fYearValues;
+
+	int[]	years;
+	int[]	yearDays;
+	int		allDaysInAllYears;
 
 	int[]	fTypeColorIndex;
 	long[]	fTypeIds;
@@ -32,4 +37,5 @@ public class TourDataTour {
 	int[]	fDistanceHigh;
 	int[]	fAltitudeHigh;
 	int[]	fTimeHigh;
+
 }

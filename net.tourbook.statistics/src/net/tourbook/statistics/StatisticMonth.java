@@ -189,7 +189,7 @@ public class StatisticMonth extends YearStatistic {
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(allMonths);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_MONTH);
-		xData.setSegmentMarker(monthSegments);
+		xData.setChartSegments(monthSegments);
 		chartDataModel.setXData(xData);
 
 		// distance

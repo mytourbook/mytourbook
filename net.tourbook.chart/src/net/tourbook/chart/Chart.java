@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.chart;
 
 import java.util.ArrayList;
@@ -473,6 +474,10 @@ public class Chart extends ViewForm {
 
 	public ISelection getSelection() {
 
+		if (fChartDataModel == null) {
+			return null;
+		}
+
 		switch (fChartDataModel.getChartType()) {
 		case ChartDataModel.CHART_TYPE_BAR:
 			return new SelectionBarChart(fBarSelectionSerieIndex, fBarSelectionValueIndex);
@@ -671,7 +676,25 @@ public class Chart extends ViewForm {
 	 *        deselect the bar
 	 */
 	public void setSelectedBars(boolean[] selectedItems) {
+
+		// set default value
+		fBarSelectionSerieIndex = 0;
+		fBarSelectionValueIndex = 0;
+
+		if (selectedItems != null) {
+
+			// get selected bar
+			for (int itemIndex = 0; itemIndex < selectedItems.length; itemIndex++) {
+				if (selectedItems[itemIndex]) {
+					fBarSelectionValueIndex = itemIndex;
+					break;
+				}
+			}
+		}
+
 		fChartComponents.getChartComponentGraph().setSelectedBars(selectedItems);
+
+		fireBarSelectionEvent(0, fBarSelectionValueIndex);
 	}
 
 	/**

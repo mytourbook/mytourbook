@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,47 +13,34 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.statistics;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartSegments;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.data.TourPerson;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.dialogs.ListDialog;
 
 public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider {
 
@@ -68,6 +55,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	int						fCurrentYear;
 	int						fCurrentMonth;
+	int						fNumberOfYears;
 
 	Calendar				fCalendar		= GregorianCalendar.getInstance();
 
@@ -79,17 +67,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	private TourDataTour	fTourDataTour;
 
 	boolean					fIsSynchScaleEnabled;
-
-	private class Tour {
-
-		long	tourId;
-		String	time;
-
-		public Tour(final long tourId, final String time) {
-			this.tourId = tourId;
-			this.time = time;
-		}
-	}
 
 	public boolean canTourBeVisible() {
 		return true;
@@ -118,8 +95,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
 		fChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
-
-//		fChart.createChartActionHandlers();
 
 		fChart.addBarSelectionListener(new IBarSelectionListener() {
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
@@ -170,124 +145,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		return fSelectedTourId;
 	}
 
-	void OLDopenTour(final ITourChartViewer tourChartViewer, final int valueIndex, final int[] dayValues) {
-
-		fCalendar.set(fCurrentYear, 0, 1);
-		fCalendar.set(Calendar.DAY_OF_YEAR, dayValues[valueIndex] + 1);
-
-		final int month = fCalendar.get(Calendar.MONTH) + 1;
-		final int day = fCalendar.get(Calendar.DAY_OF_MONTH);
-
-		final String sqlString = "SELECT " //$NON-NLS-1$
-				+ "TOURID," //$NON-NLS-1$
-				+ "STARTHOUR," //$NON-NLS-1$
-				+ "STARTMINUTE," //$NON-NLS-1$
-				+ "TOURDRIVINGTIME\n" //$NON-NLS-1$
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE STARTYEAR=" + Integer.toString(fCurrentYear)) //$NON-NLS-1$
-				+ (" AND STARTMONTH=" + month) //$NON-NLS-1$
-				+ (" AND STARTDAY=" + day); //$NON-NLS-1$
-
-		try {
-			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			final ResultSet result = statement.executeQuery();
-
-			final ArrayList<Tour> tourList = new ArrayList<Tour>();
-
-			while (result.next()) {
-
-				final short startHour = result.getShort(2);
-				final short startMinute = result.getShort(3);
-				final int startTime = startHour * 3600 + startMinute * 60;
-				final int endTime = startTime + result.getInt(4);
-
-				final String tourTime = new Formatter().format(Messages.FORMAT_HHMM_HHMM,
-						startTime / 3600,
-						(startTime % 3600) / 60,
-						endTime / 3600,
-						(endTime % 3600) / 60).toString();
-
-				tourList.add(new Tour(result.getLong(1), tourTime));
-			}
-
-			conn.close();
-
-			// get the tour
-			Long tourId;
-			tourId = -1L;
-
-			if (tourList.size() > 0) {
-				if (tourList.size() == 1) {
-					// there is only one tour for this day
-					tourId = tourList.get(0).tourId;
-				} else {
-
-					/*
-					 * there are multiple tours are available, open dialog to select the tour
-					 */
-					final ListDialog dialog = new ListDialog(Display.getCurrent().getActiveShell());
-
-					dialog.setContentProvider(new IStructuredContentProvider() {
-						public void dispose() {}
-
-						public Object[] getElements(final Object inputElement) {
-							return tourList.toArray();
-						}
-
-						public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-					});
-
-					dialog.setLabelProvider(new LabelProvider() {
-						@Override
-						public String getText(final Object element) {
-							final Tour tour = (Tour) element;
-							return tour.time;
-						}
-					});
-
-					dialog.setInput(tourList);
-					dialog.setTitle(Messages.DLG_SELECT_TOUR_TITLE);
-					dialog.setMessage(Messages.DLG_SELECT_TOUR_MSG);
-
-					if (dialog.open() == Window.OK) {
-						// get the selected tour
-						final List<Object> dlgResult = Arrays.asList(dialog.getResult());
-						if (result != null && dlgResult.size() == 1) {
-							tourId = ((Tour) dlgResult.get(0)).tourId;
-						}
-					}
-				}
-			}
-
-			// open the tour
-			if (tourId != -1L) {
-				tourChartViewer.showTourChart(tourId);
-				// TourManager.getInstance().openTourInEditor(tourId);
-			}
-
-		} catch (final SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	// public void selectDay(final Long date) {
-	//
-	// fCalendar.setTimeInMillis(date);
-	// final int selectedDay = fCalendar.get(Calendar.DAY_OF_YEAR) - 1;
-	//
-	// final int[] tourDate = fTourDataDay.fDOYValues;
-	// final boolean selectedItems[] = new boolean[tourDate.length];
-	//
-	// // find the tours which have the same day as the selected day
-	// for (int tourIndex = 0; tourIndex < tourDate.length; tourIndex++) {
-	// selectedItems[tourIndex] = tourDate[tourIndex] == selectedDay ? true :
-	// false;
-	// }
-	//
-	// fChart.setSelectedXData(selectedItems);
-	// }
-
 	public void prefColorChanged() {
 		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, 1, false);
 	}
@@ -295,15 +152,39 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	public void refreshStatistic(	final TourPerson person,
 									final TourTypeFilter tourTypeFilter,
 									final int year,
-									int numberOfYears, final boolean refreshData) {
+									int numberOfYears,
+									final boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourTypeFilter = tourTypeFilter;
 		fCurrentYear = year;
+		fNumberOfYears = numberOfYears;
+
+		/*
+		 * get currently selected tour id
+		 */
+		long selectedTourId = -1;
+		ISelection selection = fChart.getSelection();
+		if (selection instanceof SelectionBarChart) {
+			SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+
+			if (barChartSelection.serieIndex != -1) {
+
+				int selectedValueIndex = barChartSelection.valueIndex;
+				final long[] tourIds = fTourDataTour.fTourIds;
+
+				if (selectedValueIndex >= tourIds.length) {
+					selectedValueIndex = tourIds.length - 1;
+				}
+
+				selectedTourId = tourIds[selectedValueIndex];
+			}
+		}
 
 		fTourDataTour = ProviderTourDay.getInstance().getDayData(person,
 				tourTypeFilter,
 				year,
+				numberOfYears,
 				isDataDirtyWithReset() || refreshData);
 
 		// reset min/max values
@@ -311,7 +192,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			fMinMaxKeeper.resetMinMax();
 		}
 
-		updateChart(fTourDataTour);
+		updateChart(fTourDataTour, selectedTourId);
 	}
 
 	@Override
@@ -361,9 +242,12 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			selectedItems[tourIndex] = isTourSelected;
 		}
 
-		if (isSelected) {
-			fChart.setSelectedBars(selectedItems);
+		if (isSelected == false) {
+			// select first tour
+			selectedItems[0] = true;
 		}
+
+		fChart.setSelectedBars(selectedItems);
 
 		return isSelected;
 	}
@@ -418,10 +302,52 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
-	abstract void updateChart(TourDataTour tourDataDay);
+	/**
+	 * @param tourDataDay
+	 * @param tourId
+	 *        tour id which was selected before the update
+	 */
+	abstract void updateChart(TourDataTour tourDataDay, long tourId);
 
 	@Override
 	public void updateToolBar(final boolean refreshToolbar) {
 		fChart.fillToolbar(refreshToolbar);
+	}
+
+	/**
+	 * create segments for the chart
+	 */
+	ChartSegments createChartSegments(TourDataTour tourTimeData) {
+
+		int segmentStart[] = new int[fNumberOfYears];
+		int segmentEnd[] = new int[fNumberOfYears];
+		String[] segmentTitle = new String[fNumberOfYears];
+
+		int[] allYearDays = tourTimeData.yearDays;
+		int oldestYear = fCurrentYear - fNumberOfYears + 1;
+		int yearDaysSum = 0;
+
+		// create segments for each year
+		for (int yearIndex = 0; yearIndex < allYearDays.length; yearIndex++) {
+
+			int yearDays = allYearDays[yearIndex];
+
+			segmentStart[yearIndex] = yearDaysSum;
+			segmentEnd[yearIndex] = yearDaysSum + yearDays - 1;
+			segmentTitle[yearIndex] = Integer.toString(oldestYear + yearIndex);
+
+			yearDaysSum += yearDays;
+		}
+
+		ChartSegments chartSegments = new ChartSegments();
+		chartSegments.valueStart = segmentStart;
+		chartSegments.valueEnd = segmentEnd;
+		chartSegments.segmentTitle = segmentTitle;
+
+		chartSegments.years = tourTimeData.years;
+		chartSegments.yearDays = tourTimeData.yearDays;
+		chartSegments.allValues = tourTimeData.allDaysInAllYears;
+
+		return chartSegments;
 	}
 }

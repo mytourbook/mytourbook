@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.statistics;
 
 import java.util.Calendar;
@@ -26,7 +27,7 @@ import net.tourbook.colors.GraphColorProvider;
 public class StatisticDayTourTime extends StatisticDay {
 
 	@Override
-	void updateChart(TourDataTour tourTimeData) {
+	void updateChart(TourDataTour tourTimeData, long lastSelectedTourId) {
 
 		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
@@ -34,6 +35,7 @@ public class StatisticDayTourTime extends StatisticDay {
 		ChartDataXSerie xData = new ChartDataXSerie(tourTimeData.fDOYValues);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
 		xData.setVisibleMaxValue(fCurrentYear);
+		xData.setChartSegments(createChartSegments(tourTimeData));
 		chartModel.setXData(xData);
 
 		/*
@@ -66,6 +68,9 @@ public class StatisticDayTourTime extends StatisticDay {
 		}
 
 		// show the data in the chart
-		fChart.updateChart(chartModel);
+		fChart.updateChart(chartModel, false);
+
+		// try to select the previous selected tour
+		selectTour(lastSelectedTourId);
 	}
 }

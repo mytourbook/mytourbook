@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.statistics;
 
 import java.sql.Connection;
@@ -21,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -30,23 +30,15 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.ArrayListToArray;
 
-public class ProviderTourTime extends DataProvider /* implements IBarSelectionProvider */{
+public class ProviderTourTime extends DataProvider {
 
 	private static ProviderTourTime	fInstance;
 
 	private ArrayList<Long>			fTourIds;
 
-	private TourPerson				fActivePerson;
-	private TourTypeFilter			fActiveTourTypeFilter;
-
-	private int						fCurrentYear;
-	private int						fCurrentMonth;
-
 	private Long					fSelectedTourId;
 
-	private final Calendar			fCalendar	= GregorianCalendar.getInstance();
-
-	private TourDataTime			fTourTimeData;
+	private TourTimeData			fTourDataTime;
 
 	private ProviderTourTime() {}
 
@@ -55,10 +47,6 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 			fInstance = new ProviderTourTime();
 		}
 		return fInstance;
-	}
-
-	public Integer getSelectedMonth() {
-		return fCurrentMonth;
 	}
 
 	public Long getSelectedTourId() {
@@ -70,49 +58,62 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 	 * 
 	 * @param person
 	 * @param tourTypeFilter
-	 * @param year
+	 * @param lastYear
+	 * @param numberOfYears
 	 * @return
 	 */
-	TourDataTime getTourTimeData(	final TourPerson person,
+	TourTimeData getTourTimeData(	final TourPerson person,
 									final TourTypeFilter tourTypeFilter,
-									final int year,
+									final int lastYear,
+									int numberOfYears,
 									final boolean refreshData) {
 
 		// dont reload data which are already here
 		if (fActivePerson == person
 				&& fActiveTourTypeFilter == tourTypeFilter
-				&& fCurrentYear == year
+				&& fLastYear == lastYear
+				&& fNumberOfYears == numberOfYears
 				&& refreshData == false) {
-			return fTourTimeData;
+			return fTourDataTime;
 		}
+
+		fActivePerson = person;
+		fActiveTourTypeFilter = tourTypeFilter;
+
+		fLastYear = lastYear;
+		fNumberOfYears = numberOfYears;
+
+		initYearDOYs();
 
 		final ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		final String sqlString = "SELECT " //$NON-NLS-1$
-				+ "TOURID, " //$NON-NLS-1$
-				+ "STARTYEAR, " //$NON-NLS-1$
-				+ "STARTMONTH, " //$NON-NLS-1$
-				+ "STARTDAY, " //$NON-NLS-1$
-				+ "STARTHOUR, " //$NON-NLS-1$
-				+ "STARTMINUTE, " //$NON-NLS-1$
-				+ "TOURDISTANCE, " //$NON-NLS-1$
-				+ "TOURALTUP, " //$NON-NLS-1$
-				+ "tourRecordingTime, " // 9 //$NON-NLS-1$
-				+ "tourDrivingTime, "// 10 //$NON-NLS-1$
-				+ "tourType_typeId "// 11 //$NON-NLS-1$
+				+ "TourId, " //				1 //$NON-NLS-1$
+				+ "StartYear, " //			2 //$NON-NLS-1$
+				+ "StartMonth, " //			3 //$NON-NLS-1$
+				+ "StartDay, " //			4 //$NON-NLS-1$
+				+ "StartHour, " //			5 //$NON-NLS-1$
+				+ "StartMinute, " //		6 //$NON-NLS-1$
+				+ "TourDistance, " //		7 //$NON-NLS-1$
+				+ "TourAltUp, " //			8 //$NON-NLS-1$
+				+ "TourRecordingTime, " //	9 //$NON-NLS-1$
+				+ "TourDrivingTime, "//		10 //$NON-NLS-1$
+				+ "TourType_typeId "//		11 //$NON-NLS-1$
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE STARTYEAR = " + Integer.toString(year)) //$NON-NLS-1$
+				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$
 				+ getSQLFilter(person, tourTypeFilter)
-				+ (" ORDER BY StartMonth, StartDay, StartHour, StartMinute"); //$NON-NLS-1$
+				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute"); //$NON-NLS-1$
 
 		try {
+
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 			final ResultSet result = statement.executeQuery();
 
-			final ArrayList<Integer> monthList = new ArrayList<Integer>();
-			final ArrayList<Integer> doyList = new ArrayList<Integer>();
+			final ArrayList<Integer> dbYear = new ArrayList<Integer>();
+			final ArrayList<Integer> dbMonths = new ArrayList<Integer>();
+			final ArrayList<Integer> dbAllYearsDOY = new ArrayList<Integer>(); // DOY...Day Of Year
 
 			final ArrayList<Integer> startTimeList = new ArrayList<Integer>();
 			final ArrayList<Integer> endTimeList = new ArrayList<Integer>();
@@ -130,32 +131,29 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 
 				fTourIds.add(result.getLong(1));
 
+				final int tourYear = result.getShort(2);
 				final int tourMonth = result.getShort(3) - 1;
-				final short startHour = result.getShort(5);
-				final short startMinute = result.getShort(6);
+				final int startHour = result.getShort(5);
+				final int startMinute = result.getShort(6);
 				final int startTime = startHour * 3600 + startMinute * 60;
 
 				final int recordingTime = result.getInt(9);
 
-				/*
-				 * disabled driving time, wolfgang 17.8.07
-				 */
-//				final int drivingTime = result.getInt(10);
-//				final int duration = drivingTime == 0 ? recordingTime : drivingTime;
-				final int duration = recordingTime;
-
-				// get date
-				fCalendar.set(result.getShort(2), tourMonth, result.getShort(4), startHour, startMinute);
-
 				// create data lists for the chart, start with 0
-				doyList.add(fCalendar.get(Calendar.DAY_OF_YEAR) - 1);
-				monthList.add(tourMonth);
+				fCalendar.set(tourYear, tourMonth, result.getShort(4), startHour, startMinute);
+				final int tourDOY = fCalendar.get(Calendar.DAY_OF_YEAR) - 1;
+
+				dbYear.add(tourYear);
+				dbMonths.add(tourMonth);
+				dbAllYearsDOY.add(getYearDOYs(tourYear) + tourDOY);
+
+//				doyList.add(tourDOY);
 				startTimeList.add(startTime);
-				endTimeList.add((startTime + duration));
+				endTimeList.add((startTime + recordingTime));
 
 				distanceList.add((int) (result.getInt(7) / 1000 / UI.UNIT_VALUE_DISTANCE));
 				altitudeList.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
-				durationList.add(duration);
+				durationList.add(recordingTime);
 
 				/*
 				 * convert type id to the type index in the tour type array, this is also the color
@@ -179,35 +177,42 @@ public class ProviderTourTime extends DataProvider /* implements IBarSelectionPr
 
 			conn.close();
 
+			// get number of days for all years
+			int yearDays = 0;
+			for (int doy : fYearDays) {
+				yearDays += doy;
+			}
+
 			/*
-			 * keep the data for the current year
+			 * create data
 			 */
-			fTourTimeData = new TourDataTime(year);
+			fTourDataTime = new TourTimeData();
 
-			fTourTimeData.fTourIds = ArrayListToArray.toLong(fTourIds);
+			fTourDataTime.fTourIds = ArrayListToArray.toLong(fTourIds);
 
-			fTourTimeData.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
-			fTourTimeData.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
+			fTourDataTime.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
+			fTourDataTime.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
 
-			fTourTimeData.fTourDOYValues = ArrayListToArray.toInt(doyList);
-			fTourTimeData.fTourMonthValues = ArrayListToArray.toInt(monthList);
+			fTourDataTime.fYearValues = ArrayListToArray.toInt(dbYear);
+			fTourDataTime.allDaysInAllYears = yearDays;
+			fTourDataTime.yearDays = fYearDays;
+			fTourDataTime.years = fYears;
 
-			fTourTimeData.fTourTimeStartValues = ArrayListToArray.toInt(startTimeList);
-			fTourTimeData.fTourTimeEndValues = ArrayListToArray.toInt(endTimeList);
+			fTourDataTime.fTourDOYValues = ArrayListToArray.toInt(dbAllYearsDOY);
+			fTourDataTime.fTourMonthValues = ArrayListToArray.toInt(dbMonths);
 
-			fTourTimeData.fTourTimeDistanceValues = ArrayListToArray.toInt(distanceList);
-			fTourTimeData.fTourTimeAltitudeValues = ArrayListToArray.toInt(altitudeList);
-			fTourTimeData.fTourTimeDurationValues = ArrayListToArray.toInt(durationList);
+			fTourDataTime.fTourTimeStartValues = ArrayListToArray.toInt(startTimeList);
+			fTourDataTime.fTourTimeEndValues = ArrayListToArray.toInt(endTimeList);
 
-			fActivePerson = person;
-			fCurrentYear = year;
-			fActiveTourTypeFilter = tourTypeFilter;
+			fTourDataTime.fTourTimeDistanceValues = ArrayListToArray.toInt(distanceList);
+			fTourDataTime.fTourTimeAltitudeValues = ArrayListToArray.toInt(altitudeList);
+			fTourDataTime.fTourTimeDurationValues = ArrayListToArray.toInt(durationList);
 
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 
-		return fTourTimeData;
+		return fTourDataTime;
 	}
 
 //	void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
