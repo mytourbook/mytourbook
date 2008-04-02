@@ -309,13 +309,18 @@ public class ChartComponents extends Composite {
 			createXValuesYear(drawingData, units, devGraphWidth);
 			break;
 
+		case ChartDataSerie.AXIS_UNIT_DAY:
+			createXValuesDay(drawingData, units, devGraphWidth);
+			break;
+
 		default:
 			break;
 		}
 
 		// create the units for the x-axis
-		if (xAxisUnit != ChartDataSerie.AXIS_UNIT_YEAR
+		if (xAxisUnit != ChartDataSerie.AXIS_UNIT_DAY
 				&& xAxisUnit != ChartDataSerie.AXIS_UNIT_MONTH
+				&& xAxisUnit != ChartDataSerie.AXIS_UNIT_YEAR
 				&& xAxisUnit != ChartDataSerie.X_AXIS_UNIT_WEEK) {
 
 			// get the unitOffset when a startValue is set
@@ -326,6 +331,7 @@ public class ChartComponents extends Composite {
 
 			final int valueDivisor = xData.getValueDivisor();
 			int graphValue = 0;
+			int infinityLoopIndex = 0;
 
 			while (graphValue <= xMaxValue) {
 
@@ -337,6 +343,11 @@ public class ChartComponents extends Composite {
 						false)));
 
 				graphValue += unitValue;
+
+				// check for an infinity loop
+				if (infinityLoopIndex++ > 1000) {
+					break;
+				}
 			}
 
 		}
@@ -393,6 +404,7 @@ public class ChartComponents extends Composite {
 		int graphMaxValue = yData.getVisibleMaxValue();
 
 		boolean adjustGraphUnit = false;
+		// clip max value
 		if (axisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
 			graphMaxValue = 24 * 3600;
 			adjustGraphUnit = true;
@@ -641,6 +653,56 @@ public class ChartComponents extends Composite {
 		return synchConfig;
 	}
 
+	private void createXValuesDay(	final ChartDrawingData drawingData,
+									final ArrayList<ChartUnit> units,
+									final int devGraphWidth) {
+
+		final Calendar calendar = GregorianCalendar.getInstance();
+		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
+
+		// get number of days for all years
+		final int allValues = chartSegments.allValues;
+		final int[] years = chartSegments.years;
+		final int[] yearDays = chartSegments.yearDays;
+
+		// shorten the unit when there is not enough space to draw the full unit name
+		final GC gc = new GC(this);
+		final int monthLength = gc.stringExtent(monthLabels[0]).x;
+		final boolean useShortUnitLabel = monthLength > (devGraphWidth / (years.length * 12)) * 0.9;
+		gc.dispose();
+
+		int yearIndex = 0;
+		int allDays = 0;
+
+		/*
+		 * create month units for all years
+		 */
+		for (final int year : years) {
+
+			// create month units
+			for (int month = 0; month < 12; month++) {
+
+				calendar.set(year, month, 1);
+				final int firstMonthDay = calendar.get(Calendar.DAY_OF_YEAR) - 1;
+
+				String monthLabel = monthLabels[month];
+				if (useShortUnitLabel) {
+					monthLabel = monthLabel.substring(0, 1);
+				}
+
+				units.add(new ChartUnit(allDays + firstMonthDay, monthLabel));
+			}
+
+			allDays += yearDays[yearIndex++];
+		}
+
+		// compute the width of the rectangles
+		drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth / allValues)));
+		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+
+		drawingData.setScaleX((float) devGraphWidth / allValues);
+	}
+
 	private void createXValuesMonth(final ChartDrawingData drawingData,
 									final ArrayList<ChartUnit> units,
 									final int devGraphWidth) {
@@ -739,50 +801,49 @@ public class ChartComponents extends Composite {
 									final ArrayList<ChartUnit> units,
 									final int devGraphWidth) {
 
-		final Calendar calendar = GregorianCalendar.getInstance();
+		final ChartDataYSerie yData = drawingData.getYData();
+		final ChartDataXSerie xData = drawingData.getXData();
+
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
+		final int[] yearValues = chartSegments.years;
 
-		// get number of days for all years
-		final int allValues = chartSegments.allValues;
-		final int[] years = chartSegments.years;
-		final int[] yearDays = chartSegments.yearDays;
+		final int yearCounter = xData.fHighValues[0].length;
+		final float scaleX = (float) devGraphWidth / yearCounter;
+		drawingData.setScaleX(scaleX);
 
-		// shorten the unit when there is not enough space to draw the full unit name
-		final GC gc = new GC(this);
-		final int monthLength = gc.stringExtent(monthLabels[0]).x;
-		final boolean useShortUnitLabel = monthLength > (devGraphWidth / (years.length * 12)) * 0.9;
-		gc.dispose();
-
-		int yearIndex = 0;
-		int allDays = 0;
-
-		/*
-		 * create month units for all years
-		 */
-		for (final int year : years) {
-
-			// create month units
-			for (int month = 0; month < 12; month++) {
-
-				calendar.set(year, month, 1);
-				final int firstMonthDay = calendar.get(Calendar.DAY_OF_YEAR) - 1;
-
-				String monthLabel = monthLabels[month];
-				if (useShortUnitLabel) {
-					monthLabel = monthLabel.substring(0, 1);
-				}
-
-				units.add(new ChartUnit(allDays + firstMonthDay, monthLabel));
-			}
-
-			allDays += yearDays[yearIndex++];
+		// create year units
+		for (int yearIndex = 0; yearIndex < yearValues.length; yearIndex++) {
+			units.add(new ChartUnit(yearIndex, Integer.toString(yearValues[yearIndex])));
 		}
 
-		// compute the width of the rectangles
-		drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth / allValues)));
-		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
+		// compute the width and position of the rectangles
+		int barWidth;
+		final int yearWidth = (int) Math.max(0, (scaleX) - 1);
 
-		drawingData.setScaleX((float) devGraphWidth / allValues);
+		switch (yData.getChartLayout()) {
+		case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
+		case ChartDataYSerie.BAR_LAYOUT_STACKED:
+
+			// the bar's width is 50% of the width for a month
+			barWidth = (int) Math.max(0, (yearWidth * 0.9f));
+			drawingData.setBarRectangleWidth(barWidth);
+			drawingData.setDevBarRectangleXPos((int) (Math.max(0, (yearWidth - barWidth) / 2) + 1));
+			break;
+
+		case ChartDataYSerie.BAR_LAYOUT_BESIDE:
+
+			final int serieCount = yData.getHighValues().length;
+//			System.out.println("serieCount: " + serieCount);
+
+			// the bar's width is 75% of the width for a month
+			barWidth = (int) Math.max(0, yearWidth * 1.0f);
+			drawingData.setBarRectangleWidth(Math.max(1, barWidth / serieCount));
+			drawingData.setDevBarRectangleXPos((int) (Math.max(0, (yearWidth - barWidth) / 2) + 2));
+		default:
+			break;
+		}
+
+		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
 	}
 
 	ChartComponentAxis getAxisLeft() {

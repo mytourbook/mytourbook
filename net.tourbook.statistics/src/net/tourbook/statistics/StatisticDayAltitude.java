@@ -34,7 +34,7 @@ public class StatisticDayAltitude extends StatisticDay {
 
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(tourDataTour.fDOYValues);
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
+		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_DAY);
 		xData.setVisibleMaxValue(fCurrentYear);
 		xData.setChartSegments(createChartSegments(tourDataTour));
 		chartDataModel.setXData(xData);

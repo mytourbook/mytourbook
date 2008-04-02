@@ -343,7 +343,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(fTourTimeData.fTourDOYValues);
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
+		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_DAY);
 		xData.setVisibleMaxValue(fCurrentYear);
 		xData.setChartSegments(createChartSegments(fTourTimeData));
 		chartModel.setXData(xData);

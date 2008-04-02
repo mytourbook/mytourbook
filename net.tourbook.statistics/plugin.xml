@@ -20,6 +20,10 @@
             id="net.tourbook.statistics.StatisticSummaryMonth"
             name="%Pref_Month_Summary"/>
       <statistic
+            class="net.tourbook.statistics.StatisticYear"
+            id="net.tourbook.statistics.StatisticSummaryYear"
+            name="%Pref_Year_Summary"/>
+      <statistic
             class="net.tourbook.statistics.StatisticTourNumbers"
             id="net.tourbook.statistics.StatisticTourNumbers"
             name="%Pref_Tour_Numbers"/>

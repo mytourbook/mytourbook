@@ -343,7 +343,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		final ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		final ChartDataXSerie xData = new ChartDataXSerie(tourDateValues);
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
+		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_DAY);
 		chartModel.setXData(xData);
 
 		// set the bar low/high data

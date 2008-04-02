@@ -76,7 +76,7 @@ public class ChartUtil {
 			}
 			break;
 
-		case ChartDataSerie.AXIS_UNIT_YEAR:
+		case ChartDataSerie.AXIS_UNIT_DAY:
 			fNf.setMinimumFractionDigits(1);
 			valueText = fNf.format(value);
 			break;

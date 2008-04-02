@@ -1175,7 +1175,8 @@ public class ChartComponentGraph extends Canvas {
 
 			// reposition the rectangle when the bars are beside each other
 			if (serieLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE) {
-				devBarXPos += serieIndex * devBarWidth;
+//				devBarXPos += serieIndex * devBarWidth;
+				devBarXPos += serieIndex;
 			}
 
 			// loop: all values in the current serie
@@ -2435,6 +2436,10 @@ public class ChartComponentGraph extends Canvas {
 		final int[] startValues = chartSegments.valueStart;
 		final int[] endValues = chartSegments.valueEnd;
 
+		if (startValues == null || endValues == null) {
+			return;
+		}
+
 		final Color alternateColor = new Color(gc.getDevice(), 0xf5, 0xf5, 0xf5); // efefef
 
 		for (int segmentIndex = 0; segmentIndex < startValues.length; segmentIndex++) {
@@ -2753,14 +2758,14 @@ public class ChartComponentGraph extends Canvas {
 
 	private void drawXTitle(final GC gc, final ChartDrawingData drawingData) {
 
-		final ChartSegments segmentMarker = drawingData.getXData().getChartSegments();
+		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 		final int devYTitle = drawingData.getDevMarginTop();
 
 		final int devGraphWidth = canScrollZoomedChart
 				? drawingData.getDevGraphWidth()
 				: fChartComponents.getDevVisibleChartWidth();
 
-		if (segmentMarker == null) {
+		if (chartSegments == null) {
 
 			/*
 			 * draw default title, center within the chart
@@ -2785,24 +2790,27 @@ public class ChartComponentGraph extends Canvas {
 
 			final float scaleX = drawingData.getScaleX();
 
-			final int[] valueStart = segmentMarker.valueStart;
-			final int[] valueEnd = segmentMarker.valueEnd;
-			final String[] segmentTitles = segmentMarker.segmentTitle;
+			final int[] valueStart = chartSegments.valueStart;
+			final int[] valueEnd = chartSegments.valueEnd;
+			final String[] segmentTitles = chartSegments.segmentTitle;
 
-			for (int segmentIndex = 0; segmentIndex < valueStart.length; segmentIndex++) {
+			if (valueStart != null && valueEnd != null && segmentTitles != null) {
 
-				final int devValueStart = (int) (scaleX * valueStart[segmentIndex] - fDevGraphImageXOffset);
-				final int devValueEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1) - fDevGraphImageXOffset);
-				final String segmentTitle = segmentTitles[segmentIndex];
+				for (int segmentIndex = 0; segmentIndex < valueStart.length; segmentIndex++) {
+
+					final int devValueStart = (int) (scaleX * valueStart[segmentIndex] - fDevGraphImageXOffset);
+					final int devValueEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1) - fDevGraphImageXOffset);
+					final String segmentTitle = segmentTitles[segmentIndex];
 
 //				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
-				// draw the title in the center of the segment 
-				if (segmentTitle != null) {
-					gc.drawText(segmentTitle, //
-							devValueEnd - ((devValueEnd - devValueStart) / 2) - (gc.textExtent(segmentTitle).x / 2),
-							devYTitle,
-							false);
+					// draw the title in the center of the segment 
+					if (segmentTitle != null) {
+						gc.drawText(segmentTitle, //
+								devValueEnd - ((devValueEnd - devValueStart) / 2) - (gc.textExtent(segmentTitle).x / 2),
+								devYTitle,
+								false);
+					}
 				}
 			}
 		}

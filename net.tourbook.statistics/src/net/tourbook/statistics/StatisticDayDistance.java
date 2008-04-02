@@ -33,7 +33,7 @@ public class StatisticDayDistance extends StatisticDay {
 
 		// set the x-axis
 		ChartDataXSerie xData = new ChartDataXSerie(tourTimeData.fDOYValues);
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
+		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_DAY);
 		xData.setVisibleMaxValue(fCurrentYear);
 		xData.setChartSegments(createChartSegments(tourTimeData));
 		chartModel.setXData(xData);
