@@ -46,8 +46,9 @@ public class StatisticWeekTourTime extends StatisticWeek {
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
-		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, fActiveTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds, fActiveTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartDataModel);

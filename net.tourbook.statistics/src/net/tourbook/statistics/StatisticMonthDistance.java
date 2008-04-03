@@ -15,25 +15,23 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
+import net.tourbook.chart.ChartDataModel;
 
-public class TourDataYear {
+public class StatisticMonthDistance extends StatisticMonth {
 
-	long[][]	fTypeIds;
-	int[]		years;
+	@Override
+	void updateChart(final TourDataMonth tourMonthData) {
 
-	int[][]		fDistanceLow;
-	int[][]		fDistanceHigh;
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
-	int[][]		fAltitudeLow;
-	int[][]		fAltitudeHigh;
+		createXDataMonths(tourMonthData, chartDataModel);
+		createYDataDistance(tourMonthData, chartDataModel);
 
-	int[][]		fTimeLow;
-	int[][]		fTimeHigh;
+		if (fIsSynchScaleEnabled) {
+			fMinMaxKeeper.setMinMaxValues(chartDataModel);
+		}
 
-//	/**
-//	 * {@link TourType}'s which are active, retrieved from
-//	 * {@link TourTypeFilter#getActiveTourTypes(ArrayList)}
-//	 */
-//	ArrayList<TourType>	activeTourTypes;
-
+		// show the fDataModel in the chart
+		fChart.updateChart(chartDataModel);
+	}
 }

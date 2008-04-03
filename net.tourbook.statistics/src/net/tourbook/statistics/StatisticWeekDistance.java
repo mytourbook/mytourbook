@@ -46,8 +46,9 @@ public class StatisticWeekDistance extends StatisticWeek {
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
-		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds, fActiveTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartDataModel);

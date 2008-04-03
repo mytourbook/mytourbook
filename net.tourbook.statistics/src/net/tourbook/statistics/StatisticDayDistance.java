@@ -51,7 +51,8 @@ public class StatisticDayDistance extends StatisticDay {
 		yData.setVisibleMinValue(0);
 		yData.setCustomData(DISTANCE_DATA, 1);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
 		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
 
 		/*

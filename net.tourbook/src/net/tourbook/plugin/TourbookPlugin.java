@@ -20,6 +20,7 @@ import java.util.ResourceBundle;
 
 import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.data.TourPerson;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -136,6 +137,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
 	public void setActiveTourTypeFilter(TourTypeFilter tourTypeFilter) {
 		fActiveTourTypeFilter = tourTypeFilter;
+		TourDatabase.updateActiveTourTypeList(tourTypeFilter);
 	}
 
 	public void setSplashHandler(MyTourbookSplashHandler splashHandler) {

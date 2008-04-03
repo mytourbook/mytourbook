@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -218,22 +218,26 @@ public class TourManager {
 	 * set the graph colors from the pref store
 	 * 
 	 * @param prefStore
-	 * @param yDataSerie
+	 * @param yData
 	 * @param graphName
 	 */
 	public static void setGraphColor(	final IPreferenceStore prefStore,
-										final ChartDataYSerie yDataSerie,
+										final ChartDataYSerie yData,
 										final String graphName) {
 
 		final String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
 
-		yDataSerie.setRgbLine(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
-				+ GraphColorProvider.PREF_COLOR_LINE) });
+		final RGB lineColor = PreferenceConverter.getColor(prefStore, //
+				prefGraphName + GraphColorProvider.PREF_COLOR_LINE);
 
-		yDataSerie.setRgbDark(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
+		yData.setDefaultRGB(lineColor);
+
+		yData.setRgbLine(new RGB[] { lineColor });
+
+		yData.setRgbDark(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
 				+ GraphColorProvider.PREF_COLOR_DARK) });
 
-		yDataSerie.setRgbBright(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
+		yData.setRgbBright(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
 				+ GraphColorProvider.PREF_COLOR_BRIGHT) });
 	}
 
@@ -621,7 +625,7 @@ public class TourManager {
 			xDataDistance.setLabel(Messages.Tour_Properties_Label_distance);
 			xDataDistance.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 			xDataDistance.setValueDivisor(1000);
-			xDataDistance.setRgbLine(new RGB[] { new RGB(0, 0, 0) });
+			xDataDistance.setDefaultRGB(new RGB(0, 0, 0));
 		}
 
 		/*
@@ -630,7 +634,7 @@ public class TourManager {
 		final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.timeSerie);
 		xDataTime.setLabel(Messages.Tour_Properties_Label_time);
 		xDataTime.setUnitLabel(Messages.Tour_Properties_Label_time_unit);
-		xDataTime.setRgbLine(new RGB[] { new RGB(0, 0, 0) });
+		xDataTime.setDefaultRGB(new RGB(0, 0, 0));
 		xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_SECOND);
 
 		/*

@@ -52,7 +52,8 @@ public class StatisticDayTourTime extends StatisticDay {
 		yData.setCustomData(DURATION_DATA, 1);
 		chartModel.addYData(yData);
 		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, fActiveTourTypeFilter);
 
 		/*
 		 * set graph minimum width, these is the number of days in the year

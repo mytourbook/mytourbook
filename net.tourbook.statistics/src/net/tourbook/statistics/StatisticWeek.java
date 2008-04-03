@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.statistics;
 
 import java.util.Calendar;
@@ -38,7 +39,7 @@ public abstract class StatisticWeek extends YearStatistic {
 	private TourPerson		fActivePerson;
 	int						fCurrentYear;
 	int						fNumberOfYears;
-	private TourTypeFilter	fActiveTourTypeFilter;
+	TourTypeFilter			fActiveTourTypeFilter;
 
 	private final Calendar	fCalendar		= GregorianCalendar.getInstance();
 	boolean					fIsSynchScaleEnabled;
@@ -170,35 +171,36 @@ public abstract class StatisticWeek extends YearStatistic {
 		int segmentStart[] = new int[fNumberOfYears];
 		int segmentEnd[] = new int[fNumberOfYears];
 		String[] segmentTitle = new String[fNumberOfYears];
-	
+
 		int weekCounter = tourWeekData.fAltitudeHigh[0].length;
-	
+
 		int oldestYear = fCurrentYear - fNumberOfYears + 1;
-	
+
 		// get start/end and title for each segment
 		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
-	
+
 			int currentYearIndex = weekIndex / yearWeeks;
-	
+
 			if (weekIndex % yearWeeks == 0) {
-	
+
 				// first week in a year
-	
+
 				segmentStart[currentYearIndex] = weekIndex;
 				segmentTitle[currentYearIndex] = Integer.toString(oldestYear + currentYearIndex);
-	
+
 			} else if (weekIndex % yearWeeks == yearWeeks - 1) {
-	
+
 				// last week in a year
-	
+
 				segmentEnd[currentYearIndex] = weekIndex;
 			}
 		}
-	
+
 		ChartSegments weekSegments = new ChartSegments();
 		weekSegments.valueStart = segmentStart;
 		weekSegments.valueEnd = segmentEnd;
 		weekSegments.segmentTitle = segmentTitle;
+
 		return weekSegments;
 	}
 }

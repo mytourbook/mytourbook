@@ -101,9 +101,8 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 					if (isModified) {
 
 						// notify all views which display the tour type
-						TourManager.getInstance()
-								.firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED,
-										selectedTours);
+						TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED,
+								selectedTours);
 
 					}
 
@@ -111,8 +110,7 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 					if (editorTours.size() > 0) {
 
 						TourManager.getInstance()
-								.firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED_IN_EDITOR,
-										editorTours);
+								.firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED_IN_EDITOR, editorTours);
 					}
 				}
 
@@ -182,8 +180,7 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 				 * don't show the message when the tour is from a tour editor
 				 */
 
-				MessageBox msgBox = new MessageBox(Display.getCurrent().getActiveShell(),
-						SWT.ICON_INFORMATION | SWT.OK);
+				MessageBox msgBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_INFORMATION | SWT.OK);
 				msgBox.setText(Messages.App_Action_set_tour_type_dlg_title);
 				msgBox.setMessage(Messages.App_Action_set_tour_type_dlg_message);
 				msgBox.open();
@@ -236,6 +233,7 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 					items[i].dispose();
 				}
 
+				// add all tour types to the menu
 				ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 
 				for (TourType tourType : tourTypes) {

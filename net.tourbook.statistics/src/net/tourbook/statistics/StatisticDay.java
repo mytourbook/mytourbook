@@ -48,7 +48,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	static final String		ALTITUDE_DATA	= "altitude";						//$NON-NLS-1$
 	static final String		DURATION_DATA	= "duration";						//$NON-NLS-1$
 
-	private TourTypeFilter	fActiveTourTypeFilter;
+	TourTypeFilter			fActiveTourTypeFilter;
 	private TourPerson		fActivePerson;
 
 	Long					fSelectedTourId;
@@ -173,11 +173,14 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				int selectedValueIndex = barChartSelection.valueIndex;
 				final long[] tourIds = fTourDataTour.fTourIds;
 
-				if (selectedValueIndex >= tourIds.length) {
-					selectedValueIndex = tourIds.length - 1;
-				}
+				if (tourIds.length > 0) {
 
-				selectedTourId = tourIds[selectedValueIndex];
+					if (selectedValueIndex >= tourIds.length) {
+						selectedValueIndex = tourIds.length - 1;
+					}
+
+					selectedTourId = tourIds[selectedValueIndex];
+				}
 			}
 		}
 
@@ -244,7 +247,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 		if (isSelected == false) {
 			// select first tour
-			selectedItems[0] = true;
+//			selectedItems[0] = true;
 		}
 
 		fChart.setSelectedBars(selectedItems);

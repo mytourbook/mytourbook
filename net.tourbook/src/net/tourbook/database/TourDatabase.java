@@ -41,6 +41,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 import org.apache.derby.drda.NetworkServerControl;
@@ -96,6 +97,8 @@ public class TourDatabase {
 
 	private static ArrayList<TourType>	fTourTypes;
 
+	private static ArrayList<TourType>	fActiveTourTypes;
+
 	private boolean						fIsTableChecked;
 	private boolean						fIsVersionChecked;
 
@@ -134,9 +137,19 @@ public class TourDatabase {
 	}
 
 	/**
+	 * @param tourTypeList
+	 * @return Returns a list with all {@link TourType}'s.<br>
+	 *         Returns <code>null</code> when {@link TourType}'s are not defined.<br>
+	 *         Return an empty list when the {@link TourType} is not set within the {@link TourData}
+	 */
+	public static ArrayList<TourType> getActiveTourTypes() {
+		return fActiveTourTypes;
+	}
+
+	/**
 	 * @return Returns all tours in database
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private static ArrayList<Long> getAllTourIds() {
 
 		ArrayList<Long> tourList = new ArrayList<Long>();
@@ -166,7 +179,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourBike> getTourBikes() {
 
 		ArrayList<TourBike> bikeList = new ArrayList<TourBike>();
@@ -211,7 +224,7 @@ public class TourDatabase {
 	/**
 	 * @return Returns all tour people in the db sorted by last/first name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourPerson> getTourPeople() {
 
 		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
@@ -232,10 +245,24 @@ public class TourDatabase {
 		return tourPeople;
 	}
 
+	public static String getTourTypeName(long typeId) {
+
+		String tourTypeName = UI.EMPTY_STRING;
+
+		for (TourType tourType : getTourTypes()) {
+			if (tourType.getTypeId() == typeId) {
+				tourTypeName = tourType.getName();
+				break;
+			}
+		}
+
+		return tourTypeName;
+	}
+
 	/**
 	 * @return Returns all tour types which are stored in the database sorted by name
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourType> getTourTypes() {
 
 		if (fTourTypes != null) {
@@ -380,6 +407,59 @@ public class TourDatabase {
 		}
 
 		return isSaved;
+	}
+
+	public static void updateActiveTourTypeList(TourTypeFilter tourTypeFilter) {
+
+		switch (tourTypeFilter.getFilterType()) {
+		case TourTypeFilter.FILTER_TYPE_SYSTEM:
+
+			if (tourTypeFilter.getSystemFilterId() == TourTypeFilter.SYSTEM_FILTER_ID_ALL) {
+
+				// all tour types are selected
+
+				fActiveTourTypes = fTourTypes;
+				return;
+
+			} else {
+
+				// tour type is not defined
+
+			}
+
+			break;
+
+		case TourTypeFilter.FILTER_TYPE_DB:
+
+			fActiveTourTypes = new ArrayList<TourType>();
+			fActiveTourTypes.add(tourTypeFilter.getTourType());
+
+			return;
+
+		case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
+
+			final Object[] tourTypes = tourTypeFilter.getTourTypeSet().getTourTypes();
+
+			if (tourTypes.length != 0) {
+
+				// create a list with all tour types from the set
+
+				fActiveTourTypes = new ArrayList<TourType>();
+
+				for (Object item : tourTypes) {
+					fActiveTourTypes.add((TourType) item);
+				}
+				return;
+			}
+
+			break;
+
+		default:
+			break;
+		}
+
+		// set default empty list
+		fActiveTourTypes = new ArrayList<TourType>();
 	}
 
 	public void addPropertyListener(IPropertyListener listener) {
@@ -1209,20 +1289,6 @@ public class TourDatabase {
 		// cleanup everything as if nothing has happened
 		emFactory.close();
 		emFactory = null;
-	}
-
-	public static String getTourTypeName(long typeId) {
-
-		String tourTypeName = UI.EMPTY_STRING;
-
-		for (TourType tourType : getTourTypes()) {
-			if (tourType.getTypeId() == typeId) {
-				tourTypeName = tourType.getName();
-				break;
-			}
-		}
-
-		return tourTypeName;
 	}
 
 //	private void updateDbDesign_4_5(Connection conn) {

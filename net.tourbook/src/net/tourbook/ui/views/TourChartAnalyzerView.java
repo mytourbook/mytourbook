@@ -121,7 +121,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		void createInfoAvg() {
 
-			final Color lineColor = getColor(fChartData.getRgbLine()[0]);
+			final Color lineColor = getColor(fChartData.getDefaultRGB());
 
 			avg = new Label(fContainer, SWT.TRAIL);
 			avg.setForeground(lineColor);
@@ -134,7 +134,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		void createInfoDiff() {
 
-			Color lineColor = getColor(fChartData.getRgbLine()[0]);
+			Color lineColor = getColor(fChartData.getDefaultRGB());
 
 			diff = new Label(fContainer, SWT.TRAIL);
 			diff.setForeground(lineColor);
@@ -148,7 +148,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		void createInfoLeft() {
 
 			left = new Label(fContainer, SWT.TRAIL);
-			left.setForeground(getColor(fChartData.getRgbLine()[0]));
+			left.setForeground(getColor(fChartData.getDefaultRGB()));
 			left.setBackground(fBgColorData);
 
 			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -159,7 +159,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		void createInfoMax() {
 
 			max = new Label(fContainer, SWT.TRAIL);
-			max.setForeground(getColor(fChartData.getRgbLine()[0]));
+			max.setForeground(getColor(fChartData.getDefaultRGB()));
 			max.setBackground(fBgColorData);
 
 			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -170,7 +170,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		void createInfoMin() {
 
 			min = new Label(fContainer, SWT.TRAIL);
-			min.setForeground(getColor(fChartData.getRgbLine()[0]));
+			min.setForeground(getColor(fChartData.getDefaultRGB()));
 			min.setBackground(fBgColorData);
 
 			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -182,7 +182,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		void createInfoRight() {
 
 			right = new Label(fContainer, SWT.TRAIL);
-			right.setForeground(getColor(fChartData.getRgbLine()[0]));
+			right.setForeground(getColor(fChartData.getDefaultRGB()));
 			right.setBackground(fBgColorData);
 
 			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -192,7 +192,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		private void createValueLabel() {
 
-			Color lineColor = getColor(fChartData.getRgbLine()[0]);
+			Color lineColor = getColor(fChartData.getDefaultRGB());
 			Label label;
 
 			String labelText;
@@ -211,7 +211,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		void createValueUnit() {
 
-			final Color lineColor = getColor(fChartData.getRgbLine()[0]);
+			final Color lineColor = getColor(fChartData.getDefaultRGB());
 			Label label;
 
 			String toolTip;

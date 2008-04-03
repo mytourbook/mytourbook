@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Menu;
 public class ActionAdjustYear extends Action implements IMenuCreator {
 
 	public Calendar		fCalendar	= GregorianCalendar.getInstance();
+
 	private Menu		fMenu;
 
 	private ActionYear	fActionYearLast;

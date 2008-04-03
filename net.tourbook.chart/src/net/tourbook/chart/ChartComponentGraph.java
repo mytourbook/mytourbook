@@ -1123,7 +1123,7 @@ public class ChartComponentGraph extends Canvas {
 		final float scaleY = drawingData.getScaleY();
 		final int graphYBottom = drawingData.getGraphYBottom();
 		final boolean axisDirection = yData.isYAxisDirection();
-		final int barPosition = drawingData.getBarPosition();
+//		final int barPosition = drawingData.getBarPosition();
 
 		// get the horizontal offset for the graph
 		int graphValueOffset;
@@ -1157,12 +1157,11 @@ public class ChartComponentGraph extends Canvas {
 		// keep the height for stacked bar charts
 		final int devHeightSummary[] = new int[valueLength];
 
-		final int devBarWidthComputed = drawingData.getBarRectangleWidth();
-		final int devBarWidth = Math.max(1, devBarWidthComputed);
-
-		int devBarXPos = drawingData.getDevBarRectangleXPos();
+		final int devBarWidthOriginal = drawingData.getBarRectangleWidth();
+		final int devBarWidth = Math.max(1, devBarWidthOriginal);
 
 		final int serieLayout = yData.getChartLayout();
+		final int devBarRectangleStartXPos = drawingData.getDevBarRectangleXPos();
 
 		// loop: all data series
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
@@ -1173,10 +1172,13 @@ public class ChartComponentGraph extends Canvas {
 				yLowValues = yLowSeries[serieIndex];
 			}
 
+			int devBarXPos = devBarRectangleStartXPos;
+			int devBarWidthPositioned = devBarWidth;
+
 			// reposition the rectangle when the bars are beside each other
 			if (serieLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE) {
-//				devBarXPos += serieIndex * devBarWidth;
-				devBarXPos += serieIndex;
+				devBarXPos += serieIndex * devBarWidth;
+				devBarWidthPositioned = devBarWidth - 1;
 			}
 
 			// loop: all values in the current serie
@@ -1185,15 +1187,15 @@ public class ChartComponentGraph extends Canvas {
 				// get the x position
 				final int devXPos = (int) ((xValues[valueIndex] - graphValueOffset) * scaleX) + devBarXPos;
 
-				final int devBarWidthSelected = devBarWidth;
-				final int devBarWidth2 = devBarWidthSelected / 2;
-
-				int devXPosSelected = devXPos;
-
-				// center the bar
-				if (devBarWidthSelected > 1 && barPosition == ChartDrawingData.BAR_POS_CENTER) {
-					devXPosSelected -= devBarWidth2;
-				}
+//				final int devBarWidthSelected = devBarWidth;
+//				final int devBarWidth2 = devBarWidthSelected / 2;
+//
+//				int devXPosSelected = devXPos;
+//
+//				// center the bar
+//				if (devBarWidthSelected > 1 && barPosition == ChartDrawingData.BAR_POS_CENTER) {
+//					devXPosSelected -= devBarWidth2;
+//				}
 
 				// get the bar height
 				final int valueYLow = yLowValues == null ? yData.getVisibleMinValue() : yLowValues[valueIndex];
@@ -1221,7 +1223,7 @@ public class ChartComponentGraph extends Canvas {
 					devYPos = devYTop + ((int) ((valueYLow - graphYBottom) * scaleY) + devYPreviousHeight);
 				}
 
-				final Rectangle barShape = new Rectangle(devXPos, devYPos, devBarWidth, devBarHeight);
+				final Rectangle barShape = new Rectangle(devXPos, devYPos, devBarWidthPositioned, devBarHeight);
 
 				final int colorIndex = colorsIndex[serieIndex][valueIndex];
 				final RGB rgbBrightDef = rgbBright[colorIndex];
@@ -1237,7 +1239,7 @@ public class ChartComponentGraph extends Canvas {
 				/*
 				 * draw bar
 				 */
-				if (devBarWidthComputed > 0) {
+				if (devBarWidthOriginal > 0) {
 
 					gc.setForeground(colorBright);
 					gc.fillGradientRectangle(barShape.x, barShape.y, barShape.width, barShape.height, false);
@@ -1255,7 +1257,7 @@ public class ChartComponentGraph extends Canvas {
 				barRecangles[serieIndex][valueIndex] = barShape;
 				barFocusRecangles[serieIndex][valueIndex] = new Rectangle(devXPos - 2,
 						devYPos - 2,
-						devBarWidth + 4,
+						devBarWidthPositioned + 4,
 						devBarHeight + 7);
 
 				// keep the height for the bar
@@ -2451,10 +2453,10 @@ public class ChartComponentGraph extends Canvas {
 				final int startValue = startValues[segmentIndex];
 				final int endValue = endValues[segmentIndex];
 
-				final int devValueStart = (int) (scaleX * startValue - fDevGraphImageXOffset);
+				final int devValueStart = (int) (scaleX * startValue) - fDevGraphImageXOffset;
 
 				// adjust endValue to fill the last part of the segment
-				final int devValueEnd = (int) (scaleX * (endValue + 1) - fDevGraphImageXOffset);
+				final int devValueEnd = (int) (scaleX * (endValue + 1)) - fDevGraphImageXOffset;
 
 				gc.setBackground(alternateColor);
 				gc.fillRectangle(devValueStart, //
@@ -2798,11 +2800,12 @@ public class ChartComponentGraph extends Canvas {
 
 				for (int segmentIndex = 0; segmentIndex < valueStart.length; segmentIndex++) {
 
-					final int devValueStart = (int) (scaleX * valueStart[segmentIndex] - fDevGraphImageXOffset);
-					final int devValueEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1) - fDevGraphImageXOffset);
+					final int devValueStart = (int) (scaleX * valueStart[segmentIndex]) - fDevGraphImageXOffset;
+					final int devValueEnd = (int) (scaleX * (valueEnd[segmentIndex] + 1)) - fDevGraphImageXOffset;
+
 					final String segmentTitle = segmentTitles[segmentIndex];
 
-//				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 					// draw the title in the center of the segment 
 					if (segmentTitle != null) {

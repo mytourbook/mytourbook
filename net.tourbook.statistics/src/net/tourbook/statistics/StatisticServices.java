@@ -23,6 +23,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -37,26 +38,51 @@ public class StatisticServices {
 	 */
 	public static int		TOUR_TYPE_COLOR_INDEX_OFFSET	= 1;
 
-	public static void setTourTypeColors(ChartDataYSerie yData, String graphName) {
+	/**
+	 * Set default colors for the y-axis, the color is defined in
+	 * {@link GraphColorProvider#PREF_COLOR_LINE}
+	 * 
+	 * @param yData
+	 * @param graphName
+	 */
+	public static void setDefaultColors(ChartDataYSerie yData, String graphName) {
+
+		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		String defaultColorName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+
+		// put the color into the chart data
+		yData.setDefaultRGB(PreferenceConverter.getColor(prefStore, //
+				defaultColorName + GraphColorProvider.PREF_COLOR_LINE));
+	}
+
+	public static void setTourTypeColors(ChartDataYSerie yData, String graphName, TourTypeFilter tourTypeFilter) {
 
 		ArrayList<RGB> rgbBright = new ArrayList<RGB>();
 		ArrayList<RGB> rgbDark = new ArrayList<RGB>();
 		ArrayList<RGB> rgbLine = new ArrayList<RGB>();
 
 		/*
-		 * color index 0: default color
+		 * set default color when tours are displayed where the tour type is not set, these tour
+		 * will be painted in the default color
 		 */
-		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		String defaultColorName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+		if (tourTypeFilter.showUndefinedTourTypes()) {
 
-		rgbBright.add(PreferenceConverter.getColor(prefStore, defaultColorName + GraphColorProvider.PREF_COLOR_BRIGHT));
-		rgbDark.add(PreferenceConverter.getColor(prefStore, defaultColorName + GraphColorProvider.PREF_COLOR_DARK));
-		rgbLine.add(PreferenceConverter.getColor(prefStore, defaultColorName + GraphColorProvider.PREF_COLOR_LINE));
+			/*
+			 * color index 0: default color
+			 */
+			IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+			String defaultColorName = ITourbookPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+
+			rgbBright.add(PreferenceConverter.getColor(prefStore, defaultColorName
+					+ GraphColorProvider.PREF_COLOR_BRIGHT));
+			rgbDark.add(PreferenceConverter.getColor(prefStore, defaultColorName + GraphColorProvider.PREF_COLOR_DARK));
+			rgbLine.add(PreferenceConverter.getColor(prefStore, defaultColorName + GraphColorProvider.PREF_COLOR_LINE));
+		}
 
 		/*
 		 * color index 1...n+1: tour type colors
 		 */
-		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
 		for (TourType tourType : tourTypes) {
 			rgbBright.add(tourType.getRGBBright());
 			rgbDark.add(tourType.getRGBDark());
@@ -71,26 +97,33 @@ public class StatisticServices {
 
 	/**
 	 * create the color index for every tour type, <code>typeIds</code> contain all tour types
+	 * 
+	 * @param tourTypeFilter
 	 */
-	public static void setTourTypeColorIndex(ChartDataYSerie yData, long[][] typeIds) {
+	public static void setTourTypeColorIndex(ChartDataYSerie yData, long[][] allTypeIds, TourTypeFilter tourTypeFilter) {
 
-		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
 
-		int[][] colorIndex = new int[typeIds.length][typeIds[0].length];
+		int colorOffset = 0;
+		if (tourTypeFilter.showUndefinedTourTypes()) {
+			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+		}
+
+		int[][] colorIndex = new int[allTypeIds.length][allTypeIds[0].length];
 
 		int serieIndex = 0;
-		for (long[] serieTypeIds : typeIds) {
+		for (long[] typeIdSerie : allTypeIds) {
 
-			final int[] colorIndexSerie = new int[serieTypeIds.length];
-			for (int tourTypeIdIndex = 0; tourTypeIdIndex < serieTypeIds.length; tourTypeIdIndex++) {
+			final int[] colorIndexSerie = new int[typeIdSerie.length];
+			for (int tourTypeIdIndex = 0; tourTypeIdIndex < typeIdSerie.length; tourTypeIdIndex++) {
 
-				long typeId = serieTypeIds[tourTypeIdIndex];
+				long typeId = typeIdSerie[tourTypeIdIndex];
 				int tourTypeColorIndex = 0;
 
 				if (typeId != -1) {
 					for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
 						if ((tourTypes.get(typeIndex)).getTypeId() == typeId) {
-							tourTypeColorIndex = typeIndex + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+							tourTypeColorIndex = colorOffset + typeIndex;
 							break;
 						}
 					}

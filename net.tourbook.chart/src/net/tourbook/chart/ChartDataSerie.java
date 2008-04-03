@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.chart;
 
 import java.util.HashMap;
@@ -34,6 +35,11 @@ public abstract class ChartDataSerie {
 //	public static enum OverlayStatus {
 //		NOT_SET, IN_QUEUE, IMAGE_AVAILABLE, NO_IMAGE
 //	};
+
+	/**
+	 * Default color, when default color is not set
+	 */
+	private static RGB				DefaultDefaultRGB				= new RGB(0xFF, 0xA5, 0xCB);
 
 	/**
 	 * contains the values for the chart, highValues contains the upper value, lowValues the lower
@@ -88,6 +94,8 @@ public abstract class ChartDataSerie {
 	 */
 	int								fOriginalMaxValue;
 
+	private RGB						fDefaultRGB;
+
 	public int getAxisUnit() {
 		return axisUnit;
 	}
@@ -102,6 +110,22 @@ public abstract class ChartDataSerie {
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * @return Returns the default color for this data serie
+	 */
+	public RGB getDefaultRGB() {
+
+		/*
+		 * when default color is not set, return an ugly color to see in the ui that something is
+		 * wrong
+		 */
+		if (fDefaultRGB == null) {
+			return DefaultDefaultRGB;
+		}
+
+		return fDefaultRGB;
 	}
 
 	/**
@@ -177,6 +201,10 @@ public abstract class ChartDataSerie {
 	 */
 	public void setCustomData(String key, Object value) {
 		fCustomData.put(key, value);
+	}
+
+	public void setDefaultRGB(RGB color) {
+		fDefaultRGB = color;
 	}
 
 	public void setLabel(String label) {

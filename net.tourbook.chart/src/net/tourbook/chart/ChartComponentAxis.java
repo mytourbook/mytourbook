@@ -184,7 +184,7 @@ public class ChartComponentAxis extends Canvas {
 
 			if (fIsLeft && title != null) {
 
-				Color colorLine = new Color(Display.getCurrent(), yData.getRgbLine()[0]);
+				Color colorLine = new Color(Display.getCurrent(), yData.getDefaultRGB());
 				gc.setForeground(colorLine);
 
 				String yTitle = title + (unitText.equals("") ? "" : " - " + unitText); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

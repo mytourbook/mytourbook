@@ -100,7 +100,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	/**
 	 * @return Returns a list with all tour type filters
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static ArrayList<TourTypeFilter> getTourTypeFilters() {
 
 		ArrayList<TourTypeFilter> filterList = readXMLFilterFile();
@@ -334,8 +334,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 						break;
 
 					case TourTypeFilter.FILTER_TYPE_DB:
-						mementoFilter.putString(TAG_TOUR_TYPE_ID,
-								Long.toString(filter.getTourType().getTypeId()));
+						mementoFilter.putString(TAG_TOUR_TYPE_ID, Long.toString(filter.getTourType().getTypeId()));
 						break;
 
 					case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
@@ -349,8 +348,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 								TourType tourType = (TourType) item;
 								IMemento mementoTourType = mementoFilter.createChild(MEMENTO_CHILD_TOURTYPE);
 								{
-									mementoTourType.putString(TAG_TOUR_TYPE_ID,
-											Long.toString(tourType.getTypeId()));
+									mementoTourType.putString(TAG_TOUR_TYPE_ID, Long.toString(tourType.getTypeId()));
 								}
 							}
 						}
@@ -390,8 +388,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
 						|| property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-					double propertyValue = Double.valueOf(event.getNewValue().toString())
-							.doubleValue();
+					double propertyValue = Double.valueOf(event.getNewValue().toString()).doubleValue();
 
 					// check if the event was originated from this tour type
 					// combobox
@@ -446,8 +443,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 				// fire change event
 				fPropertyValue = Math.random();
-				plugin.getPreferenceStore()
-						.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, fPropertyValue);
+				plugin.getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, fPropertyValue);
 
 			}
 		});
@@ -577,6 +573,8 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	private void setActiveTourTypeFilter() {
 
 		int selectionIndex = fComboTourType.getSelectionIndex();
+
+		// check selection
 		if (selectionIndex == -1) {
 			// nothing is selected, select first entry
 			selectionIndex = 0;

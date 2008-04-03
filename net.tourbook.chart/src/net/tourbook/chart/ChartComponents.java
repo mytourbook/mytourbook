@@ -833,12 +833,24 @@ public class ChartComponents extends Composite {
 		case ChartDataYSerie.BAR_LAYOUT_BESIDE:
 
 			final int serieCount = yData.getHighValues().length;
-//			System.out.println("serieCount: " + serieCount);
 
 			// the bar's width is 75% of the width for a month
-			barWidth = (int) Math.max(0, yearWidth * 1.0f);
-			drawingData.setBarRectangleWidth(Math.max(1, barWidth / serieCount));
-			drawingData.setDevBarRectangleXPos((int) (Math.max(0, (yearWidth - barWidth) / 2) + 2));
+			barWidth = (int) Math.max(0, yearWidth * 0.9f);
+//			if (serieCount == 1) {
+//
+//				drawingData.setBarRectangleWidth(Math.max(1, barWidth));
+////			drawingData.setDevBarRectangleXPos((int) (Math.max(0, (yearWidth - barWidth) / 2) + 2));
+////			drawingData.setDevBarRectangleXPos(0);
+//
+//			} else {
+			final int singleBarWidth = Math.max(1, barWidth / (serieCount - 0));
+			drawingData.setBarRectangleWidth(singleBarWidth);
+			final int barPosition = (yearWidth - (singleBarWidth * (serieCount - 0))) / 2;
+
+			drawingData.setDevBarRectangleXPos((int) (Math.max(0, barPosition) + 0));
+//				drawingData.setDevBarRectangleXPos(0);
+//			}
+
 		default:
 			break;
 		}

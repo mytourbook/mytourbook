@@ -85,7 +85,12 @@ public class ProviderTourTime extends DataProvider {
 
 		initYearDOYs();
 
-		final ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
+		int colorOffset = 0;
+		if (tourTypeFilter.showUndefinedTourTypes()) {
+			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+		}
+
+		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		final String sqlString = "SELECT " //$NON-NLS-1$
@@ -165,7 +170,7 @@ public class ProviderTourTime extends DataProvider {
 					final long dbTypeId = result.getLong(11);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
-							tourTypeColorIndex = typeIndex + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+							tourTypeColorIndex = colorOffset + typeIndex;
 							break;
 						}
 					}

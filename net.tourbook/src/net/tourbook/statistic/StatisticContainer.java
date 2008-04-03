@@ -20,6 +20,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 
 import net.tourbook.Messages;
@@ -60,6 +63,8 @@ public class StatisticContainer extends Composite {
 	private static final int				SELECTION_TYPE_MONTH		= 1;
 	private static final int				SELECTION_TYPE_DAY			= 2;
 	private static final int				SELECTION_TYPE_TOUR			= 3;
+
+	private Calendar						fCalendar					= GregorianCalendar.getInstance();
 
 	private TourbookStatistic				fActiveStatistic;
 	private int								fActiveYear					= -1;
@@ -510,24 +515,44 @@ public class StatisticContainer extends Composite {
 		}
 
 		fComboYear.removeAll();
+
+		/*
+		 * add all years of the tours and the current year
+		 */
+		fCalendar.setTime(new Date());
+		int thisYear = fCalendar.get(Calendar.YEAR);
+
+		boolean isThisYearSet = false;
+
 		for (Integer year : fTourYears) {
+
+			if (year.intValue() == thisYear) {
+				isThisYearSet = true;
+			}
+
 			fComboYear.add(year.toString());
 		}
-	}
 
-	private void resetSelection() {
-
-		if (fActiveStatistic == null) {
-			return;
+		// add currenty year if not set
+		if (isThisYearSet == false) {
+			fTourYears.add(thisYear);
+			fComboYear.add(Integer.toString(thisYear));
 		}
-
-		// reset selection
-		fSelectedDate = -1;
-		fSelectedMonth = -1;
-		fSelectedTourId = -1;
-
-		fActiveStatistic.resetSelection();
 	}
+
+//	private void resetSelection() {
+//
+//		if (fActiveStatistic == null) {
+//			return;
+//		}
+//
+//		// reset selection
+//		fSelectedDate = -1;
+//		fSelectedMonth = -1;
+//		fSelectedTourId = -1;
+//
+//		fActiveStatistic.resetSelection();
+//	}
 
 	/**
 	 * Restore selected statistic

@@ -16,11 +16,11 @@
             id="net.tourbook.statistics.StatisticSummaryWeekCombined"
             name="%Pref_Week_Summary"/>
       <statistic
-            class="net.tourbook.statistics.StatisticMonth"
-            id="net.tourbook.statistics.StatisticSummaryMonth"
+            class="net.tourbook.statistics.StatisticMonthCombined"
+            id="net.tourbook.statistics.StatisticSummaryMonthCombined"
             name="%Pref_Month_Summary"/>
       <statistic
-            class="net.tourbook.statistics.StatisticYear"
+            class="net.tourbook.statistics.StatisticYearCombined"
             id="net.tourbook.statistics.StatisticSummaryYear"
             name="%Pref_Year_Summary"/>
       <statistic
@@ -32,25 +32,49 @@
             id="net.tourbook.statistics.StatisticSummaryDayAltitude"
             name="%Pref_Day_Summary_Altitude"/>
       <statistic
-            class="net.tourbook.statistics.StatisticDayDistance"
-            id="net.tourbook.statistics.StatisticSummaryDayDistance"
-            name="%Pref_Day_Summary_Distance"/>
-      <statistic
-            class="net.tourbook.statistics.StatisticDayTourTime"
-            id="net.tourbook.statistics.StatisticSummaryDayTourTime"
-            name="%Pref_Day_Summary_Duration"/>
-      <statistic
             class="net.tourbook.statistics.StatisticWeekAltitude"
             id="net.tourbook.statistics.StatisticSummaryWeekAltitude"
             name="%Pref_Week_Summary_Altitude"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticMonthAltitude"
+            id="net.tourbook.statistics.StatisticSummaryMonthAltitude"
+            name="%Pref_Month_Summary_Altitude"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticYearAltitude"
+            id="net.tourbook.statistics.StatisticSummaryYearAltitude"
+            name="%Pref_Year_Summary_Altitude"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticDayDistance"
+            id="net.tourbook.statistics.StatisticSummaryDayDistance"
+            name="%Pref_Day_Summary_Distance"/>
       <statistic
             class="net.tourbook.statistics.StatisticWeekDistance"
             id="net.tourbook.statistics.StatisticSummaryWeekDistance"
             name="%Pref_Week_Summary_Distance"/>
       <statistic
+            class="net.tourbook.statistics.StatisticMonthDistance"
+            id="net.tourbook.statistics.StatisticSummaryMonthDistance"
+            name="%Pref_Month_Summary_Distance"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticYearDistance"
+            id="net.tourbook.statistics.StatisticSummaryYearDistance"
+            name="%Pref_Year_Summary_Distance"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticDayTourTime"
+            id="net.tourbook.statistics.StatisticSummaryDayTourTime"
+            name="%Pref_Day_Summary_Duration"/>
+      <statistic
             class="net.tourbook.statistics.StatisticWeekTourTime"
             id="net.tourbook.statistics.StatisticSummaryWeekDuration"
             name="%Pref_Week_Summary_Duration"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticMonthTourTime"
+            id="net.tourbook.statistics.StatisticSummaryMonthTourTime"
+            name="%Pref_Month_Summary_TourTime"/>
+      <statistic
+            class="net.tourbook.statistics.StatisticYearTourTime"
+            id="net.tourbook.statistics.StatisticSummaryYearTourTime"
+            name="%Pref_Year_Summary_TourTime"/>
    </extension>
 
 </plugin>

@@ -54,7 +54,8 @@ public class StatisticDayCombined extends StatisticDay {
 		yData.setVisibleMinValue(0);
 		yData.setCustomData(DISTANCE_DATA, 1);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
 		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
 
 		/*
@@ -70,7 +71,8 @@ public class StatisticDayCombined extends StatisticDay {
 		yData.setVisibleMinValue(0);
 		yData.setCustomData(ALTITUDE_DATA, 1);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, fActiveTourTypeFilter);
 		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
 
 		/*
@@ -84,7 +86,8 @@ public class StatisticDayCombined extends StatisticDay {
 		yData.setVisibleMinValue(0);
 		yData.setCustomData(DURATION_DATA, 1);
 		chartModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, fActiveTourTypeFilter);
 		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
 
 		/*

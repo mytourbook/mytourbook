@@ -67,7 +67,7 @@ public class ProviderTourYear extends DataProvider {
 		fNumberOfYears = numberOfYears;
 
 		// get the tour types
-		final ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] allTourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		fTourDataYear = new TourDataYear();
@@ -86,7 +86,12 @@ public class ProviderTourYear extends DataProvider {
 				+ (" GROUP BY STARTYEAR, tourType_typeId") //$NON-NLS-1$
 				+ (" ORDER BY STARTYEAR"); //$NON-NLS-1$
 
-		final int tourTypeSerieLength = allTourTypes.length + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+		int colorOffset = 0;
+		if (tourTypeFilter.showUndefinedTourTypes()) {
+			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+		}
+
+		final int tourTypeSerieLength = colorOffset + allTourTypes.length;
 		final int valueLength = numberOfYears;
 
 		try {
@@ -119,7 +124,7 @@ public class ProviderTourYear extends DataProvider {
 					final long dbTypeId = result.getLong(5);
 					for (int typeIndex = 0; typeIndex < allTourTypes.length; typeIndex++) {
 						if (dbTypeId == allTourTypes[typeIndex].getTypeId()) {
-							colorIndex = typeIndex + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+							colorIndex = colorOffset + typeIndex;
 							break;
 						}
 					}
@@ -140,7 +145,6 @@ public class ProviderTourYear extends DataProvider {
 			}
 
 			fTourDataYear.fTypeIds = dbTourTypeIds;
-			fTourDataYear.activeTourTypes = tourTypeFilter.getActiveTourTypes(tourTypeList);
 			fTourDataYear.years = years;
 
 			fTourDataYear.fDistanceLow = new int[tourTypeSerieLength][valueLength];

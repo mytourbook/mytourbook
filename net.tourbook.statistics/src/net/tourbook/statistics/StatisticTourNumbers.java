@@ -360,8 +360,13 @@ public class StatisticTourNumbers extends YearStatistic {
 	 */
 	private void createStatisticData(TourDataTour tourDataTour) {
 
-		ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
-		int colorLength = tourTypeList.size() + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+		int colorOffset = 0;
+		if (fActiveTourTypeFilter.showUndefinedTourTypes()) {
+			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+		}
+
+		ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
+		int colorLength = colorOffset + tourTypeList.size();
 
 		int distanceLength = fStatDistanceUnits.length;
 		int altitudeLength = fStatAltitudeUnits.length;
@@ -616,7 +621,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
 
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, fActiveTourTypeFilter);
 		yData.setColorIndex(colorIndex);
 
 		createAltitudeStatisticProvider(chartDataModel);
@@ -665,8 +671,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setYTitle(title);
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
-
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
 		yData.setColorIndex(colorIndex);
 
 		createDistanceStatisticProvider(chartDataModel);
@@ -761,7 +767,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
 
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, fActiveTourTypeFilter);
 		yData.setColorIndex(colorIndex);
 
 		createDurationStatisticProvider(chartDataModel);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,9 +13,8 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui;
 
-import java.util.ArrayList;
+package net.tourbook.ui;
 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
@@ -90,59 +89,59 @@ public class TourTypeFilter {
 		fTourTypeSet = filterSet;
 	}
 
-	/**
-	 * @param tourTypeList
-	 * @return Returns a list with all {@link TourType}'s which this filter contains.<br>
-	 *         Returns <code>null</code> when {@link TourType}'s are not defined.<br>
-	 *         Return an empty list when the {@link TourType} is not set within the {@link TourData}
-	 */
-	public ArrayList<TourType> getActiveTourTypes(ArrayList<TourType> tourTypeList) {
-
-		ArrayList<TourType> returnList;
-
-		switch (fFilterType) {
-		case FILTER_TYPE_SYSTEM:
-			if (fSystemFilterId == SYSTEM_FILTER_ID_ALL) {
-				return tourTypeList;
-			} else {
-				// tour type is not defined
-				return new ArrayList<TourType>();
-			}
-
-		case FILTER_TYPE_DB:
-
-			returnList = new ArrayList<TourType>();
-			returnList.add(fTourType);
-
-			return returnList;
-
-		case FILTER_TYPE_TOURTYPE_SET:
-
-			final Object[] tourTypes = fTourTypeSet.getTourTypes();
-
-			if (tourTypes.length == 0) {
-
-				return null;
-
-			} else {
-
-				// select all tours were the tour type is defined in the tour type list
-
-				returnList = new ArrayList<TourType>();
-
-				for (Object item : tourTypes) {
-					returnList.add((TourType) item);
-				}
-
-				return returnList;
-			}
-
-		default:
-			break;
-		}
-
-		return null;
-	}
+//	/**
+//	 * @param tourTypeList
+//	 * @return Returns a list with all {@link TourType}'s which this filter contains.<br>
+//	 *         Returns <code>null</code> when {@link TourType}'s are not defined.<br>
+//	 *         Return an empty list when the {@link TourType} is not set within the {@link TourData}
+//	 */
+//	public ArrayList<TourType> getActiveTourTypes(ArrayList<TourType> tourTypeList) {
+//
+//		ArrayList<TourType> returnList;
+//
+//		switch (fFilterType) {
+//		case FILTER_TYPE_SYSTEM:
+//			if (fSystemFilterId == SYSTEM_FILTER_ID_ALL) {
+//				return tourTypeList;
+//			} else {
+//				// tour type is not defined
+//				return new ArrayList<TourType>();
+//			}
+//
+//		case FILTER_TYPE_DB:
+//
+//			returnList = new ArrayList<TourType>();
+//			returnList.add(fTourType);
+//
+//			return returnList;
+//
+//		case FILTER_TYPE_TOURTYPE_SET:
+//
+//			final Object[] tourTypes = fTourTypeSet.getTourTypes();
+//
+//			if (tourTypes.length == 0) {
+//
+//				return null;
+//
+//			} else {
+//
+//				// select all tours were the tour type is defined in the tour type list
+//
+//				returnList = new ArrayList<TourType>();
+//
+//				for (Object item : tourTypes) {
+//					returnList.add((TourType) item);
+//				}
+//
+//				return returnList;
+//			}
+//
+//		default:
+//			break;
+//		}
+//
+//		return null;
+//	}
 
 	public String getFilterName() {
 		switch (fFilterType) {
@@ -176,7 +175,7 @@ public class TourTypeFilter {
 		switch (fFilterType) {
 		case FILTER_TYPE_SYSTEM:
 			if (fSystemFilterId == SYSTEM_FILTER_ID_ALL) {
-				// select all tour types
+				// select all tour types also not defined tour types
 				sqlString = ""; //$NON-NLS-1$
 			} else {
 				// select tour types which are not defined
@@ -267,4 +266,14 @@ public class TourTypeFilter {
 			break;
 		}
 	}
+
+	/**
+	 * @return Returns <code>true</code> when the filter allows {@link TourData} which has no
+	 *         {@link TourType}, this tours will be painted with the default color
+	 */
+	public boolean showUndefinedTourTypes() {
+		return fFilterType == FILTER_TYPE_SYSTEM;
+
+	}
+
 }

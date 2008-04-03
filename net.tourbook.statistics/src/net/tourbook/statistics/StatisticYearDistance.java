@@ -21,35 +21,34 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
-public class StatisticWeekAltitude extends StatisticWeek {
+public class StatisticYearDistance extends StatisticYear {
 
 	@Override
-	void updateChart(TourDataWeek tourWeekData) {
+	void updateChart(final TourDataYear tourDataYear, TourTypeFilter tourTypeFilter) {
 
-		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(createWeekData(tourWeekData));
-		xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_WEEK);
-		xData.setChartSegments(createChartSegments(tourWeekData));
+		final ChartDataXSerie xData = new ChartDataXSerie(createYearData(tourDataYear));
+		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
+		xData.setChartSegments(createChartSegments(tourDataYear));
 		chartDataModel.setXData(xData);
 
-		// altitude
+		// distance
 		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				tourWeekData.fAltitudeLow,
-				tourWeekData.fAltitudeHigh);
-		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
+				ChartDataYSerie.BAR_LAYOUT_BESIDE,
+				tourDataYear.fDistanceLow,
+				tourDataYear.fDistanceHigh);
+		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
+		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setAllValueColors(0);
-		yData.setVisibleMinValue(0);
 		chartDataModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, fActiveTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds, fActiveTourTypeFilter);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, tourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, tourDataYear.fTypeIds, tourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartDataModel);

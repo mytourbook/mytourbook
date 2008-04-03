@@ -192,11 +192,13 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				int selectedValueIndex = barChartSelection.valueIndex;
 				final long[] tourIds = fTourTimeData.fTourIds;
 
-				if (selectedValueIndex >= tourIds.length) {
-					selectedValueIndex = tourIds.length - 1;
-				}
+				if (tourIds.length > 0) {
+					if (selectedValueIndex >= tourIds.length) {
+						selectedValueIndex = tourIds.length - 1;
+					}
 
-				selectedTourId = tourIds[selectedValueIndex];
+					selectedTourId = tourIds[selectedValueIndex];
+				}
 			}
 		}
 
@@ -250,6 +252,11 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	public boolean selectTour(final Long tourId) {
 
 		final long[] tourIds = fTourTimeData.fTourIds;
+
+		if (tourIds.length == 0) {
+			return false;
+		}
+
 		final boolean selectedTours[] = new boolean[tourIds.length];
 
 		boolean isSelected = false;
@@ -358,7 +365,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		yData.setYAxisDirection(false);
 
 		yData.setColorIndex(new int[][] { fTourTimeData.fTypeColorIndex });
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, fActiveTourTypeFiler);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
 
 		chartModel.addYData(yData);
 

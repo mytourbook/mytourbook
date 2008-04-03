@@ -50,7 +50,8 @@ public class StatisticDayAltitude extends StatisticDay {
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setVisibleMinValue(0);
 		yData.setCustomData(ALTITUDE_DATA, 1);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, fActiveTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
 		yData.setColorIndex(new int[][] { tourDataTour.fTypeColorIndex });
 		chartDataModel.addYData(yData);
 

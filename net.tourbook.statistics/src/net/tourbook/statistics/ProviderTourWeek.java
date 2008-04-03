@@ -72,10 +72,15 @@ public class ProviderTourWeek extends DataProvider {
 		fTourWeekData = new TourDataWeek();
 
 		// get the tour types
-		ArrayList<TourType> tourTypeList = TourDatabase.getTourTypes();
+		ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-		final int serieLength = tourTypes.length + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+		int colorOffset = 0;
+		if (tourTypeFilter.showUndefinedTourTypes()) {
+			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+		}
+
+		final int serieLength = colorOffset + tourTypes.length;
 		final int valueLength = YEAR_WEEKS * numberOfYears;
 
 		String sqlString = "SELECT " //$NON-NLS-1$
@@ -122,7 +127,7 @@ public class ProviderTourWeek extends DataProvider {
 					final long dbTypeId = result.getLong(6);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
-							colorIndex = typeIndex + StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+							colorIndex = colorOffset + typeIndex;
 							break;
 						}
 					}
