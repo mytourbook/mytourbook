@@ -30,21 +30,21 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.ArrayListToArray;
 
-public class ProviderTourTime extends DataProvider {
+public class DataProviderTourTime extends DataProvider {
 
-	private static ProviderTourTime	fInstance;
+	private static DataProviderTourTime	fInstance;
 
-	private ArrayList<Long>			fTourIds;
+	private ArrayList<Long>				fTourIds;
 
-	private Long					fSelectedTourId;
+	private Long						fSelectedTourId;
 
-	private TourTimeData			fTourDataTime;
+	private TourTimeData				fTourDataTime;
 
-	private ProviderTourTime() {}
+	private DataProviderTourTime() {}
 
-	public static ProviderTourTime getInstance() {
+	public static DataProviderTourTime getInstance() {
 		if (fInstance == null) {
-			fInstance = new ProviderTourTime();
+			fInstance = new DataProviderTourTime();
 		}
 		return fInstance;
 	}
@@ -104,7 +104,8 @@ public class ProviderTourTime extends DataProvider {
 				+ "TourAltUp, " //			8 //$NON-NLS-1$
 				+ "TourRecordingTime, " //	9 //$NON-NLS-1$
 				+ "TourDrivingTime, "//		10 //$NON-NLS-1$
-				+ "TourType_typeId "//		11 //$NON-NLS-1$
+				+ "TourTitle, " //			11 //$NON-NLS-1$
+				+ "TourType_typeId "//		12 //$NON-NLS-1$
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$
 				+ getSQLFilter(person, tourTypeFilter)
@@ -116,16 +117,17 @@ public class ProviderTourTime extends DataProvider {
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 			final ResultSet result = statement.executeQuery();
 
-			final ArrayList<Integer> dbYear = new ArrayList<Integer>();
-			final ArrayList<Integer> dbMonths = new ArrayList<Integer>();
-			final ArrayList<Integer> dbAllYearsDOY = new ArrayList<Integer>(); // DOY...Day Of Year
+			final ArrayList<Integer> dbTourYear = new ArrayList<Integer>();
+			final ArrayList<Integer> dbTourMonths = new ArrayList<Integer>();
+			final ArrayList<Integer> dbAllYearsDOY = new ArrayList<Integer>(); // DOY...Day Of Year for all years
 
-			final ArrayList<Integer> startTimeList = new ArrayList<Integer>();
-			final ArrayList<Integer> endTimeList = new ArrayList<Integer>();
+			final ArrayList<Integer> dbTourStartTime = new ArrayList<Integer>();
+			final ArrayList<Integer> dbTourEndTime = new ArrayList<Integer>();
 
-			final ArrayList<Integer> distanceList = new ArrayList<Integer>();
-			final ArrayList<Integer> altitudeList = new ArrayList<Integer>();
-			final ArrayList<Integer> durationList = new ArrayList<Integer>();
+			final ArrayList<Integer> dbDistance = new ArrayList<Integer>();
+			final ArrayList<Integer> dbAltitude = new ArrayList<Integer>();
+			final ArrayList<Integer> dbDuration = new ArrayList<Integer>();
+			final ArrayList<String> dbTourTitle = new ArrayList<String>();
 
 			final ArrayList<Long> dbTypeIds = new ArrayList<Long>();
 			final ArrayList<Integer> dbTypeColorIndex = new ArrayList<Integer>();
@@ -144,30 +146,30 @@ public class ProviderTourTime extends DataProvider {
 
 				final int recordingTime = result.getInt(9);
 
-				// create data lists for the chart, start with 0
 				fCalendar.set(tourYear, tourMonth, result.getShort(4), startHour, startMinute);
 				final int tourDOY = fCalendar.get(Calendar.DAY_OF_YEAR) - 1;
 
-				dbYear.add(tourYear);
-				dbMonths.add(tourMonth);
+				dbTourYear.add(tourYear);
+				dbTourMonths.add(tourMonth);
 				dbAllYearsDOY.add(getYearDOYs(tourYear) + tourDOY);
 
-//				doyList.add(tourDOY);
-				startTimeList.add(startTime);
-				endTimeList.add((startTime + recordingTime));
+				dbTourStartTime.add(startTime);
+				dbTourEndTime.add((startTime + recordingTime));
 
-				distanceList.add((int) (result.getInt(7) / 1000 / UI.UNIT_VALUE_DISTANCE));
-				altitudeList.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
-				durationList.add(recordingTime);
+				dbDistance.add((int) (result.getInt(7) / 1000 / UI.UNIT_VALUE_DISTANCE));
+				dbAltitude.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
+				dbDuration.add(recordingTime);
+
+				dbTourTitle.add(result.getString(11));
 
 				/*
 				 * convert type id to the type index in the tour type array, this is also the color
 				 * index for the tour type
 				 */
 				int tourTypeColorIndex = 0;
-				final Long dbTypeIdObject = (Long) result.getObject(11);
+				final Long dbTypeIdObject = (Long) result.getObject(12);
 				if (dbTypeIdObject != null) {
-					final long dbTypeId = result.getLong(11);
+					final long dbTypeId = result.getLong(12);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
 							tourTypeColorIndex = colorOffset + typeIndex;
@@ -198,20 +200,22 @@ public class ProviderTourTime extends DataProvider {
 			fTourDataTime.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
 			fTourDataTime.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
 
-			fTourDataTime.fYearValues = ArrayListToArray.toInt(dbYear);
 			fTourDataTime.allDaysInAllYears = yearDays;
 			fTourDataTime.yearDays = fYearDays;
 			fTourDataTime.years = fYears;
 
+			fTourDataTime.fTourYearValues = ArrayListToArray.toInt(dbTourYear);
+			fTourDataTime.fTourMonthValues = ArrayListToArray.toInt(dbTourMonths);
 			fTourDataTime.fTourDOYValues = ArrayListToArray.toInt(dbAllYearsDOY);
-			fTourDataTime.fTourMonthValues = ArrayListToArray.toInt(dbMonths);
 
-			fTourDataTime.fTourTimeStartValues = ArrayListToArray.toInt(startTimeList);
-			fTourDataTime.fTourTimeEndValues = ArrayListToArray.toInt(endTimeList);
+			fTourDataTime.fTourTimeStartValues = ArrayListToArray.toInt(dbTourStartTime);
+			fTourDataTime.fTourTimeEndValues = ArrayListToArray.toInt(dbTourEndTime);
 
-			fTourDataTime.fTourTimeDistanceValues = ArrayListToArray.toInt(distanceList);
-			fTourDataTime.fTourTimeAltitudeValues = ArrayListToArray.toInt(altitudeList);
-			fTourDataTime.fTourTimeDurationValues = ArrayListToArray.toInt(durationList);
+			fTourDataTime.fTourDistanceValues = ArrayListToArray.toInt(dbDistance);
+			fTourDataTime.fTourAltitudeValues = ArrayListToArray.toInt(dbAltitude);
+			fTourDataTime.fTourDurationValues = ArrayListToArray.toInt(dbDuration);
+
+			fTourDataTime.fTourTitle = dbTourTitle;
 
 		} catch (final SQLException e) {
 			e.printStackTrace();

@@ -15,27 +15,37 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
+import java.util.ArrayList;
+
 public class TourDataTour {
 
-	long[]	fTourIds;
+	long[]				fTourIds;
 
-	int[]	fDOYValues;
-	int[]	fMonthValues;
-	int[]	fYearValues;
+	int[]				fYearValues;
+	int[]				fMonthValues;
+	int[]				fDOYValues;
 
-	int[]	years;
-	int[]	yearDays;
-	int		allDaysInAllYears;
+	int[]				years;
+	int[]				yearDays;
+	int					allDaysInAllYears;
 
-	int[]	fTypeColorIndex;
-	long[]	fTypeIds;
+	int[]				fTypeColorIndex;
+	long[]				fTypeIds;
 
-	int[]	fDistanceLow;
-	int[]	fAltitudeLow;
-	int[]	fTimeLow;
+	int[]				fDistanceLow;
+	int[]				fAltitudeLow;
+	int[]				fTimeLow;
 
-	int[]	fDistanceHigh;
-	int[]	fAltitudeHigh;
-	int[]	fTimeHigh;
+	int[]				fDistanceHigh;
+	int[]				fAltitudeHigh;
+	int[]				fTimeHigh;
 
+	int[]				fTourStartValues;
+	int[]				fTourEndValues;
+
+	int[]				fTourDurationValues;
+	int[]				fTourDistanceValues;
+	int[]				fTourAltitudeValues;
+
+	ArrayList<String>	fTourTitle;
 }

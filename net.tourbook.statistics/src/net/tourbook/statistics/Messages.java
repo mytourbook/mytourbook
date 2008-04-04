@@ -58,12 +58,18 @@ public class Messages extends NLS {
 	public static String		TOURDAYINFO_DISTANCE;
 	public static String		TOURDAYINFO_DURATION;
 	public static String		TOURDAYINFO_TOUR_DATE_FORMAT;
-	public static String		TOURTIMEINFO_ALTITUDE;
-	public static String		TOURTIMEINFO_DATE_FORMAT;
-	public static String		TOURTIMEINFO_DISTANCE;
-	public static String		TOURTIMEINFO_DURATION;
-	public static String		TOURTIMEINFO_TOUR_TYPE;
 
+	public static String	tourtime_info_altitude;
+
+	public static String	tourtime_info_date_format;
+
+	public static String	tourtime_info_distance;
+
+	public static String	tourtime_info_title;
+
+	public static String	tourtime_info_tour_time;
+
+	public static String	tourtime_info_tour_type;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

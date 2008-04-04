@@ -57,6 +57,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 public class UI {
 
 	public static final String				EMPTY_STRING					= "";											//$NON-NLS-1$
+	public static final String				EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
+
 	public static final int					DEFAULT_FIELD_WIDTH				= 40;
 
 	/*

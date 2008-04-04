@@ -201,7 +201,7 @@ public abstract class StatisticMonth extends YearStatistic {
 		fCurrentYear = currentYear;
 		fNumberOfYears = numberOfYears;
 
-		final TourDataMonth tourMonthData = ProviderTourMonth.getInstance().getMonthData(person,
+		final TourDataMonth tourMonthData = DataProviderTourMonth.getInstance().getMonthData(person,
 				tourTypeFilter,
 				currentYear,
 				numberOfYears,

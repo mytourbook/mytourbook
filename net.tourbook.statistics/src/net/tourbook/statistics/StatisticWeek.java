@@ -83,7 +83,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		fCurrentYear = currentYear;
 		fNumberOfYears = numberOfYears;
 
-		TourDataWeek tourWeekData = ProviderTourWeek.getInstance().getWeekData(person,
+		TourDataWeek tourWeekData = DataProviderTourWeek.getInstance().getWeekData(person,
 				typeId,
 				currentYear,
 				numberOfYears,
@@ -107,7 +107,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		fCalendar.setTimeInMillis(date);
 		int selectedWeek = fCalendar.get(Calendar.WEEK_OF_YEAR) - 0;
 
-		boolean selectedItems[] = new boolean[ProviderTourWeek.YEAR_WEEKS];
+		boolean selectedItems[] = new boolean[DataProviderTourWeek.YEAR_WEEKS];
 		selectedItems[selectedWeek] = true;
 
 		fChart.setSelectedBars(selectedItems);
@@ -121,7 +121,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		fCalendar.setTimeInMillis(date);
 		int selectedMonth = fCalendar.get(Calendar.MONTH);
 
-		boolean selectedItems[] = new boolean[ProviderTourWeek.YEAR_WEEKS];
+		boolean selectedItems[] = new boolean[DataProviderTourWeek.YEAR_WEEKS];
 		boolean isSelected = false;
 
 		// select all weeks in the selected month
@@ -167,7 +167,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		/*
 		 * create segments for each year
 		 */
-		int yearWeeks = ProviderTourWeek.YEAR_WEEKS;
+		int yearWeeks = DataProviderTourWeek.YEAR_WEEKS;
 		int segmentStart[] = new int[fNumberOfYears];
 		int segmentEnd[] = new int[fNumberOfYears];
 		String[] segmentTitle = new String[fNumberOfYears];

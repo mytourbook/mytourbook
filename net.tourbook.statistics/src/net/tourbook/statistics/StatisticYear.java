@@ -127,7 +127,7 @@ public abstract class StatisticYear extends YearStatistic {
 		fCurrentYear = currentYear;
 		fNumberOfYears = numberOfYears;
 
-		final TourDataYear tourDataYear = ProviderTourYear.getInstance().getYearData(person,
+		final TourDataYear tourDataYear = DataProviderTourYear.getInstance().getYearData(person,
 				tourTypeFilter,
 				currentYear,
 				numberOfYears,

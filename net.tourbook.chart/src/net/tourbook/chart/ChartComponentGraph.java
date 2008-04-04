@@ -274,6 +274,7 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private int							fHoveredBarSerieIndex	= -1;
 	private int							fHoveredBarValueIndex;
+//	private ChartDrawingData			fHoveredBarDrawingData;
 	private boolean						fIsHoveredBarDirty;
 
 	private ChartYSlider				ySliderDragged;
@@ -1123,7 +1124,6 @@ public class ChartComponentGraph extends Canvas {
 		final float scaleY = drawingData.getScaleY();
 		final int graphYBottom = drawingData.getGraphYBottom();
 		final boolean axisDirection = yData.isYAxisDirection();
-//		final int barPosition = drawingData.getBarPosition();
 
 		// get the horizontal offset for the graph
 		int graphValueOffset;
@@ -1253,12 +1253,12 @@ public class ChartComponentGraph extends Canvas {
 					gc.drawLine(barShape.x, barShape.y, barShape.x, (barShape.y + barShape.height));
 				}
 
-				// save the bar position
 				barRecangles[serieIndex][valueIndex] = barShape;
-				barFocusRecangles[serieIndex][valueIndex] = new Rectangle(devXPos - 2,
-						devYPos - 2,
+				barFocusRecangles[serieIndex][valueIndex] = new Rectangle(//
+				devXPos - 2,
+						(devYPos - 2),
 						devBarWidthPositioned + 4,
-						devBarHeight + 7);
+						(devBarHeight + 7));
 
 				// keep the height for the bar
 				devHeightSummary[valueIndex] += devBarHeight;
@@ -1782,6 +1782,7 @@ public class ChartComponentGraph extends Canvas {
 
 			// get the chart data
 			final ChartDataYSerie yData = drawingData.getYData();
+			final int serieLayout = yData.getChartLayout();
 			final int[][] colorsIndex = yData.getColorsIndex();
 
 			// get the colors
@@ -1805,6 +1806,10 @@ public class ChartComponentGraph extends Canvas {
 					continue;
 				}
 
+				if (serieIndex != fHoveredBarSerieIndex) {
+					continue;
+				}
+
 				final int colorIndex = colorsIndex[serieIndex][fHoveredBarValueIndex];
 				final RGB rgbBrightDef = rgbBright[colorIndex];
 				final RGB rgbDarkDef = rgbDark[colorIndex];
@@ -1813,6 +1818,10 @@ public class ChartComponentGraph extends Canvas {
 				final Color colorBright = getColor(rgbBrightDef);
 				final Color colorDark = getColor(rgbDarkDef);
 				final Color colorLine = getColor(rgbLineDef);
+
+				if (serieLayout != ChartDataYSerie.BAR_LAYOUT_STACKED) {
+
+				}
 
 				final Rectangle hoveredBarShape = new Rectangle((hoveredRectangle.x - markerWidth2),
 						(hoveredRectangle.y - markerWidth2),
@@ -3277,9 +3286,8 @@ public class ChartComponentGraph extends Canvas {
 					// test if the mouse is within a bar focus rectangle
 					if (barInfoFocus != null && barInfoFocus.contains(graphX, devY)) {
 
-						// showBarInfo = true;
-
 						// keep the hovered bar index
+//						fHoveredBarDrawingData = drawingData;
 						fHoveredBarSerieIndex = serieIndex;
 						fHoveredBarValueIndex = valueIndex;
 

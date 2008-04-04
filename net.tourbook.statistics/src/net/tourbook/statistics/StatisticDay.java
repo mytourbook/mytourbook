@@ -28,6 +28,7 @@ import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.data.TourPerson;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
@@ -184,7 +185,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			}
 		}
 
-		fTourDataTour = ProviderTourDay.getInstance().getDayData(person,
+		fTourDataTour = DataProviderTourDay.getInstance().getDayData(person,
 				tourTypeFilter,
 				year,
 				numberOfYears,
@@ -255,49 +256,80 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		return isSelected;
 	}
 
-	/**
-	 * set the context menu provider and the provider for the bar info
-	 * 
-	 * @param chartWidget
-	 * @param chartModel
-	 */
 	void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
 
-		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, new IChartInfoProvider() {
-			public String getInfo(final int serieIndex, final int valueIndex) {
+		final IChartInfoProvider chartInfoProvider = new IChartInfoProvider() {
 
-				fCalendar.set(fCurrentYear, 0, 1);
-				fCalendar.set(Calendar.DAY_OF_YEAR, fTourDataTour.fDOYValues[valueIndex] + 1);
+			public String getInfo(final int serieIndex, int valueIndex) {
+
+				final int[] tourDOYValues = fTourDataTour.fDOYValues;
+
+				if (valueIndex >= tourDOYValues.length) {
+					valueIndex -= tourDOYValues.length;
+				}
+
+				if (tourDOYValues == null || valueIndex >= tourDOYValues.length) {
+					return ""; //$NON-NLS-1$
+				}
+
+				/*
+				 * set calendar day/month/year
+				 */
+				final int oldestYear = fCurrentYear - fNumberOfYears + 1;
+				final int tourDOY = tourDOYValues[valueIndex];
+				fCalendar.set(oldestYear, 0, 1);
+				fCalendar.set(Calendar.DAY_OF_YEAR, tourDOY + 1);
 
 				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
 				fSelectedTourId = fTourDataTour.fTourIds[valueIndex];
 
-				final int duration = fTourDataTour.fTimeHigh[valueIndex] - fTourDataTour.fTimeLow[valueIndex];
+				String tourTypeName = TourDatabase.getTourTypeName(fTourDataTour.fTypeIds[valueIndex]);
+
+				final int[] startValue = fTourDataTour.fTourStartValues;
+				final int[] endValue = fTourDataTour.fTourEndValues;
+				final int[] durationValue = fTourDataTour.fTourDurationValues;
+
+				String tourTitle = fTourDataTour.fTourTitle.get(valueIndex);
 
 				StringBuilder infoText = new StringBuilder();
-				infoText.append(Messages.TOURDAYINFO_TOUR_DATE_FORMAT);
-				infoText.append(Messages.TOURDAYINFO_DISTANCE);
-				infoText.append(Messages.TOURDAYINFO_ALTITUDE);
-				infoText.append(Messages.TOURDAYINFO_DURATION);
+
+				if (tourTitle == null) {
+					tourTitle = UI.EMPTY_STRING;
+					infoText.append(UI.EMPTY_STRING_FORMAT);
+				} else {
+					infoText.append(Messages.tourtime_info_title);
+				}
+				infoText.append(Messages.tourtime_info_date_format);
+				infoText.append(Messages.tourtime_info_distance);
+				infoText.append(Messages.tourtime_info_altitude);
+				infoText.append(Messages.tourtime_info_tour_time);
+				infoText.append(Messages.tourtime_info_tour_type);
 
 				final String barInfo = new Formatter().format(infoText.toString(),
+						tourTitle,
 						fCalendar.get(Calendar.DAY_OF_MONTH),
 						fCalendar.get(Calendar.MONTH) + 1,
 						fCalendar.get(Calendar.YEAR),
-						fTourDataTour.fDistanceHigh[valueIndex],
+						startValue[valueIndex] / 3600,
+						(startValue[valueIndex] % 3600) / 60,
+						endValue[valueIndex] / 3600,
+						(endValue[valueIndex] % 3600) / 60,
+						fTourDataTour.fTourDistanceValues[valueIndex],
 						UI.UNIT_LABEL_DISTANCE,
-						fTourDataTour.fAltitudeHigh[valueIndex],
+						fTourDataTour.fTourAltitudeValues[valueIndex],
 						UI.UNIT_LABEL_ALTITUDE,
-						duration / 3600,
-						(duration % 3600) / 60).toString();
+						durationValue[valueIndex] / 3600,
+						(durationValue[valueIndex] % 3600) / 60,
+						tourTypeName).toString();
 
 				return barInfo;
 			}
-		});
+		};
+
+		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, chartInfoProvider);
 
 		// set the menu context provider
 		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourContextProvider(fChart, this));
-
 	}
 
 	@Override

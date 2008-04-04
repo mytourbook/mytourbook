@@ -28,17 +28,17 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
-public class ProviderTourYear extends DataProvider {
+public class DataProviderTourYear extends DataProvider {
 
-	private static ProviderTourYear	fInstance;
+	private static DataProviderTourYear	fInstance;
 
 	private TourDataYear			fTourDataYear;
 
-	private ProviderTourYear() {}
+	private DataProviderTourYear() {}
 
-	public static ProviderTourYear getInstance() {
+	public static DataProviderTourYear getInstance() {
 		if (fInstance == null) {
-			fInstance = new ProviderTourYear();
+			fInstance = new DataProviderTourYear();
 		}
 		return fInstance;
 	}

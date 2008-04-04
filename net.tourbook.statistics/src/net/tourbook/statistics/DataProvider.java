@@ -33,7 +33,6 @@ public abstract class DataProvider {
 	/**
 	 * number of days in a year
 	 */
-
 	int[]			fYearDays;
 
 	/**

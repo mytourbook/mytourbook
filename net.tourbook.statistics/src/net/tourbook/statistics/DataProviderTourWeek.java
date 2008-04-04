@@ -27,7 +27,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
-public class ProviderTourWeek extends DataProvider {
+public class DataProviderTourWeek extends DataProvider {
 
 	/**
 	 * Contains the number of weeks in one year, to simplify the calculation one year has always 53
@@ -35,15 +35,15 @@ public class ProviderTourWeek extends DataProvider {
 	 */
 	static final int				YEAR_WEEKS	= 53;
 
-	private static ProviderTourWeek	fInstance;
+	private static DataProviderTourWeek	fInstance;
 
 	private TourDataWeek			fTourWeekData;
 
-	private ProviderTourWeek() {}
+	private DataProviderTourWeek() {}
 
-	public static ProviderTourWeek getInstance() {
+	public static DataProviderTourWeek getInstance() {
 		if (fInstance == null) {
-			fInstance = new ProviderTourWeek();
+			fInstance = new DataProviderTourWeek();
 		}
 		return fInstance;
 	}

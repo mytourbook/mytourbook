@@ -556,7 +556,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		fActiveTourTypeFilter = typeId;
 		fCurrentYear = year;
 
-		fTourDataTour = ProviderTourDay.getInstance().getDayData(person,
+		fTourDataTour = DataProviderTourDay.getInstance().getDayData(person,
 				typeId,
 				year,
 				numberOfYears,

@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.statistics;
 
 import java.util.Calendar;
@@ -67,7 +66,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	protected int						fCurrentMonth;
 
 	@Override
-	public void activateActions(IWorkbenchPartSite partSite) {
+	public void activateActions(final IWorkbenchPartSite partSite) {
 
 //		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
 //		fContextBarChart = contextService.activateContext(Chart.CONTEXT_ID_BAR_CHART);
@@ -75,16 +74,46 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 //		fChart.updateChartActionHandlers();
 	}
 
-	@Override
-	public void deactivateActions(IWorkbenchPartSite partSite) {
+	/**
+	 * create segments for the chart
+	 */
+	ChartSegments createChartSegments(final TourTimeData tourDataTime) {
 
-//		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
-//		contextService.deactivateContext(fContextBarChart);
+		final int segmentStart[] = new int[fNumberOfYears];
+		final int segmentEnd[] = new int[fNumberOfYears];
+		final String[] segmentTitle = new String[fNumberOfYears];
+
+		final int[] allYearDays = tourDataTime.yearDays;
+		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
+		int yearDaysSum = 0;
+
+		// create segments for each year
+		for (int yearIndex = 0; yearIndex < allYearDays.length; yearIndex++) {
+
+			final int yearDays = allYearDays[yearIndex];
+
+			segmentStart[yearIndex] = yearDaysSum;
+			segmentEnd[yearIndex] = yearDaysSum + yearDays - 1;
+			segmentTitle[yearIndex] = Integer.toString(oldestYear + yearIndex);
+
+			yearDaysSum += yearDays;
+		}
+
+		final ChartSegments chartSegments = new ChartSegments();
+		chartSegments.valueStart = segmentStart;
+		chartSegments.valueEnd = segmentEnd;
+		chartSegments.segmentTitle = segmentTitle;
+
+		chartSegments.years = tourDataTime.years;
+		chartSegments.yearDays = tourDataTime.yearDays;
+		chartSegments.allValues = tourDataTime.allDaysInAllYears;
+
+		return chartSegments;
 	}
 
 	@Override
 	public void createControl(	final Composite parent,
-								IViewSite viewSite,
+								final IViewSite viewSite,
 								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
@@ -112,8 +141,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 						valueIndex = tourIds.length - 1;
 					}
 
-					long selectedTourId = tourIds[valueIndex];
-					ProviderTourTime.getInstance().setSelectedTourId(selectedTourId);
+					final long selectedTourId = tourIds[valueIndex];
+					DataProviderTourTime.getInstance().setSelectedTourId(selectedTourId);
 					fPostSelectionProvider.setSelection(new SelectionTourId(selectedTourId));
 				}
 			}
@@ -126,8 +155,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 				final long[] tourIds = fTourTimeData.fTourIds;
 				if (tourIds.length > 0) {
-					long selectedTourId = tourIds[valueIndex];
-					ProviderTourTime.getInstance().setSelectedTourId(selectedTourId);
+					final long selectedTourId = tourIds[valueIndex];
+					DataProviderTourTime.getInstance().setSelectedTourId(selectedTourId);
 					TourManager.getInstance().openTourInEditor(selectedTourId);
 				}
 			}
@@ -137,16 +166,16 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		 * open tour with Enter key
 		 */
 		fChart.addTraverseListener(new TraverseListener() {
-			public void keyTraversed(TraverseEvent event) {
+			public void keyTraversed(final TraverseEvent event) {
 
 				if (event.detail == SWT.TRAVERSE_RETURN) {
-					ISelection selection = fChart.getSelection();
+					final ISelection selection = fChart.getSelection();
 					if (selection instanceof SelectionBarChart) {
-						SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+						final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
 
 						if (barChartSelection.serieIndex != -1) {
 
-							long selectedTourId = fTourTimeData.fTourIds[barChartSelection.valueIndex];
+							final long selectedTourId = fTourTimeData.fTourIds[barChartSelection.valueIndex];
 							TourManager.getInstance().openTourInEditor(selectedTourId);
 						}
 					}
@@ -154,6 +183,13 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			}
 		});
 
+	}
+
+	@Override
+	public void deactivateActions(final IWorkbenchPartSite partSite) {
+
+//		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
+//		contextService.deactivateContext(fContextBarChart);
 	}
 
 	public Integer getSelectedMonth() {
@@ -171,7 +207,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	public void refreshStatistic(	final TourPerson person,
 									final TourTypeFilter tourTypeFilter,
 									final int year,
-									int numberOfYears,
+									final int numberOfYears,
 									final boolean refreshData) {
 
 		fActivePerson = person;
@@ -183,9 +219,9 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		 * get currently selected tour id
 		 */
 		long selectedTourId = -1;
-		ISelection selection = fChart.getSelection();
+		final ISelection selection = fChart.getSelection();
 		if (selection instanceof SelectionBarChart) {
-			SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+			final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
 
 			if (barChartSelection.serieIndex != -1) {
 
@@ -203,7 +239,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		}
 
 //		System.out.println("selectedTourId: " + selectedTourId);
-		fTourTimeData = ProviderTourTime.getInstance().getTourTimeData(person,
+		fTourTimeData = DataProviderTourTime.getInstance().getTourTimeData(person,
 				tourTypeFilter,
 				year,
 				numberOfYears,
@@ -285,17 +321,23 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 			public String getInfo(final int serieIndex, int valueIndex) {
 
-				final int[] tourDateValues = fTourTimeData.fTourDOYValues;
+				final int[] tourDOYValues = fTourTimeData.fTourDOYValues;
 
-				if (valueIndex >= tourDateValues.length) {
-					valueIndex -= tourDateValues.length;
+				if (valueIndex >= tourDOYValues.length) {
+					valueIndex -= tourDOYValues.length;
 				}
 
-				if (tourDateValues == null || valueIndex >= tourDateValues.length) {
+				if (tourDOYValues == null || valueIndex >= tourDOYValues.length) {
 					return ""; //$NON-NLS-1$
 				}
-				fCalendar.set(fCurrentYear, 0, 1);
-				fCalendar.set(Calendar.DAY_OF_YEAR, tourDateValues[valueIndex] + 1);
+
+				/*
+				 * set calendar day/month/year
+				 */
+				final int oldestYear = fCurrentYear - fNumberOfYears + 1;
+				final int tourDOY = tourDOYValues[valueIndex];
+				fCalendar.set(oldestYear, 0, 1);
+				fCalendar.set(Calendar.DAY_OF_YEAR, tourDOY + 1);
 
 				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
 				fSelectedTourId = fTourTimeData.fTourIds[valueIndex];
@@ -304,16 +346,26 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 				final int[] startValue = fTourTimeData.fTourTimeStartValues;
 				final int[] endValue = fTourTimeData.fTourTimeEndValues;
-				final int[] durationValue = fTourTimeData.fTourTimeDurationValues;
+				final int[] durationValue = fTourTimeData.fTourDurationValues;
+
+				String tourTitle = fTourTimeData.fTourTitle.get(valueIndex);
 
 				StringBuilder infoText = new StringBuilder();
-				infoText.append(Messages.TOURTIMEINFO_DATE_FORMAT);
-				infoText.append(Messages.TOURTIMEINFO_DISTANCE);
-				infoText.append(Messages.TOURTIMEINFO_ALTITUDE);
-				infoText.append(Messages.TOURTIMEINFO_DURATION);
-				infoText.append(Messages.TOURTIMEINFO_TOUR_TYPE);
+
+				if (tourTitle == null) {
+					tourTitle = UI.EMPTY_STRING;
+					infoText.append(UI.EMPTY_STRING_FORMAT);
+				} else {
+					infoText.append(Messages.tourtime_info_title);
+				}
+				infoText.append(Messages.tourtime_info_date_format);
+				infoText.append(Messages.tourtime_info_distance);
+				infoText.append(Messages.tourtime_info_altitude);
+				infoText.append(Messages.tourtime_info_tour_time);
+				infoText.append(Messages.tourtime_info_tour_type);
 
 				final String barInfo = new Formatter().format(infoText.toString(),
+						tourTitle,
 						fCalendar.get(Calendar.DAY_OF_MONTH),
 						fCalendar.get(Calendar.MONTH) + 1,
 						fCalendar.get(Calendar.YEAR),
@@ -321,9 +373,9 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 						(startValue[valueIndex] % 3600) / 60,
 						endValue[valueIndex] / 3600,
 						(endValue[valueIndex] % 3600) / 60,
-						fTourTimeData.fTourTimeDistanceValues[valueIndex],
+						fTourTimeData.fTourDistanceValues[valueIndex],
 						UI.UNIT_LABEL_DISTANCE,
-						fTourTimeData.fTourTimeAltitudeValues[valueIndex],
+						fTourTimeData.fTourAltitudeValues[valueIndex],
 						UI.UNIT_LABEL_ALTITUDE,
 						durationValue[valueIndex] / 3600,
 						(durationValue[valueIndex] % 3600) / 60,
@@ -344,7 +396,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
-	private void updateChart(long selectedTourId) {
+	private void updateChart(final long selectedTourId) {
 
 		final ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
@@ -388,43 +440,6 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		// try to select the previous selected tour
 		selectTour(selectedTourId);
-	}
-
-	/**
-	 * create segments for the chart
-	 */
-	ChartSegments createChartSegments(TourTimeData tourDataTime) {
-
-		int segmentStart[] = new int[fNumberOfYears];
-		int segmentEnd[] = new int[fNumberOfYears];
-		String[] segmentTitle = new String[fNumberOfYears];
-
-		int[] allYearDays = tourDataTime.yearDays;
-		int oldestYear = fCurrentYear - fNumberOfYears + 1;
-		int yearDaysSum = 0;
-
-		// create segments for each year
-		for (int yearIndex = 0; yearIndex < allYearDays.length; yearIndex++) {
-
-			int yearDays = allYearDays[yearIndex];
-
-			segmentStart[yearIndex] = yearDaysSum;
-			segmentEnd[yearIndex] = yearDaysSum + yearDays - 1;
-			segmentTitle[yearIndex] = Integer.toString(oldestYear + yearIndex);
-
-			yearDaysSum += yearDays;
-		}
-
-		ChartSegments chartSegments = new ChartSegments();
-		chartSegments.valueStart = segmentStart;
-		chartSegments.valueEnd = segmentEnd;
-		chartSegments.segmentTitle = segmentTitle;
-
-		chartSegments.years = tourDataTime.years;
-		chartSegments.yearDays = tourDataTime.yearDays;
-		chartSegments.allValues = tourDataTime.allDaysInAllYears;
-
-		return chartSegments;
 	}
 
 	@Override
