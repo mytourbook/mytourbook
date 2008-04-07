@@ -33,11 +33,10 @@ public class DataProviderTourWeek extends DataProvider {
 	 * Contains the number of weeks in one year, to simplify the calculation one year has always 53
 	 * weeks
 	 */
-	static final int				YEAR_WEEKS	= 53;
-
+//	static final int					YEAR_WEEKS	= 53;
 	private static DataProviderTourWeek	fInstance;
 
-	private TourDataWeek			fTourWeekData;
+	private TourDataWeek				fTourWeekData;
 
 	private DataProviderTourWeek() {}
 
@@ -81,7 +80,7 @@ public class DataProviderTourWeek extends DataProvider {
 		}
 
 		final int serieLength = colorOffset + tourTypes.length;
-		final int valueLength = YEAR_WEEKS * numberOfYears;
+		final int valueLength = 53 * numberOfYears;
 
 		String sqlString = "SELECT " //$NON-NLS-1$
 				+ "StartYear			, " // 1 //$NON-NLS-1$
@@ -110,11 +109,11 @@ public class DataProviderTourWeek extends DataProvider {
 
 			while (result.next()) {
 
-				final int resultYear = result.getInt(1);
-				final int resultWeek = result.getInt(2);
+				final int dbYear = result.getInt(1);
+				final int dbWeek = result.getInt(2);
 
-				final int yearIndex = numberOfYears - (lastYear - resultYear + 1);
-				final int weekIndex = resultWeek - 1 + yearIndex * 53;
+				final int yearIndex = numberOfYears - (lastYear - dbYear + 1);
+				final int weekIndex = dbWeek - 1 + yearIndex * 53;
 
 				/*
 				 * convert type id to the type index in the tour types list which is also the color
@@ -146,13 +145,14 @@ public class DataProviderTourWeek extends DataProvider {
 
 			fTourWeekData.fTypeIds = dbTypeIds;
 
-			fTourWeekData.fDistanceLow = new int[serieLength][valueLength];
-			fTourWeekData.fAltitudeLow = new int[serieLength][valueLength];
 			fTourWeekData.fTimeLow = new int[serieLength][valueLength];
-
-			fTourWeekData.fDistanceHigh = dbDistance;
-			fTourWeekData.fAltitudeHigh = dbAltitude;
 			fTourWeekData.fTimeHigh = dbTime;
+
+			fTourWeekData.fDistanceLow = new int[serieLength][valueLength];
+			fTourWeekData.fDistanceHigh = dbDistance;
+
+			fTourWeekData.fAltitudeLow = new int[serieLength][valueLength];
+			fTourWeekData.fAltitudeHigh = dbAltitude;
 
 		} catch (SQLException e) {
 			e.printStackTrace();

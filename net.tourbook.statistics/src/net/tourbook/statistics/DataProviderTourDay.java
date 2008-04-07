@@ -34,7 +34,7 @@ public class DataProviderTourDay extends DataProvider {
 
 	private static DataProviderTourDay	fInstance;
 
-	private TourDataTour				fTourDataTour;
+	private TourDayData					fTourDataTour;
 
 	private DataProviderTourDay() {}
 
@@ -45,7 +45,7 @@ public class DataProviderTourDay extends DataProvider {
 		return fInstance;
 	}
 
-	TourDataTour getDayData(final TourPerson person,
+	TourDayData getDayData(	final TourPerson person,
 							final TourTypeFilter tourTypeFilter,
 							final int lastYear,
 							int numberOfYears,
@@ -77,7 +77,7 @@ public class DataProviderTourDay extends DataProvider {
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-		fTourDataTour = new TourDataTour();
+		fTourDataTour = new TourDayData();
 
 		final String sqlString = //
 		"SELECT " // //$NON-NLS-1$
@@ -115,7 +115,9 @@ public class DataProviderTourDay extends DataProvider {
 
 			final ArrayList<Integer> dbDistance = new ArrayList<Integer>();
 			final ArrayList<Integer> dbAltitude = new ArrayList<Integer>();
-			final ArrayList<Integer> dbDuration = new ArrayList<Integer>();
+			final ArrayList<Integer> dbTourDuration = new ArrayList<Integer>();
+			final ArrayList<Integer> dbTourRecordingTime = new ArrayList<Integer>();
+			final ArrayList<Integer> dbTourDrivingTime = new ArrayList<Integer>();
 			final ArrayList<String> dbTourTitle = new ArrayList<String>();
 
 			final ArrayList<Long> dbTypeIds = new ArrayList<Long>();
@@ -147,7 +149,9 @@ public class DataProviderTourDay extends DataProvider {
 
 				dbTourStartTime.add(startTime);
 				dbTourEndTime.add((startTime + recordingTime));
-				dbDuration.add(drivingTime == 0 ? recordingTime : drivingTime);
+				dbTourDuration.add(drivingTime == 0 ? recordingTime : drivingTime);
+				dbTourRecordingTime.add(recordingTime);
+				dbTourDrivingTime.add(drivingTime);
 
 				dbTourTitle.add(result.getString(11));
 
@@ -176,7 +180,7 @@ public class DataProviderTourDay extends DataProvider {
 			final int[] tourYear = ArrayListToArray.toInt(dbYear);
 			final int[] tourAllYearsDOY = ArrayListToArray.toInt(dbAllYearsDOY);
 
-			final int[] timeHigh = ArrayListToArray.toInt(dbDuration);
+			final int[] timeHigh = ArrayListToArray.toInt(dbTourDuration);
 			final int[] distanceHigh = ArrayListToArray.toInt(dbDistance);
 			final int[] altitudeHigh = ArrayListToArray.toInt(dbAltitude);
 
@@ -274,7 +278,9 @@ public class DataProviderTourDay extends DataProvider {
 
 			fTourDataTour.fTourDistanceValues = ArrayListToArray.toInt(dbDistance);
 			fTourDataTour.fTourAltitudeValues = ArrayListToArray.toInt(dbAltitude);
-			fTourDataTour.fTourDurationValues = ArrayListToArray.toInt(dbDuration);
+
+			fTourDataTour.fTourRecordingTimeValues = dbTourRecordingTime;
+			fTourDataTour.fTourDrivingTimeValues = dbTourDrivingTime;
 
 			fTourDataTour.fTourTitle = dbTourTitle;
 

@@ -40,17 +40,17 @@ public class Messages extends NLS {
 	public static String		NUMBERS_ALTITUDE_BETWEEN;
 	public static String		NUMBERS_ALTITUDE_DOWN;
 
-	public static String	NUMBERS_ALTITUDE_TOTAL;
+	public static String		NUMBERS_ALTITUDE_TOTAL;
 	public static String		NUMBERS_ALTITUDE_UP;
 	public static String		NUMBERS_DISTANCE_BETWEEN;
 	public static String		NUMBERS_DISTANCE_DOWN;
 
-	public static String	NUMBERS_DISTANCE_TOTAL;
+	public static String		NUMBERS_DISTANCE_TOTAL;
 	public static String		NUMBERS_DISTANCE_UP;
 	public static String		NUMBERS_TIME_BETWEEN;
 	public static String		NUMBERS_TIME_DOWN;
 
-	public static String	NUMBERS_TIME_TOTAL;
+	public static String		NUMBERS_TIME_TOTAL;
 	public static String		NUMBERS_TIME_UP;
 	public static String		NUMBERS_UNIT;
 
@@ -59,17 +59,14 @@ public class Messages extends NLS {
 	public static String		TOURDAYINFO_DURATION;
 	public static String		TOURDAYINFO_TOUR_DATE_FORMAT;
 
-	public static String	tourtime_info_altitude;
-
-	public static String	tourtime_info_date_format;
-
-	public static String	tourtime_info_distance;
-
-	public static String	tourtime_info_title;
-
-	public static String	tourtime_info_tour_time;
-
-	public static String	tourtime_info_tour_type;
+	public static String		tourtime_info_altitude;
+	public static String		tourtime_info_break_time;
+	public static String		tourtime_info_date_format;
+	public static String		tourtime_info_distance;
+	public static String		tourtime_info_driving_time;
+	public static String		tourtime_info_recording_time;
+	public static String		tourtime_info_title;
+	public static String		tourtime_info_tour_type;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

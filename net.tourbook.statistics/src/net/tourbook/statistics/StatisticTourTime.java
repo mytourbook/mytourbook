@@ -25,6 +25,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartSegments;
+import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
@@ -319,7 +320,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 		final IChartInfoProvider chartInfoProvider = new IChartInfoProvider() {
 
-			public String getInfo(final int serieIndex, int valueIndex) {
+			public ChartToolTipInfo getToolTipInfo(final int serieIndex, int valueIndex) {
 
 				final int[] tourDOYValues = fTourTimeData.fTourDOYValues;
 
@@ -328,7 +329,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				}
 
 				if (tourDOYValues == null || valueIndex >= tourDOYValues.length) {
-					return ""; //$NON-NLS-1$
+					return null;
 				}
 
 				/*
@@ -346,26 +347,22 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 				final int[] startValue = fTourTimeData.fTourTimeStartValues;
 				final int[] endValue = fTourTimeData.fTourTimeEndValues;
-				final int[] durationValue = fTourTimeData.fTourDurationValues;
 
-				String tourTitle = fTourTimeData.fTourTitle.get(valueIndex);
+				final Integer recordingTime = fTourTimeData.fTourRecordingTimeValues.get(valueIndex);
+				final Integer drivingTime = fTourTimeData.fTourDrivingTimeValues.get(valueIndex);
+				int breakTime = recordingTime - drivingTime;
 
-				StringBuilder infoText = new StringBuilder();
+				StringBuilder labelFormat = new StringBuilder();
+				labelFormat.append(Messages.tourtime_info_date_format);
+				labelFormat.append(Messages.tourtime_info_distance);
+				labelFormat.append(Messages.tourtime_info_altitude);
+				labelFormat.append(Messages.tourtime_info_recording_time);
+				labelFormat.append(Messages.tourtime_info_driving_time);
+				labelFormat.append(Messages.tourtime_info_break_time);
+				labelFormat.append(Messages.tourtime_info_tour_type);
 
-				if (tourTitle == null) {
-					tourTitle = UI.EMPTY_STRING;
-					infoText.append(UI.EMPTY_STRING_FORMAT);
-				} else {
-					infoText.append(Messages.tourtime_info_title);
-				}
-				infoText.append(Messages.tourtime_info_date_format);
-				infoText.append(Messages.tourtime_info_distance);
-				infoText.append(Messages.tourtime_info_altitude);
-				infoText.append(Messages.tourtime_info_tour_time);
-				infoText.append(Messages.tourtime_info_tour_type);
-
-				final String barInfo = new Formatter().format(infoText.toString(),
-						tourTitle,
+				final String toolTipLabel = new Formatter().format(labelFormat.toString(),
+				//
 						fCalendar.get(Calendar.DAY_OF_MONTH),
 						fCalendar.get(Calendar.MONTH) + 1,
 						fCalendar.get(Calendar.YEAR),
@@ -373,19 +370,43 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 						(startValue[valueIndex] % 3600) / 60,
 						endValue[valueIndex] / 3600,
 						(endValue[valueIndex] % 3600) / 60,
+						//
 						fTourTimeData.fTourDistanceValues[valueIndex],
 						UI.UNIT_LABEL_DISTANCE,
+						//
 						fTourTimeData.fTourAltitudeValues[valueIndex],
 						UI.UNIT_LABEL_ALTITUDE,
-						durationValue[valueIndex] / 3600,
-						(durationValue[valueIndex] % 3600) / 60,
-						tourTypeName).toString();
+						//
+						recordingTime / 3600,
+						(recordingTime % 3600) / 60,
+						//
+						drivingTime / 3600,
+						(drivingTime % 3600) / 60,
+						//
+						breakTime / 3600,
+						(breakTime % 3600) / 60,
+						//						//
+						tourTypeName//
+				)
+						.toString();
 
-				return barInfo;
+				/*
+				 * create tool tip info
+				 */
+				String tourTitle = fTourTimeData.fTourTitle.get(valueIndex);
+				if (tourTitle == null || tourTitle.trim().length() == 0) {
+					tourTitle = tourTypeName;
+				}
+
+				ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+				toolTipInfo.setTitle(tourTitle);
+				toolTipInfo.setLabel(toolTipLabel);
+
+				return toolTipInfo;
 			}
 		};
 
-		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, chartInfoProvider);
+		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, chartInfoProvider);
 
 		// set the menu context provider
 		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourContextProvider(fChart, this));

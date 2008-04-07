@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,14 +13,15 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.chart;
 
 /**
- * Is used when information should be provided, e.g. when the mouse will hover a
- * bar in the bar chart
+ * Is used when information should be provided, e.g. when the mouse will hover a bar in the bar
+ * chart
  */
 public interface IChartInfoProvider {
 
-	String getInfo(int serieIndex, int valueIndex);
+	ChartToolTipInfo getToolTipInfo(int serieIndex, int valueIndex);
 
 }

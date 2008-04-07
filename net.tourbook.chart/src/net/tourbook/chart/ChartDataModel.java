@@ -29,7 +29,7 @@ public class ChartDataModel {
 	public static final int				CHART_TYPE_BAR				= 20;
 	public static final int				CHART_TYPE_LINE_WITH_BARS	= 30;
 
-	public static final String			BAR_INFO_PROVIDER			= "BarInfoProvider";				//$NON-NLS-1$
+	public static final String			BAR_TOOLTIP_INFO_PROVIDER	= "BarToolTipInfoProvider";		//$NON-NLS-1$
 	public static final String			BAR_CONTEXT_PROVIDER		= "BarContextProvider";			//$NON-NLS-1$
 
 	private int							fChartType					= CHART_TYPE_LINE;

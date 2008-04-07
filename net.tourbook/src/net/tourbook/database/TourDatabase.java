@@ -245,6 +245,11 @@ public class TourDatabase {
 		return tourPeople;
 	}
 
+	/**
+	 * @param typeId
+	 * @return Returns the name for the {@link TourType} or an empty string when the tour type id
+	 *         was not found
+	 */
 	public static String getTourTypeName(long typeId) {
 
 		String tourTypeName = UI.EMPTY_STRING;

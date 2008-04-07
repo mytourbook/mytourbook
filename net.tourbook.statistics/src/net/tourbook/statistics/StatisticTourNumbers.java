@@ -24,6 +24,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartUtil;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
@@ -104,11 +105,14 @@ public class StatisticTourNumbers extends YearStatistic {
 
 	private boolean						fIsSynchScaleEnabled;
 
-	private TourDataTour				fTourDataTour;
+	private TourDayData					fTourDayData;
 
 	private IViewSite					fViewSite;
 
 	public StatisticTourNumbers() {}
+
+	@Override
+	public void activateActions(IWorkbenchPartSite partSite) {}
 
 	void addPrefListener(Composite container) {
 
@@ -154,67 +158,8 @@ public class StatisticTourNumbers extends YearStatistic {
 		});
 	}
 
-	@Override
-	public void activateActions(IWorkbenchPartSite partSite) {}
-
-	@Override
-	public void deactivateActions(IWorkbenchPartSite partSite) {}
-
 	public boolean canTourBeVisible() {
 		return false;
-	}
-
-	@Override
-	public void resetSelection() {}
-
-	private void createAltitudeStatisticProvider(ChartDataModel chartModel) {
-
-		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, new IChartInfoProvider() {
-			public String getInfo(int serieIndex, int valueIndex) {
-
-				String barInfo;
-				StringBuilder infoText = new StringBuilder();
-
-				if (valueIndex == 0) {
-
-					infoText.append(Messages.NUMBERS_ALTITUDE_DOWN);
-					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
-
-					barInfo = new Formatter().format(infoText.toString(),
-							fStatAltitudeUnits[valueIndex],
-							UI.UNIT_LABEL_ALTITUDE,
-							fStatAltitudeCounterHigh[serieIndex][valueIndex],
-							fStatAltitudeSumHigh[serieIndex][valueIndex],
-							UI.UNIT_LABEL_ALTITUDE).toString();
-
-				} else if (valueIndex == fStatAltitudeUnits.length - 1) {
-
-					infoText.append(Messages.NUMBERS_ALTITUDE_UP);
-					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
-
-					barInfo = new Formatter().format(infoText.toString(),
-							fStatAltitudeUnits[valueIndex - 1],
-							UI.UNIT_LABEL_ALTITUDE,
-							fStatAltitudeCounterHigh[serieIndex][valueIndex],
-							fStatAltitudeSumHigh[serieIndex][valueIndex],
-							UI.UNIT_LABEL_ALTITUDE).toString();
-				} else {
-
-					infoText.append(Messages.NUMBERS_ALTITUDE_BETWEEN);
-					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
-
-					barInfo = new Formatter().format(infoText.toString(),
-							fStatAltitudeUnits[valueIndex - 1],
-							fStatAltitudeUnits[valueIndex],
-							UI.UNIT_LABEL_ALTITUDE,
-							fStatAltitudeCounterHigh[serieIndex][valueIndex],
-							fStatAltitudeSumHigh[serieIndex][valueIndex],
-							UI.UNIT_LABEL_ALTITUDE).toString();
-				}
-
-				return barInfo;
-			}
-		});
 	}
 
 	@Override
@@ -253,112 +198,12 @@ public class StatisticTourNumbers extends YearStatistic {
 		getPreferences();
 	}
 
-	private void createDistanceStatisticProvider(ChartDataModel chartModel) {
-
-		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, new IChartInfoProvider() {
-
-			public String getInfo(int serieIndex, int valueIndex) {
-
-				String barInfo;
-				StringBuilder infoText = new StringBuilder();
-
-				if (valueIndex == 0) {
-
-					infoText.append(Messages.NUMBERS_DISTANCE_DOWN);
-					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
-
-					barInfo = new Formatter().format(infoText.toString(),
-							fStatDistanceUnits[valueIndex],
-							UI.UNIT_LABEL_DISTANCE,
-							fStatDistanceCounterHigh[serieIndex][valueIndex],
-							fStatDistanceSumHigh[serieIndex][valueIndex],
-							UI.UNIT_LABEL_DISTANCE).toString();
-
-				} else if (valueIndex == fStatDistanceUnits.length - 1) {
-
-					infoText.append(Messages.NUMBERS_DISTANCE_UP);
-					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
-
-					barInfo = new Formatter().format(infoText.toString(),
-							fStatDistanceUnits[valueIndex - 1],
-							UI.UNIT_LABEL_DISTANCE,
-							fStatDistanceCounterHigh[serieIndex][valueIndex],
-							fStatDistanceSumHigh[serieIndex][valueIndex],
-							UI.UNIT_LABEL_DISTANCE).toString();
-				} else {
-
-					infoText.append(Messages.NUMBERS_DISTANCE_BETWEEN);
-					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
-
-					barInfo = new Formatter().format(infoText.toString(),
-							fStatDistanceUnits[valueIndex - 1],
-							fStatDistanceUnits[valueIndex],
-							UI.UNIT_LABEL_DISTANCE,
-							fStatDistanceCounterHigh[serieIndex][valueIndex],
-							fStatDistanceSumHigh[serieIndex][valueIndex],
-							UI.UNIT_LABEL_DISTANCE).toString();
-				}
-
-				return barInfo;
-			}
-		});
-	}
-
-	private void createDurationStatisticProvider(ChartDataModel chartModel) {
-
-		chartModel.setCustomData(ChartDataModel.BAR_INFO_PROVIDER, new IChartInfoProvider() {
-			public String getInfo(int serieIndex, int valueIndex) {
-
-				String barInfo;
-				StringBuilder infoText = new StringBuilder();
-
-				if (valueIndex == 0) {
-
-					infoText.append(Messages.NUMBERS_TIME_DOWN);
-					infoText.append(Messages.NUMBERS_TIME_TOTAL);
-
-					barInfo = new Formatter().format(infoText.toString(),
-							ChartUtil.formatValue(fStatTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-							fStatTimeCounterHigh[serieIndex][valueIndex],
-							ChartUtil.formatValue(fStatTimeSumHigh[serieIndex][valueIndex],
-									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
-
-				} else if (valueIndex == fStatTimeUnits.length - 1) {
-
-					infoText.append(Messages.NUMBERS_TIME_UP);
-					infoText.append(Messages.NUMBERS_TIME_TOTAL);
-
-					barInfo = new Formatter().format(infoText.toString(),
-							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-							fStatTimeCounterHigh[serieIndex][valueIndex],
-							ChartUtil.formatValue(fStatTimeSumHigh[serieIndex][valueIndex],
-									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE))
-							.toString();
-				} else {
-
-					infoText.append(Messages.NUMBERS_TIME_BETWEEN);
-					infoText.append(Messages.NUMBERS_TIME_TOTAL);
-
-					barInfo = new Formatter().format(infoText.toString(),
-							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-							ChartUtil.formatValue(fStatTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-							fStatTimeCounterHigh[serieIndex][valueIndex],
-							ChartUtil.formatValue(fStatTimeSumHigh[serieIndex][valueIndex],
-									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE))
-							.toString();
-				}
-
-				return barInfo;
-			}
-		});
-	}
-
 	/**
 	 * calculate data for all statistics
 	 * 
-	 * @param tourDataTour
+	 * @param tourDayData
 	 */
-	private void createStatisticData(TourDataTour tourDataTour) {
+	private void createStatisticData(TourDayData tourDayData) {
 
 		int colorOffset = 0;
 		if (fActiveTourTypeFilter.showUndefinedTourTypes()) {
@@ -397,35 +242,34 @@ public class StatisticTourNumbers extends YearStatistic {
 		fStatTimeSumColorIndex = new int[colorLength][timeLength];
 
 		// loop: all tours
-		for (int tourIndex = 0; tourIndex < tourDataTour.fDistanceHigh.length; tourIndex++) {
+		for (int tourIndex = 0; tourIndex < tourDayData.fDistanceHigh.length; tourIndex++) {
 
-			int tourColorIndex = tourDataTour.fTypeColorIndex[tourIndex];
+			int typeColorIndex = tourDayData.fTypeColorIndex[tourIndex];
 			int unitIndex;
-//			tourColorIndex -= StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 
-			unitIndex = createTourStatData(tourDataTour.fDistanceHigh[tourIndex] - tourDataTour.fDistanceLow[tourIndex],
+			unitIndex = createTourStatData(tourDayData.fDistanceHigh[tourIndex] - tourDayData.fDistanceLow[tourIndex],
 					fStatDistanceUnits,
-					fStatDistanceCounterHigh[tourColorIndex],
-					fStatDistanceSumHigh[tourColorIndex]);
+					fStatDistanceCounterHigh[typeColorIndex],
+					fStatDistanceSumHigh[typeColorIndex]);
 
-			fStatDistanceCounterColorIndex[tourColorIndex][unitIndex] = tourColorIndex;
-			fStatDistanceSumColorIndex[tourColorIndex][unitIndex] = tourColorIndex;
+			fStatDistanceCounterColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
+			fStatDistanceSumColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
 
-			unitIndex = createTourStatData(tourDataTour.fAltitudeHigh[tourIndex] - tourDataTour.fAltitudeLow[tourIndex],
+			unitIndex = createTourStatData(tourDayData.fAltitudeHigh[tourIndex] - tourDayData.fAltitudeLow[tourIndex],
 					fStatAltitudeUnits,
-					fStatAltitudeCounterHigh[tourColorIndex],
-					fStatAltitudeSumHigh[tourColorIndex]);
+					fStatAltitudeCounterHigh[typeColorIndex],
+					fStatAltitudeSumHigh[typeColorIndex]);
 
-			fStatAltitudeCounterColorIndex[tourColorIndex][unitIndex] = tourColorIndex;
-			fStatAltitudeSumColorIndex[tourColorIndex][unitIndex] = tourColorIndex;
+			fStatAltitudeCounterColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
+			fStatAltitudeSumColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
 
-			unitIndex = createTourStatData(tourDataTour.fTimeHigh[tourIndex] - tourDataTour.fTimeLow[tourIndex],
+			unitIndex = createTourStatData(tourDayData.fTimeHigh[tourIndex] - tourDayData.fTimeLow[tourIndex],
 					fStatTimeUnits,
-					fStatTimeCounterHigh[tourColorIndex],
-					fStatTimeSumHigh[tourColorIndex]);
+					fStatTimeCounterHigh[typeColorIndex],
+					fStatTimeSumHigh[typeColorIndex]);
 
-			fStatTimeCounterColorIndex[tourColorIndex][unitIndex] = tourColorIndex;
-			fStatTimeSumColorIndex[tourColorIndex][unitIndex] = tourColorIndex;
+			fStatTimeCounterColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
+			fStatTimeSumColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
 		}
 
 		updateLowHighValues(fStatDistanceCounterLow, fStatDistanceCounterHigh);
@@ -434,6 +278,174 @@ public class StatisticTourNumbers extends YearStatistic {
 		updateLowHighValues(fStatAltitudeSumLow, fStatAltitudeSumHigh);
 		updateLowHighValues(fStatTimeCounterLow, fStatTimeCounterHigh);
 		updateLowHighValues(fStatTimeSumLow, fStatTimeSumHigh);
+	}
+
+	/**
+	 * create tool tip info
+	 */
+	private ChartToolTipInfo createToolTipProvider(int serieIndex, String toolTipLabel) {
+
+		String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
+
+		ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+		toolTipInfo.setTitle(tourTypeName);
+		toolTipInfo.setLabel(toolTipLabel);
+
+		return toolTipInfo;
+	}
+
+	private void createToolTipProviderAltitude(ChartDataModel chartModel) {
+
+		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+			public ChartToolTipInfo getToolTipInfo(int serieIndex, int valueIndex) {
+
+				String toolTipLabel;
+				StringBuilder infoText = new StringBuilder();
+
+				if (valueIndex == 0) {
+
+					infoText.append(Messages.NUMBERS_ALTITUDE_DOWN);
+					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
+
+					toolTipLabel = new Formatter().format(infoText.toString(),
+							fStatAltitudeUnits[valueIndex],
+							UI.UNIT_LABEL_ALTITUDE,
+							fStatAltitudeCounterHigh[serieIndex][valueIndex],
+							//
+							fStatAltitudeSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_ALTITUDE).toString();
+
+				} else if (valueIndex == fStatAltitudeUnits.length - 1) {
+
+					infoText.append(Messages.NUMBERS_ALTITUDE_UP);
+					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
+
+					toolTipLabel = new Formatter().format(infoText.toString(),
+							fStatAltitudeUnits[valueIndex - 1],
+							UI.UNIT_LABEL_ALTITUDE,
+							fStatAltitudeCounterHigh[serieIndex][valueIndex],
+							//
+							fStatAltitudeSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_ALTITUDE).toString();
+				} else {
+
+					infoText.append(Messages.NUMBERS_ALTITUDE_BETWEEN);
+					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
+
+					toolTipLabel = new Formatter().format(infoText.toString(),
+							fStatAltitudeUnits[valueIndex - 1],
+							fStatAltitudeUnits[valueIndex],
+							UI.UNIT_LABEL_ALTITUDE,
+							fStatAltitudeCounterHigh[serieIndex][valueIndex],
+							//
+							fStatAltitudeSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_ALTITUDE).toString();
+				}
+
+				return createToolTipProvider(serieIndex, toolTipLabel);
+			}
+		});
+	}
+
+	private void createToolTipProviderDistance(ChartDataModel chartModel) {
+
+		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+
+			public ChartToolTipInfo getToolTipInfo(int serieIndex, int valueIndex) {
+
+				String toolTipLabel;
+				StringBuilder infoText = new StringBuilder();
+
+				if (valueIndex == 0) {
+
+					infoText.append(Messages.NUMBERS_DISTANCE_DOWN);
+					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
+
+					toolTipLabel = new Formatter().format(infoText.toString(),
+							fStatDistanceUnits[valueIndex],
+							UI.UNIT_LABEL_DISTANCE,
+							fStatDistanceCounterHigh[serieIndex][valueIndex],
+							fStatDistanceSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_DISTANCE).toString();
+
+				} else if (valueIndex == fStatDistanceUnits.length - 1) {
+
+					infoText.append(Messages.NUMBERS_DISTANCE_UP);
+					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
+
+					toolTipLabel = new Formatter().format(infoText.toString(),
+							fStatDistanceUnits[valueIndex - 1],
+							UI.UNIT_LABEL_DISTANCE,
+							fStatDistanceCounterHigh[serieIndex][valueIndex],
+							fStatDistanceSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_DISTANCE).toString();
+				} else {
+
+					infoText.append(Messages.NUMBERS_DISTANCE_BETWEEN);
+					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
+
+					toolTipLabel = new Formatter().format(infoText.toString(),
+							fStatDistanceUnits[valueIndex - 1],
+							fStatDistanceUnits[valueIndex],
+							UI.UNIT_LABEL_DISTANCE,
+							fStatDistanceCounterHigh[serieIndex][valueIndex],
+							fStatDistanceSumHigh[serieIndex][valueIndex],
+							UI.UNIT_LABEL_DISTANCE).toString();
+				}
+
+				return createToolTipProvider(serieIndex, toolTipLabel);
+
+			}
+		});
+	}
+
+	private void createToolTipProviderDuration(ChartDataModel chartModel) {
+
+		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+			public ChartToolTipInfo getToolTipInfo(int serieIndex, int valueIndex) {
+
+				String toolTipLabel;
+				StringBuilder toolTipFormat = new StringBuilder();
+
+				if (valueIndex == 0) {
+
+					toolTipFormat.append(Messages.NUMBERS_TIME_DOWN);
+					toolTipFormat.append(Messages.NUMBERS_TIME_TOTAL);
+
+					toolTipLabel = new Formatter().format(toolTipFormat.toString(),
+							ChartUtil.formatValue(fStatTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+							fStatTimeCounterHigh[serieIndex][valueIndex],
+							ChartUtil.formatValue(fStatTimeSumHigh[serieIndex][valueIndex],
+									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
+
+				} else if (valueIndex == fStatTimeUnits.length - 1) {
+
+					toolTipFormat.append(Messages.NUMBERS_TIME_UP);
+					toolTipFormat.append(Messages.NUMBERS_TIME_TOTAL);
+
+					toolTipLabel = new Formatter().format(toolTipFormat.toString(),
+							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+							fStatTimeCounterHigh[serieIndex][valueIndex],
+							ChartUtil.formatValue(fStatTimeSumHigh[serieIndex][valueIndex],
+									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE))
+							.toString();
+				} else {
+
+					toolTipFormat.append(Messages.NUMBERS_TIME_BETWEEN);
+					toolTipFormat.append(Messages.NUMBERS_TIME_TOTAL);
+
+					toolTipLabel = new Formatter().format(toolTipFormat.toString(),
+							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+							ChartUtil.formatValue(fStatTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+							fStatTimeCounterHigh[serieIndex][valueIndex],
+							ChartUtil.formatValue(fStatTimeSumHigh[serieIndex][valueIndex],
+									ChartDataSerie.AXIS_UNIT_HOUR_MINUTE))
+							.toString();
+				}
+
+				return createToolTipProvider(serieIndex, toolTipLabel);
+			}
+		});
 	}
 
 	/**
@@ -483,6 +495,9 @@ public class StatisticTourNumbers extends YearStatistic {
 
 		return units.length - 1;
 	}
+
+	@Override
+	public void deactivateActions(IWorkbenchPartSite partSite) {}
 
 	private void getPreferences() {
 
@@ -556,7 +571,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		fActiveTourTypeFilter = typeId;
 		fCurrentYear = year;
 
-		fTourDataTour = DataProviderTourDay.getInstance().getDayData(person,
+		fTourDayData = DataProviderTourDay.getInstance().getDayData(person,
 				typeId,
 				year,
 				numberOfYears,
@@ -572,7 +587,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		tbm.removeAll();
 		tbm.update(true);
 
-		createStatisticData(fTourDataTour);
+		createStatisticData(fTourDayData);
 		updateCharts();
 
 	}
@@ -587,6 +602,9 @@ public class StatisticTourNumbers extends YearStatistic {
 			fMinMaxKeeperStatDurationSum.resetMinMax();
 		}
 	}
+
+	@Override
+	public void resetSelection() {}
 
 	@Override
 	public void setSynchScale(boolean isSynchScaleEnabled) {
@@ -625,7 +643,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, fActiveTourTypeFilter);
 		yData.setColorIndex(colorIndex);
 
-		createAltitudeStatisticProvider(chartDataModel);
+		createToolTipProviderAltitude(chartDataModel);
 
 		if (fIsSynchScaleEnabled) {
 			statAltitudeMinMaxKeeper.setMinMaxValues(chartDataModel);
@@ -675,7 +693,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
 		yData.setColorIndex(colorIndex);
 
-		createDistanceStatisticProvider(chartDataModel);
+		createToolTipProviderDistance(chartDataModel);
 
 		if (fIsSynchScaleEnabled) {
 			statDistanceMinMaxKeeper.setMinMaxValues(chartDataModel);
@@ -771,7 +789,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, fActiveTourTypeFilter);
 		yData.setColorIndex(colorIndex);
 
-		createDurationStatisticProvider(chartDataModel);
+		createToolTipProviderDuration(chartDataModel);
 
 		if (fIsSynchScaleEnabled) {
 			statDurationMinMaxKeeper.setMinMaxValues(chartDataModel);

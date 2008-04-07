@@ -17,69 +17,20 @@
 package net.tourbook.statistics;
 
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataSerie;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColorProvider;
-import net.tourbook.ui.UI;
 
 public class StatisticWeekCombined extends StatisticWeek {
 
 	@Override
-	void updateChart(TourDataWeek tourWeekData) {
+	void updateChart() {
 
 		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
-		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(createWeekData(tourWeekData));
-		xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_WEEK);
-		xData.setChartSegments(createChartSegments(tourWeekData));
-		chartDataModel.setXData(xData);
+		createXDataWeek(chartDataModel);
+		createYDataDistance(chartDataModel);
+		createYDataAltitude(chartDataModel);
+		createYDataDuration(chartDataModel);
 
-		// distance
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				tourWeekData.fDistanceLow,
-				tourWeekData.fDistanceHigh);
-		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setAllValueColors(0);
-		yData.setVisibleMinValue(0);
-		chartDataModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds, fActiveTourTypeFilter);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
-
-		// altitude
-		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				tourWeekData.fAltitudeLow,
-				tourWeekData.fAltitudeHigh);
-		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setAllValueColors(0);
-		yData.setVisibleMinValue(0);
-		chartDataModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, fActiveTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds, fActiveTourTypeFilter);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
-
-		// duration
-		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				tourWeekData.fTimeLow,
-				tourWeekData.fTimeHigh);
-		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-		yData.setAllValueColors(0);
-		yData.setVisibleMinValue(0);
-		chartDataModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, fActiveTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds, fActiveTourTypeFilter);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
+		setChartProviders(fChart, chartDataModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartDataModel);
@@ -88,4 +39,5 @@ public class StatisticWeekCombined extends StatisticWeek {
 		// show the fDataModel in the chart
 		fChart.updateChart(chartDataModel);
 	}
+
 }

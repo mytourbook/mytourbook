@@ -17,39 +17,18 @@
 package net.tourbook.statistics;
 
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataSerie;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColorProvider;
-import net.tourbook.ui.UI;
 
 public class StatisticWeekAltitude extends StatisticWeek {
 
 	@Override
-	void updateChart(TourDataWeek tourWeekData) {
+	void updateChart() {
 
 		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
-		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(createWeekData(tourWeekData));
-		xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_WEEK);
-		xData.setChartSegments(createChartSegments(tourWeekData));
-		chartDataModel.setXData(xData);
+		createXDataWeek(chartDataModel);
+		createYDataAltitude(chartDataModel);
 
-		// altitude
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				tourWeekData.fAltitudeLow,
-				tourWeekData.fAltitudeHigh);
-		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setAllValueColors(0);
-		yData.setVisibleMinValue(0);
-		chartDataModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, fActiveTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, tourWeekData.fTypeIds, fActiveTourTypeFilter);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
+		setChartProviders(fChart, chartDataModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartDataModel);

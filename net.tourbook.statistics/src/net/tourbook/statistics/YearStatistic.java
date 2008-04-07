@@ -15,18 +15,25 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
+import java.util.ArrayList;
+
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.IYearStatistic;
+import net.tourbook.statistic.TourbookStatistic;
+import net.tourbook.ui.TourTypeFilter;
+
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 
-import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.statistic.IYearStatistic;
-import net.tourbook.statistic.TourbookStatistic;
-
 public abstract class YearStatistic extends TourbookStatistic implements IYearStatistic {
+
+	private static final String		EMPTY_STRING	= "";
 
 	private IPropertyChangeListener	fPrefChangeListener;
 
@@ -61,17 +68,34 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 		};
 
 		// add pref listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(
-				fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 
 		// remove pre listener
 		container.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
-				TourbookPlugin
-						.getDefault()
-						.getPluginPreferences()
-						.removePropertyChangeListener(fPrefChangeListener);
+				TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 			}
 		});
+	}
+
+	/**
+	 * @param serieIndex
+	 * @param activeTourTypeFilter
+	 * @return Returns the tour type name for a data serie
+	 */
+	protected String getTourTypeName(int serieIndex, TourTypeFilter activeTourTypeFilter) {
+
+		int colorOffset = 0;
+		if (activeTourTypeFilter.showUndefinedTourTypes()) {
+			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+		}
+
+		if (serieIndex - colorOffset < 0) {
+			return EMPTY_STRING;
+		}
+		ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
+		String tourTypeName = TourDatabase.getTourTypeName(tourTypeList.get(serieIndex - colorOffset).getTypeId());
+
+		return tourTypeName;
 	}
 }

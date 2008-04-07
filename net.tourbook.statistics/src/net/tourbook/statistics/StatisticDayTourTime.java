@@ -27,7 +27,7 @@ import net.tourbook.colors.GraphColorProvider;
 public class StatisticDayTourTime extends StatisticDay {
 
 	@Override
-	void updateChart(TourDataTour tourTimeData, long lastSelectedTourId) {
+	void updateChart(TourDayData tourTimeData, long lastSelectedTourId) {
 
 		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 

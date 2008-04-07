@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -259,8 +261,14 @@ public class ChartComponentGraph extends Canvas {
 
 	private boolean						fIsAutoScrollActive;
 
-	private Shell						toolTipShell;
-	private Label						toolTipLabel;
+	/*
+	 * tool tip resources
+	 */
+	private Shell						fToolTipShell;
+	private Composite					fToolTipContainer;
+	private Label						fToolTipTitle;
+	private Label						fToolTipLabel;
+
 	private Listener					toolTipListener;
 	private final int[]					toolTipEvents			= new int[] {
 			SWT.MouseExit,
@@ -274,8 +282,9 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private int							fHoveredBarSerieIndex	= -1;
 	private int							fHoveredBarValueIndex;
-//	private ChartDrawingData			fHoveredBarDrawingData;
 	private boolean						fIsHoveredBarDirty;
+	private int							fToolTipHoverSerieIndex;
+	private int							fToolTipHoverValueIndex;
 
 	private ChartYSlider				ySliderDragged;
 
@@ -318,6 +327,7 @@ public class ChartComponentGraph extends Canvas {
 	int									fGraphAlpha				= 0xe0;
 
 	protected boolean					fIsLayerImageDirty;
+	private ChartToolTipInfo			fToolTipInfo;
 
 	/**
 	 * Constructor
@@ -3181,18 +3191,40 @@ public class ChartComponentGraph extends Canvas {
 		return xSliderA.getDevVirtualSliderLinePos() < xSliderB.getDevVirtualSliderLinePos() ? xSliderB : xSliderA;
 	}
 
-	private String getToolTipText(final int x, final int y) {
+	private ChartToolTipInfo getToolTipInfo(final int x, final int y) {
 
 		if (fHoveredBarSerieIndex != -1) {
 
 			// get the method which computes the bar info
-			final IChartInfoProvider computeBarInfo = (IChartInfoProvider) fChart.getChartDataModel()
-					.getCustomData(ChartDataModel.BAR_INFO_PROVIDER);
+			final IChartInfoProvider toolTipInfoProvider = (IChartInfoProvider) fChart.getChartDataModel()
+					.getCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER);
 
-			if (computeBarInfo != null) {
-				return computeBarInfo.getInfo(fHoveredBarSerieIndex, fHoveredBarValueIndex);
+			if (toolTipInfoProvider != null) {
+
+				if (fToolTipHoverSerieIndex == fHoveredBarSerieIndex
+						&& fToolTipHoverValueIndex == fHoveredBarValueIndex) {
+
+					// tool tip is already displayed for the hovered bar
+
+					if (fToolTipInfo != null) {
+						fToolTipInfo.setIsDisplayed(true);
+					}
+
+				} else {
+
+					fToolTipHoverSerieIndex = fHoveredBarSerieIndex;
+					fToolTipHoverValueIndex = fHoveredBarValueIndex;
+
+					fToolTipInfo = toolTipInfoProvider.getToolTipInfo(fHoveredBarSerieIndex, fHoveredBarValueIndex);
+				}
+
+				return fToolTipInfo;
 			}
 		}
+
+		// reset tool tip hover index
+		fToolTipHoverSerieIndex = -1;
+		fToolTipHoverValueIndex = -1;
 
 		return null;
 	}
@@ -3247,11 +3279,20 @@ public class ChartComponentGraph extends Canvas {
 
 	void hideToolTip() {
 
-		if (toolTipShell == null || toolTipShell.isDisposed()) {
+		if (fToolTipShell == null || fToolTipShell.isDisposed()) {
 			return;
 		}
 
-		toolTipShell.setVisible(false);
+		if (fToolTipShell.isVisible()) {
+
+			/*
+			 * when hiding the tooltip reposition the tooltip the next time when the tool tip is
+			 * displayed
+			 */
+			fToolTipInfo.setReposition(true);
+
+			fToolTipShell.setVisible(false);
+		}
 	}
 
 	/**
@@ -3287,7 +3328,6 @@ public class ChartComponentGraph extends Canvas {
 					if (barInfoFocus != null && barInfoFocus.contains(graphX, devY)) {
 
 						// keep the hovered bar index
-//						fHoveredBarDrawingData = drawingData;
 						fHoveredBarSerieIndex = serieIndex;
 						fHoveredBarValueIndex = valueIndex;
 
@@ -3533,14 +3573,14 @@ public class ChartComponentGraph extends Canvas {
 		gridColor = ChartUtil.disposeResource(gridColor);
 
 		// dispose tooltip
-		if (toolTipShell != null) {
+		if (fToolTipShell != null) {
 			hideToolTip();
 			for (int i = 0; i < toolTipEvents.length; i++) {
 				removeListener(toolTipEvents[i], toolTipListener);
 			}
-			toolTipShell.dispose();
-			toolTipShell = null;
-			toolTipLabel = null;
+			fToolTipShell.dispose();
+			fToolTipShell = null;
+			fToolTipContainer = null;
 		}
 
 		fColorCache.dispose();
@@ -4441,13 +4481,28 @@ public class ChartComponentGraph extends Canvas {
 
 	private void showToolTip(final int x, final int y) {
 
-		if (toolTipShell == null) {
-			toolTipShell = new Shell(getShell(), SWT.ON_TOP | SWT.TOOL);
-			toolTipLabel = new Label(toolTipShell, SWT.LEAD);
-			final Display display = toolTipShell.getDisplay();
+		if (fToolTipShell == null) {
 
-			toolTipLabel.setForeground(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-			toolTipLabel.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+			fToolTipShell = new Shell(getShell(), SWT.ON_TOP | SWT.TOOL);
+
+			final Display display = fToolTipShell.getDisplay();
+			final Color infoColorBackground = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+			final Color infoColorForeground = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+
+			fToolTipContainer = new Composite(fToolTipShell, SWT.NONE);
+			GridLayoutFactory.fillDefaults().extendedMargins(2, 5, 2, 3).applyTo(fToolTipContainer);
+
+			fToolTipContainer.setBackground(infoColorBackground);
+			fToolTipContainer.setForeground(infoColorForeground);
+
+			fToolTipTitle = new Label(fToolTipContainer, SWT.LEAD);
+			fToolTipTitle.setBackground(infoColorBackground);
+			fToolTipTitle.setForeground(infoColorForeground);
+			fToolTipTitle.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+
+			fToolTipLabel = new Label(fToolTipContainer, SWT.LEAD | SWT.WRAP);
+			fToolTipLabel.setBackground(infoColorBackground);
+			fToolTipLabel.setForeground(infoColorForeground);
 
 			for (int i = 0; i < toolTipEvents.length; i++) {
 				addListener(toolTipEvents[i], toolTipListener);
@@ -4455,7 +4510,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		if (updateToolTip(x, y)) {
-			toolTipShell.setVisible(true);
+			fToolTipShell.setVisible(true);
 		} else {
 			hideToolTip();
 		}
@@ -4704,41 +4759,71 @@ public class ChartComponentGraph extends Canvas {
 
 	private boolean updateToolTip(final int x, final int y) {
 
-		final String tooltip = getToolTipText(x, y);
+		final ChartToolTipInfo tooltip = getToolTipInfo(x, y);
 
 		if (tooltip == null) {
 			return false;
 		}
 
-		if (tooltip.equals(toolTipLabel.getText())) {
+		if (tooltip.isDisplayed()) {
+
+			// reposition the tool tip when necessary
+			if (tooltip.isReposition()) {
+				setToolTipPosition();
+			}
 			return true;
 		}
 
-		toolTipLabel.setText(tooltip);
-		final Point labelSize = toolTipLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-		labelSize.x += 2;
-		labelSize.y += 2;
-		toolTipLabel.setSize(labelSize);
-		toolTipShell.pack();
+		// check if the content has changed
+		if (tooltip.getLabel().trim().equals(fToolTipLabel.getText().trim())) {
+			return true;
+		}
+
+		final String title = tooltip.getTitle();
+		if (title != null) {
+			fToolTipTitle.setText(title);
+			fToolTipTitle.pack(true);
+			fToolTipTitle.setVisible(true);
+		} else {
+			fToolTipTitle.setVisible(false);
+		}
+
+		fToolTipLabel.setText(tooltip.getLabel());
+		fToolTipLabel.pack(true);
+
+		fToolTipContainer.pack(true);
+		final Point containerSize = fToolTipContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+		fToolTipContainer.setSize(containerSize);
+
+		fToolTipShell.pack();
 
 		/*
 		 * On some platforms, there is a minimum size for a shell which may be greater than the
 		 * label size. To avoid having the background of the tip shell showing around the label,
 		 * force the label to fill the entire client area.
 		 */
-		final Rectangle area = toolTipShell.getClientArea();
-		toolTipLabel.setSize(area.width, area.height);
+		final Rectangle area = fToolTipShell.getClientArea();
+		fToolTipContainer.setSize(area.width, area.height);
 
-		/*
-		 * Position the tooltip and ensure that it is not located off the screen.
-		 */
+		setToolTipPosition();
+
+		return true;
+	}
+
+	/**
+	 * Position the tooltip and ensure that it is not located off the screen.
+	 */
+	private void setToolTipPosition() {
+
 		final Point cursorLocation = getDisplay().getCursorLocation();
+
 		// Assuming cursor is 21x21 because this is the size of
 		// the arrow cursor on Windows
 		final int cursorHeight = 21;
-		final Point size = toolTipShell.getSize();
+		final Point size = fToolTipShell.getSize();
 		final Rectangle rect = getMonitor().getBounds();
 		final Point pt = new Point(cursorLocation.x, cursorLocation.y + cursorHeight + 2);
+
 		pt.x = Math.max(pt.x, rect.x);
 		if (pt.x + size.x > rect.x + rect.width) {
 			pt.x = rect.x + rect.width - size.x;
@@ -4746,8 +4831,8 @@ public class ChartComponentGraph extends Canvas {
 		if (pt.y + size.y > rect.y + rect.height) {
 			pt.y = cursorLocation.y - 2 - size.y;
 		}
-		toolTipShell.setLocation(pt);
-		return true;
+
+		fToolTipShell.setLocation(pt);
 	}
 
 	/**

@@ -41,7 +41,9 @@ public class TourTimeData {
 
 	int[]				fTourAltitudeValues;
 	int[]				fTourDistanceValues;
-	int[]				fTourDurationValues;
+
+	ArrayList<Integer>	fTourRecordingTimeValues;
+	ArrayList<Integer>	fTourDrivingTimeValues;
 
 	ArrayList<String>	fTourTitle;
 

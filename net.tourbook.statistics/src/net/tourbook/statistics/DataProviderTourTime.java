@@ -117,6 +117,8 @@ public class DataProviderTourTime extends DataProvider {
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 			final ResultSet result = statement.executeQuery();
 
+			final ArrayList<String> dbTourTitle = new ArrayList<String>();
+
 			final ArrayList<Integer> dbTourYear = new ArrayList<Integer>();
 			final ArrayList<Integer> dbTourMonths = new ArrayList<Integer>();
 			final ArrayList<Integer> dbAllYearsDOY = new ArrayList<Integer>(); // DOY...Day Of Year for all years
@@ -126,8 +128,8 @@ public class DataProviderTourTime extends DataProvider {
 
 			final ArrayList<Integer> dbDistance = new ArrayList<Integer>();
 			final ArrayList<Integer> dbAltitude = new ArrayList<Integer>();
-			final ArrayList<Integer> dbDuration = new ArrayList<Integer>();
-			final ArrayList<String> dbTourTitle = new ArrayList<String>();
+			final ArrayList<Integer> dbTourRecordingTime = new ArrayList<Integer>();
+			final ArrayList<Integer> dbTourDrivingTime = new ArrayList<Integer>();
 
 			final ArrayList<Long> dbTypeIds = new ArrayList<Long>();
 			final ArrayList<Integer> dbTypeColorIndex = new ArrayList<Integer>();
@@ -145,7 +147,6 @@ public class DataProviderTourTime extends DataProvider {
 				final int startTime = startHour * 3600 + startMinute * 60;
 
 				final int recordingTime = result.getInt(9);
-
 				fCalendar.set(tourYear, tourMonth, result.getShort(4), startHour, startMinute);
 				final int tourDOY = fCalendar.get(Calendar.DAY_OF_YEAR) - 1;
 
@@ -158,7 +159,9 @@ public class DataProviderTourTime extends DataProvider {
 
 				dbDistance.add((int) (result.getInt(7) / 1000 / UI.UNIT_VALUE_DISTANCE));
 				dbAltitude.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
-				dbDuration.add(recordingTime);
+
+				dbTourRecordingTime.add(recordingTime);
+				dbTourDrivingTime.add(result.getInt(10));
 
 				dbTourTitle.add(result.getString(11));
 
@@ -213,7 +216,9 @@ public class DataProviderTourTime extends DataProvider {
 
 			fTourDataTime.fTourDistanceValues = ArrayListToArray.toInt(dbDistance);
 			fTourDataTime.fTourAltitudeValues = ArrayListToArray.toInt(dbAltitude);
-			fTourDataTime.fTourDurationValues = ArrayListToArray.toInt(dbDuration);
+
+			fTourDataTime.fTourRecordingTimeValues = dbTourRecordingTime;
+			fTourDataTime.fTourDrivingTimeValues = dbTourDrivingTime;
 
 			fTourDataTime.fTourTitle = dbTourTitle;
 
@@ -223,73 +228,6 @@ public class DataProviderTourTime extends DataProvider {
 
 		return fTourDataTime;
 	}
-
-//	void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
-//
-//		chartModel.setCustomData(
-//
-//		ChartDataModel.BAR_INFO_PROVIDER, new IChartInfoProvider() {
-//			
-//			public String getInfo(final int serieIndex, int valueIndex) {
-//
-//				final int[] tourDateValues = fTourTimeData.fTourDOYValues;
-//
-//				if (valueIndex >= tourDateValues.length) {
-//					valueIndex -= tourDateValues.length;
-//				}
-//
-//				if (tourDateValues == null || valueIndex >= tourDateValues.length) {
-//					return ""; //$NON-NLS-1$
-//				}
-//				fCalendar.set(fCurrentYear, 0, 1);
-//				fCalendar.set(Calendar.DAY_OF_YEAR, tourDateValues[valueIndex] + 1);
-//
-//				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
-//				fSelectedTourId = fTourTimeData.fTourIds[valueIndex];
-//
-//				/*
-//				 * get tour type name
-//				 */
-//				final long typeId = fTourTimeData.fTypeIds[valueIndex];
-//				final ArrayList<TourType> tourTypes = TourbookPlugin.getDefault().getTourTypes();
-//
-//				String tourTypeName = ""; //$NON-NLS-1$
-//				for (final Iterator<TourType> iter = tourTypes.iterator(); iter.hasNext();) {
-//					final TourType tourType = (TourType) iter.next();
-//					if (tourType.getTypeId() == typeId) {
-//						tourTypeName = tourType.getName();
-//					}
-//				}
-//				final int[] startValue = fTourTimeData.fTourTimeStartValues;
-//				final int[] endValue = fTourTimeData.fTourTimeEndValues;
-//				final int[] durationValue = fTourTimeData.fTourTimeDurationValues;
-//
-//				final String barInfo = new Formatter().format(Messages.TOURTIMEINFO_DATE_FORMAT
-//						+ Messages.TOURTIMEINFO_DISTANCE
-//						+ Messages.TOURTIMEINFO_ALTITUDE
-//						+ Messages.TOURTIMEINFO_DURATION
-//						+ Messages.TOURTIMEINFO_TOUR_TYPE,
-//						fCalendar.get(Calendar.DAY_OF_MONTH),
-//						fCalendar.get(Calendar.MONTH) + 1,
-//						fCalendar.get(Calendar.YEAR),
-//						startValue[valueIndex] / 3600,
-//						(startValue[valueIndex] % 3600) / 60,
-//						endValue[valueIndex] / 3600,
-//						(endValue[valueIndex] % 3600) / 60,
-//						fTourTimeData.fTourTimeDistanceValues[valueIndex],
-//						fTourTimeData.fTourTimeAltitudeValues[valueIndex],
-//						durationValue[valueIndex] / 3600,
-//						(durationValue[valueIndex] % 3600) / 60,
-//						tourTypeName).toString();
-//
-//				return barInfo;
-//			}
-//		});
-//
-//		// set the menu context provider
-//		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER,
-//				new TourContextProvider(chartWidget, this));
-//	}
 
 	void setSelectedTourId(Long selectedTourId) {
 		fSelectedTourId = selectedTourId;

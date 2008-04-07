@@ -28,7 +28,7 @@ import net.tourbook.ui.UI;
 public class StatisticDayCombined extends StatisticDay {
 
 	@Override
-	void updateChart(TourDataTour tourTimeData, long lastSelectedTourId) {
+	void updateChart(TourDayData tourTimeData, long lastSelectedTourId) {
 
 		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 

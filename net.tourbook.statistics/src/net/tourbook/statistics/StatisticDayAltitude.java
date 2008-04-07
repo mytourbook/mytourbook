@@ -28,7 +28,7 @@ import net.tourbook.ui.UI;
 public class StatisticDayAltitude extends StatisticDay {
 
 	@Override
-	void updateChart(final TourDataTour tourDataTour, long lastSelectedTourId) {
+	void updateChart(final TourDayData tourDataTour, long lastSelectedTourId) {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
