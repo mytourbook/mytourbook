@@ -18,6 +18,7 @@ package net.tourbook.device._template;
 import gnu.io.SerialPort;
 
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.HashMap;
 
 import net.tourbook.data.TimeData;
@@ -63,9 +64,7 @@ public class _TemplateDeviceDataReader extends TourbookDevice {
 		return 0;
 	}
 
-	public boolean processDeviceData(	String importFileName,
-										DeviceData deviceData,
-										HashMap<String, TourData> tourDataMap) {
+	public boolean processDeviceData(String importFileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
 
 		// create data object for each tour
 		TourData tourData = new TourData();
@@ -175,6 +174,12 @@ public class _TemplateDeviceDataReader extends TourbookDevice {
 
 	public boolean validateRawData(String fileName) {
 		return true;
+	}
+
+	@Override
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + "_template", 2008, 8, 30)
+				.toString();
 	}
 
 }

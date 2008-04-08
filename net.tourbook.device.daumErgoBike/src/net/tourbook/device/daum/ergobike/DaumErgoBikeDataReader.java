@@ -282,4 +282,10 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 		return true;
 	}
 
+	@Override
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

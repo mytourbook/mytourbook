@@ -125,7 +125,7 @@ public class CRPDataReader extends TourbookDevice {
 			ArrayList<String> trackPoints = new ArrayList<String>();
 
 			tokenLine = new StringTokenizer(fileReader.readLine());
-			@SuppressWarnings("unused") //$NON-NLS-1$
+			@SuppressWarnings("unused")
 			String fileVersion = tokenLine.nextToken();
 
 			// get all trackpoints
@@ -241,15 +241,15 @@ public class CRPDataReader extends TourbookDevice {
 
 			int pulse;
 			int distance = 0;
-			@SuppressWarnings("unused") //$NON-NLS-1$
+			@SuppressWarnings("unused")
 			int speed;
 			int altitude;
-			@SuppressWarnings("unused") //$NON-NLS-1$
+			@SuppressWarnings("unused")
 			int color;
-			@SuppressWarnings("unused") //$NON-NLS-1$
+			@SuppressWarnings("unused")
 			int symbol;
 			int temperature;
-			@SuppressWarnings("unused") //$NON-NLS-1$
+			@SuppressWarnings("unused")
 			String trackpointTime;
 
 			int oldDistance = 0;
@@ -272,7 +272,7 @@ public class CRPDataReader extends TourbookDevice {
 				altitude = Integer.parseInt(tokenLine.nextToken()); // [m]
 				color = Integer.parseInt(tokenLine.nextToken()); // [0..4]
 				symbol = Integer.parseInt(tokenLine.nextToken()); // [0..42]
-				temperature = Math.round(Float.parseFloat(tokenLine.nextToken().replace(',', '.'))); // [°C]
+				temperature = Math.round(Float.parseFloat(tokenLine.nextToken().replace(',', '.'))); // [ï¿½C]
 				trackpointTime = tokenLine.nextToken();
 
 				// get comment for current trackpoint
@@ -432,6 +432,12 @@ public class CRPDataReader extends TourbookDevice {
 		}
 
 		return true;
+	}
+
+	@Override
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

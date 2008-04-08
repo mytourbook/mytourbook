@@ -9,5 +9,14 @@
             id="net.tourbook.device.CM4XXMDeviceReader"
             name="CM4xxM"/>
    </extension>
+   <extension
+         point="net.tourbook.externalDeviceDataReader">
+      <device
+            class="net.tourbook.device.cm4xxm.CM4xxmExternalDevice"
+            id="net.tourbook.device.cm4xxmExternalDeviceReader"
+            name="CM4xxM"
+            type="serial">
+      </device>
+   </extension>
 
 </plugin>

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
@@ -654,6 +655,42 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		}
 
 		return isValid;
+	}
+
+	@Override
+	public String buildFileNameFromRawData(String rawDataFileName) {
+		RandomAccessFile fileRawData = null;
+
+		CM4XXMDeviceData cm4xxDeviceData = new CM4XXMDeviceData();
+
+		try {
+
+			fileRawData = new RandomAccessFile(rawDataFileName, "r"); //$NON-NLS-1$
+
+			// position file pointer to the device data
+			fileRawData.seek(OFFSET_DEVICE_DATA);
+
+			// read device data
+			cm4xxDeviceData.readFromFile(fileRawData);
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (fileRawData != null) {
+				try {
+					fileRawData.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+
+		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
+				cm4xxDeviceData.transferYear, cm4xxDeviceData.transferMonth, cm4xxDeviceData.transferDay).toString();
 	}
 
 }
