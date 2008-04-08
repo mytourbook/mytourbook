@@ -26,6 +26,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
@@ -153,8 +154,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return 4;
 	}
 
-	public boolean processDeviceData(	final String importFileName,
-										final DeviceData deviceData,
+	public boolean processDeviceData(final String importFileName, final DeviceData deviceData,
 										final HashMap<String, TourData> tourDataMap) {
 		boolean returnValue = false;
 
@@ -304,7 +304,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					// dump BB block
 					// dumpBlock(file, recordBuffer);
 
-					temperature = (short) (recordBuffer[1]);
+					temperature = (recordBuffer[1]);
 					cadence = (short) (recordBuffer[2] & 0xFF);
 					marker = (short) (recordBuffer[3] & 0xFF);
 
@@ -628,6 +628,25 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		}
 
 		return isValid;
+	}
+
+	@Override
+	public String buildFileNameFromRawData(String rawDataFileName) {
+
+		File fileRaw = new File(rawDataFileName);
+
+		long lastModified = fileRaw.lastModified();
+
+		/*
+		 * get the year, because the year is not saved in the raw data file, the modified year of
+		 * the file is used
+		 */
+		GregorianCalendar fileDate = new GregorianCalendar();
+		fileDate.setTime(new Date(lastModified));
+
+		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
+				(short) fileDate.get(Calendar.YEAR), (short) fileDate.get(Calendar.MONTH) + 1,
+				(short) fileDate.get(Calendar.DAY_OF_MONTH)).toString();
 	}
 
 }

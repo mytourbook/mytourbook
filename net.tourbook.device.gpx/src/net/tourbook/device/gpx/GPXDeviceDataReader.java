@@ -58,8 +58,7 @@ public class GPXDeviceDataReader extends TourbookDevice {
 		return 0;
 	}
 
-	public boolean processDeviceData(	final String importFilePath,
-										final DeviceData deviceData,
+	public boolean processDeviceData(final String importFilePath, final DeviceData deviceData,
 										final HashMap<String, TourData> tourDataMap) {
 
 		/*
@@ -104,5 +103,11 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
 	public boolean validateRawData(final String fileName) {
 		return true;
+	}
+
+	@Override
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+		// NEXT Auto-generated method stub
+		return null;
 	}
 }

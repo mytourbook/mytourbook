@@ -9,5 +9,14 @@
             id="net.tourbook.device.HAC5DeviceReader"
             name="HAC5"/>
    </extension>
+   <extension
+         point="net.tourbook.externalDeviceDataReader">
+      <device
+            class="net.tourbook.device.hac5.HAC5ExternalDevice"
+            id="net.tourbook.device.HAC5ExternalDeviceReader"
+            name="HAC5"
+            type="serial">
+      </device>
+   </extension>
 
 </plugin>

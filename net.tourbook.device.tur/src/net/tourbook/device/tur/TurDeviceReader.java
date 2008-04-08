@@ -452,4 +452,10 @@ public class TurDeviceReader extends TourbookDevice {
 		return isValid;
 	}
 
+	@Override
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

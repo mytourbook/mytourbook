@@ -9,5 +9,14 @@
             id="net.tourbook.device.GarminDeviceReader"
             name="Garmin"/>
    </extension>
+   <extension
+         point="net.tourbook.externalDeviceDataReader">
+      <device
+            class="net.tourbook.device.garmin.GarminExternalDevice"
+            id="net.tourbook.device.GarminExternalDeviceReader"
+            name="Garmin"
+            type="serial">
+      </device>
+   </extension>
 
 </plugin>

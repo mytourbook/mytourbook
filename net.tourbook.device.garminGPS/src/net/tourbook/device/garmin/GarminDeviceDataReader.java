@@ -2,7 +2,7 @@
  * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
  *  
  * This program is distributed in the hope that it will be useful, but WITHOUT 
@@ -31,7 +31,7 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class GarminDeviceDataReader extends TourbookDevice {
 
-	private static final String	XML_START_ID	= "<?xml"; //$NON-NLS-1$
+	private static final String	XML_START_ID	= "<?xml";	//$NON-NLS-1$
 
 	// plugin constructor
 	public GarminDeviceDataReader() {}
@@ -59,8 +59,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
 		return 0;
 	}
 
-	public boolean processDeviceData(	final String importFilePath,
-										final DeviceData deviceData,
+	public boolean processDeviceData(final String importFilePath, final DeviceData deviceData,
 										final HashMap<String, TourData> tourDataMap) {
 
 		/*
@@ -108,5 +107,11 @@ public class GarminDeviceDataReader extends TourbookDevice {
 
 	public boolean validateRawData(final String fileName) {
 		return true;
+	}
+
+	@Override
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+		// NEXT Auto-generated method stub
+		return null;
 	}
 }
