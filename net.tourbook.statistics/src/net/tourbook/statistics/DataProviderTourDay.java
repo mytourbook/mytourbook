@@ -34,7 +34,7 @@ public class DataProviderTourDay extends DataProvider {
 
 	private static DataProviderTourDay	fInstance;
 
-	private TourDayData					fTourDataTour;
+	private TourDayData					fTourDayData;
 
 	private DataProviderTourDay() {}
 
@@ -57,7 +57,7 @@ public class DataProviderTourDay extends DataProvider {
 				&& lastYear == fLastYear
 				&& numberOfYears == fNumberOfYears
 				&& refreshData == false) {
-			return fTourDataTour;
+			return fTourDayData;
 		}
 
 		fActivePerson = person;
@@ -66,7 +66,7 @@ public class DataProviderTourDay extends DataProvider {
 		fLastYear = lastYear;
 		fNumberOfYears = numberOfYears;
 
-		initYearDOYs();
+		initYearNumbers();
 
 		int colorOffset = 0;
 		if (tourTypeFilter.showUndefinedTourTypes()) {
@@ -77,7 +77,7 @@ public class DataProviderTourDay extends DataProvider {
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-		fTourDataTour = new TourDayData();
+		fTourDayData = new TourDayData();
 
 		final String sqlString = //
 		"SELECT " // //$NON-NLS-1$
@@ -252,43 +252,43 @@ public class DataProviderTourDay extends DataProvider {
 				yearDays += doy;
 			}
 
-			fTourDataTour.fTourIds = ArrayListToArray.toLong(dbTourIds);
+			fTourDayData.fTourIds = ArrayListToArray.toLong(dbTourIds);
 
-			fTourDataTour.fYearValues = tourYear;
-			fTourDataTour.fMonthValues = ArrayListToArray.toInt(dbMonths);
-			fTourDataTour.fDOYValues = tourAllYearsDOY;
+			fTourDayData.fYearValues = tourYear;
+			fTourDayData.fMonthValues = ArrayListToArray.toInt(dbMonths);
+			fTourDayData.fDOYValues = tourAllYearsDOY;
 
-			fTourDataTour.allDaysInAllYears = yearDays;
-			fTourDataTour.yearDays = fYearDays;
-			fTourDataTour.years = fYears;
+			fTourDayData.allDaysInAllYears = yearDays;
+			fTourDayData.yearDays = fYearDays;
+			fTourDayData.years = fYears;
 
-			fTourDataTour.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
-			fTourDataTour.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
+			fTourDayData.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
+			fTourDayData.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
 
-			fTourDataTour.fTimeLow = timeLow;
-			fTourDataTour.fDistanceLow = distanceLow;
-			fTourDataTour.fAltitudeLow = altitudeLow;
+			fTourDayData.fTimeLow = timeLow;
+			fTourDayData.fDistanceLow = distanceLow;
+			fTourDayData.fAltitudeLow = altitudeLow;
 
-			fTourDataTour.fTimeHigh = timeHigh;
-			fTourDataTour.fDistanceHigh = distanceHigh;
-			fTourDataTour.fAltitudeHigh = altitudeHigh;
+			fTourDayData.fTimeHigh = timeHigh;
+			fTourDayData.fDistanceHigh = distanceHigh;
+			fTourDayData.fAltitudeHigh = altitudeHigh;
 
-			fTourDataTour.fTourStartValues = ArrayListToArray.toInt(dbTourStartTime);
-			fTourDataTour.fTourEndValues = ArrayListToArray.toInt(dbTourEndTime);
+			fTourDayData.fTourStartValues = ArrayListToArray.toInt(dbTourStartTime);
+			fTourDayData.fTourEndValues = ArrayListToArray.toInt(dbTourEndTime);
 
-			fTourDataTour.fTourDistanceValues = ArrayListToArray.toInt(dbDistance);
-			fTourDataTour.fTourAltitudeValues = ArrayListToArray.toInt(dbAltitude);
+			fTourDayData.fTourDistanceValues = ArrayListToArray.toInt(dbDistance);
+			fTourDayData.fTourAltitudeValues = ArrayListToArray.toInt(dbAltitude);
 
-			fTourDataTour.fTourRecordingTimeValues = dbTourRecordingTime;
-			fTourDataTour.fTourDrivingTimeValues = dbTourDrivingTime;
+			fTourDayData.fTourRecordingTimeValues = dbTourRecordingTime;
+			fTourDayData.fTourDrivingTimeValues = dbTourDrivingTime;
 
-			fTourDataTour.fTourTitle = dbTourTitle;
+			fTourDayData.fTourTitle = dbTourTitle;
 
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 
-		return fTourDataTour;
+		return fTourDayData;
 	}
 
 	private final void updateLastTour(	final int tourIndex,

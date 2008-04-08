@@ -71,39 +71,36 @@ public abstract class StatisticWeek extends YearStatistic {
 	 */
 	ChartSegments createChartSegments() {
 
-		int yearWeeks = 53;
 		int segmentStart[] = new int[fNumberOfYears];
 		int segmentEnd[] = new int[fNumberOfYears];
 		String[] segmentTitle = new String[fNumberOfYears];
 
-		int weekCounter = fTourWeekData.fAltitudeHigh[0].length;
-
 		int oldestYear = fCurrentYear - fNumberOfYears + 1;
+		int[] yearWeeks = fTourWeekData.fYearWeeks;
+
+		int weekCounter = 0;
+		int yearIndex = 0;
 
 		// get start/end and title for each segment
-		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
+		for (int weeks : yearWeeks) {
 
-			int currentYearIndex = weekIndex / yearWeeks;
+			segmentStart[yearIndex] = weekCounter;
+			segmentEnd[yearIndex] = weekCounter + weeks - 1;
 
-			if (weekIndex % yearWeeks == 0) {
+			segmentTitle[yearIndex] = Integer.toString(oldestYear + yearIndex);
 
-				// first week in a year
-
-				segmentStart[currentYearIndex] = weekIndex;
-				segmentTitle[currentYearIndex] = Integer.toString(oldestYear + currentYearIndex);
-
-			} else if (weekIndex % yearWeeks == yearWeeks - 1) {
-
-				// last week in a year
-
-				segmentEnd[currentYearIndex] = weekIndex;
-			}
+			weekCounter += weeks;
+			yearIndex++;
 		}
 
 		ChartSegments weekSegments = new ChartSegments();
 		weekSegments.valueStart = segmentStart;
 		weekSegments.valueEnd = segmentEnd;
 		weekSegments.segmentTitle = segmentTitle;
+
+		weekSegments.years = fTourWeekData.fYears;
+		weekSegments.yearWeeks = yearWeeks;
+		weekSegments.yearDays = fTourWeekData.fYearDays;
 
 		return weekSegments;
 	}
@@ -123,21 +120,32 @@ public abstract class StatisticWeek extends YearStatistic {
 	private ChartToolTipInfo createToolTipInfo(int serieIndex, int valueIndex) {
 
 		int oldestYear = fCurrentYear - fNumberOfYears + 1;
-		fCalendar.set(Calendar.YEAR, oldestYear);
+
+//		fCalendar.clear();
+		fCalendar.set(oldestYear, 0, 1, 5, 5, 0);
 		fCalendar.set(Calendar.WEEK_OF_YEAR, valueIndex + 1);
+
+		final int weekDayOfMonth = fCalendar.get(Calendar.DAY_OF_MONTH);
+		final int weekMonth = fCalendar.get(Calendar.MONTH) + 1;
+		final int weekYear = fCalendar.get(Calendar.YEAR);
+		final int weekWeekOfYear = fCalendar.get(Calendar.WEEK_OF_YEAR);
+
+		fCalendar.add(Calendar.DAY_OF_MONTH, 2);
+
+		final int endWeekDayOfMonth = fCalendar.get(Calendar.DAY_OF_MONTH);
+		final int endWeekMonth = fCalendar.get(Calendar.MONTH) + 1;
+		final int endWeekYear = fCalendar.get(Calendar.YEAR);
 
 		/*
 		 * tool tip: title
 		 */
 		StringBuilder titleString = new StringBuilder();
-		titleString.append("%d / %d");
-
-		final int calendarYear = fCalendar.get(Calendar.YEAR);
+		titleString.append("Week %d / %d");
 
 		final String toolTipTitle = new Formatter().format(titleString.toString(), //
 				//
-				fCalendar.get(Calendar.WEEK_OF_YEAR),
-				calendarYear
+				weekWeekOfYear,
+				weekYear
 
 		).toString();
 
@@ -145,14 +153,20 @@ public abstract class StatisticWeek extends YearStatistic {
 		 * tool tip: label
 		 */
 		StringBuilder labelString = new StringBuilder();
-		labelString.append("%d.%d.%d\n");
+		labelString.append("valueIndex:\t%d\n");
+		labelString.append("%d.%d.%d - %d.%d.%d\n");
 		labelString.append("Type:\t%s\n");
 
 		final String toolTipLabel = new Formatter().format(labelString.toString(), //
 				//
-				fCalendar.get(Calendar.DAY_OF_MONTH),
-				fCalendar.get(Calendar.MONTH) + 1,
-				calendarYear,
+				valueIndex,
+				//
+				weekDayOfMonth,
+				weekMonth,
+				weekYear,
+				endWeekDayOfMonth,
+				endWeekMonth,
+				endWeekYear,
 				//
 				getTourTypeName(serieIndex, fActiveTourTypeFilter)
 		//
@@ -179,40 +193,39 @@ public abstract class StatisticWeek extends YearStatistic {
 			allWeeks[weekIndex] = weekIndex;
 		}
 
-		createDebug();
+//		debugWeekNumber();
 
 		return allWeeks;
 	}
 
-	private void createDebug() {
+	private void debugWeekNumber() {
 
 		Calendar calendar1 = GregorianCalendar.getInstance();
 		Calendar calendar2 = GregorianCalendar.getInstance();
 		Calendar calendar3 = GregorianCalendar.getInstance();
 
-		final int firstYear = 1970;
+		final int firstYear = 2000;
 
 		calendar2.set(firstYear, 0, 1);
-		calendar3.set(firstYear, 11, 31);
-//		calendar3.set(firstYear, 11, 26);
+		calendar3.set(firstYear, 11, 26);
 
-		for (int currentYear = firstYear; currentYear <= 2030; currentYear++) {
+		for (int currentYear = firstYear; currentYear <= 2010; currentYear++) {
 
 			calendar1.set(Calendar.YEAR, currentYear);
 			calendar1.set(Calendar.WEEK_OF_YEAR, 1);
-
-			calendar2.add(Calendar.MONTH, 12);
-			calendar3.add(Calendar.MONTH, 12);
-
 			printDayAndWeek(calendar1);
 			System.out.print("\t");
 
 			printDayAndWeek(calendar2);
 			System.out.print("\t");
+			System.out.print("\t");
 
 			printDayAndWeek(calendar3);
 
 			System.out.println();
+
+			calendar2.add(Calendar.MONTH, 12);
+			calendar3.add(Calendar.MONTH, 12);
 
 		}
 

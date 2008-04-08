@@ -29,11 +29,6 @@ import net.tourbook.ui.UI;
 
 public class DataProviderTourWeek extends DataProvider {
 
-	/**
-	 * Contains the number of weeks in one year, to simplify the calculation one year has always 53
-	 * weeks
-	 */
-//	static final int					YEAR_WEEKS	= 53;
 	private static DataProviderTourWeek	fInstance;
 
 	private TourDataWeek				fTourWeekData;
@@ -68,11 +63,18 @@ public class DataProviderTourWeek extends DataProvider {
 		fLastYear = lastYear;
 		fNumberOfYears = numberOfYears;
 
+		initYearNumbers();
+
 		fTourWeekData = new TourDataWeek();
 
 		// get the tour types
 		ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+
+		int weekCounter = 0;
+		for (int weeks : fYearWeeks) {
+			weekCounter += weeks;
+		}
 
 		int colorOffset = 0;
 		if (tourTypeFilter.showUndefinedTourTypes()) {
@@ -80,7 +82,7 @@ public class DataProviderTourWeek extends DataProvider {
 		}
 
 		final int serieLength = colorOffset + tourTypes.length;
-		final int valueLength = 53 * numberOfYears;
+		final int valueLength = weekCounter;
 
 		String sqlString = "SELECT " //$NON-NLS-1$
 				+ "StartYear			, " // 1 //$NON-NLS-1$
@@ -112,8 +114,16 @@ public class DataProviderTourWeek extends DataProvider {
 				final int dbYear = result.getInt(1);
 				final int dbWeek = result.getInt(2);
 
-				final int yearIndex = numberOfYears - (lastYear - dbYear + 1);
-				final int weekIndex = dbWeek - 1 + yearIndex * 53;
+				// get number of weeks for the current year in the db
+				final int dbYearIndex = numberOfYears - (lastYear - dbYear + 1);
+				int allWeeks = 0;
+				for (int yearIndex = 0; yearIndex <= dbYearIndex; yearIndex++) {
+					if (yearIndex > 0) {
+						allWeeks += fYearWeeks[yearIndex - 1];
+					}
+				}
+
+				final int weekIndex = allWeeks + dbWeek - 1;
 
 				/*
 				 * convert type id to the type index in the tour types list which is also the color
@@ -144,6 +154,10 @@ public class DataProviderTourWeek extends DataProvider {
 			conn.close();
 
 			fTourWeekData.fTypeIds = dbTypeIds;
+
+			fTourWeekData.fYears = fYears;
+			fTourWeekData.fYearWeeks = fYearWeeks;
+			fTourWeekData.fYearDays = fYearDays;
 
 			fTourWeekData.fTimeLow = new int[serieLength][valueLength];
 			fTourWeekData.fTimeHigh = dbTime;

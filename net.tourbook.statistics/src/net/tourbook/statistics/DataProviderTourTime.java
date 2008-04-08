@@ -83,7 +83,7 @@ public class DataProviderTourTime extends DataProvider {
 		fLastYear = lastYear;
 		fNumberOfYears = numberOfYears;
 
-		initYearDOYs();
+		initYearNumbers();
 
 		int colorOffset = 0;
 		if (tourTypeFilter.showUndefinedTourTypes()) {

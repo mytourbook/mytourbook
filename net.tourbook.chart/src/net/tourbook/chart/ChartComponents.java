@@ -165,6 +165,8 @@ public class ChartComponents extends Composite {
 	private final int[]					fKeyDownCounter				= new int[1];
 	private final int[]					fLastKeyDownCounter			= new int[1];
 
+	private Calendar					fCalendar					= GregorianCalendar.getInstance();
+
 	/**
 	 * Create and layout the components of the chart
 	 * 
@@ -601,6 +603,51 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
+	 * Create the labels for the months by using the days to scale the x-axis
+	 * 
+	 * @param units
+	 * @param devGraphWidth
+	 * @param years
+	 * @param yearDays
+	 */
+	private void createMonthLabels(	final ArrayList<ChartUnit> units,
+									final int devGraphWidth,
+									final int[] years,
+									final int[] yearDays) {
+
+		// shorten the unit when there is not enough space to draw the full unit name
+		final GC gc = new GC(this);
+		final int monthLength = gc.stringExtent(monthLabels[0]).x;
+		final boolean useShortUnitLabel = monthLength > (devGraphWidth / (years.length * 12)) * 0.9;
+		gc.dispose();
+
+		int yearIndex = 0;
+		int allDays = 0;
+
+		/*
+		 * create month units for all years
+		 */
+		for (final int year : years) {
+
+			// create month units
+			for (int month = 0; month < 12; month++) {
+
+				fCalendar.set(year, month, 1);
+				final int firstMonthDay = fCalendar.get(Calendar.DAY_OF_YEAR) - 1;
+
+				String monthLabel = monthLabels[month];
+				if (useShortUnitLabel) {
+					monthLabel = monthLabel.substring(0, 1);
+				}
+
+				units.add(new ChartUnit(allDays + firstMonthDay, monthLabel));
+			}
+
+			allDays += yearDays[yearIndex++];
+		}
+	}
+
+	/**
 	 * set the {@link SynchConfiguration} when this chart is the source for the synched chart
 	 */
 	private SynchConfiguration createSynchConfig() {
@@ -657,58 +704,24 @@ public class ChartComponents extends Composite {
 									final ArrayList<ChartUnit> units,
 									final int devGraphWidth) {
 
-		final Calendar calendar = GregorianCalendar.getInstance();
 		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
 
-		// get number of days for all years
-		final int allValues = chartSegments.allValues;
-		final int[] years = chartSegments.years;
-		final int[] yearDays = chartSegments.yearDays;
-
-		// shorten the unit when there is not enough space to draw the full unit name
-		final GC gc = new GC(this);
-		final int monthLength = gc.stringExtent(monthLabels[0]).x;
-		final boolean useShortUnitLabel = monthLength > (devGraphWidth / (years.length * 12)) * 0.9;
-		gc.dispose();
-
-		int yearIndex = 0;
-		int allDays = 0;
-
-		/*
-		 * create month units for all years
-		 */
-		for (final int year : years) {
-
-			// create month units
-			for (int month = 0; month < 12; month++) {
-
-				calendar.set(year, month, 1);
-				final int firstMonthDay = calendar.get(Calendar.DAY_OF_YEAR) - 1;
-
-				String monthLabel = monthLabels[month];
-				if (useShortUnitLabel) {
-					monthLabel = monthLabel.substring(0, 1);
-				}
-
-				units.add(new ChartUnit(allDays + firstMonthDay, monthLabel));
-			}
-
-			allDays += yearDays[yearIndex++];
-		}
+		createMonthLabels(units, devGraphWidth, chartSegments.years, chartSegments.yearDays);
 
 		// compute the width of the rectangles
-		drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth / allValues)));
+		final int allDaysInAllYears = chartSegments.allValues;
+		drawingData.setBarRectangleWidth(Math.max(0, (devGraphWidth / allDaysInAllYears)));
 		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
 
-		drawingData.setScaleX((float) devGraphWidth / allValues);
+		drawingData.setScaleX((float) devGraphWidth / allDaysInAllYears);
 	}
 
 	private void createXValuesMonth(final ChartDrawingData drawingData,
 									final ArrayList<ChartUnit> units,
 									final int devGraphWidth) {
 
-		final ChartDataYSerie yData = drawingData.getYData();
 		final ChartDataXSerie xData = drawingData.getXData();
+		final ChartDataYSerie yData = drawingData.getYData();
 
 		final int months = xData.fHighValues[0].length;
 		final float scaleX = (float) devGraphWidth / months;
@@ -765,27 +778,49 @@ public class ChartComponents extends Composite {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 		final int[] xValues = xData.getHighValues()[0];
-
 		final int allWeeks = xValues.length;
-		final int monthsInChart = allWeeks / 53 * 12;
 
-		// shorten the unit when there is not enough space to draw the full unit name
-		final GC gc = new GC(this);
-		final int monthLabelLength = gc.stringExtent(monthLabels[0]).x + 2;
-		final boolean isShortUnitLabel = monthLabelLength > (devGraphWidth / monthsInChart);
-		gc.dispose();
+		final ChartSegments chartSegments = drawingData.getXData().getChartSegments();
+//
+//		// get number of days for all years
+//		final int[] years = chartSegments.years;
+//		final int[] yearWeeks = chartSegments.yearWeeks;
+//
+//		// get number of weeks
+////		int allWeeks2 = 0;
+////		for (int weeks : yearWeeks) {
+////			allWeeks2 += weeks;
+////		}
+//
+//		final int allWeeks = xValues.length;
+//		final int allMonths = years.length * 12;
+//
+//		// shorten the unit when there is not enough space to draw the full unit name
+//		final GC gc = new GC(this);
+//		final int monthLabelLength = gc.stringExtent(monthLabels[0]).x + 2;
+//		final boolean isShortUnitLabel = monthLabelLength > (devGraphWidth / allMonths);
+//		gc.dispose();
+//
+//		// create the month labels
+//		for (int month = 0; month < allMonths; month++) {
+//
+//			String monthLabel = monthLabels[month % 12];
+//			if (isShortUnitLabel) {
+//				monthLabel = monthLabel.substring(0, 1);
+//			}
+//
+//			final ChartUnit chartUnit = new ChartUnit(month, monthLabel);
+//			units.add(chartUnit);
+//		}
 
-		// create the month labels
-		for (int month = 0; month < monthsInChart; month++) {
+		final int[] yearDays = chartSegments.yearDays;
 
-			String monthLabel = monthLabels[month % 12];
-			if (isShortUnitLabel) {
-				monthLabel = monthLabel.substring(0, 1);
-			}
-
-			final ChartUnit chartUnit = new ChartUnit(month, monthLabel);
-			units.add(chartUnit);
+		int allDaysInAllYears = 0;
+		for (int days : yearDays) {
+			allDaysInAllYears += days;
 		}
+
+		createMonthLabels(units, devGraphWidth, chartSegments.years, yearDays);
 
 		// compute the width and position of the rectangles
 		final int barWidth = (devGraphWidth / xValues.length) / 2;
@@ -793,7 +828,7 @@ public class ChartComponents extends Composite {
 		drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);
 
 		drawingData.setScaleX((float) devGraphWidth / allWeeks);
-		drawingData.setScaleUnitX((float) devGraphWidth / allWeeks * 53 / 12);
+		drawingData.setScaleUnitX((float) devGraphWidth / allDaysInAllYears);
 		drawingData.setXUnitTextPos(ChartDrawingData.XUNIT_TEXT_POS_CENTER);
 	}
 

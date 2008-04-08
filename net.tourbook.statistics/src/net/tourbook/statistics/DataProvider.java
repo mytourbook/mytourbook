@@ -31,14 +31,20 @@ public abstract class DataProvider {
 	int				fNumberOfYears;
 
 	/**
+	 * all years
+	 */
+	int[]			fYears;
+
+	/**
 	 * number of days in a year
 	 */
 	int[]			fYearDays;
 
 	/**
-	 * years
+	 * number of weeks in a year
 	 */
-	int[]			fYears;
+	int[]			fYearWeeks;
+
 	Calendar		fCalendar	= GregorianCalendar.getInstance();
 
 	/**
@@ -96,20 +102,32 @@ public abstract class DataProvider {
 	}
 
 	/**
-	 * initialize the number of day's in a year for all years
+	 * get numbers for each year <br>
+	 * <br>
+	 * all years into {@link #fYears} <br>
+	 * number of day's into {@link #fYearDays} <br>
+	 * number of week's into {@link #fYearWeeks}
 	 */
-	void initYearDOYs() {
+	void initYearNumbers() {
 
-		fYearDays = new int[fNumberOfYears];
 		fYears = new int[fNumberOfYears];
-		int yearIndex = 0;
+		fYearDays = new int[fNumberOfYears];
+		fYearWeeks = new int[fNumberOfYears];
 
+		int yearIndex = 0;
 		for (int currentYear = fLastYear - fNumberOfYears + 1; currentYear <= fLastYear; currentYear++) {
 
 			fYears[yearIndex] = currentYear;
 
 			fCalendar.set(currentYear, 11, 31);
 			fYearDays[yearIndex] = fCalendar.get(Calendar.DAY_OF_YEAR);
+
+			/*
+			 * January 1st has always the week number 1, the week number 1 can start in the previous
+			 * year
+			 */
+			fCalendar.set(currentYear, 11, 25);
+			fYearWeeks[yearIndex] = fCalendar.get(Calendar.WEEK_OF_YEAR);
 
 			yearIndex++;
 		}

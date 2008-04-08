@@ -30,5 +30,6 @@ public class ChartSegments {
 
 	public int[]	years;
 	public int[]	yearDays;
+	public int[]	yearWeeks;
 
 }

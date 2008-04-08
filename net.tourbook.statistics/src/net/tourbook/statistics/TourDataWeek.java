@@ -27,4 +27,8 @@ public class TourDataWeek {
 	int[][]		fAltitudeHigh;
 	int[][]		fTimeHigh;
 
+	int[]		fYears;
+	int[]		fYearWeeks;
+	int[]		fYearDays;
+
 }
