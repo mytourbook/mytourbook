@@ -16,6 +16,7 @@
 
 package net.tourbook.ui.views.rawData;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -297,7 +298,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
 
@@ -563,11 +564,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				final int recordingTime = ((TourData) cell.getElement()).getTourRecordingTime();
 
 				if (recordingTime != 0) {
-					fCalendar.set(0,
-							0,
-							0,
-							recordingTime / 3600,
-							((recordingTime % 3600) / 60),
+					fCalendar.set(0, 0, 0, recordingTime / 3600, ((recordingTime % 3600) / 60),
 							((recordingTime % 3600) % 60));
 
 					cell.setText(fDurationFormatter.format(fCalendar.getTime()));
@@ -723,7 +720,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		final IStructuredSelection tourSelection = (IStructuredSelection) fTourViewer.getSelection();
@@ -782,7 +779,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fPostSelectionProvider.setSelection(selection);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 
@@ -886,10 +883,13 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				// loop: import all files
 				for (String fileName : files) {
 
-					if (rawDataManager.importRawData(fileName)) {
-						importCounter++;
-					} else {
-						notImportedFiles.add(fileName);
+					File file = new File(fileName);
+					if (file.exists()) {
+						if (rawDataManager.importRawData(file, null, false, null)) {
+							importCounter++;
+						} else {
+							notImportedFiles.add(fileName);
+						}
 					}
 				}
 
@@ -944,9 +944,8 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 		// save imported file names
 		final HashSet<String> importedFiles = rawDataMgr.getImportedFiles();
-		memento.putString(MEMENTO_IMPORT_FILENAME,
-				StringToArrayConverter.convertArrayToString(importedFiles.toArray(new String[importedFiles.size()]),
-						FILESTRING_SEPARATOR));
+		memento.putString(MEMENTO_IMPORT_FILENAME, StringToArrayConverter.convertArrayToString(
+				importedFiles.toArray(new String[importedFiles.size()]), FILESTRING_SEPARATOR));
 
 		// save selected tour in the viewer
 		memento.putInteger(MEMENTO_SELECTED_TOUR_INDEX, table.getSelectionIndex());

@@ -17,6 +17,7 @@
 package net.tourbook.importdata;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
@@ -29,27 +30,45 @@ import org.eclipse.core.runtime.Platform;
 
 public class DeviceManager {
 
-	public static final String					DEVICE_IS_NOT_SELECTED	= Messages.DeviceManager_Selection_device_is_not_selected;
+	public static final String			DEVICE_IS_NOT_SELECTED	= Messages.DeviceManager_Selection_device_is_not_selected;
 
-	private static ArrayList<TourbookDevice>	fDeviceList;
+	private static List<TourbookDevice>	fDeviceList;
+	private static List<ExternalDevice>	fExternalDeviceList;
 
 	/**
-	 * read devicees from the extension registry
+	 * read devices from the extension registry
 	 * 
 	 * @return
 	 */
-	public static ArrayList<TourbookDevice> getDeviceList() {
+	@SuppressWarnings("unchecked")
+	public static List<TourbookDevice> getDeviceList() {
 
-		if (fDeviceList != null) {
-			// read the list only once
-			return fDeviceList;
+		if (fDeviceList == null) {
+			fDeviceList = readDeviceExtensions(TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
 		}
+		return fDeviceList;
+	}
 
-		fDeviceList = new ArrayList<TourbookDevice>();
+	/**
+	 * read external devices from the extension registry
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<ExternalDevice> getExternalDeviceList() {
 
-		IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(
-				TourbookPlugin.PLUGIN_ID,
-				TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
+		if (fExternalDeviceList == null) {
+			fExternalDeviceList = readDeviceExtensions(TourbookPlugin.EXT_POINT_EXTERNAL_DEVICE_DATA_READER);
+		}
+		return fExternalDeviceList;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static List readDeviceExtensions(String extensionPointName) {
+		ArrayList ret = new ArrayList();
+
+		IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
+				extensionPointName);
 
 		if (extPoint != null) {
 
@@ -70,7 +89,16 @@ public class DeviceManager {
 								device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
 								device.fileExtension = configElement.getAttribute("fileextension"); //$NON-NLS-1$
 
-								fDeviceList.add(device);
+								ret.add(device);
+							}
+							if (object instanceof ExternalDevice) {
+
+								ExternalDevice device = (ExternalDevice) object;
+
+								device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
+								device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
+
+								ret.add(device);
 							}
 						} catch (CoreException e) {
 							e.printStackTrace();
@@ -79,6 +107,6 @@ public class DeviceManager {
 				}
 			}
 		}
-		return fDeviceList;
+		return ret;
 	}
 }

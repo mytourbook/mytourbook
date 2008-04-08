@@ -237,6 +237,7 @@ public class Messages extends NLS {
 	public static String		Import_Wizard_Label_serial_port;
 	public static String		Import_Wizard_Label_use_settings;
 	public static String		Import_Wizard_Message_replace_existing_file;
+	public static String		Import_Wizard_Message_Title;
 	public static String		Import_Wizard_Monitor_stop_port;
 	public static String		Import_Wizard_Monitor_task_msg;
 	public static String		Import_Wizard_Monitor_task_received_bytes;

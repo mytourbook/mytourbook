@@ -33,10 +33,11 @@ import org.osgi.framework.BundleContext;
  */
 public class TourbookPlugin extends AbstractUIPlugin {
 
-	public static final String		PLUGIN_ID						= "net.tourbook";		//$NON-NLS-1$
+	public static final String		PLUGIN_ID								= "net.tourbook";				//$NON-NLS-1$
 
-	public static final String		EXT_POINT_STATISTIC_YEAR		= "statisticYear";		//$NON-NLS-1$
-	public static final String		EXT_POINT_DEVICE_DATA_READER	= "deviceDataReader";	//$NON-NLS-1$
+	public static final String		EXT_POINT_STATISTIC_YEAR				= "statisticYear";				//$NON-NLS-1$
+	public static final String		EXT_POINT_DEVICE_DATA_READER			= "deviceDataReader";			//$NON-NLS-1$
+	public static final String		EXT_POINT_EXTERNAL_DEVICE_DATA_READER	= "externalDeviceDataReader";	//$NON-NLS-1$
 
 	// The shared instance.
 	private static TourbookPlugin	plugin;

@@ -87,6 +87,8 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 */
 	public abstract int getStartSequenceSize();
 
+	public abstract String buildFileNameFromRawData(String rawDataFileName);
+
 	public void setImportYear(int importYear) {
 		this.importYear = importYear;
 	}

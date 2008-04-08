@@ -18,11 +18,12 @@ package net.tourbook.ui.views.rawData;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourBike;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.TourbookDevice;
@@ -45,15 +46,15 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionSaveTourInDatabase extends Action {
 
-	private static final String			MEMENTO_SELECTED_PERSON	= "action-save-tour.selected-person";	//$NON-NLS-1$
+	private static final String		MEMENTO_SELECTED_PERSON	= "action-save-tour.selected-person";	//$NON-NLS-1$
 
-	private RawDataView					fViewPart;
+	private RawDataView				fViewPart;
 
-	private TourPerson					fTourPerson;
+	private TourPerson				fTourPerson;
 
-	private ArrayList<TourbookDevice>	fDeviceList;
+	private List<TourbookDevice>	fDeviceList;
 
-	private ArrayList<TourPerson>		fPeople;
+	private ArrayList<TourPerson>	fPeople;
 
 	private class PeopleContentProvider implements IStructuredContentProvider {
 
@@ -156,15 +157,14 @@ public class ActionSaveTourInDatabase extends Action {
 
 		Runnable runnable = new Runnable() {
 
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				boolean isModified = false;
 				boolean saveInDatabase = false;
 
 				// get selected tours
-				final IStructuredSelection selection = ((IStructuredSelection) fViewPart.getTourViewer()
-						.getSelection());
+				final IStructuredSelection selection = ((IStructuredSelection) fViewPart.getTourViewer().getSelection());
 
 				// loop: all selected tours
 				for (Iterator iter = selection.iterator(); iter.hasNext();) {
@@ -183,8 +183,7 @@ public class ActionSaveTourInDatabase extends Action {
 							saveInDatabase = true;
 						}
 
-						if (tourData.getTourBike() == null
-								&& tourData.getTourPerson().getTourBike() != null) {
+						if (tourData.getTourBike() == null && tourData.getTourPerson().getTourBike() != null) {
 							tourData.setTourBike(bike);
 
 							saveInDatabase = true;
@@ -237,8 +236,7 @@ public class ActionSaveTourInDatabase extends Action {
 
 		dialog.setTitle(Messages.import_data_dlg_save_tour_title);
 		dialog.setMessage(Messages.import_data_dlg_save_tour_msg);
-		dialog.setDialogBoundsSettings(getDialogSettings(), Dialog.DIALOG_PERSISTLOCATION
-				| Dialog.DIALOG_PERSISTSIZE);
+		dialog.setDialogBoundsSettings(getDialogSettings(), Dialog.DIALOG_PERSISTLOCATION | Dialog.DIALOG_PERSISTSIZE);
 
 		// select last person
 		IDialogSettings settings = getDialogSettings();

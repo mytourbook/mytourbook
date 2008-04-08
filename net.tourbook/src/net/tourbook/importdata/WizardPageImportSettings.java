@@ -55,8 +55,7 @@ public class WizardPageImportSettings extends WizardPage {
 	private boolean						fIsPortListAvailable;
 
 	private ArrayList<TourPerson>		fPeopleList;
-	private ArrayList<TourbookDevice>	fDeviceList;
-	private ArrayList<TourbookDevice>	fDeviceListWithDeviceImport;
+	private ArrayList<ExternalDevice>	fDeviceList;
 
 	private ArrayList<String>			fPortList;
 	private Combo						fComboPerson;
@@ -119,21 +118,13 @@ public class WizardPageImportSettings extends WizardPage {
 		});
 
 		// create device list
-		fDeviceList = new ArrayList<TourbookDevice>();
-		fDeviceList.addAll(DeviceManager.getDeviceList());
-
-		fDeviceListWithDeviceImport = new ArrayList<TourbookDevice>();
+		fDeviceList = new ArrayList<ExternalDevice>();
+		fDeviceList.addAll(DeviceManager.getExternalDeviceList());
 
 		fComboDevice.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
-		for (final TourbookDevice device : fDeviceList) {
-			if (device.canReadFromDevice) {
-
-				// populate the device listbox
-				fComboDevice.add(device.visibleName);
-
-				// keep the device from where the data can be read
-				fDeviceListWithDeviceImport.add(device);
-			}
+		for (final ExternalDevice device : fDeviceList) {
+			// populate the device listbox
+			fComboDevice.add(device.visibleName);
 		}
 
 		// filler
@@ -160,10 +151,12 @@ public class WizardPageImportSettings extends WizardPage {
 				if (personIndex == 0) {
 					// person is not selected
 					fIsDeviceAvailable = false;
+					System.setProperty(WizardImportData.SYSPROPERTY_IMPORT_PERSON, "MyTourbook"); //$NON-NLS-1$
 				} else {
 					final TourPerson person = fPeopleList.get(--personIndex);
 					selectPersonDevice(person);
 					fPathEditor.setStringValue(person.getRawDataPath());
+					System.setProperty(WizardImportData.SYSPROPERTY_IMPORT_PERSON, person.getName());
 				}
 				validatePage();
 			}
@@ -174,9 +167,7 @@ public class WizardPageImportSettings extends WizardPage {
 		// add people to list
 		fPeopleList = TourDatabase.getTourPeople();
 		for (final TourPerson person : fPeopleList) {
-			String lastName = person.getLastName();
-			lastName = lastName.equals("") ? "" : " " + lastName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			fComboPerson.add(person.getFirstName() + lastName);
+			fComboPerson.add(person.getName());
 		}
 
 		// filler
@@ -205,7 +196,7 @@ public class WizardPageImportSettings extends WizardPage {
 	/**
 	 * create field: serial port
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void createFieldSerialPort() {
 
 		GridData gd;
@@ -264,13 +255,13 @@ public class WizardPageImportSettings extends WizardPage {
 	 * @return Return the device which is selected in the device list or <code>null</code> when no
 	 *         device is selected
 	 */
-	public TourbookDevice getSelectedDevice() {
+	public ExternalDevice getSelectedDevice() {
 
 		int deviceIndex = fComboDevice.getSelectionIndex();
 		if (deviceIndex <= 0) {
 			return null;
 		} else {
-			return fDeviceListWithDeviceImport.get(--deviceIndex);
+			return fDeviceList.get(--deviceIndex);
 		}
 	}
 
@@ -330,6 +321,7 @@ public class WizardPageImportSettings extends WizardPage {
 
 					if (person.getPersonId() == savedPersonId) {
 						fComboPerson.select(personIndex);
+						System.setProperty(WizardImportData.SYSPROPERTY_IMPORT_PERSON, person.getName());
 						break;
 					}
 					personIndex++;
@@ -344,7 +336,7 @@ public class WizardPageImportSettings extends WizardPage {
 		fComboDevice.select(0);
 		if (savedDeviceId != null) {
 			int deviceIndex = 1;
-			for (final TourbookDevice device : fDeviceList) {
+			for (final ExternalDevice device : fDeviceList) {
 
 				if (device.deviceId.equals(savedDeviceId)) {
 					fComboDevice.select(deviceIndex);
@@ -388,7 +380,7 @@ public class WizardPageImportSettings extends WizardPage {
 		if (deviceId == null) {
 			fComboDevice.select(0);
 		} else {
-			for (final TourbookDevice device : fDeviceListWithDeviceImport) {
+			for (final ExternalDevice device : fDeviceList) {
 				if (deviceId.equals(device.deviceId)) {
 
 					// skip first entry

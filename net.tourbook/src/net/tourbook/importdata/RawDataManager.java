@@ -17,6 +17,10 @@
 package net.tourbook.importdata;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,6 +39,8 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
@@ -43,6 +49,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -53,7 +60,7 @@ public class RawDataManager {
 
 	public static final String			TEMP_RAW_DATA_FILE			= "temp-device-data.txt";						//$NON-NLS-1$
 
-	protected static final String		RAW_DATA_LAST_SELECTED_PATH	= "raw-data-view.last-selected-import-path"; //$NON-NLS-1$
+	protected static final String		RAW_DATA_LAST_SELECTED_PATH	= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
 
 	private static RawDataManager		instance					= null;
 
@@ -76,7 +83,11 @@ public class RawDataManager {
 
 	private boolean						fIsImported;
 
+	private boolean						fImportCanceled;
+
 	private boolean						fIsMergeTracks;
+
+	private String						fLastImportedFile;
 
 	private RawDataManager() {}
 
@@ -95,6 +106,11 @@ public class RawDataManager {
 		return TourbookPlugin.getDefault().getStateLocation().append(TEMP_RAW_DATA_FILE).toFile().getAbsolutePath();
 	}
 
+	public static String getTempDir() {
+
+		return TourbookPlugin.getDefault().getStateLocation().toFile().getAbsolutePath();
+	}
+
 	public void executeImportFromDevice() {
 
 		new WizardImportDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
@@ -106,14 +122,11 @@ public class RawDataManager {
 
 	public void executeImportFromDeviceDirect() {
 
-		final IWorkbench workbench = PlatformUI.getWorkbench();
-		final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-
 		final WizardImportData importWizard = new WizardImportData();
 
-		final WizardDialog dialog = new WizardImportDialog(window.getShell(),
-				importWizard,
-				Messages.Import_Wizard_Dlg_title);
+		final WizardDialog dialog = new WizardImportDialog(PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow()
+				.getShell(), importWizard, Messages.Import_Wizard_Dlg_title);
 
 		// create the dialog and shell which is required in setAutoDownload()
 		dialog.create();
@@ -130,7 +143,7 @@ public class RawDataManager {
 	 */
 	public void executeImportFromFile() {
 
-		final ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
+		final List<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 
 		// sort device list alphabetically
 		Collections.sort(deviceList, new Comparator<TourbookDevice>() {
@@ -199,7 +212,7 @@ public class RawDataManager {
 					// replace filename, keep the directory path
 					fileName = filePath.removeLastSegments(1).append(fileName).makeAbsolute().toString();
 
-					if (rawDataManager.importRawData(fileName)) {
+					if (rawDataManager.importRawData(fileName, null, false, null)) {
 						importCounter++;
 					} else {
 						notImportedFiles.add(fileName);
@@ -266,23 +279,57 @@ public class RawDataManager {
 	 * Import the raw data from a file and save the imported data in the fields
 	 * <code>fDeviceData</code> and <code>fTourData</code>
 	 * 
-	 * @param fileName
-	 * @param isDeviceImport
+	 * @param importFileName
+	 *        the file to be imported
+	 * @param destinationPath
+	 *        if not null copy the file to this path
+	 * @param buildNewFileNames
+	 *        if true create a new filename depending on the content of the file, keep old name if
+	 *        false
+	 * @param fileCollision
+	 *        behavior if destination file exists (ask if null)
 	 * @return Returns <code>true</code> when the import was successfully
 	 */
-	public boolean importRawData(final String fileName) {
+	public boolean importRawData(String importFileName, String destinationPath, boolean buildNewFileNames,
+									FileCollisionBehavior fileCollision) {
+		File importFile = new File(importFileName);
+		return importRawData(importFile, destinationPath, buildNewFileNames, fileCollision);
+	}
 
-		File importFile = new File(fileName);
+	/**
+	 * Import the raw data from a file and save the imported data in the fields
+	 * <code>fDeviceData</code> and <code>fTourData</code>
+	 * 
+	 * @param importFile
+	 *        the file to be imported
+	 * @param destinationPath
+	 *        if not null copy the file to this path
+	 * @param buildNewFileNames
+	 *        if true create a new filename depending on the content of the file, keep old name if
+	 *        false
+	 * @param fileCollision
+	 *        behavior if destination file exists (ask if null)
+	 * @return Returns <code>true</code> when the import was successfully
+	 */
+	public boolean importRawData(File importFile, final String destinationPath, final boolean buildNewFileNames,
+									final FileCollisionBehavior fileCollision) {
 
-		// check if file exist
+		final String fileName = importFile.getAbsolutePath();
+
+		// check if importFile exist
 		if (importFile.exists() == false) {
 
-			MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_ERROR | SWT.OK);
+			Shell activeShell = Display.getDefault().getActiveShell();
 
-			msgBox.setText(Messages.DataImport_Error_file_does_not_exist_title);
-			msgBox.setMessage(NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, fileName));
+			// during initialisation there is no active shell
+			if (activeShell != null) {
+				MessageBox msgBox = new MessageBox(activeShell, SWT.ICON_ERROR | SWT.OK);
 
-			msgBox.open();
+				msgBox.setText(Messages.DataImport_Error_file_does_not_exist_title);
+				msgBox.setMessage(NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, fileName));
+
+				msgBox.open();
+			}
 
 			return false;
 		}
@@ -294,7 +341,7 @@ public class RawDataManager {
 		}
 		final String fileExtension = fileName.substring(dotPos + 1);
 
-		final ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
+		final List<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 		fIsImported = false;
 
 		BusyIndicator.showWhile(null, new Runnable() {
@@ -312,22 +359,25 @@ public class RawDataManager {
 
 						// device file extension was found in the filename extension
 
-						if (importRawDataFromFile(device, fileName)) {
+						if (importRawDataFromFile(device, fileName, destinationPath, buildNewFileNames, fileCollision)) {
 							isDataImported = true;
 							fIsImported = true;
+							break;
+						}
+						if (fImportCanceled) {
 							break;
 						}
 					}
 				}
 
-				if (isDataImported == false) {
+				if (isDataImported == false && !fImportCanceled) {
 
 					/*
 					 * when data has not imported yet, try all available devices without checking
 					 * the file extension
 					 */
 					for (TourbookDevice device : deviceList) {
-						if (importRawDataFromFile(device, fileName)) {
+						if (importRawDataFromFile(device, fileName, destinationPath, buildNewFileNames, fileCollision)) {
 							isDataImported = true;
 							fIsImported = true;
 							break;
@@ -336,7 +386,7 @@ public class RawDataManager {
 				}
 
 				if (isDataImported) {
-					fImportedFiles.add(fileName);
+					fImportedFiles.add(fLastImportedFile);
 				}
 			}
 		});
@@ -345,15 +395,29 @@ public class RawDataManager {
 	}
 
 	/**
-	 * import the raw data for the device
+	 * import the raw data of the given file
 	 * 
 	 * @param device
-	 * @param fileName
+	 *        the device which is able to process the data of the file
+	 * @param sourceFileName
+	 *        the file to be imported
+	 * @param destinationPath
+	 *        if not null copy the file to this path
+	 * @param buildNewFileName
+	 *        if true create a new filename depending on the content of the file, keep old name if
+	 *        false
+	 * @param fileCollision
+	 *        behavior if destination file exists (ask if null)
 	 * @return
 	 */
-	private boolean importRawDataFromFile(TourbookDevice device, String fileName) {
+	private boolean importRawDataFromFile(TourbookDevice device, String sourceFileName, String destinationPath,
+											boolean buildNewFileName, FileCollisionBehavior fileCollision) {
 
-		if (device.validateRawData(fileName)) {
+		if (fileCollision == null) {
+			fileCollision = new FileCollisionBehavior();
+		}
+
+		if (device.validateRawData(sourceFileName)) {
 
 			// file contains valid raw data for the raw data reader
 
@@ -363,12 +427,115 @@ public class RawDataManager {
 
 			device.setMergeTracks(fIsMergeTracks);
 
-			if (device.processDeviceData(fileName, fDeviceData, fTourDataMap)) {
-				return true;
+			// copy file to destinationPath
+			if (destinationPath != null) {
+				String destFileName = new File(sourceFileName).getName();
+				if (buildNewFileName) {
+					destFileName = device.buildFileNameFromRawData(sourceFileName);
+				}
+				File newFile = new File((new Path(destinationPath).addTrailingSeparator().toString() + destFileName));
+
+				// get source file
+				File fileIn = new File(sourceFileName);
+
+				// check if file already exist
+				if (newFile.exists()) {
+					// TODO allow user to rename the file
+
+					boolean keepFile = false; // for MessageDialog result
+					if (fileCollision.value == FileCollisionBehavior.ASK) {
+
+						Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+						MessageDialog messageDialog = new MessageDialog(shell,
+								Messages.Import_Wizard_Message_Title,
+								null,
+								NLS.bind(Messages.Import_Wizard_Message_replace_existing_file, newFile),
+								MessageDialog.QUESTION,
+								new String[] {
+										IDialogConstants.YES_LABEL,
+										IDialogConstants.YES_TO_ALL_LABEL,
+										IDialogConstants.NO_LABEL,
+										IDialogConstants.NO_TO_ALL_LABEL },
+								0);
+						messageDialog.open();
+						int returnCode = messageDialog.getReturnCode();
+						switch (returnCode) {
+
+						case 1: // YES_TO_ALL
+							fileCollision.value = FileCollisionBehavior.REPLACE;
+							break;
+
+						case 3: // NO_TO_ALL
+							fileCollision.value = FileCollisionBehavior.KEEP;
+						case 2: // NO
+							keepFile = true;
+							break;
+
+						default:
+							break;
+						}
+					}
+
+					if (fileCollision.value == FileCollisionBehavior.KEEP || keepFile) {
+						fImportCanceled = true;
+						fileIn.delete();
+						return false;
+					}
+				}
+
+				// copy source file into destination file
+				FileInputStream inReader = null;
+				FileOutputStream outReader = null;
+				try {
+					inReader = new FileInputStream(fileIn);
+					outReader = new FileOutputStream(newFile);
+					int c;
+
+					while ((c = inReader.read()) != -1) {
+						outReader.write(c);
+					}
+
+					inReader.close();
+					outReader.close();
+
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+					return false;
+				} catch (IOException e) {
+					e.printStackTrace();
+					return false;
+				} finally {
+					// close the files
+					if (inReader != null) {
+						try {
+							inReader.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+							return false;
+						}
+					}
+					if (outReader != null) {
+						try {
+							outReader.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+							return false;
+						}
+					}
+				}
+
+				// delete source file
+				fileIn.delete();
+				sourceFileName = newFile.getAbsolutePath();
+
 			}
+			fLastImportedFile = sourceFileName;
+
+			return device.processDeviceData(sourceFileName, fDeviceData, fTourDataMap);
 		}
 
 		return false;
+
 	}
 
 	public void removeAllTours() {
@@ -400,7 +567,7 @@ public class RawDataManager {
 	public void updateTourDataFromDb_NOTWORKING() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				if (fTourDataMap.size() == 0) {
@@ -495,7 +662,7 @@ public class RawDataManager {
 	public void updateTourDataFromDb() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				EntityManager em = TourDatabase.getInstance().getEntityManager();

@@ -17,6 +17,7 @@ package net.tourbook.preferences;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -28,7 +29,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceManager;
-import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.importdata.ExternalDevice;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.InputFieldFloat;
 import net.tourbook.ui.UI;
@@ -116,7 +117,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * this device list has all the devices which are visible in the device combobox
 	 */
-	private ArrayList<TourbookDevice>	fDeviceList;
+	private ArrayList<ExternalDevice>	fDeviceList;
 
 	private IPropertyChangeListener		fPrefChangeListener;
 	private boolean						fIsPersonListModified	= false;
@@ -167,7 +168,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				String deviceId = tourPerson.getDeviceReaderId();
 
 				if (deviceId != null) {
-					for (TourbookDevice device : fDeviceList) {
+					for (ExternalDevice device : fDeviceList) {
 						if (device != null && deviceId.equals(device.deviceId)) {
 							return device.visibleName;
 						}
@@ -352,7 +353,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 				if (fCurrentPerson != null) {
 
-					TourbookDevice device = getSelectedDevice();
+					ExternalDevice device = getSelectedDevice();
 
 					if (device == null && fCurrentPerson.getDeviceReaderId() == null) {
 						return;
@@ -376,21 +377,19 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		new Label(fPersonDetailContainer, SWT.NONE);
 
 		// create device list
-		fDeviceList = new ArrayList<TourbookDevice>();
+		fDeviceList = new ArrayList<ExternalDevice>();
 
 		// add special device
 		fDeviceList.add(null);
 
 		// add all devices which can read from a device
-		final ArrayList<TourbookDevice> deviceList = DeviceManager.getDeviceList();
-		for (TourbookDevice device : deviceList) {
-			if (device.canReadFromDevice) {
-				fDeviceList.add(device);
-			}
+		final List<ExternalDevice> deviceList = DeviceManager.getExternalDeviceList();
+		for (ExternalDevice device : deviceList) {
+			fDeviceList.add(device);
 		}
 
 		// add all devices to the combobox
-		for (TourbookDevice device : fDeviceList) {
+		for (ExternalDevice device : fDeviceList) {
 			if (device == null) {
 				fComboDevice.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
 			} else {
@@ -399,7 +398,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private TourbookDevice getSelectedDevice() {
+	private ExternalDevice getSelectedDevice() {
 
 		int selectedIndex = fComboDevice.getSelectionIndex();
 
@@ -825,7 +824,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		// ask for the reference tour name
 		String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
 
-		MessageDialog dialog = new MessageDialog(this.getShell(),
+		MessageDialog dialog = new MessageDialog(getShell(),
 				Messages.Pref_People_Dlg_del_person_title,
 				null,
 				Messages.Pref_People_Dlg_del_person_message,
@@ -838,7 +837,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 
 		BusyIndicator.showWhile(null, new Runnable() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				Table table = fPeopleViewer.getTable();
@@ -902,7 +901,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		fRawDataPathEditor.setPropertyChangeListener(null);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private boolean removePersonFromTourData(TourPerson person) {
 
 		boolean returnResult = false;
@@ -1012,7 +1011,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			int deviceIndex = 0;
 
-			for (TourbookDevice device : fDeviceList) {
+			for (ExternalDevice device : fDeviceList) {
 
 				if (device != null) {
 					if (deviceId.equals(device.deviceId)) {
