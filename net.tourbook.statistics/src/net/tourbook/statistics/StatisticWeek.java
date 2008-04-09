@@ -16,6 +16,7 @@
 
 package net.tourbook.statistics;
 
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
@@ -54,6 +55,7 @@ public abstract class StatisticWeek extends YearStatistic {
 	boolean					fIsSynchScaleEnabled;
 
 	private final Calendar	fCalendar		= GregorianCalendar.getInstance();
+	private DateFormat		fDateFormatter	= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	TourDataWeek			fTourWeekData;
 
@@ -65,6 +67,8 @@ public abstract class StatisticWeek extends YearStatistic {
 	public boolean canTourBeVisible() {
 		return false;
 	}
+
+	abstract ChartDataModel createChartDataModel();
 
 	/**
 	 * create segments for each week
@@ -121,54 +125,78 @@ public abstract class StatisticWeek extends YearStatistic {
 
 		int oldestYear = fCurrentYear - fNumberOfYears + 1;
 
-//		fCalendar.clear();
-		fCalendar.set(oldestYear, 0, 1, 5, 5, 0);
-		fCalendar.set(Calendar.WEEK_OF_YEAR, valueIndex + 1);
+		Calendar calendar = GregorianCalendar.getInstance();
 
-		final int weekDayOfMonth = fCalendar.get(Calendar.DAY_OF_MONTH);
-		final int weekMonth = fCalendar.get(Calendar.MONTH) + 1;
-		final int weekYear = fCalendar.get(Calendar.YEAR);
-		final int weekWeekOfYear = fCalendar.get(Calendar.WEEK_OF_YEAR);
+		calendar.set(Calendar.YEAR, oldestYear);
+		calendar.set(Calendar.WEEK_OF_YEAR, valueIndex + 1);
 
-		fCalendar.add(Calendar.DAY_OF_MONTH, 2);
+		final int weekYear = calendar.get(Calendar.YEAR);
+		final int weekWeekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
 
-		final int endWeekDayOfMonth = fCalendar.get(Calendar.DAY_OF_MONTH);
-		final int endWeekMonth = fCalendar.get(Calendar.MONTH) + 1;
-		final int endWeekYear = fCalendar.get(Calendar.YEAR);
+		String beginDate = fDateFormatter.format(calendar.getTime());
+
+		calendar.add(Calendar.DAY_OF_MONTH, 6);
+		String endDate = fDateFormatter.format(calendar.getTime());
+
+		final Integer recordingTime = fTourWeekData.fRecordingTime[serieIndex][valueIndex];
+		final Integer drivingTime = fTourWeekData.fDrivingTime[serieIndex][valueIndex];
+		int breakTime = recordingTime - drivingTime;
 
 		/*
 		 * tool tip: title
 		 */
 		StringBuilder titleString = new StringBuilder();
-		titleString.append("Week %d / %d");
 
-		final String toolTipTitle = new Formatter().format(titleString.toString(), //
-				//
-				weekWeekOfYear,
-				weekYear
+		String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
+		if (tourTypeName != null && tourTypeName.length() > 0) {
+			titleString.append(tourTypeName);
+			titleString.append(NEW_LINE);
+		}
 
-		).toString();
+		final String toolTipTitle = new Formatter().format(titleString.toString()).toString();
 
 		/*
 		 * tool tip: label
 		 */
-		StringBuilder labelString = new StringBuilder();
-		labelString.append("valueIndex:\t%d\n");
-		labelString.append("%d.%d.%d - %d.%d.%d\n");
-		labelString.append("Type:\t%s\n");
+		StringBuilder toolTipFormat = new StringBuilder();
+		toolTipFormat.append("Week:\t\t%d / %d");
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append("Date:\t\t%s - %s");
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_distance);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_altitude);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_recording_time);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_driving_time);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_break_time);
 
-		final String toolTipLabel = new Formatter().format(labelString.toString(), //
+		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
 				//
-				valueIndex,
-				//
-				weekDayOfMonth,
-				weekMonth,
+				weekWeekOfYear,
 				weekYear,
-				endWeekDayOfMonth,
-				endWeekMonth,
-				endWeekYear,
 				//
-				getTourTypeName(serieIndex, fActiveTourTypeFilter)
+				beginDate,
+				endDate,
+				//
+				fTourWeekData.fDistanceHigh[serieIndex][valueIndex],
+				UI.UNIT_LABEL_DISTANCE,
+				//
+				fTourWeekData.fAltitudeHigh[serieIndex][valueIndex],
+				UI.UNIT_LABEL_ALTITUDE,
+				//
+				recordingTime / 3600,
+				(recordingTime % 3600) / 60,
+				//
+				drivingTime / 3600,
+				(drivingTime % 3600) / 60,
+				//
+				breakTime / 3600,
+				(breakTime % 3600) / 60
 		//
 		)
 				.toString();
@@ -180,9 +208,56 @@ public abstract class StatisticWeek extends YearStatistic {
 		ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 		toolTipInfo.setTitle(toolTipTitle);
 		toolTipInfo.setLabel(toolTipLabel);
+//		toolTipInfo.setLabel(toolTipFormat.toString());
 
 		return toolTipInfo;
 	}
+
+//	private void debugWeekNumber() {
+//
+//		Calendar calendar1 = GregorianCalendar.getInstance();
+//		Calendar calendar2 = GregorianCalendar.getInstance();
+//		Calendar calendar3 = GregorianCalendar.getInstance();
+//
+//		final int firstYear = 2000;
+//
+//		calendar2.set(firstYear, 0, 1);
+//		calendar3.set(firstYear, 11, 26);
+//
+//		for (int currentYear = firstYear; currentYear <= 2010; currentYear++) {
+//
+//			calendar1.set(Calendar.YEAR, currentYear);
+//			calendar1.set(Calendar.WEEK_OF_YEAR, 1);
+//			printDayAndWeek(calendar1);
+//			System.out.print("\t");
+//
+//			printDayAndWeek(calendar2);
+//			System.out.print("\t");
+//			System.out.print("\t");
+//
+//			printDayAndWeek(calendar3);
+//
+//			System.out.println();
+//
+//			calendar2.add(Calendar.MONTH, 12);
+//			calendar3.add(Calendar.MONTH, 12);
+//
+//		}
+//
+//		System.out.println();
+//	}
+//
+//	private void printDayAndWeek(Calendar calendar2) {
+//		System.out.print(calendar2.get(Calendar.DAY_OF_MONTH)
+//				+ "."
+//				+ (calendar2.get(Calendar.MONTH) + 1)
+//				+ "."
+//				+ calendar2.get(Calendar.YEAR)
+//				+ " - "
+//				+ calendar2.get(Calendar.WEEK_OF_YEAR)
+//		//
+//		);
+//	}
 
 	private int[] createWeekData() {
 
@@ -196,52 +271,6 @@ public abstract class StatisticWeek extends YearStatistic {
 //		debugWeekNumber();
 
 		return allWeeks;
-	}
-
-	private void debugWeekNumber() {
-
-		Calendar calendar1 = GregorianCalendar.getInstance();
-		Calendar calendar2 = GregorianCalendar.getInstance();
-		Calendar calendar3 = GregorianCalendar.getInstance();
-
-		final int firstYear = 2000;
-
-		calendar2.set(firstYear, 0, 1);
-		calendar3.set(firstYear, 11, 26);
-
-		for (int currentYear = firstYear; currentYear <= 2010; currentYear++) {
-
-			calendar1.set(Calendar.YEAR, currentYear);
-			calendar1.set(Calendar.WEEK_OF_YEAR, 1);
-			printDayAndWeek(calendar1);
-			System.out.print("\t");
-
-			printDayAndWeek(calendar2);
-			System.out.print("\t");
-			System.out.print("\t");
-
-			printDayAndWeek(calendar3);
-
-			System.out.println();
-
-			calendar2.add(Calendar.MONTH, 12);
-			calendar3.add(Calendar.MONTH, 12);
-
-		}
-
-		System.out.println();
-	}
-
-	private void printDayAndWeek(Calendar calendar2) {
-		System.out.print(calendar2.get(Calendar.DAY_OF_MONTH)
-				+ "."
-				+ (calendar2.get(Calendar.MONTH) + 1)
-				+ "."
-				+ calendar2.get(Calendar.YEAR)
-				+ " - "
-				+ calendar2.get(Calendar.WEEK_OF_YEAR)
-		//
-		);
 	}
 
 	void createXDataWeek(ChartDataModel chartDataModel) {
@@ -340,7 +369,15 @@ public abstract class StatisticWeek extends YearStatistic {
 			fMinMaxKeeper.resetMinMax();
 		}
 
-		updateChart();
+		ChartDataModel chartDataModel = createChartDataModel();
+
+		setChartProviders(fChart, chartDataModel);
+
+		if (fIsSynchScaleEnabled) {
+			fMinMaxKeeper.setMinMaxValues(chartDataModel);
+		}
+
+		fChart.updateChart(chartDataModel);
 	}
 
 	@Override
@@ -402,8 +439,6 @@ public abstract class StatisticWeek extends YearStatistic {
 	public void setSynchScale(boolean isSynchScaleEnabled) {
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
-
-	abstract void updateChart();
 
 	@Override
 	public void updateToolBar(final boolean refreshToolbar) {

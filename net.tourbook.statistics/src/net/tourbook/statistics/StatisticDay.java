@@ -16,6 +16,7 @@
 
 package net.tourbook.statistics;
 
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
@@ -23,11 +24,15 @@ import java.util.GregorianCalendar;
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.chart.ChartDataXSerie;
+import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartSegments;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
+import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.SelectionTourId;
@@ -46,9 +51,9 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider {
 
-	static final String		DISTANCE_DATA	= "distance";						//$NON-NLS-1$
-	static final String		ALTITUDE_DATA	= "altitude";						//$NON-NLS-1$
-	static final String		DURATION_DATA	= "duration";						//$NON-NLS-1$
+	static final String		DISTANCE_DATA	= "distance";									//$NON-NLS-1$
+	static final String		ALTITUDE_DATA	= "altitude";									//$NON-NLS-1$
+	static final String		DURATION_DATA	= "duration";									//$NON-NLS-1$
 
 	TourTypeFilter			fActiveTourTypeFilter;
 	private TourPerson		fActivePerson;
@@ -60,13 +65,14 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	int						fNumberOfYears;
 
 	Calendar				fCalendar		= GregorianCalendar.getInstance();
+	private DateFormat		fDateFormatter	= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	IPostSelectionProvider	fPostSelectionProvider;
 
 	Chart					fChart;
 	BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
 
-	private TourDayData		fTourDayData;
+	protected TourDayData	fTourDayData;
 
 	boolean					fIsSynchScaleEnabled;
 
@@ -193,6 +199,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		fCalendar.set(oldestYear, 0, 1);
 		fCalendar.set(Calendar.DAY_OF_YEAR, tourDOY + 1);
 
+		String beginDate = fDateFormatter.format(fCalendar.getTime());
+
 		fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
 		fSelectedTourId = fTourDayData.fTourIds[valueIndex];
 
@@ -205,28 +213,43 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		final Integer drivingTime = fTourDayData.fTourDrivingTimeValues.get(valueIndex);
 		int breakTime = recordingTime - drivingTime;
 
-		StringBuilder infoText = new StringBuilder();
-		infoText.append(Messages.tourtime_info_date_format);
-		infoText.append(Messages.tourtime_info_distance);
-		infoText.append(Messages.tourtime_info_altitude);
-		infoText.append(Messages.tourtime_info_recording_time);
-		infoText.append(Messages.tourtime_info_driving_time);
-		infoText.append(Messages.tourtime_info_break_time);
-		infoText.append(Messages.tourtime_info_tour_type);
+		StringBuilder toolTipFormat = new StringBuilder();
+		toolTipFormat.append("Date:\t\t%s");
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append("Time:\t\t%d:%02d-%d:%02d");
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_distance);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_altitude);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_recording_time);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_driving_time);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_break_time);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_tour_type);
 
-		final String toolTipLabel = new Formatter().format(infoText.toString(),
+		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(),
 		//
-				fCalendar.get(Calendar.DAY_OF_MONTH),
-				fCalendar.get(Calendar.MONTH) + 1,
-				fCalendar.get(Calendar.YEAR),
+				beginDate,
+				//
+				// start time
 				startValue[valueIndex] / 3600,
 				(startValue[valueIndex] % 3600) / 60,
+				//
+				// end time
 				endValue[valueIndex] / 3600,
 				(endValue[valueIndex] % 3600) / 60,
 				//
+				// distance
 				fTourDayData.fTourDistanceValues[valueIndex],
 				UI.UNIT_LABEL_DISTANCE,
 				//
+				// altitude
 				fTourDayData.fTourAltitudeValues[valueIndex],
 				UI.UNIT_LABEL_ALTITUDE,
 				//
@@ -239,7 +262,10 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				breakTime / 3600,
 				(breakTime % 3600) / 60,
 				//
-				tourTypeName).toString();
+				tourTypeName
+		//
+		)
+				.toString();
 
 		/*
 		 * create tool tip info
@@ -254,6 +280,84 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		toolTipInfo.setLabel(toolTipLabel);
 
 		return toolTipInfo;
+	}
+
+	/**
+	 * create data for the x-axis
+	 */
+	void createXDataDay(ChartDataModel chartModel) {
+
+		ChartDataXSerie xData = new ChartDataXSerie(fTourDayData.fDOYValues);
+		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_DAY);
+		xData.setVisibleMaxValue(fCurrentYear);
+		xData.setChartSegments(createChartSegments(fTourDayData));
+
+		chartModel.setXData(xData);
+	}
+
+	/**
+	 * Altitude
+	 */
+	void createYDataAltitude(ChartDataModel chartModel) {
+
+		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+				fTourDayData.fAltitudeLow,
+				fTourDayData.fAltitudeHigh);
+		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
+		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
+		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+		yData.setAllValueColors(0);
+		yData.setVisibleMinValue(0);
+		yData.setCustomData(ALTITUDE_DATA, 1);
+		yData.setColorIndex(new int[][] { fTourDayData.fTypeColorIndex });
+
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, fActiveTourTypeFilter);
+
+		chartModel.addYData(yData);
+	}
+
+	/**
+	 * Distance
+	 */
+	void createYDataDistance(ChartDataModel chartModel) {
+
+		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+				fTourDayData.fDistanceLow,
+				fTourDayData.fDistanceHigh);
+		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
+		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
+		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+		yData.setAllValueColors(0);
+		yData.setVisibleMinValue(0);
+		yData.setCustomData(DISTANCE_DATA, 1);
+		yData.setColorIndex(new int[][] { fTourDayData.fTypeColorIndex });
+
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
+
+		chartModel.addYData(yData);
+	}
+
+	/**
+	 * Time
+	 */
+	void createYDataDuration(ChartDataModel chartModel) {
+		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+				fTourDayData.fTimeLow,
+				fTourDayData.fTimeHigh);
+		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
+		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
+		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+		yData.setAllValueColors(0);
+		yData.setVisibleMinValue(0);
+		yData.setCustomData(DURATION_DATA, 1);
+		yData.setColorIndex(new int[][] { fTourDayData.fTypeColorIndex });
+
+		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
+		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, fActiveTourTypeFilter);
+
+		chartModel.addYData(yData);
 	}
 
 	@Override
@@ -317,7 +421,25 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			fMinMaxKeeper.resetMinMax();
 		}
 
-		updateChart(fTourDayData, selectedTourId);
+		ChartDataModel chartModel = updateChart();
+
+		/*
+		 * set graph minimum width, these is the number of days in the year
+		 */
+		fCalendar.set(fCurrentYear, 11, 31);
+		chartModel.setChartMinWidth(fCalendar.get(Calendar.DAY_OF_YEAR));
+
+		setChartProviders(fChart, chartModel);
+
+		if (fIsSynchScaleEnabled) {
+			fMinMaxKeeper.setMinMaxValues(chartModel);
+		}
+
+		// show the data in the chart
+		fChart.updateChart(chartModel, false);
+		// try to select the previous selected tour
+		selectTour(selectedTourId);
+
 	}
 
 	@Override
@@ -400,7 +522,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	 * @param tourId
 	 *        tour id which was selected before the update
 	 */
-	abstract void updateChart(TourDayData tourDataDay, long tourId);
+	abstract ChartDataModel updateChart();
 
 	@Override
 	public void updateToolBar(final boolean refreshToolbar) {

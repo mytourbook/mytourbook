@@ -22,13 +22,15 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class TourbookStatistic {
 
-	public String		fStatisticId;
+	protected static final String	NEW_LINE	= "\n";
 
-	public String		fVisibleName;
+	public String					fStatisticId;
 
-	private Composite	fContainer;
+	public String					fVisibleName;
 
-	private boolean		fIsDataDirty;
+	private Composite				fContainer;
+
+	private boolean					fIsDataDirty;
 
 	/**
 	 * Activates the actions in the statistic

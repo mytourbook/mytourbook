@@ -85,12 +85,15 @@ public class DataProviderTourWeek extends DataProvider {
 		final int valueLength = weekCounter;
 
 		String sqlString = "SELECT " //$NON-NLS-1$
-				+ "StartYear			, " // 1 //$NON-NLS-1$
-				+ "StartWeek			, " // 2 //$NON-NLS-1$
-				+ "SUM(TourDistance)	, " // 3 //$NON-NLS-1$
-				+ "SUM(TourAltUp)		, " // 4 //$NON-NLS-1$
+				+ "StartYear				, " // 1 //$NON-NLS-1$
+				+ "StartWeek				, " // 2 //$NON-NLS-1$
+				+ "SUM(TourDistance)		, " // 3 //$NON-NLS-1$
+				+ "SUM(TourAltUp)			, " // 4 //$NON-NLS-1$
 				+ "SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END)," // 5 //$NON-NLS-1$
-				+ "TourType_TypeId 		\n" // 6 //$NON-NLS-1$
+				+ "SUM(TourRecordingTime)	, " // 6 //$NON-NLS-1$
+				+ "SUM(TourDrivingTime)		, " // 7 //$NON-NLS-1$
+				+ "TourType_TypeId 			  " // 8 //$NON-NLS-1$
+				+ "\n" //$NON-NLS-1$
 				//
 				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$
@@ -102,7 +105,11 @@ public class DataProviderTourWeek extends DataProvider {
 
 			final int[][] dbDistance = new int[serieLength][valueLength];
 			final int[][] dbAltitude = new int[serieLength][valueLength];
-			final int[][] dbTime = new int[serieLength][valueLength];
+			final int[][] dbDurationTime = new int[serieLength][valueLength];
+			final int[][] dbRecordingTime = new int[serieLength][valueLength];
+			final int[][] dbDrivingTime = new int[serieLength][valueLength];
+			final int[][] dbBreakTime = new int[serieLength][valueLength];
+
 			final long[][] dbTypeIds = new long[serieLength][valueLength];
 
 			Connection conn = TourDatabase.getInstance().getConnection();
@@ -130,10 +137,9 @@ public class DataProviderTourWeek extends DataProvider {
 				 * index
 				 */
 				int colorIndex = 0;
-
-				final Long dbTypeIdObject = (Long) result.getObject(6);
+				final Long dbTypeIdObject = (Long) result.getObject(8);
 				if (dbTypeIdObject != null) {
-					final long dbTypeId = result.getLong(6);
+					final long dbTypeId = result.getLong(8);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
 							colorIndex = colorOffset + typeIndex;
@@ -142,13 +148,20 @@ public class DataProviderTourWeek extends DataProvider {
 					}
 				}
 
-				dbTypeIds[colorIndex][weekIndex] = dbTypeIdObject == null
-						? TourType.TOUR_TYPE_ID_NOT_DEFINED
-						: dbTypeIdObject;
+				final long dbTypeId = dbTypeIdObject == null ? TourType.TOUR_TYPE_ID_NOT_DEFINED : dbTypeIdObject;
+
+				dbTypeIds[colorIndex][weekIndex] = dbTypeId;
 
 				dbDistance[colorIndex][weekIndex] = (int) (result.getInt(3) / 1000 / UI.UNIT_VALUE_DISTANCE);
 				dbAltitude[colorIndex][weekIndex] = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
-				dbTime[colorIndex][weekIndex] = result.getInt(5);
+				dbDurationTime[colorIndex][weekIndex] = result.getInt(5);
+
+				final int recordingTime = result.getInt(6);
+				final int drivingTime = result.getInt(7);
+
+				dbRecordingTime[colorIndex][weekIndex] = recordingTime;
+				dbDrivingTime[colorIndex][weekIndex] = drivingTime;
+				dbBreakTime[colorIndex][weekIndex] = recordingTime - drivingTime;
 			}
 
 			conn.close();
@@ -160,13 +173,17 @@ public class DataProviderTourWeek extends DataProvider {
 			fTourWeekData.fYearDays = fYearDays;
 
 			fTourWeekData.fTimeLow = new int[serieLength][valueLength];
-			fTourWeekData.fTimeHigh = dbTime;
+			fTourWeekData.fTimeHigh = dbDurationTime;
 
 			fTourWeekData.fDistanceLow = new int[serieLength][valueLength];
 			fTourWeekData.fDistanceHigh = dbDistance;
 
 			fTourWeekData.fAltitudeLow = new int[serieLength][valueLength];
 			fTourWeekData.fAltitudeHigh = dbAltitude;
+
+			fTourWeekData.fRecordingTime = dbRecordingTime;
+			fTourWeekData.fDrivingTime = dbDrivingTime;
+			fTourWeekData.fBreakTime = dbBreakTime;
 
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -21,20 +21,13 @@ import net.tourbook.chart.ChartDataModel;
 public class StatisticWeekTourTime extends StatisticWeek {
 
 	@Override
-	void updateChart() {
+	ChartDataModel createChartDataModel() {
 
 		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		createXDataWeek(chartDataModel);
 		createYDataDuration(chartDataModel);
 
-		setChartProviders(fChart, chartDataModel);
-
-		if (fIsSynchScaleEnabled) {
-			fMinMaxKeeper.setMinMaxValues(chartDataModel);
-		}
-
-		// show the fDataModel in the chart
-		fChart.updateChart(chartDataModel);
+		return chartDataModel;
 	}
 }

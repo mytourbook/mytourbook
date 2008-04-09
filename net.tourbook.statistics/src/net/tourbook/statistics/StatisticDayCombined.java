@@ -16,96 +16,20 @@
 
 package net.tourbook.statistics;
 
-import java.util.Calendar;
-
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataSerie;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColorProvider;
-import net.tourbook.ui.UI;
 
 public class StatisticDayCombined extends StatisticDay {
 
 	@Override
-	void updateChart(TourDayData tourTimeData, long lastSelectedTourId) {
+	ChartDataModel updateChart() {
 
-		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
-		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(tourTimeData.fDOYValues);
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_DAY);
-		xData.setVisibleMaxValue(fCurrentYear);
-		xData.setChartSegments(createChartSegments(tourTimeData));
-		chartModel.setXData(xData);
+		createXDataDay(chartDataModel);
+		createYDataDistance(chartDataModel);
+		createYDataAltitude(chartDataModel);
+		createYDataDuration(chartDataModel);
 
-		ChartDataYSerie yData;
-
-		/*
-		 * Distance
-		 */
-		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
-				tourTimeData.fDistanceLow,
-				tourTimeData.fDistanceHigh);
-		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
-		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
-		yData.setAllValueColors(0);
-		yData.setVisibleMinValue(0);
-		yData.setCustomData(DISTANCE_DATA, 1);
-		chartModel.addYData(yData);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, fActiveTourTypeFilter);
-		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
-
-		/*
-		 * Altitude
-		 */
-		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
-				tourTimeData.fAltitudeLow,
-				tourTimeData.fAltitudeHigh);
-		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setAllValueColors(0);
-		yData.setVisibleMinValue(0);
-		yData.setCustomData(ALTITUDE_DATA, 1);
-		chartModel.addYData(yData);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_ALTITUDE, fActiveTourTypeFilter);
-		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
-
-		/*
-		 * Time
-		 */
-		yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR, tourTimeData.fTimeLow, tourTimeData.fTimeHigh);
-		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-		yData.setAllValueColors(0);
-		yData.setVisibleMinValue(0);
-		yData.setCustomData(DURATION_DATA, 1);
-		chartModel.addYData(yData);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, fActiveTourTypeFilter);
-		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
-
-		/*
-		 * set graph minimum width, these is the number of days in the year
-		 */
-		fCalendar.set(fCurrentYear, 11, 31);
-		chartModel.setChartMinWidth(fCalendar.get(Calendar.DAY_OF_YEAR));
-
-		setChartProviders(fChart, chartModel);
-
-		if (fIsSynchScaleEnabled) {
-			fMinMaxKeeper.setMinMaxValues(chartModel);
-		}
-
-		// show the data in the chart
-		fChart.updateChart(chartModel, false);
-
-		// try to select the previous selected tour
-		selectTour(lastSelectedTourId);
+		return chartDataModel;
 	}
 }

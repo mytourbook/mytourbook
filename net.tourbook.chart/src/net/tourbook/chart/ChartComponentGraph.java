@@ -4775,7 +4775,8 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// check if the content has changed
-		if (tooltip.getLabel().trim().equals(fToolTipLabel.getText().trim())) {
+		final String toolTipLabel = tooltip.getLabel();
+		if (toolTipLabel.trim().equals(fToolTipLabel.getText().trim())) {
 			return true;
 		}
 
@@ -4788,7 +4789,7 @@ public class ChartComponentGraph extends Canvas {
 			fToolTipTitle.setVisible(false);
 		}
 
-		fToolTipLabel.setText(tooltip.getLabel());
+		fToolTipLabel.setText(toolTipLabel);
 		fToolTipLabel.pack(true);
 
 		fToolTipContainer.pack(true);

@@ -16,7 +16,6 @@
 package net.tourbook.statistics;
 
 import java.util.Calendar;
-import java.util.Formatter;
 import java.util.GregorianCalendar;
 
 import net.tourbook.chart.BarChartMinMaxKeeper;
@@ -35,7 +34,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -352,43 +350,53 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				final Integer drivingTime = fTourTimeData.fTourDrivingTimeValues.get(valueIndex);
 				int breakTime = recordingTime - drivingTime;
 
-				StringBuilder labelFormat = new StringBuilder();
-				labelFormat.append(Messages.tourtime_info_date_format);
-				labelFormat.append(Messages.tourtime_info_distance);
-				labelFormat.append(Messages.tourtime_info_altitude);
-				labelFormat.append(Messages.tourtime_info_recording_time);
-				labelFormat.append(Messages.tourtime_info_driving_time);
-				labelFormat.append(Messages.tourtime_info_break_time);
-				labelFormat.append(Messages.tourtime_info_tour_type);
+				StringBuilder toolTipFormat = new StringBuilder();
+				toolTipFormat.append(Messages.tourtime_info_date_format);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(Messages.tourtime_info_distance);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(Messages.tourtime_info_altitude);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(Messages.tourtime_info_recording_time);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(Messages.tourtime_info_driving_time);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(Messages.tourtime_info_break_time);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(Messages.tourtime_info_tour_type);
 
-				final String toolTipLabel = new Formatter().format(labelFormat.toString(),
-				//
-						fCalendar.get(Calendar.DAY_OF_MONTH),
-						fCalendar.get(Calendar.MONTH) + 1,
-						fCalendar.get(Calendar.YEAR),
-						startValue[valueIndex] / 3600,
-						(startValue[valueIndex] % 3600) / 60,
-						endValue[valueIndex] / 3600,
-						(endValue[valueIndex] % 3600) / 60,
-						//
-						fTourTimeData.fTourDistanceValues[valueIndex],
-						UI.UNIT_LABEL_DISTANCE,
-						//
-						fTourTimeData.fTourAltitudeValues[valueIndex],
-						UI.UNIT_LABEL_ALTITUDE,
-						//
-						recordingTime / 3600,
-						(recordingTime % 3600) / 60,
-						//
-						drivingTime / 3600,
-						(drivingTime % 3600) / 60,
-						//
-						breakTime / 3600,
-						(breakTime % 3600) / 60,
-						//						//
-						tourTypeName//
-				)
-						.toString();
+//				final String toolTipLabel = new Formatter().format(toolTipFormat.toString(),
+//				//
+//						fCalendar.get(Calendar.DAY_OF_MONTH),
+//						fCalendar.get(Calendar.MONTH) + 1,
+//						fCalendar.get(Calendar.YEAR),
+//						//
+//						startValue[valueIndex] / 3600,
+//						(startValue[valueIndex] % 3600) / 60,
+//						endValue[valueIndex] / 3600,
+//						(endValue[valueIndex] % 3600) / 60,
+//						//
+//						fTourTimeData.fTourDistanceValues[valueIndex],
+//						UI.UNIT_LABEL_DISTANCE,
+//						//
+//						fTourTimeData.fTourAltitudeValues[valueIndex],
+//						UI.UNIT_LABEL_ALTITUDE,
+//						//
+//						recordingTime / 3600,
+//						(recordingTime % 3600) / 60,
+//						//
+//						drivingTime / 3600,
+//						(drivingTime % 3600) / 60,
+//						//
+//						breakTime / 3600,
+//						(breakTime % 3600) / 60,
+//						//						//
+//						tourTypeName//
+//				)
+//						.toString();
 
 				/*
 				 * create tool tip info
@@ -400,7 +408,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 				ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 				toolTipInfo.setTitle(tourTitle);
-				toolTipInfo.setLabel(toolTipLabel);
+//				toolTipInfo.setLabel(toolTipLabel);
+				toolTipInfo.setLabel(toolTipFormat.toString());
 
 				return toolTipInfo;
 			}

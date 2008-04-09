@@ -16,62 +16,18 @@
 
 package net.tourbook.statistics;
 
-import java.util.Calendar;
-
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataSerie;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColorProvider;
 
 public class StatisticDayTourTime extends StatisticDay {
 
 	@Override
-	void updateChart(TourDayData tourTimeData, long lastSelectedTourId) {
+	ChartDataModel updateChart() {
 
-		ChartDataModel chartModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
-		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(tourTimeData.fDOYValues);
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_DAY);
-		xData.setVisibleMaxValue(fCurrentYear);
-		xData.setChartSegments(createChartSegments(tourTimeData));
-		chartModel.setXData(xData);
+		createXDataDay(chartDataModel);
+		createYDataDuration(chartDataModel);
 
-		/*
-		 * Duration
-		 */
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
-				tourTimeData.fTimeLow,
-				tourTimeData.fTimeHigh);
-		yData.setYTitle(Messages.LABEL_DRIVING_TIME);
-		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-		yData.setAllValueColors(0);
-		yData.setVisibleMinValue(0);
-		yData.setCustomData(DURATION_DATA, 1);
-		chartModel.addYData(yData);
-		yData.setColorIndex(new int[][] { tourTimeData.fTypeColorIndex });
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_TIME);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_TIME, fActiveTourTypeFilter);
-
-		/*
-		 * set graph minimum width, these is the number of days in the year
-		 */
-		fCalendar.set(fCurrentYear, 11, 31);
-		int yearDays = fCalendar.get(Calendar.DAY_OF_YEAR);
-		chartModel.setChartMinWidth(yearDays);
-
-		setChartProviders(fChart, chartModel);
-
-		if (fIsSynchScaleEnabled) {
-			fMinMaxKeeper.setMinMaxValues(chartModel);
-		}
-
-		// show the data in the chart
-		fChart.updateChart(chartModel, false);
-
-		// try to select the previous selected tour
-		selectTour(lastSelectedTourId);
+		return chartDataModel;
 	}
 }

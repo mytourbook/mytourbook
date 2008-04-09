@@ -31,4 +31,8 @@ public class TourDataWeek {
 	int[]		fYearWeeks;
 	int[]		fYearDays;
 
+	int[][]		fRecordingTime;
+	int[][]		fDrivingTime;
+	int[][]		fBreakTime;
+
 }
