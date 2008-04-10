@@ -32,7 +32,7 @@ public class DataProviderTourMonth extends DataProvider {
 
 	private static DataProviderTourMonth	fInstance;
 
-	private TourDataMonth				fTourMonthData;
+	private TourDataMonth					fTourMonthData;
 
 	private DataProviderTourMonth() {}
 
@@ -78,7 +78,9 @@ public class DataProviderTourMonth extends DataProvider {
 				+ "SUM(TOURDISTANCE)		, " // 3 //$NON-NLS-1$
 				+ "SUM(TOURALTUP)			, " // 4 //$NON-NLS-1$
 				+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END)," // 5 //$NON-NLS-1$
-				+ "tourType_typeId 			\n" // 6 //$NON-NLS-1$
+				+ "SUM(TourRecordingTime)	, " // 6 //$NON-NLS-1$
+				+ "SUM(TourDrivingTime)		, " // 7 //$NON-NLS-1$
+				+ "tourType_typeId 			\n" // 8 //$NON-NLS-1$
 				//
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" WHERE STARTYEAR IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$
@@ -98,7 +100,12 @@ public class DataProviderTourMonth extends DataProvider {
 
 			final int[][] dbDistance = new int[tourTypeSerieLength][valueLength];
 			final int[][] dbAltitude = new int[tourTypeSerieLength][valueLength];
-			final int[][] dbTime = new int[tourTypeSerieLength][valueLength];
+			final int[][] dbDurationTime = new int[tourTypeSerieLength][valueLength];
+
+			final int[][] dbRecordingTime = new int[tourTypeSerieLength][valueLength];
+			final int[][] dbDrivingTime = new int[tourTypeSerieLength][valueLength];
+			final int[][] dbBreakTime = new int[tourTypeSerieLength][valueLength];
+
 			final long[][] dbTypeIds = new long[tourTypeSerieLength][valueLength];
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
@@ -119,9 +126,9 @@ public class DataProviderTourMonth extends DataProvider {
 				 */
 				int colorIndex = 0;
 
-				final Long dbTypeIdObject = (Long) result.getObject(6);
+				final Long dbTypeIdObject = (Long) result.getObject(8);
 				if (dbTypeIdObject != null) {
-					final long dbTypeId = result.getLong(6);
+					final long dbTypeId = result.getLong(8);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
 							colorIndex = colorOffset + typeIndex;
@@ -133,7 +140,14 @@ public class DataProviderTourMonth extends DataProvider {
 				dbTypeIds[colorIndex][monthIndex] = dbTypeIdObject == null ? -1 : dbTypeIdObject;
 				dbDistance[colorIndex][monthIndex] = (int) (result.getInt(3) / 1000 / UI.UNIT_VALUE_DISTANCE);
 				dbAltitude[colorIndex][monthIndex] = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
-				dbTime[colorIndex][monthIndex] = result.getInt(5);
+				dbDurationTime[colorIndex][monthIndex] = result.getInt(5);
+
+				final int recordingTime = result.getInt(6);
+				final int drivingTime = result.getInt(7);
+
+				dbRecordingTime[colorIndex][monthIndex] = recordingTime;
+				dbDrivingTime[colorIndex][monthIndex] = drivingTime;
+				dbBreakTime[colorIndex][monthIndex] = recordingTime - drivingTime;
 			}
 
 			conn.close();
@@ -146,7 +160,11 @@ public class DataProviderTourMonth extends DataProvider {
 
 			fTourMonthData.fDistanceHigh = dbDistance;
 			fTourMonthData.fAltitudeHigh = dbAltitude;
-			fTourMonthData.fTimeHigh = dbTime;
+			fTourMonthData.fTimeHigh = dbDurationTime;
+
+			fTourMonthData.fRecordingTime = dbRecordingTime;
+			fTourMonthData.fDrivingTime = dbDrivingTime;
+			fTourMonthData.fBreakTime = dbBreakTime;
 
 		} catch (final SQLException e) {
 			e.printStackTrace();

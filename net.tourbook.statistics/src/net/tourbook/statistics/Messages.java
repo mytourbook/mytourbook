@@ -37,21 +37,19 @@ public class Messages extends NLS {
 	public static String		LABEL_GRAPH_TIME;
 	public static String		LABEL_GRAPH_TIME_UNIT;
 
-	public static String		NUMBERS_ALTITUDE_BETWEEN;
-	public static String		NUMBERS_ALTITUDE_DOWN;
+	public static String		numbers_info_altitude_between;
+	public static String		numbers_info_altitude_down;
+	public static String		numbers_info_altitude_total;
+	public static String		numbers_info_altitude_up;
+	public static String		numbers_info_distance_between;
+	public static String		numbers_info_distance_down;
+	public static String		numbers_info_distance_total;
+	public static String		numbers_info_distance_up;
+	public static String		numbers_info_time_between;
+	public static String		numbers_info_time_down;
+	public static String		numbers_info_time_total;
+	public static String		numbers_info_time_up;
 
-	public static String		NUMBERS_ALTITUDE_TOTAL;
-	public static String		NUMBERS_ALTITUDE_UP;
-	public static String		NUMBERS_DISTANCE_BETWEEN;
-	public static String		NUMBERS_DISTANCE_DOWN;
-
-	public static String		NUMBERS_DISTANCE_TOTAL;
-	public static String		NUMBERS_DISTANCE_UP;
-	public static String		NUMBERS_TIME_BETWEEN;
-	public static String		NUMBERS_TIME_DOWN;
-
-	public static String		NUMBERS_TIME_TOTAL;
-	public static String		NUMBERS_TIME_UP;
 	public static String		NUMBERS_UNIT;
 
 	public static String		TOURDAYINFO_ALTITUDE;
@@ -61,12 +59,18 @@ public class Messages extends NLS {
 
 	public static String		tourtime_info_altitude;
 	public static String		tourtime_info_break_time;
-	public static String		tourtime_info_date_format;
+	public static String	tourtime_info_date_day;
+
+	public static String	tourtime_info_date_month;
+
+	public static String	tourtime_info_date_week;
 	public static String		tourtime_info_distance;
 	public static String		tourtime_info_driving_time;
 	public static String		tourtime_info_recording_time;
+	public static String		tourtime_info_time;
 	public static String		tourtime_info_title;
 	public static String		tourtime_info_tour_type;
+	public static String		tourtime_info_week;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

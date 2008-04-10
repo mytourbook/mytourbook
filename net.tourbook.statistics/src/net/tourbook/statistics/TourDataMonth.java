@@ -28,4 +28,8 @@ public class TourDataMonth {
 	int[][]		fTimeLow;
 	int[][]		fTimeHigh;
 
+	int[][]		fRecordingTime;
+	int[][]		fDrivingTime;
+	int[][]		fBreakTime;
+
 }

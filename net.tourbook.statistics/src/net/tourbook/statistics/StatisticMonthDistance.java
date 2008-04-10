@@ -20,18 +20,13 @@ import net.tourbook.chart.ChartDataModel;
 public class StatisticMonthDistance extends StatisticMonth {
 
 	@Override
-	void updateChart(final TourDataMonth tourMonthData) {
+	ChartDataModel updateChart() {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
-		createXDataMonths(tourMonthData, chartDataModel);
-		createYDataDistance(tourMonthData, chartDataModel);
+		createXDataMonths(chartDataModel);
+		createYDataDistance(chartDataModel);
 
-		if (fIsSynchScaleEnabled) {
-			fMinMaxKeeper.setMinMaxValues(chartDataModel);
-		}
-
-		// show the fDataModel in the chart
-		fChart.updateChart(chartDataModel);
+		return chartDataModel;
 	}
 }

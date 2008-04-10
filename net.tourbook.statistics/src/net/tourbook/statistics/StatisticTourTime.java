@@ -15,7 +15,9 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
+import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Formatter;
 import java.util.GregorianCalendar;
 
 import net.tourbook.chart.BarChartMinMaxKeeper;
@@ -34,6 +36,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -52,6 +55,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	private int							fNumberOfYears;
 
 	private final Calendar				fCalendar		= GregorianCalendar.getInstance();
+	private DateFormat					fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private Chart						fChart;
 	private TourTimeData				fTourTimeData;
@@ -62,7 +66,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	private IPostSelectionProvider		fPostSelectionProvider;
 
 	private Long						fSelectedTourId;
-	protected int						fCurrentMonth;
+	private int							fCurrentMonth;
 
 	@Override
 	public void activateActions(final IWorkbenchPartSite partSite) {
@@ -337,6 +341,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				final int tourDOY = tourDOYValues[valueIndex];
 				fCalendar.set(oldestYear, 0, 1);
 				fCalendar.set(Calendar.DAY_OF_YEAR, tourDOY + 1);
+				String beginDate = fDateFormatter.format(fCalendar.getTime());
 
 				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
 				fSelectedTourId = fTourTimeData.fTourIds[valueIndex];
@@ -351,13 +356,15 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				int breakTime = recordingTime - drivingTime;
 
 				StringBuilder toolTipFormat = new StringBuilder();
-				toolTipFormat.append(Messages.tourtime_info_date_format);
+				toolTipFormat.append(Messages.tourtime_info_date_day);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_distance);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_altitude);
 				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(Messages.tourtime_info_time);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_recording_time);
 				toolTipFormat.append(NEW_LINE);
@@ -368,35 +375,33 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_tour_type);
 
-//				final String toolTipLabel = new Formatter().format(toolTipFormat.toString(),
-//				//
-//						fCalendar.get(Calendar.DAY_OF_MONTH),
-//						fCalendar.get(Calendar.MONTH) + 1,
-//						fCalendar.get(Calendar.YEAR),
-//						//
-//						startValue[valueIndex] / 3600,
-//						(startValue[valueIndex] % 3600) / 60,
-//						endValue[valueIndex] / 3600,
-//						(endValue[valueIndex] % 3600) / 60,
-//						//
-//						fTourTimeData.fTourDistanceValues[valueIndex],
-//						UI.UNIT_LABEL_DISTANCE,
-//						//
-//						fTourTimeData.fTourAltitudeValues[valueIndex],
-//						UI.UNIT_LABEL_ALTITUDE,
-//						//
-//						recordingTime / 3600,
-//						(recordingTime % 3600) / 60,
-//						//
-//						drivingTime / 3600,
-//						(drivingTime % 3600) / 60,
-//						//
-//						breakTime / 3600,
-//						(breakTime % 3600) / 60,
-//						//						//
-//						tourTypeName//
-//				)
-//						.toString();
+				final String toolTipLabel = new Formatter().format(toolTipFormat.toString(),
+				//
+						beginDate,
+						//
+						fTourTimeData.fTourDistanceValues[valueIndex],
+						UI.UNIT_LABEL_DISTANCE,
+						//
+						fTourTimeData.fTourAltitudeValues[valueIndex],
+						UI.UNIT_LABEL_ALTITUDE,
+						//
+						startValue[valueIndex] / 3600,
+						(startValue[valueIndex] % 3600) / 60,
+						endValue[valueIndex] / 3600,
+						(endValue[valueIndex] % 3600) / 60,
+						//
+						recordingTime / 3600,
+						(recordingTime % 3600) / 60,
+						//
+						drivingTime / 3600,
+						(drivingTime % 3600) / 60,
+						//
+						breakTime / 3600,
+						(breakTime % 3600) / 60,
+						//					
+						tourTypeName//
+				)
+						.toString();
 
 				/*
 				 * create tool tip info
@@ -408,8 +413,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 				ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 				toolTipInfo.setTitle(tourTitle);
-//				toolTipInfo.setLabel(toolTipLabel);
-				toolTipInfo.setLabel(toolTipFormat.toString());
+				toolTipInfo.setLabel(toolTipLabel);
+//				toolTipInfo.setLabel(toolTipFormat.toString());
 
 				return toolTipInfo;
 			}

@@ -43,21 +43,21 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticWeek extends YearStatistic {
 
-	Chart					fChart;
-	BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
+	private Chart					fChart;
+	private BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
 
-	private TourPerson		fActivePerson;
-	TourTypeFilter			fActiveTourTypeFilter;
+	private TourPerson				fActivePerson;
+	private TourTypeFilter			fActiveTourTypeFilter;
 
-	int						fCurrentYear;
-	int						fNumberOfYears;
+	private int						fCurrentYear;
+	private int						fNumberOfYears;
 
-	boolean					fIsSynchScaleEnabled;
+	private boolean					fIsSynchScaleEnabled;
 
-	private final Calendar	fCalendar		= GregorianCalendar.getInstance();
-	private DateFormat		fDateFormatter	= DateFormat.getDateInstance(DateFormat.SHORT);
+	private final Calendar			fCalendar		= GregorianCalendar.getInstance();
+	private DateFormat				fDateFormatter	= DateFormat.getDateInstance(DateFormat.SHORT);
 
-	TourDataWeek			fTourWeekData;
+	private TourDataWeek			fTourWeekData;
 
 	@Override
 	public void activateActions(IWorkbenchPartSite partSite) {
@@ -134,7 +134,6 @@ public abstract class StatisticWeek extends YearStatistic {
 		final int weekWeekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
 
 		String beginDate = fDateFormatter.format(calendar.getTime());
-
 		calendar.add(Calendar.DAY_OF_MONTH, 6);
 		String endDate = fDateFormatter.format(calendar.getTime());
 
@@ -159,9 +158,9 @@ public abstract class StatisticWeek extends YearStatistic {
 		 * tool tip: label
 		 */
 		StringBuilder toolTipFormat = new StringBuilder();
-		toolTipFormat.append("Week:\t\t%d / %d");
+		toolTipFormat.append(Messages.tourtime_info_week);
 		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append("Date:\t\t%s - %s");
+		toolTipFormat.append(Messages.tourtime_info_date_week);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_distance);
@@ -371,7 +370,7 @@ public abstract class StatisticWeek extends YearStatistic {
 
 		ChartDataModel chartDataModel = createChartDataModel();
 
-		setChartProviders(fChart, chartDataModel);
+		setChartProviders(chartDataModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartDataModel);
@@ -425,7 +424,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		return isSelected;
 	}
 
-	void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
+	private void setChartProviders(final ChartDataModel chartModel) {
 
 		// set tool tip info
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {

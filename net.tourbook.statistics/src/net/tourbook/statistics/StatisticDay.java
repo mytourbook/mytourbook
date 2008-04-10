@@ -65,7 +65,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	int						fNumberOfYears;
 
 	Calendar				fCalendar		= GregorianCalendar.getInstance();
-	private DateFormat		fDateFormatter	= DateFormat.getDateInstance(DateFormat.SHORT);
+	private DateFormat		fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	IPostSelectionProvider	fPostSelectionProvider;
 
@@ -214,15 +214,15 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		int breakTime = recordingTime - drivingTime;
 
 		StringBuilder toolTipFormat = new StringBuilder();
-		toolTipFormat.append("Date:\t\t%s");
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append("Time:\t\t%d:%02d-%d:%02d");
+		toolTipFormat.append(Messages.tourtime_info_date_day);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_distance);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_altitude);
 		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_time);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_recording_time);
 		toolTipFormat.append(NEW_LINE);
@@ -237,14 +237,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		//
 				beginDate,
 				//
-				// start time
-				startValue[valueIndex] / 3600,
-				(startValue[valueIndex] % 3600) / 60,
-				//
-				// end time
-				endValue[valueIndex] / 3600,
-				(endValue[valueIndex] % 3600) / 60,
-				//
 				// distance
 				fTourDayData.fTourDistanceValues[valueIndex],
 				UI.UNIT_LABEL_DISTANCE,
@@ -252,6 +244,14 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				// altitude
 				fTourDayData.fTourAltitudeValues[valueIndex],
 				UI.UNIT_LABEL_ALTITUDE,
+				//
+				// start time
+				startValue[valueIndex] / 3600,
+				(startValue[valueIndex] % 3600) / 60,
+				//
+				// end time
+				endValue[valueIndex] / 3600,
+				(endValue[valueIndex] % 3600) / 60,
 				//
 				recordingTime / 3600,
 				(recordingTime % 3600) / 60,

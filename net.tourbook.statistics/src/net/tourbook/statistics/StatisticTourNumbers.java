@@ -304,8 +304,9 @@ public class StatisticTourNumbers extends YearStatistic {
 
 				if (valueIndex == 0) {
 
-					infoText.append(Messages.NUMBERS_ALTITUDE_DOWN);
-					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
+					infoText.append(Messages.numbers_info_altitude_down);
+					infoText.append(NEW_LINE);
+					infoText.append(Messages.numbers_info_altitude_total);
 
 					toolTipLabel = new Formatter().format(infoText.toString(),
 							fStatAltitudeUnits[valueIndex],
@@ -317,8 +318,9 @@ public class StatisticTourNumbers extends YearStatistic {
 
 				} else if (valueIndex == fStatAltitudeUnits.length - 1) {
 
-					infoText.append(Messages.NUMBERS_ALTITUDE_UP);
-					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
+					infoText.append(Messages.numbers_info_altitude_up);
+					infoText.append(NEW_LINE);
+					infoText.append(Messages.numbers_info_altitude_total);
 
 					toolTipLabel = new Formatter().format(infoText.toString(),
 							fStatAltitudeUnits[valueIndex - 1],
@@ -329,8 +331,9 @@ public class StatisticTourNumbers extends YearStatistic {
 							UI.UNIT_LABEL_ALTITUDE).toString();
 				} else {
 
-					infoText.append(Messages.NUMBERS_ALTITUDE_BETWEEN);
-					infoText.append(Messages.NUMBERS_ALTITUDE_TOTAL);
+					infoText.append(Messages.numbers_info_altitude_between);
+					infoText.append(NEW_LINE);
+					infoText.append(Messages.numbers_info_altitude_total);
 
 					toolTipLabel = new Formatter().format(infoText.toString(),
 							fStatAltitudeUnits[valueIndex - 1],
@@ -358,8 +361,9 @@ public class StatisticTourNumbers extends YearStatistic {
 
 				if (valueIndex == 0) {
 
-					infoText.append(Messages.NUMBERS_DISTANCE_DOWN);
-					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
+					infoText.append(Messages.numbers_info_distance_down);
+					infoText.append(NEW_LINE);
+					infoText.append(Messages.numbers_info_distance_total);
 
 					toolTipLabel = new Formatter().format(infoText.toString(),
 							fStatDistanceUnits[valueIndex],
@@ -370,8 +374,9 @@ public class StatisticTourNumbers extends YearStatistic {
 
 				} else if (valueIndex == fStatDistanceUnits.length - 1) {
 
-					infoText.append(Messages.NUMBERS_DISTANCE_UP);
-					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
+					infoText.append(Messages.numbers_info_distance_up);
+					infoText.append(NEW_LINE);
+					infoText.append(Messages.numbers_info_distance_total);
 
 					toolTipLabel = new Formatter().format(infoText.toString(),
 							fStatDistanceUnits[valueIndex - 1],
@@ -381,8 +386,9 @@ public class StatisticTourNumbers extends YearStatistic {
 							UI.UNIT_LABEL_DISTANCE).toString();
 				} else {
 
-					infoText.append(Messages.NUMBERS_DISTANCE_BETWEEN);
-					infoText.append(Messages.NUMBERS_DISTANCE_TOTAL);
+					infoText.append(Messages.numbers_info_distance_between);
+					infoText.append(NEW_LINE);
+					infoText.append(Messages.numbers_info_distance_total);
 
 					toolTipLabel = new Formatter().format(infoText.toString(),
 							fStatDistanceUnits[valueIndex - 1],
@@ -409,8 +415,9 @@ public class StatisticTourNumbers extends YearStatistic {
 
 				if (valueIndex == 0) {
 
-					toolTipFormat.append(Messages.NUMBERS_TIME_DOWN);
-					toolTipFormat.append(Messages.NUMBERS_TIME_TOTAL);
+					toolTipFormat.append(Messages.numbers_info_time_down);
+					toolTipFormat.append(NEW_LINE);
+					toolTipFormat.append(Messages.numbers_info_time_total);
 
 					toolTipLabel = new Formatter().format(toolTipFormat.toString(),
 							ChartUtil.formatValue(fStatTimeUnits[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
@@ -420,8 +427,9 @@ public class StatisticTourNumbers extends YearStatistic {
 
 				} else if (valueIndex == fStatTimeUnits.length - 1) {
 
-					toolTipFormat.append(Messages.NUMBERS_TIME_UP);
-					toolTipFormat.append(Messages.NUMBERS_TIME_TOTAL);
+					toolTipFormat.append(Messages.numbers_info_time_up);
+					toolTipFormat.append(NEW_LINE);
+					toolTipFormat.append(Messages.numbers_info_time_total);
 
 					toolTipLabel = new Formatter().format(toolTipFormat.toString(),
 							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
@@ -431,8 +439,9 @@ public class StatisticTourNumbers extends YearStatistic {
 							.toString();
 				} else {
 
-					toolTipFormat.append(Messages.NUMBERS_TIME_BETWEEN);
-					toolTipFormat.append(Messages.NUMBERS_TIME_TOTAL);
+					toolTipFormat.append(Messages.numbers_info_time_between);
+					toolTipFormat.append(NEW_LINE);
+					toolTipFormat.append(Messages.numbers_info_time_total);
 
 					toolTipLabel = new Formatter().format(toolTipFormat.toString(),
 							ChartUtil.formatValue(fStatTimeUnits[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
