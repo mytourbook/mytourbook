@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry excluding="src/" kind="src" path=""/>
+	<classpathentry exported="true" kind="lib" path="joda-time-1.5.2.jar" sourcepath="M:/jave-external-source/joda-time/joda-time-1.5.2-src/src/java"/>
 	<classpathentry exported="true" kind="lib" path="persistence.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

@@ -252,7 +252,7 @@ public class TourDatabase {
 	 */
 	public static String getTourTypeName(long typeId) {
 
-		String tourTypeName = UI.EMPTY_STRING;
+		String tourTypeName = Messages.ui_tour_not_defined;
 
 		for (TourType tourType : getTourTypes()) {
 			if (tourType.getTypeId() == typeId) {

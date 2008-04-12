@@ -64,6 +64,8 @@ public class Messages extends NLS {
 	public static String	tourtime_info_date_month;
 
 	public static String	tourtime_info_date_week;
+
+	public static String	tourtime_info_date_year;
 	public static String		tourtime_info_distance;
 	public static String		tourtime_info_driving_time;
 	public static String		tourtime_info_recording_time;

@@ -998,10 +998,10 @@ public class ChartComponents extends Composite {
 
 		switch (event.keyCode) {
 		case SWT.ARROW_RIGHT:
-			selectedIndex[0] = fComponentGraph.selectNextBarItem();
+			selectedIndex[0] = fComponentGraph.selectBarItemNext();
 			break;
 		case SWT.ARROW_LEFT:
-			selectedIndex[0] = fComponentGraph.selectPreviousBarItem();
+			selectedIndex[0] = fComponentGraph.selectBarItemPrevious();
 			break;
 		}
 

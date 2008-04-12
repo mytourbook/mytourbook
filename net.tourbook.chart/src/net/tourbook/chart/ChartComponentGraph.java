@@ -3286,7 +3286,7 @@ public class ChartComponentGraph extends Canvas {
 		if (fToolTipShell.isVisible()) {
 
 			/*
-			 * when hiding the tooltip reposition the tooltip the next time when the tool tip is
+			 * when hiding the tooltip, reposition the tooltip the next time when the tool tip is
 			 * displayed
 			 */
 			fToolTipInfo.setReposition(true);
@@ -3399,6 +3399,30 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Check if the tooltip is too far away from the cursor position
+	 * 
+	 * @return Returns <code>true</code> when the cursor is too far away
+	 */
+	private boolean isToolTipWrongPositioned() {
+
+		final Point cursorLocation = getDisplay().getCursorLocation();
+		final Point toolTipLocation = fToolTipShell.getLocation();
+
+		int cursorAreaLength = 50;
+
+		Rectangle cursorArea = new Rectangle(cursorLocation.x - cursorAreaLength,
+				cursorLocation.y - cursorAreaLength,
+				2 * cursorAreaLength,
+				2 * cursorAreaLength);
+
+		if (cursorArea.contains(toolTipLocation)) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	private ChartXSlider isXSliderHit(final int devYMouse, final int devXGraph) {
@@ -4108,7 +4132,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * select the next bar item
 	 */
-	int selectNextBarItem() {
+	int selectBarItemNext() {
 
 		int selectedIndex = Chart.NO_BAR_SELECTION;
 
@@ -4156,7 +4180,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * select the previous bar item
 	 */
-	int selectPreviousBarItem() {
+	int selectBarItemPrevious() {
 
 		int selectedIndex = Chart.NO_BAR_SELECTION;
 
@@ -4330,9 +4354,10 @@ public class ChartComponentGraph extends Canvas {
 
 					// a bar item is not selected, select first
 
-					fSelectedBarItems[0] = true;
-
-					fChart.fireBarSelectionEvent(0, 0);
+// disabled, 11.4.2008 wolfgang					
+//					fSelectedBarItems[0] = true;
+//
+//					fChart.fireBarSelectionEvent(0, 0);
 
 				} else {
 
@@ -4401,6 +4426,32 @@ public class ChartComponentGraph extends Canvas {
 		graphZoomParts = 1;
 
 		redrawBarSelection();
+	}
+
+	/**
+	 * Position the tooltip and ensure that it is not located off the screen.
+	 */
+	private void setToolTipPosition() {
+
+		final Point cursorLocation = getDisplay().getCursorLocation();
+
+		// Assuming cursor is 21x21 because this is the size of
+		// the arrow cursor on Windows
+		final int cursorHeight = 21;
+
+		final Point tooltipSize = fToolTipShell.getSize();
+		final Rectangle monitorRect = getMonitor().getBounds();
+		final Point pt = new Point(cursorLocation.x, cursorLocation.y + cursorHeight + 2);
+
+		pt.x = Math.max(pt.x, monitorRect.x);
+		if (pt.x + tooltipSize.x > monitorRect.x + monitorRect.width) {
+			pt.x = monitorRect.x + monitorRect.width - tooltipSize.x;
+		}
+		if (pt.y + tooltipSize.y > monitorRect.y + monitorRect.height) {
+			pt.y = cursorLocation.y - 2 - tooltipSize.y;
+		}
+
+		fToolTipShell.setLocation(pt);
 	}
 
 	/**
@@ -4768,9 +4819,10 @@ public class ChartComponentGraph extends Canvas {
 		if (tooltip.isDisplayed()) {
 
 			// reposition the tool tip when necessary
-			if (tooltip.isReposition()) {
+			if (tooltip.isReposition() || isToolTipWrongPositioned()) {
 				setToolTipPosition();
 			}
+
 			return true;
 		}
 
@@ -4809,31 +4861,6 @@ public class ChartComponentGraph extends Canvas {
 		setToolTipPosition();
 
 		return true;
-	}
-
-	/**
-	 * Position the tooltip and ensure that it is not located off the screen.
-	 */
-	private void setToolTipPosition() {
-
-		final Point cursorLocation = getDisplay().getCursorLocation();
-
-		// Assuming cursor is 21x21 because this is the size of
-		// the arrow cursor on Windows
-		final int cursorHeight = 21;
-		final Point size = fToolTipShell.getSize();
-		final Rectangle rect = getMonitor().getBounds();
-		final Point pt = new Point(cursorLocation.x, cursorLocation.y + cursorHeight + 2);
-
-		pt.x = Math.max(pt.x, rect.x);
-		if (pt.x + size.x > rect.x + rect.width) {
-			pt.x = rect.x + rect.width - size.x;
-		}
-		if (pt.y + size.y > rect.y + rect.height) {
-			pt.y = cursorLocation.y - 2 - size.y;
-		}
-
-		fToolTipShell.setLocation(pt);
 	}
 
 	/**

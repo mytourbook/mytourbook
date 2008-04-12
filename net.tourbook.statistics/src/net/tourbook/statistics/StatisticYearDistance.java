@@ -17,44 +17,17 @@
 package net.tourbook.statistics;
 
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartDataSerie;
-import net.tourbook.chart.ChartDataXSerie;
-import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.colors.GraphColorProvider;
-import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 public class StatisticYearDistance extends StatisticYear {
 
 	@Override
-	void updateChart(final TourDataYear tourDataYear, TourTypeFilter tourTypeFilter) {
+	ChartDataModel updateChart() {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
-		// set the x-axis
-		final ChartDataXSerie xData = new ChartDataXSerie(createYearData(tourDataYear));
-		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_YEAR);
-		xData.setChartSegments(createChartSegments(tourDataYear));
-		chartDataModel.setXData(xData);
+		createXDataYear(chartDataModel);
+		createYDataDistance(chartDataModel);
 
-		// distance
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
-				ChartDataYSerie.BAR_LAYOUT_BESIDE,
-				tourDataYear.fDistanceLow,
-				tourDataYear.fDistanceHigh);
-		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		chartDataModel.addYData(yData);
-		StatisticServices.setTourTypeColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE, tourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, tourDataYear.fTypeIds, tourTypeFilter);
-		StatisticServices.setDefaultColors(yData, GraphColorProvider.PREF_GRAPH_DISTANCE);
-
-		if (fIsSynchScaleEnabled) {
-			fMinMaxKeeper.setMinMaxValues(chartDataModel);
-		}
-
-		// show the fDataModel in the chart
-		fChart.updateChart(chartDataModel);
+		return chartDataModel;
 	}
 }

@@ -494,6 +494,8 @@ public class Messages extends NLS {
 
 	public static String		UI_Label_no_chart_is_selected;
 
+	public static String	ui_tour_not_defined;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

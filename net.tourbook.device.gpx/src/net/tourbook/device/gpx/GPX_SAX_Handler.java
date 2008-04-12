@@ -67,7 +67,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private static final SimpleDateFormat	GPX_TIME_FORMAT			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
 	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");	//$NON-NLS-1$
-
+//																							yyyy-MM-dd'T'HH:mm:ss'Z'
 	private int								fGpxVersion				= -1;
 	//	private boolean							fInWpt					= false;
 	private boolean							fInTrk					= false;
@@ -103,11 +103,16 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private boolean							fIsError				= false;
 
 	{
-		GPX_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
+//		GPX_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
+//		GPX_TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
+		GPX_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
+		GPX_TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 	}
 
-	public GPX_SAX_Handler(TourbookDevice deviceDataReader, String importFileName, DeviceData deviceData,
-			HashMap<String, TourData> tourDataMap) {
+	public GPX_SAX_Handler(	TourbookDevice deviceDataReader,
+							String importFileName,
+							DeviceData deviceData,
+							HashMap<String, TourData> tourDataMap) {
 
 		fDeviceDataReader = deviceDataReader;
 		fImportFileName = importFileName;
@@ -184,22 +189,24 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 			if (fInTrkPt) {
 
+				final String timeString = fCharacters.toString();
+
 				if (name.equals(TAG_ELE)) {
 
 					fIsInEle = false;
 
-					fTimeData.absoluteAltitude = getFloatValue(fCharacters.toString());
+					fTimeData.absoluteAltitude = getFloatValue(timeString);
 
 				} else if (name.equals(TAG_TIME)) {
 
 					fIsInTime = false;
 
 					try {
-						fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT.parse(fCharacters.toString()).getTime();
+						fCurrentTime = GPX_TIME_FORMAT.parse(timeString).getTime();
+						fTimeData.absoluteTime = fCurrentTime;
 					} catch (ParseException e) {
 						try {
-							fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_RFC822.parse(fCharacters.toString())
-									.getTime();
+							fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_RFC822.parse(timeString).getTime();
 						} catch (ParseException e2) {
 							MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage()); //$NON-NLS-1$
 //							e2.printStackTrace();

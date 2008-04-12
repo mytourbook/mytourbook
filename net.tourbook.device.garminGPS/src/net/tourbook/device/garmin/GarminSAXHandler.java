@@ -38,9 +38,6 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final String			TRAINING_CENTER_DATABASE_V1	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1"; //$NON-NLS-1$
 	private static final String			TRAINING_CENTER_DATABASE_V2	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"; //$NON-NLS-1$
 
-//	private static double				MATH_PI2				= Math.PI / 2;
-//	private static double				DEGREE_TO_RAD				= Math.PI / 180;
-
 	private static final String			TAG_DATABASE				= "TrainingCenterDatabase";									//$NON-NLS-1$
 	private static final String			TAG_ACTIVITY				= "Activity";													//$NON-NLS-1$
 	private static final String			TAG_COURSE					= "Course";													//$NON-NLS-1$
@@ -86,7 +83,6 @@ public class GarminSAXHandler extends DefaultHandler {
 	private boolean						fSetLapMarker				= false;
 	private boolean						fSetLapStartTime			= false;
 	private ArrayList<Long>				fLapStart;
-//	private ArrayList<Long>				fLapEnd;
 
 	private boolean						fIsImported;
 	private long						fCurrentTime;
@@ -97,8 +93,10 @@ public class GarminSAXHandler extends DefaultHandler {
 		iso.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
 	}
 
-	public GarminSAXHandler(TourbookDevice deviceDataReader, String importFileName, DeviceData deviceData,
-			HashMap<String, TourData> tourDataMap) {
+	public GarminSAXHandler(TourbookDevice deviceDataReader,
+							String importFileName,
+							DeviceData deviceData,
+							HashMap<String, TourData> tourDataMap) {
 
 		fDeviceDataReader = deviceDataReader;
 		fImportFileName = importFileName;

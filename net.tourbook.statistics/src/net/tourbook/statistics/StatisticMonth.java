@@ -55,6 +55,7 @@ public abstract class StatisticMonth extends YearStatistic {
 	private final BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
 
 	private boolean						fIsSynchScaleEnabled;
+
 	private final Calendar				fCalendar		= GregorianCalendar.getInstance();
 	private DateFormat					fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 

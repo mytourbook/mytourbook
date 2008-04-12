@@ -40,6 +40,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 
 public abstract class StatisticWeek extends YearStatistic {
 
@@ -55,7 +57,7 @@ public abstract class StatisticWeek extends YearStatistic {
 	private boolean					fIsSynchScaleEnabled;
 
 	private final Calendar			fCalendar		= GregorianCalendar.getInstance();
-	private DateFormat				fDateFormatter	= DateFormat.getDateInstance(DateFormat.SHORT);
+	private DateFormat				fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private TourDataWeek			fTourWeekData;
 
@@ -125,17 +127,16 @@ public abstract class StatisticWeek extends YearStatistic {
 
 		int oldestYear = fCurrentYear - fNumberOfYears + 1;
 
-		Calendar calendar = GregorianCalendar.getInstance();
+		DateTime dt = (new DateTime()).withYear(oldestYear)
+				.withWeekOfWeekyear(1)
+				.withDayOfWeek(DateTimeConstants.MONDAY)
+				.plusWeeks(valueIndex);
 
-		calendar.set(Calendar.YEAR, oldestYear);
-		calendar.set(Calendar.WEEK_OF_YEAR, valueIndex + 1);
+		final int weekYear = dt.getWeekyear();
+		final int weekOfYear = dt.getWeekOfWeekyear();
 
-		final int weekYear = calendar.get(Calendar.YEAR);
-		final int weekWeekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
-
-		String beginDate = fDateFormatter.format(calendar.getTime());
-		calendar.add(Calendar.DAY_OF_MONTH, 6);
-		String endDate = fDateFormatter.format(calendar.getTime());
+		String beginDate = fDateFormatter.format(dt.toDate());
+		String endDate = fDateFormatter.format(dt.plusDays(6).toDate());
 
 		final Integer recordingTime = fTourWeekData.fRecordingTime[serieIndex][valueIndex];
 		final Integer drivingTime = fTourWeekData.fDrivingTime[serieIndex][valueIndex];
@@ -176,7 +177,7 @@ public abstract class StatisticWeek extends YearStatistic {
 
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
 				//
-				weekWeekOfYear,
+				weekOfYear,
 				weekYear,
 				//
 				beginDate,
@@ -212,51 +213,61 @@ public abstract class StatisticWeek extends YearStatistic {
 		return toolTipInfo;
 	}
 
-//	private void debugWeekNumber() {
-//
-//		Calendar calendar1 = GregorianCalendar.getInstance();
-//		Calendar calendar2 = GregorianCalendar.getInstance();
-//		Calendar calendar3 = GregorianCalendar.getInstance();
-//
-//		final int firstYear = 2000;
-//
-//		calendar2.set(firstYear, 0, 1);
-//		calendar3.set(firstYear, 11, 26);
-//
-//		for (int currentYear = firstYear; currentYear <= 2010; currentYear++) {
-//
-//			calendar1.set(Calendar.YEAR, currentYear);
-//			calendar1.set(Calendar.WEEK_OF_YEAR, 1);
-//			printDayAndWeek(calendar1);
-//			System.out.print("\t");
-//
-//			printDayAndWeek(calendar2);
-//			System.out.print("\t");
-//			System.out.print("\t");
-//
-//			printDayAndWeek(calendar3);
-//
-//			System.out.println();
-//
-//			calendar2.add(Calendar.MONTH, 12);
-//			calendar3.add(Calendar.MONTH, 12);
-//
-//		}
-//
-//		System.out.println();
-//	}
-//
-//	private void printDayAndWeek(Calendar calendar2) {
-//		System.out.print(calendar2.get(Calendar.DAY_OF_MONTH)
-//				+ "."
-//				+ (calendar2.get(Calendar.MONTH) + 1)
-//				+ "."
-//				+ calendar2.get(Calendar.YEAR)
-//				+ " - "
-//				+ calendar2.get(Calendar.WEEK_OF_YEAR)
-//		//
-//		);
-//	}
+	private void debugWeekNumber() {
+
+		final int firstYear = 2000;
+
+		DateTime dt = (new DateTime()).withYear(firstYear)
+				.withWeekOfWeekyear(1)
+				.withDayOfWeek(DateTimeConstants.MONDAY);
+
+		Calendar calendar = GregorianCalendar.getInstance();
+//		calendar.setFirstDayOfWeek(4);
+
+		for (int currentYear = firstYear; currentYear <= 2010; currentYear++) {
+
+//			dt = dt.withYear(currentYear).withWeekOfWeekyear(1).withDayOfWeek(DateTimeConstants.MONDAY);
+			dt = dt.withYear(currentYear).withMonthOfYear(1).withDayOfYear(1);
+
+			calendar.set(currentYear, 0, 1);
+
+			printDayAndWeek(currentYear, dt, calendar);
+
+		}
+
+		System.out.println();
+	}
+
+	private void printDayAndWeek(int currentYear, DateTime dt, Calendar calendar) {
+
+		System.out.print(//
+//				currentYear
+//				+ ": "
+		+dt.getDayOfMonth() //
+				+ "."
+				+ dt.getMonthOfYear()
+				+ "."
+				+ dt.getYear()
+				+ "-"
+				+ dt.getWeekOfWeekyear()
+				+ "-"
+				+ dt.weekOfWeekyear().getMaximumValue()
+				+ "\t"
+		//
+		);
+
+		System.out.println(calendar.get(Calendar.DAY_OF_MONTH)
+				+ "."
+				+ (calendar.get(Calendar.MONTH) + 1)
+				+ "."
+				+ calendar.get(Calendar.YEAR)
+				+ " - "
+				+ calendar.get(Calendar.WEEK_OF_YEAR)
+				+ " - "
+				+ calendar.getActualMaximum(Calendar.WEEK_OF_YEAR)
+		//
+		);
+	}
 
 	private int[] createWeekData() {
 
@@ -267,7 +278,7 @@ public abstract class StatisticWeek extends YearStatistic {
 			allWeeks[weekIndex] = weekIndex;
 		}
 
-//		debugWeekNumber();
+		debugWeekNumber();
 
 		return allWeeks;
 	}
@@ -362,6 +373,9 @@ public abstract class StatisticWeek extends YearStatistic {
 				currentYear,
 				numberOfYears,
 				isDataDirtyWithReset() || refreshData);
+
+		final int[][] timeHigh = fTourWeekData.fTimeHigh;
+		timeHigh[timeHigh.length - 1][0] = 20 * 60 * 60;
 
 		// reset min/max values
 		if (fIsSynchScaleEnabled == false && refreshData) {

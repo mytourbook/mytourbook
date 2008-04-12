@@ -17,6 +17,7 @@ package net.tourbook.statistics;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -32,8 +33,6 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 
 public abstract class YearStatistic extends TourbookStatistic implements IYearStatistic {
-
-	private static final String		EMPTY_STRING	= "";
 
 	private IPropertyChangeListener	fPrefChangeListener;
 
@@ -91,8 +90,9 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 		}
 
 		if (serieIndex - colorOffset < 0) {
-			return EMPTY_STRING;
+			return Messages.ui_tour_not_defined;
 		}
+
 		ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		String tourTypeName = TourDatabase.getTourTypeName(tourTypeList.get(serieIndex - colorOffset).getTypeId());
 

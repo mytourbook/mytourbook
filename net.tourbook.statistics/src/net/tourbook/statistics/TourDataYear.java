@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.statistics;
 
-
 public class TourDataYear {
 
 	long[][]	fTypeIds;
@@ -30,10 +29,8 @@ public class TourDataYear {
 	int[][]		fTimeLow;
 	int[][]		fTimeHigh;
 
-//	/**
-//	 * {@link TourType}'s which are active, retrieved from
-//	 * {@link TourTypeFilter#getActiveTourTypes(ArrayList)}
-//	 */
-//	ArrayList<TourType>	activeTourTypes;
+	int[][]		fRecordingTime;
+	int[][]		fDrivingTime;
+	int[][]		fBreakTime;
 
 }

@@ -22,6 +22,8 @@ import java.util.GregorianCalendar;
 import net.tourbook.data.TourPerson;
 import net.tourbook.ui.TourTypeFilter;
 
+import org.joda.time.DateTime;
+
 public abstract class DataProvider {
 
 	TourPerson		fActivePerson;
@@ -114,20 +116,17 @@ public abstract class DataProvider {
 		fYearDays = new int[fNumberOfYears];
 		fYearWeeks = new int[fNumberOfYears];
 
+		final int firstYear = fLastYear - fNumberOfYears + 1;
+		DateTime dt = new DateTime(firstYear, 1, 1, 0, 0, 0, 0);
+
 		int yearIndex = 0;
-		for (int currentYear = fLastYear - fNumberOfYears + 1; currentYear <= fLastYear; currentYear++) {
+		for (int currentYear = firstYear; currentYear <= fLastYear; currentYear++) {
+
+			dt = dt.withYear(currentYear);
 
 			fYears[yearIndex] = currentYear;
-
-			fCalendar.set(currentYear, 11, 31);
-			fYearDays[yearIndex] = fCalendar.get(Calendar.DAY_OF_YEAR);
-
-			/*
-			 * January 1st has always the week number 1, the week number 1 can start in the previous
-			 * year
-			 */
-			fCalendar.set(currentYear, 11, 25);
-			fYearWeeks[yearIndex] = fCalendar.get(Calendar.WEEK_OF_YEAR);
+			fYearDays[yearIndex] = dt.dayOfYear().getMaximumValue();
+			fYearWeeks[yearIndex] = dt.weekOfWeekyear().getMaximumValue();
 
 			yearIndex++;
 		}
