@@ -222,6 +222,7 @@ public class GarminExternalDevice extends ExternalDevice {
 							runnable = new Runnable() {
 								@Override
 								public void run() {
+									ex.printStackTrace();
 									ErrorDialog.openError(display.getActiveShell(),
 											Messages.Garmin_data_transfer_error, Messages.Garmin_error_receiving_data,
 											new Status(Status.ERROR,
