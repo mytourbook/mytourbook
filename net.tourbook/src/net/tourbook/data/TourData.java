@@ -1366,7 +1366,7 @@ public class TourData {
 			isPulse = true;
 		}
 
-		if (firstTimeDataItem.cadence != Integer.MIN_VALUE) {
+		if (firstTimeDataItem.cadence != Integer.MIN_VALUE || isAbsoluteData) {
 			cadenceSerie = new int[serieLength];
 			isCadence = true;
 		}
@@ -1389,7 +1389,21 @@ public class TourData {
 		}
 
 		// check if GPS data are available
+		boolean isGPS = false;
 		if (firstTimeDataItem.latitude != Double.MIN_VALUE) {
+			isGPS = true;
+		} else {
+
+			// check all data if lat/long is available
+
+			for (TimeData timeDataItem : timeDataList) {
+				if (timeDataItem.latitude != Double.MIN_VALUE) {
+					isGPS = true;
+					break;
+				}
+			}
+		}
+		if (isGPS) {
 			latitudeSerie = new double[serieLength];
 			longitudeSerie = new double[serieLength];
 		}
@@ -1415,6 +1429,7 @@ public class TourData {
 			int altitudeDiff;
 
 			int pulseCounter = 0;
+			int cadenceCounter = 0;
 			int lastValidTime = 0;
 
 			// set initial min/max latitude/longitude
@@ -1512,19 +1527,22 @@ public class TourData {
 				final double latitude = timeData.latitude;
 				final double longitude = timeData.longitude;
 
-				if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
-					latitudeSerie[timeIndex] = lastValidLatitude;
-					longitudeSerie[timeIndex] = lastValidLongitude;
-				} else {
+				if (latitudeSerie != null && longitudeSerie != null) {
 
-					latitudeSerie[timeIndex] = lastValidLatitude = latitude;
-					longitudeSerie[timeIndex] = lastValidLongitude = longitude;
+					if (latitude == Double.MIN_VALUE || longitude == Double.MIN_VALUE) {
+						latitudeSerie[timeIndex] = lastValidLatitude;
+						longitudeSerie[timeIndex] = lastValidLongitude;
+					} else {
+
+						latitudeSerie[timeIndex] = lastValidLatitude = latitude;
+						longitudeSerie[timeIndex] = lastValidLongitude = longitude;
+					}
+
+					mapMinLatitude = Math.min(mapMinLatitude, lastValidLatitude + 90);
+					mapMaxLatitude = Math.max(mapMaxLatitude, lastValidLatitude + 90);
+					mapMinLongitude = Math.min(mapMinLongitude, lastValidLongitude + 180);
+					mapMaxLongitude = Math.max(mapMaxLongitude, lastValidLongitude + 180);
 				}
-
-				mapMinLatitude = Math.min(mapMinLatitude, lastValidLatitude + 90);
-				mapMaxLatitude = Math.max(mapMaxLatitude, lastValidLatitude + 90);
-				mapMinLongitude = Math.min(mapMinLongitude, lastValidLongitude + 180);
-				mapMaxLongitude = Math.max(mapMaxLongitude, lastValidLongitude + 180);
 
 				/*
 				 * pulse
@@ -1533,6 +1551,15 @@ public class TourData {
 				pulseSerie[timeIndex] = pulse;
 				if (pulse >= 0) {
 					pulseCounter++;
+				}
+
+				/*
+				 * cadence
+				 */
+				final int cadence = timeData.cadence;
+				cadenceSerie[timeIndex] = cadence;
+				if (cadence >= 0) {
+					cadenceCounter++;
 				}
 
 				/*
@@ -1555,13 +1582,25 @@ public class TourData {
 			 */
 			if (pulseCounter > 0) {
 				for (int pulseIndex = 0; pulseIndex < pulseSerie.length; pulseIndex++) {
-					final int pulse = pulseSerie[pulseIndex];
-					if (pulse <= 0) {
+					if (pulseSerie[pulseIndex] <= 0) {
 						pulseSerie[pulseIndex] = 0;
 					}
 				}
 			} else {
 				pulseSerie = null;
+			}
+
+			/*
+			 * make sure that all cadence data points have a valid value
+			 */
+			if (cadenceCounter > 0) {
+				for (int cadenceIndex = 0; cadenceIndex < cadenceSerie.length; cadenceIndex++) {
+					if (cadenceSerie[cadenceIndex] <= 0) {
+						cadenceSerie[cadenceIndex] = 0;
+					}
+				}
+			} else {
+				cadenceSerie = null;
 			}
 
 		} else {

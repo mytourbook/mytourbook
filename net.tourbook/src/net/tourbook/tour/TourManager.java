@@ -668,8 +668,10 @@ public class TourManager {
 			 * when time is displayed, the x-axis can show the start time starting from 0 or from
 			 * the current time of the day
 			 */
-			final int startTime = chartConfig.isStartTime ? (tourData.getStartHour() * 3600)
-					+ (tourData.getStartMinute() * 60) : 0;
+			final int startTime = chartConfig.isStartTime ? //
+					(tourData.getStartHour() * 3600) + (tourData.getStartMinute() * 60)
+					: 0;
+
 			xDataTime.setStartValue(startTime);
 
 		} else {

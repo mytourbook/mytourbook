@@ -74,6 +74,8 @@ public class ChartComponents extends Composite {
 	static final int					MARGIN_TOP_WITH_TITLE		= 5;
 	static final int					MARGIN_TOP_WITHOUT_TITLE	= 10;
 
+	private static final int			DAY_IN_SECONDS				= 24 * 60 * 60;
+
 	private final Chart					fChart;
 
 	/**
@@ -339,10 +341,22 @@ public class ChartComponents extends Composite {
 
 				// create unit value/label
 				final int unitPos = graphValue - unitOffset;
-				units.add(new ChartUnit(unitPos, ChartUtil.formatValue(unitPos + xStartValue,
-						xAxisUnit,
-						valueDivisor,
-						false)));
+				int unitLabelValue = unitPos + xStartValue;
+
+				if (xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_SECOND && xStartValue > 0) {
+
+					/*
+					 * x-axis shows day time, start with 0:00 at midnight
+					 */
+
+					unitLabelValue = unitLabelValue % DAY_IN_SECONDS;
+				}
+
+				units.add(new ChartUnit(unitPos, //
+						ChartUtil.formatValue(unitLabelValue, //
+								xAxisUnit,
+								valueDivisor,
+								false)));
 
 				graphValue += unitValue;
 

@@ -120,13 +120,13 @@ public class DataProviderTourWeek extends DataProvider {
 
 			final int firstYear = fLastYear - fNumberOfYears + 1;
 			DateTime dt = new DateTime(firstYear, 1, 1, 0, 0, 0, 0);
-
+//dt.
 			while (result.next()) {
 
 				final int dbYear = result.getInt(1);
 				final int dbWeek = result.getInt(2);
 
-				DateTime dtWeek = dt.withYear(dbYear).withWeekOfWeekyear(dbWeek);
+//				DateTime dtWeek = dt.withYear(dbYear).withWeekOfWeekyear(dbWeek);
 //				dtWeek.
 
 				// get number of weeks for the current year in the db

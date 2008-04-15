@@ -48,6 +48,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final String			TAG_LATITUDE_DEGREES		= "LatitudeDegrees";											//$NON-NLS-1$
 	private static final String			TAG_ALTITUDE_METERS			= "AltitudeMeters";											//$NON-NLS-1$
 	private static final String			TAG_DISTANCE_METERS			= "DistanceMeters";											//$NON-NLS-1$
+	private static final String			TAG_CADENCE					= "Cadence";													//$NON-NLS-1$
 	private static final String			TAG_HEART_RATE_BPM			= "HeartRateBpm";												//$NON-NLS-1$
 	private static final String			TAG_TIME					= "Time";														//$NON-NLS-1$
 	private static final String			TAG_TRACKPOINT				= "Trackpoint";												//$NON-NLS-1$
@@ -67,6 +68,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private boolean						fIsInLongitude				= false;
 	private boolean						fIsInAltitude				= false;
 	private boolean						fIsInDistance				= false;
+	private boolean						fIsInCadence;
 
 	private boolean						fIsInHeartRate				= false;
 	private boolean						fIsInHeartRateValue			= false;
@@ -109,8 +111,9 @@ public class GarminSAXHandler extends DefaultHandler {
 		if (fIsInTime
 				|| fIsInLatitude
 				|| fIsInLongitude
-				|| fIsInDistance
 				|| fIsInAltitude
+				|| fIsInDistance
+				|| fIsInCadence
 				|| fIsInHeartRate
 				|| fIsInHeartRateValue) {
 
@@ -455,6 +458,13 @@ public class GarminSAXHandler extends DefaultHandler {
 					fIsInDistance = false;
 					fTimeData.absoluteDistance = getFloatValue(fCharacters.toString());
 
+				} else if (name.equals(TAG_CADENCE)) {
+
+					fIsInCadence = false;
+					short cadence = getShortValue(fCharacters.toString());
+					cadence = cadence == Integer.MIN_VALUE ? 0 : cadence;
+					fTimeData.cadence = cadence;
+
 				} else if (name.equals(TAG_LATITUDE_DEGREES)) {
 
 					fIsInLatitude = false;
@@ -673,6 +683,10 @@ public class GarminSAXHandler extends DefaultHandler {
 							fIsInDistance = true;
 							fCharacters.delete(0, fCharacters.length());
 
+						} else if (name.equals(TAG_CADENCE)) {
+							fIsInCadence = true;
+							fCharacters.delete(0, fCharacters.length());
+
 						} else if (name.equals(TAG_TIME)) {
 							fIsInTime = true;
 							fCharacters.delete(0, fCharacters.length());
@@ -746,6 +760,10 @@ public class GarminSAXHandler extends DefaultHandler {
 
 							} else if (name.equals(TAG_DISTANCE_METERS)) {
 								fIsInDistance = true;
+								fCharacters.delete(0, fCharacters.length());
+
+							} else if (name.equals(TAG_CADENCE)) {
+								fIsInCadence = true;
 								fCharacters.delete(0, fCharacters.length());
 
 							} else if (name.equals(TAG_TIME)) {
