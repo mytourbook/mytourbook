@@ -304,6 +304,16 @@ public class Messages extends NLS {
 	public static String		Pref_People_Label_weight;
 	public static String		Pref_People_Title;
 
+	public static String		pref_regional_decimalSeparator;
+
+	public static String	pref_regional_description;
+	public static String		pref_regional_groupSeparator;
+
+	public static String		pref_regional_title;
+	public static String		pref_regional_useCustomDecimalFormat;
+
+	public static String	pref_regional_value_example;
+
 	public static String		Pref_Statistic_Label_altitude;
 	public static String		Pref_Statistic_Label_altitude_low_value;
 	public static String		Pref_Statistic_Label_altitude_quantity;
@@ -494,7 +504,7 @@ public class Messages extends NLS {
 
 	public static String		UI_Label_no_chart_is_selected;
 
-	public static String	ui_tour_not_defined;
+	public static String		ui_tour_not_defined;
 
 	static {
 		// initialize resource bundle

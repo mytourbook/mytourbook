@@ -39,8 +39,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 		/*
-		 * general
+		 * regional settings
 		 */
+		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, true);
 		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
 				ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
 
@@ -50,7 +51,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
 				ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
 
-		store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, true);
+		store.setDefault(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT, false);
+		store.setDefault(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR, ".");
+		store.setDefault(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR, "'");
 
 		/*
 		 * statistics

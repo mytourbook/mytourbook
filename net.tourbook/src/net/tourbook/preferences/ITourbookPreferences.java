@@ -90,6 +90,7 @@ public interface ITourbookPreferences {
 	 * measurement system
 	 */
 	public static final String	MEASUREMENT_SYSTEM						= "system.of.measurement";						//$NON-NLS-1$
+	public static final String	MEASUREMENT_SYSTEM_SHOW_IN_UI			= "system.of.measurement.show.in.ui";			//$NON-NLS-1$
 
 	public static final String	MEASUREMENT_SYSTEM_DISTANCE				= "system.of.measurement.distance";			//$NON-NLS-1$
 	public static final String	MEASUREMENT_SYSTEM_DISTANCE_KM			= "metric.km";									//$NON-NLS-1$
@@ -103,12 +104,17 @@ public interface ITourbookPreferences {
 	public static final String	MEASUREMENT_SYSTEM_TEMPERATURE_C		= "metric.celcius";							//$NON-NLS-1$
 	public static final String	MEASUREMENT_SYSTEM_TEMPTERATURE_F		= "metric.fahrenheit";							//$NON-NLS-1$
 
-	public static final String	MEASUREMENT_SYSTEM_SHOW_IN_UI			= "system.of.measurement.show.in.ui";			//$NON-NLS-1$
-
 	/*
 	 * map settings
 	 */
-	public static final String	MAP_PROVIDERS_SORT_ORDER				= "map.provider.sort.order"; //$NON-NLS-1$
-	public static final String	MAP_PROVIDERS_TOGGLE_LIST				= "map.provider.toggle.list"; //$NON-NLS-1$
+	public static final String	MAP_PROVIDERS_SORT_ORDER				= "map.provider.sort.order";					//$NON-NLS-1$
+	public static final String	MAP_PROVIDERS_TOGGLE_LIST				= "map.provider.toggle.list";					//$NON-NLS-1$
+
+	/*
+	 * regional settings
+	 */
+	public static final String	REGIONAL_USE_CUSTOM_DECIMAL_FORMAT		= "regional_use.custom.decimal.format";		//$NON-NLS-1$
+	public static final String	REGIONAL_DECIMAL_SEPARATOR				= "regional_decimal.separator";				//$NON-NLS-1$
+	public static final String	REGIONAL_GROUP_SEPARATOR				= "regional_group.separator";					//$NON-NLS-1$
 
 }

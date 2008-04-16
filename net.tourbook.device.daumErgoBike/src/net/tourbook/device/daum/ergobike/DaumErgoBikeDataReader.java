@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.device.daum.ergobike;
 
 import java.io.BufferedReader;
@@ -20,6 +21,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -31,6 +35,10 @@ import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public class DaumErgoBikeDataReader extends TourbookDevice {
 
@@ -40,10 +48,17 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
 	private Calendar			fCalendar				= GregorianCalendar.getInstance();
 
+	private DecimalFormat		fDecimalFormat			= (DecimalFormat) DecimalFormat.getInstance();
+
 	// plugin constructor
 	public DaumErgoBikeDataReader() {
 		canReadFromDevice = false;
 		canSelectMultipleFilesInImportDialog = true;
+	}
+
+	@Override
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+		return null;
 	}
 
 	@Override
@@ -53,10 +68,6 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
 	public String getDeviceModeName(int profileId) {
 		return null;
-	}
-
-	public int getTransferDataSize() {
-		return -1;
 	}
 
 	@Override
@@ -69,7 +80,65 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 		return -1;
 	}
 
+	public int getTransferDataSize() {
+		return -1;
+	}
+
+	private float parseFloat(String stringValue) {
+
+//		try {
+//
+//			final float number = Float.parseFloat(stringValue);
+//			System.out.println(". " + number);
+//			return number;
+//
+//		} catch (NumberFormatException e) {
+//
+		try {
+
+			Number number = fDecimalFormat.parse(stringValue);
+			System.out.println(", " + number);
+			return number.floatValue();
+
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		}
+//
+//		}
+
+		return 0;
+	}
+
 	public boolean processDeviceData(String importFilePath, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
+
+		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		if (prefStore.getBoolean(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT)) {
+
+			/*
+			 * use customized number format
+			 */
+			try {
+
+				DecimalFormatSymbols dfs = fDecimalFormat.getDecimalFormatSymbols();
+
+				String groupSep = prefStore.getString(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR);
+				String decimalSep = prefStore.getString(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR);
+
+				dfs.setGroupingSeparator(groupSep.charAt(0));
+				dfs.setDecimalSeparator(decimalSep.charAt(0));
+
+				fDecimalFormat.setDecimalFormatSymbols(dfs);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+
+			// use default number format
+
+			fDecimalFormat = (DecimalFormat) DecimalFormat.getInstance();
+		}
 
 		boolean returnValue = false;
 
@@ -158,12 +227,12 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 				tokenizer = new StringTokenizer(tokenLine, CSV_STRING_TOKEN);
 
 				time = (short) Integer.parseInt(tokenizer.nextToken()); // 				1  Elapsed Time (s)
-				distance = (int) (Float.parseFloat(tokenizer.nextToken()) * 1000); // 	2  Distance (km)
+				distance = (int) (parseFloat(tokenizer.nextToken()) * 1000); // 					2  Distance (km)
 				tokenizer.nextToken(); // 												3  Phys. kJoule
 				tokenizer.nextToken(); // 												4  Slope (%)
 				tokenizer.nextToken(); // 												5  NM
-				cadence = (int) Float.parseFloat(tokenizer.nextToken()); // 			6  RPM
-				speed = (int) Float.parseFloat(tokenizer.nextToken()); // 				7  Speed (km/h)
+				cadence = (int) parseFloat(tokenizer.nextToken()); // 								6  RPM
+				speed = (int) parseFloat(tokenizer.nextToken()); // 								7  Speed (km/h)
 				power = Integer.parseInt(tokenizer.nextToken()); //						8  Watt
 				tokenizer.nextToken(); // 												9  Gear
 				tokenizer.nextToken(); // 												10 Device Active
@@ -280,12 +349,6 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 		}
 
 		return true;
-	}
-
-	@Override
-	public String buildFileNameFromRawData(final String rawDataFileName) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
