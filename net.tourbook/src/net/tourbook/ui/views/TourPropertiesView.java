@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.ui.views;
 
 import java.text.DateFormat;
@@ -300,7 +301,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED
@@ -756,7 +757,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 
@@ -1006,21 +1007,10 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		/*
 		 * tab: location
 		 */
-		// tour title
-		final String tourTitle = fTourData.getTourTitle();
-		fTextTitle.setText(tourTitle);
-
-		// start location
-		final String startLocation = fTourData.getTourStartPlace();
-		fTextStartLocation.setText(startLocation);
-
-		// end location
-		final String endLocation = fTourData.getTourEndPlace();
-		fTextEndLocation.setText(endLocation);
-
-		// description
-		final String description = fTourData.getTourDescription();
-		fTextDescription.setText(description);
+		fTextTitle.setText(fTourData.getTourTitle());
+		fTextStartLocation.setText(fTourData.getTourStartPlace());
+		fTextEndLocation.setText(fTourData.getTourEndPlace());
+		fTextDescription.setText(fTourData.getTourDescription());
 
 		fScrolledContainer.setMinSize(fContentContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		fContentContainer.pack(true);

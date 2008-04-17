@@ -35,6 +35,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -131,6 +132,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private ActionAdjustYear			fActionAdjustImportedYear;
 	private ActionMergeTours			fActionMergeTours;
 	private ActionSetTourType			fActionSetTourType;
+	private ActionEditQuick				fActionEditQuick;
 
 	private ImageDescriptor				imageDatabaseDescriptor;
 	private ImageDescriptor				imageDatabaseOtherPersonDescriptor;
@@ -319,6 +321,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fActionSaveTour = new ActionSaveTourInDatabase(this);
 		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this);
 		fActionSetTourType = new ActionSetTourType(this);
+		fActionEditQuick = new ActionEditQuick(this);
 		fActionAdjustImportedYear = new ActionAdjustYear(this);
 		fActionMergeTours = new ActionMergeTours(this);
 
@@ -564,7 +567,11 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				final int recordingTime = ((TourData) cell.getElement()).getTourRecordingTime();
 
 				if (recordingTime != 0) {
-					fCalendar.set(0, 0, 0, recordingTime / 3600, ((recordingTime % 3600) / 60),
+					fCalendar.set(0,
+							0,
+							0,
+							recordingTime / 3600,
+							((recordingTime % 3600) / 60),
 							((recordingTime % 3600) % 60));
 
 					cell.setText(fDurationFormatter.format(fCalendar.getTime()));
@@ -763,6 +770,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			fActionSaveTour.setEnabled(unsavedTours > 0);
 			menuMgr.add(fActionSaveTour);
 
+			fActionEditQuick.setEnabled(savedTours == 1);
+			menuMgr.add(fActionEditQuick);
+
 			ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 			fActionSetTourType.setEnabled(savedTours > 0 && tourTypes.size() > 0);
 			menuMgr.add(fActionSetTourType);
@@ -944,8 +954,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 		// save imported file names
 		final HashSet<String> importedFiles = rawDataMgr.getImportedFiles();
-		memento.putString(MEMENTO_IMPORT_FILENAME, StringToArrayConverter.convertArrayToString(
-				importedFiles.toArray(new String[importedFiles.size()]), FILESTRING_SEPARATOR));
+		memento.putString(MEMENTO_IMPORT_FILENAME,
+				StringToArrayConverter.convertArrayToString(importedFiles.toArray(new String[importedFiles.size()]),
+						FILESTRING_SEPARATOR));
 
 		// save selected tour in the viewer
 		memento.putInteger(MEMENTO_SELECTED_TOUR_INDEX, table.getSelectionIndex());

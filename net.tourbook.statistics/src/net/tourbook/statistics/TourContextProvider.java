@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -16,6 +16,7 @@
 /**
  * 
  */
+
 package net.tourbook.statistics;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
@@ -48,6 +50,7 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 
 	private final ActionOpenTour		fActionOpenTour;
 	private final ActionSetTourType		fActionSetTourType;
+	private final ActionEditQuick		fActionEditQuick;
 
 	private class ActionOpenTour extends Action {
 
@@ -93,18 +96,18 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 		fBarSelectionProvider = barSelectionProvider;
 
 		fActionOpenTour = new ActionOpenTour(Messages.action_edit_tour);
+		fActionEditQuick = new ActionEditQuick(this);
 		fActionSetTourType = new ActionSetTourType(this);
 	}
 
-	public void fillBarChartContextMenu(IMenuManager menuMgr,
-										int hoveredBarSerieIndex,
-										int hoveredBarValueIndex) {
+	public void fillBarChartContextMenu(IMenuManager menuMgr, int hoveredBarSerieIndex, int hoveredBarValueIndex) {
 
 		final boolean isTourHovered = hoveredBarSerieIndex != -1;
 
 		fActionOpenTour.setEnabled(isTourHovered);
 
 		menuMgr.add(fActionOpenTour);
+		menuMgr.add(fActionEditQuick);
 
 		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourHovered && tourTypes.size() > 0);
@@ -116,9 +119,7 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 
 	public void fillContextMenu(IMenuManager menuMgr) {}
 
-	public void fillXSliderContextMenu(	IMenuManager menuMgr,
-										ChartXSlider leftSlider,
-										ChartXSlider rightSlider) {}
+	public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider) {}
 
 	public ArrayList<TourData> getSelectedTours() {
 

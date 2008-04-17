@@ -27,8 +27,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
-import org.joda.time.DateTime;
-
 public class DataProviderTourWeek extends DataProvider {
 
 	private static DataProviderTourWeek	fInstance;
@@ -118,16 +116,10 @@ public class DataProviderTourWeek extends DataProvider {
 			PreparedStatement statement = conn.prepareStatement(sqlString);
 			ResultSet result = statement.executeQuery();
 
-			final int firstYear = fLastYear - fNumberOfYears + 1;
-			DateTime dt = new DateTime(firstYear, 1, 1, 0, 0, 0, 0);
-//dt.
 			while (result.next()) {
 
 				final int dbYear = result.getInt(1);
 				final int dbWeek = result.getInt(2);
-
-//				DateTime dtWeek = dt.withYear(dbYear).withWeekOfWeekyear(dbWeek);
-//				dtWeek.
 
 				// get number of weeks for the current year in the db
 				final int dbYearIndex = numberOfYears - (lastYear - dbYear + 1);

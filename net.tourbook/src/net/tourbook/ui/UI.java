@@ -51,8 +51,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 public class UI {
 
@@ -593,6 +597,33 @@ public class UI {
 		}
 
 		return image;
+	}
+
+	/**
+	 * @return Returns a list with all opened editors
+	 */
+	public static ArrayList<IEditorPart> getOpenedEditors() {
+
+		ArrayList<IEditorPart> editorParts = new ArrayList<IEditorPart>();
+		IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
+
+		for (IWorkbenchWindow wbWindow : wbWindows) {
+			IWorkbenchPage[] pages = wbWindow.getPages();
+
+			for (IWorkbenchPage wbPage : pages) {
+				IEditorReference[] editorRefs = wbPage.getEditorReferences();
+
+				for (IEditorReference editorRef : editorRefs) {
+					IEditorPart editor = editorRef.getEditor(false);
+
+					if (editor != null) {
+						editorParts.add(editor);
+					}
+				}
+			}
+		}
+
+		return editorParts;
 	}
 
 	public static final String formatSeconds(long value) {

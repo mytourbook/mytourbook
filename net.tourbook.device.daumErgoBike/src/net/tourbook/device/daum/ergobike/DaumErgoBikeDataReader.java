@@ -188,7 +188,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 			TourData tourData = new TourData();
 
 			tourData.setTourTitle(title);
-			tourData.setTourDescription(importFilePath);
+			tourData.setTourDescription(fileName);
 
 			tourData.setDeviceMode((short) 0);
 			tourData.setDeviceTimeInterval((short) -1);

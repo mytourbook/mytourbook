@@ -41,6 +41,7 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 	private TourEditor			fTourEditor;
 
 	private ActionSetTourType	fActionSetTourType;
+	private ActionEditQuick		fActionEditQuick;
 
 	/**
 	 * add a new reference tour to all reference tours
@@ -136,8 +137,10 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 	}
 
 	public TourChartContextProvider(TourEditor tourEditor) {
+
 		fTourEditor = tourEditor;
 
+		fActionEditQuick = new ActionEditQuick(this);
 		fActionSetTourType = new ActionSetTourType(this);
 	}
 
@@ -160,6 +163,8 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 	public void fillContextMenu(IMenuManager menuMgr) {
 
 		if (fActionSetTourType != null) {
+
+			menuMgr.add(fActionEditQuick);
 
 			ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 			fActionSetTourType.setEnabled(tourTypes.size() > 0);

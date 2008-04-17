@@ -179,9 +179,7 @@ public class MappingView extends ViewPart {
 
 		final ModifyMapProviderDialog dialog = new ModifyMapProviderDialog(Display.getCurrent().getActiveShell(), this);
 
-		final int returnValue = dialog.open();
-
-		if (returnValue == Window.OK) {
+		if (dialog.open() == Window.OK) {
 			fActionSelectMapProvider.updateMapProviders();
 		}
 	}

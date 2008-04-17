@@ -50,14 +50,14 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class ModifyMapProviderDialog extends TitleAreaDialog {
 
-	private final IDialogSettings		fDialogSettings;
-	private final IPreferenceStore		fPrefStore;
+	private final IDialogSettings	fDialogSettings;
+	private final IPreferenceStore	fPrefStore;
 
-	private MappingView					fMappingView;
+	private MappingView				fMappingView;
 	private ArrayList<MapProvider>	fMapProviders;
-	private Button						fBtnUp;
-	private Button						fBtnDown;
-	private CheckboxTableViewer			fCheckboxList;
+	private Button					fBtnUp;
+	private Button					fBtnDown;
+	private CheckboxTableViewer		fCheckboxList;
 
 	{
 		fDialogSettings = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());

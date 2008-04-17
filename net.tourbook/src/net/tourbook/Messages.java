@@ -21,6 +21,15 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";						//$NON-NLS-1$
 
+	public static String		app_action_quick_edit_dlg_message;
+	public static String		app_action_quick_edit_dlg_title;
+
+	public static String		App_Action_set_tour_type_dlg_title;
+	public static String		App_Action_set_tour_type_dlg_message;
+
+	public static String		dialog_quick_edit_dialog_area_title;
+	public static String		dialog_quick_edit_dialog_title;
+
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_Menu_file;
@@ -31,10 +40,10 @@ public class Messages extends NLS {
 	public static String		App_Action_open_preferences;
 	public static String		App_Action_open_tour_segmenter;
 	public static String		App_Action_open_tour_segmenter_tooltip;
-	public static String		App_Action_set_tour_type;
-	public static String		App_Action_set_tour_type_dlg_message;
-	public static String		App_Action_set_tour_type_dlg_title;
 
+	public static String		app_action_quick_edit;
+
+	public static String		App_Action_set_tour_type;
 	public static String		App_measurement_imperial;
 	public static String		App_measurement_metric;
 	public static String		App_measurement_tooltip;
@@ -306,13 +315,13 @@ public class Messages extends NLS {
 
 	public static String		pref_regional_decimalSeparator;
 
-	public static String	pref_regional_description;
+	public static String		pref_regional_description;
 	public static String		pref_regional_groupSeparator;
 
 	public static String		pref_regional_title;
 	public static String		pref_regional_useCustomDecimalFormat;
 
-	public static String	pref_regional_value_example;
+	public static String		pref_regional_value_example;
 
 	public static String		Pref_Statistic_Label_altitude;
 	public static String		Pref_Statistic_Label_altitude_low_value;

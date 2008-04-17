@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.ui.views.tourBook;
 
 import java.text.NumberFormat;
@@ -27,6 +28,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.SelectionTourId;
@@ -144,6 +146,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private ActionEditTour			fActionEditTour;
 	private ActionDeleteTour		fActionDeleteTour;
 	private ActionSetTourType		fActionSetTourType;
+	private ActionEditQuick			fActionEditQuick;
 	private ActionModifyColumns		fActionModifyColumns;
 	private ActionCollapseAll		fActionCollapseAll;
 
@@ -273,7 +276,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
 
@@ -289,6 +292,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	private void createActions() {
 
+		fActionEditQuick = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(this);
 		fActionDeleteTour = new ActionDeleteTour(this);
 		fActionSetTourType = new ActionSetTourType(this);
@@ -742,7 +746,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void enableActions() {
 
 		ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
@@ -766,6 +770,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(tourItems > 0 && tourTypes.size() > 0);
+
+		fActionEditQuick.setEnabled(tourItems == 1);
 	}
 
 	private void fillContextMenu(IMenuManager menuMgr) {
@@ -774,10 +780,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionDeleteTour);
-
-//		menuMgr.add(new Separator());
-//		menuMgr.add(fActionModifyColumns);
 
 		enableActions();
 	}
@@ -786,7 +790,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fPostSelectionProvider.setSelection(selection);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 

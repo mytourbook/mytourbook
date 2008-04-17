@@ -17,9 +17,7 @@
 package net.tourbook.statistics;
 
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Formatter;
-import java.util.GregorianCalendar;
 
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
@@ -56,7 +54,7 @@ public abstract class StatisticWeek extends YearStatistic {
 
 	private boolean					fIsSynchScaleEnabled;
 
-	private final Calendar			fCalendar		= GregorianCalendar.getInstance();
+//	private final Calendar			fCalendar		= GregorianCalendar.getInstance();
 	private DateFormat				fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private TourDataWeek			fTourWeekData;
@@ -208,66 +206,65 @@ public abstract class StatisticWeek extends YearStatistic {
 		ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 		toolTipInfo.setTitle(toolTipTitle);
 		toolTipInfo.setLabel(toolTipLabel);
-//		toolTipInfo.setLabel(toolTipFormat.toString());
 
 		return toolTipInfo;
 	}
 
-	private void debugWeekNumber() {
-
-		final int firstYear = 2000;
-
-		DateTime dt = (new DateTime()).withYear(firstYear)
-				.withWeekOfWeekyear(1)
-				.withDayOfWeek(DateTimeConstants.MONDAY);
-
-		Calendar calendar = GregorianCalendar.getInstance();
-//		calendar.setFirstDayOfWeek(4);
-
-		for (int currentYear = firstYear; currentYear <= 2010; currentYear++) {
-
-//			dt = dt.withYear(currentYear).withWeekOfWeekyear(1).withDayOfWeek(DateTimeConstants.MONDAY);
-			dt = dt.withYear(currentYear).withMonthOfYear(1).withDayOfYear(1);
-
-			calendar.set(currentYear, 0, 1);
-
-			printDayAndWeek(currentYear, dt, calendar);
-
-		}
-
-		System.out.println();
-	}
-
-	private void printDayAndWeek(int currentYear, DateTime dt, Calendar calendar) {
-
-		System.out.print(//
-//				currentYear
-//				+ ": "
-		+dt.getDayOfMonth() //
-				+ "."
-				+ dt.getMonthOfYear()
-				+ "."
-				+ dt.getYear()
-				+ "-"
-				+ dt.getWeekOfWeekyear()
-				+ "-"
-				+ dt.weekOfWeekyear().getMaximumValue()
-				+ "\t"
-		//
-		);
-
-		System.out.println(calendar.get(Calendar.DAY_OF_MONTH)
-				+ "."
-				+ (calendar.get(Calendar.MONTH) + 1)
-				+ "."
-				+ calendar.get(Calendar.YEAR)
-				+ " - "
-				+ calendar.get(Calendar.WEEK_OF_YEAR)
-				+ " - "
-				+ calendar.getActualMaximum(Calendar.WEEK_OF_YEAR)
-		//
-		);
-	}
+//	private void debugWeekNumber() {
+//
+//		final int firstYear = 2000;
+//
+//		DateTime dt = (new DateTime()).withYear(firstYear)
+//				.withWeekOfWeekyear(1)
+//				.withDayOfWeek(DateTimeConstants.MONDAY);
+//
+//		Calendar calendar = GregorianCalendar.getInstance();
+////		calendar.setFirstDayOfWeek(4);
+//
+//		for (int currentYear = firstYear; currentYear <= 2010; currentYear++) {
+//
+////			dt = dt.withYear(currentYear).withWeekOfWeekyear(1).withDayOfWeek(DateTimeConstants.MONDAY);
+//			dt = dt.withYear(currentYear).withMonthOfYear(1).withDayOfYear(1);
+//
+//			calendar.set(currentYear, 0, 1);
+//
+//			printDayAndWeek(currentYear, dt, calendar);
+//
+//		}
+//
+//		System.out.println();
+//	}
+//
+//	private void printDayAndWeek(int currentYear, DateTime dt, Calendar calendar) {
+//
+//		System.out.print(//
+////				currentYear
+////				+ ": "
+//		+dt.getDayOfMonth() //
+//				+ "."
+//				+ dt.getMonthOfYear()
+//				+ "."
+//				+ dt.getYear()
+//				+ "-"
+//				+ dt.getWeekOfWeekyear()
+//				+ "-"
+//				+ dt.weekOfWeekyear().getMaximumValue()
+//				+ "\t"
+//		//
+//		);
+//
+//		System.out.println(calendar.get(Calendar.DAY_OF_MONTH)
+//				+ "."
+//				+ (calendar.get(Calendar.MONTH) + 1)
+//				+ "."
+//				+ calendar.get(Calendar.YEAR)
+//				+ " - "
+//				+ calendar.get(Calendar.WEEK_OF_YEAR)
+//				+ " - "
+//				+ calendar.getActualMaximum(Calendar.WEEK_OF_YEAR)
+//		//
+//		);
+//	}
 
 	private int[] createWeekData() {
 
@@ -278,7 +275,7 @@ public abstract class StatisticWeek extends YearStatistic {
 			allWeeks[weekIndex] = weekIndex;
 		}
 
-		debugWeekNumber();
+//		debugWeekNumber();
 
 		return allWeeks;
 	}
@@ -398,45 +395,45 @@ public abstract class StatisticWeek extends YearStatistic {
 		fChart.setSelectedBars(null);
 	}
 
-	@Override
-	public boolean selectDay(Long date) {
-		fCalendar.setTimeInMillis(date);
-		int selectedWeek = fCalendar.get(Calendar.WEEK_OF_YEAR) - 0;
-
-		boolean selectedItems[] = new boolean[53];
-		selectedItems[selectedWeek] = true;
-
-		fChart.setSelectedBars(selectedItems);
-
-		return true;
-	}
-
-	@Override
-	public boolean selectMonth(Long date) {
-
-		fCalendar.setTimeInMillis(date);
-		int selectedMonth = fCalendar.get(Calendar.MONTH);
-
-		boolean selectedItems[] = new boolean[53];
-		boolean isSelected = false;
-
-		// select all weeks in the selected month
-		for (int weekIndex = 0; weekIndex < selectedItems.length; weekIndex++) {
-			fCalendar.set(Calendar.WEEK_OF_YEAR, weekIndex + 0);
-
-			boolean isMonthSelected = fCalendar.get(Calendar.MONTH) == selectedMonth ? true : false;
-			if (isMonthSelected) {
-				isSelected = true;
-			}
-			selectedItems[weekIndex] = isMonthSelected;
-		}
-
-		if (isSelected) {
-			fChart.setSelectedBars(selectedItems);
-		}
-
-		return isSelected;
-	}
+//	@Override
+//	public boolean selectDay(Long date) {
+//		fCalendar.setTimeInMillis(date);
+//		int selectedWeek = fCalendar.get(Calendar.WEEK_OF_YEAR) - 0;
+//
+//		boolean selectedItems[] = new boolean[53];
+//		selectedItems[selectedWeek] = true;
+//
+//		fChart.setSelectedBars(selectedItems);
+//
+//		return true;
+//	}
+//
+//	@Override
+//	public boolean selectMonth(Long date) {
+//
+//		fCalendar.setTimeInMillis(date);
+//		int selectedMonth = fCalendar.get(Calendar.MONTH);
+//
+//		boolean selectedItems[] = new boolean[53];
+//		boolean isSelected = false;
+//
+//		// select all weeks in the selected month
+//		for (int weekIndex = 0; weekIndex < selectedItems.length; weekIndex++) {
+//			fCalendar.set(Calendar.WEEK_OF_YEAR, weekIndex + 0);
+//
+//			boolean isMonthSelected = fCalendar.get(Calendar.MONTH) == selectedMonth ? true : false;
+//			if (isMonthSelected) {
+//				isSelected = true;
+//			}
+//			selectedItems[weekIndex] = isMonthSelected;
+//		}
+//
+//		if (isSelected) {
+//			fChart.setSelectedBars(selectedItems);
+//		}
+//
+//		return isSelected;
+//	}
 
 	private void setChartProviders(final ChartDataModel chartModel) {
 

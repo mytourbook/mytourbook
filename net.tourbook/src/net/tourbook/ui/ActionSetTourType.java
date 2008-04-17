@@ -28,8 +28,8 @@ import net.tourbook.tour.TourManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -38,13 +38,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 public class ActionSetTourType extends Action implements IMenuCreator {
 
@@ -127,21 +122,7 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 		 */
 		private ArrayList<TourData> updateEditors(ArrayList<TourData> selectedTours) {
 
-			// get all opened editors
-			ArrayList<IEditorPart> editorParts = new ArrayList<IEditorPart>();
-			IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
-			for (IWorkbenchWindow wbWindow : wbWindows) {
-				IWorkbenchPage[] pages = wbWindow.getPages();
-				for (IWorkbenchPage wbPage : pages) {
-					IEditorReference[] editorRefs = wbPage.getEditorReferences();
-					for (IEditorReference editorRef : editorRefs) {
-						IEditorPart editor = editorRef.getEditor(false);
-						if (editor != null) {
-							editorParts.add(editor);
-						}
-					}
-				}
-			}
+			ArrayList<IEditorPart> editorParts = UI.getOpenedEditors();
 
 			// list for tours which are updated in the editor
 			ArrayList<TourData> updatedTours = new ArrayList<TourData>();
@@ -180,10 +161,9 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 				 * don't show the message when the tour is from a tour editor
 				 */
 
-				MessageBox msgBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_INFORMATION | SWT.OK);
-				msgBox.setText(Messages.App_Action_set_tour_type_dlg_title);
-				msgBox.setMessage(Messages.App_Action_set_tour_type_dlg_message);
-				msgBox.open();
+				MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+						Messages.App_Action_set_tour_type_dlg_title,
+						Messages.App_Action_set_tour_type_dlg_message);
 			}
 
 			return updatedTours;

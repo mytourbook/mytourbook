@@ -23,6 +23,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 
 public abstract class DataProvider {
 
@@ -117,7 +118,10 @@ public abstract class DataProvider {
 		fYearWeeks = new int[fNumberOfYears];
 
 		final int firstYear = fLastYear - fNumberOfYears + 1;
-		DateTime dt = new DateTime(firstYear, 1, 1, 0, 0, 0, 0);
+
+		DateTime dt = (new DateTime()).withYear(firstYear)
+				.withWeekOfWeekyear(1)
+				.withDayOfWeek(DateTimeConstants.MONDAY);
 
 		int yearIndex = 0;
 		for (int currentYear = firstYear; currentYear <= fLastYear; currentYear++) {
