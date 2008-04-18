@@ -44,30 +44,31 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	// --- Mathematic constants ---
 	private static final double				DEGRAD					= Math.PI / 180.0d;
 
-	private static final String				NAME_SPACE_GPX_1_0		= "http://www.topografix.com/GPX/1/0";				//$NON-NLS-1$
-	private static final String				NAME_SPACE_GPX_1_1		= "http://www.topografix.com/GPX/1/1";				//$NON-NLS-1$
+	private static final String				NAME_SPACE_GPX_1_0		= "http://www.topografix.com/GPX/1/0";					//$NON-NLS-1$
+	private static final String				NAME_SPACE_GPX_1_1		= "http://www.topografix.com/GPX/1/1";					//$NON-NLS-1$
 
 	private static final int				GPX_VERSION_1_0			= 10;
 	private static final int				GPX_VERSION_1_1			= 11;
 
-	private static final String				TAG_GPX					= "gpx";											//$NON-NLS-1$
+	private static final String				TAG_GPX					= "gpx";												//$NON-NLS-1$
 
-	private static final String				TAG_TRK					= "trk";											//$NON-NLS-1$
-	private static final String				TAG_TRKPT				= "trkpt";											//$NON-NLS-1$
-	private static final String				TAG_RTE					= "rte";											//$NON-NLS-1$
-	private static final String				TAG_RTEPT				= "rtept";											//$NON-NLS-1$
+	private static final String				TAG_TRK					= "trk";												//$NON-NLS-1$
+	private static final String				TAG_TRKPT				= "trkpt";												//$NON-NLS-1$
+	private static final String				TAG_RTE					= "rte";												//$NON-NLS-1$
+	private static final String				TAG_RTEPT				= "rtept";												//$NON-NLS-1$
 
-	private static final String				TAG_TIME				= "time";											//$NON-NLS-1$
-	private static final String				TAG_ELE					= "ele";											//$NON-NLS-1$
+	private static final String				TAG_TIME				= "time";												//$NON-NLS-1$
+	private static final String				TAG_ELE					= "ele";												//$NON-NLS-1$
 
-	private static final String				ATTR_LATITUDE			= "lat";											//$NON-NLS-1$
-	private static final String				ATTR_LONGITUDE			= "lon";											//$NON-NLS-1$
+	private static final String				ATTR_LATITUDE			= "lat";												//$NON-NLS-1$
+	private static final String				ATTR_LONGITUDE			= "lon";												//$NON-NLS-1$
 
 	private static final Calendar			fCalendar				= GregorianCalendar.getInstance();
 
-	private static final SimpleDateFormat	GPX_TIME_FORMAT			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
-	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");	//$NON-NLS-1$
-//																							yyyy-MM-dd'T'HH:mm:ss'Z'
+	private static final SimpleDateFormat	GPX_TIME_FORMAT			= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");	//$NON-NLS-1$
+	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$
+	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822	= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");		//$NON-NLS-1$
+
 	private int								fGpxVersion				= -1;
 	//	private boolean							fInWpt					= false;
 	private boolean							fInTrk					= false;
@@ -103,9 +104,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private boolean							fIsError				= false;
 
 	{
-//		GPX_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
-//		GPX_TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
 		GPX_TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
+		GPX_TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 		GPX_TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 	}
 
@@ -202,16 +202,23 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					fIsInTime = false;
 
 					try {
-						fCurrentTime = GPX_TIME_FORMAT.parse(timeString).getTime();
-						fTimeData.absoluteTime = fCurrentTime;
+						fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT.parse(timeString).getTime();
 					} catch (ParseException e) {
 						try {
-							fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_RFC822.parse(timeString).getTime();
+							fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_SSSZ.parse(timeString).getTime();
 						} catch (ParseException e2) {
-							MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage()); //$NON-NLS-1$
-//							e2.printStackTrace();
-							System.err.println(e.getMessage() + " in " + fImportFileName); //$NON-NLS-1$
-							fIsError = true;
+							try {
+								fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_RFC822.parse(timeString)
+										.getTime();
+							} catch (ParseException e3) {
+
+								fIsError = true;
+
+								final String message = e3.getMessage();
+								MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
+								System.err.println(message + " in " + fImportFileName); //$NON-NLS-1$
+//								e2.printStackTrace();
+							}
 						}
 					}
 				}
