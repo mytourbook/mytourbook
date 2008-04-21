@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,7 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.ui.views;
+
+import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
@@ -26,6 +29,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ActionEditTour;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourPropertyListener;
@@ -34,6 +38,8 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ActionSetTourType;
+import net.tourbook.ui.ISelectedTours;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.Preferences;
@@ -55,7 +61,10 @@ import org.eclipse.ui.part.ViewPart;
 // author: Wolfgang Schramm
 // create: 09.07.2007
 
-public class TourChartView extends ViewPart {
+/**
+ * Shows the selected tour in a chart
+ */
+public class TourChartView extends ViewPart implements ISelectedTours {
 
 	public static final String		ID	= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
@@ -71,22 +80,41 @@ public class TourChartView extends ViewPart {
 	private ITourPropertyListener	fTourPropertyListener;
 
 	private PageBook				fPageBook;
-
 	private Label					fPageNoChart;
 
-	private class TourChartContextProvicer implements IChartContextProvider {
+	private class TourChartContextProvicer implements IChartContextProvider, ISelectedTours {
 
-		final ActionEditTour	actionEditTour	= new ActionEditTour(TourChartView.this);
+		final ActionEditQuick	fActionQuickEdit	= new ActionEditQuick(TourChartView.this);
+		final ActionEditTour	fActionEditTour		= new ActionEditTour(TourChartView.this);
+		final ActionSetTourType	fActionSetTourType	= new ActionSetTourType(this);
 
 		public void fillBarChartContextMenu(IMenuManager menuMgr, int hoveredBarSerieIndex, int hoveredBarValueIndex) {}
 
-		public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider) {}
-
 		public void fillContextMenu(IMenuManager menuMgr) {
 
-			menuMgr.add(actionEditTour);
+			menuMgr.add(fActionQuickEdit);
+			menuMgr.add(fActionSetTourType);
+			menuMgr.add(fActionEditTour);
 
-			actionEditTour.setEnabled(fTourData != null && fTourData.getTourPerson() != null);
+			final boolean isEnabled = fTourData != null && fTourData.getTourPerson() != null;
+
+			fActionQuickEdit.setEnabled(isEnabled);
+			fActionEditTour.setEnabled(isEnabled);
+			fActionSetTourType.setEnabled(isEnabled);
+		}
+
+		public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider) {}
+
+		public ArrayList<TourData> getSelectedTours() {
+
+			ArrayList<TourData> tourList = new ArrayList<TourData>();
+			tourList.add(fTourData);
+
+			return tourList;
+		}
+
+		public boolean isFromTourEditor() {
+			return false;
 		}
 	}
 
@@ -128,22 +156,6 @@ public class TourChartView extends ViewPart {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourPropertyListener() {
-		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(int propertyId, Object propertyData) {
-
-				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
-					fTourChart.updateSegmentLayer((Boolean) propertyData);
-
-				} else if (propertyId == TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED) {
-					fTourChart.updateTourChart(true, true);
-				}
-			}
-		};
-
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
-	}
-
 	private void addTourDbListener() {
 
 		fTourDbListener = new IPropertyListener() {
@@ -168,6 +180,47 @@ public class TourChartView extends ViewPart {
 		};
 
 		TourDatabase.getInstance().addPropertyListener(fTourDbListener);
+	}
+
+	private void addTourPropertyListener() {
+		fTourPropertyListener = new ITourPropertyListener() {
+			public void propertyChanged(int propertyId, Object propertyData) {
+
+				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
+
+					fTourChart.updateSegmentLayer((Boolean) propertyData);
+
+				} else if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+
+					fTourChart.updateTourChart(true, true);
+
+				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+
+					if (fTourData == null) {
+						return;
+					}
+
+					// get modified tours
+					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					final long tourId = fTourData.getTourId();
+
+					// check if the tour in the editor was modified
+					for (TourData tourData : modifiedTours) {
+						if (tourData.getTourId() == tourId) {
+
+							// keep changed data
+							fTourData = tourData;
+
+							updateChart();
+
+							return;
+						}
+					}
+				}
+			}
+		};
+
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
 	}
 
 	@Override
@@ -241,8 +294,24 @@ public class TourChartView extends ViewPart {
 		super.dispose();
 	}
 
+	public ArrayList<TourData> getSelectedTours() {
+
+		if (fTourData == null) {
+			return null;
+		}
+
+		ArrayList<TourData> tourList = new ArrayList<TourData>();
+		tourList.add(fTourData);
+
+		return tourList;
+	}
+
 	public TourChart getTourChart() {
 		return fTourChart;
+	}
+
+	public boolean isFromTourEditor() {
+		return false;
 	}
 
 	private void onSelectionChanged(ISelection selection) {

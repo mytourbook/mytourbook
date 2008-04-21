@@ -308,7 +308,7 @@ public class TourChartPropertyView extends ViewPart {
 		TourManager.getInstance().removeAllToursFromCache();
 
 		// fire unique event for all changes
-		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED, null);
+		TourManager.getInstance().firePropertyChange(TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
 	}
 
 	private void restoreSettings() {

@@ -42,6 +42,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -103,6 +105,16 @@ public class StatisticContainer extends Composite {
 		fPostSelectionProvider = selectionProvider;
 
 		createControl();
+
+		addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+
+				// dispose all statistic resources
+				for (TourbookStatistic statistic : fStatistics) {
+					statistic.dispose();
+				}
+			}
+		});
 	}
 
 	void actionSynchScale(boolean isEnabled) {

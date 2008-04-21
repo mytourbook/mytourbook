@@ -53,7 +53,7 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 
 		public ActionTourType(TourType tourType) {
 
-			super(tourType.getName(), AS_PUSH_BUTTON);
+			super(tourType.getName(), AS_CHECK_BOX);
 
 			Image tourTypeImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
 			setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
@@ -68,8 +68,6 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 
 				public void run() {
 
-					boolean isModified = false;
-
 					// get tours which tour type should be changed
 					ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
 
@@ -77,36 +75,22 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 						return;
 					}
 
-					ArrayList<TourData> editorTours = updateEditors(selectedTours);
+					// update tours which are opened in an editor
+					ArrayList<TourData> toursInEditor = updateEditors(selectedTours);
 
-					// remove all tours where the tour is opened in an editor
-					selectedTours.removeAll(editorTours);
+					// get all tours which are not opened in an editor
+					ArrayList<TourData> saveTours = (ArrayList<TourData>) selectedTours.clone();
+					saveTours.removeAll(toursInEditor);
 
 					// update all tours (without tours from an editor) with the new tour type
-					for (TourData tourData : selectedTours) {
+					for (TourData tourData : saveTours) {
 
+						// set+save the tour type
 						tourData.setTourType(fTourType);
-
-						// save the tour type
-						if (TourDatabase.saveTour(tourData)) {
-							isModified = true;
-						}
+						TourDatabase.saveTour(tourData);
 					}
 
-					if (isModified) {
-
-						// notify all views which display the tour type
-						TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED,
-								selectedTours);
-
-					}
-
-					// check if tours are opened in an editor
-					if (editorTours.size() > 0) {
-
-						TourManager.getInstance()
-								.firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED_IN_EDITOR, editorTours);
-					}
+					TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
 				}
 
 			};
@@ -144,7 +128,10 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 								/*
 								 * a tour editor was found containing the current tour
 								 */
-								tourEditor.setTourType(fTourType);
+
+								tourEditor.getTourChart().getTourData().setTourType(fTourType);
+
+								tourEditor.setTourPropertyIsModified();
 
 								// keep updated tours
 								updatedTours.add(tourData);
@@ -213,11 +200,34 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 					items[i].dispose();
 				}
 
+				// get tours which tour type should be changed
+				ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+
+				if (selectedTours == null) {
+					return;
+				}
+
+				// get tour type which will be checked in the menu
+				TourType checkedTourType = null;
+				if (selectedTours.size() == 1) {
+					checkedTourType = selectedTours.get(0).getTourType();
+				}
+
 				// add all tour types to the menu
 				ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 
 				for (TourType tourType : tourTypes) {
-					addActionToMenu(new ActionTourType(tourType));
+
+					boolean isChecked = false;
+
+					if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
+						isChecked = true;
+					}
+
+					final ActionTourType actionTourType = new ActionTourType(tourType);
+					actionTourType.setChecked(isChecked);
+
+					addActionToMenu(actionTourType);
 				}
 			}
 		});

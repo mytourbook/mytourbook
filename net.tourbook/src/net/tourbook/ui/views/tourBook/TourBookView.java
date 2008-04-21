@@ -143,10 +143,10 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	public Font						fFontNormal;
 	public Font						fFontBold;
 
+	private ActionEditQuick			fActionEditQuick;
 	private ActionEditTour			fActionEditTour;
 	private ActionDeleteTour		fActionDeleteTour;
 	private ActionSetTourType		fActionSetTourType;
-	private ActionEditQuick			fActionEditQuick;
 	private ActionModifyColumns		fActionModifyColumns;
 	private ActionCollapseAll		fActionCollapseAll;
 
@@ -278,9 +278,9 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fTourPropertyListener = new ITourPropertyListener() {
 			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
-				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
-					// get a copy of the modified tours
+					// get a clone of the modified tours because the tours are removed from the list
 					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) ((ArrayList<TourData>) propertyData).clone();
 
 					updateTourViewer(fRootItem, modifiedTours);
@@ -776,11 +776,11 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	private void fillContextMenu(IMenuManager menuMgr) {
 
+		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionEditTour);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionEditTour);
-		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionDeleteTour);
 
 		enableActions();
@@ -1031,7 +1031,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	 */
 	private void updateTourViewer(TreeViewerItem parentItem, ArrayList<TourData> modifiedTours) {
 
-		Object[] children = parentItem.getFetchedChildren();
+//		Object[] children = parentItem.getFetchedChildren();
+		ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
 
 		if (children == null) {
 			return;
@@ -1051,7 +1052,11 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 						if (tourData.getTourId().longValue() == tourItemId) {
 
 							// update tree item
-							tourItem.fTourTypeId = tourData.getTourType().getTypeId();
+							final TourType tourType = tourData.getTourType();
+							if (tourType != null) {
+								tourItem.fTourTypeId = tourType.getTypeId();
+							}
+							tourItem.fTourTitle = tourData.getTourTitle();
 
 							// update tour viewer
 							fTourViewer.update(tourItem, null);

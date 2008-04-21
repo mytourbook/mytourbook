@@ -125,10 +125,11 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 	private TourData				fTourData;
 	public Calendar					fCalendar					= GregorianCalendar.getInstance();
+
 	private DateFormat				fTimeFormatter				= DateFormat.getTimeInstance(DateFormat.SHORT);
-	private NumberFormat			fNumberFormatter			= NumberFormat.getNumberInstance();
 	private DateFormat				fDurationFormatter			= DateFormat.getTimeInstance(DateFormat.SHORT,
 																		Locale.GERMAN);
+	private NumberFormat			fNumberFormatter			= NumberFormat.getNumberInstance();
 
 	private TourEditor				fTourEditor;
 	private TourChart				fTourChart;
@@ -304,8 +305,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED
-						|| propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED_IN_EDITOR) {
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
 					if (fTourData == null) {
 						return;
@@ -317,7 +317,6 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 					for (TourData tourData : modifiedTours) {
 						if (tourData.getTourId() == tourId) {
-
 							updateTourProperties(tourData);
 							return;
 						}
@@ -543,64 +542,59 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			}
 		});
 
-		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		// title
+		label = new Label(locationContainer, SWT.NONE);
+		label.setText(Messages.Tour_Properties_Label_tour_title);
 
-		{
-			// title
-			label = new Label(locationContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_tour_title);
-			fTextTitle = new Text(locationContainer, SWT.BORDER);
-			fTextTitle.setLayoutData(gd);
-			fTextTitle.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyReleased(KeyEvent e) {
-					onChangeContent();
-				}
-			});
+		fTextTitle = new Text(locationContainer, SWT.BORDER);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextTitle);
+		fTextTitle.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				onChangeContent();
+			}
+		});
 
-			// start location
-			label = new Label(locationContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_start_location);
-			fTextStartLocation = new Text(locationContainer, SWT.BORDER);
-			fTextStartLocation.setLayoutData(gd);
-			fTextStartLocation.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyReleased(KeyEvent e) {
-					onChangeContent();
-				}
-			});
+		// description
+		label = new Label(locationContainer, SWT.NONE);
+		label.setText(Messages.Tour_Properties_Label_description);
+		GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
-			// end location
-			label = new Label(locationContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_end_location);
-			fTextEndLocation = new Text(locationContainer, SWT.BORDER);
-			fTextEndLocation.setLayoutData(gd);
-			fTextEndLocation.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyReleased(KeyEvent e) {
-					onChangeContent();
-				}
-			});
+		fTextDescription = new Text(locationContainer, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+		GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT,
+				pixelConverter.convertHeightInCharsToPixels(2)).applyTo(fTextDescription);
+		fTextDescription.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				onChangeContent();
+			}
+		});
 
-			// description
-			label = new Label(locationContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_description);
-			label.setLayoutData(new GridData(SWT.NONE, SWT.TOP, false, false));
-			fTextDescription = new Text(locationContainer, SWT.BORDER
-					| SWT.WRAP
-					| SWT.MULTI
-					| SWT.V_SCROLL
-					| SWT.H_SCROLL);
-			gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-			gd.heightHint = pixelConverter.convertHeightInCharsToPixels(2);
-			fTextDescription.setLayoutData(gd);
-			fTextDescription.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyReleased(KeyEvent e) {
-					onChangeContent();
-				}
-			});
-		}
+		// start location
+		label = new Label(locationContainer, SWT.NONE);
+		label.setText(Messages.Tour_Properties_Label_start_location);
+
+		fTextStartLocation = new Text(locationContainer, SWT.BORDER);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextStartLocation);
+		fTextStartLocation.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				onChangeContent();
+			}
+		});
+
+		// end location
+		label = new Label(locationContainer, SWT.NONE);
+		label.setText(Messages.Tour_Properties_Label_end_location);
+
+		fTextEndLocation = new Text(locationContainer, SWT.BORDER);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextEndLocation);
+		fTextEndLocation.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				onChangeContent();
+			}
+		});
 
 		return scrolledContainer;
 	}
@@ -614,8 +608,8 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		fScrolledContainer.setExpandHorizontal(true);
 
 		fContentContainer = new Composite(fScrolledContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(fContentContainer);
 		GridLayoutFactory.swtDefaults().numColumns(2).spacing(10, 5).applyTo(fContentContainer);
-		GridDataFactory.fillDefaults().applyTo(fContentContainer);
 
 		fScrolledContainer.setContent(fContentContainer);
 		fScrolledContainer.addControlListener(new ControlAdapter() {
@@ -630,36 +624,43 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			label = new Label(fContentContainer, SWT.NONE);
 			label.setText(Messages.Tour_Properties_Label_tour_date);
 			fLblDate = new Label(fContentContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDate);
 
 			// start time
 			label = new Label(fContentContainer, SWT.NONE);
 			label.setText(Messages.Tour_Properties_Label_start_time);
 			fLblStartTime = new Label(fContentContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblStartTime);
 
 			// recording time
 			label = new Label(fContentContainer, SWT.NONE);
 			label.setText(Messages.Tour_Properties_Label_recording_time);
 			fLblRecordingTime = new Label(fContentContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblRecordingTime);
 
 			// driving time
 			label = new Label(fContentContainer, SWT.NONE);
 			label.setText(Messages.Tour_Properties_Label_driving_time);
 			fLblDrivingTime = new Label(fContentContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDrivingTime);
 
 			// tour type
 			label = new Label(fContentContainer, SWT.NONE);
 			label.setText(Messages.Tour_Properties_Label_device_name);
 			fLblDeviceName = new Label(fContentContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDeviceName);
 
 			// tour type
 			label = new Label(fContentContainer, SWT.NONE);
 			label.setText(Messages.Tour_Properties_Label_tour_type);
 			fLblTourType = new Label(fContentContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblTourType);
 
 			// data points
 			label = new Label(fContentContainer, SWT.NONE);
 			label.setText(Messages.Tour_Properties_Label_datapoints);
 			fLblDatapoints = new Label(fContentContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDatapoints);
 		}
 
 		return fScrolledContainer;
@@ -793,14 +794,13 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			return;
 		}
 
-		fTourEditor.setTourDirty();
-
 		// set changed data
 		fTourData.setTourTitle(fTextTitle.getText());
 		fTourData.setTourStartPlace(fTextStartLocation.getText());
 		fTourData.setTourEndPlace(fTextEndLocation.getText());
 		fTourData.setTourDescription(fTextDescription.getText());
 
+		fTourEditor.setTourPropertyIsModified();
 	}
 
 	private void onChangeSelection(ISelection selection) {
@@ -957,7 +957,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		 * location: time
 		 */
 		// tour date
-		fLblDate.setText(TourManager.getTourDate(tourData));
+		fLblDate.setText(TourManager.getTourDateFull(tourData));
 		fLblDate.pack(true);
 
 		// start time

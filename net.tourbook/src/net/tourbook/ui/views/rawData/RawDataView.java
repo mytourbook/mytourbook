@@ -302,7 +302,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fTourPropertyListener = new ITourPropertyListener() {
 			@SuppressWarnings("unchecked")
 			public void propertyChanged(int propertyId, Object propertyData) {
-				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
 					// update modified tours
 					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;

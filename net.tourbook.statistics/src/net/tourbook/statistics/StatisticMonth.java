@@ -148,12 +148,12 @@ public abstract class StatisticMonth extends YearStatistic {
 		calendar.add(Calendar.MONTH, valueIndex);
 
 		//
-		StringBuffer stringBuffer = new StringBuffer();
+		StringBuffer monthStringBuffer = new StringBuffer();
 		FieldPosition monthPosition = new FieldPosition(DateFormat.MONTH_FIELD);
 
 		Date date = new Date();
 		date.setTime(calendar.getTimeInMillis());
-		fDateFormatter.format(date, stringBuffer, monthPosition);
+		fDateFormatter.format(date, monthStringBuffer, monthPosition);
 
 		final Integer recordingTime = fTourMonthData.fRecordingTime[serieIndex][valueIndex];
 		final Integer drivingTime = fTourMonthData.fDrivingTime[serieIndex][valueIndex];
@@ -167,18 +167,20 @@ public abstract class StatisticMonth extends YearStatistic {
 		String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
 		if (tourTypeName != null && tourTypeName.length() > 0) {
 			titleString.append(tourTypeName);
-			titleString.append(NEW_LINE);
 		}
 
-		final String toolTipTitle = new Formatter().format(titleString.toString()).toString();
+		final String toolTipTitle = new Formatter().format(Messages.tourtime_info_date_month, //
+				titleString.toString(),
+				monthStringBuffer.substring(monthPosition.getBeginIndex(), monthPosition.getEndIndex()),
+				calendar.get(Calendar.YEAR)
+		//
+		)
+				.toString();
 
 		/*
 		 * tool tip: label
 		 */
 		StringBuilder toolTipFormat = new StringBuilder();
-		toolTipFormat.append(Messages.tourtime_info_date_month);
-		toolTipFormat.append(NEW_LINE);
-		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_distance);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_altitude);
@@ -191,9 +193,6 @@ public abstract class StatisticMonth extends YearStatistic {
 		toolTipFormat.append(Messages.tourtime_info_break_time);
 
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
-				//
-				stringBuffer.substring(monthPosition.getBeginIndex(), monthPosition.getEndIndex()),
-				calendar.get(Calendar.YEAR),
 				//
 				fTourMonthData.fDistanceHigh[serieIndex][valueIndex],
 				UI.UNIT_LABEL_DISTANCE,

@@ -46,9 +46,11 @@ public class TourDayData {
 	int[]				fTourDistanceValues;
 	int[]				fTourAltitudeValues;
 
-	ArrayList<String>	fTourTitle;
+	ArrayList<String>	tourTitle;
 
 	ArrayList<Integer>	fTourRecordingTimeValues;
 	ArrayList<Integer>	fTourDrivingTimeValues;
+
+	ArrayList<String>	tourDescription;
 
 }

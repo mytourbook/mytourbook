@@ -16,6 +16,10 @@
 
 package net.tourbook.tour;
 
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
@@ -44,7 +48,9 @@ public class QuickEditDialog extends TitleAreaDialog {
 
 	private final IDialogSettings	fDialogSettings;
 
-	{}
+	private static final Calendar	fCalendar		= GregorianCalendar.getInstance();
+	private static final DateFormat	fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
+	private static final DateFormat	fTimeFormatter	= DateFormat.getTimeInstance(DateFormat.SHORT);
 
 	public QuickEditDialog(Shell parentShell, TourData tourData) {
 
@@ -64,6 +70,14 @@ public class QuickEditDialog extends TitleAreaDialog {
 
 		getShell().setText(Messages.dialog_quick_edit_dialog_title);
 		setTitle(Messages.dialog_quick_edit_dialog_area_title);
+
+		fCalendar.set(fTourData.getStartYear(),
+				fTourData.getStartMonth() - 1,
+				fTourData.getStartDay(),
+				fTourData.getStartHour(),
+				fTourData.getStartMinute());
+
+		setMessage(fDateFormatter.format(fCalendar.getTime()) + "  " + fTimeFormatter.format(fCalendar.getTime()));
 
 	}
 
@@ -100,6 +114,17 @@ public class QuickEditDialog extends TitleAreaDialog {
 		fTextTitle = new Text(container, SWT.BORDER);
 		fTextTitle.setLayoutData(gd);
 
+		// description
+		label = new Label(container, SWT.NONE);
+		label.setText(Messages.Tour_Properties_Label_description);
+		label.setLayoutData(new GridData(SWT.NONE, SWT.TOP, false, false));
+		fTextDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+		GridDataFactory//
+		.fillDefaults()
+				.grab(true, true)
+				.hint(SWT.DEFAULT, pixelConverter.convertHeightInCharsToPixels(4))
+				.applyTo(fTextDescription);
+
 		// start location
 		label = new Label(container, SWT.NONE);
 		label.setText(Messages.Tour_Properties_Label_start_location);
@@ -111,17 +136,6 @@ public class QuickEditDialog extends TitleAreaDialog {
 		label.setText(Messages.Tour_Properties_Label_end_location);
 		fTextEndLocation = new Text(container, SWT.BORDER);
 		fTextEndLocation.setLayoutData(gd);
-
-		// description
-		label = new Label(container, SWT.NONE);
-		label.setText(Messages.Tour_Properties_Label_description);
-		label.setLayoutData(new GridData(SWT.NONE, SWT.TOP, false, false));
-		fTextDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
-		GridDataFactory//
-		.fillDefaults()
-				.grab(true, true)
-				.hint(SWT.DEFAULT, pixelConverter.convertHeightInCharsToPixels(4))
-				.applyTo(fTextDescription);
 	}
 
 	@Override

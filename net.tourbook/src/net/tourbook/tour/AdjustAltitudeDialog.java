@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.Spinner;
  */
 public class AdjustAltitudeDialog extends TitleAreaDialog {
 
-	private static final String	WIDGET_DATA_ALTI_ID				= "altiId"; //$NON-NLS-1$
+	private static final String	WIDGET_DATA_ALTI_ID				= "altiId";		//$NON-NLS-1$
 
 	private static final String	WIDGET_DATA_METRIC_ALTITUDE		= "metricAltitude"; //$NON-NLS-1$
 
@@ -385,7 +385,21 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 				Spinner spinner = (Spinner) e.widget;
 
-				if (UI.UNIT_VALUE_ALTITUDE != 1) {
+				if (UI.UNIT_VALUE_ALTITUDE == 1) {
+
+					int modifiedAlti = spinner.getSelection();
+//					int metricAlti = (Integer) spinner.getData(WIDGET_DATA_METRIC_ALTITUDE);
+//					
+//					final float oldAlti = metricAlti / UI.UNIT_VALUE_ALTITUDE;
+//					int newMetricAlti = (int) (modifiedAlti * UI.UNIT_VALUE_ALTITUDE);
+//					
+//					if (modifiedAlti > oldAlti) {
+//						newMetricAlti++;
+//					}
+
+					spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, modifiedAlti);
+
+				} else {
 
 					/**
 					 * adjust the non metric (imperial) value, this seems to be complicate and it is
@@ -712,7 +726,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		return fDialogArea;
 	}
 
-	@SuppressWarnings("unused") //$NON-NLS-1$
+	@SuppressWarnings("unused")
 	private void dumpMinMax(int[] altiSrc, String place) {
 
 		int minAltiSrc1 = altiSrc[0];
@@ -922,8 +936,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		try {
 			fComboAdjustType.select(dlgSettings.getInt(DIALOG_SETTINGS_ADJUST_TYPE));
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			fComboAdjustType.select(ADJUST_ALTITUDE_NONE);
 		}
 

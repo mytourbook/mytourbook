@@ -48,13 +48,13 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 	private final Chart					fChart;
 	private final IBarSelectionProvider	fBarSelectionProvider;
 
-	private final ActionOpenTour		fActionOpenTour;
-	private final ActionSetTourType		fActionSetTourType;
 	private final ActionEditQuick		fActionEditQuick;
+	private final ActionEditTour		fActionEditTour;
+	private final ActionSetTourType		fActionSetTourType;
 
-	private class ActionOpenTour extends Action {
+	private class ActionEditTour extends Action {
 
-		public ActionOpenTour(String text) {
+		public ActionEditTour(String text) {
 
 			super(text);
 
@@ -95,8 +95,8 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 		fChart = chart;
 		fBarSelectionProvider = barSelectionProvider;
 
-		fActionOpenTour = new ActionOpenTour(Messages.action_edit_tour);
 		fActionEditQuick = new ActionEditQuick(this);
+		fActionEditTour = new ActionEditTour(Messages.action_edit_tour);
 		fActionSetTourType = new ActionSetTourType(this);
 	}
 
@@ -104,14 +104,15 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 
 		final boolean isTourHovered = hoveredBarSerieIndex != -1;
 
-		fActionOpenTour.setEnabled(isTourHovered);
-
-		menuMgr.add(fActionOpenTour);
-		menuMgr.add(fActionEditQuick);
+		fActionEditQuick.setEnabled(isTourHovered);
+		fActionEditTour.setEnabled(isTourHovered);
 
 		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourHovered && tourTypes.size() > 0);
+
+		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionEditTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(new ActionZoomIntoMonth(Messages.ACTION_ZOOM_INTO_MONTH));

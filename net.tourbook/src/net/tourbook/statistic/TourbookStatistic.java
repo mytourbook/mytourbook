@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.statistic;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
@@ -57,6 +58,11 @@ public abstract class TourbookStatistic {
 	 * @param partSite
 	 */
 	public abstract void deactivateActions(IWorkbenchPartSite partSite);
+
+	/**
+	 * Disposes of the statistic
+	 */
+	public void dispose() {}
 
 	public Composite getControl() {
 		return fContainer;

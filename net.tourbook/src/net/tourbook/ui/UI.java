@@ -116,6 +116,7 @@ public class UI {
 	public static String					UNIT_LABEL_PACE;
 
 	private static final String				TOUR_TYPE_PREFIX				= "tourType";									//$NON-NLS-1$
+
 	public final static ImageRegistry		IMAGE_REGISTRY;
 
 	public static final String				IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";							//$NON-NLS-1$
@@ -128,6 +129,7 @@ public class UI {
 
 	public static final DateFormat			TimeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
 	public static final DateFormat			DateFormatter					= DateFormat.getDateInstance(DateFormat.SHORT);
+	public static final DateFormat			DateFormatterFull				= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
 

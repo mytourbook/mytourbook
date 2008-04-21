@@ -399,7 +399,7 @@ public class MappingView extends ViewPart {
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED) {
+				if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 					fTourData.clearComputedSeries();
 					paintTour(fTourData, true, true);
 					fMap.resetOverlayImageCache();

@@ -92,7 +92,9 @@ public class DataProviderTourDay extends DataProvider {
 				+ "TourDrivingTime, " // 	// 9 //$NON-NLS-1$
 				+ "TourRecordingTime, " // 	// 10 //$NON-NLS-1$
 				+ "TourTitle, " //			// 11 //$NON-NLS-1$
-				+ "TourType_typeId \n" // 	// 12 //$NON-NLS-1$
+				+ "TourType_typeId, " // 	// 12 //$NON-NLS-1$
+				+ "TourDescription " // 	// 13 //$NON-NLS-1$
+				+ "\n" //$NON-NLS-1$
 				//
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$
@@ -119,6 +121,7 @@ public class DataProviderTourDay extends DataProvider {
 			final ArrayList<Integer> dbTourRecordingTime = new ArrayList<Integer>();
 			final ArrayList<Integer> dbTourDrivingTime = new ArrayList<Integer>();
 			final ArrayList<String> dbTourTitle = new ArrayList<String>();
+			ArrayList<String> dbTourDescription = new ArrayList<String>();
 
 			final ArrayList<Long> dbTypeIds = new ArrayList<Long>();
 			final ArrayList<Integer> dbTypeColorIndex = new ArrayList<Integer>();
@@ -154,6 +157,9 @@ public class DataProviderTourDay extends DataProvider {
 				dbTourDrivingTime.add(drivingTime);
 
 				dbTourTitle.add(result.getString(11));
+
+				final String description = result.getString(13);
+				dbTourDescription.add(description == null ? UI.EMPTY_STRING : description);
 
 				/*
 				 * convert type id to the type index in the tour types list which is also the color
@@ -282,7 +288,8 @@ public class DataProviderTourDay extends DataProvider {
 			fTourDayData.fTourRecordingTimeValues = dbTourRecordingTime;
 			fTourDayData.fTourDrivingTimeValues = dbTourDrivingTime;
 
-			fTourDayData.fTourTitle = dbTourTitle;
+			fTourDayData.tourTitle = dbTourTitle;
+			fTourDayData.tourDescription = dbTourDescription;
 
 		} catch (final SQLException e) {
 			e.printStackTrace();

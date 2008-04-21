@@ -191,7 +191,7 @@ public class TourStatisticsView extends ViewPart {
 		fTourPropertyListener = new ITourPropertyListener() {
 			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void propertyChanged(int propertyId, Object propertyData) {
-				if (propertyId == TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED) {
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
 					// update statistics
 					refreshStatistics();

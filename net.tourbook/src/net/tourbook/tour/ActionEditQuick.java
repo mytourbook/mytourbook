@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.tour;
 
 import java.util.ArrayList;
@@ -25,7 +26,6 @@ import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
@@ -56,22 +56,24 @@ public class ActionEditQuick extends Action {
 		}
 
 		fTourData = selectedTours.get(0);
-		final QuickEditDialog dialog = new QuickEditDialog(Display.getCurrent().getActiveShell(), fTourData);
 
+		final QuickEditDialog dialog = new QuickEditDialog(Display.getCurrent().getActiveShell(), fTourData);
 		if (dialog.open() == Window.OK) {
 
-			ArrayList<TourData> editorTours = updateEditors(selectedTours);
+			ArrayList<TourData> toursInEditor = updateEditors(selectedTours);
 
-			TourDatabase.saveTour(fTourData);
+			// remove all tours where the tour is opened in an editor
+			ArrayList<TourData> savedTours = (ArrayList<TourData>) selectedTours.clone();
+			savedTours.removeAll(toursInEditor);
 
-			// notify all views which display the tour
-			TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED, selectedTours);
+			// update all tours (without tours from an editor) with the new tour type
+			for (TourData tourData : savedTours) {
 
-			// check if tours are opened in an editor
-			if (editorTours.size() > 0) {
-				TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED_IN_EDITOR,
-						editorTours);
+				// save the tour
+				TourDatabase.saveTour(tourData);
 			}
+
+			TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
 		}
 	}
 
@@ -80,6 +82,7 @@ public class ActionEditQuick extends Action {
 	 * 
 	 * @param selectedTours
 	 *        contains the tours where the tour type should be changed
+	 * @return
 	 * @return Returns the tours which are opened in a tour editor
 	 */
 	private ArrayList<TourData> updateEditors(ArrayList<TourData> selectedTours) {
@@ -114,24 +117,14 @@ public class ActionEditQuick extends Action {
 							editorTourData.setTourStartPlace(fTourData.getTourStartPlace());
 							editorTourData.setTourEndPlace(fTourData.getTourEndPlace());
 
+							tourEditor.setTourPropertyIsModified();
+
 							// keep updated tours
 							updatedTours.add(tourData);
 						}
 					}
 				}
 			}
-		}
-
-		// show info that at least one tour is opened in a tour editor
-		if (fTourProvider.isFromTourEditor() == false && updatedTours.size() > 0) {
-
-			/*
-			 * don't show the message when the tour is from a tour editor
-			 */
-
-			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
-					Messages.app_action_quick_edit_dlg_title,
-					Messages.app_action_quick_edit_dlg_message);
 		}
 
 		return updatedTours;

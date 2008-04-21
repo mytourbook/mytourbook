@@ -26,7 +26,6 @@ import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.views.tourCatalog.SelectionNewRefTours;
 import net.tourbook.util.PostSelectionProvider;
@@ -49,7 +48,7 @@ import org.eclipse.ui.part.EditorPart;
 
 public class TourEditor extends EditorPart {
 
-	public static final String				ID					= "net.tourbook.tour.TourEditor";	//$NON-NLS-1$
+	public static final String				ID						= "net.tourbook.tour.TourEditor";	//$NON-NLS-1$
 
 	private TourEditorInput					fEditorInput;
 
@@ -57,9 +56,9 @@ public class TourEditor extends EditorPart {
 	private TourChartConfiguration			fTourChartConfig;
 	private TourData						fTourData;
 
-	private boolean							fIsTourDirty		= false;
-	private boolean							fIsTourChanged		= false;
-	private boolean							fIsTourTypeChanged	= false;
+	private boolean							fIsTourDirty			= false;
+	private boolean							fIsTourChanged			= false;
+	private boolean							fIsTourPropertyModified	= false;
 
 	private PostSelectionProvider			fPostSelectionProvider;
 	private ISelectionListener				fPostSelectionListener;
@@ -69,7 +68,7 @@ public class TourEditor extends EditorPart {
 	private IHandlerService					fHandlerService;
 	private ActionHandlerRevertTourEditor	fRevertActionHandler;
 
-	private boolean							fIsRefTourCreated	= false;
+	private boolean							fIsRefTourCreated		= false;
 
 	private void addPartListener() {
 
@@ -146,10 +145,30 @@ public class TourEditor extends EditorPart {
 			public void propertyChanged(int propertyId, Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
+
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
 
-				} else if (propertyId == TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED) {
+				} else if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+
 					fTourChart.updateTourChart(true);
+
+				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+
+					if (fTourData == null) {
+						return;
+					}
+
+					// get modified tours
+					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					final long tourId = fTourData.getTourId();
+
+					// check if the tour in the editor was modified
+					for (TourData tourData : modifiedTours) {
+						if (tourData.getTourId() == tourId) {
+							fTourChart.updateTourChart(true);
+							return;
+						}
+					}
 				}
 			}
 		};
@@ -238,15 +257,15 @@ public class TourEditor extends EditorPart {
 			firePostSelection(new SelectionNewRefTours());
 		}
 
-		if (fIsTourTypeChanged) {
+		if (fIsTourPropertyModified) {
 
-			fIsTourTypeChanged = false;
+			fIsTourPropertyModified = false;
 
 			// notify all views which display the tour type
 			final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 			modifiedTour.add(fTourData);
 
-			TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_TOUR_TYPE_CHANGED, modifiedTour);
+			TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
 		}
 	}
 
@@ -301,6 +320,12 @@ public class TourEditor extends EditorPart {
 		updateRevertHandler();
 
 		updateTourChart();
+
+		// notify all views which display the tour
+		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
+		modifiedTour.add(fTourData);
+
+		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
 	}
 
 	@Override
@@ -335,13 +360,13 @@ public class TourEditor extends EditorPart {
 
 	/**
 	 * Set the tour type for the tour
-	 * 
-	 * @param tourType
 	 */
-	public void setTourType(TourType tourType) {
+	public void setTourPropertyIsModified() {
 
-		fTourData.setTourType(tourType);
-		fIsTourTypeChanged = true;
+		fIsTourPropertyModified = true;
+
+		// update changed properties (title has changed, this is an overkill and can be optimized)
+		fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 
 		setTourDirty();
 	}

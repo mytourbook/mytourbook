@@ -1325,6 +1325,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		final int markerWidth = BAR_MARKER_WIDTH;
+		final int barThickness = 1;
 		final int markerWidth2 = markerWidth / 2;
 
 		gc.setLineStyle(SWT.LINE_SOLID);
@@ -1353,9 +1354,9 @@ public class ChartComponentGraph extends Canvas {
 					(barRectangle.height + markerWidth));
 
 			final Rectangle barBarSelected = new Rectangle(barRectangle.x - 1,
-					barRectangle.y - 2,
-					barRectangle.width + 2,
-					barRectangle.height + 4);
+					barRectangle.y - barThickness,
+					barRectangle.width + barThickness,
+					barRectangle.height + 2 * barThickness);
 
 			final int colorIndex = colorsIndex[serieIndex][selectedIndex];
 			final RGB rgbBrightDef = rgbBright[colorIndex];
@@ -4826,15 +4827,17 @@ public class ChartComponentGraph extends Canvas {
 			return true;
 		}
 
-		// check if the content has changed
 		final String toolTipLabel = tooltip.getLabel();
-		if (toolTipLabel.trim().equals(fToolTipLabel.getText().trim())) {
+		final String toolTipTitle = tooltip.getTitle();
+
+		// check if the content has changed
+		if (toolTipLabel.trim().equals(fToolTipLabel.getText().trim())
+				&& toolTipTitle.trim().equals(fToolTipTitle.getText().trim())) {
 			return true;
 		}
 
-		final String title = tooltip.getTitle();
-		if (title != null) {
-			fToolTipTitle.setText(title);
+		if (toolTipTitle != null) {
+			fToolTipTitle.setText(toolTipTitle);
 			fToolTipTitle.pack(true);
 			fToolTipTitle.setVisible(true);
 		} else {

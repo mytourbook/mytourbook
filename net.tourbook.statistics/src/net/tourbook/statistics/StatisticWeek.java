@@ -371,8 +371,9 @@ public abstract class StatisticWeek extends YearStatistic {
 				numberOfYears,
 				isDataDirtyWithReset() || refreshData);
 
-		final int[][] timeHigh = fTourWeekData.fTimeHigh;
-		timeHigh[timeHigh.length - 1][0] = 20 * 60 * 60;
+// debug values
+//		final int[][] timeHigh = fTourWeekData.fTimeHigh;
+//		timeHigh[timeHigh.length - 1][0] = 20 * 60 * 60;
 
 		// reset min/max values
 		if (fIsSynchScaleEnabled == false && refreshData) {

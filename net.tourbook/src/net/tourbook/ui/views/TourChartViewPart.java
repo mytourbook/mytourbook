@@ -124,7 +124,7 @@ public abstract class TourChartViewPart extends ViewPart {
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
 
-				} else if (propertyId == TourManager.TOUR_PROPERTY_CHART_IS_MODIFIED) {
+				} else if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 					fTourChart.updateTourChart(true, true);
 				}
 			}

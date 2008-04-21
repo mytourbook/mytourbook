@@ -17,6 +17,7 @@
 package net.tourbook.statistics;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
@@ -33,8 +34,10 @@ import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.colors.GraphColorProvider;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
@@ -51,30 +54,31 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider {
 
-	static final String		DISTANCE_DATA	= "distance";									//$NON-NLS-1$
-	static final String		ALTITUDE_DATA	= "altitude";									//$NON-NLS-1$
-	static final String		DURATION_DATA	= "duration";									//$NON-NLS-1$
+	static final String				DISTANCE_DATA	= "distance";									//$NON-NLS-1$
+	static final String				ALTITUDE_DATA	= "altitude";									//$NON-NLS-1$
+	static final String				DURATION_DATA	= "duration";									//$NON-NLS-1$
 
-	TourTypeFilter			fActiveTourTypeFilter;
-	private TourPerson		fActivePerson;
+	TourTypeFilter					fActiveTourTypeFilter;
+	private TourPerson				fActivePerson;
 
-	Long					fSelectedTourId;
+	Long							fSelectedTourId;
 
-	int						fCurrentYear;
-	int						fCurrentMonth;
-	int						fNumberOfYears;
+	int								fCurrentYear;
+	int								fCurrentMonth;
+	int								fNumberOfYears;
 
-	Calendar				fCalendar		= GregorianCalendar.getInstance();
-	private DateFormat		fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
+	Calendar						fCalendar		= GregorianCalendar.getInstance();
+	private DateFormat				fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
-	IPostSelectionProvider	fPostSelectionProvider;
+	IPostSelectionProvider			fPostSelectionProvider;
 
-	Chart					fChart;
-	BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
+	Chart							fChart;
+	BarChartMinMaxKeeper			fMinMaxKeeper	= new BarChartMinMaxKeeper();
 
-	protected TourDayData	fTourDayData;
+	protected TourDayData			fTourDayData;
 
-	boolean					fIsSynchScaleEnabled;
+	boolean							fIsSynchScaleEnabled;
+	private ITourPropertyListener	fTourPropertyListener;
 
 	@Override
 	public void activateActions(IWorkbenchPartSite partSite) {
@@ -120,6 +124,42 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		chartSegments.allValues = tourTimeData.allDaysInAllYears;
 
 		return chartSegments;
+	}
+
+	private void addTourPropertyListener() {
+
+		fTourPropertyListener = new ITourPropertyListener() {
+			public void propertyChanged(int propertyId, Object propertyData) {
+
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+
+					// check if a tour was modified
+					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					for (TourData modifiedTourData : modifiedTours) {
+
+						long modifiedTourId = modifiedTourData.getTourId();
+
+						final long[] tourIds = fTourDayData.fTourIds;
+						for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
+
+							long tourId = tourIds[tourIdIndex];
+
+							if (tourId == modifiedTourId) {
+								// set new tour title
+								fTourDayData.tourTitle.set(tourIdIndex, modifiedTourData.getTourTitle());
+							}
+						}
+					}
+				}
+			}
+		};
+
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+	}
+
+	@Override
+	public void dispose() {
+		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 	}
 
 	@Override
@@ -177,6 +217,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				}
 			}
 		});
+
+		addTourPropertyListener();
 	}
 
 	private ChartToolTipInfo createToolTipInfo(int valueIndex) {
@@ -232,6 +274,10 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_tour_type);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_description);
+		toolTipFormat.append(NEW_LINE);
+		toolTipFormat.append(Messages.tourtime_info_description_text);
 
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(),
 		//
@@ -262,15 +308,15 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				breakTime / 3600,
 				(breakTime % 3600) / 60,
 				//
-				tourTypeName
+				tourTypeName,
+				//
+				fTourDayData.tourDescription.get(valueIndex)
 		//
 		)
 				.toString();
 
-		/*
-		 * create tool tip info
-		 */
-		String tourTitle = fTourDayData.fTourTitle.get(valueIndex);
+		// set title
+		String tourTitle = fTourDayData.tourTitle.get(valueIndex);
 		if (tourTitle == null || tourTitle.trim().length() == 0) {
 			tourTitle = tourTypeName;
 		}
