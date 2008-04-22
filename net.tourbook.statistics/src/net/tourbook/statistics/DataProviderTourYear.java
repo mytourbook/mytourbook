@@ -83,7 +83,7 @@ public class DataProviderTourYear extends DataProvider {
 				+ "tourType_typeId 			\n" //		7 //$NON-NLS-1$
 				//
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE STARTYEAR IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$
+				+ (" WHERE STARTYEAR IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
 				+ getSQLFilter(person, tourTypeFilter)
 				+ (" GROUP BY STARTYEAR, tourType_typeId") //$NON-NLS-1$
 				+ (" ORDER BY STARTYEAR"); //$NON-NLS-1$

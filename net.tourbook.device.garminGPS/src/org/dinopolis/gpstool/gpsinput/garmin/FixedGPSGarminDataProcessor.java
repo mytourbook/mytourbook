@@ -27,20 +27,20 @@ public class FixedGPSGarminDataProcessor extends GPSGarminDataProcessor {
 				try {
 
 					if (logger_packet_.isDebugEnabled()) {
-						logger_packet_.debug("waiting for packet...");
+						logger_packet_.debug("waiting for packet..."); //$NON-NLS-1$
 					}
 					if (in_stream_.available() > 0) {
 						final GarminPacket garmin_packet = getPacket();
 						if (garmin_packet == null) {
 							if (logger_packet_.isDebugEnabled()) {
-								logger_packet_.debug("invalid packet received");
+								logger_packet_.debug("invalid packet received"); //$NON-NLS-1$
 							}
 						} else {
 							if (logger_packet_.isDebugEnabled()) {
-								logger_packet_.debug("packet received: " + garmin_packet.getPacketId());
+								logger_packet_.debug("packet received: " + garmin_packet.getPacketId()); //$NON-NLS-1$
 							}
 							if (logger_packet_detail_.isDebugEnabled()) {
-								logger_packet_detail_.debug("packet details: " + garmin_packet.toString());
+								logger_packet_detail_.debug("packet details: " + garmin_packet.toString()); //$NON-NLS-1$
 							}
 							firePacketReceived(garmin_packet);
 						}

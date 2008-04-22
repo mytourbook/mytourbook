@@ -86,25 +86,11 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
 	private float parseFloat(String stringValue) {
 
-//		try {
-//
-//			final float number = Float.parseFloat(stringValue);
-//			System.out.println(". " + number);
-//			return number;
-//
-//		} catch (NumberFormatException e) {
-//
 		try {
-
-			Number number = fDecimalFormat.parse(stringValue);
-			System.out.println(", " + number);
-			return number.floatValue();
-
+			return fDecimalFormat.parse(stringValue).floatValue();
 		} catch (ParseException e1) {
 			e1.printStackTrace();
 		}
-//
-//		}
 
 		return 0;
 	}

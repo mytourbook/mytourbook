@@ -40,7 +40,7 @@ public class DeviceManager {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static List<TourbookDevice> getDeviceList() {
 
 		if (fDeviceList == null) {
@@ -54,7 +54,7 @@ public class DeviceManager {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static List<ExternalDevice> getExternalDeviceList() {
 
 		if (fExternalDeviceList == null) {
@@ -63,7 +63,7 @@ public class DeviceManager {
 		return fExternalDeviceList;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private static List readDeviceExtensions(String extensionPointName) {
 		ArrayList ret = new ArrayList();
 

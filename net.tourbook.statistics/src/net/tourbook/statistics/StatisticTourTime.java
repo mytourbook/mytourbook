@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.statistics;
 
 import java.text.DateFormat;
@@ -55,7 +56,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	private int							fNumberOfYears;
 
 	private final Calendar				fCalendar		= GregorianCalendar.getInstance();
-	private DateFormat					fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
+	private final DateFormat			fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private Chart						fChart;
 	private TourTimeData				fTourTimeData;
@@ -241,7 +242,6 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			}
 		}
 
-//		System.out.println("selectedTourId: " + selectedTourId);
 		fTourTimeData = DataProviderTourTime.getInstance().getTourTimeData(person,
 				tourTypeFilter,
 				year,
@@ -346,14 +346,16 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
 				fSelectedTourId = fTourTimeData.fTourIds[valueIndex];
 
-				String tourTypeName = TourDatabase.getTourTypeName(fTourTimeData.fTypeIds[valueIndex]);
+				final String tourTypeName = TourDatabase.getTourTypeName(fTourTimeData.fTypeIds[valueIndex]);
+				final String tourDescription = fTourTimeData.tourDescription.get(valueIndex).replace(UI.lineSeparator,
+						UI.NEW_LINE);
 
 				final int[] startValue = fTourTimeData.fTourTimeStartValues;
 				final int[] endValue = fTourTimeData.fTourTimeEndValues;
 
 				final Integer recordingTime = fTourTimeData.fTourRecordingTimeValues.get(valueIndex);
 				final Integer drivingTime = fTourTimeData.fTourDrivingTimeValues.get(valueIndex);
-				int breakTime = recordingTime - drivingTime;
+				final int breakTime = recordingTime - drivingTime;
 
 				StringBuilder toolTipFormat = new StringBuilder();
 				toolTipFormat.append(Messages.tourtime_info_date_day);
@@ -374,6 +376,14 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_tour_type);
+
+				if (tourDescription.length() > 0) {
+					toolTipFormat.append(NEW_LINE);
+					toolTipFormat.append(NEW_LINE);
+					toolTipFormat.append(Messages.tourtime_info_description);
+					toolTipFormat.append(NEW_LINE);
+					toolTipFormat.append(Messages.tourtime_info_description_text);
+				}
 
 				final String toolTipLabel = new Formatter().format(toolTipFormat.toString(),
 				//
@@ -399,7 +409,9 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 						breakTime / 3600,
 						(breakTime % 3600) / 60,
 						//					
-						tourTypeName//
+						tourTypeName,
+						tourDescription
+//
 				)
 						.toString();
 

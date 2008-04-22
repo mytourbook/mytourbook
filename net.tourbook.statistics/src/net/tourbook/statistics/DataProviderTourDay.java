@@ -97,7 +97,7 @@ public class DataProviderTourDay extends DataProvider {
 				+ "\n" //$NON-NLS-1$
 				//
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$
+				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ getSQLFilter(person, tourTypeFilter)
 				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute "); //$NON-NLS-1$
 
@@ -121,7 +121,7 @@ public class DataProviderTourDay extends DataProvider {
 			final ArrayList<Integer> dbTourRecordingTime = new ArrayList<Integer>();
 			final ArrayList<Integer> dbTourDrivingTime = new ArrayList<Integer>();
 			final ArrayList<String> dbTourTitle = new ArrayList<String>();
-			ArrayList<String> dbTourDescription = new ArrayList<String>();
+			final ArrayList<String> dbTourDescription = new ArrayList<String>();
 
 			final ArrayList<Long> dbTypeIds = new ArrayList<Long>();
 			final ArrayList<Integer> dbTypeColorIndex = new ArrayList<Integer>();

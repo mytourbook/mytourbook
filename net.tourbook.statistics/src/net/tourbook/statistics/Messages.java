@@ -25,12 +25,6 @@ public class Messages extends NLS {
 
 	public static String		ACTION_ZOOM_INTO_MONTH;
 
-	public static String		DLG_SELECT_TOUR_MSG;
-	public static String		DLG_SELECT_TOUR_TITLE;
-
-	public static String		FORMAT_HHMM_HHMM;
-
-	public static String		LABEL_DRIVING_TIME;
 	public static String		LABEL_GRAPH_ALTITUDE;
 	public static String		LABEL_GRAPH_DAYTIME;
 	public static String		LABEL_GRAPH_DISTANCE;
@@ -52,31 +46,21 @@ public class Messages extends NLS {
 
 	public static String		NUMBERS_UNIT;
 
-	public static String		TOURDAYINFO_ALTITUDE;
-	public static String		TOURDAYINFO_DISTANCE;
-	public static String		TOURDAYINFO_DURATION;
-	public static String		TOURDAYINFO_TOUR_DATE_FORMAT;
-
 	public static String		tourtime_info_altitude;
 	public static String		tourtime_info_break_time;
-	public static String	tourtime_info_date_day;
-
-	public static String	tourtime_info_date_month;
-
-	public static String	tourtime_info_date_week;
-
-	public static String	tourtime_info_date_year;
-
-	public static String	tourtime_info_description;
-
-	public static String	tourtime_info_description_text;
+	public static String		tourtime_info_date_day;
+	public static String		tourtime_info_date_month;
+	public static String		tourtime_info_date_week;
+	public static String		tourtime_info_date_year;
+	public static String		tourtime_info_description;
+	public static String		tourtime_info_description_text;
 	public static String		tourtime_info_distance;
 	public static String		tourtime_info_driving_time;
 	public static String		tourtime_info_recording_time;
 	public static String		tourtime_info_time;
-	public static String		tourtime_info_title;
 	public static String		tourtime_info_tour_type;
 	public static String		tourtime_info_week;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

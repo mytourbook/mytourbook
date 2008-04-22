@@ -43,24 +43,23 @@ import org.joda.time.DateTimeConstants;
 
 public abstract class StatisticWeek extends YearStatistic {
 
-	private Chart					fChart;
-	private BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
+	private Chart						fChart;
+	private final BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
 
-	private TourPerson				fActivePerson;
-	private TourTypeFilter			fActiveTourTypeFilter;
+	private TourPerson					fActivePerson;
+	private TourTypeFilter				fActiveTourTypeFilter;
 
-	private int						fCurrentYear;
-	private int						fNumberOfYears;
+	private int							fCurrentYear;
+	private int							fNumberOfYears;
 
-	private boolean					fIsSynchScaleEnabled;
+	private boolean						fIsSynchScaleEnabled;
 
-//	private final Calendar			fCalendar		= GregorianCalendar.getInstance();
-	private DateFormat				fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
+	private final DateFormat			fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
-	private TourDataWeek			fTourWeekData;
+	private TourDataWeek				fTourWeekData;
 
 	@Override
-	public void activateActions(IWorkbenchPartSite partSite) {
+	public void activateActions(final IWorkbenchPartSite partSite) {
 		fChart.updateChartActionHandlers();
 	}
 
@@ -75,18 +74,18 @@ public abstract class StatisticWeek extends YearStatistic {
 	 */
 	ChartSegments createChartSegments() {
 
-		int segmentStart[] = new int[fNumberOfYears];
-		int segmentEnd[] = new int[fNumberOfYears];
-		String[] segmentTitle = new String[fNumberOfYears];
+		final int segmentStart[] = new int[fNumberOfYears];
+		final int segmentEnd[] = new int[fNumberOfYears];
+		final String[] segmentTitle = new String[fNumberOfYears];
 
-		int oldestYear = fCurrentYear - fNumberOfYears + 1;
-		int[] yearWeeks = fTourWeekData.fYearWeeks;
+		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
+		final int[] yearWeeks = fTourWeekData.fYearWeeks;
 
 		int weekCounter = 0;
 		int yearIndex = 0;
 
 		// get start/end and title for each segment
-		for (int weeks : yearWeeks) {
+		for (final int weeks : yearWeeks) {
 
 			segmentStart[yearIndex] = weekCounter;
 			segmentEnd[yearIndex] = weekCounter + weeks - 1;
@@ -97,7 +96,7 @@ public abstract class StatisticWeek extends YearStatistic {
 			yearIndex++;
 		}
 
-		ChartSegments weekSegments = new ChartSegments();
+		final ChartSegments weekSegments = new ChartSegments();
 		weekSegments.valueStart = segmentStart;
 		weekSegments.valueEnd = segmentEnd;
 		weekSegments.segmentTitle = segmentTitle;
@@ -110,7 +109,9 @@ public abstract class StatisticWeek extends YearStatistic {
 	}
 
 	@Override
-	public void createControl(Composite parent, IViewSite viewSite, final IPostSelectionProvider postSelectionProvider) {
+	public void createControl(	final Composite parent,
+								final IViewSite viewSite,
+								final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -121,11 +122,11 @@ public abstract class StatisticWeek extends YearStatistic {
 		fChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 	}
 
-	private ChartToolTipInfo createToolTipInfo(int serieIndex, int valueIndex) {
+	private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
 
-		int oldestYear = fCurrentYear - fNumberOfYears + 1;
+		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
 
-		DateTime dt = (new DateTime()).withYear(oldestYear)
+		final DateTime dt = (new DateTime()).withYear(oldestYear)
 				.withWeekOfWeekyear(1)
 				.withDayOfWeek(DateTimeConstants.MONDAY)
 				.plusWeeks(valueIndex);
@@ -133,32 +134,34 @@ public abstract class StatisticWeek extends YearStatistic {
 		final int weekYear = dt.getWeekyear();
 		final int weekOfYear = dt.getWeekOfWeekyear();
 
-		String beginDate = fDateFormatter.format(dt.toDate());
-		String endDate = fDateFormatter.format(dt.plusDays(6).toDate());
+		final String beginDate = fDateFormatter.format(dt.toDate());
+		final String endDate = fDateFormatter.format(dt.plusDays(6).toDate());
 
 		final Integer recordingTime = fTourWeekData.fRecordingTime[serieIndex][valueIndex];
 		final Integer drivingTime = fTourWeekData.fDrivingTime[serieIndex][valueIndex];
-		int breakTime = recordingTime - drivingTime;
+		final int breakTime = recordingTime - drivingTime;
+
+		final String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
 
 		/*
 		 * tool tip: title
 		 */
-		StringBuilder titleString = new StringBuilder();
+		final StringBuilder titleFormat = new StringBuilder();
+		titleFormat.append(Messages.tourtime_info_week);
+		titleFormat.append(NEW_LINE);
 
-		String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
-		if (tourTypeName != null && tourTypeName.length() > 0) {
-			titleString.append(tourTypeName);
-			titleString.append(NEW_LINE);
-		}
-
-		final String toolTipTitle = new Formatter().format(titleString.toString()).toString();
+		final String toolTipTitle = new Formatter().format(titleFormat.toString(),//
+				tourTypeName,
+				weekOfYear,
+				weekYear
+		//
+		)
+				.toString();
 
 		/*
-		 * tool tip: label
+		 * // tool tip: label
 		 */
-		StringBuilder toolTipFormat = new StringBuilder();
-		toolTipFormat.append(Messages.tourtime_info_week);
-		toolTipFormat.append(NEW_LINE);
+		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.tourtime_info_date_week);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(NEW_LINE);
@@ -174,9 +177,6 @@ public abstract class StatisticWeek extends YearStatistic {
 		toolTipFormat.append(Messages.tourtime_info_break_time);
 
 		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
-				//
-				weekOfYear,
-				weekYear,
 				//
 				beginDate,
 				endDate,
@@ -203,7 +203,7 @@ public abstract class StatisticWeek extends YearStatistic {
 		 * create tool tip info
 		 */
 
-		ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 		toolTipInfo.setTitle(toolTipTitle);
 		toolTipInfo.setLabel(toolTipLabel);
 
@@ -268,8 +268,8 @@ public abstract class StatisticWeek extends YearStatistic {
 
 	private int[] createWeekData() {
 
-		int weekCounter = fTourWeekData.fAltitudeHigh[0].length;
-		int allWeeks[] = new int[weekCounter];
+		final int weekCounter = fTourWeekData.fAltitudeHigh[0].length;
+		final int allWeeks[] = new int[weekCounter];
 
 		for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
 			allWeeks[weekIndex] = weekIndex;
@@ -280,20 +280,20 @@ public abstract class StatisticWeek extends YearStatistic {
 		return allWeeks;
 	}
 
-	void createXDataWeek(ChartDataModel chartDataModel) {
+	void createXDataWeek(final ChartDataModel chartDataModel) {
 
 		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(createWeekData());
+		final ChartDataXSerie xData = new ChartDataXSerie(createWeekData());
 		xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_WEEK);
 		xData.setChartSegments(createChartSegments());
 
 		chartDataModel.setXData(xData);
 	}
 
-	void createYDataAltitude(ChartDataModel chartDataModel) {
+	void createYDataAltitude(final ChartDataModel chartDataModel) {
 
 		// altitude
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				fTourWeekData.fAltitudeLow,
 				fTourWeekData.fAltitudeHigh);
@@ -309,10 +309,10 @@ public abstract class StatisticWeek extends YearStatistic {
 		chartDataModel.addYData(yData);
 	}
 
-	void createYDataDistance(ChartDataModel chartDataModel) {
+	void createYDataDistance(final ChartDataModel chartDataModel) {
 
 		// distance
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				fTourWeekData.fDistanceLow,
 				fTourWeekData.fDistanceHigh);
@@ -328,10 +328,10 @@ public abstract class StatisticWeek extends YearStatistic {
 		chartDataModel.addYData(yData);
 	}
 
-	void createYDataDuration(ChartDataModel chartDataModel) {
+	void createYDataDuration(final ChartDataModel chartDataModel) {
 
 		// duration
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				fTourWeekData.fTimeLow,
 				fTourWeekData.fTimeHigh);
@@ -348,17 +348,17 @@ public abstract class StatisticWeek extends YearStatistic {
 	}
 
 	@Override
-	public void deactivateActions(IWorkbenchPartSite partSite) {}
+	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
 	public void prefColorChanged() {
 		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, fNumberOfYears, false);
 	}
 
-	public void refreshStatistic(	TourPerson person,
-									TourTypeFilter typeId,
-									int currentYear,
-									int numberOfYears,
-									boolean refreshData) {
+	public void refreshStatistic(	final TourPerson person,
+									final TourTypeFilter typeId,
+									final int currentYear,
+									final int numberOfYears,
+									final boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourTypeFilter = typeId;
@@ -380,7 +380,7 @@ public abstract class StatisticWeek extends YearStatistic {
 			fMinMaxKeeper.resetMinMax();
 		}
 
-		ChartDataModel chartDataModel = createChartDataModel();
+		final ChartDataModel chartDataModel = createChartDataModel();
 
 		setChartProviders(chartDataModel);
 
@@ -396,58 +396,18 @@ public abstract class StatisticWeek extends YearStatistic {
 		fChart.setSelectedBars(null);
 	}
 
-//	@Override
-//	public boolean selectDay(Long date) {
-//		fCalendar.setTimeInMillis(date);
-//		int selectedWeek = fCalendar.get(Calendar.WEEK_OF_YEAR) - 0;
-//
-//		boolean selectedItems[] = new boolean[53];
-//		selectedItems[selectedWeek] = true;
-//
-//		fChart.setSelectedBars(selectedItems);
-//
-//		return true;
-//	}
-//
-//	@Override
-//	public boolean selectMonth(Long date) {
-//
-//		fCalendar.setTimeInMillis(date);
-//		int selectedMonth = fCalendar.get(Calendar.MONTH);
-//
-//		boolean selectedItems[] = new boolean[53];
-//		boolean isSelected = false;
-//
-//		// select all weeks in the selected month
-//		for (int weekIndex = 0; weekIndex < selectedItems.length; weekIndex++) {
-//			fCalendar.set(Calendar.WEEK_OF_YEAR, weekIndex + 0);
-//
-//			boolean isMonthSelected = fCalendar.get(Calendar.MONTH) == selectedMonth ? true : false;
-//			if (isMonthSelected) {
-//				isSelected = true;
-//			}
-//			selectedItems[weekIndex] = isMonthSelected;
-//		}
-//
-//		if (isSelected) {
-//			fChart.setSelectedBars(selectedItems);
-//		}
-//
-//		return isSelected;
-//	}
-
 	private void setChartProviders(final ChartDataModel chartModel) {
 
 		// set tool tip info
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-			public ChartToolTipInfo getToolTipInfo(final int serieIndex, int valueIndex) {
+			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 				return createToolTipInfo(serieIndex, valueIndex);
 			}
 		});
 	}
 
 	@Override
-	public void setSynchScale(boolean isSynchScaleEnabled) {
+	public void setSynchScale(final boolean isSynchScaleEnabled) {
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
 

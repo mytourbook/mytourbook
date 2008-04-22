@@ -40,7 +40,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticYear extends YearStatistic {
 
-	private static final String			STRING_SEPARATOR	= " - ";
+	private static final String			STRING_SEPARATOR	= " - "; //$NON-NLS-1$
 	private TourPerson					fActivePerson;
 	private TourTypeFilter				fActiveTourTypeFilter;
 

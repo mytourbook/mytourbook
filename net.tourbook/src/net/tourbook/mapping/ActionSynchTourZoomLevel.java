@@ -35,7 +35,7 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 
 	private class ActionZoomLevel extends Action {
 
-		private static final String OSX_SPACER_STRING = " ";
+		private static final String OSX_SPACER_STRING = " "; //$NON-NLS-1$
 		private int	fActionZoomLevel;
 
 		public ActionZoomLevel(int zoomLevel, String label) {

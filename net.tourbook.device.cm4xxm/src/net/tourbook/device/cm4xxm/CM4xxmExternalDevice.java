@@ -32,7 +32,7 @@ public class CM4xxmExternalDevice extends SimpleSerialDevice {
 
 	@Override
 	public String getFileExtension() {
-		return "dat";
+		return "dat"; //$NON-NLS-1$
 	}
 
 }

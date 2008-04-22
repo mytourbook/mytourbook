@@ -32,7 +32,7 @@ public class HAC4ProExternalDevice extends SimpleSerialDevice {
 
 	@Override
 	public String getFileExtension() {
-		return "dat";
+		return "dat"; //$NON-NLS-1$
 	}
 
 }

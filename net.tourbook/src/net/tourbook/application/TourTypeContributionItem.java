@@ -100,7 +100,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	/**
 	 * @return Returns a list with all tour type filters
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public static ArrayList<TourTypeFilter> getTourTypeFilters() {
 
 		ArrayList<TourTypeFilter> filterList = readXMLFilterFile();

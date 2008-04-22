@@ -21,9 +21,6 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";						//$NON-NLS-1$
 
-	public static String		app_action_quick_edit_dlg_message;
-	public static String		app_action_quick_edit_dlg_title;
-
 	public static String		App_Action_set_tour_type_dlg_title;
 	public static String		App_Action_set_tour_type_dlg_message;
 
@@ -238,7 +235,6 @@ public class Messages extends NLS {
 	public static String		Import_Wizard_Dlg_message;
 	public static String		Import_Wizard_Dlg_title;
 	public static String		Import_Wizard_Error_com_port_is_required;
-	public static String		Import_Wizard_Error_invalid_data_format;
 	public static String		Import_Wizard_Error_path_is_invalid;
 	public static String		Import_Wizard_Error_select_a_device;
 	public static String		Import_Wizard_Label_auto_save_path;

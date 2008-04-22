@@ -196,7 +196,7 @@ public class WizardPageImportSettings extends WizardPage {
 	/**
 	 * create field: serial port
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void createFieldSerialPort() {
 
 		GridData gd;

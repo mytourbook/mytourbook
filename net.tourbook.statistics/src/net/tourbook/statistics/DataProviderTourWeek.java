@@ -96,7 +96,7 @@ public class DataProviderTourWeek extends DataProvider {
 				+ "\n" //$NON-NLS-1$
 				//
 				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$
+				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
 				+ getSQLFilter(person, tourTypeFilter)
 				+ (" GROUP BY StartYear, StartWeek, tourType_typeId") //$NON-NLS-1$
 				+ (" ORDER BY StartYear, StartWeek"); //$NON-NLS-1$

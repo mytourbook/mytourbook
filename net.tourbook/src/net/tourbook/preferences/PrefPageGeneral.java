@@ -192,13 +192,13 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		final String groupSep = fTxtGroupSep.getStringValue();
 
 		StringBuilder buffer = new StringBuilder();
-		buffer.append("123");
+		buffer.append("123"); //$NON-NLS-1$
 		buffer.append(groupSep);
-		buffer.append("456");
+		buffer.append("456"); //$NON-NLS-1$
 		buffer.append(groupSep);
-		buffer.append("789");
+		buffer.append("789"); //$NON-NLS-1$
 		buffer.append(fTxtDecimalSep.getStringValue());
-		buffer.append("34");
+		buffer.append("34"); //$NON-NLS-1$
 
 		fLblExampleValue.setText(buffer.toString());
 		fLblExampleValue.pack(true);

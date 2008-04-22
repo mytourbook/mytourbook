@@ -23,7 +23,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class TourbookStatistic {
 
-	protected static final String	NEW_LINE	= "\n";
+	protected static final String	NEW_LINE	= "\n"; //$NON-NLS-1$
 
 	public String					fStatisticId;
 

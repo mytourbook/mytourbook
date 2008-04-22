@@ -46,5 +46,6 @@ public class TourTimeData {
 	ArrayList<Integer>	fTourDrivingTimeValues;
 
 	ArrayList<String>	fTourTitle;
+	ArrayList<String>	tourDescription;
 
 }

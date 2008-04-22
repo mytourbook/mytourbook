@@ -77,7 +77,7 @@ public class QuickEditDialog extends TitleAreaDialog {
 				fTourData.getStartHour(),
 				fTourData.getStartMinute());
 
-		setMessage(fDateFormatter.format(fCalendar.getTime()) + "  " + fTimeFormatter.format(fCalendar.getTime()));
+		setMessage(fDateFormatter.format(fCalendar.getTime()) + "  " + fTimeFormatter.format(fCalendar.getTime())); //$NON-NLS-1$
 
 	}
 

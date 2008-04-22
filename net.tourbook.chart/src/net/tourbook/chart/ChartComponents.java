@@ -551,7 +551,7 @@ public class ChartComponents extends Composite {
 
 		if (axisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && graphValue > graphMaxValue) {
 
-			unitList.add(new ChartUnit(graphMaxValue, ""));
+			unitList.add(new ChartUnit(graphMaxValue, "")); //$NON-NLS-1$
 		}
 	}
 

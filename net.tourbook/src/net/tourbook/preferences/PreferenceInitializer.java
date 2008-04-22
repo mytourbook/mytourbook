@@ -52,8 +52,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
 
 		store.setDefault(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT, false);
-		store.setDefault(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR, ".");
-		store.setDefault(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR, "'");
+		store.setDefault(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR, "."); //$NON-NLS-1$
+		store.setDefault(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR, "'"); //$NON-NLS-1$
 
 		/*
 		 * statistics

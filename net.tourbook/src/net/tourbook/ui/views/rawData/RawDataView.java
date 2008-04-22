@@ -300,7 +300,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void propertyChanged(int propertyId, Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
@@ -727,7 +727,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		final IStructuredSelection tourSelection = (IStructuredSelection) fTourViewer.getSelection();
@@ -789,7 +789,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fPostSelectionProvider.setSelection(selection);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
 	public Object getAdapter(Class adapter) {
 
