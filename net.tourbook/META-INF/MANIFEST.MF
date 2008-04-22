@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 1.4.0.v20080312
+Bundle-Version: 1.5.0.v20080425
 Bundle-ClassPath: net.tourbook.jar,
  persistence.jar,
  joda-time-1.5.2.jar

@@ -2,8 +2,8 @@
 <feature
       id="net.tourbook.geoclipse.feature"
       label="Geoclipse Feature"
-      version="0.0.1.v20080312"
-      provider-name="de.byteholder.geoclipse">
+      version="0.1.0.v20080425"
+      provider-name="Geoclipse">
 
    <copyright>
       (c) Copyright Wolfgang Schramm and Contributors 2005, 2008. 
