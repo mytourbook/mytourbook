@@ -32,10 +32,6 @@
 		<nature>org.eclipse.jem.beaninfo.BeanInfoNature</nature>
 	</natures>
 	<linkedResources>
-		<link>
-			<name>mytourbook.wiki</name>
-			<type>1</type>
-			<location>M:/mytourbook RESOURCEN/osm-wiki/mytourbook.wiki</location>
-		</link>
+		
 	</linkedResources>
 </projectDescription>
