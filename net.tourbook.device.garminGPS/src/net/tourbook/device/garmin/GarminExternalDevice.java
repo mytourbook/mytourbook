@@ -73,7 +73,7 @@ public class GarminExternalDevice extends ExternalDevice {
 
 		return new IRunnableWithProgress() {
 
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run(final IProgressMonitor monitor) {
 				fCancelImport = false;
 				final Thread currentThread = Thread.currentThread();
@@ -85,7 +85,7 @@ public class GarminExternalDevice extends ExternalDevice {
 				// handling of monitor.isCanceled()
 				Thread cancelObserver = new Thread(new Runnable() {
 
-					@Override
+//					@Override
 					public void run() {
 						while (!monitor.isCanceled()) {
 							try {
@@ -131,19 +131,19 @@ public class GarminExternalDevice extends ExternalDevice {
 					garminDataProcessor.addProgressListener(new ProgressListener() {
 						private int	done;
 
-						@Override
+//						@Override
 						public void actionStart(String action_id, int min_value, int max_value) {
 							done = 0;
 							monitor.beginTask(monitorDevInfo, max_value);
 						}
 
-						@Override
+//						@Override
 						public void actionProgress(String action_id, int current_value) {
 							monitor.worked(current_value - done);
 							done = current_value;
 						}
 
-						@Override
+//						@Override
 						public void actionEnd(String action_id) {}
 
 					});
@@ -190,8 +190,8 @@ public class GarminExternalDevice extends ExternalDevice {
 									+ track.getIdentification()
 									+ ".gpx"); //$NON-NLS-1$
 
-							Reader reader = new InputStreamReader(this.getClass().getResourceAsStream(
-									"/gpx-template/gpx-1.0.vm")); //$NON-NLS-1$
+							Reader reader = new InputStreamReader(this.getClass()
+									.getResourceAsStream("/gpx-template/gpx-1.0.vm")); //$NON-NLS-1$
 							Writer writer = new FileWriter(receivedFile);
 
 							addDefaultValuesToContext(context);
@@ -212,19 +212,21 @@ public class GarminExternalDevice extends ExternalDevice {
 						// "Garmin device does not respond" -> org.dinopolis.gpstool.gpsinput.garmin.GPSGarminDataProcessor.open()
 						if (ex instanceof GPSException && ex.getMessage().equals("Garmin device does not respond!")) { //$NON-NLS-1$
 							runnable = new Runnable() {
-								@Override
+//								@Override
 								public void run() {
 									MessageDialog.openError(display.getActiveShell(),
-											Messages.Garmin_data_transfer_error, Messages.Garmin_no_connection);
+											Messages.Garmin_data_transfer_error,
+											Messages.Garmin_no_connection);
 								}
 							};
 						} else {
 							runnable = new Runnable() {
-								@Override
+//								@Override
 								public void run() {
 									ex.printStackTrace();
 									ErrorDialog.openError(display.getActiveShell(),
-											Messages.Garmin_data_transfer_error, Messages.Garmin_error_receiving_data,
+											Messages.Garmin_data_transfer_error,
+											Messages.Garmin_error_receiving_data,
 											new Status(Status.ERROR,
 													Activator.PLUGIN_ID,
 													Messages.Garmin_commuication_error,
@@ -248,7 +250,7 @@ public class GarminExternalDevice extends ExternalDevice {
 			 * @param activeLog
 			 * @param tracks
 			 */
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			private void mergeActiveLog(GarminTrack activeLog, List<GarminTrack> tracks) {
 
 				Map<ListIterator<GPSTrackpoint>, GPSTrackpoint> destinationTracks = new HashMap<ListIterator<GPSTrackpoint>, GPSTrackpoint>();
@@ -305,7 +307,7 @@ public class GarminExternalDevice extends ExternalDevice {
 	 * @param context
 	 *        the velocity context holding all the data
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void addDefaultValuesToContext(VelocityContext context) {
 		DecimalFormat latitude_formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
 		latitude_formatter.applyPattern("0.0000000"); //$NON-NLS-1$
