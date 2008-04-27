@@ -1,4 +1,4 @@
-<?xml version="1.0"?> $dateformatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss'Z'") $longitudeformatter.applyPattern("0.000000") $latitudeformatter.applyPattern("0.000000") $altitudeformatter.applyPattern("0")
+<?xml version="1.0"?> $dateformatter.applyPattern("yyyy-MM-dd'T'HH:mm:ssZ") $longitudeformatter.applyPattern("0.000000") $latitudeformatter.applyPattern("0.000000") $altitudeformatter.applyPattern("0")
 <gpx  version="1.0"
   creator="$author"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
