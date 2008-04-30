@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
- *  
+ *
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with 
+ *
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device.garmin;
 
@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Map.Entry;
 
 import net.tourbook.importdata.ExternalDevice;
@@ -65,6 +66,14 @@ public class GarminExternalDevice extends ExternalDevice {
 
 	public GarminExternalDevice() {
 		buildNewFileNames = false;
+		Properties veloProp = new Properties();
+		try {
+			veloProp.load(this.getClass()
+					.getResourceAsStream("/velocity.properties"));
+			Velocity.init(veloProp);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override
@@ -97,7 +106,7 @@ public class GarminExternalDevice extends ExternalDevice {
 
 						fCancelImport = true;
 
-						// we have to be a little bit insistent because 
+						// we have to be a little bit insistent because
 						// InterruptedException is catched at GPSGarminDataProcessor.putPacket(GarminPacket, long)
 						// and request is repeated 5 times (MAX_TRIES)
 						while (currentThread.isAlive()) {
@@ -196,7 +205,6 @@ public class GarminExternalDevice extends ExternalDevice {
 
 							addDefaultValuesToContext(context);
 
-							Velocity.init();
 							Velocity.evaluate(context, writer, "MyTourbook", reader); //$NON-NLS-1$
 							writer.close();
 
@@ -245,7 +253,7 @@ public class GarminExternalDevice extends ExternalDevice {
 
 			/**
 			 * If in the tracks date or altitude values is missing, these are copied from activeLog.
-			 * 
+			 *
 			 * @param monitor
 			 * @param activeLog
 			 * @param tracks
@@ -303,7 +311,7 @@ public class GarminExternalDevice extends ExternalDevice {
 	// ----------------------------------------------------------------------
 	/**
 	 * Adds some important values to the velocity context (e.g. date, ...).
-	 * 
+	 *
 	 * @param context
 	 *        the velocity context holding all the data
 	 */
