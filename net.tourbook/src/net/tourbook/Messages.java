@@ -310,13 +310,10 @@ public class Messages extends NLS {
 	public static String		Pref_People_Title;
 
 	public static String		pref_regional_decimalSeparator;
-
 	public static String		pref_regional_description;
 	public static String		pref_regional_groupSeparator;
-
 	public static String		pref_regional_title;
 	public static String		pref_regional_useCustomDecimalFormat;
-
 	public static String		pref_regional_value_example;
 
 	public static String		Pref_Statistic_Label_altitude;
@@ -450,6 +447,8 @@ public class Messages extends NLS {
 	public static String		tourCatalog_view_action_delete_compared_tour;
 	public static String		tourCatalog_view_action_delete_tours;
 	public static String		tourCatalog_view_action_link;
+
+	public static String		tourCatalog_view_action_number_of_years;
 	public static String		tourCatalog_view_action_refresh_view_tooltip;
 	public static String		tourCatalog_view_action_rename_reference_tour;
 	public static String		tourCatalog_view_action_save_marker;
@@ -474,6 +473,8 @@ public class Messages extends NLS {
 	public static String		tourCatalog_view_label_chart_title_reference_tour;
 	public static String		tourCatalog_view_label_year_chart_title;
 	public static String		tourCatalog_view_label_year_not_selected;
+	public static String		tourCatalog_view_tooltip_speed;
+
 	public static String		tourCatalog_wizard_Action_deselect_all;
 	public static String		tourCatalog_wizard_Action_select_all;
 	public static String		tourCatalog_wizard_Action_select_all_tours;

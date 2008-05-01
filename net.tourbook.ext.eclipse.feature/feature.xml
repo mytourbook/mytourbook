@@ -38,14 +38,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.update.configurator.nl1"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.update.core"
          download-size="0"
          install-size="0"
@@ -55,14 +47,6 @@
    <plugin
          id="org.eclipse.update.core.linux"
          os="linux"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.core.nl1"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -83,14 +67,6 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.ui.nl1"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
          unpack="false"/>
 
    <plugin

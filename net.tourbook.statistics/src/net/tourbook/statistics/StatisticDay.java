@@ -340,7 +340,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 		final ChartDataXSerie xData = new ChartDataXSerie(fTourDayData.fDOYValues);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_DAY);
-		xData.setVisibleMaxValue(fCurrentYear);
+//		xData.setVisibleMaxValue(fCurrentYear);
 		xData.setChartSegments(createChartSegments(fTourDayData));
 
 		chartModel.setXData(xData);

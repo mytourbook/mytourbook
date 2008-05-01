@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.util;
 
 import java.util.ArrayList;
@@ -25,14 +26,12 @@ public class ArrayListToArray {
 	 * @param list
 	 * @return
 	 */
-	final public static int[] toInt(ArrayList<Integer> list) {
+	final public static int[] toInt(final ArrayList<Integer> list) {
 
-		int[] returnInt = new int[list.size()];
-
-		Object[] valueList = list.toArray();
+		final int[] returnInt = new int[list.size()];
 		int valueIndex = 0;
 
-		for (Object value : valueList) {
+		for (final Object value : list.toArray()) {
 			returnInt[valueIndex++] = (Integer) value;
 		}
 
@@ -45,14 +44,12 @@ public class ArrayListToArray {
 	 * @param list
 	 * @return
 	 */
-	final public static long[] toLong(ArrayList<Long> list) {
+	final public static long[] toLong(final ArrayList<Long> list) {
 
-		long[] returnLong = new long[list.size()];
-
-		Object[] valueList = list.toArray();
+		final long[] returnLong = new long[list.size()];
 		int iValue = 0;
 
-		for (Object value : valueList) {
+		for (final Object value : list.toArray()) {
 			if (value == null) {
 				returnLong[iValue++] = -1;
 			} else {

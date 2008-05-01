@@ -29,19 +29,21 @@ public class SelectionTourCatalogView implements ISelection {
 	/**
 	 * Unique id for a reference tour in {@link TourReference} entity
 	 */
-	private Long			fRefId;
+	private Long							fRefId;
 
 	/**
 	 * unique id for {@link TourCompared} entity or <code>-1</code> when the compared tour is not
 	 * saved in the database
 	 */
-	private Long			fCompareId;
-	private Long			fCompTourId;
+	private Long							fCompareId;
+	private Long							fCompTourId;
 
-	private int				fCompareStartIndex;
-	private int				fCompareEndIndex;
+	private int								fCompareStartIndex;
+	private int								fCompareEndIndex;
 
-	private TourCatalogItemYear	fYearItem;
+	private TourCatalogItemYear				fYearItem;
+
+	private TourCatalogItemReferenceTour	fRefItem;
 
 	public SelectionTourCatalogView(Long refId) {
 		fRefId = refId;
@@ -76,7 +78,15 @@ public class SelectionTourCatalogView implements ISelection {
 	}
 
 	/**
-	 * @return Returns the {@link TourCatalogItemYear} item or <code>null</code> when it's not set
+	 * @return Returns the item {@link TourCatalogItemReferenceTour} or <code>null</code> when
+	 *         it's not set
+	 */
+	public TourCatalogItemReferenceTour getRefItem() {
+		return fRefItem;
+	}
+
+	/**
+	 * @return Returns the item {@link TourCatalogItemYear} or <code>null</code> when it's not set
 	 */
 	public TourCatalogItemYear getYearItem() {
 		return fYearItem;
@@ -84,6 +94,10 @@ public class SelectionTourCatalogView implements ISelection {
 
 	public boolean isEmpty() {
 		return false;
+	}
+
+	public void setRefItem(TourCatalogItemReferenceTour refItem) {
+		fRefItem = refItem;
 	}
 
 	/**
@@ -98,10 +112,7 @@ public class SelectionTourCatalogView implements ISelection {
 	 * @param compEndIndex
 	 *        end index of the x-marker
 	 */
-	public void setTourCompareData(	long compareId,
-									long compTourId,
-									int compStartIndex,
-									int compEndIndex) {
+	public void setTourCompareData(long compareId, long compTourId, int compStartIndex, int compEndIndex) {
 
 		fCompareId = compareId;
 		fCompTourId = compTourId;

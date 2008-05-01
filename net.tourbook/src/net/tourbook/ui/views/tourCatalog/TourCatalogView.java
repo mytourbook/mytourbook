@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.ui.views.tourCatalog;
 
 import java.text.DateFormat;
@@ -737,15 +738,24 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		final Object item = selection.getFirstElement();
 
 		ISelection tourCatalogSelection = null;
+		boolean selectTourInChart = false;
 
 		if (item instanceof TourCatalogItemReferenceTour) {
+
+			// reference tour is selected
 
 			final TourCatalogItemReferenceTour refItem = (TourCatalogItemReferenceTour) item;
 
 			tourCatalogSelection = new SelectionTourCatalogView(refItem.refId);
 			fActiveRefId = refItem.refId;
 
+			((SelectionTourCatalogView) tourCatalogSelection).setRefItem(refItem);
+
+			selectTourInChart = true;
+
 		} else if (item instanceof TourCatalogItemYear) {
+
+			// year item is selected
 
 			final TourCatalogItemYear yearItem = (TourCatalogItemYear) item;
 
@@ -754,7 +764,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 			((SelectionTourCatalogView) tourCatalogSelection).setYearData(yearItem);
 
+			selectTourInChart = true;
+
 		} else if (item instanceof TourCatalogItemComparedTour) {
+
+			// compared tour is selected
 
 			final TourCatalogItemComparedTour compItem = (TourCatalogItemComparedTour) item;
 
@@ -763,7 +777,22 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		}
 
 		if (tourCatalogSelection != null) {
+
+			// fire selection for the selected tour catalog item
 			fPostSelectionProvider.setSelection(tourCatalogSelection);
+
+			if (selectTourInChart) {
+
+				/*
+				 * get selection from year statistic view, this selection is set from the previous
+				 * fired selection
+				 */
+				final ISelection selectionInTourChart = getSite().getWorkbenchWindow()
+						.getSelectionService()
+						.getSelection(TourCatalogViewYearStatistic.ID);
+
+				fPostSelectionProvider.setSelection(selectionInTourChart);
+			}
 		}
 	}
 
