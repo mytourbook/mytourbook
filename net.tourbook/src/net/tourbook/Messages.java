@@ -25,6 +25,7 @@ public class Messages extends NLS {
 	public static String		App_Action_set_tour_type_dlg_message;
 
 	public static String		dialog_quick_edit_dialog_area_title;
+	public static String		dialog_quick_edit_dialog_save;
 	public static String		dialog_quick_edit_dialog_title;
 
 	public static String		App_Action_About;

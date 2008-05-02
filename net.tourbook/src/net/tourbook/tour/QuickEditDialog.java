@@ -25,6 +25,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.PixelConverter;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -79,6 +80,12 @@ public class QuickEditDialog extends TitleAreaDialog {
 
 		setMessage(fDateFormatter.format(fCalendar.getTime()) + "  " + fTimeFormatter.format(fCalendar.getTime())); //$NON-NLS-1$
 
+	}
+
+	@Override
+	protected final void createButtonsForButtonBar(final Composite parent) {
+		super.createButtonsForButtonBar(parent);
+		getButton(IDialogConstants.OK_ID).setText(Messages.dialog_quick_edit_dialog_save);
 	}
 
 	@Override

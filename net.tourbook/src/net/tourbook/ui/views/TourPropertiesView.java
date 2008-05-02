@@ -514,6 +514,8 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 		restoreState(fSessionMemento);
 
+		enableControls();
+
 		// show data from last selection
 		onChangeSelection(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 	}
