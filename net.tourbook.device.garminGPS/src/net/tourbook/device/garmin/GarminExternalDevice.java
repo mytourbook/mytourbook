@@ -69,7 +69,7 @@ public class GarminExternalDevice extends ExternalDevice {
 		Properties veloProp = new Properties();
 		try {
 			veloProp.load(this.getClass()
-					.getResourceAsStream("/velocity.properties"));
+					.getResourceAsStream("/velocity.properties")); //$NON-NLS-1$
 			Velocity.init(veloProp);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -82,7 +82,7 @@ public class GarminExternalDevice extends ExternalDevice {
 
 		return new IRunnableWithProgress() {
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void run(final IProgressMonitor monitor) {
 				fCancelImport = false;
 				final Thread currentThread = Thread.currentThread();
@@ -258,7 +258,7 @@ public class GarminExternalDevice extends ExternalDevice {
 			 * @param activeLog
 			 * @param tracks
 			 */
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			private void mergeActiveLog(GarminTrack activeLog, List<GarminTrack> tracks) {
 
 				Map<ListIterator<GPSTrackpoint>, GPSTrackpoint> destinationTracks = new HashMap<ListIterator<GPSTrackpoint>, GPSTrackpoint>();
@@ -315,7 +315,7 @@ public class GarminExternalDevice extends ExternalDevice {
 	 * @param context
 	 *        the velocity context holding all the data
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	private void addDefaultValuesToContext(VelocityContext context) {
 		DecimalFormat latitude_formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
 		latitude_formatter.applyPattern("0.0000000"); //$NON-NLS-1$
