@@ -35,7 +35,6 @@ import net.tourbook.ui.ISelectedTours;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 
 /**
  * provides the fill menu methods for the chart context menu
@@ -45,7 +44,7 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 	/** 
 	 * 
 	 */
-	private final Chart					fChart;
+//	private final Chart					fChart;
 	private final IBarSelectionProvider	fBarSelectionProvider;
 
 	private final ActionEditQuick		fActionEditQuick;
@@ -78,21 +77,21 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 		}
 	}
 
-	private class ActionZoomIntoMonth extends Action {
-
-		public ActionZoomIntoMonth(String text) {
-			super(text);
-		}
-
-		@Override
-		public void run() {
-			fChart.zoomWithParts(12, fBarSelectionProvider.getSelectedMonth() - 1, false);
-		}
-	}
+//	private class ActionZoomIntoMonth extends Action {
+//
+//		public ActionZoomIntoMonth(String text) {
+//			super(text);
+//		}
+//
+//		@Override
+//		public void run() {
+//			fChart.zoomWithParts(12, fBarSelectionProvider.getSelectedMonth() - 1, false);
+//		}
+//	}
 
 	public TourContextProvider(Chart chart, IBarSelectionProvider barSelectionProvider) {
 
-		fChart = chart;
+//		fChart = chart;
 		fBarSelectionProvider = barSelectionProvider;
 
 		fActionEditQuick = new ActionEditQuick(this);
@@ -114,8 +113,9 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionEditTour);
 
-		menuMgr.add(new Separator());
-		menuMgr.add(new ActionZoomIntoMonth(Messages.ACTION_ZOOM_INTO_MONTH));
+// disabled because it shows the wrong month		
+//		menuMgr.add(new Separator());
+//		menuMgr.add(new ActionZoomIntoMonth(Messages.ACTION_ZOOM_INTO_MONTH));
 	}
 
 	public void fillContextMenu(IMenuManager menuMgr) {}
