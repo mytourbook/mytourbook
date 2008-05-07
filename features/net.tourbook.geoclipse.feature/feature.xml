@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.geoclipse.feature"
       label="Geoclipse Feature"
-      version="0.1.0.v20080425"
+      version="0.1.0.v20080509"
       provider-name="Geoclipse">
 
    <copyright>
@@ -294,7 +294,7 @@ POSSIBILITY OF SUCH DAMAGES.
    </license>
 
    <requires>
-      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui" version="3.3" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.swt"/>
    </requires>
