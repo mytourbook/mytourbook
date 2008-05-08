@@ -74,14 +74,14 @@ public class UI {
 	private static final String				UNIT_ALTITUDE_M					= "m";											//$NON-NLS-1$
 	public static final String				UNIT_DISTANCE_KM				= "km";										//$NON-NLS-1$
 	private static final String				UNIT_SPEED_KM_H					= "km/h";										//$NON-NLS-1$
-	private static final String				UNIT_FAHRENHEIT_C				= "°C";										//$NON-NLS-1$
+	private static final String				UNIT_FAHRENHEIT_C				= "\u00B0C";										//$NON-NLS-1$
 	private static final String				UNIT_ALTIMETER_M_H				= "m/h";										//$NON-NLS-1$
 	private static final String				UNIT_PACE_MIN_P_KM				= "min/km";									//$NON-NLS-1$
 
 	private static final String				UNIT_ALTITUDE_FT				= "ft";										//$NON-NLS-1$
 	public static final String				UNIT_DISTANCE_MI				= "mi";										//$NON-NLS-1$
 	private static final String				UNIT_SPEED_MPH					= "mph";										//$NON-NLS-1$
-	private static final String				UNIT_FAHRENHEIT_F				= "°F";										//$NON-NLS-1$
+	private static final String				UNIT_FAHRENHEIT_F				= "\u00B0F";										//$NON-NLS-1$
 	private static final String				UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
 	private static final String				UNIT_PACE_MIN_P_MILE			= "min/mi";									//$NON-NLS-1$
 
@@ -106,7 +106,7 @@ public class UI {
 	 */
 	public static float						UNIT_VALUE_TEMPERATURE			= 1;
 
-	// (°C × 9/5) + 32 = °F
+	// (ï¿½C ï¿½ 9/5) + 32 = ï¿½F
 	public static final float				UNIT_FAHRENHEIT_MULTI			= 1.8f;
 	public static final float				UNIT_FAHRENHEIT_ADD				= 32;
 
