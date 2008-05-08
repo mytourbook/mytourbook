@@ -3631,10 +3631,6 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onMouseDown(final MouseEvent event) {
 
-		if (event.button != 1) {
-			return;
-		}
-
 		final ScrollBar hBar = getHorizontalBar();
 		final int hBarOffset = hBar.isVisible() ? hBar.getSelection() : 0;
 
@@ -3642,6 +3638,13 @@ public class ChartComponentGraph extends Canvas {
 		final int devYMouse = event.y;
 		final int devXGraph = hBarOffset + devXMouse;
 
+		if (event.button != 1) {
+			if (event.button == 3) {
+				calculateSliderForContextMenu(devXMouse, devYMouse, devXGraph);
+			}
+			return;
+		}
+		
 		// check if a x-slider was hit
 		xSliderDragged = null;
 		if (xSliderA.getHitRectangle().contains(devXGraph, devYMouse)) {
@@ -4012,9 +4015,6 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
-		if (event.button == 3) {
-			calculateSliderForContextMenu(devX, devY, graphX);
-		}
 	}
 
 	/**
