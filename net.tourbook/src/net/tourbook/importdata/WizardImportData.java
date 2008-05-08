@@ -105,6 +105,9 @@ public class WizardImportData extends Wizard {
 			return false;
 		}
 
+		RawDataManager rawDataManager = RawDataManager.getInstance();
+		rawDataManager.setImportCanceled(false);
+
 		/*
 		 * receive data from the device
 		 */
@@ -123,7 +126,6 @@ public class WizardImportData extends Wizard {
 		}
 
 		// import received files
-		RawDataManager rawDataManager = RawDataManager.getInstance();
 		FileCollisionBehavior fileCollision = new FileCollisionBehavior();
 		for (File inFile : fReceivedFiles) {
 			rawDataManager.importRawData(inFile, fPageImportSettings.fPathEditor.getStringValue(),

@@ -719,4 +719,8 @@ public class RawDataManager {
 	public void setMergeTracks(boolean checked) {
 		fIsMergeTracks = checked;
 	}
+
+	public void setImportCanceled(boolean importCanceled) {
+		fImportCanceled = importCanceled;
+	}
 }
