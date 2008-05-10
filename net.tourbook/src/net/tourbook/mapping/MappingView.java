@@ -30,6 +30,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
@@ -61,6 +62,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
@@ -93,6 +95,7 @@ public class MappingView extends ViewPart {
 	public static final int							TOUR_COLOR_PACE						= 50;
 
 	private static final String						MEMENTO_SHOW_START_END_IN_MAP		= "action.show-start-end-in-map";			//$NON-NLS-1$
+	private static final String						MEMENTO_SHOW_TOUR_MARKER			= "action.show-tour-marker";
 	private static final String						MEMENTO_SHOW_SLIDER_IN_MAP			= "action.show-slider-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_SLIDER_IN_LEGEND		= "action.show-slider-in-legend";			//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_LEGEND_IN_MAP			= "action.show-legend-in-map";				//$NON-NLS-1$
@@ -122,6 +125,7 @@ public class MappingView extends ViewPart {
 	private IPropertyChangeListener					fTourbookPrefChangeListener;
 	private IPartListener2							fPartListener;
 	private ITourPropertyListener					fTourPropertyListener;
+	private IPropertyListener						fTourChangeListener;
 
 	private TourData								fTourData;
 	private TourData								fPreviousTourData;
@@ -134,6 +138,7 @@ public class MappingView extends ViewPart {
 	private ActionShowSliderInMap					fActionShowSliderInMap;
 	private ActionShowSliderInLegend				fActionShowSliderInLegend;
 	private ActionShowStartEndInMap					fActionShowStartEndInMap;
+	private ActionShowTourMarker					fActionShowTourMarker;
 	private ActionSynchWithTour						fActionSynchWithTour;
 	private ActionSynchTourZoomLevel				fActionSynchTourZoomLevel;
 	private ActionTourColor							fActionTourColorAltitude;
@@ -231,6 +236,14 @@ public class MappingView extends ViewPart {
 		fMap.setShowLegend(fActionShowTourInMap.isChecked());
 
 		paintTour(fTourData, true, true);
+	}
+
+	void actionSetShowTourMarkerInMap() {
+
+		PaintManager.getInstance().setShowTourMarker(fActionShowTourMarker.isChecked());
+
+		fMap.resetOverlayImageCache();
+		fMap.queueRedrawMap();
 	}
 
 	void actionSetTourColor(final int colorId) {
@@ -394,16 +407,52 @@ public class MappingView extends ViewPart {
 		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fTourbookPrefChangeListener);
 	}
 
+	private void addTourChangeListener() {
+
+		fTourChangeListener = new IPropertyListener() {
+
+			public void propertyChanged(Object source, int propId) {
+				if (propId == TourDatabase.TOUR_IS_CHANGED) {}
+				resetMap();
+			}
+		};
+
+		TourDatabase.getInstance().addPropertyListener(fTourChangeListener);
+	}
+
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
-					fTourData.clearComputedSeries();
-					paintTour(fTourData, true, true);
-					fMap.resetOverlayImageCache();
-					fMap.queueRedrawMap();
+
+					resetMap();
+
+				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+
+					if (fTourData == null) {
+						return;
+					}
+
+					// get modified tours
+					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					final long tourId = fTourData.getTourId();
+
+					// check if the tour in the editor was modified
+					for (TourData tourData : modifiedTours) {
+						if (tourData.getTourId() == tourId) {
+
+							// keep changed data
+							fTourData = tourData;
+
+							resetMap();
+
+							return;
+						}
+					}
+
 				}
 			}
 		};
@@ -490,6 +539,7 @@ public class MappingView extends ViewPart {
 		fActionShowSliderInLegend = new ActionShowSliderInLegend(this);
 		fActionShowLegendInMap = new ActionShowLegendInMap(this);
 		fActionShowStartEndInMap = new ActionShowStartEndInMap(this);
+		fActionShowTourMarker = new ActionShowTourMarker(this);
 
 		/*
 		 * fill view toolbar
@@ -519,6 +569,7 @@ public class MappingView extends ViewPart {
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
 		menuMgr.add(fActionShowStartEndInMap);
+		menuMgr.add(fActionShowTourMarker);
 		menuMgr.add(fActionShowLegendInMap);
 		menuMgr.add(fActionShowSliderInMap);
 		menuMgr.add(fActionShowSliderInLegend);
@@ -627,6 +678,7 @@ public class MappingView extends ViewPart {
 		addSelectionListener();
 		addTourPropertyListener();
 		addTourbookPrefListener();
+		addTourChangeListener();
 
 		restoreSettings();
 
@@ -645,9 +697,12 @@ public class MappingView extends ViewPart {
 		getViewSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
 
+		TourDatabase.getInstance().removePropertyListener(fTourChangeListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fTourbookPrefChangeListener);
+
+		TourbookPlugin tourbookPlugin = TourbookPlugin.getDefault();
+		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(fTourbookPrefChangeListener);
 
 		super.dispose();
 	}
@@ -676,6 +731,7 @@ public class MappingView extends ViewPart {
 		fActionSynchWithTour.setEnabled(fIsTour);
 
 		fActionShowStartEndInMap.setEnabled(fIsTour);
+		fActionShowTourMarker.setEnabled(fIsTour);
 		fActionShowLegendInMap.setEnabled(fIsTour);
 		fActionShowSliderInMap.setEnabled(fIsTour);
 		fActionShowSliderInLegend.setEnabled(fIsTour);
@@ -928,7 +984,8 @@ public class MappingView extends ViewPart {
 		paintManager.setTourData(tourData);
 		fTourData = tourData;
 
-		// set the paint context (slider position) for the direct mapping painter
+		// set the paint context (slider position) for the direct mapping
+		// painter
 		fDirectMappingPainter.setPaintContext(fMap,
 				isShowTour,
 				tourData,
@@ -1011,6 +1068,16 @@ public class MappingView extends ViewPart {
 		fMap.redraw();
 	}
 
+	private void resetMap() {
+
+		fTourData.clearComputedSeries();
+
+		paintTour(fTourData, true, true);
+
+		fMap.resetOverlayImageCache();
+		fMap.queueRedrawMap();
+	}
+
 	private void restoreSettings() {
 
 		final IMemento memento = fSessionMemento;
@@ -1055,6 +1122,13 @@ public class MappingView extends ViewPart {
 				fActionShowStartEndInMap.setChecked(mementoShowStartEndInMap == 1);
 			}
 			paintManager.setShowStartEnd(fActionShowStartEndInMap.isChecked());
+
+			// action: show tour marker
+			Integer mementoShowTourMarker = memento.getInteger(MEMENTO_SHOW_TOUR_MARKER);
+			if (mementoShowTourMarker != null) {
+				fActionShowTourMarker.setChecked(mementoShowTourMarker == 1);
+			}
+			paintManager.setShowTourMarker(fActionShowTourMarker.isChecked());
 
 			// action: show legend in map
 			Integer mementoShowLegendInMap = memento.getInteger(MEMENTO_SHOW_LEGEND_IN_MAP);
@@ -1170,6 +1244,7 @@ public class MappingView extends ViewPart {
 		memento.putInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, fActionSynchTourZoomLevel.getZoomLevel());
 
 		memento.putInteger(MEMENTO_SHOW_START_END_IN_MAP, fActionShowStartEndInMap.isChecked() ? 1 : 0);
+		memento.putInteger(MEMENTO_SHOW_TOUR_MARKER, fActionShowTourMarker.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SHOW_LEGEND_IN_MAP, fActionShowLegendInMap.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SHOW_SLIDER_IN_MAP, fActionShowSliderInMap.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SHOW_SLIDER_IN_LEGEND, fActionShowSliderInLegend.isChecked() ? 1 : 0);
@@ -1236,7 +1311,7 @@ public class MappingView extends ViewPart {
 		// zoom until the tour is visible in the map
 		while (!viewport.contains(positionRect)) {
 
-			// center position in the map 
+			// center position in the map
 			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
 			final GeoPosition px = tileFactory.pixelToGeo(center, zoom);
@@ -1255,7 +1330,7 @@ public class MappingView extends ViewPart {
 		// zoom in until the tour is larger than the viewport
 		while (positionRect.getWidth() < viewport.width && positionRect.getHeight() < viewport.height) {
 
-			// center position in the map 
+			// center position in the map
 			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
 			final GeoPosition px = tileFactory.pixelToGeo(center, zoom);
@@ -1287,7 +1362,7 @@ public class MappingView extends ViewPart {
 		// disable tour actions in this view
 		fIsTour = false;
 
-		// disable tour data 
+		// disable tour data
 		fTourData = null;
 		fPreviousTourData = null;
 

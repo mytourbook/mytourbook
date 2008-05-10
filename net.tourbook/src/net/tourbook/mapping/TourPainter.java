@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.swt.SWT;
@@ -48,11 +49,13 @@ public class TourPainter extends MapPainter {
 	private static final String	SPACER				= " ";						//$NON-NLS-1$
 	private static final String	IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
 	private static final String	IMAGE_END_MARKER	= "map-marker-end.png";	//$NON-NLS-1$
+	private static final String	IMAGE_TOUR_MARKER	= "map-marker-tour.png";	//$NON-NLS-1$
 
 	private static TourPainter	fInstance;
 
 	private final Image			fImageStartMarker;
 	private final Image			fImageEndMarker;
+	private final Image			fImageTourMarker;
 	private final Image			fPositionImage;
 	private final Image			fMarkerImage;
 
@@ -73,6 +76,7 @@ public class TourPainter extends MapPainter {
 
 		fImageStartMarker = TourbookPlugin.getImageDescriptor(IMAGE_START_MARKER).createImage();
 		fImageEndMarker = TourbookPlugin.getImageDescriptor(IMAGE_END_MARKER).createImage();
+		fImageTourMarker = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_MARKER).createImage();
 	}
 
 	/**
@@ -429,6 +433,7 @@ public class TourPainter extends MapPainter {
 	@Override
 	protected void dispose() {
 
+		disposeImage(fImageTourMarker);
 		disposeImage(fImageStartMarker);
 		disposeImage(fImageEndMarker);
 		disposeImage(fPositionImage);
@@ -464,7 +469,7 @@ public class TourPainter extends MapPainter {
 		inizializeLegendData(tourData);
 
 		// draw tour
-		boolean isOverlayInTile = drawTourInTile(gc, map, tile, tourData);
+		boolean isTourInTile = drawTourInTile(gc, map, tile, tourData);
 
 		// status if a marker is drawn
 		boolean isMarkerInTile = false;
@@ -480,7 +485,7 @@ public class TourPainter extends MapPainter {
 					longitudeSerie[longitudeSerie.length - 1],
 					fImageEndMarker);
 
-			isOverlayInTile = isOverlayInTile || isMarkerInTile;
+			isTourInTile = isTourInTile || isMarkerInTile;
 
 			// draw start marker
 			isMarkerInTile = drawMarker(gc,//
@@ -491,9 +496,34 @@ public class TourPainter extends MapPainter {
 					fImageStartMarker);
 		}
 
-		isOverlayInTile = isOverlayInTile || isMarkerInTile;
+		boolean isTourMarkerInTile = false;
 
-		return isOverlayInTile;
+		// draw tour marker
+		if (paintManager.isShowTourMarker()) {
+
+			boolean isTourMarkerInTile2 = false;
+
+			for (TourMarker tourMarker : tourData.getTourMarkers()) {
+
+				int serieIndex = tourMarker.getSerieIndex();
+
+				// draw tour marker
+				isTourMarkerInTile2 = drawTourMarker(gc,
+						map,
+						tile,
+						latitudeSerie[serieIndex],
+						longitudeSerie[serieIndex],
+						fImageTourMarker,
+						tourMarker);
+
+				isTourMarkerInTile = isTourMarkerInTile || isTourMarkerInTile2;
+			}
+
+		}
+
+		isTourInTile = isTourInTile || isMarkerInTile || isTourMarkerInTile;
+
+		return isTourInTile;
 	}
 
 	private boolean drawMarker(	final GC gc,
@@ -537,7 +567,63 @@ public class TourPainter extends MapPainter {
 		return isMarkerInTile;
 	}
 
+	private boolean drawTourMarker(	final GC gc,
+									final Map map,
+									final Tile tile,
+									final double latitude,
+									final double longitude,
+									final Image markerImage,
+									TourMarker tourMarker) {
+
+		if (markerImage == null) {
+			return false;
+		}
+
+		final TileFactory tileFactory = map.getTileFactory();
+		final int zoomLevel = map.getZoom();
+		final int tileSize = tileFactory.getInfo().getTileSize();
+
+		// get world viewport for the current tile
+		final int worldTileX = tile.getX() * tileSize;
+		final int worldTileY = tile.getY() * tileSize;
+
+		// convert lat/long into world pixels
+		final java.awt.Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+
+		// convert world position into device position
+		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
+		final int devMarkerPosY = worldMarkerPos.y - worldTileY;
+
+		final boolean isMarkerInTile = isMarkerInTile(markerImage.getBounds(), devMarkerPosX, devMarkerPosY, tileSize);
+		if (isMarkerInTile) {
+
+			// get marker size
+			final Rectangle bounds = markerImage.getBounds();
+			final int markerWidth = bounds.width;
+			final int markerWidth2 = markerWidth / 2;
+			final int markerHeight = bounds.height;
+
+			int devPosX = devMarkerPosX - markerWidth2;
+			int devPosY = devMarkerPosY - markerHeight;
+
+			gc.drawImage(markerImage, devPosX, devPosY);
+
+			String markerLabel = tourMarker.getLabel();
+			Point labelExtent = gc.textExtent(markerLabel);
+
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+			gc.drawText(markerLabel, //
+					devPosX + markerWidth2 - (labelExtent.x / 2),
+					devPosY + markerWidth2 - (labelExtent.y / 2),
+					true);
+		}
+
+		return isMarkerInTile;
+	}
+
 	private boolean drawTourInTile(final GC gc, final Map map, final Tile tile, final TourData tourData) {
+
+		boolean isTourInTile = false;
 
 		final TileFactory tileFactory = map.getTileFactory();
 		final int zoomLevel = map.getZoom();
@@ -561,7 +647,6 @@ public class TourPainter extends MapPainter {
 		gc.setForeground(systemColorBlue);
 		gc.setBackground(systemColorBlue);
 
-		boolean isTourInTile = false;
 		int lastInsideIndex = -99;
 		java.awt.Point lastInsidePosition = null;
 
