@@ -33,14 +33,14 @@ public class DataProviderTourWeek extends DataProvider {
 
 	private TourDataWeek				fTourWeekData;
 
-	private DataProviderTourWeek() {}
-
 	public static DataProviderTourWeek getInstance() {
 		if (fInstance == null) {
 			fInstance = new DataProviderTourWeek();
 		}
 		return fInstance;
 	}
+
+	private DataProviderTourWeek() {}
 
 	TourDataWeek getWeekData(	TourPerson person,
 								TourTypeFilter tourTypeFilter,
@@ -148,7 +148,7 @@ public class DataProviderTourWeek extends DataProvider {
 					}
 				}
 
-				final long dbTypeId = dbTypeIdObject == null ? TourType.TOUR_TYPE_ID_NOT_DEFINED : dbTypeIdObject;
+				final long dbTypeId = dbTypeIdObject == null ? TourDatabase.ENTITY_IS_NOT_SAVED : dbTypeIdObject;
 
 				dbTypeIds[colorIndex][weekIndex] = dbTypeId;
 

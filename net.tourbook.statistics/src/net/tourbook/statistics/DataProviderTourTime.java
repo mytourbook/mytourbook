@@ -40,14 +40,14 @@ public class DataProviderTourTime extends DataProvider {
 
 	private TourTimeData				fTourDataTime;
 
-	private DataProviderTourTime() {}
-
 	public static DataProviderTourTime getInstance() {
 		if (fInstance == null) {
 			fInstance = new DataProviderTourTime();
 		}
 		return fInstance;
 	}
+
+	private DataProviderTourTime() {}
 
 	public Long getSelectedTourId() {
 		return fSelectedTourId;
@@ -189,7 +189,7 @@ public class DataProviderTourTime extends DataProvider {
 				}
 
 				dbTypeColorIndex.add(tourTypeColorIndex);
-				dbTypeIds.add(dbTypeIdObject == null ? TourType.TOUR_TYPE_ID_NOT_DEFINED : dbTypeIdObject);
+				dbTypeIds.add(dbTypeIdObject == null ? TourDatabase.ENTITY_IS_NOT_SAVED : dbTypeIdObject);
 			}
 
 			conn.close();
