@@ -125,58 +125,6 @@ public class TourMarkerView extends ViewPart {
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 	}
 
-//	class MarkerViewerLabelProvider extends CellLabelProvider {
-//
-//		@Override
-//		public void update(ViewerCell cell) {
-//
-//			TourMarker tourMarker = (TourMarker) cell.getElement();
-//
-//			switch (cell.getColumnIndex()) {
-//
-//			case COLUMN_TIME:
-//				int time = tourMarker.getTime();
-//				fCalendar.set(0, 0, 0, time / 3600, ((time % 3600) / 60), ((time % 3600) % 60));
-//				cell.setText(fDF.format(fCalendar.getTime()));
-//				break;
-//
-//			case COLUMN_DISTANCE:
-//				fNF.setMinimumFractionDigits(1);
-//				fNF.setMaximumFractionDigits(1);
-//				cell.setText(fNF.format(((float) tourMarker.getDistance()) / 1000 / UI.UNIT_VALUE_DISTANCE));
-//
-//				if (tourMarker.getType() == ChartMarker.MARKER_TYPE_DEVICE) {
-//					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//				}
-//				break;
-//
-//			case COLUMN_REMARK:
-//				cell.setText(tourMarker.getLabel());
-//				break;
-//
-//			case COLUMN_X_OFFSET:
-//				cell.setText(Integer.toString(tourMarker.getLabelXOffset()));
-//				break;
-//
-//			case COLUMN_Y_OFFSET:
-//				cell.setText(Integer.toString(tourMarker.getLabelYOffset()));
-//				break;
-//
-//			case COLUMN_VISUAL_POSITION:
-//				int visualPosition = tourMarker.getVisualPosition();
-//				if (visualPosition == -1 || visualPosition >= TourMarker.visualPositionLabels.length) {
-//					cell.setText(TourMarker.visualPositionLabels[0]);
-//				} else {
-//					cell.setText(TourMarker.visualPositionLabels[visualPosition]);
-//				}
-//				break;
-//
-//			default:
-//				break;
-//			}
-//		}
-//	}
-
 	/**
 	 * Sort the markers by time
 	 */
@@ -433,7 +381,7 @@ public class TourMarkerView extends ViewPart {
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	private void fillContextMenu(IMenuManager menuMgr) {
 
 		// add standard group which allows other plug-ins to contribute here

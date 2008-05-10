@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.data;
 
 import java.io.PrintStream;
@@ -54,73 +55,73 @@ public class TourData {
 	 * 
 	 */
 	@Transient
-	public static final int		MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
+	public static final int				MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
 	@Transient
-	public static final float	MAX_BIKE_SPEED					= 120f;
+	public static final float			MAX_BIKE_SPEED					= 120f;
 
 	/**
 	 * Unique persistence id which identifies the tour
 	 */
 	@Id
-	private Long				tourId;
+	private Long						tourId;
 
 	/**
 	 * HH (d) hour of tour
 	 */
-	private short				startHour;
+	private short						startHour;
 
 	/**
 	 * MM (d) minute of tour
 	 */
-	private short				startMinute;
+	private short						startMinute;
 
 	/**
 	 * year of tour start
 	 */
-	private short				startYear;
+	private short						startYear;
 
 	/**
 	 * mm (d) month of tour
 	 */
-	private short				startMonth;
+	private short						startMonth;
 
 	/**
 	 * dd (d) day of tour
 	 */
-	private short				startDay;
+	private short						startDay;
 
 	/**
 	 * week of the tour, 0 is the first week
 	 */
-	private short				startWeek;
+	private short						startWeek;
 
 	/**
 	 * tttt (h) total distance at tour start (km)
 	 */
-	private int					startDistance;
+	private int							startDistance;
 
 	/**
 	 * ssss distance msw
 	 * <p>
 	 * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
 	 */
-	@SuppressWarnings("unused") //$NON-NLS-1$
-	private int					distance;
+	@SuppressWarnings("unused")//$NON-NLS-1$
+	private int							distance;
 
 	/**
 	 * aaaa (h) initial altitude (m)
 	 */
-	private short				startAltitude;
+	private short						startAltitude;
 
 	/**
 	 * pppp (h) initial pulse (bpm)
 	 */
-	private short				startPulse;
+	private short						startPulse;
 
 	/**
 	 * tolerance for the Douglas Peucker algorithm
 	 */
-	private short				dpTolerance						= 50;
+	private short						dpTolerance						= 50;
 
 	/**
 	 * tt (h) type of tour <br>
@@ -132,143 +133,143 @@ public class TourData {
 	 * "B1" ski-bike
 	 */
 	@Column(length = 2)
-	private String				deviceTourType;
+	private String						deviceTourType;
 
 	/*
 	 * data from the device
 	 */
-	private long				deviceTravelTime;
-	private int					deviceDistance;
+	private long						deviceTravelTime;
+	private int							deviceDistance;
 
-	private int					deviceWheel;
-	private int					deviceWeight;
+	private int							deviceWheel;
+	private int							deviceWeight;
 
-	private int					deviceTotalUp;
-	private int					deviceTotalDown;
+	private int							deviceTotalUp;
+	private int							deviceTotalDown;
 
 	/**
 	 * total distance (m)
 	 */
-	private int					tourDistance;
+	private int							tourDistance;
 
 	/**
 	 * total recording time (sec)
 	 */
-	private int					tourRecordingTime;
+	private int							tourRecordingTime;
 
 	/**
 	 * total driving time (sec)
 	 */
-	private int					tourDrivingTime;
+	private int							tourDrivingTime;
 
 	/**
 	 * altitude up (m)
 	 */
-	private int					tourAltUp;
+	private int							tourAltUp;
 
 	/**
 	 * altitude down (m)
 	 */
-	private int					tourAltDown;
+	private int							tourAltDown;
 
 	/**
 	 * plugin id for the device which was used for this tour
 	 */
-	private String				devicePluginId;
+	private String						devicePluginId;
 
 	/**
 	 * Profile used by the device
 	 */
-	private short				deviceMode;													// db-version 3
+	private short						deviceMode;													// db-version 3
 
 	/**
-	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time
-	 * slices are unequally
+	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time slices
+	 * are unequally
 	 */
-	private short				deviceTimeInterval;											// db-version 3
+	private short						deviceTimeInterval;											// db-version 3
 
-	private int					maxAltitude;													// db-version 4
-	private int					maxPulse;														// db-version 4
-	private float				maxSpeed;														// db-version 4
+	private int							maxAltitude;													// db-version 4
+	private int							maxPulse;														// db-version 4
+	private float						maxSpeed;														// db-version 4
 
-	private int					avgPulse;														// db-version 4
-	private int					avgCadence;													// db-version 4
-	private int					avgTemperature;												// db-version 4
+	private int							avgPulse;														// db-version 4
+	private int							avgCadence;													// db-version 4
+	private int							avgTemperature;												// db-version 4
 
-	private String				tourTitle;														// db-version 4
-	private String				tourDescription;												// db-version 4
-	private String				tourStartPlace;												// db-version 4
-	private String				tourEndPlace;													// db-version 4
+	private String						tourTitle;														// db-version 4
+	private String						tourDescription;												// db-version 4
+	private String						tourStartPlace;												// db-version 4
+	private String						tourEndPlace;													// db-version 4
 
-	private String				calories;														// db-version 4
-	private float				bikerWeight;													// db-version 4
+	private String						calories;														// db-version 4
+	private float						bikerWeight;													// db-version 4
 
 	/**
 	 * visible name for the used plugin to import the data
 	 */
-	private String				devicePluginName;												// db-version 4
+	private String						devicePluginName;												// db-version 4
 
 	/**
 	 * visible name for {@link #deviceMode}
 	 */
-	private String				deviceModeName;												// db-version 4
+	private String						deviceModeName;												// db-version 4
 
 	/**
 	 * data series for time, speed, altitude,...
 	 */
 	@Basic(optional = false)
-	private SerieData			serieData;
+	private SerieData					serieData;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourMarker>		tourMarkers						= new HashSet<TourMarker>();
+	private Set<TourMarker>				tourMarkers						= new HashSet<TourMarker>();
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourReference>	tourReferences					= new HashSet<TourReference>();
+	private final Set<TourReference>	tourReferences					= new HashSet<TourReference>();
 
-	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER) //$NON-NLS-1$
-	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
+	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
+	private final Set<TourCategory>			tourCategory					= new HashSet<TourCategory>();
 
 	/**
 	 * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
 	 */
 	@ManyToOne
-	private TourType			tourType;
+	private TourType					tourType;
 
 	/**
 	 * Person which created this tour or <code>null</code> when the tour is not saved in the
 	 * database
 	 */
 	@ManyToOne
-	private TourPerson			tourPerson;
+	private TourPerson					tourPerson;
 
 	/**
 	 * plugin id for the device which was used for this tour Bike used for this tour
 	 */
 	@ManyToOne
-	private TourBike			tourBike;
+	private TourBike					tourBike;
 
 	/*
 	 * data series from the device
 	 */
 	@Transient
-	public int[]				timeSerie;
+	public int[]						timeSerie;
 
 	/**
 	 * contains the distance data serie in the metric system
 	 */
 	@Transient
-	public int[]				distanceSerie;
+	public int[]						distanceSerie;
 
 	@Transient
-	private int[]				distanceSerieImperial;
+	private int[]						distanceSerieImperial;
 
 	/**
 	 * contains the absolute altitude in the metric measurement system
 	 */
 	@Transient
-	public int[]				altitudeSerie;
+	public int[]						altitudeSerie;
 
 //	/**
 //	 * min/max values for the altitude
@@ -282,22 +283,22 @@ public class TourData {
 	 * contains the absolute altitude in the imperial measurement system
 	 */
 	@Transient
-	private int[]				altitudeSerieImperial;
+	private int[]						altitudeSerieImperial;
 
 	@Transient
-	public int[]				cadenceSerie;
+	public int[]						cadenceSerie;
 
 	@Transient
-	public int[]				pulseSerie;
+	public int[]						pulseSerie;
 
 	@Transient
-	public int[]				temperatureSerie;
+	public int[]						temperatureSerie;
 
 	/**
 	 * contains the temperature in the imperial measurement system
 	 */
 	@Transient
-	private int[]				temperatureSerieImperial;
+	private int[]						temperatureSerieImperial;
 
 	/*
 	 * computed data series
@@ -308,146 +309,146 @@ public class TourData {
 	 * system is imperial
 	 */
 	@Transient
-	private int[]				speedSerie;
+	private int[]						speedSerie;
 	@Transient
-	private int[]				speedSerieImperial;
+	private int[]						speedSerieImperial;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #speedSerie} are from the device and not
 	 * computed. Speed data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean				isSpeedSerieFromDevice			= false;
+	private boolean						isSpeedSerieFromDevice			= false;
 
 	@Transient
-	private int[]				paceSerie;
+	private int[]						paceSerie;
 	@Transient
-	private int[]				paceSerieImperial;
+	private int[]						paceSerieImperial;
 
 	@Transient
-	private int[]				powerSerie;
+	private int[]						powerSerie;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #powerSerie} are from the device and not
 	 * computed. Power data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean				isPowerSerieFromDevice			= false;
+	private boolean						isPowerSerieFromDevice			= false;
 
 	@Transient
-	private int[]				altimeterSerie;
+	private int[]						altimeterSerie;
 	@Transient
-	private int[]				altimeterSerieImperial;
+	private int[]						altimeterSerieImperial;
 
 	@Transient
-	public int[]				gradientSerie;
+	public int[]						gradientSerie;
 
 	@Transient
-	public int[]				tourCompareSerie;
+	public int[]						tourCompareSerie;
 
 	/*
 	 * GPS data
 	 */
 	@Transient
-	public double[]				latitudeSerie;
+	public double[]						latitudeSerie;
 	@Transient
-	public double[]				longitudeSerie;
+	public double[]						longitudeSerie;
 
 	/**
 	 * contains the bounds of the tour in latitude/longitude
 	 */
 	@Transient
-	public Rectangle			gpsBounds;
+	public Rectangle					gpsBounds;
 
 	/**
 	 * Index of the segmented data in the original serie
 	 */
 	@Transient
-	public int[]				segmentSerieIndex;
+	public int[]						segmentSerieIndex;
 
 	/**
 	 * oooo (o) DD-record // offset
 	 */
 	@Transient
-	public int					offsetDDRecord;
+	public int							offsetDDRecord;
 
 	@Transient
-	protected Object[]			fTourSegments;
+	protected Object[]					fTourSegments;
 
 	/*
 	 * data for the tour segments
 	 */
 	@Transient
-	public int[]				segmentSerieAltitude;
+	public int[]						segmentSerieAltitude;
 
 	@Transient
-	public int[]				segmentSerieDistance;
+	public int[]						segmentSerieDistance;
 
 	@Transient
-	public int[]				segmentSerieTime;
+	public int[]						segmentSerieTime;
 
 	@Transient
-	public int[]				segmentSerieDrivingTime;
+	public int[]						segmentSerieDrivingTime;
 
 	@Transient
-	public float[]				segmentSerieAltimeter;
+	public float[]						segmentSerieAltimeter;
 
 	@Transient
-	public int[]				segmentSerieAltitudeDown;
+	public int[]						segmentSerieAltitudeDown;
 
 	@Transient
-	public float[]				segmentSerieSpeed;
+	public float[]						segmentSerieSpeed;
 
 	@Transient
-	public float[]				segmentSeriePace;
+	public float[]						segmentSeriePace;
 
 	@Transient
-	public float[]				segmentSeriePower;
+	public float[]						segmentSeriePower;
 
 	@Transient
-	public float[]				segmentSerieGradient;
+	public float[]						segmentSerieGradient;
 
 	@Transient
-	public float[]				segmentSeriePulse;
+	public float[]						segmentSeriePulse;
 
 	@Transient
-	public float[]				segmentSerieCadence;
+	public float[]						segmentSerieCadence;
 
 	/**
 	 * contains the filename from which the data are imported, when set to <code>null</code> the
 	 * data are not imported they are from the database
 	 */
 	@Transient
-	public String				importRawDataFile;
+	public String						importRawDataFile;
 
 	/**
 	 * Latitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
 	 * not set
 	 */
 	@Transient
-	public double				mapCenterPositionLatitude		= Double.MIN_VALUE;
+	public double						mapCenterPositionLatitude		= Double.MIN_VALUE;
 
 	/**
 	 * Longitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
 	 * not set
 	 */
 	@Transient
-	public double				mapCenterPositionLongitude		= Double.MIN_VALUE;
+	public double						mapCenterPositionLongitude		= Double.MIN_VALUE;
 
 	/**
 	 * Zoomlevel in the map
 	 */
 	@Transient
-	public int					mapZoomLevel;
+	public int							mapZoomLevel;
 
 	@Transient
-	public double				mapMinLatitude;
+	public double						mapMinLatitude;
 	@Transient
-	public double				mapMaxLatitude;
+	public double						mapMaxLatitude;
 	@Transient
-	public double				mapMinLongitude;
+	public double						mapMinLongitude;
 	@Transient
-	public double				mapMaxLongitude;
+	public double						mapMaxLongitude;
 
 	public TourData() {}
 
@@ -1324,7 +1325,7 @@ public class TourData {
 	 * transfered
 	 * 
 	 * @param isCreateMarker
-	 *        creates markers when <code>true</code>
+	 * 	creates markers when <code>true</code>
 	 */
 	public void createTimeSeries(final ArrayList<TimeData> timeDataList, final boolean isCreateMarker) {
 
@@ -1659,7 +1660,7 @@ public class TourData {
 	 * Creates the unique tour id from the tour date/time and the unique key
 	 * 
 	 * @param uniqueKey
-	 *        unique key to identify a tour
+	 * 	unique key to identify a tour
 	 */
 	public void createTourId(String uniqueKey) {
 
@@ -1795,7 +1796,7 @@ public class TourData {
 			= drivingTime == 0 ? 0 : (float) ((float) segment.distance / drivingTime * 3.6 / UI.UNIT_VALUE_DISTANCE);
 
 			segmentSeriePace[segmentIndex] = segment.pace //
-			= drivingTime == 0 ? 0 : (float) ((float) drivingTime * 16.666 / segment.distance * UI.UNIT_VALUE_DISTANCE);
+			= drivingTime == 0 ? 0 : (float) (drivingTime * 16.666 / segment.distance * UI.UNIT_VALUE_DISTANCE);
 
 			segmentSerieGradient[segmentIndex] = segment.gradient //
 			= (float) segment.altitude * 100 / segment.distance;
@@ -1927,18 +1928,6 @@ public class TourData {
 			}
 			return altimeterSerie;
 		}
-	}
-
-	/**
-	 * @return Returns the metric or imperial altimeter serie depending on the active measurement
-	 */
-	public int[] getGradientSerie() {
-
-		if (gradientSerie == null) {
-			computeAltimeterGradientSerie();
-		}
-
-		return gradientSerie;
 	}
 
 	/**
@@ -2099,7 +2088,7 @@ public class TourData {
 
 	/**
 	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
-	 *         slices are unequally
+	 * 	slices are unequally
 	 */
 	public short getDeviceTimeInterval() {
 		return deviceTimeInterval;
@@ -2131,7 +2120,7 @@ public class TourData {
 
 	/**
 	 * @return Returns the distance data serie for the current measurement system which can be
-	 *         metric or imperial
+	 * 	metric or imperial
 	 */
 	public int[] getDistanceSerie() {
 
@@ -2174,6 +2163,18 @@ public class TourData {
 	}
 
 	/**
+	 * @return Returns the metric or imperial altimeter serie depending on the active measurement
+	 */
+	public int[] getGradientSerie() {
+
+		if (gradientSerie == null) {
+			computeAltimeterGradientSerie();
+		}
+
+		return gradientSerie;
+	}
+
+	/**
 	 * @return the maxAltitude
 	 */
 	public int getMaxAltitude() {
@@ -2195,8 +2196,8 @@ public class TourData {
 	}
 
 	/**
-	 * @return Returns the distance serie from the metric system, the distance serie is <b>always</b>
-	 *         saved in the database in the metric system
+	 * @return Returns the distance serie from the metric system, the distance serie is
+	 * 	<b>always</b> saved in the database in the metric system
 	 */
 	public int[] getMetricDistanceSerie() {
 		return distanceSerie;
@@ -2429,7 +2430,7 @@ public class TourData {
 		return tourBike;
 	}
 
-	public Collection<TourCategory> getTourCategory() {
+	public Collection<TourCategory> getTourTags() {
 		return tourCategory;
 	}
 
@@ -2467,8 +2468,8 @@ public class TourData {
 	}
 
 	/**
-	 * @return returns the person for whom the tour data is saved or <code>null</code> when the
-	 *         tour is not saved in the database
+	 * @return returns the person for whom the tour data is saved or <code>null</code> when the tour
+	 * 	is not saved in the database
 	 */
 	public TourPerson getTourPerson() {
 		return tourPerson;
@@ -2746,7 +2747,7 @@ public class TourData {
 
 	/**
 	 * @param avgCadence
-	 *        the avgCadence to set
+	 * 	the avgCadence to set
 	 */
 	public void setAvgCadence(int avgCadence) {
 		this.avgCadence = avgCadence;
@@ -2754,7 +2755,7 @@ public class TourData {
 
 	/**
 	 * @param avgPulse
-	 *        the avgPulse to set
+	 * 	the avgPulse to set
 	 */
 	public void setAvgPulse(int avgPulse) {
 		this.avgPulse = avgPulse;
@@ -2762,7 +2763,7 @@ public class TourData {
 
 	/**
 	 * @param avgTemperature
-	 *        the avgTemperature to set
+	 * 	the avgTemperature to set
 	 */
 	public void setAvgTemperature(int avgTemperature) {
 		this.avgTemperature = avgTemperature;
@@ -2770,7 +2771,7 @@ public class TourData {
 
 	/**
 	 * @param bikerWeight
-	 *        the bikerWeight to set
+	 * 	the bikerWeight to set
 	 */
 	public void setBikerWeight(float bikerWeight) {
 		this.bikerWeight = bikerWeight;
@@ -2778,7 +2779,7 @@ public class TourData {
 
 	/**
 	 * @param calories
-	 *        the calories to set
+	 * 	the calories to set
 	 */
 	public void setCalories(String calories) {
 		this.calories = calories;
@@ -2849,7 +2850,7 @@ public class TourData {
 
 	/**
 	 * @param maxAltitude
-	 *        the maxAltitude to set
+	 * 	the maxAltitude to set
 	 */
 	public void setMaxAltitude(int maxAltitude) {
 		this.maxAltitude = maxAltitude;
@@ -2857,7 +2858,7 @@ public class TourData {
 
 	/**
 	 * @param maxPulse
-	 *        the maxPulse to set
+	 * 	the maxPulse to set
 	 */
 	public void setMaxPulse(int maxPulse) {
 		this.maxPulse = maxPulse;
@@ -2865,7 +2866,7 @@ public class TourData {
 
 	/**
 	 * @param maxSpeed
-	 *        the maxSpeed to set
+	 * 	the maxSpeed to set
 	 */
 	public void setMaxSpeed(float maxSpeed) {
 		this.maxSpeed = maxSpeed;
@@ -2925,7 +2926,7 @@ public class TourData {
 
 	/**
 	 * @param tourDescription
-	 *        the tourDescription to set
+	 * 	the tourDescription to set
 	 */
 	public void setTourDescription(String tourDescription) {
 		this.tourDescription = tourDescription;
@@ -2942,7 +2943,7 @@ public class TourData {
 
 	/**
 	 * @param tourEndPlace
-	 *        the tourEndPlace to set
+	 * 	the tourEndPlace to set
 	 */
 	public void setTourEndPlace(String tourEndPlace) {
 		this.tourEndPlace = tourEndPlace;
@@ -2968,7 +2969,7 @@ public class TourData {
 
 	/**
 	 * @param tourStartPlace
-	 *        the tourStartPlace to set
+	 * 	the tourStartPlace to set
 	 */
 	public void setTourStartPlace(String tourStartPlace) {
 		this.tourStartPlace = tourStartPlace;
@@ -2976,7 +2977,7 @@ public class TourData {
 
 	/**
 	 * @param tourTitle
-	 *        the tourTitle to set
+	 * 	the tourTitle to set
 	 */
 	public void setTourTitle(String tourTitle) {
 		this.tourTitle = tourTitle;

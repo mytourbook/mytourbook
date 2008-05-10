@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.data;
 
 import javax.persistence.Basic;
@@ -21,36 +22,31 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import org.apache.derby.iapi.types.TypeId;
+import net.tourbook.database.TourDatabase;
+
 import org.eclipse.swt.graphics.RGB;
 
 @Entity
 public class TourType {
 
-	/**
-	 * contains <code>-1</code> which is the {@link TypeId} for the {@link TourType} which is not
-	 * saved in the database
-	 */
-	public static final int	TOUR_TYPE_ID_NOT_DEFINED	= -1;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long			typeId						= TOUR_TYPE_ID_NOT_DEFINED;
+	private final long	typeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@Basic(optional = false)
-	private String			name;
+	private String		name;
 
-	private short			colorBrightRed;
-	private short			colorBrightGreen;
-	private short			colorBrightBlue;
+	private short		colorBrightRed;
+	private short		colorBrightGreen;
+	private short		colorBrightBlue;
 
-	private short			colorDarkRed;
-	private short			colorDarkGreen;
-	private short			colorDarkBlue;
+	private short		colorDarkRed;
+	private short		colorDarkGreen;
+	private short		colorDarkBlue;
 
-	private short			colorLineRed;
-	private short			colorLineGreen;
-	private short			colorLineBlue;
+	private short		colorLineRed;
+	private short		colorLineGreen;
+	private short		colorLineBlue;
 
 	/**
 	 * default constructor used in ejb
@@ -81,8 +77,8 @@ public class TourType {
 	}
 
 	/**
-	 * @return Returns the type id, this can be the saved type id or
-	 *         {@link TourType#TOUR_TYPE_ID_NOT_DEFINED}
+	 * @return Returns the type id, this can be the saved type id or {@link
+	 * 	TourType#TOUR_TYPE_ID_NOT_DEFINED}
 	 */
 	public long getTypeId() {
 		return typeId;

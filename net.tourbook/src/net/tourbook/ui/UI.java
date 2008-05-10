@@ -63,8 +63,8 @@ public class UI {
 	public static final String				EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String				EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
 
-	public static final String				lineSeparator					= System.getProperty("line.separator"); //$NON-NLS-1$
-	public static final String				NEW_LINE						= "\n"; //$NON-NLS-1$
+	public static final String				lineSeparator					= System.getProperty("line.separator");		//$NON-NLS-1$
+	public static final String				NEW_LINE						= "\n";										//$NON-NLS-1$
 
 	public static final int					DEFAULT_FIELD_WIDTH				= 40;
 
@@ -74,14 +74,14 @@ public class UI {
 	private static final String				UNIT_ALTITUDE_M					= "m";											//$NON-NLS-1$
 	public static final String				UNIT_DISTANCE_KM				= "km";										//$NON-NLS-1$
 	private static final String				UNIT_SPEED_KM_H					= "km/h";										//$NON-NLS-1$
-	private static final String				UNIT_FAHRENHEIT_C				= "\u00B0C";										//$NON-NLS-1$
+	private static final String				UNIT_FAHRENHEIT_C				= "\u00B0C";									//$NON-NLS-1$
 	private static final String				UNIT_ALTIMETER_M_H				= "m/h";										//$NON-NLS-1$
 	private static final String				UNIT_PACE_MIN_P_KM				= "min/km";									//$NON-NLS-1$
 
 	private static final String				UNIT_ALTITUDE_FT				= "ft";										//$NON-NLS-1$
 	public static final String				UNIT_DISTANCE_MI				= "mi";										//$NON-NLS-1$
 	private static final String				UNIT_SPEED_MPH					= "mph";										//$NON-NLS-1$
-	private static final String				UNIT_FAHRENHEIT_F				= "\u00B0F";										//$NON-NLS-1$
+	private static final String				UNIT_FAHRENHEIT_F				= "\u00B0F";									//$NON-NLS-1$
 	private static final String				UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
 	private static final String				UNIT_PACE_MIN_P_MILE			= "min/mi";									//$NON-NLS-1$
 
@@ -134,8 +134,6 @@ public class UI {
 	public static final DateFormat			DateFormatter					= DateFormat.getDateInstance(DateFormat.SHORT);
 	public static final DateFormat			DateFormatterFull				= DateFormat.getDateInstance(DateFormat.FULL);
 
-	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
-
 	static {
 
 		updateUnits();
@@ -152,13 +150,13 @@ public class UI {
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
 	}
 
-	private UI() {}
+	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
 
 	/**
 	 * Change the title for the application
 	 * 
 	 * @param newTitle
-	 *        new title for the application or <code>null</code> to set the original title
+	 * 	new title for the application or <code>null</code> to set the original title
 	 */
 	public static void changeAppTitle(final String newTitle) {
 
@@ -189,6 +187,15 @@ public class UI {
 		}
 	}
 
+	public static final String formatSeconds(long value) {
+
+		return new Formatter().format(Messages.Format_hhmmss,
+				(value / 3600),
+				((value % 3600) / 60),
+				((value % 3600) % 60)).toString();
+
+	}
+
 	public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {
 		return new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(width), false);
 	}
@@ -200,6 +207,33 @@ public class UI {
 		}
 
 		return instance;
+	}
+
+	/**
+	 * @return Returns a list with all opened editors
+	 */
+	public static ArrayList<IEditorPart> getOpenedEditors() {
+
+		ArrayList<IEditorPart> editorParts = new ArrayList<IEditorPart>();
+		IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
+
+		for (IWorkbenchWindow wbWindow : wbWindows) {
+			IWorkbenchPage[] pages = wbWindow.getPages();
+
+			for (IWorkbenchPage wbPage : pages) {
+				IEditorReference[] editorRefs = wbPage.getEditorReferences();
+
+				for (IEditorReference editorRef : editorRefs) {
+					IEditorPart editor = editorRef.getEditor(false);
+
+					if (editor != null) {
+						editorParts.add(editor);
+					}
+				}
+			}
+		}
+
+		return editorParts;
 	}
 
 	/**
@@ -388,6 +422,8 @@ public class UI {
 		};
 	}
 
+	private UI() {}
+
 	/**
 	 * dispose resources
 	 */
@@ -461,7 +497,7 @@ public class UI {
 			}
 		}
 
-		if (colorTourType == null || colorTourType.getTypeId() == TourType.TOUR_TYPE_ID_NOT_DEFINED) {
+		if (colorTourType == null || colorTourType.getTypeId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
 			// tour type was not found use default color
 
@@ -602,42 +638,6 @@ public class UI {
 		}
 
 		return image;
-	}
-
-	/**
-	 * @return Returns a list with all opened editors
-	 */
-	public static ArrayList<IEditorPart> getOpenedEditors() {
-
-		ArrayList<IEditorPart> editorParts = new ArrayList<IEditorPart>();
-		IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
-
-		for (IWorkbenchWindow wbWindow : wbWindows) {
-			IWorkbenchPage[] pages = wbWindow.getPages();
-
-			for (IWorkbenchPage wbPage : pages) {
-				IEditorReference[] editorRefs = wbPage.getEditorReferences();
-
-				for (IEditorReference editorRef : editorRefs) {
-					IEditorPart editor = editorRef.getEditor(false);
-
-					if (editor != null) {
-						editorParts.add(editor);
-					}
-				}
-			}
-		}
-
-		return editorParts;
-	}
-
-	public static final String formatSeconds(long value) {
-
-		return new Formatter().format(Messages.Format_hhmmss,
-				(value / 3600),
-				((value % 3600) / 60),
-				((value % 3600) % 60)).toString();
-
 	}
 
 }

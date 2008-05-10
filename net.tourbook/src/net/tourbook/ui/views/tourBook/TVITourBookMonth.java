@@ -21,14 +21,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
 
 public class TVITourBookMonth extends TourBookTreeViewerItem {
 
-	public TVITourBookMonth(TourBookView view, TourBookTreeViewerItem parentItem, int year,
-			int month) {
+	public TVITourBookMonth(TourBookView view, TourBookTreeViewerItem parentItem, int year, int month) {
 
 		super(view);
 
@@ -38,6 +36,7 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 		fTourMonth = fFirstColumn = month;
 	}
 
+	@Override
 	protected void fetchChildren() {
 
 		/*
@@ -102,8 +101,8 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 				tourItem.fColumnStartDistance = result.getLong(9);
 				tourItem.fTourId = result.getLong(10);
 				Object tourTypeId = result.getObject(11);
-				tourItem.fTourTypeId = (tourTypeId == null
-						? TourType.TOUR_TYPE_ID_NOT_DEFINED
+				tourItem.fTourTypeId = (tourTypeId == null ? //
+						TourDatabase.ENTITY_IS_NOT_SAVED
 						: (Long) tourTypeId);
 
 				tourItem.fTourTitle = result.getString(12);
@@ -132,6 +131,7 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 		}
 	}
 
+	@Override
 	protected void remove() {}
 
 }

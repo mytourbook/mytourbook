@@ -356,6 +356,16 @@ public class Messages extends NLS {
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
+	public static String	Tag_Viewer_column_dlg_new_nessage;
+
+	public static String	Tag_Viewer_column_dlg_new_title;
+
+	public static String	Tag_Viewer_column_dlg_rename_nessage;
+
+	public static String	Tag_Viewer_column_dlg_rename_title;
+
+	public static String	Tag_Viewer_column_name;
+
 	public static String		Tour_Action_auto_zoom_to_slider_position;
 	public static String		Tour_Action_chart_options_tooltip;
 	public static String		Tour_Action_graph_altimeter_tooltip;

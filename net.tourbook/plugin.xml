@@ -103,6 +103,12 @@
             id="net.tourbook.preferences.PrefPageTourTypes"
             name="%preference_page_tour_types">
       </page>
+
+      <page
+            class="net.tourbook.preferences.PrefPageTags"
+            id="net.tourbook.preferences.PrefPageTags"
+            name="%preference_page_tags">
+      </page>
    </extension>
 
    <extension

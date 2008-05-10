@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.data;
 
 import java.util.ArrayList;
@@ -26,19 +27,30 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
+import net.tourbook.database.TourDatabase;
+
 @Entity
 public class TourCategory {
 
+	/*
+	 * DON'T USE THE FINAL KEYWORD FOR THE ID because the Id cannot be set
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long	categoryId;
+	private long						categoryId	= TourDatabase.ENTITY_IS_NOT_SAVED;
 
-	@ManyToMany(cascade=CascadeType.ALL)
-	private Collection<TourData>	tourData			= new ArrayList<TourData>();
+	@ManyToMany(cascade = CascadeType.ALL)
+	private final Collection<TourData>	tourData	= new ArrayList<TourData>();
 
 	@Basic(optional = false)
-	private String	category;
-	
+	private String						category;
+
+	public TourCategory() {}
+
+	public TourCategory(final String category) {
+		this.category = category;
+	}
+
 	public String getCategory() {
 		return category;
 	}
@@ -51,5 +63,13 @@ public class TourCategory {
 		return tourData;
 	}
 
+	/**
+	 * Set the name for the tour tag
+	 * 
+	 * @param tourTagName
+	 */
+	public void setCategory(final String tourTagName) {
+		this.category = tourTagName;
+	}
 
 }
