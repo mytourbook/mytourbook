@@ -28,6 +28,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -62,31 +63,14 @@ public class TourPainter extends MapPainter {
 	private int[]				fDataSerie;
 	private ILegendProvider		fLegendProvider;
 
-	public TourPainter() {
-
-		super();
-
-		fInstance = this;
-
-		final Display display = Display.getCurrent();
-		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
-		final Color systemColorRed = display.getSystemColor(SWT.COLOR_RED);
-		fPositionImage = createPositionImage(systemColorBlue);
-		fMarkerImage = createPositionImage(systemColorRed);
-
-		fImageStartMarker = TourbookPlugin.getImageDescriptor(IMAGE_START_MARKER).createImage();
-		fImageEndMarker = TourbookPlugin.getImageDescriptor(IMAGE_END_MARKER).createImage();
-		fImageTourMarker = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_MARKER).createImage();
-	}
-
 	/**
 	 * Draw legend colors into the legend bounds
 	 * 
 	 * @param gc
 	 * @param legendBounds
 	 * @param isVertical
-	 *        when <code>true</code> the legend is drawn vertical, when false the legend is drawn
-	 *        horizontal
+	 * 		when <code>true</code> the legend is drawn vertical, when false the legend is drawn
+	 * 		horizontal
 	 * @param colorId
 	 * @return
 	 */
@@ -394,6 +378,23 @@ public class TourPainter extends MapPainter {
 		return new Color(Display.getCurrent(), new RGB(red, green, blue));
 	}
 
+	public TourPainter() {
+
+		super();
+
+		fInstance = this;
+
+		final Display display = Display.getCurrent();
+		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
+		final Color systemColorRed = display.getSystemColor(SWT.COLOR_RED);
+		fPositionImage = createPositionImage(systemColorBlue);
+		fMarkerImage = createPositionImage(systemColorRed);
+
+		fImageStartMarker = TourbookPlugin.getImageDescriptor(IMAGE_START_MARKER).createImage();
+		fImageEndMarker = TourbookPlugin.getImageDescriptor(IMAGE_END_MARKER).createImage();
+		fImageTourMarker = TourbookPlugin.getImageDescriptor(IMAGE_TOUR_MARKER).createImage();
+	}
+
 	private Image createPositionImage(final Color positionColor) {
 
 		final Display display = Display.getCurrent();
@@ -428,6 +429,82 @@ public class TourPainter extends MapPainter {
 		colorTransparent.dispose();
 
 		return transparentImage;
+	}
+
+	/**
+	 * create an image for the tour marker
+	 * 
+	 * @param labelExtent
+	 * @param markerLabel
+	 * @return
+	 */
+	private Image createTourMarkerImage(final String markerLabel, final Point labelExtent) {
+
+		final int MARGIN = 5;
+		final int MARKER_POLE = 26;
+
+		final int bannerWidth = labelExtent.x + 2 * MARGIN;
+		final int bannerHeight = labelExtent.y + 2 * MARGIN;
+		final int bannerWidth2 = bannerWidth / 2;
+
+		final int markerWidth = bannerWidth;
+		final int markerHeight = bannerHeight + MARKER_POLE;
+		final int arcSize = 5;
+
+		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
+
+		final ImageData overlayImageData = new ImageData(markerWidth, markerHeight, 24, //
+				new PaletteData(0xff, 0xff00, 0xff00000));
+
+		overlayImageData.transparentPixel = overlayImageData.palette.getPixel(rgbTransparent);
+
+		final Display display = Display.getCurrent();
+		final Image markerImage = new Image(display, overlayImageData);
+		final Rectangle markerImageBounds = markerImage.getBounds();
+
+		final Color transparentColor = new Color(display, rgbTransparent);
+		final Color bannerColor = new Color(display, 0x65, 0xF9, 0x1F);
+		final Color bannerBorderColor = new Color(display, 0x69, 0xAF, 0x3D);
+
+		final GC gc = new GC(markerImage);
+
+		{
+			// fill transparent color
+			gc.setBackground(transparentColor);
+			gc.fillRectangle(markerImageBounds);
+
+			gc.setBackground(bannerColor);
+			gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
+
+			// draw banner border
+			gc.setForeground(bannerBorderColor);
+			gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
+
+			// draw text
+			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+			gc.drawText(markerLabel, //
+					MARGIN,
+					MARGIN,
+					true);
+
+			// draw pole
+//			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			gc.setForeground(bannerBorderColor);
+			gc.drawLine(bannerWidth2, bannerHeight, bannerWidth2, bannerHeight + MARKER_POLE);
+			gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
+
+			// draw image debug border
+//			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//			gc.drawRectangle(0, 0, markerImageBounds.width - 1, markerImageBounds.height - 1);
+		}
+
+		gc.dispose();
+
+		bannerColor.dispose();
+		bannerBorderColor.dispose();
+		transparentColor.dispose();
+
+		return markerImage;
 	}
 
 	@Override
@@ -503,9 +580,9 @@ public class TourPainter extends MapPainter {
 
 			boolean isTourMarkerInTile2 = false;
 
-			for (TourMarker tourMarker : tourData.getTourMarkers()) {
+			for (final TourMarker tourMarker : tourData.getTourMarkers()) {
 
-				int serieIndex = tourMarker.getSerieIndex();
+				final int serieIndex = tourMarker.getSerieIndex();
 
 				// draw tour marker
 				isTourMarkerInTile2 = drawTourMarker(gc,
@@ -562,60 +639,6 @@ public class TourPainter extends MapPainter {
 			final int markerHeight = bounds.height;
 
 			gc.drawImage(markerImage, devMarkerPosX - markerWidth2, devMarkerPosY - markerHeight);
-		}
-
-		return isMarkerInTile;
-	}
-
-	private boolean drawTourMarker(	final GC gc,
-									final Map map,
-									final Tile tile,
-									final double latitude,
-									final double longitude,
-									final Image markerImage,
-									TourMarker tourMarker) {
-
-		if (markerImage == null) {
-			return false;
-		}
-
-		final TileFactory tileFactory = map.getTileFactory();
-		final int zoomLevel = map.getZoom();
-		final int tileSize = tileFactory.getInfo().getTileSize();
-
-		// get world viewport for the current tile
-		final int worldTileX = tile.getX() * tileSize;
-		final int worldTileY = tile.getY() * tileSize;
-
-		// convert lat/long into world pixels
-		final java.awt.Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
-
-		// convert world position into device position
-		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
-		final int devMarkerPosY = worldMarkerPos.y - worldTileY;
-
-		final boolean isMarkerInTile = isMarkerInTile(markerImage.getBounds(), devMarkerPosX, devMarkerPosY, tileSize);
-		if (isMarkerInTile) {
-
-			// get marker size
-			final Rectangle bounds = markerImage.getBounds();
-			final int markerWidth = bounds.width;
-			final int markerWidth2 = markerWidth / 2;
-			final int markerHeight = bounds.height;
-
-			int devPosX = devMarkerPosX - markerWidth2;
-			int devPosY = devMarkerPosY - markerHeight;
-
-			gc.drawImage(markerImage, devPosX, devPosY);
-
-			String markerLabel = tourMarker.getLabel();
-			Point labelExtent = gc.textExtent(markerLabel);
-
-			gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-			gc.drawText(markerLabel, //
-					devPosX + markerWidth2 - (labelExtent.x / 2),
-					devPosY + markerWidth2 - (labelExtent.y / 2),
-					true);
 		}
 
 		return isMarkerInTile;
@@ -736,13 +759,87 @@ public class TourPainter extends MapPainter {
 
 	}
 
+	private boolean drawTourMarker(	final GC gc,
+									final Map map,
+									final Tile tile,
+									final double latitude,
+									final double longitude,
+									final Image markerImage,
+									final TourMarker tourMarker) {
+
+		if (markerImage == null) {
+			return false;
+		}
+
+		final TileFactory tileFactory = map.getTileFactory();
+		final int zoomLevel = map.getZoom();
+		final int tileSize = tileFactory.getInfo().getTileSize();
+
+		// get world viewport for the current tile
+		final int worldTileX = tile.getX() * tileSize;
+		final int worldTileY = tile.getY() * tileSize;
+
+		// convert lat/long into world pixels
+		final java.awt.Point worldMarkerPos = tileFactory.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+
+		// convert world position into device position
+		final int devMarkerPosX = worldMarkerPos.x - worldTileX;
+		final int devMarkerPosY = worldMarkerPos.y - worldTileY;
+
+		final boolean isMarkerInTile = isMarkerInTile(markerImage.getBounds(), devMarkerPosX, devMarkerPosY, tileSize);
+
+		if (isMarkerInTile) {
+
+			final String markerLabel = tourMarker.getLabel();
+			final Point labelExtent = gc.textExtent(markerLabel);
+
+			if (markerLabel.length() > 3) {
+
+				// draw marker with more than 3 characters
+
+				final Image tourMarkerImage = createTourMarkerImage(markerLabel, labelExtent);
+				final Rectangle markerBounds = tourMarkerImage.getBounds();
+
+				gc.drawImage(tourMarkerImage,//
+						devMarkerPosX - markerBounds.width / 2,
+						devMarkerPosY - markerBounds.height);
+
+				tourMarkerImage.dispose();
+
+			} else {
+
+				// draw marker with 3 or less characters
+
+				// get marker size
+				final Rectangle bounds = markerImage.getBounds();
+				final int markerWidth = bounds.width;
+
+				final int markerWidth2 = markerWidth / 2;
+				final int markerHeight = bounds.height;
+
+				final int devPosX = devMarkerPosX - markerWidth2;
+				final int devPosY = devMarkerPosY - markerHeight;
+
+				gc.drawImage(markerImage, devPosX, devPosY);
+
+				gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+				gc.drawText(markerLabel, //
+						devPosX + markerWidth2 - (labelExtent.x / 2),
+						devPosY + markerWidth2 - (labelExtent.y / 2),
+						true);
+			}
+		}
+
+		return isMarkerInTile;
+	}
+
 	/**
 	 * @param legendBounds
 	 * @param valueIndex
 	 * @return Returns the position for the value according to the value index in the legend,
-	 *         {@link Integer#MIN_VALUE} when data are not initialized
+	 * 	{@link Integer#MIN_VALUE} when data are not initialized
 	 */
-	public int getLegendValuePosition(Rectangle legendBounds, int valueIndex) {
+	public int getLegendValuePosition(final Rectangle legendBounds, final int valueIndex) {
 
 		if (fDataSerie == null || valueIndex >= fDataSerie.length) {
 			return Integer.MIN_VALUE;
@@ -752,7 +849,7 @@ public class TourPainter extends MapPainter {
 		 * ONLY VERTICAL LEGENDS ARE SUPPORTED
 		 */
 
-		int dataValue = fDataSerie[valueIndex];
+		final int dataValue = fDataSerie[valueIndex];
 
 		int valuePosition = 0;
 
@@ -778,19 +875,19 @@ public class TourPainter extends MapPainter {
 			// min < value < max
 
 //			int legendPositionX = legendBounds.x + 1;
-			int legendPositionY = legendBounds.y + MappingView.LEGEND_MARGIN_TOP_BOTTOM;
+			final int legendPositionY = legendBounds.y + MappingView.LEGEND_MARGIN_TOP_BOTTOM;
 //			int legendWidth = 20;
-			int legendHeight = legendBounds.height - 2 * MappingView.LEGEND_MARGIN_TOP_BOTTOM;
+			final int legendHeight = legendBounds.height - 2 * MappingView.LEGEND_MARGIN_TOP_BOTTOM;
 
-			int pixelDiff = legendHeight - 1;
+			final int pixelDiff = legendHeight - 1;
 
 			// pixelValue contains the value for ONE pixel
 //			final float pixelValue = (float) legendDiffValue / availableLegendPixels;
 
 //			valuePosition = legendPositionY + availableLegendPixels - pixelIndex;
 
-			int dataValue0 = dataValue - legendMinValue;
-			float ratio = pixelDiff / (float) legendDiffValue;
+			final int dataValue0 = dataValue - legendMinValue;
+			final float ratio = pixelDiff / (float) legendDiffValue;
 
 			valuePosition = legendPositionY + (int) (dataValue0 * ratio);
 		}
@@ -863,13 +960,13 @@ public class TourPainter extends MapPainter {
 	 * one half to the left and right side
 	 * 
 	 * @param markerBounds
-	 *        marker bounds
+	 * 		marker bounds
 	 * @param devMarkerPosX
-	 *        x position for the marker
+	 * 		x position for the marker
 	 * @param devMarkerPosY
-	 *        y position for the marker
+	 * 		y position for the marker
 	 * @param tileSize
-	 *        width and height of the tile
+	 * 		width and height of the tile
 	 * @return Returns <code>true</code> when the marker is visible in the tile
 	 */
 	private boolean isMarkerInTile(	final Rectangle markerBounds,
