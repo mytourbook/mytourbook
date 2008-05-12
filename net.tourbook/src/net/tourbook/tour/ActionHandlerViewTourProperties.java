@@ -26,16 +26,14 @@ import org.eclipse.ui.PlatformUI;
 
 public class ActionHandlerViewTourProperties extends AbstractHandler {
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 		try {
-			PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow()
-					.getActivePage()
-					.showView(TourPropertiesView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TourPropertiesView.ID,
+					null,
+					IWorkbenchPage.VIEW_VISIBLE);
 
-		} catch (PartInitException e) {
+		} catch (final PartInitException e) {
 			e.printStackTrace();
 		}
 		return null;

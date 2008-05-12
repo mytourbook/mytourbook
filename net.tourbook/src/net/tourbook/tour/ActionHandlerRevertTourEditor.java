@@ -25,12 +25,11 @@ public class ActionHandlerRevertTourEditor extends AbstractHandler {
 	private boolean		fisEnabled	= false;
 	private TourEditor	fTourEditor;
 
-	public ActionHandlerRevertTourEditor(TourEditor tourEditor) {
+	public ActionHandlerRevertTourEditor(final TourEditor tourEditor) {
 		fTourEditor = tourEditor;
 	}
 
-	@Override
-	public Object execute(ExecutionEvent execEvent) throws ExecutionException {
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
 		fTourEditor.revertTourData();
 
@@ -49,7 +48,7 @@ public class ActionHandlerRevertTourEditor extends AbstractHandler {
 		return fisEnabled;
 	}
 
-	public void setEnabled(boolean isEnabled) {
+	public void setEnabled(final boolean isEnabled) {
 		fisEnabled = isEnabled;
 	}
 

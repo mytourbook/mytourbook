@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.application;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -30,8 +31,7 @@ public class ActionHandlerPreferences extends AbstractHandler {
 
 	}
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 		if (fPrefAction == null) {
 			fPrefAction = ActionFactory.PREFERENCES.create(HandlerUtil.getActiveWorkbenchWindow(event));

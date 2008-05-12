@@ -26,12 +26,11 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class ActionHandlerAdjustAltitude extends AbstractHandler {
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 		// open the dialog to adjust the altitude
 
-		IEditorPart editorPart = HandlerUtil.getActiveEditorChecked(event);
+		final IEditorPart editorPart = HandlerUtil.getActiveEditorChecked(event);
 
 		TourEditor tourEditor;
 		TourChart tourChart;

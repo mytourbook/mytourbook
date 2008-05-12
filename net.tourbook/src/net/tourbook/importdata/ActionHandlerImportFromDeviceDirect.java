@@ -21,8 +21,7 @@ import org.eclipse.core.commands.ExecutionException;
 
 public class ActionHandlerImportFromDeviceDirect extends AbstractHandler {
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 		RawDataManager.getInstance().executeImportFromDeviceDirect();
 

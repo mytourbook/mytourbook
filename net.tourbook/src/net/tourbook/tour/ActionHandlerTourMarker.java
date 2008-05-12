@@ -26,10 +26,9 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class ActionHandlerTourMarker extends AbstractHandler {
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		IEditorPart editorPart = HandlerUtil.getActiveEditorChecked(event);
+		final IEditorPart editorPart = HandlerUtil.getActiveEditorChecked(event);
 
 		TourEditor tourEditor;
 		TourChart tourChart;

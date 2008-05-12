@@ -26,10 +26,9 @@ public class ActionHandlerCanAutoZoomToSlider extends TCActionHandler {
 		fCommandId = TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER;
 	}
 
-	@Override
-	public Object execute(ExecutionEvent execEvent) throws ExecutionException {
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
+		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
 			fTourChart.onExecuteCanAutoZoomToSlider(isItemChecked);

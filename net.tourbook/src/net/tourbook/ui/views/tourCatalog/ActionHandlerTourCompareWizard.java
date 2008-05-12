@@ -34,10 +34,9 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class ActionHandlerTourCompareWizard extends AbstractHandler {
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		Wizard wizard = new WizardTourComparer();
+		final Wizard wizard = new WizardTourComparer();
 
 		final WizardDialog dialog = new PositionedWizardDialog(HandlerUtil.getActiveShellChecked(event),
 				wizard,
@@ -58,15 +57,12 @@ public class ActionHandlerTourCompareWizard extends AbstractHandler {
 
 					try {
 						// show tour compare perspective
-						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID,
-								window);
+						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
 
 						// show tour compare view
-						window.getActivePage().showView(CompareResultView.ID,
-								null,
-								IWorkbenchPage.VIEW_ACTIVATE);
+						window.getActivePage().showView(CompareResultView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
-					} catch (WorkbenchException e) {
+					} catch (final WorkbenchException e) {
 						e.printStackTrace();
 					}
 				}

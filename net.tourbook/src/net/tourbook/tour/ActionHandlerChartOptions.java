@@ -24,8 +24,7 @@ public class ActionHandlerChartOptions extends TCActionHandler {
 		fCommandId = TourChart.COMMAND_ID_CHART_OPTIONS;
 	}
 
-	@Override
-	public Object execute(ExecutionEvent execEvent) throws ExecutionException {
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
 		// show the drop-down menu, this only works in the runWithEvent not in the run method
 //		getMenuCreator().getMenu(fTBM.getControl()).setVisible(true);

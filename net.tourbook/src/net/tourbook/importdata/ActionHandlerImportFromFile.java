@@ -21,8 +21,7 @@ import org.eclipse.core.commands.ExecutionException;
 
 public class ActionHandlerImportFromFile extends AbstractHandler {
 
-	@Override
-	public Object execute(ExecutionEvent arg0) throws ExecutionException {
+	public Object execute(final ExecutionEvent arg0) throws ExecutionException {
 
 		RawDataManager.getInstance().executeImportFromFile();
 

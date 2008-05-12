@@ -26,10 +26,9 @@ public class ActionHandlerXAxisDistance extends TCActionHandler {
 		fCommandId = TourChart.COMMAND_ID_X_AXIS_DISTANCE;
 	}
 
-	@Override
-	public Object execute(ExecutionEvent execEvent) throws ExecutionException {
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
+		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
 
 		if (isItemChecked != null) {
 			fTourChart.onExecuteXAxisDistance(isItemChecked);
