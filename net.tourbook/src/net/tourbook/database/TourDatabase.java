@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.database;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,9 +37,9 @@ import javax.persistence.Query;
 import net.tourbook.Messages;
 import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.data.TourBike;
-import net.tourbook.data.TourCategory;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
@@ -67,63 +68,65 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int				TOURBOOK_DB_VERSION				= 4;
+	private static final int			TOURBOOK_DB_VERSION				= 5;
 
 	/**
 	 * contains <code>-1</code> which is the Id for a not saved entity
 	 */
-	public static final int					ENTITY_IS_NOT_SAVED				= -1;
+	public static final int				ENTITY_IS_NOT_SAVED				= -1;
 
 	/*
 	 * database tables
 	 */
-	public static final String				TABLE_TOUR_DATA					= "TourData";								//$NON-NLS-1$
-	public static final String				TABLE_TOUR_MARKER				= "TourMarker";							//$NON-NLS-1$
-	public static final String				TABLE_TOUR_REFERENCE			= "TourReference";							//$NON-NLS-1$
-	public static final String				TABLE_TOUR_COMPARED				= "TourCompared";							//$NON-NLS-1$
-	public static final String				TABLE_TOUR_CATEGORY				= "TourCategory";							//$NON-NLS-1$
-	public static final String				TABLE_TOUR_TYPE					= "TourType";								//$NON-NLS-1$
-	public static final String				TABLE_TOUR_PERSON				= "TourPerson";							//$NON-NLS-1$
-	public static final String				TABLE_TOUR_BIKE					= "TourBike";								//$NON-NLS-1$
+	public static final String			TABLE_TOUR_DATA					= "TourData";								//$NON-NLS-1$
+	public static final String			TABLE_TOUR_MARKER				= "TourMarker";							//$NON-NLS-1$
+	public static final String			TABLE_TOUR_REFERENCE			= "TourReference";							//$NON-NLS-1$
+	public static final String			TABLE_TOUR_COMPARED				= "TourCompared";							//$NON-NLS-1$
+	public static final String			TABLE_TOUR_CATEGORY				= "TourCategory";							//$NON-NLS-1$
+	public static final String			TABLE_TOUR_TYPE					= "TourType";								//$NON-NLS-1$
+	public static final String			TABLE_TOUR_TAG					= "TourTag";								//$NON-NLS-1$
+	public static final String			TABLE_TOUR_TAG_CATEGORY			= "TourTagCategory";						//$NON-NLS-1$
+	public static final String			TABLE_TOUR_PERSON				= "TourPerson";							//$NON-NLS-1$
+	public static final String			TABLE_TOUR_BIKE					= "TourBike";								//$NON-NLS-1$
 
-	private static final String				TABLE_DB_VERSION				= "DbVersion";								//$NON-NLS-1$
+	private static final String			TABLE_DB_VERSION				= "DbVersion";								//$NON-NLS-1$
 
 	/**
 	 * Db property: tour was changed and saved in the database
 	 */
-	public static final int					TOUR_IS_CHANGED_AND_PERSISTED	= 1;
+	public static final int				TOUR_IS_CHANGED_AND_PERSISTED	= 1;
 
 	/**
 	 * Db property: tour was changed but not yet saved in the database
 	 */
-	public static final int					TOUR_IS_CHANGED					= 2;
+	public static final int				TOUR_IS_CHANGED					= 2;
 
-	private static TourDatabase				instance;
+	private static TourDatabase			instance;
 
-	private static NetworkServerControl		server;
+	private static NetworkServerControl	server;
 
-	private static EntityManagerFactory		emFactory;
+	private static EntityManagerFactory	emFactory;
 
-	private static ArrayList<TourType>		fTourTypes;
-	private static ArrayList<TourType>		fActiveTourTypes;
-	private static ArrayList<TourCategory>	fTags;
+	private static ArrayList<TourType>	fTourTypes;
+	private static ArrayList<TourType>	fActiveTourTypes;
+	private static ArrayList<TourTag>	fTags;
 
-	private boolean							fIsTableChecked;
-	private boolean							fIsVersionChecked;
+	private boolean						fIsTableChecked;
+	private boolean						fIsVersionChecked;
 
-	private final ListenerList				fPropertyListeners				= new ListenerList(ListenerList.IDENTITY);
+	private final ListenerList			fPropertyListeners				= new ListenerList(ListenerList.IDENTITY);
 
 	class CustomMonitor extends ProgressMonitorDialog {
 
 		private final String	fTitle;
 
-		public CustomMonitor(Shell parent, String title) {
+		public CustomMonitor(final Shell parent, final String title) {
 			super(parent);
 			fTitle = title;
 		}
 
 		@Override
-		protected Control createDialogArea(Composite parent) {
+		protected Control createDialogArea(final Composite parent) {
 			getShell().setText(fTitle);
 			return super.createDialogArea(parent);
 		}
@@ -161,11 +164,11 @@ public class TourDatabase {
 
 		ArrayList<Long> tourList = new ArrayList<Long>();
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
 
-			Query query = em.createQuery("SELECT TourData.tourId " //$NON-NLS-1$
+			final Query query = em.createQuery("SELECT TourData.tourId " //$NON-NLS-1$
 					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ")); //$NON-NLS-1$ //$NON-NLS-2$
 
 			tourList = (ArrayList<Long>) query.getResultList();
@@ -191,11 +194,11 @@ public class TourDatabase {
 
 		ArrayList<TourBike> bikeList = new ArrayList<TourBike>();
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
 
-			Query query = em.createQuery("SELECT TourBike " //$NON-NLS-1$
+			final Query query = em.createQuery("SELECT TourBike " //$NON-NLS-1$
 					+ ("FROM " + TourDatabase.TABLE_TOUR_BIKE + " TourBike ") //$NON-NLS-1$ //$NON-NLS-2$
 					+ (" ORDER  BY TourBike.name")); //$NON-NLS-1$
 
@@ -215,9 +218,9 @@ public class TourDatabase {
 	 */
 	public static TourData getTourData(final Long tourId) {
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
-		TourData tourData = em.find(TourData.class, tourId);
+		final TourData tourData = em.find(TourData.class, tourId);
 
 		em.close();
 
@@ -236,11 +239,11 @@ public class TourDatabase {
 
 		ArrayList<TourPerson> tourPeople = new ArrayList<TourPerson>();
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
 
-			Query query = em.createQuery("SELECT TourPerson " //$NON-NLS-1$
+			final Query query = em.createQuery("SELECT TourPerson " //$NON-NLS-1$
 					+ ("FROM " + TourDatabase.TABLE_TOUR_PERSON + " TourPerson ") //$NON-NLS-1$ //$NON-NLS-2$
 					+ (" ORDER  BY TourPerson.lastName, TourPerson.firstName")); //$NON-NLS-1$
 
@@ -256,23 +259,23 @@ public class TourDatabase {
 	 * @return Returns all tags which are stored in the database
 	 */
 	@SuppressWarnings("unchecked")//$NON-NLS-1$
-	public static ArrayList<TourCategory> getTourTags() {
+	public static ArrayList<TourTag> getTourTags() {
 
 		if (fTags != null) {
 			return fTags;
 		}
 
-		fTags = new ArrayList<TourCategory>();
+		fTags = new ArrayList<TourTag>();
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
 
-			Query query = em.createQuery("SELECT TourCategory " //$NON-NLS-1$
+			final Query query = em.createQuery("SELECT TourCategory " //$NON-NLS-1$
 					+ ("FROM " + TourDatabase.TABLE_TOUR_CATEGORY + " TourCategory ") //$NON-NLS-1$ //$NON-NLS-2$
 					+ (" ORDER  BY TourCategory.category")); //$NON-NLS-1$
 
-			fTags = (ArrayList<TourCategory>) query.getResultList();
+			fTags = (ArrayList<TourTag>) query.getResultList();
 
 			em.close();
 		}
@@ -285,11 +288,11 @@ public class TourDatabase {
 	 * @return Returns the name for the {@link TourType} or an empty string when the tour type id
 	 * 	was not found
 	 */
-	public static String getTourTypeName(long typeId) {
+	public static String getTourTypeName(final long typeId) {
 
 		String tourTypeName = Messages.ui_tour_not_defined;
 
-		for (TourType tourType : getTourTypes()) {
+		for (final TourType tourType : getTourTypes()) {
 			if (tourType.getTypeId() == typeId) {
 				tourTypeName = tourType.getName();
 				break;
@@ -311,11 +314,11 @@ public class TourDatabase {
 
 		fTourTypes = new ArrayList<TourType>();
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
 
-			Query query = em.createQuery("SELECT TourType " //$NON-NLS-1$
+			final Query query = em.createQuery("SELECT TourType " //$NON-NLS-1$
 					+ ("FROM " + TourDatabase.TABLE_TOUR_TYPE + " TourType ") //$NON-NLS-1$ //$NON-NLS-2$
 					+ (" ORDER  BY TourType.name")); //$NON-NLS-1$
 
@@ -335,19 +338,19 @@ public class TourDatabase {
 	 * @param entityClass
 	 * @return Returns <code>true</code> when the entity was saved
 	 */
-	public static boolean persistEntity(Object entity, long id, Class<?> entityClass) {
+	public static boolean persistEntity(final Object entity, final long id, final Class<?> entityClass) {
 
 		boolean isSaved = false;
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
-		EntityTransaction ts = em.getTransaction();
+		final EntityTransaction ts = em.getTransaction();
 
 		try {
 
 			ts.begin();
 			{
-				Object entityInDB = em.find(entityClass, id);
+				final Object entityInDB = em.find(entityClass, id);
 
 				if (entityInDB == null) {
 
@@ -362,7 +365,7 @@ public class TourDatabase {
 			}
 			ts.commit();
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (ts.isActive()) {
@@ -392,15 +395,15 @@ public class TourDatabase {
 	 * 
 	 * @param tourId
 	 */
-	public static boolean removeTour(long tourId) {
+	public static boolean removeTour(final long tourId) {
 
 		boolean isRemoved = false;
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
-		EntityTransaction ts = em.getTransaction();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityTransaction ts = em.getTransaction();
 
 		try {
-			TourData tour = em.find(TourData.class, tourId);
+			final TourData tour = em.find(TourData.class, tourId);
 
 			if (tour != null) {
 				ts.begin();
@@ -408,7 +411,7 @@ public class TourDatabase {
 				ts.commit();
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (ts.isActive()) {
@@ -432,15 +435,15 @@ public class TourDatabase {
 	 * @param tourData
 	 * @return returns true is the save was successful
 	 */
-	public static boolean saveTour(TourData tourData) {
+	public static boolean saveTour(final TourData tourData) {
 
 		boolean isSaved = false;
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
 
-			EntityTransaction ts = em.getTransaction();
+			final EntityTransaction ts = em.getTransaction();
 
 			try {
 
@@ -448,7 +451,7 @@ public class TourDatabase {
 
 				ts.begin();
 				{
-					TourData tourDataEntity = em.find(TourData.class, tourData.getTourId());
+					final TourData tourDataEntity = em.find(TourData.class, tourData.getTourId());
 
 					if (tourDataEntity == null) {
 
@@ -479,7 +482,7 @@ public class TourDatabase {
 //
 //				}
 
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			} finally {
 				if (ts.isActive()) {
@@ -498,7 +501,7 @@ public class TourDatabase {
 		return isSaved;
 	}
 
-	public static void updateActiveTourTypeList(TourTypeFilter tourTypeFilter) {
+	public static void updateActiveTourTypeList(final TourTypeFilter tourTypeFilter) {
 
 		switch (tourTypeFilter.getFilterType()) {
 		case TourTypeFilter.FILTER_TYPE_SYSTEM:
@@ -535,7 +538,7 @@ public class TourDatabase {
 
 				fActiveTourTypes = new ArrayList<TourType>();
 
-				for (Object item : tourTypes) {
+				for (final Object item : tourTypes) {
 					fActiveTourTypes.add((TourType) item);
 				}
 				return;
@@ -553,7 +556,7 @@ public class TourDatabase {
 
 	private TourDatabase() {}
 
-	public void addPropertyListener(IPropertyListener listener) {
+	public void addPropertyListener(final IPropertyListener listener) {
 		fPropertyListeners.add(listener);
 	}
 
@@ -580,14 +583,14 @@ public class TourDatabase {
 				if (splashHandler == null) {
 					throw new MyTourbookException("Cannot get Splash Handler"); //$NON-NLS-1$
 				} else {
-					IProgressMonitor splashProgressMonitor = splashHandler.getBundleProgressMonitor();
+					final IProgressMonitor splashProgressMonitor = splashHandler.getBundleProgressMonitor();
 
 					runnableStartServer.run(splashProgressMonitor);
 				}
 
-			} catch (InvocationTargetException e) {
+			} catch (final InvocationTargetException e) {
 				e.printStackTrace();
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
@@ -604,13 +607,13 @@ public class TourDatabase {
 
 		try {
 
-			Connection conn = createConnection();
+			final Connection conn = createConnection();
 
 			/*
 			 * Check if the tourdata table exists
 			 */
-			DatabaseMetaData metaData = conn.getMetaData();
-			ResultSet tables = metaData.getTables(null, null, null, null);
+			final DatabaseMetaData metaData = conn.getMetaData();
+			final ResultSet tables = metaData.getTables(null, null, null, null);
 			while (tables.next()) {
 				if (tables.getString(3).equalsIgnoreCase(TABLE_TOUR_DATA)) {
 					conn.close();
@@ -621,301 +624,36 @@ public class TourDatabase {
 			Statement stmt = null;
 
 			try {
+
 				stmt = conn.createStatement();
+				{
+					createTableTourData(stmt);
 
-				/*
-				 * CREATE TABLE TourBike
-				 */
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("CREATE TABLE " + TABLE_TOUR_BIKE) //$NON-NLS-1$
-						+ "(" //$NON-NLS-1$
-						+ "bikeId	 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
-						+ "name				VARCHAR(255),	\n" //$NON-NLS-1$
-						+ "weight 			FLOAT,			\n" //$NON-NLS-1$ // kg
-						+ "typeId 			INTEGER,		\n" //$NON-NLS-1$
-						+ "frontTyreId 		INTEGER,		\n" //$NON-NLS-1$
-						+ "rearTyreId 		INTEGER			\n" //$NON-NLS-1$
-						+ ")"); //$NON-NLS-1$
+					createTableTourBike(stmt);
+					createTableTourPerson(stmt);
+					createTableTourType(stmt);
+					createTableTourCategory(stmt);
+					createTableTourMarker(stmt);
+					createTableTourReference(stmt);
+					createTableTourCompared(stmt);
+					createTableVersion(stmt);
 
-				/*
-				 * ALTER TABLE TourBike
-				 */
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("ALTER TABLE " + TABLE_TOUR_BIKE) //$NON-NLS-1$
-						+ (" ADD CONSTRAINT " + (TABLE_TOUR_BIKE + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" PRIMARY KEY (bikeId)")); //$NON-NLS-1$
+					createTableTourTag(stmt);
+					createTableTourTagCategory(stmt);
 
-				/*
-				 * CREATE TABLE TourPerson
-				 */
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("CREATE TABLE " + TABLE_TOUR_PERSON) //$NON-NLS-1$
-						+ "(" //$NON-NLS-1$
-						+ "personId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
-						+ "lastName 		VARCHAR(80),	\n" //$NON-NLS-1$
-						+ "firstName 		VARCHAR(80),	\n" //$NON-NLS-1$
-						+ "weight 			FLOAT,			\n" //$NON-NLS-1$ // kg
-						+ "height 			FLOAT,			\n" //$NON-NLS-1$ // m
-						+ "rawDataPath		VARCHAR(255),	\n" //$NON-NLS-1$
-						+ "deviceReaderId	VARCHAR(255),	\n" //$NON-NLS-1$
-						+ "tourBike_bikeId 	BIGINT			\n" //$NON-NLS-1$
-						+ ")"); //$NON-NLS-1$
-				/*
-				 * ALTER TABLE TourPerson
-				 */
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("ALTER TABLE " + TABLE_TOUR_PERSON) //$NON-NLS-1$
-						+ (" ADD CONSTRAINT " + (TABLE_TOUR_PERSON + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" PRIMARY KEY (personId)")); //$NON-NLS-1$
-
-				/*
-				 * CREATE TABLE TourType
-				 */
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("CREATE TABLE " + TABLE_TOUR_TYPE) //$NON-NLS-1$
-						+ "(" //$NON-NLS-1$
-						+ "typeId 				BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
-						+ "name 				VARCHAR(100)," //$NON-NLS-1$
-						+ "colorBrightRed 		SMALLINT NOT NULL," //$NON-NLS-1$
-						+ "colorBrightGreen 	SMALLINT NOT NULL," //$NON-NLS-1$
-						+ "colorBrightBlue 		SMALLINT NOT NULL," //$NON-NLS-1$
-						+ "colorDarkRed 		SMALLINT NOT NULL," //$NON-NLS-1$
-						+ "colorDarkGreen 		SMALLINT NOT NULL," //$NON-NLS-1$
-						+ "colorDarkBlue 		SMALLINT NOT NULL," //$NON-NLS-1$
-						+ "colorLineRed 		SMALLINT NOT NULL," //$NON-NLS-1$
-						+ "colorLineGreen 		SMALLINT NOT NULL," //$NON-NLS-1$
-						+ "colorLineBlue 		SMALLINT NOT NULL" //$NON-NLS-1$
-						+ ")"); //$NON-NLS-1$
-				/*
-				 * ALTER TABLE TourType
-				 */
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("ALTER TABLE " + TABLE_TOUR_TYPE) //$NON-NLS-1$
-						+ (" ADD CONSTRAINT " + (TABLE_TOUR_TYPE + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" PRIMARY KEY (typeId)")); //$NON-NLS-1$
-
-				/*
-				 * CREATE TABLE TourCategory
-				 */
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("CREATE TABLE " + TABLE_TOUR_CATEGORY) //$NON-NLS-1$
-						+ "(" //$NON-NLS-1$
-						+ "categoryId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
-						+ (TABLE_TOUR_DATA + "tourId	BIGINT,") //$NON-NLS-1$
-						+ "category 					VARCHAR(100)" //$NON-NLS-1$
-						+ ")"); //$NON-NLS-1$
-
-				// ALTER TABLE TourCategory ADD CONSTRAINT TourCategory_pk PRIMARY KEY (categoryId);
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("ALTER TABLE " + TABLE_TOUR_CATEGORY) //$NON-NLS-1$
-						+ (" ADD CONSTRAINT " + (TABLE_TOUR_CATEGORY + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" PRIMARY KEY (categoryId)")); //$NON-NLS-1$
-
-				// CREATE TABLE TourCategory_TourData_Data
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("CREATE TABLE " + TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA) //$NON-NLS-1$ //$NON-NLS-2$
-						+ "(" //$NON-NLS-1$
-						+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
-						+ (TABLE_TOUR_CATEGORY + "_categoryId	BIGINT NOT NULL") //$NON-NLS-1$
-						+ ")"); //$NON-NLS-1$
-
-				// ALTER TABLE TourCategory_TourData ADD CONSTRAINT TourCategory_TourData_pk PRIMARY KEY (tourCategory_categoryId);
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("ALTER TABLE " + TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA) //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" ADD CONSTRAINT " + TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						+ (" PRIMARY KEY (" + TABLE_TOUR_CATEGORY + "_categoryId)")); //$NON-NLS-1$ //$NON-NLS-2$
-
-				// CREATE TABLE TourMarker
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("CREATE TABLE " + TABLE_TOUR_MARKER) //$NON-NLS-1$
-						+ "(" //$NON-NLS-1$
-						+ "markerId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
-						+ (TABLE_TOUR_DATA + "_tourId	BIGINT,") //$NON-NLS-1$
-						+ "time 						INTEGER NOT NULL," //$NON-NLS-1$
-						+ "distance 					INTEGER NOT NULL," //$NON-NLS-1$
-						+ "serieIndex 					INTEGER NOT NULL," //$NON-NLS-1$
-						+ "type 						INTEGER NOT NULL," //$NON-NLS-1$
-						+ "visualPosition				INTEGER NOT NULL," //$NON-NLS-1$
-						+ "label 						VARCHAR(255)," //$NON-NLS-1$
-						+ "category 					VARCHAR(100)," //$NON-NLS-1$
-						// Version 2
-						+ "labelXOffset					INTEGER," //$NON-NLS-1$
-						+ "labelYOffset					INTEGER," //$NON-NLS-1$
-						+ "markerType					BIGINT" //$NON-NLS-1$
-						+ ")"); //$NON-NLS-1$
-
-				// CREATE TABLE TourData_TourMarker
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("CREATE TABLE " + TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER) //$NON-NLS-1$ //$NON-NLS-2$
-						+ "(" //$NON-NLS-1$
-						+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
-						+ (TABLE_TOUR_MARKER + "_markerId		BIGINT NOT NULL") //$NON-NLS-1$
-						+ ")"); //$NON-NLS-1$
-
-				// CREATE TABLE TourReference
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("CREATE TABLE " + TABLE_TOUR_REFERENCE) //$NON-NLS-1$
-						+ "(" //$NON-NLS-1$
-						+ "refId 						BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
-						+ (TABLE_TOUR_DATA + "_tourId	BIGINT,") //$NON-NLS-1$
-						+ "startIndex					INTEGER NOT NULL," //$NON-NLS-1$
-						+ "endIndex 					INTEGER NOT NULL," //$NON-NLS-1$
-						+ "label 						VARCHAR(80)" //$NON-NLS-1$
-						+ ")"); //$NON-NLS-1$
-
-				// CREATE TABLE TourData_TourReference
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("CREATE TABLE " + TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE) //$NON-NLS-1$ //$NON-NLS-2$
-						+ "(" //$NON-NLS-1$
-						+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
-						+ (TABLE_TOUR_REFERENCE + "_refId 		BIGINT NOT NULL") //$NON-NLS-1$
-						+ ")"); //$NON-NLS-1$
-
-				// CREATE TABLE TourCompared
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("CREATE TABLE " + TABLE_TOUR_COMPARED) //	//$NON-NLS-1$
-						+ "(" //										//$NON-NLS-1$
-						+ "comparedId 			BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
-						+ "refTourId			BIGINT," //				//$NON-NLS-1$
-						+ "tourId				BIGINT," //				//$NON-NLS-1$
-						+ "startIndex			INTEGER NOT NULL," //	//$NON-NLS-1$
-						+ "endIndex 			INTEGER NOT NULL," //	//$NON-NLS-1$
-						+ "tourDate	 			DATE NOT NULL," //		//$NON-NLS-1$
-						+ "startYear			INTEGER NOT NULL," //	//$NON-NLS-1$
-						+ "tourSpeed	 		FLOAT" //				//$NON-NLS-1$
-						+ ")"); //										//$NON-NLS-1$
-
-				// CREATE TABLE TourData
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("CREATE TABLE " + TABLE_TOUR_DATA) //$NON-NLS-1$
-						+ "(" //$NON-NLS-1$
-						+ "tourId 				BIGINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "startYear 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "startMonth 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "startDay 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "startHour 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "startMinute 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "startWeek 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "startDistance 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "distance 			INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "startAltitude 		SMALLINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "startPulse 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "dpTolerance 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "tourDistance 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "tourRecordingTime 	INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "tourDrivingTime 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "tourAltUp 			INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "tourAltDown 			INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "deviceTourType 		VARCHAR(2),			\n" //$NON-NLS-1$
-						+ "deviceTravelTime 	BIGINT NOT NULL,	\n" //$NON-NLS-1$
-						+ "deviceDistance 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "deviceWheel 			INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "deviceWeight 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "deviceTotalUp 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "deviceTotalDown 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
-						+ "devicePluginId	 	VARCHAR(255),		\n" //$NON-NLS-1$
-
-						// version 3 start
-						+ "deviceMode 			SMALLINT,			\n" //$NON-NLS-1$
-						+ "deviceTimeInterval	SMALLINT,			\n" //$NON-NLS-1$
-						// version 3 end
-
-						// version 4 start
-
-						// from markus
-						+ "maxAltitude			INTEGER,			\n" //$NON-NLS-1$
-						+ "maxPulse				INTEGER,			\n" //$NON-NLS-1$
-						+ "avgPulse				INTEGER,			\n" //$NON-NLS-1$
-						+ "avgCadence			INTEGER,			\n" //$NON-NLS-1$
-						+ "avgTemperature		INTEGER,			\n" //$NON-NLS-1$
-						+ "maxSpeed				FLOAT,				\n" //$NON-NLS-1$
-						+ "tourTitle			VARCHAR(255),		\n" //$NON-NLS-1$
-						+ "tourDescription		VARCHAR(4096),		\n" //$NON-NLS-1$
-						+ "tourStartPlace		VARCHAR(255),		\n" //$NON-NLS-1$
-						+ "tourEndPlace			VARCHAR(255),		\n" //$NON-NLS-1$
-						+ "calories				INTEGER,			\n" //$NON-NLS-1$
-						+ "bikerWeight			FLOAT,				\n" //$NON-NLS-1$
-						+ "tourBike_bikeId		BIGINT,				\n" //$NON-NLS-1$
-
-						// from wolfgang
-						+ "devicePluginName		VARCHAR(255),		\n" //$NON-NLS-1$
-						+ "deviceModeName		VARCHAR(255),		\n" //$NON-NLS-1$
-
-						// version 4 end
-
-						// version 5 start
-						/**
-						 * disabled because when two blob object's are deserialized then the error
-						 * occures:
-						 * <p>
-						 * java.io.StreamCorruptedException: invalid stream header: 00ACED00
-						 * <p>
-						 * therefor the gpsData are put into the serieData object
-						 */
-//						+ "gpsData 				BLOB,				\n" //$NON-NLS-1$
-						// version 5 end
-						+ "tourType_typeId 		BIGINT,				\n" //$NON-NLS-1$
-						+ "tourPerson_personId 	BIGINT,				\n" //$NON-NLS-1$
-
-						+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
-
-						+ ")"); //$NON-NLS-1$
-
-				/*
-				 * Alter Table
-				 */
-
-				// ALTER TABLE TourData ADD CONSTRAINT TourData_pk PRIMARY KEY (tourId);
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("ALTER TABLE " + TABLE_TOUR_DATA) //$NON-NLS-1$
-						+ (" ADD CONSTRAINT " + TABLE_TOUR_DATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" PRIMARY KEY (tourId)")); //$NON-NLS-1$
-
-				// ALTER TABLE TourReference ADD CONSTRAINT TourReference_pk PRIMARY KEY (refId);
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("ALTER TABLE " + TABLE_TOUR_REFERENCE) //$NON-NLS-1$
-						+ (" ADD CONSTRAINT " + TABLE_TOUR_REFERENCE + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" PRIMARY KEY (refId)")); //$NON-NLS-1$
-
-				// ALTER TABLE TourMarker ADD CONSTRAINT TourMarker_pk PRIMARY KEY (markerId);
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("ALTER TABLE " + TABLE_TOUR_MARKER) //$NON-NLS-1$
-						+ (" ADD CONSTRAINT " + (TABLE_TOUR_MARKER + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" PRIMARY KEY (markerId)")); //$NON-NLS-1$
-
-				// ALTER TABLE TourData_TourMarker ADD CONSTRAINT TourData_TourMarker_pk PRIMARY KEY (TourData_tourId);
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("ALTER TABLE " + (TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER)) //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" ADD CONSTRAINT " + (TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER + "_pk")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
-
-				// ALTER TABLE TourData_TourReference ADD CONSTRAINT TourData_TourReference_pk PRIMARY KEY (TourData_tourId);
-				stmt.addBatch("" //$NON-NLS-1$
-						+ ("ALTER TABLE " + TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE) //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" ADD CONSTRAINT " //$NON-NLS-1$
-								+ TABLE_TOUR_DATA
-								+ "_" //$NON-NLS-1$
-								+ TABLE_TOUR_REFERENCE + "_pk") //$NON-NLS-1$
-						+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
-
-				/*
-				 * CREATE TABLE Version
-				 */
-				stmt.addBatch(("CREATE TABLE " + TABLE_DB_VERSION) //$NON-NLS-1$
-						+ " (" //$NON-NLS-1$
-						+ "version 		INTEGER	NOT NULL" //$NON-NLS-1$
-						+ ")"); //$NON-NLS-1$
-
-				stmt.executeBatch();
+					stmt.executeBatch();
+				}
 				stmt.close();
 
 				fIsTableChecked = true;
 
+			} catch (final SQLException e) {
+				e.getNextException().printStackTrace();
 			} finally {
 				if (stmt != null) {
 					try {
 						stmt.close();
-					} catch (SQLException e) {
+					} catch (final SQLException e) {
 						e.printStackTrace();
 					}
 				}
@@ -923,12 +661,12 @@ public class TourDatabase {
 
 			conn.close();
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private boolean checkVersion(IProgressMonitor monitor) {
+	private boolean checkVersion(final IProgressMonitor monitor) {
 
 		if (fIsVersionChecked) {
 			return true;
@@ -936,17 +674,17 @@ public class TourDatabase {
 
 		try {
 
-			Connection conn = createConnection();
+			final Connection conn = createConnection();
 
 			String sqlString = "SELECT * FROM " + TABLE_DB_VERSION; //$NON-NLS-1$
-			PreparedStatement prepStatement = conn.prepareStatement(sqlString);
-			ResultSet result = prepStatement.executeQuery();
+			final PreparedStatement prepStatement = conn.prepareStatement(sqlString);
+			final ResultSet result = prepStatement.executeQuery();
 
 			if (result.next()) {
 
 				// version record was found
 
-				int currentDbVersion = result.getInt(1);
+				final int currentDbVersion = result.getInt(1);
 
 				// check if the database contains the correct version
 				if (currentDbVersion != TOURBOOK_DB_VERSION) {
@@ -973,7 +711,7 @@ public class TourDatabase {
 			fIsVersionChecked = true;
 			conn.close();
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 		return true;
@@ -998,7 +736,7 @@ public class TourDatabase {
 		// load derby driver
 		try {
 			Class.forName("org.apache.derby.jdbc.ClientDriver"); //$NON-NLS-1$
-		} catch (ClassNotFoundException e) {
+		} catch (final ClassNotFoundException e) {
 			e.printStackTrace();
 			return startServerRunnable;
 		}
@@ -1006,7 +744,7 @@ public class TourDatabase {
 		// start derby server
 		startServerRunnable = new IRunnableWithProgress() {
 
-			public void run(IProgressMonitor monitor) {
+			public void run(final IProgressMonitor monitor) {
 				runStartServer(monitor);
 			}
 
@@ -1015,8 +753,554 @@ public class TourDatabase {
 		return startServerRunnable;
 	}
 
-	public void firePropertyChange(int propertyId) {
-		Object[] allListeners = fPropertyListeners.getListeners();
+	/**
+	 * create table {@link #TABLE_TOUR_BIKE}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourBike(final Statement stmt) throws SQLException {
+
+		// CREATE TABLE TourBike
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("CREATE TABLE " + TABLE_TOUR_BIKE) //$NON-NLS-1$
+				+ "(" //$NON-NLS-1$
+				+ "bikeId	 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
+				+ "name				VARCHAR(255),	\n" //$NON-NLS-1$
+				+ "weight 			FLOAT,			\n" //$NON-NLS-1$ // kg
+				+ "typeId 			INTEGER,		\n" //$NON-NLS-1$
+				+ "frontTyreId 		INTEGER,		\n" //$NON-NLS-1$
+				+ "rearTyreId 		INTEGER			\n" //$NON-NLS-1$
+				+ ")"); //$NON-NLS-1$
+
+		// ALTER TABLE TourBike
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("ALTER TABLE " + TABLE_TOUR_BIKE) //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + (TABLE_TOUR_BIKE + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (bikeId)")); //$NON-NLS-1$
+	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_CATEGORY}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourCategory(final Statement stmt) throws SQLException {
+
+		// CREATE TABLE TourCategory
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("CREATE TABLE " + TABLE_TOUR_CATEGORY) //$NON-NLS-1$
+				+ "(" //$NON-NLS-1$
+				+ "categoryId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
+				+ (TABLE_TOUR_DATA + "tourId	BIGINT,") //$NON-NLS-1$
+				+ "category 					VARCHAR(100)" //$NON-NLS-1$
+				+ ")"); //$NON-NLS-1$
+
+		// ALTER TABLE TourCategory ADD CONSTRAINT TourCategory_pk PRIMARY KEY (categoryId);
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("ALTER TABLE " + TABLE_TOUR_CATEGORY) //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + (TABLE_TOUR_CATEGORY + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (categoryId)")); //$NON-NLS-1$
+
+		// CREATE TABLE TourCategory_TourData
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("CREATE TABLE " + TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA) //$NON-NLS-1$ //$NON-NLS-2$
+				+ "(" //$NON-NLS-1$
+				+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
+				+ (TABLE_TOUR_CATEGORY + "_categoryId	BIGINT NOT NULL") //$NON-NLS-1$
+				+ ")"); //$NON-NLS-1$
+
+		// ALTER TABLE TourCategory_TourData ADD CONSTRAINT TourCategory_TourData_pk PRIMARY KEY (tourCategory_categoryId);
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("ALTER TABLE " + TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" ADD CONSTRAINT " + TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ (" PRIMARY KEY (" + TABLE_TOUR_CATEGORY + "_categoryId)")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_COMPARED}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourCompared(final Statement stmt) throws SQLException {
+
+		// CREATE TABLE TourCompared
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("CREATE TABLE " + TABLE_TOUR_COMPARED) //	//$NON-NLS-1$
+				+ "(" //										//$NON-NLS-1$
+				+ "comparedId 			BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
+				+ "refTourId			BIGINT," //				//$NON-NLS-1$
+				+ "tourId				BIGINT," //				//$NON-NLS-1$
+				+ "startIndex			INTEGER NOT NULL," //	//$NON-NLS-1$
+				+ "endIndex 			INTEGER NOT NULL," //	//$NON-NLS-1$
+				+ "tourDate	 			DATE NOT NULL," //		//$NON-NLS-1$
+				+ "startYear			INTEGER NOT NULL," //	//$NON-NLS-1$
+				+ "tourSpeed	 		FLOAT" //				//$NON-NLS-1$
+				+ ")"); //										//$NON-NLS-1$
+	}
+
+	/**
+	 *create table {@link #TABLE_TOUR_DATA}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourData(final Statement stmt) throws SQLException {
+
+		// CREATE TABLE TourData
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("CREATE TABLE " + TABLE_TOUR_DATA) //$NON-NLS-1$
+				+ "(" //$NON-NLS-1$
+				+ "tourId 				BIGINT NOT NULL,	\n" //$NON-NLS-1$
+				+ "startYear 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
+				+ "startMonth 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
+				+ "startDay 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
+				+ "startHour 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
+				+ "startMinute 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
+				+ "startWeek 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
+				+ "startDistance 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "distance 			INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "startAltitude 		SMALLINT NOT NULL,	\n" //$NON-NLS-1$
+				+ "startPulse 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
+				+ "dpTolerance 			SMALLINT NOT NULL,	\n" //$NON-NLS-1$
+				+ "tourDistance 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "tourRecordingTime 	INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "tourDrivingTime 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "tourAltUp 			INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "tourAltDown 			INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "deviceTourType 		VARCHAR(2),			\n" //$NON-NLS-1$
+				+ "deviceTravelTime 	BIGINT NOT NULL,	\n" //$NON-NLS-1$
+				+ "deviceDistance 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "deviceWheel 			INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "deviceWeight 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "deviceTotalUp 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "deviceTotalDown 		INTEGER NOT NULL,	\n" //$NON-NLS-1$
+				+ "devicePluginId	 	VARCHAR(255),		\n" //$NON-NLS-1$
+
+				// version 3 start
+				+ "deviceMode 			SMALLINT,			\n" //$NON-NLS-1$
+				+ "deviceTimeInterval	SMALLINT,			\n" //$NON-NLS-1$
+				// version 3 end
+
+				// version 4 start
+
+				// from markus
+				+ "maxAltitude			INTEGER,			\n" //$NON-NLS-1$
+				+ "maxPulse				INTEGER,			\n" //$NON-NLS-1$
+				+ "avgPulse				INTEGER,			\n" //$NON-NLS-1$
+				+ "avgCadence			INTEGER,			\n" //$NON-NLS-1$
+				+ "avgTemperature		INTEGER,			\n" //$NON-NLS-1$
+				+ "maxSpeed				FLOAT,				\n" //$NON-NLS-1$
+				+ "tourTitle			VARCHAR(255),		\n" //$NON-NLS-1$
+				+ "tourDescription		VARCHAR(4096),		\n" //$NON-NLS-1$
+				+ "tourStartPlace		VARCHAR(255),		\n" //$NON-NLS-1$
+				+ "tourEndPlace			VARCHAR(255),		\n" //$NON-NLS-1$
+				+ "calories				INTEGER,			\n" //$NON-NLS-1$
+				+ "bikerWeight			FLOAT,				\n" //$NON-NLS-1$
+				+ "tourBike_bikeId		BIGINT,				\n" //$NON-NLS-1$
+
+				// from wolfgang
+				+ "devicePluginName		VARCHAR(255),		\n" //$NON-NLS-1$
+				+ "deviceModeName		VARCHAR(255),		\n" //$NON-NLS-1$
+
+				// version 4 end
+
+				// version 5 start
+				/**
+				 * disabled because when two blob object's are deserialized then the error occures:
+				 * <p>
+				 * java.io.StreamCorruptedException: invalid stream header: 00ACED00
+				 * <p>
+				 * therefor the gpsData are put into the serieData object
+				 */
+//						+ "gpsData 				BLOB,				\n" //$NON-NLS-1$
+				// version 5 end
+				//
+				+ "tourType_typeId 		BIGINT,				\n" //$NON-NLS-1$
+				+ "tourPerson_personId 	BIGINT,				\n" //$NON-NLS-1$
+
+				+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
+
+				+ ")"); //$NON-NLS-1$
+
+		/*
+		 * Alter Table
+		 */
+
+		// ALTER TABLE TourData ADD CONSTRAINT TourData_pk PRIMARY KEY (tourId);
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("ALTER TABLE " + TABLE_TOUR_DATA) //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + TABLE_TOUR_DATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (tourId)")); //$NON-NLS-1$
+	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_MARKER}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourMarker(final Statement stmt) throws SQLException {
+
+		// CREATE TABLE TourMarker
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("CREATE TABLE " + TABLE_TOUR_MARKER) //$NON-NLS-1$
+				+ "(" //$NON-NLS-1$
+				+ "markerId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
+				+ (TABLE_TOUR_DATA + "_tourId	BIGINT,") //$NON-NLS-1$
+				+ "time 						INTEGER NOT NULL," //$NON-NLS-1$
+				+ "distance 					INTEGER NOT NULL," //$NON-NLS-1$
+				+ "serieIndex 					INTEGER NOT NULL," //$NON-NLS-1$
+				+ "type 						INTEGER NOT NULL," //$NON-NLS-1$
+				+ "visualPosition				INTEGER NOT NULL," //$NON-NLS-1$
+				+ "label 						VARCHAR(255)," //$NON-NLS-1$
+				+ "category 					VARCHAR(100)," //$NON-NLS-1$
+				// Version 2
+				+ "labelXOffset					INTEGER," //$NON-NLS-1$
+				+ "labelYOffset					INTEGER," //$NON-NLS-1$
+				+ "markerType					BIGINT" //$NON-NLS-1$
+				+ ")"); //$NON-NLS-1$
+
+		// ALTER TABLE TourMarker ADD CONSTRAINT TourMarker_pk PRIMARY KEY (markerId);
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("ALTER TABLE " + TABLE_TOUR_MARKER) //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + (TABLE_TOUR_MARKER + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (markerId)")); //$NON-NLS-1$
+
+		// CREATE TABLE TourData_TourMarker
+
+		final String table_TourData_TourMarker = TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER;
+
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("CREATE TABLE " + table_TourData_TourMarker) //$NON-NLS-1$ //$NON-NLS-2$
+				+ "(" //$NON-NLS-1$
+				+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
+				+ (TABLE_TOUR_MARKER + "_markerId		BIGINT NOT NULL") //$NON-NLS-1$
+				+ ")"); //$NON-NLS-1$
+
+		// ALTER TABLE TourData_TourMarker ADD CONSTRAINT TourData_TourMarker_pk PRIMARY KEY (TourData_tourId);
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("ALTER TABLE " + table_TourData_TourMarker) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" ADD CONSTRAINT " + table_TourData_TourMarker + "_pk") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_PERSON}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourPerson(final Statement stmt) throws SQLException {
+
+		// CREATE TABLE TourPerson
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("CREATE TABLE " + TABLE_TOUR_PERSON) //$NON-NLS-1$
+				+ "(" //$NON-NLS-1$
+				+ "personId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
+				+ "lastName 		VARCHAR(80),	\n" //$NON-NLS-1$
+				+ "firstName 		VARCHAR(80),	\n" //$NON-NLS-1$
+				+ "weight 			FLOAT,			\n" //$NON-NLS-1$ // kg
+				+ "height 			FLOAT,			\n" //$NON-NLS-1$ // m
+				+ "rawDataPath		VARCHAR(255),	\n" //$NON-NLS-1$
+				+ "deviceReaderId	VARCHAR(255),	\n" //$NON-NLS-1$
+				+ "tourBike_bikeId 	BIGINT			\n" //$NON-NLS-1$
+				+ ")"); //$NON-NLS-1$
+
+		// ALTER TABLE TourPerson
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("ALTER TABLE " + TABLE_TOUR_PERSON) //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + (TABLE_TOUR_PERSON + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (personId)")); //$NON-NLS-1$
+	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_REFERENCE}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourReference(final Statement stmt) throws SQLException {
+
+		// CREATE TABLE TourReference
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("CREATE TABLE " + TABLE_TOUR_REFERENCE) //$NON-NLS-1$
+				+ "(" //$NON-NLS-1$
+				+ "refId 						BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ (TABLE_TOUR_DATA + "_tourId	BIGINT,\n") //$NON-NLS-1$
+				+ "startIndex					INTEGER NOT NULL,\n" //$NON-NLS-1$
+				+ "endIndex 					INTEGER NOT NULL,\n" //$NON-NLS-1$
+				+ "label 						VARCHAR(80)\n" //$NON-NLS-1$
+				+ ")"); //$NON-NLS-1$
+
+		// ALTER TABLE TourReference ADD CONSTRAINT TourReference_pk PRIMARY KEY (refId);
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("ALTER TABLE " + TABLE_TOUR_REFERENCE) //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + TABLE_TOUR_REFERENCE + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (refId)")); //$NON-NLS-1$
+
+		// CREATE TABLE TourData_TourReference
+
+		final String table_TourData_TourReference = TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE;
+
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("CREATE TABLE " + table_TourData_TourReference) //$NON-NLS-1$ //$NON-NLS-2$
+				+ "(" //$NON-NLS-1$
+				+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
+				+ (TABLE_TOUR_REFERENCE + "_refId 		BIGINT NOT NULL") //$NON-NLS-1$
+				+ ")"); //$NON-NLS-1$
+
+		// ALTER TABLE TourData_TourReference ADD CONSTRAINT TourData_TourReference_pk PRIMARY KEY (TourData_tourId);
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("ALTER TABLE " + table_TourData_TourReference) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" ADD CONSTRAINT " + table_TourData_TourReference + "_pk") //$NON-NLS-1$
+				+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_TAG}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourTag(final Statement stmt) throws SQLException {
+
+		// CREATE TABLE TourTag
+
+		String sql;
+
+		sql = ("CREATE TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
+				+ "(\n" //$NON-NLS-1$
+				+ "tagId 	BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "name 	VARCHAR(255)\n" //$NON-NLS-1$
+				+ ")";
+
+		System.out.println(sql);
+
+		stmt.addBatch(sql);
+
+		// ALTER TABLE TourTag ADD CONSTRAINT TourTag_pk PRIMARY KEY (refId);
+		sql = ("ALTER TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + TABLE_TOUR_TAG + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (tagId)");
+
+		System.out.println(sql);
+		System.out.println();
+
+		stmt.addBatch(sql); //$NON-NLS-1$
+
+		// CREATE TABLE TourData_TourTag
+		final String table_TourData_TourTag = TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG;
+		final String field_TourData_tourId = TABLE_TOUR_DATA + "_tourId";
+		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId";
+
+		sql = ("CREATE TABLE " + table_TourData_TourTag) //$NON-NLS-1$ //$NON-NLS-2$
+				+ "(\n" //$NON-NLS-1$
+				+ (TABLE_TOUR_TAG + "_tagId" + "	BIGINT NOT NULL,\n") //$NON-NLS-1$
+				+ (TABLE_TOUR_DATA + "_tourId" + "	BIGINT NOT NULL\n") //$NON-NLS-1$
+				+ ")";
+
+		System.out.println(sql);
+		stmt.addBatch(sql); //$NON-NLS-1$
+
+		/*
+		 * Add Constrainsts
+		 */
+
+		sql = ("ALTER TABLE " + table_TourData_TourTag) //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ (" ADD CONSTRAINT fk_" + table_TourData_TourTag + "_" + field_TourTag_tagId)
+				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)")
+				+ (" REFERENCES " + TABLE_TOUR_TAG + " (tagId)");
+
+		System.out.println(sql);
+		stmt.addBatch(sql);
+
+		sql = ("ALTER TABLE " + table_TourData_TourTag) //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ (" ADD CONSTRAINT fk_" + table_TourData_TourTag + "_" + field_TourData_tourId)
+				+ (" FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)")
+				+ (" REFERENCES " + TABLE_TOUR_DATA + " (tourId)");
+
+		System.out.println(sql);
+		System.out.println();
+		stmt.addBatch(sql);
+	}
+
+	private void createTableTourTagCategory(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * TABLE TourTagCategory
+		 */
+		sql = ("CREATE TABLE " + TABLE_TOUR_TAG_CATEGORY) //$NON-NLS-1$
+				+ "(\n" //$NON-NLS-1$
+				+ "tagCategoryId 	BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "name 			VARCHAR(255)\n" //$NON-NLS-1$
+				+ ")";
+
+		System.out.println(sql);
+		stmt.addBatch(sql);
+
+		sql = ("ALTER TABLE " + TABLE_TOUR_TAG_CATEGORY) //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + TABLE_TOUR_TAG_CATEGORY + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (tagCategoryId)");
+
+		System.out.println(sql);
+		System.out.println();
+		stmt.addBatch(sql); //$NON-NLS-1$
+
+		/*
+		 * TABLE TourTagCategory_TourTag
+		 */
+
+		final String table_TourTagCategory_TourTag = TABLE_TOUR_TAG_CATEGORY + "_" + TABLE_TOUR_TAG;
+
+		sql = ("CREATE TABLE " + table_TourTagCategory_TourTag) //$NON-NLS-1$ //$NON-NLS-2$
+				+ "(\n" //$NON-NLS-1$
+				+ (TABLE_TOUR_TAG + "_tagId						BIGINT NOT NULL,\n") //$NON-NLS-1$
+				+ (TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId	BIGINT NOT NULL\n") //$NON-NLS-1$
+				+ ")";
+
+		System.out.println(sql);
+		stmt.addBatch(sql); //$NON-NLS-1$
+
+		/*
+		 * Add constraints
+		 */
+
+		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId";
+		final String field_TourTagCategory_tagCategoryId = TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId";
+
+		sql = ("ALTER TABLE " + table_TourTagCategory_TourTag) //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ (" ADD CONSTRAINT fk_" + table_TourTagCategory_TourTag + "_" + field_TourTag_tagId)
+				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)")
+				+ (" REFERENCES " + TABLE_TOUR_TAG + " (tagId)");
+
+		System.out.println(sql);
+		stmt.addBatch(sql);
+
+		sql = ("ALTER TABLE " + table_TourTagCategory_TourTag) //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ (" ADD CONSTRAINT fk_" + table_TourTagCategory_TourTag + "_" + field_TourTagCategory_tagCategoryId)
+				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId)")
+				+ (" REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)");
+
+		System.out.println(sql);
+		System.out.println();
+		stmt.addBatch(sql);
+
+		/*
+		 * TABLE TourTagCategory_TourTagCategory
+		 */
+
+		final String table_TourTagCategory_TourTagCategory = TABLE_TOUR_TAG_CATEGORY + "_" + TABLE_TOUR_TAG_CATEGORY;
+
+		sql = ("CREATE TABLE " + table_TourTagCategory_TourTagCategory) //$NON-NLS-1$ //$NON-NLS-2$
+				+ "(\n" //$NON-NLS-1$
+				+ (TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId1	BIGINT NOT NULL,\n") //$NON-NLS-1$
+				+ (TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2	BIGINT NOT NULL\n") //$NON-NLS-1$
+				+ ")";
+
+		System.out.println(sql);
+		stmt.addBatch(sql); //$NON-NLS-1$
+
+		/*
+		 * Add constraints
+		 */
+
+		final String field_TourTagCategory_tagCategoryId1 = TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId1";
+		final String field_TourTagCategory_tagCategoryId2 = TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2";
+
+		sql = ("ALTER TABLE " + table_TourTagCategory_TourTagCategory + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ (" ADD CONSTRAINT fk_"
+						+ table_TourTagCategory_TourTagCategory
+						+ "_"
+						+ field_TourTagCategory_tagCategoryId1 + "\n")
+				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId1)\n")
+				+ (" REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)\n");
+
+		System.out.println(sql);
+		stmt.addBatch(sql);
+
+		sql = ("ALTER TABLE " + table_TourTagCategory_TourTagCategory + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ (" ADD CONSTRAINT fk_"
+						+ table_TourTagCategory_TourTagCategory
+						+ "_"
+						+ field_TourTagCategory_tagCategoryId2 + "\n")
+				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2)\n")
+				+ (" REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)\n");
+
+		System.out.println(sql);
+		System.out.println();
+		stmt.addBatch(sql);
+	}
+
+// ALTER TABLE USER_ROLE 
+//		ADD CONSTRAINT FK_USER_ROLE_USER_ID 
+//			FOREIGN KEY (USER_ID) 
+//			REFERENCES USER (ID)
+
+// ALTER TABLE USER_ROLE 
+//		ADD CONSTRAINT FK_USER_ROLE_ROLE_ID 
+//			FOREIGN KEY (ROLE_ID) 
+//			REFERENCES ROLE (ID)
+
+	/**
+	 * create table {@link #TABLE_TOUR_TYPE}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourType(final Statement stmt) throws SQLException {
+
+		// CREATE TABLE TourType
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("CREATE TABLE " + TABLE_TOUR_TYPE) //$NON-NLS-1$
+				+ "(" //$NON-NLS-1$
+				+ "typeId 				BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
+				+ "name 				VARCHAR(100)," //$NON-NLS-1$
+				+ "colorBrightRed 		SMALLINT NOT NULL," //$NON-NLS-1$
+				+ "colorBrightGreen 	SMALLINT NOT NULL," //$NON-NLS-1$
+				+ "colorBrightBlue 		SMALLINT NOT NULL," //$NON-NLS-1$
+				+ "colorDarkRed 		SMALLINT NOT NULL," //$NON-NLS-1$
+				+ "colorDarkGreen 		SMALLINT NOT NULL," //$NON-NLS-1$
+				+ "colorDarkBlue 		SMALLINT NOT NULL," //$NON-NLS-1$
+				+ "colorLineRed 		SMALLINT NOT NULL," //$NON-NLS-1$
+				+ "colorLineGreen 		SMALLINT NOT NULL," //$NON-NLS-1$
+				+ "colorLineBlue 		SMALLINT NOT NULL" //$NON-NLS-1$
+				+ ")"); //$NON-NLS-1$
+
+		// ALTER TABLE TourType
+		stmt.addBatch("" //$NON-NLS-1$
+				+ ("ALTER TABLE " + TABLE_TOUR_TYPE) //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + (TABLE_TOUR_TYPE + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" PRIMARY KEY (typeId)")); //$NON-NLS-1$
+	}
+
+	/**
+	 * create table {@link #TABLE_DB_VERSION}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableVersion(final Statement stmt) throws SQLException {
+
+		// CREATE TABLE Version
+		stmt.addBatch(("CREATE TABLE " + TABLE_DB_VERSION) //$NON-NLS-1$
+				+ " (" //$NON-NLS-1$
+				+ "version 		INTEGER	NOT NULL" //$NON-NLS-1$
+				+ ")"); //$NON-NLS-1$
+	}
+
+	public void firePropertyChange(final int propertyId) {
+		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (int i = 0; i < allListeners.length; i++) {
 			final IPropertyListener listener = (IPropertyListener) allListeners[i];
 			listener.propertyChanged(TourDatabase.this, propertyId);
@@ -1027,7 +1311,7 @@ public class TourDatabase {
 
 		try {
 			checkServer();
-		} catch (MyTourbookException e) {
+		} catch (final MyTourbookException e) {
 			e.printStackTrace();
 		}
 
@@ -1037,7 +1321,7 @@ public class TourDatabase {
 			return null;
 		}
 
-		Connection conn = createConnection();
+		final Connection conn = createConnection();
 
 		return conn;
 	}
@@ -1058,12 +1342,12 @@ public class TourDatabase {
 		}
 
 		try {
-			IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+			final IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
+				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 					try {
 						checkServer();
-					} catch (MyTourbookException e) {
+					} catch (final MyTourbookException e) {
 						e.printStackTrace();
 						return;
 					}
@@ -1086,44 +1370,44 @@ public class TourDatabase {
 
 //		} catch (MyTourbookException e) {
 //			e.printStackTrace();
-		} catch (InvocationTargetException e) {
+		} catch (final InvocationTargetException e) {
 			e.printStackTrace();
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
 
 		if (emFactory == null) {
 			try {
 				throw new Exception("Cannot get EntityManagerFactory"); //$NON-NLS-1$
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 			return null;
 		} else {
-			EntityManager em = emFactory.createEntityManager();
+			final EntityManager em = emFactory.createEntityManager();
 
 			return em;
 		}
 	}
 
-	public void removePropertyListener(IPropertyListener listener) {
+	public void removePropertyListener(final IPropertyListener listener) {
 		fPropertyListeners.remove(listener);
 	}
 
-	private void runStartServer(IProgressMonitor monitor) {
+	private void runStartServer(final IProgressMonitor monitor) {
 
 		monitor.subTask(Messages.Database_Monitor_db_service_task);
 
-		String databasePath = getDatabasePath();
+		final String databasePath = getDatabasePath();
 
 		// set storage location for the database
 		System.setProperty("derby.system.home", databasePath); //$NON-NLS-1$
 
 		try {
 			server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
-		} catch (UnknownHostException e2) {
+		} catch (final UnknownHostException e2) {
 			e2.printStackTrace();
-		} catch (Exception e2) {
+		} catch (final Exception e2) {
 			e2.printStackTrace();
 		}
 
@@ -1133,12 +1417,12 @@ public class TourDatabase {
 			 */
 			server.ping();
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 			try {
 				server.start(null);
 				// monitor.worked(1);
-			} catch (Exception e2) {
+			} catch (final Exception e2) {
 				e2.printStackTrace();
 			}
 
@@ -1148,10 +1432,10 @@ public class TourDatabase {
 				try {
 					server.ping();
 					break;
-				} catch (Exception e1) {
+				} catch (final Exception e1) {
 					try {
 						Thread.sleep(1);
-					} catch (InterruptedException e2) {
+					} catch (final InterruptedException e2) {
 						e2.printStackTrace();
 					}
 				}
@@ -1159,32 +1443,32 @@ public class TourDatabase {
 
 			// make the first connection, this takes longer as the subsequent ones
 			try {
-				Connection connection = createConnection();
+				final Connection connection = createConnection();
 				connection.close();
 
 				System.out.println("Database path: " + databasePath); //$NON-NLS-1$
 
-			} catch (SQLException e1) {
+			} catch (final SQLException e1) {
 				e1.printStackTrace();
 			}
 		}
 	}
 
-	private boolean updateDbDesign(Connection conn, int currentDbVersion, IProgressMonitor monitor) {
+	private boolean updateDbDesign(final Connection conn, int currentDbVersion, final IProgressMonitor monitor) {
 
 		/*
 		 * this must be implemented or updated when the database version must be updated
 		 */
 
 		// confirm update
-		String[] buttons = new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL };
+		final String[] buttons = new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL };
 
-		String message = NLS.bind(Messages.Database_Confirm_update, new Object[] {
+		final String message = NLS.bind(Messages.Database_Confirm_update, new Object[] {
 				currentDbVersion,
 				TOURBOOK_DB_VERSION,
 				getDatabasePath() });
 
-		MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
+		final MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
 				Messages.Database_Confirm_update_title,
 				null,
 				message,
@@ -1211,29 +1495,29 @@ public class TourDatabase {
 			updateDbDesign_3_4(conn, monitor);
 			currentDbVersion = newVersion = 4;
 		}
-//		if (currentDbVersion == 4) {
-//			updateDbDesign_4_5(conn);
-//			currentDbVersion = newVersion = 5;
-//		}
+		if (currentDbVersion == 4) {
+			updateDbDesign_4_5(conn);
+			currentDbVersion = newVersion = 5;
+		}
 
 		// update the version number
 		try {
-			String sqlString = "" //$NON-NLS-1$
+			final String sqlString = "" //$NON-NLS-1$
 					+ ("update " + TABLE_DB_VERSION) //$NON-NLS-1$
 					+ (" set VERSION=" + newVersion) //$NON-NLS-1$
 					+ (" where 1=1"); //$NON-NLS-1$
 			conn.createStatement().executeUpdate(sqlString);
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 
 		return true;
 	}
 
-	private void updateDbDesign_1_2(Connection conn) {
+	private void updateDbDesign_1_2(final Connection conn) {
 
 		try {
-			Statement statement = conn.createStatement();
+			final Statement statement = conn.createStatement();
 
 			String sql;
 
@@ -1249,15 +1533,15 @@ public class TourDatabase {
 			statement.executeBatch();
 			statement.close();
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			printSQLException(e);
 		}
 	}
 
-	private void updateDbDesign_2_3(Connection conn) {
+	private void updateDbDesign_2_3(final Connection conn) {
 
 		try {
-			Statement statement = conn.createStatement();
+			final Statement statement = conn.createStatement();
 
 			String sql;
 
@@ -1270,15 +1554,15 @@ public class TourDatabase {
 			statement.executeBatch();
 			statement.close();
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			printSQLException(e);
 		}
 	}
 
-	private void updateDbDesign_3_4(Connection conn, IProgressMonitor monitor) {
+	private void updateDbDesign_3_4(final Connection conn, final IProgressMonitor monitor) {
 
 		try {
-			Statement statement = conn.createStatement();
+			final Statement statement = conn.createStatement();
 
 			String sql;
 
@@ -1332,7 +1616,7 @@ public class TourDatabase {
 			statement.executeBatch();
 			statement.close();
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			printSQLException(e);
 		}
 
@@ -1341,22 +1625,24 @@ public class TourDatabase {
 		emFactory = Persistence.createEntityManagerFactory("tourdatabase"); //$NON-NLS-1$
 
 		monitor.subTask(Messages.Tour_Database_load_all_tours);
-		ArrayList<Long> tourList = getAllTourIds();
+		final ArrayList<Long> tourList = getAllTourIds();
 
 		// loop over all tours and calculate and set new columns
 		int tourIdx = 1;
-		for (Long tourId : tourList) {
+		for (final Long tourId : tourList) {
 
-			TourData tourData = getTourData(tourId);
+			final TourData tourData = getTourData(tourId);
 
 			if (monitor != null) {
-				String msg = NLS.bind(Messages.Tour_Database_update_tour, new Object[] { tourIdx++, tourList.size() });
+				final String msg = NLS.bind(Messages.Tour_Database_update_tour, new Object[] {
+						tourIdx++,
+						tourList.size() });
 				monitor.subTask(msg);
 			}
 
 			tourData.computeAvgFields();
 
-			TourPerson person = tourData.getTourPerson();
+			final TourPerson person = tourData.getTourPerson();
 			tourData.setTourBike(person.getTourBike());
 			tourData.setBikerWeight(person.getWeight());
 
@@ -1368,21 +1654,22 @@ public class TourDatabase {
 		emFactory = null;
 	}
 
-//	private void updateDbDesign_4_5(Connection conn) {
-//
-//		try {
-//			Statement statement = conn.createStatement();
-//
-//			String sql;
-//
-//			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN gpsData BLOB DEFAULT NULL"; //$NON-NLS-1$ //$NON-NLS-2$
-//			statement.addBatch(sql);
-//
-//			statement.executeBatch();
-//			statement.close();
-//
-//		} catch (SQLException e) {
-//			printSQLException(e);
-//		}
-//	}
+	private void updateDbDesign_4_5(final Connection conn) {
+
+		try {
+			final Statement statement = conn.createStatement();
+
+			final String sql;
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceMode			SMALLINT DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
+			statement.addBatch(sql);
+
+			statement.executeBatch();
+			statement.close();
+
+		} catch (final SQLException e) {
+			printSQLException(e);
+		}
+	}
+
 }

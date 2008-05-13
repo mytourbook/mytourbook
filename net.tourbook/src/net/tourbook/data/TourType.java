@@ -31,29 +31,29 @@ public class TourType {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private final long	typeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long	typeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@Basic(optional = false)
-	private String		name;
+	private String	name;
 
-	private short		colorBrightRed;
-	private short		colorBrightGreen;
-	private short		colorBrightBlue;
+	private short	colorBrightRed;
+	private short	colorBrightGreen;
+	private short	colorBrightBlue;
 
-	private short		colorDarkRed;
-	private short		colorDarkGreen;
-	private short		colorDarkBlue;
+	private short	colorDarkRed;
+	private short	colorDarkGreen;
+	private short	colorDarkBlue;
 
-	private short		colorLineRed;
-	private short		colorLineGreen;
-	private short		colorLineBlue;
+	private short	colorLineRed;
+	private short	colorLineGreen;
+	private short	colorLineBlue;
 
 	/**
 	 * default constructor used in ejb
 	 */
 	public TourType() {}
 
-	public TourType(String name) {
+	public TourType(final String name) {
 		this.name = name;
 	}
 
@@ -84,25 +84,25 @@ public class TourType {
 		return typeId;
 	}
 
-	public void setColorBright(RGB rgbBright) {
+	public void setColorBright(final RGB rgbBright) {
 		colorBrightRed = (short) rgbBright.red;
 		colorBrightGreen = (short) rgbBright.green;
 		colorBrightBlue = (short) rgbBright.blue;
 	}
 
-	public void setColorDark(RGB rgbDark) {
+	public void setColorDark(final RGB rgbDark) {
 		colorDarkRed = (short) rgbDark.red;
 		colorDarkGreen = (short) rgbDark.green;
 		colorDarkBlue = (short) rgbDark.blue;
 	}
 
-	public void setColorLine(RGB rgbLine) {
+	public void setColorLine(final RGB rgbLine) {
 		colorLineRed = (short) rgbLine.red;
 		colorLineGreen = (short) rgbLine.green;
 		colorLineBlue = (short) rgbLine.blue;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 

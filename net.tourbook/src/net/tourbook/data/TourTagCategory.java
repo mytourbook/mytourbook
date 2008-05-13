@@ -16,59 +16,67 @@
 
 package net.tourbook.data;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.FetchType.LAZY;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import net.tourbook.database.TourDatabase;
 
 @Entity
-public class TourCategory {
+public class TourTagCategory {
 
-	/*
-	 * DON'T USE THE FINAL KEYWORD FOR THE ID because the Id cannot be set
-	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					categoryId	= TourDatabase.ENTITY_IS_NOT_SAVED;
-
-	@ManyToMany
-	private Collection<TourData>	tourData	= new ArrayList<TourData>();
+	private long					tagCategoryId	= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@Basic(optional = false)
-	private String					category;
+	private String					name;
 
-	public TourCategory() {}
+	@ManyToMany
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId"))
+	private Set<TourTag>			tourTags		= new HashSet<TourTag>();
 
-	public TourCategory(final String category) {
-		this.category = category;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public long getCategoryId() {
-		return categoryId;
-	}
-
-	public Collection<TourData> getTourData() {
-		return tourData;
-	}
+	@ManyToMany(cascade = ALL, fetch = LAZY)
+	@JoinTable(joinColumns = @JoinColumn(name = "TourTagCategory_tagCategoryId1", //
+	referencedColumnName = "tagCategoryId"), //
+	inverseJoinColumns = @JoinColumn(name = "tourTagCategory_tagCategoryId2", //
+	referencedColumnName = "tagCategoryId"))
+	private Set<TourTagCategory>	tourTagCategory	= new HashSet<TourTagCategory>();
 
 	/**
-	 * Set the name for the tour tag
-	 * 
-	 * @param tourTagName
+	 * default constructor used in ejb
 	 */
-	public void setCategory(final String tourTagName) {
-		this.category = tourTagName;
+	public TourTagCategory() {}
+
+	public long getBikeId() {
+		return tagCategoryId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public Set<TourTagCategory> getTagCategories() {
+		return tourTagCategory;
+	}
+
+	public Set<TourTag> getTourTags() {
+		return tourTags;
+	}
+
+	public void setName(final String name) {
+		this.name = name;
 	}
 
 }

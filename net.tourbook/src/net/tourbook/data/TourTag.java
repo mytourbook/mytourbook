@@ -16,8 +16,13 @@
 
 package net.tourbook.data;
 
-import java.util.ArrayList;
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.FetchType.EAGER;
+import static javax.persistence.FetchType.LAZY;
+
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -29,33 +34,40 @@ import javax.persistence.ManyToMany;
 import net.tourbook.database.TourDatabase;
 
 @Entity
-public class TourCategory {
+public class TourTag {
 
 	/*
 	 * DON'T USE THE FINAL KEYWORD FOR THE ID because the Id cannot be set
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					categoryId	= TourDatabase.ENTITY_IS_NOT_SAVED;
-
-	@ManyToMany
-	private Collection<TourData>	tourData	= new ArrayList<TourData>();
+	private long					tagId				= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@Basic(optional = false)
-	private String					category;
+	private String					name;
 
-	public TourCategory() {}
+	@ManyToMany(mappedBy = "tourTags", fetch = LAZY, cascade = ALL)
+	private Set<TourData>			tourData			= new HashSet<TourData>();
 
-	public TourCategory(final String category) {
-		this.category = category;
+	@ManyToMany(mappedBy = "tourTags", fetch = EAGER, cascade = ALL)//$NON-NLS-1$
+	private Set<TourTagCategory>	tourTagCategories	= new HashSet<TourTagCategory>();
+
+	public TourTag() {}
+
+	public TourTag(final String tagName) {
+		this.name = tagName;
 	}
 
-	public String getCategory() {
-		return category;
+	public Set<TourTagCategory> getTagCategories() {
+		return tourTagCategories;
 	}
 
-	public long getCategoryId() {
-		return categoryId;
+	public long getTagId() {
+		return tagId;
+	}
+
+	public String getTagName() {
+		return name;
 	}
 
 	public Collection<TourData> getTourData() {
@@ -65,10 +77,10 @@ public class TourCategory {
 	/**
 	 * Set the name for the tour tag
 	 * 
-	 * @param tourTagName
+	 * @param tagName
 	 */
-	public void setCategory(final String tourTagName) {
-		this.category = tourTagName;
+	public void setTagName(final String tagName) {
+		this.name = tagName;
 	}
 
 }

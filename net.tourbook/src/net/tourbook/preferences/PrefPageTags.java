@@ -17,7 +17,7 @@
 package net.tourbook.preferences;
 
 import net.tourbook.Messages;
-import net.tourbook.data.TourCategory;
+import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.UI;
@@ -70,11 +70,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		public void dispose() {}
 
-		public Object[] getElements(Object inputElement) {
+		public Object[] getElements(final Object inputElement) {
 			return TourDatabase.getTourTags().toArray();
 		}
 
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
 	/**
@@ -83,24 +83,24 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private class TagViewerSorter extends ViewerSorter {
 
 		@Override
-		public int compare(Viewer viewer, Object obj1, Object obj2) {
-			return ((TourCategory) (obj1)).getCategory().compareTo(((TourCategory) (obj2)).getCategory());
+		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+			return ((TourTag) (obj1)).getTagName().compareTo(((TourTag) (obj2)).getTagName());
 		}
 	}
 
 	public PrefPageTags() {}
 
-	public PrefPageTags(String title) {
+	public PrefPageTags(final String title) {
 		super(title);
 	}
 
-	public PrefPageTags(String title, ImageDescriptor image) {
+	public PrefPageTags(final String title, final ImageDescriptor image) {
 		super(title, image);
 	}
 
-	private void createButtons(Composite parent) {
+	private void createButtons(final Composite parent) {
 
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 		final GridLayout gl = new GridLayout();
 		gl.marginHeight = 0;
@@ -113,7 +113,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		setButtonLayoutData(fBtnNew);
 		fBtnNew.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onNewTag();
 			}
 		});
@@ -124,7 +124,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		setButtonLayoutData(fBtnRename);
 		fBtnRename.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onRenameTourTag();
 			}
 		});
@@ -132,27 +132,27 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	}
 
 	@Override
-	protected Control createContents(Composite parent) {
+	protected Control createContents(final Composite parent) {
 
-		Composite viewerContainer = createUI(parent);
+		final Composite viewerContainer = createUI(parent);
 
 		updateViewers();
 
 		return viewerContainer;
 	}
 
-	private void createTagViewer(Composite parent) {
+	private void createTagViewer(final Composite parent) {
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
 
-		Composite layoutContainer = new Composite(parent, SWT.NONE);
+		final Composite layoutContainer = new Composite(parent, SWT.NONE);
 		layoutContainer.setLayout(tableLayout);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
 
 		/*
 		 * create table
 		 */
-		Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
+		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
 
 		table.setLayout(new TableLayout());
 		table.setHeaderVisible(false);
@@ -193,11 +193,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		tvcColumn.setText(Messages.Tag_Viewer_column_name);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
-				TourCategory tag = (TourCategory) cell.getElement();
+				final TourTag tag = (TourTag) cell.getElement();
 
-				cell.setText(tag.getCategory());
+				cell.setText(tag.getTagName());
 			}
 		});
 		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
@@ -210,8 +210,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		fTagViewer.setSorter(new TagViewerSorter());
 
 		fTagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				StructuredSelection selection = (StructuredSelection) event.getSelection();
+			public void selectionChanged(final SelectionChangedEvent event) {
+				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
 					enableButtons();
 				}
@@ -219,9 +219,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		});
 
 		fTagViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(DoubleClickEvent event) {
-				StructuredSelection selection = (StructuredSelection) event.getSelection();
+			public void doubleClick(final DoubleClickEvent event) {
+				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
 					onRenameTourTag();
 				}
@@ -229,15 +228,15 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		});
 	}
 
-	private Composite createUI(Composite parent) {
+	private Composite createUI(final Composite parent) {
 
-		Label label = new Label(parent, SWT.WRAP);
+		final Label label = new Label(parent, SWT.WRAP);
 		label.setText(Messages.Pref_TourTypes_root_title);
 		label.setLayoutData(new GridData(SWT.NONE, SWT.NONE, true, false));
 
 		// container
-		Composite viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayout gl = new GridLayout(3, false);
+		final Composite viewerContainer = new Composite(parent, SWT.NONE);
+		final GridLayout gl = new GridLayout(3, false);
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
 		viewerContainer.setLayout(gl);
@@ -262,12 +261,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		final IStructuredSelection selection = (IStructuredSelection) fTagViewer.getSelection();
 
-		final TourCategory tourTag = (TourCategory) selection.getFirstElement();
+		final TourTag tourTag = (TourTag) selection.getFirstElement();
 
 		fBtnRename.setEnabled(tourTag != null);
 	}
 
-	public void init(IWorkbench workbench) {
+	public void init(final IWorkbench workbench) {
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
 
@@ -281,7 +280,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	private void onNewTag() {
 
-		InputDialog inputDialog = new InputDialog(getShell(),
+		final InputDialog inputDialog = new InputDialog(getShell(),
 				Messages.Tag_Viewer_column_dlg_new_title,
 				Messages.Tag_Viewer_column_dlg_new_nessage,
 				UI.EMPTY_STRING,
@@ -294,10 +293,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		}
 
 		// create new tour tag
-		TourCategory tourTag = new TourCategory(inputDialog.getValue().trim());
+		final TourTag tourTag = new TourTag(inputDialog.getValue().trim());
 
 		// add new entity to db
-		if (TourDatabase.persistEntity(tourTag, tourTag.getCategoryId(), TourCategory.class)) {
+		if (TourDatabase.persistEntity(tourTag, tourTag.getTagId(), TourTag.class)) {
 
 			// update model
 			TourDatabase.getTourTags().add(tourTag);
@@ -319,12 +318,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	 */
 	private void onRenameTourTag() {
 
-		TourCategory tourTag = (TourCategory) ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
+		final TourTag tourTag = (TourTag) ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
 
-		InputDialog inputDialog = new InputDialog(getShell(),
+		final InputDialog inputDialog = new InputDialog(getShell(),
 				Messages.Tag_Viewer_column_dlg_rename_title,
 				Messages.Tag_Viewer_column_dlg_rename_nessage,
-				tourTag.getCategory(),
+				tourTag.getTagName(),
 				null);
 
 		inputDialog.open();
@@ -334,10 +333,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		}
 
 		// update model
-		tourTag.setCategory(inputDialog.getValue().trim());
+		tourTag.setTagName(inputDialog.getValue().trim());
 
 		// update entity in the db
-		if (TourDatabase.persistEntity(tourTag, tourTag.getCategoryId(), TourCategory.class)) {
+		if (TourDatabase.persistEntity(tourTag, tourTag.getTagId(), TourTag.class)) {
 
 			// update viewer
 			fTagViewer.update(tourTag, null);

@@ -16,6 +16,9 @@
 
 package net.tourbook.data;
 
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.FetchType.EAGER;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,11 +26,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -55,50 +59,50 @@ public class TourData {
 	 * 
 	 */
 	@Transient
-	public static final int				MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
+	public static final int		MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
 	@Transient
-	public static final float			MAX_BIKE_SPEED					= 120f;
+	public static final float	MAX_BIKE_SPEED					= 120f;
 
 	/**
 	 * Unique persistence id which identifies the tour
 	 */
 	@Id
-	private Long						tourId;
+	private Long				tourId;
 
 	/**
 	 * HH (d) hour of tour
 	 */
-	private short						startHour;
+	private short				startHour;
 
 	/**
 	 * MM (d) minute of tour
 	 */
-	private short						startMinute;
+	private short				startMinute;
 
 	/**
 	 * year of tour start
 	 */
-	private short						startYear;
+	private short				startYear;
 
 	/**
 	 * mm (d) month of tour
 	 */
-	private short						startMonth;
+	private short				startMonth;
 
 	/**
 	 * dd (d) day of tour
 	 */
-	private short						startDay;
+	private short				startDay;
 
 	/**
 	 * week of the tour, 0 is the first week
 	 */
-	private short						startWeek;
+	private short				startWeek;
 
 	/**
 	 * tttt (h) total distance at tour start (km)
 	 */
-	private int							startDistance;
+	private int					startDistance;
 
 	/**
 	 * ssss distance msw
@@ -106,22 +110,22 @@ public class TourData {
 	 * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
 	 */
 	@SuppressWarnings("unused")//$NON-NLS-1$
-	private int							distance;
+	private int					distance;
 
 	/**
 	 * aaaa (h) initial altitude (m)
 	 */
-	private short						startAltitude;
+	private short				startAltitude;
 
 	/**
 	 * pppp (h) initial pulse (bpm)
 	 */
-	private short						startPulse;
+	private short				startPulse;
 
 	/**
 	 * tolerance for the Douglas Peucker algorithm
 	 */
-	private short						dpTolerance						= 50;
+	private short				dpTolerance						= 50;
 
 	/**
 	 * tt (h) type of tour <br>
@@ -133,143 +137,150 @@ public class TourData {
 	 * "B1" ski-bike
 	 */
 	@Column(length = 2)
-	private String						deviceTourType;
+	private String				deviceTourType;
 
 	/*
 	 * data from the device
 	 */
-	private long						deviceTravelTime;
-	private int							deviceDistance;
+	private long				deviceTravelTime;
+	private int					deviceDistance;
 
-	private int							deviceWheel;
-	private int							deviceWeight;
+	private int					deviceWheel;
+	private int					deviceWeight;
 
-	private int							deviceTotalUp;
-	private int							deviceTotalDown;
+	private int					deviceTotalUp;
+	private int					deviceTotalDown;
 
 	/**
 	 * total distance (m)
 	 */
-	private int							tourDistance;
+	private int					tourDistance;
 
 	/**
 	 * total recording time (sec)
 	 */
-	private int							tourRecordingTime;
+	private int					tourRecordingTime;
 
 	/**
 	 * total driving time (sec)
 	 */
-	private int							tourDrivingTime;
+	private int					tourDrivingTime;
 
 	/**
 	 * altitude up (m)
 	 */
-	private int							tourAltUp;
+	private int					tourAltUp;
 
 	/**
 	 * altitude down (m)
 	 */
-	private int							tourAltDown;
+	private int					tourAltDown;
 
 	/**
 	 * plugin id for the device which was used for this tour
 	 */
-	private String						devicePluginId;
+	private String				devicePluginId;
 
 	/**
 	 * Profile used by the device
 	 */
-	private short						deviceMode;													// db-version 3
+	private short				deviceMode;													// db-version 3
 
 	/**
 	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time slices
 	 * are unequally
 	 */
-	private short						deviceTimeInterval;											// db-version 3
+	private short				deviceTimeInterval;											// db-version 3
 
-	private int							maxAltitude;													// db-version 4
-	private int							maxPulse;														// db-version 4
-	private float						maxSpeed;														// db-version 4
+	private int					maxAltitude;													// db-version 4
+	private int					maxPulse;														// db-version 4
+	private float				maxSpeed;														// db-version 4
 
-	private int							avgPulse;														// db-version 4
-	private int							avgCadence;													// db-version 4
-	private int							avgTemperature;												// db-version 4
+	private int					avgPulse;														// db-version 4
+	private int					avgCadence;													// db-version 4
+	private int					avgTemperature;												// db-version 4
 
-	private String						tourTitle;														// db-version 4
-	private String						tourDescription;												// db-version 4
-	private String						tourStartPlace;												// db-version 4
-	private String						tourEndPlace;													// db-version 4
+	private String				tourTitle;														// db-version 4
+	private String				tourDescription;												// db-version 4
+	private String				tourStartPlace;												// db-version 4
+	private String				tourEndPlace;													// db-version 4
 
-	private String						calories;														// db-version 4
-	private float						bikerWeight;													// db-version 4
+	private String				calories;														// db-version 4
+	private float				bikerWeight;													// db-version 4
 
 	/**
 	 * visible name for the used plugin to import the data
 	 */
-	private String						devicePluginName;												// db-version 4
+	private String				devicePluginName;												// db-version 4
 
 	/**
 	 * visible name for {@link #deviceMode}
 	 */
-	private String						deviceModeName;												// db-version 4
+	private String				deviceModeName;												// db-version 4
 
 	/**
 	 * data series for time, speed, altitude,...
 	 */
 	@Basic(optional = false)
-	private SerieData					serieData;
+	private SerieData			serieData;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
+	@OneToMany(mappedBy = "tourData", fetch = FetchType.EAGER, cascade = ALL)//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourMarker>				tourMarkers						= new HashSet<TourMarker>();
+	private Set<TourMarker>		tourMarkers						= new HashSet<TourMarker>();
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
+	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")//$NON-NLS-1$
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private final Set<TourReference>	tourReferences					= new HashSet<TourReference>();
+	private Set<TourReference>	tourReferences					= new HashSet<TourReference>();
 
-	@ManyToMany(mappedBy = "tourData", fetch = FetchType.EAGER)//$NON-NLS-1$
-	private final Set<TourCategory>			tourCategory					= new HashSet<TourCategory>();
+	@ManyToMany
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId"))
+	private Set<TourTag>		tourTags						= new HashSet<TourTag>();
 
 	/**
 	 * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
 	 */
 	@ManyToOne
-	private TourType					tourType;
+	private TourType			tourType;
 
 	/**
 	 * Person which created this tour or <code>null</code> when the tour is not saved in the
 	 * database
 	 */
 	@ManyToOne
-	private TourPerson					tourPerson;
+	private TourPerson			tourPerson;
 
 	/**
 	 * plugin id for the device which was used for this tour Bike used for this tour
 	 */
 	@ManyToOne
-	private TourBike					tourBike;
+	private TourBike			tourBike;
+
+	/*
+	 * tourCategory is currently (version 1.6) not used but is defined in older databases
+	 */
+	@ManyToMany(fetch = EAGER, mappedBy = "tourData")
+	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
 
 	/*
 	 * data series from the device
 	 */
 	@Transient
-	public int[]						timeSerie;
+	public int[]				timeSerie;
 
 	/**
 	 * contains the distance data serie in the metric system
 	 */
 	@Transient
-	public int[]						distanceSerie;
+	public int[]				distanceSerie;
 
 	@Transient
-	private int[]						distanceSerieImperial;
+	private int[]				distanceSerieImperial;
 
 	/**
 	 * contains the absolute altitude in the metric measurement system
 	 */
 	@Transient
-	public int[]						altitudeSerie;
+	public int[]				altitudeSerie;
 
 //	/**
 //	 * min/max values for the altitude
@@ -283,22 +294,22 @@ public class TourData {
 	 * contains the absolute altitude in the imperial measurement system
 	 */
 	@Transient
-	private int[]						altitudeSerieImperial;
+	private int[]				altitudeSerieImperial;
 
 	@Transient
-	public int[]						cadenceSerie;
+	public int[]				cadenceSerie;
 
 	@Transient
-	public int[]						pulseSerie;
+	public int[]				pulseSerie;
 
 	@Transient
-	public int[]						temperatureSerie;
+	public int[]				temperatureSerie;
 
 	/**
 	 * contains the temperature in the imperial measurement system
 	 */
 	@Transient
-	private int[]						temperatureSerieImperial;
+	private int[]				temperatureSerieImperial;
 
 	/*
 	 * computed data series
@@ -309,146 +320,146 @@ public class TourData {
 	 * system is imperial
 	 */
 	@Transient
-	private int[]						speedSerie;
+	private int[]				speedSerie;
 	@Transient
-	private int[]						speedSerieImperial;
+	private int[]				speedSerieImperial;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #speedSerie} are from the device and not
 	 * computed. Speed data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean						isSpeedSerieFromDevice			= false;
+	private boolean				isSpeedSerieFromDevice			= false;
 
 	@Transient
-	private int[]						paceSerie;
+	private int[]				paceSerie;
 	@Transient
-	private int[]						paceSerieImperial;
+	private int[]				paceSerieImperial;
 
 	@Transient
-	private int[]						powerSerie;
+	private int[]				powerSerie;
 
 	/**
 	 * Is <code>true</code> when the data in {@link #powerSerie} are from the device and not
 	 * computed. Power data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
-	private boolean						isPowerSerieFromDevice			= false;
+	private boolean				isPowerSerieFromDevice			= false;
 
 	@Transient
-	private int[]						altimeterSerie;
+	private int[]				altimeterSerie;
 	@Transient
-	private int[]						altimeterSerieImperial;
+	private int[]				altimeterSerieImperial;
 
 	@Transient
-	public int[]						gradientSerie;
+	public int[]				gradientSerie;
 
 	@Transient
-	public int[]						tourCompareSerie;
+	public int[]				tourCompareSerie;
 
 	/*
 	 * GPS data
 	 */
 	@Transient
-	public double[]						latitudeSerie;
+	public double[]				latitudeSerie;
 	@Transient
-	public double[]						longitudeSerie;
+	public double[]				longitudeSerie;
 
 	/**
 	 * contains the bounds of the tour in latitude/longitude
 	 */
 	@Transient
-	public Rectangle					gpsBounds;
+	public Rectangle			gpsBounds;
 
 	/**
 	 * Index of the segmented data in the original serie
 	 */
 	@Transient
-	public int[]						segmentSerieIndex;
+	public int[]				segmentSerieIndex;
 
 	/**
 	 * oooo (o) DD-record // offset
 	 */
 	@Transient
-	public int							offsetDDRecord;
+	public int					offsetDDRecord;
 
 	@Transient
-	protected Object[]					fTourSegments;
+	protected Object[]			fTourSegments;
 
 	/*
 	 * data for the tour segments
 	 */
 	@Transient
-	public int[]						segmentSerieAltitude;
+	public int[]				segmentSerieAltitude;
 
 	@Transient
-	public int[]						segmentSerieDistance;
+	public int[]				segmentSerieDistance;
 
 	@Transient
-	public int[]						segmentSerieTime;
+	public int[]				segmentSerieTime;
 
 	@Transient
-	public int[]						segmentSerieDrivingTime;
+	public int[]				segmentSerieDrivingTime;
 
 	@Transient
-	public float[]						segmentSerieAltimeter;
+	public float[]				segmentSerieAltimeter;
 
 	@Transient
-	public int[]						segmentSerieAltitudeDown;
+	public int[]				segmentSerieAltitudeDown;
 
 	@Transient
-	public float[]						segmentSerieSpeed;
+	public float[]				segmentSerieSpeed;
 
 	@Transient
-	public float[]						segmentSeriePace;
+	public float[]				segmentSeriePace;
 
 	@Transient
-	public float[]						segmentSeriePower;
+	public float[]				segmentSeriePower;
 
 	@Transient
-	public float[]						segmentSerieGradient;
+	public float[]				segmentSerieGradient;
 
 	@Transient
-	public float[]						segmentSeriePulse;
+	public float[]				segmentSeriePulse;
 
 	@Transient
-	public float[]						segmentSerieCadence;
+	public float[]				segmentSerieCadence;
 
 	/**
 	 * contains the filename from which the data are imported, when set to <code>null</code> the
 	 * data are not imported they are from the database
 	 */
 	@Transient
-	public String						importRawDataFile;
+	public String				importRawDataFile;
 
 	/**
 	 * Latitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
 	 * not set
 	 */
 	@Transient
-	public double						mapCenterPositionLatitude		= Double.MIN_VALUE;
+	public double				mapCenterPositionLatitude		= Double.MIN_VALUE;
 
 	/**
 	 * Longitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
 	 * not set
 	 */
 	@Transient
-	public double						mapCenterPositionLongitude		= Double.MIN_VALUE;
+	public double				mapCenterPositionLongitude		= Double.MIN_VALUE;
 
 	/**
 	 * Zoomlevel in the map
 	 */
 	@Transient
-	public int							mapZoomLevel;
+	public int					mapZoomLevel;
 
 	@Transient
-	public double						mapMinLatitude;
+	public double				mapMinLatitude;
 	@Transient
-	public double						mapMaxLatitude;
+	public double				mapMaxLatitude;
 	@Transient
-	public double						mapMinLongitude;
+	public double				mapMinLongitude;
 	@Transient
-	public double						mapMaxLongitude;
+	public double				mapMaxLongitude;
 
 	public TourData() {}
 
@@ -708,7 +719,7 @@ public class TourData {
 		long cadenceSum = 0;
 		int cadenceCount = 0;
 
-		for (int cadence : cadenceSerie) {
+		for (final int cadence : cadenceSerie) {
 			if (cadence > 0) {
 				cadenceCount++;
 				cadenceSum += cadence;
@@ -737,7 +748,7 @@ public class TourData {
 		long pulseSum = 0;
 		int pulseCount = 0;
 
-		for (int pulse : pulseSerie) {
+		for (final int pulse : pulseSerie) {
 			if (pulse > 0) {
 				pulseCount++;
 				pulseSum += pulse;
@@ -757,7 +768,7 @@ public class TourData {
 
 		long temperatureSum = 0;
 
-		for (int temperature : temperatureSerie) {
+		for (final int temperature : temperatureSerie) {
 			temperatureSum += temperature;
 		}
 
@@ -767,7 +778,7 @@ public class TourData {
 		}
 	}
 
-	private int computeBreakTimeVariable(final int minStopTime, int startIndex, int endIndex) {
+	private int computeBreakTimeVariable(final int minStopTime, final int startIndex, int endIndex) {
 
 		endIndex = Math.min(endIndex, timeSerie.length - 1);
 
@@ -824,7 +835,7 @@ public class TourData {
 		}
 
 		int maxAltitude = 0;
-		for (int altitude : altitudeSerie) {
+		for (final int altitude : altitudeSerie) {
 			if (altitude > maxAltitude) {
 				maxAltitude = altitude;
 			}
@@ -840,7 +851,7 @@ public class TourData {
 
 		int maxPulse = 0;
 
-		for (int pulse : pulseSerie) {
+		for (final int pulse : pulseSerie) {
 			if (pulse > maxPulse) {
 				maxPulse = pulse;
 			}
@@ -867,7 +878,7 @@ public class TourData {
 			}
 
 			for (int i = 0 + anzValuesSum; i <= distanceSerie.length - 1; i++) {
-				float speed = ((float) distanceSerie[i] - (float) distanceSerie[i - anzValuesSum])
+				final float speed = ((float) distanceSerie[i] - (float) distanceSerie[i - anzValuesSum])
 						/ ((float) timeSerie[i] - (float) timeSerie[i - anzValuesSum])
 						* 3.6f;
 
@@ -1146,7 +1157,7 @@ public class TourData {
 			boolean isTimeValid = true;
 			int prevTime = timeSerie[lowIndex];
 			for (int timeIndex = lowIndex + 1; timeIndex <= highIndex; timeIndex++) {
-				int currentTime = timeSerie[timeIndex];
+				final int currentTime = timeSerie[timeIndex];
 				if (prevTime == currentTime) {
 					isTimeValid = false;
 					break;
@@ -1301,10 +1312,13 @@ public class TourData {
 	 * @param timeAbsolute
 	 * @param distanceAbsolute
 	 */
-	private void createMarker(TimeData timeData, int timeIndex, int timeAbsolute, int distanceAbsolute) {
+	private void createMarker(	final TimeData timeData,
+								final int timeIndex,
+								final int timeAbsolute,
+								final int distanceAbsolute) {
 
 		// create a new marker
-		TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
+		final TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
 
 		tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 		tourMarker.setTime(timeAbsolute + timeData.marker);
@@ -1325,7 +1339,7 @@ public class TourData {
 	 * transfered
 	 * 
 	 * @param isCreateMarker
-	 * 	creates markers when <code>true</code>
+	 * 		creates markers when <code>true</code>
 	 */
 	public void createTimeSeries(final ArrayList<TimeData> timeDataList, final boolean isCreateMarker) {
 
@@ -1397,7 +1411,7 @@ public class TourData {
 
 			// check all data if lat/long is available
 
-			for (TimeData timeDataItem : timeDataList) {
+			for (final TimeData timeDataItem : timeDataList) {
 				if (timeDataItem.latitude != Double.MIN_VALUE) {
 					isGPS = true;
 					break;
@@ -1437,7 +1451,7 @@ public class TourData {
 			if (firstTimeDataItem.latitude == Double.MIN_VALUE || firstTimeDataItem.longitude == Double.MIN_VALUE) {
 
 				// find first valid latitude/longitude
-				for (TimeData timeData : timeDataList) {
+				for (final TimeData timeData : timeDataList) {
 					if (timeData.latitude != Double.MIN_VALUE && timeData.longitude != Double.MIN_VALUE) {
 						mapMinLatitude = timeData.latitude + 90;
 						mapMaxLatitude = timeData.latitude + 90;
@@ -1498,7 +1512,7 @@ public class TourData {
 					/*
 					 * distance
 					 */
-					float tdDistance = timeData.absoluteDistance;
+					final float tdDistance = timeData.absoluteDistance;
 					if (tdDistance == Float.MIN_VALUE) {
 						distanceDiff = 0;
 					} else {
@@ -1660,9 +1674,9 @@ public class TourData {
 	 * Creates the unique tour id from the tour date/time and the unique key
 	 * 
 	 * @param uniqueKey
-	 * 	unique key to identify a tour
+	 * 		unique key to identify a tour
 	 */
-	public void createTourId(String uniqueKey) {
+	public void createTourId(final String uniqueKey) {
 
 //		final String uniqueKey = Integer.toString(Math.abs(getStartDistance()));
 
@@ -1682,7 +1696,7 @@ public class TourData {
 
 			setTourId(Long.parseLong(tourId));
 
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 
 			/*
 			 * the distance was shorted so that the maximum of a Long datatype is not exceeded
@@ -1764,7 +1778,7 @@ public class TourData {
 			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = drivingTime = //
 			Math.max(0, recordingTime - getBreakTime(segmentStartIndex, segmentEndIndex));
 
-			int[] localPowerSerie = getPowerSerie();
+			final int[] localPowerSerie = getPowerSerie();
 			int altitudeUp = 0;
 			int altitudeDown = 0;
 			int pulseSum = 0;
@@ -1825,7 +1839,7 @@ public class TourData {
 
 	public void dumpData() {
 
-		PrintStream out = System.out;
+		final PrintStream out = System.out;
 
 		out.println("----------------------------------------------------"); //$NON-NLS-1$
 		out.println("TOUR DATA"); //$NON-NLS-1$
@@ -1841,7 +1855,7 @@ public class TourData {
 	}
 
 	public void dumpTime() {
-		PrintStream out = System.out;
+		final PrintStream out = System.out;
 
 		out.print((getTourRecordingTime() / 3600) + ":" //$NON-NLS-1$
 				+ ((getTourRecordingTime() % 3600) / 60)
@@ -1853,7 +1867,7 @@ public class TourData {
 
 	public void dumpTourTotal() {
 
-		PrintStream out = System.out;
+		final PrintStream out = System.out;
 
 		out.println("Tour distance (m):	" + getTourDistance()); //$NON-NLS-1$
 
@@ -1881,7 +1895,7 @@ public class TourData {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -1894,7 +1908,7 @@ public class TourData {
 			return false;
 		}
 
-		TourData td = (TourData) obj;
+		final TourData td = (TourData) obj;
 
 		return this.getStartYear() == td.getStartYear()
 				&& this.getStartMonth() == td.getStartMonth()
@@ -1996,7 +2010,7 @@ public class TourData {
 	 * @param endIndex
 	 * @return Returns the break time in seconds
 	 */
-	public int getBreakTime(int startIndex, int endIndex) {
+	public int getBreakTime(final int startIndex, final int endIndex) {
 
 		if (distanceSerie == null) {
 			return 0;
@@ -2014,7 +2028,7 @@ public class TourData {
 
 			// fixed time slices
 
-			int ignoreTimeSlices = deviceTimeInterval == 0 ? //
+			final int ignoreTimeSlices = deviceTimeInterval == 0 ? //
 					0
 					: getBreakTimeSlices(distanceSerie, startIndex, endIndex, minBreakTime / deviceTimeInterval);
 
@@ -2248,26 +2262,26 @@ public class TourData {
 
 		powerSerie = new int[timeSerie.length];
 
-		int weightBody = 75;
-		int weightBike = 10;
-		int bodyHeight = 188;
+		final int weightBody = 75;
+		final int weightBike = 10;
+		final int bodyHeight = 188;
 
-		float cR = 0.008f; // Rollreibungskoeffizient Asphalt
-		float cD = 0.8f;// Strömungskoeffizient
-		float p = 1.145f; // 20C / 400m
+		final float cR = 0.008f; // Rollreibungskoeffizient Asphalt
+		final float cD = 0.8f;// Strömungskoeffizient
+		final float p = 1.145f; // 20C / 400m
 //		float p = 0.968f; // 10C / 2000m
 
-		float weightTotal = weightBody + weightBike;
-		float bsa = (float) (0.007184f * Math.pow(weightBody, 0.425) * Math.pow(bodyHeight, 0.725));
-		float aP = bsa * 0.185f;
+		final float weightTotal = weightBody + weightBike;
+		final float bsa = (float) (0.007184f * Math.pow(weightBody, 0.425) * Math.pow(bodyHeight, 0.725));
+		final float aP = bsa * 0.185f;
 
-		float fRoll = weightTotal * 9.81f * cR;
-		float fSlope = weightTotal * 9.81f; // * gradient/100
-		float fAir = 0.5f * p * cD * aP;// * v2;
+		final float fRoll = weightTotal * 9.81f * cR;
+		final float fSlope = weightTotal * 9.81f; // * gradient/100
+		final float fAir = 0.5f * p * cD * aP;// * v2;
 
 		for (int timeIndex = 0; timeIndex < timeSerie.length; timeIndex++) {
 
-			float speed = (float) speedSerie[timeIndex] / 36; // speed (m/s) /10
+			final float speed = (float) speedSerie[timeIndex] / 36; // speed (m/s) /10
 			float gradient = (float) gradientSerie[timeIndex] / 1000; // gradient (%) /10 /100
 
 			// adjust computed errors
@@ -2287,9 +2301,9 @@ public class TourData {
 			final float fSlopeTotal = fSlope * gradient;
 			final float fAirTotal = fAir * speed * speed;
 
-			float fTotal = fRoll + fAirTotal + fSlopeTotal;
+			final float fTotal = fRoll + fAirTotal + fSlopeTotal;
 
-			int pTotal = (int) (fTotal * speed);
+			final int pTotal = (int) (fTotal * speed);
 
 //			if (pTotal > 600) {
 //				pTotal = pTotal * 1;
@@ -2389,8 +2403,8 @@ public class TourData {
 		int[] serie;
 
 		final float unitValueTempterature = UI.UNIT_VALUE_TEMPERATURE;
-		float fahrenheitMulti = UI.UNIT_FAHRENHEIT_MULTI;
-		float fahrenheitAdd = UI.UNIT_FAHRENHEIT_ADD;
+		final float fahrenheitMulti = UI.UNIT_FAHRENHEIT_MULTI;
+		final float fahrenheitAdd = UI.UNIT_FAHRENHEIT_ADD;
 
 		if (unitValueTempterature != 1) {
 
@@ -2430,7 +2444,7 @@ public class TourData {
 		return tourBike;
 	}
 
-	public Collection<TourCategory> getTourTags() {
+	public Set<TourCategory> getTourCategory() {
 		return tourCategory;
 	}
 
@@ -2494,6 +2508,10 @@ public class TourData {
 		return tourStartPlace == null ? "" : tourStartPlace; //$NON-NLS-1$
 	}
 
+	public Set<TourTag> getTourTags() {
+		return tourTags;
+	}
+
 	/**
 	 * @return the tourTitle
 	 */
@@ -2522,6 +2540,46 @@ public class TourData {
 
 		return result;
 	}
+
+//	/**
+//	 * Called before this object gets persisted, copy data from the tourdata object into the object
+//	 * which gets serialized
+//	 */
+//	/*
+//	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
+//	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
+//	 */
+//	public void onPrePersistOLD() {
+//
+//		if (timeSerie == null) {
+//			serieData = new SerieData();
+//			return;
+//		}
+//
+//		final int serieLength = timeSerie.length;
+//
+//		serieData = new SerieData(serieLength);
+//
+//		System.arraycopy(altitudeSerie, 0, serieData.altitudeSerie, 0, serieLength);
+//		System.arraycopy(cadenceSerie, 0, serieData.cadenceSerie, 0, serieLength);
+//		System.arraycopy(distanceSerie, 0, serieData.distanceSerie, 0, serieLength);
+//		System.arraycopy(pulseSerie, 0, serieData.pulseSerie, 0, serieLength);
+//		System.arraycopy(temperatureSerie, 0, serieData.temperatureSerie, 0, serieLength);
+//		System.arraycopy(timeSerie, 0, serieData.timeSerie, 0, serieLength);
+//
+//		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0,
+//		// serieLength);
+//		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
+//		// serieLength);
+//
+//		if (latitudeSerie != null) {
+//
+//			serieData.initializeGPSData(serieLength);
+//
+//			System.arraycopy(latitudeSerie, 0, serieData.latitude, 0, serieLength);
+//			System.arraycopy(longitudeSerie, 0, serieData.longitude, 0, serieLength);
+//		}
+//	}
 
 	/**
 	 * Called after the object was loaded from the persistence store
@@ -2705,103 +2763,63 @@ public class TourData {
 		serieData.longitude = longitudeSerie;
 	}
 
-//	/**
-//	 * Called before this object gets persisted, copy data from the tourdata object into the object
-//	 * which gets serialized
-//	 */
-//	/*
-//	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
-//	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
-//	 */
-//	public void onPrePersistOLD() {
-//
-//		if (timeSerie == null) {
-//			serieData = new SerieData();
-//			return;
-//		}
-//
-//		final int serieLength = timeSerie.length;
-//
-//		serieData = new SerieData(serieLength);
-//
-//		System.arraycopy(altitudeSerie, 0, serieData.altitudeSerie, 0, serieLength);
-//		System.arraycopy(cadenceSerie, 0, serieData.cadenceSerie, 0, serieLength);
-//		System.arraycopy(distanceSerie, 0, serieData.distanceSerie, 0, serieLength);
-//		System.arraycopy(pulseSerie, 0, serieData.pulseSerie, 0, serieLength);
-//		System.arraycopy(temperatureSerie, 0, serieData.temperatureSerie, 0, serieLength);
-//		System.arraycopy(timeSerie, 0, serieData.timeSerie, 0, serieLength);
-//
-//		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0,
-//		// serieLength);
-//		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
-//		// serieLength);
-//
-//		if (latitudeSerie != null) {
-//
-//			serieData.initializeGPSData(serieLength);
-//
-//			System.arraycopy(latitudeSerie, 0, serieData.latitude, 0, serieLength);
-//			System.arraycopy(longitudeSerie, 0, serieData.longitude, 0, serieLength);
-//		}
-//	}
-
 	/**
 	 * @param avgCadence
-	 * 	the avgCadence to set
+	 * 		the avgCadence to set
 	 */
-	public void setAvgCadence(int avgCadence) {
+	public void setAvgCadence(final int avgCadence) {
 		this.avgCadence = avgCadence;
 	}
 
 	/**
 	 * @param avgPulse
-	 * 	the avgPulse to set
+	 * 		the avgPulse to set
 	 */
-	public void setAvgPulse(int avgPulse) {
+	public void setAvgPulse(final int avgPulse) {
 		this.avgPulse = avgPulse;
 	}
 
 	/**
 	 * @param avgTemperature
-	 * 	the avgTemperature to set
+	 * 		the avgTemperature to set
 	 */
-	public void setAvgTemperature(int avgTemperature) {
+	public void setAvgTemperature(final int avgTemperature) {
 		this.avgTemperature = avgTemperature;
 	}
 
 	/**
 	 * @param bikerWeight
-	 * 	the bikerWeight to set
+	 * 		the bikerWeight to set
 	 */
-	public void setBikerWeight(float bikerWeight) {
+	public void setBikerWeight(final float bikerWeight) {
 		this.bikerWeight = bikerWeight;
 	}
 
 	/**
 	 * @param calories
-	 * 	the calories to set
+	 * 		the calories to set
 	 */
-	public void setCalories(String calories) {
+	public void setCalories(final String calories) {
 		this.calories = calories;
 	}
 
-	public void setDeviceDistance(int deviceDistance) {
+	public void setDeviceDistance(final int deviceDistance) {
 		this.deviceDistance = deviceDistance;
 	}
 
-	public void setDeviceId(String deviceId) {
+	public void setDeviceId(final String deviceId) {
 		this.devicePluginId = deviceId;
 	}
 
-	public void setDeviceMode(short deviceMode) {
+	public void setDeviceMode(final short deviceMode) {
 		this.deviceMode = deviceMode;
 	}
 
-	public void setDeviceModeName(String deviceModeName) {
+	public void setDeviceModeName(final String deviceModeName) {
 		this.deviceModeName = deviceModeName;
 	}
 
-	public void setDeviceName(String deviceName) {
+	public void setDeviceName(final String deviceName) {
 		devicePluginName = deviceName;
 	}
 
@@ -2811,124 +2829,124 @@ public class TourData {
 	 * 
 	 * @param deviceTimeInterval
 	 */
-	public void setDeviceTimeInterval(short deviceTimeInterval) {
+	public void setDeviceTimeInterval(final short deviceTimeInterval) {
 		this.deviceTimeInterval = deviceTimeInterval;
 	}
 
-	public void setDeviceTotalDown(int deviceTotalDown) {
+	/*
+	 * private int maxAltitude; private int maxPulse; private int avgPulse; private int avgCadence;
+	 * private int avgTemperature; private float maxSpeed;
+	 */
+
+	public void setDeviceTotalDown(final int deviceTotalDown) {
 		this.deviceTotalDown = deviceTotalDown;
 	}
 
-	public void setDeviceTotalUp(int deviceTotalUp) {
+	public void setDeviceTotalUp(final int deviceTotalUp) {
 		this.deviceTotalUp = deviceTotalUp;
 	}
 
-/*
- * private int maxAltitude; private int maxPulse; private int avgPulse; private int avgCadence;
- * private int avgTemperature; private float maxSpeed;
- */
-
-	public void setDeviceTourType(String tourType) {
+	public void setDeviceTourType(final String tourType) {
 		this.deviceTourType = tourType;
 	}
 
-	public void setDeviceTravelTime(long deviceTravelTime) {
+	public void setDeviceTravelTime(final long deviceTravelTime) {
 		this.deviceTravelTime = deviceTravelTime;
 	}
 
-	public void setDeviceWeight(int deviceWeight) {
+	public void setDeviceWeight(final int deviceWeight) {
 		this.deviceWeight = deviceWeight;
 	}
 
-	public void setDeviceWheel(int deviceWheel) {
+	public void setDeviceWheel(final int deviceWheel) {
 		this.deviceWheel = deviceWheel;
 	}
 
-	public void setDpTolerance(short dpTolerance) {
+	public void setDpTolerance(final short dpTolerance) {
 		this.dpTolerance = dpTolerance;
 	}
 
 	/**
 	 * @param maxAltitude
-	 * 	the maxAltitude to set
+	 * 		the maxAltitude to set
 	 */
-	public void setMaxAltitude(int maxAltitude) {
+	public void setMaxAltitude(final int maxAltitude) {
 		this.maxAltitude = maxAltitude;
-	}
-
-	/**
-	 * @param maxPulse
-	 * 	the maxPulse to set
-	 */
-	public void setMaxPulse(int maxPulse) {
-		this.maxPulse = maxPulse;
-	}
-
-	/**
-	 * @param maxSpeed
-	 * 	the maxSpeed to set
-	 */
-	public void setMaxSpeed(float maxSpeed) {
-		this.maxSpeed = maxSpeed;
 	}
 
 //	public void setSerieData(SerieData serieData) {
 //		this.serieData = serieData;
 //	}
 
-	public void setStartAltitude(short startAltitude) {
+	/**
+	 * @param maxPulse
+	 * 		the maxPulse to set
+	 */
+	public void setMaxPulse(final int maxPulse) {
+		this.maxPulse = maxPulse;
+	}
+
+	/**
+	 * @param maxSpeed
+	 * 		the maxSpeed to set
+	 */
+	public void setMaxSpeed(final float maxSpeed) {
+		this.maxSpeed = maxSpeed;
+	}
+
+	public void setStartAltitude(final short startAltitude) {
 		this.startAltitude = startAltitude;
 	}
 
-	public void setStartDay(short startDay) {
+	public void setStartDay(final short startDay) {
 		this.startDay = startDay;
 	}
 
-	public void setStartDistance(int startDistance) {
+	public void setStartDistance(final int startDistance) {
 		this.startDistance = startDistance;
 	}
 
-	public void setStartHour(short startHour) {
+	public void setStartHour(final short startHour) {
 		this.startHour = startHour;
 	}
 
-	public void setStartMinute(short startMinute) {
+	public void setStartMinute(final short startMinute) {
 		this.startMinute = startMinute;
 	}
 
-	public void setStartMonth(short startMonth) {
+	public void setStartMonth(final short startMonth) {
 		this.startMonth = startMonth;
 	}
 
-	public void setStartPulse(short startPulse) {
+	public void setStartPulse(final short startPulse) {
 		this.startPulse = startPulse;
 	}
 
-	public void setStartWeek(short startWeek) {
+	public void setStartWeek(final short startWeek) {
 		this.startWeek = startWeek;
 	}
 
-	public void setStartYear(short startYear) {
+	public void setStartYear(final short startYear) {
 		this.startYear = startYear;
 	}
 
-	public void setTourAltDown(int tourAltDown) {
+	public void setTourAltDown(final int tourAltDown) {
 		this.tourAltDown = tourAltDown;
 	}
 
-	public void setTourAltUp(int tourAltUp) {
+	public void setTourAltUp(final int tourAltUp) {
 		this.tourAltUp = tourAltUp;
 	}
 
-	public void setTourBike(TourBike tourBike) {
+	public void setTourBike(final TourBike tourBike) {
 		this.tourBike = tourBike;
 	}
 
 	/**
 	 * @param tourDescription
-	 * 	the tourDescription to set
+	 * 		the tourDescription to set
 	 */
-	public void setTourDescription(String tourDescription) {
+	public void setTourDescription(final String tourDescription) {
 		this.tourDescription = tourDescription;
 	}
 
@@ -2937,23 +2955,23 @@ public class TourData {
 	 * 
 	 * @param tourDrivingTime
 	 */
-	public void setTourDrivingTime(int tourDrivingTime) {
+	public void setTourDrivingTime(final int tourDrivingTime) {
 		this.tourDrivingTime = tourDrivingTime;
 	}
 
 	/**
 	 * @param tourEndPlace
-	 * 	the tourEndPlace to set
+	 * 		the tourEndPlace to set
 	 */
-	public void setTourEndPlace(String tourEndPlace) {
+	public void setTourEndPlace(final String tourEndPlace) {
 		this.tourEndPlace = tourEndPlace;
 	}
 
-	public void setTourId(Long tourId) {
+	public void setTourId(final Long tourId) {
 		this.tourId = tourId;
 	}
 
-	public void setTourMarkers(Set<TourMarker> tourMarkers) {
+	public void setTourMarkers(final Set<TourMarker> tourMarkers) {
 		this.tourMarkers = tourMarkers;
 	}
 
@@ -2963,27 +2981,27 @@ public class TourData {
 	 * 
 	 * @param tourPerson
 	 */
-	public void setTourPerson(TourPerson tourPerson) {
+	public void setTourPerson(final TourPerson tourPerson) {
 		this.tourPerson = tourPerson;
 	}
 
 	/**
 	 * @param tourStartPlace
-	 * 	the tourStartPlace to set
+	 * 		the tourStartPlace to set
 	 */
-	public void setTourStartPlace(String tourStartPlace) {
+	public void setTourStartPlace(final String tourStartPlace) {
 		this.tourStartPlace = tourStartPlace;
 	}
 
 	/**
 	 * @param tourTitle
-	 * 	the tourTitle to set
+	 * 		the tourTitle to set
 	 */
-	public void setTourTitle(String tourTitle) {
+	public void setTourTitle(final String tourTitle) {
 		this.tourTitle = tourTitle;
 	}
 
-	public void setTourType(TourType tourType) {
+	public void setTourType(final TourType tourType) {
 		this.tourType = tourType;
 	}
 
