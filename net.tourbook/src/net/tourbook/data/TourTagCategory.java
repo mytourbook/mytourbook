@@ -16,9 +16,6 @@
 
 package net.tourbook.data;
 
-import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.LAZY;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,45 +35,68 @@ public class TourTagCategory {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					tagCategoryId	= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long			tagCategoryId	= TourDatabase.ENTITY_IS_NOT_SAVED;
+
+	/**
+	 * derby does not support BOOLEAN, 1 = <code>true</code>, 0 = <code>false</code>
+	 */
+	private int				isRoot			= 0;
 
 	@Basic(optional = false)
-	private String					name;
+	private String			name;
 
 	@ManyToMany
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId"))
-	private Set<TourTag>			tourTags		= new HashSet<TourTag>();
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"), //
+	joinColumns = @JoinColumn(name = "tourTagCategory_tagCategoryId", referencedColumnName = "tagCategoryId"))
+	private Set<TourTag>	tourTags		= new HashSet<TourTag>();
 
-	@ManyToMany(cascade = ALL, fetch = LAZY)
-	@JoinTable(joinColumns = @JoinColumn(name = "TourTagCategory_tagCategoryId1", //
-	referencedColumnName = "tagCategoryId"), //
-	inverseJoinColumns = @JoinColumn(name = "tourTagCategory_tagCategoryId2", //
-	referencedColumnName = "tagCategoryId"))
-	private Set<TourTagCategory>	tourTagCategory	= new HashSet<TourTagCategory>();
+//	@ManyToMany(cascade = ALL, fetch = LAZY)
+//	@JoinTable(joinColumns = @JoinColumn(name = "TourTagCategory_tagCategoryId1", referencedColumnName = "tagCategoryId"), //
+//	inverseJoinColumns = @JoinColumn(name = "tourTagCategory_tagCategoryId2", referencedColumnName = "tagCategoryId"))
+//	private Set<TourTagCategory>	tourTagCategory	= new HashSet<TourTagCategory>();
 
 	/**
 	 * default constructor used in ejb
 	 */
 	public TourTagCategory() {}
 
-	public long getBikeId() {
+	public TourTagCategory(final String categoryName) {
+		name = categoryName;
+	}
+
+	public long getCategoryId() {
 		return tagCategoryId;
 	}
 
-	public String getName() {
+	public String getCategoryName() {
 		return name;
 	}
 
-	public Set<TourTagCategory> getTagCategories() {
-		return tourTagCategory;
-	}
+//	public Set<TourTagCategory> getTagCategories() {
+//		return tourTagCategory;
+//	}
 
+	/**
+	 * @return Returns the tags which belong to this category
+	 */
 	public Set<TourTag> getTourTags() {
 		return tourTags;
 	}
 
+	public boolean isRoot() {
+		return isRoot == 1;
+	}
+
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	/**
+	 * set root flag if this tag is a root item or not, 1 = <code>true</code>, 0 =
+	 * <code>false</code>
+	 */
+	public void setRoot(final boolean isRoot) {
+		this.isRoot = isRoot ? 1 : 0;
 	}
 
 }

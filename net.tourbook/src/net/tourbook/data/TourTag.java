@@ -17,8 +17,6 @@
 package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.FetchType.LAZY;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -41,16 +39,21 @@ public class TourTag {
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					tagId				= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long					tagId			= TourDatabase.ENTITY_IS_NOT_SAVED;
+
+	/**
+	 * derby does not support BOOLEAN, 1 = <code>true</code>, 0 = <code>false</code>
+	 */
+	private int						isRoot			= 0;
 
 	@Basic(optional = false)
 	private String					name;
 
-	@ManyToMany(mappedBy = "tourTags", fetch = LAZY, cascade = ALL)
-	private Set<TourData>			tourData			= new HashSet<TourData>();
+	@ManyToMany(mappedBy = "tourTags", cascade = ALL)
+	private Set<TourData>			tourData		= new HashSet<TourData>();
 
-	@ManyToMany(mappedBy = "tourTags", fetch = EAGER, cascade = ALL)//$NON-NLS-1$
-	private Set<TourTagCategory>	tourTagCategories	= new HashSet<TourTagCategory>();
+	@ManyToMany(mappedBy = "tourTags", cascade = ALL)//$NON-NLS-1$
+	private Set<TourTagCategory>	tourTagCategory	= new HashSet<TourTagCategory>();
 
 	public TourTag() {}
 
@@ -59,7 +62,7 @@ public class TourTag {
 	}
 
 	public Set<TourTagCategory> getTagCategories() {
-		return tourTagCategories;
+		return tourTagCategory;
 	}
 
 	public long getTagId() {
@@ -72,6 +75,18 @@ public class TourTag {
 
 	public Collection<TourData> getTourData() {
 		return tourData;
+	}
+
+	public boolean isRoot() {
+		return isRoot == 1;
+	}
+
+	/**
+	 * set root flag if this tag is a root item or not, 1 = <code>true</code>, 0 =
+	 * <code>false</code>
+	 */
+	public void setRoot(final boolean isRoot) {
+		this.isRoot = isRoot ? 1 : 0;
 	}
 
 	/**

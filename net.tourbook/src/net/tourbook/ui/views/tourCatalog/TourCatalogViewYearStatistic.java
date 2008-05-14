@@ -630,7 +630,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		fTourSpeed = new ArrayList<Integer>();
 		fAllTours = new ArrayList<TourCatalogItemComparedTour>();
 
-		final Object[] yearItems = fCurrentRefItem.getFetchedChildren();
+		final Object[] yearItems = fCurrentRefItem.getFetchedChildrenAsArray();
 
 		// get youngest year if this is forced
 		if (yearItems != null && yearItems.length > 0 && showYoungestYear) {
@@ -654,7 +654,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 				if (yearItemYear >= firstYear && yearItemYear <= fYoungesYear) {
 
 					// loop: all tours
-					final Object[] tourItems = yearItem.getFetchedChildren();
+					final Object[] tourItems = yearItem.getFetchedChildrenAsArray();
 					for (final Object tourItemObj : tourItems) {
 						if (tourItemObj instanceof TourCatalogItemComparedTour) {
 

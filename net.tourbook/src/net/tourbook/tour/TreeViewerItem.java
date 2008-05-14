@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,10 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.tour;
 
 import java.util.ArrayList;
 
+/**
+ * Abstract class which contains an item for a tree viewer
+ */
 public abstract class TreeViewerItem {
 
 	private TreeViewerItem				fParentItem	= null;
@@ -24,6 +28,10 @@ public abstract class TreeViewerItem {
 
 	protected abstract void fetchChildren();
 
+	/**
+	 * @return Returns a list with all childrens for this item, when children have not been fetched,
+	 * 	an empty list will be returned
+	 */
 	public ArrayList<TreeViewerItem> getChildren() {
 		if (fChildren == null) {
 			return new ArrayList<TreeViewerItem>();
@@ -31,7 +39,27 @@ public abstract class TreeViewerItem {
 		return fChildren;
 	}
 
-	public Object[] getFetchedChildren() {
+	/**
+	 * @return Returns a list with all fetched children
+	 */
+	public ArrayList<TreeViewerItem> getFetchedChildren() {
+
+		if (fChildren == null) {
+			fetchChildren();
+		}
+
+		if (fChildren == null) {
+			fChildren = new ArrayList<TreeViewerItem>();
+		}
+
+		return fChildren;
+	}
+
+	/**
+	 * @return Returns an array with all fetched children
+	 */
+	public Object[] getFetchedChildrenAsArray() {
+
 		if (fChildren == null) {
 			fetchChildren();
 		}
@@ -46,6 +74,10 @@ public abstract class TreeViewerItem {
 		return fParentItem;
 	}
 
+	/**
+	 * @return Returns a list with all childrens of this item, when the childrens have not been
+	 * 	fetched, <code>null</code> will be returned
+	 */
 	public ArrayList<TreeViewerItem> getUnfetchedChildren() {
 		return fChildren;
 	}
@@ -65,11 +97,11 @@ public abstract class TreeViewerItem {
 
 	protected abstract void remove();
 
-	public void setChildren(ArrayList<TreeViewerItem> children) {
+	public void setChildren(final ArrayList<TreeViewerItem> children) {
 		fChildren = children;
 	}
 
-	public void setParentItem(TreeViewerItem parentItem) {
+	public void setParentItem(final TreeViewerItem parentItem) {
 		fParentItem = parentItem;
 	}
 

@@ -317,6 +317,17 @@ public class Messages extends NLS {
 	public static String		pref_regional_useCustomDecimalFormat;
 	public static String		pref_regional_value_example;
 
+	public static String		pref_tourtag_btn_new_tag_category;
+	public static String		pref_tourtag_btn_rename;
+	public static String		pref_tourtag_button_new_tag;
+	public static String		pref_tourtag_dlg_new_tag_category_message;
+	public static String		pref_tourtag_dlg_new_tag_category_title;
+	public static String		pref_tourtag_dlg_new_tag_message;
+	public static String		pref_tourtag_dlg_new_tag_title;
+	public static String		pref_tourtag_dlg_rename_message;
+	public static String		pref_tourtag_dlg_rename_title;
+	public static String		pref_tourtag_viewer_title;
+
 	public static String		Pref_Statistic_Label_altitude;
 	public static String		Pref_Statistic_Label_altitude_low_value;
 	public static String		Pref_Statistic_Label_altitude_quantity;
@@ -355,16 +366,6 @@ public class Messages extends NLS {
 
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
-
-	public static String	Tag_Viewer_column_dlg_new_nessage;
-
-	public static String	Tag_Viewer_column_dlg_new_title;
-
-	public static String	Tag_Viewer_column_dlg_rename_nessage;
-
-	public static String	Tag_Viewer_column_dlg_rename_title;
-
-	public static String	Tag_Viewer_column_name;
 
 	public static String		Tour_Action_auto_zoom_to_slider_position;
 	public static String		Tour_Action_chart_options_tooltip;

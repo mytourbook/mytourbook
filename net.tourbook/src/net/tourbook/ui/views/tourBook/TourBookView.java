@@ -163,11 +163,11 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		public void dispose() {}
 
 		public Object[] getChildren(Object parentElement) {
-			return ((TreeViewerItem) parentElement).getFetchedChildren();
+			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
 		public Object[] getElements(Object inputElement) {
-			return fRootItem.getFetchedChildren();
+			return fRootItem.getFetchedChildrenAsArray();
 		}
 
 		public Object getParent(Object element) {
@@ -914,7 +914,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 			if (tourBookYear.fTourYear == fTourViewerSelectedYear) {
 				newYearItem = yearItem;
 
-				Object[] monthItems = tourBookYear.getFetchedChildren();
+				Object[] monthItems = tourBookYear.getFetchedChildrenAsArray();
 				for (Object monthItem : monthItems) {
 					TVITourBookMonth tourBookMonth = ((TVITourBookMonth) monthItem);
 					if (tourBookMonth.fTourMonth == fTourViewerSelectedMonth) {

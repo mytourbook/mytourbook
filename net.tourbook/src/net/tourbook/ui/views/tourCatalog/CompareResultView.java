@@ -148,11 +148,11 @@ public class CompareResultView extends ViewPart {
 		public void dispose() {}
 
 		public Object[] getChildren(Object parentElement) {
-			return ((TreeViewerItem) parentElement).getFetchedChildren();
+			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
 		public Object[] getElements(Object inputElement) {
-			return rootItem.getFetchedChildren();
+			return rootItem.getFetchedChildrenAsArray();
 		}
 
 		public Object getParent(Object element) {

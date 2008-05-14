@@ -271,9 +271,8 @@ public class TourDatabase {
 
 		if (em != null) {
 
-			final Query query = em.createQuery("SELECT TourCategory " //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_CATEGORY + " TourCategory ") //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" ORDER  BY TourCategory.category")); //$NON-NLS-1$
+			final Query query = em.createQuery("SELECT TourTag " //$NON-NLS-1$
+					+ ("FROM " + TourDatabase.TABLE_TOUR_TAG + " TourTag ")); //$NON-NLS-1$
 
 			fTags = (ArrayList<TourTag>) query.getResultList();
 
@@ -1028,11 +1027,11 @@ public class TourDatabase {
 		stmt.addBatch("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + TABLE_TOUR_REFERENCE) //$NON-NLS-1$
 				+ "(" //$NON-NLS-1$
-				+ "refId 						BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "	refId 						BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
 				+ (TABLE_TOUR_DATA + "_tourId	BIGINT,\n") //$NON-NLS-1$
-				+ "startIndex					INTEGER NOT NULL,\n" //$NON-NLS-1$
-				+ "endIndex 					INTEGER NOT NULL,\n" //$NON-NLS-1$
-				+ "label 						VARCHAR(80)\n" //$NON-NLS-1$
+				+ "	startIndex					INTEGER NOT NULL,\n" //$NON-NLS-1$
+				+ "	endIndex 					INTEGER NOT NULL,\n" //$NON-NLS-1$
+				+ "	label 						VARCHAR(80)\n" //$NON-NLS-1$
 				+ ")"); //$NON-NLS-1$
 
 		// ALTER TABLE TourReference ADD CONSTRAINT TourReference_pk PRIMARY KEY (refId);
@@ -1073,8 +1072,9 @@ public class TourDatabase {
 
 		sql = ("CREATE TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
 				+ "(\n" //$NON-NLS-1$
-				+ "tagId 	BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
-				+ "name 	VARCHAR(255)\n" //$NON-NLS-1$
+				+ "	tagId 	BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "	isRoot 	INTEGER,\n" //$NON-NLS-1$
+				+ "	name 	VARCHAR(255)\n" //$NON-NLS-1$
 				+ ")";
 
 		System.out.println(sql);
@@ -1083,8 +1083,8 @@ public class TourDatabase {
 
 		// ALTER TABLE TourTag ADD CONSTRAINT TourTag_pk PRIMARY KEY (refId);
 		sql = ("ALTER TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
-				+ (" ADD CONSTRAINT " + TABLE_TOUR_TAG + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" PRIMARY KEY (tagId)");
+				+ ("	ADD CONSTRAINT " + TABLE_TOUR_TAG + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	PRIMARY KEY (tagId)");
 
 		System.out.println(sql);
 		System.out.println();
@@ -1092,6 +1092,7 @@ public class TourDatabase {
 		stmt.addBatch(sql); //$NON-NLS-1$
 
 		// CREATE TABLE TourData_TourTag
+
 		final String table_TourData_TourTag = TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG;
 		final String field_TourData_tourId = TABLE_TOUR_DATA + "_tourId";
 		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId";
@@ -1111,18 +1112,18 @@ public class TourDatabase {
 
 		sql = ("ALTER TABLE " + table_TourData_TourTag) //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ (" ADD CONSTRAINT fk_" + table_TourData_TourTag + "_" + field_TourTag_tagId)
-				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)")
-				+ (" REFERENCES " + TABLE_TOUR_TAG + " (tagId)");
+				+ ("	ADD CONSTRAINT fk_" + table_TourData_TourTag + "_" + field_TourTag_tagId)
+				+ ("	FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)")
+				+ ("	REFERENCES " + TABLE_TOUR_TAG + " (tagId)");
 
 		System.out.println(sql);
 		stmt.addBatch(sql);
 
 		sql = ("ALTER TABLE " + table_TourData_TourTag) //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ (" ADD CONSTRAINT fk_" + table_TourData_TourTag + "_" + field_TourData_tourId)
-				+ (" FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)")
-				+ (" REFERENCES " + TABLE_TOUR_DATA + " (tourId)");
+				+ ("	ADD CONSTRAINT fk_" + table_TourData_TourTag + "_" + field_TourData_tourId)
+				+ ("	FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)")
+				+ ("	REFERENCES " + TABLE_TOUR_DATA + " (tourId)");
 
 		System.out.println(sql);
 		System.out.println();
@@ -1138,8 +1139,9 @@ public class TourDatabase {
 		 */
 		sql = ("CREATE TABLE " + TABLE_TOUR_TAG_CATEGORY) //$NON-NLS-1$
 				+ "(\n" //$NON-NLS-1$
-				+ "tagCategoryId 	BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
-				+ "name 			VARCHAR(255)\n" //$NON-NLS-1$
+				+ "	tagCategoryId 	BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "	isRoot 			INTEGER,\n" //$NON-NLS-1$
+				+ "	name 			VARCHAR(255)\n" //$NON-NLS-1$
 				+ ")";
 
 		System.out.println(sql);

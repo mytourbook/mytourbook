@@ -156,11 +156,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		public void dispose() {}
 
 		public Object[] getChildren(final Object parentElement) {
-			return ((TreeViewerItem) parentElement).getFetchedChildren();
+			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
 		public Object[] getElements(final Object inputElement) {
-			return fRootItem.getFetchedChildren();
+			return fRootItem.getFetchedChildrenAsArray();
 		}
 
 		public Object getParent(final Object element) {
@@ -864,7 +864,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 	 */
 	private void selectRefTour(long refId) {
 
-		Object[] refTourItems = fRootItem.getFetchedChildren();
+		Object[] refTourItems = fRootItem.getFetchedChildrenAsArray();
 
 		// search ref tour
 		for (Object refTourItem : refTourItems) {

@@ -17,7 +17,6 @@
 package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.EAGER;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -256,11 +255,11 @@ public class TourData {
 	private TourBike			tourBike;
 
 	/*
-	 * tourCategory is currently (version 1.6) not used but is defined in older databases
+	 * tourCategory is currently (version 1.6) not used but is defined in older databases, it is
+	 * disabled because the field is not available in the database table
 	 */
-	@ManyToMany(fetch = EAGER, mappedBy = "tourData")
-	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
-
+	//	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "tourData")
+	//	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
 	/*
 	 * data series from the device
 	 */
@@ -2444,9 +2443,9 @@ public class TourData {
 		return tourBike;
 	}
 
-	public Set<TourCategory> getTourCategory() {
-		return tourCategory;
-	}
+//	public Set<TourCategory> getTourCategory() {
+//		return tourCategory;
+//	}
 
 	/**
 	 * @return the tourDescription

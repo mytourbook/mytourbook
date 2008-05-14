@@ -16,15 +16,11 @@
 
 package net.tourbook.data;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 
 import net.tourbook.database.TourDatabase;
 
@@ -36,13 +32,15 @@ public class TourCategory {
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					categoryId	= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long	categoryId	= TourDatabase.ENTITY_IS_NOT_SAVED;
 
-	@ManyToMany
-	private Collection<TourData>	tourData	= new ArrayList<TourData>();
-
+	/*
+	 * TourCategory is disabled since version 1.6.0
+	 */
+//	@ManyToMany
+//	private Collection<TourData>	tourData	= new ArrayList<TourData>();
 	@Basic(optional = false)
-	private String					category;
+	private String	category;
 
 	public TourCategory() {}
 
@@ -58,9 +56,9 @@ public class TourCategory {
 		return categoryId;
 	}
 
-	public Collection<TourData> getTourData() {
-		return tourData;
-	}
+//	public Collection<TourData> getTourData() {
+//		return tourData;
+//	}
 
 	/**
 	 * Set the name for the tour tag
