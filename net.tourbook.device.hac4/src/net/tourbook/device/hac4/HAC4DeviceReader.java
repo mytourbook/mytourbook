@@ -63,20 +63,12 @@ public class HAC4DeviceReader extends TourbookDevice {
 		canReadFromDevice = true;
 	}
 
-	public int getTransferDataSize() {
-		return HAC4_DATA_SIZE;
-	}
-
-	private TourType getTourType() {
-		return null;
-	}
-
 	@Override
-	public String buildFileNameFromRawData(String rawDataFileName) {
+	public String buildFileNameFromRawData(final String rawDataFileName) {
 
 		RandomAccessFile fileRawData = null;
 
-		HAC4DeviceData hac4DeviceData = new HAC4DeviceData();
+		final HAC4DeviceData hac4DeviceData = new HAC4DeviceData();
 
 		try {
 
@@ -88,35 +80,110 @@ public class HAC4DeviceReader extends TourbookDevice {
 			// read device data
 			hac4DeviceData.readFromFile(fileRawData);
 
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (fileRawData != null) {
 				try {
 					fileRawData.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}
 		}
 
 		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
-				hac4DeviceData.transferYear, hac4DeviceData.transferMonth, hac4DeviceData.transferDay).toString();
+				hac4DeviceData.transferYear,
+				hac4DeviceData.transferMonth,
+				hac4DeviceData.transferDay).toString();
 	}
 
-	public boolean processDeviceData(String importFileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
+	@Override
+	public boolean checkStartSequence(final int byteIndex, final int newByte) {
+
+		/*
+		 * check if the first 4 bytes are set to AFRO
+		 */
+		if (byteIndex == 0 & newByte == 'A') {
+			return true;
+		}
+		if (byteIndex == 1 & newByte == 'F') {
+			return true;
+		}
+		if (byteIndex == 2 & newByte == 'R') {
+			return true;
+		}
+		if (byteIndex == 3 & newByte == 'O') {
+			return true;
+		}
+
+		return false;
+	}
+
+	public String getDeviceModeName(final int profileId) {
+
+		// "81" jogging 
+		// "91" ski 
+		// "A1" bike
+		// "B1" ski-bike
+
+		switch (profileId) {
+		case 129: // 0x81
+			return Messages.HAC4_Profile_jogging;
+
+		case 145: // 0x91
+			return Messages.HAC4_Profile_ski;
+
+		case 161: // 0xA1
+			return Messages.HAC4_Profile_bike;
+
+		case 177: // 0xB1
+			return Messages.HAC4_Profile_ski_bike;
+		}
+
+		return "HAC4: unknown profile"; //$NON-NLS-1$
+	}
+
+	@Override
+	public SerialParameters getPortParameters(final String portName) {
+
+		return new SerialParameters(portName,
+				9600,
+				SerialPort.FLOWCONTROL_NONE,
+				SerialPort.FLOWCONTROL_NONE,
+				SerialPort.DATABITS_8,
+				SerialPort.STOPBITS_1,
+				SerialPort.PARITY_NONE);
+	}
+
+	@Override
+	public int getStartSequenceSize() {
+		return 4;
+	}
+
+	private TourType getTourType() {
+		return null;
+	}
+
+	public int getTransferDataSize() {
+		return HAC4_DATA_SIZE;
+	}
+
+	public boolean processDeviceData(	final String importFileName,
+										final DeviceData deviceData,
+										final HashMap<String, TourData> tourDataMap) {
 
 		RandomAccessFile fileRawData = null;
 
-		byte[] buffer = new byte[5];
+		final byte[] buffer = new byte[5];
 		String recordType = ""; //$NON-NLS-1$
 
-		HAC4DeviceData hac4DeviceData = new HAC4DeviceData();
-		TourType defaultTourType = getTourType();
+		final HAC4DeviceData hac4DeviceData = new HAC4DeviceData();
+		final TourType defaultTourType = getTourType();
 
 		try {
 
@@ -140,7 +207,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 			// pointer there
 			fileRawData.seek(hac4DeviceData.offsetDDRecord + 5);
 			int offsetAARecord = DataUtil.readFileOffset(fileRawData, buffer);
-			int initialOffsetAARecord = offsetAARecord;
+			final int initialOffsetAARecord = offsetAARecord;
 			int offsetDDRecord;
 
 			boolean isLastTour = true;
@@ -171,7 +238,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 				fileRawData.seek(offsetAARecord);
 
-				TourData tourData = new TourData();
+				final TourData tourData = new TourData();
 
 				tourData.setDeviceTimeInterval(HAC4_TIMESLICE);
 				tourData.importRawDataFile = importFileName;
@@ -185,7 +252,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 				if (isLastTour) {
 					isLastTour = false;
 
-					int deviceTravelTimeHours = ((hac4DeviceData.totalTravelTimeHourHigh * 100) + hac4DeviceData.totalTravelTimeHourLow);
+					final int deviceTravelTimeHours = ((hac4DeviceData.totalTravelTimeHourHigh * 100) + hac4DeviceData.totalTravelTimeHourLow);
 
 					tourData.setDeviceTravelTime((deviceTravelTimeHours * 3600)
 							+ (hac4DeviceData.totalTravelTimeMin * 60)
@@ -222,7 +289,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 				// out.println("Offset AA Record: " + iOffsetAARecord);
 
 				// create time list
-				ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+				final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
 
 				short temperature;
 				short marker;
@@ -385,7 +452,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 					/*
 					 * disable data series when no data are available
 					 */
-					TimeData firstTimeData = timeDataList.get(0);
+					final TimeData firstTimeData = timeDataList.get(0);
 					if (sumDistance == 0) {
 						firstTimeData.distance = Integer.MIN_VALUE;
 					}
@@ -471,17 +538,17 @@ public class HAC4DeviceReader extends TourbookDevice {
 					break;
 				}
 			}
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (fileRawData != null) {
 				try {
 					fileRawData.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}
@@ -494,9 +561,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 		return true;
 	}
 
-	private void readStartBlock(RandomAccessFile file, TourData tourData) throws IOException {
+	private void readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {
 
-		byte[] buffer = new byte[5];
+		final byte[] buffer = new byte[5];
 
 		file.read(buffer);
 		tourData.setDeviceTourType(new String(buffer, 0, 2));
@@ -524,18 +591,29 @@ public class HAC4DeviceReader extends TourbookDevice {
 		tourData.setStartPulse((short) Integer.parseInt(new String(buffer, 0, 4), 16));
 	}
 
+	public final int readSummary(final byte[] buffer) throws IOException {
+		final int ch0 = buffer[0];
+		final int ch1 = buffer[1];
+		final int ch2 = buffer[2];
+		final int ch3 = buffer[3];
+		if ((ch0 | ch1 | ch2 | ch3) < 0) {
+			throw new EOFException();
+		}
+		return ((ch1 << 8) + (ch0 << 0)) + ((ch3 << 8) + (ch2 << 0));
+	}
+
 	/**
 	 * @param timeData
 	 * @param rawData
 	 * @throws IOException
 	 */
-	public void readTimeSlice(RandomAccessFile file, TimeData timeData) throws IOException {
+	public void readTimeSlice(final RandomAccessFile file, final TimeData timeData) throws IOException {
 
 		// read encoded data
-		byte[] buffer = new byte[5];
+		final byte[] buffer = new byte[5];
 		file.read(buffer);
 
-		int data = Integer.parseInt(new String(buffer, 0, 4), 16);
+		final int data = Integer.parseInt(new String(buffer, 0, 4), 16);
 
 		// decode pulse (4 bits)
 		if ((data & 0x8000) != 0) {
@@ -562,75 +640,12 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 	}
 
-	public boolean validateRawDataNEW(String fileName) {
-
-		boolean isValid = false;
-
-		RandomAccessFile file = null;
-		try {
-
-			file = new RandomAccessFile(fileName, "r"); //$NON-NLS-1$
-
-			byte[] buffer = new byte[5];
-
-			// check header
-			file.read(buffer);
-			if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
-				return false;
-			}
-
-			int checksum = 0, lastValue = 0;
-
-			while (file.read(buffer) != -1) {
-				checksum = (checksum + lastValue) & 0xFFFF;
-
-				lastValue = readSummary(buffer);
-
-				// int lastValueOrig = Integer.parseInt(new String(buffer, 0,
-				// 4), 16);
-				// System.out.println(lastValueOrig + " " + lastValue);
-			}
-
-			if (checksum == lastValue) {
-				isValid = true;
-			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (NumberFormatException e) {
-			return false;
-		} finally {
-			if (file != null) {
-				try {
-					file.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		return isValid;
-	}
-
-	public final int readSummary(byte[] buffer) throws IOException {
-		int ch0 = buffer[0];
-		int ch1 = buffer[1];
-		int ch2 = buffer[2];
-		int ch3 = buffer[3];
-		if ((ch0 | ch1 | ch2 | ch3) < 0) {
-			throw new EOFException();
-		}
-		return ((ch1 << 8) + (ch0 << 0)) + ((ch3 << 8) + (ch2 << 0));
-	}
-
 	/**
 	 * checks if the data file has a valid HAC4 data format
 	 * 
 	 * @return true for a valid HAC4 data format
 	 */
-	public boolean validateRawData(String fileName) {
+	public boolean validateRawData(final String fileName) {
 
 		boolean isValid = false;
 
@@ -638,9 +653,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 		try {
 
-			byte[] buffer = new byte[5];
+			final byte[] buffer = new byte[5];
 
-			File dataFile = new File(fileName);
+			final File dataFile = new File(fileName);
 			inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
 			inStream.read(buffer);
@@ -673,17 +688,27 @@ public class HAC4DeviceReader extends TourbookDevice {
 				isValid = true;
 			}
 
-		} catch (NumberFormatException nfe) {
+			if (isChecksumValidation == false && isValid == false) {
+
+				System.out.println("Checksum validation failed for HAC4 file: " + fileName + ", validation is disabled");
+
+				/*
+				 * ignore validation
+				 */
+				isValid = true;
+			}
+
+		} catch (final NumberFormatException nfe) {
 			return false;
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			return false;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (inStream != null) {
 				try {
 					inStream.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}
@@ -692,66 +717,55 @@ public class HAC4DeviceReader extends TourbookDevice {
 		return isValid;
 	}
 
-	public String getDeviceModeName(int profileId) {
+	public boolean validateRawDataNEW(final String fileName) {
 
-		// "81" jogging 
-		// "91" ski 
-		// "A1" bike
-		// "B1" ski-bike
+		boolean isValid = false;
 
-		switch (profileId) {
-		case 129: // 0x81
-			return Messages.HAC4_Profile_jogging;
+		RandomAccessFile file = null;
+		try {
 
-		case 145: // 0x91
-			return Messages.HAC4_Profile_ski;
+			file = new RandomAccessFile(fileName, "r"); //$NON-NLS-1$
 
-		case 161: // 0xA1
-			return Messages.HAC4_Profile_bike;
+			final byte[] buffer = new byte[5];
 
-		case 177: // 0xB1
-			return Messages.HAC4_Profile_ski_bike;
+			// check header
+			file.read(buffer);
+			if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
+				return false;
+			}
+
+			int checksum = 0, lastValue = 0;
+
+			while (file.read(buffer) != -1) {
+				checksum = (checksum + lastValue) & 0xFFFF;
+
+				lastValue = readSummary(buffer);
+
+				// int lastValueOrig = Integer.parseInt(new String(buffer, 0,
+				// 4), 16);
+				// System.out.println(lastValueOrig + " " + lastValue);
+			}
+
+			if (checksum == lastValue) {
+				isValid = true;
+			}
+
+		} catch (final FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (final IOException e) {
+			e.printStackTrace();
+		} catch (final NumberFormatException e) {
+			return false;
+		} finally {
+			if (file != null) {
+				try {
+					file.close();
+				} catch (final IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
-		return "HAC4: unknown profile"; //$NON-NLS-1$
-	}
-
-	@Override
-	public SerialParameters getPortParameters(String portName) {
-
-		return new SerialParameters(portName,
-				9600,
-				SerialPort.FLOWCONTROL_NONE,
-				SerialPort.FLOWCONTROL_NONE,
-				SerialPort.DATABITS_8,
-				SerialPort.STOPBITS_1,
-				SerialPort.PARITY_NONE);
-	}
-
-	@Override
-	public boolean checkStartSequence(int byteIndex, int newByte) {
-
-		/*
-		 * check if the first 4 bytes are set to AFRO
-		 */
-		if (byteIndex == 0 & newByte == 'A') {
-			return true;
-		}
-		if (byteIndex == 1 & newByte == 'F') {
-			return true;
-		}
-		if (byteIndex == 2 & newByte == 'R') {
-			return true;
-		}
-		if (byteIndex == 3 & newByte == 'O') {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public int getStartSequenceSize() {
-		return 4;
+		return isValid;
 	}
 }
