@@ -24,11 +24,10 @@ public class ActionHandlerZoomIn extends ActionHandler {
 		fCommandId = Chart.COMMAND_ID_ZOOM_IN;
 	}
 
-	@Override
-	public Object execute(ExecutionEvent execEvent) throws ExecutionException {
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
 		fChart.onExecuteZoomIn();
-		
+
 		return null;
 	}
 

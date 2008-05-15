@@ -24,11 +24,10 @@ public class ActionHandlerPartPrevious extends ActionHandler {
 		fCommandId = Chart.COMMAND_ID_PART_PREVIOUS;
 	}
 
-	@Override
-	public Object execute(ExecutionEvent execEvent) throws ExecutionException {
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
 		fChart.onExecutePartPrevious();
-		
+
 		return null;
 	}
 

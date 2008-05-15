@@ -24,11 +24,10 @@ public class ActionHandlerFitGraph extends ActionHandler {
 		fCommandId = Chart.COMMAND_ID_FIT_GRAPH;
 	}
 
-	@Override
-	public Object execute(ExecutionEvent execEvent) throws ExecutionException {
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
 		fChart.onExecuteFitGraph();
-		
+
 		return null;
 	}
 

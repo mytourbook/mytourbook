@@ -24,8 +24,7 @@ public class ActionHandlerZoomOut extends ActionHandler {
 		fCommandId = Chart.COMMAND_ID_ZOOM_OUT;
 	}
 
-	@Override
-	public Object execute(ExecutionEvent execEvent) throws ExecutionException {
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
 		fChart.onExecuteZoomOut();
 
