@@ -223,6 +223,8 @@ public class Messages extends NLS {
 	public static String		import_data_action_adjust_imported_year;
 	public static String		import_data_action_clear_view;
 	public static String		import_data_action_clear_view_tooltip;
+
+	public static String	import_data_action_disable_hac4_checksum_validation;
 	public static String		import_data_action_merge_tracks;
 	public static String		import_data_action_save_tour_for_person;
 	public static String		import_data_action_save_tour_with_person;
