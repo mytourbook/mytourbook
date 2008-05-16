@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?artifactRepository class='org.eclipse.equinox.internal.p2.artifact.repository.simple.SimpleArtifactRepository' version='1.0.0'?>
+<repository name='file:/M:/mytourbook TRUNK/MyTourbook Update Site/ - artifacts' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1.0.0'>
+  <properties size='2'>
+    <property name='p2.compressed' value='false'/>
+    <property name='p2.timestamp' value='1210951896718'/>
+  </properties>
+  <mappings size='3'>
+    <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
+    <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
+    <rule filter='(&amp; (classifier=org.eclipse.update.feature))' output='${repoUrl}/features/${id}_${version}.jar'/>
+  </mappings>
+  <artifacts size='16'>
+    <artifact classifier='org.eclipse.update.feature' id='net.tourbook.patch.1.5.0.patch3' version='1.5.1.v20080515patch3'>
+      <properties size='2'>
+        <property name='artifact.size' value='7865'/>
+        <property name='download.size' value='7865'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='net.tourbook' version='1.5.1.v20080515'>
+      <properties size='2'>
+        <property name='artifact.size' value='1606755'/>
+        <property name='download.size' value='1606755'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='net.tourbook' version='1.5.1.v20080515'>
+      <properties size='2'>
+        <property name='artifact.size' value='1606844'/>
+        <property name='download.size' value='1606844'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='net.tourbook.device.hac4' version='1.5.1.v20080515'>
+      <properties size='2'>
+        <property name='artifact.size' value='13403'/>
+        <property name='download.size' value='13403'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='net.tourbook' version='1.5.1.v20080515'>
+      <properties size='2'>
+        <property name='artifact.size' value='1606872'/>
+        <property name='download.size' value='1606872'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='net.tourbook.patch.1.5.0.patch3' version='1.5.1.v20080515patch3'>
+      <properties size='2'>
+        <property name='artifact.size' value='7825'/>
+        <property name='download.size' value='7825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='net.tourbook.patch.1.5.0.patch3' version='1.5.1.v20080515patch3'>
+      <properties size='2'>
+        <property name='artifact.size' value='7810'/>
+        <property name='download.size' value='7810'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='net.tourbook.patch.1.5.0.patch3' version='1.5.1.v20080515patch3'>
+      <properties size='2'>
+        <property name='artifact.size' value='7877'/>
+        <property name='download.size' value='7877'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='net.tourbook.patch.1.5.0.patch3' version='1.5.1.v20080515patch3'>
+      <properties size='2'>
+        <property name='artifact.size' value='7933'/>
+        <property name='download.size' value='7933'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='net.tourbook' version='1.5.1.v20080515'>
+      <properties size='2'>
+        <property name='artifact.size' value='1606754'/>
+        <property name='download.size' value='1606754'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='net.tourbook' version='1.5.1.v20080515'>
+      <properties size='2'>
+        <property name='artifact.size' value='1606758'/>
+        <property name='download.size' value='1606758'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='net.tourbook' version='1.5.1.v20080515'>
+      <properties size='2'>
+        <property name='artifact.size' value='1606875'/>
+        <property name='download.size' value='1606875'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='net.tourbook.patch.1.5.0.patch3' version='1.5.1.v20080515patch3'>
+      <properties size='2'>
+        <property name='artifact.size' value='7871'/>
+        <property name='download.size' value='7871'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='net.tourbook.patch.1.5.0.patch3' version='1.5.1.v20080515patch3'>
+      <properties size='2'>
+        <property name='artifact.size' value='7813'/>
+        <property name='download.size' value='7813'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='net.tourbook' version='1.5.1.v20080515'>
+      <properties size='2'>
+        <property name='artifact.size' value='1606876'/>
+        <property name='download.size' value='1606876'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='net.tourbook.patch.1.5.0.patch3' version='1.5.1.v20080515patch3'>
+      <properties size='2'>
+        <property name='artifact.size' value='7820'/>
+        <property name='download.size' value='7820'/>
+      </properties>
+    </artifact>
+  </artifacts>
+</repository>
