@@ -337,7 +337,7 @@ public class TourDatabase {
 	 * @param entityClass
 	 * @return Returns <code>true</code> when the entity was saved
 	 */
-	public static boolean persistEntity(final Object entity, final long id, final Class<?> entityClass) {
+	public static boolean persistEntity(Object entity, final long id, final Class<?> entityClass) {
 
 		boolean isSaved = false;
 
@@ -359,7 +359,7 @@ public class TourDatabase {
 
 				} else {
 
-					em.merge(entity);
+					entity = em.merge(entity);
 				}
 			}
 			ts.commit();

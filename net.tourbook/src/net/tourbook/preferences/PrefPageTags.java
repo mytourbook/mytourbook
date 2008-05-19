@@ -16,6 +16,8 @@
 
 package net.tourbook.preferences;
 
+import java.util.Set;
+
 import javax.persistence.EntityManager;
 
 import net.tourbook.Messages;
@@ -23,9 +25,9 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tag.TVIRootItem;
 import net.tourbook.tag.TVITourTag;
 import net.tourbook.tag.TVITourTagCategory;
-import net.tourbook.tag.TourTagRootItem;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.UI;
 
@@ -37,6 +39,8 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -49,6 +53,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -62,12 +67,17 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private TreeViewer		fTagViewer;
+	private TreeViewer	fTagViewer;
 
-	private Button			fBtnNewTag;
-	private Button			fBtnRename;
+	private Button		fBtnNewTag;
+	private Button		fBtnRename;
 
-	public TourTagRootItem	fRootItem;
+	private TVIRootItem	fRootItem;
+
+	private Image		fImgFolderClosed	= TourbookPlugin.getImageDescriptor(Messages.Image__folder_closed)
+													.createImage();
+	private Image		fImgFolderOpened	= TourbookPlugin.getImageDescriptor(Messages.Image__folder_opened)
+													.createImage();
 
 	class TagViewerContentProvicer implements ITreeContentProvider {
 
@@ -187,7 +197,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		final Composite viewerContainer = createUI(parent);
 
 		// set root item
-		fRootItem = new TourTagRootItem();
+		fRootItem = new TVIRootItem();
 
 		updateViewers();
 
@@ -223,6 +233,31 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		fTagViewer.setSorter(new TagViewerSorter());
 		fTagViewer.setUseHashlookup(true);
 
+		fTagViewer.addDoubleClickListener(new IDoubleClickListener() {
+
+			public void doubleClick(final DoubleClickEvent event) {
+
+				final Object selection = ((IStructuredSelection) fTagViewer.getSelection()).getFirstElement();
+
+				if (selection instanceof TVITourTag) {
+
+					// tag is selected
+
+				} else if (selection instanceof TVITourTagCategory) {
+
+					// expand/collapse current item
+
+					final TreeViewerItem tourItem = (TVITourTagCategory) selection;
+
+					if (fTagViewer.getExpandedState(tourItem)) {
+						fTagViewer.collapseToLevel(tourItem, 1);
+					} else {
+						fTagViewer.expandToLevel(tourItem, 1);
+					}
+				}
+			}
+		});
+
 		/*
 		 * create columns
 		 */
@@ -240,15 +275,18 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 				if (element instanceof TVITourTag) {
 
-					cell.setText(((TVITourTag) element).getTourTag().getTagName());
+					cell.setText(((TVITourTag) element).getTourTag().getTagName()); //$NON-NLS-1$
 
 				} else if (element instanceof TVITourTagCategory) {
 
-					final TVITourTagCategory tourTagCategory = (TVITourTagCategory) element;
+					final TVITourTagCategory tourTagCategoryItem = (TVITourTagCategory) element;
+					final TourTagCategory tourTagCategory = tourTagCategoryItem.getTourTagCategory();
 
-					cell.setText(tourTagCategory.getTourTagCategory().getCategoryName());
+					cell.setText(tourTagCategory.getCategoryName()); //$NON-NLS-1$
 
-					cell.setImage(getImage());
+					cell.setImage(fTagViewer.getExpandedState(tourTagCategoryItem)
+							? fImgFolderOpened
+							: fImgFolderClosed);
 				}
 			}
 		});
@@ -281,6 +319,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	@Override
 	public void dispose() {
+
+		fImgFolderOpened.dispose();
+		fImgFolderClosed.dispose();
 
 		super.dispose();
 	}
@@ -320,30 +361,87 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			return;
 		}
 
-		// create tour tag category + item
-		final TourTagCategory tourTagCategory = new TourTagCategory(inputDialog.getValue().trim());
-		final TVITourTagCategory categoryItem = new TVITourTagCategory(tourTagCategory);
+		// create tour tag category + tree item
+		final TourTagCategory newTourTagCategory = new TourTagCategory(inputDialog.getValue().trim());
+		final TVITourTagCategory newCategoryItem = new TVITourTagCategory(newTourTagCategory);
+
+		boolean isSaved = false;
 
 		final Object parentElement = ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
 		if (parentElement == null) {
 
 			// a parent is not selected, this will be a root category
 
-			tourTagCategory.setRoot(true);
+			newTourTagCategory.setRoot(true);
 
 			/*
 			 * update model
 			 */
 
-			fRootItem.getFetchedChildren().add(categoryItem);
+			fRootItem.getFetchedChildren().add(newCategoryItem);
 
-			// persist category
-			TourDatabase.persistEntity(tourTagCategory, tourTagCategory.getCategoryId(), TourTagCategory.class);
+			// persist new category
+			isSaved = TourDatabase.persistEntity(newTourTagCategory,
+					newTourTagCategory.getCategoryId(),
+					TourTagCategory.class);
+
+			// update viewer
+			fTagViewer.add(this, newCategoryItem);
+
+		} else if (parentElement instanceof TVITourTagCategory) {
+
+			// parent is a category
+
+			final TVITourTagCategory parentCategoryItem = (TVITourTagCategory) parentElement;
+			TourTagCategory parentTourTagCategory = parentCategoryItem.getTourTagCategory();
 
 			/*
-			 * update viewer
+			 * update model
 			 */
-			fTagViewer.add(this, categoryItem);
+
+			final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+			// persist new category
+			isSaved = TourDatabase.persistEntity(newTourTagCategory,
+					newTourTagCategory.getCategoryId(),
+					TourTagCategory.class);
+
+			if (isSaved) {
+
+				// update parent category
+				{
+					final TourTagCategory parentTourTagCategoryEntity = em.find(TourTagCategory.class,
+							parentTourTagCategory.getCategoryId());
+
+					// set new entity
+					parentTourTagCategory = parentTourTagCategoryEntity;
+					parentCategoryItem.setTourTagCategory(parentTourTagCategoryEntity);
+
+					// set tag in parent category
+					final Set<TourTagCategory> lazyTourTagCategories = parentTourTagCategoryEntity.getTagCategories();
+					lazyTourTagCategories.add(newTourTagCategory);
+				}
+
+				// persist parent category
+				isSaved = TourDatabase.persistEntity(parentTourTagCategory,
+						parentTourTagCategory.getCategoryId(),
+						TourTagCategory.class);
+
+				// update viewer
+				fTagViewer.add(parentCategoryItem, newCategoryItem);
+			}
+
+			em.close();
+
+		}
+
+		if (isSaved) {
+
+			// reveal new tag in viewer
+			fTagViewer.reveal(newCategoryItem);
+
+		} else {
+			MessageDialog.openError(getShell(), "Error", "Error occured when saving new tag/category");//$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -412,31 +510,51 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			// parent is a category
 
 			final TVITourTagCategory parentCategoryItem = (TVITourTagCategory) parentElement;
-			final TourTagCategory parentTourTagCategory = parentCategoryItem.getTourTagCategory();
+			TourTagCategory parentTourTagCategory = parentCategoryItem.getTourTagCategory();
 
 			/*
 			 * update model
 			 */
 
-			final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-			// set category in tag
-			tourTag.getTagCategories().add(parentTourTagCategory);
-
-			// set tag in parent category
-			parentTourTagCategory.getTourTags().add(tourTag);
-
-			// persist tag
+			/*
+			 * persist tag without new category otherwise an exception "detached entity passed to
+			 * persist: net.tourbook.data.TourTagCategory" is raised
+			 */
 			isSaved = TourDatabase.persistEntity(tourTag, tourTag.getTagId(), TourTag.class);
 			if (isSaved) {
 
-				// persist category
+				// update parent category
+				final EntityManager em = TourDatabase.getInstance().getEntityManager();
+				{
+
+					final TourTagCategory parentTourTagCategoryEntity = em.find(TourTagCategory.class,
+							parentTourTagCategory.getCategoryId());
+
+					// set new entity
+					parentTourTagCategory = parentTourTagCategoryEntity;
+					parentCategoryItem.setTourTagCategory(parentTourTagCategoryEntity);
+
+					// set tag in parent category
+					final Set<TourTag> lazyTourTags = parentTourTagCategoryEntity.getTourTags();
+					lazyTourTags.add(tourTag);
+
+				}
+				em.close();
+
+				// persist parent category
 				isSaved = TourDatabase.persistEntity(parentTourTagCategory,
 						parentTourTagCategory.getCategoryId(),
 						TourTagCategory.class);
-			}
 
-			em.close();
+				if (isSaved) {
+
+					// set category in tag
+					tourTag.getTagCategories().add(parentTourTagCategory);
+
+					// persist tag with category
+					isSaved = TourDatabase.persistEntity(tourTag, tourTag.getTagId(), TourTag.class);
+				}
+			}
 
 			if (isSaved) {
 
@@ -453,7 +571,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 			// parent is a tag
 
-			final TVITourTag tviTourTag = (TVITourTag) parentElement;
+//			final TVITourTag tviTourTag = (TVITourTag) parentElement;
 
 		}
 
@@ -465,7 +583,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			// fTagViewer.setSelection(new StructuredSelection(tourTagItem), true);
 
 		} else {
-			MessageDialog.openError(getShell(), "Error", "Error occured when saving new tag");
+			MessageDialog.openError(getShell(), "Error", "Error occured when saving new tag"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -508,19 +626,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		return true;
 	}
-
-//	private void saveFilterList() {
-//
-//		if (fIsModified) {
-//
-//			fIsModified = false;
-//
-//			TourTypeContributionItem.writeXMLFilterFile(fTagViewer);
-//
-//			// fire modify event
-//			getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
-//		}
-//	}
 
 	private void updateViewers() {
 

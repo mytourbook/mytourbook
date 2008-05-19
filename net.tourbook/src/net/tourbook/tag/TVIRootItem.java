@@ -26,7 +26,7 @@ import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
 
-public class TourTagRootItem extends TreeViewerItem {
+public class TVIRootItem extends TreeViewerItem {
 
 	@SuppressWarnings("unchecked")
 	@Override

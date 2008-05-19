@@ -173,6 +173,10 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour_disabled;
 	public static String		Image__fit_to_window;
 
+	public static String	Image__folder_closed;
+
+	public static String	Image__folder_opened;
+
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;

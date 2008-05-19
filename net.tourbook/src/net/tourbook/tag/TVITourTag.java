@@ -28,11 +28,16 @@ public class TVITourTag extends TreeViewerItem {
 
 	@Override
 	protected void fetchChildren() {
-
+	// a tag has no children
 	}
 
 	public TourTag getTourTag() {
 		return fTourTag;
+	}
+
+	@Override
+	public boolean hasChildren() {
+		return false;
 	}
 
 	@Override

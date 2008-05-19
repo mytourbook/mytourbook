@@ -15,7 +15,14 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
+import java.util.ArrayList;
+import java.util.Set;
+
+import javax.persistence.EntityManager;
+
+import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
 
 public class TVITourTagCategory extends TreeViewerItem {
@@ -29,6 +36,30 @@ public class TVITourTagCategory extends TreeViewerItem {
 	@Override
 	protected void fetchChildren() {
 
+		// set childrens
+		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
+		setChildren(children);
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		if (em != null) {
+
+			final TourTagCategory tourTagCategory = em.find(TourTagCategory.class, fTourTagCategory.getCategoryId());
+
+			// create tree tag items
+			final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
+			for (final TourTag tourTag : lazyTourTags) {
+				children.add(new TVITourTag(tourTag));
+			}
+
+			// create tree category items
+			final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
+			for (final TourTagCategory tagCategory : lazyTourTagCategories) {
+				children.add(new TVITourTagCategory(tagCategory));
+			}
+
+			em.close();
+		}
 	}
 
 	/**
@@ -41,6 +72,10 @@ public class TVITourTagCategory extends TreeViewerItem {
 	@Override
 	protected void remove() {
 
+	}
+
+	public void setTourTagCategory(final TourTagCategory tourTagCategoryEntity) {
+		fTourTagCategory = tourTagCategoryEntity;
 	}
 
 }

@@ -17,6 +17,7 @@
 package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.FetchType.LAZY;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -49,10 +50,10 @@ public class TourTag {
 	@Basic(optional = false)
 	private String					name;
 
-	@ManyToMany(mappedBy = "tourTags", cascade = ALL)
+	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
 	private Set<TourData>			tourData		= new HashSet<TourData>();
 
-	@ManyToMany(mappedBy = "tourTags", cascade = ALL)//$NON-NLS-1$
+	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)//$NON-NLS-1$
 	private Set<TourTagCategory>	tourTagCategory	= new HashSet<TourTagCategory>();
 
 	public TourTag() {}

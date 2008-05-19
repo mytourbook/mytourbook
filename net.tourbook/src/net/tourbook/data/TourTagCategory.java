@@ -21,6 +21,7 @@ import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -35,25 +36,25 @@ public class TourTagCategory {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long			tagCategoryId	= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long					tagCategoryId	= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	/**
 	 * derby does not support BOOLEAN, 1 = <code>true</code>, 0 = <code>false</code>
 	 */
-	private int				isRoot			= 0;
+	private int						isRoot			= 0;
 
 	@Basic(optional = false)
-	private String			name;
+	private String					name;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"), //
 	joinColumns = @JoinColumn(name = "tourTagCategory_tagCategoryId", referencedColumnName = "tagCategoryId"))
-	private Set<TourTag>	tourTags		= new HashSet<TourTag>();
+	private Set<TourTag>			tourTags		= new HashSet<TourTag>();
 
-//	@ManyToMany(cascade = ALL, fetch = LAZY)
-//	@JoinTable(joinColumns = @JoinColumn(name = "TourTagCategory_tagCategoryId1", referencedColumnName = "tagCategoryId"), //
-//	inverseJoinColumns = @JoinColumn(name = "tourTagCategory_tagCategoryId2", referencedColumnName = "tagCategoryId"))
-//	private Set<TourTagCategory>	tourTagCategory	= new HashSet<TourTagCategory>();
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(joinColumns = @JoinColumn(name = "TourTagCategory_tagCategoryId1", referencedColumnName = "tagCategoryId"), //
+	inverseJoinColumns = @JoinColumn(name = "tourTagCategory_tagCategoryId2", referencedColumnName = "tagCategoryId"))
+	private Set<TourTagCategory>	tourTagCategory	= new HashSet<TourTagCategory>();
 
 	/**
 	 * default constructor used in ejb
@@ -72,12 +73,13 @@ public class TourTagCategory {
 		return name;
 	}
 
-//	public Set<TourTagCategory> getTagCategories() {
-//		return tourTagCategory;
-//	}
+	public Set<TourTagCategory> getTagCategories() {
+		return tourTagCategory;
+	}
 
 	/**
-	 * @return Returns the tags which belong to this category
+	 * @return Returns the tags which belong to this category, the tags will be fetched with the
+	 * 	fetch type {@link FetchType#LAZY}
 	 */
 	public Set<TourTag> getTourTags() {
 		return tourTags;

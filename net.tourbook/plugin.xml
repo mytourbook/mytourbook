@@ -426,7 +426,7 @@
          </command>
          <command
                commandId="net.tourbook.command.device.importFromFile"
-               icon="icons/open_folder_add.gif"
+               icon="icons/folder_open_add.gif"
                label="%command_device_importFromFile">
          </command>
          <separator

@@ -1,1 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="System Color" enabled="true" name="syscol">Display.getCurrent().getSystemColor(SWT.COLOR_${cursor})</template></templates>
+<?xml version="1.0" encoding="UTF-8"?><templates><template autoinsert="true" context="java-statements" deleted="false" description="if null" enabled="true" name="ifnull">if (${cursor} == null) {&#13;
+	&#13;
+}</template></templates>
