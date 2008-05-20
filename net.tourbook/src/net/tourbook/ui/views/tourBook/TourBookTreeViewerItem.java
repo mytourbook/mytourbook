@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,6 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.ui.views.tourBook;
 
 import java.util.Calendar;
@@ -68,24 +69,24 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 	long				fColumnAvgCadence;
 	long				fColumnAvgTemperature;
 
-	TourBookTreeViewerItem(TourBookView view) {
+	TourBookTreeViewerItem(final TourBookView view) {
 		fView = view;
 	}
 
-	public void addSumData(	long long1,
-							long long2,
-							long long3,
-							long long4,
-							long long5,
-							long long6,
-							float float7,
-							long long8,
-							long long9,
-							long long10,
-							long long11,
-							long long12,
-							long long13,
-							long long14) {
+	public void addSumData(	final long long1,
+							final long long2,
+							final long long3,
+							final long long4,
+							final long long5,
+							final long long6,
+							final float float7,
+							final long long8,
+							final long long9,
+							final long long10,
+							final long long11,
+							final long long12,
+							final long long13,
+							final long long14) {
 
 		fColumnDistance = long1;
 
@@ -101,7 +102,7 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 
 		// prevent divide by 0
 		// 3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME)	
-		fColumnAvgSpeed = (float) (long9 == 0 ? 0 : 3.6 * (float) long8 / long9);
+		fColumnAvgSpeed = (float) (long9 == 0 ? 0 : 3.6 * long8 / long9);
 
 		fColumnMaxAltitude = long10;
 		fColumnMaxPulse = long11;
@@ -116,14 +117,13 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 	}
 
 	/**
-	 * @return Returns a sql statement string to select only the data which tour type is defined in
-	 *         fTourTypeId
+	 * @return Returns a sql statement string to select only the data which for the selected person
 	 */
 	String sqlTourPersonId() {
 
-		StringBuffer sqlString = new StringBuffer();
+		final StringBuffer sqlString = new StringBuffer();
 
-		long personId = fView.fActivePerson == null ? -1 : fView.fActivePerson.getPersonId();
+		final long personId = fView.fActivePerson == null ? -1 : fView.fActivePerson.getPersonId();
 
 		if (personId == -1) {
 			// select all people
@@ -136,7 +136,7 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 
 	/**
 	 * @return Returns a sql statement string to select only the data which tour type is defined in
-	 *         fTourTypeId
+	 * 	fTourTypeId
 	 */
 	String sqlTourTypeId() {
 

@@ -375,6 +375,11 @@ public class TourDatabase {
 			em.close();
 		}
 
+		if (isSaved == false) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(),//
+					"Error", "Error occured when saving an entity"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
 		return isSaved;
 	}
 
@@ -1066,8 +1071,11 @@ public class TourDatabase {
 	 */
 	private void createTableTourTag(final Statement stmt) throws SQLException {
 
-		// CREATE TABLE TourTag
+		/*
+		 * creates the tables for the tour tags for VERSION 5
+		 */
 
+		// CREATE TABLE TourTag
 		String sql;
 
 		sql = ("CREATE TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
@@ -1131,6 +1139,10 @@ public class TourDatabase {
 	}
 
 	private void createTableTourTagCategory(final Statement stmt) throws SQLException {
+
+		/*
+		 * creates the tables for the tour tag categories for VERSION 5
+		 */
 
 		String sql;
 
@@ -1661,10 +1673,8 @@ public class TourDatabase {
 		try {
 			final Statement statement = conn.createStatement();
 
-			final String sql;
-
-			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceMode			SMALLINT DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			createTableTourTag(statement);
+			createTableTourTagCategory(statement);
 
 			statement.executeBatch();
 			statement.close();

@@ -26,6 +26,9 @@ public abstract class TreeViewerItem {
 	private TreeViewerItem				fParentItem	= null;
 	private ArrayList<TreeViewerItem>	fChildren	= null;
 
+	/**
+	 * fetches the children for this tree item an updates {@link #fChildren}
+	 */
 	protected abstract void fetchChildren();
 
 	/**
@@ -63,6 +66,7 @@ public abstract class TreeViewerItem {
 		if (fChildren == null) {
 			fetchChildren();
 		}
+
 		if (fChildren == null) {
 			return new Object[0];
 		}
@@ -75,8 +79,8 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
-	 * @return Returns a list with all childrens of this item, when the childrens have not been
-	 * 	fetched, <code>null</code> will be returned
+	 * @return Returns a list with all childrens of this item, <code>null</code> will be returned
+	 * 	when childrens have not yet been fetched
 	 */
 	public ArrayList<TreeViewerItem> getUnfetchedChildren() {
 		return fChildren;
@@ -96,6 +100,13 @@ public abstract class TreeViewerItem {
 	}
 
 	protected abstract void remove();
+
+	/**
+	 * reset children that they will be fetched again
+	 */
+	public void resetChildren() {
+		fChildren = null;
+	}
 
 	public void setChildren(final ArrayList<TreeViewerItem> children) {
 		fChildren = children;

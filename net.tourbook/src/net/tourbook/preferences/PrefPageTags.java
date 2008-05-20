@@ -32,7 +32,6 @@ import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.PreferencePage;
@@ -41,8 +40,10 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
@@ -78,6 +79,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 													.createImage();
 	private Image		fImgFolderOpened	= TourbookPlugin.getImageDescriptor(Messages.Image__folder_opened)
 													.createImage();
+
+	private Button		fBtnNewTagCategory;
 
 	class TagViewerContentProvicer implements ITreeContentProvider {
 
@@ -125,6 +128,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 				return 1;
 
+			} else if (obj2 instanceof TVITourTag && obj1 instanceof TVITourTagCategory) {
+
+				return -1;
+
 			} else if (obj1 instanceof TVITourTagCategory && obj2 instanceof TVITourTagCategory) {
 
 				final TourTagCategory tourTagCat1 = ((TVITourTagCategory) (obj1)).getTourTagCategory();
@@ -168,10 +175,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		});
 
 		// button: new tag category
-		fBtnNewTag = new Button(container, SWT.NONE);
-		fBtnNewTag.setText(Messages.pref_tourtag_btn_new_tag_category);
-		setButtonLayoutData(fBtnNewTag);
-		fBtnNewTag.addSelectionListener(new SelectionAdapter() {
+		fBtnNewTagCategory = new Button(container, SWT.NONE);
+		fBtnNewTagCategory.setText(Messages.pref_tourtag_btn_new_tag_category);
+		setButtonLayoutData(fBtnNewTagCategory);
+		fBtnNewTagCategory.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onNewCategory();
@@ -200,6 +207,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		fRootItem = new TVIRootItem();
 
 		updateViewers();
+		enableButtons();
 
 		return viewerContainer;
 	}
@@ -232,6 +240,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		fTagViewer.setContentProvider(new TagViewerContentProvicer());
 		fTagViewer.setSorter(new TagViewerSorter());
 		fTagViewer.setUseHashlookup(true);
+		fTagViewer.getTree().setLinesVisible(true);
 
 		fTagViewer.addDoubleClickListener(new IDoubleClickListener() {
 
@@ -243,11 +252,13 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 					// tag is selected
 
+					onRenameTourTag();
+
 				} else if (selection instanceof TVITourTagCategory) {
 
 					// expand/collapse current item
 
-					final TreeViewerItem tourItem = (TVITourTagCategory) selection;
+					final TreeViewerItem tourItem = (TreeViewerItem) selection;
 
 					if (fTagViewer.getExpandedState(tourItem)) {
 						fTagViewer.collapseToLevel(tourItem, 1);
@@ -255,6 +266,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 						fTagViewer.expandToLevel(tourItem, 1);
 					}
 				}
+			}
+		});
+
+		fTagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(final SelectionChangedEvent event) {
+				enableButtons();
 			}
 		});
 
@@ -284,9 +301,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 					cell.setText(tourTagCategory.getCategoryName()); //$NON-NLS-1$
 
-					cell.setImage(fTagViewer.getExpandedState(tourTagCategoryItem)
-							? fImgFolderOpened
-							: fImgFolderClosed);
+					final boolean expandedState = fTagViewer.getExpandedState(tourTagCategoryItem);
+					cell.setImage(expandedState ? fImgFolderOpened : fImgFolderClosed);
 				}
 			}
 		});
@@ -328,11 +344,21 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	private void enableButtons() {
 
-		final IStructuredSelection selection = (IStructuredSelection) fTagViewer.getSelection();
+		final Object selection = ((IStructuredSelection) fTagViewer.getSelection()).getFirstElement();
 
-		final TourTag tourTag = (TourTag) selection.getFirstElement();
+		boolean isTourTag = false;
+		boolean isTagCategory = false;
+		final boolean isSelection = selection != null;
 
-		fBtnRename.setEnabled(tourTag != null);
+		if (selection instanceof TVITourTag) {
+			isTourTag = true;
+		} else if (selection instanceof TVITourTagCategory) {
+			isTagCategory = true;
+		}
+
+		fBtnNewTag.setEnabled(isSelection == false || isTagCategory == true && isTourTag == false);
+		fBtnNewTagCategory.setEnabled(isSelection == false || isTagCategory == true && isTourTag == false);
+		fBtnRename.setEnabled(isSelection);
 	}
 
 	public void init(final IWorkbench workbench) {
@@ -363,7 +389,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		// create tour tag category + tree item
 		final TourTagCategory newTourTagCategory = new TourTagCategory(inputDialog.getValue().trim());
-		final TVITourTagCategory newCategoryItem = new TVITourTagCategory(newTourTagCategory);
+		final TreeViewerItem newCategoryItem = new TVITourTagCategory(newTourTagCategory);
 
 		boolean isSaved = false;
 
@@ -427,8 +453,17 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 						parentTourTagCategory.getCategoryId(),
 						TourTagCategory.class);
 
-				// update viewer
-				fTagViewer.add(parentCategoryItem, newCategoryItem);
+				if (isSaved) {
+
+					/*
+					 * update viewer
+					 */
+					parentCategoryItem.resetChildren();
+
+					fTagViewer.add(parentCategoryItem, newCategoryItem);
+
+					fTagViewer.expandToLevel(parentCategoryItem, 1);
+				}
 			}
 
 			em.close();
@@ -439,9 +474,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 			// reveal new tag in viewer
 			fTagViewer.reveal(newCategoryItem);
-
-		} else {
-			MessageDialog.openError(getShell(), "Error", "Error occured when saving new tag/category");//$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -554,6 +586,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 					// persist tag with category
 					isSaved = TourDatabase.persistEntity(tourTag, tourTag.getTagId(), TourTag.class);
 				}
+
 			}
 
 			if (isSaved) {
@@ -564,7 +597,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				/*
 				 * update viewer
 				 */
+				parentCategoryItem.resetChildren();
+
 				fTagViewer.add(parentCategoryItem, tourTagItem);
+
+				fTagViewer.expandToLevel(parentCategoryItem, 1);
 			}
 
 		} else if (parentElement instanceof TVITourTag) {
@@ -579,25 +616,27 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 			// show new tag in viewer
 			fTagViewer.reveal(tourTagItem);
-
-			// fTagViewer.setSelection(new StructuredSelection(tourTagItem), true);
-
-		} else {
-			MessageDialog.openError(getShell(), "Error", "Error occured when saving new tag"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
 	/**
-	 * Rename selected tag
+	 * Rename selected tag/category
 	 */
 	private void onRenameTourTag() {
 
-		final TourTag tourTag = (TourTag) ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
+		final Object selection = ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
+		String name = UI.EMPTY_STRING;
+
+		if (selection instanceof TVITourTag) {
+			name = ((TVITourTag) selection).getTourTag().getTagName();
+		} else if (selection instanceof TVITourTagCategory) {
+			name = ((TVITourTagCategory) selection).getTourTagCategory().getCategoryName();
+		}
 
 		final InputDialog inputDialog = new InputDialog(getShell(),
 				Messages.pref_tourtag_dlg_rename_title,
 				Messages.pref_tourtag_dlg_rename_message,
-				tourTag.getTagName(),
+				name,
 				null);
 
 		inputDialog.open();
@@ -606,16 +645,34 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			return;
 		}
 
-		// update model
-		tourTag.setTagName(inputDialog.getValue().trim());
+		// save changed name
 
-		// update entity in the db
-		if (TourDatabase.persistEntity(tourTag, tourTag.getTagId(), TourTag.class)) {
+		name = inputDialog.getValue().trim();
 
-			// update viewer
-			fTagViewer.update(tourTag, null);
+		if (selection instanceof TVITourTag) {
 
-//			fIsModified = true;
+			final TVITourTag tourTagItem = ((TVITourTag) selection);
+			final TourTag tourTag = tourTagItem.getTourTag();
+
+			tourTag.setTagName(name);
+
+			// persist tag
+			TourDatabase.persistEntity(tourTag, tourTag.getTagId(), TourTag.class);
+
+			fTagViewer.update(tourTagItem, null);
+
+		} else if (selection instanceof TVITourTagCategory) {
+
+			final TVITourTagCategory tourCategoryItem = ((TVITourTagCategory) selection);
+			final TourTagCategory tourCategory = tourCategoryItem.getTourTagCategory();
+
+			tourCategory.setName(name);
+
+			// persist category
+			TourDatabase.persistEntity(tourCategory, tourCategory.getCategoryId(), TourTagCategory.class);
+
+			fTagViewer.update(tourCategoryItem, null);
+
 		}
 	}
 

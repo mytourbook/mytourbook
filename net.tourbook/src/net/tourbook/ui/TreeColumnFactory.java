@@ -39,6 +39,24 @@ public abstract class TreeColumnFactory {
 		};
 	};
 
+	public static final TreeColumnFactory TAG = new TreeColumnFactory() {
+		
+		@Override
+		public TreeColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter) {
+			
+			TreeColumnDefinition colDef = new TreeColumnDefinition("tag", SWT.TRAIL); //$NON-NLS-1$
+			
+			colDef.setLabel(Messages.ColumnFactory_tag_label);
+			colDef.setText(Messages.ColumnFactory_tag);
+			colDef.setToolTipText(Messages.ColumnFactory_tag_tooltip);
+			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(20));
+			
+			columnManager.addColumn(colDef); 
+			
+			return colDef;
+		};
+	};
+
 	public static final TreeColumnFactory TITLE = new TreeColumnFactory() {
 		
 		@Override

@@ -77,11 +77,6 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 	private final DateFormat						fDateFormatter			= DateFormat.getDateInstance(DateFormat.FULL);
 	private NumberFormat							fNumberFormatter		= NumberFormat.getNumberInstance();
-	{
-		fNumberFormatter.setMinimumFractionDigits(1);
-		fNumberFormatter.setMaximumFractionDigits(1);
-	}
-
 	/**
 	 * contains all {@link TourCatalogItemComparedTour} tour objects for all years
 	 */
@@ -93,30 +88,30 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	private TourCatalogItemReferenceTour			fCurrentRefItem;
 
 	private PageBook								fPageBook;
-	private Label									fPageNoChart;
 
+	private Label									fPageNoChart;
 	/**
 	 * selection which is thrown by the year statistic
 	 */
 	private StructuredSelection						fCurrentSelection;
 
 	private ITourPropertyListener					fCompareTourPropertyListener;
+
 	private IPropertyChangeListener					fPrefChangeListener;
 	private IPartListener2							fPartListener;
-
 	private IAction									fActionSynchChartScale;
-	private ActionSelectYears						fActionSelectYears;
 
+	private ActionSelectYears						fActionSelectYears;
 	private boolean									fIsSynchMaxValue;
 
 	private IMemento								fSessionMemento;
 
 	private int										fNumberOfYears;
+
 	private int										fYoungesYear			= new DateTime().getYear();
-
 	private int[]									fAllYears;
-	private int[]									fYearDays;
 
+	private int[]									fYearDays;
 	/**
 	 * Day of year values for all years
 	 */
@@ -126,6 +121,11 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	 * Tour speed for all years
 	 */
 	private ArrayList<Integer>						fTourSpeed;
+
+	{
+		fNumberFormatter.setMinimumFractionDigits(1);
+		fNumberFormatter.setMaximumFractionDigits(1);
+	}
 
 	public TourCatalogViewYearStatistic() {}
 
@@ -316,7 +316,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		 */
 		final int oldestYear = fYoungesYear - fNumberOfYears + 1;
 		final int tourDOY = fDOYValues.get(valueIndex);
-		DateTime tourDate = new DateTime(oldestYear, 1, 1, 0, 0, 0, 1).plusDays(tourDOY);
+		final DateTime tourDate = new DateTime(oldestYear, 1, 1, 0, 0, 0, 1).plusDays(tourDOY);
 
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.tourCatalog_view_tooltip_speed);
@@ -362,29 +362,6 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		super.dispose();
-	}
-
-	/**
-	 * get data for each displayed year
-	 */
-	private void setYearData() {
-
-		fYearDays = new int[fNumberOfYears];
-		fAllYears = new int[fNumberOfYears];
-
-		final int firstYear = fYoungesYear - fNumberOfYears + 1;
-
-		final DateTime dt = (new DateTime()).withYear(firstYear)
-				.withWeekOfWeekyear(1)
-				.withDayOfWeek(DateTimeConstants.MONDAY);
-
-		int yearIndex = 0;
-		for (int currentYear = firstYear; currentYear <= fYoungesYear; currentYear++) {
-
-			fAllYears[yearIndex] = currentYear;
-			fYearDays[yearIndex] = dt.withYear(currentYear).dayOfYear().getMaximumValue();
-			yearIndex++;
-		}
 	}
 
 	/**
@@ -470,7 +447,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 				// select first tour for the youngest year
 				int yearIndex = 0;
-				for (TourCatalogItemComparedTour tourItem : fAllTours) {
+				for (final TourCatalogItemComparedTour tourItem : fAllTours) {
 
 					if (new DateTime(tourItem.getTourDate()).getYear() == fYoungesYear) {
 						break;
@@ -478,7 +455,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 					yearIndex++;
 				}
 
-				if (fAllTours != null || fAllTours.size() >= yearIndex) {
+				if (fAllTours != null && fAllTours.size() > 0 && fAllTours.size() >= yearIndex) {
 					selectTourInYearStatistic(fAllTours.get(yearIndex).getTourId());
 				}
 
@@ -571,7 +548,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	 * select the tour in the year map chart
 	 * 
 	 * @param selectedTourId
-	 *        tour id which should be selected
+	 * 		tour id which should be selected
 	 */
 	private void selectTourInYearStatistic(final long selectedTourId) {
 
@@ -598,6 +575,29 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	}
 
 	/**
+	 * get data for each displayed year
+	 */
+	private void setYearData() {
+
+		fYearDays = new int[fNumberOfYears];
+		fAllYears = new int[fNumberOfYears];
+
+		final int firstYear = fYoungesYear - fNumberOfYears + 1;
+
+		final DateTime dt = (new DateTime()).withYear(firstYear)
+				.withWeekOfWeekyear(1)
+				.withDayOfWeek(DateTimeConstants.MONDAY);
+
+		int yearIndex = 0;
+		for (int currentYear = firstYear; currentYear <= fYoungesYear; currentYear++) {
+
+			fAllYears[yearIndex] = currentYear;
+			fYearDays[yearIndex] = dt.withYear(currentYear).dayOfYear().getMaximumValue();
+			yearIndex++;
+		}
+	}
+
+	/**
 	 * Update statistic by setting the number of years
 	 * 
 	 * @param numberOfYears
@@ -614,9 +614,9 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	 * show statistic for several years
 	 * 
 	 * @param showYoungestYear
-	 *        shows the youngest year and the years before
+	 * 		shows the youngest year and the years before
 	 */
-	private void updateYearBarChart(boolean showYoungestYear) {
+	private void updateYearBarChart(final boolean showYoungestYear) {
 
 		if (fCurrentRefItem == null) {
 			return;
@@ -634,14 +634,14 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 		// get youngest year if this is forced
 		if (yearItems != null && yearItems.length > 0 && showYoungestYear) {
-			Object item = yearItems[yearItems.length - 1];
+			final Object item = yearItems[yearItems.length - 1];
 			if (item instanceof TourCatalogItemYear) {
-				TourCatalogItemYear youngestYearItem = (TourCatalogItemYear) item;
+				final TourCatalogItemYear youngestYearItem = (TourCatalogItemYear) item;
 				fYoungesYear = youngestYearItem.year;
 			}
 		}
 
-		int firstYear = fYoungesYear - fNumberOfYears + 1;
+		final int firstYear = fYoungesYear - fNumberOfYears + 1;
 
 		// loop: all years
 		for (final Object yearItemObj : yearItems) {
@@ -660,7 +660,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 							final TourCatalogItemComparedTour tourItem = (TourCatalogItemComparedTour) tourItemObj;
 
-							DateTime dt = new DateTime(tourItem.getTourDate());
+							final DateTime dt = new DateTime(tourItem.getTourDate());
 
 							fDOYValues.add(getYearDOYs(dt.getYear()) + dt.getDayOfYear() - 1);
 							fTourSpeed.add((int) (tourItem.getTourSpeed() * 10 / UI.UNIT_VALUE_DISTANCE));

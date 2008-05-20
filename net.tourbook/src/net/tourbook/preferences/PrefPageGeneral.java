@@ -48,10 +48,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	private Label					fLblExample;
 	private Label					fLblExampleValue;
 
-	public void init(IWorkbench workbench) {
-		setPreferenceStore(fPrefStore);
-	}
-
 	@Override
 	protected void createFieldEditors() {
 
@@ -187,23 +183,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		setExampleValue();
 	}
 
-	private void setExampleValue() {
-
-		final String groupSep = fTxtGroupSep.getStringValue();
-
-		StringBuilder buffer = new StringBuilder();
-		buffer.append("123"); //$NON-NLS-1$
-		buffer.append(groupSep);
-		buffer.append("456"); //$NON-NLS-1$
-		buffer.append(groupSep);
-		buffer.append("789"); //$NON-NLS-1$
-		buffer.append(fTxtDecimalSep.getStringValue());
-		buffer.append("34"); //$NON-NLS-1$
-
-		fLblExampleValue.setText(buffer.toString());
-		fLblExampleValue.pack(true);
-	}
-
 	private void enableControls() {
 
 		boolean isUseCustomFormat = fChkUseCustomFormat.getBooleanValue();
@@ -213,6 +192,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		fLblExample.setEnabled(isUseCustomFormat);
 		fLblExampleValue.setEnabled(isUseCustomFormat);
+	}
+
+	public void init(IWorkbench workbench) {
+		setPreferenceStore(fPrefStore);
 	}
 
 	@Override
@@ -235,6 +218,23 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		}
 
 		return isOK;
+	}
+
+	private void setExampleValue() {
+
+		final String groupSep = fTxtGroupSep.getStringValue();
+
+		StringBuilder buffer = new StringBuilder();
+		buffer.append("123"); //$NON-NLS-1$
+		buffer.append(groupSep);
+		buffer.append("456"); //$NON-NLS-1$
+		buffer.append(groupSep);
+		buffer.append("789"); //$NON-NLS-1$
+		buffer.append(fTxtDecimalSep.getStringValue());
+		buffer.append("34"); //$NON-NLS-1$
+
+		fLblExampleValue.setText(buffer.toString());
+		fLblExampleValue.pack(true);
 	}
 
 }

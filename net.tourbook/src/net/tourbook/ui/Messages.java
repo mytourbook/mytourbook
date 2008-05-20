@@ -92,6 +92,12 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_sequence_label;
 	public static String		ColumnFactory_speed_label;
 	public static String		ColumnFactory_speed_tooltip;
+	public static String	ColumnFactory_tag;
+
+	public static String	ColumnFactory_tag_label;
+
+	public static String	ColumnFactory_tag_tooltip;
+
 	public static String		ColumnFactory_temperature_label;
 	public static String		ColumnFactory_temperature_tooltip;
 	public static String		ColumnFactory_time;

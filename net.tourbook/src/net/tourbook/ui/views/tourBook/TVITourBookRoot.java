@@ -85,6 +85,5 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 		}
 	}
 
-	@Override
 	protected void remove() {}
 }
