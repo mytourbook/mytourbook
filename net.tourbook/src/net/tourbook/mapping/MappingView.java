@@ -411,7 +411,7 @@ public class MappingView extends ViewPart {
 
 		fTourChangeListener = new IPropertyListener() {
 
-			public void propertyChanged(Object source, int propId) {
+			public void propertyChanged(final Object source, final int propId) {
 				if (propId == TourDatabase.TOUR_IS_CHANGED) {}
 				resetMap();
 			}
@@ -437,11 +437,11 @@ public class MappingView extends ViewPart {
 					}
 
 					// get modified tours
-					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
 					final long tourId = fTourData.getTourId();
 
 					// check if the tour in the editor was modified
-					for (TourData tourData : modifiedTours) {
+					for (final TourData tourData : modifiedTours) {
 						if (tourData.getTourId() == tourId) {
 
 							// keep changed data
@@ -612,9 +612,9 @@ public class MappingView extends ViewPart {
 
 		final Display display = Display.getCurrent();
 		legendImage = new Image(display, overlayImageData);
-		Rectangle legendImageBounds = legendImage.getBounds();
+		final Rectangle legendImageBounds = legendImage.getBounds();
 
-		boolean isDataAvailable = updateLegendValues(legendProvider, legendImageBounds);
+		final boolean isDataAvailable = updateLegendValues(legendProvider, legendImageBounds);
 
 		final Color transparentColor = new Color(display, rgbTransparent);
 		final GC gc = new GC(legendImage);
@@ -663,8 +663,8 @@ public class MappingView extends ViewPart {
 
 		// create list with all map factories
 		fTileFactories = new ArrayList<MapProvider>();
-		List<TileFactory> tileFactories = GeoclipseExtensions.getInstance().readExtensions(fMap);
-		for (TileFactory tileFactory : tileFactories) {
+		final List<TileFactory> tileFactories = GeoclipseExtensions.getInstance().readExtensions(fMap);
+		for (final TileFactory tileFactory : tileFactories) {
 
 			final MapProvider mapProvider = new MapProvider(tileFactory, tileFactory.getProjection());
 			fTileFactories.add(mapProvider);
@@ -700,7 +700,7 @@ public class MappingView extends ViewPart {
 		TourDatabase.getInstance().removePropertyListener(fTourChangeListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
-		TourbookPlugin tourbookPlugin = TourbookPlugin.getDefault();
+		final TourbookPlugin tourbookPlugin = TourbookPlugin.getDefault();
 		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(fTourbookPrefChangeListener);
 
@@ -1070,6 +1070,10 @@ public class MappingView extends ViewPart {
 
 	private void resetMap() {
 
+		if (fTourData == null) {
+			return;
+		}
+
 		fTourData.clearComputedSeries();
 
 		paintTour(fTourData, true, true);
@@ -1117,33 +1121,33 @@ public class MappingView extends ViewPart {
 			}
 
 			// action: show start/end in map
-			Integer mementoShowStartEndInMap = memento.getInteger(MEMENTO_SHOW_START_END_IN_MAP);
+			final Integer mementoShowStartEndInMap = memento.getInteger(MEMENTO_SHOW_START_END_IN_MAP);
 			if (mementoShowStartEndInMap != null) {
 				fActionShowStartEndInMap.setChecked(mementoShowStartEndInMap == 1);
 			}
 			paintManager.setShowStartEnd(fActionShowStartEndInMap.isChecked());
 
 			// action: show tour marker
-			Integer mementoShowTourMarker = memento.getInteger(MEMENTO_SHOW_TOUR_MARKER);
+			final Integer mementoShowTourMarker = memento.getInteger(MEMENTO_SHOW_TOUR_MARKER);
 			if (mementoShowTourMarker != null) {
 				fActionShowTourMarker.setChecked(mementoShowTourMarker == 1);
 			}
 			paintManager.setShowTourMarker(fActionShowTourMarker.isChecked());
 
 			// action: show legend in map
-			Integer mementoShowLegendInMap = memento.getInteger(MEMENTO_SHOW_LEGEND_IN_MAP);
+			final Integer mementoShowLegendInMap = memento.getInteger(MEMENTO_SHOW_LEGEND_IN_MAP);
 			if (mementoShowLegendInMap != null) {
 				fActionShowLegendInMap.setChecked(mementoShowLegendInMap == 1);
 			}
 
 			// action: show slider in map
-			Integer mementoShowSliderInMap = memento.getInteger(MEMENTO_SHOW_SLIDER_IN_MAP);
+			final Integer mementoShowSliderInMap = memento.getInteger(MEMENTO_SHOW_SLIDER_IN_MAP);
 			if (mementoShowSliderInMap != null) {
 				fActionShowSliderInMap.setChecked(mementoShowSliderInMap == 1);
 			}
 
 			// action: show slider in legend
-			Integer mementoShowSliderInLegend = memento.getInteger(MEMENTO_SHOW_SLIDER_IN_LEGEND);
+			final Integer mementoShowSliderInLegend = memento.getInteger(MEMENTO_SHOW_SLIDER_IN_LEGEND);
 			if (mementoShowSliderInLegend != null) {
 				fActionShowSliderInLegend.setChecked(mementoShowSliderInLegend == 1);
 			}
@@ -1211,7 +1215,7 @@ public class MappingView extends ViewPart {
 		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 		// check legend provider
-		ILegendProvider legendProvider = paintManager.getLegendProvider();
+		final ILegendProvider legendProvider = paintManager.getLegendProvider();
 		if (legendProvider == null) {
 
 			// set default legend provider
@@ -1289,9 +1293,9 @@ public class MappingView extends ViewPart {
 	 * so that the entire city and it's points are visible without panning.
 	 * 
 	 * @param positions
-	 *        A set of GeoPositions to calculate the new zoom from
+	 * 		A set of GeoPositions to calculate the new zoom from
 	 * @param adjustZoomLevel
-	 *        when <code>true</code> the zoom level will be adjusted to user settings
+	 * 		when <code>true</code> the zoom level will be adjusted to user settings
 	 */
 	private void setTourZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
 
@@ -1381,7 +1385,7 @@ public class MappingView extends ViewPart {
 	 * @param legendProvider
 	 * @param legendBounds
 	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
-	 *         when data are not available
+	 * 	when data are not available
 	 */
 	private boolean updateLegendValues(final ILegendProvider legendProvider, final Rectangle legendBounds) {
 
@@ -1392,7 +1396,7 @@ public class MappingView extends ViewPart {
 		final GraphColorProvider colorProvider = GraphColorProvider.getInstance();
 
 		ColorDefinition colorDefinition = null;
-		LegendConfig legendConfig = legendProvider.getLegendConfig();
+		final LegendConfig legendConfig = legendProvider.getLegendConfig();
 
 		// tell the legend provider how to draw the legend
 		switch (legendProvider.getTourColorId()) {
