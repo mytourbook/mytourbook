@@ -23,6 +23,7 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -31,8 +32,8 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -64,168 +65,6 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 		super(GRID);
 	}
 
-	@Override
-	protected void createFieldEditors() {
-
-		Composite parent = getFieldEditorParent();
-
-		createDistancePreferences(parent);
-		UI.setHorizontalSpacer(parent, 2);
-
-		createAltitudePreferences(parent);
-		UI.setHorizontalSpacer(parent, 2);
-
-		createDurationPreferences(parent);
-
-		parent.addControlListener(new ControlListener() {
-			public void controlMoved(ControlEvent e) {}
-
-			public void controlResized(ControlEvent e) {
-				computeAllExamples();
-			}
-		});
-	}
-
-	private void createDistancePreferences(Composite parent) {
-
-		Label label;
-		GridData gridData;
-
-		// title
-		label = new Label(parent, SWT.NONE);
-		label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
-		label.setText(Messages.Pref_Statistic_Label_distance);
-
-		// distance example
-		fLblDistanceExampleLabel = new Label(parent, SWT.NONE);
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.widthHint = 200;
-		fLblDistanceExampleLabel.setLayoutData(gridData);
-
-		// low value
-		fEditorDistanceLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_LOW_VALUE,
-				Messages.Pref_Statistic_Label_distance_low_value,
-				parent,
-				4);
-		UI.setFieldWidth(parent, fEditorDistanceLowValue, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDistanceLowValue);
-
-		// interval
-		fEditorDistanceInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_INTERVAL,
-				Messages.Pref_Statistic_Label_interval,
-				parent,
-				4);
-		UI.setFieldWidth(parent, fEditorDistanceInterval, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDistanceInterval);
-
-		// numbers
-		fEditorDistanceNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_NUMBERS,
-				Messages.Pref_Statistic_Label_distance_quantity,
-				parent,
-				2);
-		UI.setFieldWidth(parent, fEditorDistanceNumbers, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDistanceNumbers);
-
-		fEditorDistanceLowValue.setPropertyChangeListener(this);
-		fEditorDistanceInterval.setPropertyChangeListener(this);
-		fEditorDistanceNumbers.setPropertyChangeListener(this);
-	}
-
-	private void createAltitudePreferences(Composite parent) {
-
-		Label label;
-		GridData gridData;
-
-		// title
-		label = new Label(parent, SWT.NONE);
-		label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
-		gridData = new GridData();
-		label.setLayoutData(gridData);
-		label.setText(Messages.Pref_Statistic_Label_altitude);
-
-		// altitude example
-		fLblAltitudeExampleLabel = new Label(parent, SWT.NONE);
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.widthHint = 200;
-		fLblAltitudeExampleLabel.setLayoutData(gridData);
-
-		// low value
-		fEditorAltitudeLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE,
-				Messages.Pref_Statistic_Label_altitude_low_value,
-				parent,
-				4);
-		UI.setFieldWidth(parent, fEditorAltitudeLowValue, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorAltitudeLowValue);
-
-		// interval
-		fEditorAltitudeInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_INTERVAL,
-				Messages.Pref_Statistic_Label_interval,
-				parent,
-				4);
-		UI.setFieldWidth(parent, fEditorAltitudeInterval, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorAltitudeInterval);
-
-		// numbers
-		fEditorAltitudeNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_NUMBERS,
-				Messages.Pref_Statistic_Label_altitude_quantity,
-				parent,
-				2);
-		fEditorAltitudeNumbers.setValidRange(2, 99);
-		UI.setFieldWidth(parent, fEditorAltitudeNumbers, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorAltitudeNumbers);
-
-		fEditorAltitudeLowValue.setPropertyChangeListener(this);
-		fEditorAltitudeInterval.setPropertyChangeListener(this);
-		fEditorAltitudeNumbers.setPropertyChangeListener(this);
-	}
-
-	private void createDurationPreferences(Composite parent) {
-
-		Label label;
-		GridData gridData;
-
-		// title
-		label = new Label(parent, SWT.NONE);
-		label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
-		gridData = new GridData();
-		label.setLayoutData(gridData);
-		label.setText(Messages.Pref_Statistic_Label_duration);
-
-		// duration example
-		fLblDurationExampleLabel = new Label(parent, SWT.NONE);
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.widthHint = 200;
-		fLblDurationExampleLabel.setLayoutData(gridData);
-
-		// low value
-		fEditorDurationLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_LOW_VALUE,
-				Messages.Pref_Statistic_Label_duration_low_value,
-				parent,
-				4);
-		UI.setFieldWidth(parent, fEditorDurationLowValue, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDurationLowValue);
-
-		// interval
-		fEditorDurationInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_INTERVAL,
-				Messages.Pref_Statistic_Label_duration_interval,
-				parent,
-				4);
-		UI.setFieldWidth(parent, fEditorDurationInterval, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDurationInterval);
-
-		// numbers
-		fEditorDurationNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_NUMBERS,
-				Messages.Pref_Statistic_Label_duration_quantity,
-				parent,
-				2);
-		UI.setFieldWidth(parent, fEditorDurationNumbers, UI.DEFAULT_FIELD_WIDTH);
-		addField(fEditorDurationNumbers);
-
-		fEditorDurationLowValue.setPropertyChangeListener(this);
-		fEditorDurationInterval.setPropertyChangeListener(this);
-		fEditorDurationNumbers.setPropertyChangeListener(this);
-	}
-
 	private void addPrefListener() {
 
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
@@ -238,58 +77,6 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 		};
 
 		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
-	}
-
-	/**
-	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	protected Control createContents(Composite parent) {
-
-		Control control = super.createContents(parent);
-
-		addPrefListener();
-
-		// the example can only be computed when the fields have been initialized
-		parent.layout(true);
-		computeAllExamples();
-
-		return control;
-	}
-
-	@Override
-	public void dispose() {
-
-		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
-
-		super.dispose();
-	}
-
-	public void init(IWorkbench workbench) {
-		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
-	}
-
-	/*
-	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
-	 */
-	@Override
-	public void propertyChange(PropertyChangeEvent event) {
-		if (event.getProperty().equals(FieldEditor.VALUE)) {
-			if (!fEditorAltitudeLowValue.isValid()
-					|| !fEditorDistanceLowValue.isValid()
-					|| !fEditorDistanceInterval.isValid()
-					|| !fEditorDistanceNumbers.isValid()
-					|| !fEditorAltitudeLowValue.isValid()
-					|| !fEditorAltitudeInterval.isValid()
-					|| !fEditorAltitudeNumbers.isValid()
-					|| !fEditorDurationLowValue.isValid()
-					|| !fEditorDurationInterval.isValid()
-					|| !fEditorDurationNumbers.isValid()) {
-				return;
-			}
-
-			computeAllExamples();
-		}
 	}
 
 	private void computeAllExamples() {
@@ -322,9 +109,14 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 	/**
 	 * show an example of the entered values
 	 */
-	private void computeExample(Label label, int lowValue, int interval, int numbers, String unit, int unitType) {
+	private void computeExample(final Label label,
+								final int lowValue,
+								final int interval,
+								final int numbers,
+								final String unit,
+								final int unitType) {
 
-		StringBuilder text = new StringBuilder();
+		final StringBuilder text = new StringBuilder();
 		for (int number = 0; number < numbers; number++) {
 
 			if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
@@ -338,6 +130,228 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 			}
 		}
 		label.setText(Dialog.shortenText(text.toString() + " " + unit, label)); //$NON-NLS-1$
-//		label.pack(true);
+	}
+
+	/**
+	 * @see
+	 * 	org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite
+	 * 	)
+	 */
+	@Override
+	protected Control createContents(final Composite parent) {
+
+		final Control control = super.createContents(parent);
+
+		addPrefListener();
+
+		// set minimum width
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.hint(300, SWT.DEFAULT)
+				.applyTo(fLblDurationExampleLabel);
+
+		parent.layout(true);
+
+		// the example can only be computed when the fields have been initialized
+		computeAllExamples();
+
+		return control;
+	}
+
+	@Override
+	protected void createFieldEditors() {
+
+		final Composite parent = getFieldEditorParent();
+//		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+
+		createFieldsDistance(parent);
+		createFieldsAltitude(parent);
+		createFieldsDuration(parent);
+
+		parent.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				computeAllExamples();
+			}
+		});
+	}
+
+	private void createFieldsAltitude(final Composite parent) {
+
+		Label label;
+		GridData gridData;
+
+		// title
+		label = new Label(parent, SWT.NONE);
+		label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+		gridData = new GridData();
+		label.setLayoutData(gridData);
+		label.setText(Messages.Pref_Statistic_Label_altitude);
+
+		// altitude example
+		fLblAltitudeExampleLabel = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+//				.hint(200, SWT.DEFAULT)
+				.applyTo(fLblAltitudeExampleLabel);
+
+		// low value
+		fEditorAltitudeLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE,
+				Messages.Pref_Statistic_Label_altitude_low_value,
+				parent,
+				4);
+		UI.setFieldWidth(parent, fEditorAltitudeLowValue, UI.DEFAULT_FIELD_WIDTH);
+		addField(fEditorAltitudeLowValue);
+
+		// interval
+		fEditorAltitudeInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_INTERVAL,
+				Messages.Pref_Statistic_Label_interval,
+				parent,
+				4);
+		UI.setFieldWidth(parent, fEditorAltitudeInterval, UI.DEFAULT_FIELD_WIDTH);
+		addField(fEditorAltitudeInterval);
+
+		// numbers
+		fEditorAltitudeNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_ALTITUDE_NUMBERS,
+				Messages.Pref_Statistic_Label_altitude_quantity,
+				parent,
+				2);
+		fEditorAltitudeNumbers.setValidRange(2, 99);
+		UI.setFieldWidth(parent, fEditorAltitudeNumbers, UI.DEFAULT_FIELD_WIDTH);
+		addField(fEditorAltitudeNumbers);
+
+		fEditorAltitudeLowValue.setPropertyChangeListener(this);
+		fEditorAltitudeInterval.setPropertyChangeListener(this);
+		fEditorAltitudeNumbers.setPropertyChangeListener(this);
+	}
+
+	private void createFieldsDistance(final Composite parent) {
+
+		Label label;
+
+		// title
+		label = new Label(parent, SWT.NONE);
+		label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+		label.setText(Messages.Pref_Statistic_Label_distance);
+
+		// distance example
+		fLblDistanceExampleLabel = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+//				.hint(200, SWT.DEFAULT)
+				.applyTo(fLblDistanceExampleLabel);
+
+		// low value
+		fEditorDistanceLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_LOW_VALUE,
+				Messages.Pref_Statistic_Label_distance_low_value,
+				parent,
+				4);
+		UI.setFieldWidth(parent, fEditorDistanceLowValue, UI.DEFAULT_FIELD_WIDTH);
+		addField(fEditorDistanceLowValue);
+
+		// interval
+		fEditorDistanceInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_INTERVAL,
+				Messages.Pref_Statistic_Label_interval,
+				parent,
+				4);
+		UI.setFieldWidth(parent, fEditorDistanceInterval, UI.DEFAULT_FIELD_WIDTH);
+		addField(fEditorDistanceInterval);
+
+		// numbers
+		fEditorDistanceNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_DISTANCE_NUMBERS,
+				Messages.Pref_Statistic_Label_distance_quantity,
+				parent,
+				2);
+		UI.setFieldWidth(parent, fEditorDistanceNumbers, UI.DEFAULT_FIELD_WIDTH);
+		addField(fEditorDistanceNumbers);
+
+		fEditorDistanceLowValue.setPropertyChangeListener(this);
+		fEditorDistanceInterval.setPropertyChangeListener(this);
+		fEditorDistanceNumbers.setPropertyChangeListener(this);
+	}
+
+	private void createFieldsDuration(final Composite parent) {
+
+		Label label;
+		GridData gridData;
+
+		// title
+		label = new Label(parent, SWT.NONE);
+		label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+		gridData = new GridData();
+		label.setLayoutData(gridData);
+		label.setText(Messages.Pref_Statistic_Label_duration);
+
+		// duration example
+		fLblDurationExampleLabel = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+//				.hint(200, SWT.DEFAULT)
+				.applyTo(fLblDurationExampleLabel);
+
+		// low value
+		fEditorDurationLowValue = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_LOW_VALUE,
+				Messages.Pref_Statistic_Label_duration_low_value,
+				parent,
+				4);
+		UI.setFieldWidth(parent, fEditorDurationLowValue, UI.DEFAULT_FIELD_WIDTH);
+		addField(fEditorDurationLowValue);
+
+		// interval
+		fEditorDurationInterval = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_INTERVAL,
+				Messages.Pref_Statistic_Label_duration_interval,
+				parent,
+				4);
+		UI.setFieldWidth(parent, fEditorDurationInterval, UI.DEFAULT_FIELD_WIDTH);
+		addField(fEditorDurationInterval);
+
+		// numbers
+		fEditorDurationNumbers = new IntegerFieldEditor(ITourbookPreferences.STAT_DURATION_NUMBERS,
+				Messages.Pref_Statistic_Label_duration_quantity,
+				parent,
+				2);
+		UI.setFieldWidth(parent, fEditorDurationNumbers, UI.DEFAULT_FIELD_WIDTH);
+		addField(fEditorDurationNumbers);
+
+		fEditorDurationLowValue.setPropertyChangeListener(this);
+		fEditorDurationInterval.setPropertyChangeListener(this);
+		fEditorDurationNumbers.setPropertyChangeListener(this);
+	}
+
+	@Override
+	public void dispose() {
+
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+
+		super.dispose();
+	}
+
+	public void init(final IWorkbench workbench) {
+		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
+	}
+
+	/*
+	 * @see
+	 * org.eclipse.jface.preference.FieldEditorPreferencePage#propertyChange(org.eclipse.jface.util
+	 * .PropertyChangeEvent)
+	 */
+	@Override
+	public void propertyChange(final PropertyChangeEvent event) {
+		if (event.getProperty().equals(FieldEditor.VALUE)) {
+			if (!fEditorAltitudeLowValue.isValid()
+					|| !fEditorDistanceLowValue.isValid()
+					|| !fEditorDistanceInterval.isValid()
+					|| !fEditorDistanceNumbers.isValid()
+					|| !fEditorAltitudeLowValue.isValid()
+					|| !fEditorAltitudeInterval.isValid()
+					|| !fEditorAltitudeNumbers.isValid()
+					|| !fEditorDurationLowValue.isValid()
+					|| !fEditorDurationInterval.isValid()
+					|| !fEditorDurationNumbers.isValid()) {
+				return;
+			}
+
+			computeAllExamples();
+		}
 	}
 }

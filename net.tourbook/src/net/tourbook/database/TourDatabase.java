@@ -85,9 +85,12 @@ public class TourDatabase {
 	public static final String			TABLE_TOUR_CATEGORY				= "TourCategory";							//$NON-NLS-1$
 	public static final String			TABLE_TOUR_TYPE					= "TourType";								//$NON-NLS-1$
 	public static final String			TABLE_TOUR_TAG					= "TourTag";								//$NON-NLS-1$
+
 	public static final String			TABLE_TOUR_TAG_CATEGORY			= "TourTagCategory";						//$NON-NLS-1$
 	public static final String			TABLE_TOUR_PERSON				= "TourPerson";							//$NON-NLS-1$
 	public static final String			TABLE_TOUR_BIKE					= "TourBike";								//$NON-NLS-1$
+
+	public static final String			JOIN_TABLE_TOUR_DATA__TOUR_TAG	= TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG;	//$NON-NLS-1$
 
 	private static final String			TABLE_DB_VERSION				= "DbVersion";								//$NON-NLS-1$
 
@@ -1099,13 +1102,10 @@ public class TourDatabase {
 
 		stmt.addBatch(sql); //$NON-NLS-1$
 
-		// CREATE TABLE TourData_TourTag
-
-		final String table_TourData_TourTag = TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG;
 		final String field_TourData_tourId = TABLE_TOUR_DATA + "_tourId";
 		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId";
 
-		sql = ("CREATE TABLE " + table_TourData_TourTag) //$NON-NLS-1$ //$NON-NLS-2$
+		sql = ("CREATE TABLE " + JOIN_TABLE_TOUR_DATA__TOUR_TAG) //$NON-NLS-1$ //$NON-NLS-2$
 				+ "(\n" //$NON-NLS-1$
 				+ (TABLE_TOUR_TAG + "_tagId" + "	BIGINT NOT NULL,\n") //$NON-NLS-1$
 				+ (TABLE_TOUR_DATA + "_tourId" + "	BIGINT NOT NULL\n") //$NON-NLS-1$
@@ -1118,18 +1118,18 @@ public class TourDatabase {
 		 * Add Constrainsts
 		 */
 
-		sql = ("ALTER TABLE " + table_TourData_TourTag) //$NON-NLS-1$ //$NON-NLS-2$
+		sql = ("ALTER TABLE " + JOIN_TABLE_TOUR_DATA__TOUR_TAG) //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ ("	ADD CONSTRAINT fk_" + table_TourData_TourTag + "_" + field_TourTag_tagId)
+				+ ("	ADD CONSTRAINT fk_" + JOIN_TABLE_TOUR_DATA__TOUR_TAG + "_" + field_TourTag_tagId)
 				+ ("	FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)")
 				+ ("	REFERENCES " + TABLE_TOUR_TAG + " (tagId)");
 
 		System.out.println(sql);
 		stmt.addBatch(sql);
 
-		sql = ("ALTER TABLE " + table_TourData_TourTag) //$NON-NLS-1$ //$NON-NLS-2$
+		sql = ("ALTER TABLE " + JOIN_TABLE_TOUR_DATA__TOUR_TAG) //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ ("	ADD CONSTRAINT fk_" + table_TourData_TourTag + "_" + field_TourData_tourId)
+				+ ("	ADD CONSTRAINT fk_" + JOIN_TABLE_TOUR_DATA__TOUR_TAG + "_" + field_TourData_tourId)
 				+ ("	FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)")
 				+ ("	REFERENCES " + TABLE_TOUR_DATA + " (tourId)");
 

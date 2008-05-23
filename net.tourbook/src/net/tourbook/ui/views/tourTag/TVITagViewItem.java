@@ -13,18 +13,26 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.ui.views.tourTag;
 
 import net.tourbook.tour.TreeViewerItem;
 
-public abstract class TVITagItem extends TreeViewerItem {
+public abstract class TVITagViewItem extends TreeViewerItem {
 
-	TagView	fTagView;
+	private TagView	fTagView;
 
-	String	fTreeColumn;
+	/**
+	 * content which is displayed in the tree column
+	 */
+	String			treeColumn;
 
-	public TVITagItem(final TagView tagView) {
+	public TVITagViewItem(final TagView tagView) {
 		fTagView = tagView;
+	}
+
+	public TagView getTagView() {
+		return fTagView;
 	}
 
 }

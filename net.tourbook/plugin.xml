@@ -147,6 +147,12 @@
             name="%view_name_Book"/>
       <view
             category="net.tourbook.category.tourList"
+            class="net.tourbook.ui.views.tourTag.TagView"
+            icon="icons/tour-tag.gif"
+            id="net.tourbook.views.tagViewID"
+            name="%view_name_tagView"/>
+      <view
+            category="net.tourbook.category.tourList"
             class="net.tourbook.ui.views.tourCatalog.TourCatalogView"
             icon="icons/tour-map.gif"
             id="net.tourbook.views.tourCatalog.TourCatalogView"

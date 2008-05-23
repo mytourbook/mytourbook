@@ -20,6 +20,10 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourTagCategory;
+import net.tourbook.tag.TVITourTag;
+import net.tourbook.tag.TVITourTagCategory;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ColumnManager;
@@ -31,8 +35,10 @@ import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -42,6 +48,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -54,7 +61,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
-	static public final String		ID	= "net.tourbook.views.tourListView";	//$NON-NLS-1$
+	static public final String		ID	= "net.tourbook.views.tagViewID";	//$NON-NLS-1$
 
 	private static IMemento			fSessionMemento;
 
@@ -67,7 +74,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	private PostSelectionProvider	fPostSelectionProvider;
 
-	TVITagRoot						fRootItem;
+	TVITagViewRoot					fRootItem;
 
 	private class TagContentProvider implements ITreeContentProvider {
 
@@ -92,6 +99,41 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
+	/**
+	 * Sort the tags and categories
+	 */
+	private class TagViewerSorter extends ViewerSorter {
+
+		@Override
+		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+
+			if (obj1 instanceof TVITourTag && obj2 instanceof TVITourTag) {
+
+				final TourTag tourTag1 = ((TVITourTag) (obj1)).getTourTag();
+				final TourTag tourTag2 = ((TVITourTag) (obj2)).getTourTag();
+
+				return tourTag1.getTagName().compareTo(tourTag2.getTagName());
+
+			} else if (obj1 instanceof TVITourTag && obj2 instanceof TVITourTagCategory) {
+
+				return 1;
+
+			} else if (obj2 instanceof TVITourTag && obj1 instanceof TVITourTagCategory) {
+
+				return -1;
+
+			} else if (obj1 instanceof TVITourTagCategory && obj2 instanceof TVITourTagCategory) {
+
+				final TourTagCategory tourTagCat1 = ((TVITourTagCategory) (obj1)).getTourTagCategory();
+				final TourTagCategory tourTagCat2 = ((TVITourTagCategory) (obj2)).getTourTagCategory();
+
+				return tourTagCat1.getCategoryName().compareTo(tourTagCat2.getCategoryName());
+			}
+
+			return 0;
+		}
+	}
+
 	private void createContextMenu() {
 
 	}
@@ -102,18 +144,18 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		fViewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
 
-		createTourViewer(fViewerContainer);
+		createTagViewer(fViewerContainer);
 //		createActions();
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		// update the viewer
-		fRootItem = new TVITagRoot(this);
+		fRootItem = new TVITagViewRoot(this);
 		fTagViewer.setInput(this);
 	}
 
-	private Control createTourViewer(final Composite parent) {
+	private Control createTagViewer(final Composite parent) {
 
 		// tour tree
 		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.FULL_SELECTION | SWT.MULTI);
@@ -126,11 +168,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		// define and create all columns
 		fColumnManager = new ColumnManager(this);
-		defineAllColumns(parent);
+		createTagViewerColumns(parent);
 		fColumnManager.createColumns();
 
 		fTagViewer.setContentProvider(new TagContentProvider());
 		fTagViewer.setUseHashlookup(true);
+		fTagViewer.setSorter(new TagViewerSorter());
 
 		fTagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
@@ -179,7 +222,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	 * 
 	 * @param parent
 	 */
-	private void defineAllColumns(final Composite parent) {
+	private void createTagViewerColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 		TreeColumnDefinition colDef;
@@ -193,59 +236,32 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
-				final TVITagItem tagItem = (TVITagItem) element;
-				cell.setText(tagItem.fTreeColumn);
+				final TVITagViewItem tagItem = (TVITagViewItem) element;
+				cell.setText(tagItem.treeColumn);
 			}
 		});
 
-//		/*
-//		 * column: date
-//		 */
-//		colDef = TreeColumnFactory.DATE.createColumn(fColumnManager, pixelConverter);
-//		colDef.setCanModifyVisibility(false);
-//		colDef.setLabelProvider(new CellLabelProvider() {
-//			@Override
-//			public void update(final ViewerCell cell) {
-//				final Object element = cell.getElement();
-//				final TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
-//				cell.setText(Long.toString(tourItem.fFirstColumn));
-//			}
-//		});
-//		
-//		/*
-//		 * column: distance (km/miles)
-//		 */
-//		colDef = TreeColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
-//		colDef.setLabelProvider(new CellLabelProvider() {
-//			@Override
-//			public void update(final ViewerCell cell) {
-//				final Object element = cell.getElement();
-//				final TourBookTreeViewerItem tourItem = (TourBookTreeViewerItem) element;
-//				fNF.setMinimumFractionDigits(1);
-//				fNF.setMaximumFractionDigits(1);
-//				cell.setText(fNF.format(((float) tourItem.fColumnDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
-//			}
-//		});
-//
-//		/*
-//		 * column: tour type
-//		 */
-//		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
-////		colDef.setColumnResizable(false);
-//		colDef.setLabelProvider(new CellLabelProvider() {
-//			@Override
-//			public void update(final ViewerCell cell) {
-//				final Object element = cell.getElement();
-//				if (element instanceof TVITourBookTour) {
-//					cell.setImage(UI.getInstance().getTourTypeImage(((TVITourBookTour) element).getTourTypeId()));
-//				}
-//			}
-//		});
+	}
 
+	@Override
+	public void dispose() {
+
+		super.dispose();
 	}
 
 	protected void enableActions() {
 
+	}
+
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@Override
+	public Object getAdapter(final Class adapter) {
+
+		if (adapter == ColumnViewer.class) {
+			return fTagViewer;
+		}
+
+		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
 	public ColumnManager getColumnManager() {
