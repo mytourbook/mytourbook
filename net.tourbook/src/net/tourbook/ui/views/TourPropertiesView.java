@@ -20,12 +20,16 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -105,13 +109,15 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private static IMemento			fSessionMemento;
 
 	private CTabFolder				fTabFolder;
+
 	private Label					fLblDate;
-	private Label					fLblStartTime;
-	private Label					fLblRecordingTime;
-	private Label					fLblDrivingTime;
 	private Label					fLblDatapoints;
-	private Label					fLblTourType;
 	private Label					fLblDeviceName;
+	private Label					fLblDrivingTime;
+	private Label					fLblRecordingTime;
+	private Label					fLblStartTime;
+	private Label					fLblTourTags;
+	private Label					fLblTourType;
 
 	private Text					fTextTitle;
 	private Text					fTextStartLocation;
@@ -168,7 +174,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 			final int serieLength = timeSerie.length;
 
-			TourElement[] dataElements = new TourElement[serieLength];
+			final TourElement[] dataElements = new TourElement[serieLength];
 			TourElement tourElement;
 
 			for (int serieIndex = 0; serieIndex < dataElements.length; serieIndex++) {
@@ -201,7 +207,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 				}
 			}
 
-			return (Object[]) (dataElements);
+			return (dataElements);
 		}
 
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
@@ -227,26 +233,26 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 		// set the part listener
 		fPartListener = new IPartListener2() {
-			public void partActivated(IWorkbenchPartReference partRef) {}
+			public void partActivated(final IWorkbenchPartReference partRef) {}
 
-			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			public void partClosed(IWorkbenchPartReference partRef) {
+			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (ID.equals(partRef.getId())) {
 					// keep settings for this part
 					saveSettings();
 				}
 			}
 
-			public void partDeactivated(IWorkbenchPartReference partRef) {}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-			public void partHidden(IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {}
 
-			public void partInputChanged(IWorkbenchPartReference partRef) {}
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-			public void partOpened(IWorkbenchPartReference partRef) {}
+			public void partOpened(final IWorkbenchPartReference partRef) {}
 
-			public void partVisible(IWorkbenchPartReference partRef) {}
+			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		// register the listener in the page
 		getSite().getPage().addPartListener(fPartListener);
@@ -268,7 +274,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 					saveViewerSettings(fSessionMemento);
 
 					// dispose viewer
-					Control[] children = fTourDataContainer.getChildren();
+					final Control[] children = fTourDataContainer.getChildren();
 					for (int childIndex = 0; childIndex < children.length; childIndex++) {
 						children[childIndex].dispose();
 					}
@@ -292,7 +298,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private void addSelectionListener() {
 
 		fPostSelectionListener = new ISelectionListener() {
-			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				onChangeSelection(selection);
 			}
 		};
@@ -302,8 +308,8 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
-			public void propertyChanged(int propertyId, Object propertyData) {
+			@SuppressWarnings("unchecked")//$NON-NLS-1$
+			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
@@ -312,10 +318,10 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 					}
 
 					// get modified tours
-					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
 					final long tourId = fTourData.getTourId();
 
-					for (TourData tourData : modifiedTours) {
+					for (final TourData tourData : modifiedTours) {
 						if (tourData.getTourId() == tourId) {
 							updateTourProperties(tourData);
 							return;
@@ -330,12 +336,12 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 	private void createActions() {
 
-		ActionModifyColumns actionModifyColumns = new ActionModifyColumns(this);
+		final ActionModifyColumns actionModifyColumns = new ActionModifyColumns(this);
 
 		/*
 		 * fill view menu
 		 */
-		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(actionModifyColumns);
 	}
 
@@ -363,8 +369,8 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		fDataViewer.setContentProvider(new TourDataContentProvider());
 
 		fDataViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				StructuredSelection selection = (StructuredSelection) event.getSelection();
+			public void selectionChanged(final SelectionChangedEvent event) {
+				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
 					fireSliderPosition(selection);
 				}
@@ -372,7 +378,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		});
 	}
 
-	private void createDataViewerColumns(Composite parent) {
+	private void createDataViewerColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 
@@ -386,7 +392,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef.setIsColumnMoveable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {}
+			public void update(final ViewerCell cell) {}
 		});
 
 		/*
@@ -397,7 +403,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef.setIsColumnMoveable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
 				cell.setText(Integer.toString(((TourElement) cell.getElement()).sequence));
 
@@ -411,7 +417,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef = TableColumnFactory.TOUR_TIME.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 				cell.setText(Integer.toString(((TourElement) cell.getElement()).time));
 			}
 		});
@@ -422,7 +428,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
 				final int distance = ((TourElement) cell.getElement()).distance;
 				cell.setText(fNumberFormatter.format((float) distance / 1000));
@@ -435,7 +441,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef = TableColumnFactory.ALTITUDE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 				cell.setText(Integer.toString(((TourElement) cell.getElement()).altitude));
 			}
 		});
@@ -446,7 +452,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef = TableColumnFactory.PULSE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 				cell.setText(Integer.toString(((TourElement) cell.getElement()).pulse));
 			}
 		});
@@ -457,7 +463,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef = TableColumnFactory.TEMPERATURE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 				cell.setText(Integer.toString(((TourElement) cell.getElement()).temperature));
 			}
 		});
@@ -468,7 +474,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef = TableColumnFactory.CADENCE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 				cell.setText(Integer.toString(((TourElement) cell.getElement()).cadence));
 			}
 		});
@@ -479,7 +485,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef = TableColumnFactory.LONGITUDE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 				cell.setText(Double.toString(((TourElement) cell.getElement()).longitude));
 			}
 		});
@@ -490,7 +496,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef = TableColumnFactory.LATITUDE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 				cell.setText(Double.toString(((TourElement) cell.getElement()).latitude));
 			}
 		});
@@ -498,7 +504,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 
 		createUI(parent);
 
@@ -520,10 +526,9 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		onChangeSelection(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 	}
 
-	private Composite createTabLocation(Composite parent) {
+	private Composite createTabInfo(final Composite parent) {
 
 		Label label;
-		GridData gd;
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 
 		final ScrolledComposite scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
@@ -539,7 +544,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		scrolledContainer.setContent(locationContainer);
 		scrolledContainer.addControlListener(new ControlAdapter() {
 			@Override
-			public void controlResized(ControlEvent e) {
+			public void controlResized(final ControlEvent e) {
 				scrolledContainer.setMinSize(locationContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
@@ -552,7 +557,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextTitle);
 		fTextTitle.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(final KeyEvent e) {
 				onChangeContent();
 			}
 		});
@@ -567,7 +572,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 				pixelConverter.convertHeightInCharsToPixels(2)).applyTo(fTextDescription);
 		fTextDescription.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(final KeyEvent e) {
 				onChangeContent();
 			}
 		});
@@ -580,7 +585,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextStartLocation);
 		fTextStartLocation.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(final KeyEvent e) {
 				onChangeContent();
 			}
 		});
@@ -593,7 +598,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTextEndLocation);
 		fTextEndLocation.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(final KeyEvent e) {
 				onChangeContent();
 			}
 		});
@@ -601,74 +606,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		return scrolledContainer;
 	}
 
-	private Composite createTabTime(Composite parent) {
-
-		Label label;
-
-		fScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
-		fScrolledContainer.setExpandVertical(true);
-		fScrolledContainer.setExpandHorizontal(true);
-
-		fContentContainer = new Composite(fScrolledContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(fContentContainer);
-		GridLayoutFactory.swtDefaults().numColumns(2).spacing(10, 5).applyTo(fContentContainer);
-
-		fScrolledContainer.setContent(fContentContainer);
-		fScrolledContainer.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				fScrolledContainer.setMinSize(fContentContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-			}
-		});
-
-		{
-			// tour date
-			label = new Label(fContentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_tour_date);
-			fLblDate = new Label(fContentContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDate);
-
-			// start time
-			label = new Label(fContentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_start_time);
-			fLblStartTime = new Label(fContentContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblStartTime);
-
-			// recording time
-			label = new Label(fContentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_recording_time);
-			fLblRecordingTime = new Label(fContentContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblRecordingTime);
-
-			// driving time
-			label = new Label(fContentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_driving_time);
-			fLblDrivingTime = new Label(fContentContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDrivingTime);
-
-			// tour type
-			label = new Label(fContentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_device_name);
-			fLblDeviceName = new Label(fContentContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDeviceName);
-
-			// tour type
-			label = new Label(fContentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_tour_type);
-			fLblTourType = new Label(fContentContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblTourType);
-
-			// data points
-			label = new Label(fContentContainer, SWT.NONE);
-			label.setText(Messages.Tour_Properties_Label_datapoints);
-			fLblDatapoints = new Label(fContentContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDatapoints);
-		}
-
-		return fScrolledContainer;
-	}
-
-	private Control createTabTourData(Composite parent) {
+	private Control createTabRawData(final Composite parent) {
 
 		fTourDataContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(fTourDataContainer);
@@ -678,21 +616,103 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		return fTourDataContainer;
 	}
 
-	private void createUI(Composite parent) {
+	private Composite createTabTourData(final Composite parent) {
+
+		Label label;
+
+		fScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+		fScrolledContainer.setExpandVertical(true);
+		fScrolledContainer.setExpandHorizontal(true);
+//		fScrolledContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+
+		fContentContainer = new Composite(fScrolledContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(fContentContainer);
+		GridLayoutFactory.swtDefaults().numColumns(2).spacing(10, 5).applyTo(fContentContainer);
+//		fContentContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+
+		fScrolledContainer.setContent(fContentContainer);
+		fScrolledContainer.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				onResizeContainer();
+			}
+		});
+
+		{
+			// tour date
+			label = new Label(fContentContainer, SWT.NONE);
+			label.setText(Messages.Tour_Properties_Label_tour_date);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
+
+			fLblDate = new Label(fContentContainer, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDate);
+
+			// start time
+			label = new Label(fContentContainer, SWT.NONE);
+			label.setText(Messages.Tour_Properties_Label_start_time);
+			fLblStartTime = new Label(fContentContainer, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblStartTime);
+
+			// recording time
+			label = new Label(fContentContainer, SWT.NONE);
+			label.setText(Messages.Tour_Properties_Label_recording_time);
+			fLblRecordingTime = new Label(fContentContainer, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblRecordingTime);
+
+			// driving time
+			label = new Label(fContentContainer, SWT.NONE);
+			label.setText(Messages.Tour_Properties_Label_driving_time);
+			fLblDrivingTime = new Label(fContentContainer, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDrivingTime);
+
+			// tour type
+			label = new Label(fContentContainer, SWT.NONE);
+			label.setText(Messages.Tour_Properties_Label_device_name);
+			fLblDeviceName = new Label(fContentContainer, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDeviceName);
+
+			// tour type
+			label = new Label(fContentContainer, SWT.NONE);
+			label.setText(Messages.Tour_Properties_Label_tour_type);
+			fLblTourType = new Label(fContentContainer, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblTourType);
+
+			// tags
+			label = new Label(fContentContainer, SWT.NONE);
+			label.setText(Messages.Tour_Properties_Label_tour_tag);
+			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
+
+			fLblTourTags = new Label(fContentContainer, SWT.WRAP);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.hint(10, SWT.DEFAULT)
+					.applyTo(fLblTourTags);
+
+			// data points
+			label = new Label(fContentContainer, SWT.NONE);
+			label.setText(Messages.Tour_Properties_Label_datapoints);
+			fLblDatapoints = new Label(fContentContainer, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(fLblDatapoints);
+		}
+
+		return fScrolledContainer;
+	}
+
+	private void createUI(final Composite parent) {
 
 		fTabFolder = new CTabFolder(parent, SWT.FLAT | SWT.BOTTOM);
 
-		CTabItem fTabItemLocation = new CTabItem(fTabFolder, SWT.FLAT);
-		fTabItemLocation.setText(Messages.Tour_Properties_label_location);
-		fTabItemLocation.setControl(createTabLocation(fTabFolder));
+		final CTabItem fTabItemLocation = new CTabItem(fTabFolder, SWT.FLAT);
+		fTabItemLocation.setText(Messages.Tour_Properties_tabLabel_info);
+		fTabItemLocation.setControl(createTabInfo(fTabFolder));
 
-		CTabItem fTabItemTime = new CTabItem(fTabFolder, SWT.FLAT);
-		fTabItemTime.setText(Messages.Tour_Properties_label_time);
-		fTabItemTime.setControl(createTabTime(fTabFolder));
+		final CTabItem fTabItemTime = new CTabItem(fTabFolder, SWT.FLAT);
+		fTabItemTime.setText(Messages.Tour_Properties_tabLabel_time);
+		fTabItemTime.setControl(createTabTourData(fTabFolder));
 
-		CTabItem fTabItemTourData = new CTabItem(fTabFolder, SWT.FLAT);
-		fTabItemTourData.setText(Messages.Tour_Properties_label_tour_data);
-		fTabItemTourData.setControl(createTabTourData(fTabFolder));
+		final CTabItem fTabItemTourData = new CTabItem(fTabFolder, SWT.FLAT);
+		fTabItemTourData.setText(Messages.Tour_Properties_tabLabel_tour_data);
+		fTabItemTourData.setControl(createTabRawData(fTabFolder));
 
 	}
 
@@ -716,7 +736,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	 */
 	private void enableControls() {
 
-		boolean isEditor = fTourEditor != null;
+		final boolean isEditor = fTourEditor != null;
 
 		fTextTitle.setEnabled(isEditor);
 		fTextStartLocation.setEnabled(isEditor);
@@ -727,11 +747,11 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	/**
 	 * select the chart slider(s) according to the selected marker(s)
 	 */
-	private void fireSliderPosition(StructuredSelection selection) {
+	private void fireSliderPosition(final StructuredSelection selection) {
 
 		if (fTourChart == null) {
 
-			TourChart tourChart = TourManager.getInstance().getActiveTourChart();
+			final TourChart tourChart = TourManager.getInstance().getActiveTourChart();
 
 			if (tourChart == null || tourChart.isDisposed()) {
 				return;
@@ -740,7 +760,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			}
 		}
 
-		Object[] selectedData = selection.toArray();
+		final Object[] selectedData = selection.toArray();
 
 		if (selectedData.length > 1) {
 
@@ -760,9 +780,9 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	@Override
-	public Object getAdapter(Class adapter) {
+	public Object getAdapter(final Class adapter) {
 
 		if (adapter == ColumnViewer.class) {
 			return fDataViewer;
@@ -780,7 +800,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	}
 
 	@Override
-	public void init(IViewSite site, IMemento memento) throws PartInitException {
+	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
 
 		super.init(site, memento);
 
@@ -805,7 +825,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		fTourEditor.setTourPropertyIsModified();
 	}
 
-	private void onChangeSelection(ISelection selection) {
+	private void onChangeSelection(final ISelection selection) {
 
 		if (selection instanceof SelectionTourData) {
 
@@ -830,7 +850,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 		} else if (selection instanceof SelectionTourId) {
 
-			SelectionTourId tourIdSelection = (SelectionTourId) selection;
+			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 
 			// don't reload the same tour
 			if (fTourData != null) {
@@ -866,7 +886,38 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private void restoreViewerSettings(IMemento memento) {
+	private void onResizeContainer() {
+
+		fScrolledContainer.setMinSize(fContentContainer.computeSize(fScrolledContainer.getClientArea().width,
+				SWT.DEFAULT));
+
+	}
+
+	private void restoreState(final IMemento memento) {
+
+		if (memento == null) {
+
+			// memento is not set, set defaults
+
+			fTabFolder.setSelection(0);
+
+		} else {
+
+			// restore from memento
+
+			// select tab
+			final Integer selectedTab = memento.getInteger(MEMENTO_SELECTED_TAB);
+			if (selectedTab != null) {
+				fTabFolder.setSelection(selectedTab);
+			} else {
+				fTabFolder.setSelection(0);
+			}
+
+			restoreViewerSettings(memento);
+		}
+	}
+
+	private void restoreViewerSettings(final IMemento memento) {
 
 		if (memento == null) {
 			return;
@@ -888,31 +939,21 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		fDataViewer.getTable().getColumn(0).setWidth(0);
 	}
 
-	private void restoreState(IMemento memento) {
-
-		if (memento == null) {
-
-			// memento is not set, set defaults
-
-			fTabFolder.setSelection(0);
-
-		} else {
-
-			// restore from memento
-
-			// select tab
-			Integer selectedTab = memento.getInteger(MEMENTO_SELECTED_TAB);
-			if (selectedTab != null) {
-				fTabFolder.setSelection(selectedTab);
-			} else {
-				fTabFolder.setSelection(0);
-			}
-
-			restoreViewerSettings(memento);
-		}
+	private void saveSettings() {
+		fSessionMemento = XMLMemento.createWriteRoot("TourPropertiesView"); //$NON-NLS-1$
+		saveState(fSessionMemento);
 	}
 
-	private void saveViewerSettings(IMemento memento) {
+	@Override
+	public void saveState(final IMemento memento) {
+
+		// save selected tab
+		memento.putInteger(MEMENTO_SELECTED_TAB, fTabFolder.getSelectionIndex());
+
+		saveViewerSettings(memento);
+	}
+
+	private void saveViewerSettings(final IMemento memento) {
 
 		if (memento == null) {
 			return;
@@ -929,26 +970,12 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private void saveSettings() {
-		fSessionMemento = XMLMemento.createWriteRoot("TourPropertiesView"); //$NON-NLS-1$
-		saveState(fSessionMemento);
-	}
-
-	@Override
-	public void saveState(IMemento memento) {
-
-		// save selected tab
-		memento.putInteger(MEMENTO_SELECTED_TAB, fTabFolder.getSelectionIndex());
-
-		saveViewerSettings(memento);
-	}
-
 	@Override
 	public void setFocus() {
 
 	}
 
-	private void updateTourProperties(TourData tourData) {
+	private void updateTourProperties(final TourData tourData) {
 
 		enableControls();
 
@@ -969,7 +996,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		// recording time
 		final int recordingTime = tourData.getTourRecordingTime();
 		if (recordingTime == 0) {
-			fLblRecordingTime.setText(""); //$NON-NLS-1$
+			fLblRecordingTime.setText(UI.EMPTY_STRING); //$NON-NLS-1$
 		} else {
 			fCalendar.set(0, 0, 0, recordingTime / 3600, ((recordingTime % 3600) / 60), ((recordingTime % 3600) % 60));
 
@@ -979,7 +1006,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		// driving time
 		final int drivingTime = tourData.getTourDrivingTime();
 		if (drivingTime == 0) {
-			fLblDrivingTime.setText(""); //$NON-NLS-1$
+			fLblDrivingTime.setText(UI.EMPTY_STRING); //$NON-NLS-1$
 		} else {
 			fCalendar.set(0, 0, 0, drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
 
@@ -989,7 +1016,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		// data points
 		final int[] timeSerie = tourData.timeSerie;
 		if (timeSerie == null) {
-			fLblDatapoints.setText(""); //$NON-NLS-1$
+			fLblDatapoints.setText(UI.EMPTY_STRING); //$NON-NLS-1$
 		} else {
 			final int dataPoints = timeSerie.length;
 			fLblDatapoints.setText(Integer.toString(dataPoints));
@@ -998,9 +1025,41 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		// tour type
 		final TourType tourType = tourData.getTourType();
 		if (tourType == null) {
-			fLblTourType.setText(""); //$NON-NLS-1$
+			fLblTourType.setText(UI.EMPTY_STRING); //$NON-NLS-1$
 		} else {
 			fLblTourType.setText(tourType.getName());
+		}
+
+		// tour tags
+		final Set<TourTag> tourTags = tourData.getTourTags();
+
+		if (tourTags == null || tourTags.size() == 0) {
+
+			fLblTourTags.setText(UI.EMPTY_STRING); //$NON-NLS-1$
+
+		} else {
+
+			// sort tour tags by name
+			final ArrayList<TourTag> tourTagList = new ArrayList<TourTag>(tourTags);
+			Collections.sort(tourTagList, new Comparator<TourTag>() {
+				public int compare(final TourTag tt1, final TourTag tt2) {
+					return tt1.getTagName().compareTo(tt2.getTagName());
+				}
+			});
+
+			final StringBuilder sb = new StringBuilder();
+			int index = 0;
+			for (final TourTag tourTag : tourTagList) {
+
+				if (index > 0) {
+					sb.append(", "); //$NON-NLS-1$
+				}
+
+				sb.append(tourTag.getTagName());
+
+				index++;
+			}
+			fLblTourTags.setText(sb.toString());
 		}
 
 		// device name
@@ -1014,8 +1073,8 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		fTextEndLocation.setText(fTourData.getTourEndPlace());
 		fTextDescription.setText(fTourData.getTourDescription());
 
-		fScrolledContainer.setMinSize(fContentContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		fContentContainer.pack(true);
+		onResizeContainer();
+		fContentContainer.layout(true);
 
 		/*
 		 * tab: tour data

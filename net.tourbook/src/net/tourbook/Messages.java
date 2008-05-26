@@ -41,6 +41,10 @@ public class Messages extends NLS {
 
 	public static String		app_action_quick_edit;
 
+	public static String	app_action_remove_tour_tag;
+
+	public static String		app_action_set_tour_tag;
+
 	public static String		App_Action_set_tour_type;
 	public static String		App_measurement_imperial;
 	public static String		App_measurement_metric;
@@ -173,9 +177,9 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour_disabled;
 	public static String		Image__fit_to_window;
 
-	public static String	Image__folder_closed;
+	public static String		Image__folder_closed;
 
-	public static String	Image__folder_opened;
+	public static String		Image__folder_opened;
 
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
@@ -228,7 +232,7 @@ public class Messages extends NLS {
 	public static String		import_data_action_clear_view;
 	public static String		import_data_action_clear_view_tooltip;
 
-	public static String	import_data_action_disable_hac4_checksum_validation;
+	public static String		import_data_action_disable_hac4_checksum_validation;
 	public static String		import_data_action_merge_tracks;
 	public static String		import_data_action_save_tour_for_person;
 	public static String		import_data_action_save_tour_with_person;
@@ -432,19 +436,24 @@ public class Messages extends NLS {
 	public static String		Tour_Properties_Label_description;
 	public static String		Tour_Properties_Label_driving_time;
 	public static String		Tour_Properties_Label_end_location;
-	public static String		Tour_Properties_label_location;
 	public static String		Tour_Properties_Label_recording_time;
 	public static String		Tour_Properties_Label_start_location;
 	public static String		Tour_Properties_Label_start_time;
-	public static String		Tour_Properties_label_time;
-	public static String		Tour_Properties_label_tour_data;
 	public static String		Tour_Properties_Label_tour_date;
+	public static String	Tour_Properties_Label_tour_tag;
+
 	public static String		Tour_Properties_Label_tour_title;
 	public static String		Tour_Properties_Label_tour_type;
+	public static String	Tour_Properties_tabLabel_info;
+
+	public static String		Tour_Properties_tabLabel_time;
+	public static String		Tour_Properties_tabLabel_tour_data;
 
 	public static String		Tour_Segmenter_Label_default_tolerance;
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;
+
+	public static String	tag_view_action_refresh_view_tooltip;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;

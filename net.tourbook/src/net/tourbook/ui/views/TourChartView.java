@@ -38,6 +38,8 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ActionRemoveTourTag;
+import net.tourbook.ui.ActionSetTourTag;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
 import net.tourbook.util.PostSelectionProvider;
@@ -45,6 +47,7 @@ import net.tourbook.util.PostSelectionProvider;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -84,16 +87,26 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 	private class TourChartContextProvicer implements IChartContextProvider, ISelectedTours {
 
-		final ActionEditQuick	fActionQuickEdit	= new ActionEditQuick(TourChartView.this);
-		final ActionEditTour	fActionEditTour		= new ActionEditTour(TourChartView.this);
-		final ActionSetTourType	fActionSetTourType	= new ActionSetTourType(this);
+		final ActionEditQuick		fActionQuickEdit		= new ActionEditQuick(TourChartView.this);
+		final ActionEditTour		fActionEditTour			= new ActionEditTour(TourChartView.this);
+		final ActionSetTourType		fActionSetTourType		= new ActionSetTourType(this);
+		final ActionSetTourTag		fActionSetTourTag		= new ActionSetTourTag(this);
+		final ActionRemoveTourTag	fActionRemoveTourTag	= new ActionRemoveTourTag(this);
 
-		public void fillBarChartContextMenu(IMenuManager menuMgr, int hoveredBarSerieIndex, int hoveredBarValueIndex) {}
+		public void fillBarChartContextMenu(final IMenuManager menuMgr,
+											final int hoveredBarSerieIndex,
+											final int hoveredBarValueIndex) {}
 
-		public void fillContextMenu(IMenuManager menuMgr) {
+		public void fillContextMenu(final IMenuManager menuMgr) {
 
 			menuMgr.add(fActionQuickEdit);
 			menuMgr.add(fActionSetTourType);
+
+			menuMgr.add(new Separator());
+			menuMgr.add(fActionSetTourTag);
+			menuMgr.add(fActionRemoveTourTag);
+
+			menuMgr.add(new Separator());
 			menuMgr.add(fActionEditTour);
 
 			final boolean isEnabled = fTourData != null && fTourData.getTourPerson() != null;
@@ -103,11 +116,13 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			fActionSetTourType.setEnabled(isEnabled);
 		}
 
-		public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider) {}
+		public void fillXSliderContextMenu(	final IMenuManager menuMgr,
+											final ChartXSlider leftSlider,
+											final ChartXSlider rightSlider) {}
 
 		public ArrayList<TourData> getSelectedTours() {
 
-			ArrayList<TourData> tourList = new ArrayList<TourData>();
+			final ArrayList<TourData> tourList = new ArrayList<TourData>();
 			tourList.add(fTourData);
 
 			return tourList;
@@ -149,7 +164,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 	private void addSelectionListener() {
 
 		fPostSelectionListener = new ISelectionListener() {
-			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				onSelectionChanged(selection);
 			}
 		};
@@ -160,7 +175,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 		fTourDbListener = new IPropertyListener() {
 
-			public void propertyChanged(Object source, int propId) {
+			public void propertyChanged(final Object source, final int propId) {
 				if (propId == TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED) {
 
 					if (fTourData == null) {
@@ -184,7 +199,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 	private void addTourPropertyListener() {
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(int propertyId, Object propertyData) {
+			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 
@@ -201,11 +216,11 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 					}
 
 					// get modified tours
-					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
 					final long tourId = fTourData.getTourId();
 
 					// check if the tour in the editor was modified
-					for (TourData tourData : modifiedTours) {
+					for (final TourData tourData : modifiedTours) {
 						if (tourData.getTourId() == tourId) {
 
 							// keep changed data
@@ -224,7 +239,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 
 		fPageBook = new PageBook(parent, SWT.NONE);
 
@@ -238,7 +253,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		fTourChart.setContextProvider(new TourChartContextProvicer());
 
 		fTourChart.addDoubleClickListener(new Listener() {
-			public void handleEvent(Event event) {
+			public void handleEvent(final Event event) {
 				if (fTourData.getTourPerson() != null) {
 					TourManager.getInstance().openTourInEditor(fTourData.getTourId());
 				}
@@ -249,7 +264,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 		// set chart title
 		fTourChart.addDataModelListener(new IDataModelListener() {
-			public void dataModelChanged(ChartDataModel chartDataModel) {
+			public void dataModelChanged(final ChartDataModel chartDataModel) {
 				chartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
 			}
 		});
@@ -271,7 +286,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		// show current selected chart if there are any
-		ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
 		if (selection != null) {
 			onSelectionChanged(selection);
 		} else {
@@ -300,7 +315,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			return null;
 		}
 
-		ArrayList<TourData> tourList = new ArrayList<TourData>();
+		final ArrayList<TourData> tourList = new ArrayList<TourData>();
 		tourList.add(fTourData);
 
 		return tourList;
@@ -314,7 +329,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		return false;
 	}
 
-	private void onSelectionChanged(ISelection selection) {
+	private void onSelectionChanged(final ISelection selection) {
 
 		if (selection instanceof SelectionTourData) {
 
@@ -330,7 +345,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 		} else if (selection instanceof SelectionTourId) {
 
-			SelectionTourId tourIdSelection = (SelectionTourId) selection;
+			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 
 			if (fTourData != null) {
 				if (fTourData.getTourId().equals(tourIdSelection.getTourId())) {

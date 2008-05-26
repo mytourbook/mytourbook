@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TVITourTag;
 import net.tourbook.tag.TVITourTagCategory;
 import net.tourbook.tour.TourManager;
@@ -36,6 +38,9 @@ import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -73,8 +78,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	private ColumnManager			fColumnManager;
 
 	private PostSelectionProvider	fPostSelectionProvider;
+	private IPropertyChangeListener	fPrefChangeListener;
 
 	TVITagViewRoot					fRootItem;
+
+	private ActionRefreshView		fActionRefreshView;
 
 	private class TagContentProvider implements ITreeContentProvider {
 
@@ -134,6 +142,34 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		}
 	}
 
+	private void addPrefListener() {
+
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+
+					reloadTagViewer();
+
+				}
+			}
+		};
+
+		// register the listener
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+	}
+
+	private void createActions() {
+
+		fActionRefreshView = new ActionRefreshView(this);
+
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(fActionRefreshView);
+	}
+
 	private void createContextMenu() {
 
 	}
@@ -145,14 +181,14 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
 
 		createTagViewer(fViewerContainer);
-//		createActions();
+		createActions();
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		// update the viewer
-		fRootItem = new TVITagViewRoot(this);
-		fTagViewer.setInput(this);
+		addPrefListener();
+
+		reloadTagViewer();
 	}
 
 	private Control createTagViewer(final Composite parent) {
@@ -246,6 +282,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	@Override
 	public void dispose() {
 
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+
 		super.dispose();
 	}
 
@@ -269,11 +307,34 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	}
 
 	public ArrayList<TourData> getSelectedTours() {
-		return null;
+
+		// get selected tours
+		final IStructuredSelection selectedTours = ((IStructuredSelection) fTagViewer.getSelection());
+
+		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+
+//		// loop: all selected tours
+//		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+//
+//			final Object treeItem = iter.next();
+//
+//			if (treeItem instanceof TVITourBookTour) {
+//
+//				final TVITourBookTour tviTour = ((TVITourBookTour) treeItem);
+//
+//				final TourData tourData = TourManager.getInstance().getTourData(tviTour.getTourId());
+//
+//				if (tourData != null) {
+//					selectedTourData.add(tourData);
+//				}
+//			}
+//		}
+
+		return selectedTourData;
 	}
 
 	public TreeViewer getTreeViewer() {
-		return null;
+		return fTagViewer;
 	}
 
 	@Override
@@ -288,6 +349,14 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	public boolean isFromTourEditor() {
 		return false;
+	}
+
+	/**
+	 * reload the content of the tag viewer
+	 */
+	void reloadTagViewer() {
+		fRootItem = new TVITagViewRoot(this);
+		fTagViewer.setInput(this);
 	}
 
 	@Override

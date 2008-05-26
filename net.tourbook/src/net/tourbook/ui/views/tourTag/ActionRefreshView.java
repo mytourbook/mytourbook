@@ -14,27 +14,30 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 
-package net.tourbook.ui;
+package net.tourbook.ui.views.tourTag;
 
-import java.util.ArrayList;
+import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
 
-import net.tourbook.data.TourData;
-import net.tourbook.tour.TourEditor;
+import org.eclipse.jface.action.Action;
 
-/**
- * This interface provides tours which are selected in a view or editor
- */
-public interface ISelectedTours {
+public class ActionRefreshView extends Action {
 
-	/**
-	 * Returns the tours which are selected or <code>null</code> when a tour is not selected
-	 */
-	ArrayList<TourData> getSelectedTours();
+	private TagView	fTagView;
 
-	/**
-	 * @return Returns <code>true</code> when {@link ISelectedTours#getSelectedTours()} is created
-	 * 	in a {@link TourEditor}
-	 */
-	boolean isFromTourEditor();
+	public ActionRefreshView(final TagView view) {
+
+		super(null, AS_PUSH_BUTTON);
+
+		fTagView = view;
+
+		setToolTipText(Messages.tag_view_action_refresh_view_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__refresh));
+	}
+
+	@Override
+	public void run() {
+		fTagView.reloadTagViewer();
+	}
 
 }

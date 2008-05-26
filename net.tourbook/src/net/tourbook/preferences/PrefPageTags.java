@@ -82,6 +82,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	private Button		fBtnNewTagCategory;
 
+	private boolean		fIsModified			= false;
+
 	class TagViewerContentProvicer implements ITreeContentProvider {
 
 		public void dispose() {}
@@ -474,6 +476,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 			// reveal new tag in viewer
 			fTagViewer.reveal(newCategoryItem);
+
+			fIsModified = true;
 		}
 	}
 
@@ -616,6 +620,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 			// show new tag in viewer
 			fTagViewer.reveal(tourTagItem);
+
+			fIsModified = true;
 		}
 	}
 
@@ -674,12 +680,18 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			fTagViewer.update(tourCategoryItem, null);
 
 		}
+
+		fIsModified = true;
 	}
 
 	@Override
 	public boolean performOk() {
 
-//		saveFilterList();
+		if (fIsModified) {
+
+			// fire modify event
+			getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
+		}
 
 		return true;
 	}

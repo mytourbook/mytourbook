@@ -117,8 +117,6 @@ public class TourManager {
 	 */
 	private TourChart						fActiveTourChart;
 
-	private TourManager() {}
-
 	public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {
 
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
@@ -187,7 +185,7 @@ public class TourManager {
 		return UI.DateFormatter.format(calendar.getTime());
 	}
 
-	public static String getTourDateFull(TourData tourData) {
+	public static String getTourDateFull(final TourData tourData) {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
 
@@ -219,8 +217,10 @@ public class TourManager {
 
 		final String tourTitle = tourData.getTourTitle();
 
-		return getTourDate(tourData)
-				+ " - " + getTourTime(tourData) + ((tourTitle.length() == 0) ? "" : " - " + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return getTourDateFull(tourData) + //
+				" - "
+				+ getTourTime(tourData)
+				+ ((tourTitle.length() == 0) ? "" : " - " + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -274,6 +274,8 @@ public class TourManager {
 		chartConfig.scrollZoomedGraph = scrollZoomedGraph;
 		chartConfig.autoZoomToSlider = autoZoomToSlider;
 	}
+
+	private TourManager() {}
 
 	public void addPropertyListener(final ITourPropertyListener listener) {
 		fPropertyListeners.add(listener);
@@ -576,7 +578,7 @@ public class TourManager {
 	 * Creates a chart data fDataModel from the tour data
 	 * 
 	 * @param tourData
-	 *        data which contains the tour data
+	 * 		data which contains the tour data
 	 * @param tourChartProperty
 	 * @param fTourChartConfig
 	 * @return
@@ -1042,7 +1044,7 @@ public class TourManager {
 	 * 
 	 * @param tourId
 	 * @return Returns the tour data for the tour id or <code>null</code> when the tour is not in
-	 *         the database
+	 * 	the database
 	 */
 	public TourData getTourData(final Long tourId) {
 
@@ -1097,8 +1099,12 @@ public class TourManager {
 		fTourDataMap.remove(tourId);
 	}
 
-	public void setActiveTourChart(TourChart tourChart) {
+	public void setActiveTourChart(final TourChart tourChart) {
 		fActiveTourChart = tourChart;
+	}
+
+	public void updateTourInCache(final TourData tourData) {
+		fTourDataMap.put(tourData.getTourId(), tourData);
 	}
 
 }

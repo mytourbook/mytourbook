@@ -1,9 +1,9 @@
 package net.tourbook.ui.views.tourTag;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
@@ -31,25 +31,36 @@ public class TVITagViewTag extends TVITagViewItem {
 		try {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement;
+			Statement statement;
 			ResultSet result;
 
 			/*
-			 * get tour tag categories
+			 * get tour data for the tag Id of this tree item
 			 */
 			sb.append("SELECT ");
-			sb.append(" StartYear,");
-			sb.append(" StartMonth,");
-			sb.append(" StartDay,");
-			sb.append(" TourDistance,");
-			sb.append(" TourRecordingTime,");
-			sb.append(" TourDrivingTime,");
-			sb.append(" TourAltUp,");
-			sb.append(" TourAltDown");
-			sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA + " AS TourData");
-			sb.append(" WHERE isRoot = 1");
+			sb.append(TourDatabase.TABLE_TOUR_DATA + ".StartYear,");
+			sb.append(TourDatabase.TABLE_TOUR_DATA + ".StartMonth,");
+			sb.append(TourDatabase.TABLE_TOUR_DATA + ".StartDay,");
+			sb.append(TourDatabase.TABLE_TOUR_DATA + ".TourDistance,");
+			sb.append(TourDatabase.TABLE_TOUR_DATA + ".TourRecordingTime,");
+			sb.append(TourDatabase.TABLE_TOUR_DATA + ".TourDrivingTime,");
+			sb.append(TourDatabase.TABLE_TOUR_DATA + ".TourAltUp,");
+			sb.append(TourDatabase.TABLE_TOUR_DATA + ".TourAltDown");
 
-//			String sqlString = "SELECT " //			//$NON-NLS-1$
+			sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA + " " + TourDatabase.TABLE_TOUR_DATA);
+
+			sb.append(" LEFT OUTER JOIN "
+					+ TourDatabase.JOINTABLE_TOURDATA__TOURTAG
+					+ " "
+					+ TourDatabase.JOINTABLE_TOURDATA__TOURTAG
+					+ " ON ");
+
+			sb.append((TourDatabase.JOINTABLE_TOURDATA__TOURTAG + ".TourData_tourId = ")
+					+ (TourDatabase.TABLE_TOUR_DATA + ".tourId"));
+
+			sb.append(" WHERE " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + ".TourTag_TagId = " + tagId);
+
+			//			String sqlString = "SELECT " //			//$NON-NLS-1$
 //				+ "STARTYear, " //1				//$NON-NLS-1$
 //				+ "STARTMonth, " //2			//$NON-NLS-1$
 //				+ "STARTDay, " //3				//$NON-NLS-1$
@@ -69,20 +80,15 @@ public class TVITagViewTag extends TVITagViewItem {
 //				+ "avgPulse," //17				//$NON-NLS-1$
 //				+ "avgCadence," //18			//$NON-NLS-1$
 //				+ "avgTemperature" //19			//$NON-NLS-1$
-//				+ "\n" //						//$NON-NLS-1$
-//				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //			//$NON-NLS-1$ //$NON-NLS-2$
-//				+ (" WHERE STARTYEAR = " + yearItem.fTourYear) //				//$NON-NLS-1$
-//				+ (" AND STARTMONTH = " + fTourMonth) //						//$NON-NLS-1$
-//				+ sqlTourPersonId()
-//				+ sqlTourTypeId()
-//				+ " ORDER BY STARTDAY, StartHour, StartMinute"; //$NON-NLS-1$
 
-			statement = conn.prepareStatement(sb.toString());
-			result = statement.executeQuery();
+//			statement = conn.prepareStatement(sb.toString());
+			statement = conn.createStatement();
+
+			result = statement.executeQuery(sb.toString());
 
 			while (result.next()) {
 
-				final TVITagViewTagCategory treeItem = new TVITagViewTagCategory(getTagView());
+				final TVITagViewTour treeItem = new TVITagViewTour(getTagView());
 				treeItem.treeColumn = result.getString(1);
 
 				children.add(treeItem);
@@ -95,9 +101,12 @@ public class TVITagViewTag extends TVITagViewItem {
 		}
 	}
 
-	@Override
-	protected void remove() {
+//	@Override
+//	public boolean hasChildren() {
+//		return false;
+//	}
 
-	}
+	@Override
+	protected void remove() {}
 
 }

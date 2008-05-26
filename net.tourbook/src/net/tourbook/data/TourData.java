@@ -17,6 +17,7 @@
 package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.FetchType.EAGER;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -231,8 +232,9 @@ public class TourData {
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	private Set<TourReference>	tourReferences					= new HashSet<TourReference>();
 
-	@ManyToMany
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId"))
+	@ManyToMany(fetch = EAGER)
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"))
+//	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId"))
 	private Set<TourTag>		tourTags						= new HashSet<TourTag>();
 
 	/**
