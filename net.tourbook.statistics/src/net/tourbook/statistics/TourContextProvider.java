@@ -30,11 +30,13 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ActionSetTourTag;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 
 /**
  * provides the fill menu methods for the chart context menu
@@ -44,16 +46,16 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 	/** 
 	 * 
 	 */
-//	private final Chart					fChart;
 	private final IBarSelectionProvider	fBarSelectionProvider;
 
 	private final ActionEditQuick		fActionEditQuick;
 	private final ActionEditTour		fActionEditTour;
 	private final ActionSetTourType		fActionSetTourType;
+	private final ActionSetTourTag		fActionSetTourTag;
 
 	private class ActionEditTour extends Action {
 
-		public ActionEditTour(String text) {
+		public ActionEditTour(final String text) {
 
 			super(text);
 
@@ -89,28 +91,34 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 //		}
 //	}
 
-	public TourContextProvider(Chart chart, IBarSelectionProvider barSelectionProvider) {
+	public TourContextProvider(final Chart chart, final IBarSelectionProvider barSelectionProvider) {
 
-//		fChart = chart;
 		fBarSelectionProvider = barSelectionProvider;
 
 		fActionEditQuick = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(Messages.action_edit_tour);
 		fActionSetTourType = new ActionSetTourType(this);
+		fActionSetTourTag = new ActionSetTourTag(this);
 	}
 
-	public void fillBarChartContextMenu(IMenuManager menuMgr, int hoveredBarSerieIndex, int hoveredBarValueIndex) {
+	public void fillBarChartContextMenu(final IMenuManager menuMgr,
+										final int hoveredBarSerieIndex,
+										final int hoveredBarValueIndex) {
 
 		final boolean isTourHovered = hoveredBarSerieIndex != -1;
 
 		fActionEditQuick.setEnabled(isTourHovered);
 		fActionEditTour.setEnabled(isTourHovered);
 
-		ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourHovered && tourTypes.size() > 0);
+		fActionSetTourTag.setEnabled(isTourHovered && tourTypes.size() > 0);
 
 		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionSetTourTag);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditTour);
 
 // disabled because it shows the wrong month		
@@ -118,9 +126,11 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 //		menuMgr.add(new ActionZoomIntoMonth(Messages.ACTION_ZOOM_INTO_MONTH));
 	}
 
-	public void fillContextMenu(IMenuManager menuMgr) {}
+	public void fillContextMenu(final IMenuManager menuMgr) {}
 
-	public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider) {}
+	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
+										final ChartXSlider leftSlider,
+										final ChartXSlider rightSlider) {}
 
 	public ArrayList<TourData> getSelectedTours() {
 
@@ -131,7 +141,7 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 			final TourData tourData = TourManager.getInstance().getTourData(selectedTourId);
 
 			if (tourData != null) {
-				ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+				final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
 				selectedTourData.add(tourData);
 				return selectedTourData;
 			}
