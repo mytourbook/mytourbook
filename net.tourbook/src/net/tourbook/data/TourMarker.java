@@ -55,7 +55,8 @@ public class TourMarker {
 	private TourData				tourData;
 
 	/**
-	 * type contains the marker type which is defined in ChartMarker e.g.<code>ChartMarker.MARKER_TYPE_DEVICE</code>
+	 * type contains the marker type which is defined in {@link ChartMarker} like {@link
+	 * ChartMarker#MARKER_TYPE_DEVICE}
 	 */
 	private int						type;
 
@@ -92,7 +93,7 @@ public class TourMarker {
 
 	public TourMarker() {}
 
-	public TourMarker(TourData tourData, int markerType) {
+	public TourMarker(final TourData tourData, final int markerType) {
 		this.tourData = tourData;
 		this.type = markerType;
 	}
@@ -102,10 +103,10 @@ public class TourMarker {
 	 * 
 	 * @param comparedMarker
 	 * @param ignoreType
-	 *        set <code>true</code> to not compare the type field
+	 * 		set <code>true</code> to not compare the type field
 	 * @return Returns true when the content of the markers are equal
 	 */
-	public boolean compareTo(TourMarker comparedMarker, boolean ignoreType) {
+	public boolean compareTo(final TourMarker comparedMarker, final boolean ignoreType) {
 
 		if (category.compareTo(comparedMarker.category) != 0) {
 			return false;
@@ -179,6 +180,10 @@ public class TourMarker {
 		return type;
 	}
 
+	public int getVisibleType() {
+		return visibleType;
+	}
+
 	public int getVisualPosition() {
 		return visualPosition;
 	}
@@ -188,7 +193,7 @@ public class TourMarker {
 	 * 
 	 * @param backupMarker
 	 */
-	public void restoreMarkerFromBackup(TourMarker backupMarker) {
+	public void restoreMarkerFromBackup(final TourMarker backupMarker) {
 
 		category = backupMarker.category;
 		label = backupMarker.label;
@@ -206,7 +211,7 @@ public class TourMarker {
 		tourData = backupMarker.tourData;
 	}
 
-	public void setCategory(String category) {
+	public void setCategory(final String category) {
 		this.category = category;
 	}
 
@@ -215,19 +220,19 @@ public class TourMarker {
 	 * 
 	 * @param distance
 	 */
-	public void setDistance(int distance) {
+	public void setDistance(final int distance) {
 		this.distance = distance;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(final String label) {
 		this.label = label;
 	}
 
-	public void setLabelXOffset(int labelXOffset) {
+	public void setLabelXOffset(final int labelXOffset) {
 		this.labelXOffset = labelXOffset;
 	}
 
-	public void setLabelYOffset(int labelYOffset) {
+	public void setLabelYOffset(final int labelYOffset) {
 		this.labelYOffset = labelYOffset;
 	}
 
@@ -236,7 +241,7 @@ public class TourMarker {
 	 * 
 	 * @param backupMarker
 	 */
-	public void setMarkerBackup(TourMarker backupMarker) {
+	public void setMarkerBackup(final TourMarker backupMarker) {
 
 		backupMarker.category = new String(category);
 		backupMarker.label = new String(label);
@@ -254,27 +259,23 @@ public class TourMarker {
 		backupMarker.tourData = tourData;
 	}
 
-	public void setSerieIndex(int serieIndex) {
+	public void setSerieIndex(final int serieIndex) {
 		this.serieIndex = serieIndex;
-	}
-
-	public void setTime(int time) {
-		this.time = time;
 	}
 
 //	public void setType(int type) {
 //		this.type = type;
 //	}
 
-	public void setVisualPosition(int visualPosition) {
-		this.visualPosition = visualPosition;
+	public void setTime(final int time) {
+		this.time = time;
 	}
 
-	public int getVisibleType() {
-		return visibleType;
-	}
-
-	public void setVisibleType(int visibleType) {
+	public void setVisibleType(final int visibleType) {
 		this.visibleType = visibleType;
+	}
+
+	public void setVisualPosition(final int visualPosition) {
+		this.visualPosition = visualPosition;
 	}
 }

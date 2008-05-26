@@ -1,8 +1,11 @@
 package net.tourbook.ui.views.tourTag;
 
+import org.joda.time.DateTime;
+
 public class TVITagViewTour extends TVITagViewItem {
 
-	long	tourId;
+	long		tourId;
+	DateTime	tourDate;
 
 	public TVITagViewTour(final TagView tagView) {
 		super(tagView);

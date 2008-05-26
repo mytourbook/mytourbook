@@ -1,13 +1,15 @@
 package net.tourbook.ui.views.tourTag;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+
+import org.joda.time.DateTime;
 
 public class TVITagViewTag extends TVITagViewItem {
 
@@ -31,65 +33,45 @@ public class TVITagViewTag extends TVITagViewItem {
 		try {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
-			Statement statement;
-			ResultSet result;
 
 			/*
 			 * get tour data for the tag Id of this tree item
 			 */
 			sb.append("SELECT ");
-			sb.append(TourDatabase.TABLE_TOUR_DATA + ".StartYear,");
-			sb.append(TourDatabase.TABLE_TOUR_DATA + ".StartMonth,");
-			sb.append(TourDatabase.TABLE_TOUR_DATA + ".StartDay,");
-			sb.append(TourDatabase.TABLE_TOUR_DATA + ".TourDistance,");
-			sb.append(TourDatabase.TABLE_TOUR_DATA + ".TourRecordingTime,");
-			sb.append(TourDatabase.TABLE_TOUR_DATA + ".TourDrivingTime,");
-			sb.append(TourDatabase.TABLE_TOUR_DATA + ".TourAltUp,");
-			sb.append(TourDatabase.TABLE_TOUR_DATA + ".TourAltDown");
 
-			sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA + " " + TourDatabase.TABLE_TOUR_DATA);
+			sb.append(" jTdataTtag.TourData_tourId,");//	// 1 
+			sb.append(" Tdata.StartYear,"); //				// 2 
+			sb.append(" Tdata.StartMonth,");//				// 3
+			sb.append(" Tdata.StartDay,");//				// 4
+			sb.append(" Tdata.TourDistance,");//			// 5
+			sb.append(" Tdata.TourRecordingTime,");//		// 6
+			sb.append(" Tdata.TourDrivingTime,");//			// 7
+			sb.append(" Tdata.TourAltUp,");//				// 8
+			sb.append(" Tdata.TourAltDown");//				// 9
 
-			sb.append(" LEFT OUTER JOIN "
-					+ TourDatabase.JOINTABLE_TOURDATA__TOURTAG
-					+ " "
-					+ TourDatabase.JOINTABLE_TOURDATA__TOURTAG
-					+ " ON ");
+			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
 
-			sb.append((TourDatabase.JOINTABLE_TOURDATA__TOURTAG + ".TourData_tourId = ")
-					+ (TourDatabase.TABLE_TOUR_DATA + ".tourId"));
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " Tdata ON ");
+			sb.append(" jTdataTtag.TourData_tourId=Tdata.tourId ");
+//			sb.append(" Tdata.tourId=jTdataTtag.TourData_tourId ");
 
-			sb.append(" WHERE " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + ".TourTag_TagId = " + tagId);
+			sb.append(" WHERE jTdataTtag.TourTag_TagId = " + tagId);
 
-			//			String sqlString = "SELECT " //			//$NON-NLS-1$
-//				+ "STARTYear, " //1				//$NON-NLS-1$
-//				+ "STARTMonth, " //2			//$NON-NLS-1$
-//				+ "STARTDay, " //3				//$NON-NLS-1$
-//				+ "TOURDISTANCE, " //4			//$NON-NLS-1$
-//				+ "TOURRECORDINGTIME, " //5		//$NON-NLS-1$
-//				+ "TOURDRIVINGTIME, " //6		//$NON-NLS-1$
-//				+ "TOURALTUP, " //7				//$NON-NLS-1$
-//				+ "TOURALTDOWN, " //8			//$NON-NLS-1$
-//				+ "startDistance, " //9			//$NON-NLS-1$
-//				+ "tourID," //10				//$NON-NLS-1$
-//				+ "tourType_typeId," //11		//$NON-NLS-1$
-//				+ "tourTitle," //12				//$NON-NLS-1$
-//				+ "deviceTimeInterval," //13	//$NON-NLS-1$
-//				+ "maxSpeed," //14				//$NON-NLS-1$
-//				+ "maxAltitude," //15			//$NON-NLS-1$
-//				+ "maxPulse," //16				//$NON-NLS-1$
-//				+ "avgPulse," //17				//$NON-NLS-1$
-//				+ "avgCadence," //18			//$NON-NLS-1$
-//				+ "avgTemperature" //19			//$NON-NLS-1$
+			final String sqlString = sb.toString();
 
-//			statement = conn.prepareStatement(sb.toString());
-			statement = conn.createStatement();
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final ResultSet result = statement.executeQuery();
 
-			result = statement.executeQuery(sb.toString());
+//			final long time = System.currentTimeMillis();
+//			System.out.println(System.currentTimeMillis() - time + "ms\t" + sqlString);
 
 			while (result.next()) {
 
 				final TVITagViewTour treeItem = new TVITagViewTour(getTagView());
+
 				treeItem.treeColumn = result.getString(1);
+
+				treeItem.tourDate = new DateTime(result.getInt(2), result.getInt(3), result.getInt(4), 0, 0, 0, 0);
 
 				children.add(treeItem);
 			}

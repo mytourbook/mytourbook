@@ -1091,6 +1091,9 @@ public class TourDatabase {
 
 		stmt.addBatch(sql); //$NON-NLS-1$
 
+		/*
+		 * CREATE TABLE TourData_TourTag
+		 */
 		final String field_TourData_tourId = TABLE_TOUR_DATA + "_tourId";
 		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId";
 
@@ -1107,6 +1110,12 @@ public class TourDatabase {
 		 * Add Constrainsts
 		 */
 
+//		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //						//$NON-NLS-1$ //$NON-NLS-2$
+//				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURTAG + "_pk") //		//$NON-NLS-1$
+//				+ (" PRIMARY KEY (" + field_TourTag_tagId + ")"); //				//$NON-NLS-1$ //$NON-NLS-2$
+//
+//		System.out.println(sql);
+//		stmt.addBatch(sql);
 		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				+ ("	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourTag_tagId)

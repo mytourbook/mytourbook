@@ -16,6 +16,7 @@
 
 package net.tourbook.ui.views.tourTag;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -66,11 +67,12 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
-	static public final String		ID	= "net.tourbook.views.tagViewID";	//$NON-NLS-1$
+	static public final String		ID	= "net.tourbook.views.tagViewID";				//$NON-NLS-1$
 
 	private static IMemento			fSessionMemento;
 
-	public NumberFormat				fNF	= NumberFormat.getNumberInstance();
+	private NumberFormat			fNF	= NumberFormat.getNumberInstance();
+	private DateFormat				fDF	= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	private Composite				fViewerContainer;
 
@@ -271,9 +273,16 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final Object element = cell.getElement();
 				final TVITagViewItem tagItem = (TVITagViewItem) element;
-				cell.setText(tagItem.treeColumn);
+
+				if (tagItem instanceof TVITagViewTour) {
+					cell.setText(fDF.format(((TVITagViewTour) tagItem).tourDate.toDate()));
+//					cell.setText(tagItem.treeColumn);
+				} else {
+					cell.setText(tagItem.treeColumn);
+				}
 			}
 		});
 
