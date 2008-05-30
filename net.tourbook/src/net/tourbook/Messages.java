@@ -220,6 +220,10 @@ public class Messages extends NLS {
 	public static String		Image__synch_graph_bySize;
 	public static String		Image__synch_graph_bySize_disabled;
 	public static String		Image__synch_statistics;
+	public static String	Image__tag;
+
+	public static String	Image__tag_category;
+
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
 	public static String		Image__undo_edit;

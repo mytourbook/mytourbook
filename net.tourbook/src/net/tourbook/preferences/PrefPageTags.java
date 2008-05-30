@@ -75,14 +75,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	private TVIRootItem	fRootItem;
 
-	private Image		fImgFolderClosed	= TourbookPlugin.getImageDescriptor(Messages.Image__folder_closed)
-													.createImage();
-	private Image		fImgFolderOpened	= TourbookPlugin.getImageDescriptor(Messages.Image__folder_opened)
-													.createImage();
+	private Image		fImgTagCategory	= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category).createImage();
+	private Image		fImgTag			= TourbookPlugin.getImageDescriptor(Messages.Image__tag).createImage();
 
 	private Button		fBtnNewTagCategory;
 
-	private boolean		fIsModified			= false;
+	private boolean		fIsModified		= false;
 
 	class TagViewerContentProvicer implements ITreeContentProvider {
 
@@ -295,6 +293,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				if (element instanceof TVITourTag) {
 
 					cell.setText(((TVITourTag) element).getTourTag().getTagName()); //$NON-NLS-1$
+					cell.setImage(fImgTag);
 
 				} else if (element instanceof TVITourTagCategory) {
 
@@ -302,9 +301,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 					final TourTagCategory tourTagCategory = tourTagCategoryItem.getTourTagCategory();
 
 					cell.setText(tourTagCategory.getCategoryName()); //$NON-NLS-1$
-
-					final boolean expandedState = fTagViewer.getExpandedState(tourTagCategoryItem);
-					cell.setImage(expandedState ? fImgFolderOpened : fImgFolderClosed);
+					cell.setImage(fImgTagCategory);
 				}
 			}
 		});
@@ -338,8 +335,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	@Override
 	public void dispose() {
 
-		fImgFolderOpened.dispose();
-		fImgFolderClosed.dispose();
+		fImgTag.dispose();
+		fImgTagCategory.dispose();
 
 		super.dispose();
 	}

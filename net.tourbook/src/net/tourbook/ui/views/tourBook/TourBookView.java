@@ -395,7 +395,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		// define and create all columns
 		fColumnManager = new ColumnManager(this);
-		defineAllColumns(parent);
+		createTourViewerColumns(parent);
 		fColumnManager.createColumns();
 
 		fTourViewer.setContentProvider(new TourBookContentProvider());
@@ -476,7 +476,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	 * 
 	 * @param parent
 	 */
-	private void defineAllColumns(final Composite parent) {
+	private void createTourViewerColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 		TreeColumnDefinition colDef;
@@ -850,7 +850,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	/**
 	 * @param initializeYearMonth
-	 * 		reset the selected year/month when set to <code>true</code>
+	 *            reset the selected year/month when set to <code>true</code>
 	 */
 	private void getTourViewerSelection(final boolean initializeYearMonth) {
 

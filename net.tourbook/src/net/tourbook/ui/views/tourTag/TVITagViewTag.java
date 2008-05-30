@@ -39,41 +39,46 @@ public class TVITagViewTag extends TVITagViewItem {
 			 */
 			sb.append("SELECT ");
 
-			sb.append(" jTdataTtag.TourData_tourId,");//	// 1 
+			sb.append(" TData.TourId,");//	// 1 
 			sb.append(" Tdata.StartYear,"); //				// 2 
 			sb.append(" Tdata.StartMonth,");//				// 3
 			sb.append(" Tdata.StartDay,");//				// 4
-			sb.append(" Tdata.TourDistance,");//			// 5
-			sb.append(" Tdata.TourRecordingTime,");//		// 6
-			sb.append(" Tdata.TourDrivingTime,");//			// 7
-			sb.append(" Tdata.TourAltUp,");//				// 8
-			sb.append(" Tdata.TourAltDown");//				// 9
+			sb.append(" Tdata.TourTitle,");//				// 5
+			sb.append(" Tdata.tourType_typeId,");//			// 6
 
-			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
+//			sb.append(" Tdata.TourDistance,");//			// 
+//			sb.append(" Tdata.TourRecordingTime,");//		// 
+//			sb.append(" Tdata.TourDrivingTime,");//			// 
+//			sb.append(" Tdata.TourAltUp,");//				// 
+			sb.append(" Tdata.TourAltDown");//				// 
 
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " Tdata ON ");
+			sb.append(" FROM \"USER\".\"TOURDATA_TOURTAG\" jTdataTtag");
+			sb.append(" LEFT OUTER JOIN \"USER\".\"TOURDATA\" Tdata ON ");
 			sb.append(" jTdataTtag.TourData_tourId=Tdata.tourId ");
-//			sb.append(" Tdata.tourId=jTdataTtag.TourData_tourId ");
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId = " + tagId);
 
 			final String sqlString = sb.toString();
 
+//			final long time = System.currentTimeMillis();
+
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 			final ResultSet result = statement.executeQuery();
 
-//			final long time = System.currentTimeMillis();
 //			System.out.println(System.currentTimeMillis() - time + "ms\t" + sqlString);
 
 			while (result.next()) {
 
-				final TVITagViewTour treeItem = new TVITagViewTour(getTagView());
+				final TVITagViewTour tourItem = new TVITagViewTour(getTagView());
 
-				treeItem.treeColumn = result.getString(1);
+				tourItem.treeColumn = result.getString(1);
+				tourItem.tourDate = new DateTime(result.getInt(2), result.getInt(3), result.getInt(4), 0, 0, 0, 0);
+				tourItem.tourTitle = result.getString(5);
 
-				treeItem.tourDate = new DateTime(result.getInt(2), result.getInt(3), result.getInt(4), 0, 0, 0, 0);
+				final Object tourTypeId = result.getObject(6);
+				tourItem.tourTypeId = (tourTypeId == null ? TourDatabase.ENTITY_IS_NOT_SAVED : (Long) tourTypeId);
 
-				children.add(treeItem);
+				children.add(tourItem);
 			}
 
 			conn.close();
@@ -82,11 +87,6 @@ public class TVITagViewTag extends TVITagViewItem {
 			e.printStackTrace();
 		}
 	}
-
-//	@Override
-//	public boolean hasChildren() {
-//		return false;
-//	}
 
 	@Override
 	protected void remove() {}

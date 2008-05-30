@@ -75,6 +75,8 @@ public class TourDatabase {
 	 */
 	private static final String			TABLE_DB_VERSION							= "DbVersion";													//$NON-NLS-1$
 
+	public static final String			TABLE_SCHEMA								= "USER";														//$NON-NLS-1$
+
 	public static final String			TABLE_TOUR_BIKE								= "TourBike";													//$NON-NLS-1$
 	public static final String			TABLE_TOUR_CATEGORY							= "TourCategory";												//$NON-NLS-1$
 	public static final String			TABLE_TOUR_COMPARED							= "TourCompared";												//$NON-NLS-1$
@@ -156,8 +158,8 @@ public class TourDatabase {
 	/**
 	 * @param tourTypeList
 	 * @return Returns a list with all {@link TourType}'s.<br>
-	 * 	Returns <code>null</code> when {@link TourType}'s are not defined.<br>
-	 * 	Return an empty list when the {@link TourType} is not set within the {@link TourData}
+	 *         Returns <code>null</code> when {@link TourType}'s are not defined.<br>
+	 *         Return an empty list when the {@link TourType} is not set within the {@link TourData}
 	 */
 	public static ArrayList<TourType> getActiveTourTypes() {
 		return fActiveTourTypes;
@@ -295,7 +297,7 @@ public class TourDatabase {
 	/**
 	 * @param typeId
 	 * @return Returns the name for the {@link TourType} or an empty string when the tour type id
-	 * 	was not found
+	 *         was not found
 	 */
 	public static String getTourTypeName(final long typeId) {
 
@@ -722,7 +724,7 @@ public class TourDatabase {
 	private Connection createConnection() throws SQLException {
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby://localhost:1527/tourbook;create=true", //$NON-NLS-1$
-				"user", //$NON-NLS-1$
+				TABLE_SCHEMA,
 				"adsf"); //$NON-NLS-1$
 		return conn;
 	}
@@ -1249,16 +1251,6 @@ public class TourDatabase {
 		System.out.println();
 		stmt.addBatch(sql);
 	}
-
-// ALTER TABLE USER_ROLE 
-//		ADD CONSTRAINT FK_USER_ROLE_USER_ID 
-//			FOREIGN KEY (USER_ID) 
-//			REFERENCES USER (ID)
-
-// ALTER TABLE USER_ROLE 
-//		ADD CONSTRAINT FK_USER_ROLE_ROLE_ID 
-//			FOREIGN KEY (ROLE_ID) 
-//			REFERENCES ROLE (ID)
 
 	/**
 	 * create table {@link #TABLE_TOUR_TYPE}

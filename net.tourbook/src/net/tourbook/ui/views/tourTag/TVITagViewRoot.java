@@ -51,7 +51,7 @@ public class TVITagViewRoot extends TVITagViewItem {
 			ResultSet result;
 
 			/*
-			 * get tour tag categories
+			 * get tag categories
 			 */
 			sb.append("SELECT");
 			sb.append(" tagCategoryId,"); // 	1
@@ -74,7 +74,7 @@ public class TVITagViewRoot extends TVITagViewItem {
 			}
 
 			/*
-			 * get tour tags
+			 * get tags
 			 */
 			sb.delete(0, sb.length());
 			sb.append("SELECT");

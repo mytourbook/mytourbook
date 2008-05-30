@@ -20,6 +20,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
@@ -34,6 +35,7 @@ import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -56,6 +58,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -67,12 +70,12 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
-	static public final String		ID	= "net.tourbook.views.tagViewID";				//$NON-NLS-1$
+	static public final String		ID				= "net.tourbook.views.tagViewID";				//$NON-NLS-1$
 
 	private static IMemento			fSessionMemento;
 
-	private NumberFormat			fNF	= NumberFormat.getNumberInstance();
-	private DateFormat				fDF	= DateFormat.getDateInstance(DateFormat.SHORT);
+	private NumberFormat			fNF				= NumberFormat.getNumberInstance();
+	private DateFormat				fDF				= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	private Composite				fViewerContainer;
 
@@ -85,6 +88,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	TVITagViewRoot					fRootItem;
 
 	private ActionRefreshView		fActionRefreshView;
+
+	private Image					fImgTagCategory	= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
+															.createImage();
+	private Image					fImgTag			= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
+															.createImage();
 
 	private class TagContentProvider implements ITreeContentProvider {
 
@@ -266,7 +274,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		TreeColumnDefinition colDef;
 
 		/*
-		 * column: tag
+		 * first column
 		 */
 		colDef = TreeColumnFactory.TAG.createColumn(fColumnManager, pixelConverter);
 		colDef.setCanModifyVisibility(false);
@@ -275,13 +283,39 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final TVITagViewItem tagItem = (TVITagViewItem) element;
+				final TVITagViewItem viewItem = (TVITagViewItem) element;
 
-				if (tagItem instanceof TVITagViewTour) {
-					cell.setText(fDF.format(((TVITagViewTour) tagItem).tourDate.toDate()));
-//					cell.setText(tagItem.treeColumn);
-				} else {
-					cell.setText(tagItem.treeColumn);
+				if (viewItem instanceof TVITagViewTour) {
+
+					final TVITagViewTour tagItem = (TVITagViewTour) viewItem;
+					cell.setText(fDF.format(tagItem.tourDate.toDate()));
+					cell.setImage(UI.getInstance().getTourTypeImage(tagItem.tourTypeId));
+
+				} else if (viewItem instanceof TVITagViewTag) {
+
+					cell.setText(viewItem.treeColumn);
+					cell.setImage(fImgTag);
+
+				} else if (viewItem instanceof TVITagViewTagCategory) {
+
+					cell.setText(viewItem.treeColumn);
+					cell.setImage(fImgTagCategory);
+				}
+			}
+		});
+
+		/*
+		 * column: title
+		 */
+		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if (element instanceof TVITagViewTour) {
+					cell.setText(((TVITagViewTour) element).tourTitle);
 				}
 			}
 		});
@@ -292,6 +326,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	public void dispose() {
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+
+		fImgTagCategory.dispose();
+		fImgTag.dispose();
 
 		super.dispose();
 	}

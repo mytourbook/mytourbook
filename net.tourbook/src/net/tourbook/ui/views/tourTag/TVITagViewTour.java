@@ -6,6 +6,8 @@ public class TVITagViewTour extends TVITagViewItem {
 
 	long		tourId;
 	DateTime	tourDate;
+	String		tourTitle;
+	long		tourTypeId;
 
 	public TVITagViewTour(final TagView tagView) {
 		super(tagView);
