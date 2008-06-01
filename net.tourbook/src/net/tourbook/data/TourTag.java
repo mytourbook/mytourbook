@@ -62,6 +62,20 @@ public class TourTag {
 		this.name = tagName;
 	}
 
+	/**
+	 * Returns true if both tag id's have the same value.
+	 * 
+	 * @see IComparator#equals
+	 */
+	@Override
+	public boolean equals(final Object other) {
+		if (other instanceof TourTag) {
+			final long otherId = ((TourTag) other).getTagId();
+			return otherId == tagId;
+		}
+		return super.equals(other);
+	}
+
 	public Set<TourTagCategory> getTagCategories() {
 		return tourTagCategory;
 	}
@@ -76,6 +90,13 @@ public class TourTag {
 
 	public Collection<TourData> getTourData() {
 		return tourData;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = 17;
+		result = (int) (37 * result + tagId);
+		return result;
 	}
 
 	public boolean isRoot() {

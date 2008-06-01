@@ -32,10 +32,6 @@ public class TVIRootItem extends TreeViewerItem {
 	@Override
 	protected void fetchChildren() {
 
-		// set children for the root item
-		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
-		setChildren(children);
-
 		ArrayList<TourTag> tourTags = new ArrayList<TourTag>();
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -52,7 +48,7 @@ public class TVIRootItem extends TreeViewerItem {
 			tourTags = (ArrayList<TourTag>) query.getResultList();
 
 			for (final TourTag tourTag : tourTags) {
-				children.add(new TVITourTag(tourTag));
+				addChild(new TVITourTag(tourTag));
 			}
 
 			/*
@@ -65,7 +61,7 @@ public class TVIRootItem extends TreeViewerItem {
 			final ArrayList<TourTagCategory> tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
 
 			for (final TourTagCategory tourTagCategory : tourTagCategories) {
-				children.add(new TVITourTagCategory(tourTagCategory));
+				addChild(new TVITourTagCategory(tourTagCategory));
 			}
 
 			em.close();

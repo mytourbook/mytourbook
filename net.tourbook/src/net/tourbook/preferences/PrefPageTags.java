@@ -36,10 +36,12 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -49,9 +51,15 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -81,6 +89,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private Button		fBtnNewTagCategory;
 
 	private boolean		fIsModified		= false;
+
+	protected long		fDragStartTime;
 
 	class TagViewerContentProvicer implements ITreeContentProvider {
 
@@ -275,6 +285,237 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			}
 		});
 
+		fTagViewer.addDragSupport(DND.DROP_MOVE,
+				new Transfer[] { LocalSelectionTransfer.getTransfer() },
+				new DragSourceListener() {
+
+					public void dragFinished(final DragSourceEvent event) {
+
+						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+
+						if (event.doit == false) {
+							return;
+						}
+
+						transfer.setSelection(null);
+						transfer.setSelectionSetTime(0);
+					}
+
+					public void dragSetData(final DragSourceEvent event) {
+					// data are set in LocalSelectionTransfer
+					}
+
+					public void dragStart(final DragSourceEvent event) {
+
+						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+						final ISelection selection = fTagViewer.getSelection();
+
+						transfer.setSelection(selection);
+						transfer.setSelectionSetTime(fDragStartTime = event.time & 0xFFFFFFFFL);
+
+						event.doit = !selection.isEmpty();
+					}
+				});
+
+		fTagViewer.addDropSupport(DND.DROP_MOVE,
+				new Transfer[] { LocalSelectionTransfer.getTransfer() },
+				new ViewerDropAdapter(fTagViewer) {
+
+					/**
+					 * A dragged tag item is dragged and dropped
+					 * 
+					 * @param draggedTagItem
+					 *            tag tree item which is dragged
+					 * @return
+					 */
+					private boolean dropTag(final TVITourTag draggedTagItem) {
+
+						final Object hoveredTarget = getCurrentTarget();
+//						final int location = getCurrentLocation();
+//						final Tree tree = fTagViewer.getTree();
+
+						/*
+						 * check if drag was startet from this tree, remove the tree item before the
+						 * new tag/category is inserted
+						 */
+						if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == fDragStartTime) {
+//							fTagViewer.remove(srcTagItem);
+						}
+
+						if (hoveredTarget instanceof TVITourTagCategory) {
+
+							/*
+							 * drop the dragged tag into the hovered target category
+							 */
+
+//							droppedTag.setRoot(false);
+							final TreeViewerItem draggedTagParentItem = draggedTagItem.getParentItem();
+							final TourTag draggedTag = draggedTagItem.getTourTag();
+
+							final TVITourTagCategory targetCatItem = (TVITourTagCategory) hoveredTarget;
+							final TourTagCategory targetCategory = targetCatItem.getTourTagCategory();
+
+							boolean isUpdateViewer = false;
+
+							if (draggedTagParentItem instanceof TVITourTagCategory) {
+
+								/*
+								 * dragged tag is from a tag category
+								 */
+
+								final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+								if (em != null) {
+
+									final TVITourTagCategory draggedCatItem = (TVITourTagCategory) draggedTagParentItem;
+									final TourTagCategory draggedCategory = draggedCatItem.getTourTagCategory();
+
+									/*
+									 * remove tag from old category
+									 */
+									draggedCatItem.removeChild(draggedTagItem);
+									updateModelDraggedCategory(draggedCategory, draggedTag, em);
+
+									/*
+									 * add tag to the target category
+									 */
+									targetCatItem.addChild(draggedTagItem);
+									updateModelTargetCategory(targetCategory, draggedTag, em);
+
+									em.close();
+
+									isUpdateViewer = true;
+								}
+
+							} else if (draggedTagParentItem instanceof TVIRootItem) {
+
+								/*
+								 * dragged tag is a root tag item
+								 */
+
+								final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+								if (em != null) {
+
+									final TVIRootItem draggedRootItem = (TVIRootItem) draggedTagParentItem;
+
+									/*
+									 * remove tag from old category
+									 */
+									draggedRootItem.removeChild(draggedTagItem);
+
+									/*
+									 * add tag to the target category
+									 */
+									targetCatItem.addChild(draggedTagItem);
+									draggedTag.setRoot(false);
+
+									updateModelTargetCategory(targetCategory, draggedTag, em);
+
+									em.close();
+
+									isUpdateViewer = true;
+								}
+							}
+
+							if (isUpdateViewer) {
+
+								// update tag viewer
+
+								fTagViewer.remove(draggedTagItem);
+								fTagViewer.add(targetCatItem, draggedTagItem);
+							}
+						}
+
+						fIsModified = true;
+
+						return true;
+					}
+
+					@Override
+					public boolean performDrop(final Object dropData) {
+
+						if (dropData instanceof StructuredSelection) {
+
+							final StructuredSelection selection = (StructuredSelection) dropData;
+							final Object firstElement = selection.getFirstElement();
+
+							if (firstElement instanceof TVITourTag) {
+								return dropTag((TVITourTag) firstElement);
+							}
+						}
+
+						return false;
+					}
+
+					private void updateModelDraggedCategory(final TourTagCategory draggedCategory,
+															final TourTag dropTag,
+															final EntityManager em) {
+
+						final TourTagCategory lazyCategory = em.find(TourTagCategory.class, //
+								draggedCategory.getCategoryId());
+
+						// remove tag
+						final Set<TourTag> lazyTourTags = lazyCategory.getTourTags();
+						lazyTourTags.remove(dropTag);
+
+						TourDatabase.saveEntity(lazyCategory, lazyCategory.getCategoryId(), TourTagCategory.class, em);
+					}
+
+					private void updateModelTargetCategory(	final TourTagCategory targetCategory,
+															final TourTag dropTag,
+															final EntityManager em) {
+
+						final TourTagCategory lazyCategory = em.find(TourTagCategory.class,
+								targetCategory.getCategoryId());
+
+						// add new tag
+						final Set<TourTag> lazyTourTags = lazyCategory.getTourTags();
+						lazyTourTags.add(dropTag);
+
+						TourDatabase.saveEntity(lazyCategory, lazyCategory.getCategoryId(), TourTagCategory.class, em);
+					}
+
+					@Override
+					public boolean validateDrop(final Object target,
+												final int operation,
+												final TransferData transferType) {
+
+//				System.out.println("validateDrop:\t" + target);
+						final LocalSelectionTransfer localTransfer = LocalSelectionTransfer.getTransfer();
+
+						if (localTransfer.isSupportedType(transferType) == false) {
+							return false;
+						}
+
+						final ISelection selection = localTransfer.getSelection();
+						if (selection instanceof StructuredSelection) {
+
+							final Object draggedItem = ((StructuredSelection) selection).getFirstElement();
+
+							if (target == draggedItem) {
+
+								// don't drop on itself
+
+								return false;
+
+							} else {
+
+								// drag a tag into a category
+
+								if (draggedItem instanceof TVITourTag) {
+									if (target instanceof TVITourTagCategory) {
+										return true;
+									}
+
+								}
+							}
+						}
+
+						return false;
+					}
+
+				});
 		/*
 		 * create columns
 		 */
@@ -406,7 +647,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			fRootItem.getFetchedChildren().add(newCategoryItem);
 
 			// persist new category
-			isSaved = TourDatabase.persistEntity(newTourTagCategory,
+			isSaved = TourDatabase.saveEntity(newTourTagCategory,
 					newTourTagCategory.getCategoryId(),
 					TourTagCategory.class);
 
@@ -427,7 +668,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 			// persist new category
-			isSaved = TourDatabase.persistEntity(newTourTagCategory,
+			isSaved = TourDatabase.saveEntity(newTourTagCategory,
 					newTourTagCategory.getCategoryId(),
 					TourTagCategory.class);
 
@@ -448,7 +689,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				}
 
 				// persist parent category
-				isSaved = TourDatabase.persistEntity(parentTourTagCategory,
+				isSaved = TourDatabase.saveEntity(parentTourTagCategory,
 						parentTourTagCategory.getCategoryId(),
 						TourTagCategory.class);
 
@@ -528,7 +769,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			fRootItem.getFetchedChildren().add(tourTagItem);
 
 			// persist tag
-			isSaved = TourDatabase.persistEntity(tourTag, tourTag.getTagId(), TourTag.class);
+			isSaved = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
 
 			if (isSaved) {
 
@@ -543,7 +784,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			// parent is a category
 
 			final TVITourTagCategory parentCategoryItem = (TVITourTagCategory) parentElement;
-			TourTagCategory parentTourTagCategory = parentCategoryItem.getTourTagCategory();
+			TourTagCategory parentCategory = parentCategoryItem.getTourTagCategory();
+
+			tourTagItem.setParentItem(parentCategoryItem);
 
 			/*
 			 * update model
@@ -553,7 +796,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			 * persist tag without new category otherwise an exception "detached entity passed to
 			 * persist: net.tourbook.data.TourTagCategory" is raised
 			 */
-			isSaved = TourDatabase.persistEntity(tourTag, tourTag.getTagId(), TourTag.class);
+			isSaved = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
 			if (isSaved) {
 
 				// update parent category
@@ -561,10 +804,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				{
 
 					final TourTagCategory parentTourTagCategoryEntity = em.find(TourTagCategory.class,
-							parentTourTagCategory.getCategoryId());
+							parentCategory.getCategoryId());
 
 					// set new entity
-					parentTourTagCategory = parentTourTagCategoryEntity;
+					parentCategory = parentTourTagCategoryEntity;
 					parentCategoryItem.setTourTagCategory(parentTourTagCategoryEntity);
 
 					// set tag in parent category
@@ -575,17 +818,15 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				em.close();
 
 				// persist parent category
-				isSaved = TourDatabase.persistEntity(parentTourTagCategory,
-						parentTourTagCategory.getCategoryId(),
-						TourTagCategory.class);
+				isSaved = TourDatabase.saveEntity(parentCategory, parentCategory.getCategoryId(), TourTagCategory.class);
 
 				if (isSaved) {
 
 					// set category in tag
-					tourTag.getTagCategories().add(parentTourTagCategory);
+					tourTag.getTagCategories().add(parentCategory);
 
 					// persist tag with category
-					isSaved = TourDatabase.persistEntity(tourTag, tourTag.getTagId(), TourTag.class);
+					isSaved = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
 				}
 
 			}
@@ -660,7 +901,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			tourTag.setTagName(name);
 
 			// persist tag
-			TourDatabase.persistEntity(tourTag, tourTag.getTagId(), TourTag.class);
+			TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
 
 			fTagViewer.update(tourTagItem, null);
 
@@ -672,7 +913,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			tourCategory.setName(name);
 
 			// persist category
-			TourDatabase.persistEntity(tourCategory, tourCategory.getCategoryId(), TourTagCategory.class);
+			TourDatabase.saveEntity(tourCategory, tourCategory.getCategoryId(), TourTagCategory.class);
 
 			fTagViewer.update(tourCategoryItem, null);
 

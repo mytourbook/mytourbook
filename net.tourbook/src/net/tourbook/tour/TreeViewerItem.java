@@ -27,13 +27,35 @@ public abstract class TreeViewerItem {
 	private ArrayList<TreeViewerItem>	fChildren	= null;
 
 	/**
-	 * fetches the children for this tree item an updates {@link #fChildren}
+	 * Adds a new child to this tree item
+	 * 
+	 * @param newTreeItem
+	 */
+	public void addChild(final TreeViewerItem newTreeItem) {
+
+		// update parent for the new item
+		newTreeItem.setParentItem(this);
+
+		getFetchedChildren().add(newTreeItem);
+	}
+
+	/**
+	 * fetches the children for this tree item and updates {@link #fChildren}
 	 */
 	protected abstract void fetchChildren();
 
+	private void fetchChildrenInternal() {
+
+		if (fChildren == null) {
+			fChildren = new ArrayList<TreeViewerItem>();
+		}
+
+		fetchChildren();
+	}
+
 	/**
 	 * @return Returns a list with all childrens for this item, when children have not been fetched,
-	 * 	an empty list will be returned
+	 *         an empty list will be returned.
 	 */
 	public ArrayList<TreeViewerItem> getChildren() {
 		if (fChildren == null) {
@@ -43,13 +65,16 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
-	 * @return Returns a list with all fetched children
+	 * @return Returns a list with all fetched children, when childrens are not available, an empty
+	 *         list for the children will be returned.
 	 */
 	public ArrayList<TreeViewerItem> getFetchedChildren() {
 
-		if (fChildren == null) {
-			fetchChildren();
+		if (fChildren != null) {
+			return fChildren;
 		}
+
+		fetchChildrenInternal();
 
 		if (fChildren == null) {
 			fChildren = new ArrayList<TreeViewerItem>();
@@ -64,10 +89,10 @@ public abstract class TreeViewerItem {
 	public Object[] getFetchedChildrenAsArray() {
 
 		if (fChildren == null) {
-			fetchChildren();
+			fetchChildrenInternal();
 		}
 
-		if (fChildren == null) {
+		if (fChildren == null || fChildren.size() == 0) {
 			return new Object[0];
 		}
 
@@ -80,7 +105,7 @@ public abstract class TreeViewerItem {
 
 	/**
 	 * @return Returns a list with all childrens of this item, <code>null</code> will be returned
-	 * 	when childrens have not yet been fetched
+	 *         when childrens have not yet been fetched
 	 */
 	public ArrayList<TreeViewerItem> getUnfetchedChildren() {
 		return fChildren;
@@ -100,6 +125,24 @@ public abstract class TreeViewerItem {
 	}
 
 	protected abstract void remove();
+
+	/**
+	 * Removes a child from this tree item
+	 * 
+	 * @param treeItem
+	 * @return Returns <code>true</code> when the child was removed
+	 */
+	public boolean removeChild(final TreeViewerItem treeItem) {
+
+		final boolean isRemoved = getFetchedChildren().remove(treeItem);
+
+		if (isRemoved) {
+			// update parent
+			treeItem.setParentItem(null);
+		}
+
+		return isRemoved;
+	}
 
 	/**
 	 * reset children that they will be fetched again

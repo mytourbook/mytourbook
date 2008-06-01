@@ -352,60 +352,6 @@ public class TourDatabase {
 		return fTourTypes;
 	}
 
-	/**
-	 * Persists an entity
-	 * 
-	 * @param entity
-	 * @param id
-	 * @param entityClass
-	 * @return Returns <code>true</code> when the entity was saved
-	 */
-	public static boolean persistEntity(Object entity, final long id, final Class<?> entityClass) {
-
-		boolean isSaved = false;
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-		final EntityTransaction ts = em.getTransaction();
-
-		try {
-
-			ts.begin();
-			{
-				final Object entityInDB = em.find(entityClass, id);
-
-				if (entityInDB == null) {
-
-					// entity is not persisted
-
-					em.persist(entity);
-
-				} else {
-
-					entity = em.merge(entity);
-				}
-			}
-			ts.commit();
-
-		} catch (final Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (ts.isActive()) {
-				ts.rollback();
-			} else {
-				isSaved = true;
-			}
-			em.close();
-		}
-
-		if (isSaved == false) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(),//
-					"Error", "Error occured when saving an entity"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		return isSaved;
-	}
-
 	public static void printSQLException(SQLException sqle) {
 		while (sqle != null) {
 			System.out.println("\n---SQLException Caught---\n"); //$NON-NLS-1$
@@ -454,6 +400,109 @@ public class TourDatabase {
 		}
 
 		return isRemoved;
+	}
+
+	/**
+	 * Persists an entity
+	 * 
+	 * @param entity
+	 * @param id
+	 * @param entityClass
+	 * @return Returns <code>true</code> when the entity was saved
+	 */
+	public static boolean saveEntity(Object entity, final long id, final Class<?> entityClass) {
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		boolean isSaved = false;
+		final EntityTransaction ts = em.getTransaction();
+
+		try {
+
+			ts.begin();
+			{
+				final Object entityInDB = em.find(entityClass, id);
+
+				if (entityInDB == null) {
+
+					// entity is not persisted
+
+					em.persist(entity);
+
+				} else {
+
+					entity = em.merge(entity);
+				}
+			}
+			ts.commit();
+
+		} catch (final Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (ts.isActive()) {
+				ts.rollback();
+			} else {
+				isSaved = true;
+			}
+			em.close();
+		}
+
+		if (isSaved == false) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(),//
+					"Error", "Error occured when saving an entity"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		return isSaved;
+	}
+
+	/**
+	 * Persists an entity
+	 * 
+	 * @param entity
+	 * @param id
+	 * @param entityClass
+	 * @return Returns <code>true</code> when the entity was saved
+	 */
+	public static boolean saveEntity(Object entity, final long id, final Class<?> entityClass, final EntityManager em) {
+
+		boolean isSaved = false;
+		final EntityTransaction ts = em.getTransaction();
+
+		try {
+
+			ts.begin();
+			{
+				final Object entityInDB = em.find(entityClass, id);
+
+				if (entityInDB == null) {
+
+					// entity is not persisted
+
+					em.persist(entity);
+
+				} else {
+
+					entity = em.merge(entity);
+				}
+			}
+			ts.commit();
+
+		} catch (final Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (ts.isActive()) {
+				ts.rollback();
+			} else {
+				isSaved = true;
+			}
+		}
+
+		if (isSaved == false) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(),//
+					"Error", "Error occured when saving an entity"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		return isSaved;
 	}
 
 	/**

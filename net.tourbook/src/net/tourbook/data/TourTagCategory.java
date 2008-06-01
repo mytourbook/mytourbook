@@ -79,7 +79,7 @@ public class TourTagCategory {
 
 	/**
 	 * @return Returns the tags which belong to this category, the tags will be fetched with the
-	 * 	fetch type {@link FetchType#LAZY}
+	 *         fetch type {@link FetchType#LAZY}
 	 */
 	public Set<TourTag> getTourTags() {
 		return tourTags;

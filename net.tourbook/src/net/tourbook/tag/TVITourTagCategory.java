@@ -13,9 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
+
 package net.tourbook.tag;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -36,10 +36,6 @@ public class TVITourTagCategory extends TreeViewerItem {
 	@Override
 	protected void fetchChildren() {
 
-		// set childrens
-		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
-		setChildren(children);
-
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
@@ -49,13 +45,13 @@ public class TVITourTagCategory extends TreeViewerItem {
 			// create tree tag items
 			final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
 			for (final TourTag tourTag : lazyTourTags) {
-				children.add(new TVITourTag(tourTag));
+				addChild(new TVITourTag(tourTag));
 			}
 
 			// create tree category items
 			final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
 			for (final TourTagCategory tagCategory : lazyTourTagCategories) {
-				children.add(new TVITourTagCategory(tagCategory));
+				addChild(new TVITourTagCategory(tagCategory));
 			}
 
 			em.close();
@@ -70,9 +66,7 @@ public class TVITourTagCategory extends TreeViewerItem {
 	}
 
 	@Override
-	protected void remove() {
-
-	}
+	protected void remove() {}
 
 	public void setTourTagCategory(final TourTagCategory tourTagCategoryEntity) {
 		fTourTagCategory = tourTagCategoryEntity;
