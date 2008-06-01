@@ -1002,7 +1002,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		// save selection in the tour viewer
 		memento.putInteger(MEMENTO_TOURVIEWER_SELECTED_YEAR, fTourViewerSelectedYear);
 		memento.putInteger(MEMENTO_TOURVIEWER_SELECTED_MONTH, fTourViewerSelectedMonth);
-//		memento.putInteger(MEMENTO_LAST_SELECTED_TOUR_TYPE_ID, fLastSelectedTourTypeId);
 
 		// save column sort order
 		memento.putString(MEMENTO_COLUMN_SORT_ORDER,

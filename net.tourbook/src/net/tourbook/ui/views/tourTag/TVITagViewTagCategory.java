@@ -24,8 +24,6 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		final StringBuilder sb = new StringBuilder();
-
 		try {
 
 			/*
@@ -34,10 +32,47 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
-			final String schema = "\"" + TourDatabase.TABLE_SCHEMA + "\".";
-			final String jTblCatTag = schema + TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG;
-			final String tblTag = schema + TourDatabase.TABLE_TOUR_TAG;
+			final String tblSchema = "\"" + TourDatabase.TABLE_SCHEMA + "\".";
+			final String tblTag = tblSchema + TourDatabase.TABLE_TOUR_TAG;
+			final String tblCat = tblSchema + TourDatabase.TABLE_TOUR_TAG_CATEGORY;
+			final String jTblCatTag = tblSchema + TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG;
+			final String jTblCatCat = tblSchema + TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY;
 
+			StringBuilder sb = new StringBuilder();
+
+			/*
+			 * get tag categories
+			 */
+			sb.append("SELECT ");
+
+			sb.append(" tblCat.tagCategoryId,");//	//1
+			sb.append(" tblCat.name");//			//2
+
+			sb.append(" FROM " + jTblCatCat + " jTblCatCat");
+			sb.append(" LEFT OUTER JOIN " + tblCat + " tblCat ON ");
+			sb.append(" jTblCatCat.TourTagCategory_tagCategoryId2 = tblCat.tagCategoryId ");
+
+			sb.append(" WHERE jTblCatCat.TourTagCategory_tagCategoryId1 = " + tagCategoryId);
+
+			String sqlString = sb.toString();
+//			System.out.println(sqlString);
+			PreparedStatement statement = conn.prepareStatement(sqlString);
+			ResultSet result = statement.executeQuery();
+
+			while (result.next()) {
+
+				final TVITagViewTagCategory treeItem = new TVITagViewTagCategory(getTagView());
+
+				treeItem.tagCategoryId = result.getLong(1);
+				treeItem.treeColumn = result.getString(2);
+
+				children.add(treeItem);
+			}
+
+			/*
+			 * get tags
+			 */
+			sb = new StringBuilder();
 			sb.append("SELECT ");
 
 			sb.append(" tblTag.tagId,");//	//1
@@ -49,10 +84,10 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 
 			sb.append(" WHERE jTblCatTag.TourTagCategory_TagCategoryId = " + tagCategoryId);
 
-			final String sqlString = sb.toString();
-			System.out.println(sqlString);
-			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			final ResultSet result = statement.executeQuery();
+			sqlString = sb.toString();
+//			System.out.println(sqlString);
+			statement = conn.prepareStatement(sqlString);
+			result = statement.executeQuery();
 
 			while (result.next()) {
 

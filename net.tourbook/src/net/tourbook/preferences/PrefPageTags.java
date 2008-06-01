@@ -686,6 +686,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		if (fIsModified) {
 
+			TourDatabase.cleanTourTags();
+
 			// fire modify event
 			getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
 		}

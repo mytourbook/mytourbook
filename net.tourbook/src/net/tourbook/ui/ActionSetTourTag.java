@@ -94,7 +94,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		 * Update the tour type in tours which are opened in a tour editor
 		 * 
 		 * @param selectedTours
-		 * 		contains the tours where the tour type should be changed
+		 *            contains the tours where the tour type should be changed
 		 * @return Returns the tours which are opened in a tour editor
 		 */
 		private ArrayList<TourData> updateEditors(final ArrayList<TourData> selectedTours) {
@@ -201,10 +201,10 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 				for (final TourTag tourTag : TourDatabase.getTourTags()) {
 
-					final ActionTourTag actionTourType = new ActionTourTag(tourTag);
+					final ActionTourTag actionTourTag = new ActionTourTag(tourTag);
 //					actionTourType.setChecked(isChecked);
 
-					addActionToMenu(actionTourType);
+					addActionToMenu(actionTourTag);
 				}
 			}
 		});

@@ -483,7 +483,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 			fIsModified = false;
 
-			TourDatabase.disposeTourTypes();
+			TourDatabase.cleanTourTypes();
 
 			// fire modify event
 			getPreferenceStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());

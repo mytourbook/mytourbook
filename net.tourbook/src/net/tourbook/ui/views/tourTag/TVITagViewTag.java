@@ -71,7 +71,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 				final TVITagViewTour tourItem = new TVITagViewTour(getTagView());
 
-				tourItem.treeColumn = result.getString(1);
+				tourItem.tourId = result.getLong(1);
 				tourItem.tourDate = new DateTime(result.getInt(2), result.getInt(3), result.getInt(4), 0, 0, 0, 0);
 				tourItem.tourTitle = result.getString(5);
 

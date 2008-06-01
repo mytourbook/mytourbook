@@ -142,10 +142,21 @@ public class TourDatabase {
 	}
 
 	/**
-	 * dispose tour types and their images so the next time they have to be loaded from the database
-	 * and the images are recreated
+	 * remove all tour tags that the next time they have to be loaded from the database
 	 */
-	public static void disposeTourTypes() {
+	public static void cleanTourTags() {
+
+		if (fTourTags != null) {
+			fTourTags.clear();
+			fTourTags = null;
+		}
+	}
+
+	/**
+	 * remove all tour types and dispose their images so the next time they have to be loaded from
+	 * the database and the images are recreated
+	 */
+	public static void cleanTourTypes() {
 
 		if (fTourTypes != null) {
 			fTourTypes.clear();

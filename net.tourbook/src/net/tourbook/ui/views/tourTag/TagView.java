@@ -28,6 +28,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TVITourTag;
 import net.tourbook.tag.TVITourTagCategory;
+import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ColumnManager;
@@ -36,9 +37,9 @@ import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
+import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
@@ -66,16 +67,20 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
 public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
-	static public final String		ID				= "net.tourbook.views.tagViewID";				//$NON-NLS-1$
+	static public final String		ID							= "net.tourbook.views.tagViewID";				//$NON-NLS-1$
+
+	private static final String		MEMENTO_COLUMN_SORT_ORDER	= "tagview.column_sort_order";					//$NON-NLS-1$
+	private static final String		MEMENTO_COLUMN_WIDTH		= "tagview.column_width";						//$NON-NLS-1$
 
 	private static IMemento			fSessionMemento;
 
-	private NumberFormat			fNF				= NumberFormat.getNumberInstance();
-	private DateFormat				fDF				= DateFormat.getDateInstance(DateFormat.SHORT);
+	private NumberFormat			fNF							= NumberFormat.getNumberInstance();
+	private DateFormat				fDF							= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	private Composite				fViewerContainer;
 
@@ -89,10 +94,10 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	private ActionRefreshView		fActionRefreshView;
 
-	private Image					fImgTagCategory	= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
-															.createImage();
-	private Image					fImgTag			= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
-															.createImage();
+	private Image					fImgTagCategory				= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
+																		.createImage();
+	private Image					fImgTag						= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
+																		.createImage();
 
 	private class TagContentProvider implements ITreeContentProvider {
 
@@ -198,6 +203,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		addPrefListener();
 
+		restoreState(fSessionMemento);
 		reloadTagViewer();
 	}
 
@@ -226,6 +232,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 				final Object selectedItem = ((IStructuredSelection) (event.getSelection())).getFirstElement();
 
+				if (selectedItem instanceof TVITagViewTour) {
+					final TVITagViewTour tourItem = (TVITagViewTour) selectedItem;
+					fPostSelectionProvider.setSelection(new SelectionTourId(tourItem.tourId));
+				}
+
 				enableActions();
 			}
 		});
@@ -236,12 +247,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 				final Object selection = ((IStructuredSelection) fTagViewer.getSelection()).getFirstElement();
 
-				if (selection instanceof TVITourBookTour) {
+				if (selection instanceof TVITagViewTour) {
 
-					// open tour in editor
+					// open tour in the tour editor
 
-					final TVITourBookTour tourItem = (TVITourBookTour) selection;
-					TourManager.getInstance().openTourInEditor(tourItem.getTourId());
+					TourManager.getInstance().openTourInEditor(((TVITagViewTour) selection).tourId);
 
 				} else if (selection != null) {
 
@@ -333,7 +343,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		super.dispose();
 	}
 
-	protected void enableActions() {
+	private void enableActions() {
 
 	}
 
@@ -403,6 +413,47 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	void reloadTagViewer() {
 		fRootItem = new TVITagViewRoot(this);
 		fTagViewer.setInput(this);
+	}
+
+	private void restoreState(final IMemento memento) {
+
+		if (memento != null) {
+
+			/*
+			 * restore states from the memento
+			 */
+
+			// restore columns sort order
+			final String mementoColumnSortOrderIds = memento.getString(MEMENTO_COLUMN_SORT_ORDER);
+			if (mementoColumnSortOrderIds != null) {
+				fColumnManager.orderColumns(StringToArrayConverter.convertStringToArray(mementoColumnSortOrderIds));
+			}
+
+			// restore column width
+			final String mementoColumnWidth = memento.getString(MEMENTO_COLUMN_WIDTH);
+			if (mementoColumnWidth != null) {
+				fColumnManager.setColumnWidth(StringToArrayConverter.convertStringToArray(mementoColumnWidth));
+			}
+		}
+	}
+
+	private void saveSettings() {
+		fSessionMemento = XMLMemento.createWriteRoot("DeviceImportView"); //$NON-NLS-1$
+		saveState(fSessionMemento);
+	}
+
+	@Override
+	public void saveState(final IMemento memento) {
+
+		// save column sort order
+		memento.putString(MEMENTO_COLUMN_SORT_ORDER,
+				StringToArrayConverter.convertArrayToString(fColumnManager.getColumnIds()));
+
+		// save columns width
+		final String[] columnIdAndWidth = fColumnManager.getColumnIdAndWidth();
+		if (columnIdAndWidth != null) {
+			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(columnIdAndWidth));
+		}
 	}
 
 	@Override
