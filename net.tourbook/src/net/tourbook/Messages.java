@@ -224,6 +224,8 @@ public class Messages extends NLS {
 
 	public static String	Image__tag_category;
 
+	public static String	Image__tag_root;
+
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
 	public static String		Image__undo_edit;

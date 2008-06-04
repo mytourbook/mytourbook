@@ -33,22 +33,21 @@ public abstract class TreeViewerItem {
 	 */
 	public void addChild(final TreeViewerItem newTreeItem) {
 
-		// update parent for the new item
+		// set parent for the new child item
 		newTreeItem.setParentItem(this);
 
 		getFetchedChildren().add(newTreeItem);
 	}
 
 	/**
-	 * fetches the children for this tree item and updates {@link #fChildren}
+	 * fetches the children for this tree item, childs can be added to this tree item with
+	 * {@link #addChild(TreeViewerItem)}
 	 */
 	protected abstract void fetchChildren();
 
 	private void fetchChildrenInternal() {
 
-		if (fChildren == null) {
-			fChildren = new ArrayList<TreeViewerItem>();
-		}
+		fChildren = new ArrayList<TreeViewerItem>();
 
 		fetchChildren();
 	}
@@ -66,7 +65,7 @@ public abstract class TreeViewerItem {
 
 	/**
 	 * @return Returns a list with all fetched children, when childrens are not available, an empty
-	 *         list for the children will be returned.
+	 *         list will be returned.
 	 */
 	public ArrayList<TreeViewerItem> getFetchedChildren() {
 
@@ -137,7 +136,7 @@ public abstract class TreeViewerItem {
 		final boolean isRemoved = getFetchedChildren().remove(treeItem);
 
 		if (isRemoved) {
-			// update parent
+			// remove parent from the child
 			treeItem.setParentItem(null);
 		}
 
