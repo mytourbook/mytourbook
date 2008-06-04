@@ -24,9 +24,14 @@ import javax.persistence.Query;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TreeViewerItem;
 
-public class TVIRootItem extends TreeViewerItem {
+import org.eclipse.jface.viewers.TreeViewer;
+
+public class TVIRootItem extends TVIPrefTagViewer {
+
+	public TVIRootItem(final TreeViewer tagViewer) {
+		super(tagViewer);
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -48,7 +53,7 @@ public class TVIRootItem extends TreeViewerItem {
 			tourTags = (ArrayList<TourTag>) query.getResultList();
 
 			for (final TourTag tourTag : tourTags) {
-				addChild(new TVITourTag(tourTag));
+				addChild(new TVITourTag(getTagViewer(), tourTag));
 			}
 
 			/*
@@ -61,7 +66,7 @@ public class TVIRootItem extends TreeViewerItem {
 			final ArrayList<TourTagCategory> tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
 
 			for (final TourTagCategory tourTagCategory : tourTagCategories) {
-				addChild(new TVITourTagCategory(tourTagCategory));
+				addChild(new TVITourTagCategory(getTagViewer(), tourTagCategory));
 			}
 
 			em.close();

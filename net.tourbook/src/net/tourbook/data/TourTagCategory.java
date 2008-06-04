@@ -28,6 +28,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
 
@@ -36,12 +37,12 @@ public class TourTagCategory {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					tagCategoryId	= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long					tagCategoryId		= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	/**
 	 * derby does not support BOOLEAN, 1 = <code>true</code>, 0 = <code>false</code>
 	 */
-	private int						isRoot			= 0;
+	private int						isRoot				= 0;
 
 	@Basic(optional = false)
 	private String					name;
@@ -49,12 +50,24 @@ public class TourTagCategory {
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"), //
 	joinColumns = @JoinColumn(name = "tourTagCategory_tagCategoryId", referencedColumnName = "tagCategoryId"))
-	private Set<TourTag>			tourTags		= new HashSet<TourTag>();
+	private Set<TourTag>			tourTags			= new HashSet<TourTag>();
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(joinColumns = @JoinColumn(name = "TourTagCategory_tagCategoryId1", referencedColumnName = "tagCategoryId"), //
 	inverseJoinColumns = @JoinColumn(name = "tourTagCategory_tagCategoryId2", referencedColumnName = "tagCategoryId"))
-	private Set<TourTagCategory>	tourTagCategory	= new HashSet<TourTagCategory>();
+	private Set<TourTagCategory>	tourTagCategory		= new HashSet<TourTagCategory>();
+
+	/**
+	 * contains the number of categories or <code>-1</code> when the categories are not loaded
+	 */
+	@Transient
+	private int						fCategoryCounter	= -1;
+
+	/**
+	 * contains the number of tags or <code>-1</code> when the tags are not loaded
+	 */
+	@Transient
+	private int						fTagCounter			= -1;
 
 	/**
 	 * default constructor used in ejb
@@ -63,6 +76,10 @@ public class TourTagCategory {
 
 	public TourTagCategory(final String categoryName) {
 		name = categoryName;
+	}
+
+	public int getCategoryCounter() {
+		return fCategoryCounter;
 	}
 
 	public long getCategoryId() {
@@ -77,6 +94,10 @@ public class TourTagCategory {
 		return tourTagCategory;
 	}
 
+	public int getTagCounter() {
+		return fTagCounter;
+	}
+
 	/**
 	 * @return Returns the tags which belong to this category, the tags will be fetched with the
 	 *         fetch type {@link FetchType#LAZY}
@@ -89,6 +110,10 @@ public class TourTagCategory {
 		return isRoot == 1;
 	}
 
+	public void setCategoryCounter(final int fCategoryCounter) {
+		this.fCategoryCounter = fCategoryCounter;
+	}
+
 	public void setName(final String name) {
 		this.name = name;
 	}
@@ -99,6 +124,10 @@ public class TourTagCategory {
 	 */
 	public void setRoot(final boolean isRoot) {
 		this.isRoot = isRoot ? 1 : 0;
+	}
+
+	public void setTagCounter(final int fTagCounter) {
+		this.fTagCounter = fTagCounter;
 	}
 
 }

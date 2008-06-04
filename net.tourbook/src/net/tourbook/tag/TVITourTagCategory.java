@@ -23,13 +23,15 @@ import javax.persistence.EntityManager;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TreeViewerItem;
 
-public class TVITourTagCategory extends TreeViewerItem {
+import org.eclipse.jface.viewers.TreeViewer;
+
+public class TVITourTagCategory extends TVIPrefTagViewer {
 
 	private TourTagCategory	fTourTagCategory;
 
-	public TVITourTagCategory(final TourTagCategory tourTagCategory) {
+	public TVITourTagCategory(final TreeViewer tagViewer, final TourTagCategory tourTagCategory) {
+		super(tagViewer);
 		fTourTagCategory = tourTagCategory;
 	}
 
@@ -45,14 +47,18 @@ public class TVITourTagCategory extends TreeViewerItem {
 			// create tree tag items
 			final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
 			for (final TourTag tourTag : lazyTourTags) {
-				addChild(new TVITourTag(tourTag));
+				addChild(new TVITourTag(getTagViewer(), tourTag));
 			}
 
 			// create tree category items
 			final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
 			for (final TourTagCategory tagCategory : lazyTourTagCategories) {
-				addChild(new TVITourTagCategory(tagCategory));
+				addChild(new TVITourTagCategory(getTagViewer(), tagCategory));
 			}
+
+			// update number of categories/tags
+			fTourTagCategory.setTagCounter(lazyTourTags.size());
+			fTourTagCategory.setCategoryCounter(lazyTourTagCategories.size());
 
 			em.close();
 		}

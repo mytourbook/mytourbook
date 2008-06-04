@@ -461,9 +461,9 @@ public class TourDatabase {
 	 * @param entity
 	 * @param id
 	 * @param entityClass
-	 * @return Returns <code>true</code> when the entity was saved
+	 * @return Returns the saved entity
 	 */
-	public static boolean saveEntity(Object entity, final long id, final Class<?> entityClass, final EntityManager em) {
+	public static <T> T saveEntity(T entity, final long id, final Class<T> entityClass, final EntityManager em) {
 
 		boolean isSaved = false;
 		final EntityTransaction ts = em.getTransaction();
@@ -472,7 +472,7 @@ public class TourDatabase {
 
 			ts.begin();
 			{
-				final Object entityInDB = em.find(entityClass, id);
+				final T entityInDB = em.find(entityClass, id);
 
 				if (entityInDB == null) {
 
@@ -502,7 +502,7 @@ public class TourDatabase {
 					"Error", "Error occured when saving an entity"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		return isSaved;
+		return entity;
 	}
 
 	/**

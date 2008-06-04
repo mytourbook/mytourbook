@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2001, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,38 +13,41 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.tag;
+package net.tourbook.ui;
 
-import net.tourbook.data.TourTag;
+import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
-public class TVITourTag extends TVIPrefTagViewer {
+public class ActionCollapseAll extends Action {
 
-	private TourTag	fTourTag;
+	private TreeViewer	fTreeViewer;
 
-	public TVITourTag(final TreeViewer tagViewer, final TourTag tourTag) {
-		super(tagViewer);
-		fTourTag = tourTag;
+	public ActionCollapseAll(final TreeViewer tourViewer) {
+
+		super(null, AS_PUSH_BUTTON);
+
+		fTreeViewer = tourViewer;
+
+		setToolTipText(Messages.app_action_collapse_all_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
 	}
 
 	@Override
-	protected void fetchChildren() {
-	// a tag has no children
+	public void run() {
+
+		if (fTreeViewer != null) {
+
+			fTreeViewer.collapseAll();
+
+			final Object firstElement = ((StructuredSelection) fTreeViewer.getSelection()).getFirstElement();
+
+			if (firstElement != null) {
+				fTreeViewer.reveal(firstElement);
+			}
+		}
 	}
-
-	public TourTag getTourTag() {
-		return fTourTag;
-	}
-
-	@Override
-	public boolean hasChildren() {
-		return false;
-	}
-
-	@Override
-	protected void remove() {
-
-	}
-
 }
