@@ -39,6 +39,8 @@ public class Messages extends NLS {
 	public static String		App_Action_open_tour_segmenter;
 	public static String		App_Action_open_tour_segmenter_tooltip;
 
+	public static String	app_action_collapse_all_tooltip;
+
 	public static String		app_action_quick_edit;
 
 	public static String	app_action_remove_tour_tag;

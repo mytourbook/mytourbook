@@ -29,8 +29,10 @@ import net.tourbook.tag.TVIRootItem;
 import net.tourbook.tag.TVITourTag;
 import net.tourbook.tag.TVITourTagCategory;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -38,7 +40,6 @@ import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -48,6 +49,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -62,12 +65,11 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
@@ -78,9 +80,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private static final String	SORT_PROPERTY	= "sort";																//$NON-NLS-1$
 
 	private TreeViewer			fTagViewer;
+	private ToolBar				fToolBar;
 
 	private Button				fBtnNewTag;
 	private Button				fBtnRename;
+	private Button				fBtnNewTagCategory;
 
 	private TVIRootItem			fRootItem;
 
@@ -89,8 +93,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 														.createImage();
 	private Image				fImgTagCategory	= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
 														.createImage();
-
-	private Button				fBtnNewTagCategory;
 
 	private boolean				fIsModified		= false;
 
@@ -180,11 +182,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private void createButtons(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		container.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-		final GridLayout gl = new GridLayout();
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		container.setLayout(gl);
+		GridDataFactory.fillDefaults()//
+				.indent(5, 0)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().applyTo(container);
 
 		// button: new tag
 		fBtnNewTag = new Button(container, SWT.NONE);
@@ -227,7 +228,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		final Composite viewerContainer = createUI(parent);
 
 		// set root item
-		fRootItem = new TVIRootItem();
+		fRootItem = new TVIRootItem(fTagViewer);
 
 		updateViewers();
 		enableButtons();
@@ -269,7 +270,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		fTagViewer.setUseHashlookup(true);
 
 		fTagViewer.addDoubleClickListener(new IDoubleClickListener() {
-
 			public void doubleClick(final DoubleClickEvent event) {
 
 				final Object selection = ((IStructuredSelection) fTagViewer.getSelection()).getFirstElement();
@@ -326,6 +326,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
 						final ISelection selection = fTagViewer.getSelection();
 
+						System.out.println("dragStart");
 						transfer.setSelection(selection);
 						transfer.setSelectionSetTime(fDragStartTime = event.time & 0xFFFFFFFFL);
 
@@ -346,7 +347,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		// column: tags + tag categories
 		tvc = new TreeViewerColumn(fTagViewer, SWT.TRAIL);
 		tvcColumn = tvc.getColumn();
-		tvc.setLabelProvider(new CellLabelProvider() {
+		tvc.setLabelProvider(new StyledCellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -363,8 +364,30 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 					final TVITourTagCategory tourTagCategoryItem = (TVITourTagCategory) element;
 					final TourTagCategory tourTagCategory = tourTagCategoryItem.getTourTagCategory();
 
-					cell.setText(tourTagCategory.getCategoryName()); //$NON-NLS-1$
 					cell.setImage(fImgTagCategory);
+
+					final StyledString styledString = new StyledString();
+
+					styledString.append(tourTagCategory.getCategoryName());
+
+					// get number of categories
+					final int categoryCounter = tourTagCategory.getCategoryCounter();
+					final int tagCounter = tourTagCategory.getTagCounter();
+					if (categoryCounter == -1 && tagCounter == -1) {
+
+//						styledString.append("  ...", StyledString.COUNTER_STYLER);
+
+					} else {
+
+						String categoryString = UI.EMPTY_STRING;
+						if (categoryCounter > 0) {
+							categoryString = "/" + categoryCounter;
+						}
+						styledString.append("   " + tagCounter + categoryString, StyledString.COUNTER_STYLER);
+					}
+
+					cell.setText(styledString.getString());
+					cell.setStyleRanges(styledString.getStyleRanges());
 				}
 			}
 		});
@@ -376,37 +399,29 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		// container
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().margins(0, 0).numColumns(3).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.margins(0, 0)
+				.spacing(SWT.DEFAULT, 0)
+				.numColumns(3)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		final Label label = new Label(container, SWT.WRAP);
 		label.setText(Messages.pref_tourtag_viewer_title);
 		GridDataFactory.swtDefaults()//
 				.grab(true, false)
-//				.span(2, 1)
 				.applyTo(label);
 
-		// button: collapse all
-		final Button btnCollapseAll = new Button(container, SWT.PUSH);
-		btnCollapseAll.setImage(fImgTag);
-		btnCollapseAll.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-
-				fTagViewer.collapseAll();
-
-				final Object firstElement = ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
-
-				if (firstElement != null) {
-					fTagViewer.reveal(firstElement);
-				}
-			}
-		});
+		// toolbar
+		fToolBar = new ToolBar(container, SWT.FLAT);
 
 		// spacer
 		new Label(container, SWT.NONE);
 
 		createTagViewer(container);
 		createButtons(container);
+
+		setToolbarActions();
 
 		return container;
 	}
@@ -477,7 +492,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		// create tour tag category + tree item
 		final TourTagCategory newTourTagCategory = new TourTagCategory(inputDialog.getValue().trim());
-		final TreeViewerItem newCategoryItem = new TVITourTagCategory(newTourTagCategory);
+		final TreeViewerItem newCategoryItem = new TVITourTagCategory(fTagViewer, newTourTagCategory);
 
 		boolean isSaved = false;
 
@@ -507,7 +522,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			// parent is a category
 
 			final TVITourTagCategory parentCategoryItem = (TVITourTagCategory) parentElement;
-			TourTagCategory parentTourTagCategory = parentCategoryItem.getTourTagCategory();
+			TourTagCategory parentTagCategory = parentCategoryItem.getTourTagCategory();
 
 			/*
 			 * update model
@@ -525,20 +540,23 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				// update parent category
 				{
 					final TourTagCategory parentTourTagCategoryEntity = em.find(TourTagCategory.class,
-							parentTourTagCategory.getCategoryId());
+							parentTagCategory.getCategoryId());
 
 					// set new entity
-					parentTourTagCategory = parentTourTagCategoryEntity;
+					parentTagCategory = parentTourTagCategoryEntity;
 					parentCategoryItem.setTourTagCategory(parentTourTagCategoryEntity);
 
 					// set tag in parent category
 					final Set<TourTagCategory> lazyTourTagCategories = parentTourTagCategoryEntity.getTagCategories();
 					lazyTourTagCategories.add(newTourTagCategory);
+
+					// update number of categories
+					parentTourTagCategoryEntity.setCategoryCounter(lazyTourTagCategories.size());
 				}
 
 				// persist parent category
-				isSaved = TourDatabase.saveEntity(parentTourTagCategory,
-						parentTourTagCategory.getCategoryId(),
+				isSaved = TourDatabase.saveEntity(parentTagCategory,
+						parentTagCategory.getCategoryId(),
 						TourTagCategory.class);
 
 				if (isSaved) {
@@ -548,6 +566,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 					 */
 					parentCategoryItem.resetChildren();
 
+					fTagViewer.update(parentCategoryItem, null);
 					fTagViewer.add(parentCategoryItem, newCategoryItem);
 
 					fTagViewer.expandToLevel(parentCategoryItem, 1);
@@ -602,7 +621,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		// create new tour tag + item
 		final TourTag tourTag = new TourTag(inputDialog.getValue().trim());
-		final TVITourTag tourTagItem = new TVITourTag(tourTag);
+		final TVITourTag tourTagItem = new TVITourTag(fTagViewer, tourTag);
 
 		final Object parentElement = ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
 		if (parentElement == null) {
@@ -786,6 +805,18 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	public void setIsModified(final boolean fIsModified) {
 		this.fIsModified = fIsModified;
+	}
+
+	/**
+	 * set the toolbar action after the {@link #fTagViewer} is created
+	 */
+	private void setToolbarActions() {
+
+		final ToolBarManager tbm = new ToolBarManager(fToolBar);
+
+		tbm.add(new ActionCollapseAll(fTagViewer));
+
+		tbm.update(true);
 	}
 
 	private void updateViewers() {

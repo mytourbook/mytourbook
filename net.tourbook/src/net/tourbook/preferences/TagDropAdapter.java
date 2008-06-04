@@ -58,7 +58,6 @@ final class TagDropAdapter extends ViewerDropAdapter {
 	private boolean dropTag(final TVITourTag draggedTagItem) {
 
 		final Object hoveredTarget = getCurrentTarget();
-//						final int location = getCurrentLocation();
 
 		/*
 		 * check if drag was startet from this tree
@@ -114,61 +113,60 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		return true;
 	}
 
-	private void dropTagIntoCategory(final TVITourTag draggedTagItem, final TVITourTagCategory targetCatItem) {
+	private void dropTagIntoCategory(final TVITourTag itemDraggedTag, final TVITourTagCategory itemTargetCategory) {
 
-		final TourTag draggedTag = draggedTagItem.getTourTag();
-		final TreeViewerItem draggedTagParentItem = draggedTagItem.getParentItem();
+		final TourTag draggedTag = itemDraggedTag.getTourTag();
+		final TreeViewerItem itemDraggedParent = itemDraggedTag.getParentItem();
 
-		final TourTagCategory targetCategory = targetCatItem.getTourTagCategory();
+		final TourTagCategory targetCategory = itemTargetCategory.getTourTagCategory();
+		TVITourTagCategory itemDraggedParentCategory = null;
 
 		boolean isUpdateViewer = false;
 
-		if (draggedTagParentItem instanceof TVITourTagCategory) {
+		if (itemDraggedParent instanceof TVITourTagCategory) {
 
 			/*
 			 * dragged tag is from a tag category
 			 */
 
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
 			if (em != null) {
 
-				final TVITourTagCategory draggedParentCatItem = (TVITourTagCategory) draggedTagParentItem;
-				final TourTagCategory draggedCategory = draggedParentCatItem.getTourTagCategory();
+				itemDraggedParentCategory = (TVITourTagCategory) itemDraggedParent;
+				final TourTagCategory draggedCategory = itemDraggedParentCategory.getTourTagCategory();
 
 				/*
 				 * remove tag from old category
 				 */
-				draggedParentCatItem.removeChild(draggedTagItem);
-				updateModelRemoveCategory(draggedCategory, draggedTag, em);
+				itemDraggedParentCategory.removeChild(itemDraggedTag);
+				itemDraggedParentCategory.setTourTagCategory(updateModelRemoveTag(draggedTag, draggedCategory, em));
 
 				/*
 				 * add tag to the new category (target)
 				 */
-				targetCatItem.addChild(draggedTagItem);
-				updateModelAddCategory(targetCategory, draggedTag, em);
+				itemTargetCategory.addChild(itemDraggedTag);
+				itemTargetCategory.setTourTagCategory(updateModelAddTag(draggedTag, targetCategory, em));
 
 				em.close();
 
 				isUpdateViewer = true;
 			}
 
-		} else if (draggedTagParentItem instanceof TVIRootItem) {
+		} else if (itemDraggedParent instanceof TVIRootItem) {
 
 			/*
 			 * dragged tag is a root tag item
 			 */
 
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
 			if (em != null) {
 
-				final TVIRootItem draggedRootItem = (TVIRootItem) draggedTagParentItem;
+				final TVIRootItem draggedRootItem = (TVIRootItem) itemDraggedParent;
 
 				/*
 				 * remove tag from root item
 				 */
-				draggedRootItem.removeChild(draggedTagItem);
+				draggedRootItem.removeChild(itemDraggedTag);
 
 				/*
 				 * update tag in db
@@ -179,8 +177,8 @@ final class TagDropAdapter extends ViewerDropAdapter {
 				/*
 				 * add tag to the new category (target)
 				 */
-				targetCatItem.addChild(draggedTagItem);
-				updateModelAddCategory(targetCategory, draggedTag, em);
+				itemTargetCategory.addChild(itemDraggedTag);
+				itemTargetCategory.setTourTagCategory(updateModelAddTag(draggedTag, targetCategory, em));
 
 				em.close();
 
@@ -192,31 +190,37 @@ final class TagDropAdapter extends ViewerDropAdapter {
 
 			// update tag viewer
 
-			fTagViewer.remove(draggedTagItem);
-			fTagViewer.add(targetCatItem, draggedTagItem);
+			fTagViewer.remove(itemDraggedTag);
+			fTagViewer.add(itemTargetCategory, itemDraggedTag);
+
+			if (itemDraggedParentCategory != null) {
+				fTagViewer.update(itemDraggedParentCategory, null);
+			}
+			fTagViewer.update(itemTargetCategory, null);
 		}
 	}
 
-	private void dropTagIntoRoot(final TVITourTag draggedTagItem) {
-
-		final TourTag draggedTag = draggedTagItem.getTourTag();
-		final TreeViewerItem draggedTagParentItem = draggedTagItem.getParentItem();
+	private void dropTagIntoRoot(final TVITourTag itemDraggedTag) {
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
 		if (em != null) {
 
-			if (draggedTagParentItem instanceof TVITourTagCategory) {
+			final TourTag draggedTag = itemDraggedTag.getTourTag();
+			final TreeViewerItem itemDraggedTagParent = itemDraggedTag.getParentItem();
+
+			TVITourTagCategory itemDraggedParentCategory = null;
+
+			if (itemDraggedTagParent instanceof TVITourTagCategory) {
 
 				/*
 				 * remove tag from old category
 				 */
 
-				final TVITourTagCategory draggedParentCatItem = (TVITourTagCategory) draggedTagParentItem;
-				final TourTagCategory draggedParentCategory = draggedParentCatItem.getTourTagCategory();
+				itemDraggedParentCategory = (TVITourTagCategory) itemDraggedTagParent;
+				final TourTagCategory draggedParentCategory = itemDraggedParentCategory.getTourTagCategory();
 
-				draggedParentCatItem.removeChild(draggedTagItem);
-				updateModelRemoveCategory(draggedParentCategory, draggedTag, em);
+				itemDraggedParentCategory.removeChild(itemDraggedTag);
+				itemDraggedParentCategory.setTourTagCategory(updateModelRemoveTag(draggedTag, draggedParentCategory, em));
 			}
 
 			/*
@@ -229,15 +233,19 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			 * add tag to the root item (target)
 			 */
 			final TVIRootItem rootItem = fPrefPageTags.getRootItem();
-			rootItem.addChild(draggedTagItem);
+			rootItem.addChild(itemDraggedTag);
 
 			em.close();
 
 			/*
 			 * update tag viewer
 			 */
-			fTagViewer.remove(draggedTagItem);
-			fTagViewer.add(fPrefPageTags, draggedTagItem);
+			fTagViewer.remove(itemDraggedTag);
+			fTagViewer.add(fPrefPageTags, itemDraggedTag);
+
+			if (itemDraggedParentCategory != null) {
+				fTagViewer.update(itemDraggedParentCategory, null);
+			}
 		}
 	}
 
@@ -260,27 +268,50 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		return returnValue;
 	}
 
-	private void updateModelAddCategory(final TourTagCategory category, final TourTag dropTag, final EntityManager em) {
+	/**
+	 * Add tag to the category
+	 * 
+	 * @param dropTag
+	 * @param category
+	 * @param em
+	 * @return Returns the saved entity
+	 */
+	private TourTagCategory updateModelAddTag(	final TourTag dropTag,
+												final TourTagCategory category,
+												final EntityManager em) {
 
 		final TourTagCategory lazyCategory = em.find(TourTagCategory.class, category.getCategoryId());
 
 		// add new tag
 		final Set<TourTag> lazyTourTags = lazyCategory.getTourTags();
-		lazyTourTags.add(dropTag);
 
-		TourDatabase.saveEntity(lazyCategory, lazyCategory.getCategoryId(), TourTagCategory.class, em);
+		lazyTourTags.add(dropTag);
+		lazyCategory.setTagCounter(lazyTourTags.size());
+
+		return TourDatabase.saveEntity(lazyCategory, lazyCategory.getCategoryId(), TourTagCategory.class, em);
 	}
 
-	private void updateModelRemoveCategory(final TourTagCategory category, final TourTag dropTag, final EntityManager em) {
+	/**
+	 * Remove tag from the category
+	 * 
+	 * @param dropTag
+	 * @param category
+	 * @param em
+	 * @return Returns the saved entity
+	 */
+	private TourTagCategory updateModelRemoveTag(	final TourTag dropTag,
+													final TourTagCategory category,
+													final EntityManager em) {
 
-		final TourTagCategory lazyCategory = em.find(TourTagCategory.class, //
-				category.getCategoryId());
+		final TourTagCategory lazyCategory = em.find(TourTagCategory.class, category.getCategoryId());
 
 		// remove tag
 		final Set<TourTag> lazyTourTags = lazyCategory.getTourTags();
-		lazyTourTags.remove(dropTag);
 
-		TourDatabase.saveEntity(lazyCategory, lazyCategory.getCategoryId(), TourTagCategory.class, em);
+		lazyTourTags.remove(dropTag);
+		lazyCategory.setTagCounter(lazyTourTags.size());
+
+		return TourDatabase.saveEntity(lazyCategory, lazyCategory.getCategoryId(), TourTagCategory.class, em);
 	}
 
 	@Override
