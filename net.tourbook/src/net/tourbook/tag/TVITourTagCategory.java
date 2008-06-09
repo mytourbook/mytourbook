@@ -25,6 +25,7 @@ import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Display;
 
 public class TVITourTagCategory extends TVIPrefTagViewer {
 
@@ -59,6 +60,16 @@ public class TVITourTagCategory extends TVIPrefTagViewer {
 			// update number of categories/tags
 			fTourTagCategory.setTagCounter(lazyTourTags.size());
 			fTourTagCategory.setCategoryCounter(lazyTourTagCategories.size());
+
+			/*
+			 * show number of tags/categories in the viewer, this must after the viewer task is
+			 * finished
+			 */
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+					getTagViewer().update(TVITourTagCategory.this, null);
+				}
+			});
 
 			em.close();
 		}

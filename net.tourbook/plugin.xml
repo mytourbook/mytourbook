@@ -333,6 +333,9 @@
          <viewShortcut
                id="net.tourbook.views.TourMarkerView">
          </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.tagViewID">
+         </viewShortcut>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="net.tourbook.perspective.TourBook">
@@ -341,6 +344,9 @@
          </viewShortcut>
          <viewShortcut
                id="net.tourbook.views.TourMarkerView">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.tagViewID">
          </viewShortcut>
       </perspectiveExtension>
       <perspectiveExtension
@@ -365,6 +371,9 @@
          </viewShortcut>
          <viewShortcut
                id="net.tourbook.views.TourMarkerView">
+         </viewShortcut>
+         <viewShortcut
+               id="net.tourbook.views.tagViewID">
          </viewShortcut>
       </perspectiveExtension>
       <perspectiveExtension

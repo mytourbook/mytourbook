@@ -30,6 +30,7 @@ import net.tourbook.tag.TVITourTag;
 import net.tourbook.tag.TVITourTagCategory;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
+import net.tourbook.ui.ActionExpandAll;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.ToolBarManager;
@@ -189,7 +190,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		// button: new tag
 		fBtnNewTag = new Button(container, SWT.NONE);
-		fBtnNewTag.setText(Messages.pref_tourtag_button_new_tag);
+		fBtnNewTag.setText(Messages.pref_tourtag_btn_new_tag);
 		setButtonLayoutData(fBtnNewTag);
 		fBtnNewTag.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -326,7 +327,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
 						final ISelection selection = fTagViewer.getSelection();
 
-						System.out.println("dragStart");
+//						System.out.println("dragStart");
 						transfer.setSelection(selection);
 						transfer.setSelectionSetTime(fDragStartTime = event.time & 0xFFFFFFFFL);
 
@@ -338,6 +339,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				new Transfer[] { LocalSelectionTransfer.getTransfer() },
 				new TagDropAdapter(this, fTagViewer));
 
+		createTagViewerColumns(treeLayout);
+	}
+
+	private void createTagViewerColumns(final TreeColumnLayout treeLayout) {
 		/*
 		 * create columns
 		 */
@@ -814,6 +819,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		final ToolBarManager tbm = new ToolBarManager(fToolBar);
 
+		tbm.add(new ActionExpandAll(fTagViewer));
 		tbm.add(new ActionCollapseAll(fTagViewer));
 
 		tbm.update(true);

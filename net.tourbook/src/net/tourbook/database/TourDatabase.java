@@ -1228,7 +1228,7 @@ public class TourDatabase {
 		stmt.addBatch(sql); //$NON-NLS-1$
 
 		/*
-		 * TABLE TourTagCategory_TourTag
+		 * JOIN TABLE TourTagCategory_TourTag
 		 */
 
 		sql = ("CREATE TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG) //$NON-NLS-1$ //$NON-NLS-2$
@@ -1267,7 +1267,7 @@ public class TourDatabase {
 		stmt.addBatch(sql);
 
 		/*
-		 * TABLE TourTagCategory_TourTagCategory
+		 * JOIN TABLE TourTagCategory_TourTagCategory
 		 */
 
 		sql = ("CREATE TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY) //$NON-NLS-1$ //$NON-NLS-2$
