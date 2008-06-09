@@ -335,9 +335,9 @@ public class ChartComponentGraph extends Canvas {
 	 * Constructor
 	 * 
 	 * @param parent
-	 * 		the parent of this control.
+	 *            the parent of this control.
 	 * @param style
-	 * 		the style of this control.
+	 *            the style of this control.
 	 */
 	ChartComponentGraph(final Chart chartWidget, final Composite parent, final int style) {
 
@@ -2883,10 +2883,10 @@ public class ChartComponentGraph extends Canvas {
 	 * @param gc
 	 * @param drawingData
 	 * @param drawUnit
-	 * 		<code>true</code> indicate to draws the unit tick and unit label additional to the unit grid
-	 * 		line
+	 *            <code>true</code> indicate to draws the unit tick and unit label additional to the
+	 *            unit grid line
 	 * @param draw0Unit
-	 * 		<code>true</code> indicate to draw the unit at the 0 position
+	 *            <code>true</code> indicate to draw the unit at the 0 position
 	 */
 	private void drawXUnits(final GC gc,
 							final ChartDrawingData drawingData,
@@ -3177,7 +3177,7 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * @param rgb
 	 * @return Returns the color from the color cache, the color must not be disposed this is done
-	 * 	when the cache is disposed
+	 *         when the cache is disposed
 	 */
 	private Color getColor(final RGB rgb) {
 
@@ -3194,7 +3194,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * @return when the zoomed graph can't be scrolled the chart image can be wider than the visible
-	 * 	part. It returns the device offset to the start of the visible chart
+	 *         part. It returns the device offset to the start of the visible chart
 	 */
 	int getDevGraphImageXOffset() {
 		return fDevGraphImageXOffset;
@@ -3202,7 +3202,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * @return Returns the virtual graph image width, this is the width of the graph image when the
-	 * 	full graph would be displayed
+	 *         full graph would be displayed
 	 */
 	int getDevVirtualGraphImageWidth() {
 		return fDevVirtualGraphImageWidth;
@@ -3279,7 +3279,7 @@ public class ChartComponentGraph extends Canvas {
 	 * scrollbars are visible
 	 * 
 	 * @param bounds
-	 * 		is the size of the receiver where the chart can be drawn
+	 *            is the size of the receiver where the chart can be drawn
 	 * @return bounds for the chart without scrollbars
 	 */
 	Point getVisibleSizeWithHBar(final int width, final int height) {
@@ -3525,10 +3525,10 @@ public class ChartComponentGraph extends Canvas {
 	 * Move the slider to a new position
 	 * 
 	 * @param xSlider
-	 * 		Current slider
+	 *            Current slider
 	 * @param devSliderLinePos
-	 * 		x coordinate for the slider line within the graph, this can be outside of the visible
-	 * 		graph
+	 *            x coordinate for the slider line within the graph, this can be outside of the
+	 *            visible graph
 	 */
 	private void moveXSlider(final ChartXSlider xSlider, int devSliderLinePos) {
 
@@ -4265,7 +4265,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * @param canAutoZoomToSlider
-	 * 		the canAutoZoomToSlider to set
+	 *            the canAutoZoomToSlider to set
 	 */
 	void setCanAutoZoomToSlider(final boolean canAutoZoomToSlider) {
 
@@ -4281,7 +4281,7 @@ public class ChartComponentGraph extends Canvas {
 
 	/**
 	 * @param canScrollZoomedChart
-	 * 		the canScrollZoomedChart to set
+	 *            the canScrollZoomedChart to set
 	 */
 	void setCanScrollZoomedChart(final boolean canScrollZoomedGraph) {
 
@@ -4495,7 +4495,7 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param devX
 	 * @param devY
-	 * 		vertical coordinat of the mouse in the graph
+	 *            vertical coordinat of the mouse in the graph
 	 */
 	private void setupScrollCursor(final int devX, final int devY) {
 
@@ -4617,7 +4617,7 @@ public class ChartComponentGraph extends Canvas {
 	 * painted graph can have a white space on the right side
 	 * 
 	 * @param slider
-	 * 		the slider which gets changed
+	 *            the slider which gets changed
 	 */
 	private void switchSliderTo2ndXData(final ChartXSlider slider) {
 
@@ -4885,7 +4885,7 @@ public class ChartComponentGraph extends Canvas {
 		fToolTipContainer.pack(true);
 		final Point containerSize = fToolTipContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		fToolTipContainer.setSize(containerSize);
-
+//final x
 		fToolTipShell.pack();
 
 		/*
