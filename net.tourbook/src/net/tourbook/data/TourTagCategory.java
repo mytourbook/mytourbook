@@ -130,4 +130,9 @@ public class TourTagCategory {
 		this.fTagCounter = fTagCounter;
 	}
 
+	@Override
+	public String toString() {
+		return "TourTagCategory ID:" + tagCategoryId + "\tisRoot:" + isRoot + "\t" + name;
+	}
+
 }

@@ -89,4 +89,9 @@ public class TVITourTagCategory extends TVIPrefTagViewer {
 		fTourTagCategory = tourTagCategoryEntity;
 	}
 
+	@Override
+	public String toString() {
+		return "TVITourTagCategory: " + fTourTagCategory;
+	}
+
 }

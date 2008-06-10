@@ -76,6 +76,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 	private void dropCategoryIntoCategory(	final TVITourTagCategory itemDraggedCategory,
 											final TVITourTagCategory itemTargetCategory) {
 
+//		System.out.println("dropCategoryIntoCategory");
 		final TourTagCategory draggedCategory = itemDraggedCategory.getTourTagCategory();
 		final TreeViewerItem itemDraggedParent = itemDraggedCategory.getParentItem();
 
@@ -180,6 +181,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 
 	private void dropCategoryIntoRoot(final TVITourTagCategory itemDraggedCategory) {
 
+//		System.out.println("dropCategoryIntoRoot");
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 		if (em == null) {
 			return;
@@ -204,7 +206,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			 * remove category from old category
 			 */
 
-			// remove category from parent item
+			// remove category from dragged parent item
 			itemDraggedParentCategory.removeChild(itemDraggedCategory);
 
 			// remove category from the database
@@ -434,6 +436,46 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		}
 	}
 
+	/**
+	 * !!! Recursive method !!!<br>
+	 * <br>
+	 * This will check if the dragged item is dropped in one of it's children
+	 * 
+	 * @param itemDraggedCategory
+	 * @param targetCategoryId
+	 * @return Returns <code>true</code> when the dragged category will be dropped on its children
+	 */
+	private boolean isDraggedIntoChildren(final TVITourTagCategory itemDraggedCategory, final long targetCategoryId) {
+
+		final ArrayList<TreeViewerItem> unfetchedChildren = itemDraggedCategory.getUnfetchedChildren();
+		if (unfetchedChildren != null) {
+
+			for (final TreeViewerItem treeViewerItem : unfetchedChildren) {
+				if (treeViewerItem instanceof TVITourTagCategory) {
+
+					final TVITourTagCategory itemChildCategory = (TVITourTagCategory) treeViewerItem;
+
+//					System.out.println("parent: "
+//							+ itemDraggedCategory.getTourTagCategory().getCategoryName()
+//							+ "\tchild: "
+//							+ itemChildCategory.getTourTagCategory().getCategoryName());
+
+					// check child
+					if (itemChildCategory.getTourTagCategory().getCategoryId() == targetCategoryId) {
+						return true;
+					}
+
+					// check children of the child 
+					if (isDraggedIntoChildren(itemChildCategory, targetCategoryId)) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
 	@Override
 	public boolean performDrop(final Object dropData) {
 
@@ -478,6 +520,8 @@ final class TagDropAdapter extends ViewerDropAdapter {
 	private TourTagCategory updateModelAddCategory(	final TourTagCategory draggedCategory,
 													final TourTagCategory targetCategory,
 													final EntityManager em) {
+
+//		System.out.println("updateModelAddCategory - dragged:" + draggedCategory + "\ttarget:" + targetCategory);
 
 		final TourTagCategory lazyTargetCategory = em.find(TourTagCategory.class, targetCategory.getCategoryId());
 
@@ -526,6 +570,8 @@ final class TagDropAdapter extends ViewerDropAdapter {
 	private TourTagCategory updateModelRemoveCategory(	final TourTagCategory draggedCategory,
 														final TourTagCategory parentCategory,
 														final EntityManager em) {
+
+//		System.out.println("updateModelRemoveCategory - dragged:" + draggedCategory + "\tparent:" + parentCategory);
 
 		final TourTagCategory lazyParentCategory = em.find(TourTagCategory.class, parentCategory.getCategoryId());
 
@@ -587,40 +633,6 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		return TourDatabase.saveEntity(lazyCategory, lazyCategory.getCategoryId(), TourTagCategory.class, em);
 	}
 
-	/**
-	 * !!! Recursive method !!!
-	 * 
-	 * @param itemDraggedCategory
-	 * @param targetCategoryId
-	 * @return Returns <code>true</code> when the dragged category will be dropped on its children
-	 */
-	private boolean validateDraggedChildren(final TVITourTagCategory itemDraggedCategory, final long targetCategoryId) {
-
-		final ArrayList<TreeViewerItem> unfetchedChildren = itemDraggedCategory.getUnfetchedChildren();
-		if (unfetchedChildren != null) {
-
-			for (final TreeViewerItem treeViewerItem : unfetchedChildren) {
-				if (treeViewerItem instanceof TVITourTagCategory) {
-
-					final TVITourTagCategory itemChildCategory = (TVITourTagCategory) treeViewerItem;
-
-//					System.out.println("parent: "
-//							+ itemDraggedCategory.getTourTagCategory().getCategoryName()
-//							+ "\tchild: "
-//							+ itemChildCategory.getTourTagCategory().getCategoryName());
-
-					if (itemChildCategory.getTourTagCategory().getCategoryId() == targetCategoryId) {
-						return true;
-					}
-
-					return validateDraggedChildren(itemChildCategory, targetCategoryId);
-				}
-			}
-		}
-
-		return false;
-	}
-
 	@Override
 	public boolean validateDrop(final Object target, final int operation, final TransferData transferType) {
 
@@ -657,7 +669,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 
 						final long targetCategoryId = itemTargetCategory.getTourTagCategory().getCategoryId();
 
-						if (validateDraggedChildren(itemDraggedCategory, targetCategoryId)) {
+						if (isDraggedIntoChildren(itemDraggedCategory, targetCategoryId)) {
 							return false;
 						}
 

@@ -343,6 +343,8 @@ public class Messages extends NLS {
 
 	public static String		pref_tourtag_btn_new_tag_category;
 	public static String		pref_tourtag_btn_rename;
+
+	public static String	pref_tourtag_btn_reset;
 	public static String		pref_tourtag_dlg_new_tag_category_message;
 	public static String		pref_tourtag_dlg_new_tag_category_title;
 	public static String		pref_tourtag_dlg_new_tag_message;

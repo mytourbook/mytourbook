@@ -16,6 +16,8 @@
 
 package net.tourbook.preferences;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -34,7 +36,9 @@ import net.tourbook.ui.ActionExpandAll;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -66,9 +70,11 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
@@ -84,8 +90,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private ToolBar				fToolBar;
 
 	private Button				fBtnNewTag;
-	private Button				fBtnRename;
 	private Button				fBtnNewTagCategory;
+	private Button				fBtnRename;
+	private Button				fBtnReset;
 
 	private TVIRootItem			fRootItem;
 
@@ -221,6 +228,20 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			}
 		});
 
+		// button: reset
+		fBtnReset = new Button(container, SWT.NONE);
+		fBtnReset.setText(Messages.pref_tourtag_btn_reset);
+		setButtonLayoutData(fBtnReset);
+		final GridData gd = (GridData) fBtnReset.getLayoutData();
+		gd.verticalIndent = 50;
+
+		fBtnReset.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onReset();
+			}
+		});
+
 	}
 
 	@Override
@@ -231,7 +252,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		// set root item
 		fRootItem = new TVIRootItem(fTagViewer);
 
-		updateViewers();
+		updateTagViewer();
 		enableButtons();
 
 		return viewerContainer;
@@ -794,6 +815,82 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		setIsModified(true);
 	}
 
+	private void onReset() {
+
+		final MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
+				"Emergency Reset",
+				null,
+				"Are you sure to reset the structure of the tags?\n\n"
+						+ "Reseting the structure will not delete the tags or categories,\n"
+						+ "they will be set to a main tag or main category.",
+				MessageDialog.QUESTION,
+				new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL },
+				1);
+
+		if ((dialog.open()) == Window.OK) {
+
+			try {
+
+				System.out.println("RESET TAG STRUCTURE");
+
+				final StringBuilder sb = new StringBuilder();
+				final Connection conn = TourDatabase.getInstance().getConnection();
+
+				/*
+				 * remove join table tag->category
+				 */
+				sb.append("DELETE FROM ");
+				sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
+				int result = conn.createStatement().executeUpdate(sb.toString());
+				System.out.println("Deleted "
+						+ result
+						+ " entries from "
+						+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
+
+				/*
+				 * remove jointable category<->category
+				 */
+				sb.setLength(0);
+				sb.append("DELETE FROM ");
+				sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
+				result = conn.createStatement().executeUpdate(sb.toString());
+				System.out.println("Deleted "
+						+ result
+						+ " entries from "
+						+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
+
+				/*
+				 * set tags to root
+				 */
+				sb.setLength(0);
+				sb.append("UPDATE ");
+				sb.append(TourDatabase.TABLE_TOUR_TAG);
+				sb.append(" SET isRoot=1");
+				result = conn.createStatement().executeUpdate(sb.toString());
+				System.out.println("Set " + result + " tour tags to root");
+
+				/*
+				 * set categories to root
+				 */
+				sb.setLength(0);
+				sb.append("UPDATE ");
+				sb.append(TourDatabase.TABLE_TOUR_TAG_CATEGORY);
+				sb.append(" SET isRoot=1");
+				result = conn.createStatement().executeUpdate(sb.toString());
+				System.out.println("Set " + result + " tour categories to root");
+
+				conn.close();
+
+				// update the tag viewer
+				fRootItem = new TVIRootItem(fTagViewer);
+				updateTagViewer();
+
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	@Override
 	public boolean performOk() {
 
@@ -825,7 +922,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		tbm.update(true);
 	}
 
-	private void updateViewers() {
+	private void updateTagViewer() {
 
 		// show contents in the viewers
 		fTagViewer.setInput(this);
