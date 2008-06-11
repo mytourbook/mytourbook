@@ -61,7 +61,7 @@ public class TourTypeFilter {
 	 * 
 	 * @param tourType
 	 */
-	public TourTypeFilter(int systemFilterId, String filterName) {
+	public TourTypeFilter(final int systemFilterId, final String filterName) {
 
 		fFilterType = FILTER_TYPE_SYSTEM;
 
@@ -74,7 +74,7 @@ public class TourTypeFilter {
 	 * 
 	 * @param tourType
 	 */
-	public TourTypeFilter(TourType tourType) {
+	public TourTypeFilter(final TourType tourType) {
 		fFilterType = FILTER_TYPE_DB;
 		fTourType = tourType;
 	}
@@ -84,7 +84,7 @@ public class TourTypeFilter {
 	 * 
 	 * @param filterSet
 	 */
-	public TourTypeFilter(TourTypeFilterSet filterSet) {
+	public TourTypeFilter(final TourTypeFilterSet filterSet) {
 		fFilterType = FILTER_TYPE_TOURTYPE_SET;
 		fTourTypeSet = filterSet;
 	}
@@ -166,7 +166,7 @@ public class TourTypeFilter {
 	}
 
 	/**
-	 * @return Returns a sql string to select the tour types in the database
+	 * @return Returns a sql string for the WHERE clause to select the tour types in the database
 	 */
 	public String getSQLString() {
 
@@ -203,7 +203,7 @@ public class TourTypeFilter {
 				int itemIndex = 0;
 				String filter = ""; //$NON-NLS-1$
 
-				for (Object item : tourTypes) {
+				for (final Object item : tourTypes) {
 
 					if (itemIndex > 0) {
 						filter += " OR "; //$NON-NLS-1$
@@ -248,7 +248,7 @@ public class TourTypeFilter {
 		return fTourTypeSet;
 	}
 
-	public void setName(String filterName) {
+	public void setName(final String filterName) {
 		switch (fFilterType) {
 		case FILTER_TYPE_SYSTEM:
 			// not supported

@@ -46,6 +46,8 @@ import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TableColumnDefinition;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TourCatalogItemComparedTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
@@ -850,22 +852,9 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 		} else if (selection instanceof SelectionTourId) {
 
-			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
+			final Long tourId = ((SelectionTourId) selection).getTourId();
 
-			// don't reload the same tour
-			if (fTourData != null) {
-				if (fTourData.getTourId().equals(tourIdSelection.getTourId())) {
-					return;
-				}
-			}
-
-			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
-
-			if (tourData != null) {
-				fTourEditor = null;
-				fTourChart = null;
-				updateTourProperties(tourData);
-			}
+			onSelectTourId(tourId);
 
 		} else if (selection instanceof SelectionActiveEditor) {
 
@@ -883,6 +872,17 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 				fTourChart = fTourEditor.getTourChart();
 				updateTourProperties(fTourChart.getTourData());
 			}
+
+		} else if (selection instanceof StructuredSelection) {
+
+			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+			if (firstElement instanceof TourCatalogItemComparedTour) {
+				onSelectTourId(((TourCatalogItemComparedTour) firstElement).getTourId());
+			}
+
+		} else if (selection instanceof SelectionTourCatalogView) {
+			// this selection is overwritten by another selection
+//			onSelectTourId(((SelectionTourCatalogView) selection).getRefItem().getTourId());
 		}
 	}
 
@@ -891,6 +891,24 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		fScrolledContainer.setMinSize(fContentContainer.computeSize(fScrolledContainer.getClientArea().width,
 				SWT.DEFAULT));
 
+	}
+
+	private void onSelectTourId(final Long tourId) {
+
+		// don't reload the same tour
+		if (fTourData != null) {
+			if (fTourData.getTourId().equals(tourId)) {
+				return;
+			}
+		}
+
+		final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
+		if (tourData != null) {
+			fTourEditor = null;
+			fTourChart = null;
+			updateTourProperties(tourData);
+		}
 	}
 
 	private void restoreState(final IMemento memento) {

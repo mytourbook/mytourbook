@@ -78,8 +78,9 @@ public class TVITagViewRoot extends TVITagViewItem {
 			 */
 			sb.delete(0, sb.length());
 			sb.append("SELECT");
-			sb.append(" tagId,"); //	1
-			sb.append(" name"); //		2
+			sb.append(" tagId,"); //		1
+			sb.append(" name,"); //			2
+			sb.append(" expandType"); //	3
 
 			sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG);
 			sb.append(" WHERE isRoot = 1");
@@ -93,6 +94,7 @@ public class TVITagViewRoot extends TVITagViewItem {
 
 				treeItem.tagId = result.getLong(1);
 				treeItem.treeColumn = result.getString(2);
+				treeItem.expandType = result.getInt(3);
 
 				children.add(treeItem);
 			}

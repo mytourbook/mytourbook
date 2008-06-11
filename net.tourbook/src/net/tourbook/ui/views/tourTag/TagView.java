@@ -19,6 +19,7 @@ package net.tourbook.ui.views.tourTag;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
@@ -31,6 +32,7 @@ import net.tourbook.tag.TVITourTagCategory;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.ActionSetTreeExpandType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.ITourViewer;
@@ -44,7 +46,11 @@ import net.tourbook.util.StringToArrayConverter;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -54,6 +60,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -63,6 +70,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
@@ -93,6 +101,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	TVITagViewRoot					fRootItem;
 
 	private ActionRefreshView		fActionRefreshView;
+	private ActionSetTreeExpandType	fActionSetTreeExpandType;
 
 	private Image					fImgTagCategory				= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
 																		.createImage();
@@ -179,14 +188,33 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	private void createActions() {
 
 		fActionRefreshView = new ActionRefreshView(this);
+		fActionSetTreeExpandType = new ActionSetTreeExpandType(this, fTagViewer);
 
+		/*
+		 * action in the view toolbar
+		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
 		tbm.add(fActionRefreshView);
 	}
 
+	/**
+	 * create the views context menu
+	 */
 	private void createContextMenu() {
 
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
+
+		// add the context menu to the table viewer
+		final Control tourViewer = fTagViewer.getControl();
+		final Menu menu = menuMgr.createContextMenu(tourViewer);
+		tourViewer.setMenu(menu);
 	}
 
 	@Override
@@ -197,6 +225,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		createTagViewer(fViewerContainer);
 		createActions();
+		createContextMenu();
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -267,8 +296,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 				}
 			}
 		});
-
-		createContextMenu();
 
 		return tree;
 	}
@@ -345,6 +372,23 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	private void enableActions() {
 
+		final StructuredSelection selection = (StructuredSelection) fTagViewer.getSelection();
+		final int selectedItems = selection.size();
+
+		boolean isTagSelected = false;
+		if (selection.getFirstElement() instanceof TVITagViewTag) {
+			isTagSelected = true;
+		}
+
+		fActionSetTreeExpandType.setEnabled(isTagSelected && selectedItems == 1);
+	}
+
+	private void fillContextMenu(final IMenuManager menuMgr) {
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionSetTreeExpandType);
+
+		enableActions();
 	}
 
 	@SuppressWarnings("unchecked")//$NON-NLS-1$
@@ -367,24 +411,23 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		// get selected tours
 		final IStructuredSelection selectedTours = ((IStructuredSelection) fTagViewer.getSelection());
 
+		final TourManager tourManager = TourManager.getInstance();
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
 
-//		// loop: all selected tours
-//		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
-//
-//			final Object treeItem = iter.next();
-//
-//			if (treeItem instanceof TVITourBookTour) {
-//
-//				final TVITourBookTour tviTour = ((TVITourBookTour) treeItem);
-//
-//				final TourData tourData = TourManager.getInstance().getTourData(tviTour.getTourId());
-//
-//				if (tourData != null) {
-//					selectedTourData.add(tourData);
-//				}
-//			}
-//		}
+		// loop: all selected tours
+		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+
+			final Object treeItem = iter.next();
+			if (treeItem instanceof TVITagViewTour) {
+
+				final TVITagViewTour tviTour = (TVITagViewTour) treeItem;
+				final TourData tourData = tourManager.getTourData(tviTour.tourId);
+
+				if (tourData != null) {
+					selectedTourData.add(tourData);
+				}
+			}
+		}
 
 		return selectedTourData;
 	}

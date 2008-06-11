@@ -17,11 +17,14 @@
 package net.tourbook.ui;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
+import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
@@ -41,6 +44,74 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 	private Menu			fMenu;
 
 	private ISelectedTours	fTourProvider;
+
+	private int				fSelectedTourCounter;
+
+	/**
+	 * When one tour is selected ({@link #fSelectedTourCounter} == 1) in the viewer, this set
+	 * contains the tags for the selected tour
+	 */
+	private Set<TourTag>	fTourTagIds;
+
+	public class ActionTagCategory extends Action implements IMenuCreator {
+
+		private Menu			fCategoryMenu;
+		private TourTagCategory	fTagCategory;
+
+		public ActionTagCategory(final TourTagCategory tagCategory) {
+
+			super(tagCategory.getCategoryName(), AS_DROP_DOWN_MENU);
+			setMenuCreator(this);
+
+			fTagCategory = tagCategory;
+		}
+
+		public void dispose() {
+			if (fCategoryMenu != null) {
+				fCategoryMenu.dispose();
+				fCategoryMenu = null;
+			}
+		}
+
+		public Menu getMenu(final Control parent) {
+			return null;
+		}
+
+		public Menu getMenu(final Menu parent) {
+
+			dispose();
+			fCategoryMenu = new Menu(parent);
+
+			// Add listener to repopulate the menu each time
+			fCategoryMenu.addMenuListener(new MenuAdapter() {
+				@Override
+				public void menuShown(final MenuEvent e) {
+
+					final Menu menu = (Menu) e.widget;
+
+					// dispose old items
+					final MenuItem[] items = menu.getItems();
+					for (int i = 0; i < items.length; i++) {
+						items[i].dispose();
+					}
+
+					final TagCollection categoryTagCollection = TourDatabase.getTagEntries(fTagCategory.getCategoryId());
+
+//					// add category actions
+//					for (final TourTagCategory tagCategory : categoryTagCollection.tourTagCategories) {
+//						addActionToMenu(fCategoryMenu, new ActionTagCategory(tagCategory));
+//					}
+
+					// add tag actions
+					addCategoryActions(categoryTagCollection, fCategoryMenu);
+					addTagActions(categoryTagCollection, fCategoryMenu);
+				}
+			});
+
+			return fCategoryMenu;
+		}
+
+	}
 
 	private class ActionTourTag extends Action {
 
@@ -158,10 +229,43 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		fTourProvider = tourProvider;
 	}
 
-	private void addActionToMenu(final Action action) {
+	private void addActionToMenu(final Menu menu, final Action action) {
 
 		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(fMenu, -1);
+		item.fill(menu, -1);
+	}
+
+	private void addCategoryActions(final TagCollection tagCollection, final Menu menu) {
+
+		// add tag categories
+		for (final TourTagCategory tagCategory : tagCollection.tourTagCategories) {
+			addActionToMenu(menu, new ActionTagCategory(tagCategory));
+		}
+	}
+
+	private void addTagActions(final TagCollection tagCollection, final Menu menu) {
+
+		// add tag items
+		for (final TourTag menuTourTag : tagCollection.tourTags) {
+
+			// check the tag when it's set in the tour
+			final ActionTourTag actionTourTag = new ActionTourTag(menuTourTag);
+			boolean isChecked = false;
+			if (fSelectedTourCounter == 1) {
+
+				final long tagId = menuTourTag.getTagId();
+
+				for (final TourTag checkTourTag : fTourTagIds) {
+					if (checkTourTag.getTagId() == tagId) {
+						isChecked = true;
+						break;
+					}
+				}
+			}
+			actionTourTag.setChecked(isChecked);
+
+			addActionToMenu(menu, actionTourTag);
+		}
 	}
 
 	public void dispose() {
@@ -193,19 +297,22 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 					items[i].dispose();
 				}
 
-				// get tours which tags should be changed
+				// check if tours are selected
 				final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
 				if (selectedTours == null || selectedTours.size() == 0) {
+					// a tour is not selected
 					return;
 				}
+				fSelectedTourCounter = selectedTours.size();
 
-				for (final TourTag tourTag : TourDatabase.getTourTags()) {
-
-					final ActionTourTag actionTourTag = new ActionTourTag(tourTag);
-//					actionTourType.setChecked(isChecked);
-
-					addActionToMenu(actionTourTag);
+				if (fSelectedTourCounter == 1) {
+					fTourTagIds = selectedTours.get(0).getTourTags();
 				}
+
+				final TagCollection rootTagCollection = TourDatabase.getRootTags();
+
+				addCategoryActions(rootTagCollection, fMenu);
+				addTagActions(rootTagCollection, fMenu);
 			}
 		});
 

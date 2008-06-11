@@ -27,6 +27,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -40,8 +42,10 @@ import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
+import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
@@ -65,65 +69,72 @@ import org.eclipse.ui.PlatformUI;
 
 public class TourDatabase {
 
+	private static final long					ROOT_TAG_ID									= -1L;
+
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int			TOURBOOK_DB_VERSION							= 5;
+	private static final int					TOURBOOK_DB_VERSION							= 5;
 
 	/*
 	 * database tables
 	 */
-	private static final String			TABLE_DB_VERSION							= "DbVersion";													//$NON-NLS-1$
+	private static final String					TABLE_DB_VERSION							= "DbVersion";										//$NON-NLS-1$
 
-	public static final String			TABLE_SCHEMA								= "USER";														//$NON-NLS-1$
+	public static final String					TABLE_SCHEMA								= "USER";											//$NON-NLS-1$
 
-	public static final String			TABLE_TOUR_BIKE								= "TourBike";													//$NON-NLS-1$
-	public static final String			TABLE_TOUR_CATEGORY							= "TourCategory";												//$NON-NLS-1$
-	public static final String			TABLE_TOUR_COMPARED							= "TourCompared";												//$NON-NLS-1$
-	public static final String			TABLE_TOUR_DATA								= "TourData";													//$NON-NLS-1$
-	public static final String			TABLE_TOUR_MARKER							= "TourMarker";												//$NON-NLS-1$
-	public static final String			TABLE_TOUR_PERSON							= "TourPerson";												//$NON-NLS-1$
-	public static final String			TABLE_TOUR_REFERENCE						= "TourReference";												//$NON-NLS-1$
-	public static final String			TABLE_TOUR_TAG								= "TourTag";													//$NON-NLS-1$
-	public static final String			TABLE_TOUR_TAG_CATEGORY						= "TourTagCategory";											//$NON-NLS-1$
-	public static final String			TABLE_TOUR_TYPE								= "TourType";													//$NON-NLS-1$
+	public static final String					TABLE_TOUR_BIKE								= "TourBike";										//$NON-NLS-1$
+	public static final String					TABLE_TOUR_CATEGORY							= "TourCategory";									//$NON-NLS-1$
+	public static final String					TABLE_TOUR_COMPARED							= "TourCompared";									//$NON-NLS-1$
+	public static final String					TABLE_TOUR_DATA								= "TourData";										//$NON-NLS-1$
+	public static final String					TABLE_TOUR_MARKER							= "TourMarker";									//$NON-NLS-1$
+	public static final String					TABLE_TOUR_PERSON							= "TourPerson";									//$NON-NLS-1$
+	public static final String					TABLE_TOUR_REFERENCE						= "TourReference";									//$NON-NLS-1$
+	public static final String					TABLE_TOUR_TAG								= "TourTag";										//$NON-NLS-1$
+	public static final String					TABLE_TOUR_TAG_CATEGORY						= "TourTagCategory";								//$NON-NLS-1$
+	public static final String					TABLE_TOUR_TYPE								= "TourType";										//$NON-NLS-1$
 
-	public static final String			JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG);					//$NON-NLS-1$
-	public static final String			JOINTABLE_TOURDATA__TOURMARKER				= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER);					//$NON-NLS-1$
-	public static final String			JOINTABLE_TOURDATA__TOURREFERENCE			= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE);				//$NON-NLS-1$
-	public static final String			JOINTABLE_TOURTAGCATEGORY_TOURTAG			= (TABLE_TOUR_TAG_CATEGORY + "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
-	public static final String			JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY	= (TABLE_TOUR_TAG_CATEGORY + "_" + TABLE_TOUR_TAG_CATEGORY);	//$NON-NLS-1$
-	public static final String			JOINTABLE_TOURCATEGORY__TOURDATA			= (TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA);				//$NON-NLS-1$
+	public static final String					JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG);		//$NON-NLS-1$
+	public static final String					JOINTABLE_TOURDATA__TOURMARKER				= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER);		//$NON-NLS-1$
+	public static final String					JOINTABLE_TOURDATA__TOURREFERENCE			= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE);	//$NON-NLS-1$
+	public static final String					JOINTABLE_TOURTAGCATEGORY_TOURTAG			= (TABLE_TOUR_TAG_CATEGORY
+																									+ "_" + TABLE_TOUR_TAG);					//$NON-NLS-1$
+	public static final String					JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY	= (TABLE_TOUR_TAG_CATEGORY
+																									+ "_" + TABLE_TOUR_TAG_CATEGORY);			//$NON-NLS-1$
+	public static final String					JOINTABLE_TOURCATEGORY__TOURDATA			= (TABLE_TOUR_CATEGORY
+																									+ "_" + TABLE_TOUR_DATA);					//$NON-NLS-1$
 
 	/**
 	 * contains <code>-1</code> which is the Id for a not saved entity
 	 */
-	public static final int				ENTITY_IS_NOT_SAVED							= -1;
+	public static final int						ENTITY_IS_NOT_SAVED							= -1;
 
 	/**
 	 * Db property: tour was changed and saved in the database
 	 */
-	public static final int				TOUR_IS_CHANGED_AND_PERSISTED				= 1;
+	public static final int						TOUR_IS_CHANGED_AND_PERSISTED				= 1;
 
 	/**
 	 * Db property: tour was changed but not yet saved in the database
 	 */
-	public static final int				TOUR_IS_CHANGED								= 2;
+	public static final int						TOUR_IS_CHANGED								= 2;
 
-	private static TourDatabase			instance;
+	private static TourDatabase					instance;
 
-	private static NetworkServerControl	server;
+	private static NetworkServerControl			server;
 
-	private static EntityManagerFactory	emFactory;
+	private static EntityManagerFactory			emFactory;
 
-	private static ArrayList<TourType>	fActiveTourTypes;
-	private static ArrayList<TourType>	fTourTypes;
-	private static ArrayList<TourTag>	fTourTags;
+	private static ArrayList<TourType>			fActiveTourTypes;
+	private static ArrayList<TourType>			fTourTypes;
+	private static ArrayList<TourTag>			fTourTags;
 
-	private boolean						fIsTableChecked;
-	private boolean						fIsVersionChecked;
+	private static HashMap<Long, TagCollection>	fTagCollections;
 
-	private final ListenerList			fPropertyListeners							= new ListenerList(ListenerList.IDENTITY);
+	private boolean								fIsTableChecked;
+	private boolean								fIsVersionChecked;
+
+	private final ListenerList					fPropertyListeners							= new ListenerList(ListenerList.IDENTITY);
 
 	class CustomMonitor extends ProgressMonitorDialog {
 
@@ -144,11 +155,16 @@ public class TourDatabase {
 	/**
 	 * remove all tour tags that the next time they have to be loaded from the database
 	 */
-	public static void cleanTourTags() {
+	public static void clearTourTags() {
 
 		if (fTourTags != null) {
 			fTourTags.clear();
 			fTourTags = null;
+		}
+
+		if (fTagCollections != null) {
+			fTagCollections.clear();
+			fTagCollections = null;
 		}
 	}
 
@@ -156,7 +172,7 @@ public class TourDatabase {
 	 * remove all tour types and dispose their images so the next time they have to be loaded from
 	 * the database and the images are recreated
 	 */
-	public static void cleanTourTypes() {
+	public static void clearTourTypes() {
 
 		if (fTourTypes != null) {
 			fTourTypes.clear();
@@ -199,11 +215,124 @@ public class TourDatabase {
 		return tourList;
 	}
 
+//	/**
+//	 * @return Returns all tags which are stored in the database ordered by name
+//	 */
+//	@SuppressWarnings("unchecked")//$NON-NLS-1$
+//	public static ArrayList<TourTag> getAllTourTags() {
+//
+//		if (fTourTags != null) {
+//			return fTourTags;
+//		}
+//
+//		fTourTags = new ArrayList<TourTag>();
+//
+//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+//
+//		if (em != null) {
+//
+//			final Query query = em.createQuery("SELECT TourTag " //$NON-NLS-1$
+//					+ ("FROM " + TourDatabase.TABLE_TOUR_TAG + " TourTag ")
+//					+ (" ORDER BY TourTag.name")
+//			//
+//			); //$NON-NLS-1$
+//
+//			fTourTags = (ArrayList<TourTag>) query.getResultList();
+//
+//			em.close();
+//		}
+//
+//		return fTourTags;
+//	}
+
 	public static TourDatabase getInstance() {
 		if (instance == null) {
 			instance = new TourDatabase();
 		}
 		return instance;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static TagCollection getRootTags() {
+
+		if (fTagCollections == null) {
+			fTagCollections = new HashMap<Long, TagCollection>();
+		}
+
+		TagCollection rootEntry = fTagCollections.get(Long.valueOf(ROOT_TAG_ID));
+		if (rootEntry != null) {
+			return rootEntry;
+		}
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		if (em == null) {
+			return null;
+		}
+
+		rootEntry = new TagCollection();
+
+		/*
+		 * read tag categories from db
+		 */
+		Query query = em.createQuery("SELECT TourTagCategory " //$NON-NLS-1$
+				+ ("FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " AS TourTagCategory ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE TourTagCategory.isRoot = 1"));
+
+		rootEntry.tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
+
+		/*
+		 * read tour tags from db
+		 */
+		query = em.createQuery("SELECT TourTag " //$NON-NLS-1$
+				+ ("FROM " + TourDatabase.TABLE_TOUR_TAG + " AS TourTag ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE TourTag.isRoot = 1"));
+
+		rootEntry.tourTags = (ArrayList<TourTag>) query.getResultList();
+
+		em.close();
+
+		fTagCollections.put(ROOT_TAG_ID, rootEntry);
+
+		return rootEntry;
+	}
+
+	public static TagCollection getTagEntries(final long categoryId) {
+
+		if (fTagCollections == null) {
+			fTagCollections = new HashMap<Long, TagCollection>();
+		}
+
+		final Long categoryIdValue = Long.valueOf(categoryId);
+
+		TagCollection categoryEntries = fTagCollections.get(categoryIdValue);
+		if (categoryEntries != null) {
+			return categoryEntries;
+		}
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		if (em == null) {
+			return null;
+		}
+
+		categoryEntries = new TagCollection();
+
+		final TourTagCategory tourTagCategory = em.find(TourTagCategory.class, categoryIdValue);
+
+		// get tags
+		final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
+		categoryEntries.tourTags = new ArrayList<TourTag>(lazyTourTags);
+
+		// get categories
+		final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
+		categoryEntries.tourTagCategories = new ArrayList<TourTagCategory>(lazyTourTagCategories);
+
+		em.close();
+
+		fTagCollections.put(categoryIdValue, categoryEntries);
+
+		return categoryEntries;
 	}
 
 	/**
@@ -273,36 +402,6 @@ public class TourDatabase {
 		}
 
 		return tourPeople;
-	}
-
-	/**
-	 * @return Returns all tags which are stored in the database ordered by name
-	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
-	public static ArrayList<TourTag> getTourTags() {
-
-		if (fTourTags != null) {
-			return fTourTags;
-		}
-
-		fTourTags = new ArrayList<TourTag>();
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-		if (em != null) {
-
-			final Query query = em.createQuery("SELECT TourTag " //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_TAG + " TourTag ")
-					+ (" ORDER BY TourTag.name")
-			//
-			); //$NON-NLS-1$
-
-			fTourTags = (ArrayList<TourTag>) query.getResultList();
-
-			em.close();
-		}
-
-		return fTourTags;
 	}
 
 	/**
@@ -1134,9 +1233,10 @@ public class TourDatabase {
 
 		sql = ("CREATE TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
 				+ "(\n" //$NON-NLS-1$
-				+ "	tagId 	BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
-				+ "	isRoot 	INTEGER,\n" //$NON-NLS-1$
-				+ "	name 	VARCHAR(255)\n" //$NON-NLS-1$
+				+ "	tagId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "	isRoot 		INTEGER,\n" //$NON-NLS-1$
+				+ "	expandType 	INTEGER,\n" //$NON-NLS-1$
+				+ "	name 		VARCHAR(255)\n" //$NON-NLS-1$
 				+ ")";
 
 		System.out.println(sql);

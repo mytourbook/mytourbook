@@ -39,15 +39,14 @@ public class Messages extends NLS {
 	public static String		App_Action_open_tour_segmenter;
 	public static String		App_Action_open_tour_segmenter_tooltip;
 
-	public static String	app_action_collapse_all_tooltip;
-
-	public static String	app_action_expand_all_tooltip;
-
+	public static String		app_action_collapse_all_tooltip;
+	public static String		app_action_expand_all_tooltip;
+	public static String		app_action_expand_type_flat;
+	public static String		app_action_expand_type_year_month_day;
 	public static String		app_action_quick_edit;
-
-	public static String	app_action_remove_tour_tag;
-
+	public static String		app_action_remove_tour_tag;
 	public static String		app_action_set_tour_tag;
+	public static String		app_action_set_tour_tag_tree_expand_type;
 
 	public static String		App_Action_set_tour_type;
 	public static String		App_measurement_imperial;
@@ -180,7 +179,7 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour;
 	public static String		Image__edit_tour_disabled;
 
-	public static String	Image__expand_all;
+	public static String		Image__expand_all;
 	public static String		Image__fit_to_window;
 
 	public static String		Image__folder_closed;
@@ -226,11 +225,11 @@ public class Messages extends NLS {
 	public static String		Image__synch_graph_bySize;
 	public static String		Image__synch_graph_bySize_disabled;
 	public static String		Image__synch_statistics;
-	public static String	Image__tag;
+	public static String		Image__tag;
 
-	public static String	Image__tag_category;
+	public static String		Image__tag_category;
 
-	public static String	Image__tag_root;
+	public static String		Image__tag_root;
 
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
@@ -339,12 +338,12 @@ public class Messages extends NLS {
 	public static String		pref_regional_useCustomDecimalFormat;
 	public static String		pref_regional_value_example;
 
-	public static String	pref_tourtag_btn_new_tag;
+	public static String		pref_tourtag_btn_new_tag;
 
 	public static String		pref_tourtag_btn_new_tag_category;
 	public static String		pref_tourtag_btn_rename;
 
-	public static String	pref_tourtag_btn_reset;
+	public static String		pref_tourtag_btn_reset;
 	public static String		pref_tourtag_dlg_new_tag_category_message;
 	public static String		pref_tourtag_dlg_new_tag_category_title;
 	public static String		pref_tourtag_dlg_new_tag_message;
@@ -455,11 +454,11 @@ public class Messages extends NLS {
 	public static String		Tour_Properties_Label_start_location;
 	public static String		Tour_Properties_Label_start_time;
 	public static String		Tour_Properties_Label_tour_date;
-	public static String	Tour_Properties_Label_tour_tag;
+	public static String		Tour_Properties_Label_tour_tag;
 
 	public static String		Tour_Properties_Label_tour_title;
 	public static String		Tour_Properties_Label_tour_type;
-	public static String	Tour_Properties_tabLabel_info;
+	public static String		Tour_Properties_tabLabel_info;
 
 	public static String		Tour_Properties_tabLabel_time;
 	public static String		Tour_Properties_tabLabel_tour_data;
@@ -468,7 +467,7 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;
 
-	public static String	tag_view_action_refresh_view_tooltip;
+	public static String		tag_view_action_refresh_view_tooltip;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;

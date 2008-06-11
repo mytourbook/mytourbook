@@ -356,8 +356,10 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		addPrefListener();
 		addTourPropertyListener();
 
-		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
-		fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
+		final TourbookPlugin tourbookPlugin = TourbookPlugin.getDefault();
+		fActivePerson = tourbookPlugin.getActivePerson();
+		fActiveTourTypeFilter = tourbookPlugin.getActiveTourTypeFilter();
+
 		restoreState(fSessionMemento);
 
 		// update the viewer

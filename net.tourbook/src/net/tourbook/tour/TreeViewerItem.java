@@ -18,6 +18,9 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 
+import net.tourbook.data.TourPerson;
+import net.tourbook.plugin.TourbookPlugin;
+
 /**
  * Abstract class which contains an item for a tree viewer
  */
@@ -103,6 +106,34 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
+	 * @return Returns a sql string for the WHERE clause to select only the data which for the
+	 *         selected person
+	 */
+	public String getSQlTourPersonId() {
+
+		final TourPerson fActivePerson = TourbookPlugin.getDefault().getActivePerson();
+		final StringBuffer sqlString = new StringBuffer();
+
+		final long personId = fActivePerson == null ? -1 : fActivePerson.getPersonId();
+		if (personId == -1) {
+			// select all people
+		} else {
+			// select only one person
+			sqlString.append(" AND tourPerson_personId = " + Long.toString(personId)); //$NON-NLS-1$
+		}
+		return sqlString.toString();
+	}
+
+	/**
+	 * @return Returns a sql string for the WHERE clause to select only the data which tour type is
+	 *         defined in fTourTypeId
+	 */
+	public String getSQLTourTypeId() {
+		return TourbookPlugin.getDefault().getActiveTourTypeFilter().getSQLString();
+
+	}
+
+	/**
 	 * @return Returns a list with all childrens of this item, <code>null</code> will be returned
 	 *         when childrens have not yet been fetched
 	 */
@@ -157,5 +188,4 @@ public abstract class TreeViewerItem {
 	public void setParentItem(final TreeViewerItem parentItem) {
 		fParentItem = parentItem;
 	}
-
 }

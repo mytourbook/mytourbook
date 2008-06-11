@@ -234,7 +234,6 @@ public class TourData {
 
 	@ManyToMany(fetch = EAGER)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId", referencedColumnName = "tagId"))
-//	@JoinTable(inverseJoinColumns = @JoinColumn(name = "tourTag_tagId"))
 	private Set<TourTag>		tourTags						= new HashSet<TourTag>();
 
 	/**
@@ -1340,7 +1339,7 @@ public class TourData {
 	 * transfered
 	 * 
 	 * @param isCreateMarker
-	 * 		creates markers when <code>true</code>
+	 *            creates markers when <code>true</code>
 	 */
 	public void createTimeSeries(final ArrayList<TimeData> timeDataList, final boolean isCreateMarker) {
 
@@ -1675,7 +1674,7 @@ public class TourData {
 	 * Creates the unique tour id from the tour date/time and the unique key
 	 * 
 	 * @param uniqueKey
-	 * 		unique key to identify a tour
+	 *            unique key to identify a tour
 	 */
 	public void createTourId(final String uniqueKey) {
 
@@ -2103,7 +2102,7 @@ public class TourData {
 
 	/**
 	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
-	 * 	slices are unequally
+	 *         slices are unequally
 	 */
 	public short getDeviceTimeInterval() {
 		return deviceTimeInterval;
@@ -2135,7 +2134,7 @@ public class TourData {
 
 	/**
 	 * @return Returns the distance data serie for the current measurement system which can be
-	 * 	metric or imperial
+	 *         metric or imperial
 	 */
 	public int[] getDistanceSerie() {
 
@@ -2212,7 +2211,7 @@ public class TourData {
 
 	/**
 	 * @return Returns the distance serie from the metric system, the distance serie is
-	 * 	<b>always</b> saved in the database in the metric system
+	 *         <b>always</b> saved in the database in the metric system
 	 */
 	public int[] getMetricDistanceSerie() {
 		return distanceSerie;
@@ -2484,7 +2483,7 @@ public class TourData {
 
 	/**
 	 * @return returns the person for whom the tour data is saved or <code>null</code> when the tour
-	 * 	is not saved in the database
+	 *         is not saved in the database
 	 */
 	public TourPerson getTourPerson() {
 		return tourPerson;
@@ -2509,6 +2508,9 @@ public class TourData {
 		return tourStartPlace == null ? "" : tourStartPlace; //$NON-NLS-1$
 	}
 
+	/**
+	 * @return Returns the tags {@link #tourTags} which are defined for this tour
+	 */
 	public Set<TourTag> getTourTags() {
 		return tourTags;
 	}
@@ -2766,7 +2768,7 @@ public class TourData {
 
 	/**
 	 * @param avgCadence
-	 * 		the avgCadence to set
+	 *            the avgCadence to set
 	 */
 	public void setAvgCadence(final int avgCadence) {
 		this.avgCadence = avgCadence;
@@ -2774,7 +2776,7 @@ public class TourData {
 
 	/**
 	 * @param avgPulse
-	 * 		the avgPulse to set
+	 *            the avgPulse to set
 	 */
 	public void setAvgPulse(final int avgPulse) {
 		this.avgPulse = avgPulse;
@@ -2782,7 +2784,7 @@ public class TourData {
 
 	/**
 	 * @param avgTemperature
-	 * 		the avgTemperature to set
+	 *            the avgTemperature to set
 	 */
 	public void setAvgTemperature(final int avgTemperature) {
 		this.avgTemperature = avgTemperature;
@@ -2790,7 +2792,7 @@ public class TourData {
 
 	/**
 	 * @param bikerWeight
-	 * 		the bikerWeight to set
+	 *            the bikerWeight to set
 	 */
 	public void setBikerWeight(final float bikerWeight) {
 		this.bikerWeight = bikerWeight;
@@ -2798,7 +2800,7 @@ public class TourData {
 
 	/**
 	 * @param calories
-	 * 		the calories to set
+	 *            the calories to set
 	 */
 	public void setCalories(final String calories) {
 		this.calories = calories;
@@ -2869,7 +2871,7 @@ public class TourData {
 
 	/**
 	 * @param maxAltitude
-	 * 		the maxAltitude to set
+	 *            the maxAltitude to set
 	 */
 	public void setMaxAltitude(final int maxAltitude) {
 		this.maxAltitude = maxAltitude;
@@ -2881,7 +2883,7 @@ public class TourData {
 
 	/**
 	 * @param maxPulse
-	 * 		the maxPulse to set
+	 *            the maxPulse to set
 	 */
 	public void setMaxPulse(final int maxPulse) {
 		this.maxPulse = maxPulse;
@@ -2889,7 +2891,7 @@ public class TourData {
 
 	/**
 	 * @param maxSpeed
-	 * 		the maxSpeed to set
+	 *            the maxSpeed to set
 	 */
 	public void setMaxSpeed(final float maxSpeed) {
 		this.maxSpeed = maxSpeed;
@@ -2945,7 +2947,7 @@ public class TourData {
 
 	/**
 	 * @param tourDescription
-	 * 		the tourDescription to set
+	 *            the tourDescription to set
 	 */
 	public void setTourDescription(final String tourDescription) {
 		this.tourDescription = tourDescription;
@@ -2962,7 +2964,7 @@ public class TourData {
 
 	/**
 	 * @param tourEndPlace
-	 * 		the tourEndPlace to set
+	 *            the tourEndPlace to set
 	 */
 	public void setTourEndPlace(final String tourEndPlace) {
 		this.tourEndPlace = tourEndPlace;
@@ -2988,7 +2990,7 @@ public class TourData {
 
 	/**
 	 * @param tourStartPlace
-	 * 		the tourStartPlace to set
+	 *            the tourStartPlace to set
 	 */
 	public void setTourStartPlace(final String tourStartPlace) {
 		this.tourStartPlace = tourStartPlace;
@@ -2996,7 +2998,7 @@ public class TourData {
 
 	/**
 	 * @param tourTitle
-	 * 		the tourTitle to set
+	 *            the tourTitle to set
 	 */
 	public void setTourTitle(final String tourTitle) {
 		this.tourTitle = tourTitle;

@@ -35,26 +35,35 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class TourTag {
 
+	public static final int			EXPAND_TYPE_YEAR_MONTH_DAY	= 0;
+	public static final int			EXPAND_TYPE_FLAT			= 1;
+
 	/*
 	 * DON'T USE THE FINAL KEYWORD FOR THE ID because the Id cannot be set
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					tagId			= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long					tagId						= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	/**
 	 * derby does not support BOOLEAN, 1 = <code>true</code>, 0 = <code>false</code>
 	 */
-	private int						isRoot			= 0;
+	private int						isRoot						= 0;
 
 	@Basic(optional = false)
 	private String					name;
 
+	/**
+	 * when a tag is expanded in the tag tree viewer, the tours can be displayed in different
+	 * structures
+	 */
+	private int						expandType					= EXPAND_TYPE_YEAR_MONTH_DAY;
+
 	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
-	private Set<TourData>			tourData		= new HashSet<TourData>();
+	private Set<TourData>			tourData					= new HashSet<TourData>();
 
 	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)//$NON-NLS-1$
-	private Set<TourTagCategory>	tourTagCategory	= new HashSet<TourTagCategory>();
+	private Set<TourTagCategory>	tourTagCategory				= new HashSet<TourTagCategory>();
 
 	public TourTag() {}
 
@@ -74,6 +83,10 @@ public class TourTag {
 			return otherId == tagId;
 		}
 		return super.equals(other);
+	}
+
+	public int getExpandType() {
+		return expandType;
 	}
 
 	public Set<TourTagCategory> getTagCategories() {
@@ -101,6 +114,10 @@ public class TourTag {
 
 	public boolean isRoot() {
 		return isRoot == 1;
+	}
+
+	public void setExpandType(final int expandType) {
+		this.expandType = expandType;
 	}
 
 	/**

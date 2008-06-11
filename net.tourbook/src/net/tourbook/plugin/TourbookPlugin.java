@@ -56,14 +56,6 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	private MyTourbookSplashHandler	fSplashHandler;
 
 	/**
-	 * The constructor.
-	 */
-	public TourbookPlugin() {
-		super();
-		plugin = this;
-	}
-
-	/**
 	 * Returns the shared instance.
 	 */
 	public static TourbookPlugin getDefault() {
@@ -74,25 +66,36 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	 * Returns an image descriptor for images in the plug-in path.
 	 * 
 	 * @param path
-	 *        the path
+	 *            the path
 	 * @return the axisImage descriptor
 	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
+	public static ImageDescriptor getImageDescriptor(final String path) {
 		return imageDescriptorFromPlugin(TourbookPlugin.PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
 	}
 
 	/**
 	 * Returns the string from the plugin's resource bundle, or 'key' if not found.
 	 */
-	public static String getResourceString(String key) {
-		ResourceBundle bundle = TourbookPlugin.getDefault().getResourceBundle();
+	public static String getResourceString(final String key) {
+		final ResourceBundle bundle = TourbookPlugin.getDefault().getResourceBundle();
 		try {
 			return (bundle != null) ? bundle.getString(key) : key;
-		} catch (MissingResourceException e) {
+		} catch (final MissingResourceException e) {
 			return key;
 		}
 	}
 
+	/**
+	 * The constructor.
+	 */
+	public TourbookPlugin() {
+		super();
+		plugin = this;
+	}
+
+	/**
+	 * @return Returns the active selected person or <code>null</code> when no person is selected
+	 */
 	public TourPerson getActivePerson() {
 		return fCurrentPerson;
 	}
@@ -105,8 +108,8 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	 * @param sectionName
 	 * @return Returns the dialog setting section for the sectionName
 	 */
-	public IDialogSettings getDialogSettingsSection(String sectionName) {
-		IDialogSettings dialogSettings = getDialogSettings();
+	public IDialogSettings getDialogSettingsSection(final String sectionName) {
+		final IDialogSettings dialogSettings = getDialogSettings();
 		IDialogSettings section = dialogSettings.getSection(sectionName);
 		if (section == null) {
 			section = dialogSettings.addNewSection(sectionName);
@@ -122,7 +125,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 			if (resourceBundle == null) {
 				resourceBundle = ResourceBundle.getBundle("net.tourbook.data.TourbookPluginResources"); //$NON-NLS-1$
 			}
-		} catch (MissingResourceException x) {
+		} catch (final MissingResourceException x) {
 			resourceBundle = null;
 		}
 		return resourceBundle;
@@ -132,16 +135,16 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		return fSplashHandler;
 	}
 
-	public void setActivePerson(TourPerson currentPerson) {
+	public void setActivePerson(final TourPerson currentPerson) {
 		fCurrentPerson = currentPerson;
 	}
 
-	public void setActiveTourTypeFilter(TourTypeFilter tourTypeFilter) {
+	public void setActiveTourTypeFilter(final TourTypeFilter tourTypeFilter) {
 		fActiveTourTypeFilter = tourTypeFilter;
 		TourDatabase.updateActiveTourTypeList(tourTypeFilter);
 	}
 
-	public void setSplashHandler(MyTourbookSplashHandler splashHandler) {
+	public void setSplashHandler(final MyTourbookSplashHandler splashHandler) {
 		fSplashHandler = splashHandler;
 	}
 
@@ -149,7 +152,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	 * This method is called upon plug-in activation
 	 */
 	@Override
-	public void start(BundleContext context) throws Exception {
+	public void start(final BundleContext context) throws Exception {
 		super.start(context);
 	}
 
@@ -157,7 +160,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	 * This method is called when the plug-in is stopped
 	 */
 	@Override
-	public void stop(BundleContext context) throws Exception {
+	public void stop(final BundleContext context) throws Exception {
 		super.stop(context);
 		plugin = null;
 		resourceBundle = null;

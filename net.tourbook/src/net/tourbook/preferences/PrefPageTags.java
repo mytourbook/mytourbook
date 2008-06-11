@@ -502,6 +502,18 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		return true;
 	}
 
+	private void modifyPostAction() {
+		if (fIsModified) {
+
+			TourDatabase.clearTourTags();
+
+			// fire modify event
+			getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
+
+			fIsModified = false;
+		}
+	}
+
 	private void onNewCategory() {
 
 		final InputDialog inputDialog = new InputDialog(getShell(),
@@ -608,7 +620,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			// reveal new tag in viewer
 			fTagViewer.reveal(newCategoryItem);
 
-			setIsModified(true);
+			fIsModified = true;
 		}
 	}
 
@@ -726,8 +738,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 			if (isSaved) {
 
-				// update list which contains all tour tags
-				TourDatabase.getTourTags().add(tourTag);
+				// clear tour tag list
+				TourDatabase.clearTourTags();
 
 				/*
 				 * update viewer
@@ -752,7 +764,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			// show new tag in viewer
 			fTagViewer.reveal(tourTagItem);
 
-			setIsModified(true);
+			fIsModified = true;
 		}
 	}
 
@@ -812,7 +824,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		}
 
-		setIsModified(true);
+		fIsModified = true;
 	}
 
 	private void onReset() {
@@ -820,9 +832,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		final MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
 				"Emergency Reset",
 				null,
-				"Are you sure to reset the structure of the tags?\n\n"
-						+ "Reseting the structure will not delete the tags or categories,\n"
-						+ "they will be set to a main tag or main category.",
+				"When the hierarchical structure of the tags are corrupted (tags or categories disappear),"
+						+ " this reset will remove the hierarchy.\n\n"
+						+ "Tags and categories will not be deleted they will be displayed as a list."
+						+ "\n\nAre you sure to reset the structure?\n",
 				MessageDialog.QUESTION,
 				new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL },
 				1);
@@ -892,16 +905,14 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	}
 
 	@Override
+	public boolean performCancel() {
+		modifyPostAction();
+		return true;
+	}
+
+	@Override
 	public boolean performOk() {
-
-		if (fIsModified) {
-
-			TourDatabase.cleanTourTags();
-
-			// fire modify event
-			getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
-		}
-
+		modifyPostAction();
 		return true;
 	}
 

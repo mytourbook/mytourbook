@@ -14,6 +14,7 @@ import org.joda.time.DateTime;
 public class TVITagViewTag extends TVITagViewItem {
 
 	public long	tagId;
+	public int	expandType;
 
 	public TVITagViewTag(final TagView tagView) {
 		super(tagView);

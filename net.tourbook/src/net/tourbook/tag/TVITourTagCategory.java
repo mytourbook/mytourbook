@@ -41,38 +41,39 @@ public class TVITourTagCategory extends TVIPrefTagViewer {
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
-		if (em != null) {
-
-			final TourTagCategory tourTagCategory = em.find(TourTagCategory.class, fTourTagCategory.getCategoryId());
-
-			// create tree tag items
-			final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
-			for (final TourTag tourTag : lazyTourTags) {
-				addChild(new TVITourTag(getTagViewer(), tourTag));
-			}
-
-			// create tree category items
-			final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
-			for (final TourTagCategory tagCategory : lazyTourTagCategories) {
-				addChild(new TVITourTagCategory(getTagViewer(), tagCategory));
-			}
-
-			// update number of categories/tags
-			fTourTagCategory.setTagCounter(lazyTourTags.size());
-			fTourTagCategory.setCategoryCounter(lazyTourTagCategories.size());
-
-			/*
-			 * show number of tags/categories in the viewer, this must after the viewer task is
-			 * finished
-			 */
-			Display.getCurrent().asyncExec(new Runnable() {
-				public void run() {
-					getTagViewer().update(TVITourTagCategory.this, null);
-				}
-			});
-
-			em.close();
+		if (em == null) {
+			return;
 		}
+
+		final TourTagCategory tourTagCategory = em.find(TourTagCategory.class, fTourTagCategory.getCategoryId());
+
+		// create tree tag items
+		final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
+		for (final TourTag tourTag : lazyTourTags) {
+			addChild(new TVITourTag(getTagViewer(), tourTag));
+		}
+
+		// create tree category items
+		final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
+		for (final TourTagCategory tagCategory : lazyTourTagCategories) {
+			addChild(new TVITourTagCategory(getTagViewer(), tagCategory));
+		}
+
+		// update number of categories/tags
+		fTourTagCategory.setTagCounter(lazyTourTags.size());
+		fTourTagCategory.setCategoryCounter(lazyTourTagCategories.size());
+
+		/*
+		 * show number of tags/categories in the viewer, this must be done after the viewer task is
+		 * finished
+		 */
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+				getTagViewer().update(TVITourTagCategory.this, null);
+			}
+		});
+
+		em.close();
 	}
 
 	/**

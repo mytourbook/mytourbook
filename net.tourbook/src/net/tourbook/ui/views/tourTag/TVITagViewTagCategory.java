@@ -33,12 +33,13 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final String tblSchema = "\"" + TourDatabase.TABLE_SCHEMA + "\".";
+
 			final String tblTag = tblSchema + TourDatabase.TABLE_TOUR_TAG;
 			final String tblCat = tblSchema + TourDatabase.TABLE_TOUR_TAG_CATEGORY;
 			final String jTblCatTag = tblSchema + TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG;
 			final String jTblCatCat = tblSchema + TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY;
 
-			StringBuilder sb = new StringBuilder();
+			final StringBuilder sb = new StringBuilder();
 
 			/*
 			 * get tag categories
@@ -72,11 +73,12 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 			/*
 			 * get tags
 			 */
-			sb = new StringBuilder();
+			sb.setLength(0);
 			sb.append("SELECT ");
 
-			sb.append(" tblTag.tagId,");//	//1
-			sb.append(" tblTag.name");//	//2
+			sb.append(" tblTag.tagId,");//		1
+			sb.append(" tblTag.name,");//		2
+			sb.append(" tblTag.expandType");//	3
 
 			sb.append(" FROM " + jTblCatTag + " jTblCatTag");
 			sb.append(" LEFT OUTER JOIN " + tblTag + " tblTag ON ");
@@ -95,6 +97,7 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 
 				treeItem.tagId = result.getLong(1);
 				treeItem.treeColumn = result.getString(2);
+				treeItem.expandType = result.getInt(3);
 
 				children.add(treeItem);
 			}
