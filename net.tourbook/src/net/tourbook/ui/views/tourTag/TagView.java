@@ -75,7 +75,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
 public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
@@ -85,6 +84,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	private static final String		MEMENTO_COLUMN_SORT_ORDER	= "tagview.column_sort_order";					//$NON-NLS-1$
 	private static final String		MEMENTO_COLUMN_WIDTH		= "tagview.column_width";						//$NON-NLS-1$
 
+	public static final String		STATEMENT_TOURDATA_TOURTAG	= "tourData_tourTag";
+
+//	private static final HashMap<String, PreparedStatement>	fStatements					= new HashMap<String, PreparedStatement>();
 	private static IMemento			fSessionMemento;
 
 	private NumberFormat			fNF							= NumberFormat.getNumberInstance();
@@ -107,6 +109,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 																		.createImage();
 	private Image					fImgTag						= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
 																		.createImage();
+
+//	private Connection				fConnection;
 
 	private class TagContentProvider implements ITreeContentProvider {
 
@@ -226,6 +230,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		createTagViewer(fViewerContainer);
 		createActions();
 		createContextMenu();
+
+//		try {
+//			fConnection = TourDatabase.getInstance().getConnection();
+//		} catch (final SQLException e) {
+//			e.printStackTrace();
+//		}
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -364,6 +374,14 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
+//		if (fConnection != null) {
+//			try {
+//				fConnection.close();
+//			} catch (final SQLException e) {
+//				e.printStackTrace();
+//			}
+//		}
+
 		fImgTagCategory.dispose();
 		fImgTag.dispose();
 
@@ -406,6 +424,10 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		return null;
 	}
 
+//	public Connection getConnection() {
+//		return fConnection;
+//	}
+
 	public ArrayList<TourData> getSelectedTours() {
 
 		// get selected tours
@@ -431,6 +453,10 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		return selectedTourData;
 	}
+
+//	public PreparedStatement getStatement(final String statementTourdataTourtag) {
+//		return fStatements.get(statementTourdataTourtag);
+//	}
 
 	public TreeViewer getTreeViewer() {
 		return fTagViewer;
@@ -480,10 +506,10 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		}
 	}
 
-	private void saveSettings() {
-		fSessionMemento = XMLMemento.createWriteRoot("DeviceImportView"); //$NON-NLS-1$
-		saveState(fSessionMemento);
-	}
+//	private void saveSettings() {
+//		fSessionMemento = XMLMemento.createWriteRoot("TagView"); //$NON-NLS-1$
+//		saveState(fSessionMemento);
+//	}
 
 	@Override
 	public void saveState(final IMemento memento) {
@@ -503,5 +529,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	public void setFocus() {
 
 	}
+
+//	public void setStatement(final String statementTourdataTourtag, final PreparedStatement statement) {
+//		fStatements.put(statementTourdataTourtag, statement);
+//	}
 
 }

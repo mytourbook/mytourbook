@@ -4,27 +4,28 @@ Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
 Bundle-Version: 1.5.0.v20080509
 Bundle-ClassPath: net.tourbook.jar,
- persistence.jar,
- joda-time-1.5.2.jar
+ persistence.jar
 Bundle-Activator: net.tourbook.plugin.TourbookPlugin
 Bundle-Localization: plugin
-Require-Bundle: net.tourbook.chart,
+Require-Bundle: org.apache.derby.core,
+ net.tourbook.ext;bundle-version="1.6.0",
+ net.tourbook.chart,
  net.tourbook.ext.ejb3,
  net.tourbook.rxtx,
  de.byteholder.geoclipse,
  de.byteholder.gpx,
  org.eclipse.core.runtime,
  org.eclipse.ui,
- org.apache.derby.core,
  org.eclipse.update.ui,
  org.eclipse.core.expressions
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Eclipse-RegisterBuddy: net.tourbook.ext.ejb3
 Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
  net.tourbook.colors;uses:="net.tourbook.mapping,org.eclipse.swt.graphics",
  net.tourbook.data;uses:="org.eclipse.swt.graphics",
  net.tourbook.database;
   uses:="net.tourbook.data,
+   net.tourbook.tag,
    org.eclipse.ui,
    net.tourbook.ui,
    org.eclipse.swt.widgets,
@@ -60,14 +61,16 @@ Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
    org.osgi.framework,
    org.eclipse.jface.dialogs",
  net.tourbook.preferences;
-  uses:="org.eclipse.jface.preference,
-   org.eclipse.jface.resource,
-   net.tourbook.mapping,
+  uses:="org.eclipse.jface.resource,
    org.eclipse.ui,
-   org.eclipse.jface.viewers,
-   org.eclipse.swt.graphics,
-   org.eclipse.jface.util,
+   net.tourbook.mapping,
    org.eclipse.core.runtime.preferences,
+   org.eclipse.jface.preference,
+   net.tourbook.tag,
+   org.eclipse.swt.dnd,
+   org.eclipse.swt.graphics,
+   org.eclipse.jface.viewers,
+   org.eclipse.jface.util,
    org.eclipse.swt.widgets",
  net.tourbook.statistic;
   uses:="org.eclipse.jface.action,
@@ -75,6 +78,7 @@ Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
    org.eclipse.ui,
    net.tourbook.ui,
    org.eclipse.jface.viewers,
+   net.tourbook.ui.views.tourCatalog,
    org.eclipse.swt.widgets",
  net.tourbook.tour;
   uses:="org.eclipse.ui.handlers,
@@ -108,8 +112,8 @@ Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
    org.eclipse.osgi.util,
    org.eclipse.jface.preference,
    net.tourbook.util,
-   org.eclipse.swt.graphics,
    org.eclipse.jface.viewers,
+   org.eclipse.swt.graphics,
    org.eclipse.ui.dialogs,
    org.eclipse.swt.widgets,
    org.eclipse.jface.dialogs",
@@ -118,13 +122,6 @@ Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
    org.eclipse.core.runtime,
    org.eclipse.swt.graphics,
    org.eclipse.jface.viewers,
-   org.eclipse.swt.widgets",
- org.joda.time,
- org.joda.time.base,
- org.joda.time.chrono,
- org.joda.time.convert,
- org.joda.time.field,
- org.joda.time.format,
- org.joda.time.tz
+   org.eclipse.swt.widgets"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: MyTourbook

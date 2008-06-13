@@ -1,6 +1,5 @@
 package net.tourbook.ui.views.tourTag;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,37 +32,37 @@ public class TVITagViewTag extends TVITagViewItem {
 
 		try {
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
-
 			/*
 			 * get tour data for the tag Id of this tree item
 			 */
 			sb.append("SELECT ");
 
-			sb.append(" TData.TourId,");//	// 1 
-			sb.append(" Tdata.StartYear,"); //				// 2 
-			sb.append(" Tdata.StartMonth,");//				// 3
-			sb.append(" Tdata.StartDay,");//				// 4
-			sb.append(" Tdata.TourTitle,");//				// 5
-			sb.append(" Tdata.tourType_typeId,");//			// 6
+			sb.append(" TData.TourId			as tdata_tourid,");//	// 1 
+			sb.append(" Tdata.StartYear			as tdata_year,"); //				// 2 
+			sb.append(" Tdata.StartMonth		as tdata_month,");//				// 3
+			sb.append(" Tdata.StartDay			as tdata_day,");//				// 4
+			sb.append(" Tdata.TourTitle			as tdata_title,");//				// 5
+			sb.append(" Tdata.tourType_typeId	as tdata_typeid,");//			// 6
 
 //			sb.append(" Tdata.TourDistance,");//			// 
 //			sb.append(" Tdata.TourRecordingTime,");//		// 
 //			sb.append(" Tdata.TourDrivingTime,");//			// 
 //			sb.append(" Tdata.TourAltUp,");//				// 
-			sb.append(" Tdata.TourAltDown");//				// 
+			sb.append(" Tdata.TourAltDown	as tdata_altdown");//				// 
 
 			sb.append(" FROM \"USER\".\"TOURDATA_TOURTAG\" jTdataTtag");
 			sb.append(" LEFT OUTER JOIN \"USER\".\"TOURDATA\" Tdata ON ");
 			sb.append(" jTdataTtag.TourData_tourId=Tdata.tourId ");
 
-			sb.append(" WHERE jTdataTtag.TourTag_TagId = " + tagId);
+			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");// + tagId);
 
 			final String sqlString = sb.toString();
 
 //			final long time = System.currentTimeMillis();
 
-			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final PreparedStatement statement = TourDatabase.getInstance().getPreparedStatement(sqlString);
+			statement.setLong(1, tagId);
+
 			final ResultSet result = statement.executeQuery();
 
 //			System.out.println(System.currentTimeMillis() - time + "ms\t" + sqlString);
@@ -81,8 +80,6 @@ public class TVITagViewTag extends TVITagViewItem {
 
 				children.add(tourItem);
 			}
-
-			conn.close();
 
 		} catch (final SQLException e) {
 			e.printStackTrace();

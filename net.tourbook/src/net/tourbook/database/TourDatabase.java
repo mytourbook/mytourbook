@@ -16,12 +16,12 @@
 
 package net.tourbook.database;
 
+import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,9 +67,15 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.mchange.v2.c3p0.DataSources;
+
+
+
+
 public class TourDatabase {
 
-	private static final long					ROOT_TAG_ID									= -1L;
+	private static final String					DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
 
 	/**
 	 * version for the database which is required that the tourbook application works successfully
@@ -79,30 +85,30 @@ public class TourDatabase {
 	/*
 	 * database tables
 	 */
-	private static final String					TABLE_DB_VERSION							= "DbVersion";										//$NON-NLS-1$
+	private static final String					TABLE_DB_VERSION							= "DbVersion";											//$NON-NLS-1$
 
-	public static final String					TABLE_SCHEMA								= "USER";											//$NON-NLS-1$
+	public static final String					TABLE_SCHEMA								= "USER";												//$NON-NLS-1$
 
-	public static final String					TABLE_TOUR_BIKE								= "TourBike";										//$NON-NLS-1$
-	public static final String					TABLE_TOUR_CATEGORY							= "TourCategory";									//$NON-NLS-1$
-	public static final String					TABLE_TOUR_COMPARED							= "TourCompared";									//$NON-NLS-1$
-	public static final String					TABLE_TOUR_DATA								= "TourData";										//$NON-NLS-1$
-	public static final String					TABLE_TOUR_MARKER							= "TourMarker";									//$NON-NLS-1$
-	public static final String					TABLE_TOUR_PERSON							= "TourPerson";									//$NON-NLS-1$
-	public static final String					TABLE_TOUR_REFERENCE						= "TourReference";									//$NON-NLS-1$
-	public static final String					TABLE_TOUR_TAG								= "TourTag";										//$NON-NLS-1$
-	public static final String					TABLE_TOUR_TAG_CATEGORY						= "TourTagCategory";								//$NON-NLS-1$
-	public static final String					TABLE_TOUR_TYPE								= "TourType";										//$NON-NLS-1$
+	public static final String					TABLE_TOUR_BIKE								= "TourBike";											//$NON-NLS-1$
+	public static final String					TABLE_TOUR_CATEGORY							= "TourCategory";										//$NON-NLS-1$
+	public static final String					TABLE_TOUR_COMPARED							= "TourCompared";										//$NON-NLS-1$
+	public static final String					TABLE_TOUR_DATA								= "TourData";											//$NON-NLS-1$
+	public static final String					TABLE_TOUR_MARKER							= "TourMarker";										//$NON-NLS-1$
+	public static final String					TABLE_TOUR_PERSON							= "TourPerson";										//$NON-NLS-1$
+	public static final String					TABLE_TOUR_REFERENCE						= "TourReference";										//$NON-NLS-1$
+	public static final String					TABLE_TOUR_TAG								= "TourTag";											//$NON-NLS-1$
+	public static final String					TABLE_TOUR_TAG_CATEGORY						= "TourTagCategory";									//$NON-NLS-1$
+	public static final String					TABLE_TOUR_TYPE								= "TourType";											//$NON-NLS-1$
 
-	public static final String					JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG);		//$NON-NLS-1$
-	public static final String					JOINTABLE_TOURDATA__TOURMARKER				= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER);		//$NON-NLS-1$
-	public static final String					JOINTABLE_TOURDATA__TOURREFERENCE			= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE);	//$NON-NLS-1$
+	public static final String					JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
+	public static final String					JOINTABLE_TOURDATA__TOURMARKER				= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER);			//$NON-NLS-1$
+	public static final String					JOINTABLE_TOURDATA__TOURREFERENCE			= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE);		//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURTAGCATEGORY_TOURTAG			= (TABLE_TOUR_TAG_CATEGORY
-																									+ "_" + TABLE_TOUR_TAG);					//$NON-NLS-1$
+																									+ "_" + TABLE_TOUR_TAG);						//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY	= (TABLE_TOUR_TAG_CATEGORY
-																									+ "_" + TABLE_TOUR_TAG_CATEGORY);			//$NON-NLS-1$
+																									+ "_" + TABLE_TOUR_TAG_CATEGORY);				//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURCATEGORY__TOURDATA			= (TABLE_TOUR_CATEGORY
-																									+ "_" + TABLE_TOUR_DATA);					//$NON-NLS-1$
+																									+ "_" + TABLE_TOUR_DATA);						//$NON-NLS-1$
 
 	/**
 	 * contains <code>-1</code> which is the Id for a not saved entity
@@ -135,6 +141,8 @@ public class TourDatabase {
 	private boolean								fIsVersionChecked;
 
 	private final ListenerList					fPropertyListeners							= new ListenerList(ListenerList.IDENTITY);
+
+	private ComboPooledDataSource				fPooledDataSource;
 
 	class CustomMonitor extends ProgressMonitorDialog {
 
@@ -259,7 +267,9 @@ public class TourDatabase {
 			fTagCollections = new HashMap<Long, TagCollection>();
 		}
 
-		TagCollection rootEntry = fTagCollections.get(Long.valueOf(ROOT_TAG_ID));
+		final long rootTagId = -1L;
+
+		TagCollection rootEntry = fTagCollections.get(Long.valueOf(rootTagId));
 		if (rootEntry != null) {
 			return rootEntry;
 		}
@@ -292,7 +302,7 @@ public class TourDatabase {
 
 		em.close();
 
-		fTagCollections.put(ROOT_TAG_ID, rootEntry);
+		fTagCollections.put(rootTagId, rootEntry);
 
 		return rootEntry;
 	}
@@ -723,6 +733,22 @@ public class TourDatabase {
 		fPropertyListeners.add(listener);
 	}
 
+	private boolean checkDb() {
+		try {
+			checkServer();
+		} catch (final MyTourbookException e) {
+			e.printStackTrace();
+		}
+
+		checkTable();
+
+		if (checkVersion(null) == false) {
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * Check if the server is available
 	 * 
@@ -736,7 +762,6 @@ public class TourDatabase {
 		}
 
 		final IRunnableWithProgress runnableStartServer = createStartServerRunnable();
-
 		if (runnableStartServer != null) {
 
 			try {
@@ -770,7 +795,7 @@ public class TourDatabase {
 
 		try {
 
-			final Connection conn = createConnection();
+			final Connection conn = getConnectionInternal();
 
 			/*
 			 * Check if the tourdata table exists
@@ -837,7 +862,7 @@ public class TourDatabase {
 
 		try {
 
-			final Connection conn = createConnection();
+			final Connection conn = getConnectionInternal();
 
 			String sqlString = "SELECT * FROM " + TABLE_DB_VERSION; //$NON-NLS-1$
 			final PreparedStatement prepStatement = conn.prepareStatement(sqlString);
@@ -880,12 +905,15 @@ public class TourDatabase {
 		return true;
 	}
 
-	private Connection createConnection() throws SQLException {
+	public void closeConnectionPool() {
 
-		final Connection conn = DriverManager.getConnection("jdbc:derby://localhost:1527/tourbook;create=true", //$NON-NLS-1$
-				TABLE_SCHEMA,
-				"adsf"); //$NON-NLS-1$
-		return conn;
+		if (fPooledDataSource != null) {
+			try {
+				DataSources.destroy(fPooledDataSource);
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -1469,21 +1497,17 @@ public class TourDatabase {
 
 	public Connection getConnection() throws SQLException {
 
-		try {
-			checkServer();
-		} catch (final MyTourbookException e) {
-			e.printStackTrace();
-		}
-
-		checkTable();
-
-		if (checkVersion(null) == false) {
+		if (checkDb()) {
+//			return getConnectionInternal();
+			return getPooledConnection();
+		} else {
 			return null;
 		}
+	}
 
-		final Connection conn = createConnection();
-
-		return conn;
+	private Connection getConnectionInternal() throws SQLException {
+//		return DriverManager.getConnection(DERBY_URL, TABLE_SCHEMA, TABLE_SCHEMA);
+		return getPooledConnection();
 	}
 
 	private String getDatabasePath() {
@@ -1550,6 +1574,49 @@ public class TourDatabase {
 		}
 	}
 
+	public Connection getPooledConnection() {
+
+		if (fPooledDataSource == null) {
+			try {
+
+				fPooledDataSource = new ComboPooledDataSource();
+
+				//loads the jdbc driver 
+				fPooledDataSource.setDriverClass("org.apache.derby.jdbc.ClientDriver");
+				fPooledDataSource.setJdbcUrl(DERBY_URL);
+				fPooledDataSource.setUser(TABLE_SCHEMA);
+				fPooledDataSource.setPassword(TABLE_SCHEMA);
+
+				fPooledDataSource.setMaxPoolSize(100);
+				fPooledDataSource.setMaxStatements(100);
+
+			} catch (final PropertyVetoException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Connection conn = null;
+		try {
+			conn = fPooledDataSource.getConnection();
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
+
+		return conn;
+	}
+
+	public PreparedStatement getPreparedStatement(final String sql) {
+
+		PreparedStatement statement = null;
+		try {
+			statement = getPooledConnection().prepareStatement(sql);
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
+
+		return statement;
+	}
+
 	public void removePropertyListener(final IPropertyListener listener) {
 		fPropertyListeners.remove(listener);
 	}
@@ -1562,6 +1629,10 @@ public class TourDatabase {
 
 		// set storage location for the database
 		System.setProperty("derby.system.home", databasePath); //$NON-NLS-1$
+
+		// debug properties
+		System.setProperty("derby.language.logQueryPlan", "true"); //$NON-NLS-1$
+		System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
 
 		try {
 			server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
@@ -1603,7 +1674,7 @@ public class TourDatabase {
 
 			// make the first connection, this takes longer as the subsequent ones
 			try {
-				final Connection connection = createConnection();
+				final Connection connection = getConnectionInternal();
 				connection.close();
 
 				System.out.println("Database path: " + databasePath); //$NON-NLS-1$
