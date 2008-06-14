@@ -85,6 +85,37 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		fChart.updateChartActionHandlers();
 	}
 
+	private void addTourPropertyListener() {
+
+		fTourPropertyListener = new ITourPropertyListener() {
+			public void propertyChanged(final int propertyId, final Object propertyData) {
+
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+
+					// check if a tour was modified
+					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					for (final TourData modifiedTourData : modifiedTours) {
+
+						final long modifiedTourId = modifiedTourData.getTourId();
+
+						final long[] tourIds = fTourDayData.fTourIds;
+						for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
+
+							final long tourId = tourIds[tourIdIndex];
+
+							if (tourId == modifiedTourId) {
+								// set new tour title
+								fTourDayData.tourTitle.set(tourIdIndex, modifiedTourData.getTourTitle());
+							}
+						}
+					}
+				}
+			}
+		};
+
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+	}
+
 	public boolean canTourBeVisible() {
 		return true;
 	}
@@ -124,42 +155,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		chartSegments.allValues = tourTimeData.allDaysInAllYears;
 
 		return chartSegments;
-	}
-
-	private void addTourPropertyListener() {
-
-		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final int propertyId, final Object propertyData) {
-
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
-
-					// check if a tour was modified
-					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
-					for (final TourData modifiedTourData : modifiedTours) {
-
-						final long modifiedTourId = modifiedTourData.getTourId();
-
-						final long[] tourIds = fTourDayData.fTourIds;
-						for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
-
-							final long tourId = tourIds[tourIdIndex];
-
-							if (tourId == modifiedTourId) {
-								// set new tour title
-								fTourDayData.tourTitle.set(tourIdIndex, modifiedTourData.getTourTitle());
-							}
-						}
-					}
-				}
-			}
-		};
-
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
-	}
-
-	@Override
-	public void dispose() {
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 	}
 
 	@Override
@@ -247,7 +242,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		fSelectedTourId = fTourDayData.fTourIds[valueIndex];
 
 		final String tourTypeName = TourDatabase.getTourTypeName(fTourDayData.fTypeIds[valueIndex]);
-		final String tourDescription = fTourDayData.tourDescription.get(valueIndex).replace(UI.lineSeparator, "\n"); //$NON-NLS-1$
+		final String tourDescription = fTourDayData.tourDescription.get(valueIndex).replace(UI.SYSTEM_NEW_LINE, UI.NEW_LINE);
 
 		final int[] startValue = fTourDayData.fTourStartValues;
 		final int[] endValue = fTourDayData.fTourEndValues;
@@ -413,6 +408,11 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	@Override
 	public void deactivateActions(final IWorkbenchPartSite partSite) {}
+
+	@Override
+	public void dispose() {
+		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+	}
 
 	public Integer getSelectedMonth() {
 		return fCurrentMonth;

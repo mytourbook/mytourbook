@@ -347,7 +347,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				fSelectedTourId = fTourTimeData.fTourIds[valueIndex];
 
 				final String tourTypeName = TourDatabase.getTourTypeName(fTourTimeData.fTypeIds[valueIndex]);
-				final String tourDescription = fTourTimeData.tourDescription.get(valueIndex).replace(UI.lineSeparator,
+				final String tourDescription = fTourTimeData.tourDescription.get(valueIndex).replace(UI.SYSTEM_NEW_LINE,
 						UI.NEW_LINE);
 
 				final int[] startValue = fTourTimeData.fTourTimeStartValues;
