@@ -63,8 +63,12 @@ public class UI {
 	public static final String				EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String				EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
 
-	public static final String				lineSeparator					= System.getProperty("line.separator");		//$NON-NLS-1$
+	/**
+	 * contains a new line string
+	 */
 	public static final String				NEW_LINE						= "\n";										//$NON-NLS-1$
+
+	public static final String				SYSTEM_NEW_LINE					= System.getProperty("line.separator");		//$NON-NLS-1$
 
 	public static final int					DEFAULT_FIELD_WIDTH				= 40;
 
@@ -156,7 +160,7 @@ public class UI {
 	 * Change the title for the application
 	 * 
 	 * @param newTitle
-	 * 	new title for the application or <code>null</code> to set the original title
+	 *            new title for the application or <code>null</code> to set the original title
 	 */
 	public static void changeAppTitle(final String newTitle) {
 
@@ -187,7 +191,7 @@ public class UI {
 		}
 	}
 
-	public static final String formatSeconds(long value) {
+	public static final String formatSeconds(final long value) {
 
 		return new Formatter().format(Messages.Format_hhmmss,
 				(value / 3600),
@@ -214,17 +218,17 @@ public class UI {
 	 */
 	public static ArrayList<IEditorPart> getOpenedEditors() {
 
-		ArrayList<IEditorPart> editorParts = new ArrayList<IEditorPart>();
-		IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		final ArrayList<IEditorPart> editorParts = new ArrayList<IEditorPart>();
+		final IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
 
-		for (IWorkbenchWindow wbWindow : wbWindows) {
-			IWorkbenchPage[] pages = wbWindow.getPages();
+		for (final IWorkbenchWindow wbWindow : wbWindows) {
+			final IWorkbenchPage[] pages = wbWindow.getPages();
 
-			for (IWorkbenchPage wbPage : pages) {
-				IEditorReference[] editorRefs = wbPage.getEditorReferences();
+			for (final IWorkbenchPage wbPage : pages) {
+				final IEditorReference[] editorRefs = wbPage.getEditorReferences();
 
-				for (IEditorReference editorRef : editorRefs) {
-					IEditorPart editor = editorRef.getEditor(false);
+				for (final IEditorReference editorRef : editorRefs) {
+					final IEditorPart editor = editorRef.getEditor(false);
 
 					if (editor != null) {
 						editorParts.add(editor);
@@ -336,7 +340,7 @@ public class UI {
 	 */
 	public static void updateUnits() {
 
-		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 		/*
 		 * distance
@@ -601,18 +605,18 @@ public class UI {
 			/*
 			 * Use magenta as transparency color since it is used infrequently.
 			 */
-			Color colorTransparent = display.getSystemColor(SWT.COLOR_MAGENTA);
-			Color colorBright = drawingColors.colorBright;
-			Color colorDark = drawingColors.colorDark;
-			Color colorLine = drawingColors.colorLine;
+			final Color colorTransparent = display.getSystemColor(SWT.COLOR_MAGENTA);
+			final Color colorBright = drawingColors.colorBright;
+			final Color colorDark = drawingColors.colorDark;
+			final Color colorLine = drawingColors.colorLine;
 
-			PaletteData palette = new PaletteData(new RGB[] {
+			final PaletteData palette = new PaletteData(new RGB[] {
 					colorTransparent.getRGB(),
 					colorDark.getRGB(),
 					colorBright.getRGB(),
 					colorLine.getRGB() });
 
-			ImageData data = new ImageData(imageWidth, imageHeight, 8, palette);
+			final ImageData data = new ImageData(imageWidth, imageHeight, 8, palette);
 			data.transparentPixel = 0;
 
 			image = new Image(display, data);

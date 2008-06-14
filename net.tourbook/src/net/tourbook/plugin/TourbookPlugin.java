@@ -161,14 +161,12 @@ public class TourbookPlugin extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(final BundleContext context) throws Exception {
-		
+
 		super.stop(context);
-		
+
 		plugin = null;
 		resourceBundle = null;
 
-		TourDatabase.getInstance().closeConnectionPool();
-		
 		// NetworkServerControl server = new NetworkServerControl();
 		// server.shutdown();
 	}

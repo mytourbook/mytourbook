@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -23,10 +23,11 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.UI;
 
 public class TVITourBookRoot extends TourBookTreeViewerItem {
 
-	TVITourBookRoot(TourBookView view) {
+	TVITourBookRoot(final TourBookView view) {
 		super(view);
 	}
 
@@ -36,26 +37,27 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 		/*
 		 * set the children for the root item, these are year items
 		 */
-		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
+		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		String sqlString = "SELECT STARTYEAR, " //$NON-NLS-1$
+		final String sqlString = "SELECT " + //		$NON-NLS-1$
+				"StartYear, " //					$NON-NLS-1$
 				+ SQL_SUM_COLUMNS
-				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ " WHERE 1=1 " //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
+				+ " WHERE 1=1 " //					$NON-NLS-1$
 				+ sqlTourPersonId()
 				+ sqlTourTypeId()
-				+ " GROUP BY STARTYEAR" //$NON-NLS-1$
-				+ " ORDER BY STARTYEAR"; //$NON-NLS-1$
+				+ " GROUP BY StartYear" //			$NON-NLS-1$
+				+ " ORDER BY StartYear"; //			$NON-NLS-1$
 
 		try {
 
-			Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement = conn.prepareStatement(sqlString);
-			ResultSet result = statement.executeQuery();
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				TVITourBookYear tourItem = new TVITourBookYear(fView, this, result.getInt(1));
+				final TVITourBookYear tourItem = new TVITourBookYear(fView, this, result.getInt(1));
 
 				fCalendar.set(result.getShort(1), 0, 1);
 				tourItem.fTourDate = fCalendar.getTimeInMillis();
@@ -80,10 +82,11 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 
 			conn.close();
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
+	@Override
 	protected void remove() {}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -23,10 +23,14 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.UI;
 
 public class TVITourBookMonth extends TourBookTreeViewerItem {
 
-	public TVITourBookMonth(TourBookView view, TourBookTreeViewerItem parentItem, int year, int month) {
+	public TVITourBookMonth(final TourBookView view,
+							final TourBookTreeViewerItem parentItem,
+							final int year,
+							final int month) {
 
 		super(view);
 
@@ -42,21 +46,21 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 		/*
 		 * set the children for the month item, these are tour items
 		 */
-		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
+		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		TVITourBookYear yearItem = (TVITourBookYear) (getParentItem());
+		final TVITourBookYear yearItem = (TVITourBookYear) (getParentItem());
 
-		String sqlString = "SELECT " //			//$NON-NLS-1$
-				+ "STARTYear, " //1				//$NON-NLS-1$
-				+ "STARTMonth, " //2			//$NON-NLS-1$
-				+ "STARTDay, " //3				//$NON-NLS-1$
-				+ "TOURDISTANCE, " //4			//$NON-NLS-1$
-				+ "TOURRECORDINGTIME, " //5		//$NON-NLS-1$
-				+ "TOURDRIVINGTIME, " //6		//$NON-NLS-1$
-				+ "TOURALTUP, " //7				//$NON-NLS-1$
-				+ "TOURALTDOWN, " //8			//$NON-NLS-1$
-				+ "startDistance, " //9			//$NON-NLS-1$
+		final String sqlString = "SELECT " //	//$NON-NLS-1$
+				+ "STARTYear," //1				//$NON-NLS-1$
+				+ "STARTMonth," //2				//$NON-NLS-1$
+				+ "STARTDay," //3				//$NON-NLS-1$
+				+ "TOURDISTANCE," //4			//$NON-NLS-1$
+				+ "TOURRECORDINGTIME," //5		//$NON-NLS-1$
+				+ "TOURDRIVINGTIME," //6		//$NON-NLS-1$
+				+ "TOURALTUP," //7				//$NON-NLS-1$
+				+ "TOURALTDOWN," //8			//$NON-NLS-1$
+				+ "startDistance," //9			//$NON-NLS-1$
 				+ "tourID," //10				//$NON-NLS-1$
 				+ "tourType_typeId," //11		//$NON-NLS-1$
 				+ "tourTitle," //12				//$NON-NLS-1$
@@ -67,23 +71,29 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 				+ "avgPulse," //17				//$NON-NLS-1$
 				+ "avgCadence," //18			//$NON-NLS-1$
 				+ "avgTemperature" //19			//$NON-NLS-1$
-				+ "\n" //						//$NON-NLS-1$
-				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //			//$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE STARTYEAR = " + yearItem.fTourYear) //				//$NON-NLS-1$
-				+ (" AND STARTMONTH = " + fTourMonth) //						//$NON-NLS-1$
+				+ UI.NEW_LINE
+				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //			//$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE STARTYEAR = ?")// + yearItem.fTourYear) //				//$NON-NLS-1$
+				+ (" AND STARTMONTH = ?")// + fTourMonth) //						//$NON-NLS-1$
 				+ sqlTourPersonId()
 				+ sqlTourTypeId()
-				+ " ORDER BY STARTDAY, StartHour, StartMinute"; //$NON-NLS-1$
+				+ " ORDER BY STARTDAY,StartHour,StartMinute"; //$NON-NLS-1$
 
 		try {
 
-			Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement = conn.prepareStatement(sqlString);
-			ResultSet result = statement.executeQuery();
+			final Connection conn = TourDatabase.getInstance().getConnection();
 
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			statement.setInt(1, yearItem.fTourYear);
+			statement.setInt(2, fTourMonth);
+
+//			final long time = System.currentTimeMillis();
+//			System.out.println(System.currentTimeMillis() - time + "ms");
+
+			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
-				TVITourBookTour tourItem = new TVITourBookTour(fView, this);
+				final TVITourBookTour tourItem = new TVITourBookTour(fView, this);
 
 				tourItem.fTourYear = result.getInt(1);
 				tourItem.fTourMonth = result.getInt(2);
@@ -100,7 +110,7 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 
 				tourItem.fColumnStartDistance = result.getLong(9);
 				tourItem.fTourId = result.getLong(10);
-				Object tourTypeId = result.getObject(11);
+				final Object tourTypeId = result.getObject(11);
 				tourItem.fTourTypeId = (tourTypeId == null ? //
 						TourDatabase.ENTITY_IS_NOT_SAVED
 						: (Long) tourTypeId);
@@ -126,7 +136,7 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 
 			conn.close();
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 	}

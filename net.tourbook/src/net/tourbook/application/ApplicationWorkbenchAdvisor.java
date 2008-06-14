@@ -23,7 +23,7 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	@Override
-	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
+	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(final IWorkbenchWindowConfigurer configurer) {
 		return new ApplicationWorkbenchWindowAdvisor(this, configurer);
 	}
 
@@ -38,8 +38,17 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 	}
 
 	@Override
-	public void initialize(IWorkbenchConfigurer configurer) {
+	public void initialize(final IWorkbenchConfigurer configurer) {
 		configurer.setSaveAndRestore(true);
+	}
+
+	@Override
+	public boolean preShutdown() {
+
+		// this causes an error
+//		TourDatabase.getInstance().closeConnectionPool();
+
+		return super.preShutdown();
 	}
 
 }

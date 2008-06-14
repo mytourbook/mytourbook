@@ -23,10 +23,11 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.UI;
 
 public class TVITourBookYear extends TourBookTreeViewerItem {
 
-	public TVITourBookYear(TourBookView view, TourBookTreeViewerItem parentItem, int year) {
+	public TVITourBookYear(final TourBookView view, final TourBookTreeViewerItem parentItem, final int year) {
 
 		super(view);
 
@@ -40,15 +41,15 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 		/*
 		 * set the children for the root item, these are month items
 		 */
-		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
+		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		String sqlString = "SELECT " //$NON-NLS-1$
+		final String sqlString = "SELECT " //$NON-NLS-1$
 				+ "STARTYear, " //$NON-NLS-1$
 				+ "STARTMonth, " //$NON-NLS-1$
 				+ SQL_SUM_COLUMNS
-				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("WHERE STARTYEAR=" + fTourYear) //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE STARTYEAR=?") //$NON-NLS-1$
 				+ sqlTourPersonId()
 				+ sqlTourTypeId()
 				+ " GROUP BY StartYear, STARTMONTH" //$NON-NLS-1$
@@ -56,12 +57,15 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 
 		try {
 
-			Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement = conn.prepareStatement(sqlString);
-			ResultSet result = statement.executeQuery();
-
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			statement.setInt(1, fTourYear);
+			
+			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
-				TourBookTreeViewerItem tourItem = new TVITourBookMonth(fView,
+				
+				final TourBookTreeViewerItem tourItem = new TVITourBookMonth(fView,
 						this,
 						result.getInt(1),
 						result.getInt(2));
@@ -89,7 +93,7 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 
 			conn.close();
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 	}

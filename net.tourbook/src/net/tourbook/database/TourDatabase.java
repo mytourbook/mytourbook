@@ -68,19 +68,16 @@ import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.DataSources;
-
-
-
 
 public class TourDatabase {
-
-	private static final String					DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
 
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
 	private static final int					TOURBOOK_DB_VERSION							= 5;
+
+	private static final String					DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";
+	private static final String					DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
 
 	/*
 	 * database tables
@@ -130,6 +127,7 @@ public class TourDatabase {
 	private static NetworkServerControl			server;
 
 	private static EntityManagerFactory			emFactory;
+	private ComboPooledDataSource				fPooledDataSource;
 
 	private static ArrayList<TourType>			fActiveTourTypes;
 	private static ArrayList<TourType>			fTourTypes;
@@ -142,7 +140,18 @@ public class TourDatabase {
 
 	private final ListenerList					fPropertyListeners							= new ListenerList(ListenerList.IDENTITY);
 
-	private ComboPooledDataSource				fPooledDataSource;
+	private String								fDatabasePath								= (Platform.getInstanceLocation()
+																									.getURL()
+																									.getPath() + "derby-database");				//$NON-NLS-1$
+
+	{
+		// set storage location for the database
+		System.setProperty("derby.system.home", fDatabasePath); //$NON-NLS-1$
+
+		// derby debug properties
+		//	System.setProperty("derby.language.logQueryPlan", "true"); //$NON-NLS-1$
+		//	System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
+	}
 
 	class CustomMonitor extends ProgressMonitorDialog {
 
@@ -222,36 +231,6 @@ public class TourDatabase {
 
 		return tourList;
 	}
-
-//	/**
-//	 * @return Returns all tags which are stored in the database ordered by name
-//	 */
-//	@SuppressWarnings("unchecked")//$NON-NLS-1$
-//	public static ArrayList<TourTag> getAllTourTags() {
-//
-//		if (fTourTags != null) {
-//			return fTourTags;
-//		}
-//
-//		fTourTags = new ArrayList<TourTag>();
-//
-//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-//
-//		if (em != null) {
-//
-//			final Query query = em.createQuery("SELECT TourTag " //$NON-NLS-1$
-//					+ ("FROM " + TourDatabase.TABLE_TOUR_TAG + " TourTag ")
-//					+ (" ORDER BY TourTag.name")
-//			//
-//			); //$NON-NLS-1$
-//
-//			fTourTags = (ArrayList<TourTag>) query.getResultList();
-//
-//			em.close();
-//		}
-//
-//		return fTourTags;
-//	}
 
 	public static TourDatabase getInstance() {
 		if (instance == null) {
@@ -449,8 +428,8 @@ public class TourDatabase {
 
 		if (em != null) {
 
-			final Query query = em.createQuery("SELECT TourType " //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_TYPE + " TourType ") //$NON-NLS-1$ //$NON-NLS-2$
+			final Query query = em.createQuery("SELECT TourType" //$NON-NLS-1$
+					+ (" FROM " + TourDatabase.TABLE_TOUR_TYPE + " TourType ") //$NON-NLS-1$ //$NON-NLS-2$
 					+ (" ORDER  BY TourType.name")); //$NON-NLS-1$
 
 			fTourTypes = (ArrayList<TourType>) query.getResultList();
@@ -795,7 +774,7 @@ public class TourDatabase {
 
 		try {
 
-			final Connection conn = getConnectionInternal();
+			final Connection conn = getPooledConnection();
 
 			/*
 			 * Check if the tourdata table exists
@@ -862,7 +841,7 @@ public class TourDatabase {
 
 		try {
 
-			final Connection conn = getConnectionInternal();
+			final Connection conn = getPooledConnection();
 
 			String sqlString = "SELECT * FROM " + TABLE_DB_VERSION; //$NON-NLS-1$
 			final PreparedStatement prepStatement = conn.prepareStatement(sqlString);
@@ -905,16 +884,16 @@ public class TourDatabase {
 		return true;
 	}
 
-	public void closeConnectionPool() {
-
-		if (fPooledDataSource != null) {
-			try {
-				DataSources.destroy(fPooledDataSource);
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+//	public void closeConnectionPool() {
+//
+//		if (fPooledDataSource != null) {
+//			try {
+//				DataSources.destroy(fPooledDataSource);
+//			} catch (final SQLException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 
 	/**
 	 * Checks if the database server is running, if not it will start the server. startServerJob has
@@ -926,7 +905,7 @@ public class TourDatabase {
 
 		// load derby driver
 		try {
-			Class.forName("org.apache.derby.jdbc.ClientDriver"); //$NON-NLS-1$
+			Class.forName(DERBY_CLIENT_DRIVER); //$NON-NLS-1$
 		} catch (final ClassNotFoundException e) {
 			e.printStackTrace();
 			return startServerRunnable;
@@ -934,11 +913,9 @@ public class TourDatabase {
 
 		// start derby server
 		startServerRunnable = new IRunnableWithProgress() {
-
 			public void run(final IProgressMonitor monitor) {
 				runStartServer(monitor);
 			}
-
 		};
 
 		return startServerRunnable;
@@ -1498,20 +1475,10 @@ public class TourDatabase {
 	public Connection getConnection() throws SQLException {
 
 		if (checkDb()) {
-//			return getConnectionInternal();
 			return getPooledConnection();
 		} else {
 			return null;
 		}
-	}
-
-	private Connection getConnectionInternal() throws SQLException {
-//		return DriverManager.getConnection(DERBY_URL, TABLE_SCHEMA, TABLE_SCHEMA);
-		return getPooledConnection();
-	}
-
-	private String getDatabasePath() {
-		return Platform.getInstanceLocation().getURL().getPath() + "derby-database"; //$NON-NLS-1$
 	}
 
 	/**
@@ -1574,7 +1541,7 @@ public class TourDatabase {
 		}
 	}
 
-	public Connection getPooledConnection() {
+	private Connection getPooledConnection() {
 
 		if (fPooledDataSource == null) {
 			try {
@@ -1582,13 +1549,14 @@ public class TourDatabase {
 				fPooledDataSource = new ComboPooledDataSource();
 
 				//loads the jdbc driver 
-				fPooledDataSource.setDriverClass("org.apache.derby.jdbc.ClientDriver");
+				fPooledDataSource.setDriverClass(DERBY_CLIENT_DRIVER);
 				fPooledDataSource.setJdbcUrl(DERBY_URL);
 				fPooledDataSource.setUser(TABLE_SCHEMA);
 				fPooledDataSource.setPassword(TABLE_SCHEMA);
 
 				fPooledDataSource.setMaxPoolSize(100);
 				fPooledDataSource.setMaxStatements(100);
+				fPooledDataSource.setMaxStatementsPerConnection(20);
 
 			} catch (final PropertyVetoException e) {
 				e.printStackTrace();
@@ -1605,18 +1573,6 @@ public class TourDatabase {
 		return conn;
 	}
 
-	public PreparedStatement getPreparedStatement(final String sql) {
-
-		PreparedStatement statement = null;
-		try {
-			statement = getPooledConnection().prepareStatement(sql);
-		} catch (final SQLException e) {
-			e.printStackTrace();
-		}
-
-		return statement;
-	}
-
 	public void removePropertyListener(final IPropertyListener listener) {
 		fPropertyListeners.remove(listener);
 	}
@@ -1624,15 +1580,6 @@ public class TourDatabase {
 	private void runStartServer(final IProgressMonitor monitor) {
 
 		monitor.subTask(Messages.Database_Monitor_db_service_task);
-
-		final String databasePath = getDatabasePath();
-
-		// set storage location for the database
-		System.setProperty("derby.system.home", databasePath); //$NON-NLS-1$
-
-		// debug properties
-		System.setProperty("derby.language.logQueryPlan", "true"); //$NON-NLS-1$
-		System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
 
 		try {
 			server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
@@ -1674,10 +1621,10 @@ public class TourDatabase {
 
 			// make the first connection, this takes longer as the subsequent ones
 			try {
-				final Connection connection = getConnectionInternal();
+				final Connection connection = getPooledConnection();
 				connection.close();
 
-				System.out.println("Database path: " + databasePath); //$NON-NLS-1$
+				System.out.println("Database path: " + fDatabasePath); //$NON-NLS-1$
 
 			} catch (final SQLException e1) {
 				e1.printStackTrace();
@@ -1697,7 +1644,7 @@ public class TourDatabase {
 		final String message = NLS.bind(Messages.Database_Confirm_update, new Object[] {
 				currentDbVersion,
 				TOURBOOK_DB_VERSION,
-				getDatabasePath() });
+				fDatabasePath });
 
 		final MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
 				Messages.Database_Confirm_update_title,

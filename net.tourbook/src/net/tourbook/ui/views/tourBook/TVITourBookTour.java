@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -24,40 +24,42 @@ public class TVITourBookTour extends TourBookTreeViewerItem {
 	long	fTourTypeId;
 	short	fColumnTimeInterval;
 
-	public TVITourBookTour(TourBookView view, TreeViewerItem parentItem) {
+	public TVITourBookTour(final TourBookView view, final TreeViewerItem parentItem) {
 
 		super(view);
 
 		setParentItem(parentItem);
 	}
 
-	/**
-	 * tour items do not have children
-	 * 
-	 * @see net.tourbook.tour.TreeViewerItem#hasChildren()
-	 */
-	public boolean hasChildren() {
-		return false;
-	}
-
-	public Long getTourId() {
-		return fTourId;
-	}
-
+	@Override
 	protected void fetchChildren() {}
-
-	protected void remove() {}
 
 	public long getColumnStartDistance() {
 		return fColumnStartDistance;
+	}
+
+	public short getColumnTimeInterval() {
+		return fColumnTimeInterval;
+	}
+
+	@Override
+	public Long getTourId() {
+		return fTourId;
 	}
 
 	public long getTourTypeId() {
 		return fTourTypeId;
 	}
 
-	public short getColumnTimeInterval() {
-		return fColumnTimeInterval;
+	/**
+	 * tour items do not have children
+	 */
+	@Override
+	public boolean hasChildren() {
+		return false;
 	}
+
+	@Override
+	protected void remove() {}
 
 }
