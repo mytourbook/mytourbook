@@ -58,3 +58,4 @@ Export-Package: com.mchange,
  org.joda.time.format,
  org.joda.time.tz
 Require-Bundle: org.apache.derby.core;bundle-version="10.3.3"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
