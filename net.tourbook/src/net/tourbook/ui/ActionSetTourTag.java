@@ -39,19 +39,22 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorPart;
 
+/**
+ * Add or removes a tag from the selected tours
+ */
 public class ActionSetTourTag extends Action implements IMenuCreator {
 
 	private Menu			fMenu;
 
 	private ISelectedTours	fTourProvider;
 
-	private int				fSelectedTourCounter;
+	private boolean			fIsSingleTour;
 
 	/**
-	 * When one tour is selected ({@link #fSelectedTourCounter} == 1) in the viewer, this set
-	 * contains the tags for the selected tour
+	 * When one tour is selected ({@link #fIsSingleTour} == <code>true</code>) in the viewer, this
+	 * set contains the tags for the selected tour
 	 */
-	private Set<TourTag>	fTourTagIds;
+	private Set<TourTag>	fSingleTourTagIds;
 
 	public class ActionTagCategory extends Action implements IMenuCreator {
 
@@ -95,16 +98,11 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 						items[i].dispose();
 					}
 
-					final TagCollection categoryTagCollection = TourDatabase.getTagEntries(fTagCategory.getCategoryId());
+					final TagCollection tagCollection = TourDatabase.getTagEntries(fTagCategory.getCategoryId());
 
-//					// add category actions
-//					for (final TourTagCategory tagCategory : categoryTagCollection.tourTagCategories) {
-//						addActionToMenu(fCategoryMenu, new ActionTagCategory(tagCategory));
-//					}
-
-					// add tag actions
-					addCategoryActions(categoryTagCollection, fCategoryMenu);
-					addTagActions(categoryTagCollection, fCategoryMenu);
+					// add actions
+					addCategoryActions(tagCollection, fCategoryMenu);
+					addTagActions(tagCollection, fCategoryMenu);
 				}
 			});
 
@@ -250,12 +248,12 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 			// check the tag when it's set in the tour
 			final ActionTourTag actionTourTag = new ActionTourTag(menuTourTag);
-			boolean isChecked = false;
-			if (fSelectedTourCounter == 1) {
 
+			boolean isChecked = false;
+			if (fIsSingleTour) {
 				final long tagId = menuTourTag.getTagId();
 
-				for (final TourTag checkTourTag : fTourTagIds) {
+				for (final TourTag checkTourTag : fSingleTourTagIds) {
 					if (checkTourTag.getTagId() == tagId) {
 						isChecked = true;
 						break;
@@ -303,10 +301,10 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 					// a tour is not selected
 					return;
 				}
-				fSelectedTourCounter = selectedTours.size();
+				;
 
-				if (fSelectedTourCounter == 1) {
-					fTourTagIds = selectedTours.get(0).getTourTags();
+				if (fIsSingleTour = selectedTours.size() == 1) {
+					fSingleTourTagIds = selectedTours.get(0).getTourTags();
 				}
 
 				final TagCollection rootTagCollection = TourDatabase.getRootTags();

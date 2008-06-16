@@ -286,6 +286,10 @@ public class TourDatabase {
 		return rootEntry;
 	}
 
+	/**
+	 * @param categoryId
+	 * @return Returns a {@link TagCollection} with all tags and categories for the category Id
+	 */
 	public static TagCollection getTagEntries(final long categoryId) {
 
 		if (fTagCollections == null) {

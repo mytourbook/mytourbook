@@ -911,6 +911,11 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
+	public void reloadViewer() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void restoreState(final IMemento memento) {
 
 		if (memento == null) {

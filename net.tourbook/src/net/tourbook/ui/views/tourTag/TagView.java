@@ -32,6 +32,7 @@ import net.tourbook.tag.TVITourTagCategory;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.ActionRefreshView;
 import net.tourbook.ui.ActionSetTreeExpandType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ISelectedTours;
@@ -179,7 +180,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-					reloadTagViewer();
+					reloadViewer();
 
 				}
 			}
@@ -231,19 +232,13 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		createActions();
 		createContextMenu();
 
-//		try {
-//			fConnection = TourDatabase.getInstance().getConnection();
-//		} catch (final SQLException e) {
-//			e.printStackTrace();
-//		}
-
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		addPrefListener();
 
 		restoreState(fSessionMemento);
-		reloadTagViewer();
+		reloadViewer();
 	}
 
 	private Control createTagViewer(final Composite parent) {
@@ -479,10 +474,15 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	/**
 	 * reload the content of the tag viewer
 	 */
-	void reloadTagViewer() {
+	public void reloadViewer() {
 		fRootItem = new TVITagViewRoot(this);
 		fTagViewer.setInput(this);
 	}
+
+//	private void saveSettings() {
+//		fSessionMemento = XMLMemento.createWriteRoot("TagView"); //$NON-NLS-1$
+//		saveState(fSessionMemento);
+//	}
 
 	private void restoreState(final IMemento memento) {
 
@@ -505,11 +505,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			}
 		}
 	}
-
-//	private void saveSettings() {
-//		fSessionMemento = XMLMemento.createWriteRoot("TagView"); //$NON-NLS-1$
-//		saveState(fSessionMemento);
-//	}
 
 	@Override
 	public void saveState(final IMemento memento) {

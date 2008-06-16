@@ -49,10 +49,12 @@ public class TVITagViewTag extends TVITagViewItem {
 //			sb.append(" Tdata.TourRecordingTime,");//		// 
 //			sb.append(" Tdata.TourDrivingTime,");//			// 
 //			sb.append(" Tdata.TourAltUp,");//				// 
+//			sb.append(" Tdata.TourAltDown,");//				// 
 
-			sb.append(" Tdata.TourAltDown");//				// 
+			sb.append(" jTdataTtag.TourTag_tagId");//		// 7 
 
 			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
+
 			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " Tdata ON");
 			sb.append(" jTdataTtag.TourData_tourId=Tdata.tourId ");
 
@@ -75,11 +77,18 @@ public class TVITagViewTag extends TVITagViewItem {
 				final Object tourTypeId = result.getObject(6);
 				tourItem.tourTypeId = (tourTypeId == null ? TourDatabase.ENTITY_IS_NOT_SAVED : (Long) tourTypeId);
 
+				System.out.println(result.getObject(1) + //
+						("\t" + result.getObject(7))
+				//
+				);
+				
 				children.add(tourItem);
 			}
 
-			conn.close();
+			System.out.println();
 			
+			conn.close();
+
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}

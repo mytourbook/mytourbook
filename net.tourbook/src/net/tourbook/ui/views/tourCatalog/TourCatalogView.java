@@ -257,8 +257,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	public TourCatalogView() {}
-
 	/**
 	 * Find the compared tours in the tour map tree viewer<br>
 	 * !!! Recursive !!!
@@ -268,7 +266,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 	 * @param findCompIds
 	 *        comp id's which should be found
 	 */
-	private static void getComparedTours(	ArrayList<TourCatalogItemComparedTour> comparedTours,
+	private static void getComparedTours(	final ArrayList<TourCatalogItemComparedTour> comparedTours,
 											final TreeViewerItem parentItem,
 											final ArrayList<Long> findCompIds) {
 
@@ -299,31 +297,33 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		}
 	}
 
+	public TourCatalogView() {}
+
 	private void addCompareTourPropertyListener() {
 
 		fCompareTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(int propertyId, Object propertyData) {
+			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyCompareTourChanged) {
 
-					TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
+					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
 
 					// check if the compared tour was saved in the database
 					if (compareTourProperty.isDataSaved) {
 
-						ArrayList<Long> compareIds = new ArrayList<Long>();
+						final ArrayList<Long> compareIds = new ArrayList<Long>();
 						compareIds.add(compareTourProperty.compareId);
 
 						// find the compared tour in the viewer
-						ArrayList<TourCatalogItemComparedTour> comparedTours = new ArrayList<TourCatalogItemComparedTour>();
+						final ArrayList<TourCatalogItemComparedTour> comparedTours = new ArrayList<TourCatalogItemComparedTour>();
 						final TreeViewerItem rootItem = ((TourContentProvider) fTourViewer.getContentProvider()).getRootItem();
 
 						getComparedTours(comparedTours, rootItem, compareIds);
 
 						if (comparedTours.size() > 0) {
 
-							TourCatalogItemComparedTour comparedTour = comparedTours.get(0);
+							final TourCatalogItemComparedTour comparedTour = comparedTours.get(0);
 
 							// update entity
 							comparedTour.setStartIndex(compareTourProperty.startIndex);
@@ -415,7 +415,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 					 * find/remove the removed compared tours in the viewer
 					 */
 
-					ArrayList<TourCatalogItemComparedTour> comparedTours = new ArrayList<TourCatalogItemComparedTour>();
+					final ArrayList<TourCatalogItemComparedTour> comparedTours = new ArrayList<TourCatalogItemComparedTour>();
 					final TreeViewerItem rootItem = ((TourContentProvider) fTourViewer.getContentProvider()).getRootItem();
 
 					getComparedTours(comparedTours, rootItem, removedCompTours.removedComparedTours);
@@ -430,9 +430,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 				} else if (selection instanceof StructuredSelection) {
 
-					StructuredSelection structuredSelection = (StructuredSelection) selection;
+					final StructuredSelection structuredSelection = (StructuredSelection) selection;
 
-					Object firstElement = structuredSelection.getFirstElement();
+					final Object firstElement = structuredSelection.getFirstElement();
 
 					if (firstElement instanceof TourCatalogItemComparedTour) {
 
@@ -470,7 +470,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 					saveSettings();
 
 					// dispose viewer
-					Control[] children = fViewerContainer.getChildren();
+					final Control[] children = fViewerContainer.getChildren();
 					for (int childIndex = 0; childIndex < children.length; childIndex++) {
 						children[childIndex].dispose();
 					}
@@ -551,7 +551,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 		final TreeColumnLayout treeLayout = new TreeColumnLayout();
 
-		Composite layoutContainer = new Composite(parent, SWT.NONE);
+		final Composite layoutContainer = new Composite(parent, SWT.NONE);
 		layoutContainer.setLayout(treeLayout);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
 
@@ -567,7 +567,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 		// tree columns
 		TreeColumn tc;
-		PixelConverter pixelConverter = new PixelConverter(tree);
+		final PixelConverter pixelConverter = new PixelConverter(tree);
 
 		tc = new TreeColumn(tree, SWT.NONE);
 		tc.setText(Messages.tourCatalog_view_column_tour);
@@ -653,7 +653,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		// count how many different items are selected
 		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 
-			final Object item = (Object) iter.next();
+			final Object item = iter.next();
 
 			if (item instanceof TourCatalogItemReferenceTour) {
 				refItemCounter++;
@@ -696,7 +696,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		}
 		fIsToolbarCreated = true;
 
-		IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
 		tbm.add(fActionLinkTour);
 		tbm.add(fActionCollapseAll);
@@ -732,7 +732,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 	 * 
 	 * @param selection
 	 */
-	private void onSelectionChanged(IStructuredSelection selection) {
+	private void onSelectionChanged(final IStructuredSelection selection) {
 
 		// show the reference tour chart
 		final Object item = selection.getFirstElement();
@@ -802,6 +802,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		fTourViewer.refresh();
 	}
 
+	public void reloadViewer() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * Restore settings from the last session
 	 * 
@@ -816,12 +821,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		/*
 		 * select ref tour in tour viewer
 		 */
-		String mementoRefId = memento.getString(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID);
+		final String mementoRefId = memento.getString(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID);
 		if (mementoRefId != null) {
 
 			try {
 				selectRefTour(Long.parseLong(mementoRefId));
-			} catch (NumberFormatException e) {
+			} catch (final NumberFormatException e) {
 				// do nothing
 			}
 		}
@@ -829,7 +834,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		/*
 		 * action: link tour with statistics
 		 */
-		Integer mementoLinkTour = memento.getInteger(MEMENTO_TOUR_CATALOG_LINK_TOUR);
+		final Integer mementoLinkTour = memento.getInteger(MEMENTO_TOUR_CATALOG_LINK_TOUR);
 		if (mementoLinkTour != null) {
 			fActionLinkTour.setChecked(mementoLinkTour == 1);
 		}
@@ -862,15 +867,15 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 	 * 
 	 * @param refId
 	 */
-	private void selectRefTour(long refId) {
+	private void selectRefTour(final long refId) {
 
-		Object[] refTourItems = fRootItem.getFetchedChildrenAsArray();
+		final Object[] refTourItems = fRootItem.getFetchedChildrenAsArray();
 
 		// search ref tour
-		for (Object refTourItem : refTourItems) {
+		for (final Object refTourItem : refTourItems) {
 			if (refTourItem instanceof TourCatalogItemReferenceTour) {
 
-				TourCatalogItemReferenceTour tvtiRefTour = (TourCatalogItemReferenceTour) refTourItem;
+				final TourCatalogItemReferenceTour tvtiRefTour = (TourCatalogItemReferenceTour) refTourItem;
 				if (tvtiRefTour.refId == refId) {
 
 					// select ref tour
@@ -913,7 +918,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		// loop: all ref tours where children has been added
 		for (final Iterator<Long> refIdIter = viewRefIds.values().iterator(); refIdIter.hasNext();) {
 
-			final Long refId = (Long) refIdIter.next();
+			final Long refId = refIdIter.next();
 
 			final ArrayList<TreeViewerItem> unfetchedChildren = fRootItem.getUnfetchedChildren();
 			if (unfetchedChildren != null) {

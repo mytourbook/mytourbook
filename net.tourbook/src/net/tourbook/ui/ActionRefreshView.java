@@ -13,8 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
-package net.tourbook.ui.views.tourTag;
+package net.tourbook.ui;
 
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
@@ -23,13 +22,13 @@ import org.eclipse.jface.action.Action;
 
 public class ActionRefreshView extends Action {
 
-	private TagView	fTagView;
+	private ITourViewer	tourViewer;
 
-	public ActionRefreshView(final TagView view) {
+	public ActionRefreshView(final ITourViewer view) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		fTagView = view;
+		tourViewer = view;
 
 		setToolTipText(Messages.tag_view_action_refresh_view_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__refresh));
@@ -37,7 +36,7 @@ public class ActionRefreshView extends Action {
 
 	@Override
 	public void run() {
-		fTagView.reloadTagViewer();
+		tourViewer.reloadViewer();
 	}
 
 }

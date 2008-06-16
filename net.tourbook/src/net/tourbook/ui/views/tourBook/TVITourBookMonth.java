@@ -51,33 +51,53 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 
 		final TVITourBookYear yearItem = (TVITourBookYear) (getParentItem());
 
-		final String sqlString = "SELECT " //	//$NON-NLS-1$
-				+ "STARTYear," //1				//$NON-NLS-1$
-				+ "STARTMonth," //2				//$NON-NLS-1$
-				+ "STARTDay," //3				//$NON-NLS-1$
-				+ "TOURDISTANCE," //4			//$NON-NLS-1$
-				+ "TOURRECORDINGTIME," //5		//$NON-NLS-1$
-				+ "TOURDRIVINGTIME," //6		//$NON-NLS-1$
-				+ "TOURALTUP," //7				//$NON-NLS-1$
-				+ "TOURALTDOWN," //8			//$NON-NLS-1$
-				+ "startDistance," //9			//$NON-NLS-1$
-				+ "tourID," //10				//$NON-NLS-1$
-				+ "tourType_typeId," //11		//$NON-NLS-1$
-				+ "tourTitle," //12				//$NON-NLS-1$
-				+ "deviceTimeInterval," //13	//$NON-NLS-1$
-				+ "maxSpeed," //14				//$NON-NLS-1$
-				+ "maxAltitude," //15			//$NON-NLS-1$
-				+ "maxPulse," //16				//$NON-NLS-1$
-				+ "avgPulse," //17				//$NON-NLS-1$
-				+ "avgCadence," //18			//$NON-NLS-1$
-				+ "avgTemperature" //19			//$NON-NLS-1$
+		final String sqlString = "SELECT " //		//$NON-NLS-1$
+
+				+ "Tdata.STARTYear," //			1	//$NON-NLS-1$
+				+ "Tdata.STARTMonth," //		2	//$NON-NLS-1$
+				+ "Tdata.STARTDay," //			3	//$NON-NLS-1$
+				+ "Tdata.TOURDISTANCE," //		4	//$NON-NLS-1$
+				+ "Tdata.TOURRECORDINGTIME," //	5	//$NON-NLS-1$
+				+ "Tdata.TOURDRIVINGTIME," //	6	//$NON-NLS-1$
+				+ "Tdata.TOURALTUP," //			7	//$NON-NLS-1$
+				+ "Tdata.TOURALTDOWN," //		8	//$NON-NLS-1$
+				+ "Tdata.startDistance," //		9	//$NON-NLS-1$
+				+ "Tdata.tourID," //			10	//$NON-NLS-1$
+				+ "Tdata.tourType_typeId," //	11	//$NON-NLS-1$
+				+ "Tdata.tourTitle," //			12	//$NON-NLS-1$
+				+ "Tdata.deviceTimeInterval," //13	//$NON-NLS-1$
+				+ "Tdata.maxSpeed," //			14	//$NON-NLS-1$
+				+ "Tdata.maxAltitude," //		15	//$NON-NLS-1$
+				+ "Tdata.maxPulse," //			16	//$NON-NLS-1$
+				+ "Tdata.avgPulse," //			17	//$NON-NLS-1$
+				+ "Tdata.avgCadence," //		18	//$NON-NLS-1$
+				+ "Tdata.avgTemperature," //	19	//$NON-NLS-1$
+
+				+ ("jTdataTtag.TourTag_tagId")//20 
+
 				+ UI.NEW_LINE
-				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //			//$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE STARTYEAR = ?")// + yearItem.fTourYear) //				//$NON-NLS-1$
-				+ (" AND STARTMONTH = ?")// + fTourMonth) //						//$NON-NLS-1$
+
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " Tdata" + UI.NEW_LINE) //			//$NON-NLS-1$ //$NON-NLS-2$
+
+				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag")
+				+ (" ON Tdata.tourID = jTdataTtag.TourData_tourId")
+
+//				left outer join TourData_TourTag tourtags6_ on tourdata0_.tourId=tourtags6_.tourData_tourId 
+
+				+ (" WHERE Tdata.STARTYEAR = ?")//				//$NON-NLS-1$
+				+ (" AND Tdata.STARTMONTH = ?")//					//$NON-NLS-1$
 				+ sqlTourPersonId()
 				+ sqlTourTypeId()
-				+ " ORDER BY STARTDAY,StartHour,StartMinute"; //$NON-NLS-1$
+				+ " ORDER BY Tdata.StartDay, Tdata.StartHour, Tdata.StartMinute"; //$NON-NLS-1$
+
+//		sb.append(" Tdata.TourAltDown");//				// 
+//
+//		sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
+//
+//		sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " Tdata ON");
+//		sb.append(" jTdataTtag.TourData_tourId=Tdata.tourId ");
+//
+//		sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");// + tagId);
 
 		try {
 
@@ -90,48 +110,74 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 //			final long time = System.currentTimeMillis();
 //			System.out.println(System.currentTimeMillis() - time + "ms");
 
+			long lastTourId = -1;
+
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
-				final TVITourBookTour tourItem = new TVITourBookTour(fView, this);
+				final long tourId = result.getLong(10);
 
-				tourItem.fTourYear = result.getInt(1);
-				tourItem.fTourMonth = result.getInt(2);
-				tourItem.fTourDay = tourItem.fFirstColumn = result.getInt(3);
+				if (tourId == lastTourId) {
 
-				fCalendar.set(tourItem.fTourYear, tourItem.fTourMonth - 1, tourItem.fTourDay);
-				tourItem.fTourDate = fCalendar.getTimeInMillis();
+					// get tags from outer join
+					
+					
+				} else {
 
-				tourItem.fColumnDistance = result.getLong(4);
-				tourItem.fColumnRecordingTime = result.getLong(5);
-				tourItem.fColumnDrivingTime = result.getLong(6);
-				tourItem.fColumnAltitudeUp = result.getLong(7);
-				tourItem.fColumnAltitudeDown = result.getLong(8);
+					// new tour is in the resultset
+					final TVITourBookTour tourItem = new TVITourBookTour(fView, this);
+					children.add(tourItem);
 
-				tourItem.fColumnStartDistance = result.getLong(9);
-				tourItem.fTourId = result.getLong(10);
-				final Object tourTypeId = result.getObject(11);
-				tourItem.fTourTypeId = (tourTypeId == null ? //
-						TourDatabase.ENTITY_IS_NOT_SAVED
-						: (Long) tourTypeId);
+					tourItem.fTourId = tourId;
 
-				tourItem.fTourTitle = result.getString(12);
-				tourItem.fColumnTimeInterval = result.getShort(13);
-				tourItem.fColumnMaxSpeed = result.getFloat(14);
+					tourItem.fTourYear = result.getInt(1);
+					tourItem.fTourMonth = result.getInt(2);
+					tourItem.fTourDay = tourItem.fFirstColumn = result.getInt(3);
 
-				if (tourItem.fColumnDrivingTime != 0) {
-					tourItem.fColumnAvgSpeed = (float) tourItem.fColumnDistance
-							/ (float) tourItem.fColumnDrivingTime
-							* 3.6f;
+					fCalendar.set(tourItem.fTourYear, tourItem.fTourMonth - 1, tourItem.fTourDay);
+					tourItem.fTourDate = fCalendar.getTimeInMillis();
+
+					tourItem.fColumnDistance = result.getLong(4);
+					tourItem.fColumnRecordingTime = result.getLong(5);
+					tourItem.fColumnDrivingTime = result.getLong(6);
+					tourItem.fColumnAltitudeUp = result.getLong(7);
+					tourItem.fColumnAltitudeDown = result.getLong(8);
+
+					tourItem.fColumnStartDistance = result.getLong(9);
+
+					final Object tourTypeId = result.getObject(11);
+					tourItem.fTourTypeId = (tourTypeId == null ? //
+							TourDatabase.ENTITY_IS_NOT_SAVED
+							: (Long) tourTypeId);
+
+					tourItem.fTourTitle = result.getString(12);
+					tourItem.fColumnTimeInterval = result.getShort(13);
+					tourItem.fColumnMaxSpeed = result.getFloat(14);
+
+					if (tourItem.fColumnDrivingTime != 0) {
+						tourItem.fColumnAvgSpeed = (float) tourItem.fColumnDistance
+								/ (float) tourItem.fColumnDrivingTime
+								* 3.6f;
+					}
+
+					tourItem.fColumnMaxAltitude = result.getLong(15);
+					tourItem.fColumnMaxPulse = result.getLong(16);
+					tourItem.fColumnAvgPulse = result.getLong(17);
+					tourItem.fColumnAvgCadence = result.getLong(18);
+					tourItem.fColumnAvgTemperature = result.getLong(19);
+					
+					final Object resultTagId = result.getObject(20);
+					if (resultTagId instanceof Long) {
+						tourItem.fTagIds = new ArrayList<Long>();
+					}
 				}
 
-				tourItem.fColumnMaxAltitude = result.getLong(15);
-				tourItem.fColumnMaxPulse = result.getLong(16);
-				tourItem.fColumnAvgPulse = result.getLong(17);
-				tourItem.fColumnAvgCadence = result.getLong(18);
-				tourItem.fColumnAvgTemperature = result.getLong(19);
+				System.out.println(result.getObject(10) + //
+						("\t" + result.getObject(20))
+				//
+				);
 
-				children.add(tourItem);
+				lastTourId = tourId;
 			}
 
 			conn.close();

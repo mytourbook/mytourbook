@@ -35,6 +35,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionModifyColumns;
+import net.tourbook.ui.ActionRefreshView;
 import net.tourbook.ui.ActionRemoveTourTag;
 import net.tourbook.ui.ActionSetTourTag;
 import net.tourbook.ui.ActionSetTourType;
@@ -86,6 +87,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -160,6 +162,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 //	private int						fLastSelectedTourTypeId;
 
 	private Composite				fViewerContainer;
+
+	private ActionRefreshView		fActionRefreshView;
 
 	private class TourBookContentProvider implements ITreeContentProvider {
 
@@ -305,17 +309,21 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fActionModifyColumns = new ActionModifyColumns(this);
 		fActionCollapseAll = new ActionCollapseAll(this);
 
+		fActionRefreshView = new ActionRefreshView(this);
+
+		final IActionBars actionBars = getViewSite().getActionBars();
 		/*
 		 * fill view menu
 		 */
-		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		final IMenuManager menuMgr = actionBars.getMenuManager();
 		menuMgr.add(fActionModifyColumns);
 
 		/*
 		 * fill view toolbar
 		 */
-		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+		final IToolBarManager tbm = actionBars.getToolBarManager();
 		tbm.add(fActionCollapseAll);
+		tbm.add(fActionRefreshView);
 	}
 
 	/**
@@ -911,6 +919,14 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		}
 
 		reselectTourViewer();
+	}
+
+	/**
+	 * reload the content of the tag viewer
+	 */
+	public void reloadViewer() {
+		fRootItem = new TVITourBookRoot(this);
+		fTourViewer.setInput(this);
 	}
 
 	private void reselectTourViewer() {

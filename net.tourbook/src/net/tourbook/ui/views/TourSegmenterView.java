@@ -257,11 +257,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		// set the part listener
 		fPartListener = new IPartListener2() {
-			public void partActivated(IWorkbenchPartReference partRef) {}
+			public void partActivated(final IWorkbenchPartReference partRef) {}
 
-			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			public void partClosed(IWorkbenchPartReference partRef) {
+			public void partClosed(final IWorkbenchPartReference partRef) {
 
 				if (ID.equals(partRef.getId())) {
 					// keep settings for this part
@@ -275,15 +275,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			}
 
-			public void partDeactivated(IWorkbenchPartReference partRef) {}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-			public void partHidden(IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {}
 
-			public void partInputChanged(IWorkbenchPartReference partRef) {}
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-			public void partOpened(IWorkbenchPartReference partRef) {}
+			public void partOpened(final IWorkbenchPartReference partRef) {}
 
-			public void partVisible(IWorkbenchPartReference partRef) {}
+			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 
 		getSite().getPage().addPartListener(fPartListener);
@@ -304,7 +304,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 					// dispose viewer
 					saveViewerSettings(fSessionMemento);
-					Control[] children = fViewerContainer.getChildren();
+					final Control[] children = fViewerContainer.getChildren();
 					for (int childIndex = 0; childIndex < children.length; childIndex++) {
 						children[childIndex].dispose();
 					}
@@ -341,12 +341,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void createActions() {
 
-		ActionModifyColumns actionModifyColumns = new ActionModifyColumns(this);
+		final ActionModifyColumns actionModifyColumns = new ActionModifyColumns(this);
 
 		/*
 		 * fill view menu
 		 */
-		IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(actionModifyColumns);
 	}
 
@@ -357,7 +357,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		fActionShowSegments = new ActionShowSegments();
 
-		IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 		tbm.add(fActionShowSegments);
 
 	}
@@ -453,12 +453,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fLabelToleranceValue.setLayoutData(gd);
 	}
 
-	private void createTableColumns(Composite parent) {
+	private void createTableColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 		TableColumnDefinition colDef;
 
-		SelectionAdapter defaultColumnSelectionListener = new SelectionAdapter() {
+		final SelectionAdapter defaultColumnSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_DEFAULT);
@@ -473,7 +473,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 				final TourSegment segment = (TourSegment) cell.getElement();
 				cell.setText(UI.formatSeconds(segment.drivingTime));
 			}
@@ -486,14 +486,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
 				fNf.setMinimumFractionDigits(2);
 				fNf.setMaximumFractionDigits(2);
 
-				cell.setText(fNf.format(((float) segment.distance) / (1000 * UI.UNIT_VALUE_DISTANCE)));
+				cell.setText(fNf.format((segment.distance) / (1000 * UI.UNIT_VALUE_DISTANCE)));
 			}
 		});
 
@@ -504,7 +504,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
@@ -522,7 +522,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 				if (segment.drivingTime == 0) {
@@ -550,7 +550,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 				if (segment.drivingTime == 0) {
@@ -578,7 +578,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 				fNf.setMinimumFractionDigits(1);
@@ -602,13 +602,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 				if (segment.drivingTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final float result = (float) (segment.altitudeUp / UI.UNIT_VALUE_ALTITUDE)
+					final float result = (segment.altitudeUp / UI.UNIT_VALUE_ALTITUDE)
 							/ segment.drivingTime
 							* 3600;
 					if (result == 0) {
@@ -629,13 +629,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 				if (segment.drivingTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final float result = (float) (segment.altitudeDown / UI.UNIT_VALUE_ALTITUDE)
+					final float result = (segment.altitudeDown / UI.UNIT_VALUE_ALTITUDE)
 							/ segment.drivingTime
 							* 3600;
 					if (result == 0) {
@@ -720,7 +720,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final IWorkbenchPage page = getSite().getPage();
 
-		IEditorPart activeEditor = page.getActiveEditor();
+		final IEditorPart activeEditor = page.getActiveEditor();
 		if (activeEditor != null && activeEditor instanceof TourEditor) {
 
 			final TourEditor tourEditor = (TourEditor) activeEditor;
@@ -736,9 +736,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 
 		final IViewReference[] viewReferences = page.getViewReferences();
-		for (IViewReference viewReference : viewReferences) {
+		for (final IViewReference viewReference : viewReferences) {
 
-			IViewPart view = viewReference.getView(false);
+			final IViewPart view = viewReference.getView(false);
 			if (view != null && view instanceof TourChartView) {
 
 				final TourChartView tourChartView = ((TourChartView) view);
@@ -756,7 +756,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
-	public Object getAdapter(Class adapter) {
+	public Object getAdapter(final Class adapter) {
 
 		if (adapter == ColumnViewer.class) {
 			return fSegmentViewer;
@@ -770,7 +770,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	private int getTolerance() {
-		return (int) ((Math.pow(fScaleTolerance.getSelection(), 2.05)) / (double) 50.0);
+		return (int) ((Math.pow(fScaleTolerance.getSelection(), 2.05)) / 50.0);
 	}
 
 	public TreeViewer getTreeViewer() {
@@ -778,7 +778,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	@Override
-	public void init(IViewSite site, IMemento memento) throws PartInitException {
+	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
 
 		super.init(site, memento);
 
@@ -835,7 +835,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		} else if (selection instanceof SelectionTourId) {
 
-			SelectionTourId tourIdSelection = (SelectionTourId) selection;
+			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 
 			if (fTourData != null) {
 				if (fTourData.getTourId().equals(tourIdSelection.getTourId())) {
@@ -940,7 +940,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fireSegmentLayerChanged();
 	}
 
-	private void restoreViewerSettings(IMemento memento) {
+	public void reloadViewer() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void restoreViewerSettings(final IMemento memento) {
 
 		if (memento == null) {
 			return;
@@ -967,12 +972,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	@Override
-	public void saveState(IMemento memento) {
+	public void saveState(final IMemento memento) {
 
 		saveViewerSettings(memento);
 	}
 
-	private void saveViewerSettings(IMemento memento) {
+	private void saveViewerSettings(final IMemento memento) {
 
 		if (memento == null) {
 			return;

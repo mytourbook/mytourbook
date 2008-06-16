@@ -857,6 +857,8 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		return false;
 	}
 
+	public void reloadViewer() {}
+
 	private void restoreState(final IMemento memento) {
 
 		final RawDataManager rawDataManager = RawDataManager.getInstance();

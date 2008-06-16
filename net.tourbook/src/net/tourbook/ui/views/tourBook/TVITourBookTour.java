@@ -15,14 +15,17 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import java.util.ArrayList;
+
 import net.tourbook.tour.TreeViewerItem;
 
 public class TVITourBookTour extends TourBookTreeViewerItem {
 
-	long	fColumnStartDistance;
-	long	fTourId;
-	long	fTourTypeId;
-	short	fColumnTimeInterval;
+	long			fColumnStartDistance;
+	long			fTourId;
+	long			fTourTypeId;
+	short			fColumnTimeInterval;
+	ArrayList<Long>	fTagIds;
 
 	public TVITourBookTour(final TourBookView view, final TreeViewerItem parentItem) {
 
