@@ -51,7 +51,8 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 	private final ActionEditQuick		fActionEditQuick;
 	private final ActionEditTour		fActionEditTour;
 	private final ActionSetTourType		fActionSetTourType;
-	private final ActionSetTourTag		fActionSetTourTag;
+	private final ActionSetTourTag		fActionAddTag;
+	private final ActionSetTourTag		fActionRemoveTag;
 
 	private class ActionEditTour extends Action {
 
@@ -98,7 +99,8 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 		fActionEditQuick = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(Messages.action_edit_tour);
 		fActionSetTourType = new ActionSetTourType(this);
-		fActionSetTourTag = new ActionSetTourTag(this);
+		fActionAddTag = new ActionSetTourTag(this, true);
+		fActionRemoveTag = new ActionSetTourTag(this, false);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
@@ -112,11 +114,13 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourHovered && tourTypes.size() > 0);
-		fActionSetTourTag.setEnabled(isTourHovered && tourTypes.size() > 0);
+		fActionAddTag.setEnabled(isTourHovered);
+		fActionRemoveTag.setEnabled(isTourHovered);
 
 		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionSetTourType);
-		menuMgr.add(fActionSetTourTag);
+		menuMgr.add(fActionAddTag);
+		menuMgr.add(fActionRemoveTag);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditTour);
