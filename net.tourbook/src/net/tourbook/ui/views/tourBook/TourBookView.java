@@ -20,10 +20,12 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -36,7 +38,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionRefreshView;
-import net.tourbook.ui.ActionRemoveTourTag;
+import net.tourbook.ui.ActionRemoveAllTags;
 import net.tourbook.ui.ActionSetTourTag;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
@@ -152,8 +154,9 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private ActionSetTourType		fActionSetTourType;
 	private ActionModifyColumns		fActionModifyColumns;
 	private ActionCollapseAll		fActionCollapseAll;
-	private ActionSetTourTag		fActionSetTourTag;
-	private ActionRemoveTourTag		fActionRemoveTourTag;
+	private ActionSetTourTag		fActionAddTag;
+	private ActionSetTourTag		fActionRemoveTag;
+	private ActionRemoveAllTags		fActionRemoveAllTags;
 
 	private int						fTourViewerSelectedYear				= -1;
 	private int						fTourViewerSelectedMonth			= -1;
@@ -303,8 +306,9 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fActionEditTour = new ActionEditTour(this);
 		fActionDeleteTour = new ActionDeleteTour(this);
 		fActionSetTourType = new ActionSetTourType(this);
-		fActionSetTourTag = new ActionSetTourTag(this);
-		fActionRemoveTourTag = new ActionRemoveTourTag(this);
+		fActionAddTag = new ActionSetTourTag(this, true);
+		fActionRemoveTag = new ActionSetTourTag(this, false);
+		fActionRemoveAllTags = new ActionRemoveAllTags(this);
 
 		fActionModifyColumns = new ActionModifyColumns(this);
 		fActionCollapseAll = new ActionCollapseAll(this);
@@ -607,6 +611,21 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		});
 
 		/*
+		 * column: tags
+		 */
+		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+					cell.setText(TourDatabase.getInstance().getTagNames(((TVITourBookTour) element).fTagIds));
+				}
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
 		 * column: number of tours
 		 */
 		colDef = TreeColumnFactory.TOUR_COUNTER.createColumn(fColumnManager, pixelConverter);
@@ -739,7 +758,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 				setCellColor(cell, element);
 			}
 		});
-
 	}
 
 	@Override
@@ -768,8 +786,13 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		// count number of selected tour items
 		int tourItems = 0;
+		TVITourBookTour firstTour = null;
 		for (final Iterator iter = selection.iterator(); iter.hasNext();) {
-			if (iter.next() instanceof TVITourBookTour) {
+			final Object treeItem = iter.next();
+			if (treeItem instanceof TVITourBookTour) {
+				if (tourItems == 0) {
+					firstTour = (TVITourBookTour) treeItem;
+				}
 				tourItems++;
 			}
 		}
@@ -788,8 +811,26 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		fActionEditQuick.setEnabled(tourItems == 1);
 
-		fActionSetTourTag.setEnabled(tourItems > 0);
-		fActionRemoveTourTag.setEnabled(tourItems > 0);
+		fActionAddTag.setEnabled(tourItems > 0);
+		fActionRemoveTag.setEnabled(tourItems > 0);
+
+		if (firstTour != null && tourItems == 1) {
+
+			// one tour is selected
+
+			final ArrayList<Long> tagIds = firstTour.fTagIds;
+			if (tagIds != null && tagIds.size() > 0) {
+				fActionRemoveAllTags.setEnabled(true);
+			} else {
+				// tags are not available
+				fActionRemoveAllTags.setEnabled(false);
+			}
+		} else {
+
+			// multiple tours are selected
+
+			fActionRemoveAllTags.setEnabled(tourItems > 0);
+		}
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -799,8 +840,9 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		menuMgr.add(fActionEditTour);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionSetTourTag);
-		menuMgr.add(fActionRemoveTourTag);
+		menuMgr.add(fActionAddTag);
+		menuMgr.add(fActionRemoveTag);
+		menuMgr.add(fActionRemoveAllTags);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionDeleteTour);
@@ -1040,8 +1082,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		if (element instanceof TVITourBookMonth) {
 			cell.setBackground(fColorMonthBg);
-		}
-		if (element instanceof TVITourBookYear) {
+		} else if (element instanceof TVITourBookYear) {
 			cell.setForeground(fColorYearFg);
 			cell.setBackground(fColorYearBg);
 		}
@@ -1085,7 +1126,15 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 							if (tourType != null) {
 								tourItem.fTourTypeId = tourType.getTypeId();
 							}
+
 							tourItem.fTourTitle = tourData.getTourTitle();
+							final Set<TourTag> tourTags = tourData.getTourTags();
+
+							final ArrayList<Long> tagIds;
+							tourItem.fTagIds = tagIds = new ArrayList<Long>();
+							for (final TourTag tourTag : tourTags) {
+								tagIds.add(tourTag.getTagId());
+							}
 
 							// update tour viewer
 							fTourViewer.update(tourItem, null);

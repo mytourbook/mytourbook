@@ -80,7 +80,7 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 			sb.append(" LEFT OUTER JOIN " + tblTag + " tblTag ON ");
 			sb.append(" jTblCatTag.TourTag_TagId = tblTag.tagId ");
 
-			sb.append(" WHERE jTblCatTag.TourTagCategory_TagCategoryId = ?");// + tagCategoryId);
+			sb.append(" WHERE jTblCatTag.TourTagCategory_TagCategoryId = ?");
 
 			statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, tagCategoryId);

@@ -38,7 +38,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ActionRemoveTourTag;
+import net.tourbook.ui.ActionRemoveAllTags;
 import net.tourbook.ui.ActionSetTourTag;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
@@ -90,8 +90,9 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		final ActionEditQuick		fActionQuickEdit		= new ActionEditQuick(TourChartView.this);
 		final ActionEditTour		fActionEditTour			= new ActionEditTour(TourChartView.this);
 		final ActionSetTourType		fActionSetTourType		= new ActionSetTourType(this);
-		final ActionSetTourTag		fActionSetTourTag		= new ActionSetTourTag(this);
-		final ActionRemoveTourTag	fActionRemoveTourTag	= new ActionRemoveTourTag(this);
+		final ActionSetTourTag		fActionAddTag			= new ActionSetTourTag(this, true);
+		final ActionSetTourTag		fActionRemoveTag		= new ActionSetTourTag(this, false);
+		final ActionRemoveAllTags	fActionRemoveAllTags	= new ActionRemoveAllTags(this);
 
 		public void fillBarChartContextMenu(final IMenuManager menuMgr,
 											final int hoveredBarSerieIndex,
@@ -103,8 +104,9 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			menuMgr.add(fActionSetTourType);
 
 			menuMgr.add(new Separator());
-			menuMgr.add(fActionSetTourTag);
-			menuMgr.add(fActionRemoveTourTag);
+			menuMgr.add(fActionAddTag);
+			menuMgr.add(fActionRemoveTag);
+			menuMgr.add(fActionRemoveAllTags);
 
 			menuMgr.add(new Separator());
 			menuMgr.add(fActionEditTour);

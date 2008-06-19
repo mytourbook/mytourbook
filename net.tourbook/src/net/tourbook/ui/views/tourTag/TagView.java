@@ -17,7 +17,6 @@
 package net.tourbook.ui.views.tourTag;
 
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -25,6 +24,7 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TVITourTag;
@@ -87,10 +87,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	public static final String		STATEMENT_TOURDATA_TOURTAG	= "tourData_tourTag";
 
-//	private static final HashMap<String, PreparedStatement>	fStatements					= new HashMap<String, PreparedStatement>();
 	private static IMemento			fSessionMemento;
 
-	private NumberFormat			fNF							= NumberFormat.getNumberInstance();
+//	private NumberFormat			fNF							= NumberFormat.getNumberInstance();
 	private DateFormat				fDF							= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	private Composite				fViewerContainer;
@@ -193,7 +192,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	private void createActions() {
 
 		fActionRefreshView = new ActionRefreshView(this);
-		fActionSetTreeExpandType = new ActionSetTreeExpandType(this, fTagViewer);
+		fActionSetTreeExpandType = new ActionSetTreeExpandType(this);
 
 		/*
 		 * action in the view toolbar
@@ -362,6 +361,19 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			}
 		});
 
+		/*
+		 * column: tags
+		 */
+		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTour) {
+					cell.setText(TourDatabase.getInstance().getTagNames(((TVITagViewTour) element).tagIds));
+				}
+			}
+		});
 	}
 
 	@Override
@@ -393,6 +405,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			isTagSelected = true;
 		}
 
+		/*
+		 * tree expand type can be set only for one tag
+		 */
 		fActionSetTreeExpandType.setEnabled(isTagSelected && selectedItems == 1);
 	}
 

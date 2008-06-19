@@ -27,13 +27,13 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionRemoveTourTag extends Action {
+public class ActionRemoveAllTags extends Action {
 
 	private ISelectedTours	fTourProvider;
 
-	public ActionRemoveTourTag(final ISelectedTours tourProvider) {
+	public ActionRemoveAllTags(final ISelectedTours tourProvider) {
 
-		super(Messages.app_action_remove_tour_tag, AS_PUSH_BUTTON);
+		super(Messages.app_action_tag_remove_all, AS_PUSH_BUTTON);
 
 		fTourProvider = tourProvider;
 	}

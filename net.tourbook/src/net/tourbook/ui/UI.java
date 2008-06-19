@@ -62,6 +62,7 @@ public class UI {
 
 	public static final String				EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String				EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
+	public static final String				IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";							//$NON-NLS-1$
 
 	/**
 	 * contains a new line string

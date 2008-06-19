@@ -109,6 +109,10 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_numbers;
 	public static String		ColumnFactory_tour_numbers_lable;
 	public static String		ColumnFactory_tour_numbers_tooltip;
+	public static String	ColumnFactory_tour_tag_label;
+
+	public static String	ColumnFactory_tour_tag_tooltip;
+
 	public static String		ColumnFactory_tour_time;
 	public static String		ColumnFactory_tour_time_label;
 	public static String		ColumnFactory_tour_time_tooltip;

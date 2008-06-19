@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -44,9 +44,13 @@ public class Messages extends NLS {
 	public static String		app_action_expand_type_flat;
 	public static String		app_action_expand_type_year_month_day;
 	public static String		app_action_quick_edit;
-	public static String		app_action_remove_tour_tag;
-	public static String		app_action_set_tour_tag;
 	public static String		app_action_set_tour_tag_tree_expand_type;
+
+	public static String	app_action_tag_add;
+
+	public static String	app_action_tag_remove;
+
+	public static String	app_action_tag_remove_all;
 
 	public static String		App_Action_set_tour_type;
 	public static String		App_measurement_imperial;

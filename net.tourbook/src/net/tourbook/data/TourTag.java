@@ -46,10 +46,14 @@ public class TourTag {
 	private long					tagId						= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	/**
-	 * derby does not support BOOLEAN, 1 = <code>true</code>, 0 = <code>false</code>
+	 * This is a root tag when set to <code>1</code>, derby does not support BOOLEAN, 1 =
+	 * <code>true</code>, 0 = <code>false</code>
 	 */
 	private int						isRoot						= 0;
 
+	/**
+	 * Display name of the tag
+	 */
 	@Basic(optional = false)
 	private String					name;
 

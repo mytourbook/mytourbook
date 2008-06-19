@@ -73,7 +73,7 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 				+ "Tdata.avgCadence," //		18	//$NON-NLS-1$
 				+ "Tdata.avgTemperature," //	19	//$NON-NLS-1$
 
-				+ ("jTdataTtag.TourTag_tagId")//20 
+				+ "jTdataTtag.TourTag_tagId"//	20	//$NON-NLS-1$ 
 
 				+ UI.NEW_LINE
 
@@ -82,22 +82,11 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag")
 				+ (" ON Tdata.tourID = jTdataTtag.TourData_tourId")
 
-//				left outer join TourData_TourTag tourtags6_ on tourdata0_.tourId=tourtags6_.tourData_tourId 
-
 				+ (" WHERE Tdata.STARTYEAR = ?")//				//$NON-NLS-1$
 				+ (" AND Tdata.STARTMONTH = ?")//					//$NON-NLS-1$
 				+ sqlTourPersonId()
 				+ sqlTourTypeId()
 				+ " ORDER BY Tdata.StartDay, Tdata.StartHour, Tdata.StartMinute"; //$NON-NLS-1$
-
-//		sb.append(" Tdata.TourAltDown");//				// 
-//
-//		sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
-//
-//		sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " Tdata ON");
-//		sb.append(" jTdataTtag.TourData_tourId=Tdata.tourId ");
-//
-//		sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");// + tagId);
 
 		try {
 
@@ -111,6 +100,7 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 //			System.out.println(System.currentTimeMillis() - time + "ms");
 
 			long lastTourId = -1;
+			ArrayList<Long> tagIds = null;
 
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
@@ -120,8 +110,12 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 				if (tourId == lastTourId) {
 
 					// get tags from outer join
-					
-					
+
+					final Object resultTagId = result.getObject(20);
+					if (resultTagId instanceof Long) {
+						tagIds.add((Long) resultTagId);
+					}
+
 				} else {
 
 					// new tour is in the resultset
@@ -165,17 +159,13 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 					tourItem.fColumnAvgPulse = result.getLong(17);
 					tourItem.fColumnAvgCadence = result.getLong(18);
 					tourItem.fColumnAvgTemperature = result.getLong(19);
-					
+
 					final Object resultTagId = result.getObject(20);
 					if (resultTagId instanceof Long) {
-						tourItem.fTagIds = new ArrayList<Long>();
+						tourItem.fTagIds = tagIds = new ArrayList<Long>();
+						tagIds.add((Long) resultTagId);
 					}
 				}
-
-				System.out.println(result.getObject(10) + //
-						("\t" + result.getObject(20))
-				//
-				);
 
 				lastTourId = tourId;
 			}

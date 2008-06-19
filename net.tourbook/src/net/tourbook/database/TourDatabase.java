@@ -27,7 +27,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -131,8 +133,8 @@ public class TourDatabase {
 
 	private static ArrayList<TourType>			fActiveTourTypes;
 	private static ArrayList<TourType>			fTourTypes;
-	private static ArrayList<TourTag>			fTourTags;
 
+	private static HashMap<Long, TourTag>		fTourTags;
 	private static HashMap<Long, TagCollection>	fTagCollections;
 
 	private boolean								fIsTableChecked;
@@ -395,6 +397,35 @@ public class TourDatabase {
 		}
 
 		return tourPeople;
+	}
+
+	/**
+	 * @return Returns all tour tags which are stored in the database
+	 */
+	@SuppressWarnings("unchecked")
+	private static HashMap<Long, TourTag> getTourTags() {
+
+		if (fTourTags != null) {
+			return fTourTags;
+		}
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		if (em != null) {
+
+			final Query query = em.createQuery("SELECT TourTag" //$NON-NLS-1$
+					+ (" FROM " + TourDatabase.TABLE_TOUR_TAG + " TourTag ")); //$NON-NLS-1$ //$NON-NLS-2$
+
+			fTourTags = new HashMap<Long, TourTag>();
+
+			for (final TourTag tourTag : ((List<TourTag>) query.getResultList())) {
+				fTourTags.put(tourTag.getTagId(), tourTag);
+			}
+
+			em.close();
+		}
+
+		return fTourTags;
 	}
 
 	/**
@@ -1575,6 +1606,38 @@ public class TourDatabase {
 		}
 
 		return conn;
+	}
+
+	public String getTagNames(final ArrayList<Long> tagIds) {
+
+		if (tagIds == null) {
+			return UI.EMPTY_STRING;
+		}
+
+		final HashMap<Long, TourTag> hashTags = getTourTags();
+		final ArrayList<String> tagList = new ArrayList<String>();
+
+		final StringBuilder sb = new StringBuilder();
+
+		// get tag name for each tag id
+		for (final Long tagId : tagIds) {
+			final TourTag tag = hashTags.get(tagId);
+			tagList.add(tag.getTagName());
+		}
+
+		// sort tags by name
+		Collections.sort(tagList);
+
+		// convert list into visible string
+		int tagIndex = 0;
+		for (final String tagName : tagList) {
+			if (tagIndex++ > 0) {
+				sb.append(", ");//$NON-NLS-1$
+			}
+			sb.append(tagName);
+		}
+
+		return sb.toString();
 	}
 
 	public void removePropertyListener(final IPropertyListener listener) {

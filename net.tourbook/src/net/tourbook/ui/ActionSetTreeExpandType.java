@@ -24,7 +24,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -37,14 +36,15 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 
 	private Menu					fMenu;
 
-	private ISelectedTours			fTourProvider;
-	private TreeViewer				fTagViewer;
+	private ITourViewer				fTourViewer;
 
-	private static final String[]	expandTypeNames	= {
+	private static final String[]	fExpandTypeNames	= {
 			Messages.app_action_expand_type_year_month_day,
-			Messages.app_action_expand_type_flat	};
+			Messages.app_action_expand_type_flat		};
 
-	private static final int[]		expandTypes		= { TourTag.EXPAND_TYPE_YEAR_MONTH_DAY, TourTag.EXPAND_TYPE_FLAT };
+	private static final int[]		fExpandTypes		= {
+			TourTag.EXPAND_TYPE_YEAR_MONTH_DAY,
+			TourTag.EXPAND_TYPE_FLAT					};
 
 	private class ActionTagStructure extends Action {
 
@@ -63,6 +63,21 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 
 				public void run() {
 
+					final StructuredSelection selection = (StructuredSelection) fTourViewer.getTreeViewer()
+							.getSelection();
+					if (selection.getFirstElement() instanceof TVITagViewTag) {
+						final TVITagViewTag tagItem = (TVITagViewTag) selection.getFirstElement();
+						
+						// check if expand type has changed
+						if (tagItem.expandType == fExpandType) {
+							return;
+						}
+						
+						// set new expand type
+						tagItem.expandType = fExpandType;
+						
+						tagItem.clearChildren();
+					}
 				}
 
 			};
@@ -70,13 +85,13 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 		}
 	}
 
-	public ActionSetTreeExpandType(final ISelectedTours tourProvider, final TreeViewer tagViewer) {
+	public ActionSetTreeExpandType(final ITourViewer tourViewer) {
 
 		super(Messages.app_action_set_tour_tag_tree_expand_type, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
-		fTourProvider = tourProvider;
-		fTagViewer = tagViewer;
+//		fTourProvider = tourProvider;
+		fTourViewer = tourViewer;
 	}
 
 	private void addActionToMenu(final Action action) {
@@ -113,23 +128,18 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 					menuItem.dispose();
 				}
 
-				// get current expand type
-				int selectedExpandType = -1;
-				final StructuredSelection selection = (StructuredSelection) fTagViewer.getSelection();
-				if (selection.getFirstElement() instanceof TVITagViewTag) {
-					final TVITagViewTag itemTag = (TVITagViewTag) selection.getFirstElement();
-					selectedExpandType = itemTag.expandType;
-				}
 
 				/*
 				 * create all expand types
 				 */
+				final int selectedExpandType = getSelectedExpandType();
 				int typeIndex = 0;
-				for (final int expandType : expandTypes) {
+				for (final int expandType : fExpandTypes) {
 
 					final ActionTagStructure actionTagStructure = new ActionTagStructure(expandType,
-							expandTypeNames[typeIndex++]);
+							fExpandTypeNames[typeIndex++]);
 
+					// check active expand type
 					actionTagStructure.setChecked(selectedExpandType == expandType);
 
 					addActionToMenu(actionTagStructure);
@@ -138,5 +148,20 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 		});
 
 		return fMenu;
+	}
+
+	/**
+	 * get expand type from the selected tag
+	 * 
+	 * @return
+	 */
+	private int getSelectedExpandType() {
+		int selectedExpandType = -1;
+		final StructuredSelection selection = (StructuredSelection) fTourViewer.getTreeViewer().getSelection();
+		if (selection.getFirstElement() instanceof TVITagViewTag) {
+			final TVITagViewTag itemTag = (TVITagViewTag) selection.getFirstElement();
+			selectedExpandType = itemTag.expandType;
+		}
+		return selectedExpandType;
 	}
 }

@@ -43,6 +43,16 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
+	 * clear children so they will be fetched again
+	 */
+	public void clearChildren() {
+		if (fChildren != null) {
+			fChildren.clear();
+		}
+		fChildren = null;
+	}
+
+	/**
 	 * fetches the children for this tree item, childs can be added to this tree item with
 	 * {@link #addChild(TreeViewerItem)}
 	 */
@@ -172,13 +182,6 @@ public abstract class TreeViewerItem {
 		}
 
 		return isRemoved;
-	}
-
-	/**
-	 * reset children that they will be fetched again
-	 */
-	public void resetChildren() {
-		fChildren = null;
 	}
 
 	public void setChildren(final ArrayList<TreeViewerItem> children) {

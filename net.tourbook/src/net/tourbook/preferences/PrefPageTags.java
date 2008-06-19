@@ -602,7 +602,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 					/*
 					 * update viewer
 					 */
-					parentCategoryItem.resetChildren();
+					parentCategoryItem.clearChildren();
 
 					fTagViewer.update(parentCategoryItem, null);
 					fTagViewer.add(parentCategoryItem, newCategoryItem);
@@ -744,7 +744,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				/*
 				 * update viewer
 				 */
-				parentCategoryItem.resetChildren();
+				parentCategoryItem.clearChildren();
 
 				fTagViewer.add(parentCategoryItem, tourTagItem);
 
