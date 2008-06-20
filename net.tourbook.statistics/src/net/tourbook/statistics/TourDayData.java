@@ -53,4 +53,6 @@ public class TourDayData {
 
 	ArrayList<String>	tourDescription;
 
+	ArrayList<Long>[]	fTagIds;
+
 }

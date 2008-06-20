@@ -242,6 +242,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		fSelectedTourId = fTourDayData.fTourIds[valueIndex];
 
 		final String tourTypeName = TourDatabase.getTourTypeName(fTourDayData.fTypeIds[valueIndex]);
+//		final String tourTags = TourDatabase.getInstance().getTagNames(fTourDayData.fTagIds[valueIndex]);
 		final String tourDescription = fTourDayData.tourDescription.get(valueIndex).replace(UI.SYSTEM_NEW_LINE, UI.NEW_LINE);
 
 		final int[] startValue = fTourDayData.fTourStartValues;
@@ -270,6 +271,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_tour_type);
+		toolTipFormat.append(NEW_LINE);
+//		toolTipFormat.append(Messages.tourtime_info_tags);
 
 		if (tourDescription.length() > 0) {
 			toolTipFormat.append(NEW_LINE);
@@ -309,6 +312,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				(breakTime % 3600) / 60,
 				//
 				tourTypeName,
+//				tourTags,
 				//
 				tourDescription
 		//

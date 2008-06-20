@@ -36,8 +36,6 @@ public class DataProviderTourDay extends DataProvider {
 
 	private TourDayData					fTourDayData;
 
-	private DataProviderTourDay() {}
-
 	public static DataProviderTourDay getInstance() {
 		if (fInstance == null) {
 			fInstance = new DataProviderTourDay();
@@ -45,10 +43,12 @@ public class DataProviderTourDay extends DataProvider {
 		return fInstance;
 	}
 
+	private DataProviderTourDay() {}
+
 	TourDayData getDayData(	final TourPerson person,
 							final TourTypeFilter tourTypeFilter,
 							final int lastYear,
-							int numberOfYears,
+							final int numberOfYears,
 							final boolean refreshData) {
 
 		// dont reload data which are already here
@@ -81,24 +81,32 @@ public class DataProviderTourDay extends DataProvider {
 
 		final String sqlString = //
 		"SELECT " // //$NON-NLS-1$
-				+ "TourId, " //				// 1 //$NON-NLS-1$
-				+ "StartYear, " // 			// 2 //$NON-NLS-1$
-				+ "StartMonth, " // 		// 3 //$NON-NLS-1$
-				+ "StartDay, " // 			// 4 //$NON-NLS-1$
-				+ "StartHour, " // 			// 5 //$NON-NLS-1$
-				+ "StartMinute, " // 		// 6 //$NON-NLS-1$
-				+ "TourDistance, " // 		// 7 //$NON-NLS-1$
-				+ "TourAltUp, " // 			// 8 //$NON-NLS-1$
-				+ "TourDrivingTime, " // 	// 9 //$NON-NLS-1$
-				+ "TourRecordingTime, " // 	// 10 //$NON-NLS-1$
-				+ "TourTitle, " //			// 11 //$NON-NLS-1$
-				+ "TourType_typeId, " // 	// 12 //$NON-NLS-1$
-				+ "TourDescription " // 	// 13 //$NON-NLS-1$
-				+ "\n" //$NON-NLS-1$
-				//
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "TourId, " //					// 1 //$NON-NLS-1$
+				+ "StartYear, " // 				// 2 //$NON-NLS-1$
+				+ "StartMonth, " // 			// 3 //$NON-NLS-1$
+				+ "StartDay, " // 				// 4 //$NON-NLS-1$
+				+ "StartHour, " // 				// 5 //$NON-NLS-1$
+				+ "StartMinute, " // 			// 6 //$NON-NLS-1$
+				+ "TourDistance, " // 			// 7 //$NON-NLS-1$
+				+ "TourAltUp, " // 				// 8 //$NON-NLS-1$
+				+ "TourDrivingTime, " // 		// 9 //$NON-NLS-1$
+				+ "TourRecordingTime, " // 		// 10 //$NON-NLS-1$
+				+ "TourTitle, " //				// 11 //$NON-NLS-1$
+				+ "TourType_typeId, " // 		// 12 //$NON-NLS-1$
+				+ "TourDescription, " // 		// 13 //$NON-NLS-1$
+				
+				+ "jTdataTtag.TourTag_tagId"//	// 14 //$NON-NLS-1$ 
+				+ UI.NEW_LINE
+
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
+
+				// get tag id's
+				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag")
+				+ (" ON tourID = jTdataTtag.TourData_tourId")
+
+				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
 				+ getSQLFilter(person, tourTypeFilter)
+
 				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute "); //$NON-NLS-1$
 
 		try {
@@ -254,7 +262,7 @@ public class DataProviderTourDay extends DataProvider {
 
 			// get number of days for all years
 			int yearDays = 0;
-			for (int doy : fYearDays) {
+			for (final int doy : fYearDays) {
 				yearDays += doy;
 			}
 
@@ -270,6 +278,9 @@ public class DataProviderTourDay extends DataProvider {
 
 			fTourDayData.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
 			fTourDayData.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
+
+//ArrayList<Long>[] dbTagIds;
+//fTourDayData.fTagIds = dbTagIds;
 
 			fTourDayData.fTimeLow = timeLow;
 			fTourDayData.fDistanceLow = distanceLow;
