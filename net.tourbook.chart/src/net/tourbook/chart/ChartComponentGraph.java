@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -63,6 +64,11 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class ChartComponentGraph extends Canvas {
 
+	/**
+	 * maximum width in pixel for the width of the tooltip
+	 */
+	private static final int			MAX_TOOLTIP_WIDTH		= 500;
+	
 	private static final int			BAR_MARKER_WIDTH		= 16;
 	/**
 	 * the factor is multiplied whth the visible graph width, so that the sliders are indented from
@@ -4871,6 +4877,7 @@ public class ChartComponentGraph extends Canvas {
 			return true;
 		}
 
+		// title
 		if (toolTipTitle != null) {
 			fToolTipTitle.setText(toolTipTitle);
 			fToolTipTitle.pack(true);
@@ -4879,14 +4886,25 @@ public class ChartComponentGraph extends Canvas {
 			fToolTipTitle.setVisible(false);
 		}
 
+		// label
 		fToolTipLabel.setText(toolTipLabel);
+		GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT).applyTo(fToolTipLabel);
 		fToolTipLabel.pack(true);
 
-		fToolTipContainer.pack(true);
-		final Point containerSize = fToolTipContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+		/*
+		 * adjust width of the tooltip when it exeeds the maximum
+		 */
+		Point containerSize = fToolTipContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+		if (containerSize.x > MAX_TOOLTIP_WIDTH) {
+
+			GridDataFactory.fillDefaults().hint(MAX_TOOLTIP_WIDTH, SWT.DEFAULT).applyTo(fToolTipLabel);
+			fToolTipLabel.pack(true);
+			
+			containerSize = fToolTipContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+		}
+
 		fToolTipContainer.setSize(containerSize);
-//final x
-		fToolTipShell.pack();
+		fToolTipShell.pack(true);
 
 		/*
 		 * On some platforms, there is a minimum size for a shell which may be greater than the
