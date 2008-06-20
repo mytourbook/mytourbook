@@ -32,6 +32,7 @@ import net.tourbook.tag.TVITourTagCategory;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.ActionExpandSelection;
 import net.tourbook.ui.ActionRefreshView;
 import net.tourbook.ui.ActionSetTreeExpandType;
 import net.tourbook.ui.ColumnManager;
@@ -40,6 +41,7 @@ import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourCatalog.ActionCollapseAll;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
@@ -109,6 +111,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 																		.createImage();
 	private Image					fImgTag						= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
 																		.createImage();
+
 
 //	private Connection				fConnection;
 
@@ -194,10 +197,14 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		fActionRefreshView = new ActionRefreshView(this);
 		fActionSetTreeExpandType = new ActionSetTreeExpandType(this);
 
+
 		/*
 		 * action in the view toolbar
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(new ActionExpandSelection(fTagViewer));
+		tbm.add(new ActionCollapseAll(fTagViewer));
 
 		tbm.add(fActionRefreshView);
 	}

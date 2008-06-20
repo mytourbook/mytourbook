@@ -32,7 +32,7 @@ import net.tourbook.tag.TVITourTag;
 import net.tourbook.tag.TVITourTagCategory;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
-import net.tourbook.ui.ActionExpandAll;
+import net.tourbook.ui.ActionExpandSelection;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.ToolBarManager;
@@ -420,6 +420,19 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
 	}
 
+	/**
+	 * set the toolbar action after the {@link #fTagViewer} is created
+	 */
+	private void createToolbarActions() {
+
+		final ToolBarManager tbm = new ToolBarManager(fToolBar);
+
+		tbm.add(new ActionExpandSelection(fTagViewer));
+		tbm.add(new ActionCollapseAll(fTagViewer));
+
+		tbm.update(true);
+	}
+
 	private Composite createUI(final Composite parent) {
 
 		// container
@@ -447,7 +460,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		createTagViewer(container);
 		createButtons(container);
 
-		setToolbarActions();
+		createToolbarActions();
 
 		return container;
 	}
@@ -918,19 +931,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	public void setIsModified(final boolean fIsModified) {
 		this.fIsModified = fIsModified;
-	}
-
-	/**
-	 * set the toolbar action after the {@link #fTagViewer} is created
-	 */
-	private void setToolbarActions() {
-
-		final ToolBarManager tbm = new ToolBarManager(fToolBar);
-
-		tbm.add(new ActionExpandAll(fTagViewer));
-		tbm.add(new ActionCollapseAll(fTagViewer));
-
-		tbm.update(true);
 	}
 
 	private void updateTagViewer() {

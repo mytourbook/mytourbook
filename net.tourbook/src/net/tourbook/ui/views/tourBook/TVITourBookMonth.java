@@ -79,6 +79,7 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " Tdata" + UI.NEW_LINE) //			//$NON-NLS-1$ //$NON-NLS-2$
 
+				// get tag id's
 				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag")
 				+ (" ON Tdata.tourID = jTdataTtag.TourData_tourId")
 

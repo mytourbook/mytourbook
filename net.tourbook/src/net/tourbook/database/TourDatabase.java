@@ -400,10 +400,10 @@ public class TourDatabase {
 	}
 
 	/**
-	 * @return Returns all tour tags which are stored in the database
+	 * @return Returns all tour tags which are stored in the database, the hash key is the tag id
 	 */
 	@SuppressWarnings("unchecked")
-	private static HashMap<Long, TourTag> getTourTags() {
+	public static HashMap<Long, TourTag> getTourTags() {
 
 		if (fTourTags != null) {
 			return fTourTags;

@@ -40,13 +40,16 @@ public class Messages extends NLS {
 	public static String		App_Action_open_tour_segmenter_tooltip;
 
 	public static String		app_action_collapse_all_tooltip;
-	public static String		app_action_expand_all_tooltip;
+	public static String	app_action_expand_selection_tooltip;
+
 	public static String		app_action_expand_type_flat;
 	public static String		app_action_expand_type_year_month_day;
 	public static String		app_action_quick_edit;
 	public static String		app_action_set_tour_tag_tree_expand_type;
 
 	public static String	app_action_tag_add;
+
+	public static String	app_action_tag_recently_used;
 
 	public static String	app_action_tag_remove;
 

@@ -17,7 +17,6 @@ package net.tourbook.ui.views.tourCatalog;
 
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.ITourViewer;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -25,13 +24,13 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class ActionCollapseAll extends Action {
 
-	private ITourViewer	fTourViewer;
+	private TreeViewer	fTreeViewer;
 
-	public ActionCollapseAll(ITourViewer tourViewer) {
+	public ActionCollapseAll(final TreeViewer treeViewer) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		fTourViewer = tourViewer;
+		fTreeViewer = treeViewer;
 
 		setToolTipText(Messages.tourCatalog_view_action_collapse_all_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
@@ -40,16 +39,14 @@ public class ActionCollapseAll extends Action {
 	@Override
 	public void run() {
 
-		TreeViewer treeViewer = fTourViewer.getTreeViewer();
+		if (fTreeViewer != null) {
 
-		if (treeViewer != null) {
+			fTreeViewer.collapseAll();
 
-			treeViewer.collapseAll();
-
-			Object firstElement = ((StructuredSelection) treeViewer.getSelection()).getFirstElement();
+			final Object firstElement = ((StructuredSelection) fTreeViewer.getSelection()).getFirstElement();
 
 			if (firstElement != null) {
-				treeViewer.reveal(firstElement);
+				fTreeViewer.reveal(firstElement);
 			}
 		}
 	}

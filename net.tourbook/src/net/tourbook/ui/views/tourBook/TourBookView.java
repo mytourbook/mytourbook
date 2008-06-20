@@ -30,12 +30,14 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.ActionExpandSelection;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionRefreshView;
 import net.tourbook.ui.ActionRemoveAllTags;
@@ -153,7 +155,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private ActionDeleteTour		fActionDeleteTour;
 	private ActionSetTourType		fActionSetTourType;
 	private ActionModifyColumns		fActionModifyColumns;
-	private ActionCollapseAll		fActionCollapseAll;
 	private ActionSetTourTag		fActionAddTag;
 	private ActionSetTourTag		fActionRemoveTag;
 	private ActionRemoveAllTags		fActionRemoveAllTags;
@@ -311,11 +312,10 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
 
 		fActionModifyColumns = new ActionModifyColumns(this);
-		fActionCollapseAll = new ActionCollapseAll(this);
-
 		fActionRefreshView = new ActionRefreshView(this);
 
 		final IActionBars actionBars = getViewSite().getActionBars();
+
 		/*
 		 * fill view menu
 		 */
@@ -326,7 +326,10 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		 * fill view toolbar
 		 */
 		final IToolBarManager tbm = actionBars.getToolBarManager();
-		tbm.add(fActionCollapseAll);
+		
+		tbm.add(new ActionExpandSelection(fTourViewer));
+		tbm.add(new ActionCollapseAll(fTourViewer));
+
 		tbm.add(fActionRefreshView);
 	}
 
@@ -843,6 +846,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
+
+		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionDeleteTour);

@@ -26,19 +26,16 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.TagCollection;
-import net.tourbook.tour.TourManager;
+import net.tourbook.tag.TagManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.ui.IEditorPart;
 
 /**
  * Add or removes a tag from the selected tours
@@ -125,108 +122,9 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 		@Override
 		public void run() {
-
-			final Runnable runnable = new Runnable() {
-
-				@SuppressWarnings("unchecked")
-				public void run() {
-
-					// get tours which tag should be changed
-					final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
-					if (selectedTours == null) {
-						return;
-					}
-
-					// update tours which are opened in an editor
-					final ArrayList<TourData> toursInEditor = updateEditors(selectedTours);
-
-					// get all tours which are not opened in an editor
-					final ArrayList<TourData> noneEditorTours = (ArrayList<TourData>) selectedTours.clone();
-					noneEditorTours.removeAll(toursInEditor);
-
-					// add tag in all tours (without tours which are opened in an editor)
-					for (final TourData tourData : noneEditorTours) {
-
-						// set+save the tour tag
-						final Set<TourTag> tourTags = tourData.getTourTags();
-
-						if (fIsAddMode) {
-							// add tag to tour
-							tourTags.add(fTourTag);
-						} else {
-							// remove tag from tour
-							tourTags.remove(fTourTag);
-						}
-
-						// save tour tag
-						TourDatabase.saveTour(tourData);
-					}
-
-					TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
-				}
-
-			};
-			BusyIndicator.showWhile(Display.getCurrent(), runnable);
+			TagManager.setTagsIntoTour(fTourTag, fTourProvider, fIsAddMode);
 		}
-
-		/**
-		 * Update the tour type in tours which are opened in a tour editor
-		 * 
-		 * @param selectedTours
-		 *            contains the tours where the tour type should be changed
-		 * @return Returns the tours which are opened in a tour editor
-		 */
-		private ArrayList<TourData> updateEditors(final ArrayList<TourData> selectedTours) {
-
-			final ArrayList<IEditorPart> editorParts = UI.getOpenedEditors();
-
-			// list for tours which are updated in the editor
-			final ArrayList<TourData> updatedTours = new ArrayList<TourData>();
-
-			// check if a tour is in an editor
-//			for (final IEditorPart editorPart : editorParts) {
-//				if (editorPart instanceof TourEditor) {
-//
-//					final IEditorInput editorInput = editorPart.getEditorInput();
-//
-//					if (editorInput instanceof TourEditorInput) {
-//
-//						final TourEditor tourEditor = (TourEditor) editorPart;
-//						final long editorTourId = ((TourEditorInput) editorInput).getTourId();
-//
-//						for (final TourData tourData : selectedTours) {
-//							if (editorTourId == tourData.getTourId()) {
-//
-//								/*
-//								 * a tour editor was found containing the current tour
-//								 */
-//
-//								tourEditor.getTourChart().getTourData().setTourType(fTourTag);
-//
-//								tourEditor.setTourPropertyIsModified();
-//
-//								// keep updated tours
-//								updatedTours.add(tourData);
-//							}
-//						}
-//					}
-//				}
-//			}
-//
-//			// show info that at least one tour is opened in a tour editor
-//			if (fTourProvider.isFromTourEditor() == false && updatedTours.size() > 0) {
-//
-//				/*
-//				 * don't show the message when the tour is from a tour editor
-//				 */
-//
-//				MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
-//						Messages.App_Action_set_tour_type_dlg_title,
-//						Messages.App_Action_set_tour_type_dlg_message);
-//			}
-
-			return updatedTours;
-		}
+		
 	}
 
 	public ActionSetTourTag(final ISelectedTours tourProvider, final boolean isAddMode) {
@@ -284,7 +182,13 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 			actionTourTag.setChecked(isTagChecked);
 
 			// disable tags which are not tagged
-			if (fIsAddMode == false) {
+			if (isOneTour) {
+				if (fIsAddMode) {
+					actionTourTag.setEnabled(!isTagChecked);
+				} else {
+					actionTourTag.setEnabled(isTagChecked);
+				}
+			} else if (fIsAddMode == false) {
 				actionTourTag.setEnabled(isTagChecked);
 			}
 

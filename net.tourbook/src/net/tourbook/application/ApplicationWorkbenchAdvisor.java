@@ -42,13 +42,4 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 		configurer.setSaveAndRestore(true);
 	}
 
-	@Override
-	public boolean preShutdown() {
-
-		// this causes an error
-//		TourDatabase.getInstance().closeConnectionPool();
-
-		return super.preShutdown();
-	}
-
 }

@@ -19,34 +19,36 @@ import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
-public class ActionExpandAll extends Action {
+public class ActionExpandSelection extends Action {
 
 	private TreeViewer	fTreeViewer;
 
-	public ActionExpandAll(final TreeViewer tourViewer) {
+	public ActionExpandSelection(final TreeViewer tourViewer) {
 
 		super(null, AS_PUSH_BUTTON);
 
 		fTreeViewer = tourViewer;
 
-		setToolTipText(Messages.app_action_expand_all_tooltip);
+		setToolTipText(Messages.app_action_expand_selection_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__expand_all));
 	}
 
 	@Override
 	public void run() {
 
-		if (fTreeViewer != null) {
-
-			fTreeViewer.expandAll();
-
-//			final Object firstElement = ((StructuredSelection) fTreeViewer.getSelection()).getFirstElement();
-//
-//			if (firstElement != null) {
-//				fTreeViewer.reveal(firstElement);
-//			}
+		if (fTreeViewer == null) {
+			return;
 		}
+
+		final StructuredSelection selection = (StructuredSelection) fTreeViewer.getSelection();
+
+		if (selection.size() == 0) {
+			return;
+		}
+
+		fTreeViewer.expandToLevel(selection.getFirstElement(), 2);//TreeViewer.ALL_LEVELS);
 	}
 }

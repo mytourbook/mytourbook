@@ -80,6 +80,7 @@ Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
    org.eclipse.jface.viewers,
    net.tourbook.ui.views.tourCatalog,
    org.eclipse.swt.widgets",
+ net.tourbook.tag,
  net.tourbook.tour;
   uses:="org.eclipse.ui.handlers,
    org.eclipse.core.runtime,

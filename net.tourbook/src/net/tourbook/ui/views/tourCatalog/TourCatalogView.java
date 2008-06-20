@@ -494,7 +494,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		fActionRenameRefTour = new ActionRenameRefTour(this);
 		fActionLinkTour = new ActionLinkTour(this);
 		fActionRefreshView = new ActionRefreshView(this);
-		fActionCollapseAll = new ActionCollapseAll(this);
+		fActionCollapseAll = new ActionCollapseAll(fTourViewer);
 	}
 
 	/**

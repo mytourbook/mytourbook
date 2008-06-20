@@ -29,6 +29,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ActionEditTour;
 import net.tourbook.tour.IDataModelListener;
@@ -107,6 +108,8 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			menuMgr.add(fActionAddTag);
 			menuMgr.add(fActionRemoveTag);
 			menuMgr.add(fActionRemoveAllTags);
+
+			TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
 
 			menuMgr.add(new Separator());
 			menuMgr.add(fActionEditTour);

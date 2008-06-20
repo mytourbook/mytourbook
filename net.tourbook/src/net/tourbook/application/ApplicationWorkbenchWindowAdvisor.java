@@ -22,6 +22,7 @@ import java.sql.SQLException;
 
 import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.TagManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 
@@ -70,15 +71,67 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private IPropertyListener					partPropertyListener;
 
-	public ApplicationWorkbenchWindowAdvisor(ApplicationWorkbenchAdvisor wbAdvisor,
-			IWorkbenchWindowConfigurer configurer) {
+	public ApplicationWorkbenchWindowAdvisor(final ApplicationWorkbenchAdvisor wbAdvisor,
+			final IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
 		this.wbAdvisor = wbAdvisor;
 
 	}
 
+	private String computeTitle() {
+
+		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+		final IWorkbenchPage currentPage = configurer.getWindow().getActivePage();
+		IWorkbenchPart activePart = null;
+
+		if (currentPage != null) {
+			activePart = currentPage.getActivePart();
+		}
+
+		String title = null;
+		final IProduct product = Platform.getProduct();
+		if (product != null) {
+			title = product.getName();
+		}
+		if (title == null) {
+			title = ""; //$NON-NLS-1$
+		}
+
+		if (currentPage != null) {
+
+			final String shellTitle = Messages.App_Window_Title;
+
+			if (activePart != null) {
+				lastPartTitle = activePart.getTitleToolTip();
+				if (lastPartTitle != null) {
+					if (lastPartTitle.length() > 0) {
+						title = NLS.bind(shellTitle, lastPartTitle, title);
+					}
+				}
+			}
+
+			String label = ""; //$NON-NLS-1$
+
+			final IPerspectiveDescriptor persp = currentPage.getPerspective();
+			if (persp != null) {
+				label = persp.getLabel();
+			}
+
+			final IAdaptable input = currentPage.getInput();
+			if (input != null && !input.equals(wbAdvisor.getDefaultPageInput())) {
+				label = currentPage.getLabel();
+			}
+
+			if (label != null && !label.equals("")) { //$NON-NLS-1$ 
+				title = NLS.bind(shellTitle, label, title);
+			}
+		}
+
+		return title;
+	}
+
 	@Override
-	public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
+	public ActionBarAdvisor createActionBarAdvisor(final IActionBarConfigurer configurer) {
 		fApplicationActionBarAdvisor = new ApplicationActionBarAdvisor(configurer);
 		return fApplicationActionBarAdvisor;
 	}
@@ -88,28 +141,100 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		UI.getInstance().dispose();
 	}
 
-	@Override
-	public void postWindowCreate() {
+	/**
+	 * Hooks the listeners needed on the window
+	 * 
+	 * @param configurer
+	 */
+	private void hookTitleUpdateListeners(final IWorkbenchWindowConfigurer configurer) {
 
-		// show editor area
-//		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
-//		activePage.setEditorAreaVisible(true);
+		// hook up the listeners to update the window title
 
-		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+		configurer.getWindow().addPageListener(new IPageListener() {
 
-		configurer.setTitle(Messages.App_Title + " - " + MyTourbookSplashHandler.APP_BUILD_ID); //$NON-NLS-1$
+			public void pageActivated(final IWorkbenchPage page) {
+				updateTitle();
+			}
+
+			public void pageClosed(final IWorkbenchPage page) {
+				updateTitle();
+			}
+
+			public void pageOpened(final IWorkbenchPage page) {}
+		});
+
+		configurer.getWindow().addPerspectiveListener(new PerspectiveAdapter() {
+
+			@Override
+			public void perspectiveActivated(final IWorkbenchPage page, final IPerspectiveDescriptor perspective) {
+				updateTitle();
+			}
+
+			@Override
+			public void perspectiveDeactivated(final IWorkbenchPage page, final IPerspectiveDescriptor perspective) {
+				updateTitle();
+			}
+
+			@Override
+			public void perspectiveSavedAs(	final IWorkbenchPage page,
+											final IPerspectiveDescriptor oldPerspective,
+											final IPerspectiveDescriptor newPerspective) {
+				updateTitle();
+			}
+		});
+
+		configurer.getWindow().getPartService().addPartListener(new IPartListener2() {
+
+			public void partActivated(final IWorkbenchPartReference ref) {
+				if (ref instanceof IEditorReference || ref instanceof IViewReference) {
+					updateTitle();
+				}
+			}
+
+			public void partBroughtToTop(final IWorkbenchPartReference ref) {
+				if (ref instanceof IEditorReference || ref instanceof IViewReference) {
+					updateTitle();
+				}
+			}
+
+			public void partClosed(final IWorkbenchPartReference ref) {
+				updateTitle();
+			}
+
+			public void partDeactivated(final IWorkbenchPartReference ref) {}
+
+			public void partHidden(final IWorkbenchPartReference ref) {}
+
+			public void partInputChanged(final IWorkbenchPartReference ref) {}
+
+			public void partOpened(final IWorkbenchPartReference ref) {}
+
+			public void partVisible(final IWorkbenchPartReference ref) {}
+		});
+
+		partPropertyListener = new IPropertyListener() {
+			public void propertyChanged(final Object source, final int propId) {
+
+				if (propId == IWorkbenchPartConstants.PROP_TITLE) {
+					if (lastActivePart != null) {
+						final String newTitle = lastActivePart.getTitle();
+						if (!lastPartTitle.equals(newTitle)) {
+							recomputeTitle();
+						}
+					}
+				}
+			}
+		};
 
 	}
 
-	@Override
-	public void postWindowOpen() {
-
-		String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
+	private void loadPeopleData() {
+		final String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
 
 		try {
-			Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement = conn.prepareStatement(sqlString);
-			ResultSet result = statement.executeQuery();
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final ResultSet result = statement.executeQuery();
 
 			if (result.next()) {
 				// people are available, nothing more to do
@@ -118,13 +243,13 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 				// no people are in the db, open the pref dialog to enter people
 
-				Shell activeShell = Display.getCurrent().getActiveShell();
+				final Shell activeShell = Display.getCurrent().getActiveShell();
 
 				MessageDialog.openInformation(activeShell,
 						Messages.App_Dlg_first_startup_title,
 						Messages.App_Dlg_first_startup_msg);
 
-				PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(activeShell,
+				final PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(activeShell,
 						"net.tourbook.preferences.PrefPageClients", //$NON-NLS-1$
 						null,
 						null);
@@ -137,7 +262,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 							null,
 							IWorkbenchPage.VIEW_ACTIVATE);
 				}
-				catch (PartInitException e) {
+				catch (final PartInitException e) {
 					e.printStackTrace();
 				}
 
@@ -148,15 +273,35 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
 
 		}
-		catch (SQLException e) {
+		catch (final SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Override
+	public void postWindowCreate() {
+
+		// show editor area
+//		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
+//		activePage.setEditorAreaVisible(true);
+
+		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+
+		configurer.setTitle(Messages.App_Title + " - " + MyTourbookSplashHandler.APP_BUILD_ID); //$NON-NLS-1$
+
+	}
+
+	@Override
+	public void postWindowOpen() {
+
+		TagManager.restoreSettings();
+		loadPeopleData();
+	}
+
+	@Override
 	public void preWindowOpen() {
 
-		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 
 		configurer.setInitialSize(new Point(900, 700));
 		configurer.setShowCoolBar(true);
@@ -175,91 +320,23 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		hookTitleUpdateListeners(configurer);
 	}
 
-	/**
-	 * Hooks the listeners needed on the window
-	 * 
-	 * @param configurer
-	 */
-	private void hookTitleUpdateListeners(IWorkbenchWindowConfigurer configurer) {
+	@Override
+	public boolean preWindowShellClose() {
+		
+//		TourDatabase.getInstance().closeConnectionPool();
 
-		// hook up the listeners to update the window title
+		TagManager.saveSettings();
+		
+		return super.preWindowShellClose();
+	}
 
-		configurer.getWindow().addPageListener(new IPageListener() {
-
-			public void pageActivated(IWorkbenchPage page) {
-				updateTitle();
-			}
-
-			public void pageClosed(IWorkbenchPage page) {
-				updateTitle();
-			}
-
-			public void pageOpened(IWorkbenchPage page) {}
-		});
-
-		configurer.getWindow().addPerspectiveListener(new PerspectiveAdapter() {
-
-			@Override
-			public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-				updateTitle();
-			}
-
-			@Override
-			public void perspectiveSavedAs(	IWorkbenchPage page,
-											IPerspectiveDescriptor oldPerspective,
-											IPerspectiveDescriptor newPerspective) {
-				updateTitle();
-			}
-
-			@Override
-			public void perspectiveDeactivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-				updateTitle();
-			}
-		});
-
-		configurer.getWindow().getPartService().addPartListener(new IPartListener2() {
-
-			public void partActivated(IWorkbenchPartReference ref) {
-				if (ref instanceof IEditorReference || ref instanceof IViewReference) {
-					updateTitle();
-				}
-			}
-
-			public void partBroughtToTop(IWorkbenchPartReference ref) {
-				if (ref instanceof IEditorReference || ref instanceof IViewReference) {
-					updateTitle();
-				}
-			}
-
-			public void partClosed(IWorkbenchPartReference ref) {
-				updateTitle();
-			}
-
-			public void partDeactivated(IWorkbenchPartReference ref) {}
-
-			public void partOpened(IWorkbenchPartReference ref) {}
-
-			public void partHidden(IWorkbenchPartReference ref) {}
-
-			public void partVisible(IWorkbenchPartReference ref) {}
-
-			public void partInputChanged(IWorkbenchPartReference ref) {}
-		});
-
-		partPropertyListener = new IPropertyListener() {
-			public void propertyChanged(Object source, int propId) {
-
-				if (propId == IWorkbenchPartConstants.PROP_TITLE) {
-					if (lastActivePart != null) {
-						String newTitle = lastActivePart.getTitle();
-						if (!lastPartTitle.equals(newTitle)) {
-							recomputeTitle();
-						}
-					}
-				}
-			}
-		};
-
+	private void recomputeTitle() {
+		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+		final String oldTitle = configurer.getTitle();
+		final String newTitle = computeTitle();
+		if (!newTitle.equals(oldTitle)) {
+			configurer.setTitle(newTitle);
+		}
 	}
 
 	/**
@@ -269,11 +346,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	 */
 	private void updateTitle() {
 
-		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
-		IWorkbenchWindow window = configurer.getWindow();
+		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+		final IWorkbenchWindow window = configurer.getWindow();
 
 		IWorkbenchPart activePart = null;
-		IWorkbenchPage currentPage = window.getActivePage();
+		final IWorkbenchPage currentPage = window.getActivePage();
 
 		IPerspectiveDescriptor persp = null;
 
@@ -301,66 +378,5 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		}
 
 		recomputeTitle();
-	}
-
-	private String computeTitle() {
-
-		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
-		IWorkbenchPage currentPage = configurer.getWindow().getActivePage();
-		IWorkbenchPart activePart = null;
-
-		if (currentPage != null) {
-			activePart = currentPage.getActivePart();
-		}
-
-		String title = null;
-		IProduct product = Platform.getProduct();
-		if (product != null) {
-			title = product.getName();
-		}
-		if (title == null) {
-			title = ""; //$NON-NLS-1$
-		}
-
-		if (currentPage != null) {
-
-			final String shellTitle = Messages.App_Window_Title;
-
-			if (activePart != null) {
-				lastPartTitle = activePart.getTitleToolTip();
-				if (lastPartTitle != null) {
-					if (lastPartTitle.length() > 0) {
-						title = NLS.bind(shellTitle, lastPartTitle, title);
-					}
-				}
-			}
-
-			String label = ""; //$NON-NLS-1$
-
-			IPerspectiveDescriptor persp = currentPage.getPerspective();
-			if (persp != null) {
-				label = persp.getLabel();
-			}
-
-			IAdaptable input = currentPage.getInput();
-			if (input != null && !input.equals(wbAdvisor.getDefaultPageInput())) {
-				label = currentPage.getLabel();
-			}
-
-			if (label != null && !label.equals("")) { //$NON-NLS-1$ 
-				title = NLS.bind(shellTitle, label, title);
-			}
-		}
-
-		return title;
-	}
-
-	private void recomputeTitle() {
-		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
-		String oldTitle = configurer.getTitle();
-		String newTitle = computeTitle();
-		if (!newTitle.equals(oldTitle)) {
-			configurer.setTitle(newTitle);
-		}
 	}
 }
