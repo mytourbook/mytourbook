@@ -16,6 +16,7 @@
 package net.tourbook.statistics;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TourDayData {
 
@@ -53,6 +54,9 @@ public class TourDayData {
 
 	ArrayList<String>	tourDescription;
 
-	ArrayList<Long>[]	fTagIds;
+	/**
+	 * hashmap contains the tags for the tour where the key is the tour ID
+	 */
+	HashMap<Long, ArrayList<Long>>	fTagIds;
 
 }

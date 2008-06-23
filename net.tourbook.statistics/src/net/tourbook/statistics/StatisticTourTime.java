@@ -341,12 +341,13 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				final int tourDOY = tourDOYValues[valueIndex];
 				fCalendar.set(oldestYear, 0, 1);
 				fCalendar.set(Calendar.DAY_OF_YEAR, tourDOY + 1);
-				String beginDate = fDateFormatter.format(fCalendar.getTime());
+				final String beginDate = fDateFormatter.format(fCalendar.getTime());
 
 				fCurrentMonth = fCalendar.get(Calendar.MONTH) + 1;
 				fSelectedTourId = fTourTimeData.fTourIds[valueIndex];
 
 				final String tourTypeName = TourDatabase.getTourTypeName(fTourTimeData.fTypeIds[valueIndex]);
+				final String tourTags = TourDatabase.getTagNames(fTourTimeData.fTagIds.get(fSelectedTourId));
 				final String tourDescription = fTourTimeData.tourDescription.get(valueIndex).replace(UI.SYSTEM_NEW_LINE,
 						UI.NEW_LINE);
 
@@ -357,7 +358,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				final Integer drivingTime = fTourTimeData.fTourDrivingTimeValues.get(valueIndex);
 				final int breakTime = recordingTime - drivingTime;
 
-				StringBuilder toolTipFormat = new StringBuilder();
+				final StringBuilder toolTipFormat = new StringBuilder();
 				toolTipFormat.append(Messages.tourtime_info_date_day);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(NEW_LINE);
@@ -365,8 +366,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_altitude);
 				toolTipFormat.append(NEW_LINE);
-				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_time);
+				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_recording_time);
 				toolTipFormat.append(NEW_LINE);
@@ -376,6 +377,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(NEW_LINE);
 				toolTipFormat.append(Messages.tourtime_info_tour_type);
+				toolTipFormat.append(NEW_LINE);
+				toolTipFormat.append(Messages.tourtime_info_tags);
 
 				if (tourDescription.length() > 0) {
 					toolTipFormat.append(NEW_LINE);
@@ -410,6 +413,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 						(breakTime % 3600) / 60,
 						//					
 						tourTypeName,
+						tourTags,
+						//
 						tourDescription
 //
 				)
@@ -423,7 +428,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 					tourTitle = tourTypeName;
 				}
 
-				ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+				final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 				toolTipInfo.setTitle(tourTitle);
 				toolTipInfo.setLabel(toolTipLabel);
 //				toolTipInfo.setLabel(toolTipFormat.toString());

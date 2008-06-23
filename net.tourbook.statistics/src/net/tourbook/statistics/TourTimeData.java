@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -16,6 +16,7 @@
 package net.tourbook.statistics;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TourTimeData {
 
@@ -48,4 +49,8 @@ public class TourTimeData {
 	ArrayList<String>	fTourTitle;
 	ArrayList<String>	tourDescription;
 
+	/**
+	 * hashmap contains the tags for the tour where the key is the tour ID
+	 */
+	HashMap<Long, ArrayList<Long>>	fTagIds;
 }

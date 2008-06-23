@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -65,7 +66,7 @@ public class DataProviderTourTime extends DataProvider {
 	TourTimeData getTourTimeData(	final TourPerson person,
 									final TourTypeFilter tourTypeFilter,
 									final int lastYear,
-									int numberOfYears,
+									final int numberOfYears,
 									final boolean refreshData) {
 
 		// dont reload data which are already here
@@ -94,23 +95,31 @@ public class DataProviderTourTime extends DataProvider {
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		final String sqlString = "SELECT " //$NON-NLS-1$
-				+ "TourId, " //				1 //$NON-NLS-1$
-				+ "StartYear, " //			2 //$NON-NLS-1$
-				+ "StartMonth, " //			3 //$NON-NLS-1$
-				+ "StartDay, " //			4 //$NON-NLS-1$
-				+ "StartHour, " //			5 //$NON-NLS-1$
-				+ "StartMinute, " //		6 //$NON-NLS-1$
-				+ "TourDistance, " //		7 //$NON-NLS-1$
-				+ "TourAltUp, " //			8 //$NON-NLS-1$
-				+ "TourRecordingTime, " //	9 //$NON-NLS-1$
-				+ "TourDrivingTime, "//		10 //$NON-NLS-1$
-				+ "TourTitle, " //			11 //$NON-NLS-1$
-				+ "TourType_typeId, "//		12 //$NON-NLS-1$
-				+ "TourDescription " // 	13 //$NON-NLS-1$
-				+ "\n" //$NON-NLS-1$
+				+ "TourId," //					1 //$NON-NLS-1$
+				+ "StartYear," //				2 //$NON-NLS-1$
+				+ "StartMonth," //				3 //$NON-NLS-1$
+				+ "StartDay," //				4 //$NON-NLS-1$
+				+ "StartHour," //				5 //$NON-NLS-1$
+				+ "StartMinute," //				6 //$NON-NLS-1$
+				+ "TourDistance," //			7 //$NON-NLS-1$
+				+ "TourAltUp," //				8 //$NON-NLS-1$
+				+ "TourRecordingTime," //		9 //$NON-NLS-1$
+				+ "TourDrivingTime,"//			10 //$NON-NLS-1$
+				+ "TourTitle," //				11 //$NON-NLS-1$
+				+ "TourType_typeId,"//			12 //$NON-NLS-1$
+				+ "TourDescription," // 		13 //$NON-NLS-1$
 
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "jTdataTtag.TourTag_tagId"//	14 //$NON-NLS-1$ 
+
+				+ UI.NEW_LINE
+
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ 
+
+				// get tag id's
+				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag")
+				+ (" ON tourID = jTdataTtag.TourData_tourId")
+
+				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
 				+ getSQLFilter(person, tourTypeFilter)
 				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute"); //$NON-NLS-1$
 
@@ -140,63 +149,93 @@ public class DataProviderTourTime extends DataProvider {
 
 			fTourIds = new ArrayList<Long>();
 
+			final HashMap<Long, ArrayList<Long>> dbTagIds = new HashMap<Long, ArrayList<Long>>();
+
+			long lastTourId = -1;
+			ArrayList<Long> tagIds = null;
+
 			while (result.next()) {
 
-				fTourIds.add(result.getLong(1));
+				final long tourId = result.getLong(1);
+				final Object dbTagId = result.getObject(14);
 
-				final int tourYear = result.getShort(2);
-				final int tourMonth = result.getShort(3) - 1;
-				final int startHour = result.getShort(5);
-				final int startMinute = result.getShort(6);
-				final int startTime = startHour * 3600 + startMinute * 60;
+				if (tourId == lastTourId) {
 
-				final int recordingTime = result.getInt(9);
-				fCalendar.set(tourYear, tourMonth, result.getShort(4), startHour, startMinute);
-				final int tourDOY = fCalendar.get(Calendar.DAY_OF_YEAR) - 1;
+					// get additional tags from outer join
 
-				dbTourYear.add(tourYear);
-				dbTourMonths.add(tourMonth);
-				dbAllYearsDOY.add(getYearDOYs(tourYear) + tourDOY);
+					if (dbTagId instanceof Long) {
+						tagIds.add((Long) dbTagId);
+					}
 
-				dbTourStartTime.add(startTime);
-				dbTourEndTime.add((startTime + recordingTime));
+				} else {
 
-				dbDistance.add((int) (result.getInt(7) / 1000 / UI.UNIT_VALUE_DISTANCE));
-				dbAltitude.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
+					// get first record for a tour
 
-				dbTourRecordingTime.add(recordingTime);
-				dbTourDrivingTime.add(result.getInt(10));
+					fTourIds.add(tourId);
 
-				dbTourTitle.add(result.getString(11));
+					final int tourYear = result.getShort(2);
+					final int tourMonth = result.getShort(3) - 1;
+					final int startHour = result.getShort(5);
+					final int startMinute = result.getShort(6);
+					final int startTime = startHour * 3600 + startMinute * 60;
 
-				final String description = result.getString(13);
-				dbTourDescription.add(description == null ? UI.EMPTY_STRING : description);
+					final int recordingTime = result.getInt(9);
+					fCalendar.set(tourYear, tourMonth, result.getShort(4), startHour, startMinute);
+					final int tourDOY = fCalendar.get(Calendar.DAY_OF_YEAR) - 1;
 
-				/*
-				 * convert type id to the type index in the tour type array, this is also the color
-				 * index for the tour type
-				 */
-				int tourTypeColorIndex = 0;
-				final Long dbTypeIdObject = (Long) result.getObject(12);
-				if (dbTypeIdObject != null) {
-					final long dbTypeId = result.getLong(12);
-					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
-						if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
-							tourTypeColorIndex = colorOffset + typeIndex;
-							break;
+					dbTourYear.add(tourYear);
+					dbTourMonths.add(tourMonth);
+					dbAllYearsDOY.add(getYearDOYs(tourYear) + tourDOY);
+
+					dbTourStartTime.add(startTime);
+					dbTourEndTime.add((startTime + recordingTime));
+
+					dbDistance.add((int) (result.getInt(7) / 1000 / UI.UNIT_VALUE_DISTANCE));
+					dbAltitude.add((int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE));
+
+					dbTourRecordingTime.add(recordingTime);
+					dbTourDrivingTime.add(result.getInt(10));
+
+					dbTourTitle.add(result.getString(11));
+
+					final String description = result.getString(13);
+					dbTourDescription.add(description == null ? UI.EMPTY_STRING : description);
+
+					if (dbTagId instanceof Long) {
+						tagIds = new ArrayList<Long>();
+						tagIds.add((Long) dbTagId);
+
+						dbTagIds.put(tourId, tagIds);
+					}
+
+					/*
+					 * convert type id to the type index in the tour type array, this is also the
+					 * color index for the tour type
+					 */
+					int tourTypeColorIndex = 0;
+					final Long dbTypeIdObject = (Long) result.getObject(12);
+					if (dbTypeIdObject != null) {
+						final long dbTypeId = result.getLong(12);
+						for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
+							if (tourTypes[typeIndex].getTypeId() == dbTypeId) {
+								tourTypeColorIndex = colorOffset + typeIndex;
+								break;
+							}
 						}
 					}
+
+					dbTypeColorIndex.add(tourTypeColorIndex);
+					dbTypeIds.add(dbTypeIdObject == null ? TourDatabase.ENTITY_IS_NOT_SAVED : dbTypeIdObject);
 				}
 
-				dbTypeColorIndex.add(tourTypeColorIndex);
-				dbTypeIds.add(dbTypeIdObject == null ? TourDatabase.ENTITY_IS_NOT_SAVED : dbTypeIdObject);
+				lastTourId = tourId;
 			}
 
 			conn.close();
 
 			// get number of days for all years
 			int yearDays = 0;
-			for (int doy : fYearDays) {
+			for (final int doy : fYearDays) {
 				yearDays += doy;
 			}
 
@@ -209,6 +248,8 @@ public class DataProviderTourTime extends DataProvider {
 
 			fTourDataTime.fTypeIds = ArrayListToArray.toLong(dbTypeIds);
 			fTourDataTime.fTypeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
+
+			fTourDataTime.fTagIds = dbTagIds;
 
 			fTourDataTime.allDaysInAllYears = yearDays;
 			fTourDataTime.yearDays = fYearDays;
@@ -237,7 +278,7 @@ public class DataProviderTourTime extends DataProvider {
 		return fTourDataTime;
 	}
 
-	void setSelectedTourId(Long selectedTourId) {
+	void setSelectedTourId(final Long selectedTourId) {
 		fSelectedTourId = selectedTourId;
 	}
 
