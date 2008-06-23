@@ -29,8 +29,10 @@ import net.tourbook.tour.TreeViewerItem;
  */
 public class TVITagViewRoot extends TVITagViewItem {
 
+	private TagView	fTagView;
+
 	public TVITagViewRoot(final TagView tagView) {
-		super(tagView);
+		fTagView = tagView;
 	}
 
 	@Override
@@ -59,18 +61,18 @@ public class TVITagViewRoot extends TVITagViewItem {
 
 			sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY);
 			sb.append(" WHERE isRoot = 1");
+			sb.append(" ORDER BY name");
 
 			statement = conn.prepareStatement(sb.toString());
 			result = statement.executeQuery();
 
 			while (result.next()) {
 
-				final TVITagViewTagCategory treeItem = new TVITagViewTagCategory(getTagView());
+				final TVITagViewTagCategory treeItem = new TVITagViewTagCategory(this);
+				children.add(treeItem);
 
 				treeItem.tagCategoryId = result.getLong(1);
 				treeItem.treeColumn = result.getString(2);
-
-				children.add(treeItem);
 			}
 
 			/*
@@ -84,17 +86,18 @@ public class TVITagViewRoot extends TVITagViewItem {
 
 			sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG);
 			sb.append(" WHERE isRoot = 1");
+			sb.append(" ORDER BY name");
 
 			statement = conn.prepareStatement(sb.toString());
 			result = statement.executeQuery();
 
 			while (result.next()) {
 
-				final TVITagViewTag treeItem = new TVITagViewTag(getTagView());
+				final TVITagViewTag treeItem = new TVITagViewTag(this);
 
 				treeItem.tagId = result.getLong(1);
 				treeItem.treeColumn = result.getString(2);
-				treeItem.expandType = result.getInt(3);
+				treeItem.setExpandType(result.getInt(3));
 
 				children.add(treeItem);
 			}
@@ -104,6 +107,10 @@ public class TVITagViewRoot extends TVITagViewItem {
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public TagView getTagView() {
+		return fTagView;
 	}
 
 	@Override

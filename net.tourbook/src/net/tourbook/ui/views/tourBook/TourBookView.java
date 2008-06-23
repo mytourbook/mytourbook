@@ -622,7 +622,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					cell.setText(TourDatabase.getInstance().getTagNames(((TVITourBookTour) element).fTagIds));
+					TourDatabase.getInstance();
+					cell.setText(TourDatabase.getTagNames(((TVITourBookTour) element).fTagIds));
 				}
 				setCellColor(cell, element);
 			}

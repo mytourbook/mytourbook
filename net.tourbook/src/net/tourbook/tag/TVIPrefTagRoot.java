@@ -27,9 +27,9 @@ import net.tourbook.database.TourDatabase;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
-public class TVIRootItem extends TVIPrefTagViewer {
+public class TVIPrefTagRoot extends TVIPrefTagViewer {
 
-	public TVIRootItem(final TreeViewer tagViewer) {
+	public TVIPrefTagRoot(final TreeViewer tagViewer) {
 		super(tagViewer);
 	}
 
@@ -53,7 +53,7 @@ public class TVIRootItem extends TVIPrefTagViewer {
 			tourTags = (ArrayList<TourTag>) query.getResultList();
 
 			for (final TourTag tourTag : tourTags) {
-				addChild(new TVITourTag(getTagViewer(), tourTag));
+				addChild(new TVIPrefTag(getTagViewer(), tourTag));
 			}
 
 			/*
@@ -66,7 +66,7 @@ public class TVIRootItem extends TVIPrefTagViewer {
 			final ArrayList<TourTagCategory> tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
 
 			for (final TourTagCategory tourTagCategory : tourTagCategories) {
-				addChild(new TVITourTagCategory(getTagViewer(), tourTagCategory));
+				addChild(new TVIPrefTagCategory(getTagViewer(), tourTagCategory));
 			}
 
 			em.close();

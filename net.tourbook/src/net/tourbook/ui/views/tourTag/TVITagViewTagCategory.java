@@ -11,10 +11,11 @@ import net.tourbook.tour.TreeViewerItem;
 
 public class TVITagViewTagCategory extends TVITagViewItem {
 
-	public long	tagCategoryId;
 
-	public TVITagViewTagCategory(final TagView tagView) {
-		super(tagView);
+	public long				tagCategoryId;
+
+	public TVITagViewTagCategory(final TVITagViewItem parentItem) {
+		setParentItem(parentItem);
 	}
 
 	@Override
@@ -40,16 +41,18 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 			/*
 			 * get tag categories
 			 */
-			sb.append("SELECT ");
+			sb.append("SELECT");
 
 			sb.append(" tblCat.tagCategoryId,");//	//1
 			sb.append(" tblCat.name");//			//2
 
 			sb.append(" FROM " + jTblCatCat + " jTblCatCat");
+			
 			sb.append(" LEFT OUTER JOIN " + tblCat + " tblCat ON ");
 			sb.append(" jTblCatCat.TourTagCategory_tagCategoryId2 = tblCat.tagCategoryId ");
 
 			sb.append(" WHERE jTblCatCat.TourTagCategory_tagCategoryId1 = ?");// + tagCategoryId);
+			sb.append(" ORDER BY tblCat.name");
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			PreparedStatement statement = conn.prepareStatement(sb.toString());
@@ -58,29 +61,31 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 			ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
-				final TVITagViewTagCategory treeItem = new TVITagViewTagCategory(getTagView());
+				final TVITagViewTagCategory treeItem = new TVITagViewTagCategory(this);
+				children.add(treeItem);
 
 				treeItem.tagCategoryId = result.getLong(1);
 				treeItem.treeColumn = result.getString(2);
 
-				children.add(treeItem);
 			}
 
 			/*
 			 * get tags
 			 */
 			sb.setLength(0);
-			sb.append("SELECT ");
+			sb.append("SELECT");
 
 			sb.append(" tblTag.tagId,");//		1
 			sb.append(" tblTag.name,");//		2
 			sb.append(" tblTag.expandType");//	3
 
 			sb.append(" FROM " + jTblCatTag + " jTblCatTag");
+			
 			sb.append(" LEFT OUTER JOIN " + tblTag + " tblTag ON ");
 			sb.append(" jTblCatTag.TourTag_TagId = tblTag.tagId ");
 
 			sb.append(" WHERE jTblCatTag.TourTagCategory_TagCategoryId = ?");
+			sb.append(" ORDER BY tblTag.name");
 
 			statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, tagCategoryId);
@@ -88,11 +93,11 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 			result = statement.executeQuery();
 			while (result.next()) {
 
-				final TVITagViewTag treeItem = new TVITagViewTag(getTagView());
+				final TVITagViewTag treeItem = new TVITagViewTag(this);
 
 				treeItem.tagId = result.getLong(1);
 				treeItem.treeColumn = result.getString(2);
-				treeItem.expandType = result.getInt(3);
+				treeItem.setExpandType(result.getInt(3));
 
 				children.add(treeItem);
 			}

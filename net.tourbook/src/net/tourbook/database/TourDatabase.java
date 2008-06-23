@@ -331,6 +331,43 @@ public class TourDatabase {
 	}
 
 	/**
+	 * @param tagIds
+	 * @return Returns the tag names separated with a comma or an empty string when tagIds are
+	 *         <code>null</code>
+	 */
+	public static String getTagNames(final ArrayList<Long> tagIds) {
+
+		if (tagIds == null) {
+			return UI.EMPTY_STRING;
+		}
+
+		final HashMap<Long, TourTag> hashTags = getTourTags();
+		final ArrayList<String> tagList = new ArrayList<String>();
+
+		final StringBuilder sb = new StringBuilder();
+
+		// get tag name for each tag id
+		for (final Long tagId : tagIds) {
+			final TourTag tag = hashTags.get(tagId);
+			tagList.add(tag.getTagName());
+		}
+
+		// sort tags by name
+		Collections.sort(tagList);
+
+		// convert list into visible string
+		int tagIndex = 0;
+		for (final String tagName : tagList) {
+			if (tagIndex++ > 0) {
+				sb.append(", ");//$NON-NLS-1$
+			}
+			sb.append(tagName);
+		}
+
+		return sb.toString();
+	}
+
+	/**
 	 * @return Returns all tour types in the db sorted by name
 	 */
 	@SuppressWarnings("unchecked")//$NON-NLS-1$
@@ -868,6 +905,17 @@ public class TourDatabase {
 		}
 	}
 
+//	public void closeConnectionPool() {
+//
+//		if (fPooledDataSource != null) {
+//			try {
+//				DataSources.destroy(fPooledDataSource);
+//			} catch (final SQLException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+
 	private boolean checkVersion(final IProgressMonitor monitor) {
 
 		if (fIsVersionChecked) {
@@ -918,17 +966,6 @@ public class TourDatabase {
 		}
 		return true;
 	}
-
-//	public void closeConnectionPool() {
-//
-//		if (fPooledDataSource != null) {
-//			try {
-//				DataSources.destroy(fPooledDataSource);
-//			} catch (final SQLException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
 
 	/**
 	 * Checks if the database server is running, if not it will start the server. startServerJob has
@@ -1606,38 +1643,6 @@ public class TourDatabase {
 		}
 
 		return conn;
-	}
-
-	public String getTagNames(final ArrayList<Long> tagIds) {
-
-		if (tagIds == null) {
-			return UI.EMPTY_STRING;
-		}
-
-		final HashMap<Long, TourTag> hashTags = getTourTags();
-		final ArrayList<String> tagList = new ArrayList<String>();
-
-		final StringBuilder sb = new StringBuilder();
-
-		// get tag name for each tag id
-		for (final Long tagId : tagIds) {
-			final TourTag tag = hashTags.get(tagId);
-			tagList.add(tag.getTagName());
-		}
-
-		// sort tags by name
-		Collections.sort(tagList);
-
-		// convert list into visible string
-		int tagIndex = 0;
-		for (final String tagName : tagList) {
-			if (tagIndex++ > 0) {
-				sb.append(", ");//$NON-NLS-1$
-			}
-			sb.append(tagName);
-		}
-
-		return sb.toString();
 	}
 
 	public void removePropertyListener(final IPropertyListener listener) {

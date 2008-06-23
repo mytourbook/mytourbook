@@ -116,32 +116,32 @@ public abstract class TourBookTreeViewerItem extends TreeViewerItem implements I
 		return null;
 	}
 
-	/**
-	 * @return Returns a sql statement string to select only the data which for the selected person
-	 */
-	String sqlTourPersonId() {
-
-		final StringBuffer sqlString = new StringBuffer();
-
-		final long personId = fView.fActivePerson == null ? -1 : fView.fActivePerson.getPersonId();
-
-		if (personId == -1) {
-			// select all people
-		} else {
-			// select only one person
-			sqlString.append(" AND tourPerson_personId = " + Long.toString(personId)); //$NON-NLS-1$
-		}
-		return sqlString.toString();
-	}
-
-	/**
-	 * @return Returns a sql statement string to select only the data which tour type is defined in
-	 * 	fTourTypeId
-	 */
-	String sqlTourTypeId() {
-
-		return fView.fActiveTourTypeFilter.getSQLString();
-
-	}
+//	/**
+//	 * @return Returns a sql statement string to select only the data which for the selected person
+//	 */
+//	String sqlTourPersonId() {
+//
+//		final StringBuffer sqlString = new StringBuffer();
+//
+//		final long personId = fView.fActivePerson == null ? -1 : fView.fActivePerson.getPersonId();
+//
+//		if (personId == -1) {
+//			// select all people
+//		} else {
+//			// select only one person
+//			sqlString.append(" AND tourPerson_personId = " + Long.toString(personId)); //$NON-NLS-1$
+//		}
+//		return sqlString.toString();
+//	}
+//
+//	/**
+//	 * @return Returns a sql statement string to select only the data which tour type is defined in
+//	 * 	fTourTypeId
+//	 */
+//	String sqlTourTypeId() {
+//
+//		return fView.fActiveTourTypeFilter.getSQLString();
+//
+//	}
 
 }

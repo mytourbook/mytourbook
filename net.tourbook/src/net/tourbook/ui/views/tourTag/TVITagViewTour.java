@@ -21,19 +21,25 @@ import org.joda.time.DateTime;
 
 public class TVITagViewTour extends TVITagViewItem {
 
-	long			tourId;
-	DateTime		tourDate;
-	String			tourTitle;
-	long			tourTypeId;
+	private TVITagViewItem	fParentItem;
 
-	ArrayList<Long>	tagIds;
+	long					tourId;
+	DateTime				tourDate;
+	String					tourTitle;
+	long					tourTypeId;
 
-	public TVITagViewTour(final TagView tagView) {
-		super(tagView);
+	ArrayList<Long>			tagIds;
+
+	public TVITagViewTour(final TVITagViewItem parentItem) {
+		fParentItem = parentItem;
 	}
 
 	@Override
 	protected void fetchChildren() {}
+
+	public TVITagViewItem getRootItem() {
+		return fParentItem;
+	}
 
 	@Override
 	public boolean hasChildren() {

@@ -17,6 +17,7 @@
 package net.tourbook.ui.views.tourTag;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -27,8 +28,8 @@ import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.TVITourTag;
-import net.tourbook.tag.TVITourTagCategory;
+import net.tourbook.tag.TVIPrefTag;
+import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
@@ -91,7 +92,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	private static IMemento			fSessionMemento;
 
-//	private NumberFormat			fNF							= NumberFormat.getNumberInstance();
+	private NumberFormat			fNF							= NumberFormat.getNumberInstance();
 	private DateFormat				fDF							= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	private Composite				fViewerContainer;
@@ -111,9 +112,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 																		.createImage();
 	private Image					fImgTag						= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
 																		.createImage();
-
-
-//	private Connection				fConnection;
 
 	private class TagContentProvider implements ITreeContentProvider {
 
@@ -139,32 +137,32 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	}
 
 	/**
-	 * Sort the tags and categories
+	 * Sort tags and categories
 	 */
 	private class TagViewerSorter extends ViewerSorter {
 
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
-			if (obj1 instanceof TVITourTag && obj2 instanceof TVITourTag) {
+			if (obj1 instanceof TVIPrefTag && obj2 instanceof TVIPrefTag) {
 
-				final TourTag tourTag1 = ((TVITourTag) (obj1)).getTourTag();
-				final TourTag tourTag2 = ((TVITourTag) (obj2)).getTourTag();
+				final TourTag tourTag1 = ((TVIPrefTag) (obj1)).getTourTag();
+				final TourTag tourTag2 = ((TVIPrefTag) (obj2)).getTourTag();
 
 				return tourTag1.getTagName().compareTo(tourTag2.getTagName());
 
-			} else if (obj1 instanceof TVITourTag && obj2 instanceof TVITourTagCategory) {
+			} else if (obj1 instanceof TVIPrefTag && obj2 instanceof TVIPrefTagCategory) {
 
 				return 1;
 
-			} else if (obj2 instanceof TVITourTag && obj1 instanceof TVITourTagCategory) {
+			} else if (obj2 instanceof TVIPrefTag && obj1 instanceof TVIPrefTagCategory) {
 
 				return -1;
 
-			} else if (obj1 instanceof TVITourTagCategory && obj2 instanceof TVITourTagCategory) {
+			} else if (obj1 instanceof TVIPrefTagCategory && obj2 instanceof TVIPrefTagCategory) {
 
-				final TourTagCategory tourTagCat1 = ((TVITourTagCategory) (obj1)).getTourTagCategory();
-				final TourTagCategory tourTagCat2 = ((TVITourTagCategory) (obj2)).getTourTagCategory();
+				final TourTagCategory tourTagCat1 = ((TVIPrefTagCategory) (obj1)).getTourTagCategory();
+				final TourTagCategory tourTagCat2 = ((TVIPrefTagCategory) (obj2)).getTourTagCategory();
 
 				return tourTagCat1.getCategoryName().compareTo(tourTagCat2.getCategoryName());
 			}
@@ -196,7 +194,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		fActionRefreshView = new ActionRefreshView(this);
 		fActionSetTreeExpandType = new ActionSetTreeExpandType(this);
-
 
 		/*
 		 * action in the view toolbar
@@ -348,6 +345,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 					cell.setText(viewItem.treeColumn);
 					cell.setImage(fImgTagCategory);
+					
+				} else {
+					cell.setText(viewItem.treeColumn);
 				}
 			}
 		});
@@ -377,24 +377,33 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITagViewTour) {
-					cell.setText(TourDatabase.getInstance().getTagNames(((TVITagViewTour) element).tagIds));
+					TourDatabase.getInstance();
+					cell.setText(TourDatabase.getTagNames(((TVITagViewTour) element).tagIds));
 				}
 			}
 		});
+	
+		/*
+		 * column: distance (km/miles)
+		 */
+		colDef = TreeColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				final TVITagViewItem treeItem = (TVITagViewItem) element;
+				fNF.setMinimumFractionDigits(1);
+				fNF.setMaximumFractionDigits(1);
+				cell.setText(fNF.format(((float) treeItem.colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+			}
+		});
+
 	}
 
 	@Override
 	public void dispose() {
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
-
-//		if (fConnection != null) {
-//			try {
-//				fConnection.close();
-//			} catch (final SQLException e) {
-//				e.printStackTrace();
-//			}
-//		}
 
 		fImgTagCategory.dispose();
 		fImgTag.dispose();
@@ -440,10 +449,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	public ColumnManager getColumnManager() {
 		return null;
 	}
-
-//	public Connection getConnection() {
-//		return fConnection;
-//	}
 
 	public ArrayList<TourData> getSelectedTours() {
 

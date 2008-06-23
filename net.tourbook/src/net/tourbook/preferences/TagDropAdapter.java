@@ -24,9 +24,9 @@ import javax.persistence.EntityManager;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.TVIRootItem;
-import net.tourbook.tag.TVITourTag;
-import net.tourbook.tag.TVITourTagCategory;
+import net.tourbook.tag.TVIPrefTagRoot;
+import net.tourbook.tag.TVIPrefTag;
+import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tour.TreeViewerItem;
 
 import org.eclipse.jface.util.LocalSelectionTransfer;
@@ -49,17 +49,17 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		fTagViewer = tagViewer;
 	}
 
-	private boolean dropCategory(final TVITourTagCategory itemDraggedCategory) {
+	private boolean dropCategory(final TVIPrefTagCategory itemDraggedCategory) {
 
 		final Object hoveredTarget = getCurrentTarget();
 
-		if (hoveredTarget instanceof TVITourTagCategory) {
+		if (hoveredTarget instanceof TVIPrefTagCategory) {
 
 			/*
 			 * drop category into another category
 			 */
 
-			dropCategoryIntoCategory(itemDraggedCategory, (TVITourTagCategory) hoveredTarget);
+			dropCategoryIntoCategory(itemDraggedCategory, (TVIPrefTagCategory) hoveredTarget);
 
 		} else if (hoveredTarget == null) {
 
@@ -73,19 +73,19 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		return true;
 	}
 
-	private void dropCategoryIntoCategory(	final TVITourTagCategory itemDraggedCategory,
-											final TVITourTagCategory itemTargetCategory) {
+	private void dropCategoryIntoCategory(	final TVIPrefTagCategory itemDraggedCategory,
+											final TVIPrefTagCategory itemTargetCategory) {
 
 //		System.out.println("dropCategoryIntoCategory");
 		final TourTagCategory draggedCategory = itemDraggedCategory.getTourTagCategory();
 		final TreeViewerItem itemDraggedParent = itemDraggedCategory.getParentItem();
 
 		final TourTagCategory targetCategory = itemTargetCategory.getTourTagCategory();
-		TVITourTagCategory itemDraggedParentCategory = null;
+		TVIPrefTagCategory itemDraggedParentCategory = null;
 
 		boolean isUpdateViewer = false;
 
-		if (itemDraggedParent instanceof TVITourTagCategory) {
+		if (itemDraggedParent instanceof TVIPrefTagCategory) {
 
 			/*
 			 * dragged category is from another category
@@ -94,7 +94,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 			if (em != null) {
 
-				itemDraggedParentCategory = (TVITourTagCategory) itemDraggedParent;
+				itemDraggedParentCategory = (TVIPrefTagCategory) itemDraggedParent;
 				final TourTagCategory draggedParentCategory = itemDraggedParentCategory.getTourTagCategory();
 
 				/*
@@ -125,7 +125,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 				em.close();
 			}
 
-		} else if (itemDraggedParent instanceof TVIRootItem) {
+		} else if (itemDraggedParent instanceof TVIPrefTagRoot) {
 
 			/*
 			 * dragged category is a root category
@@ -134,7 +134,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 			if (em != null) {
 
-				final TVIRootItem itemDraggedRoot = (TVIRootItem) itemDraggedParent;
+				final TVIPrefTagRoot itemDraggedRoot = (TVIPrefTagRoot) itemDraggedParent;
 
 				/*
 				 * remove category from old category
@@ -179,7 +179,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		}
 	}
 
-	private void dropCategoryIntoRoot(final TVITourTagCategory itemDraggedCategory) {
+	private void dropCategoryIntoRoot(final TVIPrefTagCategory itemDraggedCategory) {
 
 //		System.out.println("dropCategoryIntoRoot");
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -190,16 +190,16 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		final TourTagCategory draggedCategory = itemDraggedCategory.getTourTagCategory();
 		final TreeViewerItem itemDraggedTagParent = itemDraggedCategory.getParentItem();
 
-		TVITourTagCategory itemDraggedParentCategory = null;
+		TVIPrefTagCategory itemDraggedParentCategory = null;
 
-		if (itemDraggedTagParent instanceof TVITourTagCategory) {
+		if (itemDraggedTagParent instanceof TVIPrefTagCategory) {
 
 			/*
 			 * parent of the dragged category is a category, remove dragged category from old
 			 * category
 			 */
 
-			itemDraggedParentCategory = (TVITourTagCategory) itemDraggedTagParent;
+			itemDraggedParentCategory = (TVIPrefTagCategory) itemDraggedTagParent;
 			final TourTagCategory draggedParentCategory = itemDraggedParentCategory.getTourTagCategory();
 
 			/*
@@ -229,7 +229,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		/*
 		 * add category to the root item (target)
 		 */
-		final TVIRootItem rootItem = fPrefPageTags.getRootItem();
+		final TVIPrefTagRoot rootItem = fPrefPageTags.getRootItem();
 		rootItem.addChild(itemDraggedCategory);
 
 		/*
@@ -250,12 +250,12 @@ final class TagDropAdapter extends ViewerDropAdapter {
 	 *            tag tree item which is dragged
 	 * @return Returns <code>true</code> when the tag is dropped
 	 */
-	private boolean dropTag(final TVITourTag draggedTagItem) {
+	private boolean dropTag(final TVIPrefTag draggedTagItem) {
 
 		final Object hoveredTarget = getCurrentTarget();
-		if (hoveredTarget instanceof TVITourTag) {
+		if (hoveredTarget instanceof TVIPrefTag) {
 
-			final TVITourTag targetTagItem = (TVITourTag) hoveredTarget;
+			final TVIPrefTag targetTagItem = (TVIPrefTag) hoveredTarget;
 			final TourTag targetTourTag = targetTagItem.getTourTag();
 
 			if (targetTourTag.isRoot()) {
@@ -273,18 +273,18 @@ final class TagDropAdapter extends ViewerDropAdapter {
 				 */
 
 				final TreeViewerItem tagParentItem = targetTagItem.getParentItem();
-				if (tagParentItem instanceof TVITourTagCategory) {
-					dropTagIntoCategory(draggedTagItem, (TVITourTagCategory) tagParentItem);
+				if (tagParentItem instanceof TVIPrefTagCategory) {
+					dropTagIntoCategory(draggedTagItem, (TVIPrefTagCategory) tagParentItem);
 				}
 			}
 
-		} else if (hoveredTarget instanceof TVITourTagCategory) {
+		} else if (hoveredTarget instanceof TVIPrefTagCategory) {
 
 			/*
 			 * drop the dragged tag into the hovered target category
 			 */
 
-			dropTagIntoCategory(draggedTagItem, (TVITourTagCategory) hoveredTarget);
+			dropTagIntoCategory(draggedTagItem, (TVIPrefTagCategory) hoveredTarget);
 
 		} else if (hoveredTarget == null) {
 
@@ -300,17 +300,17 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		return true;
 	}
 
-	private void dropTagIntoCategory(final TVITourTag itemDraggedTag, final TVITourTagCategory itemTargetCategory) {
+	private void dropTagIntoCategory(final TVIPrefTag itemDraggedTag, final TVIPrefTagCategory itemTargetCategory) {
 
 		final TourTag draggedTag = itemDraggedTag.getTourTag();
 		final TreeViewerItem itemDraggedParent = itemDraggedTag.getParentItem();
 
 		final TourTagCategory targetCategory = itemTargetCategory.getTourTagCategory();
-		TVITourTagCategory itemDraggedParentCategory = null;
+		TVIPrefTagCategory itemDraggedParentCategory = null;
 
 		boolean isUpdateViewer = false;
 
-		if (itemDraggedParent instanceof TVITourTagCategory) {
+		if (itemDraggedParent instanceof TVIPrefTagCategory) {
 
 			/*
 			 * dragged tag is from a tag category
@@ -319,7 +319,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 			if (em != null) {
 
-				itemDraggedParentCategory = (TVITourTagCategory) itemDraggedParent;
+				itemDraggedParentCategory = (TVIPrefTagCategory) itemDraggedParent;
 				final TourTagCategory draggedParentCategory = itemDraggedParentCategory.getTourTagCategory();
 
 				/*
@@ -339,7 +339,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 				isUpdateViewer = true;
 			}
 
-		} else if (itemDraggedParent instanceof TVIRootItem) {
+		} else if (itemDraggedParent instanceof TVIPrefTagRoot) {
 
 			/*
 			 * dragged tag is a root tag item
@@ -348,7 +348,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 			if (em != null) {
 
-				final TVIRootItem draggedRootItem = (TVIRootItem) itemDraggedParent;
+				final TVIPrefTagRoot draggedRootItem = (TVIPrefTagRoot) itemDraggedParent;
 
 				/*
 				 * remove tag from root item
@@ -387,7 +387,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		}
 	}
 
-	private void dropTagIntoRoot(final TVITourTag itemDraggedTag) {
+	private void dropTagIntoRoot(final TVIPrefTag itemDraggedTag) {
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 		if (em != null) {
@@ -395,15 +395,15 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			final TourTag draggedTag = itemDraggedTag.getTourTag();
 			final TreeViewerItem itemDraggedTagParent = itemDraggedTag.getParentItem();
 
-			TVITourTagCategory itemDraggedParentCategory = null;
+			TVIPrefTagCategory itemDraggedParentCategory = null;
 
-			if (itemDraggedTagParent instanceof TVITourTagCategory) {
+			if (itemDraggedTagParent instanceof TVIPrefTagCategory) {
 
 				/*
 				 * remove tag from old category
 				 */
 
-				itemDraggedParentCategory = (TVITourTagCategory) itemDraggedTagParent;
+				itemDraggedParentCategory = (TVIPrefTagCategory) itemDraggedTagParent;
 				final TourTagCategory draggedParentCategory = itemDraggedParentCategory.getTourTagCategory();
 
 				itemDraggedParentCategory.removeChild(itemDraggedTag);
@@ -419,7 +419,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			/*
 			 * add tag to the root item (target)
 			 */
-			final TVIRootItem rootItem = fPrefPageTags.getRootItem();
+			final TVIPrefTagRoot rootItem = fPrefPageTags.getRootItem();
 			rootItem.addChild(itemDraggedTag);
 
 			em.close();
@@ -445,15 +445,15 @@ final class TagDropAdapter extends ViewerDropAdapter {
 	 * @param targetCategoryId
 	 * @return Returns <code>true</code> when the dragged category will be dropped on its children
 	 */
-	private boolean isDraggedIntoChildren(final TVITourTagCategory itemDraggedCategory, final long targetCategoryId) {
+	private boolean isDraggedIntoChildren(final TVIPrefTagCategory itemDraggedCategory, final long targetCategoryId) {
 
 		final ArrayList<TreeViewerItem> unfetchedChildren = itemDraggedCategory.getUnfetchedChildren();
 		if (unfetchedChildren != null) {
 
 			for (final TreeViewerItem treeViewerItem : unfetchedChildren) {
-				if (treeViewerItem instanceof TVITourTagCategory) {
+				if (treeViewerItem instanceof TVIPrefTagCategory) {
 
-					final TVITourTagCategory itemChildCategory = (TVITourTagCategory) treeViewerItem;
+					final TVIPrefTagCategory itemChildCategory = (TVIPrefTagCategory) treeViewerItem;
 
 //					System.out.println("parent: "
 //							+ itemDraggedCategory.getTourTagCategory().getCategoryName()
@@ -493,22 +493,22 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			final StructuredSelection selection = (StructuredSelection) dropData;
 			final Object firstElement = selection.getFirstElement();
 
-			if (selection.size() == 1 && firstElement instanceof TVITourTagCategory) {
+			if (selection.size() == 1 && firstElement instanceof TVIPrefTagCategory) {
 
 				/*
 				 * drop a category, to avoid confusion only one category is supported to be dragged
 				 * & dropped
 				 */
 
-				returnValue = dropCategory((TVITourTagCategory) firstElement);
+				returnValue = dropCategory((TVIPrefTagCategory) firstElement);
 
 			} else {
 
 				// drop all tags, categories will be ignored
 
 				for (final Object element : selection.toList()) {
-					if (element instanceof TVITourTag) {
-						returnValue |= dropTag((TVITourTag) element);
+					if (element instanceof TVIPrefTag) {
+						returnValue |= dropTag((TVIPrefTag) element);
 					}
 				}
 			}
@@ -655,17 +655,17 @@ final class TagDropAdapter extends ViewerDropAdapter {
 
 			} else {
 
-				if (draggedItem instanceof TVITourTagCategory) {
+				if (draggedItem instanceof TVIPrefTagCategory) {
 
-					if (target instanceof TVITourTagCategory) {
+					if (target instanceof TVIPrefTagCategory) {
 
 						/*
 						 * check if a dragged category item is dropped on one of it's children, this
 						 * is not allowed
 						 */
 
-						final TVITourTagCategory itemDraggedCategory = (TVITourTagCategory) draggedItem;
-						final TVITourTagCategory itemTargetCategory = (TVITourTagCategory) target;
+						final TVIPrefTagCategory itemDraggedCategory = (TVIPrefTagCategory) draggedItem;
+						final TVIPrefTagCategory itemTargetCategory = (TVIPrefTagCategory) target;
 
 						final long targetCategoryId = itemTargetCategory.getTourTagCategory().getCategoryId();
 
@@ -673,7 +673,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 							return false;
 						}
 
-					} else if (target instanceof TVITourTag) {
+					} else if (target instanceof TVIPrefTag) {
 						return false;
 					}
 				}

@@ -13,17 +13,20 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.ui;
+
+import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourTag;
+import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.views.tourTag.TVITagViewTag;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -31,6 +34,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Tree;
 
 public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 
@@ -66,17 +70,40 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 					final StructuredSelection selection = (StructuredSelection) fTourViewer.getTreeViewer()
 							.getSelection();
 					if (selection.getFirstElement() instanceof TVITagViewTag) {
+
 						final TVITagViewTag tagItem = (TVITagViewTag) selection.getFirstElement();
-						
+
 						// check if expand type has changed
-						if (tagItem.expandType == fExpandType) {
+						if (tagItem.getExpandType() == fExpandType) {
 							return;
 						}
+
+						// remove the children of the tag because another type of children will be displayed
+						final TreeViewer treeViewer = fTourViewer.getTreeViewer();
 						
+						final boolean isTagExpanded = treeViewer.getExpandedState(tagItem);
+						
+						final Tree tree = treeViewer.getTree();
+						tree.setRedraw(false);
+						{
+							treeViewer.collapseToLevel(tagItem, TreeViewer.ALL_LEVELS);
+							final ArrayList<TreeViewerItem> tagUnfetchedChildren = tagItem.getUnfetchedChildren();
+							if (tagUnfetchedChildren != null) {
+								treeViewer.remove(tagUnfetchedChildren.toArray());
+							}
+						}
+						tree.setRedraw(true);
+
 						// set new expand type
-						tagItem.expandType = fExpandType;
-						
+						tagItem.setExpandType(fExpandType);
+
 						tagItem.clearChildren();
+
+						if (isTagExpanded) {
+							treeViewer.setExpandedState(tagItem, true);
+						}
+						
+						treeViewer.refresh(tagItem);
 					}
 				}
 
@@ -90,7 +117,6 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 		super(Messages.app_action_set_tour_tag_tree_expand_type, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
-//		fTourProvider = tourProvider;
 		fTourViewer = tourViewer;
 	}
 
@@ -128,7 +154,6 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 					menuItem.dispose();
 				}
 
-
 				/*
 				 * create all expand types
 				 */
@@ -160,7 +185,7 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 		final StructuredSelection selection = (StructuredSelection) fTourViewer.getTreeViewer().getSelection();
 		if (selection.getFirstElement() instanceof TVITagViewTag) {
 			final TVITagViewTag itemTag = (TVITagViewTag) selection.getFirstElement();
-			selectedExpandType = itemTag.expandType;
+			selectedExpandType = itemTag.getExpandType();
 		}
 		return selectedExpandType;
 	}

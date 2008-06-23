@@ -6,6 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.persistence.EntityManager;
+
+import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
 
@@ -14,18 +17,36 @@ import org.joda.time.DateTime;
 public class TVITagViewTag extends TVITagViewItem {
 
 	public long	tagId;
-	public int	expandType;
 
-	public TVITagViewTag(final TagView tagView) {
-		super(tagView);
+	private int	fExpandType;
+
+	public TVITagViewTag(final TVITagViewItem parentItem) {
+		setParentItem(parentItem);
 	}
 
 	@Override
 	protected void fetchChildren() {
 
-		/*
-		 * set the children for the root item, these are year items
-		 */
+		switch (fExpandType) {
+		case TourTag.EXPAND_TYPE_FLAT:
+			getChildrenFlat();
+			break;
+
+		case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
+			getChildrenYearMonthDay();
+			break;
+
+		default:
+			break;
+		}
+
+	}
+
+	/**
+	 * get all tours for the tag Id of this tree item
+	 */
+	private void getChildrenFlat() {
+
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
@@ -33,9 +54,6 @@ public class TVITagViewTag extends TVITagViewItem {
 
 		try {
 
-			/*
-			 * get all tours for the tag Id of this tree item
-			 */
 			sb.append("SELECT ");
 
 			sb.append(" Tdata.tourId,");//					// 1 
@@ -44,12 +62,6 @@ public class TVITagViewTag extends TVITagViewItem {
 			sb.append(" Tdata.startDay,");//				// 4
 			sb.append(" Tdata.tourTitle,");//				// 5
 			sb.append(" Tdata.tourType_typeId,");//			// 6
-
-//			sb.append(" Tdata.TourDistance,");//			// 
-//			sb.append(" Tdata.TourRecordingTime,");//		// 
-//			sb.append(" Tdata.TourDrivingTime,");//			// 
-//			sb.append(" Tdata.TourAltUp,");//				// 
-//			sb.append(" Tdata.TourAltDown,");//				// 
 
 			sb.append(" jTdataTtag2.TourTag_tagId");//		// 7 
 
@@ -64,6 +76,7 @@ public class TVITagViewTag extends TVITagViewItem {
 			sb.append(" ON Tdata.tourID = jTdataTtag2.TourData_tourId");
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");// + tagId);
+			sb.append(" ORDER BY startYear, startMonth, startDay, startHour, startMinute"); //$NON-NLS-1$
 
 			long lastTourId = -1;
 			ArrayList<Long> tagIds = null;
@@ -89,7 +102,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 				} else {
 
-					final TVITagViewTour tourItem = new TVITagViewTour(getTagView());
+					final TVITagViewTour tourItem = new TVITagViewTour(this);
 					children.add(tourItem);
 
 					tourItem.tourId = tourId = result.getLong(1);
@@ -104,9 +117,8 @@ public class TVITagViewTag extends TVITagViewItem {
 						tourItem.tagIds = tagIds = new ArrayList<Long>();
 						tagIds.add((Long) resultTagId);
 					}
-
 				}
-				
+
 				lastTourId = tourId;
 			}
 
@@ -117,7 +129,99 @@ public class TVITagViewTag extends TVITagViewItem {
 		}
 	}
 
+	private void getChildrenYearMonthDay() {
+
+		/*
+		 * set the children for the root item, these are year items
+		 */
+		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
+		setChildren(children);
+
+		final StringBuilder sb = new StringBuilder();
+
+		try {
+
+			/*
+			 * get all tours for the tag Id of this tree item
+			 */
+			sb.append("SELECT ");
+
+			sb.append(" startYear,"); //		// 1
+			sb.append(SQL_SUM_COLUMNS);
+
+			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
+
+			// get all tours for current tag
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " Tdata");
+			sb.append(" ON jTdataTtag.TourData_tourId=Tdata.tourId ");
+
+			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");
+			sb.append(sqlTourPersonId());
+			sb.append(sqlTourTypeId());
+
+			sb.append(" GROUP BY startYear");
+			sb.append(" ORDER BY startYear");
+
+			final Connection conn = TourDatabase.getInstance().getConnection();
+
+			final PreparedStatement statement = conn.prepareStatement(sb.toString());
+			statement.setLong(1, tagId);
+
+			final ResultSet result = statement.executeQuery();
+			while (result.next()) {
+
+				final int dbYear = result.getInt(1);
+
+				final TVITagViewYear tourItem = new TVITagViewYear(this, dbYear);
+				children.add(tourItem);
+
+				tourItem.treeColumn = Integer.toString(dbYear);
+				tourItem.addSumData(result, 1);
+			}
+
+			conn.close();
+
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public int getExpandType() {
+		return fExpandType;
+	}
+
 	@Override
 	protected void remove() {}
+
+	/**
+	 * Set the expand type for the item and save the changed model in the database
+	 * 
+	 * @param expandType
+	 */
+	public void setExpandType(final int expandType) {
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		try {
+
+			final TourTag tagInDb = em.find(TourTag.class, tagId);
+
+			if (tagInDb != null) {
+
+				tagInDb.setExpandType(expandType);
+
+				TourDatabase.saveEntity(tagInDb, tagId, TourTag.class, em);
+			}
+
+		} catch (final Exception e) {
+			e.printStackTrace();
+		} finally {
+
+			em.close();
+
+			fExpandType = expandType;
+		}
+
+	}
 
 }

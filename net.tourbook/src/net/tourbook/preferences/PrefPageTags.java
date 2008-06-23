@@ -27,9 +27,9 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tag.TVIRootItem;
-import net.tourbook.tag.TVITourTag;
-import net.tourbook.tag.TVITourTagCategory;
+import net.tourbook.tag.TVIPrefTag;
+import net.tourbook.tag.TVIPrefTagCategory;
+import net.tourbook.tag.TVIPrefTagRoot;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionExpandSelection;
@@ -94,7 +94,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private Button				fBtnRename;
 	private Button				fBtnReset;
 
-	private TVIRootItem			fRootItem;
+	private TVIPrefTagRoot			fRootItem;
 
 	private Image				fImgTag			= TourbookPlugin.getImageDescriptor(Messages.Image__tag).createImage();
 	private Image				fImgTagRoot		= TourbookPlugin.getImageDescriptor(Messages.Image__tag_root)
@@ -112,29 +112,29 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private final class TagViewerComparator extends ViewerComparator {
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
-			if (obj1 instanceof TVITourTag && obj2 instanceof TVITourTag) {
+			if (obj1 instanceof TVIPrefTag && obj2 instanceof TVIPrefTag) {
 
 				// sort tags by name
-				final TourTag tourTag1 = ((TVITourTag) (obj1)).getTourTag();
-				final TourTag tourTag2 = ((TVITourTag) (obj2)).getTourTag();
+				final TourTag tourTag1 = ((TVIPrefTag) (obj1)).getTourTag();
+				final TourTag tourTag2 = ((TVIPrefTag) (obj2)).getTourTag();
 
 				return tourTag1.getTagName().compareTo(tourTag2.getTagName());
 
-			} else if (obj1 instanceof TVITourTag && obj2 instanceof TVITourTagCategory) {
+			} else if (obj1 instanceof TVIPrefTag && obj2 instanceof TVIPrefTagCategory) {
 
 				// sort category before tag
 				return 1;
 
-			} else if (obj2 instanceof TVITourTag && obj1 instanceof TVITourTagCategory) {
+			} else if (obj2 instanceof TVIPrefTag && obj1 instanceof TVIPrefTagCategory) {
 
 				// sort category before tag
 				return -1;
 
-			} else if (obj1 instanceof TVITourTagCategory && obj2 instanceof TVITourTagCategory) {
+			} else if (obj1 instanceof TVIPrefTagCategory && obj2 instanceof TVIPrefTagCategory) {
 
 				// sort categories by name
-				final TourTagCategory tourTagCat1 = ((TVITourTagCategory) (obj1)).getTourTagCategory();
-				final TourTagCategory tourTagCat2 = ((TVITourTagCategory) (obj2)).getTourTagCategory();
+				final TourTagCategory tourTagCat1 = ((TVIPrefTagCategory) (obj1)).getTourTagCategory();
+				final TourTagCategory tourTagCat2 = ((TVIPrefTagCategory) (obj2)).getTourTagCategory();
 
 				return tourTagCat1.getCategoryName().compareTo(tourTagCat2.getCategoryName());
 			}
@@ -250,7 +250,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		final Composite viewerContainer = createUI(parent);
 
 		// set root item
-		fRootItem = new TVIRootItem(fTagViewer);
+		fRootItem = new TVIPrefTagRoot(fTagViewer);
 
 		updateTagViewer();
 		enableButtons();
@@ -296,13 +296,13 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 				final Object selection = ((IStructuredSelection) fTagViewer.getSelection()).getFirstElement();
 
-				if (selection instanceof TVITourTag) {
+				if (selection instanceof TVIPrefTag) {
 
 					// tag is selected
 
 					onRenameTourTag();
 
-				} else if (selection instanceof TVITourTagCategory) {
+				} else if (selection instanceof TVIPrefTagCategory) {
 
 					// expand/collapse current item
 
@@ -379,15 +379,15 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 				final Object element = cell.getElement();
 
-				if (element instanceof TVITourTag) {
+				if (element instanceof TVIPrefTag) {
 
-					final TourTag tourTag = ((TVITourTag) element).getTourTag();
+					final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
 					cell.setText(tourTag.getTagName()); //$NON-NLS-1$
 					cell.setImage(tourTag.isRoot() ? fImgTagRoot : fImgTag);
 
-				} else if (element instanceof TVITourTagCategory) {
+				} else if (element instanceof TVIPrefTagCategory) {
 
-					final TVITourTagCategory tourTagCategoryItem = (TVITourTagCategory) element;
+					final TVIPrefTagCategory tourTagCategoryItem = (TVIPrefTagCategory) element;
 					final TourTagCategory tourTagCategory = tourTagCategoryItem.getTourTagCategory();
 
 					cell.setImage(fImgTagCategory);
@@ -484,9 +484,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		boolean isTagCategory = false;
 		final boolean isSelection = selection != null;
 
-		if (selection instanceof TVITourTag) {
+		if (selection instanceof TVIPrefTag) {
 			isTourTag = true;
-		} else if (selection instanceof TVITourTagCategory) {
+		} else if (selection instanceof TVIPrefTagCategory) {
 			isTagCategory = true;
 		}
 
@@ -499,7 +499,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		return fDragStartTime;
 	}
 
-	public TVIRootItem getRootItem() {
+	public TVIPrefTagRoot getRootItem() {
 		return fRootItem;
 	}
 
@@ -543,7 +543,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		// create tour tag category + tree item
 		final TourTagCategory newTourTagCategory = new TourTagCategory(inputDialog.getValue().trim());
-		final TreeViewerItem newCategoryItem = new TVITourTagCategory(fTagViewer, newTourTagCategory);
+		final TreeViewerItem newCategoryItem = new TVIPrefTagCategory(fTagViewer, newTourTagCategory);
 
 		boolean isSaved = false;
 
@@ -568,11 +568,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			// update viewer
 			fTagViewer.add(this, newCategoryItem);
 
-		} else if (parentElement instanceof TVITourTagCategory) {
+		} else if (parentElement instanceof TVIPrefTagCategory) {
 
 			// parent is a category
 
-			final TVITourTagCategory parentCategoryItem = (TVITourTagCategory) parentElement;
+			final TVIPrefTagCategory parentCategoryItem = (TVIPrefTagCategory) parentElement;
 			TourTagCategory parentTagCategory = parentCategoryItem.getTourTagCategory();
 
 			/*
@@ -672,7 +672,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		// create new tour tag + item
 		final TourTag tourTag = new TourTag(inputDialog.getValue().trim());
-		final TVITourTag tourTagItem = new TVITourTag(fTagViewer, tourTag);
+		final TVIPrefTag tourTagItem = new TVIPrefTag(fTagViewer, tourTag);
 
 		final Object parentElement = ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
 		if (parentElement == null) {
@@ -697,11 +697,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				fTagViewer.add(this, tourTagItem);
 			}
 
-		} else if (parentElement instanceof TVITourTagCategory) {
+		} else if (parentElement instanceof TVIPrefTagCategory) {
 
 			// parent is a category
 
-			final TVITourTagCategory parentCategoryItem = (TVITourTagCategory) parentElement;
+			final TVIPrefTagCategory parentCategoryItem = (TVIPrefTagCategory) parentElement;
 			TourTagCategory parentCategory = parentCategoryItem.getTourTagCategory();
 
 			tourTagItem.setParentItem(parentCategoryItem);
@@ -764,7 +764,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				fTagViewer.expandToLevel(parentCategoryItem, 1);
 			}
 
-		} else if (parentElement instanceof TVITourTag) {
+		} else if (parentElement instanceof TVIPrefTag) {
 
 			// parent is a tag
 
@@ -789,10 +789,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		final Object selection = ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
 		String name = UI.EMPTY_STRING;
 
-		if (selection instanceof TVITourTag) {
-			name = ((TVITourTag) selection).getTourTag().getTagName();
-		} else if (selection instanceof TVITourTagCategory) {
-			name = ((TVITourTagCategory) selection).getTourTagCategory().getCategoryName();
+		if (selection instanceof TVIPrefTag) {
+			name = ((TVIPrefTag) selection).getTourTag().getTagName();
+		} else if (selection instanceof TVIPrefTagCategory) {
+			name = ((TVIPrefTagCategory) selection).getTourTagCategory().getCategoryName();
 		}
 
 		final InputDialog inputDialog = new InputDialog(getShell(),
@@ -811,9 +811,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		name = inputDialog.getValue().trim();
 
-		if (selection instanceof TVITourTag) {
+		if (selection instanceof TVIPrefTag) {
 
-			final TVITourTag tourTagItem = ((TVITourTag) selection);
+			// save tag
+			
+			final TVIPrefTag tourTagItem = ((TVIPrefTag) selection);
 			final TourTag tourTag = tourTagItem.getTourTag();
 
 			tourTag.setTagName(name);
@@ -823,9 +825,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 			fTagViewer.update(tourTagItem, new String[] { SORT_PROPERTY });
 
-		} else if (selection instanceof TVITourTagCategory) {
+		} else if (selection instanceof TVIPrefTagCategory) {
 
-			final TVITourTagCategory tourCategoryItem = ((TVITourTagCategory) selection);
+			// save category
+			
+			final TVIPrefTagCategory tourCategoryItem = ((TVIPrefTagCategory) selection);
 			final TourTagCategory tourCategory = tourCategoryItem.getTourTagCategory();
 
 			tourCategory.setName(name);
@@ -908,7 +912,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				conn.close();
 
 				// update the tag viewer
-				fRootItem = new TVIRootItem(fTagViewer);
+				fRootItem = new TVIPrefTagRoot(fTagViewer);
 				updateTagViewer();
 
 			} catch (final SQLException e) {

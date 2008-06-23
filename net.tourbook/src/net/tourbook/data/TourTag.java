@@ -36,8 +36,8 @@ import net.tourbook.database.TourDatabase;
 public class TourTag {
 
 	public static final int			EXPAND_TYPE_YEAR_MONTH_DAY	= 0;
-
 	public static final int			EXPAND_TYPE_FLAT			= 1;
+	
 	/*
 	 * DON'T USE THE FINAL KEYWORD FOR THE ID because the Id cannot be set
 	 */

@@ -47,13 +47,17 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 		final String sqlString = "SELECT " //$NON-NLS-1$
 				+ "STARTYear, " //$NON-NLS-1$
 				+ "STARTMonth, " //$NON-NLS-1$
+				
 				+ SQL_SUM_COLUMNS
+				
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
+				
 				+ (" WHERE STARTYEAR=?") //$NON-NLS-1$
 				+ sqlTourPersonId()
 				+ sqlTourTypeId()
-				+ " GROUP BY StartYear, STARTMONTH" //$NON-NLS-1$
-				+ " ORDER BY STARTMONTH"; //$NON-NLS-1$
+				
+				+ " GROUP BY StartYear, StartMonth" //$NON-NLS-1$
+				+ " ORDER BY StartMonth"; //$NON-NLS-1$
 
 		try {
 

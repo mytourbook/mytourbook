@@ -27,11 +27,11 @@ import net.tourbook.database.TourDatabase;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 
-public class TVITourTagCategory extends TVIPrefTagViewer {
+public class TVIPrefTagCategory extends TVIPrefTagViewer {
 
 	private TourTagCategory	fTourTagCategory;
 
-	public TVITourTagCategory(final TreeViewer tagViewer, final TourTagCategory tourTagCategory) {
+	public TVIPrefTagCategory(final TreeViewer tagViewer, final TourTagCategory tourTagCategory) {
 		super(tagViewer);
 		fTourTagCategory = tourTagCategory;
 	}
@@ -50,13 +50,13 @@ public class TVITourTagCategory extends TVIPrefTagViewer {
 		// create tree tag items
 		final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
 		for (final TourTag tourTag : lazyTourTags) {
-			addChild(new TVITourTag(getTagViewer(), tourTag));
+			addChild(new TVIPrefTag(getTagViewer(), tourTag));
 		}
 
 		// create tree category items
 		final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
 		for (final TourTagCategory tagCategory : lazyTourTagCategories) {
-			addChild(new TVITourTagCategory(getTagViewer(), tagCategory));
+			addChild(new TVIPrefTagCategory(getTagViewer(), tagCategory));
 		}
 
 		// update number of categories/tags
@@ -69,7 +69,7 @@ public class TVITourTagCategory extends TVIPrefTagViewer {
 		 */
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
-				getTagViewer().update(TVITourTagCategory.this, null);
+				getTagViewer().update(TVIPrefTagCategory.this, null);
 			}
 		});
 

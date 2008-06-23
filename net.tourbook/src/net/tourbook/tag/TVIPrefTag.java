@@ -19,11 +19,11 @@ import net.tourbook.data.TourTag;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
-public class TVITourTag extends TVIPrefTagViewer {
+public class TVIPrefTag extends TVIPrefTagViewer {
 
 	private TourTag	fTourTag;
 
-	public TVITourTag(final TreeViewer tagViewer, final TourTag tourTag) {
+	public TVIPrefTag(final TreeViewer tagViewer, final TourTag tourTag) {
 		super(tagViewer);
 		fTourTag = tourTag;
 	}
