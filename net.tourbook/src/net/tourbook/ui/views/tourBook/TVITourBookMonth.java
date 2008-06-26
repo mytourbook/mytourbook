@@ -53,41 +53,41 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 
 		final String sqlString = "SELECT " //		//$NON-NLS-1$
 
-				+ "Tdata.STARTYear," //			1	//$NON-NLS-1$
-				+ "Tdata.STARTMonth," //		2	//$NON-NLS-1$
-				+ "Tdata.STARTDay," //			3	//$NON-NLS-1$
-				+ "Tdata.TOURDISTANCE," //		4	//$NON-NLS-1$
-				+ "Tdata.TOURRECORDINGTIME," //	5	//$NON-NLS-1$
-				+ "Tdata.TOURDRIVINGTIME," //	6	//$NON-NLS-1$
-				+ "Tdata.TOURALTUP," //			7	//$NON-NLS-1$
-				+ "Tdata.TOURALTDOWN," //		8	//$NON-NLS-1$
-				+ "Tdata.startDistance," //		9	//$NON-NLS-1$
-				+ "Tdata.tourID," //			10	//$NON-NLS-1$
-				+ "Tdata.tourType_typeId," //	11	//$NON-NLS-1$
-				+ "Tdata.tourTitle," //			12	//$NON-NLS-1$
-				+ "Tdata.deviceTimeInterval," //13	//$NON-NLS-1$
-				+ "Tdata.maxSpeed," //			14	//$NON-NLS-1$
-				+ "Tdata.maxAltitude," //		15	//$NON-NLS-1$
-				+ "Tdata.maxPulse," //			16	//$NON-NLS-1$
-				+ "Tdata.avgPulse," //			17	//$NON-NLS-1$
-				+ "Tdata.avgCadence," //		18	//$NON-NLS-1$
-				+ "Tdata.avgTemperature," //	19	//$NON-NLS-1$
+				+ "startYear," //			1	//$NON-NLS-1$
+				+ "startMonth," //			2	//$NON-NLS-1$
+				+ "startDay," //			3	//$NON-NLS-1$
+				+ "tourDistance," //		4	//$NON-NLS-1$
+				+ "tourRecordingTime," //	5	//$NON-NLS-1$
+				+ "tourDrivingTime," //		6	//$NON-NLS-1$
+				+ "tourAltUp," //			7	//$NON-NLS-1$
+				+ "tourAltDown," //			8	//$NON-NLS-1$
+				+ "startDistance," //		9	//$NON-NLS-1$
+				+ "tourID," //				10	//$NON-NLS-1$
+				+ "tourType_typeId," //		11	//$NON-NLS-1$
+				+ "tourTitle," //			12	//$NON-NLS-1$
+				+ "deviceTimeInterval," //	13	//$NON-NLS-1$
+				+ "maxSpeed," //			14	//$NON-NLS-1$
+				+ "maxAltitude," //			15	//$NON-NLS-1$
+				+ "maxPulse," //			16	//$NON-NLS-1$
+				+ "avgPulse," //			17	//$NON-NLS-1$
+				+ "avgCadence," //			18	//$NON-NLS-1$
+				+ "avgTemperature," //		19	//$NON-NLS-1$
 
 				+ "jTdataTtag.TourTag_tagId"//	20	//$NON-NLS-1$ 
 
 				+ UI.NEW_LINE
 
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " Tdata" + UI.NEW_LINE) //			//$NON-NLS-1$ //$NON-NLS-2$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + UI.NEW_LINE) //			//$NON-NLS-1$ //$NON-NLS-2$
 
 				// get tag id's
 				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag")
-				+ (" ON Tdata.tourID = jTdataTtag.TourData_tourId")
+				+ (" ON TourData.tourID = jTdataTtag.TourData_tourId")
 
-				+ (" WHERE Tdata.STARTYEAR = ?")//				//$NON-NLS-1$
-				+ (" AND Tdata.STARTMONTH = ?")//					//$NON-NLS-1$
+				+ (" WHERE STARTYEAR = ?")//				//$NON-NLS-1$
+				+ (" AND STARTMONTH = ?")//					//$NON-NLS-1$
 				+ sqlTourPersonId()
 				+ sqlTourTypeId()
-				+ " ORDER BY Tdata.StartDay, Tdata.StartHour, Tdata.StartMinute"; //$NON-NLS-1$
+				+ " ORDER BY StartDay, StartHour, StartMinute"; //$NON-NLS-1$
 
 		try {
 
@@ -107,12 +107,12 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 			while (result.next()) {
 
 				final long tourId = result.getLong(10);
+				final Object resultTagId = result.getObject(20);
 
 				if (tourId == lastTourId) {
 
 					// get tags from outer join
 
-					final Object resultTagId = result.getObject(20);
 					if (resultTagId instanceof Long) {
 						tagIds.add((Long) resultTagId);
 					}
@@ -161,7 +161,6 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 					tourItem.fColumnAvgCadence = result.getLong(18);
 					tourItem.fColumnAvgTemperature = result.getLong(19);
 
-					final Object resultTagId = result.getObject(20);
 					if (resultTagId instanceof Long) {
 						tourItem.fTagIds = tagIds = new ArrayList<Long>();
 						tagIds.add((Long) resultTagId);

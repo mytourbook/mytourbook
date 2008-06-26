@@ -43,12 +43,14 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 	private ITourViewer				fTourViewer;
 
 	private static final String[]	fExpandTypeNames	= {
-			Messages.app_action_expand_type_year_month_day,
-			Messages.app_action_expand_type_flat		};
+			Messages.app_action_expand_type_flat,
+			Messages.app_action_expand_type_year_day,
+			Messages.app_action_expand_type_year_month_day };
 
 	private static final int[]		fExpandTypes		= {
-			TourTag.EXPAND_TYPE_YEAR_MONTH_DAY,
-			TourTag.EXPAND_TYPE_FLAT					};
+			TourTag.EXPAND_TYPE_FLAT,
+			TourTag.EXPAND_TYPE_YEAR_DAY,
+			TourTag.EXPAND_TYPE_YEAR_MONTH_DAY			};
 
 	private class ActionTagStructure extends Action {
 
@@ -80,9 +82,9 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 
 						// remove the children of the tag because another type of children will be displayed
 						final TreeViewer treeViewer = fTourViewer.getTreeViewer();
-						
+
 						final boolean isTagExpanded = treeViewer.getExpandedState(tagItem);
-						
+
 						final Tree tree = treeViewer.getTree();
 						tree.setRedraw(false);
 						{
@@ -95,14 +97,14 @@ public class ActionSetTreeExpandType extends Action implements IMenuCreator {
 						tree.setRedraw(true);
 
 						// set new expand type
-						tagItem.setExpandType(fExpandType);
+						tagItem.setNewExpandType(fExpandType);
 
 						tagItem.clearChildren();
 
 						if (isTagExpanded) {
 							treeViewer.setExpandedState(tagItem, true);
 						}
-						
+
 						treeViewer.refresh(tagItem);
 					}
 				}

@@ -31,8 +31,12 @@ import net.tourbook.util.PixelConverter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.VerifyEvent;
@@ -62,7 +66,10 @@ public class UI {
 
 	public static final String				EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String				EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
-	public static final String				IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";							//$NON-NLS-1$
+	public static final String				IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";						//$NON-NLS-1$
+
+	public static final String				TAG_COLOR						= "TAG_FG";
+	public static final String				SUB_TAG_COLOR					= "SUB_TAG_COLOR";
 
 	/**
 	 * contains a new line string
@@ -135,9 +142,11 @@ public class UI {
 
 	private static UI						instance;
 
-	public static final DateFormat			TimeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
-	public static final DateFormat			DateFormatter					= DateFormat.getDateInstance(DateFormat.SHORT);
+	public static final DateFormat			TimeFormatterShort				= DateFormat.getTimeInstance(DateFormat.SHORT);
+	public static final DateFormat			DateFormatterShort				= DateFormat.getDateInstance(DateFormat.SHORT);
 	public static final DateFormat			DateFormatterFull				= DateFormat.getDateInstance(DateFormat.FULL);
+
+	public static Styler					TAG_STYLER;
 
 	static {
 
@@ -146,13 +155,26 @@ public class UI {
 		/*
 		 * load images into the image registry
 		 */
-
 		IMAGE_REGISTRY = TourbookPlugin.getDefault().getImageRegistry();
 
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
+
+		/*
+		 * set colors
+		 */
+		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+
+		colorRegistry.put(SUB_TAG_COLOR, new RGB(0x60, 0x9E, 0x1B));
+		colorRegistry.put(TAG_COLOR, new RGB(0xF0, 0x81, 0x0F));
+
+		/*
+		 * set styler
+		 */
+		TAG_STYLER = StyledString.createColorRegistryStyler(TAG_COLOR, null);
+
 	}
 
 	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();

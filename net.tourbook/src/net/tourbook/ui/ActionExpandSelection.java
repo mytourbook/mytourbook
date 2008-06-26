@@ -32,6 +32,7 @@ public class ActionExpandSelection extends Action {
 
 		fTreeViewer = tourViewer;
 
+		setText(Messages.app_action_expand_selection_tooltip);
 		setToolTipText(Messages.app_action_expand_selection_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__expand_all));
 	}

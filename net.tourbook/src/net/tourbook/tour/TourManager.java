@@ -182,7 +182,7 @@ public class TourManager {
 
 		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 
-		return UI.DateFormatter.format(calendar.getTime());
+		return UI.DateFormatterShort.format(calendar.getTime());
 	}
 
 	public static String getTourDateFull(final TourData tourData) {
@@ -207,7 +207,7 @@ public class TourManager {
 				tourData.getStartHour(),
 				tourData.getStartMinute());
 
-		return UI.TimeFormatter.format(calendar.getTime());
+		return UI.TimeFormatterShort.format(calendar.getTime());
 	}
 
 	/**

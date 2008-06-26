@@ -32,6 +32,7 @@ public class ActionCollapseAll extends Action {
 
 		fTreeViewer = treeViewer;
 
+		setText(Messages.tourCatalog_view_action_collapse_all_tooltip);
 		setToolTipText(Messages.tourCatalog_view_action_collapse_all_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
 	}
@@ -44,7 +45,6 @@ public class ActionCollapseAll extends Action {
 			fTreeViewer.collapseAll();
 
 			final Object firstElement = ((StructuredSelection) fTreeViewer.getSelection()).getFirstElement();
-
 			if (firstElement != null) {
 				fTreeViewer.reveal(firstElement);
 			}

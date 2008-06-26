@@ -94,7 +94,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private Button				fBtnRename;
 	private Button				fBtnReset;
 
-	private TVIPrefTagRoot			fRootItem;
+	private TVIPrefTagRoot		fRootItem;
 
 	private Image				fImgTag			= TourbookPlugin.getImageDescriptor(Messages.Image__tag).createImage();
 	private Image				fImgTagRoot		= TourbookPlugin.getImageDescriptor(Messages.Image__tag_root)
@@ -814,7 +814,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		if (selection instanceof TVIPrefTag) {
 
 			// save tag
-			
+
 			final TVIPrefTag tourTagItem = ((TVIPrefTag) selection);
 			final TourTag tourTag = tourTagItem.getTourTag();
 
@@ -828,7 +828,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		} else if (selection instanceof TVIPrefTagCategory) {
 
 			// save category
-			
+
 			final TVIPrefTagCategory tourCategoryItem = ((TVIPrefTagCategory) selection);
 			final TourTagCategory tourCategory = tourCategoryItem.getTourTagCategory();
 

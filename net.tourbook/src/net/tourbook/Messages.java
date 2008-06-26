@@ -43,6 +43,8 @@ public class Messages extends NLS {
 	public static String	app_action_expand_selection_tooltip;
 
 	public static String		app_action_expand_type_flat;
+	public static String	app_action_expand_type_year_day;
+
 	public static String		app_action_expand_type_year_month_day;
 	public static String		app_action_quick_edit;
 	public static String		app_action_set_tour_tag_tree_expand_type;

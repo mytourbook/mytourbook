@@ -179,13 +179,13 @@ public class TourTypeFilter {
 				sqlString = ""; //$NON-NLS-1$
 			} else {
 				// select tour types which are not defined
-				sqlString = " AND tourType_typeId is null"; //$NON-NLS-1$
+				sqlString = " AND TourData.tourType_typeId is null"; //$NON-NLS-1$
 			}
 			break;
 
 		case FILTER_TYPE_DB:
 
-			sqlString = " AND tourType_typeId =" + Long.toString(fTourType.getTypeId()); //$NON-NLS-1$
+			sqlString = " AND TourData.tourType_typeId =" + Long.toString(fTourType.getTypeId()); //$NON-NLS-1$
 			break;
 
 		case FILTER_TYPE_TOURTYPE_SET:
@@ -209,7 +209,7 @@ public class TourTypeFilter {
 						filter += " OR "; //$NON-NLS-1$
 					}
 
-					filter += " tourType_typeId =" + Long.toString(((TourType) item).getTypeId()); //$NON-NLS-1$
+					filter += " TourData.tourType_typeId =" + Long.toString(((TourType) item).getTypeId()); //$NON-NLS-1$
 
 					itemIndex++;
 				}

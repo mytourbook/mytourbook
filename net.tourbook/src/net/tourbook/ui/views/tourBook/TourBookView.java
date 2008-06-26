@@ -326,7 +326,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		 * fill view toolbar
 		 */
 		final IToolBarManager tbm = actionBars.getToolBarManager();
-		
+
 		tbm.add(new ActionExpandSelection(fTourViewer));
 		tbm.add(new ActionCollapseAll(fTourViewer));
 
@@ -499,7 +499,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		TreeColumnDefinition colDef;
 
 		/*
-		 * column: date
+		 * first column: date
 		 */
 		colDef = TreeColumnFactory.DATE.createColumn(fColumnManager, pixelConverter);
 		colDef.setCanModifyVisibility(false);
@@ -907,15 +907,11 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	}
 
 	/**
-	 * @param initializeYearMonth
-	 *            reset the selected year/month when set to <code>true</code>
 	 */
-	private void getTourViewerSelection(final boolean initializeYearMonth) {
+	private void getTourViewerSelection() {
 
-		if (initializeYearMonth) {
-			fTourViewerSelectedYear = -1;
-			fTourViewerSelectedMonth = -1;
-		}
+		fTourViewerSelectedYear = -1;
+		fTourViewerSelectedMonth = -1;
 
 		final ITreeSelection selectedItems = (ITreeSelection) fTourViewer.getSelection();
 		final TreePath[] treePaths = selectedItems.getPaths();
@@ -956,7 +952,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	private void refreshTourViewer() {
 
-		getTourViewerSelection(true);
+		getTourViewerSelection();
 
 		// refresh the tree viewer
 		fRootItem.fetchChildren();

@@ -72,7 +72,7 @@ public class TVITagViewRoot extends TVITagViewItem {
 				children.add(treeItem);
 
 				treeItem.tagCategoryId = result.getLong(1);
-				treeItem.treeColumn = result.getString(2);
+				treeItem.treeColumn = treeItem.name = result.getString(2);
 			}
 
 			/*
@@ -93,13 +93,16 @@ public class TVITagViewRoot extends TVITagViewItem {
 
 			while (result.next()) {
 
-				final TVITagViewTag treeItem = new TVITagViewTag(this);
+				final TVITagViewTag tagItem = new TVITagViewTag(this);
+				children.add(tagItem);
 
-				treeItem.tagId = result.getLong(1);
-				treeItem.treeColumn = result.getString(2);
-				treeItem.setExpandType(result.getInt(3));
+				final long tagId = result.getLong(1);
 
-				children.add(treeItem);
+				tagItem.tagId = tagId;
+				tagItem.treeColumn = tagItem.name = result.getString(2);
+				tagItem.setExpandType(result.getInt(3));
+
+				getTagTotals(tagItem);
 			}
 
 			conn.close();

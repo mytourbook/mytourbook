@@ -8,11 +8,12 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.UI;
 
 public class TVITagViewTagCategory extends TVITagViewItem {
 
-
-	public long				tagCategoryId;
+	long	tagCategoryId;
+	String	name;
 
 	public TVITagViewTagCategory(final TVITagViewItem parentItem) {
 		setParentItem(parentItem);
@@ -47,7 +48,7 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 			sb.append(" tblCat.name");//			//2
 
 			sb.append(" FROM " + jTblCatCat + " jTblCatCat");
-			
+
 			sb.append(" LEFT OUTER JOIN " + tblCat + " tblCat ON ");
 			sb.append(" jTblCatCat.TourTagCategory_tagCategoryId2 = tblCat.tagCategoryId ");
 
@@ -65,8 +66,7 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 				children.add(treeItem);
 
 				treeItem.tagCategoryId = result.getLong(1);
-				treeItem.treeColumn = result.getString(2);
-
+				treeItem.treeColumn = treeItem.name = result.getString(2);
 			}
 
 			/*
@@ -79,27 +79,33 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 			sb.append(" tblTag.name,");//		2
 			sb.append(" tblTag.expandType");//	3
 
-			sb.append(" FROM " + jTblCatTag + " jTblCatTag");
-			
-			sb.append(" LEFT OUTER JOIN " + tblTag + " tblTag ON ");
-			sb.append(" jTblCatTag.TourTag_TagId = tblTag.tagId ");
+			sb.append(" FROM " + jTblCatTag + " jTblCatTag" + UI.NEW_LINE);
 
-			sb.append(" WHERE jTblCatTag.TourTagCategory_TagCategoryId = ?");
-			sb.append(" ORDER BY tblTag.name");
+			// get all tags for the category
+			sb.append(" LEFT OUTER JOIN " + tblTag + " tblTag ON");
+			sb.append(" jTblCatTag.TourTag_TagId = tblTag.tagId" + UI.NEW_LINE);
 
-			statement = conn.prepareStatement(sb.toString());
+			sb.append(" WHERE jTblCatTag.TourTagCategory_TagCategoryId = ?" + UI.NEW_LINE);
+			sb.append(" ORDER BY tblTag.name" + UI.NEW_LINE);
+
+			final String sql = sb.toString();
+			statement = conn.prepareStatement(sql);
 			statement.setLong(1, tagCategoryId);
 
 			result = statement.executeQuery();
 			while (result.next()) {
 
-				final TVITagViewTag treeItem = new TVITagViewTag(this);
+				final TVITagViewTag tagItem = new TVITagViewTag(this);
+				children.add(tagItem);
 
-				treeItem.tagId = result.getLong(1);
-				treeItem.treeColumn = result.getString(2);
-				treeItem.setExpandType(result.getInt(3));
+				final long tagId = result.getLong(1);
+				final int expandType = result.getInt(3);
 
-				children.add(treeItem);
+				tagItem.tagId = tagId;
+				tagItem.treeColumn = tagItem.name = result.getString(2);
+				tagItem.setExpandType(expandType);
+
+				getTagTotals(tagItem);
 			}
 
 			conn.close();

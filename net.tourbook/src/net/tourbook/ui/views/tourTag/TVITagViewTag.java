@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
@@ -12,13 +13,14 @@ import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
 
-import org.joda.time.DateTime;
-
 public class TVITagViewTag extends TVITagViewItem {
 
-	public long	tagId;
+	private static final DateFormat	fDF	= DateFormat.getDateInstance(DateFormat.SHORT);
 
-	private int	fExpandType;
+	long							tagId;
+	String							name;
+
+	private int						fExpandType;
 
 	public TVITagViewTag(final TVITagViewItem parentItem) {
 		setParentItem(parentItem);
@@ -33,7 +35,11 @@ public class TVITagViewTag extends TVITagViewItem {
 			break;
 
 		case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
-			getChildrenYearMonthDay();
+			getChildrenYearMonthDay(true);
+			break;
+
+		case TourTag.EXPAND_TYPE_YEAR_DAY:
+			getChildrenYearMonthDay(false);
 			break;
 
 		default:
@@ -54,32 +60,30 @@ public class TVITagViewTag extends TVITagViewItem {
 
 		try {
 
-			sb.append("SELECT ");
+			sb.append("SELECT");
 
-			sb.append(" Tdata.tourId,");//					// 1 
-			sb.append(" Tdata.startYear,"); //				// 2 
-			sb.append(" Tdata.startMonth,");//				// 3
-			sb.append(" Tdata.startDay,");//				// 4
-			sb.append(" Tdata.tourTitle,");//				// 5
-			sb.append(" Tdata.tourType_typeId,");//			// 6
-
-			sb.append(" jTdataTtag2.TourTag_tagId");//		// 7 
+			sb.append(" tourId,");//						1 
+			sb.append(" jTdataTtag2.TourTag_tagId,");//		2
+			sb.append(TVITagViewTour.SQL_TOUR_COLUMNS); //	3
 
 			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
 
 			// get all tours for current tag
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " Tdata");
-			sb.append(" ON jTdataTtag.TourData_tourId=Tdata.tourId ");
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData");
+			sb.append(" ON jTdataTtag.TourData_tourId = TourData.tourId ");
 
 			// get all tag id's for one tour 
 			sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag2");
-			sb.append(" ON Tdata.tourID = jTdataTtag2.TourData_tourId");
+			sb.append(" ON TourData.tourID = jTdataTtag2.TourData_tourId");
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");// + tagId);
+			sb.append(sqlTourPersonId());
+			sb.append(sqlTourTypeId());
+
 			sb.append(" ORDER BY startYear, startMonth, startDay, startHour, startMinute"); //$NON-NLS-1$
 
-			long lastTourId = -1;
-			ArrayList<Long> tagIds = null;
+			long previousTourId = -1;
+			TVITagViewTour tourItem = null;
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
@@ -89,37 +93,29 @@ public class TVITagViewTag extends TVITagViewItem {
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
-				long tourId = result.getLong(1);
+				final long tourId = result.getLong(1);
+				final Object resultTagId = result.getObject(2);
 
-				if (tourId == lastTourId) {
+				if (tourId == previousTourId) {
 
 					// get tags from outer join
 
-					final Object resultTagId = result.getObject(7);
 					if (resultTagId instanceof Long) {
-						tagIds.add((Long) resultTagId);
+						tourItem.tagIds.add((Long) resultTagId);
 					}
 
 				} else {
 
-					final TVITagViewTour tourItem = new TVITagViewTour(this);
+					tourItem = new TVITagViewTour(this);
 					children.add(tourItem);
 
-					tourItem.tourId = tourId = result.getLong(1);
-					tourItem.tourDate = new DateTime(result.getInt(2), result.getInt(3), result.getInt(4), 0, 0, 0, 0);
-					tourItem.tourTitle = result.getString(5);
-
-					final Object tourTypeId = result.getObject(6);
-					tourItem.tourTypeId = (tourTypeId == null ? TourDatabase.ENTITY_IS_NOT_SAVED : (Long) tourTypeId);
-
-					final Object resultTagId = result.getObject(7);
-					if (resultTagId instanceof Long) {
-						tourItem.tagIds = tagIds = new ArrayList<Long>();
-						tagIds.add((Long) resultTagId);
-					}
+					tourItem.tourId = tourId;
+					tourItem.getTourColumnData(result, resultTagId, 3);
+					
+					tourItem.treeColumn = fDF.format(tourItem.tourDate.toDate());
 				}
 
-				lastTourId = tourId;
+				previousTourId = tourId;
 			}
 
 			conn.close();
@@ -129,7 +125,7 @@ public class TVITagViewTag extends TVITagViewItem {
 		}
 	}
 
-	private void getChildrenYearMonthDay() {
+	private void getChildrenYearMonthDay(final boolean isMonth) {
 
 		/*
 		 * set the children for the root item, these are year items
@@ -152,8 +148,8 @@ public class TVITagViewTag extends TVITagViewItem {
 			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
 
 			// get all tours for current tag
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " Tdata");
-			sb.append(" ON jTdataTtag.TourData_tourId=Tdata.tourId ");
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData");
+			sb.append(" ON jTdataTtag.TourData_tourId = TourData.tourId ");
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");
 			sb.append(sqlTourPersonId());
@@ -172,11 +168,11 @@ public class TVITagViewTag extends TVITagViewItem {
 
 				final int dbYear = result.getInt(1);
 
-				final TVITagViewYear tourItem = new TVITagViewYear(this, dbYear);
+				final TVITagViewYear tourItem = new TVITagViewYear(this, dbYear, isMonth);
 				children.add(tourItem);
 
 				tourItem.treeColumn = Integer.toString(dbYear);
-				tourItem.addSumData(result, 1);
+				tourItem.getSumColumnData(result, 2);
 			}
 
 			conn.close();
@@ -193,12 +189,16 @@ public class TVITagViewTag extends TVITagViewItem {
 	@Override
 	protected void remove() {}
 
+	public void setExpandType(final int expandType) {
+		fExpandType = expandType;
+	}
+
 	/**
 	 * Set the expand type for the item and save the changed model in the database
 	 * 
 	 * @param expandType
 	 */
-	public void setExpandType(final int expandType) {
+	public void setNewExpandType(final int expandType) {
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 

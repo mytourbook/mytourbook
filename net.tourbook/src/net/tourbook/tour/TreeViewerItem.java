@@ -199,19 +199,18 @@ public abstract class TreeViewerItem {
 	 */
 	public String sqlTourPersonId() {
 
-		final StringBuffer sqlString = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 
 		final TourPerson activePerson = TourbookPlugin.getDefault().getActivePerson();
 
 		final long personId = activePerson == null ? -1 : activePerson.getPersonId();
-
 		if (personId == -1) {
 			// select all people
 		} else {
 			// select only one person
-			sqlString.append(" AND tourPerson_personId = " + Long.toString(personId)); //$NON-NLS-1$
+			sb.append(" AND TourData.tourPerson_personId = " + Long.toString(personId)); //$NON-NLS-1$
 		}
-		return sqlString.toString();
+		return sb.toString();
 	}
 
 	/**

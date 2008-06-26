@@ -15,27 +15,43 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourTag;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
 
 public abstract class TVITagViewItem extends TreeViewerItem {
 
-	static final String	SQL_SUM_COLUMNS	= "SUM(TOURDISTANCE), " // 				1	//$NON-NLS-1$
-												+ "SUM(TOURRECORDINGTIME), " //	2	//$NON-NLS-1$
-												+ "SUM(TOURDRIVINGTIME), " //	3	//$NON-NLS-1$
-												+ "SUM(TOURALTUP), " //			4	//$NON-NLS-1$
-												+ "SUM(TOURALTDOWN)," //		5	//$NON-NLS-1$
-												+ "SUM(1)," //					6	//$NON-NLS-1$
-												+ "MAX(MAXSPEED)," //			7	//$NON-NLS-1$
-												+ "SUM(TOURDISTANCE)," //		8	//$NON-NLS-1$
-												+ "SUM(TOURDRIVINGTIME)," //	9	//$NON-NLS-1$
-												+ "MAX(MAXALTITUDE)," //		10	//$NON-NLS-1$
-												+ "MAX(MAXPULSE)," //			11	//$NON-NLS-1$
-												+ "AVG(AVGPULSE)," //			12	//$NON-NLS-1$
-												+ "AVG(AVGCADENCE)," //			13	//$NON-NLS-1$
-												+ "AVG(AVGTEMPERATURE)";	//	14	//$NON-NLS-1$
+	static final String	SQL_SUM_COLUMNS			= ""//
+														+ "SUM(tourDistance)," // 		0	//$NON-NLS-1$
+														+ "SUM(tourRecordingTime)," //	1	//$NON-NLS-1$
+														+ "SUM(tourDrivingTime)," //	2	//$NON-NLS-1$
+														+ "SUM(tourAltUp)," //			3	//$NON-NLS-1$
+														+ "SUM(tourAltDown)," //		4	//$NON-NLS-1$
+														+ "MAX(maxPulse)," //			5	//$NON-NLS-1$
+														+ "MAX(maxAltitude)," //		6	//$NON-NLS-1$
+														+ "MAX(maxSpeed)," //			7	//$NON-NLS-1$
+														+ "AVG(avgPulse)," //			8	//$NON-NLS-1$
+														+ "AVG(avgCadence)," //			9	//$NON-NLS-1$
+														+ "AVG(avgTemperature)," //		10	//$NON-NLS-1$
+
+														+ "SUM(1)";		//				11	//$NON-NLS-1$
+
+	static final String	SQL_TOUR_SUM_COLUMNS	= ""//
+														+ "tourDistance," // 			0	//$NON-NLS-1$
+														+ "tourRecordingTime," //		1	//$NON-NLS-1$
+														+ "tourDrivingTime," //			2	//$NON-NLS-1$
+														+ "tourAltUp," //				3	//$NON-NLS-1$
+														+ "tourAltDown," //				4	//$NON-NLS-1$
+														+ "maxPulse," //				5	//$NON-NLS-1$
+														+ "maxAltitude," //				6	//$NON-NLS-1$
+														+ "maxSpeed," //				7	//$NON-NLS-1$
+														+ "avgPulse," //				8	//$NON-NLS-1$
+														+ "avgCadence," //				9	//$NON-NLS-1$
+														+ "avgTemperature"; //			10	//$NON-NLS-1$
 
 	/**
 	 * content which is displayed in the tree column
@@ -50,43 +66,82 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 	long				colAltitudeUp;
 	long				colAltitudeDown;
 
-	long				colCounter;
-
 	float				colMaxSpeed;
-	float				colAvgSpeed;
-
-	long				colMaxAltitude;
 	long				colMaxPulse;
+	long				colMaxAltitude;
 
+	float				colAvgSpeed;
 	long				colAvgPulse;
 	long				colAvgCadence;
 	long				colAvgTemperature;
 
-	public void addSumData(final ResultSet result, final int startIndex) throws SQLException {
+	long				colItemCounter;
 
-		colDistance = result.getLong(startIndex + 1);
+	void getDefaultColumnData(final ResultSet result, final int startIndex) throws SQLException {
 
-		colRecordingTime = result.getLong(startIndex + 2);
-		colDrivingTime = result.getLong(startIndex + 3);
+		colDistance = result.getLong(startIndex + 0);
 
-		colAltitudeUp = result.getLong(startIndex + 4);
-		colAltitudeDown = result.getLong(startIndex + 5);
+		colRecordingTime = result.getLong(startIndex + 1);
+		colDrivingTime = result.getLong(startIndex + 2);
 
-		colCounter = result.getLong(startIndex + 6);
+		colAltitudeUp = result.getLong(startIndex + 3);
+		colAltitudeDown = result.getLong(startIndex + 4);
 
+		colMaxPulse = result.getLong(startIndex + 5);
+		colMaxAltitude = result.getLong(startIndex + 6);
 		colMaxSpeed = result.getFloat(startIndex + 7);
+
+		colAvgPulse = result.getLong(startIndex + 8);
+		colAvgCadence = result.getLong(startIndex + 9);
+		colAvgTemperature = result.getLong(startIndex + 10);
 
 		// prevent divide by 0
 		// 3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME)	
-		final float dbSpeed = result.getFloat(startIndex + 9);
-		colAvgSpeed = (float) (dbSpeed == 0 ? 0 : 3.6 * result.getLong(startIndex + 8) / dbSpeed);
+		colAvgSpeed = (float) (colDrivingTime == 0 ? 0 : 3.6 * colDistance / colDrivingTime);
+	}
 
-		colMaxAltitude = result.getLong(startIndex + 10);
-		colMaxPulse = result.getLong(startIndex + 11);
+	public void getSumColumnData(final ResultSet result, final int startIndex) throws SQLException {
 
-		colAvgPulse = result.getLong(startIndex + 12);
-		colAvgCadence = result.getLong(startIndex + 13);
-		colAvgTemperature = result.getLong(startIndex + 14);
+		getDefaultColumnData(result, startIndex);
+
+		colItemCounter = result.getLong(startIndex + 11);
+	}
+
+	protected void getTagTotals(final TVITagViewTag tagItem) {
+
+		try {
+			final StringBuilder sb = new StringBuilder();
+
+			/*
+			 * get tags
+			 */
+			sb.append("SELECT ");
+			sb.append(SQL_SUM_COLUMNS);
+
+			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jtblTagData");
+
+			// get data for a tour
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON ");
+			sb.append(" jtblTagData.TourData_tourId = TourData.tourId");
+
+			sb.append(" WHERE jtblTagData.TourTag_TagId = ?");
+			sb.append(sqlTourPersonId());
+			sb.append(sqlTourTypeId());
+
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sb.toString());
+			statement.setLong(1, tagItem.tagId);
+
+			final ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				tagItem.getSumColumnData(result, 1);
+			}
+
+			conn.close();
+
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
