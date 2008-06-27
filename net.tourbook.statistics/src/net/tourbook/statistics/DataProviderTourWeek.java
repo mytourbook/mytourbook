@@ -42,11 +42,11 @@ public class DataProviderTourWeek extends DataProvider {
 
 	private DataProviderTourWeek() {}
 
-	TourDataWeek getWeekData(	TourPerson person,
-								TourTypeFilter tourTypeFilter,
-								int lastYear,
-								int numberOfYears,
-								boolean refreshData) {
+	TourDataWeek getWeekData(	final TourPerson person,
+								final TourTypeFilter tourTypeFilter,
+								final int lastYear,
+								final int numberOfYears,
+								final boolean refreshData) {
 
 		// when the data for the year are already loaded, all is done
 		if (fActivePerson == person
@@ -68,11 +68,11 @@ public class DataProviderTourWeek extends DataProvider {
 		fTourWeekData = new TourDataWeek();
 
 		// get the tour types
-		ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-		TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
+		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		int weekCounter = 0;
-		for (int weeks : fYearWeeks) {
+		for (final int weeks : fYearWeeks) {
 			weekCounter += weeks;
 		}
 
@@ -84,7 +84,7 @@ public class DataProviderTourWeek extends DataProvider {
 		final int serieLength = colorOffset + tourTypes.length;
 		final int valueLength = weekCounter;
 
-		String sqlString = "SELECT " //$NON-NLS-1$
+		final String sqlString = "SELECT " //$NON-NLS-1$
 				+ "StartYear				, " // 1 //$NON-NLS-1$
 				+ "StartWeek				, " // 2 //$NON-NLS-1$
 				+ "SUM(TourDistance)		, " // 3 //$NON-NLS-1$
@@ -112,9 +112,9 @@ public class DataProviderTourWeek extends DataProvider {
 
 			final long[][] dbTypeIds = new long[serieLength][valueLength];
 
-			Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement = conn.prepareStatement(sqlString);
-			ResultSet result = statement.executeQuery();
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
 
@@ -185,8 +185,8 @@ public class DataProviderTourWeek extends DataProvider {
 			fTourWeekData.fDrivingTime = dbDrivingTime;
 			fTourWeekData.fBreakTime = dbBreakTime;
 
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
 		}
 
 		return fTourWeekData;

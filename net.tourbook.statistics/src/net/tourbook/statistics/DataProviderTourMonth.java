@@ -34,14 +34,14 @@ public class DataProviderTourMonth extends DataProvider {
 
 	private TourDataMonth					fTourMonthData;
 
-	private DataProviderTourMonth() {}
-
 	public static DataProviderTourMonth getInstance() {
 		if (fInstance == null) {
 			fInstance = new DataProviderTourMonth();
 		}
 		return fInstance;
 	}
+
+	private DataProviderTourMonth() {}
 
 	TourDataMonth getMonthData(	final TourPerson person,
 								final TourTypeFilter tourTypeFilter,
@@ -167,7 +167,7 @@ public class DataProviderTourMonth extends DataProvider {
 			fTourMonthData.fBreakTime = dbBreakTime;
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 
 		return fTourMonthData;

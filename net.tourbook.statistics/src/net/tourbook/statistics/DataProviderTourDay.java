@@ -334,7 +334,7 @@ public class DataProviderTourDay extends DataProvider {
 			fTourDayData.tourDescription = dbTourDescription;
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 
 		return fTourDayData;

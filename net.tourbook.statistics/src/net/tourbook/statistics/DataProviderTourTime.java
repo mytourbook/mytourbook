@@ -272,7 +272,7 @@ public class DataProviderTourTime extends DataProvider {
 			fTourDataTime.tourDescription = dbTourDescription;
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 
 		return fTourDataTime;

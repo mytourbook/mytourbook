@@ -34,14 +34,14 @@ public class DataProviderTourYear extends DataProvider {
 
 	private TourDataYear				fTourDataYear;
 
-	private DataProviderTourYear() {}
-
 	public static DataProviderTourYear getInstance() {
 		if (fInstance == null) {
 			fInstance = new DataProviderTourYear();
 		}
 		return fInstance;
 	}
+
+	private DataProviderTourYear() {}
 
 	TourDataYear getYearData(	final TourPerson person,
 								final TourTypeFilter tourTypeFilter,
@@ -153,7 +153,7 @@ public class DataProviderTourYear extends DataProvider {
 
 			conn.close();
 
-			int[] years = new int[fNumberOfYears];
+			final int[] years = new int[fNumberOfYears];
 			int yearIndex = 0;
 			for (int currentYear = fLastYear - fNumberOfYears + 1; currentYear <= fLastYear; currentYear++) {
 				years[yearIndex++] = currentYear;
@@ -175,7 +175,7 @@ public class DataProviderTourYear extends DataProvider {
 			fTourDataYear.fBreakTime = dbBreakTime;
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 
 		return fTourDataYear;
