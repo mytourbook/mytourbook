@@ -25,6 +25,7 @@ import java.util.HashMap;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.UI;
 
 /**
  * contains tree viewer items (TVI) for reference tours
@@ -51,7 +52,7 @@ public class CompareResultItemReferenceTour extends TreeViewerItem {
 
 		private float	tourSpeed;
 
-		public StoredComparedTour(long compareId, int startIndex, int endIndex, float speed) {
+		public StoredComparedTour(final long compareId, final int startIndex, final int endIndex, final float speed) {
 			this.comparedId = compareId;
 			this.startIndex = startIndex;
 			this.endIndex = endIndex;
@@ -59,8 +60,8 @@ public class CompareResultItemReferenceTour extends TreeViewerItem {
 		}
 	}
 
-	public CompareResultItemReferenceTour(CompareResultItemRoot parentItem, String label,
-			TourReference refTour, long tourId) {
+	public CompareResultItemReferenceTour(final CompareResultItemRoot parentItem, final String label,
+			final TourReference refTour, final long tourId) {
 
 		this.setParentItem(parentItem);
 
@@ -72,24 +73,24 @@ public class CompareResultItemReferenceTour extends TreeViewerItem {
 	@Override
 	protected void fetchChildren() {
 
-		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
+		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
 		fStoredComparedTours = new HashMap<Long, StoredComparedTour>();
 
-		CompareResultItemComparedTour[] comparedTours = TourCompareManager.getInstance().getComparedTours();
+		final CompareResultItemComparedTour[] comparedTours = TourCompareManager.getInstance().getComparedTours();
 
-		long refId = refTour.getRefId();
+		final long refId = refTour.getRefId();
 
-		String sqlString = "SELECT tourId, comparedId, startIndex, endIndex, tourSpeed  \n" //$NON-NLS-1$
+		final String sqlString = "SELECT tourId, comparedId, startIndex, endIndex, tourSpeed  \n" //$NON-NLS-1$
 				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("WHERE refTourId=" + refId); //$NON-NLS-1$
 
 		try {
 
-			Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement = conn.prepareStatement(sqlString);
-			ResultSet result = statement.executeQuery();
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
 				fStoredComparedTours.put(result.getLong(1),
@@ -101,12 +102,12 @@ public class CompareResultItemReferenceTour extends TreeViewerItem {
 
 			conn.close();
 
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
 		}
 
 		// create children for one reference tour
-		for (CompareResultItemComparedTour compTour : comparedTours) {
+		for (final CompareResultItemComparedTour compTour : comparedTours) {
 
 			if (compTour.refTour.getRefId() == refId) {
 
@@ -119,8 +120,8 @@ public class CompareResultItemReferenceTour extends TreeViewerItem {
 				 * set the status if the compared tour is already stored in the database and set the
 				 * id for the compared tour
 				 */
-				Long comparedTourId = compTour.comparedTourData.getTourId();
-				boolean isStoredForRefTour = fStoredComparedTours.containsKey(comparedTourId);
+				final Long comparedTourId = compTour.comparedTourData.getTourId();
+				final boolean isStoredForRefTour = fStoredComparedTours.containsKey(comparedTourId);
 
 				if (isStoredForRefTour) {
 					final StoredComparedTour storedComparedTour = fStoredComparedTours.get(comparedTourId);

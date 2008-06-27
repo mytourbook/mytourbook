@@ -93,14 +93,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	static public final String			ID							= "net.tourbook.views.tagViewID";	//$NON-NLS-1$
 
 	private static final String			MEMENTO_COLUMN_SORT_ORDER	= "tagview.column_sort_order";		//$NON-NLS-1$
-
 	private static final String			MEMENTO_COLUMN_WIDTH		= "tagview.column_width";			//$NON-NLS-1$
 
-	public static final String			STATEMENT_TOURDATA_TOURTAG	= "tourData_tourTag";
 	private IMemento					fSessionMemento;
 
 	private static final NumberFormat	fNF							= NumberFormat.getNumberInstance();
-//	private static final DateFormat		fDF							= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	private Composite					fViewerContainer;
 
@@ -134,7 +131,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		public boolean equals(final Object a, final Object b) {
 
-			if (a instanceof TVITagViewYear && b instanceof TVITagViewYear) {
+			if (a == b) {
+
+				return true;
+
+			} else if (a instanceof TVITagViewYear && b instanceof TVITagViewYear) {
 
 				final TVITagViewYear year1 = (TVITagViewYear) a;
 				final TVITagViewYear year2 = (TVITagViewYear) b;
@@ -154,13 +155,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 				return ((TVITagViewTag) a).tagId == ((TVITagViewTag) b).tagId;
 
-			} else if (a instanceof TagView && b instanceof TagView) {
-
-				return ((TagView) a) == ((TagView) b);
-
-			} else if (a instanceof TVITagViewRoot && b instanceof TVITagViewRoot) {
-
-				return ((TVITagViewRoot) a) == ((TVITagViewRoot) b);
 			}
 
 			return false;
@@ -629,10 +623,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			fSessionMemento = memento;
 		}
 	}
-
-//	public PreparedStatement getStatement(final String statementTourdataTourtag) {
-//		return fStatements.get(statementTourdataTourtag);
-//	}
 
 	public boolean isFromTourEditor() {
 		return false;

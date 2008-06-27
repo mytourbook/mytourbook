@@ -16,6 +16,7 @@
 
 package net.tourbook.ui;
 
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import net.tourbook.Messages;
+import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -356,6 +358,48 @@ public class UI {
 		gd.widthHint = width;
 		control.setLayoutData(gd);
 		return gd;
+	}
+
+	public static void showSQLException(SQLException e) {
+		while (e != null) {
+			System.out.println("\n---SQLException Caught---\n"); //$NON-NLS-1$
+			System.out.println("SQLState: " + (e).getSQLState()); //$NON-NLS-1$
+			System.out.println("Severity: " + (e).getErrorCode()); //$NON-NLS-1$
+			System.out.println("Message: " + (e).getMessage()); //$NON-NLS-1$
+			e.printStackTrace();
+			e = e.getNextException();
+		}
+	}
+
+	/**
+	 * @return Returns the where clause to select only the data which for the active person
+	 */
+	public static String sqlTourPersonId() {
+	
+		final StringBuffer sb = new StringBuffer();
+		final TourPerson activePerson = TourbookPlugin.getDefault().getActivePerson();
+	
+		final long personId = activePerson == null ? -1 : activePerson.getPersonId();
+		if (personId == -1) {
+			// select all people
+		} else {
+			// select only one person
+			sb.append(" AND TourData.tourPerson_personId = " + Long.toString(personId)); //$NON-NLS-1$
+		}
+		
+		return sb.toString();
+	}
+
+	/**
+	 * @return Returns a sql statement string to select only the data which tour type is defined
+	 */
+	public static TourTypeSQL sqlTourTypes() {
+		final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
+		if (activeTourTypeFilter == null) {
+			return new TourTypeSQL(EMPTY_STRING);
+		} else {
+			return activeTourTypeFilter.getSQLString();
+		}
 	}
 
 	/**

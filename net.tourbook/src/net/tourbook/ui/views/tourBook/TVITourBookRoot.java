@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.TourTypeSQL;
 import net.tourbook.ui.UI;
 
 public class TVITourBookRoot extends TourBookTreeViewerItem {
@@ -40,13 +41,19 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
+		final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
+
 		final String sqlString = "SELECT " + //		$NON-NLS-1$
-				"StartYear, " //					$NON-NLS-1$
-				+ SQL_SUM_COLUMNS
+
+				" StartYear, " //		1				$NON-NLS-1$
+				+ SQL_SUM_COLUMNS //	2
+
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
+
 				+ " WHERE 1=1 " //					$NON-NLS-1$
-				+ sqlTourPersonId()
-				+ sqlTourTypeId()
+				+ UI.sqlTourPersonId()
+				+ sqlTourTypes.getWhereClause()
+
 				+ " GROUP BY StartYear" //			$NON-NLS-1$
 				+ " ORDER BY StartYear"; //			$NON-NLS-1$
 
@@ -54,6 +61,8 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			sqlTourTypes.setSQLParameters(statement, 1);
+
 			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
@@ -83,7 +92,7 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 			conn.close();
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 	}
 

@@ -22,6 +22,8 @@ import java.sql.SQLException;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.TourTypeSQL;
+import net.tourbook.ui.UI;
 
 public abstract class TVITagViewItem extends TreeViewerItem {
 
@@ -111,6 +113,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 		try {
 			final StringBuilder sb = new StringBuilder();
+			final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
 
 			/*
 			 * get tags
@@ -125,12 +128,13 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 			sb.append(" jtblTagData.TourData_tourId = TourData.tourId");
 
 			sb.append(" WHERE jtblTagData.TourTag_TagId = ?");
-			sb.append(sqlTourPersonId());
-			sb.append(sqlTourTypeId());
+			sb.append(UI.sqlTourPersonId());
+			sb.append(sqlTourTypes.getWhereClause());
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, tagItem.tagId);
+			sqlTourTypes.setSQLParameters(statement, 2);
 
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
@@ -140,7 +144,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 			conn.close();
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 	}
 

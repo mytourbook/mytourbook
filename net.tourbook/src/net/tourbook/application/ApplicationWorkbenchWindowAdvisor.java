@@ -71,8 +71,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private IPropertyListener					partPropertyListener;
 
-	public ApplicationWorkbenchWindowAdvisor(final ApplicationWorkbenchAdvisor wbAdvisor,
-			final IWorkbenchWindowConfigurer configurer) {
+	public ApplicationWorkbenchWindowAdvisor(	final ApplicationWorkbenchAdvisor wbAdvisor,
+												final IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
 		this.wbAdvisor = wbAdvisor;
 
@@ -261,8 +261,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 					getWindowConfigurer().getWindow().getActivePage().showView(RawDataView.ID,
 							null,
 							IWorkbenchPage.VIEW_ACTIVATE);
-				}
-				catch (final PartInitException e) {
+				} catch (final PartInitException e) {
 					e.printStackTrace();
 				}
 
@@ -272,9 +271,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			// select person/tour type which was selected in the last session
 			fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
 
-		}
-		catch (final SQLException e) {
-			e.printStackTrace();
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
 		}
 	}
 
@@ -322,11 +320,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	@Override
 	public boolean preWindowShellClose() {
-		
+
 //		TourDatabase.getInstance().closeConnectionPool();
 
 		TagManager.saveSettings();
-		
+
 		return super.preWindowShellClose();
 	}
 

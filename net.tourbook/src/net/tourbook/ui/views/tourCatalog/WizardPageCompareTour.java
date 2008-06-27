@@ -99,9 +99,11 @@ public class WizardPageCompareTour extends WizardPage {
 
 	public class TourContentProvider implements ITreeContentProvider {
 
-		public Object[] getChildren(Object parentElement) {
+		public void dispose() {}
 
-			TourCatalogTourItem tourItem = ((TourCatalogTourItem) parentElement);
+		public Object[] getChildren(final Object parentElement) {
+
+			final TourCatalogTourItem tourItem = ((TourCatalogTourItem) parentElement);
 
 			// fetch the children if not yet done
 			if (!tourItem.hasChildrenBeenFetched()) {
@@ -110,30 +112,32 @@ public class WizardPageCompareTour extends WizardPage {
 			return tourItem.getChildren();
 		}
 
-		public Object getParent(Object element) {
-			return ((TourCatalogTourItem) element).getParent();
-		}
-
-		public boolean hasChildren(Object element) {
-			return ((TourCatalogTourItem) element).hasChildren();
-		}
-
-		public Object[] getElements(Object inputElement) {
+		public Object[] getElements(final Object inputElement) {
 			return fWizardDataModel.getTopLevelEntries();
 		}
 
-		public void dispose() {}
+		public Object getParent(final Object element) {
+			return ((TourCatalogTourItem) element).getParent();
+		}
 
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public boolean hasChildren(final Object element) {
+			return ((TourCatalogTourItem) element).hasChildren();
+		}
+
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 
 	}
 
 	class TourLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-		public String getColumnText(Object obj, int index) {
+		public Image getColumnImage(final Object element, final int columnIndex) {
+			return null;
+		}
 
-			TourCatalogTourItem tourItem = (TourCatalogTourItem) obj;
-			long[] row = tourItem.fTourItemData;
+		public String getColumnText(final Object obj, final int index) {
+
+			final TourCatalogTourItem tourItem = (TourCatalogTourItem) obj;
+			final long[] row = tourItem.fTourItemData;
 
 			switch (index) {
 			case COLUMN_DATE:
@@ -143,14 +147,14 @@ public class WizardPageCompareTour extends WizardPage {
 				if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
 					fNf.setMinimumFractionDigits(1);
 					fNf.setMaximumFractionDigits(1);
-					return fNf.format(((float) row[COLUMN_DISTANCE]) / (1000 * UI.UNIT_VALUE_DISTANCE));
+					return fNf.format((row[COLUMN_DISTANCE]) / (1000 * UI.UNIT_VALUE_DISTANCE));
 				} else {
 					return ""; //$NON-NLS-1$
 				}
 
 			case COLUMN_RECORDING:
 				if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
-					long recordingTime = row[COLUMN_RECORDING];
+					final long recordingTime = row[COLUMN_RECORDING];
 					return new Formatter().format(Messages.Format_hhmm,
 							(recordingTime / 3600),
 							((recordingTime % 3600) / 60)).toString();
@@ -169,27 +173,23 @@ public class WizardPageCompareTour extends WizardPage {
 				return (getText(obj));
 			}
 		}
-
-		public Image getColumnImage(Object element, int columnIndex) {
-			return null;
-		}
 	}
 
-	protected WizardPageCompareTour(String pageName) {
+	protected WizardPageCompareTour(final String pageName) {
 		super(pageName);
 		setTitle(Messages.tourCatalog_wizard_Page_compared_tours_title);
 	}
 
-	public void createControl(Composite parent) {
+	public void createControl(final Composite parent) {
 
-		Composite pageContainer = new Composite(parent, SWT.NONE);
+		final Composite pageContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(pageContainer);
 
 		fCheckSelectAll = new Button(pageContainer, SWT.CHECK);
 		fCheckSelectAll.setText(Messages.tourCatalog_wizard_Action_select_all_tours);
 		fCheckSelectAll.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				enableTours(fCheckSelectAll.getSelection());
 				validatePage();
 			}
@@ -198,7 +198,7 @@ public class WizardPageCompareTour extends WizardPage {
 		/*
 		 * create master detail layout
 		 */
-		Composite masterDetailContainer = new Composite(pageContainer, SWT.NONE);
+		final Composite masterDetailContainer = new Composite(pageContainer, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
 
 		final Control viewer = createTourViewer(masterDetailContainer);
@@ -234,40 +234,13 @@ public class WizardPageCompareTour extends WizardPage {
 		validatePage();
 	}
 
-	/**
-	 * enables/disables the controls which belong to the tour
-	 * 
-	 * @param isChecked
-	 */
-	private void enableTours(boolean isChecked) {
-
-		boolean isEnabled = !isChecked;
-
-		// load tour data into the viewer if not yet done
-		if (isEnabled && fIsTourViewerInitialized == false) {
-			BusyIndicator.showWhile(null, new Runnable() {
-				public void run() {
-
-					// initialize the data before the view input is set
-					fWizardDataModel.setRootItem();
-
-					fTourViewer.setInput(this);
-				}
-			});
-
-			fIsTourViewerInitialized = true;
-		}
-
-		fTourViewer.getControl().setEnabled(isEnabled);
-	}
-
-	private Control createTourViewer(Composite parent) {
+	private Control createTourViewer(final Composite parent) {
 
 		initializeDialogUnits(parent);
 
 		final TreeColumnLayout treeLayout = new TreeColumnLayout();
 
-		Composite layoutContainer = new Composite(parent, SWT.NONE);
+		final Composite layoutContainer = new Composite(parent, SWT.NONE);
 		layoutContainer.setLayout(treeLayout);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
 
@@ -314,22 +287,22 @@ public class WizardPageCompareTour extends WizardPage {
 		fTourViewer.setUseHashlookup(true);
 
 		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
+			public void selectionChanged(final SelectionChangedEvent event) {
 				showCompareTour(event);
 			}
 		});
 
 		fTourViewer.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(CheckStateChangedEvent event) {
+			public void checkStateChanged(final CheckStateChangedEvent event) {
 				validatePage();
 			}
 		});
 
 		fTourViewer.addDoubleClickListener(new IDoubleClickListener() {
 
-			public void doubleClick(DoubleClickEvent event) {
+			public void doubleClick(final DoubleClickEvent event) {
 
-				Object selection = ((IStructuredSelection) fTourViewer.getSelection()).getFirstElement();
+				final Object selection = ((IStructuredSelection) fTourViewer.getSelection()).getFirstElement();
 
 				if (selection != null) {
 
@@ -347,15 +320,122 @@ public class WizardPageCompareTour extends WizardPage {
 		return layoutContainer;
 	}
 
-	private void showCompareTour(SelectionChangedEvent event) {
+	/**
+	 * enables/disables the controls which belong to the tour
+	 * 
+	 * @param isChecked
+	 */
+	private void enableTours(final boolean isChecked) {
 
-		IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+		final boolean isEnabled = !isChecked;
+
+		// load tour data into the viewer if not yet done
+		if (isEnabled && fIsTourViewerInitialized == false) {
+			BusyIndicator.showWhile(null, new Runnable() {
+				public void run() {
+
+					// initialize the data before the view input is set
+					fWizardDataModel.setRootItem();
+
+					fTourViewer.setInput(this);
+				}
+			});
+
+			fIsTourViewerInitialized = true;
+		}
+
+		fTourViewer.getControl().setEnabled(isEnabled);
+	}
+
+	private Long[] getAllTourIds() {
+
+		final String sqlString = "SELECT TourId FROM " + TourDatabase.TABLE_TOUR_DATA; //$NON-NLS-1$
+
+		final ArrayList<Long> tourIdList = new ArrayList<Long>();
+
+		try {
+
+			final Connection conn = TourDatabase.getInstance().getConnection();
+
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final ResultSet result = statement.executeQuery();
+
+			while (result.next()) {
+				tourIdList.add(result.getLong(1));
+			}
+
+			conn.close();
+
+		}
+		catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		return tourIdList.toArray(new Long[tourIdList.size()]);
+	}
+
+	/**
+	 * @return return all checked tours
+	 */
+	public Object[] getComparedTours() {
+
+		TourCatalogTourItem[] tours = new TourCatalogTourItem[0];
+
+		if (fCheckSelectAll.getSelection()) {
+
+			// return all tours
+
+			return getAllTourIds();
+
+		} else {
+
+			// convert the Object[] into a TreeViewerItem[]
+			final Object[] checked = fTourViewer.getCheckedElements();
+			tours = new TourCatalogTourItem[checked.length];
+			System.arraycopy(checked, 0, tours, 0, checked.length);
+		}
+
+		return tours;
+	}
+
+	void persistDialogSettings() {
+
+		final IDialogSettings wizardSettings = getDialogSettings();
+
+		// save the viewer width
+		wizardSettings.put(COMP_TOUR_VIEWER_WIDTH, fTourViewer.getTree().getSize().x);
+
+		wizardSettings.put(COMP_TOUR_SELECT_ALL, fCheckSelectAll.getSelection());
+	}
+
+	private void restoreDialogSettings() {
+
+		final IDialogSettings wizardSettings = getDialogSettings();
+
+		// restore viewer width
+		Integer viewerWidth = null;
+		try {
+			viewerWidth = wizardSettings.getInt(COMP_TOUR_VIEWER_WIDTH);
+		}
+		catch (final NumberFormatException e) {}
+		fViewerDetailForm.setViewerWidth(viewerWidth);
+
+		// restore checkbox: select all tours
+		final boolean isSelectAllTours = wizardSettings.getBoolean(COMP_TOUR_SELECT_ALL);
+		fCheckSelectAll.setSelection(isSelectAllTours);
+
+		enableTours(isSelectAllTours);
+	}
+
+	private void showCompareTour(final SelectionChangedEvent event) {
+
+		final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
 		if (selection != null) {
 
 			if (selection.getFirstElement() instanceof TourCatalogTourItem) {
 
-				TourCatalogTourItem tourItem = (TourCatalogTourItem) selection.getFirstElement();
+				final TourCatalogTourItem tourItem = (TourCatalogTourItem) selection.getFirstElement();
 
 				if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
 
@@ -363,7 +443,7 @@ public class WizardPageCompareTour extends WizardPage {
 					final TourData tourData = TourManager.getInstance().getTourData(tourItem.getTourId());
 
 					// set altitude visible
-					TourChartConfiguration chartConfig = new TourChartConfiguration(true);
+					final TourChartConfiguration chartConfig = new TourChartConfiguration(true);
 					chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
 					fTourChart.updateTourChart(tourData, chartConfig, false);
@@ -377,35 +457,6 @@ public class WizardPageCompareTour extends WizardPage {
 				}
 			}
 		}
-	}
-
-	private void restoreDialogSettings() {
-
-		IDialogSettings wizardSettings = getDialogSettings();
-
-		// restore viewer width
-		Integer viewerWidth = null;
-		try {
-			viewerWidth = wizardSettings.getInt(COMP_TOUR_VIEWER_WIDTH);
-		}
-		catch (NumberFormatException e) {}
-		fViewerDetailForm.setViewerWidth(viewerWidth);
-
-		// restore checkbox: select all tours
-		boolean isSelectAllTours = wizardSettings.getBoolean(COMP_TOUR_SELECT_ALL);
-		fCheckSelectAll.setSelection(isSelectAllTours);
-
-		enableTours(isSelectAllTours);
-	}
-
-	void persistDialogSettings() {
-
-		IDialogSettings wizardSettings = getDialogSettings();
-
-		// save the viewer width
-		wizardSettings.put(COMP_TOUR_VIEWER_WIDTH, fTourViewer.getTree().getSize().x);
-
-		wizardSettings.put(COMP_TOUR_SELECT_ALL, fCheckSelectAll.getSelection());
 	}
 
 	private boolean validatePage() {
@@ -433,57 +484,6 @@ public class WizardPageCompareTour extends WizardPage {
 				return true;
 			}
 		}
-	}
-
-	/**
-	 * @return return all checked tours
-	 */
-	public Object[] getComparedTours() {
-
-		TourCatalogTourItem[] tours = new TourCatalogTourItem[0];
-
-		if (fCheckSelectAll.getSelection()) {
-
-			// return all tours
-
-			return getAllTourIds();
-
-		} else {
-
-			// convert the Object[] into a TreeViewerItem[]
-			Object[] checked = fTourViewer.getCheckedElements();
-			tours = new TourCatalogTourItem[checked.length];
-			System.arraycopy(checked, 0, tours, 0, checked.length);
-		}
-
-		return tours;
-	}
-
-	private Long[] getAllTourIds() {
-
-		String sqlString = "SELECT TourId FROM " + TourDatabase.TABLE_TOUR_DATA; //$NON-NLS-1$
-
-		ArrayList<Long> tourIdList = new ArrayList<Long>();
-
-		try {
-
-			Connection conn = TourDatabase.getInstance().getConnection();
-
-			PreparedStatement statement = conn.prepareStatement(sqlString);
-			ResultSet result = statement.executeQuery();
-
-			while (result.next()) {
-				tourIdList.add(result.getLong(1));
-			}
-
-			conn.close();
-
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return tourIdList.toArray(new Long[tourIdList.size()]);
 	}
 
 }

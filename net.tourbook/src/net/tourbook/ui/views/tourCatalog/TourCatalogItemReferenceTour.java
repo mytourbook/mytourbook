@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.tour.TreeViewerTourItem;
+import net.tourbook.ui.UI;
 
 /**
  * TTI (TreeViewerItem) is used in the tree viewer {@link TourCatalogView}, it contains tree items
@@ -37,7 +38,7 @@ public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
 	int		yearMapMinValue	= Integer.MIN_VALUE;
 	int		yearMapMaxValue;
 
-	public TourCatalogItemReferenceTour(TourCatalogItemRoot parentItem, String label, long refId, long tourId) {
+	public TourCatalogItemReferenceTour(final TourCatalogItemRoot parentItem, final String label, final long refId, final long tourId) {
 
 		this.setParentItem(parentItem);
 
@@ -50,7 +51,7 @@ public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
 	@Override
 	protected void fetchChildren() {
 
-		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
+		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
 		/**
@@ -72,7 +73,7 @@ public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
 		 *</code>
 		 */
 
-		String sqlString = "SELECT startYear\n" //$NON-NLS-1$
+		final String sqlString = "SELECT startYear\n" //$NON-NLS-1$
 				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" WHERE refTourId=" + refId + "\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" GROUP BY startYear"); //$NON-NLS-1$
@@ -80,9 +81,9 @@ public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
 		// System.out.println(sqlString);
 		try {
 
-			Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement = conn.prepareStatement(sqlString);
-			ResultSet result = statement.executeQuery();
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
 				children.add(new TourCatalogItemYear(this, refId, result.getInt(1)));
@@ -90,8 +91,8 @@ public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
 
 			conn.close();
 
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
 		}
 	}
 

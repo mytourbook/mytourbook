@@ -24,7 +24,8 @@ import net.tourbook.tour.TreeViewerItem;
 
 public abstract class TourBookTreeViewerItem extends TreeViewerItem implements ITourItem {
 
-	static final String	SQL_SUM_COLUMNS	= "SUM(TOURDISTANCE), " // 				1	//$NON-NLS-1$
+	static final String	SQL_SUM_COLUMNS	= "" //
+												+ "SUM(TOURDISTANCE), " // 		1	//$NON-NLS-1$
 												+ "SUM(TOURRECORDINGTIME), " //	2	//$NON-NLS-1$
 												+ "SUM(TOURDRIVINGTIME), " //	3	//$NON-NLS-1$
 												+ "SUM(TOURALTUP), " //			4	//$NON-NLS-1$

@@ -20,8 +20,6 @@ import java.util.ArrayList;
 
 import net.tourbook.data.TourPerson;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 /**
  * Abstract class which contains an item for a tree viewer
@@ -137,15 +135,6 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
-	 * @return Returns a sql string for the WHERE clause to select only the data which tour type is
-	 *         defined in fTourTypeId
-	 */
-	public String getSQLTourTypeId() {
-		return TourbookPlugin.getDefault().getActiveTourTypeFilter().getSQLString();
-
-	}
-
-	/**
 	 * @return Returns a list with all childrens of this item, <code>null</code> will be returned
 	 *         when childrens have not yet been fetched
 	 */
@@ -192,36 +181,5 @@ public abstract class TreeViewerItem {
 
 	public void setParentItem(final TreeViewerItem parentItem) {
 		fParentItem = parentItem;
-	}
-
-	/**
-	 * @return Returns a sql statement string to select only the data which for the selected person
-	 */
-	public String sqlTourPersonId() {
-
-		final StringBuffer sb = new StringBuffer();
-
-		final TourPerson activePerson = TourbookPlugin.getDefault().getActivePerson();
-
-		final long personId = activePerson == null ? -1 : activePerson.getPersonId();
-		if (personId == -1) {
-			// select all people
-		} else {
-			// select only one person
-			sb.append(" AND TourData.tourPerson_personId = " + Long.toString(personId)); //$NON-NLS-1$
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * @return Returns a sql statement string to select only the data which tour type is defined
-	 */
-	public String sqlTourTypeId() {
-		final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
-		if (activeTourTypeFilter == null) {
-			return UI.EMPTY_STRING;
-		} else {
-			return activeTourTypeFilter.getSQLString();
-		}
 	}
 }

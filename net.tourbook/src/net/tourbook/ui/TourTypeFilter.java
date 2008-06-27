@@ -16,6 +16,8 @@
 
 package net.tourbook.ui;
 
+import java.util.ArrayList;
+
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 
@@ -168,24 +170,26 @@ public class TourTypeFilter {
 	/**
 	 * @return Returns a sql string for the WHERE clause to select the tour types in the database
 	 */
-	public String getSQLString() {
+	public TourTypeSQL getSQLString() {
 
-		String sqlString = null;
+		String sqlSelect = UI.EMPTY_STRING;
+		final ArrayList<Long> sqlTourTypes = new ArrayList<Long>();
 
 		switch (fFilterType) {
 		case FILTER_TYPE_SYSTEM:
 			if (fSystemFilterId == SYSTEM_FILTER_ID_ALL) {
 				// select all tour types also not defined tour types
-				sqlString = ""; //$NON-NLS-1$
+				sqlSelect = ""; //$NON-NLS-1$
 			} else {
 				// select tour types which are not defined
-				sqlString = " AND TourData.tourType_typeId is null"; //$NON-NLS-1$
+				sqlSelect = " AND TourData.tourType_typeId IS NULL"; //$NON-NLS-1$
 			}
 			break;
 
 		case FILTER_TYPE_DB:
 
-			sqlString = " AND TourData.tourType_typeId =" + Long.toString(fTourType.getTypeId()); //$NON-NLS-1$
+			sqlSelect = " AND TourData.tourType_typeId=?"; //$NON-NLS-1$
+			sqlTourTypes.add(fTourType.getTypeId());
 			break;
 
 		case FILTER_TYPE_TOURTYPE_SET:
@@ -194,7 +198,7 @@ public class TourTypeFilter {
 
 			if (tourTypes.length == 0) {
 				// select nothing
-				sqlString = " AND 1=0"; //$NON-NLS-1$
+				sqlSelect = " AND 1=0"; //$NON-NLS-1$
 
 			} else {
 
@@ -209,11 +213,12 @@ public class TourTypeFilter {
 						filter += " OR "; //$NON-NLS-1$
 					}
 
-					filter += " TourData.tourType_typeId =" + Long.toString(((TourType) item).getTypeId()); //$NON-NLS-1$
+					filter += " TourData.tourType_typeId =?"; //$NON-NLS-1$
+					sqlTourTypes.add(((TourType) item).getTypeId());
 
 					itemIndex++;
 				}
-				sqlString = " AND (" + filter + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
+				sqlSelect = " AND (" + filter + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			break;
@@ -221,7 +226,8 @@ public class TourTypeFilter {
 		default:
 			break;
 		}
-		return sqlString;
+
+		return new TourTypeSQL(sqlSelect, sqlTourTypes);
 	}
 
 	public int getSystemFilterId() {

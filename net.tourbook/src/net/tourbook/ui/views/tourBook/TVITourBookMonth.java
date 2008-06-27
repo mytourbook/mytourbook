@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.TourTypeSQL;
 import net.tourbook.ui.UI;
 
 public class TVITourBookMonth extends TourBookTreeViewerItem {
@@ -50,9 +51,11 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 		setChildren(children);
 
 		final TVITourBookYear yearItem = (TVITourBookYear) (getParentItem());
+		final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
 
-		final String sqlString = "SELECT " //		//$NON-NLS-1$
-
+		final String sqlString = "" + //
+				//
+				"SELECT " //		//$NON-NLS-1$
 				+ "startYear," //			1	//$NON-NLS-1$
 				+ "startMonth," //			2	//$NON-NLS-1$
 				+ "startDay," //			3	//$NON-NLS-1$
@@ -85,8 +88,9 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 
 				+ (" WHERE STARTYEAR = ?")//				//$NON-NLS-1$
 				+ (" AND STARTMONTH = ?")//					//$NON-NLS-1$
-				+ sqlTourPersonId()
-				+ sqlTourTypeId()
+				+ UI.sqlTourPersonId()
+				+ sqlTourTypes.getWhereClause()
+				
 				+ " ORDER BY StartDay, StartHour, StartMinute"; //$NON-NLS-1$
 
 		try {
@@ -96,6 +100,7 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 			statement.setInt(1, yearItem.fTourYear);
 			statement.setInt(2, fTourMonth);
+			sqlTourTypes.setSQLParameters(statement, 3);
 
 //			final long time = System.currentTimeMillis();
 //			System.out.println(System.currentTimeMillis() - time + "ms");
@@ -173,7 +178,7 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 			conn.close();
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 	}
 

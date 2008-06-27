@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.TourTypeSQL;
 import net.tourbook.ui.UI;
 
 public class TVITagViewYear extends TVITagViewItem {
@@ -41,13 +42,14 @@ public class TVITagViewYear extends TVITagViewItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		final StringBuilder sb = new StringBuilder();
-
 		try {
 
 			/*
 			 * get all tours for the tag Id of this tree item
 			 */
+			final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
+			final StringBuilder sb = new StringBuilder();
+
 			sb.append("SELECT");
 
 			sb.append(" tourID,"); //							1	
@@ -66,8 +68,8 @@ public class TVITagViewYear extends TVITagViewItem {
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId=?");
 			sb.append(" AND startYear=?");
-			sb.append(sqlTourPersonId());
-			sb.append(sqlTourTypeId());
+			sb.append(UI.sqlTourPersonId());
+			sb.append(sqlTourTypes.getWhereClause());
 
 			sb.append(" ORDER BY startMonth, startDay, startHour, startMinute");
 
@@ -76,6 +78,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, fTagItem.tagId);
 			statement.setInt(2, fYear);
+			sqlTourTypes.setSQLParameters(statement, 3);
 
 			long lastTourId = -1;
 			TVITagViewTour tourItem = null;
@@ -112,7 +115,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			conn.close();
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 	}
 
@@ -123,13 +126,14 @@ public class TVITagViewYear extends TVITagViewItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		final StringBuilder sb = new StringBuilder();
-
 		try {
 
 			/*
 			 * get all tours for the tag Id of this tree item
 			 */
+			final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
+			final StringBuilder sb = new StringBuilder();
+			
 			sb.append("SELECT");
 			sb.append(" startYear,"); //		// 1
 			sb.append(" startMonth,"); //		// 2
@@ -144,8 +148,8 @@ public class TVITagViewYear extends TVITagViewItem {
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId=?");
 			sb.append(" AND startYear=?");
-			sb.append(sqlTourPersonId());
-			sb.append(sqlTourTypeId());
+			sb.append(UI.sqlTourPersonId());
+			sb.append(sqlTourTypes.getWhereClause());
 
 			sb.append(" GROUP BY startYear, startMonth");
 			sb.append(" ORDER BY startYear");
@@ -155,6 +159,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, fTagItem.tagId);
 			statement.setInt(2, fYear);
+			sqlTourTypes.setSQLParameters(statement, 3);
 
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
@@ -172,7 +177,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			conn.close();
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 	}
 

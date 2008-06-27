@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.UI;
 
 /**
  * Data fDataModel for the tour list viewer
@@ -32,23 +33,11 @@ public class WizardDataModel {
 
 	private TourCatalogTourItem	rootItem;
 
-	public void setRootItem() {
-
-		rootItem = new TourCatalogTourItem(TourCatalogTourItem.ITEM_TYPE_ROOT, new long[0]);
-
-		fetchChildren(rootItem);
-	}
-
-	public Object[] getTopLevelEntries() {
-
-		return rootItem.getChildren();
-	}
-
-	public void fetchChildren(TourCatalogTourItem parentItem) {
+	public void fetchChildren(final TourCatalogTourItem parentItem) {
 
 		int childType = 0;
 
-		String sumColumns = "SUM(TOURDISTANCE), SUM(TOURALTUP), SUM(TOURRECORDINGTIME)"; //$NON-NLS-1$
+		final String sumColumns = "SUM(TOURDISTANCE), SUM(TOURALTUP), SUM(TOURRECORDINGTIME)"; //$NON-NLS-1$
 		String sqlString = ""; //$NON-NLS-1$
 
 		switch (parentItem.getItemType()) {
@@ -92,21 +81,21 @@ public class WizardDataModel {
 
 		try {
 
-			Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement = conn.prepareStatement(sqlString);
-			ResultSet result = statement.executeQuery();
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final ResultSet result = statement.executeQuery();
 
-			int columnCount = result.getMetaData().getColumnCount();
+			final int columnCount = result.getMetaData().getColumnCount();
 
 			while (result.next()) {
 
-				long[] row = new long[columnCount];
+				final long[] row = new long[columnCount];
 
 				for (int col = 0; col < columnCount; col++) {
 					row[col] = result.getLong(col + 1);
 				}
 
-				TourCatalogTourItem childItem = new TourCatalogTourItem(childType, row);
+				final TourCatalogTourItem childItem = new TourCatalogTourItem(childType, row);
 
 				/*
 				 * when a tour item does not have children, it's set to be a
@@ -121,9 +110,21 @@ public class WizardDataModel {
 
 			conn.close();
 
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
 		}
 
+	}
+
+	public Object[] getTopLevelEntries() {
+
+		return rootItem.getChildren();
+	}
+
+	public void setRootItem() {
+
+		rootItem = new TourCatalogTourItem(TourCatalogTourItem.ITEM_TYPE_ROOT, new long[0]);
+
+		fetchChildren(rootItem);
 	}
 }

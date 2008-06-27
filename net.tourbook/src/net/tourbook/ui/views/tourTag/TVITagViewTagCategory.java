@@ -111,7 +111,7 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 			conn.close();
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 	}
 

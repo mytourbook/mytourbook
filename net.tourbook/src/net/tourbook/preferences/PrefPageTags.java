@@ -916,7 +916,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				updateTagViewer();
 
 			} catch (final SQLException e) {
-				e.printStackTrace();
+				UI.showSQLException(e);
 			}
 		}
 	}

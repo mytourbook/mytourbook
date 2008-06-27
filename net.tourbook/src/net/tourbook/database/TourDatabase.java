@@ -512,17 +512,6 @@ public class TourDatabase {
 		return fTourTypes;
 	}
 
-	public static void printSQLException(SQLException sqle) {
-		while (sqle != null) {
-			System.out.println("\n---SQLException Caught---\n"); //$NON-NLS-1$
-			System.out.println("SQLState: " + (sqle).getSQLState()); //$NON-NLS-1$
-			System.out.println("Severity: " + (sqle).getErrorCode()); //$NON-NLS-1$
-			System.out.println("Message: " + (sqle).getMessage()); //$NON-NLS-1$
-			sqle.printStackTrace();
-			sqle = sqle.getNextException();
-		}
-	}
-
 	/**
 	 * Remove a tour from the database
 	 * 
@@ -887,13 +876,13 @@ public class TourDatabase {
 				fIsTableChecked = true;
 
 			} catch (final SQLException e) {
-				e.getNextException().printStackTrace();
+				UI.showSQLException(e);
 			} finally {
 				if (stmt != null) {
 					try {
 						stmt.close();
 					} catch (final SQLException e) {
-						e.printStackTrace();
+						UI.showSQLException(e);
 					}
 				}
 			}
@@ -901,7 +890,7 @@ public class TourDatabase {
 			conn.close();
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 	}
 
@@ -962,7 +951,7 @@ public class TourDatabase {
 			conn.close();
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 		return true;
 	}
@@ -1639,7 +1628,7 @@ public class TourDatabase {
 		try {
 			conn = fPooledDataSource.getConnection();
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 
 		return conn;
@@ -1699,7 +1688,7 @@ public class TourDatabase {
 				System.out.println("Database path: " + fDatabasePath); //$NON-NLS-1$
 
 			} catch (final SQLException e1) {
-				e1.printStackTrace();
+				UI.showSQLException(e1);
 			}
 		}
 	}
@@ -1758,7 +1747,7 @@ public class TourDatabase {
 					+ (" where 1=1"); //$NON-NLS-1$
 			conn.createStatement().executeUpdate(sqlString);
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 
 		return true;
@@ -1784,7 +1773,7 @@ public class TourDatabase {
 			statement.close();
 
 		} catch (final SQLException e) {
-			printSQLException(e);
+			UI.showSQLException(e);
 		}
 	}
 
@@ -1805,7 +1794,7 @@ public class TourDatabase {
 			statement.close();
 
 		} catch (final SQLException e) {
-			printSQLException(e);
+			UI.showSQLException(e);
 		}
 	}
 
@@ -1867,7 +1856,7 @@ public class TourDatabase {
 			statement.close();
 
 		} catch (final SQLException e) {
-			printSQLException(e);
+			UI.showSQLException(e);
 		}
 
 		// Create a EntityManagerFactory here, so we can access TourData with EJB
@@ -1916,7 +1905,7 @@ public class TourDatabase {
 			statement.close();
 
 		} catch (final SQLException e) {
-			printSQLException(e);
+			UI.showSQLException(e);
 		}
 	}
 

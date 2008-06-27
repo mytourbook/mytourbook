@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.UI;
 
 /**
  * TTI (TreeViewerItem) is used in the tree viewer {@link TourCatalogView}, it contains tree items
@@ -38,7 +39,7 @@ public class TourCatalogItemYear extends TreeViewerItem {
 	 * @param refId
 	 * @param year
 	 */
-	public TourCatalogItemYear(TreeViewerItem parentItem, long refId, int year) {
+	public TourCatalogItemYear(final TreeViewerItem parentItem, final long refId, final int year) {
 
 		this.setParentItem(parentItem);
 
@@ -49,10 +50,10 @@ public class TourCatalogItemYear extends TreeViewerItem {
 	@Override
 	protected void fetchChildren() {
 
-		ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
+		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		String sqlString = "SELECT " //$NON-NLS-1$
+		final String sqlString = "SELECT " //$NON-NLS-1$
 				+ "tourDate, " //$NON-NLS-1$
 				+ "tourSpeed, " //$NON-NLS-1$
 				+ "comparedId, " //$NON-NLS-1$
@@ -68,9 +69,9 @@ public class TourCatalogItemYear extends TreeViewerItem {
 
 		try {
 
-			Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement = conn.prepareStatement(sqlString);
-			ResultSet result = statement.executeQuery();
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
 				children.add(new TourCatalogItemComparedTour(this,
@@ -85,9 +86,13 @@ public class TourCatalogItemYear extends TreeViewerItem {
 
 			conn.close();
 
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
 		}
+	}
+
+	TourCatalogItemReferenceTour getRefItem() {
+		return (TourCatalogItemReferenceTour) getParentItem();
 	}
 
 	@Override
@@ -98,10 +103,6 @@ public class TourCatalogItemYear extends TreeViewerItem {
 
 		// remove this tour item from the parent
 		getParentItem().getUnfetchedChildren().remove(this);
-	}
-
-	TourCatalogItemReferenceTour getRefItem() {
-		return (TourCatalogItemReferenceTour) getParentItem();
 	}
 
 }

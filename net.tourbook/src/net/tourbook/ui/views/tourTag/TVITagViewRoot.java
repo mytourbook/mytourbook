@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.UI;
 
 /**
  * root item for the tag view
@@ -108,7 +109,7 @@ public class TVITagViewRoot extends TVITagViewItem {
 			conn.close();
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			UI.showSQLException(e);
 		}
 	}
 

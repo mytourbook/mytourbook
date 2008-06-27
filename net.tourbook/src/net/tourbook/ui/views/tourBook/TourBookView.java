@@ -69,6 +69,7 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -107,50 +108,51 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	static public final String		ID									= "net.tourbook.views.tourListView";		//$NON-NLS-1$
 
 	private static final String		MEMENTO_TOURVIEWER_SELECTED_YEAR	= "tourbookview.tourviewer.selected-year";	//$NON-NLS-1$
+
 	private static final String		MEMENTO_TOURVIEWER_SELECTED_MONTH	= "tourbookview.tourviewer.selected-month"; //$NON-NLS-1$
 	private static final String		MEMENTO_COLUMN_SORT_ORDER			= "tourbookview.column_sort_order";		//$NON-NLS-1$
 	private static final String		MEMENTO_COLUMN_WIDTH				= "tourbookview.column_width";				//$NON-NLS-1$
-
 	private static IMemento			fSessionMemento;
 
 	private TreeViewer				fTourViewer;
-	private ColumnManager			fColumnManager;
 
+	private ColumnManager			fColumnManager;
 	private PostSelectionProvider	fPostSelectionProvider;
+
 	private ISelectionListener		fPostSelectionListener;
 	private IPartListener2			fPartListener;
 	private ITourPropertyListener	fTourPropertyListener;
-
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	TVITourBookRoot					fRootItem;
-	TourPerson						fActivePerson;
 
+	TourPerson						fActivePerson;
 	TourTypeFilter					fActiveTourTypeFilter;
 
 	public NumberFormat				fNF									= NumberFormat.getNumberInstance();
 
 	private final RGB				fRGBYearFg							= new RGB(0, 0, 0);
+
 	private final RGB				fRGBYearBg							= new RGB(255, 251, 153);
-
 	private final RGB				fRGBMonthFg							= new RGB(0, 0, 0);
+
 	private final RGB				fRGBMonthBg							= new RGB(255, 253, 191);
-
 	private final RGB				fRGBTourFg							= new RGB(0, 0, 0);
-	private final RGB				fRGBTourBg							= new RGB(255, 255, 255);
 
+	private final RGB				fRGBTourBg							= new RGB(255, 255, 255);
 	private Color					fColorYearFg;
+
 	private Color					fColorMonthFg;
 	private Color					fColorTourFg;
-
 	private Color					fColorYearBg;
+
 	private Color					fColorMonthBg;
 	private Color					fColorTourBg;
-
 	public Font						fFontNormal;
-	public Font						fFontBold;
 
+	public Font						fFontBold;
 	private ActionEditQuick			fActionEditQuick;
+
 	private ActionEditTour			fActionEditTour;
 	private ActionDeleteTour		fActionDeleteTour;
 	private ActionSetTourType		fActionSetTourType;
@@ -158,16 +160,51 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private ActionSetTourTag		fActionAddTag;
 	private ActionSetTourTag		fActionRemoveTag;
 	private ActionRemoveAllTags		fActionRemoveAllTags;
-
 	private int						fTourViewerSelectedYear				= -1;
-	private int						fTourViewerSelectedMonth			= -1;
 
+	private int						fTourViewerSelectedMonth			= -1;
 	Long							fActiveTourId;
 //	private int						fLastSelectedTourTypeId;
 
 	private Composite				fViewerContainer;
 
 	private ActionRefreshView		fActionRefreshView;
+
+	public class TagComparer implements IElementComparer {
+
+		public boolean equals(final Object a, final Object b) {
+
+			if (a == b) {
+
+				return true;
+
+			} else if (a instanceof TVITourBookYear && b instanceof TVITourBookYear) {
+
+				final TVITourBookYear item1 = (TVITourBookYear) a;
+				final TVITourBookYear item2 = (TVITourBookYear) b;
+				return item1.fTourYear == item2.fTourYear;
+
+			} else if (a instanceof TVITourBookMonth && b instanceof TVITourBookMonth) {
+
+				final TVITourBookMonth item1 = (TVITourBookMonth) a;
+				final TVITourBookMonth item2 = (TVITourBookMonth) b;
+				return item1.fTourYear == item2.fTourYear && item1.fTourMonth == item2.fTourMonth;
+
+			} else if (a instanceof TVITourBookTour && b instanceof TVITourBookTour) {
+
+				final TVITourBookTour item1 = (TVITourBookTour) a;
+				final TVITourBookTour item2 = (TVITourBookTour) b;
+				return item1.fTourId == item2.fTourId;
+
+			}
+
+			return false;
+		}
+
+		public int hashCode(final Object element) {
+			return 0;
+		}
+	}
 
 	private class TourBookContentProvider implements ITreeContentProvider {
 
@@ -416,6 +453,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fColumnManager.createColumns();
 
 		fTourViewer.setContentProvider(new TourBookContentProvider());
+		fTourViewer.setComparer(new TagComparer());
 		fTourViewer.setUseHashlookup(true);
 
 		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -952,17 +990,26 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	private void refreshTourViewer() {
 
-		getTourViewerSelection();
+//		getTourViewerSelection();
+//
+//		// refresh the tree viewer
+//		fRootItem.fetchChildren();
+//		fTourViewer.refresh();
+//
+//		if (fTourViewerSelectedYear == -1) {
+//			return;
+//		}
+//
+//		reselectTourViewer();
 
-		// refresh the tree viewer
-		fRootItem.fetchChildren();
-		fTourViewer.refresh();
-
-		if (fTourViewerSelectedYear == -1) {
-			return;
+		final Tree tree = fTourViewer.getTree();
+		tree.setRedraw(false);
+		{
+			final Object[] expandedElements = fTourViewer.getExpandedElements();
+			reloadViewer();
+			fTourViewer.setExpandedElements(expandedElements);
 		}
-
-		reselectTourViewer();
+		tree.setRedraw(true);
 	}
 
 	/**
@@ -970,7 +1017,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	 */
 	public void reloadViewer() {
 		fRootItem = new TVITourBookRoot(this);
-		fTourViewer.setInput(this);
+		fTourViewer.setInput(fRootItem);
 	}
 
 	private void reselectTourViewer() {
