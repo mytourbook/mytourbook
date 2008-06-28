@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -83,6 +84,7 @@ public class DataProviderTourWeek extends DataProvider {
 
 		final int serieLength = colorOffset + tourTypes.length;
 		final int valueLength = weekCounter;
+		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "SELECT " //$NON-NLS-1$
 				+ "StartYear				, " // 1 //$NON-NLS-1$
@@ -93,11 +95,12 @@ public class DataProviderTourWeek extends DataProvider {
 				+ "SUM(TourRecordingTime)	, " // 6 //$NON-NLS-1$
 				+ "SUM(TourDrivingTime)		, " // 7 //$NON-NLS-1$
 				+ "TourType_TypeId 			  " // 8 //$NON-NLS-1$
-				+ "\n" //$NON-NLS-1$
 				//
 				+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+				
 				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
-				+ getSQLFilter(person, tourTypeFilter)
+				+ sqlFilter.getWhereClause()
+				
 				+ (" GROUP BY StartYear, StartWeek, tourType_typeId") //$NON-NLS-1$
 				+ (" ORDER BY StartYear, StartWeek"); //$NON-NLS-1$
 
@@ -114,8 +117,9 @@ public class DataProviderTourWeek extends DataProvider {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			final ResultSet result = statement.executeQuery();
+			sqlFilter.setParameters(statement, 1);
 
+			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
 				final int dbYear = result.getInt(1);

@@ -71,15 +71,6 @@ public abstract class DataProvider {
 		return buffer.toString();
 	}
 
-	String getSQLFilter(TourPerson person, TourTypeFilter tourTypeFilter) {
-		return getSQLFilterPerson(person) + tourTypeFilter.getSQLString();
-	}
-
-	String getSQLFilterPerson(TourPerson person) {
-		return person == null ? "" : " AND tourPerson_personId = " //$NON-NLS-1$ //$NON-NLS-2$
-				+ Long.toString(person.getPersonId());
-	}
-
 	/**
 	 * @param selectedYear
 	 * @param numberOfYears

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.ArrayListToArray;
@@ -93,6 +94,7 @@ public class DataProviderTourTime extends DataProvider {
 
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "SELECT " //$NON-NLS-1$
 				+ "TourId," //					1 //$NON-NLS-1$
@@ -120,14 +122,11 @@ public class DataProviderTourTime extends DataProvider {
 				+ (" ON tourID = jTdataTtag.TourData_tourId")
 
 				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
-				+ getSQLFilter(person, tourTypeFilter)
+				+ sqlFilter.getWhereClause()
+				
 				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute"); //$NON-NLS-1$
 
 		try {
-
-			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			final ResultSet result = statement.executeQuery();
 
 			final ArrayList<String> dbTourTitle = new ArrayList<String>();
 			final ArrayList<String> dbTourDescription = new ArrayList<String>();
@@ -154,6 +153,12 @@ public class DataProviderTourTime extends DataProvider {
 			long lastTourId = -1;
 			ArrayList<Long> tagIds = null;
 
+			final Connection conn = TourDatabase.getInstance().getConnection();
+
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			sqlFilter.setParameters(statement, 1);
+
+			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
 				final long tourId = result.getLong(1);

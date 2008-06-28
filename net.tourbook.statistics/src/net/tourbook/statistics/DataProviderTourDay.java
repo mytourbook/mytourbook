@@ -27,6 +27,7 @@ import java.util.HashMap;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.ArrayListToArray;
@@ -79,9 +80,9 @@ public class DataProviderTourDay extends DataProvider {
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		fTourDayData = new TourDayData();
+		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = //
-		"SELECT " // //$NON-NLS-1$
+		final String sqlString = "SELECT " // //$NON-NLS-1$
 				+ "TourId, " //					// 1 //$NON-NLS-1$
 				+ "StartYear, " // 				// 2 //$NON-NLS-1$
 				+ "StartMonth, " // 			// 3 //$NON-NLS-1$
@@ -97,7 +98,7 @@ public class DataProviderTourDay extends DataProvider {
 				+ "TourDescription, " // 		// 13 //$NON-NLS-1$
 
 				+ "jTdataTtag.TourTag_tagId"//	// 14 //$NON-NLS-1$ 
-				
+
 				+ UI.NEW_LINE
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
@@ -107,14 +108,11 @@ public class DataProviderTourDay extends DataProvider {
 				+ (" ON tourID = jTdataTtag.TourData_tourId")
 
 				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
-				+ getSQLFilter(person, tourTypeFilter)
+				+ sqlFilter.getWhereClause()
 
 				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute "); //$NON-NLS-1$
 
 		try {
-			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			final ResultSet result = statement.executeQuery();
 
 			final ArrayList<Long> dbTourIds = new ArrayList<Long>();
 
@@ -136,11 +134,17 @@ public class DataProviderTourDay extends DataProvider {
 			final ArrayList<Long> dbTypeIds = new ArrayList<Long>();
 			final ArrayList<Integer> dbTypeColorIndex = new ArrayList<Integer>();
 
-			final HashMap<Long,ArrayList<Long>> dbTagIds = new HashMap<Long,ArrayList<Long>>();
+			final HashMap<Long, ArrayList<Long>> dbTagIds = new HashMap<Long, ArrayList<Long>>();
 
 			long lastTourId = -1;
 			ArrayList<Long> tagIds = null;
 
+			final Connection conn = TourDatabase.getInstance().getConnection();
+
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			sqlFilter.setParameters(statement, 1);
+
+			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
 				final long tourId = result.getLong(1);
@@ -157,7 +161,7 @@ public class DataProviderTourDay extends DataProvider {
 				} else {
 
 					// get first record for a tour
-					
+
 					final int tourYear = result.getShort(2);
 					final int tourMonth = result.getShort(3) - 1;
 
@@ -197,7 +201,7 @@ public class DataProviderTourDay extends DataProvider {
 
 						dbTagIds.put(tourId, tagIds);
 					}
-					
+
 					/*
 					 * convert type id to the type index in the tour types list which is also the
 					 * color index
@@ -217,7 +221,7 @@ public class DataProviderTourDay extends DataProvider {
 					dbTypeColorIndex.add(colorIndex);
 					dbTypeIds.add((Long) dbTypeIdObject);
 				}
-				
+
 				lastTourId = tourId;
 			}
 

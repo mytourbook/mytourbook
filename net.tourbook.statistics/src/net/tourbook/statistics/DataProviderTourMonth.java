@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -70,23 +71,25 @@ public class DataProviderTourMonth extends DataProvider {
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
 		fTourMonthData = new TourDataMonth();
+		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = //
-		"SELECT " // //$NON-NLS-1$
-				+ "StartYear				, " // 1 //$NON-NLS-1$
-				+ "STARTMONTH				, " // 2 //$NON-NLS-1$
-				+ "SUM(TOURDISTANCE)		, " // 3 //$NON-NLS-1$
-				+ "SUM(TOURALTUP)			, " // 4 //$NON-NLS-1$
+		final String sqlString = "SELECT " // //$NON-NLS-1$
+				+ "startYear," // 					1 //$NON-NLS-1$
+				+ "startMonth," // 					2 //$NON-NLS-1$
+				+ "SUM(tourDistance)," //			3 //$NON-NLS-1$
+				+ "SUM(tourAltUp)," // 				4 //$NON-NLS-1$
 				+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END)," // 5 //$NON-NLS-1$
-				+ "SUM(TourRecordingTime)	, " // 6 //$NON-NLS-1$
-				+ "SUM(TourDrivingTime)		, " // 7 //$NON-NLS-1$
-				+ "tourType_typeId 			\n" // 8 //$NON-NLS-1$
-				//
+				+ "SUM(tourRecordingTime)," // 		6 //$NON-NLS-1$
+				+ "SUM(tourDrivingTime)," // 		7 //$NON-NLS-1$
+				+ "tourType_typeId" // 				8 //$NON-NLS-1$
+
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE STARTYEAR IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
-				+ getSQLFilter(person, tourTypeFilter)
-				+ (" GROUP BY STARTYEAR, STARTMONTH, tourType_typeId") //$NON-NLS-1$
-				+ (" ORDER BY STARTYEAR, STARTMONTH"); //$NON-NLS-1$
+
+				+ (" WHERE startYear IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
+				+ sqlFilter.getWhereClause()
+
+				+ (" GROUP BY startYear, startMonth, tourType_typeId") //$NON-NLS-1$
+				+ (" ORDER BY startYear, startMonth"); //$NON-NLS-1$
 
 		int colorOffset = 0;
 		if (tourTypeFilter.showUndefinedTourTypes()) {
@@ -109,9 +112,11 @@ public class DataProviderTourMonth extends DataProvider {
 			final long[][] dbTypeIds = new long[tourTypeSerieLength][valueLength];
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			final ResultSet result = statement.executeQuery();
 
+			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			sqlFilter.setParameters(statement, 1);
+
+			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
 				final int resultYear = result.getInt(1);
