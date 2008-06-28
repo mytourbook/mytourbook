@@ -39,7 +39,7 @@ public class ActionEditTour extends Action {
 	@Override
 	public void run() {
 
-		Long tourId = fTourView.fActiveTourId;
+		Long tourId = fTourView.getActiveTourId();
 
 		if (tourId != null) {
 			TourManager.getInstance().openTourInEditor(tourId);

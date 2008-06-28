@@ -29,8 +29,8 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.TourTypeSQL;
 import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.CoreException;
@@ -509,7 +509,7 @@ public class StatisticContainer extends Composite {
 	 */
 	private void refreshYearCombobox() {
 
-		final TourTypeSQL tourTypeSQL = UI.sqlTourTypes();
+		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "SELECT " //
 				+ "startYear " //$NON-NLS-1$
@@ -517,9 +517,7 @@ public class StatisticContainer extends Composite {
 				+ " FROM " + TourDatabase.TABLE_TOUR_DATA //$NON-NLS-1$ 
 
 				+ " WHERE 1=1 "
-
-				+ UI.sqlTourPersonId()
-				+ tourTypeSQL.getWhereClause()
+				+ sqlFilter.getWhereClause()
 
 				+ " GROUP BY STARTYEAR ORDER BY STARTYEAR"; //$NON-NLS-1$
 
@@ -528,7 +526,7 @@ public class StatisticContainer extends Composite {
 		try {
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			tourTypeSQL.setSQLParameters(statement, 1);
+			sqlFilter.setParameters(statement, 1);
 
 			final ResultSet result = statement.executeQuery();
 

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
-import net.tourbook.ui.TourTypeSQL;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
 public class TVITagViewMonth extends TVITagViewItem {
@@ -40,7 +40,7 @@ public class TVITagViewMonth extends TVITagViewItem {
 			 * get all tours for the tag Id of this tree item
 			 */
 			final StringBuilder sb = new StringBuilder();
-			final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
+			final SQLFilter sqlFilter = new SQLFilter();
 
 			sb.append("SELECT");
 
@@ -61,8 +61,7 @@ public class TVITagViewMonth extends TVITagViewItem {
 			sb.append(" WHERE jTdataTtag.TourTag_TagId=?");
 			sb.append(" AND startYear=?");
 			sb.append(" AND startMonth=?");
-			sb.append(UI.sqlTourPersonId());
-			sb.append(sqlTourTypes.getWhereClause());
+			sb.append(sqlFilter.getWhereClause());
 
 			sb.append(" ORDER BY startDay, startHour, startMinute");
 
@@ -72,7 +71,7 @@ public class TVITagViewMonth extends TVITagViewItem {
 			statement.setLong(1, fYearItem.getTagId());
 			statement.setInt(2, fYear);
 			statement.setInt(3, fMonth);
-			sqlTourTypes.setSQLParameters(statement, 4);
+			sqlFilter.setParameters(statement, 4);
 
 			long lastTourId = -1;
 			TVITagViewTour tourItem = null;

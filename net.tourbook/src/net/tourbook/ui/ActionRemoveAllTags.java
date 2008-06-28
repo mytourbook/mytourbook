@@ -17,10 +17,14 @@
 package net.tourbook.ui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.ChangedTags;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
@@ -60,15 +64,26 @@ public class ActionRemoveAllTags extends Action {
 				final ArrayList<TourData> saveTours = (ArrayList<TourData>) selectedTours.clone();
 //				saveTours.removeAll(toursInEditor);
 
+				final HashMap<Long, TourTag> changedTags = new HashMap<Long, TourTag>();
+
 				// add tour tag in all tours (without tours from an editor)
 				for (final TourData tourData : saveTours) {
 
+					// get all tag's which will be removed
+					final Set<TourTag> tourTags = tourData.getTourTags();
+					for (final TourTag tourTag : tourTags) {
+						changedTags.put(tourTag.getTagId(), tourTag);
+					}
+
 					// remove all tour tags
-					tourData.getTourTags().clear();
+					tourTags.clear();
 					TourDatabase.saveTour(tourData);
 				}
 
-				TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
+				TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
+				
+				TourManager.firePropertyChange(TourManager.TOUR_TAGS_CHANGED,
+						new ChangedTags(changedTags, selectedTours, false));
 			}
 
 		};

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
-import net.tourbook.ui.TourTypeSQL;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
 public class TVITagViewYear extends TVITagViewItem {
@@ -47,7 +47,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			/*
 			 * get all tours for the tag Id of this tree item
 			 */
-			final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
+			final SQLFilter sqlFilter = new SQLFilter();
 			final StringBuilder sb = new StringBuilder();
 
 			sb.append("SELECT");
@@ -68,8 +68,7 @@ public class TVITagViewYear extends TVITagViewItem {
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId=?");
 			sb.append(" AND startYear=?");
-			sb.append(UI.sqlTourPersonId());
-			sb.append(sqlTourTypes.getWhereClause());
+			sb.append(sqlFilter.getWhereClause());
 
 			sb.append(" ORDER BY startMonth, startDay, startHour, startMinute");
 
@@ -78,7 +77,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, fTagItem.tagId);
 			statement.setInt(2, fYear);
-			sqlTourTypes.setSQLParameters(statement, 3);
+			sqlFilter.setParameters(statement, 3);
 
 			long lastTourId = -1;
 			TVITagViewTour tourItem = null;
@@ -131,7 +130,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			/*
 			 * get all tours for the tag Id of this tree item
 			 */
-			final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
+			final SQLFilter sqlFilter = new SQLFilter();
 			final StringBuilder sb = new StringBuilder();
 			
 			sb.append("SELECT");
@@ -148,8 +147,7 @@ public class TVITagViewYear extends TVITagViewItem {
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId=?");
 			sb.append(" AND startYear=?");
-			sb.append(UI.sqlTourPersonId());
-			sb.append(sqlTourTypes.getWhereClause());
+			sb.append(sqlFilter.getWhereClause());
 
 			sb.append(" GROUP BY startYear, startMonth");
 			sb.append(" ORDER BY startYear");
@@ -159,7 +157,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, fTagItem.tagId);
 			statement.setInt(2, fYear);
-			sqlTourTypes.setSQLParameters(statement, 3);
+			sqlFilter.setParameters(statement, 3);
 
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {

@@ -36,7 +36,7 @@ public class ActionEditQuick extends Action {
 	private ISelectedTours	fTourProvider;
 	private TourData		fTourData;
 
-	public ActionEditQuick(ISelectedTours tourProvider) {
+	public ActionEditQuick(final ISelectedTours tourProvider) {
 
 		setText(Messages.app_action_quick_edit);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
@@ -45,11 +45,12 @@ public class ActionEditQuick extends Action {
 		fTourProvider = tourProvider;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
 
 		// get tours which tour type should be changed
-		ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
 
 		if (selectedTours == null || selectedTours.size() == 0) {
 			return;
@@ -60,20 +61,21 @@ public class ActionEditQuick extends Action {
 		final QuickEditDialog dialog = new QuickEditDialog(Display.getCurrent().getActiveShell(), fTourData);
 		if (dialog.open() == Window.OK) {
 
-			ArrayList<TourData> toursInEditor = updateEditors(selectedTours);
+			final ArrayList<TourData> toursInEditor = updateEditors(selectedTours);
 
 			// remove all tours where the tour is opened in an editor
-			ArrayList<TourData> savedTours = (ArrayList<TourData>) selectedTours.clone();
+			final ArrayList<TourData> savedTours = (ArrayList<TourData>) selectedTours.clone();
 			savedTours.removeAll(toursInEditor);
 
 			// update all tours (without tours from an editor) with the new tour type
-			for (TourData tourData : savedTours) {
+			for (final TourData tourData : savedTours) {
 
 				// save the tour
 				TourDatabase.saveTour(tourData);
 			}
 
-			TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
+			TourManager.getInstance();
+			TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
 		}
 	}
 
@@ -85,32 +87,32 @@ public class ActionEditQuick extends Action {
 	 * @return
 	 * @return Returns the tours which are opened in a tour editor
 	 */
-	private ArrayList<TourData> updateEditors(ArrayList<TourData> selectedTours) {
+	private ArrayList<TourData> updateEditors(final ArrayList<TourData> selectedTours) {
 
-		ArrayList<IEditorPart> editorParts = UI.getOpenedEditors();
+		final ArrayList<IEditorPart> editorParts = UI.getOpenedEditors();
 
 		// list for tours which are updated in the editor
-		ArrayList<TourData> updatedTours = new ArrayList<TourData>();
+		final ArrayList<TourData> updatedTours = new ArrayList<TourData>();
 
 		// check if a tour is in an editor
-		for (IEditorPart editorPart : editorParts) {
+		for (final IEditorPart editorPart : editorParts) {
 			if (editorPart instanceof TourEditor) {
 
-				IEditorInput editorInput = editorPart.getEditorInput();
+				final IEditorInput editorInput = editorPart.getEditorInput();
 
 				if (editorInput instanceof TourEditorInput) {
 
-					TourEditor tourEditor = (TourEditor) editorPart;
-					long editorTourId = ((TourEditorInput) editorInput).getTourId();
+					final TourEditor tourEditor = (TourEditor) editorPart;
+					final long editorTourId = ((TourEditorInput) editorInput).getTourId();
 
-					for (TourData tourData : selectedTours) {
+					for (final TourData tourData : selectedTours) {
 						if (editorTourId == tourData.getTourId()) {
 
 							/*
 							 * a tour editor was found containing the current tour
 							 */
 
-							TourData editorTourData = tourEditor.getTourChart().getTourData();
+							final TourData editorTourData = tourEditor.getTourChart().getTourData();
 
 							editorTourData.setTourTitle(fTourData.getTourTitle());
 							editorTourData.setTourDescription(fTourData.getTourDescription());

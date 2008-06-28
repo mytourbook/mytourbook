@@ -122,7 +122,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 		@Override
 		public void run() {
-			TagManager.setTagsIntoTour(fTourTag, fTourProvider, fIsAddMode);
+			TagManager.setTagIntoTour(fTourTag, fTourProvider, fIsAddMode);
 		}
 		
 	}

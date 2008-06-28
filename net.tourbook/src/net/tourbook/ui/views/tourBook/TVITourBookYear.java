@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
-import net.tourbook.ui.TourTypeSQL;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
 public class TVITourBookYear extends TourBookTreeViewerItem {
@@ -45,19 +45,19 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
+		final SQLFilter sqlFilter = new SQLFilter();
+
 		final String sqlString = ""//
-				+ "SELECT " //$NON-NLS-1$
-				+ "startYear, " //$NON-NLS-1$
-				+ "startMonth, " //$NON-NLS-1$
+				+ "SELECT" //$NON-NLS-1$
+				+ " startYear, " //$NON-NLS-1$
+				+ " startMonth, " //$NON-NLS-1$
 
 				+ SQL_SUM_COLUMNS
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
 
 				+ (" WHERE startYear=?") //$NON-NLS-1$
-				+ UI.sqlTourPersonId()
-				+ sqlTourTypes.getWhereClause()
+				+ sqlFilter.getWhereClause()
 
 				+ " GROUP BY StartYear, StartMonth" //$NON-NLS-1$
 				+ " ORDER BY StartMonth"; //$NON-NLS-1$
@@ -68,7 +68,7 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 			statement.setInt(1, fTourYear);
-			sqlTourTypes.setSQLParameters(statement, 2);
+			sqlFilter.setParameters(statement, 2);
 
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {

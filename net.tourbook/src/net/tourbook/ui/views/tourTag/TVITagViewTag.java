@@ -6,14 +6,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
-import net.tourbook.ui.TourTypeSQL;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
+
+import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVITagViewTag extends TVITagViewItem {
 
@@ -33,15 +38,15 @@ public class TVITagViewTag extends TVITagViewItem {
 
 		switch (fExpandType) {
 		case TourTag.EXPAND_TYPE_FLAT:
-			getChildrenFlat();
+			setChildren(getChildrenFlat(null));
 			break;
 
 		case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
-			getChildrenYearMonthDay(true);
+			setChildren(getChildrenYearMonthDay(true));
 			break;
 
 		case TourTag.EXPAND_TYPE_YEAR_DAY:
-			getChildrenYearMonthDay(false);
+			setChildren(getChildrenYearMonthDay(false));
 			break;
 
 		default:
@@ -53,19 +58,18 @@ public class TVITagViewTag extends TVITagViewItem {
 	/**
 	 * get all tours for the tag Id of this tree item
 	 */
-	private void getChildrenFlat() {
+	private ArrayList<TreeViewerItem> getChildrenFlat(final String whereClause) {
 
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
-		setChildren(children);
 
 		try {
 
-			final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
+			final SQLFilter sqlFilter = new SQLFilter();
 			final StringBuilder sb = new StringBuilder();
 
 			sb.append("SELECT");
 
-			sb.append(" tourId,");//						1 
+			sb.append(" TourData.tourId,");//						1 
 			sb.append(" jTdataTtag2.TourTag_tagId,");//		2
 			sb.append(TVITagViewTour.SQL_TOUR_COLUMNS); //	3
 
@@ -79,9 +83,13 @@ public class TVITagViewTag extends TVITagViewItem {
 			sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag2");
 			sb.append(" ON TourData.tourID = jTdataTtag2.TourData_tourId");
 
-			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");// + tagId);
-			sb.append(UI.sqlTourPersonId());
-			sb.append(sqlTourTypes.getWhereClause());
+			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");
+
+			if (whereClause != null) {
+				sb.append(whereClause);
+			}
+
+			sb.append(sqlFilter.getWhereClause());
 
 			sb.append(" ORDER BY startYear, startMonth, startDay, startHour, startMinute"); //$NON-NLS-1$
 
@@ -92,7 +100,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, tagId);
-			sqlTourTypes.setSQLParameters(statement, 2);
+			sqlFilter.setParameters(statement, 2);
 
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
@@ -127,23 +135,23 @@ public class TVITagViewTag extends TVITagViewItem {
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
+		return children;
 	}
 
-	private void getChildrenYearMonthDay(final boolean isMonth) {
+	private ArrayList<TreeViewerItem> getChildrenYearMonthDay(final boolean isMonth) {
 
 		/*
-		 * set the children for the root item, these are year items
+		 * get the children for the tag item
 		 */
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
-		setChildren(children);
 
 		try {
 
 			/*
 			 * get all tours for the tag Id of this tree item
 			 */
-			final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
 			final StringBuilder sb = new StringBuilder();
+			final SQLFilter sqlFilter = new SQLFilter();
 
 			sb.append("SELECT ");
 
@@ -157,8 +165,7 @@ public class TVITagViewTag extends TVITagViewItem {
 			sb.append(" ON jTdataTtag.TourData_tourId = TourData.tourId ");
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");
-			sb.append(UI.sqlTourPersonId());
-			sb.append(sqlTourTypes.getWhereClause());
+			sb.append(sqlFilter.getWhereClause());
 
 			sb.append(" GROUP BY startYear");
 			sb.append(" ORDER BY startYear");
@@ -167,7 +174,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, tagId);
-			sqlTourTypes.setSQLParameters(statement, 2);
+			sqlFilter.setParameters(statement, 2);
 
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
@@ -186,10 +193,146 @@ public class TVITagViewTag extends TVITagViewItem {
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
+
+		return children;
 	}
 
 	public int getExpandType() {
 		return fExpandType;
+	}
+
+	/**
+	 * @param modifiedTours
+	 * @return Returns an expression to select tour id's in the WHERE clause or <code>null</code>
+	 *         when tour id's are not available
+	 */
+	private String getTourIdWhereClause(final ArrayList<TourData> modifiedTours) {
+
+		if (modifiedTours.size() == 0) {
+			return null;
+		}
+
+		final StringBuilder sb = new StringBuilder();
+		boolean isFirst = true;
+
+		sb.append(" AND TourData.tourId IN (");
+
+		for (final TourData tourData : modifiedTours) {
+
+			if (isFirst) {
+				isFirst = false;
+			} else {
+				sb.append(',');
+			}
+
+			sb.append(Long.toString(tourData.getTourId()));
+		}
+
+		sb.append(')');
+
+		return sb.toString();
+	}
+
+	/**
+	 * According to the expand type, the structure of the tag will be modified for the added or
+	 * removed tours
+	 * 
+	 * @param tagViewer
+	 * @param modifiedTours
+	 * @param isAddMode
+	 */
+	public void refresh(final TreeViewer tagViewer, final ArrayList<TourData> modifiedTours, final boolean isAddMode) {
+
+		switch (fExpandType) {
+		case TourTag.EXPAND_TYPE_FLAT:
+			refreshFlatTours(tagViewer, modifiedTours, isAddMode);
+			break;
+
+		case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
+			refreshYearMonthTours(tagViewer, modifiedTours, isAddMode);
+			break;
+
+		case TourTag.EXPAND_TYPE_YEAR_DAY:
+			refreshYearTours(tagViewer, modifiedTours, isAddMode);
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	private void refreshFlatTours(	final TreeViewer tagViewer,
+									final ArrayList<TourData> modifiedTours,
+									final boolean isAddMode) {
+
+		final ArrayList<TreeViewerItem> unfetchedChildren = getUnfetchedChildren();
+		if (unfetchedChildren == null) {
+			// children are not fetched
+			return;
+		}
+
+		if (isAddMode) {
+
+			// add tours
+
+			final ArrayList<TreeViewerItem> tagChildren = getChildrenFlat(getTourIdWhereClause(modifiedTours));
+
+			// update model
+			unfetchedChildren.addAll(tagChildren);
+
+			// update viewer
+			tagViewer.add(this, tagChildren.toArray());
+
+		} else {
+
+			// remove tours
+
+			final HashMap<Long, TVITagViewTour> removedTours = new HashMap<Long, TVITagViewTour>();
+
+			// loop all tour items
+			for (final TreeViewerItem treeItem : unfetchedChildren) {
+
+				if (treeItem instanceof TVITagViewTour) {
+
+					final TVITagViewTour tourItem = (TVITagViewTour) treeItem;
+					final long itemTourId = tourItem.getTourId();
+
+					// find tour item in the modified tours
+					for (final TourData tourData : modifiedTours) {
+						if (tourData.getTourId().longValue() == itemTourId) {
+
+							// tree tour item was found in the modified tours
+
+							removedTours.put(itemTourId, tourItem);
+
+							break;
+						}
+					}
+				}
+			}
+
+			final Collection<TVITagViewTour> removedTourItems = removedTours.values();
+
+			// update model
+			for (final TVITagViewTour removedTourItem : removedTourItems) {
+				unfetchedChildren.remove(removedTourItem);
+			}
+
+			// update viewer
+			tagViewer.remove(removedTourItems.toArray());
+		}
+	}
+
+	private void refreshYearMonthTours(	final TreeViewer tagViewer,
+										final ArrayList<TourData> modifiedTours,
+										final boolean isAddMode) {
+
+	}
+
+	private void refreshYearTours(	final TreeViewer tagViewer,
+									final ArrayList<TourData> modifiedTours,
+									final boolean isAddMode) {
+
 	}
 
 	@Override

@@ -22,7 +22,7 @@ import java.sql.SQLException;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
-import net.tourbook.ui.TourTypeSQL;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
 public abstract class TVITagViewItem extends TreeViewerItem {
@@ -79,6 +79,49 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 	long				colItemCounter;
 
+	/**
+	 * Read sum totals from the database for the tagItem
+	 * 
+	 * @param tagItem
+	 */
+	public static void getTagTotals(final TVITagViewTag tagItem) {
+
+		try {
+			final StringBuilder sb = new StringBuilder();
+			final SQLFilter sqlFilter = new SQLFilter();
+
+			/*
+			 * get tags
+			 */
+			sb.append("SELECT ");
+			sb.append(SQL_SUM_COLUMNS);
+
+			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jtblTagData");
+
+			// get data for a tour
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON ");
+			sb.append(" jtblTagData.TourData_tourId = TourData.tourId");
+
+			sb.append(" WHERE jtblTagData.TourTag_TagId = ?");
+			sb.append(sqlFilter.getWhereClause());
+
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sb.toString());
+			statement.setLong(1, tagItem.tagId);
+			sqlFilter.setParameters(statement, 2);
+
+			final ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				tagItem.getSumColumnData(result, 1);
+			}
+
+			conn.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+	}
+
 	void getDefaultColumnData(final ResultSet result, final int startIndex) throws SQLException {
 
 		colDistance = result.getLong(startIndex + 0);
@@ -107,45 +150,6 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 		getDefaultColumnData(result, startIndex);
 
 		colItemCounter = result.getLong(startIndex + 11);
-	}
-
-	protected void getTagTotals(final TVITagViewTag tagItem) {
-
-		try {
-			final StringBuilder sb = new StringBuilder();
-			final TourTypeSQL sqlTourTypes = UI.sqlTourTypes();
-
-			/*
-			 * get tags
-			 */
-			sb.append("SELECT ");
-			sb.append(SQL_SUM_COLUMNS);
-
-			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jtblTagData");
-
-			// get data for a tour
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON ");
-			sb.append(" jtblTagData.TourData_tourId = TourData.tourId");
-
-			sb.append(" WHERE jtblTagData.TourTag_TagId = ?");
-			sb.append(UI.sqlTourPersonId());
-			sb.append(sqlTourTypes.getWhereClause());
-
-			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setLong(1, tagItem.tagId);
-			sqlTourTypes.setSQLParameters(statement, 2);
-
-			final ResultSet result = statement.executeQuery();
-			while (result.next()) {
-				tagItem.getSumColumnData(result, 1);
-			}
-
-			conn.close();
-
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		}
 	}
 
 }

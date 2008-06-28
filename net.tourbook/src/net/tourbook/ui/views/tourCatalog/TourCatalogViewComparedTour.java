@@ -165,7 +165,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	private void addRefTourPropertyListener() {
 
 		fRefTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(int propertyId, Object propertyData) {
+			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyRefTourChanged) {
@@ -174,7 +174,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 					 * reference tour changed
 					 */
 
-					TourPropertyRefTourChanged tourProperty = (TourPropertyRefTourChanged) propertyData;
+					final TourPropertyRefTourChanged tourProperty = (TourPropertyRefTourChanged) propertyData;
 
 					fRefTourRefId = tourProperty.refId;
 					fRefTourTourChart = tourProperty.refTourChart;
@@ -211,7 +211,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 
 		super.createPartControl(parent);
 
@@ -226,7 +226,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		addRefTourPropertyListener();
 
 		// show current selected tour
-		ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
 		if (selection != null) {
 			onSelectionChanged(selection);
 		} else {
@@ -244,7 +244,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 
 		fTourChart.addDoubleClickListener(new Listener() {
-			public void handleEvent(Event event) {
+			public void handleEvent(final Event event) {
 				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
 			}
 		});
@@ -257,9 +257,9 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		});
 
 		fTourChart.addDataModelListener(new IDataModelListener() {
-			public void dataModelChanged(ChartDataModel changedChartDataModel) {
+			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
-				ChartDataXSerie xData = changedChartDataModel.getXData();
+				final ChartDataXSerie xData = changedChartDataModel.getXData();
 
 				/*
 				 * set synch marker position, this method is also called when a graph is
@@ -298,7 +298,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 	private void enableSaveAction() {
 
-		boolean isNotMoved = fDefaultStartIndex == fMovedStartIndex && fDefaultEndIndex == fMovedEndIndex;
+		final boolean isNotMoved = fDefaultStartIndex == fMovedStartIndex && fDefaultEndIndex == fMovedEndIndex;
 
 		fActionSaveComparedTour.setEnabled(isNotMoved == false || fCTCompareId == -1);
 	}
@@ -366,11 +366,11 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		updateTourViewer(fMovedStartIndex, fMovedEndIndex);
 	}
 
-	private void onSelectionChanged(ISelection selection) {
+	private void onSelectionChanged(final ISelection selection) {
 
 		if (selection instanceof StructuredSelection) {
 
-			Object firstElement = ((StructuredSelection) selection).getFirstElement();
+			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
 			if (firstElement instanceof TourCatalogItemComparedTour) {
 
@@ -384,7 +384,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	}
 
 	@Override
-	protected void onSelectionChanged(IWorkbenchPart part, ISelection selection) {
+	protected void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 //		if (fIsDataDirty && part != TourCatalogViewComparedTour.this) {
 //			return;
@@ -398,30 +398,30 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 	private void persistComparedTour() {
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
 
-			EntityTransaction ts = em.getTransaction();
+			final EntityTransaction ts = em.getTransaction();
 
 			try {
 
 				if (fComparedTourItem instanceof CompareResultItemComparedTour) {
 
-					CompareResultItemComparedTour comparedTourItem = (CompareResultItemComparedTour) fComparedTourItem;
+					final CompareResultItemComparedTour comparedTourItem = (CompareResultItemComparedTour) fComparedTourItem;
 
 					TourCompareManager.saveComparedTourItem(comparedTourItem, em, ts);
 
 					fCTCompareId = comparedTourItem.compId;
 
 					// update tour map view
-					SelectionPersistedCompareResults persistedCompareResults = new SelectionPersistedCompareResults();
+					final SelectionPersistedCompareResults persistedCompareResults = new SelectionPersistedCompareResults();
 					persistedCompareResults.persistedCompareResults.add(comparedTourItem);
 
 					fPostSelectionProvider.setSelection(persistedCompareResults);
 				}
 
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			} finally {
 				if (ts.isActive()) {
@@ -507,7 +507,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 			return true;
 		}
 
-		MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO/*
+		final MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO/*
 		 * |
 		 * SWT.CANCEL
 		 */);
@@ -532,7 +532,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		return true;
 	}
 
-	private void setDataDirty(boolean isDirty) {
+	private void setDataDirty(final boolean isDirty) {
 
 		fIsDataDirty = isDirty;
 
@@ -548,7 +548,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		fPostSelectionProvider.setSelection(new SelectionTourChart(fTourChart));
 	}
 
-	private void setRangeMarkers(ChartDataXSerie xData) {
+	private void setRangeMarkers(final ChartDataXSerie xData) {
 
 		if (fComparedTourItem instanceof TourCatalogItemComparedTour) {
 
@@ -562,7 +562,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		}
 	}
 
-	public void synchCharts(boolean isSynched, int synchMode) {
+	public void synchCharts(final boolean isSynched, final int synchMode) {
 
 		if (fCTRefTourChart != null) {
 
@@ -627,7 +627,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 //			return false;
 //		}
 
-		TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(fCTRefId);
+		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(fCTRefId);
 
 		if (tourCompareConfig != null) {
 
@@ -653,7 +653,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		return false;
 	}
 
-	private void updateTourChart(CompareResultItemComparedTour compareResultItem) {
+	private void updateTourChart(final CompareResultItemComparedTour compareResultItem) {
 
 		if (saveComparedTourDialog() == false) {
 			return;
@@ -713,7 +713,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 * 
 	 * @param selectionComparedTour
 	 */
-	private void updateTourChart(TourCatalogItemComparedTour itemComparedTour) {
+	private void updateTourChart(final TourCatalogItemComparedTour itemComparedTour) {
 
 		if (saveComparedTourDialog() == false) {
 			return;
@@ -759,7 +759,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	/**
 	 * update tour map and compare result view
 	 */
-	private void updateTourViewer(int startIndex, int endIndex) {
+	private void updateTourViewer(final int startIndex, final int endIndex) {
 
 		final float speed = TourManager.computeTourSpeed(fTourData, startIndex, endIndex);
 
@@ -776,7 +776,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 	private void updateTourViewer(final int startIndex, final int endIndex, final float speed, final boolean isDataSaved) {
 
-		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED,
+		TourManager.firePropertyChange(TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED,
 				new TourPropertyCompareTourChanged(fCTCompareId,
 						startIndex,
 						endIndex,

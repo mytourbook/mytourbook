@@ -99,7 +99,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 		return fTourChart;
 	}
 
-	private void onSelectionChanged(ISelection selection) {
+	private void onSelectionChanged(final ISelection selection) {
 
 		if (selection instanceof SelectionTourCatalogView) {
 
@@ -107,7 +107,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 
 		} else if (selection instanceof StructuredSelection) {
 
-			Object firstElement = ((StructuredSelection) selection).getFirstElement();
+			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
 			if (firstElement instanceof TourCatalogItemComparedTour) {
 
@@ -121,7 +121,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 	}
 
 	@Override
-	protected void onSelectionChanged(IWorkbenchPart part, ISelection selection) {
+	protected void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 //		if (part != TourCatalogViewReferenceTour.this) {
 //			return;
@@ -130,36 +130,11 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 		onSelectionChanged(selection);
 	}
 
-	private void showRefTour(long refId) {
+	@Override
+	public void setFocus() {
+		fTourChart.setFocus();
 
-		// check if the ref tour is already displayed
-		if (refId == fActiveRefId) {
-			return;
-		}
-
-		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(refId);
-
-		if (tourCompareConfig == null) {
-			return;
-		}
-
-		/*
-		 * show new ref tour
-		 */
-
-		fTourData = tourCompareConfig.getRefTourData();
-		fTourChartConfig = tourCompareConfig.getRefTourChartConfig();
-
-		setTourCompareConfig(tourCompareConfig);
-
-		// set active ref id after the configuration is set
-		fActiveRefId = refId;
-
-		// ???
-		fTourChart.zoomOut(false);
-
-		updateChart();
-
+		fPostSelectionProvider.setSelection(new SelectionTourChart(fTourChart));
 	}
 
 //	/**
@@ -247,7 +222,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 				final int refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
 						- xValues[refTour.getStartValueIndex()];
 
-				TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED,
+				TourManager.firePropertyChange(TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED,
 						new TourPropertyRefTourChanged(fTourChart, refTour.getRefId(), refTourXMarkerValue));
 
 				// set title
@@ -259,11 +234,36 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 		});
 	}
 
-	@Override
-	public void setFocus() {
-		fTourChart.setFocus();
+	private void showRefTour(final long refId) {
 
-		fPostSelectionProvider.setSelection(new SelectionTourChart(fTourChart));
+		// check if the ref tour is already displayed
+		if (refId == fActiveRefId) {
+			return;
+		}
+
+		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(refId);
+
+		if (tourCompareConfig == null) {
+			return;
+		}
+
+		/*
+		 * show new ref tour
+		 */
+
+		fTourData = tourCompareConfig.getRefTourData();
+		fTourChartConfig = tourCompareConfig.getRefTourChartConfig();
+
+		setTourCompareConfig(tourCompareConfig);
+
+		// set active ref id after the configuration is set
+		fActiveRefId = refId;
+
+		// ???
+		fTourChart.zoomOut(false);
+
+		updateChart();
+
 	}
 
 	@Override

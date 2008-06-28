@@ -27,7 +27,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ISelectedTours;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -35,7 +34,6 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorPart;
 
 public class TagManager {
 
@@ -61,7 +59,7 @@ public class TagManager {
 
 		@Override
 		public void run() {
-			setTagsIntoTour(fTag, fTourProvider, fIsAddMode);
+			setTagIntoTour(fTag, fTourProvider, fIsAddMode);
 		}
 
 		private void setTag(final TourTag tag) {
@@ -69,6 +67,11 @@ public class TagManager {
 		}
 	}
 
+	/**
+	 * Adds the {@link TourTag} to the list of the recently used tags
+	 * 
+	 * @param tourTag
+	 */
 	public static void addRecentTag(final TourTag tourTag) {
 		fRecentTags.remove(tourTag);
 		fRecentTags.addFirst(tourTag);
@@ -110,7 +113,7 @@ public class TagManager {
 		final Action titleAction = new Action(Messages.app_action_tag_recently_used, SWT.NONE) {};
 		titleAction.setEnabled(false);
 		menuMgr.add(titleAction);
-		
+
 		// add tag's
 		int tagIndex = 0;
 		for (final ActionRecentTag actionRecentTag : fActionsRecentTags) {
@@ -178,7 +181,7 @@ public class TagManager {
 		TourbookPlugin.getDefault().getDialogSettingsSection(SETTINGS_SECTION_RECENT_TAGS).put(SETTINGS_TAG_ID, tagIds);
 	}
 
-	public static void setTagsIntoTour(final TourTag tourTag, final ISelectedTours tourProvider, final boolean isAddMode) {
+	public static void setTagIntoTour(final TourTag tourTag, final ISelectedTours tourProvider, final boolean isAddMode) {
 
 		final Runnable runnable = new Runnable() {
 
@@ -216,7 +219,11 @@ public class TagManager {
 					TourDatabase.saveTour(tourData);
 				}
 
-				TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
+				TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
+
+				TourManager.firePropertyChange(TourManager.TOUR_TAGS_CHANGED, //
+						new ChangedTags(tourTag, selectedTours, isAddMode));
+
 				TagManager.addRecentTag(tourTag);
 			}
 
@@ -233,7 +240,7 @@ public class TagManager {
 	 */
 	private static ArrayList<TourData> updateEditors(final ArrayList<TourData> selectedTours) {
 
-		final ArrayList<IEditorPart> editorParts = UI.getOpenedEditors();
+//		final ArrayList<IEditorPart> editorParts = UI.getOpenedEditors();
 
 		// list for tours which are updated in the editor
 		final ArrayList<TourData> updatedTours = new ArrayList<TourData>();

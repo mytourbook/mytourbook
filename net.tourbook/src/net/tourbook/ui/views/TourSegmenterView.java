@@ -608,9 +608,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (segment.drivingTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final float result = (segment.altitudeUp / UI.UNIT_VALUE_ALTITUDE)
-							/ segment.drivingTime
-							* 3600;
+					final float result = (segment.altitudeUp / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
 					if (result == 0) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
@@ -635,9 +633,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (segment.drivingTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					final float result = (segment.altitudeDown / UI.UNIT_VALUE_ALTITUDE)
-							/ segment.drivingTime
-							* 3600;
+					final float result = (segment.altitudeDown / UI.UNIT_VALUE_ALTITUDE) / segment.drivingTime * 3600;
 					if (result == 0) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
@@ -709,8 +705,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void fireSegmentLayerChanged() {
 
 		// show/hide the segments in the chart
-		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED,
-				fShowSegmentsInChart);
+		TourManager.firePropertyChange(TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED, fShowSegmentsInChart);
 	}
 
 	/**
@@ -754,7 +749,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	@Override
 	public Object getAdapter(final Class adapter) {
 
@@ -941,8 +936,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	public void reloadViewer() {
-		// TODO Auto-generated method stub
-		
+	// TODO Auto-generated method stub
+
 	}
 
 	private void restoreViewerSettings(final IMemento memento) {

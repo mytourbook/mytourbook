@@ -75,7 +75,7 @@ public class TourEditor extends EditorPart {
 		// set the part listener
 		fPartListener = new IPartListener2() {
 
-			public void partActivated(IWorkbenchPartReference partRef) {
+			public void partActivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
 
 					fTourChart.activateActionHandlers(getSite());
@@ -84,23 +84,23 @@ public class TourEditor extends EditorPart {
 				}
 			}
 
-			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			public void partClosed(IWorkbenchPartReference partRef) {
+			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (fIsTourChanged) {
 					TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
 				}
 			}
 
-			public void partDeactivated(IWorkbenchPartReference partRef) {}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-			public void partHidden(IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {}
 
-			public void partInputChanged(IWorkbenchPartReference partRef) {}
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-			public void partOpened(IWorkbenchPartReference partRef) {}
+			public void partOpened(final IWorkbenchPartReference partRef) {}
 
-			public void partVisible(IWorkbenchPartReference partRef) {}
+			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 
 		// register the part listener
@@ -111,7 +111,7 @@ public class TourEditor extends EditorPart {
 
 		fPostSelectionListener = new ISelectionListener() {
 
-			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (selection instanceof SelectionChartXSliderPosition) {
 
@@ -124,7 +124,7 @@ public class TourEditor extends EditorPart {
 					final long tourId = fTourData.getTourId().longValue();
 
 					// find the current tour id in the removed tour id's
-					for (ITourItem tourItem : removedTours) {
+					for (final ITourItem tourItem : removedTours) {
 						if (tourId == tourItem.getTourId().longValue()) {
 
 							// close this editor
@@ -142,7 +142,7 @@ public class TourEditor extends EditorPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(int propertyId, Object propertyData) {
+			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 
@@ -159,11 +159,11 @@ public class TourEditor extends EditorPart {
 					}
 
 					// get modified tours
-					ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
 					final long tourId = fTourData.getTourId();
 
 					// check if the tour in the editor was modified
-					for (TourData tourData : modifiedTours) {
+					for (final TourData tourData : modifiedTours) {
 						if (tourData.getTourId() == tourId) {
 							fTourChart.updateTourChart(true);
 							return;
@@ -187,7 +187,7 @@ public class TourEditor extends EditorPart {
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 
 		addPartListener();
 		addTourPropertyListener();
@@ -235,7 +235,7 @@ public class TourEditor extends EditorPart {
 	}
 
 	@Override
-	public void doSave(IProgressMonitor monitor) {
+	public void doSave(final IProgressMonitor monitor) {
 
 		TourDatabase.saveTour(fTourData);
 
@@ -265,7 +265,7 @@ public class TourEditor extends EditorPart {
 			final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 			modifiedTour.add(fTourData);
 
-			TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
+			TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
 		}
 	}
 
@@ -277,7 +277,7 @@ public class TourEditor extends EditorPart {
 	 * 
 	 * @param selection
 	 */
-	public void firePostSelection(ISelection selection) {
+	public void firePostSelection(final ISelection selection) {
 		fPostSelectionProvider.setSelection(selection);
 	}
 
@@ -286,7 +286,7 @@ public class TourEditor extends EditorPart {
 	}
 
 	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+	public void init(final IEditorSite site, final IEditorInput input) throws PartInitException {
 
 		setSite(site);
 		setInput(input);
@@ -325,7 +325,7 @@ public class TourEditor extends EditorPart {
 		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 		modifiedTour.add(fTourData);
 
-		TourManager.getInstance().firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
+		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
 	}
 
 	@Override
@@ -386,7 +386,7 @@ public class TourEditor extends EditorPart {
 			// show the tour chart
 
 			fTourChart.addDataModelListener(new IDataModelListener() {
-				public void dataModelChanged(ChartDataModel changedChartDataModel) {
+				public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
 					// set title
 					changedChartDataModel.setTitle(NLS.bind(Messages.Tour_Book_Label_chart_title,

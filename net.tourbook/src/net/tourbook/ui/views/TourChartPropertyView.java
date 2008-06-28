@@ -55,19 +55,19 @@ public class TourChartPropertyView extends ViewPart {
 	private Button				fChkUseCustomPaceClipping;
 	private Spinner				fSpinnerPaceClipping;
 
-	private void adjustSpinnerValueOnMouseScroll(MouseEvent event) {
+	private void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
 
 		// accelerate with Ctrl + Shift key
 		int accelerator = (event.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
 		accelerator *= (event.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
 
-		Spinner spinner = (Spinner) event.widget;
+		final Spinner spinner = (Spinner) event.widget;
 		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
 
 		spinner.setSelection(spinner.getSelection() + newValue);
 	}
 
-	private void createLayout(Composite parent) {
+	private void createLayout(final Composite parent) {
 
 		GridLayout gl;
 		GridData gd;
@@ -80,7 +80,7 @@ public class TourChartPropertyView extends ViewPart {
 		final Composite container = new Composite(scrolledContainer, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(container);
 
-		Composite subContainer1 = new Composite(container, SWT.NONE);
+		final Composite subContainer1 = new Composite(container, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 0).applyTo(subContainer1);
 		{
 			/*
@@ -90,7 +90,7 @@ public class TourChartPropertyView extends ViewPart {
 			label.setText(Messages.TourChart_Property_label_chart_type);
 
 			// group: 
-			Composite groupChartType = new Composite(subContainer1, SWT.NONE);
+			final Composite groupChartType = new Composite(subContainer1, SWT.NONE);
 			gl = new GridLayout(2, false);
 			gl.marginTop = 0;
 			gl.marginWidth = 0;
@@ -102,7 +102,7 @@ public class TourChartPropertyView extends ViewPart {
 				fRadioLineChartType.setText(Messages.TourChart_Property_chart_type_line);
 				fRadioLineChartType.addSelectionListener(new SelectionAdapter() {
 					@Override
-					public void widgetSelected(SelectionEvent event) {
+					public void widgetSelected(final SelectionEvent event) {
 						onChangeProperty();
 					}
 				});
@@ -112,14 +112,14 @@ public class TourChartPropertyView extends ViewPart {
 				fRadioBarChartType.setText(Messages.TourChart_Property_chart_type_bar);
 				fRadioBarChartType.addSelectionListener(new SelectionAdapter() {
 					@Override
-					public void widgetSelected(SelectionEvent event) {
+					public void widgetSelected(final SelectionEvent event) {
 						onChangeProperty();
 					}
 				});
 			}
 		}
 
-		Composite subContainer2 = new Composite(container, SWT.NONE);
+		final Composite subContainer2 = new Composite(container, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 0).spacing(0, 0).applyTo(subContainer2);
 
 		// check: use custom settings to compute values
@@ -128,7 +128,7 @@ public class TourChartPropertyView extends ViewPart {
 		fChkUseCustomComputeSettings.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 2, 1));
 		fChkUseCustomComputeSettings.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent event) {
+			public void widgetSelected(final SelectionEvent event) {
 				onChangeProperty();
 			}
 		});
@@ -147,13 +147,13 @@ public class TourChartPropertyView extends ViewPart {
 
 		fSpinnerComputeValues.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onChangeProperty();
 			}
 		});
 
 		fSpinnerComputeValues.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseScrolled(MouseEvent event) {
+			public void mouseScrolled(final MouseEvent event) {
 				adjustSpinnerValueOnMouseScroll(event);
 				onChangeProperty();
 			}
@@ -171,7 +171,7 @@ public class TourChartPropertyView extends ViewPart {
 
 		fChkUseCustomClipSettings.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent event) {
+			public void widgetSelected(final SelectionEvent event) {
 				onChangeProperty();
 			}
 		});
@@ -190,13 +190,13 @@ public class TourChartPropertyView extends ViewPart {
 
 		fSpinnerClipValues.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onChangeProperty();
 			}
 		});
 
 		fSpinnerClipValues.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseScrolled(MouseEvent event) {
+			public void mouseScrolled(final MouseEvent event) {
 				adjustSpinnerValueOnMouseScroll(event);
 				onChangeProperty();
 			}
@@ -214,7 +214,7 @@ public class TourChartPropertyView extends ViewPart {
 
 		fChkUseCustomPaceClipping.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent event) {
+			public void widgetSelected(final SelectionEvent event) {
 				onChangeProperty();
 			}
 		});
@@ -233,13 +233,13 @@ public class TourChartPropertyView extends ViewPart {
 
 		fSpinnerPaceClipping.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onChangeProperty();
 			}
 		});
 
 		fSpinnerPaceClipping.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseScrolled(MouseEvent event) {
+			public void mouseScrolled(final MouseEvent event) {
 				adjustSpinnerValueOnMouseScroll(event);
 				onChangeProperty();
 			}
@@ -247,7 +247,7 @@ public class TourChartPropertyView extends ViewPart {
 
 		scrolledContainer.addControlListener(new ControlAdapter() {
 			@Override
-			public void controlResized(ControlEvent e) {
+			public void controlResized(final ControlEvent e) {
 				scrolledContainer.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
@@ -256,7 +256,7 @@ public class TourChartPropertyView extends ViewPart {
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 
 		createLayout(parent);
 		restoreSettings();
@@ -276,7 +276,7 @@ public class TourChartPropertyView extends ViewPart {
 
 		enableControls();
 
-		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 		// set new values in the pref store
 
@@ -308,12 +308,12 @@ public class TourChartPropertyView extends ViewPart {
 		TourManager.getInstance().removeAllToursFromCache();
 
 		// fire unique event for all changes
-		TourManager.getInstance().firePropertyChange(TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+		TourManager.firePropertyChange(TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
 	}
 
 	private void restoreSettings() {
 
-		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 		// get values from pref store
 
@@ -327,7 +327,7 @@ public class TourChartPropertyView extends ViewPart {
 		fSpinnerPaceClipping.setSelection(store.getInt(ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE));
 
 		// chart type
-		int speedChartType = store.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
+		final int speedChartType = store.getInt(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
 		if (speedChartType == 0 || speedChartType == ChartDataModel.CHART_TYPE_LINE) {
 			fRadioLineChartType.setSelection(true);
 		} else {

@@ -41,7 +41,11 @@ public class TVITagViewTour extends TVITagViewItem {
 	long						tourId;
 
 	DateTime					tourDate;
+
+	int							tourYear;
+	int							tourMonth;
 	int							tourDay;
+	long						tourTime;
 
 	String						tourTitle;
 	long						tourTypeId;
@@ -56,6 +60,21 @@ public class TVITagViewTour extends TVITagViewItem {
 	}
 
 	@Override
+	public boolean equals(final Object obj) {
+
+		if (obj == this) {
+			return true;
+		}
+
+//		if (obj instanceof TVITagViewTour) {
+//			final TVITagViewTour tourItem = (TVITagViewTour) obj;
+//			return tourId == tourItem.tourId && fParentItem == tourItem.fParentItem;
+//		}
+
+		return false;
+	}
+
+	@Override
 	protected void fetchChildren() {}
 
 	public TVITagViewItem getRootItem() {
@@ -65,10 +84,12 @@ public class TVITagViewTour extends TVITagViewItem {
 	public void getTourColumnData(final ResultSet result, final Object resultTagId, final int startIndex)
 			throws SQLException {
 
-		final int tourYear = result.getInt(startIndex + 0);
-		final int tourMonth = result.getInt(startIndex + 1);
+		tourYear = result.getInt(startIndex + 0);
+		tourMonth = result.getInt(startIndex + 1);
 		tourDay = result.getInt(startIndex + 2);
+		
 		tourDate = new DateTime(tourYear, tourMonth, tourDay, 0, 0, 0, 0);
+		tourTime = tourDate.getMillis();
 
 		tourTitle = result.getString(startIndex + 3);
 

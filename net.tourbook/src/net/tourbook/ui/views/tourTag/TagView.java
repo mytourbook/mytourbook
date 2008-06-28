@@ -18,17 +18,17 @@ package net.tourbook.ui.views.tourTag;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
-import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.TVIPrefTag;
-import net.tourbook.tag.TVIPrefTagCategory;
+import net.tourbook.tag.ChangedTags;
+import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
@@ -71,15 +71,12 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IMemento;
@@ -116,16 +113,29 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	private ActionExpandSelection		fActionExpandSelection;
 	private ActionCollapseAll			fActionCollapseAll;
 
+	private ITourPropertyListener		fTourPropertyListener;
+
 	private static final Image			fImgTagCategory				= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
 																			.createImage();
 	private static final Image			fImgTag						= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
 																			.createImage();
 
-	private static Color				fColorYearBg;
-	private static Color				fColorMonthBg;
+	private final class TagComparator extends ViewerComparator {
+		@Override
+		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+			
+			if (obj1 instanceof TVITagViewTour && obj2 instanceof TVITagViewTour) {
 
-	private static final RGB			fRGBYearBg					= new RGB(255, 251, 153);
-	private static final RGB			fRGBMonthBg					= new RGB(255, 253, 191);
+				// sort tours by date
+				final TVITagViewTour tourItem1 = (TVITagViewTour) (obj1);
+				final TVITagViewTour tourItem2 = (TVITagViewTour) (obj2);
+
+				return tourItem1.tourDate.compareTo(tourItem2.tourDate);
+			}
+
+			return 0;
+		}
+	}
 
 	private class TagComparer implements IElementComparer {
 
@@ -201,41 +211,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		}
 	}
 
-	/**
-	 * Sort tags and categories
-	 */
-	private class TagViewerSorter extends ViewerSorter {
-
-		@Override
-		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
-
-			if (obj1 instanceof TVIPrefTag && obj2 instanceof TVIPrefTag) {
-
-				final TourTag tourTag1 = ((TVIPrefTag) (obj1)).getTourTag();
-				final TourTag tourTag2 = ((TVIPrefTag) (obj2)).getTourTag();
-
-				return tourTag1.getTagName().compareTo(tourTag2.getTagName());
-
-			} else if (obj1 instanceof TVIPrefTag && obj2 instanceof TVIPrefTagCategory) {
-
-				return 1;
-
-			} else if (obj2 instanceof TVIPrefTag && obj1 instanceof TVIPrefTagCategory) {
-
-				return -1;
-
-			} else if (obj1 instanceof TVIPrefTagCategory && obj2 instanceof TVIPrefTagCategory) {
-
-				final TourTagCategory tourTagCat1 = ((TVIPrefTagCategory) (obj1)).getTourTagCategory();
-				final TourTagCategory tourTagCat2 = ((TVIPrefTagCategory) (obj2)).getTourTagCategory();
-
-				return tourTagCat1.getCategoryName().compareTo(tourTagCat2.getCategoryName());
-			}
-
-			return 0;
-		}
-	}
-
 	private void addPrefListener() {
 
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
@@ -260,6 +235,31 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		// register the listener
 		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+	}
+
+	private void addTourPropertyListener() {
+
+		fTourPropertyListener = new ITourPropertyListener() {
+			public void propertyChanged(final int propertyId, final Object propertyData) {
+
+				if (propertyId == TourManager.TOUR_TAGS_CHANGED) {
+					if (propertyData instanceof ChangedTags) {
+
+						final ChangedTags changedTags = (ChangedTags) propertyData;
+
+						// get a clone of the modified tours/tags because the tours are removed from the list
+						final boolean isAddMode = changedTags.isAddMode();
+
+						updateViewer(fRootItem, //
+								new ChangedTags(changedTags.getModifiedTags(),
+										changedTags.getModifiedTours(),
+										isAddMode),
+								isAddMode);
+					}
+				}
+			}
+		};
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
 	}
 
 	private void createActions() {
@@ -295,11 +295,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		final Display display = Display.getCurrent();
-
-		fColorYearBg = new Color(display, fRGBYearBg);
-		fColorMonthBg = new Color(display, fRGBMonthBg);
-
 		fViewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
 
@@ -311,6 +306,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		addPrefListener();
+		addTourPropertyListener();
 
 		restoreState(fSessionMemento);
 		reloadViewer();
@@ -335,8 +331,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		fTagViewer.setContentProvider(new TagContentProvider());
 		fTagViewer.setComparer(new TagComparer());
+		fTagViewer.setComparator(new TagComparator());
 		fTagViewer.setUseHashlookup(true);
-		fTagViewer.setSorter(new TagViewerSorter());
 
 		fTagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
@@ -509,12 +505,10 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	public void dispose() {
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
 		fImgTagCategory.dispose();
 		fImgTag.dispose();
-
-		fColorYearBg.dispose();
-		fColorMonthBg.dispose();
 
 		super.dispose();
 	}
@@ -688,6 +682,75 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		}
 
 		setContentDescription(description);
+	}
+
+	/**
+	 * @param tagItem
+	 * @param modifiedTours
+	 * @param isAddMode
+	 *            <code>true</code> when a tag is added to a tour
+	 */
+	private void updateTag(final TVITagViewTag tagItem, final ArrayList<TourData> modifiedTours, final boolean isAddMode) {
+
+		// add/remove tours from the tag
+		tagItem.refresh(fTagViewer, modifiedTours, isAddMode);
+
+		// update tag totals
+		TVITagViewItem.getTagTotals(tagItem);
+
+		// 
+		fTagViewer.refresh(tagItem);
+	}
+
+	/**
+	 * !!! Recursive !!! method to update the tags in the viewer
+	 * 
+	 * @param rootItem
+	 * @param changedTags
+	 * @param isAddMode
+	 */
+	private void updateViewer(final TreeViewerItem parentItem, final ChangedTags changedTags, final boolean isAddMode) {
+
+		final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
+
+		if (children == null) {
+			return;
+		}
+
+		// loop: all children
+		for (final Object object : children) {
+
+			if (object instanceof TVITagViewTag) {
+
+				final TVITagViewTag tagItem = (TVITagViewTag) object;
+				final long viewerTagId = tagItem.tagId;
+
+				final HashMap<Long, TourTag> modifiedTags = changedTags.getModifiedTags();
+
+				for (final Long modifiedTagId : modifiedTags.keySet()) {
+					if (viewerTagId == modifiedTagId.longValue()) {
+
+						/*
+						 * current tag was modified
+						 */
+						updateTag(tagItem, changedTags.getModifiedTours(), changedTags.isAddMode());
+
+						// modified tag id exists only once in the tree viewer
+						modifiedTags.remove(modifiedTagId);
+					}
+				}
+
+				// optimize
+				if (modifiedTags.size() == 0) {
+					return;
+				}
+
+			} else {
+				if (object instanceof TreeViewerItem) {
+					updateViewer((TreeViewerItem) object, changedTags, isAddMode);
+				}
+			}
+		}
 	}
 
 }

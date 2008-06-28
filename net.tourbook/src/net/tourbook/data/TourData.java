@@ -1891,32 +1891,18 @@ public class TourData {
 		out.println("Altitude down (m):	" + getTourAltDown()); //$NON-NLS-1$
 	}
 
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
 
 		if (this == obj) {
 			return true;
 		}
 
-		if (!this.getClass().equals(obj.getClass())) {
-			return false;
+		if (obj instanceof TourData) {
+			return tourId.longValue() == ((TourData) obj).tourId.longValue();
 		}
 
-		final TourData td = (TourData) obj;
-
-		return this.getStartYear() == td.getStartYear()
-				&& this.getStartMonth() == td.getStartMonth()
-				&& this.getStartDay() == td.getStartDay()
-				&& this.getStartHour() == td.getStartHour()
-				&& this.getStartMinute() == td.getStartMinute()
-				&& this.getTourDistance() == td.getTourDistance()
-				&& this.getTourRecordingTime() == td.getTourRecordingTime();
+		return false;
 	}
 
 	/**

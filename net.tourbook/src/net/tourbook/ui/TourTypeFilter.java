@@ -170,25 +170,25 @@ public class TourTypeFilter {
 	/**
 	 * @return Returns a sql string for the WHERE clause to select the tour types in the database
 	 */
-	public TourTypeSQL getSQLString() {
+	public SQLData getSQLData() {
 
-		String sqlSelect = UI.EMPTY_STRING;
+		String sqlWhereClause = UI.EMPTY_STRING;
 		final ArrayList<Long> sqlTourTypes = new ArrayList<Long>();
 
 		switch (fFilterType) {
 		case FILTER_TYPE_SYSTEM:
 			if (fSystemFilterId == SYSTEM_FILTER_ID_ALL) {
 				// select all tour types also not defined tour types
-				sqlSelect = ""; //$NON-NLS-1$
+				sqlWhereClause = ""; //$NON-NLS-1$
 			} else {
 				// select tour types which are not defined
-				sqlSelect = " AND TourData.tourType_typeId IS NULL"; //$NON-NLS-1$
+				sqlWhereClause = " AND TourData.tourType_typeId IS NULL"; //$NON-NLS-1$
 			}
 			break;
 
 		case FILTER_TYPE_DB:
 
-			sqlSelect = " AND TourData.tourType_typeId=?"; //$NON-NLS-1$
+			sqlWhereClause = " AND TourData.tourType_typeId=?"; //$NON-NLS-1$
 			sqlTourTypes.add(fTourType.getTypeId());
 			break;
 
@@ -198,7 +198,7 @@ public class TourTypeFilter {
 
 			if (tourTypes.length == 0) {
 				// select nothing
-				sqlSelect = " AND 1=0"; //$NON-NLS-1$
+				sqlWhereClause = " AND 1=0"; //$NON-NLS-1$
 
 			} else {
 
@@ -213,12 +213,12 @@ public class TourTypeFilter {
 						filter += " OR "; //$NON-NLS-1$
 					}
 
-					filter += " TourData.tourType_typeId =?"; //$NON-NLS-1$
+					filter += " TourData.tourType_typeId=?"; //$NON-NLS-1$
 					sqlTourTypes.add(((TourType) item).getTypeId());
 
 					itemIndex++;
 				}
-				sqlSelect = " AND (" + filter + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
+				sqlWhereClause = " AND (" + filter + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			break;
@@ -227,7 +227,7 @@ public class TourTypeFilter {
 			break;
 		}
 
-		return new TourTypeSQL(sqlSelect, sqlTourTypes);
+		return new SQLData(sqlWhereClause, sqlTourTypes);
 	}
 
 	public int getSystemFilterId() {

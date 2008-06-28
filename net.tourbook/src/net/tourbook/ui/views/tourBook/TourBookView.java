@@ -77,7 +77,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -160,15 +159,13 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private ActionSetTourTag		fActionAddTag;
 	private ActionSetTourTag		fActionRemoveTag;
 	private ActionRemoveAllTags		fActionRemoveAllTags;
-	private int						fTourViewerSelectedYear				= -1;
+	private ActionRefreshView		fActionRefreshView;
 
+	private int						fTourViewerSelectedYear				= -1;
 	private int						fTourViewerSelectedMonth			= -1;
-	Long							fActiveTourId;
-//	private int						fLastSelectedTourTypeId;
+	private Long					fActiveTourId;
 
 	private Composite				fViewerContainer;
-
-	private ActionRefreshView		fActionRefreshView;
 
 	public class TagComparer implements IElementComparer {
 
@@ -898,6 +895,10 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fPostSelectionProvider.setSelection(selection);
 	}
 
+	Long getActiveTourId() {
+		return fActiveTourId;
+	}
+
 	@SuppressWarnings("unchecked")//$NON-NLS-1$
 	@Override
 	public Object getAdapter(final Class adapter) {
@@ -944,32 +945,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		return fTourViewer;
 	}
 
-	/**
-	 */
-	private void getTourViewerSelection() {
-
-		fTourViewerSelectedYear = -1;
-		fTourViewerSelectedMonth = -1;
-
-		final ITreeSelection selectedItems = (ITreeSelection) fTourViewer.getSelection();
-		final TreePath[] treePaths = selectedItems.getPaths();
-
-		// get selected year/month
-		for (final TreePath treePath : treePaths) {
-			for (int segmentIndex = 0; segmentIndex < treePath.getSegmentCount(); segmentIndex++) {
-				final Object treeItem = treePath.getSegment(segmentIndex);
-				if (treeItem instanceof TVITourBookYear) {
-					fTourViewerSelectedYear = ((TVITourBookYear) treeItem).fTourYear;
-				} else if (treeItem instanceof TVITourBookMonth) {
-					fTourViewerSelectedMonth = ((TVITourBookMonth) treeItem).fTourMonth;
-				}
-			}
-
-			// currently only the first selected entry is supported
-			break;
-		}
-	}
-
 	public TreeViewer getTreeViewer() {
 		return fTourViewer;
 	}
@@ -989,18 +964,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	}
 
 	private void refreshTourViewer() {
-
-//		getTourViewerSelection();
-//
-//		// refresh the tree viewer
-//		fRootItem.fetchChildren();
-//		fTourViewer.refresh();
-//
-//		if (fTourViewerSelectedYear == -1) {
-//			return;
-//		}
-//
-//		reselectTourViewer();
 
 		final Tree tree = fTourViewer.getTree();
 		tree.setRedraw(false);
@@ -1150,7 +1113,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	 */
 	private void updateTourViewer(final TreeViewerItem parentItem, final ArrayList<TourData> modifiedTours) {
 
-//		Object[] children = parentItem.getFetchedChildren();
 		final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
 
 		if (children == null) {
@@ -1167,44 +1129,49 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 					final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
 					final long tourItemId = tourItem.getTourId();
 
-					for (final TourData tourData : modifiedTours) {
-						if (tourData.getTourId().longValue() == tourItemId) {
+					for (final TourData modifiedTourData : modifiedTours) {
+						if (modifiedTourData.getTourId().longValue() == tourItemId) {
 
 							// update tree item
-							final TourType tourType = tourData.getTourType();
+							
+							final TourType tourType = modifiedTourData.getTourType();
 							if (tourType != null) {
 								tourItem.fTourTypeId = tourType.getTypeId();
 							}
 
-							tourItem.fTourTitle = tourData.getTourTitle();
-							final Set<TourTag> tourTags = tourData.getTourTags();
-
+							// update item title
+							tourItem.fTourTitle = modifiedTourData.getTourTitle();
+							
+							// update item tags
+							final Set<TourTag> tourTags = modifiedTourData.getTourTags();
 							final ArrayList<Long> tagIds;
+
 							tourItem.fTagIds = tagIds = new ArrayList<Long>();
 							for (final TourTag tourTag : tourTags) {
 								tagIds.add(tourTag.getTagId());
 							}
 
-							// update tour viewer
+							// update item in the viewer
 							fTourViewer.update(tourItem, null);
 
-							// remove updated tour
-							modifiedTours.remove(tourData);
+							// modified tour exists only once in the viewer, remove modified tour
+							modifiedTours.remove(modifiedTourData);
+							
 							break;
 						}
 					}
+
+					// optimize
+					if (modifiedTours.size() == 0) {
+						return;
+					}
+
 				} else {
 					// update children
 					updateTourViewer(treeItem, modifiedTours);
 				}
 			}
-
-			// optimize
-			if (modifiedTours.size() == 0) {
-				return;
-			}
 		}
-
 	}
 
 }

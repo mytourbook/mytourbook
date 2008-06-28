@@ -32,6 +32,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.util.StringToArrayConverter;
@@ -58,6 +59,12 @@ public class TourManager {
 	 * The property data contains an {@link ArrayList} with {@link TourData}
 	 */
 	public static final int					TOUR_PROPERTIES_CHANGED					= 50;
+
+	/**
+	 * Tags for a tour has been modified.<br>
+	 * The property data contains an object {@link ChangedTags} which contains the changed tags
+	 */
+	public static final int					TOUR_TAGS_CHANGED						= 60;
 
 	public static final String				CUSTOM_DATA_TIME						= "time";									//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_DISTANCE					= "distance";								//$NON-NLS-1$
@@ -110,7 +117,7 @@ public class TourManager {
 
 	private final HashMap<Long, TourData>	fTourDataMap							= new HashMap<Long, TourData>();
 
-	private final ListenerList				fPropertyListeners						= new ListenerList(ListenerList.IDENTITY);
+	private static final ListenerList		fPropertyListeners						= new ListenerList(ListenerList.IDENTITY);
 
 	/**
 	 * tour chart which shows the selected tour
@@ -162,6 +169,14 @@ public class TourManager {
 		updateZoomOptionsInChartConfig(chartConfig, prefStore);
 
 		return chartConfig;
+	}
+
+	public static void firePropertyChange(final int propertyId, final Object propertyData) {
+		final Object[] allListeners = fPropertyListeners.getListeners();
+		for (int i = 0; i < allListeners.length; i++) {
+			final ITourPropertyListener listener = (ITourPropertyListener) allListeners[i];
+			listener.propertyChanged(propertyId, propertyData);
+		}
 	}
 
 	public static TourManager getInstance() {
@@ -578,7 +593,7 @@ public class TourManager {
 	 * Creates a chart data fDataModel from the tour data
 	 * 
 	 * @param tourData
-	 * 		data which contains the tour data
+	 *            data which contains the tour data
 	 * @param tourChartProperty
 	 * @param fTourChartConfig
 	 * @return
@@ -1013,14 +1028,6 @@ public class TourManager {
 		}
 	}
 
-	public void firePropertyChange(final int propertyId, final Object propertyData) {
-		final Object[] allListeners = fPropertyListeners.getListeners();
-		for (int i = 0; i < allListeners.length; i++) {
-			final ITourPropertyListener listener = (ITourPropertyListener) allListeners[i];
-			listener.propertyChanged(propertyId, propertyData);
-		}
-	}
-
 	public TourChart getActiveTourChart() {
 		return fActiveTourChart;
 	}
@@ -1044,7 +1051,7 @@ public class TourManager {
 	 * 
 	 * @param tourId
 	 * @return Returns the tour data for the tour id or <code>null</code> when the tour is not in
-	 * 	the database
+	 *         the database
 	 */
 	public TourData getTourData(final Long tourId) {
 
