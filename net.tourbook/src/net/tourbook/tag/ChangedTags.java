@@ -2,7 +2,6 @@ package net.tourbook.tag;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
@@ -47,7 +46,7 @@ public class ChangedTags {
 	}
 
 	/**
-	 * @return Returns a {@link Set} with a copy of the tag id's
+	 * @return Returns the modified tags
 	 */
 	public HashMap<Long, TourTag> getModifiedTags() {
 		return fModifiedTags;

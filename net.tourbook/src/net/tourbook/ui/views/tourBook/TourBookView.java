@@ -30,6 +30,8 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.ActionRemoveAllTags;
+import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
@@ -40,8 +42,6 @@ import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionExpandSelection;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionRefreshView;
-import net.tourbook.ui.ActionRemoveAllTags;
-import net.tourbook.ui.ActionSetTourTag;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ISelectedTours;
@@ -329,6 +329,10 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) ((ArrayList<TourData>) propertyData).clone();
 
 					updateTourViewer(fRootItem, modifiedTours);
+
+				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
+
+					refreshTourViewer();
 				}
 			}
 		};
@@ -851,7 +855,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fActionEditQuick.setEnabled(tourItems == 1);
 
 		fActionAddTag.setEnabled(tourItems > 0);
-		fActionRemoveTag.setEnabled(tourItems > 0);
 
 		if (firstTour != null && tourItems == 1) {
 
@@ -859,24 +862,33 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 			final ArrayList<Long> tagIds = firstTour.fTagIds;
 			if (tagIds != null && tagIds.size() > 0) {
+				
+				// at least one tag is within the tour
+				
 				fActionRemoveAllTags.setEnabled(true);
+				fActionRemoveTag.setEnabled(true);
 			} else {
 				// tags are not available
 				fActionRemoveAllTags.setEnabled(false);
+				fActionRemoveTag.setEnabled(false);
 			}
 		} else {
 
 			// multiple tours are selected
 
+			fActionRemoveTag.setEnabled(tourItems > 0);
 			fActionRemoveAllTags.setEnabled(tourItems > 0);
 		}
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
+
 		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionEditTour);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionSetTourType);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionAddTag);
@@ -1133,7 +1145,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 						if (modifiedTourData.getTourId().longValue() == tourItemId) {
 
 							// update tree item
-							
+
 							final TourType tourType = modifiedTourData.getTourType();
 							if (tourType != null) {
 								tourItem.fTourTypeId = tourType.getTypeId();
@@ -1141,7 +1153,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 							// update item title
 							tourItem.fTourTitle = modifiedTourData.getTourTitle();
-							
+
 							// update item tags
 							final Set<TourTag> tourTags = modifiedTourData.getTourTags();
 							final ArrayList<Long> tagIds;
@@ -1156,7 +1168,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 							// modified tour exists only once in the viewer, remove modified tour
 							modifiedTours.remove(modifiedTourData);
-							
+
 							break;
 						}
 					}

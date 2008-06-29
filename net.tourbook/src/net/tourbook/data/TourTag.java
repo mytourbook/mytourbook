@@ -82,12 +82,18 @@ public class TourTag {
 	 * @see IComparator#equals
 	 */
 	@Override
-	public boolean equals(final Object other) {
-		if (other instanceof TourTag) {
-			final long otherId = ((TourTag) other).getTagId();
+	public boolean equals(final Object obj) {
+
+		if (obj instanceof TourTag) {
+			final long otherId = ((TourTag) obj).getTagId();
 			return otherId == tagId;
 		}
-		return super.equals(other);
+
+		if (this == obj) {
+			return true;
+		}
+		
+		return false;
 	}
 
 	public int getExpandType() {

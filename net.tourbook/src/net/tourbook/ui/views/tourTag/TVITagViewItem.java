@@ -107,7 +107,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setLong(1, tagItem.tagId);
+			statement.setLong(1, tagItem.getTagId());
 			sqlFilter.setParameters(statement, 2);
 
 			final ResultSet result = statement.executeQuery();

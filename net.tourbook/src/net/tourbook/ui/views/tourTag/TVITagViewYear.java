@@ -75,7 +75,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setLong(1, fTagItem.tagId);
+			statement.setLong(1, fTagItem.getTagId());
 			statement.setInt(2, fYear);
 			sqlFilter.setParameters(statement, 3);
 
@@ -155,7 +155,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setLong(1, fTagItem.tagId);
+			statement.setLong(1, fTagItem.getTagId());
 			statement.setInt(2, fYear);
 			sqlFilter.setParameters(statement, 3);
 

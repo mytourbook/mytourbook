@@ -201,6 +201,14 @@ public class TVITagViewTag extends TVITagViewItem {
 		return fExpandType;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public long getTagId() {
+		return tagId;
+	}
+
 	/**
 	 * @param modifiedTours
 	 * @return Returns an expression to select tour id's in the WHERE clause or <code>null</code>
@@ -340,6 +348,11 @@ public class TVITagViewTag extends TVITagViewItem {
 
 	public void setExpandType(final int expandType) {
 		fExpandType = expandType;
+	}
+
+	public String setName(final String name) {
+		this.name = name;
+		return name;
 	}
 
 	/**

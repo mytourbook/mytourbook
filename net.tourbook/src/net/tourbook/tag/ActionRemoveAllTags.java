@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 
-package net.tourbook.ui;
+package net.tourbook.tag;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +24,8 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.ChangedTags;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ISelectedTours;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -37,7 +37,7 @@ public class ActionRemoveAllTags extends Action {
 
 	public ActionRemoveAllTags(final ISelectedTours tourProvider) {
 
-		super(Messages.app_action_tag_remove_all, AS_PUSH_BUTTON);
+		super(Messages.action_tag_remove_all, AS_PUSH_BUTTON);
 
 		fTourProvider = tourProvider;
 	}

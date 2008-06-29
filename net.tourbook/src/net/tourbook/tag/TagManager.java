@@ -37,6 +37,16 @@ import org.eclipse.swt.widgets.Display;
 
 public class TagManager {
 
+	public static final String[]		EXPAND_TYPE_NAMES				= {
+			Messages.app_action_expand_type_flat,
+			Messages.app_action_expand_type_year_day,
+			Messages.app_action_expand_type_year_month_day				};
+
+	public static final int[]			EXPAND_TYPES					= {
+			TourTag.EXPAND_TYPE_FLAT,
+			TourTag.EXPAND_TYPE_YEAR_DAY,
+			TourTag.EXPAND_TYPE_YEAR_MONTH_DAY							};
+
 	private static final String			SETTINGS_SECTION_RECENT_TAGS	= "recentTags";				//$NON-NLS-1$
 	private static final String			SETTINGS_TAG_ID					= "tagId";						//$NON-NLS-1$
 

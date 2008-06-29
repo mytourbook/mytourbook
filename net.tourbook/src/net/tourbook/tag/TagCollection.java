@@ -17,6 +17,7 @@
 package net.tourbook.tag;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
@@ -25,5 +26,11 @@ public class TagCollection {
 
 	public ArrayList<TourTagCategory>	tourTagCategories;
 	public ArrayList<TourTag>			tourTags;
+	
+	public TagCollection() {}
+
+	public TagCollection(final Set<TourTag> tourTagsInOneTour) {
+		tourTags = new ArrayList<TourTag>(tourTagsInOneTour);
+	}
 
 }

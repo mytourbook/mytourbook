@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.data;
 
 import java.util.HashSet;
@@ -114,6 +113,11 @@ public class TourTagCategory {
 		this.fCategoryCounter = fCategoryCounter;
 	}
 
+	/**
+	 * Set the name for the tag category
+	 * 
+	 * @param name
+	 */
 	public void setName(final String name) {
 		this.name = name;
 	}

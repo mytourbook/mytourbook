@@ -15,11 +15,13 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import java.util.Iterator;
+
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
 public class ActionExpandSelection extends Action {
@@ -37,6 +39,7 @@ public class ActionExpandSelection extends Action {
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__expand_all));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
 
@@ -44,12 +47,16 @@ public class ActionExpandSelection extends Action {
 			return;
 		}
 
-		final StructuredSelection selection = (StructuredSelection) fTreeViewer.getSelection();
+		final ITreeSelection selection = (ITreeSelection) fTreeViewer.getSelection();
 
 		if (selection.size() == 0) {
 			return;
 		}
 
-		fTreeViewer.expandToLevel(selection.getFirstElement(), 2);//TreeViewer.ALL_LEVELS);
+//		fTreeViewer.expandToLevel(selection.getFirstElement(), 2);//TreeViewer.ALL_LEVELS);
+
+		for (final Iterator iterator = selection.iterator(); iterator.hasNext();) {
+			fTreeViewer.expandToLevel(iterator.next(), 2);//TreeViewer.ALL_LEVELS);
+		}
 	}
 }

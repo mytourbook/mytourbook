@@ -30,6 +30,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionExpandSelection;
@@ -495,6 +496,18 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		fBtnRename.setEnabled(selectedTags.size() == 1);
 	}
 
+	private void fireModifyEvent() {
+		if (fIsModified) {
+
+			TourDatabase.clearTourTags();
+
+			// fire modify event
+			TourManager.firePropertyChange(TourManager.TAG_STRUCTURE_CHANGED, null);
+			
+			fIsModified = false;
+		}
+	}
+
 	public long getDragStartTime() {
 		return fDragStartTime;
 	}
@@ -513,18 +526,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 //		saveFilterList();
 
 		return true;
-	}
-
-	private void modifyPostAction() {
-		if (fIsModified) {
-
-			TourDatabase.clearTourTags();
-
-			// fire modify event
-			getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
-
-			fIsModified = false;
-		}
 	}
 
 	private void onNewCategory() {
@@ -915,6 +916,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				fRootItem = new TVIPrefTagRoot(fTagViewer);
 				updateTagViewer();
 
+				fIsModified = true;
+
 			} catch (final SQLException e) {
 				UI.showSQLException(e);
 			}
@@ -923,18 +926,18 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	@Override
 	public boolean performCancel() {
-		modifyPostAction();
+		fireModifyEvent();
 		return true;
 	}
 
 	@Override
 	public boolean performOk() {
-		modifyPostAction();
+		fireModifyEvent();
 		return true;
 	}
 
-	public void setIsModified(final boolean fIsModified) {
-		this.fIsModified = fIsModified;
+	public void setIsModified(final boolean isModified) {
+		fIsModified = isModified;
 	}
 
 	private void updateTagViewer() {

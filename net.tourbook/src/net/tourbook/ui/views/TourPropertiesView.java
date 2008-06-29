@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
@@ -321,13 +323,19 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 					// get modified tours
 					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
-					final long tourId = fTourData.getTourId();
+					final long displayedTourId = fTourData.getTourId();
 
 					for (final TourData tourData : modifiedTours) {
-						if (tourData.getTourId() == tourId) {
+						if (tourData.getTourId() == displayedTourId) {
 							updateTourProperties(tourData);
 							return;
 						}
+					}
+
+				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
+
+					if (isTagListModified(fTourData)) {
+						updateTourProperties(fTourData);
 					}
 				}
 			}
@@ -812,6 +820,65 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
+	/**
+	 * Checks if the tour tags in the {@link TourData} has changed, the tag list will be updated for
+	 * changed tag names or removed tags
+	 * 
+	 * @param tourData
+	 * @return Returns <code>true</code> when the tags have changed
+	 */
+	private boolean isTagListModified(final TourData tourData) {
+
+		if (tourData == null) {
+			return false;
+		}
+
+		final Set<TourTag> tourTags = tourData.getTourTags();
+
+		if (tourTags == null) {
+			return false;
+		}
+
+		final HashMap<Long, TourTag> allTags = TourDatabase.getTourTags();
+		final ArrayList<TourTag> removedTags = new ArrayList<TourTag>();
+		boolean isModified = false;
+
+		// loop: all tags in tour data
+		for (final TourTag tourTag : tourTags) {
+
+			final String tagName = tourTag.getTagName();
+			final TourTag allTag = allTags.get(tourTag.getTagId());
+
+			if (allTag == null) {
+
+				// tag is not available in all tags, tag was deleted
+
+				removedTags.add(tourTag);
+				isModified = true;
+
+			} else {
+
+				// tag is available in all tags
+
+				final String allTagName = allTag.getTagName();
+				if (allTagName.equals(tagName) == false) {
+
+					// tag name has changed, update name
+
+					tourTag.setTagName(allTagName);
+
+					isModified = true;
+				}
+			}
+		}
+		
+		for (final TourTag removedTag : removedTags) {
+			tourTags.remove(removedTag);
+		}
+
+		return isModified;
+	}
+
 	private void onChangeContent() {
 
 		if (fTourEditor == null) {
@@ -912,8 +979,8 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	}
 
 	public void reloadViewer() {
-		// TODO Auto-generated method stub
-		
+	// TODO Auto-generated method stub
+
 	}
 
 	private void restoreState(final IMemento memento) {

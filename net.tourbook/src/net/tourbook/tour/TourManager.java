@@ -66,6 +66,12 @@ public class TourManager {
 	 */
 	public static final int					TOUR_TAGS_CHANGED						= 60;
 
+	/**
+	 * structure of the tags changed, this includes add/remove of tags and categories and
+	 * tag/category renaming
+	 */
+	public static final int					TAG_STRUCTURE_CHANGED					= 70;
+
 	public static final String				CUSTOM_DATA_TIME						= "time";									//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_DISTANCE					= "distance";								//$NON-NLS-1$
 	public static final String				CUSTOM_DATA_ALTITUDE					= "altitude";								//$NON-NLS-1$

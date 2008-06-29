@@ -45,7 +45,6 @@ public class TVITagViewTour extends TVITagViewItem {
 	int							tourYear;
 	int							tourMonth;
 	int							tourDay;
-	long						tourTime;
 
 	String						tourTitle;
 	long						tourTypeId;
@@ -89,7 +88,6 @@ public class TVITagViewTour extends TVITagViewItem {
 		tourDay = result.getInt(startIndex + 2);
 		
 		tourDate = new DateTime(tourYear, tourMonth, tourDay, 0, 0, 0, 0);
-		tourTime = tourDate.getMillis();
 
 		tourTitle = result.getString(startIndex + 3);
 

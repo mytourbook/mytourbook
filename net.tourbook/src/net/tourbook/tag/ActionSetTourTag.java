@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
 
-package net.tourbook.ui;
+package net.tourbook.tag;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,8 +25,8 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.TagCollection;
-import net.tourbook.tag.TagManager;
+import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -48,7 +48,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 	private final boolean			fIsAddMode;
 
 	/**
-	 * contains the tags for the selected tour when one tour is selected in the viewer
+	 * contains the tags for all selected tours in the viewer
 	 */
 	private Set<TourTag>			fSelectedTags;
 
@@ -124,7 +124,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		public void run() {
 			TagManager.setTagIntoTour(fTourTag, fTourProvider, fIsAddMode);
 		}
-		
+
 	}
 
 	public ActionSetTourTag(final ISelectedTours tourProvider, final boolean isAddMode) {
@@ -154,8 +154,13 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 	private void createTagActions(final TagCollection tagCollection, final Menu menu) {
 
+		final ArrayList<TourTag> tourTags = tagCollection.tourTags;
+		if (tourTags == null) {
+			return;
+		}
+		
 		// add tag items
-		for (final TourTag menuTourTag : tagCollection.tourTags) {
+		for (final TourTag menuTourTag : tourTags) {
 
 			// check the tag when it's set in the tour
 			final ActionTourTag actionTourTag = new ActionTourTag(menuTourTag);
@@ -225,7 +230,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 					items[i].dispose();
 				}
 
-				// check if tours are selected
+				// check if a tour is selected
 				fSelectedTours = fTourProvider.getSelectedTours();
 				if (fSelectedTours == null || fSelectedTours.size() == 0) {
 					// a tour is not selected
@@ -240,10 +245,19 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 					}
 				}
 
-				final TagCollection rootTagCollection = TourDatabase.getRootTags();
+				if (fIsAddMode || fSelectedTours.size() > 1) {
 
-				createCategoryActions(rootTagCollection, fMenu);
-				createTagActions(rootTagCollection, fMenu);
+					final TagCollection rootTagCollection = TourDatabase.getRootTags();
+
+					createCategoryActions(rootTagCollection, fMenu);
+					createTagActions(rootTagCollection, fMenu);
+
+				} else {
+
+					// remove mode for one tour
+					final Set<TourTag> tourTagsForOneTour = (fSelectedTours.get(0)).getTourTags();
+					createTagActions(new TagCollection(tourTagsForOneTour), fMenu);
+				}
 			}
 		});
 

@@ -115,6 +115,14 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 		}
 	}
 
+	public long getCategoryId() {
+		return tagCategoryId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
 	@Override
 	protected void remove() {}
 
