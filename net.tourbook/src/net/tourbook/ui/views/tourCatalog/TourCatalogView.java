@@ -28,6 +28,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.UI;
@@ -494,7 +495,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		fActionRenameRefTour = new ActionRenameRefTour(this);
 		fActionLinkTour = new ActionLinkTour(this);
 		fActionRefreshView = new ActionRefreshView(this);
-		fActionCollapseAll = new ActionCollapseAll(fTourViewer);
+		fActionCollapseAll = new ActionCollapseAll(this);
 	}
 
 	/**

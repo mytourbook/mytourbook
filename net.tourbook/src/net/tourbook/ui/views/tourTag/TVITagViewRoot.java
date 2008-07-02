@@ -101,9 +101,10 @@ public class TVITagViewRoot extends TVITagViewItem {
 
 				tagItem.tagId = tagId;
 				tagItem.treeColumn = tagItem.name = result.getString(2);
+				tagItem.isRoot = true;
 				tagItem.setExpandType(result.getInt(3));
 
-				getTagTotals(tagItem);
+				readTagTotals(tagItem);
 			}
 
 			conn.close();

@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
@@ -15,6 +18,13 @@ public class TVITagViewYear extends TVITagViewItem {
 
 	private final int		fYear;
 	private TVITagViewTag	fTagItem;
+
+	private static Calendar	fCalendar	= GregorianCalendar.getInstance();
+
+	/**
+	 * <code>true</code> when the children of this year item contains month items<br>
+	 * <code>false</code> when the children of this year item contains tour items
+	 */
 	private boolean			fIsMonth;
 
 	public TVITagViewYear(final TVITagViewTag parentItem, final int year, final boolean isMonth) {
@@ -22,6 +32,57 @@ public class TVITagViewYear extends TVITagViewItem {
 		fTagItem = parentItem;
 		fYear = year;
 		fIsMonth = isMonth;
+	}
+
+	/**
+	 * Compare two instances of {@link TVITagViewYear}
+	 * 
+	 * @param otherYearItem
+	 * @return
+	 */
+	public int compareTo(final TVITagViewYear otherYearItem) {
+
+		if (this == otherYearItem) {
+			return 0;
+		}
+
+		if (fYear < otherYearItem.fYear) {
+			return -1;
+		} else {
+			return 1;
+		}
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+
+		final TVITagViewYear other = (TVITagViewYear) obj;
+		if (fIsMonth != other.fIsMonth) {
+			return false;
+		}
+		if (fYear != other.fYear) {
+			return false;
+		}
+
+		if (fTagItem == null) {
+			if (other.fTagItem != null) {
+				return false;
+			}
+		} else if (!fTagItem.equals(other.fTagItem)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -132,7 +193,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			 */
 			final SQLFilter sqlFilter = new SQLFilter();
 			final StringBuilder sb = new StringBuilder();
-			
+
 			sb.append("SELECT");
 			sb.append(" startYear,"); //		// 1
 			sb.append(" startMonth,"); //		// 2
@@ -159,6 +220,10 @@ public class TVITagViewYear extends TVITagViewItem {
 			statement.setInt(2, fYear);
 			sqlFilter.setParameters(statement, 3);
 
+			final SimpleDateFormat dfMonth = new SimpleDateFormat("MMM");
+//			final DateTime dt = new DateTime(2000, 1, 1, 0, 0, 0, 0);
+//			final Date monthDate = new Date();
+
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
@@ -168,8 +233,12 @@ public class TVITagViewYear extends TVITagViewItem {
 				final TVITagViewMonth tourItem = new TVITagViewMonth(this, dbYear, dbMonth);
 				children.add(tourItem);
 
-				tourItem.treeColumn = Integer.toString(dbMonth);
-				tourItem.getSumColumnData(result, 3);
+//				dt.withMonthOfYear(dbMonth);
+				fCalendar.set(2000, dbMonth - 1, 1);
+				tourItem.treeColumn = dfMonth.format(fCalendar.getTime());
+//				tourItem.treeColumn = tourItem.treeColumn + "   " + Integer.toString(dbMonth);
+
+				tourItem.readSumColumnData(result, 3);
 			}
 
 			conn.close();
@@ -185,6 +254,16 @@ public class TVITagViewYear extends TVITagViewItem {
 
 	public int getYear() {
 		return fYear;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (fIsMonth ? 1231 : 1237);
+		result = prime * result + ((fTagItem == null) ? 0 : fTagItem.hashCode());
+		result = prime * result + fYear;
+		return result;
 	}
 
 	@Override

@@ -186,6 +186,10 @@ public class TagManager {
 
 		for (final TourTag tag : fRecentTags) {
 			tagIds[tagIndex++] = Long.toString(tag.getTagId());
+			
+			if (tagIndex == MAX_RECENT_TAGS) {
+				break;
+			}
 		}
 
 		TourbookPlugin.getDefault().getDialogSettingsSection(SETTINGS_SECTION_RECENT_TAGS).put(SETTINGS_TAG_ID, tagIds);

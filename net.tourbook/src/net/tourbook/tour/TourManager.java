@@ -19,7 +19,7 @@ package net.tourbook.tour;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
@@ -49,57 +49,57 @@ public class TourManager {
 	/**
 	 * properties of the tour chart has been changed
 	 */
-	public static final int					TOUR_CHART_PROPERTY_IS_MODIFIED			= 10;
-	public static final int					TOUR_PROPERTY_SEGMENT_LAYER_CHANGED		= 20;
-	public static final int					TOUR_PROPERTY_REFERENCE_TOUR_CHANGED	= 30;
-	public static final int					TOUR_PROPERTY_COMPARE_TOUR_CHANGED		= 40;
+	public static final int						TOUR_CHART_PROPERTY_IS_MODIFIED			= 10;
+	public static final int						TOUR_PROPERTY_SEGMENT_LAYER_CHANGED		= 20;
+	public static final int						TOUR_PROPERTY_REFERENCE_TOUR_CHANGED	= 30;
+	public static final int						TOUR_PROPERTY_COMPARE_TOUR_CHANGED		= 40;
 
 	/**
-	 * Data of a tour has been modified.<br>
-	 * The property data contains an {@link ArrayList} with {@link TourData}
+	 * Data of a tour has been modified. The property data contains an {@link ArrayList} with
+	 * {@link TourData}
 	 */
-	public static final int					TOUR_PROPERTIES_CHANGED					= 50;
+	public static final int						TOUR_PROPERTIES_CHANGED					= 50;
 
 	/**
-	 * Tags for a tour has been modified.<br>
-	 * The property data contains an object {@link ChangedTags} which contains the changed tags
+	 * Tags for a tour has been modified. The property data contains an object {@link ChangedTags}
+	 * which contains the tags and the modified tours
 	 */
-	public static final int					TOUR_TAGS_CHANGED						= 60;
+	public static final int						TOUR_TAGS_CHANGED						= 60;
 
 	/**
 	 * structure of the tags changed, this includes add/remove of tags and categories and
 	 * tag/category renaming
 	 */
-	public static final int					TAG_STRUCTURE_CHANGED					= 70;
+	public static final int						TAG_STRUCTURE_CHANGED					= 70;
 
-	public static final String				CUSTOM_DATA_TIME						= "time";									//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_DISTANCE					= "distance";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_ALTITUDE					= "altitude";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_SPEED						= "speed";									//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_PACE						= "pace";									//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_POWER						= "power";									//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_GRADIENT					= "gradient";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_ALTIMETER					= "altimeter";								//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_PULSE						= "pulse";									//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_TIME						= "time";									//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_DISTANCE					= "distance";								//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_ALTITUDE					= "altitude";								//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_SPEED						= "speed";									//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_PACE						= "pace";									//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_POWER						= "power";									//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_GRADIENT					= "gradient";								//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_ALTIMETER					= "altimeter";								//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_PULSE						= "pulse";									//$NON-NLS-1$
 
-	public static final String				CUSTOM_DATA_TOUR_DATA					= "tourdata";								//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_TOUR_DATA					= "tourdata";								//$NON-NLS-1$
 
-	public static final String				ANALYZER_INFO							= "AnalyzerInfo";							//$NON-NLS-1$
-	public static final String				X_AXIS_TIME								= "time";									//$NON-NLS-1$
-	public static final String				X_AXIS_DISTANCE							= "distance";								//$NON-NLS-1$
+	public static final String					ANALYZER_INFO							= "AnalyzerInfo";							//$NON-NLS-1$
+	public static final String					X_AXIS_TIME								= "time";									//$NON-NLS-1$
+	public static final String					X_AXIS_DISTANCE							= "distance";								//$NON-NLS-1$
 
-	public static final int					GRAPH_ALTITUDE							= 1000;
-	public static final int					GRAPH_SPEED								= 1001;
-	public static final int					GRAPH_ALTIMETER							= 1002;
-	public static final int					GRAPH_PULSE								= 1003;
-	public static final int					GRAPH_TEMPERATURE						= 1004;
-	public static final int					GRAPH_CADENCE							= 1005;
-	public static final int					GRAPH_GRADIENT							= 1006;
-	public static final int					GRAPH_POWER								= 1007;
-	public static final int					GRAPH_PACE								= 1008;
-	public static final int					GRAPH_TOUR_COMPARE						= 2000;
+	public static final int						GRAPH_ALTITUDE							= 1000;
+	public static final int						GRAPH_SPEED								= 1001;
+	public static final int						GRAPH_ALTIMETER							= 1002;
+	public static final int						GRAPH_PULSE								= 1003;
+	public static final int						GRAPH_TEMPERATURE						= 1004;
+	public static final int						GRAPH_CADENCE							= 1005;
+	public static final int						GRAPH_GRADIENT							= 1006;
+	public static final int						GRAPH_POWER								= 1007;
+	public static final int						GRAPH_PACE								= 1008;
+	public static final int						GRAPH_TOUR_COMPARE						= 2000;
 
-	public static final int[]				allGraphIDs								= new int[] {
+	public static final int[]					allGraphIDs								= new int[] {
 			GRAPH_ALTITUDE,
 			GRAPH_SPEED,
 			GRAPH_ALTIMETER,
@@ -109,26 +109,27 @@ public class TourManager {
 			GRAPH_GRADIENT,
 			GRAPH_POWER,
 			GRAPH_PACE,
-			GRAPH_TOUR_COMPARE														};
+			GRAPH_TOUR_COMPARE															};
 
-	public static final int					GRADIENT_DIVISOR						= 10;
+	public static final int						GRADIENT_DIVISOR						= 10;
 
-	private static TourManager				instance;
+	private static TourManager					instance;
 
-	private ComputeChartValue				computeAltimeterAvg;
-	private ComputeChartValue				computeGradientAvg;
-	private ComputeChartValue				computePaceAvg;
-	private ComputeChartValue				computePowerAvg;
-	private ComputeChartValue				computeSpeedAvg;
+	private ComputeChartValue					computeAltimeterAvg;
+	private ComputeChartValue					computeGradientAvg;
+	private ComputeChartValue					computePaceAvg;
+	private ComputeChartValue					computePowerAvg;
+	private ComputeChartValue					computeSpeedAvg;
 
-	private final HashMap<Long, TourData>	fTourDataMap							= new HashMap<Long, TourData>();
+//	private final HashMap<Long, TourData>	fTourDataMap							= new HashMap<Long, TourData>();
+	private final LinkedHashMap<Long, TourData>	fTourDataMap							= new LinkedHashMap<Long, TourData>();
 
-	private static final ListenerList		fPropertyListeners						= new ListenerList(ListenerList.IDENTITY);
+	private static final ListenerList			fPropertyListeners						= new ListenerList(ListenerList.IDENTITY);
 
 	/**
 	 * tour chart which shows the selected tour
 	 */
-	private TourChart						fActiveTourChart;
+	private TourChart							fActiveTourChart;
 
 	public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {
 
@@ -313,6 +314,14 @@ public class TourManager {
 		if (yData.getVisibleMinValue() > 0) {
 			yData.setVisibleMinValue(yData.getVisibleMinValue() - 1);
 		}
+	}
+
+	/**
+	 * Remove all {@link TourData} from the cache so they need to be reloaded the next time in
+	 * {@link #getTourData} the database
+	 */
+	public void clearTourDataCache() {
+		fTourDataMap.clear();
 	}
 
 	/**
@@ -1069,7 +1078,7 @@ public class TourManager {
 
 		// keep the tour data
 		if (tourData != null) {
-			fTourDataMap.put(tourId, tourData);
+			putTourDataIntoMap(tourId, tourData);
 			return tourData;
 		}
 
@@ -1098,6 +1107,10 @@ public class TourManager {
 		}
 	}
 
+	private void putTourDataIntoMap(final Long tourId, final TourData tourData) {
+		fTourDataMap.put(tourId, tourData);
+	}
+
 	public void removeAllToursFromCache() {
 		fTourDataMap.values().clear();
 	}
@@ -1117,7 +1130,7 @@ public class TourManager {
 	}
 
 	public void updateTourInCache(final TourData tourData) {
-		fTourDataMap.put(tourData.getTourId(), tourData);
+		putTourDataIntoMap(tourData.getTourId(), tourData);
 	}
 
 }

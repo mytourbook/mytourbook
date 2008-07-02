@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.ui.views.tourBook;
 
 import java.text.NumberFormat;
@@ -39,6 +38,7 @@ import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionExpandSelection;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionRefreshView;
@@ -50,7 +50,6 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourCatalog.ActionCollapseAll;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
@@ -365,8 +364,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		 */
 		final IToolBarManager tbm = actionBars.getToolBarManager();
 
-		tbm.add(new ActionExpandSelection(fTourViewer));
-		tbm.add(new ActionCollapseAll(fTourViewer));
+		tbm.add(new ActionExpandSelection(this));
+		tbm.add(new ActionCollapseAll(this));
 
 		tbm.add(fActionRefreshView);
 	}
@@ -522,6 +521,10 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 			}
 		});
 
+		/*
+		 * the context menu must be created after the viewer is created which is also done after the
+		 * measurement system has changed
+		 */
 		createContextMenu();
 
 		return tree;
@@ -862,9 +865,9 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 			final ArrayList<Long> tagIds = firstTour.fTagIds;
 			if (tagIds != null && tagIds.size() > 0) {
-				
+
 				// at least one tag is within the tour
-				
+
 				fActionRemoveAllTags.setEnabled(true);
 				fActionRemoveTag.setEnabled(true);
 			} else {
@@ -882,7 +885,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
-
 
 		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionEditTour);
@@ -951,10 +953,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		}
 
 		return selectedTourData;
-	}
-
-	TreeViewer getTourViewer() {
-		return fTourViewer;
 	}
 
 	public TreeViewer getTreeViewer() {

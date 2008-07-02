@@ -105,7 +105,7 @@ public class TVITagViewTagCategory extends TVITagViewItem {
 				tagItem.treeColumn = tagItem.name = result.getString(2);
 				tagItem.setExpandType(expandType);
 
-				getTagTotals(tagItem);
+				readTagTotals(tagItem);
 			}
 
 			conn.close();

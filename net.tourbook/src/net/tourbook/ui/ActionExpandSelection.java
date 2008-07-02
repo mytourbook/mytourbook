@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -26,13 +26,13 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class ActionExpandSelection extends Action {
 
-	private TreeViewer	fTreeViewer;
+	private ITourViewer	fTourViewer;
 
-	public ActionExpandSelection(final TreeViewer tourViewer) {
+	public ActionExpandSelection(final ITourViewer tourViewer) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		fTreeViewer = tourViewer;
+		fTourViewer = tourViewer;
 
 		setText(Messages.app_action_expand_selection_tooltip);
 		setToolTipText(Messages.app_action_expand_selection_tooltip);
@@ -43,20 +43,19 @@ public class ActionExpandSelection extends Action {
 	@Override
 	public void run() {
 
-		if (fTreeViewer == null) {
+		if (fTourViewer == null) {
 			return;
 		}
 
-		final ITreeSelection selection = (ITreeSelection) fTreeViewer.getSelection();
+		final TreeViewer treeViewer = fTourViewer.getTreeViewer();
+		final ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
 
 		if (selection.size() == 0) {
 			return;
 		}
 
-//		fTreeViewer.expandToLevel(selection.getFirstElement(), 2);//TreeViewer.ALL_LEVELS);
-
 		for (final Iterator iterator = selection.iterator(); iterator.hasNext();) {
-			fTreeViewer.expandToLevel(iterator.next(), 2);//TreeViewer.ALL_LEVELS);
+			treeViewer.expandToLevel(iterator.next(), 2);//TreeViewer.ALL_LEVELS);
 		}
 	}
 }

@@ -8,8 +8,8 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.plugin.TourbookPlugin;
 
 /**
- * The {@link SQLFilter} provides a where clause and sets the parameters for the selected person and
- * tour type
+ * The {@link SQLFilter} provides a where clause and sets the statement parameters for the selected
+ * person and tour type
  */
 public class SQLFilter {
 

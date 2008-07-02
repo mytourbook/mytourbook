@@ -84,7 +84,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 	 * 
 	 * @param tagItem
 	 */
-	public static void getTagTotals(final TVITagViewTag tagItem) {
+	public static void readTagTotals(final TVITagViewTag tagItem) {
 
 		try {
 			final StringBuilder sb = new StringBuilder();
@@ -112,7 +112,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
-				tagItem.getSumColumnData(result, 1);
+				tagItem.readSumColumnData(result, 1);
 			}
 
 			conn.close();
@@ -122,7 +122,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 		}
 	}
 
-	void getDefaultColumnData(final ResultSet result, final int startIndex) throws SQLException {
+	void readDefaultColumnData(final ResultSet result, final int startIndex) throws SQLException {
 
 		colDistance = result.getLong(startIndex + 0);
 
@@ -145,9 +145,9 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 		colAvgSpeed = (float) (colDrivingTime == 0 ? 0 : 3.6 * colDistance / colDrivingTime);
 	}
 
-	public void getSumColumnData(final ResultSet result, final int startIndex) throws SQLException {
+	public void readSumColumnData(final ResultSet result, final int startIndex) throws SQLException {
 
-		getDefaultColumnData(result, startIndex);
+		readDefaultColumnData(result, startIndex);
 
 		colItemCounter = result.getLong(startIndex + 11);
 	}

@@ -22,15 +22,36 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVITagViewTag extends TVITagViewItem {
 
-	private static final DateFormat	fDF	= DateFormat.getDateInstance(DateFormat.SHORT);
+	private static final DateFormat	fDF		= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	long							tagId;
+
 	String							name;
 
 	private int						fExpandType;
 
+	public boolean					isRoot	= false;
+
 	public TVITagViewTag(final TVITagViewItem parentItem) {
 		setParentItem(parentItem);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final TVITagViewTag other = (TVITagViewTag) obj;
+		if (tagId != other.tagId) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -38,15 +59,15 @@ public class TVITagViewTag extends TVITagViewItem {
 
 		switch (fExpandType) {
 		case TourTag.EXPAND_TYPE_FLAT:
-			setChildren(getChildrenFlat(null));
+			setChildren(getChildrenFlat(UI.EMPTY_STRING));
 			break;
 
 		case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
-			setChildren(getChildrenYearMonthDay(true));
+			setChildren(getChildrenYear(true, UI.EMPTY_STRING));
 			break;
 
 		case TourTag.EXPAND_TYPE_YEAR_DAY:
-			setChildren(getChildrenYearMonthDay(false));
+			setChildren(getChildrenYear(false, UI.EMPTY_STRING));
 			break;
 
 		default:
@@ -84,11 +105,7 @@ public class TVITagViewTag extends TVITagViewItem {
 			sb.append(" ON TourData.tourID = jTdataTtag2.TourData_tourId");
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");
-
-			if (whereClause != null) {
-				sb.append(whereClause);
-			}
-
+			sb.append(whereClause);
 			sb.append(sqlFilter.getWhereClause());
 
 			sb.append(" ORDER BY startYear, startMonth, startDay, startHour, startMinute"); //$NON-NLS-1$
@@ -138,7 +155,7 @@ public class TVITagViewTag extends TVITagViewItem {
 		return children;
 	}
 
-	private ArrayList<TreeViewerItem> getChildrenYearMonthDay(final boolean isMonth) {
+	private ArrayList<TreeViewerItem> getChildrenYear(final boolean isMonth, final String whereClause) {
 
 		/*
 		 * get the children for the tag item
@@ -165,6 +182,7 @@ public class TVITagViewTag extends TVITagViewItem {
 			sb.append(" ON jTdataTtag.TourData_tourId = TourData.tourId ");
 
 			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");
+			sb.append(whereClause);
 			sb.append(sqlFilter.getWhereClause());
 
 			sb.append(" GROUP BY startYear");
@@ -181,11 +199,11 @@ public class TVITagViewTag extends TVITagViewItem {
 
 				final int dbYear = result.getInt(1);
 
-				final TVITagViewYear tourItem = new TVITagViewYear(this, dbYear, isMonth);
-				children.add(tourItem);
+				final TVITagViewYear yearItem = new TVITagViewYear(this, dbYear, isMonth);
+				children.add(yearItem);
 
-				tourItem.treeColumn = Integer.toString(dbYear);
-				tourItem.getSumColumnData(result, 2);
+				yearItem.treeColumn = Integer.toString(dbYear);
+				yearItem.readSumColumnData(result, 2);
 			}
 
 			conn.close();
@@ -211,13 +229,12 @@ public class TVITagViewTag extends TVITagViewItem {
 
 	/**
 	 * @param modifiedTours
-	 * @return Returns an expression to select tour id's in the WHERE clause or <code>null</code>
-	 *         when tour id's are not available
+	 * @return Returns an expression to select tour id's in the WHERE clause
 	 */
 	private String getTourIdWhereClause(final ArrayList<TourData> modifiedTours) {
 
 		if (modifiedTours.size() == 0) {
-			return null;
+			return UI.EMPTY_STRING;
 		}
 
 		final StringBuilder sb = new StringBuilder();
@@ -241,9 +258,28 @@ public class TVITagViewTag extends TVITagViewItem {
 		return sb.toString();
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (tagId ^ (tagId >>> 32));
+		return result;
+	}
+
+	private void readYearTotals(final TreeViewer tagViewer) {
+
+		final ArrayList<TreeViewerItem> allYearItems = getChildrenYear(false, UI.EMPTY_STRING);
+
+		// update model
+		setChildren(allYearItems);
+
+		// update viewer
+		tagViewer.update(allYearItems.toArray(), null);
+	}
+
 	/**
-	 * According to the expand type, the structure of the tag will be modified for the added or
-	 * removed tours
+	 * This tag was added or removed from tours. According to the expand type, the structure of the
+	 * tag will be modified for the added or removed tours
 	 * 
 	 * @param tagViewer
 	 * @param modifiedTours
@@ -281,7 +317,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 		if (isAddMode) {
 
-			// add tours
+			// this tag was added to tours
 
 			final ArrayList<TreeViewerItem> tagChildren = getChildrenFlat(getTourIdWhereClause(modifiedTours));
 
@@ -293,7 +329,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 		} else {
 
-			// remove tours
+			// this tag was remove from tours
 
 			final HashMap<Long, TVITagViewTour> removedTours = new HashMap<Long, TVITagViewTour>();
 
@@ -311,6 +347,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 							// tree tour item was found in the modified tours
 
+							// remove the item outside of the for loop
 							removedTours.put(itemTourId, tourItem);
 
 							break;
@@ -322,9 +359,10 @@ public class TVITagViewTag extends TVITagViewItem {
 			final Collection<TVITagViewTour> removedTourItems = removedTours.values();
 
 			// update model
-			for (final TVITagViewTour removedTourItem : removedTourItems) {
-				unfetchedChildren.remove(removedTourItem);
-			}
+//			for (final TVITagViewTour removedTourItem : removedTourItems) {
+//				unfetchedChildren.remove(removedTourItem);
+//			}
+			unfetchedChildren.removeAll(removedTours.values());
 
 			// update viewer
 			tagViewer.remove(removedTourItems.toArray());
@@ -337,10 +375,161 @@ public class TVITagViewTag extends TVITagViewItem {
 
 	}
 
+	/**
+	 * Refresh the children of the tag, these are year items
+	 * 
+	 * @param tagViewer
+	 * @param modifiedTours
+	 * @param isAddMode
+	 */
 	private void refreshYearTours(	final TreeViewer tagViewer,
 									final ArrayList<TourData> modifiedTours,
 									final boolean isAddMode) {
 
+		final ArrayList<TreeViewerItem> unfetchedTagChildren = getUnfetchedChildren();
+		if (unfetchedTagChildren == null) {
+			// children are not fetched, nothing to do
+			return;
+		}
+
+		if (isAddMode) {
+
+			// this tag was added to tours
+
+			// get year items for the modified tours
+			final ArrayList<TreeViewerItem> modifiedYearItems = getChildrenYear(false,
+					getTourIdWhereClause(modifiedTours));
+
+			/*
+			 * update model
+			 */
+
+			final ArrayList<TVITagViewYear> addedYearItems = new ArrayList<TVITagViewYear>();
+			final ArrayList<TVITagViewYear> updatedYearItems = new ArrayList<TVITagViewYear>();
+
+			// loop: all modified year items, add the year item or replace a year item
+			for (final TreeViewerItem treeItem : modifiedYearItems) {
+				if (treeItem instanceof TVITagViewYear) {
+
+					final TVITagViewYear newYearItem = (TVITagViewYear) treeItem;
+
+					final int oldYearItemIndex = unfetchedTagChildren.indexOf(newYearItem);
+					if (oldYearItemIndex == -1) {
+
+						// add new year item
+
+						unfetchedTagChildren.add(newYearItem);
+
+						addedYearItems.add(newYearItem);
+
+					} else {
+
+						// replace existing year item to display the corrected sum totals
+
+						unfetchedTagChildren.remove(oldYearItemIndex);
+						unfetchedTagChildren.add(newYearItem);
+
+						updatedYearItems.add(newYearItem);
+					}
+				}
+			}
+
+			/*
+			 * update viewer
+			 */
+			if (addedYearItems.size() > 0) {
+				tagViewer.add(this, addedYearItems.toArray());
+			}
+			if (updatedYearItems.size() > 0) {
+				tagViewer.update(updatedYearItems.toArray(), null);
+			}
+
+		} else {
+
+			/*
+			 * this tag was removed from tours, remove the tour from this tag and remove the year
+			 * item when it does not contain tours
+			 */
+
+			final HashMap<Integer, TVITagViewYear> removedYears = new HashMap<Integer, TVITagViewYear>();
+
+			// loop: all year items
+			for (final TreeViewerItem tagChildItem : unfetchedTagChildren) {
+				if (tagChildItem instanceof TVITagViewYear) {
+
+					final TVITagViewYear tagYearItem = (TVITagViewYear) tagChildItem;
+					final ArrayList<TreeViewerItem> unfetchedYearChildren = tagYearItem.getUnfetchedChildren();
+
+					if (unfetchedYearChildren == null) {
+
+						/*
+						 * the tours for the year item are not fetched but the tag for such a tour
+						 * could have been removed. Because the tours are not loaded for this year
+						 * item, it cannot be checked if the year item could have been removed
+						 */
+
+						continue;
+
+					} else {
+
+						/*
+						 * the tours for the current year item are fetched
+						 */
+						final HashMap<Long, TVITagViewTour> removedTours = new HashMap<Long, TVITagViewTour>();
+
+						// loop: all tour items in the current year item
+						for (final TreeViewerItem yearChildItem : unfetchedYearChildren) {
+							if (yearChildItem instanceof TVITagViewTour) {
+
+								final TVITagViewTour tourItem = (TVITagViewTour) yearChildItem;
+								final long tourItemTourId = tourItem.tourId;
+
+								for (final TourData tourData : modifiedTours) {
+									if (tourData.getTourId() == tourItemTourId) {
+
+										/*
+										 * the modified tour was found in the tree, remove the tour
+										 * from the year item
+										 */
+
+										removedTours.put(tourItemTourId, tourItem);
+
+										break;
+									}
+								}
+							}
+						}
+
+						final Collection<TVITagViewTour> removedTourItems = removedTours.values();
+
+						// update year model
+						unfetchedYearChildren.removeAll(removedTourItems);
+
+						if (unfetchedYearChildren.size() == 0) {
+
+							// year item does not contain any tours, year will be removed
+
+							removedYears.put(tagYearItem.hashCode(), tagYearItem);
+
+						} else {
+
+							// update viewer
+							tagViewer.remove(removedTourItems.toArray());
+						}
+					}
+				}
+			}
+
+			final Collection<TVITagViewYear> removedYearItems = removedYears.values();
+
+			// update tag model
+			unfetchedTagChildren.removeAll(removedYearItems);
+
+			// update viewer
+			tagViewer.remove(removedYearItems.toArray());
+
+			readYearTotals(tagViewer);
+		}
 	}
 
 	@Override

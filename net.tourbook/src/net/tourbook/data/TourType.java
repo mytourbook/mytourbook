@@ -57,6 +57,14 @@ public class TourType {
 		this.name = name;
 	}
 
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj instanceof TourType) {
+			return ((TourType) obj).typeId == typeId;
+		}
+		return false;
+	}
+
 	/**
 	 * @return Returns the name for the tour type
 	 */
@@ -77,8 +85,8 @@ public class TourType {
 	}
 
 	/**
-	 * @return Returns the type id, this can be the saved type id or {@link
-	 * 	TourType#TOUR_TYPE_ID_NOT_DEFINED}
+	 * @return Returns the type id, this can be the saved type id or
+	 *         {@link TourType#TOUR_TYPE_ID_NOT_DEFINED}
 	 */
 	public long getTypeId() {
 		return typeId;

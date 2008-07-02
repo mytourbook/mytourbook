@@ -29,13 +29,14 @@ import net.tourbook.tour.TreeViewerItem;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 
 public class ActionDeleteTour extends Action {
 
 	private TourBookView	tourView;
 	private TreeViewerItem	fNextSelectedTreeItem;
 
-	public ActionDeleteTour(TourBookView tourBookView) {
+	public ActionDeleteTour(final TourBookView tourBookView) {
 
 		this.tourView = tourBookView;
 
@@ -47,57 +48,34 @@ public class ActionDeleteTour extends Action {
 		setEnabled(false);
 	}
 
-	@Override
-	public void run() {
+	private void deleteTours(final Iterator<?> selectedTreeItems, final SelectionDeletedTours selectionRemovedTours) {
 
-		SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
+		final ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
 
-		// get selected reference tours
-		IStructuredSelection selection = (IStructuredSelection) tourView.getTourViewer().getSelection();
-
-		// delete selected tours
-		deleteTours(selection.iterator(), selectionRemovedTours);
-
-		// fire post selection
-		tourView.firePostSelection(selectionRemovedTours);
-
-		// set selection empty
-		selectionRemovedTours.removedTours.clear();
-
-		if (fNextSelectedTreeItem != null) {
-			tourView.getTourViewer().setSelection(new StructuredSelection(fNextSelectedTreeItem), true);
-		}
-
-	}
-
-	private void deleteTours(Iterator<?> selectedTreeItems, SelectionDeletedTours selectionRemovedTours) {
-
-		ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
-
-		HashSet<TreeViewerItem> tourParents = new HashSet<TreeViewerItem>();
+		final HashSet<TreeViewerItem> tourParents = new HashSet<TreeViewerItem>();
 
 		int firstSelectedTourIndex = -1;
 		TreeViewerItem firstSelectedParent = null;
 
 		// loop: selected tours
-		for (Iterator<?> treeItem = selectedTreeItems; treeItem.hasNext();) {
+		for (final Iterator<?> treeItem = selectedTreeItems; treeItem.hasNext();) {
 
-			Object ttiTourItem = treeItem.next();
+			final Object ttiTourItem = treeItem.next();
 
 			if (ttiTourItem instanceof TVITourBookTour) {
 
-				TVITourBookTour tourItem = (TVITourBookTour) ttiTourItem;
+				final TVITourBookTour tourItem = (TVITourBookTour) ttiTourItem;
 
 				if (TourDatabase.removeTour(tourItem.getTourId())) {
 
-					TreeViewerItem tourParent = tourItem.getParentItem();
+					final TreeViewerItem tourParent = tourItem.getParentItem();
 
 					tourParents.add(tourParent);
 
 					// get the index for the first selected tour item
 					if (firstSelectedTourIndex == -1) {
-						ArrayList<TreeViewerItem> parentTourItems = tourParent.getChildren();
-						for (TreeViewerItem firstTourItem : parentTourItems) {
+						final ArrayList<TreeViewerItem> parentTourItems = tourParent.getChildren();
+						for (final TreeViewerItem firstTourItem : parentTourItems) {
 							firstSelectedTourIndex++;
 							if (firstTourItem == tourItem) {
 								firstSelectedParent = tourParent;
@@ -116,7 +94,7 @@ public class ActionDeleteTour extends Action {
 		}
 
 		// refresh the tree viewer
-		tourView.getTourViewer().remove(removedTours.toArray(new TVITourBookTour[removedTours.size()]));
+		tourView.getTreeViewer().remove(removedTours.toArray(new TVITourBookTour[removedTours.size()]));
 
 		/*
 		 * select the item which is before the removed items, this is not yet finished because there
@@ -127,8 +105,8 @@ public class ActionDeleteTour extends Action {
 
 		if (firstSelectedParent != null) {
 
-			ArrayList<TreeViewerItem> firstSelectedChildren = firstSelectedParent.getChildren();
-			int remainingChildren = firstSelectedChildren.size();
+			final ArrayList<TreeViewerItem> firstSelectedChildren = firstSelectedParent.getChildren();
+			final int remainingChildren = firstSelectedChildren.size();
 
 			if (remainingChildren > 0) {
 
@@ -151,6 +129,29 @@ public class ActionDeleteTour extends Action {
 				//					
 				// }
 			}
+		}
+	}
+
+	@Override
+	public void run() {
+
+		final SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
+		final TreeViewer treeViewer = tourView.getTreeViewer();
+
+		// get selected reference tours
+		final IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
+
+		// delete selected tours
+		deleteTours(selection.iterator(), selectionRemovedTours);
+
+		// fire post selection
+		tourView.firePostSelection(selectionRemovedTours);
+
+		// set selection empty
+		selectionRemovedTours.removedTours.clear();
+
+		if (fNextSelectedTreeItem != null) {
+			treeViewer.setSelection(new StructuredSelection(fNextSelectedTreeItem), true);
 		}
 	}
 

@@ -29,7 +29,7 @@ public class TVITagViewMonth extends TVITagViewItem {
 	protected void fetchChildren() {
 
 		/*
-		 * set the children for the root item, these are year items
+		 * set tour children for the month
 		 */
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);

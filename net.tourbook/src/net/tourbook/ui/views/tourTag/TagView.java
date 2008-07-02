@@ -26,6 +26,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
 import net.tourbook.tag.ActionRenameTag;
@@ -34,6 +35,7 @@ import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionExpandSelection;
 import net.tourbook.ui.ActionRefreshView;
 import net.tourbook.ui.ColumnManager;
@@ -42,12 +44,13 @@ import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourCatalog.ActionCollapseAll;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -83,6 +86,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
@@ -115,10 +119,15 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	private ActionCollapseAll				fActionCollapseAll;
 	private Action							fActionOpenTagPrefs;
 
+	private IPropertyChangeListener			fPrefChangeListener;
+
 	private static final Image				fImgTagCategory				= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
 																				.createImage();
 	private static final Image				fImgTag						= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
 																				.createImage();
+	private Image							fImgTagRoot					= TourbookPlugin.getImageDescriptor(Messages.Image__tag_root)
+																				.createImage();
+
 	private static final NumberFormat		fNF							= NumberFormat.getNumberInstance();
 
 	private final class TagComparator extends ViewerComparator {
@@ -132,6 +141,13 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 				final TVITagViewTour tourItem2 = (TVITagViewTour) (obj2);
 
 				return tourItem1.tourDate.compareTo(tourItem2.tourDate);
+			}
+
+			if (obj1 instanceof TVITagViewYear && obj2 instanceof TVITagViewYear) {
+				final TVITagViewYear treeItem1 = (TVITagViewYear) (obj1);
+				final TVITagViewYear treeItem2 = (TVITagViewYear) (obj2);
+
+				return treeItem1.compareTo(treeItem2);
 			}
 
 			return 0;
@@ -212,6 +228,56 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		}
 	}
 
+	private void addPrefListener() {
+
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+					reloadViewer();
+
+				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+					// update viewer
+
+					fTagViewer.refresh();
+
+				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					// measurement system has changed
+
+					UI.updateUnits();
+
+					final Object[] expandedElements = fTagViewer.getExpandedElements();
+
+					fViewerContainer.setRedraw(false);
+					{
+						// recreate the tree with the new measurement system
+						saveSettings();
+
+						fTagViewer.getTree().dispose();
+						createTagViewer(fViewerContainer);
+						fViewerContainer.layout();
+
+						restoreState(fSessionMemento);
+
+						// reload the viewer
+						fRootItem = new TVITagViewRoot(TagView.this);
+						fTagViewer.setInput(fRootItem);
+					}
+					fViewerContainer.setRedraw(true);
+
+					fTagViewer.setExpandedElements(expandedElements);
+				}
+			}
+		};
+
+		// register the listener
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+	}
+
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
@@ -225,24 +291,16 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 						final boolean isAddMode = changedTags.isAddMode();
 
 						// get a clone of the modified tours/tags because the tours are removed from the list
-						updateViewer(fRootItem, //
-								new ChangedTags(changedTags.getModifiedTags(),
-										changedTags.getModifiedTours(),
-										isAddMode),
+						final ChangedTags changedTagsClone = new ChangedTags(changedTags.getModifiedTags(),
+								changedTags.getModifiedTours(),
 								isAddMode);
+
+						updateViewer(fRootItem, changedTagsClone, isAddMode);
 					}
 
 				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
 
-					final Tree tree = fTagViewer.getTree();
-					final Object[] expandedElements = fTagViewer.getExpandedElements();
-
-					tree.setRedraw(false);
-					{
-						reloadViewer();
-						fTagViewer.setExpandedElements(expandedElements);
-					}
-					tree.setRedraw(true);
+					reloadViewer();
 				}
 			}
 		};
@@ -255,10 +313,10 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		fActionRefreshView = new ActionRefreshView(this);
 		fActionSetTagStructure = new ActionMenuSetTagStructure(this);
 		fActionSetAllTagStructures = new ActionMenuSetAllTagStructures(this);
-		fActionRenameTag = new ActionRenameTag(fTagViewer);
+		fActionRenameTag = new ActionRenameTag(this);
 
-		fActionExpandSelection = new ActionExpandSelection(fTagViewer);
-		fActionCollapseAll = new ActionCollapseAll(fTagViewer);
+		fActionExpandSelection = new ActionExpandSelection(this);
+		fActionCollapseAll = new ActionCollapseAll(this);
 
 		fActionOpenTagPrefs = new Action(Messages.app_action_tag_open_tagging_structure) {
 
@@ -302,12 +360,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		createTagViewer(fViewerContainer);
 		createActions();
-		createContextMenu();
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		addTourPropertyListener();
+		addPrefListener();
 
 		restoreState(fSessionMemento);
 		reloadViewer();
@@ -376,6 +434,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			}
 		});
 
+		/*
+		 * the context menu must be created after the viewer is created which is also done after the
+		 * measurement system has changed
+		 */
+		createContextMenu();
+
 		return tree;
 	}
 
@@ -412,8 +476,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 				} else if (viewItem instanceof TVITagViewTag) {
 
 					styledString.append(viewItem.treeColumn, UI.TAG_STYLER);
-					styledString.append("   " + viewItem.colItemCounter, StyledString.COUNTER_STYLER); //$NON-NLS-1$
-					cell.setImage(fImgTag);
+					styledString.append("   " + viewItem.colItemCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+					cell.setImage(((TVITagViewTag) viewItem).isRoot ? fImgTagRoot : fImgTag);
 
 				} else if (viewItem instanceof TVITagViewTagCategory) {
 
@@ -423,6 +487,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 				} else if (viewItem instanceof TVITagViewYear || viewItem instanceof TVITagViewMonth) {
 
 					styledString.append(viewItem.treeColumn);
+					styledString.append("   " + viewItem.colItemCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+
 					cell.setForeground(JFaceResources.getColorRegistry().get(UI.SUB_TAG_COLOR));
 
 				} else {
@@ -506,9 +572,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	public void dispose() {
 
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
-		fImgTagCategory.dispose();
 		fImgTag.dispose();
+		fImgTagRoot.dispose();
+		fImgTagCategory.dispose();
 
 		super.dispose();
 	}
@@ -519,16 +587,35 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		final int selectedItems = selection.size();
 
 		boolean isTagSelected = false;
+		boolean isCategorySelected = false;
 		final TVITagViewItem firstElement = (TVITagViewItem) selection.getFirstElement();
 		if (firstElement instanceof TVITagViewTag) {
 			isTagSelected = true;
+		} else if (firstElement instanceof TVITagViewTagCategory) {
+			isCategorySelected = true;
+		}
+
+		// enable rename action
+		if (selectedItems == 1) {
+
+			if (isTagSelected) {
+				fActionRenameTag.setText(Messages.action_tag_rename_tag);
+				fActionRenameTag.setEnabled(true);
+			} else if (isCategorySelected) {
+				fActionRenameTag.setText(Messages.action_tag_rename_tag_category);
+				fActionRenameTag.setEnabled(true);
+
+			} else {
+				fActionRenameTag.setEnabled(false);
+			}
+		} else {
+			fActionRenameTag.setEnabled(false);
 		}
 
 		/*
 		 * tree expand type can be set only for one tag
 		 */
 		fActionSetTagStructure.setEnabled(isTagSelected && selectedItems == 1);
-		fActionRenameTag.setEnabled(isTagSelected && selectedItems == 1);
 
 		fActionExpandSelection.setEnabled(firstElement == null ? false : //
 				selectedItems == 1 ? firstElement.hasChildren() : //
@@ -630,8 +717,18 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	 * reload the content of the tag viewer
 	 */
 	public void reloadViewer() {
-		fRootItem = new TVITagViewRoot(this);
-		fTagViewer.setInput(fRootItem);
+
+		final Tree tree = fTagViewer.getTree();
+		tree.setRedraw(false);
+		{
+			final Object[] expandedElements = fTagViewer.getExpandedElements();
+
+			fRootItem = new TVITagViewRoot(this);
+			fTagViewer.setInput(fRootItem);
+
+			fTagViewer.setExpandedElements(expandedElements);
+		}
+		tree.setRedraw(true);
 	}
 
 	private void restoreState(final IMemento memento) {
@@ -654,6 +751,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 				fColumnManager.setColumnWidth(StringToArrayConverter.convertStringToArray(mementoColumnWidth));
 			}
 		}
+	}
+
+	private void saveSettings() {
+		fSessionMemento = XMLMemento.createWriteRoot("TagView"); //$NON-NLS-1$
+		saveState(fSessionMemento);
 	}
 
 	@Override
@@ -680,9 +782,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		String description = UI.EMPTY_STRING;
 
 		if (newInput instanceof TVITagViewTag) {
-			description = "Tag: " + ((TVITagViewTag) newInput).getName();
+			description = Messages.tag_view_title_tag + ((TVITagViewTag) newInput).getName();
 		} else if (newInput instanceof TVITagViewTagCategory) {
-			description = "Category: " + ((TVITagViewTagCategory) newInput).name;
+			description = Messages.tag_view_title_tag_category + ((TVITagViewTagCategory) newInput).name;
 		}
 
 		setContentDescription(description);
@@ -725,7 +827,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 						tagItem.refresh(fTagViewer, changedTags.getModifiedTours(), changedTags.isAddMode());
 
 						// update tag totals
-						TVITagViewItem.getTagTotals(tagItem);
+						TVITagViewItem.readTagTotals(tagItem);
 
 						// update viewer
 						fTagViewer.refresh(tagItem);

@@ -24,29 +24,32 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class ActionCollapseAll extends Action {
 
-	private TreeViewer	fTreeViewer;
+	private ITourViewer	fTourViewer;
 
-	public ActionCollapseAll(final TreeViewer tourViewer) {
+	public ActionCollapseAll(final ITourViewer tourViewer) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		fTreeViewer = tourViewer;
+		fTourViewer = tourViewer;
 
+		setText(Messages.app_action_collapse_all_tooltip);
 		setToolTipText(Messages.app_action_collapse_all_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
+
 	}
 
 	@Override
 	public void run() {
 
-		if (fTreeViewer != null) {
+		if (fTourViewer != null) {
 
-			fTreeViewer.collapseAll();
+			final TreeViewer treeViewer = fTourViewer.getTreeViewer();
 
-			final Object firstElement = ((StructuredSelection) fTreeViewer.getSelection()).getFirstElement();
+			treeViewer.collapseAll();
 
+			final Object firstElement = ((StructuredSelection) treeViewer.getSelection()).getFirstElement();
 			if (firstElement != null) {
-				fTreeViewer.reveal(firstElement);
+				treeViewer.reveal(firstElement);
 			}
 		}
 	}

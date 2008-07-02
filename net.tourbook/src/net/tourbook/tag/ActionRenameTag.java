@@ -23,6 +23,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourTag.TVITagViewTag;
 import net.tourbook.ui.views.tourTag.TVITagViewTagCategory;
@@ -31,35 +32,34 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionRenameTag extends Action {
 
-	private TreeViewer	fTreeViewer;
+	private ITourViewer	fTourViewer;
 
 	private static boolean updateCategory(final long id, final String tagName) {
-		
+
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		
+
 		boolean isSaved = false;
 		final EntityTransaction ts = em.getTransaction();
-		
+
 		try {
-			
+
 			ts.begin();
 			{
 				final TourTagCategory categoryInDb = em.find(TourTagCategory.class, id);
 				if (categoryInDb != null) {
-					
+
 					categoryInDb.setName(tagName);
 					em.merge(categoryInDb);
 				}
 			}
 			ts.commit();
-			
+
 		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -70,12 +70,12 @@ public class ActionRenameTag extends Action {
 			}
 			em.close();
 		}
-		
+
 		if (isSaved == false) {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(),//
 					"Error", "Error occured when saving an entity"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		
+
 		return isSaved;
 	}
 
@@ -118,35 +118,39 @@ public class ActionRenameTag extends Action {
 		return isSaved;
 	}
 
-	public ActionRenameTag(final TreeViewer treeViewer) {
+	public ActionRenameTag(final ITourViewer tourViewer) {
 
 		super(Messages.action_tag_rename_tag, AS_PUSH_BUTTON);
 
-		fTreeViewer = treeViewer;
+		fTourViewer = tourViewer;
 	}
 
 	/**
 	 * Rename selected tag/category
 	 */
-	private void onRenameTourTag() {
+	@Override
+	public void run() {
 
-		final Object selection = ((StructuredSelection) fTreeViewer.getSelection()).getFirstElement();
+		final StructuredSelection selection = (StructuredSelection) fTourViewer.getTreeViewer().getSelection();
+		final Object firstElement = selection.getFirstElement();
 
 		String name = UI.EMPTY_STRING;
 		String dlgTitle = UI.EMPTY_STRING;
 		String dlgMessage = UI.EMPTY_STRING;
 
-		if (selection instanceof TVITagViewTag) {
+		if (firstElement instanceof TVITagViewTag) {
 
-			name = ((TVITagViewTag) selection).getName();
+			name = ((TVITagViewTag) firstElement).getName();
 			dlgTitle = Messages.action_tag_dlg_rename_title;
 			dlgMessage = Messages.action_tag_dlg_rename_message;
 
-		} else if (selection instanceof TVITagViewTagCategory) {
+		} else if (firstElement instanceof TVITagViewTagCategory) {
 
-			name = ((TVITagViewTagCategory) selection).getName();
+			name = ((TVITagViewTagCategory) firstElement).getName();
 			dlgTitle = Messages.action_tagcategory_dlg_rename_title;
 			dlgMessage = Messages.action_tagcategory_dlg_rename_message;
+		} else {
+			return;
 		}
 
 		final InputDialog inputDialog = new InputDialog(Display.getCurrent().getActiveShell(),
@@ -161,48 +165,48 @@ public class ActionRenameTag extends Action {
 			return;
 		}
 
-		// save changed name
-
-		name = inputDialog.getValue().trim();
-
-		if (selection instanceof TVITagViewTag) {
-
-			// save tag
-
-			final TVITagViewTag tourTagItem = ((TVITagViewTag) selection);
-
-			// persist tag
-			updateTag(tourTagItem.getTagId(), name);
-
-			fTreeViewer.update(tourTagItem, null);
-
-		} else if (selection instanceof TVITagViewTagCategory) {
-
-			// save category
-
-			final TVITagViewTagCategory tourCategoryItem = ((TVITagViewTagCategory) selection);
-
-			// persist category
-			updateCategory(tourCategoryItem.getCategoryId(), name);
-
-			fTreeViewer.update(tourCategoryItem, null);
-
+		final String newName = inputDialog.getValue().trim();
+		if (name.equals(newName)) {
+			// name was not changed
+			return;
 		}
 
-		TourDatabase.clearTourTags();
-
-		// fire modify event
-		TourManager.firePropertyChange(TourManager.TAG_STRUCTURE_CHANGED, null);
-	}
-
-	@Override
-	public void run() {
-
-		final Runnable runnable = new Runnable() {
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
-				onRenameTourTag();
+
+				if (firstElement instanceof TVITagViewTag) {
+
+					// save tag
+
+					final TVITagViewTag tourTagItem = ((TVITagViewTag) firstElement);
+
+					// update model
+					updateTag(tourTagItem.getTagId(), newName);
+
+					// update view
+					fTourViewer.getTreeViewer().update(tourTagItem, null);
+
+				} else if (firstElement instanceof TVITagViewTagCategory) {
+
+					// save category
+
+					final TVITagViewTagCategory tourCategoryItem = ((TVITagViewTagCategory) firstElement);
+
+					// update model
+					updateCategory(tourCategoryItem.getCategoryId(), newName);
+
+					// update view
+					fTourViewer.getTreeViewer().update(tourCategoryItem, null);
+
+				}
+
+				// remove old tags from internal list
+				TourDatabase.clearTourTags();
+
+				// fire modify event
+				TourManager.firePropertyChange(TourManager.TAG_STRUCTURE_CHANGED, null);
+
 			}
-		};
-		BusyIndicator.showWhile(Display.getCurrent(), runnable);
+		});
 	}
 }

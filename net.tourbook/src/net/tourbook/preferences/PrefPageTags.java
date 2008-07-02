@@ -34,6 +34,8 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionExpandSelection;
+import net.tourbook.ui.ColumnManager;
+import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.ToolBarManager;
@@ -83,7 +85,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
 	private static final String	SORT_PROPERTY	= "sort";																//$NON-NLS-1$
 
@@ -428,8 +430,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		final ToolBarManager tbm = new ToolBarManager(fToolBar);
 
-		tbm.add(new ActionExpandSelection(fTagViewer));
-		tbm.add(new ActionCollapseAll(fTagViewer));
+		tbm.add(new ActionExpandSelection(this));
+		tbm.add(new ActionCollapseAll(this));
 
 		tbm.update(true);
 	}
@@ -500,6 +502,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		if (fIsModified) {
 
 			TourDatabase.clearTourTags();
+			TourManager.getInstance().clearTourDataCache();
 
 			// fire modify event
 			TourManager.firePropertyChange(TourManager.TAG_STRUCTURE_CHANGED, null);
@@ -508,12 +511,20 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		}
 	}
 
+	public ColumnManager getColumnManager() {
+		return null;
+	}
+
 	public long getDragStartTime() {
 		return fDragStartTime;
 	}
 
 	public TVIPrefTagRoot getRootItem() {
 		return fRootItem;
+	}
+
+	public TreeViewer getTreeViewer() {
+		return fTagViewer;
 	}
 
 	public void init(final IWorkbench workbench) {
@@ -935,6 +946,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		fireModifyEvent();
 		return true;
 	}
+
+	public void reloadViewer() {}
 
 	public void setIsModified(final boolean isModified) {
 		fIsModified = isModified;

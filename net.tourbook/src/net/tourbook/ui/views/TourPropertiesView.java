@@ -23,7 +23,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 
@@ -32,7 +31,6 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
@@ -267,6 +265,10 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
+				if (fTourData == null) {
+					return;
+				}
+
 				final String property = event.getProperty();
 
 				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
@@ -290,6 +292,13 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 					fTourDataContainer.layout();
 
 					updateViewer();
+
+				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+					// reload tour data
+
+					fTourData = TourManager.getInstance().getTourData(fTourData.getTourId());
+					updateTourProperties(fTourData);
 				}
 			}
 		};
@@ -315,11 +324,11 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			@SuppressWarnings("unchecked")//$NON-NLS-1$
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+				if (fTourData == null) {
+					return;
+				}
 
-					if (fTourData == null) {
-						return;
-					}
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
 					// get modified tours
 					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
@@ -334,9 +343,12 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
 
-					if (isTagListModified(fTourData)) {
-						updateTourProperties(fTourData);
-					}
+//					if (isTagListModified(fTourData)) {
+//						updateTourProperties(fTourData);
+//					}
+
+					fTourData = TourManager.getInstance().getTourData(fTourData.getTourId());
+					updateTourProperties(fTourData);
 				}
 			}
 		};
@@ -820,65 +832,6 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	/**
-	 * Checks if the tour tags in the {@link TourData} has changed, the tag list will be updated for
-	 * changed tag names or removed tags
-	 * 
-	 * @param tourData
-	 * @return Returns <code>true</code> when the tags have changed
-	 */
-	private boolean isTagListModified(final TourData tourData) {
-
-		if (tourData == null) {
-			return false;
-		}
-
-		final Set<TourTag> tourTags = tourData.getTourTags();
-
-		if (tourTags == null) {
-			return false;
-		}
-
-		final HashMap<Long, TourTag> allTags = TourDatabase.getTourTags();
-		final ArrayList<TourTag> removedTags = new ArrayList<TourTag>();
-		boolean isModified = false;
-
-		// loop: all tags in tour data
-		for (final TourTag tourTag : tourTags) {
-
-			final String tagName = tourTag.getTagName();
-			final TourTag allTag = allTags.get(tourTag.getTagId());
-
-			if (allTag == null) {
-
-				// tag is not available in all tags, tag was deleted
-
-				removedTags.add(tourTag);
-				isModified = true;
-
-			} else {
-
-				// tag is available in all tags
-
-				final String allTagName = allTag.getTagName();
-				if (allTagName.equals(tagName) == false) {
-
-					// tag name has changed, update name
-
-					tourTag.setTagName(allTagName);
-
-					isModified = true;
-				}
-			}
-		}
-		
-		for (final TourTag removedTag : removedTags) {
-			tourTags.remove(removedTag);
-		}
-
-		return isModified;
-	}
-
 	private void onChangeContent() {
 
 		if (fTourEditor == null) {
@@ -978,10 +931,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	public void reloadViewer() {
-	// TODO Auto-generated method stub
-
-	}
+	public void reloadViewer() {}
 
 	private void restoreState(final IMemento memento) {
 

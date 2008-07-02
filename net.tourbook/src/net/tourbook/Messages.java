@@ -44,6 +44,8 @@ public class Messages extends NLS {
 	public static String		action_tag_remove_all;
 
 	public static String	action_tag_rename_tag;
+
+	public static String	action_tag_rename_tag_category;
 	public static String		action_tagcategory_dlg_rename_message;
 	public static String		action_tagcategory_dlg_rename_title;
 
@@ -482,6 +484,10 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Label_tolerance;
 
 	public static String		tag_view_action_refresh_view_tooltip;
+
+	public static String	tag_view_title_tag;
+
+	public static String	tag_view_title_tag_category;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;

@@ -16,23 +16,36 @@ public class ChangedTags {
 	 * Creates a copy of the modifiedTags parameter and modifiedTours parameter
 	 * 
 	 * @param modifiedTags
+	 *            tags which are added or removed from the tours
 	 * @param modifiedTours
+	 *            tours which have been modified
 	 * @param isAddMode
+	 *            <code>true</code> when tags were added to tours, <code>false</code> when tags are
+	 *            removed from tours
 	 */
 	@SuppressWarnings("unchecked")
 	public ChangedTags(	final HashMap<Long, TourTag> modifiedTags,
 						final ArrayList<TourData> modifiedTours,
 						final boolean isAddMode) {
-		
+
 		if (fModifiedTags == null) {
 			fModifiedTags = new HashMap<Long, TourTag>();
 		}
-		
+
 		fModifiedTags.putAll(modifiedTags);
 		fModifiedTours = (ArrayList<TourData>) modifiedTours.clone();
 		fIsAddMode = isAddMode;
 	}
 
+	/**
+	 * @param modifiedTag
+	 *            tag which was added or removed from the tours
+	 * @param modifiedTours
+	 *            tours which have been modified
+	 * @param isAddMode
+	 *            <code>true</code> when tags were added to tours, <code>false</code> when a tag was
+	 *            removed from tours
+	 */
 	@SuppressWarnings("unchecked")
 	public ChangedTags(final TourTag modifiedTag, final ArrayList<TourData> modifiedTours, final boolean isAddMode) {
 

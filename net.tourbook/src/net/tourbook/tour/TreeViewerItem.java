@@ -135,7 +135,7 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
-	 * @return Returns a list with all childrens of this item, <code>null</code> will be returned
+	 * @return Returns a list with all childrens of this tree item, <code>null</code> is returned
 	 *         when childrens have not yet been fetched
 	 */
 	public ArrayList<TreeViewerItem> getUnfetchedChildren() {
@@ -175,10 +175,20 @@ public abstract class TreeViewerItem {
 		return isRemoved;
 	}
 
+	/**
+	 * Set the children for this tree item
+	 * 
+	 * @param children
+	 */
 	public void setChildren(final ArrayList<TreeViewerItem> children) {
 		fChildren = children;
 	}
 
+	/**
+	 * Set the parent for this tree item
+	 * 
+	 * @param parentItem
+	 */
 	public void setParentItem(final TreeViewerItem parentItem) {
 		fParentItem = parentItem;
 	}

@@ -97,7 +97,7 @@ public class TVITagViewTour extends TVITagViewItem {
 		deviceTimeInterval = result.getShort(startIndex + 5);
 		deviceStartDistance = result.getLong(startIndex + 6);
 
-		getDefaultColumnData(result, startIndex + 7);
+		readDefaultColumnData(result, startIndex + 7);
 
 		if (resultTagId instanceof Long) {
 			tagIds = new ArrayList<Long>();
