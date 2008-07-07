@@ -46,7 +46,9 @@ public class TVITagViewYear extends TVITagViewItem {
 			return 0;
 		}
 
-		if (fYear < otherYearItem.fYear) {
+		if (fYear == otherYearItem.fYear) {
+			return 0;
+		} else if (fYear < otherYearItem.fYear) {
 			return -1;
 		} else {
 			return 1;
@@ -89,19 +91,100 @@ public class TVITagViewYear extends TVITagViewItem {
 	protected void fetchChildren() {
 
 		if (fIsMonth) {
-			getChildrenByYearMonth();
+			setChildren(readYearChildrenMonths());
 		} else {
-			getChildrenByYear();
+			setChildren(readYearChildrenTours());
 		}
 	}
 
-	private void getChildrenByYear() {
+	public long getTagId() {
+		return fTagItem.tagId;
+	}
 
-		/*
-		 * set the children for the root item, these are year items
-		 */
+	public int getYear() {
+		return fYear;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (fIsMonth ? 1231 : 1237);
+		result = prime * result + ((fTagItem == null) ? 0 : fTagItem.hashCode());
+		result = prime * result + fYear;
+		return result;
+	}
+
+	private ArrayList<TreeViewerItem> readYearChildrenMonths() {
+
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
-		setChildren(children);
+
+		try {
+
+			/*
+			 * get all tours for the tag Id of this tree item
+			 */
+			final SQLFilter sqlFilter = new SQLFilter();
+			final StringBuilder sb = new StringBuilder();
+
+			sb.append("SELECT");
+			sb.append(" startYear,"); //		// 1
+			sb.append(" startMonth,"); //		// 2
+
+			sb.append(SQL_SUM_COLUMNS);
+
+			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
+
+			// get all tours for current tag and year
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData");
+			sb.append(" ON jTdataTtag.TourData_tourId=TourData.tourId ");
+
+			sb.append(" WHERE jTdataTtag.TourTag_TagId=?");
+			sb.append(" AND startYear=?");
+			sb.append(sqlFilter.getWhereClause());
+
+			sb.append(" GROUP BY startYear, startMonth");
+			sb.append(" ORDER BY startYear");
+
+			final Connection conn = TourDatabase.getInstance().getConnection();
+
+			final PreparedStatement statement = conn.prepareStatement(sb.toString());
+			statement.setLong(1, fTagItem.getTagId());
+			statement.setInt(2, fYear);
+			sqlFilter.setParameters(statement, 3);
+
+			final SimpleDateFormat dfMonth = new SimpleDateFormat("MMM");
+//			final DateTime dt = new DateTime(2000, 1, 1, 0, 0, 0, 0);
+//			final Date monthDate = new Date();
+
+			final ResultSet result = statement.executeQuery();
+			while (result.next()) {
+
+				final int dbYear = result.getInt(1);
+				final int dbMonth = result.getInt(2);
+
+				final TVITagViewMonth tourItem = new TVITagViewMonth(this, dbYear, dbMonth);
+				children.add(tourItem);
+
+//				dt.withMonthOfYear(dbMonth);
+				fCalendar.set(2000, dbMonth - 1, 1);
+				tourItem.treeColumn = dfMonth.format(fCalendar.getTime());
+
+				tourItem.readSumColumnData(result, 3);
+			}
+
+			conn.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		return children;
+	}
+
+	private ArrayList<TreeViewerItem> readYearChildrenTours() {
+
+		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 
 		try {
 
@@ -177,93 +260,8 @@ public class TVITagViewYear extends TVITagViewItem {
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
-	}
 
-	private void getChildrenByYearMonth() {
-		/*
-		 * set the children for the root item, these are year items
-		 */
-		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
-		setChildren(children);
-
-		try {
-
-			/*
-			 * get all tours for the tag Id of this tree item
-			 */
-			final SQLFilter sqlFilter = new SQLFilter();
-			final StringBuilder sb = new StringBuilder();
-
-			sb.append("SELECT");
-			sb.append(" startYear,"); //		// 1
-			sb.append(" startMonth,"); //		// 2
-
-			sb.append(SQL_SUM_COLUMNS);
-
-			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
-
-			// get all tours for current tag and year
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData");
-			sb.append(" ON jTdataTtag.TourData_tourId=TourData.tourId ");
-
-			sb.append(" WHERE jTdataTtag.TourTag_TagId=?");
-			sb.append(" AND startYear=?");
-			sb.append(sqlFilter.getWhereClause());
-
-			sb.append(" GROUP BY startYear, startMonth");
-			sb.append(" ORDER BY startYear");
-
-			final Connection conn = TourDatabase.getInstance().getConnection();
-
-			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setLong(1, fTagItem.getTagId());
-			statement.setInt(2, fYear);
-			sqlFilter.setParameters(statement, 3);
-
-			final SimpleDateFormat dfMonth = new SimpleDateFormat("MMM");
-//			final DateTime dt = new DateTime(2000, 1, 1, 0, 0, 0, 0);
-//			final Date monthDate = new Date();
-
-			final ResultSet result = statement.executeQuery();
-			while (result.next()) {
-
-				final int dbYear = result.getInt(1);
-				final int dbMonth = result.getInt(2);
-
-				final TVITagViewMonth tourItem = new TVITagViewMonth(this, dbYear, dbMonth);
-				children.add(tourItem);
-
-//				dt.withMonthOfYear(dbMonth);
-				fCalendar.set(2000, dbMonth - 1, 1);
-				tourItem.treeColumn = dfMonth.format(fCalendar.getTime());
-//				tourItem.treeColumn = tourItem.treeColumn + "   " + Integer.toString(dbMonth);
-
-				tourItem.readSumColumnData(result, 3);
-			}
-
-			conn.close();
-
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		}
-	}
-
-	public long getTagId() {
-		return fTagItem.tagId;
-	}
-
-	public int getYear() {
-		return fYear;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (fIsMonth ? 1231 : 1237);
-		result = prime * result + ((fTagItem == null) ? 0 : fTagItem.hashCode());
-		result = prime * result + fYear;
-		return result;
+		return children;
 	}
 
 	@Override

@@ -17,14 +17,13 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 
-
 import org.eclipse.jface.viewers.ISelection;
 
+/**
+ * contains tours which has been deleted in the database
+ */
 public class SelectionDeletedTours implements ISelection {
 
-	/**
-	 * contains tours which has been deleted in the database
-	 */
 	public ArrayList<ITourItem>	removedTours	= new ArrayList<ITourItem>();
 
 	public boolean isEmpty() {

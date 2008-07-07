@@ -27,9 +27,11 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TreeViewerItem;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Display;
 
 public class ActionDeleteTour extends Action {
 
@@ -60,11 +62,11 @@ public class ActionDeleteTour extends Action {
 		// loop: selected tours
 		for (final Iterator<?> treeItem = selectedTreeItems; treeItem.hasNext();) {
 
-			final Object ttiTourItem = treeItem.next();
+			final Object treeTourItem = treeItem.next();
 
-			if (ttiTourItem instanceof TVITourBookTour) {
+			if (treeTourItem instanceof TVITourBookTour) {
 
-				final TVITourBookTour tourItem = (TVITourBookTour) ttiTourItem;
+				final TVITourBookTour tourItem = (TVITourBookTour) treeTourItem;
 
 				if (TourDatabase.removeTour(tourItem.getTourId())) {
 
@@ -134,6 +136,12 @@ public class ActionDeleteTour extends Action {
 
 	@Override
 	public void run() {
+
+		if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+				"Delete Tours",
+				"Are you sure to delete the selected tours?") == false) {
+			return;
+		}
 
 		final SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
 		final TreeViewer treeViewer = tourView.getTreeViewer();

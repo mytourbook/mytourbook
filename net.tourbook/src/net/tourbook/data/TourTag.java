@@ -33,7 +33,7 @@ import javax.persistence.ManyToMany;
 import net.tourbook.database.TourDatabase;
 
 @Entity
-public class TourTag {
+public class TourTag implements Comparable<Object> {
 
 	public static final int			EXPAND_TYPE_YEAR_MONTH_DAY	= 0;
 	public static final int			EXPAND_TYPE_FLAT			= 1;
@@ -73,7 +73,17 @@ public class TourTag {
 	public TourTag() {}
 
 	public TourTag(final String tagName) {
-		this.name = tagName;
+		name = tagName;
+	}
+
+	public int compareTo(final Object obj) {
+
+		if (obj instanceof TourTag) {
+			final TourTag otherTag = (TourTag) obj;
+			return name.compareTo(otherTag.name);
+		}
+
+		return 0;
 	}
 
 	/**
@@ -92,7 +102,7 @@ public class TourTag {
 		if (this == obj) {
 			return true;
 		}
-		
+
 		return false;
 	}
 

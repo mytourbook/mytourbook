@@ -88,7 +88,6 @@ public class TourStatisticsView extends ViewPart {
 	protected Long					fActiveTourId;
 
 	private ITourPropertyListener	fTourPropertyListener;
-
 	private ISelectionListener		fPostSelectionListener;
 
 	private void addPartListener() {
@@ -96,29 +95,29 @@ public class TourStatisticsView extends ViewPart {
 		// set the part listener
 		fPartListener = new IPartListener2() {
 
-			public void partActivated(IWorkbenchPartReference partRef) {
+			public void partActivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourStatisticsView.this) {
 					fStatisticContainer.activateActions(getSite());
 				}
 			}
 
-			public void partBroughtToTop(IWorkbenchPartReference partRef) {}
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			public void partClosed(IWorkbenchPartReference partRef) {}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
-			public void partDeactivated(IWorkbenchPartReference partRef) {
+			public void partDeactivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourStatisticsView.this) {
 					fStatisticContainer.deactivateActions(getSite());
 				}
 			}
 
-			public void partHidden(IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {}
 
-			public void partInputChanged(IWorkbenchPartReference partRef) {}
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-			public void partOpened(IWorkbenchPartReference partRef) {}
+			public void partOpened(final IWorkbenchPartReference partRef) {}
 
-			public void partVisible(IWorkbenchPartReference partRef) {}
+			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 
 		// register the part listener
@@ -129,7 +128,7 @@ public class TourStatisticsView extends ViewPart {
 
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
 
-			public void propertyChange(Preferences.PropertyChangeEvent event) {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -169,7 +168,7 @@ public class TourStatisticsView extends ViewPart {
 		// this view part is a selection listener
 		fPostSelectionListener = new ISelectionListener() {
 
-			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (selection instanceof SelectionNewTours && selection.isEmpty() == false) {
 
@@ -189,8 +188,7 @@ public class TourStatisticsView extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
-			public void propertyChanged(int propertyId, Object propertyData) {
+			public void propertyChanged(final int propertyId, final Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
 					// update statistics
@@ -202,7 +200,7 @@ public class TourStatisticsView extends ViewPart {
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 
 		createResources();
 
@@ -224,7 +222,7 @@ public class TourStatisticsView extends ViewPart {
 
 	private void createResources() {
 
-		Display display = Display.getCurrent();
+		final Display display = Display.getCurrent();
 
 		fColorYearFg = new Color(display, fRGBYearFg);
 		fColorYearBg = new Color(display, fRGBYearBg);
@@ -257,7 +255,7 @@ public class TourStatisticsView extends ViewPart {
 	}
 
 	@Override
-	public void init(IViewSite site, IMemento memento) throws PartInitException {
+	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
 
 		super.init(site, memento);
 
@@ -272,7 +270,7 @@ public class TourStatisticsView extends ViewPart {
 	}
 
 	@Override
-	public void saveState(IMemento memento) {
+	public void saveState(final IMemento memento) {
 		fStatisticContainer.saveState(memento);
 	}
 

@@ -90,7 +90,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -151,11 +150,13 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	public Font						fFontBold;
 	private ActionEditQuick			fActionEditQuick;
 
-	private ActionEditTour			fActionEditTour;
-	private ActionDeleteTour		fActionDeleteTour;
-	private ActionSetTourType		fActionSetTourType;
-	private ActionModifyColumns		fActionModifyColumns;
 	private ActionSetTourTag		fActionAddTag;
+	private ActionCollapseAll		fActionCollapseAll;
+	private ActionDeleteTour		fActionDeleteTour;
+	private ActionEditTour			fActionEditTour;
+	private ActionExpandSelection	fActionExpandSelection;
+	private ActionModifyColumns		fActionModifyColumns;
+	private ActionSetTourType		fActionSetTourType;
 	private ActionSetTourTag		fActionRemoveTag;
 	private ActionRemoveAllTags		fActionRemoveAllTags;
 	private ActionRefreshView		fActionRefreshView;
@@ -351,23 +352,16 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fActionModifyColumns = new ActionModifyColumns(this);
 		fActionRefreshView = new ActionRefreshView(this);
 
-		final IActionBars actionBars = getViewSite().getActionBars();
+		fActionExpandSelection = new ActionExpandSelection(this);
+		fActionCollapseAll = new ActionCollapseAll(this);
 
 		/*
 		 * fill view menu
 		 */
-		final IMenuManager menuMgr = actionBars.getMenuManager();
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(fActionModifyColumns);
 
-		/*
-		 * fill view toolbar
-		 */
-		final IToolBarManager tbm = actionBars.getToolBarManager();
-
-		tbm.add(new ActionExpandSelection(this));
-		tbm.add(new ActionCollapseAll(this));
-
-		tbm.add(fActionRefreshView);
+		fillToolBar();
 	}
 
 	/**
@@ -842,22 +836,23 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 				tourItems++;
 			}
 		}
+		final boolean isTourSelected = tourItems > 0;
 
 		fActionEditTour.setEnabled(tourItems == 1);
 
 		// enable delete ation when at least one tour is selected
-		if (tourItems > 0) {
+		if (isTourSelected) {
 			fActionDeleteTour.setEnabled(true);
 		} else {
 			fActionDeleteTour.setEnabled(false);
 		}
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
-		fActionSetTourType.setEnabled(tourItems > 0 && tourTypes.size() > 0);
+		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
 		fActionEditQuick.setEnabled(tourItems == 1);
 
-		fActionAddTag.setEnabled(tourItems > 0);
+		fActionAddTag.setEnabled(isTourSelected);
 
 		if (firstTour != null && tourItems == 1) {
 
@@ -879,9 +874,14 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 			// multiple tours are selected
 
-			fActionRemoveTag.setEnabled(tourItems > 0);
-			fActionRemoveAllTags.setEnabled(tourItems > 0);
+			fActionRemoveTag.setEnabled(isTourSelected);
+			fActionRemoveAllTags.setEnabled(isTourSelected);
 		}
+
+		fActionExpandSelection.setEnabled(selection.size() == 0 ? false : true);
+
+		// enable/disable actions for the recent tags
+		TagManager.enableRecentTagActions(isTourSelected);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
@@ -900,9 +900,25 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(fActionExpandSelection);
+		menuMgr.add(fActionCollapseAll);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(fActionDeleteTour);
 
 		enableActions();
+	}
+
+	private void fillToolBar() {
+		/*
+		 * fill view toolbar
+		 */
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(fActionExpandSelection);
+		tbm.add(fActionCollapseAll);
+
+		tbm.add(fActionRefreshView);
 	}
 
 	void firePostSelection(final ISelection selection) {

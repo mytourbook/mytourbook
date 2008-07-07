@@ -121,7 +121,6 @@ public class TourManager {
 	private ComputeChartValue					computePowerAvg;
 	private ComputeChartValue					computeSpeedAvg;
 
-//	private final HashMap<Long, TourData>	fTourDataMap							= new HashMap<Long, TourData>();
 	private final LinkedHashMap<Long, TourData>	fTourDataMap							= new LinkedHashMap<Long, TourData>();
 
 	private static final ListenerList			fPropertyListeners						= new ListenerList(ListenerList.IDENTITY);

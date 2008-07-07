@@ -69,8 +69,10 @@ public class UI {
 	public static final String				EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
 	public static final String				IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";						//$NON-NLS-1$
 
-	public static final String				TAG_COLOR						= "TAG_FG";
-	public static final String				SUB_TAG_COLOR					= "SUB_TAG_COLOR";
+	public static final String				TAG_CATEGORY_COLOR				= "TAG_CATEGORY_COLOR";						//$NON-NLS-1$
+	public static final String				TAG_COLOR						= "TAG_COLOR";									//$NON-NLS-1$
+	public static final String				TAG_SUB_COLOR					= "TAG_SUB_COLOR";								//$NON-NLS-1$
+	public static final String				TAG_SUB_SUB_COLOR				= "TAG_SUB_SUB_COLOR";							//$NON-NLS-1$
 
 	/**
 	 * contains a new line string
@@ -148,6 +150,7 @@ public class UI {
 	public static final DateFormat			DateFormatterFull				= DateFormat.getDateInstance(DateFormat.FULL);
 
 	public static Styler					TAG_STYLER;
+	public static Styler					TAG_CATEGORY_STYLER;
 
 	static {
 
@@ -168,13 +171,19 @@ public class UI {
 		 */
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 
-		colorRegistry.put(SUB_TAG_COLOR, new RGB(0x60, 0x9E, 0x1B));
-		colorRegistry.put(TAG_COLOR, new RGB(0xF0, 0x81, 0x0F));
+//		colorRegistry.put(SUB_TAG_COLOR, new RGB(0xff, 0, 0));
+//		colorRegistry.put(SUB_SUB_TAG_COLOR, new RGB(0, 0xff, 0));
+
+		colorRegistry.put(TAG_CATEGORY_COLOR, new RGB(0x81, 0x03, 0x50));
+		colorRegistry.put(TAG_SUB_COLOR, new RGB(0xD3, 0x6A, 0x00));
+		colorRegistry.put(TAG_COLOR, new RGB(0x03, 0x27, 0x86));
+		colorRegistry.put(TAG_SUB_SUB_COLOR, new RGB(0x95, 0x95, 0x0F));
 
 		/*
 		 * set styler
 		 */
 		TAG_STYLER = StyledString.createColorRegistryStyler(TAG_COLOR, null);
+		TAG_CATEGORY_STYLER = StyledString.createColorRegistryStyler(TAG_CATEGORY_COLOR, null);
 
 	}
 

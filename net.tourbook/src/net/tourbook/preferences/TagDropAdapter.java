@@ -24,9 +24,9 @@ import javax.persistence.EntityManager;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.TVIPrefTagRoot;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
+import net.tourbook.tag.TVIPrefTagRoot;
 import net.tourbook.tour.TreeViewerItem;
 
 import org.eclipse.jface.util.LocalSelectionTransfer;
@@ -64,7 +64,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		} else if (hoveredTarget == null) {
 
 			/*
-			 * drop tag item into the root
+			 * drop category item into the root
 			 */
 
 			dropCategoryIntoRoot(itemDraggedCategory);
@@ -295,8 +295,6 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			dropTagIntoRoot(draggedTagItem);
 		}
 
-		fPrefPageTags.setIsModified(true);
-
 		return true;
 	}
 
@@ -511,6 +509,10 @@ final class TagDropAdapter extends ViewerDropAdapter {
 						returnValue |= dropTag((TVIPrefTag) element);
 					}
 				}
+			}
+			
+			if (returnValue) {
+				fPrefPageTags.setIsModified();
 			}
 		}
 

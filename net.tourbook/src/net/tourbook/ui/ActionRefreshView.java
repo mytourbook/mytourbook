@@ -22,13 +22,13 @@ import org.eclipse.jface.action.Action;
 
 public class ActionRefreshView extends Action {
 
-	private ITourViewer	tourViewer;
+	private ITourViewer	fTourViewer;
 
-	public ActionRefreshView(final ITourViewer view) {
+	public ActionRefreshView(final ITourViewer tourViewer) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		tourViewer = view;
+		fTourViewer = tourViewer;
 
 		setToolTipText(Messages.tag_view_action_refresh_view_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__refresh));
@@ -36,7 +36,7 @@ public class ActionRefreshView extends Action {
 
 	@Override
 	public void run() {
-		tourViewer.reloadViewer();
+		fTourViewer.reloadViewer();
 	}
 
 }

@@ -19,10 +19,74 @@ public class TVITagViewMonth extends TVITagViewItem {
 	private final int				fMonth;
 
 	public TVITagViewMonth(final TVITagViewYear parentItem, final int dbYear, final int dbMonth) {
+
 		setParentItem(parentItem);
+
 		fYearItem = parentItem;
 		fYear = dbYear;
 		fMonth = dbMonth;
+	}
+
+	/**
+	 * Compare two instances of {@link TVITagViewMonth}
+	 * 
+	 * @param otherMonthItem
+	 * @return
+	 */
+	public int compareTo(final TVITagViewMonth otherMonthItem) {
+
+		if (this == otherMonthItem) {
+			return 0;
+		}
+
+		if (fYear < otherMonthItem.fYear) {
+
+			return -1;
+
+		} else if (fYear > otherMonthItem.fYear) {
+
+			return 1;
+
+		} else {
+
+			// same year, check month
+
+			if (fMonth == otherMonthItem.fMonth) {
+				return 0;
+			} else if (fMonth < otherMonthItem.fMonth) {
+				return -1;
+			} else {
+				return 1;
+			}
+		}
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final TVITagViewMonth other = (TVITagViewMonth) obj;
+		if (fMonth != other.fMonth) {
+			return false;
+		}
+		if (fYear != other.fYear) {
+			return false;
+		}
+		if (fYearItem == null) {
+			if (other.fYearItem != null) {
+				return false;
+			}
+		} else if (!fYearItem.equals(other.fYearItem)) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -37,7 +101,7 @@ public class TVITagViewMonth extends TVITagViewItem {
 		try {
 
 			/*
-			 * get all tours for the tag Id of this tree item
+			 * get all tours for the current month
 			 */
 			final StringBuilder sb = new StringBuilder();
 			final SQLFilter sqlFilter = new SQLFilter();
@@ -118,6 +182,16 @@ public class TVITagViewMonth extends TVITagViewItem {
 
 	public TVITagViewYear getYearItem() {
 		return fYearItem;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + fMonth;
+		result = prime * result + fYear;
+		result = prime * result + ((fYearItem == null) ? 0 : fYearItem.hashCode());
+		return result;
 	}
 
 	@Override

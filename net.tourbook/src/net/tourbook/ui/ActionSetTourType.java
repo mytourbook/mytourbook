@@ -91,11 +91,10 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 						TourDatabase.saveTour(tourData);
 					}
 
-					TourManager.getInstance();
 					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
 				}
-
 			};
+
 			BusyIndicator.showWhile(Display.getCurrent(), runnable);
 		}
 

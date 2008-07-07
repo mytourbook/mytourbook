@@ -74,7 +74,6 @@ public class ActionEditQuick extends Action {
 				TourDatabase.saveTour(tourData);
 			}
 
-			TourManager.getInstance();
 			TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
 		}
 	}

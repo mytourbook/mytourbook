@@ -341,7 +341,7 @@ public class TourDatabase {
 			return UI.EMPTY_STRING;
 		}
 
-		final HashMap<Long, TourTag> hashTags = getTourTags();
+		final HashMap<Long, TourTag> hashTags = getAllTourTags();
 		final ArrayList<String> tagList = new ArrayList<String>();
 
 		final StringBuilder sb = new StringBuilder();
@@ -440,7 +440,7 @@ public class TourDatabase {
 	 * @return Returns all tour tags which are stored in the database, the hash key is the tag id
 	 */
 	@SuppressWarnings("unchecked")
-	public static HashMap<Long, TourTag> getTourTags() {
+	public static HashMap<Long, TourTag> getAllTourTags() {
 
 		if (fTourTags != null) {
 			return fTourTags;

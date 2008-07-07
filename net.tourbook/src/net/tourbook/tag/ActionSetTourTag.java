@@ -17,6 +17,7 @@
 package net.tourbook.tag;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -237,6 +238,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 					return;
 				}
 
+				// get all tags for all tours
 				fSelectedTags = new HashSet<TourTag>();
 				for (final TourData tourData : fSelectedTours) {
 					final Set<TourTag> tags = tourData.getTourTags();
@@ -245,8 +247,10 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 					}
 				}
 
-				if (fIsAddMode || fSelectedTours.size() > 1) {
+				if (fIsAddMode) {
 
+					// add tags
+					
 					final TagCollection rootTagCollection = TourDatabase.getRootTags();
 
 					createCategoryActions(rootTagCollection, fMenu);
@@ -254,9 +258,13 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 				} else {
 
-					// remove mode for one tour
-					final Set<TourTag> tourTagsForOneTour = (fSelectedTours.get(0)).getTourTags();
-					createTagActions(new TagCollection(tourTagsForOneTour), fMenu);
+					// remove tags
+					
+					
+					final ArrayList<TourTag> sortedTags = new ArrayList<TourTag>(fSelectedTags);
+					Collections.sort(sortedTags);
+					
+					createTagActions(new TagCollection(sortedTags), fMenu);
 				}
 			}
 		});

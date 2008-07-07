@@ -26,8 +26,12 @@ public class TagCollection {
 
 	public ArrayList<TourTagCategory>	tourTagCategories;
 	public ArrayList<TourTag>			tourTags;
-	
+
 	public TagCollection() {}
+
+	public TagCollection(final ArrayList<TourTag> sortedTags) {
+		tourTags = sortedTags;
+	}
 
 	public TagCollection(final Set<TourTag> tourTagsInOneTour) {
 		tourTags = new ArrayList<TourTag>(tourTagsInOneTour);

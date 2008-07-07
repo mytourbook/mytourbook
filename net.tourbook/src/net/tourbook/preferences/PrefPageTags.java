@@ -949,8 +949,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	public void reloadViewer() {}
 
-	public void setIsModified(final boolean isModified) {
-		fIsModified = isModified;
+	public void setIsModified() {
+		fIsModified = true;
 	}
 
 	private void updateTagViewer() {

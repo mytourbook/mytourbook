@@ -20,24 +20,33 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
+import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionRenameTag;
+import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.ChangedTags;
+import net.tourbook.tag.TagManager;
+import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionExpandSelection;
+import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionRefreshView;
+import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.ITourViewer;
@@ -64,6 +73,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -84,11 +94,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
 
 public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
@@ -103,21 +114,29 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	private Composite						fViewerContainer;
 
 	private TreeViewer						fTagViewer;
-	private DrillDownAdapter				fDrillDownAdapter;
+//	private DrillDownAdapter				fDrillDownAdapter;
 	private TVITagViewRoot					fRootItem;
 
 	private ColumnManager					fColumnManager;
 
 	private PostSelectionProvider			fPostSelectionProvider;
-	private ITourPropertyListener			fTourPropertyListener;
 
-	private ActionRefreshView				fActionRefreshView;
-	private ActionMenuSetTagStructure		fActionSetTagStructure;
-	private ActionMenuSetAllTagStructures	fActionSetAllTagStructures;
-	private ActionRenameTag					fActionRenameTag;
-	private ActionExpandSelection			fActionExpandSelection;
+	private ITourPropertyListener			fTourPropertyListener;
+	private ISelectionListener				fPostSelectionListener;
+
+	private ActionSetTourTag				fActionAddTag;
 	private ActionCollapseAll				fActionCollapseAll;
+	private ActionExpandSelection			fActionExpandSelection;
 	private Action							fActionOpenTagPrefs;
+	private ActionRefreshView				fActionRefreshView;
+	private ActionRemoveAllTags				fActionRemoveAllTags;
+	private ActionSetTourTag				fActionRemoveTag;
+	private ActionRenameTag					fActionRenameTag;
+	private ActionMenuSetAllTagStructures	fActionSetAllTagStructures;
+	private ActionMenuSetTagStructure		fActionSetTagStructure;
+	private ActionSetTourType				fActionSetTourType;
+
+	private ActionModifyColumns				fActionModifyColumns;
 
 	private IPropertyChangeListener			fPrefChangeListener;
 
@@ -144,16 +163,26 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			}
 
 			if (obj1 instanceof TVITagViewYear && obj2 instanceof TVITagViewYear) {
-				final TVITagViewYear treeItem1 = (TVITagViewYear) (obj1);
-				final TVITagViewYear treeItem2 = (TVITagViewYear) (obj2);
+				final TVITagViewYear yearItem1 = (TVITagViewYear) (obj1);
+				final TVITagViewYear yearItem2 = (TVITagViewYear) (obj2);
 
-				return treeItem1.compareTo(treeItem2);
+				return yearItem1.compareTo(yearItem2);
+			}
+
+			if (obj1 instanceof TVITagViewMonth && obj2 instanceof TVITagViewMonth) {
+				final TVITagViewMonth monthItem1 = (TVITagViewMonth) (obj1);
+				final TVITagViewMonth monthItem2 = (TVITagViewMonth) (obj2);
+
+				return monthItem1.compareTo(monthItem2);
 			}
 
 			return 0;
 		}
 	}
 
+	/**
+	 * The comparator is necessary to set and restore the expanded elements
+	 */
 	private class TagComparer implements IElementComparer {
 
 		public boolean equals(final Object a, final Object b) {
@@ -164,15 +193,22 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 			} else if (a instanceof TVITagViewYear && b instanceof TVITagViewYear) {
 
-				final TVITagViewYear year1 = (TVITagViewYear) a;
-				final TVITagViewYear year2 = (TVITagViewYear) b;
-				return year1.getTagId() == year2.getTagId() && year1.getYear() == year2.getYear();
+				final TVITagViewYear yearItem1 = (TVITagViewYear) a;
+				final TVITagViewYear yearItem2 = (TVITagViewYear) b;
+
+				return yearItem1.getTagId() == yearItem2.getTagId() //
+						&& yearItem1.getYear() == yearItem2.getYear();
 
 			} else if (a instanceof TVITagViewMonth && b instanceof TVITagViewMonth) {
 
 				final TVITagViewMonth month1 = (TVITagViewMonth) a;
 				final TVITagViewMonth month2 = (TVITagViewMonth) b;
-				return month1.getYearItem() == month2.getYearItem() && month1.getMonth() == month2.getMonth();
+				final TVITagViewYear yearItem1 = month1.getYearItem();
+				final TVITagViewYear yearItem2 = month2.getYearItem();
+
+				return yearItem1.getTagId() == yearItem2.getTagId()
+						&& yearItem1.getYear() == yearItem2.getYear()
+						&& month1.getMonth() == month2.getMonth();
 
 			} else if (a instanceof TVITagViewTagCategory && b instanceof TVITagViewTagCategory) {
 
@@ -258,6 +294,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 						saveSettings();
 
 						fTagViewer.getTree().dispose();
+
 						createTagViewer(fViewerContainer);
 						fViewerContainer.layout();
 
@@ -278,9 +315,29 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
+	private void addSelectionListener() {
+
+		// this view part is a selection listener
+		fPostSelectionListener = new ISelectionListener() {
+
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+				if (selection instanceof SelectionDeletedTours) {
+					final SelectionDeletedTours deletedTourSelection = (SelectionDeletedTours) selection;
+
+					updateViewerAfterTourIsDeleted(fRootItem, deletedTourSelection.removedTours);
+				}
+			}
+		};
+
+		// register selection listener in the page
+		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
+	}
+
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_TAGS_CHANGED) {
@@ -295,12 +352,19 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 								changedTags.getModifiedTours(),
 								isAddMode);
 
-						updateViewer(fRootItem, changedTagsClone, isAddMode);
+						updateViewerAfterTagStructureIsModified(fRootItem, changedTagsClone, isAddMode);
 					}
 
 				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
 
 					reloadViewer();
+
+				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+
+					// get a clone of the modified tours because the tours are removed from the list
+					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) ((ArrayList<TourData>) propertyData).clone();
+
+					updateViewerAfterTourIsModified(fRootItem, modifiedTours);
 				}
 			}
 		};
@@ -309,6 +373,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	}
 
 	private void createActions() {
+
+		fActionSetTourType = new ActionSetTourType(this);
+
+		fActionAddTag = new ActionSetTourTag(this, true);
+		fActionRemoveTag = new ActionSetTourTag(this, false);
+		fActionRemoveAllTags = new ActionRemoveAllTags(this);
 
 		fActionRefreshView = new ActionRefreshView(this);
 		fActionSetTagStructure = new ActionMenuSetTagStructure(this);
@@ -330,7 +400,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			}
 		};
 
-		fillToolBar();
+		fActionModifyColumns = new ActionModifyColumns(this);
 	}
 
 	/**
@@ -358,20 +428,23 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		fViewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
 
-		createTagViewer(fViewerContainer);
 		createActions();
+		fillViewMenu();
+
+		createTagViewer(fViewerContainer);
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		addTourPropertyListener();
 		addPrefListener();
+		addSelectionListener();
 
 		restoreState(fSessionMemento);
 		reloadViewer();
 	}
 
-	private Control createTagViewer(final Composite parent) {
+	private void createTagViewer(final Composite parent) {
 
 		// tour tree
 		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.FULL_SELECTION | SWT.MULTI);
@@ -381,7 +454,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		tree.setLinesVisible(false);
 
 		fTagViewer = new TreeViewer(tree);
-		fDrillDownAdapter = new DrillDownAdapter(fTagViewer);
+//		fDrillDownAdapter = new DrillDownAdapter(fTagViewer);
 
 		// define and create all columns
 		fColumnManager = new ColumnManager(this);
@@ -435,12 +508,13 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		});
 
 		/*
-		 * the context menu must be created after the viewer is created which is also done after the
-		 * measurement system has changed
+		 * the context menu must be created AFTER the viewer is created which is also done after the
+		 * measurement system has changed, if not, the context menu is not displayed because it
+		 * belongs to the old viewer
 		 */
 		createContextMenu();
 
-		return tree;
+		fillToolBar();
 	}
 
 	/**
@@ -481,7 +555,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 				} else if (viewItem instanceof TVITagViewTagCategory) {
 
-					styledString.append(viewItem.treeColumn, UI.TAG_STYLER);
+					styledString.append(viewItem.treeColumn, UI.TAG_CATEGORY_STYLER);
 					cell.setImage(fImgTagCategory);
 
 				} else if (viewItem instanceof TVITagViewYear || viewItem instanceof TVITagViewMonth) {
@@ -489,7 +563,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					styledString.append(viewItem.treeColumn);
 					styledString.append("   " + viewItem.colItemCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 
-					cell.setForeground(JFaceResources.getColorRegistry().get(UI.SUB_TAG_COLOR));
+					if (viewItem instanceof TVITagViewMonth) {
+						cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_SUB_COLOR));
+					} else {
+						cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_COLOR));
+					}
 
 				} else {
 					styledString.append(viewItem.treeColumn);
@@ -556,10 +634,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					// set color
 					if (element instanceof TVITagViewTag) {
 						cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_COLOR));
-					} else if (element instanceof TVITagViewYear || element instanceof TVITagViewMonth) {
-						cell.setForeground(JFaceResources.getColorRegistry().get(UI.SUB_TAG_COLOR));
+					} else if (element instanceof TVITagViewYear) {
+						cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_COLOR));
+					} else if (element instanceof TVITagViewMonth) {
+						cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_SUB_COLOR));
 					}
-
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -571,6 +650,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	@Override
 	public void dispose() {
 
+		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
@@ -585,6 +665,52 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		final StructuredSelection selection = (StructuredSelection) fTagViewer.getSelection();
 		final int selectedItems = selection.size();
+
+		// count number of selected tour items
+		int tourItems = 0;
+		TVITagViewTour firstTour = null;
+		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+			final Object treeItem = iter.next();
+			if (treeItem instanceof TVITagViewTour) {
+				if (tourItems == 0) {
+					firstTour = (TVITagViewTour) treeItem;
+				}
+				tourItems++;
+			}
+		}
+		final boolean isTourSelected = tourItems > 0;
+
+		// action: set tour type
+		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+
+		// action: add tag
+		fActionAddTag.setEnabled(isTourSelected);
+
+		// actions: remove tags
+		if (firstTour != null && tourItems == 1) {
+
+			// one tour is selected
+
+			final ArrayList<Long> tagIds = firstTour.tagIds;
+			if (tagIds != null && tagIds.size() > 0) {
+
+				// at least one tag is within the tour
+
+				fActionRemoveAllTags.setEnabled(true);
+				fActionRemoveTag.setEnabled(true);
+			} else {
+				// tags are not available
+				fActionRemoveAllTags.setEnabled(false);
+				fActionRemoveTag.setEnabled(false);
+			}
+		} else {
+
+			// multiple tours are selected
+
+			fActionRemoveTag.setEnabled(isTourSelected);
+			fActionRemoveAllTags.setEnabled(isTourSelected);
+		}
 
 		boolean isTagSelected = false;
 		boolean isCategorySelected = false;
@@ -620,16 +746,35 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		fActionExpandSelection.setEnabled(firstElement == null ? false : //
 				selectedItems == 1 ? firstElement.hasChildren() : //
 						true);
+
+		// enable/disable actions for the recent tags
+		TagManager.enableRecentTagActions(isTourSelected);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
+
+//		menuMgr.add(fActionEditQuick);
+//		menuMgr.add(fActionEditTour);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionSetTourType);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionAddTag);
+		menuMgr.add(fActionRemoveTag);
+		menuMgr.add(fActionRemoveAllTags);
+
+		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
+
+//		menuMgr.add(new Separator());
+//		menuMgr.add(fActionDeleteTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionExpandSelection);
 		menuMgr.add(fActionCollapseAll);
 
-		menuMgr.add(new Separator());
-		fDrillDownAdapter.addNavigationActions(menuMgr);
+//		menuMgr.add(new Separator());
+//		fDrillDownAdapter.addNavigationActions(menuMgr);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionSetTagStructure);
@@ -646,12 +791,27 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		fDrillDownAdapter.addNavigationActions(tbm);
+		// recreate the toolbar
+		tbm.removeAll();
+
+//		fDrillDownAdapter.addNavigationActions(tbm);
 
 		tbm.add(fActionExpandSelection);
 		tbm.add(fActionCollapseAll);
 
 		tbm.add(fActionRefreshView);
+
+		tbm.update(true);
+	}
+
+	private void fillViewMenu() {
+
+		/*
+		 * fill view menu
+		 */
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		menuMgr.add(fActionModifyColumns);
+
 	}
 
 	@SuppressWarnings("unchecked")//$NON-NLS-1$
@@ -666,7 +826,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	}
 
 	public ColumnManager getColumnManager() {
-		return null;
+		return fColumnManager;
 	}
 
 	public ArrayList<TourData> getSelectedTours() {
@@ -683,8 +843,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			final Object treeItem = iter.next();
 			if (treeItem instanceof TVITagViewTour) {
 
-				final TVITagViewTour tviTour = (TVITagViewTour) treeItem;
-				final TourData tourData = tourManager.getTourData(tviTour.getTourId());
+				final TourData tourData = tourManager.getTourData(((TVITagViewTour) treeItem).getTourId());
 
 				if (tourData != null) {
 					selectedTourData.add(tourData);
@@ -725,6 +884,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 			fRootItem = new TVITagViewRoot(this);
 			fTagViewer.setInput(fRootItem);
+//			fDrillDownAdapter.reset();
 
 			fTagViewer.setExpandedElements(expandedElements);
 		}
@@ -770,6 +930,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		if (columnIdAndWidth != null) {
 			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(columnIdAndWidth));
 		}
+
+//		final Object[] expandedElements = fTagViewer.getExpandedElements();
+//		final Object[] visibleExpandedElements = fTagViewer.getVisibleExpandedElements();
+//		final TreePath[] expandedTreePaths = fTagViewer.getExpandedTreePaths();
+//		fTagViewer.setExpandedTreePaths(expandedTreePaths);
+//		fTagViewer.setExpandedElements(expandedElements);
 	}
 
 	@Override
@@ -791,13 +957,16 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	}
 
 	/**
-	 * !!! Recursive !!! method to update the tags in the viewer
+	 * !!! Recursive !!! method to update the tags in the viewer, this method handles changes in the
+	 * tag structure
 	 * 
 	 * @param rootItem
 	 * @param changedTags
 	 * @param isAddMode
 	 */
-	private void updateViewer(final TreeViewerItem parentItem, final ChangedTags changedTags, final boolean isAddMode) {
+	private void updateViewerAfterTagStructureIsModified(	final TreeViewerItem parentItem,
+															final ChangedTags changedTags,
+															final boolean isAddMode) {
 
 		final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
 
@@ -851,7 +1020,132 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 			} else {
 				if (object instanceof TreeViewerItem) {
-					updateViewer((TreeViewerItem) object, changedTags, isAddMode);
+					updateViewerAfterTagStructureIsModified((TreeViewerItem) object, changedTags, isAddMode);
+				}
+			}
+		}
+	}
+
+	/**
+	 * !!!Recursive !!! delete tour items
+	 * 
+	 * @param rootItem
+	 * @param deletedTourIds
+	 */
+	private void updateViewerAfterTourIsDeleted(final TreeViewerItem parentItem,
+												final ArrayList<ITourItem> deletedTourIds) {
+
+		final ArrayList<TreeViewerItem> parentChildren = parentItem.getUnfetchedChildren();
+
+		if (parentChildren == null) {
+			return;
+		}
+
+		final ArrayList<TVITagViewTour> deletedTourItems = new ArrayList<TVITagViewTour>();
+
+		// loop: all tree children items
+		for (final Object object : parentChildren) {
+			if (object instanceof TreeViewerItem) {
+
+				final TreeViewerItem treeChildItem = (TreeViewerItem) object;
+				if (treeChildItem instanceof TVITagViewTour) {
+
+					final TVITagViewTour tourItem = (TVITagViewTour) treeChildItem;
+					final long tourItemId = tourItem.getTourId();
+
+					// loop: all deleted tour id's
+					for (final ITourItem deletedTourItem : deletedTourIds) {
+						if (deletedTourItem.getTourId().longValue() == tourItemId) {
+
+							// keep deleted tour item
+							deletedTourItems.add(tourItem);
+
+							break;
+						}
+					}
+
+				} else {
+					// update children
+					updateViewerAfterTourIsDeleted(treeChildItem, deletedTourIds);
+				}
+			}
+		}
+
+		if (deletedTourItems.size() > 0) {
+
+			// update model
+			parentChildren.removeAll(deletedTourItems);
+
+			// update viewer
+			fTagViewer.remove(deletedTourItems.toArray());
+		}
+	}
+
+	/**
+	 * !!!Recursive !!! update the data for all tour items
+	 * 
+	 * @param rootItem
+	 * @param modifiedTours
+	 */
+	private void updateViewerAfterTourIsModified(	final TreeViewerItem parentItem,
+													final ArrayList<TourData> modifiedTours) {
+
+		final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
+
+		if (children == null) {
+			return;
+		}
+
+		// loop: all children
+		for (final Object object : children) {
+			if (object instanceof TreeViewerItem) {
+
+				final TreeViewerItem treeItem = (TreeViewerItem) object;
+				if (treeItem instanceof TVITagViewTour) {
+
+					final TVITagViewTour tourItem = (TVITagViewTour) treeItem;
+					final long tourItemId = tourItem.getTourId();
+
+					for (final TourData modifiedTourData : modifiedTours) {
+						if (modifiedTourData.getTourId().longValue() == tourItemId) {
+
+							// update tree item
+
+							final TourType tourType = modifiedTourData.getTourType();
+							if (tourType != null) {
+								tourItem.tourTypeId = tourType.getTypeId();
+							}
+
+							// update item title
+							tourItem.tourTitle = modifiedTourData.getTourTitle();
+
+							// update item tags
+							final Set<TourTag> tourTags = modifiedTourData.getTourTags();
+							final ArrayList<Long> tagIds;
+
+							tourItem.tagIds = tagIds = new ArrayList<Long>();
+							for (final TourTag tourTag : tourTags) {
+								tagIds.add(tourTag.getTagId());
+							}
+
+							// update item in the viewer
+							fTagViewer.update(tourItem, null);
+
+							// modified tour exists only once in the viewer, remove modified tour
+//							modifiedTours.remove(modifiedTourData);
+
+							break;
+						}
+					}
+
+					// optimize
+//					if (modifiedTours.size() == 0) {
+//						return;
+//					}
+
+				} else {
+					// update children
+					updateViewerAfterTourIsModified(treeItem, modifiedTours);
 				}
 			}
 		}

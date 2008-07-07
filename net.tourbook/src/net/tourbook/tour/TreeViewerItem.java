@@ -135,8 +135,8 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
-	 * @return Returns a list with all childrens of this tree item, <code>null</code> is returned
-	 *         when childrens have not yet been fetched
+	 * @return Returns a list with all fetched childrens of this tree item, it will return
+	 *         <code>null</code> when childrens are not yet fetched
 	 */
 	public ArrayList<TreeViewerItem> getUnfetchedChildren() {
 		return fChildren;

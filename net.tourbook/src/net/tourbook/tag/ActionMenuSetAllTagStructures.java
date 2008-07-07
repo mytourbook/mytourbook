@@ -65,7 +65,7 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 						 * update all tags which has not the current expand type
 						 */
 
-						final HashMap<Long, TourTag> allTourTags = TourDatabase.getTourTags();
+						final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 						for (final TourTag tourTag : allTourTags.values()) {
 
 							if (tourTag.getExpandType() != fExpandType) {

@@ -202,10 +202,12 @@ public class ActionRenameTag extends Action {
 
 				// remove old tags from internal list
 				TourDatabase.clearTourTags();
+				TagManager.updateTagNames();
+
+				TourManager.getInstance().clearTourDataCache();
 
 				// fire modify event
 				TourManager.firePropertyChange(TourManager.TAG_STRUCTURE_CHANGED, null);
-
 			}
 		});
 	}

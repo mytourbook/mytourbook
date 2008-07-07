@@ -35,6 +35,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
+/**
+ * @author FC081647
+ */
 public class TagManager {
 
 	public static final String[]		EXPAND_TYPE_NAMES				= {
@@ -63,7 +66,7 @@ public class TagManager {
 	private static ISelectedTours		fTourProvider;
 	private static boolean				fIsAddMode;
 
-	private static class ActionRecentTag extends Action {
+	public static class ActionRecentTag extends Action {
 
 		private TourTag	fTag;
 
@@ -87,6 +90,17 @@ public class TagManager {
 		fRecentTags.addFirst(tourTag);
 	}
 
+	public static void enableRecentTagActions(final boolean isEnabled) {
+
+		if (fActionsRecentTags == null) {
+			return;
+		}
+
+		for (final ActionRecentTag actionRecentTag : fActionsRecentTags) {
+			actionRecentTag.setEnabled(isEnabled);
+		}
+	}
+
 	/**
 	 * Create the menu entries for the recently used tags
 	 * 
@@ -105,9 +119,7 @@ public class TagManager {
 			}
 		}
 
-		final LinkedList<TourTag> recentTags = TagManager.getRecentTags();
-
-		if (recentTags.size() == 0) {
+		if (fRecentTags.size() == 0) {
 			return;
 		}
 
@@ -129,7 +141,7 @@ public class TagManager {
 		for (final ActionRecentTag actionRecentTag : fActionsRecentTags) {
 			try {
 
-				final TourTag tag = recentTags.get(tagIndex);
+				final TourTag tag = fRecentTags.get(tagIndex);
 
 				actionRecentTag.setText("&" + (tagIndex + 1) + " " + tag.getTagName());
 				actionRecentTag.setTag(tag);
@@ -145,8 +157,8 @@ public class TagManager {
 		}
 	}
 
-	public static LinkedList<TourTag> getRecentTags() {
-		return fRecentTags;
+	public static ActionRecentTag[] getRecentTagActions() {
+		return fActionsRecentTags;
 	}
 
 	public static void restoreSettings() {
@@ -166,7 +178,7 @@ public class TagManager {
 			return;
 		}
 
-		final HashMap<Long, TourTag> allTags = TourDatabase.getTourTags();
+		final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
 		for (final String tagId : savedTagIds) {
 			try {
 				final TourTag tag = allTags.get(Long.parseLong(tagId));
@@ -186,7 +198,7 @@ public class TagManager {
 
 		for (final TourTag tag : fRecentTags) {
 			tagIds[tagIndex++] = Long.toString(tag.getTagId());
-			
+
 			if (tagIndex == MAX_RECENT_TAGS) {
 				break;
 			}
@@ -215,7 +227,7 @@ public class TagManager {
 				final ArrayList<TourData> noneEditorTours = (ArrayList<TourData>) selectedTours.clone();
 				noneEditorTours.removeAll(toursInEditor);
 
-				// add tag in all tours (without tours which are opened in an editor)
+				// add the tag in all tours (without tours which are opened in an editor)
 				for (final TourData tourData : noneEditorTours) {
 
 					// set+save the tour tag
@@ -302,5 +314,21 @@ public class TagManager {
 //		}
 
 		return updatedTours;
+	}
+
+	/**
+	 * Update the names of all tags
+	 */
+	public static void updateTagNames() {
+
+		final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
+
+		for (final TourTag recentTag : fRecentTags) {
+
+			final TourTag tourTag = allTourTags.get(recentTag.getTagId());
+			if (tourTag != null) {
+				recentTag.setTagName(tourTag.getTagName());
+			}
+		}
 	}
 }

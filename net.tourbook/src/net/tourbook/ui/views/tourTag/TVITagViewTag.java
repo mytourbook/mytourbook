@@ -59,15 +59,15 @@ public class TVITagViewTag extends TVITagViewItem {
 
 		switch (fExpandType) {
 		case TourTag.EXPAND_TYPE_FLAT:
-			setChildren(getChildrenFlat(UI.EMPTY_STRING));
+			setChildren(readTagChildrenTours(UI.EMPTY_STRING));
 			break;
 
 		case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
-			setChildren(getChildrenYear(true, UI.EMPTY_STRING));
+			setChildren(readTagChildrenYears(true, UI.EMPTY_STRING));
 			break;
 
 		case TourTag.EXPAND_TYPE_YEAR_DAY:
-			setChildren(getChildrenYear(false, UI.EMPTY_STRING));
+			setChildren(readTagChildrenYears(false, UI.EMPTY_STRING));
 			break;
 
 		default:
@@ -76,10 +76,61 @@ public class TVITagViewTag extends TVITagViewItem {
 
 	}
 
+	public int getExpandType() {
+		return fExpandType;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public long getTagId() {
+		return tagId;
+	}
+
+	/**
+	 * @param modifiedTours
+	 * @return Returns an expression to select tour id's in the WHERE clause
+	 */
+	private String getTourIdWhereClause(final ArrayList<TourData> modifiedTours) {
+
+		if (modifiedTours.size() == 0) {
+			return UI.EMPTY_STRING;
+		}
+
+		final StringBuilder sb = new StringBuilder();
+		boolean isFirst = true;
+
+		sb.append(" AND TourData.tourId IN (");
+
+		for (final TourData tourData : modifiedTours) {
+
+			if (isFirst) {
+				isFirst = false;
+			} else {
+				sb.append(',');
+			}
+
+			sb.append(Long.toString(tourData.getTourId()));
+		}
+
+		sb.append(')');
+
+		return sb.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (tagId ^ (tagId >>> 32));
+		return result;
+	}
+
 	/**
 	 * get all tours for the tag Id of this tree item
 	 */
-	private ArrayList<TreeViewerItem> getChildrenFlat(final String whereClause) {
+	private ArrayList<TreeViewerItem> readTagChildrenTours(final String whereClause) {
 
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 
@@ -155,7 +206,7 @@ public class TVITagViewTag extends TVITagViewItem {
 		return children;
 	}
 
-	private ArrayList<TreeViewerItem> getChildrenYear(final boolean isMonth, final String whereClause) {
+	private ArrayList<TreeViewerItem> readTagChildrenYears(final boolean isMonth, final String whereClause) {
 
 		/*
 		 * get the children for the tag item
@@ -215,60 +266,33 @@ public class TVITagViewTag extends TVITagViewItem {
 		return children;
 	}
 
-	public int getExpandType() {
-		return fExpandType;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public long getTagId() {
-		return tagId;
-	}
+//	/**
+//	 * Read the year totals, this will read all year items for the tag and removes the years which
+//	 * do not have any tour items
+//	 * 
+//	 * @param tagViewer
+//	 */
+//	private void readTotalsMonth(final TreeViewer tagViewer) {
+//
+////		final ArrayList<TreeViewerItem> allMonthItems = readYearChildrenMonths();
+////
+////		// update model
+////		setChildren(allMonthItems);
+////
+////		// update viewer
+////		tagViewer.update(allMonthItems.toArray(), null);
+//	}
 
 	/**
-	 * @param modifiedTours
-	 * @return Returns an expression to select tour id's in the WHERE clause
+	 * Read the year totals, this will read all year items for the tag and removes the years which
+	 * do not have any tour items
+	 * 
+	 * @param tagViewer
+	 * @param isMonth
 	 */
-	private String getTourIdWhereClause(final ArrayList<TourData> modifiedTours) {
+	private void readTotalsYear(final TreeViewer tagViewer, final boolean isMonth) {
 
-		if (modifiedTours.size() == 0) {
-			return UI.EMPTY_STRING;
-		}
-
-		final StringBuilder sb = new StringBuilder();
-		boolean isFirst = true;
-
-		sb.append(" AND TourData.tourId IN (");
-
-		for (final TourData tourData : modifiedTours) {
-
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				sb.append(',');
-			}
-
-			sb.append(Long.toString(tourData.getTourId()));
-		}
-
-		sb.append(')');
-
-		return sb.toString();
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (tagId ^ (tagId >>> 32));
-		return result;
-	}
-
-	private void readYearTotals(final TreeViewer tagViewer) {
-
-		final ArrayList<TreeViewerItem> allYearItems = getChildrenYear(false, UI.EMPTY_STRING);
+		final ArrayList<TreeViewerItem> allYearItems = readTagChildrenYears(isMonth, UI.EMPTY_STRING);
 
 		// update model
 		setChildren(allYearItems);
@@ -319,7 +343,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 			// this tag was added to tours
 
-			final ArrayList<TreeViewerItem> tagChildren = getChildrenFlat(getTourIdWhereClause(modifiedTours));
+			final ArrayList<TreeViewerItem> tagChildren = readTagChildrenTours(getTourIdWhereClause(modifiedTours));
 
 			// update model
 			unfetchedChildren.addAll(tagChildren);
@@ -359,9 +383,6 @@ public class TVITagViewTag extends TVITagViewItem {
 			final Collection<TVITagViewTour> removedTourItems = removedTours.values();
 
 			// update model
-//			for (final TVITagViewTour removedTourItem : removedTourItems) {
-//				unfetchedChildren.remove(removedTourItem);
-//			}
 			unfetchedChildren.removeAll(removedTours.values());
 
 			// update viewer
@@ -373,6 +394,154 @@ public class TVITagViewTag extends TVITagViewItem {
 										final ArrayList<TourData> modifiedTours,
 										final boolean isAddMode) {
 
+//		final ArrayList<TreeViewerItem> unfetchedTagChildren = getUnfetchedChildren();
+//		if (unfetchedTagChildren == null) {
+//			// children are not fetched, nothing to do
+//			return;
+//		}
+//
+//		if (isAddMode) {
+//
+//			// this tag was added to tours
+//
+//		} else {
+//
+//			/*
+//			 * this tag was removed from tours, remove the tour from this tag and remove the
+//			 * year/month item when it does not contain tours
+//			 */
+//
+//			final HashMap<Integer, TVITagViewYear> removedYears = new HashMap<Integer, TVITagViewYear>();
+//
+//			// loop: all year items for the current tag
+//			for (final TreeViewerItem tagChildItem : unfetchedTagChildren) {
+//				if (tagChildItem instanceof TVITagViewYear) {
+//
+//					final TVITagViewYear yearItem = (TVITagViewYear) tagChildItem;
+//					final ArrayList<TreeViewerItem> unfetchedYearChildren = yearItem.getUnfetchedChildren();
+//
+//					if (unfetchedYearChildren == null) {
+//
+//						/*
+//						 * The months for the year item are not fetched but the tag for such a tour
+//						 * could have been removed. The year item will be removed if necessary in
+//						 * the method readYearTotals()
+//						 */
+//
+//						continue;
+//
+//					} else {
+//
+//						/*
+//						 * the months for the current year item are fetched
+//						 */
+//
+//						final HashMap<Integer, TVITagViewMonth> removedMonths = new HashMap<Integer, TVITagViewMonth>();
+//
+//						// loop: all month items for the current year item
+//						for (final TreeViewerItem yearChildItem : unfetchedYearChildren) {
+//							if (yearChildItem instanceof TVITagViewMonth) {
+//
+//								final TVITagViewMonth monthItem = (TVITagViewMonth) yearChildItem;
+//								final ArrayList<TreeViewerItem> unfetchedMonthChildren = monthItem.getUnfetchedChildren();
+//
+//								if (unfetchedMonthChildren == null) {
+//
+//									/*
+//									 * tours for the months are not fetched
+//									 */
+//
+//									continue;
+//
+//								} else {
+//
+//									final HashMap<Long, TVITagViewTour> removedTours = new HashMap<Long, TVITagViewTour>();
+//
+//									// loop: all tour items
+//									for (final TreeViewerItem monthChildItem : unfetchedMonthChildren) {
+//										if (monthChildItem instanceof TVITagViewTour) {
+//
+//											final TVITagViewTour tourItem = (TVITagViewTour) monthChildItem;
+//											final long tourItemTourId = tourItem.tourId;
+//
+//											// loop: all modified tours
+//											for (final TourData tourData : modifiedTours) {
+//												if (tourData.getTourId() == tourItemTourId) {
+//
+//													/*
+//													 * the modified tour was found in the tree,
+//													 * remove the tour from the year item
+//													 */
+//
+//													removedTours.put(tourItemTourId, tourItem);
+//
+//													break;
+//												}
+//											}
+//										}
+//									}
+//
+//									if (removedTours.size() > 0) {
+//
+//										final Collection<TVITagViewTour> removedTourItems = removedTours.values();
+//
+//										// update month model
+//										unfetchedMonthChildren.removeAll(removedTourItems);
+//
+//										if (unfetchedMonthChildren.size() == 0) {
+//
+//											// month item does not contain any tours, month will be removed
+//
+//											removedMonths.put(monthItem.hashCode(), monthItem);
+//
+//										} else {
+//
+//											// update viewer, remove tours from month
+//											tagViewer.remove(removedTourItems.toArray());
+//										}
+//									}
+//								}
+//							}
+//						}
+//
+//						if (removedMonths.size() > 0) {
+//
+//							final Collection<TVITagViewMonth> removedMonthItems = removedMonths.values();
+//
+//							// update year model
+//							unfetchedYearChildren.removeAll(removedMonthItems);
+//
+//							if (unfetchedYearChildren.size() == 0) {
+//
+//								// year item does not contain any tours, year will be removed
+//
+//								removedYears.put(yearItem.hashCode(), yearItem);
+//
+//							} else {
+//
+//								// update viewer
+//								tagViewer.remove(removedMonthItems.toArray());
+//							}
+//						}
+//					}
+//
+//					readTotalsMonth(tagViewer);
+//				}
+//			}
+//
+//			if (removedYears.size() > 0) {
+//
+//				final Collection<TVITagViewYear> removedYearItems = removedYears.values();
+//
+//				// update tag model
+//				unfetchedTagChildren.removeAll(removedYearItems);
+//
+//				// update viewer
+//				tagViewer.remove(removedYearItems.toArray());
+//			}
+//		}
+
+		readTotalsYear(tagViewer, true);
 	}
 
 	/**
@@ -386,150 +555,156 @@ public class TVITagViewTag extends TVITagViewItem {
 									final ArrayList<TourData> modifiedTours,
 									final boolean isAddMode) {
 
-		final ArrayList<TreeViewerItem> unfetchedTagChildren = getUnfetchedChildren();
-		if (unfetchedTagChildren == null) {
-			// children are not fetched, nothing to do
-			return;
-		}
+//		final ArrayList<TreeViewerItem> unfetchedTagChildren = getUnfetchedChildren();
+//		if (unfetchedTagChildren == null) {
+//			// children are not fetched, nothing to do
+//			return;
+//		}
+//
+//		if (isAddMode) {
+//
+//			// this tag was added to tours
+//
+//			// get year items for the modified tours
+//			final ArrayList<TreeViewerItem> modifiedYearItems = readTagChildrenYears(false,
+//					getTourIdWhereClause(modifiedTours));
+//
+//			/*
+//			 * update model
+//			 */
+//
+//			final ArrayList<TVITagViewYear> addedYearItems = new ArrayList<TVITagViewYear>();
+//			final ArrayList<TVITagViewYear> updatedYearItems = new ArrayList<TVITagViewYear>();
+//
+//			// loop: all modified year items, add the year item or replace a year item
+//			for (final TreeViewerItem treeItem : modifiedYearItems) {
+//				if (treeItem instanceof TVITagViewYear) {
+//
+//					final TVITagViewYear newYearItem = (TVITagViewYear) treeItem;
+//
+//					final int oldYearItemIndex = unfetchedTagChildren.indexOf(newYearItem);
+//					if (oldYearItemIndex == -1) {
+//
+//						// add new year item
+//
+//						unfetchedTagChildren.add(newYearItem);
+//
+//						addedYearItems.add(newYearItem);
+//
+//					} else {
+//
+//						// replace existing year item to display the corrected sum totals
+//
+//						unfetchedTagChildren.remove(oldYearItemIndex);
+//						unfetchedTagChildren.add(newYearItem);
+//
+//						updatedYearItems.add(newYearItem);
+//					}
+//				}
+//			}
+//
+//			/*
+//			 * update viewer
+//			 */
+//			if (addedYearItems.size() > 0) {
+//				tagViewer.add(this, addedYearItems.toArray());
+//			}
+//			if (updatedYearItems.size() > 0) {
+//				tagViewer.update(updatedYearItems.toArray(), null);
+//			}
+//
+//		} else {
+//
+//			/*
+//			 * this tag was removed from tours, remove the tour from this tag and remove the year
+//			 * item when it does not contain tours
+//			 */
+//
+//			final HashMap<Integer, TVITagViewYear> removedYears = new HashMap<Integer, TVITagViewYear>();
+//
+//			// loop: all year items
+//			for (final TreeViewerItem tagChildItem : unfetchedTagChildren) {
+//				if (tagChildItem instanceof TVITagViewYear) {
+//
+//					final TVITagViewYear tagYearItem = (TVITagViewYear) tagChildItem;
+//					final ArrayList<TreeViewerItem> unfetchedYearChildren = tagYearItem.getUnfetchedChildren();
+//
+//					if (unfetchedYearChildren == null) {
+//
+//						/*
+//						 * the tours for the year item are not fetched but the tag for such a tour
+//						 * could have been removed. Because the tours are not loaded for this year
+//						 * item, it cannot be checked if the year item could have been removed
+//						 */
+//
+//						continue;
+//
+//					} else {
+//
+//						/*
+//						 * the tours for the current year item are fetched
+//						 */
+//						final HashMap<Long, TVITagViewTour> removedTours = new HashMap<Long, TVITagViewTour>();
+//
+//						// loop: all tour items in the current year item
+//						for (final TreeViewerItem yearChildItem : unfetchedYearChildren) {
+//							if (yearChildItem instanceof TVITagViewTour) {
+//
+//								final TVITagViewTour tourItem = (TVITagViewTour) yearChildItem;
+//								final long tourItemTourId = tourItem.tourId;
+//
+//								for (final TourData tourData : modifiedTours) {
+//									if (tourData.getTourId() == tourItemTourId) {
+//
+//										/*
+//										 * the modified tour was found in the tree, remove the tour
+//										 * from the year item
+//										 */
+//
+//										removedTours.put(tourItemTourId, tourItem);
+//
+//										break;
+//									}
+//								}
+//							}
+//						}
+//
+//						if (removedTours.size() > 0) {
+//
+//							final Collection<TVITagViewTour> removedTourItems = removedTours.values();
+//
+//							// update year model
+//							unfetchedYearChildren.removeAll(removedTourItems);
+//
+//							if (unfetchedYearChildren.size() == 0) {
+//
+//								// year item does not contain any tours, year will be removed
+//
+//								removedYears.put(tagYearItem.hashCode(), tagYearItem);
+//
+//							} else {
+//
+//								// update viewer
+//								tagViewer.remove(removedTourItems.toArray());
+//							}
+//						}
+//					}
+//				}
+//			}
+//
+//			if (removedYears.size() > 0) {
+//
+//				final Collection<TVITagViewYear> removedYearItems = removedYears.values();
+//
+//				// update tag model
+//				unfetchedTagChildren.removeAll(removedYearItems);
+//
+//				// update viewer
+//				tagViewer.remove(removedYearItems.toArray());
+//			}
+//		}
 
-		if (isAddMode) {
-
-			// this tag was added to tours
-
-			// get year items for the modified tours
-			final ArrayList<TreeViewerItem> modifiedYearItems = getChildrenYear(false,
-					getTourIdWhereClause(modifiedTours));
-
-			/*
-			 * update model
-			 */
-
-			final ArrayList<TVITagViewYear> addedYearItems = new ArrayList<TVITagViewYear>();
-			final ArrayList<TVITagViewYear> updatedYearItems = new ArrayList<TVITagViewYear>();
-
-			// loop: all modified year items, add the year item or replace a year item
-			for (final TreeViewerItem treeItem : modifiedYearItems) {
-				if (treeItem instanceof TVITagViewYear) {
-
-					final TVITagViewYear newYearItem = (TVITagViewYear) treeItem;
-
-					final int oldYearItemIndex = unfetchedTagChildren.indexOf(newYearItem);
-					if (oldYearItemIndex == -1) {
-
-						// add new year item
-
-						unfetchedTagChildren.add(newYearItem);
-
-						addedYearItems.add(newYearItem);
-
-					} else {
-
-						// replace existing year item to display the corrected sum totals
-
-						unfetchedTagChildren.remove(oldYearItemIndex);
-						unfetchedTagChildren.add(newYearItem);
-
-						updatedYearItems.add(newYearItem);
-					}
-				}
-			}
-
-			/*
-			 * update viewer
-			 */
-			if (addedYearItems.size() > 0) {
-				tagViewer.add(this, addedYearItems.toArray());
-			}
-			if (updatedYearItems.size() > 0) {
-				tagViewer.update(updatedYearItems.toArray(), null);
-			}
-
-		} else {
-
-			/*
-			 * this tag was removed from tours, remove the tour from this tag and remove the year
-			 * item when it does not contain tours
-			 */
-
-			final HashMap<Integer, TVITagViewYear> removedYears = new HashMap<Integer, TVITagViewYear>();
-
-			// loop: all year items
-			for (final TreeViewerItem tagChildItem : unfetchedTagChildren) {
-				if (tagChildItem instanceof TVITagViewYear) {
-
-					final TVITagViewYear tagYearItem = (TVITagViewYear) tagChildItem;
-					final ArrayList<TreeViewerItem> unfetchedYearChildren = tagYearItem.getUnfetchedChildren();
-
-					if (unfetchedYearChildren == null) {
-
-						/*
-						 * the tours for the year item are not fetched but the tag for such a tour
-						 * could have been removed. Because the tours are not loaded for this year
-						 * item, it cannot be checked if the year item could have been removed
-						 */
-
-						continue;
-
-					} else {
-
-						/*
-						 * the tours for the current year item are fetched
-						 */
-						final HashMap<Long, TVITagViewTour> removedTours = new HashMap<Long, TVITagViewTour>();
-
-						// loop: all tour items in the current year item
-						for (final TreeViewerItem yearChildItem : unfetchedYearChildren) {
-							if (yearChildItem instanceof TVITagViewTour) {
-
-								final TVITagViewTour tourItem = (TVITagViewTour) yearChildItem;
-								final long tourItemTourId = tourItem.tourId;
-
-								for (final TourData tourData : modifiedTours) {
-									if (tourData.getTourId() == tourItemTourId) {
-
-										/*
-										 * the modified tour was found in the tree, remove the tour
-										 * from the year item
-										 */
-
-										removedTours.put(tourItemTourId, tourItem);
-
-										break;
-									}
-								}
-							}
-						}
-
-						final Collection<TVITagViewTour> removedTourItems = removedTours.values();
-
-						// update year model
-						unfetchedYearChildren.removeAll(removedTourItems);
-
-						if (unfetchedYearChildren.size() == 0) {
-
-							// year item does not contain any tours, year will be removed
-
-							removedYears.put(tagYearItem.hashCode(), tagYearItem);
-
-						} else {
-
-							// update viewer
-							tagViewer.remove(removedTourItems.toArray());
-						}
-					}
-				}
-			}
-
-			final Collection<TVITagViewYear> removedYearItems = removedYears.values();
-
-			// update tag model
-			unfetchedTagChildren.removeAll(removedYearItems);
-
-			// update viewer
-			tagViewer.remove(removedYearItems.toArray());
-
-			readYearTotals(tagViewer);
-		}
+		readTotalsYear(tagViewer, false);
 	}
 
 	@Override
