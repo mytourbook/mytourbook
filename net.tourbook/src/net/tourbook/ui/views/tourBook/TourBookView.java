@@ -824,7 +824,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		final ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
 
-		// count number of selected tour items
+		// get number of selected tour items
 		int tourItems = 0;
 		TVITourBookTour firstTour = null;
 		for (final Iterator iter = selection.iterator(); iter.hasNext();) {
@@ -839,6 +839,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		final boolean isTourSelected = tourItems > 0;
 
 		fActionEditTour.setEnabled(tourItems == 1);
+		fActionEditQuick.setEnabled(tourItems == 1);
 
 		// enable delete ation when at least one tour is selected
 		if (isTourSelected) {
@@ -850,7 +851,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-		fActionEditQuick.setEnabled(tourItems == 1);
 
 		fActionAddTag.setEnabled(isTourSelected);
 

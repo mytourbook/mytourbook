@@ -36,6 +36,7 @@ import net.tourbook.tag.ActionRenameTag;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.tag.TagManager;
+import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -43,6 +44,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
+import net.tourbook.ui.ActionCollapseOthers;
 import net.tourbook.ui.ActionExpandSelection;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionRefreshView;
@@ -53,6 +55,7 @@ import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourBook.ActionEditTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
@@ -104,10 +107,16 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
-	static public final String				ID							= "net.tourbook.views.tagViewID";	//$NON-NLS-1$
+	static public final String				ID								= "net.tourbook.views.tagViewID";	//$NON-NLS-1$
 
-	private static final String				MEMENTO_COLUMN_SORT_ORDER	= "tagview.column_sort_order";		//$NON-NLS-1$
-	private static final String				MEMENTO_COLUMN_WIDTH		= "tagview.column_width";			//$NON-NLS-1$
+	private static final String				MEMENTO_COLUMN_SORT_ORDER		= "tagview.column_sort_order";		//$NON-NLS-1$
+	private static final String				MEMENTO_COLUMN_WIDTH			= "tagview.column_width";			//$NON-NLS-1$
+	private static final String				MEMENTO_TAG_VIEW_LAYOUT			= "tagview.layout";
+
+	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
+	static final int						TAG_VIEW_LAYOUT_HIERARCHICAL	= 10;
+
+	private int								fTagViewLayout					= TAG_VIEW_LAYOUT_HIERARCHICAL;
 
 	private IMemento						fSessionMemento;
 
@@ -126,7 +135,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	private ActionSetTourTag				fActionAddTag;
 	private ActionCollapseAll				fActionCollapseAll;
+	private ActionCollapseOthers			fActionCollapseOthers;
+	private ActionEditQuick					fActionEditQuick;
+	private ActionEditTour					fActionEditTour;
 	private ActionExpandSelection			fActionExpandSelection;
+	private ActionSetLayoutHierarchical		fActionSetLayoutHierarchical;
+	private ActionSetLayoutFlat				fActionSetLayoutFlat;
 	private Action							fActionOpenTagPrefs;
 	private ActionRefreshView				fActionRefreshView;
 	private ActionRemoveAllTags				fActionRemoveAllTags;
@@ -140,14 +154,14 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	private IPropertyChangeListener			fPrefChangeListener;
 
-	private static final Image				fImgTagCategory				= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
-																				.createImage();
-	private static final Image				fImgTag						= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
-																				.createImage();
-	private Image							fImgTagRoot					= TourbookPlugin.getImageDescriptor(Messages.Image__tag_root)
-																				.createImage();
+	private final Image						fImgTagCategory					= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
+																					.createImage();
+	private final Image						fImgTag							= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
+																					.createImage();
+	private final Image						fImgTagRoot						= TourbookPlugin.getImageDescriptor(Messages.Image__tag_root)
+																					.createImage();
 
-	private static final NumberFormat		fNF							= NumberFormat.getNumberInstance();
+	private static final NumberFormat		fNF								= NumberFormat.getNumberInstance();
 
 	private final class TagComparator extends ViewerComparator {
 		@Override
@@ -301,12 +315,22 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 						restoreState(fSessionMemento);
 
 						// reload the viewer
-						fRootItem = new TVITagViewRoot(TagView.this);
+						fRootItem = new TVITagViewRoot(TagView.this, fTagViewLayout);
 						fTagViewer.setInput(fRootItem);
 					}
 					fViewerContainer.setRedraw(true);
 
 					fTagViewer.setExpandedElements(expandedElements);
+					
+				} else if (property.equals(ITourbookPreferences.TAG_COLOR_CHANGED)) {
+
+					fTagViewer.refresh();
+					
+					/*
+					 * the tree must be redrawn because the styled text does not show with the new
+					 * color
+					 */
+					fTagViewer.getTree().redraw();
 				}
 			}
 		};
@@ -374,6 +398,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	private void createActions() {
 
+		fActionEditQuick = new ActionEditQuick(this);
+		fActionEditTour = new ActionEditTour(this);
+
 		fActionSetTourType = new ActionSetTourType(this);
 
 		fActionAddTag = new ActionSetTourTag(this, true);
@@ -387,6 +414,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		fActionExpandSelection = new ActionExpandSelection(this);
 		fActionCollapseAll = new ActionCollapseAll(this);
+		fActionCollapseOthers = new ActionCollapseOthers(this);
 
 		fActionOpenTagPrefs = new Action(Messages.app_action_tag_open_tagging_structure) {
 
@@ -399,6 +427,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 						null).open();
 			}
 		};
+
+		fActionSetLayoutFlat = new ActionSetLayoutFlat(this);
+		fActionSetLayoutHierarchical = new ActionSetLayoutHierarchical(this);
 
 		fActionModifyColumns = new ActionModifyColumns(this);
 	}
@@ -680,6 +711,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		}
 		final boolean isTourSelected = tourItems > 0;
 
+		fActionEditTour.setEnabled(tourItems == 1);
+		fActionEditQuick.setEnabled(tourItems == 1);
+
 		// action: set tour type
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
@@ -715,6 +749,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		boolean isTagSelected = false;
 		boolean isCategorySelected = false;
 		final TVITagViewItem firstElement = (TVITagViewItem) selection.getFirstElement();
+		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
+
 		if (firstElement instanceof TVITagViewTag) {
 			isTagSelected = true;
 		} else if (firstElement instanceof TVITagViewTagCategory) {
@@ -744,8 +780,10 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		fActionSetTagStructure.setEnabled(isTagSelected && selectedItems == 1);
 
 		fActionExpandSelection.setEnabled(firstElement == null ? false : //
-				selectedItems == 1 ? firstElement.hasChildren() : //
+				selectedItems == 1 ? firstElementHasChildren : //
 						true);
+
+		fActionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
 
 		// enable/disable actions for the recent tags
 		TagManager.enableRecentTagActions(isTourSelected);
@@ -753,11 +791,13 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-//		menuMgr.add(fActionEditQuick);
-//		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionCollapseOthers);
+		menuMgr.add(fActionExpandSelection);
+		menuMgr.add(fActionCollapseAll);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionEditQuick);
+		menuMgr.add(fActionEditTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionAddTag);
@@ -766,21 +806,14 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
 
-//		menuMgr.add(new Separator());
-//		menuMgr.add(fActionDeleteTour);
-
-		menuMgr.add(new Separator());
-		menuMgr.add(fActionExpandSelection);
-		menuMgr.add(fActionCollapseAll);
-
-//		menuMgr.add(new Separator());
-//		fDrillDownAdapter.addNavigationActions(menuMgr);
-
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionSetTagStructure);
 		menuMgr.add(fActionSetAllTagStructures);
 		menuMgr.add(fActionRenameTag);
 		menuMgr.add(fActionOpenTagPrefs);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionSetTourType);
 
 		enableActions();
 	}
@@ -810,6 +843,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		 * fill view menu
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+
+		menuMgr.add(fActionSetLayoutFlat);
+		menuMgr.add(fActionSetLayoutHierarchical);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(fActionModifyColumns);
 
 	}
@@ -882,7 +920,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		{
 			final Object[] expandedElements = fTagViewer.getExpandedElements();
 
-			fRootItem = new TVITagViewRoot(this);
+			fRootItem = new TVITagViewRoot(this, fTagViewLayout);
 			fTagViewer.setInput(fRootItem);
 //			fDrillDownAdapter.reset();
 
@@ -892,6 +930,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	}
 
 	private void restoreState(final IMemento memento) {
+
+		fTagViewLayout = -1;
 
 		if (memento != null) {
 
@@ -910,6 +950,35 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			if (mementoColumnWidth != null) {
 				fColumnManager.setColumnWidth(StringToArrayConverter.convertStringToArray(mementoColumnWidth));
 			}
+
+			// restore view layout
+			final Integer mementoViewLayout = memento.getInteger(MEMENTO_TAG_VIEW_LAYOUT);
+			if (mementoViewLayout != null) {
+
+				switch (mementoViewLayout) {
+
+				case TAG_VIEW_LAYOUT_FLAT:
+
+					fTagViewLayout = mementoViewLayout;
+					fActionSetLayoutFlat.setChecked(true);
+					break;
+
+				case TAG_VIEW_LAYOUT_HIERARCHICAL:
+
+					fTagViewLayout = mementoViewLayout;
+					fActionSetLayoutHierarchical.setChecked(true);
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+
+		// set default layout
+		if (fTagViewLayout == -1) {
+			fTagViewLayout = TAG_VIEW_LAYOUT_FLAT;
+			fActionSetLayoutFlat.setChecked(true);
 		}
 	}
 
@@ -930,6 +999,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		if (columnIdAndWidth != null) {
 			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(columnIdAndWidth));
 		}
+
+		// save view layout
+		memento.putInteger(MEMENTO_TAG_VIEW_LAYOUT, fTagViewLayout);
 
 //		final Object[] expandedElements = fTagViewer.getExpandedElements();
 //		final Object[] visibleExpandedElements = fTagViewer.getVisibleExpandedElements();
@@ -954,6 +1026,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		}
 
 		setContentDescription(description);
+	}
+
+	public void setViewLayout(final int tagViewStructure) {
+		fTagViewLayout = tagViewStructure;
+		reloadViewer();
 	}
 
 	/**

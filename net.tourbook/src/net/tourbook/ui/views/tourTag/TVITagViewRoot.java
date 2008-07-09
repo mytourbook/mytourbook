@@ -31,9 +31,11 @@ import net.tourbook.ui.UI;
 public class TVITagViewRoot extends TVITagViewItem {
 
 	private TagView	fTagView;
+	private int		fTagViewStructure;
 
-	public TVITagViewRoot(final TagView tagView) {
+	public TVITagViewRoot(final TagView tagView, final int tagViewStructure) {
 		fTagView = tagView;
+		fTagViewStructure = tagViewStructure;
 	}
 
 	@Override
@@ -53,40 +55,50 @@ public class TVITagViewRoot extends TVITagViewItem {
 			PreparedStatement statement;
 			ResultSet result;
 
-			/*
-			 * get tag categories
-			 */
-			sb.append("SELECT");
-			sb.append(" tagCategoryId,"); // 	1
-			sb.append(" name"); // 				2
+			if (fTagViewStructure == TagView.TAG_VIEW_LAYOUT_HIERARCHICAL) {
 
-			sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY);
-			sb.append(" WHERE isRoot = 1");
-			sb.append(" ORDER BY name");
+				/*
+				 * get tag categories
+				 */
+				sb.append("SELECT");
+				sb.append(" tagCategoryId,"); // 	1
+				sb.append(" name"); // 				2
 
-			statement = conn.prepareStatement(sb.toString());
-			result = statement.executeQuery();
+				sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY);
+				sb.append(" WHERE isRoot = 1");
+				sb.append(" ORDER BY name");
 
-			while (result.next()) {
+				statement = conn.prepareStatement(sb.toString());
+				result = statement.executeQuery();
 
-				final TVITagViewTagCategory treeItem = new TVITagViewTagCategory(this);
-				children.add(treeItem);
+				while (result.next()) {
 
-				treeItem.tagCategoryId = result.getLong(1);
-				treeItem.treeColumn = treeItem.name = result.getString(2);
+					final TVITagViewTagCategory treeItem = new TVITagViewTagCategory(this);
+					children.add(treeItem);
+
+					treeItem.tagCategoryId = result.getLong(1);
+					treeItem.treeColumn = treeItem.name = result.getString(2);
+				}
 			}
 
 			/*
 			 * get tags
 			 */
+			final String whereClause = fTagViewStructure == TagView.TAG_VIEW_LAYOUT_FLAT
+					? UI.EMPTY_STRING
+					: fTagViewStructure == TagView.TAG_VIEW_LAYOUT_HIERARCHICAL ? //
+							" WHERE isRoot = 1"
+							: UI.EMPTY_STRING;
+
 			sb.delete(0, sb.length());
 			sb.append("SELECT");
 			sb.append(" tagId,"); //		1
 			sb.append(" name,"); //			2
-			sb.append(" expandType"); //	3
+			sb.append(" expandType,"); //	3
+			sb.append(" isRoot"); //		44
 
 			sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG);
-			sb.append(" WHERE isRoot = 1");
+			sb.append(whereClause);
 			sb.append(" ORDER BY name");
 
 			statement = conn.prepareStatement(sb.toString());
@@ -101,8 +113,8 @@ public class TVITagViewRoot extends TVITagViewItem {
 
 				tagItem.tagId = tagId;
 				tagItem.treeColumn = tagItem.name = result.getString(2);
-				tagItem.isRoot = true;
 				tagItem.setExpandType(result.getInt(3));
+				tagItem.isRoot = result.getInt(4) == 1;
 
 				readTagTotals(tagItem);
 			}

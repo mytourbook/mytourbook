@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.UI;
 
@@ -39,8 +38,8 @@ public class ActionEditQuick extends Action {
 	public ActionEditQuick(final ISelectedTours tourProvider) {
 
 		setText(Messages.app_action_quick_edit);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
+//		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
+//		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
 
 		fTourProvider = tourProvider;
 	}

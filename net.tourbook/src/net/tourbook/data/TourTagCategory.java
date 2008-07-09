@@ -32,7 +32,7 @@ import javax.persistence.Transient;
 import net.tourbook.database.TourDatabase;
 
 @Entity
-public class TourTagCategory {
+public class TourTagCategory implements Comparable<Object> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -75,6 +75,16 @@ public class TourTagCategory {
 
 	public TourTagCategory(final String categoryName) {
 		name = categoryName;
+	}
+
+	public int compareTo(final Object obj) {
+
+		if (obj instanceof TourTagCategory) {
+			final TourTagCategory otherCategory = (TourTagCategory) obj;
+			return name.compareTo(otherCategory.name);
+		}
+
+		return 0;
 	}
 
 	public int getCategoryCounter() {

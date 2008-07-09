@@ -172,7 +172,7 @@ public class TourDatabase {
 	}
 
 	/**
-	 * remove all tour tags that the next time they have to be loaded from the database
+	 * remove all tour tags, the next time they have to be loaded from the database
 	 */
 	public static void clearTourTags() {
 
@@ -234,6 +234,35 @@ public class TourDatabase {
 		return tourList;
 	}
 
+	/**
+	 * @return Returns all tour tags which are stored in the database, the hash key is the tag id
+	 */
+	@SuppressWarnings("unchecked")
+	public static HashMap<Long, TourTag> getAllTourTags() {
+
+		if (fTourTags != null) {
+			return fTourTags;
+		}
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		if (em != null) {
+
+			final Query query = em.createQuery("SELECT TourTag" //$NON-NLS-1$
+					+ (" FROM " + TourDatabase.TABLE_TOUR_TAG + " TourTag ")); //$NON-NLS-1$ //$NON-NLS-2$
+
+			fTourTags = new HashMap<Long, TourTag>();
+
+			for (final TourTag tourTag : ((List<TourTag>) query.getResultList())) {
+				fTourTags.put(tourTag.getTagId(), tourTag);
+			}
+
+			em.close();
+		}
+
+		return fTourTags;
+	}
+
 	public static TourDatabase getInstance() {
 		if (instance == null) {
 			instance = new TourDatabase();
@@ -255,6 +284,9 @@ public class TourDatabase {
 			return rootEntry;
 		}
 
+		/*
+		 * read root tags from the database
+		 */
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em == null) {
@@ -268,7 +300,8 @@ public class TourDatabase {
 		 */
 		Query query = em.createQuery("SELECT TourTagCategory " //$NON-NLS-1$
 				+ ("FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " AS TourTagCategory ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE TourTagCategory.isRoot = 1"));
+				+ (" WHERE TourTagCategory.isRoot = 1")
+				+ (" ORDER  BY TourTagCategory.name")); //$NON-NLS-1$
 
 		rootEntry.tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
 
@@ -277,7 +310,8 @@ public class TourDatabase {
 		 */
 		query = em.createQuery("SELECT TourTag " //$NON-NLS-1$
 				+ ("FROM " + TourDatabase.TABLE_TOUR_TAG + " AS TourTag ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE TourTag.isRoot = 1"));
+				+ (" WHERE TourTag.isRoot = 1")
+				+ (" ORDER  BY TourTag.name")); //$NON-NLS-1$
 
 		rootEntry.tourTags = (ArrayList<TourTag>) query.getResultList();
 
@@ -305,6 +339,10 @@ public class TourDatabase {
 			return categoryEntries;
 		}
 
+		/*
+		 * read tag entries from the database
+		 */
+
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em == null) {
@@ -318,10 +356,12 @@ public class TourDatabase {
 		// get tags
 		final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
 		categoryEntries.tourTags = new ArrayList<TourTag>(lazyTourTags);
+		Collections.sort(categoryEntries.tourTags);
 
 		// get categories
 		final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
 		categoryEntries.tourTagCategories = new ArrayList<TourTagCategory>(lazyTourTagCategories);
+		Collections.sort(categoryEntries.tourTagCategories);
 
 		em.close();
 
@@ -434,35 +474,6 @@ public class TourDatabase {
 		}
 
 		return tourPeople;
-	}
-
-	/**
-	 * @return Returns all tour tags which are stored in the database, the hash key is the tag id
-	 */
-	@SuppressWarnings("unchecked")
-	public static HashMap<Long, TourTag> getAllTourTags() {
-
-		if (fTourTags != null) {
-			return fTourTags;
-		}
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-		if (em != null) {
-
-			final Query query = em.createQuery("SELECT TourTag" //$NON-NLS-1$
-					+ (" FROM " + TourDatabase.TABLE_TOUR_TAG + " TourTag ")); //$NON-NLS-1$ //$NON-NLS-2$
-
-			fTourTags = new HashMap<Long, TourTag>();
-
-			for (final TourTag tourTag : ((List<TourTag>) query.getResultList())) {
-				fTourTags.put(tourTag.getTagId(), tourTag);
-			}
-
-			em.close();
-		}
-
-		return fTourTags;
 	}
 
 	/**

@@ -51,10 +51,12 @@
          </property>
       </product>
    </extension>
+   
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer class="net.tourbook.preferences.PreferenceInitializer"/>
    </extension>
+   
    <extension
          point="org.eclipse.ui.splashHandlers">
       <splashHandler
@@ -66,6 +68,7 @@
             splashId="net.tourbook.splashHandler">
       </splashHandlerProductBinding>
    </extension>
+   
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
@@ -101,14 +104,19 @@
             category="net.tourbook.preferences.PrefPageTourTypes"
             class="net.tourbook.preferences.PrefPageTourTypes"
             id="net.tourbook.preferences.PrefPageTourTypes"
-            name="%preference_page_tour_types">
-      </page>
+            name="%preference_page_tour_types"/>
 
       <page
             class="net.tourbook.preferences.PrefPageTags"
             id="net.tourbook.preferences.PrefPageTags"
-            name="%preference_page_tags">
+            name="%preference_page_tags"/>
+      <page
+            category="net.tourbook.preferences.PrefPageTags"
+            class="net.tourbook.preferences.PrefPageTagColors"
+            id="net.tourbook.preferences.PrefPageTagColors"
+            name="%preference_page_tag_colors">
       </page>
+      
    </extension>
 
    <extension

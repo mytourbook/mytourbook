@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -35,7 +35,9 @@ import org.eclipse.ui.splash.BasicSplashHandler;
  */
 public class MyTourbookSplashHandler extends BasicSplashHandler {
 
-	public static final String	APP_BUILD_ID	= "1.6.0.v2008????";	//$NON-NLS-1$
+	public static final String	APP_BUILD_ID_VERSION	= "1.6.0";								//$NON-NLS-1$
+	public static final String	APP_BUILD_ID			= APP_BUILD_ID_VERSION + ".v2008????";	//$NON-NLS-1$
+
 //	public static final String	APP_BUILD_ID	= "1.5.0.v20080509";	//$NON-NLS-1$
 //	public static final String	APP_BUILD_ID	= "1.4.0.v20080312";	//$NON-NLS-1$
 //	public static final String	APP_BUILD_ID	= "1.3.0.v20080125";	//$NON-NLS-1$
@@ -43,7 +45,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 //	public static final String	APP_BUILD_ID	= "1.1.0.v20071107";	//$NON-NLS-1$
 
 	@Override
-	public void init(Shell splash) {
+	public void init(final Shell splash) {
 
 		super.init(splash);
 
@@ -54,7 +56,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 		String messageRectString = null;
 		String foregroundColorString = null;
 
-		IProduct product = Platform.getProduct();
+		final IProduct product = Platform.getProduct();
 		if (product != null) {
 			progressRectString = product.getProperty(IProductConstants.STARTUP_PROGRESS_RECT);
 			messageRectString = product.getProperty(IProductConstants.STARTUP_MESSAGE_RECT);
@@ -79,7 +81,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 		int foregroundColorInteger;
 		try {
 			foregroundColorInteger = Integer.parseInt(foregroundColorString, 16);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			foregroundColorInteger = 0xD2D7FF; // off white
 		}
 
@@ -91,10 +93,10 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 
 		getContent().addPaintListener(new PaintListener() {
 
-			public void paintControl(PaintEvent e) {
-				GC gc = e.gc;
+			public void paintControl(final PaintEvent e) {
+				final GC gc = e.gc;
 				final String version = "Version " + APP_BUILD_ID; //$NON-NLS-1$
-				Point extend = gc.textExtent(version);
+				final Point extend = gc.textExtent(version);
 
 				gc.setForeground(getForeground());
 				gc.drawText(version, 383 - extend.x, 57, true);
@@ -102,7 +104,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 		});
 	}
 
-	private Rectangle parseRect(String string) {
+	private Rectangle parseRect(final String string) {
 		if (string == null) {
 			return null;
 		}
@@ -119,7 +121,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 			w = Integer.parseInt(string.substring(lastPos, i));
 			lastPos = i + 1;
 			h = Integer.parseInt(string.substring(lastPos));
-		} catch (RuntimeException e) {
+		} catch (final RuntimeException e) {
 			// sloppy error handling
 			return null;
 		}

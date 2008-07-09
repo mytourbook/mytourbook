@@ -91,10 +91,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		String title = null;
 		final IProduct product = Platform.getProduct();
 		if (product != null) {
-			title = product.getName();
+			title = product.getName() + " (" + MyTourbookSplashHandler.APP_BUILD_ID_VERSION + ")";
 		}
 		if (title == null) {
-			title = ""; //$NON-NLS-1$
+			title = UI.EMPTY_STRING;
 		}
 
 		if (currentPage != null) {
@@ -110,7 +110,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				}
 			}
 
-			String label = ""; //$NON-NLS-1$
+			String label = UI.EMPTY_STRING;
 
 			final IPerspectiveDescriptor persp = currentPage.getPerspective();
 			if (persp != null) {
@@ -122,7 +122,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				label = currentPage.getLabel();
 			}
 
-			if (label != null && !label.equals("")) { //$NON-NLS-1$ 
+			if (label != null && !label.equals(UI.EMPTY_STRING)) {  
 				title = NLS.bind(shellTitle, label, title);
 			}
 		}

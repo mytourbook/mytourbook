@@ -24,6 +24,7 @@ import net.tourbook.util.StringToArrayConverter;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.swt.graphics.RGB;
 
 /**
  * Class used to initialize default preference values.
@@ -31,12 +32,14 @@ import org.eclipse.jface.preference.PreferenceConverter;
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	/*
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	 * @see
+	 * org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences
+	 * ()
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
 
-		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 		/*
 		 * regional settings
@@ -73,9 +76,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * graph color preferences
 		 */
-		for (ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
+		for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
 
-			String graphPrefName = graphDefinition.getGraphPrefName();
+			final String graphPrefName = graphDefinition.getGraphPrefName();
 
 			PreferenceConverter.setDefault(store,
 					graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT,
@@ -110,5 +113,25 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		// define which unit is shown on the x-axis
 		store.setDefault(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
+
+		/*
+		 * tagging colors
+		 */
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.TAG_VIEW_TAG_CATEGORY_COLOR,
+				new RGB(0x81, 0x03, 0x50));
+
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.TAG_VIEW_TAG_COLOR,
+				new RGB(0x03, 0x27, 0x86));
+
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.TAG_VIEW_SUB_TAG_COLOR,
+				new RGB(0xD3, 0x6A, 0x00));
+
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.TAG_VIEW_SUB_SUB_TAG_COLOR,
+				new RGB(0x95, 0x95, 0x0F));
+
 	}
 }

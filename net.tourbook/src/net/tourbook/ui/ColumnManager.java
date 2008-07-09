@@ -40,16 +40,14 @@ import org.eclipse.swt.widgets.TreeColumn;
  */
 public class ColumnManager {
 
-	private static final String			COLUMN_DATA_COLUMN_MANAGER	= "colMgr";
-
 	private IAdaptable					fViewerAdapter;
 
 	/**
 	 * contains the column definitions in the sort order of the table/tree
 	 */
-	private ArrayList<ColumnDefinition>	fColumns					= new ArrayList<ColumnDefinition>();
+	private ArrayList<ColumnDefinition>	fColumns			= new ArrayList<ColumnDefinition>();
 
-	private int							columnCreateIndex			= 0;
+	private int							columnCreateIndex	= 0;
 
 	public ColumnManager(final IAdaptable viewerAdapter) {
 		fViewerAdapter = viewerAdapter;
@@ -130,7 +128,7 @@ public class ColumnManager {
 		tc.setMoveable(colDef.isColumnMoveable());
 
 		// keep reference to the column definition
-		tc.setData(COLUMN_DATA_COLUMN_MANAGER, colDef);
+		tc.setData(colDef);
 		colDef.setTableColumn(tc);
 
 		final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
@@ -193,9 +191,9 @@ public class ColumnManager {
 
 	/**
 	 * @param columnId
-	 *            column id
-	 * @return Returns the column definition for the column id, or <code>null</code> when the column
-	 *         for the column id is not available
+	 *        column id
+	 * @return Returns the column definition for the column id, or <code>null</code> when the
+	 *         column for the column id is not available
 	 */
 	private ColumnDefinition getColumnDefinitionByColumnId(final String columnId) {
 		for (final ColumnDefinition colDef : fColumns) {
@@ -208,9 +206,9 @@ public class ColumnManager {
 
 	/**
 	 * @param orderIndex
-	 *            column create id
-	 * @return Returns the column definition for the column create index, or <code>null</code> when
-	 *         the column is not available
+	 *        column create id
+	 * @return Returns the column definition for the column create index, or <code>null</code>
+	 *         when the column is not available
 	 */
 	private ColumnDefinition getColumnDefinitionByCreateIndex(final int orderIndex) {
 		for (final ColumnDefinition colDef : fColumns) {
@@ -224,7 +222,7 @@ public class ColumnManager {
 	/**
 	 * @return Returns the columns in the format: id/width ...
 	 */
-	public String[] getColumnIdAndWidth() {
+	public String[] getColumnIdAndWidth() { 
 
 		final ArrayList<String> columnIds = new ArrayList<String>();
 
@@ -238,11 +236,8 @@ public class ColumnManager {
 			}
 
 			for (final TableColumn column : table.getColumns()) {
-				final Object columnData = column.getData(COLUMN_DATA_COLUMN_MANAGER);
-				if (columnData != null) {
-					columnIds.add(((TableColumnDefinition) columnData).getColumnId());
-					columnIds.add(Integer.toString(column.getWidth()));
-				}
+				columnIds.add(((TableColumnDefinition) column.getData()).getColumnId());
+				columnIds.add(Integer.toString(column.getWidth()));
 			}
 
 		} else if (adapter instanceof TreeViewer) {
@@ -253,11 +248,8 @@ public class ColumnManager {
 			}
 
 			for (final TreeColumn column : tree.getColumns()) {
-				final Object columnData = column.getData(COLUMN_DATA_COLUMN_MANAGER);
-				if (columnData != null) {
-					columnIds.add(((TreeColumnDefinition) columnData).getColumnId());
-					columnIds.add(Integer.toString(column.getWidth()));
-				}
+				columnIds.add(((TreeColumnDefinition) column.getData()).getColumnId());
+				columnIds.add(Integer.toString(column.getWidth()));
 			}
 		}
 
@@ -336,7 +328,7 @@ public class ColumnManager {
 	 * 
 	 * @param columnIds
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	public void orderColumns(final String[] columnIds) {
 
 		final ArrayList<ColumnDefinition> orderedColumns = new ArrayList<ColumnDefinition>();
@@ -367,21 +359,19 @@ public class ColumnManager {
 	 * 
 	 * @param tableItems
 	 */
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	void orderColumns(final TableItem[] tableItems) {
 
 		final ArrayList<ColumnDefinition> sortedColumns = new ArrayList<ColumnDefinition>();
 		final ArrayList<ColumnDefinition> deletedColumns = (ArrayList<ColumnDefinition>) fColumns.clone();
 
-		// create columns in the correct sort order
+		// secreate columns in the correct sort order
 		for (final TableItem tableItem : tableItems) {
 
-			final ColumnDefinition colDef = (ColumnDefinition) tableItem.getData(COLUMN_DATA_COLUMN_MANAGER);
+			final ColumnDefinition colDef = (ColumnDefinition) tableItem.getData();
 
-			if (colDef != null) {
-				sortedColumns.add(colDef);
-				deletedColumns.remove(colDef);
-			}
+			sortedColumns.add(colDef);
+			deletedColumns.remove(colDef);
 		}
 
 		// add all columns which are not sorted but are available
@@ -415,7 +405,8 @@ public class ColumnManager {
 			} else if (adapter instanceof TreeViewer) {
 				((TreeViewer) adapter).getTree().setColumnOrder(columnOrder);
 			}
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			// ignore exception
 		}
 
@@ -504,7 +495,7 @@ public class ColumnManager {
 	 * Sets the width for columns
 	 * 
 	 * @param columnIdAndWidth
-	 *            contains the data pair: column id/column width,...
+	 *        contains the data pair: column id/column width,...
 	 */
 	public void setColumnWidth(final String[] columnIdAndWidth) {
 

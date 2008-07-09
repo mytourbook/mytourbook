@@ -53,7 +53,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 	 */
 	private Set<TourTag>			fSelectedTags;
 
-	protected ArrayList<TourData>	fSelectedTours;
+	private ArrayList<TourData>		fSelectedTours;
 
 	public class ActionTagCategory extends Action implements IMenuCreator {
 
@@ -159,7 +159,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		if (tourTags == null) {
 			return;
 		}
-		
+
 		// add tag items
 		for (final TourTag menuTourTag : tourTags) {
 
@@ -249,8 +249,8 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 				if (fIsAddMode) {
 
-					// add tags
-					
+					// add tags, create actions for the root tags
+
 					final TagCollection rootTagCollection = TourDatabase.getRootTags();
 
 					createCategoryActions(rootTagCollection, fMenu);
@@ -258,12 +258,11 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 				} else {
 
-					// remove tags
-					
-					
+					// remove tags, create actions for all tags of all selected tours
+
 					final ArrayList<TourTag> sortedTags = new ArrayList<TourTag>(fSelectedTags);
 					Collections.sort(sortedTags);
-					
+
 					createTagActions(new TagCollection(sortedTags), fMenu);
 				}
 			}

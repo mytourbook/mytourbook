@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -16,26 +16,25 @@
 package net.tourbook.ui;
 
 import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
 
-public class ActionCollapseAll extends Action {
+public class ActionCollapseOthers extends Action {
 
 	private ITourViewer	fTourViewer;
 
-	public ActionCollapseAll(final ITourViewer tourViewer) {
+	public ActionCollapseOthers(final ITourViewer tourViewer) {
 
 		super(null, AS_PUSH_BUTTON);
 
 		fTourViewer = tourViewer;
 
-		setText(Messages.app_action_collapse_all_tooltip);
-		setToolTipText(Messages.app_action_collapse_all_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
+		setText(Messages.app_action_collapse_others_tooltip);
+		setToolTipText(Messages.app_action_collapse_others_tooltip);
+//		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
 
 	}
 
@@ -45,17 +44,18 @@ public class ActionCollapseAll extends Action {
 		if (fTourViewer != null) {
 
 			final TreeViewer treeViewer = fTourViewer.getTreeViewer();
-
-			final Tree tree = treeViewer.getTree();
-			tree.setRedraw(false);
-			{
-				treeViewer.collapseAll();
-			}
-			tree.setRedraw(true);
-
 			final Object firstElement = ((StructuredSelection) treeViewer.getSelection()).getFirstElement();
+
 			if (firstElement != null) {
-				treeViewer.reveal(firstElement);
+
+				final Tree tree = treeViewer.getTree();
+				tree.setRedraw(false);
+				{
+					treeViewer.collapseAll();
+					treeViewer.setExpandedElements(new Object[] { firstElement });
+					treeViewer.setSelection(new StructuredSelection(firstElement), true);
+				}
+				tree.setRedraw(true);
 			}
 		}
 	}

@@ -31,6 +31,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.util.PixelConverter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -67,6 +68,7 @@ public class UI {
 
 	public static final String				EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String				EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
+
 	public static final String				IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";						//$NON-NLS-1$
 
 	public static final String				TAG_CATEGORY_COLOR				= "TAG_CATEGORY_COLOR";						//$NON-NLS-1$
@@ -155,6 +157,7 @@ public class UI {
 	static {
 
 		updateUnits();
+		setTagColorsFromPrefStore();
 
 		/*
 		 * load images into the image registry
@@ -165,26 +168,12 @@ public class UI {
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
-
-		/*
-		 * set colors
-		 */
-		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-
-//		colorRegistry.put(SUB_TAG_COLOR, new RGB(0xff, 0, 0));
-//		colorRegistry.put(SUB_SUB_TAG_COLOR, new RGB(0, 0xff, 0));
-
-		colorRegistry.put(TAG_CATEGORY_COLOR, new RGB(0x81, 0x03, 0x50));
-		colorRegistry.put(TAG_SUB_COLOR, new RGB(0xD3, 0x6A, 0x00));
-		colorRegistry.put(TAG_COLOR, new RGB(0x03, 0x27, 0x86));
-		colorRegistry.put(TAG_SUB_SUB_COLOR, new RGB(0x95, 0x95, 0x0F));
-
+		
 		/*
 		 * set styler
 		 */
-		TAG_STYLER = StyledString.createColorRegistryStyler(TAG_COLOR, null);
 		TAG_CATEGORY_STYLER = StyledString.createColorRegistryStyler(TAG_CATEGORY_COLOR, null);
-
+		TAG_STYLER = StyledString.createColorRegistryStyler(TAG_COLOR, null);
 	}
 
 	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
@@ -359,6 +348,29 @@ public class UI {
 		final GridData gd = new GridData();
 		gd.horizontalSpan = columns;
 		label.setLayoutData(gd);
+	}
+
+	/**
+	 * set the tag colors from the pref store
+	 * 
+	 * @param prefs
+	 */
+	public static void setTagColorsFromPrefStore() {
+		
+		/*
+		 * set colors
+		 */
+		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+
+		colorRegistry.put(TAG_CATEGORY_COLOR, //
+				PreferenceConverter.getColor(store, ITourbookPreferences.TAG_VIEW_TAG_CATEGORY_COLOR));
+		colorRegistry.put(TAG_COLOR, //
+				PreferenceConverter.getColor(store, ITourbookPreferences.TAG_VIEW_TAG_COLOR));
+		colorRegistry.put(TAG_SUB_COLOR, //
+				PreferenceConverter.getColor(store, ITourbookPreferences.TAG_VIEW_SUB_TAG_COLOR));
+		colorRegistry.put(TAG_SUB_SUB_COLOR, //
+				PreferenceConverter.getColor(store, ITourbookPreferences.TAG_VIEW_SUB_SUB_TAG_COLOR));
 	}
 
 	public static GridData setWidth(final Control control, final int width) {

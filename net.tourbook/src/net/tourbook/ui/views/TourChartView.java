@@ -102,7 +102,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		public void fillContextMenu(final IMenuManager menuMgr) {
 
 			menuMgr.add(fActionQuickEdit);
-			menuMgr.add(fActionSetTourType);
+			menuMgr.add(fActionEditTour);
 
 			menuMgr.add(new Separator());
 			menuMgr.add(fActionAddTag);
@@ -112,13 +112,25 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
 
 			menuMgr.add(new Separator());
-			menuMgr.add(fActionEditTour);
+			menuMgr.add(fActionSetTourType);
 
+			/*
+			 * enable actions
+			 */
 			final boolean isEnabled = fTourData != null && fTourData.getTourPerson() != null;
 
 			fActionQuickEdit.setEnabled(isEnabled);
 			fActionEditTour.setEnabled(isEnabled);
+			
+			fActionAddTag.setEnabled(isEnabled);
+			fActionRemoveTag.setEnabled(isEnabled);
+			fActionRemoveAllTags.setEnabled(isEnabled);
+			
 			fActionSetTourType.setEnabled(isEnabled);
+			
+			// enable actions for the recent tags
+			TagManager.enableRecentTagActions(isEnabled);
+
 		}
 
 		public void fillXSliderContextMenu(	final IMenuManager menuMgr,

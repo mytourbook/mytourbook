@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,19 +15,23 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
+import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ISelectedTours;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionEditTour extends Action {
 
-	private TourBookView	fTourView;
+	private ISelectedTours	fTourProvider;
 
-	public ActionEditTour(TourBookView tourBookView) {
+	public ActionEditTour(final ISelectedTours tourProvider) {
 
-		fTourView = tourBookView;
+		fTourProvider = tourProvider;
 
 		setText(Messages.App_Action_edit_tour);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
@@ -39,10 +43,10 @@ public class ActionEditTour extends Action {
 	@Override
 	public void run() {
 
-		Long tourId = fTourView.getActiveTourId();
+		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
 
-		if (tourId != null) {
-			TourManager.getInstance().openTourInEditor(tourId);
+		if (selectedTours != null && selectedTours.size() > 0) {
+			TourManager.getInstance().openTourInEditor(selectedTours.get(0).getTourId());
 		}
 	}
 

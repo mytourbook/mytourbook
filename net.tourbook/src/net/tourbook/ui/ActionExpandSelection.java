@@ -23,6 +23,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Tree;
 
 public class ActionExpandSelection extends Action {
 
@@ -54,8 +55,13 @@ public class ActionExpandSelection extends Action {
 			return;
 		}
 
-		for (final Iterator iterator = selection.iterator(); iterator.hasNext();) {
-			treeViewer.expandToLevel(iterator.next(), 2);//TreeViewer.ALL_LEVELS);
+		final Tree tree = treeViewer.getTree();
+		tree.setRedraw(false);
+		{
+			for (final Iterator iterator = selection.iterator(); iterator.hasNext();) {
+				treeViewer.expandToLevel(iterator.next(), 2);//TreeViewer.ALL_LEVELS);
+			}
 		}
+		tree.setRedraw(true);
 	}
 }

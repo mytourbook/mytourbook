@@ -117,4 +117,16 @@ public interface ITourbookPreferences {
 	public static final String	REGIONAL_DECIMAL_SEPARATOR				= "regional_decimal.separator";				//$NON-NLS-1$
 	public static final String	REGIONAL_GROUP_SEPARATOR				= "regional_group.separator";					//$NON-NLS-1$
 
+	/*
+	 * tag colors
+	 */
+	/**
+	 * color for the tagging has changed
+	 */
+	public static final String	TAG_COLOR_CHANGED						= "tag.color.changed";
+	public static final String	TAG_VIEW_TAG_CATEGORY_COLOR				= "tag_view.tag_category.color";
+	public static final String	TAG_VIEW_TAG_COLOR						= "tag_view.tag.color";
+	public static final String	TAG_VIEW_SUB_TAG_COLOR					= "tag_view.sub_tag.color";
+	public static final String	TAG_VIEW_SUB_SUB_TAG_COLOR				= "tag_view.sub_sub_tag.color";
+
 }

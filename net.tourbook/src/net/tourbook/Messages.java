@@ -49,7 +49,13 @@ public class Messages extends NLS {
 	public static String		action_tagcategory_dlg_rename_message;
 	public static String		action_tagcategory_dlg_rename_title;
 
+	public static String	action_tagView_flat_hierarchical;
+
+	public static String	action_tagView_flat_layout;
+
 	public static String		app_action_collapse_all_tooltip;
+
+	public static String	app_action_collapse_others_tooltip;
 	public static String		app_action_expand_selection_tooltip;
 	public static String		app_action_expand_type_flat;
 	public static String		app_action_expand_type_year_day;
@@ -223,6 +229,10 @@ public class Messages extends NLS {
 	public static String		Image__graph_tour_compare;
 	public static String		Image__graph_tour_compare_disabled;
 
+	public static String	Image__layout_flat;
+
+	public static String	Image__layout_hierarchical;
+
 	public static String		Image__link;
 	public static String		Image__open_tour_segmenter;
 	public static String		Image__refresh;
@@ -353,6 +363,14 @@ public class Messages extends NLS {
 	public static String		pref_regional_title;
 	public static String		pref_regional_useCustomDecimalFormat;
 	public static String		pref_regional_value_example;
+
+	public static String	pref_tag_color_sub_sub_tag;
+
+	public static String	pref_tag_color_sub_tag;
+
+	public static String	pref_tag_color_tag;
+
+	public static String	pref_tag_color_tag_category;
 
 	public static String		pref_tourtag_btn_new_tag;
 
