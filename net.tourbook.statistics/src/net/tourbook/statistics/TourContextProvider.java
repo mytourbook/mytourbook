@@ -28,6 +28,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditQuick;
@@ -54,6 +55,7 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 	private final ActionSetTourType		fActionSetTourType;
 	private final ActionSetTourTag		fActionAddTag;
 	private final ActionSetTourTag		fActionRemoveTag;
+	private ActionRemoveAllTags			fActionRemoveAllTags;
 
 	private class ActionEditTour extends Action {
 
@@ -102,6 +104,7 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 		fActionSetTourType = new ActionSetTourType(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
+		fActionRemoveAllTags = new ActionRemoveAllTags(this);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
@@ -110,23 +113,27 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 
 		final boolean isTourHovered = hoveredBarSerieIndex != -1;
 
-		fActionEditQuick.setEnabled(isTourHovered);
-		fActionEditTour.setEnabled(isTourHovered);
-
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
-		fActionSetTourType.setEnabled(isTourHovered && tourTypes.size() > 0);
-		fActionAddTag.setEnabled(isTourHovered);
-		fActionRemoveTag.setEnabled(isTourHovered);
-
+		menuMgr.add(fActionEditTour);
 		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionSetTourType);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
+		menuMgr.add(fActionRemoveAllTags);
 
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionSetTourType);
+
+		fActionEditQuick.setEnabled(isTourHovered);
+		fActionEditTour.setEnabled(isTourHovered);
+
+		fActionAddTag.setEnabled(isTourHovered);
+		fActionRemoveTag.setEnabled(isTourHovered);
+
+		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		fActionSetTourType.setEnabled(isTourHovered && tourTypes.size() > 0);
 
 // disabled because it shows the wrong month		
 //		menuMgr.add(new Separator());
