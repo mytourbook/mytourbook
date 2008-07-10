@@ -101,6 +101,10 @@ public class TVITagViewYear extends TVITagViewItem {
 		return fTagItem.tagId;
 	}
 
+	public TVITagViewTag getTagItem() {
+		return fTagItem;
+	}
+
 	public int getYear() {
 		return fYear;
 	}

@@ -119,19 +119,20 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.TAG_VIEW_TAG_CATEGORY_COLOR,
-				new RGB(0x81, 0x03, 0x50));
+				new RGB(0xF2, 0x5B, 0x00));
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.TAG_VIEW_TAG_COLOR,
-				new RGB(0x03, 0x27, 0x86));
+				new RGB(0x00, 0x6F, 0xDD));
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.TAG_VIEW_SUB_TAG_COLOR,
-				new RGB(0xD3, 0x6A, 0x00));
+				new RGB(0x7D, 0x58, 0x00));
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.TAG_VIEW_SUB_SUB_TAG_COLOR,
-				new RGB(0x95, 0x95, 0x0F));
+				new RGB(0x40, 0x80, 0x00));
 
+		store.setDefault(ITourbookPreferences.TAG_VIEW_SHOW_LINES, false);
 	}
 }

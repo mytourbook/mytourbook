@@ -20,7 +20,10 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ITourViewer;
+import net.tourbook.ui.views.tourTag.TVITagViewMonth;
 import net.tourbook.ui.views.tourTag.TVITagViewTag;
+import net.tourbook.ui.views.tourTag.TVITagViewTour;
+import net.tourbook.ui.views.tourTag.TVITagViewYear;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -61,47 +64,70 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 
 					final StructuredSelection selection = (StructuredSelection) fTourViewer.getTreeViewer()
 							.getSelection();
-					final Object firstElement = selection.getFirstElement();
-					if (firstElement instanceof TVITagViewTag) {
 
-						final TVITagViewTag tagItem = (TVITagViewTag) firstElement;
+					for (final Object element : selection.toArray()) {
 
-						// check if expand type has changed
-						if (tagItem.getExpandType() == fExpandType) {
-							return;
+						if (element instanceof TVITagViewTour) {
+							setTagStructure(((TVITagViewTour) element).getParentItem());
+						} else {
+							setTagStructure(element);
 						}
-
-						// remove the children of the tag because another type of children will be displayed
-						final TreeViewer treeViewer = fTourViewer.getTreeViewer();
-
-						final boolean isTagExpanded = treeViewer.getExpandedState(tagItem);
-
-						final Tree tree = treeViewer.getTree();
-						tree.setRedraw(false);
-						{
-							treeViewer.collapseToLevel(tagItem, TreeViewer.ALL_LEVELS);
-							final ArrayList<TreeViewerItem> tagUnfetchedChildren = tagItem.getUnfetchedChildren();
-							if (tagUnfetchedChildren != null) {
-								treeViewer.remove(tagUnfetchedChildren.toArray());
-							}
-						}
-						tree.setRedraw(true);
-
-						// set new expand type
-						tagItem.setNewExpandType(fExpandType);
-
-						tagItem.clearChildren();
-
-						if (isTagExpanded) {
-							treeViewer.setExpandedState(tagItem, true);
-						}
-
-						// update viewer
-						treeViewer.refresh(tagItem);
 					}
 				}
 
+				private void setTagStructure(final Object element) {
+					
+					if (element instanceof TVITagViewTag) {
+
+						setTagStructure2((TVITagViewTag) element);
+
+					} else if (element instanceof TVITagViewYear) {
+
+						setTagStructure2(((TVITagViewYear) element).getTagItem());
+
+					} else if (element instanceof TVITagViewMonth) {
+
+						setTagStructure2(((TVITagViewMonth) element).getYearItem().getTagItem());
+					}
+				}
+
+				private void setTagStructure2(final TVITagViewTag tagItem) {
+
+					// check if expand type has changed
+					if (tagItem.getExpandType() == fExpandType) {
+						return;
+					}
+
+					// remove the children of the tag because another type of children will be displayed
+					final TreeViewer treeViewer = fTourViewer.getTreeViewer();
+
+					final boolean isTagExpanded = treeViewer.getExpandedState(tagItem);
+
+					final Tree tree = treeViewer.getTree();
+					tree.setRedraw(false);
+					{
+						treeViewer.collapseToLevel(tagItem, TreeViewer.ALL_LEVELS);
+						final ArrayList<TreeViewerItem> tagUnfetchedChildren = tagItem.getUnfetchedChildren();
+						if (tagUnfetchedChildren != null) {
+							treeViewer.remove(tagUnfetchedChildren.toArray());
+						}
+					}
+					tree.setRedraw(true);
+
+					// set new expand type in the database
+					tagItem.setNewExpandType(fExpandType);
+
+					tagItem.clearChildren();
+
+					if (isTagExpanded) {
+						treeViewer.setExpandedState(tagItem, true);
+					}
+
+					// update viewer
+					treeViewer.refresh(tagItem);
+				}
 			};
+
 			BusyIndicator.showWhile(Display.getCurrent(), runnable);
 		}
 	}
@@ -177,9 +203,15 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 	private int getSelectedExpandType() {
 		int selectedExpandType = -1;
 		final StructuredSelection selection = (StructuredSelection) fTourViewer.getTreeViewer().getSelection();
-		if (selection.getFirstElement() instanceof TVITagViewTag) {
-			final TVITagViewTag itemTag = (TVITagViewTag) selection.getFirstElement();
-			selectedExpandType = itemTag.getExpandType();
+
+		if (selection.size() == 1) {
+
+			// set the expand type when only one tag is selected
+
+			if (selection.getFirstElement() instanceof TVITagViewTag) {
+				final TVITagViewTag itemTag = (TVITagViewTag) selection.getFirstElement();
+				selectedExpandType = itemTag.getExpandType();
+			}
 		}
 		return selectedExpandType;
 	}

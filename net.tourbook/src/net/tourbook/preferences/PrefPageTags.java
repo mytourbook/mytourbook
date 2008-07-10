@@ -38,6 +38,8 @@ import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.UI;
 
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -87,27 +89,30 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
-	private static final String	SORT_PROPERTY	= "sort";																//$NON-NLS-1$
+	private static final String		SORT_PROPERTY	= "sort";				//$NON-NLS-1$
 
-	private TreeViewer			fTagViewer;
-	private ToolBar				fToolBar;
+	private TreeViewer				fTagViewer;
+	private ToolBar					fToolBar;
 
-	private Button				fBtnNewTag;
-	private Button				fBtnNewTagCategory;
-	private Button				fBtnRename;
-	private Button				fBtnReset;
+	private Button					fBtnNewTag;
+	private Button					fBtnNewTagCategory;
+	private Button					fBtnRename;
+	private Button					fBtnReset;
 
-	private TVIPrefTagRoot		fRootItem;
+	private TVIPrefTagRoot			fRootItem;
 
-	private Image				fImgTag			= TourbookPlugin.getImageDescriptor(Messages.Image__tag).createImage();
-	private Image				fImgTagRoot		= TourbookPlugin.getImageDescriptor(Messages.Image__tag_root)
-														.createImage();
-	private Image				fImgTagCategory	= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
-														.createImage();
+	private Image					fImgTag			= TourbookPlugin.getImageDescriptor(Messages.Image__tag)
+															.createImage();
+	private Image					fImgTagRoot		= TourbookPlugin.getImageDescriptor(Messages.Image__tag_root)
+															.createImage();
+	private Image					fImgTagCategory	= TourbookPlugin.getImageDescriptor(Messages.Image__tag_category)
+															.createImage();
 
-	private boolean				fIsModified		= false;
+	private boolean					fIsModified		= false;
 
-	private long				fDragStartTime;
+	private long					fDragStartTime;
+
+	private IPropertyChangeListener	fPrefChangeListener;
 
 	/**
 	 * Sort the tags and categories
@@ -190,6 +195,33 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		super(title, image);
 	}
 
+	private void addPrefListener() {
+
+		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.TAG_COLOR_AND_LAYOUT_CHANGED)) {
+
+					fTagViewer.getTree()
+							.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+
+					fTagViewer.refresh();
+
+					/*
+					 * the tree must be redrawn because the styled text does not display the new
+					 * color
+					 */
+					fTagViewer.getTree().redraw();
+				}
+			}
+		};
+
+		// register the listener
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+	}
+
 	private void createButtons(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -257,6 +289,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		updateTagViewer();
 		enableButtons();
+		addPrefListener();
 
 		return viewerContainer;
 	}
@@ -287,7 +320,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				| SWT.FULL_SELECTION);
 
 		tree.setHeaderVisible(false);
-		tree.setLinesVisible(true);
+		tree.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
 
 		fTagViewer = new TreeViewer(tree);
 		fTagViewer.setContentProvider(new TagViewerContentProvicer());
@@ -380,12 +413,14 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final Object element = cell.getElement();
+				final StyledString styledString = new StyledString();
 
+				final Object element = cell.getElement();
 				if (element instanceof TVIPrefTag) {
 
 					final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
-					cell.setText(tourTag.getTagName()); //$NON-NLS-1$
+
+					styledString.append(tourTag.getTagName(), UI.TAG_STYLER);
 					cell.setImage(tourTag.isRoot() ? fImgTagRoot : fImgTag);
 
 				} else if (element instanceof TVIPrefTagCategory) {
@@ -395,9 +430,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 					cell.setImage(fImgTagCategory);
 
-					final StyledString styledString = new StyledString();
-
-					styledString.append(tourTagCategory.getCategoryName());
+					styledString.append(tourTagCategory.getCategoryName(), UI.TAG_CATEGORY_STYLER);
 
 					// get number of categories
 					final int categoryCounter = tourTagCategory.getCategoryCounter();
@@ -410,14 +443,17 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 						String categoryString = UI.EMPTY_STRING;
 						if (categoryCounter > 0) {
-							categoryString = "/" + categoryCounter;
+							categoryString = "/" + categoryCounter; //$NON-NLS-1$
 						}
-						styledString.append("   " + tagCounter + categoryString, StyledString.COUNTER_STYLER);
+						styledString.append("   " + tagCounter + categoryString, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 					}
 
-					cell.setText(styledString.getString());
-					cell.setStyleRanges(styledString.getStyleRanges());
+				} else {
+					styledString.append(element.toString());
 				}
+
+				cell.setText(styledString.getString());
+				cell.setStyleRanges(styledString.getStyleRanges());
 			}
 		});
 		treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
@@ -475,6 +511,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		fImgTagRoot.dispose();
 		fImgTagCategory.dispose();
 
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
+
 		super.dispose();
 	}
 
@@ -506,7 +544,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 			// fire modify event
 			TourManager.firePropertyChange(TourManager.TAG_STRUCTURE_CHANGED, null);
-			
+
 			fIsModified = false;
 		}
 	}
@@ -799,19 +837,22 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private void onRenameTourTag() {
 
 		final Object selection = ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
+
 		String name = UI.EMPTY_STRING;
+		String dlgTitle = UI.EMPTY_STRING;
+		String dlgMessage = UI.EMPTY_STRING;
 
 		if (selection instanceof TVIPrefTag) {
+			dlgTitle = Messages.pref_tourtag_dlg_rename_title;
+			dlgMessage = Messages.pref_tourtag_dlg_rename_message;
 			name = ((TVIPrefTag) selection).getTourTag().getTagName();
 		} else if (selection instanceof TVIPrefTagCategory) {
+			dlgTitle = Messages.pref_tourtag_dlg_rename_title_category;
+			dlgMessage = Messages.pref_tourtag_dlg_rename_message_category;
 			name = ((TVIPrefTagCategory) selection).getTourTagCategory().getCategoryName();
 		}
 
-		final InputDialog inputDialog = new InputDialog(getShell(),
-				Messages.pref_tourtag_dlg_rename_title,
-				Messages.pref_tourtag_dlg_rename_message,
-				name,
-				null);
+		final InputDialog inputDialog = new InputDialog(getShell(), dlgTitle, dlgMessage, name, null);
 
 		inputDialog.open();
 
@@ -873,7 +914,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 			try {
 
-				System.out.println("RESET TAG STRUCTURE");
+				System.out.println("RESET TAG STRUCTURE"); //$NON-NLS-1$
 
 				final StringBuilder sb = new StringBuilder();
 				final Connection conn = TourDatabase.getInstance().getConnection();
@@ -881,45 +922,45 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				/*
 				 * remove join table tag->category
 				 */
-				sb.append("DELETE FROM ");
+				sb.append("DELETE FROM "); //$NON-NLS-1$
 				sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
 				int result = conn.createStatement().executeUpdate(sb.toString());
-				System.out.println("Deleted "
+				System.out.println("Deleted " //$NON-NLS-1$
 						+ result
-						+ " entries from "
+						+ " entries from " //$NON-NLS-1$
 						+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAG);
 
 				/*
 				 * remove jointable category<->category
 				 */
 				sb.setLength(0);
-				sb.append("DELETE FROM ");
+				sb.append("DELETE FROM "); //$NON-NLS-1$
 				sb.append(TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
 				result = conn.createStatement().executeUpdate(sb.toString());
-				System.out.println("Deleted "
+				System.out.println("Deleted " //$NON-NLS-1$
 						+ result
-						+ " entries from "
+						+ " entries from " //$NON-NLS-1$
 						+ TourDatabase.JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY);
 
 				/*
 				 * set tags to root
 				 */
 				sb.setLength(0);
-				sb.append("UPDATE ");
+				sb.append("UPDATE "); //$NON-NLS-1$
 				sb.append(TourDatabase.TABLE_TOUR_TAG);
-				sb.append(" SET isRoot=1");
+				sb.append(" SET isRoot=1"); //$NON-NLS-1$
 				result = conn.createStatement().executeUpdate(sb.toString());
-				System.out.println("Set " + result + " tour tags to root");
+				System.out.println("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
 
 				/*
 				 * set categories to root
 				 */
 				sb.setLength(0);
-				sb.append("UPDATE ");
+				sb.append("UPDATE "); //$NON-NLS-1$
 				sb.append(TourDatabase.TABLE_TOUR_TAG_CATEGORY);
-				sb.append(" SET isRoot=1");
+				sb.append(" SET isRoot=1"); //$NON-NLS-1$
 				result = conn.createStatement().executeUpdate(sb.toString());
-				System.out.println("Set " + result + " tour categories to root");
+				System.out.println("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
 
 				conn.close();
 

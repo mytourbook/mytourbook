@@ -18,6 +18,7 @@ package net.tourbook.ui.views.tourTag;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -280,6 +281,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	private void addPrefListener() {
 
+		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
+
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
@@ -302,30 +305,34 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 					final Object[] expandedElements = fTagViewer.getExpandedElements();
 
-					fViewerContainer.setRedraw(false);
+					// recreate the tree with the new measurement system
+					saveSettings();
+
+					fTagViewer.getTree().dispose();
+
+					createTagViewer(fViewerContainer);
+					fViewerContainer.layout();
+
+					restoreState(fSessionMemento);
+
+					// reload the viewer
+					fRootItem = new TVITagViewRoot(TagView.this, fTagViewLayout);
+					fTagViewer.setInput(fRootItem);
+
+					final Tree tree = fTagViewer.getTree();
+					tree.setRedraw(false);
 					{
-						// recreate the tree with the new measurement system
-						saveSettings();
-
-						fTagViewer.getTree().dispose();
-
-						createTagViewer(fViewerContainer);
-						fViewerContainer.layout();
-
-						restoreState(fSessionMemento);
-
-						// reload the viewer
-						fRootItem = new TVITagViewRoot(TagView.this, fTagViewLayout);
-						fTagViewer.setInput(fRootItem);
+						fTagViewer.setExpandedElements(expandedElements);
 					}
-					fViewerContainer.setRedraw(true);
+					tree.setRedraw(true);
 
-					fTagViewer.setExpandedElements(expandedElements);
-					
-				} else if (property.equals(ITourbookPreferences.TAG_COLOR_CHANGED)) {
+				} else if (property.equals(ITourbookPreferences.TAG_COLOR_AND_LAYOUT_CHANGED)) {
+
+					fTagViewer.getTree()
+							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
 
 					fTagViewer.refresh();
-					
+
 					/*
 					 * the tree must be redrawn because the styled text does not show with the new
 					 * color
@@ -336,7 +343,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		};
 
 		// register the listener
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+		prefStore.addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	private void addSelectionListener() {
@@ -482,7 +489,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		tree.setHeaderVisible(true);
-		tree.setLinesVisible(false);
+
+		final boolean isLinesVisible = TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES);
+		tree.setLinesVisible(isLinesVisible);
 
 		fTagViewer = new TreeViewer(tree);
 //		fDrillDownAdapter = new DrillDownAdapter(fTagViewer);
@@ -580,9 +591,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 				} else if (viewItem instanceof TVITagViewTag) {
 
+					final TVITagViewTag tagItem = (TVITagViewTag) viewItem;
+
 					styledString.append(viewItem.treeColumn, UI.TAG_STYLER);
 					styledString.append("   " + viewItem.colItemCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
-					cell.setImage(((TVITagViewTag) viewItem).isRoot ? fImgTagRoot : fImgTag);
+					cell.setImage(tagItem.isRoot ? fImgTagRoot : fImgTag);
 
 				} else if (viewItem instanceof TVITagViewTagCategory) {
 
@@ -651,31 +664,222 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final Object element = cell.getElement();
-				final TVITagViewItem treeItem = (TVITagViewItem) element;
-
-				if (element instanceof TVITagViewTagCategory == false) {
-
-					// set distance
-					fNF.setMinimumFractionDigits(1);
-					fNF.setMaximumFractionDigits(1);
-					final String distance = fNF.format(((float) treeItem.colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE);
-					cell.setText(distance);
-
-					// set color
-					if (element instanceof TVITagViewTag) {
-						cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_COLOR));
-					} else if (element instanceof TVITagViewYear) {
-						cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_COLOR));
-					} else if (element instanceof TVITagViewMonth) {
-						cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_SUB_COLOR));
-					}
-				} else {
-					cell.setText(UI.EMPTY_STRING);
+				if (element instanceof TVITagViewTagCategory) {
+					return;
 				}
+
+				// set distance
+				fNF.setMinimumFractionDigits(1);
+				fNF.setMaximumFractionDigits(1);
+				final TVITagViewItem treeItem = (TVITagViewItem) element;
+				final String distance = fNF.format(((float) treeItem.colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE);
+				cell.setText(distance);
+
+				setCellColor(cell, element);
 			}
 		});
 
+		/*
+		 * column: recording time (h)
+		 */
+		colDef = TreeColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long recordingTime = ((TVITagViewItem) element).colRecordingTime;
+
+				cell.setText(new Formatter().format(Messages.Format_hhmm,
+						(recordingTime / 3600),
+						((recordingTime % 3600) / 60)).toString());
+
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: driving time (h)
+		 */
+		colDef = TreeColumnFactory.DRIVING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long drivingTime = ((TVITagViewItem) element).colDrivingTime;
+
+				cell.setText(new Formatter().format(Messages.Format_hhmm,
+						(drivingTime / 3600),
+						((drivingTime % 3600) / 60)).toString());
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: altitude up (m)
+		 */
+		colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				cell.setText(Long.toString((long) (((TVITagViewItem) element).colAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: altitude down (m)
+		 */
+		colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				cell.setText(Long.toString((long) (((TVITagViewItem) element).colAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
+				setCellColor(cell, element);
+			}
+		});
+
+// additional columns are disabled because they slow down the scrolling in the tree
+
+		/*
+		 * column: max pulse
+		 */
+		colDef = TreeColumnFactory.MAX_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				cell.setText(Long.toString(((TVITagViewItem) element).colMaxPulse));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: max altitude
+		 */
+		colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				cell.setText(Long.toString(((TVITagViewItem) element).colMaxAltitude));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: max speed
+		 */
+		colDef = TreeColumnFactory.MAX_SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				fNF.setMinimumFractionDigits(1);
+				fNF.setMaximumFractionDigits(1);
+				cell.setText(fNF.format(((TVITagViewItem) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: avg speed
+		 */
+		colDef = TreeColumnFactory.AVG_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				cell.setText(Long.toString(((TVITagViewItem) element).colAvgPulse));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: avg cadence
+		 */
+		colDef = TreeColumnFactory.AVG_CADENCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				cell.setText(Long.toString(((TVITagViewItem) element).colAvgCadence));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: avg temperature
+		 */
+		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				long temperature = ((TVITagViewItem) element).colAvgTemperature;
+
+				if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+					temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+				}
+				cell.setText(Long.toString(temperature));
+
+				setCellColor(cell, element);
+			}
+		});
 	}
 
 	@Override
@@ -697,8 +901,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		final StructuredSelection selection = (StructuredSelection) fTagViewer.getSelection();
 		final int selectedItems = selection.size();
 
-		// count number of selected tour items
+		// count number of selected items
 		int tourItems = 0;
+		int tagItems = 0;
+		int categoryItems = 0;
+		int items = 0;
+		int otherItems = 0;
 		TVITagViewTour firstTour = null;
 		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 			final Object treeItem = iter.next();
@@ -707,7 +915,14 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					firstTour = (TVITagViewTour) treeItem;
 				}
 				tourItems++;
+			} else if (treeItem instanceof TVITagViewTag) {
+				tagItems++;
+			} else if (treeItem instanceof TVITagViewTagCategory) {
+				categoryItems++;
+			} else {
+				otherItems++;
 			}
+			items++;
 		}
 		final boolean isTourSelected = tourItems > 0;
 
@@ -746,20 +961,14 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			fActionRemoveAllTags.setEnabled(isTourSelected);
 		}
 
-		boolean isTagSelected = false;
-		boolean isCategorySelected = false;
+		final boolean isTagSelected = tagItems > 0 && tourItems == 0 && categoryItems == 0 && otherItems == 0;
+		final boolean isCategorySelected = categoryItems > 0 && tourItems == 0 && tagItems == 0 && otherItems == 0;
+
 		final TVITagViewItem firstElement = (TVITagViewItem) selection.getFirstElement();
 		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
 
-		if (firstElement instanceof TVITagViewTag) {
-			isTagSelected = true;
-		} else if (firstElement instanceof TVITagViewTagCategory) {
-			isCategorySelected = true;
-		}
-
 		// enable rename action
 		if (selectedItems == 1) {
-
 			if (isTagSelected) {
 				fActionRenameTag.setText(Messages.action_tag_rename_tag);
 				fActionRenameTag.setEnabled(true);
@@ -775,9 +984,10 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		}
 
 		/*
-		 * tree expand type can be set only for one tag
+		 * tree expand type can be set if only tags are selected or when an item is selected which
+		 * is not a category
 		 */
-		fActionSetTagStructure.setEnabled(isTagSelected && selectedItems == 1);
+		fActionSetTagStructure.setEnabled(isTagSelected || (items == 1 && categoryItems == 0));
 
 		fActionExpandSelection.setEnabled(firstElement == null ? false : //
 				selectedItems == 1 ? firstElementHasChildren : //
@@ -1008,6 +1218,17 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 //		final TreePath[] expandedTreePaths = fTagViewer.getExpandedTreePaths();
 //		fTagViewer.setExpandedTreePaths(expandedTreePaths);
 //		fTagViewer.setExpandedElements(expandedElements);
+	}
+
+	private void setCellColor(final ViewerCell cell, final Object element) {
+		// set color
+		if (element instanceof TVITagViewTag) {
+			cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_COLOR));
+		} else if (element instanceof TVITagViewYear) {
+			cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_COLOR));
+		} else if (element instanceof TVITagViewMonth) {
+			cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_SUB_COLOR));
+		}
 	}
 
 	@Override

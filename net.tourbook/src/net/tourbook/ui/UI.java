@@ -351,7 +351,7 @@ public class UI {
 	}
 
 	/**
-	 * set the tag colors from the pref store
+	 * set the tag colors in the JFace color registry from the pref store
 	 * 
 	 * @param prefs
 	 */

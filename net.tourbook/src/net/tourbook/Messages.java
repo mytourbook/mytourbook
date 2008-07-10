@@ -372,6 +372,10 @@ public class Messages extends NLS {
 
 	public static String	pref_tag_color_tag_category;
 
+	public static String	pref_tag_label_color_group;
+
+	public static String	pref_tag_show_lines;
+
 	public static String		pref_tourtag_btn_new_tag;
 
 	public static String		pref_tourtag_btn_new_tag_category;
@@ -383,7 +387,11 @@ public class Messages extends NLS {
 	public static String		pref_tourtag_dlg_new_tag_message;
 	public static String		pref_tourtag_dlg_new_tag_title;
 	public static String		pref_tourtag_dlg_rename_message;
+
+	public static String	pref_tourtag_dlg_rename_message_category;
 	public static String		pref_tourtag_dlg_rename_title;
+
+	public static String	pref_tourtag_dlg_rename_title_category;
 	public static String		pref_tourtag_viewer_title;
 
 	public static String		Pref_Statistic_Label_altitude;

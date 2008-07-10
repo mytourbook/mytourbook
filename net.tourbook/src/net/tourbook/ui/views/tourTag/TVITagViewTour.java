@@ -34,9 +34,7 @@ public class TVITagViewTour extends TVITagViewItem {
 															+ "deviceTimeInterval," //	5
 															+ "startDistance," //		6
 															//
-															+ SQL_TOUR_SUM_COLUMNS; //	7
-
-	private TVITagViewItem		fParentItem;
+															+ SQL_SUM_COLUMNS_TOUR; //	7
 
 	long						tourId;
 
@@ -55,7 +53,7 @@ public class TVITagViewTour extends TVITagViewItem {
 	public short				deviceTimeInterval;
 
 	public TVITagViewTour(final TVITagViewItem parentItem) {
-		fParentItem = parentItem;
+		setParentItem(parentItem);
 	}
 
 	@Override
@@ -76,17 +74,13 @@ public class TVITagViewTour extends TVITagViewItem {
 	@Override
 	protected void fetchChildren() {}
 
-	public TVITagViewItem getRootItem() {
-		return fParentItem;
-	}
-
 	public void getTourColumnData(final ResultSet result, final Object resultTagId, final int startIndex)
 			throws SQLException {
 
 		tourYear = result.getInt(startIndex + 0);
 		tourMonth = result.getInt(startIndex + 1);
 		tourDay = result.getInt(startIndex + 2);
-		
+
 		tourDate = new DateTime(tourYear, tourMonth, tourDay, 0, 0, 0, 0);
 
 		tourTitle = result.getString(startIndex + 3);

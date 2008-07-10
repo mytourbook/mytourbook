@@ -42,7 +42,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 														+ "SUM(1)";		//				11	//$NON-NLS-1$
 
-	static final String	SQL_TOUR_SUM_COLUMNS	= ""//
+	static final String	SQL_SUM_COLUMNS_TOUR	= ""//
 														+ "tourDistance," // 			0	//$NON-NLS-1$
 														+ "tourRecordingTime," //		1	//$NON-NLS-1$
 														+ "tourDrivingTime," //			2	//$NON-NLS-1$

@@ -145,6 +145,23 @@ public abstract class TreeColumnFactory {
 		};
 	};
 	
+	public static final TreeColumnFactory ALTITUDE_DOWN = new TreeColumnFactory() {
+		
+		@Override
+		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final TreeColumnDefinition colDef = new TreeColumnDefinition("altitudeDown", SWT.TRAIL); //$NON-NLS-1$
+			colDef.setLabel(Messages.ColumnFactory_altitude_up_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setText(UI.UNIT_LABEL_ALTITUDE);
+			colDef.setToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
+			colDef.setWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			
+			columnManager.addColumn(colDef); 
+			
+			return colDef;
+		};
+	};
+	
 	public static final TreeColumnFactory DEVICE_DISTANCE = new TreeColumnFactory() {
 		
 		@Override
