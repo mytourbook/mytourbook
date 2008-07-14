@@ -39,7 +39,6 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
-import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
@@ -57,7 +56,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerSorter;
@@ -92,15 +90,12 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourSegmenterView extends ViewPart implements ITourViewer {
 
-	public static final String		ID							= "net.tourbook.views.TourSegmenter";	//$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.views.TourSegmenter";	//$NON-NLS-1$
 
-	private static final String		MEMENTO_COLUMN_SORT_ORDER	= "tourSegmenter.column_sort_order";	//$NON-NLS-1$
-	private static final String		MEMENTO_COLUMN_WIDTH		= "tourSegmenter.column_width";		//$NON-NLS-1$
-
-	private static final int		COLUMN_DEFAULT				= 0;									// sort by time
-	private static final int		COLUMN_SPEED				= 10;
-	private static final int		COLUMN_PACE					= 20;
-	private static final int		COLUMN_GRADIENT				= 30;
+	private static final int		COLUMN_DEFAULT	= 0;									// sort by time
+	private static final int		COLUMN_SPEED	= 10;
+	private static final int		COLUMN_PACE		= 20;
+	private static final int		COLUMN_GRADIENT	= 30;
 
 	private static IMemento			fSessionMemento;
 
@@ -128,7 +123,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private PostSelectionProvider	fPostSelectionProvider;
 
-	private final NumberFormat		fNf							= NumberFormat.getNumberInstance();
+	private final NumberFormat		fNf				= NumberFormat.getNumberInstance();
 
 	private TourEditor				fTourEditor;
 
@@ -302,21 +297,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 					UI.updateUnits();
 
-					// dispose viewer
-					saveViewerSettings(fSessionMemento);
-					final Control[] children = fViewerContainer.getChildren();
-					for (int childIndex = 0; childIndex < children.length; childIndex++) {
-						children[childIndex].dispose();
-					}
-
-					// recreate viewer
-					createTableViewer(fViewerContainer);
-					restoreViewerSettings(fSessionMemento);
-
-					fViewerContainer.layout();
-
-					// update viewer content
-					setTableInput();
+					recreateViewer();
 
 					// refresh tour with the new measurement system
 					fireSegmentLayerChanged();
@@ -365,6 +346,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		// define all columns
+		fColumnManager = new ColumnManager(this, fSessionMemento);
+		defineViewerColumns(parent);
+
 		fPageBook = new PageBook(parent, SWT.NONE);
 
 		fPageNoChart = new Label(fPageBook, SWT.WRAP);
@@ -378,7 +363,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fViewerContainer = new Composite(fPageSegmenter, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(fViewerContainer);
 		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
-		createTableViewer(fViewerContainer);
+		createSegmentViewer(fViewerContainer);
 
 		createMenus();
 		createActions();
@@ -395,8 +380,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// set default value, show segments in opened charts
 		fShowSegmentsInChart = true;
 		fActionShowSegments.setChecked(fShowSegmentsInChart);
-
-		restoreViewerSettings(fSessionMemento);
 
 		// update viewer with current selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
@@ -453,7 +436,45 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fLabelToleranceValue.setLayoutData(gd);
 	}
 
-	private void createTableColumns(final Composite parent) {
+	private void createSegmentViewer(final Composite parent) {
+		// table
+		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
+
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+
+		fSegmentViewer = new TableViewer(table);
+		fColumnManager.createColumns();
+
+		fSegmentViewer.setContentProvider(new ViewContentProvider());
+		fSegmentViewer.setSorter(new ViewSorter());
+
+		fSegmentViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(final SelectionChangedEvent event) {
+
+				final StructuredSelection selection = (StructuredSelection) event.getSelection();
+
+				if (selection != null) {
+
+					/*
+					 * select the chart sliders according to the selected segment(s)
+					 */
+
+					final Object[] segments = selection.toArray();
+
+					if (segments.length > 0) {
+						final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(fTourChart,
+								((TourSegment) (segments[0])).serieIndexStart,
+								((TourSegment) (segments[segments.length - 1])).serieIndexEnd);
+						fPostSelectionProvider.setSelection(selectionSliderPosition);
+					}
+				}
+			}
+		});
+	}
+
+	private void defineViewerColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 		TableColumnDefinition colDef;
@@ -647,49 +668,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	}
 
-	private void createTableViewer(final Composite parent) {
-
-		// table
-		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
-
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
-
-		fSegmentViewer = new TableViewer(table);
-
-		// define and create all columns
-		fColumnManager = new ColumnManager(this);
-		createTableColumns(parent);
-		fColumnManager.createColumns();
-
-		fSegmentViewer.setContentProvider(new ViewContentProvider());
-		fSegmentViewer.setSorter(new ViewSorter());
-
-		fSegmentViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(final SelectionChangedEvent event) {
-
-				final StructuredSelection selection = (StructuredSelection) event.getSelection();
-
-				if (selection != null) {
-
-					/*
-					 * select the chart sliders according to the selected segment(s)
-					 */
-
-					final Object[] segments = selection.toArray();
-
-					if (segments.length > 0) {
-						final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(fTourChart,
-								((TourSegment) (segments[0])).serieIndexStart,
-								((TourSegment) (segments[segments.length - 1])).serieIndexEnd);
-						fPostSelectionProvider.setSelection(selectionSliderPosition);
-					}
-				}
-			}
-		});
-	}
-
 	@Override
 	public void dispose() {
 
@@ -768,8 +746,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return (int) ((Math.pow(fScaleTolerance.getSelection(), 2.05)) / 50.0);
 	}
 
-	public TreeViewer getTreeViewer() {
-		return null;
+	public ColumnViewer getViewer() {
+		return fSegmentViewer;
 	}
 
 	@Override
@@ -935,29 +913,26 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fireSegmentLayerChanged();
 	}
 
-	public void reloadViewer() {
-	// TODO Auto-generated method stub
+	public void recreateViewer() {
 
+		saveViewerSettings(fSessionMemento);
+
+		// dispose viewer
+		final Control[] children = fViewerContainer.getChildren();
+		for (int childIndex = 0; childIndex < children.length; childIndex++) {
+			children[childIndex].dispose();
+		}
+
+		// recreate viewer
+		createSegmentViewer(fViewerContainer);
+
+		fViewerContainer.layout();
+
+		// update viewer content
+		setTableInput();
 	}
 
-	private void restoreViewerSettings(final IMemento memento) {
-
-		if (memento == null) {
-			return;
-		}
-
-		// restore table columns sort order
-		final String mementoColumnSortOrderIds = memento.getString(MEMENTO_COLUMN_SORT_ORDER);
-		if (mementoColumnSortOrderIds != null) {
-			fColumnManager.orderColumns(StringToArrayConverter.convertStringToArray(mementoColumnSortOrderIds));
-		}
-
-		// restore column width
-		final String mementoColumnWidth = memento.getString(MEMENTO_COLUMN_WIDTH);
-		if (mementoColumnWidth != null) {
-			fColumnManager.setColumnWidth(StringToArrayConverter.convertStringToArray(mementoColumnWidth));
-		}
-	}
+	public void reloadViewer() {}
 
 	private void savePartSettings() {
 
@@ -968,7 +943,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	@Override
 	public void saveState(final IMemento memento) {
-
 		saveViewerSettings(memento);
 	}
 
@@ -978,15 +952,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			return;
 		}
 
-		// save column sort order
-		memento.putString(MEMENTO_COLUMN_SORT_ORDER,
-				StringToArrayConverter.convertArrayToString(fColumnManager.getColumnIds()));
-
-		// save columns width
-		final String[] columnIdAndWidth = fColumnManager.getColumnIdAndWidth();
-		if (columnIdAndWidth != null) {
-			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(columnIdAndWidth));
-		}
+		fColumnManager.saveState(memento);
 	}
 
 	@Override

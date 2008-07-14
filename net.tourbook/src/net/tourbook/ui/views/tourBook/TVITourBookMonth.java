@@ -26,19 +26,13 @@ import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
-public class TVITourBookMonth extends TourBookTreeViewerItem {
+public class TVITourBookMonth extends TVITourBookItem {
 
-	public TVITourBookMonth(final TourBookView view,
-							final TourBookTreeViewerItem parentItem,
-							final int year,
-							final int month) {
+	public TVITourBookMonth(final TourBookView view, final TVITourBookItem parentItem) {
 
 		super(view);
 
 		setParentItem(parentItem);
-
-		fTourYear = year;
-		fTourMonth = fFirstColumn = month;
 	}
 
 	@Override
@@ -89,7 +83,7 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 				+ (" WHERE STARTYEAR = ?")//				//$NON-NLS-1$
 				+ (" AND STARTMONTH = ?")//					//$NON-NLS-1$
 				+ sqlFilter.getWhereClause()
-				
+
 				+ " ORDER BY StartDay, StartHour, StartMinute"; //$NON-NLS-1$
 
 		try {
@@ -129,18 +123,24 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 
 					tourItem.fTourId = tourId;
 
-					tourItem.fTourYear = result.getInt(1);
-					tourItem.fTourMonth = result.getInt(2);
-					tourItem.fTourDay = tourItem.fFirstColumn = result.getInt(3);
+					final int dbYear = result.getInt(1);
+					final int dbMonth = result.getInt(2);
+					final int dbDay = result.getInt(3);
 
-					fCalendar.set(tourItem.fTourYear, tourItem.fTourMonth - 1, tourItem.fTourDay);
+					tourItem.treeColumn = Integer.toString(dbDay);
+
+					tourItem.fTourYear = dbYear;
+					tourItem.fTourMonth = dbMonth;
+					tourItem.fTourDay = dbDay;
+
+					fCalendar.set(dbYear, dbMonth - 1, dbDay);
 					tourItem.fTourDate = fCalendar.getTimeInMillis();
 
-					tourItem.fColumnDistance = result.getLong(4);
-					tourItem.fColumnRecordingTime = result.getLong(5);
-					tourItem.fColumnDrivingTime = result.getLong(6);
-					tourItem.fColumnAltitudeUp = result.getLong(7);
-					tourItem.fColumnAltitudeDown = result.getLong(8);
+					tourItem.colDistance = result.getLong(4);
+					tourItem.colRecordingTime = result.getLong(5);
+					tourItem.colDrivingTime = result.getLong(6);
+					tourItem.colAltitudeUp = result.getLong(7);
+					tourItem.colAltitudeDown = result.getLong(8);
 
 					tourItem.fColumnStartDistance = result.getLong(9);
 
@@ -151,19 +151,17 @@ public class TVITourBookMonth extends TourBookTreeViewerItem {
 
 					tourItem.fTourTitle = result.getString(12);
 					tourItem.fColumnTimeInterval = result.getShort(13);
-					tourItem.fColumnMaxSpeed = result.getFloat(14);
+					tourItem.colMaxSpeed = result.getFloat(14);
 
-					if (tourItem.fColumnDrivingTime != 0) {
-						tourItem.fColumnAvgSpeed = (float) tourItem.fColumnDistance
-								/ (float) tourItem.fColumnDrivingTime
-								* 3.6f;
+					if (tourItem.colDrivingTime != 0) {
+						tourItem.colAvgSpeed = (float) tourItem.colDistance / (float) tourItem.colDrivingTime * 3.6f;
 					}
 
-					tourItem.fColumnMaxAltitude = result.getLong(15);
-					tourItem.fColumnMaxPulse = result.getLong(16);
-					tourItem.fColumnAvgPulse = result.getLong(17);
-					tourItem.fColumnAvgCadence = result.getLong(18);
-					tourItem.fColumnAvgTemperature = result.getLong(19);
+					tourItem.colMaxAltitude = result.getLong(15);
+					tourItem.colMaxPulse = result.getLong(16);
+					tourItem.colAvgPulse = result.getLong(17);
+					tourItem.colAvgCadence = result.getLong(18);
+					tourItem.colAvgTemperature = result.getLong(19);
 
 					if (resultTagId instanceof Long) {
 						tourItem.fTagIds = tagIds = new ArrayList<Long>();

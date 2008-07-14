@@ -26,22 +26,29 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.ActionRemoveAllTags;
+import net.tourbook.tag.ActionSetTourTag;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ActionEditTour;
 import net.tourbook.ui.ActionModifyColumns;
+import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ISelectedTours;
@@ -76,7 +83,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
@@ -117,8 +123,6 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private static final String				MEMENTO_SASH_CONTAINER			= "importview.sash.container.";				//$NON-NLS-1$
 	private static final String				MEMENTO_IMPORT_FILENAME			= "importview.raw-data.filename";				//$NON-NLS-1$
 	private static final String				MEMENTO_SELECTED_TOUR_INDEX		= "importview.selected-tour-index";			//$NON-NLS-1$
-	private static final String				MEMENTO_COLUMN_SORT_ORDER		= "importview.column_sort_order";				//$NON-NLS-1$
-	private static final String				MEMENTO_COLUMN_WIDTH			= "importview.column_width";					//$NON-NLS-1$
 
 	private static final String				MEMENTO_MERGE_TRACKS			= "importview.action.merge-tracks";			//$NON-NLS-1$
 	private static final String				MEMENTO_IS_CHECKSUM_VALIDATION	= "importview.action.is-checksum-validation";	//$NON-NLS-1$
@@ -136,6 +140,11 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private ActionDisableChecksumValidation	fActionDisableChecksumValidation;
 	private ActionSetTourType				fActionSetTourType;
 	private ActionEditQuick					fActionEditQuick;
+	private ActionEditTour					fActionEditTour;
+	private ActionSetTourTag				fActionAddTag;
+	private ActionSetTourTag				fActionRemoveTag;
+	private ActionRemoveAllTags				fActionRemoveAllTags;
+	private ActionOpenPrefDialog			fActionOpenTagPrefs;
 
 	private ImageDescriptor					imageDatabaseDescriptor;
 	private ImageDescriptor					imageDatabaseOtherPersonDescriptor;
@@ -214,7 +223,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				if (RawDataView.this == partRef.getPart(false)) {
 					fIsPartVisible = true;
 					if (fIsViewerPersonDataDirty || (fNewActivePerson != fActivePerson)) {
-						updateViewer();
+						reloadViewer();
 						updateViewerPersonData();
 						fNewActivePerson = fActivePerson;
 						fIsViewerPersonDataDirty = false;
@@ -226,6 +235,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	}
 
 	private void addPrefListener() {
+
+		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
+
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
@@ -255,20 +267,29 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 					UI.updateUnits();
 
-					saveSettings();
+					fColumnManager.saveState(fSessionMemento);
+					fColumnManager.resetColumns();
+					defineViewerColumns(fViewerContainer);
 
-					fTourViewer.getTable().dispose();
-					createTourViewer(fViewerContainer);
-					fViewerContainer.layout();
+					recreateViewer();
 
-					restoreState(fSessionMemento);
+				} else if (property.equals(ITourbookPreferences.TAG_COLOR_AND_LAYOUT_CHANGED)) {
 
-					// update the viewer
-					updateViewer();
+					fTourViewer.getTable()
+							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+
+					fTourViewer.refresh();
+
+					/*
+					 * the tree must be redrawn because the styled text does not show with the new
+					 * color
+					 */
+					fTourViewer.getTable().redraw();
 				}
 			}
 		};
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+
+		prefStore.addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	private void addSelectionListener() {
@@ -290,7 +311,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 						RawDataManager.getInstance().updateTourDataFromDb();
 
 						// update the table viewer
-						updateViewer();
+						reloadViewer();
 					} else {
 						fIsViewerPersonDataDirty = true;
 					}
@@ -311,6 +332,12 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
 
 					fTourViewer.update(modifiedTours.toArray(), null);
+
+				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
+
+					RawDataManager.getInstance().updateTourDataFromDb();
+
+					reloadViewer();
 				}
 			}
 		};
@@ -318,6 +345,8 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	}
 
 	private void createActions() {
+
+		fActionEditTour = new ActionEditTour(this);
 
 		fActionClearView = new ActionClearView(this);
 		fActionModifyColumns = new ActionModifyColumns(this);
@@ -329,26 +358,12 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fActionMergeTours = new ActionMergeTours(this);
 		fActionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
 
-		/*
-		 * fill view toolbar
-		 */
-		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
+		fActionAddTag = new ActionSetTourTag(this, true);
+		fActionRemoveTag = new ActionSetTourTag(this, false);
+		fActionRemoveAllTags = new ActionRemoveAllTags(this);
 
-		// place for import and transfer actions
-		viewTbm.add(new GroupMarker("import")); //$NON-NLS-1$
-
-		viewTbm.add(fActionClearView);
-
-		/*
-		 * fill view menu
-		 */
-		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-		menuMgr.add(fActionModifyColumns);
-
-		menuMgr.add(new Separator());
-		menuMgr.add(fActionMergeTours);
-		menuMgr.add(fActionDisableChecksumValidation);
-		menuMgr.add(fActionAdjustImportedYear);
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
+				"net.tourbook.preferences.PrefPageTags");
 
 	}
 
@@ -385,12 +400,17 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 		createResources();
 
+		// define all columns
+		fColumnManager = new ColumnManager(this, fSessionMemento);
+		defineViewerColumns(parent);
+
 		fViewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
 
 		createTourViewer(fViewerContainer);
 
 		createActions();
+		fillToolbar();
 
 		addPartListener();
 		addSelectionListener();
@@ -437,10 +457,6 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		table.setLinesVisible(true);
 
 		fTourViewer = new TableViewer(table);
-
-		// define and create all columns
-		fColumnManager = new ColumnManager(this);
-		createTourViewerColumns(parent);
 		fColumnManager.createColumns();
 
 		// table viewer
@@ -459,11 +475,11 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 				final TourData tourData = (TourData) selection.getFirstElement();
 
-				if (tourData == null) {
-					return;
-				}
+				enableActions();
 
-				fPostSelectionProvider.setSelection(new SelectionTourData(null, tourData));
+				if (tourData != null) {
+					fPostSelectionProvider.setSelection(new SelectionTourData(null, tourData));
+				}
 			}
 		});
 
@@ -475,10 +491,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	 * 
 	 * @param parent
 	 */
-	private void createTourViewerColumns(final Composite parent) {
+	private void defineViewerColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
-
 		TableColumnDefinition colDef;
 
 		/*
@@ -557,6 +572,30 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				final TourType tourType = ((TourData) cell.getElement()).getTourType();
 				if (tourType != null) {
 					cell.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+				}
+			}
+		});
+
+		/*
+		 * column: tags
+		 */
+		colDef = TableColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final Set<TourTag> tourTags = ((TourData) element).getTourTags();
+
+				if (tourTags.size() > 0) {
+
+					// convert the tags into a list of tag ids 
+					final ArrayList<Long> tagIds = new ArrayList<Long>();
+					for (final TourTag tourTag : tourTags) {
+						tagIds.add(tourTag.getTagId());
+					}
+
+					cell.setText(TourDatabase.getTagNames(tagIds));
 				}
 			}
 		});
@@ -732,62 +771,136 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
-	private void fillContextMenu(final IMenuManager menuMgr) {
+	private void enableActions() {
 
-		final IStructuredSelection tourSelection = (IStructuredSelection) fTourViewer.getSelection();
+		final StructuredSelection selection = (StructuredSelection) fTourViewer.getSelection();
 
-		if (!tourSelection.isEmpty()) {
-			// menuMgr.add(new Action("Open the Tour") {
-			// public void run() {
-			// createChart(true);
-			// }
-			// });
-		}
+		final int selectedItems = selection.size();
+		int unsavedTours = 0;
+		int savedTours = 0;
+		TourData firstTour = null;
 
-		if (tourSelection.isEmpty() == false) {
+		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+			final Object treeItem = iter.next();
+			if (treeItem instanceof TourData) {
 
-			int unsavedTours = 0;
-			int savedTours = 0;
-			for (final Iterator<TourData> iter = tourSelection.iterator(); iter.hasNext();) {
-				final TourData tourData = iter.next();
+				final TourData tourData = (TourData) treeItem;
 				if (tourData.getTourPerson() == null) {
 					unsavedTours++;
 				} else {
+
+					if (savedTours == 0) {
+						firstTour = tourData;
+					}
+
 					savedTours++;
 				}
 			}
+		}
+		final boolean isTourSelected = savedTours > 0;
 
-			final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
-			if (person != null) {
-				fActionSaveTourWithPerson.setText(NLS.bind(Messages.import_data_action_save_tour_with_person,
-						person.getName()));
-				fActionSaveTourWithPerson.setPerson(person);
-				fActionSaveTourWithPerson.setEnabled(unsavedTours > 0);
-				menuMgr.add(fActionSaveTourWithPerson);
-			}
+		final TourPerson person = TourbookPlugin.getDefault().getActivePerson();
+		if (person != null) {
+			fActionSaveTourWithPerson.setText(NLS.bind(Messages.import_data_action_save_tour_with_person,
+					person.getName()));
+			fActionSaveTourWithPerson.setPerson(person);
+		}
+		fActionSaveTourWithPerson.setEnabled(person != null && unsavedTours > 0);
 
-			if (tourSelection.size() == 1) {
-				fActionSaveTour.setText(Messages.import_data_action_save_tour_for_person);
+		if (selection.size() == 1) {
+			fActionSaveTour.setText(Messages.import_data_action_save_tour_for_person);
+		} else {
+			fActionSaveTour.setText(Messages.import_data_action_save_tours_for_person);
+		}
+		fActionSaveTour.setEnabled(unsavedTours > 0);
+
+		fActionEditQuick.setEnabled(selectedItems == 1 && savedTours == 1);
+
+		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+
+		fActionAddTag.setEnabled(isTourSelected);
+
+		/*
+		 * enable/disable remove actions
+		 */
+		if (firstTour != null && savedTours == 1) {
+
+			// one tour is selected
+
+			final Set<TourTag> tourTags = firstTour.getTourTags();
+			if (tourTags != null && tourTags.size() > 0) {
+
+				// at least one tag is within the tour
+
+				fActionRemoveAllTags.setEnabled(true);
+				fActionRemoveTag.setEnabled(true);
 			} else {
-				fActionSaveTour.setText(Messages.import_data_action_save_tours_for_person);
+				// tags are not available
+				fActionRemoveAllTags.setEnabled(false);
+				fActionRemoveTag.setEnabled(false);
 			}
-			fActionSaveTour.setEnabled(unsavedTours > 0);
-			menuMgr.add(fActionSaveTour);
+		} else {
 
-			fActionEditQuick.setEnabled(savedTours == 1);
-			menuMgr.add(fActionEditQuick);
+			// multiple tours are selected
 
-			final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
-			fActionSetTourType.setEnabled(savedTours > 0 && tourTypes.size() > 0);
-			menuMgr.add(fActionSetTourType);
+			fActionRemoveTag.setEnabled(isTourSelected);
+			fActionRemoveAllTags.setEnabled(isTourSelected);
 		}
 
+		// enable/disable actions for the recent tags
+		TagManager.enableRecentTagActions(isTourSelected);
+
+	}
+
+	private void fillContextMenu(final IMenuManager menuMgr) {
+
+		menuMgr.add(fActionSaveTourWithPerson);
+		menuMgr.add(fActionSaveTour);
+
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionModifyColumns);
+		menuMgr.add(fActionEditQuick);
+		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionEditTour);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionAddTag);
+		menuMgr.add(fActionRemoveTag);
+		menuMgr.add(fActionRemoveAllTags);
+
+		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionOpenTagPrefs);
 
 		// add standard group which allows other plug-ins to contribute here
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+		enableActions();
+	}
+
+	private void fillToolbar() {
+		/*
+		 * fill view toolbar
+		 */
+		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
+
+		// place for import and transfer actions
+		viewTbm.add(new GroupMarker("import")); //$NON-NLS-1$
+
+		viewTbm.add(fActionClearView);
+
+		/*
+		 * fill view menu
+		 */
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+
+		menuMgr.add(fActionMergeTours);
+		menuMgr.add(fActionDisableChecksumValidation);
+		menuMgr.add(fActionAdjustImportedYear);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionModifyColumns);
 	}
 
 	void fireSelectionEvent(final ISelection selection) {
@@ -811,6 +924,8 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 	public ArrayList<TourData> getSelectedTours() {
 
+		final TourManager tourManager = TourManager.getInstance();
+
 		// get selected tours
 		final IStructuredSelection selectedTours = ((IStructuredSelection) fTourViewer.getSelection());
 
@@ -825,8 +940,19 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 				final TourData tourData = (TourData) tourItem;
 
+				/*
+				 * only tours are added which are saved in the database
+				 */
 				if (tourData.getTourPerson() != null) {
-					selectedTourData.add(tourData);
+
+					/*
+					 * get the data from the database because the tag names could be changed and
+					 * this is not reflected in the tours which are displayed in the raw data view
+					 */
+					final TourData tourDataInDb = tourManager.getTourData(tourData.getTourId());
+					if (tourDataInDb != null) {
+						selectedTourData.add(tourDataInDb);
+					}
 				}
 			}
 		}
@@ -834,12 +960,8 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		return selectedTourData;
 	}
 
-	public TableViewer getTourViewer() {
+	public ColumnViewer getViewer() {
 		return fTourViewer;
-	}
-
-	public TreeViewer getTreeViewer() {
-		return null;
 	}
 
 	@Override
@@ -857,7 +979,25 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		return false;
 	}
 
-	public void reloadViewer() {}
+	public void recreateViewer() {
+
+		fViewerContainer.setRedraw(false);
+		{
+			fTourViewer.getTable().dispose();
+			createTourViewer(fViewerContainer);
+			fViewerContainer.layout();
+
+			// update the viewer
+			reloadViewer();
+		}
+		fViewerContainer.setRedraw(true);
+	}
+
+	public void reloadViewer() {
+
+		// update tour data viewer
+		fTourViewer.setInput(RawDataManager.getInstance().getTourDataMap().values().toArray());
+	}
 
 	private void restoreState(final IMemento memento) {
 
@@ -893,18 +1033,6 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			}
 			rawDataManager.setIsChecksumValidation(fActionDisableChecksumValidation.isChecked() == false);
 
-			// restore table columns sort order
-			final String mementoColumnSortOrderIds = memento.getString(MEMENTO_COLUMN_SORT_ORDER);
-			if (mementoColumnSortOrderIds != null) {
-				fColumnManager.orderColumns(StringToArrayConverter.convertStringToArray(mementoColumnSortOrderIds));
-			}
-
-			// restore column width
-			final String mementoColumnWidth = memento.getString(MEMENTO_COLUMN_WIDTH);
-			if (mementoColumnWidth != null) {
-				fColumnManager.setColumnWidth(StringToArrayConverter.convertStringToArray(mementoColumnWidth));
-			}
-
 			// restore imported tours
 			final String mementoImportedFiles = memento.getString(MEMENTO_IMPORT_FILENAME);
 			final ArrayList<String> notImportedFiles = new ArrayList<String>();
@@ -933,7 +1061,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				if (importCounter > 0) {
 
 					rawDataManager.updateTourDataFromDb();
-					updateViewer();
+					reloadViewer();
 
 					// restore selected tour
 					final Integer selectedTourIndex = memento.getInteger(MEMENTO_SELECTED_TOUR_INDEX);
@@ -989,15 +1117,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		memento.putInteger(MEMENTO_MERGE_TRACKS, fActionMergeTours.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_IS_CHECKSUM_VALIDATION, fActionDisableChecksumValidation.isChecked() ? 0 : 1);
 
-		// save column sort order
-		memento.putString(MEMENTO_COLUMN_SORT_ORDER,
-				StringToArrayConverter.convertArrayToString(fColumnManager.getColumnIds()));
-
-		// save columns width
-		final String[] columnIdAndWidth = fColumnManager.getColumnIdAndWidth();
-		if (columnIdAndWidth != null) {
-			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(columnIdAndWidth));
-		}
+		fColumnManager.saveState(memento);
 	}
 
 	/**
@@ -1030,12 +1150,6 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	@Override
 	public void setFocus() {
 		fTourViewer.getControl().setFocus();
-	}
-
-	public void updateViewer() {
-
-		// update tour data viewer
-		fTourViewer.setInput(RawDataManager.getInstance().getTourDataMap().values().toArray());
 	}
 
 	/**

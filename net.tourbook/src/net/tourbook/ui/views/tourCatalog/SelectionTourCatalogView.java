@@ -41,9 +41,9 @@ public class SelectionTourCatalogView implements ISelection {
 	private int								fCompareStartIndex;
 	private int								fCompareEndIndex;
 
-	private TourCatalogItemYear				fYearItem;
+	private TVICatalogYearItem				fYearItem;
 
-	private TourCatalogItemReferenceTour	fRefItem;
+	private TVICatalogReferenceTour	fRefItem;
 
 	public SelectionTourCatalogView(Long refId) {
 		fRefId = refId;
@@ -78,17 +78,17 @@ public class SelectionTourCatalogView implements ISelection {
 	}
 
 	/**
-	 * @return Returns the item {@link TourCatalogItemReferenceTour} or <code>null</code> when
+	 * @return Returns the item {@link TVICatalogReferenceTour} or <code>null</code> when
 	 *         it's not set
 	 */
-	public TourCatalogItemReferenceTour getRefItem() {
+	public TVICatalogReferenceTour getRefItem() {
 		return fRefItem;
 	}
 
 	/**
-	 * @return Returns the item {@link TourCatalogItemYear} or <code>null</code> when it's not set
+	 * @return Returns the item {@link TVICatalogYearItem} or <code>null</code> when it's not set
 	 */
-	public TourCatalogItemYear getYearItem() {
+	public TVICatalogYearItem getYearItem() {
 		return fYearItem;
 	}
 
@@ -96,7 +96,7 @@ public class SelectionTourCatalogView implements ISelection {
 		return false;
 	}
 
-	public void setRefItem(TourCatalogItemReferenceTour refItem) {
+	public void setRefItem(TVICatalogReferenceTour refItem) {
 		fRefItem = refItem;
 	}
 
@@ -121,7 +121,7 @@ public class SelectionTourCatalogView implements ISelection {
 		fCompareEndIndex = compEndIndex;
 	}
 
-	public void setYearData(TourCatalogItemYear yearItem) {
+	public void setYearData(TVICatalogYearItem yearItem) {
 		fYearItem = yearItem;
 	}
 

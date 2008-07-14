@@ -141,7 +141,7 @@ public class TVITagViewTag extends TVITagViewItem {
 
 			sb.append("SELECT");
 
-			sb.append(" TourData.tourId,");//						1 
+			sb.append(" TourData.tourId,");//				1 
 			sb.append(" jTdataTtag2.TourTag_tagId,");//		2
 			sb.append(TVITagViewTour.SQL_TOUR_COLUMNS); //	3
 

@@ -28,6 +28,7 @@ import net.tourbook.tour.TreeViewerItem;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -35,17 +36,18 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionDeleteTour extends Action {
 
-	private TourBookView	tourView;
+	private TourBookView	fTourViewer;
 	private TreeViewerItem	fNextSelectedTreeItem;
 
 	public ActionDeleteTour(final TourBookView tourBookView) {
 
-		this.tourView = tourBookView;
+		fTourViewer = tourBookView;
+
+		setText(Messages.Tour_Book_Action_delete_selected_tours);
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
 
-		setText(Messages.Tour_Book_Action_delete_selected_tours);
 
 		setEnabled(false);
 	}
@@ -96,7 +98,10 @@ public class ActionDeleteTour extends Action {
 		}
 
 		// refresh the tree viewer
-		tourView.getTreeViewer().remove(removedTours.toArray(new TVITourBookTour[removedTours.size()]));
+		final ColumnViewer viewer = fTourViewer.getViewer();
+		if (viewer instanceof TreeViewer) {
+			((TreeViewer) viewer).remove(removedTours.toArray(new TVITourBookTour[removedTours.size()]));
+		}
 
 		/*
 		 * select the item which is before the removed items, this is not yet finished because there
@@ -144,7 +149,7 @@ public class ActionDeleteTour extends Action {
 		}
 
 		final SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
-		final TreeViewer treeViewer = tourView.getTreeViewer();
+		final ColumnViewer treeViewer = fTourViewer.getViewer();
 
 		// get selected reference tours
 		final IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
@@ -153,7 +158,7 @@ public class ActionDeleteTour extends Action {
 		deleteTours(selection.iterator(), selectionRemovedTours);
 
 		// fire post selection
-		tourView.firePostSelection(selectionRemovedTours);
+		fTourViewer.firePostSelection(selectionRemovedTours);
 
 		// set selection empty
 		selectionRemovedTours.removedTours.clear();

@@ -109,9 +109,9 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-			if (firstElement instanceof TourCatalogItemComparedTour) {
+			if (firstElement instanceof TVICatalogComparedTour) {
 
-				showRefTour(((TourCatalogItemComparedTour) firstElement).getRefId());
+				showRefTour(((TVICatalogComparedTour) firstElement).getRefId());
 
 			} else if (firstElement instanceof CompareResultItemComparedTour) {
 

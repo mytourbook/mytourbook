@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -50,35 +50,40 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class ColumnModifyDialog extends TrayDialog {
 
-	private ColumnManager		fColumnManager;
-	private CheckboxTableViewer	fColumnViewer;
+	private ColumnManager				fColumnManager;
+	private CheckboxTableViewer			fColumnViewer;
 
-	private Button				fBtnMoveUp;
-	private Button				fBtnMoveDown;
-	private Button				fBtnSelectAll;
-	private Button				fBtnDeselectAll;
+	private Button						fBtnMoveUp;
+	private Button						fBtnMoveDown;
+	private Button						fBtnSelectAll;
+	private Button						fBtnDeselectAll;
 
-	public ColumnModifyDialog(Shell parentShell, ColumnManager columnManager) {
+	private ArrayList<ColumnDefinition>	fAllColumns;
+
+	public ColumnModifyDialog(	final Shell parentShell,
+								final ColumnManager columnManager,
+								final ArrayList<ColumnDefinition> allDialogColumns) {
 
 		super(parentShell);
 
 		fColumnManager = columnManager;
+		fAllColumns = allDialogColumns;
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
 
 	@Override
-	protected void configureShell(Shell newShell) {
+	protected void configureShell(final Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(Messages.ColumnModifyDialog_Dialog_title);
 	}
 
-	private void createButtons(Composite parent) {
+	private void createButtons(final Composite parent) {
 
-		Composite btnContainer = new Composite(parent, SWT.NONE);
+		final Composite btnContainer = new Composite(parent, SWT.NONE);
 		btnContainer.setLayout(new GridLayout());
-		GridData gd = new GridData();
+		final GridData gd = new GridData();
 		gd.verticalAlignment = SWT.BEGINNING;
 		btnContainer.setLayoutData(gd);
 
@@ -86,7 +91,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		fBtnMoveUp.setText(Messages.ColumnModifyDialog_Button_move_up);
 		fBtnMoveUp.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				moveSelectionUp();
 				enableUpDownButtons();
 			}
@@ -97,7 +102,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		fBtnMoveDown.setText(Messages.ColumnModifyDialog_Button_move_down);
 		fBtnMoveDown.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				moveSelectionDown();
 				enableUpDownButtons();
 			}
@@ -111,10 +116,10 @@ public class ColumnModifyDialog extends TrayDialog {
 		fBtnSelectAll.setText(Messages.ColumnModifyDialog_Button_select_all);
 		fBtnSelectAll.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 
 				// update model
-				for (ColumnDefinition colDef : fColumnManager.getColumns()) {
+				for (final ColumnDefinition colDef : fAllColumns) {
 					colDef.setIsVisibleInDialog(true);
 				}
 
@@ -128,13 +133,13 @@ public class ColumnModifyDialog extends TrayDialog {
 		fBtnDeselectAll.setText(Messages.ColumnModifyDialog_Button_deselect_all);
 		fBtnDeselectAll.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 
 				// list with all columns which must be checked
-				ArrayList<ColumnDefinition> checkedElements = new ArrayList<ColumnDefinition>();
+				final ArrayList<ColumnDefinition> checkedElements = new ArrayList<ColumnDefinition>();
 
 				// update model
-				for (ColumnDefinition colDef : fColumnManager.getColumns()) {
+				for (final ColumnDefinition colDef : fAllColumns) {
 					if (colDef.canModifyVisibility() == false) {
 						checkedElements.add(colDef);
 						colDef.setIsVisibleInDialog(true);
@@ -150,15 +155,15 @@ public class ColumnModifyDialog extends TrayDialog {
 		setButtonLayoutData(fBtnDeselectAll);
 	}
 
-	private void createColumnsViewer(Composite parent) {
+	private void createColumnsViewer(final Composite parent) {
 
-		TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
+		final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
 		tableLayouter.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		/*
 		 * create table
 		 */
-		Table table = new Table(tableLayouter, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER);
+		final Table table = new Table(tableLayouter, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER);
 		fColumnViewer = new CheckboxTableViewer(table);
 
 		TableViewerColumn tvc;
@@ -168,9 +173,9 @@ public class ColumnModifyDialog extends TrayDialog {
 
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
-				ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-				cell.setText(colDef.getLabel());
+			public void update(final ViewerCell cell) {
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(colDef.getColumnLabel());
 
 				// paint columns in a different color which can't be hidden
 				if (colDef.canModifyVisibility() == false) {
@@ -183,15 +188,15 @@ public class ColumnModifyDialog extends TrayDialog {
 
 			public void dispose() {}
 
-			public Object[] getElements(Object inputElement) {
-				return fColumnManager.getColumns().toArray();
+			public Object[] getElements(final Object inputElement) {
+				return fAllColumns.toArray();
 			}
 
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 		});
 
 		fColumnViewer.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(CheckStateChangedEvent event) {
+			public void checkStateChanged(final CheckStateChangedEvent event) {
 
 				final ColumnDefinition colDef = (ColumnDefinition) event.getElement();
 
@@ -212,29 +217,26 @@ public class ColumnModifyDialog extends TrayDialog {
 		});
 
 		fColumnViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
+			public void selectionChanged(final SelectionChangedEvent event) {
 				enableUpDownButtons();
 			}
 		});
 	}
 
 	@Override
-	protected Control createDialogArea(Composite parent) {
+	protected Control createDialogArea(final Composite parent) {
 
-		Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
+		final Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
 
 		createUI(dlgAreaContainer);
 
+		// load columns into the viewer
 		fColumnViewer.setInput(this);
 
-		// check visible columns
-		ArrayList<ColumnDefinition> visibleColumns = new ArrayList<ColumnDefinition>();
-		for (ColumnDefinition colDef : fColumnManager.getColumns()) {
-
-			final boolean isVisible = colDef.isVisible();
-			colDef.setIsVisibleInDialog(isVisible);
-
-			if (isVisible) {
+		// check columns which are visible
+		final ArrayList<ColumnDefinition> visibleColumns = new ArrayList<ColumnDefinition>();
+		for (final ColumnDefinition colDef : fAllColumns) {
+			if (colDef.isVisibleInDialog()) {
 				visibleColumns.add(colDef);
 			}
 		}
@@ -245,7 +247,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		return dlgAreaContainer;
 	}
 
-	private void createUI(Composite parent) {
+	private void createUI(final Composite parent) {
 
 		Label label;
 		GridLayout gl;
@@ -253,7 +255,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		label = new Label(parent, SWT.NONE);
 		label.setText(Messages.ColumnModifyDialog_Label_info);
 
-		Composite dlgContainer = new Composite(parent, SWT.NONE);
+		final Composite dlgContainer = new Composite(parent, SWT.NONE);
 		dlgContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		gl = new GridLayout(2, false);
 		dlgContainer.setLayout(gl);
@@ -268,39 +270,23 @@ public class ColumnModifyDialog extends TrayDialog {
 		createButtons(dlgContainer);
 	}
 
-	@Override
-	protected void okPressed() {
-
-		// update column definition with the check state
-		for (Object element : fColumnViewer.getTable().getItems()) {
-			final TableItem tableItem = (TableItem) element;
-
-			ColumnDefinition colDef = (ColumnDefinition) tableItem.getData();
-			colDef.setIsVisibleInDialog(tableItem.getChecked());
-		}
-
-		fColumnManager.orderColumns(fColumnViewer.getTable().getItems());
-
-		super.okPressed();
-	}
-
 	/**
 	 * check if the up/down button are enabled
 	 */
 	private void enableUpDownButtons() {
 
-		Table table = fColumnViewer.getTable();
-		TableItem[] items = table.getSelection();
+		final Table table = fColumnViewer.getTable();
+		final TableItem[] items = table.getSelection();
 
-		boolean isSelected = items != null && items.length > 0;
+		final boolean isSelected = items != null && items.length > 0;
 
 		boolean isUpEnabled = isSelected;
 		boolean isDownEnabled = isSelected;
 
 		if (isSelected) {
 
-			int indices[] = table.getSelectionIndices();
-			int max = table.getItemCount();
+			final int indices[] = table.getSelectionIndices();
+			final int max = table.getItemCount();
 
 			isUpEnabled = indices[0] != 0;
 			isDownEnabled = indices[indices.length - 1] < max - 1;
@@ -318,7 +304,7 @@ public class ColumnModifyDialog extends TrayDialog {
 	/**
 	 * Moves an entry in the table to the given index.
 	 */
-	private void move(TableItem item, int index) {
+	private void move(final TableItem item, final int index) {
 
 		final ColumnDefinition colDef = (ColumnDefinition) item.getData();
 
@@ -334,15 +320,15 @@ public class ColumnModifyDialog extends TrayDialog {
 	 * Move the current selection in the build list down.
 	 */
 	private void moveSelectionDown() {
-		Table table = fColumnViewer.getTable();
-		int indices[] = table.getSelectionIndices();
+		final Table table = fColumnViewer.getTable();
+		final int indices[] = table.getSelectionIndices();
 		if (indices.length < 1) {
 			return;
 		}
-		int newSelection[] = new int[indices.length];
-		int max = table.getItemCount() - 1;
+		final int newSelection[] = new int[indices.length];
+		final int max = table.getItemCount() - 1;
 		for (int i = indices.length - 1; i >= 0; i--) {
-			int index = indices[i];
+			final int index = indices[i];
 			if (index < max) {
 				move(table.getItem(index), index + 1);
 				newSelection[i] = index + 1;
@@ -355,17 +341,25 @@ public class ColumnModifyDialog extends TrayDialog {
 	 * Move the current selection in the build list up.
 	 */
 	private void moveSelectionUp() {
-		Table table = fColumnViewer.getTable();
-		int indices[] = table.getSelectionIndices();
-		int newSelection[] = new int[indices.length];
+		final Table table = fColumnViewer.getTable();
+		final int indices[] = table.getSelectionIndices();
+		final int newSelection[] = new int[indices.length];
 		for (int i = 0; i < indices.length; i++) {
-			int index = indices[i];
+			final int index = indices[i];
 			if (index > 0) {
 				move(table.getItem(index), index - 1);
 				newSelection[i] = index - 1;
 			}
 		}
 		table.setSelection(newSelection);
+	}
+
+	@Override
+	protected void okPressed() {
+
+		fColumnManager.updateColumns(fColumnViewer.getTable().getItems());
+
+		super.okPressed();
 	}
 
 }

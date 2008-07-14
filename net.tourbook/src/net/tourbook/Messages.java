@@ -42,35 +42,28 @@ public class Messages extends NLS {
 	public static String		action_tag_dlg_rename_message;
 	public static String		action_tag_dlg_rename_title;
 	public static String		action_tag_remove_all;
-
-	public static String	action_tag_rename_tag;
-
-	public static String	action_tag_rename_tag_category;
+	public static String		action_tag_rename_tag;
+	public static String		action_tag_rename_tag_category;
 	public static String		action_tagcategory_dlg_rename_message;
 	public static String		action_tagcategory_dlg_rename_title;
-
-	public static String	action_tagView_flat_hierarchical;
-
-	public static String	action_tagView_flat_layout;
+	public static String		action_tagView_flat_hierarchical;
+	public static String		action_tagView_flat_layout;
 
 	public static String		app_action_collapse_all_tooltip;
-
-	public static String	app_action_collapse_others_tooltip;
+	public static String		app_action_collapse_others_tooltip;
 	public static String		app_action_expand_selection_tooltip;
 	public static String		app_action_expand_type_flat;
 	public static String		app_action_expand_type_year_day;
 	public static String		app_action_expand_type_year_month_day;
 	public static String		app_action_quick_edit;
-
 	public static String		app_action_tag_add;
 	public static String		app_action_tag_open_tagging_structure;
 	public static String		app_action_tag_recently_used;
 	public static String		app_action_tag_remove;
 	public static String		app_action_tag_set_all_tag_structures;
-
 	public static String		app_action_tag_set_tag_expand_type;
-
 	public static String		App_Action_set_tour_type;
+
 	public static String		App_measurement_imperial;
 	public static String		App_measurement_metric;
 	public static String		App_measurement_tooltip;
@@ -171,7 +164,6 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Cadence;
 	public static String		Graph_Label_Cadence_unit;
 	public static String		Graph_Label_Gradiend_unit;
-
 	public static String		Graph_Label_Gradient;
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_unit;
@@ -200,14 +192,10 @@ public class Messages extends NLS {
 	public static String		Image__delete_disabled;
 	public static String		Image__edit_tour;
 	public static String		Image__edit_tour_disabled;
-
 	public static String		Image__expand_all;
 	public static String		Image__fit_to_window;
-
 	public static String		Image__folder_closed;
-
 	public static String		Image__folder_opened;
-
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;
@@ -228,13 +216,11 @@ public class Messages extends NLS {
 	public static String		Image__graph_temperature_disabled;
 	public static String		Image__graph_tour_compare;
 	public static String		Image__graph_tour_compare_disabled;
-
-	public static String	Image__layout_flat;
-
-	public static String	Image__layout_hierarchical;
-
+	public static String		Image__layout_flat;
+	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
 	public static String		Image__open_tour_segmenter;
+	public static String		Image__options;
 	public static String		Image__refresh;
 	public static String		Image__remove_all;
 	public static String		Image__remove_all_disabled;
@@ -243,7 +229,6 @@ public class Messages extends NLS {
 	public static String		Image__save_tour;
 	public static String		Image__save_tour_disabled;
 	public static String		Image__show_distance_on_x_axis;
-
 	public static String		Image__show_distance_on_x_axis_disabled;
 	public static String		Image__show_time_on_x_axis;
 	public static String		Image__synch_graph_byScale;
@@ -252,11 +237,8 @@ public class Messages extends NLS {
 	public static String		Image__synch_graph_bySize_disabled;
 	public static String		Image__synch_statistics;
 	public static String		Image__tag;
-
 	public static String		Image__tag_category;
-
 	public static String		Image__tag_root;
-
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
 	public static String		Image__undo_edit;
@@ -364,34 +346,25 @@ public class Messages extends NLS {
 	public static String		pref_regional_useCustomDecimalFormat;
 	public static String		pref_regional_value_example;
 
-	public static String	pref_tag_color_sub_sub_tag;
-
-	public static String	pref_tag_color_sub_tag;
-
-	public static String	pref_tag_color_tag;
-
-	public static String	pref_tag_color_tag_category;
-
-	public static String	pref_tag_label_color_group;
-
-	public static String	pref_tag_show_lines;
+	public static String		pref_tag_color_sub_sub_tag;
+	public static String		pref_tag_color_sub_tag;
+	public static String		pref_tag_color_tag;
+	public static String		pref_tag_color_tag_category;
+	public static String		pref_tag_label_color_group;
+	public static String		pref_tag_show_lines;
 
 	public static String		pref_tourtag_btn_new_tag;
-
 	public static String		pref_tourtag_btn_new_tag_category;
 	public static String		pref_tourtag_btn_rename;
-
 	public static String		pref_tourtag_btn_reset;
 	public static String		pref_tourtag_dlg_new_tag_category_message;
 	public static String		pref_tourtag_dlg_new_tag_category_title;
 	public static String		pref_tourtag_dlg_new_tag_message;
 	public static String		pref_tourtag_dlg_new_tag_title;
 	public static String		pref_tourtag_dlg_rename_message;
-
-	public static String	pref_tourtag_dlg_rename_message_category;
+	public static String		pref_tourtag_dlg_rename_message_category;
 	public static String		pref_tourtag_dlg_rename_title;
-
-	public static String	pref_tourtag_dlg_rename_title_category;
+	public static String		pref_tourtag_dlg_rename_title_category;
 	public static String		pref_tourtag_viewer_title;
 
 	public static String		Pref_Statistic_Label_altitude;
@@ -510,10 +483,8 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Label_tolerance;
 
 	public static String		tag_view_action_refresh_view_tooltip;
-
-	public static String	tag_view_title_tag;
-
-	public static String	tag_view_title_tag_category;
+	public static String		tag_view_title_tag;
+	public static String		tag_view_title_tag_category;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;
@@ -531,7 +502,6 @@ public class Messages extends NLS {
 	public static String		tourCatalog_view_action_create_marker;
 	public static String		tourCatalog_view_action_create_reference_tour;
 	public static String		tourCatalog_view_action_create_right_marker;
-	public static String		tourCatalog_view_action_delete_compared_tour;
 	public static String		tourCatalog_view_action_delete_tours;
 	public static String		tourCatalog_view_action_link;
 

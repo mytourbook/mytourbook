@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 
 /**
@@ -35,11 +36,16 @@ public interface ITourViewer {
 	 * @return Returns the {@link TreeViewer} or <code>null</code> when a tree viewer is not
 	 *         available
 	 */
-	TreeViewer getTreeViewer();
+	ColumnViewer getViewer();
 
-	
+	/**
+	 * Recreates the viewer after the columns or the measurement system has changed
+	 */
+	void recreateViewer();
+
 	/**
 	 * Reloads the viewer completely
 	 */
 	void reloadViewer();
+
 }

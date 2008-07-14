@@ -26,7 +26,7 @@ import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
-public class TVITourBookRoot extends TourBookTreeViewerItem {
+public class TVITourBookRoot extends TVITourBookItem {
 
 	TVITourBookRoot(final TourBookView view) {
 		super(view);
@@ -43,9 +43,9 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = "SELECT " + //		$NON-NLS-1$
-
-				" StartYear, " //		1				$NON-NLS-1$
+		final String sqlString = ""//
+				+ "SELECT " //						$NON-NLS-1$
+				+ " startYear, " //		1			$NON-NLS-1$
 				+ SQL_SUM_COLUMNS //	2
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
@@ -53,8 +53,8 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 				+ " WHERE 1=1 " //					$NON-NLS-1$
 				+ sqlFilter.getWhereClause()
 
-				+ " GROUP BY StartYear" //			$NON-NLS-1$
-				+ " ORDER BY StartYear"; //			$NON-NLS-1$
+				+ " GROUP BY startYear" //			$NON-NLS-1$
+				+ " ORDER BY startYear"; //			$NON-NLS-1$
 
 		try {
 
@@ -65,27 +65,19 @@ public class TVITourBookRoot extends TourBookTreeViewerItem {
 			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				final TVITourBookYear tourItem = new TVITourBookYear(fView, this, result.getInt(1));
 
-				fCalendar.set(result.getShort(1), 0, 1);
-				tourItem.fTourDate = fCalendar.getTimeInMillis();
+				final int dbYear = result.getInt(1);
 
-				tourItem.addSumData(result.getLong(2),
-						result.getLong(3),
-						result.getLong(4),
-						result.getLong(5),
-						result.getLong(6),
-						result.getLong(7),
-						result.getFloat(8),
-						result.getLong(9),
-						result.getLong(10),
-						result.getLong(11),
-						result.getLong(12),
-						result.getLong(13),
-						result.getLong(14),
-						result.getLong(15));
+				final TVITourBookYear yearItem = new TVITourBookYear(fView, this);
+				children.add(yearItem);
 
-				children.add(tourItem);
+				yearItem.treeColumn = Integer.toString(dbYear);
+				yearItem.fTourYear = dbYear;
+
+				fCalendar.set(dbYear, 0, 1);
+				yearItem.fTourDate = fCalendar.getTimeInMillis();
+
+				yearItem.addSumColumns(result, 2);
 			}
 
 			conn.close();

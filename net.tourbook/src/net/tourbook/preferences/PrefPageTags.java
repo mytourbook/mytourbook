@@ -30,6 +30,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
@@ -50,6 +51,7 @@ import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -537,15 +539,19 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	}
 
 	private void fireModifyEvent() {
+		
 		if (fIsModified) {
+			fIsModified = false;
 
+			// remove old tags from internal list
 			TourDatabase.clearTourTags();
+			
+			TagManager.updateTagNames();
+
 			TourManager.getInstance().clearTourDataCache();
 
 			// fire modify event
 			TourManager.firePropertyChange(TourManager.TAG_STRUCTURE_CHANGED, null);
-
-			fIsModified = false;
 		}
 	}
 
@@ -561,7 +567,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		return fRootItem;
 	}
 
-	public TreeViewer getTreeViewer() {
+	public ColumnViewer getViewer() {
 		return fTagViewer;
 	}
 
@@ -987,6 +993,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		fireModifyEvent();
 		return true;
 	}
+
+	public void recreateViewer() {}
 
 	public void reloadViewer() {}
 

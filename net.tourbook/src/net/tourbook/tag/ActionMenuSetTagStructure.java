@@ -28,6 +28,7 @@ import net.tourbook.ui.views.tourTag.TVITagViewYear;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -62,8 +63,7 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 
 				public void run() {
 
-					final StructuredSelection selection = (StructuredSelection) fTourViewer.getTreeViewer()
-							.getSelection();
+					final StructuredSelection selection = (StructuredSelection) fTourViewer.getViewer().getSelection();
 
 					for (final Object element : selection.toArray()) {
 
@@ -76,7 +76,7 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 				}
 
 				private void setTagStructure(final Object element) {
-					
+
 					if (element instanceof TVITagViewTag) {
 
 						setTagStructure2((TVITagViewTag) element);
@@ -99,32 +99,36 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 					}
 
 					// remove the children of the tag because another type of children will be displayed
-					final TreeViewer treeViewer = fTourViewer.getTreeViewer();
+					final ColumnViewer viewer = fTourViewer.getViewer();
+					if (viewer instanceof TreeViewer) {
 
-					final boolean isTagExpanded = treeViewer.getExpandedState(tagItem);
+						final TreeViewer treeViewer = (TreeViewer) viewer;
 
-					final Tree tree = treeViewer.getTree();
-					tree.setRedraw(false);
-					{
-						treeViewer.collapseToLevel(tagItem, TreeViewer.ALL_LEVELS);
-						final ArrayList<TreeViewerItem> tagUnfetchedChildren = tagItem.getUnfetchedChildren();
-						if (tagUnfetchedChildren != null) {
-							treeViewer.remove(tagUnfetchedChildren.toArray());
+						final boolean isTagExpanded = treeViewer.getExpandedState(tagItem);
+
+						final Tree tree = treeViewer.getTree();
+						tree.setRedraw(false);
+						{
+							treeViewer.collapseToLevel(tagItem, TreeViewer.ALL_LEVELS);
+							final ArrayList<TreeViewerItem> tagUnfetchedChildren = tagItem.getUnfetchedChildren();
+							if (tagUnfetchedChildren != null) {
+								treeViewer.remove(tagUnfetchedChildren.toArray());
+							}
 						}
+						tree.setRedraw(true);
+
+						// set new expand type in the database
+						tagItem.setNewExpandType(fExpandType);
+
+						tagItem.clearChildren();
+
+						if (isTagExpanded) {
+							treeViewer.setExpandedState(tagItem, true);
+						}
+
+						// update viewer
+						treeViewer.refresh(tagItem);
 					}
-					tree.setRedraw(true);
-
-					// set new expand type in the database
-					tagItem.setNewExpandType(fExpandType);
-
-					tagItem.clearChildren();
-
-					if (isTagExpanded) {
-						treeViewer.setExpandedState(tagItem, true);
-					}
-
-					// update viewer
-					treeViewer.refresh(tagItem);
 				}
 			};
 
@@ -201,8 +205,9 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 	 * @return
 	 */
 	private int getSelectedExpandType() {
+		
 		int selectedExpandType = -1;
-		final StructuredSelection selection = (StructuredSelection) fTourViewer.getTreeViewer().getSelection();
+		final StructuredSelection selection = (StructuredSelection) fTourViewer.getViewer().getSelection();
 
 		if (selection.size() == 1) {
 

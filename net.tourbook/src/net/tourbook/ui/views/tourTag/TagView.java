@@ -46,8 +46,10 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionCollapseOthers;
+import net.tourbook.ui.ActionEditTour;
 import net.tourbook.ui.ActionExpandSelection;
 import net.tourbook.ui.ActionModifyColumns;
+import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionRefreshView;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
@@ -56,15 +58,12 @@ import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourBook.ActionEditTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
-import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -94,24 +93,22 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.ViewPart;
 
 public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	static public final String				ID								= "net.tourbook.views.tagViewID";	//$NON-NLS-1$
 
-	private static final String				MEMENTO_COLUMN_SORT_ORDER		= "tagview.column_sort_order";		//$NON-NLS-1$
-	private static final String				MEMENTO_COLUMN_WIDTH			= "tagview.column_width";			//$NON-NLS-1$
 	private static final String				MEMENTO_TAG_VIEW_LAYOUT			= "tagview.layout";
 
 	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
@@ -140,9 +137,9 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	private ActionEditQuick					fActionEditQuick;
 	private ActionEditTour					fActionEditTour;
 	private ActionExpandSelection			fActionExpandSelection;
+	private ActionOpenPrefDialog			fActionOpenTagPrefs;
 	private ActionSetLayoutHierarchical		fActionSetLayoutHierarchical;
 	private ActionSetLayoutFlat				fActionSetLayoutFlat;
-	private Action							fActionOpenTagPrefs;
 	private ActionRefreshView				fActionRefreshView;
 	private ActionRemoveAllTags				fActionRemoveAllTags;
 	private ActionSetTourTag				fActionRemoveTag;
@@ -161,6 +158,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 																					.createImage();
 	private final Image						fImgTagRoot						= TourbookPlugin.getImageDescriptor(Messages.Image__tag_root)
 																					.createImage();
+
+	private IPartListener2					fPartListener;
 
 	private static final NumberFormat		fNF								= NumberFormat.getNumberInstance();
 
@@ -279,6 +278,37 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		}
 	}
 
+	private void addPartListener() {
+
+		fPartListener = new IPartListener2() {
+			public void partActivated(final IWorkbenchPartReference partRef) {}
+
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+			public void partClosed(final IWorkbenchPartReference partRef) {
+				if (ID.equals(partRef.getId())) {
+					saveSettings();
+				}
+			}
+
+			public void partDeactivated(final IWorkbenchPartReference partRef) {
+				if (ID.equals(partRef.getId())) {
+					saveSettings();
+				}
+			}
+
+			public void partHidden(final IWorkbenchPartReference partRef) {}
+
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+			public void partOpened(final IWorkbenchPartReference partRef) {}
+
+			public void partVisible(final IWorkbenchPartReference partRef) {}
+		};
+
+		getViewSite().getPage().addPartListener(fPartListener);
+	}
+
 	private void addPrefListener() {
 
 		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
@@ -303,28 +333,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 					UI.updateUnits();
 
-					final Object[] expandedElements = fTagViewer.getExpandedElements();
+					fColumnManager.saveState(fSessionMemento);
+					fColumnManager.resetColumns();
+					defineViewerColumns(fViewerContainer);
 
-					// recreate the tree with the new measurement system
-					saveSettings();
-
-					fTagViewer.getTree().dispose();
-
-					createTagViewer(fViewerContainer);
-					fViewerContainer.layout();
-
-					restoreState(fSessionMemento);
-
-					// reload the viewer
-					fRootItem = new TVITagViewRoot(TagView.this, fTagViewLayout);
-					fTagViewer.setInput(fRootItem);
-
-					final Tree tree = fTagViewer.getTree();
-					tree.setRedraw(false);
-					{
-						fTagViewer.setExpandedElements(expandedElements);
-					}
-					tree.setRedraw(true);
+					recreateViewer();
 
 				} else if (property.equals(ITourbookPreferences.TAG_COLOR_AND_LAYOUT_CHANGED)) {
 
@@ -423,17 +436,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		fActionCollapseAll = new ActionCollapseAll(this);
 		fActionCollapseOthers = new ActionCollapseOthers(this);
 
-		fActionOpenTagPrefs = new Action(Messages.app_action_tag_open_tagging_structure) {
-
-			@Override
-			public void run() {
-				PreferencesUtil.createPreferenceDialogOn(//
-				Display.getCurrent().getActiveShell(),
-						"net.tourbook.preferences.PrefPageTags", //$NON-NLS-1$
-						null,
-						null).open();
-			}
-		};
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
+				"net.tourbook.preferences.PrefPageTags");
 
 		fActionSetLayoutFlat = new ActionSetLayoutFlat(this);
 		fActionSetLayoutHierarchical = new ActionSetLayoutHierarchical(this);
@@ -463,12 +467,17 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		// define all columns
+		fColumnManager = new ColumnManager(this, fSessionMemento);
+		defineViewerColumns(parent);
+
 		fViewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
 
 		createActions();
 		fillViewMenu();
 
+		// viewer must be created after the action are created
 		createTagViewer(fViewerContainer);
 
 		// set selection provider
@@ -476,6 +485,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		addTourPropertyListener();
 		addPrefListener();
+		addPartListener();
 		addSelectionListener();
 
 		restoreState(fSessionMemento);
@@ -490,18 +500,13 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		tree.setHeaderVisible(true);
 
-		final boolean isLinesVisible = TourbookPlugin.getDefault()
+		tree.setLinesVisible(TourbookPlugin.getDefault()
 				.getPluginPreferences()
-				.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES);
-		tree.setLinesVisible(isLinesVisible);
+				.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
 
 		fTagViewer = new TreeViewer(tree);
-//		fDrillDownAdapter = new DrillDownAdapter(fTagViewer);
-
-		// define and create all columns
-		fColumnManager = new ColumnManager(this);
-		createTagViewerColumns(parent);
 		fColumnManager.createColumns();
+//		fDrillDownAdapter = new DrillDownAdapter(fTagViewer);
 
 		fTagViewer.setContentProvider(new TagContentProvider());
 		fTagViewer.setComparer(new TagComparer());
@@ -564,7 +569,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	 * 
 	 * @param parent
 	 */
-	private void createTagViewerColumns(final Composite parent) {
+	private void defineViewerColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 		TreeColumnDefinition colDef;
@@ -1007,6 +1012,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
+		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionEditTour);
 
 		menuMgr.add(new Separator());
@@ -1021,10 +1027,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		menuMgr.add(fActionSetAllTagStructures);
 		menuMgr.add(fActionRenameTag);
 		menuMgr.add(fActionOpenTagPrefs);
-
-		menuMgr.add(new Separator());
-		menuMgr.add(fActionSetTourType);
-
+		
 		enableActions();
 	}
 
@@ -1102,12 +1105,13 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		return selectedTourData;
 	}
 
-	public TreeViewer getTreeViewer() {
+	public ColumnViewer getViewer() {
 		return fTagViewer;
 	}
 
 	@Override
 	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
+
 		super.init(site, memento);
 
 		// set the session memento if it's not yet set
@@ -1120,20 +1124,38 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		return false;
 	}
 
+	public void recreateViewer() {
+
+		final Object[] expandedElements = fTagViewer.getExpandedElements();
+
+		fTagViewer.getTree().dispose();
+
+		fViewerContainer.setRedraw(false);
+		{
+			createTagViewer(fViewerContainer);
+			fViewerContainer.layout();
+		}
+		fViewerContainer.setRedraw(true);
+
+		reloadViewer(expandedElements);
+	}
+
 	/**
 	 * reload the content of the tag viewer
 	 */
 	public void reloadViewer() {
 
+		final Object[] expandedElements = fTagViewer.getExpandedElements();
+
+		reloadViewer(expandedElements);
+	}
+
+	private void reloadViewer(final Object[] expandedElements) {
+
 		final Tree tree = fTagViewer.getTree();
 		tree.setRedraw(false);
 		{
-			final Object[] expandedElements = fTagViewer.getExpandedElements();
-
-			fRootItem = new TVITagViewRoot(this, fTagViewLayout);
-			fTagViewer.setInput(fRootItem);
-//			fDrillDownAdapter.reset();
-
+			fTagViewer.setInput(fRootItem = new TVITagViewRoot(this, fTagViewLayout));
 			fTagViewer.setExpandedElements(expandedElements);
 		}
 		tree.setRedraw(true);
@@ -1148,18 +1170,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			/*
 			 * restore states from the memento
 			 */
-
-			// restore columns sort order
-			final String mementoColumnSortOrderIds = memento.getString(MEMENTO_COLUMN_SORT_ORDER);
-			if (mementoColumnSortOrderIds != null) {
-				fColumnManager.orderColumns(StringToArrayConverter.convertStringToArray(mementoColumnSortOrderIds));
-			}
-
-			// restore column width
-			final String mementoColumnWidth = memento.getString(MEMENTO_COLUMN_WIDTH);
-			if (mementoColumnWidth != null) {
-				fColumnManager.setColumnWidth(StringToArrayConverter.convertStringToArray(mementoColumnWidth));
-			}
 
 			// restore view layout
 			final Integer mementoViewLayout = memento.getInteger(MEMENTO_TAG_VIEW_LAYOUT);
@@ -1185,7 +1195,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			}
 		}
 
-		// set default layout
+		// set default tag view layout
 		if (fTagViewLayout == -1) {
 			fTagViewLayout = TAG_VIEW_LAYOUT_FLAT;
 			fActionSetLayoutFlat.setChecked(true);
@@ -1193,22 +1203,16 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	}
 
 	private void saveSettings() {
-		fSessionMemento = XMLMemento.createWriteRoot("TagView"); //$NON-NLS-1$
+		if (fSessionMemento == null) {
+			fSessionMemento = XMLMemento.createWriteRoot("TagView"); //$NON-NLS-1$
+		}
 		saveState(fSessionMemento);
 	}
 
 	@Override
 	public void saveState(final IMemento memento) {
 
-		// save column sort order
-		memento.putString(MEMENTO_COLUMN_SORT_ORDER,
-				StringToArrayConverter.convertArrayToString(fColumnManager.getColumnIds()));
-
-		// save columns width
-		final String[] columnIdAndWidth = fColumnManager.getColumnIdAndWidth();
-		if (columnIdAndWidth != null) {
-			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(columnIdAndWidth));
-		}
+		fColumnManager.saveState(memento);
 
 		// save view layout
 		memento.putInteger(MEMENTO_TAG_VIEW_LAYOUT, fTagViewLayout);

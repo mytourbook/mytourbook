@@ -78,14 +78,14 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	private final DateFormat						fDateFormatter			= DateFormat.getDateInstance(DateFormat.FULL);
 	private NumberFormat							fNumberFormatter		= NumberFormat.getNumberInstance();
 	/**
-	 * contains all {@link TourCatalogItemComparedTour} tour objects for all years
+	 * contains all {@link TVICatalogComparedTour} tour objects for all years
 	 */
-	private ArrayList<TourCatalogItemComparedTour>	fAllTours;
+	private ArrayList<TVICatalogComparedTour>	fAllTours;
 
 	/**
 	 * year item for the visible statistics
 	 */
-	private TourCatalogItemReferenceTour			fCurrentRefItem;
+	private TVICatalogReferenceTour			fCurrentRefItem;
 
 	private PageBook								fPageBook;
 
@@ -345,7 +345,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 				}
 
 				// select the tour in the tour viewer & show tour in compared tour char
-				final TourCatalogItemComparedTour tourCatalogComparedTour = fAllTours.get(valueIndex);
+				final TVICatalogComparedTour tourCatalogComparedTour = fAllTours.get(valueIndex);
 				fCurrentSelection = new StructuredSelection(tourCatalogComparedTour);
 				fPostSelectionProvider.setSelection(fCurrentSelection);
 			}
@@ -418,7 +418,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 			final SelectionTourCatalogView tourCatalogItem = (SelectionTourCatalogView) selection;
 
-			final TourCatalogItemReferenceTour refItem = tourCatalogItem.getRefItem();
+			final TVICatalogReferenceTour refItem = tourCatalogItem.getRefItem();
 			if (refItem != null) {
 
 				// reference tour is selected
@@ -430,7 +430,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 				// show year statistic
 
-				final TourCatalogItemYear yearItem = tourCatalogItem.getYearItem();
+				final TVICatalogYearItem yearItem = tourCatalogItem.getYearItem();
 				if (yearItem != null) {
 
 					fCurrentRefItem = yearItem.getRefItem();
@@ -447,7 +447,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 				// select first tour for the youngest year
 				int yearIndex = 0;
-				for (final TourCatalogItemComparedTour tourItem : fAllTours) {
+				for (final TVICatalogComparedTour tourItem : fAllTours) {
 
 					if (new DateTime(tourItem.getTourDate()).getYear() == fYoungesYear) {
 						break;
@@ -475,10 +475,10 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 			if (structuredSelection.size() > 0) {
 				final Object firstElement = structuredSelection.getFirstElement();
-				if (firstElement instanceof TourCatalogItemComparedTour) {
+				if (firstElement instanceof TVICatalogComparedTour) {
 
-					final TourCatalogItemComparedTour compareItem = (TourCatalogItemComparedTour) firstElement;
-					final TourCatalogItemYear yearItem = (TourCatalogItemYear) compareItem.getParentItem();
+					final TVICatalogComparedTour compareItem = (TVICatalogComparedTour) firstElement;
+					final TVICatalogYearItem yearItem = (TVICatalogYearItem) compareItem.getParentItem();
 
 //					// show year statistic
 //					if (yearItem != fCurrentYearItem) {
@@ -560,7 +560,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		final boolean[] selectedTours = new boolean[tourLength];
 
 		for (int tourIndex = 0; tourIndex < tourLength; tourIndex++) {
-			final TourCatalogItemComparedTour comparedItem = fAllTours.get(tourIndex);
+			final TVICatalogComparedTour comparedItem = fAllTours.get(tourIndex);
 			if (comparedItem.getTourId() == selectedTourId) {
 				selectedTours[tourIndex] = true;
 			}
@@ -628,15 +628,15 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 		fDOYValues = new ArrayList<Integer>(); // DOY...Day Of Year
 		fTourSpeed = new ArrayList<Integer>();
-		fAllTours = new ArrayList<TourCatalogItemComparedTour>();
+		fAllTours = new ArrayList<TVICatalogComparedTour>();
 
 		final Object[] yearItems = fCurrentRefItem.getFetchedChildrenAsArray();
 
 		// get youngest year if this is forced
 		if (yearItems != null && yearItems.length > 0 && showYoungestYear) {
 			final Object item = yearItems[yearItems.length - 1];
-			if (item instanceof TourCatalogItemYear) {
-				final TourCatalogItemYear youngestYearItem = (TourCatalogItemYear) item;
+			if (item instanceof TVICatalogYearItem) {
+				final TVICatalogYearItem youngestYearItem = (TVICatalogYearItem) item;
 				fYoungesYear = youngestYearItem.year;
 			}
 		}
@@ -645,9 +645,9 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 		// loop: all years
 		for (final Object yearItemObj : yearItems) {
-			if (yearItemObj instanceof TourCatalogItemYear) {
+			if (yearItemObj instanceof TVICatalogYearItem) {
 
-				final TourCatalogItemYear yearItem = (TourCatalogItemYear) yearItemObj;
+				final TVICatalogYearItem yearItem = (TVICatalogYearItem) yearItemObj;
 
 				// check if the year can be displayed
 				final int yearItemYear = yearItem.year;
@@ -656,9 +656,9 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 					// loop: all tours
 					final Object[] tourItems = yearItem.getFetchedChildrenAsArray();
 					for (final Object tourItemObj : tourItems) {
-						if (tourItemObj instanceof TourCatalogItemComparedTour) {
+						if (tourItemObj instanceof TVICatalogComparedTour) {
 
-							final TourCatalogItemComparedTour tourItem = (TourCatalogItemComparedTour) tourItemObj;
+							final TVICatalogComparedTour tourItem = (TVICatalogComparedTour) tourItemObj;
 
 							final DateTime dt = new DateTime(tourItem.getTourDate());
 
@@ -687,7 +687,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		/*
 		 * set/restore min/max values
 		 */
-		final TourCatalogItemReferenceTour refItem = fCurrentRefItem;
+		final TVICatalogReferenceTour refItem = fCurrentRefItem;
 		final int minValue = yData.getVisibleMinValue();
 		final int maxValue = yData.getVisibleMaxValue();
 

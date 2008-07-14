@@ -47,10 +47,9 @@ import net.tourbook.ui.TableColumnDefinition;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TourCatalogItemComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
-import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
@@ -66,7 +65,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
@@ -105,9 +103,6 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	public static final String		ID							= "net.tourbook.views.TourPropertiesView";		//$NON-NLS-1$
 
 	private static final String		MEMENTO_SELECTED_TAB		= "tourProperties.selectedTab";				//$NON-NLS-1$
-	private static final String		MEMENTO_COLUMN_SORT_ORDER	= "tourProperties.column_sort_order";			//$NON-NLS-1$
-	private static final String		MEMENTO_COLUMN_WIDTH		= "tourProperties.column_width";				//$NON-NLS-1$
-
 	private static IMemento			fSessionMemento;
 
 	private CTabFolder				fTabFolder;
@@ -382,10 +377,6 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		table.setLinesVisible(true);
 
 		fDataViewer = new TableViewer(table);
-
-		// define and create all columns
-		fColumnManager = new ColumnManager(this);
-		createDataViewerColumns(parent);
 		fColumnManager.createColumns();
 
 		fDataViewer.setContentProvider(new TourDataContentProvider());
@@ -400,133 +391,12 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		});
 	}
 
-	private void createDataViewerColumns(final Composite parent) {
-
-		final PixelConverter pixelConverter = new PixelConverter(parent);
-
-		TableColumnDefinition colDef;
-
-		/*
-		 * 1. column will be hidden because the alignment for the first column is always to the left
-		 */
-		colDef = TableColumnFactory.FIRST_COLUMN.createColumn(fColumnManager, pixelConverter);
-		colDef.setCanModifyVisibility(false);
-		colDef.setIsColumnMoveable(false);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {}
-		});
-
-		/*
-		 * column: #
-		 */
-		colDef = TableColumnFactory.SEQUENCE.createColumn(fColumnManager, pixelConverter);
-		colDef.setCanModifyVisibility(false);
-		colDef.setIsColumnMoveable(false);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				cell.setText(Integer.toString(((TourElement) cell.getElement()).sequence));
-
-				cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-			}
-		});
-
-		/*
-		 * column: time
-		 */
-		colDef = TableColumnFactory.TOUR_TIME.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(Integer.toString(((TourElement) cell.getElement()).time));
-			}
-		});
-
-		/*
-		 * column: distance
-		 */
-		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final int distance = ((TourElement) cell.getElement()).distance;
-				cell.setText(fNumberFormatter.format((float) distance / 1000));
-			}
-		});
-
-		/*
-		 * column: altitude
-		 */
-		colDef = TableColumnFactory.ALTITUDE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(Integer.toString(((TourElement) cell.getElement()).altitude));
-			}
-		});
-
-		/*
-		 * column: pulse
-		 */
-		colDef = TableColumnFactory.PULSE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(Integer.toString(((TourElement) cell.getElement()).pulse));
-			}
-		});
-
-		/*
-		 * column: temperature
-		 */
-		colDef = TableColumnFactory.TEMPERATURE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(Integer.toString(((TourElement) cell.getElement()).temperature));
-			}
-		});
-
-		/*
-		 * column: cadence
-		 */
-		colDef = TableColumnFactory.CADENCE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(Integer.toString(((TourElement) cell.getElement()).cadence));
-			}
-		});
-
-		/*
-		 * column: longitude
-		 */
-		colDef = TableColumnFactory.LONGITUDE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(Double.toString(((TourElement) cell.getElement()).longitude));
-			}
-		});
-
-		/*
-		 * column: latitude
-		 */
-		colDef = TableColumnFactory.LATITUDE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(Double.toString(((TourElement) cell.getElement()).latitude));
-			}
-		});
-
-	}
-
 	@Override
 	public void createPartControl(final Composite parent) {
+
+		// define all columns
+		fColumnManager = new ColumnManager(this, fSessionMemento);
+		defineViewerColumns(parent);
 
 		createUI(parent);
 
@@ -738,6 +608,131 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 	}
 
+	private void defineViewerColumns(final Composite parent) {
+
+		final PixelConverter pixelConverter = new PixelConverter(parent);
+
+		TableColumnDefinition colDef;
+
+		/*
+		 * 1. column will be hidden because the alignment for the first column is always to the left
+		 */
+		colDef = TableColumnFactory.FIRST_COLUMN.createColumn(fColumnManager, pixelConverter);
+		colDef.setCanModifyVisibility(false);
+		colDef.setIsColumnMoveable(false);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {}
+		});
+
+		/*
+		 * column: #
+		 */
+		colDef = TableColumnFactory.SEQUENCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setCanModifyVisibility(false);
+		colDef.setIsColumnMoveable(false);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				cell.setText(Integer.toString(((TourElement) cell.getElement()).sequence));
+
+				cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+			}
+		});
+
+		/*
+		 * column: time
+		 */
+		colDef = TableColumnFactory.TOUR_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(Integer.toString(((TourElement) cell.getElement()).time));
+			}
+		});
+
+		/*
+		 * column: distance
+		 */
+		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final int distance = ((TourElement) cell.getElement()).distance;
+				cell.setText(fNumberFormatter.format((float) distance / 1000));
+			}
+		});
+
+		/*
+		 * column: altitude
+		 */
+		colDef = TableColumnFactory.ALTITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(Integer.toString(((TourElement) cell.getElement()).altitude));
+			}
+		});
+
+		/*
+		 * column: pulse
+		 */
+		colDef = TableColumnFactory.PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(Integer.toString(((TourElement) cell.getElement()).pulse));
+			}
+		});
+
+		/*
+		 * column: temperature
+		 */
+		colDef = TableColumnFactory.TEMPERATURE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(Integer.toString(((TourElement) cell.getElement()).temperature));
+			}
+		});
+
+		/*
+		 * column: cadence
+		 */
+		colDef = TableColumnFactory.CADENCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(Integer.toString(((TourElement) cell.getElement()).cadence));
+			}
+		});
+
+		/*
+		 * column: longitude
+		 */
+		colDef = TableColumnFactory.LONGITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(Double.toString(((TourElement) cell.getElement()).longitude));
+			}
+		});
+
+		/*
+		 * column: latitude
+		 */
+		colDef = TableColumnFactory.LATITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(Double.toString(((TourElement) cell.getElement()).latitude));
+			}
+		});
+
+	}
+
 	@Override
 	public void dispose() {
 
@@ -817,7 +812,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		return fColumnManager;
 	}
 
-	public TreeViewer getTreeViewer() {
+	public ColumnViewer getViewer() {
 		return null;
 	}
 
@@ -896,8 +891,8 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		} else if (selection instanceof StructuredSelection) {
 
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-			if (firstElement instanceof TourCatalogItemComparedTour) {
-				onSelectTourId(((TourCatalogItemComparedTour) firstElement).getTourId());
+			if (firstElement instanceof TVICatalogComparedTour) {
+				onSelectTourId(((TVICatalogComparedTour) firstElement).getTourId());
 			}
 
 		} else if (selection instanceof SelectionTourCatalogView) {
@@ -931,6 +926,8 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
+	public void recreateViewer() {}
+
 	public void reloadViewer() {}
 
 	private void restoreState(final IMemento memento) {
@@ -963,18 +960,6 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			return;
 		}
 
-		// restore table columns sort order
-		final String mementoColumnSortOrderIds = memento.getString(MEMENTO_COLUMN_SORT_ORDER);
-		if (mementoColumnSortOrderIds != null) {
-			fColumnManager.orderColumns(StringToArrayConverter.convertStringToArray(mementoColumnSortOrderIds));
-		}
-
-		// restore column width
-		final String mementoColumnWidth = memento.getString(MEMENTO_COLUMN_WIDTH);
-		if (mementoColumnWidth != null) {
-			fColumnManager.setColumnWidth(StringToArrayConverter.convertStringToArray(mementoColumnWidth));
-		}
-
 		// hide first column, this is a hack to align the "first" column to right
 		fDataViewer.getTable().getColumn(0).setWidth(0);
 	}
@@ -999,15 +984,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			return;
 		}
 
-		// save column sort order
-		memento.putString(MEMENTO_COLUMN_SORT_ORDER,
-				StringToArrayConverter.convertArrayToString(fColumnManager.getColumnIds()));
-
-		// save columns width
-		final String[] columnIdAndWidth = fColumnManager.getColumnIdAndWidth();
-		if (columnIdAndWidth != null) {
-			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(columnIdAndWidth));
-		}
+		fColumnManager.saveState(memento);
 	}
 
 	@Override

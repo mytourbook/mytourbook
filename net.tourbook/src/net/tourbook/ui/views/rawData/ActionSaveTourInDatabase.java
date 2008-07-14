@@ -60,22 +60,22 @@ public class ActionSaveTourInDatabase extends Action {
 
 		public void dispose() {}
 
-		public Object[] getElements(Object inputElement) {
+		public Object[] getElements(final Object inputElement) {
 			return fPeople.toArray();
 		}
 
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
 	private class PeopleLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-		public Image getColumnImage(Object element, int columnIndex) {
+		public Image getColumnImage(final Object element, final int columnIndex) {
 			return null;
 		}
 
-		public String getColumnText(Object element, int columnIndex) {
+		public String getColumnText(final Object element, final int columnIndex) {
 
-			TourPerson person = (TourPerson) element;
+			final TourPerson person = (TourPerson) element;
 			switch (columnIndex) {
 			case 0:
 				return person.getName() + " (" + getPersonDevice(person) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -84,7 +84,7 @@ public class ActionSaveTourInDatabase extends Action {
 		}
 	}
 
-	public ActionSaveTourInDatabase(RawDataView viewPart) {
+	public ActionSaveTourInDatabase(final RawDataView viewPart) {
 
 		fViewPart = viewPart;
 
@@ -102,7 +102,7 @@ public class ActionSaveTourInDatabase extends Action {
 
 		final String DIALOG_SETTINGS_SECTION = "DialogSelectPerson"; //$NON-NLS-1$
 
-		IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
+		final IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
 		IDialogSettings dialogSettings = pluginSettings.getSection(DIALOG_SETTINGS_SECTION);
 
 		if (dialogSettings == null) {
@@ -117,12 +117,12 @@ public class ActionSaveTourInDatabase extends Action {
 	 * @param person
 	 * @return
 	 */
-	private String getPersonDevice(TourPerson person) {
+	private String getPersonDevice(final TourPerson person) {
 
-		String deviceId = person.getDeviceReaderId();
+		final String deviceId = person.getDeviceReaderId();
 
 		if (deviceId != null) {
-			for (TourbookDevice device : fDeviceList) {
+			for (final TourbookDevice device : fDeviceList) {
 				if (deviceId.equals(device.deviceId)) {
 					return device.visibleName;
 				}
@@ -130,6 +130,13 @@ public class ActionSaveTourInDatabase extends Action {
 		}
 
 		return Messages.import_data_label_unknown_device;
+	}
+
+	/**
+	 * force the people list to be recreated the next time when it's used
+	 */
+	public void resetPeopleList() {
+		fPeople = null;
 	}
 
 	/**
@@ -155,7 +162,7 @@ public class ActionSaveTourInDatabase extends Action {
 
 		bike = person.getTourBike();
 
-		Runnable runnable = new Runnable() {
+		final Runnable runnable = new Runnable() {
 
 			@SuppressWarnings("unchecked") //$NON-NLS-1$
 			public void run() {
@@ -164,16 +171,16 @@ public class ActionSaveTourInDatabase extends Action {
 				boolean saveInDatabase = false;
 
 				// get selected tours
-				final IStructuredSelection selection = ((IStructuredSelection) fViewPart.getTourViewer().getSelection());
+				final IStructuredSelection selection = ((IStructuredSelection) fViewPart.getViewer().getSelection());
 
 				// loop: all selected tours
-				for (Iterator iter = selection.iterator(); iter.hasNext();) {
+				for (final Iterator iter = selection.iterator(); iter.hasNext();) {
 
-					Object selObject = iter.next();
+					final Object selObject = iter.next();
 
 					if (selObject instanceof TourData) {
 
-						TourData tourData = (TourData) selObject;
+						final TourData tourData = (TourData) selObject;
 
 						if (tourData.getTourPerson() == null) {
 
@@ -202,12 +209,12 @@ public class ActionSaveTourInDatabase extends Action {
 				if (isModified) {
 
 					// update the table viewer
-					fViewPart.updateViewer();
+					fViewPart.reloadViewer();
 
 					/*
 					 * fire event that new tours have been saved in the database
 					 */
-					SelectionNewTours selectionNewTours = new SelectionNewTours();
+					final SelectionNewTours selectionNewTours = new SelectionNewTours();
 
 					// activate selection
 					selectionNewTours.setEmpty(false);
@@ -229,7 +236,7 @@ public class ActionSaveTourInDatabase extends Action {
 			fPeople = TourDatabase.getTourPeople();
 		}
 
-		ResizeableListDialog dialog = new ResizeableListDialog(fViewPart.getSite().getShell());
+		final ResizeableListDialog dialog = new ResizeableListDialog(fViewPart.getSite().getShell());
 
 		dialog.setContentProvider(new PeopleContentProvider());
 		dialog.setLabelProvider(new PeopleLabelProvider());
@@ -239,16 +246,16 @@ public class ActionSaveTourInDatabase extends Action {
 		dialog.setDialogBoundsSettings(getDialogSettings(), Dialog.DIALOG_PERSISTLOCATION | Dialog.DIALOG_PERSISTSIZE);
 
 		// select last person
-		IDialogSettings settings = getDialogSettings();
+		final IDialogSettings settings = getDialogSettings();
 		try {
-			long personId = settings.getLong(MEMENTO_SELECTED_PERSON);
-			for (TourPerson person : fPeople) {
+			final long personId = settings.getLong(MEMENTO_SELECTED_PERSON);
+			for (final TourPerson person : fPeople) {
 				if (person.getPersonId() == personId) {
 					dialog.setInitialSelections(new TourPerson[] { person });
 					break;
 				}
 			}
-		} catch (NumberFormatException e) {}
+		} catch (final NumberFormatException e) {}
 
 		dialog.setInput(this);
 		dialog.create();
@@ -262,9 +269,9 @@ public class ActionSaveTourInDatabase extends Action {
 			return null;
 		}
 
-		Object[] people = dialog.getResult();
+		final Object[] people = dialog.getResult();
 		if (people != null && people.length > 0) {
-			TourPerson selectedPerson = (TourPerson) people[0];
+			final TourPerson selectedPerson = (TourPerson) people[0];
 
 			settings.put(MEMENTO_SELECTED_PERSON, selectedPerson.getPersonId());
 
@@ -280,15 +287,8 @@ public class ActionSaveTourInDatabase extends Action {
 	 * 
 	 * @param person
 	 */
-	void setPerson(TourPerson person) {
+	void setPerson(final TourPerson person) {
 		fTourPerson = person;
-	}
-
-	/**
-	 * force the people list to be recreated the next time when it's used
-	 */
-	public void resetPeopleList() {
-		fPeople = null;
 	}
 
 }

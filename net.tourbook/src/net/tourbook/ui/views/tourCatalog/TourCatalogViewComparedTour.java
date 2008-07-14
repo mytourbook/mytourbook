@@ -372,9 +372,9 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-			if (firstElement instanceof TourCatalogItemComparedTour) {
+			if (firstElement instanceof TVICatalogComparedTour) {
 
-				updateTourChart((TourCatalogItemComparedTour) firstElement);
+				updateTourChart((TVICatalogComparedTour) firstElement);
 
 			} else if (firstElement instanceof CompareResultItemComparedTour) {
 
@@ -550,7 +550,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 	private void setRangeMarkers(final ChartDataXSerie xData) {
 
-		if (fComparedTourItem instanceof TourCatalogItemComparedTour) {
+		if (fComparedTourItem instanceof TVICatalogComparedTour) {
 
 			xData.setRangeMarkers(new int[] { fDefaultStartIndex }, new int[] { fDefaultEndIndex });
 
@@ -713,7 +713,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 * 
 	 * @param selectionComparedTour
 	 */
-	private void updateTourChart(final TourCatalogItemComparedTour itemComparedTour) {
+	private void updateTourChart(final TVICatalogComparedTour itemComparedTour) {
 
 		if (saveComparedTourDialog() == false) {
 			return;
@@ -722,7 +722,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		final Long ctTourId = itemComparedTour.getTourId();
 
 		// check if the compared tour is already displayed
-		if (fCTTourId == ctTourId.longValue() && fComparedTourItem instanceof TourCatalogItemComparedTour) {
+		if (fCTTourId == ctTourId.longValue() && fComparedTourItem instanceof TVICatalogComparedTour) {
 			return;
 		}
 

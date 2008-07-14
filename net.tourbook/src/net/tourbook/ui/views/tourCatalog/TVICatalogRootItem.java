@@ -25,7 +25,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.UI;
 
-public class TourCatalogItemRoot extends TreeViewerItem {
+public class TVICatalogRootItem extends TVICatalogItem {
 
 	@Override
 	protected void fetchChildren() {
@@ -48,7 +48,7 @@ public class TourCatalogItemRoot extends TreeViewerItem {
 			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				children.add(new TourCatalogItemReferenceTour(this,
+				children.add(new TVICatalogReferenceTour(this,
 						result.getString(1),
 						result.getLong(2),
 						result.getLong(3)));

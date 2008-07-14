@@ -21,6 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
@@ -48,20 +49,24 @@ public class ActionExpandSelection extends Action {
 			return;
 		}
 
-		final TreeViewer treeViewer = fTourViewer.getTreeViewer();
-		final ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
+		final ColumnViewer viewer = fTourViewer.getViewer();
+		if (viewer instanceof TreeViewer) {
 
-		if (selection.size() == 0) {
-			return;
-		}
+			final TreeViewer treeViewer = (TreeViewer) viewer;
+			final ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
 
-		final Tree tree = treeViewer.getTree();
-		tree.setRedraw(false);
-		{
-			for (final Iterator iterator = selection.iterator(); iterator.hasNext();) {
-				treeViewer.expandToLevel(iterator.next(), 2);//TreeViewer.ALL_LEVELS);
+			if (selection.size() == 0) {
+				return;
 			}
+
+			final Tree tree = treeViewer.getTree();
+			tree.setRedraw(false);
+			{
+				for (final Iterator iterator = selection.iterator(); iterator.hasNext();) {
+					treeViewer.expandToLevel(iterator.next(), 2);//TreeViewer.ALL_LEVELS);
+				}
+			}
+			tree.setRedraw(true);
 		}
-		tree.setRedraw(true);
 	}
 }

@@ -172,7 +172,8 @@ public class TourDatabase {
 	}
 
 	/**
-	 * remove all tour tags, the next time they have to be loaded from the database
+	 * remove all tour tags which are loaded from the database so the next time they will be
+	 * reloaded
 	 */
 	public static void clearTourTags() {
 

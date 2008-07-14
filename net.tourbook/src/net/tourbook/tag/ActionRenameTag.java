@@ -131,7 +131,7 @@ public class ActionRenameTag extends Action {
 	@Override
 	public void run() {
 
-		final StructuredSelection selection = (StructuredSelection) fTourViewer.getTreeViewer().getSelection();
+		final StructuredSelection selection = (StructuredSelection) fTourViewer.getViewer().getSelection();
 		final Object firstElement = selection.getFirstElement();
 
 		String name = UI.EMPTY_STRING;
@@ -184,7 +184,7 @@ public class ActionRenameTag extends Action {
 					updateTag(tourTagItem.getTagId(), newName);
 
 					// update view
-					fTourViewer.getTreeViewer().update(tourTagItem, null);
+					fTourViewer.getViewer().update(tourTagItem, null);
 
 				} else if (firstElement instanceof TVITagViewTagCategory) {
 
@@ -196,7 +196,7 @@ public class ActionRenameTag extends Action {
 					updateCategory(tourCategoryItem.getCategoryId(), newName);
 
 					// update view
-					fTourViewer.getTreeViewer().update(tourCategoryItem, null);
+					fTourViewer.getViewer().update(tourCategoryItem, null);
 
 				}
 

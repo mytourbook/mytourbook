@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.tour.TreeViewerItem;
 
-public class TVITourBookTour extends TourBookTreeViewerItem {
+public class TVITourBookTour extends TVITourBookItem {
 
 	long			fColumnStartDistance;
 	long			fTourId;

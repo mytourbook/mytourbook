@@ -16,16 +16,17 @@ import net.tourbook.ui.UI;
 
 public class TVITagViewYear extends TVITagViewItem {
 
-	private final int		fYear;
-	private TVITagViewTag	fTagItem;
+	private final int				fYear;
+	private TVITagViewTag			fTagItem;
 
-	private static Calendar	fCalendar	= GregorianCalendar.getInstance();
+	private static Calendar			fCalendar		= GregorianCalendar.getInstance();
+	private static SimpleDateFormat	fMonthFormatter	= new SimpleDateFormat("MMM");
 
 	/**
 	 * <code>true</code> when the children of this year item contains month items<br>
 	 * <code>false</code> when the children of this year item contains tour items
 	 */
-	private boolean			fIsMonth;
+	private boolean					fIsMonth;
 
 	public TVITagViewYear(final TVITagViewTag parentItem, final int year, final boolean isMonth) {
 		setParentItem(parentItem);
@@ -157,10 +158,6 @@ public class TVITagViewYear extends TVITagViewItem {
 			statement.setInt(2, fYear);
 			sqlFilter.setParameters(statement, 3);
 
-			final SimpleDateFormat dfMonth = new SimpleDateFormat("MMM");
-//			final DateTime dt = new DateTime(2000, 1, 1, 0, 0, 0, 0);
-//			final Date monthDate = new Date();
-
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
@@ -170,9 +167,8 @@ public class TVITagViewYear extends TVITagViewItem {
 				final TVITagViewMonth tourItem = new TVITagViewMonth(this, dbYear, dbMonth);
 				children.add(tourItem);
 
-//				dt.withMonthOfYear(dbMonth);
-				fCalendar.set(2000, dbMonth - 1, 1);
-				tourItem.treeColumn = dfMonth.format(fCalendar.getTime());
+				fCalendar.set(Calendar.MONTH, dbMonth - 1);
+				tourItem.treeColumn = fMonthFormatter.format(fCalendar.getTime());
 
 				tourItem.readSumColumnData(result, 3);
 			}

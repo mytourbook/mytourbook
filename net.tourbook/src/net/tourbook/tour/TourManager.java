@@ -55,8 +55,8 @@ public class TourManager {
 	public static final int						TOUR_PROPERTY_COMPARE_TOUR_CHANGED		= 40;
 
 	/**
-	 * Data of a tour has been modified. The property data contains an {@link ArrayList} with
-	 * {@link TourData}
+	 * The property data contains an {@link ArrayList} with all {@link TourData} which have been
+	 * modified
 	 */
 	public static final int						TOUR_PROPERTIES_CHANGED					= 50;
 
@@ -1069,19 +1069,25 @@ public class TourManager {
 	 */
 	public TourData getTourData(final Long tourId) {
 
-		if (fTourDataMap.containsKey(tourId)) {
-			return fTourDataMap.get(tourId);
+		if (tourId == null) {
+			return null;
+		}
+
+		final TourData tourDataInMap = fTourDataMap.get(tourId);
+		if (tourDataInMap != null) {
+			return tourDataInMap;
 		}
 
 		final TourData tourData = TourDatabase.getTourData(tourId);
 
-		// keep the tour data
-		if (tourData != null) {
-			putTourDataIntoMap(tourId, tourData);
-			return tourData;
+		if (tourData == null) {
+			return null;
 		}
 
-		return null;
+		// keep the tour data
+		putTourDataIntoMap(tourId, tourData);
+
+		return tourData;
 	}
 
 	/**

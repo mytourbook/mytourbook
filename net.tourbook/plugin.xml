@@ -363,6 +363,9 @@
                id="net.tourbook.views.tourCatalog.TourCatalogView">
          </viewShortcut>
          <viewShortcut
+               id="net.tourbook.views.tagViewID">
+         </viewShortcut>
+         <viewShortcut
                id="net.tourbook.views.tourCatalog.comparedTourView">
          </viewShortcut>
          <viewShortcut

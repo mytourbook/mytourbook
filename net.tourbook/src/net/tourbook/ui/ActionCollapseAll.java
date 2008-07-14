@@ -19,6 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
@@ -44,18 +45,22 @@ public class ActionCollapseAll extends Action {
 
 		if (fTourViewer != null) {
 
-			final TreeViewer treeViewer = fTourViewer.getTreeViewer();
+			final ColumnViewer viewer = fTourViewer.getViewer();
+			if (viewer instanceof TreeViewer) {
 
-			final Tree tree = treeViewer.getTree();
-			tree.setRedraw(false);
-			{
-				treeViewer.collapseAll();
-			}
-			tree.setRedraw(true);
+				final TreeViewer treeViewer = (TreeViewer) viewer;
 
-			final Object firstElement = ((StructuredSelection) treeViewer.getSelection()).getFirstElement();
-			if (firstElement != null) {
-				treeViewer.reveal(firstElement);
+				final Tree tree = treeViewer.getTree();
+				tree.setRedraw(false);
+				{
+					treeViewer.collapseAll();
+				}
+				tree.setRedraw(true);
+
+				final Object firstElement = ((StructuredSelection) treeViewer.getSelection()).getFirstElement();
+				if (firstElement != null) {
+					treeViewer.reveal(firstElement);
+				}
 			}
 		}
 	}

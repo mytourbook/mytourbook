@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.ui;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,6 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ISelectedTours;
 
 import org.eclipse.jface.action.Action;
 

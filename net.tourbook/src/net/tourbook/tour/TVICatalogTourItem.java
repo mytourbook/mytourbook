@@ -16,16 +16,20 @@
 package net.tourbook.tour;
 
 import net.tourbook.data.TourData;
+import net.tourbook.ui.views.tourCatalog.TVICatalogItem;
 
 /**
  * this contains a tree item which represents a tour
  */
-public abstract class TreeViewerTourItem extends TreeViewerItem {
+public abstract class TVICatalogTourItem extends TVICatalogItem {
 
 	/**
 	 * id for the {@link TourData} entity
 	 */
 	private long	tourId;
+
+	@Override
+	protected abstract void fetchChildren();
 
 	/**
 	 * @return Returns the Id for the {@link TourData} entity
@@ -34,19 +38,16 @@ public abstract class TreeViewerTourItem extends TreeViewerItem {
 		return tourId;
 	}
 
+	@Override
+	protected abstract void remove();
+
 	/**
 	 * Set the tour id for the tour item
 	 * 
 	 * @param tourId
 	 */
-	public void setTourId(long tourId) {
+	public void setTourId(final long tourId) {
 		this.tourId = tourId;
 	}
-
-	@Override
-	protected abstract void fetchChildren();
-
-	@Override
-	protected abstract void remove();
 
 }

@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
@@ -239,7 +238,7 @@ public class RawDataManager {
 
 					final RawDataView view = showRawDataView();
 					if (view != null) {
-						view.updateViewer();
+						view.reloadViewer();
 						view.selectFirstTour();
 					}
 				}
@@ -276,14 +275,14 @@ public class RawDataManager {
 	 * <code>fDeviceData</code> and <code>fTourData</code>
 	 * 
 	 * @param importFile
-	 * 		the file to be imported
+	 *            the file to be imported
 	 * @param destinationPath
-	 * 		if not null copy the file to this path
+	 *            if not null copy the file to this path
 	 * @param buildNewFileNames
-	 * 		if true create a new filename depending on the content of the file, keep old name if
-	 * 		false
+	 *            if true create a new filename depending on the content of the file, keep old name
+	 *            if false
 	 * @param fileCollision
-	 * 		behavior if destination file exists (ask if null)
+	 *            behavior if destination file exists (ask if null)
 	 * @return Returns <code>true</code> when the import was successfully
 	 */
 	public boolean importRawData(	final File importFile,
@@ -376,14 +375,14 @@ public class RawDataManager {
 	 * <code>fDeviceData</code> and <code>fTourData</code>
 	 * 
 	 * @param importFileName
-	 * 		the file to be imported
+	 *            the file to be imported
 	 * @param destinationPath
-	 * 		if not null copy the file to this path
+	 *            if not null copy the file to this path
 	 * @param buildNewFileNames
-	 * 		if true create a new filename depending on the content of the file, keep old name if
-	 * 		false
+	 *            if true create a new filename depending on the content of the file, keep old name
+	 *            if false
 	 * @param fileCollision
-	 * 		behavior if destination file exists (ask if null)
+	 *            behavior if destination file exists (ask if null)
 	 * @return Returns <code>true</code> when the import was successfully
 	 */
 	public boolean importRawData(	final String importFileName,
@@ -398,16 +397,16 @@ public class RawDataManager {
 	 * import the raw data of the given file
 	 * 
 	 * @param device
-	 * 		the device which is able to process the data of the file
+	 *            the device which is able to process the data of the file
 	 * @param sourceFileName
-	 * 		the file to be imported
+	 *            the file to be imported
 	 * @param destinationPath
-	 * 		if not null copy the file to this path
+	 *            if not null copy the file to this path
 	 * @param buildNewFileName
-	 * 		if true create a new filename depending on the content of the file, keep old name if
-	 * 		false
+	 *            if true create a new filename depending on the content of the file, keep old name
+	 *            if false
 	 * @param fileCollision
-	 * 		behavior if destination file exists (ask if null)
+	 *            behavior if destination file exists (ask if null)
 	 * @return
 	 */
 	private boolean importRawDataFromFile(	final TourbookDevice device,
@@ -583,40 +582,27 @@ public class RawDataManager {
 	}
 
 	/**
-	 * get the tourdata from the database when available
+	 * update {@link TourData} from the database for all saved tours
 	 */
 	public void updateTourDataFromDb() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked")//$NON-NLS-1$
 			public void run() {
 
 				final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-				final String sqlQuery = "SELECT TourData " //$NON-NLS-1$
-						+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ") //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" WHERE tourId = :tourId"); //$NON-NLS-1$
-
-				long tourId = -1;
 
 				try {
 
 					if (em != null) {
 
-						final Query query = em.createQuery(sqlQuery);
-
 						for (final TourData tourDataFromMap : fTourDataMap.values()) {
 
-							tourId = tourDataFromMap.getTourId();
-							query.setParameter("tourId", tourId); //$NON-NLS-1$
+							final Long tourId = tourDataFromMap.getTourId();
+							final TourData tourDataFromDB = em.find(TourData.class, tourId);
 
-							final List peopleList = query.getResultList();
-
-							if (peopleList.size() != 0) {
+							if (tourDataFromDB != null) {
 
 								// tour is in the database, replace the imported tour with the tour from the database
-
-								final TourData tourDataFromDB = (TourData) peopleList.get(0);
 
 								tourDataFromDB.importRawDataFile = tourDataFromMap.importRawDataFile;
 
@@ -629,11 +615,8 @@ public class RawDataManager {
 								tourDataFromMap.setTourPerson(null);
 							}
 						}
-
 					}
 				} catch (final Exception e) {
-					System.err.println(sqlQuery);
-					System.err.println("tourId=" + tourId); //$NON-NLS-1$
 					e.printStackTrace();
 				} finally {
 					em.close();
@@ -642,98 +625,4 @@ public class RawDataManager {
 		});
 	}
 
-	/**
-	 * get the tourdata from the database when available
-	 */
-	public void updateTourDataFromDb_NOTWORKING() {
-
-		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-			@SuppressWarnings("unchecked")//$NON-NLS-1$
-			public void run() {
-
-				if (fTourDataMap.size() == 0) {
-					// nothing to do
-					return;
-				}
-
-				/*
-				 * get tour id's in a list
-				 */
-				final ArrayList<Long> tourIdList = new ArrayList<Long>();
-				for (final TourData tourData : fTourDataMap.values()) {
-					tourIdList.add(tourData.getTourId());
-				}
-
-//				// Named parameter list
-//				List names = new ArrayList();
-//				names.add("Izi");
-//				names.add("Fritz");
-//				Query q = em.createQuery("select cat from DomesticCat cat where cat.name in (:namesList)");
-//				q.setParameter("namesList", names);
-//				List cats = q.list();
-
-				final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-				final String sqlQuery = "SELECT TourData " //$NON-NLS-1$
-						+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " tourdata ") //$NON-NLS-1$ //$NON-NLS-2$
-						+ (" WHERE tourdata.tourId IN (:tourIdList)");//$NON-NLS-1$
-
-				try {
-
-					if (em != null) {
-
-						final Query query = em.createQuery(sqlQuery);
-
-						query.setParameter("tourIdList", tourIdList); //$NON-NLS-1$
-
-						final List tourDataList = query.getResultList();
-
-						for (final TourData tourDataFromMap : fTourDataMap.values()) {
-
-							final long tourIdFromMap = tourDataFromMap.getTourId().longValue();
-							boolean isFound = false;
-
-							for (final Object dbObject : tourDataList) {
-
-								final TourData tourDataFromDb = (TourData) dbObject;
-
-								if (tourDataFromDb.getTourId().longValue() == tourIdFromMap) {
-
-									/*
-									 * tour is available in the database, replace the imported tour
-									 * with the tour from the database
-									 */
-
-									final TourData tourDataFromDB = (TourData) tourDataList.get(0);
-
-									tourDataFromDB.importRawDataFile = tourDataFromMap.importRawDataFile;
-
-									fTourDataMap.put(tourDataFromDB.getTourId().toString(), tourDataFromDB);
-
-									isFound = true;
-									break;
-								}
-							}
-
-							if (isFound == false) {
-
-								/*
-								 * tour is not in the databse, therefore the tour was deleted and
-								 * the person in the tour data must be removed
-								 */
-
-								tourDataFromMap.setTourPerson(null);
-							}
-						}
-					}
-				} catch (final Exception e) {
-					System.err.println(sqlQuery);
-//					System.err.println("tourIdList=" + tourIdList.toString());
-					e.printStackTrace();
-				} finally {
-					em.close();
-				}
-			}
-		});
-	}
 }

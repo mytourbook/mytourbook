@@ -34,7 +34,7 @@ class ActionRenameRefTour extends Action {
 	 */
 	private final TourCatalogView	fTourCatalogView;
 
-	public ActionRenameRefTour(TourCatalogView tourCatalogView) {
+	public ActionRenameRefTour(final TourCatalogView tourCatalogView) {
 
 		super(Messages.tourCatalog_view_action_rename_reference_tour);
 		fTourCatalogView = tourCatalogView;
@@ -45,9 +45,9 @@ class ActionRenameRefTour extends Action {
 
 		final Object selectedItem = (((ITreeSelection) fTourCatalogView.getTourViewer().getSelection()).getFirstElement());
 
-		if (selectedItem instanceof TourCatalogItemReferenceTour) {
+		if (selectedItem instanceof TVICatalogReferenceTour) {
 
-			final TourCatalogItemReferenceTour ttiRefTour = (TourCatalogItemReferenceTour) selectedItem;
+			final TVICatalogReferenceTour ttiRefTour = (TVICatalogReferenceTour) selectedItem;
 
 			// ask for the reference tour name
 			final InputDialog dialog = new InputDialog(this.fTourCatalogView.getSite().getShell(),
@@ -84,8 +84,7 @@ class ActionRenameRefTour extends Action {
 					} else {
 
 						// refresh the tree viewer and resort the ref tours
-						fTourCatalogView.fRootItem.fetchChildren();
-						fTourCatalogView.getTourViewer().refresh();
+						fTourCatalogView.reloadViewer();
 					}
 					em.close();
 				}

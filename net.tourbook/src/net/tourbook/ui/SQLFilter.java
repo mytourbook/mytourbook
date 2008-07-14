@@ -61,7 +61,7 @@ public class SQLFilter {
 	}
 
 	/**
-	 * Sets the parameters into the statement
+	 * Sets the parameters into the filter statement
 	 * 
 	 * @param statement
 	 * @param startIndex

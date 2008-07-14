@@ -41,6 +41,10 @@ import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourCatalog.CompareResultItemComparedTour;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogReferenceTour;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -49,6 +53,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -918,6 +923,40 @@ public class MappingView extends ViewPart {
 			fMap.setZoom(poi.getRecommendedZoom());
 			fMap.setCenterPosition(fPOIPosition);
 			fMap.queueRedrawMap();
+
+		} else if (selection instanceof StructuredSelection) {
+
+			final StructuredSelection structuredSelection = (StructuredSelection) selection;
+
+			final Object firstElement = structuredSelection.getFirstElement();
+			if (firstElement instanceof TVICatalogComparedTour) {
+
+				final TVICatalogComparedTour comparedTour = (TVICatalogComparedTour) firstElement;
+				final long tourId = comparedTour.getTourId();
+
+				final TourData tourData = TourManager.getInstance().getTourData(tourId);
+				paintTour(tourData, false, false);
+
+			} else if (firstElement instanceof CompareResultItemComparedTour) {
+
+				final CompareResultItemComparedTour compareResultItem = (CompareResultItemComparedTour) firstElement;
+				final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData()
+						.getTourId());
+				paintTour(tourData, false, false);
+			}
+
+		} else if (selection instanceof SelectionTourCatalogView) {
+
+			// show reference tour
+			
+			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+
+			final TVICatalogReferenceTour refItem = tourCatalogSelection.getRefItem();
+			if (refItem != null) {
+
+				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
+				paintTour(tourData, false, false);
+			}
 		}
 
 		enableActions();
@@ -1293,9 +1332,9 @@ public class MappingView extends ViewPart {
 	 * so that the entire city and it's points are visible without panning.
 	 * 
 	 * @param positions
-	 * 		A set of GeoPositions to calculate the new zoom from
+	 *            A set of GeoPositions to calculate the new zoom from
 	 * @param adjustZoomLevel
-	 * 		when <code>true</code> the zoom level will be adjusted to user settings
+	 *            when <code>true</code> the zoom level will be adjusted to user settings
 	 */
 	private void setTourZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
 
@@ -1385,7 +1424,7 @@ public class MappingView extends ViewPart {
 	 * @param legendProvider
 	 * @param legendBounds
 	 * @return Return <code>true</code> when the legend value could be updated, <code>false</code>
-	 * 	when data are not available
+	 *         when data are not available
 	 */
 	private boolean updateLegendValues(final ILegendProvider legendProvider, final Rectangle legendBounds) {
 

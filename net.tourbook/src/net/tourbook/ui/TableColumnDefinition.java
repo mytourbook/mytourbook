@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -26,24 +26,26 @@ public class TableColumnDefinition extends ColumnDefinition {
 
 	/**
 	 * @param columnManager
-	 *        manager which managed the columns
+	 *            manager which managed the columns
 	 * @param columnId
-	 *        column id which must be unique within the table
+	 *            column id which must be unique within the table
 	 * @param style
-	 *        ui style
+	 *            ui style
 	 */
-	public TableColumnDefinition(ColumnManager columnManager, String columnId, int style) {
-		columnManager.addColumn(this);
+	public TableColumnDefinition(final ColumnManager columnManager, final String columnId, final int style) {
+
 		fColumnId = columnId;
 		fStyle = style;
-	}
 
-	public void setTableColumn(TableColumn tableColumn) {
-		fTableColumn = tableColumn;
+		columnManager.addColumn(this);
 	}
 
 	public TableColumn getTableColumn() {
 		return fTableColumn;
+	}
+
+	public void setTableColumn(final TableColumn tableColumn) {
+		fTableColumn = tableColumn;
 	}
 
 }

@@ -26,14 +26,13 @@ import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
-public class TVITourBookYear extends TourBookTreeViewerItem {
+public class TVITourBookYear extends TVITourBookItem {
 
-	public TVITourBookYear(final TourBookView view, final TourBookTreeViewerItem parentItem, final int year) {
+	public TVITourBookYear(final TourBookView view, final TVITourBookItem parentItem) {
 
 		super(view);
 
 		setParentItem(parentItem);
-		fTourYear = fFirstColumn = year;
 	}
 
 	@Override
@@ -73,30 +72,20 @@ public class TVITourBookYear extends TourBookTreeViewerItem {
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
-				final TourBookTreeViewerItem tourItem = new TVITourBookMonth(fView,
-						this,
-						result.getInt(1),
-						result.getInt(2));
+				final TVITourBookItem tourItem = new TVITourBookMonth(fView, this);
+				children.add(tourItem);
 
-				fCalendar.set(result.getShort(1), result.getShort(2) - 1, 1);
+				final int dbYear = result.getInt(1);
+				final int dbMonth = result.getInt(2);
+				fCalendar.set(dbYear, dbMonth - 1, 1);
+
+				tourItem.treeColumn = fMonthFormatter.format(fCalendar.getTime());
+
+				tourItem.fTourYear = dbYear;
+				tourItem.fTourMonth = dbMonth;
 				tourItem.fTourDate = fCalendar.getTimeInMillis();
 
-				tourItem.addSumData(result.getLong(3),
-						result.getLong(4),
-						result.getLong(5),
-						result.getLong(6),
-						result.getLong(7),
-						result.getLong(8),
-						result.getFloat(9),
-						result.getLong(10),
-						result.getLong(11),
-						result.getLong(12),
-						result.getLong(13),
-						result.getLong(14),
-						result.getLong(15),
-						result.getLong(16));
-
-				children.add(tourItem);
+				tourItem.addSumColumns(result, 3);
 			}
 
 			conn.close();

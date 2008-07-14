@@ -22,23 +22,27 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TVICatalogTourItem;
 import net.tourbook.tour.TreeViewerItem;
-import net.tourbook.tour.TreeViewerTourItem;
 import net.tourbook.ui.UI;
 
 /**
  * TTI (TreeViewerItem) is used in the tree viewer {@link TourCatalogView}, it contains tree items
  * for reference tours
  */
-public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
+public class TVICatalogReferenceTour extends TVICatalogTourItem {
 
 	String	label;
+
 	long	refId;
 
 	int		yearMapMinValue	= Integer.MIN_VALUE;
 	int		yearMapMaxValue;
 
-	public TourCatalogItemReferenceTour(final TourCatalogItemRoot parentItem, final String label, final long refId, final long tourId) {
+	public TVICatalogReferenceTour(	final TVICatalogRootItem parentItem,
+									final String label,
+									final long refId,
+									final long tourId) {
 
 		this.setParentItem(parentItem);
 
@@ -49,6 +53,24 @@ public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
 	}
 
 	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TVICatalogReferenceTour)) {
+			return false;
+		}
+		final TVICatalogReferenceTour other = (TVICatalogReferenceTour) obj;
+		if (refId != other.refId) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	protected void fetchChildren() {
 
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
@@ -56,20 +78,19 @@ public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
 
 		/**
 		 * derby does not support expression in "GROUP BY" statements, this is a workaround found
-		 * here:
-		 * http://mail-archives.apache.org/mod_mbox/db-derby-dev/200605.mbox/%3C7415300.1147889647479.JavaMail.jira@brutus%3E
-		 * <code>
-		 *	String subSQLString = "(SELECT YEAR(tourDate)\n"
-		 *		+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n")
-		 *		+ (" WHERE "
-		 *				+ TourDatabase.TABLE_TOUR_REFERENCE
-		 *				+ "_generatedId="
-		 *				+ refId + "\n")
-		 *		+ ")";
-		 *
-		 *	String sqlString = "SELECT years FROM \n"
-		 *		+ subSQLString
-		 *		+ (" REFYEARS(years) GROUP BY years");
+		 * here: http://mail-archives.apache.org/mod_mbox/db-derby-dev/200605.mbox/%3C7415300
+		 * .1147889647479.JavaMail.jira@brutus%3E <code>
+		 * 	String subSQLString = "(SELECT YEAR(tourDate)\n"
+		 * 		+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n")
+		 * 		+ (" WHERE "
+		 * 				+ TourDatabase.TABLE_TOUR_REFERENCE
+		 * 				+ "_generatedId="
+		 * 				+ refId + "\n")
+		 * 		+ ")";
+		 * 
+		 * 	String sqlString = "SELECT years FROM \n"
+		 * 		+ subSQLString
+		 * 		+ (" REFYEARS(years) GROUP BY years");
 		 *</code>
 		 */
 
@@ -86,7 +107,7 @@ public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
 			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				children.add(new TourCatalogItemYear(this, refId, result.getInt(1)));
+				children.add(new TVICatalogYearItem(this, refId, result.getInt(1)));
 			}
 
 			conn.close();
@@ -94,6 +115,14 @@ public class TourCatalogItemReferenceTour extends TreeViewerTourItem {
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (refId ^ (refId >>> 32));
+		return result;
 	}
 
 	@Override

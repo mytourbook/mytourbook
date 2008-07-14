@@ -43,6 +43,9 @@ import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogReferenceTour;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.Preferences;
@@ -50,6 +53,7 @@ import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -121,13 +125,13 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 			fActionQuickEdit.setEnabled(isEnabled);
 			fActionEditTour.setEnabled(isEnabled);
-			
+
 			fActionAddTag.setEnabled(isEnabled);
 			fActionRemoveTag.setEnabled(isEnabled);
 			fActionRemoveAllTags.setEnabled(isEnabled);
-			
+
 			fActionSetTourType.setEnabled(isEnabled);
-			
+
 			// enable actions for the recent tags
 			TagManager.enableRecentTagActions(isEnabled);
 
@@ -216,6 +220,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 	private void addTourPropertyListener() {
 		fTourPropertyListener = new ITourPropertyListener() {
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
@@ -243,7 +248,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 							// keep changed data
 							fTourData = tourData;
 
-							updateChart();
+							updateChart(tourData);
 
 							return;
 						}
@@ -351,38 +356,43 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		if (selection instanceof SelectionTourData) {
 
 			final TourData selectionTourData = ((SelectionTourData) selection).getTourData();
+			if (selectionTourData != null) {
 
-			// check if the tour chart already shows the new tour data
-			if (selectionTourData == fTourData) {
-				return;
+				if (fTourData != null && fTourData.equals(selectionTourData)) {
+					return;
+				}
+				updateChart(selectionTourData);
 			}
-
-			fTourData = selectionTourData;
-			updateChart();
 
 		} else if (selection instanceof SelectionTourId) {
 
-			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
+			final SelectionTourId selectionTourId = (SelectionTourId) selection;
+			final Long tourId = selectionTourId.getTourId();
 
-			if (fTourData != null) {
-				if (fTourData.getTourId().equals(tourIdSelection.getTourId())) {
-					// don't reload the same tour
-					return;
-				}
-			}
-
-			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
-
-			if (tourData != null) {
-				fTourData = tourData;
-				updateChart();
-			}
+			updateChart(tourId);
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
 
 			fTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
-		}
 
+		} else if (selection instanceof StructuredSelection) {
+
+			final StructuredSelection structuredSelection = (StructuredSelection) selection;
+
+			final Object firstElement = structuredSelection.getFirstElement();
+			if (firstElement instanceof TVICatalogComparedTour) {
+				updateChart(((TVICatalogComparedTour) firstElement).getTourId());
+			}
+
+		} else if (selection instanceof SelectionTourCatalogView) {
+
+			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+
+			final TVICatalogReferenceTour refItem = tourCatalogSelection.getRefItem();
+			if (refItem != null) {
+				updateChart(refItem.getTourId());
+			}
+		}
 	}
 
 	@Override
@@ -398,6 +408,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 	private void updateChart() {
 
 		if (fTourData == null) {
+			// nothing to do
 			return;
 		}
 
@@ -409,6 +420,28 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 		// set application window title
 		setTitleToolTip(TourManager.getTourDate(fTourData));
+	}
+
+	private void updateChart(final Long tourId) {
+
+		if (fTourData != null && fTourData.getTourId() == tourId) {
+			// optimize
+			return;
+		}
+
+		updateChart(TourManager.getInstance().getTourData(tourId));
+	}
+
+	private void updateChart(final TourData tourData) {
+
+		if (tourData == null) {
+			// nothing to do
+			return;
+		}
+
+		fTourData = tourData;
+
+		updateChart();
 	}
 
 }

@@ -21,16 +21,33 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.ActionRemoveAllTags;
+import net.tourbook.tag.ActionSetTourTag;
+import net.tourbook.tag.TagManager;
+import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
+import net.tourbook.ui.ActionEditTour;
+import net.tourbook.ui.ActionModifyColumns;
+import net.tourbook.ui.ActionOpenPrefDialog;
+import net.tourbook.ui.ActionRefreshView;
+import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
+import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.ITourViewer;
+import net.tourbook.ui.TreeColumnDefinition;
+import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -44,33 +61,27 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.TreeColumnLayout;
-import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableColorProvider;
-import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -81,76 +92,68 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourCatalogView extends ViewPart implements ITourViewer {
+public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedTours {
 
-	private static final String				MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";					//$NON-NLS-1$
-	private static final String				MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";						//$NON-NLS-1$
+	private static final String			MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";					//$NON-NLS-1$
+	private static final String			MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";						//$NON-NLS-1$
 
-	public static final String				ID									= "net.tourbook.views.tourCatalog.TourCatalogView"; //$NON-NLS-1$
+	public static final String			ID									= "net.tourbook.views.tourCatalog.TourCatalogView"; //$NON-NLS-1$
 
-	public static final int					COLUMN_LABEL						= 0;
-	public static final int					COLUMN_SPEED						= 1;
+	public static final int				COLUMN_LABEL						= 0;
+	public static final int				COLUMN_SPEED						= 1;
 
 	/**
 	 * This memento allows this view to save and restore state when it is closed and opened within a
 	 * session. A different memento is supplied by the platform for persistance at workbench
 	 * shutdown.
 	 */
-	private static IMemento					fSessionMemento						= null;
+	private static IMemento				fSessionMemento						= null;
 
-	TourCatalogItemRoot						fRootItem							= new TourCatalogItemRoot();
+	private TVICatalogRootItem			fRootItem;
 
-	private Composite						fViewerContainer;
-	private TreeViewer						fTourViewer;
+	private Composite					fViewerContainer;
+	private TreeViewer					fTourViewer;
 
-	final NumberFormat						nf									= NumberFormat.getNumberInstance();
+	final NumberFormat					nf									= NumberFormat.getNumberInstance();
 
-	private ISelectionListener				fPostSelectionListener;
-	private IPartListener2					fPartListener;
-	PostSelectionProvider					fPostSelectionProvider;
-	private ITourPropertyListener			fCompareTourPropertyListener;
-	private IPropertyChangeListener			fPrefChangeListener;
+	private ISelectionListener			fPostSelectionListener;
+	private IPartListener2				fPartListener;
+	PostSelectionProvider				fPostSelectionProvider;
+	private ITourPropertyListener		fCompareTourPropertyListener;
+	private IPropertyChangeListener		fPrefChangeListener;
 
-	protected int							fRefTourXMarkerValue;
+	protected int						fRefTourXMarkerValue;
 
-	private ActionDeleteTourFromMap			fActionDeleteSelectedTour;
-	private ActionRenameRefTour				fActionRenameRefTour;
-	private ActionLinkTour					fActionLinkTour;
-	private ActionCollapseAll				fActionCollapseAll;
-	private ActionRefreshView				fActionRefreshView;
-
-	private final RGB						fRGBRefFg							= new RGB(0, 0, 0);
-	private final RGB						fRGBRefBg							= new RGB(255, 220, 153);
-
-	private final RGB						fRGBYearFg							= new RGB(255, 255, 255);
-	private final RGB						fRGBYearBg							= new RGB(255, 233, 191);
-
-	private final RGB						fRGBTourFg							= new RGB(0, 0, 0);
-	private final RGB						fRGBTourBg							= new RGB(255, 255, 255);
-
-	private Color							fColorRefFg;
-	private Color							fColorRefBg;
-
-	private Color							fColorYearFg;
-	private Color							fColorYearBg;
-
-	private Color							fColorTourFg;
-	private Color							fColorTourBg;
+	private ActionRemoveComparedTours		fActionDeleteSelectedTour;
+	private ActionRenameRefTour			fActionRenameRefTour;
+	private ActionLinkTour				fActionLinkTour;
+	private ActionCollapseAll			fActionCollapseAll;
+	private ActionRefreshView			fActionRefreshView;
+	private ActionModifyColumns			fActionModifyColumns;
 
 	/**
 	 * tour item which is selected by the link tour action
 	 */
-	protected TourCatalogItemComparedTour	fLinkedTour;
+	protected TVICatalogComparedTour	fLinkedTour;
 
 	/**
 	 * ref id which is currently selected in the tour viewer
 	 */
-	private long							fActiveRefId;
+	private long						fActiveRefId;
 
 	/**
 	 * flag if actions are added to the toolbar
 	 */
-	private boolean							fIsToolbarCreated					= false;
+	private boolean						fIsToolbarCreated					= false;
+	private ColumnManager				fColumnManager;
+	private ITourPropertyListener		fTourPropertyListener;
+	private ActionEditQuick				fActionEditQuick;
+	private ActionEditTour				fActionEditTour;
+	private ActionSetTourType			fActionSetTourType;
+	private ActionSetTourTag			fActionAddTag;
+	private ActionRemoveAllTags			fActionRemoveAllTags;
+	private ActionOpenPrefDialog		fActionOpenTagPrefs;
+	private ActionSetTourTag			fActionRemoveTag;
 
 	class TourContentProvider implements ITreeContentProvider {
 
@@ -168,10 +171,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 			return ((TreeViewerItem) element).getParentItem();
 		}
 
-		public TreeViewerItem getRootItem() {
-			return fRootItem;
-		}
-
 		public boolean hasChildren(final Object element) {
 			return ((TreeViewerItem) element).hasChildren();
 		}
@@ -179,84 +178,65 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	private class TourLabelProvider extends LabelProvider implements ITableLabelProvider, ITableColorProvider {
-
-		public Color getBackground(final Object element, final int columnIndex) {
-			if (/* columnIndex == 0 && */element instanceof TourCatalogItemReferenceTour) {
-				return fColorRefBg;
-			}
-			if (/* columnIndex == 0 && */element instanceof TourCatalogItemYear) {
-				return fColorYearBg;
-			}
-			if (columnIndex == 0 && element instanceof TourCatalogItemComparedTour) {
-				return fColorTourBg;
-			}
-
-			return null;
-		}
-
-		public Image getColumnImage(final Object element, final int columnIndex) {
-			return null;
-		}
-
-		public String getColumnText(final Object obj, final int index) {
-
-			if (obj instanceof TourCatalogItemReferenceTour) {
-
-				final TourCatalogItemReferenceTour refTour = (TourCatalogItemReferenceTour) obj;
-				switch (index) {
-				case COLUMN_LABEL:
-					return refTour.label;
-				}
-				return ""; //$NON-NLS-1$
-
-			} else if (obj instanceof TourCatalogItemYear) {
-
-				final TourCatalogItemYear yearItem = (TourCatalogItemYear) obj;
-				switch (index) {
-				case COLUMN_LABEL:
-					return Integer.toString(yearItem.year);
-				}
-				return ""; //$NON-NLS-1$
-
-			} else if (obj instanceof TourCatalogItemComparedTour) {
-
-				final TourCatalogItemComparedTour compTour = (TourCatalogItemComparedTour) obj;
-				switch (index) {
-				case COLUMN_LABEL:
-					return DateFormat.getDateInstance(DateFormat.SHORT).format(compTour.getTourDate());
-
-				case COLUMN_SPEED:
-
-					nf.setMinimumFractionDigits(1);
-					nf.setMaximumFractionDigits(1);
-
-					final float speed = compTour.getTourSpeed();
-					if (speed == 0) {
-						return ""; //$NON-NLS-1$
-					} else {
-						return nf.format(speed / UI.UNIT_VALUE_DISTANCE);
-					}
-				}
-
-			}
-			return (getText(obj));
-		}
-
-		public Color getForeground(final Object element, final int columnIndex) {
-//			if (/* columnIndex != 0 && */element instanceof TVTITourCatalogReferenceTour) {
-//				return fColorRefFg;
+//	private class TourLabelProvider extends LabelProvider implements ITableLabelProvider, ITableColorProvider {
+//
+//		public String getColumnText(final Object obj, final int index) {
+//
+//			if (obj instanceof TVICatalogReferenceTour) {
+//
+//				final TVICatalogReferenceTour refTour = (TVICatalogReferenceTour) obj;
+//				switch (index) {
+//				case COLUMN_LABEL:
+//					return refTour.label;
+//				}
+//				return ""; //$NON-NLS-1$
+//
+//			} else if (obj instanceof TourCatalogItemYear) {
+//
+//				final TourCatalogItemYear yearItem = (TourCatalogItemYear) obj;
+//				switch (index) {
+//				case COLUMN_LABEL:
+//					return Integer.toString(yearItem.year);
+//				}
+//				return ""; //$NON-NLS-1$
+//
+//			} else if (obj instanceof TVICatalogComparedTour) {
+//
+//				final TVICatalogComparedTour compTour = (TVICatalogComparedTour) obj;
+//				switch (index) {
+//				case COLUMN_LABEL:
+//					return DateFormat.getDateInstance(DateFormat.SHORT).format(compTour.getTourDate());
+//
+//				case COLUMN_SPEED:
+//
+//					nf.setMinimumFractionDigits(1);
+//					nf.setMaximumFractionDigits(1);
+//
+//					final float speed = compTour.getTourSpeed();
+//					if (speed == 0) {
+//						return ""; //$NON-NLS-1$
+//					} else {
+//						return nf.format(speed / UI.UNIT_VALUE_DISTANCE);
+//					}
+//				}
 //			}
-			return fColorRefFg;
-			// if (element instanceof TVITourBookTour) {
-			// return fColorTourFg;
-			// }
-			// if (columnIndex != 0 && element instanceof TVITourBookMonth) {
-			// return fColorMonthFg;
-			// }
-//			return null;
-		}
-	}
+//			return (getText(obj));
+//		}
+//
+////		public Color getForeground(final Object element, final int columnIndex) {
+//////			if (/* columnIndex != 0 && */element instanceof TVTITourCatalogReferenceTour) {
+//////				return fColorRefFg;
+//////			}
+//////			return fColorRefFg;
+////			// if (element instanceof TVITourBookTour) {
+////			// return fColorTourFg;
+////			// }
+////			// if (columnIndex != 0 && element instanceof TVITourBookMonth) {
+////			// return fColorMonthFg;
+////			// }
+//////			return null;
+////		}
+//	}
 
 	/**
 	 * Find the compared tours in the tour map tree viewer<br>
@@ -265,9 +245,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 	 * @param comparedTours
 	 * @param parentItem
 	 * @param findCompIds
-	 *        comp id's which should be found
+	 *            comp id's which should be found
 	 */
-	private static void getComparedTours(	final ArrayList<TourCatalogItemComparedTour> comparedTours,
+	private static void getComparedTours(	final ArrayList<TVICatalogComparedTour> comparedTours,
 											final TreeViewerItem parentItem,
 											final ArrayList<Long> findCompIds) {
 
@@ -279,9 +259,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 			for (final TreeViewerItem tourTreeItem : unfetchedChildren) {
 
-				if (tourTreeItem instanceof TourCatalogItemComparedTour) {
+				if (tourTreeItem instanceof TVICatalogComparedTour) {
 
-					final TourCatalogItemComparedTour ttiCompResult = (TourCatalogItemComparedTour) tourTreeItem;
+					final TVICatalogComparedTour ttiCompResult = (TVICatalogComparedTour) tourTreeItem;
 					final long ttiCompId = ttiCompResult.getCompId();
 
 					for (final Long compId : findCompIds) {
@@ -317,14 +297,13 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 						compareIds.add(compareTourProperty.compareId);
 
 						// find the compared tour in the viewer
-						final ArrayList<TourCatalogItemComparedTour> comparedTours = new ArrayList<TourCatalogItemComparedTour>();
-						final TreeViewerItem rootItem = ((TourContentProvider) fTourViewer.getContentProvider()).getRootItem();
+						final ArrayList<TVICatalogComparedTour> comparedTours = new ArrayList<TVICatalogComparedTour>();
 
-						getComparedTours(comparedTours, rootItem, compareIds);
+						getComparedTours(comparedTours, fRootItem, compareIds);
 
 						if (comparedTours.size() > 0) {
 
-							final TourCatalogItemComparedTour comparedTour = comparedTours.get(0);
+							final TVICatalogComparedTour comparedTour = comparedTours.get(0);
 
 							// update entity
 							comparedTour.setStartIndex(compareTourProperty.startIndex);
@@ -399,14 +378,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 				} else if (selection instanceof SelectionNewRefTours) {
 
-					refreshViewer();
-
-//					final SelectionNewRefTours tourSelection = (SelectionNewRefTours) selection;
-//					final ArrayList<TourReference> newRefTours = tourSelection.newRefTours;
-//
-//					if (newRefTours.size() > 0) {
-//						refreshView();
-//					}
+					reloadViewer();
 
 				} else if (selection instanceof SelectionRemovedComparedTours) {
 
@@ -416,13 +388,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 					 * find/remove the removed compared tours in the viewer
 					 */
 
-					final ArrayList<TourCatalogItemComparedTour> comparedTours = new ArrayList<TourCatalogItemComparedTour>();
-					final TreeViewerItem rootItem = ((TourContentProvider) fTourViewer.getContentProvider()).getRootItem();
+					final ArrayList<TVICatalogComparedTour> comparedTours = new ArrayList<TVICatalogComparedTour>();
 
-					getComparedTours(comparedTours, rootItem, removedCompTours.removedComparedTours);
+					getComparedTours(comparedTours, fRootItem, removedCompTours.removedComparedTours);
 
 					// remove compared tour from the data model
-					for (final TourCatalogItemComparedTour comparedTour : comparedTours) {
+					for (final TVICatalogComparedTour comparedTour : comparedTours) {
 						comparedTour.remove();
 					}
 
@@ -435,11 +406,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 					final Object firstElement = structuredSelection.getFirstElement();
 
-					if (firstElement instanceof TourCatalogItemComparedTour) {
+					if (firstElement instanceof TVICatalogComparedTour) {
 
 						// select the compared tour in the tour viewer
 
-						final TourCatalogItemComparedTour linkedTour = (TourCatalogItemComparedTour) firstElement;
+						final TVICatalogComparedTour linkedTour = (TVICatalogComparedTour) firstElement;
 
 						// check if the linked tour is already set, prevent recursion
 						if (fLinkedTour != linkedTour) {
@@ -457,6 +428,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 	private void addPrefListener() {
 
+		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
+
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
@@ -468,34 +441,71 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 					UI.updateUnits();
 
-					saveSettings();
+					recreateViewer();
 
-					// dispose viewer
-					final Control[] children = fViewerContainer.getChildren();
-					for (int childIndex = 0; childIndex < children.length; childIndex++) {
-						children[childIndex].dispose();
-					}
+				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-					createTourViewer(fViewerContainer);
-					fViewerContainer.layout();
+					// update tourbook viewer
+					fTourViewer.refresh();
 
-					// update the viewer
-					fTourViewer.setInput(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem());
+				} else if (property.equals(ITourbookPreferences.TAG_COLOR_AND_LAYOUT_CHANGED)) {
 
-					restoreState(fSessionMemento);
+					fTourViewer.getTree()
+							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+
+					fTourViewer.refresh();
+
+					/*
+					 * the tree must be redrawn because the styled text does not show with the new
+					 * color
+					 */
+					fTourViewer.getTree().redraw();
 				}
 			}
 		};
-		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
+		prefStore.addPropertyChangeListener(fPrefChangeListener);
+	}
+
+	private void addTourPropertyListener() {
+
+		fTourPropertyListener = new ITourPropertyListener() {
+			@SuppressWarnings("unchecked")//$NON-NLS-1$
+			public void propertyChanged(final int propertyId, final Object propertyData) {
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+
+					// get a clone of the modified tours because the tours are removed from the list
+					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) ((ArrayList<TourData>) propertyData).clone();
+
+					updateTourViewer(fRootItem, modifiedTours);
+
+				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
+
+					reloadViewer();
+				}
+			}
+		};
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
 	}
 
 	private void createActions() {
 
-		fActionDeleteSelectedTour = new ActionDeleteTourFromMap(this);
+		fActionDeleteSelectedTour = new ActionRemoveComparedTours(this);
 		fActionRenameRefTour = new ActionRenameRefTour(this);
 		fActionLinkTour = new ActionLinkTour(this);
 		fActionRefreshView = new ActionRefreshView(this);
 		fActionCollapseAll = new ActionCollapseAll(this);
+		fActionModifyColumns = new ActionModifyColumns(this);
+
+		fActionEditQuick = new ActionEditQuick(this);
+		fActionEditTour = new ActionEditTour(this);
+		fActionSetTourType = new ActionSetTourType(this);
+
+		fActionAddTag = new ActionSetTourTag(this, true);
+		fActionRemoveTag = new ActionSetTourTag(this, false);
+		fActionRemoveAllTags = new ActionRemoveAllTags(this);
+
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
+				"net.tourbook.preferences.PrefPageTags");
 	}
 
 	/**
@@ -520,74 +530,54 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		final Display display = parent.getDisplay();
-
-		fColorRefFg = new Color(display, fRGBRefFg);
-		fColorRefBg = new Color(display, fRGBRefBg);
-		fColorYearFg = new Color(display, fRGBYearFg);
-		fColorYearBg = new Color(display, fRGBYearBg);
-		fColorTourFg = new Color(display, fRGBTourFg);
-		fColorTourBg = new Color(display, fRGBTourBg);
+		// define all columns for the viewer
+		fColumnManager = new ColumnManager(this, fSessionMemento);
+		defineViewerColumns(parent);
 
 		fViewerContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
+
 		createTourViewer(fViewerContainer);
 
 		createActions();
+		fillViewMenu();
 
 		addPartListener();
 		addPostSelectionListener();
 		addCompareTourPropertyListener();
+		addTourPropertyListener();
 		addPrefListener();
 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		fTourViewer.setInput(((TourContentProvider) fTourViewer.getContentProvider()).getRootItem());
+		fTourViewer.setInput(fRootItem = new TVICatalogRootItem());
 
 		restoreState(fSessionMemento);
 	}
 
-	private Control createTourViewer(final Composite parent) {
-
-		final TreeColumnLayout treeLayout = new TreeColumnLayout();
-
-		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		layoutContainer.setLayout(treeLayout);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
+	private void createTourViewer(final Composite parent) {
 
 		// tour tree
-		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.BORDER
-				| SWT.MULTI
-				| SWT.FULL_SELECTION);
+		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
 		tree.setHeaderVisible(true);
-		// tree.setLinesVisible(true);
 
-		// tree columns
-		TreeColumn tc;
-		final PixelConverter pixelConverter = new PixelConverter(tree);
+		tree.setLinesVisible(TourbookPlugin.getDefault()
+				.getPluginPreferences()
+				.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
 
-		tc = new TreeColumn(tree, SWT.NONE);
-		tc.setText(Messages.tourCatalog_view_column_tour);
-		treeLayout.setColumnData(tc, new ColumnWeightData(18, true));
-
-		tc = new TreeColumn(tree, SWT.TRAIL);
-		tc.setText(UI.UNIT_LABEL_SPEED);
-		treeLayout.setColumnData(tc, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10), false));
-
-		// tour viewer
 		fTourViewer = new TreeViewer(tree);
+		fColumnManager.createColumns();
+
 		fTourViewer.setContentProvider(new TourContentProvider());
-		fTourViewer.setLabelProvider(new TourLabelProvider());
 		fTourViewer.setUseHashlookup(true);
 
 		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectionChanged((IStructuredSelection) event.getSelection());
-//				enableActions();
 			}
 		});
 
@@ -602,8 +592,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 				 * get tour id
 				 */
 				long tourId = -1;
-				if (tourItem instanceof TourCatalogItemComparedTour) {
-					tourId = ((TourCatalogItemComparedTour) tourItem).getTourId();
+				if (tourItem instanceof TVICatalogComparedTour) {
+					tourId = ((TVICatalogComparedTour) tourItem).getTourId();
 				}
 
 				if (tourId != -1) {
@@ -620,8 +610,91 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		});
 
 		createContextMenu();
+	}
 
-		return layoutContainer;
+	private void defineViewerColumns(final Composite parent) {
+
+		final PixelConverter pixelConverter = new PixelConverter(parent);
+		TreeColumnDefinition colDef;
+
+		/*
+		 * first column: ref tour name/compare tour name /year
+		 */
+		colDef = TreeColumnFactory.REF_TOUR.createColumn(fColumnManager, pixelConverter);
+		colDef.setCanModifyVisibility(false);
+		colDef.setLabelProvider(new StyledCellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				if ((element instanceof TVICatalogReferenceTour)) {
+
+					// ref tour item
+
+					cell.setText(((TVICatalogReferenceTour) element).label);
+
+				} else if (element instanceof TVICatalogYearItem) {
+
+					// year item
+
+					cell.setText(Integer.toString(((TVICatalogYearItem) element).year));
+
+				} else if (element instanceof TVICatalogComparedTour) {
+
+					// compared tour item
+
+					cell.setText(DateFormat.getDateInstance(DateFormat.SHORT)
+							.format(((TVICatalogComparedTour) element).getTourDate()));
+
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: tour type
+		 */
+		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICatalogComparedTour) {
+					cell.setImage(UI.getInstance().getTourTypeImage(((TVICatalogComparedTour) element).tourTypeId));
+				}
+			}
+		});
+
+		/*
+		 * column: title
+		 */
+		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICatalogComparedTour) {
+					cell.setText(((TVICatalogComparedTour) element).tourTitle);
+				}
+			}
+		});
+
+		/*
+		 * column: tags
+		 */
+		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICatalogComparedTour) {
+					cell.setText(TourDatabase.getTagNames(((TVICatalogComparedTour) element).tagIds));
+				}
+			}
+		});
+
 	}
 
 	@Override
@@ -629,62 +702,167 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
+
 		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
+		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
-		fColorRefFg.dispose();
-		fColorYearFg.dispose();
-		fColorTourFg.dispose();
-		fColorRefBg.dispose();
-		fColorYearBg.dispose();
-		fColorTourBg.dispose();
-
 		super.dispose();
 	}
+
+//	public String getColumnText(final Object obj, final int index) {
+//
+//				if (obj instanceof TVICatalogReferenceTour) {
+//
+//					final TVICatalogReferenceTour refTour = (TVICatalogReferenceTour) obj;
+//					switch (index) {
+//					case COLUMN_LABEL:
+//						return refTour.label;
+//					}
+//					return ""; //$NON-NLS-1$
+//
+//				} else if (obj instanceof TourCatalogItemYear) {
+//
+//					final TourCatalogItemYear yearItem = (TourCatalogItemYear) obj;
+//					switch (index) {
+//					case COLUMN_LABEL:
+//						return Integer.toString(yearItem.year);
+//					}
+//					return ""; //$NON-NLS-1$
+//
+//				} else if (obj instanceof TVICatalogComparedTour) {
+//
+//					final TVICatalogComparedTour compTour = (TVICatalogComparedTour) obj;
+//					switch (index) {
+//					case COLUMN_LABEL:
+//						return DateFormat.getDateInstance(DateFormat.SHORT).format(compTour.getTourDate());
+//
+//					case COLUMN_SPEED:
+//
+//						nf.setMinimumFractionDigits(1);
+//						nf.setMaximumFractionDigits(1);
+//
+//						final float speed = compTour.getTourSpeed();
+//						if (speed == 0) {
+//							return ""; //$NON-NLS-1$
+//						} else {
+//							return nf.format(speed / UI.UNIT_VALUE_DISTANCE);
+//						}
+//					}
+//				}
+//				return (getText(obj));
+//			}
+//
+//				if (obj ins
+//		// tree columns
+//		TreeColumn tc;
+//		final PixelConverter pixelConverter = new PixelConverter(tree);
+//
+//		tc = new TreeColumn(tree, SWT.NONE);
+//		tc.setText(Messages.tourCatalog_view_column_tour);
+//		treeLayout.setColumnData(tc, new ColumnWeightData(18, true));
+//
+//		tc = new TreeColumn(tree, SWT.TRAIL);
+//		tc.setText(UI.UNIT_LABEL_SPEED);
+//		treeLayout.setColumnData(tc, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10), false));
+//
+//		// tour viewer
 
 	private void enableActions() {
 
 		final ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
 
-		int refItemCounter = 0;
-		int tourItemCounter = 0;
-		int yearItemCounter = 0;
+		int refItems = 0;
+		int yearItems = 0;
+		int tourItems = 0;
+		TVICatalogComparedTour firstTour = null;
 
 		// count how many different items are selected
 		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 
-			final Object item = iter.next();
+			final Object treeItem = iter.next();
 
-			if (item instanceof TourCatalogItemReferenceTour) {
-				refItemCounter++;
-			} else if (item instanceof TourCatalogItemComparedTour) {
-				tourItemCounter++;
-			} else if (item instanceof TourCatalogItemYear) {
-				yearItemCounter++;
+			if (treeItem instanceof TVICatalogReferenceTour) {
+				refItems++;
+			} else if (treeItem instanceof TVICatalogComparedTour) {
+				if (tourItems == 0) {
+					firstTour = (TVICatalogComparedTour) treeItem;
+				}
+				tourItems++;
+			} else if (treeItem instanceof TVICatalogYearItem) {
+				yearItems++;
 			}
 		}
+		final boolean isTourSelected = tourItems > 0 && refItems == 0 && yearItems == 0;
+		final boolean isOneTour = tourItems == 1 && refItems == 0 && yearItems == 0;
 
-		// enable: delete button when only one type is selected
-		if (yearItemCounter == 0
-				&& ((refItemCounter > 0 && tourItemCounter == 0) || (refItemCounter == 0 & tourItemCounter > 0))) {
+		fActionDeleteSelectedTour.setEnabled(isOneTour);
+
+		// enable remove button when only one type of item is selected
+		if (yearItems == 0 && ((refItems > 0 && tourItems == 0) || (refItems == 0 & tourItems > 0))) {
 			fActionDeleteSelectedTour.setEnabled(true);
 		} else {
 			fActionDeleteSelectedTour.setEnabled(false);
 		}
 
-		// enable: rename ref tour
-		fActionRenameRefTour.setEnabled(refItemCounter == 1 && tourItemCounter == 0 && yearItemCounter == 0);
-//
-//		fActionAdjustAltitude.setEnabled(tourItemCounter > 0);
+		fActionEditTour.setEnabled(isOneTour);
+		fActionEditQuick.setEnabled(isOneTour);
+
+		fActionRenameRefTour.setEnabled(refItems == 1 && tourItems == 0 && yearItems == 0);
+
+		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+
+		fActionAddTag.setEnabled(isTourSelected);
+
+		if (isOneTour) {
+
+			// one tour is selected
+
+			final ArrayList<Long> tagIds = firstTour.tagIds;
+			if (tagIds != null && tagIds.size() > 0) {
+
+				// at least one tag is within the tour
+
+				fActionRemoveAllTags.setEnabled(true);
+				fActionRemoveTag.setEnabled(true);
+			} else {
+				// tags are not available
+				fActionRemoveAllTags.setEnabled(false);
+				fActionRemoveTag.setEnabled(false);
+			}
+		} else {
+
+			// multiple tours are selected
+
+			fActionRemoveTag.setEnabled(isTourSelected);
+			fActionRemoveAllTags.setEnabled(isTourSelected);
+		}
+		// enable/disable actions for the recent tags
+		TagManager.enableRecentTagActions(isTourSelected);
+
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-//		menuMgr.add(fActionAdjustAltitude);
-		menuMgr.add(fActionRenameRefTour);
-		menuMgr.add(new Separator());
+		menuMgr.add(fActionEditQuick);
+		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionEditTour);
 		menuMgr.add(fActionDeleteSelectedTour);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionAddTag);
+		menuMgr.add(fActionRemoveTag);
+		menuMgr.add(fActionRemoveAllTags);
+
+		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionOpenTagPrefs);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionRenameRefTour);
 
 		enableActions();
 	}
@@ -706,15 +884,50 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		tbm.update(true);
 	}
 
+	private void fillViewMenu() {
+
+		/*
+		 * fill view menu
+		 */
+		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		menuMgr.add(fActionModifyColumns);
+	}
+
 	public ColumnManager getColumnManager() {
-		return null;
+		return fColumnManager;
+	}
+
+	public ArrayList<TourData> getSelectedTours() {
+
+		// get selected tours
+
+		final IStructuredSelection selectedTours = ((IStructuredSelection) fTourViewer.getSelection());
+		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+
+		// loop: all selected tours
+		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+
+			final Object treeItem = iter.next();
+
+			if (treeItem instanceof TVICatalogComparedTour) {
+
+				final TVICatalogComparedTour tourItem = ((TVICatalogComparedTour) treeItem);
+
+				final TourData tourData = TourManager.getInstance().getTourData(tourItem.getTourId());
+				if (tourData != null) {
+					selectedTourData.add(tourData);
+				}
+			}
+		}
+
+		return selectedTourData;
 	}
 
 	public TreeViewer getTourViewer() {
 		return fTourViewer;
 	}
 
-	public TreeViewer getTreeViewer() {
+	public ColumnViewer getViewer() {
 		return fTourViewer;
 	}
 
@@ -726,6 +939,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		if (fSessionMemento == null) {
 			fSessionMemento = memento;
 		}
+	}
+
+	public boolean isFromTourEditor() {
+		return false;
 	}
 
 	/**
@@ -741,11 +958,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		ISelection tourCatalogSelection = null;
 		boolean selectTourInChart = false;
 
-		if (item instanceof TourCatalogItemReferenceTour) {
+		if (item instanceof TVICatalogReferenceTour) {
 
 			// reference tour is selected
 
-			final TourCatalogItemReferenceTour refItem = (TourCatalogItemReferenceTour) item;
+			final TVICatalogReferenceTour refItem = (TVICatalogReferenceTour) item;
 
 			tourCatalogSelection = new SelectionTourCatalogView(refItem.refId);
 			fActiveRefId = refItem.refId;
@@ -754,11 +971,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 			selectTourInChart = true;
 
-		} else if (item instanceof TourCatalogItemYear) {
+		} else if (item instanceof TVICatalogYearItem) {
 
 			// year item is selected
 
-			final TourCatalogItemYear yearItem = (TourCatalogItemYear) item;
+			final TVICatalogYearItem yearItem = (TVICatalogYearItem) item;
 
 			tourCatalogSelection = new SelectionTourCatalogView(yearItem.refId);
 			fActiveRefId = yearItem.refId;
@@ -767,11 +984,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 			selectTourInChart = true;
 
-		} else if (item instanceof TourCatalogItemComparedTour) {
+		} else if (item instanceof TVICatalogComparedTour) {
 
 			// compared tour is selected
 
-			final TourCatalogItemComparedTour compItem = (TourCatalogItemComparedTour) item;
+			final TVICatalogComparedTour compItem = (TVICatalogComparedTour) item;
 
 			tourCatalogSelection = new StructuredSelection(compItem);
 			fActiveRefId = compItem.getRefId();
@@ -797,15 +1014,40 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	public void refreshViewer() {
-		// refresh the tree viewer and resort the ref tours
-		fRootItem.fetchChildren();
-		fTourViewer.refresh();
+	public void recreateViewer() {
+
+		final Object[] expandedElements = fTourViewer.getExpandedElements();
+		final ISelection selection = fTourViewer.getSelection();
+
+		fViewerContainer.setRedraw(false);
+		{
+			fTourViewer.getTree().dispose();
+
+			createTourViewer(fViewerContainer);
+			fViewerContainer.layout();
+
+			fTourViewer.setInput(fRootItem = new TVICatalogRootItem());
+
+			fTourViewer.setExpandedElements(expandedElements);
+			fTourViewer.setSelection(selection);
+		}
+		fViewerContainer.setRedraw(true);
 	}
 
 	public void reloadViewer() {
-		// TODO Auto-generated method stub
-		
+
+		final Tree tree = fTourViewer.getTree();
+		tree.setRedraw(false);
+		{
+			final Object[] expandedElements = fTourViewer.getExpandedElements();
+			final ISelection selection = fTourViewer.getSelection();
+
+			fTourViewer.setInput(fRootItem = new TVICatalogRootItem());
+
+			fTourViewer.setExpandedElements(expandedElements);
+			fTourViewer.setSelection(selection);
+		}
+		tree.setRedraw(true);
 	}
 
 	/**
@@ -852,6 +1094,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 		memento.putString(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID, Long.toString(fActiveRefId));
 		memento.putInteger(MEMENTO_TOUR_CATALOG_LINK_TOUR, fActionLinkTour.isChecked() ? 1 : 0);
 
+		fColumnManager.saveState(memento);
 	}
 
 	/**
@@ -874,9 +1117,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 		// search ref tour
 		for (final Object refTourItem : refTourItems) {
-			if (refTourItem instanceof TourCatalogItemReferenceTour) {
+			if (refTourItem instanceof TVICatalogReferenceTour) {
 
-				final TourCatalogItemReferenceTour tvtiRefTour = (TourCatalogItemReferenceTour) refTourItem;
+				final TVICatalogReferenceTour tvtiRefTour = (TVICatalogReferenceTour) refTourItem;
 				if (tvtiRefTour.refId == refId) {
 
 					// select ref tour
@@ -884,6 +1127,14 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 					break;
 				}
 			}
+		}
+	}
+
+	private void setCellColor(final ViewerCell cell, final Object element) {
+		if (element instanceof TVICatalogReferenceTour) {
+			cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_COLOR));
+		} else if (element instanceof TVICatalogYearItem) {
+			cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_COLOR));
 		}
 	}
 
@@ -925,7 +1176,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 			if (unfetchedChildren != null) {
 
 				for (final TreeViewerItem rootChild : unfetchedChildren) {
-					final TourCatalogItemReferenceTour mapRefTour = (TourCatalogItemReferenceTour) rootChild;
+					final TVICatalogReferenceTour mapRefTour = (TVICatalogReferenceTour) rootChild;
 
 					if (mapRefTour.refId == refId) {
 
@@ -935,6 +1186,67 @@ public class TourCatalogView extends ViewPart implements ITourViewer {
 
 						break;
 					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * !!!Recursive !!! update all tour items with the new tour type
+	 * 
+	 * @param rootItem
+	 * @param modifiedTours
+	 */
+	private void updateTourViewer(final TreeViewerItem parentItem, final ArrayList<TourData> modifiedTours) {
+
+		final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
+
+		if (children == null) {
+			return;
+		}
+
+		// loop: all children
+		for (final Object object : children) {
+			if (object instanceof TreeViewerItem) {
+
+				final TreeViewerItem treeItem = (TreeViewerItem) object;
+				if (treeItem instanceof TVICatalogComparedTour) {
+
+					final TVICatalogComparedTour tourItem = (TVICatalogComparedTour) treeItem;
+					final long tourItemId = tourItem.getTourId();
+
+					for (final TourData modifiedTourData : modifiedTours) {
+						if (modifiedTourData.getTourId().longValue() == tourItemId) {
+
+							// update tree item
+
+							final TourType tourType = modifiedTourData.getTourType();
+							if (tourType != null) {
+								tourItem.tourTypeId = tourType.getTypeId();
+							}
+
+							// update item title
+							tourItem.tourTitle = modifiedTourData.getTourTitle();
+
+							// update item tags
+							final Set<TourTag> tourTags = modifiedTourData.getTourTags();
+							final ArrayList<Long> tagIds;
+
+							tourItem.tagIds = tagIds = new ArrayList<Long>();
+							for (final TourTag tourTag : tourTags) {
+								tagIds.add(tourTag.getTagId());
+							}
+
+							// update item in the viewer
+							fTourViewer.update(tourItem, null);
+
+							break;
+						}
+					}
+
+				} else {
+					// update children
+					updateTourViewer(treeItem, modifiedTours);
 				}
 			}
 		}

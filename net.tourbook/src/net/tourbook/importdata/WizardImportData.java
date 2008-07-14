@@ -142,7 +142,7 @@ public class WizardImportData extends Wizard {
 					.showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
 			if (importView != null) {
-				importView.updateViewer();
+				importView.reloadViewer();
 			}
 		} catch (PartInitException e) {
 			e.printStackTrace();

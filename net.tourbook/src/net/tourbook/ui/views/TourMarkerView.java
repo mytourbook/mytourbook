@@ -114,7 +114,7 @@ public class TourMarkerView extends ViewPart {
 
 		public void dispose() {}
 
-		public Object[] getElements(Object inputElement) {
+		public Object[] getElements(final Object inputElement) {
 			if (fTourData == null) {
 				return new Object[0];
 			} else {
@@ -122,7 +122,7 @@ public class TourMarkerView extends ViewPart {
 			}
 		}
 
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class TourMarkerView extends ViewPart {
 	private class MarkerViewerSorter extends ViewerSorter {
 
 		@Override
-		public int compare(Viewer viewer, Object obj1, Object obj2) {
+		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
 		}
 	}
@@ -154,7 +154,7 @@ public class TourMarkerView extends ViewPart {
 					UI.updateUnits();
 
 					// dispose viewer
-					Control[] children = fViewerContainer.getChildren();
+					final Control[] children = fViewerContainer.getChildren();
 					for (int childIndex = 0; childIndex < children.length; childIndex++) {
 						children[childIndex].dispose();
 					}
@@ -177,7 +177,7 @@ public class TourMarkerView extends ViewPart {
 	private void addSelectionListener() {
 
 		fPostSelectionListener = new ISelectionListener() {
-			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				onSelectionChanged(selection);
 			}
 		};
@@ -188,7 +188,7 @@ public class TourMarkerView extends ViewPart {
 
 		fTourChangeListener = new IPropertyListener() {
 
-			public void propertyChanged(Object source, int propId) {
+			public void propertyChanged(final Object source, final int propId) {
 				if (propId == TourDatabase.TOUR_IS_CHANGED) {
 					fMarkerViewer.setInput(this);
 				}
@@ -203,23 +203,23 @@ public class TourMarkerView extends ViewPart {
 	 */
 	private void createContextMenu() {
 
-		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
+			public void menuAboutToShow(final IMenuManager manager) {
 				fillContextMenu(manager);
 			}
 		});
 
-		Control viewerControl = fMarkerViewer.getControl();
-		Menu menu = menuMgr.createContextMenu(viewerControl);
+		final Control viewerControl = fMarkerViewer.getControl();
+		final Menu menu = menuMgr.createContextMenu(viewerControl);
 		viewerControl.setMenu(menu);
 
 		getSite().registerContextMenu(menuMgr, fMarkerViewer);
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 
 		fPageBook = new PageBook(parent, SWT.NONE);
 		fPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -247,25 +247,25 @@ public class TourMarkerView extends ViewPart {
 		if (curretSelection instanceof SelectionActiveEditor) {
 			onSelectionChanged(curretSelection);
 		} else {
-			IEditorPart activeEditor = getSite().getPage().getActiveEditor();
+			final IEditorPart activeEditor = getSite().getPage().getActiveEditor();
 			if (activeEditor != null) {
 				onSelectionChanged(new SelectionActiveEditor(activeEditor));
 			}
 		}
 	}
 
-	private void createTableViewer(Composite parent) {
+	private void createTableViewer(final Composite parent) {
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
 
-		Composite layoutContainer = new Composite(parent, SWT.NONE);
+		final Composite layoutContainer = new Composite(parent, SWT.NONE);
 		layoutContainer.setLayout(tableLayout);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
 
 		/*
 		 * create table
 		 */
-		Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
+		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
 
 		table.setLayout(new TableLayout());
 		table.setHeaderVisible(true);
@@ -273,9 +273,9 @@ public class TourMarkerView extends ViewPart {
 
 		table.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e) {
+			public void keyPressed(final KeyEvent e) {
 
-				IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
+				final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
 
 				if (selection.size() > 0) {
 					if (e.keyCode == SWT.CR) {
@@ -299,7 +299,7 @@ public class TourMarkerView extends ViewPart {
 		 */
 		TableViewerColumn tvc;
 		TableColumn tvcColumn;
-		PixelConverter pixelConverter = new PixelConverter(table);
+		final PixelConverter pixelConverter = new PixelConverter(table);
 
 		// column: time
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
@@ -307,11 +307,11 @@ public class TourMarkerView extends ViewPart {
 		tvcColumn.setText(Messages.Tour_Marker_Column_time);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
-				TourMarker tourMarker = (TourMarker) cell.getElement();
+				final TourMarker tourMarker = (TourMarker) cell.getElement();
 
-				int time = tourMarker.getTime();
+				final int time = tourMarker.getTime();
 
 				cell.setText(new Formatter().format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60))
 						.toString());
@@ -327,9 +327,9 @@ public class TourMarkerView extends ViewPart {
 
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
-				TourMarker tourMarker = (TourMarker) cell.getElement();
+				final TourMarker tourMarker = (TourMarker) cell.getElement();
 
 				fNF.setMinimumFractionDigits(1);
 				fNF.setMaximumFractionDigits(1);
@@ -344,9 +344,9 @@ public class TourMarkerView extends ViewPart {
 		tvcColumn.setText(Messages.Tour_Marker_Column_remark);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void update(ViewerCell cell) {
+			public void update(final ViewerCell cell) {
 
-				TourMarker tourMarker = (TourMarker) cell.getElement();
+				final TourMarker tourMarker = (TourMarker) cell.getElement();
 
 				cell.setText(tourMarker.getLabel());
 			}
@@ -361,8 +361,8 @@ public class TourMarkerView extends ViewPart {
 		fMarkerViewer.setSorter(new MarkerViewerSorter());
 
 		fMarkerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				StructuredSelection selection = (StructuredSelection) event.getSelection();
+			public void selectionChanged(final SelectionChangedEvent event) {
+				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
 					fireSliderPosition(selection);
 				}
@@ -381,8 +381,7 @@ public class TourMarkerView extends ViewPart {
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
-	private void fillContextMenu(IMenuManager menuMgr) {
+	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		// add standard group which allows other plug-ins to contribute here
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -391,12 +390,12 @@ public class TourMarkerView extends ViewPart {
 	/**
 	 * select the chart slider(s) according to the selected marker(s)
 	 */
-	private void fireSliderPosition(StructuredSelection selection) {
+	private void fireSliderPosition(final StructuredSelection selection) {
 
 		// a chart must be available
 		if (fTourChart == null) {
 
-			TourChart tourChart = TourManager.getInstance().getActiveTourChart();
+			final TourChart tourChart = TourManager.getInstance().getActiveTourChart();
 
 			if (tourChart == null || tourChart.isDisposed()) {
 				return;
@@ -405,7 +404,7 @@ public class TourMarkerView extends ViewPart {
 			}
 		}
 
-		Object[] segments = selection.toArray();
+		final Object[] segments = selection.toArray();
 
 		if (segments.length > 1) {
 
@@ -429,7 +428,7 @@ public class TourMarkerView extends ViewPart {
 		return fMarkerViewer;
 	}
 
-	private void onSelectionChanged(ISelection selection) {
+	private void onSelectionChanged(final ISelection selection) {
 
 		if (selection instanceof SelectionTourData) {
 
@@ -456,7 +455,7 @@ public class TourMarkerView extends ViewPart {
 
 		} else if (selection instanceof SelectionTourId) {
 
-			SelectionTourId tourIdSelection = (SelectionTourId) selection;
+			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 
 			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 

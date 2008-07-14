@@ -26,8 +26,8 @@ import net.tourbook.tour.TreeViewerItem;
 public class CompareResultItemComparedTour extends TreeViewerItem {
 
 	/**
-	 * Unique key for the {@link TourCompared} entity, when <code>-1</code> the compared tour is
-	 * not saved in the database
+	 * Unique key for the {@link TourCompared} entity, when <code>-1</code> the compared tour is not
+	 * saved in the database
 	 */
 	long			compId					= -1;
 
@@ -78,15 +78,19 @@ public class CompareResultItemComparedTour extends TreeViewerItem {
 	float			movedSpeed;
 
 	@Override
+	protected void fetchChildren() {}
+
+	public TourData getComparedTourData() {
+		return comparedTourData;
+	}
+
+	@Override
 	public boolean hasChildren() {
 		/*
 		 * compare result has no children, hide the expand sign
 		 */
 		return false;
 	}
-
-	@Override
-	protected void fetchChildren() {}
 
 	@Override
 	protected void remove() {}
