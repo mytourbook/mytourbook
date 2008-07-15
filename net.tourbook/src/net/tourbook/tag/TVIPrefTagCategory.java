@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.tag;
 
 import java.util.Set;
@@ -62,6 +61,8 @@ public class TVIPrefTagCategory extends TVIPrefTagViewer {
 		// update number of categories/tags
 		fTourTagCategory.setTagCounter(lazyTourTags.size());
 		fTourTagCategory.setCategoryCounter(lazyTourTagCategories.size());
+		
+		em.close();
 
 		/*
 		 * show number of tags/categories in the viewer, this must be done after the viewer task is
@@ -72,8 +73,6 @@ public class TVIPrefTagCategory extends TVIPrefTagViewer {
 				getTagViewer().update(TVIPrefTagCategory.this, null);
 			}
 		});
-
-		em.close();
 	}
 
 	/**

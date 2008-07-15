@@ -25,8 +25,8 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourTag.TVITagViewTag;
-import net.tourbook.ui.views.tourTag.TVITagViewTagCategory;
+import net.tourbook.ui.views.tagging.TVITagViewTag;
+import net.tourbook.ui.views.tagging.TVITagViewTagCategory;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;

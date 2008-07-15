@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -23,9 +23,17 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.UI;
 
 public class TVICatalogRootItem extends TVICatalogItem {
+
+	private ITourViewer	fTourViewer;
+
+	public TVICatalogRootItem(final ITourViewer tourViewer) {
+		super();
+		fTourViewer = tourViewer;
+	}
 
 	@Override
 	protected void fetchChildren() {
@@ -36,22 +44,33 @@ public class TVICatalogRootItem extends TVICatalogItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		final String sqlString = "SELECT label, refId, " //$NON-NLS-1$
-				+ (TourDatabase.TABLE_TOUR_DATA + "_tourId	\n") //$NON-NLS-1$
-				+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ " ORDER BY label"; //$NON-NLS-1$
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("SELECT");
+
+		sb.append(" label,");
+		sb.append(" refId,");
+		sb.append(" TourData_tourId");
+//		sb.append(" SUM(1)");
+
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_REFERENCE);
+		sb.append(" ORDER BY label");
 
 		try {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sqlString);
+			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			final ResultSet result = statement.executeQuery();
 
 			while (result.next()) {
-				children.add(new TVICatalogReferenceTour(this,
-						result.getString(1),
-						result.getLong(2),
-						result.getLong(3)));
+
+				final TVICatalogReferenceTour refItem = new TVICatalogReferenceTour(this);
+				children.add(refItem);
+
+				refItem.label = result.getString(1);
+				refItem.refId = result.getLong(2);
+				refItem.setTourId(result.getLong(3));
+//				refItem.tourCounter = result.getInt(1);
 			}
 
 			conn.close();
@@ -59,6 +78,10 @@ public class TVICatalogRootItem extends TVICatalogItem {
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
+	}
+
+	public ITourViewer getRootTourViewer() {
+		return fTourViewer;
 	}
 
 	@Override

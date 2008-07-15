@@ -98,8 +98,7 @@ public class WizardDataModel {
 				final TourCatalogTourItem childItem = new TourCatalogTourItem(childType, row);
 
 				/*
-				 * when a tour item does not have children, it's set to be a
-				 * leaf
+				 * when a tour item does not have children, it's set to be a leaf
 				 */
 				if (childType == TourCatalogTourItem.ITEM_TYPE_TOUR) {
 					childItem.setLeaf();

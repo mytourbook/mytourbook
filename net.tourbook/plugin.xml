@@ -155,7 +155,7 @@
             name="%view_name_Book"/>
       <view
             category="net.tourbook.category.tourList"
-            class="net.tourbook.ui.views.tourTag.TagView"
+            class="net.tourbook.ui.views.tagging.TagView"
             icon="icons/tour-tag.gif"
             id="net.tourbook.views.tagViewID"
             name="%view_name_tagView"/>

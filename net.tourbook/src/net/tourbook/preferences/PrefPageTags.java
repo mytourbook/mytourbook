@@ -740,6 +740,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			/*
 			 * update model
 			 */
+			tourTagItem.setParentItem(fRootItem);
 			fRootItem.getFetchedChildren().add(tourTagItem);
 
 			// persist tag

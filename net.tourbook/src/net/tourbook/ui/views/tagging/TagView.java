@@ -13,8 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
-package net.tourbook.ui.views.tourTag;
+package net.tourbook.ui.views.tagging;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -1027,7 +1026,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		menuMgr.add(fActionSetAllTagStructures);
 		menuMgr.add(fActionRenameTag);
 		menuMgr.add(fActionOpenTagPrefs);
-		
+
 		enableActions();
 	}
 
@@ -1127,17 +1126,22 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	public void recreateViewer() {
 
 		final Object[] expandedElements = fTagViewer.getExpandedElements();
-
-		fTagViewer.getTree().dispose();
+		final ISelection selection = fTagViewer.getSelection();
 
 		fViewerContainer.setRedraw(false);
 		{
+			fTagViewer.getTree().dispose();
+
 			createTagViewer(fViewerContainer);
 			fViewerContainer.layout();
+
+			fTagViewer.setInput(fRootItem = new TVITagViewRoot(this, fTagViewLayout));
+
+			fTagViewer.setExpandedElements(expandedElements);
+			fTagViewer.setSelection(selection);
 		}
 		fViewerContainer.setRedraw(true);
 
-		reloadViewer(expandedElements);
 	}
 
 	/**
@@ -1146,11 +1150,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	public void reloadViewer() {
 
 		final Object[] expandedElements = fTagViewer.getExpandedElements();
-
-		reloadViewer(expandedElements);
-	}
-
-	private void reloadViewer(final Object[] expandedElements) {
 
 		final Tree tree = fTagViewer.getTree();
 		tree.setRedraw(false);

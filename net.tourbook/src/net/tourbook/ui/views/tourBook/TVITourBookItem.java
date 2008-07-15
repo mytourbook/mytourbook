@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.ui.views.tourBook;
 
 import java.sql.ResultSet;
@@ -51,6 +50,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	String							treeColumn;
 
 	int								fTourYear;
+	
 	/**
 	 * month starts with 1 for january
 	 */

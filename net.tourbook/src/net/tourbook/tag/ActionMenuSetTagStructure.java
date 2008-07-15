@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ITourViewer;
-import net.tourbook.ui.views.tourTag.TVITagViewMonth;
-import net.tourbook.ui.views.tourTag.TVITagViewTag;
-import net.tourbook.ui.views.tourTag.TVITagViewTour;
-import net.tourbook.ui.views.tourTag.TVITagViewYear;
+import net.tourbook.ui.views.tagging.TVITagViewMonth;
+import net.tourbook.ui.views.tagging.TVITagViewTag;
+import net.tourbook.ui.views.tagging.TVITagViewTour;
+import net.tourbook.ui.views.tagging.TVITagViewYear;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;

@@ -22,7 +22,7 @@ import javax.persistence.EntityManager;
 import net.tourbook.Messages;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.views.tourTag.TagView;
+import net.tourbook.ui.views.tagging.TagView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;

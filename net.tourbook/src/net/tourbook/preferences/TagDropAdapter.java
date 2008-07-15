@@ -643,8 +643,8 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		if (localTransfer.isSupportedType(transferType) == false) {
 			return false;
 		}
-
 		final ISelection selection = localTransfer.getSelection();
+
 		if (selection instanceof StructuredSelection) {
 
 			final Object draggedItem = ((StructuredSelection) selection).getFirstElement();

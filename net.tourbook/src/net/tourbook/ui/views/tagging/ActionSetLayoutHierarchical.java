@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.tourbook.ui.views.tourTag;
+package net.tourbook.ui.views.tagging;
 
 import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;

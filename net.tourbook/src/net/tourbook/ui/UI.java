@@ -153,6 +153,7 @@ public class UI {
 
 	public static Styler					TAG_STYLER;
 	public static Styler					TAG_CATEGORY_STYLER;
+	public static Styler					TAG_SUB_STYLER;
 
 	static {
 
@@ -174,6 +175,7 @@ public class UI {
 		 */
 		TAG_CATEGORY_STYLER = StyledString.createColorRegistryStyler(TAG_CATEGORY_COLOR, null);
 		TAG_STYLER = StyledString.createColorRegistryStyler(TAG_COLOR, null);
+		TAG_SUB_STYLER = StyledString.createColorRegistryStyler(TAG_SUB_COLOR, null);
 	}
 
 	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();

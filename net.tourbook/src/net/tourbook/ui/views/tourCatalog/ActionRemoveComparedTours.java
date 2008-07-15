@@ -209,7 +209,7 @@ public class ActionRemoveComparedTours extends Action {
 
 		if (isDeleted) {
 			// update the compare result view
-			fTourView.fPostSelectionProvider.setSelection(selectionRemovedTours);
+			fTourView.fireSelection(selectionRemovedTours);
 		}
 	}
 

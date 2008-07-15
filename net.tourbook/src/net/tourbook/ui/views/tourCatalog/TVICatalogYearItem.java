@@ -33,18 +33,15 @@ public class TVICatalogYearItem extends TVICatalogItem {
 
 	long	refId;
 	int		year;
+	int		tourCounter;	// number of tours
 
 	/**
 	 * @param parentItem
 	 * @param refId
 	 * @param year
 	 */
-	public TVICatalogYearItem(final TreeViewerItem parentItem, final long refId, final int year) {
-
+	public TVICatalogYearItem(final TreeViewerItem parentItem) {
 		this.setParentItem(parentItem);
-
-		this.refId = refId;
-		this.year = year;
 	}
 
 	@Override

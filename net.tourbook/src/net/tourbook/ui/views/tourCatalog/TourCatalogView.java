@@ -61,7 +61,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -74,6 +73,7 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -114,22 +114,30 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 	private Composite					fViewerContainer;
 	private TreeViewer					fTourViewer;
 
-	final NumberFormat					nf									= NumberFormat.getNumberInstance();
+	private final NumberFormat			fNf									= NumberFormat.getNumberInstance();
 
 	private ISelectionListener			fPostSelectionListener;
 	private IPartListener2				fPartListener;
-	PostSelectionProvider				fPostSelectionProvider;
+	private PostSelectionProvider		fPostSelectionProvider;
 	private ITourPropertyListener		fCompareTourPropertyListener;
 	private IPropertyChangeListener		fPrefChangeListener;
+	private ITourPropertyListener		fTourPropertyListener;
 
 	protected int						fRefTourXMarkerValue;
 
-	private ActionRemoveComparedTours		fActionDeleteSelectedTour;
+	private ActionRemoveComparedTours	fActionDeleteSelectedTour;
 	private ActionRenameRefTour			fActionRenameRefTour;
 	private ActionLinkTour				fActionLinkTour;
 	private ActionCollapseAll			fActionCollapseAll;
 	private ActionRefreshView			fActionRefreshView;
 	private ActionModifyColumns			fActionModifyColumns;
+	private ActionEditQuick				fActionEditQuick;
+	private ActionEditTour				fActionEditTour;
+	private ActionSetTourType			fActionSetTourType;
+	private ActionSetTourTag			fActionAddTag;
+	private ActionRemoveAllTags			fActionRemoveAllTags;
+	private ActionOpenPrefDialog		fActionOpenTagPrefs;
+	private ActionSetTourTag			fActionRemoveTag;
 
 	/**
 	 * tour item which is selected by the link tour action
@@ -146,14 +154,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 	 */
 	private boolean						fIsToolbarCreated					= false;
 	private ColumnManager				fColumnManager;
-	private ITourPropertyListener		fTourPropertyListener;
-	private ActionEditQuick				fActionEditQuick;
-	private ActionEditTour				fActionEditTour;
-	private ActionSetTourType			fActionSetTourType;
-	private ActionSetTourTag			fActionAddTag;
-	private ActionRemoveAllTags			fActionRemoveAllTags;
-	private ActionOpenPrefDialog		fActionOpenTagPrefs;
-	private ActionSetTourTag			fActionRemoveTag;
 
 	class TourContentProvider implements ITreeContentProvider {
 
@@ -399,6 +399,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 					// remove compared tour from the tree viewer
 					fTourViewer.remove(comparedTours.toArray());
+					reloadViewer();
 
 				} else if (selection instanceof StructuredSelection) {
 
@@ -440,6 +441,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 					// measurement system has changed
 
 					UI.updateUnits();
+
+					fColumnManager.saveState(fSessionMemento);
+
+					fColumnManager.resetColumns();
+					defineViewerColumns(fViewerContainer);
 
 					recreateViewer();
 
@@ -551,7 +557,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		fTourViewer.setInput(fRootItem = new TVICatalogRootItem());
+		fTourViewer.setInput(fRootItem = new TVICatalogRootItem(this));
 
 		restoreState(fSessionMemento);
 	}
@@ -632,13 +638,28 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 					// ref tour item
 
-					cell.setText(((TVICatalogReferenceTour) element).label);
+					final TVICatalogReferenceTour refItem = (TVICatalogReferenceTour) element;
+
+					final StyledString styledString = new StyledString();
+					styledString.append(refItem.label, UI.TAG_STYLER);
+//					styledString.append("   " + refItem.tourCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+
+					cell.setText(styledString.getString());
+					cell.setStyleRanges(styledString.getStyleRanges());
 
 				} else if (element instanceof TVICatalogYearItem) {
 
 					// year item
 
-					cell.setText(Integer.toString(((TVICatalogYearItem) element).year));
+					final TVICatalogYearItem yearItem = (TVICatalogYearItem) element;
+					final StyledString styledString = new StyledString();
+					styledString.append(Integer.toString(yearItem.year), UI.TAG_SUB_STYLER);
+					styledString.append("   " + yearItem.tourCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+
+					cell.setText(styledString.getString());
+					cell.setStyleRanges(styledString.getStyleRanges());
+
+//					cell.setText(Integer.toString(yearItem.year));
 
 				} else if (element instanceof TVICatalogComparedTour) {
 
@@ -649,7 +670,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 				}
 
-				setCellColor(cell, element);
+//				setCellColor(cell, element);
 			}
 		});
 
@@ -695,6 +716,27 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 			}
 		});
 
+		/*
+		 * column: speed
+		 */
+		colDef = TreeColumnFactory.SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICatalogComparedTour) {
+
+					fNf.setMinimumFractionDigits(1);
+					fNf.setMaximumFractionDigits(1);
+
+					final float speed = ((TVICatalogComparedTour) element).getTourSpeed();
+					if (speed > 0) {
+						cell.setText(fNf.format(speed / UI.UNIT_VALUE_DISTANCE));
+					}
+				}
+			}
+		});
+
 	}
 
 	@Override
@@ -711,63 +753,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		super.dispose();
 	}
 
-//	public String getColumnText(final Object obj, final int index) {
-//
-//				if (obj instanceof TVICatalogReferenceTour) {
-//
-//					final TVICatalogReferenceTour refTour = (TVICatalogReferenceTour) obj;
-//					switch (index) {
-//					case COLUMN_LABEL:
-//						return refTour.label;
-//					}
-//					return ""; //$NON-NLS-1$
-//
-//				} else if (obj instanceof TourCatalogItemYear) {
-//
-//					final TourCatalogItemYear yearItem = (TourCatalogItemYear) obj;
-//					switch (index) {
-//					case COLUMN_LABEL:
-//						return Integer.toString(yearItem.year);
-//					}
-//					return ""; //$NON-NLS-1$
-//
-//				} else if (obj instanceof TVICatalogComparedTour) {
-//
-//					final TVICatalogComparedTour compTour = (TVICatalogComparedTour) obj;
-//					switch (index) {
-//					case COLUMN_LABEL:
-//						return DateFormat.getDateInstance(DateFormat.SHORT).format(compTour.getTourDate());
-//
-//					case COLUMN_SPEED:
-//
-//						nf.setMinimumFractionDigits(1);
-//						nf.setMaximumFractionDigits(1);
-//
-//						final float speed = compTour.getTourSpeed();
-//						if (speed == 0) {
-//							return ""; //$NON-NLS-1$
-//						} else {
-//							return nf.format(speed / UI.UNIT_VALUE_DISTANCE);
-//						}
-//					}
-//				}
-//				return (getText(obj));
-//			}
-//
-//				if (obj ins
-//		// tree columns
-//		TreeColumn tc;
-//		final PixelConverter pixelConverter = new PixelConverter(tree);
-//
-//		tc = new TreeColumn(tree, SWT.NONE);
-//		tc.setText(Messages.tourCatalog_view_column_tour);
-//		treeLayout.setColumnData(tc, new ColumnWeightData(18, true));
-//
-//		tc = new TreeColumn(tree, SWT.TRAIL);
-//		tc.setText(UI.UNIT_LABEL_SPEED);
-//		treeLayout.setColumnData(tc, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10), false));
-//
-//		// tour viewer
 
 	private void enableActions() {
 
@@ -846,12 +831,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionSetTourType);
-		menuMgr.add(fActionEditTour);
-		menuMgr.add(fActionDeleteSelectedTour);
-
-		menuMgr.add(new Separator());
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
@@ -863,6 +842,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionRenameRefTour);
+		menuMgr.add(fActionDeleteSelectedTour);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionEditQuick);
+		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionEditTour);
 
 		enableActions();
 	}
@@ -891,6 +876,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(fActionModifyColumns);
+	}
+
+	public void fireSelection(final ISelection selection) {
+		fPostSelectionProvider.setSelection(selection);
 	}
 
 	public ColumnManager getColumnManager() {
@@ -1026,7 +1015,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 			createTourViewer(fViewerContainer);
 			fViewerContainer.layout();
 
-			fTourViewer.setInput(fRootItem = new TVICatalogRootItem());
+			fTourViewer.setInput(fRootItem = new TVICatalogRootItem(this));
 
 			fTourViewer.setExpandedElements(expandedElements);
 			fTourViewer.setSelection(selection);
@@ -1042,7 +1031,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 			final Object[] expandedElements = fTourViewer.getExpandedElements();
 			final ISelection selection = fTourViewer.getSelection();
 
-			fTourViewer.setInput(fRootItem = new TVICatalogRootItem());
+			fTourViewer.setInput(fRootItem = new TVICatalogRootItem(this));
 
 			fTourViewer.setExpandedElements(expandedElements);
 			fTourViewer.setSelection(selection);
@@ -1130,14 +1119,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		}
 	}
 
-	private void setCellColor(final ViewerCell cell, final Object element) {
-		if (element instanceof TVICatalogReferenceTour) {
-			cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_COLOR));
-		} else if (element instanceof TVICatalogYearItem) {
-			cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_COLOR));
-		}
-	}
-
 	@Override
 	public void setFocus() {
 		fTourViewer.getTree().setFocus();
@@ -1164,10 +1145,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 			}
 		}
 
-		// remove all compare results that from the selection
+		// clear selection
 		persistedCompareResults.clear();
 
-		// loop: all ref tours where children has been added
+		// loop: all ref tours where children have been added
 		for (final Iterator<Long> refIdIter = viewRefIds.values().iterator(); refIdIter.hasNext();) {
 
 			final Long refId = refIdIter.next();
@@ -1182,7 +1163,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 						// reload the children for the reference tour
 						mapRefTour.fetchChildren();
-						fTourViewer.refresh(mapRefTour, false);
+						fTourViewer.refresh(mapRefTour, true);
 
 						break;
 					}
@@ -1192,7 +1173,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 	}
 
 	/**
-	 * !!!Recursive !!! update all tour items with the new tour type
+	 * !!!Recursive !!! update all tour items with new data
 	 * 
 	 * @param rootItem
 	 * @param modifiedTours

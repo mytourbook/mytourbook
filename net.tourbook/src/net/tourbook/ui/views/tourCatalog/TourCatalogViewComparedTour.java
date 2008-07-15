@@ -339,6 +339,35 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		fActionSynchChartsBySize.setEnabled(isSynchEnabled);
 	}
 
+	/**
+	 * update tour map and compare result view
+	 */
+	private void fireChangeEvent(final int startIndex, final int endIndex) {
+
+		final float speed = TourManager.computeTourSpeed(fTourData, startIndex, endIndex);
+
+		fireChangeEvent(startIndex, endIndex, speed, false);
+	}
+
+	/**
+	 * update tour map and compare result view
+	 * 
+	 * @param startIndex
+	 * @param endIndex
+	 * @param speed
+	 * @param isDataSaved
+	 */
+	private void fireChangeEvent(final int startIndex, final int endIndex, final float speed, final boolean isDataSaved) {
+
+		TourManager.firePropertyChange(TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED,
+				new TourPropertyCompareTourChanged(fCTCompareId,
+						startIndex,
+						endIndex,
+						speed,
+						isDataSaved,
+						fComparedTourItem));
+	}
+
 	private void onMoveSynchedMarker(final int movedValueIndex, final int movedEndIndex) {
 
 		// update the chart
@@ -363,7 +392,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		}
 		setDataDirty(isDataDirty);
 
-		updateTourViewer(fMovedStartIndex, fMovedEndIndex);
+		fireChangeEvent(fMovedStartIndex, fMovedEndIndex);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -481,7 +510,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 				fTourChart.updateChart(chartDataModel);
 				enableSaveAction();
 
-				updateTourViewer(fDefaultStartIndex, fDefaultEndIndex, speed, true);
+				fireChangeEvent(fDefaultStartIndex, fDefaultEndIndex, speed, true);
 			}
 		} catch (final Exception e) {
 			e.printStackTrace();
@@ -524,7 +553,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 // disabled, pop up for every selection when multiple selections are fired
 //			return false;
 		} else {
-			updateTourViewer(fComputedStartIndex, fComputedEndIndex);
+			fireChangeEvent(fComputedStartIndex, fComputedEndIndex);
 		}
 
 		setDataDirty(false);
@@ -599,7 +628,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		setDataDirty(false);
 
-		updateTourViewer(fDefaultStartIndex, fDefaultEndIndex);
+		fireChangeEvent(fDefaultStartIndex, fDefaultEndIndex);
 	}
 
 	@Override
@@ -754,35 +783,6 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		// disable action after the chart was created
 		fTourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, false);
-	}
-
-	/**
-	 * update tour map and compare result view
-	 */
-	private void updateTourViewer(final int startIndex, final int endIndex) {
-
-		final float speed = TourManager.computeTourSpeed(fTourData, startIndex, endIndex);
-
-		updateTourViewer(startIndex, endIndex, speed, false);
-	}
-
-	/**
-	 * update tour map and compare result view
-	 * 
-	 * @param startIndex
-	 * @param endIndex
-	 * @param speed
-	 * @param isDataSaved
-	 */
-	private void updateTourViewer(final int startIndex, final int endIndex, final float speed, final boolean isDataSaved) {
-
-		TourManager.firePropertyChange(TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED,
-				new TourPropertyCompareTourChanged(fCTCompareId,
-						startIndex,
-						endIndex,
-						speed,
-						isDataSaved,
-						fComparedTourItem));
 	}
 
 }

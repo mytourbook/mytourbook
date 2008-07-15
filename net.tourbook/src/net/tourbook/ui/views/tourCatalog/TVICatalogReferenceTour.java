@@ -33,23 +33,14 @@ import net.tourbook.ui.UI;
 public class TVICatalogReferenceTour extends TVICatalogTourItem {
 
 	String	label;
-
 	long	refId;
 
 	int		yearMapMinValue	= Integer.MIN_VALUE;
 	int		yearMapMaxValue;
+	int		tourCounter;
 
-	public TVICatalogReferenceTour(	final TVICatalogRootItem parentItem,
-									final String label,
-									final long refId,
-									final long tourId) {
-
-		this.setParentItem(parentItem);
-
-		this.label = label;
-		this.refId = refId;
-
-		setTourId(tourId);
+	public TVICatalogReferenceTour(final TVICatalogRootItem parentItem) {
+		setParentItem(parentItem);
 	}
 
 	@Override
@@ -94,20 +85,31 @@ public class TVICatalogReferenceTour extends TVICatalogTourItem {
 		 *</code>
 		 */
 
-		final String sqlString = "SELECT startYear\n" //$NON-NLS-1$
-				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE refTourId=" + refId + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" GROUP BY startYear"); //$NON-NLS-1$
+		final StringBuilder sb = new StringBuilder();
 
-		// System.out.println(sqlString);
+		sb.append("SELECT");
+		sb.append(" startYear,");
+		sb.append(" SUM(1)");
+
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED);
+		sb.append(" WHERE refTourId=?");
+		sb.append(" GROUP BY startYear");
+
 		try {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			final ResultSet result = statement.executeQuery();
+			final PreparedStatement statement = conn.prepareStatement(sb.toString());
+			statement.setLong(1, refId);
 
+			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
-				children.add(new TVICatalogYearItem(this, refId, result.getInt(1)));
+
+				final TVICatalogYearItem yearItem = new TVICatalogYearItem(this);
+				children.add(yearItem);
+
+				yearItem.refId = refId;
+				yearItem.year = result.getInt(1);
+				yearItem.tourCounter = result.getInt(2);
 			}
 
 			conn.close();

@@ -88,18 +88,14 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_recording_time;
 	public static String		ColumnFactory_recording_time_label;
 	public static String		ColumnFactory_recording_time_tooltip;
-
-	public static String	ColumnFactory_reference_tour;
+	public static String		ColumnFactory_reference_tour;
 	public static String		ColumnFactory_sequence;
 	public static String		ColumnFactory_sequence_label;
 	public static String		ColumnFactory_speed_label;
 	public static String		ColumnFactory_speed_tooltip;
-	public static String	ColumnFactory_tag;
-
-	public static String	ColumnFactory_tag_label;
-
-	public static String	ColumnFactory_tag_tooltip;
-
+	public static String		ColumnFactory_tag;
+	public static String		ColumnFactory_tag_label;
+	public static String		ColumnFactory_tag_tooltip;
 	public static String		ColumnFactory_temperature_label;
 	public static String		ColumnFactory_temperature_tooltip;
 	public static String		ColumnFactory_time;
@@ -111,10 +107,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_numbers;
 	public static String		ColumnFactory_tour_numbers_lable;
 	public static String		ColumnFactory_tour_numbers_tooltip;
-	public static String	ColumnFactory_tour_tag_label;
-
-	public static String	ColumnFactory_tour_tag_tooltip;
-
+	public static String		ColumnFactory_tour_tag_label;
+	public static String		ColumnFactory_tour_tag_tooltip;
 	public static String		ColumnFactory_tour_time;
 	public static String		ColumnFactory_tour_time_label;
 	public static String		ColumnFactory_tour_time_tooltip;

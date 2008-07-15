@@ -1,4 +1,4 @@
-package net.tourbook.ui.views.tourTag;
+package net.tourbook.ui.views.tagging;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
