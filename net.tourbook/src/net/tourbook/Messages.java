@@ -87,9 +87,13 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Action_save_checked_tours_tooltip;
 	public static String		Compare_Result_Action_uncheck_selected_tours;
 	public static String		Compare_Result_Column_diff;
+
+	public static String	Compare_Result_Column_diff_label;
 	public static String		Compare_Result_Column_diff_tooltip;
 	public static String		Compare_Result_Column_km_tooltip;
 	public static String		Compare_Result_Column_kmh_db_tooltip;
+
+	public static String	Compare_Result_Column_kmh_label;
 	public static String		Compare_Result_Column_kmh_moved_tooltip;
 	public static String		Compare_Result_Column_kmh_tooltip;
 	public static String		Compare_Result_Column_tour;

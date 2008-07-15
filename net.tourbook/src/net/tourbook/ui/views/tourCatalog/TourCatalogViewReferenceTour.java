@@ -113,9 +113,9 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 
 				showRefTour(((TVICatalogComparedTour) firstElement).getRefId());
 
-			} else if (firstElement instanceof CompareResultItemComparedTour) {
+			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
-				showRefTour(((CompareResultItemComparedTour) firstElement).refTour.getRefId());
+				showRefTour(((TVICompareResultComparedTour) firstElement).refTour.getRefId());
 			}
 		}
 	}

@@ -21,6 +21,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+/**
+ * Represents a reference tour which is between the {@link #startIndex} and {@link #endIndex} in the
+ * {@link TourData} of a tour
+ */
 @Entity
 public class TourReference {
 
@@ -35,21 +39,46 @@ public class TourReference {
 	 * value index position for the reference tour in the original tour
 	 */
 	private int			startIndex;
+
 	private int			endIndex;
 
 	private String		label	= "";	//$NON-NLS-1$
-
 	public TourReference() {}
 
-	public TourReference(String label, TourData tourData, int startIndex, int endIndex) {
+	public TourReference(final String label, final TourData tourData, final int startIndex, final int endIndex) {
 		this.tourData = tourData;
 		this.label = label;
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
 	}
 
-	public void setGeneratedId(long generatedId) {
-		this.refId = generatedId;
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TourReference)) {
+			return false;
+		}
+		final TourReference other = (TourReference) obj;
+		if (refId != other.refId) {
+			return false;
+		}
+		return true;
+	}
+
+	public int getEndValueIndex() {
+		return endIndex;
+	}
+
+	/**
+	 * @return Return the name for the reference tour
+	 */
+	public String getLabel() {
+		return label;
 	}
 
 	/**
@@ -59,38 +88,39 @@ public class TourReference {
 		return refId;
 	}
 
-	public void setTourData(TourData tourData) {
-		this.tourData = tourData;
+	public int getStartValueIndex() {
+		return startIndex;
 	}
 
 	public TourData getTourData() {
 		return tourData;
 	}
 
-	public void setStartValueIndex(int startIndex) {
-		this.startIndex = startIndex;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (refId ^ (refId >>> 32));
+		return result;
 	}
 
-	public int getStartValueIndex() {
-		return startIndex;
-	}
-
-	public void setEndValueIndex(int endIndex) {
+	public void setEndValueIndex(final int endIndex) {
 		this.endIndex = endIndex;
 	}
 
-	public int getEndValueIndex() {
-		return endIndex;
+	public void setGeneratedId(final long generatedId) {
+		this.refId = generatedId;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(final String label) {
 		this.label = label;
 	}
 
-	/**
-	 * @return Return the name for the reference tour
-	 */
-	public String getLabel() {
-		return label;
+	public void setStartValueIndex(final int startIndex) {
+		this.startIndex = startIndex;
+	}
+
+	public void setTourData(final TourData tourData) {
+		this.tourData = tourData;
 	}
 }

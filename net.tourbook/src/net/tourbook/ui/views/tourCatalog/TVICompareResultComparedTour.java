@@ -18,12 +18,11 @@ package net.tourbook.ui.views.tourCatalog;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
-import net.tourbook.tour.TreeViewerItem;
 
 /**
  * Tree view item with the compare result between the reference and the compared tour
  */
-public class CompareResultItemComparedTour extends TreeViewerItem {
+public class TVICompareResultComparedTour extends TVICompareResultItem {
 
 	/**
 	 * Unique key for the {@link TourCompared} entity, when <code>-1</code> the compared tour is not
@@ -49,6 +48,7 @@ public class CompareResultItemComparedTour extends TreeViewerItem {
 	int[]			altitudeDiffSerie;
 
 	int				computedStartIndex		= -1;
+
 	int				computedEndIndex		= -1;
 
 	int				normalizedStartIndex	= -1;
@@ -56,27 +56,44 @@ public class CompareResultItemComparedTour extends TreeViewerItem {
 
 	int				compareDrivingTime;
 	int				compareRecordingTime;
+
 	int				compareDistance;
 	float			compareSpeed;
-
 	int				timeIntervall;
-
 	/*
 	 * when a compared tour is stored in the database, the compId is set and the data from the
 	 * database are stored in the field's db...
 	 */
 	int				dbStartIndex;
-	int				dbEndIndex;
-	float			dbSpeed;
 
+	int				dbEndIndex;
+
+	float			dbSpeed;
 	/*
 	 * the moved... fields contain the position of the compared tour when the user moved the
 	 * position
 	 */
 	int				movedStartIndex;
 	int				movedEndIndex;
-	float			movedSpeed;
 
+	float			movedSpeed;
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TVICompareResultComparedTour)) {
+			return false;
+		}
+		final TVICompareResultComparedTour other = (TVICompareResultComparedTour) obj;
+		if (compId != other.compId) {
+			return false;
+		}
+		return true;
+	}
 	@Override
 	protected void fetchChildren() {}
 
@@ -90,6 +107,14 @@ public class CompareResultItemComparedTour extends TreeViewerItem {
 		 * compare result has no children, hide the expand sign
 		 */
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (compId ^ (compId >>> 32));
+		return result;
 	}
 
 	@Override

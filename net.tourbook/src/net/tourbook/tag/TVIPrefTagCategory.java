@@ -26,7 +26,7 @@ import net.tourbook.database.TourDatabase;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 
-public class TVIPrefTagCategory extends TVIPrefTagViewer {
+public class TVIPrefTagCategory extends TVIPrefTagItem {
 
 	private TourTagCategory	fTourTagCategory;
 

@@ -30,7 +30,7 @@ import net.tourbook.ui.UI;
 /**
  * contains tree viewer items (TVI) for reference tours
  */
-public class CompareResultItemReferenceTour extends TreeViewerItem {
+public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
 	String										label;
 
@@ -60,7 +60,7 @@ public class CompareResultItemReferenceTour extends TreeViewerItem {
 		}
 	}
 
-	public CompareResultItemReferenceTour(final CompareResultItemRoot parentItem, final String label,
+	public TVICompareResultReferenceTour(final TVICompareResultRootItem parentItem, final String label,
 			final TourReference refTour, final long tourId) {
 
 		this.setParentItem(parentItem);
@@ -71,6 +71,28 @@ public class CompareResultItemReferenceTour extends TreeViewerItem {
 	}
 
 	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TVICompareResultReferenceTour)) {
+			return false;
+		}
+		final TVICompareResultReferenceTour other = (TVICompareResultReferenceTour) obj;
+		if (refTour == null) {
+			if (other.refTour != null) {
+				return false;
+			}
+		} else if (!refTour.equals(other.refTour)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	protected void fetchChildren() {
 
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
@@ -78,7 +100,7 @@ public class CompareResultItemReferenceTour extends TreeViewerItem {
 
 		fStoredComparedTours = new HashMap<Long, StoredComparedTour>();
 
-		final CompareResultItemComparedTour[] comparedTours = TourCompareManager.getInstance().getComparedTours();
+		final TVICompareResultComparedTour[] comparedTours = TourCompareManager.getInstance().getComparedTours();
 
 		final long refId = refTour.getRefId();
 
@@ -107,7 +129,7 @@ public class CompareResultItemReferenceTour extends TreeViewerItem {
 		}
 
 		// create children for one reference tour
-		for (final CompareResultItemComparedTour compTour : comparedTours) {
+		for (final TVICompareResultComparedTour compTour : comparedTours) {
 
 			if (compTour.refTour.getRefId() == refId) {
 
@@ -137,6 +159,14 @@ public class CompareResultItemReferenceTour extends TreeViewerItem {
 			}
 		}
 
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((refTour == null) ? 0 : refTour.hashCode());
+		return result;
 	}
 
 	@Override

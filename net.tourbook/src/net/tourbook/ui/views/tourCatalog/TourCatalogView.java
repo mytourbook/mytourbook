@@ -178,66 +178,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-//	private class TourLabelProvider extends LabelProvider implements ITableLabelProvider, ITableColorProvider {
-//
-//		public String getColumnText(final Object obj, final int index) {
-//
-//			if (obj instanceof TVICatalogReferenceTour) {
-//
-//				final TVICatalogReferenceTour refTour = (TVICatalogReferenceTour) obj;
-//				switch (index) {
-//				case COLUMN_LABEL:
-//					return refTour.label;
-//				}
-//				return ""; //$NON-NLS-1$
-//
-//			} else if (obj instanceof TourCatalogItemYear) {
-//
-//				final TourCatalogItemYear yearItem = (TourCatalogItemYear) obj;
-//				switch (index) {
-//				case COLUMN_LABEL:
-//					return Integer.toString(yearItem.year);
-//				}
-//				return ""; //$NON-NLS-1$
-//
-//			} else if (obj instanceof TVICatalogComparedTour) {
-//
-//				final TVICatalogComparedTour compTour = (TVICatalogComparedTour) obj;
-//				switch (index) {
-//				case COLUMN_LABEL:
-//					return DateFormat.getDateInstance(DateFormat.SHORT).format(compTour.getTourDate());
-//
-//				case COLUMN_SPEED:
-//
-//					nf.setMinimumFractionDigits(1);
-//					nf.setMaximumFractionDigits(1);
-//
-//					final float speed = compTour.getTourSpeed();
-//					if (speed == 0) {
-//						return ""; //$NON-NLS-1$
-//					} else {
-//						return nf.format(speed / UI.UNIT_VALUE_DISTANCE);
-//					}
-//				}
-//			}
-//			return (getText(obj));
-//		}
-//
-////		public Color getForeground(final Object element, final int columnIndex) {
-//////			if (/* columnIndex != 0 && */element instanceof TVTITourCatalogReferenceTour) {
-//////				return fColorRefFg;
-//////			}
-//////			return fColorRefFg;
-////			// if (element instanceof TVITourBookTour) {
-////			// return fColorTourFg;
-////			// }
-////			// if (columnIndex != 0 && element instanceof TVITourBookMonth) {
-////			// return fColorMonthFg;
-////			// }
-//////			return null;
-////		}
-//	}
-
 	/**
 	 * Find the compared tours in the tour map tree viewer<br>
 	 * !!! Recursive !!!
@@ -370,7 +310,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 					final SelectionPersistedCompareResults selectionPersisted = (SelectionPersistedCompareResults) selection;
 
-					final ArrayList<CompareResultItemComparedTour> persistedCompareResults = selectionPersisted.persistedCompareResults;
+					final ArrayList<TVICompareResultComparedTour> persistedCompareResults = selectionPersisted.persistedCompareResults;
 
 					if (persistedCompareResults.size() > 0) {
 						updateTourViewer(persistedCompareResults);
@@ -570,7 +510,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
 		tree.setHeaderVisible(true);
-
 		tree.setLinesVisible(TourbookPlugin.getDefault()
 				.getPluginPreferences()
 				.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
@@ -752,7 +691,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 		super.dispose();
 	}
-
 
 	private void enableActions() {
 
@@ -1129,17 +1067,17 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 	 * 
 	 * @param persistedCompareResults
 	 */
-	private void updateTourViewer(final ArrayList<CompareResultItemComparedTour> persistedCompareResults) {
+	private void updateTourViewer(final ArrayList<TVICompareResultComparedTour> persistedCompareResults) {
 
 		// ref id's which hast new children
 		final HashMap<Long, Long> viewRefIds = new HashMap<Long, Long>();
 
 		// get all ref tours which needs to be updated
-		for (final CompareResultItemComparedTour compareResult : persistedCompareResults) {
+		for (final TVICompareResultComparedTour compareResult : persistedCompareResults) {
 
-			if (compareResult.getParentItem() instanceof CompareResultItemReferenceTour) {
+			if (compareResult.getParentItem() instanceof TVICompareResultReferenceTour) {
 
-				final long compResultRefId = ((CompareResultItemReferenceTour) compareResult.getParentItem()).refTour.getRefId();
+				final long compResultRefId = ((TVICompareResultReferenceTour) compareResult.getParentItem()).refTour.getRefId();
 
 				viewRefIds.put(compResultRefId, compResultRefId);
 			}

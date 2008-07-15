@@ -27,7 +27,7 @@ import net.tourbook.database.TourDatabase;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
-public class TVIPrefTagRoot extends TVIPrefTagViewer {
+public class TVIPrefTagRoot extends TVIPrefTagItem {
 
 	public TVIPrefTagRoot(final TreeViewer tagViewer) {
 		super(tagViewer);

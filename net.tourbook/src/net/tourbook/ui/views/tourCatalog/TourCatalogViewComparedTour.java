@@ -405,9 +405,9 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 				updateTourChart((TVICatalogComparedTour) firstElement);
 
-			} else if (firstElement instanceof CompareResultItemComparedTour) {
+			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
-				updateTourChart((CompareResultItemComparedTour) firstElement);
+				updateTourChart((TVICompareResultComparedTour) firstElement);
 			}
 		}
 	}
@@ -435,9 +435,9 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 			try {
 
-				if (fComparedTourItem instanceof CompareResultItemComparedTour) {
+				if (fComparedTourItem instanceof TVICompareResultComparedTour) {
 
-					final CompareResultItemComparedTour comparedTourItem = (CompareResultItemComparedTour) fComparedTourItem;
+					final TVICompareResultComparedTour comparedTourItem = (TVICompareResultComparedTour) fComparedTourItem;
 
 					TourCompareManager.saveComparedTourItem(comparedTourItem, em, ts);
 
@@ -583,7 +583,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 			xData.setRangeMarkers(new int[] { fDefaultStartIndex }, new int[] { fDefaultEndIndex });
 
-		} else if (fComparedTourItem instanceof CompareResultItemComparedTour) {
+		} else if (fComparedTourItem instanceof TVICompareResultComparedTour) {
 
 			xData.setRangeMarkers(new int[] { fDefaultStartIndex, fComputedStartIndex }, new int[] {
 					fDefaultEndIndex,
@@ -682,7 +682,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		return false;
 	}
 
-	private void updateTourChart(final CompareResultItemComparedTour compareResultItem) {
+	private void updateTourChart(final TVICompareResultComparedTour compareResultItem) {
 
 		if (saveComparedTourDialog() == false) {
 			return;
@@ -691,7 +691,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		final Long ctTourId = compareResultItem.comparedTourData.getTourId();
 
 		// check if the compared tour is already displayed
-		if (fCTTourId == ctTourId && fComparedTourItem instanceof CompareResultItemComparedTour) {
+		if (fCTTourId == ctTourId && fComparedTourItem instanceof TVICompareResultComparedTour) {
 			return;
 		}
 

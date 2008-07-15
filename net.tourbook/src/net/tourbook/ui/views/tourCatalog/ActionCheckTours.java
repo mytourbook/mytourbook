@@ -26,8 +26,8 @@ final class ActionCheckTours extends Action {
 
 			for (final Object tour : selection.toArray()) {
 
-				if (tour instanceof CompareResultItemComparedTour) {
-					final CompareResultItemComparedTour comparedTour = (CompareResultItemComparedTour) tour;
+				if (tour instanceof TVICompareResultComparedTour) {
+					final TVICompareResultComparedTour comparedTour = (TVICompareResultComparedTour) tour;
 					if (comparedTour.compId == -1) {
 						viewer.setChecked(tour, true);
 					}

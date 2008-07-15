@@ -56,7 +56,7 @@ public class TourCompareManager {
 	private TourReference[]								refTourContext;
 	private TourData[]									refToursData;
 
-	private ArrayList<CompareResultItemComparedTour>	fComparedTourItems	= new ArrayList<CompareResultItemComparedTour>();
+	private ArrayList<TVICompareResultComparedTour>	fComparedTourItems	= new ArrayList<TVICompareResultComparedTour>();
 
 	/**
 	 * internal constructor
@@ -71,13 +71,13 @@ public class TourCompareManager {
 	}
 
 	/**
-	 * Saves the {@link CompareResultItemComparedTour} item and updates the item with the saved data
+	 * Saves the {@link TVICompareResultComparedTour} item and updates the item with the saved data
 	 * 
 	 * @param comparedTourItem
 	 * @param em
 	 * @param ts
 	 */
-	public static void saveComparedTourItem(CompareResultItemComparedTour comparedTourItem,
+	public static void saveComparedTourItem(TVICompareResultComparedTour comparedTourItem,
 											EntityManager em,
 											EntityTransaction ts) {
 
@@ -159,7 +159,7 @@ public class TourCompareManager {
 										IProgressMonitor monitor) {
 
 				int tourCounter = 0;
-				fComparedTourItems = new ArrayList<CompareResultItemComparedTour>();
+				fComparedTourItems = new ArrayList<TVICompareResultComparedTour>();
 
 				// get all reference tours
 				getRefToursData();
@@ -204,7 +204,7 @@ public class TourCompareManager {
 							}
 
 							// compare the tour
-							CompareResultItemComparedTour compareResult = compareTour(refTourIndex, compareTourData);
+							TVICompareResultComparedTour compareResult = compareTour(refTourIndex, compareTourData);
 
 							// ignore tours which could not be compared
 							if (compareResult.computedStartIndex != -1) {
@@ -292,9 +292,9 @@ public class TourCompareManager {
 	 *        tour data of the tour which will be compared
 	 * @return returns the start index for the ref tour in the compare tour
 	 */
-	private CompareResultItemComparedTour compareTour(int refTourIndex, TourData compareTourData) {
+	private TVICompareResultComparedTour compareTour(int refTourIndex, TourData compareTourData) {
 
-		final CompareResultItemComparedTour compareResultItem = new CompareResultItemComparedTour();
+		final TVICompareResultComparedTour compareResultItem = new TVICompareResultComparedTour();
 
 		/*
 		 * normalize the compare tour
@@ -479,8 +479,8 @@ public class TourCompareManager {
 	/**
 	 * @return Returns the comparedTours.
 	 */
-	public CompareResultItemComparedTour[] getComparedTours() {
-		return fComparedTourItems.toArray(new CompareResultItemComparedTour[fComparedTourItems.size()]);
+	public TVICompareResultComparedTour[] getComparedTours() {
+		return fComparedTourItems.toArray(new TVICompareResultComparedTour[fComparedTourItems.size()]);
 	}
 
 	/**

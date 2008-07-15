@@ -69,7 +69,7 @@ public class ColumnManager {
 		restoreState(memento);
 	}
 
-	void addColumn(final ColumnDefinition colDef) {
+	public void addColumn(final ColumnDefinition colDef) {
 		fAllColumnDefinitions.add(colDef);
 	}
 

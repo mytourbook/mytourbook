@@ -41,7 +41,7 @@ import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourCatalog.CompareResultItemComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogReferenceTour;
@@ -937,9 +937,9 @@ public class MappingView extends ViewPart {
 				final TourData tourData = TourManager.getInstance().getTourData(tourId);
 				paintTour(tourData, false, false);
 
-			} else if (firstElement instanceof CompareResultItemComparedTour) {
+			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
-				final CompareResultItemComparedTour compareResultItem = (CompareResultItemComparedTour) firstElement;
+				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
 				final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData()
 						.getTourId());
 				paintTour(tourData, false, false);

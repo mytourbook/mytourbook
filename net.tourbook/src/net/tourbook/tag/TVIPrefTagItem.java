@@ -4,11 +4,11 @@ import net.tourbook.tour.TreeViewerItem;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
-public abstract class TVIPrefTagViewer extends TreeViewerItem {
+public abstract class TVIPrefTagItem extends TreeViewerItem {
 
 	private TreeViewer	fTagViewer;
 
-	public TVIPrefTagViewer(final TreeViewer tagViewer) {
+	public TVIPrefTagItem(final TreeViewer tagViewer) {
 		this.fTagViewer = tagViewer;
 	}
 
