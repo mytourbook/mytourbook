@@ -581,7 +581,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 					final StyledString styledString = new StyledString();
 					styledString.append(refItem.label, UI.TAG_STYLER);
-//					styledString.append("   " + refItem.tourCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 
 					cell.setText(styledString.getString());
 					cell.setStyleRanges(styledString.getStyleRanges());
@@ -598,8 +597,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 					cell.setText(styledString.getString());
 					cell.setStyleRanges(styledString.getStyleRanges());
 
-//					cell.setText(Integer.toString(yearItem.year));
-
 				} else if (element instanceof TVICatalogComparedTour) {
 
 					// compared tour item
@@ -608,8 +605,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 							.format(((TVICatalogComparedTour) element).getTourDate()));
 
 				}
-
-//				setCellColor(cell, element);
 			}
 		});
 

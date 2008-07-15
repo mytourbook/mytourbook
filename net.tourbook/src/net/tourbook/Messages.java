@@ -511,6 +511,8 @@ public class Messages extends NLS {
 
 	public static String		tourCatalog_view_action_number_of_years;
 	public static String		tourCatalog_view_action_refresh_view_tooltip;
+
+	public static String	tourCatalog_view_action_remove_compared_tours;
 	public static String		tourCatalog_view_action_rename_reference_tour;
 	public static String		tourCatalog_view_action_save_marker;
 	public static String		tourCatalog_view_action_synch_chart_years_tooltip;

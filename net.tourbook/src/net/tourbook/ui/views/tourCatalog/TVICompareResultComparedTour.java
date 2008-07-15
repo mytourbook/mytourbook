@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -89,7 +89,18 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
 			return false;
 		}
 		final TVICompareResultComparedTour other = (TVICompareResultComparedTour) obj;
-		if (compId != other.compId) {
+		if (comparedTourData == null) {
+			if (other.comparedTourData != null) {
+				return false;
+			}
+		} else if (!comparedTourData.equals(other.comparedTourData)) {
+			return false;
+		}
+		if (refTour == null) {
+			if (other.refTour != null) {
+				return false;
+			}
+		} else if (!refTour.equals(other.refTour)) {
 			return false;
 		}
 		return true;
@@ -113,7 +124,8 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (compId ^ (compId >>> 32));
+		result = prime * result + ((comparedTourData == null) ? 0 : comparedTourData.hashCode());
+		result = prime * result + ((refTour == null) ? 0 : refTour.hashCode());
 		return result;
 	}
 

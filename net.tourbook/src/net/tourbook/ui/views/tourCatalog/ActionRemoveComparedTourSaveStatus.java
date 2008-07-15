@@ -28,7 +28,7 @@ public class ActionRemoveComparedTourSaveStatus extends Action {
 
 		fResultView = resultView;
 
-		setText(Messages.tourCatalog_view_action_delete_tours);
+		setText(Messages.tourCatalog_view_action_remove_compared_tours);
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
@@ -38,7 +38,7 @@ public class ActionRemoveComparedTourSaveStatus extends Action {
 
 	@Override
 	public void run() {
-		fResultView.removeComparedTour();
+		fResultView.removeComparedTourFromDb();
 	}
 
 }
