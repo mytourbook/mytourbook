@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -29,6 +29,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
 
@@ -73,59 +74,52 @@ import org.eclipse.ui.part.PageBook;
 public class WizardPageCompareTour extends WizardPage {
 
 	// dialog settings
-	private static final String	COMP_TOUR_VIEWER_WIDTH		= "CompTour.viewerWidth";			//$NON-NLS-1$
-	private static final String	COMP_TOUR_SELECT_ALL		= "CompTour.selectAll";			//$NON-NLS-1$
+	private static final String		COMP_TOUR_VIEWER_WIDTH		= "CompTour.viewerWidth";			//$NON-NLS-1$
+	private static final String		COMP_TOUR_SELECT_ALL		= "CompTour.selectAll";			//$NON-NLS-1$
 
 	// tree columns
-	static final int			COLUMN_DATE					= 0;
-	static final int			COLUMN_DISTANCE				= 1;
-	static final int			COLUMN_UP					= 2;
-	static final int			COLUMN_RECORDING			= 3;
+	static final int				COLUMN_DATE					= 0;
+	static final int				COLUMN_DISTANCE				= 1;
+	static final int				COLUMN_UP					= 2;
+	static final int				COLUMN_RECORDING			= 3;
 
-	private Button				fCheckSelectAll;
-	private PageBook			fPageBook;
-	private Label				fPageNoTourIsSelected;
+	private Button					fCheckSelectAll;
+	private PageBook				fPageBook;
+	private Label					fPageTourIsNotSelected;
 
-	private CheckboxTreeViewer	fTourViewer;
-	private TourChart			fTourChart;
-	private ViewerDetailForm	fViewerDetailForm;
+	private CheckboxTreeViewer		fTourViewer;
+	private TVIWizardCompareRoot	fRootItem;
 
-	private WizardDataModel		fWizardDataModel			= new WizardDataModel();
-	private boolean				fIsTourViewerInitialized	= false;
+	private TourChart				fTourChart;
+	private ViewerDetailForm		fViewerDetailForm;
 
-	private NumberFormat		fNf							= NumberFormat.getNumberInstance();
+	private boolean					fIsTourViewerInitialized	= false;
 
-	private Group				fChartGroup;
+	private NumberFormat			fNf							= NumberFormat.getNumberInstance();
 
-	public class TourContentProvider implements ITreeContentProvider {
+	private Group					fChartGroup;
+
+	private class TourContentProvider implements ITreeContentProvider {
 
 		public void dispose() {}
 
 		public Object[] getChildren(final Object parentElement) {
-
-			final TourCatalogTourItem tourItem = ((TourCatalogTourItem) parentElement);
-
-			// fetch the children if not yet done
-			if (!tourItem.hasChildrenBeenFetched()) {
-				fWizardDataModel.fetchChildren(tourItem);
-			}
-			return tourItem.getChildren();
+			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
 		public Object[] getElements(final Object inputElement) {
-			return fWizardDataModel.getTopLevelEntries();
+			return fRootItem.getFetchedChildrenAsArray();
 		}
 
 		public Object getParent(final Object element) {
-			return ((TourCatalogTourItem) element).getParent();
+			return ((TreeViewerItem) element).getParentItem();
 		}
 
 		public boolean hasChildren(final Object element) {
-			return ((TourCatalogTourItem) element).hasChildren();
+			return ((TreeViewerItem) element).hasChildren();
 		}
 
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-
 	}
 
 	class TourLabelProvider extends LabelProvider implements ITableLabelProvider {
@@ -136,42 +130,40 @@ public class WizardPageCompareTour extends WizardPage {
 
 		public String getColumnText(final Object obj, final int index) {
 
-			final TourCatalogTourItem tourItem = (TourCatalogTourItem) obj;
-			final long[] row = tourItem.fTourItemData;
+			if (obj instanceof TVIWizardCompareTour) {
 
-			switch (index) {
-			case COLUMN_DATE:
-				return Long.toString(row[COLUMN_DATE]);
+				final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) obj;
 
-			case COLUMN_DISTANCE:
-				if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
+				switch (index) {
+				case COLUMN_DATE:
+					return ((TVIWizardCompareItem) obj).treeColumn;
+
+				case COLUMN_DISTANCE:
 					fNf.setMinimumFractionDigits(1);
 					fNf.setMaximumFractionDigits(1);
-					return fNf.format((row[COLUMN_DISTANCE]) / (1000 * UI.UNIT_VALUE_DISTANCE));
-				} else {
-					return ""; //$NON-NLS-1$
-				}
+					return fNf.format((tourItem.colDistance) / (1000 * UI.UNIT_VALUE_DISTANCE));
 
-			case COLUMN_RECORDING:
-				if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
-					final long recordingTime = row[COLUMN_RECORDING];
+				case COLUMN_RECORDING:
+					final long recordingTime = tourItem.colRecordingTime;
 					return new Formatter().format(Messages.Format_hhmm,
 							(recordingTime / 3600),
 							((recordingTime % 3600) / 60)).toString();
-				} else {
-					return ""; //$NON-NLS-1$
+
+				case COLUMN_UP:
+					return Long.toString((long) (tourItem.colAltitudeUp / UI.UNIT_VALUE_ALTITUDE));
+
+				default:
 				}
 
-			case COLUMN_UP:
-				if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
-					return Long.toString((long) (row[COLUMN_UP] / UI.UNIT_VALUE_ALTITUDE));
+			} else {
+				if (index == COLUMN_DATE) {
+					return ((TVIWizardCompareItem) obj).treeColumn;
 				} else {
-					return ""; //$NON-NLS-1$
+					return UI.EMPTY_STRING;
 				}
-
-			default:
-				return (getText(obj));
 			}
+
+			return UI.EMPTY_STRING;
 		}
 	}
 
@@ -182,49 +174,7 @@ public class WizardPageCompareTour extends WizardPage {
 
 	public void createControl(final Composite parent) {
 
-		final Composite pageContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(pageContainer);
-
-		fCheckSelectAll = new Button(pageContainer, SWT.CHECK);
-		fCheckSelectAll.setText(Messages.tourCatalog_wizard_Action_select_all_tours);
-		fCheckSelectAll.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				enableTours(fCheckSelectAll.getSelection());
-				validatePage();
-			}
-		});
-
-		/*
-		 * create master detail layout
-		 */
-		final Composite masterDetailContainer = new Composite(pageContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
-
-		final Control viewer = createTourViewer(masterDetailContainer);
-
-		final Sash sash = new Sash(masterDetailContainer, SWT.VERTICAL);
-
-		// chart group
-		fChartGroup = new Group(masterDetailContainer, SWT.NONE);
-		fChartGroup.setLayout(new GridLayout());
-		fChartGroup.setText(Messages.tourCatalog_wizard_Group_selected_tour);
-		fChartGroup.setEnabled(false);
-
-		fViewerDetailForm = new ViewerDetailForm(masterDetailContainer, viewer, sash, fChartGroup);
-
-		/*
-		 * create pagebook with the chart and the no-chart page
-		 */
-		fPageBook = new PageBook(fChartGroup, SWT.NONE);
-		fPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		fTourChart = new TourChart(fPageBook, SWT.NONE, false);
-		fTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-
-		fPageNoTourIsSelected = new Label(fPageBook, SWT.NONE);
-		fPageNoTourIsSelected.setText(Messages.tourCatalog_wizard_Label_a_tour_is_not_selected);
-		fPageNoTourIsSelected.setEnabled(false);
+		final Composite pageContainer = createUI(parent);
 
 		restoreDialogSettings();
 
@@ -299,11 +249,9 @@ public class WizardPageCompareTour extends WizardPage {
 		});
 
 		fTourViewer.addDoubleClickListener(new IDoubleClickListener() {
-
 			public void doubleClick(final DoubleClickEvent event) {
 
 				final Object selection = ((IStructuredSelection) fTourViewer.getSelection()).getFirstElement();
-
 				if (selection != null) {
 
 					// expand/collapse current item
@@ -320,6 +268,55 @@ public class WizardPageCompareTour extends WizardPage {
 		return layoutContainer;
 	}
 
+	private Composite createUI(final Composite parent) {
+
+		final Composite pageContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(pageContainer);
+
+		fCheckSelectAll = new Button(pageContainer, SWT.CHECK);
+		fCheckSelectAll.setText(Messages.tourCatalog_wizard_Action_select_all_tours);
+		fCheckSelectAll.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				enableTours(fCheckSelectAll.getSelection());
+				validatePage();
+			}
+		});
+
+		/*
+		 * create master detail layout
+		 */
+		final Composite masterDetailContainer = new Composite(pageContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(masterDetailContainer);
+
+		final Control viewer = createTourViewer(masterDetailContainer);
+
+		final Sash sash = new Sash(masterDetailContainer, SWT.VERTICAL);
+
+		// chart group
+		fChartGroup = new Group(masterDetailContainer, SWT.NONE);
+		fChartGroup.setLayout(new GridLayout());
+		fChartGroup.setText(Messages.tourCatalog_wizard_Group_selected_tour);
+		fChartGroup.setEnabled(false);
+
+		fViewerDetailForm = new ViewerDetailForm(masterDetailContainer, viewer, sash, fChartGroup);
+
+		/*
+		 * create pagebook with the chart and the no-chart page
+		 */
+		fPageBook = new PageBook(fChartGroup, SWT.NONE);
+		fPageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		fTourChart = new TourChart(fPageBook, SWT.NONE, false);
+		fTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+		fPageTourIsNotSelected = new Label(fPageBook, SWT.NONE);
+		fPageTourIsNotSelected.setText(Messages.tourCatalog_wizard_Label_a_tour_is_not_selected);
+		fPageTourIsNotSelected.setEnabled(false);
+
+		return pageContainer;
+	}
+
 	/**
 	 * enables/disables the controls which belong to the tour
 	 * 
@@ -331,17 +328,18 @@ public class WizardPageCompareTour extends WizardPage {
 
 		// load tour data into the viewer if not yet done
 		if (isEnabled && fIsTourViewerInitialized == false) {
+
 			BusyIndicator.showWhile(null, new Runnable() {
 				public void run() {
 
 					// initialize the data before the view input is set
-					fWizardDataModel.setRootItem();
-
+					fRootItem = new TVIWizardCompareRoot();
 					fTourViewer.setInput(this);
+
+					fIsTourViewerInitialized = true;
 				}
 			});
 
-			fIsTourViewerInitialized = true;
 		}
 
 		fTourViewer.getControl().setEnabled(isEnabled);
@@ -349,37 +347,33 @@ public class WizardPageCompareTour extends WizardPage {
 
 	private Long[] getAllTourIds() {
 
-		final String sqlString = "SELECT TourId FROM " + TourDatabase.TABLE_TOUR_DATA; //$NON-NLS-1$
-
-		final ArrayList<Long> tourIdList = new ArrayList<Long>();
+		final ArrayList<Long> allTourIds = new ArrayList<Long>();
 
 		try {
 
+			final String sqlString = "SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA; //$NON-NLS-1$
+
 			final Connection conn = TourDatabase.getInstance().getConnection();
-
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			final ResultSet result = statement.executeQuery();
 
+			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
-				tourIdList.add(result.getLong(1));
+				allTourIds.add(result.getLong(1));
 			}
 
 			conn.close();
 
-		}
-		catch (final SQLException e) {
+		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
 
-		return tourIdList.toArray(new Long[tourIdList.size()]);
+		return allTourIds.toArray(new Long[allTourIds.size()]);
 	}
 
 	/**
 	 * @return return all checked tours
 	 */
 	public Object[] getComparedTours() {
-
-		TourCatalogTourItem[] tours = new TourCatalogTourItem[0];
 
 		if (fCheckSelectAll.getSelection()) {
 
@@ -389,13 +383,8 @@ public class WizardPageCompareTour extends WizardPage {
 
 		} else {
 
-			// convert the Object[] into a TreeViewerItem[]
-			final Object[] checked = fTourViewer.getCheckedElements();
-			tours = new TourCatalogTourItem[checked.length];
-			System.arraycopy(checked, 0, tours, 0, checked.length);
+			return fTourViewer.getCheckedElements();
 		}
-
-		return tours;
 	}
 
 	void persistDialogSettings() {
@@ -416,8 +405,7 @@ public class WizardPageCompareTour extends WizardPage {
 		Integer viewerWidth = null;
 		try {
 			viewerWidth = wizardSettings.getInt(COMP_TOUR_VIEWER_WIDTH);
-		}
-		catch (final NumberFormatException e) {}
+		} catch (final NumberFormatException e) {}
 		fViewerDetailForm.setViewerWidth(viewerWidth);
 
 		// restore checkbox: select all tours
@@ -433,28 +421,28 @@ public class WizardPageCompareTour extends WizardPage {
 
 		if (selection != null) {
 
-			if (selection.getFirstElement() instanceof TourCatalogTourItem) {
+			final Object firstElement = selection.getFirstElement();
+			if (firstElement instanceof TVIWizardCompareTour) {
 
-				final TourCatalogTourItem tourItem = (TourCatalogTourItem) selection.getFirstElement();
+				final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) firstElement;
 
-				if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
+				// get tour data from the database
+				final TourData tourData = TourManager.getInstance().getTourData(tourItem.tourId);
 
-					// get tour data from the database
-					final TourData tourData = TourManager.getInstance().getTourData(tourItem.getTourId());
+				// set altitude visible
+				final TourChartConfiguration chartConfig = new TourChartConfiguration(true);
+				chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-					// set altitude visible
-					final TourChartConfiguration chartConfig = new TourChartConfiguration(true);
-					chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
+				fTourChart.updateTourChart(tourData, chartConfig, false);
 
-					fTourChart.updateTourChart(tourData, chartConfig, false);
+				fChartGroup.setText(NLS.bind(Messages.tourCatalog_wizard_Group_selected_tour_2,
+						TourManager.getTourDate(tourData)));
 
-					fChartGroup.setText(NLS.bind(Messages.tourCatalog_wizard_Group_selected_tour_2,
-							TourManager.getTourDate(tourData)));
-					fPageBook.showPage(fTourChart);
-				} else {
-					fChartGroup.setText(""); //$NON-NLS-1$
-					fPageBook.showPage(fPageNoTourIsSelected);
-				}
+				fPageBook.showPage(fTourChart);
+
+			} else {
+				fPageBook.showPage(fPageTourIsNotSelected);
+				fChartGroup.setText(UI.EMPTY_STRING);
 			}
 		}
 	}

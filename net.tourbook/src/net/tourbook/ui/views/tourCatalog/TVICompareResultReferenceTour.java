@@ -52,16 +52,18 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
 		private float	tourSpeed;
 
-		public StoredComparedTour(final long compareId, final int startIndex, final int endIndex, final float speed) {
-			this.comparedId = compareId;
-			this.startIndex = startIndex;
-			this.endIndex = endIndex;
-			this.tourSpeed = speed;
-		}
+//		public StoredComparedTour(final long compareId, final int startIndex, final int endIndex, final float speed) {
+//			this.comparedId = compareId;
+//			this.startIndex = startIndex;
+//			this.endIndex = endIndex;
+//			this.tourSpeed = speed;
+//		}
 	}
 
-	public TVICompareResultReferenceTour(final TVICompareResultRootItem parentItem, final String label,
-			final TourReference refTour, final long tourId) {
+	public TVICompareResultReferenceTour(	final TVICompareResultRootItem parentItem,
+											final String label,
+											final TourReference refTour,
+											final long tourId) {
 
 		this.setParentItem(parentItem);
 
@@ -104,22 +106,37 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
 		final long refId = refTour.getRefId();
 
-		final String sqlString = "SELECT tourId, comparedId, startIndex, endIndex, tourSpeed  \n" //$NON-NLS-1$
-				+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + " \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("WHERE refTourId=" + refId); //$NON-NLS-1$
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("SELECT");
+
+		sb.append(" tourId,"); //		1
+		sb.append(" comparedId,"); //	2
+		sb.append(" startIndex,"); //	3
+		sb.append(" endIndex,"); //		4
+		sb.append(" tourSpeed"); //		5	
+
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED);
+		sb.append(" WHERE refTourId=?");
 
 		try {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			final ResultSet result = statement.executeQuery();
+			final PreparedStatement statement = conn.prepareStatement(sb.toString());
+			statement.setLong(1, refId);
 
+			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
-				fStoredComparedTours.put(result.getLong(1),
-						new StoredComparedTour(result.getLong(2),
-								result.getInt(3),
-								result.getInt(4),
-								result.getFloat(5)));
+
+				final StoredComparedTour storedComparedTour = new StoredComparedTour();
+
+				final long dbTourId = result.getLong(1);
+				storedComparedTour.comparedId = result.getLong(2);
+				storedComparedTour.startIndex = result.getInt(3);
+				storedComparedTour.endIndex = result.getInt(4);
+				storedComparedTour.tourSpeed = result.getFloat(5);
+
+				fStoredComparedTours.put(dbTourId, storedComparedTour);
 			}
 
 			conn.close();

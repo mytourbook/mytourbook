@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.ui.views.tourCatalog;
 
 import java.text.DateFormat;
@@ -694,7 +693,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		int refItems = 0;
 		int yearItems = 0;
 		int tourItems = 0;
-		TVICatalogComparedTour firstTour = null;
+		TVICatalogComparedTour firstTourItem = null;
 
 		// count how many different items are selected
 		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
@@ -705,7 +704,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 				refItems++;
 			} else if (treeItem instanceof TVICatalogComparedTour) {
 				if (tourItems == 0) {
-					firstTour = (TVICatalogComparedTour) treeItem;
+					firstTourItem = (TVICatalogComparedTour) treeItem;
 				}
 				tourItems++;
 			} else if (treeItem instanceof TVICatalogYearItem) {
@@ -732,13 +731,16 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
+		/*
+		 * add/remove/remove all and recent tags
+		 */
 		fActionAddTag.setEnabled(isTourSelected);
 
 		if (isOneTour) {
 
 			// one tour is selected
 
-			final ArrayList<Long> tagIds = firstTour.tagIds;
+			final ArrayList<Long> tagIds = firstTourItem.tagIds;
 			if (tagIds != null && tagIds.size() > 0) {
 
 				// at least one tag is within the tour

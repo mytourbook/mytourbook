@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.ui.views.tourCatalog;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,66 +23,45 @@ import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
-import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
-public class TVITourBookYear extends TVITourBookItem {
-
-	public TVITourBookYear(final TourBookView view, final TVITourBookItem parentItem) {
-
-		super(view);
-
-		setParentItem(parentItem);
-	}
+public class TVIWizardCompareRoot extends TVIWizardCompareItem {
 
 	@Override
 	protected void fetchChildren() {
 
+		/*
+		 * set the children for the root item, these are year items
+		 */
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		final SQLFilter sqlFilter = new SQLFilter();
-
 		final StringBuilder sb = new StringBuilder();
+
 		sb.append("SELECT");
 
-		sb.append(" startYear, ");
-		sb.append(" startMonth, ");
-		sb.append(SQL_SUM_COLUMNS);
+		sb.append(" startYear ");
 
 		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA);
 
-		sb.append(" WHERE startYear=?");
-		sb.append(sqlFilter.getWhereClause());
-
-		sb.append(" GROUP BY startYear, startMonth");
-		sb.append(" ORDER BY startMonth");
-
+		sb.append(" GROUP BY startYear");
+		sb.append(" ORDER BY startYear");
+		
 		try {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
-
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setInt(1, fTourYear);
-			sqlFilter.setParameters(statement, 2);
 
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
-				final TVITourBookItem tourItem = new TVITourBookMonth(fView, this);
-				children.add(tourItem);
-
 				final int dbYear = result.getInt(1);
-				final int dbMonth = result.getInt(2);
-				fCalendar.set(dbYear, dbMonth - 1, 1);
 
-				tourItem.treeColumn = UI.MonthFormatter.format(fCalendar.getTime());
+				final TVIWizardCompareYear yearItem = new TVIWizardCompareYear(this);
+				children.add(yearItem);
 
-				tourItem.fTourYear = dbYear;
-				tourItem.fTourMonth = dbMonth;
-				tourItem.fTourDate = fCalendar.getTimeInMillis();
-
-				tourItem.addSumColumns(result, 3);
+				yearItem.treeColumn = Integer.toString(dbYear);
+				yearItem.tourYear = dbYear;
 			}
 
 			conn.close();
@@ -94,5 +73,4 @@ public class TVITourBookYear extends TVITourBookItem {
 
 	@Override
 	protected void remove() {}
-
 }

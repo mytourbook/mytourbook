@@ -18,6 +18,7 @@ package net.tourbook.ui;
 
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -150,6 +151,7 @@ public class UI {
 	public static final DateFormat			TimeFormatterShort				= DateFormat.getTimeInstance(DateFormat.SHORT);
 	public static final DateFormat			DateFormatterShort				= DateFormat.getDateInstance(DateFormat.SHORT);
 	public static final DateFormat			DateFormatterFull				= DateFormat.getDateInstance(DateFormat.FULL);
+	public static final SimpleDateFormat	MonthFormatter					= new SimpleDateFormat("MMM");
 
 	public static Styler					TAG_STYLER;
 	public static Styler					TAG_CATEGORY_STYLER;
@@ -169,7 +171,7 @@ public class UI {
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
 		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
-		
+
 		/*
 		 * set styler
 		 */
@@ -358,7 +360,7 @@ public class UI {
 	 * @param prefs
 	 */
 	public static void setTagColorsFromPrefStore() {
-		
+
 		/*
 		 * set colors
 		 */

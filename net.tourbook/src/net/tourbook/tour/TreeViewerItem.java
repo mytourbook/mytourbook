@@ -116,8 +116,7 @@ public abstract class TreeViewerItem {
 	}
 
 	/**
-	 * @return Returns a sql string for the WHERE clause to select only the data which for the
-	 *         selected person
+	 * @return Returns a sql string for the WHERE clause to select data only for the selected person
 	 */
 	public String getSQlTourPersonId() {
 

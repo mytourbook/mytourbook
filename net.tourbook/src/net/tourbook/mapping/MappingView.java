@@ -41,10 +41,10 @@ import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -926,9 +926,8 @@ public class MappingView extends ViewPart {
 
 		} else if (selection instanceof StructuredSelection) {
 
-			final StructuredSelection structuredSelection = (StructuredSelection) selection;
+			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-			final Object firstElement = structuredSelection.getFirstElement();
 			if (firstElement instanceof TVICatalogComparedTour) {
 
 				final TVICatalogComparedTour comparedTour = (TVICatalogComparedTour) firstElement;
@@ -948,7 +947,7 @@ public class MappingView extends ViewPart {
 		} else if (selection instanceof SelectionTourCatalogView) {
 
 			// show reference tour
-			
+
 			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
 
 			final TVICatalogReferenceTour refItem = tourCatalogSelection.getRefItem();
@@ -957,6 +956,7 @@ public class MappingView extends ViewPart {
 				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
 				paintTour(tourData, false, false);
 			}
+
 		}
 
 		enableActions();

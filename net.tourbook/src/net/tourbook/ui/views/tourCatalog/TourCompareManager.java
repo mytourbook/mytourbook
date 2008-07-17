@@ -49,12 +49,12 @@ import org.eclipse.ui.WorkbenchException;
  */
 public class TourCompareManager {
 
-	private static TourCompareManager					fInstance;
+	private static TourCompareManager				fInstance;
 
-	private boolean										isComparing			= false;
+	private boolean									isComparing			= false;
 
-	private TourReference[]								refTourContext;
-	private TourData[]									refToursData;
+	private TourReference[]							refTourContext;
+	private TourData[]								refToursData;
 
 	private ArrayList<TVICompareResultComparedTour>	fComparedTourItems	= new ArrayList<TVICompareResultComparedTour>();
 
@@ -155,9 +155,9 @@ public class TourCompareManager {
 
 	/**
 	 * @param refTourIndex
-	 *        index into refTourContext and refToursData
+	 *            index into refTourContext and refToursData
 	 * @param compareTourData
-	 *        tour data of the tour which will be compared
+	 *            tour data of the tour which will be compared
 	 * @return returns the start index for the ref tour in the compare tour
 	 */
 	private TVICompareResultComparedTour compareTour(final int refTourIndex, final TourData compareTourData) {
@@ -323,9 +323,11 @@ public class TourCompareManager {
 		compareResultItem.normalizedStartIndex = normCompareIndexStart;
 		compareResultItem.normalizedEndIndex = normCompareIndexStart + normIndexDiff;
 
-		final int compareDistance = compareTourDataDistance[compareEndIndex] - compareTourDataDistance[compareStartIndex];
+		final int compareDistance = compareTourDataDistance[compareEndIndex]
+				- compareTourDataDistance[compareStartIndex];
 		final int recordingTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
-		final int drivingTime = Math.max(0, recordingTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
+		final int drivingTime = Math.max(0, recordingTime
+				- compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
 
 		compareResultItem.compareDrivingTime = drivingTime;
 		compareResultItem.compareRecordingTime = recordingTime;
@@ -351,7 +353,7 @@ public class TourCompareManager {
 		final Job compareJob = new Job(Messages.tourCatalog_view_compare_job_title) {
 
 			private void compareTourJob(final TourReference[] refTourContext,
-										final Object[] compareTourIDs,
+										final Object[] comparedTours,
 										final IProgressMonitor monitor) {
 
 				int tourCounter = 0;
@@ -361,35 +363,25 @@ public class TourCompareManager {
 				getRefToursData();
 
 				// loop: all compare tours
-				for (int compareIndex = 0; compareIndex < compareTourIDs.length; compareIndex++) {
+				for (int compareIndex = 0; compareIndex < comparedTours.length; compareIndex++) {
 
 					Long tourId;
 
-					final Object tour = compareTourIDs[compareIndex];
+					final Object tour = comparedTours[compareIndex];
 
-					if (tour instanceof TourCatalogTourItem) {
-						final TourCatalogTourItem tourItem = (TourCatalogTourItem) tour;
-
-						// ignore none tour items
-						if (tourItem.getItemType() == TourCatalogTourItem.ITEM_TYPE_TOUR) {
-
-							// load compare tour from database
-							tourId = tourItem.getTourId();
-						} else {
-							continue;
-						}
-
+					if (tour instanceof TVIWizardCompareTour) {
+						tourId = ((TVIWizardCompareTour) tour).tourId;
 					} else if (tour instanceof Long) {
 						tourId = (Long) tour;
-
 					} else {
+						// ignore checked year/month
 						continue;
 					}
 
-					// load compare tour from the database
+					// load compared tour from the database
 					final TourData compareTourData = TourManager.getInstance().getTourData(tourId);
 
-					if (compareTourData.timeSerie.length > 0) {
+					if (compareTourData != null && compareTourData.timeSerie.length > 0) {
 
 						// loop: all reference tours
 						for (int refTourIndex = 0; refTourIndex < refTourContext.length; refTourIndex++) {
@@ -400,7 +392,8 @@ public class TourCompareManager {
 							}
 
 							// compare the tour
-							final TVICompareResultComparedTour compareResult = compareTour(refTourIndex, compareTourData);
+							final TVICompareResultComparedTour compareResult = compareTour(refTourIndex,
+									compareTourData);
 
 							// ignore tours which could not be compared
 							if (compareResult.computedStartIndex != -1) {
@@ -412,9 +405,8 @@ public class TourCompareManager {
 							}
 
 							// update the message in the progress monitor
-							tourCounter++;
 							monitor.subTask(NLS.bind(Messages.tourCatalog_view_compare_job_subtask,
-									Integer.toString(tourCounter)));
+									Integer.toString(++tourCounter)));
 
 							monitor.worked(1);
 						}
@@ -502,7 +494,7 @@ public class TourCompareManager {
 								.showView(CompareResultView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
 						if (view != null) {
-							view.updateViewer();
+							view.reloadViewer();
 						}
 
 					} catch (final PartInitException e) {

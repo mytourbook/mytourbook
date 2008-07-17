@@ -46,6 +46,7 @@ import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.Preferences;
@@ -377,11 +378,18 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 		} else if (selection instanceof StructuredSelection) {
 
-			final StructuredSelection structuredSelection = (StructuredSelection) selection;
-
-			final Object firstElement = structuredSelection.getFirstElement();
+			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+			
 			if (firstElement instanceof TVICatalogComparedTour) {
+
 				updateChart(((TVICatalogComparedTour) firstElement).getTourId());
+
+			} else if (firstElement instanceof TVICompareResultComparedTour) {
+
+				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
+				final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData()
+						.getTourId());
+				updateChart(tourData);
 			}
 
 		} else if (selection instanceof SelectionTourCatalogView) {
@@ -392,7 +400,9 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			if (refItem != null) {
 				updateChart(refItem.getTourId());
 			}
+
 		}
+
 	}
 
 	@Override

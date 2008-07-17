@@ -282,6 +282,12 @@ public class TourData {
 	@Transient
 	public int[]				altitudeSerie;
 
+	/**
+	 * contains the absolute altitude in the imperial measurement system
+	 */
+	@Transient
+	private int[]				altitudeSerieImperial;
+
 //	/**
 //	 * min/max values for the altitude
 //	 */
@@ -289,12 +295,6 @@ public class TourData {
 //	public int					altitudeSerieMin;
 //	@Transient
 //	public int					altitudeSerieMax;
-
-	/**
-	 * contains the absolute altitude in the imperial measurement system
-	 */
-	@Transient
-	private int[]				altitudeSerieImperial;
 
 	@Transient
 	public int[]				cadenceSerie;
@@ -311,19 +311,19 @@ public class TourData {
 	@Transient
 	private int[]				temperatureSerieImperial;
 
-	/*
-	 * computed data series
-	 */
-
 	/**
 	 * the metric speed serie is required form computing the power even if the current measurement
 	 * system is imperial
 	 */
 	@Transient
 	private int[]				speedSerie;
+
+	/*
+	 * computed data series
+	 */
+
 	@Transient
 	private int[]				speedSerieImperial;
-
 	/**
 	 * Is <code>true</code> when the data in {@link #speedSerie} are from the device and not
 	 * computed. Speed data are normally available from an ergometer and not from a bike computer
@@ -333,9 +333,9 @@ public class TourData {
 
 	@Transient
 	private int[]				paceSerie;
+
 	@Transient
 	private int[]				paceSerieImperial;
-
 	@Transient
 	private int[]				powerSerie;
 
@@ -348,9 +348,9 @@ public class TourData {
 
 	@Transient
 	private int[]				altimeterSerie;
+
 	@Transient
 	private int[]				altimeterSerieImperial;
-
 	@Transient
 	public int[]				gradientSerie;
 
@@ -362,9 +362,9 @@ public class TourData {
 	 */
 	@Transient
 	public double[]				latitudeSerie;
+
 	@Transient
 	public double[]				longitudeSerie;
-
 	/**
 	 * contains the bounds of the tour in latitude/longitude
 	 */
@@ -454,13 +454,13 @@ public class TourData {
 
 	@Transient
 	public double				mapMinLatitude;
+
 	@Transient
 	public double				mapMaxLatitude;
 	@Transient
 	public double				mapMinLongitude;
 	@Transient
 	public double				mapMaxLongitude;
-
 	public TourData() {}
 
 	/**
@@ -1201,6 +1201,36 @@ public class TourData {
 		tourDrivingTime = Math.max(0, timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length));
 	}
 
+	/**
+	 * Create a device marker at the current position
+	 * 
+	 * @param timeData
+	 * @param timeIndex
+	 * @param timeAbsolute
+	 * @param distanceAbsolute
+	 */
+	private void createMarker(	final TimeData timeData,
+								final int timeIndex,
+								final int timeAbsolute,
+								final int distanceAbsolute) {
+
+		// create a new marker
+		final TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
+
+		tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+		tourMarker.setTime(timeAbsolute + timeData.marker);
+		tourMarker.setDistance(distanceAbsolute);
+		tourMarker.setSerieIndex(timeIndex);
+
+		if (timeData.markerLabel == null) {
+			tourMarker.setLabel(Messages.TourData_Label_device_marker);
+		} else {
+			tourMarker.setLabel(timeData.markerLabel);
+		}
+
+		getTourMarkers().add(tourMarker);
+	}
+
 //	/**
 //	 * Clip values when a minimum distance is fallen short of
 //	 */
@@ -1303,36 +1333,6 @@ public class TourData {
 //
 ////		System.out.println("clipping");
 //	}
-
-	/**
-	 * Create a device marker at the current position
-	 * 
-	 * @param timeData
-	 * @param timeIndex
-	 * @param timeAbsolute
-	 * @param distanceAbsolute
-	 */
-	private void createMarker(	final TimeData timeData,
-								final int timeIndex,
-								final int timeAbsolute,
-								final int distanceAbsolute) {
-
-		// create a new marker
-		final TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
-
-		tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-		tourMarker.setTime(timeAbsolute + timeData.marker);
-		tourMarker.setDistance(distanceAbsolute);
-		tourMarker.setSerieIndex(timeIndex);
-
-		if (timeData.markerLabel == null) {
-			tourMarker.setLabel(Messages.TourData_Label_device_marker);
-		} else {
-			tourMarker.setLabel(timeData.markerLabel);
-		}
-
-		getTourMarkers().add(tourMarker);
-	}
 
 	/**
 	 * Convert {@link TimeData} into {@link TourData} this will be done after data are imported or
@@ -2430,16 +2430,16 @@ public class TourData {
 		return tourBike;
 	}
 
-//	public Set<TourCategory> getTourCategory() {
-//		return tourCategory;
-//	}
-
 	/**
 	 * @return the tourDescription
 	 */
 	public String getTourDescription() {
 		return tourDescription == null ? "" : tourDescription; //$NON-NLS-1$
 	}
+
+//	public Set<TourCategory> getTourCategory() {
+//		return tourCategory;
+//	}
 
 	public int getTourDistance() {
 		return tourDistance;
@@ -2529,46 +2529,6 @@ public class TourData {
 
 		return result;
 	}
-
-//	/**
-//	 * Called before this object gets persisted, copy data from the tourdata object into the object
-//	 * which gets serialized
-//	 */
-//	/*
-//	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
-//	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
-//	 */
-//	public void onPrePersistOLD() {
-//
-//		if (timeSerie == null) {
-//			serieData = new SerieData();
-//			return;
-//		}
-//
-//		final int serieLength = timeSerie.length;
-//
-//		serieData = new SerieData(serieLength);
-//
-//		System.arraycopy(altitudeSerie, 0, serieData.altitudeSerie, 0, serieLength);
-//		System.arraycopy(cadenceSerie, 0, serieData.cadenceSerie, 0, serieLength);
-//		System.arraycopy(distanceSerie, 0, serieData.distanceSerie, 0, serieLength);
-//		System.arraycopy(pulseSerie, 0, serieData.pulseSerie, 0, serieLength);
-//		System.arraycopy(temperatureSerie, 0, serieData.temperatureSerie, 0, serieLength);
-//		System.arraycopy(timeSerie, 0, serieData.timeSerie, 0, serieLength);
-//
-//		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0,
-//		// serieLength);
-//		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
-//		// serieLength);
-//
-//		if (latitudeSerie != null) {
-//
-//			serieData.initializeGPSData(serieLength);
-//
-//			System.arraycopy(latitudeSerie, 0, serieData.latitude, 0, serieLength);
-//			System.arraycopy(longitudeSerie, 0, serieData.longitude, 0, serieLength);
-//		}
-//	}
 
 	/**
 	 * Called after the object was loaded from the persistence store
@@ -2718,6 +2678,46 @@ public class TourData {
 
 	}
 
+//	/**
+//	 * Called before this object gets persisted, copy data from the tourdata object into the object
+//	 * which gets serialized
+//	 */
+//	/*
+//	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
+//	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
+//	 */
+//	public void onPrePersistOLD() {
+//
+//		if (timeSerie == null) {
+//			serieData = new SerieData();
+//			return;
+//		}
+//
+//		final int serieLength = timeSerie.length;
+//
+//		serieData = new SerieData(serieLength);
+//
+//		System.arraycopy(altitudeSerie, 0, serieData.altitudeSerie, 0, serieLength);
+//		System.arraycopy(cadenceSerie, 0, serieData.cadenceSerie, 0, serieLength);
+//		System.arraycopy(distanceSerie, 0, serieData.distanceSerie, 0, serieLength);
+//		System.arraycopy(pulseSerie, 0, serieData.pulseSerie, 0, serieLength);
+//		System.arraycopy(temperatureSerie, 0, serieData.temperatureSerie, 0, serieLength);
+//		System.arraycopy(timeSerie, 0, serieData.timeSerie, 0, serieLength);
+//
+//		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0,
+//		// serieLength);
+//		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
+//		// serieLength);
+//
+//		if (latitudeSerie != null) {
+//
+//			serieData.initializeGPSData(serieLength);
+//
+//			System.arraycopy(latitudeSerie, 0, serieData.latitude, 0, serieLength);
+//			System.arraycopy(longitudeSerie, 0, serieData.longitude, 0, serieLength);
+//		}
+//	}
+
 	/**
 	 * Called before this object gets persisted, copy data from the tourdata object into the object
 	 * which gets serialized
@@ -2822,14 +2822,14 @@ public class TourData {
 		this.deviceTimeInterval = deviceTimeInterval;
 	}
 
+	public void setDeviceTotalDown(final int deviceTotalDown) {
+		this.deviceTotalDown = deviceTotalDown;
+	}
+
 	/*
 	 * private int maxAltitude; private int maxPulse; private int avgPulse; private int avgCadence;
 	 * private int avgTemperature; private float maxSpeed;
 	 */
-
-	public void setDeviceTotalDown(final int deviceTotalDown) {
-		this.deviceTotalDown = deviceTotalDown;
-	}
 
 	public void setDeviceTotalUp(final int deviceTotalUp) {
 		this.deviceTotalUp = deviceTotalUp;
@@ -2863,10 +2863,6 @@ public class TourData {
 		this.maxAltitude = maxAltitude;
 	}
 
-//	public void setSerieData(SerieData serieData) {
-//		this.serieData = serieData;
-//	}
-
 	/**
 	 * @param maxPulse
 	 *            the maxPulse to set
@@ -2874,6 +2870,10 @@ public class TourData {
 	public void setMaxPulse(final int maxPulse) {
 		this.maxPulse = maxPulse;
 	}
+
+//	public void setSerieData(SerieData serieData) {
+//		this.serieData = serieData;
+//	}
 
 	/**
 	 * @param maxSpeed
@@ -2980,6 +2980,10 @@ public class TourData {
 	 */
 	public void setTourStartPlace(final String tourStartPlace) {
 		this.tourStartPlace = tourStartPlace;
+	}
+
+	public void setTourTags(final Set<TourTag> tourTags) {
+		this.tourTags = tourTags;
 	}
 
 	/**

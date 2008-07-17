@@ -17,7 +17,6 @@ package net.tourbook.ui.views.tourBook;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -27,8 +26,7 @@ import net.tourbook.tour.TreeViewerItem;
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
 	static final Calendar			fCalendar		= GregorianCalendar.getInstance();
-	static final SimpleDateFormat	fMonthFormatter	= new SimpleDateFormat("MMM");
-
+	
 	static final String				SQL_SUM_COLUMNS	= "" //
 															+ "SUM(TOURDISTANCE), " // 		1	//$NON-NLS-1$
 															+ "SUM(TOURRECORDINGTIME), " //	2	//$NON-NLS-1$
