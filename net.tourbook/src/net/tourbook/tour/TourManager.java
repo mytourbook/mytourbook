@@ -367,6 +367,7 @@ public class TourManager {
 		}
 
 		final int serieLength = timeSerie.length;
+		final int serieLengthLast = serieLength - 1;
 
 		final int deviceTimeInterval = tourData.getDeviceTimeInterval();
 		if (deviceTimeInterval > 0) {
@@ -381,7 +382,8 @@ public class TourManager {
 
 				// adjust index to the array size
 				int sliceIndex = serieIndex + slices;
-				sliceIndex = Math.min(Math.max(0, sliceIndex), serieLength - 1);
+				final int sliceIndexMax = ((0 >= sliceIndex) ? 0 : sliceIndex);
+				sliceIndex = (sliceIndexMax <= serieLengthLast) ? sliceIndexMax : serieLengthLast;
 
 				final int distance = distanceSerie[sliceIndex] - distanceSerie[serieIndex];
 
@@ -406,7 +408,8 @@ public class TourManager {
 			for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 				// adjust index to the array size
-				int lowIndex = Math.max(0, serieIndex - 1);
+				final int serieIndexPrev = serieIndex - 1;
+				int lowIndex = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
 
 				int timeDiff = timeSerie[serieIndex] - timeSerie[lowIndex];
 				int distDiff = 0;

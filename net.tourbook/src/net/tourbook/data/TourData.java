@@ -461,6 +461,7 @@ public class TourData {
 	public double				mapMinLongitude;
 	@Transient
 	public double				mapMaxLongitude;
+
 	public TourData() {}
 
 	/**
@@ -531,8 +532,9 @@ public class TourData {
 			final int computeTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
 			final int slices = computeTimeSlice / deviceTimeInterval;
 
-			adjustmentIndexHigh = Math.max(1, slices / 2);
-			adjustIndexLow = slices / 2;
+			final int slice2 = slices / 2;
+			adjustmentIndexHigh = (1 >= slice2) ? 1 : slice2;
+			adjustIndexLow = slice2;
 
 			// round up
 			if (adjustIndexLow + adjustmentIndexHigh < slices) {
@@ -582,9 +584,18 @@ public class TourData {
 
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-			// adjust index to the array size
-			final int indexLow = Math.min(Math.max(0, serieIndex - adjustIndexLow), serieLength - 1);
-			final int indexHigh = Math.max(0, Math.min(serieIndex + adjustmentIndexHigh, serieLength - 1));
+			/*
+			 * adjust index to the array size, this is optimized to NOT use Math.min or Math.max
+			 */
+			final int serieLengthLow = serieLength - 1;
+
+			final int indexLowTemp = serieIndex - adjustIndexLow;
+			final int indexLowTempMax = ((0 >= indexLowTemp) ? 0 : indexLowTemp);
+			final int indexLow = ((indexLowTempMax <= serieLengthLow) ? indexLowTempMax : serieLengthLow);
+
+			final int indexHighTemp = serieIndex + adjustmentIndexHigh;
+			final int indexHighTempMin = ((indexHighTemp <= serieLengthLow) ? indexHighTemp : serieLengthLow);
+			final int indexHigh = ((0 >= indexHighTempMin) ? 0 : indexHighTempMin);
 
 			final int distanceDiff = distanceSerie[indexHigh] - distanceSerie[indexLow];
 			final int altitudeDiff = altitudeSerie[indexHigh] - altitudeSerie[indexLow];
@@ -650,8 +661,11 @@ public class TourData {
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 			// get index for the low value
-			int indexLow = Math.max(0, serieIndex - 1);
+			final int serieIndexPrev = serieIndex - 1;
+			int indexLow = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
+
 			int dataDiffLow = timeSerieDiff[serieIndex] - timeSerieDiff[indexLow];
+
 			while (dataDiffLow < minDataDiff) {
 				// make sure to be in the array bounds
 				if (indexLow < 1) {
@@ -659,12 +673,19 @@ public class TourData {
 				}
 				dataDiffLow = timeSerieDiff[serieIndex] - timeSerieDiff[--indexLow];
 			}
+
+			final int serieLengthLow = serieLength - 1;
+
 			// remove lowest index
-			indexLow = Math.min(serieLength - 1, ++indexLow);
+			final int indexLowNext = ++indexLow;
+			indexLow = (serieLengthLow <= indexLowNext) ? serieLengthLow : indexLowNext;
 
 			// get index for the high value
-			int indexHigh = Math.min(serieLength - 1, serieIndex + 1);
+			final int serieIndexNext = serieIndex + 1;
+			int indexHigh = ((serieLengthLow <= serieIndexNext) ? serieLengthLow : serieIndexNext);
+
 			int dataDiffHigh = timeSerieDiff[serieIndex] - timeSerieDiff[indexHigh];
+
 			while (dataDiffHigh < minDataDiff) {
 				// make sure to be in the array bounds
 				if (indexHigh > serieLength - 2) {
@@ -673,7 +694,8 @@ public class TourData {
 				dataDiffHigh = timeSerieDiff[indexHigh++] + -timeSerieDiff[serieIndex];
 			}
 			// remove highest index
-			indexHigh = Math.max(0, --indexHigh);
+			final int indexHighPrev = --indexHigh;
+			indexHigh = (0 >= indexHighPrev) ? 0 : indexHighPrev;
 
 			final int distanceDiff = dataSerieDistance[indexHigh] - dataSerieDistance[indexLow];
 			final int altitudeDiff = dataSerieAltitude[indexHigh] - dataSerieAltitude[indexLow];
@@ -942,19 +964,27 @@ public class TourData {
 
 		final int slices = speedTimeSlice / deviceTimeInterval;
 
-		highIndexAdjustment = Math.max(1, slices / 2);
-		lowIndexAdjustment = slices / 2;
+		final int slice2 = slices / 2;
+		highIndexAdjustment = (1 >= slice2) ? 1 : slice2;
+		lowIndexAdjustment = slice2;
 
 		// round up
 		if (lowIndexAdjustment + highIndexAdjustment < slices) {
 			highIndexAdjustment++;
 		}
 
+		final int serieLengthLast = serieLength - 1;
+
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-			// adjust index to the array size
-			final int distIndexLow = Math.min(Math.max(0, serieIndex - lowIndexAdjustment), serieLength - 1);
-			final int distIndexHigh = Math.max(0, Math.min(serieIndex + highIndexAdjustment, serieLength - 1));
+			// adjust index to the array size, this is optimized to NOT use Math functions
+			final int serieIndexLow = serieIndex - lowIndexAdjustment;
+			final int serieIndexLowMax = ((0 >= serieIndexLow) ? 0 : serieIndexLow);
+			final int distIndexLow = ((serieIndexLowMax <= serieLengthLast) ? serieIndexLowMax : serieLengthLast);
+
+			final int serieIndexHigh = serieIndex + highIndexAdjustment;
+			final int serieIndexHighMin = ((serieIndexHigh <= serieLengthLast) ? serieIndexHigh : serieLengthLast);
+			final int distIndexHigh = ((0 >= serieIndexHighMin) ? 0 : serieIndexHighMin);
 
 			final int distance = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
 			final float time = deviceTimeInterval * (distIndexHigh - distIndexLow);
@@ -1026,11 +1056,18 @@ public class TourData {
 			highIndexAdjustmentDefault = 1;
 		}
 
+		final int serieLengthLast = serieLength - 1;
+
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
 			// adjust index to the array size
-			int distIndexLow = Math.min(Math.max(0, serieIndex - lowIndexAdjustmentDefault), serieLength - 1);
-			int distIndexHigh = Math.max(0, Math.min(serieIndex + highIndexAdjustmentDefault, serieLength - 1));
+			final int serieIndexLow = serieIndex - lowIndexAdjustmentDefault;
+			final int serieIndexLowMax = ((0 >= serieIndexLow) ? 0 : serieIndexLow);
+			int distIndexLow = ((serieIndexLowMax <= serieLengthLast) ? serieIndexLowMax : serieLengthLast);
+
+			final int serieIndexHigh = serieIndex + highIndexAdjustmentDefault;
+			final int serieIndexHighMax = ((serieIndexHigh <= serieLengthLast) ? serieIndexHigh : serieLengthLast);
+			int distIndexHigh = ((0 >= serieIndexHighMax) ? 0 : serieIndexHighMax);
 
 			final int distanceDefault = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
 
@@ -1050,8 +1087,17 @@ public class TourData {
 			}
 
 			// adjust index to the array size
-			distIndexLow = Math.min(Math.max(0, serieIndex - lowIndexAdjustment), serieLength - 1);
-			distIndexHigh = Math.max(0, Math.min(serieIndex + highIndexAdjustment, serieLength - 1));
+			final int serieIndexLowAdjusted = serieIndex - lowIndexAdjustment;
+			final int serieIndexLowAdjustedMax = ((0 >= serieIndexLowAdjusted) ? 0 : serieIndexLowAdjusted);
+
+			distIndexLow = (serieIndexLowAdjustedMax <= serieLengthLast) ? serieIndexLowAdjustedMax : serieLengthLast;
+
+			final int serieIndexHighAdjusted = serieIndex + highIndexAdjustment;
+			final int serieIndexHighAdjustedMin = ((serieIndexHighAdjusted <= serieLengthLast)
+					? serieIndexHighAdjusted
+					: serieLengthLast);
+
+			distIndexHigh = (0 >= serieIndexHighAdjustedMin) ? 0 : serieIndexHighAdjustedMin;
 
 			final int distance = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
 			final float time = timeSerie[distIndexHigh] - timeSerie[distIndexLow];
@@ -1106,6 +1152,7 @@ public class TourData {
 		}
 
 		final int serieLength = timeSerie.length;
+		final int serieLengthLast = serieLength - 1;
 
 		speedSerie = new int[serieLength];
 		speedSerieImperial = new int[serieLength];
@@ -1114,9 +1161,11 @@ public class TourData {
 
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
+			final int serieIndexPrev = serieIndex - 1;
+
 			// adjust index to the array size
-			int lowIndex = Math.max(0, serieIndex - 1);
-			int highIndex = Math.min(serieIndex, serieLength - 1);
+			int lowIndex = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
+			int highIndex = ((serieIndex <= serieLengthLast) ? serieIndex : serieLengthLast);
 
 			int timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
 			int distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
@@ -1152,10 +1201,12 @@ public class TourData {
 			 * check if a time difference is available between 2 time data, this can happen in gps
 			 * data that lat+long is available but no time
 			 */
-			highIndex = Math.min(highIndex, serieLength - 1);
-			lowIndex = Math.max(lowIndex, 0);
+			highIndex = (highIndex <= serieLengthLast) ? highIndex : serieLengthLast;
+			lowIndex = (lowIndex >= 0) ? lowIndex : 0;
+
 			boolean isTimeValid = true;
 			int prevTime = timeSerie[lowIndex];
+
 			for (int timeIndex = lowIndex + 1; timeIndex <= highIndex; timeIndex++) {
 				final int currentTime = timeSerie[timeIndex];
 				if (prevTime == currentTime) {
@@ -1553,10 +1604,13 @@ public class TourData {
 						longitudeSerie[timeIndex] = lastValidLongitude = longitude;
 					}
 
-					mapMinLatitude = Math.min(mapMinLatitude, lastValidLatitude + 90);
-					mapMaxLatitude = Math.max(mapMaxLatitude, lastValidLatitude + 90);
-					mapMinLongitude = Math.min(mapMinLongitude, lastValidLongitude + 180);
-					mapMaxLongitude = Math.max(mapMaxLongitude, lastValidLongitude + 180);
+					final double lastValidLatitude90 = lastValidLatitude + 90;
+					mapMinLatitude = Math.min(mapMinLatitude, lastValidLatitude90);
+					mapMaxLatitude = Math.max(mapMaxLatitude, lastValidLatitude90);
+
+					final double lastValidLongitude180 = lastValidLongitude + 180;
+					mapMinLongitude = Math.min(mapMinLongitude, lastValidLongitude180);
+					mapMaxLongitude = Math.max(mapMaxLongitude, lastValidLongitude180);
 				}
 
 				/*
@@ -1775,8 +1829,10 @@ public class TourData {
 
 			segmentSerieTime[segmentIndex] = segment.recordingTime = recordingTime;
 
-			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = drivingTime = //
-			Math.max(0, recordingTime - getBreakTime(segmentStartIndex, segmentEndIndex));
+			final int drivingTimeTemp = recordingTime - getBreakTime(segmentStartIndex, segmentEndIndex);
+			segmentSerieDrivingTime[segmentIndex] = //
+			segment.drivingTime = //
+			drivingTime = (0 >= drivingTimeTemp) ? 0 : drivingTimeTemp;
 
 			final int[] localPowerSerie = getPowerSerie();
 			int altitudeUp = 0;
@@ -2034,11 +2090,13 @@ public class TourData {
 	 */
 	private int getBreakTimeSlices(final int[] distanceValues, final int indexLeft, int indexRight, int sliceMin) {
 
+		final int distanceLengthLast = distanceValues.length - 1;
+
 		int ignoreTimeCounter = 0;
 		int oldDistance = 0;
 
-		sliceMin = Math.max(sliceMin, 1);
-		indexRight = Math.min(indexRight, distanceValues.length - 1);
+		sliceMin = (sliceMin >= 1) ? sliceMin : 1;
+		indexRight = (indexRight <= distanceLengthLast) ? indexRight : distanceLengthLast;
 
 		for (int valueIndex = indexLeft; valueIndex <= indexRight; valueIndex++) {
 
