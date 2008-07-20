@@ -122,9 +122,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 	private IPropertyChangeListener		fPrefChangeListener;
 	private ITourPropertyListener		fTourPropertyListener;
 
-	protected int						fRefTourXMarkerValue;
-
-	private ActionRemoveComparedTours	fActionDeleteSelectedTour;
+	private ActionRemoveComparedTours	fActionRemoveComparedTours;
 	private ActionRenameRefTour			fActionRenameRefTour;
 	private ActionLinkTour				fActionLinkTour;
 	private ActionCollapseAll			fActionCollapseAll;
@@ -434,7 +432,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 	private void createActions() {
 
-		fActionDeleteSelectedTour = new ActionRemoveComparedTours(this);
+		fActionRemoveComparedTours = new ActionRemoveComparedTours(this);
 		fActionRenameRefTour = new ActionRenameRefTour(this);
 		fActionLinkTour = new ActionLinkTour(this);
 		fActionRefreshView = new ActionRefreshView(this);
@@ -450,7 +448,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
 
 		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
-				"net.tourbook.preferences.PrefPageTags");
+				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 
 	/**
@@ -714,13 +712,13 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		final boolean isTourSelected = tourItems > 0 && refItems == 0 && yearItems == 0;
 		final boolean isOneTour = tourItems == 1 && refItems == 0 && yearItems == 0;
 
-		fActionDeleteSelectedTour.setEnabled(isOneTour);
+		fActionRemoveComparedTours.setEnabled(isOneTour);
 
 		// enable remove button when only one type of item is selected
 		if (yearItems == 0 && ((refItems > 0 && tourItems == 0) || (refItems == 0 & tourItems > 0))) {
-			fActionDeleteSelectedTour.setEnabled(true);
+			fActionRemoveComparedTours.setEnabled(true);
 		} else {
-			fActionDeleteSelectedTour.setEnabled(false);
+			fActionRemoveComparedTours.setEnabled(false);
 		}
 
 		fActionEditTour.setEnabled(isOneTour);
@@ -777,7 +775,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionRenameRefTour);
-		menuMgr.add(fActionDeleteSelectedTour);
+		menuMgr.add(fActionRemoveComparedTours);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);

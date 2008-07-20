@@ -131,4 +131,9 @@ public interface ITourbookPreferences {
 	public static final String	TAG_VIEW_SUB_TAG_COLOR					= "tag_view.sub_tag.color";
 	public static final String	TAG_VIEW_SUB_SUB_TAG_COLOR				= "tag_view.sub_sub_tag.color";
 
+	/*
+	 * id's for preference pages
+	 */
+	public static final String	PREF_PAGE_TAGS							= "net.tourbook.preferences.PrefPageTags";
+
 }

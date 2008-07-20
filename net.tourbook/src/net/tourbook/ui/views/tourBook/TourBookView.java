@@ -362,7 +362,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fActionCollapseAll = new ActionCollapseAll(this);
 
 		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
-				"net.tourbook.preferences.PrefPageTags");
+				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		fillActions();
 	}

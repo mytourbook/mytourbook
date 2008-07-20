@@ -30,6 +30,7 @@ import net.tourbook.ui.ISelectedTours;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
@@ -126,7 +127,7 @@ public class TagManager {
 		fIsAddMode = isAddMode;
 
 		// add separator
-//		menuMgr.add(new Separator());
+		menuMgr.add(new Separator());
 
 		/*
 		 * add title menu item

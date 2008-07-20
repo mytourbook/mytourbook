@@ -436,7 +436,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		fActionCollapseOthers = new ActionCollapseOthers(this);
 
 		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
-				"net.tourbook.preferences.PrefPageTags");
+				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		fActionSetLayoutFlat = new ActionSetLayoutFlat(this);
 		fActionSetLayoutHierarchical = new ActionSetLayoutHierarchical(this);

@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageTagColors extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageViewColors extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	private final IPreferenceStore	fPrefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 	private boolean					fIsModified;

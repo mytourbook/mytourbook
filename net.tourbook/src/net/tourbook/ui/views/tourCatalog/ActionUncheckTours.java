@@ -4,7 +4,6 @@ import net.tourbook.Messages;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 
 final class ActionUncheckTours extends Action {
 
@@ -21,12 +20,14 @@ final class ActionUncheckTours extends Action {
 		// uncheck all selected tours
 
 		final CheckboxTreeViewer viewer = fCompareResultView.getViewer();
-		final StructuredSelection selection = (StructuredSelection) viewer.getSelection();
-		if (selection.size() > 0) {
+//		final StructuredSelection selection = (StructuredSelection) viewer.getSelection();
+//		if (selection.size() > 0) {
+//
+//			for (final Object tour : selection.toArray()) {
+//				viewer.setChecked(tour, false);
+//			}
+//		}
 
-			for (final Object tour : selection.toArray()) {
-				viewer.setChecked(tour, false);
-			}
-		}
+		viewer.setCheckedElements(new Object[0]);
 	}
 }

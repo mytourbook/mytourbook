@@ -83,17 +83,23 @@ public class Messages extends NLS {
 	public static String		App_Window_Title;
 
 	public static String		Compare_Result_Action_check_selected_tours;
+	public static String		Compare_Result_Action_remove_save_result;
 	public static String		Compare_Result_Action_save_checked_tours;
 	public static String		Compare_Result_Action_save_checked_tours_tooltip;
 	public static String		Compare_Result_Action_uncheck_selected_tours;
-	public static String		Compare_Result_Column_diff;
 
-	public static String	Compare_Result_Column_diff_label;
+	public static String		Compare_Result_Column_diff;
+	public static String		Compare_Result_Column_diff_label;
 	public static String		Compare_Result_Column_diff_tooltip;
 	public static String		Compare_Result_Column_km_tooltip;
-	public static String		Compare_Result_Column_kmh_db_tooltip;
+	public static String	Compare_Result_Column_kmh_db_label;
 
-	public static String	Compare_Result_Column_kmh_label;
+	public static String		Compare_Result_Column_kmh_db_tooltip;
+	public static String		Compare_Result_Column_kmh_label;
+	public static String	Compare_Result_Column_kmh_moved_;
+
+	public static String	Compare_Result_Column_kmh_moved_label;
+
 	public static String		Compare_Result_Column_kmh_moved_tooltip;
 	public static String		Compare_Result_Column_kmh_tooltip;
 	public static String		Compare_Result_Column_tour;
@@ -254,7 +260,6 @@ public class Messages extends NLS {
 	public static String		import_data_action_adjust_imported_year;
 	public static String		import_data_action_clear_view;
 	public static String		import_data_action_clear_view_tooltip;
-
 	public static String		import_data_action_disable_hac4_checksum_validation;
 	public static String		import_data_action_merge_tracks;
 	public static String		import_data_action_save_tour_for_person;
@@ -474,11 +479,9 @@ public class Messages extends NLS {
 	public static String		Tour_Properties_Label_start_time;
 	public static String		Tour_Properties_Label_tour_date;
 	public static String		Tour_Properties_Label_tour_tag;
-
 	public static String		Tour_Properties_Label_tour_title;
 	public static String		Tour_Properties_Label_tour_type;
 	public static String		Tour_Properties_tabLabel_info;
-
 	public static String		Tour_Properties_tabLabel_time;
 	public static String		Tour_Properties_tabLabel_tour_data;
 
@@ -512,7 +515,7 @@ public class Messages extends NLS {
 	public static String		tourCatalog_view_action_number_of_years;
 	public static String		tourCatalog_view_action_refresh_view_tooltip;
 
-	public static String	tourCatalog_view_action_remove_compared_tours;
+	public static String		tourCatalog_view_action_remove_compared_tours;
 	public static String		tourCatalog_view_action_rename_reference_tour;
 	public static String		tourCatalog_view_action_save_marker;
 	public static String		tourCatalog_view_action_synch_chart_years_tooltip;

@@ -22,6 +22,8 @@ import net.tourbook.util.TableLayoutComposite;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TrayDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -37,8 +39,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -82,10 +82,9 @@ public class ColumnModifyDialog extends TrayDialog {
 	private void createButtons(final Composite parent) {
 
 		final Composite btnContainer = new Composite(parent, SWT.NONE);
-		btnContainer.setLayout(new GridLayout());
-		final GridData gd = new GridData();
-		gd.verticalAlignment = SWT.BEGINNING;
-		btnContainer.setLayoutData(gd);
+		GridDataFactory.fillDefaults().applyTo(btnContainer);
+		GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).applyTo(btnContainer);
+//		btnContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
 		fBtnMoveUp = new Button(btnContainer, SWT.NONE);
 		fBtnMoveUp.setText(Messages.ColumnModifyDialog_Button_move_up);
@@ -158,7 +157,8 @@ public class ColumnModifyDialog extends TrayDialog {
 	private void createColumnsViewer(final Composite parent) {
 
 		final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
-		tableLayouter.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(tableLayouter);
+//		tableLayouter.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		/*
 		 * create table
@@ -250,24 +250,23 @@ public class ColumnModifyDialog extends TrayDialog {
 	private void createUI(final Composite parent) {
 
 		Label label;
-		GridLayout gl;
 
-		label = new Label(parent, SWT.NONE);
+		label = new Label(parent, SWT.WRAP);
 		label.setText(Messages.ColumnModifyDialog_Label_info);
+		GridDataFactory.swtDefaults().grab(true, false).applyTo(label);
 
 		final Composite dlgContainer = new Composite(parent, SWT.NONE);
-		dlgContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		gl = new GridLayout(2, false);
-		dlgContainer.setLayout(gl);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(dlgContainer);
+		GridLayoutFactory.swtDefaults().numColumns(2).margins(0, 0).applyTo(dlgContainer);
+//		dlgContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
-		label = new Label(dlgContainer, SWT.NONE);
-		label.setText(Messages.ColumnModifyDialog_Label_columns);
-
-		// spacer
-		new Label(dlgContainer, SWT.NONE);
 
 		createColumnsViewer(dlgContainer);
 		createButtons(dlgContainer);
+
+		label = new Label(parent, SWT.WRAP);
+		label.setText(Messages.ColumnModifyDialog_Label_hint);
+		GridDataFactory.swtDefaults().grab(true, false).applyTo(label);
 	}
 
 	/**

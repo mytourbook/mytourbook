@@ -502,7 +502,8 @@ public class ColumnManager {
 		}
 
 		/*
-		 * when no columns are visible (which is the first time), show the the first column
+		 * when no columns are visible (which is the first time), show only the first column because
+		 * every column reduces performance
 		 */
 		if (fVisibleColumnDefinitions.size() == 0 && fAllColumnDefinitions.size() > 0) {
 

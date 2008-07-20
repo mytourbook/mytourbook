@@ -115,7 +115,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
 
 		/*
-		 * tagging colors
+		 * view colors
 		 */
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.TAG_VIEW_TAG_CATEGORY_COLOR,
@@ -127,11 +127,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.TAG_VIEW_SUB_TAG_COLOR,
-				new RGB(0x7D, 0x58, 0x00));
+				new RGB(0xF2, 0x5B, 0x00));
 
 		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.TAG_VIEW_SUB_SUB_TAG_COLOR,
-				new RGB(0x40, 0x80, 0x00));
+				new RGB(0x00, 0x6F, 0xDD));
 
 		store.setDefault(ITourbookPreferences.TAG_VIEW_SHOW_LINES, false);
 	}

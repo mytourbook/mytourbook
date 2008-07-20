@@ -126,10 +126,6 @@ public class TourCompareManager {
 		comparedTour.setTourDate(calendar.getTimeInMillis());
 		comparedTour.setStartYear(tourData.getStartYear());
 
-//		float speed = TourManager.computeTourSpeed(tourData.getMetricDistanceSerie(),
-//				tourData.timeSerie,
-//				comparedTourItem.computedStartIndex,
-//				comparedTourItem.computedEndIndex);
 		final float speed = TourManager.computeTourSpeed(tourData,
 				comparedTourItem.computedStartIndex,
 				comparedTourItem.computedEndIndex);

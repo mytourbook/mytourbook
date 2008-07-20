@@ -363,7 +363,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
 
 		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
-				"net.tourbook.preferences.PrefPageTags");
+				ITourbookPreferences.PREF_PAGE_TAGS);
 
 	}
 
@@ -587,7 +587,13 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 				final Object element = cell.getElement();
 				final Set<TourTag> tourTags = ((TourData) element).getTourTags();
 
-				if (tourTags.size() > 0) {
+				if (tourTags.size() == 0) {
+
+					// the tags could have been removed, set empty field
+
+					cell.setText(UI.EMPTY_STRING);
+
+				} else {
 
 					// convert the tags into a list of tag ids 
 					final ArrayList<Long> tagIds = new ArrayList<Long>();

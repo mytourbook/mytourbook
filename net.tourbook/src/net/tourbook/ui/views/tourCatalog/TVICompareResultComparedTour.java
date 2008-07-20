@@ -77,6 +77,7 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
 	int				movedEndIndex;
 
 	float			movedSpeed;
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -105,6 +106,7 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
 		}
 		return true;
 	}
+
 	@Override
 	protected void fetchChildren() {}
 
@@ -127,6 +129,13 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
 		result = prime * result + ((comparedTourData == null) ? 0 : comparedTourData.hashCode());
 		result = prime * result + ((refTour == null) ? 0 : refTour.hashCode());
 		return result;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the compare result is saved in the database
+	 */
+	public boolean isSaved() {
+		return compId != -1;
 	}
 
 	@Override
