@@ -17,7 +17,6 @@
 /**
  * Author: Wolfgang Schramm Created: 21.06.2005
  */
-
 package net.tourbook.chart;
 
 /**
@@ -53,7 +52,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 */
 	private ChartSegments	fChartSegments;
 
-	public ChartDataXSerie(int values[]) {
+	public ChartDataXSerie(final int values[]) {
 		setMinMaxValues(new int[][] { values });
 	}
 
@@ -90,12 +89,12 @@ public class ChartDataXSerie extends ChartDataSerie {
 		return fSynchMarkerStartIndex;
 	}
 
-	public void setChartSegments(ChartSegments chartSegments) {
+	public void setChartSegments(final ChartSegments chartSegments) {
 		fChartSegments = chartSegments;
 	}
 
-	@Override
-	void setMinMaxValues(int[][] lowValues, int[][] highValues) {}
+	@Override 
+	void setMinMaxValues(final int[][] lowValues, final int[][] highValues) {}
 
 	/**
 	 * Range markers are an area in the graph which will be displayed in a different color
@@ -103,7 +102,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * @param rangeMarkerStartIndex
 	 * @param rangeMarkerEndIndex
 	 */
-	public void setRangeMarkers(int[] rangeMarkerStartIndex, int[] rangeMarkerEndIndex) {
+	public void setRangeMarkers(final int[] rangeMarkerStartIndex, final int[] rangeMarkerEndIndex) {
 		fRangeMarkerStartIndex = rangeMarkerStartIndex;
 		fRangeMarkerEndIndex = rangeMarkerEndIndex;
 	}
@@ -112,7 +111,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * @param startValue
 	 *        The startValue to set.
 	 */
-	public void setStartValue(int startValue) {
+	public void setStartValue(final int startValue) {
 		this.startValue = startValue;
 	}
 
@@ -123,7 +122,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 * @param startIndex
 	 * @param endIndex
 	 */
-	public void setSynchMarkerValueIndex(int startIndex, int endIndex) {
+	public void setSynchMarkerValueIndex(final int startIndex, final int endIndex) {
 		fSynchMarkerStartIndex = startIndex;
 		fSynchMarkerEndIndex = endIndex;
 	}

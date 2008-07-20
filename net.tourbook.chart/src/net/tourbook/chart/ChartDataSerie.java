@@ -104,7 +104,7 @@ public abstract class ChartDataSerie {
 	 * Returns the application defined property of the receiver with the specified name, or null if
 	 * it was not been set.
 	 */
-	public Object getCustomData(String key) {
+	public Object getCustomData(final String key) {
 		if (fCustomData.containsKey(key)) {
 			return fCustomData.get(key);
 		} else {
@@ -191,7 +191,7 @@ public abstract class ChartDataSerie {
 		return fVisibleMinValue;
 	}
 
-	public void setAxisUnit(int axisUnit) {
+	public void setAxisUnit(final int axisUnit) {
 		this.axisUnit = axisUnit;
 	}
 
@@ -199,19 +199,19 @@ public abstract class ChartDataSerie {
 	 * Sets the application defined property of the receiver with the specified name to the given
 	 * value.
 	 */
-	public void setCustomData(String key, Object value) {
+	public void setCustomData(final String key, final Object value) {
 		fCustomData.put(key, value);
 	}
 
-	public void setDefaultRGB(RGB color) {
+	public void setDefaultRGB(final RGB color) {
 		fDefaultRGB = color;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(final String label) {
 		this.label = label;
 	}
 
-	void setMinMaxValues(int valueSeries[][]) {
+	void setMinMaxValues(final int valueSeries[][]) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
 			fVisibleMaxValue = fVisibleMinValue = 0;
@@ -226,10 +226,10 @@ public abstract class ChartDataSerie {
 			fVisibleMaxValue = fVisibleMinValue = valueSeries[0][0];
 
 			// calculate min/max highValues
-			for (int[] valueSerie : valueSeries) {
-				for (int value : valueSerie) {
-					fVisibleMaxValue = Math.max(fVisibleMaxValue, value);
-					fVisibleMinValue = Math.min(fVisibleMinValue, value);
+			for (final int[] valueSerie : valueSeries) {
+				for (final int value : valueSerie) {
+					fVisibleMaxValue = (fVisibleMaxValue >= value) ? fVisibleMaxValue : value;
+					fVisibleMinValue = (fVisibleMinValue <= value) ? fVisibleMinValue : value;
 				}
 			}
 
@@ -253,35 +253,35 @@ public abstract class ChartDataSerie {
 
 	abstract void setMinMaxValues(int[][] lowValues, int[][] highValues);
 
-	public void setRgbBright(RGB[] rgbBright) {
+	public void setRgbBright(final RGB[] rgbBright) {
 		fRgbBright = rgbBright;
 	}
 
-	public void setRgbDark(RGB[] rgbDark) {
+	public void setRgbDark(final RGB[] rgbDark) {
 		fRgbDark = rgbDark;
 	}
 
-	public void setRgbLine(RGB[] rgbLine) {
+	public void setRgbLine(final RGB[] rgbLine) {
 		fRgbLine = rgbLine;
 	}
 
 	/**
 	 * @param unit
-	 *        The measurement to set.
+	 *            The measurement to set.
 	 */
-	public void setUnitLabel(String unit) {
+	public void setUnitLabel(final String unit) {
 		this.unitLabel = unit == null ? "" : unit; //$NON-NLS-1$
 	}
 
-	public void setValueDivisor(int valueDivisor) {
+	public void setValueDivisor(final int valueDivisor) {
 		this.valueDivisor = valueDivisor;
 	}
 
-	public void setVisibleMaxValue(int maxValue) {
+	public void setVisibleMaxValue(final int maxValue) {
 		fVisibleMaxValue = maxValue;
 	}
 
-	public void setVisibleMinValue(int minValue) {
+	public void setVisibleMinValue(final int minValue) {
 		fVisibleMinValue = minValue;
 	}
 

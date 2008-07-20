@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.chart;
 
 import java.util.ArrayList;
@@ -73,7 +72,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	private final int				fChartType;
 
-	public ChartDataYSerie(int chartType, int chartLayout, int[][] lowValueSeries, int[][] highValueSeries) {
+	public ChartDataYSerie(final int chartType, final int chartLayout, final int[][] lowValueSeries, final int[][] highValueSeries) {
 
 		fChartType = chartType;
 		fChartLayout = chartLayout;
@@ -81,12 +80,12 @@ public class ChartDataYSerie extends ChartDataSerie {
 		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
 
-	public ChartDataYSerie(int chartType, int[] valueSerie) {
+	public ChartDataYSerie(final int chartType, final int[] valueSerie) {
 		fChartType = chartType;
 		setMinMaxValues(new int[][] { valueSerie });
 	}
 
-	public ChartDataYSerie(int chartType, int[] lowValueSerie, int[] highValueSerie) {
+	public ChartDataYSerie(final int chartType, final int[] lowValueSerie, final int[] highValueSerie) {
 		fChartType = chartType;
 		setMinMaxValues(new int[][] { lowValueSerie }, new int[][] { highValueSerie });
 	}
@@ -96,7 +95,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 //		setMinMaxValues(valueSerie);
 //	}
 
-	public ChartDataYSerie(int chartType, int[][] lowValueSeries, int[][] highValueSeries) {
+	public ChartDataYSerie(final int chartType, final int[][] lowValueSeries, final int[][] highValueSeries) {
 		fChartType = chartType;
 		setMinMaxValues(lowValueSeries, highValueSeries);
 	}
@@ -122,6 +121,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return fChartLayout;
 	}
 
+	public int getChartType() {
+		return fChartType;
+	}
+
 	/**
 	 * @return Returns the valueColors.
 	 */
@@ -132,15 +135,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 		return fColorIndex;
 	}
 
+	public ArrayList<IChartLayer> getCustomLayers() {
+		return fCustomLayers;
+	}
+
 	/**
 	 * @return returns true if the graph is filled
 	 */
 	public int getGraphFillMethod() {
 		return graphFillMethod;
-	}
-
-	public ArrayList<IChartLayer> getCustomLayers() {
-		return fCustomLayers;
 	}
 
 	public String getXTitle() {
@@ -189,7 +192,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 * 
 	 * @param colorIndexValue
 	 */
-	public void setAllValueColors(int colorIndexValue) {
+	public void setAllValueColors(final int colorIndexValue) {
 
 		if (fHighValues == null || fHighValues.length == 0 || fHighValues[0] == null || fHighValues[0].length == 0) {
 			return;
@@ -204,30 +207,30 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 	/**
 	 * @param colorIndex
-	 *        set's the color index for each value
+	 *            set's the color index for each value
 	 */
-	public void setColorIndex(int[] colorIndex) {
+	public void setColorIndex(final int[] colorIndex) {
 		fColorIndex = new int[][] { colorIndex };
 	}
 
-	public void setColorIndex(int[][] colorIndex) {
+	public void setColorIndex(final int[][] colorIndex) {
 		fColorIndex = colorIndex;
+	}
+
+	public void setCustomLayers(final ArrayList<IChartLayer> customLayers) {
+		fCustomLayers = customLayers;
 	}
 
 	/**
 	 * @param fillMethod
-	 *        when set to <tt>true</tt> graph is filled, default is <tt>false</tt>
+	 *            when set to <tt>true</tt> graph is filled, default is <tt>false</tt>
 	 */
-	public void setGraphFillMethod(int fillMethod) {
+	public void setGraphFillMethod(final int fillMethod) {
 		graphFillMethod = fillMethod;
 	}
 
-	public void setCustomLayers(ArrayList<IChartLayer> customLayers) {
-		fCustomLayers = customLayers;
-	}
-
 	@Override
-	void setMinMaxValues(int[][] valueSeries) {
+	void setMinMaxValues(final int[][] valueSeries) {
 
 		if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
 			fHighValues = new int[0][0];
@@ -252,33 +255,38 @@ public class ChartDataYSerie extends ChartDataSerie {
 				case ChartDataYSerie.BAR_LAYOUT_BESIDE:
 
 					// get the min/max highValues for all data
-					for (int[] valuesOuter : valueSeries) {
-						for (int valuesInner : valuesOuter) {
-							fVisibleMaxValue = Math.max(fVisibleMaxValue, valuesInner);
-							fVisibleMinValue = Math.min(fVisibleMinValue, valuesInner);
+					for (final int[] valuesOuter : valueSeries) {
+						for (final int valuesInner : valuesOuter) {
+							fVisibleMaxValue = (fVisibleMaxValue >= valuesInner) ? fVisibleMaxValue : valuesInner;
+							fVisibleMinValue = (fVisibleMinValue <= valuesInner) ? fVisibleMinValue : valuesInner;
 						}
 					}
 					break;
 
 				case ChartDataYSerie.BAR_LAYOUT_STACKED:
 
-					int serieMax[] = new int[valueSeries[0].length];
+					final int serieMax[] = new int[valueSeries[0].length];
 
 					// get the max value for the data which are stacked on each
 					// other
-					for (int[] valuesOuter : valueSeries) {
+					for (final int[] valuesOuter : valueSeries) {
 						for (int valueIndex = 0; valueIndex < valuesOuter.length; valueIndex++) {
-							serieMax[valueIndex] = Math.max(fVisibleMaxValue, serieMax[valueIndex]
-									+ valuesOuter[valueIndex]);
 
-							fVisibleMinValue = Math.min(fVisibleMinValue, valuesOuter[valueIndex]);
+							final int outerValue = valuesOuter[valueIndex];
+							final int outerValueWithMax = serieMax[valueIndex] + outerValue;
+
+							serieMax[valueIndex] = (fVisibleMaxValue >= outerValueWithMax)
+									? fVisibleMaxValue
+									: outerValueWithMax;
+
+							fVisibleMinValue = (fVisibleMinValue <= outerValue) ? fVisibleMinValue : outerValue;
 						}
 					}
 
 					// get max for all series
 					fVisibleMaxValue = 0;
-					for (int serieValue : serieMax) {
-						fVisibleMaxValue = Math.max(fVisibleMaxValue, serieValue);
+					for (final int serieValue : serieMax) {
+						fVisibleMaxValue = (fVisibleMaxValue >= serieValue) ? fVisibleMaxValue : serieValue;
 					}
 
 					break;
@@ -295,7 +303,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	}
 
 	@Override
-	void setMinMaxValues(int[][] lowValues, int[][] highValues) {
+	void setMinMaxValues(final int[][] lowValues, final int[][] highValues) {
 
 		if (lowValues == null || lowValues.length == 0 || lowValues[0] == null || lowValues[0].length == 0
 
@@ -322,15 +330,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 					|| (fChartType == ChartDataModel.CHART_TYPE_BAR && fChartLayout == ChartDataYSerie.BAR_LAYOUT_BESIDE)) {
 
 				// get the min/max values for all data
-				for (int[] valueSerie : highValues) {
-					for (int value : valueSerie) {
-						fVisibleMaxValue = Math.max(fVisibleMaxValue, value);
+				for (final int[] valueSerie : highValues) {
+					for (final int value : valueSerie) {
+						fVisibleMaxValue = (fVisibleMaxValue >= value) ? fVisibleMaxValue : value;
 					}
 				}
 
-				for (int[] valueSerie : lowValues) {
-					for (int value : valueSerie) {
-						fVisibleMinValue = Math.min(fVisibleMinValue, value);
+				for (final int[] valueSerie : lowValues) {
+					for (final int value : valueSerie) {
+						fVisibleMinValue = (fVisibleMinValue <= value) ? fVisibleMinValue : value;
 					}
 				}
 
@@ -342,24 +350,24 @@ public class ChartDataYSerie extends ChartDataSerie {
 				 */
 
 				// summarize the data
-				int[] summarizedMaxValues = new int[highValues[0].length];
-				for (int[] valueSerie : highValues) {
+				final int[] summarizedMaxValues = new int[highValues[0].length];
+				for (final int[] valueSerie : highValues) {
 					for (int valueIndex = 0; valueIndex < valueSerie.length; valueIndex++) {
 						summarizedMaxValues[valueIndex] += valueSerie[valueIndex];
 					}
 				}
 
 				// get max value for the summarized values
-				for (int value : summarizedMaxValues) {
-					fVisibleMaxValue = Math.max(fVisibleMaxValue, value);
+				for (final int value : summarizedMaxValues) {
+					fVisibleMaxValue = (fVisibleMaxValue >= value) ? fVisibleMaxValue : value;
 				}
 
 				/*
 				 * calculate the min value
 				 */
-				for (int[] serieData : lowValues) {
-					for (int value : serieData) {
-						fVisibleMinValue = Math.min(fVisibleMinValue, value);
+				for (final int[] serieData : lowValues) {
+					for (final int value : serieData) {
+						fVisibleMinValue = (fVisibleMinValue <= value) ? fVisibleMinValue : value;
 					}
 				}
 			}
@@ -373,9 +381,9 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 * show the y-sliders for the chart
 	 * 
 	 * @param showYSlider
-	 *        The showYSlider to set.
+	 *            The showYSlider to set.
 	 */
-	public void setShowYSlider(boolean showYSlider) {
+	public void setShowYSlider(final boolean showYSlider) {
 
 		this.showYSlider = showYSlider;
 
@@ -391,19 +399,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 * 
 	 * @param axisDirection
 	 */
-	public void setYAxisDirection(boolean axisDirection) {
+	public void setYAxisDirection(final boolean axisDirection) {
 		yAxisDirection = axisDirection;
 	}
 
 	/**
 	 * @param title
-	 *        set the title for the y-axis
+	 *            set the title for the y-axis
 	 */
-	public void setYTitle(String title) {
+	public void setYTitle(final String title) {
 		fYTitle = title;
-	}
-
-	public int getChartType() {
-		return fChartType;
 	}
 }
