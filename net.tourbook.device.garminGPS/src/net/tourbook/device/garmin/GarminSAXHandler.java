@@ -42,6 +42,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 	private static final String			TAG_ACTIVITY				= "Activity";													//$NON-NLS-1$
 	private static final String			TAG_COURSE					= "Course";													//$NON-NLS-1$
+	private static final String			TAG_HISTORY					= "History";
 
 	private static final String			TAG_LAP						= "Lap";														//$NON-NLS-1$
 	private static final String			TAG_TRACKPOINT				= "Trackpoint";												//$NON-NLS-1$
@@ -476,10 +477,10 @@ public class GarminSAXHandler extends DefaultHandler {
 
 				setTourData();
 
-			} else if (name.equals(TAG_COURSE)) {
+			} else if (name.equals(TAG_COURSE) || name.equals(TAG_HISTORY)) {
 
 				/*
-				 * version 1+2: course and tour ends
+				 * version 1+2: course and tour ends, v1: history ends
 				 */
 
 				fIsInCourse = false;
@@ -737,7 +738,7 @@ public class GarminSAXHandler extends DefaultHandler {
 						fSetLapStartTime = true;
 					}
 
-				} else if (name.equals(TAG_COURSE)) {
+				} else if (name.equals(TAG_COURSE) || name.equals(TAG_HISTORY)) {
 
 					/*
 					 * a new activity starts
