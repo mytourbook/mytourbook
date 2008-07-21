@@ -23,7 +23,7 @@ public class Messages extends NLS {
 
 	public static String		action_edit_tour;
 
-	public static String		ACTION_ZOOM_INTO_MONTH;
+//	public static String		ACTION_ZOOM_INTO_MONTH;
 
 	public static String		LABEL_GRAPH_ALTITUDE;
 	public static String		LABEL_GRAPH_DAYTIME;
@@ -57,7 +57,7 @@ public class Messages extends NLS {
 	public static String		tourtime_info_distance;
 	public static String		tourtime_info_driving_time;
 	public static String		tourtime_info_recording_time;
-	public static String	tourtime_info_tags;
+	public static String		tourtime_info_tags;
 
 	public static String		tourtime_info_time;
 	public static String		tourtime_info_tour_type;

@@ -104,8 +104,8 @@ public class DataProviderTourDay extends DataProvider {
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
 
 				// get tag id's
-				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag")
-				+ (" ON tourID = jTdataTtag.TourData_tourId")
+				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" ON tourID = jTdataTtag.TourData_tourId") //$NON-NLS-1$
 
 				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
