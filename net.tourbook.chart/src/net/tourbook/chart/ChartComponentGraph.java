@@ -883,11 +883,11 @@ public class ChartComponentGraph extends Canvas {
 	private Cursor createCursorFromImage(final String imageName) {
 
 		Image cursorImage = null;
-		final ImageDescriptor imageDescriptor = Activator.getImageDescriptor(imageName + "yyy");
+		final ImageDescriptor imageDescriptor = Activator.getImageDescriptor(imageName);
 
 		if (imageDescriptor == null) {
 
-			final String resourceName = "icons/" + imageName;
+			final String resourceName = "icons/" + imageName;//$NON-NLS-1$
 
 			final ClassLoader classLoader = getClass().getClassLoader();
 
