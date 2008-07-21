@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.device.hac4;
 
 import gnu.io.SerialPort;
@@ -690,7 +689,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 			if (isChecksumValidation == false && isValid == false) {
 
-				System.out.println("Checksum validation failed for HAC4 file: " + fileName + ", validation is disabled");
+				System.out.println("Checksum validation failed for HAC4 file: " + fileName + ", validation is disabled");//$NON-NLS-1$ //$NON-NLS-2$
 
 				/*
 				 * ignore validation
