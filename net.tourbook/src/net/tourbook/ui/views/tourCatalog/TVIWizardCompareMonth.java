@@ -45,20 +45,20 @@ public class TVIWizardCompareMonth extends TVIWizardCompareItem {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("SELECT");
+		sb.append("SELECT"); //$NON-NLS-1$
 
-		sb.append(" tourId,"); //				1
-		sb.append(" startYear,"); //			2
-		sb.append(" startMonth,"); //			3
-		sb.append(" startDay,"); //				4
-		sb.append(" tourType_typeId,"); //		5	
-		sb.append(" tourDistance,"); //			6
-		sb.append(" tourRecordingTime,"); //	7		
-		sb.append(" tourAltUp"); //				8
+		sb.append(" tourId,"); //				1 //$NON-NLS-1$
+		sb.append(" startYear,"); //			2 //$NON-NLS-1$
+		sb.append(" startMonth,"); //			3 //$NON-NLS-1$
+		sb.append(" startDay,"); //				4 //$NON-NLS-1$
+		sb.append(" tourType_typeId,"); //		5	 //$NON-NLS-1$
+		sb.append(" tourDistance,"); //			6 //$NON-NLS-1$
+		sb.append(" tourRecordingTime,"); //	7		 //$NON-NLS-1$
+		sb.append(" tourAltUp"); //				8 //$NON-NLS-1$
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA);
-		sb.append(" WHERE startYear=? AND startMonth=?");
-		sb.append(" ORDER BY startDay, startHour, startMinute");
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
+		sb.append(" WHERE startYear=? AND startMonth=?"); //$NON-NLS-1$
+		sb.append(" ORDER BY startDay, startHour, startMinute"); //$NON-NLS-1$
 
 		try {
 

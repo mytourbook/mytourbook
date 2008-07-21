@@ -539,13 +539,13 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	}
 
 	private void fireModifyEvent() {
-		
+
 		if (fIsModified) {
 			fIsModified = false;
 
 			// remove old tags from internal list
 			TourDatabase.clearTourTags();
-			
+
 			TagManager.updateTagNames();
 
 			TourManager.getInstance().clearTourDataCache();
@@ -907,12 +907,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 	private void onReset() {
 
 		final MessageDialog dialog = new MessageDialog(Display.getCurrent().getActiveShell(),
-				"Emergency Reset",
+				Messages.pref_tourtag_dlg_reset_title,
 				null,
-				"When the hierarchical structure of the tags are corrupted (tags or categories disappear),"
-						+ " this reset will remove the hierarchy.\n\n"
-						+ "Tags and categories will not be deleted they will be displayed as a list."
-						+ "\n\nAre you sure to reset the structure?\n",
+				Messages.pref_tourtag_dlg_reset_message,
 				MessageDialog.QUESTION,
 				new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL },
 				1);

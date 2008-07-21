@@ -49,7 +49,7 @@ public class SQLFilter {
 
 			// select only one person
 
-			sb.append(" AND TourData.tourPerson_personId = ?");
+			sb.append(" AND TourData.tourPerson_personId = ?"); //$NON-NLS-1$
 			fParameters.add(activePerson.getPersonId());
 		}
 

@@ -486,8 +486,8 @@ public class TourCompareManager {
 						// show compare result perspective
 						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
 
-						final CompareResultView view = (CompareResultView) window.getActivePage()
-								.showView(CompareResultView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+						final TourCompareResultView view = (TourCompareResultView) window.getActivePage()
+								.showView(TourCompareResultView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
 						if (view != null) {
 							view.reloadViewer();

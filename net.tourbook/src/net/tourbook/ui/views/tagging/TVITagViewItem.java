@@ -27,7 +27,7 @@ import net.tourbook.ui.UI;
 
 public abstract class TVITagViewItem extends TreeViewerItem {
 
-	static final String	SQL_SUM_COLUMNS			= ""//
+	static final String	SQL_SUM_COLUMNS			= ""// //$NON-NLS-1$
 														+ "SUM(tourDistance)," // 		0	//$NON-NLS-1$
 														+ "SUM(tourRecordingTime)," //	1	//$NON-NLS-1$
 														+ "SUM(tourDrivingTime)," //	2	//$NON-NLS-1$
@@ -42,7 +42,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 														+ "SUM(1)";		//				11	//$NON-NLS-1$
 
-	static final String	SQL_SUM_COLUMNS_TOUR	= ""//
+	static final String	SQL_SUM_COLUMNS_TOUR	= ""// //$NON-NLS-1$
 														+ "tourDistance," // 			0	//$NON-NLS-1$
 														+ "tourRecordingTime," //		1	//$NON-NLS-1$
 														+ "tourDrivingTime," //			2	//$NON-NLS-1$
@@ -93,16 +93,16 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 			/*
 			 * get tags
 			 */
-			sb.append("SELECT ");
+			sb.append("SELECT "); //$NON-NLS-1$
 			sb.append(SQL_SUM_COLUMNS);
 
-			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jtblTagData");
+			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jtblTagData"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			// get data for a tour
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON ");
-			sb.append(" jtblTagData.TourData_tourId = TourData.tourId");
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON "); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(" jtblTagData.TourData_tourId = TourData.tourId"); //$NON-NLS-1$
 
-			sb.append(" WHERE jtblTagData.TourTag_TagId = ?");
+			sb.append(" WHERE jtblTagData.TourTag_TagId = ?"); //$NON-NLS-1$
 			sb.append(sqlFilter.getWhereClause());
 
 			final Connection conn = TourDatabase.getInstance().getConnection();

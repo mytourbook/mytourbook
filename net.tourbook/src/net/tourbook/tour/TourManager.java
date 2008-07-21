@@ -239,7 +239,7 @@ public class TourManager {
 		final String tourTitle = tourData.getTourTitle();
 
 		return getTourDateFull(tourData) + //
-				" - "
+				" - " //$NON-NLS-1$
 				+ getTourTime(tourData)
 				+ ((tourTitle.length() == 0) ? "" : " - " + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}

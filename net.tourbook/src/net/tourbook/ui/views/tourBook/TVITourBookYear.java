@@ -44,19 +44,19 @@ public class TVITourBookYear extends TVITourBookItem {
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final StringBuilder sb = new StringBuilder();
-		sb.append("SELECT");
+		sb.append("SELECT"); //$NON-NLS-1$
 
-		sb.append(" startYear, ");
-		sb.append(" startMonth, ");
+		sb.append(" startYear, "); //$NON-NLS-1$
+		sb.append(" startMonth, "); //$NON-NLS-1$
 		sb.append(SQL_SUM_COLUMNS);
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA);
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
 
-		sb.append(" WHERE startYear=?");
+		sb.append(" WHERE startYear=?"); //$NON-NLS-1$
 		sb.append(sqlFilter.getWhereClause());
 
-		sb.append(" GROUP BY startYear, startMonth");
-		sb.append(" ORDER BY startMonth");
+		sb.append(" GROUP BY startYear, startMonth"); //$NON-NLS-1$
+		sb.append(" ORDER BY startMonth"); //$NON-NLS-1$
 
 		try {
 

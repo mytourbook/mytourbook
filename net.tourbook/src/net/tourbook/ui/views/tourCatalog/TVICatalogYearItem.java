@@ -75,32 +75,32 @@ public class TVICatalogYearItem extends TVICatalogItem {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("SELECT");
+		sb.append("SELECT"); //$NON-NLS-1$
 
-		sb.append(" TourCompared.comparedId,"); // 		1
-		sb.append(" TourCompared.tourId,"); //			2
-		sb.append(" TourCompared.tourDate,"); //		3
-		sb.append(" TourCompared.tourSpeed,"); //		4
-		sb.append(" TourCompared.startIndex,"); //		5
-		sb.append(" TourCompared.endIndex,"); //		6
+		sb.append(" TourCompared.comparedId,"); // 		1 //$NON-NLS-1$
+		sb.append(" TourCompared.tourId,"); //			2 //$NON-NLS-1$
+		sb.append(" TourCompared.tourDate,"); //		3 //$NON-NLS-1$
+		sb.append(" TourCompared.tourSpeed,"); //		4 //$NON-NLS-1$
+		sb.append(" TourCompared.startIndex,"); //		5 //$NON-NLS-1$
+		sb.append(" TourCompared.endIndex,"); //		6 //$NON-NLS-1$
 
-		sb.append(" TourData.tourTitle,"); //			7		
-		sb.append(" TourData.tourType_typeId,"); //		8
+		sb.append(" TourData.tourTitle,"); //			7		 //$NON-NLS-1$
+		sb.append(" TourData.tourType_typeId,"); //		8 //$NON-NLS-1$
 
-		sb.append(" jTdataTtag.TourTag_tagId"); //		9
+		sb.append(" jTdataTtag.TourTag_tagId"); //		9 //$NON-NLS-1$
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared");
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// get data for a tour
-		sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON ");
-		sb.append(" TourCompared.tourId = TourData.tourId");
+		sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON "); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(" TourCompared.tourId = TourData.tourId"); //$NON-NLS-1$
 
 		// get tag id's
-		sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
-		sb.append(" ON TourData.tourId = jTdataTtag.TourData_tourId");
+		sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(" ON TourData.tourId = jTdataTtag.TourData_tourId"); //$NON-NLS-1$
 
-		sb.append(" WHERE TourCompared.refTourId=? AND TourCompared.startYear=?");
-		sb.append(" ORDER BY TourCompared.tourDate");
+		sb.append(" WHERE TourCompared.refTourId=? AND TourCompared.startYear=?"); //$NON-NLS-1$
+		sb.append(" ORDER BY TourCompared.tourDate"); //$NON-NLS-1$
 
 		try {
 

@@ -220,7 +220,7 @@
       </category>
       <view
             category="net.tourbook.category.compareTours"
-            class="net.tourbook.ui.views.tourCatalog.CompareResultView"
+            class="net.tourbook.ui.views.tourCatalog.TourCompareResultView"
             icon="icons/tour-map-compare-result.gif"
             id="net.tourbook.views.tourCatalog.CompareResultView"
             name="%view_name_Compare_Result"/>

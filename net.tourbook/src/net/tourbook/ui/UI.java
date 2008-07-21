@@ -151,7 +151,7 @@ public class UI {
 	public static final DateFormat			TimeFormatterShort				= DateFormat.getTimeInstance(DateFormat.SHORT);
 	public static final DateFormat			DateFormatterShort				= DateFormat.getDateInstance(DateFormat.SHORT);
 	public static final DateFormat			DateFormatterFull				= DateFormat.getDateInstance(DateFormat.FULL);
-	public static final SimpleDateFormat	MonthFormatter					= new SimpleDateFormat("MMM");
+	public static final SimpleDateFormat	MonthFormatter					= new SimpleDateFormat("MMM"); //$NON-NLS-1$
 
 	public static Styler					TAG_STYLER;
 	public static Styler					TAG_CATEGORY_STYLER;

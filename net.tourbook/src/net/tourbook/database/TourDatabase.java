@@ -78,7 +78,7 @@ public class TourDatabase {
 	 */
 	private static final int					TOURBOOK_DB_VERSION							= 5;
 
-	private static final String					DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";
+	private static final String					DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver"; //$NON-NLS-1$
 	private static final String					DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
 
 	/*
@@ -301,7 +301,7 @@ public class TourDatabase {
 		 */
 		Query query = em.createQuery("SELECT TourTagCategory " //$NON-NLS-1$
 				+ ("FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " AS TourTagCategory ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE TourTagCategory.isRoot = 1")
+				+ (" WHERE TourTagCategory.isRoot = 1") //$NON-NLS-1$
 				+ (" ORDER  BY TourTagCategory.name")); //$NON-NLS-1$
 
 		rootEntry.tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
@@ -311,7 +311,7 @@ public class TourDatabase {
 		 */
 		query = em.createQuery("SELECT TourTag " //$NON-NLS-1$
 				+ ("FROM " + TourDatabase.TABLE_TOUR_TAG + " AS TourTag ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" WHERE TourTag.isRoot = 1")
+				+ (" WHERE TourTag.isRoot = 1") //$NON-NLS-1$
 				+ (" ORDER  BY TourTag.name")); //$NON-NLS-1$
 
 		rootEntry.tourTags = (ArrayList<TourTag>) query.getResultList();
@@ -670,7 +670,7 @@ public class TourDatabase {
 	 * Persist the tourData in the database
 	 * 
 	 * @param tourData
-	 * @return returns true is the save was successful
+	 * @return returns true if the save was successful
 	 */
 	public static boolean saveTour(final TourData tourData) {
 
@@ -1290,7 +1290,7 @@ public class TourDatabase {
 		// ALTER TABLE TourData_TourReference ADD CONSTRAINT TourData_TourReference_pk PRIMARY KEY (TourData_tourId);
 		stmt.addBatch("" //$NON-NLS-1$
 				+ ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURREFERENCE) //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURREFERENCE + "_pk") //$NON-NLS-1$
+				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURREFERENCE + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -1315,7 +1315,7 @@ public class TourDatabase {
 				+ "	isRoot 		INTEGER,\n" //$NON-NLS-1$
 				+ "	expandType 	INTEGER,\n" //$NON-NLS-1$
 				+ "	name 		VARCHAR(255)\n" //$NON-NLS-1$
-				+ ")";
+				+ ")"; //$NON-NLS-1$
 
 		System.out.println(sql);
 
@@ -1324,7 +1324,7 @@ public class TourDatabase {
 		// ALTER TABLE TourTag ADD CONSTRAINT TourTag_pk PRIMARY KEY (refId);
 		sql = ("ALTER TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
 				+ ("	ADD CONSTRAINT " + TABLE_TOUR_TAG + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	PRIMARY KEY (tagId)");
+				+ ("	PRIMARY KEY (tagId)"); //$NON-NLS-1$
 
 		System.out.println(sql);
 		System.out.println();
@@ -1334,14 +1334,14 @@ public class TourDatabase {
 		/*
 		 * CREATE TABLE TourData_TourTag
 		 */
-		final String field_TourData_tourId = TABLE_TOUR_DATA + "_tourId";
-		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId";
+		final String field_TourData_tourId = TABLE_TOUR_DATA + "_tourId"; //$NON-NLS-1$
+		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId"; //$NON-NLS-1$
 
 		sql = ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ //$NON-NLS-2$
 				+ "(\n" //$NON-NLS-1$
-				+ (TABLE_TOUR_TAG + "_tagId" + "	BIGINT NOT NULL,\n") //$NON-NLS-1$
-				+ (TABLE_TOUR_DATA + "_tourId" + "	BIGINT NOT NULL\n") //$NON-NLS-1$
-				+ ")";
+				+ (TABLE_TOUR_TAG + "_tagId" + "	BIGINT NOT NULL,\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (TABLE_TOUR_DATA + "_tourId" + "	BIGINT NOT NULL\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ")"; //$NON-NLS-1$
 
 		System.out.println(sql);
 		stmt.addBatch(sql); //$NON-NLS-1$
@@ -1358,18 +1358,18 @@ public class TourDatabase {
 //		stmt.addBatch(sql);
 		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ ("	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourTag_tagId)
-				+ ("	FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)")
-				+ ("	REFERENCES " + TABLE_TOUR_TAG + " (tagId)");
+				+ ("	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourTag_tagId) //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	REFERENCES " + TABLE_TOUR_TAG + " (tagId)"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println(sql);
 		stmt.addBatch(sql);
 
 		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ ("	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourData_tourId)
-				+ ("	FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)")
-				+ ("	REFERENCES " + TABLE_TOUR_DATA + " (tourId)");
+				+ ("	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourData_tourId) //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	REFERENCES " + TABLE_TOUR_DATA + " (tourId)"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println(sql);
 		System.out.println();
@@ -1392,14 +1392,14 @@ public class TourDatabase {
 				+ "	tagCategoryId 	BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
 				+ "	isRoot 			INTEGER,\n" //$NON-NLS-1$
 				+ "	name 			VARCHAR(255)\n" //$NON-NLS-1$
-				+ ")";
+				+ ")"; //$NON-NLS-1$
 
 		System.out.println(sql);
 		stmt.addBatch(sql);
 
 		sql = ("ALTER TABLE " + TABLE_TOUR_TAG_CATEGORY) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + TABLE_TOUR_TAG_CATEGORY + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" PRIMARY KEY (tagCategoryId)");
+				+ (" PRIMARY KEY (tagCategoryId)"); //$NON-NLS-1$
 
 		System.out.println(sql);
 		System.out.println();
@@ -1413,7 +1413,7 @@ public class TourDatabase {
 				+ "(\n" //$NON-NLS-1$
 				+ (TABLE_TOUR_TAG + "_tagId						BIGINT NOT NULL,\n") //$NON-NLS-1$
 				+ (TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId	BIGINT NOT NULL\n") //$NON-NLS-1$
-				+ ")";
+				+ ")"; //$NON-NLS-1$
 
 		System.out.println(sql);
 		stmt.addBatch(sql); //$NON-NLS-1$
@@ -1422,23 +1422,23 @@ public class TourDatabase {
 		 * Add constraints
 		 */
 
-		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId";
-		final String field_TourTagCategory_tagCategoryId = TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId";
+		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId"; //$NON-NLS-1$
+		final String field_TourTagCategory_tagCategoryId = TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId"; //$NON-NLS-1$
 
 		sql = ("ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG) //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ (" ADD CONSTRAINT fk_" + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "_" + field_TourTag_tagId)
-				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)")
-				+ (" REFERENCES " + TABLE_TOUR_TAG + " (tagId)");
+				+ (" ADD CONSTRAINT fk_" + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "_" + field_TourTag_tagId) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" REFERENCES " + TABLE_TOUR_TAG + " (tagId)"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println(sql);
 		stmt.addBatch(sql);
 
 		sql = ("ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG) //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ (" ADD CONSTRAINT fk_" + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "_" + field_TourTagCategory_tagCategoryId)
-				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId)")
-				+ (" REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)");
+				+ (" ADD CONSTRAINT fk_" + JOINTABLE_TOURTAGCATEGORY_TOURTAG + "_" + field_TourTagCategory_tagCategoryId) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId)") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println(sql);
 		System.out.println();
@@ -1452,7 +1452,7 @@ public class TourDatabase {
 				+ "(\n" //$NON-NLS-1$
 				+ (TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId1	BIGINT NOT NULL,\n") //$NON-NLS-1$
 				+ (TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2	BIGINT NOT NULL\n") //$NON-NLS-1$
-				+ ")";
+				+ ")"; //$NON-NLS-1$
 
 		System.out.println(sql);
 		stmt.addBatch(sql); //$NON-NLS-1$
@@ -1461,29 +1461,29 @@ public class TourDatabase {
 		 * Add constraints
 		 */
 
-		final String field_TourTagCategory_tagCategoryId1 = TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId1";
-		final String field_TourTagCategory_tagCategoryId2 = TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2";
+		final String field_TourTagCategory_tagCategoryId1 = TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId1"; //$NON-NLS-1$
+		final String field_TourTagCategory_tagCategoryId2 = TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2"; //$NON-NLS-1$
 
 		sql = ("ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY + "\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ (" ADD CONSTRAINT fk_"
+				+ (" ADD CONSTRAINT fk_" //$NON-NLS-1$
 						+ JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY
-						+ "_"
-						+ field_TourTagCategory_tagCategoryId1 + "\n")
-				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId1)\n")
-				+ (" REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)\n");
+						+ "_" //$NON-NLS-1$
+						+ field_TourTagCategory_tagCategoryId1 + "\n") //$NON-NLS-1$
+				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId1)\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println(sql);
 		stmt.addBatch(sql);
 
 		sql = ("ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY + "\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ (" ADD CONSTRAINT fk_"
+				+ (" ADD CONSTRAINT fk_" //$NON-NLS-1$
 						+ JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY
-						+ "_"
-						+ field_TourTagCategory_tagCategoryId2 + "\n")
-				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2)\n")
-				+ (" REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)\n");
+						+ "_" //$NON-NLS-1$
+						+ field_TourTagCategory_tagCategoryId2 + "\n") //$NON-NLS-1$
+				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2)\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println(sql);
 		System.out.println();

@@ -138,7 +138,7 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 
 	public ActionMenuSetTagStructure(final ITourViewer tourViewer) {
 
-		super(Messages.app_action_tag_set_tag_expand_type, AS_DROP_DOWN_MENU);
+		super(Messages.action_tag_set_tag_expand_type, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
 		fTourViewer = tourViewer;

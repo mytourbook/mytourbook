@@ -381,7 +381,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 					fColumnManager.saveState(fSessionMemento);
 
-					fColumnManager.resetColumns();
+					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
 					recreateViewer();
@@ -447,7 +447,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
 
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 

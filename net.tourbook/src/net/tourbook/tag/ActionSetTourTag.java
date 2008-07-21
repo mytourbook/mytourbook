@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.tag;
 
 import java.util.ArrayList;
@@ -135,7 +134,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		fTourProvider = tourProvider;
 		fIsAddMode = isAddMode;
 
-		setText(isAddMode ? Messages.app_action_tag_add : Messages.app_action_tag_remove);
+		setText(isAddMode ? Messages.action_tag_add : Messages.action_tag_remove);
 		setMenuCreator(this);
 	}
 

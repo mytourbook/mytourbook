@@ -60,7 +60,7 @@ public class ActionHandlerTourCompareWizard extends AbstractHandler {
 						workbench.showPerspective(PerspectiveFactoryCompareTours.PERSPECTIVE_ID, window);
 
 						// show tour compare view
-						window.getActivePage().showView(CompareResultView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
+						window.getActivePage().showView(TourCompareResultView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
 					} catch (final WorkbenchException e) {
 						e.printStackTrace();

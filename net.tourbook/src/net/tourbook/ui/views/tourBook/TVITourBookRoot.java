@@ -43,18 +43,18 @@ public class TVITourBookRoot extends TVITourBookItem {
 
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = ""//
-				+ "SELECT " //						$NON-NLS-1$
-				+ " startYear, " //		1			$NON-NLS-1$
+		final String sqlString = ""// //$NON-NLS-1$
+				+ "SELECT " //						$NON-NLS-1$ //$NON-NLS-1$
+				+ " startYear, " //		1			$NON-NLS-1$ //$NON-NLS-1$
 				+ SQL_SUM_COLUMNS //	2
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ " WHERE 1=1 " //					$NON-NLS-1$
+				+ " WHERE 1=1 " //					$NON-NLS-1$ //$NON-NLS-1$
 				+ sqlFilter.getWhereClause()
 
-				+ " GROUP BY startYear" //			$NON-NLS-1$
-				+ " ORDER BY startYear"; //			$NON-NLS-1$
+				+ " GROUP BY startYear" //			$NON-NLS-1$ //$NON-NLS-1$
+				+ " ORDER BY startYear"; //			$NON-NLS-1$ //$NON-NLS-1$
 
 		try {
 

@@ -380,7 +380,7 @@ public class ColumnManager {
 	/**
 	 * Removes all defined columns
 	 */
-	public void resetColumns() {
+	public void clearColumns() {
 		fAllColumnDefinitions.clear();
 	}
 

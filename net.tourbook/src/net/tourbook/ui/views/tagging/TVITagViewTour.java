@@ -25,14 +25,14 @@ import org.joda.time.DateTime;
 
 public class TVITagViewTour extends TVITagViewItem {
 
-	public static final String	SQL_TOUR_COLUMNS	= ""//
-															+ "startYear," //			0
-															+ "startMonth," //			1
-															+ "startDay," //			2
-															+ "tourTitle," //			3
-															+ "tourType_typeId," //		4
-															+ "deviceTimeInterval," //	5
-															+ "startDistance," //		6
+	public static final String	SQL_TOUR_COLUMNS	= ""// //$NON-NLS-1$
+															+ "startYear," //			0 //$NON-NLS-1$
+															+ "startMonth," //			1 //$NON-NLS-1$
+															+ "startDay," //			2 //$NON-NLS-1$
+															+ "tourTitle," //			3 //$NON-NLS-1$
+															+ "tourType_typeId," //		4 //$NON-NLS-1$
+															+ "deviceTimeInterval," //	5 //$NON-NLS-1$
+															+ "startDistance," //		6 //$NON-NLS-1$
 															//
 															+ SQL_SUM_COLUMNS_TOUR; //	7
 

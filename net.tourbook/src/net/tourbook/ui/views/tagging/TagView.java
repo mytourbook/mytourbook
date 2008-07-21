@@ -108,7 +108,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	static public final String				ID								= "net.tourbook.views.tagViewID";	//$NON-NLS-1$
 
-	private static final String				MEMENTO_TAG_VIEW_LAYOUT			= "tagview.layout";
+	private static final String				MEMENTO_TAG_VIEW_LAYOUT			= "tagview.layout";				//$NON-NLS-1$
 
 	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
 	static final int						TAG_VIEW_LAYOUT_HIERARCHICAL	= 10;
@@ -120,7 +120,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	private Composite						fViewerContainer;
 
 	private TreeViewer						fTagViewer;
-//	private DrillDownAdapter				fDrillDownAdapter;
 	private TVITagViewRoot					fRootItem;
 
 	private ColumnManager					fColumnManager;
@@ -333,7 +332,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					UI.updateUnits();
 
 					fColumnManager.saveState(fSessionMemento);
-					fColumnManager.resetColumns();
+					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
 					recreateViewer();
@@ -435,7 +434,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		fActionCollapseAll = new ActionCollapseAll(this);
 		fActionCollapseOthers = new ActionCollapseOthers(this);
 
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		fActionSetLayoutFlat = new ActionSetLayoutFlat(this);
@@ -505,7 +504,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		fTagViewer = new TreeViewer(tree);
 		fColumnManager.createColumns();
-//		fDrillDownAdapter = new DrillDownAdapter(fTagViewer);
 
 		fTagViewer.setContentProvider(new TagContentProvider());
 		fTagViewer.setComparer(new TagComparer());
@@ -1038,8 +1036,6 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		// recreate the toolbar
 		tbm.removeAll();
-
-//		fDrillDownAdapter.addNavigationActions(tbm);
 
 		tbm.add(fActionExpandSelection);
 		tbm.add(fActionCollapseAll);

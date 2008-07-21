@@ -100,9 +100,9 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourPropertiesView extends ViewPart implements ITourViewer {
 
-	public static final String		ID							= "net.tourbook.views.TourPropertiesView";		//$NON-NLS-1$
+	public static final String		ID						= "net.tourbook.views.TourPropertiesView";		//$NON-NLS-1$
 
-	private static final String		MEMENTO_SELECTED_TAB		= "tourProperties.selectedTab";				//$NON-NLS-1$
+	private static final String		MEMENTO_SELECTED_TAB	= "tourProperties.selectedTab";				//$NON-NLS-1$
 	private static IMemento			fSessionMemento;
 
 	private CTabFolder				fTabFolder;
@@ -127,12 +127,12 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	private TourData				fTourData;
-	public Calendar					fCalendar					= GregorianCalendar.getInstance();
+	public Calendar					fCalendar				= GregorianCalendar.getInstance();
 
-	private DateFormat				fTimeFormatter				= DateFormat.getTimeInstance(DateFormat.SHORT);
-	private DateFormat				fDurationFormatter			= DateFormat.getTimeInstance(DateFormat.SHORT,
-																		Locale.GERMAN);
-	private NumberFormat			fNumberFormatter			= NumberFormat.getNumberInstance();
+	private DateFormat				fTimeFormatter			= DateFormat.getTimeInstance(DateFormat.SHORT);
+	private DateFormat				fDurationFormatter		= DateFormat.getTimeInstance(DateFormat.SHORT,
+																	Locale.GERMAN);
+	private NumberFormat			fNumberFormatter		= NumberFormat.getNumberInstance();
 
 	private TourEditor				fTourEditor;
 	private TourChart				fTourChart;
@@ -142,7 +142,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private ScrolledComposite		fScrolledContainer;
 	private Composite				fContentContainer;
 
-	private Composite				fTourDataContainer;
+	private Composite				fDataViewerContainer;
 	private TableViewer				fDataViewer;
 	private ColumnManager			fColumnManager;
 
@@ -268,26 +268,37 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
+//					// measurement system has changed
+//
+//					UI.updateUnits();
+//
+//					saveViewerSettings(fSessionMemento);
+//
+//					// dispose viewer
+//					final Control[] children = fDataViewerContainer.getChildren();
+//					for (int childIndex = 0; childIndex < children.length; childIndex++) {
+//						children[childIndex].dispose();
+//					}
+//
+//					createDataViewer(fDataViewerContainer);
+//
+//					restoreViewerSettings(fSessionMemento);
+//
+//					fDataViewerContainer.layout();
+//
+//					updateViewer();
+
+					
 					// measurement system has changed
 
 					UI.updateUnits();
 
-					saveViewerSettings(fSessionMemento);
+					fColumnManager.saveState(fSessionMemento);
+					fColumnManager.clearColumns();
+					defineViewerColumns(fDataViewerContainer);
 
-					// dispose viewer
-					final Control[] children = fTourDataContainer.getChildren();
-					for (int childIndex = 0; childIndex < children.length; childIndex++) {
-						children[childIndex].dispose();
-					}
-
-					createDataViewer(fTourDataContainer);
-
-					restoreViewerSettings(fSessionMemento);
-
-					fTourDataContainer.layout();
-
-					updateViewer();
-
+					recreateViewer();
+					
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 					// reload tour data
@@ -500,12 +511,12 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 	private Control createTabRawData(final Composite parent) {
 
-		fTourDataContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(fTourDataContainer);
+		fDataViewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(fDataViewerContainer);
 
-		createDataViewer(fTourDataContainer);
+		createDataViewer(fDataViewerContainer);
 
-		return fTourDataContainer;
+		return fDataViewerContainer;
 	}
 
 	private Composite createTabTourData(final Composite parent) {
@@ -813,7 +824,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	}
 
 	public ColumnViewer getViewer() {
-		return null;
+		return fDataViewer;
 	}
 
 	@Override
@@ -926,9 +937,43 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	public void recreateViewer() {}
+	public void recreateViewer() {
 
-	public void reloadViewer() {}
+		final ISelection selection = fDataViewer.getSelection();
+
+		fDataViewerContainer.setRedraw(false);
+		{
+			fDataViewer.getTable().dispose();
+
+			createDataViewer(fDataViewerContainer);
+			fDataViewerContainer.layout();
+
+			// update the viewer
+			fNumberFormatter.setMinimumFractionDigits(3);
+			fNumberFormatter.setMaximumFractionDigits(3);
+			fDataViewer.setInput(new Object());
+			
+			fDataViewer.setSelection(selection);
+		}
+		fDataViewerContainer.setRedraw(true);
+
+	}
+
+	/**
+	 * reload the content of the tag viewer
+	 */
+	public void reloadViewer() {
+
+		final Table table = fDataViewer.getTable();
+		table.setRedraw(false);
+		{
+			// update the viewer
+			fNumberFormatter.setMinimumFractionDigits(3);
+			fNumberFormatter.setMaximumFractionDigits(3);
+			fDataViewer.setInput(new Object());
+		}
+		table.setRedraw(true);
+	}
 
 	private void restoreState(final IMemento memento) {
 
@@ -1096,16 +1141,16 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		/*
 		 * tab: tour data
 		 */
-		updateViewer();
+		reloadViewer();
 	}
 
-	private void updateViewer() {
-
-		// update the viewer
-		fNumberFormatter.setMinimumFractionDigits(3);
-		fNumberFormatter.setMaximumFractionDigits(3);
-
-		fDataViewer.setInput(new Object());
-	}
+//	private void updateViewer() {
+//
+//		// update the viewer
+//		fNumberFormatter.setMinimumFractionDigits(3);
+//		fNumberFormatter.setMaximumFractionDigits(3);
+//
+//		fDataViewer.setInput(new Object());
+//	}
 
 }

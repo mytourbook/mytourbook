@@ -159,14 +159,16 @@ public class TourEditor extends EditorPart {
 					}
 
 					// get modified tours
-					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					final ArrayList<?> modifiedTours = (ArrayList<?>) propertyData;
 					final long tourId = fTourData.getTourId();
 
 					// check if the tour in the editor was modified
-					for (final TourData tourData : modifiedTours) {
-						if (tourData.getTourId() == tourId) {
-							fTourChart.updateTourChart(true);
-							return;
+					for (final Object object : modifiedTours) {
+						if (object instanceof TourData) {
+							if (((TourData) object).getTourId() == tourId) {
+								fTourChart.updateTourChart(true);
+								return;
+							}
 						}
 					}
 				}
@@ -359,7 +361,8 @@ public class TourEditor extends EditorPart {
 	}
 
 	/**
-	 * Set the tour type for the tour
+	 * Marks the tour dirty and fire an {@link TourManager#TOUR_PROPERTIES_CHANGED} event when the
+	 * tour is saved
 	 */
 	public void setTourPropertyIsModified() {
 

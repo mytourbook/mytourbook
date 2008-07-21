@@ -143,8 +143,8 @@ public class ActionDeleteTour extends Action {
 	public void run() {
 
 		if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
-				"Delete Tours",
-				"Are you sure to delete the selected tours?") == false) {
+				Messages.Tour_Book_Action_delete_selected_tours_dlg_title,
+				Messages.Tour_Book_Action_delete_selected_tours_dlg_message) == false) {
 			return;
 		}
 

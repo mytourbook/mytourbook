@@ -23,9 +23,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 
 final class ActionCheckTours extends Action {
 
-	private final CompareResultView	fCompareResultView;
+	private final TourCompareResultView	fCompareResultView;
 
-	ActionCheckTours(final CompareResultView compareResultView) {
+	ActionCheckTours(final TourCompareResultView compareResultView) {
 		super(Messages.Compare_Result_Action_check_selected_tours);
 		fCompareResultView = compareResultView;
 	}

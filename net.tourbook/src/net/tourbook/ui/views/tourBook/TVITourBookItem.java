@@ -27,7 +27,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 	static final Calendar			fCalendar		= GregorianCalendar.getInstance();
 	
-	static final String				SQL_SUM_COLUMNS	= "" //
+	static final String				SQL_SUM_COLUMNS	= "" // //$NON-NLS-1$
 															+ "SUM(TOURDISTANCE), " // 		1	//$NON-NLS-1$
 															+ "SUM(TOURRECORDINGTIME), " //	2	//$NON-NLS-1$
 															+ "SUM(TOURDRIVINGTIME), " //	3	//$NON-NLS-1$

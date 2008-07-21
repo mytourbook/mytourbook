@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.ui.views.tourCatalog.CompareResultView;
+import net.tourbook.ui.views.tourCatalog.TourCompareResultView;
 import net.tourbook.ui.views.tourCatalog.TourCatalogViewComparedTour;
 import net.tourbook.ui.views.tourCatalog.TourCatalogViewReferenceTour;
 
@@ -40,7 +40,7 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 				0.4f,
 				IPageLayout.ID_EDITOR_AREA);
 
-		listFolder.addView(CompareResultView.ID);
+		listFolder.addView(TourCompareResultView.ID);
 
 		//--------------------------------------------------------------------------------
 

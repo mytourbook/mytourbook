@@ -47,7 +47,7 @@ public class TVITourBookMonth extends TVITourBookItem {
 		final TVITourBookYear yearItem = (TVITourBookYear) (getParentItem());
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = "" + //
+		final String sqlString = "" + // //$NON-NLS-1$
 				//
 				"SELECT " //		//$NON-NLS-1$
 				+ "startYear," //			1	//$NON-NLS-1$
@@ -77,8 +77,8 @@ public class TVITourBookMonth extends TVITourBookItem {
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + UI.NEW_LINE) //			//$NON-NLS-1$ //$NON-NLS-2$
 
 				// get tag id's
-				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag")
-				+ (" ON TourData.tourID = jTdataTtag.TourData_tourId")
+				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" ON TourData.tourID = jTdataTtag.TourData_tourId") //$NON-NLS-1$
 
 				+ (" WHERE STARTYEAR = ?")//				//$NON-NLS-1$
 				+ (" AND STARTMONTH = ?")//					//$NON-NLS-1$

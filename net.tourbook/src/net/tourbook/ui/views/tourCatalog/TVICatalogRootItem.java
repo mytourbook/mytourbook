@@ -46,15 +46,15 @@ public class TVICatalogRootItem extends TVICatalogItem {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("SELECT");
+		sb.append("SELECT"); //$NON-NLS-1$
 
-		sb.append(" label,");
-		sb.append(" refId,");
-		sb.append(" TourData_tourId");
+		sb.append(" label,"); //$NON-NLS-1$
+		sb.append(" refId,"); //$NON-NLS-1$
+		sb.append(" TourData_tourId"); //$NON-NLS-1$
 //		sb.append(" SUM(1)");
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_REFERENCE);
-		sb.append(" ORDER BY label");
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_REFERENCE); //$NON-NLS-1$
+		sb.append(" ORDER BY label"); //$NON-NLS-1$
 
 		try {
 

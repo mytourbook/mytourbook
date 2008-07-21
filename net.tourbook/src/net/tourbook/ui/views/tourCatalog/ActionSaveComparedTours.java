@@ -22,9 +22,9 @@ import org.eclipse.jface.action.Action;
 
 class ActionSaveComparedTours extends Action {
 
-	private final CompareResultView	fCompareResultView;
+	private final TourCompareResultView	fCompareResultView;
 
-	ActionSaveComparedTours(final CompareResultView compareResultView) {
+	ActionSaveComparedTours(final TourCompareResultView compareResultView) {
 
 		fCompareResultView = compareResultView;
 

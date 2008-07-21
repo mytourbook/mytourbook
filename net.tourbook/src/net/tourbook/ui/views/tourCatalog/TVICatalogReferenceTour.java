@@ -87,13 +87,13 @@ public class TVICatalogReferenceTour extends TVICatalogTourItem {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("SELECT");
-		sb.append(" startYear,");
-		sb.append(" SUM(1)");
+		sb.append("SELECT"); //$NON-NLS-1$
+		sb.append(" startYear,"); //$NON-NLS-1$
+		sb.append(" SUM(1)"); //$NON-NLS-1$
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED);
-		sb.append(" WHERE refTourId=?");
-		sb.append(" GROUP BY startYear");
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
+		sb.append(" WHERE refTourId=?"); //$NON-NLS-1$
+		sb.append(" GROUP BY startYear"); //$NON-NLS-1$
 
 		try {
 

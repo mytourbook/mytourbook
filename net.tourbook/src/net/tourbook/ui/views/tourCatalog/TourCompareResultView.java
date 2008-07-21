@@ -98,7 +98,7 @@ import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
-public class CompareResultView extends ViewPart implements ITourViewer, ISelectedTours {
+public class TourCompareResultView extends ViewPart implements ITourViewer, ISelectedTours {
 
 	public static final String					ID					= "net.tourbook.views.tourCatalog.CompareResultView";	//$NON-NLS-1$
 
@@ -273,7 +273,7 @@ public class CompareResultView extends ViewPart implements ITourViewer, ISelecte
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	public CompareResultView() {}
+	public TourCompareResultView() {}
 
 	private void addCompareTourPropertyListener() {
 
@@ -425,7 +425,7 @@ public class CompareResultView extends ViewPart implements ITourViewer, ISelecte
 
 					fColumnManager.saveState(fSessionMemento);
 
-					fColumnManager.resetColumns();
+					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
 					recreateViewer();
@@ -520,7 +520,7 @@ public class CompareResultView extends ViewPart implements ITourViewer, ISelecte
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
 
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		fActionEditQuick = new ActionEditQuick(this);
@@ -540,7 +540,7 @@ public class CompareResultView extends ViewPart implements ITourViewer, ISelecte
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(final IMenuManager manager) {
-				CompareResultView.this.fillContextMenu(manager);
+				TourCompareResultView.this.fillContextMenu(manager);
 			}
 		});
 

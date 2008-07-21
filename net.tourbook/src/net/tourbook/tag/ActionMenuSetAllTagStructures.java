@@ -110,7 +110,7 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 
 	public ActionMenuSetAllTagStructures(final TagView tagView) {
 
-		super(Messages.app_action_tag_set_all_tag_structures, AS_DROP_DOWN_MENU);
+		super(Messages.action_tag_set_all_tag_structures, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
 		fTagView = tagView;

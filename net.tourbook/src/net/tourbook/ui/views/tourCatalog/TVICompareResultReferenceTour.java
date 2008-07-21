@@ -108,16 +108,16 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("SELECT");
+		sb.append("SELECT"); //$NON-NLS-1$
 
-		sb.append(" tourId,"); //		1
-		sb.append(" comparedId,"); //	2
-		sb.append(" startIndex,"); //	3
-		sb.append(" endIndex,"); //		4
-		sb.append(" tourSpeed"); //		5	
+		sb.append(" tourId,"); //		1 //$NON-NLS-1$
+		sb.append(" comparedId,"); //	2 //$NON-NLS-1$
+		sb.append(" startIndex,"); //	3 //$NON-NLS-1$
+		sb.append(" endIndex,"); //		4 //$NON-NLS-1$
+		sb.append(" tourSpeed"); //		5	 //$NON-NLS-1$
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED);
-		sb.append(" WHERE refTourId=?");
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
+		sb.append(" WHERE refTourId=?"); //$NON-NLS-1$
 
 		try {
 

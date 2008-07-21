@@ -38,14 +38,14 @@ public class TVIWizardCompareRoot extends TVIWizardCompareItem {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("SELECT");
+		sb.append("SELECT"); //$NON-NLS-1$
 
-		sb.append(" startYear ");
+		sb.append(" startYear "); //$NON-NLS-1$
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA);
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
 
-		sb.append(" GROUP BY startYear");
-		sb.append(" ORDER BY startYear");
+		sb.append(" GROUP BY startYear"); //$NON-NLS-1$
+		sb.append(" ORDER BY startYear"); //$NON-NLS-1$
 		
 		try {
 

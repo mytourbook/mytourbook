@@ -116,7 +116,7 @@ public class TVITagViewTag extends TVITagViewItem {
 		final StringBuilder sb = new StringBuilder();
 		boolean isFirst = true;
 
-		sb.append(" AND TourData.tourId IN (");
+		sb.append(" AND TourData.tourId IN ("); //$NON-NLS-1$
 
 		for (final TourData tourData : modifiedTours) {
 
@@ -154,23 +154,23 @@ public class TVITagViewTag extends TVITagViewItem {
 			final SQLFilter sqlFilter = new SQLFilter();
 			final StringBuilder sb = new StringBuilder();
 
-			sb.append("SELECT");
+			sb.append("SELECT"); //$NON-NLS-1$
 
-			sb.append(" TourData.tourId,");//				1 
-			sb.append(" jTdataTtag2.TourTag_tagId,");//		2
+			sb.append(" TourData.tourId,");//				1  //$NON-NLS-1$
+			sb.append(" jTdataTtag2.TourTag_tagId,");//		2 //$NON-NLS-1$
 			sb.append(TVITagViewTour.SQL_TOUR_COLUMNS); //	3
 
-			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
+			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			// get all tours for current tag
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData");
-			sb.append(" ON jTdataTtag.TourData_tourId = TourData.tourId ");
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(" ON jTdataTtag.TourData_tourId = TourData.tourId "); //$NON-NLS-1$
 
 			// get all tag id's for one tour 
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag2");
-			sb.append(" ON TourData.tourID = jTdataTtag2.TourData_tourId");
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag2"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(" ON TourData.tourID = jTdataTtag2.TourData_tourId"); //$NON-NLS-1$
 
-			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");
+			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?"); //$NON-NLS-1$
 			sb.append(whereClause);
 			sb.append(sqlFilter.getWhereClause());
 
@@ -236,23 +236,23 @@ public class TVITagViewTag extends TVITagViewItem {
 			final StringBuilder sb = new StringBuilder();
 			final SQLFilter sqlFilter = new SQLFilter();
 
-			sb.append("SELECT ");
+			sb.append("SELECT "); //$NON-NLS-1$
 
-			sb.append(" startYear,"); //		// 1
+			sb.append(" startYear,"); //		// 1 //$NON-NLS-1$
 			sb.append(SQL_SUM_COLUMNS);
 
-			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag");
+			sb.append(" FROM " + TourDatabase.JOINTABLE_TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			// get all tours for current tag
-			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData");
-			sb.append(" ON jTdataTtag.TourData_tourId = TourData.tourId ");
+			sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(" ON jTdataTtag.TourData_tourId = TourData.tourId "); //$NON-NLS-1$
 
-			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?");
+			sb.append(" WHERE jTdataTtag.TourTag_TagId = ?"); //$NON-NLS-1$
 			sb.append(whereClause);
 			sb.append(sqlFilter.getWhereClause());
 
-			sb.append(" GROUP BY startYear");
-			sb.append(" ORDER BY startYear");
+			sb.append(" GROUP BY startYear"); //$NON-NLS-1$
+			sb.append(" ORDER BY startYear"); //$NON-NLS-1$
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 

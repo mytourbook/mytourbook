@@ -22,9 +22,9 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 
 final class ActionUncheckTours extends Action {
 
-	private final CompareResultView	fCompareResultView;
+	private final TourCompareResultView	fCompareResultView;
 
-	ActionUncheckTours(final CompareResultView compareResultView) {
+	ActionUncheckTours(final TourCompareResultView compareResultView) {
 		super(Messages.Compare_Result_Action_uncheck_selected_tours);
 		fCompareResultView = compareResultView;
 	}

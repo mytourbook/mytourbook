@@ -511,12 +511,12 @@ public class StatisticContainer extends Composite {
 
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = "SELECT " //
+		final String sqlString = "SELECT " // //$NON-NLS-1$
 				+ "startYear " //$NON-NLS-1$
 
 				+ " FROM " + TourDatabase.TABLE_TOUR_DATA //$NON-NLS-1$ 
 
-				+ " WHERE 1=1 "
+				+ " WHERE 1=1 " //$NON-NLS-1$
 				+ sqlFilter.getWhereClause()
 
 				+ " GROUP BY STARTYEAR ORDER BY STARTYEAR"; //$NON-NLS-1$

@@ -283,7 +283,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 					fColumnManager.saveState(fSessionMemento);
 
-					fColumnManager.resetColumns();
+					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
 					recreateViewer();
@@ -361,7 +361,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fActionExpandSelection = new ActionExpandSelection(this);
 		fActionCollapseAll = new ActionCollapseAll(this);
 
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
 		fillActions();

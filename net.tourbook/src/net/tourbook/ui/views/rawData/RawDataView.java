@@ -268,7 +268,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 					UI.updateUnits();
 
 					fColumnManager.saveState(fSessionMemento);
-					fColumnManager.resetColumns();
+					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
 					recreateViewer();
@@ -362,7 +362,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
 
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.app_action_tag_open_tagging_structure,
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
 	}

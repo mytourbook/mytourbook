@@ -91,7 +91,7 @@ public class TVIPrefTagCategory extends TVIPrefTagItem {
 
 	@Override
 	public String toString() {
-		return "TVITourTagCategory: " + fTourTagCategory;
+		return "TVITourTagCategory: " + fTourTagCategory; //$NON-NLS-1$
 	}
 
 }
