@@ -453,7 +453,7 @@ public class ChartComponents extends Composite {
 		}
 
 		float adjustMinValue = 0;
-		if (((float) graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
+		if ((graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
 			adjustMinValue = graphUnit;
 		}
 		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / graphUnit) * graphUnit);
@@ -465,7 +465,7 @@ public class ChartComponents extends Composite {
 
 		// increase the max value when it does not fit to unit borders
 		float adjustMaxValue = 0;
-		if (((float) graphMaxValue % graphUnit) != 0) {
+		if ((graphMaxValue % graphUnit) != 0) {
 			adjustMaxValue = graphUnit;
 		}
 		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / graphUnit) * graphUnit);
@@ -769,16 +769,16 @@ public class ChartComponents extends Composite {
 			// the bar's width is 50% of the width for a month
 			barWidth = (int) Math.max(0, (monthWidth * 0.90f));
 			drawingData.setBarRectangleWidth(barWidth);
-			drawingData.setDevBarRectangleXPos((int) (Math.max(0, (monthWidth - barWidth) / 2) + 1));
+			drawingData.setDevBarRectangleXPos((Math.max(0, (monthWidth - barWidth) / 2) + 1));
 			break;
 
 		case ChartDataYSerie.BAR_LAYOUT_BESIDE:
 			final int serieCount = yData.getHighValues()[0].length;
 
 			// the bar's width is 75% of the width for a month
-			barWidth = (int) Math.max(0, monthWidth / 4 * 3);
+			barWidth = Math.max(0, monthWidth / 4 * 3);
 			drawingData.setBarRectangleWidth(Math.max(1, barWidth / serieCount));
-			drawingData.setDevBarRectangleXPos((int) (Math.max(0, (monthWidth - barWidth) / 2) + 2));
+			drawingData.setDevBarRectangleXPos((Math.max(0, (monthWidth - barWidth) / 2) + 2));
 		default:
 			break;
 		}
@@ -830,7 +830,7 @@ public class ChartComponents extends Composite {
 		final int[] yearDays = chartSegments.yearDays;
 
 		int allDaysInAllYears = 0;
-		for (int days : yearDays) {
+		for (final int days : yearDays) {
 			allDaysInAllYears += days;
 		}
 
@@ -876,7 +876,7 @@ public class ChartComponents extends Composite {
 			// the bar's width is 50% of the width for a month
 			barWidth = (int) Math.max(0, (yearWidth * 0.9f));
 			drawingData.setBarRectangleWidth(barWidth);
-			drawingData.setDevBarRectangleXPos((int) (Math.max(0, (yearWidth - barWidth) / 2) + 1));
+			drawingData.setDevBarRectangleXPos((Math.max(0, (yearWidth - barWidth) / 2) + 1));
 			break;
 
 		case ChartDataYSerie.BAR_LAYOUT_BESIDE:
@@ -896,7 +896,7 @@ public class ChartComponents extends Composite {
 			drawingData.setBarRectangleWidth(singleBarWidth);
 			final int barPosition = (yearWidth - (singleBarWidth * (serieCount - 0))) / 2;
 
-			drawingData.setDevBarRectangleXPos((int) (Math.max(0, barPosition) + 0));
+			drawingData.setDevBarRectangleXPos((Math.max(0, barPosition) + 0));
 //				drawingData.setDevBarRectangleXPos(0);
 //			}
 
