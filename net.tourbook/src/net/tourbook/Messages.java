@@ -71,6 +71,10 @@ public class Messages extends NLS {
 
 	public static String		app_action_collapse_all_tooltip;
 	public static String		app_action_collapse_others_tooltip;
+	public static String	app_action_dlg_confirm_save_editors_message;
+
+	public static String	app_action_dlg_confirm_save_editors_title;
+
 	public static String		app_action_expand_selection_tooltip;
 	public static String		app_action_expand_type_flat;
 	public static String		app_action_expand_type_year_day;

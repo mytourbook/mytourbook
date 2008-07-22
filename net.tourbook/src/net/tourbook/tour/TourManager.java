@@ -38,9 +38,13 @@ import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
@@ -242,6 +246,68 @@ public class TourManager {
 				" - " //$NON-NLS-1$
 				+ getTourTime(tourData)
 				+ ((tourTitle.length() == 0) ? "" : " - " + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	/**
+	 * Check if the selected tours are opened in an editor
+	 * 
+	 * @param selectedTours
+	 *            contains the tours which will be checked
+	 * @return Returns <code>true</code> when the tours are saved or <code>false</code> when the
+	 *         user prevented to save the editors
+	 */
+	public static boolean saveTourEditors(final ArrayList<TourData> selectedTours) {
+
+		final ArrayList<IEditorPart> openedEditors = UI.getOpenedEditors();
+		final ArrayList<IEditorPart> editorsToBeSaved = new ArrayList<IEditorPart>();
+
+		// check if a tour is opened in an editor
+		for (final IEditorPart editorPart : openedEditors) {
+			if (editorPart instanceof TourEditor) {
+
+				final IEditorInput editorInput = editorPart.getEditorInput();
+
+				if (editorInput instanceof TourEditorInput) {
+
+					final TourEditor tourEditor = (TourEditor) editorPart;
+					final long editorTourId = ((TourEditorInput) editorInput).getTourId();
+
+					for (final TourData tourData : selectedTours) {
+						if (editorTourId == tourData.getTourId()) {
+
+							// a tour editor was found containing the current tour
+
+							if (tourEditor.isDirty()) {
+								editorsToBeSaved.add(tourEditor);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// editors must be saved when they contain a tour which will be modified
+		if (editorsToBeSaved.size() > 0) {
+
+			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), //
+					Messages.app_action_dlg_confirm_save_editors_title,
+					Messages.app_action_dlg_confirm_save_editors_message)) {
+
+				// save all editors
+				for (final IEditorPart editorPart : editorsToBeSaved) {
+					editorPart.doSave(null);
+				}
+
+				return true;
+
+			} else {
+				return false;
+			}
+
+		} else {
+			return true;
+		}
+
 	}
 
 	/**

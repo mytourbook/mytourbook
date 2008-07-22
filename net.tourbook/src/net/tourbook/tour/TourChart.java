@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.tour;
 
 import java.util.ArrayList;
@@ -108,7 +107,7 @@ public class TourChart extends Chart {
 
 //	private boolean							fBackupIsXSliderVisible;
 
-	public TourChart(final Composite parent, final int style, boolean showActions) {
+	public TourChart(final Composite parent, final int style, final boolean showActions) {
 
 		super(parent, style);
 
@@ -121,13 +120,13 @@ public class TourChart extends Chart {
 		 * tour markers when a tour chart got the focus
 		 */
 		addFocusListener(new Listener() {
-			public void handleEvent(Event event) {
+			public void handleEvent(final Event event) {
 				fireTourChartSelection();
 			}
 		});
 
 		addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
+			public void widgetDisposed(final DisposeEvent e) {
 
 				TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 			}
@@ -140,7 +139,7 @@ public class TourChart extends Chart {
 	 * 
 	 * @param workbenchPartSite
 	 */
-	public void activateActionHandlers(IWorkbenchPartSite partSite) {
+	public void activateActionHandlers(final IWorkbenchPartSite partSite) {
 
 		if (useActionHandlers()) {
 
@@ -242,7 +241,7 @@ public class TourChart extends Chart {
 
 	}
 
-	public void addTourChartListener(ITourChartSelectionListener listener) {
+	public void addTourChartListener(final ITourChartSelectionListener listener) {
 		fSelectionListeners.add(listener);
 	}
 
@@ -339,11 +338,11 @@ public class TourChart extends Chart {
 	 * @return
 	 */
 	private void createGraphActionProxy(final int graphId,
-										String commandId,
+										final String commandId,
 										final String label,
 										final String toolTip,
 										final String imageEnabled,
-										String imageDisabled) {
+										final String imageDisabled) {
 
 		Action action = null;
 
@@ -440,21 +439,6 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * Creates the handlers for the tour chart actions
-	 * 
-	 * @param workbenchWindow
-	 * @param tourChartConfig
-	 */
-	public void createTourEditorActionHandlers(TourChartConfiguration tourChartConfig) {
-
-		fTourChartConfig = tourChartConfig;
-
-		fTCActionHandlerManager.createActionHandlers();
-		createTourActionProxies();
-		createChartActionHandlers();
-	}
-
-	/**
 	 * Create the action proxies for all tour actions
 	 */
 	private void createTourActionProxies() {
@@ -521,7 +505,22 @@ public class TourChart extends Chart {
 
 	}
 
-	public void enableGraphAction(int graphId, boolean isEnabled) {
+	/**
+	 * Creates the handlers for the tour chart actions
+	 * 
+	 * @param workbenchWindow
+	 * @param tourChartConfig
+	 */
+	public void createTourEditorActionHandlers(final TourChartConfiguration tourChartConfig) {
+
+		fTourChartConfig = tourChartConfig;
+
+		fTCActionHandlerManager.createActionHandlers();
+		createTourActionProxies();
+		createChartActionHandlers();
+	}
+
+	public void enableGraphAction(final int graphId, final boolean isEnabled) {
 
 		if (fActionProxies == null) {
 			return;
@@ -585,7 +584,7 @@ public class TourChart extends Chart {
 	 * fire a selection event for this tour chart
 	 */
 	public void fireTourChartSelection() {
-		Object[] listeners = fSelectionListeners.getListeners();
+		final Object[] listeners = fSelectionListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final ITourChartSelectionListener listener = (ITourChartSelectionListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
@@ -602,7 +601,7 @@ public class TourChart extends Chart {
 	 * @param graphId
 	 * @return
 	 */
-	private String getProxyId(int graphId) {
+	private String getProxyId(final int graphId) {
 		return "graphId." + Integer.toString(graphId); //$NON-NLS-1$
 	}
 
@@ -614,7 +613,7 @@ public class TourChart extends Chart {
 		return fIsTourDirty;
 	}
 
-	void onExecuteCanAutoZoomToSlider(Boolean isItemChecked) {
+	void onExecuteCanAutoZoomToSlider(final Boolean isItemChecked) {
 
 		setCanAutoZoomToSlider(isItemChecked);
 
@@ -628,7 +627,7 @@ public class TourChart extends Chart {
 		updateZoomOptionActionHandlers();
 	}
 
-	void onExecuteCanScrollChart(Boolean isItemChecked) {
+	void onExecuteCanScrollChart(final Boolean isItemChecked) {
 
 		setCanScrollZoomedChart(isItemChecked);
 
@@ -642,7 +641,7 @@ public class TourChart extends Chart {
 		updateZoomOptionActionHandlers();
 	}
 
-	void onExecuteShowStartTime(Boolean isItemChecked) {
+	void onExecuteShowStartTime(final Boolean isItemChecked) {
 
 		fTourChartConfig.isStartTime = isItemChecked;
 		updateTourChart(true);
@@ -656,7 +655,7 @@ public class TourChart extends Chart {
 	 * @param isChecked
 	 * @return Returns <code>true</code> when the x-axis was set to the distance
 	 */
-	boolean onExecuteXAxisDistance(boolean isChecked) {
+	boolean onExecuteXAxisDistance(final boolean isChecked) {
 
 		// check if the distance axis button was pressed
 		if (isChecked && !fTourChartConfig.showTimeOnXAxis) {
@@ -685,7 +684,7 @@ public class TourChart extends Chart {
 	 * @param isChecked
 	 * @return Returns <code>true</code> when the check state was changed
 	 */
-	boolean onExecuteXAxisTime(boolean isChecked) {
+	boolean onExecuteXAxisTime(final boolean isChecked) {
 
 		// check if the time axis button was pressed
 		if (isChecked && fTourChartConfig.showTimeOnXAxis) {
@@ -710,7 +709,7 @@ public class TourChart extends Chart {
 		return true;
 	}
 
-	public void removeTourChartListener(ITourChartSelectionListener listener) {
+	public void removeTourChartListener(final ITourChartSelectionListener listener) {
 		fSelectionListeners.remove(listener);
 	}
 
@@ -720,16 +719,32 @@ public class TourChart extends Chart {
 	 * @param commandId
 	 * @param isItemChecked
 	 */
-	public void setCommandChecked(String commandId, Boolean isItemChecked) {
+	public void setCommandChecked(final String commandId, final Boolean isItemChecked) {
 
 		fActionProxies.get(commandId).setChecked(isItemChecked);
 		fTCActionHandlerManager.updateUICheckState(commandId);
 	}
 
 	/**
+	 * Set the enable state for a command and update the UI
+	 */
+	public void setCommandEnabled(final String commandId, final boolean isEnabled) {
+
+		final TCActionProxy actionProxy = fActionProxies.get(commandId);
+
+		if (actionProxy != null) {
+			actionProxy.setEnabled(isEnabled);
+			final TCActionHandler actionHandler = fTCActionHandlerManager.getActionHandler(commandId);
+			if (actionHandler != null) {
+				actionHandler.fireHandlerChanged();
+			}
+		}
+	}
+
+	/**
 	 * Set the enable/check state for a command and update the UI
 	 */
-	public void setCommandState(String commandId, boolean isEnabled, boolean isChecked) {
+	public void setCommandState(final String commandId, final boolean isEnabled, final boolean isChecked) {
 
 		final TCActionProxy actionProxy = fActionProxies.get(commandId);
 
@@ -741,22 +756,6 @@ public class TourChart extends Chart {
 
 		actionProxy.setChecked(isChecked);
 		fTCActionHandlerManager.updateUICheckState(commandId);
-	}
-
-	/**
-	 * Set the enable state for a command and update the UI
-	 */
-	public void setCommandEnabled(String commandId, boolean isEnabled) {
-
-		final TCActionProxy actionProxy = fActionProxies.get(commandId);
-
-		if (actionProxy != null) {
-			actionProxy.setEnabled(isEnabled);
-			final TCActionHandler actionHandler = fTCActionHandlerManager.getActionHandler(commandId);
-			if (actionHandler != null) {
-				actionHandler.fireHandlerChanged();
-			}
-		}
 	}
 
 	/**
@@ -805,7 +804,7 @@ public class TourChart extends Chart {
 										final String tagIsMinEnabled,
 										final String tabMinValue,
 										final int yDataInfoId,
-										int valueDivisor) {
+										final int valueDivisor) {
 
 		if (property.equals(tagIsMinEnabled) || property.equals(tabMinValue)) {
 
@@ -843,10 +842,10 @@ public class TourChart extends Chart {
 	}
 
 	private void setSegmentLayer(	final ArrayList<IChartLayer> segmentValueLayers,
-									float[] segmentSerie,
-									String customDataKey) {
+									final float[] segmentSerie,
+									final String customDataKey) {
 
-		ChartDataYSerie yData = (ChartDataYSerie) getDataModel().getCustomData(customDataKey);
+		final ChartDataYSerie yData = (ChartDataYSerie) getDataModel().getCustomData(customDataKey);
 
 		if (yData != null) {
 			yData.setCustomLayers(segmentValueLayers);
@@ -857,7 +856,7 @@ public class TourChart extends Chart {
 	/**
 	 * set the tour dirty that the tour is saved when the tour is closed
 	 */
-	public void setTourDirty(boolean isDirty) {
+	public void setTourDirty(final boolean isDirty) {
 
 		fIsTourDirty = isDirty;
 
@@ -870,12 +869,12 @@ public class TourChart extends Chart {
 	 * set's the chart which is synched with this chart
 	 * 
 	 * @param isSynchEnabled
-	 *        <code>true</code> to enable synch, <code>false</code> to disable synch
+	 *            <code>true</code> to enable synch, <code>false</code> to disable synch
 	 * @param synchedChart
-	 *        contains the {@link Chart} which is synched with this chart
+	 *            contains the {@link Chart} which is synched with this chart
 	 * @param synchMode
 	 */
-	public void synchChart(final boolean isSynchEnabled, final TourChart synchedChart, int synchMode) {
+	public void synchChart(final boolean isSynchEnabled, final TourChart synchedChart, final int synchMode) {
 
 		// enable/disable synched chart
 		super.setSynchedChart(isSynchEnabled ? synchedChart : null);
@@ -938,9 +937,9 @@ public class TourChart extends Chart {
 	 */
 	void updateActionState() {
 
-		int[] allGraphIds = TourManager.allGraphIDs;
-		ArrayList<Integer> checkedGraphIds = fTourChartConfig.getVisibleGraphs();
-		ArrayList<Integer> enabledGraphIds = new ArrayList<Integer>();
+		final int[] allGraphIds = TourManager.allGraphIDs;
+		final ArrayList<Integer> checkedGraphIds = fTourChartConfig.getVisibleGraphs();
+		final ArrayList<Integer> enabledGraphIds = new ArrayList<Integer>();
 
 		// get all graph ids which can be displayed
 		for (final ChartDataSerie xyDataIterator : getChartDataModel().getXyData()) {
@@ -952,7 +951,7 @@ public class TourChart extends Chart {
 			}
 		}
 
-		for (int graphId : allGraphIds) {
+		for (final int graphId : allGraphIds) {
 
 			final TCActionProxy actionProxy = fActionProxies.get(getProxyId(graphId));
 
@@ -1058,7 +1057,7 @@ public class TourChart extends Chart {
 	 * Update the tour chart with the previous data and configuration
 	 * 
 	 * @param keepMinMaxValues
-	 *        <code>true</code> keeps the min/max values from the previous chart
+	 *            <code>true</code> keeps the min/max values from the previous chart
 	 */
 	public void updateTourChart(final boolean keepMinMaxValues) {
 		updateTourChartInternal(fTourData, fTourChartConfig, keepMinMaxValues, false);
@@ -1068,12 +1067,17 @@ public class TourChart extends Chart {
 	 * Update the tour chart with the previous data and configuration
 	 * 
 	 * @param keepMinMaxValues
-	 *        <code>true</code> keeps the min/max values from the previous chart
+	 *            <code>true</code> keeps the min/max values from the previous chart
 	 * @param isPropertyChanged
-	 *        when <code>true</code> the properties for the tour chart have changed
+	 *            when <code>true</code> the properties for the tour chart have changed
 	 */
-	public void updateTourChart(boolean keepMinMaxValues, boolean isPropertyChanged) {
+	public void updateTourChart(final boolean keepMinMaxValues, final boolean isPropertyChanged) {
 		updateTourChartInternal(fTourData, fTourChartConfig, keepMinMaxValues, isPropertyChanged);
+	}
+
+	public void updateTourChart(final TourData tourData, final boolean keepMinMaxValues) {
+		updateTourChartInternal(tourData, fTourChartConfig, keepMinMaxValues, false);
+
 	}
 
 	/**
@@ -1082,7 +1086,7 @@ public class TourChart extends Chart {
 	 * @param tourData
 	 * @param chartConfig
 	 * @param keepMinMaxValues
-	 *        <code>true</code> keeps the min/max values from the previous chart
+	 *            <code>true</code> keeps the min/max values from the previous chart
 	 */
 	public void updateTourChart(final TourData tourData,
 								final TourChartConfiguration chartConfig,
@@ -1094,7 +1098,7 @@ public class TourChart extends Chart {
 	private void updateTourChartInternal(	final TourData newTourData,
 											final TourChartConfiguration newChartConfig,
 											final boolean keepMinMaxValues,
-											boolean isPropertyChanged) {
+											final boolean isPropertyChanged) {
 
 		if (newTourData == null || newChartConfig == null) {
 			return;

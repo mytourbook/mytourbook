@@ -60,6 +60,13 @@ public class TourEditor extends EditorPart {
 	private boolean							fIsTourChanged			= false;
 	private boolean							fIsTourPropertyModified	= false;
 
+//	private boolean							fIsTagModified			= false;
+//	private boolean							fIsTagAddMode			= false;
+//	private boolean							fIsTagRemoveMode		= false;
+//
+//	private HashMap<Long, TourTag>			fAddedTags				= new HashMap<Long, TourTag>();
+//	private HashMap<Long, TourTag>			fRemovedTags			= new HashMap<Long, TourTag>();
+
 	private PostSelectionProvider			fPostSelectionProvider;
 	private ISelectionListener				fPostSelectionListener;
 	private IPartListener2					fPartListener;
@@ -69,6 +76,8 @@ public class TourEditor extends EditorPart {
 	private ActionHandlerRevertTourEditor	fRevertActionHandler;
 
 	private boolean							fIsRefTourCreated		= false;
+
+//	private Object[]						fClonedTourTags;
 
 	private void addPartListener() {
 
@@ -164,14 +173,36 @@ public class TourEditor extends EditorPart {
 
 					// check if the tour in the editor was modified
 					for (final Object object : modifiedTours) {
+
 						if (object instanceof TourData) {
-							if (((TourData) object).getTourId() == tourId) {
-								fTourChart.updateTourChart(true);
+							final TourData tourData = (TourData) object;
+
+							if (tourData.getTourId() == tourId) {
+								if (isDirty()) {
+
+									final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
+									modifiedTour.add(tourData);
+									if (TourManager.saveTourEditors(modifiedTour)) {
+										updateTourData(tourData);
+									}
+								} else {
+									updateTourData(tourData);
+								}
+
+								// exit here because only one tourdata can be inside a tour editor
 								return;
 							}
 						}
 					}
 				}
+			}
+
+			private void updateTourData(final TourData tourData) {
+
+				// keep changed data
+				fTourData = tourData;
+
+				fTourChart.updateTourChart(fTourData, true);
 			}
 		};
 
@@ -347,6 +378,36 @@ public class TourEditor extends EditorPart {
 	public void setRefTourIsCreated() {
 		fIsRefTourCreated = true;
 	}
+
+//	public void setTagIsModified(final TourTag tourTag, final boolean isAddMode) {
+//
+//		if (fIsTagModified == false) {
+//
+//			// clone original tags
+//
+//			final Set<TourTag> tourTags = fTourData.getTourTags();
+//			fClonedTourTags = tourTags.toArray();
+//
+//			fIsTagModified = true;
+//		}
+//
+////		fIsTagAddMode = fIsTagAddMode || isAddMode;
+////		fIsTagRemoveMode = fIsTagRemoveMode || isAddMode == false;
+////
+////		if (isAddMode) {
+////			fAddedTags.put(tourTag.getTagId(), tourTag);
+////		} else {
+////			fRemovedTags.put(tourTag.getTagId(), tourTag);
+////		}
+//	}
+
+//	public void setTagIsRemoved(final HashMap<Long, TourTag> removedTags) {
+//
+////		fIsTagModified = true;
+////		fIsTagRemoveMode = true;
+////
+////		fRemovedTags.putAll(removedTags);
+//	}
 
 	/**
 	 * Set the tour dirty

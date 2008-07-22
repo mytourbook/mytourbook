@@ -64,7 +64,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -908,31 +907,50 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 
 		// update table and create the tour segments in tour data
-		setTableInput();
+		reloadViewer();
 
 		fireSegmentLayerChanged();
 	}
 
 	public void recreateViewer() {
 
-		saveViewerSettings(fSessionMemento);
+		fViewerContainer.setRedraw(false);
+		{
+			fSegmentViewer.getTable().dispose();
+			
+			createSegmentViewer(fViewerContainer);
+			fViewerContainer.layout();
 
-		// dispose viewer
-		final Control[] children = fViewerContainer.getChildren();
-		for (int childIndex = 0; childIndex < children.length; childIndex++) {
-			children[childIndex].dispose();
+			// update the viewer
+			reloadViewer();
 		}
-
-		// recreate viewer
-		createSegmentViewer(fViewerContainer);
-
-		fViewerContainer.layout();
-
-		// update viewer content
-		setTableInput();
+		fViewerContainer.setRedraw(true);
 	}
 
-	public void reloadViewer() {}
+	public void reloadViewer() {
+		fSegmentViewer.setInput(new Object[0]);
+	}
+	
+//	public void recreateViewer() {
+//
+//		saveViewerSettings(fSessionMemento);
+//
+//		// dispose viewer
+//		final Control[] children = fViewerContainer.getChildren();
+//		for (int childIndex = 0; childIndex < children.length; childIndex++) {
+//			children[childIndex].dispose();
+//		}
+//
+//		// recreate viewer
+//		createSegmentViewer(fViewerContainer);
+//
+//		fViewerContainer.layout();
+//
+//		// update viewer content
+//		setTableInput();
+//	}
+//
+//	public void reloadViewer() {}
 
 	private void savePartSettings() {
 
@@ -960,9 +978,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fScaleTolerance.setFocus();
 	}
 
-	private void setTableInput() {
-		fSegmentViewer.setInput(this);
-	}
+//	private void setTableInput() {
+//		fSegmentViewer.setInput(new Object[0]);
+//	}
 
 	/**
 	 * when dp tolerance was changed set the tour dirty

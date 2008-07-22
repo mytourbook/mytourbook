@@ -866,10 +866,10 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 				final TourChart tourChart = selectionTourData.getTourChart();
 
-				// prevent loading the same tour
-				if (tourChart != null && fTourChart != null && fTourChart.getTourData() == tourData) {
-					return;
-				}
+//				// prevent loading the same tour
+//				if (tourChart != null && fTourChart != null && fTourChart.getTourData() == tourData) {
+//					return;
+//				}
 
 				fTourEditor = null;
 				fTourChart = tourChart;
@@ -887,12 +887,13 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
 
 			if (editor instanceof TourEditor) {
-
-				// prevent loading the same tour
 				final TourEditor tourEditor = (TourEditor) editor;
-				if (tourEditor == fTourEditor) {
-					return;
-				}
+
+//				// prevent loading the same tour
+//				// this is disabled because the data can be changed
+//				if (tourEditor == fTourEditor) {
+//					return;
+//				}
 
 				fTourEditor = tourEditor;
 				fTourChart = fTourEditor.getTourChart();

@@ -25,21 +25,15 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.TourEditor;
-import net.tourbook.tour.TourEditorInput;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ISelectedTours;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 
 /**
  * @author FC081647
@@ -217,106 +211,46 @@ public class TagManager {
 
 		final Runnable runnable = new Runnable() {
 
-			@SuppressWarnings("unchecked")
 			public void run() {
 
 				// get tours which tag should be changed
-				final ArrayList<TourData> modifiedTours = tourProvider.getSelectedTours();
-				if (modifiedTours == null || modifiedTours.size() == 0) {
+				final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+
+				if (selectedTours == null || selectedTours.size() == 0) {
 					return;
 				}
 
-				// update tours which are opened in an editor
-				final ArrayList<TourData> toursInEditor = updateEditors(modifiedTours, tourTag, isAddMode);
+				if (TourManager.saveTourEditors(selectedTours)) {
 
-				// get all tours which are not opened in an editor
-				final ArrayList<TourData> noneEditorTours = (ArrayList<TourData>) modifiedTours.clone();
-				noneEditorTours.removeAll(toursInEditor);
+					// add the tag in all tours (without tours which are opened in an editor)
+					for (final TourData tourData : selectedTours) {
 
-				// add the tag in all tours (without tours which are opened in an editor)
-				for (final TourData tourData : noneEditorTours) {
+						// set tag into tour
+						final Set<TourTag> tourTags = tourData.getTourTags();
 
-					updateTourData(tourData, tourTag, isAddMode);
+						if (isAddMode) {
+							// add tag to the tour
+							tourTags.add(tourTag);
+						} else {
+							// remove tag from tour
+							tourTags.remove(tourTag);
+						}
 
-					// save tour with modified tags
-					TourDatabase.saveTour(tourData);
+						// save tour with modified tags
+						TourDatabase.saveTour(tourData);
+					}
+
+					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
+
+					TourManager.firePropertyChange(TourManager.TOUR_TAGS_CHANGED, //
+							new ChangedTags(tourTag, selectedTours, isAddMode));
+
+					TagManager.addRecentTag(tourTag);
 				}
-
-				TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTours);
-
-				TourManager.firePropertyChange(TourManager.TOUR_TAGS_CHANGED, //
-						new ChangedTags(tourTag, modifiedTours, isAddMode));
-
-				TagManager.addRecentTag(tourTag);
 			}
 
 		};
 		BusyIndicator.showWhile(Display.getCurrent(), runnable);
-	}
-
-	/**
-	 * Update the tour type in tours which are opened in a tour editor
-	 * 
-	 * @param modifiedTours
-	 *            contains the tours where the tour type should be changed
-	 * @param isAddMode
-	 * @param tourTag
-	 * @return Returns the tours which are opened in a tour editor
-	 */
-	private static ArrayList<TourData> updateEditors(	final ArrayList<TourData> modifiedTours,
-														final TourTag tourTag,
-														final boolean isAddMode) {
-
-		final ArrayList<IEditorPart> editorParts = UI.getOpenedEditors();
-
-		// list for tours which are updated in the editor
-		final ArrayList<TourData> updatedTours = new ArrayList<TourData>();
-
-		// check if a tour is in an editor
-		for (final IEditorPart editorPart : editorParts) {
-			if (editorPart instanceof TourEditor) {
-
-				final IEditorInput editorInput = editorPart.getEditorInput();
-
-				if (editorInput instanceof TourEditorInput) {
-
-					final TourEditor tourEditor = (TourEditor) editorPart;
-					final long editorTourId = ((TourEditorInput) editorInput).getTourId();
-
-					for (final TourData tourData : modifiedTours) {
-						if (editorTourId == tourData.getTourId()) {
-
-							/*
-							 * a tour editor was found containing the current tour
-							 */
-
-							final TourData editorTourData = tourEditor.getTourChart().getTourData();
-
-							updateTourData(editorTourData, tourTag, isAddMode);
-
-							tourEditor.setTourPropertyIsModified();
-
-							// keep updated tours
-							updatedTours.add(tourData);
-						}
-					}
-				}
-			}
-		}
-
-		// show info that at least one tour is opened in a tour editor
-		if (fTourProvider.isFromTourEditor() == false && updatedTours.size() > 0) {
-
-			/*
-			 * don't show the message when the tour is from a tour editor
-			 */
-
-			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
-					Messages.action_tag_set_dlg_title,
-					Messages.action_tag_set_dlg_message);
-		}
-
-		return updatedTours;
 	}
 
 	/**
@@ -332,20 +266,6 @@ public class TagManager {
 			if (tourTag != null) {
 				recentTag.setTagName(tourTag.getTagName());
 			}
-		}
-	}
-
-	private static void updateTourData(final TourData tourData, final TourTag tourTag, final boolean isAddMode) {
-
-		// set tag into tour
-		final Set<TourTag> tourTags = tourData.getTourTags();
-
-		if (isAddMode) {
-			// add tag to the tour
-			tourTags.add(tourTag);
-		} else {
-			// remove tag from tour
-			tourTags.remove(tourTag);
 		}
 	}
 }
