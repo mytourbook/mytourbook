@@ -286,7 +286,7 @@ public class TourManager {
 			}
 		}
 
-		// editors must be saved when they contain a tour which will be modified
+		// tour editors must be saved when they contain a tour which will be modified
 		if (editorsToBeSaved.size() > 0) {
 
 			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), //

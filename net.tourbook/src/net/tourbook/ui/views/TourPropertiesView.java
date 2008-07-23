@@ -288,7 +288,6 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 //
 //					updateViewer();
 
-					
 					// measurement system has changed
 
 					UI.updateUnits();
@@ -298,7 +297,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 					defineViewerColumns(fDataViewerContainer);
 
 					recreateViewer();
-					
+
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 					// reload tour data
@@ -448,7 +447,8 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		scrolledContainer.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
-				scrolledContainer.setMinSize(locationContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+				// disabled because a long description text in one line is not wrapped
+//				scrolledContainer.setMinSize(locationContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
 
@@ -471,8 +471,12 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
 		fTextDescription = new Text(locationContainer, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
-		GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT,
-				pixelConverter.convertHeightInCharsToPixels(2)).applyTo(fTextDescription);
+		GridDataFactory//
+		.fillDefaults()
+				.grab(true, true)
+				.hint(SWT.DEFAULT, pixelConverter.convertHeightInCharsToPixels(2))
+				.applyTo(fTextDescription);
+		
 		fTextDescription.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(final KeyEvent e) {
@@ -953,7 +957,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 			fNumberFormatter.setMinimumFractionDigits(3);
 			fNumberFormatter.setMaximumFractionDigits(3);
 			fDataViewer.setInput(new Object());
-			
+
 			fDataViewer.setSelection(selection);
 		}
 		fDataViewerContainer.setRedraw(true);

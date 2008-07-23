@@ -346,17 +346,13 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 	private void createActions() {
 
-		fActionEditTour = new ActionEditTour(this);
-
-		fActionClearView = new ActionClearView(this);
-		fActionModifyColumns = new ActionModifyColumns(this);
+		// context menu
 		fActionSaveTour = new ActionSaveTourInDatabase(this);
 		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this);
-		fActionSetTourType = new ActionSetTourType(this);
+
+		fActionEditTour = new ActionEditTour(this);
 		fActionEditQuick = new ActionEditQuick(this);
-		fActionAdjustImportedYear = new ActionAdjustYear(this);
-		fActionMergeTours = new ActionMergeTours(this);
-		fActionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
+		fActionSetTourType = new ActionSetTourType(this);
 
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
@@ -365,6 +361,13 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
+		fActionClearView = new ActionClearView(this);
+
+		// view menu
+		fActionModifyColumns = new ActionModifyColumns(this);
+		fActionMergeTours = new ActionMergeTours(this);
+		fActionAdjustImportedYear = new ActionAdjustYear(this);
+		fActionDisableChecksumValidation = new ActionDisableChecksumValidation(this);
 	}
 
 	private void createChart() {
@@ -820,6 +823,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		}
 		fActionSaveTour.setEnabled(unsavedTours > 0);
 
+		fActionEditTour.setEnabled(selectedItems == 1 && savedTours == 1);
 		fActionEditQuick.setEnabled(selectedItems == 1 && savedTours == 1);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();

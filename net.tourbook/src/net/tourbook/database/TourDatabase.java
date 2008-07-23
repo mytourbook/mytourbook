@@ -20,6 +20,7 @@ import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -78,7 +79,7 @@ public class TourDatabase {
 	 */
 	private static final int					TOURBOOK_DB_VERSION							= 5;
 
-	private static final String					DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver"; //$NON-NLS-1$
+	private static final String					DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";				//$NON-NLS-1$
 	private static final String					DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
 
 	/*
@@ -151,8 +152,8 @@ public class TourDatabase {
 		System.setProperty("derby.system.home", fDatabasePath); //$NON-NLS-1$
 
 		// derby debug properties
-		//	System.setProperty("derby.language.logQueryPlan", "true"); //$NON-NLS-1$
-		//	System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
+//		System.setProperty("derby.language.logQueryPlan", "true"); //$NON-NLS-1$
+//		System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
 	}
 
 	class CustomMonitor extends ProgressMonitorDialog {
@@ -200,6 +201,55 @@ public class TourDatabase {
 		}
 
 		UI.getInstance().disposeTourTypeImages();
+	}
+
+	/**
+	 * Disable runtime statistics by putting this stagement after the result set was read
+	 * 
+	 * @param conn
+	 * @throws SQLException
+	 */
+	public static void disableRuntimeStatistic(final Connection conn) throws SQLException {
+
+		CallableStatement cs;
+
+		cs = conn.prepareCall("VALUES SYSCS_UTIL.SYSCS_GET_RUNTIMESTATISTICS()");
+		cs.execute();
+
+		// log runtime statistics
+		final ResultSet rs = cs.getResultSet();
+		while (rs.next()) {
+			System.out.println(rs.getString(1));
+		}
+
+		cs.close();
+
+		cs = conn.prepareCall("CALL SYSCS_UTIL.SYSCS_SET_RUNTIMESTATISTICS(0)");
+		cs.execute();
+		cs.close();
+
+		cs = conn.prepareCall("CALL SYSCS_UTIL.SYSCS_SET_STATISTICS_TIMING(0)");
+		cs.execute();
+		cs.close();
+	}
+
+	/**
+	 * Get runtime statistics by putting this stagement before the query is executed
+	 * 
+	 * @param conn
+	 * @throws SQLException
+	 */
+	public static void enableRuntimeStatistics(final Connection conn) throws SQLException {
+
+		CallableStatement cs;
+
+		cs = conn.prepareCall("CALL SYSCS_UTIL.SYSCS_SET_RUNTIMESTATISTICS(1)");
+		cs.execute();
+		cs.close();
+
+		cs = conn.prepareCall("CALL SYSCS_UTIL.SYSCS_SET_STATISTICS_TIMING(1)");
+		cs.execute();
+		cs.close();
 	}
 
 	/**
@@ -801,6 +851,17 @@ public class TourDatabase {
 		return true;
 	}
 
+//	public void closeConnectionPool() {
+//
+//		if (fPooledDataSource != null) {
+//			try {
+//				DataSources.destroy(fPooledDataSource);
+//			} catch (final SQLException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+
 	/**
 	 * Check if the server is available
 	 * 
@@ -906,17 +967,6 @@ public class TourDatabase {
 		}
 	}
 
-//	public void closeConnectionPool() {
-//
-//		if (fPooledDataSource != null) {
-//			try {
-//				DataSources.destroy(fPooledDataSource);
-//			} catch (final SQLException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
-
 	private boolean checkVersion(final IProgressMonitor monitor) {
 
 		if (fIsVersionChecked) {
@@ -966,6 +1016,41 @@ public class TourDatabase {
 			UI.showSQLException(e);
 		}
 		return true;
+	}
+
+	/**
+	 * Create index for {@link TourData} will dramatically improve performance
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createIndexTourDataV5(final Statement stmt) throws SQLException {
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.setLength(0);
+		sb.append("CREATE INDEX YearMonth"); //$NON-NLS-1$
+		sb.append(" ON " + TABLE_TOUR_DATA); //$NON-NLS-1$
+		sb.append(" (startYear, startMonth)"); //$NON-NLS-1$
+
+		stmt.addBatch(sb.toString());
+		System.out.println(sb.toString());
+
+		sb.setLength(0);
+		sb.append("CREATE INDEX TourType"); //$NON-NLS-1$
+		sb.append(" ON " + TABLE_TOUR_DATA); //$NON-NLS-1$
+		sb.append(" (tourType_typeId)"); //$NON-NLS-1$
+
+		stmt.addBatch(sb.toString());
+		System.out.println(sb.toString());
+
+		sb.setLength(0);
+		sb.append("CREATE INDEX TourPerson"); //$NON-NLS-1$
+		sb.append(" ON " + TABLE_TOUR_DATA); //$NON-NLS-1$
+		sb.append(" (tourPerson_personId)"); //$NON-NLS-1$
+
+		stmt.addBatch(sb.toString());
+		System.out.println(sb.toString());
 	}
 
 	/**
@@ -1175,6 +1260,8 @@ public class TourDatabase {
 				+ ("ALTER TABLE " + TABLE_TOUR_DATA) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + TABLE_TOUR_DATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (tourId)")); //$NON-NLS-1$
+
+		createIndexTourDataV5(stmt);
 	}
 
 	/**
@@ -1912,6 +1999,7 @@ public class TourDatabase {
 
 			createTableTourTag(statement);
 			createTableTourTagCategory(statement);
+			createIndexTourDataV5(statement);
 
 			statement.executeBatch();
 			statement.close();

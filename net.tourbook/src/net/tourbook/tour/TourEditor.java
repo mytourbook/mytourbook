@@ -60,12 +60,6 @@ public class TourEditor extends EditorPart {
 	private boolean							fIsTourChanged			= false;
 	private boolean							fIsTourPropertyModified	= false;
 
-//	private boolean							fIsTagModified			= false;
-//	private boolean							fIsTagAddMode			= false;
-//	private boolean							fIsTagRemoveMode		= false;
-//
-//	private HashMap<Long, TourTag>			fAddedTags				= new HashMap<Long, TourTag>();
-//	private HashMap<Long, TourTag>			fRemovedTags			= new HashMap<Long, TourTag>();
 
 	private PostSelectionProvider			fPostSelectionProvider;
 	private ISelectionListener				fPostSelectionListener;
@@ -77,7 +71,6 @@ public class TourEditor extends EditorPart {
 
 	private boolean							fIsRefTourCreated		= false;
 
-//	private Object[]						fClonedTourTags;
 
 	private void addPartListener() {
 
@@ -379,35 +372,6 @@ public class TourEditor extends EditorPart {
 		fIsRefTourCreated = true;
 	}
 
-//	public void setTagIsModified(final TourTag tourTag, final boolean isAddMode) {
-//
-//		if (fIsTagModified == false) {
-//
-//			// clone original tags
-//
-//			final Set<TourTag> tourTags = fTourData.getTourTags();
-//			fClonedTourTags = tourTags.toArray();
-//
-//			fIsTagModified = true;
-//		}
-//
-////		fIsTagAddMode = fIsTagAddMode || isAddMode;
-////		fIsTagRemoveMode = fIsTagRemoveMode || isAddMode == false;
-////
-////		if (isAddMode) {
-////			fAddedTags.put(tourTag.getTagId(), tourTag);
-////		} else {
-////			fRemovedTags.put(tourTag.getTagId(), tourTag);
-////		}
-//	}
-
-//	public void setTagIsRemoved(final HashMap<Long, TourTag> removedTags) {
-//
-////		fIsTagModified = true;
-////		fIsTagRemoveMode = true;
-////
-////		fRemovedTags.putAll(removedTags);
-//	}
 
 	/**
 	 * Set the tour dirty

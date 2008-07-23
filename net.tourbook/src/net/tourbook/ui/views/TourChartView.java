@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.ui.views;
 
 import java.util.ArrayList;
@@ -41,6 +40,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
@@ -100,6 +100,9 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		final ActionSetTourTag		fActionRemoveTag		= new ActionSetTourTag(this, false);
 		final ActionRemoveAllTags	fActionRemoveAllTags	= new ActionRemoveAllTags(this);
 
+		final ActionOpenPrefDialog	fActionOpenTagPrefs		= new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
+																	ITourbookPreferences.PREF_PAGE_TAGS);
+
 		public void fillBarChartContextMenu(final IMenuManager menuMgr,
 											final int hoveredBarSerieIndex,
 											final int hoveredBarValueIndex) {}
@@ -107,6 +110,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		public void fillContextMenu(final IMenuManager menuMgr) {
 
 			menuMgr.add(fActionQuickEdit);
+			menuMgr.add(fActionSetTourType);
 			menuMgr.add(fActionEditTour);
 
 			menuMgr.add(new Separator());
@@ -117,25 +121,28 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
 
 			menuMgr.add(new Separator());
-			menuMgr.add(fActionSetTourType);
+			menuMgr.add(fActionOpenTagPrefs);
 
 			/*
 			 * enable actions
 			 */
-			final boolean isEnabled = fTourData != null && fTourData.getTourPerson() != null;
+			final boolean isDataAvailable = fTourData != null && fTourData.getTourPerson() != null;
 
-			fActionQuickEdit.setEnabled(isEnabled);
-			fActionEditTour.setEnabled(isEnabled);
+			boolean isTagAvailable = false;
+			if (isDataAvailable) {
+				isTagAvailable = fTourData.getTourTags().size() > 0;
+			}
 
-			fActionAddTag.setEnabled(isEnabled);
-			fActionRemoveTag.setEnabled(isEnabled);
-			fActionRemoveAllTags.setEnabled(isEnabled);
+			fActionQuickEdit.setEnabled(isDataAvailable);
+			fActionEditTour.setEnabled(isDataAvailable);
+			fActionAddTag.setEnabled(isDataAvailable);
+			fActionRemoveTag.setEnabled(isDataAvailable && isTagAvailable);
+			fActionRemoveAllTags.setEnabled(isDataAvailable && isTagAvailable);
 
-			fActionSetTourType.setEnabled(isEnabled);
+			fActionSetTourType.setEnabled(isDataAvailable);
 
 			// enable actions for the recent tags
-			TagManager.enableRecentTagActions(isEnabled);
-
+			TagManager.enableRecentTagActions(isDataAvailable);
 		}
 
 		public void fillXSliderContextMenu(	final IMenuManager menuMgr,
@@ -379,7 +386,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		} else if (selection instanceof StructuredSelection) {
 
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-			
+
 			if (firstElement instanceof TVICatalogComparedTour) {
 
 				updateChart(((TVICatalogComparedTour) firstElement).getTourId());

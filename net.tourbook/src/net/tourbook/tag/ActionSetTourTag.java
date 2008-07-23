@@ -17,6 +17,7 @@ package net.tourbook.tag;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -268,6 +269,15 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 		});
 
 		return fMenu;
+	}
+
+	@Override
+	public void setEnabled(final boolean enabled) {
+
+		// ensure tags are available 
+		final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
+
+		super.setEnabled(enabled && allTags.size() > 0);
 	}
 
 }

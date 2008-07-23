@@ -90,13 +90,12 @@ public class TVITourBookMonth extends TVITourBookItem {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
+//			TourDatabase.enableRuntimeStatistics(conn);
+
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 			statement.setInt(1, yearItem.fTourYear);
 			statement.setInt(2, fTourMonth);
 			sqlFilter.setParameters(statement, 3);
-
-//			final long time = System.currentTimeMillis();
-//			System.out.println(System.currentTimeMillis() - time + "ms");
 
 			long lastTourId = -1;
 			ArrayList<Long> tagIds = null;
@@ -171,6 +170,8 @@ public class TVITourBookMonth extends TVITourBookItem {
 
 				lastTourId = tourId;
 			}
+
+//			TourDatabase.disableRuntimeStatistic(conn); 
 
 			conn.close();
 

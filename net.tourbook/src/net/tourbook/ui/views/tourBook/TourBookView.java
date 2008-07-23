@@ -19,18 +19,17 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Iterator;
-import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
+import net.tourbook.tag.TagCollection;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
@@ -124,26 +123,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	TourTypeFilter					fActiveTourTypeFilter;
 
 	public NumberFormat				fNF									= NumberFormat.getNumberInstance();
-
-//	private final RGB				fRGBYearFg							= new RGB(0, 0, 0);
-//
-//	private final RGB				fRGBYearBg							= new RGB(255, 251, 153);
-//	private final RGB				fRGBMonthFg							= new RGB(0, 0, 0);
-//
-//	private final RGB				fRGBMonthBg							= new RGB(255, 253, 191);
-//	private final RGB				fRGBTourFg							= new RGB(0, 0, 0);
-//
-//	private final RGB				fRGBTourBg							= new RGB(255, 255, 255);
-//	private Color					fColorYearFg;
-//
-//	private Color					fColorMonthFg;
-//	private Color					fColorTourFg;
-//	private Color					fColorYearBg;
-//
-//	private Color					fColorMonthBg;
-//	private Color					fColorTourBg;
-//	public Font						fFontNormal;
-//	public Font						fFontBold;
 
 	private ActionEditQuick			fActionEditQuick;
 
@@ -327,14 +306,19 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked")//$NON-NLS-1$
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
-					// get a clone of the modified tours because the tours are removed from the list
-					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) ((ArrayList<TourData>) propertyData).clone();
+//					// get a clone of the modified tours because the tours are removed from the list
+//					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) ((ArrayList<TourData>) propertyData).clone();
+//
+//					updateTourViewer(fRootItem, modifiedTours);
 
-					updateTourViewer(fRootItem, modifiedTours);
+					/*
+					 * it is possible that a tour type was modified and the tour is hidden or
+					 * displayed in the viewer because the filter could have been changed
+					 */
+					reloadViewer();
 
 				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
 
@@ -420,21 +404,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		reselectTourViewer();
 	}
-
-//	private void createResources() {
-//
-////		final Display display = Display.getCurrent();
-//
-////		fColorYearFg = new Color(display, fRGBYearFg);
-////		fColorYearBg = new Color(display, fRGBYearBg);
-////		fColorMonthFg = new Color(display, fRGBMonthFg);
-////		fColorMonthBg = new Color(display, fRGBMonthBg);
-////		fColorTourFg = new Color(display, fRGBTourFg);
-////		fColorTourBg = new Color(display, fRGBTourBg);
-////
-////		fFontNormal = JFaceResources.getFontRegistry().get(JFaceResources.DIALOG_FONT);
-////		fFontBold = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-//	}
 
 	private Control createTourViewer(final Composite parent) {
 
@@ -798,13 +767,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
-//		fColorYearFg.dispose();
-//		fColorYearBg.dispose();
-//		fColorMonthFg.dispose();
-//		fColorMonthBg.dispose();
-//		fColorTourFg.dispose();
-//		fColorTourBg.dispose();
-
 		super.dispose();
 	}
 
@@ -840,7 +802,9 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-		fActionAddTag.setEnabled(isTourSelected);
+		// add tag
+		final TagCollection rootTags = TourDatabase.getRootTags();
+		fActionAddTag.setEnabled(isTourSelected && rootTags.tourTags.size() > 0);
 
 		if (firstTour != null && tourItems == 1) {
 
@@ -981,17 +945,17 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	public void recreateViewer() {
 
-		final Object[] expandedElements = fTourViewer.getExpandedElements();
-		final ISelection selection = fTourViewer.getSelection();
-
 		fViewerContainer.setRedraw(false);
 		{
+			final Object[] expandedElements = fTourViewer.getExpandedElements();
+			final ISelection selection = fTourViewer.getSelection();
+
 			fTourViewer.getTree().dispose();
 
 			createTourViewer(fViewerContainer);
 			fViewerContainer.layout();
 
-			fTourViewer.setInput(new Object());
+			fTourViewer.setInput(fRootItem = new TVITourBookRoot(this));
 
 			fTourViewer.setExpandedElements(expandedElements);
 			fTourViewer.setSelection(selection);
@@ -999,16 +963,18 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fViewerContainer.setRedraw(true);
 	}
 
-	/**
-	 * reload the content of the tag viewer
-	 */
 	public void reloadViewer() {
+
 		final Tree tree = fTourViewer.getTree();
 		tree.setRedraw(false);
 		{
 			final Object[] expandedElements = fTourViewer.getExpandedElements();
+			final ISelection selection = fTourViewer.getSelection();
+
 			fTourViewer.setInput(fRootItem = new TVITourBookRoot(this));
+
 			fTourViewer.setExpandedElements(expandedElements);
+			fTourViewer.setSelection(selection);
 		}
 		tree.setRedraw(true);
 	}
@@ -1114,73 +1080,73 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fTourViewer.getControl().setFocus();
 	}
 
-	/**
-	 * !!!Recursive !!! update all tour items with the new tour type
-	 * 
-	 * @param rootItem
-	 * @param modifiedTours
-	 */
-	private void updateTourViewer(final TreeViewerItem parentItem, final ArrayList<TourData> modifiedTours) {
-
-		final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
-
-		if (children == null) {
-			return;
-		}
-
-		// loop: all children
-		for (final Object object : children) {
-			if (object instanceof TreeViewerItem) {
-
-				final TreeViewerItem treeItem = (TreeViewerItem) object;
-				if (treeItem instanceof TVITourBookTour) {
-
-					final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
-					final long tourItemId = tourItem.getTourId();
-
-					for (final TourData modifiedTourData : modifiedTours) {
-						if (modifiedTourData.getTourId().longValue() == tourItemId) {
-
-							// update tree item
-
-							final TourType tourType = modifiedTourData.getTourType();
-							if (tourType != null) {
-								tourItem.fTourTypeId = tourType.getTypeId();
-							}
-
-							// update item title
-							tourItem.fTourTitle = modifiedTourData.getTourTitle();
-
-							// update item tags
-							final Set<TourTag> tourTags = modifiedTourData.getTourTags();
-							final ArrayList<Long> tagIds;
-
-							tourItem.fTagIds = tagIds = new ArrayList<Long>();
-							for (final TourTag tourTag : tourTags) {
-								tagIds.add(tourTag.getTagId());
-							}
-
-							// update item in the viewer
-							fTourViewer.update(tourItem, null);
-
-							// modified tour exists only once in the viewer, remove modified tour
-							modifiedTours.remove(modifiedTourData);
-
-							break;
-						}
-					}
-
-					// optimize
-					if (modifiedTours.size() == 0) {
-						return;
-					}
-
-				} else {
-					// update children
-					updateTourViewer(treeItem, modifiedTours);
-				}
-			}
-		}
-	}
+//	/**
+//	 * !!!Recursive !!! update all tour items with the modified tour data
+//	 * 
+//	 * @param rootItem
+//	 * @param modifiedTours
+//	 */
+//	private void updateTourViewer(final TreeViewerItem parentItem, final ArrayList<TourData> modifiedTours) {
+//
+//		final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
+//
+//		if (children == null) {
+//			return;
+//		}
+//
+//		// loop: all children
+//		for (final Object object : children) {
+//			if (object instanceof TreeViewerItem) {
+//
+//				final TreeViewerItem treeItem = (TreeViewerItem) object;
+//				if (treeItem instanceof TVITourBookTour) {
+//
+//					final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
+//					final long tourItemId = tourItem.getTourId();
+//
+//					for (final TourData modifiedTourData : modifiedTours) {
+//						if (modifiedTourData.getTourId().longValue() == tourItemId) {
+//
+//							// update tree item
+//
+//							final TourType tourType = modifiedTourData.getTourType();
+//							if (tourType != null) {
+//								tourItem.fTourTypeId = tourType.getTypeId();
+//							}
+//
+//							// update item title
+//							tourItem.fTourTitle = modifiedTourData.getTourTitle();
+//
+//							// update item tags
+//							final Set<TourTag> tourTags = modifiedTourData.getTourTags();
+//							final ArrayList<Long> tagIds;
+//
+//							tourItem.fTagIds = tagIds = new ArrayList<Long>();
+//							for (final TourTag tourTag : tourTags) {
+//								tagIds.add(tourTag.getTagId());
+//							}
+//
+//							// update item in the viewer
+//							fTourViewer.update(tourItem, null);
+//
+//							// modified tour exists only once in the viewer, remove modified tour
+//							modifiedTours.remove(modifiedTourData);
+//
+//							break;
+//						}
+//					}
+//
+//					// optimize
+//					if (modifiedTours.size() == 0) {
+//						return;
+//					}
+//
+//				} else {
+//					// update children
+//					updateTourViewer(treeItem, modifiedTours);
+//				}
+//			}
+//		}
+//	}
 
 }

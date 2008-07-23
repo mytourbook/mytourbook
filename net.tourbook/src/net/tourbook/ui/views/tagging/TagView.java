@@ -1121,11 +1121,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	public void recreateViewer() {
 
-		final Object[] expandedElements = fTagViewer.getExpandedElements();
-		final ISelection selection = fTagViewer.getSelection();
-
 		fViewerContainer.setRedraw(false);
 		{
+			final Object[] expandedElements = fTagViewer.getExpandedElements();
+			final ISelection selection = fTagViewer.getSelection();
+
 			fTagViewer.getTree().dispose();
 
 			createTagViewer(fViewerContainer);
@@ -1145,11 +1145,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	 */
 	public void reloadViewer() {
 
-		final Object[] expandedElements = fTagViewer.getExpandedElements();
-
 		final Tree tree = fTagViewer.getTree();
 		tree.setRedraw(false);
 		{
+			final Object[] expandedElements = fTagViewer.getExpandedElements();
+
 			fTagViewer.setInput(fRootItem = new TVITagViewRoot(this, fTagViewLayout));
 			fTagViewer.setExpandedElements(expandedElements);
 		}
@@ -1428,17 +1428,10 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 							// update item in the viewer
 							fTagViewer.update(tourItem, null);
 
-							// modified tour exists only once in the viewer, remove modified tour
-//							modifiedTours.remove(modifiedTourData);
-
+							// a tour exists only once as a child in a tree item
 							break;
 						}
 					}
-
-					// optimize
-//					if (modifiedTours.size() == 0) {
-//						return;
-//					}
 
 				} else {
 					// update children

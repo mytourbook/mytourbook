@@ -21,14 +21,11 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourEditor;
-import net.tourbook.tour.TourEditorInput;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
@@ -38,8 +35,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 
 public class ActionSetTourType extends Action implements IMenuCreator {
 
@@ -66,96 +61,35 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 
 			final Runnable runnable = new Runnable() {
 
-				@SuppressWarnings("unchecked")
 				public void run() {
 
 					// get tours which tour type should be changed
 					final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
 
-					if (selectedTours == null) {
+					if (selectedTours == null || selectedTours.size() == 0) {
 						return;
 					}
 
-					// update tours which are opened in an editor
-					final ArrayList<TourData> toursInEditor = updateEditors(selectedTours);
+					if (TourManager.saveTourEditors(selectedTours)) {
 
-					// get all tours which are not opened in an editor
-					final ArrayList<TourData> saveTours = (ArrayList<TourData>) selectedTours.clone();
-					saveTours.removeAll(toursInEditor);
+						// add the tag in all tours (without tours which are opened in an editor)
+						for (final TourData tourData : selectedTours) {
 
-					// update all tours (without tours from an editor) with the new tour type
-					for (final TourData tourData : saveTours) {
+							// set tour type
+							tourData.setTourType(fTourType);
 
-						// set+save the tour type
-						tourData.setTourType(fTourType);
-						TourDatabase.saveTour(tourData);
+							// save tour with modified tags
+							TourDatabase.saveTour(tourData);
+						}
+
+						TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
 					}
-
-					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
 				}
 			};
 
 			BusyIndicator.showWhile(Display.getCurrent(), runnable);
 		}
 
-		/**
-		 * Update the tour type in tours which are opened in a tour editor
-		 * 
-		 * @param selectedTours
-		 *        contains the tours where the tour type should be changed
-		 * @return Returns the tours which are opened in a tour editor
-		 */
-		private ArrayList<TourData> updateEditors(final ArrayList<TourData> selectedTours) {
-
-			final ArrayList<IEditorPart> editorParts = UI.getOpenedEditors();
-
-			// list for tours which are updated in the editor
-			final ArrayList<TourData> updatedTours = new ArrayList<TourData>();
-
-			// check if a tour is in an editor
-			for (final IEditorPart editorPart : editorParts) {
-				if (editorPart instanceof TourEditor) {
-
-					final IEditorInput editorInput = editorPart.getEditorInput();
-
-					if (editorInput instanceof TourEditorInput) {
-
-						final TourEditor tourEditor = (TourEditor) editorPart;
-						final long editorTourId = ((TourEditorInput) editorInput).getTourId();
-
-						for (final TourData tourData : selectedTours) {
-							if (editorTourId == tourData.getTourId()) {
-
-								/*
-								 * a tour editor was found containing the current tour
-								 */
-
-								tourEditor.getTourChart().getTourData().setTourType(fTourType);
-
-								tourEditor.setTourPropertyIsModified();
-
-								// keep updated tours
-								updatedTours.add(tourData);
-							}
-						}
-					}
-				}
-			}
-
-			// show info that at least one tour is opened in a tour editor
-			if (fTourProvider.isFromTourEditor() == false && updatedTours.size() > 0) {
-
-				/*
-				 * don't show the message when the tour is from a tour editor
-				 */
-
-				MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
-						Messages.App_Action_set_tour_type_dlg_title,
-						Messages.App_Action_set_tour_type_dlg_message);
-			}
-
-			return updatedTours;
-		}
 	}
 
 	public ActionSetTourType(final ISelectedTours tourProvider) {

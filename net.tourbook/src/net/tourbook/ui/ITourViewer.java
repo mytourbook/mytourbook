@@ -44,7 +44,7 @@ public interface ITourViewer {
 	void recreateViewer();
 
 	/**
-	 * Reloads the viewer completely
+	 * Reloads the viewer by setting the input, this handels structural changes
 	 */
 	void reloadViewer();
 

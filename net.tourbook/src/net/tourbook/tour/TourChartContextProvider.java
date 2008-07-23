@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -23,25 +23,36 @@ import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.ActionRemoveAllTags;
+import net.tourbook.tag.ActionSetTourTag;
+import net.tourbook.tag.TagManager;
+import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Display;
 
 public class TourChartContextProvider implements IChartContextProvider, ISelectedTours {
 
-	public ChartXSlider			fSlider;
+	public ChartXSlider				fSlider;
 
-	private MarkerDialog		fMarkerDialog;
-	private TourEditor			fTourEditor;
+	private MarkerDialog			fMarkerDialog;
+	private TourEditor				fTourEditor;
 
-	private ActionSetTourType	fActionSetTourType;
-	private ActionEditQuick		fActionEditQuick;
+	private ActionSetTourType		fActionSetTourType;
+	private ActionEditQuick			fActionQuickEdit;
+
+	private ActionSetTourTag		fActionAddTag;
+	private ActionSetTourTag		fActionRemoveTag;
+	private ActionRemoveAllTags		fActionRemoveAllTags;
+
+	private ActionOpenPrefDialog	fActionOpenTagPrefs;
 
 	/**
 	 * add a new reference tour to all reference tours
@@ -54,33 +65,24 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 
 		@Override
 		public void run() {
-
 			ReferenceTourManager.getInstance().addReferenceTour(fTourEditor);
-
-//			if (refTour != null) {
-//
-//				SelectionNewRefTours selection = new SelectionNewRefTours();
-//				selection.newRefTours.add(refTour);
-//
-//				fTourEditor.firePostSelection(selection);
-//			}
 		}
 	}
 
 	class SliderAction extends Action {
 
-		SliderAction(String text, ChartXSlider slider) {
+		SliderAction(final String text, final ChartXSlider slider) {
 			super(text);
 
 			fSlider = slider;
 		}
 
-		private TourMarker createTourMarker(TourData tourData) {
+		private TourMarker createTourMarker(final TourData tourData) {
 
-			int serieIndex = fSlider.getValuesIndex();
+			final int serieIndex = fSlider.getValuesIndex();
 
 			// create a new marker
-			TourMarker newTourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_CUSTOM);
+			final TourMarker newTourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_CUSTOM);
 			newTourMarker.setSerieIndex(serieIndex);
 			newTourMarker.setDistance(tourData.getMetricDistanceSerie()[serieIndex]);
 			newTourMarker.setTime(tourData.timeSerie[serieIndex]);
@@ -98,7 +100,7 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 				final TourChart tourChart = fTourEditor.getTourChart();
 				final TourData tourData = tourChart.getTourData();
 
-				TourMarker newTourMarker = createTourMarker(tourData);
+				final TourMarker newTourMarker = createTourMarker(tourData);
 
 				final MarkerDialog markerDialog = new MarkerDialog(Display.getCurrent().getActiveShell(),
 						tourData,
@@ -125,26 +127,35 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 
 			} else if (fMarkerDialog != null) {
 
-				TourMarker newTourMarker = createTourMarker(fMarkerDialog.getTourData());
+				final TourMarker newTourMarker = createTourMarker(fMarkerDialog.getTourData());
 
 				fMarkerDialog.addTourMarker(newTourMarker);
 			}
 		}
 	}
 
-	public TourChartContextProvider(MarkerDialog markerDialog) {
+	public TourChartContextProvider(final MarkerDialog markerDialog) {
 		fMarkerDialog = markerDialog;
 	}
 
-	public TourChartContextProvider(TourEditor tourEditor) {
+	public TourChartContextProvider(final TourEditor tourEditor) {
 
 		fTourEditor = tourEditor;
 
-		fActionEditQuick = new ActionEditQuick(this);
+		fActionQuickEdit = new ActionEditQuick(this);
 		fActionSetTourType = new ActionSetTourType(this);
+
+		fActionAddTag = new ActionSetTourTag(this, true);
+		fActionRemoveTag = new ActionSetTourTag(this, false);
+		fActionRemoveAllTags = new ActionRemoveAllTags(this);
+
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
+				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 
-	private void createMarkerMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider) {
+	private void createMarkerMenu(	final IMenuManager menuMgr,
+									final ChartXSlider leftSlider,
+									final ChartXSlider rightSlider) {
 
 		if (leftSlider != null || rightSlider != null) {
 
@@ -158,21 +169,61 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 		}
 	}
 
-	public void fillBarChartContextMenu(IMenuManager menuMgr, int hoveredBarSerieIndex, int hoveredBarValueIndex) {}
+	/**
+	 * enable actions for the tour editor
+	 */
+	private void enableActions() {
+		final TourChart tourChart = fTourEditor.getTourChart();
+		final TourData tourData = tourChart.getTourData();
 
-	public void fillContextMenu(IMenuManager menuMgr) {
+		final boolean isDataAvailable = tourData != null && tourData.getTourPerson() != null;
 
-		if (fActionSetTourType != null) {
+		boolean isTagAvailable = false;
+		if (isDataAvailable) {
+			isTagAvailable = tourData.getTourTags().size() > 0;
+		}
 
-			menuMgr.add(fActionEditQuick);
+		fActionQuickEdit.setEnabled(isDataAvailable);
+		fActionSetTourType.setEnabled(TourDatabase.getTourTypes().size() > 0);
 
-			ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
-			fActionSetTourType.setEnabled(tourTypes.size() > 0);
+		fActionAddTag.setEnabled(isDataAvailable);
+		fActionRemoveTag.setEnabled(isDataAvailable && isTagAvailable);
+		fActionRemoveAllTags.setEnabled(isDataAvailable && isTagAvailable);
+
+		fActionSetTourType.setEnabled(isDataAvailable);
+
+		// enable actions for the recent tags
+		TagManager.enableRecentTagActions(isDataAvailable);
+	}
+
+	public void fillBarChartContextMenu(final IMenuManager menuMgr,
+										final int hoveredBarSerieIndex,
+										final int hoveredBarValueIndex) {}
+
+	public void fillContextMenu(final IMenuManager menuMgr) {
+
+		if (fTourEditor != null) {
+
+			menuMgr.add(fActionQuickEdit);
 			menuMgr.add(fActionSetTourType);
+
+			menuMgr.add(new Separator());
+			menuMgr.add(fActionAddTag);
+			menuMgr.add(fActionRemoveTag);
+			menuMgr.add(fActionRemoveAllTags);
+
+			TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
+
+			menuMgr.add(new Separator());
+			menuMgr.add(fActionOpenTagPrefs);
+
+			enableActions();
 		}
 	}
 
-	public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider) {
+	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
+										final ChartXSlider leftSlider,
+										final ChartXSlider rightSlider) {
 
 		if (fTourEditor != null) {
 
@@ -203,7 +254,7 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 
 	public ArrayList<TourData> getSelectedTours() {
 
-		ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
 		selectedTourData.add(fTourEditor.getTourChart().getTourData());
 		return selectedTourData;
 
