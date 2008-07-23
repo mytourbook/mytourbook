@@ -3,7 +3,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/antlr-2.7.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/asm.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/asm-attrs.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/c3p0-0.9.1.jar" sourcepath="L:/java-resources/c3p0/c3p0-0.9.1.src"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/c3p0-0.9.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/cglib-2.1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/commons-collections-2.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/commons-logging-1.0.4.jar" sourcepath="M:/source/commons-logging-1.0.4/commons-logging-1.0.4-src/src/java"/>
