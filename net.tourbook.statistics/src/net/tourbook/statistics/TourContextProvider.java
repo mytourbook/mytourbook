@@ -16,7 +16,6 @@
 /**
  * 
  */
-
 package net.tourbook.statistics;
 
 import java.util.ArrayList;
@@ -25,14 +24,15 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
 
@@ -55,7 +55,9 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 	private final ActionSetTourType		fActionSetTourType;
 	private final ActionSetTourTag		fActionAddTag;
 	private final ActionSetTourTag		fActionRemoveTag;
-	private ActionRemoveAllTags			fActionRemoveAllTags;
+
+	private final ActionRemoveAllTags	fActionRemoveAllTags;
+	private final ActionOpenPrefDialog	fActionOpenTagPrefs;
 
 	private class ActionEditTour extends Action {
 
@@ -105,16 +107,42 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
+
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(net.tourbook.Messages.action_tag_open_tagging_structure,
+				ITourbookPreferences.PREF_PAGE_TAGS);
+
+	}
+
+	private void enableActions(final boolean isTourHovered) {
+
+		boolean isTagAvailable = false;
+		final Long selectedTourId = fBarSelectionProvider.getSelectedTourId();
+		if (selectedTourId != null) {
+			final TourData tourData = TourManager.getInstance().getTourData(selectedTourId);
+			if (tourData != null) {
+				isTagAvailable = tourData.getTourTags().size() > 0;
+			}
+		}
+
+		fActionEditQuick.setEnabled(isTourHovered);
+		fActionSetTourType.setEnabled(isTourHovered && TourDatabase.getTourTypes().size() > 0);
+		fActionEditTour.setEnabled(isTourHovered);
+
+		fActionAddTag.setEnabled(isTourHovered);
+		fActionRemoveTag.setEnabled(isTourHovered && isTagAvailable);
+		fActionRemoveAllTags.setEnabled(isTourHovered && isTagAvailable);
+
+		// enable actions for the recent tags
+		TagManager.enableRecentTagActions(isTourHovered);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
 										final int hoveredBarSerieIndex,
 										final int hoveredBarValueIndex) {
 
-		final boolean isTourHovered = hoveredBarSerieIndex != -1;
-
-		menuMgr.add(fActionEditTour);
 		menuMgr.add(fActionEditQuick);
+		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionEditTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionAddTag);
@@ -124,20 +152,9 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionOpenTagPrefs);
 
-		fActionEditQuick.setEnabled(isTourHovered);
-		fActionEditTour.setEnabled(isTourHovered);
-
-		fActionAddTag.setEnabled(isTourHovered);
-		fActionRemoveTag.setEnabled(isTourHovered);
-
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
-		fActionSetTourType.setEnabled(isTourHovered && tourTypes.size() > 0);
-
-// disabled because it shows the wrong month		
-//		menuMgr.add(new Separator());
-//		menuMgr.add(new ActionZoomIntoMonth(Messages.ACTION_ZOOM_INTO_MONTH));
+		enableActions(hoveredBarSerieIndex != -1);
 	}
 
 	public void fillContextMenu(final IMenuManager menuMgr) {}
@@ -149,14 +166,14 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 	public ArrayList<TourData> getSelectedTours() {
 
 		final Long selectedTourId = fBarSelectionProvider.getSelectedTourId();
-
 		if (selectedTourId != null) {
 
 			final TourData tourData = TourManager.getInstance().getTourData(selectedTourId);
-
 			if (tourData != null) {
+
 				final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
 				selectedTourData.add(tourData);
+
 				return selectedTourData;
 			}
 		}
