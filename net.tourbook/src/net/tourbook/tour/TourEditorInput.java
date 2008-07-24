@@ -23,7 +23,7 @@ import org.eclipse.ui.IPersistableElement;
 /**
  * @author: Wolfgang Schramm
  * 
- * <pre>
+ *          <pre>
  * created: 6th July 2007
  * </pre>
  */
@@ -32,12 +32,12 @@ public class TourEditorInput implements IEditorInput, IPersistableElement {
 	private long	fTourId;
 	String			fEditorTitle;
 
-	public TourEditorInput(long tourId) {
+	public TourEditorInput(final long tourId) {
 		fTourId = tourId;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 
 		/*
 		 * check if the tour is already open
@@ -57,8 +57,8 @@ public class TourEditorInput implements IEditorInput, IPersistableElement {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
-	public Object getAdapter(Class adapter) {
+	@SuppressWarnings("unchecked")
+	public Object getAdapter(final Class adapter) {
 		return null;
 	}
 
@@ -77,7 +77,6 @@ public class TourEditorInput implements IEditorInput, IPersistableElement {
 	/*
 	 * this method is necessary that the editor input is saved when the editor is closed so that the
 	 * editor can be restored
-	 * 
 	 * @see org.eclipse.ui.IEditorInput#getPersistable()
 	 */
 	public IPersistableElement getPersistable() {
@@ -92,7 +91,7 @@ public class TourEditorInput implements IEditorInput, IPersistableElement {
 		return fTourId;
 	}
 
-	public void saveState(IMemento memento) {
+	public void saveState(final IMemento memento) {
 		TourEditorInputFactory.saveState(memento, this);
 	}
 

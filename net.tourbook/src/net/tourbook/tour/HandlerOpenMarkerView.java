@@ -27,9 +27,9 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class HandlerOpenMarkerView extends AbstractHandler {
 
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+		final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		if (window == null) {
 			return null;
 		}
@@ -39,7 +39,7 @@ public class HandlerOpenMarkerView extends AbstractHandler {
 
 				window.getActivePage().showView(TourMarkerView.ID);
 
-			} catch (PartInitException e) {
+			} catch (final PartInitException e) {
 				MessageDialog.openError(window.getShell(), "Error", "Error opening view:" //$NON-NLS-1$ //$NON-NLS-2$
 						+ e.getMessage());
 			}

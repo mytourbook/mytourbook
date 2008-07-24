@@ -25,7 +25,7 @@ public class ActionSynchChartScale extends Action {
 
 	private final StatisticContainer	fStatContainer;
 
-	public ActionSynchChartScale(StatisticContainer container) {
+	public ActionSynchChartScale(final StatisticContainer container) {
 
 		super("", AS_CHECK_BOX); //$NON-NLS-1$
 

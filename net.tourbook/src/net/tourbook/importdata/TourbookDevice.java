@@ -72,9 +72,9 @@ public abstract class TourbookDevice implements IRawDataReader {
 	 * received data are correct for this device
 	 * 
 	 * @param byteIndex
-	 * 		index in the byte stream, this will be incremented when the return value is true
+	 *            index in the byte stream, this will be incremented when the return value is true
 	 * @param newByte
-	 * 		received byte
+	 *            received byte
 	 * @return Return <code>true</code> when the receice data are correct for this device
 	 */
 	public abstract boolean checkStartSequence(int byteIndex, int newByte);
@@ -82,7 +82,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 	/**
 	 * @param portName
 	 * @return returns the serial port parameters which are use to receive data from the device or
-	 * 	<code>null</code> when data transfer from a device is not supported
+	 *         <code>null</code> when data transfer from a device is not supported
 	 */
 	public abstract SerialParameters getPortParameters(String portName);
 

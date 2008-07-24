@@ -21,7 +21,7 @@ public class ActionShowSliderInLegend extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionShowSliderInLegend(MappingView mapView) {
+	public ActionShowSliderInLegend(final MappingView mapView) {
 
 		super(Messages.map_action_show_slider_in_legend, AS_CHECK_BOX);
 

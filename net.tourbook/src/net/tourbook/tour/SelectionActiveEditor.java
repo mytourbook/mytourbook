@@ -25,7 +25,7 @@ public class SelectionActiveEditor implements ISelection {
 
 	private final IEditorPart	fEditorPart;
 
-	public SelectionActiveEditor(IEditorPart activeEditor) {
+	public SelectionActiveEditor(final IEditorPart activeEditor) {
 		fEditorPart = activeEditor;
 	}
 

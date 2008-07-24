@@ -37,7 +37,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 
 	private ToolBarManager	fTBM;
 
-	public ActionChartOptions(TourChart tourChart, ToolBarManager tbm) {
+	public ActionChartOptions(final TourChart tourChart, final ToolBarManager tbm) {
 
 		super(null, Action.AS_DROP_DOWN_MENU);
 
@@ -51,7 +51,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 	}
 
 	@Override
-	public void runWithEvent(Event event) {
+	public void runWithEvent(final Event event) {
 
 		// show the drop-down menu, this only works in the runWithEvent not in the run method
 		getMenuCreator().getMenu(fTBM.getControl()).setVisible(true);
@@ -64,7 +64,7 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		}
 	}
 
-	public Menu getMenu(Control parent) {
+	public Menu getMenu(final Control parent) {
 
 		final Map<String, TCActionProxy> actionProxies = fTourChart.fActionProxies;
 
@@ -79,12 +79,12 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		return fMenu;
 	}
 
-	private void addItem(Action action) {
-		ActionContributionItem item = new ActionContributionItem(action);
+	private void addItem(final Action action) {
+		final ActionContributionItem item = new ActionContributionItem(action);
 		item.fill(fMenu, -1);
 	}
 
-	public Menu getMenu(Menu parent) {
+	public Menu getMenu(final Menu parent) {
 		return null;
 	}
 

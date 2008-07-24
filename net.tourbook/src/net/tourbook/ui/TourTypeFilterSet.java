@@ -37,7 +37,7 @@ public class TourTypeFilterSet {
 		return fTourTypes;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.fName = name;
 	}
 
@@ -46,7 +46,7 @@ public class TourTypeFilterSet {
 	 * 
 	 * @param objects
 	 */
-	public void setTourTypes(Object[] objects) {
+	public void setTourTypes(final Object[] objects) {
 		fTourTypes = objects;
 	}
 }

@@ -27,7 +27,7 @@ public class MapProvider extends DefaultTileFactory {
 	 */
 	private boolean	fCanBeToggled	= false;
 
-	public MapProvider(TileFactory tileFactory, Projection projection) {
+	public MapProvider(final TileFactory tileFactory, final Projection projection) {
 		super(tileFactory.getInfo());
 		this.projection = projection;
 	}
@@ -36,7 +36,7 @@ public class MapProvider extends DefaultTileFactory {
 		return fCanBeToggled;
 	}
 
-	void setCanBeToggled(boolean canBeToggled) {
+	void setCanBeToggled(final boolean canBeToggled) {
 		fCanBeToggled = canBeToggled;
 	}
 

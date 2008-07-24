@@ -27,15 +27,15 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
 	static final String			PERSPECTIVE_ID			= "net.tourbook.perspective.TourBook";	//$NON-NLS-1$
 
-	private static final String	FOLDER_ID_CHART			= "chart"; //$NON-NLS-1$
-	private static final String	FOLDER_ID_STATISTICS	= "stat"; //$NON-NLS-1$
-	private static final String	FOLDER_ID_LIST			= "list"; //$NON-NLS-1$
+	private static final String	FOLDER_ID_CHART			= "chart";								//$NON-NLS-1$
+	private static final String	FOLDER_ID_STATISTICS	= "stat";								//$NON-NLS-1$
+	private static final String	FOLDER_ID_LIST			= "list";								//$NON-NLS-1$
 
-	public void createInitialLayout(IPageLayout layout) {
+	public void createInitialLayout(final IPageLayout layout) {
 
 		//--------------------------------------------------------------------------------
 
-		IFolderLayout listFolder = layout.createFolder(FOLDER_ID_LIST,
+		final IFolderLayout listFolder = layout.createFolder(FOLDER_ID_LIST,
 				IPageLayout.LEFT,
 				0.4f,
 				IPageLayout.ID_EDITOR_AREA);
@@ -44,7 +44,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		IFolderLayout markerFolder = layout.createFolder(FOLDER_ID_STATISTICS,
+		final IFolderLayout markerFolder = layout.createFolder(FOLDER_ID_STATISTICS,
 				IPageLayout.BOTTOM,
 				0.7f,
 				FOLDER_ID_LIST);
@@ -53,7 +53,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
 		//--------------------------------------------------------------------------------
 
-		IFolderLayout chartFolder = layout.createFolder(FOLDER_ID_CHART,
+		final IFolderLayout chartFolder = layout.createFolder(FOLDER_ID_CHART,
 				IPageLayout.TOP,
 				0.5f,
 				IPageLayout.ID_EDITOR_AREA);

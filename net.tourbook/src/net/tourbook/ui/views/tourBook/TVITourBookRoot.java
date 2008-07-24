@@ -45,18 +45,18 @@ public class TVITourBookRoot extends TVITourBookItem {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append(" SELECT"); //						$NON-NLS-1$ //$NON-NLS-1$
+		sb.append(" SELECT"); //						 //$NON-NLS-1$
 
-		sb.append(" startYear,"); //		1			$NON-NLS-1$ //$NON-NLS-1$
+		sb.append(" startYear,"); //		1			 //$NON-NLS-1$
 		sb.append(SQL_SUM_COLUMNS); //		2
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE); //$NON-NLS-1$ 
 
-		sb.append(" WHERE 1=1"); //					$NON-NLS-1$ //$NON-NLS-1$
+		sb.append(" WHERE 1=1"); //					//$NON-NLS-1$
 		sb.append(sqlFilter.getWhereClause());
 
-		sb.append(" GROUP BY startYear"); //			$NON-NLS-1$ //$NON-NLS-1$
-		sb.append(" ORDER BY startYear"); //			$NON-NLS-1$ //$NON-NLS-1$
+		sb.append(" GROUP BY startYear"); //			//$NON-NLS-1$
+		sb.append(" ORDER BY startYear"); //			//$NON-NLS-1$
 
 		try {
 

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
@@ -447,9 +446,7 @@ public class StatisticContainer extends Composite {
 		selectActiveYear();
 
 		// tell all existing statistics the data have changed
-		for (final Iterator<TourbookStatistic> iter = fStatistics.iterator(); iter.hasNext();) {
-
-			final TourbookStatistic statistic = iter.next();
+		for (final TourbookStatistic statistic : fStatistics) {
 
 			if (statistic.getControl() != null) {
 				if (statistic instanceof IYearStatistic) {

@@ -21,7 +21,7 @@ public class ActionSetDefaultPosition extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionSetDefaultPosition(MappingView mapView) {
+	public ActionSetDefaultPosition(final MappingView mapView) {
 
 		super(Messages.map_action_set_default_position, AS_PUSH_BUTTON);
 

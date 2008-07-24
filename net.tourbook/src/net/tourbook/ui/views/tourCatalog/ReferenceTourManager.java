@@ -61,10 +61,10 @@ public class ReferenceTourManager {
 	 * 
 	 * @param tourEditor
 	 */
-	public TourReference addReferenceTour(TourEditor tourEditor) {
+	public TourReference addReferenceTour(final TourEditor tourEditor) {
 
 		// get the reference tour name
-		InputDialog dialog = new InputDialog(Display.getCurrent().getActiveShell(),
+		final InputDialog dialog = new InputDialog(Display.getCurrent().getActiveShell(),
 				Messages.tourCatalog_view_dlg_add_reference_tour_title,
 				Messages.tourCatalog_view_dlg_add_reference_tour_msg,
 				"", //$NON-NLS-1$
@@ -74,12 +74,12 @@ public class ReferenceTourManager {
 			return null;
 		}
 
-		TourChart tourChart = tourEditor.getTourChart();
-		SelectionChartInfo chartInfo = tourChart.getChartInfo();
-		TourData tourData = tourChart.getTourData();
+		final TourChart tourChart = tourEditor.getTourChart();
+		final SelectionChartInfo chartInfo = tourChart.getChartInfo();
+		final TourData tourData = tourChart.getTourData();
 
 		// create new tour reference
-		TourReference newTourReference = new TourReference(dialog.getValue(),
+		final TourReference newTourReference = new TourReference(dialog.getValue(),
 				tourData,
 				chartInfo.leftSliderValuesIndex,
 				chartInfo.rightSliderValuesIndex);
@@ -98,7 +98,7 @@ public class ReferenceTourManager {
 	 * loaded from the database
 	 * 
 	 * @param refId
-	 *        Reference Id
+	 *            Reference Id
 	 * @return
 	 */
 	public TourCompareConfig getTourCompareConfig(final long refId) {
@@ -127,8 +127,8 @@ public class ReferenceTourManager {
 
 			final TourChartConfiguration compTourchartConfig = TourManager.createTourChartConfiguration();
 
-			final ChartDataModel chartDataModel = TourManager.getInstance()
-					.createChartDataModel(refTourData, refTourChartConfig);
+			final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(refTourData,
+					refTourChartConfig);
 
 			compareConfig = new TourCompareConfig(refTour,
 					chartDataModel,
@@ -150,7 +150,7 @@ public class ReferenceTourManager {
 
 		List<?> referenceTours = null;
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
 

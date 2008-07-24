@@ -26,17 +26,17 @@ public class TreeColumnDefinition extends ColumnDefinition {
 
 	/**
 	 * @param columnId
-	 *        column id which must be unique within the tree
+	 *            column id which must be unique within the tree
 	 * @param style
-	 *        ui style
+	 *            ui style
 	 */
-	public TreeColumnDefinition(String columnId, int style) {
+	public TreeColumnDefinition(final String columnId, final int style) {
 
 		fColumnId = columnId;
 		fStyle = style;
 	}
 
-	public void setTreeColumn(TreeColumn tableColumn) {
+	public void setTreeColumn(final TreeColumn tableColumn) {
 		fTreeColumn = tableColumn;
 	}
 

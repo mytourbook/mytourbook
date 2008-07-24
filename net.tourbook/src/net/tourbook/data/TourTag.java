@@ -67,7 +67,7 @@ public class TourTag implements Comparable<Object> {
 	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
 	private Set<TourData>			tourData					= new HashSet<TourData>();
 
-	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)//$NON-NLS-1$
+	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
 	private Set<TourTagCategory>	tourTagCategory				= new HashSet<TourTagCategory>();
 
 	public TourTag() {}

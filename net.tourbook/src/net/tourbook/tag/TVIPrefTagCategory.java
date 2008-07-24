@@ -61,7 +61,7 @@ public class TVIPrefTagCategory extends TVIPrefTagItem {
 		// update number of categories/tags
 		fTourTagCategory.setTagCounter(lazyTourTags.size());
 		fTourTagCategory.setCategoryCounter(lazyTourTagCategories.size());
-		
+
 		em.close();
 
 		/*

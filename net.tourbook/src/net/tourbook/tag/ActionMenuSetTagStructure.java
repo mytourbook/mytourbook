@@ -205,7 +205,7 @@ public class ActionMenuSetTagStructure extends Action implements IMenuCreator {
 	 * @return
 	 */
 	private int getSelectedExpandType() {
-		
+
 		int selectedExpandType = -1;
 		final StructuredSelection selection = (StructuredSelection) fTourViewer.getViewer().getSelection();
 

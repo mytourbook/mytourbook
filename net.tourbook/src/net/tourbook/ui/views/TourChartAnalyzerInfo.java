@@ -18,8 +18,7 @@ package net.tourbook.ui.views;
 import net.tourbook.chart.ComputeChartValue;
 
 /**
- * contains the information which is needed to draw the average values in the
- * tour chart analyzer
+ * contains the information which is needed to draw the average values in the tour chart analyzer
  */
 public class TourChartAnalyzerInfo {
 
@@ -31,13 +30,12 @@ public class TourChartAnalyzerInfo {
 	/**
 	 * default constructor
 	 */
-	public TourChartAnalyzerInfo() {
-	}
+	public TourChartAnalyzerInfo() {}
 
 	/**
 	 * @param showAvg
 	 */
-	public TourChartAnalyzerInfo(boolean showAvg) {
+	public TourChartAnalyzerInfo(final boolean showAvg) {
 		this.showAvg = showAvg;
 	}
 
@@ -45,7 +43,7 @@ public class TourChartAnalyzerInfo {
 	 * @param showAvg
 	 * @param showAvgDecimals
 	 */
-	public TourChartAnalyzerInfo(boolean showAvg, boolean showAvgDecimals) {
+	public TourChartAnalyzerInfo(final boolean showAvg, final boolean showAvgDecimals) {
 		this.showAvg = showAvg;
 		this.showAvgDecimals = showAvgDecimals;
 	}
@@ -54,7 +52,7 @@ public class TourChartAnalyzerInfo {
 	 * @param showAvg
 	 * @param computeValues
 	 */
-	public TourChartAnalyzerInfo(boolean showAvg, ComputeChartValue computeValues) {
+	public TourChartAnalyzerInfo(final boolean showAvg, final ComputeChartValue computeValues) {
 		this.showAvg = showAvg;
 		this.computeValues = computeValues;
 	}
@@ -65,8 +63,10 @@ public class TourChartAnalyzerInfo {
 	 * @param computeValues
 	 * @param avgDecimals
 	 */
-	public TourChartAnalyzerInfo(boolean showAvg, boolean showAvgDecimals,
-			ComputeChartValue computeValues, int avgDecimals) {
+	public TourChartAnalyzerInfo(	final boolean showAvg,
+									final boolean showAvgDecimals,
+									final ComputeChartValue computeValues,
+									final int avgDecimals) {
 
 		this.showAvg = showAvg;
 		this.showAvgDecimals = showAvgDecimals;

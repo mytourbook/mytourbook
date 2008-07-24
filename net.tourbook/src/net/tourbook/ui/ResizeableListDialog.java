@@ -21,7 +21,7 @@ import org.eclipse.ui.dialogs.ListDialog;
 
 public class ResizeableListDialog extends ListDialog {
 
-	public ResizeableListDialog(Shell parent) {
+	public ResizeableListDialog(final Shell parent) {
 		super(parent);
 
 		// make the dialog resizeable

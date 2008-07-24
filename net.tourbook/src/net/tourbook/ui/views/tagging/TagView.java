@@ -1060,7 +1060,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	}
 
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(final Class adapter) {
 

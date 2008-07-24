@@ -46,6 +46,7 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 		return fCommandId;
 	}
 
+	@Override
 	public boolean isEnabled() {
 		return fisEnabled;
 	}
@@ -56,7 +57,7 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 	 * 
 	 * @param isEnabled
 	 */
-	public void setChecked(boolean isChecked) {
+	public void setChecked(final boolean isChecked) {
 
 		if (fIsChecked != isChecked) {
 			fIsChecked = isChecked;
@@ -69,7 +70,7 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 	 * 
 	 * @param isEnabled
 	 */
-	public void setEnabled(boolean isEnabled) {
+	public void setEnabled(final boolean isEnabled) {
 
 		if (fisEnabled != isEnabled) {
 			fisEnabled = isEnabled;
@@ -81,7 +82,7 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 	 * 
 	 * @param handlerActivation
 	 */
-	public void setHandlerActivation(IHandlerActivation handlerActivation) {
+	public void setHandlerActivation(final IHandlerActivation handlerActivation) {
 
 	/*
 	 * handlerActivation is currently disabled because it's currently not used
@@ -90,12 +91,12 @@ public abstract class TCActionHandler extends AbstractHandler implements IElemen
 	//		fHandlerActivation = handlerActivation;
 	}
 
-	public void setTourChart(TourChart tourChart) {
+	public void setTourChart(final TourChart tourChart) {
 		fTourChart = tourChart;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
-	public void updateElement(UIElement element, Map parameters) {
+	@SuppressWarnings("unchecked")
+	public void updateElement(final UIElement element, final Map parameters) {
 
 		// update check state in the UI
 		element.setChecked(fIsChecked);

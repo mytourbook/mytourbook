@@ -417,9 +417,7 @@ public class TourChart extends Chart {
 		fSegmentLayer = new ChartSegmentLayer();
 		fSegmentLayer.setLineColor(new RGB(0, 177, 219));
 
-		for (int segmentIndex = 0; segmentIndex < segmentSerie.length; segmentIndex++) {
-
-			final int serieIndex = segmentSerie[segmentIndex];
+		for (final int serieIndex : segmentSerie) {
 
 			final ChartMarker chartMarker = new ChartMarker();
 

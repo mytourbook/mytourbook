@@ -28,9 +28,12 @@ public class TourPropertyCompareTourChanged {
 
 	Object	comparedTourItem;
 
-	public TourPropertyCompareTourChanged(final long compareId, final int startIndex,
-			final int endIndex, final float speed, final boolean isDataSaved,
-			Object comparedTourItem) {
+	public TourPropertyCompareTourChanged(	final long compareId,
+											final int startIndex,
+											final int endIndex,
+											final float speed,
+											final boolean isDataSaved,
+											final Object comparedTourItem) {
 
 		this.compareId = compareId;
 

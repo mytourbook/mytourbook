@@ -71,8 +71,8 @@ public class TourPerson {
 
 		boolean isSaved = false;
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
-		EntityTransaction ts = em.getTransaction();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityTransaction ts = em.getTransaction();
 
 		try {
 
@@ -88,7 +88,7 @@ public class TourPerson {
 				ts.commit();
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (ts.isActive()) {
@@ -125,23 +125,23 @@ public class TourPerson {
 		return weight;
 	}
 
-	public void setDeviceReaderId(String deviceId) {
+	public void setDeviceReaderId(final String deviceId) {
 		this.deviceReaderId = deviceId;
 	}
 
-	public void setFirstName(String name) {
+	public void setFirstName(final String name) {
 		this.firstName = name;
 	}
 
-	public void setHeight(float height) {
+	public void setHeight(final float height) {
 		this.height = height;
 	}
 
-	public void setLastName(String lastName) {
+	public void setLastName(final String lastName) {
 		this.lastName = lastName;
 	}
 
-	public void setWeight(float weight) {
+	public void setWeight(final float weight) {
 		this.weight = weight;
 	}
 
@@ -149,7 +149,7 @@ public class TourPerson {
 		return tourBike;
 	}
 
-	public void setTourBike(TourBike tourBike) {
+	public void setTourBike(final TourBike tourBike) {
 		this.tourBike = tourBike;
 	}
 
@@ -157,7 +157,7 @@ public class TourPerson {
 		return rawDataPath;
 	}
 
-	public void setRawDataPath(String rawDataPath) {
+	public void setRawDataPath(final String rawDataPath) {
 		this.rawDataPath = rawDataPath;
 	}
 

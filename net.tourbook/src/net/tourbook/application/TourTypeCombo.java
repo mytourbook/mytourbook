@@ -32,14 +32,14 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class TourTypeCombo {
 
-	private static final boolean	osx	= "carbon".equals(SWT.getPlatform()); //$NON-NLS-1$
+	private static final boolean	osx	= "carbon".equals(SWT.getPlatform());	//$NON-NLS-1$
 
 	private Composite				fContainer;
 
 	private Combo					fTourTypeComboOSX;
 	private ImageCombo				fTourTypeCombo;
 
-	TourTypeCombo(Composite parent, int style) {
+	TourTypeCombo(final Composite parent, final int style) {
 
 		if (osx) {
 
@@ -51,7 +51,7 @@ public class TourTypeCombo {
 			 * wrap the combo into a container to align it vertically to the center
 			 */
 			fContainer = new Composite(parent, SWT.NONE);
-			GridLayout gl = new GridLayout();
+			final GridLayout gl = new GridLayout();
 			gl.marginWidth = 0;
 			gl.marginHeight = 0;
 			gl.horizontalSpacing = 0;
@@ -63,7 +63,7 @@ public class TourTypeCombo {
 		}
 	}
 
-	void add(String filterName, Image filterImage) {
+	void add(final String filterName, final Image filterImage) {
 		if (osx) {
 			fTourTypeComboOSX.add(filterName);
 		} else {
@@ -71,7 +71,7 @@ public class TourTypeCombo {
 		}
 	}
 
-	void addDisposeListener(DisposeListener disposeListener) {
+	void addDisposeListener(final DisposeListener disposeListener) {
 		if (osx) {
 			fTourTypeComboOSX.addDisposeListener(disposeListener);
 		} else {
@@ -79,7 +79,7 @@ public class TourTypeCombo {
 		}
 	}
 
-	void addSelectionListener(SelectionListener selectionListener) {
+	void addSelectionListener(final SelectionListener selectionListener) {
 		if (osx) {
 			fTourTypeComboOSX.addSelectionListener(selectionListener);
 		} else {
@@ -103,7 +103,7 @@ public class TourTypeCombo {
 		}
 	}
 
-	void select(int index) {
+	void select(final int index) {
 		if (osx) {
 			fTourTypeComboOSX.select(index);
 		} else {
@@ -111,7 +111,7 @@ public class TourTypeCombo {
 		}
 	}
 
-	void setLayoutData(GridData gridData) {
+	void setLayoutData(final GridData gridData) {
 		if (osx) {
 			fTourTypeComboOSX.setLayoutData(gridData);
 		} else {
@@ -119,7 +119,7 @@ public class TourTypeCombo {
 		}
 	}
 
-	void setToolTipText(String tooltip) {
+	void setToolTipText(final String tooltip) {
 		if (osx) {
 			fTourTypeComboOSX.setToolTipText(tooltip);
 		} else {
@@ -127,7 +127,7 @@ public class TourTypeCombo {
 		}
 	}
 
-	void setVisibleItemCount(int count) {
+	void setVisibleItemCount(final int count) {
 		if (osx) {
 			fTourTypeComboOSX.setVisibleItemCount(count);
 		} else {

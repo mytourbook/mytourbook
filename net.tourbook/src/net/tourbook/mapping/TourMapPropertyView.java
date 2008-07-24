@@ -38,7 +38,7 @@ public class TourMapPropertyView extends ViewPart {
 	private Button				fRadioTileInfoNo;
 	private Button				fRadioTileInfoYes;
 
-	private void createLayout(Composite parent) {
+	private void createLayout(final Composite parent) {
 
 		Label label;
 
@@ -52,12 +52,12 @@ public class TourMapPropertyView extends ViewPart {
 		scrolledContainer.setContent(viewContainer);
 		scrolledContainer.addControlListener(new ControlAdapter() {
 			@Override
-			public void controlResized(ControlEvent e) {
+			public void controlResized(final ControlEvent e) {
 				scrolledContainer.setMinSize(viewContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
 
-		Composite infoContainer = new Composite(viewContainer, SWT.NONE);
+		final Composite infoContainer = new Composite(viewContainer, SWT.NONE);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(infoContainer);
 		{
 			/*
@@ -67,7 +67,7 @@ public class TourMapPropertyView extends ViewPart {
 			label.setText(Messages.map_properties_show_tile_info);
 
 			// group: yes/no
-			Composite groupChartType = new Composite(infoContainer, SWT.NONE);
+			final Composite groupChartType = new Composite(infoContainer, SWT.NONE);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(groupChartType);
 
 			{
@@ -76,7 +76,7 @@ public class TourMapPropertyView extends ViewPart {
 				fRadioTileInfoNo.setText(Messages.map_properties_show_tile_info_no);
 				fRadioTileInfoNo.addSelectionListener(new SelectionAdapter() {
 					@Override
-					public void widgetSelected(SelectionEvent event) {
+					public void widgetSelected(final SelectionEvent event) {
 						onChangeProperty();
 					}
 				});
@@ -86,7 +86,7 @@ public class TourMapPropertyView extends ViewPart {
 				fRadioTileInfoYes.setText(Messages.map_properties_show_tile_info_yes);
 				fRadioTileInfoYes.addSelectionListener(new SelectionAdapter() {
 					@Override
-					public void widgetSelected(SelectionEvent event) {
+					public void widgetSelected(final SelectionEvent event) {
 						onChangeProperty();
 					}
 				});
@@ -95,7 +95,7 @@ public class TourMapPropertyView extends ViewPart {
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 
 		createLayout(parent);
 
@@ -113,7 +113,7 @@ public class TourMapPropertyView extends ViewPart {
 
 		enableControls();
 
-		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 		// set new values in the pref store
 
@@ -125,12 +125,12 @@ public class TourMapPropertyView extends ViewPart {
 
 	private void restoreSettings() {
 
-		IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
 		// get values from pref store
 
 		// tile info
-		boolean isShowTileInfo = store.getBoolean(MappingView.SHOW_TILE_INFO);
+		final boolean isShowTileInfo = store.getBoolean(MappingView.SHOW_TILE_INFO);
 		if (isShowTileInfo) {
 			fRadioTileInfoYes.setSelection(true);
 		} else {

@@ -21,7 +21,7 @@ public class ActionShowLegendInMap extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionShowLegendInMap(MappingView mapView) {
+	public ActionShowLegendInMap(final MappingView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

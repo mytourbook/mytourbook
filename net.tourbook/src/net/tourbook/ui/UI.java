@@ -196,9 +196,9 @@ public class UI {
 
 			// Look at all the shells and pick the first one that is a workbench window.
 			final Shell shells[] = display.getShells();
-			for (int shellIdx = 0; shellIdx < shells.length; shellIdx++) {
+			for (final Shell shell : shells) {
 
-				final Object data = shells[shellIdx].getData();
+				final Object data = shell.getData();
 
 				// Check whether this shell points to the Application main window's shell:
 				if (data instanceof IWorkbenchWindow) {
@@ -210,7 +210,7 @@ public class UI {
 						title = newTitle;
 					}
 
-					shells[shellIdx].setText(title);
+					shell.setText(title);
 					break;
 				}
 			}
@@ -497,8 +497,8 @@ public class UI {
 
 	private void disposeImages() {
 
-		for (final Iterator<Image> iterator = fImageCache.values().iterator(); iterator.hasNext();) {
-			iterator.next().dispose();
+		for (final Image image : fImageCache.values()) {
+			image.dispose();
 		}
 		fImageCache.clear();
 	}

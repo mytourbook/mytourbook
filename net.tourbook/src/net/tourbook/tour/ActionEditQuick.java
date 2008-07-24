@@ -81,7 +81,7 @@ public class ActionEditQuick extends Action {
 	 * Update the tour type in tours which are opened in a tour editor
 	 * 
 	 * @param selectedTours
-	 *        contains the tours where the tour type should be changed
+	 *            contains the tours where the tour type should be changed
 	 * @return
 	 * @return Returns the tours which are opened in a tour editor
 	 */

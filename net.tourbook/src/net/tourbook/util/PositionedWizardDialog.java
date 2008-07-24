@@ -50,10 +50,13 @@ public class PositionedWizardDialog extends WizardDialog {
 	 * @param parent
 	 * @param wizard
 	 * @param fSettingsSection
-	 *        dialog settings section to store the dialog position and size
+	 *            dialog settings section to store the dialog position and size
 	 */
-	public PositionedWizardDialog(Shell parent, Wizard wizard, String settingsSection,
-			int defaultWidth, int defaultHeight) {
+	public PositionedWizardDialog(	final Shell parent,
+									final Wizard wizard,
+									final String settingsSection,
+									final int defaultWidth,
+									final int defaultHeight) {
 
 		super(parent, wizard);
 
@@ -63,18 +66,17 @@ public class PositionedWizardDialog extends WizardDialog {
 		fDefaultWidth = defaultWidth;
 		fDefaultHeight = defaultHeight;
 
-		Point point = getInitialSize();
+		final Point point = getInitialSize();
 		if (point != null) {
 			setMinimumPageSize(point.x, point.y);
 		}
 
 		// set icon for the window 
-		fWindowIcon = TourbookPlugin.getImageDescriptor(Messages.Image__view_compare_wizard)
-				.createImage();
+		fWindowIcon = TourbookPlugin.getImageDescriptor(Messages.Image__view_compare_wizard).createImage();
 		setDefaultImage(fWindowIcon);
 
 		parent.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
+			public void widgetDisposed(final DisposeEvent e) {
 				fWindowIcon.dispose();
 			}
 		});
@@ -84,7 +86,7 @@ public class PositionedWizardDialog extends WizardDialog {
 	@Override
 	protected Point getInitialSize() {
 
-		IDialogSettings settings = fDialogSettings.getSection(fSettingsSection);
+		final IDialogSettings settings = fDialogSettings.getSection(fSettingsSection);
 
 		int width = fDefaultWidth;
 		int height = fDefaultHeight;
@@ -92,36 +94,36 @@ public class PositionedWizardDialog extends WizardDialog {
 		if (settings == null) {
 			final Shell shell = getShell();
 			if (shell != null) {
-				Point shellSize = shell.getSize();
+				final Point shellSize = shell.getSize();
 				return new Point(shellSize.x, shellSize.y);
 			}
 		} else {
 			try {
 				width = settings.getInt(WIZARD_WIDTH);
-			} catch (NumberFormatException e) {}
+			} catch (final NumberFormatException e) {}
 			try {
 				height = settings.getInt(WIZARD_HEIGHT);
-			} catch (NumberFormatException e) {}
+			} catch (final NumberFormatException e) {}
 		}
 		return new Point(width, height);
 
 	}
 
 	@Override
-	protected Point getInitialLocation(Point initialSize) {
+	protected Point getInitialLocation(final Point initialSize) {
 
-		Point location = super.getInitialLocation(initialSize);
+		final Point location = super.getInitialLocation(initialSize);
 
-		IDialogSettings bounds = fDialogSettings.getSection(fSettingsSection);
+		final IDialogSettings bounds = fDialogSettings.getSection(fSettingsSection);
 		if (bounds != null) {
 			try {
 				location.x = bounds.getInt(WIZARD_X);
-			} catch (NumberFormatException e) {
+			} catch (final NumberFormatException e) {
 				// silently ignored
 			}
 			try {
 				location.y = bounds.getInt(WIZARD_Y);
-			} catch (NumberFormatException e) {
+			} catch (final NumberFormatException e) {
 				// silently ignored
 			}
 		}
@@ -142,7 +144,7 @@ public class PositionedWizardDialog extends WizardDialog {
 			fDialogSettings.addSection(settings);
 		}
 
-		Rectangle bounds = getShell().getBounds();
+		final Rectangle bounds = getShell().getBounds();
 
 		settings.put(WIZARD_X, bounds.x);
 		settings.put(WIZARD_Y, bounds.y);

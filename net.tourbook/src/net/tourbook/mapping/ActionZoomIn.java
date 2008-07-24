@@ -23,7 +23,7 @@ public class ActionZoomIn extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionZoomIn(MappingView mapView) {
+	public ActionZoomIn(final MappingView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 

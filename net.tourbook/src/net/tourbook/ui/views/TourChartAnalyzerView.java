@@ -134,7 +134,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		void createInfoDiff() {
 
-			Color lineColor = getColor(fChartData.getDefaultRGB());
+			final Color lineColor = getColor(fChartData.getDefaultRGB());
 
 			diff = new Label(fContainer, SWT.TRAIL);
 			diff.setForeground(lineColor);
@@ -192,7 +192,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		private void createValueLabel() {
 
-			Color lineColor = getColor(fChartData.getDefaultRGB());
+			final Color lineColor = getColor(fChartData.getDefaultRGB());
 			Label label;
 
 			String labelText;
@@ -262,7 +262,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 				} else if (selection instanceof SelectionTourData) {
 
-					TourChart tourChart = ((SelectionTourData) selection).getTourChart();
+					final TourChart tourChart = ((SelectionTourData) selection).getTourChart();
 
 					if (tourChart != null) {
 						updateInfo(tourChart.getChartInfo());
@@ -270,7 +270,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 				} else if (selection instanceof SelectionTourChart) {
 
-					TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
+					final TourChart tourChart = ((SelectionTourChart) selection).getTourChart();
 					if (tourChart != null) {
 						updateInfo(tourChart.getChartInfo());
 					}
@@ -279,7 +279,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 					final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
 					if (editor instanceof TourEditor) {
-						TourEditor tourEditor = (TourEditor) editor;
+						final TourEditor tourEditor = (TourEditor) editor;
 						updateInfo(tourEditor.getTourChart().getChartInfo());
 					}
 				}
@@ -291,7 +291,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void createHeaderAvg() {
 
-		Label label = new Label(fContainer, SWT.TRAIL);
+		final Label label = new Label(fContainer, SWT.TRAIL);
 		label.setText(Messages.TourAnalyzer_Label_average);
 		label.setFont(fontBold);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -300,7 +300,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void createHeaderDiff() {
 
-		Label label = new Label(fContainer, SWT.TRAIL);
+		final Label label = new Label(fContainer, SWT.TRAIL);
 		label.setText(Messages.TourAnalyzer_Label_difference);
 		label.setFont(fontBold);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -309,7 +309,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void createHeaderLeft() {
 
-		Label label = new Label(fContainer, SWT.TRAIL);
+		final Label label = new Label(fContainer, SWT.TRAIL);
 		label.setText(Messages.TourAnalyzer_Label_left);
 		label.setFont(fontBold);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -318,7 +318,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void createHeaderMax() {
 
-		Label label = new Label(fContainer, SWT.TRAIL);
+		final Label label = new Label(fContainer, SWT.TRAIL);
 		label.setText(Messages.TourAnalyzer_Label_maximum);
 		label.setFont(fontBold);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -327,7 +327,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void createHeaderMin() {
 
-		Label label = new Label(fContainer, SWT.TRAIL);
+		final Label label = new Label(fContainer, SWT.TRAIL);
 		label.setText(Messages.TourAnalyzer_Label_minimum);
 		label.setFont(fontBold);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -336,7 +336,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void createHeaderRight() {
 
-		Label label = new Label(fContainer, SWT.TRAIL);
+		final Label label = new Label(fContainer, SWT.TRAIL);
 		label.setText(Messages.TourAnalyzer_Label_right);
 		label.setFont(fontBold);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -345,7 +345,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void createHeaderUnitLabel() {
 
-		Label label = new Label(fContainer, SWT.LEFT);
+		final Label label = new Label(fContainer, SWT.LEFT);
 		label.setText(""); //$NON-NLS-1$
 		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		label.setBackground(fBgColorHeader);
@@ -353,7 +353,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 	private void createHeaderValueLabel() {
 
-		Label label = new Label(fContainer, SWT.NONE);
+		final Label label = new Label(fContainer, SWT.NONE);
 		label.setText(Messages.TourAnalyzer_Label_value);
 		label.setFont(fontBold);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -374,7 +374,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		// fPartContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		// define the layout which is being used
-		int clientWidth = fPartContainer.getClientArea().width;
+		final int clientWidth = fPartContainer.getClientArea().width;
 		fLayout = clientWidth < 110 ? LAYOUT_TINY : clientWidth < 150 ? LAYOUT_SMALL : clientWidth < 370
 				? LAYOUT_MEDIUM
 				: LAYOUT_LARGE;
@@ -385,7 +385,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		fScrolledContainer.setExpandHorizontal(true);
 		fScrolledContainer.addControlListener(new ControlAdapter() {
 			@Override
-			public void controlResized(ControlEvent e) {
+			public void controlResized(final ControlEvent e) {
 				fScrolledContainer.setMinSize(fContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
@@ -394,7 +394,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		fContainer = new Composite(fScrolledContainer, SWT.NONE);
 		fContainer.setBackground(fBgColorHeader);
 
-		GridLayout gl = new GridLayout(fLayout == LAYOUT_TINY ? 2 : fLayout == LAYOUT_SMALL
+		final GridLayout gl = new GridLayout(fLayout == LAYOUT_TINY ? 2 : fLayout == LAYOUT_SMALL
 				? 3
 				: fLayout == LAYOUT_MEDIUM ? 4 : 8, false);
 		gl.marginHeight = 0;
@@ -434,7 +434,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		fGraphInfos = new ArrayList<GraphInfo>();
 		for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
 
-			GraphInfo graphInfo = new GraphInfo(xyData);
+			final GraphInfo graphInfo = new GraphInfo(xyData);
 
 			graphInfo.createValueLabel();
 
@@ -462,7 +462,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		fGraphInfos = new ArrayList<GraphInfo>();
 		for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
 
-			GraphInfo graphInfo = new GraphInfo(xyData);
+			final GraphInfo graphInfo = new GraphInfo(xyData);
 
 			graphInfo.createInfoLeft();
 			graphInfo.createInfoRight();
@@ -479,7 +479,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		createHeaderAvg();
 		createHeaderUnitLabel();
 
-		for (GraphInfo graphInfo : fGraphInfos) {
+		for (final GraphInfo graphInfo : fGraphInfos) {
 			graphInfo.createInfoMin();
 			graphInfo.createInfoMax();
 			graphInfo.createInfoAvg();
@@ -497,7 +497,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		fGraphInfos = new ArrayList<GraphInfo>();
 		for (final ChartDataSerie xyData : fChartDataModel.getXyData()) {
 
-			GraphInfo graphInfo = new GraphInfo(xyData);
+			final GraphInfo graphInfo = new GraphInfo(xyData);
 
 			graphInfo.createInfoLeft();
 			graphInfo.createInfoRight();
@@ -514,7 +514,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		createHeaderAvg();
 		createHeaderUnitLabel();
 
-		for (GraphInfo graphInfo : fGraphInfos) {
+		for (final GraphInfo graphInfo : fGraphInfos) {
 			graphInfo.createInfoDiff();
 			graphInfo.createInfoAvg();
 			graphInfo.createValueUnit();
@@ -528,7 +528,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		createHeaderMax();
 		createHeaderUnitLabel();
 
-		for (GraphInfo graphInfo : fGraphInfos) {
+		for (final GraphInfo graphInfo : fGraphInfos) {
 			graphInfo.createInfoMin();
 			graphInfo.createInfoMax();
 			graphInfo.createValueUnit();
@@ -548,7 +548,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		createHeaderLeft();
 		createHeaderUnitLabel();
 
-		for (GraphInfo graphInfo : fGraphInfos) {
+		for (final GraphInfo graphInfo : fGraphInfos) {
 			graphInfo.createInfoLeft();
 			graphInfo.createValueUnit();
 		}
@@ -560,7 +560,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		createHeaderRight();
 		createHeaderUnitLabel();
 
-		for (GraphInfo graphInfo : fGraphInfos) {
+		for (final GraphInfo graphInfo : fGraphInfos) {
 			graphInfo.createInfoRight();
 			graphInfo.createValueUnit();
 		}
@@ -572,7 +572,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		createHeaderDiff();
 		createHeaderUnitLabel();
 
-		for (GraphInfo graphInfo : fGraphInfos) {
+		for (final GraphInfo graphInfo : fGraphInfos) {
 			graphInfo.createInfoDiff();
 			graphInfo.createValueUnit();
 		}
@@ -584,7 +584,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		createHeaderAvg();
 		createHeaderUnitLabel();
 
-		for (GraphInfo graphInfo : fGraphInfos) {
+		for (final GraphInfo graphInfo : fGraphInfos) {
 			graphInfo.createInfoAvg();
 			graphInfo.createValueUnit();
 		}
@@ -596,7 +596,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		createHeaderMin();
 		createHeaderUnitLabel();
 
-		for (GraphInfo graphInfo : fGraphInfos) {
+		for (final GraphInfo graphInfo : fGraphInfos) {
 			graphInfo.createInfoMin();
 			graphInfo.createValueUnit();
 		}
@@ -608,7 +608,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		createHeaderMax();
 		createHeaderUnitLabel();
 
-		for (GraphInfo graphInfo : fGraphInfos) {
+		for (final GraphInfo graphInfo : fGraphInfos) {
 			graphInfo.createInfoMax();
 			graphInfo.createValueUnit();
 		}
@@ -632,7 +632,7 @@ public class TourChartAnalyzerView extends ViewPart {
 		addListeners();
 
 		// show chart info for the current selection
-		ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
 		if (selection != null) {
 
 		}
@@ -642,7 +642,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
 		GridData gd;
 
-		int columns = fLayout == LAYOUT_TINY ? 1 : fLayout == LAYOUT_SMALL ? 2 : fLayout == LAYOUT_MEDIUM ? 3 : 8;
+		final int columns = fLayout == LAYOUT_TINY ? 1 : fLayout == LAYOUT_SMALL ? 2 : fLayout == LAYOUT_MEDIUM ? 3 : 8;
 
 		gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 		gd.heightHint = 5;
@@ -743,13 +743,13 @@ public class TourChartAnalyzerView extends ViewPart {
 	 * selection is not from a chart, so it's possible that the chart has not yet the correct slider
 	 * positon, we create the chart info from the slider position
 	 */
-	private void updateInfo(SelectionChartXSliderPosition sliderPosition) {
+	private void updateInfo(final SelectionChartXSliderPosition sliderPosition) {
 
 		Chart chart = sliderPosition.getChart();
 
 		if (chart == null) {
 
-			TourChart tourChart = TourManager.getInstance().getActiveTourChart();
+			final TourChart tourChart = TourManager.getInstance().getActiveTourChart();
 
 			if (tourChart == null || tourChart.isDisposed()) {
 				return;
@@ -758,7 +758,7 @@ public class TourChartAnalyzerView extends ViewPart {
 			}
 		}
 
-		SelectionChartInfo chartInfo = new SelectionChartInfo(chart);
+		final SelectionChartInfo chartInfo = new SelectionChartInfo(chart);
 
 		chartInfo.chartDataModel = chart.getChartDataModel();
 		chartInfo.chartDrawingData = chart.getChartDrawingData();

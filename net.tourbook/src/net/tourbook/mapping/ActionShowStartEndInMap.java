@@ -21,7 +21,7 @@ public class ActionShowStartEndInMap extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionShowStartEndInMap(MappingView mapView) {
+	public ActionShowStartEndInMap(final MappingView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

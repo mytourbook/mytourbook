@@ -39,8 +39,7 @@ public interface IBikeDefinitions {
 	 * </code>
 	 */
 
-	public static String[]	bikeType	= new String[] {
-			"Hollandrad", //$NON-NLS-1$
+	public static String[]	bikeType	= new String[] { "Hollandrad", //$NON-NLS-1$
 			"Mountain Bike (MTB) ungefedert", //$NON-NLS-1$
 			"Tandem mit Rennlenkern", //$NON-NLS-1$
 			"Rennrad Obenlenker-Haltung", //$NON-NLS-1$
@@ -54,10 +53,9 @@ public interface IBikeDefinitions {
 			"Tieflieger + Heckflosse Kreuzotter race", //$NON-NLS-1$
 			"Tieflieger vollverschalt White Hawk (Stundenweltrekord)", //$NON-NLS-1$
 			"Velomobil verschalt", //$NON-NLS-1$
-			"Handbike 3 Räder, Kurbeln mit Kettenschaltung" }; //$NON-NLS-1$
+			"Handbike 3 Räder, Kurbeln mit Kettenschaltung" };											//$NON-NLS-1$
 
-	public static String[]	bikeArr		= new String[] {
-			"roadster", //$NON-NLS-1$
+	public static String[]	bikeArr		= new String[] { "roadster", //$NON-NLS-1$
 			"mtb", //$NON-NLS-1$
 			"tandem", //$NON-NLS-1$
 			"racetops", //$NON-NLS-1$
@@ -71,7 +69,7 @@ public interface IBikeDefinitions {
 			"ko4tailbox", //$NON-NLS-1$
 			"whitehawk", //$NON-NLS-1$
 			"questclosed", //$NON-NLS-1$
-			"handtrike"				}; //$NON-NLS-1$
+			"handtrike"				};																//$NON-NLS-1$
 
 	public static float[]	Cw			= new float[] {
 			0.9f,
@@ -226,29 +224,16 @@ public interface IBikeDefinitions {
 			1.09f,
 			1.04f						};
 
-	public static String[]	tyreType	= new String[] {
-			"schmaler Rennreifen", //$NON-NLS-1$
+	public static String[]	tyreType	= new String[] { "schmaler Rennreifen", //$NON-NLS-1$
 			"mittelbreiter Hochdruck-Slick", //$NON-NLS-1$
 			"breiter Hochdruck-Slick", //$NON-NLS-1$
 			"breiter Tourenreifen (Profil)", //$NON-NLS-1$
 			"Rinkowski-Gürtelreifen (breit)", //$NON-NLS-1$
-			"Stollenreifen 1.75'"		}; //$NON-NLS-1$
+			"Stollenreifen 1.75'"		};																//$NON-NLS-1$
 
-	public static float[]	Cr			= new float[] {
-			.006f,
-			.0055f,
-			.005f,
-			.0075f,
-			.003f,
-			.007f						};
+	public static float[]	Cr			= new float[] { .006f, .0055f, .005f, .0075f, .003f, .007f };
 
-	public static float[]	ATire		= new float[] {
-			.021f,
-			.031f,
-			.042f,
-			.048f,
-			.042f,
-			.055f						};
+	public static float[]	ATire		= new float[] { .021f, .031f, .042f, .048f, .042f, .055f };
 
 	/**
 	 * weight default values
@@ -271,43 +256,13 @@ public interface IBikeDefinitions {
 			18							};
 
 	/**
-	 * front tyre default index into tyreType 
+	 * front tyre default index into tyreType
 	 */
-	public static int[]		i_tireF		= new int[] {
-			3,
-			5,
-			1,
-			0,
-			0,
-			0,
-			0,
-			1,
-			2,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0							};
+	public static int[]		i_tireF		= new int[] { 3, 5, 1, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0 };
 
 	/**
-	 * rear tyre default index into tyreType 
+	 * rear tyre default index into tyreType
 	 */
-	public static int[]		i_tireR		= new int[] {
-			3,
-			5,
-			1,
-			0,
-			0,
-			0,
-			0,
-			3,
-			3,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0							};
+	public static int[]		i_tireR		= new int[] { 3, 5, 1, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0 };
 
 }

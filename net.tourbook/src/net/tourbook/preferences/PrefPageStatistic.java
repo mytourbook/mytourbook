@@ -133,9 +133,8 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 	}
 
 	/**
-	 * @see
-	 * 	org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite
-	 * 	)
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite
+	 *      )
 	 */
 	@Override
 	protected Control createContents(final Composite parent) {

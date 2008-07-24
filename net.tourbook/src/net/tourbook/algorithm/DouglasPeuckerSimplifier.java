@@ -18,7 +18,6 @@ package net.tourbook.algorithm;
 
 import java.util.ArrayList;
 
-
 public class DouglasPeuckerSimplifier {
 
 	/**
@@ -29,17 +28,14 @@ public class DouglasPeuckerSimplifier {
 	private Point[]		graphPoints;
 
 	/**
-	 * Contains true for each point in graphPoints which remains for the
-	 * simplifyed graph
+	 * Contains true for each point in graphPoints which remains for the simplifyed graph
 	 */
 	private boolean[]	usedPoints;
 
-
-	public DouglasPeuckerSimplifier(int tolerance, Point[] graphPoints) {
+	public DouglasPeuckerSimplifier(final int tolerance, final Point[] graphPoints) {
 		this.tolerance = tolerance;
 		this.graphPoints = graphPoints;
 	}
-
 
 	public Object[] simplify() {
 
@@ -57,10 +53,10 @@ public class DouglasPeuckerSimplifier {
 		simplifySection(0, graphPoints.length - 1);
 
 		// create a point list with all simplified points
-		ArrayList<Point> simplifiedPoints = new ArrayList<Point>();
+		final ArrayList<Point> simplifiedPoints = new ArrayList<Point>();
 		for (int iPoint = 0; iPoint < graphPoints.length; iPoint++) {
 			if (usedPoints[iPoint]) {
-				Point graphPoint = graphPoints[iPoint];
+				final Point graphPoint = graphPoints[iPoint];
 				simplifiedPoints.add(new Point(graphPoint.x, graphPoint.y, iPoint));
 			}
 		}
@@ -68,8 +64,7 @@ public class DouglasPeuckerSimplifier {
 		return simplifiedPoints.toArray();
 	}
 
-
-	private void simplifySection(int startIndex, int endIndex) {
+	private void simplifySection(final int startIndex, final int endIndex) {
 
 		if (startIndex >= endIndex + 1) {
 			// nothing can be simplified
@@ -84,17 +79,17 @@ public class DouglasPeuckerSimplifier {
 		long maxd2 = 0;
 
 		// tolerance squared
-		long tol2 = tolerance * tolerance;
+		final long tol2 = tolerance * tolerance;
 
 		// Segment S = { v[j], v[k] }; // segment from v[j] to v[k]
-		Point startPoint = graphPoints[startIndex];
-		Point endPoint = graphPoints[endIndex];
+		final Point startPoint = graphPoints[startIndex];
+		final Point endPoint = graphPoints[endIndex];
 
 		// Vector u = S.P1 - S.P0; // segment direction vector
-		Vector u = endPoint.diff(startPoint);
+		final Vector u = endPoint.diff(startPoint);
 
 		// double cu = dot(u, u); // segment length squared
-		long cu = u.dot(u);
+		final long cu = u.dot(u);
 
 		// test each vertex v[i] for max distance from S
 		// compute using the Feb 2001 Algorithm's dist_Point_to_Segment()

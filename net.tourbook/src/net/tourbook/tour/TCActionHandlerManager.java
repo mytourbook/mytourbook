@@ -16,7 +16,6 @@
 package net.tourbook.tour;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
@@ -71,7 +70,7 @@ class TCActionHandlerManager {
 			return;
 		}
 
-		IServiceLocator workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		final IServiceLocator workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
 		fCommandService = ((ICommandService) workbenchWindow.getService(ICommandService.class));
 		fHandlerService = ((IHandlerService) workbenchWindow.getService(IHandlerService.class));
@@ -109,7 +108,7 @@ class TCActionHandlerManager {
 	 * @param commandId
 	 * @return
 	 */
-	TCActionHandler getActionHandler(String commandId) {
+	TCActionHandler getActionHandler(final String commandId) {
 
 		if (fActionHandlers == null) {
 			return null;
@@ -127,21 +126,21 @@ class TCActionHandlerManager {
 		 * org.eclipse.core.expressions.definitions extension, but in Eclipse 3.3 the
 		 * ReferenceExpression is only for eclipse internal use, wolfgang 9.8.2007
 		 */
-		Expression partIdExpression = new Expression() {
+		final Expression partIdExpression = new Expression() {
 
 			@Override
-			public void collectExpressionInfo(ExpressionInfo info) {
+			public void collectExpressionInfo(final ExpressionInfo info) {
 				info.addVariableNameAccess(ISources.ACTIVE_PART_ID_NAME);
 			}
 
 			@Override
-			public EvaluationResult evaluate(IEvaluationContext context) throws CoreException {
+			public EvaluationResult evaluate(final IEvaluationContext context) throws CoreException {
 
-				Object var = context.getVariable(ISources.ACTIVE_PART_ID_NAME);
+				final Object var = context.getVariable(ISources.ACTIVE_PART_ID_NAME);
 
 				if (var instanceof String) {
 
-					String stringVar = (String) var;
+					final String stringVar = (String) var;
 
 					/*
 					 * check if the active part ID contains a tour chart
@@ -158,9 +157,7 @@ class TCActionHandlerManager {
 		};
 
 		// activate the handler for all tour chart actions
-		for (Iterator<TCActionHandler> iterator = fActionHandlers.values().iterator(); iterator.hasNext();) {
-
-			TCActionHandler actionHandler = iterator.next();
+		for (final TCActionHandler actionHandler : fActionHandlers.values()) {
 
 			final IHandlerActivation handlerActivation = fHandlerService.activateHandler(actionHandler.getCommandId(),
 					actionHandler,
@@ -176,11 +173,11 @@ class TCActionHandlerManager {
 	 * 
 	 * @param partSite
 	 */
-	void updateTourActionHandlers(IWorkbenchPartSite partSite, TourChart tourChart) {
+	void updateTourActionHandlers(final IWorkbenchPartSite partSite, final TourChart tourChart) {
 
-		for (TCActionProxy actionProxy : tourChart.fActionProxies.values()) {
+		for (final TCActionProxy actionProxy : tourChart.fActionProxies.values()) {
 
-			TCActionHandler actionHandler = fActionHandlers.get(actionProxy.getCommandId());
+			final TCActionHandler actionHandler = fActionHandlers.get(actionProxy.getCommandId());
 
 			if (actionHandler != null) {
 				actionHandler.setTourChart(tourChart);
@@ -195,7 +192,7 @@ class TCActionHandlerManager {
 	/**
 	 * Update the UI check state for one command
 	 */
-	void updateUICheckState(String commandId) {
+	void updateUICheckState(final String commandId) {
 		if (fCommandService != null) {
 			fCommandService.refreshElements(commandId, null);
 		}

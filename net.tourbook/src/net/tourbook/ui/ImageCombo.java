@@ -54,15 +54,15 @@ import org.eclipse.swt.widgets.Widget;
  * CCombo stands out as distinctly non-native - especially GNOME's new standard "ClearLooks" which
  * shows the gray background between Text and Arrow and border</dd>
  * <dt>Arrow gets the focus:</dt>
- * <dd>It used to take two tabs to cross a CCombo. Solution: if the arrow gets a SWT.FOCUS_IN
- * event, ignore it and setFocus to the Text</dd>
+ * <dd>It used to take two tabs to cross a CCombo. Solution: if the arrow gets a SWT.FOCUS_IN event,
+ * ignore it and setFocus to the Text</dd>
  * <dt>When dropped, clicking the arrow closes and immediately re-drops:</dt>
  * <dd>see comment in the popup shell's SWT.DEACTIVATE event</dd>
  * </dl>
  * </p>
  * <p>
- * Note that although this class is a subclass of <code>Composite</code>, it does not make sense
- * to add children to it, or set a layout on it.
+ * Note that although this class is a subclass of <code>Composite</code>, it does not make sense to
+ * add children to it, or set a layout on it.
  * </p>
  * <dl>
  * <dt><b>Styles:</b>
@@ -73,7 +73,7 @@ import org.eclipse.swt.widgets.Widget;
  */
 public final class ImageCombo extends Composite {
 
-	private static final boolean	gtk					= "gtk".equals(SWT.getPlatform()); //$NON-NLS-1$
+	private static final boolean	gtk					= "gtk".equals(SWT.getPlatform());	//$NON-NLS-1$
 	private boolean					dontDrop			= false;
 
 	ImageComboLabel					fLabel;
@@ -90,32 +90,32 @@ public final class ImageCombo extends Composite {
 	 * Constructs a new instance of this class given its parent and a style value describing its
 	 * behavior and appearance.
 	 * <p>
-	 * The style value is either one of the style constants defined in class <code>SWT</code>
-	 * which is applicable to instances of this class, or must be built by <em>bitwise OR</em>'ing
+	 * The style value is either one of the style constants defined in class <code>SWT</code> which
+	 * is applicable to instances of this class, or must be built by <em>bitwise OR</em>'ing
 	 * together (that is, using the <code>int</code> "|" operator) two or more of those
 	 * <code>SWT</code> style constants. The class description lists the style constants that are
 	 * applicable to the class. Style bits are also inherited from superclasses.
 	 * </p>
 	 * 
 	 * @param parent
-	 *        a widget which will be the parent of the new instance (cannot be null)
+	 *            a widget which will be the parent of the new instance (cannot be null)
 	 * @param style
-	 *        the style of widget to construct
+	 *            the style of widget to construct
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the parent is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the parent is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            parent</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the parent</li>
+	 *                </ul>
 	 * @see SWT#BORDER
 	 * @see SWT#READ_ONLY
 	 * @see SWT#FLAT
 	 * @see Widget#getStyle()
 	 */
-	public ImageCombo(Composite parent, int style) {
+	public ImageCombo(final Composite parent, int style) {
 
 		super(parent, style = checkStyle(style));
 
@@ -139,7 +139,7 @@ public final class ImageCombo extends Composite {
 		arrow = new Button(this, arrowStyle);
 
 		listener = new Listener() {
-			public void handleEvent(Event event) {
+			public void handleEvent(final Event event) {
 
 				if (popup == event.widget) {
 					onPopupEvent(event);
@@ -168,20 +168,20 @@ public final class ImageCombo extends Composite {
 		};
 
 		filter = new Listener() {
-			public void handleEvent(Event event) {
-				Shell shell = ((Control) event.widget).getShell();
+			public void handleEvent(final Event event) {
+				final Shell shell = ((Control) event.widget).getShell();
 				if (shell == ImageCombo.this.getShell()) {
 					handleFocus(SWT.FocusOut);
 				}
 			}
 		};
 
-		int[] comboEvents = { SWT.Dispose, SWT.Move, SWT.Resize };
-		for (int i = 0; i < comboEvents.length; i++) {
-			this.addListener(comboEvents[i], listener);
+		final int[] comboEvents = { SWT.Dispose, SWT.Move, SWT.Resize };
+		for (final int comboEvent : comboEvents) {
+			this.addListener(comboEvent, listener);
 		}
 
-		int[] labelEvents = {
+		final int[] labelEvents = {
 				SWT.KeyDown,
 				SWT.KeyUp,
 				SWT.Modify,
@@ -190,21 +190,21 @@ public final class ImageCombo extends Composite {
 				SWT.Traverse,
 				SWT.FocusIn,
 				SWT.MouseWheel };
-		for (int i = 0; i < labelEvents.length; i++) {
-			fLabel.addListener(labelEvents[i], listener);
+		for (final int labelEvent : labelEvents) {
+			fLabel.addListener(labelEvent, listener);
 		}
 
-		int[] arrowEvents = { SWT.Selection, SWT.FocusIn };
-		for (int i = 0; i < arrowEvents.length; i++) {
-			arrow.addListener(arrowEvents[i], listener);
+		final int[] arrowEvents = { SWT.Selection, SWT.FocusIn };
+		for (final int arrowEvent : arrowEvents) {
+			arrow.addListener(arrowEvent, listener);
 		}
 
 		createPopup(-1);
 		initAccessible();
 	}
 
-	static int checkStyle(int style) {
-		int mask = gtk
+	static int checkStyle(final int style) {
+		final int mask = gtk
 				? SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT
 				: SWT.BORDER | SWT.READ_ONLY | SWT.FLAT | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
 		return style & mask;
@@ -214,26 +214,26 @@ public final class ImageCombo extends Composite {
 	 * Adds the argument to the end of the receiver's list.
 	 * 
 	 * @param string
-	 *        the new item
+	 *            the new item
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the string is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the string is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 * @see #add(String,int)
 	 */
-	public void add(String string, Image image) {
+	public void add(final String string, final Image image) {
 		checkWidget();
 		if (string == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
 
-		TableItem newItem = new TableItem(this.table, SWT.NONE);
+		final TableItem newItem = new TableItem(this.table, SWT.NONE);
 
 		newItem.setText(string);
 
@@ -250,29 +250,29 @@ public final class ImageCombo extends Composite {
 	 * </p>
 	 * 
 	 * @param string
-	 *        the new item
+	 *            the new item
 	 * @param index
-	 *        the index for the item
+	 *            the index for the item
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the string is null</li>
-	 *            <li>ERROR_INVALID_RANGE - if the index is not between 0 and the number of
-	 *            elements in the list (inclusive)</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the string is null</li>
+	 *                <li>ERROR_INVALID_RANGE - if the index is not between 0 and the number of
+	 *                elements in the list (inclusive)</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 * @see #add(String)
 	 */
-	public void add(String string, Image image, int index) {
+	public void add(final String string, final Image image, final int index) {
 		checkWidget();
 		if (string == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
-		TableItem newItem = new TableItem(this.table, SWT.NONE, index);
+		final TableItem newItem = new TableItem(this.table, SWT.NONE, index);
 		if (image != null) {
 			newItem.setImage(image);
 		}
@@ -284,26 +284,26 @@ public final class ImageCombo extends Composite {
 	 * <code>ModifyListener</code> interface.
 	 * 
 	 * @param listener
-	 *        the listener which should be notified
+	 *            the listener which should be notified
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 * @see ModifyListener
 	 * @see #removeModifyListener
 	 */
-	public void addModifyListener(ModifyListener listener) {
+	public void addModifyListener(final ModifyListener listener) {
 		checkWidget();
 		if (listener == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
-		TypedListener typedListener = new TypedListener(listener);
+		final TypedListener typedListener = new TypedListener(listener);
 		addListener(SWT.Modify, typedListener);
 	}
 
@@ -313,32 +313,32 @@ public final class ImageCombo extends Composite {
 	 * <code>SelectionListener</code> interface.
 	 * <p>
 	 * <code>widgetSelected</code> is called when the combo's list selection changes.
-	 * <code>widgetDefaultSelected</code> is typically called when ENTER is pressed the combo's
-	 * text area.
+	 * <code>widgetDefaultSelected</code> is typically called when ENTER is pressed the combo's text
+	 * area.
 	 * </p>
 	 * 
 	 * @param listener
-	 *        the listener which should be notified
+	 *            the listener which should be notified
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 * @see SelectionListener
 	 * @see #removeSelectionListener
 	 * @see SelectionEvent
 	 */
-	public void addSelectionListener(SelectionListener listener) {
+	public void addSelectionListener(final SelectionListener listener) {
 		checkWidget();
 		if (listener == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
 		}
-		TypedListener typedListener = new TypedListener(listener);
+		final TypedListener typedListener = new TypedListener(listener);
 		addListener(SWT.Selection, typedListener);
 		addListener(SWT.DefaultSelection, typedListener);
 	}
@@ -352,11 +352,11 @@ public final class ImageCombo extends Composite {
 	 * </p>
 	 * 
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 * @see #deselectAll
 	 */
 	public void clearSelection() {
@@ -366,34 +366,33 @@ public final class ImageCombo extends Composite {
 	}
 
 	@Override
-	public Point computeSize(int wHint, int hHint, boolean changed) {
+	public Point computeSize(final int wHint, final int hHint, final boolean changed) {
 		checkWidget();
 		int width = 0, height = 0;
-		String[] items = getStringsFromTable();
+		final String[] items = getStringsFromTable();
 		int textWidth = 0;
-		GC gc = new GC(fLabel);
-		int spacer = gc.stringExtent(" ").x; //$NON-NLS-1$
-		for (int i = 0; i < items.length; i++) {
-			textWidth = Math.max(gc.stringExtent(items[i]).x, textWidth);
+		final GC gc = new GC(fLabel);
+		final int spacer = gc.stringExtent(" ").x; //$NON-NLS-1$
+		for (final String item : items) {
+			textWidth = Math.max(gc.stringExtent(item).x, textWidth);
 		}
 		gc.dispose();
-		Point textSize = fLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT, changed);
-		Point arrowSize = arrow.computeSize(SWT.DEFAULT, SWT.DEFAULT, changed);
-		Point listSize = table.computeSize(wHint, SWT.DEFAULT, changed);
-		int borderWidth = getBorderWidth();
+		final Point textSize = fLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT, changed);
+		final Point arrowSize = arrow.computeSize(SWT.DEFAULT, SWT.DEFAULT, changed);
+		final Point listSize = table.computeSize(wHint, SWT.DEFAULT, changed);
+		final int borderWidth = getBorderWidth();
 
 		height = Math.max(hHint, Math.max(textSize.y, arrowSize.y) + 2 * borderWidth);
-		width = Math.max(wHint, Math.max(textWidth + 2 * spacer + arrowSize.x + 2 * borderWidth,
-				listSize.x));
+		width = Math.max(wHint, Math.max(textWidth + 2 * spacer + arrowSize.x + 2 * borderWidth, listSize.x));
 		return new Point(width, height);
 	}
 
-	void createPopup(int selectionIndex) {
+	void createPopup(final int selectionIndex) {
 
 		// create shell and list
 		popup = new Shell(getShell(), SWT.NO_TRIM | SWT.ON_TOP);
 
-		int style = getStyle();
+		final int style = getStyle();
 		int listStyle = SWT.SINGLE | SWT.V_SCROLL | SWT.FULL_SELECTION;
 		if ((style & SWT.FLAT) != 0) {
 			listStyle |= SWT.FLAT;
@@ -416,12 +415,12 @@ public final class ImageCombo extends Composite {
 			table.setBackground(background);
 		}
 
-		int[] popupEvents = { SWT.Close, SWT.Paint, SWT.Deactivate };
-		for (int i = 0; i < popupEvents.length; i++) {
-			popup.addListener(popupEvents[i], listener);
+		final int[] popupEvents = { SWT.Close, SWT.Paint, SWT.Deactivate };
+		for (final int popupEvent : popupEvents) {
+			popup.addListener(popupEvent, listener);
 		}
 
-		int[] listEvents = {
+		final int[] listEvents = {
 				SWT.MouseUp,
 				SWT.Selection,
 				SWT.Traverse,
@@ -429,8 +428,8 @@ public final class ImageCombo extends Composite {
 				SWT.KeyUp,
 				SWT.FocusIn,
 				SWT.Dispose };
-		for (int i = 0; i < listEvents.length; i++) {
-			table.addListener(listEvents[i], listener);
+		for (final int listEvent : listEvents) {
+			table.addListener(listEvent, listener);
 		}
 
 		if (selectionIndex != -1) {
@@ -444,15 +443,15 @@ public final class ImageCombo extends Composite {
 	 * ignored.
 	 * 
 	 * @param index
-	 *        the index of the item to deselect
+	 *            the index of the item to deselect
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
-	public void deselect(int index) {
+	public void deselect(final int index) {
 		checkWidget();
 		table.deselect(index);
 	}
@@ -464,11 +463,11 @@ public final class ImageCombo extends Composite {
 	 * </p>
 	 * 
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 * @see #clearSelection
 	 */
 	public void deselectAll() {
@@ -476,7 +475,7 @@ public final class ImageCombo extends Composite {
 		table.deselectAll();
 	}
 
-	void dropDown(boolean drop) {
+	void dropDown(final boolean drop) {
 
 		if (drop == isDropped()) {
 			return;
@@ -496,7 +495,7 @@ public final class ImageCombo extends Composite {
 		}
 
 		if (getShell() != popup.getParent()) {
-			int selectionIndex = table.getSelectionIndex();
+			final int selectionIndex = table.getSelectionIndex();
 			table.removeListener(SWT.Dispose, listener);
 			popup.dispose();
 			popup = null;
@@ -504,26 +503,26 @@ public final class ImageCombo extends Composite {
 			createPopup(selectionIndex);
 		}
 
-		Point size = getSize();
+		final Point size = getSize();
 		int itemCount = table.getItemCount();
 		itemCount = (itemCount == 0) ? visibleItemCount : Math.min(visibleItemCount, itemCount);
-		int itemHeight = table.getItemHeight() * itemCount;
-		Point listSize = table.computeSize(SWT.DEFAULT, itemHeight, false);
+		final int itemHeight = table.getItemHeight() * itemCount;
+		final Point listSize = table.computeSize(SWT.DEFAULT, itemHeight, false);
 		table.setBounds(1, 1, Math.max(size.x - 2, listSize.x), listSize.y);
 
-		int index = table.getSelectionIndex();
+		final int index = table.getSelectionIndex();
 		if (index != -1) {
 			table.setTopIndex(index);
 		}
 
-		Display display = getDisplay();
-		Rectangle listRect = table.getBounds();
-		Rectangle parentRect = display.map(getParent(), null, getBounds());
-		Point comboSize = getSize();
-		Rectangle displayRect = getMonitor().getClientArea();
-		int width = Math.max(comboSize.x, listRect.width + 2);
-		int height = listRect.height + 2;
-		int x = parentRect.x;
+		final Display display = getDisplay();
+		final Rectangle listRect = table.getBounds();
+		final Rectangle parentRect = display.map(getParent(), null, getBounds());
+		final Point comboSize = getSize();
+		final Rectangle displayRect = getMonitor().getClientArea();
+		final int width = Math.max(comboSize.x, listRect.width + 2);
+		final int height = listRect.height + 2;
+		final int x = parentRect.x;
 		int y = parentRect.y + comboSize.y;
 		if (y + height > displayRect.y + displayRect.height) {
 			y = parentRect.y - height;
@@ -538,7 +537,7 @@ public final class ImageCombo extends Composite {
 	 * Return the Label immediately preceding the receiver in the z-order, or null if none.
 	 */
 	Label getAssociatedLabel() {
-		Control[] siblings = getParent().getChildren();
+		final Control[] siblings = getParent().getChildren();
 		for (int i = 0; i < siblings.length; i++) {
 			if (siblings[i] == ImageCombo.this) {
 				if (i > 0 && siblings[i - 1] instanceof Label) {
@@ -577,21 +576,21 @@ public final class ImageCombo extends Composite {
 	 * exception if the index is out of range.
 	 * 
 	 * @param index
-	 *        the index of the item to return
+	 *            the index of the item to return
 	 * @return the item at the given index
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_INVALID_RANGE - if the index is not between 0 and the number of
-	 *            elements in the list minus 1 (inclusive)</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_INVALID_RANGE - if the index is not between 0 and the number of
+	 *                elements in the list minus 1 (inclusive)</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
-	public TableItem getItem(int index) {
+	public TableItem getItem(final int index) {
 		checkWidget();
 		return this.table.getItem(index);
 	}
@@ -601,11 +600,11 @@ public final class ImageCombo extends Composite {
 	 * 
 	 * @return the number of items
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
 	public int getItemCount() {
 		checkWidget();
@@ -618,11 +617,11 @@ public final class ImageCombo extends Composite {
 	 * 
 	 * @return the height of one item
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
 	public int getItemHeight() {
 		checkWidget();
@@ -638,20 +637,20 @@ public final class ImageCombo extends Composite {
 	 * 
 	 * @return the items in the receiver's list
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
 	public TableItem[] getItems() {
 		checkWidget();
 		return table.getItems();
 	}
 
-	char getMnemonic(String string) {
+	char getMnemonic(final String string) {
 		int index = 0;
-		int length = string.length();
+		final int length = string.length();
 		do {
 			while ((index < length) && (string.charAt(index) != '&')) {
 				index++;
@@ -663,7 +662,8 @@ public final class ImageCombo extends Composite {
 				return string.charAt(index);
 			}
 			index++;
-		} while (index < length);
+		}
+		while (index < length);
 		return '\0';
 	}
 
@@ -692,11 +692,11 @@ public final class ImageCombo extends Composite {
 	 * 
 	 * @return the index of the selected item
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
 	public int getSelectionIndex() {
 		checkWidget();
@@ -704,7 +704,7 @@ public final class ImageCombo extends Composite {
 	}
 
 	String[] getStringsFromTable() {
-		String[] items = new String[this.table.getItems().length];
+		final String[] items = new String[this.table.getItems().length];
 		for (int i = 0, n = items.length; i < n; i++) {
 			items[i] = this.table.getItem(i).getText();
 		}
@@ -726,11 +726,11 @@ public final class ImageCombo extends Composite {
 	 * 
 	 * @return the receiver's text
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
 	public String getText() {
 		checkWidget();
@@ -776,11 +776,11 @@ public final class ImageCombo extends Composite {
 	 * 
 	 * @return the number of items that are visible
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 * @since 3.0
 	 */
 	public int getVisibleItemCount() {
@@ -788,7 +788,7 @@ public final class ImageCombo extends Composite {
 		return visibleItemCount;
 	}
 
-	void handleFocus(int type) {
+	void handleFocus(final int type) {
 		if (isDisposed()) {
 			return;
 		}
@@ -803,13 +803,13 @@ public final class ImageCombo extends Composite {
 
 			fLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION));
 
-			Shell shell = getShell();
+			final Shell shell = getShell();
 			shell.removeListener(SWT.Deactivate, listener);
 			shell.addListener(SWT.Deactivate, listener);
-			Display display = getDisplay();
+			final Display display = getDisplay();
 			display.removeFilter(SWT.FocusIn, filter);
 			display.addFilter(SWT.FocusIn, filter);
-			Event e = new Event();
+			final Event e = new Event();
 			notifyListeners(SWT.FocusIn, e);
 
 			break;
@@ -818,7 +818,7 @@ public final class ImageCombo extends Composite {
 			if (!hasFocus) {
 				return;
 			}
-			Control focusControl = getDisplay().getFocusControl();
+			final Control focusControl = getDisplay().getFocusControl();
 			if (focusControl == arrow || focusControl == table || focusControl == fLabel) {
 				return;
 			}
@@ -826,11 +826,11 @@ public final class ImageCombo extends Composite {
 
 			fLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
-			Shell shell = getShell();
+			final Shell shell = getShell();
 			shell.removeListener(SWT.Deactivate, listener);
-			Display display = getDisplay();
+			final Display display = getDisplay();
 			display.removeFilter(SWT.FocusIn, filter);
-			Event e = new Event();
+			final Event e = new Event();
 			notifyListeners(SWT.FocusOut, e);
 			break;
 		}
@@ -843,20 +843,20 @@ public final class ImageCombo extends Composite {
 	 * -1.
 	 * 
 	 * @param string
-	 *        the search item
+	 *            the search item
 	 * @return the index of the item
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the string is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the string is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
-	public int indexOf(String string) {
+	public int indexOf(final String string) {
 		checkWidget();
 		if (string == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
@@ -865,20 +865,20 @@ public final class ImageCombo extends Composite {
 	}
 
 	void initAccessible() {
-		AccessibleAdapter accessibleAdapter = new AccessibleAdapter() {
+		final AccessibleAdapter accessibleAdapter = new AccessibleAdapter() {
 			@Override
-			public void getHelp(AccessibleEvent e) {
+			public void getHelp(final AccessibleEvent e) {
 				e.result = getToolTipText();
 			}
 
 			@Override
-			public void getKeyboardShortcut(AccessibleEvent e) {
+			public void getKeyboardShortcut(final AccessibleEvent e) {
 				String shortcut = null;
-				Label label = getAssociatedLabel();
+				final Label label = getAssociatedLabel();
 				if (label != null) {
-					String text = label.getText();
+					final String text = label.getText();
 					if (text != null) {
-						char mnemonic = getMnemonic(text);
+						final char mnemonic = getMnemonic(text);
 						if (mnemonic != '\0') {
 							shortcut = "Alt+" + mnemonic; //$NON-NLS-1$
 						}
@@ -888,9 +888,9 @@ public final class ImageCombo extends Composite {
 			}
 
 			@Override
-			public void getName(AccessibleEvent e) {
+			public void getName(final AccessibleEvent e) {
 				String name = null;
-				Label label = getAssociatedLabel();
+				final Label label = getAssociatedLabel();
 				if (label != null) {
 					name = stripMnemonic(label.getText());
 				}
@@ -903,17 +903,17 @@ public final class ImageCombo extends Composite {
 
 		arrow.getAccessible().addAccessibleListener(new AccessibleAdapter() {
 			@Override
-			public void getHelp(AccessibleEvent e) {
+			public void getHelp(final AccessibleEvent e) {
 				e.result = getToolTipText();
 			}
 
 			@Override
-			public void getKeyboardShortcut(AccessibleEvent e) {
+			public void getKeyboardShortcut(final AccessibleEvent e) {
 				e.result = "Alt+Down Arrow"; //$NON-NLS-1$
 			}
 
 			@Override
-			public void getName(AccessibleEvent e) {
+			public void getName(final AccessibleEvent e) {
 				e.result = isDropped() ? SWT.getMessage("SWT_Close") : SWT.getMessage("SWT_Open"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
@@ -927,22 +927,22 @@ public final class ImageCombo extends Composite {
 
 		getAccessible().addAccessibleControlListener(new AccessibleControlAdapter() {
 			@Override
-			public void getChildAtPoint(AccessibleControlEvent e) {
-				Point testPoint = toControl(e.x, e.y);
+			public void getChildAtPoint(final AccessibleControlEvent e) {
+				final Point testPoint = toControl(e.x, e.y);
 				if (getBounds().contains(testPoint)) {
 					e.childID = ACC.CHILDID_SELF;
 				}
 			}
 
 			@Override
-			public void getChildCount(AccessibleControlEvent e) {
+			public void getChildCount(final AccessibleControlEvent e) {
 				e.detail = 0;
 			}
 
 			@Override
-			public void getLocation(AccessibleControlEvent e) {
-				Rectangle location = getBounds();
-				Point pt = toDisplay(location.x, location.y);
+			public void getLocation(final AccessibleControlEvent e) {
+				final Rectangle location = getBounds();
+				final Point pt = toDisplay(location.x, location.y);
 				e.x = pt.x;
 				e.y = pt.y;
 				e.width = location.width;
@@ -950,17 +950,17 @@ public final class ImageCombo extends Composite {
 			}
 
 			@Override
-			public void getRole(AccessibleControlEvent e) {
+			public void getRole(final AccessibleControlEvent e) {
 				e.detail = ACC.ROLE_COMBOBOX;
 			}
 
 			@Override
-			public void getState(AccessibleControlEvent e) {
+			public void getState(final AccessibleControlEvent e) {
 				e.detail = ACC.STATE_NORMAL;
 			}
 
 			@Override
-			public void getValue(AccessibleControlEvent e) {
+			public void getValue(final AccessibleControlEvent e) {
 				e.result = getText();
 			}
 		});
@@ -974,20 +974,20 @@ public final class ImageCombo extends Composite {
 
 		arrow.getAccessible().addAccessibleControlListener(new AccessibleControlAdapter() {
 			@Override
-			public void getDefaultAction(AccessibleControlEvent e) {
+			public void getDefaultAction(final AccessibleControlEvent e) {
 				e.result = isDropped() ? SWT.getMessage("SWT_Close") : SWT.getMessage("SWT_Open"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 	}
 
-	void internalLayout(boolean changed) {
+	void internalLayout(final boolean changed) {
 		if (isDropped()) {
 			dropDown(false);
 		}
-		Rectangle rect = getClientArea();
-		int width = rect.width;
-		int height = rect.height;
-		Point arrowSize = arrow.computeSize(SWT.DEFAULT, height, changed);
+		final Rectangle rect = getClientArea();
+		final int width = rect.width;
+		final int height = rect.height;
+		final Point arrowSize = arrow.computeSize(SWT.DEFAULT, height, changed);
 		fLabel.setBounds(0, 0, width - arrowSize.x, height);
 		arrow.setBounds(width - arrowSize.x, 0, arrowSize.x, arrowSize.y);
 	}
@@ -999,16 +999,13 @@ public final class ImageCombo extends Composite {
 	@Override
 	public boolean isFocusControl() {
 		checkWidget();
-		if (fLabel.isFocusControl()
-				|| arrow.isFocusControl()
-				|| table.isFocusControl()
-				|| popup.isFocusControl()) {
+		if (fLabel.isFocusControl() || arrow.isFocusControl() || table.isFocusControl() || popup.isFocusControl()) {
 			return true;
 		}
 		return super.isFocusControl();
 	}
 
-	void onArrowEvent(Event event) {
+	void onArrowEvent(final Event event) {
 		switch (event.type) {
 		case SWT.FocusIn: {
 			if (gtk) {
@@ -1032,16 +1029,16 @@ public final class ImageCombo extends Composite {
 		}
 	}
 
-	void onComboEvent(Event event) {
+	void onComboEvent(final Event event) {
 		switch (event.type) {
 		case SWT.Dispose:
 			if (popup != null && !popup.isDisposed()) {
 				table.removeListener(SWT.Dispose, listener);
 				popup.dispose();
 			}
-			Shell shell = getShell();
+			final Shell shell = getShell();
 			shell.removeListener(SWT.Deactivate, listener);
-			Display display = getDisplay();
+			final Display display = getDisplay();
 			display.removeFilter(SWT.FocusIn, filter);
 			popup = null;
 			fLabel = null;
@@ -1061,14 +1058,14 @@ public final class ImageCombo extends Composite {
 		}
 	}
 
-	void onPopupEvent(Event event) {
+	void onPopupEvent(final Event event) {
 
 		switch (event.type) {
 
 		case SWT.Paint:
 			// draw black rectangle around list
-			Rectangle listRect = table.getBounds();
-			Color black = getDisplay().getSystemColor(SWT.COLOR_BLACK);
+			final Rectangle listRect = table.getBounds();
+			final Color black = getDisplay().getSystemColor(SWT.COLOR_BLACK);
 			event.gc.setForeground(black);
 			event.gc.drawRectangle(0, 0, listRect.width + 1, listRect.height + 1);
 			break;
@@ -1085,8 +1082,8 @@ public final class ImageCombo extends Composite {
 			// then a Selection event from the button.
 			// as a work-around, set a flag (dontDrop) if running GTK
 			if (gtk) {
-				Point loc = arrow.toControl(getDisplay().getCursorLocation());
-				Point size = arrow.getSize();
+				final Point loc = arrow.toControl(getDisplay().getCursorLocation());
+				final Point size = arrow.getSize();
 				if ((loc.x >= 0) && (loc.y >= 0) && (loc.x < size.x) && (loc.y < size.y)) {
 					dontDrop = true;
 				}
@@ -1096,11 +1093,11 @@ public final class ImageCombo extends Composite {
 		}
 	}
 
-	void onTableEvent(Event event) {
+	void onTableEvent(final Event event) {
 		switch (event.type) {
 		case SWT.Dispose:
 			if (getShell() != popup.getParent()) {
-				int selectionIndex = table.getSelectionIndex();
+				final int selectionIndex = table.getSelectionIndex();
 				popup = null;
 				table = null;
 				createPopup(selectionIndex);
@@ -1118,7 +1115,7 @@ public final class ImageCombo extends Composite {
 			break;
 		}
 		case SWT.Selection: {
-			int index = table.getSelectionIndex();
+			final int index = table.getSelectionIndex();
 			if (index == -1) {
 				return;
 			}
@@ -1136,7 +1133,7 @@ public final class ImageCombo extends Composite {
 
 			table.setSelection(index);
 
-			Event e = new Event();
+			final Event e = new Event();
 			e.time = event.time;
 			e.stateMask = event.stateMask;
 			e.doit = event.doit;
@@ -1161,7 +1158,7 @@ public final class ImageCombo extends Composite {
 				return;
 			}
 
-			Event e = new Event();
+			final Event e = new Event();
 			e.time = event.time;
 			e.detail = event.detail;
 			e.doit = event.doit;
@@ -1173,7 +1170,7 @@ public final class ImageCombo extends Composite {
 			break;
 		}
 		case SWT.KeyUp: {
-			Event e = new Event();
+			final Event e = new Event();
 			e.time = event.time;
 			e.character = event.character;
 			e.keyCode = event.keyCode;
@@ -1186,14 +1183,13 @@ public final class ImageCombo extends Composite {
 				// Escape key cancels popup list
 				dropDown(false);
 			}
-			if ((event.stateMask & SWT.ALT) != 0
-					&& (event.keyCode == SWT.ARROW_UP || event.keyCode == SWT.ARROW_DOWN)) {
+			if ((event.stateMask & SWT.ALT) != 0 && (event.keyCode == SWT.ARROW_UP || event.keyCode == SWT.ARROW_DOWN)) {
 				dropDown(false);
 			}
 			if (event.character == SWT.CR) {
 				// Enter causes default selection
 				dropDown(false);
-				Event e = new Event();
+				final Event e = new Event();
 				e.time = event.time;
 				e.stateMask = event.stateMask;
 				notifyListeners(SWT.DefaultSelection, e);
@@ -1203,7 +1199,7 @@ public final class ImageCombo extends Composite {
 			if (isDisposed()) {
 				break;
 			}
-			Event e = new Event();
+			final Event e = new Event();
 			e.time = event.time;
 			e.character = event.character;
 			e.keyCode = event.keyCode;
@@ -1240,7 +1236,7 @@ public final class ImageCombo extends Composite {
 //		}
 //	});
 
-	void onTextEvent(Event event) {
+	void onTextEvent(final Event event) {
 
 		// simulate key up/down with the mouse wheel
 		if (event.type == SWT.MouseWheel) {
@@ -1268,7 +1264,7 @@ public final class ImageCombo extends Composite {
 //			}
 
 			if (event.character == SWT.CR) {
-				boolean dropped = isDropped();
+				final boolean dropped = isDropped();
 				if (!dropped) {
 					setFocus();
 				}
@@ -1286,7 +1282,7 @@ public final class ImageCombo extends Composite {
 				event.doit = false;
 
 				if ((event.stateMask & SWT.ALT) != 0) {
-					boolean dropped = isDropped();
+					final boolean dropped = isDropped();
 					if (!dropped) {
 						setFocus();
 					}
@@ -1294,7 +1290,7 @@ public final class ImageCombo extends Composite {
 					break;
 				}
 
-				int oldIndex = getSelectionIndex();
+				final int oldIndex = getSelectionIndex();
 				if (event.keyCode == SWT.ARROW_UP) {
 					select(Math.max(oldIndex - 1, 0));
 				} else {
@@ -1302,7 +1298,7 @@ public final class ImageCombo extends Composite {
 				}
 
 				if (oldIndex != getSelectionIndex()) {
-					Event e = new Event();
+					final Event e = new Event();
 					e.time = event.time;
 					e.stateMask = event.stateMask;
 					notifyListeners(SWT.Selection, e);
@@ -1317,7 +1313,7 @@ public final class ImageCombo extends Composite {
 			// Further work : Need to add support for incremental search in 
 			// pop up list as characters typed in text widget
 
-			Event e = new Event();
+			final Event e = new Event();
 			e.time = event.time;
 			e.character = event.character;
 			e.keyCode = event.keyCode;
@@ -1327,7 +1323,7 @@ public final class ImageCombo extends Composite {
 		}
 
 		case SWT.KeyUp: {
-			Event e = new Event();
+			final Event e = new Event();
 			e.time = event.time;
 			e.character = event.character;
 			e.keyCode = event.keyCode;
@@ -1337,7 +1333,7 @@ public final class ImageCombo extends Composite {
 		}
 		case SWT.Modify: {
 			table.deselectAll();
-			Event e = new Event();
+			final Event e = new Event();
 			e.time = event.time;
 			notifyListeners(SWT.Modify, e);
 			break;
@@ -1347,7 +1343,7 @@ public final class ImageCombo extends Composite {
 				return;
 			}
 
-			boolean dropped = isDropped();
+			final boolean dropped = isDropped();
 			if (!dropped) {
 //				setFocus();
 			}
@@ -1373,7 +1369,7 @@ public final class ImageCombo extends Composite {
 				break;
 			}
 
-			Event e = new Event();
+			final Event e = new Event();
 			e.time = event.time;
 			e.detail = event.detail;
 			e.doit = event.doit;
@@ -1399,7 +1395,7 @@ public final class ImageCombo extends Composite {
 	}
 
 	@Override
-	public void redraw(int x, int y, int width, int height, boolean all) {
+	public void redraw(final int x, final int y, final int width, final int height, final boolean all) {
 		super.redraw(x, y, width, height, true);
 	}
 
@@ -1407,20 +1403,20 @@ public final class ImageCombo extends Composite {
 	 * Removes the item from the receiver's list at the given zero-relative index.
 	 * 
 	 * @param index
-	 *        the index for the item
+	 *            the index for the item
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_INVALID_RANGE - if the index is not between 0 and the number of
-	 *            elements in the list minus 1 (inclusive)</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_INVALID_RANGE - if the index is not between 0 and the number of
+	 *                elements in the list minus 1 (inclusive)</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
-	public void remove(int index) {
+	public void remove(final int index) {
 		checkWidget();
 		table.remove(index);
 	}
@@ -1430,22 +1426,22 @@ public final class ImageCombo extends Composite {
 	 * and end indices (inclusive).
 	 * 
 	 * @param start
-	 *        the start of the range
+	 *            the start of the range
 	 * @param end
-	 *        the end of the range
+	 *            the end of the range
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_INVALID_RANGE - if either the start or end are not between 0 and the
-	 *            number of elements in the list minus 1 (inclusive)</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_INVALID_RANGE - if either the start or end are not between 0 and the
+	 *                number of elements in the list minus 1 (inclusive)</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
-	public void remove(int start, int end) {
+	public void remove(final int start, final int end) {
 		checkWidget();
 		table.remove(start, end);
 	}
@@ -1455,20 +1451,20 @@ public final class ImageCombo extends Composite {
 	 * to the argument, and removes that item from the list.
 	 * 
 	 * @param string
-	 *        the item to remove
+	 *            the item to remove
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the string is null</li>
-	 *            <li>ERROR_INVALID_ARGUMENT - if the string is not found in the list</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the string is null</li>
+	 *                <li>ERROR_INVALID_ARGUMENT - if the string is not found in the list</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
-	public void remove(String string) {
+	public void remove(final String string) {
 		checkWidget();
 		if (string == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
@@ -1489,11 +1485,11 @@ public final class ImageCombo extends Composite {
 	 * <p>
 	 * 
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li> <li>
+	 *                ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
+	 *                receiver</li>
+	 *                </ul>
 	 */
 	public void removeAll() {
 		checkWidget();
@@ -1506,21 +1502,21 @@ public final class ImageCombo extends Composite {
 	 * receiver's text is modified.
 	 * 
 	 * @param listener
-	 *        the listener which should no longer be notified
+	 *            the listener which should no longer be notified
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li> <li>
+	 *                ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
+	 *                receiver</li>
+	 *                </ul>
 	 * @see ModifyListener
 	 * @see #addModifyListener
 	 */
-	public void removeModifyListener(ModifyListener listener) {
+	public void removeModifyListener(final ModifyListener listener) {
 		checkWidget();
 		if (listener == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
@@ -1533,21 +1529,21 @@ public final class ImageCombo extends Composite {
 	 * receiver's selection changes.
 	 * 
 	 * @param listener
-	 *        the listener which should no longer be notified
+	 *            the listener which should no longer be notified
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li> <li>
+	 *                ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
+	 *                receiver</li>
+	 *                </ul>
 	 * @see SelectionListener
 	 * @see #addSelectionListener
 	 */
-	public void removeSelectionListener(SelectionListener listener) {
+	public void removeSelectionListener(final SelectionListener listener) {
 		checkWidget();
 		if (listener == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
@@ -1561,15 +1557,15 @@ public final class ImageCombo extends Composite {
 	 * index was already selected, it remains selected. Indices that are out of range are ignored.
 	 * 
 	 * @param index
-	 *        the index of the item to select
+	 *            the index of the item to select
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li> <li>
+	 *                ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
+	 *                receiver</li>
+	 *                </ul>
 	 */
-	public void select(int index) {
+	public void select(final int index) {
 
 		checkWidget();
 
@@ -1586,7 +1582,7 @@ public final class ImageCombo extends Composite {
 
 				fLabel.setText(tableItem.getText());
 
-				Image tableImage = tableItem.getImage();
+				final Image tableImage = tableItem.getImage();
 				if (tableImage != null && tableImage.isDisposed() == false) {
 					fLabel.setImage(tableImage);
 				}
@@ -1599,7 +1595,7 @@ public final class ImageCombo extends Composite {
 	}
 
 	@Override
-	public void setBackground(Color color) {
+	public void setBackground(final Color color) {
 		super.setBackground(color);
 		background = color;
 		if (fLabel != null) {
@@ -1617,22 +1613,22 @@ public final class ImageCombo extends Composite {
 	 * Sets the editable state.
 	 * 
 	 * @param editable
-	 *        the new editable state
+	 *            the new editable state
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li> <li>
+	 *                ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
+	 *                receiver</li>
+	 *                </ul>
 	 * @since 3.0
 	 */
-	public void setEditable(boolean editable) {
+	public void setEditable(final boolean editable) {
 		checkWidget();
 //		text.setEditable(editable);
 	}
 
 	@Override
-	public void setEnabled(boolean enabled) {
+	public void setEnabled(final boolean enabled) {
 		super.setEnabled(enabled);
 		if (popup != null) {
 			popup.setVisible(false);
@@ -1652,7 +1648,7 @@ public final class ImageCombo extends Composite {
 	}
 
 	@Override
-	public void setFont(Font font) {
+	public void setFont(final Font font) {
 		super.setFont(font);
 		this.font = font;
 		fLabel.setFont(font);
@@ -1661,7 +1657,7 @@ public final class ImageCombo extends Composite {
 	}
 
 	@Override
-	public void setForeground(Color color) {
+	public void setForeground(final Color color) {
 		super.setForeground(color);
 		foreground = color;
 		if (fLabel != null) {
@@ -1677,27 +1673,27 @@ public final class ImageCombo extends Composite {
 
 	/**
 	 * Sets the text of the item in the receiver's list at the given zero-relative index to the
-	 * string argument. This is equivalent to <code>remove</code>'ing the old item at the index,
-	 * and then <code>add</code>'ing the new item at that index.
+	 * string argument. This is equivalent to <code>remove</code>'ing the old item at the index, and
+	 * then <code>add</code>'ing the new item at that index.
 	 * 
 	 * @param index
-	 *        the index for the item
+	 *            the index for the item
 	 * @param string
-	 *        the new text for the item
+	 *            the new text for the item
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_INVALID_RANGE - if the index is not between 0 and the number of
-	 *            elements in the list minus 1 (inclusive)</li>
-	 *            <li>ERROR_NULL_ARGUMENT - if the string is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_INVALID_RANGE - if the index is not between 0 and the number of
+	 *                elements in the list minus 1 (inclusive)</li> <li>ERROR_NULL_ARGUMENT - if the
+	 *                string is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li> <li>
+	 *                ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
+	 *                receiver</li>
+	 *                </ul>
 	 */
-	public void setItem(int index, String string, Image image) {
+	public void setItem(final int index, final String string, final Image image) {
 		checkWidget();
 		remove(index);
 		add(string, image, index);
@@ -1707,24 +1703,24 @@ public final class ImageCombo extends Composite {
 	 * Sets the receiver's list to be the given array of items.
 	 * 
 	 * @param items
-	 *        the array of items
+	 *            the array of items
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the items array is null</li>
-	 *            <li>ERROR_INVALID_ARGUMENT - if an item in the items array is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the items array is null</li> <li>
+	 *                ERROR_INVALID_ARGUMENT - if an item in the items array is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li> <li>
+	 *                ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
+	 *                receiver</li>
+	 *                </ul>
 	 */
-	public void setItems(String[] items) {
+	public void setItems(final String[] items) {
 		checkWidget();
 		this.table.removeAll();
-		for (int i = 0, n = items.length; i < n; i++) {
-			add(items[i], null);
+		for (final String item : items) {
+			add(item, null);
 		}
 //		if (!text.getEditable()) {
 //			text.setText(""); //$NON-NLS-1$
@@ -1739,16 +1735,16 @@ public final class ImageCombo extends Composite {
 	 * </p>
 	 * 
 	 * @param layout
-	 *        the receiver's new layout or null
+	 *            the receiver's new layout or null
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
 	@Override
-	public void setLayout(Layout layout) {
+	public void setLayout(final Layout layout) {
 		checkWidget();
 		return;
 	}
@@ -1759,19 +1755,19 @@ public final class ImageCombo extends Composite {
 	 * selection.
 	 * 
 	 * @param selection
-	 *        a point representing the new selection start and end
+	 *            a point representing the new selection start and end
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the point is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the point is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
-	public void setSelection(Point selection) {
+	public void setSelection(final Point selection) {
 		checkWidget();
 		if (selection == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
@@ -1782,25 +1778,25 @@ public final class ImageCombo extends Composite {
 	/**
 	 * Sets the contents of the receiver's text field to the given string.
 	 * <p>
-	 * Note: The text field in a <code>Combo</code> is typically only capable of displaying a
-	 * single line of text. Thus, setting the text to a string containing line breaks or other
-	 * special characters will probably cause it to display incorrectly.
+	 * Note: The text field in a <code>Combo</code> is typically only capable of displaying a single
+	 * line of text. Thus, setting the text to a string containing line breaks or other special
+	 * characters will probably cause it to display incorrectly.
 	 * </p>
 	 * 
 	 * @param string
-	 *        the new text
+	 *            the new text
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the string is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the string is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
-	public void setText(String string) {
+	public void setText(final String string) {
 		checkWidget();
 		if (string == null) {
 			SWT.error(SWT.ERROR_NULL_ARGUMENT);
@@ -1846,7 +1842,7 @@ public final class ImageCombo extends Composite {
 //	}
 
 	@Override
-	public void setToolTipText(String string) {
+	public void setToolTipText(final String string) {
 		checkWidget();
 		super.setToolTipText(string);
 		arrow.setToolTipText(string);
@@ -1854,7 +1850,7 @@ public final class ImageCombo extends Composite {
 	}
 
 	@Override
-	public void setVisible(boolean visible) {
+	public void setVisible(final boolean visible) {
 		super.setVisible(visible);
 		if (!visible) {
 			popup.setVisible(false);
@@ -1865,16 +1861,16 @@ public final class ImageCombo extends Composite {
 	 * Sets the number of items that are visible in the drop down portion of the receiver's list.
 	 * 
 	 * @param count
-	 *        the new number of items to be visible
+	 *            the new number of items to be visible
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 * @since 3.0
 	 */
-	public void setVisibleItemCount(int count) {
+	public void setVisibleItemCount(final int count) {
 		checkWidget();
 		if (count < 0) {
 			return;
@@ -1882,9 +1878,9 @@ public final class ImageCombo extends Composite {
 		visibleItemCount = count;
 	}
 
-	String stripMnemonic(String string) {
+	String stripMnemonic(final String string) {
 		int index = 0;
-		int length = string.length();
+		final int length = string.length();
 		do {
 			while ((index < length) && (string.charAt(index) != '&')) {
 				index++;
@@ -1896,7 +1892,8 @@ public final class ImageCombo extends Composite {
 				return string.substring(0, index - 1) + string.substring(index, length);
 			}
 			index++;
-		} while (index < length);
+		}
+		while (index < length);
 		return string;
 	}
 }

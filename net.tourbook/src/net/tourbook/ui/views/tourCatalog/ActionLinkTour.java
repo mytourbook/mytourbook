@@ -24,7 +24,7 @@ public class ActionLinkTour extends Action {
 
 	private TourCatalogView	fTourCatalogView;
 
-	public ActionLinkTour(TourCatalogView view) {
+	public ActionLinkTour(final TourCatalogView view) {
 
 		super(null, AS_CHECK_BOX);
 

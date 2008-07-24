@@ -134,7 +134,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		public void dispose() {}
 
-		public Object[] getElements(Object inputElement) {
+		public Object[] getElements(final Object inputElement) {
 			if (fTourData == null) {
 				return new Object[0];
 			} else {
@@ -142,22 +142,22 @@ public class MarkerDialog extends TitleAreaDialog {
 			}
 		}
 
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
 	class MarkerViewerLabelProvider extends CellLabelProvider {
 
 		@Override
-		public void update(ViewerCell cell) {
+		public void update(final ViewerCell cell) {
 
-			TourMarker tourMarker = (TourMarker) cell.getElement();
+			final TourMarker tourMarker = (TourMarker) cell.getElement();
 
 			switch (cell.getColumnIndex()) {
 
 			case COLUMN_DISTANCE:
 				fNF.setMinimumFractionDigits(1);
 				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(((float) tourMarker.getDistance()) / (1000 * UI.UNIT_VALUE_DISTANCE)));
+				cell.setText(fNF.format((tourMarker.getDistance()) / (1000 * UI.UNIT_VALUE_DISTANCE)));
 
 				if (tourMarker.getType() == ChartMarker.MARKER_TYPE_DEVICE) {
 					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -187,7 +187,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	 */
 	private class MarkerViewerSorter extends ViewerSorter {
 		@Override
-		public int compare(Viewer viewer, Object obj1, Object obj2) {
+		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
 		}
 	}
@@ -196,9 +196,9 @@ public class MarkerDialog extends TitleAreaDialog {
 	 * @param parentShell
 	 * @param tourData
 	 * @param initialTourMarker
-	 *        TourMarker which is selected when the dialog is opened
+	 *            TourMarker which is selected when the dialog is opened
 	 */
-	public MarkerDialog(Shell parentShell, TourData tourData, TourMarker initialTourMarker) {
+	public MarkerDialog(final Shell parentShell, final TourData tourData, final TourMarker initialTourMarker) {
 
 		super(parentShell);
 
@@ -209,7 +209,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 	}
 
-	public void addTourMarker(TourMarker newTourMarker) {
+	public void addTourMarker(final TourMarker newTourMarker) {
 
 		// update data model, add new marker to the marker list
 		fTourData.getTourMarkers().add(newTourMarker);
@@ -236,7 +236,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	}
 
 	@Override
-	protected void configureShell(Shell shell) {
+	protected void configureShell(final Shell shell) {
 
 		super.configureShell(shell);
 		shell.setText(Messages.Dlg_TourMarker_Dlg_title);
@@ -264,22 +264,22 @@ public class MarkerDialog extends TitleAreaDialog {
 	}
 
 	@Override
-	protected void createButtonsForButtonBar(Composite parent) {
+	protected void createButtonsForButtonBar(final Composite parent) {
 
 		fBtnClose = createButton(parent, IDialogConstants.CLOSE_ID, IDialogConstants.CLOSE_LABEL, false);
 
 		fBtnClose.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				close();
 			}
 		});
 	}
 
 	@Override
-	protected Control createDialogArea(Composite parent) {
+	protected Control createDialogArea(final Composite parent) {
 
-		Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
+		final Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
 
 		createUI(dlgAreaContainer);
 
@@ -293,7 +293,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		if (fInitialTourMarker == null) {
 			// select first marker if any are available
-			Object firstElement = fMarkerViewer.getElementAt(0);
+			final Object firstElement = fMarkerViewer.getElementAt(0);
 			if (firstElement != null) {
 				fMarkerViewer.setSelection(new StructuredSelection(firstElement), true);
 			}
@@ -310,16 +310,16 @@ public class MarkerDialog extends TitleAreaDialog {
 		return dlgAreaContainer;
 	}
 
-	private Composite createMarkerViewer(Composite parent) {
+	private Composite createMarkerViewer(final Composite parent) {
 
-		TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
+		final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
+		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
 		tableLayouter.setLayoutData(gd);
 
 		/*
 		 * create table
 		 */
-		Table table = new Table(tableLayouter, SWT.FULL_SELECTION | SWT.BORDER);
+		final Table table = new Table(tableLayouter, SWT.FULL_SELECTION | SWT.BORDER);
 
 		table.setLayout(new TableLayout());
 		table.setHeaderVisible(true);
@@ -331,7 +331,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		 * create columns
 		 */
 		TableViewerColumn tvc;
-		PixelConverter pixelConverter = new PixelConverter(table);
+		final PixelConverter pixelConverter = new PixelConverter(table);
 
 		final MarkerViewerLabelProvider labelProvider = new MarkerViewerLabelProvider();
 
@@ -371,8 +371,8 @@ public class MarkerDialog extends TitleAreaDialog {
 		fMarkerViewer.setSorter(new MarkerViewerSorter());
 
 		fMarkerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				StructuredSelection selection = (StructuredSelection) event.getSelection();
+			public void selectionChanged(final SelectionChangedEvent event) {
+				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
 					onSelectMarker((TourMarker) selection.getFirstElement());
 				}
@@ -380,7 +380,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		});
 
 		fMarkerViewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
+			public void doubleClick(final DoubleClickEvent event) {
 				fTextMarkerName.setFocus();
 				fTextMarkerName.selectAll();
 			}
@@ -392,7 +392,7 @@ public class MarkerDialog extends TitleAreaDialog {
 	/**
 	 * create tour chart with new marker
 	 */
-	private void createTourChart(Composite parent) {
+	private void createTourChart(final Composite parent) {
 
 		fTourChart = new TourChart(parent, SWT.BORDER, true);
 
@@ -400,14 +400,14 @@ public class MarkerDialog extends TitleAreaDialog {
 		fTourChart.setShowSlider(true);
 		fTourChart.setContextProvider(new TourChartContextProvider(this));
 
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
+		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
 		gd.heightHint = 400;
 		gd.verticalIndent = 5;
 		fTourChart.setLayoutData(gd);
 
 		// set title
 		fTourChart.addDataModelListener(new IDataModelListener() {
-			public void dataModelChanged(ChartDataModel changedChartDataModel) {
+			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
 			}
 		});
@@ -415,21 +415,21 @@ public class MarkerDialog extends TitleAreaDialog {
 //		TourChartConfiguration chartConfig = new TourChartConfiguration(false);
 //		chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
-		TourChartConfiguration chartConfig = TourManager.createTourChartConfiguration();
+		final TourChartConfiguration chartConfig = TourManager.createTourChartConfiguration();
 		fTourChart.updateTourChart(fTourData, chartConfig, false);
 	}
 
-	private void createUI(Composite parent) {
+	private void createUI(final Composite parent) {
 
 		Label label;
 		GridLayout gl;
 		GridData gd;
 
-		Composite dlgMarginContainer = new Composite(parent, SWT.NONE);
+		final Composite dlgMarginContainer = new Composite(parent, SWT.NONE);
 		dlgMarginContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		dlgMarginContainer.setLayout(new GridLayout());
 
-		Composite dlgContainer = new Composite(dlgMarginContainer, SWT.NONE);
+		final Composite dlgContainer = new Composite(dlgMarginContainer, SWT.NONE);
 		dlgContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		// dlgContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
@@ -463,7 +463,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		fBtnDelete.setToolTipText(Messages.Dlg_TourMarker_Button_delete_tooltip);
 		fBtnDelete.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onDeleteMarker();
 			}
 		});
@@ -476,7 +476,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		fBtnUndo.setToolTipText(Messages.Dlg_TourMarker_Button_undo_tooltip);
 		fBtnUndo.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				fSelectedTourMarker.restoreMarkerFromBackup(fBackupMarker);
 				updateMarkerUI();
 				onChangeMarkerUI();
@@ -487,7 +487,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		/*
 		 * container: marker details
 		 */
-		Composite markerSettingsContainer = new Composite(markerDetailContainer, SWT.NONE);
+		final Composite markerSettingsContainer = new Composite(markerDetailContainer, SWT.NONE);
 		gl = new GridLayout(4, false);
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
@@ -510,7 +510,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		fTextMarkerName.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(final KeyEvent e) {
 				onChangeMarkerUI();
 			}
 		});
@@ -534,13 +534,13 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		fComboMarkerPosition.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onChangeMarkerUI();
 			}
 		});
 
 		// fill position combo
-		for (String position : TourMarker.visualPositionLabels) {
+		for (final String position : TourMarker.visualPositionLabels) {
 			fComboMarkerPosition.add(position);
 		}
 
@@ -573,12 +573,12 @@ public class MarkerDialog extends TitleAreaDialog {
 		fScaleX.setLayoutData(gd);
 		fScaleX.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onChangeMarkerUI();
 			}
 		});
 		fScaleX.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseScrolled(MouseEvent e) {
+			public void mouseScrolled(final MouseEvent e) {
 				onChangeMarkerUI();
 			}
 		});
@@ -606,12 +606,12 @@ public class MarkerDialog extends TitleAreaDialog {
 		fScaleY.setLayoutData(gd);
 		fScaleY.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onChangeMarkerUI();
 			}
 		});
 		fScaleY.addMouseWheelListener(new MouseWheelListener() {
-			public void mouseScrolled(MouseEvent e) {
+			public void mouseScrolled(final MouseEvent e) {
 				onChangeMarkerUI();
 			}
 		});
@@ -633,7 +633,7 @@ public class MarkerDialog extends TitleAreaDialog {
 
 		fBtnReset.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 
 				fScaleX.setSelection(OFFSET_0);
 				fScaleY.setSelection(OFFSET_0);
@@ -644,7 +644,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		setButtonLayoutData(fBtnReset);
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void enableControls() {
 
 		if (fSelectedTourMarker != null) {
@@ -657,11 +657,11 @@ public class MarkerDialog extends TitleAreaDialog {
 		 * button: delete marker
 		 */
 		boolean isCustomMarker = false;
-		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();
+		final IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();
 
 		// check if custom markers are selected
-		for (Iterator<TourMarker> iter = markerSelection.iterator(); iter.hasNext();) {
-			TourMarker tourMarker = iter.next();
+		for (final Iterator<TourMarker> iter = markerSelection.iterator(); iter.hasNext();) {
+			final TourMarker tourMarker = iter.next();
 			if (tourMarker.getType() != ChartMarker.MARKER_TYPE_DEVICE) {
 				isCustomMarker = true;
 				break;
@@ -669,10 +669,11 @@ public class MarkerDialog extends TitleAreaDialog {
 		}
 		fBtnDelete.setEnabled(isCustomMarker);
 
-		boolean isMarkerAvailable = fMarkerViewer.getTable().getItemCount() != 0;
+		final boolean isMarkerAvailable = fMarkerViewer.getTable().getItemCount() != 0;
 
 		if (isMarkerAvailable) {
-			boolean isScale0 = (fScaleX.getSelection() - OFFSET_0) == 0 && (fScaleY.getSelection() - OFFSET_0) == 0;
+			final boolean isScale0 = (fScaleX.getSelection() - OFFSET_0) == 0
+					&& (fScaleY.getSelection() - OFFSET_0) == 0;
 			fBtnReset.setEnabled(!isScale0);
 		} else {
 			fBtnReset.setEnabled(false);
@@ -720,21 +721,21 @@ public class MarkerDialog extends TitleAreaDialog {
 	/**
 	 * remove selected markers from the view and update dependened structures
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void onDeleteMarker() {
 
-		IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();
+		final IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();
 		final TourMarker selectedMarker = (TourMarker) markerSelection.getFirstElement();
 
 		// confirm to save the changes
-		MessageBox msgBox = new MessageBox(fTourChart.getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+		final MessageBox msgBox = new MessageBox(fTourChart.getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 		msgBox.setText(Messages.Dlg_TourMarker_MsgBox_delete_marker_title);
 		msgBox.setMessage(NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (selectedMarker).getLabel()));
 
 		if (msgBox.open() == SWT.YES) {
 
 			// get index for selected marker
-			int lastMarkerIndex = fMarkerViewer.getTable().getSelectionIndex();
+			final int lastMarkerIndex = fMarkerViewer.getTable().getSelectionIndex();
 
 			// update data model
 			fTourData.getTourMarkers().remove(selectedMarker);
@@ -761,7 +762,7 @@ public class MarkerDialog extends TitleAreaDialog {
 		}
 	}
 
-	private void onSelectMarker(TourMarker newSelectedMarker) {
+	private void onSelectMarker(final TourMarker newSelectedMarker) {
 
 		if (newSelectedMarker == null) {
 			return;
@@ -790,13 +791,12 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	private void restoreDialogSettings() {
 
-		IDialogSettings dlgSettings = getDialogSettings();
+		final IDialogSettings dlgSettings = getDialogSettings();
 
 		// restore width for the marker list when the width is available
 		try {
 			fViewerDetailForm.setViewerWidth(dlgSettings.getInt(DIALOG_SETTINGS_VIEWER_WIDTH));
-		}
-		catch (NumberFormatException e) {}
+		} catch (final NumberFormatException e) {}
 	}
 
 	/**
@@ -813,13 +813,13 @@ public class MarkerDialog extends TitleAreaDialog {
 
 	private void saveDialogSettings() {
 
-		IDialogSettings dlgSettings = getDialogSettings();
+		final IDialogSettings dlgSettings = getDialogSettings();
 
 		dlgSettings.put(DIALOG_SETTINGS_POSITION, fComboMarkerPosition.getSelectionIndex());
 		dlgSettings.put(DIALOG_SETTINGS_VIEWER_WIDTH, fMarkerListContainer.getSize().x);
 	}
 
-	private void saveMarkerValuesFromUI(TourMarker tourMarker) {
+	private void saveMarkerValuesFromUI(final TourMarker tourMarker) {
 
 		if (tourMarker == null) {
 			return;

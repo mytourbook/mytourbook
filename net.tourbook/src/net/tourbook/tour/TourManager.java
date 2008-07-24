@@ -183,8 +183,8 @@ public class TourManager {
 
 	public static void firePropertyChange(final int propertyId, final Object propertyData) {
 		final Object[] allListeners = fPropertyListeners.getListeners();
-		for (int i = 0; i < allListeners.length; i++) {
-			final ITourPropertyListener listener = (ITourPropertyListener) allListeners[i];
+		for (final Object allListener : allListeners) {
+			final ITourPropertyListener listener = (ITourPropertyListener) allListener;
 			listener.propertyChanged(propertyId, propertyData);
 		}
 	}
@@ -245,7 +245,7 @@ public class TourManager {
 		return getTourDateFull(tourData) + //
 				" - " //$NON-NLS-1$
 				+ getTourTime(tourData)
-				+ ((tourTitle.length() == 0) ? "" : " - " + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ((tourTitle.length() == 0) ? "" : " - " + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ 
 	}
 
 	/**

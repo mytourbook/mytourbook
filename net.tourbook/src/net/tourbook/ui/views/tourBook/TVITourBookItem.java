@@ -25,52 +25,52 @@ import net.tourbook.tour.TreeViewerItem;
 
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
-	static final Calendar			fCalendar		= GregorianCalendar.getInstance();
-	
-	static final String				SQL_SUM_COLUMNS	= "" // //$NON-NLS-1$
-															+ "SUM(TOURDISTANCE), " // 		1	//$NON-NLS-1$
-															+ "SUM(TOURRECORDINGTIME), " //	2	//$NON-NLS-1$
-															+ "SUM(TOURDRIVINGTIME), " //	3	//$NON-NLS-1$
-															+ "SUM(TOURALTUP), " //			4	//$NON-NLS-1$
-															+ "SUM(TOURALTDOWN)," //		5	//$NON-NLS-1$
-															+ "SUM(1)," //					6	//$NON-NLS-1$
-															+ "MAX(MAXSPEED)," //			7	//$NON-NLS-1$
-															+ "SUM(TOURDISTANCE)," //		8	//$NON-NLS-1$
-															+ "SUM(TOURDRIVINGTIME)," //	9	//$NON-NLS-1$
-															+ "MAX(MAXALTITUDE)," //		10	//$NON-NLS-1$
-															+ "MAX(MAXPULSE)," //			11	//$NON-NLS-1$
-															+ "AVG(AVGPULSE)," //			12	//$NON-NLS-1$
-															+ "AVG(AVGCADENCE)," //			13	//$NON-NLS-1$
-															+ "AVG(AVGTEMPERATURE)";	//	14	//$NON-NLS-1$
+	static final Calendar	fCalendar		= GregorianCalendar.getInstance();
 
-	TourBookView					fView;
+	static final String		SQL_SUM_COLUMNS	= "" // //$NON-NLS-1$
+													+ "SUM(TOURDISTANCE), " // 		1	//$NON-NLS-1$
+													+ "SUM(TOURRECORDINGTIME), " //	2	//$NON-NLS-1$
+													+ "SUM(TOURDRIVINGTIME), " //	3	//$NON-NLS-1$
+													+ "SUM(TOURALTUP), " //			4	//$NON-NLS-1$
+													+ "SUM(TOURALTDOWN)," //		5	//$NON-NLS-1$
+													+ "SUM(1)," //					6	//$NON-NLS-1$
+													+ "MAX(MAXSPEED)," //			7	//$NON-NLS-1$
+													+ "SUM(TOURDISTANCE)," //		8	//$NON-NLS-1$
+													+ "SUM(TOURDRIVINGTIME)," //	9	//$NON-NLS-1$
+													+ "MAX(MAXALTITUDE)," //		10	//$NON-NLS-1$
+													+ "MAX(MAXPULSE)," //			11	//$NON-NLS-1$
+													+ "AVG(AVGPULSE)," //			12	//$NON-NLS-1$
+													+ "AVG(AVGCADENCE)," //			13	//$NON-NLS-1$
+													+ "AVG(AVGTEMPERATURE)";	//	14	//$NON-NLS-1$
 
-	String							treeColumn;
+	TourBookView			fView;
 
-	int								fTourYear;
-	
+	String					treeColumn;
+
+	int						fTourYear;
+
 	/**
 	 * month starts with 1 for january
 	 */
-	int								fTourMonth;
-	int								fTourDay;
+	int						fTourMonth;
+	int						fTourDay;
 
-	long							fTourDate;
-	String							fTourTitle;
+	long					fTourDate;
+	String					fTourTitle;
 
-	long							colDistance;
-	long							colRecordingTime;
-	long							colDrivingTime;
-	long							colAltitudeUp;
-	long							colAltitudeDown;
-	long							colCounter;
-	float							colMaxSpeed;
-	float							colAvgSpeed;
-	long							colMaxAltitude;
-	long							colMaxPulse;
-	long							colAvgPulse;
-	long							colAvgCadence;
-	long							colAvgTemperature;
+	long					colDistance;
+	long					colRecordingTime;
+	long					colDrivingTime;
+	long					colAltitudeUp;
+	long					colAltitudeDown;
+	long					colCounter;
+	float					colMaxSpeed;
+	float					colAvgSpeed;
+	long					colMaxAltitude;
+	long					colMaxPulse;
+	long					colAvgPulse;
+	long					colAvgCadence;
+	long					colAvgTemperature;
 
 	TVITourBookItem(final TourBookView view) {
 		fView = view;

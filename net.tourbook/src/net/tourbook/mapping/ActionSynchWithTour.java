@@ -23,7 +23,7 @@ public class ActionSynchWithTour extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionSynchWithTour(MappingView mapView) {
+	public ActionSynchWithTour(final MappingView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

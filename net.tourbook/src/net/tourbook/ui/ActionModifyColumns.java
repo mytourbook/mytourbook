@@ -23,7 +23,7 @@ public class ActionModifyColumns extends Action {
 
 	private ITourViewer	fTourViewer;
 
-	public ActionModifyColumns(ITourViewer tourViewer) {
+	public ActionModifyColumns(final ITourViewer tourViewer) {
 
 		fTourViewer = tourViewer;
 
@@ -36,7 +36,7 @@ public class ActionModifyColumns extends Action {
 	@Override
 	public void run() {
 
-		ColumnManager columnManager = fTourViewer.getColumnManager();
+		final ColumnManager columnManager = fTourViewer.getColumnManager();
 		if (columnManager != null) {
 			columnManager.openColumnDialog();
 		}

@@ -87,7 +87,7 @@ public class ChartSegmentValueLayer implements IChartLayer {
 			final int xDevOffset = (int) (fXDataSerie[serieIndex] * scaleX) - devGraphImageXOffset;
 
 			final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
-			final int devYGraph = (int) ((float) (graphYValue - graphYBottom) * scaleY);
+			final int devYGraph = (int) ((graphYValue - graphYBottom) * scaleY);
 			int devYMarker = devYBottom - devYGraph;
 
 			// don't draw over the graph borders

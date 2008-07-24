@@ -45,7 +45,7 @@ public class PersonContributionItem extends CustomControlContribution {
 
 	static TourbookPlugin			plugin	= TourbookPlugin.getDefault();
 
-	private static final boolean	osx		= "carbon".equals(SWT.getPlatform()); //$NON-NLS-1$
+	private static final boolean	osx		= "carbon".equals(SWT.getPlatform());	//$NON-NLS-1$
 
 	private Combo					fComboPeople;
 
@@ -56,7 +56,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		this(ID);
 	}
 
-	protected PersonContributionItem(String id) {
+	protected PersonContributionItem(final String id) {
 		super(id);
 	}
 
@@ -66,7 +66,7 @@ public class PersonContributionItem extends CustomControlContribution {
 	private void addPrefListener() {
 
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(Preferences.PropertyChangeEvent event) {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -75,14 +75,14 @@ public class PersonContributionItem extends CustomControlContribution {
 					// fill people combobox with modified people list
 					fillPeopleComboBox();
 
-					TourPerson currentPerson = plugin.getActivePerson();
+					final TourPerson currentPerson = plugin.getActivePerson();
 
 					// reselect the person which was selected before
 					if (currentPerson == null) {
 						fComboPeople.select(0);
 					} else {
 						// try to set and select the old person
-						long previousPersonId = currentPerson.getPersonId();
+						final long previousPersonId = currentPerson.getPersonId();
 						reselectPerson(previousPersonId);
 					}
 				}
@@ -105,7 +105,7 @@ public class PersonContributionItem extends CustomControlContribution {
 //	}
 
 	@Override
-	protected Control createControl(Composite parent) {
+	protected Control createControl(final Composite parent) {
 
 		Composite content;
 
@@ -122,7 +122,7 @@ public class PersonContributionItem extends CustomControlContribution {
 			content = new Composite(parent, SWT.NONE);
 			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(content);
 
-			Composite control = createPeopleComboBox(content);
+			final Composite control = createPeopleComboBox(content);
 			control.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
 		}
 
@@ -132,7 +132,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		return content;
 	}
 
-	private Composite createPeopleComboBox(Composite parent) {
+	private Composite createPeopleComboBox(final Composite parent) {
 
 		fComboPeople = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 
@@ -140,15 +140,15 @@ public class PersonContributionItem extends CustomControlContribution {
 		fComboPeople.setToolTipText(Messages.App_People_tooltip);
 
 		fComboPeople.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
+			public void widgetDisposed(final DisposeEvent e) {
 				plugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 			}
 		});
 
 		fComboPeople.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				int selectedIndex = fComboPeople.getSelectionIndex();
+			public void widgetSelected(final SelectionEvent e) {
+				final int selectedIndex = fComboPeople.getSelectionIndex();
 				if (selectedIndex == -1) {
 					return;
 				}
@@ -186,7 +186,7 @@ public class PersonContributionItem extends CustomControlContribution {
 			return;
 		}
 
-		for (TourPerson person : fPeople) {
+		for (final TourPerson person : fPeople) {
 			String lastName = person.getLastName();
 			lastName = lastName.equals("") ? "" : " " + lastName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			fComboPeople.add(person.getFirstName() + lastName);
@@ -197,11 +197,10 @@ public class PersonContributionItem extends CustomControlContribution {
 	 * fire event that client has changed
 	 */
 	void fireEventNewPersonIsSelected() {
-		plugin.getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED,
-				Math.random());
+		plugin.getPreferenceStore().setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
 	}
 
-	private void reselectPerson(long previousPersonId) {
+	private void reselectPerson(final long previousPersonId) {
 
 		if (fPeople == null) {
 			fComboPeople.select(0);
@@ -211,7 +210,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		TourPerson currentPerson = null;
 		int personIndex = 1;
 
-		for (TourPerson person : fPeople) {
+		for (final TourPerson person : fPeople) {
 			if (previousPersonId == person.getPersonId()) {
 				// previous person was found
 				fComboPeople.select(personIndex);
@@ -237,13 +236,12 @@ public class PersonContributionItem extends CustomControlContribution {
 		Long lastPersonId;
 		try {
 
-			lastPersonId = plugin.getDialogSettings()
-					.getLong(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID);
+			lastPersonId = plugin.getDialogSettings().getLong(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID);
 
 			// try to reselect the last person
 			reselectPerson(lastPersonId);
 
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			// no last person id, select all
 			fComboPeople.select(0);
 		}
@@ -254,9 +252,9 @@ public class PersonContributionItem extends CustomControlContribution {
 	 * 
 	 * @param memento
 	 */
-	private void saveSettings(IMemento memento) {
+	private void saveSettings(final IMemento memento) {
 
-		int selectedIndex = fComboPeople.getSelectionIndex();
+		final int selectedIndex = fComboPeople.getSelectionIndex();
 
 		long personId = -1;
 		if (selectedIndex > 0) {
@@ -266,7 +264,7 @@ public class PersonContributionItem extends CustomControlContribution {
 		plugin.getDialogSettings().put(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID, personId);
 	}
 
-	public void saveState(IMemento memento) {
+	public void saveState(final IMemento memento) {
 		saveSettings(memento);
 	}
 }

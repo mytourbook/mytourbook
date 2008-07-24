@@ -29,7 +29,7 @@ public class LegendProvider implements ILegendProvider {
 	private LegendColor		fLegendColor;
 	private int				fColorId;
 
-	public LegendProvider(LegendConfig legendConfig, LegendColor legendColor, int colorId) {
+	public LegendProvider(final LegendConfig legendConfig, final LegendColor legendColor, final int colorId) {
 		fLegendConfig = legendConfig;
 		fLegendColor = legendColor;
 		fColorId = colorId;
@@ -56,7 +56,7 @@ public class LegendProvider implements ILegendProvider {
 		 * adjust min value
 		 */
 		float adjustMinValue = 0;
-		if (((float) graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
+		if ((graphMinValue % graphUnit) != 0 && graphMinValue < 0) {
 			adjustMinValue = graphUnit;
 		}
 		graphMinValue = (int) ((int) ((graphMinValue - adjustMinValue) / graphUnit) * graphUnit);
@@ -66,7 +66,7 @@ public class LegendProvider implements ILegendProvider {
 		 */
 		// increase the max value when it does not fit to unit borders
 		float adjustMaxValue = 0;
-		if (((float) graphMaxValue % graphUnit) != 0) {
+		if ((graphMaxValue % graphUnit) != 0) {
 			adjustMaxValue = graphUnit;
 		}
 		graphMaxValue = (int) ((int) ((graphMaxValue + adjustMaxValue) / graphUnit) * graphUnit);
@@ -108,20 +108,20 @@ public class LegendProvider implements ILegendProvider {
 		return fColorId;
 	}
 
-	public Color getValueColor(int legendValue) {
+	public Color getValueColor(final int legendValue) {
 		return TourPainter.getLegendColor(fLegendConfig, fLegendColor, legendValue);
 	}
 
-	public void setLegendColorColors(LegendColor legendColor) {
+	public void setLegendColorColors(final LegendColor legendColor) {
 
-		ValueColor[] valueColors = fLegendColor.valueColors;
-		ValueColor[] newValueColors = legendColor.valueColors;
+		final ValueColor[] valueColors = fLegendColor.valueColors;
+		final ValueColor[] newValueColors = legendColor.valueColors;
 
 		// copy new colors into current legend colors
 		for (int valueIndex = 0; valueIndex < valueColors.length; valueIndex++) {
 
-			ValueColor valueColor = valueColors[valueIndex];
-			ValueColor newValueColor = newValueColors[valueIndex];
+			final ValueColor valueColor = valueColors[valueIndex];
+			final ValueColor newValueColor = newValueColors[valueIndex];
 
 			valueColor.red = newValueColor.red;
 			valueColor.green = newValueColor.green;
@@ -164,7 +164,7 @@ public class LegendProvider implements ILegendProvider {
 			}
 		}
 
-		int unitFactor = fLegendConfig.unitFactor;
+		final int unitFactor = fLegendConfig.unitFactor;
 
 		if (fLegendColor.isMinValueOverwrite && minValue < fLegendColor.overwriteMinValue * unitFactor) {
 			minValue = fLegendColor.overwriteMinValue * unitFactor;

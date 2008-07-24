@@ -263,13 +263,13 @@ public class GraphColorProvider {
 		Document document;
 		try {
 			document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-			Element element = document.createElement(MEMENTO_ROOT);
+			final Element element = document.createElement(MEMENTO_ROOT);
 			element.setAttribute("version", "1"); //$NON-NLS-1$ //$NON-NLS-2$
 			document.appendChild(element);
 
 			return new XMLMemento(document, element);
 
-		} catch (ParserConfigurationException e) {
+		} catch (final ParserConfigurationException e) {
 			throw new Error(e.getMessage());
 		}
 	}
@@ -283,14 +283,14 @@ public class GraphColorProvider {
 
 		try {
 
-			IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
-			File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
+			final IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
+			final File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
 
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
 
-			XMLMemento xmlMemento = getXMLMementoRoot();
+			final XMLMemento xmlMemento = getXMLMementoRoot();
 
-			for (ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
+			for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
 
 				final LegendColor legendColor = graphDefinition.getNewLegendColor();
 
@@ -299,12 +299,12 @@ public class GraphColorProvider {
 					continue;
 				}
 
-				IMemento mementoLegendColor = xmlMemento.createChild(MEMENTO_CHILD_LEGEND_COLOR);
+				final IMemento mementoLegendColor = xmlMemento.createChild(MEMENTO_CHILD_LEGEND_COLOR);
 				mementoLegendColor.putString(TAG_LEGEND_COLOR_PREF_NAME, graphDefinition.getPrefName());
 
-				for (ValueColor valueColor : legendColor.valueColors) {
+				for (final ValueColor valueColor : legendColor.valueColors) {
 
-					IMemento mementoValueColor = mementoLegendColor.createChild(MEMENTO_CHILD_VALUE_COLOR);
+					final IMemento mementoValueColor = mementoLegendColor.createChild(MEMENTO_CHILD_VALUE_COLOR);
 
 					mementoValueColor.putInteger(TAG_VALUE_COLOR_VALUE, valueColor.value);
 					mementoValueColor.putInteger(TAG_VALUE_COLOR_RED, valueColor.red);
@@ -312,13 +312,13 @@ public class GraphColorProvider {
 					mementoValueColor.putInteger(TAG_VALUE_COLOR_BLUE, valueColor.blue);
 				}
 
-				IMemento mementoBrightness = mementoLegendColor.createChild(MEMENTO_CHILD_BRIGHTNESS);
+				final IMemento mementoBrightness = mementoLegendColor.createChild(MEMENTO_CHILD_BRIGHTNESS);
 				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN, legendColor.minBrightness);
 				mementoBrightness.putInteger(TAG_BRIGHTNESS_MIN_FACTOR, legendColor.minBrightnessFactor);
 				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX, legendColor.maxBrightness);
 				mementoBrightness.putInteger(TAG_BRIGHTNESS_MAX_FACTOR, legendColor.maxBrightnessFactor);
 
-				IMemento mementoMinMaxValue = mementoLegendColor.createChild(MEMENTO_CHILD_MIN_MAX_VALUE);
+				final IMemento mementoMinMaxValue = mementoLegendColor.createChild(MEMENTO_CHILD_MIN_MAX_VALUE);
 				mementoMinMaxValue.putInteger(TAG_IS_MIN_VALUE_OVERWRITE, legendColor.isMinValueOverwrite ? 1 : 0);
 				mementoMinMaxValue.putInteger(TAG_MIN_VALUE_OVERWRITE, legendColor.overwriteMinValue);
 				mementoMinMaxValue.putInteger(TAG_IS_MAX_VALUE_OVERWRITE, legendColor.isMaxValueOverwrite ? 1 : 0);
@@ -327,13 +327,13 @@ public class GraphColorProvider {
 
 			xmlMemento.save(writer);
 
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		} finally {
 			if (writer != null) {
 				try {
 					writer.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -342,13 +342,13 @@ public class GraphColorProvider {
 
 	/**
 	 * @param preferenceName
-	 *        preference name PREF_GRAPH_...
+	 *            preference name PREF_GRAPH_...
 	 * @return Returns the {@link ColorDefinition} for the preference name
 	 */
-	public ColorDefinition getGraphColorDefinition(String preferenceName) {
+	public ColorDefinition getGraphColorDefinition(final String preferenceName) {
 
-		ColorDefinition[] colorDefinitions = getGraphColorDefinitions();
-		for (ColorDefinition colorDefinition : colorDefinitions) {
+		final ColorDefinition[] colorDefinitions = getGraphColorDefinitions();
+		for (final ColorDefinition colorDefinition : colorDefinitions) {
 			if (colorDefinition.getPrefName().equals(preferenceName)) {
 				return colorDefinition;
 			}
@@ -363,7 +363,7 @@ public class GraphColorProvider {
 			return fGraphColorDefinitions;
 		}
 
-		List<ColorDefinition> list = new ArrayList<ColorDefinition>();
+		final List<ColorDefinition> list = new ArrayList<ColorDefinition>();
 
 		Collections.addAll(list, GRAPH_COLOR_DEFAULTS);
 
@@ -387,8 +387,8 @@ public class GraphColorProvider {
 	 */
 	private void readLegendColors() {
 
-		IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
-		File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
+		final IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
+		final File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
 
 		// check if file is available
 		if (file.exists() == false) {
@@ -400,38 +400,38 @@ public class GraphColorProvider {
 		try {
 			reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
 
-			XMLMemento mementoRoot = XMLMemento.createReadRoot(reader);
-			IMemento[] mementoLegendColors = mementoRoot.getChildren(MEMENTO_CHILD_LEGEND_COLOR);
+			final XMLMemento mementoRoot = XMLMemento.createReadRoot(reader);
+			final IMemento[] mementoLegendColors = mementoRoot.getChildren(MEMENTO_CHILD_LEGEND_COLOR);
 
 			// loop: all legend colors
-			for (IMemento mementoLegendColor : mementoLegendColors) {
+			for (final IMemento mementoLegendColor : mementoLegendColors) {
 
 				// check pref name
-				String prefName = mementoLegendColor.getString(TAG_LEGEND_COLOR_PREF_NAME);
+				final String prefName = mementoLegendColor.getString(TAG_LEGEND_COLOR_PREF_NAME);
 				if (prefName == null) {
 					continue;
 				}
 
 				// check value colors
-				IMemento[] mementoValueColors = mementoLegendColor.getChildren(MEMENTO_CHILD_VALUE_COLOR);
+				final IMemento[] mementoValueColors = mementoLegendColor.getChildren(MEMENTO_CHILD_VALUE_COLOR);
 				if (mementoLegendColors == null) {
 					continue;
 				}
 
-				LegendColor legendColor = new LegendColor();
+				final LegendColor legendColor = new LegendColor();
 
 				/*
 				 * value colors
 				 */
-				ArrayList<ValueColor> valueColors = new ArrayList<ValueColor>();
+				final ArrayList<ValueColor> valueColors = new ArrayList<ValueColor>();
 
 				// loop: all value colors
-				for (IMemento mementoValueColor : mementoValueColors) {
+				for (final IMemento mementoValueColor : mementoValueColors) {
 
-					Integer value = mementoValueColor.getInteger(TAG_VALUE_COLOR_VALUE);
-					Integer red = mementoValueColor.getInteger(TAG_VALUE_COLOR_RED);
-					Integer green = mementoValueColor.getInteger(TAG_VALUE_COLOR_GREEN);
-					Integer blue = mementoValueColor.getInteger(TAG_VALUE_COLOR_BLUE);
+					final Integer value = mementoValueColor.getInteger(TAG_VALUE_COLOR_VALUE);
+					final Integer red = mementoValueColor.getInteger(TAG_VALUE_COLOR_RED);
+					final Integer green = mementoValueColor.getInteger(TAG_VALUE_COLOR_GREEN);
+					final Integer blue = mementoValueColor.getInteger(TAG_VALUE_COLOR_BLUE);
 
 					if (value != null && red != null && green != null && blue != null) {
 						valueColors.add(new ValueColor(value, red, green, blue));
@@ -442,24 +442,24 @@ public class GraphColorProvider {
 				/*
 				 * min/max brightness
 				 */
-				IMemento[] mementoBrightness = mementoLegendColor.getChildren(MEMENTO_CHILD_BRIGHTNESS);
+				final IMemento[] mementoBrightness = mementoLegendColor.getChildren(MEMENTO_CHILD_BRIGHTNESS);
 				if (mementoBrightness.length > 0) {
 
-					IMemento mementoBrightness0 = mementoBrightness[0];
+					final IMemento mementoBrightness0 = mementoBrightness[0];
 
-					Integer minBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN);
+					final Integer minBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN);
 					if (minBrightness != null) {
 						legendColor.minBrightness = minBrightness;
 					}
-					Integer minBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN_FACTOR);
+					final Integer minBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MIN_FACTOR);
 					if (minBrightness != null) {
 						legendColor.minBrightnessFactor = minBrightnessFactor;
 					}
-					Integer maxBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX);
+					final Integer maxBrightness = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX);
 					if (maxBrightness != null) {
 						legendColor.maxBrightness = maxBrightness;
 					}
-					Integer maxBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX_FACTOR);
+					final Integer maxBrightnessFactor = mementoBrightness0.getInteger(TAG_BRIGHTNESS_MAX_FACTOR);
 					if (minBrightness != null) {
 						legendColor.maxBrightnessFactor = maxBrightnessFactor;
 					}
@@ -468,25 +468,25 @@ public class GraphColorProvider {
 				/*
 				 * min/max overwrite
 				 */
-				IMemento[] mementoMinMaxValue = mementoLegendColor.getChildren(MEMENTO_CHILD_MIN_MAX_VALUE);
+				final IMemento[] mementoMinMaxValue = mementoLegendColor.getChildren(MEMENTO_CHILD_MIN_MAX_VALUE);
 				if (mementoMinMaxValue.length > 0) {
 
-					IMemento mementoMinMaxValue0 = mementoMinMaxValue[0];
+					final IMemento mementoMinMaxValue0 = mementoMinMaxValue[0];
 
-					Integer isMinOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MIN_VALUE_OVERWRITE);
+					final Integer isMinOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MIN_VALUE_OVERWRITE);
 					if (isMinOverwrite != null) {
 						legendColor.isMinValueOverwrite = isMinOverwrite == 1;
 					}
-					Integer minValue = mementoMinMaxValue0.getInteger(TAG_MIN_VALUE_OVERWRITE);
+					final Integer minValue = mementoMinMaxValue0.getInteger(TAG_MIN_VALUE_OVERWRITE);
 					if (minValue != null) {
 						legendColor.overwriteMinValue = minValue;
 					}
 
-					Integer isMaxOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MAX_VALUE_OVERWRITE);
+					final Integer isMaxOverwrite = mementoMinMaxValue0.getInteger(TAG_IS_MAX_VALUE_OVERWRITE);
 					if (isMaxOverwrite != null) {
 						legendColor.isMaxValueOverwrite = isMaxOverwrite == 1;
 					}
-					Integer maxValue = mementoMinMaxValue0.getInteger(TAG_MAX_VALUE_OVERWRITE);
+					final Integer maxValue = mementoMinMaxValue0.getInteger(TAG_MAX_VALUE_OVERWRITE);
 					if (maxValue != null) {
 						legendColor.overwriteMaxValue = maxValue;
 					}
@@ -495,7 +495,7 @@ public class GraphColorProvider {
 				/*
 				 * update color definition with the read data
 				 */
-				for (ColorDefinition colorDefinition : fGraphColorDefinitions) {
+				for (final ColorDefinition colorDefinition : fGraphColorDefinitions) {
 
 					if (colorDefinition.getPrefName().equals(prefName)) {
 
@@ -507,19 +507,19 @@ public class GraphColorProvider {
 				}
 			}
 
-		} catch (UnsupportedEncodingException e) {
+		} catch (final UnsupportedEncodingException e) {
 			e.printStackTrace();
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (WorkbenchException e) {
+		} catch (final WorkbenchException e) {
 			e.printStackTrace();
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			e.printStackTrace();
 		} finally {
 			if (reader != null) {
 				try {
 					reader.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -531,7 +531,7 @@ public class GraphColorProvider {
 	 */
 	private void setLegendColors() {
 
-		for (ColorDefinition colorDefinition : fGraphColorDefinitions) {
+		for (final ColorDefinition colorDefinition : fGraphColorDefinitions) {
 
 			// set legend color
 			if (colorDefinition.getLegendColor() == null) {
@@ -545,7 +545,7 @@ public class GraphColorProvider {
 			}
 
 			// set new legend color
-			LegendColor legendColor = colorDefinition.getLegendColor();
+			final LegendColor legendColor = colorDefinition.getLegendColor();
 			colorDefinition.setNewLegendColor(legendColor);
 		}
 	}

@@ -29,23 +29,23 @@ public class SelectionTourCatalogView implements ISelection {
 	/**
 	 * Unique id for a reference tour in {@link TourReference} entity
 	 */
-	private Long							fRefId;
+	private Long					fRefId;
 
 	/**
 	 * unique id for {@link TourCompared} entity or <code>-1</code> when the compared tour is not
 	 * saved in the database
 	 */
-	private Long							fCompareId;
-	private Long							fCompTourId;
+	private Long					fCompareId;
+	private Long					fCompTourId;
 
-	private int								fCompareStartIndex;
-	private int								fCompareEndIndex;
+	private int						fCompareStartIndex;
+	private int						fCompareEndIndex;
 
-	private TVICatalogYearItem				fYearItem;
+	private TVICatalogYearItem		fYearItem;
 
 	private TVICatalogReferenceTour	fRefItem;
 
-	public SelectionTourCatalogView(Long refId) {
+	public SelectionTourCatalogView(final Long refId) {
 		fRefId = refId;
 	}
 
@@ -54,8 +54,8 @@ public class SelectionTourCatalogView implements ISelection {
 	}
 
 	/**
-	 * @return Returns the key for the {@link TourCompared} instance or <code>null</code> when
-	 *         it's not set
+	 * @return Returns the key for the {@link TourCompared} instance or <code>null</code> when it's
+	 *         not set
 	 */
 	public Long getCompareId() {
 		return fCompareId;
@@ -78,8 +78,8 @@ public class SelectionTourCatalogView implements ISelection {
 	}
 
 	/**
-	 * @return Returns the item {@link TVICatalogReferenceTour} or <code>null</code> when
-	 *         it's not set
+	 * @return Returns the item {@link TVICatalogReferenceTour} or <code>null</code> when it's not
+	 *         set
 	 */
 	public TVICatalogReferenceTour getRefItem() {
 		return fRefItem;
@@ -96,7 +96,7 @@ public class SelectionTourCatalogView implements ISelection {
 		return false;
 	}
 
-	public void setRefItem(TVICatalogReferenceTour refItem) {
+	public void setRefItem(final TVICatalogReferenceTour refItem) {
 		fRefItem = refItem;
 	}
 
@@ -104,15 +104,18 @@ public class SelectionTourCatalogView implements ISelection {
 	 * Set data for the compared tour
 	 * 
 	 * @param compareId
-	 *        database Id for the compared tour
+	 *            database Id for the compared tour
 	 * @param compTourId
-	 *        database Id for the compared tour data
+	 *            database Id for the compared tour data
 	 * @param compStartIndex
-	 *        start index of the x-marker
+	 *            start index of the x-marker
 	 * @param compEndIndex
-	 *        end index of the x-marker
+	 *            end index of the x-marker
 	 */
-	public void setTourCompareData(long compareId, long compTourId, int compStartIndex, int compEndIndex) {
+	public void setTourCompareData(	final long compareId,
+									final long compTourId,
+									final int compStartIndex,
+									final int compEndIndex) {
 
 		fCompareId = compareId;
 		fCompTourId = compTourId;
@@ -121,7 +124,7 @@ public class SelectionTourCatalogView implements ISelection {
 		fCompareEndIndex = compEndIndex;
 	}
 
-	public void setYearData(TVICatalogYearItem yearItem) {
+	public void setYearData(final TVICatalogYearItem yearItem) {
 		fYearItem = yearItem;
 	}
 

@@ -35,10 +35,8 @@ public class TVICompareResultRootItem extends TVICompareResultItem {
 
 		if (refTours != null) {
 			for (final TourReference refTour : refTours) {
-				children.add(new TVICompareResultReferenceTour(this,
-						refTour.getLabel(),
-						refTour,
-						refTour.getTourData().getTourId()));
+				children.add(new TVICompareResultReferenceTour(this, refTour.getLabel(), refTour, refTour.getTourData()
+						.getTourId()));
 			}
 		}
 	}

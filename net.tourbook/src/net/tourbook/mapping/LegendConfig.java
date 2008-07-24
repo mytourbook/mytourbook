@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class LegendConfig {
 
-	private static final String	EMPTY_STRING	= ""; //$NON-NLS-1$
+	private static final String	EMPTY_STRING	= "";			//$NON-NLS-1$
 
 	public int					legendMinValue;
 	public int					legendMaxValue;

@@ -43,6 +43,7 @@ public class TourReference {
 	private int			endIndex;
 
 	private String		label	= "";	//$NON-NLS-1$
+
 	public TourReference() {}
 
 	public TourReference(final String label, final TourData tourData, final int startIndex, final int endIndex) {

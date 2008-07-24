@@ -25,7 +25,7 @@ public class ActionSynchYearScale extends Action {
 
 	private final TourCatalogViewYearStatistic	fYearStatisticView;
 
-	public ActionSynchYearScale(TourCatalogViewYearStatistic yearStatisticView) {
+	public ActionSynchYearScale(final TourCatalogViewYearStatistic yearStatisticView) {
 
 		super("", AS_CHECK_BOX); //$NON-NLS-1$
 

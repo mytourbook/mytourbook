@@ -121,14 +121,14 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 	//	private Image				fWindowIcon;
 
-	public AdjustAltitudeDialog(Shell parentShell, IStructuredSelection selection) {
+	public AdjustAltitudeDialog(final Shell parentShell, final IStructuredSelection selection) {
 
 		super(parentShell);
 
 		setShell();
 	}
 
-	public AdjustAltitudeDialog(Shell parentShell, TourChart tourChart) {
+	public AdjustAltitudeDialog(final Shell parentShell, final TourChart tourChart) {
 
 		super(parentShell);
 
@@ -139,7 +139,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		/*
 		 * keep a backup of the altitude data because these data will be changed in this dialog
 		 */
-		int[] originalAltitudeSerie = fTourData.altitudeSerie;
+		final int[] originalAltitudeSerie = fTourData.altitudeSerie;
 		if (originalAltitudeSerie != null) {
 			final int serieLength = originalAltitudeSerie.length;
 			fAltitudeSerieOriginal = new int[serieLength];
@@ -147,7 +147,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		}
 	}
 
-	private void adjustAltitude(Integer altiFlag) {
+	private void adjustAltitude(final Integer altiFlag) {
 
 		final int newAltiStart = (Integer) fSpinnerNewStartAlti.getData(WIDGET_DATA_METRIC_ALTITUDE);
 		final int newAltiMax = (Integer) fSpinnerNewMaxAlti.getData(WIDGET_DATA_METRIC_ALTITUDE);
@@ -155,7 +155,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		final int[] altiDest = fTourData.altitudeSerie;
 
-		boolean isAltiSetByUser = altiFlag != null;
+		final boolean isAltiSetByUser = altiFlag != null;
 
 		// set adjustment type and enable the field(s) which can be modified
 		switch (fComboAdjustType.getSelectionIndex()) {
@@ -200,7 +200,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		/*
 		 * make a backup of the current values
 		 */
-		int[] altitudeSerie = fTourData.altitudeSerie;
+		final int[] altitudeSerie = fTourData.altitudeSerie;
 		if (altitudeSerie != null) {
 			fAltitudeSerieModified = new int[altitudeSerie.length];
 
@@ -220,17 +220,17 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 * @param tourData
 	 * @param newEndAlti
 	 */
-	private void adjustEndAltitude(int[] altiSrc, TourData tourData, int newEndAlti) {
+	private void adjustEndAltitude(final int[] altiSrc, final TourData tourData, final int newEndAlti) {
 
-		int[] altiDest = tourData.altitudeSerie;
-		int[] distanceSerie = tourData.getDistanceSerie();
+		final int[] altiDest = tourData.altitudeSerie;
+		final int[] distanceSerie = tourData.getDistanceSerie();
 
-		int altiEndDiff = newEndAlti - altiSrc[altiDest.length - 1];
-		float tourDistance = distanceSerie[distanceSerie.length - 1];
+		final int altiEndDiff = newEndAlti - altiSrc[altiDest.length - 1];
+		final float tourDistance = distanceSerie[distanceSerie.length - 1];
 
 		for (int serieIndex = 0; serieIndex < altiDest.length; serieIndex++) {
-			float distance = distanceSerie[serieIndex];
-			float altiDiff = distance / tourDistance * altiEndDiff;
+			final float distance = distanceSerie[serieIndex];
+			final float altiDiff = distance / tourDistance * altiEndDiff;
 			altiDest[serieIndex] = altiSrc[serieIndex] + Math.round(altiDiff);
 		}
 	}
@@ -242,9 +242,9 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 * @param altiDest
 	 * @param newStartAlti
 	 */
-	private void adjustEvenly(int[] altiSrc, int[] altiDest, int newStartAlti) {
+	private void adjustEvenly(final int[] altiSrc, final int[] altiDest, final int newStartAlti) {
 
-		int altiStartDiff = newStartAlti - altiSrc[0];
+		final int altiStartDiff = newStartAlti - altiSrc[0];
 
 		for (int altIndex = 0; altIndex < altiSrc.length; altIndex++) {
 			altiDest[altIndex] = altiSrc[altIndex] + altiStartDiff;
@@ -258,12 +258,12 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 * @param altiDest
 	 * @param maxAltiNew
 	 */
-	private void adjustMaxAltitude(int[] altiSrc, int[] altiDest, int maxAltiNew) {
+	private void adjustMaxAltitude(final int[] altiSrc, final int[] altiDest, final int maxAltiNew) {
 
 		// calculate min/max altitude
 		int maxAltiSrc = altiSrc[0];
 		int minAltiSrc = altiSrc[0];
-		for (int altitude : altiSrc) {
+		for (final int altitude : altiSrc) {
 			if (altitude > maxAltiSrc) {
 				maxAltiSrc = altitude;
 			}
@@ -273,10 +273,10 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		}
 
 		// adjust altitude
-		int altiDiffSrc = maxAltiSrc - minAltiSrc;
-		int altiDiffNew = maxAltiNew - minAltiSrc;
+		final int altiDiffSrc = maxAltiSrc - minAltiSrc;
+		final int altiDiffNew = maxAltiNew - minAltiSrc;
 
-		float altiDiff = (float) altiDiffSrc / (float) altiDiffNew;
+		final float altiDiff = (float) altiDiffSrc / (float) altiDiffNew;
 
 		for (int serieIndex = 0; serieIndex < altiDest.length; serieIndex++) {
 
@@ -294,7 +294,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 */
 	private void adjustStartAndMax(	final int[] altiSrc,
 									final int[] altiDest,
-									boolean isAltiSetByUser,
+									final boolean isAltiSetByUser,
 									final int newAltiStart,
 									final int newAltiMax) {
 		if (isAltiSetByUser) {
@@ -303,9 +303,9 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			fAltiStartDiff -= fOldAltiInputStart - newAltiStart;
 			fAltiMaxDiff -= fOldAltiInputMax - newAltiMax;
 
-			int oldStart = altiSrc[0];
+			final int oldStart = altiSrc[0];
 			adjustMaxAltitude(altiSrc, altiDest, fInitialAltiMax + fAltiMaxDiff);
-			int newStart = altiDest[0];
+			final int newStart = altiDest[0];
 
 			// adjust start
 			int startDiff;
@@ -321,7 +321,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			// set initial altitude values
 
 			int altiMax = altiDest[0];
-			for (int altitude : altiDest) {
+			for (final int altitude : altiDest) {
 				if (altitude > altiMax) {
 					altiMax = altitude;
 				}
@@ -344,7 +344,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	}
 
 	@Override
-	protected void configureShell(Shell shell) {
+	protected void configureShell(final Shell shell) {
 
 		super.configureShell(shell);
 
@@ -366,9 +366,9 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 * @param startContainer
 	 * @return Returns the field
 	 */
-	private Spinner createAltiField(Composite startContainer) {
+	private Spinner createAltiField(final Composite startContainer) {
 
-		Spinner spinner = new Spinner(startContainer, SWT.BORDER);
+		final Spinner spinner = new Spinner(startContainer, SWT.BORDER);
 		spinner.setMinimum(0);
 		spinner.setMaximum(99999);
 		spinner.setIncrement(1);
@@ -377,17 +377,17 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		spinner.addModifyListener(new ModifyListener() {
 
-			public void modifyText(ModifyEvent e) {
+			public void modifyText(final ModifyEvent e) {
 
 				if (fIsModifiedInternal) {
 					return;
 				}
 
-				Spinner spinner = (Spinner) e.widget;
+				final Spinner spinner = (Spinner) e.widget;
 
 				if (UI.UNIT_VALUE_ALTITUDE == 1) {
 
-					int modifiedAlti = spinner.getSelection();
+					final int modifiedAlti = spinner.getSelection();
 //					int metricAlti = (Integer) spinner.getData(WIDGET_DATA_METRIC_ALTITUDE);
 //					
 //					final float oldAlti = metricAlti / UI.UNIT_VALUE_ALTITUDE;
@@ -412,8 +412,8 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 					 * after many hours of investigation this seems to work
 					 */
 
-					int modifiedAlti = spinner.getSelection();
-					int metricAlti = (Integer) spinner.getData(WIDGET_DATA_METRIC_ALTITUDE);
+					final int modifiedAlti = spinner.getSelection();
+					final int metricAlti = (Integer) spinner.getData(WIDGET_DATA_METRIC_ALTITUDE);
 
 					final float oldAlti = metricAlti / UI.UNIT_VALUE_ALTITUDE;
 					int newMetricAlti = (int) (modifiedAlti * UI.UNIT_VALUE_ALTITUDE);
@@ -431,13 +431,13 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		spinner.addMouseWheelListener(new MouseWheelListener() {
 
-			public void mouseScrolled(MouseEvent e) {
+			public void mouseScrolled(final MouseEvent e) {
 
 				if (fIsModifiedInternal) {
 					return;
 				}
 
-				Spinner spinner = (Spinner) e.widget;
+				final Spinner spinner = (Spinner) e.widget;
 
 				int accelerator = (e.stateMask & SWT.CONTROL) != 0 ? 10 : 1;
 				accelerator *= (e.stateMask & SWT.SHIFT) != 0 ? 5 : 1;
@@ -459,9 +459,9 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		spinner.addFocusListener(new FocusListener() {
 
-			public void focusGained(FocusEvent e) {}
+			public void focusGained(final FocusEvent e) {}
 
-			public void focusLost(FocusEvent e) {
+			public void focusLost(final FocusEvent e) {
 				onChangeAltitude((Integer) e.widget.getData(WIDGET_DATA_ALTI_ID));
 			}
 		});
@@ -470,7 +470,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	}
 
 	@Override
-	protected Control createDialogArea(Composite parent) {
+	protected Control createDialogArea(final Composite parent) {
 
 		// fFieldContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
@@ -480,7 +480,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		fDialogArea = (Composite) super.createDialogArea(parent);
 
-		Composite dlgContainer = new Composite(fDialogArea, SWT.NONE);
+		final Composite dlgContainer = new Composite(fDialogArea, SWT.NONE);
 		gl = new GridLayout(1, false);
 		gl.marginWidth = 10;
 		gl.verticalSpacing = 0;
@@ -492,7 +492,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		/*
 		 * combo: adjust type
 		 */
-		Composite typeContainer = new Composite(dlgContainer, SWT.NONE);
+		final Composite typeContainer = new Composite(dlgContainer, SWT.NONE);
 		gl = new GridLayout(2, false);
 		gl.marginWidth = 0;
 		typeContainer.setLayout(gl);
@@ -505,13 +505,13 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fComboAdjustType.setVisibleItemCount(20);
 		fComboAdjustType.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onChangeAdjustType();
 			}
 		});
 
 		// fill combo
-		for (String adjustType : adjustTypes) {
+		for (final String adjustType : adjustTypes) {
 			fComboAdjustType.add(adjustType);
 		}
 
@@ -528,12 +528,12 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fDialogTourChart.setShowSlider(true);
 
 		// set altitude visible
-		TourChartConfiguration chartConfig = new TourChartConfiguration(true);
+		final TourChartConfiguration chartConfig = new TourChartConfiguration(true);
 		chartConfig.addVisibleGraph(TourManager.GRAPH_ALTITUDE);
 
 		fDialogTourChart.addDataModelListener(new IDataModelListener() {
 
-			public void dataModelChanged(ChartDataModel changedChartDataModel) {
+			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
 				// set title
 				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(fTourData));
@@ -545,7 +545,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		/*
 		 * container: altitude controls
 		 */
-		Composite adjustContainer = new Composite(dlgContainer, SWT.NONE);
+		final Composite adjustContainer = new Composite(dlgContainer, SWT.NONE);
 		gl = new GridLayout(3, false);
 		gl.marginTop = 0;
 		gl.marginBottom = 0;
@@ -556,7 +556,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		/*
 		 * field: start altitude
 		 */
-		Composite startContainer = new Composite(adjustContainer, SWT.NONE);
+		final Composite startContainer = new Composite(adjustContainer, SWT.NONE);
 		gl = new GridLayout(3, false);
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
@@ -577,7 +577,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		/*
 		 * field: max altitude
 		 */
-		Composite maxContainer = new Composite(adjustContainer, SWT.NONE);
+		final Composite maxContainer = new Composite(adjustContainer, SWT.NONE);
 		maxContainer.setLayout(gl);
 		maxContainer.setLayoutData(new GridData(SWT.CENTER, SWT.DEFAULT, true, false));
 
@@ -595,14 +595,14 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		/*
 		 * group: keep start/bottom
 		 */
-		Group keepContainer = new Group(maxContainer, SWT.NONE);
+		final Group keepContainer = new Group(maxContainer, SWT.NONE);
 		keepContainer.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 3, 1));
 		keepContainer.setLayout(new GridLayout(1, false));
 		keepContainer.setText(Messages.Dlg_AdjustAltitude_Group_options);
 
 		final SelectionAdapter keepButtonSelectionAdapter = new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onChangeAltitude(new Integer(ALTI_ID_MAX));
 			}
 		};
@@ -623,7 +623,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		/*
 		 * field: end altitude
 		 */
-		Composite endContainer = new Composite(adjustContainer, SWT.NONE);
+		final Composite endContainer = new Composite(adjustContainer, SWT.NONE);
 		endContainer.setLayout(gl);
 		endContainer.setLayoutData(new GridData(SWT.TRAIL, SWT.DEFAULT, true, false));
 
@@ -641,7 +641,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		/*
 		 * button container
 		 */
-		Composite buttonContainer = new Composite(dlgContainer, SWT.NONE);
+		final Composite buttonContainer = new Composite(dlgContainer, SWT.NONE);
 		gl = new GridLayout(3, false);
 		gl.marginTop = 0;
 		gl.marginBottom = 0;
@@ -659,7 +659,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fChkScaleYAxis.setToolTipText(Messages.Dlg_AdjustAltitude_Checkbox_autoscale_yaxis_tooltip);
 		fChkScaleYAxis.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onChangeAltitude(new Integer(ALTI_ID_START));
 			}
 		});
@@ -673,7 +673,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fBtnReset.setLayoutData(new GridData(SWT.TRAIL, SWT.DEFAULT, true, false));
 		fBtnReset.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onChangeAdjustType();
 			}
 		});
@@ -688,7 +688,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fBtnCompare.addKeyListener(new KeyAdapter() {
 
 			@Override
-			public void keyPressed(KeyEvent e) {
+			public void keyPressed(final KeyEvent e) {
 				if (fIsInitialAltiDisplayed == false && e.character == ' ') {
 					fIsInitialAltiDisplayed = true;
 					setOriginalAltitudeValues();
@@ -697,7 +697,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			}
 
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(final KeyEvent e) {
 				setInitialAltitudeValues();
 				fDialogTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 				fIsInitialAltiDisplayed = false;
@@ -707,7 +707,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		fBtnCompare.addMouseListener(new MouseAdapter() {
 
 			@Override
-			public void mouseDown(MouseEvent e) {
+			public void mouseDown(final MouseEvent e) {
 				if (fIsInitialAltiDisplayed == false) {
 					fIsInitialAltiDisplayed = true;
 					setOriginalAltitudeValues();
@@ -716,7 +716,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			}
 
 			@Override
-			public void mouseUp(MouseEvent e) {
+			public void mouseUp(final MouseEvent e) {
 				setInitialAltitudeValues();
 				fDialogTourChart.updateTourChart(!fChkScaleYAxis.getSelection());
 				fIsInitialAltiDisplayed = false;
@@ -726,12 +726,12 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		return fDialogArea;
 	}
 
-	@SuppressWarnings("unused") //$NON-NLS-1$
-	private void dumpMinMax(int[] altiSrc, String place) {
+	@SuppressWarnings("unused")
+	private void dumpMinMax(final int[] altiSrc, final String place) {
 
 		int minAltiSrc1 = altiSrc[0];
 		int maxAltiSrc1 = altiSrc[0];
-		for (int altitude : altiSrc) {
+		for (final int altitude : altiSrc) {
 			if (altitude < minAltiSrc1) {
 				minAltiSrc1 = altitude;
 			}
@@ -845,9 +845,9 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		getButton(IDialogConstants.CANCEL_ID).setFocus();
 
 		// set button width
-		int btnCompareWidth = fBtnCompare.getBounds().width;
-		int btnResetWidth = fBtnReset.getBounds().width;
-		int newWidth = Math.max(btnCompareWidth, btnResetWidth);
+		final int btnCompareWidth = fBtnCompare.getBounds().width;
+		final int btnResetWidth = fBtnReset.getBounds().width;
+		final int newWidth = Math.max(btnCompareWidth, btnResetWidth);
 
 		GridData gd;
 		gd = (GridData) fBtnCompare.getLayoutData();
@@ -872,7 +872,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		onChangeAltitude(null);
 	}
 
-	private void onChangeAltitude(Integer altiFlag) {
+	private void onChangeAltitude(final Integer altiFlag) {
 
 		// calcuate new altitude values
 		adjustAltitude(altiFlag);
@@ -895,7 +895,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 		// calculate max altitude
 		int maxAlti = startAlti;
-		for (int altitude : fAltitudeSerieOriginal) {
+		for (final int altitude : fAltitudeSerieOriginal) {
 			if (altitude > maxAlti) {
 				maxAlti = altitude;
 			}
@@ -932,11 +932,11 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 */
 	private void restoreDialogSettings() {
 
-		IDialogSettings dlgSettings = getDialogSettings();
+		final IDialogSettings dlgSettings = getDialogSettings();
 
 		try {
 			fComboAdjustType.select(dlgSettings.getInt(DIALOG_SETTINGS_ADJUST_TYPE));
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			fComboAdjustType.select(ADJUST_ALTITUDE_NONE);
 		}
 
@@ -954,7 +954,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 */
 	public void restoreOriginalAltitudeValues() {
 
-		int[] altitudeSerie = fTourData.altitudeSerie;
+		final int[] altitudeSerie = fTourData.altitudeSerie;
 
 		if (altitudeSerie == null | fAltitudeSerieOriginal == null) {
 			return;
@@ -972,7 +972,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 	private void saveDialogSettings() {
 
-		IDialogSettings dlgSettings = getDialogSettings();
+		final IDialogSettings dlgSettings = getDialogSettings();
 
 		dlgSettings.put(DIALOG_SETTINGS_ADJUST_TYPE, fComboAdjustType.getSelectionIndex());
 		dlgSettings.put(DIALOG_SETTINGS_SCALE_YAXIS, fChkScaleYAxis.getSelection());
@@ -984,14 +984,14 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 	 */
 	private void setAltiFieldValues() {
 
-		int[] altiSerie = fTourData.altitudeSerie;
+		final int[] altiSerie = fTourData.altitudeSerie;
 
-		int startAlti = altiSerie[0];
-		int endAlti = altiSerie[altiSerie.length - 1];
+		final int startAlti = altiSerie[0];
+		final int endAlti = altiSerie[altiSerie.length - 1];
 
 		// get max altitude
 		int maxAlti = altiSerie[0];
-		for (int altitude : altiSerie) {
+		for (final int altitude : altiSerie) {
 			if (altitude > maxAlti) {
 				maxAlti = altitude;
 			}
@@ -1022,7 +1022,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 	private void setInitialAltitudeValues() {
 
-		int[] altitudeSerie = fTourData.altitudeSerie;
+		final int[] altitudeSerie = fTourData.altitudeSerie;
 
 		if (altitudeSerie == null || fAltitudeSerieModified == null) {
 			return;
@@ -1039,7 +1039,7 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 
 	private void setOriginalAltitudeValues() {
 
-		int[] altitudeSerie = fTourData.altitudeSerie;
+		final int[] altitudeSerie = fTourData.altitudeSerie;
 
 		if (altitudeSerie == null || fAltitudeSerieOriginal == null) {
 			return;

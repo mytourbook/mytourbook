@@ -33,7 +33,7 @@ public class TCActionProxy {
 	private boolean	fIsEnabled	= true;
 	private boolean	fIsChecked;
 
-	public TCActionProxy(String commandId, Action action) {
+	public TCActionProxy(final String commandId, final Action action) {
 
 		fCommandId = commandId;
 		fAction = action;
@@ -61,7 +61,7 @@ public class TCActionProxy {
 	 * 
 	 * @param isChecked
 	 */
-	public void setChecked(boolean isChecked) {
+	public void setChecked(final boolean isChecked) {
 
 		// keep check state for this action 
 		fIsChecked = isChecked;
@@ -84,7 +84,7 @@ public class TCActionProxy {
 	 * 
 	 * @param isChecked
 	 */
-	public void setEnabled(boolean isEnabled) {
+	public void setEnabled(final boolean isEnabled) {
 
 		// keep enabled state for this action 
 		fIsEnabled = isEnabled;

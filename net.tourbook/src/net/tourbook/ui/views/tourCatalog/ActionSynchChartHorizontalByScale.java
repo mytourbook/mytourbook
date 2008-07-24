@@ -25,7 +25,7 @@ public class ActionSynchChartHorizontalByScale extends Action {
 
 	private ISynchedChart	synchChart;
 
-	public ActionSynchChartHorizontalByScale(ISynchedChart resultView) {
+	public ActionSynchChartHorizontalByScale(final ISynchedChart resultView) {
 
 		super(null, AS_CHECK_BOX);
 

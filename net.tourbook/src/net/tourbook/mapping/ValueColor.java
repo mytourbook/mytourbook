@@ -25,7 +25,7 @@ public class ValueColor {
 	public int	green;
 	public int	blue;
 
-	public ValueColor(int value, int red, int green, int blue) {
+	public ValueColor(final int value, final int red, final int green, final int blue) {
 		this.value = value;
 		this.red = red;
 		this.green = green;
@@ -37,7 +37,7 @@ public class ValueColor {
 	 * 
 	 * @param valueColor
 	 */
-	public ValueColor(ValueColor valueColor) {
+	public ValueColor(final ValueColor valueColor) {
 		value = valueColor.value;
 		red = valueColor.red;
 		green = valueColor.green;

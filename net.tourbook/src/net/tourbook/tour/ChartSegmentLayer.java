@@ -41,15 +41,14 @@ public class ChartSegmentLayer implements IChartLayer {
 	private RGB						lineColor		= new RGB(189, 0, 255);
 
 	/**
-	 * Adds a new marker to the internal marker list, the list can be retrieved
-	 * with getMarkerList()
+	 * Adds a new marker to the internal marker list, the list can be retrieved with getMarkerList()
 	 * 
 	 * @param marker
 	 * @param xCoord
-	 *        Position of the marker on the x axis
+	 *            Position of the marker on the x axis
 	 * @param label
 	 */
-	public void addMarker(ChartMarker marker) {
+	public void addMarker(final ChartMarker marker) {
 		fChartMarkers.add(marker);
 	}
 
@@ -57,7 +56,7 @@ public class ChartSegmentLayer implements IChartLayer {
 		return lineColor;
 	}
 
-	public void setLineColor(RGB lineColor) {
+	public void setLineColor(final RGB lineColor) {
 		this.lineColor = lineColor;
 	}
 
@@ -68,9 +67,9 @@ public class ChartSegmentLayer implements IChartLayer {
 	 * @param drawingData
 	 * @param fChartComponents
 	 */
-	public void draw(GC gc, ChartDrawingData drawingData, Chart chart) {
+	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
 
-		Display display = Display.getCurrent();
+		final Display display = Display.getCurrent();
 
 		final int devYTop = drawingData.getDevYTop();
 		final int devYBottom = drawingData.getDevYBottom();
@@ -88,18 +87,18 @@ public class ChartSegmentLayer implements IChartLayer {
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 
-		Color colorLine = new Color(display, getLineColor());
+		final Color colorLine = new Color(display, getLineColor());
 		Point labelExtend;
 		Point lastPoint = null;
 
-		for (ChartMarker chartMarker : fChartMarkers) {
+		for (final ChartMarker chartMarker : fChartMarkers) {
 
-			int devXOffset = (int) (chartMarker.graphX * scaleX) - devGraphImageOffset;
-			
-			int yValueIndex = Math.min(yValues.length - 1, chartMarker.serieIndex);
-			int yValue = yValues[yValueIndex];
-			
-			int devYGraph = (int) ((float) (yValue - graphYBottom) * scaleY) - 0;
+			final int devXOffset = (int) (chartMarker.graphX * scaleX) - devGraphImageOffset;
+
+			final int yValueIndex = Math.min(yValues.length - 1, chartMarker.serieIndex);
+			final int yValue = yValues[yValueIndex];
+
+			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
 			int devYMarker = devYBottom - devYGraph;
 
 			// don't draw over the graph borders
@@ -137,13 +136,13 @@ public class ChartSegmentLayer implements IChartLayer {
 
 				labelExtend = gc.textExtent(chartMarker.markerLabel);
 
-				int xPos = devXOffset - labelExtend.y;
+				final int xPos = devXOffset - labelExtend.y;
 				int yPos = yMarkerBar - labelExtend.y;
 
 				yPos = devYBottom - 5;
 
 				if (chart.getAdvancedGraphics()) {
-					Transform tr = new Transform(display);
+					final Transform tr = new Transform(display);
 					tr.translate(xPos, yPos);
 					tr.rotate(-90f);
 

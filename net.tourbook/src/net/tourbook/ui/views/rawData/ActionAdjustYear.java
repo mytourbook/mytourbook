@@ -42,7 +42,7 @@ public class ActionAdjustYear extends Action implements IMenuCreator {
 
 		private int	fYear;
 
-		public ActionYear(int year) {
+		public ActionYear(final int year) {
 			super(Integer.toString(year), AS_RADIO_BUTTON);
 
 			fYear = year;
@@ -55,13 +55,13 @@ public class ActionAdjustYear extends Action implements IMenuCreator {
 
 	}
 
-	public ActionAdjustYear(RawDataView rawDataView) {
+	public ActionAdjustYear(final RawDataView rawDataView) {
 
 		super(Messages.import_data_action_adjust_imported_year, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
 		fCalendar.setTime(new Date());
-		int thisYear = fCalendar.get(Calendar.YEAR);
+		final int thisYear = fCalendar.get(Calendar.YEAR);
 
 		fActionYearLast = new ActionYear(thisYear - 1);
 		fActionYearThis = new ActionYear(thisYear);
@@ -71,8 +71,8 @@ public class ActionAdjustYear extends Action implements IMenuCreator {
 		fActionYearThis.setChecked(true);
 	}
 
-	private void addActionToMenu(Action action) {
-		ActionContributionItem item = new ActionContributionItem(action);
+	private void addActionToMenu(final Action action) {
+		final ActionContributionItem item = new ActionContributionItem(action);
 		item.fill(fMenu, -1);
 	}
 
@@ -83,11 +83,11 @@ public class ActionAdjustYear extends Action implements IMenuCreator {
 		}
 	}
 
-	public Menu getMenu(Control parent) {
+	public Menu getMenu(final Control parent) {
 		return null;
 	}
 
-	public Menu getMenu(Menu parent) {
+	public Menu getMenu(final Menu parent) {
 
 		fMenu = new Menu(parent);
 

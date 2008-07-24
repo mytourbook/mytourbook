@@ -73,7 +73,7 @@ public abstract class TourbookStatistic {
 	 *         to <code>false</code>
 	 */
 	protected boolean isDataDirtyWithReset() {
-		boolean isDataDirty = fIsDataDirty;
+		final boolean isDataDirty = fIsDataDirty;
 		fIsDataDirty = false;
 		return isDataDirty;
 	}
@@ -85,14 +85,14 @@ public abstract class TourbookStatistic {
 
 	/**
 	 * Select the day in the statistic, this is used to visualize a selected tour in the statistic
-	 * chart. Deselect the day when set to <code>null</code>. <code>date</code> is in the
-	 * format milliseconds
+	 * chart. Deselect the day when set to <code>null</code>. <code>date</code> is in the format
+	 * milliseconds
 	 * 
 	 * @param date
-	 *        contains the date value in milliseconds
+	 *            contains the date value in milliseconds
 	 * @return <code>true</code> when a day was selected
 	 */
-	public boolean selectDay(Long date) {
+	public boolean selectDay(final Long date) {
 		return false;
 	}
 
@@ -101,10 +101,10 @@ public abstract class TourbookStatistic {
 	 * chart. Deselect the month when set to <code>null</code>
 	 * 
 	 * @param date
-	 *        contains the date value in milliseconds
+	 *            contains the date value in milliseconds
 	 * @return <code>true</code> when a month was selected
 	 */
-	public boolean selectMonth(Long date) {
+	public boolean selectMonth(final Long date) {
 		return false;
 	}
 
@@ -116,11 +116,11 @@ public abstract class TourbookStatistic {
 	 * @param tourId
 	 * @return <code>true</code> when a tour was selected
 	 */
-	public boolean selectTour(Long tourId) {
+	public boolean selectTour(final Long tourId) {
 		return false;
 	}
 
-	public void setContainer(Composite container) {
+	public void setContainer(final Composite container) {
 		fContainer = container;
 	}
 
@@ -136,7 +136,7 @@ public abstract class TourbookStatistic {
 	 * Set the state if the scale for the chart is synched for different data (e.g. years)
 	 * 
 	 * @param isEnabled
-	 *        <code>true</code> when the synch is enabled, <code>false</code> when it's disabled
+	 *            <code>true</code> when the synch is enabled, <code>false</code> when it's disabled
 	 */
 	public abstract void setSynchScale(boolean isEnabled);
 
@@ -145,7 +145,7 @@ public abstract class TourbookStatistic {
 	 * manager is used, this method should put the actions into the toolbar manager
 	 * 
 	 * @param refreshToolbar
-	 *        <code>true</code> will refresh the toolbar
+	 *            <code>true</code> will refresh the toolbar
 	 */
 	public abstract void updateToolBar(boolean refreshToolbar);
 

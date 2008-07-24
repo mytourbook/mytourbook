@@ -23,7 +23,7 @@ public class ActionZoomCentered extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionZoomCentered(MappingView mapView) {
+	public ActionZoomCentered(final MappingView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

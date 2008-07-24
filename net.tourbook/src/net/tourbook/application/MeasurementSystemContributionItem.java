@@ -53,7 +53,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 		this(ID);
 	}
 
-	protected MeasurementSystemContributionItem(String id) {
+	protected MeasurementSystemContributionItem(final String id) {
 		super(id);
 	}
 
@@ -63,7 +63,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 	private void addPrefListener() {
 
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(Preferences.PropertyChangeEvent event) {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
@@ -80,7 +80,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 	}
 
 	@Override
-	protected Control createControl(Composite parent) {
+	protected Control createControl(final Composite parent) {
 
 		Composite content;
 
@@ -97,7 +97,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 			content = new Composite(parent, SWT.NONE);
 			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(content);
 
-			Composite control = createComboBox(content);
+			final Composite control = createComboBox(content);
 			control.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
 		}
 
@@ -106,7 +106,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 		return content;
 	}
 
-	private Composite createComboBox(Composite parent) {
+	private Composite createComboBox(final Composite parent) {
 
 		final IPreferenceStore prefStore = plugin.getPreferenceStore();
 
@@ -114,19 +114,23 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 		fCombo.setToolTipText(Messages.App_measurement_tooltip);
 
 		fCombo.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
+			public void widgetDisposed(final DisposeEvent e) {
 				plugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 			}
 		});
 
 		fCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 
-				if (fFireSelectionEvent == false) { return; }
+				if (fFireSelectionEvent == false) {
+					return;
+				}
 
-				int selectedIndex = fCombo.getSelectionIndex();
-				if (selectedIndex == -1) { return; }
+				final int selectedIndex = fCombo.getSelectionIndex();
+				if (selectedIndex == -1) {
+					return;
+				}
 
 				if (selectedIndex == 0) {
 
@@ -172,8 +176,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 
 	private void selectSystem() {
 
-		String system = plugin.getPreferenceStore()
-				.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE);
+		final String system = plugin.getPreferenceStore().getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE);
 
 		if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM)) {
 			fCombo.select(0);

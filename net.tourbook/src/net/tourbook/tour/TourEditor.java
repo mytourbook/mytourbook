@@ -60,7 +60,6 @@ public class TourEditor extends EditorPart {
 	private boolean							fIsTourChanged			= false;
 	private boolean							fIsTourPropertyModified	= false;
 
-
 	private PostSelectionProvider			fPostSelectionProvider;
 	private ISelectionListener				fPostSelectionListener;
 	private IPartListener2					fPartListener;
@@ -70,7 +69,6 @@ public class TourEditor extends EditorPart {
 	private ActionHandlerRevertTourEditor	fRevertActionHandler;
 
 	private boolean							fIsRefTourCreated		= false;
-
 
 	private void addPartListener() {
 
@@ -371,7 +369,6 @@ public class TourEditor extends EditorPart {
 	public void setRefTourIsCreated() {
 		fIsRefTourCreated = true;
 	}
-
 
 	/**
 	 * Set the tour dirty

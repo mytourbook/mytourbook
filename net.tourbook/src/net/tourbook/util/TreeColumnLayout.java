@@ -52,27 +52,27 @@ public final class TreeColumnLayout extends Layout {
 	 * Adds a new column of data to this table layout.
 	 * 
 	 * @param data
-	 *        the column layout data
+	 *            the column layout data
 	 */
-	public void addColumnData(ColumnLayoutData data) {
+	public void addColumnData(final ColumnLayoutData data) {
 		columns.add(data);
 	}
 
-	private Point computeTableSize(Tree table, int wHint, int hHint) {
-		Point result = table.computeSize(wHint, hHint);
+	private Point computeTableSize(final Tree table, final int wHint, final int hHint) {
+		final Point result = table.computeSize(wHint, hHint);
 
 		int width = 0;
-		int size = columns.size();
+		final int size = columns.size();
 		for (int i = 0; i < size; ++i) {
-			ColumnLayoutData layoutData = (ColumnLayoutData) columns.get(i);
+			final ColumnLayoutData layoutData = columns.get(i);
 			if (layoutData instanceof ColumnPixelData) {
-				ColumnPixelData col = (ColumnPixelData) layoutData;
+				final ColumnPixelData col = (ColumnPixelData) layoutData;
 				width += col.width;
 				if (col.addTrim) {
 					width += COLUMN_TRIM;
 				}
 			} else if (layoutData instanceof ColumnWeightData) {
-				ColumnWeightData col = (ColumnWeightData) layoutData;
+				final ColumnWeightData col = (ColumnWeightData) layoutData;
 				width += col.minimumWidth;
 			} else {
 				Assert.isTrue(false, "Unknown column layout data"); //$NON-NLS-1$
@@ -84,10 +84,7 @@ public final class TreeColumnLayout extends Layout {
 		return result;
 	}
 
-	private void layoutTable(	final Tree table,
-								final int width,
-								final Rectangle area,
-								final boolean increase) {
+	private void layoutTable(final Tree table, final int width, final Rectangle area, final boolean increase) {
 		final TreeColumn[] tableColumns = table.getColumns();
 		final int size = Math.min(columns.size(), tableColumns.length);
 		final int[] widths = new int[size];
@@ -101,9 +98,9 @@ public final class TreeColumnLayout extends Layout {
 
 		// First calc space occupied by fixed columns
 		for (int i = 0; i < size; i++) {
-			ColumnLayoutData col = (ColumnLayoutData) columns.get(i);
+			final ColumnLayoutData col = columns.get(i);
 			if (col instanceof ColumnPixelData) {
-				ColumnPixelData cpd = (ColumnPixelData) col;
+				final ColumnPixelData cpd = (ColumnPixelData) col;
 				int pixels = cpd.width;
 				if (cpd.addTrim) {
 					pixels += COLUMN_TRIM;
@@ -111,7 +108,7 @@ public final class TreeColumnLayout extends Layout {
 				widths[i] = pixels;
 				fixedWidth += pixels;
 			} else if (col instanceof ColumnWeightData) {
-				ColumnWeightData cw = (ColumnWeightData) col;
+				final ColumnWeightData cw = (ColumnWeightData) col;
 				weightIteration[numberOfWeightColumns] = i;
 				numberOfWeightColumns++;
 				totalWeight += cw.weight;
@@ -133,19 +130,15 @@ public final class TreeColumnLayout extends Layout {
 			int totalWantedPixels = 0;
 			final int[] wantedPixels = new int[numberOfWeightColumns];
 			for (int i = 0; i < numberOfWeightColumns; i++) {
-				ColumnWeightData cw = (ColumnWeightData) columns.get(weightIteration[i]);
-				wantedPixels[i] = totalWeight == 0 ? 0 : cw.weight
-						* restIncludingMinWidths
-						/ totalWeight;
+				final ColumnWeightData cw = (ColumnWeightData) columns.get(weightIteration[i]);
+				wantedPixels[i] = totalWeight == 0 ? 0 : cw.weight * restIncludingMinWidths / totalWeight;
 				totalWantedPixels += wantedPixels[i];
 			}
 
 			// Now distribute the rest to the columns with weight.
 			int totalDistributed = 0;
 			for (int i = 0; i < numberOfWeightColumns; ++i) {
-				int pixels = totalWantedPixels == 0 ? 0 : wantedPixels[i]
-						* rest
-						/ totalWantedPixels;
+				final int pixels = totalWantedPixels == 0 ? 0 : wantedPixels[i] * rest / totalWantedPixels;
 				totalDistributed += pixels;
 				widths[weightIteration[i]] += pixels;
 			}
@@ -171,10 +164,10 @@ public final class TreeColumnLayout extends Layout {
 
 	/*
 	 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite, int, int,
-	 *      boolean)
+	 * boolean)
 	 */
 	@Override
-	protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
+	protected Point computeSize(final Composite composite, final int wHint, final int hHint, final boolean flushCache) {
 		return computeTableSize(getTable(composite), wHint, hHint);
 	}
 
@@ -182,20 +175,20 @@ public final class TreeColumnLayout extends Layout {
 	 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite, boolean)
 	 */
 	@Override
-	protected void layout(Composite composite, boolean flushCache) {
-		Rectangle area = composite.getClientArea();
-		Tree table = getTable(composite);
-		int tableWidth = table.getSize().x;
-		int trim = computeTrim(area, table, tableWidth);
-		int width = Math.max(0, area.width - trim);
+	protected void layout(final Composite composite, final boolean flushCache) {
+		final Rectangle area = composite.getClientArea();
+		final Tree table = getTable(composite);
+		final int tableWidth = table.getSize().x;
+		final int trim = computeTrim(area, table, tableWidth);
+		final int width = Math.max(0, area.width - trim);
 
 		if (width > 1) {
 			layoutTable(table, width, area, tableWidth < area.width);
 		}
 	}
 
-	private int computeTrim(Rectangle area, Tree table, int tableWidth) {
-		Point preferredSize = computeTableSize(table, area.width, area.height);
+	private int computeTrim(final Rectangle area, final Tree table, final int tableWidth) {
+		final Point preferredSize = computeTableSize(table, area.width, area.height);
 		int trim;
 		if (tableWidth > 1) {
 			trim = tableWidth - table.getClientArea().width;
@@ -208,16 +201,16 @@ public final class TreeColumnLayout extends Layout {
 			// Subtract the scrollbar width from the total column width
 			// if a vertical scrollbar will be required, but is not currently showing
 			// (in which case it is already subtracted above)
-			ScrollBar vBar = table.getVerticalBar();
+			final ScrollBar vBar = table.getVerticalBar();
 			if (!vBar.isVisible() || tableWidth <= 1) {
-				Point vBarSize = vBar.getSize();
+				final Point vBarSize = vBar.getSize();
 				trim += vBarSize.x;
 			}
 		}
 		return trim;
 	}
 
-	private Tree getTable(Composite composite) {
+	private Tree getTable(final Composite composite) {
 		return (Tree) composite.getChildren()[0];
 	}
 

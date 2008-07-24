@@ -66,17 +66,17 @@ import org.joda.time.DateTimeConstants;
 
 public class TourCatalogViewYearStatistic extends ViewPart {
 
-	public static final String						ID						= "net.tourbook.views.tourCatalog.yearStatisticView";	//$NON-NLS-1$
+	public static final String					ID						= "net.tourbook.views.tourCatalog.yearStatisticView";	//$NON-NLS-1$
 
-	private static final String						MEMENTO_NUMBER_OF_YEARS	= "numberOfYearsToDisplay";							//$NON-NLS-1$
+	private static final String					MEMENTO_NUMBER_OF_YEARS	= "numberOfYearsToDisplay";							//$NON-NLS-1$
 
-	private Chart									fYearChart;
+	private Chart								fYearChart;
 
-	private ISelectionListener						fPostSelectionListener;
-	private PostSelectionProvider					fPostSelectionProvider;
+	private ISelectionListener					fPostSelectionListener;
+	private PostSelectionProvider				fPostSelectionProvider;
 
-	private final DateFormat						fDateFormatter			= DateFormat.getDateInstance(DateFormat.FULL);
-	private NumberFormat							fNumberFormatter		= NumberFormat.getNumberInstance();
+	private final DateFormat					fDateFormatter			= DateFormat.getDateInstance(DateFormat.FULL);
+	private NumberFormat						fNumberFormatter		= NumberFormat.getNumberInstance();
 	/**
 	 * contains all {@link TVICatalogComparedTour} tour objects for all years
 	 */
@@ -85,42 +85,42 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	/**
 	 * year item for the visible statistics
 	 */
-	private TVICatalogReferenceTour			fCurrentRefItem;
+	private TVICatalogReferenceTour				fCurrentRefItem;
 
-	private PageBook								fPageBook;
+	private PageBook							fPageBook;
 
-	private Label									fPageNoChart;
+	private Label								fPageNoChart;
 	/**
 	 * selection which is thrown by the year statistic
 	 */
-	private StructuredSelection						fCurrentSelection;
+	private StructuredSelection					fCurrentSelection;
 
-	private ITourPropertyListener					fCompareTourPropertyListener;
+	private ITourPropertyListener				fCompareTourPropertyListener;
 
-	private IPropertyChangeListener					fPrefChangeListener;
-	private IPartListener2							fPartListener;
-	private IAction									fActionSynchChartScale;
+	private IPropertyChangeListener				fPrefChangeListener;
+	private IPartListener2						fPartListener;
+	private IAction								fActionSynchChartScale;
 
-	private ActionSelectYears						fActionSelectYears;
-	private boolean									fIsSynchMaxValue;
+	private ActionSelectYears					fActionSelectYears;
+	private boolean								fIsSynchMaxValue;
 
-	private IMemento								fSessionMemento;
+	private IMemento							fSessionMemento;
 
-	private int										fNumberOfYears;
+	private int									fNumberOfYears;
 
-	private int										fYoungesYear			= new DateTime().getYear();
-	private int[]									fAllYears;
+	private int									fYoungesYear			= new DateTime().getYear();
+	private int[]								fAllYears;
 
-	private int[]									fYearDays;
+	private int[]								fYearDays;
 	/**
 	 * Day of year values for all years
 	 */
-	private ArrayList<Integer>						fDOYValues;
+	private ArrayList<Integer>					fDOYValues;
 
 	/**
 	 * Tour speed for all years
 	 */
-	private ArrayList<Integer>						fTourSpeed;
+	private ArrayList<Integer>					fTourSpeed;
 
 	{
 		fNumberFormatter.setMinimumFractionDigits(1);
@@ -548,7 +548,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	 * select the tour in the year map chart
 	 * 
 	 * @param selectedTourId
-	 * 		tour id which should be selected
+	 *            tour id which should be selected
 	 */
 	private void selectTourInYearStatistic(final long selectedTourId) {
 
@@ -614,7 +614,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	 * show statistic for several years
 	 * 
 	 * @param showYoungestYear
-	 * 		shows the youngest year and the years before
+	 *            shows the youngest year and the years before
 	 */
 	private void updateYearBarChart(final boolean showYoungestYear) {
 

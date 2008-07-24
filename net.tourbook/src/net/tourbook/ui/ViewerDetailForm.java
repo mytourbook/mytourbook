@@ -47,13 +47,15 @@ public class ViewerDetailForm {
 
 	private boolean				isInitialResize;
 
-	public ViewerDetailForm(final Composite parent, final Control viewer, final Control sash,
-			final Control detail) {
+	public ViewerDetailForm(final Composite parent, final Control viewer, final Control sash, final Control detail) {
 		this(parent, viewer, sash, detail, 50);
 	}
 
-	public ViewerDetailForm(final Composite parent, final Control viewer, final Control sash,
-			final Control detail, final int leftWidth) {
+	public ViewerDetailForm(final Composite parent,
+							final Control viewer,
+							final Control sash,
+							final Control detail,
+							final int leftWidth) {
 
 		fParent = parent;
 		fViewer = viewer;
@@ -62,8 +64,8 @@ public class ViewerDetailForm {
 
 		parent.setLayout(new FormLayout());
 
-		FormAttachment topAttachment = new FormAttachment(0, 0);
-		FormAttachment bottomAttachment = new FormAttachment(100, 0);
+		final FormAttachment topAttachment = new FormAttachment(0, 0);
+		final FormAttachment bottomAttachment = new FormAttachment(100, 0);
 
 		final FormData viewerLayoutData = new FormData();
 		viewerLayoutData.left = new FormAttachment(0, 0);
@@ -86,25 +88,27 @@ public class ViewerDetailForm {
 		detail.setLayoutData(detailLayoutData);
 
 		viewer.addControlListener(new ControlAdapter() {
-			public void controlResized(ControlEvent e) {
+			@Override
+			public void controlResized(final ControlEvent e) {
 				onResize();
 			}
 		});
 
 		detail.addControlListener(new ControlAdapter() {
-			public void controlResized(ControlEvent e) {
+			@Override
+			public void controlResized(final ControlEvent e) {
 				onResize();
 			}
 		});
 
 		sash.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			public void handleEvent(final Event e) {
 
-				Rectangle sashRect = sash.getBounds();
-				Rectangle parentRect = parent.getClientArea();
+				final Rectangle sashRect = sash.getBounds();
+				final Rectangle parentRect = parent.getClientArea();
 
-				int right = parentRect.width - sashRect.width - MINIMUM_WIDTH;
-				int sashWidth = Math.max(Math.min(e.x, right), MINIMUM_WIDTH);
+				final int right = parentRect.width - sashRect.width - MINIMUM_WIDTH;
+				final int sashWidth = Math.max(Math.min(e.x, right), MINIMUM_WIDTH);
 
 				if (sashWidth != sashRect.x) {
 					fSashLayoutData.left = new FormAttachment(0, sashWidth);
@@ -159,7 +163,7 @@ public class ViewerDetailForm {
 					fSashLayoutData.left = new FormAttachment(50, 0);
 				} else {
 
-					Rectangle parentRect = fParent.getClientArea();
+					final Rectangle parentRect = fParent.getClientArea();
 
 					// set the minimum width
 
@@ -187,7 +191,7 @@ public class ViewerDetailForm {
 	 * 
 	 * @param control
 	 */
-	public void setMaximizedControl(Control control) {
+	public void setMaximizedControl(final Control control) {
 		fMaximizedControl = control;
 		onResize();
 	}
@@ -195,7 +199,7 @@ public class ViewerDetailForm {
 	/**
 	 * @param viewerWidth
 	 */
-	public void setViewerWidth(Integer viewerWidth) {
+	public void setViewerWidth(final Integer viewerWidth) {
 		fViewerWidth = viewerWidth == null ? null : Math.max(MINIMUM_WIDTH, viewerWidth);
 	}
 }

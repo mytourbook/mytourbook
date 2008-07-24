@@ -21,28 +21,28 @@ public class StringToArrayConverter {
 
 	public static final String	STRING_SEPARATOR	= ",";	//$NON-NLS-1$
 
-	public static String[] convertStringToArray(String str) {
+	public static String[] convertStringToArray(final String str) {
 		return convertStringToArray(str, STRING_SEPARATOR);
 	}
 
-	public static String[] convertStringToArray(String str, String separator) {
-		StringTokenizer tok = new StringTokenizer(str, separator);
-		int nTokens = tok.countTokens();
-		String[] res = new String[nTokens];
+	public static String[] convertStringToArray(final String str, final String separator) {
+		final StringTokenizer tok = new StringTokenizer(str, separator);
+		final int nTokens = tok.countTokens();
+		final String[] res = new String[nTokens];
 		for (int i = 0; i < nTokens; i++) {
 			res[i] = tok.nextToken();
 		}
 		return res;
 	}
 
-	public static String convertArrayToString(String[] array) {
+	public static String convertArrayToString(final String[] array) {
 		return convertArrayToString(array, STRING_SEPARATOR);
 	}
 
-	public static String convertArrayToString(String[] array, String separator) {
-		StringBuffer buf = new StringBuffer();
-		for (int arrayIndex = 0; arrayIndex < array.length; arrayIndex++) {
-			buf.append(array[arrayIndex]);
+	public static String convertArrayToString(final String[] array, final String separator) {
+		final StringBuffer buf = new StringBuffer();
+		for (final String element : array) {
+			buf.append(element);
 			buf.append(separator);
 		}
 		return buf.toString();

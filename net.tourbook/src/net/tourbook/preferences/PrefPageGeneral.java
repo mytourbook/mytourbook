@@ -54,7 +54,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		final Composite parent = getFieldEditorParent();
 		GridLayoutFactory.fillDefaults().applyTo(parent);
 
-		Group measurementGroup = new Group(parent, SWT.NONE);
+		final Group measurementGroup = new Group(parent, SWT.NONE);
 		measurementGroup.setText(Messages.Pref_general_system_measurement);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(measurementGroup);
 
@@ -106,7 +106,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				true));
 
 		// set margins after the editors are added
-		GridLayout groupLayout = (GridLayout) measurementGroup.getLayout();
+		final GridLayout groupLayout = (GridLayout) measurementGroup.getLayout();
 		groupLayout.marginWidth = 5;
 		groupLayout.marginHeight = 5;
 
@@ -130,7 +130,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		fChkUseCustomFormat.setPreferenceStore(fPrefStore);
 		fChkUseCustomFormat.load();
 		fChkUseCustomFormat.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 				enableControls();
 			}
 		});
@@ -146,7 +146,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		fTxtGroupSep.setPreferenceStore(fPrefStore);
 		fTxtGroupSep.load();
 		fTxtGroupSep.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 				setExampleValue();
 			}
 		});
@@ -162,7 +162,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		fTxtDecimalSep.setPreferenceStore(fPrefStore);
 		fTxtDecimalSep.load();
 		fTxtDecimalSep.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 				setExampleValue();
 			}
 		});
@@ -175,7 +175,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		fLblExampleValue.setText(UI.EMPTY_STRING);
 
 		// add layout to the group
-		GridLayout regionalLayout = (GridLayout) fDecimalFormatContainer.getLayout();
+		final GridLayout regionalLayout = (GridLayout) fDecimalFormatContainer.getLayout();
 		regionalLayout.marginWidth = 5;
 		regionalLayout.marginHeight = 5;
 
@@ -185,7 +185,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 	private void enableControls() {
 
-		boolean isUseCustomFormat = fChkUseCustomFormat.getBooleanValue();
+		final boolean isUseCustomFormat = fChkUseCustomFormat.getBooleanValue();
 
 		fTxtDecimalSep.setEnabled(isUseCustomFormat, fDecimalFormatContainer);
 		fTxtGroupSep.setEnabled(isUseCustomFormat, fDecimalFormatContainer);
@@ -194,7 +194,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		fLblExampleValue.setEnabled(isUseCustomFormat);
 	}
 
-	public void init(IWorkbench workbench) {
+	public void init(final IWorkbench workbench) {
 		setPreferenceStore(fPrefStore);
 	}
 
@@ -224,7 +224,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		final String groupSep = fTxtGroupSep.getStringValue();
 
-		StringBuilder buffer = new StringBuilder();
+		final StringBuilder buffer = new StringBuilder();
 		buffer.append("123"); //$NON-NLS-1$
 		buffer.append(groupSep);
 		buffer.append("456"); //$NON-NLS-1$

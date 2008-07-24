@@ -22,33 +22,33 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * Pixel conversion utility.
- *
+ * 
  * @since 3.0
  */
 public class PixelConverter {
 
-	private FontMetrics fFontMetrics;
+	private FontMetrics	fFontMetrics;
 
-	public PixelConverter(Control control) {
-		GC gc = new GC(control);
+	public PixelConverter(final Control control) {
+		final GC gc = new GC(control);
 		gc.setFont(control.getFont());
-		fFontMetrics= gc.getFontMetrics();
+		fFontMetrics = gc.getFontMetrics();
 		gc.dispose();
 	}
 
-	public int convertWidthInCharsToPixels(int chars) {
+	public int convertWidthInCharsToPixels(final int chars) {
 		return Dialog.convertWidthInCharsToPixels(fFontMetrics, chars);
 	}
 
-	public int convertHeightInCharsToPixels(int chars) {
+	public int convertHeightInCharsToPixels(final int chars) {
 		return Dialog.convertHeightInCharsToPixels(fFontMetrics, chars);
 	}
 
-	public int convertHorizontalDLUsToPixels(int dlus) {
+	public int convertHorizontalDLUsToPixels(final int dlus) {
 		return Dialog.convertHorizontalDLUsToPixels(fFontMetrics, dlus);
 	}
 
-	public int convertVerticalDLUsToPixels(int dlus) {
+	public int convertVerticalDLUsToPixels(final int dlus) {
 		return Dialog.convertVerticalDLUsToPixels(fFontMetrics, dlus);
 	}
 }

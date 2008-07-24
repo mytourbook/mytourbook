@@ -25,7 +25,7 @@ public class ActionEditTour extends Action {
 
 	private TourChartView	fTourChartView;
 
-	public ActionEditTour(TourChartView tourChartView) {
+	public ActionEditTour(final TourChartView tourChartView) {
 
 		fTourChartView = tourChartView;
 
@@ -37,9 +37,7 @@ public class ActionEditTour extends Action {
 	@Override
 	public void run() {
 
-		TourManager.getInstance().openTourInEditor(fTourChartView.getTourChart()
-				.getTourData()
-				.getTourId());
+		TourManager.getInstance().openTourInEditor(fTourChartView.getTourChart().getTourData().getTourId());
 	}
 
 }

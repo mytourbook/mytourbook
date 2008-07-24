@@ -30,9 +30,9 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
- * this is a copy of ControlContribution which will force the height for the
- * toolbar with a image in a push toolitem. this is a really hack but there was
- * no other solution to enlarge the height for a toolbar
+ * this is a copy of ControlContribution which will force the height for the toolbar with a image in
+ * a push toolitem. this is a really hack but there was no other solution to enlarge the height for
+ * a toolbar
  */
 public abstract class CustomControlContribution extends ContributionItem {
 	private Image	image;
@@ -41,87 +41,86 @@ public abstract class CustomControlContribution extends ContributionItem {
 	 * Creates a control contribution item with the given id.
 	 * 
 	 * @param id
-	 *        the contribution item id
+	 *            the contribution item id
 	 */
-	protected CustomControlContribution(String id) {
+	protected CustomControlContribution(final String id) {
 		super(id);
 	}
 
 	/**
-	 * Computes the width of the given control which is being added to a tool
-	 * bar. This is needed to determine the width of the tool bar item
-	 * containing the given control.
+	 * Computes the width of the given control which is being added to a tool bar. This is needed to
+	 * determine the width of the tool bar item containing the given control.
 	 * <p>
 	 * The default implementation of this framework method returns
-	 * <code>control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x</code>.
-	 * Subclasses may override if required.
+	 * <code>control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x</code>. Subclasses may override
+	 * if required.
 	 * </p>
 	 * 
 	 * @param control
-	 *        the control being added
+	 *            the control being added
 	 * @return the width of the control
 	 */
-	protected int computeWidth(Control control) {
+	protected int computeWidth(final Control control) {
 		return control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
 	}
 
 	/**
-	 * Creates and returns the control for this contribution item under the
-	 * given parent composite.
+	 * Creates and returns the control for this contribution item under the given parent composite.
 	 * <p>
 	 * This framework method must be implemented by concrete subclasses.
 	 * </p>
 	 * 
 	 * @param parent
-	 *        the parent composite
+	 *            the parent composite
 	 * @return the new control
 	 */
 	protected abstract Control createControl(Composite parent);
 
 	/**
-	 * The control item implementation of this <code>IContributionItem</code>
-	 * method calls the <code>createControl</code> framework method.
-	 * Subclasses must implement <code>createControl</code> rather than
-	 * overriding this method.
+	 * The control item implementation of this <code>IContributionItem</code> method calls the
+	 * <code>createControl</code> framework method. Subclasses must implement
+	 * <code>createControl</code> rather than overriding this method.
 	 */
-	public final void fill(Composite parent) {
+	@Override
+	public final void fill(final Composite parent) {
 		createControl(parent);
 	}
 
 	/**
-	 * The control item implementation of this <code>IContributionItem</code>
-	 * method throws an exception since controls cannot be added to menus.
+	 * The control item implementation of this <code>IContributionItem</code> method throws an
+	 * exception since controls cannot be added to menus.
 	 */
-	public final void fill(Menu parent, int index) {
+	@Override
+	public final void fill(final Menu parent, final int index) {
 		Assert.isTrue(false, "Can't add a control to a menu");//$NON-NLS-1$
 	}
 
 	/**
-	 * The control item implementation of this <code>IContributionItem</code>
-	 * method calls the <code>createControl</code> framework method to create
-	 * a control under the given parent, and then creates a new tool item to
-	 * hold it. Subclasses must implement <code>createControl</code> rather
-	 * than overriding this method.
+	 * The control item implementation of this <code>IContributionItem</code> method calls the
+	 * <code>createControl</code> framework method to create a control under the given parent, and
+	 * then creates a new tool item to hold it. Subclasses must implement <code>createControl</code>
+	 * rather than overriding this method.
 	 */
-	public final void fill(ToolBar toolbar, int index) {
+	@Override
+	public final void fill(final ToolBar toolbar, final int index) {
 
-		Control control = createControl(toolbar);
+		final Control control = createControl(toolbar);
 
-		ToolItem ti = new ToolItem(toolbar, SWT.SEPARATOR);
+		final ToolItem ti = new ToolItem(toolbar, SWT.SEPARATOR);
 		ti.setControl(control);
 		ti.setWidth(computeWidth(control));
 
 		// create dummy item to force the height
-		int height = control.getSize().y;
-		ImageData imageData = new ImageData(1, height, 1, new PaletteData(
-				new RGB[] { new RGB(0, 0, 0) }));
+		final int height = control.getSize().y;
+		final ImageData imageData = new ImageData(1, height, 1, new PaletteData(new RGB[] { new RGB(0, 0, 0) }));
 		imageData.transparentPixel = 0;
 		image = new Image(Display.getCurrent(), imageData);
 
-		ToolItem imageItem = new ToolItem(toolbar, SWT.PUSH);
+		final ToolItem imageItem = new ToolItem(toolbar, SWT.PUSH);
 		imageItem.setImage(image);
 	}
 
+	@Override
 	public void dispose() {
 		image.dispose();
 	}

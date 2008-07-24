@@ -25,11 +25,11 @@ final class ActionSetLayoutHierarchical extends Action {
 	private TagView	fTagView;
 
 	ActionSetLayoutHierarchical(final TagView tagView) {
-		
+
 		super(Messages.action_tagView_flat_hierarchical, AS_RADIO_BUTTON);
-		
+
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__layout_hierarchical));
-		
+
 		fTagView = tagView;
 	}
 

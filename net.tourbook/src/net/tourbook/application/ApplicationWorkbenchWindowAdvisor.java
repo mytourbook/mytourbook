@@ -122,7 +122,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				label = currentPage.getLabel();
 			}
 
-			if (label != null && !label.equals(UI.EMPTY_STRING)) {  
+			if (label != null && !label.equals(UI.EMPTY_STRING)) {
 				title = NLS.bind(shellTitle, label, title);
 			}
 		}

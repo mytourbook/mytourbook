@@ -93,8 +93,8 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 					// dispose old items
 					final MenuItem[] items = menu.getItems();
-					for (int i = 0; i < items.length; i++) {
-						items[i].dispose();
+					for (final MenuItem item : items) {
+						item.dispose();
 					}
 
 					final TagCollection tagCollection = TourDatabase.getTagEntries(fTagCategory.getCategoryId());
@@ -227,8 +227,8 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 				// dispose old items
 				final MenuItem[] items = menu.getItems();
-				for (int i = 0; i < items.length; i++) {
-					items[i].dispose();
+				for (final MenuItem item : items) {
+					item.dispose();
 				}
 
 				// check if a tour is selected

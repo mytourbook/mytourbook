@@ -90,7 +90,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		String	graphLabel;
 		boolean	isChecked	= false;
 
-		public Graph(int graphId, String graphLabel) {
+		public Graph(final int graphId, final String graphLabel) {
 			this.graphId = graphId;
 			this.graphLabel = graphLabel;
 		}
@@ -99,12 +99,12 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	/*
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
-	public void init(IWorkbench workbench) {
+	public void init(final IWorkbench workbench) {
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
 
 	@Override
-	protected Control createContents(Composite parent) {
+	protected Control createContents(final Composite parent) {
 
 		// create a map with all available graphs
 		fGraphMap = new HashMap<Integer, Graph>();
@@ -138,26 +138,26 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_ALTIMETER));
 		fGraphList.add(fGraphMap.get(TourManager.GRAPH_GRADIENT));
 
-		TabFolder tabFolder = new TabFolder(parent, SWT.NONE);
+		final TabFolder tabFolder = new TabFolder(parent, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		TabItem tabVisibleGraphs = new TabItem(tabFolder, SWT.NONE);
+		final TabItem tabVisibleGraphs = new TabItem(tabFolder, SWT.NONE);
 		tabVisibleGraphs.setText(Messages.Pref_Graphs_Tab_graph_defaults);
 		tabVisibleGraphs.setControl(createTabGraphs(tabFolder));
 
-		TabItem tabAltimeter = new TabItem(tabFolder, SWT.NONE);
+		final TabItem tabAltimeter = new TabItem(tabFolder, SWT.NONE);
 		tabAltimeter.setText(Messages.Pref_Graphs_Tab_default_values);
 		tabAltimeter.setControl(createTabDefaultsValues(tabFolder));
 
 		return tabFolder;
 	}
 
-	private Control createTabGraphs(Composite parent) {
+	private Control createTabGraphs(final Composite parent) {
 
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new GridLayout(2, false));
 
-		Label label = new Label(container, SWT.WRAP);
+		final Label label = new Label(container, SWT.WRAP);
 		label.setText(Messages.Pref_Graphs_Label_select_graph);
 		GridData gd = new GridData();
 		gd.horizontalSpan = 2;
@@ -170,7 +170,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		fGraphCheckboxList.getTable().setLayoutData(gd);
 
 		// button container
-		Composite buttonContainer = new Composite(container, SWT.NONE);
+		final Composite buttonContainer = new Composite(container, SWT.NONE);
 		final GridLayout gl = new GridLayout();
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
@@ -185,12 +185,12 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		btnUp.setLayoutData(gd);
 		btnUp.setEnabled(false);
 		btnUp.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				moveSelectionUp();
 				enableUpDownButtons();
 			}
 
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(final SelectionEvent e) {}
 		});
 
 		// down button
@@ -199,19 +199,19 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		btnDown.setLayoutData(gd);
 		btnDown.setEnabled(false);
 		btnDown.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				moveSelectionDown();
 				enableUpDownButtons();
 			}
 
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(final SelectionEvent e) {}
 		});
 
 		validateTab();
 		enableUpDownButtons();
 
 		// group: units for the x-axis
-		Group group = new Group(container, SWT.NONE);
+		final Group group = new Group(container, SWT.NONE);
 		group.setText(Messages.Pref_Graphs_Group_units_for_xaxis);
 		gd = new GridData();
 		gd.horizontalSpan = 2;
@@ -223,7 +223,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		radioShowDistance.setText(Messages.Pref_Graphs_Radio_show_distance);
 		radioShowDistance.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent event) {
+			public void widgetSelected(final SelectionEvent event) {
 				enableTabGraphControls();
 			}
 		});
@@ -249,7 +249,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		checkShowStartTime.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME));
 
 		// group: zoom options
-		Group groupZoomOptions = new Group(container, SWT.NONE);
+		final Group groupZoomOptions = new Group(container, SWT.NONE);
 		groupZoomOptions.setText(Messages.Pref_Graphs_Group_zoom_options);
 		gd = new GridData();
 		gd.horizontalSpan = 2;
@@ -262,7 +262,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		checkScrollZoomedChart.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH));
 		checkScrollZoomedChart.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent event) {
+			public void widgetSelected(final SelectionEvent event) {
 				if (checkScrollZoomedChart.getSelection()) {
 					checkZoomToSlider.setSelection(false);
 				}
@@ -275,7 +275,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		checkZoomToSlider.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
 		checkZoomToSlider.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent event) {
+			public void widgetSelected(final SelectionEvent event) {
 				if (checkZoomToSlider.getSelection()) {
 					checkScrollZoomedChart.setSelection(false);
 				}
@@ -288,11 +288,11 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		return container;
 	}
 
-	private Control createTabDefaultsValues(Composite parent) {
+	private Control createTabDefaultsValues(final Composite parent) {
 
 		GridData gd;
 
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new GridLayout(1, false));
 
 		// the editor container removes all margins
@@ -310,8 +310,8 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		altimeterMinCheckbox.setPage(this);
 		altimeterMinCheckbox.load();
 		altimeterMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
-				boolean isChecked = (Boolean) event.getNewValue();
+			public void propertyChange(final PropertyChangeEvent event) {
+				final boolean isChecked = (Boolean) event.getNewValue();
 				altimeterMinEditor.setEnabled(isChecked, editorContainer);
 			}
 		});
@@ -348,8 +348,8 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		gradientMinCheckbox.setPage(this);
 		gradientMinCheckbox.load();
 		gradientMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
-				boolean isChecked = (Boolean) event.getNewValue();
+			public void propertyChange(final PropertyChangeEvent event) {
+				final boolean isChecked = (Boolean) event.getNewValue();
 				gradientMinEditor.setEnabled(isChecked, editorContainer);
 			}
 		});
@@ -383,32 +383,32 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		checkShowStartTime.setEnabled(radioShowTime.getSelection());
 	}
 
-	private CheckboxTableViewer createGraphCheckBoxList(Composite parent) {
+	private CheckboxTableViewer createGraphCheckBoxList(final Composite parent) {
 
 		final CheckboxTableViewer checkboxList = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE
 				| SWT.TOP
 				| SWT.BORDER);
 
 		checkboxList.setContentProvider(new IStructuredContentProvider() {
-			public Object[] getElements(Object inputElement) {
+			public Object[] getElements(final Object inputElement) {
 				return fViewerGraphs.toArray();
 			}
 
 			public void dispose() {}
 
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 		});
 
 		checkboxList.setLabelProvider(new LabelProvider() {
 			@Override
-			public String getText(Object element) {
-				Graph graph = (Graph) element;
+			public String getText(final Object element) {
+				final Graph graph = (Graph) element;
 				return graph.graphLabel;
 			}
 		});
 
 		checkboxList.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(CheckStateChangedEvent event) {
+			public void checkStateChanged(final CheckStateChangedEvent event) {
 
 				// keep the checked status
 				final Graph item = (Graph) event.getElement();
@@ -422,7 +422,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		});
 
 		checkboxList.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
+			public void selectionChanged(final SelectionChangedEvent event) {
 				enableUpDownButtons();
 			}
 		});
@@ -431,13 +431,13 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		createGraphList();
 		checkboxList.setInput(this);
 
-		String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(getPreferenceStore().getString(ITourbookPreferences.GRAPH_VISIBLE));
+		final String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(getPreferenceStore().getString(ITourbookPreferences.GRAPH_VISIBLE));
 
 		// check all graphs which are defined in the prefs
-		ArrayList<Graph> checkedGraphs = new ArrayList<Graph>();
-		for (Graph graph : fViewerGraphs) {
+		final ArrayList<Graph> checkedGraphs = new ArrayList<Graph>();
+		for (final Graph graph : fViewerGraphs) {
 			final int graphId = graph.graphId;
-			for (String prefId : prefVisibleIds) {
+			for (final String prefId : prefVisibleIds) {
 				if (graphId == Integer.valueOf(prefId)) {
 					graph.isChecked = true;
 					checkedGraphs.add(graph);
@@ -455,21 +455,21 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	 */
 	private void createGraphList() {
 
-		String[] allGraphIds = StringToArrayConverter.convertStringToArray(//
+		final String[] allGraphIds = StringToArrayConverter.convertStringToArray(//
 		getPreferenceStore().getString(ITourbookPreferences.GRAPH_ALL));
 
 		fViewerGraphs = new ArrayList<Graph>();
 
 		// put all graphs in the viewer which are defined in the prefs
-		for (int graphIndex = 0; graphIndex < allGraphIds.length; graphIndex++) {
-			final int graphId = Integer.valueOf(allGraphIds[graphIndex]);
+		for (final String allGraphId : allGraphIds) {
+			final int graphId = Integer.valueOf(allGraphId);
 			if (fGraphMap.containsKey(graphId)) {
 				fViewerGraphs.add(fGraphMap.get(graphId));
 			}
 		}
 
 		// make sure that all available graphs are in the viewer
-		for (Graph graph : fGraphList) {
+		for (final Graph graph : fGraphList) {
 			if (!fViewerGraphs.contains(graph)) {
 				fViewerGraphs.add(graph);
 			}
@@ -485,7 +485,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 		saveGraphs();
 
-		IPreferenceStore prefStore = getPreferenceStore();
+		final IPreferenceStore prefStore = getPreferenceStore();
 
 		if (radioShowTime.getSelection()) {
 			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_TIME);
@@ -513,10 +513,10 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 		// convert the array with the graph objects into a string which is store
 		// in the prefs
-		Object[] graphs = fGraphCheckboxList.getCheckedElements();
-		String[] prefGraphsChecked = new String[graphs.length];
+		final Object[] graphs = fGraphCheckboxList.getCheckedElements();
+		final String[] prefGraphsChecked = new String[graphs.length];
 		for (int graphIndex = 0; graphIndex < graphs.length; graphIndex++) {
-			Graph graph = (Graph) graphs[graphIndex];
+			final Graph graph = (Graph) graphs[graphIndex];
 			prefGraphsChecked[graphIndex] = Integer.toString(graph.graphId);
 		}
 		getPreferenceStore().setValue(ITourbookPreferences.GRAPH_VISIBLE,
@@ -524,8 +524,8 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 		// convert the array of all table items into a string which is store in
 		// the prefs
-		TableItem[] items = fGraphCheckboxList.getTable().getItems();
-		String[] prefGraphs = new String[items.length];
+		final TableItem[] items = fGraphCheckboxList.getTable().getItems();
+		final String[] prefGraphs = new String[items.length];
 		for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
 			prefGraphs[itemIndex] = Integer.toString(((Graph) items[itemIndex].getData()).graphId);
 		}
@@ -554,15 +554,15 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	 */
 	private void enableUpDownButtons() {
 
-		Table table = fGraphCheckboxList.getTable();
-		TableItem[] items = table.getSelection();
-		boolean validSelection = items != null && items.length > 0;
+		final Table table = fGraphCheckboxList.getTable();
+		final TableItem[] items = table.getSelection();
+		final boolean validSelection = items != null && items.length > 0;
 		boolean enableUp = validSelection;
 		boolean enableDown = validSelection;
 
 		if (validSelection) {
-			int indices[] = table.getSelectionIndices();
-			int max = table.getItemCount();
+			final int indices[] = table.getSelectionIndices();
+			final int max = table.getItemCount();
 			enableUp = indices[0] != 0;
 			enableDown = indices[indices.length - 1] < max - 1;
 		}
@@ -574,15 +574,15 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	 * Move the current selection in the build list down.
 	 */
 	private void moveSelectionDown() {
-		Table table = fGraphCheckboxList.getTable();
-		int indices[] = table.getSelectionIndices();
+		final Table table = fGraphCheckboxList.getTable();
+		final int indices[] = table.getSelectionIndices();
 		if (indices.length < 1) {
 			return;
 		}
-		int newSelection[] = new int[indices.length];
-		int max = table.getItemCount() - 1;
+		final int newSelection[] = new int[indices.length];
+		final int max = table.getItemCount() - 1;
 		for (int i = indices.length - 1; i >= 0; i--) {
-			int index = indices[i];
+			final int index = indices[i];
 			if (index < max) {
 				move(table.getItem(index), index + 1);
 				newSelection[i] = index + 1;
@@ -595,11 +595,11 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	 * Move the current selection in the build list up.
 	 */
 	private void moveSelectionUp() {
-		Table table = fGraphCheckboxList.getTable();
-		int indices[] = table.getSelectionIndices();
-		int newSelection[] = new int[indices.length];
+		final Table table = fGraphCheckboxList.getTable();
+		final int indices[] = table.getSelectionIndices();
+		final int newSelection[] = new int[indices.length];
 		for (int i = 0; i < indices.length; i++) {
-			int index = indices[i];
+			final int index = indices[i];
 			if (index > 0) {
 				move(table.getItem(index), index - 1);
 				newSelection[i] = index - 1;
@@ -611,7 +611,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	/**
 	 * Moves an entry in the table to the given index.
 	 */
-	private void move(TableItem item, int index) {
+	private void move(final TableItem item, final int index) {
 		this.setValid(true);
 		final Graph graph = (Graph) item.getData();
 		item.dispose();

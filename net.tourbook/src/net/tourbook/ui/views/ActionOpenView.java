@@ -24,12 +24,10 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 
-
 public class ActionOpenView extends Action {
 
 	private final IWorkbenchWindow	window;
 	private final String			viewId;
-
 
 	/**
 	 * @param window
@@ -39,9 +37,12 @@ public class ActionOpenView extends Action {
 	 * @param cmdId
 	 * @param image
 	 */
-	public ActionOpenView(IWorkbenchWindow window, String label, String toolTip, String viewId,
-			String cmdId, String image)
-	{
+	public ActionOpenView(	final IWorkbenchWindow window,
+							final String label,
+							final String toolTip,
+							final String viewId,
+							final String cmdId,
+							final String image) {
 
 		this.window = window;
 		this.viewId = viewId;
@@ -56,17 +57,16 @@ public class ActionOpenView extends Action {
 		// Associate the action with a pre-defined command, to allow key
 		// bindings.
 //		setActionDefinitionId(cmdId);
-		
+
 	}
 
-
+	@Override
 	public void run() {
 
 		if (window != null) {
 			try {
 				window.getActivePage().showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
-			}
-			catch (PartInitException e) {
+			} catch (final PartInitException e) {
 				MessageDialog.openError(window.getShell(), "Error", "Error opening view:" //$NON-NLS-1$ //$NON-NLS-2$
 						+ e.getMessage());
 			}

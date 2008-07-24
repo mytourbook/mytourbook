@@ -18,8 +18,8 @@ package net.tourbook.tour;
 import org.eclipse.jface.viewers.ISelection;
 
 /**
- * When the selection is set by this type and is not empty, the raw tour data
- * has changed (added, removed)
+ * When the selection is set by this type and is not empty, the raw tour data has changed (added,
+ * removed)
  */
 public class SelectionNewTours implements ISelection {
 
@@ -29,7 +29,7 @@ public class SelectionNewTours implements ISelection {
 		return fIsEmpty;
 	}
 
-	public void setEmpty(boolean isEmpty) {
+	public void setEmpty(final boolean isEmpty) {
 		fIsEmpty = isEmpty;
 	}
 

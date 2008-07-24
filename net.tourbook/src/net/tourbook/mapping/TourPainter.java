@@ -69,8 +69,8 @@ public class TourPainter extends MapPainter {
 	 * @param gc
 	 * @param legendBounds
 	 * @param isVertical
-	 * 		when <code>true</code> the legend is drawn vertical, when false the legend is drawn
-	 * 		horizontal
+	 *            when <code>true</code> the legend is drawn vertical, when false the legend is
+	 *            drawn horizontal
 	 * @param colorId
 	 * @return
 	 */
@@ -276,9 +276,9 @@ public class TourPainter extends MapPainter {
 		ValueColor minValueColor = null;
 		ValueColor maxValueColor = null;
 
-		for (int colorIndex = 0; colorIndex < valueColors.length; colorIndex++) {
+		for (final ValueColor valueColor2 : valueColors) {
 
-			valueColor = valueColors[colorIndex];
+			valueColor = valueColor2;
 			if (legendValue > valueColor.value) {
 				minValueColor = valueColor;
 			}
@@ -837,7 +837,7 @@ public class TourPainter extends MapPainter {
 	 * @param legendBounds
 	 * @param valueIndex
 	 * @return Returns the position for the value according to the value index in the legend,
-	 * 	{@link Integer#MIN_VALUE} when data are not initialized
+	 *         {@link Integer#MIN_VALUE} when data are not initialized
 	 */
 	public int getLegendValuePosition(final Rectangle legendBounds, final int valueIndex) {
 
@@ -960,13 +960,13 @@ public class TourPainter extends MapPainter {
 	 * one half to the left and right side
 	 * 
 	 * @param markerBounds
-	 * 		marker bounds
+	 *            marker bounds
 	 * @param devMarkerPosX
-	 * 		x position for the marker
+	 *            x position for the marker
 	 * @param devMarkerPosY
-	 * 		y position for the marker
+	 *            y position for the marker
 	 * @param tileSize
-	 * 		width and height of the tile
+	 *            width and height of the tile
 	 * @return Returns <code>true</code> when the marker is visible in the tile
 	 */
 	private boolean isMarkerInTile(	final Rectangle markerBounds,

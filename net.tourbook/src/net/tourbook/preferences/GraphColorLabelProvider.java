@@ -17,7 +17,6 @@
 package net.tourbook.preferences;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorItem;
@@ -61,13 +60,13 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 
 	void disposeGraphImages() {
 
-		for (final Iterator<Image> i = fImageCache.values().iterator(); i.hasNext();) {
-			((Image) i.next()).dispose();
+		for (final Image image : fImageCache.values()) {
+			(image).dispose();
 		}
 		fImageCache.clear();
 
-		for (final Iterator<Color> i = fColorCache.values().iterator(); i.hasNext();) {
-			((Color) i.next()).dispose();
+		for (final Color color : fColorCache.values()) {
+			(color).dispose();
 		}
 		fColorCache.clear();
 	}

@@ -21,7 +21,7 @@ public class ActionShowSliderInMap extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionShowSliderInMap(MappingView mapView) {
+	public ActionShowSliderInMap(final MappingView mapView) {
 
 		super(Messages.map_action_show_slider_in_map, AS_CHECK_BOX);
 

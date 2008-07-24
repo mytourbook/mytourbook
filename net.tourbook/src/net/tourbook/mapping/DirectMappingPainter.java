@@ -69,7 +69,9 @@ public class DirectMappingPainter implements IDirectPainter {
 		}
 	}
 
-	private void drawSliderMarker(final DirectPainterContext painterContext, int sliderValueIndex, Image markerImage) {
+	private void drawSliderMarker(	final DirectPainterContext painterContext,
+									int sliderValueIndex,
+									final Image markerImage) {
 
 		final TileFactory tileFactory = fMap.getTileFactory();
 		final int zoomLevel = fMap.getZoom();
@@ -101,7 +103,7 @@ public class DirectMappingPainter implements IDirectPainter {
 		}
 	}
 
-	private void drawValueMarkerInLegend(DirectPainterContext painterContext) {
+	private void drawValueMarkerInLegend(final DirectPainterContext painterContext) {
 
 		final MapLegend mapLegend = fMap.getLegend();
 
@@ -116,23 +118,23 @@ public class DirectMappingPainter implements IDirectPainter {
 
 		final Rectangle legendImageBounds = legendImage.getBounds();
 
-		int leftValueInlegendPosition = TourPainter.getInstance().getLegendValuePosition(legendImageBounds,
+		final int leftValueInlegendPosition = TourPainter.getInstance().getLegendValuePosition(legendImageBounds,
 				fLeftSliderValueIndex);
 		if (leftValueInlegendPosition == Integer.MIN_VALUE) {
 			return;
 		}
 
-		int rightValueInlegendPosition = TourPainter.getInstance().getLegendValuePosition(legendImageBounds,
+		final int rightValueInlegendPosition = TourPainter.getInstance().getLegendValuePosition(legendImageBounds,
 				fRightSliderValueIndex);
 		if (rightValueInlegendPosition == Integer.MIN_VALUE) {
 			return;
 		}
 
-		Point legendInMapPosition = mapLegend.getLegendPosition();
+		final Point legendInMapPosition = mapLegend.getLegendPosition();
 		final int positionX = legendInMapPosition.x;
 		final int positionY = legendInMapPosition.y + legendImageBounds.height - 2;
 
-		GC gc = painterContext.gc;
+		final GC gc = painterContext.gc;
 
 		gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 
@@ -162,7 +164,7 @@ public class DirectMappingPainter implements IDirectPainter {
 	/**
 	 * @param map
 	 * @param isTourVisible
-	 *        <code>true</code> when tour is visible
+	 *            <code>true</code> when tour is visible
 	 * @param tourData
 	 * @param leftSliderValuesIndex
 	 * @param rightSliderValuesIndex
@@ -170,13 +172,13 @@ public class DirectMappingPainter implements IDirectPainter {
 	 * @param isShowSliderInMap
 	 * @param legendImageBounds
 	 */
-	public void setPaintContext(Map map,
-								boolean isTourVisible,
+	public void setPaintContext(final Map map,
+								final boolean isTourVisible,
 								final TourData tourData,
 								final int leftSliderValuesIndex,
 								final int rightSliderValuesIndex,
-								boolean isShowSliderInMap,
-								boolean isShowSliderInLegend) {
+								final boolean isShowSliderInMap,
+								final boolean isShowSliderInLegend) {
 		fMap = map;
 		fIsTourVisible = isTourVisible;
 		fTourData = tourData;

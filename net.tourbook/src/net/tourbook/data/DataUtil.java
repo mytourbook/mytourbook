@@ -25,12 +25,9 @@ package net.tourbook.data;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-
 /**
  */
 public class DataUtil {
-
-
 
 	/**
 	 * read an file offset value from the file stream
@@ -40,7 +37,7 @@ public class DataUtil {
 	 * @return offset value adjusted to the file position
 	 * @throws IOException
 	 */
-	public static int readFileOffset(RandomAccessFile fileRawData, byte[] buffer) throws IOException {
+	public static int readFileOffset(final RandomAccessFile fileRawData, final byte[] buffer) throws IOException {
 
 		fileRawData.read(buffer);
 

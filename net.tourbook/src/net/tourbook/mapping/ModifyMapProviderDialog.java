@@ -64,7 +64,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		fPrefStore = TourbookPlugin.getDefault().getPreferenceStore();
 	}
 
-	public ModifyMapProviderDialog(final Shell parentShell, MappingView mappingView) {
+	public ModifyMapProviderDialog(final Shell parentShell, final MappingView mappingView) {
 
 		super(parentShell);
 
@@ -106,18 +106,16 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 
 		final List<MapProvider> mapProviders = fMappingView.getFactories();
 
-		String[] storedProviderIds = StringToArrayConverter.convertStringToArray(//
+		final String[] storedProviderIds = StringToArrayConverter.convertStringToArray(//
 		fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER));
 
 		fMapProviders = new ArrayList<MapProvider>();
 
 		// put all map providers into the viewer which are defined in the pref store
-		for (int providerIndex = 0; providerIndex < storedProviderIds.length; providerIndex++) {
-
-			String storeMapProvider = storedProviderIds[providerIndex];
+		for (final String storeMapProvider : storedProviderIds) {
 
 			// find the stored map provider in the available map providers
-			for (MapProvider mapProvider : mapProviders) {
+			for (final MapProvider mapProvider : mapProviders) {
 				if (mapProvider.getInfo().getFactoryID().equals(storeMapProvider)) {
 					fMapProviders.add(mapProvider);
 					break;
@@ -126,7 +124,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		}
 
 		// make sure that all available map providers are in the viewer
-		for (MapProvider tileFactory : mapProviders) {
+		for (final MapProvider tileFactory : mapProviders) {
 			if (!fMapProviders.contains(tileFactory)) {
 				fMapProviders.add(tileFactory);
 			}
@@ -146,7 +144,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		createUIMapProviderList(dlgContainer);
 		createUIButtons(dlgContainer);
 
-		Label label = new Label(dlgContainer, SWT.WRAP);
+		final Label label = new Label(dlgContainer, SWT.WRAP);
 		label.setText(Messages.modify_mapprovider_lbl_toggle_info);
 		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(label);
 
@@ -154,10 +152,10 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		new Label(dlgContainer, SWT.NONE);
 	}
 
-	private void createUIButtons(Composite parent) {
+	private void createUIButtons(final Composite parent) {
 
 		// button container
-		Composite buttonContainer = new Composite(parent, SWT.NONE);
+		final Composite buttonContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.swtDefaults().grab(false, false).align(SWT.FILL, SWT.FILL).applyTo(buttonContainer);
 		GridLayoutFactory.fillDefaults().applyTo(buttonContainer);
 //		buttonContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -168,7 +166,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		setButtonLayoutData(fBtnUp);
 		fBtnUp.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				moveSelectionUp();
 				enableUpDownButtons();
 			}
@@ -180,7 +178,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		setButtonLayoutData(fBtnDown);
 		fBtnDown.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				moveSelectionDown();
 				enableUpDownButtons();
 			}
@@ -191,7 +189,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 
 		fCheckboxList = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE | SWT.TOP | SWT.BORDER);
 
-		Table table = fCheckboxList.getTable();
+		final Table table = fCheckboxList.getTable();
 		GridDataFactory.swtDefaults()//
 				.grab(true, true)
 				.align(SWT.FILL, SWT.FILL)
@@ -209,8 +207,8 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 
 		fCheckboxList.setLabelProvider(new LabelProvider() {
 			@Override
-			public String getText(Object element) {
-				MapProvider tileFactory = (MapProvider) element;
+			public String getText(final Object element) {
+				final MapProvider tileFactory = (MapProvider) element;
 				return tileFactory.getInfo().getFactoryName();
 			}
 		});
@@ -242,14 +240,14 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		/*
 		 * check all map providers which are defined in the pref store
 		 */
-		String[] storeProviderIds = StringToArrayConverter.convertStringToArray(//
+		final String[] storeProviderIds = StringToArrayConverter.convertStringToArray(//
 		fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_TOGGLE_LIST));
 
-		ArrayList<MapProvider> checkedProviders = new ArrayList<MapProvider>();
+		final ArrayList<MapProvider> checkedProviders = new ArrayList<MapProvider>();
 
-		for (MapProvider mapProvider : fMapProviders) {
+		for (final MapProvider mapProvider : fMapProviders) {
 			final String factoryId = mapProvider.getInfo().getFactoryID();
-			for (String storedProviderId : storeProviderIds) {
+			for (final String storedProviderId : storeProviderIds) {
 				if (factoryId.equals(storedProviderId)) {
 					mapProvider.setCanBeToggled(true);
 					checkedProviders.add(mapProvider);
@@ -266,16 +264,16 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 	 */
 	private void enableUpDownButtons() {
 
-		Table table = fCheckboxList.getTable();
-		TableItem[] items = table.getSelection();
+		final Table table = fCheckboxList.getTable();
+		final TableItem[] items = table.getSelection();
 
-		boolean validSelection = items != null && items.length > 0;
+		final boolean validSelection = items != null && items.length > 0;
 		boolean enableUp = validSelection;
 		boolean enableDown = validSelection;
 
 		if (validSelection) {
-			int indices[] = table.getSelectionIndices();
-			int max = table.getItemCount();
+			final int indices[] = table.getSelectionIndices();
+			final int max = table.getItemCount();
 			enableUp = indices[0] != 0;
 			enableDown = indices[indices.length - 1] < max - 1;
 		}
@@ -294,7 +292,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 	/**
 	 * Moves an entry in the table to the given index.
 	 */
-	private void move(TableItem item, int index) {
+	private void move(final TableItem item, final int index) {
 
 		final MapProvider tileFactory = (MapProvider) item.getData();
 		item.dispose();
@@ -307,15 +305,15 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 	 * Move the current selection in the build list down.
 	 */
 	private void moveSelectionDown() {
-		Table table = fCheckboxList.getTable();
-		int indices[] = table.getSelectionIndices();
+		final Table table = fCheckboxList.getTable();
+		final int indices[] = table.getSelectionIndices();
 		if (indices.length < 1) {
 			return;
 		}
-		int newSelection[] = new int[indices.length];
-		int max = table.getItemCount() - 1;
+		final int newSelection[] = new int[indices.length];
+		final int max = table.getItemCount() - 1;
 		for (int i = indices.length - 1; i >= 0; i--) {
-			int index = indices[i];
+			final int index = indices[i];
 			if (index < max) {
 				move(table.getItem(index), index + 1);
 				newSelection[i] = index + 1;
@@ -328,11 +326,11 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 	 * Move the current selection in the build list up.
 	 */
 	private void moveSelectionUp() {
-		Table table = fCheckboxList.getTable();
-		int indices[] = table.getSelectionIndices();
-		int newSelection[] = new int[indices.length];
+		final Table table = fCheckboxList.getTable();
+		final int indices[] = table.getSelectionIndices();
+		final int newSelection[] = new int[indices.length];
 		for (int i = 0; i < indices.length; i++) {
-			int index = indices[i];
+			final int index = indices[i];
 			if (index > 0) {
 				move(table.getItem(index), index - 1);
 				newSelection[i] = index - 1;
@@ -357,8 +355,8 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		/*
 		 * save all checked map providers
 		 */
-		Object[] mapProviders = fCheckboxList.getCheckedElements();
-		String[] prefGraphsChecked = new String[mapProviders.length];
+		final Object[] mapProviders = fCheckboxList.getCheckedElements();
+		final String[] prefGraphsChecked = new String[mapProviders.length];
 
 		for (int graphIndex = 0; graphIndex < mapProviders.length; graphIndex++) {
 			final MapProvider mapTileFactory = (MapProvider) mapProviders[graphIndex];
@@ -371,8 +369,8 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 		/*
 		 * save order of all map providers
 		 */
-		TableItem[] items = fCheckboxList.getTable().getItems();
-		String[] mapProviderIds = new String[items.length];
+		final TableItem[] items = fCheckboxList.getTable().getItems();
+		final String[] mapProviderIds = new String[items.length];
 
 		for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
 			mapProviderIds[itemIndex] = ((MapProvider) items[itemIndex].getData()).getInfo().getFactoryID();

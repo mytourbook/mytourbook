@@ -31,43 +31,42 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * The MessageRegion is the optional area to
- * show messages in the page.
+ * The MessageRegion is the optional area to show messages in the page.
  * <p>
- * XXX: Copied from org.eclipse.jface.preference.PreferencePage.MessageRegion
- * 		see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=84061
+ * XXX: Copied from org.eclipse.jface.preference.PreferencePage.MessageRegion see:
+ * https://bugs.eclipse.org/bugs/show_bug.cgi?id=84061
  * </p>
- *
+ * 
  * @since 3.1
  */
 class MessageRegion {
 
-	private Text messageText;
+	private Text		messageText;
 
-	private Label messageImageLabel;
+	private Label		messageImageLabel;
 
-	private Composite messageComposite;
+	private Composite	messageComposite;
 
-	private String lastMessageText = "";//$NON-NLS-1$
+	private String		lastMessageText	= "";	//$NON-NLS-1$
 
-	private int lastMessageType;
+	private int			lastMessageType;
 
 	/**
 	 * Create a new instance of the receiver.
 	 */
 	public MessageRegion() {
-		//No initial behavior
+	//No initial behavior
 	}
 
 	/**
 	 * Create the contents for the receiver.
-	 *
+	 * 
 	 * @param parent
 	 *            the Composite that the children will be created in
 	 */
-	public void createContents(Composite parent) {
+	public void createContents(final Composite parent) {
 		messageComposite = new Composite(parent, SWT.NONE);
-		GridLayout messageLayout = new GridLayout();
+		final GridLayout messageLayout = new GridLayout();
 		messageLayout.numColumns = 2;
 		messageLayout.marginWidth = 0;
 		messageLayout.marginHeight = 0;
@@ -75,23 +74,27 @@ class MessageRegion {
 		messageComposite.setLayout(messageLayout);
 		messageImageLabel = new Label(messageComposite, SWT.NONE);
 
-		GridData imageData = new GridData(GridData.VERTICAL_ALIGN_CENTER);
-		Image sizingImage = JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_ERROR);
+		final GridData imageData = new GridData(GridData.VERTICAL_ALIGN_CENTER);
+		final Image sizingImage = JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_ERROR);
 		Rectangle imageBounds;
-		if(sizingImage == null)
-			imageBounds = new Rectangle(0,0,IDialogConstants.VERTICAL_MARGIN * 2,IDialogConstants.VERTICAL_MARGIN * 2);
-		else
+		if (sizingImage == null) {
+			imageBounds = new Rectangle(0,
+					0,
+					IDialogConstants.VERTICAL_MARGIN * 2,
+					IDialogConstants.VERTICAL_MARGIN * 2);
+		} else {
 			imageBounds = sizingImage.getBounds();
+		}
 		imageData.heightHint = imageBounds.height + IDialogConstants.VERTICAL_SPACING;
 		imageData.widthHint = imageBounds.width + IDialogConstants.HORIZONTAL_SPACING;
 		messageImageLabel.setLayoutData(imageData);
 
 		messageText = new Text(messageComposite, SWT.NONE);
 		messageText.setEditable(false);
-		messageText.setBackground(parent.getDisplay().getSystemColor(
-				SWT.COLOR_WIDGET_BACKGROUND));
+		messageText.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-		GridData textData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL
+		final GridData textData = new GridData(GridData.GRAB_HORIZONTAL
+				| GridData.FILL_HORIZONTAL
 				| GridData.VERTICAL_ALIGN_CENTER);
 		messageText.setLayoutData(textData);
 		hideRegion();
@@ -99,28 +102,28 @@ class MessageRegion {
 	}
 
 	/**
-	 * Set the layoutData for the messageArea. In most cases this will be a copy
-	 * of the layoutData used in setTitleLayoutData.
-	 *
+	 * Set the layoutData for the messageArea. In most cases this will be a copy of the layoutData
+	 * used in setTitleLayoutData.
+	 * 
 	 * @param layoutData
 	 *            the layoutData for the message area composite.
 	 */
-	public void setMessageLayoutData(Object layoutData) {
+	public void setMessageLayoutData(final Object layoutData) {
 		messageComposite.setLayoutData(layoutData);
 	}
 
 	/**
-	 * Show the new message in the message text and update the image. Base the
-	 * background color on whether or not there are errors.
-	 *
+	 * Show the new message in the message text and update the image. Base the background color on
+	 * whether or not there are errors.
+	 * 
 	 * @param newMessage
 	 *            The new value for the message
 	 * @param newType
-	 *            One of the IMessageProvider constants. If newType is
-	 *            IMessageProvider.NONE show the title.
+	 *            One of the IMessageProvider constants. If newType is IMessageProvider.NONE show
+	 *            the title.
 	 * @see IMessageProvider
 	 */
-	public void updateText(String newMessage, int newType) {
+	public void updateText(final String newMessage, final int newType) {
 		Image newImage = null;
 		boolean showingError = false;
 		switch (newType) {
@@ -139,20 +142,20 @@ class MessageRegion {
 			break;
 		}
 
-		if(newMessage == null){//No message so clear the area
+		if (newMessage == null) {//No message so clear the area
 			hideRegion();
 			return;
 		}
 		showRegion();
 		// Any more updates required
-		if (newMessage.equals(messageText.getText())
-				&& newImage == messageImageLabel.getImage())
+		if (newMessage.equals(messageText.getText()) && newImage == messageImageLabel.getImage()) {
 			return;
+		}
 		messageImageLabel.setImage(newImage);
 		messageText.setText(newMessage);
-		if (showingError)
+		if (showingError) {
 			setMessageColors(JFaceColors.getErrorBackground(messageComposite.getDisplay()));
-		else {
+		} else {
 			lastMessageText = newMessage;
 			setMessageColors(JFaceColors.getBannerBackground(messageComposite.getDisplay()));
 		}
@@ -177,20 +180,19 @@ class MessageRegion {
 
 	/**
 	 * Set the colors of the message area.
-	 *
+	 * 
 	 * @param color
 	 *            The color to be use in the message area.
 	 */
-	private void setMessageColors(Color color) {
+	private void setMessageColors(final Color color) {
 		messageText.setBackground(color);
 		messageComposite.setBackground(color);
 		messageImageLabel.setBackground(color);
 	}
 
 	/**
-	 * Clear the error message. Restore the previously displayed message if
-	 * there is one, if not restore the title label.
-	 *
+	 * Clear the error message. Restore the previously displayed message if there is one, if not
+	 * restore the title label.
 	 */
 	public void clearErrorMessage() {
 		updateText(lastMessageText, lastMessageType);

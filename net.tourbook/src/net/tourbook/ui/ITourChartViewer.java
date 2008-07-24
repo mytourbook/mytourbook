@@ -21,8 +21,8 @@ package net.tourbook.ui;
 public interface ITourChartViewer {
 
 	/**
-	 * Show the tour chart for the given tour id, when the tour id is -1, the
-	 * tour chart should be hidden
+	 * Show the tour chart for the given tour id, when the tour id is -1, the tour chart should be
+	 * hidden
 	 * 
 	 * @param tourId
 	 */

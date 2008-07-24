@@ -43,7 +43,7 @@ final class ActionCheckTours extends Action {
 
 				if (tour instanceof TVICompareResultComparedTour) {
 					final TVICompareResultComparedTour comparedTour = (TVICompareResultComparedTour) tour;
-					if (comparedTour.isSaved()==false) {
+					if (comparedTour.isSaved() == false) {
 						viewer.setChecked(tour, true);
 					}
 				}

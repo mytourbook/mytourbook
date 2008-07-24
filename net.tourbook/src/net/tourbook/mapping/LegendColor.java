@@ -19,7 +19,10 @@ package net.tourbook.mapping;
 public class LegendColor {
 
 	public static final String[]	BRIGHTNESS_LABELS		= new String[] //
-															{ Messages.legend_color_keep_color, Messages.legend_color_dim_color, Messages.legend_color_lighten_color };
+															{
+			Messages.legend_color_keep_color,
+			Messages.legend_color_dim_color,
+			Messages.legend_color_lighten_color			};
 
 	public static final int			BRIGHTNESS_DEFAULT		= 0;
 	public static final int			BRIGHTNESS_DIMMING		= 1;
@@ -50,11 +53,11 @@ public class LegendColor {
 
 	public LegendColor() {}
 
-	public LegendColor(	ValueColor[] valueColors,
-						int minBrightness,
-						int minBrightnessFactor,
-						int maxBrightness,
-						int maxBrightnessFactor) {
+	public LegendColor(	final ValueColor[] valueColors,
+						final int minBrightness,
+						final int minBrightnessFactor,
+						final int maxBrightness,
+						final int maxBrightnessFactor) {
 
 		this.valueColors = valueColors;
 		this.minBrightness = minBrightness;
@@ -63,15 +66,15 @@ public class LegendColor {
 		this.maxBrightnessFactor = maxBrightnessFactor;
 	}
 
-	public LegendColor(	ValueColor[] valueColors,
-						int minBrightness,
-						int minBrightnessFactor,
-						int maxBrightness,
-						int maxBrightnessFactor,
-						boolean isMinOverwrite,
-						int minOverwrite,
-						boolean isMaxOverwrite,
-						int maxOverwrite) {
+	public LegendColor(	final ValueColor[] valueColors,
+						final int minBrightness,
+						final int minBrightnessFactor,
+						final int maxBrightness,
+						final int maxBrightnessFactor,
+						final boolean isMinOverwrite,
+						final int minOverwrite,
+						final boolean isMaxOverwrite,
+						final int maxOverwrite) {
 
 		this.valueColors = valueColors;
 		this.minBrightness = minBrightness;
@@ -101,7 +104,7 @@ public class LegendColor {
 	 */
 	public String createConstructorString() {
 
-		StringBuffer buffer = new StringBuffer();
+		final StringBuffer buffer = new StringBuffer();
 
 		buffer.append('\n');
 		buffer.append('\n');
@@ -109,7 +112,7 @@ public class LegendColor {
 		buffer.append('\n');
 
 		int index = 0;
-		for (ValueColor valueColor : valueColors) {
+		for (final ValueColor valueColor : valueColors) {
 			buffer.append(valueColor.toString());
 
 			if (index++ != valueColors.length - 1) {
@@ -137,7 +140,7 @@ public class LegendColor {
 		return buffer.toString();
 	}
 
-	private String getBrightnessJavaText(int brightness) {
+	private String getBrightnessJavaText(final int brightness) {
 
 		switch (brightness) {
 		case BRIGHTNESS_DEFAULT:
@@ -161,7 +164,7 @@ public class LegendColor {
 	 */
 	public LegendColor getCopy() {
 
-		LegendColor copy = new LegendColor();
+		final LegendColor copy = new LegendColor();
 
 		copy.valueColors = new ValueColor[valueColors.length];
 		for (int colorIndex = 0; colorIndex < valueColors.length; colorIndex++) {

@@ -726,7 +726,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(final Class adapter) {
 
@@ -917,7 +917,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fViewerContainer.setRedraw(false);
 		{
 			fSegmentViewer.getTable().dispose();
-			
+
 			createSegmentViewer(fViewerContainer);
 			fViewerContainer.layout();
 
@@ -930,7 +930,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	public void reloadViewer() {
 		fSegmentViewer.setInput(new Object[0]);
 	}
-	
+
 //	public void recreateViewer() {
 //
 //		saveViewerSettings(fSessionMemento);

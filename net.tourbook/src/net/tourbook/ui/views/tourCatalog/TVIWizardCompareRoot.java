@@ -46,7 +46,7 @@ public class TVIWizardCompareRoot extends TVIWizardCompareItem {
 
 		sb.append(" GROUP BY startYear"); //$NON-NLS-1$
 		sb.append(" ORDER BY startYear"); //$NON-NLS-1$
-		
+
 		try {
 
 			final Connection conn = TourDatabase.getInstance().getConnection();

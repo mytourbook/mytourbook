@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-
 public class TourCatalogTourItemOLD extends Object {
 
 //	static final int					ITEM_TYPE_ROOT			= 0;

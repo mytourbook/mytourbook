@@ -40,7 +40,7 @@ public class DeviceManager {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static List<TourbookDevice> getDeviceList() {
 
 		if (fDeviceList == null) {
@@ -54,7 +54,7 @@ public class DeviceManager {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	public static List<ExternalDevice> getExternalDeviceList() {
 
 		if (fExternalDeviceList == null) {
@@ -63,18 +63,18 @@ public class DeviceManager {
 		return fExternalDeviceList;
 	}
 
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
-	private static List readDeviceExtensions(String extensionPointName) {
-		ArrayList ret = new ArrayList();
+	@SuppressWarnings("unchecked")
+	private static List readDeviceExtensions(final String extensionPointName) {
+		final ArrayList ret = new ArrayList();
 
-		IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
+		final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
 				extensionPointName);
 
 		if (extPoint != null) {
 
-			for (IExtension extension : extPoint.getExtensions()) {
+			for (final IExtension extension : extPoint.getExtensions()) {
 
-				for (IConfigurationElement configElement : extension.getConfigurationElements()) {
+				for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
 
 					if (configElement.getName().equalsIgnoreCase("device")) { //$NON-NLS-1$
 
@@ -83,7 +83,7 @@ public class DeviceManager {
 							object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
 							if (object instanceof TourbookDevice) {
 
-								TourbookDevice device = (TourbookDevice) object;
+								final TourbookDevice device = (TourbookDevice) object;
 
 								device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
 								device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
@@ -93,14 +93,14 @@ public class DeviceManager {
 							}
 							if (object instanceof ExternalDevice) {
 
-								ExternalDevice device = (ExternalDevice) object;
+								final ExternalDevice device = (ExternalDevice) object;
 
 								device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
 								device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
 
 								ret.add(device);
 							}
-						} catch (CoreException e) {
+						} catch (final CoreException e) {
 							e.printStackTrace();
 						}
 					}

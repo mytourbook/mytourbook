@@ -21,19 +21,19 @@ import org.eclipse.ui.IMemento;
 
 public class TourEditorInputFactory implements IElementFactory {
 
-	private static final String	ID_FACTORY	= "net.tourbook.tour.TourEditorInputFactory";	//$NON-NLS-1$
+	private static final String	ID_FACTORY		= "net.tourbook.tour.TourEditorInputFactory";	//$NON-NLS-1$
 
-	private static final String	MEMENTO_TOUR_ID	= "tourId"; //$NON-NLS-1$
+	private static final String	MEMENTO_TOUR_ID	= "tourId";									//$NON-NLS-1$
 
 	public static String getFactoryId() {
 		return ID_FACTORY;
 	}
 
-	public static void saveState(IMemento memento, TourEditorInput input) {
+	public static void saveState(final IMemento memento, final TourEditorInput input) {
 		memento.putString(MEMENTO_TOUR_ID, Long.toString(input.getTourId()));
 	}
 
-	public IAdaptable createElement(IMemento memento) {
+	public IAdaptable createElement(final IMemento memento) {
 		return new TourEditorInput(Long.parseLong(memento.getString(MEMENTO_TOUR_ID)));
 	}
 

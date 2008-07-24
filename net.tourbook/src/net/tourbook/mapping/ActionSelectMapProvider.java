@@ -226,7 +226,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 	 * Select a tile factory by it's factory ID
 	 * 
 	 * @param factoryId
-	 *        factory ID or <code>null</code> to select the first tile factory
+	 *            factory ID or <code>null</code> to select the first tile factory
 	 */
 	public void setSelectedFactory(final String factoryId) {
 
@@ -273,9 +273,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 		final ArrayList<MapProvider> mapProviders = new ArrayList<MapProvider>();
 
 		// put all map providers into the viewer which are defined in the pref store
-		for (int providerIndex = 0; providerIndex < storedProviderIds.length; providerIndex++) {
-
-			final String storeMapProvider = storedProviderIds[providerIndex];
+		for (final String storeMapProvider : storedProviderIds) {
 
 			// find the stored map provider in the available map providers
 			for (final MapProvider mapProvider : allMapProviders) {

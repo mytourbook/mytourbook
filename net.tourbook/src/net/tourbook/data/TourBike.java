@@ -41,7 +41,7 @@ public class TourBike {
 	 * weight in kg
 	 */
 	private float			weight;
-	
+
 	/**
 	 * type of the bike: MTB, Hollandbike, Rennvelo
 	 */
@@ -51,7 +51,6 @@ public class TourBike {
 
 	private int				rearTyreId;
 
-	
 	/**
 	 * default constructor used in ejb
 	 */
@@ -81,8 +80,8 @@ public class TourBike {
 
 		boolean isSaved = false;
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
-		EntityTransaction ts = em.getTransaction();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityTransaction ts = em.getTransaction();
 
 		try {
 
@@ -98,7 +97,7 @@ public class TourBike {
 				ts.commit();
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (ts.isActive()) {
@@ -111,19 +110,19 @@ public class TourBike {
 		return isSaved;
 	}
 
-	public void setFrontTyreId(int frontTyre) {
+	public void setFrontTyreId(final int frontTyre) {
 		this.frontTyreId = frontTyre;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
-	public void setRearTyreId(int rearTyre) {
+	public void setRearTyreId(final int rearTyre) {
 		this.rearTyreId = rearTyre;
 	}
 
-	public void setWeight(float weight) {
+	public void setWeight(final float weight) {
 		this.weight = weight;
 	}
 
@@ -131,7 +130,7 @@ public class TourBike {
 		return typeId;
 	}
 
-	public void setTypeId(int typeId) {
+	public void setTypeId(final int typeId) {
 		this.typeId = typeId;
 	}
 

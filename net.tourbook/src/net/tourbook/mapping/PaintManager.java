@@ -80,33 +80,33 @@ public class PaintManager {
 		return fShowTourMarker;
 	}
 
-	public void setLegendProvider(ILegendProvider legendProvider) {
+	public void setLegendProvider(final ILegendProvider legendProvider) {
 		fLegendProvider = legendProvider;
 	}
 
-	public void setShowStartEnd(boolean isVisible) {
+	public void setShowStartEnd(final boolean isVisible) {
 		fShowStartEndInMap = isVisible;
 	}
 
-	public void setShowTourMarker(boolean isVisible) {
+	public void setShowTourMarker(final boolean isVisible) {
 		fShowTourMarker = isVisible;
 	}
 
-	public void setSynchTourZoomLevel(int zoomLevel) {
+	public void setSynchTourZoomLevel(final int zoomLevel) {
 		fSynchTourZoomLevel = zoomLevel;
 	}
 
-	public void setTourBounds(Set<GeoPosition> mapPositions) {
+	public void setTourBounds(final Set<GeoPosition> mapPositions) {
 		fTourBounds = mapPositions;
 	}
 
 	/**
-	 * Set {@link TourData} which is used for the next painting or <code>null</code> to not draw
-	 * the tour
+	 * Set {@link TourData} which is used for the next painting or <code>null</code> to not draw the
+	 * tour
 	 * 
 	 * @param tourData
 	 */
-	public void setTourData(TourData tourData) {
+	public void setTourData(final TourData tourData) {
 		fTourData = tourData;
 	}
 }

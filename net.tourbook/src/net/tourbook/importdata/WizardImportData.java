@@ -65,7 +65,7 @@ public class WizardImportData extends Wizard {
 
 	}
 
-	public void appendReceivedFile(File inFile) {
+	public void appendReceivedFile(final File inFile) {
 		fReceivedFiles.add(inFile);
 	}
 
@@ -74,7 +74,7 @@ public class WizardImportData extends Wizard {
 	 */
 	private boolean receiveData() {
 
-		Combo comboPorts = fPageImportSettings.fComboPorts;
+		final Combo comboPorts = fPageImportSettings.fComboPorts;
 
 		if (comboPorts.isDisposed()) {
 			return false;
@@ -83,7 +83,7 @@ public class WizardImportData extends Wizard {
 		/*
 		 * get port name
 		 */
-		int selectedComPort = comboPorts.getSelectionIndex();
+		final int selectedComPort = comboPorts.getSelectionIndex();
 		if (selectedComPort == -1) {
 			return false;
 		}
@@ -105,7 +105,7 @@ public class WizardImportData extends Wizard {
 			return false;
 		}
 
-		RawDataManager rawDataManager = RawDataManager.getInstance();
+		final RawDataManager rawDataManager = RawDataManager.getInstance();
 		rawDataManager.setImportCanceled(false);
 
 		/*
@@ -114,9 +114,9 @@ public class WizardImportData extends Wizard {
 		try {
 			fRunnableReceiveData = fImportDevice.createImportRunnable(portName, fReceivedFiles);
 			getContainer().run(true, true, fRunnableReceiveData);
-		} catch (InvocationTargetException e) {
+		} catch (final InvocationTargetException e) {
 			e.printStackTrace();
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
 
@@ -126,17 +126,19 @@ public class WizardImportData extends Wizard {
 		}
 
 		// import received files
-		FileCollisionBehavior fileCollision = new FileCollisionBehavior();
-		for (File inFile : fReceivedFiles) {
-			rawDataManager.importRawData(inFile, fPageImportSettings.fPathEditor.getStringValue(),
-					fImportDevice.buildNewFileNames, fileCollision);
+		final FileCollisionBehavior fileCollision = new FileCollisionBehavior();
+		for (final File inFile : fReceivedFiles) {
+			rawDataManager.importRawData(inFile,
+					fPageImportSettings.fPathEditor.getStringValue(),
+					fImportDevice.buildNewFileNames,
+					fileCollision);
 		}
 
 		rawDataManager.updateTourDataFromDb();
 
 		// show imported data in the raw data view
 		try {
-			RawDataView importView = (RawDataView) PlatformUI.getWorkbench()
+			final RawDataView importView = (RawDataView) PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow()
 					.getActivePage()
 					.showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
@@ -144,7 +146,7 @@ public class WizardImportData extends Wizard {
 			if (importView != null) {
 				importView.reloadViewer();
 			}
-		} catch (PartInitException e) {
+		} catch (final PartInitException e) {
 			e.printStackTrace();
 		}
 
@@ -169,13 +171,13 @@ public class WizardImportData extends Wizard {
 
 		getContainer().getShell().addShellListener(new ShellAdapter() {
 			@Override
-			public void shellActivated(ShellEvent e) {
+			public void shellActivated(final ShellEvent e) {
 
 				Display.getCurrent().asyncExec(new Runnable() {
 					public void run() {
 
 						// start downloading
-						boolean importResult = receiveData();
+						final boolean importResult = receiveData();
 
 						fPageImportSettings.persistDialogSettings();
 
@@ -191,7 +193,7 @@ public class WizardImportData extends Wizard {
 
 	public void setDialogSettings() {
 
-		IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
+		final IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
 		IDialogSettings wizardSettings = pluginSettings.getSection(DIALOG_SETTINGS_SECTION);
 
 		if (wizardSettings == null) {

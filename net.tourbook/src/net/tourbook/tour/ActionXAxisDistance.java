@@ -24,7 +24,7 @@ public class ActionXAxisDistance extends Action {
 
 	private TourChart	fTourChart;
 
-	public ActionXAxisDistance(TourChart tourChart) {
+	public ActionXAxisDistance(final TourChart tourChart) {
 
 		super(Messages.Tour_Action_show_distance_on_x_axis, AS_RADIO_BUTTON);
 

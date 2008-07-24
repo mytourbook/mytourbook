@@ -260,7 +260,6 @@ public class ColumnModifyDialog extends TrayDialog {
 		GridLayoutFactory.swtDefaults().numColumns(2).margins(0, 0).applyTo(dlgContainer);
 //		dlgContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
-
 		createColumnsViewer(dlgContainer);
 		createButtons(dlgContainer);
 

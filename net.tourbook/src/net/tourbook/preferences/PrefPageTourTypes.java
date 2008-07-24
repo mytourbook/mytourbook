@@ -422,7 +422,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		return returnResult;
 	}
 
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private boolean deleteTourTypeFromTourData(final TourType tourType) {
 
 		boolean returnResult = false;

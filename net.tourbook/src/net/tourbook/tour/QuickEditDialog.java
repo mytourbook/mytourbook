@@ -53,7 +53,7 @@ public class QuickEditDialog extends TitleAreaDialog {
 	private static final DateFormat	fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 	private static final DateFormat	fTimeFormatter	= DateFormat.getTimeInstance(DateFormat.SHORT);
 
-	public QuickEditDialog(Shell parentShell, TourData tourData) {
+	public QuickEditDialog(final Shell parentShell, final TourData tourData) {
 
 		super(parentShell);
 
@@ -104,14 +104,14 @@ public class QuickEditDialog extends TitleAreaDialog {
 		return dlgAreaContainer;
 	}
 
-	private void createUI(Composite parent) {
+	private void createUI(final Composite parent) {
 
 		Label label;
-		GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		final GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
 

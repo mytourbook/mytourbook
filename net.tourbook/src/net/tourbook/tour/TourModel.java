@@ -23,16 +23,13 @@ package net.tourbook.tour;
 
 import net.tourbook.data.TourData;
 
-
 public class TourModel {
 
 	private TourData	tourData;
 
-
-	public TourModel(TourData tourData) {
+	public TourModel(final TourData tourData) {
 		this.tourData = tourData;
 	}
-
 
 	public TourData getTourData() {
 		return tourData;

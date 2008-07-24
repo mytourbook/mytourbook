@@ -24,7 +24,7 @@ public class SelectionTourChart implements ISelection {
 
 	private TourChart	fTourChart;
 
-	public SelectionTourChart(TourChart tourChart) {
+	public SelectionTourChart(final TourChart tourChart) {
 		fTourChart = tourChart;
 	}
 

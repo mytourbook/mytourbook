@@ -23,7 +23,7 @@ public class ActionZoomShowAll extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionZoomShowAll(MappingView mapView) {
+	public ActionZoomShowAll(final MappingView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 

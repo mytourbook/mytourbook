@@ -23,7 +23,7 @@ class ActionCanAutoZoomToSlider extends Action {
 
 	private TourChart	fTourChart;
 
-	public ActionCanAutoZoomToSlider(TourChart tourChart) {
+	public ActionCanAutoZoomToSlider(final TourChart tourChart) {
 		super(Messages.Tour_Action_auto_zoom_to_slider_position, AS_CHECK_BOX);
 		fTourChart = tourChart;
 	}

@@ -27,7 +27,7 @@ import net.tourbook.ui.UI;
 
 public class TVIWizardCompareYear extends TVIWizardCompareItem {
 
-	int		tourYear;
+	int	tourYear;
 
 	TVIWizardCompareYear(final TVIWizardCompareItem parentItem) {
 		setParentItem(parentItem);
@@ -40,7 +40,7 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
 		setChildren(children);
 
 		final StringBuilder sb = new StringBuilder();
-		
+
 		sb.append("SELECT"); //$NON-NLS-1$
 
 		sb.append(" startYear, "); //$NON-NLS-1$

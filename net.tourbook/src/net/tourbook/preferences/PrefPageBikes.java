@@ -103,7 +103,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		public void dispose() {}
 
-		public Object[] getElements(Object parent) {
+		public Object[] getElements(final Object parent) {
 			if (fBikes == null) {
 				fBikes = TourDatabase.getTourBikes();
 			}
@@ -114,18 +114,18 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 			}
 		}
 
-		public void inputChanged(Viewer v, Object oldInput, Object newInput) {}
+		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
 	private class BikeLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-		public Image getColumnImage(Object element, int columnIndex) {
+		public Image getColumnImage(final Object element, final int columnIndex) {
 			return null;
 		}
 
-		public String getColumnText(Object obj, int index) {
+		public String getColumnText(final Object obj, final int index) {
 
-			TourBike bike = ((TourBike) obj);
+			final TourBike bike = ((TourBike) obj);
 
 			switch (index) {
 			case COLUMN_IS_MODIFIED:
@@ -144,20 +144,20 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		}
 	}
 
-	private void createBikeDetails(Composite parent) {
+	private void createBikeDetails(final Composite parent) {
 
 		GridLayout gl;
 		GridData gd;
 		Label lbl;
 
 		// group: units for the x-axis
-		Group groupBikeInfo = new Group(parent, SWT.NONE);
+		final Group groupBikeInfo = new Group(parent, SWT.NONE);
 		groupBikeInfo.setText("Bike Data"); //$NON-NLS-1$
 		groupBikeInfo.setLayout(new GridLayout(1, false));
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
 		groupBikeInfo.setLayoutData(gd);
 
-		Composite container = new Composite(groupBikeInfo, SWT.NONE);
+		final Composite container = new Composite(groupBikeInfo, SWT.NONE);
 		gl = new GridLayout(2, false);
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
@@ -174,9 +174,9 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
 		fTextBikeName.setLayoutData(gd);
 		fTextBikeName.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
+			public void modifyText(final ModifyEvent e) {
 				if (fCurrentBike != null) {
-					String name = ((Text) (e.widget)).getText();
+					final String name = ((Text) (e.widget)).getText();
 					if (!name.equals(fCurrentBike.getName())) {
 						fIsBikeModified = true;
 
@@ -199,16 +199,16 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		fComboBikeType.setLayoutData(gd);
 		fComboBikeType.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 
-				int selectedIndex = fComboBikeType.getSelectionIndex();
+				final int selectedIndex = fComboBikeType.getSelectionIndex();
 
 				// select tyres
 				fComboFrontTyre.select(IBikeDefinitions.i_tireF[selectedIndex]);
 				fComboRearTyre.select(IBikeDefinitions.i_tireR[selectedIndex]);
 
 				// set new weight
-				float weight = IBikeDefinitions.def_mr[selectedIndex] * (isMetricSystem ? 1 : 2.2f);
+				final float weight = IBikeDefinitions.def_mr[selectedIndex] * (isMetricSystem ? 1 : 2.2f);
 				fTextWeight.setText(Float.toString(weight));
 
 				if (fCurrentBike != null) {
@@ -222,9 +222,9 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		});
 
 		fComboBikeType.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
+			public void modifyText(final ModifyEvent e) {
 				if (fCurrentBike != null) {
-					int index = ((Combo) (e.widget)).getSelectionIndex();
+					final int index = ((Combo) (e.widget)).getSelectionIndex();
 					if (index != fCurrentBike.getTypeId()) {
 						fCurrentBike.setTypeId(index);
 						fCurrentBike.setFrontTyreId(fComboFrontTyre.getSelectionIndex());
@@ -236,23 +236,23 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 				}
 			}
 		});
-		for (String bikeType : IBikeDefinitions.bikeType) {
+		for (final String bikeType : IBikeDefinitions.bikeType) {
 			fComboBikeType.add(bikeType);
 		}
 
 		/*
 		 * field: weight
 		 */
-		InputFieldFloat floatInput = new InputFieldFloat(container, "&Weight (kg):", //$NON-NLS-1$
+		final InputFieldFloat floatInput = new InputFieldFloat(container, "&Weight (kg):", //$NON-NLS-1$
 				convertHorizontalDLUsToPixels(40));
 
 		fTextWeight = floatInput.getTextField();
 		fTextWeight.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
+			public void modifyText(final ModifyEvent e) {
 				if (fCurrentBike != null) {
-					Text control = (Text) e.widget;
+					final Text control = (Text) e.widget;
 					try {
-						float value = Float.parseFloat(((Text) (e.widget)).getText());
+						final float value = Float.parseFloat(((Text) (e.widget)).getText());
 						if (value != fCurrentBike.getWeight()) {
 							fCurrentBike.setWeight(value);
 
@@ -260,7 +260,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 							fBikeViewer.update(fCurrentBike, null);
 						}
 						UI.setDefaultColor(control);
-					} catch (NumberFormatException e1) {
+					} catch (final NumberFormatException e1) {
 						UI.setErrorColor(control);
 					}
 				}
@@ -278,9 +278,9 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		gd.widthHint = 50;
 		fComboFrontTyre.setLayoutData(gd);
 		fComboFrontTyre.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
+			public void modifyText(final ModifyEvent e) {
 				if (fCurrentBike != null) {
-					int index = ((Combo) (e.widget)).getSelectionIndex();
+					final int index = ((Combo) (e.widget)).getSelectionIndex();
 					if (index != fCurrentBike.getFrontTyreId()) {
 						fCurrentBike.setFrontTyreId(index);
 
@@ -290,7 +290,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 				}
 			}
 		});
-		for (String tyre : IBikeDefinitions.tyreType) {
+		for (final String tyre : IBikeDefinitions.tyreType) {
 			fComboFrontTyre.add(tyre);
 		}
 
@@ -305,9 +305,9 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		gd.widthHint = 50;
 		fComboRearTyre.setLayoutData(gd);
 		fComboRearTyre.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
+			public void modifyText(final ModifyEvent e) {
 				if (fCurrentBike != null) {
-					int index = ((Combo) (e.widget)).getSelectionIndex();
+					final int index = ((Combo) (e.widget)).getSelectionIndex();
 					if (index != fCurrentBike.getRearTyreId()) {
 						fCurrentBike.setRearTyreId(index);
 
@@ -317,7 +317,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 				}
 			}
 		});
-		for (String tyre : IBikeDefinitions.tyreType) {
+		for (final String tyre : IBikeDefinitions.tyreType) {
 			fComboRearTyre.add(tyre);
 		}
 
@@ -330,10 +330,10 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		lbl.setText(""); //$NON-NLS-1$
 	}
 
-	private void createBikeViewer(Composite container) {
+	private void createBikeViewer(final Composite container) {
 
-		TableLayoutComposite layouter = new TableLayoutComposite(container, SWT.NONE);
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+		final TableLayoutComposite layouter = new TableLayoutComposite(container, SWT.NONE);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.widthHint = convertWidthInCharsToPixels(20);
 		layouter.setLayoutData(gridData);
 
@@ -366,36 +366,36 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 
 		fBikeViewer.setSorter(new ViewerSorter() {
 			@Override
-			public int compare(Viewer viewer, Object e1, Object e2) {
+			public int compare(final Viewer viewer, final Object e1, final Object e2) {
 				return collator.compare(((TourBike) e1).getName(), ((TourBike) e2).getName());
 			}
 		});
 
 		fBikeViewer.setComparator(new ViewerComparator() {
 			@Override
-			public int compare(Viewer viewer, Object e1, Object e2) {
+			public int compare(final Viewer viewer, final Object e1, final Object e2) {
 				return ((TourBike) e1).getName().compareTo(((TourBike) e2).getName());
 			}
 
 		});
 
 		fBikeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
+			public void selectionChanged(final SelectionChangedEvent event) {
 				selectBike();
 			}
 		});
 
 		fBikeViewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
+			public void doubleClick(final DoubleClickEvent event) {
 				fTextBikeName.setFocus();
 				fTextBikeName.selectAll();
 			}
 		});
 	}
 
-	private void createBikeViewerButtons(Composite parent) {
+	private void createBikeViewerButtons(final Composite parent) {
 
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
 		final GridLayout gridLayout = new GridLayout();
 		gridLayout.marginHeight = 0;
@@ -409,7 +409,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		setButtonLayoutData(fButtonAdd);
 		fButtonAdd.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				onAddBike();
 			}
 		});
@@ -429,14 +429,14 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 	}
 
 	@Override
-	protected Control createContents(Composite parent) {
+	protected Control createContents(final Composite parent) {
 
-		Label label = new Label(parent, SWT.WRAP);
+		final Label label = new Label(parent, SWT.WRAP);
 		label.setText("Bikes are used to calculate the power."); //$NON-NLS-1$
 
 		// container
-		Composite container = new Composite(parent, SWT.NONE);
-		GridLayout gl = new GridLayout(2, false);
+		final Composite container = new Composite(parent, SWT.NONE);
+		final GridLayout gl = new GridLayout(2, false);
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
 		container.setLayout(gl);
@@ -464,7 +464,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 	 * @param bike
 	 * @return
 	 */
-	private boolean deleteBike(TourBike bike) {
+	private boolean deleteBike(final TourBike bike) {
 
 		if (deleteBikeFromPerson(bike)) {
 			if (deleteBikeFromDb(bike)) {
@@ -475,15 +475,15 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		return false;
 	}
 
-	private boolean deleteBikeFromDb(TourBike bike) {
+	private boolean deleteBikeFromDb(final TourBike bike) {
 
 		boolean returnResult = false;
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
-		EntityTransaction ts = em.getTransaction();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityTransaction ts = em.getTransaction();
 
 		try {
-			TourBike entity = em.find(TourBike.class, bike.getBikeId());
+			final TourBike entity = em.find(TourBike.class, bike.getBikeId());
 
 			if (entity != null) {
 				ts.begin();
@@ -491,7 +491,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 				ts.commit();
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (ts.isActive()) {
@@ -505,37 +505,37 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		return returnResult;
 	}
 
-	private boolean deleteBikeFromPerson(TourBike bike) {
+	private boolean deleteBikeFromPerson(final TourBike bike) {
 
 		boolean returnResult = false;
 
-		EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		if (em != null) {
 
-			Query query = em.createQuery("SELECT TourPerson " //$NON-NLS-1$
+			final Query query = em.createQuery("SELECT TourPerson " //$NON-NLS-1$
 					+ ("FROM " + TourDatabase.TABLE_TOUR_PERSON + " TourPerson ") //$NON-NLS-1$ //$NON-NLS-2$
 					+ (" WHERE TourPerson.tourBike.bikeId=" + bike.getBikeId())); //$NON-NLS-1$
 
-			ArrayList<TourPerson> people = (ArrayList<TourPerson>) query.getResultList();
+			final ArrayList<TourPerson> people = (ArrayList<TourPerson>) query.getResultList();
 
 			if (people.size() > 0) {
 
-				EntityTransaction ts = em.getTransaction();
+				final EntityTransaction ts = em.getTransaction();
 
 				try {
 
 					ts.begin();
 
 					// remove bike from all persons
-					for (TourPerson person : people) {
+					for (final TourPerson person : people) {
 						person.setTourBike(null);
 						em.merge(person);
 					}
 
 					ts.commit();
 
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					e.printStackTrace();
 				} finally {
 					if (ts.isActive()) {
@@ -552,7 +552,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 	}
 
 	private void enableButtons() {
-		IStructuredSelection selection = (IStructuredSelection) fBikeViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) fBikeViewer.getSelection();
 //		fButtonDelete.setEnabled(!selection.isEmpty());
 	}
 
@@ -566,7 +566,7 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		}
 	}
 
-	public void init(IWorkbench workbench) {
+	public void init(final IWorkbench workbench) {
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
 
@@ -607,9 +607,9 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		}
 
 		// ask for the reference tour name
-		String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
+		final String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
 
-		MessageDialog dialog = new MessageDialog(this.getShell(), "Delete Bike", //$NON-NLS-1$
+		final MessageDialog dialog = new MessageDialog(this.getShell(), "Delete Bike", //$NON-NLS-1$
 				null,
 				"Are you sure to delete the bike(s) and remove them from ALL related persons?", //$NON-NLS-1$
 				MessageDialog.QUESTION,
@@ -623,11 +623,11 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 		BusyIndicator.showWhile(null, new Runnable() {
 			public void run() {
 
-				Table table = fBikeViewer.getTable();
-				int lastIndex = table.getSelectionIndex();
+				final Table table = fBikeViewer.getTable();
+				final int lastIndex = table.getSelectionIndex();
 
-				for (Iterator iter = selection.iterator(); iter.hasNext();) {
-					TourBike bike = (TourBike) iter.next();
+				for (final Iterator iter = selection.iterator(); iter.hasNext();) {
+					final TourBike bike = (TourBike) iter.next();
 
 					deleteBike(bike);
 
@@ -698,13 +698,13 @@ public class PrefPageBikes extends PreferencePage implements IWorkbenchPreferenc
 	 */
 	private void updateBikeDetails() {
 
-		IStructuredSelection selection = (IStructuredSelection) fBikeViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) fBikeViewer.getSelection();
 
-		Object item = selection.getFirstElement();
+		final Object item = selection.getFirstElement();
 		boolean isEnabled = true;
 
 		if (item instanceof TourBike) {
-			TourBike bike = (TourBike) item;
+			final TourBike bike = (TourBike) item;
 			// set the current bike before the fields are updated
 			fCurrentBike = bike;
 

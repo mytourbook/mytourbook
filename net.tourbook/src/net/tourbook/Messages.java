@@ -39,30 +39,30 @@ public class Messages extends NLS {
 	public static String		App_Action_open_tour_segmenter;
 	public static String		App_Action_open_tour_segmenter_tooltip;
 
-	public static String	action_tag_add;
+	public static String		action_tag_add;
 
 	public static String		action_tag_dlg_rename_message;
 	public static String		action_tag_dlg_rename_title;
 
-	public static String	action_tag_open_tagging_structure;
-	public static String	action_tag_recently_used;
+	public static String		action_tag_open_tagging_structure;
+	public static String		action_tag_recently_used;
 
-	public static String	action_tag_remove;
+	public static String		action_tag_remove;
 
 	public static String		action_tag_remove_all;
-	public static String	action_tag_remove_all_dlg_message;
+	public static String		action_tag_remove_all_dlg_message;
 
-	public static String	action_tag_remove_all_dlg_title;
+	public static String		action_tag_remove_all_dlg_title;
 
 	public static String		action_tag_rename_tag;
 	public static String		action_tag_rename_tag_category;
-	public static String	action_tag_set_all_tag_structures;
+	public static String		action_tag_set_all_tag_structures;
 
-	public static String	action_tag_set_dlg_message;
+	public static String		action_tag_set_dlg_message;
 
-	public static String	action_tag_set_dlg_title;
+	public static String		action_tag_set_dlg_title;
 
-	public static String	action_tag_set_tag_expand_type;
+	public static String		action_tag_set_tag_expand_type;
 
 	public static String		action_tagcategory_dlg_rename_message;
 	public static String		action_tagcategory_dlg_rename_title;
@@ -71,9 +71,9 @@ public class Messages extends NLS {
 
 	public static String		app_action_collapse_all_tooltip;
 	public static String		app_action_collapse_others_tooltip;
-	public static String	app_action_dlg_confirm_save_editors_message;
+	public static String		app_action_dlg_confirm_save_editors_message;
 
-	public static String	app_action_dlg_confirm_save_editors_title;
+	public static String		app_action_dlg_confirm_save_editors_title;
 
 	public static String		app_action_expand_selection_tooltip;
 	public static String		app_action_expand_type_flat;

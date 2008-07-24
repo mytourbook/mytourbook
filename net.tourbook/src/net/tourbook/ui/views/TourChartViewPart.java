@@ -73,9 +73,7 @@ public abstract class TourChartViewPart extends ViewPart {
 			}
 		};
 
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.addPropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fPrefChangeListener);
 	}
 
 	/**
@@ -84,7 +82,7 @@ public abstract class TourChartViewPart extends ViewPart {
 	private void addSelectionListener() {
 
 		fPostSelectionListener = new ISelectionListener() {
-			public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				onSelectionChanged(part, selection);
 			}
 		};
@@ -94,7 +92,7 @@ public abstract class TourChartViewPart extends ViewPart {
 	private void addTourDbListener() {
 
 		fTourDbListener = new IPropertyListener() {
-			public void propertyChanged(Object source, int propId) {
+			public void propertyChanged(final Object source, final int propId) {
 				if (propId == TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED) {
 
 					if (fTourData == null) {
@@ -119,7 +117,7 @@ public abstract class TourChartViewPart extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(int propertyId, Object propertyData) {
+			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
@@ -134,7 +132,7 @@ public abstract class TourChartViewPart extends ViewPart {
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 
 		addPrefListener();
 		addTourDbListener();
@@ -154,9 +152,7 @@ public abstract class TourChartViewPart extends ViewPart {
 		TourDatabase.getInstance().removePropertyListener(fTourDbListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
-		TourbookPlugin.getDefault()
-				.getPluginPreferences()
-				.removePropertyChangeListener(fPrefChangeListener);
+		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		super.dispose();
 	}

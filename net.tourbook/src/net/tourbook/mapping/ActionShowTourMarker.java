@@ -22,7 +22,7 @@ public class ActionShowTourMarker extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionShowTourMarker(MappingView mapView) {
+	public ActionShowTourMarker(final MappingView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

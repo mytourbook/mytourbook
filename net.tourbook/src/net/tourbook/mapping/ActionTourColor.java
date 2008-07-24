@@ -24,8 +24,11 @@ public class ActionTourColor extends Action {
 	private MappingView	fMapView;
 	private int			fColorId;
 
-	public ActionTourColor(MappingView mapView, int colorId, String toolTipText, String imageEnabled,
-			String imageDisabled) {
+	public ActionTourColor(	final MappingView mapView,
+							final int colorId,
+							final String toolTipText,
+							final String imageEnabled,
+							final String imageDisabled) {
 
 		super(null, AS_RADIO_BUTTON);
 

@@ -24,37 +24,38 @@ import org.eclipse.swt.widgets.Composite;
 
 public class MessageDialogPage extends DialogPage {
 
-	MessageRegion fMessageRegion;
+	MessageRegion	fMessageRegion;
 
-
-	public MessageDialogPage(Composite parent) {
+	public MessageDialogPage(final Composite parent) {
 		createControl(parent);
 	}
 
-	public void createControl(Composite parent) {
-		Composite composite1= new Composite(parent, SWT.NONE);
-		
+	public void createControl(final Composite parent) {
+		final Composite composite1 = new Composite(parent, SWT.NONE);
+
 		// cumtomized - begin
-		composite1.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
+		composite1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		// customized - end
-		
-		GridLayout layout = new GridLayout();
+
+		final GridLayout layout = new GridLayout();
 		layout.marginWidth = 0;
 		layout.marginHeight = 0;
 		composite1.setLayout(layout);
-		fMessageRegion= new MessageRegion();
+		fMessageRegion = new MessageRegion();
 		fMessageRegion.createContents(composite1);
-		GridData messageData= new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+		final GridData messageData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
 		fMessageRegion.setMessageLayoutData(messageData);
 		setControl(composite1);
 	}
 
-	public void setMessage(String newMessage,int newType) {
+	@Override
+	public void setMessage(final String newMessage, final int newType) {
 		super.setMessage(newMessage, newType);
 		fMessageRegion.updateText(newMessage, newType);
 	}
 
-	public void setErrorMessage(String newMessage) {
+	@Override
+	public void setErrorMessage(final String newMessage) {
 		super.setErrorMessage(newMessage);
 		fMessageRegion.updateText(newMessage, IMessageProvider.ERROR);
 	}

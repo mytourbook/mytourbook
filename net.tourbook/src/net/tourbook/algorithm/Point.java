@@ -16,7 +16,6 @@
 
 package net.tourbook.algorithm;
 
-
 public class Point {
 
 	/**
@@ -34,13 +33,11 @@ public class Point {
 	 */
 	public int	serieIndex;
 
-
-	public Point(int x, int y, int serieIndex) {
+	public Point(final int x, final int y, final int serieIndex) {
 		this.x = x;
 		this.y = y;
 		this.serieIndex = serieIndex;
 	}
-
 
 	/**
 	 * Difference
@@ -48,10 +45,9 @@ public class Point {
 	 * @param point
 	 * @return
 	 */
-	public Vector diff(Point point) {
+	public Vector diff(final Point point) {
 		return new Vector(x - point.x, y - point.y, serieIndex);
 	}
-
 
 	/**
 	 * Squared Distance
@@ -59,15 +55,13 @@ public class Point {
 	 * @param point
 	 * @return
 	 */
-	public long d2(Point point) {
-		Vector difference = diff(point);
+	public long d2(final Point point) {
+		final Vector difference = diff(point);
 		return difference.dot(difference);
 	}
 
-
-	public Point add(Vector vector) {
+	public Point add(final Vector vector) {
 		return new Point(x + vector.x, y + vector.y, serieIndex);
 	}
-
 
 }

@@ -18,7 +18,6 @@
  */
 package net.tourbook.ui.views.tourCatalog;
 
-
 /**
  * Data fDataModel for the tour list viewer
  */

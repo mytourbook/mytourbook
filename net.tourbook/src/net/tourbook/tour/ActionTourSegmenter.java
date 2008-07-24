@@ -31,7 +31,7 @@ public class ActionTourSegmenter extends Action {
 
 	private TourChart	fTourChart;
 
-	public ActionTourSegmenter(TourChart tourChart) {
+	public ActionTourSegmenter(final TourChart tourChart) {
 
 		super(null, AS_PUSH_BUTTON);
 
@@ -42,20 +42,18 @@ public class ActionTourSegmenter extends Action {
 
 	}
 
+	@Override
 	public void run() {
 
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
 		if (window != null) {
 			try {
-				window.getActivePage().showView(
-						TourSegmenterView.ID,
-						null,
-						IWorkbenchPage.VIEW_VISIBLE);
+				window.getActivePage().showView(TourSegmenterView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
 				fTourChart.fireTourChartSelection();
 
-			} catch (PartInitException e) {
+			} catch (final PartInitException e) {
 				MessageDialog.openError(window.getShell(), "Error", "Error opening view:" //$NON-NLS-1$ //$NON-NLS-2$
 						+ e.getMessage());
 			}

@@ -28,14 +28,14 @@ public class InputFieldFloat {
 
 	private Text	fText;
 
-	public InputFieldFloat(Composite container, String label, int width) {
+	public InputFieldFloat(final Composite container, final String label, final int width) {
 
-		Label lbl = new Label(container, SWT.NONE);
+		final Label lbl = new Label(container, SWT.NONE);
 		lbl.setText(label);
 
 		fText = new Text(container, SWT.BORDER | SWT.TRAIL);
 
-		GridData gd = new GridData();
+		final GridData gd = new GridData();
 		gd.widthHint = width;
 		fText.setLayoutData(gd);
 	}

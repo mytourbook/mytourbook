@@ -164,7 +164,7 @@ public class ActionSaveTourInDatabase extends Action {
 
 		final Runnable runnable = new Runnable() {
 
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void run() {
 
 				boolean isModified = false;
@@ -282,8 +282,8 @@ public class ActionSaveTourInDatabase extends Action {
 	}
 
 	/**
-	 * Sets the person for which the tour should be saved, when set to <code>null</code>, the
-	 * person needs to be selected before the tour is saved.
+	 * Sets the person for which the tour should be saved, when set to <code>null</code>, the person
+	 * needs to be selected before the tour is saved.
 	 * 
 	 * @param person
 	 */

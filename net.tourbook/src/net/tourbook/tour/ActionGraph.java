@@ -38,8 +38,12 @@ class ActionGraph extends Action {
 	 * @param imageDisabled
 	 * @param isChecked
 	 */
-	public ActionGraph(TourChart tourChart, int graphId, String label, String toolTip,
-			String imageEnabled, String imageDisabled) {
+	public ActionGraph(	final TourChart tourChart,
+						final int graphId,
+						final String label,
+						final String toolTip,
+						final String imageEnabled,
+						final String imageDisabled) {
 
 		super(label, AS_CHECK_BOX);
 
@@ -59,7 +63,7 @@ class ActionGraph extends Action {
 	@Override
 	public void run() {
 
-		TourChartConfiguration chartConfig = fTourChart.fTourChartConfig;
+		final TourChartConfiguration chartConfig = fTourChart.fTourChartConfig;
 		final ArrayList<Integer> visibleGraphs = chartConfig.getVisibleGraphs();
 
 		final boolean isThisGraphVisible = visibleGraphs.contains(fGraphId);

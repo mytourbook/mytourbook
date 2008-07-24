@@ -51,7 +51,6 @@ import org.eclipse.swt.widgets.Display;
  * 		shortens the text by replacing the center portion of the label with an ellipsis
  * 		shortens the text by removing the center portion of the label
  * </pre>
- * 
  * <p>
  * <dl>
  * <dt><b>Styles:</b>
@@ -106,26 +105,26 @@ public class ImageComboLabel extends Canvas {
 	 * Constructs a new instance of this class given its parent and a style value describing its
 	 * behavior and appearance.
 	 * <p>
-	 * The style value is either one of the style constants defined in class <code>SWT</code>
-	 * which is applicable to instances of this class, or must be built by <em>bitwise OR</em>'ing
+	 * The style value is either one of the style constants defined in class <code>SWT</code> which
+	 * is applicable to instances of this class, or must be built by <em>bitwise OR</em>'ing
 	 * together (that is, using the <code>int</code> "|" operator) two or more of those
 	 * <code>SWT</code> style constants. The class description lists the style constants that are
 	 * applicable to the class. Style bits are also inherited from superclasses.
 	 * </p>
 	 * 
 	 * @param parent
-	 *        a widget which will be the parent of the new instance (cannot be null)
+	 *            a widget which will be the parent of the new instance (cannot be null)
 	 * @param style
-	 *        the style of widget to construct
+	 *            the style of widget to construct
 	 * @exception IllegalArgumentException
-	 *            <ul>
-	 *            <li>ERROR_NULL_ARGUMENT - if the parent is null</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the parent is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            parent</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the parent</li>
+	 *                </ul>
 	 * @see SWT#LEFT
 	 * @see SWT#RIGHT
 	 * @see SWT#CENTER
@@ -134,7 +133,7 @@ public class ImageComboLabel extends Canvas {
 	 * @see SWT#SHADOW_NONE
 	 * @see #getStyle()
 	 */
-	public ImageComboLabel(Composite parent, int style) {
+	public ImageComboLabel(final Composite parent, int style) {
 		super(parent, checkStyle(style));
 		if ((style & (SWT.CENTER | SWT.RIGHT)) == 0) {
 			style |= SWT.LEFT;
@@ -150,19 +149,19 @@ public class ImageComboLabel extends Canvas {
 		}
 
 		addPaintListener(new PaintListener() {
-			public void paintControl(PaintEvent event) {
+			public void paintControl(final PaintEvent event) {
 				onPaint(event);
 			}
 		});
 
 		addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent event) {
+			public void widgetDisposed(final DisposeEvent event) {
 				onDispose(event);
 			}
 		});
 
 		addTraverseListener(new TraverseListener() {
-			public void keyTraversed(TraverseEvent event) {
+			public void keyTraversed(final TraverseEvent event) {
 				if (event.detail == SWT.TRAVERSE_MNEMONIC) {
 					onMnemonic(event);
 				}
@@ -180,11 +179,7 @@ public class ImageComboLabel extends Canvas {
 		if ((style & SWT.BORDER) != 0) {
 			style |= SWT.SHADOW_IN;
 		}
-		int mask = SWT.SHADOW_IN
-				| SWT.SHADOW_OUT
-				| SWT.SHADOW_NONE
-				| SWT.LEFT_TO_RIGHT
-				| SWT.RIGHT_TO_LEFT;
+		final int mask = SWT.SHADOW_IN | SWT.SHADOW_OUT | SWT.SHADOW_NONE | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
 		style = style & mask;
 		return style |= SWT.NO_FOCUS | SWT.DOUBLE_BUFFERED;
 	}
@@ -198,9 +193,9 @@ public class ImageComboLabel extends Canvas {
 //}
 
 	@Override
-	public Point computeSize(int wHint, int hHint, boolean changed) {
+	public Point computeSize(final int wHint, final int hHint, final boolean changed) {
 		checkWidget();
-		Point e = getTotalSize(image, text);
+		final Point e = getTotalSize(image, text);
 		if (wHint == SWT.DEFAULT) {
 			e.x += 2 * hIndent;
 		} else {
@@ -217,7 +212,13 @@ public class ImageComboLabel extends Canvas {
 	/**
 	 * Draw a rectangle in the given colors.
 	 */
-	private void drawBevelRect(GC gc, int x, int y, int w, int h, Color topleft, Color bottomright) {
+	private void drawBevelRect(	final GC gc,
+								final int x,
+								final int y,
+								final int w,
+								final int h,
+								final Color topleft,
+								final Color bottomright) {
 		gc.setForeground(bottomright);
 		gc.drawLine(x + w, y, x + w, y + h);
 		gc.drawLine(x, y + h, x + w, y + h);
@@ -227,16 +228,16 @@ public class ImageComboLabel extends Canvas {
 		gc.drawLine(x, y, x, y + h - 1);
 	}
 
-/*
- * Return the lowercase of the first non-'&' character following an '&' character in the given
- * string. If there are no '&' characters in the given string, return '\0'.
- */
-	char _findMnemonic(String string) {
+	/*
+	 * Return the lowercase of the first non-'&' character following an '&' character in the given
+	 * string. If there are no '&' characters in the given string, return '\0'.
+	 */
+	char _findMnemonic(final String string) {
 		if (string == null) {
 			return '\0';
 		}
 		int index = 0;
-		int length = string.length();
+		final int length = string.length();
 		do {
 			while (index < length && string.charAt(index) != '&') {
 				index++;
@@ -248,7 +249,8 @@ public class ImageComboLabel extends Canvas {
 				return Character.toLowerCase(string.charAt(index));
 			}
 			index++;
-		} while (index < length);
+		}
+		while (index < length);
 		return '\0';
 	}
 
@@ -275,18 +277,18 @@ public class ImageComboLabel extends Canvas {
 	/**
 	 * Compute the minimum size.
 	 */
-	private Point getTotalSize(Image image, String text) {
-		Point size = new Point(0, 0);
+	private Point getTotalSize(final Image image, final String text) {
+		final Point size = new Point(0, 0);
 
 		if (image != null) {
-			Rectangle r = image.getBounds();
+			final Rectangle r = image.getBounds();
 			size.x += r.width;
 			size.y += r.height;
 		}
 
-		GC gc = new GC(this);
+		final GC gc = new GC(this);
 		if (text != null && text.length() > 0) {
-			Point e = gc.textExtent(text, DRAW_FLAGS);
+			final Point e = gc.textExtent(text, DRAW_FLAGS);
 			size.x += e.x;
 			size.y = Math.max(size.y, e.y);
 			if (image != null) {
@@ -334,21 +336,21 @@ public class ImageComboLabel extends Canvas {
 	}
 
 	private void initAccessible() {
-		Accessible accessible = getAccessible();
+		final Accessible accessible = getAccessible();
 		accessible.addAccessibleListener(new AccessibleAdapter() {
 			@Override
-			public void getName(AccessibleEvent e) {
+			public void getName(final AccessibleEvent e) {
 				e.result = getText();
 			}
 
 			@Override
-			public void getHelp(AccessibleEvent e) {
+			public void getHelp(final AccessibleEvent e) {
 				e.result = getToolTipText();
 			}
 
 			@Override
-			public void getKeyboardShortcut(AccessibleEvent e) {
-				char mnemonic = _findMnemonic(ImageComboLabel.this.text);
+			public void getKeyboardShortcut(final AccessibleEvent e) {
+				final char mnemonic = _findMnemonic(ImageComboLabel.this.text);
 				if (mnemonic != '\0') {
 					e.result = "Alt+" + mnemonic; //$NON-NLS-1$
 				}
@@ -357,13 +359,13 @@ public class ImageComboLabel extends Canvas {
 
 		accessible.addAccessibleControlListener(new AccessibleControlAdapter() {
 			@Override
-			public void getChildAtPoint(AccessibleControlEvent e) {
+			public void getChildAtPoint(final AccessibleControlEvent e) {
 				e.childID = ACC.CHILDID_SELF;
 			}
 
 			@Override
-			public void getLocation(AccessibleControlEvent e) {
-				Rectangle rect = getDisplay().map(getParent(), null, getBounds());
+			public void getLocation(final AccessibleControlEvent e) {
+				final Rectangle rect = getDisplay().map(getParent(), null, getBounds());
 				e.x = rect.x;
 				e.y = rect.y;
 				e.width = rect.width;
@@ -371,23 +373,23 @@ public class ImageComboLabel extends Canvas {
 			}
 
 			@Override
-			public void getChildCount(AccessibleControlEvent e) {
+			public void getChildCount(final AccessibleControlEvent e) {
 				e.detail = 0;
 			}
 
 			@Override
-			public void getRole(AccessibleControlEvent e) {
+			public void getRole(final AccessibleControlEvent e) {
 				e.detail = ACC.ROLE_LABEL;
 			}
 
 			@Override
-			public void getState(AccessibleControlEvent e) {
+			public void getState(final AccessibleControlEvent e) {
 				e.detail = ACC.STATE_READONLY;
 			}
 		});
 	}
 
-	void onDispose(DisposeEvent event) {
+	void onDispose(final DisposeEvent event) {
 		gradientColors = null;
 		gradientPercents = null;
 		backgroundImage = null;
@@ -396,8 +398,8 @@ public class ImageComboLabel extends Canvas {
 		appToolTipText = null;
 	}
 
-	void onMnemonic(TraverseEvent event) {
-		char mnemonic = _findMnemonic(text);
+	void onMnemonic(final TraverseEvent event) {
+		final char mnemonic = _findMnemonic(text);
 		if (mnemonic == '\0') {
 			return;
 		}
@@ -406,7 +408,7 @@ public class ImageComboLabel extends Canvas {
 		}
 		Composite control = this.getParent();
 		while (control != null) {
-			Control[] children = control.getChildren();
+			final Control[] children = control.getChildren();
 			int index = 0;
 			while (index < children.length) {
 				if (children[index] == this) {
@@ -425,16 +427,16 @@ public class ImageComboLabel extends Canvas {
 		}
 	}
 
-	void onPaint(PaintEvent event) {
-		Rectangle rect = getClientArea();
+	void onPaint(final PaintEvent event) {
+		final Rectangle rect = getClientArea();
 		if (rect.width == 0 || rect.height == 0) {
 			return;
 		}
 
 		boolean shortenText = false;
-		String t = text;
+		final String t = text;
 		Image img = image;
-		int availableWidth = Math.max(0, rect.width - 2 * hIndent);
+		final int availableWidth = Math.max(0, rect.width - 2 * hIndent);
 		Point extent = getTotalSize(img, t);
 		if (extent.x > availableWidth) {
 			img = null;
@@ -444,14 +446,14 @@ public class ImageComboLabel extends Canvas {
 			}
 		}
 
-		GC gc = event.gc;
-		String[] lines = text == null ? null : splitString(text);
+		final GC gc = event.gc;
+		final String[] lines = text == null ? null : splitString(text);
 
 		// shorten the text
 		if (shortenText) {
 			extent.x = 0;
 			for (int i = 0; i < lines.length; i++) {
-				Point e = gc.textExtent(lines[i], DRAW_FLAGS);
+				final Point e = gc.textExtent(lines[i], DRAW_FLAGS);
 				if (e.x > availableWidth) {
 					lines[i] = shortenText(gc, lines[i], availableWidth);
 					extent.x = Math.max(extent.x, getTotalSize(null, lines[i]).x);
@@ -479,7 +481,7 @@ public class ImageComboLabel extends Canvas {
 		try {
 			if (backgroundImage != null) {
 				// draw a background image behind the text
-				Rectangle imageRect = backgroundImage.getBounds();
+				final Rectangle imageRect = backgroundImage.getBounds();
 				// tile image to fill space
 				gc.setBackground(getBackground());
 				gc.fillRectangle(rect);
@@ -515,13 +517,11 @@ public class ImageComboLabel extends Canvas {
 						}
 						gc.setBackground(lastColor);
 						if (gradientVertical) {
-							final int gradientHeight = (gradientPercents[i] * rect.height / 100)
-									- pos;
+							final int gradientHeight = (gradientPercents[i] * rect.height / 100) - pos;
 							gc.fillGradientRectangle(0, pos, rect.width, gradientHeight, true);
 							pos += gradientHeight;
 						} else {
-							final int gradientWidth = (gradientPercents[i] * rect.width / 100)
-									- pos;
+							final int gradientWidth = (gradientPercents[i] * rect.width / 100) - pos;
 							gc.fillGradientRectangle(pos, 0, gradientWidth, rect.height, false);
 							pos += gradientWidth;
 						}
@@ -543,7 +543,7 @@ public class ImageComboLabel extends Canvas {
 					gc.fillRectangle(rect);
 				}
 			}
-		} catch (SWTException e) {
+		} catch (final SWTException e) {
 			if ((getStyle() & SWT.DOUBLE_BUFFERED) == 0) {
 				gc.setBackground(getBackground());
 				gc.fillRectangle(rect);
@@ -551,14 +551,14 @@ public class ImageComboLabel extends Canvas {
 		}
 
 		// draw border
-		int style = getStyle();
+		final int style = getStyle();
 		if ((style & SWT.SHADOW_IN) != 0 || (style & SWT.SHADOW_OUT) != 0) {
 			paintBorder(gc, rect);
 		}
 
 		// draw the image
 		if (img != null) {
-			Rectangle imageRect = img.getBounds();
+			final Rectangle imageRect = img.getBounds();
 			gc.drawImage(img,
 					0,
 					0,
@@ -573,23 +573,23 @@ public class ImageComboLabel extends Canvas {
 		}
 		// draw the text
 		if (lines != null) {
-			int lineHeight = gc.getFontMetrics().getHeight();
-			int textHeight = lines.length * lineHeight;
+			final int lineHeight = gc.getFontMetrics().getHeight();
+			final int textHeight = lines.length * lineHeight;
 			int lineY = Math.max(vIndent, rect.y + (rect.height - textHeight) / 2);
 			gc.setForeground(getForeground());
-			for (int i = 0; i < lines.length; i++) {
+			for (final String line : lines) {
 				int lineX = x;
 				if (lines.length > 1) {
 					if (align == SWT.CENTER) {
-						int lineWidth = gc.textExtent(lines[i], DRAW_FLAGS).x;
+						final int lineWidth = gc.textExtent(line, DRAW_FLAGS).x;
 						lineX = x + Math.max(0, (extent.x - lineWidth) / 2);
 					}
 					if (align == SWT.RIGHT) {
-						int lineWidth = gc.textExtent(lines[i], DRAW_FLAGS).x;
+						final int lineWidth = gc.textExtent(line, DRAW_FLAGS).x;
 						lineX = Math.max(x, rect.x + rect.width - hIndent - lineWidth);
 					}
 				}
-				gc.drawText(lines[i], lineX, lineY, DRAW_FLAGS);
+				gc.drawText(line, lineX, lineY, DRAW_FLAGS);
 				lineY += lineHeight;
 			}
 		}
@@ -598,13 +598,13 @@ public class ImageComboLabel extends Canvas {
 	/**
 	 * Paint the Label's border.
 	 */
-	private void paintBorder(GC gc, Rectangle r) {
-		Display disp = getDisplay();
+	private void paintBorder(final GC gc, final Rectangle r) {
+		final Display disp = getDisplay();
 
 		Color c1 = null;
 		Color c2 = null;
 
-		int style = getStyle();
+		final int style = getStyle();
 		if ((style & SWT.SHADOW_IN) != 0) {
 			c1 = disp.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
 			c2 = disp.getSystemColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW);
@@ -625,17 +625,17 @@ public class ImageComboLabel extends Canvas {
 	 * text within the available space.
 	 * 
 	 * @param align
-	 *        the alignment style of LEFT, RIGHT or CENTER
+	 *            the alignment style of LEFT, RIGHT or CENTER
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            <li>ERROR_INVALID_ARGUMENT - if the value of align is not one of SWT.LEFT,
-	 *            SWT.RIGHT or SWT.CENTER</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                <li>ERROR_INVALID_ARGUMENT - if the value of align is not one of SWT.LEFT,
+	 *                SWT.RIGHT or SWT.CENTER</li>
+	 *                </ul>
 	 */
-	public void setAlignment(int align) {
+	public void setAlignment(final int align) {
 		checkWidget();
 		if (align != SWT.LEFT && align != SWT.RIGHT && align != SWT.CENTER) {
 			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
@@ -647,7 +647,7 @@ public class ImageComboLabel extends Canvas {
 	}
 
 	@Override
-	public void setBackground(Color color) {
+	public void setBackground(final Color color) {
 		super.setBackground(color);
 		// Are these settings the same as before?
 		if (backgroundImage == null && gradientColors == null && gradientPercents == null) {
@@ -684,24 +684,24 @@ public class ImageComboLabel extends Canvas {
 	 * </pre>
 	 * 
 	 * @param colors
-	 *        an array of Color that specifies the colors to appear in the gradient in order of
-	 *        appearance from left to right; The value <code>null</code> clears the background
-	 *        gradient; the value <code>null</code> can be used inside the array of Color to
-	 *        specify the background color.
+	 *            an array of Color that specifies the colors to appear in the gradient in order of
+	 *            appearance from left to right; The value <code>null</code> clears the background
+	 *            gradient; the value <code>null</code> can be used inside the array of Color to
+	 *            specify the background color.
 	 * @param percents
-	 *        an array of integers between 0 and 100 specifying the percent of the width of the
-	 *        widget at which the color should change; the size of the percents array must be one
-	 *        less than the size of the colors array.
+	 *            an array of integers between 0 and 100 specifying the percent of the width of the
+	 *            widget at which the color should change; the size of the percents array must be
+	 *            one less than the size of the colors array.
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            <li>ERROR_INVALID_ARGUMENT - if the values of colors and percents are not
-	 *            consistent</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                <li>ERROR_INVALID_ARGUMENT - if the values of colors and percents are not
+	 *                consistent</li>
+	 *                </ul>
 	 */
-	public void setBackground(Color[] colors, int[] percents) {
+	public void setBackground(final Color[] colors, final int[] percents) {
 		setBackground(colors, percents, false);
 	}
 
@@ -713,33 +713,33 @@ public class ImageComboLabel extends Canvas {
 	 * </p>
 	 * 
 	 * <pre>
-	 * clabel.setBackground(new Color[] {
-	 * 		display.getSystemColor(SWT.COLOR_DARK_BLUE),
-	 * 		display.getSystemColor(SWT.COLOR_WHITE) }, new int[] { 100 }, true);
+	 * clabel.setBackground(new Color[] { display.getSystemColor(SWT.COLOR_DARK_BLUE), display.getSystemColor(SWT.COLOR_WHITE) },
+	 * 		new int[] { 100 },
+	 * 		true);
 	 * </pre>
 	 * 
 	 * @param colors
-	 *        an array of Color that specifies the colors to appear in the gradient in order of
-	 *        appearance from left/top to right/bottom; The value <code>null</code> clears the
-	 *        background gradient; the value <code>null</code> can be used inside the array of
-	 *        Color to specify the background color.
+	 *            an array of Color that specifies the colors to appear in the gradient in order of
+	 *            appearance from left/top to right/bottom; The value <code>null</code> clears the
+	 *            background gradient; the value <code>null</code> can be used inside the array of
+	 *            Color to specify the background color.
 	 * @param percents
-	 *        an array of integers between 0 and 100 specifying the percent of the width/height of
-	 *        the widget at which the color should change; the size of the percents array must be
-	 *        one less than the size of the colors array.
+	 *            an array of integers between 0 and 100 specifying the percent of the width/height
+	 *            of the widget at which the color should change; the size of the percents array
+	 *            must be one less than the size of the colors array.
 	 * @param vertical
-	 *        indicate the direction of the gradient. True is vertical and false is horizontal.
+	 *            indicate the direction of the gradient. True is vertical and false is horizontal.
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            <li>ERROR_INVALID_ARGUMENT - if the values of colors and percents are not
-	 *            consistent</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                <li>ERROR_INVALID_ARGUMENT - if the values of colors and percents are not
+	 *                consistent</li>
+	 *                </ul>
 	 * @since 3.0
 	 */
-	public void setBackground(Color[] colors, int[] percents, boolean vertical) {
+	public void setBackground(Color[] colors, int[] percents, final boolean vertical) {
 		checkWidget();
 		if (colors != null) {
 			if (percents == null || percents.length != colors.length - 1) {
@@ -763,9 +763,7 @@ public class ImageComboLabel extends Canvas {
 		// Are these settings the same as before?
 		final Color background = getBackground();
 		if (backgroundImage == null) {
-			if ((gradientColors != null)
-					&& (colors != null)
-					&& (gradientColors.length == colors.length)) {
+			if ((gradientColors != null) && (colors != null) && (gradientColors.length == colors.length)) {
 				boolean same = false;
 				for (int i = 0; i < gradientColors.length; i++) {
 					same = (gradientColors[i] == colors[i])
@@ -814,15 +812,15 @@ public class ImageComboLabel extends Canvas {
 	 * Set the image to be drawn in the background of the label.
 	 * 
 	 * @param image
-	 *        the image to be drawn in the background
+	 *            the image to be drawn in the background
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
-	public void setBackground(Image image) {
+	public void setBackground(final Image image) {
 		checkWidget();
 		if (image == backgroundImage) {
 			return;
@@ -837,7 +835,7 @@ public class ImageComboLabel extends Canvas {
 	}
 
 	@Override
-	public void setFont(Font font) {
+	public void setFont(final Font font) {
 		super.setFont(font);
 		redraw();
 	}
@@ -846,15 +844,15 @@ public class ImageComboLabel extends Canvas {
 	 * Set the label's Image. The value <code>null</code> clears it.
 	 * 
 	 * @param image
-	 *        the image to be displayed in the label or null
+	 *            the image to be displayed in the label or null
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
-	public void setImage(Image image) {
+	public void setImage(final Image image) {
 		checkWidget();
 		if (image != this.image) {
 			this.image = image;
@@ -866,13 +864,13 @@ public class ImageComboLabel extends Canvas {
 	 * Set the label's text. The value <code>null</code> clears it.
 	 * 
 	 * @param text
-	 *        the text to be displayed in the label or null
+	 *            the text to be displayed in the label or null
 	 * @exception SWTException
-	 *            <ul>
-	 *            <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-	 *            <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the
-	 *            receiver</li>
-	 *            </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created
+	 *                the receiver</li>
+	 *                </ul>
 	 */
 	public void setText(String text) {
 		checkWidget();
@@ -886,33 +884,33 @@ public class ImageComboLabel extends Canvas {
 	}
 
 	@Override
-	public void setToolTipText(String string) {
+	public void setToolTipText(final String string) {
 		super.setToolTipText(string);
 		appToolTipText = super.getToolTipText();
 	}
 
 	/**
-	 * Shorten the given text <code>t</code> so that its length doesn't exceed the given width.
-	 * The default implementation replaces characters in the center of the original string with an
+	 * Shorten the given text <code>t</code> so that its length doesn't exceed the given width. The
+	 * default implementation replaces characters in the center of the original string with an
 	 * ellipsis ("..."). Override if you need a different strategy.
 	 * 
 	 * @param gc
-	 *        the gc to use for text measurement
+	 *            the gc to use for text measurement
 	 * @param t
-	 *        the text to shorten
+	 *            the text to shorten
 	 * @param width
-	 *        the width to shorten the text to, in pixels
+	 *            the width to shorten the text to, in pixels
 	 * @return the shortened text
 	 */
-	protected String shortenText(GC gc, String t, int width) {
+	protected String shortenText(final GC gc, final String t, final int width) {
 		if (t == null) {
 			return null;
 		}
-		int w = gc.textExtent(ELLIPSIS, DRAW_FLAGS).x;
+		final int w = gc.textExtent(ELLIPSIS, DRAW_FLAGS).x;
 		if (width <= w) {
 			return t;
 		}
-		int l = t.length();
+		final int l = t.length();
 		int max = l / 2;
 		int min = 0;
 		int mid = (max + min) / 2 - 1;
@@ -920,10 +918,10 @@ public class ImageComboLabel extends Canvas {
 			return t;
 		}
 		while (min < mid && mid < max) {
-			String s1 = t.substring(0, mid);
-			String s2 = t.substring(l - mid, l);
-			int l1 = gc.textExtent(s1, DRAW_FLAGS).x;
-			int l2 = gc.textExtent(s2, DRAW_FLAGS).x;
+			final String s1 = t.substring(0, mid);
+			final String s2 = t.substring(l - mid, l);
+			final int l1 = gc.textExtent(s1, DRAW_FLAGS).x;
+			final int l2 = gc.textExtent(s2, DRAW_FLAGS).x;
 			if (l1 + w + l2 > width) {
 				max = mid;
 				mid = (max + min) / 2;
@@ -940,7 +938,7 @@ public class ImageComboLabel extends Canvas {
 		return t.substring(0, mid) + ELLIPSIS + t.substring(l - mid, l);
 	}
 
-	private String[] splitString(String text) {
+	private String[] splitString(final String text) {
 		String[] lines = new String[1];
 		int start = 0, pos;
 		do {
@@ -948,14 +946,15 @@ public class ImageComboLabel extends Canvas {
 			if (pos == -1) {
 				lines[lines.length - 1] = text.substring(start);
 			} else {
-				boolean crlf = (pos > 0) && (text.charAt(pos - 1) == '\r');
+				final boolean crlf = (pos > 0) && (text.charAt(pos - 1) == '\r');
 				lines[lines.length - 1] = text.substring(start, pos - (crlf ? 1 : 0));
 				start = pos + 1;
-				String[] newLines = new String[lines.length + 1];
+				final String[] newLines = new String[lines.length + 1];
 				System.arraycopy(lines, 0, newLines, 0, lines.length);
 				lines = newLines;
 			}
-		} while (pos != -1);
+		}
+		while (pos != -1);
 		return lines;
 	}
 }

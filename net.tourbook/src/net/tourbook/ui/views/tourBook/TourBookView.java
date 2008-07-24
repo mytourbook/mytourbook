@@ -770,7 +770,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void enableActions() {
 
 		final ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
@@ -883,7 +883,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		return fActiveTourId;
 	}
 
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(final Class adapter) {
 

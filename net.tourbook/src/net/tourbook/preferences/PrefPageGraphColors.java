@@ -71,7 +71,11 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
 	private static final List<Integer>	fUnitValues		= Arrays.asList(10, 50, 100, 150, 190);
-	private static final List<String>	fUnitLabels		= Arrays.asList(Messages.Pref_ChartColors_unit_min, Messages.Pref_ChartColors_unit_low, Messages.Pref_ChartColors_unit_mid, Messages.Pref_ChartColors_unit_high, Messages.Pref_ChartColors_unit_max);
+	private static final List<String>	fUnitLabels		= Arrays.asList(Messages.Pref_ChartColors_unit_min,
+																Messages.Pref_ChartColors_unit_low,
+																Messages.Pref_ChartColors_unit_mid,
+																Messages.Pref_ChartColors_unit_high,
+																Messages.Pref_ChartColors_unit_max);
 
 	private ValueColor[]				fValueColors	= new ValueColor[] {
 			new ValueColor(10, 255, 0, 0),
@@ -118,33 +122,33 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 
 		public void dispose() {}
 
-		public Object[] getChildren(Object parentElement) {
+		public Object[] getChildren(final Object parentElement) {
 			if (parentElement instanceof ColorDefinition) {
-				ColorDefinition graphDefinition = (ColorDefinition) parentElement;
+				final ColorDefinition graphDefinition = (ColorDefinition) parentElement;
 				return graphDefinition.getGraphColorParts();
 			}
 			return null;
 		}
 
-		public Object[] getElements(Object inputElement) {
+		public Object[] getElements(final Object inputElement) {
 			if (inputElement instanceof PrefPageGraphColors) {
 				return GraphColorProvider.getInstance().getGraphColorDefinitions();
 			}
 			return null;
 		}
 
-		public Object getParent(Object element) {
+		public Object getParent(final Object element) {
 			return null;
 		}
 
-		public boolean hasChildren(Object element) {
+		public boolean hasChildren(final Object element) {
 			if (element instanceof ColorDefinition) {
 				return true;
 			}
 			return false;
 		}
 
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 
 	}
 
@@ -153,16 +157,16 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 	 * 
 	 * @param parent
 	 */
-	private void createColorControl(Composite parent) {
+	private void createColorControl(final Composite parent) {
 
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 
-		GridLayout layout = new GridLayout(1, false);
+		final GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		container.setLayout(layout);
 
-		GridData gd = new GridData();
+		final GridData gd = new GridData();
 		gd.verticalAlignment = SWT.TOP;
 		gd.horizontalAlignment = SWT.LEAD;
 		container.setLayoutData(gd);
@@ -174,7 +178,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		fColorSelector.setEnabled(false);
 		setButtonLayoutData(fColorSelector.getButton());
 		fColorSelector.addListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 				onSelectColorInColorSelector(event);
 			}
 		});
@@ -188,7 +192,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 
 		fBtnLegend.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				modifyLegendColor();
 			}
 		});
@@ -202,11 +206,11 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 
 		final ColorDefinition[] graphColorDefinitions = GraphColorProvider.getInstance().getGraphColorDefinitions();
 
-		for (ColorDefinition colorDefinition : graphColorDefinitions) {
+		for (final ColorDefinition colorDefinition : graphColorDefinitions) {
 
-			ArrayList<GraphColorItem> graphColors = new ArrayList<GraphColorItem>();
+			final ArrayList<GraphColorItem> graphColors = new ArrayList<GraphColorItem>();
 
-			boolean isLegendColorAvailable = colorDefinition.getLegendColor() != null;
+			final boolean isLegendColorAvailable = colorDefinition.getLegendColor() != null;
 
 			for (int nameIndex = 0; nameIndex < GraphColorProvider.colorNames.length; nameIndex++) {
 
@@ -230,7 +234,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		}
 	}
 
-	private void createColorViewer(Composite parent) {
+	private void createColorViewer(final Composite parent) {
 
 		// parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
@@ -238,7 +242,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		GridLayout gl;
 
 		// viewer container
-		Composite viewerContainer = new Composite(parent, SWT.NONE);
+		final Composite viewerContainer = new Composite(parent, SWT.NONE);
 		gl = new GridLayout();
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
@@ -248,7 +252,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		viewerContainer.setLayoutData(gd);
 
 		// tree container
-		Composite treeContainer = new Composite(viewerContainer, SWT.NONE);
+		final Composite treeContainer = new Composite(viewerContainer, SWT.NONE);
 		gl = new GridLayout();
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
@@ -257,7 +261,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		treeContainer.setLayoutData(gd);
 
-		TreeColumnLayout treeLayouter = new TreeColumnLayout();
+		final TreeColumnLayout treeLayouter = new TreeColumnLayout();
 		treeContainer.setLayout(treeLayouter);
 
 		// color tree
@@ -267,8 +271,8 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		// tree columns
 		TreeColumn tc;
 
-		int colorWidth=(tree.getItemHeight() + 5) * 4 + 0;
-		
+		final int colorWidth = (tree.getItemHeight() + 5) * 4 + 0;
+
 		tc = new TreeColumn(tree, SWT.NONE);
 		tc.setText(Messages.Pref_ChartColors_Column_color);
 		treeLayouter.addColumnData(new ColumnWeightData(30, true));
@@ -289,20 +293,20 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		fColorViewer.setLabelProvider(fColorLabelProvider);
 
 		fColorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
+			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectColorInColorViewer();
 			}
 		});
 
 		fColorViewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
+			public void doubleClick(final DoubleClickEvent event) {
 
-				Object selection = ((IStructuredSelection) fColorViewer.getSelection()).getFirstElement();
+				final Object selection = ((IStructuredSelection) fColorViewer.getSelection()).getFirstElement();
 
 				if (selection instanceof ColorDefinition) {
 
 					// expand/collapse current item
-					ColorDefinition treeItem = (ColorDefinition) selection;
+					final ColorDefinition treeItem = (ColorDefinition) selection;
 
 					if (fColorViewer.getExpandedState(treeItem)) {
 						fColorViewer.collapseToLevel(treeItem, 1);
@@ -315,7 +319,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 					}
 				} else if (selection instanceof GraphColorItem) {
 
-					GraphColorItem graphColor = (GraphColorItem) selection;
+					final GraphColorItem graphColor = (GraphColorItem) selection;
 
 					if (graphColor.isLegend()) {
 
@@ -333,19 +337,19 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 
 		fColorViewer.addTreeListener(new ITreeViewerListener() {
 
-			public void treeCollapsed(TreeExpansionEvent event) {
+			public void treeCollapsed(final TreeExpansionEvent event) {
 
 				if (event.getElement() instanceof ColorDefinition) {
 					fExpandedItem = null;
 				}
 			}
 
-			public void treeExpanded(TreeExpansionEvent event) {
+			public void treeExpanded(final TreeExpansionEvent event) {
 
-				Object element = event.getElement();
+				final Object element = event.getElement();
 
 				if (element instanceof ColorDefinition) {
-					ColorDefinition treeItem = (ColorDefinition) element;
+					final ColorDefinition treeItem = (ColorDefinition) element;
 
 					if (fExpandedItem != null) {
 						fColorViewer.collapseToLevel(fExpandedItem, 1);
@@ -358,20 +362,20 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 	}
 
 	@Override
-	protected Control createContents(Composite parent) {
+	protected Control createContents(final Composite parent) {
 
 		createColorDefinitions();
 
 		// container
-		Composite container = new Composite(parent, SWT.NONE);
-		GridLayout gridLayout = new GridLayout(2, false);
+		final Composite container = new Composite(parent, SWT.NONE);
+		final GridLayout gridLayout = new GridLayout(2, false);
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		container.setLayout(gridLayout);
 
-		Label label = new Label(container, SWT.WRAP);
+		final Label label = new Label(container, SWT.WRAP);
 		label.setText(Messages.Pref_ChartColors_Label_title);
-		GridData gd = new GridData();
+		final GridData gd = new GridData();
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
 
@@ -393,7 +397,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		return fColorViewer;
 	}
 
-	public void init(IWorkbench workbench) {
+	public void init(final IWorkbench workbench) {
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
 
@@ -402,14 +406,14 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 	 */
 	private void initializeLegend() {
 
-		LegendConfig legendConfig = new LegendConfig();
+		final LegendConfig legendConfig = new LegendConfig();
 		legendConfig.units = fUnitValues;
 		legendConfig.unitLabels = fUnitLabels;
 		legendConfig.legendMinValue = 0;
 		legendConfig.legendMaxValue = 200;
 		legendConfig.unitText = ""; //$NON-NLS-1$
 
-		LegendColor legendColor = new LegendColor();
+		final LegendColor legendColor = new LegendColor();
 		legendColor.valueColors = fValueColors;
 
 		fLegendProvider = new LegendProvider(legendConfig, legendColor, 0);
@@ -426,7 +430,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		// set the color which should be modified in the dialog
 		fLegendColorDialog.setLegendColor(selectedColorDefinition);
 
-		int returnValue = fLegendColorDialog.open();
+		final int returnValue = fLegendColorDialog.open();
 
 		if (returnValue != Window.OK) {
 			return;
@@ -460,10 +464,10 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 	 * 
 	 * @param event
 	 */
-	private void onSelectColorInColorSelector(PropertyChangeEvent event) {
+	private void onSelectColorInColorSelector(final PropertyChangeEvent event) {
 
-		RGB oldValue = (RGB) event.getOldValue();
-		RGB newValue = (RGB) event.getNewValue();
+		final RGB oldValue = (RGB) event.getOldValue();
+		final RGB newValue = (RGB) event.getNewValue();
 
 		if (!oldValue.equals(newValue) && fSelectedColor != null) {
 
@@ -493,7 +497,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 	 */
 	private void onSelectColorInColorViewer() {
 
-		IStructuredSelection selection = (IStructuredSelection) fColorViewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) fColorViewer.getSelection();
 
 		fBtnLegend.setEnabled(false);
 		fColorSelector.setEnabled(false);
@@ -502,7 +506,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 
 			// graph color is selected
 
-			GraphColorItem graphColor = (GraphColorItem) selection.getFirstElement();
+			final GraphColorItem graphColor = (GraphColorItem) selection.getFirstElement();
 
 			// keep selected color
 			fSelectedColor = graphColor;
@@ -541,7 +545,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		final ColorDefinition[] graphColorDefinitions = GraphColorProvider.getInstance().getGraphColorDefinitions();
 
 		// update current colors
-		for (ColorDefinition graphDefinition : graphColorDefinitions) {
+		for (final ColorDefinition graphDefinition : graphColorDefinitions) {
 
 			graphDefinition.setNewGradientBright(graphDefinition.getDefaultGradientBright());
 			graphDefinition.setNewGradientDark(graphDefinition.getDefaultGradientDark());
@@ -569,7 +573,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 			saveGraphColors();
 
 			// update current colors
-			for (ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
+			for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
 
 				graphDefinition.setGradientBright(graphDefinition.getNewGradientBright());
 				graphDefinition.setGradientDark(graphDefinition.getNewGradientDark());
@@ -587,7 +591,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 
 	private void resetColors() {
 
-		for (ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
+		for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
 
 			graphDefinition.setNewGradientBright(graphDefinition.getGradientBright());
 			graphDefinition.setNewGradientDark(graphDefinition.getGradientDark());
@@ -602,11 +606,11 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 	 */
 	private void saveGraphColors() {
 
-		IPreferenceStore prefStore = getPreferenceStore();
+		final IPreferenceStore prefStore = getPreferenceStore();
 
-		for (ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
+		for (final ColorDefinition graphDefinition : GraphColorProvider.getInstance().getGraphColorDefinitions()) {
 
-			String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphDefinition.getPrefName() + "."; //$NON-NLS-1$
+			final String prefGraphName = ITourbookPreferences.GRAPH_COLORS + graphDefinition.getPrefName() + "."; //$NON-NLS-1$
 
 			PreferenceConverter.setValue(prefStore,
 					prefGraphName + GraphColorProvider.PREF_COLOR_BRIGHT,

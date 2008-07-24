@@ -27,15 +27,13 @@ public class SelectionProvider implements ISelectionProvider {
 	ListenerList		selectionListeners	= new ListenerList();
 	private ISelection	currentSelection;
 
-	public void setSelection(ISelection selection) {
+	public void setSelection(final ISelection selection) {
 
 		currentSelection = selection;
 
-		final SelectionChangedEvent event = new SelectionChangedEvent(
-				this,
-				currentSelection);
+		final SelectionChangedEvent event = new SelectionChangedEvent(this, currentSelection);
 
-		Object[] listeners = selectionListeners.getListeners();
+		final Object[] listeners = selectionListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
@@ -50,11 +48,11 @@ public class SelectionProvider implements ISelectionProvider {
 		return currentSelection;
 	}
 
-	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+	public void addSelectionChangedListener(final ISelectionChangedListener listener) {
 		selectionListeners.add(listener);
 	}
 
-	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+	public void removeSelectionChangedListener(final ISelectionChangedListener listener) {
 		selectionListeners.remove(listener);
 	}
 }

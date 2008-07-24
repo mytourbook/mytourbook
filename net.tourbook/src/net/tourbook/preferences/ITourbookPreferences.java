@@ -123,17 +123,17 @@ public interface ITourbookPreferences {
 	/**
 	 * color for the tagging has changed
 	 */
-	public static final String	TAG_COLOR_AND_LAYOUT_CHANGED			= "tag.color.changed"; //$NON-NLS-1$
-	public static final String	TAG_VIEW_SHOW_LINES						= "tag_view.show_lines"; //$NON-NLS-1$
+	public static final String	TAG_COLOR_AND_LAYOUT_CHANGED			= "tag.color.changed";							//$NON-NLS-1$
+	public static final String	TAG_VIEW_SHOW_LINES						= "tag_view.show_lines";						//$NON-NLS-1$
 
-	public static final String	TAG_VIEW_TAG_CATEGORY_COLOR				= "tag_view.tag_category.color"; //$NON-NLS-1$
-	public static final String	TAG_VIEW_TAG_COLOR						= "tag_view.tag.color"; //$NON-NLS-1$
-	public static final String	TAG_VIEW_SUB_TAG_COLOR					= "tag_view.sub_tag.color"; //$NON-NLS-1$
-	public static final String	TAG_VIEW_SUB_SUB_TAG_COLOR				= "tag_view.sub_sub_tag.color"; //$NON-NLS-1$
+	public static final String	TAG_VIEW_TAG_CATEGORY_COLOR				= "tag_view.tag_category.color";				//$NON-NLS-1$
+	public static final String	TAG_VIEW_TAG_COLOR						= "tag_view.tag.color";						//$NON-NLS-1$
+	public static final String	TAG_VIEW_SUB_TAG_COLOR					= "tag_view.sub_tag.color";					//$NON-NLS-1$
+	public static final String	TAG_VIEW_SUB_SUB_TAG_COLOR				= "tag_view.sub_sub_tag.color";				//$NON-NLS-1$
 
 	/*
 	 * id's for preference pages
 	 */
-	public static final String	PREF_PAGE_TAGS							= "net.tourbook.preferences.PrefPageTags"; //$NON-NLS-1$
+	public static final String	PREF_PAGE_TAGS							= "net.tourbook.preferences.PrefPageTags";		//$NON-NLS-1$
 
 }

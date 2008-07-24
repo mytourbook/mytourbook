@@ -359,11 +359,9 @@ public class TourCompareManager {
 				getRefToursData();
 
 				// loop: all compare tours
-				for (int compareIndex = 0; compareIndex < comparedTours.length; compareIndex++) {
+				for (final Object tour : comparedTours) {
 
 					Long tourId;
-
-					final Object tour = comparedTours[compareIndex];
 
 					if (tour instanceof TVIWizardCompareTour) {
 						tourId = ((TVIWizardCompareTour) tour).tourId;

@@ -23,7 +23,7 @@ class ActionCanScrollZoomedChart extends Action {
 
 	private TourChart	fTourChart;
 
-	public ActionCanScrollZoomedChart(TourChart tourChart) {
+	public ActionCanScrollZoomedChart(final TourChart tourChart) {
 
 		super(Messages.Tour_Action_scroll_zoomed_chart, AS_CHECK_BOX);
 		fTourChart = tourChart;

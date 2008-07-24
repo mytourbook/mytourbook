@@ -412,7 +412,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked")//$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
@@ -1082,9 +1082,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		persistedCompareResults.clear();
 
 		// loop: all ref tours where children have been added
-		for (final Iterator<Long> refIdIter = viewRefIds.values().iterator(); refIdIter.hasNext();) {
-
-			final Long refId = refIdIter.next();
+		for (final Long refId : viewRefIds.values()) {
 
 			final ArrayList<TreeViewerItem> unfetchedChildren = fRootItem.getUnfetchedChildren();
 			if (unfetchedChildren != null) {

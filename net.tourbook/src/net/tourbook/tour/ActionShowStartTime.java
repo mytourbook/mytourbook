@@ -23,7 +23,7 @@ class ActionShowStartTime extends Action {
 
 	private TourChart	fTourChart;
 
-	public ActionShowStartTime(TourChart tourChart) {
+	public ActionShowStartTime(final TourChart tourChart) {
 
 		super(Messages.Tour_Action_show_start_time_on_x_axis, AS_CHECK_BOX);
 

@@ -35,13 +35,13 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 
 	private class ActionZoomLevel extends Action {
 
-		private static final String OSX_SPACER_STRING = " "; //$NON-NLS-1$
-		private int	fActionZoomLevel;
+		private static final String	OSX_SPACER_STRING	= " ";	//$NON-NLS-1$
+		private int					fActionZoomLevel;
 
-		public ActionZoomLevel(int zoomLevel, String label) {
+		public ActionZoomLevel(final int zoomLevel, final String label) {
 
 			// add space before the label otherwise OSX will not display the menu item,
-			super(OSX_SPACER_STRING+NLS.bind(label, Integer.toString(zoomLevel)), AS_RADIO_BUTTON);
+			super(OSX_SPACER_STRING + NLS.bind(label, Integer.toString(zoomLevel)), AS_RADIO_BUTTON);
 
 			fActionZoomLevel = zoomLevel;
 		}
@@ -53,7 +53,7 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 		}
 	}
 
-	public ActionSynchTourZoomLevel(MappingView osmView) {
+	public ActionSynchTourZoomLevel(final MappingView osmView) {
 
 		super(Messages.map_action_zoom_level_centered_tour, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
@@ -67,8 +67,8 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 		fActionZoomLevel_0.setChecked(true);
 	}
 
-	private void addActionToMenu(Action action) {
-		ActionContributionItem item = new ActionContributionItem(action);
+	private void addActionToMenu(final Action action) {
+		final ActionContributionItem item = new ActionContributionItem(action);
 		item.fill(fMenu, -1);
 	}
 
@@ -79,11 +79,11 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 		}
 	}
 
-	public Menu getMenu(Control parent) {
+	public Menu getMenu(final Control parent) {
 		return null;
 	}
 
-	public Menu getMenu(Menu parent) {
+	public Menu getMenu(final Menu parent) {
 
 		fMenu = new Menu(parent);
 
@@ -99,7 +99,7 @@ public class ActionSynchTourZoomLevel extends Action implements IMenuCreator {
 		return fZoomLevel;
 	}
 
-	public void setZoomLevel(Integer zoomLevel) {
+	public void setZoomLevel(final Integer zoomLevel) {
 
 		fZoomLevel = zoomLevel;
 		PaintManager.getInstance().setSynchTourZoomLevel(zoomLevel);

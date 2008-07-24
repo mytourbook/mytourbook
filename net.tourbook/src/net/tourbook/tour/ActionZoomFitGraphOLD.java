@@ -24,7 +24,7 @@ public class ActionZoomFitGraphOLD extends Action {
 
 	private TourChart	tourChart;
 
-	public ActionZoomFitGraphOLD(TourChart tourChart) {
+	public ActionZoomFitGraphOLD(final TourChart tourChart) {
 
 		super("ZoomFitGraph", AS_PUSH_BUTTON); //$NON-NLS-1$
 

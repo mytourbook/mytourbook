@@ -57,7 +57,7 @@ public class TourCompared {
 		return endIndex;
 	}
 
-	public void setEndIndex(int endIndex) {
+	public void setEndIndex(final int endIndex) {
 		this.endIndex = endIndex;
 	}
 
@@ -65,7 +65,7 @@ public class TourCompared {
 		return startIndex;
 	}
 
-	public void setStartIndex(int startIndex) {
+	public void setStartIndex(final int startIndex) {
 		this.startIndex = startIndex;
 	}
 
@@ -81,11 +81,11 @@ public class TourCompared {
 		return tourSpeed;
 	}
 
-	public void setTourSpeed(float speed) {
+	public void setTourSpeed(final float speed) {
 		this.tourSpeed = speed;
 	}
 
-	public void setTourDate(long timeInMillis) {
+	public void setTourDate(final long timeInMillis) {
 		tourDate = new Date(timeInMillis);
 	}
 
@@ -93,7 +93,7 @@ public class TourCompared {
 		return startYear;
 	}
 
-	public void setStartYear(int startYear) {
+	public void setStartYear(final int startYear) {
 		this.startYear = startYear;
 	}
 
@@ -101,7 +101,7 @@ public class TourCompared {
 		return refTourId;
 	}
 
-	public void setRefTourId(long refTourId) {
+	public void setRefTourId(final long refTourId) {
 		this.refTourId = refTourId;
 	}
 
@@ -109,7 +109,7 @@ public class TourCompared {
 		return tourId;
 	}
 
-	public void setTourId(long tourId) {
+	public void setTourId(final long tourId) {
 		this.tourId = tourId;
 	}
 

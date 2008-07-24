@@ -16,13 +16,11 @@
 
 package net.tourbook.algorithm;
 
-
 public class Vector extends Point {
 
-	public Vector(int x, int y, int serieIndex) {
+	public Vector(final int x, final int y, final int serieIndex) {
 		super(x, y, serieIndex);
 	}
-
 
 	/**
 	 * Vector product
@@ -30,10 +28,9 @@ public class Vector extends Point {
 	 * @param vector
 	 * @return
 	 */
-	public long dot(Vector vector) {
+	public long dot(final Vector vector) {
 		return (long) x * vector.x + (long) y * vector.y;
 	}
-
 
 	/**
 	 * Scalar Product
@@ -41,9 +38,8 @@ public class Vector extends Point {
 	 * @param scalar
 	 * @return
 	 */
-	public Vector dot(float scalar) {
+	public Vector dot(final float scalar) {
 		return new Vector((int) (scalar * x), (int) (scalar * y), serieIndex);
 	}
-
 
 }

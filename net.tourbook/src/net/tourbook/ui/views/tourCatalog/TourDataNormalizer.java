@@ -24,19 +24,19 @@ public class TourDataNormalizer {
 	private int[]			normalizedDistance	= null;
 	private int[]			normalizedAltitude	= null;
 
-	public void normalizeAltitude(TourData tourData, int measureStartIndex, int measureEndIndex) {
+	public void normalizeAltitude(final TourData tourData, final int measureStartIndex, final int measureEndIndex) {
 
-		int[] measureAltitudes = tourData.altitudeSerie;
-		int[] measureDistances = tourData.getMetricDistanceSerie();
+		final int[] measureAltitudes = tourData.altitudeSerie;
+		final int[] measureDistances = tourData.getMetricDistanceSerie();
 
 		if (measureAltitudes == null || measureDistances == null) {
 			return;
 		}
 
 		// create normalized data, the distance will be normalized to 100m
-		int normStartDistance = measureDistances[measureStartIndex] / NORMALIZED_DISTANCE;
-		int normEndDistance = measureDistances[measureEndIndex] / NORMALIZED_DISTANCE;
-		int normSize = normEndDistance - normStartDistance + 1;
+		final int normStartDistance = measureDistances[measureStartIndex] / NORMALIZED_DISTANCE;
+		final int normEndDistance = measureDistances[measureEndIndex] / NORMALIZED_DISTANCE;
+		final int normSize = normEndDistance - normStartDistance + 1;
 
 		normalizedDistance = new int[normSize];
 		normalizedAltitude = new int[normSize];

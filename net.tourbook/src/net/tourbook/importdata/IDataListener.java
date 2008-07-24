@@ -16,10 +16,8 @@
 
 package net.tourbook.importdata;
 
-
 /**
  * @author Administrator
- * 
  */
 public interface IDataListener {
 

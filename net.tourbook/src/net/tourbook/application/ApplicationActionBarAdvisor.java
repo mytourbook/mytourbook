@@ -66,19 +66,19 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IWorkbenchAction					editActionSetAction;
 	private IWorkbenchWindow					fWindow;
 
-	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
+	public ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
 		super(configurer);
 	}
 
 	/**
 	 * Adds the perspective actions to the specified menu.
 	 */
-	private void addPerspectiveActions(MenuManager menu) {
+	private void addPerspectiveActions(final MenuManager menu) {
 
 		{
-			String openText = Messages.App_Action_open_perspective;
-			MenuManager changePerspMenuMgr = new MenuManager(openText, "openPerspective"); //$NON-NLS-1$
-			IContributionItem changePerspMenuItem = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(fWindow);
+			final String openText = Messages.App_Action_open_perspective;
+			final MenuManager changePerspMenuMgr = new MenuManager(openText, "openPerspective"); //$NON-NLS-1$
+			final IContributionItem changePerspMenuItem = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(fWindow);
 			changePerspMenuMgr.add(changePerspMenuItem);
 
 			menu.add(changePerspMenuMgr);
@@ -92,7 +92,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createFileMenu() {
 
-		MenuManager fileMenu = new MenuManager(Messages.App_Action_Menu_file, IWorkbenchActionConstants.M_FILE);
+		final MenuManager fileMenu = new MenuManager(Messages.App_Action_Menu_file, IWorkbenchActionConstants.M_FILE);
 
 		fileMenu.add(new GroupMarker("fileNew")); //$NON-NLS-1$
 
@@ -110,7 +110,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
 		 * the application menu.
 		 */
-		ActionContributionItem quitItem = new ActionContributionItem(fActionQuit);
+		final ActionContributionItem quitItem = new ActionContributionItem(fActionQuit);
 		quitItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
 		fileMenu.add(quitItem);
 
@@ -121,7 +121,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		/*
 		 * help - menu
 		 */
-		MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help, IWorkbenchActionConstants.M_HELP);
+		final MenuManager helpMenu = new MenuManager(Messages.App_Action_Menu_help, IWorkbenchActionConstants.M_HELP);
 
 		helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
 
@@ -130,7 +130,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createToolMenu() {
 
-		MenuManager toolMenu = new MenuManager(Messages.App_Action_Menu_tools, "net.tourbook.menu.main.tools"); //$NON-NLS-1$
+		final MenuManager toolMenu = new MenuManager(Messages.App_Action_Menu_tools, "net.tourbook.menu.main.tools"); //$NON-NLS-1$
 
 		toolMenu.add(new GroupMarker("tools")); //$NON-NLS-1$
 		toolMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -143,7 +143,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		 * through our menu structure looking for it when Cmd-Q is invoked (or Quit is chosen from
 		 * the application menu.
 		 */
-		ActionContributionItem prefItem = new ActionContributionItem(fActionPreferences);
+		final ActionContributionItem prefItem = new ActionContributionItem(fActionPreferences);
 		prefItem.setVisible(!"carbon".equals(SWT.getPlatform())); //$NON-NLS-1$
 		toolMenu.add(prefItem);
 
@@ -152,7 +152,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private MenuManager createViewMenu() {
 
-		MenuManager viewMenu = new MenuManager(Messages.App_Action_Menu_view, "views"); //$NON-NLS-1$
+		final MenuManager viewMenu = new MenuManager(Messages.App_Action_Menu_view, "views"); //$NON-NLS-1$
 
 		viewMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
 		viewMenu.add(fActionViewShortList);
@@ -164,16 +164,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	}
 
 	@Override
-	protected void fillCoolBar(ICoolBarManager coolBar) {
+	protected void fillCoolBar(final ICoolBarManager coolBar) {
 
-		IToolBarManager tbmPeople = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		final IToolBarManager tbmPeople = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 		tbmPeople.add(personSelector);
 
 		coolBar.add(new ToolBarContributionItem(tbmPeople, "people")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 
-		IToolBarManager tbmTourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		final IToolBarManager tbmTourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 		tbmTourType.add(tourTypeSelector);
 
 		coolBar.add(new ToolBarContributionItem(tbmTourType, "tourtype")); //$NON-NLS-1$
@@ -184,7 +184,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				.getPreferenceStore()
 				.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI)) {
 
-			IToolBarManager tbmSystem = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+			final IToolBarManager tbmSystem = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 			tbmSystem.add(measurementSelector);
 
 			coolBar.add(new ToolBarContributionItem(tbmSystem, "measurementSystem")); //$NON-NLS-1$
@@ -192,7 +192,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		// ---------------------------------------------------------
 
-		IToolBarManager tbmSave = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		final IToolBarManager tbmSave = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 		tbmSave.add(fActionSave);
 		tbmSave.add(fActionSaveAll);
 
@@ -234,7 +234,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	}
 
 	@Override
-	protected void fillMenuBar(IMenuManager menuBar) {
+	protected void fillMenuBar(final IMenuManager menuBar) {
 
 		/*
 		 * create menu bar
@@ -292,7 +292,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	}
 
 	@Override
-	public IStatus saveState(IMemento memento) {
+	public IStatus saveState(final IMemento memento) {
 
 		personSelector.saveState(memento);
 		tourTypeSelector.saveState(memento);

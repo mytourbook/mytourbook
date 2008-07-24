@@ -50,24 +50,24 @@ public class ColorDefinition {
 	 * Sets the color for the default, current and changes
 	 * 
 	 * @param prefName
-	 *        preference name
+	 *            preference name
 	 * @param visibleName
-	 *        visible name
+	 *            visible name
 	 * @param defaultGradientBright
-	 *        default bright gradient color
+	 *            default bright gradient color
 	 * @param defaultGradientDark
-	 *        default dark gradient color
+	 *            default dark gradient color
 	 * @param defaultLineColor
-	 *        default line color
+	 *            default line color
 	 * @param defaultLegendColor
-	 *        legend color configuration or <code>null</code> when legend is not available
+	 *            legend color configuration or <code>null</code> when legend is not available
 	 */
-	protected ColorDefinition(	String prefName,
-								String visibleName,
-								RGB defaultGradientBright,
-								RGB defaultGradientDark,
-								RGB defaultLineColor,
-								LegendColor defaultLegendColor) {
+	protected ColorDefinition(	final String prefName,
+								final String visibleName,
+								final RGB defaultGradientBright,
+								final RGB defaultGradientDark,
+								final RGB defaultLineColor,
+								final LegendColor defaultLegendColor) {
 
 		fPrefName = prefName;
 		fVisibleName = visibleName;
@@ -78,13 +78,13 @@ public class ColorDefinition {
 
 		fDefaultLegendColor = defaultLegendColor;
 
-		IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		String graphPrefName = getGraphPrefName();
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		final String graphPrefName = getGraphPrefName();
 
 		/*
 		 * set gradient bright from pref store or default
 		 */
-		String prefColorGradientBright = graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT;
+		final String prefColorGradientBright = graphPrefName + GraphColorProvider.PREF_COLOR_BRIGHT;
 		if (prefStore.contains(prefColorGradientBright)) {
 			fGradientBright = PreferenceConverter.getColor(prefStore, prefColorGradientBright);
 		} else {
@@ -95,7 +95,7 @@ public class ColorDefinition {
 		/*
 		 * gradient dark
 		 */
-		String prefColorGradientDark = graphPrefName + GraphColorProvider.PREF_COLOR_DARK;
+		final String prefColorGradientDark = graphPrefName + GraphColorProvider.PREF_COLOR_DARK;
 		if (prefStore.contains(prefColorGradientDark)) {
 			fGradientDark = PreferenceConverter.getColor(prefStore, prefColorGradientDark);
 		} else {
@@ -106,7 +106,7 @@ public class ColorDefinition {
 		/*
 		 * line color
 		 */
-		String prefColorLine = graphPrefName + GraphColorProvider.PREF_COLOR_LINE;
+		final String prefColorLine = graphPrefName + GraphColorProvider.PREF_COLOR_LINE;
 		if (prefStore.contains(prefColorLine)) {
 			fLineColor = PreferenceConverter.getColor(prefStore, prefColorLine);
 		} else {
@@ -188,47 +188,47 @@ public class ColorDefinition {
 	 * 
 	 * @param children
 	 */
-	public void setColorNames(GraphColorItem[] children) {
+	public void setColorNames(final GraphColorItem[] children) {
 		fColorParts = children;
 	}
 
-	public void setGradientBright(RGB gradientBright) {
+	public void setGradientBright(final RGB gradientBright) {
 		fGradientBright = gradientBright;
 	}
 
-	public void setGradientDark(RGB gradientDark) {
+	public void setGradientDark(final RGB gradientDark) {
 		fGradientDark = gradientDark;
 	}
 
-	public void setLegendColor(LegendColor legendColor) {
+	public void setLegendColor(final LegendColor legendColor) {
 		fLegendColor = legendColor;
 	}
 
-	public void setLineColor(RGB lineColor) {
+	public void setLineColor(final RGB lineColor) {
 		fLineColor = lineColor;
 	}
 
-	public void setNewGradientBright(RGB newGradientBright) {
+	public void setNewGradientBright(final RGB newGradientBright) {
 		fNewGradientBright = newGradientBright;
 	}
 
-	public void setNewGradientDark(RGB newGradientDark) {
+	public void setNewGradientDark(final RGB newGradientDark) {
 		fNewGradientDark = newGradientDark;
 	}
 
-	public void setNewLegendColor(LegendColor newLegendColor) {
+	public void setNewLegendColor(final LegendColor newLegendColor) {
 		fNewLegendColor = newLegendColor;
 	}
 
-	public void setNewLineColor(RGB newLineColor) {
+	public void setNewLineColor(final RGB newLineColor) {
 		fNewLineColor = newLineColor;
 	}
 
-	public void setPrefName(String prefName) {
+	public void setPrefName(final String prefName) {
 		fPrefName = prefName;
 	}
 
-	public void setVisibleName(String visibleName) {
+	public void setVisibleName(final String visibleName) {
 		fVisibleName = visibleName;
 	}
 }

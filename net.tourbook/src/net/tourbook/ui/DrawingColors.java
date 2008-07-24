@@ -20,8 +20,8 @@ import org.eclipse.swt.graphics.Color;
 public class DrawingColors {
 
 	/**
-	 * when <code>true</code> the colors must be disposed, when <code>false</code> the colors
-	 * must not be disposed
+	 * when <code>true</code> the colors must be disposed, when <code>false</code> the colors must
+	 * not be disposed
 	 * <p>
 	 * default is <code>true</code>
 	 */

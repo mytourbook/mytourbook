@@ -33,7 +33,7 @@ public interface ISelectedTours {
 
 	/**
 	 * @return Returns <code>true</code> when {@link ISelectedTours#getSelectedTours()} is created
-	 * 	in a {@link TourEditor}
+	 *         in a {@link TourEditor}
 	 */
 	boolean isFromTourEditor();
 

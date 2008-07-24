@@ -326,7 +326,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked")//$NON-NLS-1$
+			@SuppressWarnings("unchecked")
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (fTourData == null) {
@@ -447,7 +447,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		scrolledContainer.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
-				// disabled because a long description text in one line is not wrapped
+			// disabled because a long description text in one line is not wrapped
 //				scrolledContainer.setMinSize(locationContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
@@ -476,7 +476,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 				.grab(true, true)
 				.hint(SWT.DEFAULT, pixelConverter.convertHeightInCharsToPixels(2))
 				.applyTo(fTextDescription);
-		
+
 		fTextDescription.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(final KeyEvent e) {
@@ -812,7 +812,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	@SuppressWarnings("unchecked")//$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(final Class adapter) {
 
@@ -1063,7 +1063,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		// recording time
 		final int recordingTime = tourData.getTourRecordingTime();
 		if (recordingTime == 0) {
-			fLblRecordingTime.setText(UI.EMPTY_STRING); //$NON-NLS-1$
+			fLblRecordingTime.setText(UI.EMPTY_STRING);
 		} else {
 			fCalendar.set(0, 0, 0, recordingTime / 3600, ((recordingTime % 3600) / 60), ((recordingTime % 3600) % 60));
 
@@ -1073,7 +1073,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		// driving time
 		final int drivingTime = tourData.getTourDrivingTime();
 		if (drivingTime == 0) {
-			fLblDrivingTime.setText(UI.EMPTY_STRING); //$NON-NLS-1$
+			fLblDrivingTime.setText(UI.EMPTY_STRING);
 		} else {
 			fCalendar.set(0, 0, 0, drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
 
@@ -1083,7 +1083,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		// data points
 		final int[] timeSerie = tourData.timeSerie;
 		if (timeSerie == null) {
-			fLblDatapoints.setText(UI.EMPTY_STRING); //$NON-NLS-1$
+			fLblDatapoints.setText(UI.EMPTY_STRING);
 		} else {
 			final int dataPoints = timeSerie.length;
 			fLblDatapoints.setText(Integer.toString(dataPoints));
@@ -1092,7 +1092,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		// tour type
 		final TourType tourType = tourData.getTourType();
 		if (tourType == null) {
-			fLblTourType.setText(UI.EMPTY_STRING); //$NON-NLS-1$
+			fLblTourType.setText(UI.EMPTY_STRING);
 		} else {
 			fLblTourType.setText(tourType.getName());
 		}
@@ -1102,7 +1102,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 
 		if (tourTags == null || tourTags.size() == 0) {
 
-			fLblTourTags.setText(UI.EMPTY_STRING); //$NON-NLS-1$
+			fLblTourTags.setText(UI.EMPTY_STRING);
 
 		} else {
 

@@ -23,7 +23,7 @@ public class ActionZoomOut extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionZoomOut(MappingView mapView) {
+	public ActionZoomOut(final MappingView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 

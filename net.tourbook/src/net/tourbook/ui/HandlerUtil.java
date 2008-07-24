@@ -30,17 +30,17 @@ public class HandlerUtil {
 	 * Gets the triggered item from the {@link ExecutionEvent} and returns the status
 	 * 
 	 * @param execEvent
-	 * @return Returns <code>true</code> when the item is checked or <code>null</code> when the
-	 *         item is not from type {@link MenuItem} or {@link ToolItem}
+	 * @return Returns <code>true</code> when the item is checked or <code>null</code> when the item
+	 *         is not from type {@link MenuItem} or {@link ToolItem}
 	 */
-	public static Boolean isItemChecked(ExecutionEvent execEvent) {
+	public static Boolean isItemChecked(final ExecutionEvent execEvent) {
 
-		Object trigger = execEvent.getTrigger();
+		final Object trigger = execEvent.getTrigger();
 
 		if (trigger instanceof Event) {
 
-			Event event = (Event) trigger;
-			Widget widget = event.widget;
+			final Event event = (Event) trigger;
+			final Widget widget = event.widget;
 
 			if (widget instanceof MenuItem) {
 				return ((MenuItem) widget).getSelection();

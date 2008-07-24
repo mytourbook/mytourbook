@@ -22,7 +22,7 @@ import org.eclipse.jface.action.Action;
 
 public class ActionMergeTours extends Action {
 
-	public ActionMergeTours(RawDataView rawDataView) {
+	public ActionMergeTours(final RawDataView rawDataView) {
 		super(Messages.import_data_action_merge_tracks, AS_CHECK_BOX);
 	}
 

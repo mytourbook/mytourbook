@@ -24,7 +24,7 @@ public class ActionXAxisTime extends Action {
 
 	private TourChart	fTourChart;
 
-	public ActionXAxisTime(TourChart tourChart) {
+	public ActionXAxisTime(final TourChart tourChart) {
 
 		super(Messages.Tour_Action_show_time_on_x_axis, AS_RADIO_BUTTON);
 
@@ -36,6 +36,7 @@ public class ActionXAxisTime extends Action {
 		setChecked(tourChart.fTourChartConfig.showTimeOnXAxis);
 	}
 
+	@Override
 	public void run() {
 		fTourChart.onExecuteXAxisTime(isChecked());
 	}

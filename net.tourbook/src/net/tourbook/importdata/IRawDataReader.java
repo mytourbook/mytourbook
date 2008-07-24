@@ -42,7 +42,7 @@ public interface IRawDataReader {
 	 * Validate data format
 	 * 
 	 * @param fileName
-	 *        file name for the file which is validated
+	 *            file name for the file which is validated
 	 * @return return <code>true</code> when the file has the format for this device reader
 	 */
 	public boolean validateRawData(String fileName);

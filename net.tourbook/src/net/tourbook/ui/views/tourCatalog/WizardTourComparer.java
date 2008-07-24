@@ -45,8 +45,8 @@ public class WizardTourComparer extends Wizard {
 
 		persistDialogSettings();
 
-		TourReference[] refTours = pageReferenceTour.getReferenceTours();
-		Object[] comparesTours = pageCompareTour.getComparedTours();
+		final TourReference[] refTours = pageReferenceTour.getReferenceTours();
+		final Object[] comparesTours = pageCompareTour.getComparedTours();
 
 		TourCompareManager.getInstance().compareTours(refTours, comparesTours);
 
@@ -66,7 +66,7 @@ public class WizardTourComparer extends Wizard {
 
 	private void setDialogSettings() {
 
-		IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
+		final IDialogSettings pluginSettings = TourbookPlugin.getDefault().getDialogSettings();
 		IDialogSettings wizardSettings = pluginSettings.getSection(DIALOG_SETTINGS_SECTION);
 
 		if (wizardSettings == null) {

@@ -27,7 +27,7 @@ public class WizardImportDialog extends WizardDialog {
 
 	private String	fWindowTitle;
 
-	public WizardImportDialog(Shell parentShell, IWizard newWizard, String windowTitle) {
+	public WizardImportDialog(final Shell parentShell, final IWizard newWizard, final String windowTitle) {
 
 		super(parentShell, newWizard);
 
@@ -36,15 +36,16 @@ public class WizardImportDialog extends WizardDialog {
 		fWindowTitle = windowTitle;
 	}
 
+	@Override
 	public void create() {
-		
+
 		super.create();
 
 		getShell().setText(fWindowTitle);
 	}
 
+	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
-		return TourbookPlugin.getDefault().getDialogSettingsSection(
-				getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
+		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
 	}
 }

@@ -31,7 +31,10 @@ public class GraphColorItem {
 	 */
 	private boolean			fIsLegend;
 
-	public GraphColorItem(ColorDefinition parent, String colorPrefName, String visibleName, boolean isLegend) {
+	public GraphColorItem(	final ColorDefinition parent,
+							final String colorPrefName,
+							final String visibleName,
+							final boolean isLegend) {
 
 		fColorDefinition = parent;
 
@@ -73,11 +76,11 @@ public class GraphColorItem {
 		return fIsLegend;
 	}
 
-	public void setName(String fName) {
+	public void setName(final String fName) {
 		this.fVisibleName = fName;
 	}
 
-	public void setNewRGB(RGB rgb) {
+	public void setNewRGB(final RGB rgb) {
 		if (fColorPrefName.compareTo(GraphColorProvider.PREF_COLOR_LINE) == 0) {
 			fColorDefinition.setNewLineColor(rgb);
 		} else if (fColorPrefName.compareTo(GraphColorProvider.PREF_COLOR_DARK) == 0) {
@@ -87,7 +90,7 @@ public class GraphColorItem {
 		}
 	}
 
-	void setPrefName(String fPrefName) {
+	void setPrefName(final String fPrefName) {
 		this.fColorPrefName = fPrefName;
 	}
 }

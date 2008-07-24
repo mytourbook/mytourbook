@@ -25,38 +25,38 @@ import org.eclipse.update.ui.UpdateManagerUI;
 
 public class InstallWizardAction implements IWorkbenchWindowActionDelegate {
 
-    private IWorkbenchWindow window;
+	private IWorkbenchWindow	window;
 
-    public InstallWizardAction() {
-        // do nothing
-    }
+	public InstallWizardAction() {
+	// do nothing
+	}
 
-    public void run() {
-        openInstaller(PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-    }
+	public void run() {
+		openInstaller(PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+	}
 
-    public void run(IAction action) {
-        openInstaller(window);
-    }
+	public void run(final IAction action) {
+		openInstaller(window);
+	}
 
-    private void openInstaller(final IWorkbenchWindow window) {
-        BusyIndicator.showWhile(window.getShell().getDisplay(), new Runnable() {
-            public void run() {
-                UpdateManagerUI.openInstaller(window.getShell());
-            }
-        });
-    }
+	private void openInstaller(final IWorkbenchWindow window) {
+		BusyIndicator.showWhile(window.getShell().getDisplay(), new Runnable() {
+			public void run() {
+				UpdateManagerUI.openInstaller(window.getShell());
+			}
+		});
+	}
 
-    public void selectionChanged(IAction action, ISelection selection) {
-        // do nothing
-    }
+	public void selectionChanged(final IAction action, final ISelection selection) {
+	// do nothing
+	}
 
-    public void dispose() {
-        // do nothing
-    }
+	public void dispose() {
+	// do nothing
+	}
 
-    public void init(IWorkbenchWindow window) {
-        this.window = window;
-    }
+	public void init(final IWorkbenchWindow window) {
+		this.window = window;
+	}
 
 }

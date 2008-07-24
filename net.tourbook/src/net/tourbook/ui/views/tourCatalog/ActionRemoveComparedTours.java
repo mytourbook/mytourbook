@@ -131,9 +131,9 @@ public class ActionRemoveComparedTours extends Action {
 
 				// remove all compared tours for the current ref tour from
 				// the database
-				for (final Iterator<TreeViewerItem> compTour = unfetchedChildren.iterator(); selTour.hasNext();) {
+				for (final TreeViewerItem treeViewerItem : unfetchedChildren) {
 
-					final long compId = ((TVICatalogComparedTour) compTour.next()).getCompId();
+					final long compId = ((TVICatalogComparedTour) treeViewerItem).getCompId();
 
 					TourCompareManager.removeComparedTourFromDb(compId);
 

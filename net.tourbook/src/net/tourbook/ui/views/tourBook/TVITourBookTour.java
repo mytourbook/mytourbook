@@ -25,8 +25,7 @@ public class TVITourBookTour extends TVITourBookItem {
 	long			fTourId;
 	long			fTourTypeId;
 	short			fColumnTimeInterval;
-	
-	
+
 	/**
 	 * id's for the tags or <code>null</code> when tags are not available
 	 */

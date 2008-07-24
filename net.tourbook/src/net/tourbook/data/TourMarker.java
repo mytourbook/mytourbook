@@ -55,8 +55,8 @@ public class TourMarker {
 	private TourData				tourData;
 
 	/**
-	 * type contains the marker type which is defined in {@link ChartMarker} like {@link
-	 * ChartMarker#MARKER_TYPE_DEVICE}
+	 * type contains the marker type which is defined in {@link ChartMarker} like
+	 * {@link ChartMarker#MARKER_TYPE_DEVICE}
 	 */
 	private int						type;
 
@@ -103,7 +103,7 @@ public class TourMarker {
 	 * 
 	 * @param comparedMarker
 	 * @param ignoreType
-	 * 		set <code>true</code> to not compare the type field
+	 *            set <code>true</code> to not compare the type field
 	 * @return Returns true when the content of the markers are equal
 	 */
 	public boolean compareTo(final TourMarker comparedMarker, final boolean ignoreType) {

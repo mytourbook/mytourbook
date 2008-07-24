@@ -41,7 +41,7 @@ public class ActionSelectYears extends Action implements IMenuCreator {
 
 		private int	fYears;
 
-		public ActionYear(int years) {
+		public ActionYear(final int years) {
 			super(Integer.toString(years), AS_RADIO_BUTTON);
 
 			fYears = years;
@@ -55,7 +55,7 @@ public class ActionSelectYears extends Action implements IMenuCreator {
 
 	}
 
-	public ActionSelectYears(TourCatalogViewYearStatistic yearStatistic) {
+	public ActionSelectYears(final TourCatalogViewYearStatistic yearStatistic) {
 
 		super(Messages.tourCatalog_view_action_number_of_years, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
@@ -71,8 +71,8 @@ public class ActionSelectYears extends Action implements IMenuCreator {
 		fYearActions.get(0).setChecked(true);
 	}
 
-	private void addActionToMenu(Action action) {
-		ActionContributionItem item = new ActionContributionItem(action);
+	private void addActionToMenu(final Action action) {
+		final ActionContributionItem item = new ActionContributionItem(action);
 		item.fill(fMenu, -1);
 	}
 
@@ -83,15 +83,15 @@ public class ActionSelectYears extends Action implements IMenuCreator {
 		}
 	}
 
-	public Menu getMenu(Control parent) {
+	public Menu getMenu(final Control parent) {
 		return null;
 	}
 
-	public Menu getMenu(Menu parent) {
+	public Menu getMenu(final Menu parent) {
 
 		fMenu = new Menu(parent);
 
-		for (ActionYear yearAction : fYearActions) {
+		for (final ActionYear yearAction : fYearActions) {
 			addActionToMenu(yearAction);
 		}
 
@@ -102,12 +102,12 @@ public class ActionSelectYears extends Action implements IMenuCreator {
 		return fNumberOfYears;
 	}
 
-	public void setNumberOfYears(int numberOfYears) {
+	public void setNumberOfYears(final int numberOfYears) {
 
 		fNumberOfYears = numberOfYears;
 
 		// update check status for the menu items
-		for (ActionYear yearAction : fYearActions) {
+		for (final ActionYear yearAction : fYearActions) {
 			if (yearAction.fYears == numberOfYears) {
 				yearAction.setChecked(true);
 			} else {

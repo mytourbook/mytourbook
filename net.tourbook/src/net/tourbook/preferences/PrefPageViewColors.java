@@ -43,7 +43,7 @@ public class PrefPageViewColors extends FieldEditorPreferencePage implements IWo
 	protected void createFieldEditors() {
 
 		final Composite parent = getFieldEditorParent();
-		
+
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(parent);
 		GridLayoutFactory.fillDefaults().applyTo(parent);
 //		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -51,7 +51,7 @@ public class PrefPageViewColors extends FieldEditorPreferencePage implements IWo
 		final Group colorGroup = new Group(parent, SWT.NONE);
 		colorGroup.setText(Messages.pref_tag_label_color_group);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(colorGroup);
-		
+
 		// color: tag category
 		addField(new ColorFieldEditor(ITourbookPreferences.TAG_VIEW_TAG_CATEGORY_COLOR,
 				Messages.pref_tag_color_tag_category,
@@ -75,10 +75,10 @@ public class PrefPageViewColors extends FieldEditorPreferencePage implements IWo
 		final GridLayout gl = (GridLayout) colorGroup.getLayout();
 		gl.marginHeight = 5;
 		gl.marginWidth = 5;
-		
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(container);
-		
+
 		// show lines
 		addField(new BooleanFieldEditor(ITourbookPreferences.TAG_VIEW_SHOW_LINES,
 				Messages.pref_tag_show_lines,

@@ -510,7 +510,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 					}
 				}
 			}
-			
+
 			if (returnValue) {
 				fPrefPageTags.setIsModified();
 			}

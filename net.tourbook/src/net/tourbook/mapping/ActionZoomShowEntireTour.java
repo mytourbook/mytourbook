@@ -24,7 +24,7 @@ public class ActionZoomShowEntireTour extends Action {
 
 	private MappingView	fMapView;
 
-	public ActionZoomShowEntireTour(MappingView mapView) {
+	public ActionZoomShowEntireTour(final MappingView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 

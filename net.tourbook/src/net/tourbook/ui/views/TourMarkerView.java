@@ -155,8 +155,8 @@ public class TourMarkerView extends ViewPart {
 
 					// dispose viewer
 					final Control[] children = fViewerContainer.getChildren();
-					for (int childIndex = 0; childIndex < children.length; childIndex++) {
-						children[childIndex].dispose();
+					for (final Control element : children) {
+						element.dispose();
 					}
 
 					createTableViewer(fViewerContainer);

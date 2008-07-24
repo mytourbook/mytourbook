@@ -34,9 +34,11 @@ public class TourCompareConfig {
 
 	private SelectionChartXSliderPosition	xSliderPosition;
 
-	TourCompareConfig(TourReference refTour, ChartDataModel refChartDataModel,
-			TourData refTourData, TourChartConfiguration refTourChartConfig,
-			TourChartConfiguration compTourChartConfig) {
+	TourCompareConfig(	final TourReference refTour,
+						final ChartDataModel refChartDataModel,
+						final TourData refTourData,
+						final TourChartConfiguration refTourChartConfig,
+						final TourChartConfiguration compTourChartConfig) {
 
 		fRefTour = refTour;
 		fRefTourData = refTourData;
@@ -49,7 +51,7 @@ public class TourCompareConfig {
 		return xSliderPosition;
 	}
 
-	void setXSliderPosition(SelectionChartXSliderPosition sliderPosition) {
+	void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
 		xSliderPosition = sliderPosition;
 	}
 

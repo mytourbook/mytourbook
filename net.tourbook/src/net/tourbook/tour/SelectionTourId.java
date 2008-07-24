@@ -24,7 +24,7 @@ public class SelectionTourId implements ISelection {
 
 	private Long	fTourId;
 
-	public SelectionTourId(Long tourId) {
+	public SelectionTourId(final Long tourId) {
 		fTourId = tourId;
 	}
 

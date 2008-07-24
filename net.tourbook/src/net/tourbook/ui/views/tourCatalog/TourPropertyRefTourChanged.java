@@ -25,13 +25,13 @@ public class TourPropertyRefTourChanged {
 
 	/**
 	 * @param refTourChart
-	 *        reference tour chart
+	 *            reference tour chart
 	 * @param refId
-	 *        reference id
+	 *            reference id
 	 * @param refTourXMarkerValue
-	 *        value difference in the reference tour
+	 *            value difference in the reference tour
 	 */
-	public TourPropertyRefTourChanged(TourChart refTourChart, long refId, int refTourXMarkerValue) {
+	public TourPropertyRefTourChanged(final TourChart refTourChart, final long refId, final int refTourXMarkerValue) {
 		this.refTourChart = refTourChart;
 		this.refId = refId;
 		this.xMarkerValue = refTourXMarkerValue;

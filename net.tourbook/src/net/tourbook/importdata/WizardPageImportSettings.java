@@ -98,7 +98,7 @@ public class WizardPageImportSettings extends WizardPage {
 
 		GridData gd;
 
-		Label label = new Label(fGroupContainer, SWT.NONE);
+		final Label label = new Label(fGroupContainer, SWT.NONE);
 		label.setText(Messages.Import_Wizard_Label_device);
 		gd = new GridData(SWT.NONE, SWT.CENTER, false, false);
 		gd.verticalIndent = 10;
@@ -196,7 +196,7 @@ public class WizardPageImportSettings extends WizardPage {
 	/**
 	 * create field: serial port
 	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
+	@SuppressWarnings("unchecked")
 	private void createFieldSerialPort() {
 
 		GridData gd;
@@ -446,7 +446,7 @@ public class WizardPageImportSettings extends WizardPage {
 		if (fileName.length() == 0) {
 			return false;
 		}
-		File file = new File(fileName);
+		final File file = new File(fileName);
 		return file.isDirectory();
 	}
 }

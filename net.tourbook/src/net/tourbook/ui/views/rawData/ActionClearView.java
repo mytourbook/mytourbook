@@ -25,17 +25,18 @@ public class ActionClearView extends Action {
 
 	private RawDataView	fRawDataView;
 
-	public ActionClearView(RawDataView rawDataView) {
+	public ActionClearView(final RawDataView rawDataView) {
 
 		fRawDataView = rawDataView;
 
 		setText(Messages.import_data_action_clear_view);
 		setToolTipText(Messages.import_data_action_clear_view_tooltip);
-		
+
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__remove_all));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__remove_all_disabled));
 	}
 
+	@Override
 	public void run() {
 
 		// remove all tours

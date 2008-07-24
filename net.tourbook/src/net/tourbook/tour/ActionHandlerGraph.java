@@ -28,18 +28,18 @@ class ActionHandlerGraph extends TCActionHandler implements IElementUpdater {
 
 	private int	fGraphId;
 
-	public ActionHandlerGraph(int graphId, String commandId) {
+	public ActionHandlerGraph(final int graphId, final String commandId) {
 
 		fGraphId = graphId;
 		fCommandId = commandId;
 	}
 
-	public Object execute(ExecutionEvent execEvent) throws ExecutionException {
+	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		TourChartConfiguration chartConfig = fTourChart.fTourChartConfig;
+		final TourChartConfiguration chartConfig = fTourChart.fTourChartConfig;
 		final ArrayList<Integer> visibleGraphs = chartConfig.getVisibleGraphs();
 
-		boolean isThisGraphVisible = visibleGraphs.contains(fGraphId);
+		final boolean isThisGraphVisible = visibleGraphs.contains(fGraphId);
 
 		// check that at least one graph is visible
 		if (isThisGraphVisible && visibleGraphs.size() == 1) {

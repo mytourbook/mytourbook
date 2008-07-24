@@ -48,7 +48,6 @@ public class ActionDeleteTour extends Action {
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
 
-
 		setEnabled(false);
 	}
 

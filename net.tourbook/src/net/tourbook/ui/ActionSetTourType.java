@@ -131,8 +131,8 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 
 				// dispose old items
 				final MenuItem[] items = menu.getItems();
-				for (int i = 0; i < items.length; i++) {
-					items[i].dispose();
+				for (final MenuItem item : items) {
+					item.dispose();
 				}
 
 				// get tours which tour type should be changed

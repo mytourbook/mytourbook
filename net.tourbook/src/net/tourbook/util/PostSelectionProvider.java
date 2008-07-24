@@ -27,7 +27,7 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 	ListenerList		postSelectionListeners	= new ListenerList();
 	private ISelection	currentSelection;
 
-	public void setSelection(ISelection selection) {
+	public void setSelection(final ISelection selection) {
 
 		if (selection == null) {
 			return;
@@ -37,7 +37,7 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 
 		final SelectionChangedEvent event = new SelectionChangedEvent(this, currentSelection);
 
-		Object[] listeners = postSelectionListeners.getListeners();
+		final Object[] listeners = postSelectionListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
@@ -52,15 +52,15 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 		return currentSelection;
 	}
 
-	public void addPostSelectionChangedListener(ISelectionChangedListener listener) {
+	public void addPostSelectionChangedListener(final ISelectionChangedListener listener) {
 		postSelectionListeners.add(listener);
 	}
 
-	public void removePostSelectionChangedListener(ISelectionChangedListener listener) {
+	public void removePostSelectionChangedListener(final ISelectionChangedListener listener) {
 		postSelectionListeners.remove(listener);
 	}
 
-	public void addSelectionChangedListener(ISelectionChangedListener listener) {}
+	public void addSelectionChangedListener(final ISelectionChangedListener listener) {}
 
-	public void removeSelectionChangedListener(ISelectionChangedListener listener) {}
+	public void removeSelectionChangedListener(final ISelectionChangedListener listener) {}
 }

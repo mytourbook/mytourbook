@@ -372,7 +372,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		});
 	}
 
-	private void createUILegendColorSelector(Composite parent) {
+	private void createUILegendColorSelector(final Composite parent) {
 
 		final Composite selectorContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(false, true).applyTo(selectorContainer);
@@ -395,7 +395,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 				.align(SWT.BEGINNING, SWT.BEGINNING)
 				.applyTo(fColorSelectorMax.getButton());
 		fColorSelectorMax.addListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 				onSelectColorSelector(fColorSelectorMax, 0);
 			}
 		});
@@ -414,7 +414,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 				.applyTo(fColorSelectorHigh.getButton());
 
 		fColorSelectorHigh.addListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 				onSelectColorSelector(fColorSelectorHigh, 1);
 			}
 		});
@@ -430,7 +430,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		fColorSelectorMid = new ColorSelector(midContainer);
 		GridDataFactory.swtDefaults().applyTo(fColorSelectorMid.getButton());
 		fColorSelectorMid.addListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 				onSelectColorSelector(fColorSelectorMid, 2);
 			}
 		});
@@ -450,7 +450,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 				.applyTo(fColorSelectorLow.getButton());
 
 		fColorSelectorLow.addListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 				onSelectColorSelector(fColorSelectorLow, 3);
 			}
 		});
@@ -469,14 +469,14 @@ public class LegendColorDialog extends TitleAreaDialog {
 				.applyTo(fColorSelectorMin.getButton());
 
 		fColorSelectorMin.addListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
+			public void propertyChange(final PropertyChangeEvent event) {
 				onSelectColorSelector(fColorSelectorMin, 4);
 			}
 		});
 //		minContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 	}
 
-	private void onSelectColorSelector(ColorSelector colorSelector, int valueColorIndex) {
+	private void onSelectColorSelector(final ColorSelector colorSelector, final int valueColorIndex) {
 
 //		RGB colorValue = fColorSelectorMax.getColorValue();
 //
@@ -486,7 +486,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 //		final ValueColor valueColor = fValueColors[items - valueColorIndex];
 		final ValueColor valueColor = fValueColors[4 - valueColorIndex];
 
-		RGB colorValue = colorSelector.getColorValue();
+		final RGB colorValue = colorSelector.getColorValue();
 		valueColor.red = colorValue.red;
 		valueColor.green = colorValue.green;
 		valueColor.blue = colorValue.blue;
@@ -780,12 +780,12 @@ public class LegendColorDialog extends TitleAreaDialog {
 		fLegendColorWorkingCopy.isMinValueOverwrite = fChkForceMinValue.getSelection();
 		try {
 			fLegendColorWorkingCopy.overwriteMinValue = Integer.parseInt(fTxtMinValue.getText());
-		} catch (NumberFormatException e) {}
+		} catch (final NumberFormatException e) {}
 
 		fLegendColorWorkingCopy.isMaxValueOverwrite = fChkForceMaxValue.getSelection();
 		try {
 			fLegendColorWorkingCopy.overwriteMaxValue = Integer.parseInt(fTxtMaxValue.getText());
-		} catch (NumberFormatException e) {}
+		} catch (final NumberFormatException e) {}
 
 		enableControls();
 		updateLabels();
@@ -905,7 +905,7 @@ public class LegendColorDialog extends TitleAreaDialog {
 		}
 	}
 
-	private boolean verifyIntegerValue(String valueString) {
+	private boolean verifyIntegerValue(final String valueString) {
 
 		if (valueString.trim().length() == 0) {
 			return false;

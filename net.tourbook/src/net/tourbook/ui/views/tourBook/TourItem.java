@@ -38,13 +38,13 @@ public class TourItem extends Object {
 	private int					childrenStatus			= CHILDREN_STATUS_NOT_SET;
 
 	/**
-	 * when the type for the tour item is <code>ITEM_TYPE_TOUR</code>, this
-	 * field contains the tourId for the tour
+	 * when the type for the tour item is <code>ITEM_TYPE_TOUR</code>, this field contains the
+	 * tourId for the tour
 	 */
 	private long				fTourId;
 	private long				fTourTypeId;
 
-	TourItem(int itemType, long[] itemData, Long tourTypeId) {
+	TourItem(final int itemType, final long[] itemData, final Long tourTypeId) {
 
 		fItemType = itemType;
 		fTourItemData = itemData;
@@ -63,7 +63,7 @@ public class TourItem extends Object {
 
 	}
 
-	TourItem(int itemType, long[] itemData) {
+	TourItem(final int itemType, final long[] itemData) {
 		this.fItemType = itemType;
 		this.fTourItemData = itemData;
 
@@ -87,8 +87,8 @@ public class TourItem extends Object {
 
 		if (childrenStatus == CHILDREN_STATUS_NOT_SET) {
 			/*
-			 * if the children have not yet been retrieved we assume that
-			 * children can be available to make the tree node expandable
+			 * if the children have not yet been retrieved we assume that children can be available
+			 * to make the tree node expandable
 			 */
 			return true;
 
@@ -119,25 +119,24 @@ public class TourItem extends Object {
 		return parent;
 	}
 
-	void setParent(TourItem parent) {
+	void setParent(final TourItem parent) {
 		this.parent = parent;
 	}
 
 	public boolean hasChildrenBeenFetched() {
 
-		return childrenStatus == CHILDREN_STATUS_FETCHED
-				|| childrenStatus == CHILDREN_STATUS_IS_LEAF;
+		return childrenStatus == CHILDREN_STATUS_FETCHED || childrenStatus == CHILDREN_STATUS_IS_LEAF;
 	}
 
 	public int getItemType() {
 		return fItemType;
 	}
 
-	public void setItemType(int type) {
+	public void setItemType(final int type) {
 		this.fItemType = type;
 	}
 
-	public void addChild(TourItem child) {
+	public void addChild(final TourItem child) {
 		if (children == null) {
 			children = new ArrayList<TourItem>();
 			childrenStatus = CHILDREN_STATUS_FETCHED;

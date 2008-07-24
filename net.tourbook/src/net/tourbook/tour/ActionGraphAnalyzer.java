@@ -31,7 +31,7 @@ public class ActionGraphAnalyzer extends Action {
 
 	private final Chart	fChart;
 
-	public ActionGraphAnalyzer(Chart chart) {
+	public ActionGraphAnalyzer(final Chart chart) {
 
 		super(null, AS_PUSH_BUTTON);
 
@@ -41,21 +41,19 @@ public class ActionGraphAnalyzer extends Action {
 		fChart = chart;
 	}
 
+	@Override
 	public void run() {
 
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
 		if (window != null) {
 			try {
-				window.getActivePage().showView(
-						TourChartAnalyzerView.ID,
-						null,
-						IWorkbenchPage.VIEW_VISIBLE);
+				window.getActivePage().showView(TourChartAnalyzerView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
 				// create a new selection to update the analyzer view
 				fChart.fireSliderMoveEvent();
 
-			} catch (PartInitException e) {
+			} catch (final PartInitException e) {
 				MessageDialog.openError(window.getShell(), "Error", "Error opening view:" //$NON-NLS-1$ //$NON-NLS-2$
 						+ e.getMessage());
 			}

@@ -40,8 +40,8 @@ public class TourChartConfiguration {
 	public boolean					showTimeOnXAxisBackup	= false;
 
 	/**
-	 * is <code>true</code> when the distance is not available and the time must be displayed on
-	 * the x-axis
+	 * is <code>true</code> when the distance is not available and the time must be displayed on the
+	 * x-axis
 	 */
 	public boolean					isForceTimeOnXAxis;
 
@@ -81,23 +81,23 @@ public class TourChartConfiguration {
 
 	/**
 	 * @param keepMinMaxValues
-	 *        set <code>true</code> to keep min/max values when tour data will change
+	 *            set <code>true</code> to keep min/max values when tour data will change
 	 */
-	public TourChartConfiguration(boolean keepMinMaxValues) {
+	public TourChartConfiguration(final boolean keepMinMaxValues) {
 		if (keepMinMaxValues) {
 			setMinMaxKeeper(true);
 		}
 	}
 
-	public void addVisibleGraph(int visibleGraph) {
+	public void addVisibleGraph(final int visibleGraph) {
 		visibleGraphSequence.add(visibleGraph);
 	}
 
-	public void removeVisibleGraph(int selectedGraphId) {
+	public void removeVisibleGraph(final int selectedGraphId) {
 
 		int graphIndex = 0;
 
-		for (Integer graphId : visibleGraphSequence) {
+		for (final Integer graphId : visibleGraphSequence) {
 			if (graphId == selectedGraphId) {
 				visibleGraphSequence.remove(graphIndex);
 				break;
@@ -120,9 +120,9 @@ public class TourChartConfiguration {
 	 * chart widget
 	 * 
 	 * @param keepMinMaxValues
-	 *        the keepMinMaxValues to set
+	 *            the keepMinMaxValues to set
 	 */
-	public void setMinMaxKeeper(boolean keepMinMaxValues) {
+	public void setMinMaxKeeper(final boolean keepMinMaxValues) {
 		if (keepMinMaxValues) {
 			fMinMaxKeeper = new ChartYDataMinMaxKeeper();
 		} else {

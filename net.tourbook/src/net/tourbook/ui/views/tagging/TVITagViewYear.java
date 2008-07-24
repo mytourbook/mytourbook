@@ -35,7 +35,7 @@ public class TVITagViewYear extends TVITagViewItem {
 	private TVITagViewTag			fTagItem;
 
 	private static Calendar			fCalendar		= GregorianCalendar.getInstance();
-	private static SimpleDateFormat	fMonthFormatter	= new SimpleDateFormat("MMM"); //$NON-NLS-1$
+	private static SimpleDateFormat	fMonthFormatter	= new SimpleDateFormat("MMM");		//$NON-NLS-1$
 
 	/**
 	 * <code>true</code> when the children of this year item contains month items<br>
