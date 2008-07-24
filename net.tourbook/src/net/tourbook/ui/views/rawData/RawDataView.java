@@ -273,10 +273,10 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 					recreateViewer();
 
-				} else if (property.equals(ITourbookPreferences.TAG_COLOR_AND_LAYOUT_CHANGED)) {
+				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 					fTourViewer.getTable()
-							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					fTourViewer.refresh();
 

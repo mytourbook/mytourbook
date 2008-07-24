@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.preferences;
 
 import java.sql.Connection;
@@ -204,10 +203,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 				final String property = event.getProperty();
 
-				if (property.equals(ITourbookPreferences.TAG_COLOR_AND_LAYOUT_CHANGED)) {
+				if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 					fTagViewer.getTree()
-							.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+							.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					fTagViewer.refresh();
 
@@ -322,7 +321,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				| SWT.FULL_SELECTION);
 
 		tree.setHeaderVisible(false);
-		tree.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+		tree.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTagViewer = new TreeViewer(tree);
 		fTagViewer.setContentProvider(new TagViewerContentProvicer());
@@ -486,11 +485,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		final Label label = new Label(container, SWT.WRAP);
+		Label label = new Label(container, SWT.WRAP);
 		label.setText(Messages.pref_tourtag_viewer_title);
-		GridDataFactory.swtDefaults()//
-				.grab(true, false)
-				.applyTo(label);
+		GridDataFactory.swtDefaults().grab(true, false).applyTo(label);
 
 		// toolbar
 		fToolBar = new ToolBar(container, SWT.FLAT);
@@ -500,6 +497,13 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		createTagViewer(container);
 		createButtons(container);
+
+		label = new Label(container, SWT.WRAP);
+		label.setText(Messages.pref_tourtag_hint);
+		GridDataFactory.swtDefaults().grab(true, false).span(3, 1).applyTo(label);
+
+		// spacer
+		new Label(container, SWT.NONE);
 
 		createToolbarActions();
 

@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.ui;
 
 import java.sql.SQLException;
@@ -72,10 +71,11 @@ public class UI {
 
 	public static final String				IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";						//$NON-NLS-1$
 
-	public static final String				TAG_CATEGORY_COLOR				= "TAG_CATEGORY_COLOR";						//$NON-NLS-1$
-	public static final String				TAG_COLOR						= "TAG_COLOR";									//$NON-NLS-1$
-	public static final String				TAG_SUB_COLOR					= "TAG_SUB_COLOR";								//$NON-NLS-1$
-	public static final String				TAG_SUB_SUB_COLOR				= "TAG_SUB_SUB_COLOR";							//$NON-NLS-1$
+	public static final String				VIEW_COLOR_CATEGORY				= "view.color.category";						//$NON-NLS-1$
+	public static final String				VIEW_COLOR_TITLE				= "view.color.title";							//$NON-NLS-1$
+	public static final String				VIEW_COLOR_SUB					= "view.color.sub";							//$NON-NLS-1$
+	public static final String				VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";						//$NON-NLS-1$
+	public static final String				VIEW_COLOR_TOUR					= "view.color.tour";							//$NON-NLS-1$
 
 	/**
 	 * contains a new line string
@@ -175,9 +175,9 @@ public class UI {
 		/*
 		 * set styler
 		 */
-		TAG_CATEGORY_STYLER = StyledString.createColorRegistryStyler(TAG_CATEGORY_COLOR, null);
-		TAG_STYLER = StyledString.createColorRegistryStyler(TAG_COLOR, null);
-		TAG_SUB_STYLER = StyledString.createColorRegistryStyler(TAG_SUB_COLOR, null);
+		TAG_CATEGORY_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_CATEGORY, null);
+		TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
+		TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
 	}
 
 	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
@@ -367,14 +367,16 @@ public class UI {
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
-		colorRegistry.put(TAG_CATEGORY_COLOR, //
-				PreferenceConverter.getColor(store, ITourbookPreferences.TAG_VIEW_TAG_CATEGORY_COLOR));
-		colorRegistry.put(TAG_COLOR, //
-				PreferenceConverter.getColor(store, ITourbookPreferences.TAG_VIEW_TAG_COLOR));
-		colorRegistry.put(TAG_SUB_COLOR, //
-				PreferenceConverter.getColor(store, ITourbookPreferences.TAG_VIEW_SUB_TAG_COLOR));
-		colorRegistry.put(TAG_SUB_SUB_COLOR, //
-				PreferenceConverter.getColor(store, ITourbookPreferences.TAG_VIEW_SUB_SUB_TAG_COLOR));
+		colorRegistry.put(VIEW_COLOR_CATEGORY, //
+				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY));
+		colorRegistry.put(VIEW_COLOR_TITLE, //
+				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE));
+		colorRegistry.put(VIEW_COLOR_SUB, //
+				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB));
+		colorRegistry.put(VIEW_COLOR_SUB_SUB, //
+				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB));
+		colorRegistry.put(VIEW_COLOR_TOUR, //
+				PreferenceConverter.getColor(store, ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR));
 	}
 
 	public static GridData setWidth(final Control control, final int width) {

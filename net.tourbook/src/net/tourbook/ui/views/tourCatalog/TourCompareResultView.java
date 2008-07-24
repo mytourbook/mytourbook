@@ -430,10 +430,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 
 					recreateViewer();
 
-				} else if (property.equals(ITourbookPreferences.TAG_COLOR_AND_LAYOUT_CHANGED)) {
+				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 					fTourViewer.getTree()
-							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					fTourViewer.refresh();
 
@@ -593,7 +593,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(TourbookPlugin.getDefault()
 				.getPluginPreferences()
-				.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTourViewer = new ContainerCheckedTreeViewer(tree);
 		fColumnManager.createColumns();
@@ -1456,7 +1456,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 
 		if (element instanceof TVICompareResultReferenceTour) {
 
-			cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_COLOR));
+			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TITLE));
 
 		} else if (element instanceof TVICompareResultComparedTour) {
 
@@ -1465,8 +1465,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 			if (((TVICompareResultComparedTour) (element)).isSaved()) {
 				cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
 			} else {
-				// show the text with default color
-				cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+				// show the text with tour color
+				cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
+//				cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
 			}
 		}
 	}

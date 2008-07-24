@@ -118,6 +118,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_type_label;
 	public static String		ColumnFactory_tour_type_tooltip;
 
+	public static String	ColumnModifyDialog_Button_default;
+
 	public static String		ColumnModifyDialog_Button_deselect_all;
 	public static String		ColumnModifyDialog_Button_move_down;
 	public static String		ColumnModifyDialog_Button_move_up;

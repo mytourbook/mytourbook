@@ -117,19 +117,17 @@ public interface ITourbookPreferences {
 	public static final String	REGIONAL_DECIMAL_SEPARATOR				= "regional_decimal.separator";				//$NON-NLS-1$
 	public static final String	REGIONAL_GROUP_SEPARATOR				= "regional_group.separator";					//$NON-NLS-1$
 
-	/*
-	 * tag colors
-	 */
 	/**
-	 * color for the tagging has changed
+	 * layout for the views have been changed
 	 */
-	public static final String	TAG_COLOR_AND_LAYOUT_CHANGED			= "tag.color.changed";							//$NON-NLS-1$
-	public static final String	TAG_VIEW_SHOW_LINES						= "tag_view.show_lines";						//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_CHANGED						= "view.layout.changed";						//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_DISPLAY_LINES				= "view.layout.display.lines";					//$NON-NLS-1$
 
-	public static final String	TAG_VIEW_TAG_CATEGORY_COLOR				= "tag_view.tag_category.color";				//$NON-NLS-1$
-	public static final String	TAG_VIEW_TAG_COLOR						= "tag_view.tag.color";						//$NON-NLS-1$
-	public static final String	TAG_VIEW_SUB_TAG_COLOR					= "tag_view.sub_tag.color";					//$NON-NLS-1$
-	public static final String	TAG_VIEW_SUB_SUB_TAG_COLOR				= "tag_view.sub_sub_tag.color";				//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_COLOR_CATEGORY				= "view.layout.color.category";				//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_COLOR_TITLE					= "view.layout.color.title";					//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_COLOR_SUB					= "view.layout.color.sub";						//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_COLOR_SUB_SUB				= "view.layout.color.sub-sub";					//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_COLOR_TOUR					= "view.layout.color.tour";					//$NON-NLS-1$
 
 	/*
 	 * id's for preference pages

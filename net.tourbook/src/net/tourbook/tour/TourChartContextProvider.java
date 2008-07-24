@@ -173,6 +173,7 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 	 * enable actions for the tour editor
 	 */
 	private void enableActions() {
+		
 		final TourChart tourChart = fTourEditor.getTourChart();
 		final TourData tourData = tourChart.getTourData();
 

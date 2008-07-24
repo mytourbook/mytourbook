@@ -29,7 +29,6 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
-import net.tourbook.tag.TagCollection;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
@@ -38,6 +37,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
+import net.tourbook.ui.ActionCollapseOthers;
 import net.tourbook.ui.ActionEditTour;
 import net.tourbook.ui.ActionExpandSelection;
 import net.tourbook.ui.ActionModifyColumns;
@@ -128,6 +128,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	private ActionSetTourTag		fActionAddTag;
 	private ActionCollapseAll		fActionCollapseAll;
+	private ActionCollapseOthers	fActionCollapseOthers;
 	private ActionDeleteTour		fActionDeleteTour;
 	private ActionEditTour			fActionEditTour;
 	private ActionExpandSelection	fActionExpandSelection;
@@ -267,10 +268,10 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 					recreateViewer();
 
-				} else if (property.equals(ITourbookPreferences.TAG_COLOR_AND_LAYOUT_CHANGED)) {
+				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 					fTourViewer.getTree()
-							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					fTourViewer.refresh();
 
@@ -335,6 +336,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fActionEditTour = new ActionEditTour(this);
 		fActionDeleteTour = new ActionDeleteTour(this);
 		fActionSetTourType = new ActionSetTourType(this);
+
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
@@ -344,6 +346,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		fActionExpandSelection = new ActionExpandSelection(this);
 		fActionCollapseAll = new ActionCollapseAll(this);
+		fActionCollapseOthers = new ActionCollapseOthers(this);
 
 		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
@@ -414,7 +417,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(TourbookPlugin.getDefault()
 				.getPluginPreferences()
-				.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTourViewer = new TreeViewer(tree);
 		fColumnManager.createColumns();
@@ -532,9 +535,9 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 					styledString.append("   " + tourItem.colCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 
 					if (tourItem instanceof TVITourBookMonth) {
-						cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_SUB_COLOR));
+						cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
 					} else {
-						cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_COLOR));
+						cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB));
 					}
 					cell.setText(styledString.getString());
 					cell.setStyleRanges(styledString.getStyleRanges());
@@ -559,17 +562,34 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		});
 
 		/*
-		 * column: distance (km/miles)
+		 * column: title
 		 */
-		colDef = TreeColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
-				final TVITourBookItem tourItem = (TVITourBookItem) element;
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(((float) tourItem.colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+				if (element instanceof TVITourBookTour) {
+					cell.setText(((TVITourBookTour) element).fTourTitle);
+
+					setCellColor(cell, element);
+				}
+			}
+		});
+
+		/*
+		 * column: tags
+		 */
+		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+					cell.setText(TourDatabase.getTagNames(((TVITourBookTour) element).fTagIds));
+
+					setCellColor(cell, element);
+				}
 			}
 		});
 
@@ -587,6 +607,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 				cell.setText(new Formatter().format(Messages.Format_hhmm,
 						(recordingTime / 3600),
 						((recordingTime % 3600) / 60)).toString());
+
+				setCellColor(cell, element);
 			}
 		});
 
@@ -604,6 +626,25 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 				cell.setText(new Formatter().format(Messages.Format_hhmm,
 						(drivingTime / 3600),
 						((drivingTime % 3600) / 60)).toString());
+
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: distance (km/miles)
+		 */
+		colDef = TreeColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				final TVITourBookItem tourItem = (TVITourBookItem) element;
+				fNF.setMinimumFractionDigits(1);
+				fNF.setMaximumFractionDigits(1);
+				cell.setText(fNF.format(((float) tourItem.colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
+
+				setCellColor(cell, element);
 			}
 		});
 
@@ -614,36 +655,159 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final Object element = cell.getElement();
 				final TVITourBookItem tourItem = (TVITourBookItem) element;
 				cell.setText(Long.toString((long) (tourItem.colAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
+
+				setCellColor(cell, element);
 			}
 		});
 
 		/*
-		 * column: title
+		 * column: altitude down (m)
 		 */
-		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final Object element = cell.getElement();
-				if (element instanceof TVITourBookTour) {
-					cell.setText(((TVITourBookTour) element).fTourTitle);
+
+				cell.setText(Long.toString((long) (((TVITourBookItem) element).colAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: max altitude
+		 */
+		colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				cell.setText(Long.toString((long) (((TVITourBookItem) element).colMaxAltitude / UI.UNIT_VALUE_ALTITUDE)));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: max speed
+		 */
+		colDef = TreeColumnFactory.MAX_SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				fNF.setMinimumFractionDigits(1);
+				fNF.setMaximumFractionDigits(1);
+
+				cell.setText(fNF.format(((TVITourBookItem) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: avg speed km/h - mph
+		 */
+		colDef = TreeColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				fNF.setMinimumFractionDigits(1);
+				fNF.setMaximumFractionDigits(1);
+
+				cell.setText(fNF.format(((TVITourBookItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: max pulse
+		 */
+		colDef = TreeColumnFactory.MAX_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				cell.setText(Long.toString(((TVITourBookItem) element).colMaxPulse));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: avg pulse
+		 */
+		colDef = TreeColumnFactory.AVG_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				cell.setText(Long.toString(((TVITourBookItem) element).colAvgPulse));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: avg cadence
+		 */
+		colDef = TreeColumnFactory.AVG_CADENCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				cell.setText(Long.toString(((TVITourBookItem) element).colAvgCadence));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
+		 * column: avg temperature
+		 */
+		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				long temperature = ((TVITourBookItem) element).colAvgTemperature;
+
+				if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+					temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
 				}
+
+				cell.setText(Long.toString(temperature));
+				setCellColor(cell, element);
 			}
 		});
 
 		/*
-		 * column: tags
+		 * column: timeinterval
 		 */
-		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
-					cell.setText(TourDatabase.getTagNames(((TVITourBookTour) element).fTagIds));
+
+					cell.setText(Long.toString(((TVITourBookTour) element).getColumnTimeInterval()));
+					setCellColor(cell, element);
 				}
 			}
 		});
@@ -657,103 +821,10 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
+
 					cell.setText(Long.toString((long) (((TVITourBookTour) element).getColumnStartDistance() / UI.UNIT_VALUE_DISTANCE)));
+					setCellColor(cell, element);
 				}
-			}
-		});
-
-		colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVITourBookTour) {
-					cell.setText(Long.toString(((TVITourBookTour) element).getColumnTimeInterval()));
-				}
-			}
-		});
-
-		colDef = TreeColumnFactory.MAX_SPEED.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				final TVITourBookItem tourItem = (TVITourBookItem) element;
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(tourItem.colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
-			}
-		});
-
-		/*
-		 * column: speed km/h - mph
-		 */
-		colDef = TreeColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				final TVITourBookItem tourItem = (TVITourBookItem) element;
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(tourItem.colAvgSpeed / UI.UNIT_VALUE_DISTANCE));
-			}
-		});
-
-		colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				final TVITourBookItem tourItem = (TVITourBookItem) element;
-				cell.setText(Long.toString((long) (tourItem.colMaxAltitude / UI.UNIT_VALUE_ALTITUDE)));
-			}
-		});
-
-		colDef = TreeColumnFactory.MAX_PULSE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				final TVITourBookItem tourItem = (TVITourBookItem) element;
-				cell.setText(Long.toString(tourItem.colMaxPulse));
-			}
-		});
-
-		colDef = TreeColumnFactory.AVG_PULSE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				final TVITourBookItem tourItem = (TVITourBookItem) element;
-				cell.setText(Long.toString(tourItem.colAvgPulse));
-			}
-		});
-
-		colDef = TreeColumnFactory.AVG_CADENCE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				final TVITourBookItem tourItem = (TVITourBookItem) element;
-				cell.setText(Long.toString(tourItem.colAvgCadence));
-			}
-		});
-
-		colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				final TVITourBookItem tourItem = (TVITourBookItem) element;
-
-				long temperature = tourItem.colAvgTemperature;
-
-				if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-					temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
-				}
-				cell.setText(Long.toString(temperature));
 			}
 		});
 	}
@@ -770,24 +841,54 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		super.dispose();
 	}
 
-	@SuppressWarnings("unchecked")
 	private void enableActions() {
 
 		final ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
 
-		// get number of selected tour items
+//		// get number of selected tour items
+//		int tourItems = 0;
+//		TVITourBookTour firstTour = null;
+//		for (final Iterator iter = selection.iterator(); iter.hasNext();) {
+//			final Object treeItem = iter.next();
+//			if (treeItem instanceof TVITourBookTour) {
+//				if (tourItems == 0) {
+//					firstTour = (TVITourBookTour) treeItem;
+//				}
+//				tourItems++;
+//			}
+//		}
+//		final boolean isTourSelected = tourItems > 0;
+
+		/*
+		 * count number of selected items
+		 */
 		int tourItems = 0;
+		int items = 0;
+		int otherItems = 0;
 		TVITourBookTour firstTour = null;
-		for (final Iterator iter = selection.iterator(); iter.hasNext();) {
+
+		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 			final Object treeItem = iter.next();
 			if (treeItem instanceof TVITourBookTour) {
 				if (tourItems == 0) {
 					firstTour = (TVITourBookTour) treeItem;
 				}
 				tourItems++;
+			} else {
+				otherItems++;
 			}
+			items++;
 		}
+
+		final int selectedItems = selection.size();
 		final boolean isTourSelected = tourItems > 0;
+
+		final TVITourBookItem firstElement = (TVITourBookItem) selection.getFirstElement();
+		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
+
+		/*
+		 * enable actions
+		 */
 
 		fActionEditTour.setEnabled(tourItems == 1);
 		fActionEditQuick.setEnabled(tourItems == 1);
@@ -803,9 +904,9 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
 		// add tag
-		final TagCollection rootTags = TourDatabase.getRootTags();
-		fActionAddTag.setEnabled(isTourSelected && rootTags.tourTags.size() > 0);
+		fActionAddTag.setEnabled(isTourSelected);
 
+		// remove tags
 		if (firstTour != null && tourItems == 1) {
 
 			// one tour is selected
@@ -832,6 +933,12 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		fActionExpandSelection.setEnabled(selection.size() == 0 ? false : true);
 
+		fActionExpandSelection.setEnabled(firstElement == null ? false : //
+				selectedItems == 1 ? firstElementHasChildren : //
+						true);
+
+		fActionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
+
 		// enable/disable actions for the recent tags
 		TagManager.enableRecentTagActions(isTourSelected);
 	}
@@ -857,6 +964,11 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
+		menuMgr.add(fActionCollapseOthers);
+		menuMgr.add(fActionExpandSelection);
+		menuMgr.add(fActionCollapseAll);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionEditTour);
@@ -1069,9 +1181,11 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private void setCellColor(final ViewerCell cell, final Object element) {
 
 		if (element instanceof TVITourBookYear) {
-			cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_COLOR));
+			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB));
 		} else if (element instanceof TVITourBookMonth) {
-			cell.setForeground(JFaceResources.getColorRegistry().get(UI.TAG_SUB_SUB_COLOR));
+			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
+		} else if (element instanceof TVITourBookTour) {
+			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
 		}
 	}
 

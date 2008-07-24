@@ -57,17 +57,21 @@ public class ColumnModifyDialog extends TrayDialog {
 	private Button						fBtnMoveDown;
 	private Button						fBtnSelectAll;
 	private Button						fBtnDeselectAll;
+	private Button						fBtnDefault;
 
-	private ArrayList<ColumnDefinition>	fAllColumns;
+	private ArrayList<ColumnDefinition>	fCustomColumns;
+	private ArrayList<ColumnDefinition>	fDefaultColumns;
 
 	public ColumnModifyDialog(	final Shell parentShell,
 								final ColumnManager columnManager,
-								final ArrayList<ColumnDefinition> allDialogColumns) {
+								final ArrayList<ColumnDefinition> customColumns,
+								final ArrayList<ColumnDefinition> defaultColumns) {
 
 		super(parentShell);
 
 		fColumnManager = columnManager;
-		fAllColumns = allDialogColumns;
+		fCustomColumns = customColumns;
+		fDefaultColumns = defaultColumns;
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -79,86 +83,10 @@ public class ColumnModifyDialog extends TrayDialog {
 		newShell.setText(Messages.ColumnModifyDialog_Dialog_title);
 	}
 
-	private void createButtons(final Composite parent) {
-
-		final Composite btnContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(btnContainer);
-		GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).applyTo(btnContainer);
-//		btnContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-
-		fBtnMoveUp = new Button(btnContainer, SWT.NONE);
-		fBtnMoveUp.setText(Messages.ColumnModifyDialog_Button_move_up);
-		fBtnMoveUp.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				moveSelectionUp();
-				enableUpDownButtons();
-			}
-		});
-		setButtonLayoutData(fBtnMoveUp);
-
-		fBtnMoveDown = new Button(btnContainer, SWT.NONE);
-		fBtnMoveDown.setText(Messages.ColumnModifyDialog_Button_move_down);
-		fBtnMoveDown.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				moveSelectionDown();
-				enableUpDownButtons();
-			}
-		});
-		setButtonLayoutData(fBtnMoveDown);
-
-		// spacer
-		new Label(btnContainer, SWT.NONE);
-
-		fBtnSelectAll = new Button(btnContainer, SWT.NONE);
-		fBtnSelectAll.setText(Messages.ColumnModifyDialog_Button_select_all);
-		fBtnSelectAll.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-
-				// update model
-				for (final ColumnDefinition colDef : fAllColumns) {
-					colDef.setIsVisibleInDialog(true);
-				}
-
-				// update viewer
-				fColumnViewer.setAllChecked(true);
-			}
-		});
-		setButtonLayoutData(fBtnSelectAll);
-
-		fBtnDeselectAll = new Button(btnContainer, SWT.NONE);
-		fBtnDeselectAll.setText(Messages.ColumnModifyDialog_Button_deselect_all);
-		fBtnDeselectAll.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-
-				// list with all columns which must be checked
-				final ArrayList<ColumnDefinition> checkedElements = new ArrayList<ColumnDefinition>();
-
-				// update model
-				for (final ColumnDefinition colDef : fAllColumns) {
-					if (colDef.canModifyVisibility() == false) {
-						checkedElements.add(colDef);
-						colDef.setIsVisibleInDialog(true);
-					} else {
-						colDef.setIsVisibleInDialog(false);
-					}
-				}
-
-				// update viewer
-				fColumnViewer.setCheckedElements(checkedElements.toArray());
-			}
-		});
-		setButtonLayoutData(fBtnDeselectAll);
-	}
-
 	private void createColumnsViewer(final Composite parent) {
 
 		final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tableLayouter);
-//		tableLayouter.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		/*
 		 * create table
@@ -189,7 +117,7 @@ public class ColumnModifyDialog extends TrayDialog {
 			public void dispose() {}
 
 			public Object[] getElements(final Object inputElement) {
-				return fAllColumns.toArray();
+				return fCustomColumns.toArray();
 			}
 
 			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
@@ -230,19 +158,7 @@ public class ColumnModifyDialog extends TrayDialog {
 
 		createUI(dlgAreaContainer);
 
-		// load columns into the viewer
-		fColumnViewer.setInput(this);
-
-		// check columns which are visible
-		final ArrayList<ColumnDefinition> visibleColumns = new ArrayList<ColumnDefinition>();
-		for (final ColumnDefinition colDef : fAllColumns) {
-			if (colDef.isVisibleInDialog()) {
-				visibleColumns.add(colDef);
-			}
-		}
-		fColumnViewer.setCheckedElements(visibleColumns.toArray());
-
-		enableUpDownButtons();
+		setupColumnsInViewer(fCustomColumns);
 
 		return dlgAreaContainer;
 	}
@@ -258,14 +174,139 @@ public class ColumnModifyDialog extends TrayDialog {
 		final Composite dlgContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(dlgContainer);
 		GridLayoutFactory.swtDefaults().numColumns(2).margins(0, 0).applyTo(dlgContainer);
-//		dlgContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		createColumnsViewer(dlgContainer);
-		createButtons(dlgContainer);
+		createUIButtons(dlgContainer);
 
 		label = new Label(parent, SWT.WRAP);
 		label.setText(Messages.ColumnModifyDialog_Label_hint);
 		GridDataFactory.swtDefaults().grab(true, false).applyTo(label);
+	}
+
+	private void createUIButtons(final Composite parent) {
+
+		final Composite btnContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(btnContainer);
+		GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).applyTo(btnContainer);
+//		btnContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+
+		fBtnMoveUp = new Button(btnContainer, SWT.NONE);
+		fBtnMoveUp.setText(Messages.ColumnModifyDialog_Button_move_up);
+		fBtnMoveUp.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				moveSelectionUp();
+				enableUpDownButtons();
+			}
+		});
+		setButtonLayoutData(fBtnMoveUp);
+
+		fBtnMoveDown = new Button(btnContainer, SWT.NONE);
+		fBtnMoveDown.setText(Messages.ColumnModifyDialog_Button_move_down);
+		fBtnMoveDown.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				moveSelectionDown();
+				enableUpDownButtons();
+			}
+		});
+		setButtonLayoutData(fBtnMoveDown);
+
+		// spacer
+		new Label(btnContainer, SWT.NONE);
+
+		fBtnSelectAll = new Button(btnContainer, SWT.NONE);
+		fBtnSelectAll.setText(Messages.ColumnModifyDialog_Button_select_all);
+		fBtnSelectAll.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+
+				// update model
+				for (final ColumnDefinition colDef : fCustomColumns) {
+					colDef.setIsVisibleInDialog(true);
+				}
+
+				// update viewer
+				fColumnViewer.setAllChecked(true);
+			}
+		});
+		setButtonLayoutData(fBtnSelectAll);
+
+		fBtnDeselectAll = new Button(btnContainer, SWT.NONE);
+		fBtnDeselectAll.setText(Messages.ColumnModifyDialog_Button_deselect_all);
+		fBtnDeselectAll.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+
+				// list with all columns which must be checked
+				final ArrayList<ColumnDefinition> checkedElements = new ArrayList<ColumnDefinition>();
+
+				// update model
+				for (final ColumnDefinition colDef : fCustomColumns) {
+					if (colDef.canModifyVisibility() == false) {
+						checkedElements.add(colDef);
+						colDef.setIsVisibleInDialog(true);
+					} else {
+						colDef.setIsVisibleInDialog(false);
+					}
+				}
+
+				// update viewer
+				fColumnViewer.setCheckedElements(checkedElements.toArray());
+			}
+		});
+		setButtonLayoutData(fBtnDeselectAll);
+
+		// spacer
+		new Label(btnContainer, SWT.NONE);
+
+		fBtnDefault = new Button(btnContainer, SWT.NONE);
+		fBtnDefault.setText(Messages.ColumnModifyDialog_Button_default);
+		fBtnDefault.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+
+				/*
+				 * copy default columns into the custom columns
+				 */
+
+				fCustomColumns = new ArrayList<ColumnDefinition>();
+
+				for (final ColumnDefinition defaultColumn : fDefaultColumns) {
+					try {
+
+						final ColumnDefinition columnDefinitionClone = (ColumnDefinition) defaultColumn.clone();
+
+						/*
+						 * visible columns in the dialog will be checked, here we set these columns
+						 * checked which visibility cannot be modified by the user
+						 */
+						final boolean canModifyVisibility = columnDefinitionClone.canModifyVisibility();
+						columnDefinitionClone.setIsVisibleInDialog(canModifyVisibility == false);
+
+						
+//						
+//						
+//						if (colDef.canModifyVisibility() == false) {
+//							checkedElements.add(colDef);
+//							colDef.setIsVisibleInDialog(true);
+//						} else {
+//							colDef.setIsVisibleInDialog(false);
+//						}
+//						
+						
+						fCustomColumns.add(columnDefinitionClone);
+
+					} catch (final CloneNotSupportedException e) {
+						e.printStackTrace();
+					}
+				}
+
+				setupColumnsInViewer(fCustomColumns);
+			}
+		});
+		setButtonLayoutData(fBtnDefault);
+
 	}
 
 	/**
@@ -358,6 +399,24 @@ public class ColumnModifyDialog extends TrayDialog {
 		fColumnManager.updateColumns(fColumnViewer.getTable().getItems());
 
 		super.okPressed();
+	}
+
+	private void setupColumnsInViewer(final ArrayList<ColumnDefinition> columnDefinitions) {
+
+		// load columns into the viewer
+		fColumnViewer.setInput(this);
+
+		// check columns which are visible
+		final ArrayList<ColumnDefinition> checkedColumns = new ArrayList<ColumnDefinition>();
+
+		for (final ColumnDefinition colDef : columnDefinitions) {
+			if (colDef.isVisibleInDialog()) {
+				checkedColumns.add(colDef);
+			}
+		}
+		fColumnViewer.setCheckedElements(checkedColumns.toArray());
+
+		enableUpDownButtons();
 	}
 
 }

@@ -48,8 +48,8 @@ public abstract class TreeViewerItem {
 	public void clearChildren() {
 		if (fChildren != null) {
 			fChildren.clear();
+			fChildren = null;
 		}
-		fChildren = null;
 	}
 
 	/**

@@ -18,7 +18,7 @@ package net.tourbook.ui;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.swt.events.SelectionAdapter;
 
-public class ColumnDefinition {
+public class ColumnDefinition implements Cloneable {
 
 	/**
 	 * visible name in the modify dialog
@@ -42,15 +42,16 @@ public class ColumnDefinition {
 	private boolean				fCanModifyVisibility	= true;
 
 	protected int				fStyle;
+
 	private CellLabelProvider	fCellLabelProvider;
 	private String				fColumnText;
 	private String				fColumnToolTipText;
 	private int					fColumnWidth;
-
 	private boolean				fIsColumnResizable		= true;
-	private boolean				fIsColumnMoveable		= true;
 
+	private boolean				fIsColumnMoveable		= true;
 	private SelectionAdapter	fColumnSelectionListener;
+
 	private int					fCreateIndex;
 
 	public void addSelectionListener(final SelectionAdapter selectionAdapter) {
@@ -62,6 +63,54 @@ public class ColumnDefinition {
 	 */
 	public boolean canModifyVisibility() {
 		return fCanModifyVisibility;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+
+		final ColumnDefinition clone = (ColumnDefinition) super.clone();
+
+		clone.fLabel = fLabel;
+		clone.fColumnId = fColumnId;
+		clone.fIsVisibleInDialog = fIsVisibleInDialog;
+		clone.fCanModifyVisibility = fCanModifyVisibility;
+
+		clone.fStyle = fStyle;
+
+		clone.fCellLabelProvider = fCellLabelProvider;
+		clone.fColumnText = fColumnText;
+		clone.fColumnToolTipText = fColumnToolTipText;
+		clone.fColumnWidth = fColumnWidth;
+		clone.fIsColumnResizable = fIsColumnResizable;
+
+		clone.fIsColumnMoveable = fIsColumnMoveable;
+		clone.fColumnSelectionListener = fColumnSelectionListener;
+
+		clone.fCreateIndex = fCreateIndex;
+
+		return clone;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof ColumnDefinition)) {
+			return false;
+		}
+		final ColumnDefinition other = (ColumnDefinition) obj;
+		if (fColumnId == null) {
+			if (other.fColumnId != null) {
+				return false;
+			}
+		} else if (!fColumnId.equals(other.fColumnId)) {
+			return false;
+		}
+		return true;
 	}
 
 	public CellLabelProvider getCellLabelProvider() {
@@ -98,6 +147,14 @@ public class ColumnDefinition {
 
 	public int getCreateIndex() {
 		return fCreateIndex;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((fColumnId == null) ? 0 : fColumnId.hashCode());
+		return result;
 	}
 
 	public boolean isColumnMoveable() {

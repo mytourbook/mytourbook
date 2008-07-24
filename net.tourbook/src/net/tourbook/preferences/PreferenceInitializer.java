@@ -118,21 +118,25 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * view colors
 		 */
 		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.TAG_VIEW_TAG_CATEGORY_COLOR,
+				ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY,
 				new RGB(0xF2, 0x5B, 0x00));
 
 		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.TAG_VIEW_TAG_COLOR,
+				ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE,
 				new RGB(0x00, 0x6F, 0xDD));
 
 		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.TAG_VIEW_SUB_TAG_COLOR,
+				ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB,
 				new RGB(0xF2, 0x5B, 0x00));
 
 		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.TAG_VIEW_SUB_SUB_TAG_COLOR,
+				ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB,
 				new RGB(0x00, 0x6F, 0xDD));
 
-		store.setDefault(ITourbookPreferences.TAG_VIEW_SHOW_LINES, false);
+		PreferenceConverter.setDefault(store, //
+				ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR,
+				new RGB(0x00, 0x00, 0x00));
+
+		store.setDefault(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES, false);
 	}
 }

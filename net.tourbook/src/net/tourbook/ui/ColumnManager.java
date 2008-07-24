@@ -74,6 +74,13 @@ public class ColumnManager {
 	}
 
 	/**
+	 * Removes all defined columns
+	 */
+	public void clearColumns() {
+		fAllColumnDefinitions.clear();
+	}
+
+	/**
 	 * Create columns for all defined columns
 	 */
 	public void createColumns() {
@@ -372,16 +379,9 @@ public class ColumnManager {
 
 	public void openColumnDialog() {
 
-		final ArrayList<ColumnDefinition> allColumns = createModifyDialogColumns();
+		final ArrayList<ColumnDefinition> customColumns = createModifyDialogColumns();
 
-		(new ColumnModifyDialog(Display.getCurrent().getActiveShell(), this, allColumns)).open();
-	}
-
-	/**
-	 * Removes all defined columns
-	 */
-	public void clearColumns() {
-		fAllColumnDefinitions.clear();
+		(new ColumnModifyDialog(Display.getCurrent().getActiveShell(), this, customColumns, fAllColumnDefinitions)).open();
 	}
 
 	/**

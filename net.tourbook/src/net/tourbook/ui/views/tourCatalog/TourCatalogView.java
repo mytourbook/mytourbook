@@ -391,10 +391,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 					// update tourbook viewer
 					fTourViewer.refresh();
 
-				} else if (property.equals(ITourbookPreferences.TAG_COLOR_AND_LAYOUT_CHANGED)) {
+				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 					fTourViewer.getTree()
-							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+							.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 					fTourViewer.refresh();
 
@@ -509,7 +509,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(TourbookPlugin.getDefault()
 				.getPluginPreferences()
-				.getBoolean(ITourbookPreferences.TAG_VIEW_SHOW_LINES));
+				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTourViewer = new TreeViewer(tree);
 		fColumnManager.createColumns();

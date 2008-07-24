@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.preferences;
 
 import net.tourbook.Messages;
@@ -46,31 +45,37 @@ public class PrefPageViewColors extends FieldEditorPreferencePage implements IWo
 
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(parent);
 		GridLayoutFactory.fillDefaults().applyTo(parent);
-//		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		final Group colorGroup = new Group(parent, SWT.NONE);
-		colorGroup.setText(Messages.pref_tag_label_color_group);
+		colorGroup.setText(Messages.pref_view_layout_label_color_group);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(colorGroup);
 
 		// color: tag category
-		addField(new ColorFieldEditor(ITourbookPreferences.TAG_VIEW_TAG_CATEGORY_COLOR,
-				Messages.pref_tag_color_tag_category,
+		addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY,
+				Messages.pref_view_layout_label_category,
 				colorGroup));
 
 		// color: tag 
-		addField(new ColorFieldEditor(ITourbookPreferences.TAG_VIEW_TAG_COLOR, //
-				Messages.pref_tag_color_tag,
+		addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE, //
+				Messages.pref_view_layout_label_title,
 				colorGroup));
 
 		// color: sub tag (year)
-		addField(new ColorFieldEditor(ITourbookPreferences.TAG_VIEW_SUB_TAG_COLOR,
-				Messages.pref_tag_color_sub_tag,
+		addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB,
+				Messages.pref_view_layout_label_sub,
 				colorGroup));
 
 		// color: sub sub tag (month)
-		addField(new ColorFieldEditor(ITourbookPreferences.TAG_VIEW_SUB_SUB_TAG_COLOR,
-				Messages.pref_tag_color_sub_sub_tag,
+		addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB,
+				Messages.pref_view_layout_label_sub_sub,
 				colorGroup));
+
+// THIS IS CURRENTLY DISABLED
+//		
+//		// color: tour 
+//		addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR, //
+//				Messages.pref_view_layout_label_tour,
+//				colorGroup));
 
 		final GridLayout gl = (GridLayout) colorGroup.getLayout();
 		gl.marginHeight = 5;
@@ -80,8 +85,8 @@ public class PrefPageViewColors extends FieldEditorPreferencePage implements IWo
 		GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(container);
 
 		// show lines
-		addField(new BooleanFieldEditor(ITourbookPreferences.TAG_VIEW_SHOW_LINES,
-				Messages.pref_tag_show_lines,
+		addField(new BooleanFieldEditor(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES,
+				Messages.pref_view_layout_display_lines,
 				container));
 	}
 
@@ -94,7 +99,7 @@ public class PrefPageViewColors extends FieldEditorPreferencePage implements IWo
 			UI.setTagColorsFromPrefStore();
 
 			// fire one event for all modified colors
-			getPreferenceStore().setValue(ITourbookPreferences.TAG_COLOR_AND_LAYOUT_CHANGED, Math.random());
+			getPreferenceStore().setValue(ITourbookPreferences.VIEW_LAYOUT_CHANGED, Math.random());
 		}
 	}
 
