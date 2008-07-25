@@ -496,8 +496,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.FULL_SELECTION | SWT.MULTI);
 
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		tree.setHeaderVisible(true);
 
+		tree.setHeaderVisible(true);
 		tree.setLinesVisible(TourbookPlugin.getDefault()
 				.getPluginPreferences()
 				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -933,7 +933,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		int items = 0;
 		int otherItems = 0;
 		TVITagViewTour firstTour = null;
-		
+
 		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 			final Object treeItem = iter.next();
 			if (treeItem instanceof TVITagViewTour) {
@@ -951,11 +951,11 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 			items++;
 		}
 
-		final int selectedItems = selection.size();
 		final boolean isTourSelected = tourItems > 0;
 		final boolean isTagSelected = tagItems > 0 && tourItems == 0 && categoryItems == 0 && otherItems == 0;
 		final boolean isCategorySelected = categoryItems > 0 && tourItems == 0 && tagItems == 0 && otherItems == 0;
 
+		final int selectedItems = selection.size();
 		final TVITagViewItem firstElement = (TVITagViewItem) selection.getFirstElement();
 		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
 
@@ -1371,10 +1371,10 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		for (final Object object : parentChildren) {
 			if (object instanceof TreeViewerItem) {
 
-				final TreeViewerItem treeChildItem = (TreeViewerItem) object;
-				if (treeChildItem instanceof TVITagViewTour) {
+				final TreeViewerItem childItem = (TreeViewerItem) object;
+				if (childItem instanceof TVITagViewTour) {
 
-					final TVITagViewTour tourItem = (TVITagViewTour) treeChildItem;
+					final TVITagViewTour tourItem = (TVITagViewTour) childItem;
 					final long tourItemId = tourItem.getTourId();
 
 					// loop: all deleted tour id's
@@ -1390,7 +1390,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 				} else {
 					// update children
-					updateViewerAfterTourIsDeleted(treeChildItem, deletedTourIds);
+					updateViewerAfterTourIsDeleted(childItem, deletedTourIds);
 				}
 			}
 		}

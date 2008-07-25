@@ -284,17 +284,6 @@ public class ColumnModifyDialog extends TrayDialog {
 						final boolean canModifyVisibility = columnDefinitionClone.canModifyVisibility();
 						columnDefinitionClone.setIsVisibleInDialog(canModifyVisibility == false);
 
-						
-//						
-//						
-//						if (colDef.canModifyVisibility() == false) {
-//							checkedElements.add(colDef);
-//							colDef.setIsVisibleInDialog(true);
-//						} else {
-//							colDef.setIsVisibleInDialog(false);
-//						}
-//						
-						
 						fCustomColumns.add(columnDefinitionClone);
 
 					} catch (final CloneNotSupportedException e) {

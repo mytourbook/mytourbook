@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import net.tourbook.data.TourCompared;
 import net.tourbook.tour.TVICatalogTourItem;
+import net.tourbook.tour.TreeViewerItem;
 
 /**
  * Represents a compared tour (tree item) in the tour map viewer
@@ -125,7 +126,10 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 	public void remove() {
 
 		// remove this tour item from the parent
-		getParentItem().getUnfetchedChildren().remove(this);
+		final ArrayList<TreeViewerItem> unfetchedChildren = getParentItem().getUnfetchedChildren();
+		if (unfetchedChildren != null) {
+			unfetchedChildren.remove(this);
+		}
 	}
 
 	void setEndIndex(final int endIndex) {

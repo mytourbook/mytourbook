@@ -443,7 +443,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 			// select tour in the statistic
 			final Long compTourId = tourCatalogItem.getCompTourId();
-			if (compTourId == null) {
+			if (compTourId == null && fAllTours != null) {
 
 				// select first tour for the youngest year
 				int yearIndex = 0;
@@ -455,7 +455,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 					yearIndex++;
 				}
 
-				if (fAllTours != null && fAllTours.size() > 0 && fAllTours.size() >= yearIndex) {
+				if (fAllTours.size() > 0 && fAllTours.size() >= yearIndex) {
 					selectTourInYearStatistic(fAllTours.get(yearIndex).getTourId());
 				}
 
@@ -478,8 +478,8 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 				if (firstElement instanceof TVICatalogComparedTour) {
 
 					final TVICatalogComparedTour compareItem = (TVICatalogComparedTour) firstElement;
-					final TVICatalogYearItem yearItem = (TVICatalogYearItem) compareItem.getParentItem();
-
+//					final TVICatalogYearItem yearItem = (TVICatalogYearItem) compareItem.getParentItem();
+//
 //					// show year statistic
 //					if (yearItem != fCurrentYearItem) {
 //						fCurrentYearItem = yearItem;

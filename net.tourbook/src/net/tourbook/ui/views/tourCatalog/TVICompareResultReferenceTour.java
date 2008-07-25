@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,17 +15,11 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.data.TourReference;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
-import net.tourbook.ui.UI;
 
 /**
  * contains tree viewer items (TVI) for reference tours
@@ -42,23 +36,6 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 	 * keeps the tourId's for all compared tours which have already been stored in the db
 	 */
 	private HashMap<Long, StoredComparedTour>	fStoredComparedTours;
-
-	private class StoredComparedTour {
-
-		long			comparedId;
-
-		private int		startIndex;
-		private int		endIndex;
-
-		private float	tourSpeed;
-
-//		public StoredComparedTour(final long compareId, final int startIndex, final int endIndex, final float speed) {
-//			this.comparedId = compareId;
-//			this.startIndex = startIndex;
-//			this.endIndex = endIndex;
-//			this.tourSpeed = speed;
-//		}
-	}
 
 	public TVICompareResultReferenceTour(	final TVICompareResultRootItem parentItem,
 											final String label,
@@ -100,50 +77,11 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
-		fStoredComparedTours = new HashMap<Long, StoredComparedTour>();
-
-		final TVICompareResultComparedTour[] comparedTours = TourCompareManager.getInstance().getComparedTours();
-
 		final long refId = refTour.getRefId();
 
-		final StringBuilder sb = new StringBuilder();
+		fStoredComparedTours = TourCompareManager.getComparedToursFromDb(refId);
 
-		sb.append("SELECT"); //$NON-NLS-1$
-
-		sb.append(" tourId,"); //		1 //$NON-NLS-1$
-		sb.append(" comparedId,"); //	2 //$NON-NLS-1$
-		sb.append(" startIndex,"); //	3 //$NON-NLS-1$
-		sb.append(" endIndex,"); //		4 //$NON-NLS-1$
-		sb.append(" tourSpeed"); //		5	 //$NON-NLS-1$
-
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
-		sb.append(" WHERE refTourId=?"); //$NON-NLS-1$
-
-		try {
-
-			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setLong(1, refId);
-
-			final ResultSet result = statement.executeQuery();
-			while (result.next()) {
-
-				final StoredComparedTour storedComparedTour = new StoredComparedTour();
-
-				final long dbTourId = result.getLong(1);
-				storedComparedTour.comparedId = result.getLong(2);
-				storedComparedTour.startIndex = result.getInt(3);
-				storedComparedTour.endIndex = result.getInt(4);
-				storedComparedTour.tourSpeed = result.getFloat(5);
-
-				fStoredComparedTours.put(dbTourId, storedComparedTour);
-			}
-
-			conn.close();
-
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		}
+		final TVICompareResultComparedTour[] comparedTours = TourCompareManager.getInstance().getComparedTours();
 
 		// create children for one reference tour
 		for (final TVICompareResultComparedTour compTour : comparedTours) {
@@ -177,6 +115,8 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 		}
 
 	}
+
+	
 
 	@Override
 	public int hashCode() {

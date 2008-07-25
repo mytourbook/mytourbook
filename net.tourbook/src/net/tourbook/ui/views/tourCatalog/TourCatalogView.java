@@ -37,7 +37,9 @@ import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
+import net.tourbook.ui.ActionCollapseOthers;
 import net.tourbook.ui.ActionEditTour;
+import net.tourbook.ui.ActionExpandSelection;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionRefreshView;
@@ -58,7 +60,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -77,6 +78,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -126,6 +128,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 	private ActionRenameRefTour			fActionRenameRefTour;
 	private ActionLinkTour				fActionLinkTour;
 	private ActionCollapseAll			fActionCollapseAll;
+	private ActionCollapseOthers		fActionCollapseOthers;
+	private ActionExpandSelection		fActionExpandSelection;
 	private ActionRefreshView			fActionRefreshView;
 	private ActionModifyColumns			fActionModifyColumns;
 	private ActionEditQuick				fActionEditQuick;
@@ -436,8 +440,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		fActionRenameRefTour = new ActionRenameRefTour(this);
 		fActionLinkTour = new ActionLinkTour(this);
 		fActionRefreshView = new ActionRefreshView(this);
-		fActionCollapseAll = new ActionCollapseAll(this);
 		fActionModifyColumns = new ActionModifyColumns(this);
+
+		fActionCollapseOthers = new ActionCollapseOthers(this);
+		fActionExpandSelection = new ActionExpandSelection(this);
+		fActionCollapseAll = new ActionCollapseAll(this);
 
 		fActionEditQuick = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(this);
@@ -502,9 +509,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 	private void createTourViewer(final Composite parent) {
 
 		// tour tree
-		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.MULTI | SWT.FULL_SELECTION);
 
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
+//		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
+		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(TourbookPlugin.getDefault()
@@ -693,7 +701,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		int tourItems = 0;
 		TVICatalogComparedTour firstTourItem = null;
 
-		// count how many different items are selected
+		// count number of items
 		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 
 			final Object treeItem = iter.next();
@@ -709,8 +717,13 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 				yearItems++;
 			}
 		}
+
 		final boolean isTourSelected = tourItems > 0 && refItems == 0 && yearItems == 0;
 		final boolean isOneTour = tourItems == 1 && refItems == 0 && yearItems == 0;
+
+		final int selectedItems = selection.size();
+		final TreeViewerItem firstElement = (TreeViewerItem) selection.getFirstElement();
+		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
 
 		fActionRemoveComparedTours.setEnabled(isOneTour);
 
@@ -757,13 +770,29 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 			fActionRemoveTag.setEnabled(isTourSelected);
 			fActionRemoveAllTags.setEnabled(isTourSelected);
 		}
+
 		// enable/disable actions for the recent tags
 		TagManager.enableRecentTagActions(isTourSelected);
 
+		fActionExpandSelection.setEnabled(firstElement == null ? false : //
+				selectedItems == 1 ? firstElementHasChildren : //
+						true);
+
+		fActionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
+		menuMgr.add(fActionCollapseOthers);
+		menuMgr.add(fActionExpandSelection);
+		menuMgr.add(fActionCollapseAll);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionEditQuick);
+		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionEditTour);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
@@ -776,11 +805,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionRenameRefTour);
 		menuMgr.add(fActionRemoveComparedTours);
-
-		menuMgr.add(new Separator());
-		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionSetTourType);
-		menuMgr.add(fActionEditTour);
 
 		enableActions();
 	}
@@ -808,6 +832,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		 * fill view menu
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+		
 		menuMgr.add(fActionModifyColumns);
 	}
 
@@ -1054,7 +1079,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 
 	@Override
 	public void setFocus() {
-		fTourViewer.getTree().setFocus();
+//		fTourViewer.getTree().setFocus();
 	}
 
 	/**

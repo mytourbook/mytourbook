@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TreeViewerItem;
@@ -117,6 +118,16 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
 			conn.close();
 
+			
+			if (tagItem.colItemCounter == 0) {
+
+				/*
+				 * to hide the '+' for an item which has no children, an empty list of children will
+				 * be created
+				 */
+				tagItem.setChildren(new ArrayList<TreeViewerItem>());
+			}
+			
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}

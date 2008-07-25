@@ -44,7 +44,9 @@ public class TVITagViewYear extends TVITagViewItem {
 	private boolean					fIsMonth;
 
 	public TVITagViewYear(final TVITagViewTag parentItem, final int year, final boolean isMonth) {
+		
 		setParentItem(parentItem);
+		
 		fTagItem = parentItem;
 		fYear = year;
 		fIsMonth = isMonth;
@@ -144,6 +146,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			/*
 			 * get all tours for the tag Id of this tree item
 			 */
+			
 			final SQLFilter sqlFilter = new SQLFilter();
 			final StringBuilder sb = new StringBuilder();
 
@@ -206,6 +209,7 @@ public class TVITagViewYear extends TVITagViewItem {
 			/*
 			 * get all tours for the tag Id of this tree item
 			 */
+			
 			final SQLFilter sqlFilter = new SQLFilter();
 			final StringBuilder sb = new StringBuilder();
 
@@ -249,7 +253,7 @@ public class TVITagViewYear extends TVITagViewItem {
 
 				if (tourId == lastTourId) {
 
-					// get tags from outer join
+					// get tags from outer join for the current tour id
 
 					if (resultTagId instanceof Long) {
 						tourItem.tagIds.add((Long) resultTagId);
@@ -257,7 +261,8 @@ public class TVITagViewYear extends TVITagViewItem {
 
 				} else {
 
-					// new tour is in the resultset
+					// resultset contains a new tour
+					
 					tourItem = new TVITagViewTour(this);
 
 					children.add(tourItem);

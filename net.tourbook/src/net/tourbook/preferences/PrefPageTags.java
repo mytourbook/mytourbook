@@ -732,10 +732,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		// create new tour tag + item
 		final TourTag tourTag = new TourTag(inputDialog.getValue().trim());
-		final TVIPrefTag tourTagItem = new TVIPrefTag(fTagViewer, tourTag);
+		final TVIPrefTag tagItem = new TVIPrefTag(fTagViewer, tourTag);
 
-		final Object parentElement = ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
-		if (parentElement == null) {
+		final Object parentItem = ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
+		if (parentItem == null) {
 
 			// a parent is not selected, this will be a root tag
 
@@ -744,65 +744,69 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			/*
 			 * update model
 			 */
-			tourTagItem.setParentItem(fRootItem);
-			fRootItem.getFetchedChildren().add(tourTagItem);
+			tagItem.setParentItem(fRootItem);
+			fRootItem.getFetchedChildren().add(tagItem);
 
 			// persist tag
-			isSaved = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
+			isSaved = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
 
 			if (isSaved) {
 
 				/*
 				 * update viewer
 				 */
-				fTagViewer.add(this, tourTagItem);
+				fTagViewer.add(this, tagItem);
 			}
 
-		} else if (parentElement instanceof TVIPrefTagCategory) {
+		} else if (parentItem instanceof TVIPrefTagCategory) {
 
 			// parent is a category
 
-			final TVIPrefTagCategory parentCategoryItem = (TVIPrefTagCategory) parentElement;
-			TourTagCategory parentCategory = parentCategoryItem.getTourTagCategory();
-
-			tourTagItem.setParentItem(parentCategoryItem);
+			final TVIPrefTagCategory parentCategoryItem = (TVIPrefTagCategory) parentItem;
+			TourTagCategory parentTagCategory = parentCategoryItem.getTourTagCategory();
 
 			/*
 			 * update model
 			 */
 
+			// set parent into tag
+			tagItem.setParentItem(parentCategoryItem);
+
 			/*
 			 * persist tag without new category otherwise an exception "detached entity passed to
 			 * persist: net.tourbook.data.TourTagCategory" is raised
 			 */
-			isSaved = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
+			isSaved = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
 			if (isSaved) {
 
 				// update parent category
 				final EntityManager em = TourDatabase.getInstance().getEntityManager();
 				{
 
-					final TourTagCategory parentTourTagCategoryEntity = em.find(TourTagCategory.class,
-							parentCategory.getCategoryId());
+					final TourTagCategory parentTagCategoryEntity = em.find(TourTagCategory.class,
+							parentTagCategory.getCategoryId());
 
 					// set new entity
-					parentCategory = parentTourTagCategoryEntity;
-					parentCategoryItem.setTourTagCategory(parentTourTagCategoryEntity);
+					parentTagCategory = parentTagCategoryEntity;
+					parentCategoryItem.setTourTagCategory(parentTagCategoryEntity);
 
-					// set tag in parent category
-					final Set<TourTag> lazyTourTags = parentTourTagCategoryEntity.getTourTags();
+					// set tag into parent category
+					final Set<TourTag> lazyTourTags = parentTagCategoryEntity.getTourTags();
 					lazyTourTags.add(tourTag);
 
+					parentTagCategory.setTagCounter(lazyTourTags.size());
 				}
 				em.close();
 
 				// persist parent category
-				isSaved = TourDatabase.saveEntity(parentCategory, parentCategory.getCategoryId(), TourTagCategory.class);
+				isSaved = TourDatabase.saveEntity(parentTagCategory,
+						parentTagCategory.getCategoryId(),
+						TourTagCategory.class);
 
 				if (isSaved) {
 
 					// set category in tag
-					tourTag.getTagCategories().add(parentCategory);
+					tourTag.getTagCategories().add(parentTagCategory);
 
 					// persist tag with category
 					isSaved = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
@@ -820,23 +824,17 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				 */
 				parentCategoryItem.clearChildren();
 
-				fTagViewer.add(parentCategoryItem, tourTagItem);
+				fTagViewer.add(parentCategoryItem, tagItem);
+				fTagViewer.update(parentCategoryItem, null);
 
 				fTagViewer.expandToLevel(parentCategoryItem, 1);
 			}
-
-		} else if (parentElement instanceof TVIPrefTag) {
-
-			// parent is a tag
-
-//			final TVITourTag tviTourTag = (TVITourTag) parentElement;
-
 		}
 
 		if (isSaved) {
 
 			// show new tag in viewer
-			fTagViewer.reveal(tourTagItem);
+			fTagViewer.reveal(tagItem);
 
 			fIsModified = true;
 		}

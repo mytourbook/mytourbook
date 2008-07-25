@@ -102,14 +102,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 
 	public static final String					ID					= "net.tourbook.views.tourCatalog.CompareResultView";	//$NON-NLS-1$
 
-//	public static final int						COLUMN_REF_TOUR				= 0;
-//	public static final int						COLUMN_ALTITUDE_DIFFERENCE	= 1;
-//	public static final int						COLUMN_SPEED_COMPUTED		= 2;
-//	public static final int						COLUMN_SPEED_SAVED			= 3;															// speed saved in the database
-//	public static final int						COLUMN_SPEED_MOVED			= 4;															// speed saved in the database
-//	public static final int						COLUMN_DISTANCE				= 5;
-//	public static final int						COLUMN_TIME_INTERVAL		= 6;
-
 	/**
 	 * This memento allows this view to save and restore state when it is closed and opened within a
 	 * session. A different memento is supplied by the platform for persistance at workbench
@@ -156,99 +148,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 	private ColumnManager						fColumnManager;
 
 	SelectionRemovedComparedTours				fOldRemoveSelection	= null;
-
-//	private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider, IColorProvider {
-//
-//		public Color getBackground(final Object element) {
-//			return null;
-//		}
-//
-//		public Image getColumnImage(final Object element, final int columnIndex) {
-//
-//			if (element instanceof CompareResultItemComparedTour) {
-//				final CompareResultItemComparedTour compTour = (CompareResultItemComparedTour) element;
-//				if (columnIndex == COLUMN_REF_TOUR) {
-//					if (compTour.compId != -1) {
-//						return resManager.createImageWithDefault(dbImgDescriptor);
-//					}
-//				}
-//			}
-//
-//			return null;
-//		}
-//
-//		public String getColumnText(final Object obj, final int index) {
-//
-//			if (obj instanceof CompareResultItemReferenceTour) {
-//
-//				final CompareResultItemReferenceTour refTour = (CompareResultItemReferenceTour) obj;
-//				if (index == 0) {
-//					return refTour.label;
-//				} else {
-//					return ""; //$NON-NLS-1$
-//				}
-//
-//			} else if (obj instanceof CompareResultItemComparedTour) {
-//
-//				final CompareResultItemComparedTour result = (CompareResultItemComparedTour) obj;
-//
-//				switch (index) {
-//				case COLUMN_REF_TOUR:
-//					return TourManager.getTourDate(result.comparedTourData);
-//
-//				case COLUMN_SPEED_COMPUTED:
-//					nf.setMinimumFractionDigits(1);
-//					nf.setMaximumFractionDigits(1);
-//					return nf.format(result.compareSpeed / UI.UNIT_VALUE_DISTANCE);
-//
-//				case COLUMN_SPEED_SAVED:
-//					final float speedSaved = result.dbSpeed;
-//					if (speedSaved == 0) {
-//						return ""; //$NON-NLS-1$
-//					} else {
-//						nf.setMinimumFractionDigits(1);
-//						nf.setMaximumFractionDigits(1);
-//						return nf.format(speedSaved / UI.UNIT_VALUE_DISTANCE);
-//					}
-//
-//				case COLUMN_SPEED_MOVED:
-//					final float speedMoved = result.movedSpeed;
-//					if (speedMoved == 0) {
-//						return ""; //$NON-NLS-1$
-//					} else {
-//						nf.setMinimumFractionDigits(1);
-//						nf.setMaximumFractionDigits(1);
-//						return nf.format(speedMoved / UI.UNIT_VALUE_DISTANCE);
-//					}
-//
-//				case COLUMN_DISTANCE:
-//					nf.setMinimumFractionDigits(2);
-//					nf.setMaximumFractionDigits(2);
-//					return nf.format((result.compareDistance) / (1000 * UI.UNIT_VALUE_DISTANCE));
-//
-//				case COLUMN_ALTITUDE_DIFFERENCE:
-//					return Integer.toString(result.minAltitudeDiff
-//							* 100
-//							/ (result.normalizedEndIndex - result.normalizedStartIndex));
-//
-//				case COLUMN_TIME_INTERVAL:
-//					return Integer.toString(result.timeIntervall);
-//
-//				}
-//			}
-//
-//			return ""; //$NON-NLS-1$
-//		}
-//
-//		public Color getForeground(final Object element) {
-//			if (element instanceof CompareResultItemComparedTour) {
-//				if (((CompareResultItemComparedTour) (element)).compId != -1) {
-//					return Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
-//				}
-//			}
-//			return null;
-//		}
-//	}
 
 	class ResultContentProvider implements ITreeContentProvider {
 
@@ -397,27 +296,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 				final String property = event.getProperty();
 
 				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-// ORIGINAL 
-//					// measurement system has changed
-//
-//					UI.updateUnits();
-//
-//					saveSettings();
-//
-//					// dispose viewer
-//					final Control[] children = fViewerContainer.getChildren();
-//					for (int childIndex = 0; childIndex < children.length; childIndex++) {
-//						children[childIndex].dispose();
-//					}
-//
-//					createTourViewer(fViewerContainer);
-//					fViewerContainer.layout();
-//
-//					// update the viewer
-//					fTourViewer.setInput(((ResultContentProvider) fTourViewer.getContentProvider()).getRootItem());
-//
-//					restoreState(fSessionMemento);
 
 					// measurement system has changed
 
@@ -919,53 +797,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 
 	}
 
-	//	} else if (obj instanceof CompareResultItemComparedTour) {
-	//
-//					final CompareResultItemComparedTour result = (CompareResultItemComparedTour) obj;
-	//
-//					switch (index) {
-//					case COLUMN_REF_TOUR:
-//						return TourManager.getTourDate(result.comparedTourData);
-	//
-//					case COLUMN_SPEED_COMPUTED:
-//						nf.setMinimumFractionDigits(1);
-//						nf.setMaximumFractionDigits(1);
-//						return nf.format(result.compareSpeed / UI.UNIT_VALUE_DISTANCE);
-	//
-//					case COLUMN_SPEED_SAVED:
-//						final float speedSaved = result.dbSpeed;
-//						if (speedSaved == 0) {
-//							return ""; //$NON-NLS-1$
-//						} else {
-//							nf.setMinimumFractionDigits(1);
-//							nf.setMaximumFractionDigits(1);
-//							return nf.format(speedSaved / UI.UNIT_VALUE_DISTANCE);
-//						}
-	//
-//					case COLUMN_SPEED_MOVED:
-//						final float speedMoved = result.movedSpeed;
-//						if (speedMoved == 0) {
-//							return ""; //$NON-NLS-1$
-//						} else {
-//							nf.setMinimumFractionDigits(1);
-//							nf.setMaximumFractionDigits(1);
-//							return nf.format(speedMoved / UI.UNIT_VALUE_DISTANCE);
-//						}
-	//
-//					case COLUMN_DISTANCE:
-//						nf.setMinimumFractionDigits(2);
-//						nf.setMaximumFractionDigits(2);
-//						return nf.format((result.compareDistance) / (1000 * UI.UNIT_VALUE_DISTANCE));
-	//
-//					case COLUMN_ALTITUDE_DIFFERENCE:
-//						return Integer.toString(result.minAltitudeDiff
-//								* 100
-//								/ (result.normalizedEndIndex - result.normalizedStartIndex));
-	//
-//					case COLUMN_TIME_INTERVAL:
-//						return Integer.toString(result.timeIntervall);
-	//
-//					}
 	@Override
 	public void dispose() {
 
@@ -1257,11 +1088,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 
 	public void recreateViewer() {
 
-		final Object[] expandedElements = fTourViewer.getExpandedElements();
-		final ISelection selection = fTourViewer.getSelection();
-
 		fViewerContainer.setRedraw(false);
 		{
+			final Object[] expandedElements = fTourViewer.getExpandedElements();
+			final ISelection selection = fTourViewer.getSelection();
+
 			fTourViewer.getTree().dispose();
 
 			createTourViewer(fViewerContainer);

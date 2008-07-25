@@ -130,13 +130,18 @@ public class TVICatalogReferenceTour extends TVICatalogTourItem {
 	@Override
 	public void remove() {
 
-		if (getUnfetchedChildren() != null) {
-			// remove all children
-			getUnfetchedChildren().clear();
+		final ArrayList<TreeViewerItem> unfetchedChildren = getUnfetchedChildren();
+
+		// remove all children
+		if (unfetchedChildren != null) {
+			unfetchedChildren.clear();
 		}
 
-		// remove this tour item from the parent
-		getParentItem().getUnfetchedChildren().remove(this);
+		// remove this ref item from the parent item
+		final ArrayList<TreeViewerItem> unfetchedParentChildren = getParentItem().getUnfetchedChildren();
+		if (unfetchedParentChildren != null) {
+			unfetchedParentChildren.remove(this);
+		}
 	}
 
 }

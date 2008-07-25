@@ -15,9 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -29,6 +34,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -57,6 +63,58 @@ public class TourCompareManager {
 	private TourData[]								refToursData;
 
 	private ArrayList<TVICompareResultComparedTour>	fComparedTourItems	= new ArrayList<TVICompareResultComparedTour>();
+
+	/**
+	 * @param refId
+	 *            Reference Id
+	 * @return Returns all compared tours for the reference tour with the <code>refId</code> which
+	 *         are saved in the database
+	 */
+	public static HashMap<Long, StoredComparedTour> getComparedToursFromDb(final long refId) {
+
+		final HashMap<Long, StoredComparedTour> storedComparedTours = new HashMap<Long, StoredComparedTour>();
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("SELECT"); //$NON-NLS-1$
+
+		sb.append(" tourId,"); //		1 //$NON-NLS-1$
+		sb.append(" comparedId,"); //	2 //$NON-NLS-1$
+		sb.append(" startIndex,"); //	3 //$NON-NLS-1$
+		sb.append(" endIndex,"); //		4 //$NON-NLS-1$
+		sb.append(" tourSpeed"); //		5	 //$NON-NLS-1$
+
+		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
+		sb.append(" WHERE refTourId=?"); //$NON-NLS-1$
+
+		try {
+
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(sb.toString());
+			statement.setLong(1, refId);
+
+			final ResultSet result = statement.executeQuery();
+			while (result.next()) {
+
+				final StoredComparedTour storedComparedTour = new StoredComparedTour();
+
+				final long dbTourId = result.getLong(1);
+				storedComparedTour.comparedId = result.getLong(2);
+				storedComparedTour.startIndex = result.getInt(3);
+				storedComparedTour.endIndex = result.getInt(4);
+				storedComparedTour.tourSpeed = result.getFloat(5);
+
+				storedComparedTours.put(dbTourId, storedComparedTour);
+			}
+
+			conn.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		return storedComparedTours;
+	}
 
 	public static TourCompareManager getInstance() {
 		if (fInstance == null) {
@@ -438,7 +496,7 @@ public class TourCompareManager {
 	}
 
 	/**
-	 * @return Returns the comparedTours.
+	 * @return Returns the compare result with all compared tours
 	 */
 	public TVICompareResultComparedTour[] getComparedTours() {
 		return fComparedTourItems.toArray(new TVICompareResultComparedTour[fComparedTourItems.size()]);

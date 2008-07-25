@@ -316,8 +316,8 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 //					updateTourViewer(fRootItem, modifiedTours);
 
 					/*
-					 * it is possible that a tour type was modified and the tour is hidden or
-					 * displayed in the viewer because the filter could have been changed
+					 * it is possible when a tour type was modified, the tour can be hidden or
+					 * visible in the viewer because the tour type filter
 					 */
 					reloadViewer();
 
@@ -414,6 +414,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.FULL_SELECTION | SWT.MULTI);
 
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(TourbookPlugin.getDefault()
 				.getPluginPreferences()
@@ -1191,7 +1192,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	@Override
 	public void setFocus() {
-		fTourViewer.getControl().setFocus();
+//		fTourViewer.getControl().setFocus();
 	}
 
 //	/**
