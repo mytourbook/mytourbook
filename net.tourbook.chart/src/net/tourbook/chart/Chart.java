@@ -107,14 +107,14 @@ public class Chart extends ViewForm {
 	/**
 	 * Chart widget
 	 */
-	public Chart(Composite parent, int style) {
+	public Chart(final Composite parent, final int style) {
 
 		super(parent, style);
 		setBorderVisible(false);
 
 		// setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		GridLayout gl = new GridLayout(1, false);
+		final GridLayout gl = new GridLayout(1, false);
 		gl.marginWidth = 0;
 		gl.marginHeight = 0;
 		gl.verticalSpacing = 0;
@@ -130,27 +130,27 @@ public class Chart extends ViewForm {
 		fBackgroundColor = getDisplay().getSystemColor(SWT.COLOR_WHITE);
 	}
 
-	public void addBarSelectionListener(IBarSelectionListener listener) {
+	public void addBarSelectionListener(final IBarSelectionListener listener) {
 		fBarSelectionListeners.add(listener);
 	}
 
-	public void addDoubleClickListener(IBarSelectionListener listener) {
+	public void addDoubleClickListener(final IBarSelectionListener listener) {
 		fBarDoubleClickListeners.add(listener);
 	}
 
-	public void addDoubleClickListener(Listener listener) {
+	public void addDoubleClickListener(final Listener listener) {
 		fDoubleClickListeners.add(listener);
 	}
 
-	public void addFocusListener(Listener listener) {
+	public void addFocusListener(final Listener listener) {
 		fFocusListeners.add(listener);
 	}
 
-	public void addSliderMoveListener(ISliderMoveListener listener) {
+	public void addSliderMoveListener(final ISliderMoveListener listener) {
 		fSliderMoveListeners.add(listener);
 	}
 
-	public void addXMarkerDraggingListener(IChartListener xMarkerDraggingListener) {
+	public void addXMarkerDraggingListener(final IChartListener xMarkerDraggingListener) {
 		fXMarkerDraggingListener = xMarkerDraggingListener;
 	}
 
@@ -262,38 +262,34 @@ public class Chart extends ViewForm {
 			return null;
 		}
 
-		SelectionChartInfo chartInfo = new SelectionChartInfo(this);
+		final SelectionChartInfo chartInfo = new SelectionChartInfo(this);
 
 		chartInfo.chartDataModel = fChartDataModel;
 		chartInfo.chartDrawingData = fChartComponents.getChartDrawingData();
 
-		ChartComponentGraph chartGraph = fChartComponents.getChartComponentGraph();
+		final ChartComponentGraph chartGraph = fChartComponents.getChartComponentGraph();
 		chartInfo.leftSliderValuesIndex = chartGraph.getLeftSlider().getValuesIndex();
 		chartInfo.rightSliderValuesIndex = chartGraph.getRightSlider().getValuesIndex();
 
 		return chartInfo;
 	}
 
-	void fillContextMenu(IMenuManager menuMgr) {
+	void fillContextMenu(final IMenuManager menuMgr) {
 		if (fChartContextProvider != null) {
 			fChartContextProvider.fillContextMenu(menuMgr);
 		}
 	}
 
-	void fillContextMenu(	IMenuManager menuMgr,
-							ChartXSlider leftSlider,
-							ChartXSlider rightSlider,
-							int hoveredBarSerieIndex,
-							int hoveredBarValueIndex) {
-
-		if (fChartContextProvider != null) {
-			fChartContextProvider.fillContextMenu(menuMgr);
-		}
+	void fillContextMenu(	final IMenuManager menuMgr,
+							final ChartXSlider leftSlider,
+							final ChartXSlider rightSlider,
+							final int hoveredBarSerieIndex,
+							final int hoveredBarValueIndex) {
 
 		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 
 			// get the context provider from the data model
-			IChartContextProvider barChartContextProvider = (IChartContextProvider) fChartDataModel.getCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER);
+			final IChartContextProvider barChartContextProvider = (IChartContextProvider) fChartDataModel.getCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER);
 
 			// create the menu for bar charts
 			if (barChartContextProvider != null) {
@@ -306,6 +302,10 @@ public class Chart extends ViewForm {
 				fChartContextProvider.fillXSliderContextMenu(menuMgr, leftSlider, rightSlider);
 			}
 		}
+		
+		if (fChartContextProvider != null) {
+			fChartContextProvider.fillContextMenu(menuMgr);
+		}
 	}
 
 	/**
@@ -313,7 +313,7 @@ public class Chart extends ViewForm {
 	 * 
 	 * @param refreshToolbar
 	 */
-	public void fillToolbar(boolean refreshToolbar) {
+	public void fillToolbar(final boolean refreshToolbar) {
 
 		if (fChartActionProxies == null) {
 			return;
@@ -322,7 +322,7 @@ public class Chart extends ViewForm {
 		if (fUseInternalActionBar && (fShowPartNavigation || fShowZoomActions)) {
 
 			// add the action to the toolbar
-			IToolBarManager tbm = getToolBarManager();
+			final IToolBarManager tbm = getToolBarManager();
 
 			if (fShowZoomActions) {
 				tbm.add(new Separator());
@@ -348,7 +348,7 @@ public class Chart extends ViewForm {
 		fBarSelectionSerieIndex = serieIndex;
 		fBarSelectionValueIndex = valueIndex;
 
-		Object[] listeners = fBarSelectionListeners.getListeners();
+		final Object[] listeners = fBarSelectionListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final IBarSelectionListener listener = (IBarSelectionListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
@@ -364,7 +364,7 @@ public class Chart extends ViewForm {
 		fBarSelectionSerieIndex = serieIndex;
 		fBarSelectionValueIndex = valueIndex;
 
-		Object[] listeners = fBarDoubleClickListeners.getListeners();
+		final Object[] listeners = fBarDoubleClickListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final IBarSelectionListener listener = (IBarSelectionListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
@@ -377,7 +377,7 @@ public class Chart extends ViewForm {
 
 	void fireDoubleClick() {
 
-		Object[] listeners = fDoubleClickListeners.getListeners();
+		final Object[] listeners = fDoubleClickListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final Listener listener = (Listener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
@@ -390,7 +390,7 @@ public class Chart extends ViewForm {
 
 	void fireFocusEvent() {
 
-		Object[] listeners = fFocusListeners.getListeners();
+		final Object[] listeners = fFocusListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final Listener listener = (Listener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
@@ -405,7 +405,7 @@ public class Chart extends ViewForm {
 
 		final SelectionChartInfo chartInfo = createChartInfo();
 //		System.out.println("fireSliderMove... " + this);
-		Object[] listeners = fSliderMoveListeners.getListeners();
+		final Object[] listeners = fSliderMoveListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			final ISliderMoveListener listener = (ISliderMoveListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
@@ -493,6 +493,13 @@ public class Chart extends ViewForm {
 	}
 
 	/**
+	 * @return Returns <code>true</code> to start the bars at the bottom of the chart
+	 */
+	boolean getStartAtChartBottom() {
+		return fDrawBarChartAtBottom;
+	}
+
+	/**
 	 * Returns the toolbar for the chart, if no toolbar manager is set with setToolbarManager, the
 	 * manager will be created and the toolbar is on top of the chart
 	 * 
@@ -531,7 +538,7 @@ public class Chart extends ViewForm {
 	 */
 	public SelectionChartXSliderPosition getXSliderPosition() {
 
-		ChartComponentGraph chartGraph = fChartComponents.getChartComponentGraph();
+		final ChartComponentGraph chartGraph = fChartComponents.getChartComponentGraph();
 
 		return new SelectionChartXSliderPosition(this,
 				chartGraph.getLeftSlider().getValuesIndex(),
@@ -584,20 +591,24 @@ public class Chart extends ViewForm {
 		fChartComponents.getChartComponentGraph().redrawChart();
 	}
 
-	public void removeDoubleClickListener(IBarSelectionListener listener) {
+	public void removeDoubleClickListener(final IBarSelectionListener listener) {
 		fBarDoubleClickListeners.remove(listener);
 	}
 
-	public void removeDoubleClickListener(Listener listener) {
+	public void removeDoubleClickListener(final Listener listener) {
 		fDoubleClickListeners.remove(listener);
 	}
 
-	public void removeFocusListener(Listener listener) {
+	public void removeFocusListener(final Listener listener) {
 		fFocusListeners.remove(listener);
 	}
 
-	public void removeSelectionChangedListener(IBarSelectionListener listener) {
+	public void removeSelectionChangedListener(final IBarSelectionListener listener) {
 		fBarSelectionListeners.remove(listener);
+	}
+
+	public void resetGraphAlpha() {
+		fChartComponents.getChartComponentGraph().fGraphAlpha = GRAPH_ALPHA;
 	}
 
 	/**
@@ -606,7 +617,7 @@ public class Chart extends ViewForm {
 	 * @param backgroundColor
 	 *        The backgroundColor to set.
 	 */
-	public void setBackgroundColor(Color backgroundColor) {
+	public void setBackgroundColor(final Color backgroundColor) {
 		this.fBackgroundColor = backgroundColor;
 	}
 
@@ -615,7 +626,7 @@ public class Chart extends ViewForm {
 	 * 
 	 * @param canZoomToSliderOnMouseUp
 	 */
-	public void setCanAutoZoomToSlider(boolean canZoomToSliderOnMouseUp) {
+	public void setCanAutoZoomToSlider(final boolean canZoomToSliderOnMouseUp) {
 
 		fChartComponents.getChartComponentGraph().setCanAutoZoomToSlider(canZoomToSliderOnMouseUp);
 	}
@@ -625,7 +636,7 @@ public class Chart extends ViewForm {
 	 * 
 	 * @param canScrollabelZoomedGraph
 	 */
-	public void setCanScrollZoomedChart(boolean canScrollabelZoomedGraph) {
+	public void setCanScrollZoomedChart(final boolean canScrollabelZoomedGraph) {
 
 		fChartComponents.getChartComponentGraph().setCanScrollZoomedChart(canScrollabelZoomedGraph);
 	}
@@ -633,7 +644,7 @@ public class Chart extends ViewForm {
 	/**
 	 * Set the enable state for a command and update the UI
 	 */
-	public void setChartCommandEnabled(String commandId, boolean isEnabled) {
+	public void setChartCommandEnabled(final String commandId, final boolean isEnabled) {
 
 		fChartActionProxies.get(commandId).setEnabled(isEnabled);
 
@@ -642,12 +653,21 @@ public class Chart extends ViewForm {
 		}
 	}
 
-	public void setContextProvider(IChartContextProvider chartContextProvider) {
+	public void setContextProvider(final IChartContextProvider chartContextProvider) {
 		fChartContextProvider = chartContextProvider;
 	}
 
-	public void setDataModel(ChartDataModel chartDataModel) {
+	public void setDataModel(final ChartDataModel chartDataModel) {
 		fChartDataModel = chartDataModel;
+	}
+
+	/**
+	 * Set <code>false</code> to not draw the bars at the bottom of the chart
+	 * 
+	 * @param fDrawBarCharttAtBottom
+	 */
+	public void setDrawBarChartAtBottom(final boolean fDrawBarCharttAtBottom) {
+		this.fDrawBarChartAtBottom = fDrawBarCharttAtBottom;
 	}
 
 	@Override
@@ -664,7 +684,7 @@ public class Chart extends ViewForm {
 	 * 
 	 * @param alphaValue
 	 */
-	public void setGraphAlpha(int alphaValue) {
+	public void setGraphAlpha(final int alphaValue) {
 		fChartComponents.getChartComponentGraph().fGraphAlpha = alphaValue;
 	}
 
@@ -675,7 +695,7 @@ public class Chart extends ViewForm {
 	 *        items in the x-data serie which should be selected, can be <code>null</code> to
 	 *        deselect the bar
 	 */
-	public void setSelectedBars(boolean[] selectedItems) {
+	public void setSelectedBars(final boolean[] selectedItems) {
 
 		// set default value
 		fBarSelectionSerieIndex = 0;
@@ -701,11 +721,11 @@ public class Chart extends ViewForm {
 	 * @param isMarkerVisible
 	 *        <code>true</code> shows the marker area
 	 */
-	public void setShowMarker(boolean isMarkerVisible) {
+	public void setShowMarker(final boolean isMarkerVisible) {
 		fChartComponents.setMarkerVisible(isMarkerVisible);
 	}
 
-	public void setShowPartNavigation(boolean showPartNavigation) {
+	public void setShowPartNavigation(final boolean showPartNavigation) {
 		fShowPartNavigation = showPartNavigation;
 	}
 
@@ -713,32 +733,8 @@ public class Chart extends ViewForm {
 	 * @param isSliderVisible
 	 *        <code>true</code> shows the sliders
 	 */
-	public void setShowSlider(boolean isSliderVisible) {
+	public void setShowSlider(final boolean isSliderVisible) {
 		fChartComponents.setSliderVisible(isSliderVisible);
-	}
-
-	public void setShowZoomActions(boolean showZoomActions) {
-		fShowZoomActions = showZoomActions;
-	}
-
-	/**
-	 * set the synch configuration which is used when the chart is drawn/resized
-	 * 
-	 * @param synchConfigIn
-	 *        set <code>null</code> to disable the synchronization
-	 */
-	public void setSynchConfig(SynchConfiguration synchConfigIn) {
-		fChartComponents.setSynchConfig(synchConfigIn);
-	}
-
-	/**
-	 * Set's the {@link SynchConfiguration} listener, this is a {@link Chart} which will be notified
-	 * when this chart is resized, <code>null</code> will disable the synchronisation
-	 * 
-	 * @param chartWidget
-	 */
-	public void setSynchedChart(Chart chartWidget) {
-		fSynchedChart = chartWidget;
 	}
 
 //	/**
@@ -751,6 +747,34 @@ public class Chart extends ViewForm {
 //		fUseInternalActionBar = useInternalActionBar;
 //	}
 
+	public void setShowZoomActions(final boolean showZoomActions) {
+		fShowZoomActions = showZoomActions;
+	}
+
+	/**
+	 * set the synch configuration which is used when the chart is drawn/resized
+	 * 
+	 * @param synchConfigIn
+	 *        set <code>null</code> to disable the synchronization
+	 */
+	public void setSynchConfig(final SynchConfiguration synchConfigIn) {
+		fChartComponents.setSynchConfig(synchConfigIn);
+	}
+
+	/**
+	 * Set's the {@link SynchConfiguration} listener, this is a {@link Chart} which will be notified
+	 * when this chart is resized, <code>null</code> will disable the synchronisation
+	 * 
+	 * @param chartWidget
+	 */
+	public void setSynchedChart(final Chart chartWidget) {
+		fSynchedChart = chartWidget;
+	}
+
+	protected void setSynchMode(final int synchMode) {
+		fSynchMode = synchMode;
+	}
+
 	/**
 	 * @param toolbarMgr
 	 * @param isFillToolbar
@@ -758,7 +782,7 @@ public class Chart extends ViewForm {
 	 *        {@link Chart#fillToolbar(boolean)} from externally, when <code>true</code> the
 	 *        toolbar will be filled when the chart is updated
 	 */
-	public void setToolBarManager(IToolBarManager toolbarMgr, boolean isFillToolbar) {
+	public void setToolBarManager(final IToolBarManager toolbarMgr, final boolean isFillToolbar) {
 		fToolbarMgr = toolbarMgr;
 		fIsFillToolbar = isFillToolbar;
 	}
@@ -768,7 +792,7 @@ public class Chart extends ViewForm {
 	 * 
 	 * @param sliderPosition
 	 */
-	public void setXSliderPosition(SelectionChartXSliderPosition sliderPosition) {
+	public void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
 
 		// check if the position is for this chart
 		if (sliderPosition.getChart() == this) {
@@ -781,7 +805,7 @@ public class Chart extends ViewForm {
 	 * 
 	 * @param isEnabled
 	 */
-	public void setZoomActionsEnabled(boolean isEnabled) {
+	public void setZoomActionsEnabled(final boolean isEnabled) {
 		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(isEnabled);
 		fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(isEnabled);
 		fChartActionProxies.get(COMMAND_ID_FIT_GRAPH).setEnabled(isEnabled);
@@ -829,7 +853,7 @@ public class Chart extends ViewForm {
 	 * 
 	 * @param chartDataModel
 	 */
-	public void updateChart(ChartDataModel chartDataModel) {
+	public void updateChart(final ChartDataModel chartDataModel) {
 		updateChart(chartDataModel, true);
 	}
 
@@ -842,11 +866,11 @@ public class Chart extends ViewForm {
 	 * @param isResetSelection
 	 *        <code>true</code> to reset the last selection in the chart
 	 */
-	public void updateChart(ChartDataModel chartDataModel, boolean isResetSelection) {
+	public void updateChart(final ChartDataModel chartDataModel, final boolean isResetSelection) {
 
 		if (chartDataModel == null || (chartDataModel != null && chartDataModel.getYData().isEmpty())) {
 
-			ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
+			final ChartDataModel emptyModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
 
 			fChartDataModel = emptyModel;
 			fChartComponents.setModel(emptyModel);
@@ -914,7 +938,7 @@ public class Chart extends ViewForm {
 		setChartCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
 	}
 
-	public void zoomOut(boolean updateChart) {
+	public void zoomOut(final boolean updateChart) {
 
 		if (fChartDataModel == null) {
 			return;
@@ -946,7 +970,7 @@ public class Chart extends ViewForm {
 	 *        is based on 0
 	 * @param scrollSmoothly
 	 */
-	public void zoomWithParts(int parts, int position, boolean scrollSmoothly) {
+	public void zoomWithParts(final int parts, final int position, final boolean scrollSmoothly) {
 
 		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(false);
 		fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(true);
@@ -959,30 +983,6 @@ public class Chart extends ViewForm {
 		}
 
 		fChartComponents.zoomWithParts(parts, position, scrollSmoothly);
-	}
-
-	protected void setSynchMode(int synchMode) {
-		fSynchMode = synchMode;
-	}
-
-	/**
-	 * @return Returns <code>true</code> to start the bars at the bottom of the chart
-	 */
-	boolean getStartAtChartBottom() {
-		return fDrawBarChartAtBottom;
-	}
-
-	/**
-	 * Set <code>false</code> to not draw the bars at the bottom of the chart
-	 * 
-	 * @param fDrawBarCharttAtBottom
-	 */
-	public void setDrawBarChartAtBottom(boolean fDrawBarCharttAtBottom) {
-		this.fDrawBarChartAtBottom = fDrawBarCharttAtBottom;
-	}
-
-	public void resetGraphAlpha() {
-		fChartComponents.getChartComponentGraph().fGraphAlpha = GRAPH_ALPHA;
 	}
 
 }
