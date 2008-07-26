@@ -205,6 +205,7 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 
 		if (fTourEditor != null) {
 
+			menuMgr.add(new Separator());
 			menuMgr.add(fActionQuickEdit);
 			menuMgr.add(fActionSetTourType);
 

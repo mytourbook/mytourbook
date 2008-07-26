@@ -18,6 +18,7 @@ package net.tourbook.ui;
 import java.util.ArrayList;
 
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.util.PixelConverter;
 import net.tourbook.util.TableLayoutComposite;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -27,10 +28,14 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -59,18 +64,18 @@ public class ColumnModifyDialog extends TrayDialog {
 	private Button						fBtnDeselectAll;
 	private Button						fBtnDefault;
 
-	private ArrayList<ColumnDefinition>	fCustomColumns;
+	private ArrayList<ColumnDefinition>	fDialogColumns;
 	private ArrayList<ColumnDefinition>	fDefaultColumns;
 
 	public ColumnModifyDialog(	final Shell parentShell,
 								final ColumnManager columnManager,
-								final ArrayList<ColumnDefinition> customColumns,
+								final ArrayList<ColumnDefinition> dialogColumns,
 								final ArrayList<ColumnDefinition> defaultColumns) {
 
 		super(parentShell);
 
 		fColumnManager = columnManager;
-		fCustomColumns = customColumns;
+		fDialogColumns = dialogColumns;
 		fDefaultColumns = defaultColumns;
 
 		// make dialog resizable
@@ -84,6 +89,8 @@ public class ColumnModifyDialog extends TrayDialog {
 	}
 
 	private void createColumnsViewer(final Composite parent) {
+
+		final PixelConverter pixelConverter = new PixelConverter(parent);
 
 		final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tableLayouter);
@@ -112,15 +119,44 @@ public class ColumnModifyDialog extends TrayDialog {
 			}
 		});
 
+		tvc = new TableViewerColumn(fColumnViewer, SWT.TRAIL);
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), true));
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(Integer.toString(colDef.getColumnWidth()));
+
+				// paint columns in a different color which can't be hidden
+				if (colDef.canModifyVisibility() == false) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				}
+			}
+		});
+
 		fColumnViewer.setContentProvider(new IStructuredContentProvider() {
 
 			public void dispose() {}
 
 			public Object[] getElements(final Object inputElement) {
-				return fCustomColumns.toArray();
+				return fDialogColumns.toArray();
 			}
 
 			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+		});
+
+		fColumnViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(final DoubleClickEvent event) {
+
+				final Object firstElement = ((IStructuredSelection) fColumnViewer.getSelection()).getFirstElement();
+				if (firstElement != null) {
+
+					// check/uncheck current item
+
+					fColumnViewer.setChecked(firstElement, !fColumnViewer.getChecked(firstElement));
+				}
+			}
 		});
 
 		fColumnViewer.addCheckStateListener(new ICheckStateListener() {
@@ -158,7 +194,7 @@ public class ColumnModifyDialog extends TrayDialog {
 
 		createUI(dlgAreaContainer);
 
-		setupColumnsInViewer(fCustomColumns);
+		setupColumnsInViewer();
 
 		return dlgAreaContainer;
 	}
@@ -222,7 +258,7 @@ public class ColumnModifyDialog extends TrayDialog {
 			public void widgetSelected(final SelectionEvent e) {
 
 				// update model
-				for (final ColumnDefinition colDef : fCustomColumns) {
+				for (final ColumnDefinition colDef : fDialogColumns) {
 					colDef.setIsVisibleInDialog(true);
 				}
 
@@ -242,7 +278,7 @@ public class ColumnModifyDialog extends TrayDialog {
 				final ArrayList<ColumnDefinition> checkedElements = new ArrayList<ColumnDefinition>();
 
 				// update model
-				for (final ColumnDefinition colDef : fCustomColumns) {
+				for (final ColumnDefinition colDef : fDialogColumns) {
 					if (colDef.canModifyVisibility() == false) {
 						checkedElements.add(colDef);
 						colDef.setIsVisibleInDialog(true);
@@ -270,7 +306,7 @@ public class ColumnModifyDialog extends TrayDialog {
 				 * copy default columns into the custom columns
 				 */
 
-				fCustomColumns = new ArrayList<ColumnDefinition>();
+				fDialogColumns = new ArrayList<ColumnDefinition>();
 
 				for (final ColumnDefinition defaultColumn : fDefaultColumns) {
 					try {
@@ -284,14 +320,14 @@ public class ColumnModifyDialog extends TrayDialog {
 						final boolean canModifyVisibility = columnDefinitionClone.canModifyVisibility();
 						columnDefinitionClone.setIsVisibleInDialog(canModifyVisibility == false);
 
-						fCustomColumns.add(columnDefinitionClone);
+						fDialogColumns.add(columnDefinitionClone);
 
 					} catch (final CloneNotSupportedException e) {
 						e.printStackTrace();
 					}
 				}
 
-				setupColumnsInViewer(fCustomColumns);
+				setupColumnsInViewer();
 			}
 		});
 		setButtonLayoutData(fBtnDefault);
@@ -390,15 +426,15 @@ public class ColumnModifyDialog extends TrayDialog {
 		super.okPressed();
 	}
 
-	private void setupColumnsInViewer(final ArrayList<ColumnDefinition> columnDefinitions) {
+	private void setupColumnsInViewer() {
 
 		// load columns into the viewer
-		fColumnViewer.setInput(this);
+		fColumnViewer.setInput(new Object[0]);
 
 		// check columns which are visible
 		final ArrayList<ColumnDefinition> checkedColumns = new ArrayList<ColumnDefinition>();
 
-		for (final ColumnDefinition colDef : columnDefinitions) {
+		for (final ColumnDefinition colDef : fDialogColumns) {
 			if (colDef.isVisibleInDialog()) {
 				checkedColumns.add(colDef);
 			}

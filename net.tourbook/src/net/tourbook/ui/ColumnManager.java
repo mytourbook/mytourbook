@@ -60,6 +60,10 @@ public class ColumnManager {
 	 * contains the column ids which are visible in the viewer
 	 */
 	private String[]					fVisibleColumnIds;
+
+	/**
+	 * contains a pair of column id and width for each column
+	 */
 	private String[]					fColumnIdsAndWidth;
 
 	public ColumnManager(final ITourViewer viewerAdapter, final IMemento memento) {
@@ -106,76 +110,6 @@ public class ColumnManager {
 			}
 		}
 
-	}
-
-	/**
-	 * Read the order/width for the columns, this is necessary because the user can have rearranged
-	 * the columns and/or resized the columns with the mouse
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private ArrayList<ColumnDefinition> createModifyDialogColumns() {
-
-		final ArrayList<ColumnDefinition> allColumns = (ArrayList<ColumnDefinition>) fAllColumnDefinitions.clone();
-		final ArrayList<ColumnDefinition> allDialogColumns = new ArrayList<ColumnDefinition>();
-
-		int[] columnOrder = null;
-		final ColumnViewer columnViewer = fTourViewer.getViewer();
-
-		/*
-		 * get column order
-		 */
-		if (columnViewer instanceof TableViewer) {
-
-			final Table table = ((TableViewer) columnViewer).getTable();
-			if (table.isDisposed()) {
-				return null;
-			}
-			columnOrder = table.getColumnOrder();
-
-		} else if (columnViewer instanceof TreeViewer) {
-
-			final Tree tree = ((TreeViewer) columnViewer).getTree();
-			if (tree.isDisposed()) {
-				return null;
-			}
-			columnOrder = tree.getColumnOrder();
-		}
-
-		/*
-		 * add columns in the correct sort order and width
-		 */
-		for (final int createIndex : columnOrder) {
-
-			final ColumnDefinition colDef = getColumnDefinitionByCreateIndex(createIndex);
-
-			if (colDef != null) {
-
-				// keep the column
-				colDef.setIsVisibleInDialog(true);
-				allDialogColumns.add(colDef);
-
-				allColumns.remove(colDef);
-
-				// set width from the column definition
-				if (colDef instanceof TableColumnDefinition) {
-					colDef.setColumnWidth(((TableColumnDefinition) colDef).getTableColumn().getWidth());
-				} else if (colDef instanceof TreeColumnDefinition) {
-					colDef.setColumnWidth(((TreeColumnDefinition) colDef).getTreeColumn().getWidth());
-				}
-			}
-		}
-
-		/*
-		 * add the columns which are defined but not visible
-		 */
-		for (final ColumnDefinition colDef : allColumns) {
-			colDef.setIsVisibleInDialog(false);
-			allDialogColumns.add(colDef);
-		}
-
-		return allDialogColumns;
 	}
 
 	/**
@@ -299,7 +233,7 @@ public class ColumnManager {
 	/**
 	 * @return Returns the columns in the format: id/width ...
 	 */
-	private String[] getColumnIdAndWidth() {
+	private String[] getColumnIdAndWidthFromViewer() {
 
 		final ArrayList<String> columnIds = new ArrayList<String>();
 
@@ -377,11 +311,76 @@ public class ColumnManager {
 		return orderedColumnIds.toArray(new String[orderedColumnIds.size()]);
 	}
 
+	/**
+	 * Read the order/width for the columns, this is necessary because the user can have rearranged
+	 * the columns and/or resized the columns with the mouse
+	 * 
+	 * @return Returns all columns which are displayed in the {@link ColumnModifyDialog}
+	 */
+	@SuppressWarnings("unchecked")
+	private ArrayList<ColumnDefinition> getDialogColumns() {
+
+		final ArrayList<ColumnDefinition> allColumnsClone = (ArrayList<ColumnDefinition>) fAllColumnDefinitions.clone();
+		final ArrayList<ColumnDefinition> allDialogColumns = new ArrayList<ColumnDefinition>();
+
+		final ColumnViewer columnViewer = fTourViewer.getViewer();
+		int[] columnOrder = null;
+
+		/*
+		 * get column order from viewer
+		 */
+		if (columnViewer instanceof TableViewer) {
+
+			final Table table = ((TableViewer) columnViewer).getTable();
+			if (table.isDisposed()) {
+				return null;
+			}
+			columnOrder = table.getColumnOrder();
+
+		} else if (columnViewer instanceof TreeViewer) {
+
+			final Tree tree = ((TreeViewer) columnViewer).getTree();
+			if (tree.isDisposed()) {
+				return null;
+			}
+			columnOrder = tree.getColumnOrder();
+		}
+
+		/*
+		 * add columns in the correct sort order
+		 */
+		for (final int createIndex : columnOrder) {
+
+			final ColumnDefinition colDef = getColumnDefinitionByCreateIndex(createIndex);
+
+			if (colDef != null) {
+
+				// keep the column
+				colDef.setIsVisibleInDialog(true);
+				allDialogColumns.add(colDef);
+
+				allColumnsClone.remove(colDef);
+			}
+		}
+
+		/*
+		 * add the columns which are defined but not visible
+		 */
+		for (final ColumnDefinition colDef : allColumnsClone) {
+			colDef.setIsVisibleInDialog(false);
+			allDialogColumns.add(colDef);
+		}
+
+		return allDialogColumns;
+	}
+
 	public void openColumnDialog() {
 
-		final ArrayList<ColumnDefinition> customColumns = createModifyDialogColumns();
+		// get the sorting order and column width from the viewer
+		fVisibleColumnIds = getColumnIdsFromViewer();
+		fColumnIdsAndWidth = getColumnIdAndWidthFromViewer();
 
-		(new ColumnModifyDialog(Display.getCurrent().getActiveShell(), this, customColumns, fAllColumnDefinitions)).open();
+		(new ColumnModifyDialog(Display.getCurrent().getActiveShell(), this, getDialogColumns(), fAllColumnDefinitions)).open();
 	}
 
 	/**
@@ -426,7 +425,7 @@ public class ColumnManager {
 		}
 
 		// save columns width and keep it for internal use
-		fColumnIdsAndWidth = getColumnIdAndWidth();
+		fColumnIdsAndWidth = getColumnIdAndWidthFromViewer();
 		if (fColumnIdsAndWidth != null) {
 			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(fColumnIdsAndWidth));
 		}
