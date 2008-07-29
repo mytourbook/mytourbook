@@ -503,7 +503,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		 * column: database indicator
 		 */
 		colDef = TableColumnFactory.DB_STATUS.createColumn(fColumnManager, pixelConverter);
-//		colDef.setColumnResizable(false);
+		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

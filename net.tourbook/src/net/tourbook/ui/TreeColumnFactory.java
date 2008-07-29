@@ -28,7 +28,7 @@ public abstract class TreeColumnFactory {
 			final TreeColumnDefinition colDef = new TreeColumnDefinition("altitudeDown", SWT.TRAIL); //$NON-NLS-1$
 			columnManager.addColumn(colDef); 
 			
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label + " (" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setColumnText(UI.UNIT_LABEL_ALTITUDE);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
 			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));

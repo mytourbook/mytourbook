@@ -621,12 +621,13 @@ public class TourDatabase {
 	 * @param entityClass
 	 * @return Returns <code>true</code> when the entity was saved
 	 */
-	public static boolean saveEntity(Object entity, final long id, final Class<?> entityClass) {
+	public static <T> T saveEntity(final T entity, final long id, final Class<?> entityClass) {
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		boolean isSaved = false;
 		final EntityTransaction ts = em.getTransaction();
+		T savedEntity = null;
 
 		try {
 
@@ -639,10 +640,11 @@ public class TourDatabase {
 					// entity is not persisted
 
 					em.persist(entity);
+					savedEntity = entity;
 
 				} else {
 
-					entity = em.merge(entity);
+					savedEntity = em.merge(entity);
 				}
 			}
 			ts.commit();
@@ -663,7 +665,7 @@ public class TourDatabase {
 					"Error", "Error occured when saving an entity"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		return isSaved;
+		return savedEntity;
 	}
 
 	/**
@@ -674,10 +676,11 @@ public class TourDatabase {
 	 * @param entityClass
 	 * @return Returns the saved entity
 	 */
-	public static <T> T saveEntity(T entity, final long id, final Class<T> entityClass, final EntityManager em) {
+	public static <T> T saveEntity(final T entity, final long id, final Class<T> entityClass, final EntityManager em) {
 
 		boolean isSaved = false;
 		final EntityTransaction ts = em.getTransaction();
+		T savedEntity = null;
 
 		try {
 
@@ -690,10 +693,11 @@ public class TourDatabase {
 					// entity is not persisted
 
 					em.persist(entity);
+					savedEntity = entity;
 
 				} else {
 
-					entity = em.merge(entity);
+					savedEntity = em.merge(entity);
 				}
 			}
 			ts.commit();
@@ -713,7 +717,7 @@ public class TourDatabase {
 					"Error", "Error occured when saving an entity"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		return entity;
+		return savedEntity;
 	}
 
 	/**

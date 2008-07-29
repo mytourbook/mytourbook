@@ -820,6 +820,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 		int savedTourItems = 0;
 		int unsavedTourItems = 0;
 		TVICompareResultComparedTour firstTourItem = null;
+		TVICompareResultComparedTour firstCheckedItem = null;
+		TVICompareResultComparedTour firstSelectedItem = null;
 
 		/*
 		 * count selected items
@@ -835,6 +837,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 				// count tours
 				if (tourItems == 0) {
 					firstTourItem = comparedTourItem;
+					firstSelectedItem = comparedTourItem;
 				}
 				tourItems++;
 
@@ -862,8 +865,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 				final TVICompareResultComparedTour comparedTourItem = (TVICompareResultComparedTour) checkedElement;
 
 				// count tours
-				if (tourItems == 0) {
+				if (tourItems <= 1) {
 					firstTourItem = comparedTourItem;
+					firstCheckedItem = comparedTourItem;
 				}
 				tourItems++;
 
@@ -879,8 +883,14 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 		}
 
 		final boolean isTourSelected = tourItems > 0 && otherItems == 0;
-		final boolean isOneTour = tourItems == 1 && otherItems == 0;
-		final boolean isOneTourSelected = selectedTours == 1;
+		boolean isOneTour = tourItems == 1 && otherItems == 0;
+		boolean isOneTourSelected = selectedTours == 1;
+
+		// check if the same tour is selected and/or checked
+		if (tourItems == 2 && otherItems == 0 && firstSelectedItem == firstCheckedItem) {
+			isOneTour = true;
+			isOneTourSelected = true;
+		}
 
 		fActionCheckTours.setEnabled(unsavedTourItems > 0);
 		fActionUncheckTours.setEnabled(checkedTours > 0);

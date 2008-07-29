@@ -78,14 +78,14 @@ final class TagDropAdapter extends ViewerDropAdapter {
 
 //		System.out.println("dropCategoryIntoCategory");
 		final TourTagCategory draggedCategory = itemDraggedCategory.getTourTagCategory();
-		final TreeViewerItem itemDraggedParent = itemDraggedCategory.getParentItem();
+		final TreeViewerItem draggedParentItem = itemDraggedCategory.getParentItem();
 
 		final TourTagCategory targetCategory = itemTargetCategory.getTourTagCategory();
 		TVIPrefTagCategory itemDraggedParentCategory = null;
 
 		boolean isUpdateViewer = false;
 
-		if (itemDraggedParent instanceof TVIPrefTagCategory) {
+		if (draggedParentItem instanceof TVIPrefTagCategory) {
 
 			/*
 			 * dragged category is from another category
@@ -94,7 +94,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 			if (em != null) {
 
-				itemDraggedParentCategory = (TVIPrefTagCategory) itemDraggedParent;
+				itemDraggedParentCategory = (TVIPrefTagCategory) draggedParentItem;
 				final TourTagCategory draggedParentCategory = itemDraggedParentCategory.getTourTagCategory();
 
 				/*
@@ -125,7 +125,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 				em.close();
 			}
 
-		} else if (itemDraggedParent instanceof TVIPrefTagRoot) {
+		} else if (draggedParentItem instanceof TVIPrefTagRoot) {
 
 			/*
 			 * dragged category is a root category
@@ -134,7 +134,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 			if (em != null) {
 
-				final TVIPrefTagRoot itemDraggedRoot = (TVIPrefTagRoot) itemDraggedParent;
+				final TVIPrefTagRoot itemDraggedRoot = (TVIPrefTagRoot) draggedParentItem;
 
 				/*
 				 * remove category from old category
@@ -179,7 +179,7 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		}
 	}
 
-	private void dropCategoryIntoRoot(final TVIPrefTagCategory itemDraggedCategory) {
+	private void dropCategoryIntoRoot(final TVIPrefTagCategory draggedCategoryItem) {
 
 //		System.out.println("dropCategoryIntoRoot");
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -187,34 +187,34 @@ final class TagDropAdapter extends ViewerDropAdapter {
 			return;
 		}
 
-		final TourTagCategory draggedCategory = itemDraggedCategory.getTourTagCategory();
-		final TreeViewerItem itemDraggedTagParent = itemDraggedCategory.getParentItem();
+		final TourTagCategory draggedCategory = draggedCategoryItem.getTourTagCategory();
+		final TreeViewerItem draggedCategoryParentItem = draggedCategoryItem.getParentItem();
 
-		TVIPrefTagCategory itemDraggedParentCategory = null;
+		TVIPrefTagCategory draggedCategoryParentCategoryItem = null;
 
-		if (itemDraggedTagParent instanceof TVIPrefTagCategory) {
+		if (draggedCategoryParentItem instanceof TVIPrefTagCategory) {
 
 			/*
 			 * parent of the dragged category is a category, remove dragged category from old
 			 * category
 			 */
 
-			itemDraggedParentCategory = (TVIPrefTagCategory) itemDraggedTagParent;
-			final TourTagCategory draggedParentCategory = itemDraggedParentCategory.getTourTagCategory();
+			draggedCategoryParentCategoryItem = (TVIPrefTagCategory) draggedCategoryParentItem;
+			final TourTagCategory draggedParentCategory = draggedCategoryParentCategoryItem.getTourTagCategory();
 
 			/*
 			 * remove category from old category
 			 */
 
 			// remove category from dragged parent item
-			itemDraggedParentCategory.removeChild(itemDraggedCategory);
+			draggedCategoryParentCategoryItem.removeChild(draggedCategoryItem);
 
 			// remove category from the database
 			final TourTagCategory updatedEntity = updateModelRemoveCategory(draggedCategory, draggedParentCategory, em);
 			if (updatedEntity != null) {
 
 				// set updated categoy into the item
-				itemDraggedParentCategory.setTourTagCategory(updatedEntity);
+				draggedCategoryParentCategoryItem.setTourTagCategory(updatedEntity);
 			}
 		}
 
@@ -222,24 +222,34 @@ final class TagDropAdapter extends ViewerDropAdapter {
 		 * update category in db
 		 */
 		draggedCategory.setRoot(true);
-		TourDatabase.saveEntity(draggedCategory, draggedCategory.getCategoryId(), TourTagCategory.class, em);
 
+		final TourTagCategory savedDraggedCategory = TourDatabase.saveEntity(draggedCategory,
+				draggedCategory.getCategoryId(),
+				TourTagCategory.class,
+				em);
+
+		/*
+		 * update item with the saved category entity
+		 */
+		if (savedDraggedCategory != null) {
+			draggedCategoryItem.setTourTagCategory(savedDraggedCategory);
+		}
 		em.close();
 
 		/*
 		 * add category to the root item (target)
 		 */
 		final TVIPrefTagRoot rootItem = fPrefPageTags.getRootItem();
-		rootItem.addChild(itemDraggedCategory);
+		rootItem.addChild(draggedCategoryItem);
 
 		/*
 		 * update tag viewer
 		 */
-		fTagViewer.remove(itemDraggedCategory);
-		fTagViewer.add(fPrefPageTags, itemDraggedCategory);
+		fTagViewer.remove(draggedCategoryItem);
+		fTagViewer.add(fPrefPageTags, draggedCategoryItem);
 
-		if (itemDraggedParentCategory != null) {
-			fTagViewer.update(itemDraggedParentCategory, null);
+		if (draggedCategoryParentCategoryItem != null) {
+			fTagViewer.update(draggedCategoryParentCategoryItem, null);
 		}
 	}
 

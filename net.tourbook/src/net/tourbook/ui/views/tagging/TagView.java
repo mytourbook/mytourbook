@@ -679,12 +679,14 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 				}
 
 				final long recordingTime = ((TVITagViewItem) element).colRecordingTime;
+				if (recordingTime != 0) {
 
-				cell.setText(new Formatter().format(Messages.Format_hhmm,
-						(recordingTime / 3600),
-						((recordingTime % 3600) / 60)).toString());
+					cell.setText(new Formatter().format(Messages.Format_hhmm,
+							(recordingTime / 3600),
+							((recordingTime % 3600) / 60)).toString());
 
-				setCellColor(cell, element);
+					setCellColor(cell, element);
+				}
 			}
 		});
 
@@ -702,11 +704,13 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 				}
 
 				final long drivingTime = ((TVITagViewItem) element).colDrivingTime;
+				if (drivingTime != 0) {
 
-				cell.setText(new Formatter().format(Messages.Format_hhmm,
-						(drivingTime / 3600),
-						((drivingTime % 3600) / 60)).toString());
-				setCellColor(cell, element);
+					cell.setText(new Formatter().format(Messages.Format_hhmm,
+							(drivingTime / 3600),
+							((drivingTime % 3600) / 60)).toString());
+					setCellColor(cell, element);
+				}
 			}
 		});
 
@@ -723,16 +727,18 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					return;
 				}
 
-				// set distance
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
+				final long colDistance = ((TVITagViewItem) element).colDistance;
+				if (colDistance != 0) {
 
-				final String distance = fNF.format(((float) ((TVITagViewItem) element).colDistance)
-						/ 1000
-						/ UI.UNIT_VALUE_DISTANCE);
-				cell.setText(distance);
+					// set distance
+					fNF.setMinimumFractionDigits(1);
+					fNF.setMaximumFractionDigits(1);
 
-				setCellColor(cell, element);
+					final String distance = fNF.format(((float) colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE);
+
+					cell.setText(distance);
+					setCellColor(cell, element);
+				}
 			}
 		});
 
@@ -749,8 +755,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					return;
 				}
 
-				cell.setText(Long.toString((long) (((TVITagViewItem) element).colAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
-				setCellColor(cell, element);
+				final long colAltitudeUp = ((TVITagViewItem) element).colAltitudeUp;
+				if (colAltitudeUp != 0) {
+
+					cell.setText(Long.toString((long) (colAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
+					setCellColor(cell, element);
+				}
 			}
 		});
 
@@ -767,8 +777,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					return;
 				}
 
-				cell.setText(Long.toString((long) (((TVITagViewItem) element).colAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
-				setCellColor(cell, element);
+				final long colAltitudeDown = ((TVITagViewItem) element).colAltitudeDown;
+				if (colAltitudeDown != 0) {
+
+					cell.setText(Long.toString((long) (colAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
+					setCellColor(cell, element);
+				}
 			}
 		});
 
@@ -785,8 +799,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					return;
 				}
 
-				cell.setText(Long.toString(((TVITagViewItem) element).colMaxAltitude));
-				setCellColor(cell, element);
+				final long colMaxAltitude = ((TVITagViewItem) element).colMaxAltitude;
+				if (colMaxAltitude != 0) {
+
+					cell.setText(Long.toString(colMaxAltitude));
+					setCellColor(cell, element);
+				}
 			}
 		});
 
@@ -803,28 +821,15 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					return;
 				}
 
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
-				cell.setText(fNF.format(((TVITagViewItem) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
-				setCellColor(cell, element);
-			}
-		});
+				final float colMaxSpeed = ((TVITagViewItem) element).colMaxSpeed;
+				if (colMaxSpeed != 0) {
 
-		/*
-		 * column: avg speed
-		 */
-		colDef = TreeColumnFactory.AVG_PULSE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+					fNF.setMinimumFractionDigits(1);
+					fNF.setMaximumFractionDigits(1);
 
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
+					cell.setText(fNF.format(colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
+					setCellColor(cell, element);
 				}
-
-				cell.setText(Long.toString(((TVITagViewItem) element).colAvgPulse));
-				setCellColor(cell, element);
 			}
 		});
 
@@ -841,8 +846,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					return;
 				}
 
-				cell.setText(Long.toString(((TVITagViewItem) element).colMaxPulse));
-				setCellColor(cell, element);
+				final long colMaxPulse = ((TVITagViewItem) element).colMaxPulse;
+				if (colMaxPulse != 0) {
+
+					cell.setText(Long.toString(colMaxPulse));
+					setCellColor(cell, element);
+				}
 			}
 		});
 
@@ -859,8 +868,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					return;
 				}
 
-				cell.setText(Long.toString(((TVITagViewItem) element).colAvgPulse));
-				setCellColor(cell, element);
+				final long colAvgPulse = ((TVITagViewItem) element).colAvgPulse;
+				if (colAvgPulse != 0) {
+
+					cell.setText(Long.toString(colAvgPulse));
+					setCellColor(cell, element);
+				}
 			}
 		}); /*
 			 * column: avg cadence
@@ -875,8 +888,12 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 					return;
 				}
 
-				cell.setText(Long.toString(((TVITagViewItem) element).colAvgCadence));
-				setCellColor(cell, element);
+				final long colAvgCadence = ((TVITagViewItem) element).colAvgCadence;
+				if (colAvgCadence != 0) {
+
+					cell.setText(Long.toString(colAvgCadence));
+					setCellColor(cell, element);
+				}
 			}
 		});
 
@@ -895,13 +912,15 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 				}
 
 				long temperature = ((TVITagViewItem) element).colAvgTemperature;
+				if (temperature != 0) {
 
-				if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-					temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+						temperature = (long) (temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD);
+					}
+
+					cell.setText(Long.toString(temperature));
+					setCellColor(cell, element);
 				}
-				cell.setText(Long.toString(temperature));
-
-				setCellColor(cell, element);
 			}
 		});
 	}

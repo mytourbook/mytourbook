@@ -31,7 +31,9 @@ public class TVIPrefTagCategory extends TVIPrefTagItem {
 	private TourTagCategory	fTourTagCategory;
 
 	public TVIPrefTagCategory(final TreeViewer tagViewer, final TourTagCategory tourTagCategory) {
+
 		super(tagViewer);
+
 		fTourTagCategory = tourTagCategory;
 	}
 
@@ -46,13 +48,13 @@ public class TVIPrefTagCategory extends TVIPrefTagItem {
 
 		final TourTagCategory tourTagCategory = em.find(TourTagCategory.class, fTourTagCategory.getCategoryId());
 
-		// create tree tag items
+		// create tag items
 		final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
 		for (final TourTag tourTag : lazyTourTags) {
 			addChild(new TVIPrefTag(getTagViewer(), tourTag));
 		}
 
-		// create tree category items
+		// create category items
 		final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
 		for (final TourTagCategory tagCategory : lazyTourTagCategories) {
 			addChild(new TVIPrefTagCategory(getTagViewer(), tagCategory));
@@ -76,7 +78,7 @@ public class TVIPrefTagCategory extends TVIPrefTagItem {
 	}
 
 	/**
-	 * @return Returns the tag category for this view item
+	 * @return Returns the tag category for this item
 	 */
 	public TourTagCategory getTourTagCategory() {
 		return fTourTagCategory;
@@ -85,6 +87,11 @@ public class TVIPrefTagCategory extends TVIPrefTagItem {
 	@Override
 	protected void remove() {}
 
+	/**
+	 * Set the tag category for this item
+	 * 
+	 * @param tourTagCategoryEntity
+	 */
 	public void setTourTagCategory(final TourTagCategory tourTagCategoryEntity) {
 		fTourTagCategory = tourTagCategoryEntity;
 	}

@@ -601,18 +601,18 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			return;
 		}
 
-		// create tour tag category + tree item
-		final TourTagCategory newTourTagCategory = new TourTagCategory(inputDialog.getValue().trim());
-		final TreeViewerItem newCategoryItem = new TVIPrefTagCategory(fTagViewer, newTourTagCategory);
-
-		boolean isSaved = false;
+		// create tag category + tree item
+		final TourTagCategory newCategory = new TourTagCategory(inputDialog.getValue().trim());
+		final TVIPrefTagCategory newCategoryItem = new TVIPrefTagCategory(fTagViewer, newCategory);
 
 		final Object parentElement = ((StructuredSelection) fTagViewer.getSelection()).getFirstElement();
+		TourTagCategory savedNewCategory = null;
+
 		if (parentElement == null) {
 
 			// a parent is not selected, this will be a root category
 
-			newTourTagCategory.setRoot(true);
+			newCategory.setRoot(true);
 
 			/*
 			 * update model
@@ -621,19 +621,22 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			fRootItem.getFetchedChildren().add(newCategoryItem);
 
 			// persist new category
-			isSaved = TourDatabase.saveEntity(newTourTagCategory,
-					newTourTagCategory.getCategoryId(),
-					TourTagCategory.class);
+			savedNewCategory = TourDatabase.saveEntity(newCategory, newCategory.getCategoryId(), TourTagCategory.class);
+			if (savedNewCategory != null) {
 
-			// update viewer
-			fTagViewer.add(this, newCategoryItem);
+				// update item
+				newCategoryItem.setTourTagCategory(savedNewCategory);
+
+				// update viewer
+				fTagViewer.add(this, newCategoryItem);
+			}
 
 		} else if (parentElement instanceof TVIPrefTagCategory) {
 
 			// parent is a category
 
 			final TVIPrefTagCategory parentCategoryItem = (TVIPrefTagCategory) parentElement;
-			TourTagCategory parentTagCategory = parentCategoryItem.getTourTagCategory();
+			final TourTagCategory parentCategory = parentCategoryItem.getTourTagCategory();
 
 			/*
 			 * update model
@@ -642,42 +645,44 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 			// persist new category
-			isSaved = TourDatabase.saveEntity(newTourTagCategory,
-					newTourTagCategory.getCategoryId(),
-					TourTagCategory.class);
+			savedNewCategory = TourDatabase.saveEntity(newCategory, newCategory.getCategoryId(), TourTagCategory.class);
+			if (savedNewCategory != null) {
 
-			if (isSaved) {
+				// update item
+				newCategoryItem.setTourTagCategory(savedNewCategory);
 
-				// update parent category
-				{
-					final TourTagCategory parentTourTagCategoryEntity = em.find(TourTagCategory.class,
-							parentTagCategory.getCategoryId());
+				/*
+				 * update parent category
+				 */
+				final TourTagCategory parentCategoryEntity = em.find(TourTagCategory.class,
+						parentCategory.getCategoryId());
 
-					// set new entity
-					parentTagCategory = parentTourTagCategoryEntity;
-					parentCategoryItem.setTourTagCategory(parentTourTagCategoryEntity);
+				// set tag in parent category
+				final Set<TourTagCategory> lazyTourTagCategories = parentCategoryEntity.getTagCategories();
+				lazyTourTagCategories.add(savedNewCategory);
 
-					// set tag in parent category
-					final Set<TourTagCategory> lazyTourTagCategories = parentTourTagCategoryEntity.getTagCategories();
-					lazyTourTagCategories.add(newTourTagCategory);
+				// update number of categories
+				parentCategoryEntity.setCategoryCounter(lazyTourTagCategories.size());
 
-					// update number of categories
-					parentTourTagCategoryEntity.setCategoryCounter(lazyTourTagCategories.size());
-				}
-
-				// persist parent category
-				isSaved = TourDatabase.saveEntity(parentTagCategory,
-						parentTagCategory.getCategoryId(),
+				/*
+				 * persist parent category
+				 */
+				final TourTagCategory savedParentCategory = TourDatabase.saveEntity(parentCategoryEntity,
+						parentCategoryEntity.getCategoryId(),
 						TourTagCategory.class);
 
-				if (isSaved) {
+				if (savedParentCategory != null) {
+
+					// update item
+					parentCategoryItem.setTourTagCategory(savedParentCategory);
 
 					/*
 					 * update viewer
 					 */
 					parentCategoryItem.clearChildren();
 
-					fTagViewer.update(parentCategoryItem, null);
+//					fTagViewer.update(parentCategoryItem, null);
+
 					fTagViewer.add(parentCategoryItem, newCategoryItem);
 
 					fTagViewer.expandToLevel(parentCategoryItem, 1);
@@ -688,7 +693,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 		}
 
-		if (isSaved) {
+		if (savedNewCategory != null) {
 
 			// reveal new tag in viewer
 			fTagViewer.reveal(newCategoryItem);
@@ -728,7 +733,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			return;
 		}
 
-		boolean isSaved = false;
+		TourTag savedTag = null;
 
 		// create new tour tag + item
 		final TourTag tourTag = new TourTag(inputDialog.getValue().trim());
@@ -748,9 +753,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			fRootItem.getFetchedChildren().add(tagItem);
 
 			// persist tag
-			isSaved = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
+			savedTag = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
 
-			if (isSaved) {
+			if (savedTag != null) {
+
+				// update item
+				tagItem.setTourTag(savedTag);
 
 				/*
 				 * update viewer
@@ -776,8 +784,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			 * persist tag without new category otherwise an exception "detached entity passed to
 			 * persist: net.tourbook.data.TourTagCategory" is raised
 			 */
-			isSaved = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
-			if (isSaved) {
+			savedTag = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
+			if (savedTag != null) {
+
+				// update item
+				tagItem.setTourTag(savedTag);
 
 				// update parent category
 				final EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -799,22 +810,26 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				em.close();
 
 				// persist parent category
-				isSaved = TourDatabase.saveEntity(parentTagCategory,
+				final TourTagCategory savedParent = TourDatabase.saveEntity(parentTagCategory,
 						parentTagCategory.getCategoryId(),
 						TourTagCategory.class);
 
-				if (isSaved) {
+				if (savedParent != null) {
+
+					// update item
+					parentCategoryItem.setTourTagCategory(savedParent);
 
 					// set category in tag
 					tourTag.getTagCategories().add(parentTagCategory);
 
 					// persist tag with category
-					isSaved = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
+					savedTag = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
+
 				}
 
 			}
 
-			if (isSaved) {
+			if (savedTag != null) {
 
 				// clear tour tag list
 				TourDatabase.clearTourTags();
@@ -831,7 +846,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			}
 		}
 
-		if (isSaved) {
+		if (savedTag != null) {
 
 			// show new tag in viewer
 			fTagViewer.reveal(tagItem);

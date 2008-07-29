@@ -718,7 +718,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 			}
 		}
 
-		final boolean isTourSelected = tourItems > 0 && refItems == 0 && yearItems == 0;
+		final boolean isTourSelected = tourItems > 0;// && refItems == 0 && yearItems == 0;
 		final boolean isOneTour = tourItems == 1 && refItems == 0 && yearItems == 0;
 
 		final int selectedItems = selection.size();
@@ -851,11 +851,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		final IStructuredSelection selectedTours = ((IStructuredSelection) fTourViewer.getSelection());
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
 
-		// loop: all selected tours
+		// loop: all selected items
 		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
 
 			final Object treeItem = iter.next();
-
 			if (treeItem instanceof TVICatalogComparedTour) {
 
 				final TVICatalogComparedTour tourItem = ((TVICatalogComparedTour) treeItem);

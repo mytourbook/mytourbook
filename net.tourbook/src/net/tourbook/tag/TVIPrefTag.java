@@ -47,4 +47,8 @@ public class TVIPrefTag extends TVIPrefTagItem {
 
 	}
 
+	public void setTourTag(final TourTag savedTag) {
+		fTourTag = savedTag;
+	}
+
 }

@@ -53,7 +53,8 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 			tourTags = (ArrayList<TourTag>) query.getResultList();
 
 			for (final TourTag tourTag : tourTags) {
-				addChild(new TVIPrefTag(getTagViewer(), tourTag));
+				final TVIPrefTag tagItem = new TVIPrefTag(getTagViewer(), tourTag);
+				addChild(tagItem);
 			}
 
 			/*
@@ -66,7 +67,8 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 			final ArrayList<TourTagCategory> tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
 
 			for (final TourTagCategory tourTagCategory : tourTagCategories) {
-				addChild(new TVIPrefTagCategory(getTagViewer(), tourTagCategory));
+				final TVIPrefTagCategory categoryItem = new TVIPrefTagCategory(getTagViewer(), tourTagCategory);
+				addChild(categoryItem);
 			}
 
 			em.close();

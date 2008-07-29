@@ -146,7 +146,14 @@ public class TourTagCategory implements Comparable<Object> {
 
 	@Override
 	public String toString() {
-		return "TourTagCategory ID:" + tagCategoryId + "\tisRoot:" + isRoot + "\t" + name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final String category = "TourTagCategory ID:" + tagCategoryId + "\tisRoot:" + isRoot + "\t" + name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//		if (tourTagCategory.size() > 0) {
+//			category += UI.NEW_LINE + "\tchildren:";
+//			for (final TourTagCategory ttCategory : tourTagCategory) {
+//				category += UI.NEW_LINE + "\t" + ttCategory.toString();
+//			}
+//		}
+		return category;
 	}
 
 }
