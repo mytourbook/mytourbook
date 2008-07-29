@@ -119,9 +119,9 @@ public class ChartComponents extends Composite {
 	 * minimum width in pixel for one unit, this is only an approximate value because the pixel is
 	 * rounded up or down to fit a rounded unit
 	 */
-	private final int					fDevMinXUnit				= 100;
+	private final int					fDevMinXUnit				= 70;
 
-	private final int					fDevMinYUnit				= 50;
+	private final int					fDevMinYUnit				= 30;
 
 	/**
 	 * contains the {@link SynchConfiguration} for the current chart and will be used from the chart
