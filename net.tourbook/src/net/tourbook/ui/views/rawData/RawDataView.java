@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.ui.views.rawData;
 
 import java.io.File;
@@ -23,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
@@ -146,12 +146,14 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private ActionRemoveAllTags				fActionRemoveAllTags;
 	private ActionOpenPrefDialog			fActionOpenTagPrefs;
 
-	private ImageDescriptor					imageDatabaseDescriptor;
-	private ImageDescriptor					imageDatabaseOtherPersonDescriptor;
-	private ImageDescriptor					imageDatabasePlaceholderDescriptor;
+	private ImageDescriptor					imageDescDatabase;
+	private ImageDescriptor					imageDescDatabaseOtherPerson;
+	private ImageDescriptor					imageDescDatabasePlaceholder;
+	private ImageDescriptor					imageDescDelete;
 	private Image							imageDatabase;
 	private Image							imageDatabaseOtherPerson;
 	private Image							imageDatabasePlaceholder;
+	private Image							imageDelete;
 
 	private IPartListener2					fPartListener;
 	private ISelectionListener				fPostSelectionListener;
@@ -306,6 +308,8 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 						return;
 					}
 
+					removeTours(removedTours);
+
 					if (fIsPartVisible) {
 
 						RawDataManager.getInstance().updateTourDataFromDb();
@@ -430,15 +434,17 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 	private void createResources() {
 
-		imageDatabaseDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__database);
-		imageDatabaseOtherPersonDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person);
-		imageDatabasePlaceholderDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__database_placeholder);
+		imageDescDatabase = TourbookPlugin.getImageDescriptor(Messages.Image__database);
+		imageDescDatabaseOtherPerson = TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person);
+		imageDescDatabasePlaceholder = TourbookPlugin.getImageDescriptor(Messages.Image__database_placeholder);
+		imageDescDelete = TourbookPlugin.getImageDescriptor(Messages.Image__delete);
 
 		try {
 			final Display display = Display.getCurrent();
-			imageDatabase = (Image) imageDatabaseDescriptor.createResource(display);
-			imageDatabaseOtherPerson = (Image) imageDatabaseOtherPersonDescriptor.createResource(display);
-			imageDatabasePlaceholder = (Image) imageDatabasePlaceholderDescriptor.createResource(display);
+			imageDatabase = (Image) imageDescDatabase.createResource(display);
+			imageDatabaseOtherPerson = (Image) imageDescDatabaseOtherPerson.createResource(display);
+			imageDatabasePlaceholder = (Image) imageDescDatabasePlaceholder.createResource(display);
+			imageDelete = (Image) imageDescDelete.createResource(display);
 		} catch (final DeviceResourceException e) {
 			e.printStackTrace();
 		}
@@ -450,14 +456,14 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	 */
 	private void createTourViewer(final Composite parent) {
 
-		// parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		final Preferences prefStore = TourbookPlugin.getDefault().getPluginPreferences();
 
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
 
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		table.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTourViewer = new TableViewer(table);
 		fColumnManager.createColumns();
@@ -509,12 +515,15 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				// show the database indicator for the person who owns the tour
-				final TourPerson tourPerson = ((TourData) cell.getElement()).getTourPerson();
+				final TourData tourData = (TourData) cell.getElement();
+				final TourPerson tourPerson = tourData.getTourPerson();
 				final long activePersonId = fActivePerson == null ? -1 : fActivePerson.getPersonId();
 
-				cell.setImage(tourPerson == null
-						? imageDatabasePlaceholder
-						: tourPerson.getPersonId() == activePersonId ? imageDatabase : imageDatabaseOtherPerson);
+				cell.setImage(tourData.isTourDeleted ? //
+						imageDelete
+						: tourPerson == null ? imageDatabasePlaceholder : tourPerson.getPersonId() == activePersonId
+								? imageDatabase
+								: imageDatabaseOtherPerson);
 			}
 		});
 
@@ -669,7 +678,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		/*
 		 * column: speed
 		 */
-		colDef = TableColumnFactory.SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -762,13 +771,16 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	public void dispose() {
 
 		if (imageDatabase != null) {
-			imageDatabaseDescriptor.destroyResource(imageDatabase);
+			imageDescDatabase.destroyResource(imageDatabase);
 		}
 		if (imageDatabaseOtherPerson != null) {
-			imageDatabaseOtherPersonDescriptor.destroyResource(imageDatabaseOtherPerson);
+			imageDescDatabaseOtherPerson.destroyResource(imageDatabaseOtherPerson);
 		}
 		if (imageDatabasePlaceholder != null) {
-			imageDatabasePlaceholderDescriptor.destroyResource(imageDatabasePlaceholder);
+			imageDescDatabasePlaceholder.destroyResource(imageDatabasePlaceholder);
+		}
+		if (imageDelete != null) {
+			imageDescDelete.destroyResource(imageDelete);
 		}
 
 		getViewSite().getPage().removePartListener(fPartListener);
@@ -795,7 +807,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 				final TourData tourData = (TourData) treeItem;
 				if (tourData.getTourPerson() == null) {
-					unsavedTours++;
+					if (tourData.isTourDeleted == false) {
+						unsavedTours++;
+					}
 				} else {
 
 					if (savedTours == 0) {
@@ -865,7 +879,9 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(fActionSaveTourWithPerson);
+		if (TourbookPlugin.getDefault().getActivePerson() != null) {
+			menuMgr.add(fActionSaveTourWithPerson);
+		}
 		menuMgr.add(fActionSaveTour);
 
 		menuMgr.add(new Separator());
@@ -1007,6 +1023,34 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 		// update tour data viewer
 		fTourViewer.setInput(RawDataManager.getInstance().getTourDataMap().values().toArray());
+	}
+
+	private void removeTours(final ArrayList<ITourItem> removedTours) {
+
+		final HashMap<String, TourData> tourMap = RawDataManager.getInstance().getTourDataMap();
+
+		for (final ITourItem tourItem : removedTours) {
+
+			final TourData tourData = tourMap.get(tourItem.getTourId().toString());
+			if (tourData != null) {
+
+				// when a tour was deleted the person in the tour data must be removed
+				tourData.setTourPerson(null);
+
+				// remove tour properties
+				tourData.setTourType(null);
+				tourData.setTourTitle(UI.EMPTY_STRING);
+				tourData.setTourTags(new HashSet<TourTag>());
+
+				/**
+				 * when a remove tour is saved again, this will cause the exception: <br>
+				 * detached entity passed to persist: net.tourbook.data.TourMarker<br>
+				 * I didn't find a workaround, so this tour cannot be saved again until it is
+				 * reloaded from the file
+				 */
+				tourData.isTourDeleted = true;
+			}
+		}
 	}
 
 	private void restoreState(final IMemento memento) {

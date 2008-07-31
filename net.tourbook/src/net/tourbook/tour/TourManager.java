@@ -1147,14 +1147,14 @@ public class TourManager {
 			return tourDataInMap;
 		}
 
-		final TourData tourData = TourDatabase.getTourData(tourId);
+		final TourData tourData = TourDatabase.getTourFromDb(tourId);
 
 		if (tourData == null) {
 			return null;
 		}
 
 		// keep the tour data
-		putTourDataIntoMap(tourId, tourData);
+		updateTourInCache(tourData);
 
 		return tourData;
 	}
@@ -1181,10 +1181,6 @@ public class TourManager {
 		}
 	}
 
-	private void putTourDataIntoMap(final Long tourId, final TourData tourData) {
-		fTourDataMap.put(tourId, tourData);
-	}
-
 	public void removeAllToursFromCache() {
 		fTourDataMap.values().clear();
 	}
@@ -1204,7 +1200,7 @@ public class TourManager {
 	}
 
 	public void updateTourInCache(final TourData tourData) {
-		putTourDataIntoMap(tourData.getTourId(), tourData);
+		fTourDataMap.put(tourData.getTourId(), tourData);
 	}
 
 }

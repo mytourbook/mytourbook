@@ -32,6 +32,7 @@ import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
@@ -294,7 +295,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-				if (!selection.isEmpty() && selection instanceof SelectionNewTours) {
+				if (selection instanceof SelectionNewTours || selection instanceof SelectionDeletedTours) {
 					reloadViewer();
 				}
 			}

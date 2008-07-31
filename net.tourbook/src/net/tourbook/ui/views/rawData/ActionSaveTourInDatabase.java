@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.ui.views.rawData;
 
 import java.util.ArrayList;
@@ -164,7 +163,6 @@ public class ActionSaveTourInDatabase extends Action {
 
 		final Runnable runnable = new Runnable() {
 
-			@SuppressWarnings("unchecked")
 			public void run() {
 
 				boolean isModified = false;
@@ -174,32 +172,33 @@ public class ActionSaveTourInDatabase extends Action {
 				final IStructuredSelection selection = ((IStructuredSelection) fViewPart.getViewer().getSelection());
 
 				// loop: all selected tours
-				for (final Iterator iter = selection.iterator(); iter.hasNext();) {
+				for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 
 					final Object selObject = iter.next();
-
 					if (selObject instanceof TourData) {
 
 						final TourData tourData = (TourData) selObject;
+						if (tourData.isTourDeleted == false) {
 
-						if (tourData.getTourPerson() == null) {
+							if (tourData.getTourPerson() == null) {
 
-							tourData.setTourPerson(person);
-							tourData.setBikerWeight(person.getWeight());
+								tourData.setTourPerson(person);
+								tourData.setBikerWeight(person.getWeight());
 
-							saveInDatabase = true;
-						}
+								saveInDatabase = true;
+							}
 
-						if (tourData.getTourBike() == null && tourData.getTourPerson().getTourBike() != null) {
-							tourData.setTourBike(bike);
+							if (tourData.getTourBike() == null && tourData.getTourPerson().getTourBike() != null) {
+								tourData.setTourBike(bike);
 
-							saveInDatabase = true;
-						}
+								saveInDatabase = true;
+							}
 
-						// save the person and or bike when it's not yet set
-						if (saveInDatabase == true) {
-							if (TourDatabase.saveTour(tourData)) {
-								isModified = true;
+							// save the person and or bike when it's not yet set
+							if (saveInDatabase == true) {
+								if (TourDatabase.saveTour(tourData)) {
+									isModified = true;
+								}
 							}
 						}
 					}

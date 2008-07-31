@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -73,10 +73,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
-	/**
-	 * width for the tour type combo box
-	 */
-//	private static final int					TOUR_TYPE_WIDTH		= 30;
 	TreeViewer									fColorViewer;
 	private ColorDefinition						fExpandedItem;
 	private GraphColorItem						fSelectedColor;
@@ -280,9 +276,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		treeContainer.setLayout(treeLayouter);
 
 		// tour tree
-		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER);
+		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 
 		tree.setLinesVisible(false);
+		final int colorColumnWidth = tree.getItemHeight() * 4 + 5; 
 
 		// tree columns
 		TreeColumn tc;
@@ -292,10 +289,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		treeLayouter.addColumnData(new ColumnWeightData(3, true));
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		treeLayouter.addColumnData(new ColumnPixelData(tree.getItemHeight() * 4, true));
+		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
 
 		tc = new TreeColumn(tree, SWT.NONE);
-		treeLayouter.addColumnData(new ColumnPixelData(tree.getItemHeight() * 4, true));
+		treeLayouter.addColumnData(new ColumnPixelData(colorColumnWidth, true));
 
 		fColorViewer = new TreeViewer(tree);
 		fColorViewer.setContentProvider(new ColorContentProvider());
@@ -365,7 +362,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		final Label label = new Label(parent, SWT.WRAP);
 		label.setText(Messages.Pref_TourTypes_Title);
-		label.setLayoutData(new GridData(SWT.NONE, SWT.NONE, true, false));
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		// container
 		final Composite viewerContainer = new Composite(parent, SWT.NONE);
@@ -374,7 +371,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		gl.marginWidth = 0;
 		viewerContainer.setLayout(gl);
 		viewerContainer.setLayoutData(new GridData(SWT.NONE, SWT.FILL, true, true));
-//		viewerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		createTreeViewer(viewerContainer);
 

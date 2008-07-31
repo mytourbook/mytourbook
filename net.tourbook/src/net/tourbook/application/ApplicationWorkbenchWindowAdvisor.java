@@ -59,13 +59,15 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
+	private static final String					PREF_PAGE_ID_USER	= "net.tourbook.preferences.PrefPageClients";
+
 	private ApplicationActionBarAdvisor			fApplicationActionBarAdvisor;
 
 	private IPerspectiveDescriptor				lastPerspective;
 	private IWorkbenchPage						lastActivePage;
 
 	private IWorkbenchPart						lastActivePart;
-	private String								lastPartTitle	= "";			//$NON-NLS-1$
+	private String								lastPartTitle		= "";											//$NON-NLS-1$
 
 	private final ApplicationWorkbenchAdvisor	wbAdvisor;
 
@@ -250,8 +252,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 						Messages.App_Dlg_first_startup_msg);
 
 				final PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(activeShell,
-						"net.tourbook.preferences.PrefPageClients", //$NON-NLS-1$
-						null,
+						PREF_PAGE_ID_USER, //$NON-NLS-1$
+						new String[] { PREF_PAGE_ID_USER },
 						null);
 
 				dialog.open();

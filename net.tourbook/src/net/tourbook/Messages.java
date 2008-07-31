@@ -459,7 +459,11 @@ public class Messages extends NLS {
 
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;
+
+	public static String	Tour_Book_Action_delete_selected_tours_dlg_message_confirm;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_title;
+
+	public static String	Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;

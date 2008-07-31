@@ -192,8 +192,16 @@ public class TourData {
 	 */
 	private short				deviceTimeInterval;											// db-version 3
 
+	/**
+	 * maximum altitude in metric system
+	 */
 	private int					maxAltitude;													// db-version 4
+
 	private int					maxPulse;														// db-version 4
+
+	/**
+	 * maximum speed in metric system
+	 */
 	private float				maxSpeed;														// db-version 4
 
 	private int					avgPulse;														// db-version 4
@@ -461,6 +469,14 @@ public class TourData {
 	public double				mapMinLongitude;
 	@Transient
 	public double				mapMaxLongitude;
+
+	/**
+	 * when a tour was deleted and is still visible in the raw data view, resaving the tour or
+	 * finding the tour in the entity manager causes lots of trouble with hibernate, therefor this
+	 * tour cannot be saved again, it must be reloaded from the file system
+	 */
+	@Transient
+	public boolean				isTourDeleted					= false;
 
 	public TourData() {}
 
@@ -732,7 +748,7 @@ public class TourData {
 		gradientSerie = dataSerieGradient;
 	}
 
-	public void computeAvgCadence() {
+	private void computeAvgCadence() {
 
 		if (cadenceSerie == null) {
 			return;
@@ -761,7 +777,7 @@ public class TourData {
 		computeMaxSpeed();
 	}
 
-	public void computeAvgPulse() {
+	private void computeAvgPulse() {
 
 		if (pulseSerie == null) {
 			return;
@@ -782,7 +798,7 @@ public class TourData {
 		}
 	}
 
-	public void computeAvgTemperature() {
+	private void computeAvgTemperature() {
 
 		if (temperatureSerie == null) {
 			return;
@@ -850,7 +866,7 @@ public class TourData {
 		return totalBreakTime;
 	}
 
-	public void computeMaxAltitude() {
+	private void computeMaxAltitude() {
 
 		if (altitudeSerie == null) {
 			return;
@@ -865,7 +881,7 @@ public class TourData {
 		this.maxAltitude = maxAltitude;
 	}
 
-	public void computeMaxPulse() {
+	private void computeMaxPulse() {
 
 		if (pulseSerie == null) {
 			return;
@@ -881,35 +897,38 @@ public class TourData {
 		this.maxPulse = maxPulse;
 	}
 
-	public void computeMaxSpeed() {
+	private void computeMaxSpeed() {
 
 		if (distanceSerie == null) {
 			return;
 		}
 
-		float maxSpeed = 0;
-		int anzValuesSum = 1;
+		computeSpeedSerie();
 
-		if (distanceSerie.length >= 2) {
-
-			if (deviceTimeInterval > 0) {
-				anzValuesSum = MIN_TIMEINTERVAL_FOR_MAX_SPEED / deviceTimeInterval;
-				if (anzValuesSum == 0) {
-					anzValuesSum = 1;
-				}
-			}
-
-			for (int i = 0 + anzValuesSum; i <= distanceSerie.length - 1; i++) {
-				final float speed = ((float) distanceSerie[i] - (float) distanceSerie[i - anzValuesSum])
-						/ ((float) timeSerie[i] - (float) timeSerie[i - anzValuesSum])
-						* 3.6f;
-
-				if (speed > maxSpeed && speed < MAX_BIKE_SPEED) {
-					maxSpeed = speed;
-				}
-			}
-		}
-		this.maxSpeed = maxSpeed;
+//		float maxSpeed = 0;
+//		int anzValuesSum = 1;
+//
+//		if (distanceSerie.length >= 2) {
+//
+//			if (deviceTimeInterval > 0) {
+//				anzValuesSum = MIN_TIMEINTERVAL_FOR_MAX_SPEED / deviceTimeInterval;
+//				if (anzValuesSum == 0) {
+//					anzValuesSum = 1;
+//				}
+//			}
+//
+//			for (int i = 0 + anzValuesSum; i <= distanceSerie.length - 1; i++) {
+//				final float speed = ((float) distanceSerie[i] - (float) distanceSerie[i - anzValuesSum])
+//						/ ((float) timeSerie[i] - (float) timeSerie[i - anzValuesSum])
+//						* 3.6f;
+//
+//				if (speed > maxSpeed && speed < MAX_BIKE_SPEED) {
+//					maxSpeed = speed;
+//				}
+//			}
+//		}
+//
+//		this.maxSpeed = maxSpeed;
 	}
 
 	/**
@@ -1003,6 +1022,8 @@ public class TourData {
 			speedSerie[serieIndex] = speedMetric;
 			speedSerieImperial[serieIndex] = speedImperial;
 
+			maxSpeed = Math.max(maxSpeed, speedMetric);
+
 			/*
 			 * pace
 			 */
@@ -1017,6 +1038,8 @@ public class TourData {
 			paceSerie[serieIndex] = paceMetric;
 			paceSerieImperial[serieIndex] = paceImperial;
 		}
+
+		maxSpeed /= 10;
 	}
 
 	/**
@@ -1116,6 +1139,8 @@ public class TourData {
 			speedSerie[serieIndex] = speedMetric;
 			speedSerieImperial[serieIndex] = speedImperial;
 
+			maxSpeed = Math.max(maxSpeed, speedMetric);
+
 			/*
 			 * pace
 			 */
@@ -1130,6 +1155,8 @@ public class TourData {
 			paceSerie[serieIndex] = paceMetric;
 			paceSerieImperial[serieIndex] = paceImperial;
 		}
+
+		maxSpeed /= 10;
 	}
 
 	/**
@@ -1232,6 +1259,8 @@ public class TourData {
 			speedSerie[serieIndex] = speedMetric;
 			speedSerieImperial[serieIndex] = speedImperial;
 
+			maxSpeed = Math.max(maxSpeed, speedMetric);
+
 			/*
 			 * pace
 			 */
@@ -1246,6 +1275,8 @@ public class TourData {
 			paceSerie[serieIndex] = paceMetric;
 			paceSerieImperial[serieIndex] = paceImperial;
 		}
+
+		maxSpeed /= 10;
 	}
 
 	public void computeTourDrivingTime() {
@@ -2884,11 +2915,6 @@ public class TourData {
 		this.deviceTotalDown = deviceTotalDown;
 	}
 
-	/*
-	 * private int maxAltitude; private int maxPulse; private int avgPulse; private int avgCadence;
-	 * private int avgTemperature; private float maxSpeed;
-	 */
-
 	public void setDeviceTotalUp(final int deviceTotalUp) {
 		this.deviceTotalUp = deviceTotalUp;
 	}
@@ -2928,10 +2954,6 @@ public class TourData {
 	public void setMaxPulse(final int maxPulse) {
 		this.maxPulse = maxPulse;
 	}
-
-//	public void setSerieData(SerieData serieData) {
-//		this.serieData = serieData;
-//	}
 
 	/**
 	 * @param maxSpeed

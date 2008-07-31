@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.preferences;
 
 import java.util.HashMap;
@@ -148,7 +147,7 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 		final String imageId = colorDefinition.getImageId();
 		Image definitionImage = fImageCache.get(imageId);
 
-		if (definitionImage == null) {
+		if (definitionImage == null || definitionImage.isDisposed()) {
 
 			final int imageHeight = fTreeItemHeight;
 			final int imageWidth = 4 * imageHeight;
@@ -187,12 +186,12 @@ public class GraphColorLabelProvider extends LabelProvider implements ITableLabe
 						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
 						gc.setBackground(getGraphColor(display, graphColorItem));
 
-						gc.drawRectangle(borderRect);
-
 						gc.fillRectangle(xPosition + 1, //
 								yPosition + 1,
 								colorHeight - 1,
 								colorWidth - 1);
+						
+						gc.drawRectangle(borderRect);
 					}
 
 					colorIndex++;

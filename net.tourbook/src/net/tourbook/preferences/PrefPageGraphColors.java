@@ -265,7 +265,7 @@ public class PrefPageGraphColors extends PreferencePage implements IWorkbenchPre
 		treeContainer.setLayout(treeLayouter);
 
 		// color tree
-		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER);
+		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		tree.setLinesVisible(false);
 
 		// tree columns

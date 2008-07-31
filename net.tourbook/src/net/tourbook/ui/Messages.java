@@ -35,6 +35,10 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_avg_pulse;
 	public static String		ColumnFactory_avg_pulse_label;
 	public static String		ColumnFactory_avg_pulse_tooltip;
+
+	public static String	ColumnFactory_avg_speed_label;
+
+	public static String	ColumnFactory_avg_speed_tooltip;
 	public static String		ColumnFactory_avg_temperature_label;
 	public static String		ColumnFactory_avg_temperature_tooltip;
 	public static String		ColumnFactory_cadence;

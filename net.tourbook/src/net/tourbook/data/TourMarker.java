@@ -259,13 +259,13 @@ public class TourMarker {
 		backupMarker.tourData = tourData;
 	}
 
-	public void setSerieIndex(final int serieIndex) {
-		this.serieIndex = serieIndex;
-	}
-
 //	public void setType(int type) {
 //		this.type = type;
 //	}
+
+	public void setSerieIndex(final int serieIndex) {
+		this.serieIndex = serieIndex;
+	}
 
 	public void setTime(final int time) {
 		this.time = time;

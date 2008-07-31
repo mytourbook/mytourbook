@@ -538,7 +538,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		/*
 		 * column: speed
 		 */
-		colDef = TableColumnFactory.SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef = TableColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override

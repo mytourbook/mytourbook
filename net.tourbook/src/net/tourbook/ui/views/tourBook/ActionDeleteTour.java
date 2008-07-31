@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 
 import net.tourbook.Messages;
@@ -26,12 +26,17 @@ import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TreeViewerItem;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionDeleteTour extends Action {
@@ -51,29 +56,30 @@ public class ActionDeleteTour extends Action {
 		setEnabled(false);
 	}
 
-	private void deleteTours(final Iterator<?> selectedTreeItems, final SelectionDeletedTours selectionRemovedTours) {
+	private void deleteTours(	final IStructuredSelection selection,
+								final SelectionDeletedTours selectionRemovedTours,
+								final IProgressMonitor monitor) {
 
 		final ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
-
-		final HashSet<TreeViewerItem> tourParents = new HashSet<TreeViewerItem>();
 
 		int firstSelectedTourIndex = -1;
 		TreeViewerItem firstSelectedParent = null;
 
+		if (monitor != null) {
+			monitor.beginTask("Delete Tours", selection.size());
+		}
+
 		// loop: selected tours
-		for (final Iterator<?> treeItem = selectedTreeItems; treeItem.hasNext();) {
+		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
-			final Object treeTourItem = treeItem.next();
+			final Object treeItem = iterator.next();
+			if (treeItem instanceof TVITourBookTour) {
 
-			if (treeTourItem instanceof TVITourBookTour) {
-
-				final TVITourBookTour tourItem = (TVITourBookTour) treeTourItem;
+				final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
 
 				if (TourDatabase.removeTour(tourItem.getTourId())) {
 
 					final TreeViewerItem tourParent = tourItem.getParentItem();
-
-					tourParents.add(tourParent);
 
 					// get the index for the first selected tour item
 					if (firstSelectedTourIndex == -1) {
@@ -94,6 +100,10 @@ public class ActionDeleteTour extends Action {
 					removedTours.add(tourItem);
 				}
 			}
+
+			if (monitor != null) {
+				monitor.worked(1);
+			}
 		}
 
 		// refresh the tree viewer
@@ -106,7 +116,6 @@ public class ActionDeleteTour extends Action {
 		 * select the item which is before the removed items, this is not yet finished because there
 		 * are multiple possibilities
 		 */
-
 		fNextSelectedTreeItem = null;
 
 		if (firstSelectedParent != null) {
@@ -136,25 +145,70 @@ public class ActionDeleteTour extends Action {
 				// }
 			}
 		}
+
 	}
 
 	@Override
 	public void run() {
 
+		// confirm deletion
 		if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
 				Messages.Tour_Book_Action_delete_selected_tours_dlg_title,
 				Messages.Tour_Book_Action_delete_selected_tours_dlg_message) == false) {
 			return;
 		}
 
-		final SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
+		// get selected tours
 		final ColumnViewer treeViewer = fTourViewer.getViewer();
-
-		// get selected reference tours
 		final IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
 
-		// delete selected tours
-		deleteTours(selection.iterator(), selectionRemovedTours);
+		int selectedTours = 0;
+		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+			final Object nextElement = iterator.next();
+			if (nextElement instanceof TVITourBookTour) {
+				selectedTours++;
+			}
+		}
+
+		/*
+		 * confirm a second time when more than one tour is deleted
+		 */
+		if (selectedTours > 1) {
+			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+					Messages.Tour_Book_Action_delete_selected_tours_dlg_title_confirm,
+					NLS.bind(Messages.Tour_Book_Action_delete_selected_tours_dlg_message_confirm, selectedTours)) == false) {
+				return;
+			}
+		}
+
+		final SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
+
+		if (selectedTours < 2) {
+			
+			final Runnable deleteRunnable = new Runnable() {
+				public void run() {
+					// delete selected tours
+					deleteTours(selection, selectionRemovedTours, null);
+				}
+			};
+			BusyIndicator.showWhile(Display.getCurrent(), deleteRunnable);
+
+		} else {
+
+			final IRunnableWithProgress deleteRunnable = new IRunnableWithProgress() {
+				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					// delete selected tours
+					deleteTours(selection, selectionRemovedTours, monitor);
+				}
+			};
+			try {
+				new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, deleteRunnable);
+			} catch (final InvocationTargetException e) {
+				e.printStackTrace();
+			} catch (final InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 
 		// fire post selection
 		fTourViewer.firePostSelection(selectionRemovedTours);
@@ -163,7 +217,7 @@ public class ActionDeleteTour extends Action {
 		selectionRemovedTours.removedTours.clear();
 
 		if (fNextSelectedTreeItem != null) {
-			treeViewer.setSelection(new StructuredSelection(fNextSelectedTreeItem), true);
+			fTourViewer.getViewer().setSelection(new StructuredSelection(fNextSelectedTreeItem), true);
 		}
 	}
 

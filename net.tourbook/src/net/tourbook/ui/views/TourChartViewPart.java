@@ -100,7 +100,7 @@ public abstract class TourChartViewPart extends ViewPart {
 					}
 
 					// reload data from the database
-					fTourData = TourDatabase.getTourData(fTourData.getTourId());
+					fTourData = TourDatabase.getTourFromDb(fTourData.getTourId());
 
 					updateChart();
 

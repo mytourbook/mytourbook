@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.importdata;
 
 import java.io.File;
@@ -28,13 +27,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.core.runtime.Path;
@@ -49,6 +46,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -266,6 +264,9 @@ public class RawDataManager {
 		return fImportSettingsImportYear;
 	}
 
+	/**
+	 * @return Returns the tour data which were imported or received, key is tour ID
+	 */
 	public HashMap<String, TourData> getTourDataMap() {
 		return fTourDataMap;
 	}
@@ -569,8 +570,14 @@ public class RawDataManager {
 		final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 
 		try {
-			// show raw data perspective
-			workbench.showPerspective(PerspectiveFactoryRawData.PERSPECTIVE_ID, window);
+
+			final IViewPart rawDataView = window.getActivePage().findView(RawDataView.ID);
+
+			if (rawDataView == null) {
+
+				// show raw data perspective when raw data view is not visible
+				workbench.showPerspective(PerspectiveFactoryRawData.PERSPECTIVE_ID, window);
+			}
 
 			// show raw data view
 			return (RawDataView) window.getActivePage().showView(RawDataView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
@@ -589,40 +596,30 @@ public class RawDataManager {
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
 
-				final EntityManager em = TourDatabase.getInstance().getEntityManager();
+				for (final TourData mapTourData : fTourDataMap.values()) {
 
-				try {
+					if (mapTourData.isTourDeleted == false) {
 
-					if (em != null) {
+						final Long tourId = mapTourData.getTourId();
 
-						for (final TourData tourDataFromMap : fTourDataMap.values()) {
+						try {
 
-							final Long tourId = tourDataFromMap.getTourId();
-							final TourData tourDataFromDB = em.find(TourData.class, tourId);
-
-							if (tourDataFromDB != null) {
+							final TourData dbTourData = TourManager.getInstance().getTourData(tourId);
+							if (dbTourData != null) {
 
 								// tour is in the database, replace the imported tour with the tour from the database
 
-								tourDataFromDB.importRawDataFile = tourDataFromMap.importRawDataFile;
+								dbTourData.importRawDataFile = mapTourData.importRawDataFile;
 
-								fTourDataMap.put(tourDataFromDB.getTourId().toString(), tourDataFromDB);
-
-							} else {
-
-								// when a tour was deleted the person in the tour data must be removed
-
-								tourDataFromMap.setTourPerson(null);
+								fTourDataMap.put(dbTourData.getTourId().toString(), dbTourData);
 							}
+						} catch (final Exception e) {
+							e.printStackTrace();
 						}
 					}
-				} catch (final Exception e) {
-					e.printStackTrace();
-				} finally {
-					em.close();
 				}
+
 			}
 		});
 	}
-
 }

@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.database;
 
 import java.beans.PropertyVetoException;
@@ -80,8 +79,8 @@ public class TourDatabase {
 	private static final int					TOURBOOK_DB_VERSION							= 5;
 
 	private static final String					DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";				//$NON-NLS-1$
-	private static final String					DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
 
+	private static final String					DERBY_URL									= "jdbc:derby://localhost:1527/tourbook;create=true";	//$NON-NLS-1$
 	/*
 	 * database tables
 	 */
@@ -90,6 +89,7 @@ public class TourDatabase {
 	public static final String					TABLE_SCHEMA								= "USER";												//$NON-NLS-1$
 
 	public static final String					TABLE_TOUR_BIKE								= "TourBike";											//$NON-NLS-1$
+
 	public static final String					TABLE_TOUR_CATEGORY							= "TourCategory";										//$NON-NLS-1$
 	public static final String					TABLE_TOUR_COMPARED							= "TourCompared";										//$NON-NLS-1$
 	public static final String					TABLE_TOUR_DATA								= "TourData";											//$NON-NLS-1$
@@ -99,8 +99,8 @@ public class TourDatabase {
 	public static final String					TABLE_TOUR_TAG								= "TourTag";											//$NON-NLS-1$
 	public static final String					TABLE_TOUR_TAG_CATEGORY						= "TourTagCategory";									//$NON-NLS-1$
 	public static final String					TABLE_TOUR_TYPE								= "TourType";											//$NON-NLS-1$
-
 	public static final String					JOINTABLE_TOURDATA__TOURTAG					= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG);			//$NON-NLS-1$
+
 	public static final String					JOINTABLE_TOURDATA__TOURMARKER				= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_MARKER);			//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURDATA__TOURREFERENCE			= (TABLE_TOUR_DATA + "_" + TABLE_TOUR_REFERENCE);		//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURTAGCATEGORY_TOURTAG			= (TABLE_TOUR_TAG_CATEGORY
@@ -109,7 +109,6 @@ public class TourDatabase {
 																									+ "_" + TABLE_TOUR_TAG_CATEGORY);				//$NON-NLS-1$
 	public static final String					JOINTABLE_TOURCATEGORY__TOURDATA			= (TABLE_TOUR_CATEGORY
 																									+ "_" + TABLE_TOUR_DATA);						//$NON-NLS-1$
-
 	/**
 	 * contains <code>-1</code> which is the Id for a not saved entity
 	 */
@@ -130,17 +129,17 @@ public class TourDatabase {
 	private static NetworkServerControl			server;
 
 	private static EntityManagerFactory			emFactory;
+
 	private ComboPooledDataSource				fPooledDataSource;
-
 	private static ArrayList<TourType>			fActiveTourTypes;
+
 	private static ArrayList<TourType>			fTourTypes;
-
 	private static HashMap<Long, TourTag>		fTourTags;
+
 	private static HashMap<Long, TagCollection>	fTagCollections;
-
 	private boolean								fIsTableChecked;
-	private boolean								fIsVersionChecked;
 
+	private boolean								fIsVersionChecked;
 	private final ListenerList					fPropertyListeners							= new ListenerList(ListenerList.IDENTITY);
 
 	private String								fDatabasePath								= (Platform.getInstanceLocation()
@@ -488,7 +487,7 @@ public class TourDatabase {
 	 * @param tourId
 	 * @return Returns the tour data or <code>null</code> if the tour is not in the database
 	 */
-	public static TourData getTourData(final Long tourId) {
+	public static TourData getTourFromDb(final Long tourId) {
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
@@ -587,16 +586,24 @@ public class TourDatabase {
 		final EntityTransaction ts = em.getTransaction();
 
 		try {
-			final TourData tour = em.find(TourData.class, tourId);
+			final TourData tourData = em.find(TourData.class, tourId);
 
-			if (tour != null) {
+			if (tourData != null) {
 				ts.begin();
-				em.remove(tour);
+				em.remove(tourData);
 				ts.commit();
 			}
 
 		} catch (final Exception e) {
+
 			e.printStackTrace();
+
+			/*
+			 * an error could have been occured when loading the tour with em.find, remove the tour
+			 * with sql commands
+			 */
+			removeTourWithSQL(tourId);
+
 		} finally {
 			if (ts.isActive()) {
 				ts.rollback();
@@ -607,10 +614,89 @@ public class TourDatabase {
 		}
 
 		if (isRemoved) {
+
+			removeTourWithSQL(tourId);
 			TourManager.getInstance().removeTourFromCache(tourId);
 		}
 
-		return isRemoved;
+		return true;
+	}
+
+	/**
+	 * Remove tour from all tables which contain data for the removed tour
+	 * 
+	 * @param tourId
+	 *            Tour Id for the tour which is removed
+	 */
+	private static void removeTourWithSQL(final long tourId) {
+
+		Connection conn;
+		try {
+
+			conn = TourDatabase.getInstance().getConnection();
+
+			PreparedStatement prepStmt;
+			final String sqlWhere = " WHERE " + TABLE_TOUR_DATA + "_tourId=?" + tourId;
+
+			/*
+			 * tour data
+			 */
+
+			prepStmt = conn.prepareStatement("DELETE FROM " + TABLE_TOUR_DATA + " WHERE tourId=?");
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+
+			/*
+			 * tour marker
+			 */
+			prepStmt = conn.prepareStatement("DELETE FROM " + TABLE_TOUR_MARKER + sqlWhere);
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+			prepStmt = conn.prepareStatement("DELETE FROM " + JOINTABLE_TOURDATA__TOURMARKER + sqlWhere);
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+
+			/*
+			 * reference tour
+			 */
+			prepStmt = conn.prepareStatement("DELETE FROM " + TABLE_TOUR_REFERENCE + sqlWhere);
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+			prepStmt = conn.prepareStatement("DELETE FROM " + JOINTABLE_TOURDATA__TOURREFERENCE + sqlWhere);
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+
+			/*
+			 * tour tags
+			 */
+			prepStmt = conn.prepareStatement("DELETE FROM " + JOINTABLE_TOURDATA__TOURTAG + sqlWhere);
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+
+			/*
+			 * compared tour
+			 */
+			prepStmt = conn.prepareStatement("DELETE FROM " + TABLE_TOUR_COMPARED + " WHERE tourId=?");
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+
+			/*
+			 * OLD unused table: tour category
+			 */
+			prepStmt = conn.prepareStatement(("DELETE FROM " + TABLE_TOUR_CATEGORY) //
+					+ (" WHERE " + TABLE_TOUR_DATA + "tourId = " + tourId));
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+
+			prepStmt = conn.prepareStatement(("DELETE FROM " + JOINTABLE_TOURCATEGORY__TOURDATA) + sqlWhere);
+			prepStmt.setLong(1, tourId);
+			prepStmt.execute();
+
+			conn.close();
+
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -728,9 +814,16 @@ public class TourDatabase {
 	 */
 	public static boolean saveTour(final TourData tourData) {
 
+		/*
+		 * prevent saving a tour which was deleted before
+		 */
+		if (tourData.isTourDeleted) {
+			return false;
+		}
+
 		boolean isSaved = false;
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		TourData persistedEntity = null;
 
@@ -774,6 +867,17 @@ public class TourDatabase {
 		}
 
 		if (persistedEntity != null) {
+
+			em = TourDatabase.getInstance().getEntityManager();
+			try {
+
+				persistedEntity = em.find(TourData.class, tourData.getTourId());
+
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+			em.close();
+
 			TourManager.getInstance().updateTourInCache(persistedEntity);
 		}
 
@@ -1038,7 +1142,7 @@ public class TourDatabase {
 		sb.append(" ON " + TABLE_TOUR_DATA); //$NON-NLS-1$
 		sb.append(" (startYear, startMonth)"); //$NON-NLS-1$
 
-		stmt.addBatch(sb.toString());
+		stmt.execute(sb.toString());
 		System.out.println(sb.toString());
 
 		// CREATE INDEX TourType
@@ -1047,7 +1151,7 @@ public class TourDatabase {
 		sb.append(" ON " + TABLE_TOUR_DATA); //$NON-NLS-1$
 		sb.append(" (tourType_typeId)"); //$NON-NLS-1$
 
-		stmt.addBatch(sb.toString());
+		stmt.execute(sb.toString());
 		System.out.println(sb.toString());
 
 		// CREATE INDEX TourPerson
@@ -1056,7 +1160,7 @@ public class TourDatabase {
 		sb.append(" ON " + TABLE_TOUR_DATA); //$NON-NLS-1$
 		sb.append(" (tourPerson_personId)"); //$NON-NLS-1$
 
-		stmt.addBatch(sb.toString());
+		stmt.execute(sb.toString());
 		System.out.println(sb.toString());
 	}
 
@@ -1095,7 +1199,7 @@ public class TourDatabase {
 	private void createTableTourBike(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE TourBike
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + TABLE_TOUR_BIKE) //$NON-NLS-1$
 				+ "(" //$NON-NLS-1$
 				+ "bikeId	 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
@@ -1107,7 +1211,7 @@ public class TourDatabase {
 				+ ")"); //$NON-NLS-1$
 
 		// ALTER TABLE TourBike
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("ALTER TABLE " + TABLE_TOUR_BIKE) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + (TABLE_TOUR_BIKE + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (bikeId)")); //$NON-NLS-1$
@@ -1122,7 +1226,7 @@ public class TourDatabase {
 	private void createTableTourCategory(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE TourCategory
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + TABLE_TOUR_CATEGORY) //$NON-NLS-1$
 				+ "(" //$NON-NLS-1$
 				+ "categoryId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
@@ -1131,13 +1235,13 @@ public class TourDatabase {
 				+ ")"); //$NON-NLS-1$
 
 		// ALTER TABLE TourCategory ADD CONSTRAINT TourCategory_pk PRIMARY KEY (categoryId);
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("ALTER TABLE " + TABLE_TOUR_CATEGORY) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + (TABLE_TOUR_CATEGORY + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (categoryId)")); //$NON-NLS-1$
 
 		// CREATE TABLE TourCategory_TourData
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + JOINTABLE_TOURCATEGORY__TOURDATA) //$NON-NLS-1$ 
 				+ "(" //$NON-NLS-1$
 				+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
@@ -1145,7 +1249,7 @@ public class TourDatabase {
 				+ ")"); //$NON-NLS-1$
 
 		// ALTER TABLE TourCategory_TourData ADD CONSTRAINT TourCategory_TourData_pk PRIMARY KEY (tourCategory_categoryId);
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("ALTER TABLE " + JOINTABLE_TOURCATEGORY__TOURDATA) //$NON-NLS-1$ 
 				+ (" ADD CONSTRAINT " + JOINTABLE_TOURCATEGORY__TOURDATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$ 
 				+ (" PRIMARY KEY (" + TABLE_TOUR_CATEGORY + "_categoryId)")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1160,7 +1264,7 @@ public class TourDatabase {
 	private void createTableTourCompared(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE TourCompared
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + TABLE_TOUR_COMPARED) //	//$NON-NLS-1$
 				+ "(" //										//$NON-NLS-1$
 				+ "comparedId 			BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
@@ -1183,7 +1287,7 @@ public class TourDatabase {
 	private void createTableTourData(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE TourData
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + TABLE_TOUR_DATA) //$NON-NLS-1$
 				+ "(" //$NON-NLS-1$
 				+ "tourId 				BIGINT NOT NULL,	\n" //$NON-NLS-1$
@@ -1263,7 +1367,7 @@ public class TourDatabase {
 		 */
 
 		// ALTER TABLE TourData ADD CONSTRAINT TourData_pk PRIMARY KEY (tourId);
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("ALTER TABLE " + TABLE_TOUR_DATA) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + TABLE_TOUR_DATA + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (tourId)")); //$NON-NLS-1$
@@ -1280,7 +1384,7 @@ public class TourDatabase {
 	private void createTableTourMarker(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE TourMarker
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + TABLE_TOUR_MARKER) //$NON-NLS-1$
 				+ "(" //$NON-NLS-1$
 				+ "markerId 					BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
@@ -1299,12 +1403,12 @@ public class TourDatabase {
 				+ ")"); //$NON-NLS-1$
 
 		// ALTER TABLE TourMarker ADD CONSTRAINT TourMarker_pk PRIMARY KEY (markerId);
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("ALTER TABLE " + TABLE_TOUR_MARKER) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + (TABLE_TOUR_MARKER + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (markerId)")); //$NON-NLS-1$
 
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURMARKER) //$NON-NLS-1$ 
 				+ "(" //$NON-NLS-1$
 				+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
@@ -1312,7 +1416,7 @@ public class TourDatabase {
 				+ ")"); //$NON-NLS-1$
 
 		// ALTER TABLE TourData_TourMarker ADD CONSTRAINT TourData_TourMarker_pk PRIMARY KEY (TourData_tourId);
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURMARKER) //$NON-NLS-1$ 
 				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURMARKER + "_pk") //$NON-NLS-1$ //$NON-NLS-2$ 
 				+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1327,7 +1431,7 @@ public class TourDatabase {
 	private void createTableTourPerson(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE TourPerson
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + TABLE_TOUR_PERSON) //$NON-NLS-1$
 				+ "(" //$NON-NLS-1$
 				+ "personId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
@@ -1341,7 +1445,7 @@ public class TourDatabase {
 				+ ")"); //$NON-NLS-1$
 
 		// ALTER TABLE TourPerson
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("ALTER TABLE " + TABLE_TOUR_PERSON) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + (TABLE_TOUR_PERSON + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (personId)")); //$NON-NLS-1$
@@ -1356,7 +1460,7 @@ public class TourDatabase {
 	private void createTableTourReference(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE TourReference
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + TABLE_TOUR_REFERENCE) //$NON-NLS-1$
 				+ "(" //$NON-NLS-1$
 				+ "	refId 						BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
@@ -1367,14 +1471,14 @@ public class TourDatabase {
 				+ ")"); //$NON-NLS-1$
 
 		// ALTER TABLE TourReference ADD CONSTRAINT TourReference_pk PRIMARY KEY (refId);
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("ALTER TABLE " + TABLE_TOUR_REFERENCE) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + TABLE_TOUR_REFERENCE + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (refId)")); //$NON-NLS-1$
 
 		// CREATE TABLE TourData_TourReference
 
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURREFERENCE) //$NON-NLS-1$ 
 				+ "(" //$NON-NLS-1$
 				+ (TABLE_TOUR_DATA + "_tourId			BIGINT NOT NULL,") //$NON-NLS-1$
@@ -1382,7 +1486,7 @@ public class TourDatabase {
 				+ ")"); //$NON-NLS-1$
 
 		// ALTER TABLE TourData_TourReference ADD CONSTRAINT TourData_TourReference_pk PRIMARY KEY (TourData_tourId);
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURREFERENCE) //$NON-NLS-1$ 
 				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURREFERENCE + "_pk") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1413,7 +1517,7 @@ public class TourDatabase {
 
 		System.out.println(sql);
 
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 
 		// ALTER TABLE TourTag ADD CONSTRAINT TourTag_pk PRIMARY KEY (refId);
 		sql = ("ALTER TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
@@ -1423,7 +1527,7 @@ public class TourDatabase {
 		System.out.println(sql);
 		System.out.println();
 
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 
 		/*
 		 * CREATE TABLE TourData_TourTag
@@ -1438,7 +1542,7 @@ public class TourDatabase {
 				+ ")"; //$NON-NLS-1$
 
 		System.out.println(sql);
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 
 		/*
 		 * Add Constrainsts
@@ -1457,7 +1561,7 @@ public class TourDatabase {
 				+ ("	REFERENCES " + TABLE_TOUR_TAG + " (tagId)"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println(sql);
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 
 		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ 
 				//
@@ -1467,7 +1571,7 @@ public class TourDatabase {
 
 		System.out.println(sql);
 		System.out.println();
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 	}
 
 	private void createTableTourTagCategory(final Statement stmt) throws SQLException {
@@ -1489,7 +1593,7 @@ public class TourDatabase {
 				+ ")"; //$NON-NLS-1$
 
 		System.out.println(sql);
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 
 		sql = ("ALTER TABLE " + TABLE_TOUR_TAG_CATEGORY) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + TABLE_TOUR_TAG_CATEGORY + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1497,7 +1601,7 @@ public class TourDatabase {
 
 		System.out.println(sql);
 		System.out.println();
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 
 		/*
 		 * JOIN TABLE TourTagCategory_TourTag
@@ -1510,7 +1614,7 @@ public class TourDatabase {
 				+ ")"; //$NON-NLS-1$
 
 		System.out.println(sql);
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 
 		/*
 		 * Add constraints
@@ -1526,7 +1630,7 @@ public class TourDatabase {
 				+ (" REFERENCES " + TABLE_TOUR_TAG + " (tagId)"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println(sql);
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 
 		sql = ("ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAG) //$NON-NLS-1$ 
 				//
@@ -1536,7 +1640,7 @@ public class TourDatabase {
 
 		System.out.println(sql);
 		System.out.println();
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 
 		/*
 		 * JOIN TABLE TourTagCategory_TourTagCategory
@@ -1549,7 +1653,7 @@ public class TourDatabase {
 				+ ")"; //$NON-NLS-1$
 
 		System.out.println(sql);
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 
 		/*
 		 * Add constraints
@@ -1568,7 +1672,7 @@ public class TourDatabase {
 				+ (" REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println(sql);
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 
 		sql = ("ALTER TABLE " + JOINTABLE_TOURTAGCATEGORY_TOURTAGCATEGORY + "\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
@@ -1581,7 +1685,7 @@ public class TourDatabase {
 
 		System.out.println(sql);
 		System.out.println();
-		stmt.addBatch(sql);
+		stmt.execute(sql);
 	}
 
 	/**
@@ -1593,7 +1697,7 @@ public class TourDatabase {
 	private void createTableTourType(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE TourType
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("CREATE TABLE " + TABLE_TOUR_TYPE) //$NON-NLS-1$
 				+ "(" //$NON-NLS-1$
 				+ "typeId 				BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1)," //$NON-NLS-1$
@@ -1610,7 +1714,7 @@ public class TourDatabase {
 				+ ")"); //$NON-NLS-1$
 
 		// ALTER TABLE TourType
-		stmt.addBatch("" //$NON-NLS-1$
+		stmt.execute("" //$NON-NLS-1$
 				+ ("ALTER TABLE " + TABLE_TOUR_TYPE) //$NON-NLS-1$
 				+ (" ADD CONSTRAINT " + (TABLE_TOUR_TYPE + "_pk ")) //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" PRIMARY KEY (typeId)")); //$NON-NLS-1$
@@ -1625,7 +1729,7 @@ public class TourDatabase {
 	private void createTableVersion(final Statement stmt) throws SQLException {
 
 		// CREATE TABLE Version
-		stmt.addBatch(("CREATE TABLE " + TABLE_DB_VERSION) //$NON-NLS-1$
+		stmt.execute(("CREATE TABLE " + TABLE_DB_VERSION) //$NON-NLS-1$
 				+ " (" //$NON-NLS-1$
 				+ "version 		INTEGER	NOT NULL" //$NON-NLS-1$
 				+ ")"); //$NON-NLS-1$
@@ -1867,13 +1971,13 @@ public class TourDatabase {
 			String sql;
 
 			sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN labelXOffset	INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN labelYOffset	INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN markerType		BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			statement.executeBatch();
 			statement.close();
@@ -1891,10 +1995,10 @@ public class TourDatabase {
 			String sql;
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceMode			SMALLINT DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceTimeInterval	SMALLINT DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			statement.executeBatch();
 			statement.close();
@@ -1912,51 +2016,51 @@ public class TourDatabase {
 			String sql;
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxAltitude			INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxPulse				INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgPulse				INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgCadence			INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN avgTemperature		INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN maxSpeed				FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourTitle				VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourDescription		VARCHAR(4096)"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourStartPlace		VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourEndPlace			VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN calories				INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN bikerWeight			FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourBike_bikeId		BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			// from wolfgang
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN devicePluginName		VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			// from wolfgang
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceModeName		VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
-			statement.addBatch(sql);
+			statement.execute(sql);
 
 			statement.executeBatch();
 			statement.close();
@@ -1976,7 +2080,7 @@ public class TourDatabase {
 		int tourIdx = 1;
 		for (final Long tourId : tourList) {
 
-			final TourData tourData = getTourData(tourId);
+			final TourData tourData = getTourFromDb(tourId);
 
 			if (monitor != null) {
 				final String msg = NLS.bind(Messages.Tour_Database_update_tour, new Object[] {

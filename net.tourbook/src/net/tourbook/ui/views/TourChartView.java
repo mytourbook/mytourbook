@@ -212,7 +212,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 					}
 
 					// reload data from the database
-					fTourData = TourDatabase.getTourData(fTourData.getTourId());
+					fTourData = TourDatabase.getTourFromDb(fTourData.getTourId());
 
 					updateChart();
 
