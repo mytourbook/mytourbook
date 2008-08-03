@@ -130,6 +130,12 @@ public interface ITourbookPreferences {
 	public static final String	VIEW_LAYOUT_COLOR_TOUR					= "view.layout.color.tour";					//$NON-NLS-1$
 
 	/*
+	 * layout for maps
+	 */
+	public static final String	MAP_LAYOUT_SYMBOL						= "map.layout.symbol";							//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_SYMBOL_WIDTH					= "map.layout.symbol.width";					//$NON-NLS-1$
+
+	/*
 	 * id's for preference pages
 	 */
 	public static final String	PREF_PAGE_TAGS							= "net.tourbook.preferences.PrefPageTags";		//$NON-NLS-1$

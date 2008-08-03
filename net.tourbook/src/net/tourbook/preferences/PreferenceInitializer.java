@@ -138,5 +138,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				new RGB(0x00, 0x00, 0x00));
 
 		store.setDefault(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES, false);
+
+		/*
+		 * map appearance
+		 */
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL, PrefPageMapAppearance.MAP_TOUR_SYMBOL_DOT);
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 3);
 	}
 }

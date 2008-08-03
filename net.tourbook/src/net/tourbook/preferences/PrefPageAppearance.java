@@ -22,17 +22,17 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageColors extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public PrefPageColors() {
+	public PrefPageAppearance() {
 		noDefaultAndApplyButton();
 	}
 
-	public PrefPageColors(final String title) {
+	public PrefPageAppearance(final String title) {
 		super(title);
 	}
 
-	public PrefPageColors(final String title, final ImageDescriptor image) {
+	public PrefPageAppearance(final String title, final ImageDescriptor image) {
 		super(title, image);
 	}
 

@@ -22,7 +22,10 @@ import java.util.List;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageMapAppearance;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -45,7 +48,7 @@ import de.byteholder.gpx.GeoPosition;
  */
 public class TourPainter extends MapPainter {
 
-	private static final int	LINE_WIDTH			= 7;
+	private static int			LINE_WIDTH			= 7;
 
 	private static final String	SPACER				= " ";						//$NON-NLS-1$
 	private static final String	IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
@@ -644,6 +647,31 @@ public class TourPainter extends MapPainter {
 		return isMarkerInTile;
 	}
 
+	private void drawTourDot(final GC gc, final int serieIndex, final java.awt.Point devPosition) {
+
+		gc.setLineWidth(LINE_WIDTH);
+
+		if (fDataSerie == null) {
+
+			// draw default dot when data are not available
+
+			gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
+
+		} else {
+
+			// draw dot with the color from the legend provider
+
+			final Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
+
+			{
+				gc.setForeground(lineColor);
+				gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
+			}
+
+			lineColor.dispose();
+		}
+	}
+
 	private boolean drawTourInTile(final GC gc, final Map map, final Tile tile, final TourData tourData) {
 
 		boolean isTourInTile = false;
@@ -673,6 +701,11 @@ public class TourPainter extends MapPainter {
 		int lastInsideIndex = -99;
 		java.awt.Point lastInsidePosition = null;
 
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		final boolean isDrawLine = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL)
+				.equals(PrefPageMapAppearance.MAP_TOUR_SYMBOL_LINE);
+		LINE_WIDTH = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH) - 0;
+
 		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
 			// convert lat/long into world pixels
@@ -696,13 +729,17 @@ public class TourPainter extends MapPainter {
 
 					isTourInTile = true;
 
-					drawTourLine(gc, serieIndex, devPosition, devPreviousPosition);
+					if (isDrawLine) {
+						drawTourLine(gc, serieIndex, devPosition, devPreviousPosition);
+					} else {
+						drawTourDot(gc, serieIndex, devPosition);
+					}
 				}
 
 				lastInsideIndex = serieIndex;
 				lastInsidePosition = devPosition;
 
-			} else {
+			} else if (isDrawLine) {
 
 				// current position is outside the tile
 

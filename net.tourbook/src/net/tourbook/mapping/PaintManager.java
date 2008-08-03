@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.mapping;
 
 import java.util.Set;
@@ -39,8 +38,6 @@ public class PaintManager {
 	private boolean				fShowStartEndInMap;
 	private boolean				fShowTourMarker;
 
-	private PaintManager() {}
-
 	public static PaintManager getInstance() {
 
 		if (fInstance == null) {
@@ -49,6 +46,8 @@ public class PaintManager {
 
 		return fInstance;
 	}
+
+	private PaintManager() {}
 
 	public ILegendProvider getLegendProvider() {
 		return fLegendProvider;

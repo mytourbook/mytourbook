@@ -89,11 +89,6 @@
             id="net.tourbook.preferences.PrefPageStatistic"
             name="%preference_page_Statistics"/>
       <page
-            category="net.tourbook.preferences.PrefPageColors"
-            class="net.tourbook.preferences.PrefPageGraphColors"
-            id="net.tourbook.preferences.PrefPageChartColors"
-            name="%preference_page_Chart_Colors"/>
-      <page
             class="net.tourbook.preferences.PrefPageChartGraphs"
             id="net.tourbook.preferences.PrefPageChartGraphs"
             name="%preference_page_Graphs"/>
@@ -111,16 +106,32 @@
             class="net.tourbook.preferences.PrefPageTags"
             id="net.tourbook.preferences.PrefPageTags"
             name="%preference_page_tags"/>
+            
       <page
-            category="net.tourbook.preferences.PrefPageColors"
+            class="net.tourbook.preferences.PrefPageAppearance"
+            id="net.tourbook.preferences.PrefPageAppearance"
+            name="%preference_page_appearance">
+      </page>
+      
+      <page
+            category="net.tourbook.preferences.PrefPageAppearance"
+            class="net.tourbook.preferences.PrefPageGraphColors"
+            id="net.tourbook.preferences.PrefPageChartColors"
+            name="%preference_page_Chart_Colors">
+      </page>
+      
+      <page
+            category="net.tourbook.preferences.PrefPageAppearance"
             class="net.tourbook.preferences.PrefPageViewColors"
             id="net.tourbook.preferences.PrefPageViewColors"
             name="%preference_page_view_colors">
       </page>
+      
       <page
-            class="net.tourbook.preferences.PrefPageColors"
-            id="net.tourbook.preferences.PrefPageColors"
-            name="%preference_page_colors">
+            category="net.tourbook.preferences.PrefPageAppearance"
+            class="net.tourbook.preferences.PrefPageMapAppearance"
+            id="net.tourbook.preferences.PrefPageMapAppearance"
+            name="%preference_page_map_appearance">
       </page>
       
    </extension>

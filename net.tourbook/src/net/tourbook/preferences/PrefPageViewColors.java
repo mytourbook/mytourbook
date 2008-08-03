@@ -70,13 +70,6 @@ public class PrefPageViewColors extends FieldEditorPreferencePage implements IWo
 				Messages.pref_view_layout_label_sub_sub,
 				colorGroup));
 
-// THIS IS CURRENTLY DISABLED
-//		
-//		// color: tour 
-//		addField(new ColorFieldEditor(ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR, //
-//				Messages.pref_view_layout_label_tour,
-//				colorGroup));
-
 		final GridLayout gl = (GridLayout) colorGroup.getLayout();
 		gl.marginHeight = 5;
 		gl.marginWidth = 5;

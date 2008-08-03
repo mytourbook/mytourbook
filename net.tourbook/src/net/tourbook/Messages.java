@@ -363,6 +363,14 @@ public class Messages extends NLS {
 	public static String		Pref_People_Label_weight;
 	public static String		Pref_People_Title;
 
+	public static String	pref_map_layout_symbol;
+
+	public static String	pref_map_layout_symbol_dot;
+
+	public static String	pref_map_layout_symbol_line;
+
+	public static String	pref_map_layout_symbol_width;
+
 	public static String		pref_regional_decimalSeparator;
 	public static String		pref_regional_description;
 	public static String		pref_regional_groupSeparator;
