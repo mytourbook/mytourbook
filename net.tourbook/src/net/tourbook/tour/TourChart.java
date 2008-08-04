@@ -115,6 +115,11 @@ public class TourChart extends Chart {
 
 		addPrefListeners();
 
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		gridVerticalDistance = prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
+		gridHorizontalDistance = prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
+
 		/*
 		 * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
 		 * tour markers when a tour chart got the focus
@@ -185,6 +190,7 @@ public class TourChart extends Chart {
 					return;
 				}
 
+				final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 				boolean isChartModified = false;
 				boolean keepMinMax = true;
 
@@ -192,8 +198,6 @@ public class TourChart extends Chart {
 						|| property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
 
 					// zoom preferences has changed
-
-					final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
 					TourManager.updateZoomOptionsInChartConfig(fTourChartConfig, prefStore);
 
@@ -215,6 +219,13 @@ public class TourChart extends Chart {
 
 					isChartModified = true;
 					keepMinMax = false;
+
+				} else if (property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)) {
+
+					gridVerticalDistance = prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
+					gridHorizontalDistance = prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
+					isChartModified = true;
 				}
 
 				isChartModified = setMinDefaultValue(property,

@@ -24,6 +24,8 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.util.StringToArrayConverter;
 
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -84,6 +86,9 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	private BooleanFieldEditor		gradientMinCheckbox;
 	private IntegerFieldEditor		gradientMinEditor;
 
+	private IntegerFieldEditor		gridEditorVerticalDistance;
+	private IntegerFieldEditor		gridEditorHorizontalDistance;
+
 	private class Graph {
 
 		int		graphId;
@@ -96,47 +101,10 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		}
 	};
 
-	/*
-	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
-	 */
-	public void init(final IWorkbench workbench) {
-		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
-	}
-
 	@Override
 	protected Control createContents(final Composite parent) {
 
-		// create a map with all available graphs
-		fGraphMap = new HashMap<Integer, Graph>();
-		fGraphMap.put(TourManager.GRAPH_ALTITUDE, new Graph(TourManager.GRAPH_ALTITUDE, Messages.Graph_Label_Altitude));
-		fGraphMap.put(TourManager.GRAPH_SPEED, new Graph(TourManager.GRAPH_SPEED, Messages.Graph_Label_Speed));
-		fGraphMap.put(TourManager.GRAPH_PACE, new Graph(TourManager.GRAPH_PACE, Messages.Graph_Label_Pace));
-		fGraphMap.put(TourManager.GRAPH_POWER, new Graph(TourManager.GRAPH_POWER, Messages.Graph_Label_Power));
-		fGraphMap.put(TourManager.GRAPH_PULSE, new Graph(TourManager.GRAPH_PULSE, Messages.Graph_Label_Heartbeat));
-
-		fGraphMap.put(TourManager.GRAPH_TEMPERATURE, //
-				new Graph(TourManager.GRAPH_TEMPERATURE, Messages.Graph_Label_Temperature));
-
-		fGraphMap.put(TourManager.GRAPH_CADENCE, //
-				new Graph(TourManager.GRAPH_CADENCE, Messages.Graph_Label_Cadence));
-
-		fGraphMap.put(TourManager.GRAPH_ALTIMETER, //
-				new Graph(TourManager.GRAPH_ALTIMETER, Messages.Graph_Label_Altimeter));
-
-		fGraphMap.put(TourManager.GRAPH_GRADIENT, //
-				new Graph(TourManager.GRAPH_GRADIENT, Messages.Graph_Label_Gradient));
-
-		// create a list with all available graphs
-		fGraphList = new ArrayList<Graph>();
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_ALTITUDE));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_SPEED));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_PACE));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_POWER));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_PULSE));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_TEMPERATURE));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_CADENCE));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_ALTIMETER));
-		fGraphList.add(fGraphMap.get(TourManager.GRAPH_GRADIENT));
+		initializeGraphs();
 
 		final TabFolder tabFolder = new TabFolder(parent, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -145,11 +113,230 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		tabVisibleGraphs.setText(Messages.Pref_Graphs_Tab_graph_defaults);
 		tabVisibleGraphs.setControl(createTabGraphs(tabFolder));
 
-		final TabItem tabAltimeter = new TabItem(tabFolder, SWT.NONE);
-		tabAltimeter.setText(Messages.Pref_Graphs_Tab_default_values);
-		tabAltimeter.setControl(createTabDefaultsValues(tabFolder));
+		final TabItem tabChart = new TabItem(tabFolder, SWT.NONE);
+		tabChart.setText(Messages.Pref_Graphs_Tab_default_values);
+		tabChart.setControl(createTabDefaultsValues(tabFolder));
 
 		return tabFolder;
+	}
+
+	private CheckboxTableViewer createGraphCheckBoxList(final Composite parent) {
+
+		final CheckboxTableViewer checkboxList = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE
+				| SWT.TOP
+				| SWT.BORDER);
+
+		checkboxList.setContentProvider(new IStructuredContentProvider() {
+			public void dispose() {}
+
+			public Object[] getElements(final Object inputElement) {
+				return fViewerGraphs.toArray();
+			}
+
+			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+		});
+
+		checkboxList.setLabelProvider(new LabelProvider() {
+			@Override
+			public String getText(final Object element) {
+				final Graph graph = (Graph) element;
+				return graph.graphLabel;
+			}
+		});
+
+		checkboxList.addCheckStateListener(new ICheckStateListener() {
+			public void checkStateChanged(final CheckStateChangedEvent event) {
+
+				// keep the checked status
+				final Graph item = (Graph) event.getElement();
+				item.isChecked = event.getChecked();
+
+				// select the checked item
+				checkboxList.setSelection(new StructuredSelection(item));
+
+				validateTab();
+			}
+		});
+
+		checkboxList.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(final SelectionChangedEvent event) {
+				enableUpDownButtons();
+			}
+		});
+
+		// first create the input, then set it
+		createGraphList();
+		checkboxList.setInput(this);
+
+		final String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(getPreferenceStore().getString(ITourbookPreferences.GRAPH_VISIBLE));
+
+		// check all graphs which are defined in the prefs
+		final ArrayList<Graph> checkedGraphs = new ArrayList<Graph>();
+		for (final Graph graph : fViewerGraphs) {
+			final int graphId = graph.graphId;
+			for (final String prefId : prefVisibleIds) {
+				if (graphId == Integer.valueOf(prefId)) {
+					graph.isChecked = true;
+					checkedGraphs.add(graph);
+				}
+			}
+		}
+
+		checkboxList.setCheckedElements(checkedGraphs.toArray());
+
+		return checkboxList;
+	}
+
+	/**
+	 * create a list with all available graphs
+	 */
+	private void createGraphList() {
+
+		final String[] allGraphIds = StringToArrayConverter.convertStringToArray(//
+		getPreferenceStore().getString(ITourbookPreferences.GRAPH_ALL));
+
+		fViewerGraphs = new ArrayList<Graph>();
+
+		// put all graphs in the viewer which are defined in the prefs
+		for (final String allGraphId : allGraphIds) {
+			final int graphId = Integer.valueOf(allGraphId);
+			if (fGraphMap.containsKey(graphId)) {
+				fViewerGraphs.add(fGraphMap.get(graphId));
+			}
+		}
+
+		// make sure that all available graphs are in the viewer
+		for (final Graph graph : fGraphList) {
+			if (!fViewerGraphs.contains(graph)) {
+				fViewerGraphs.add(graph);
+			}
+		}
+
+	}
+
+	private Control createTabDefaultsValues(final Composite parent) {
+
+		GridData gd;
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		container.setLayout(new GridLayout(1, false));
+
+		// the editor container removes all margins
+		final Group groupMinValue = new Group(container, SWT.NONE);
+		groupMinValue.setText(Messages.Pref_Graphs_force_minimum_value);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupMinValue);
+
+		/*
+		 * checkbox: altimeter min value
+		 */
+		altimeterMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
+				Messages.Pref_Graphs_Check_force_minimum_for_altimeter,
+				groupMinValue);
+		altimeterMinCheckbox.setPreferenceStore(getPreferenceStore());
+		altimeterMinCheckbox.setPage(this);
+		altimeterMinCheckbox.load();
+		altimeterMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+				final boolean isChecked = (Boolean) event.getNewValue();
+				altimeterMinEditor.setEnabled(isChecked, groupMinValue);
+			}
+		});
+
+		// add placeholder
+		Label label = new Label(groupMinValue, SWT.NONE);
+		label.setText(""); //$NON-NLS-1$
+
+		/*
+		 * editor: altimeter min value
+		 */
+		altimeterMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
+				Messages.Pref_Graphs_Text_min_value,
+				groupMinValue);
+		altimeterMinEditor.setPreferenceStore(getPreferenceStore());
+		altimeterMinEditor.setPage(this);
+		altimeterMinEditor.setTextLimit(4);
+		altimeterMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
+		altimeterMinEditor.load();
+		UI.setFieldWidth(groupMinValue, altimeterMinEditor, DEFAULT_FIELD_WIDTH);
+		gd = new GridData();
+		gd.horizontalIndent = COLUMN_INDENT;
+		altimeterMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
+
+		altimeterMinEditor.setEnabled(altimeterMinCheckbox.getBooleanValue(), groupMinValue);
+
+		/*
+		 * checkbox: gradient min value
+		 */
+		gradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
+				Messages.Pref_Graphs_Check_force_minimum_for_gradient,
+				groupMinValue);
+		gradientMinCheckbox.setPreferenceStore(getPreferenceStore());
+		gradientMinCheckbox.setPage(this);
+		gradientMinCheckbox.load();
+		gradientMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+				final boolean isChecked = (Boolean) event.getNewValue();
+				gradientMinEditor.setEnabled(isChecked, groupMinValue);
+			}
+		});
+
+		// add placeholder
+		label = new Label(groupMinValue, SWT.NONE);
+		label.setText(""); //$NON-NLS-1$
+
+		/*
+		 * editor: gradient min value
+		 */
+		gradientMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+				Messages.Pref_Graphs_Text_min_value,
+				groupMinValue);
+		gradientMinEditor.setPreferenceStore(getPreferenceStore());
+		gradientMinEditor.setPage(this);
+		gradientMinEditor.setTextLimit(4);
+		gradientMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
+		gradientMinEditor.load();
+		UI.setFieldWidth(groupMinValue, gradientMinEditor, DEFAULT_FIELD_WIDTH);
+		gd = new GridData();
+		gd.horizontalIndent = COLUMN_INDENT;
+		gradientMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
+		gradientMinEditor.setEnabled(gradientMinCheckbox.getBooleanValue(), groupMinValue);
+
+		GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupMinValue);
+
+		/*
+		 * group: grid
+		 */
+		final Group groupGrid = new Group(container, SWT.NONE);
+		groupGrid.setText(Messages.Pref_Graphs_grid_distance);
+		GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(groupGrid);
+
+		/*
+		 * editor: grid vertical distance
+		 */
+		gridEditorVerticalDistance = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE,
+				Messages.Pref_Graphs_grid_vertical_distance,
+				groupGrid);
+		gridEditorVerticalDistance.setPreferenceStore(getPreferenceStore());
+		gridEditorVerticalDistance.setPage(this);
+		gridEditorVerticalDistance.setValidRange(10, 100);
+		gridEditorVerticalDistance.load();
+		UI.setFieldWidth(groupGrid, gridEditorVerticalDistance, DEFAULT_FIELD_WIDTH);
+
+		/*
+		 * editor: grid horizontal distance
+		 */
+		gridEditorHorizontalDistance = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE,
+				Messages.Pref_Graphs_grid_horizontal_distance,
+				groupGrid);
+		gridEditorHorizontalDistance.setPreferenceStore(getPreferenceStore());
+		gridEditorHorizontalDistance.setPage(this);
+		gridEditorHorizontalDistance.setValidRange(20, 200);
+		gridEditorHorizontalDistance.load();
+		UI.setFieldWidth(groupGrid, gridEditorHorizontalDistance, DEFAULT_FIELD_WIDTH);
+
+		GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupGrid);
+
+		return container;
 	}
 
 	private Control createTabGraphs(final Composite parent) {
@@ -185,12 +372,12 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		btnUp.setLayoutData(gd);
 		btnUp.setEnabled(false);
 		btnUp.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(final SelectionEvent e) {}
+
 			public void widgetSelected(final SelectionEvent e) {
 				moveSelectionUp();
 				enableUpDownButtons();
 			}
-
-			public void widgetDefaultSelected(final SelectionEvent e) {}
 		});
 
 		// down button
@@ -199,12 +386,12 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		btnDown.setLayoutData(gd);
 		btnDown.setEnabled(false);
 		btnDown.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(final SelectionEvent e) {}
+
 			public void widgetSelected(final SelectionEvent e) {
 				moveSelectionDown();
 				enableUpDownButtons();
 			}
-
-			public void widgetDefaultSelected(final SelectionEvent e) {}
 		});
 
 		validateTab();
@@ -288,265 +475,8 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		return container;
 	}
 
-	private Control createTabDefaultsValues(final Composite parent) {
-
-		GridData gd;
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		container.setLayout(new GridLayout(1, false));
-
-		// the editor container removes all margins
-		final Composite editorContainer = new Composite(container, SWT.NONE);
-		editorContainer.setLayout(new GridLayout());
-		editorContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		/*
-		 * checkbox: altimeter min value
-		 */
-		altimeterMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
-				Messages.Pref_Graphs_Check_force_minimum_for_altimeter,
-				editorContainer);
-		altimeterMinCheckbox.setPreferenceStore(getPreferenceStore());
-		altimeterMinCheckbox.setPage(this);
-		altimeterMinCheckbox.load();
-		altimeterMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				final boolean isChecked = (Boolean) event.getNewValue();
-				altimeterMinEditor.setEnabled(isChecked, editorContainer);
-			}
-		});
-
-		// add placeholder
-		Label label = new Label(editorContainer, SWT.NONE);
-		label.setText(""); //$NON-NLS-1$
-
-		/*
-		 * editor: altimeter min value
-		 */
-		altimeterMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
-				Messages.Pref_Graphs_Text_min_value,
-				editorContainer);
-		altimeterMinEditor.setPreferenceStore(getPreferenceStore());
-		altimeterMinEditor.setPage(this);
-		altimeterMinEditor.setTextLimit(4);
-		altimeterMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
-		altimeterMinEditor.load();
-		UI.setFieldWidth(editorContainer, altimeterMinEditor, DEFAULT_FIELD_WIDTH);
-		gd = new GridData();
-		gd.horizontalIndent = COLUMN_INDENT;
-		altimeterMinEditor.getLabelControl(editorContainer).setLayoutData(gd);
-
-		altimeterMinEditor.setEnabled(altimeterMinCheckbox.getBooleanValue(), editorContainer);
-
-		/*
-		 * checkbox: gradient min value
-		 */
-		gradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
-				Messages.Pref_Graphs_Check_force_minimum_for_gradient,
-				editorContainer);
-		gradientMinCheckbox.setPreferenceStore(getPreferenceStore());
-		gradientMinCheckbox.setPage(this);
-		gradientMinCheckbox.load();
-		gradientMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				final boolean isChecked = (Boolean) event.getNewValue();
-				gradientMinEditor.setEnabled(isChecked, editorContainer);
-			}
-		});
-
-		// add placeholder
-		label = new Label(editorContainer, SWT.NONE);
-		label.setText(""); //$NON-NLS-1$
-
-		/*
-		 * editor: gradient min value
-		 */
-		gradientMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-				Messages.Pref_Graphs_Text_min_value,
-				editorContainer);
-		gradientMinEditor.setPreferenceStore(getPreferenceStore());
-		gradientMinEditor.setPage(this);
-		gradientMinEditor.setTextLimit(4);
-		gradientMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
-		gradientMinEditor.load();
-		UI.setFieldWidth(editorContainer, gradientMinEditor, DEFAULT_FIELD_WIDTH);
-		gd = new GridData();
-		gd.horizontalIndent = COLUMN_INDENT;
-		gradientMinEditor.getLabelControl(editorContainer).setLayoutData(gd);
-
-		gradientMinEditor.setEnabled(gradientMinCheckbox.getBooleanValue(), editorContainer);
-
-		return container;
-	}
-
 	private void enableTabGraphControls() {
 		checkShowStartTime.setEnabled(radioShowTime.getSelection());
-	}
-
-	private CheckboxTableViewer createGraphCheckBoxList(final Composite parent) {
-
-		final CheckboxTableViewer checkboxList = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE
-				| SWT.TOP
-				| SWT.BORDER);
-
-		checkboxList.setContentProvider(new IStructuredContentProvider() {
-			public Object[] getElements(final Object inputElement) {
-				return fViewerGraphs.toArray();
-			}
-
-			public void dispose() {}
-
-			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-		});
-
-		checkboxList.setLabelProvider(new LabelProvider() {
-			@Override
-			public String getText(final Object element) {
-				final Graph graph = (Graph) element;
-				return graph.graphLabel;
-			}
-		});
-
-		checkboxList.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(final CheckStateChangedEvent event) {
-
-				// keep the checked status
-				final Graph item = (Graph) event.getElement();
-				item.isChecked = event.getChecked();
-
-				// select the checked item
-				checkboxList.setSelection(new StructuredSelection(item));
-
-				validateTab();
-			}
-		});
-
-		checkboxList.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(final SelectionChangedEvent event) {
-				enableUpDownButtons();
-			}
-		});
-
-		// first create the input, then set it
-		createGraphList();
-		checkboxList.setInput(this);
-
-		final String[] prefVisibleIds = StringToArrayConverter.convertStringToArray(getPreferenceStore().getString(ITourbookPreferences.GRAPH_VISIBLE));
-
-		// check all graphs which are defined in the prefs
-		final ArrayList<Graph> checkedGraphs = new ArrayList<Graph>();
-		for (final Graph graph : fViewerGraphs) {
-			final int graphId = graph.graphId;
-			for (final String prefId : prefVisibleIds) {
-				if (graphId == Integer.valueOf(prefId)) {
-					graph.isChecked = true;
-					checkedGraphs.add(graph);
-				}
-			}
-		}
-
-		checkboxList.setCheckedElements(checkedGraphs.toArray());
-
-		return checkboxList;
-	}
-
-	/**
-	 * create a list with all available graphs
-	 */
-	private void createGraphList() {
-
-		final String[] allGraphIds = StringToArrayConverter.convertStringToArray(//
-		getPreferenceStore().getString(ITourbookPreferences.GRAPH_ALL));
-
-		fViewerGraphs = new ArrayList<Graph>();
-
-		// put all graphs in the viewer which are defined in the prefs
-		for (final String allGraphId : allGraphIds) {
-			final int graphId = Integer.valueOf(allGraphId);
-			if (fGraphMap.containsKey(graphId)) {
-				fViewerGraphs.add(fGraphMap.get(graphId));
-			}
-		}
-
-		// make sure that all available graphs are in the viewer
-		for (final Graph graph : fGraphList) {
-			if (!fViewerGraphs.contains(graph)) {
-				fViewerGraphs.add(graph);
-			}
-		}
-
-	}
-
-	/*
-	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performOk()
-	 */
-	@Override
-	public boolean performOk() {
-
-		saveGraphs();
-
-		final IPreferenceStore prefStore = getPreferenceStore();
-
-		if (radioShowTime.getSelection()) {
-			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_TIME);
-		} else {
-			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
-		}
-
-		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, checkShowStartTime.getSelection());
-
-		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH, checkScrollZoomedChart.getSelection());
-		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, checkZoomToSlider.getSelection());
-
-		altimeterMinCheckbox.store();
-		altimeterMinEditor.store();
-		gradientMinCheckbox.store();
-		gradientMinEditor.store();
-
-		return super.performOk();
-	}
-
-	/**
-	 * get the graph id's from the preferences and check the graphs in the list
-	 */
-	private void saveGraphs() {
-
-		// convert the array with the graph objects into a string which is store
-		// in the prefs
-		final Object[] graphs = fGraphCheckboxList.getCheckedElements();
-		final String[] prefGraphsChecked = new String[graphs.length];
-		for (int graphIndex = 0; graphIndex < graphs.length; graphIndex++) {
-			final Graph graph = (Graph) graphs[graphIndex];
-			prefGraphsChecked[graphIndex] = Integer.toString(graph.graphId);
-		}
-		getPreferenceStore().setValue(ITourbookPreferences.GRAPH_VISIBLE,
-				StringToArrayConverter.convertArrayToString(prefGraphsChecked));
-
-		// convert the array of all table items into a string which is store in
-		// the prefs
-		final TableItem[] items = fGraphCheckboxList.getTable().getItems();
-		final String[] prefGraphs = new String[items.length];
-		for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
-			prefGraphs[itemIndex] = Integer.toString(((Graph) items[itemIndex].getData()).graphId);
-		}
-
-		getPreferenceStore().setValue(ITourbookPreferences.GRAPH_ALL,
-				StringToArrayConverter.convertArrayToString(prefGraphs));
-	}
-
-	/**
-	 * check the fields in the tab if they are valid
-	 */
-	private void validateTab() {
-
-		if (fGraphCheckboxList.getCheckedElements().length == 0) {
-			setErrorMessage(Messages.Pref_Graphs_Error_one_graph_must_be_selected);
-			setValid(false);
-
-		} else {
-			setErrorMessage(null);
-			setValid(true);
-		}
 	}
 
 	/**
@@ -568,6 +498,58 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		}
 		btnUp.setEnabled(enableUp);
 		btnDown.setEnabled(enableDown);
+	}
+
+	/*
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 */
+	public void init(final IWorkbench workbench) {
+		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
+	}
+
+	private void initializeGraphs() {
+		// create a map with all available graphs
+		fGraphMap = new HashMap<Integer, Graph>();
+		fGraphMap.put(TourManager.GRAPH_ALTITUDE, new Graph(TourManager.GRAPH_ALTITUDE, Messages.Graph_Label_Altitude));
+		fGraphMap.put(TourManager.GRAPH_SPEED, new Graph(TourManager.GRAPH_SPEED, Messages.Graph_Label_Speed));
+		fGraphMap.put(TourManager.GRAPH_PACE, new Graph(TourManager.GRAPH_PACE, Messages.Graph_Label_Pace));
+		fGraphMap.put(TourManager.GRAPH_POWER, new Graph(TourManager.GRAPH_POWER, Messages.Graph_Label_Power));
+		fGraphMap.put(TourManager.GRAPH_PULSE, new Graph(TourManager.GRAPH_PULSE, Messages.Graph_Label_Heartbeat));
+
+		fGraphMap.put(TourManager.GRAPH_TEMPERATURE, //
+				new Graph(TourManager.GRAPH_TEMPERATURE, Messages.Graph_Label_Temperature));
+
+		fGraphMap.put(TourManager.GRAPH_CADENCE, //
+				new Graph(TourManager.GRAPH_CADENCE, Messages.Graph_Label_Cadence));
+
+		fGraphMap.put(TourManager.GRAPH_ALTIMETER, //
+				new Graph(TourManager.GRAPH_ALTIMETER, Messages.Graph_Label_Altimeter));
+
+		fGraphMap.put(TourManager.GRAPH_GRADIENT, //
+				new Graph(TourManager.GRAPH_GRADIENT, Messages.Graph_Label_Gradient));
+
+		// create a list with all available graphs
+		fGraphList = new ArrayList<Graph>();
+		fGraphList.add(fGraphMap.get(TourManager.GRAPH_ALTITUDE));
+		fGraphList.add(fGraphMap.get(TourManager.GRAPH_SPEED));
+		fGraphList.add(fGraphMap.get(TourManager.GRAPH_PACE));
+		fGraphList.add(fGraphMap.get(TourManager.GRAPH_POWER));
+		fGraphList.add(fGraphMap.get(TourManager.GRAPH_PULSE));
+		fGraphList.add(fGraphMap.get(TourManager.GRAPH_TEMPERATURE));
+		fGraphList.add(fGraphMap.get(TourManager.GRAPH_CADENCE));
+		fGraphList.add(fGraphMap.get(TourManager.GRAPH_ALTIMETER));
+		fGraphList.add(fGraphMap.get(TourManager.GRAPH_GRADIENT));
+	}
+
+	/**
+	 * Moves an entry in the table to the given index.
+	 */
+	private void move(final TableItem item, final int index) {
+		this.setValid(true);
+		final Graph graph = (Graph) item.getData();
+		item.dispose();
+		fGraphCheckboxList.insert(graph, index);
+		fGraphCheckboxList.setChecked(graph, graph.isChecked);
 	}
 
 	/**
@@ -608,15 +590,89 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		table.setSelection(newSelection);
 	}
 
-	/**
-	 * Moves an entry in the table to the given index.
+	@Override
+	protected void performDefaults() {
+
+		gridEditorHorizontalDistance.loadDefault();
+		gridEditorVerticalDistance.loadDefault();
+
+		super.performDefaults();
+	}
+
+	/*
+	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performOk()
 	 */
-	private void move(final TableItem item, final int index) {
-		this.setValid(true);
-		final Graph graph = (Graph) item.getData();
-		item.dispose();
-		fGraphCheckboxList.insert(graph, index);
-		fGraphCheckboxList.setChecked(graph, graph.isChecked);
+	@Override
+	public boolean performOk() {
+
+		saveGraphs();
+
+		final IPreferenceStore prefStore = getPreferenceStore();
+
+		if (radioShowTime.getSelection()) {
+			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_TIME);
+		} else {
+			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
+		}
+
+		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, checkShowStartTime.getSelection());
+
+		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH, checkScrollZoomedChart.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, checkZoomToSlider.getSelection());
+
+		altimeterMinCheckbox.store();
+		altimeterMinEditor.store();
+		gradientMinCheckbox.store();
+		gradientMinEditor.store();
+
+		gridEditorHorizontalDistance.store();
+		gridEditorVerticalDistance.store();
+
+		return super.performOk();
+	}
+
+	/**
+	 * get the graph id's from the preferences and check the graphs in the list
+	 */
+	private void saveGraphs() {
+
+		final IPreferenceStore prefstore = getPreferenceStore();
+
+		// convert the array with the graph objects into a string which is store
+		// in the prefs
+		final Object[] graphs = fGraphCheckboxList.getCheckedElements();
+		final String[] prefGraphsChecked = new String[graphs.length];
+		for (int graphIndex = 0; graphIndex < graphs.length; graphIndex++) {
+			final Graph graph = (Graph) graphs[graphIndex];
+			prefGraphsChecked[graphIndex] = Integer.toString(graph.graphId);
+		}
+		prefstore.setValue(ITourbookPreferences.GRAPH_VISIBLE,
+				StringToArrayConverter.convertArrayToString(prefGraphsChecked));
+
+		// convert the array of all table items into a string which is store in
+		// the prefs
+		final TableItem[] items = fGraphCheckboxList.getTable().getItems();
+		final String[] prefGraphs = new String[items.length];
+		for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
+			prefGraphs[itemIndex] = Integer.toString(((Graph) items[itemIndex].getData()).graphId);
+		}
+
+		prefstore.setValue(ITourbookPreferences.GRAPH_ALL, StringToArrayConverter.convertArrayToString(prefGraphs));
+	}
+
+	/**
+	 * check the fields in the tab if they are valid
+	 */
+	private void validateTab() {
+
+		if (fGraphCheckboxList.getCheckedElements().length == 0) {
+			setErrorMessage(Messages.Pref_Graphs_Error_one_graph_must_be_selected);
+			setValid(false);
+
+		} else {
+			setErrorMessage(null);
+			setValid(true);
+		}
 	}
 
 }

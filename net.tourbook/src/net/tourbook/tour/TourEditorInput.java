@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -54,7 +54,10 @@ public class TourEditorInput implements IEditorInput, IPersistableElement {
 	}
 
 	public boolean exists() {
-		return false;
+		/*
+		 * !!! requires true to save the editors state, took hours to figure this out !!!
+		 */
+		return true;
 	}
 
 	@SuppressWarnings("unchecked")

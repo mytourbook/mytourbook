@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -113,6 +113,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		// define which unit is shown on the x-axis
 		store.setDefault(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
+
+		// graph grid distance
+		store.setDefault(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, 30);
+		store.setDefault(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, 70);
 
 		/*
 		 * view colors

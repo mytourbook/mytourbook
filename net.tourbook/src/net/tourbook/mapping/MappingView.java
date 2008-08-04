@@ -458,6 +458,8 @@ public class MappingView extends ViewPart {
 						}
 					}
 
+				} else if (propertyId == TourManager.SLIDER_POSITION_CHANGED) {
+					onChangeSelection((ISelection) propertyData);
 				}
 			}
 		};
@@ -883,6 +885,9 @@ public class MappingView extends ViewPart {
 				final TourData tourData = fTourChart.getTourData();
 
 				paintTour(tourData, false, false);
+
+				final SelectionChartInfo chartInfo = fTourChart.getChartInfo();
+				paintTourSliders(tourData, chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
 			}
 
 		} else if (selection instanceof SelectionChartInfo) {

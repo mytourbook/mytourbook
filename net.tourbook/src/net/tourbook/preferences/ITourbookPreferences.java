@@ -59,6 +59,9 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_GRADIENT_MIN_ENABLED				= "graphs.gradient.is-min-enabled";			//$NON-NLS-1$
 	public static final String	GRAPH_GRADIENT_MIN_VALUE				= "graphs.gradient.min-value";					//$NON-NLS-1$
 
+	public static final String	GRAPH_GRID_VERTICAL_DISTANCE			= "graphs.grid.vertical-distance";				//$NON-NLS-1$
+	public static final String	GRAPH_GRID_HORIZONTAL_DISTANCE			= "graphs.grid.horizontal-distance";			//$NON-NLS-1$
+
 	public static final String	DEFAULT_IMPORT_TOUR_TYPE_ID				= "tourtype.import.default";					//$NON-NLS-1$
 
 	public static final String	TOUR_TYPE_LIST_IS_MODIFIED				= "tourtype.list.is-modified";					//$NON-NLS-1$

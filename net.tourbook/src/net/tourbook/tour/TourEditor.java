@@ -37,7 +37,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IPersistableEditor;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -46,9 +48,11 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
 
-public class TourEditor extends EditorPart {
+public class TourEditor extends EditorPart implements IPersistableEditor {
 
 	public static final String				ID						= "net.tourbook.tour.TourEditor";	//$NON-NLS-1$
+
+	private static final String				MEMENTO_TOUR_ID			= "tourId";						//$NON-NLS-1$
 
 	private TourEditorInput					fEditorInput;
 
@@ -333,6 +337,16 @@ public class TourEditor extends EditorPart {
 		return false;
 	}
 
+	public void restoreState(final IMemento memento) {
+
+		if (memento == null) {
+			return;
+		}
+
+//		return new TourEditorInput(Long.parseLong(memento.getString(MEMENTO_TOUR_ID)));
+
+	}
+
 	public void revertTourData() {
 
 		TourManager.getInstance().removeTourFromCache(fEditorInput.getTourId());
@@ -350,6 +364,11 @@ public class TourEditor extends EditorPart {
 		modifiedTour.add(fTourData);
 
 		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
+	}
+
+	public void saveState(final IMemento memento) {
+		
+		memento.putString(MEMENTO_TOUR_ID, Long.toString(fEditorInput.getTourId()));
 	}
 
 	@Override

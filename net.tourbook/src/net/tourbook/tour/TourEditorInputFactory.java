@@ -34,7 +34,16 @@ public class TourEditorInputFactory implements IElementFactory {
 	}
 
 	public IAdaptable createElement(final IMemento memento) {
-		return new TourEditorInput(Long.parseLong(memento.getString(MEMENTO_TOUR_ID)));
+		final String mementoTourId = memento.getString(MEMENTO_TOUR_ID);
+		if (mementoTourId == null) {
+			return null;
+		}
+		final long tourId = Long.parseLong(mementoTourId);
+		try {
+			return new TourEditorInput(tourId);
+		} catch (final NumberFormatException e) {
+			return null;
+		}
 	}
 
 }

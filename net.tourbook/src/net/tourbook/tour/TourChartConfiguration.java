@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -18,7 +18,6 @@
  * 
  * created: 06.07.2005
  */
-
 package net.tourbook.tour;
 
 import java.util.ArrayList;
@@ -93,6 +92,22 @@ public class TourChartConfiguration {
 		visibleGraphSequence.add(visibleGraph);
 	}
 
+	/**
+	 * @return Returns the min/max keeper of the chart configuration or <code>null</code> when a
+	 *         min/max keeper is not set
+	 */
+	ChartYDataMinMaxKeeper getMinMaxKeeper() {
+		return fMinMaxKeeper;
+	}
+
+	/**
+	 * @return Returns all graph id's which are displayed in the chart, the list is in the sequence
+	 *         in which the graphs are displayed
+	 */
+	public ArrayList<Integer> getVisibleGraphs() {
+		return visibleGraphSequence;
+	}
+
 	public void removeVisibleGraph(final int selectedGraphId) {
 
 		int graphIndex = 0;
@@ -104,14 +119,6 @@ public class TourChartConfiguration {
 			}
 			graphIndex++;
 		}
-	}
-
-	/**
-	 * @return Returns all graph id's which are displayed in the chart, the list is in the sequence
-	 *         in which the graphs are displayed
-	 */
-	public ArrayList<Integer> getVisibleGraphs() {
-		return visibleGraphSequence;
 	}
 
 	/**
@@ -128,14 +135,6 @@ public class TourChartConfiguration {
 		} else {
 			fMinMaxKeeper = null;
 		}
-	}
-
-	/**
-	 * @return Returns the min/max keeper of the chart configuration or <code>null</code> when a
-	 *         min/max keeper is not set
-	 */
-	ChartYDataMinMaxKeeper getMinMaxKeeper() {
-		return fMinMaxKeeper;
 	}
 
 }

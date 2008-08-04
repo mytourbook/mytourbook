@@ -57,6 +57,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -339,6 +340,18 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		super.dispose();
 	}
 
+	/**
+	 * fire slider move event when the chart is drawn the first time or when the focus gets the
+	 * chart, this will move the sliders in the map to the correct position
+	 */
+	private void fireSliderPosition() {
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+				TourManager.firePropertyChange(TourManager.SLIDER_POSITION_CHANGED, fTourChart.getChartInfo());
+			}
+		});
+	}
+
 	public ArrayList<TourData> getSelectedTours() {
 
 		if (fTourData == null) {
@@ -386,7 +399,6 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		} else if (selection instanceof StructuredSelection) {
 
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-
 			if (firstElement instanceof TVICatalogComparedTour) {
 
 				updateChart(((TVICatalogComparedTour) firstElement).getTourId());
@@ -407,7 +419,6 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			if (refItem != null) {
 				updateChart(refItem.getTourId());
 			}
-
 		}
 
 	}
@@ -420,6 +431,8 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		 * fire tour selection
 		 */
 		fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart, fTourData));
+
+		fireSliderPosition();
 	}
 
 	private void updateChart() {
@@ -447,6 +460,8 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		}
 
 		updateChart(TourManager.getInstance().getTourData(tourId));
+
+		fireSliderPosition();
 	}
 
 	private void updateChart(final TourData tourData) {

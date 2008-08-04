@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.tour;
 
 import java.util.ArrayList;
@@ -27,6 +26,7 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ComputeChartValue;
+import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
@@ -75,6 +75,12 @@ public class TourManager {
 	 * tag/category renaming
 	 */
 	public static final int						TAG_STRUCTURE_CHANGED					= 70;
+
+	/**
+	 * Sliders in the tourchart moved. Property data contains {@link SelectionChartInfo} with the
+	 * position of the sliders
+	 */
+	public static final int						SLIDER_POSITION_CHANGED					= 80;
 
 	public static final String					CUSTOM_DATA_TIME						= "time";									//$NON-NLS-1$
 	public static final String					CUSTOM_DATA_DISTANCE					= "distance";								//$NON-NLS-1$
