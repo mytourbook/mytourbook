@@ -63,8 +63,8 @@ public class ChartComponents extends Composite {
 	/**
 	 * min/max pixel widthDev/heightDev of the chart
 	 */
-	static final int					CHART_MIN_WIDTH				= 1;
-	static final int					CHART_MIN_HEIGHT			= 1;
+	static final int					CHART_MIN_WIDTH				= 5;
+	static final int					CHART_MIN_HEIGHT			= 5;
 	static final int					CHART_MAX_WIDTH				= 0x7fff;
 	static final int					CHART_MAX_HEIGHT			= 5000;
 
@@ -114,14 +114,6 @@ public class ChartComponents extends Composite {
 	 * vertical distance between two graphs
 	 */
 	private final int					fChartsVerticalDistance		= 15;
-
-	/**
-	 * minimum width in pixel for one unit, this is only an approximate value because the pixel is
-	 * rounded up or down to fit a rounded unit
-	 */
-	private final int					fDevMinXUnit				= 70;
-
-	private final int					fDevMinYUnit				= 30;
 
 	/**
 	 * contains the {@link SynchConfiguration} for the current chart and will be used from the chart
@@ -182,19 +174,21 @@ public class ChartComponents extends Composite {
 		GridData gd;
 		fChart = parent;
 
-		// set the layout for the components
+		// set layout for the components
 		gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 //		gd.widthHint = CHART_MIN_WIDTH;
 //		gd.heightHint = CHART_MIN_HEIGHT;
 		setLayoutData(gd);
+//		GridDataFactory.fillDefaults().grab(true, true).applyTo(this);
 
-		// set the layout for this chart
+		// set layout for this chart
 		final GridLayout gl = new GridLayout(3, false);
 		gl.horizontalSpacing = 0;
 		gl.verticalSpacing = 0;
 		gl.marginWidth = 0;
 		gl.marginHeight = 0;
 		setLayout(gl);
+//		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(this);
 
 		// left: create left axis canvas
 		fComponentAxisLeft = new ChartComponentAxis(parent, this, SWT.NONE);
@@ -280,7 +274,7 @@ public class ChartComponents extends Composite {
 		 * calculate the number of units which will be visible by dividing the visible length by the
 		 * minimum size which one unit should have in pixels
 		 */
-		final int unitRawNumbers = devGraphWidth / fDevMinXUnit;
+		final int unitRawNumbers = devGraphWidth / fChart.gridHorizontalDistance;
 
 		// unitRawValue is the number in data values for one unit
 		final int unitRawValue = xMaxValue / Math.max(1, unitRawNumbers);
@@ -432,7 +426,7 @@ public class ChartComponents extends Composite {
 		 * calculate the number of units which will be visible by dividing the available height by
 		 * the minimum size which one unit should have in pixels
 		 */
-		final int unitCount = devGraphHeight / (fDevMinYUnit + 15);
+		final int unitCount = devGraphHeight / fChart.gridVerticalDistance;
 
 		// unitValue is the number in data values for one unit
 		final int graphUnitValue = graphValueRange / Math.max(1, unitCount);
@@ -1094,7 +1088,7 @@ public class ChartComponents extends Composite {
 	 * sets the synch config
 	 * 
 	 * @param fSynchConfigSrc
-	 *        the xMarkerPosition to set
+	 *            the xMarkerPosition to set
 	 */
 	void setSynchConfig(final SynchConfiguration synchConfigIn) {
 

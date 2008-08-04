@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.chart;
 
 import java.util.ArrayList;
@@ -71,18 +70,18 @@ public class ChartDataModel {
 	 */
 	private int							chartMinWidth				= ChartComponents.CHART_MIN_WIDTH;
 
-	public ChartDataModel(int chartType) {
+	public ChartDataModel(final int chartType) {
 		fChartType = chartType;
 	}
 
-	public void addXyData(ChartDataSerie data) {
+	public void addXyData(final ChartDataSerie data) {
 		xyData.add(data);
 	}
 
 	/**
 	 * @param data
 	 */
-	public void addYData(ChartDataYSerie data) {
+	public void addYData(final ChartDataYSerie data) {
 		yData.add(data);
 	}
 
@@ -101,7 +100,7 @@ public class ChartDataModel {
 	 * Returns the application defined property of the receiver with the specified name, or null if
 	 * it has not been set.
 	 */
-	public Object getCustomData(String key) {
+	public Object getCustomData(final String key) {
 		if (customData.containsKey(key)) {
 			return customData.get(key);
 		} else {
@@ -152,13 +151,13 @@ public class ChartDataModel {
 	 */
 	public void resetMinMaxValues() {
 
-		for (ChartDataYSerie ySerie : yData) {
+		for (final ChartDataYSerie ySerie : yData) {
 			ySerie.fVisibleMinValue = ySerie.getOriginalMinValue();
 			ySerie.fVisibleMaxValue = ySerie.getOriginalMaxValue();
 		}
 	}
 
-	public void setChartMinWidth(int chartMinWidth) {
+	public void setChartMinWidth(final int chartMinWidth) {
 		this.chartMinWidth = chartMinWidth;
 	}
 
@@ -166,19 +165,19 @@ public class ChartDataModel {
 	 * Sets the application defined property of the receiver with the specified name to the given
 	 * value.
 	 */
-	public void setCustomData(String key, Object value) {
+	public void setCustomData(final String key, final Object value) {
 		customData.put(key, value);
 	}
 
-	public void setStackedChart(boolean isStackedChart) {
+	public void setStackedChart(final boolean isStackedChart) {
 		this.isStackedChart = isStackedChart;
 	}
 
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.fTitle = title;
 	}
 
-	public void setXData(ChartDataXSerie data) {
+	public void setXData(final ChartDataXSerie data) {
 		xData = data;
 	}
 
@@ -186,7 +185,7 @@ public class ChartDataModel {
 	 * @param data2nd
 	 *        The xData2nd to set.
 	 */
-	public void setXData2nd(ChartDataXSerie data2nd) {
+	public void setXData2nd(final ChartDataXSerie data2nd) {
 		xData2nd = data2nd;
 	}
 

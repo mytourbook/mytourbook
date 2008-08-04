@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.chart;
 
 import java.util.ArrayList;
@@ -81,8 +80,8 @@ public class Chart extends ViewForm {
 	IChartListener						fXMarkerDraggingListener;
 
 	/**
-	 * when set to <code>true</code> the toolbar is within the chart control, otherwise the
-	 * toolbar is outsite of the chart
+	 * when set to <code>true</code> the toolbar is within the chart control, otherwise the toolbar
+	 * is outsite of the chart
 	 */
 	boolean								fUseInternalActionBar		= true;
 
@@ -103,6 +102,13 @@ public class Chart extends ViewForm {
 	 * <code>true</code> to start the bar chart at the bottom of the chart
 	 */
 	private boolean						fDrawBarChartAtBottom		= true;
+
+	/**
+	 * minimum width in pixel for one unit, this is only an approximate value because the pixel is
+	 * rounded up or down to fit a rounded unit
+	 */
+	protected int						gridVerticalDistance		= 30;
+	protected int						gridHorizontalDistance		= 70;
 
 	/**
 	 * Chart widget
@@ -302,7 +308,7 @@ public class Chart extends ViewForm {
 				fChartContextProvider.fillXSliderContextMenu(menuMgr, leftSlider, rightSlider);
 			}
 		}
-		
+
 		if (fChartContextProvider != null) {
 			fChartContextProvider.fillContextMenu(menuMgr);
 		}
@@ -615,7 +621,7 @@ public class Chart extends ViewForm {
 	 * Set the background color for the chart, the default is SWT.COLOR_WHITE
 	 * 
 	 * @param backgroundColor
-	 *        The backgroundColor to set.
+	 *            The backgroundColor to set.
 	 */
 	public void setBackgroundColor(final Color backgroundColor) {
 		this.fBackgroundColor = backgroundColor;
@@ -692,8 +698,8 @@ public class Chart extends ViewForm {
 	 * Select (highlight) the bar in the bar chart
 	 * 
 	 * @param selectedItems
-	 *        items in the x-data serie which should be selected, can be <code>null</code> to
-	 *        deselect the bar
+	 *            items in the x-data serie which should be selected, can be <code>null</code> to
+	 *            deselect the bar
 	 */
 	public void setSelectedBars(final boolean[] selectedItems) {
 
@@ -719,7 +725,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * @param isMarkerVisible
-	 *        <code>true</code> shows the marker area
+	 *            <code>true</code> shows the marker area
 	 */
 	public void setShowMarker(final boolean isMarkerVisible) {
 		fChartComponents.setMarkerVisible(isMarkerVisible);
@@ -731,7 +737,7 @@ public class Chart extends ViewForm {
 
 	/**
 	 * @param isSliderVisible
-	 *        <code>true</code> shows the sliders
+	 *            <code>true</code> shows the sliders
 	 */
 	public void setShowSlider(final boolean isSliderVisible) {
 		fChartComponents.setSliderVisible(isSliderVisible);
@@ -755,7 +761,7 @@ public class Chart extends ViewForm {
 	 * set the synch configuration which is used when the chart is drawn/resized
 	 * 
 	 * @param synchConfigIn
-	 *        set <code>null</code> to disable the synchronization
+	 *            set <code>null</code> to disable the synchronization
 	 */
 	public void setSynchConfig(final SynchConfiguration synchConfigIn) {
 		fChartComponents.setSynchConfig(synchConfigIn);
@@ -778,9 +784,9 @@ public class Chart extends ViewForm {
 	/**
 	 * @param toolbarMgr
 	 * @param isFillToolbar
-	 *        set <code>false</code> when the toolbar will be filled with
-	 *        {@link Chart#fillToolbar(boolean)} from externally, when <code>true</code> the
-	 *        toolbar will be filled when the chart is updated
+	 *            set <code>false</code> when the toolbar will be filled with
+	 *            {@link Chart#fillToolbar(boolean)} from externally, when <code>true</code> the
+	 *            toolbar will be filled when the chart is updated
 	 */
 	public void setToolBarManager(final IToolBarManager toolbarMgr, final boolean isFillToolbar) {
 		fToolbarMgr = toolbarMgr;
@@ -864,7 +870,7 @@ public class Chart extends ViewForm {
 	 * 
 	 * @param chartDataModel
 	 * @param isResetSelection
-	 *        <code>true</code> to reset the last selection in the chart
+	 *            <code>true</code> to reset the last selection in the chart
 	 */
 	public void updateChart(final ChartDataModel chartDataModel, final boolean isResetSelection) {
 
@@ -965,9 +971,9 @@ public class Chart extends ViewForm {
 	 * zoom into the chart where the graph is divided into parts (months)
 	 * 
 	 * @param parts
-	 *        number of parts into how many parts the chart is devided
+	 *            number of parts into how many parts the chart is devided
 	 * @param position
-	 *        is based on 0
+	 *            is based on 0
 	 * @param scrollSmoothly
 	 */
 	public void zoomWithParts(final int parts, final int position, final boolean scrollSmoothly) {

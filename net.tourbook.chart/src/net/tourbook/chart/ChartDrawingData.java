@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.chart;
 
 import java.util.ArrayList;
@@ -93,7 +92,7 @@ public class ChartDrawingData {
 
 	private int						fChartType;
 
-	public ChartDrawingData(int chartType) {
+	public ChartDrawingData(final int chartType) {
 		fChartType = chartType;
 	}
 
@@ -283,7 +282,7 @@ public class ChartDrawingData {
 	 * @param barFocusRectangles
 	 *        The barFocusRectangles to set.
 	 */
-	public void setBarFocusRectangles(Rectangle[][] barFocusRectangles) {
+	public void setBarFocusRectangles(final Rectangle[][] barFocusRectangles) {
 		this.barFocusRectangles = barFocusRectangles;
 	}
 
@@ -291,7 +290,7 @@ public class ChartDrawingData {
 	 * @param barPosition
 	 *        The barPosition to set.
 	 */
-	public void setBarPosition(int barPosition) {
+	public void setBarPosition(final int barPosition) {
 		this.barPosition = barPosition;
 	}
 
@@ -299,7 +298,7 @@ public class ChartDrawingData {
 	 * @param barRectangles
 	 *        The barRectangles to set.
 	 */
-	public void setBarRectangles(Rectangle[][] barRectList) {
+	public void setBarRectangles(final Rectangle[][] barRectList) {
 		this.barRectangles = barRectList;
 	}
 
@@ -307,7 +306,7 @@ public class ChartDrawingData {
 	 * @param barRectangleWidth
 	 *        The barRectangleWidth to set.
 	 */
-	public void setBarRectangleWidth(int barRectangleWidth) {
+	public void setBarRectangleWidth(final int barRectangleWidth) {
 		this.fBarRectangleWidth = barRectangleWidth;
 	}
 
@@ -315,15 +314,15 @@ public class ChartDrawingData {
 	 * @param barRectanglePos
 	 *        The barRectanglePos to set.
 	 */
-	public void setDevBarRectangleXPos(int barRectanglePos) {
+	public void setDevBarRectangleXPos(final int barRectanglePos) {
 		fDevBarRectangleXPos = barRectanglePos;
 	}
 
-	public void setDevGraphHeight(int heightDev) {
+	public void setDevGraphHeight(final int heightDev) {
 		this.devGraphHeight = heightDev;
 	}
 
-	public void setDevGraphWidth(int devGraphWidth) {
+	public void setDevGraphWidth(final int devGraphWidth) {
 		this.devGraphWidth = devGraphWidth;
 	}
 
@@ -331,7 +330,7 @@ public class ChartDrawingData {
 	 * @param devMarginTop
 	 *        The devMarginTop to set.
 	 */
-	public void setDevMarginTop(int devMarginTop) {
+	public void setDevMarginTop(final int devMarginTop) {
 		this.devMarginTop = devMarginTop;
 	}
 
@@ -339,7 +338,7 @@ public class ChartDrawingData {
 	 * @param devMarkerBarHeight
 	 *        The devMarkerBarHeight to set.
 	 */
-	public void setDevMarkerBarHeight(int devMarkerBarHeight) {
+	public void setDevMarkerBarHeight(final int devMarkerBarHeight) {
 		this.devMarkerBarHeight = devMarkerBarHeight;
 	}
 
@@ -347,11 +346,11 @@ public class ChartDrawingData {
 	 * @param devSliderBarHeight
 	 *        The devSliderBarHeight to set.
 	 */
-	public void setDevSliderBarHeight(int devSliderBarHeight) {
+	public void setDevSliderBarHeight(final int devSliderBarHeight) {
 		this.devSliderBarHeight = devSliderBarHeight;
 	}
 
-	public void setDevSliderHeight(int devSliderHeight) {
+	public void setDevSliderHeight(final int devSliderHeight) {
 		this.devSliderHeight = devSliderHeight;
 	}
 
@@ -359,11 +358,11 @@ public class ChartDrawingData {
 	 * @param devTitelBarHeight
 	 *        The devTitelBarHeight to set.
 	 */
-	void setDevXTitelBarHeight(int devTitelBarHeight) {
+	void setDevXTitelBarHeight(final int devTitelBarHeight) {
 		this.devXTitelBarHeight = devTitelBarHeight;
 	}
 
-	public void setDevYBottom(int devY) {
+	public void setDevYBottom(final int devY) {
 		this.devYBottom = devY;
 	}
 
@@ -371,11 +370,11 @@ public class ChartDrawingData {
 	 * @param devYTop
 	 *        The devYTop to set.
 	 */
-	protected void setDevYTop(int devYTop) {
+	protected void setDevYTop(final int devYTop) {
 		this.devYTop = devYTop;
 	}
 
-	public void setGraphYBottom(int yGraphMin) {
+	public void setGraphYBottom(final int yGraphMin) {
 		this.graphYBottom = yGraphMin;
 	}
 
@@ -383,7 +382,7 @@ public class ChartDrawingData {
 	 * @param graphYTop
 	 *        The graphYTop to set.
 	 */
-	protected void setGraphYTop(int graphYTop) {
+	protected void setGraphYTop(final int graphYTop) {
 		this.graphYTop = graphYTop;
 	}
 
@@ -392,7 +391,7 @@ public class ChartDrawingData {
 	 * 
 	 * @param scaleXUnit
 	 */
-	public void setScaleUnitX(float scaleXUnit) {
+	public void setScaleUnitX(final float scaleXUnit) {
 		this.scaleUnitX = scaleXUnit;
 	}
 
@@ -401,11 +400,11 @@ public class ChartDrawingData {
 	 * 
 	 * @param scaleX
 	 */
-	public void setScaleX(float scaleX) {
+	public void setScaleX(final float scaleX) {
 		this.scaleX = scaleX;
 	}
 
-	public void setScaleY(float scaleY) {
+	public void setScaleY(final float scaleY) {
 		this.scaleY = scaleY;
 	}
 
@@ -413,7 +412,7 @@ public class ChartDrawingData {
 	 * @param xData
 	 *        The xData to set.
 	 */
-	public void setXData(ChartDataXSerie xData) {
+	public void setXData(final ChartDataXSerie xData) {
 		this.xData = xData;
 	}
 
@@ -421,11 +420,11 @@ public class ChartDrawingData {
 	 * @param data2nd
 	 *        The xData2nd to set.
 	 */
-	public void setXData2nd(ChartDataXSerie data2nd) {
+	public void setXData2nd(final ChartDataXSerie data2nd) {
 		xData2nd = data2nd;
 	}
 
-	public void setXTitle(String title) {
+	public void setXTitle(final String title) {
 		fXTitle = title;
 	}
 
@@ -435,7 +434,7 @@ public class ChartDrawingData {
 	 * @param unitTextPos
 	 *        The xUnitTextPos to set.
 	 */
-	public void setXUnitTextPos(int unitTextPos) {
+	public void setXUnitTextPos(final int unitTextPos) {
 		xUnitTextPos = unitTextPos;
 	}
 
@@ -443,7 +442,7 @@ public class ChartDrawingData {
 	 * @param data
 	 *        The yData to set.
 	 */
-	public void setYData(ChartDataYSerie data) {
+	public void setYData(final ChartDataYSerie data) {
 		this.yData = data;
 	}
 
@@ -451,7 +450,7 @@ public class ChartDrawingData {
 	 * @param sliderHitRect
 	 *        The ySliderHitRect to set.
 	 */
-	public void setYSliderHitRect(Rectangle[] sliderHitRect) {
+	public void setYSliderHitRect(final Rectangle[] sliderHitRect) {
 		ySliderHitRect = sliderHitRect;
 	}
 }
