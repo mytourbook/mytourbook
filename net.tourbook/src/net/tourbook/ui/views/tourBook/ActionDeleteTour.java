@@ -22,7 +22,6 @@ import java.util.Iterator;
 import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TreeViewerItem;
 
@@ -34,7 +33,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
@@ -60,7 +58,7 @@ public class ActionDeleteTour extends Action {
 								final SelectionDeletedTours selectionRemovedTours,
 								final IProgressMonitor monitor) {
 
-		final ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
+//		final ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
 
 		int firstSelectedTourIndex = -1;
 		TreeViewerItem firstSelectedParent = null;
@@ -94,22 +92,16 @@ public class ActionDeleteTour extends Action {
 					}
 
 					// remove the tour from the data model
-					tourParent.getChildren().remove(tourItem);
+//					tourParent.getChildren().remove(tourItem);
 
 					// add to removed tour list
-					removedTours.add(tourItem);
+//					removedTours.add(tourItem);
 				}
 			}
 
 			if (monitor != null) {
 				monitor.worked(1);
 			}
-		}
-
-		// refresh the tree viewer
-		final ColumnViewer viewer = fTourViewer.getViewer();
-		if (viewer instanceof TreeViewer) {
-			((TreeViewer) viewer).remove(removedTours.toArray(new TVITourBookTour[removedTours.size()]));
 		}
 
 		/*
@@ -184,7 +176,7 @@ public class ActionDeleteTour extends Action {
 		final SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
 
 		if (selectedTours < 2) {
-			
+
 			final Runnable deleteRunnable = new Runnable() {
 				public void run() {
 					// delete selected tours

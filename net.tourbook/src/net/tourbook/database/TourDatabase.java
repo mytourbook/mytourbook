@@ -152,7 +152,7 @@ public class TourDatabase {
 
 		// derby debug properties
 //		System.setProperty("derby.language.logQueryPlan", "true"); //$NON-NLS-1$
-//		System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
+		System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
 	}
 
 	class CustomMonitor extends ProgressMonitorDialog {
@@ -200,6 +200,38 @@ public class TourDatabase {
 		}
 
 		UI.getInstance().disposeTourTypeImages();
+	}
+
+	public static void computeComputedValuesForAllTours() {
+
+		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+				final ArrayList<Long> tourList = getAllTourIds();
+
+				// loop over all tours and calculate and set new columns
+				int tourCounter = 1;
+				for (final Long tourId : tourList) {
+
+					monitor.subTask(NLS.bind(Messages.Tour_Database_update_tour,//
+							new Object[] { tourCounter++, tourList.size() }));
+
+					final TourData tourData = getTourFromDb(tourId);
+					if (tourData != null) {
+
+						tourData.computeAvgFields();
+						saveTour(tourData);
+					}
+				}
+			}
+		};
+		try {
+			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
+		} catch (final InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -261,27 +293,31 @@ public class TourDatabase {
 		return fActiveTourTypes;
 	}
 
-	/**
-	 * @return Returns all tours in database
-	 */
-	@SuppressWarnings("unchecked")
 	private static ArrayList<Long> getAllTourIds() {
 
-		ArrayList<Long> tourList = new ArrayList<Long>();
+		final ArrayList<Long> tourIds = new ArrayList<Long>();
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		try {
+			final StringBuilder sb = new StringBuilder();
 
-		if (em != null) {
+			sb.append("SELECT"); //$NON-NLS-1$
+			sb.append(" tourId"); // 	1 //$NON-NLS-1$
+			sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
 
-			final Query query = em.createQuery("SELECT TourData.tourId " //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData ")); //$NON-NLS-1$ //$NON-NLS-2$
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final ResultSet result = conn.prepareStatement(sb.toString()).executeQuery();
 
-			tourList = (ArrayList<Long>) query.getResultList();
+			while (result.next()) {
+				tourIds.add(result.getLong(1));
+			}
 
-			em.close();
+			conn.close();
+
+		} catch (final SQLException e) {
+			e.printStackTrace();
 		}
 
-		return tourList;
+		return tourIds;
 	}
 
 	/**
@@ -495,10 +531,6 @@ public class TourDatabase {
 
 		em.close();
 
-//		long startTime = System.currentTimeMillis();
-//		long endTime = System.currentTimeMillis();
-//		System.out.println("Execution time : " + (endTime - startTime) + " ms");
-
 		return tourData;
 	}
 
@@ -631,71 +663,81 @@ public class TourDatabase {
 	private static void removeTourWithSQL(final long tourId) {
 
 		Connection conn;
+		PreparedStatement prepStmt;
+		String sqlString = UI.EMPTY_STRING;
+
 		try {
 
 			conn = TourDatabase.getInstance().getConnection();
 
-			PreparedStatement prepStmt;
-			final String sqlWhere = " WHERE " + TABLE_TOUR_DATA + "_tourId=?" + tourId;
+			final String sqlWhereTourDataTourId = " WHERE " + TABLE_TOUR_DATA + "_tourId=?";
 
 			/*
 			 * tour data
 			 */
-
-			prepStmt = conn.prepareStatement("DELETE FROM " + TABLE_TOUR_DATA + " WHERE tourId=?");
+			sqlString = "DELETE FROM " + TABLE_TOUR_DATA + " WHERE tourId=?";
+			prepStmt = conn.prepareStatement(sqlString);
 			prepStmt.setLong(1, tourId);
 			prepStmt.execute();
 
 			/*
 			 * tour marker
 			 */
-			prepStmt = conn.prepareStatement("DELETE FROM " + TABLE_TOUR_MARKER + sqlWhere);
+			sqlString = "DELETE FROM " + TABLE_TOUR_MARKER + sqlWhereTourDataTourId;
+			prepStmt = conn.prepareStatement(sqlString);
 			prepStmt.setLong(1, tourId);
 			prepStmt.execute();
-			prepStmt = conn.prepareStatement("DELETE FROM " + JOINTABLE_TOURDATA__TOURMARKER + sqlWhere);
+			sqlString = "DELETE FROM " + JOINTABLE_TOURDATA__TOURMARKER + sqlWhereTourDataTourId;
+			prepStmt = conn.prepareStatement(sqlString);
 			prepStmt.setLong(1, tourId);
 			prepStmt.execute();
 
 			/*
 			 * reference tour
 			 */
-			prepStmt = conn.prepareStatement("DELETE FROM " + TABLE_TOUR_REFERENCE + sqlWhere);
+			sqlString = "DELETE FROM " + TABLE_TOUR_REFERENCE + sqlWhereTourDataTourId;
+			prepStmt = conn.prepareStatement(sqlString);
 			prepStmt.setLong(1, tourId);
 			prepStmt.execute();
-			prepStmt = conn.prepareStatement("DELETE FROM " + JOINTABLE_TOURDATA__TOURREFERENCE + sqlWhere);
+			sqlString = "DELETE FROM " + JOINTABLE_TOURDATA__TOURREFERENCE + sqlWhereTourDataTourId;
+			prepStmt = conn.prepareStatement(sqlString);
 			prepStmt.setLong(1, tourId);
 			prepStmt.execute();
 
 			/*
 			 * tour tags
 			 */
-			prepStmt = conn.prepareStatement("DELETE FROM " + JOINTABLE_TOURDATA__TOURTAG + sqlWhere);
+			sqlString = "DELETE FROM " + JOINTABLE_TOURDATA__TOURTAG + sqlWhereTourDataTourId;
+			prepStmt = conn.prepareStatement(sqlString);
 			prepStmt.setLong(1, tourId);
 			prepStmt.execute();
 
 			/*
 			 * compared tour
 			 */
-			prepStmt = conn.prepareStatement("DELETE FROM " + TABLE_TOUR_COMPARED + " WHERE tourId=?");
+			sqlString = "DELETE FROM " + TABLE_TOUR_COMPARED + " WHERE tourId=?";
+			prepStmt = conn.prepareStatement(sqlString);
 			prepStmt.setLong(1, tourId);
 			prepStmt.execute();
 
 			/*
 			 * OLD unused table: tour category
 			 */
-			prepStmt = conn.prepareStatement(("DELETE FROM " + TABLE_TOUR_CATEGORY) //
-					+ (" WHERE " + TABLE_TOUR_DATA + "tourId = " + tourId));
+			sqlString = ("DELETE FROM " + TABLE_TOUR_CATEGORY) + (" WHERE " + TABLE_TOUR_DATA + "tourId=?");
+			prepStmt = conn.prepareStatement(sqlString);
 			prepStmt.setLong(1, tourId);
 			prepStmt.execute();
 
-			prepStmt = conn.prepareStatement(("DELETE FROM " + JOINTABLE_TOURCATEGORY__TOURDATA) + sqlWhere);
+			sqlString = ("DELETE FROM " + JOINTABLE_TOURCATEGORY__TOURDATA) + sqlWhereTourDataTourId;
+			prepStmt = conn.prepareStatement(sqlString);
 			prepStmt.setLong(1, tourId);
 			prepStmt.execute();
 
 			conn.close();
 
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			System.out.println(sqlString);
+			UI.showSQLException(e);
 		}
 	}
 
@@ -838,7 +880,6 @@ public class TourDatabase {
 				ts.begin();
 				{
 					final TourData tourDataEntity = em.find(TourData.class, tourData.getTourId());
-
 					if (tourDataEntity == null) {
 
 						// tour is not yet persisted
@@ -959,17 +1000,6 @@ public class TourDatabase {
 		return true;
 	}
 
-//	public void closeConnectionPool() {
-//
-//		if (fPooledDataSource != null) {
-//			try {
-//				DataSources.destroy(fPooledDataSource);
-//			} catch (final SQLException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
-
 	/**
 	 * Check if the server is available
 	 * 
@@ -1047,8 +1077,8 @@ public class TourDatabase {
 					createTableTourCompared(stmt);
 					createTableVersion(stmt);
 
-					createTableTourTag(stmt);
-					createTableTourTagCategory(stmt);
+					createTableTourTagV5(stmt);
+					createTableTourTagCategoryV5(stmt);
 
 					stmt.executeBatch();
 				}
@@ -1492,89 +1522,7 @@ public class TourDatabase {
 				+ (" PRIMARY KEY (" + TABLE_TOUR_DATA + "_tourId)")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/**
-	 * create table {@link #TABLE_TOUR_TAG}
-	 * 
-	 * @param stmt
-	 * @throws SQLException
-	 */
-	private void createTableTourTag(final Statement stmt) throws SQLException {
-
-		/*
-		 * creates the tables for the tour tags for VERSION 5
-		 */
-
-		// CREATE TABLE TourTag
-		String sql;
-
-		sql = ("CREATE TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
-				+ "(\n" //$NON-NLS-1$
-				+ "	tagId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
-				+ "	isRoot 		INTEGER,\n" //$NON-NLS-1$
-				+ "	expandType 	INTEGER,\n" //$NON-NLS-1$
-				+ "	name 		VARCHAR(255)\n" //$NON-NLS-1$
-				+ ")"; //$NON-NLS-1$
-
-		System.out.println(sql);
-
-		stmt.execute(sql);
-
-		// ALTER TABLE TourTag ADD CONSTRAINT TourTag_pk PRIMARY KEY (refId);
-		sql = ("ALTER TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
-				+ ("	ADD CONSTRAINT " + TABLE_TOUR_TAG + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	PRIMARY KEY (tagId)"); //$NON-NLS-1$
-
-		System.out.println(sql);
-		System.out.println();
-
-		stmt.execute(sql);
-
-		/*
-		 * CREATE TABLE TourData_TourTag
-		 */
-		final String field_TourData_tourId = TABLE_TOUR_DATA + "_tourId"; //$NON-NLS-1$
-		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId"; //$NON-NLS-1$
-
-		sql = ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ 
-				+ "(\n" //$NON-NLS-1$
-				+ (TABLE_TOUR_TAG + "_tagId" + "	BIGINT NOT NULL,\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (TABLE_TOUR_DATA + "_tourId" + "	BIGINT NOT NULL\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ")"; //$NON-NLS-1$
-
-		System.out.println(sql);
-		stmt.execute(sql);
-
-		/*
-		 * Add Constrainsts
-		 */
-
-//		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //						//$NON-NLS-1$ //$NON-NLS-2$
-//				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURTAG + "_pk") //		//$NON-NLS-1$
-//				+ (" PRIMARY KEY (" + field_TourTag_tagId + ")"); //				//$NON-NLS-1$ //$NON-NLS-2$
-//
-//		System.out.println(sql);
-//		stmt.addBatch(sql);
-		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ 
-				//
-				+ ("	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourTag_tagId) //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	REFERENCES " + TABLE_TOUR_TAG + " (tagId)"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		System.out.println(sql);
-		stmt.execute(sql);
-
-		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ 
-				//
-				+ ("	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourData_tourId) //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	REFERENCES " + TABLE_TOUR_DATA + " (tourId)"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		System.out.println(sql);
-		System.out.println();
-		stmt.execute(sql);
-	}
-
-	private void createTableTourTagCategory(final Statement stmt) throws SQLException {
+	private void createTableTourTagCategoryV5(final Statement stmt) throws SQLException {
 
 		/*
 		 * creates the tables for the tour tag categories for VERSION 5
@@ -1682,6 +1630,88 @@ public class TourDatabase {
 						+ field_TourTagCategory_tagCategoryId2 + "\n") //$NON-NLS-1$
 				+ (" FOREIGN KEY (" + TABLE_TOUR_TAG_CATEGORY + "_tagCategoryId2)\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (tagCategoryId)\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		System.out.println(sql);
+		System.out.println();
+		stmt.execute(sql);
+	}
+
+	/**
+	 * create table {@link #TABLE_TOUR_TAG}
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 */
+	private void createTableTourTagV5(final Statement stmt) throws SQLException {
+
+		/*
+		 * creates the tables for the tour tags for VERSION 5
+		 */
+
+		// CREATE TABLE TourTag
+		String sql;
+
+		sql = ("CREATE TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
+				+ "(\n" //$NON-NLS-1$
+				+ "	tagId 		BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 ,INCREMENT BY 1),\n" //$NON-NLS-1$
+				+ "	isRoot 		INTEGER,\n" //$NON-NLS-1$
+				+ "	expandType 	INTEGER,\n" //$NON-NLS-1$
+				+ "	name 		VARCHAR(255)\n" //$NON-NLS-1$
+				+ ")"; //$NON-NLS-1$
+
+		System.out.println(sql);
+
+		stmt.execute(sql);
+
+		// ALTER TABLE TourTag ADD CONSTRAINT TourTag_pk PRIMARY KEY (refId);
+		sql = ("ALTER TABLE " + TABLE_TOUR_TAG) //$NON-NLS-1$
+				+ ("	ADD CONSTRAINT " + TABLE_TOUR_TAG + "_pk ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	PRIMARY KEY (tagId)"); //$NON-NLS-1$
+
+		System.out.println(sql);
+		System.out.println();
+
+		stmt.execute(sql);
+
+		/*
+		 * CREATE TABLE TourData_TourTag
+		 */
+		final String field_TourData_tourId = TABLE_TOUR_DATA + "_tourId"; //$NON-NLS-1$
+		final String field_TourTag_tagId = TABLE_TOUR_TAG + "_tagId"; //$NON-NLS-1$
+
+		sql = ("CREATE TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ 
+				+ "(\n" //$NON-NLS-1$
+				+ (TABLE_TOUR_TAG + "_tagId" + "	BIGINT NOT NULL,\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (TABLE_TOUR_DATA + "_tourId" + "	BIGINT NOT NULL\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ")"; //$NON-NLS-1$
+
+		System.out.println(sql);
+		stmt.execute(sql);
+
+		/*
+		 * Add Constrainsts
+		 */
+
+//		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //						//$NON-NLS-1$ //$NON-NLS-2$
+//				+ (" ADD CONSTRAINT " + JOINTABLE_TOURDATA__TOURTAG + "_pk") //		//$NON-NLS-1$
+//				+ (" PRIMARY KEY (" + field_TourTag_tagId + ")"); //				//$NON-NLS-1$ //$NON-NLS-2$
+//
+//		System.out.println(sql);
+//		stmt.addBatch(sql);
+		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ 
+				//
+				+ ("	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourTag_tagId) //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	FOREIGN KEY (" + TABLE_TOUR_TAG + "_tagId)") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	REFERENCES " + TABLE_TOUR_TAG + " (tagId)"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		System.out.println(sql);
+		stmt.execute(sql);
+
+		sql = ("ALTER TABLE " + JOINTABLE_TOURDATA__TOURTAG) //$NON-NLS-1$ 
+				//
+				+ ("	ADD CONSTRAINT fk_" + JOINTABLE_TOURDATA__TOURTAG + "_" + field_TourData_tourId) //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	FOREIGN KEY (" + TABLE_TOUR_DATA + "_tourId)") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	REFERENCES " + TABLE_TOUR_DATA + " (tourId)"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println(sql);
 		System.out.println();
@@ -2108,8 +2138,8 @@ public class TourDatabase {
 		try {
 			final Statement statement = conn.createStatement();
 
-			createTableTourTag(statement);
-			createTableTourTagCategory(statement);
+			createTableTourTagV5(statement);
+			createTableTourTagCategoryV5(statement);
 			createIndexTourDataV5(statement);
 
 			statement.executeBatch();

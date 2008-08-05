@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.mapping;
 
 import net.tourbook.colors.ColorDefinition;
@@ -64,7 +63,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class LegendColorDialog extends TitleAreaDialog {
 
-	private static final String		DIALOG_SETTINGS_SELECTED_VALUE_POINT	= "selected.value.point";	//$NON-NLS-1$
+//	private static final String		DIALOG_SETTINGS_SELECTED_VALUE_POINT	= "selected.value.point";	//$NON-NLS-1$
 
 	private static final String		VALUE_SPACER							= "999";					//$NON-NLS-1$
 
@@ -476,26 +475,6 @@ public class LegendColorDialog extends TitleAreaDialog {
 //		minContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 	}
 
-	private void onSelectColorSelector(final ColorSelector colorSelector, final int valueColorIndex) {
-
-//		RGB colorValue = fColorSelectorMax.getColorValue();
-//
-//		final int selectedValuePoint = 0;
-
-//		final int items = fComboValuePoint.getItemCount() - 1;
-//		final ValueColor valueColor = fValueColors[items - valueColorIndex];
-		final ValueColor valueColor = fValueColors[4 - valueColorIndex];
-
-		final RGB colorValue = colorSelector.getColorValue();
-		valueColor.red = colorValue.red;
-		valueColor.green = colorValue.green;
-		valueColor.blue = colorValue.blue;
-
-//		fComboValuePoint.select(valueColorIndex);
-
-		updateUI();
-	}
-
 	private void createUIMinMaxValue(final Composite parent) {
 
 		final ModifyListener validateFieldOnModify = new ModifyListener() {
@@ -576,6 +555,29 @@ public class LegendColorDialog extends TitleAreaDialog {
 
 //		fLblMaxValueUnit = new Label(group, SWT.NONE);
 //		fLblMaxValueUnit.setText(fLegendProvider.getLegendConfig().unitText);
+	}
+
+	private void enableControls() {
+
+		// min brightness
+		final int minBrightness = fComboMinBrightness.getSelectionIndex();
+		fScaleMinBrightness.setEnabled(minBrightness != 0);
+		fLblMinBrightnessValue.setEnabled(minBrightness != 0);
+
+		// max brightness
+		final int maxBrightness = fComboMaxBrightness.getSelectionIndex();
+		fScaleMaxBrightness.setEnabled(maxBrightness != 0);
+		fLblMaxBrightnessValue.setEnabled(maxBrightness != 0);
+
+		// min value
+		boolean isChecked = fChkForceMinValue.getSelection();
+		fLblMinValue.setEnabled(isChecked);
+		fTxtMinValue.setEnabled(isChecked);
+
+		// max value
+		isChecked = fChkForceMaxValue.getSelection();
+		fLblMaxValue.setEnabled(isChecked);
+		fTxtMaxValue.setEnabled(isChecked);
 	}
 
 //	private void createUIValuePointColor(final Composite parent) {
@@ -663,29 +665,6 @@ public class LegendColorDialog extends TitleAreaDialog {
 //		fLblBlueValue.setText(VALUE_SPACER);
 //	}
 
-	private void enableControls() {
-
-		// min brightness
-		final int minBrightness = fComboMinBrightness.getSelectionIndex();
-		fScaleMinBrightness.setEnabled(minBrightness != 0);
-		fLblMinBrightnessValue.setEnabled(minBrightness != 0);
-
-		// max brightness
-		final int maxBrightness = fComboMaxBrightness.getSelectionIndex();
-		fScaleMaxBrightness.setEnabled(maxBrightness != 0);
-		fLblMaxBrightnessValue.setEnabled(maxBrightness != 0);
-
-		// min value
-		boolean isChecked = fChkForceMinValue.getSelection();
-		fLblMinValue.setEnabled(isChecked);
-		fTxtMinValue.setEnabled(isChecked);
-
-		// max value
-		isChecked = fChkForceMaxValue.getSelection();
-		fLblMaxValue.setEnabled(isChecked);
-		fTxtMaxValue.setEnabled(isChecked);
-	}
-
 	private void enableOK(final boolean isEnabled) {
 		final Button okButton = getButton(IDialogConstants.OK_ID);
 		if (okButton != null) {
@@ -702,6 +681,26 @@ public class LegendColorDialog extends TitleAreaDialog {
 
 	public LegendColor getLegendColor() {
 		return fLegendColorWorkingCopy;
+	}
+
+	private void onSelectColorSelector(final ColorSelector colorSelector, final int valueColorIndex) {
+
+//		RGB colorValue = fColorSelectorMax.getColorValue();
+//
+//		final int selectedValuePoint = 0;
+
+//		final int items = fComboValuePoint.getItemCount() - 1;
+//		final ValueColor valueColor = fValueColors[items - valueColorIndex];
+		final ValueColor valueColor = fValueColors[4 - valueColorIndex];
+
+		final RGB colorValue = colorSelector.getColorValue();
+		valueColor.red = colorValue.red;
+		valueColor.green = colorValue.green;
+		valueColor.blue = colorValue.blue;
+
+//		fComboValuePoint.select(valueColorIndex);
+
+		updateUI();
 	}
 
 	/**

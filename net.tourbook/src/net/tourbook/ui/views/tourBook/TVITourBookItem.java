@@ -90,8 +90,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 		colMaxSpeed = result.getFloat(startIndex + 6);
 
-		// prevent divide by 0
-		// 3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME)	
+		// compute average speed, prevent divide by 0
 		final long dbDistance = result.getLong(startIndex + 7);
 		final long dbDrivingTime = result.getLong(startIndex + 8);
 		colAvgSpeed = (float) (dbDrivingTime == 0 ? 0 : 3.6 * dbDistance / dbDrivingTime);

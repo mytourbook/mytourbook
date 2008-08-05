@@ -309,20 +309,20 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final int propertyId, final Object propertyData) {
+				
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
-
-//					// get a clone of the modified tours because the tours are removed from the list
-//					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) ((ArrayList<TourData>) propertyData).clone();
-//
-//					updateTourViewer(fRootItem, modifiedTours);
 
 					/*
 					 * it is possible when a tour type was modified, the tour can be hidden or
-					 * visible in the viewer because the tour type filter
+					 * visible in the viewer because of the tour type filter
 					 */
 					reloadViewer();
 
 				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
+
+					reloadViewer();
+
+				} else if (propertyId == TourManager.ALL_TOURS_ARE_MODIFIED) {
 
 					reloadViewer();
 				}
@@ -847,20 +847,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		final ITreeSelection selection = (ITreeSelection) fTourViewer.getSelection();
 
-//		// get number of selected tour items
-//		int tourItems = 0;
-//		TVITourBookTour firstTour = null;
-//		for (final Iterator iter = selection.iterator(); iter.hasNext();) {
-//			final Object treeItem = iter.next();
-//			if (treeItem instanceof TVITourBookTour) {
-//				if (tourItems == 0) {
-//					firstTour = (TVITourBookTour) treeItem;
-//				}
-//				tourItems++;
-//			}
-//		}
-//		final boolean isTourSelected = tourItems > 0;
-
 		/*
 		 * count number of selected items
 		 */
@@ -1195,74 +1181,5 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	public void setFocus() {
 //		fTourViewer.getControl().setFocus();
 	}
-
-//	/**
-//	 * !!!Recursive !!! update all tour items with the modified tour data
-//	 * 
-//	 * @param rootItem
-//	 * @param modifiedTours
-//	 */
-//	private void updateTourViewer(final TreeViewerItem parentItem, final ArrayList<TourData> modifiedTours) {
-//
-//		final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
-//
-//		if (children == null) {
-//			return;
-//		}
-//
-//		// loop: all children
-//		for (final Object object : children) {
-//			if (object instanceof TreeViewerItem) {
-//
-//				final TreeViewerItem treeItem = (TreeViewerItem) object;
-//				if (treeItem instanceof TVITourBookTour) {
-//
-//					final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
-//					final long tourItemId = tourItem.getTourId();
-//
-//					for (final TourData modifiedTourData : modifiedTours) {
-//						if (modifiedTourData.getTourId().longValue() == tourItemId) {
-//
-//							// update tree item
-//
-//							final TourType tourType = modifiedTourData.getTourType();
-//							if (tourType != null) {
-//								tourItem.fTourTypeId = tourType.getTypeId();
-//							}
-//
-//							// update item title
-//							tourItem.fTourTitle = modifiedTourData.getTourTitle();
-//
-//							// update item tags
-//							final Set<TourTag> tourTags = modifiedTourData.getTourTags();
-//							final ArrayList<Long> tagIds;
-//
-//							tourItem.fTagIds = tagIds = new ArrayList<Long>();
-//							for (final TourTag tourTag : tourTags) {
-//								tagIds.add(tourTag.getTagId());
-//							}
-//
-//							// update item in the viewer
-//							fTourViewer.update(tourItem, null);
-//
-//							// modified tour exists only once in the viewer, remove modified tour
-//							modifiedTours.remove(modifiedTourData);
-//
-//							break;
-//						}
-//					}
-//
-//					// optimize
-//					if (modifiedTours.size() == 0) {
-//						return;
-//					}
-//
-//				} else {
-//					// update children
-//					updateTourViewer(treeItem, modifiedTours);
-//				}
-//			}
-//		}
-//	}
 
 }

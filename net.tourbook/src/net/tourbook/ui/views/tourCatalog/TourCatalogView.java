@@ -832,7 +832,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		 * fill view menu
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-		
+
 		menuMgr.add(fActionModifyColumns);
 	}
 
@@ -1047,7 +1047,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 	 * select the tour which was selected in the year chart
 	 */
 	void selectLinkedTour() {
-		if (fActionLinkTour.isChecked()) {
+		if (fLinkedTour != null && fActionLinkTour.isChecked()) {
 			fTourViewer.setSelection(new StructuredSelection((fLinkedTour)), true);
 		}
 	}

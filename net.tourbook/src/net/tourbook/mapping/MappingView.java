@@ -893,10 +893,13 @@ public class MappingView extends ViewPart {
 		} else if (selection instanceof SelectionChartInfo) {
 
 			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
-			final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+			if (chartDataModel != null) {
 
-			paintTourSliders(tourData, chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+				final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+				final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+				paintTourSliders(tourData, chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
 

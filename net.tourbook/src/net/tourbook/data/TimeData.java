@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -18,7 +18,6 @@
  * 
  * 
  */
-
 package net.tourbook.data;
 
 import java.io.Serializable;
@@ -60,8 +59,8 @@ public class TimeData implements Serializable {
 	public int					altitude			= Integer.MIN_VALUE;
 
 	/**
-	 * relative value for distance, this is the difference for the distance with the previous time
-	 * slice
+	 * relative value for distance in meters, this is the difference for the distance with the
+	 * previous time slice
 	 */
 	public int					distance			= Integer.MIN_VALUE;
 

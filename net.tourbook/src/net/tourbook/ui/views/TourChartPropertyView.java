@@ -17,10 +17,12 @@ package net.tourbook.ui.views;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
@@ -35,6 +37,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
@@ -67,7 +70,14 @@ public class TourChartPropertyView extends ViewPart {
 		spinner.setSelection(spinner.getSelection() + newValue);
 	}
 
-	private void createLayout(final Composite parent) {
+	@Override
+	public void createPartControl(final Composite parent) {
+
+		createUI(parent);
+		restoreSettings();
+	}
+
+	private void createUI(final Composite parent) {
 
 		GridLayout gl;
 		GridData gd;
@@ -80,17 +90,17 @@ public class TourChartPropertyView extends ViewPart {
 		final Composite container = new Composite(scrolledContainer, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(container);
 
-		final Composite subContainer1 = new Composite(container, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 0).applyTo(subContainer1);
+		final Composite containerChartType = new Composite(container, SWT.NONE);
+		GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 0).applyTo(containerChartType);
 		{
 			/*
 			 * chart type
 			 */
-			label = new Label(subContainer1, SWT.NONE);
+			label = new Label(containerChartType, SWT.NONE);
 			label.setText(Messages.TourChart_Property_label_chart_type);
 
 			// group: 
-			final Composite groupChartType = new Composite(subContainer1, SWT.NONE);
+			final Composite groupChartType = new Composite(containerChartType, SWT.NONE);
 			gl = new GridLayout(2, false);
 			gl.marginTop = 0;
 			gl.marginWidth = 0;
@@ -119,11 +129,11 @@ public class TourChartPropertyView extends ViewPart {
 			}
 		}
 
-		final Composite subContainer2 = new Composite(container, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 0).spacing(0, 0).applyTo(subContainer2);
+		final Composite containerCustomizeValues = new Composite(container, SWT.NONE);
+		GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 0).spacing(0, 0).applyTo(containerCustomizeValues);
 
 		// check: use custom settings to compute values
-		fChkUseCustomComputeSettings = new Button(subContainer2, SWT.CHECK);
+		fChkUseCustomComputeSettings = new Button(containerCustomizeValues, SWT.CHECK);
 		fChkUseCustomComputeSettings.setText(Messages.TourChart_Property_check_customize_value_computing);
 		fChkUseCustomComputeSettings.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 2, 1));
 		fChkUseCustomComputeSettings.addSelectionListener(new SelectionAdapter() {
@@ -136,13 +146,13 @@ public class TourChartPropertyView extends ViewPart {
 		/*
 		 * computed value time slice
 		 */
-		label = new Label(subContainer2, SWT.NONE);
+		label = new Label(containerCustomizeValues, SWT.NONE);
 		label.setText(Messages.TourChart_Property_label_time_slices);
 		gd = new GridData();
 		gd.horizontalIndent = 20;
 		label.setLayoutData(gd);
 
-		fSpinnerComputeValues = new Spinner(subContainer2, SWT.HORIZONTAL | SWT.BORDER);
+		fSpinnerComputeValues = new Spinner(containerCustomizeValues, SWT.HORIZONTAL | SWT.BORDER);
 		fSpinnerComputeValues.setMaximum(1000);
 
 		fSpinnerComputeValues.addSelectionListener(new SelectionAdapter() {
@@ -162,7 +172,7 @@ public class TourChartPropertyView extends ViewPart {
 		/*
 		 * value clipping
 		 */
-		fChkUseCustomClipSettings = new Button(subContainer2, SWT.CHECK);
+		fChkUseCustomClipSettings = new Button(containerCustomizeValues, SWT.CHECK);
 		fChkUseCustomClipSettings.setText(Messages.TourChart_Property_check_customize_value_clipping);
 
 		gd = new GridData(SWT.NONE, SWT.NONE, false, false, 2, 1);
@@ -179,13 +189,13 @@ public class TourChartPropertyView extends ViewPart {
 		/*
 		 * time slice to clip values
 		 */
-		label = new Label(subContainer2, SWT.NONE);
+		label = new Label(containerCustomizeValues, SWT.NONE);
 		label.setText(Messages.TourChart_Property_label_time_slices);
 		gd = new GridData();
 		gd.horizontalIndent = 20;
 		label.setLayoutData(gd);
 
-		fSpinnerClipValues = new Spinner(subContainer2, SWT.HORIZONTAL | SWT.BORDER);
+		fSpinnerClipValues = new Spinner(containerCustomizeValues, SWT.HORIZONTAL | SWT.BORDER);
 		fSpinnerClipValues.setMaximum(1000);
 
 		fSpinnerClipValues.addSelectionListener(new SelectionAdapter() {
@@ -205,7 +215,7 @@ public class TourChartPropertyView extends ViewPart {
 		/*
 		 * pace clipping
 		 */
-		fChkUseCustomPaceClipping = new Button(subContainer2, SWT.CHECK);
+		fChkUseCustomPaceClipping = new Button(containerCustomizeValues, SWT.CHECK);
 		fChkUseCustomPaceClipping.setText(Messages.TourChart_Property_check_customize_pace_clipping);
 
 		gd = new GridData(SWT.NONE, SWT.NONE, false, false, 2, 1);
@@ -222,13 +232,13 @@ public class TourChartPropertyView extends ViewPart {
 		/*
 		 * time slice to clip pace
 		 */
-		label = new Label(subContainer2, SWT.NONE);
+		label = new Label(containerCustomizeValues, SWT.NONE);
 		label.setText(Messages.TourChart_Property_label_pace_speed);
 		gd = new GridData();
 		gd.horizontalIndent = 20;
 		label.setLayoutData(gd);
 
-		fSpinnerPaceClipping = new Spinner(subContainer2, SWT.HORIZONTAL | SWT.BORDER);
+		fSpinnerPaceClipping = new Spinner(containerCustomizeValues, SWT.HORIZONTAL | SWT.BORDER);
 		fSpinnerPaceClipping.setMaximum(1000);
 
 		fSpinnerPaceClipping.addSelectionListener(new SelectionAdapter() {
@@ -245,6 +255,33 @@ public class TourChartPropertyView extends ViewPart {
 			}
 		});
 
+		/*
+		 * button: update computed values
+		 */
+		final Button btnComputValues = new Button(container, SWT.NONE);
+		btnComputValues.setText(Messages.TourChart_Property_button_compute_values);
+		btnComputValues.setToolTipText(Messages.TourChart_Property_button_compute_values_tooltip);
+		btnComputValues.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+
+				if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+						Messages.TourChart_Property_dlg_compute_values_title,
+						Messages.TourChart_Property_dlg_compute_values_message)) {
+
+					TourDatabase.computeComputedValuesForAllTours();
+
+					TourManager.getInstance().removeAllToursFromCache();
+
+					// fire unique event for all changes
+					TourManager.firePropertyChange(TourManager.ALL_TOURS_ARE_MODIFIED, null);
+				}
+			}
+		});
+
+		/*
+		 * setup scrolled container
+		 */
 		scrolledContainer.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
@@ -253,13 +290,6 @@ public class TourChartPropertyView extends ViewPart {
 		});
 
 		scrolledContainer.setContent(container);
-	}
-
-	@Override
-	public void createPartControl(final Composite parent) {
-
-		createLayout(parent);
-		restoreSettings();
 	}
 
 	private void enableControls() {

@@ -269,7 +269,20 @@ public class TourData {
 	 */
 	//	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "tourData")
 	//	private Set<TourCategory>	tourCategory					= new HashSet<TourCategory>();
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
 	/*
+	 * TRANSIENT DATA
+	 */
+
+	/**
 	 * data series from the device
 	 */
 	@Transient
@@ -768,6 +781,9 @@ public class TourData {
 		}
 	}
 
+	/**
+	 * compute maximum and average fields
+	 */
 	public void computeAvgFields() {
 		computeMaxAltitude();
 		computeMaxPulse();
@@ -940,32 +956,45 @@ public class TourData {
 			return;
 		}
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		if (isSpeedSerieFromDevice) {
 
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING)) {
+			// speed is from the device
 
-			// compute speed for custom settings
+			computeSpeedSerieFromDevice();
 
-			if (deviceTimeInterval == -1) {
-				computeSpeedSerieInternalWithVariableInterval();
-			} else {
-				computeSpeedSerieCustomWithFixedInterval();
-			}
 		} else {
 
-			// compute speed with internal algorithm
+			// speed is computed from distance and time
 
-			if (deviceTimeInterval == -1) {
-				computeSpeedSerieInternalWithVariableInterval();
+			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING)) {
+
+				// compute speed for custom settings
+
+				if (deviceTimeInterval == -1) {
+					computeSpeedSerieInternalWithVariableInterval();
+				} else {
+					computeSpeedSerieCustomWithFixedInterval();
+				}
 			} else {
-				computeSpeedSerieInternalWithFixedInterval();
+
+				// compute speed with internal algorithm
+
+				if (deviceTimeInterval == -1) {
+					computeSpeedSerieInternalWithVariableInterval();
+				} else {
+					computeSpeedSerieInternalWithFixedInterval();
+				}
 			}
 		}
-
-//		computeValueClipping();
 	}
 
 	private void computeSpeedSerieCustomWithFixedInterval() {
+
+		if (distanceSerie == null) {
+			return;
+		}
 
 		final int serieLength = timeSerie.length;
 
@@ -1035,8 +1064,39 @@ public class TourData {
 				paceMetric = (int) (pace);
 				paceImperial = (int) (pace * UI.UNIT_MILE);
 			}
+
 			paceSerie[serieIndex] = paceMetric;
 			paceSerieImperial[serieIndex] = paceImperial;
+		}
+
+		maxSpeed /= 10;
+	}
+
+	/**
+	 * Computes the imperial speed data serie and max speed
+	 * 
+	 * @return
+	 */
+	private void computeSpeedSerieFromDevice() {
+
+		if (speedSerie == null) {
+			return;
+		}
+
+		final int serieLength = speedSerie.length;
+
+		speedSerieImperial = new int[serieLength];
+
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			/*
+			 * speed
+			 */
+
+			final int speedMetric = speedSerie[serieIndex];
+
+			speedSerieImperial[serieIndex] = ((int) (speedMetric / UI.UNIT_MILE));
+			maxSpeed = Math.max(maxSpeed, speedMetric);
 		}
 
 		maxSpeed /= 10;
@@ -1186,7 +1246,20 @@ public class TourData {
 		paceSerie = new int[serieLength];
 		paceSerieImperial = new int[serieLength];
 
+		final boolean checkPosition = latitudeSerie != null && longitudeSerie != null;
+
 		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			// check if a lat and long diff is available
+			if (checkPosition && serieIndex > 0 && serieIndex < serieLengthLast - 1) {
+
+				if (latitudeSerie[serieIndex] == latitudeSerie[serieIndex - 1]) {
+					continue;
+				}
+				if (longitudeSerie[serieIndex] == longitudeSerie[serieIndex - 1]) {
+					continue;
+				}
+			}
 
 			final int serieIndexPrev = serieIndex - 1;
 
@@ -1197,17 +1270,17 @@ public class TourData {
 			int timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
 			int distDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
 
-			boolean adjustHighIndex = true;
+			boolean toggleIndex = true;
 
 			while (timeDiff < minTimeDiff) {
 
 				// toggle between low and high index
-				if (adjustHighIndex) {
+				if (toggleIndex) {
 					highIndex++;
 				} else {
 					lowIndex--;
 				}
-				adjustHighIndex = !adjustHighIndex;
+				toggleIndex = !toggleIndex;
 
 				// check array scope
 				if (lowIndex < 0 || highIndex >= serieLength) {
@@ -1243,17 +1316,33 @@ public class TourData {
 				prevTime = currentTime;
 			}
 
-			if (isTimeValid && serieIndex > 0) {
-				if (timeDiff != 0) {
-					if (timeDiff > 20 && distDiff < 5) {
-						speedMetric = 0;
-					} else {
-						speedMetric = (int) ((distDiff * 36f) / timeDiff);
-						speedMetric = speedMetric < 0 ? 0 : speedMetric;
+			if (isTimeValid && serieIndex > 0 && timeDiff != 0) {
 
-						speedImperial = (int) ((distDiff * 36f) / (timeDiff * UI.UNIT_MILE));
-						speedImperial = speedImperial < 0 ? 0 : speedImperial;
+				// check if a lat and long diff is available
+				if (checkPosition && lowIndex > 0 && highIndex < serieLengthLast - 1) {
+
+					if (latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1]) {
+						continue;
 					}
+					if (latitudeSerie[highIndex] == latitudeSerie[highIndex + 1]) {
+						continue;
+					}
+					if (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1]) {
+						continue;
+					}
+					if (longitudeSerie[highIndex] == longitudeSerie[highIndex + 1]) {
+						continue;
+					}
+				}
+
+				if (timeDiff > 20 && distDiff < 5) {
+					speedMetric = 0;
+				} else {
+					speedMetric = (int) ((distDiff * 36f) / timeDiff);
+					speedMetric = speedMetric < 0 ? 0 : speedMetric;
+
+					speedImperial = (int) ((distDiff * 36f) / (timeDiff * UI.UNIT_MILE));
+					speedImperial = speedImperial < 0 ? 0 : speedImperial;
 				}
 			}
 			speedSerie[serieIndex] = speedMetric;
@@ -1272,6 +1361,7 @@ public class TourData {
 				paceMetric = (int) (pace);
 				paceImperial = (int) (pace * UI.UNIT_MILE);
 			}
+
 			paceSerie[serieIndex] = paceMetric;
 			paceSerieImperial[serieIndex] = paceImperial;
 		}
@@ -1413,7 +1503,6 @@ public class TourData {
 //			}
 //		}
 //
-////		System.out.println("clipping");
 //	}
 
 	/**
@@ -1507,7 +1596,7 @@ public class TourData {
 
 		int timeIndex = 0;
 
-		int timeAbsolute = 0; // time in seconds
+		int recordingTime = 0; // time in seconds
 		int altitudeAbsolute = 0;
 		int distanceAbsolute = 0;
 
@@ -1565,15 +1654,35 @@ public class TourData {
 
 					// first trackpoint
 
+					/*
+					 * time
+					 */
+					timeSerie[timeIndex] = 0;
 					if (absoluteTime == Long.MIN_VALUE) {
 						firstTime = 0;
 					} else {
 						firstTime = absoluteTime;
 					}
-					lastValidTime = 0;
+//					firstTime = 0;
 
+					recordingTime = 0;
+					lastValidTime = (int) firstTime;
+
+					/*
+					 * distance
+					 */
+					final float tdDistance = timeData.absoluteDistance;
+					if (tdDistance == Float.MIN_VALUE) {
+						distanceDiff = 0;
+					} else {
+						distanceDiff = (int) tdDistance;
+					}
+					distanceSerie[timeIndex] = distanceAbsolute += distanceDiff;
+
+					/*
+					 * altitude
+					 */
 					if (isAltitude) {
-
 						altitudeSerie[timeIndex] = altitudeAbsolute;
 					}
 
@@ -1585,11 +1694,11 @@ public class TourData {
 					 * time
 					 */
 					if (absoluteTime == Long.MIN_VALUE) {
-						timeAbsolute = lastValidTime;
+						recordingTime = lastValidTime;
 					} else {
-						timeAbsolute = (int) ((absoluteTime - firstTime) / 1000);
+						recordingTime = (int) ((absoluteTime - firstTime) / 1000);
 					}
-					timeSerie[timeIndex] = lastValidTime = timeAbsolute;
+					timeSerie[timeIndex] = lastValidTime = recordingTime;
 
 					/*
 					 * distance
@@ -1666,7 +1775,7 @@ public class TourData {
 				 * marker
 				 */
 				if (isCreateMarker && timeData.marker != 0) {
-					createMarker(timeData, timeIndex, timeAbsolute, distanceAbsolute);
+					createMarker(timeData, timeIndex, recordingTime, distanceAbsolute);
 				}
 
 				timeIndex++;
@@ -1712,7 +1821,7 @@ public class TourData {
 			// convert data from the tour format into an interger[]
 			for (final TimeData timeData : timeDataList) {
 
-				timeSerie[timeIndex] = timeAbsolute += timeData.time;
+				timeSerie[timeIndex] = recordingTime += timeData.time;
 
 				if (isDistance) {
 					distanceSerie[timeIndex] = distanceAbsolute += timeData.distance;
@@ -1743,7 +1852,7 @@ public class TourData {
 				}
 
 				if (isCreateMarker && timeData.marker != 0) {
-					createMarker(timeData, timeIndex, timeAbsolute, distanceAbsolute);
+					createMarker(timeData, timeIndex, recordingTime, distanceAbsolute);
 				}
 
 				timeIndex++;
@@ -1751,7 +1860,7 @@ public class TourData {
 		}
 
 		tourDistance = distanceAbsolute;
-		tourRecordingTime = timeAbsolute;
+		tourRecordingTime = recordingTime;
 
 	}
 
@@ -2407,6 +2516,8 @@ public class TourData {
 
 	private int[] getSpeedSerieInternal() {
 
+		computeSpeedSerie();
+
 		/*
 		 * when the speed series are not computed, the internal algorithm will be used to create the
 		 * speed data serie
@@ -2415,19 +2526,11 @@ public class TourData {
 
 			// use metric system
 
-			if (speedSerie == null) {
-				computeSpeedSerieInternalWithFixedInterval();
-			}
-
 			return speedSerie;
 
 		} else {
 
 			// use imperial system
-
-			if (speedSerieImperial == null) {
-				computeSpeedSerieInternalWithFixedInterval();
-			}
 
 			return speedSerieImperial;
 		}

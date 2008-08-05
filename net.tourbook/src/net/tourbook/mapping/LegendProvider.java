@@ -29,12 +29,6 @@ public class LegendProvider implements ILegendProvider {
 	private LegendColor		fLegendColor;
 	private int				fColorId;
 
-	public LegendProvider(final LegendConfig legendConfig, final LegendColor legendColor, final int colorId) {
-		fLegendConfig = legendConfig;
-		fLegendColor = legendColor;
-		fColorId = colorId;
-	}
-
 	private static List<Integer> getLegendUnits(final Rectangle legendBounds, int graphMinValue, int graphMaxValue) {
 
 		final int legendHeight = legendBounds.height - 2 * MappingView.LEGEND_MARGIN_TOP_BOTTOM;
@@ -94,6 +88,12 @@ public class LegendProvider implements ILegendProvider {
 		}
 
 		return unitList;
+	}
+
+	public LegendProvider(final LegendConfig legendConfig, final LegendColor legendColor, final int colorId) {
+		fLegendConfig = legendConfig;
+		fLegendColor = legendColor;
+		fColorId = colorId;
 	}
 
 	public LegendColor getLegendColor() {
@@ -174,29 +174,31 @@ public class LegendProvider implements ILegendProvider {
 		}
 
 		final List<Integer> legendUnits = getLegendUnits(legendBounds, minValue, maxValue);
+		if (legendUnits.size() > 0) {
 
-		final Integer legendMinValue = legendUnits.get(0);
-		final Integer legendMaxValue = legendUnits.get(legendUnits.size() - 1);
+			final Integer legendMinValue = legendUnits.get(0);
+			final Integer legendMaxValue = legendUnits.get(legendUnits.size() - 1);
 
-		fLegendConfig.units = legendUnits;
-		fLegendConfig.unitText = unitText;
-		fLegendConfig.legendMinValue = legendMinValue;
-		fLegendConfig.legendMaxValue = legendMaxValue;
+			fLegendConfig.units = legendUnits;
+			fLegendConfig.unitText = unitText;
+			fLegendConfig.legendMinValue = legendMinValue;
+			fLegendConfig.legendMaxValue = legendMaxValue;
 
-		/*
-		 * set color configuration, each tour has a different altitude config
-		 */
+			/*
+			 * set color configuration, each tour has a different altitude config
+			 */
 
-		final int diffMinMax = legendMaxValue - legendMinValue;
-		final int diffMinMax2 = diffMinMax / 2;
-		final int diffMinMax10 = diffMinMax / 10;
-		final int midValueAbsolute = legendMinValue + diffMinMax2;
+			final int diffMinMax = legendMaxValue - legendMinValue;
+			final int diffMinMax2 = diffMinMax / 2;
+			final int diffMinMax10 = diffMinMax / 10;
+			final int midValueAbsolute = legendMinValue + diffMinMax2;
 
-		final ValueColor[] valueColors = fLegendColor.valueColors;
-		valueColors[0].value = legendMinValue + diffMinMax10;
-		valueColors[1].value = legendMinValue + diffMinMax2 / 2;
-		valueColors[2].value = midValueAbsolute;
-		valueColors[3].value = legendMaxValue - diffMinMax2 / 2;
-		valueColors[4].value = legendMaxValue - diffMinMax10;
+			final ValueColor[] valueColors = fLegendColor.valueColors;
+			valueColors[0].value = legendMinValue + diffMinMax10;
+			valueColors[1].value = legendMinValue + diffMinMax2 / 2;
+			valueColors[2].value = midValueAbsolute;
+			valueColors[3].value = legendMaxValue - diffMinMax2 / 2;
+			valueColors[4].value = legendMaxValue - diffMinMax10;
+		}
 	}
 }

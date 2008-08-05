@@ -156,7 +156,6 @@ public abstract class TableColumnFactory {
 		public TableColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "avgSpeed", SWT.TRAIL); //$NON-NLS-1$
-			columnManager.addColumn(colDef); 
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_avg_speed_label + " (Ø " + UI.UNIT_LABEL_SPEED + ")");
 			colDef.setColumnText("Ø " + UI.UNIT_LABEL_SPEED);

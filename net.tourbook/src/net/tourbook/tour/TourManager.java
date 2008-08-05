@@ -54,8 +54,20 @@ public class TourManager {
 	 * properties of the tour chart has been changed
 	 */
 	public static final int						TOUR_CHART_PROPERTY_IS_MODIFIED			= 10;
+
+	/**
+	 * 
+	 */
 	public static final int						TOUR_PROPERTY_SEGMENT_LAYER_CHANGED		= 20;
+
+	/**
+	 * 
+	 */
 	public static final int						TOUR_PROPERTY_REFERENCE_TOUR_CHANGED	= 30;
+
+	/**
+	 * 
+	 */
 	public static final int						TOUR_PROPERTY_COMPARE_TOUR_CHANGED		= 40;
 
 	/**
@@ -81,6 +93,11 @@ public class TourManager {
 	 * position of the sliders
 	 */
 	public static final int						SLIDER_POSITION_CHANGED					= 80;
+
+	/**
+	 * All computed data for all tours are modified
+	 */
+	public static final int						ALL_TOURS_ARE_MODIFIED					= 90;
 
 	public static final String					CUSTOM_DATA_TIME						= "time";									//$NON-NLS-1$
 	public static final String					CUSTOM_DATA_DISTANCE					= "distance";								//$NON-NLS-1$

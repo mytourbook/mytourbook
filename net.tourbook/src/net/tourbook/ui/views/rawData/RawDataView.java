@@ -577,7 +577,6 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		 * column: tour type
 		 */
 		colDef = TableColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
-//		colDef.setColumnResizable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -676,7 +675,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		});
 
 		/*
-		 * column: speed
+		 * column: avg speed
 		 */
 		colDef = TableColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
 		colDef.setLabelProvider(new CellLabelProvider() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -721,7 +721,6 @@ public class MarkerDialog extends TitleAreaDialog {
 	/**
 	 * remove selected markers from the view and update dependened structures
 	 */
-	@SuppressWarnings("unchecked")
 	private void onDeleteMarker() {
 
 		final IStructuredSelection markerSelection = (IStructuredSelection) fMarkerViewer.getSelection();

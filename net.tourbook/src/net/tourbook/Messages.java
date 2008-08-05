@@ -600,11 +600,19 @@ public class Messages extends NLS {
 	public static String		tourCatalog_wizard_Page_reference_tour_title;
 	public static String		tourCatalog_wizard_Wizard_title;
 
+	public static String	TourChart_Property_button_compute_values;
+
+	public static String	TourChart_Property_button_compute_values_tooltip;
+
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;
 	public static String		TourChart_Property_check_customize_pace_clipping;
 	public static String		TourChart_Property_check_customize_value_clipping;
 	public static String		TourChart_Property_check_customize_value_computing;
+	public static String	TourChart_Property_dlg_compute_values_message;
+
+	public static String	TourChart_Property_dlg_compute_values_title;
+
 	public static String		TourChart_Property_label_chart_type;
 	public static String		TourChart_Property_label_pace_speed;
 	public static String		TourChart_Property_label_time_slices;
