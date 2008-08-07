@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -18,9 +18,9 @@ package net.tourbook.chart;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-public class ActionHandlerFitGraph extends ActionHandler {
+public class ActionHandlerZoomFitGraph extends ActionHandler {
 
-	public ActionHandlerFitGraph() {
+	public ActionHandlerZoomFitGraph() {
 		fCommandId = Chart.COMMAND_ID_FIT_GRAPH;
 	}
 
