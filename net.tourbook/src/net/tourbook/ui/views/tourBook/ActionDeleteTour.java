@@ -58,8 +58,6 @@ public class ActionDeleteTour extends Action {
 								final SelectionDeletedTours selectionRemovedTours,
 								final IProgressMonitor monitor) {
 
-//		final ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
-
 		int firstSelectedTourIndex = -1;
 		TreeViewerItem firstSelectedParent = null;
 
@@ -90,12 +88,6 @@ public class ActionDeleteTour extends Action {
 							}
 						}
 					}
-
-					// remove the tour from the data model
-//					tourParent.getChildren().remove(tourItem);
-
-					// add to removed tour list
-//					removedTours.add(tourItem);
 				}
 			}
 

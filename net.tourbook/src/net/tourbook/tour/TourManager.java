@@ -615,11 +615,7 @@ public class TourManager {
 					if (distance == 0) {
 						return 0;
 					} else {
-
-						final float pace = (float) (time * 16.666 / distance);
-						// * UI.UNIT_VALUE_DISTANCE);
-
-						return pace;
+						return (float) (time * 16.666 / distance);
 					}
 				}
 			}
@@ -719,10 +715,6 @@ public class TourManager {
 	private ChartDataModel createChartDataModelInternal(final TourData tourData,
 														final TourChartConfiguration chartConfig,
 														final boolean hasPropertyChanged) {
-//		long startTime = System.currentTimeMillis();
-
-//		long endTime = System.currentTimeMillis();
-//		System.out.println("Execution time : " + (endTime - startTime) + " ms");
 
 		// check if the callbacks are created
 		if (computeSpeedAvg == null) {
@@ -741,8 +733,8 @@ public class TourManager {
 			tourData.clearComputedSeries();
 		}
 
-		tourData.computeAltimeterGradientSerie();
 		tourData.computeSpeedSerie();
+		tourData.computeAltimeterGradientSerie();
 
 		computeValueClipping(tourData);
 

@@ -66,6 +66,11 @@ import org.eclipse.ui.PlatformUI;
 
 public class UI {
 
+//	long startTime = System.currentTimeMillis();
+
+//	long endTime = System.currentTimeMillis();
+//	System.out.println("Execution time : " + (endTime - startTime) + " ms");
+
 	public static final String				EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String				EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
 

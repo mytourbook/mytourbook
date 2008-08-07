@@ -289,22 +289,25 @@ public class TourData {
 	public int[]				timeSerie;
 
 	/**
-	 * contains the distance data serie in the metric system
+	 * contains the absolute distance in m (metric system)
 	 */
 	@Transient
 	public int[]				distanceSerie;
 
 	@Transient
+	/*
+	 * contains the absolute distance in miles/1000 (imperial system)
+	 */
 	private int[]				distanceSerieImperial;
 
 	/**
-	 * contains the absolute altitude in the metric measurement system
+	 * contains the absolute altitude in m (metric system)
 	 */
 	@Transient
 	public int[]				altitudeSerie;
 
 	/**
-	 * contains the absolute altitude in the imperial measurement system
+	 * contains the absolute altitude in feet (imperial system)
 	 */
 	@Transient
 	private int[]				altitudeSerieImperial;
@@ -529,7 +532,7 @@ public class TourData {
 		}
 
 		if (deviceTimeInterval == -1) {
-			computeAltimeterGradientSerieWithVariableInterval();
+			computeAltimeterGradientSerieWithVariableIntervalNEW();
 		} else {
 			computeAltimeterGradientSerieWithFixedInterval();
 		}
@@ -738,10 +741,223 @@ public class TourData {
 			}
 
 			// keep gradient data
-			if (distanceDiff == 0) {
+//			if (distanceDiff == 0) {
+			if (distanceDiff <= minDataDiff) {
 				dataSerieGradient[serieIndex] = 0;
 			} else {
-				dataSerieGradient[serieIndex] = altitudeDiff * 1000 / distanceDiff;
+				dataSerieGradient[serieIndex] = (altitudeDiff * 1000 / distanceDiff);
+			}
+		}
+
+		if (UI.UNIT_VALUE_ALTITUDE != 1) {
+
+			// set imperial system
+
+			altimeterSerieImperial = dataSerieAltimeter;
+
+		} else {
+
+			// set metric system
+
+			altimeterSerie = dataSerieAltimeter;
+		}
+
+		gradientSerie = dataSerieGradient;
+	}
+
+	/**
+	 * Computes the data serie for gradient and altimeters for a variable time interval
+	 */
+	private void computeAltimeterGradientSerieWithVariableIntervalNEW() {
+
+		if (distanceSerie == null || altitudeSerie == null) {
+			return;
+		}
+
+		final int serieLength = timeSerie.length;
+		final int serieLengthLast = serieLength - 1;
+
+		final int dataSerieAltimeter[] = new int[serieLength];
+		final int dataSerieGradient[] = new int[serieLength];
+
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		// get minimum difference
+		int minTimeDiff;
+		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING)) {
+			// use custom settings to compute altimeter and gradient
+			minTimeDiff = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
+		} else {
+			// use internal algorithm to compute altimeter and gradient
+			minTimeDiff = 10;
+		}
+		final int minDistanceDiff = minTimeDiff;
+
+		final boolean checkPosition = latitudeSerie != null && longitudeSerie != null;
+
+		boolean isPrevValueSet = true;
+		int prevGradient = 0;
+//		int prevAltimeter = 0;
+		int prevSerieIndex = 0;
+		int prevTimeDiff = 0;
+		int prevDistanceDiff = 0;
+
+		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
+
+			/*
+			 * set value for previous data point when this is not set
+			 */
+			if (isPrevValueSet == false/* && (prevTimeDiff < 20 */)
+			/*
+			 * && (prevTimeDiff < minDataDiff || prevDistanceDiff < minDistanceDiff)
+			 */
+			{
+//				dataSerieAltimeter[prevSerieIndex] = prevAltimeter;
+				dataSerieGradient[prevSerieIndex] = prevGradient;
+				dataSerieAltimeter[prevSerieIndex] = 1000;
+			}
+			isPrevValueSet = false;
+
+			// check if a lat and long diff is available
+			if (checkPosition && serieIndex > 0 && serieIndex < serieLengthLast - 1) {
+
+				if (latitudeSerie[serieIndex] == latitudeSerie[serieIndex - 1]) {
+					dataSerieAltimeter[serieIndex] = 100;
+					continue;
+				}
+				if (longitudeSerie[serieIndex] == longitudeSerie[serieIndex - 1]) {
+					dataSerieAltimeter[serieIndex] = 110;
+					continue;
+				}
+				if (distanceSerie[serieIndex] == distanceSerie[serieIndex - 1]) {
+					dataSerieAltimeter[serieIndex] = 120;
+					continue;
+				}
+				if (altitudeSerie[serieIndex] == altitudeSerie[serieIndex - 1]) {
+					dataSerieAltimeter[serieIndex] = 130;
+					continue;
+				}
+			}
+
+			final int serieIndexPrev = serieIndex - 1;
+
+			// adjust index to the array size
+			int lowIndex = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
+			int highIndex = ((serieIndex <= serieLengthLast) ? serieIndex : serieLengthLast);
+
+			int timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
+			int distanceDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
+			int altitudeDiff = altitudeSerie[highIndex] - altitudeSerie[lowIndex];
+
+			boolean toggleIndex = true;
+
+			while (timeDiff < minTimeDiff || distanceDiff < minDistanceDiff) {
+
+				// toggle between low and high index
+				if (toggleIndex) {
+					highIndex++;
+				} else {
+					lowIndex--;
+				}
+				toggleIndex = !toggleIndex;
+
+				// check array scope
+				if (lowIndex < 0 || highIndex >= serieLength) {
+					break;
+				}
+
+				timeDiff = timeSerie[highIndex] - timeSerie[lowIndex];
+				distanceDiff = distanceSerie[highIndex] - distanceSerie[lowIndex];
+				altitudeDiff = altitudeSerie[highIndex] - altitudeSerie[lowIndex];
+			}
+
+			prevTimeDiff = timeDiff;
+			prevDistanceDiff = distanceDiff;
+
+			highIndex = (highIndex <= serieLengthLast) ? highIndex : serieLengthLast;
+			lowIndex = (lowIndex >= 0) ? lowIndex : 0;
+
+			/*
+			 * check if a time difference is available between 2 time data, this can happen in gps
+			 * data that lat+long is available but no time
+			 */
+			boolean isTimeValid = true;
+			int prevTime = timeSerie[lowIndex];
+			for (int timeIndex = lowIndex + 1; timeIndex <= highIndex; timeIndex++) {
+				final int currentTime = timeSerie[timeIndex];
+				if (prevTime == currentTime) {
+					isTimeValid = false;
+					break;
+				}
+				prevTime = currentTime;
+			}
+
+			if (isTimeValid) {
+
+				// check if lat and long diff is available
+				if (checkPosition && lowIndex > 0 && highIndex < serieLengthLast - 1) {
+
+					if (latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1]) {
+						dataSerieAltimeter[serieIndex] = 210;
+						continue;
+					}
+					if (latitudeSerie[highIndex] == latitudeSerie[highIndex + 1]) {
+						dataSerieAltimeter[serieIndex] = 220;
+						continue;
+					}
+
+					if (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1]) {
+						dataSerieAltimeter[serieIndex] = 230;
+						continue;
+					}
+					if (longitudeSerie[highIndex] == longitudeSerie[highIndex + 1]) {
+						dataSerieAltimeter[serieIndex] = 240;
+						continue;
+					}
+
+					if (distanceSerie[lowIndex] == distanceSerie[lowIndex - 1]) {
+						dataSerieAltimeter[serieIndex] = 250;
+						continue;
+					}
+					if (distanceSerie[highIndex] == distanceSerie[highIndex + 1]) {
+						dataSerieAltimeter[serieIndex] = 260;
+						continue;
+					}
+
+					if (altitudeSerie[lowIndex] == altitudeSerie[lowIndex - 1]) {
+						dataSerieAltimeter[serieIndex] = 270;
+						continue;
+					}
+					if (altitudeSerie[highIndex] == altitudeSerie[highIndex + 1]) {
+						dataSerieAltimeter[serieIndex] = 280;
+						continue;
+					}
+				}
+
+				// compute altimeter 
+				if (timeDiff > 0) {
+//					prevAltimeter = (int) (3600f * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE);
+//					dataSerieAltimeter[serieIndex] = prevAltimeter;
+//					isPrevValueSet = true;
+				} else {
+					dataSerieAltimeter[serieIndex] = -100;
+				}
+
+				// compute gradient 
+				if (distanceDiff > 0) {
+					prevGradient = altitudeDiff * 1000 / distanceDiff;
+					dataSerieGradient[serieIndex] = prevGradient;
+					isPrevValueSet = true;
+				} else {
+					dataSerieAltimeter[serieIndex] = -200;
+				}
+				prevSerieIndex = serieIndex;
+
+//				dataSerieAltimeter[serieIndex] = distanceDiff;
+				speedSerie[serieIndex] = timeDiff;//altitudeDiff;
+
+			} else {
+				dataSerieAltimeter[serieIndex] = -300;
 			}
 		}
 

@@ -152,7 +152,7 @@ public class TourDatabase {
 
 		// derby debug properties
 //		System.setProperty("derby.language.logQueryPlan", "true"); //$NON-NLS-1$
-		System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
+//		System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
 	}
 
 	class CustomMonitor extends ProgressMonitorDialog {
