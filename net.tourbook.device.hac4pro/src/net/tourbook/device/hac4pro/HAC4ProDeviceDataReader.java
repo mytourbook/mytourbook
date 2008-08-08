@@ -334,7 +334,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 					tourData.createTimeSeries(timeDataList, true);
 					tourData.computeTourDrivingTime();
-					tourData.computeAvgFields();
+					tourData.computeValues();
 					computeTourAltitudeUpDown(tourData);
 
 					tourData.setDeviceId(deviceId);
