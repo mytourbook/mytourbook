@@ -432,7 +432,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		if (fTourDataMap.containsKey(tourId) == false) {
 
 			tourData.computeTourDrivingTime();
-			tourData.computeAvgFields();
+			tourData.computeValues();
 
 			tourData.setDeviceId(fDeviceDataReader.deviceId);
 			tourData.setDeviceName(fDeviceDataReader.visibleName);
