@@ -209,6 +209,8 @@ public class TourDatabase {
 
 				final ArrayList<Long> tourList = getAllTourIds();
 
+				monitor.beginTask("Update computed values", tourList.size());
+
 				// loop over all tours and calculate and set new columns
 				int tourCounter = 1;
 				for (final Long tourId : tourList) {
@@ -219,18 +221,41 @@ public class TourDatabase {
 					final TourData tourData = getTourFromDb(tourId);
 					if (tourData != null) {
 
-						tourData.computeAvgFields();
+						tourData.computeValues();
 						saveTour(tourData);
 					}
+
+					monitor.worked(1);
 				}
 			}
 		};
+
 		try {
 			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
 		} catch (final InvocationTargetException e) {
 			e.printStackTrace();
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private static void computeComputedValuesForAllTours(final IProgressMonitor monitor) {
+
+		final ArrayList<Long> tourList = getAllTourIds();
+
+		// loop: all tours, compute computed fields and save the tour
+		int tourCounter = 1;
+		for (final Long tourId : tourList) {
+
+			monitor.subTask(NLS.bind(Messages.Tour_Database_update_tour,//
+					new Object[] { tourCounter++, tourList.size() }));
+
+			final TourData tourData = getTourFromDb(tourId);
+			if (tourData != null) {
+
+				tourData.computeValues();
+				saveTour(tourData);
+			}
 		}
 	}
 
@@ -1962,6 +1987,9 @@ public class TourDatabase {
 
 		int newVersion = currentDbVersion;
 
+		/*
+		 * database update
+		 */
 		if (currentDbVersion == 1) {
 			updateDbDesign_1_2(conn);
 			currentDbVersion = newVersion = 2;
@@ -1975,11 +2003,13 @@ public class TourDatabase {
 			currentDbVersion = newVersion = 4;
 		}
 		if (currentDbVersion == 4) {
-			updateDbDesign_4_5(conn);
+			updateDbDesign_4_5(conn, monitor);
 			currentDbVersion = newVersion = 5;
 		}
 
-		// update the version number
+		/*
+		 * update version number
+		 */
 		try {
 			final String sqlString = "" //$NON-NLS-1$
 					+ ("update " + TABLE_DB_VERSION) //$NON-NLS-1$
@@ -1988,6 +2018,19 @@ public class TourDatabase {
 			conn.createStatement().executeUpdate(sqlString);
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
+		}
+
+		/*
+		 * post updates
+		 */
+		if (newVersion == 5) {
+
+			/*
+			 * do this post update after the version number is updated because the post update uses
+			 * connections and this will check the version number
+			 */
+			TourDatabase.computeComputedValuesForAllTours(monitor);
+			TourManager.getInstance().removeAllToursFromCache();
 		}
 
 		return true;
@@ -2119,7 +2162,7 @@ public class TourDatabase {
 				monitor.subTask(msg);
 			}
 
-			tourData.computeAvgFields();
+			tourData.computeValues();
 
 			final TourPerson person = tourData.getTourPerson();
 			tourData.setTourBike(person.getTourBike());
@@ -2133,7 +2176,7 @@ public class TourDatabase {
 		emFactory = null;
 	}
 
-	private void updateDbDesign_4_5(final Connection conn) {
+	private void updateDbDesign_4_5(final Connection conn, final IProgressMonitor monitor) {
 
 		try {
 			final Statement statement = conn.createStatement();

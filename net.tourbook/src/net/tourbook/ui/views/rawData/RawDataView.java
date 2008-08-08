@@ -509,6 +509,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		 * column: database indicator
 		 */
 		colDef = TableColumnFactory.DB_STATUS.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -531,6 +532,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		 * column: date
 		 */
 		colDef = TableColumnFactory.TOUR_DATE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -554,6 +556,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		 * column: time
 		 */
 		colDef = TableColumnFactory.TOUR_START_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -577,6 +580,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		 * column: tour type
 		 */
 		colDef = TableColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -588,39 +592,10 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		});
 
 		/*
-		 * column: tags
-		 */
-		colDef = TableColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final Set<TourTag> tourTags = ((TourData) element).getTourTags();
-
-				if (tourTags.size() == 0) {
-
-					// the tags could have been removed, set empty field
-
-					cell.setText(UI.EMPTY_STRING);
-
-				} else {
-
-					// convert the tags into a list of tag ids 
-					final ArrayList<Long> tagIds = new ArrayList<Long>();
-					for (final TourTag tourTag : tourTags) {
-						tagIds.add(tourTag.getTagId());
-					}
-
-					cell.setText(TourDatabase.getTagNames(tagIds));
-				}
-			}
-		});
-
-		/*
 		 * column: recording time
 		 */
 		colDef = TableColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -662,6 +637,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		 * column: distance (km/mile)
 		 */
 		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -699,6 +675,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		 * column: altitude up
 		 */
 		colDef = TableColumnFactory.ALTITUDE_UP.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -727,6 +704,7 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		 * column: tour title
 		 */
 		colDef = TableColumnFactory.TOUR_TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -742,6 +720,40 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			}
 		});
 
+		/*
+		 * column: tags
+		 */
+		colDef = TableColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final Set<TourTag> tourTags = ((TourData) element).getTourTags();
+
+				if (tourTags.size() == 0) {
+
+					// the tags could have been removed, set empty field
+
+					cell.setText(UI.EMPTY_STRING);
+
+				} else {
+
+					// convert the tags into a list of tag ids 
+					final ArrayList<Long> tagIds = new ArrayList<Long>();
+					for (final TourTag tourTag : tourTags) {
+						tagIds.add(tourTag.getTagId());
+					}
+
+					cell.setText(TourDatabase.getTagNames(tagIds));
+				}
+			}
+		});
+
+		/*
+		 * column: device name
+		 */
 		colDef = TableColumnFactory.DEVICE_NAME.createColumn(fColumnManager, pixelConverter);
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -751,9 +763,19 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 			}
 		});
 
+		/*
+		 * column: device profile
+		 */
 		TableColumnFactory.DEVICE_PROFILE.createColumn(fColumnManager, pixelConverter);
+
+		/*
+		 * column: time interval
+		 */
 		TableColumnFactory.TIME_INTERVAL.createColumn(fColumnManager, pixelConverter);
 
+		/*
+		 * column: import file name
+		 */
 		colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(fColumnManager, pixelConverter);
 		colDef.addSelectionListener(new SelectionAdapter() {
 			@Override

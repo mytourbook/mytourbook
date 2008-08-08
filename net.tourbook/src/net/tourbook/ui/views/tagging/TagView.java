@@ -577,6 +577,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		 * tree column: category/tag/year/month/tour
 		 */
 		colDef = TreeColumnFactory.TAG.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new StyledCellLabelProvider() {
 			@Override
@@ -630,6 +631,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		 * column: title
 		 */
 		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -649,6 +651,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		 * column: tags
 		 */
 		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

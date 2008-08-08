@@ -490,6 +490,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 * column: driving time
 		 */
 		colDef = TableColumnFactory.DRIVING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -503,6 +504,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 * column: distance (km/mile)
 		 */
 		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -521,6 +523,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 * column: altitude (m/ft)
 		 */
 		colDef = TableColumnFactory.ALTITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.addSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -539,7 +542,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 * column: speed
 		 */
 		colDef = TableColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.setIsDefaultColumn();
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_SPEED);
+				fSegmentViewer.refresh();
+			}
+		});
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -555,19 +565,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			}
 		});
 
-		colDef.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_SPEED);
-				fSegmentViewer.refresh();
-			}
-		});
-
 		/*
 		 * column: pace
 		 */
 		colDef = TableColumnFactory.PACE.createColumn(fColumnManager, pixelConverter);
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_PACE);
+				fSegmentViewer.refresh();
+			}
+		});
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -583,19 +591,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			}
 		});
 
-		colDef.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_PACE);
-				fSegmentViewer.refresh();
-			}
-		});
-
 		/*
 		 * column: gradient
 		 */
 		colDef = TableColumnFactory.GRADIENT.createColumn(fColumnManager, pixelConverter);
-		colDef.addSelectionListener(defaultColumnSelectionListener);
+		colDef.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
+				fSegmentViewer.refresh();
+			}
+		});
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -605,13 +611,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				fNf.setMaximumFractionDigits(1);
 
 				cell.setText(fNf.format(segment.gradient));
-			}
-		});
-		colDef.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) fSegmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
-				fSegmentViewer.refresh();
 			}
 		});
 

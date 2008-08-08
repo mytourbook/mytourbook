@@ -571,6 +571,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		 * first column: ref tour name/compare tour name /year
 		 */
 		colDef = TreeColumnFactory.REF_TOUR.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new StyledCellLabelProvider() {
 			@Override
@@ -617,6 +618,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		 * column: tour type
 		 */
 		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -631,6 +633,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		 * column: title
 		 */
 		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -645,6 +648,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		 * column: tags
 		 */
 		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -659,6 +663,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		 * column: speed
 		 */
 		colDef = TreeColumnFactory.SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

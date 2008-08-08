@@ -347,16 +347,15 @@ public class ColumnManager {
 		}
 
 		/*
-		 * add columns in the correct sort order
+		 * add columns in the sort order of the modify dialog
 		 */
 		for (final int createIndex : columnOrder) {
 
 			final ColumnDefinition colDef = getColumnDefinitionByCreateIndex(createIndex);
-
 			if (colDef != null) {
 
 				// keep the column
-				colDef.setIsVisibleInDialog(true);
+				colDef.setIsCheckedInDialog(true);
 				allDialogColumns.add(colDef);
 
 				allColumnsClone.remove(colDef);
@@ -367,7 +366,7 @@ public class ColumnManager {
 		 * add the columns which are defined but not visible
 		 */
 		for (final ColumnDefinition colDef : allColumnsClone) {
-			colDef.setIsVisibleInDialog(false);
+			colDef.setIsCheckedInDialog(false);
 			allDialogColumns.add(colDef);
 		}
 
@@ -501,8 +500,29 @@ public class ColumnManager {
 		}
 
 		/*
-		 * when no columns are visible (which is the first time), show only the first column because
-		 * every column reduces performance
+		 * when no columns are visible (which is the first time), show only the default columns
+		 * because every column reduces performance
+		 */
+		if (fVisibleColumnDefinitions.size() == 0 && fAllColumnDefinitions.size() > 0) {
+
+			final ArrayList<String> columnIds = new ArrayList<String>();
+			int createIndex = 0;
+
+			for (final ColumnDefinition columnDef : fAllColumnDefinitions) {
+				if (columnDef.isDefaultColumn()) {
+
+					columnDef.setCreateIndex(createIndex++);
+
+					fVisibleColumnDefinitions.add(columnDef);
+					columnIds.add(columnDef.getColumnId());
+				}
+			}
+
+			fVisibleColumnIds = columnIds.toArray(new String[columnIds.size()]);
+		}
+
+		/*
+		 * when no default columns are set, use the first column
 		 */
 		if (fVisibleColumnDefinitions.size() == 0 && fAllColumnDefinitions.size() > 0) {
 

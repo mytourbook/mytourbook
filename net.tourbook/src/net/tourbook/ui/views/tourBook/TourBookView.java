@@ -516,6 +516,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		 * tree column: date
 		 */
 		colDef = TreeColumnFactory.DATE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new StyledCellLabelProvider() {
 			@Override
@@ -553,6 +554,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		 * column: tour type
 		 */
 		colDef = TreeColumnFactory.TOUR_TYPE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -567,6 +569,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		 * column: title
 		 */
 		colDef = TreeColumnFactory.TITLE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -583,6 +586,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		 * column: tags
 		 */
 		colDef = TreeColumnFactory.TOUR_TAGS.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -599,6 +603,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		 * column: recording time (h)
 		 */
 		colDef = TreeColumnFactory.RECORDING_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -637,6 +642,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		 * column: distance (km/miles)
 		 */
 		colDef = TreeColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -654,6 +660,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		 * column: altitude up (m)
 		 */
 		colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

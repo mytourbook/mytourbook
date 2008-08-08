@@ -34,7 +34,7 @@ public class ColumnDefinition implements Cloneable {
 	 * visibility status used in the modify dialog, this is used if the dialog is canceled to not
 	 * touch the visible status
 	 */
-	private boolean				fIsVisibleInDialog;
+	private boolean				fIsCheckedInDialog;
 
 	/**
 	 * when <code>true</code> the visibility for this column can be changed
@@ -54,6 +54,12 @@ public class ColumnDefinition implements Cloneable {
 
 	private int					fCreateIndex;
 
+	/**
+	 * when <code>true</code> this column will be checked in the modify dialog when the default
+	 * button is selected
+	 */
+	private boolean				fIsDefaultColumn		= false;
+
 	public void addSelectionListener(final SelectionAdapter selectionAdapter) {
 		fColumnSelectionListener = selectionAdapter;
 	}
@@ -72,7 +78,7 @@ public class ColumnDefinition implements Cloneable {
 
 		clone.fLabel = fLabel;
 		clone.fColumnId = fColumnId;
-		clone.fIsVisibleInDialog = fIsVisibleInDialog;
+		clone.fIsCheckedInDialog = fIsCheckedInDialog;
 		clone.fCanModifyVisibility = fCanModifyVisibility;
 
 		clone.fStyle = fStyle;
@@ -157,6 +163,10 @@ public class ColumnDefinition implements Cloneable {
 		return result;
 	}
 
+	public boolean isCheckedInDialog() {
+		return fIsCheckedInDialog;
+	}
+
 	public boolean isColumnMoveable() {
 		return fIsColumnMoveable;
 	}
@@ -165,8 +175,8 @@ public class ColumnDefinition implements Cloneable {
 		return fIsColumnResizable;
 	}
 
-	public boolean isVisibleInDialog() {
-		return fIsVisibleInDialog;
+	public boolean isDefaultColumn() {
+		return fIsDefaultColumn;
 	}
 
 	/**
@@ -227,12 +237,16 @@ public class ColumnDefinition implements Cloneable {
 		fCreateIndex = createIndex;
 	}
 
+	public void setIsCheckedInDialog(final boolean isCheckedInDialog) {
+		fIsCheckedInDialog = isCheckedInDialog;
+	}
+
 	public void setIsColumnMoveable(final boolean isColumnMovablee) {
 		fIsColumnMoveable = isColumnMovablee;
 	}
 
-	public void setIsVisibleInDialog(final boolean isVisibleInDialog) {
-		fIsVisibleInDialog = isVisibleInDialog;
+	public void setIsDefaultColumn() {
+		this.fIsDefaultColumn = true;
 	}
 
 	public void setLabelProvider(final CellLabelProvider cellLabelProvider) {

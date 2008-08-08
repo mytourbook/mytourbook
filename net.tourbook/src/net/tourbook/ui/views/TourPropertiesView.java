@@ -633,6 +633,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		 * 1. column will be hidden because the alignment for the first column is always to the left
 		 */
 		colDef = TableColumnFactory.FIRST_COLUMN.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setIsColumnMoveable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -644,6 +645,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		 * column: #
 		 */
 		colDef = TableColumnFactory.SEQUENCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setIsColumnMoveable(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -660,6 +662,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		 * column: time
 		 */
 		colDef = TableColumnFactory.TOUR_TIME.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -671,6 +674,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		 * column: distance
 		 */
 		colDef = TableColumnFactory.DISTANCE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -684,6 +688,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		 * column: altitude
 		 */
 		colDef = TableColumnFactory.ALTITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -728,6 +733,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		 * column: longitude
 		 */
 		colDef = TableColumnFactory.LONGITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -739,6 +745,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		 * column: latitude
 		 */
 		colDef = TableColumnFactory.LATITUDE.createColumn(fColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

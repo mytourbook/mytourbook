@@ -44,6 +44,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -64,19 +65,19 @@ public class ColumnModifyDialog extends TrayDialog {
 	private Button						fBtnDeselectAll;
 	private Button						fBtnDefault;
 
-	private ArrayList<ColumnDefinition>	fDialogColumns;
-	private ArrayList<ColumnDefinition>	fDefaultColumns;
+	private ArrayList<ColumnDefinition>	fAllColumnsInDialog;
+	private ArrayList<ColumnDefinition>	fAllColumns;
 
 	public ColumnModifyDialog(	final Shell parentShell,
 								final ColumnManager columnManager,
 								final ArrayList<ColumnDefinition> dialogColumns,
-								final ArrayList<ColumnDefinition> defaultColumns) {
+								final ArrayList<ColumnDefinition> allColumns) {
 
 		super(parentShell);
 
 		fColumnManager = columnManager;
-		fDialogColumns = dialogColumns;
-		fDefaultColumns = defaultColumns;
+		fAllColumnsInDialog = dialogColumns;
+		fAllColumns = allColumns;
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -140,7 +141,7 @@ public class ColumnModifyDialog extends TrayDialog {
 			public void dispose() {}
 
 			public Object[] getElements(final Object inputElement) {
-				return fDialogColumns.toArray();
+				return fAllColumnsInDialog.toArray();
 			}
 
 			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
@@ -167,7 +168,7 @@ public class ColumnModifyDialog extends TrayDialog {
 				if (colDef.canModifyVisibility()) {
 
 					// keep the checked status
-					colDef.setIsVisibleInDialog(event.getChecked());
+					colDef.setIsCheckedInDialog(event.getChecked());
 
 					// select the checked item
 					fColumnViewer.setSelection(new StructuredSelection(colDef));
@@ -190,13 +191,16 @@ public class ColumnModifyDialog extends TrayDialog {
 	@Override
 	protected Control createDialogArea(final Composite parent) {
 
-		final Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
+		final Composite dlgContainer = (Composite) super.createDialogArea(parent);
+		final GridData gd = (GridData) dlgContainer.getLayoutData();
+		gd.heightHint = 400;
+		gd.widthHint = 400;
 
-		createUI(dlgAreaContainer);
+		createUI(dlgContainer);
 
 		setupColumnsInViewer();
 
-		return dlgAreaContainer;
+		return dlgContainer;
 	}
 
 	private void createUI(final Composite parent) {
@@ -258,8 +262,8 @@ public class ColumnModifyDialog extends TrayDialog {
 			public void widgetSelected(final SelectionEvent e) {
 
 				// update model
-				for (final ColumnDefinition colDef : fDialogColumns) {
-					colDef.setIsVisibleInDialog(true);
+				for (final ColumnDefinition colDef : fAllColumnsInDialog) {
+					colDef.setIsCheckedInDialog(true);
 				}
 
 				// update viewer
@@ -278,12 +282,12 @@ public class ColumnModifyDialog extends TrayDialog {
 				final ArrayList<ColumnDefinition> checkedElements = new ArrayList<ColumnDefinition>();
 
 				// update model
-				for (final ColumnDefinition colDef : fDialogColumns) {
+				for (final ColumnDefinition colDef : fAllColumnsInDialog) {
 					if (colDef.canModifyVisibility() == false) {
 						checkedElements.add(colDef);
-						colDef.setIsVisibleInDialog(true);
+						colDef.setIsCheckedInDialog(true);
 					} else {
-						colDef.setIsVisibleInDialog(false);
+						colDef.setIsCheckedInDialog(false);
 					}
 				}
 
@@ -303,24 +307,21 @@ public class ColumnModifyDialog extends TrayDialog {
 			public void widgetSelected(final SelectionEvent event) {
 
 				/*
-				 * copy default columns into the custom columns
+				 * copy all columns into the custom columns
 				 */
 
-				fDialogColumns = new ArrayList<ColumnDefinition>();
+				fAllColumnsInDialog = new ArrayList<ColumnDefinition>();
 
-				for (final ColumnDefinition defaultColumn : fDefaultColumns) {
+				for (final ColumnDefinition columnDef : fAllColumns) {
 					try {
 
-						final ColumnDefinition columnDefinitionClone = (ColumnDefinition) defaultColumn.clone();
+						final ColumnDefinition columnDefinitionClone = (ColumnDefinition) columnDef.clone();
 
-						/*
-						 * visible columns in the dialog will be checked, here we set these columns
-						 * checked which visibility cannot be modified by the user
-						 */
-						final boolean canModifyVisibility = columnDefinitionClone.canModifyVisibility();
-						columnDefinitionClone.setIsVisibleInDialog(canModifyVisibility == false);
+						// visible columns in the viewer will be checked
+						final boolean isDefaultColumn = columnDef.isDefaultColumn();
+						columnDefinitionClone.setIsCheckedInDialog(isDefaultColumn);
 
-						fDialogColumns.add(columnDefinitionClone);
+						fAllColumnsInDialog.add(columnDefinitionClone);
 
 					} catch (final CloneNotSupportedException e) {
 						e.printStackTrace();
@@ -377,7 +378,7 @@ public class ColumnModifyDialog extends TrayDialog {
 
 		// create new item
 		fColumnViewer.insert(colDef, index);
-		fColumnViewer.setChecked(colDef, colDef.isVisibleInDialog());
+		fColumnViewer.setChecked(colDef, colDef.isCheckedInDialog());
 	}
 
 	/**
@@ -434,8 +435,8 @@ public class ColumnModifyDialog extends TrayDialog {
 		// check columns which are visible
 		final ArrayList<ColumnDefinition> checkedColumns = new ArrayList<ColumnDefinition>();
 
-		for (final ColumnDefinition colDef : fDialogColumns) {
-			if (colDef.isVisibleInDialog()) {
+		for (final ColumnDefinition colDef : fAllColumnsInDialog) {
+			if (colDef.isCheckedInDialog()) {
 				checkedColumns.add(colDef);
 			}
 		}
