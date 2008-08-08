@@ -271,7 +271,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 				// create additional data
 				tourData.createTimeSeries(timeDataList, false);
 				tourData.computeTourDrivingTime();
-				tourData.computeAvgFields();
+				tourData.computeValues();
 
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);
