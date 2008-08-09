@@ -531,7 +531,7 @@ public class TourData {
 		}
 
 		if (deviceTimeInterval == -1) {
-			computeAltimeterGradientSerieWithVariableIntervalNEW();
+			computeAltimeterGradientSerieWithVariableInterval();
 		} else {
 			computeAltimeterGradientSerieWithFixedInterval();
 		}
@@ -659,7 +659,7 @@ public class TourData {
 	/**
 	 * Computes the data serie for gradient and altimeters for a variable time interval
 	 */
-	private void computeAltimeterGradientSerieWithVariableIntervalNEW() {
+	private void computeAltimeterGradientSerieWithVariableInterval() {
 
 		if (distanceSerie == null || altitudeSerie == null) {
 			return;
@@ -674,15 +674,16 @@ public class TourData {
 		final int dataSerieGradient[] = new int[serieLength];
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		final boolean isCustomProperty = prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING);
 
 		// get minimum difference
 		int minTimeDiff;
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING)) {
+		if (isCustomProperty) {
 			// use custom settings to compute altimeter and gradient
 			minTimeDiff = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
 		} else {
 			// use internal algorithm to compute altimeter and gradient
-			minTimeDiff = 20;
+			minTimeDiff = 16;
 		}
 		final int minDistanceDiff = minTimeDiff;
 
@@ -773,7 +774,7 @@ public class TourData {
 
 			if (isTimeValid) {
 
-				if (timeDiff > 40) {
+				if (timeDiff > 50 && isCustomProperty == false) {
 //					dataSerieAltimeter[serieIndex] = 300;
 					continue;
 				}
@@ -793,24 +794,6 @@ public class TourData {
 //							dataSerieAltimeter[serieIndex] = 220;
 							continue;
 						}
-
-//						if (distanceSerie[lowIndex] == distanceSerie[lowIndex - 1]) {
-//							dataSerieAltimeter[serieIndex] = 250;
-//							continue;
-//						}
-//						if (distanceSerie[highIndex] == distanceSerie[highIndex + 1]) {
-//							dataSerieAltimeter[serieIndex] = 260;
-//							continue;
-//						}
-//
-//						if (altitudeSerie[lowIndex] == altitudeSerie[lowIndex - 1]) {
-//							dataSerieAltimeter[serieIndex] = 270;
-//							continue;
-//						}
-//						if (altitudeSerie[highIndex] == altitudeSerie[highIndex + 1]) {
-//							dataSerieAltimeter[serieIndex] = 280;
-//							continue;
-//						}
 					}
 				}
 
@@ -832,114 +815,6 @@ public class TourData {
 
 			} else {
 //				dataSerieAltimeter[serieIndex] = -300;
-			}
-		}
-
-		if (UI.UNIT_VALUE_ALTITUDE != 1) {
-
-			// set imperial system
-
-			altimeterSerieImperial = dataSerieAltimeter;
-
-		} else {
-
-			// set metric system
-
-			altimeterSerie = dataSerieAltimeter;
-		}
-
-		gradientSerie = dataSerieGradient;
-	}
-
-	/**
-	 * Computes the data serie for gradient and altimeters for a variable time interval
-	 */
-	private void computeAltimeterGradientSerieWithVariableIntervalOLD() {
-
-		if (distanceSerie == null || altitudeSerie == null) {
-			return;
-		}
-
-		final int serieLength = timeSerie.length;
-
-		final int[] dataSerieDistance = distanceSerie;
-		final int[] dataSerieAltitude = altitudeSerie;
-		final int[] timeSerieDiff = timeSerie;
-
-		final int dataSerieAltimeter[] = new int[serieLength];
-		final int dataSerieGradient[] = new int[serieLength];
-
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
-		// get minimum difference
-		int minDataDiff;
-		if (prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_COMPUTING)) {
-			// use custom settings to compute altimeter and gradient
-			minDataDiff = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE) / 2;
-		} else {
-			// use internal algorithm to compute altimeter and gradient
-			minDataDiff = 10;
-		}
-
-		/*
-		 * compute values
-		 */
-		for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
-
-			// get index for the low value
-			final int serieIndexPrev = serieIndex - 1;
-			int indexLow = ((0 >= serieIndexPrev) ? 0 : serieIndexPrev);
-
-			int dataDiffLow = timeSerieDiff[serieIndex] - timeSerieDiff[indexLow];
-
-			while (dataDiffLow < minDataDiff) {
-				// make sure to be in the array bounds
-				if (indexLow < 1) {
-					break;
-				}
-				dataDiffLow = timeSerieDiff[serieIndex] - timeSerieDiff[--indexLow];
-			}
-
-			final int serieLengthLow = serieLength - 1;
-
-			// remove lowest index
-			final int indexLowNext = ++indexLow;
-			indexLow = (serieLengthLow <= indexLowNext) ? serieLengthLow : indexLowNext;
-
-			// get index for the high value
-			final int serieIndexNext = serieIndex + 1;
-			int indexHigh = ((serieLengthLow <= serieIndexNext) ? serieLengthLow : serieIndexNext);
-
-			int dataDiffHigh = timeSerieDiff[serieIndex] - timeSerieDiff[indexHigh];
-
-			while (dataDiffHigh < minDataDiff) {
-				// make sure to be in the array bounds
-				if (indexHigh > serieLength - 2) {
-					break;
-				}
-				dataDiffHigh = timeSerieDiff[indexHigh++] + -timeSerieDiff[serieIndex];
-			}
-			// remove highest index
-			final int indexHighPrev = --indexHigh;
-			indexHigh = (0 >= indexHighPrev) ? 0 : indexHighPrev;
-
-			final int distanceDiff = dataSerieDistance[indexHigh] - dataSerieDistance[indexLow];
-			final int altitudeDiff = dataSerieAltitude[indexHigh] - dataSerieAltitude[indexLow];
-			final int timeDiff = timeSerie[indexHigh] - timeSerie[indexLow];
-
-			// keep altimeter data
-			if (timeDiff == 0) {
-				dataSerieAltimeter[serieIndex] = 0;
-			} else {
-				dataSerieAltimeter[serieIndex] = (int) (3600f * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE);
-			}
-
-			// keep gradient data
-//			if (distanceDiff == 0) {
-			if (distanceDiff <= minDataDiff) {
-				dataSerieGradient[serieIndex] = 0;
-			} else {
-				dataSerieGradient[serieIndex] = (altitudeDiff * 1000 / distanceDiff);
 			}
 		}
 
