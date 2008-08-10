@@ -54,6 +54,8 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH			= "graphs.zoom.scroll-zoomed-graph";			//$NON-NLS-1$
 	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER			= "graphs.zoom.autozoom-to-slider";			//$NON-NLS-1$
 
+	public static final String	GRAPH_MOUSE_MODE						= "graph.toggle-mouse";						//$NON-NLS-1$
+
 	public static final String	GRAPH_ALTIMETER_MIN_ENABLED				= "graphs.altimeter.is-min-enabled";			//$NON-NLS-1$
 	public static final String	GRAPH_ALTIMETER_MIN_VALUE				= "graphs.altimeter.min-value";				//$NON-NLS-1$
 	public static final String	GRAPH_GRADIENT_MIN_ENABLED				= "graphs.gradient.is-min-enabled";			//$NON-NLS-1$

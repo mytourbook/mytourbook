@@ -33,9 +33,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 
@@ -66,11 +64,11 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 		fTourChart.setShowSlider(true);
 		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 
-		fTourChart.addDoubleClickListener(new Listener() {
-			public void handleEvent(final Event event) {
-				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
-			}
-		});
+//		fTourChart.addDoubleClickListener(new Listener() {
+//			public void handleEvent(final Event event) {
+//				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
+//			}
+//		});
 
 		// set chart title
 		fTourChart.addDataModelListener(new IDataModelListener() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.Chart;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
@@ -71,23 +72,26 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	private ArrayList<Graph>		fGraphList;
 	private ArrayList<Graph>		fViewerGraphs;
 
-	private Button					btnUp;
-	private Button					btnDown;
+	private Button					fBtnUp;
+	private Button					fBtnDown;
 
-	private Button					radioShowDistance;
-	private Button					radioShowTime;
-	private Button					checkShowStartTime;
+	private Button					fRdoShowDistance;
+	private Button					fRdoShowTime;
+	private Button					fChkShowStartTime;
 
-	private Button					checkScrollZoomedChart;
-	private Button					checkZoomToSlider;
+	private Button					fChkScrollZoomedChart;
+	private Button					fChkZoomToSlider;
 
-	private BooleanFieldEditor		altimeterMinCheckbox;
-	private IntegerFieldEditor		altimeterMinEditor;
-	private BooleanFieldEditor		gradientMinCheckbox;
-	private IntegerFieldEditor		gradientMinEditor;
+	private BooleanFieldEditor		fEditAltimeterMinCheckbox;
+	private IntegerFieldEditor		fEditAltimeterMinEditor;
+	private BooleanFieldEditor		fEditgradientMinCheckbox;
+	private IntegerFieldEditor		fEditgradientMinEditor;
 
-	private IntegerFieldEditor		gridEditorVerticalDistance;
-	private IntegerFieldEditor		gridEditorHorizontalDistance;
+	private IntegerFieldEditor		fEditGridVerticalDistance;
+	private IntegerFieldEditor		fEditGridHorizontalDistance;
+
+	private Button					fRdoZoomFeatures;
+	private Button					fRdoSliderFeatures;
 
 	private class Graph {
 
@@ -113,9 +117,15 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		tabVisibleGraphs.setText(Messages.Pref_Graphs_Tab_graph_defaults);
 		tabVisibleGraphs.setControl(createTabGraphs(tabFolder));
 
-		final TabItem tabChart = new TabItem(tabFolder, SWT.NONE);
-		tabChart.setText(Messages.Pref_Graphs_Tab_default_values);
-		tabChart.setControl(createTabDefaultsValues(tabFolder));
+		final TabItem tabMinimumValues = new TabItem(tabFolder, SWT.NONE);
+		tabMinimumValues.setText(Messages.Pref_Graphs_Tab_default_values);
+		tabMinimumValues.setControl(createTabDefaultsValues(tabFolder));
+
+		final TabItem tabZoom = new TabItem(tabFolder, SWT.NONE);
+		tabZoom.setText(Messages.Pref_Graphs_Tab_zoom_options);
+		tabZoom.setControl(createTabZoomOptions(tabFolder));
+
+		enableActions();
 
 		return tabFolder;
 	}
@@ -216,125 +226,10 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 	private Control createTabDefaultsValues(final Composite parent) {
 
-		GridData gd;
-
 		final Composite container = new Composite(parent, SWT.NONE);
-		container.setLayout(new GridLayout(1, false));
+		GridLayoutFactory.swtDefaults().applyTo(container);
 
-		// the editor container removes all margins
-		final Group groupMinValue = new Group(container, SWT.NONE);
-		groupMinValue.setText(Messages.Pref_Graphs_force_minimum_value);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupMinValue);
-
-		/*
-		 * checkbox: altimeter min value
-		 */
-		altimeterMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
-				Messages.Pref_Graphs_Check_force_minimum_for_altimeter,
-				groupMinValue);
-		altimeterMinCheckbox.setPreferenceStore(getPreferenceStore());
-		altimeterMinCheckbox.setPage(this);
-		altimeterMinCheckbox.load();
-		altimeterMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				final boolean isChecked = (Boolean) event.getNewValue();
-				altimeterMinEditor.setEnabled(isChecked, groupMinValue);
-			}
-		});
-
-		// add placeholder
-		Label label = new Label(groupMinValue, SWT.NONE);
-		label.setText(""); //$NON-NLS-1$
-
-		/*
-		 * editor: altimeter min value
-		 */
-		altimeterMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
-				Messages.Pref_Graphs_Text_min_value,
-				groupMinValue);
-		altimeterMinEditor.setPreferenceStore(getPreferenceStore());
-		altimeterMinEditor.setPage(this);
-		altimeterMinEditor.setTextLimit(4);
-		altimeterMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
-		altimeterMinEditor.load();
-		UI.setFieldWidth(groupMinValue, altimeterMinEditor, DEFAULT_FIELD_WIDTH);
-		gd = new GridData();
-		gd.horizontalIndent = COLUMN_INDENT;
-		altimeterMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
-
-		altimeterMinEditor.setEnabled(altimeterMinCheckbox.getBooleanValue(), groupMinValue);
-
-		/*
-		 * checkbox: gradient min value
-		 */
-		gradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
-				Messages.Pref_Graphs_Check_force_minimum_for_gradient,
-				groupMinValue);
-		gradientMinCheckbox.setPreferenceStore(getPreferenceStore());
-		gradientMinCheckbox.setPage(this);
-		gradientMinCheckbox.load();
-		gradientMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
-				final boolean isChecked = (Boolean) event.getNewValue();
-				gradientMinEditor.setEnabled(isChecked, groupMinValue);
-			}
-		});
-
-		// add placeholder
-		label = new Label(groupMinValue, SWT.NONE);
-		label.setText(""); //$NON-NLS-1$
-
-		/*
-		 * editor: gradient min value
-		 */
-		gradientMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
-				Messages.Pref_Graphs_Text_min_value,
-				groupMinValue);
-		gradientMinEditor.setPreferenceStore(getPreferenceStore());
-		gradientMinEditor.setPage(this);
-		gradientMinEditor.setTextLimit(4);
-		gradientMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
-		gradientMinEditor.load();
-		UI.setFieldWidth(groupMinValue, gradientMinEditor, DEFAULT_FIELD_WIDTH);
-		gd = new GridData();
-		gd.horizontalIndent = COLUMN_INDENT;
-		gradientMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
-		gradientMinEditor.setEnabled(gradientMinCheckbox.getBooleanValue(), groupMinValue);
-
-		GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupMinValue);
-
-		/*
-		 * group: grid
-		 */
-		final Group groupGrid = new Group(container, SWT.NONE);
-		groupGrid.setText(Messages.Pref_Graphs_grid_distance);
-		GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(groupGrid);
-
-		/*
-		 * editor: grid vertical distance
-		 */
-		gridEditorVerticalDistance = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE,
-				Messages.Pref_Graphs_grid_vertical_distance,
-				groupGrid);
-		gridEditorVerticalDistance.setPreferenceStore(getPreferenceStore());
-		gridEditorVerticalDistance.setPage(this);
-		gridEditorVerticalDistance.setValidRange(10, 100);
-		gridEditorVerticalDistance.load();
-		UI.setFieldWidth(groupGrid, gridEditorVerticalDistance, DEFAULT_FIELD_WIDTH);
-
-		/*
-		 * editor: grid horizontal distance
-		 */
-		gridEditorHorizontalDistance = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE,
-				Messages.Pref_Graphs_grid_horizontal_distance,
-				groupGrid);
-		gridEditorHorizontalDistance.setPreferenceStore(getPreferenceStore());
-		gridEditorHorizontalDistance.setPage(this);
-		gridEditorHorizontalDistance.setValidRange(20, 200);
-		gridEditorHorizontalDistance.load();
-		UI.setFieldWidth(groupGrid, gridEditorHorizontalDistance, DEFAULT_FIELD_WIDTH);
-
-		GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupGrid);
+		createUIMinValue(container);
 
 		return container;
 	}
@@ -342,22 +237,50 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	private Control createTabGraphs(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		container.setLayout(new GridLayout(2, false));
+		GridLayoutFactory.swtDefaults().applyTo(container);
 
-		final Label label = new Label(container, SWT.WRAP);
-		label.setText(Messages.Pref_Graphs_Label_select_graph);
-		GridData gd = new GridData();
-		gd.horizontalSpan = 2;
-		label.setLayoutData(gd);
+		createUIGraphs(container);
+		createUIXAxisUnits(container);
+		createUIGrid(container);
+
+		return container;
+	}
+
+	private Control createTabZoomOptions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.swtDefaults().applyTo(container);
+
+		createUIMouseMode(container);
+		createUIZoomOptions(container);
+
+		return container;
+	}
+
+	private void createUIGraphs(final Composite parent) {
+
+		// group: units for the x-axis
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Pref_Graphs_Label_select_graph);
+		group.setToolTipText(Messages.Pref_Graphs_Label_select_graph_tooltip);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().applyTo(group);
+
+		/*
+		 * graph container
+		 */
+		final Composite graphContainer = new Composite(group, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(graphContainer);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(graphContainer);
 
 		// graph list
-		fGraphCheckboxList = createGraphCheckBoxList(container);
-		gd = new GridData();
+		fGraphCheckboxList = createGraphCheckBoxList(graphContainer);
+		GridData gd = new GridData();
 		gd.verticalSpan = 2;
 		fGraphCheckboxList.getTable().setLayoutData(gd);
 
 		// button container
-		final Composite buttonContainer = new Composite(container, SWT.NONE);
+		final Composite buttonContainer = new Composite(graphContainer, SWT.NONE);
 		final GridLayout gl = new GridLayout();
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
@@ -367,11 +290,12 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		gd.grabExcessHorizontalSpace = true;
 
 		// up button
-		btnUp = new Button(buttonContainer, SWT.NONE);
-		btnUp.setText(Messages.Pref_Graphs_Button_up);
-		btnUp.setLayoutData(gd);
-		btnUp.setEnabled(false);
-		btnUp.addSelectionListener(new SelectionListener() {
+		fBtnUp = new Button(buttonContainer, SWT.NONE);
+		fBtnUp.setText(Messages.Pref_Graphs_Button_up);
+		fBtnUp.setLayoutData(gd);
+		fBtnUp.setEnabled(false);
+		setButtonLayoutData(fBtnUp);
+		fBtnUp.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(final SelectionEvent e) {}
 
 			public void widgetSelected(final SelectionEvent e) {
@@ -381,11 +305,12 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		});
 
 		// down button
-		btnDown = new Button(buttonContainer, SWT.NONE);
-		btnDown.setText(Messages.Pref_Graphs_Button_down);
-		btnDown.setLayoutData(gd);
-		btnDown.setEnabled(false);
-		btnDown.addSelectionListener(new SelectionListener() {
+		fBtnDown = new Button(buttonContainer, SWT.NONE);
+		fBtnDown.setText(Messages.Pref_Graphs_Button_down);
+		fBtnDown.setLayoutData(gd);
+		fBtnDown.setEnabled(false);
+		setButtonLayoutData(fBtnDown);
+		fBtnDown.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(final SelectionEvent e) {}
 
 			public void widgetSelected(final SelectionEvent e) {
@@ -396,87 +321,243 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 		validateTab();
 		enableUpDownButtons();
+	}
+
+	/**
+	 * group: grid
+	 */
+	private void createUIGrid(final Composite container) {
+
+		final Group groupGrid = new Group(container, SWT.NONE);
+		groupGrid.setText(Messages.Pref_Graphs_grid_distance);
+		GridDataFactory.fillDefaults().indent(0, 0).applyTo(groupGrid);
+
+		/*
+		 * editor: grid vertical distance
+		 */
+		fEditGridVerticalDistance = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE,
+				Messages.Pref_Graphs_grid_vertical_distance,
+				groupGrid);
+		fEditGridVerticalDistance.setPreferenceStore(getPreferenceStore());
+		fEditGridVerticalDistance.setPage(this);
+		fEditGridVerticalDistance.setValidRange(10, 100);
+		fEditGridVerticalDistance.load();
+		UI.setFieldWidth(groupGrid, fEditGridVerticalDistance, DEFAULT_FIELD_WIDTH);
+
+		/*
+		 * editor: grid horizontal distance
+		 */
+		fEditGridHorizontalDistance = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE,
+				Messages.Pref_Graphs_grid_horizontal_distance,
+				groupGrid);
+		fEditGridHorizontalDistance.setPreferenceStore(getPreferenceStore());
+		fEditGridHorizontalDistance.setPage(this);
+		fEditGridHorizontalDistance.setValidRange(20, 200);
+		fEditGridHorizontalDistance.load();
+		UI.setFieldWidth(groupGrid, fEditGridHorizontalDistance, DEFAULT_FIELD_WIDTH);
+
+		GridLayoutFactory.swtDefaults()//
+				.margins(5, 5)
+				.numColumns(2)
+				.applyTo(groupGrid);
+	}
+
+	private void createUIMinValue(final Composite container) {
+
+		GridData gd;
+
+		// the editor container removes all margins
+		final Group groupMinValue = new Group(container, SWT.NONE);
+		groupMinValue.setText(Messages.Pref_Graphs_force_minimum_value);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupMinValue);
+
+		/*
+		 * checkbox: altimeter min value
+		 */
+		fEditAltimeterMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED,
+				Messages.Pref_Graphs_Check_force_minimum_for_altimeter,
+				groupMinValue);
+		fEditAltimeterMinCheckbox.setPreferenceStore(getPreferenceStore());
+		fEditAltimeterMinCheckbox.setPage(this);
+		fEditAltimeterMinCheckbox.load();
+		fEditAltimeterMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+				final boolean isChecked = (Boolean) event.getNewValue();
+				fEditAltimeterMinEditor.setEnabled(isChecked, groupMinValue);
+			}
+		});
+
+		// add placeholder
+		Label label = new Label(groupMinValue, SWT.NONE);
+		label.setText(""); //$NON-NLS-1$
+
+		/*
+		 * editor: altimeter min value
+		 */
+		fEditAltimeterMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE,
+				Messages.Pref_Graphs_Text_min_value,
+				groupMinValue);
+		fEditAltimeterMinEditor.setPreferenceStore(getPreferenceStore());
+		fEditAltimeterMinEditor.setPage(this);
+		fEditAltimeterMinEditor.setTextLimit(4);
+		fEditAltimeterMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
+		fEditAltimeterMinEditor.load();
+		UI.setFieldWidth(groupMinValue, fEditAltimeterMinEditor, DEFAULT_FIELD_WIDTH);
+		gd = new GridData();
+		gd.horizontalIndent = COLUMN_INDENT;
+		fEditAltimeterMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
+
+		fEditAltimeterMinEditor.setEnabled(fEditAltimeterMinCheckbox.getBooleanValue(), groupMinValue);
+
+		/*
+		 * checkbox: gradient min value
+		 */
+		fEditgradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
+				Messages.Pref_Graphs_Check_force_minimum_for_gradient,
+				groupMinValue);
+		fEditgradientMinCheckbox.setPreferenceStore(getPreferenceStore());
+		fEditgradientMinCheckbox.setPage(this);
+		fEditgradientMinCheckbox.load();
+		fEditgradientMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(final PropertyChangeEvent event) {
+				final boolean isChecked = (Boolean) event.getNewValue();
+				fEditgradientMinEditor.setEnabled(isChecked, groupMinValue);
+			}
+		});
+
+		// add placeholder
+		label = new Label(groupMinValue, SWT.NONE);
+		label.setText(""); //$NON-NLS-1$
+
+		/*
+		 * editor: gradient min value
+		 */
+		fEditgradientMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+				Messages.Pref_Graphs_Text_min_value,
+				groupMinValue);
+		fEditgradientMinEditor.setPreferenceStore(getPreferenceStore());
+		fEditgradientMinEditor.setPage(this);
+		fEditgradientMinEditor.setTextLimit(4);
+		fEditgradientMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
+		fEditgradientMinEditor.load();
+		UI.setFieldWidth(groupMinValue, fEditgradientMinEditor, DEFAULT_FIELD_WIDTH);
+		gd = new GridData();
+		gd.horizontalIndent = COLUMN_INDENT;
+		fEditgradientMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
+		fEditgradientMinEditor.setEnabled(fEditgradientMinCheckbox.getBooleanValue(), groupMinValue);
+
+		GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupMinValue);
+	}
+
+	private void createUIMouseMode(final Composite container) {
+
+		final Group group = new Group(container, SWT.NONE);
+		group.setText(Messages.Pref_Graphs_Group_mouse_mode);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().applyTo(group);
+
+		// radio: zoom features
+		fRdoZoomFeatures = new Button(group, SWT.RADIO);
+		fRdoZoomFeatures.setText(Messages.Pref_Graphs_Radio_mouse_mode_zoom);
+		fRdoZoomFeatures.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				enableActions();
+			}
+		});
+
+		// radio: slider features
+		fRdoSliderFeatures = new Button(group, SWT.RADIO);
+		fRdoSliderFeatures.setText(Messages.Pref_Graphs_Radio_mouse_mode_slider);
+
+		// initialize the radio button
+		if (getPreferenceStore().getString(ITourbookPreferences.GRAPH_MOUSE_MODE).equals(Chart.MOUSE_MODE_SLIDER)) {
+			fRdoSliderFeatures.setSelection(true);
+		} else {
+			fRdoZoomFeatures.setSelection(true);
+		}
+	}
+
+	private void createUIXAxisUnits(final Composite container) {
+
+		GridData gd;
 
 		// group: units for the x-axis
 		final Group group = new Group(container, SWT.NONE);
 		group.setText(Messages.Pref_Graphs_Group_units_for_xaxis);
-		gd = new GridData();
-		gd.horizontalSpan = 2;
-		group.setLayoutData(gd);
-		group.setLayout(new GridLayout(1, false));
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory.swtDefaults().applyTo(group);
 
 		// radio: distance
-		radioShowDistance = new Button(group, SWT.RADIO);
-		radioShowDistance.setText(Messages.Pref_Graphs_Radio_show_distance);
-		radioShowDistance.addSelectionListener(new SelectionAdapter() {
+		fRdoShowDistance = new Button(group, SWT.RADIO);
+		fRdoShowDistance.setText(Messages.Pref_Graphs_Radio_show_distance);
+		fRdoShowDistance.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				enableTabGraphControls();
+				enableActions();
 			}
 		});
 
 		// radio: time
-		radioShowTime = new Button(group, SWT.RADIO);
-		radioShowTime.setText(Messages.Pref_Graphs_Radio_show_time);
+		fRdoShowTime = new Button(group, SWT.RADIO);
+		fRdoShowTime.setText(Messages.Pref_Graphs_Radio_show_time);
 
-		checkShowStartTime = new Button(group, SWT.CHECK);
-		checkShowStartTime.setText(Messages.Pref_Graphs_Check_show_start_time);
+		fChkShowStartTime = new Button(group, SWT.CHECK);
+		fChkShowStartTime.setText(Messages.Pref_Graphs_Check_show_start_time);
 		gd = new GridData();
 		gd.horizontalIndent = COLUMN_INDENT;
-		checkShowStartTime.setLayoutData(gd);
+		fChkShowStartTime.setLayoutData(gd);
 
 		// initialize the radio button
 		if (getPreferenceStore().getString(ITourbookPreferences.GRAPH_X_AXIS).equals(TourManager.X_AXIS_TIME)) {
-			radioShowTime.setSelection(true);
+			fRdoShowTime.setSelection(true);
 		} else {
-			radioShowDistance.setSelection(true);
+			fRdoShowDistance.setSelection(true);
 		}
 
 		// checkbox: starttime
-		checkShowStartTime.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME));
+		fChkShowStartTime.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME));
+	}
 
-		// group: zoom options
+	/**
+	 * group: zoom options
+	 */
+	private void createUIZoomOptions(final Composite container) {
+
 		final Group groupZoomOptions = new Group(container, SWT.NONE);
 		groupZoomOptions.setText(Messages.Pref_Graphs_Group_zoom_options);
-		gd = new GridData();
-		gd.horizontalSpan = 2;
-		groupZoomOptions.setLayoutData(gd);
-		groupZoomOptions.setLayout(new GridLayout(1, false));
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupZoomOptions);
+		GridLayoutFactory.swtDefaults().applyTo(groupZoomOptions);
 
 		// checkbox: scroll zoomed chart
-		checkScrollZoomedChart = new Button(groupZoomOptions, SWT.CHECK);
-		checkScrollZoomedChart.setText(Messages.Pref_Graphs_Check_scroll_zoomed_chart);
-		checkScrollZoomedChart.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH));
-		checkScrollZoomedChart.addSelectionListener(new SelectionAdapter() {
+		fChkScrollZoomedChart = new Button(groupZoomOptions, SWT.CHECK);
+		fChkScrollZoomedChart.setText(Messages.Pref_Graphs_Check_scroll_zoomed_chart);
+		fChkScrollZoomedChart.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH));
+		fChkScrollZoomedChart.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				if (checkScrollZoomedChart.getSelection()) {
-					checkZoomToSlider.setSelection(false);
+				if (fChkScrollZoomedChart.getSelection()) {
+					fChkZoomToSlider.setSelection(false);
 				}
 			}
 		});
 
 		// checkbox: auto zoom to moved slider
-		checkZoomToSlider = new Button(groupZoomOptions, SWT.CHECK);
-		checkZoomToSlider.setText(Messages.Pref_Graphs_Check_autozoom);
-		checkZoomToSlider.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
-		checkZoomToSlider.addSelectionListener(new SelectionAdapter() {
+		fChkZoomToSlider = new Button(groupZoomOptions, SWT.CHECK);
+		fChkZoomToSlider.setText(Messages.Pref_Graphs_Check_autozoom);
+		fChkZoomToSlider.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
+		fChkZoomToSlider.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				if (checkZoomToSlider.getSelection()) {
-					checkScrollZoomedChart.setSelection(false);
+				if (fChkZoomToSlider.getSelection()) {
+					fChkScrollZoomedChart.setSelection(false);
 				}
 			}
 		});
-
-		// enable/disable the controls
-		enableTabGraphControls();
-
-		return container;
 	}
 
-	private void enableTabGraphControls() {
-		checkShowStartTime.setEnabled(radioShowTime.getSelection());
+	private void enableActions() {
+		fChkShowStartTime.setEnabled(fRdoShowTime.getSelection());
 	}
 
 	/**
@@ -496,8 +577,8 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 			enableUp = indices[0] != 0;
 			enableDown = indices[indices.length - 1] < max - 1;
 		}
-		btnUp.setEnabled(enableUp);
-		btnDown.setEnabled(enableDown);
+		fBtnUp.setEnabled(enableUp);
+		fBtnDown.setEnabled(enableDown);
 	}
 
 	/*
@@ -593,8 +674,8 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	@Override
 	protected void performDefaults() {
 
-		gridEditorHorizontalDistance.loadDefault();
-		gridEditorVerticalDistance.loadDefault();
+		fEditGridHorizontalDistance.loadDefault();
+		fEditGridVerticalDistance.loadDefault();
 
 		super.performDefaults();
 	}
@@ -609,24 +690,24 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 		final IPreferenceStore prefStore = getPreferenceStore();
 
-		if (radioShowTime.getSelection()) {
+		if (fRdoShowTime.getSelection()) {
 			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_TIME);
 		} else {
 			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
 		}
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, checkShowStartTime.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, fChkShowStartTime.getSelection());
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH, checkScrollZoomedChart.getSelection());
-		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, checkZoomToSlider.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH, fChkScrollZoomedChart.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, fChkZoomToSlider.getSelection());
 
-		altimeterMinCheckbox.store();
-		altimeterMinEditor.store();
-		gradientMinCheckbox.store();
-		gradientMinEditor.store();
+		fEditAltimeterMinCheckbox.store();
+		fEditAltimeterMinEditor.store();
+		fEditgradientMinCheckbox.store();
+		fEditgradientMinEditor.store();
 
-		gridEditorHorizontalDistance.store();
-		gridEditorVerticalDistance.store();
+		fEditGridHorizontalDistance.store();
+		fEditGridVerticalDistance.store();
 
 		return super.performOk();
 	}

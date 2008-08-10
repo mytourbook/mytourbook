@@ -399,8 +399,9 @@ public class TourManager {
 
 		yData.setVisibleMaxValue(yData.getVisibleMaxValue() + 1);
 
-		if (yData.getVisibleMinValue() > 0) {
-			yData.setVisibleMinValue(yData.getVisibleMinValue() - 1);
+		final int visibleMinValue = yData.getVisibleMinValue();
+		if (visibleMinValue > 0) {
+			yData.setVisibleMinValue(visibleMinValue - 1);
 		}
 	}
 

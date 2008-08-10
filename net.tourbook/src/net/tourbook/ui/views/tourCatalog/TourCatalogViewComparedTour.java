@@ -46,9 +46,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
@@ -243,11 +241,11 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		fTourChart.setShowSlider(true);
 		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 
-		fTourChart.addDoubleClickListener(new Listener() {
-			public void handleEvent(final Event event) {
-				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
-			}
-		});
+//		fTourChart.addDoubleClickListener(new Listener() {
+//			public void handleEvent(final Event event) {
+//				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
+//			}
+//		});
 
 		// fire a slider move selection when a slider was moved in the tour chart
 		fTourChart.addSliderMoveListener(new ISliderMoveListener() {
@@ -683,6 +681,54 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		return false;
 	}
 
+	/**
+	 * Shows the compared tour which was selected by the user in the {@link TourCatalogView}
+	 * 
+	 * @param selectionComparedTour
+	 */
+	private void updateTourChart(final TVICatalogComparedTour itemComparedTour) {
+
+		if (saveComparedTourDialog() == false) {
+			return;
+		}
+
+		final Long ctTourId = itemComparedTour.getTourId();
+
+		// check if the compared tour is already displayed
+		if (fCTTourId == ctTourId.longValue() && fComparedTourItem instanceof TVICatalogComparedTour) {
+			return;
+		}
+
+		// load the tourdata of the compared tour from the database
+		final TourData compTourData = TourManager.getInstance().getTourData(ctTourId);
+		if (compTourData == null) {
+			return;
+		}
+
+		// set data from the selection
+		fCTTourId = ctTourId;
+		fCTRefId = itemComparedTour.getRefId();
+		fCTCompareId = itemComparedTour.getCompId();
+
+		fTourData = compTourData;
+
+		/*
+		 * remove tour compare data (when there are any), but set dummy object to display the action
+		 * button
+		 */
+		fTourData.tourCompareSerie = new int[0];
+
+		fDefaultStartIndex = fMovedStartIndex = fComputedStartIndex = itemComparedTour.getStartIndex();
+		fDefaultEndIndex = fMovedEndIndex = fComputedEndIndex = itemComparedTour.getEndIndex();
+
+		fComparedTourItem = itemComparedTour;
+
+		updateTourChart();
+
+		// disable action after the chart was created
+		fTourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, false);
+	}
+
 	private void updateTourChart(final TVICompareResultComparedTour compareResultItem) {
 
 		if (saveComparedTourDialog() == false) {
@@ -736,54 +782,6 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		// enable action after the chart was created
 		fTourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
-	}
-
-	/**
-	 * Shows the compared tour which was selected by the user in the {@link TourCatalogView}
-	 * 
-	 * @param selectionComparedTour
-	 */
-	private void updateTourChart(final TVICatalogComparedTour itemComparedTour) {
-
-		if (saveComparedTourDialog() == false) {
-			return;
-		}
-
-		final Long ctTourId = itemComparedTour.getTourId();
-
-		// check if the compared tour is already displayed
-		if (fCTTourId == ctTourId.longValue() && fComparedTourItem instanceof TVICatalogComparedTour) {
-			return;
-		}
-
-		// load the tourdata of the compared tour from the database
-		final TourData compTourData = TourManager.getInstance().getTourData(ctTourId);
-		if (compTourData == null) {
-			return;
-		}
-
-		// set data from the selection
-		fCTTourId = ctTourId;
-		fCTRefId = itemComparedTour.getRefId();
-		fCTCompareId = itemComparedTour.getCompId();
-
-		fTourData = compTourData;
-
-		/*
-		 * remove tour compare data (when there are any), but set dummy object to display the action
-		 * button
-		 */
-		fTourData.tourCompareSerie = new int[0];
-
-		fDefaultStartIndex = fMovedStartIndex = fComputedStartIndex = itemComparedTour.getStartIndex();
-		fDefaultEndIndex = fMovedEndIndex = fComputedEndIndex = itemComparedTour.getEndIndex();
-
-		fComparedTourItem = itemComparedTour;
-
-		updateTourChart();
-
-		// disable action after the chart was created
-		fTourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, false);
 	}
 
 }

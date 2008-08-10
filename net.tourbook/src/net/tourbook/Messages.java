@@ -342,13 +342,23 @@ public class Messages extends NLS {
 
 	public static String	Pref_Graphs_grid_vertical_distance;
 
+	public static String	Pref_Graphs_Group_mouse_mode;
+
 	public static String		Pref_Graphs_Group_units_for_xaxis;
 	public static String		Pref_Graphs_Group_zoom_options;
 	public static String		Pref_Graphs_Label_select_graph;
+
+	public static String	Pref_Graphs_Label_select_graph_tooltip;
+	public static String	Pref_Graphs_Radio_mouse_mode_slider;
+
+	public static String	Pref_Graphs_Radio_mouse_mode_zoom;
+
 	public static String		Pref_Graphs_Radio_show_distance;
 	public static String		Pref_Graphs_Radio_show_time;
 	public static String		Pref_Graphs_Tab_default_values;
 	public static String		Pref_Graphs_Tab_graph_defaults;
+
+	public static String	Pref_Graphs_Tab_zoom_options;
 	public static String		Pref_Graphs_Text_min_value;
 
 	public static String		Pref_People_Action_add_person;
