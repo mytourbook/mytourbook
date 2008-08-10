@@ -45,6 +45,8 @@ public class Chart extends ViewForm {
 	static final String					COMMAND_ID_ZOOM_OUT			= "net.tourbook.chart.command.zoomOut";		//$NON-NLS-1$
 	static final String					COMMAND_ID_FIT_GRAPH		= "net.tourbook.chart.command.fitGraph";		//$NON-NLS-1$
 
+	static final String					COMMAND_ID_TOGGLE_MOUSE		= "net.tourbook.chart.command.toggleMouse";	//$NON-NLS-1$
+
 	static final String					COMMAND_ID_PART_NEXT		= "net.tourbook.chart.command.partNext";		//$NON-NLS-1$
 	static final String					COMMAND_ID_PART_PREVIOUS	= "net.tourbook.chart.command.partPrevious";	//$NON-NLS-1$
 
@@ -56,11 +58,14 @@ public class Chart extends ViewForm {
 
 	static final int					GRAPH_ALPHA					= 0xd0;
 
+	public static final String			MOUSE_MODE_SLIDER			= "slider";									//$NON-NLS-1$
+	public static final String			MOUSE_MODE_ZOOM				= "zoom";										//$NON-NLS-1$
+
 	private final ListenerList			fFocusListeners				= new ListenerList();
 	private final ListenerList			fBarSelectionListeners		= new ListenerList();
 	private final ListenerList			fSliderMoveListeners		= new ListenerList();
 	private final ListenerList			fBarDoubleClickListeners	= new ListenerList();
-	private final ListenerList			fDoubleClickListeners		= new ListenerList();
+//	private final ListenerList			fDoubleClickListeners		= new ListenerList();
 
 	ChartComponents						fChartComponents;
 	private ChartDataModel				fChartDataModel;
@@ -111,6 +116,14 @@ public class Chart extends ViewForm {
 	protected int						gridHorizontalDistance		= 70;
 
 	/**
+	 * mouse behaviour:<br>
+	 * <br>
+	 * <code>true</code> use in slider-mode<br>
+	 * <code>false</code> use in zoom-mode<br>
+	 */
+	private boolean						fToggleMouse;
+
+	/**
 	 * Chart widget
 	 */
 	public Chart(final Composite parent, final int style) {
@@ -144,9 +157,9 @@ public class Chart extends ViewForm {
 		fBarDoubleClickListeners.add(listener);
 	}
 
-	public void addDoubleClickListener(final Listener listener) {
-		fDoubleClickListeners.add(listener);
-	}
+//	public void addDoubleClickListener(final Listener listener) {
+//		fDoubleClickListeners.add(listener);
+//	}
 
 	public void addFocusListener(final Listener listener) {
 		fFocusListeners.add(listener);
@@ -256,6 +269,17 @@ public class Chart extends ViewForm {
 		actionProxy = new ActionProxy(COMMAND_ID_PART_NEXT, action);
 		fChartActionProxies.put(COMMAND_ID_PART_NEXT, actionProxy);
 
+		/*
+		 * Action: toggle mouse
+		 */
+		if (useInternalActionBar) {
+			action = new ActionToggleMouse(this);
+		} else {
+			action = null;
+		}
+		actionProxy = new ActionProxy(COMMAND_ID_TOGGLE_MOUSE, action);
+		fChartActionProxies.put(COMMAND_ID_TOGGLE_MOUSE, actionProxy);
+
 		updateActionState();
 	}
 
@@ -332,6 +356,7 @@ public class Chart extends ViewForm {
 
 			if (fShowZoomActions) {
 				tbm.add(new Separator());
+				tbm.add(fChartActionProxies.get(COMMAND_ID_TOGGLE_MOUSE).getAction());
 				tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
 				tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).getAction());
 				tbm.add(fChartActionProxies.get(COMMAND_ID_FIT_GRAPH).getAction());
@@ -381,18 +406,18 @@ public class Chart extends ViewForm {
 		}
 	}
 
-	void fireDoubleClick() {
-
-		final Object[] listeners = fDoubleClickListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			final Listener listener = (Listener) listeners[i];
-			SafeRunnable.run(new SafeRunnable() {
-				public void run() {
-					listener.handleEvent(null);
-				}
-			});
-		}
-	}
+//	void fireDoubleClick() {
+//
+//		final Object[] listeners = fDoubleClickListeners.getListeners();
+//		for (int i = 0; i < listeners.length; ++i) {
+//			final Listener listener = (Listener) listeners[i];
+//			SafeRunnable.run(new SafeRunnable() {
+//				public void run() {
+//					listener.handleEvent(null);
+//				}
+//			});
+//		}
+//	}
 
 	void fireFocusEvent() {
 
@@ -551,6 +576,10 @@ public class Chart extends ViewForm {
 				chartGraph.getRightSlider().getValuesIndex());
 	}
 
+	public boolean isToggleMouse() {
+		return fToggleMouse;
+	}
+
 	/**
 	 * @return Returns <code>true</code> when the x-sliders are visible
 	 */
@@ -569,6 +598,11 @@ public class Chart extends ViewForm {
 
 	void onExecutePartPrevious() {
 		fChartComponents.getChartComponentGraph().moveToPrevPart();
+	}
+
+	public void onExecuteToggleMouse() {
+
+		setToggleMouse(!isToggleMouse());
 	}
 
 	void onExecuteZoomIn() {
@@ -590,6 +624,10 @@ public class Chart extends ViewForm {
 		fChartComponents.zoomOut(true);
 	}
 
+//	public void removeDoubleClickListener(final Listener listener) {
+//		fDoubleClickListeners.remove(listener);
+//	}
+
 	/**
 	 * make the graph dirty and redraw it
 	 */
@@ -599,10 +637,6 @@ public class Chart extends ViewForm {
 
 	public void removeDoubleClickListener(final IBarSelectionListener listener) {
 		fBarDoubleClickListeners.remove(listener);
-	}
-
-	public void removeDoubleClickListener(final Listener listener) {
-		fDoubleClickListeners.remove(listener);
 	}
 
 	public void removeFocusListener(final Listener listener) {
@@ -731,6 +765,16 @@ public class Chart extends ViewForm {
 		fChartComponents.setMarkerVisible(isMarkerVisible);
 	}
 
+//	/**
+//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
+//	 * when the workbench action should be used.
+//	 * 
+//	 * @param useInternalActionBar
+//	 */
+//	public void setUseInternalActionBar(boolean useInternalActionBar) {
+//		fUseInternalActionBar = useInternalActionBar;
+//	}
+
 	public void setShowPartNavigation(final boolean showPartNavigation) {
 		fShowPartNavigation = showPartNavigation;
 	}
@@ -742,16 +786,6 @@ public class Chart extends ViewForm {
 	public void setShowSlider(final boolean isSliderVisible) {
 		fChartComponents.setSliderVisible(isSliderVisible);
 	}
-
-//	/**
-//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
-//	 * when the workbench action should be used.
-//	 * 
-//	 * @param useInternalActionBar
-//	 */
-//	public void setUseInternalActionBar(boolean useInternalActionBar) {
-//		fUseInternalActionBar = useInternalActionBar;
-//	}
 
 	public void setShowZoomActions(final boolean showZoomActions) {
 		fShowZoomActions = showZoomActions;
@@ -779,6 +813,10 @@ public class Chart extends ViewForm {
 
 	protected void setSynchMode(final int synchMode) {
 		fSynchMode = synchMode;
+	}
+
+	public void setToggleMouse(final boolean fToggleMouse) {
+		this.fToggleMouse = fToggleMouse;
 	}
 
 	/**
@@ -959,14 +997,6 @@ public class Chart extends ViewForm {
 		setChartCommandEnabled(COMMAND_ID_PART_NEXT, false);
 	}
 
-	/**
-	 * Zoom the graph, so that the left and right sliders are at the visible border
-	 * 
-	 * @param sliderPosition
-	 */
-//	public void zoomToXSlider(SelectionChartXSliderPosition sliderPosition) {
-//		fChartComponents.zoomToXSlider(sliderPosition);
-//	}
 	/**
 	 * zoom into the chart where the graph is divided into parts (months)
 	 * 

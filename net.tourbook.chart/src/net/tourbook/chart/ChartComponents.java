@@ -221,12 +221,6 @@ public class ChartComponents extends Composite {
 			}
 		});
 
-		// addListener(SWT.MouseDown, new Listener() {
-		// public void handleEvent(final Event event) {
-		// // set the focus to the chart
-		// fComponentGraph.setFocus();
-		// }
-		// });
 
 		fComponentGraph.addListener(SWT.Traverse, new Listener() {
 			public void handleEvent(final Event event) {
@@ -1331,11 +1325,6 @@ public class ChartComponents extends Composite {
 
 		fComponentGraph.updateChartLayers();
 	}
-
-	// void zoomToXSlider(final SelectionChartXSliderPosition sliderPosition) {
-	// fComponentGraph.zoomToXSliderPosition(sliderPosition);
-	// onResize();
-	// }
 
 	/**
 	 */

@@ -23,6 +23,8 @@ public class Messages extends NLS {
 	public static String	Action_next_month_tooltip;
 	public static String	Action_previous_month;
 	public static String	Action_previous_month_tooltip;
+	public static String	Action_toggle_mouse;
+	public static String	Action_toggle_mouse_tooltip;
 	public static String	Action_zoom_fit_to_graph;
 	public static String	Action_zoom_fit_to_graph_tooltip;
 	public static String	Action_zoom_in;
@@ -40,6 +42,7 @@ public class Messages extends NLS {
 	public static String	Image_cursor_hand_10x;
 	public static String	Image_cursor_hand_20x;
 	public static String	Image_cursor_hand_50x;
+	public static String	Image_toggle_mouse;
 	public static String	Image_zoom_fit_to_graph;
 	public static String	Image_zoom_fit_to_graph_disabled;
 	public static String	Image_zoom_in;

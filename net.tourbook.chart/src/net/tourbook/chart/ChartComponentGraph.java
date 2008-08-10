@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.chart;
 
 import java.io.InputStream;
@@ -64,11 +63,13 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class ChartComponentGraph extends Canvas {
 
+	private static final float			ZOOM_RATIO_FACTOR		= 1.5f;
+
 	/**
 	 * maximum width in pixel for the width of the tooltip
 	 */
 	private static final int			MAX_TOOLTIP_WIDTH		= 500;
-	
+
 	private static final int			BAR_MARKER_WIDTH		= 16;
 	/**
 	 * the factor is multiplied whth the visible graph width, so that the sliders are indented from
@@ -127,7 +128,16 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private int							fDevGraphImageXOffset;
 
+	/**
+	 * ratio for the position where the chart starts on the left side within the virtual graph width
+	 */
 	private float						fXOffsetZoomRatio;
+
+	/**
+	 * ratio where the mouse was double clicked, this position is used to zoom the chart with the
+	 * mouse
+	 */
+	private float						fXOffsetMouseRatio;
 
 	/**
 	 * the zoomed chart can be scrolled when set to <code>true</code>, for a zoomed chart, the chart
@@ -443,20 +453,34 @@ public class ChartComponentGraph extends Canvas {
 		addListener(SWT.MouseWheel, new Listener() {
 			public void handleEvent(final Event event) {
 
-				if (event.count < 0) {
-					event.keyCode = SWT.ARROW_RIGHT;
+				if ((event.stateMask & SWT.SHIFT) != 0 && (event.stateMask & SWT.CONTROL) == 0) {
+
+					// zoom the chart
+
+					if (event.count < 0) {
+						zoomOutWithMouse();
+					} else {
+						zoomInWithMouse();
+					}
+
 				} else {
-					event.keyCode = SWT.ARROW_LEFT;
+
+					if (event.count < 0) {
+						event.keyCode = SWT.ARROW_RIGHT;
+					} else {
+						event.keyCode = SWT.ARROW_LEFT;
+					}
+
+					/*
+					 * set focus when the mouse is over the chart and the mousewheel is scrolled,
+					 */
+					if (isFocusControl() == false) {
+						forceFocus();
+					}
+
+					fChartComponents.handleLeftRightEvent(event);
 				}
 
-				/*
-				 * set focus when the mouse is over the chart and the mousewheel is scrolled,
-				 */
-				if (isFocusControl() == false) {
-					forceFocus();
-				}
-
-				fChartComponents.handleLeftRightEvent(event);
 				/*
 				 * prevent scrolling the scrollbar, scrolling is done by the chart itself
 				 */
@@ -527,7 +551,6 @@ public class ChartComponentGraph extends Canvas {
 		final float scaleY = drawingData.getScaleY();
 
 		final int graphValue1 = (int) ((devYBottom - slider1.getDevYSliderLine()) / scaleY) + graphYBottom;
-
 		final int graphValue2 = (int) ((devYBottom - slider2.getDevYSliderLine()) / scaleY) + graphYBottom;
 
 		int minValue;
@@ -1658,8 +1681,8 @@ public class ChartComponentGraph extends Canvas {
 				 * the image size is adjusted to the client size but it must be within the min/max
 				 * ranges
 				 */
-				final int devImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT, Math.min(getVisibleGraphHeight(),
-						ChartComponents.CHART_MAX_HEIGHT));
+				final int devImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT,
+						Math.min(getDevVisibleGraphHeight(), ChartComponents.CHART_MAX_HEIGHT));
 
 				/*
 				 * when the image is the same size as the new we will redraw it only if it is set to
@@ -3157,8 +3180,6 @@ public class ChartComponentGraph extends Canvas {
 						ChartComponents.CHART_MIN_WIDTH);
 
 				fDevVirtualGraphImageWidth = Math.max(devMinWidth, devImageWidth);
-
-//				System.out.println("fDevVirtualGraphImageWidth: "+fDevVirtualGraphImageWidth);
 			}
 		}
 	}
@@ -3171,7 +3192,7 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void fillImagePadding(final GC gc, final Rectangle imageRect) {
 
-		final int clientHeight = getVisibleGraphHeight();
+		final int clientHeight = getDevVisibleGraphHeight();
 		final int visibleGraphWidth = getDevVisibleChartWidth();
 
 		gc.setBackground(fChart.getBackgroundColor());
@@ -3219,6 +3240,13 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private int getDevVisibleChartWidth() {
 		return fChartComponents.getDevVisibleChartWidth() - 0;
+	}
+
+	/**
+	 * @return Returns the visible height of the chart graph
+	 */
+	private int getDevVisibleGraphHeight() {
+		return fChartComponents.getDevVisibleChartHeight();
 	}
 
 	/**
@@ -3274,13 +3302,6 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * @return Returns the visible height of the chart graph
-	 */
-	private int getVisibleGraphHeight() {
-		return fChartComponents.getDevVisibleChartHeight();
-	}
-
-	/**
 	 * Returns the size of the graph for the given bounds, the size will be reduced when the
 	 * scrollbars are visible
 	 * 
@@ -3319,6 +3340,15 @@ public class ChartComponentGraph extends Canvas {
 
 	private ChartDrawingData getXDrawingData() {
 		return fDrawingData.get(0);
+	}
+
+	private void handleChartResizeForSliders() {
+
+		// update the width in the sliders
+		final int visibleGraphHeight = getDevVisibleGraphHeight();
+
+		getLeftSlider().handleChartResize(visibleGraphHeight);
+		getRightSlider().handleChartResize(visibleGraphHeight);
 	}
 
 	void hideToolTip() {
@@ -3656,12 +3686,22 @@ public class ChartComponentGraph extends Canvas {
 
 		if (fHoveredBarSerieIndex != -1) {
 
-			// execute the action which is defined when a bar is selected
-			// with the left mouse button
+			/*
+			 * execute the action which is defined when a bar is selected with the left mouse button
+			 */
 
 			fChart.fireChartDoubleClick(fHoveredBarSerieIndex, fHoveredBarValueIndex);
+
 		} else {
-			fChart.fireDoubleClick();
+
+			/*
+			 * set position where the double click occured, this position will be used when the
+			 * chart is zoomed
+			 */
+			final int devMousePosInChart = fDevGraphImageXOffset + e.x;
+			fXOffsetMouseRatio = (float) devMousePosInChart / fDevVirtualGraphImageWidth;
+
+			zoomInWithMouse();
 		}
 	}
 
@@ -3671,6 +3711,14 @@ public class ChartComponentGraph extends Canvas {
 	 * @param event
 	 */
 	private void onMouseDown(final MouseEvent event) {
+
+//		System.out.println(event.button + "\t" + event.count + "\t" + event.stateMask);
+
+		// zoom out with the button on the left side
+		if (event.button == 4) {
+			zoomOutWithMouse();
+			return;
+		}
 
 		final ScrollBar hBar = getHorizontalBar();
 		final int hBarOffset = hBar.isVisible() ? hBar.getSelection() : 0;
@@ -4505,7 +4553,7 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void setupScrollCursor(final int devX, final int devY) {
 
-		final int height = getVisibleGraphHeight();
+		final int height = getDevVisibleGraphHeight();
 		final int height4 = height / 4;
 		final int height2 = height / 2;
 
@@ -4532,6 +4580,25 @@ public class ChartComponentGraph extends Canvas {
 			startPosScrollbar = getHorizontalBar().getSelection();
 			startPosDev = devX;
 		}
+	}
+
+	/**
+	 * set the ratio at which the zoomed chart starts
+	 */
+	private void setXOffsetZoomRatio() {
+
+		final int devVisibleChartWidth = getDevVisibleChartWidth();
+
+		float devXOffset = fXOffsetMouseRatio * fDevVirtualGraphImageWidth;
+		devXOffset -= devVisibleChartWidth / 2;
+
+		// adjust left border
+		devXOffset = Math.max(devXOffset, 0);
+
+		// adjust right border
+		devXOffset = Math.min(devXOffset, fDevVirtualGraphImageWidth - devVisibleChartWidth);
+
+		fXOffsetZoomRatio = devXOffset / fDevVirtualGraphImageWidth;
 	}
 
 	/**
@@ -4570,6 +4637,86 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	void setXSliderVisible(final boolean isSliderVisible) {
 		this.fIsXSliderVisible = isSliderVisible;
+	}
+
+	/**
+	 * sets the min/max values for the y-axis that the visible area will be filled with the chart
+	 */
+	private void setYDataMinMaxValues() {
+
+		final ChartDataXSerie xData = getXData();
+
+		if (xData == null) {
+			return;
+		}
+
+		final int[][] xValueSerie = xData.getHighValues();
+
+		if (xValueSerie.length == 0) {
+			// data are not available
+			return;
+		}
+
+		final int[] xValues = xValueSerie[0];
+		final int serieLength = xValues.length;
+
+		final int lastXValue = xValues[serieLength - 1];
+		final int valueVisibleArea = (int) (lastXValue / fGraphZoomRatio);
+
+		final int valueLeftBorder = (int) (lastXValue * fXOffsetZoomRatio);
+		int valueRightBorder = valueLeftBorder + valueVisibleArea;
+
+		// make sure right is higher than left
+		if (valueLeftBorder >= valueRightBorder) {
+			valueRightBorder = valueLeftBorder + 1;
+		}
+
+		/*
+		 * get value index for the left and right border of the visible area
+		 */
+		int valueIndexLeft = 0;
+		for (final int xValue : xValues) {
+			if (xValue > valueLeftBorder) {
+				break;
+			}
+			valueIndexLeft++;
+		}
+		int valueIndexRight = valueIndexLeft;
+		for (; valueIndexRight < xValues.length; valueIndexRight++) {
+			if (xValues[valueIndexRight] > valueRightBorder) {
+				break;
+			}
+		}
+
+		/*
+		 * get min/max value for each dataserie to fill the visible area with the chart
+		 */
+		for (final ChartDrawingData drawingData : fDrawingData) {
+			final ChartDataYSerie yData = drawingData.getYData();
+
+			final int yValues[] = yData.getHighValues()[0];
+			int minValue = yValues[valueIndexLeft];
+			int maxValue = yValues[valueIndexLeft];
+
+			for (int valueIndex = valueIndexLeft; valueIndex < valueIndexRight; valueIndex++) {
+
+				final int yValue = yValues[valueIndex];
+
+				if (yValue < minValue) {
+					minValue = yValue;
+				}
+				if (yValue > maxValue) {
+					maxValue = yValue;
+				}
+			}
+
+			/*
+			 * set visible min/max value, adjust the value to prevent it to be displayed at the
+			 * border of the chart
+			 */
+			yData.setVisibleMinValue(minValue - 1);
+			yData.setVisibleMaxValue(maxValue + 1);
+		}
 	}
 
 	private void showToolTip(final int x, final int y) {
@@ -4799,7 +4946,7 @@ public class ChartComponentGraph extends Canvas {
 		} else {
 
 			// calculate new virtual graph width
-			fDevVirtualGraphImageWidth = (int) (fGraphZoomRatio * getDevVisibleChartWidth());
+			fDevVirtualGraphImageWidth = (int) (fGraphZoomRatio * devVisibleChartWidth);
 
 			if (fGraphZoomRatio == 1.0) {
 				// with the ration 1.0 the graph is not zoomed
@@ -4820,7 +4967,7 @@ public class ChartComponentGraph extends Canvas {
 		/*
 		 * update all x-sliders
 		 */
-		final int visibleGraphHeight = getVisibleGraphHeight();
+		final int visibleGraphHeight = getDevVisibleGraphHeight();
 		xSliderA.handleChartResize(visibleGraphHeight);
 		xSliderB.handleChartResize(visibleGraphHeight);
 
@@ -4899,7 +5046,7 @@ public class ChartComponentGraph extends Canvas {
 
 			GridDataFactory.fillDefaults().hint(MAX_TOOLTIP_WIDTH, SWT.DEFAULT).applyTo(fToolTipLabel);
 			fToolTipLabel.pack(true);
-			
+
 			containerSize = fToolTipContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		}
 
@@ -4944,6 +5091,45 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
+	private void zoomInWithMouse() {
+
+		if (canScrollZoomedChart) {
+
+			// the image can be scrolled
+
+		} else {
+
+			// chart can't be scrolled
+
+			final int devVisibleChartWidth = getDevVisibleChartWidth();
+			final int devMaxChartWidth = ChartComponents.CHART_MAX_WIDTH;
+
+			if (fDevVirtualGraphImageWidth <= devMaxChartWidth) {
+
+				// chart is within the range which can be zoomed in
+
+				if (devVisibleChartWidth * (fGraphZoomRatio * ZOOM_RATIO_FACTOR) > devMaxChartWidth) {
+					/*
+					 * the double zoomed graph would be wider than the max width, reduce it to the
+					 * max width
+					 */
+					fGraphZoomRatio = devMaxChartWidth / devVisibleChartWidth;
+					fDevVirtualGraphImageWidth = devMaxChartWidth;
+				} else {
+					fGraphZoomRatio = fGraphZoomRatio * ZOOM_RATIO_FACTOR;
+					fDevVirtualGraphImageWidth = (int) (fGraphZoomRatio * devVisibleChartWidth);
+				}
+
+				setXOffsetZoomRatio();
+				handleChartResizeForSliders();
+
+				setYDataMinMaxValues();
+
+				fChartComponents.onResize();
+			}
+		}
+	}
+
 	/**
 	 * Zoom into the graph with the ratio 1:2
 	 */
@@ -4952,10 +5138,9 @@ public class ChartComponentGraph extends Canvas {
 		final int visibleGraphWidth = getDevVisibleChartWidth();
 		final int graphImageWidth = fDevVirtualGraphImageWidth;
 
-//		final int minChartWidth = fChart.getChartDataModel().getChartMinWidth();
 		final int maxChartWidth = ChartComponents.CHART_MAX_WIDTH;
 
-		if (/* graphImageWidth >= minChartWidth && */graphImageWidth <= maxChartWidth) {
+		if (graphImageWidth <= maxChartWidth) {
 
 			// chart is within the range which can be zoomed in
 
@@ -5043,11 +5228,7 @@ public class ChartComponentGraph extends Canvas {
 		// set the new graph width
 		// enforceChartImageMinMaxWidth();
 
-		// update the width in the sliders
-		final int visibleGraphHeight = getVisibleGraphHeight();
-
-		leftSlider.handleChartResize(visibleGraphHeight);
-		rightSlider.handleChartResize(visibleGraphHeight);
+		handleChartResizeForSliders();
 	}
 
 	/**
@@ -5056,7 +5237,6 @@ public class ChartComponentGraph extends Canvas {
 	void zoomOut() {
 
 		final int visibleGraphWidth = getDevVisibleChartWidth();
-		final int visibleGraphHeight = getVisibleGraphHeight();
 
 		// reset the data which influence the computed graph image width
 		fGraphZoomRatio = 1;
@@ -5077,53 +5257,41 @@ public class ChartComponentGraph extends Canvas {
 		// set the new graph width
 		// enforceChartImageMinMaxWidth();
 
+		final int visibleGraphHeight = getDevVisibleGraphHeight();
+
 		// reposition the sliders
 		xSliderA.handleChartResize(visibleGraphHeight);
 		xSliderB.handleChartResize(visibleGraphHeight);
 	}
 
-	// /**
-	// * zoom to the provided x-slider position
-	// *
-	// * @param sliderPosition
-	// */
-	// void zoomToXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
-	//
-	// final int[] xValues = getXData().getHighValues()[0];
-	// final int maxValue = xValues[xValues.length - 1];
-	// final int visibleGraphWidth = getDevVisibleChartWidth();
-	//
-	// // get slider values
-	// final int valueIndex1 = sliderPosition.slider1ValueIndex;
-	// final int valueIndex2 = sliderPosition.slider2ValueIndex;
-	// final int value1 = xValues[valueIndex1];
-	// final int value2 = xValues[valueIndex2];
-	//
-	// // set the new slider value/index
-	// xSliderA.setSliderLineValueIndex(valueIndex1, value1);
-	// xSliderB.setSliderLineValueIndex(valueIndex2, value2);
-	//
-	// final int valueDiff = Math.abs(value1 - value2);
-	//
-	// // calculate new graph ratio
-	// fGraphZoomRatio = (float) maxValue / valueDiff;
-	//
-	// // calculate new virtual graph width
-	// fDevVirtualGraphImageWidth = (int) (fGraphZoomRatio * visibleGraphWidth);
-	//
-	// // set the sliders to a new position
-	// final int virtualSlider1Pos = (int) ((float) (fDevVirtualGraphImageWidth * value1) /
-	// maxValue);
-	// final int virtualSlider2Pos = (int) ((float) (fDevVirtualGraphImageWidth * value2) /
-	// maxValue);
-	//
-	// /*
-	// * calculate the offset for the left slider, the graph is drawn starting at this position
-	// */
-	// fDevGraphImageXOffset = Math.min(virtualSlider1Pos, virtualSlider2Pos);
-	// xSliderA.moveToDevPosition(virtualSlider1Pos, true, true);
-	// xSliderB.moveToDevPosition(virtualSlider2Pos, true, true);
-	// }
+	private void zoomOutWithMouse() {
+
+		if (canScrollZoomedChart) {
+
+			// the image can be scrolled
+
+		} else {
+
+			final int devVisibleChartWidth = getDevVisibleChartWidth();
+
+			if (fGraphZoomRatio >= ZOOM_RATIO_FACTOR) {
+
+				fGraphZoomRatio = fGraphZoomRatio / ZOOM_RATIO_FACTOR;
+				fDevVirtualGraphImageWidth = (int) (fGraphZoomRatio * devVisibleChartWidth);
+
+			} else {
+				fGraphZoomRatio = 1;
+				fDevVirtualGraphImageWidth = devVisibleChartWidth;
+			}
+
+			setXOffsetZoomRatio();
+
+			handleChartResizeForSliders();
+			setYDataMinMaxValues();
+
+			fChartComponents.onResize();
+		}
+	}
 
 	/**
 	 * zoom in where parts defines how the width of the graph will be splitted and position defines
@@ -5137,9 +5305,7 @@ public class ChartComponentGraph extends Canvas {
 		canScrollZoomedChart = true;
 
 		final int devVisibleGraphWidth = getDevVisibleChartWidth();
-		final int maxChartWidth = ChartComponents.CHART_MAX_WIDTH;
-
-		final int graphWidth = Math.min(maxChartWidth, devVisibleGraphWidth * parts);
+		final int graphWidth = Math.min(ChartComponents.CHART_MAX_WIDTH, devVisibleGraphWidth * parts);
 
 		// reduce the width so that more than one part will be visible in the
 		// clientarea

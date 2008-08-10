@@ -148,12 +148,6 @@ public class ChartXSlider {
 	/**
 	 * When the width of the graph changed, the slider bar position must be adjusted
 	 * 
-	 * @param newWidth
-	 *        new width for the graph
-	 * @param newHeight
-	 *        new height for the graph
-	 * @param devMarkerOffset
-	 *        virtual offset for the slider
 	 */
 	void handleChartResize(final int devGraphHeight) {
 
@@ -177,9 +171,11 @@ public class ChartXSlider {
 					chartGraph.computeXSliderValue(ChartXSlider.this, devVirtualGraphImageWidth);
 				}
 			});
+			
 		} else {
+			
 			// reposition the slider line but keep the position ratio
-			final float devSliderPos = (float) devVirtualGraphImageWidth * positionRatio;
+			final float devSliderPos = devVirtualGraphImageWidth * positionRatio;
 
 			moveToDevPosition((int) (devSliderPos < 0 ? 0 : devSliderPos), true, false);
 		}
@@ -229,10 +225,16 @@ public class ChartXSlider {
 		}
 	}
 
-	void setSliderLineValueIndex(final int valueIndex, final int xValue) {
+	public void reset() {
 
-		this.valuesIndex = valueIndex;
-		this.valueX = xValue;
+		final int devGraphRightBorder = chartGraph.getDevVirtualGraphImageWidth();
+
+		float devSliderPos = devGraphRightBorder * positionRatio;
+		devSliderPos = devSliderPos < 0 ? 0 : devSliderPos;
+
+		moveToDevPosition((int) devSliderPos, true, true);
+
+		chartGraph.computeXSliderValue(ChartXSlider.this, (int) devSliderPos);
 	}
 
 	/**
@@ -247,6 +249,12 @@ public class ChartXSlider {
 		this.labelList = labelList;
 	}
 
+	void setSliderLineValueIndex(final int valueIndex, final int xValue) {
+
+		this.valuesIndex = valueIndex;
+		this.valueX = xValue;
+	}
+
 	/**
 	 * valuesIndex is the position of the slider in the values array
 	 * 
@@ -258,18 +266,6 @@ public class ChartXSlider {
 
 	void setValueX(final int sliderValueX) {
 		this.valueX = sliderValueX;
-	}
-
-	public void reset() {
-
-		final int devGraphRightBorder = chartGraph.getDevVirtualGraphImageWidth();
-
-		float devSliderPos = (float) devGraphRightBorder * positionRatio;
-		devSliderPos = devSliderPos < 0 ? 0 : devSliderPos;
-
-		moveToDevPosition((int) devSliderPos, true, true);
-
-		chartGraph.computeXSliderValue(ChartXSlider.this, (int) devSliderPos);
 	}
 
 }

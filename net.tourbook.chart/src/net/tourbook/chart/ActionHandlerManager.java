@@ -48,8 +48,6 @@ public class ActionHandlerManager {
 	 */
 	private HashMap<String, ActionHandler>	fActionHandlers;
 
-	private ActionHandlerManager() {}
-
 	static ActionHandlerManager getInstance() {
 
 		if (fInstance == null) {
@@ -58,6 +56,8 @@ public class ActionHandlerManager {
 		return fInstance;
 	}
 
+	private ActionHandlerManager() {}
+
 	private void activateHandlers() {
 
 		/*
@@ -65,17 +65,17 @@ public class ActionHandlerManager {
 		 * org.eclipse.core.expressions.definitions extension, but in Eclipse 3.3 the
 		 * ReferenceExpression is only for eclipse internal use, wolfgang 9.8.2007
 		 */
-		Expression partIdExpression = new Expression() {
+		final Expression partIdExpression = new Expression() {
 
 			@Override
-			public void collectExpressionInfo(ExpressionInfo info) {
+			public void collectExpressionInfo(final ExpressionInfo info) {
 				info.addVariableNameAccess(ISources.ACTIVE_PART_ID_NAME);
 			}
 
 			@Override
-			public EvaluationResult evaluate(IEvaluationContext context) throws CoreException {
+			public EvaluationResult evaluate(final IEvaluationContext context) throws CoreException {
 
-				Object var = context.getVariable(ISources.ACTIVE_PART_ID_NAME);
+				final Object var = context.getVariable(ISources.ACTIVE_PART_ID_NAME);
 
 				if (var instanceof String) {
 
@@ -97,9 +97,9 @@ public class ActionHandlerManager {
 		};
 
 		// activate the handler for all tour chart actions
-		for (Iterator<ActionHandler> iterator = fActionHandlers.values().iterator(); iterator.hasNext();) {
+		for (final Iterator<ActionHandler> iterator = fActionHandlers.values().iterator(); iterator.hasNext();) {
 
-			ActionHandler actionHandler = iterator.next();
+			final ActionHandler actionHandler = iterator.next();
 
 			final IHandlerActivation handlerActivation = fHandlerService.activateHandler(actionHandler.getCommandId(),
 					actionHandler,
@@ -120,7 +120,7 @@ public class ActionHandlerManager {
 			return;
 		}
 
-		IServiceLocator workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		final IServiceLocator workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		fCommandService = ((ICommandService) workbenchWindow.getService(ICommandService.class));
 		fHandlerService = ((IHandlerService) workbenchWindow.getService(IHandlerService.class));
 
@@ -134,6 +134,8 @@ public class ActionHandlerManager {
 		fActionHandlers.put(Chart.COMMAND_ID_PART_PREVIOUS, new ActionHandlerPartPrevious());
 		fActionHandlers.put(Chart.COMMAND_ID_PART_NEXT, new ActionHandlerPartNext());
 
+		fActionHandlers.put(Chart.COMMAND_ID_TOGGLE_MOUSE, new ActionHandlerToggleMouse());
+
 		activateHandlers();
 	}
 
@@ -143,7 +145,7 @@ public class ActionHandlerManager {
 	 * @param commandId
 	 * @return
 	 */
-	ActionHandler getActionHandler(String commandId) {
+	ActionHandler getActionHandler(final String commandId) {
 
 		if (fActionHandlers == null) {
 			return null;
@@ -157,15 +159,15 @@ public class ActionHandlerManager {
 	 * 
 	 * @param chart
 	 */
-	void updateActionHandlers(Chart chart) {
+	void updateActionHandlers(final Chart chart) {
 
 		if (fActionHandlers == null || chart.fChartActionProxies == null) {
 			return;
 		}
 
-		for (ActionProxy actionProxy : chart.fChartActionProxies.values()) {
+		for (final ActionProxy actionProxy : chart.fChartActionProxies.values()) {
 
-			ActionHandler actionHandler = fActionHandlers.get(actionProxy.getCommandId());
+			final ActionHandler actionHandler = fActionHandlers.get(actionProxy.getCommandId());
 
 			if (actionHandler != null) {
 				actionHandler.setTourChart(chart);
@@ -180,7 +182,7 @@ public class ActionHandlerManager {
 	/**
 	 * Update the UI check state for one action
 	 */
-	void updateUICheckState(String commandId) {
+	void updateUICheckState(final String commandId) {
 		fCommandService.refreshElements(commandId, null);
 	}
 
