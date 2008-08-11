@@ -69,6 +69,10 @@ public abstract class TourChartViewPart extends ViewPart {
 					if (fTourChart != null) {
 						fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 					}
+
+				} else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
+
+					fTourChart.setMouseMode(event.getNewValue());
 				}
 			}
 		};

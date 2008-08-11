@@ -46,7 +46,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
@@ -241,11 +243,11 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		fTourChart.setShowSlider(true);
 		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 
-//		fTourChart.addDoubleClickListener(new Listener() {
-//			public void handleEvent(final Event event) {
-//				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
-//			}
-//		});
+		fTourChart.addDoubleClickListener(new Listener() {
+			public void handleEvent(final Event event) {
+				TourManager.getInstance().openTourInEditor(fTourData.getTourId());
+			}
+		});
 
 		// fire a slider move selection when a slider was moved in the tour chart
 		fTourChart.addSliderMoveListener(new ISliderMoveListener() {

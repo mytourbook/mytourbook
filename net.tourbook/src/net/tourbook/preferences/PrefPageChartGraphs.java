@@ -696,6 +696,12 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 			prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
 		}
 
+		if (fRdoSliderFeatures.getSelection()) {
+			prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_SLIDER);
+		} else {
+			prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_ZOOM);
+		}
+
 		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, fChkShowStartTime.getSelection());
 
 		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH, fChkScrollZoomedChart.getSelection());

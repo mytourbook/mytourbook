@@ -58,7 +58,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -180,6 +182,10 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 					if (fTourChart != null) {
 						fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 					}
+
+				} else if (property.equals(ITourbookPreferences.GRAPH_MOUSE_MODE)) {
+
+					fTourChart.setMouseMode(event.getNewValue());
 				}
 			}
 		};
@@ -281,13 +287,13 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
 		fTourChart.setContextProvider(new TourChartContextProvicer());
 
-//		fTourChart.addDoubleClickListener(new Listener() {
-//			public void handleEvent(final Event event) {
-//				if (fTourData.getTourPerson() != null) {
-//					TourManager.getInstance().openTourInEditor(fTourData.getTourId());
-//				}
-//			}
-//		});
+		fTourChart.addDoubleClickListener(new Listener() {
+			public void handleEvent(final Event event) {
+				if (fTourData.getTourPerson() != null) {
+					TourManager.getInstance().openTourInEditor(fTourData.getTourId());
+				}
+			}
+		});
 
 		fTourChartConfig = TourManager.createTourChartConfiguration();
 

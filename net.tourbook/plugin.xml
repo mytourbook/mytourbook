@@ -77,6 +77,11 @@
             name="%preference_page_general">
       </page>
       <page
+            class="net.tourbook.preferences.PrefPageDataImport"
+            id="net.tourbook.preferences.PrefPageDataImport"
+            name="%preference_page_data_import">
+      </page>
+      <page
             class="net.tourbook.preferences.PrefPageBikes"
             id="net.tourbook.preferences.PrefPageBikes"
             name="%preference_page_Bikes"/>

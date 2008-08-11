@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import net.tourbook.chart.Chart;
 import net.tourbook.colors.ColorDefinition;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.plugin.TourbookPlugin;
@@ -114,9 +115,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// define which unit is shown on the x-axis
 		store.setDefault(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
 
+		// mouse modus: zoom tour chart
+		store.setDefault(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_ZOOM);
+
 		// graph grid distance
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, 30);
-		store.setDefault(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, 70);
+		store.setDefault(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, 80);
 
 		/*
 		 * view colors

@@ -120,6 +120,8 @@ public class TourChart extends Chart {
 		gridVerticalDistance = prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
 		gridHorizontalDistance = prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
 
+		setShowMouseMode();
+
 		/*
 		 * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
 		 * tour markers when a tour chart got the focus
@@ -1150,6 +1152,14 @@ public class TourChart extends Chart {
 		setGraphLayers();
 
 		updateChart(newChartDataModel);
+
+		/*
+		 * this must be done after the chart is created because is sets an action
+		 */
+		setMouseMode(TourbookPlugin.getDefault()
+				.getPreferenceStore()
+				.getString(ITourbookPreferences.GRAPH_MOUSE_MODE)
+				.equals(Chart.MOUSE_MODE_SLIDER));
 	}
 
 	/**
