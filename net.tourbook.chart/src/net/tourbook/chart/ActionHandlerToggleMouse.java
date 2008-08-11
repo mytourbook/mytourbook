@@ -21,14 +21,17 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerToggleMouse extends ActionHandler {
 
 	public ActionHandlerToggleMouse() {
-		fCommandId = Chart.COMMAND_ID_TOGGLE_MOUSE;
+		fCommandId = Chart.COMMAND_ID_MOUSE_MODE;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		fChart.onExecuteToggleMouse();
+		final Boolean isItemChecked = HandlerUtil.isItemChecked(execEvent);
+
+		if (isItemChecked != null) {
+			fChart.onExecuteMouseMode(isItemChecked);
+		}
 
 		return null;
 	}
-
 }

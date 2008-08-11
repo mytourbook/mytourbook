@@ -17,11 +17,11 @@ package net.tourbook.chart;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionToggleMouse extends Action {
+public class ActionMouseMode extends Action {
 
 	private Chart	fChart;
 
-	public ActionToggleMouse(final Chart chart) {
+	public ActionMouseMode(final Chart chart) {
 
 		super(Messages.Action_toggle_mouse, Action.AS_CHECK_BOX);
 		
@@ -33,7 +33,7 @@ public class ActionToggleMouse extends Action {
 
 	@Override
 	public void run() {
-		fChart.onExecuteToggleMouse();
+		fChart.onExecuteMouseMode(isChecked());
 	}
 
 }

@@ -221,7 +221,6 @@ public class ChartComponents extends Composite {
 			}
 		});
 
-
 		fComponentGraph.addListener(SWT.Traverse, new Listener() {
 			public void handleEvent(final Event event) {
 
@@ -1047,7 +1046,7 @@ public class ChartComponents extends Composite {
 	}
 
 	/**
-	 * updates the chart data fDataModel and redraw the chart
+	 * set the chart data model and redraw the chart
 	 * 
 	 * @param fChartDataModel
 	 * @throws ChartIsEmptyException

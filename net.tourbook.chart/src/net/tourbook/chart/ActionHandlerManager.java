@@ -134,7 +134,7 @@ public class ActionHandlerManager {
 		fActionHandlers.put(Chart.COMMAND_ID_PART_PREVIOUS, new ActionHandlerPartPrevious());
 		fActionHandlers.put(Chart.COMMAND_ID_PART_NEXT, new ActionHandlerPartNext());
 
-		fActionHandlers.put(Chart.COMMAND_ID_TOGGLE_MOUSE, new ActionHandlerToggleMouse());
+		fActionHandlers.put(Chart.COMMAND_ID_MOUSE_MODE, new ActionHandlerToggleMouse());
 
 		activateHandlers();
 	}
