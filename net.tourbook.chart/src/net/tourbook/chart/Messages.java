@@ -19,6 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.chart.messages";	//$NON-NLS-1$
+	public static String	Action_make_sliders_visible;
 	public static String	Action_next_month;
 	public static String	Action_next_month_tooltip;
 	public static String	Action_previous_month;

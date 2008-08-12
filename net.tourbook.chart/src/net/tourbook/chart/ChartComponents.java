@@ -255,19 +255,19 @@ public class ChartComponents extends Composite {
 		final int xAxisUnit = xData.getAxisUnit();
 		final int xStartValue = xData.getStartValue();
 
-		final int devGraphWidth = fComponentGraph.getDevVirtualGraphImageWidth();
+		final int devVirtualGraphWidth = fComponentGraph.getDevVirtualGraphImageWidth();
 
 		// enforce minimum chart width
 //		devGraphWidth = Math.max(devGraphWidth, CHART_MIN_WIDTH);
 
-		drawingData.setDevGraphWidth(devGraphWidth);
-		drawingData.setScaleX((float) devGraphWidth / xMaxValue);
+		drawingData.setDevGraphWidth(devVirtualGraphWidth);
+		drawingData.setScaleX((float) devVirtualGraphWidth / xMaxValue);
 
 		/*
 		 * calculate the number of units which will be visible by dividing the visible length by the
 		 * minimum size which one unit should have in pixels
 		 */
-		final int unitRawNumbers = devGraphWidth / fChart.gridHorizontalDistance;
+		final int unitRawNumbers = devVirtualGraphWidth / fChart.gridHorizontalDistance;
 
 		// unitRawValue is the number in data values for one unit
 		final int unitRawValue = xMaxValue / Math.max(1, unitRawNumbers);
@@ -289,19 +289,19 @@ public class ChartComponents extends Composite {
 			break;
 
 		case ChartDataSerie.X_AXIS_UNIT_WEEK:
-			createXValuesWeek(drawingData, units, devGraphWidth);
+			createXValuesWeek(drawingData, units, devVirtualGraphWidth);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_MONTH:
-			createXValuesMonth(drawingData, units, devGraphWidth);
+			createXValuesMonth(drawingData, units, devVirtualGraphWidth);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_YEAR:
-			createXValuesYear(drawingData, units, devGraphWidth);
+			createXValuesYear(drawingData, units, devVirtualGraphWidth);
 			break;
 
 		case ChartDataSerie.AXIS_UNIT_DAY:
-			createXValuesDay(drawingData, units, devGraphWidth);
+			createXValuesDay(drawingData, units, devVirtualGraphWidth);
 			break;
 
 		default:
@@ -360,7 +360,7 @@ public class ChartComponents extends Composite {
 				(xAxisUnit == ChartDataSerie.AXIS_UNIT_NUMBER //
 				|| xAxisUnit == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)) {
 
-			final int barWidth = (devGraphWidth / xData.getHighValues()[0].length) / 2;
+			final int barWidth = (devVirtualGraphWidth / xData.getHighValues()[0].length) / 2;
 
 			drawingData.setBarRectangleWidth(Math.max(0, barWidth));
 			drawingData.setBarPosition(ChartDrawingData.BAR_POS_CENTER);

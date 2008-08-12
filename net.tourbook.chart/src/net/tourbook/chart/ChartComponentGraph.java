@@ -245,12 +245,13 @@ public class ChartComponentGraph extends Canvas {
 	 * hit
 	 */
 	private ChartXSlider				contextRightSlider;
+
 	/**
 	 * cursor when the graph can be resizes
 	 */
 	private Cursor						cursorResizeLeftRight;
 	private Cursor						cursorResizeTopDown;
-	private Cursor						cursorMoveXMarker;
+	private Cursor						cursorDragged;
 	private Cursor						cursorHand05x;
 	private Cursor						cursorHand;
 	private Cursor						cursorHand2x;
@@ -330,7 +331,7 @@ public class ChartComponentGraph extends Canvas {
 	private int							fXMarkerValueDiff;
 
 	/**
-	 * <code>true</code> when the chart is moved with the mouse
+	 * <code>true</code> when the chart is dragged with the mouse
 	 */
 	private boolean						fIsChartDragged			= false;
 
@@ -340,7 +341,7 @@ public class ChartComponentGraph extends Canvas {
 	private boolean						fIsChartDraggedStarted	= false;
 
 	private Point						fDraggedChartStartPos;
-	private Point						fDraggedChartMovePos;
+	private Point						fDraggedChartDraggedPos;
 
 	private boolean[]					fSelectedBarItems;
 
@@ -377,7 +378,7 @@ public class ChartComponentGraph extends Canvas {
 
 		cursorResizeLeftRight = new Cursor(getDisplay(), SWT.CURSOR_SIZEWE);
 		cursorResizeTopDown = new Cursor(getDisplay(), SWT.CURSOR_SIZENS);
-		cursorMoveXMarker = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
+		cursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
 
 		cursorHand05x = createCursorFromImage(Messages.Image_cursor_hand_05x);
 		cursorHand = createCursorFromImage(Messages.Image_cursor_hand_10x);
@@ -407,10 +408,8 @@ public class ChartComponentGraph extends Canvas {
 		addPaintListener(new PaintListener() {
 			public void paintControl(final PaintEvent event) {
 				if (fIsChartDragged) {
-//					System.out.println("drawDraggedChart");
 					drawDraggedChart(event.gc);
 				} else {
-//					System.out.println("drawChart");
 					drawChart(event.gc);
 				}
 			}
@@ -471,42 +470,7 @@ public class ChartComponentGraph extends Canvas {
 
 		addListener(SWT.MouseWheel, new Listener() {
 			public void handleEvent(final Event event) {
-
-				if (fChart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
-
-					// mouse mode: move slider
-
-					if (event.count < 0) {
-						event.keyCode = SWT.ARROW_RIGHT;
-					} else {
-						event.keyCode = SWT.ARROW_LEFT;
-					}
-
-					/*
-					 * set focus when the mouse is over the chart and the mousewheel is scrolled,
-					 */
-					if (isFocusControl() == false) {
-						forceFocus();
-					}
-
-					fChartComponents.handleLeftRightEvent(event);
-
-				} else {
-
-					// mouse mode: zoom chart
-
-					if (event.count < 0) {
-						zoomOutWithMouse();
-					} else {
-						zoomInWithMouse();
-					}
-				}
-
-				/*
-				 * prevent scrolling the scrollbar, scrolling is done by the chart itself
-				 */
-				event.doit = false;
-
+				onMouseWheel(event);
 			}
 		});
 
@@ -1681,20 +1645,16 @@ public class ChartComponentGraph extends Canvas {
 
 	private void drawDraggedChart(final GC gc) {
 
-		if (fGraphImage == null) {
-			return;
-		}
-
 		/*
 		 * draw background between moved chart and the client area
 		 */
 		final Rectangle clientArea = getClientArea();
-		final int devXDiff = fDraggedChartMovePos.x - fDraggedChartStartPos.x;
-		int devYDiff = fDraggedChartMovePos.y - fDraggedChartStartPos.y;
+		final int devXDiff = fDraggedChartDraggedPos.x - fDraggedChartStartPos.x;
+		int devYDiff = fDraggedChartDraggedPos.y - fDraggedChartStartPos.y;
 
 		// disable vertical dragging
 		devYDiff = 0;
-		
+
 		gc.setBackground(fChart.getBackgroundColor());
 
 		if (devXDiff > 0) {
@@ -1703,13 +1663,13 @@ public class ChartComponentGraph extends Canvas {
 			gc.fillRectangle(clientArea.width + devXDiff, devYDiff, -devXDiff, clientArea.height);
 		}
 
-//		if (posY > 0) {
-//			gc.fillRectangle(0, 0, clientArea.width, posY);
-//		} else {
-//			gc.fillRectangle(0, clientArea.height + posY, clientArea.width, -posY);
-//		}
-
-		gc.drawImage(fGraphImage, devXDiff, devYDiff);
+		if (fCumstomLayerImage != null && fCumstomLayerImage.isDisposed() == false) {
+			gc.drawImage(fCumstomLayerImage, devXDiff, devYDiff);
+		} else if (fLayerImage != null && fLayerImage.isDisposed() == false) {
+			gc.drawImage(fLayerImage, devXDiff, devYDiff);
+		} else if (fGraphImage != null && fGraphImage.isDisposed() == false) {
+			gc.drawImage(fGraphImage, devXDiff, devYDiff);
+		}
 
 		fChartComponents.onResize();
 	}
@@ -1802,9 +1762,9 @@ public class ChartComponentGraph extends Canvas {
 
 					if (graphIndex == fDrawingData.size() - 1) {
 						// draw the unit label and unit tick for the last graph
-						drawXUnits(gc, drawingData, true, true);
+						drawXUnitsAndGrid(gc, drawingData, true, true);
 					} else {
-						drawXUnits(gc, drawingData, false, true);
+						drawXUnitsAndGrid(gc, drawingData, false, true);
 					}
 
 					drawHorizontalGridlines(gc, drawingData);
@@ -1997,7 +1957,6 @@ public class ChartComponentGraph extends Canvas {
 						hoveredBarShape.height,
 						4,
 						4);
-
 			}
 		}
 
@@ -2987,10 +2946,10 @@ public class ChartComponentGraph extends Canvas {
 	 * @param draw0Unit
 	 *            <code>true</code> indicate to draw the unit at the 0 position
 	 */
-	private void drawXUnits(final GC gc,
-							final ChartDrawingData drawingData,
-							final boolean drawUnit,
-							final boolean draw0Unit) {
+	private void drawXUnitsAndGrid(	final GC gc,
+									final ChartDrawingData drawingData,
+									final boolean drawUnit,
+									final boolean draw0Unit) {
 
 		final Display display = getDisplay();
 
@@ -3005,12 +2964,13 @@ public class ChartComponentGraph extends Canvas {
 		if (scaleUnitX != Float.MIN_VALUE) {
 			scaleX = scaleUnitX;
 		}
+
 		// compute the distance between two units
 		final float devUnitWidth = units.size() > 1 ? //
 				((units.get(1).value * scaleX) - (units.get(0).value * scaleX))
 				: 0;
 
-		int devXOffset = 0;
+		float devXOffset = 0;
 		int unitOffset = 0;
 		int unitCounter = 0;
 
@@ -3034,13 +2994,13 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			// dev x-position for the unit tick
-			final int devXUnitTick = devXOffset + (int) (unit.value * scaleX);
+			final int devXUnitTick = (int) (devXOffset + (unit.value * scaleX));
 
 			/*
 			 * the first unit is not painted because it would clip at the left border of the chart
 			 * canvas
 			 */
-			if (unitCounter > 0 || (unitCounter == 0 && draw0Unit)) {
+			if ((unitCounter == 0 && draw0Unit) || unitCounter > 0) {
 
 				if (drawUnit) {
 
@@ -3611,6 +3571,31 @@ public class ChartComponentGraph extends Canvas {
 		return null;
 	}
 
+	void makeSlidersVisible() {
+
+		/*
+		 * adjust left slider
+		 */
+		final ChartXSlider leftSlider = getLeftSlider();
+		final int devLeftPosition = fDevGraphImageXOffset + 2;
+
+		computeXSliderValue(leftSlider, devLeftPosition);
+		leftSlider.moveToDevPosition(devLeftPosition, true, true);
+
+		/*
+		 * adjust right slider
+		 */
+		final ChartXSlider rightSlider = getRightSlider();
+		final int devRightPosition = fDevGraphImageXOffset + getDevVisibleChartWidth() - 2;
+
+		computeXSliderValue(rightSlider, devRightPosition);
+		rightSlider.moveToDevPosition(devRightPosition, true, true);
+
+		fIsSliderDirty = true;
+
+		redraw();
+	}
+
 	void moveToNextPart() {
 		if (graphZoomPartPosition < graphZoomParts - 1) {
 			graphZoomPartPosition++;
@@ -3726,7 +3711,7 @@ public class ChartComponentGraph extends Canvas {
 		// dispose resources
 		cursorResizeLeftRight = ChartUtil.disposeResource(cursorResizeLeftRight);
 		cursorResizeTopDown = ChartUtil.disposeResource(cursorResizeTopDown);
-		cursorMoveXMarker = ChartUtil.disposeResource(cursorMoveXMarker);
+		cursorDragged = ChartUtil.disposeResource(cursorDragged);
 		cursorHand05x = ChartUtil.disposeResource(cursorHand05x);
 		cursorHand = ChartUtil.disposeResource(cursorHand);
 		cursorHand2x = ChartUtil.disposeResource(cursorHand2x);
@@ -3793,8 +3778,6 @@ public class ChartComponentGraph extends Canvas {
 	 * @param event
 	 */
 	private void onMouseDown(final MouseEvent event) {
-
-//		System.out.println("onMouseDown");
 
 		// zoom out to show the whole chart with the button on the left side
 		if (event.button == 4) {
@@ -3905,6 +3888,9 @@ public class ChartComponentGraph extends Canvas {
 
 				// start moving the chart
 
+				/*
+				 * to prevent flickering with the double click event, dragged started is used
+				 */
 				fIsChartDraggedStarted = true;
 
 				fDraggedChartStartPos = new Point(event.x, event.y);
@@ -3913,9 +3899,9 @@ public class ChartComponentGraph extends Canvas {
 				 * set also the move position because when changing the data model, the old position
 				 * will be used and the chart is painted on the wrong position on mouse down
 				 */
-				fDraggedChartMovePos = fDraggedChartStartPos;
+				fDraggedChartDraggedPos = fDraggedChartStartPos;
 
-				setCursor(cursorHand);
+				setCursor(cursorDragged);
 			}
 		}
 	}
@@ -4050,7 +4036,7 @@ public class ChartComponentGraph extends Canvas {
 			fIsChartDraggedStarted = false;
 			fIsChartDragged = true;
 
-			fDraggedChartMovePos = new Point(event.x, event.y);
+			fDraggedChartDraggedPos = new Point(event.x, event.y);
 
 			isChartDirty = true;
 
@@ -4119,7 +4105,7 @@ public class ChartComponentGraph extends Canvas {
 
 			} else if (fChart.fXMarkerDraggingListener != null && isSynchMarkerHit(devXGraph)) {
 
-				setCursor(cursorMoveXMarker);
+				setCursor(cursorDragged);
 
 			} else if (isBarHit(devYMouse, devXGraph)) {
 
@@ -4209,7 +4195,7 @@ public class ChartComponentGraph extends Canvas {
 
 				setCursor(null);
 
-				updateDraggedChart();
+				updateDraggedChart(fDraggedChartDraggedPos.x - fDraggedChartStartPos.x);
 			}
 
 			// show scroll cursor if mouse up was not over the slider
@@ -4220,6 +4206,66 @@ public class ChartComponentGraph extends Canvas {
 			}
 		}
 
+	}
+
+	private void onMouseWheel(final Event event) {
+
+		if (fChart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+
+			// mouse mode: move slider
+
+			if (event.count < 0) {
+				event.keyCode = SWT.ARROW_RIGHT;
+			} else {
+				event.keyCode = SWT.ARROW_LEFT;
+			}
+
+			/*
+			 * set focus when the mouse is over the chart and the mousewheel is scrolled,
+			 */
+			if (isFocusControl() == false) {
+				forceFocus();
+			}
+
+			fChartComponents.handleLeftRightEvent(event);
+
+		} else {
+
+			// mouse mode: zoom chart
+
+			if ((event.stateMask & SWT.CONTROL) != 0) {
+
+				// scroll the chart
+
+				int devXDiff = 0;
+				if (event.count < 0) {
+					devXDiff = -10;
+				} else {
+					devXDiff = 10;
+				}
+
+				if ((event.stateMask & SWT.SHIFT) != 0) {
+					devXDiff *= 10;
+				}
+
+				updateDraggedChart(devXDiff);
+
+			} else {
+
+				// zoom the chart
+
+				if (event.count < 0) {
+					zoomOutWithMouse();
+				} else {
+					zoomInWithMouse();
+				}
+			}
+		}
+
+		/*
+		 * prevent scrolling the scrollbar, scrolling is done by the chart itself
+		 */
+		event.doit = false;
 	}
 
 	/**
@@ -4852,9 +4898,7 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 	}
 
-	private void updateDraggedChart() {
-
-		final int devXDiff = fDraggedChartMovePos.x - fDraggedChartStartPos.x;
+	private void updateDraggedChart(final int devXDiff) {
 
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
 
@@ -4877,6 +4921,9 @@ public class ChartComponentGraph extends Canvas {
 
 		updateYDataMinMaxValues();
 
+		/*
+		 * prevent to display the old chart image
+		 */
 		fIsGraphDirty = true;
 
 		fChartComponents.onResize();
@@ -5364,13 +5411,19 @@ public class ChartComponentGraph extends Canvas {
 
 				// set the position (ratio) at which the zoomed chart starts
 				fXOffsetZoomRatio = getLeftSlider().getPositionRatio();
+
+				// set the center of the chart for the position when zooming with the mouse
+				final float devVirtualWidth = fGraphZoomRatio * devVisibleChartWidth;
+				final float devXOffset = fXOffsetZoomRatio * devVirtualWidth;
+				final int devCenterPos = (int) (devXOffset + devVisibleChartWidth / 2);
+				fXOffsetMouseRatio = devCenterPos / devVirtualWidth;
 			}
 		}
 
-		// set the new graph width
-		// enforceChartImageMinMaxWidth();
-
 		handleChartResizeForSliders();
+
+		updateYDataMinMaxValues();
+
 	}
 
 	/**

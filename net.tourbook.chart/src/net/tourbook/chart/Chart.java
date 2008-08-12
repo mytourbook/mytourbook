@@ -41,31 +41,33 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class Chart extends ViewForm {
 
-	static final String					COMMAND_ID_ZOOM_IN			= "net.tourbook.chart.command.zoomIn";			//$NON-NLS-1$
-	static final String					COMMAND_ID_ZOOM_OUT			= "net.tourbook.chart.command.zoomOut";		//$NON-NLS-1$
-	static final String					COMMAND_ID_FIT_GRAPH		= "net.tourbook.chart.command.fitGraph";		//$NON-NLS-1$
+	static final String					COMMAND_ID_ZOOM_IN				= "net.tourbook.chart.command.zoomIn";				//$NON-NLS-1$
+	static final String					COMMAND_ID_ZOOM_OUT				= "net.tourbook.chart.command.zoomOut";			//$NON-NLS-1$
+	static final String					COMMAND_ID_FIT_GRAPH			= "net.tourbook.chart.command.fitGraph";			//$NON-NLS-1$
 
-	static final String					COMMAND_ID_MOUSE_MODE		= "net.tourbook.chart.command.toggleMouse";	//$NON-NLS-1$
+	static final String					COMMAND_ID_MOUSE_MODE			= "net.tourbook.chart.command.mouseMode";			//$NON-NLS-1$
 
-	static final String					COMMAND_ID_PART_NEXT		= "net.tourbook.chart.command.partNext";		//$NON-NLS-1$
-	static final String					COMMAND_ID_PART_PREVIOUS	= "net.tourbook.chart.command.partPrevious";	//$NON-NLS-1$
+	static final String					COMMAND_ID_PART_NEXT			= "net.tourbook.chart.command.partNext";			//$NON-NLS-1$
+	static final String					COMMAND_ID_PART_PREVIOUS		= "net.tourbook.chart.command.partPrevious";		//$NON-NLS-1$
 
-	static final int					NO_BAR_SELECTION			= -1;
+	static final String					COMMAND_ID_MAKE_SLIDERS_VISIBLE	= "net.tourbook.chart.command.makeSlidersVisible";	//$NON-NLS-1$
 
-	public static final int				SYNCH_MODE_NO				= 0;
-	public static final int				SYNCH_MODE_BY_SCALE			= 1;
-	public static final int				SYNCH_MODE_BY_SIZE			= 2;
+	static final int					NO_BAR_SELECTION				= -1;
 
-	static final int					GRAPH_ALPHA					= 0xd0;
+	public static final int				SYNCH_MODE_NO					= 0;
+	public static final int				SYNCH_MODE_BY_SCALE				= 1;
+	public static final int				SYNCH_MODE_BY_SIZE				= 2;
 
-	public static final String			MOUSE_MODE_SLIDER			= "slider";									//$NON-NLS-1$
-	public static final String			MOUSE_MODE_ZOOM				= "zoom";										//$NON-NLS-1$
+	static final int					GRAPH_ALPHA						= 0xd0;
 
-	private final ListenerList			fFocusListeners				= new ListenerList();
-	private final ListenerList			fBarSelectionListeners		= new ListenerList();
-	private final ListenerList			fSliderMoveListeners		= new ListenerList();
-	private final ListenerList			fBarDoubleClickListeners	= new ListenerList();
-	private final ListenerList			fDoubleClickListeners		= new ListenerList();
+	public static final String			MOUSE_MODE_SLIDER				= "slider";										//$NON-NLS-1$
+	public static final String			MOUSE_MODE_ZOOM					= "zoom";											//$NON-NLS-1$
+
+	private final ListenerList			fFocusListeners					= new ListenerList();
+	private final ListenerList			fBarSelectionListeners			= new ListenerList();
+	private final ListenerList			fSliderMoveListeners			= new ListenerList();
+	private final ListenerList			fBarDoubleClickListeners		= new ListenerList();
+	private final ListenerList			fDoubleClickListeners			= new ListenerList();
 
 	ChartComponents						fChartComponents;
 	private ChartDataModel				fChartDataModel;
@@ -76,7 +78,7 @@ public class Chart extends ViewForm {
 
 	private boolean						fShowZoomActions;
 	private boolean						fShowPartNavigation;
-	private boolean						fShowMouseMode				= false;
+	private boolean						fShowMouseMode					= false;
 
 	private Color						fBackgroundColor;
 
@@ -89,17 +91,17 @@ public class Chart extends ViewForm {
 	 * when set to <code>true</code> the toolbar is within the chart control, otherwise the toolbar
 	 * is outsite of the chart
 	 */
-	boolean								fUseInternalActionBar		= true;
+	boolean								fUseInternalActionBar			= true;
 
-	boolean								fUseActionHandlers			= false;
+	boolean								fUseActionHandlers				= false;
 
 	private int							fBarSelectionSerieIndex;
 	private int							fBarSelectionValueIndex;
 
-	private final ActionHandlerManager	fActionHandlerManager		= ActionHandlerManager.getInstance();
+	private final ActionHandlerManager	fActionHandlerManager			= ActionHandlerManager.getInstance();
 	HashMap<String, ActionProxy>		fChartActionProxies;
 
-	private boolean						fIsFillToolbar				= true;
+	private boolean						fIsFillToolbar					= true;
 	private boolean						fIsToolbarCreated;
 
 	int									fSynchMode;
@@ -107,20 +109,20 @@ public class Chart extends ViewForm {
 	/**
 	 * <code>true</code> to start the bar chart at the bottom of the chart
 	 */
-	private boolean						fDrawBarChartAtBottom		= true;
+	private boolean						fDrawBarChartAtBottom			= true;
 
 	/**
 	 * minimum width in pixel for one unit, this is only an approximate value because the pixel is
 	 * rounded up or down to fit a rounded unit
 	 */
-	protected int						gridVerticalDistance		= 30;
-	protected int						gridHorizontalDistance		= 70;
+	protected int						gridVerticalDistance			= 30;
+	protected int						gridHorizontalDistance			= 70;
 
 	/**
 	 * mouse behaviour:<br>
 	 * <br>{@link #MOUSE_MODE_SLIDER} or {@link #MOUSE_MODE_ZOOM}
 	 */
-	private String						fMouseMode					= MOUSE_MODE_SLIDER;
+	private String						fMouseMode						= MOUSE_MODE_SLIDER;
 
 	/**
 	 * Chart widget
@@ -269,7 +271,7 @@ public class Chart extends ViewForm {
 		fChartActionProxies.put(COMMAND_ID_PART_NEXT, actionProxy);
 
 		/*
-		 * Action: toggle mouse
+		 * Action: mouse moude
 		 */
 		if (useInternalActionBar) {
 			action = new ActionMouseMode(this);
@@ -278,6 +280,17 @@ public class Chart extends ViewForm {
 		}
 		actionProxy = new ActionProxy(COMMAND_ID_MOUSE_MODE, action);
 		fChartActionProxies.put(COMMAND_ID_MOUSE_MODE, actionProxy);
+
+		/*
+		 * Action: move sliders to border
+		 */
+		if (useInternalActionBar) {
+			action = new ActionMoveSlidersIntoVisibleArea(this);
+		} else {
+			action = null;
+		}
+		actionProxy = new ActionProxy(COMMAND_ID_MAKE_SLIDERS_VISIBLE, action);
+		fChartActionProxies.put(COMMAND_ID_MAKE_SLIDERS_VISIBLE, actionProxy);
 
 		updateActionState();
 	}
@@ -304,6 +317,7 @@ public class Chart extends ViewForm {
 	}
 
 	void fillContextMenu(final IMenuManager menuMgr) {
+
 		if (fChartContextProvider != null) {
 			fChartContextProvider.fillContextMenu(menuMgr);
 		}
@@ -326,6 +340,12 @@ public class Chart extends ViewForm {
 			}
 
 		} else {
+			
+			menuMgr.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
+			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MAKE_SLIDERS_VISIBLE).getAction());
+			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOUSE_MODE).getAction());
+			menuMgr.add(new Separator());
+			
 			// create the menu for line charts
 			if (fChartContextProvider != null) {
 				fChartContextProvider.fillXSliderContextMenu(menuMgr, leftSlider, rightSlider);
@@ -359,10 +379,11 @@ public class Chart extends ViewForm {
 
 				if (fShowMouseMode) {
 					tbm.add(fChartActionProxies.get(COMMAND_ID_MOUSE_MODE).getAction());
+				} else {
+					tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
+					tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).getAction());
 				}
 
-				tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
-				tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).getAction());
 				tbm.add(fChartActionProxies.get(COMMAND_ID_FIT_GRAPH).getAction());
 			}
 
@@ -596,6 +617,10 @@ public class Chart extends ViewForm {
 		zoomOut(true);
 	}
 
+	public void onExecuteMakeSlidersVisible() {
+		fChartComponents.getChartComponentGraph().makeSlidersVisible();
+	}
+
 	public void onExecuteMouseMode(final boolean isChecked) {
 		setMouseMode(isChecked);
 	}
@@ -754,6 +779,16 @@ public class Chart extends ViewForm {
 		}
 	}
 
+//	/**
+//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
+//	 * when the workbench action should be used.
+//	 * 
+//	 * @param useInternalActionBar
+//	 */
+//	public void setUseInternalActionBar(boolean useInternalActionBar) {
+//		fUseInternalActionBar = useInternalActionBar;
+//	}
+
 	/**
 	 * Select (highlight) the bar in the bar chart
 	 * 
@@ -782,16 +817,6 @@ public class Chart extends ViewForm {
 
 		fireBarSelectionEvent(0, fBarSelectionValueIndex);
 	}
-
-//	/**
-//	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
-//	 * when the workbench action should be used.
-//	 * 
-//	 * @param useInternalActionBar
-//	 */
-//	public void setUseInternalActionBar(boolean useInternalActionBar) {
-//		fUseInternalActionBar = useInternalActionBar;
-//	}
 
 	/**
 	 * @param isMarkerVisible
