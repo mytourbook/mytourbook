@@ -486,6 +486,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		addPartListener();
 		addSelectionListener();
 
+		enableActions();
+
 		restoreState(fSessionMemento);
 		reloadViewer();
 	}
@@ -945,6 +947,7 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 	private void enableActions() {
 
 		final StructuredSelection selection = (StructuredSelection) fTagViewer.getSelection();
+		final int treeItems = fTagViewer.getTree().getItemCount();
 
 		/*
 		 * count number of selected items
@@ -1037,12 +1040,14 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		 * is not a category
 		 */
 		fActionSetTagStructure.setEnabled(isTagSelected || (items == 1 && categoryItems == 0));
+		fActionSetAllTagStructures.setEnabled(treeItems > 0);
 
 		fActionExpandSelection.setEnabled(firstElement == null ? false : //
 				selectedItems == 1 ? firstElementHasChildren : //
 						true);
 
 		fActionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
+		fActionCollapseAll.setEnabled(treeItems > 0);
 
 		// enable/disable actions for the recent tags
 		TagManager.enableRecentTagActions(isTourSelected);

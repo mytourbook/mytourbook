@@ -693,14 +693,28 @@
 
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+            
          <toolbar
                id="net.tourbook.toolbars.tourViews">
+            
             <command
                   commandId="net.tourbook.command.selectedTour"
                   icon="icons/tour-chart.gif"
                   label="%command_view_selectedTour"
                   mnemonic="%command_view_selectedTour_mnemonic"
                   tooltip="%command_view_selectedTour_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.mapping.command.tourMap"
+                  icon="icons/earth-globe-abstract.png"
+                  label="%command_tour_map_name"
+                  tooltip="%command_tour_map_name_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.mapping.command.taggingView"
+                  icon="icons/tour-tag.gif"
+                  label="%command_tagging_name"
+                  tooltip="%command_tagging_name_tooltip">
             </command>
             <command
                   commandId="net.tourbook.command.tourProperties"
@@ -717,9 +731,10 @@
                   style="push"
                   tooltip="%command_tourChart_tool_graphAnalyzer_tooltip">
             </command>
-         </toolbar>
          
+         </toolbar>
       </menuContribution>
+
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
@@ -829,13 +844,8 @@
       
       <menuContribution
             locationURI="toolbar:net.tourbook.toolbars.tourViews?after=additions">
-         <command
-               commandId="net.tourbook.mapping.command.tourMap"
-               icon="icons/earth-globe-abstract.png"
-               label="%command_tour_map_name"
-               tooltip="%command_tour_map_name_tooltip">
-         </command>
       </menuContribution>
+      
       <menuContribution
             locationURI="menu:views?before=defaultViews">
          <command
@@ -990,6 +1000,11 @@
             defaultHandler="net.tourbook.mapping.ActionHandlerOpenTourMapView"
             id="net.tourbook.mapping.command.tourMap"
             name="%command_tour_map_name">
+      </command>
+      <command
+            defaultHandler="net.tourbook.ui.views.tagging.ActionHandlerOpenTaggingView"
+            id="net.tourbook.mapping.command.taggingView"
+            name="%command_tagging_name">
       </command>
    </extension>
    

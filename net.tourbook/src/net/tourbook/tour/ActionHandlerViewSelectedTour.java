@@ -31,7 +31,7 @@ public class ActionHandlerViewSelectedTour extends AbstractHandler {
 		try {
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TourChartView.ID,
 					null,
-					IWorkbenchPage.VIEW_VISIBLE);
+					IWorkbenchPage.VIEW_ACTIVATE);
 
 		} catch (final PartInitException e) {
 			e.printStackTrace();

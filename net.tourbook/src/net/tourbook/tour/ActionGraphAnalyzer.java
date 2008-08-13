@@ -48,7 +48,7 @@ public class ActionGraphAnalyzer extends Action {
 
 		if (window != null) {
 			try {
-				window.getActivePage().showView(TourChartAnalyzerView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+				window.getActivePage().showView(TourChartAnalyzerView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
 				// create a new selection to update the analyzer view
 				fChart.fireSliderMoveEvent();

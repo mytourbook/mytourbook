@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.mapping;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -30,7 +29,7 @@ public class ActionHandlerOpenTourMapView extends AbstractHandler {
 		try {
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(MappingView.ID,
 					null,
-					IWorkbenchPage.VIEW_VISIBLE);
+					IWorkbenchPage.VIEW_ACTIVATE);
 
 		} catch (final PartInitException e) {
 			e.printStackTrace();

@@ -49,7 +49,7 @@ public class ActionTourSegmenter extends Action {
 
 		if (window != null) {
 			try {
-				window.getActivePage().showView(TourSegmenterView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+				window.getActivePage().showView(TourSegmenterView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
 				fTourChart.fireTourChartSelection();
 

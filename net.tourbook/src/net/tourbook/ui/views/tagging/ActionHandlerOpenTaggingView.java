@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,9 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.tour;
-
-import net.tourbook.ui.views.TourSegmenterView;
+package net.tourbook.ui.views.tagging;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -24,19 +22,18 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-public class ActionHandlerViewTourSegmenter extends AbstractHandler {
+public class ActionHandlerOpenTaggingView extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TourSegmenterView.ID,
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TagView.ID,
 					null,
 					IWorkbenchPage.VIEW_ACTIVATE);
 
 		} catch (final PartInitException e) {
 			e.printStackTrace();
 		}
-
 		return null;
 	}
 
