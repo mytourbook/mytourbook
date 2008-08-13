@@ -361,6 +361,13 @@ public class ChartComponentGraph extends Canvas {
 	protected boolean					fIsLayerImageDirty;
 	private ChartToolTipInfo			fToolTipInfo;
 
+	/*
+	 * position of the mouse in the mouse down event
+	 */
+	private int							fMouseDownPositionX;
+
+//	private int							fMouseDownPositionY;
+
 	/**
 	 * Constructor
 	 * 
@@ -3571,7 +3578,37 @@ public class ChartComponentGraph extends Canvas {
 		return null;
 	}
 
-	void makeSlidersVisible() {
+	/**
+	 * moves the right slider to the mouse position
+	 */
+	void moveLeftSliderHere() {
+
+		final ChartXSlider leftSlider = getLeftSlider();
+		final int devRightPosition = fDevGraphImageXOffset + fMouseDownPositionX;
+
+		computeXSliderValue(leftSlider, devRightPosition);
+		leftSlider.moveToDevPosition(devRightPosition, true, true);
+
+		fIsSliderDirty = true;
+		redraw();
+	}
+
+	/**
+	 * moves the left slider to the mouse position
+	 */
+	void moveRightSliderHere() {
+
+		final ChartXSlider rightSlider = getRightSlider();
+		final int devRightPosition = fDevGraphImageXOffset + fMouseDownPositionX;
+
+		computeXSliderValue(rightSlider, devRightPosition);
+		rightSlider.moveToDevPosition(devRightPosition, true, true);
+
+		fIsSliderDirty = true;
+		redraw();
+	}
+
+	void moveSlidersToBorder() {
 
 		/*
 		 * adjust left slider
@@ -3592,7 +3629,6 @@ public class ChartComponentGraph extends Canvas {
 		rightSlider.moveToDevPosition(devRightPosition, true, true);
 
 		fIsSliderDirty = true;
-
 		redraw();
 	}
 
@@ -3791,6 +3827,9 @@ public class ChartComponentGraph extends Canvas {
 		final int devXMouse = event.x;
 		final int devYMouse = event.y;
 		final int devXGraph = hBarOffset + devXMouse;
+
+		fMouseDownPositionX = event.x;
+//		fMouseDownPositionY = event.y;
 
 		if (event.button != 1) {
 			if (event.button == 3) {

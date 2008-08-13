@@ -17,20 +17,20 @@ package net.tourbook.chart;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionMoveSlidersIntoVisibleArea extends Action {
+public class ActionMoveLeftSliderHere extends Action {
 
 	private Chart	fChart;
 
-	public ActionMoveSlidersIntoVisibleArea(final Chart chart) {
+	public ActionMoveLeftSliderHere(final Chart chart) {
 
 		fChart = chart;
 
-		setText(Messages.Action_make_sliders_visible);
+		setText(Messages.Action_move_left_slider_here);
 	}
 
 	@Override
 	public void run() {
-		fChart.onExecuteMoveSlidersToBorder();
+		fChart.onExecuteMoveLeftSliderHere();
 	}
 
 }
