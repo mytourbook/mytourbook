@@ -630,11 +630,11 @@ public class TourChart extends Chart {
 		setCanAutoZoomToSlider(isItemChecked);
 
 		// apply setting to the chart
-		if (isItemChecked) {
-			zoomInWithSlider();
-		} else {
-			zoomOut(true);
-		}
+//		if (isItemChecked) {
+//			zoomInWithSlider();
+//		} else {
+//			zoomOut(true);
+//		}
 
 		updateZoomOptionActionHandlers();
 	}
