@@ -50,11 +50,9 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		setMenuCreator(this);
 	}
 
-	@Override
-	public void runWithEvent(final Event event) {
-
-		// show the drop-down menu, this only works in the runWithEvent not in the run method
-		getMenuCreator().getMenu(fTBM.getControl()).setVisible(true);
+	private void addItem(final Action action) {
+		final ActionContributionItem item = new ActionContributionItem(action);
+		item.fill(fMenu, -1);
 	}
 
 	public void dispose() {
@@ -73,19 +71,21 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 		addItem(actionProxies.get(TourChart.COMMAND_ID_SHOW_START_TIME).getAction());
 		(new Separator()).fill(fMenu, -1);
 
-		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_SCROLL_CHART).getAction());
+//		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_SCROLL_CHART).getAction());
 		addItem(actionProxies.get(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).getAction());
 
 		return fMenu;
 	}
 
-	private void addItem(final Action action) {
-		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(fMenu, -1);
-	}
-
 	public Menu getMenu(final Menu parent) {
 		return null;
+	}
+
+	@Override
+	public void runWithEvent(final Event event) {
+
+		// show the drop-down menu, this only works in the runWithEvent not in the run method
+		getMenuCreator().getMenu(fTBM.getControl()).setVisible(true);
 	}
 
 }

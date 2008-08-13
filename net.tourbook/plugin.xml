@@ -94,7 +94,7 @@
             id="net.tourbook.preferences.PrefPageStatistic"
             name="%preference_page_Statistics"/>
       <page
-            class="net.tourbook.preferences.PrefPageChartGraphs"
+            class="net.tourbook.preferences.PrefPageTourChart"
             id="net.tourbook.preferences.PrefPageChartGraphs"
             name="%preference_page_Graphs"/>
       <page

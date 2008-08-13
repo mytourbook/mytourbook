@@ -59,7 +59,7 @@ public class TourChart extends Chart {
 
 	static final String						COMMAND_ID_CHART_OPTIONS			= "net.tourbook.command.tourChart.options";			//$NON-NLS-1$
 	static final String						COMMAND_ID_SHOW_START_TIME			= "net.tourbook.command.tourChart.showStartTime";		//$NON-NLS-1$
-	static final String						COMMAND_ID_CAN_SCROLL_CHART			= "net.tourbook.command.tourChart.canScrollChart";		//$NON-NLS-1$
+//	static final String						COMMAND_ID_CAN_SCROLL_CHART			= "net.tourbook.command.tourChart.canScrollChart";		//$NON-NLS-1$
 	static final String						COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER	= "net.tourbook.command.tourChart.canAutoZoomToSlider"; //$NON-NLS-1$
 
 	static final String						COMMAND_ID_X_AXIS_DISTANCE			= "net.tourbook.command.tourChart.xAxisDistance";		//$NON-NLS-1$
@@ -196,8 +196,9 @@ public class TourChart extends Chart {
 				boolean isChartModified = false;
 				boolean keepMinMax = true;
 
-				if (property.equals(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH)
-						|| property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
+				if (/*
+					 * property.equals(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH) ||
+					 */property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
 
 					// zoom preferences has changed
 
@@ -498,13 +499,13 @@ public class TourChart extends Chart {
 		fActionProxies.put(COMMAND_ID_SHOW_START_TIME, new TCActionProxy(COMMAND_ID_SHOW_START_TIME,
 				useInternalActionBar ? new ActionShowStartTime(this) : null));
 
-		/*
-		 * Action: can scroll zoomed chart
-		 */
-		actionProxy = new TCActionProxy(COMMAND_ID_CAN_SCROLL_CHART, useInternalActionBar
-				? new ActionCanScrollZoomedChart(this)
-				: null);
-		fActionProxies.put(COMMAND_ID_CAN_SCROLL_CHART, actionProxy);
+//		/*
+//		 * Action: can scroll zoomed chart
+//		 */
+//		actionProxy = new TCActionProxy(COMMAND_ID_CAN_SCROLL_CHART, useInternalActionBar
+//				? new ActionCanScrollZoomedChart(this)
+//				: null);
+//		fActionProxies.put(COMMAND_ID_CAN_SCROLL_CHART, actionProxy);
 
 		/*
 		 * Action: auto zoom to slider
@@ -924,14 +925,13 @@ public class TourChart extends Chart {
 			// disable chart synchronization
 
 			// enable zoom action
-			actionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setChecked(synchedChart.getCanScrollZoomedChart());
+//			actionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setChecked(synchedChart.getCanScrollZoomedChart());
 			actionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setChecked(synchedChart.getCanAutoZoomToSlider());
 
 			synchedChart.setZoomActionsEnabled(true);
 			synchedChart.updateZoomOptions(true);
 
 			// restore the x-sliders
-//			synchedChart.setShowSlider(fBackupIsXSliderVisible);
 			synchedChart.setShowSlider(true);
 
 			synchedChart.setSynchConfig(null);
@@ -1167,7 +1167,7 @@ public class TourChart extends Chart {
 	 */
 	void updateZoomOptionActionHandlers() {
 
-		setCommandChecked(TourChart.COMMAND_ID_CAN_SCROLL_CHART, getCanScrollZoomedChart());
+//		setCommandChecked(TourChart.COMMAND_ID_CAN_SCROLL_CHART, getCanScrollZoomedChart());
 		setCommandChecked(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, getCanAutoZoomToSlider());
 	}
 
@@ -1184,8 +1184,8 @@ public class TourChart extends Chart {
 		setCanScrollZoomedChart(canScrollZoomedChart);
 		setCanAutoZoomToSlider(canAutoZoomToSlider);
 
-		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setEnabled(true);
-		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setChecked(canScrollZoomedChart);
+//		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setEnabled(true);
+//		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setChecked(canScrollZoomedChart);
 
 		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(true);
 		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setChecked(canAutoZoomToSlider);
@@ -1198,7 +1198,7 @@ public class TourChart extends Chart {
 	 */
 	private void updateZoomOptions(final boolean isEnabled) {
 
-		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setEnabled(isEnabled);
+//		fActionProxies.get(COMMAND_ID_CAN_SCROLL_CHART).setEnabled(isEnabled);
 		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(isEnabled);
 	}
 

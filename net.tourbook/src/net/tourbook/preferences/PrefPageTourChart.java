@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageTourChart extends PreferencePage implements IWorkbenchPreferencePage {
 
 	private static final int		COLUMN_INDENT		= 20;
 
@@ -79,7 +79,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 	private Button					fRdoShowTime;
 	private Button					fChkShowStartTime;
 
-	private Button					fChkScrollZoomedChart;
+//	private Button					fChkScrollZoomedChart;
 	private Button					fChkZoomToSlider;
 
 	private BooleanFieldEditor		fEditAltimeterMinCheckbox;
@@ -123,7 +123,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 		final TabItem tabZoom = new TabItem(tabFolder, SWT.NONE);
 		tabZoom.setText(Messages.Pref_Graphs_Tab_zoom_options);
-		tabZoom.setControl(createTabZoomOptions(tabFolder));
+		tabZoom.setControl(createTabOptions(tabFolder));
 
 		enableActions();
 
@@ -246,7 +246,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		return container;
 	}
 
-	private Control createTabZoomOptions(final Composite parent) {
+	private Control createTabOptions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.swtDefaults().applyTo(container);
@@ -529,18 +529,18 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupZoomOptions);
 		GridLayoutFactory.swtDefaults().applyTo(groupZoomOptions);
 
-		// checkbox: scroll zoomed chart
-		fChkScrollZoomedChart = new Button(groupZoomOptions, SWT.CHECK);
-		fChkScrollZoomedChart.setText(Messages.Pref_Graphs_Check_scroll_zoomed_chart);
-		fChkScrollZoomedChart.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH));
-		fChkScrollZoomedChart.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				if (fChkScrollZoomedChart.getSelection()) {
-					fChkZoomToSlider.setSelection(false);
-				}
-			}
-		});
+//		// checkbox: scroll zoomed chart
+//		fChkScrollZoomedChart = new Button(groupZoomOptions, SWT.CHECK);
+//		fChkScrollZoomedChart.setText(Messages.Pref_Graphs_Check_scroll_zoomed_chart);
+//		fChkScrollZoomedChart.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH));
+//		fChkScrollZoomedChart.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(final SelectionEvent event) {
+//				if (fChkScrollZoomedChart.getSelection()) {
+//					fChkZoomToSlider.setSelection(false);
+//				}
+//			}
+//		});
 
 		// checkbox: auto zoom to moved slider
 		fChkZoomToSlider = new Button(groupZoomOptions, SWT.CHECK);
@@ -550,7 +550,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				if (fChkZoomToSlider.getSelection()) {
-					fChkScrollZoomedChart.setSelection(false);
+//					fChkScrollZoomedChart.setSelection(false);
 				}
 			}
 		});
@@ -704,7 +704,7 @@ public class PrefPageChartGraphs extends PreferencePage implements IWorkbenchPre
 
 		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, fChkShowStartTime.getSelection());
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH, fChkScrollZoomedChart.getSelection());
+//		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH, fChkScrollZoomedChart.getSelection());
 		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, fChkZoomToSlider.getSelection());
 
 		fEditAltimeterMinCheckbox.store();

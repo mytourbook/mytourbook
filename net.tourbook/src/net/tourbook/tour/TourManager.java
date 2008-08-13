@@ -370,18 +370,18 @@ public class TourManager {
 												final IPreferenceStore prefStore) {
 
 		// get pref store settings
-		boolean scrollZoomedGraph = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH);
-		boolean autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
+//		boolean scrollZoomedGraph = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH);
+		final boolean autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
 
-		// prevent setting both zoom options to true
-		if (scrollZoomedGraph) {
-			autoZoomToSlider = false;
-		}
-		if (autoZoomToSlider) {
-			scrollZoomedGraph = false;
-		}
-
-		chartConfig.scrollZoomedGraph = scrollZoomedGraph;
+//		// prevent setting both zoom options to true
+//		if (scrollZoomedGraph) {
+//			autoZoomToSlider = false;
+//		}
+//		if (autoZoomToSlider) {
+//			scrollZoomedGraph = false;
+//		}
+//
+//		chartConfig.scrollZoomedGraph = scrollZoomedGraph;
 		chartConfig.autoZoomToSlider = autoZoomToSlider;
 	}
 

@@ -20,10 +20,10 @@ import net.tourbook.ui.HandlerUtil;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-public class ActionHandlerCanScrollChart extends TCActionHandler {
+public class ActionHandlerCanScrollChartOLD extends TCActionHandler {
 
-	public ActionHandlerCanScrollChart() {
-		fCommandId = TourChart.COMMAND_ID_CAN_SCROLL_CHART;
+	public ActionHandlerCanScrollChartOLD() {
+//		fCommandId = TourChart.COMMAND_ID_CAN_SCROLL_CHART;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
