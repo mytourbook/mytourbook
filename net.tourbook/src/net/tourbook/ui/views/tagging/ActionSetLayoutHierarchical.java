@@ -22,9 +22,9 @@ import org.eclipse.jface.action.Action;
 
 final class ActionSetLayoutHierarchical extends Action {
 
-	private TagView	fTagView;
+	private TaggingView	fTagView;
 
-	ActionSetLayoutHierarchical(final TagView tagView) {
+	ActionSetLayoutHierarchical(final TaggingView tagView) {
 
 		super(Messages.action_tagView_flat_hierarchical, AS_RADIO_BUTTON);
 
@@ -35,6 +35,6 @@ final class ActionSetLayoutHierarchical extends Action {
 
 	@Override
 	public void run() {
-		fTagView.setViewLayout(TagView.TAG_VIEW_LAYOUT_HIERARCHICAL);
+		fTagView.setViewLayout(TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL);
 	}
 }

@@ -722,6 +722,21 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		});
 
 		/*
+		 * column: max pulse
+		 */
+		colDef = TreeColumnFactory.MAX_PULSE.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				cell.setText(Long.toString(((TVITourBookItem) element).colMaxPulse));
+				setCellColor(cell, element);
+			}
+		});
+
+		/*
 		 * column: avg speed km/h - mph
 		 */
 		colDef = TreeColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
@@ -735,21 +750,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 				fNF.setMaximumFractionDigits(1);
 
 				cell.setText(fNF.format(((TVITourBookItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE));
-				setCellColor(cell, element);
-			}
-		});
-
-		/*
-		 * column: max pulse
-		 */
-		colDef = TreeColumnFactory.MAX_PULSE.createColumn(fColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-
-				cell.setText(Long.toString(((TVITourBookItem) element).colMaxPulse));
 				setCellColor(cell, element);
 			}
 		});

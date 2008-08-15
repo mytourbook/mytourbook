@@ -30,10 +30,10 @@ import net.tourbook.ui.UI;
  */
 public class TVITagViewRoot extends TVITagViewItem {
 
-	private TagView	fTagView;
+	private TaggingView	fTagView;
 	private int		fTagViewStructure;
 
-	public TVITagViewRoot(final TagView tagView, final int tagViewStructure) {
+	public TVITagViewRoot(final TaggingView tagView, final int tagViewStructure) {
 		fTagView = tagView;
 		fTagViewStructure = tagViewStructure;
 	}
@@ -55,7 +55,7 @@ public class TVITagViewRoot extends TVITagViewItem {
 			PreparedStatement statement;
 			ResultSet result;
 
-			if (fTagViewStructure == TagView.TAG_VIEW_LAYOUT_HIERARCHICAL) {
+			if (fTagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL) {
 
 				/*
 				 * get tag categories
@@ -84,9 +84,9 @@ public class TVITagViewRoot extends TVITagViewItem {
 			/*
 			 * get tags
 			 */
-			final String whereClause = fTagViewStructure == TagView.TAG_VIEW_LAYOUT_FLAT
+			final String whereClause = fTagViewStructure == TaggingView.TAG_VIEW_LAYOUT_FLAT
 					? UI.EMPTY_STRING
-					: fTagViewStructure == TagView.TAG_VIEW_LAYOUT_HIERARCHICAL ? //
+					: fTagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL ? //
 							" WHERE isRoot = 1" //$NON-NLS-1$
 							: UI.EMPTY_STRING;
 
@@ -126,7 +126,7 @@ public class TVITagViewRoot extends TVITagViewItem {
 		}
 	}
 
-	public TagView getTagView() {
+	public TaggingView getTagView() {
 		return fTagView;
 	}
 

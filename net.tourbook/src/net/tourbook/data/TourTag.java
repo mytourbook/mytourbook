@@ -62,7 +62,7 @@ public class TourTag implements Comparable<Object> {
 	 * when a tag is expanded in the tag tree viewer, the tours can be displayed in different
 	 * structures
 	 */
-	private int						expandType					= EXPAND_TYPE_YEAR_MONTH_DAY;
+	private int						expandType					= EXPAND_TYPE_FLAT;
 
 	@ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
 	private Set<TourData>			tourData					= new HashSet<TourData>();

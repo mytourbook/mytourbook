@@ -22,7 +22,7 @@ import javax.persistence.EntityManager;
 import net.tourbook.Messages;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.views.tagging.TagView;
+import net.tourbook.ui.views.tagging.TaggingView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -39,7 +39,7 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 
 	private Menu	fMenu;
 
-	private TagView	fTagView;
+	private TaggingView	fTagView;
 
 	private class ActionSetTagStructure extends Action {
 
@@ -108,7 +108,7 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 		}
 	}
 
-	public ActionMenuSetAllTagStructures(final TagView tagView) {
+	public ActionMenuSetAllTagStructures(final TaggingView tagView) {
 
 		super(Messages.action_tag_set_all_tag_structures, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);

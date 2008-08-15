@@ -27,7 +27,7 @@ public class ActionHandlerOpenTaggingView extends AbstractHandler {
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TagView.ID,
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TaggingView.ID,
 					null,
 					IWorkbenchPage.VIEW_ACTIVATE);
 

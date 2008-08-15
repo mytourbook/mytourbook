@@ -104,7 +104,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
-public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
+public class TaggingView extends ViewPart implements ISelectedTours, ITourViewer {
 
 	static public final String				ID								= "net.tourbook.views.tagViewID";	//$NON-NLS-1$
 
@@ -861,6 +861,28 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 		});
 
 		/*
+		 * column: avg speed km/h - mph
+		 */
+		colDef = TreeColumnFactory.AVG_SPEED.createColumn(fColumnManager, pixelConverter);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				fNF.setMinimumFractionDigits(1);
+				fNF.setMaximumFractionDigits(1);
+
+				final float colAvgSpeed = ((TVITagViewItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
+				if (colAvgSpeed != 0) {
+
+					cell.setText(fNF.format(colAvgSpeed));
+					setCellColor(cell, element);
+				}
+			}
+		});
+
+		/*
 		 * column: avg pulse
 		 */
 		colDef = TreeColumnFactory.AVG_PULSE.createColumn(fColumnManager, pixelConverter);
@@ -1244,8 +1266,8 @@ public class TagView extends ViewPart implements ISelectedTours, ITourViewer {
 
 		// set default tag view layout
 		if (fTagViewLayout == -1) {
-			fTagViewLayout = TAG_VIEW_LAYOUT_FLAT;
-			fActionSetLayoutFlat.setChecked(true);
+			fTagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
+			fActionSetLayoutHierarchical.setChecked(true);
 		}
 	}
 

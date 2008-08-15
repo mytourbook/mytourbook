@@ -25,9 +25,9 @@ import org.eclipse.jface.action.Action;
 
 final class ActionSetLayoutFlat extends Action {
 
-	private TagView	fTagView;
+	private TaggingView	fTagView;
 
-	ActionSetLayoutFlat(final TagView tagView) {
+	ActionSetLayoutFlat(final TaggingView tagView) {
 
 		super(Messages.action_tagView_flat_layout, AS_RADIO_BUTTON);
 
@@ -38,6 +38,6 @@ final class ActionSetLayoutFlat extends Action {
 
 	@Override
 	public void run() {
-		fTagView.setViewLayout(TagView.TAG_VIEW_LAYOUT_FLAT);
+		fTagView.setViewLayout(TaggingView.TAG_VIEW_LAYOUT_FLAT);
 	}
 }
