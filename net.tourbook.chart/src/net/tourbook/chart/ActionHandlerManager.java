@@ -128,8 +128,7 @@ public class ActionHandlerManager {
 
 		fActionHandlers.put(Chart.COMMAND_ID_ZOOM_IN, new ActionHandlerZoomIn());
 		fActionHandlers.put(Chart.COMMAND_ID_ZOOM_OUT, new ActionHandlerZoomOut());
-
-		fActionHandlers.put(Chart.COMMAND_ID_FIT_GRAPH, new ActionHandlerZoomFitGraph());
+		fActionHandlers.put(Chart.COMMAND_ID_ZOOM_FIT_GRAPH, new ActionHandlerZoomFitGraph());
 
 		fActionHandlers.put(Chart.COMMAND_ID_PART_PREVIOUS, new ActionHandlerPartPrevious());
 		fActionHandlers.put(Chart.COMMAND_ID_PART_NEXT, new ActionHandlerPartNext());

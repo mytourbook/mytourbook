@@ -21,7 +21,7 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerZoomFitGraph extends ActionHandler {
 
 	public ActionHandlerZoomFitGraph() {
-		fCommandId = Chart.COMMAND_ID_FIT_GRAPH;
+		fCommandId = Chart.COMMAND_ID_ZOOM_FIT_GRAPH;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {

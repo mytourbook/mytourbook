@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -28,12 +28,17 @@ public class SelectionChartInfo implements ISelection {
 
 	public int							leftSliderValuesIndex;
 	public int							rightSliderValuesIndex;
+	public int							selectedSliderValuesIndex;
 
-	@SuppressWarnings("unused") //$NON-NLS-1$
+	@SuppressWarnings("unused")//$NON-NLS-1$
 	private SelectionChartInfo() {}
 
-	public SelectionChartInfo(Chart chart) {
+	public SelectionChartInfo(final Chart chart) {
 		fChart = chart;
+	}
+
+	public Chart getChart() {
+		return fChart;
 	}
 
 	public boolean isEmpty() {
@@ -42,16 +47,11 @@ public class SelectionChartInfo implements ISelection {
 
 	@Override
 	public String toString() {
-		String string = super.toString()
-				+ " l:" //$NON-NLS-1$
+		final String string = super.toString() + " l:" //$NON-NLS-1$
 				+ leftSliderValuesIndex
 				+ " r:" //$NON-NLS-1$
 				+ rightSliderValuesIndex;
 		return string;
-	}
-
-	public Chart getChart() {
-		return fChart;
 	}
 
 }

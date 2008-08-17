@@ -152,6 +152,12 @@ public class ChartComponentGraph extends Canvas {
 	boolean								canAutoZoomToSlider;
 
 	/**
+	 * when <code>true</code> the vertical sliders will be moved to the border when the chart is
+	 * zoomed
+	 */
+	boolean								canMoveSlidersWhenZoomed;
+
+	/**
 	 * true indicates the graph needs to be redrawn in the paint event
 	 */
 	private boolean						fIsGraphDirty;
@@ -3300,6 +3306,16 @@ public class ChartComponentGraph extends Canvas {
 		return xSliderA.getDevVirtualSliderLinePos() < xSliderB.getDevVirtualSliderLinePos() ? xSliderB : xSliderA;
 	}
 
+	ChartXSlider getSelectedSlider() {
+
+		final ChartXSlider slider = fSelectedXSlider;
+
+		if (slider == null) {
+			return getLeftSlider();
+		}
+		return slider;
+	}
+
 	private ChartToolTipInfo getToolTipInfo(final int x, final int y) {
 
 		if (fHoveredBarSerieIndex != -1) {
@@ -3608,7 +3624,11 @@ public class ChartComponentGraph extends Canvas {
 		redraw();
 	}
 
-	void moveSlidersToBorder() {
+	private void moveSlidersToBorder() {
+
+		if (canMoveSlidersWhenZoomed == false || fChart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+			return;
+		}
 
 		/*
 		 * adjust left slider
@@ -3687,7 +3707,6 @@ public class ChartComponentGraph extends Canvas {
 			} else {
 				return;
 			}
-			;
 		}
 
 		if ((event.stateMask & SWT.SHIFT) != 0 && (event.stateMask & SWT.CONTROL) == 0) {
@@ -3789,8 +3808,6 @@ public class ChartComponentGraph extends Canvas {
 
 				// mouse mode: move slider
 
-//				fChart.fireDoubleClick();
-
 				// switch to mouse zoom mode
 				fChart.setMouseMode(false);
 			}
@@ -3805,6 +3822,7 @@ public class ChartComponentGraph extends Canvas {
 			fXOffsetMouseRatio = (float) devMousePosInChart / fDevVirtualGraphImageWidth;
 
 			zoomInWithMouse();
+			moveSlidersToBorder();
 		}
 	}
 
@@ -4174,8 +4192,6 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onMouseUp(final MouseEvent event) {
 
-//		System.out.println("onMouseUp");
-
 		final ScrollBar hBar = getHorizontalBar();
 		final int hBarOffset = hBar.isVisible() ? hBar.getSelection() : 0;
 
@@ -4201,7 +4217,7 @@ public class ChartComponentGraph extends Canvas {
 					getDisplay().asyncExec(new Runnable() {
 						public void run() {
 							if (!isDisposed()) {
-								fChart.zoomInWithSlider();
+								fChart.onExecuteZoomInWithSlider();
 							}
 						}
 					});
@@ -4268,6 +4284,23 @@ public class ChartComponentGraph extends Canvas {
 
 			fChartComponents.handleLeftRightEvent(event);
 
+			if (canAutoZoomToSlider) {
+
+				/*
+				 * zoom the chart
+				 */
+				Display.getCurrent().asyncExec(new Runnable() {
+					public void run() {
+
+						if (event.count < 0) {
+							zoomOutWithMouse();
+						} else {
+							zoomInWithMouse();
+						}
+					}
+				});
+			}
+
 		} else {
 
 			// mouse mode: zoom chart
@@ -4298,6 +4331,8 @@ public class ChartComponentGraph extends Canvas {
 				} else {
 					zoomInWithMouse();
 				}
+
+				moveSlidersToBorder();
 			}
 		}
 
@@ -4532,6 +4567,10 @@ public class ChartComponentGraph extends Canvas {
 		if (canAutoZoomToSlider) {
 			this.canScrollZoomedChart = false;
 		}
+	}
+
+	void setCanMoveSlidersWhenZoomed(final boolean canMoveSlidersWhenZoomed) {
+		this.canMoveSlidersWhenZoomed = canMoveSlidersWhenZoomed;
 	}
 
 	/**
@@ -4966,6 +5005,8 @@ public class ChartComponentGraph extends Canvas {
 		fIsGraphDirty = true;
 
 		fChartComponents.onResize();
+
+		moveSlidersToBorder();
 	}
 
 	/**
