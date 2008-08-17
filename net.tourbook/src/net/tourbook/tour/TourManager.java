@@ -369,20 +369,8 @@ public class TourManager {
 	static void updateZoomOptionsInChartConfig(	final TourChartConfiguration chartConfig,
 												final IPreferenceStore prefStore) {
 
-		// get pref store settings
-//		boolean scrollZoomedGraph = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH);
-		final boolean autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
-
-//		// prevent setting both zoom options to true
-//		if (scrollZoomedGraph) {
-//			autoZoomToSlider = false;
-//		}
-//		if (autoZoomToSlider) {
-//			scrollZoomedGraph = false;
-//		}
-//
-//		chartConfig.scrollZoomedGraph = scrollZoomedGraph;
-		chartConfig.autoZoomToSlider = autoZoomToSlider;
+		chartConfig.autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
+		chartConfig.moveSlidersWhenZoomed = prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED);
 	}
 
 	private TourManager() {}

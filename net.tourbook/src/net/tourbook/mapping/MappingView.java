@@ -107,6 +107,7 @@ public class MappingView extends ViewPart {
 	private static final String						MEMENTO_ZOOM_CENTERED				= "action.zoom-centered";					//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_IN_MAP			= "action.show-tour-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "action.synch-with-selected-tour";		//$NON-NLS-1$
+	private static final String						MEMENTO_SYNCH_WITH_TOURCHART_SLIDER	= "action.synch-with-tourchart-slider";	//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "synch-tour-zoom-level";					//$NON-NLS-1$
 	private static final String						MEMENTO_CURRENT_FACTORY_ID			= "current.factory-id";					//$NON-NLS-1$
 
@@ -145,6 +146,7 @@ public class MappingView extends ViewPart {
 	private ActionShowStartEndInMap					fActionShowStartEndInMap;
 	private ActionShowTourMarker					fActionShowTourMarker;
 	private ActionSynchWithTour						fActionSynchWithTour;
+	private ActionSynchWithSlider					fActionSynchWithSlider;
 	private ActionSynchTourZoomLevel				fActionSynchTourZoomLevel;
 	private ActionTourColor							fActionTourColorAltitude;
 	private ActionTourColor							fActionTourColorGradient;
@@ -158,6 +160,7 @@ public class MappingView extends ViewPart {
 	private ActionZoomShowEntireTour				fActionZoomShowEntireTour;
 
 	private boolean									fIsMapSynchedWithTour;
+	private boolean									fIsMapSynchedWithSlider;
 	private boolean									fIsPositionCentered;
 
 	private List<MapProvider>						fTileFactories;
@@ -174,11 +177,12 @@ public class MappingView extends ViewPart {
 
 	private final DirectMappingPainter				fDirectMappingPainter				= new DirectMappingPainter();
 
-	/**
-	 * current position for the x-slider
+	/*
+	 * current position for the x-sliders
 	 */
 	private int										fCurrentLeftSliderValueIndex;
 	private int										fCurrentRightSliderValueIndex;
+	private int										fCurrentSelectedSliderValueIndex;
 
 	private MapLegend								fMapLegend;
 	private final HashMap<Integer, ILegendProvider>	fLegendProviders					= new HashMap<Integer, ILegendProvider>();
@@ -276,6 +280,26 @@ public class MappingView extends ViewPart {
 		fMap.redraw();
 	}
 
+	void actionSynchWithSlider() {
+
+		fIsMapSynchedWithSlider = fActionSynchWithSlider.isChecked();
+
+		if (fIsMapSynchedWithSlider) {
+
+			fActionShowTourInMap.setChecked(true);
+
+			// map must be synched with selected tour
+			fActionSynchWithTour.setChecked(true);
+			fIsMapSynchedWithTour = true;
+
+			fMap.setShowOverlays(true);
+
+			paintTour(fTourData, false, false);
+			
+			setMapToSliderBounds(fTourData);
+		}
+	}
+
 	void actionSynchWithTour() {
 
 		fIsMapSynchedWithTour = fActionSynchWithTour.isChecked();
@@ -286,6 +310,12 @@ public class MappingView extends ViewPart {
 			fMap.setShowOverlays(true);
 
 			paintTour(fTourData, true, false);
+
+		} else {
+
+			// disable synch with slider
+			fIsMapSynchedWithSlider = false;
+			fActionSynchWithSlider.setChecked(false);
 		}
 	}
 
@@ -491,8 +521,11 @@ public class MappingView extends ViewPart {
 			}
 
 			final Rectangle2D positionRect = getPositionRect(positionBounds, zoom);
-			final Point2D center = new Point2D.Double(positionRect.getX() + positionRect.getWidth() / 2,
+
+			final Point2D center = new Point2D.Double(//
+			positionRect.getX() + positionRect.getWidth() / 2,
 					positionRect.getY() + positionRect.getHeight() / 2);
+
 			final GeoPosition geoPosition = fMap.getTileFactory().pixelToGeo(center, zoom);
 
 			fMap.setCenterPosition(geoPosition);
@@ -537,6 +570,7 @@ public class MappingView extends ViewPart {
 		fActionZoomShowAll = new ActionZoomShowAll(this);
 		fActionZoomShowEntireTour = new ActionZoomShowEntireTour(this);
 		fActionSynchWithTour = new ActionSynchWithTour(this);
+		fActionSynchWithSlider = new ActionSynchWithSlider(this);
 		fActionShowTourInMap = new ActionShowTourInMap(this);
 		fActionSynchTourZoomLevel = new ActionSynchTourZoomLevel(this);
 		fActionSelectMapProvider = new ActionSelectMapProvider(this);
@@ -562,6 +596,7 @@ public class MappingView extends ViewPart {
 		viewTbm.add(fActionShowTourInMap);
 		viewTbm.add(fActionZoomShowEntireTour);
 		viewTbm.add(fActionSynchWithTour);
+		viewTbm.add(fActionSynchWithSlider);
 		viewTbm.add(new Separator());
 		viewTbm.add(fActionZoomCentered);
 		viewTbm.add(fActionZoomIn);
@@ -736,6 +771,7 @@ public class MappingView extends ViewPart {
 		fActionSynchTourZoomLevel.setEnabled(fIsTour);
 		fActionShowTourInMap.setEnabled(fIsTour);
 		fActionSynchWithTour.setEnabled(fIsTour);
+		fActionSynchWithSlider.setEnabled(fIsTour);
 
 		fActionShowStartEndInMap.setEnabled(fIsTour);
 		fActionShowTourMarker.setEnabled(fIsTour);
@@ -887,7 +923,10 @@ public class MappingView extends ViewPart {
 				paintTour(tourData, false, false);
 
 				final SelectionChartInfo chartInfo = fTourChart.getChartInfo();
-				paintTourSliders(tourData, chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+				paintTourSliders(tourData,
+						chartInfo.leftSliderValuesIndex,
+						chartInfo.rightSliderValuesIndex,
+						chartInfo.selectedSliderValuesIndex);
 			}
 
 		} else if (selection instanceof SelectionChartInfo) {
@@ -898,7 +937,10 @@ public class MappingView extends ViewPart {
 				final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 				final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
 
-				paintTourSliders(tourData, chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+				paintTourSliders(tourData,
+						chartInfo.leftSliderValuesIndex,
+						chartInfo.rightSliderValuesIndex,
+						chartInfo.selectedSliderValuesIndex);
 			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
@@ -910,11 +952,12 @@ public class MappingView extends ViewPart {
 
 			final int leftSliderValueIndex = xSliderPos.getSlider1ValueIndex();
 			int rightSliderValueIndex = xSliderPos.getSlider2ValueIndex();
+
 			rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
 					? leftSliderValueIndex
 					: rightSliderValueIndex;
 
-			paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex);
+			paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex, leftSliderValueIndex);
 
 		} else if (selection instanceof PointOfInterest) {
 
@@ -1005,6 +1048,7 @@ public class MappingView extends ViewPart {
 	 * @param tourData
 	 * @param forceRedraw
 	 * @param ignoreSynch
+	 *            when <code>true</code>, synchronization will be ignored
 	 */
 	private void paintTour(final TourData tourData, final boolean forceRedraw, final boolean ignoreSynch) {
 
@@ -1064,13 +1108,24 @@ public class MappingView extends ViewPart {
 			}
 
 			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
+
 				// use default position for the tour
 				setTourZoomLevel(tourBounds, true);
+
 			} else {
+
+//				if (fIsMapSynchedWithSlider) {
+//
+//					fMap.setZoom(tourData.mapZoomLevel);
+//					setMapToSliderBounds(tourData);
+//
+//				} else {
+
 				// position tour to the previous position
 				fMap.setZoom(tourData.mapZoomLevel);
 				fMap.setCenterPosition(new GeoPosition(tourData.mapCenterPositionLatitude,
 						tourData.mapCenterPositionLongitude));
+//				}
 			}
 		}
 
@@ -1093,7 +1148,8 @@ public class MappingView extends ViewPart {
 
 	private void paintTourSliders(	final TourData tourData,
 									final int leftSliderValuesIndex,
-									final int rightSliderValuesIndex) {
+									final int rightSliderValuesIndex,
+									final int selectedSliderIndex) {
 
 		if (isPaintDataValid(tourData) == false) {
 			showDefaultMap();
@@ -1103,6 +1159,7 @@ public class MappingView extends ViewPart {
 		fIsTour = true;
 		fCurrentLeftSliderValueIndex = leftSliderValuesIndex;
 		fCurrentRightSliderValueIndex = rightSliderValuesIndex;
+		fCurrentSelectedSliderValueIndex = selectedSliderIndex;
 
 		fDirectMappingPainter.setPaintContext(fMap,
 				fActionShowTourInMap.isChecked(),
@@ -1112,7 +1169,17 @@ public class MappingView extends ViewPart {
 				fActionShowSliderInMap.isChecked(),
 				fActionShowSliderInLegend.isChecked());
 
-		fMap.redraw();
+		if (fIsMapSynchedWithSlider) {
+
+//			fMap.setZoom(tourData.mapZoomLevel);
+			setMapToSliderBounds(tourData);
+
+			fMap.queueRedrawMap();
+
+		} else {
+
+			fMap.redraw();
+		}
 	}
 
 	private void resetMap() {
@@ -1150,6 +1217,15 @@ public class MappingView extends ViewPart {
 
 				fActionSynchWithTour.setChecked(isSynchTour);
 				fIsMapSynchedWithTour = isSynchTour;
+			}
+
+			final Integer mementoSynchSlider = memento.getInteger(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER);
+			if (mementoSynchSlider != null) {
+
+				final boolean isSynchSlider = mementoSynchSlider == 1 ? true : false;
+
+				fActionSynchWithSlider.setChecked(isSynchSlider);
+				fIsMapSynchedWithSlider = isSynchSlider;
 			}
 
 			final Integer mementoShowTour = memento.getInteger(MEMENTO_SHOW_TOUR_IN_MAP);
@@ -1292,6 +1368,7 @@ public class MappingView extends ViewPart {
 		memento.putInteger(MEMENTO_ZOOM_CENTERED, fActionZoomCentered.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SHOW_TOUR_IN_MAP, fActionShowTourInMap.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR, fActionSynchWithTour.isChecked() ? 1 : 0);
+		memento.putInteger(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, fActionSynchWithSlider.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, fActionSynchTourZoomLevel.getZoomLevel());
 
 		memento.putInteger(MEMENTO_SHOW_START_END_IN_MAP, fActionShowStartEndInMap.isChecked() ? 1 : 0);
@@ -1333,6 +1410,44 @@ public class MappingView extends ViewPart {
 
 	@Override
 	public void setFocus() {}
+
+	/**
+	 * Calculate the bounds for the tour in latitude and longitude values
+	 * 
+	 * @param tourData
+	 * @return
+	 */
+	private void setMapToSliderBounds(final TourData tourData) {
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
+
+		final double leftSliderLat = latitudeSerie[fCurrentLeftSliderValueIndex];
+		final double leftSliderLong = longitudeSerie[fCurrentLeftSliderValueIndex];
+
+		final double rightSliderLat = latitudeSerie[fCurrentRightSliderValueIndex];
+		final double rightSliderLong = longitudeSerie[fCurrentRightSliderValueIndex];
+
+		final double minLatitude = Math.min(leftSliderLat + 0, rightSliderLat + 0);
+		final double minLongitude = Math.min(leftSliderLong + 0, rightSliderLong + 0);
+
+		final double maxLatitude = Math.max(leftSliderLat + 0, rightSliderLat + 0);
+		final double maxLongitude = Math.max(leftSliderLong + 0, rightSliderLong + 0);
+
+		final double latDiff2 = (maxLatitude - minLatitude) / 2;
+		final double longDiff2 = (maxLongitude - minLongitude) / 2;
+
+		final double sliderLat = minLatitude + latDiff2 - 0;
+		final double sliderLong = minLongitude + longDiff2 - 0;
+
+//		fMap.setCenterPosition(new GeoPosition(sliderLat, sliderLong));
+//		fMap.setCenterPosition(new GeoPosition(sliderLat, leftSliderLong));
+//		fMap.setCenterPosition(new GeoPosition(leftSliderLat, leftSliderLong));
+
+		fMap.setCenterPosition(new GeoPosition(latitudeSerie[fCurrentSelectedSliderValueIndex],
+				longitudeSerie[fCurrentSelectedSliderValueIndex]));
+
+	}
 
 	/**
 	 * Calculates a zoom level so that all points in the specified set will be visible on screen.

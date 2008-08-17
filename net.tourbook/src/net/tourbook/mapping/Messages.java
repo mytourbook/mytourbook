@@ -28,6 +28,10 @@ public class Messages extends NLS {
 	public static String		image_action_change_tile_factory;
 	public static String		image_action_show_tour_in_map;
 	public static String		image_action_show_tour_in_map_disabled;
+	public static String	image_action_synch_with_slider;
+
+	public static String	image_action_synch_with_slider_disabled;
+
 	public static String		image_action_synch_with_tour;
 	public static String		image_action_synch_with_tour_disabled;
 
@@ -85,6 +89,8 @@ public class Messages extends NLS {
 	public static String		map_action_show_tour_in_map;
 
 	public static String		map_action_show_tour_marker;
+	public static String	map_action_synch_with_slider;
+
 	public static String		map_action_synch_with_tour;
 	public static String		map_action_tour_color_altitude_tooltip;
 	public static String		map_action_tour_color_gradient_tooltip;

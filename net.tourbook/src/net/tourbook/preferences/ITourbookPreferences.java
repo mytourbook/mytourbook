@@ -51,8 +51,8 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_X_AXIS							= "graphs.x-axis";								//$NON-NLS-1$
 	public static final String	GRAPH_X_AXIS_STARTTIME					= "graphs.x-axis.starttime";					//$NON-NLS-1$
 
-//	public static final String	GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH			= "graphs.zoom.scroll-zoomed-graph";			//$NON-NLS-1$
 	public static final String	GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER			= "graphs.zoom.autozoom-to-slider";			//$NON-NLS-1$
+	public static final String	GRAPH_MOVE_SLIDERS_WHEN_ZOOMED			= "graphs.move-sliders-when-zoomed";			//$NON-NLS-1$
 
 	public static final String	GRAPH_MOUSE_MODE						= "graph.toggle-mouse";						//$NON-NLS-1$
 

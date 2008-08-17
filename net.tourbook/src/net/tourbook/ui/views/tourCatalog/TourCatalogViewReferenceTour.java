@@ -260,7 +260,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 		fActiveRefId = refId;
 
 		// ???
-		fTourChart.zoomOut(false);
+		fTourChart.onExecuteZoomOut(false);
 
 		updateChart();
 

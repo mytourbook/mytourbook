@@ -63,9 +63,9 @@ public class TourChartConfiguration {
 	private ChartYDataMinMaxKeeper	fMinMaxKeeper;
 
 	/**
-	 * the graph can be scrolled when set to <code>true</code>
+	 * when <code>true</code> the sliders are moved when the chart is zoomed
 	 */
-	public boolean					scrollZoomedGraph		= false;
+	public boolean					moveSlidersWhenZoomed		= false;
 
 	/**
 	 * the graph is automatically zoomed to the slider position when the slider is moved

@@ -79,13 +79,13 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 	private Button					fRdoShowTime;
 	private Button					fChkShowStartTime;
 
-//	private Button					fChkScrollZoomedChart;
 	private Button					fChkZoomToSlider;
+	private Button					fChkMoveSlidersWhenZoomed;
 
 	private BooleanFieldEditor		fEditAltimeterMinCheckbox;
 	private IntegerFieldEditor		fEditAltimeterMinEditor;
-	private BooleanFieldEditor		fEditgradientMinCheckbox;
-	private IntegerFieldEditor		fEditgradientMinEditor;
+	private BooleanFieldEditor		fEditGradientMinCheckbox;
+	private IntegerFieldEditor		fEditGradientMinEditor;
 
 	private IntegerFieldEditor		fEditGridVerticalDistance;
 	private IntegerFieldEditor		fEditGridHorizontalDistance;
@@ -412,16 +412,16 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 		/*
 		 * checkbox: gradient min value
 		 */
-		fEditgradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
+		fEditGradientMinCheckbox = new BooleanFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED,
 				Messages.Pref_Graphs_Check_force_minimum_for_gradient,
 				groupMinValue);
-		fEditgradientMinCheckbox.setPreferenceStore(getPreferenceStore());
-		fEditgradientMinCheckbox.setPage(this);
-		fEditgradientMinCheckbox.load();
-		fEditgradientMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
+		fEditGradientMinCheckbox.setPreferenceStore(getPreferenceStore());
+		fEditGradientMinCheckbox.setPage(this);
+		fEditGradientMinCheckbox.load();
+		fEditGradientMinCheckbox.setPropertyChangeListener(new IPropertyChangeListener() {
 			public void propertyChange(final PropertyChangeEvent event) {
 				final boolean isChecked = (Boolean) event.getNewValue();
-				fEditgradientMinEditor.setEnabled(isChecked, groupMinValue);
+				fEditGradientMinEditor.setEnabled(isChecked, groupMinValue);
 			}
 		});
 
@@ -432,19 +432,19 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 		/*
 		 * editor: gradient min value
 		 */
-		fEditgradientMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
+		fEditGradientMinEditor = new IntegerFieldEditor(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE,
 				Messages.Pref_Graphs_Text_min_value,
 				groupMinValue);
-		fEditgradientMinEditor.setPreferenceStore(getPreferenceStore());
-		fEditgradientMinEditor.setPage(this);
-		fEditgradientMinEditor.setTextLimit(4);
-		fEditgradientMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
-		fEditgradientMinEditor.load();
-		UI.setFieldWidth(groupMinValue, fEditgradientMinEditor, DEFAULT_FIELD_WIDTH);
+		fEditGradientMinEditor.setPreferenceStore(getPreferenceStore());
+		fEditGradientMinEditor.setPage(this);
+		fEditGradientMinEditor.setTextLimit(4);
+		fEditGradientMinEditor.setErrorMessage(Messages.Pref_Graphs_Error_value_must_be_integer);
+		fEditGradientMinEditor.load();
+		UI.setFieldWidth(groupMinValue, fEditGradientMinEditor, DEFAULT_FIELD_WIDTH);
 		gd = new GridData();
 		gd.horizontalIndent = COLUMN_INDENT;
-		fEditgradientMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
-		fEditgradientMinEditor.setEnabled(fEditgradientMinCheckbox.getBooleanValue(), groupMinValue);
+		fEditGradientMinEditor.getLabelControl(groupMinValue).setLayoutData(gd);
+		fEditGradientMinEditor.setEnabled(fEditGradientMinCheckbox.getBooleanValue(), groupMinValue);
 
 		GridLayoutFactory.swtDefaults().margins(5, 5).numColumns(2).applyTo(groupMinValue);
 	}
@@ -524,36 +524,22 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private void createUIZoomOptions(final Composite container) {
 
+		final IPreferenceStore prefStore = getPreferenceStore();
+
 		final Group groupZoomOptions = new Group(container, SWT.NONE);
 		groupZoomOptions.setText(Messages.Pref_Graphs_Group_zoom_options);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupZoomOptions);
 		GridLayoutFactory.swtDefaults().applyTo(groupZoomOptions);
 
-//		// checkbox: scroll zoomed chart
-//		fChkScrollZoomedChart = new Button(groupZoomOptions, SWT.CHECK);
-//		fChkScrollZoomedChart.setText(Messages.Pref_Graphs_Check_scroll_zoomed_chart);
-//		fChkScrollZoomedChart.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH));
-//		fChkScrollZoomedChart.addSelectionListener(new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(final SelectionEvent event) {
-//				if (fChkScrollZoomedChart.getSelection()) {
-//					fChkZoomToSlider.setSelection(false);
-//				}
-//			}
-//		});
-
 		// checkbox: auto zoom to moved slider
 		fChkZoomToSlider = new Button(groupZoomOptions, SWT.CHECK);
 		fChkZoomToSlider.setText(Messages.Pref_Graphs_Check_autozoom);
-		fChkZoomToSlider.setSelection(getPreferenceStore().getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
-		fChkZoomToSlider.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				if (fChkZoomToSlider.getSelection()) {
-//					fChkScrollZoomedChart.setSelection(false);
-				}
-			}
-		});
+		fChkZoomToSlider.setSelection(prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER));
+
+		// checkbox: move sliders to border when zoomed
+		fChkMoveSlidersWhenZoomed = new Button(groupZoomOptions, SWT.CHECK);
+		fChkMoveSlidersWhenZoomed.setText(Messages.Pref_Graphs_move_sliders_when_zoomed);
+		fChkMoveSlidersWhenZoomed.setSelection(prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED));
 	}
 
 	private void enableActions() {
@@ -702,15 +688,19 @@ public class PrefPageTourChart extends PreferencePage implements IWorkbenchPrefe
 			prefStore.setValue(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_ZOOM);
 		}
 
-		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, fChkShowStartTime.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, //
+				fChkShowStartTime.getSelection());
 
-//		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_SCROLL_ZOOMED_GRAPH, fChkScrollZoomedChart.getSelection());
-		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, fChkZoomToSlider.getSelection());
+		prefStore.setValue(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER, //
+				fChkZoomToSlider.getSelection());
+
+		prefStore.setValue(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED,
+				fChkMoveSlidersWhenZoomed.getSelection());
 
 		fEditAltimeterMinCheckbox.store();
 		fEditAltimeterMinEditor.store();
-		fEditgradientMinCheckbox.store();
-		fEditgradientMinEditor.store();
+		fEditGradientMinCheckbox.store();
+		fEditGradientMinEditor.store();
 
 		fEditGridHorizontalDistance.store();
 		fEditGridVerticalDistance.store();

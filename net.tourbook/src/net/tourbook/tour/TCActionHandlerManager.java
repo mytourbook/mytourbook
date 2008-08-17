@@ -95,8 +95,9 @@ class TCActionHandlerManager {
 
 		fActionHandlers.put(TourChart.COMMAND_ID_CHART_OPTIONS, new ActionHandlerChartOptions());
 		fActionHandlers.put(TourChart.COMMAND_ID_SHOW_START_TIME, new ActionHandlerShowStartTime());
-//		fActionHandlers.put(TourChart.COMMAND_ID_CAN_SCROLL_CHART, new ActionHandlerCanScrollChart());
 		fActionHandlers.put(TourChart.COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionHandlerCanAutoZoomToSlider());
+		fActionHandlers.put(TourChart.COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED,
+				new ActionHandlerCanMoveSlidersWhenZoomed());
 
 		setupHandlers();
 	}

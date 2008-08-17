@@ -349,6 +349,8 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Label_select_graph;
 
 	public static String	Pref_Graphs_Label_select_graph_tooltip;
+
+	public static String	Pref_Graphs_move_sliders_when_zoomed;
 	public static String	Pref_Graphs_Radio_mouse_mode_slider;
 
 	public static String	Pref_Graphs_Radio_mouse_mode_zoom;
@@ -462,6 +464,8 @@ public class Messages extends NLS {
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
+	public static String	Tour_Action_auto_move_sliders_when_zoomed;
+
 	public static String		Tour_Action_auto_zoom_to_slider_position;
 	public static String		Tour_Action_chart_options_tooltip;
 	public static String		Tour_Action_graph_altimeter_tooltip;
@@ -475,6 +479,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_speed_tooltip;
 	public static String		Tour_Action_graph_temperature_tooltip;
 	public static String		Tour_Action_graph_tour_compare_tooltip;
+
 	public static String		Tour_Action_open_tour_segmenter_tooltip;
 	public static String		Tour_Action_scroll_zoomed_chart;
 	public static String		Tour_Action_show_distance_on_x_axis;
