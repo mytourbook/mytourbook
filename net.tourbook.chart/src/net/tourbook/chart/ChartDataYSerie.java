@@ -43,7 +43,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 	public static final int			FILL_METHOD_FILL_BOTTOM	= 1;
 	public static final int			FILL_METHOD_FILL_ZERO	= 2;
 
-	private int						fChartLayout			= ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE;
+	private int						fChartLayout			= BAR_LAYOUT_SINGLE_SERIE;
 	private String					fYTitle;
 
 	/**

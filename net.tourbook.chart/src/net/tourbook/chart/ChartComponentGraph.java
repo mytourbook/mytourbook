@@ -255,14 +255,15 @@ public class ChartComponentGraph extends Canvas {
 	/**
 	 * cursor when the graph can be resizes
 	 */
-	private Cursor						cursorResizeLeftRight;
-	private Cursor						cursorResizeTopDown;
-	private Cursor						cursorDragged;
-	private Cursor						cursorHand05x;
-	private Cursor						cursorHand;
-	private Cursor						cursorHand2x;
-
-	private Cursor						cursorHand5x;
+	private Cursor						fCursorResizeLeftRight;
+	private Cursor						fCursorResizeTopDown;
+	private Cursor						fCursorDragged;
+	private Cursor						fCursorHand05x;
+	private Cursor						fCursorHand;
+	private Cursor						fCursorHand2x;
+	private Cursor						fCursorHand5x;
+	private Cursor						fCursorModeSlider;
+	private Cursor						fCursorModeZoom;
 
 	private Color						gridColor;
 
@@ -389,14 +390,17 @@ public class ChartComponentGraph extends Canvas {
 
 		fChart = chartWidget;
 
-		cursorResizeLeftRight = new Cursor(getDisplay(), SWT.CURSOR_SIZEWE);
-		cursorResizeTopDown = new Cursor(getDisplay(), SWT.CURSOR_SIZENS);
-		cursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
+		fCursorResizeLeftRight = new Cursor(getDisplay(), SWT.CURSOR_SIZEWE);
+		fCursorResizeTopDown = new Cursor(getDisplay(), SWT.CURSOR_SIZENS);
+		fCursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
 
-		cursorHand05x = createCursorFromImage(Messages.Image_cursor_hand_05x);
-		cursorHand = createCursorFromImage(Messages.Image_cursor_hand_10x);
-		cursorHand2x = createCursorFromImage(Messages.Image_cursor_hand_20x);
-		cursorHand5x = createCursorFromImage(Messages.Image_cursor_hand_50x);
+		fCursorHand05x = createCursorFromImage(Messages.Image_cursor_hand_05x);
+		fCursorHand = createCursorFromImage(Messages.Image_cursor_hand_10x);
+		fCursorHand2x = createCursorFromImage(Messages.Image_cursor_hand_20x);
+		fCursorHand5x = createCursorFromImage(Messages.Image_cursor_hand_50x);
+
+		fCursorModeSlider = createCursorFromImage(Messages.Image_cursor_mode_slider);
+		fCursorModeZoom = createCursorFromImage(Messages.Image_cursor_mode_zoom);
 
 		gridColor = new Color(getDisplay(), gridRGB);
 
@@ -411,6 +415,8 @@ public class ChartComponentGraph extends Canvas {
 
 		addListener();
 		createContextMenu();
+
+		setDefaultCursor();
 	}
 
 	/**
@@ -580,7 +586,7 @@ public class ChartComponentGraph extends Canvas {
 		ySliderDragged = null;
 
 		// the cursour could be outside of the chart, reset it
-		setCursor(null);
+		setDefaultCursor();
 
 		/*
 		 * the hited slider could be outsite of the chart, hide the labels on the slider
@@ -3745,8 +3751,7 @@ public class ChartComponentGraph extends Canvas {
 
 		setXSliderValueIndex(fSelectedXSlider, valueIndex);
 
-		// hide the cursor
-		setCursor(null);
+		setDefaultCursor();
 
 		redraw();
 	}
@@ -3764,13 +3769,15 @@ public class ChartComponentGraph extends Canvas {
 	private void onDispose() {
 
 		// dispose resources
-		cursorResizeLeftRight = ChartUtil.disposeResource(cursorResizeLeftRight);
-		cursorResizeTopDown = ChartUtil.disposeResource(cursorResizeTopDown);
-		cursorDragged = ChartUtil.disposeResource(cursorDragged);
-		cursorHand05x = ChartUtil.disposeResource(cursorHand05x);
-		cursorHand = ChartUtil.disposeResource(cursorHand);
-		cursorHand2x = ChartUtil.disposeResource(cursorHand2x);
-		cursorHand5x = ChartUtil.disposeResource(cursorHand5x);
+		fCursorResizeLeftRight = ChartUtil.disposeResource(fCursorResizeLeftRight);
+		fCursorResizeTopDown = ChartUtil.disposeResource(fCursorResizeTopDown);
+		fCursorDragged = ChartUtil.disposeResource(fCursorDragged);
+		fCursorHand05x = ChartUtil.disposeResource(fCursorHand05x);
+		fCursorHand = ChartUtil.disposeResource(fCursorHand);
+		fCursorHand2x = ChartUtil.disposeResource(fCursorHand2x);
+		fCursorHand5x = ChartUtil.disposeResource(fCursorHand5x);
+		fCursorModeSlider = ChartUtil.disposeResource(fCursorModeSlider);
+		fCursorModeZoom = ChartUtil.disposeResource(fCursorModeZoom);
 
 		fGraphImage = ChartUtil.disposeResource(fGraphImage);
 		fLayerImage = ChartUtil.disposeResource(fLayerImage);
@@ -3804,25 +3811,41 @@ public class ChartComponentGraph extends Canvas {
 
 		} else {
 
-			if (fChart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+			if ((e.stateMask & SWT.CONTROL) != 0) {
 
-				// mouse mode: move slider
+				// toggle mouse mode
 
-				// switch to mouse zoom mode
-				fChart.setMouseMode(false);
+				if (fChart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+
+					// switch to mouse zoom mode
+					fChart.setMouseMode(false);
+
+				} else {
+
+					// switch to mouse slider mode
+					fChart.setMouseMode(true);
+				}
+
+			} else {
+
+				if (fChart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+
+					// switch to mouse zoom mode
+					fChart.setMouseMode(false);
+				}
+
+				// mouse mode: zoom chart
+
+				/*
+				 * set position where the double click occured, this position will be used when the
+				 * chart is zoomed
+				 */
+				final int devMousePosInChart = fDevGraphImageXOffset + e.x;
+				fXOffsetMouseRatio = (float) devMousePosInChart / fDevVirtualGraphImageWidth;
+
+				zoomInWithMouse();
+				moveSlidersToBorder();
 			}
-
-			// mouse mode: zoom chart
-
-			/*
-			 * set position where the double click occured, this position will be used when the
-			 * chart is zoomed
-			 */
-			final int devMousePosInChart = fDevGraphImageXOffset + e.x;
-			fXOffsetMouseRatio = (float) devMousePosInChart / fDevVirtualGraphImageWidth;
-
-			zoomInWithMouse();
-			moveSlidersToBorder();
 		}
 	}
 
@@ -3958,7 +3981,7 @@ public class ChartComponentGraph extends Canvas {
 				 */
 				fDraggedChartDraggedPos = fDraggedChartStartPos;
 
-				setCursor(cursorDragged);
+				setCursor(fCursorDragged);
 			}
 		}
 	}
@@ -3992,7 +4015,7 @@ public class ChartComponentGraph extends Canvas {
 			redraw();
 		}
 
-		setCursor(null);
+		setDefaultCursor();
 	}
 
 	/**
@@ -4131,7 +4154,7 @@ public class ChartComponentGraph extends Canvas {
 					fMouseOverXSlider = xSlider;
 
 					// set cursor
-					setCursor(cursorResizeLeftRight);
+					setCursor(fCursorResizeLeftRight);
 
 					// hide the y-slider
 					hitYSlider = null;
@@ -4152,7 +4175,7 @@ public class ChartComponentGraph extends Canvas {
 
 				// cursor is within a y-slider
 
-				setCursor(cursorResizeTopDown);
+				setCursor(fCursorResizeTopDown);
 
 				// show the y-slider labels
 				ySliderGraphX = devXGraph;
@@ -4162,21 +4185,20 @@ public class ChartComponentGraph extends Canvas {
 
 			} else if (fChart.fXMarkerDraggingListener != null && isSynchMarkerHit(devXGraph)) {
 
-				setCursor(cursorDragged);
+				setCursor(fCursorDragged);
 
 			} else if (isBarHit(devYMouse, devXGraph)) {
 
 				fIsHoveredBarDirty = true;
 				isChartDirty = true;
 
-				setCursor(null);
+				setDefaultCursor();
 
 			} else if (hBar.isVisible()) {
 				// horizontal bar is visible, show the scroll cursor
 				setupScrollCursor(devXMouse, devYMouse);
 			} else {
-				// hide the cursor
-				setCursor(null);
+				setDefaultCursor();
 			}
 		}
 
@@ -4248,7 +4270,7 @@ public class ChartComponentGraph extends Canvas {
 				fIsChartDragged = false;
 				fIsChartDraggedStarted = false;
 
-				setCursor(null);
+				setDefaultCursor();
 
 				updateDraggedChart(fDraggedChartDraggedPos.x - fDraggedChartStartPos.x);
 			}
@@ -4589,6 +4611,27 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
+	void setDefaultCursor() {
+
+		final ChartDataModel chartDataModel = fChart.getChartDataModel();
+		if (chartDataModel == null) {
+			return;
+		}
+
+		final int chartType = chartDataModel.getChartType();
+
+		if (chartType == ChartDataModel.CHART_TYPE_LINE || chartType == ChartDataModel.CHART_TYPE_LINE_WITH_BARS) {
+
+			if (fChart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+				setCursor(fCursorModeSlider);
+			} else {
+				setCursor(fCursorModeZoom);
+			}
+		} else {
+			setCursor(null);
+		}
+	}
+
 	/**
 	 * sets a new configuration for the graph, the whole graph will be recreated
 	 */
@@ -4803,13 +4846,13 @@ public class ChartComponentGraph extends Canvas {
 
 		// set cursor according to the position
 		if (scrollAcceleration == 0.25) {
-			setCursor(cursorHand05x);
+			setCursor(fCursorHand05x);
 		} else if (scrollAcceleration == 1) {
-			setCursor(cursorHand);
+			setCursor(fCursorHand);
 		} else if (scrollAcceleration == 2) {
-			setCursor(cursorHand2x);
+			setCursor(fCursorHand2x);
 		} else {
-			setCursor(cursorHand5x);
+			setCursor(fCursorHand5x);
 		}
 
 		/*

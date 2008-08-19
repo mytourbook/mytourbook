@@ -849,6 +849,9 @@ public class Chart extends ViewForm {
 		fMouseMode = isChecked ? MOUSE_MODE_SLIDER : MOUSE_MODE_ZOOM;
 
 		updateMouseModeUIState();
+
+		fChartComponents.getChartComponentGraph().setDefaultCursor();
+
 	}
 
 	public void setMouseMode(final Object newMouseMode) {
@@ -1107,7 +1110,7 @@ public class Chart extends ViewForm {
 //		fChartComponents.zoomIn();
 //		setChartCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
 //	}
-	
+
 //	/**
 //	 * zoom into the chart where the graph is divided into parts (months)
 //	 * 

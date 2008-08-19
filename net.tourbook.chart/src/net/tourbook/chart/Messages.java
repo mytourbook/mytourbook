@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -21,7 +21,7 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.chart.messages";	//$NON-NLS-1$
 	public static String	Action_move_left_slider_here;
 	public static String	Action_move_right_slider_here;
-	public static String	Action_move_sliders_to_border;
+//	public static String	Action_move_sliders_to_border;
 	public static String	Action_next_month;
 	public static String	Action_next_month_tooltip;
 	public static String	Action_previous_month;
@@ -45,6 +45,8 @@ public class Messages extends NLS {
 	public static String	Image_cursor_hand_10x;
 	public static String	Image_cursor_hand_20x;
 	public static String	Image_cursor_hand_50x;
+	public static String	Image_cursor_mode_slider;
+	public static String	Image_cursor_mode_zoom;
 	public static String	Image_toggle_mouse;
 	public static String	Image_zoom_fit_to_graph;
 	public static String	Image_zoom_fit_to_graph_disabled;
