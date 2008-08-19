@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: net.tourbook.branding
-Bundle-Version: 1.5.0.v20080509
+Bundle-Version: 1.6.0.v2008-08
 Bundle-Vendor: MyTourbook
 Bundle-Localization: plugin
 Eclipse-LazyStart: true
