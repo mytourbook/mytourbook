@@ -62,7 +62,7 @@ public class ActionDeleteTour extends Action {
 		TreeViewerItem firstSelectedParent = null;
 
 		if (monitor != null) {
-			monitor.beginTask("Delete Tours", selection.size());
+			monitor.beginTask(Messages.Tour_Book_Action_delete_selected_tours_task, selection.size());
 		}
 
 		// loop: selected tours

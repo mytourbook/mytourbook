@@ -59,7 +59,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
-	private static final String					PREF_PAGE_ID_USER	= "net.tourbook.preferences.PrefPageClients";
+	private static final String					PREF_PAGE_ID_USER	= "net.tourbook.preferences.PrefPageClients"; //$NON-NLS-1$
 
 	private ApplicationActionBarAdvisor			fApplicationActionBarAdvisor;
 

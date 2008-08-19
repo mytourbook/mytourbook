@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?pde version="3.1"?>
+<?pde version="3.4"?>
 
 <product name="MyTourbook" id="net.tourbook.product" application="net.tourbook.application" useFeatures="true">
 
@@ -10,7 +10,12 @@
       </text>
    </aboutInfo>
 
-   <configIni use="custom" path="/net.tourbook/install-settings/config.ini"/>
+   <configIni use="default">
+      <linux>/net.tourbook/install-settings/config.ini</linux>
+      <macosx>/net.tourbook/install-settings/config.ini</macosx>
+      <solaris>/net.tourbook/install-settings/config.ini</solaris>
+      <win32>/net.tourbook/install-settings/config.ini</win32>
+   </configIni>
 
    <launcherArgs>
       <programArgs>#_enable_debug_mode_by_removing_the_#_character_in_the_next_lines
@@ -72,15 +77,15 @@
    </plugins>
 
    <features>
-      <feature id="org.eclipse.rcp" version="3.3.3.r33x_r20080129-8y8eE9UEUWI6qujeED0xT7bc"/>
+      <feature id="org.eclipse.rcp" version="3.4.0.v20080324a-989JERhEk-jWnd5IY8K5tjxB"/>
+      <feature id="net.tourbook.ext.eclipse" version="1.6.0.v2008-08"/>
+      <feature id="net.tourbook.ext.eclipse.nl_de" version="1.6.0.v2008-08"/>
       <feature id="net.tourbook.ext.derby.feature" version="10.3.2.1"/>
       <feature id="net.tourbook.ext.ejb3.feature" version="3.3.0"/>
-      <feature id="net.tourbook.ext.eclipse" version="1.5.0.v20080509"/>
-      <feature id="net.tourbook.ext.eclipse.nl_de" version="1.5.0.v20080509"/>
-      <feature id="net.tourbook.feature" version="1.5.0.v20080509"/>
-      <feature id="net.tourbook.device.feature" version="1.5.0.v20080509"/>
-      <feature id="net.tourbook.statistics.feature" version="1.5.0.v20080509"/>
-      <feature id="net.tourbook.geoclipse.feature" version="0.1.0.v20080509"/>
+      <feature id="net.tourbook.feature" version="1.6.0.v2008-08"/>
+      <feature id="net.tourbook.device.feature" version="1.6.0.v2008-08"/>
+      <feature id="net.tourbook.statistics.feature" version="1.6.0.v2008-08"/>
+      <feature id="net.tourbook.geoclipse.feature" version="0.1.1.v2008-08"/>
    </features>
 
 </product>

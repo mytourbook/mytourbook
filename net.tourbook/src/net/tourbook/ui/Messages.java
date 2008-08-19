@@ -62,6 +62,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_gradient;
 	public static String		ColumnFactory_gradient_label;
 	public static String		ColumnFactory_gradient_tooltip;
+
+	public static String	ColumnFactory_hour;
 	public static String		ColumnFactory_import_filename;
 	public static String		ColumnFactory_import_filename_label;
 	public static String		ColumnFactory_import_filename_tooltip;

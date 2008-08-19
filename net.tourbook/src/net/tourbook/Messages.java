@@ -21,8 +21,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";						//$NON-NLS-1$
 
-	public static String		App_Action_set_tour_type_dlg_title;
-	public static String		App_Action_set_tour_type_dlg_message;
+//	public static String		App_Action_set_tour_type_dlg_title;
+//	public static String		App_Action_set_tour_type_dlg_message;
 
 	public static String		dialog_quick_edit_dialog_area_title;
 	public static String		dialog_quick_edit_dialog_save;
@@ -50,17 +50,17 @@ public class Messages extends NLS {
 	public static String		action_tag_remove;
 
 	public static String		action_tag_remove_all;
-	public static String		action_tag_remove_all_dlg_message;
-
-	public static String		action_tag_remove_all_dlg_title;
+//	public static String		action_tag_remove_all_dlg_message;
+//
+//	public static String		action_tag_remove_all_dlg_title;
 
 	public static String		action_tag_rename_tag;
 	public static String		action_tag_rename_tag_category;
 	public static String		action_tag_set_all_tag_structures;
 
-	public static String		action_tag_set_dlg_message;
-
-	public static String		action_tag_set_dlg_title;
+//	public static String		action_tag_set_dlg_message;
+//
+//	public static String		action_tag_set_dlg_title;
 
 	public static String		action_tag_set_tag_expand_type;
 
@@ -218,7 +218,7 @@ public class Messages extends NLS {
 	public static String		Image__edit_tour;
 	public static String		Image__edit_tour_disabled;
 	public static String		Image__expand_all;
-	public static String		Image__fit_to_window;
+//	public static String		Image__fit_to_window;
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;
@@ -262,7 +262,7 @@ public class Messages extends NLS {
 	public static String		Image__tag;
 	public static String		Image__tag_category;
 
-	public static String	Image__tag_category_opened;
+//	public static String	Image__tag_category_opened;
 	public static String		Image__tag_root;
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
@@ -329,7 +329,7 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Check_autozoom;
 	public static String		Pref_Graphs_Check_force_minimum_for_altimeter;
 	public static String		Pref_Graphs_Check_force_minimum_for_gradient;
-	public static String		Pref_Graphs_Check_scroll_zoomed_chart;
+//	public static String		Pref_Graphs_Check_scroll_zoomed_chart;
 	public static String		Pref_Graphs_Check_show_start_time;
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
 	public static String		Pref_Graphs_Error_value_must_be_integer;
@@ -423,7 +423,7 @@ public class Messages extends NLS {
 	public static String		pref_view_layout_label_sub;
 	public static String		pref_view_layout_label_sub_sub;
 	public static String		pref_view_layout_label_title;
-	public static String		pref_view_layout_label_tour;
+//	public static String		pref_view_layout_label_tour;
 
 	public static String		Pref_Statistic_Label_altitude;
 	public static String		Pref_Statistic_Label_altitude_low_value;
@@ -487,7 +487,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_show_start_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis_tooltip;
-	public static String		Tour_Action_zoom_fit_to_window;
+//	public static String		Tour_Action_zoom_fit_to_window;
 
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;
@@ -496,11 +496,15 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_title;
 
 	public static String	Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
+
+	public static String	Tour_Book_Action_delete_selected_tours_task;
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
 
 	public static String		Tour_Database_load_all_tours;
+	public static String	Tour_Database_update_computed_values;
+
 	public static String		Tour_Database_update_tour;
 
 	public static String		Tour_Properties_Label_device_name;

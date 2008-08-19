@@ -160,7 +160,7 @@ public class TourTag implements Comparable<Object> {
 
 	@Override
 	public String toString() {
-		return "tag: " + name + " (id:" + tagId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "tag: " + name + " (id:" + tagId + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 }

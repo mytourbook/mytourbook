@@ -18,8 +18,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageMapAppearance extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		MAP_TOUR_SYMBOL_LINE	= "line";
-	public static final String		MAP_TOUR_SYMBOL_DOT		= "dot";
+	public static final String		MAP_TOUR_SYMBOL_LINE	= "line"; //$NON-NLS-1$
+	public static final String		MAP_TOUR_SYMBOL_DOT		= "dot"; //$NON-NLS-1$
 
 	private final IPreferenceStore	fPrefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 	private boolean					fIsModified;

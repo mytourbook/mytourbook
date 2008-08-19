@@ -29,7 +29,7 @@ public abstract class TreeColumnFactory {
 			columnManager.addColumn(colDef); 
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label + " (" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-			colDef.setColumnText("\\ " + UI.UNIT_LABEL_ALTITUDE);
+			colDef.setColumnText("\\ " + UI.UNIT_LABEL_ALTITUDE); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
 			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
@@ -45,7 +45,7 @@ public abstract class TreeColumnFactory {
 			columnManager.addColumn(colDef); 
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-			colDef.setColumnText("/ " + UI.UNIT_LABEL_ALTITUDE);
+			colDef.setColumnText("/ " + UI.UNIT_LABEL_ALTITUDE); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_up_tooltip);
 			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -92,8 +92,8 @@ public abstract class TreeColumnFactory {
 			final TreeColumnDefinition colDef = new TreeColumnDefinition("avgSpeed", SWT.TRAIL); //$NON-NLS-1$
 			columnManager.addColumn(colDef); 
 			
-			colDef.setColumnLabel(Messages.ColumnFactory_avg_speed_label + " (Ø " + UI.UNIT_LABEL_SPEED + ")");
-			colDef.setColumnText("Ø " + UI.UNIT_LABEL_SPEED);
+			colDef.setColumnLabel(Messages.ColumnFactory_avg_speed_label + " (Ø " + UI.UNIT_LABEL_SPEED + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnText("Ø " + UI.UNIT_LABEL_SPEED); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_speed_tooltip);
 			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
@@ -109,7 +109,7 @@ public abstract class TreeColumnFactory {
 			columnManager.addColumn(colDef); 
 
 			colDef.setColumnLabel(Messages.ColumnFactory_avg_temperature_label + " (Ø " + UI.UNIT_LABEL_TEMPERATURE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-			colDef.setColumnText("Ø " + UI.UNIT_LABEL_TEMPERATURE);
+			colDef.setColumnText("Ø " + UI.UNIT_LABEL_TEMPERATURE); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_temperature_tooltip);
 			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
 
@@ -188,7 +188,7 @@ public abstract class TreeColumnFactory {
 			final TreeColumnDefinition colDef = new TreeColumnDefinition("maxAltitude", SWT.TRAIL); //$NON-NLS-1$
 			columnManager.addColumn(colDef); 
 			
-			colDef.setColumnLabel(Messages.ColumnFactory_max_altitude_label + "(^" + UI.UNIT_LABEL_ALTITUDE + ")");
+			colDef.setColumnLabel(Messages.ColumnFactory_max_altitude_label + "(^" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setColumnText("^" + UI.UNIT_LABEL_ALTITUDE); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_max_altitude_tooltip);
 			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
@@ -221,7 +221,7 @@ public abstract class TreeColumnFactory {
 			final TreeColumnDefinition colDef = new TreeColumnDefinition("maxSpeed", SWT.TRAIL); //$NON-NLS-1$
 			columnManager.addColumn(colDef); 
 			
-			colDef.setColumnLabel(Messages.ColumnFactory_max_speed_label + " (^" + UI.UNIT_LABEL_SPEED + ")");
+			colDef.setColumnLabel(Messages.ColumnFactory_max_speed_label + " (^" + UI.UNIT_LABEL_SPEED + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setColumnText("^" + UI.UNIT_LABEL_SPEED); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_max_speed_tooltip);
 			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
