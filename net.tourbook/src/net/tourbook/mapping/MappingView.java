@@ -1419,26 +1419,30 @@ public class MappingView extends ViewPart {
 	 */
 	private void setMapToSliderBounds(final TourData tourData) {
 
+		if (tourData == null) {
+			return;
+		}
+		
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 
-		final double leftSliderLat = latitudeSerie[fCurrentLeftSliderValueIndex];
-		final double leftSliderLong = longitudeSerie[fCurrentLeftSliderValueIndex];
-
-		final double rightSliderLat = latitudeSerie[fCurrentRightSliderValueIndex];
-		final double rightSliderLong = longitudeSerie[fCurrentRightSliderValueIndex];
-
-		final double minLatitude = Math.min(leftSliderLat + 0, rightSliderLat + 0);
-		final double minLongitude = Math.min(leftSliderLong + 0, rightSliderLong + 0);
-
-		final double maxLatitude = Math.max(leftSliderLat + 0, rightSliderLat + 0);
-		final double maxLongitude = Math.max(leftSliderLong + 0, rightSliderLong + 0);
-
-		final double latDiff2 = (maxLatitude - minLatitude) / 2;
-		final double longDiff2 = (maxLongitude - minLongitude) / 2;
-
-		final double sliderLat = minLatitude + latDiff2 - 0;
-		final double sliderLong = minLongitude + longDiff2 - 0;
+//		final double leftSliderLat = latitudeSerie[fCurrentLeftSliderValueIndex];
+//		final double leftSliderLong = longitudeSerie[fCurrentLeftSliderValueIndex];
+//
+//		final double rightSliderLat = latitudeSerie[fCurrentRightSliderValueIndex];
+//		final double rightSliderLong = longitudeSerie[fCurrentRightSliderValueIndex];
+//
+//		final double minLatitude = Math.min(leftSliderLat + 0, rightSliderLat + 0);
+//		final double minLongitude = Math.min(leftSliderLong + 0, rightSliderLong + 0);
+//
+//		final double maxLatitude = Math.max(leftSliderLat + 0, rightSliderLat + 0);
+//		final double maxLongitude = Math.max(leftSliderLong + 0, rightSliderLong + 0);
+//
+//		final double latDiff2 = (maxLatitude - minLatitude) / 2;
+//		final double longDiff2 = (maxLongitude - minLongitude) / 2;
+//
+//		final double sliderLat = minLatitude + latDiff2 - 0;
+//		final double sliderLong = minLongitude + longDiff2 - 0;
 
 //		fMap.setCenterPosition(new GeoPosition(sliderLat, sliderLong));
 //		fMap.setCenterPosition(new GeoPosition(sliderLat, leftSliderLong));

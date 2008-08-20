@@ -923,7 +923,8 @@ public class TourManager {
 
 			// adjust min altitude when it's defined in the pref store
 			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_MIN_ENABLED)) {
-				yDataAltimeter.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE));
+				yDataAltimeter.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE),
+						true);
 			}
 		}
 
@@ -949,7 +950,7 @@ public class TourManager {
 			// adjust min value when defined in the pref store
 			if (prefStore.getBoolean(ITourbookPreferences.GRAPH_GRADIENT_MIN_ENABLED)) {
 				yDataGradient.setVisibleMinValue(prefStore.getInt(ITourbookPreferences.GRAPH_GRADIENT_MIN_VALUE)
-						* GRADIENT_DIVISOR);
+						* GRADIENT_DIVISOR, true);
 			}
 		}
 
