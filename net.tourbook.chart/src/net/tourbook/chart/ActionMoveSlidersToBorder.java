@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -17,22 +17,20 @@ package net.tourbook.chart;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionZoomOut extends Action {
+public class ActionMoveSlidersToBorder extends Action {
 
 	private Chart	fChart;
 
-	public ActionZoomOut(final Chart chart) {
+	public ActionMoveSlidersToBorder(final Chart chart) {
 
 		fChart = chart;
 
-		setText(Messages.Action_zoom_out);
-		setToolTipText(Messages.Action_zoom_out_tooltip);
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image_zoom_out));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image_zoom_out_disabled));
+		setText(Messages.Action_move_sliders_to_border);
 	}
 
 	@Override
 	public void run() {
-		fChart.onExecuteZoomOut(true);
+		fChart.onExecuteMoveSlidersToBorder();
 	}
+
 }

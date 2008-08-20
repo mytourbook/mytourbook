@@ -18,9 +18,9 @@ package net.tourbook.chart;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-public class ActionHandlerToggleMouse extends ActionHandler {
+public class ActionHandlerMouseMode extends ActionHandler {
 
-	public ActionHandlerToggleMouse() {
+	public ActionHandlerMouseMode() {
 		fCommandId = Chart.COMMAND_ID_MOUSE_MODE;
 	}
 

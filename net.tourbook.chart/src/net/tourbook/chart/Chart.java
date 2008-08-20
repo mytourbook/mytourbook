@@ -42,16 +42,18 @@ import org.eclipse.swt.widgets.ToolBar;
 public class Chart extends ViewForm {
 
 	static final String					COMMAND_ID_ZOOM_IN					= "net.tourbook.chart.command.zoomIn";				//$NON-NLS-1$
+	static final String					COMMAND_ID_ZOOM_IN_TO_SLIDER		= "net.tourbook.chart.command.zoomInToSlider";		//$NON-NLS-1$
 	static final String					COMMAND_ID_ZOOM_OUT					= "net.tourbook.chart.command.zoomOut";			//$NON-NLS-1$
 	static final String					COMMAND_ID_ZOOM_FIT_GRAPH			= "net.tourbook.chart.command.fitGraph";			//$NON-NLS-1$
 
 	static final String					COMMAND_ID_MOUSE_MODE				= "net.tourbook.chart.command.mouseMode";			//$NON-NLS-1$
 
-	static final String					COMMAND_ID_PART_NEXT				= "net.tourbook.chart.command.partNext";			//$NON-NLS-1$
-	static final String					COMMAND_ID_PART_PREVIOUS			= "net.tourbook.chart.command.partPrevious";		//$NON-NLS-1$
+//	static final String					COMMAND_ID_PART_NEXT				= "net.tourbook.chart.command.partNext";			//$NON-NLS-1$
+//	static final String					COMMAND_ID_PART_PREVIOUS			= "net.tourbook.chart.command.partPrevious";		//$NON-NLS-1$
 
 	private static final String			COMMAND_ID_MOVE_LEFT_SLIDER_HERE	= "net.tourbook.chart.command.moveLeftSliderHere";	//$NON-NLS-1$
 	private static final String			COMMAND_ID_MOVE_RIGHT_SLIDER_HERE	= "net.tourbook.chart.command.moveRightSliderHere"; //$NON-NLS-1$
+	private static final String			COMMAND_ID_MOVE_SLIDERS_TO_BORDER	= "net.tourbook.chart.command.moveSlidersToBorder"; //$NON-NLS-1$
 
 	static final int					NO_BAR_SELECTION					= -1;
 
@@ -78,7 +80,7 @@ public class Chart extends ViewForm {
 	private Chart						fSynchedChart;
 
 	private boolean						fShowZoomActions;
-	private boolean						fShowPartNavigation;
+//	private boolean						fShowPartNavigation;
 	private boolean						fShowMouseMode						= false;
 
 	private Color						fBackgroundColor;
@@ -228,6 +230,17 @@ public class Chart extends ViewForm {
 		fChartActionProxies.put(COMMAND_ID_ZOOM_IN, actionProxy);
 
 		/*
+		 * Action: zoom in to slider
+		 */
+		if (useInternalActionBar) {
+			action = new ActionZoomToSlider(this);
+		} else {
+			action = null;
+		}
+		actionProxy = new ActionProxy(COMMAND_ID_ZOOM_IN_TO_SLIDER, action);
+		fChartActionProxies.put(COMMAND_ID_ZOOM_IN_TO_SLIDER, actionProxy);
+
+		/*
 		 * Action: zoom out
 		 */
 		if (useInternalActionBar) {
@@ -250,28 +263,6 @@ public class Chart extends ViewForm {
 		fChartActionProxies.put(COMMAND_ID_ZOOM_FIT_GRAPH, actionProxy);
 
 		/*
-		 * Action: previous part
-		 */
-		if (useInternalActionBar) {
-			action = new ActionPartPrevious(this);
-		} else {
-			action = null;
-		}
-		actionProxy = new ActionProxy(COMMAND_ID_PART_PREVIOUS, action);
-		fChartActionProxies.put(COMMAND_ID_PART_PREVIOUS, actionProxy);
-
-		/*
-		 * Action: next part
-		 */
-		if (useInternalActionBar) {
-			action = new ActionPartNext(this);
-		} else {
-			action = null;
-		}
-		actionProxy = new ActionProxy(COMMAND_ID_PART_NEXT, action);
-		fChartActionProxies.put(COMMAND_ID_PART_NEXT, actionProxy);
-
-		/*
 		 * Action: mouse moude
 		 */
 		if (useInternalActionBar) {
@@ -282,16 +273,16 @@ public class Chart extends ViewForm {
 		actionProxy = new ActionProxy(COMMAND_ID_MOUSE_MODE, action);
 		fChartActionProxies.put(COMMAND_ID_MOUSE_MODE, actionProxy);
 
-//		/*
-//		 * Action: move sliders when
-//		 */
-//		if (useInternalActionBar) {
-//			action = new ActionMoveSlidersToBorder(this);
-//		} else {
-//			action = null;
-//		}
-//		actionProxy = new ActionProxy(COMMAND_ID_MOVE_SLIDERS_WHEN_ZOOMED, action);
-//		fChartActionProxies.put(COMMAND_ID_MOVE_SLIDERS_WHEN_ZOOMED, actionProxy);
+		/*
+		 * Action: move sliders when
+		 */
+		if (useInternalActionBar) {
+			action = new ActionMoveSlidersToBorder(this);
+		} else {
+			action = null;
+		}
+		actionProxy = new ActionProxy(COMMAND_ID_MOVE_SLIDERS_TO_BORDER, action);
+		fChartActionProxies.put(COMMAND_ID_MOVE_SLIDERS_TO_BORDER, actionProxy);
 
 		/*
 		 * Action: move left slider here
@@ -315,7 +306,7 @@ public class Chart extends ViewForm {
 		actionProxy = new ActionProxy(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE, action);
 		fChartActionProxies.put(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE, actionProxy);
 
-		updateActionState();
+		enableActions();
 	}
 
 	/**
@@ -338,6 +329,25 @@ public class Chart extends ViewForm {
 		chartInfo.selectedSliderValuesIndex = chartGraph.getSelectedSlider().getValuesIndex();
 
 		return chartInfo;
+	}
+
+	void enableActions() {
+
+		final boolean canZoomOut = fChartComponents.getChartComponentGraph().getGraphZoomRatio() > 1;
+
+		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(true);
+		fChartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).setEnabled(true);
+		fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(canZoomOut);
+
+		/*
+		 * this is always enabled because the y-slider can change the chart
+		 */
+		fChartActionProxies.get(COMMAND_ID_ZOOM_FIT_GRAPH).setEnabled(true);
+
+		if (fUseActionHandlers) {
+			fActionHandlerManager.updateUIState();
+		}
+
 	}
 
 	void fillContextMenu(final IMenuManager menuMgr) {
@@ -365,12 +375,24 @@ public class Chart extends ViewForm {
 
 		} else {
 
-			menuMgr.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
-			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOUSE_MODE).getAction());
-			menuMgr.add(new Separator());
-//			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_WHEN_ZOOMED).getAction());
+			// set text for mouse wheel mode
+			final Action actionMouseMode = fChartActionProxies.get(COMMAND_ID_MOUSE_MODE).getAction();
+			if (fMouseMode.equals(MOUSE_MODE_SLIDER)) {
+				// mouse mode: slider
+				actionMouseMode.setText(Messages.Action_mouse_mode_zoom);
+
+			} else {
+				// mouse mode: zoom
+				actionMouseMode.setText(Messages.Action_mouse_mode_slider);
+			}
+
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).getAction());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).getAction());
+			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
+			menuMgr.add(new Separator());
+
+			menuMgr.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
+			menuMgr.add(actionMouseMode);
 			menuMgr.add(new Separator());
 
 			// create the menu for line charts
@@ -395,7 +417,7 @@ public class Chart extends ViewForm {
 			return;
 		}
 
-		if (fUseInternalActionBar && (fShowPartNavigation || fShowZoomActions || fShowMouseMode)) {
+		if (fUseInternalActionBar && (fShowZoomActions || fShowMouseMode)) {
 
 			// add the action to the toolbar
 			final IToolBarManager tbm = getToolBarManager();
@@ -406,18 +428,14 @@ public class Chart extends ViewForm {
 
 				if (fShowMouseMode) {
 					tbm.add(fChartActionProxies.get(COMMAND_ID_MOUSE_MODE).getAction());
-				} else {
-					tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
-					tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).getAction());
 				}
 
-				tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_FIT_GRAPH).getAction());
-			}
+				tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN).getAction());
+				tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).getAction());
 
-			if (fShowPartNavigation) {
-				tbm.add(new Separator());
-				tbm.add(fChartActionProxies.get(COMMAND_ID_PART_PREVIOUS).getAction());
-				tbm.add(fChartActionProxies.get(COMMAND_ID_PART_NEXT).getAction());
+				if (fChartDataModel.getChartType() != ChartDataModel.CHART_TYPE_BAR) {
+					tbm.add(fChartActionProxies.get(COMMAND_ID_ZOOM_FIT_GRAPH).getAction());
+				}
 			}
 
 			if (refreshToolbar) {
@@ -643,12 +661,7 @@ public class Chart extends ViewForm {
 		return fChartComponents.devSliderBarHeight != 0;
 	}
 
-	void onExecuteFitGraph() {
-		fChartDataModel.resetMinMaxValues();
-		onExecuteZoomOut(true);
-	}
-
-	public void onExecuteMouseMode(final boolean isChecked) {
+	void onExecuteMouseMode(final boolean isChecked) {
 		setMouseMode(isChecked);
 	}
 
@@ -660,46 +673,34 @@ public class Chart extends ViewForm {
 		fChartComponents.getChartComponentGraph().moveRightSliderHere();
 	}
 
-//	public void onExecuteMoveSlidersWhenZoomed(final Boolean isItemChecked) {
-//		fChartComponents.getChartComponentGraph().moveSlidersWhenZoomed(isItemChecked);
-//	}
-
-	void onExecutePartNext() {
-		fChartComponents.getChartComponentGraph().moveToNextPart();
+	void onExecuteMoveSlidersToBorder() {
+		fChartComponents.getChartComponentGraph().moveSlidersToBorderWithoutCheck();
 	}
 
-	void onExecutePartPrevious() {
-		fChartComponents.getChartComponentGraph().moveToPrevPart();
+	void onExecuteZoomFitGraph() {
+
+		fChartDataModel.resetMinMaxValues();
+
+		fChartComponents.getChartComponentGraph().zoomOutFitGraph();
 	}
 
 	void onExecuteZoomIn() {
-		fChartComponents.zoomIn();
-		setChartCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
+
+		if (fChartComponents.devSliderBarHeight == 0) {
+			fChartComponents.getChartComponentGraph().zoomInWithoutSlider();
+			fChartComponents.onResize();
+		} else {
+			fChartComponents.getChartComponentGraph().zoomInWithMouse();
+		}
 	}
 
 	/**
-	 * Zoom into the chart and update the actions
+	 * Zoom to the vertical sliders
 	 */
 	public void onExecuteZoomInWithSlider() {
 
 		fChartComponents.getChartComponentGraph().zoomInWithSlider();
 		fChartComponents.onResize();
-
-		setChartCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
-	}
-
-	void onExecuteZoomOut() {
-
-		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(true);
-		fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(false);
-		fChartActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(false);
-		fChartActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(false);
-
-		if (fUseActionHandlers) {
-			fActionHandlerManager.updateUIState();
-		}
-
-		fChartComponents.zoomOut(true);
 	}
 
 	public void onExecuteZoomOut(final boolean updateChart) {
@@ -708,13 +709,7 @@ public class Chart extends ViewForm {
 			return;
 		}
 
-		fChartComponents.zoomOut(updateChart);
-
-		setChartCommandEnabled(COMMAND_ID_ZOOM_IN, true);
-		setChartCommandEnabled(COMMAND_ID_ZOOM_OUT, false);
-
-		setChartCommandEnabled(COMMAND_ID_PART_PREVIOUS, false);
-		setChartCommandEnabled(COMMAND_ID_PART_NEXT, false);
+		fChartComponents.getChartComponentGraph().zoomOutWithMouse(updateChart);
 	}
 
 	/**
@@ -810,15 +805,6 @@ public class Chart extends ViewForm {
 		this.fDrawBarChartAtBottom = fDrawBarCharttAtBottom;
 	}
 
-	@Override
-	public boolean setFocus() {
-
-		/*
-		 * set focus to the graph component
-		 */
-		return fChartComponents.getChartComponentGraph().setFocus();
-	}
-
 //	/**
 //	 * Set <code>true</code> when the internal action bar should be used, set <code>false</code>
 //	 * when the workbench action should be used.
@@ -828,6 +814,15 @@ public class Chart extends ViewForm {
 //	public void setUseInternalActionBar(boolean useInternalActionBar) {
 //		fUseInternalActionBar = useInternalActionBar;
 //	}
+
+	@Override
+	public boolean setFocus() {
+
+		/*
+		 * set focus to the graph component
+		 */
+		return fChartComponents.getChartComponentGraph().setFocus();
+	}
 
 	/**
 	 * Sets the alpha value for the filling operation
@@ -901,15 +896,15 @@ public class Chart extends ViewForm {
 		fChartComponents.setMarkerVisible(isMarkerVisible);
 	}
 
+//	public void setShowPartNavigation(final boolean showPartNavigation) {
+//		fShowPartNavigation = showPartNavigation;
+//	}
+
 	/**
 	 * Make the mouse mode button visible
 	 */
 	public void setShowMouseMode() {
 		fShowMouseMode = true;
-	}
-
-	public void setShowPartNavigation(final boolean showPartNavigation) {
-		fShowPartNavigation = showPartNavigation;
 	}
 
 	/**
@@ -1005,22 +1000,6 @@ public class Chart extends ViewForm {
 		});
 	}
 
-	private void updateActionState() {
-
-		fChartActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(false);
-		fChartActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(false);
-
-		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(true);
-		fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(false);
-
-		fChartActionProxies.get(COMMAND_ID_ZOOM_FIT_GRAPH).setEnabled(true);
-
-		// update UI state for the action handlers
-		if (useInternalActionBar() == false) {
-			fActionHandlerManager.updateUIState();
-		}
-	}
-
 	/**
 	 * Sets a new data model for the chart and redraws it, NULL will hide the chart
 	 * 
@@ -1102,36 +1081,4 @@ public class Chart extends ViewForm {
 		return fUseInternalActionBar;
 	}
 
-//	/**
-//	 * Zoom into the chart so that the sliders are positioned on the right and left border of the
-//	 * chart
-//	 */
-//	public void zoomIn() {
-//		fChartComponents.zoomIn();
-//		setChartCommandEnabled(COMMAND_ID_ZOOM_OUT, true);
-//	}
-
-//	/**
-//	 * zoom into the chart where the graph is divided into parts (months)
-//	 * 
-//	 * @param parts
-//	 *            number of parts into how many parts the chart is devided
-//	 * @param position
-//	 *            is based on 0
-//	 * @param scrollSmoothly
-//	 */
-//	public void zoomWithParts(final int parts, final int position, final boolean scrollSmoothly) {
-//
-//		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(false);
-//		fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(true);
-//
-//		fChartActionProxies.get(COMMAND_ID_PART_PREVIOUS).setEnabled(true);
-//		fChartActionProxies.get(COMMAND_ID_PART_NEXT).setEnabled(true);
-//
-//		if (fUseActionHandlers) {
-//			fActionHandlerManager.updateUIEnablementState();
-//		}
-//
-//		fChartComponents.zoomWithParts(parts, position, scrollSmoothly);
-//	}
 }

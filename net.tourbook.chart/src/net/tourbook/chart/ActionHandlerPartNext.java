@@ -21,12 +21,12 @@ import org.eclipse.core.commands.ExecutionException;
 public class ActionHandlerPartNext extends ActionHandler {
 
 	public ActionHandlerPartNext() {
-		fCommandId = Chart.COMMAND_ID_PART_NEXT;
+//		fCommandId = Chart.COMMAND_ID_PART_NEXT;
 	}
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		fChart.onExecutePartNext();
+//		fChart.onExecutePartNext();
 
 		return null;
 	}

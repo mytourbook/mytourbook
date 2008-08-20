@@ -26,7 +26,7 @@ public class ActionHandlerZoomOut extends ActionHandler {
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		fChart.onExecuteZoomOut();
+		fChart.onExecuteZoomOut(true);
 
 		return null;
 	}

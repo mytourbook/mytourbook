@@ -26,7 +26,7 @@ public class ActionHandlerZoomFitGraph extends ActionHandler {
 
 	public Object execute(final ExecutionEvent execEvent) throws ExecutionException {
 
-		fChart.onExecuteFitGraph();
+		fChart.onExecuteZoomFitGraph();
 
 		return null;
 	}

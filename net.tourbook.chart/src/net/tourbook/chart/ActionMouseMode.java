@@ -23,12 +23,12 @@ public class ActionMouseMode extends Action {
 
 	public ActionMouseMode(final Chart chart) {
 
-		super(Messages.Action_toggle_mouse, Action.AS_CHECK_BOX);
+		super(Messages.Action_mouse_mode, Action.AS_CHECK_BOX);
 		
 		fChart = chart;
 
-		setToolTipText(Messages.Action_toggle_mouse_tooltip);
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image_toggle_mouse));
+		setToolTipText(Messages.Action_mouse_mode_tooltip);
+		setImageDescriptor(Activator.getImageDescriptor(Messages.Image_mouse_mode));
 	}
 
 	@Override

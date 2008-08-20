@@ -21,7 +21,7 @@ public class ActionPartNext extends Action {
 
 	private Chart	fChart;
 
-	public ActionPartNext(Chart chart) {
+	public ActionPartNext(final Chart chart) {
 
 		fChart = chart;
 
@@ -33,6 +33,6 @@ public class ActionPartNext extends Action {
 
 	@Override
 	public void run() {
-		fChart.onExecutePartNext();
+//		fChart.onExecutePartNext();
 	}
 }

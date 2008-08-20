@@ -130,10 +130,7 @@ public class ActionHandlerManager {
 		fActionHandlers.put(Chart.COMMAND_ID_ZOOM_OUT, new ActionHandlerZoomOut());
 		fActionHandlers.put(Chart.COMMAND_ID_ZOOM_FIT_GRAPH, new ActionHandlerZoomFitGraph());
 
-		fActionHandlers.put(Chart.COMMAND_ID_PART_PREVIOUS, new ActionHandlerPartPrevious());
-		fActionHandlers.put(Chart.COMMAND_ID_PART_NEXT, new ActionHandlerPartNext());
-
-		fActionHandlers.put(Chart.COMMAND_ID_MOUSE_MODE, new ActionHandlerToggleMouse());
+		fActionHandlers.put(Chart.COMMAND_ID_MOUSE_MODE, new ActionHandlerMouseMode());
 
 		activateHandlers();
 	}

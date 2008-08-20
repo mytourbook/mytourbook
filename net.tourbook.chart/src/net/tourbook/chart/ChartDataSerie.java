@@ -96,6 +96,11 @@ public abstract class ChartDataSerie {
 
 	private RGB						fDefaultRGB;
 
+	/**
+	 * when <code>true</code> the minimum value is forced when the dataserie is displayed
+	 */
+	private boolean					fIsForceMinValue				= false;
+
 	public int getAxisUnit() {
 		return axisUnit;
 	}
@@ -191,6 +196,10 @@ public abstract class ChartDataSerie {
 		return fVisibleMinValue;
 	}
 
+	public boolean isForceMinValue() {
+		return fIsForceMinValue;
+	}
+
 	public void setAxisUnit(final int axisUnit) {
 		this.axisUnit = axisUnit;
 	}
@@ -259,7 +268,7 @@ public abstract class ChartDataSerie {
 
 	public void setRgbDark(final RGB[] rgbDark) {
 		fRgbDark = rgbDark;
-	}
+	} 
 
 	public void setRgbLine(final RGB[] rgbLine) {
 		fRgbLine = rgbLine;
@@ -283,6 +292,11 @@ public abstract class ChartDataSerie {
 
 	public void setVisibleMinValue(final int minValue) {
 		fVisibleMinValue = minValue;
+	}
+
+	public void setVisibleMinValue(final int minValue, final boolean forceMinValue) {
+		fVisibleMinValue = minValue;
+		fIsForceMinValue = forceMinValue;
 	}
 
 }

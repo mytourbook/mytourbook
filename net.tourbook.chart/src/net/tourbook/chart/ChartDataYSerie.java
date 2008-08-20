@@ -391,6 +391,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 		ySliderBottom = new ChartYSlider(this);
 	}
 
+
 	/**
 	 * set the direction for the y axis <code>
 	 * true: the direction is from bottom to top by increasing number

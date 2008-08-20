@@ -34,7 +34,7 @@ public class ActionFitGraph extends Action {
 
 	@Override
 	public void run() {
-		fChart.onExecuteFitGraph();
+		fChart.onExecuteZoomFitGraph();
 	}
 
 }
