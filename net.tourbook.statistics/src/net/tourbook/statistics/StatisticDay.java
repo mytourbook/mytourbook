@@ -168,7 +168,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 		// create statistic chart
 		fChart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-		fChart.setShowPartNavigation(true);
+//		fChart.setShowPartNavigation(true);
 		fChart.setShowZoomActions(true);
 		fChart.setCanScrollZoomedChart(true);
 		fChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
