@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.device.feature"
       label="%Feature_Name"
-      version="1.5.0.v20080509"
+      version="1.6.0.v2008-08"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -315,70 +315,70 @@ POSSIBILITY OF SUCH DAMAGES.
          id="net.tourbook.device.hac4"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.hac5"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.hac4pro"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.cm4xxm"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.tur"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.crp"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.garmin"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.daum_ergobike"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.device.gpx"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
 </feature>
