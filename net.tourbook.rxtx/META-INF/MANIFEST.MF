@@ -7,3 +7,4 @@ Bundle-ClassPath: RXTXcomm.jar
 Bundle-Localization: plugin
 Export-Package: gnu.io
 Bundle-Vendor: MyTourbook
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
