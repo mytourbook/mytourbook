@@ -4,5 +4,5 @@ Bundle-SymbolicName: net.tourbook.branding
 Bundle-Version: 1.6.0.v2008-08
 Bundle-Vendor: MyTourbook
 Bundle-Localization: plugin
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Bundle-Name: Branding plugin
