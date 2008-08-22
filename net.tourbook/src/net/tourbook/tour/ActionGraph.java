@@ -85,7 +85,7 @@ class ActionGraph extends Action {
 			chartConfig.removeVisibleGraph(fGraphId);
 		}
 
-		fTourChart.updateActionState();
+		fTourChart.initializeTourActions();
 		fTourChart.updateTourChart(true);
 	}
 

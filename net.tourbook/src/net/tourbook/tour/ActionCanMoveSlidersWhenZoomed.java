@@ -30,6 +30,6 @@ class ActionCanMoveSlidersWhenZoomed extends Action {
 
 	@Override
 	public void run() {
-		fTourChart.onExecuteCanMoveSlidersWhenZoomed(isChecked());
+		fTourChart.onExecuteCanAutoMoveSliders(isChecked());
 	}
 }

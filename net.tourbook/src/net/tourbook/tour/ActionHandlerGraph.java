@@ -59,7 +59,7 @@ class ActionHandlerGraph extends TCActionHandler implements IElementUpdater {
 			chartConfig.removeVisibleGraph(fGraphId);
 		}
 
-		fTourChart.updateActionState();
+		fTourChart.initializeTourActions();
 		fTourChart.updateTourChart(true);
 
 		return null;
