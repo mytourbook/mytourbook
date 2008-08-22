@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.feature"
       label="%Feature_Name"
-      version="1.5.0.v20080509"
+      version="1.6.0.v2008-08"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -307,7 +307,6 @@ POSSIBILITY OF SUCH DAMAGES.
          version="0.0.0"/>
 
    <requires>
-      <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="de.byteholder.geoclipse"/>
       <import plugin="de.byteholder.gpx"/>
       <import plugin="org.eclipse.core.runtime"/>
@@ -315,29 +314,28 @@ POSSIBILITY OF SUCH DAMAGES.
       <import plugin="org.apache.derby.core"/>
       <import plugin="org.eclipse.update.ui"/>
       <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="net.tourbook.ext.ejb3"/>
    </requires>
 
    <plugin
          id="net.tourbook"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.branding"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.rxtx.win32"
-         os="win32"
+         id="net.tourbook.chart"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         fragment="true"
+         version="1.6.0.v2008-08"
          unpack="false"/>
 
    <plugin
@@ -349,7 +347,6 @@ POSSIBILITY OF SUCH DAMAGES.
 
    <plugin
          id="net.tourbook.rxtx.linux"
-         os="linux"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -358,7 +355,6 @@ POSSIBILITY OF SUCH DAMAGES.
 
    <plugin
          id="net.tourbook.rxtx.macosx"
-         os="macosx"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -366,10 +362,11 @@ POSSIBILITY OF SUCH DAMAGES.
          unpack="false"/>
 
    <plugin
-         id="net.tourbook.chart"
+         id="net.tourbook.rxtx.win32"
          download-size="0"
          install-size="0"
          version="0.0.0"
+         fragment="true"
          unpack="false"/>
 
 </feature>
