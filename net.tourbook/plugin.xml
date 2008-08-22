@@ -1,25 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.0"?>
+<?eclipse version="3.2"?>
 <plugin>
    <extension-point id="statisticYear" name="Year Statistic" schema="schema/statisticYear.exsd"/>
    <extension-point id="deviceDataReader" name="Device Data Reader" schema="schema/deviceDataReader.exsd"/>
    <extension-point id="externalDeviceDataReader" name="External Device Data Reader" schema="schema/externalDeviceDataReader.exsd"/>
 
-     <extension
+   <extension
          id="application"
          point="org.eclipse.core.runtime.applications">
+         
       <application>
          <run
                class="net.tourbook.application.Application">
          </run>
       </application>
+      
    </extension>
+   
+  
+   
    <extension
          id="product"
          point="org.eclipse.core.runtime.products">
+         
       <product
             application="net.tourbook.application"
             name="MyTourbook">
+            
          <property
                name="windowImages"
                value="icons/application/tourbook16.gif,icons/application/tourbook32.gif,icons/application/tourbook48.gif,icons/application/tourbook64.gif,icons/application/tourbook128.gif"/>
@@ -50,7 +57,9 @@
                value="plugin_customization.ini">
          </property>
       </product>
+      
    </extension>
+   
    
    <extension
          point="org.eclipse.core.runtime.preferences">

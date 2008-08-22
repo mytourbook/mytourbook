@@ -22,6 +22,7 @@ import java.util.Iterator;
 import net.tourbook.Messages;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TreeViewerItem;
 
@@ -61,6 +62,8 @@ public class ActionDeleteTour extends Action {
 		int firstSelectedTourIndex = -1;
 		TreeViewerItem firstSelectedParent = null;
 
+		final ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
+		
 		if (monitor != null) {
 			monitor.beginTask(Messages.Tour_Book_Action_delete_selected_tours_task, selection.size());
 		}
@@ -75,6 +78,8 @@ public class ActionDeleteTour extends Action {
 
 				if (TourDatabase.removeTour(tourItem.getTourId())) {
 
+					removedTours.add(tourItem);
+					
 					final TreeViewerItem tourParent = tourItem.getParentItem();
 
 					// get the index for the first selected tour item

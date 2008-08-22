@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -148,26 +148,46 @@ public class TourbookPlugin extends AbstractUIPlugin {
 		fSplashHandler = splashHandler;
 	}
 
-	/**
-	 * This method is called upon plug-in activation
+//	/**
+//	 * This method is called upon plug-in activation
+//	 */
+//	@Override
+//	public void start(final BundleContext context) throws Exception {
+//		super.start(context);
+//	}
+//
+//	/**
+//	 * This method is called when the plug-in is stopped
+//	 */
+//	@Override
+//	public void stop(final BundleContext context) throws Exception {
+//
+//		super.stop(context);
+//
+//		plugin = null;
+//		resourceBundle = null;
+//
+//		// NetworkServerControl server = new NetworkServerControl();
+//		// server.shutdown();
+//	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	public void start(final BundleContext context) throws Exception {
 		super.start(context);
+		plugin = this;
 	}
 
-	/**
-	 * This method is called when the plug-in is stopped
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	public void stop(final BundleContext context) throws Exception {
-
-		super.stop(context);
-
 		plugin = null;
-		resourceBundle = null;
-
-		// NetworkServerControl server = new NetworkServerControl();
-		// server.shutdown();
+		super.stop(context);
 	}
 }
