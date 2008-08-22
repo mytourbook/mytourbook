@@ -131,7 +131,7 @@ public class ChartComponentGraph extends Canvas {
 	 * ratio where the mouse was double clicked, this position is used to zoom the chart with the
 	 * mouse
 	 */
-	private float						fXOffsetMouseRatio;
+	private float						fXOffsetMouseZoomInRatio;
 
 	/**
 	 * the zoomed chart can be scrolled when set to <code>true</code>, for a zoomed chart, the chart
@@ -149,7 +149,7 @@ public class ChartComponentGraph extends Canvas {
 	 * when <code>true</code> the vertical sliders will be moved to the border when the chart is
 	 * zoomed
 	 */
-	boolean								canMoveSlidersWhenZoomed;
+	boolean								canAutoMoveSliders;
 
 	/**
 	 * true indicates the graph needs to be redrawn in the paint event
@@ -3221,39 +3221,39 @@ public class ChartComponentGraph extends Canvas {
 		colorTxt.dispose();
 	}
 
-	void enforceChartImageMinMaxWidth() {
-
-//		if (graphZoomParts != 1) {
+//	void enforceChartImageMinMaxWidth() {
 //
-////			zoomWithParts(graphZoomParts, graphZoomPartPosition, true);
+////		if (graphZoomParts != 1) {
+////
+//////			zoomWithParts(graphZoomParts, graphZoomPartPosition, true);
+////
+////		} else {
+//
+//		final int devVisibleChartWidth = getDevVisibleChartWidth();
+//
+//		final int devImageWidth = (int) (fGraphZoomRatio * devVisibleChartWidth);
+//		final int chartMinWidth = fChart.getChartDataModel().getChartMinWidth();
+//
+//		if (canScrollZoomedChart) {
+//
+//			// enforce min/max width for the chart
+//			final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
+//					ChartComponents.CHART_MIN_WIDTH);
+//
+//			final int devMaxWidth = Math.min(devImageWidth, ChartComponents.CHART_MAX_WIDTH);
+//
+//			fDevVirtualGraphImageWidth = Math.max(devMinWidth, devMaxWidth);
 //
 //		} else {
-
-		final int devVisibleChartWidth = getDevVisibleChartWidth();
-
-		final int devImageWidth = (int) (fGraphZoomRatio * devVisibleChartWidth);
-		final int chartMinWidth = fChart.getChartDataModel().getChartMinWidth();
-
-		if (canScrollZoomedChart) {
-
-			// enforce min/max width for the chart
-			final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
-					ChartComponents.CHART_MIN_WIDTH);
-
-			final int devMaxWidth = Math.min(devImageWidth, ChartComponents.CHART_MAX_WIDTH);
-
-			fDevVirtualGraphImageWidth = Math.max(devMinWidth, devMaxWidth);
-
-		} else {
-
-			// enforce min width for the chart
-			final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
-					ChartComponents.CHART_MIN_WIDTH);
-
-			fDevVirtualGraphImageWidth = Math.max(devMinWidth, devImageWidth);
-		}
+//
+//			// enforce min width for the chart
+//			final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
+//					ChartComponents.CHART_MIN_WIDTH);
+//
+//			fDevVirtualGraphImageWidth = Math.max(devMinWidth, devImageWidth);
 //		}
-	}
+////		}
+//	}
 
 	/**
 	 * Fills the surrounding area of an rectangle with background color
@@ -3632,10 +3632,12 @@ public class ChartComponentGraph extends Canvas {
 	void moveLeftSliderHere() {
 
 		final ChartXSlider leftSlider = getLeftSlider();
-		final int devRightPosition = fDevGraphImageXOffset + fMouseDownPositionX;
+		final int devLeftPosition = fDevGraphImageXOffset + fMouseDownPositionX;
 
-		computeXSliderValue(leftSlider, devRightPosition);
-		leftSlider.moveToDevPosition(devRightPosition, true, true);
+		computeXSliderValue(leftSlider, devLeftPosition);
+		leftSlider.moveToDevPosition(devLeftPosition, true, true);
+
+		setZoomInPosition();
 
 		fIsSliderDirty = true;
 		redraw();
@@ -3652,13 +3654,15 @@ public class ChartComponentGraph extends Canvas {
 		computeXSliderValue(rightSlider, devRightPosition);
 		rightSlider.moveToDevPosition(devRightPosition, true, true);
 
+		setZoomInPosition();
+
 		fIsSliderDirty = true;
 		redraw();
 	}
 
 	private void moveSlidersToBorder() {
 
-		if (canMoveSlidersWhenZoomed == false || fChart.getMouseMode().equals(Chart.MOUSE_MODE_SLIDER)) {
+		if (canAutoMoveSliders == false) {
 			return;
 		}
 
@@ -3782,7 +3786,7 @@ public class ChartComponentGraph extends Canvas {
 			 * chart is zoomed
 			 */
 			final int devMousePosInChart = fSelectedXSlider.getDevVirtualSliderLinePos();
-			fXOffsetMouseRatio = (float) devMousePosInChart / fDevVirtualGraphImageWidth;
+			fXOffsetMouseZoomInRatio = (float) devMousePosInChart / fDevVirtualGraphImageWidth;
 
 			redraw();
 			setDefaultCursor();
@@ -3833,19 +3837,6 @@ public class ChartComponentGraph extends Canvas {
 		fColorCache.dispose();
 	}
 
-//	void onKeyUp(final Event event) {
-//
-//		final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
-//		final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
-//
-//		final boolean isMoveMode = isShift || isCtrl;
-//
-//		fIsMoveMode = !isMoveMode;
-//
-//		System.out.println(fIsMoveMode + " " + event.stateMask + " s:" + isShift + " c:" + isCtrl);
-//		setDefaultCursor();
-//	}
-
 	void onMouseDoubleClick(final MouseEvent e) {
 
 		if (fHoveredBarSerieIndex != -1) {
@@ -3888,13 +3879,25 @@ public class ChartComponentGraph extends Canvas {
 				 * chart is zoomed
 				 */
 				final int devMousePosInChart = fDevGraphImageXOffset + e.x;
-				fXOffsetMouseRatio = (float) devMousePosInChart / fDevVirtualGraphImageWidth;
+				fXOffsetMouseZoomInRatio = (float) devMousePosInChart / fDevVirtualGraphImageWidth;
 
 				zoomInWithMouse();
-				moveSlidersToBorder();
 			}
 		}
 	}
+
+//	void onKeyUp(final Event event) {
+//
+//		final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
+//		final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
+//
+//		final boolean isMoveMode = isShift || isCtrl;
+//
+//		fIsMoveMode = !isMoveMode;
+//
+//		System.out.println(fIsMoveMode + " " + event.stateMask + " s:" + isShift + " c:" + isCtrl);
+//		setDefaultCursor();
+//	}
 
 	/**
 	 * Mouse down event handler
@@ -4355,6 +4358,14 @@ public class ChartComponentGraph extends Canvas {
 
 			fChartComponents.handleLeftRightEvent(event);
 
+//			if (canAutoMoveSliders) {
+//				Display.getCurrent().asyncExec(new Runnable() {
+//					public void run() {
+//						moveSlidersToBorder();
+//					}
+//				});
+//
+//			}
 			if (canAutoZoomToSlider) {
 
 				/*
@@ -4622,6 +4633,10 @@ public class ChartComponentGraph extends Canvas {
 		return selectedIndex;
 	}
 
+	void setCanAutoMoveSlidersWhenZoomed(final boolean canMoveSlidersWhenZoomed) {
+		this.canAutoMoveSliders = canMoveSlidersWhenZoomed;
+	}
+
 	/**
 	 * @param canAutoZoomToSlider
 	 *            the canAutoZoomToSlider to set
@@ -4636,10 +4651,6 @@ public class ChartComponentGraph extends Canvas {
 		if (canAutoZoomToSlider) {
 			this.canScrollZoomedChart = false;
 		}
-	}
-
-	void setCanMoveSlidersWhenZoomed(final boolean canMoveSlidersWhenZoomed) {
-		this.canMoveSlidersWhenZoomed = canMoveSlidersWhenZoomed;
 	}
 
 	/**
@@ -4700,7 +4711,7 @@ public class ChartComponentGraph extends Canvas {
 			 * reposition the mouse zoom position
 			 */
 			final float xOffsetMouse = fDevGraphImageXOffset + devVisibleChartWidth / 2;
-			fXOffsetMouseRatio = xOffsetMouse / fDevVirtualGraphImageWidth;
+			fXOffsetMouseZoomInRatio = xOffsetMouse / fDevVirtualGraphImageWidth;
 
 			updateYDataMinMaxValues();
 
@@ -4902,9 +4913,6 @@ public class ChartComponentGraph extends Canvas {
 
 		fIsSelectionVisible = true;
 
-//		// disable zoom with parts
-//		graphZoomParts = 1;
-
 		redrawBarSelection();
 	}
 
@@ -4979,7 +4987,7 @@ public class ChartComponentGraph extends Canvas {
 
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
 
-		float devXOffset = fXOffsetMouseRatio * fDevVirtualGraphImageWidth;
+		float devXOffset = fXOffsetMouseZoomInRatio * fDevVirtualGraphImageWidth;
 		devXOffset -= devVisibleChartWidth / 2;
 
 		// adjust left border
@@ -5027,6 +5035,20 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	void setXSliderVisible(final boolean isSliderVisible) {
 		this.fIsXSliderVisible = isSliderVisible;
+	}
+
+	private void setZoomInPosition() {
+
+		// get left+right slider
+		final ChartXSlider leftSlider = getLeftSlider();
+		final ChartXSlider rightSlider = getRightSlider();
+
+		final int devLeftVirtualSliderLinePos = leftSlider.getDevVirtualSliderLinePos();
+
+		final int devZoomInPosInChart = devLeftVirtualSliderLinePos
+				+ ((rightSlider.getDevVirtualSliderLinePos() - devLeftVirtualSliderLinePos) / 2);
+
+		fXOffsetMouseZoomInRatio = (float) devZoomInPosInChart / fDevVirtualGraphImageWidth;
 	}
 
 	private void showToolTip(final int x, final int y) {
@@ -5143,9 +5165,9 @@ public class ChartComponentGraph extends Canvas {
 		/*
 		 * reposition the mouse zoom position
 		 */
-		float xOffsetMouse = fXOffsetMouseRatio * fDevVirtualGraphImageWidth;
+		float xOffsetMouse = fXOffsetMouseZoomInRatio * fDevVirtualGraphImageWidth;
 		xOffsetMouse = xOffsetMouse - devXDiff;
-		fXOffsetMouseRatio = xOffsetMouse / fDevVirtualGraphImageWidth;
+		fXOffsetMouseZoomInRatio = xOffsetMouse / fDevVirtualGraphImageWidth;
 
 		updateYDataMinMaxValues();
 
@@ -5530,22 +5552,26 @@ public class ChartComponentGraph extends Canvas {
 
 				// chart is within the range which can be zoomed in
 
-				if (devVisibleChartWidth * (fGraphZoomRatio * ZOOM_RATIO_FACTOR) > devMaxChartWidth) {
-					/*
-					 * the zoomed graph would be wider than the max width, reduce it to the max
-					 * width
-					 */
-					fGraphZoomRatio = devMaxChartWidth / devVisibleChartWidth;
+				final float zoomedInRatio = fGraphZoomRatio * ZOOM_RATIO_FACTOR;
+				final int devZoomedInWidth = (int) (devVisibleChartWidth * zoomedInRatio);
+
+				if (devZoomedInWidth > devMaxChartWidth) {
+
+					// the zoomed graph would be wider than the max width, reduce it to the max width
+					fGraphZoomRatio = (float) devMaxChartWidth / devVisibleChartWidth;
 					fDevVirtualGraphImageWidth = devMaxChartWidth;
+
 				} else {
-					fGraphZoomRatio = fGraphZoomRatio * ZOOM_RATIO_FACTOR;
-					fDevVirtualGraphImageWidth = (int) (fGraphZoomRatio * devVisibleChartWidth);
+
+					fGraphZoomRatio = zoomedInRatio;
+					fDevVirtualGraphImageWidth = devZoomedInWidth;
 				}
 
 				setXOffsetZoomRatio();
 				handleChartResizeForSliders();
 
 				updateYDataMinMaxValues();
+				moveSlidersToBorder();
 
 				fChartComponents.onResize();
 			}
@@ -5579,9 +5605,6 @@ public class ChartComponentGraph extends Canvas {
 				fGraphZoomRatio = fGraphZoomRatio * ZOOM_RATIO_FACTOR;
 				fDevVirtualGraphImageWidth = (int) (graphImageWidth * ZOOM_RATIO_FACTOR);
 			}
-
-//			// disable zoom with parts
-//			graphZoomParts = 1;
 
 			fScrollToSelection = true;
 
@@ -5653,7 +5676,7 @@ public class ChartComponentGraph extends Canvas {
 				final float devVirtualWidth = fGraphZoomRatio * devVisibleChartWidth;
 				final float devXOffset = fXOffsetZoomRatio * devVirtualWidth;
 				final int devCenterPos = (int) (devXOffset + devVisibleChartWidth / 2);
-				fXOffsetMouseRatio = devCenterPos / devVirtualWidth;
+				fXOffsetMouseZoomInRatio = devCenterPos / devVirtualWidth;
 			}
 		}
 
@@ -5763,6 +5786,8 @@ public class ChartComponentGraph extends Canvas {
 					}
 				}
 			}
+
+			moveSlidersToBorder();
 		}
 
 		fChart.enableActions();

@@ -80,7 +80,6 @@ public class Chart extends ViewForm {
 	private Chart						fSynchedChart;
 
 	private boolean						fShowZoomActions;
-//	private boolean						fShowPartNavigation;
 	private boolean						fShowMouseMode						= false;
 
 	private Color						fBackgroundColor;
@@ -333,15 +332,18 @@ public class Chart extends ViewForm {
 
 	void enableActions() {
 
-		final boolean canZoomOut = fChartComponents.getChartComponentGraph().getGraphZoomRatio() > 1;
+		final ChartComponentGraph chartComponentGraph = fChartComponents.getChartComponentGraph();
 
-		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(true);
-		fChartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).setEnabled(true);
+		final boolean canZoomOut = chartComponentGraph.getGraphZoomRatio() > 1;
+		final boolean canZoomIn = chartComponentGraph.getDevVirtualGraphImageWidth() < ChartComponents.CHART_MAX_WIDTH;
+
+		fChartActionProxies.get(COMMAND_ID_ZOOM_IN).setEnabled(canZoomIn);
 		fChartActionProxies.get(COMMAND_ID_ZOOM_OUT).setEnabled(canZoomOut);
 
-		/*
-		 * this is always enabled because the y-slider can change the chart
-		 */
+		// zoom in to slider has no limits but when there are more than 10000 units, the units are not displayed
+		fChartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).setEnabled(true);
+
+		// fit to graph is always enabled because the y-slider can change the chart
 		fChartActionProxies.get(COMMAND_ID_ZOOM_FIT_GRAPH).setEnabled(true);
 
 		if (fUseActionHandlers) {
@@ -386,12 +388,10 @@ public class Chart extends ViewForm {
 				actionMouseMode.setText(Messages.Action_mouse_mode_slider);
 			}
 
+			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
+			menuMgr.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).getAction());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).getAction());
-			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
-			menuMgr.add(new Separator());
-
-			menuMgr.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
 			menuMgr.add(actionMouseMode);
 			menuMgr.add(new Separator());
 
@@ -525,12 +525,12 @@ public class Chart extends ViewForm {
 		return fBackgroundColor;
 	}
 
-	public boolean getCanAutoZoomToSlider() {
-		return fChartComponents.getChartComponentGraph().canAutoZoomToSlider;
+	public Boolean getCanAutoMoveSliders() {
+		return fChartComponents.getChartComponentGraph().canAutoMoveSliders;
 	}
 
-	public Boolean getCanMoveSlidersWhenZoomed() {
-		return fChartComponents.getChartComponentGraph().canMoveSlidersWhenZoomed;
+	public boolean getCanAutoZoomToSlider() {
+		return fChartComponents.getChartComponentGraph().canAutoZoomToSlider;
 	}
 
 	public boolean getCanScrollZoomedChart() {
@@ -573,7 +573,7 @@ public class Chart extends ViewForm {
 		return fChartComponents.getChartComponentGraph().getLeftSlider();
 	}
 
-	String getMouseMode() {
+	public String getMouseMode() {
 		return fMouseMode;
 	}
 
@@ -673,7 +673,7 @@ public class Chart extends ViewForm {
 		fChartComponents.getChartComponentGraph().moveRightSliderHere();
 	}
 
-	void onExecuteMoveSlidersToBorder() {
+	public void onExecuteMoveSlidersToBorder() {
 		fChartComponents.getChartComponentGraph().moveSlidersToBorderWithoutCheck();
 	}
 
@@ -750,21 +750,21 @@ public class Chart extends ViewForm {
 	}
 
 	/**
+	 * Set the option to move the sliders to the border when the chart is zoomed
+	 * 
+	 * @param canMoveSlidersWhenZoomed
+	 */
+	public void setCanAutoMoveSliders(final boolean canMoveSlidersWhenZoomed) {
+		fChartComponents.getChartComponentGraph().setCanAutoMoveSlidersWhenZoomed(canMoveSlidersWhenZoomed);
+	}
+
+	/**
 	 * set the option to auto zoom the chart
 	 * 
 	 * @param canZoomToSliderOnMouseUp
 	 */
 	public void setCanAutoZoomToSlider(final boolean canZoomToSliderOnMouseUp) {
 		fChartComponents.getChartComponentGraph().setCanAutoZoomToSlider(canZoomToSliderOnMouseUp);
-	}
-
-	/**
-	 * Set the option to move the sliders to the border when the chart is zoomed
-	 * 
-	 * @param canMoveSlidersWhenZoomed
-	 */
-	public void setCanMoveSlidersWhenZoomed(final boolean canMoveSlidersWhenZoomed) {
-		fChartComponents.getChartComponentGraph().setCanMoveSlidersWhenZoomed(canMoveSlidersWhenZoomed);
 	}
 
 	/**
