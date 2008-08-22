@@ -321,21 +321,21 @@ POSSIBILITY OF SUCH DAMAGES.
          id="net.tourbook"
          download-size="0"
          install-size="0"
-         version="1.6.0.v2008-08"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.branding"
          download-size="0"
          install-size="0"
-         version="1.6.0.v2008-08"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="net.tourbook.chart"
          download-size="0"
          install-size="0"
-         version="1.6.0.v2008-08"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
@@ -367,6 +367,13 @@ POSSIBILITY OF SUCH DAMAGES.
          install-size="0"
          version="0.0.0"
          fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
