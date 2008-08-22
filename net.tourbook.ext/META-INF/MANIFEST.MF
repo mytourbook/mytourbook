@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ext Plug-in
-Bundle-SymbolicName: net.tourbook.ext
-Bundle-Version: 1.6.0
+Bundle-SymbolicName: net.tourbook.ext;singleton:=true
+Bundle-Version: 1.6.0.v2008-08
 Bundle-ClassPath: joda-time-1.5.2.jar,
  c3p0-0.9.1.2.jar
 Bundle-Vendor: MyTourbook
@@ -59,3 +59,4 @@ Export-Package: com.mchange,
  org.joda.time.tz
 Require-Bundle: org.apache.derby.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
