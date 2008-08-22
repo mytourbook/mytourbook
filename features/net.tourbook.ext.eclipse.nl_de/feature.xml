@@ -2,7 +2,7 @@
 <feature
       id="net.tourbook.ext.eclipse.nl_de"
       label="Eclipse German Translation"
-      version="1.5.0.v20080509"
+      version="1.6.0.v2008-08"
       provider-name="MyTourbook">
 
    <description url="http://www.example.com/description">
@@ -138,14 +138,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.osgi.nl_de"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.swt.nl_de"
          download-size="0"
          install-size="0"
@@ -155,14 +147,6 @@
 
    <plugin
          id="org.eclipse.ui.forms.nl_de"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ui.nl_de"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -195,6 +179,14 @@
 
    <plugin
          id="org.eclipse.update.ui.nl_de"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.nl_de"
          download-size="0"
          install-size="0"
          version="0.0.0"
