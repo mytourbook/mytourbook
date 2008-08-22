@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Hibernate EJB3
-Bundle-SymbolicName: net.tourbook.ext.ejb3
+Bundle-SymbolicName: net.tourbook.ext.ejb3;singleton:=true
 Bundle-Version: 3.3.0
 Eclipse-BuddyPolicy: registered
 Bundle-ClassPath: lib/hibernate-entitymanager-3.3.0.GA/lib/ejb3-persistence.jar,
@@ -131,3 +131,5 @@ Export-Package: javax.persistence,
  org.hibernate.validator.interpolator,
  org.hibernate.validator.resources
 Bundle-Vendor: MyTourbook
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
