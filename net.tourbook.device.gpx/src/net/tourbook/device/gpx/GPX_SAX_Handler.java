@@ -99,7 +99,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private long							fCurrentTime;
 
 	private StringBuilder					fCharacters				= new StringBuilder();
-	private int								fAbsoluteDistance;
+	private float							fAbsoluteDistance;
 
 	private boolean							fIsError				= false;
 
@@ -109,10 +109,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		GPX_TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 	}
 
-	public GPX_SAX_Handler(	TourbookDevice deviceDataReader,
-							String importFileName,
-							DeviceData deviceData,
-							HashMap<String, TourData> tourDataMap) {
+	public GPX_SAX_Handler(	final TourbookDevice deviceDataReader,
+							final String importFileName,
+							final DeviceData deviceData,
+							final HashMap<String, TourData> tourDataMap) {
 
 		fDeviceDataReader = deviceDataReader;
 		fImportFileName = importFileName;
@@ -120,14 +120,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	}
 
 	@Override
-	public void characters(char[] chars, int startIndex, int length) throws SAXException {
+	public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
 		if (fIsInTime || fIsInEle || fIsInName) {
 			fCharacters.append(chars, startIndex, length);
 		}
 	}
 
-	private void computeAltitudeUpDown(TourData tourData) {
+	private void computeAltitudeUpDown(final TourData tourData) {
 
 		final int[] timeSerie = tourData.timeSerie;
 		final int[] altitudeSerie = tourData.altitudeSerie;
@@ -149,19 +149,19 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		int altitudeUp = 0;
 		int altitudeDown = 0;
 
-		int minTimeDiff = 10;
+		final int minTimeDiff = 10;
 
 		for (int timeIndex = 0; timeIndex < serieLength; timeIndex++) {
 
 			final int currentTime = timeSerie[timeIndex];
 
-			int timeDiff = currentTime - lastTime;
+			final int timeDiff = currentTime - lastTime;
 
 			currentAltitude = altitudeSerie[timeIndex];
 
 			if (timeDiff >= minTimeDiff) {
 
-				int altitudeDiff = lastAltitude - currentAltitude;
+				final int altitudeDiff = lastAltitude - currentAltitude;
 
 				if (altitudeDiff >= 0) {
 					altitudeUp += altitudeDiff;
@@ -179,7 +179,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	}
 
 	@Override
-	public void endElement(String uri, String localName, String name) throws SAXException {
+	public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
 		if (fIsError) {
 			return;
@@ -203,14 +203,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 					try {
 						fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT.parse(timeString).getTime();
-					} catch (ParseException e) {
+					} catch (final ParseException e) {
 						try {
 							fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_SSSZ.parse(timeString).getTime();
-						} catch (ParseException e2) {
+						} catch (final ParseException e2) {
 							try {
 								fTimeData.absoluteTime = fCurrentTime = GPX_TIME_FORMAT_RFC822.parse(timeString)
 										.getTime();
-							} catch (ParseException e3) {
+							} catch (final ParseException e3) {
 
 								fIsError = true;
 
@@ -289,7 +289,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			fTimeData.absoluteDistance = 0;
 		} else {
 			if (fTimeData.absoluteDistance == Float.MIN_VALUE) {
-				fTimeData.absoluteDistance = fAbsoluteDistance += (int) getDistance();
+				fTimeData.absoluteDistance = fAbsoluteDistance += getDistance();
 			}
 		}
 
@@ -322,8 +322,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		lat2 = lat2 * DEGRAD;
 		lon2 = lon2 * DEGRAD;
 
-		double dlon = lon2 - lon1;
-		double dlat = lat2 - lat1;
+		final double dlon = lon2 - lon1;
+		final double dlat = lat2 - lat1;
 
 		a = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
 
@@ -332,7 +332,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		return (EARTH_RADIUS * c) * 1000;
 	}
 
-	private double getDoubleValue(String textValue) {
+	private double getDoubleValue(final String textValue) {
 
 		try {
 			if (textValue != null) {
@@ -341,12 +341,12 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				return Double.MIN_VALUE;
 			}
 
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return Double.MIN_VALUE;
 		}
 	}
 
-	private float getFloatValue(String textValue) {
+	private float getFloatValue(final String textValue) {
 
 		try {
 			if (textValue != null) {
@@ -355,7 +355,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				return Float.MIN_VALUE;
 			}
 
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return Float.MIN_VALUE;
 		}
 	}
@@ -445,7 +445,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	}
 
 	@Override
-	public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
+	public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
+			throws SAXException {
 
 		if (fIsError) {
 			return;
