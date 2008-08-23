@@ -904,6 +904,8 @@ public class TourData {
 		int breakTime = 0;
 		int currentBreakTime = 0;
 
+//		cadenceSerie = new int[timeSerie.length];
+
 		for (int serieIndex = startIndex; serieIndex <= endIndex; serieIndex++) {
 
 			final int currentDistance = distanceSerie[serieIndex];
@@ -912,14 +914,17 @@ public class TourData {
 			final int timeDiff = currentTime - lastMovingTime;
 			final int distDiff = currentDistance - lastMovingDistance;
 
-			if (distDiff == 0 || timeDiff > 20 && distDiff < 5) {
+			if (distDiff == 0 || timeDiff > 20 && distDiff < 10) {
 
 				// distance has not changed, check if a longer stop is done
+
+				// speed must be greater than 1.8 km/h
 
 				final int breakDiff = currentTime - currentBreakTime;
 
 				breakTime += breakDiff;
 
+//				int breakValue = 0;
 				if (timeDiff > minStopTime) {
 
 					// person has stopped for a break
@@ -927,7 +932,21 @@ public class TourData {
 
 					breakTime = 0;
 					currentBreakTime = currentTime;
+
+//					breakValue = -500 - breakTime;
+
+				} else {
+
+//					breakValue = 20;
 				}
+
+//				if (distDiff == 0) {
+//					cadenceSerie[serieIndex] = 100 + breakValue;
+//				} else if (timeDiff > 20) {
+//					cadenceSerie[serieIndex] = 200 + breakValue;
+//				} else if (distDiff < 5) {
+//					cadenceSerie[serieIndex] = 300 + breakValue;
+//				}
 
 			} else {
 
@@ -937,6 +956,8 @@ public class TourData {
 
 				breakTime = 0;
 				currentBreakTime = currentTime;
+
+//				cadenceSerie[serieIndex] = 0;
 			}
 		}
 
@@ -1362,7 +1383,8 @@ public class TourData {
 					}
 				}
 
-				if (timeDiff > 20 && distDiff < 5) {
+				if (timeDiff > 20 && distDiff < 10) {
+					// speed must be greater than 1.8 km/h
 					speedMetric = 0;
 				} else {
 					speedMetric = (int) ((distDiff * 36f) / timeDiff);
@@ -2239,7 +2261,7 @@ public class TourData {
 			return 0;
 		}
 
-		final int minBreakTime = 10;
+		final int minBreakTime = 20;
 
 		if (deviceTimeInterval == -1) {
 
