@@ -41,6 +41,11 @@ import org.eclipse.ui.IMemento;
  */
 public class ColumnManager {
 
+	/**
+	 * minimum column width when the column width is 0, there was an bug that this happened
+	 */
+	private static final int 			MINIMUM_COLUMN_WIDTH = 1;
+	
 	private static final String			MEMENTO_COLUMN_SORT_ORDER	= "column_sort_order";					//$NON-NLS-1$
 	private static final String			MEMENTO_COLUMN_WIDTH		= "column_width";						//$NON-NLS-1$
 
@@ -248,7 +253,11 @@ public class ColumnManager {
 
 			for (final TableColumn column : table.getColumns()) {
 				columnIds.add(((TableColumnDefinition) column.getData()).getColumnId());
-				columnIds.add(Integer.toString(column.getWidth()));
+				int columnWidth = column.getWidth();
+				if (columnWidth==0) {
+					columnWidth=MINIMUM_COLUMN_WIDTH;
+				}
+				columnIds.add(Integer.toString(columnWidth));
 			}
 
 		} else if (columnViewer instanceof TreeViewer) {
@@ -260,7 +269,12 @@ public class ColumnManager {
 
 			for (final TreeColumn column : tree.getColumns()) {
 				columnIds.add(((TreeColumnDefinition) column.getData()).getColumnId());
-				columnIds.add(Integer.toString(column.getWidth()));
+				
+				int columnWidth = column.getWidth();
+				if (columnWidth==0) {
+					columnWidth=MINIMUM_COLUMN_WIDTH;
+				}
+				columnIds.add(Integer.toString(columnWidth));
 			}
 		}
 

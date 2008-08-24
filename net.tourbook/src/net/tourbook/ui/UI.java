@@ -107,7 +107,10 @@ public class UI {
 	private static final String				UNIT_FAHRENHEIT_F				= "\u00B0F";									//$NON-NLS-1$
 	private static final String				UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
 	private static final String				UNIT_PACE_MIN_P_MILE			= "min/mi";									//$NON-NLS-1$
-
+	
+	public static final String				SYMBOL_AVERAGE 					= "\u00D8";									//$NON-NLS-1$
+	public static final String				SYMBOL_AVERAGE_WITH_SPACE		= "\u00D8 ";									//$NON-NLS-1$
+	
 	public static final float				UNIT_MILE						= 1.609344f;
 	private static final float				UNIT_FOOT						= 0.3048f;
 
@@ -129,7 +132,7 @@ public class UI {
 	 */
 	public static float						UNIT_VALUE_TEMPERATURE			= 1;
 
-	// (�C � 9/5) + 32 = �F
+	// (\u00D8C � 9/5) + 32 = �F
 	public static final float				UNIT_FAHRENHEIT_MULTI			= 1.8f;
 	public static final float				UNIT_FAHRENHEIT_ADD				= 32;
 

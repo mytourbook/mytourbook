@@ -92,8 +92,8 @@ public abstract class TreeColumnFactory {
 			final TreeColumnDefinition colDef = new TreeColumnDefinition("avgSpeed", SWT.TRAIL); //$NON-NLS-1$
 			columnManager.addColumn(colDef); 
 			
-			colDef.setColumnLabel(Messages.ColumnFactory_avg_speed_label + " (Ø " + UI.UNIT_LABEL_SPEED + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-			colDef.setColumnText("Ø " + UI.UNIT_LABEL_SPEED); //$NON-NLS-1$
+			colDef.setColumnLabel(Messages.ColumnFactory_avg_speed_label + " ("+ UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_speed_tooltip);
 			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
@@ -108,8 +108,8 @@ public abstract class TreeColumnFactory {
 			final TreeColumnDefinition colDef = new TreeColumnDefinition("avgTemperature", SWT.TRAIL); //$NON-NLS-1$
 			columnManager.addColumn(colDef); 
 
-			colDef.setColumnLabel(Messages.ColumnFactory_avg_temperature_label + " (Ø " + UI.UNIT_LABEL_TEMPERATURE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-			colDef.setColumnText("Ø " + UI.UNIT_LABEL_TEMPERATURE); //$NON-NLS-1$
+			colDef.setColumnLabel(Messages.ColumnFactory_avg_temperature_label + " (" + UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_temperature_tooltip);
 			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
 
