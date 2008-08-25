@@ -59,7 +59,7 @@ public class RawDataManager {
 
 	private static final String			RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
 
-	private static final String			TEMP_IMPORTED_FILE					= "received-device-data.txt";
+	private static final String			TEMP_IMPORTED_FILE					= "received-device-data.txt"; //$NON-NLS-1$
 
 	private static RawDataManager		instance							= null;
 
@@ -452,19 +452,19 @@ public class RawDataManager {
 
 						if (destFileName == null) {
 							MessageDialog.openError(Display.getCurrent().getActiveShell(),
-									"Error Creating Filename",
-									"The filename for the received data"
-											+ " could not be created from the file '"
+									"Error Creating Filename", //$NON-NLS-1$
+									"The filename for the received data" //$NON-NLS-1$
+											+ " could not be created from the file '" //$NON-NLS-1$
 											+ sourceFileName
-											+ "'\n\n"
-											+ "The received data will be saved in the temp file '"
+											+ "'\n\n" //$NON-NLS-1$
+											+ "The received data will be saved in the temp file '" //$NON-NLS-1$
 											+ new Path(destinationPath).addTrailingSeparator().toString()
 											+ TEMP_IMPORTED_FILE
-											+ "'\n\n"
-											+ "The possible reason could be that the transfered data are corrupted."
-											+ "\n\n"
-											+ "When you think the received data are correct, "
-											+ "you can send the received data file to the author of MyTourbook so he can analyze it.");
+											+ "'\n\n" //$NON-NLS-1$
+											+ "The possible reason could be that the transfered data are corrupted." //$NON-NLS-1$
+											+ "\n\n" //$NON-NLS-1$
+											+ "When you think the received data are correct, " //$NON-NLS-1$
+											+ "you can send the received data file to the author of MyTourbook so he can analyze it."); //$NON-NLS-1$
 
 							destFileName = TEMP_IMPORTED_FILE;
 						}
