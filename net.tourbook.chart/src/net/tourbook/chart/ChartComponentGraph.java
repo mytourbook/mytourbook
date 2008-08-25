@@ -373,7 +373,7 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private int							fMouseDownPositionX;
 
-	private boolean fIsDrawDraggedImage=false;
+	private boolean						fIsPaintDraggedImage	= false;
 
 	/**
 	 * is <code>true</code> when the chart is panned
@@ -431,6 +431,7 @@ public class ChartComponentGraph extends Canvas {
 
 		addPaintListener(new PaintListener() {
 			public void paintControl(final PaintEvent event) {
+
 				if (fIsChartDragged) {
 					paintDraggedChart(event.gc);
 				} else {
@@ -1685,9 +1686,9 @@ public class ChartComponentGraph extends Canvas {
 
 				// remove dirty status
 				fIsGraphDirty = false;
-				
+
 				// dragged image will be painted until the graph image is recomputed
-				fIsDrawDraggedImage = false;
+				fIsPaintDraggedImage = false;
 
 				/*
 				 * force the layer image to be redrawn
@@ -4311,15 +4312,15 @@ public class ChartComponentGraph extends Canvas {
 
 			drawGraphImage();
 
-			if (fIsDrawDraggedImage) {
-				
+			if (fIsPaintDraggedImage) {
+
 				/*
 				 * paint dragged chart until the chart is recomputed
 				 */
 				paintDraggedChart(gc);
 				return;
 			}
-			
+
 			// prevent flickering the graph
 
 			/*
@@ -4337,7 +4338,7 @@ public class ChartComponentGraph extends Canvas {
 					// fill the gap between the image and the drawable area
 					gc.setBackground(fChart.getBackgroundColor());
 					gc.fillRectangle(0, imageHeight, clientArea.width, clientArea.height - imageHeight);
-				
+
 				} else {
 					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 				}
@@ -4403,12 +4404,12 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isLayerImageVisible) {
 //			if (fIsGraphDirty == false) {
-				gc.drawImage(fLayerImage, imageScrollPosition, 0);
+			gc.drawImage(fLayerImage, imageScrollPosition, 0);
 //			}
 			return fLayerImage;
 		} else {
 //			if (fIsGraphDirty == false) {
-				gc.drawImage(fGraphImage, imageScrollPosition, 0);
+			gc.drawImage(fGraphImage, imageScrollPosition, 0);
 //			}
 			return fGraphImage;
 		}
@@ -4416,18 +4417,27 @@ public class ChartComponentGraph extends Canvas {
 
 	private void paintDraggedChart(final GC gc) {
 
-		/*
-		 * draw background between moved chart and the client area
-		 */
-		final Rectangle clientArea = getClientArea();
-		final int devXDiff = fDraggedChartDraggedPos.x - fDraggedChartStartPos.x;
-		int devYDiff = fDraggedChartDraggedPos.y - fDraggedChartStartPos.y;
+		int devXDiff = 0;
 
-		// disable vertical dragging
-		devYDiff = 0;
+//		if (fIsPaintDraggedImage) {
+//
+//			final int devXOffsetNew = (int) (fXOffsetZoomRatio * fDevVirtualGraphImageWidth);
+//			devXDiff = fDevGraphImageXOffset - devXOffsetNew;
+//			System.out.println(devXDiff);
+//		} else {
+//
+//			/*
+//			 * draw background between moved chart and the client area
+//			 */
+//			devXDiff = fDraggedChartDraggedPos.x - fDraggedChartStartPos.x;
+//		}
+		devXDiff = fDraggedChartDraggedPos.x - fDraggedChartStartPos.x;
+
+		final int devYDiff = 0;
 
 		gc.setBackground(fChart.getBackgroundColor());
 
+		final Rectangle clientArea = getClientArea();
 		if (devXDiff > 0) {
 			gc.fillRectangle(0, devYDiff, devXDiff, clientArea.height);
 		} else {
@@ -5185,8 +5195,8 @@ public class ChartComponentGraph extends Canvas {
 		/*
 		 * draw the dragged image until the graph image is recomuted
 		 */
-		fIsDrawDraggedImage = true;
-		
+		fIsPaintDraggedImage = true;
+
 		fChartComponents.onResize();
 
 		moveSlidersToBorder();
