@@ -86,15 +86,18 @@ public class ChartComponentGraph extends Canvas {
 	private final ChartComponents		fChartComponents;
 
 	/**
-	 * this image is displayed when no additional layers are visible
+	 * contains the graphs without additional layers
 	 */
 	private Image						fGraphImage;
 
 	/**
-	 * this image is displayed when additional layers are visible
+	 * contains additional layers, like the x/y sliders, x-marker, selection or hovered bar
 	 */
 	private Image						fLayerImage;
 
+	/**
+	 * contains custom layers like the markers, tour segments
+	 */
 	private Image						fCumstomLayerImage;
 
 	private int							fHorizontalScrollBarPos;
@@ -427,9 +430,9 @@ public class ChartComponentGraph extends Canvas {
 		addPaintListener(new PaintListener() {
 			public void paintControl(final PaintEvent event) {
 				if (fIsChartDragged) {
-					drawDraggedChart(event.gc);
+					paintDraggedChart(event.gc);
 				} else {
-					drawChart(event.gc);
+					paintChart(event.gc);
 				}
 			}
 		});
@@ -496,8 +499,6 @@ public class ChartComponentGraph extends Canvas {
 		addFocusListener(new FocusListener() {
 
 			public void focusGained(final FocusEvent e) {
-
-				// System.out.println("component graph: focusGained");
 
 				setFocusToControl();
 
@@ -1508,113 +1509,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	/**
-	 * Paint event handler
-	 * 
-	 * @param gc
-	 */
-	private void drawChart(final GC gc) {
-
-		final Rectangle clientArea = getClientArea();
-
-		if (fDrawingData == null || fDrawingData.isEmpty()) {
-			// fill the image area when there is no graphic
-			gc.setBackground(fChart.getBackgroundColor());
-			gc.fillRectangle(clientArea);
-			return;
-		}
-
-		if (fIsGraphDirty) {
-
-			drawGraphImage();
-
-			// prevent flickering the graph
-
-			/*
-			 * mac osx is still flickering, added the drawChartImage in version 1.0
-			 */
-			if (fGraphImage != null) {
-
-				final Image image = drawChartImage(gc);
-
-				final int gcHeight = clientArea.height;
-				final int imageHeight = image.getBounds().height;
-
-				if (gcHeight > imageHeight) {
-
-					// fill the gap between the image and the drawable area
-
-					gc.setBackground(fChart.getBackgroundColor());
-					gc.fillRectangle(0, imageHeight, clientArea.width, clientArea.height - imageHeight);
-				}
-			}
-			return;
-		}
-
-		// if the graph was not drawn (because this is done in another thread)
-		// there is nothing to do
-		if (fGraphImage == null) {
-			// fill the image area when there is no graphic
-			gc.setBackground(fChart.getBackgroundColor());
-			gc.fillRectangle(clientArea);
-			return;
-		}
-
-		// calculate the scrollbars before the sliders are created
-		updateHorizontalBar();
-
-		drawCustomLayers();
-
-		drawChartImage(gc);
-	}
-
-	private Image drawChartImage(final GC gc) {
-
-		final boolean isLayerImageVisible = fIsXSliderVisible
-				|| fIsYSliderVisible
-				|| fIsXMarkerMoved
-				|| fIsSelectionVisible;
-
-		if (isLayerImageVisible) {
-			drawLayerImage();
-		}
-
-		final Rectangle graphRect = fGraphImage.getBounds();
-		final ScrollBar hBar = getHorizontalBar();
-		int imageScrollPosition = 0;
-
-		if (graphRect.width < getDevVisibleChartWidth()) {
-
-			// image is smaller than client area, the image is drawn in the top
-			// left corner and the free are is painted with background color
-
-			if (fIsXSliderVisible) {
-				hBar.setVisible(false);
-				fillImagePadding(gc, fLayerImage.getBounds());
-			} else {
-				fillImagePadding(gc, graphRect);
-			}
-		} else {
-			if (hBar.isVisible()) {
-				// move the image when the horizontal bar is visible
-				imageScrollPosition = -hBar.getSelection();
-			}
-		}
-
-		if (isLayerImageVisible) {
-			if (fIsGraphDirty == false) {
-				gc.drawImage(fLayerImage, imageScrollPosition, 0);
-			}
-			return fLayerImage;
-		} else {
-			if (fIsGraphDirty == false) {
-				gc.drawImage(fGraphImage, imageScrollPosition, 0);
-			}
-			return fGraphImage;
-		}
-	}
-
-	private void drawCustomLayers() {
+	private void drawCustomLayerImage() {
 
 		// the layer above image is the same size as the graph image
 		final Rectangle graphRect = fGraphImage.getBounds();
@@ -1624,8 +1519,10 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		// when the existing image is the same size as the new image, we will
-		// redraw it only if it's set to dirty
+		/*
+		 * when the existing image is the same size as the new image, we will redraw it only if it's
+		 * set to dirty
+		 */
 		if (fIsCustomLayerDirty == false && fCumstomLayerImage != null) {
 
 			final Rectangle oldBounds = fCumstomLayerImage.getBounds();
@@ -1647,9 +1544,9 @@ public class ChartComponentGraph extends Canvas {
 		 * copy the image with the graphs into the custom layer image, the custom layers are drawn
 		 * on top of the graphs
 		 */
-		if (fIsGraphDirty == false) {
-			gc.drawImage(fGraphImage, 0, 0);
-		}
+//		if (fIsGraphDirty == false) {
+		gc.drawImage(fGraphImage, 0, 0);
+//		}
 
 		for (final ChartDrawingData drawingData : fDrawingData) {
 			for (final IChartLayer layer : drawingData.getYData().getCustomLayers()) {
@@ -1662,39 +1559,8 @@ public class ChartComponentGraph extends Canvas {
 		fIsCustomLayerDirty = false;
 	}
 
-	private void drawDraggedChart(final GC gc) {
-
-		/*
-		 * draw background between moved chart and the client area
-		 */
-		final Rectangle clientArea = getClientArea();
-		final int devXDiff = fDraggedChartDraggedPos.x - fDraggedChartStartPos.x;
-		int devYDiff = fDraggedChartDraggedPos.y - fDraggedChartStartPos.y;
-
-		// disable vertical dragging
-		devYDiff = 0;
-
-		gc.setBackground(fChart.getBackgroundColor());
-
-		if (devXDiff > 0) {
-			gc.fillRectangle(0, devYDiff, devXDiff, clientArea.height);
-		} else {
-			gc.fillRectangle(clientArea.width + devXDiff, devYDiff, -devXDiff, clientArea.height);
-		}
-
-		if (fCumstomLayerImage != null && fCumstomLayerImage.isDisposed() == false) {
-			gc.drawImage(fCumstomLayerImage, devXDiff, devYDiff);
-		} else if (fLayerImage != null && fLayerImage.isDisposed() == false) {
-			gc.drawImage(fLayerImage, devXDiff, devYDiff);
-		} else if (fGraphImage != null && fGraphImage.isDisposed() == false) {
-			gc.drawImage(fGraphImage, devXDiff, devYDiff);
-		}
-
-//		fChartComponents.onResize();
-	}
-
 	/**
-	 * draw the graph into the graph image
+	 * draws the graph into the graph image
 	 */
 	private void drawGraphImage() {
 
@@ -1702,33 +1568,37 @@ public class ChartComponentGraph extends Canvas {
 
 		final Runnable imageThread = new Runnable() {
 
-			final int	fCurrentDrawCounter	= fDrawCounter[0];
+			final int	fRunnableDrawCounter	= fDrawCounter[0];
 
 			public void run() {
+
+//				long startTime = System.currentTimeMillis();
 
 				/*
 				 * create the chart image only when a new onPaint event has not occured
 				 */
-
-//				long startTime = System.currentTimeMillis();
-				if (fCurrentDrawCounter != fDrawCounter[0]) {
+				if (fRunnableDrawCounter != fDrawCounter[0]) {
+					// a new onPaint event occured
 					return;
 				}
 
 				if (isDisposed()) {
+					// this widget is disposed
 					return;
 				}
 
 				final int devNonScrolledImageWidth = Math.max(ChartComponents.CHART_MIN_WIDTH,
 						getDevVisibleChartWidth());
 
-				final int devImageWidth = canScrollZoomedChart ? fDevVirtualGraphImageWidth : devNonScrolledImageWidth;
+				final int devNewImageWidth = canScrollZoomedChart
+						? fDevVirtualGraphImageWidth
+						: devNonScrolledImageWidth;
 
 				/*
 				 * the image size is adjusted to the client size but it must be within the min/max
 				 * ranges
 				 */
-				final int devImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT,
+				final int devNewImageHeight = Math.max(ChartComponents.CHART_MIN_HEIGHT,
 						Math.min(getDevVisibleGraphHeight(), ChartComponents.CHART_MAX_HEIGHT));
 
 				/*
@@ -1739,13 +1609,12 @@ public class ChartComponentGraph extends Canvas {
 
 					final Rectangle oldBounds = fGraphImage.getBounds();
 
-					if (oldBounds.width == devImageWidth && oldBounds.height == devImageHeight) {
+					if (oldBounds.width == devNewImageWidth && oldBounds.height == devNewImageHeight) {
 						return;
 					}
 				}
 
-				final Display display = getDisplay();
-				final Rectangle imageRect = new Rectangle(0, 0, devImageWidth, devImageHeight);
+				final Rectangle imageRect = new Rectangle(0, 0, devNewImageWidth, devNewImageHeight);
 
 				// ensure correct image size
 				if (imageRect.width <= 0 || imageRect.height <= 0) {
@@ -1755,7 +1624,7 @@ public class ChartComponentGraph extends Canvas {
 				if (ChartUtil.canReuseImage(fGraphImage, imageRect) == false) {
 
 					// create image on which the graph is drawn
-					fGraphImage = ChartUtil.createImage(display, fGraphImage, imageRect);
+					fGraphImage = ChartUtil.createImage(getDisplay(), fGraphImage, imageRect);
 				}
 
 				// create graphics context
@@ -1820,12 +1689,10 @@ public class ChartComponentGraph extends Canvas {
 				 */
 				fIsLayerImageDirty = true;
 
-//				System.out.println("redraw graph image");
 				redraw();
 
 //				long endTime = System.currentTimeMillis();
 //				System.out.println("Execution time : " + (endTime - startTime) + " ms");
-
 			}
 		};
 
@@ -1983,7 +1850,7 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * @return
+	 * draws the layer image which contains the custom layer image
 	 */
 	private void drawLayerImage() {
 
@@ -2008,7 +1875,6 @@ public class ChartComponentGraph extends Canvas {
 				return;
 			}
 		}
-		// System.out.println("draw layer");
 
 		// ensure correct image size
 		if (graphRect.width <= 0 || graphRect.height <= 0) {
@@ -2028,9 +1894,9 @@ public class ChartComponentGraph extends Canvas {
 		// copy the graph image into the slider image, the slider will be drawn
 		// on top of the graph
 		gc.fillRectangle(graphRect);
-		if (fIsGraphDirty == false) {
-			gc.drawImage(fCumstomLayerImage, 0, 0);
-		}
+//		if (fIsGraphDirty == false) {
+		gc.drawImage(fCumstomLayerImage, 0, 0);
+//		}
 
 		/*
 		 * draw x/y-sliders
@@ -2678,12 +2544,6 @@ public class ChartComponentGraph extends Canvas {
 			 */
 			final int valueMovedDiff = xValues[fMovedXMarkerEndValueIndex] - xValues[fMovedXMarkerStartValueIndex];
 
-//			System.out.println(fMovedXMarkerStartValueIndex
-//					+ "\t"
-//					+ fMovedXMarkerEndValueIndex
-//					+ "\t"
-//					+ valueMovedDiff);
-
 			/*
 			 * adjust start and end position
 			 */
@@ -2741,8 +2601,6 @@ public class ChartComponentGraph extends Canvas {
 				valueIndex = Math.min(valueIndex, xValues.length - 1);
 
 				fMovedXMarkerEndValueIndex = valueIndex;
-			} else {
-//				System.out.println(valueMovedDiff + "\t" + fXMarkerValueDiff);
 			}
 
 			fMovedXMarkerEndValueIndex = Math.min(fMovedXMarkerEndValueIndex, xValues.length - 1);
@@ -3126,8 +2984,6 @@ public class ChartComponentGraph extends Canvas {
 
 			unitCounter++;
 		}
-
-//		System.out.println(unitCounter + " " + skippedUnits);
 	}
 
 	/**
@@ -3221,40 +3077,6 @@ public class ChartComponentGraph extends Canvas {
 		colorTxt.dispose();
 	}
 
-//	void enforceChartImageMinMaxWidth() {
-//
-////		if (graphZoomParts != 1) {
-////
-//////			zoomWithParts(graphZoomParts, graphZoomPartPosition, true);
-////
-////		} else {
-//
-//		final int devVisibleChartWidth = getDevVisibleChartWidth();
-//
-//		final int devImageWidth = (int) (fGraphZoomRatio * devVisibleChartWidth);
-//		final int chartMinWidth = fChart.getChartDataModel().getChartMinWidth();
-//
-//		if (canScrollZoomedChart) {
-//
-//			// enforce min/max width for the chart
-//			final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
-//					ChartComponents.CHART_MIN_WIDTH);
-//
-//			final int devMaxWidth = Math.min(devImageWidth, ChartComponents.CHART_MAX_WIDTH);
-//
-//			fDevVirtualGraphImageWidth = Math.max(devMinWidth, devMaxWidth);
-//
-//		} else {
-//
-//			// enforce min width for the chart
-//			final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
-//					ChartComponents.CHART_MIN_WIDTH);
-//
-//			fDevVirtualGraphImageWidth = Math.max(devMinWidth, devImageWidth);
-//		}
-////		}
-//	}
-
 	/**
 	 * Fills the surrounding area of an rectangle with background color
 	 * 
@@ -3297,6 +3119,40 @@ public class ChartComponentGraph extends Canvas {
 	int getDevGraphImageXOffset() {
 		return fDevGraphImageXOffset;
 	}
+
+//	void enforceChartImageMinMaxWidth() {
+//
+////		if (graphZoomParts != 1) {
+////
+//////			zoomWithParts(graphZoomParts, graphZoomPartPosition, true);
+////
+////		} else {
+//
+//		final int devVisibleChartWidth = getDevVisibleChartWidth();
+//
+//		final int devImageWidth = (int) (fGraphZoomRatio * devVisibleChartWidth);
+//		final int chartMinWidth = fChart.getChartDataModel().getChartMinWidth();
+//
+//		if (canScrollZoomedChart) {
+//
+//			// enforce min/max width for the chart
+//			final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
+//					ChartComponents.CHART_MIN_WIDTH);
+//
+//			final int devMaxWidth = Math.min(devImageWidth, ChartComponents.CHART_MAX_WIDTH);
+//
+//			fDevVirtualGraphImageWidth = Math.max(devMinWidth, devMaxWidth);
+//
+//		} else {
+//
+//			// enforce min width for the chart
+//			final int devMinWidth = Math.max(Math.max(devVisibleChartWidth, chartMinWidth),
+//					ChartComponents.CHART_MIN_WIDTH);
+//
+//			fDevVirtualGraphImageWidth = Math.max(devMinWidth, devImageWidth);
+//		}
+////		}
+//	}
 
 	/**
 	 * @return Returns the virtual graph image width, this is the width of the graph image when the
@@ -3886,19 +3742,6 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-//	void onKeyUp(final Event event) {
-//
-//		final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
-//		final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
-//
-//		final boolean isMoveMode = isShift || isCtrl;
-//
-//		fIsMoveMode = !isMoveMode;
-//
-//		System.out.println(fIsMoveMode + " " + event.stateMask + " s:" + isShift + " c:" + isCtrl);
-//		setDefaultCursor();
-//	}
-
 	/**
 	 * Mouse down event handler
 	 * 
@@ -4082,7 +3925,6 @@ public class ChartComponentGraph extends Canvas {
 		final int devYMouse = event.y;
 		final int devXGraph = hBarOffset + devXMouse;
 
-		// System.out.println(event.stateMask+" "+event.x+" "+event.y);
 		boolean isChartDirty = false;
 
 		if (isGraphScrolled) {
@@ -4259,6 +4101,19 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
+//	void onKeyUp(final Event event) {
+//
+//		final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
+//		final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
+//
+//		final boolean isMoveMode = isShift || isCtrl;
+//
+//		fIsMoveMode = !isMoveMode;
+//
+//		System.out.println(fIsMoveMode + " " + event.stateMask + " s:" + isShift + " c:" + isCtrl);
+//		setDefaultCursor();
+//	}
+
 	/**
 	 * Mouse up event handler
 	 * 
@@ -4429,6 +4284,149 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void onScroll(final SelectionEvent event) {
 		redraw();
+	}
+
+	/**
+	 * Paint event handler
+	 * 
+	 * @param gc
+	 */
+	private void paintChart(final GC gc) {
+
+		final Rectangle clientArea = getClientArea();
+
+		if (fDrawingData == null || fDrawingData.isEmpty()) {
+			// fill the image area when there is no graphic
+			gc.setBackground(fChart.getBackgroundColor());
+			gc.fillRectangle(clientArea);
+			return;
+		}
+
+		if (fIsGraphDirty) {
+
+			drawGraphImage();
+
+			// prevent flickering the graph
+
+			/*
+			 * mac osx is still flickering, added the drawChartImage in version 1.0
+			 */
+			if (fGraphImage != null) {
+
+				final Image image = paintChartImage(gc);
+
+				final int gcHeight = clientArea.height;
+				final int imageHeight = image.getBounds().height;
+
+				if (gcHeight > imageHeight) {
+
+					// fill the gap between the image and the drawable area
+
+					gc.setBackground(fChart.getBackgroundColor());
+					gc.fillRectangle(0, imageHeight, clientArea.width, clientArea.height - imageHeight);
+				} else {
+					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+				}
+			} else {
+				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+			}
+
+			return;
+		}
+
+		/*
+		 * if the graph was not drawn (because this is done in another thread) there is nothing to
+		 * do
+		 */
+		if (fGraphImage == null) {
+			// fill the image area when there is no graphic
+			gc.setBackground(fChart.getBackgroundColor());
+			gc.fillRectangle(clientArea);
+			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+			return;
+		}
+
+		// calculate the scrollbars before the sliders are created
+		updateHorizontalBar();
+
+		drawCustomLayerImage();
+
+		paintChartImage(gc);
+	}
+
+	private Image paintChartImage(final GC gc) {
+
+		final boolean isLayerImageVisible = fIsXSliderVisible
+				|| fIsYSliderVisible
+				|| fIsXMarkerMoved
+				|| fIsSelectionVisible;
+
+		if (isLayerImageVisible) {
+			drawLayerImage();
+		}
+
+		final Rectangle graphRect = fGraphImage.getBounds();
+		final ScrollBar hBar = getHorizontalBar();
+		int imageScrollPosition = 0;
+
+		if (graphRect.width < getDevVisibleChartWidth()) {
+
+			// image is smaller than client area, the image is drawn in the top
+			// left corner and the free are is painted with background color
+
+			if (fIsXSliderVisible) {
+				hBar.setVisible(false);
+				fillImagePadding(gc, fLayerImage.getBounds());
+			} else {
+				fillImagePadding(gc, graphRect);
+			}
+		} else {
+			if (hBar.isVisible()) {
+				// move the image when the horizontal bar is visible
+				imageScrollPosition = -hBar.getSelection();
+			}
+		}
+
+		if (isLayerImageVisible) {
+//			if (fIsGraphDirty == false) {
+				gc.drawImage(fLayerImage, imageScrollPosition, 0);
+//			}
+			return fLayerImage;
+		} else {
+//			if (fIsGraphDirty == false) {
+				gc.drawImage(fGraphImage, imageScrollPosition, 0);
+//			}
+			return fGraphImage;
+		}
+	}
+
+	private void paintDraggedChart(final GC gc) {
+
+		/*
+		 * draw background between moved chart and the client area
+		 */
+		final Rectangle clientArea = getClientArea();
+		final int devXDiff = fDraggedChartDraggedPos.x - fDraggedChartStartPos.x;
+		int devYDiff = fDraggedChartDraggedPos.y - fDraggedChartStartPos.y;
+
+		// disable vertical dragging
+		devYDiff = 0;
+
+		gc.setBackground(fChart.getBackgroundColor());
+
+		if (devXDiff > 0) {
+			gc.fillRectangle(0, devYDiff, devXDiff, clientArea.height);
+		} else {
+			gc.fillRectangle(clientArea.width + devXDiff, devYDiff, -devXDiff, clientArea.height);
+		}
+
+		if (fCumstomLayerImage != null && fCumstomLayerImage.isDisposed() == false) {
+			gc.drawImage(fCumstomLayerImage, devXDiff, devYDiff);
+		} else if (fLayerImage != null && fLayerImage.isDisposed() == false) {
+			gc.drawImage(fLayerImage, devXDiff, devYDiff);
+		} else if (fGraphImage != null && fGraphImage.isDisposed() == false) {
+			gc.drawImage(fGraphImage, devXDiff, devYDiff);
+		}
 	}
 
 	/**
@@ -4866,7 +4864,6 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		if (isFocus) {
-			// System.out.println("setFocus");
 			fChart.fireFocusEvent();
 		}
 
@@ -5507,7 +5504,7 @@ public class ChartComponentGraph extends Canvas {
 		for (final ChartDataYSerie yData : yDataList) {
 
 			final int yValues[] = yData.getHighValues()[0];
-			
+
 			// ensure array bounds
 			final int maxYValueIndex = yValues.length - 1;
 			valueIndexLeft = Math.min(valueIndexLeft, maxYValueIndex);

@@ -388,11 +388,11 @@ public class Chart extends ViewForm {
 				actionMouseMode.setText(Messages.Action_mouse_mode_slider);
 			}
 
-			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_ZOOM_IN_TO_SLIDER).getAction());
+			menuMgr.add(actionMouseMode);
+			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_SLIDERS_TO_BORDER).getAction());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_LEFT_SLIDER_HERE).getAction());
 			menuMgr.add(fChartActionProxies.get(COMMAND_ID_MOVE_RIGHT_SLIDER_HERE).getAction());
-			menuMgr.add(actionMouseMode);
 			menuMgr.add(new Separator());
 
 			// create the menu for line charts
