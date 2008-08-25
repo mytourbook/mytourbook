@@ -40,17 +40,29 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 	private final ByteArrayOutputStream	fRawDataBuffer	= new ByteArrayOutputStream();
 	private List<File>					fReceivedFiles;
 
-	public abstract TourbookDevice getTourbookDevice();
-
-	public abstract String getFileExtension();
-
 	public SimpleSerialDevice() {
 		fTourbookDevice = getTourbookDevice();
 	}
 
+	/**
+	 * Append newly received data to the internal data buffer
+	 * 
+	 * @param newData
+	 *            data being written into the buffer
+	 */
+	public void appendReceivedData(final int newData) {
+		fRawDataBuffer.write(newData);
+	}
+
+	public void cancelImport() {
+		fCancelImport = true;
+	}
+
 	@Override
 	public IRunnableWithProgress createImportRunnable(final String portName, final List<File> receivedFiles) {
+
 		fReceivedFiles = receivedFiles;
+
 		return new IRunnableWithProgress() {
 			public void run(final IProgressMonitor monitor) {
 
@@ -68,10 +80,19 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 				monitor.beginTask(msg, fTourbookDevice.getTransferDataSize());
 
 				readDeviceData(monitor, portName);
-				processDeviceData();
+				saveReceivedData();
 			}
 
 		};
+	}
+
+	public abstract String getFileExtension();
+
+	public abstract TourbookDevice getTourbookDevice();
+
+	@Override
+	public boolean isImportCanceled() {
+		return fCancelImport;
 	}
 
 	/**
@@ -180,42 +201,28 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 		}
 	}
 
-	private void processDeviceData() {
+	/**
+	 * write received data into a temp file
+	 */
+	private void saveReceivedData() {
 
-		// write received data into a temp file
-		FileOutputStream fileStream;
 		try {
+			
 			final File tempFile = File.createTempFile("myTourbook", "." + getFileExtension(), //$NON-NLS-1$ //$NON-NLS-2$
 					new File(RawDataManager.getTempDir()));
-			fileStream = new FileOutputStream(tempFile);
+
+			final FileOutputStream fileStream = new FileOutputStream(tempFile);
 			fileStream.write(fRawDataBuffer.toByteArray());
 			fileStream.close();
+
 			fReceivedFiles.add(tempFile);
+
 		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 
-	}
-
-	public void cancelImport() {
-		fCancelImport = true;
-	}
-
-	@Override
-	public boolean isImportCanceled() {
-		return fCancelImport;
-	}
-
-	/**
-	 * Append newly received data to the internal data buffer
-	 * 
-	 * @param newData
-	 *        data being written into the buffer
-	 */
-	public void appendReceivedData(final int newData) {
-		fRawDataBuffer.write(newData);
 	}
 
 }
