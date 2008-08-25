@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -37,28 +37,21 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	/**
-	 * call super.createControl to initialize the color change listener
-	 * 
-	 * @see net.tourbook.statistic.TourbookStatistic#createControl(org.eclipse.swt.widgets.Composite)
-	 */
-	public void createControl(Composite parent) {
-		addPrefListener(parent);
-	}
-
-	/**
 	 * Add the pref listener which is called when the color was changed
 	 * 
 	 * @param container
 	 */
-	private void addPrefListener(Composite container) {
+	private void addPrefListener(final Composite container) {
 
 		// create pref listener
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(Preferences.PropertyChangeEvent event) {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 				final String property = event.getProperty();
 
 				// test if the color or statistic data have changed
-				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)) {
 
 					// update chart
 					prefColorChanged();
@@ -71,10 +64,19 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 
 		// remove pre listener
 		container.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
+			public void widgetDisposed(final DisposeEvent e) {
 				TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 			}
 		});
+	}
+
+	/**
+	 * call super.createControl to initialize the color change listener
+	 * 
+	 * @see net.tourbook.statistic.TourbookStatistic#createControl(org.eclipse.swt.widgets.Composite)
+	 */
+	public void createControl(final Composite parent) {
+		addPrefListener(parent);
 	}
 
 	/**
@@ -82,7 +84,7 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 	 * @param activeTourTypeFilter
 	 * @return Returns the tour type name for a data serie
 	 */
-	protected String getTourTypeName(int serieIndex, TourTypeFilter activeTourTypeFilter) {
+	protected String getTourTypeName(final int serieIndex, final TourTypeFilter activeTourTypeFilter) {
 
 		int colorOffset = 0;
 		if (activeTourTypeFilter.showUndefinedTourTypes()) {
@@ -93,8 +95,8 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 			return Messages.ui_tour_not_defined;
 		}
 
-		ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-		String tourTypeName = TourDatabase.getTourTypeName(tourTypeList.get(serieIndex - colorOffset).getTypeId());
+		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
+		final String tourTypeName = TourDatabase.getTourTypeName(tourTypeList.get(serieIndex - colorOffset).getTypeId());
 
 		return tourTypeName;
 	}

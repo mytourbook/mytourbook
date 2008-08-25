@@ -34,11 +34,14 @@ import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -348,8 +351,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 				final String tourTypeName = TourDatabase.getTourTypeName(fTourTimeData.fTypeIds[valueIndex]);
 				final String tourTags = TourDatabase.getTagNames(fTourTimeData.fTagIds.get(fSelectedTourId));
-				final String tourDescription = fTourTimeData.tourDescription.get(valueIndex).replace(UI.SYSTEM_NEW_LINE,
-						UI.NEW_LINE);
+				final String tourDescription = fTourTimeData.tourDescription.get(valueIndex)
+						.replace(UI.SYSTEM_NEW_LINE, UI.NEW_LINE);
 
 				final int[] startValue = fTourTimeData.fTourTimeStartValues;
 				final int[] endValue = fTourTimeData.fTourTimeEndValues;
@@ -486,6 +489,11 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartModel);
 		}
+
+		// set grid size
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		fChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		// show the data in the chart
 		fChart.updateChart(chartModel, false);

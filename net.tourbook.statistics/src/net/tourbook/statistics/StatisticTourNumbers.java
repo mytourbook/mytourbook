@@ -112,13 +112,13 @@ public class StatisticTourNumbers extends YearStatistic {
 	public StatisticTourNumbers() {}
 
 	@Override
-	public void activateActions(IWorkbenchPartSite partSite) {}
+	public void activateActions(final IWorkbenchPartSite partSite) {}
 
-	void addPrefListener(Composite container) {
+	void addPrefListener(final Composite container) {
 
 		// create pref listener
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
-			public void propertyChange(Preferences.PropertyChangeEvent event) {
+			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 				final String property = event.getProperty();
 
 				// test if the color or statistic data have changed
@@ -152,7 +152,7 @@ public class StatisticTourNumbers extends YearStatistic {
 
 		// remove pref listener
 		container.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
+			public void widgetDisposed(final DisposeEvent e) {
 				TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 			}
 		});
@@ -163,7 +163,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	}
 
 	@Override
-	public void createControl(Composite parent, IViewSite viewSite, final IPostSelectionProvider postSelectionProvider) {
+	public void createControl(final Composite parent, final IViewSite viewSite, final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -176,7 +176,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		// remove colored border
 		fStatisticPage.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 
-		GridLayout gl = new GridLayout(2, true);
+		final GridLayout gl = new GridLayout(2, true);
 		gl.marginHeight = 0;
 		gl.marginWidth = 0;
 		gl.verticalSpacing = 0;
@@ -203,19 +203,19 @@ public class StatisticTourNumbers extends YearStatistic {
 	 * 
 	 * @param tourDayData
 	 */
-	private void createStatisticData(TourDayData tourDayData) {
+	private void createStatisticData(final TourDayData tourDayData) {
 
 		int colorOffset = 0;
 		if (fActiveTourTypeFilter.showUndefinedTourTypes()) {
 			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 		}
 
-		ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-		int colorLength = colorOffset + tourTypeList.size();
+		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
+		final int colorLength = colorOffset + tourTypeList.size();
 
-		int distanceLength = fStatDistanceUnits.length;
-		int altitudeLength = fStatAltitudeUnits.length;
-		int timeLength = fStatTimeUnits.length;
+		final int distanceLength = fStatDistanceUnits.length;
+		final int altitudeLength = fStatAltitudeUnits.length;
+		final int timeLength = fStatTimeUnits.length;
 
 		fStatDistanceCounterLow = new int[colorLength][distanceLength];
 		fStatDistanceCounterHigh = new int[colorLength][distanceLength];
@@ -244,7 +244,7 @@ public class StatisticTourNumbers extends YearStatistic {
 		// loop: all tours
 		for (int tourIndex = 0; tourIndex < tourDayData.fDistanceHigh.length; tourIndex++) {
 
-			int typeColorIndex = tourDayData.fTypeColorIndex[tourIndex];
+			final int typeColorIndex = tourDayData.fTypeColorIndex[tourIndex];
 			int unitIndex;
 
 			unitIndex = createTourStatData(tourDayData.fDistanceHigh[tourIndex] - tourDayData.fDistanceLow[tourIndex],
@@ -283,24 +283,24 @@ public class StatisticTourNumbers extends YearStatistic {
 	/**
 	 * create tool tip info
 	 */
-	private ChartToolTipInfo createToolTipProvider(int serieIndex, String toolTipLabel) {
+	private ChartToolTipInfo createToolTipProvider(final int serieIndex, final String toolTipLabel) {
 
-		String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
+		final String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
 
-		ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 		toolTipInfo.setTitle(tourTypeName);
 		toolTipInfo.setLabel(toolTipLabel);
 
 		return toolTipInfo;
 	}
 
-	private void createToolTipProviderAltitude(ChartDataModel chartModel) {
+	private void createToolTipProviderAltitude(final ChartDataModel chartModel) {
 
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-			public ChartToolTipInfo getToolTipInfo(int serieIndex, int valueIndex) {
+			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 
 				String toolTipLabel;
-				StringBuilder infoText = new StringBuilder();
+				final StringBuilder infoText = new StringBuilder();
 
 				if (valueIndex == 0) {
 
@@ -350,14 +350,14 @@ public class StatisticTourNumbers extends YearStatistic {
 		});
 	}
 
-	private void createToolTipProviderDistance(ChartDataModel chartModel) {
+	private void createToolTipProviderDistance(final ChartDataModel chartModel) {
 
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 
-			public ChartToolTipInfo getToolTipInfo(int serieIndex, int valueIndex) {
+			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 
 				String toolTipLabel;
-				StringBuilder infoText = new StringBuilder();
+				final StringBuilder infoText = new StringBuilder();
 
 				if (valueIndex == 0) {
 
@@ -405,13 +405,13 @@ public class StatisticTourNumbers extends YearStatistic {
 		});
 	}
 
-	private void createToolTipProviderDuration(ChartDataModel chartModel) {
+	private void createToolTipProviderDuration(final ChartDataModel chartModel) {
 
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-			public ChartToolTipInfo getToolTipInfo(int serieIndex, int valueIndex) {
+			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 
 				String toolTipLabel;
-				StringBuilder toolTipFormat = new StringBuilder();
+				final StringBuilder toolTipFormat = new StringBuilder();
 
 				if (valueIndex == 0) {
 
@@ -466,7 +466,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	 * @param sum
 	 * @return
 	 */
-	private int createTourStatData(int tourValue, int[] units, int[] counter, int[] sum) {
+	private int createTourStatData(final int tourValue, final int[] units, final int[] counter, final int[] sum) {
 
 		int lastUnit = -1;
 		boolean isUnitFound = false;
@@ -506,7 +506,7 @@ public class StatisticTourNumbers extends YearStatistic {
 	}
 
 	@Override
-	public void deactivateActions(IWorkbenchPartSite partSite) {}
+	public void deactivateActions(final IWorkbenchPartSite partSite) {}
 
 	private void getPreferences() {
 
@@ -542,17 +542,17 @@ public class StatisticTourNumbers extends YearStatistic {
 	 * @param unitType
 	 * @return
 	 */
-	private int[] getPrefUnits(	IPreferenceStore store,
-								String prefNumbers,
-								String prefLowValue,
-								String prefInterval,
-								int unitType) {
+	private int[] getPrefUnits(	final IPreferenceStore store,
+								final String prefNumbers,
+								final String prefLowValue,
+								final String prefInterval,
+								final int unitType) {
 
-		int lowValue = store.getInt(prefLowValue);
-		int interval = store.getInt(prefInterval);
-		int numbers = store.getInt(prefNumbers);
+		final int lowValue = store.getInt(prefLowValue);
+		final int interval = store.getInt(prefInterval);
+		final int numbers = store.getInt(prefNumbers);
 
-		int[] units = new int[numbers];
+		final int[] units = new int[numbers];
 
 		for (int number = 0; number < numbers; number++) {
 			if (unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE) {
@@ -570,11 +570,11 @@ public class StatisticTourNumbers extends YearStatistic {
 		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fCurrentYear, 1, false);
 	}
 
-	public void refreshStatistic(	TourPerson person,
-									TourTypeFilter typeId,
-									int year,
-									int numberOfYears,
-									boolean refreshData) {
+	public void refreshStatistic(	final TourPerson person,
+									final TourTypeFilter typeId,
+									final int year,
+									final int numberOfYears,
+									final boolean refreshData) {
 
 		fActivePerson = person;
 		fActiveTourTypeFilter = typeId;
@@ -616,28 +616,28 @@ public class StatisticTourNumbers extends YearStatistic {
 	public void resetSelection() {}
 
 	@Override
-	public void setSynchScale(boolean isSynchScaleEnabled) {
+	public void setSynchScale(final boolean isSynchScaleEnabled) {
 		fIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
-	private void updateChartAltitude(	Chart statAltitudeChart,
-										BarChartMinMaxKeeper statAltitudeMinMaxKeeper,
-										int[][] lowValues,
-										int[][] highValues,
-										int[][] colorIndex,
-										String unit,
-										String title) {
+	private void updateChartAltitude(	final Chart statAltitudeChart,
+										final BarChartMinMaxKeeper statAltitudeMinMaxKeeper,
+										final int[][] lowValues,
+										final int[][] highValues,
+										final int[][] colorIndex,
+										final String unit,
+										final String title) {
 
-		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(fStatAltitudeUnits);
+		final ChartDataXSerie xData = new ChartDataXSerie(fStatAltitudeUnits);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		xData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		chartDataModel.setXData(xData);
 
 		// y-axis: altitude
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				lowValues,
 				highValues);
@@ -658,6 +658,11 @@ public class StatisticTourNumbers extends YearStatistic {
 			statAltitudeMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
+		// set grid size
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		statAltitudeChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+
 		// show the new data in the chart
 		statAltitudeChart.updateChart(chartDataModel);
 	}
@@ -671,24 +676,24 @@ public class StatisticTourNumbers extends YearStatistic {
 	 * @param unit
 	 * @param title
 	 */
-	private void updateChartDistance(	Chart statDistanceChart,
-										BarChartMinMaxKeeper statDistanceMinMaxKeeper,
-										int[][] lowValues,
-										int[][] highValues,
-										int[][] colorIndex,
-										String unit,
-										String title) {
+	private void updateChartDistance(	final Chart statDistanceChart,
+										final BarChartMinMaxKeeper statDistanceMinMaxKeeper,
+										final int[][] lowValues,
+										final int[][] highValues,
+										final int[][] colorIndex,
+										final String unit,
+										final String title) {
 
-		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(fStatDistanceUnits);
+		final ChartDataXSerie xData = new ChartDataXSerie(fStatDistanceUnits);
 		xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		xData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		chartDataModel.setXData(xData);
 
 		// y-axis: distance
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				lowValues,
 				highValues);
@@ -707,6 +712,11 @@ public class StatisticTourNumbers extends YearStatistic {
 		if (fIsSynchScaleEnabled) {
 			statDistanceMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
+
+		// set grid size
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		statDistanceChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		// show the new data fDataModel in the chart
 		statDistanceChart.updateChart(chartDataModel);
@@ -765,25 +775,25 @@ public class StatisticTourNumbers extends YearStatistic {
 				Messages.LABEL_GRAPH_TIME);
 	}
 
-	private void updateChartTime(	Chart statDurationChart,
-									BarChartMinMaxKeeper statDurationMinMaxKeeper,
-									int[][] lowValues,
-									int[][] highValues,
-									int[][] colorIndex,
-									int yUnit,
-									String unit,
-									String title) {
+	private void updateChartTime(	final Chart statDurationChart,
+									final BarChartMinMaxKeeper statDurationMinMaxKeeper,
+									final int[][] lowValues,
+									final int[][] highValues,
+									final int[][] colorIndex,
+									final int yUnit,
+									final String unit,
+									final String title) {
 
-		ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_BAR);
 
 		// set the x-axis
-		ChartDataXSerie xData = new ChartDataXSerie(fStatTimeUnits);
+		final ChartDataXSerie xData = new ChartDataXSerie(fStatTimeUnits);
 		xData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		xData.setUnitLabel(UI.UNIT_LABEL_TIME);
 		chartDataModel.setXData(xData);
 
 		// y-axis: altitude
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				lowValues,
 				highValues);
@@ -804,6 +814,11 @@ public class StatisticTourNumbers extends YearStatistic {
 			statDurationMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
+		// set grid size
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		statDurationChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+
 		// show the new data fDataModel in the chart
 		statDurationChart.updateChart(chartDataModel);
 	}
@@ -822,7 +837,7 @@ public class StatisticTourNumbers extends YearStatistic {
 
 					if (highValues[colorIndex][valueIndex] > 0) {
 
-						int previousHighValue = highValues[colorIndex - 1][valueIndex];
+						final int previousHighValue = highValues[colorIndex - 1][valueIndex];
 
 						highValues[colorIndex][valueIndex] += previousHighValue;
 					}

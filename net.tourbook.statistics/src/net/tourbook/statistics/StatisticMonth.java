@@ -34,9 +34,12 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -70,7 +73,7 @@ public abstract class StatisticMonth extends YearStatistic {
 		return false;
 	}
 
-	ChartSegments createChartSegments(TourDataMonth tourMonthData) {
+	ChartSegments createChartSegments(final TourDataMonth tourMonthData) {
 
 		/*
 		 * create segments for each year
@@ -85,7 +88,7 @@ public abstract class StatisticMonth extends YearStatistic {
 		// get start/end and title for each segment
 		for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
 
-			int yearIndex = monthIndex / 12;
+			final int yearIndex = monthIndex / 12;
 
 			if (monthIndex % 12 == 0) {
 
@@ -100,7 +103,7 @@ public abstract class StatisticMonth extends YearStatistic {
 			}
 		}
 
-		ChartSegments monthSegments = new ChartSegments();
+		final ChartSegments monthSegments = new ChartSegments();
 		monthSegments.valueStart = segmentStart;
 		monthSegments.valueEnd = segmentEnd;
 		monthSegments.segmentTitle = segmentTitle;
@@ -122,7 +125,7 @@ public abstract class StatisticMonth extends YearStatistic {
 		fChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 	}
 
-	int[] createMonthData(TourDataMonth tourMonthData) {
+	int[] createMonthData(final TourDataMonth tourMonthData) {
 
 		/*
 		 * create segments for each year
@@ -138,33 +141,33 @@ public abstract class StatisticMonth extends YearStatistic {
 		return allMonths;
 	}
 
-	private ChartToolTipInfo createToolTipInfo(int serieIndex, int valueIndex) {
+	private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
 
-		int oldestYear = fCurrentYear - fNumberOfYears + 1;
+		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
 
-		Calendar calendar = GregorianCalendar.getInstance();
+		final Calendar calendar = GregorianCalendar.getInstance();
 
 		calendar.set(oldestYear, 0, 1);
 		calendar.add(Calendar.MONTH, valueIndex);
 
 		//
-		StringBuffer monthStringBuffer = new StringBuffer();
-		FieldPosition monthPosition = new FieldPosition(DateFormat.MONTH_FIELD);
+		final StringBuffer monthStringBuffer = new StringBuffer();
+		final FieldPosition monthPosition = new FieldPosition(DateFormat.MONTH_FIELD);
 
-		Date date = new Date();
+		final Date date = new Date();
 		date.setTime(calendar.getTimeInMillis());
 		fDateFormatter.format(date, monthStringBuffer, monthPosition);
 
 		final Integer recordingTime = fTourMonthData.fRecordingTime[serieIndex][valueIndex];
 		final Integer drivingTime = fTourMonthData.fDrivingTime[serieIndex][valueIndex];
-		int breakTime = recordingTime - drivingTime;
+		final int breakTime = recordingTime - drivingTime;
 
 		/*
 		 * tool tip: title
 		 */
-		StringBuilder titleString = new StringBuilder();
+		final StringBuilder titleString = new StringBuilder();
 
-		String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
+		final String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
 		if (tourTypeName != null && tourTypeName.length() > 0) {
 			titleString.append(tourTypeName);
 		}
@@ -180,7 +183,7 @@ public abstract class StatisticMonth extends YearStatistic {
 		/*
 		 * tool tip: label
 		 */
-		StringBuilder toolTipFormat = new StringBuilder();
+		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.tourtime_info_distance);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_altitude);
@@ -216,7 +219,7 @@ public abstract class StatisticMonth extends YearStatistic {
 		 * create tool tip info
 		 */
 
-		ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 		toolTipInfo.setTitle(toolTipTitle);
 		toolTipInfo.setLabel(toolTipLabel);
 //		toolTipInfo.setLabel(toolTipFormat.toString());
@@ -235,7 +238,7 @@ public abstract class StatisticMonth extends YearStatistic {
 
 	void createYDataAltitude(final ChartDataModel chartDataModel) {
 		// altitude
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				fTourMonthData.fAltitudeLow,
 				fTourMonthData.fAltitudeHigh);
@@ -251,7 +254,7 @@ public abstract class StatisticMonth extends YearStatistic {
 
 	void createYDataDistance(final ChartDataModel chartDataModel) {
 		// distance
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				fTourMonthData.fDistanceLow,
 				fTourMonthData.fDistanceHigh);
@@ -267,7 +270,7 @@ public abstract class StatisticMonth extends YearStatistic {
 
 	void createYDataTourTime(final ChartDataModel chartDataModel) {
 		// duration
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				fTourMonthData.fTimeLow,
 				fTourMonthData.fTimeHigh);
@@ -310,13 +313,18 @@ public abstract class StatisticMonth extends YearStatistic {
 			fMinMaxKeeper.resetMinMax();
 		}
 
-		ChartDataModel chartDataModel = updateChart();
+		final ChartDataModel chartDataModel = updateChart();
 
 		setChartProviders(chartDataModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
+
+		// set grid size
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		fChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		// show the fDataModel in the chart
 		fChart.updateChart(chartDataModel);
@@ -345,7 +353,7 @@ public abstract class StatisticMonth extends YearStatistic {
 
 		// set tool tip info
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-			public ChartToolTipInfo getToolTipInfo(final int serieIndex, int valueIndex) {
+			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 				return createToolTipInfo(serieIndex, valueIndex);
 			}
 		});

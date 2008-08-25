@@ -37,12 +37,15 @@ import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -243,7 +246,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 		final String tourTypeName = TourDatabase.getTourTypeName(fTourDayData.fTypeIds[valueIndex]);
 		final String tourTags = TourDatabase.getTagNames(fTourDayData.fTagIds.get(fSelectedTourId));
-		final String tourDescription = fTourDayData.tourDescription.get(valueIndex).replace(UI.SYSTEM_NEW_LINE, UI.NEW_LINE);
+		final String tourDescription = fTourDayData.tourDescription.get(valueIndex).replace(UI.SYSTEM_NEW_LINE,
+				UI.NEW_LINE);
 
 		final int[] startValue = fTourDayData.fTourStartValues;
 		final int[] endValue = fTourDayData.fTourEndValues;
@@ -490,11 +494,16 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			fMinMaxKeeper.setMinMaxValues(chartModel);
 		}
 
+		// set grid size
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		fChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+
 		// show the data in the chart
 		fChart.updateChart(chartModel, false);
+
 		// try to select the previous selected tour
 		selectTour(selectedTourId);
-
 	}
 
 	@Override
@@ -575,7 +584,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	/**
 	 * @param tourDataDay
 	 * @param tourId
-	 *        tour id which was selected before the update
+	 *            tour id which was selected before the update
 	 */
 	abstract ChartDataModel updateChart();
 

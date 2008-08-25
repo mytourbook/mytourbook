@@ -29,9 +29,12 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourPerson;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -63,7 +66,7 @@ public abstract class StatisticYear extends YearStatistic {
 		return false;
 	}
 
-	ChartSegments createChartSegments(TourDataYear tourDataYear) {
+	ChartSegments createChartSegments(final TourDataYear tourDataYear) {
 
 		final int yearCounter = tourDataYear.fAltitudeHigh[0].length;
 
@@ -81,7 +84,7 @@ public abstract class StatisticYear extends YearStatistic {
 			segmentEnd[yearIndex] = yearIndex;
 		}
 
-		ChartSegments yearSegments = new ChartSegments();
+		final ChartSegments yearSegments = new ChartSegments();
 		yearSegments.valueStart = segmentStart;
 		yearSegments.valueEnd = segmentEnd;
 		yearSegments.segmentTitle = segmentTitle;
@@ -104,20 +107,20 @@ public abstract class StatisticYear extends YearStatistic {
 		fChart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 	}
 
-	private ChartToolTipInfo createToolTipInfo(int serieIndex, int valueIndex) {
+	private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
 
-		int oldestYear = fCurrentYear - fNumberOfYears + 1;
+		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
 
 		final Integer recordingTime = fTourYearData.fRecordingTime[serieIndex][valueIndex];
 		final Integer drivingTime = fTourYearData.fDrivingTime[serieIndex][valueIndex];
-		int breakTime = recordingTime - drivingTime;
+		final int breakTime = recordingTime - drivingTime;
 
 		/*
 		 * tool tip: title
 		 */
-		StringBuilder titleString = new StringBuilder();
+		final StringBuilder titleString = new StringBuilder();
 
-		String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
+		final String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
 		final boolean isTourType = tourTypeName != null && tourTypeName.length() > 0;
 
 		if (isTourType) {
@@ -132,7 +135,7 @@ public abstract class StatisticYear extends YearStatistic {
 		/*
 		 * tool tip: label
 		 */
-		StringBuilder toolTipFormat = new StringBuilder();
+		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.tourtime_info_distance);
 		toolTipFormat.append(NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_altitude);
@@ -169,7 +172,7 @@ public abstract class StatisticYear extends YearStatistic {
 		 * create tool tip info
 		 */
 
-		ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 		toolTipInfo.setTitle(toolTipTitle);
 		toolTipInfo.setLabel(toolTipLabel);
 //		toolTipInfo.setLabel(toolTipFormat.toString());
@@ -192,7 +195,7 @@ public abstract class StatisticYear extends YearStatistic {
 	 */
 	void createYDataAltitude(final ChartDataModel chartDataModel) {
 
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_BESIDE,
 				fTourYearData.fAltitudeLow,
 				fTourYearData.fAltitudeHigh);
@@ -213,7 +216,7 @@ public abstract class StatisticYear extends YearStatistic {
 	 */
 	void createYDataDistance(final ChartDataModel chartDataModel) {
 
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_BESIDE,
 				fTourYearData.fDistanceLow,
 				fTourYearData.fDistanceHigh);
@@ -234,7 +237,7 @@ public abstract class StatisticYear extends YearStatistic {
 	 */
 	void createYDataDuration(final ChartDataModel chartDataModel) {
 
-		ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartDataModel.CHART_TYPE_BAR,
 				ChartDataYSerie.BAR_LAYOUT_BESIDE,
 				fTourYearData.fTimeLow,
 				fTourYearData.fTimeHigh);
@@ -248,7 +251,7 @@ public abstract class StatisticYear extends YearStatistic {
 		chartDataModel.addYData(yData);
 	}
 
-	int[] createYearData(TourDataYear tourDataYear) {
+	int[] createYearData(final TourDataYear tourDataYear) {
 
 		final int yearCounter = tourDataYear.fAltitudeHigh[0].length;
 		final int allYears[] = new int[yearCounter];
@@ -289,13 +292,18 @@ public abstract class StatisticYear extends YearStatistic {
 			fMinMaxKeeper.resetMinMax();
 		}
 
-		ChartDataModel chartDataModel = updateChart();
+		final ChartDataModel chartDataModel = updateChart();
 
 		setChartProviders(chartDataModel);
 
 		if (fIsSynchScaleEnabled) {
 			fMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
+
+		// set grid size
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		fChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
 		// show the fDataModel in the chart
 		fChart.updateChart(chartDataModel);
@@ -311,7 +319,7 @@ public abstract class StatisticYear extends YearStatistic {
 
 		// set tool tip info
 		chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-			public ChartToolTipInfo getToolTipInfo(final int serieIndex, int valueIndex) {
+			public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
 				return createToolTipInfo(serieIndex, valueIndex);
 			}
 		});
