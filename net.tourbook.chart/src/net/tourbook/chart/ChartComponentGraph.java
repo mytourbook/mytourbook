@@ -373,6 +373,8 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private int							fMouseDownPositionX;
 
+	private boolean fIsDrawDraggedImage=false;
+
 	/**
 	 * is <code>true</code> when the chart is panned
 	 */
@@ -1681,8 +1683,11 @@ public class ChartComponentGraph extends Canvas {
 
 				gc.dispose();
 
-				// force a redraw
+				// remove dirty status
 				fIsGraphDirty = false;
+				
+				// dragged image will be painted until the graph image is recomputed
+				fIsDrawDraggedImage = false;
 
 				/*
 				 * force the layer image to be redrawn
@@ -4306,6 +4311,15 @@ public class ChartComponentGraph extends Canvas {
 
 			drawGraphImage();
 
+			if (fIsDrawDraggedImage) {
+				
+				/*
+				 * paint dragged chart until the chart is recomputed
+				 */
+				paintDraggedChart(gc);
+				return;
+			}
+			
 			// prevent flickering the graph
 
 			/*
@@ -4321,9 +4335,9 @@ public class ChartComponentGraph extends Canvas {
 				if (gcHeight > imageHeight) {
 
 					// fill the gap between the image and the drawable area
-
 					gc.setBackground(fChart.getBackgroundColor());
 					gc.fillRectangle(0, imageHeight, clientArea.width, clientArea.height - imageHeight);
+				
 				} else {
 					gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 				}
@@ -5169,10 +5183,10 @@ public class ChartComponentGraph extends Canvas {
 		updateYDataMinMaxValues();
 
 		/*
-		 * prevent to display the old chart image
+		 * draw the dragged image until the graph image is recomuted
 		 */
-		fIsGraphDirty = true;
-
+		fIsDrawDraggedImage = true;
+		
 		fChartComponents.onResize();
 
 		moveSlidersToBorder();

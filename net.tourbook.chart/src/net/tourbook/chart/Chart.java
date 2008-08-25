@@ -833,6 +833,14 @@ public class Chart extends ViewForm {
 		fChartComponents.getChartComponentGraph().fGraphAlpha = alphaValue;
 	}
 
+	public void setGridDistance(final int horizontalGrid, final int verticalGrid){
+
+		gridVerticalDistance = verticalGrid;
+		gridHorizontalDistance = horizontalGrid;
+		
+		fChartComponents.onResize();
+	}
+
 	/**
 	 * Sets the mouse mode, when <code>true</code> the mode {@link #MOUSE_MODE_SLIDER} is active,
 	 * this is the default
