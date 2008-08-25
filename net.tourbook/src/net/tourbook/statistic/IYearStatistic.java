@@ -21,6 +21,11 @@ import net.tourbook.ui.TourTypeFilter;
 public interface IYearStatistic {
 
 	/**
+	 * color have changed for the graphs
+	 */
+	public abstract void prefColorChanged();
+
+	/**
 	 * @param person
 	 *            active person or <code>null</code> when no person/all people are selected
 	 * @param activeTourTypeFilter
@@ -37,10 +42,5 @@ public interface IYearStatistic {
 											int year,
 											int numberOfYears,
 											boolean refreshData);
-
-	/**
-	 * color have changed for the graphs
-	 */
-	public abstract void prefColorChanged();
 
 }

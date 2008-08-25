@@ -741,6 +741,10 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 			}
 		});
 
+		// set grid size
+		fYearChart.setGridDistance(prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
+				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+
 		// show the data in the chart
 		fYearChart.updateChart(chartModel, false);
 	}
