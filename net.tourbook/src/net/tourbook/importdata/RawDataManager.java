@@ -438,8 +438,11 @@ public class RawDataManager {
 
 			// copy file to destinationPath
 			if (destinationPath != null) {
+
 				String destFileName = new File(sourceFileName).getName();
 				if (buildNewFileName) {
+
+					destFileName = null;
 
 					try {
 						destFileName = device.buildFileNameFromRawData(sourceFileName);
@@ -450,11 +453,18 @@ public class RawDataManager {
 						if (destFileName == null) {
 							MessageDialog.openError(Display.getCurrent().getActiveShell(),
 									"Error Creating Filename",
-									"The filename for "
+									"The filename for the received data"
+											+ " could not be created from the file '"
 											+ sourceFileName
-											+ " could not be created.\n\n"
-											+ "The received data will be saved in the file "
-											+ TEMP_IMPORTED_FILE);
+											+ "'\n\n"
+											+ "The received data will be saved in the temp file '"
+											+ new Path(destinationPath).addTrailingSeparator().toString()
+											+ TEMP_IMPORTED_FILE
+											+ "'\n\n"
+											+ "The possible reason could be that the transfered data are corrupted."
+											+ "\n\n"
+											+ "When you think the received data are correct, "
+											+ "you can send the received data file to the author of MyTourbook so he can analyze it.");
 
 							destFileName = TEMP_IMPORTED_FILE;
 						}
@@ -556,6 +566,7 @@ public class RawDataManager {
 				sourceFileName = newFile.getAbsolutePath();
 
 			}
+
 			fLastImportedFile = sourceFileName;
 
 			return device.processDeviceData(sourceFileName, fDeviceData, fTourDataMap);
