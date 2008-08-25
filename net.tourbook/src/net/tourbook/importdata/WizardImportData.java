@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.importdata;
 
 import java.io.File;
@@ -65,8 +64,22 @@ public class WizardImportData extends Wizard {
 
 	}
 
-	public void appendReceivedFile(final File inFile) {
-		fReceivedFiles.add(inFile);
+//	public void appendReceivedFile(final File inFile) {
+//		fReceivedFiles.add(inFile);
+//	}
+
+	@Override
+	public boolean performFinish() {
+
+		if (fPageImportSettings.validatePage() == false) {
+			return false;
+		}
+
+		receiveData();
+
+		fPageImportSettings.persistDialogSettings();
+
+		return true;
 	}
 
 	/**
@@ -149,20 +162,6 @@ public class WizardImportData extends Wizard {
 		} catch (final PartInitException e) {
 			e.printStackTrace();
 		}
-
-		return true;
-	}
-
-	@Override
-	public boolean performFinish() {
-
-		if (fPageImportSettings.validatePage() == false) {
-			return false;
-		}
-
-		receiveData();
-
-		fPageImportSettings.persistDialogSettings();
 
 		return true;
 	}

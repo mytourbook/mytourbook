@@ -27,6 +27,7 @@ public abstract class ExternalDevice {
 	public String				name;
 	public String				deviceId;
 	public String				visibleName;
+	
 	public boolean				buildNewFileNames	= true;
 
 	public abstract IRunnableWithProgress createImportRunnable(String portName, List<File> receivedFiles);

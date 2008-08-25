@@ -55,9 +55,11 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-	public static final String			TEMP_RAW_DATA_FILE					= "temp-device-data.txt";						//$NON-NLS-1$
+//	public static final String			TEMP_RAW_DATA_FILE					= "temp-device-data.txt";						//$NON-NLS-1$
 
-	protected static final String		RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
+	private static final String			RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
+
+	private static final String			TEMP_IMPORTED_FILE					= "received-device-data.txt";
 
 	private static RawDataManager		instance							= null;
 
@@ -93,16 +95,18 @@ public class RawDataManager {
 		return instance;
 	}
 
+//	/**
+//	 * @return Returns the file to the temp data file
+//	 */
+//	public static String getTempDataFileName() {
+//
+//		return TourbookPlugin.getDefault().getStateLocation().append(TEMP_RAW_DATA_FILE).toFile().getAbsolutePath();
+//	}
+
 	/**
-	 * @return Returns the file to the temp data file
+	 * @return Return the temp directory where received data are stored temporarily
 	 */
-	public static String getTempDataFileName() {
-
-		return TourbookPlugin.getDefault().getStateLocation().append(TEMP_RAW_DATA_FILE).toFile().getAbsolutePath();
-	}
-
 	public static String getTempDir() {
-
 		return TourbookPlugin.getDefault().getStateLocation().toFile().getAbsolutePath();
 	}
 
@@ -408,7 +412,7 @@ public class RawDataManager {
 	 *            if false
 	 * @param fileCollision
 	 *            behavior if destination file exists (ask if null)
-	 * @return
+	 * @return Return <code>true</code> when the data have been imported
 	 */
 	private boolean importRawDataFromFile(	final TourbookDevice device,
 											String sourceFileName,
@@ -436,7 +440,25 @@ public class RawDataManager {
 			if (destinationPath != null) {
 				String destFileName = new File(sourceFileName).getName();
 				if (buildNewFileName) {
-					destFileName = device.buildFileNameFromRawData(sourceFileName);
+
+					try {
+						destFileName = device.buildFileNameFromRawData(sourceFileName);
+					} catch (final Exception e) {
+						e.printStackTrace();
+					} finally {
+
+						if (destFileName == null) {
+							MessageDialog.openError(Display.getCurrent().getActiveShell(),
+									"Error Creating Filename",
+									"The filename for "
+											+ sourceFileName
+											+ " could not be created.\n\n"
+											+ "The received data will be saved in the file "
+											+ TEMP_IMPORTED_FILE);
+
+							destFileName = TEMP_IMPORTED_FILE;
+						}
+					}
 				}
 				final File newFile = new File((new Path(destinationPath).addTrailingSeparator().toString() + destFileName));
 
