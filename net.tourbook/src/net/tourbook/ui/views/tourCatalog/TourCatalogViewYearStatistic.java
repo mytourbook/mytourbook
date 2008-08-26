@@ -122,6 +122,8 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	 */
 	private ArrayList<Integer>					fTourSpeed;
 
+	protected int								fSelectedTourIndex;
+
 	{
 		fNumberFormatter.setMinimumFractionDigits(1);
 		fNumberFormatter.setMaximumFractionDigits(1);
@@ -344,8 +346,11 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 					return;
 				}
 
+				// ensure list size
+				fSelectedTourIndex = Math.min(valueIndex, fAllTours.size() - 1);
+
 				// select the tour in the tour viewer & show tour in compared tour char
-				final TVICatalogComparedTour tourCatalogComparedTour = fAllTours.get(valueIndex);
+				final TVICatalogComparedTour tourCatalogComparedTour = fAllTours.get(fSelectedTourIndex);
 				fCurrentSelection = new StructuredSelection(tourCatalogComparedTour);
 				fPostSelectionProvider.setSelection(fCurrentSelection);
 			}
@@ -410,6 +415,31 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	 */
 	void initYearNumbers() {
 
+	}
+
+	/**
+	 * Update statistic by setting the number of years
+	 * 
+	 * @param numberOfYears
+	 */
+	public void onExecuteSelectNumberOfYears(final int numberOfYears) {
+
+		// get selected tour
+		long selectedTourId = 0;
+		if (fAllTours.size() == 0) {
+			selectedTourId = -1;
+		} else {
+			final int selectedTourIndex = Math.min(fSelectedTourIndex, fAllTours.size() - 1);
+			selectedTourId = fAllTours.get(selectedTourIndex).getTourId();
+		}
+
+		fNumberOfYears = numberOfYears;
+		setYearData();
+
+		updateYearBarChart(false);
+
+		// reselect last selected tour
+		selectTourInYearStatistic(selectedTourId);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -558,12 +588,19 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 		final int tourLength = fAllTours.size();
 		final boolean[] selectedTours = new boolean[tourLength];
+		boolean isTourSelected = false;
 
 		for (int tourIndex = 0; tourIndex < tourLength; tourIndex++) {
 			final TVICatalogComparedTour comparedItem = fAllTours.get(tourIndex);
 			if (comparedItem.getTourId() == selectedTourId) {
 				selectedTours[tourIndex] = true;
+				isTourSelected = true;
 			}
+		}
+
+		if (isTourSelected == false && selectedTours.length > 0) {
+			// a tour is not selected, select first tour
+			selectedTours[0] = true;
 		}
 
 		fYearChart.setSelectedBars(selectedTours);
@@ -595,19 +632,6 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 			fYearDays[yearIndex] = dt.withYear(currentYear).dayOfYear().getMaximumValue();
 			yearIndex++;
 		}
-	}
-
-	/**
-	 * Update statistic by setting the number of years
-	 * 
-	 * @param numberOfYears
-	 */
-	public void updateStatistic(final int numberOfYears) {
-
-		fNumberOfYears = numberOfYears;
-		setYearData();
-
-		updateYearBarChart(false);
 	}
 
 	/**

@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.statistic;
 
 import java.util.ArrayList;
@@ -49,8 +48,14 @@ public class ActionSelectYears extends Action implements IMenuCreator {
 
 		@Override
 		public void run() {
-			fNumberOfYears = fYears;
-			fYearStatistic.updateStatistic(fYears);
+
+			if (isChecked()) {
+
+				// ignore uncheck event
+
+				fNumberOfYears = fYears;
+				fYearStatistic.onExecuteSelectNumberOfYears(fYears);
+			}
 		}
 
 	}
