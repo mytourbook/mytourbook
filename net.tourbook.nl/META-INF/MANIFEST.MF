@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Language Fragment
-Bundle-SymbolicName: net.tourbook.nl
-Bundle-Version: 1.2.0
-Bundle-Vendor: MyTourbook
-Fragment-Host: net.tourbook;bundle-version="1.2.0"
