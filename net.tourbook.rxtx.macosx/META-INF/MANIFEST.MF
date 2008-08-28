@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: rxtx Macosx Fragment
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: net.tourbook.rxtx.macosx
 Bundle-Version: 2.1.8.v20071231-arduino
 Fragment-Host: net.tourbook.rxtx;bundle-version="2.1.8"
 Bundle-Localization: plugin
-Bundle-Vendor: MyTourbook
+Bundle-Vendor: %Bundle-Vendor
