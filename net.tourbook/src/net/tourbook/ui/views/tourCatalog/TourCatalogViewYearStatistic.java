@@ -473,7 +473,11 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 			// select tour in the statistic
 			final Long compTourId = tourCatalogItem.getCompTourId();
-			if (compTourId == null && fAllTours != null) {
+			if (compTourId != null) {
+
+				selectTourInYearStatistic(compTourId);
+
+			} else if (fAllTours != null) {
 
 				// select first tour for the youngest year
 				int yearIndex = 0;
@@ -488,9 +492,6 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 				if (fAllTours.size() > 0 && fAllTours.size() >= yearIndex) {
 					selectTourInYearStatistic(fAllTours.get(yearIndex).getTourId());
 				}
-
-			} else {
-				selectTourInYearStatistic(compTourId);
 			}
 
 //			// hide chart when a different ref tour is selected

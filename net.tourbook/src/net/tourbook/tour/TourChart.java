@@ -363,8 +363,6 @@ public class TourChart extends Chart {
 
 		final TCActionProxy actionProxy = new TCActionProxy(commandId, action);
 
-//		actionProxy.setIsGraphAction();
-
 		fActionProxies.put(getProxyId(graphId), actionProxy);
 	}
 
@@ -541,9 +539,17 @@ public class TourChart extends Chart {
 	}
 
 	private void enableZoomOptions() {
+		
+		if (fActionProxies == null) {
+			return;
+		}
+
 		final boolean canAutoZoom = getMouseMode().equals(Chart.MOUSE_MODE_ZOOM);
 
-		fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED).setEnabled(canAutoZoom);
+		final TCActionProxy actionProxy = fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED);
+		if (actionProxy != null) {
+			actionProxy.setEnabled(canAutoZoom);
+		}
 	}
 
 	/**

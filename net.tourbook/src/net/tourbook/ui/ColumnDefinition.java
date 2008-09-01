@@ -60,6 +60,8 @@ public class ColumnDefinition implements Cloneable {
 	 */
 	private boolean				fIsDefaultColumn		= false;
 
+	private int					fDefaultColumnWidth;
+
 	public void addSelectionListener(final SelectionAdapter selectionAdapter) {
 		fColumnSelectionListener = selectionAdapter;
 	}
@@ -87,6 +89,7 @@ public class ColumnDefinition implements Cloneable {
 		clone.fColumnText = fColumnText;
 		clone.fColumnToolTipText = fColumnToolTipText;
 		clone.fColumnWidth = fColumnWidth;
+		clone.fDefaultColumnWidth = fDefaultColumnWidth;
 		clone.fIsColumnResizable = fIsColumnResizable;
 
 		clone.fIsColumnMoveable = fIsColumnMoveable;
@@ -155,6 +158,10 @@ public class ColumnDefinition implements Cloneable {
 		return fCreateIndex;
 	}
 
+	public int getDefaultColumnWidth() {
+		return fDefaultColumnWidth;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -175,6 +182,9 @@ public class ColumnDefinition implements Cloneable {
 		return fIsColumnResizable;
 	}
 
+	/**
+	 * @return Returns <code>true</code> when this is a default column
+	 */
 	public boolean isDefaultColumn() {
 		return fIsDefaultColumn;
 	}
@@ -237,6 +247,10 @@ public class ColumnDefinition implements Cloneable {
 		fCreateIndex = createIndex;
 	}
 
+	public void setDefaultColumnWidth(final int defaultColumnWidth) {
+		fDefaultColumnWidth = defaultColumnWidth;
+	}
+
 	public void setIsCheckedInDialog(final boolean isCheckedInDialog) {
 		fIsCheckedInDialog = isCheckedInDialog;
 	}
@@ -251,6 +265,11 @@ public class ColumnDefinition implements Cloneable {
 
 	public void setLabelProvider(final CellLabelProvider cellLabelProvider) {
 		fCellLabelProvider = cellLabelProvider;
+	}
+
+	@Override
+	public String toString() {
+		return fColumnId + ":" + fColumnWidth + " (" + fDefaultColumnWidth + ")";
 	}
 
 }

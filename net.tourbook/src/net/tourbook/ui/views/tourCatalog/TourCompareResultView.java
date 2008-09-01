@@ -563,7 +563,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 		colDef.setIsDefaultColumn();
 		colDef.setColumnLabel(Messages.Compare_Result_Column_tour);
 		colDef.setColumnText(Messages.Compare_Result_Column_tour);
-		colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(25) + 16);
+		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25) + 16);
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -602,7 +602,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 		colDef.setColumnText(Messages.Compare_Result_Column_diff);
 		colDef.setColumnToolTipText(Messages.Compare_Result_Column_diff_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_diff_label);
-		colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -629,7 +629,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 		colDef.setColumnText(UI.UNIT_LABEL_SPEED);
 		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_label);
-		colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -655,7 +655,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 		colDef.setColumnText(UI.UNIT_LABEL_SPEED);
 		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_db_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_db_label);
-		colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -681,7 +681,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 		colDef.setColumnText(UI.UNIT_LABEL_SPEED);
 		colDef.setColumnToolTipText(Messages.Compare_Result_Column_kmh_moved_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_moved_label);
-		colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+		colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

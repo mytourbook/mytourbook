@@ -66,18 +66,18 @@ public class ColumnModifyDialog extends TrayDialog {
 	private Button						fBtnDefault;
 
 	private ArrayList<ColumnDefinition>	fAllColumnsInDialog;
-	private ArrayList<ColumnDefinition>	fAllColumns;
+	private ArrayList<ColumnDefinition>	fAllDefinedColumns;
 
 	public ColumnModifyDialog(	final Shell parentShell,
 								final ColumnManager columnManager,
 								final ArrayList<ColumnDefinition> dialogColumns,
-								final ArrayList<ColumnDefinition> allColumns) {
+								final ArrayList<ColumnDefinition> allDefaultColumns) {
 
 		super(parentShell);
 
 		fColumnManager = columnManager;
 		fAllColumnsInDialog = dialogColumns;
-		fAllColumns = allColumns;
+		fAllDefinedColumns = allDefaultColumns;
 
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -312,14 +312,15 @@ public class ColumnModifyDialog extends TrayDialog {
 
 				fAllColumnsInDialog = new ArrayList<ColumnDefinition>();
 
-				for (final ColumnDefinition columnDef : fAllColumns) {
+				for (final ColumnDefinition definedColumnDef : fAllDefinedColumns) {
 					try {
 
-						final ColumnDefinition columnDefinitionClone = (ColumnDefinition) columnDef.clone();
+						final ColumnDefinition columnDefinitionClone = (ColumnDefinition) definedColumnDef.clone();
 
 						// visible columns in the viewer will be checked
-						final boolean isDefaultColumn = columnDef.isDefaultColumn();
+						final boolean isDefaultColumn = definedColumnDef.isDefaultColumn();
 						columnDefinitionClone.setIsCheckedInDialog(isDefaultColumn);
+						columnDefinitionClone.setColumnWidth(definedColumnDef.getDefaultColumnWidth());
 
 						fAllColumnsInDialog.add(columnDefinitionClone);
 

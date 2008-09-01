@@ -31,7 +31,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label + " (" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setColumnText("\\ " + UI.UNIT_LABEL_ALTITUDE); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 			
 			return colDef;
 		};
@@ -47,7 +47,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setColumnText("/ " + UI.UNIT_LABEL_ALTITUDE); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_up_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 			return colDef;
 		};
@@ -63,7 +63,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_avg_cadence_label);
 			colDef.setColumnText(Messages.ColumnFactory_avg_cadence);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_cadence_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
 			
 			return colDef;
 		};
@@ -79,7 +79,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_avg_pulse_label);
 			colDef.setColumnText(Messages.ColumnFactory_avg_pulse);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_pulse_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			return colDef;
 		};
@@ -95,7 +95,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_avg_speed_label + " ("+ UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setColumnText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_speed_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			return colDef;
 		};
@@ -111,7 +111,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_avg_temperature_label + " (" + UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setColumnText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_avg_temperature_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
 
 			return colDef;
 		};
@@ -127,7 +127,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_date_label);
 			colDef.setColumnText(Messages.ColumnFactory_date);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_date_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(16));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(16));
 
 			return colDef;
 		};
@@ -142,7 +142,7 @@ public abstract class TreeColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_device_start_distance_label);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_device_start_distance_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 			return colDef;
 		};
@@ -158,7 +158,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_distance_label + " (" + UI.UNIT_LABEL_DISTANCE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setColumnText(UI.UNIT_LABEL_DISTANCE);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_distance_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 			return colDef;
 		};
@@ -174,7 +174,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_driving_time_label);
 			colDef.setColumnText(Messages.ColumnFactory_driving_time);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_driving_time_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 			return colDef;
 		};
@@ -191,7 +191,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_max_altitude_label + "(^" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setColumnText("^" + UI.UNIT_LABEL_ALTITUDE); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_max_altitude_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			return colDef;
 		};
@@ -207,7 +207,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_max_pulse_label);
 			colDef.setColumnText(Messages.ColumnFactory_max_pulse);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_max_pulse_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 			
 			return colDef;
 		};
@@ -224,7 +224,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_max_speed_label + " (^" + UI.UNIT_LABEL_SPEED + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 			colDef.setColumnText("^" + UI.UNIT_LABEL_SPEED); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_max_speed_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 			
 			return colDef;
 		};
@@ -240,7 +240,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_recording_time_label);
 			colDef.setColumnText(Messages.ColumnFactory_recording_time);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_recording_time_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 			return colDef;
 		};
@@ -255,7 +255,7 @@ public abstract class TreeColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_reference_tour);
 			colDef.setColumnText(Messages.ColumnFactory_reference_tour);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 			
 			return colDef;
 		};
@@ -271,7 +271,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_speed_label);
 			colDef.setColumnText(UI.UNIT_LABEL_SPEED); //$NON-NLS-1$
 			colDef.setColumnToolTipText(Messages.ColumnFactory_speed_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
 			return colDef;
 		};
@@ -287,7 +287,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_tag_label);
 			colDef.setColumnText(Messages.ColumnFactory_tag);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_tag_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 			
 			return colDef;
 		};
@@ -303,7 +303,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_time_interval_label);
 			colDef.setColumnText(Messages.ColumnFactory_time_interval);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_time_interval_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 			return colDef;
 		};
@@ -319,7 +319,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_tour_title);
 			colDef.setColumnText(Messages.ColumnFactory_tour_title);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_title_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
 			return colDef;
 		};
@@ -335,7 +335,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnText(Messages.ColumnFactory_tour_numbers);
 			colDef.setColumnLabel(Messages.ColumnFactory_tour_numbers_lable);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_numbers_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
 			return colDef;
 		};
@@ -351,7 +351,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_tour_tag_label);
 			colDef.setColumnText(Messages.ColumnFactory_tour_tag_label);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_tag_tooltip);
-			colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
 			return colDef;
 		};
@@ -366,7 +366,7 @@ public abstract class TreeColumnFactory {
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_tour_type_label);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_tour_type_tooltip);
-			colDef.setColumnWidth(18);
+			colDef.setDefaultColumnWidth(18);
 
 			return colDef;
 		};
