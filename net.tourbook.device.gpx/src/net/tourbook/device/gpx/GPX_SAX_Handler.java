@@ -161,7 +161,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 			if (timeDiff >= minTimeDiff) {
 
-				final int altitudeDiff = lastAltitude - currentAltitude;
+				final int altitudeDiff = currentAltitude - lastAltitude;
 
 				if (altitudeDiff >= 0) {
 					altitudeUp += altitudeDiff;
