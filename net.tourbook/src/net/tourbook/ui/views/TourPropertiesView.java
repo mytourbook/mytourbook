@@ -635,6 +635,7 @@ public class TourPropertiesView extends ViewPart implements ITourViewer {
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setIsColumnMoveable(false);
+		colDef.setHideColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {}

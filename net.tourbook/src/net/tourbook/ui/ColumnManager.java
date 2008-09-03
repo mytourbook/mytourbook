@@ -44,7 +44,7 @@ public class ColumnManager {
 	/**
 	 * minimum column width when the column width is 0, there was an bug that this happened
 	 */
-	private static final int			MINIMUM_COLUMN_WIDTH			= 1;
+	private static final int			MINIMUM_COLUMN_WIDTH			= 7;
 
 	private static final String			MEMENTO_COLUMN_SORT_ORDER		= "column_sort_order";					//$NON-NLS-1$
 	private static final String			MEMENTO_COLUMN_WIDTH			= "column_width";						//$NON-NLS-1$
@@ -147,7 +147,17 @@ public class ColumnManager {
 			tc.setToolTipText(columnToolTipText);
 		}
 
-		tc.setWidth(colDef.getColumnWidth());
+		/*
+		 * set column width
+		 */
+		int columnWidth = colDef.getColumnWidth();
+		if (colDef.isColumnHidden()) {
+			columnWidth = 0;
+		} else {
+			columnWidth = columnWidth < MINIMUM_COLUMN_WIDTH ? colDef.getDefaultColumnWidth() : columnWidth;
+		}
+		tc.setWidth(columnWidth);
+
 		tc.setResizable(colDef.isColumnResizable());
 		tc.setMoveable(colDef.isColumnMoveable());
 
@@ -191,7 +201,17 @@ public class ColumnManager {
 			tc.setToolTipText(columnToolTipText);
 		}
 
-		tc.setWidth(colDef.getColumnWidth());
+		/*
+		 * set column width
+		 */
+		int columnWidth = colDef.getColumnWidth();
+		if (colDef.isColumnHidden()) {
+			columnWidth = 0;
+		} else {
+			columnWidth = columnWidth < MINIMUM_COLUMN_WIDTH ? colDef.getDefaultColumnWidth() : columnWidth;
+		}
+		tc.setWidth(columnWidth);
+
 		tc.setResizable(colDef.isColumnResizable());
 		tc.setMoveable(colDef.isColumnMoveable());
 
@@ -252,12 +272,11 @@ public class ColumnManager {
 			}
 
 			for (final TableColumn column : table.getColumns()) {
-				columnIdsAndWidth.add(((TableColumnDefinition) column.getData()).getColumnId());
-				int columnWidth = column.getWidth();
-				if (columnWidth == 0) {
-					columnWidth = MINIMUM_COLUMN_WIDTH;
-				}
-				columnIdsAndWidth.add(Integer.toString(columnWidth));
+
+				final String columnId = ((TableColumnDefinition) column.getData()).getColumnId();
+				final int columnWidth = column.getWidth();
+
+				setColumnIdAndWidth(columnIdsAndWidth, columnId, columnWidth);
 			}
 
 		} else if (columnViewer instanceof TreeViewer) {
@@ -268,13 +287,11 @@ public class ColumnManager {
 			}
 
 			for (final TreeColumn column : tree.getColumns()) {
-				columnIdsAndWidth.add(((TreeColumnDefinition) column.getData()).getColumnId());
 
-				int columnWidth = column.getWidth();
-				if (columnWidth == 0) {
-					columnWidth = MINIMUM_COLUMN_WIDTH;
-				}
-				columnIdsAndWidth.add(Integer.toString(columnWidth));
+				final String columnId = ((TreeColumnDefinition) column.getData()).getColumnId();
+				final int columnWidth = column.getWidth();
+
+				setColumnIdAndWidth(columnIdsAndWidth, columnId, columnWidth);
 			}
 		}
 
@@ -401,7 +418,7 @@ public class ColumnManager {
 
 				// set column width
 				colDef.setColumnWidth(getColumnWidth(colDef.fColumnId));
-				
+
 				// keep the column
 				allDialogColumns.add(colDef);
 
@@ -413,13 +430,13 @@ public class ColumnManager {
 		 * add columns which are defined but not visible
 		 */
 		for (final ColumnDefinition colDef : allColumnsClone) {
-			
+
 			// uncheck hidden columns
 			colDef.setIsCheckedInDialog(false);
 
 			// set column default width
 			colDef.setColumnWidth(colDef.getDefaultColumnWidth());
-			
+
 			allDialogColumns.add(colDef);
 		}
 
@@ -486,6 +503,28 @@ public class ColumnManager {
 		}
 	}
 
+	private void setColumnIdAndWidth(final ArrayList<String> columnIdsAndWidth, final String columnId, int columnWidth) {
+
+		final ColumnDefinition colDef = getColumnDefinitionByColumnId(columnId);
+		if (colDef.isColumnHidden()) {
+
+			// column is hidden
+
+			columnWidth = 0;
+
+		} else {
+
+			// column is visible
+
+			if (columnWidth == 0) {
+				columnWidth = MINIMUM_COLUMN_WIDTH;
+			}
+		}
+
+		columnIdsAndWidth.add(columnId);
+		columnIdsAndWidth.add(Integer.toString(columnWidth));
+	}
+
 	/**
 	 * Set the columns in {@link #fVisibleColumnDefinitions} to the order of the
 	 * <code>tableItems</code> in the {@link ColumnModifyDialog}
@@ -507,7 +546,7 @@ public class ColumnManager {
 
 				// set the visible columns 
 				visibleColumnIds.add(colDef.getColumnId());
-				
+
 				// set column id and width
 				columnIdsAndWidth.add(colDef.getColumnId());
 				columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));

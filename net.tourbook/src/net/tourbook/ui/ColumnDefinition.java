@@ -62,6 +62,12 @@ public class ColumnDefinition implements Cloneable {
 
 	private int					fDefaultColumnWidth;
 
+	/**
+	 * column will have the width 0 to be hidden, this is necessary that the first visible column
+	 * can be right aligned
+	 */
+	private boolean				fIsColumnHidden			= false;
+
 	public void addSelectionListener(final SelectionAdapter selectionAdapter) {
 		fColumnSelectionListener = selectionAdapter;
 	}
@@ -174,6 +180,10 @@ public class ColumnDefinition implements Cloneable {
 		return fIsCheckedInDialog;
 	}
 
+	public boolean isColumnHidden() {
+		return fIsColumnHidden;
+	}
+
 	public boolean isColumnMoveable() {
 		return fIsColumnMoveable;
 	}
@@ -249,6 +259,13 @@ public class ColumnDefinition implements Cloneable {
 
 	public void setDefaultColumnWidth(final int defaultColumnWidth) {
 		fDefaultColumnWidth = defaultColumnWidth;
+	}
+
+	/**
+	 * Hidden columns will be displayed with the width 0
+	 */
+	public void setHideColumn() {
+		fIsColumnHidden = true;
 	}
 
 	public void setIsCheckedInDialog(final boolean isCheckedInDialog) {

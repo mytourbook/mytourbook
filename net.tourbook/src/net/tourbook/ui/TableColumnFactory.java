@@ -443,7 +443,7 @@ public abstract class TableColumnFactory {
 			
 			final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "firstColumn", SWT.LEAD); //$NON-NLS-1$
 	
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(1));
+			colDef.setDefaultColumnWidth(0);
 			
 			return colDef;
 		};
