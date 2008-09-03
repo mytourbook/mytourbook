@@ -7,14 +7,14 @@
             class="net.tourbook.device.garmin.GarminDeviceDataReader"
             fileextension="*"
             id="net.tourbook.device.GarminDeviceReader"
-            name="Garmin"/>
+            name="%device.name.0"/>
    </extension>
    <extension
          point="net.tourbook.externalDeviceDataReader">
       <device
             class="net.tourbook.device.garmin.GarminExternalDevice"
             id="net.tourbook.device.GarminExternalDeviceReader"
-            name="Garmin"
+            name="%device.name.1"
             type="serial">
       </device>
    </extension>

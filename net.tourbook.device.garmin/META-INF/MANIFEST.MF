@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Device Reader for Garmin Devices
+Bundle-Name: %Bundle-Name.0
 Bundle-SymbolicName: net.tourbook.device.garmin;singleton:=true
 Bundle-Version: 1.6.0.v2008-08
 Bundle-Activator: net.tourbook.device.garmin.Activator
@@ -10,8 +10,8 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook,
  net.tourbook.device,
  net.tourbook.rxtx
-Eclipse-LazyStart: true
-Bundle-Vendor: MyTourbook
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: %Bundle-Vendor.0
 Bundle-ClassPath: .,
  gpsinput-0.5.3.jar,
  dinopolis-util-0.5.3.jar,
@@ -19,3 +19,4 @@ Bundle-ClassPath: .,
  velocity-1.5.jar,
  commons-collections-3.2.jar,
  commons-lang-2.4.jar
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
