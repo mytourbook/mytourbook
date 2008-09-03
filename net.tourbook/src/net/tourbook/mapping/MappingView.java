@@ -136,6 +136,7 @@ public class MappingView extends ViewPart {
 	private TourData								fTourData;
 	private TourData								fPreviousTourData;
 
+	private ActionFailedMapImages					fActionFailedMapImages;
 	private ActionSelectMapProvider					fActionSelectMapProvider;
 	private ActionSaveDefaultPosition				fActionSaveDefaultPosition;
 	private ActionSetDefaultPosition				fActionSetDefaultPosition;
@@ -188,6 +189,10 @@ public class MappingView extends ViewPart {
 	private final HashMap<Integer, ILegendProvider>	fLegendProviders					= new HashMap<Integer, ILegendProvider>();
 
 	public MappingView() {}
+
+	public void actionFailedMapImages() {
+		fMap.reload();
+	}
 
 	void actionOpenMapProviderDialog() {
 
@@ -295,7 +300,7 @@ public class MappingView extends ViewPart {
 			fMap.setShowOverlays(true);
 
 			paintTour(fTourData, false, false);
-			
+
 			setMapToSliderBounds(fTourData);
 		}
 	}
@@ -581,6 +586,7 @@ public class MappingView extends ViewPart {
 		fActionShowLegendInMap = new ActionShowLegendInMap(this);
 		fActionShowStartEndInMap = new ActionShowStartEndInMap(this);
 		fActionShowTourMarker = new ActionShowTourMarker(this);
+		fActionFailedMapImages = new ActionFailedMapImages(this);
 
 		/*
 		 * fill view toolbar
@@ -620,7 +626,7 @@ public class MappingView extends ViewPart {
 		menuMgr.add(fActionSaveDefaultPosition);
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionSynchTourZoomLevel);
-
+		menuMgr.add(fActionFailedMapImages);
 	}
 
 	/**
@@ -726,6 +732,8 @@ public class MappingView extends ViewPart {
 
 		// show map from last selection
 		onChangeSelection(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		fMap.queueRedrawMap();
 	}
 
 	@Override
@@ -1422,7 +1430,7 @@ public class MappingView extends ViewPart {
 		if (tourData == null) {
 			return;
 		}
-		
+
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
 

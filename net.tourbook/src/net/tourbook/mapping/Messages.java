@@ -26,6 +26,8 @@ public class Messages extends NLS {
 	public static String		graph_label_heartbeat_unit;
 
 	public static String		image_action_change_tile_factory;
+
+	public static String	image_action_reload_map;
 	public static String		image_action_show_tour_in_map;
 	public static String		image_action_show_tour_in_map_disabled;
 	public static String	image_action_synch_with_slider;
@@ -80,6 +82,8 @@ public class Messages extends NLS {
 
 	public static String		map_action_change_tile_factory_tooltip;
 	public static String		map_action_modify_map_provider;
+
+	public static String	map_action_reload_map;
 	public static String		map_action_save_default_position;
 	public static String		map_action_set_default_position;
 	public static String		map_action_show_legend_in_map;
