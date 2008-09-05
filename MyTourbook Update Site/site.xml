@@ -3,12 +3,17 @@
    <description url="http://mytourbook.sourceforge.net/updates/">
       MyTourbook Update Site
    </description>
-   <feature url="features/net.tourbook.patch.1.5.0.patch3_1.5.1.v20080515patch3.jar" id="net.tourbook.patch.1.5.0.patch3" version="1.5.1.v20080515patch3" patch="true">
-      <category name="MyTourbook 1.5.1 patch"/>
+   <feature url="features/net.tourbook.device.feature_1.6.1.v2008-09.jar" id="net.tourbook.device.feature" version="1.6.1.v2008-09">
+      <category name="MyTourbook 1.6.1"/>
    </feature>
-   <category-def name="MyTourbook 1.5.1 patch" label="MyTourbook 1.5.1 patch">
-      <description>
-         Disable HAC4 import checksum validation
-      </description>
-   </category-def>
+   <feature url="features/net.tourbook.feature_1.6.1.v2008-09.jar" id="net.tourbook.feature" version="1.6.1.v2008-09">
+      <category name="MyTourbook 1.6.1"/>
+   </feature>
+   <feature url="features/net.tourbook.geoclipse.feature_0.1.2.v2008-09.jar" id="net.tourbook.geoclipse.feature" version="0.1.2.v2008-09">
+      <category name="MyTourbook 1.6.1"/>
+   </feature>
+   <feature url="features/net.tourbook.statistics.feature_1.6.1.v2008-09.jar" id="net.tourbook.statistics.feature" version="1.6.1.v2008-09">
+      <category name="MyTourbook 1.6.1"/>
+   </feature>
+   <category-def name="MyTourbook 1.6.1" label="MyTourbook 1.6.1"/>
 </site>
