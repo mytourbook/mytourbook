@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Tour Statistics
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: net.tourbook.statistics;singleton:=true
-Bundle-Version: 1.6.0.v2008-08
+Bundle-Version: 1.6.1.v2008-09
 Bundle-Activator: net.tourbook.statistics.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
@@ -11,5 +11,5 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.chart,
  net.tourbook.ext
 Bundle-ActivationPolicy: lazy
-Bundle-Vendor: MyTourbook
+Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
