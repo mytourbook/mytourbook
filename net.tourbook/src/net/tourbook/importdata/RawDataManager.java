@@ -464,7 +464,7 @@ public class RawDataManager {
 											+ "The possible reason could be that the transfered data are corrupted." //$NON-NLS-1$
 											+ "\n\n" //$NON-NLS-1$
 											+ "When you think the received data are correct, " //$NON-NLS-1$
-											+ "you can send the received data file to the author of MyTourbook so he can analyze it."); //$NON-NLS-1$
+											+ "you can send the received data file to the author of MyTourbook to analyze it."); //$NON-NLS-1$
 
 							destFileName = TEMP_IMPORTED_FILE;
 						}

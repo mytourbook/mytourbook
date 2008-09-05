@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.4"?>
 
-<product name="MyTourbook" id="net.tourbook.product" application="net.tourbook.application" version="1.6.0" useFeatures="true">
+<product name="MyTourbook" id="net.tourbook.product" application="net.tourbook.application" version="1.6.1" useFeatures="true">
 
    <aboutInfo>
       <image path="/net.tourbook/icons/application/tourbook-about-250.gif"/>
@@ -45,7 +45,6 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
 
@@ -83,10 +82,10 @@
       <feature id="net.tourbook.ext.eclipse.nl_de" version="1.6.0.v2008-08"/>
       <feature id="net.tourbook.ext.derby.feature" version="10.3.2.1"/>
       <feature id="net.tourbook.ext.ejb3.feature" version="3.3.0"/>
-      <feature id="net.tourbook.feature" version="1.6.0.v2008-08"/>
-      <feature id="net.tourbook.device.feature" version="1.6.0.v2008-08"/>
-      <feature id="net.tourbook.statistics.feature" version="1.6.0.v2008-08"/>
-      <feature id="net.tourbook.geoclipse.feature" version="0.1.1.v2008-08"/>
+      <feature id="net.tourbook.device.feature" version="1.6.1.v2008-09"/>
+      <feature id="net.tourbook.feature" version="1.6.1.v2008-09"/>
+      <feature id="net.tourbook.geoclipse.feature" version="0.1.2.v2008-09"/>
+      <feature id="net.tourbook.statistics.feature" version="1.6.1.v2008-09"/>
    </features>
 
 </product>
