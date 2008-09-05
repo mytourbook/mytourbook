@@ -1,10 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
-Bundle-SymbolicName: net.tourbook.rxtx
+Bundle-SymbolicName: net.tourbook.rxtx;singleton:=true
 Bundle-Version: 2.1.8.v20071231-arduino
 Bundle-ClassPath: RXTXcomm.jar
 Bundle-Localization: plugin
 Export-Package: gnu.io
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
