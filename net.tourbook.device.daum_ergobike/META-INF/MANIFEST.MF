@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Import Daum Ergometer .CSV files
 Bundle-SymbolicName: net.tourbook.device.daum_ergobike;singleton:=true
-Bundle-Version: 1.6.0.v2008-08
+Bundle-Version: 1.6.1.v2008-09
 Bundle-Activator: net.tourbook.device.daum.ergobike.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
