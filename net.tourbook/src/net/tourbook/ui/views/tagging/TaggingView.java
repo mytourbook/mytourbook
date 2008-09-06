@@ -41,6 +41,7 @@ import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
@@ -504,8 +505,6 @@ public class TaggingView extends ViewPart implements ISelectedTours, ITourViewer
 				.getPluginPreferences()
 				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-//		tree.addTreeListener(new UpdateIconTreeListener());
-
 		fTagViewer = new TreeViewer(tree);
 		fColumnManager.createColumns();
 
@@ -517,11 +516,30 @@ public class TaggingView extends ViewPart implements ISelectedTours, ITourViewer
 		fTagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
 
+				final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
 				final Object selectedItem = ((IStructuredSelection) (event.getSelection())).getFirstElement();
 
-				if (selectedItem instanceof TVITagViewTour) {
+				if (selectedItem instanceof TVITagViewTour && selectedTours.size() == 1) {
+
+					// one tour is selected
+
 					final TVITagViewTour tourItem = (TVITagViewTour) selectedItem;
 					fPostSelectionProvider.setSelection(new SelectionTourId(tourItem.getTourId()));
+
+				} else {
+
+					// multiple tours are selected
+
+					final ArrayList<Long> tourIds = new ArrayList<Long>();
+
+					for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
+						final Object viewItem = tourIterator.next();
+						if (viewItem instanceof TVITagViewTour) {
+							tourIds.add(((TVITagViewTour) viewItem).getTourId());
+						}
+					}
+
+					fPostSelectionProvider.setSelection(new SelectionTourIds(tourIds));
 				}
 
 				enableActions();

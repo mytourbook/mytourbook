@@ -147,6 +147,54 @@ public class LegendProvider implements ILegendProvider {
 	 * @param legendProvider
 	 * @param unitText
 	 */
+	public void setLegendColorValues(final Rectangle legendBounds, int minValue, int maxValue, final String unitText) {
+
+		final int unitFactor = fLegendConfig.unitFactor;
+
+		if (fLegendColor.isMinValueOverwrite && minValue < fLegendColor.overwriteMinValue * unitFactor) {
+			minValue = fLegendColor.overwriteMinValue * unitFactor;
+		}
+		if (fLegendColor.isMaxValueOverwrite && maxValue > fLegendColor.overwriteMaxValue * unitFactor) {
+			maxValue = fLegendColor.overwriteMaxValue * unitFactor;
+		}
+
+		final List<Integer> legendUnits = getLegendUnits(legendBounds, minValue, maxValue);
+		if (legendUnits.size() > 0) {
+
+			final Integer legendMinValue = legendUnits.get(0);
+			final Integer legendMaxValue = legendUnits.get(legendUnits.size() - 1);
+
+			fLegendConfig.units = legendUnits;
+			fLegendConfig.unitText = unitText;
+			fLegendConfig.legendMinValue = legendMinValue;
+			fLegendConfig.legendMaxValue = legendMaxValue;
+
+			/*
+			 * set color configuration, each tour has a different altitude config
+			 */
+
+			final int diffMinMax = legendMaxValue - legendMinValue;
+			final int diffMinMax2 = diffMinMax / 2;
+			final int diffMinMax10 = diffMinMax / 10;
+			final int midValueAbsolute = legendMinValue + diffMinMax2;
+
+			final ValueColor[] valueColors = fLegendColor.valueColors;
+			valueColors[0].value = legendMinValue + diffMinMax10;
+			valueColors[1].value = legendMinValue + diffMinMax2 / 2;
+			valueColors[2].value = midValueAbsolute;
+			valueColors[3].value = legendMaxValue - diffMinMax2 / 2;
+			valueColors[4].value = legendMaxValue - diffMinMax10;
+		}
+	}
+
+	/**
+	 * Set legend values from a dataserie
+	 * 
+	 * @param legendBounds
+	 * @param dataSerie
+	 * @param legendProvider
+	 * @param unitText
+	 */
 	public void setLegendColorValues(final Rectangle legendBounds, final int[] dataSerie, final String unitText) {
 
 		/*
@@ -156,11 +204,12 @@ public class LegendProvider implements ILegendProvider {
 		int maxValue = 0;
 		for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
 			if (valueIndex == 0) {
-				minValue = dataSerie[valueIndex];
-				maxValue = dataSerie[valueIndex];
+				minValue = dataSerie[0];
+				maxValue = dataSerie[0];
 			} else {
-				minValue = Math.min(minValue, dataSerie[valueIndex]);
-				maxValue = Math.max(maxValue, dataSerie[valueIndex]);
+				final int dataValue = dataSerie[valueIndex];
+				minValue = (minValue <= dataValue) ? minValue : dataValue;
+				maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
 			}
 		}
 

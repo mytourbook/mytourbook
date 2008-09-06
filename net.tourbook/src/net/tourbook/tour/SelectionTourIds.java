@@ -13,33 +13,29 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.mapping;
+package net.tourbook.tour;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Rectangle;
+import java.util.ArrayList;
 
-public interface ILegendProvider {
+import org.eclipse.jface.viewers.ISelection;
 
-	abstract LegendColor getLegendColor();
+/**
+ * selection contains multiple tour ids
+ */
+public class SelectionTourIds implements ISelection {
 
-	abstract LegendConfig getLegendConfig();
+	private ArrayList<Long>	fTourIds;
 
-	abstract int getTourColorId();
+	public SelectionTourIds(final ArrayList<Long> tourIds) {
+		fTourIds = tourIds;
+	}
 
-	/**
-	 * @param legendValue
-	 * @return Returns a color for the legend value, this {@link Color} must be disposed
-	 */
-	abstract Color getValueColor(int legendValue);
+	public ArrayList<Long> getTourIds() {
+		return fTourIds;
+	}
 
-	/**
-	 * Set the colors for the legend, the values will not be changed
-	 * 
-	 * @param newLegendColor
-	 */
-	abstract void setLegendColorColors(LegendColor newLegendColor);
+	public boolean isEmpty() {
+		return false;
+	}
 
-	abstract void setLegendColorValues(Rectangle legendBounds, int minValue, int maxValue, String unit_label_altitude);
-
-	abstract void setLegendColorValues(Rectangle legendBounds, int[] dataSerie, String unitLabel);
 }

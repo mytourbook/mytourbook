@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import net.tourbook.data.TourData;
@@ -24,7 +25,7 @@ public class PaintManager {
 
 	private static PaintManager	fInstance;
 
-	private TourData			fTourData;
+	private ArrayList<TourData>	fTourDataList;
 
 	/**
 	 * contains the upper left and lower right position for a tour
@@ -67,8 +68,8 @@ public class PaintManager {
 	/**
 	 * @return Returns the current {@link TourData} which is selected in a view or editor
 	 */
-	public TourData getTourData() {
-		return fTourData;
+	public ArrayList<TourData> getTourData() {
+		return fTourDataList;
 	}
 
 	public boolean isShowStartEndInMap() {
@@ -99,6 +100,10 @@ public class PaintManager {
 		fTourBounds = mapPositions;
 	}
 
+	public void setTourData(final ArrayList<TourData> tourDataList) {
+		fTourDataList = tourDataList;
+	}
+
 	/**
 	 * Set {@link TourData} which is used for the next painting or <code>null</code> to not draw the
 	 * tour
@@ -106,6 +111,7 @@ public class PaintManager {
 	 * @param tourData
 	 */
 	public void setTourData(final TourData tourData) {
-		fTourData = tourData;
+		fTourDataList = new ArrayList<TourData>();
+		fTourDataList.add(tourData);
 	}
 }

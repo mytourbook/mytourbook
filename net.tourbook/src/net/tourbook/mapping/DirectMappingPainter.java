@@ -58,6 +58,15 @@ public class DirectMappingPainter implements IDirectPainter {
 		fImageRightSlider = TourbookPlugin.getImageDescriptor(IMAGE_RIGHT_SLIDER).createImage();
 	}
 
+	/**
+	 * set paint context to draw nothing
+	 */
+	public void disablePaintContext() {
+		fMap = null;
+		fTourData = null;
+		fIsTourVisible = false;
+	}
+
 	public void dispose() {
 		disposeImage(fImageLeftSlider);
 		disposeImage(fImageRightSlider);

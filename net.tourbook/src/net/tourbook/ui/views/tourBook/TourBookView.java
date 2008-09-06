@@ -35,6 +35,7 @@ import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
@@ -309,7 +310,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final int propertyId, final Object propertyData) {
-				
+
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
 					/*
@@ -430,38 +431,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		fTourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(final SelectionChangedEvent event) {
-
-				final Object selectedItem = ((IStructuredSelection) (event.getSelection())).getFirstElement();
-
-				if (selectedItem instanceof TVITourBookYear) {
-
-					// year is selected
-
-					final TVITourBookYear yearItem = ((TVITourBookYear) selectedItem);
-					fTourViewerSelectedYear = yearItem.fTourYear;
-
-				} else if (selectedItem instanceof TVITourBookMonth) {
-
-					// month is selected
-
-					final TVITourBookMonth monthItem = (TVITourBookMonth) selectedItem;
-					fTourViewerSelectedYear = monthItem.fTourYear;
-					fTourViewerSelectedMonth = monthItem.fTourMonth;
-
-				} else if (selectedItem instanceof TVITourBookTour) {
-
-					// tour is selected
-
-					final TVITourBookTour tourItem = (TVITourBookTour) selectedItem;
-
-					fTourViewerSelectedYear = tourItem.fTourYear;
-					fTourViewerSelectedMonth = tourItem.fTourMonth;
-
-					fActiveTourId = tourItem.getTourId();
-					fPostSelectionProvider.setSelection(new SelectionTourId(fActiveTourId));
-				}
-
-				enableActions();
+				onSelectTreeItem(event);
 			}
 		});
 
@@ -1048,6 +1018,75 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	public boolean isFromTourEditor() {
 		return false;
+	}
+
+	private void onSelectTreeItem(final SelectionChangedEvent event) {
+		
+		final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
+		if (selectedTours.size() < 2) {
+
+			// one item is selected
+
+			final Object selectedItem = selectedTours.getFirstElement();
+			if (selectedItem instanceof TVITourBookYear) {
+
+				// year is selected
+
+				final TVITourBookYear yearItem = ((TVITourBookYear) selectedItem);
+				fTourViewerSelectedYear = yearItem.fTourYear;
+
+			} else if (selectedItem instanceof TVITourBookMonth) {
+
+				// month is selected
+
+				final TVITourBookMonth monthItem = (TVITourBookMonth) selectedItem;
+				fTourViewerSelectedYear = monthItem.fTourYear;
+				fTourViewerSelectedMonth = monthItem.fTourMonth;
+
+			} else if (selectedItem instanceof TVITourBookTour) {
+
+				// tour is selected
+
+				final TVITourBookTour tourItem = (TVITourBookTour) selectedItem;
+
+				fTourViewerSelectedYear = tourItem.fTourYear;
+				fTourViewerSelectedMonth = tourItem.fTourMonth;
+				fActiveTourId = tourItem.getTourId();
+
+				fPostSelectionProvider.setSelection(new SelectionTourId(fActiveTourId));
+			}
+
+		} else {
+
+			// multiple items are selected
+
+			final ArrayList<Long> tourIds = new ArrayList<Long>();
+			boolean isFirstTour = true;
+
+			// get all selected tours
+			for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
+
+				final Object viewItem = tourIterator.next();
+				if (viewItem instanceof TVITourBookTour) {
+
+					final TVITourBookTour tourItem = (TVITourBookTour) viewItem;
+					tourIds.add(tourItem.getTourId());
+
+					if (isFirstTour) {
+
+						isFirstTour = false;
+
+						fTourViewerSelectedYear = tourItem.fTourYear;
+						fTourViewerSelectedMonth = tourItem.fTourMonth;
+						fActiveTourId = tourItem.getTourId();
+					}
+				}
+			}
+
+			fPostSelectionProvider.setSelection(new SelectionTourIds(tourIds));
+		}
+
+		enableActions();
 	}
 
 	public void recreateViewer() {

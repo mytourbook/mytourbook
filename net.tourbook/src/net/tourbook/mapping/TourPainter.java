@@ -372,11 +372,13 @@ public class TourPainter extends MapPainter {
 			blue = (int) (minBlue + blueDiff * ratio);
 		}
 
-//		System.out.println(legendValue + "\t" + red + "\t" + green + "\t" + blue);
-
-		red = Math.min(255, Math.max(0, red));
-		green = Math.min(255, Math.max(0, green));
-		blue = Math.min(255, Math.max(0, blue));
+		// adjust color values to 0...255, this is optimized
+		final int maxRed = (0 >= red) ? 0 : red;
+		final int maxGreen = (0 >= green) ? 0 : green;
+		final int maxBlue = (0 >= blue) ? 0 : blue;
+		red = (255 <= maxRed) ? 255 : maxRed;
+		green = (255 <= maxGreen) ? 255 : maxGreen;
+		blue = (255 <= maxBlue) ? 255 : maxBlue;
 
 		return new Color(Display.getCurrent(), new RGB(red, green, blue));
 	}
@@ -533,75 +535,86 @@ public class TourPainter extends MapPainter {
 	@Override
 	protected boolean doPaint(final GC gc, final Map map, final Tile tile) {
 
+		boolean isTourInTile = false;
 		final PaintManager paintManager = PaintManager.getInstance();
 
-		final TourData tourData = paintManager.getTourData();
-		if (tourData == null) {
+		final ArrayList<TourData> tourDataList = paintManager.getTourData();
+
+		if (tourDataList == null) {
 			return false;
 		}
 
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		final double[] longitudeSerie = tourData.longitudeSerie;
-		if (latitudeSerie == null || longitudeSerie == null) {
-			return false;
-		}
+		for (final TourData tourData : tourDataList) {
 
-		inizializeLegendData(tourData);
-
-		// draw tour
-		boolean isTourInTile = drawTourInTile(gc, map, tile, tourData);
-
-		// status if a marker is drawn
-		boolean isMarkerInTile = false;
-
-		// draw start/end marker
-		if (paintManager.isShowStartEndInMap()) {
-
-			// draw end marker
-			isMarkerInTile = drawMarker(gc,
-					map,
-					tile,
-					latitudeSerie[latitudeSerie.length - 1],
-					longitudeSerie[longitudeSerie.length - 1],
-					fImageEndMarker);
-
-			isTourInTile = isTourInTile || isMarkerInTile;
-
-			// draw start marker
-			isMarkerInTile = drawMarker(gc,//
-					map,
-					tile,
-					latitudeSerie[0],
-					longitudeSerie[0],
-					fImageStartMarker);
-		}
-
-		boolean isTourMarkerInTile = false;
-
-		// draw tour marker
-		if (paintManager.isShowTourMarker()) {
-
-			boolean isTourMarkerInTile2 = false;
-
-			for (final TourMarker tourMarker : tourData.getTourMarkers()) {
-
-				final int serieIndex = tourMarker.getSerieIndex();
-
-				// draw tour marker
-				isTourMarkerInTile2 = drawTourMarker(gc,
-						map,
-						tile,
-						latitudeSerie[serieIndex],
-						longitudeSerie[serieIndex],
-						fImageTourMarker,
-						tourMarker);
-
-				isTourMarkerInTile = isTourMarkerInTile || isTourMarkerInTile2;
+			if (tourData == null) {
+				continue;
 			}
 
-		}
+			final double[] latitudeSerie = tourData.latitudeSerie;
+			final double[] longitudeSerie = tourData.longitudeSerie;
+			if (latitudeSerie == null || longitudeSerie == null) {
+				return false;
+			}
 
-		isTourInTile = isTourInTile || isMarkerInTile || isTourMarkerInTile;
+			inizializeLegendData(tourData);
+
+			// draw tour into the tile
+			final boolean isDrawTourInTile = drawTourInTile(gc, map, tile, tourData);
+
+			isTourInTile = isTourInTile || isDrawTourInTile;
+
+			// status if a marker is drawn
+			boolean isMarkerInTile = false;
+
+			// draw start/end marker
+			if (paintManager.isShowStartEndInMap()) {
+
+				// draw end marker
+				isMarkerInTile = drawMarker(gc,
+						map,
+						tile,
+						latitudeSerie[latitudeSerie.length - 1],
+						longitudeSerie[longitudeSerie.length - 1],
+						fImageEndMarker);
+
+				isTourInTile = isTourInTile || isMarkerInTile;
+
+				// draw start marker
+				isMarkerInTile = drawMarker(gc,//
+						map,
+						tile,
+						latitudeSerie[0],
+						longitudeSerie[0],
+						fImageStartMarker);
+			}
+
+			boolean isTourMarkerInTile = false;
+
+			// draw tour marker
+			if (paintManager.isShowTourMarker()) {
+
+				boolean isTourMarkerInTile2 = false;
+
+				for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+
+					final int serieIndex = tourMarker.getSerieIndex();
+
+					// draw tour marker
+					isTourMarkerInTile2 = drawTourMarker(gc,
+							map,
+							tile,
+							latitudeSerie[serieIndex],
+							longitudeSerie[serieIndex],
+							fImageTourMarker,
+							tourMarker);
+
+					isTourMarkerInTile = isTourMarkerInTile || isTourMarkerInTile2;
+				}
+
+			}
+
+			isTourInTile = isTourInTile || isMarkerInTile || isTourMarkerInTile;
+		}
 
 		return isTourInTile;
 	}
@@ -649,7 +662,7 @@ public class TourPainter extends MapPainter {
 
 	private void drawTourDot(final GC gc, final int serieIndex, final java.awt.Point devPosition) {
 
-		gc.setLineWidth(LINE_WIDTH);
+//		gc.setLineWidth(LINE_WIDTH);
 
 		if (fDataSerie == null) {
 
@@ -685,12 +698,22 @@ public class TourPainter extends MapPainter {
 		final int worldTileY = tile.getY() * tileSize;
 		final java.awt.Rectangle tileViewport = new java.awt.Rectangle(worldTileX, worldTileY, tileSize, tileSize);
 
-		java.awt.Point worldPosition = null;
-		java.awt.Point devPosition = null;
+		java.awt.Point worldPosition;
+		java.awt.Point devPosition;
 		java.awt.Point devPreviousPosition = null;
 
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
+
+		/*
+		 * world positions are cached to optimize performance when multiple tours are selected
+		 */
+		java.awt.Point worldPositions[] = tourData.getWorldPosition(zoomLevel);
+		final boolean createWorldPosition = worldPositions == null;
+		if (createWorldPosition) {
+			worldPositions = new java.awt.Point[latitudeSerie.length];
+			tourData.setWorldPosition(worldPositions, zoomLevel);
+		}
 
 		final Display display = Display.getCurrent();
 		final Color systemColorBlue = display.getSystemColor(SWT.COLOR_BLUE);
@@ -704,57 +727,94 @@ public class TourPainter extends MapPainter {
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		final boolean isDrawLine = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL)
 				.equals(PrefPageMapAppearance.MAP_TOUR_SYMBOL_LINE);
-		LINE_WIDTH = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH) - 0;
+
+		LINE_WIDTH = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
+		gc.setLineWidth(LINE_WIDTH);
 
 		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
 
-			// convert lat/long into world pixels
-			worldPosition = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[serieIndex],
-					longitudeSerie[serieIndex]), zoomLevel);
+			if (createWorldPosition) {
 
-			// convert world position into device position
-			devPosition = new java.awt.Point(worldPosition.x - worldTileX, worldPosition.y - worldTileY);
+				// convert lat/long into world pixels
 
-			// initialize previous pixel
-			if (devPreviousPosition == null) {
-				devPreviousPosition = devPosition;
+				worldPosition = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[serieIndex],
+						longitudeSerie[serieIndex]), zoomLevel);
+
+				worldPositions[serieIndex] = worldPosition;
+
+			} else {
+				worldPosition = worldPositions[serieIndex];
 			}
 
-			// check if position is in the viewport or position has changed
-			if (tileViewport.contains(worldPosition)) {
+			if (isDrawLine) {
 
-				// current position is inside the tile
+				// convert world position into device position
+				devPosition = new java.awt.Point(worldPosition.x - worldTileX, worldPosition.y - worldTileY);
 
-				if (devPosition.equals(devPreviousPosition) == false) {
+				// initialize previous pixel
+				if (devPreviousPosition == null) {
+					devPreviousPosition = devPosition;
+				}
 
-					isTourInTile = true;
+				if (tileViewport.contains(worldPosition.x, worldPosition.y)) {
 
-					if (isDrawLine) {
-						drawTourLine(gc, serieIndex, devPosition, devPreviousPosition);
-					} else {
-						drawTourDot(gc, serieIndex, devPosition);
+					// current position is inside the tile
+
+					// check if position is in the viewport or position has changed
+					if (devPosition.equals(devPreviousPosition) == false) {
+
+						isTourInTile = true;
+
+						if (isDrawLine) {
+							drawTourLine(gc, serieIndex, devPosition, devPreviousPosition);
+						} else {
+							drawTourDot(gc, serieIndex, devPosition);
+						}
+					}
+
+					lastInsideIndex = serieIndex;
+					lastInsidePosition = devPosition;
+
+				} else if (isDrawLine) {
+
+					// current position is outside the tile
+
+					if (serieIndex == lastInsideIndex + 1) {
+
+						/*
+						 * this position is the first which is outside of the tile, draw a line from
+						 * the last inside to the first outside position
+						 */
+
+						drawTourLine(gc, serieIndex, devPosition, lastInsidePosition);
 					}
 				}
 
-				lastInsideIndex = serieIndex;
-				lastInsidePosition = devPosition;
+				devPreviousPosition = devPosition;
 
-			} else if (isDrawLine) {
+			} else {
 
-				// current position is outside the tile
+				if (tileViewport.inside(worldPosition.x, worldPosition.y)) {
 
-				if (serieIndex == lastInsideIndex + 1) {
+					// current position is inside the tile
 
-					/*
-					 * this position is the first which is outside of the tile, draw a line from the
-					 * last inside to the first outside position
-					 */
+					// convert world position into device position
+					devPosition = new java.awt.Point(worldPosition.x - worldTileX, worldPosition.y - worldTileY);
 
-					drawTourLine(gc, serieIndex, devPosition, lastInsidePosition);
+					// initialize previous pixel
+					if (devPreviousPosition == null) {
+						devPreviousPosition = devPosition;
+					}
+
+					// check if position is in the viewport or position has changed
+					if (devPosition.equals(devPreviousPosition) == false) {
+
+						isTourInTile = true;
+
+						drawTourDot(gc, serieIndex, devPosition);
+					}
 				}
 			}
-
-			devPreviousPosition = devPosition;
 		}
 
 		return isTourInTile;
@@ -765,16 +825,11 @@ public class TourPainter extends MapPainter {
 								final java.awt.Point devPosition,
 								final java.awt.Point devPreviousPosition) {
 
-		gc.setLineWidth(LINE_WIDTH);
-
 		if (fDataSerie == null) {
 
 			// draw default line when data are not available
 
 			gc.drawLine(devPreviousPosition.x, devPreviousPosition.y, devPosition.x, devPosition.y);
-
-//			gc.setLineWidth(0);
-//			gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH - 1, LINE_WIDTH - 1);
 
 		} else {
 
@@ -785,10 +840,6 @@ public class TourPainter extends MapPainter {
 			{
 				gc.setForeground(lineColor);
 				gc.drawLine(devPreviousPosition.x, devPreviousPosition.y, devPosition.x, devPosition.y);
-
-//				gc.setLineWidth(0);
-//				gc.setBackground(lineColor);
-//				gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH - 3, LINE_WIDTH - 3);
 			}
 
 			lineColor.dispose();
