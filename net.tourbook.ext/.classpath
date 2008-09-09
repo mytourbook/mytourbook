@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="joda-time-1.5.2.jar" sourcepath="L:/java-resources/joda-time/joda-time-1.5.2-src/src"/>
+	<classpathentry exported="true" kind="lib" path="joda-time-1.5.2.jar" sourcepath="L:/java-resources/joda-time/joda-time-1.5.2-src/src/java"/>
 	<classpathentry exported="true" kind="lib" path="c3p0-0.9.1.2.jar" sourcepath="L:/java-resources/c3p0/mytourbook/c3p0-0.9.1.2.src">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/L:/java-resources/c3p0/c3p0-0.9.1.2/doc/apidocs/"/>
