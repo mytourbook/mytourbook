@@ -661,6 +661,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		 * set tour start date/time
 		 */
 		fCalendar.setTimeInMillis(fTimeDataList.get(0).absoluteTime);
+		
 		tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
 		tourData.setStartHour((short) fCalendar.get(Calendar.HOUR_OF_DAY));
 		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
