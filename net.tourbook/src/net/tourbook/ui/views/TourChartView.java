@@ -453,7 +453,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		fPageBook.showPage(fTourChart);
 
 		// set application window title
-		setTitleToolTip(TourManager.getTourDate(fTourData));
+		setTitleToolTip(TourManager.getTourDateShort(fTourData));
 	}
 
 	private void updateChart(final Long tourId) {

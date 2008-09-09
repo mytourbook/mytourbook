@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.ext.ejb3,
  net.tourbook.rxtx,
  de.byteholder.geoclipse,
- de.byteholder.gpx
+ de.byteholder.gpx,
+ org.aspencloud.cdatetime
 Eclipse-RegisterBuddy: net.tourbook.ext.ejb3
 Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
  net.tourbook.colors;uses:="net.tourbook.mapping,org.eclipse.swt.graphics",

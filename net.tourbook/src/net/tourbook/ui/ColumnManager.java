@@ -135,6 +135,8 @@ public class ColumnManager {
 			tvc.setLabelProvider(cellLabelProvider);
 		}
 
+		tvc.setEditingSupport(colDef.getEditingSupport());
+		
 		tc = tvc.getColumn();
 
 		final String columnText = colDef.getColumnText();

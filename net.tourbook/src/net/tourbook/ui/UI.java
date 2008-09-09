@@ -132,7 +132,7 @@ public class UI {
 	 */
 	public static float						UNIT_VALUE_TEMPERATURE			= 1;
 
-	// (\u00D8C � 9/5) + 32 = �F
+	// (Celcius * 9/5) + 32 = Fahrenheit
 	public static final float				UNIT_FAHRENHEIT_MULTI			= 1.8f;
 	public static final float				UNIT_FAHRENHEIT_ADD				= 32;
 

@@ -47,6 +47,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.joda.time.DateTime;
 
 public class TourManager {
 
@@ -222,15 +223,17 @@ public class TourManager {
 	}
 
 	/**
-	 * @return returns the date of this tour
+	 * @return returns the date of the tour
 	 */
-	public static String getTourDate(final TourData tourData) {
+	public static DateTime getTourDate(final TourData tourData) {
 
-		final Calendar calendar = GregorianCalendar.getInstance();
-
-		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
-
-		return UI.DateFormatterShort.format(calendar.getTime());
+		return new DateTime(tourData.getStartYear(),
+				tourData.getStartMonth(),
+				tourData.getStartDay(),
+				tourData.getStartHour(),
+				tourData.getStartMinute(),
+				0,
+				0);
 	}
 
 	public static String getTourDateFull(final TourData tourData) {
@@ -245,7 +248,19 @@ public class TourManager {
 	/**
 	 * @return returns the date of this tour
 	 */
-	public static String getTourTime(final TourData tourData) {
+	public static String getTourDateShort(final TourData tourData) {
+
+		final Calendar calendar = GregorianCalendar.getInstance();
+
+		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
+
+		return UI.DateFormatterShort.format(calendar.getTime());
+	}
+
+	/**
+	 * @return returns the date of this tour
+	 */
+	public static String getTourTimeShort(final TourData tourData) {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
 
@@ -267,7 +282,7 @@ public class TourManager {
 
 		return getTourDateFull(tourData) + //
 				" - " //$NON-NLS-1$
-				+ getTourTime(tourData)
+				+ getTourTimeShort(tourData)
 				+ ((tourTitle.length() == 0) ? "" : " - " + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ 
 	}
 

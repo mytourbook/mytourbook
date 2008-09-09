@@ -278,7 +278,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 		fPageBook.showPage(fTourChart);
 
 		// set application window title
-		setTitleToolTip(TourManager.getTourDate(fTourData));
+		setTitleToolTip(TourManager.getTourDateShort(fTourData));
 	}
 
 }

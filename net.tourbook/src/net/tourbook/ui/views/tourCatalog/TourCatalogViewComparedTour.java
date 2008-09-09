@@ -644,7 +644,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		fPageBook.showPage(fTourChart);
 
 		// set application window title
-		setTitleToolTip(TourManager.getTourDate(fTourData));
+		setTitleToolTip(TourManager.getTourDateShort(fTourData));
 	}
 
 	/**

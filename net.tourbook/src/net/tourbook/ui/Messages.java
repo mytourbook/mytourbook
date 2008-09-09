@@ -85,6 +85,12 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_max_speed_tooltip;
 	public static String		ColumnFactory_pace_label;
 	public static String		ColumnFactory_pace_tooltip;
+	public static String	ColumnFactory_power;
+
+	public static String	ColumnFactory_power_label;
+
+	public static String	ColumnFactory_power_tooltip;
+
 	public static String		ColumnFactory_profile;
 	public static String		ColumnFactory_profile_label;
 	public static String		ColumnFactory_profile_tooltip;

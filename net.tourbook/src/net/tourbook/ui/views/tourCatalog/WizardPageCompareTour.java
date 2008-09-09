@@ -436,7 +436,7 @@ public class WizardPageCompareTour extends WizardPage {
 				fTourChart.updateTourChart(tourData, chartConfig, false);
 
 				fChartGroup.setText(NLS.bind(Messages.tourCatalog_wizard_Group_selected_tour_2,
-						TourManager.getTourDate(tourData)));
+						TourManager.getTourDateShort(tourData)));
 
 				fPageBook.showPage(fTourChart);
 

@@ -331,7 +331,7 @@ public class WizardPageReferenceTour extends WizardPage {
 			xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
 
 			fChartGroup.setText(NLS.bind(refTour.getLabel() + ": " //$NON-NLS-1$
-					+ Messages.tourCatalog_wizard_Group_chart_title, TourManager.getTourDate(tourData)));
+					+ Messages.tourCatalog_wizard_Group_chart_title, TourManager.getTourDateShort(tourData)));
 
 			// set grid size
 			final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();

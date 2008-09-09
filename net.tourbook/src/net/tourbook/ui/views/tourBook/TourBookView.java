@@ -152,27 +152,28 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		public boolean equals(final Object a, final Object b) {
 
 			if (a == b) {
-
 				return true;
+			}
 
-			} else if (a instanceof TVITourBookYear && b instanceof TVITourBookYear) {
+			if (a instanceof TVITourBookYear && b instanceof TVITourBookYear) {
 
 				final TVITourBookYear item1 = (TVITourBookYear) a;
 				final TVITourBookYear item2 = (TVITourBookYear) b;
 				return item1.fTourYear == item2.fTourYear;
+			}
 
-			} else if (a instanceof TVITourBookMonth && b instanceof TVITourBookMonth) {
+			if (a instanceof TVITourBookMonth && b instanceof TVITourBookMonth) {
 
 				final TVITourBookMonth item1 = (TVITourBookMonth) a;
 				final TVITourBookMonth item2 = (TVITourBookMonth) b;
 				return item1.fTourYear == item2.fTourYear && item1.fTourMonth == item2.fTourMonth;
+			}
 
-			} else if (a instanceof TVITourBookTour && b instanceof TVITourBookTour) {
+			if (a instanceof TVITourBookTour && b instanceof TVITourBookTour) {
 
 				final TVITourBookTour item1 = (TVITourBookTour) a;
 				final TVITourBookTour item2 = (TVITourBookTour) b;
 				return item1.fTourId == item2.fTourId;
-
 			}
 
 			return false;
@@ -1021,7 +1022,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	}
 
 	private void onSelectTreeItem(final SelectionChangedEvent event) {
-		
+
 		final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
 		if (selectedTours.size() < 2) {
 

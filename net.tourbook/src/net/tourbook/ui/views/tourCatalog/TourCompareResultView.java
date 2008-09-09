@@ -578,7 +578,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 				} else if (element instanceof TVICompareResultComparedTour) {
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
-					cell.setText(TourManager.getTourDate(compareItem.comparedTourData));
+					cell.setText(TourManager.getTourDateShort(compareItem.comparedTourData));
 
 					// display an image when a tour is saved
 					if (compareItem.isSaved()) {

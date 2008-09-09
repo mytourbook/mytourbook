@@ -26,18 +26,24 @@ public class SelectionTourData implements ISelection {
 
 	private TourChart	fTourChart;
 	private TourData	fTourData;
+	private boolean		fForceRedraw	= false;
 
 	public SelectionTourData(final TourChart tourChart, final TourData tourData) {
 		fTourChart = tourChart;
 		fTourData = tourData;
 	}
 
-	public boolean isEmpty() {
-		return false;
-	}
-
-	public TourData getTourData() {
-		return fTourData;
+	/**
+	 * @param tourChart
+	 * @param tourData
+	 * @param forceRedraw
+	 *            when <code>true</code> the displayed tour should be redrawn because the
+	 *            {@link TourData} has changed
+	 */
+	public SelectionTourData(final TourChart tourChart, final TourData tourData, final boolean forceRedraw) {
+		fTourChart = tourChart;
+		fTourData = tourData;
+		fForceRedraw = forceRedraw;
 	}
 
 	/**
@@ -46,6 +52,22 @@ public class SelectionTourData implements ISelection {
 	 */
 	public TourChart getTourChart() {
 		return fTourChart;
+	}
+
+	public TourData getTourData() {
+		return fTourData;
+	}
+
+	public boolean isEmpty() {
+		return false;
+	}
+
+	public boolean isForceRedraw() {
+		return fForceRedraw;
+	}
+
+	public void setForceRedraw(final boolean fForceRedraw) {
+		this.fForceRedraw = fForceRedraw;
 	}
 
 }

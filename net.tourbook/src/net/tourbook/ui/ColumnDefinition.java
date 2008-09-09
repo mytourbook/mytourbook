@@ -16,6 +16,7 @@
 package net.tourbook.ui;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.swt.events.SelectionAdapter;
 
 public class ColumnDefinition implements Cloneable {
@@ -67,6 +68,8 @@ public class ColumnDefinition implements Cloneable {
 	 * can be right aligned
 	 */
 	private boolean				fIsColumnHidden			= false;
+
+	private EditingSupport		fEditingSupport;
 
 	public void addSelectionListener(final SelectionAdapter selectionAdapter) {
 		fColumnSelectionListener = selectionAdapter;
@@ -168,6 +171,10 @@ public class ColumnDefinition implements Cloneable {
 		return fDefaultColumnWidth;
 	}
 
+	public EditingSupport getEditingSupport() {
+		return fEditingSupport;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -259,6 +266,10 @@ public class ColumnDefinition implements Cloneable {
 
 	public void setDefaultColumnWidth(final int defaultColumnWidth) {
 		fDefaultColumnWidth = defaultColumnWidth;
+	}
+
+	public void setEditingSupport(final EditingSupport editingSupport) {
+		fEditingSupport = editingSupport;
 	}
 
 	/**

@@ -920,10 +920,10 @@ public class MappingView extends ViewPart {
 			final SelectionTourData selectionTourData = (SelectionTourData) selection;
 			final TourData tourData = selectionTourData.getTourData();
 
-			paintTour(tourData, false, true);
+			paintTour(tourData, selectionTourData.isForceRedraw(), true);
 
 			enableActions(false);
-			
+
 		} else if (selection instanceof SelectionTourId) {
 
 			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
@@ -932,13 +932,13 @@ public class MappingView extends ViewPart {
 			paintTour(tourData, false, true);
 
 			enableActions(false);
-			
+
 		} else if (selection instanceof SelectionTourIds) {
 
 			// paint all selected tours
 
 			paintTours(((SelectionTourIds) selection).getTourIds());
-			
+
 			enableActions(true);
 
 		} else if (selection instanceof SelectionActiveEditor) {
@@ -959,7 +959,7 @@ public class MappingView extends ViewPart {
 						chartInfo.rightSliderValuesIndex,
 						chartInfo.selectedSliderValuesIndex);
 			}
-			
+
 			enableActions(false);
 
 		} else if (selection instanceof SelectionChartInfo) {
@@ -975,7 +975,7 @@ public class MappingView extends ViewPart {
 						chartInfo.rightSliderValuesIndex,
 						chartInfo.selectedSliderValuesIndex);
 			}
-			
+
 			enableActions(false);
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
@@ -993,7 +993,7 @@ public class MappingView extends ViewPart {
 					: rightSliderValueIndex;
 
 			paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex, leftSliderValueIndex);
-			
+
 			enableActions(false);
 
 		} else if (selection instanceof PointOfInterest) {
@@ -1011,7 +1011,7 @@ public class MappingView extends ViewPart {
 			fMap.setZoom(poi.getRecommendedZoom());
 			fMap.setCenterPosition(fPOIPosition);
 			fMap.queueRedrawMap();
-			
+
 			enableActions(false);
 
 		} else if (selection instanceof StructuredSelection) {
@@ -1169,15 +1169,14 @@ public class MappingView extends ViewPart {
 		// keep tour data
 		fPreviousTourData = tourData;
 
-		if (isNewTour) {
+		if (isNewTour || forceRedraw) {
 
-			// adjust legend for the new tour
+			// adjust legend values for the new or changed tour
 			createLegendImage(PaintManager.getInstance().getLegendProvider());
 
 			fMap.setOverlayKey(tourData.getTourId().toString());
-			fMap.resetOverlays();
-
-//			enableActions(false);
+//			fMap.resetOverlays();
+			fMap.resetOverlayImageCache();
 		}
 
 		fMap.queueRedrawMap();

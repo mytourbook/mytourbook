@@ -85,6 +85,11 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 					fTourChart.activateActionHandlers(getSite());
 
 					updateRevertHandler();
+					
+					/*
+					 * fire selection
+					 */
+					fPostSelectionProvider.setSelection(new SelectionActiveEditor(TourEditor.this));
 				}
 			}
 
@@ -236,10 +241,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 		fTourChart.addTourModifyListener(new ITourModifyListener() {
 			public void tourIsModified() {
-				fIsTourDirty = true;
-				fIsTourChanged = true;
-				firePropertyChange(PROP_DIRTY);
-				updateRevertHandler();
+				setTourDirty();
 			}
 		});
 
@@ -367,19 +369,13 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	}
 
 	public void saveState(final IMemento memento) {
-		
+
 		memento.putString(MEMENTO_TOUR_ID, Long.toString(fEditorInput.getTourId()));
 	}
 
 	@Override
 	public void setFocus() {
-
 		fTourChart.setFocus();
-
-		/*
-		 * fire tour selection
-		 */
-		fPostSelectionProvider.setSelection(new SelectionActiveEditor(TourEditor.this));
 	}
 
 	/**
@@ -402,14 +398,12 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	}
 
 	/**
-	 * Marks the tour dirty and fire an {@link TourManager#TOUR_PROPERTIES_CHANGED} event when the
-	 * tour is saved
+	 * Marks the tour dirty
 	 */
-	public void setTourPropertyIsModified() {
+	public void setTourDirtyAndUpdateChart() {
 
 		fIsTourPropertyModified = true;
 
-		// update changed properties (title has changed, this is an overkill and can be optimized)
 		fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 
 		setTourDirty();
@@ -440,7 +434,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 			fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 
-			final String tourTitle = TourManager.getTourDate(fTourData);
+			final String tourTitle = TourManager.getTourDateShort(fTourData);
 
 			fEditorInput.fEditorTitle = tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
 			setPartName(tourTitle);

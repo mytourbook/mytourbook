@@ -964,7 +964,7 @@ public class TourChart extends Chart {
 	}
 
 	/**
-	 * set the tour dirty that the tour is saved when the tour is closed
+	 * set tour dirty to save the tour when the tour is closed
 	 */
 	public void setTourDirty(final boolean isDirty) {
 

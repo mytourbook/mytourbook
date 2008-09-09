@@ -162,6 +162,9 @@ public class TaggingView extends ViewPart implements ISelectedTours, ITourViewer
 
 	private static final NumberFormat		fNF								= NumberFormat.getNumberInstance();
 
+	/**
+	 * comparatore is sorting the tree items
+	 */
 	private final class TagComparator extends ViewerComparator {
 		@Override
 		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
