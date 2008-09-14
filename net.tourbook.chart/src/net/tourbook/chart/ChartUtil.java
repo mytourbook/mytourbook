@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -29,6 +29,98 @@ public class ChartUtil {
 	private final static NumberFormat	fNf	= NumberFormat.getNumberInstance();
 
 	/**
+	 * Checks if an image can be reused, this is true if the image exists and has the same size
+	 * 
+	 * @param newWidth
+	 * @param newHeight
+	 * @return
+	 */
+	public static boolean canReuseImage(final Image image, final Rectangle rect) {
+
+		// check if we could reuse the existing image
+
+		if (image == null || image.isDisposed()) {
+			return false;
+		} else {
+			// image exist, check for the bounds
+			final Rectangle oldBounds = image.getBounds();
+
+			if (!(oldBounds.width == rect.width && oldBounds.height == rect.height)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * creates a new image
+	 * 
+	 * @param display
+	 * @param image
+	 *        image which will be disposed if the image is not null
+	 * @param rect
+	 * @return returns a new created image
+	 */
+	public static Image createImage(final Display display, final Image image, final Rectangle rect) {
+
+		if (image != null && !image.isDisposed()) {
+			image.dispose();
+		}
+
+		return new Image(display, rect.width, rect.height);
+	}
+
+	public static Color disposeResource(final Color resource) {
+		if (resource != null && !resource.isDisposed()) {
+			resource.dispose();
+		}
+		return null;
+	}
+
+	public static Cursor disposeResource(final Cursor resource) {
+		if (resource != null && !resource.isDisposed()) {
+			resource.dispose();
+		}
+		return null;
+	}
+
+	/**
+	 * disposes a resource
+	 * 
+	 * @param image
+	 * @return
+	 */
+	public static Image disposeResource(final Image resource) {
+		if (resource != null && !resource.isDisposed()) {
+			resource.dispose();
+		}
+		return null;
+	}
+
+	/**
+	 * @param value
+	 *        The value which is formatted
+	 * @param divisor
+	 *        Divisor by which the value is divided
+	 * @param precision
+	 *        Decimal numbers after the decimal point
+	 * @param removeDecimalZero
+	 *        True removes trailing zeros after a decimal point
+	 * @return
+	 */
+	public static String formatInteger(final int value, final int divisor, final int precision, final boolean removeDecimalZero) {
+
+		final float divValue = (float) value / divisor;
+
+		String format = Messages.Format_number_float;
+
+		format += (removeDecimalZero && (divValue % 1 == 0)) ? "0f" : Integer //$NON-NLS-1$
+		.toString(precision) + 'f';
+
+		return new Formatter().format(format, divValue).toString();
+	}
+
+	/**
 	 * Formats a value according to the defined unit
 	 * 
 	 * @param value
@@ -39,14 +131,14 @@ public class ChartUtil {
 		return formatValue(value, unitType, 1, false);
 	}
 
-	public static String formatValue(final int value, final int unitType, final float divisor, boolean showSeconds) {
+	public static String formatValue(final int value, final int unitType, final float divisor, final boolean showSeconds) {
 
 		String valueText = ""; //$NON-NLS-1$
 
 		// format the unit label
 		switch (unitType) {
 		case ChartDataSerie.AXIS_UNIT_NUMBER:
-			float divValue = (float) value / divisor;
+			final float divValue = value / divisor;
 			if (divValue % 1 == 0) {
 				fNf.setMinimumFractionDigits(0);
 			} else {
@@ -89,33 +181,31 @@ public class ChartUtil {
 	}
 
 	/**
-	 * @param value
-	 *        The value which is formatted
-	 * @param divisor
-	 *        Divisor by which the value is divided
-	 * @param precision
-	 *        Decimal numbers after the decimal point
-	 * @param removeDecimalZero
-	 *        True removes trailing zeros after a decimal point
-	 * @return
+	 * @param unitValue
+	 * @return Returns minUnitValue rounded to the number of 50/20/10/5/2/1
 	 */
-	public static String formatInteger(final int value, int divisor, int precision, boolean removeDecimalZero) {
+	public static float roundDecimalValue(final int unitValue) {
 
-		float divValue = (float) value / divisor;
+		float unit = unitValue;
+		int multiplier = 1;
 
-		String format = Messages.Format_number_float;
+		while (unit > 100) {
+			multiplier *= 10;
+			unit /= 10;
+		}
 
-		format += (removeDecimalZero && (divValue % 1 == 0)) ? "0f" : Integer //$NON-NLS-1$
-		.toString(precision) + 'f';
+		unit = (float) unitValue / multiplier;
+		unit = unit > 50 ? 50 : unit > 20 ? 20 : unit > 10 ? 10 : unit > 5 ? 5 : unit > 2 ? 2 : 1;
+		unit *= multiplier;
 
-		return new Formatter().format(format, divValue).toString();
+		return unit;
 	}
 
 	/**
 	 * @param unitValue
 	 * @return Returns minUnitValue rounded to the number 60/30/20/10/5/2/1
 	 */
-	public static float roundTimeValue(int unitValue) {
+	public static float roundTimeValue(final int unitValue) {
 
 		float unit = unitValue;
 		int multiplier = 1;
@@ -135,96 +225,6 @@ public class ChartUtil {
 		unit *= multiplier;
 
 		return unit;
-	}
-
-	/**
-	 * @param unitValue
-	 * @return Returns minUnitValue rounded to the number of 50/20/10/5/2/1
-	 */
-	public static float roundDecimalValue(int unitValue) {
-
-		float unit = unitValue;
-		int multiplier = 1;
-
-		while (unit > 100) {
-			multiplier *= 10;
-			unit /= 10;
-		}
-
-		unit = (float) unitValue / multiplier;
-		unit = unit > 50 ? 50 : unit > 20 ? 20 : unit > 10 ? 10 : unit > 5 ? 5 : unit > 2 ? 2 : 1;
-		unit *= multiplier;
-
-		return unit;
-	}
-
-	/**
-	 * creates a new image
-	 * 
-	 * @param display
-	 * @param image
-	 *        image which will be disposed if the image is not null
-	 * @param rect
-	 * @return returns a new created image
-	 */
-	public static Image createImage(Display display, Image image, Rectangle rect) {
-
-		if (image != null && !image.isDisposed()) {
-			image.dispose();
-		}
-
-		return new Image(display, rect.width, rect.height);
-	}
-
-	/**
-	 * disposes a resource
-	 * 
-	 * @param image
-	 * @return
-	 */
-	public static Image disposeResource(Image resource) {
-		if (resource != null && !resource.isDisposed()) {
-			resource.dispose();
-		}
-		return null;
-	}
-
-	public static Cursor disposeResource(Cursor resource) {
-		if (resource != null && !resource.isDisposed()) {
-			resource.dispose();
-		}
-		return null;
-	}
-
-	public static Color disposeResource(Color resource) {
-		if (resource != null && !resource.isDisposed()) {
-			resource.dispose();
-		}
-		return null;
-	}
-
-	/**
-	 * Checks if an image can be reused, this is true if the image exists and has the same size
-	 * 
-	 * @param newWidth
-	 * @param newHeight
-	 * @return
-	 */
-	public static boolean canReuseImage(final Image image, final Rectangle rect) {
-
-		// check if we could reuse the existing image
-
-		if (image == null || image.isDisposed()) {
-			return false;
-		} else {
-			// image exist, check for the bounds
-			Rectangle oldBounds = image.getBounds();
-
-			if (!(oldBounds.width == rect.width && oldBounds.height == rect.height)) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 }
