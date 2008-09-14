@@ -1140,7 +1140,7 @@ public class MappingView extends ViewPart {
 		// set position and zoom level for the tour
 		if (fIsMapSynchedWithTour && isSynchronized) {
 
-			if (forceRedraw == false && fPreviousTourData != null) {
+			if (forceRedraw == false && fPreviousTourData != null || tourData == fPreviousTourData) {
 
 				/*
 				 * keep map configuration for the previous tour

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,37 +13,36 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.ui.views;
 
-import org.eclipse.swt.widgets.TreeColumn;
+import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
 
-/**
- * A ColumnDefinition contains the data for creating a column in a TableViewer
- */
-public class TreeColumnDefinition extends ColumnDefinition {
+import org.eclipse.jface.action.Action;
 
-	private TreeColumn	fTreeColumn;
+class ActionSaveTour extends Action {
 
 	/**
-	 * @param columnId
-	 *            column id which must be unique within the tree
-	 * @param style
-	 *            ui style
+	 * 
 	 */
-	public TreeColumnDefinition(final ColumnManager columnManager, final String columnId, final int style) {
+	private final TourPropertiesView	fTourPropertiesView;
 
-		fColumnId = columnId;
-		fStyle = style;
+	public ActionSaveTour(final TourPropertiesView tourPropertiesView) {
 
-		columnManager.addColumn(this);
+		super(null, AS_PUSH_BUTTON);
+
+		fTourPropertiesView = tourPropertiesView;
+
+		setToolTipText(Messages.app_action_save_tour_tooltip);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
+
+		setEnabled(false);
 	}
 
-	public TreeColumn getTreeColumn() {
-		return fTreeColumn;
+	@Override
+	public void run() {
+		fTourPropertiesView.actionSaveTour();
 	}
-
-	public void setTreeColumn(final TreeColumn tableColumn) {
-		fTreeColumn = tableColumn;
-	}
-
 }

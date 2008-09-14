@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,37 +13,21 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.ui.views;
 
-import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.EditingSupport;
 
-/**
- * A ColumnDefinition contains the data for creating a column in a TableViewer
- */
-public class TreeColumnDefinition extends ColumnDefinition {
+public abstract class DoubleDataSerieEditingSupport extends EditingSupport {
 
-	private TreeColumn	fTreeColumn;
+	protected double[]	fDataSerie;
 
-	/**
-	 * @param columnId
-	 *            column id which must be unique within the tree
-	 * @param style
-	 *            ui style
-	 */
-	public TreeColumnDefinition(final ColumnManager columnManager, final String columnId, final int style) {
-
-		fColumnId = columnId;
-		fStyle = style;
-
-		columnManager.addColumn(this);
+	public DoubleDataSerieEditingSupport(final ColumnViewer viewer) {
+		super(viewer);
 	}
 
-	public TreeColumn getTreeColumn() {
-		return fTreeColumn;
-	}
-
-	public void setTreeColumn(final TreeColumn tableColumn) {
-		fTreeColumn = tableColumn;
+	public void setDataSerie(final double[] dataSerie) {
+		fDataSerie = dataSerie;
 	}
 
 }

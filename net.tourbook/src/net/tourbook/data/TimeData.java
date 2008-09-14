@@ -43,7 +43,7 @@ public class TimeData implements Serializable {
 	public int					temperature			= Integer.MIN_VALUE;
 
 	/**
-	 * absolute value for cadence
+	 * absolute value for cadence or {@link Integer#MIN_VALUE} when cadence is not set
 	 */
 	public int					cadence				= Integer.MIN_VALUE;
 

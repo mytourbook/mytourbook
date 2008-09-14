@@ -75,11 +75,17 @@ public class Messages extends NLS {
 
 	public static String		app_action_dlg_confirm_save_editors_title;
 
+	public static String	app_action_edit_rows_tooltip;
+
 	public static String		app_action_expand_selection_tooltip;
 	public static String		app_action_expand_type_flat;
 	public static String		app_action_expand_type_year_day;
 	public static String		app_action_expand_type_year_month_day;
 	public static String		app_action_quick_edit;
+
+	public static String	app_action_save_tour_tooltip;
+
+	public static String	app_action_undo_modifications_tooltip;
 	public static String		App_Action_set_tour_type;
 
 	public static String		App_measurement_imperial;
@@ -215,6 +221,8 @@ public class Messages extends NLS {
 	public static String		Image__database_placeholder;
 	public static String		Image__delete;
 	public static String		Image__delete_disabled;
+	public static String	Image__edit_row;
+
 	public static String		Image__edit_tour;
 	public static String		Image__edit_tour_disabled;
 	public static String		Image__expand_all;
@@ -554,6 +562,10 @@ public class Messages extends NLS {
 	public static String		tag_view_action_refresh_view_tooltip;
 	public static String		tag_view_title_tag;
 	public static String		tag_view_title_tag_category;
+
+	public static String	tour_properties_dlg_save_tour_message;
+
+	public static String	tour_properties_dlg_save_tour_title;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;

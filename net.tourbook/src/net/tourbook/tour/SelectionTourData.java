@@ -38,7 +38,7 @@ public class SelectionTourData implements ISelection {
 	 * @param tourData
 	 * @param forceRedraw
 	 *            when <code>true</code> the displayed tour should be redrawn because the
-	 *            {@link TourData} has changed
+	 *            {@link TourData} has been changed
 	 */
 	public SelectionTourData(final TourChart tourChart, final TourData tourData, final boolean forceRedraw) {
 		fTourChart = tourChart;

@@ -1226,7 +1226,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	@Override
 	public void setFocus() {
-//		fTourViewer.getControl().setFocus();
+		fTourViewer.getControl().setFocus();
 	}
 
 }

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.tour.TourManager;
+
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
@@ -40,6 +42,11 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 	@Override
 	public void initialize(final IWorkbenchConfigurer configurer) {
 		configurer.setSaveAndRestore(true);
+	}
+
+	@Override
+	public boolean preShutdown() {
+		return TourManager.getInstance().saveTours();
 	}
 
 }

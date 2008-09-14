@@ -90,7 +90,7 @@ public class ColumnManager {
 	}
 
 	/**
-	 * Create columns for all defined columns
+	 * Creates the columns in the tree/table for all defined columns
 	 */
 	public void createColumns() {
 

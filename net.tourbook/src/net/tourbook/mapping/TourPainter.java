@@ -751,11 +751,6 @@ public class TourPainter extends MapPainter {
 				// convert world position into device position
 				devPosition = new java.awt.Point(worldPosition.x - worldTileX, worldPosition.y - worldTileY);
 
-				// initialize previous pixel
-				if (devPreviousPosition == null) {
-					devPreviousPosition = devPosition;
-				}
-
 				if (tileViewport.contains(worldPosition.x, worldPosition.y)) {
 
 					// current position is inside the tile
@@ -770,23 +765,31 @@ public class TourPainter extends MapPainter {
 						} else {
 							drawTourDot(gc, serieIndex, devPosition);
 						}
+
+						// initialize previous pixel
+						if (devPreviousPosition == null) {
+							devPreviousPosition = devPosition;
+						}
 					}
 
 					lastInsideIndex = serieIndex;
 					lastInsidePosition = devPosition;
+				}
 
-				} else if (isDrawLine) {
+				// current position is outside the tile
 
-					// current position is outside the tile
+				if (serieIndex == lastInsideIndex + 1) {
 
-					if (serieIndex == lastInsideIndex + 1) {
+					/*
+					 * this position is the first which is outside of the tile, draw a line from the
+					 * last inside to the first outside position
+					 */
 
-						/*
-						 * this position is the first which is outside of the tile, draw a line from
-						 * the last inside to the first outside position
-						 */
+					drawTourLine(gc, serieIndex, devPosition, lastInsidePosition);
 
-						drawTourLine(gc, serieIndex, devPosition, lastInsidePosition);
+					// initialize previous pixel
+					if (devPreviousPosition == null) {
+						devPreviousPosition = devPosition;
 					}
 				}
 
@@ -801,22 +804,22 @@ public class TourPainter extends MapPainter {
 					// convert world position into device position
 					devPosition = new java.awt.Point(worldPosition.x - worldTileX, worldPosition.y - worldTileY);
 
-					// initialize previous pixel
-					if (devPreviousPosition == null) {
-						devPreviousPosition = devPosition;
-					}
-
 					// check if position is in the viewport or position has changed
 					if (devPosition.equals(devPreviousPosition) == false) {
 
 						isTourInTile = true;
 
 						drawTourDot(gc, serieIndex, devPosition);
+
+						// initialize previous pixel
+						if (devPreviousPosition == null) {
+							devPreviousPosition = devPosition;
+						}
 					}
 				}
 			}
 		}
-
+		System.out.println();
 		return isTourInTile;
 	}
 

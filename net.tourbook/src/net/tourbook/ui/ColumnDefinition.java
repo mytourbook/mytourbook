@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import net.tourbook.ui.views.IntegerDataSerieEditingSupport;
+
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -24,52 +26,54 @@ public class ColumnDefinition implements Cloneable {
 	/**
 	 * visible name in the modify dialog
 	 */
-	private String				fLabel;
+	private String					fLabel;
 
 	/**
 	 * every column in a table must have a unique id
 	 */
-	protected String			fColumnId;
+	protected String				fColumnId;
 
 	/**
 	 * visibility status used in the modify dialog, this is used if the dialog is canceled to not
 	 * touch the visible status
 	 */
-	private boolean				fIsCheckedInDialog;
+	private boolean					fIsCheckedInDialog;
 
 	/**
 	 * when <code>true</code> the visibility for this column can be changed
 	 */
-	private boolean				fCanModifyVisibility	= true;
+	private boolean					fCanModifyVisibility	= true;
 
-	protected int				fStyle;
+	protected int					fStyle;
 
-	private CellLabelProvider	fCellLabelProvider;
-	private String				fColumnText;
-	private String				fColumnToolTipText;
-	private int					fColumnWidth;
-	private boolean				fIsColumnResizable		= true;
+	private CellLabelProvider		fCellLabelProvider;
 
-	private boolean				fIsColumnMoveable		= true;
-	private SelectionAdapter	fColumnSelectionListener;
+	private String					fColumnText;
+	private String					fColumnToolTipText;
+	private int						fColumnWidth;
+	private String					fColumnUnit;
+	private boolean					fIsColumnResizable		= true;
 
-	private int					fCreateIndex;
+	private boolean					fIsColumnMoveable		= true;
+	private SelectionAdapter		fColumnSelectionListener;
+
+	private int						fCreateIndex;
 
 	/**
 	 * when <code>true</code> this column will be checked in the modify dialog when the default
 	 * button is selected
 	 */
-	private boolean				fIsDefaultColumn		= false;
+	private boolean					fIsDefaultColumn		= false;
 
-	private int					fDefaultColumnWidth;
+	private int						fDefaultColumnWidth;
 
 	/**
 	 * column will have the width 0 to be hidden, this is necessary that the first visible column
 	 * can be right aligned
 	 */
-	private boolean				fIsColumnHidden			= false;
+	private boolean					fIsColumnHidden			= false;
 
-	private EditingSupport		fEditingSupport;
+	private IntegerDataSerieEditingSupport	fEditingSupport;
 
 	public void addSelectionListener(final SelectionAdapter selectionAdapter) {
 		fColumnSelectionListener = selectionAdapter;
@@ -159,6 +163,10 @@ public class ColumnDefinition implements Cloneable {
 		return fColumnToolTipText;
 	}
 
+	public String getColumnUnit() {
+		return fColumnUnit;
+	}
+
 	public int getColumnWidth() {
 		return fColumnWidth;
 	}
@@ -217,6 +225,15 @@ public class ColumnDefinition implements Cloneable {
 	}
 
 	/**
+	 * Set the text which is displayed in the column header
+	 * 
+	 * @param text
+	 */
+	public void setColumnHeader(final String text) {
+		fColumnText = text;
+	}
+
+	/**
 	 * @param label
 	 *            contains the label which is displayed in the column modify dialog
 	 */
@@ -234,21 +251,16 @@ public class ColumnDefinition implements Cloneable {
 	}
 
 	/**
-	 * Set the text which is displayed in the column header
-	 * 
-	 * @param text
-	 */
-	public void setColumnText(final String text) {
-		fColumnText = text;
-	}
-
-	/**
 	 * Set the text which is displayed as tooltip in the column header
 	 * 
 	 * @param toolTipText
 	 */
 	public void setColumnToolTipText(final String toolTipText) {
 		fColumnToolTipText = toolTipText;
+	}
+
+	public void setColumnUnit(final String columnUnit) {
+		fColumnUnit = columnUnit;
 	}
 
 	public void setColumnWidth(final int columnWidth) {
@@ -268,8 +280,15 @@ public class ColumnDefinition implements Cloneable {
 		fDefaultColumnWidth = defaultColumnWidth;
 	}
 
-	public void setEditingSupport(final EditingSupport editingSupport) {
+	public void setEditingSupport(final IntegerDataSerieEditingSupport editingSupport) {
 		fEditingSupport = editingSupport;
+	}
+
+	public void setEditorDataSerie(final int[] dataSerie) {
+		if (fEditingSupport != null) {
+			fEditingSupport.setDataSerie(dataSerie);
+		}
+
 	}
 
 	/**
@@ -299,5 +318,4 @@ public class ColumnDefinition implements Cloneable {
 	public String toString() {
 		return fColumnId + ":" + fColumnWidth + " (" + fDefaultColumnWidth + ")";
 	}
-
 }

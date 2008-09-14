@@ -152,6 +152,7 @@ public class TourManager {
 	private final LinkedHashMap<Long, TourData>	fTourDataMap							= new LinkedHashMap<Long, TourData>();
 
 	private static final ListenerList			fPropertyListeners						= new ListenerList(ListenerList.IDENTITY);
+	private static final ListenerList			fTourSaveListeners						= new ListenerList(ListenerList.IDENTITY);
 
 	/**
 	 * tour chart which shows the selected tour
@@ -392,6 +393,15 @@ public class TourManager {
 
 	public void addPropertyListener(final ITourPropertyListener listener) {
 		fPropertyListeners.add(listener);
+	}
+
+	/**
+	 * Tour save listener will be called to save tours before the application is shut down
+	 * 
+	 * @param listener
+	 */
+	public void addTourSaveListener(final ITourSaveListener listener) {
+		fTourSaveListeners.add(listener);
 	}
 
 	/**
@@ -1210,9 +1220,30 @@ public class TourManager {
 			fPropertyListeners.remove(listener);
 		}
 	}
-
 	public void removeTourFromCache(final Long tourId) {
 		fTourDataMap.remove(tourId);
+	}
+
+	public void removeTourSaveListener(final ITourSaveListener listener) {
+		if (listener != null) {
+			fTourSaveListeners.remove(listener);
+		}
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the tours have been saved or false when it was
+	 *         canceled
+	 */
+	public boolean saveTours() {
+		
+		final Object[] allListeners = fTourSaveListeners.getListeners();
+		for (final Object tourSaveListener : allListeners) {
+			if (((ITourSaveListener) tourSaveListener).saveTour() == false) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public void setActiveTourChart(final TourChart tourChart) {

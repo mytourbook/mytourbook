@@ -19,12 +19,12 @@ import java.util.ArrayList;
 
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.util.PixelConverter;
-import net.tourbook.util.TableLayoutComposite;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -38,6 +38,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -52,6 +53,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 public class ColumnModifyDialog extends TrayDialog {
@@ -93,20 +95,32 @@ public class ColumnModifyDialog extends TrayDialog {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
 
-		final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(tableLayouter);
+		final TableColumnLayout tableLayout = new TableColumnLayout();
+		final Composite layoutContainer = new Composite(parent, SWT.NONE);
+		layoutContainer.setLayout(tableLayout);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
 
 		/*
 		 * create table
 		 */
-		final Table table = new Table(tableLayouter, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER);
+		final Table table = new Table(layoutContainer, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER);
+
+		table.setLayout(new TableLayout());
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+
 		fColumnViewer = new CheckboxTableViewer(table);
 
+		/*
+		 * create columns
+		 */
 		TableViewerColumn tvc;
+		TableColumn tvcColumn;
 
+		// column: label
 		tvc = new TableViewerColumn(fColumnViewer, SWT.LEAD);
-		tableLayouter.addColumnData(new ColumnWeightData(1, true));
-
+		tvcColumn = tvc.getColumn();
+		tvcColumn.setText("Column");
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -119,10 +133,30 @@ public class ColumnModifyDialog extends TrayDialog {
 				}
 			}
 		});
+		tableLayout.setColumnData(tvcColumn, new ColumnWeightData(1, true));
 
+		// column: unit
+		tvc = new TableViewerColumn(fColumnViewer, SWT.LEAD);
+		tvcColumn = tvc.getColumn();
+		tvcColumn.setText("Unit");
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(colDef.getColumnUnit());
+
+				// paint columns in a different color which can't be hidden
+				if (colDef.canModifyVisibility() == false) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				}
+			}
+		});
+		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10), true));
+		
+		// column: width
 		tvc = new TableViewerColumn(fColumnViewer, SWT.TRAIL);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), true));
-
+		tvcColumn = tvc.getColumn();
+		tvcColumn.setText("Width");
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -135,6 +169,7 @@ public class ColumnModifyDialog extends TrayDialog {
 				}
 			}
 		});
+		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10), true));
 
 		fColumnViewer.setContentProvider(new IStructuredContentProvider() {
 

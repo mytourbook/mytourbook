@@ -536,11 +536,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 			return true;
 		}
 
-		final MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_QUESTION
-				| SWT.YES
-				| SWT.NO/*
-						 * | SWT.CANCEL
-						 */);
+		final MessageBox msgBox = new MessageBox(Display.getDefault().getActiveShell(), //
+				SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 
 		msgBox.setText(Messages.tourCatalog_view_dlg_save_compared_tour_title);
 		msgBox.setMessage(NLS.bind(Messages.tourCatalog_view_dlg_save_compared_tour_message,
