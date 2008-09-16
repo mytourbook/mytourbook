@@ -42,6 +42,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -96,7 +97,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
 					// check if a tour was modified
-					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
 					for (final TourData modifiedTourData : modifiedTours) {
 
 						final long modifiedTourId = modifiedTourData.getTourId();
