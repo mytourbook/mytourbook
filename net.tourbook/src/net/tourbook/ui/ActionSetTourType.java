@@ -22,6 +22,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -82,7 +83,8 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 							TourDatabase.saveTour(tourData);
 						}
 
-						TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
+						TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED,
+								new TourProperties(selectedTours));
 					}
 				}
 			};

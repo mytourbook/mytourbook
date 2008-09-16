@@ -35,11 +35,14 @@ import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ActionEditTour;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
+import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ISelectedTours;
@@ -61,6 +64,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -233,7 +237,6 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 	private void addTourPropertyListener() {
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked")
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
@@ -251,12 +254,12 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 					}
 
 					// get modified tours
-					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
-					final long tourId = fTourData.getTourId();
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
+					final long chartTourId = fTourData.getTourId();
 
-					// check if the tour in the editor was modified
+					// update modified tour in the chart
 					for (final TourData tourData : modifiedTours) {
-						if (tourData.getTourId() == tourId) {
+						if (tourData.getTourId() == chartTourId) {
 
 							// keep changed data
 							fTourData = tourData;
@@ -383,9 +386,11 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			final TourData selectionTourData = ((SelectionTourData) selection).getTourData();
 			if (selectionTourData != null) {
 
+				// prevent loading the same tour
 				if (fTourData != null && fTourData.equals(selectionTourData)) {
 					return;
 				}
+
 				updateChart(selectionTourData);
 			}
 
@@ -395,6 +400,19 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			final Long tourId = selectionTourId.getTourId();
 
 			updateChart(tourId);
+
+		} else if (selection instanceof SelectionChartInfo) {
+
+			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
+			if (chartDataModel != null) {
+
+				final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+				// set slider position
+				fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
+						chartInfo.leftSliderValuesIndex,
+						chartInfo.rightSliderValuesIndex));
+			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
 
@@ -423,8 +441,25 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			if (refItem != null) {
 				updateChart(refItem.getTourId());
 			}
-		}
 
+		} else if (selection instanceof SelectionActiveEditor) {
+
+			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
+
+			if (editor instanceof TourEditor) {
+
+				final TourData editorTourData = ((TourEditor) editor).getTourChart().getTourData();
+
+				// prevent loading the same tour when it has not been modified
+				if (editor.isDirty() == false //
+						&& fTourData != null
+						&& fTourData.equals(editorTourData)) {
+					return;
+				}
+
+				updateChart(editorTourData);
+			}
+		}
 	}
 
 	@Override

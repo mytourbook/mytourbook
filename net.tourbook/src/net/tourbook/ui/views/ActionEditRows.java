@@ -25,9 +25,9 @@ class ActionEditRows extends Action {
 	/**
 	 * 
 	 */
-	private final TourPropertiesView	fTourPropertiesView;
+	private final TourDataEditorView	fTourPropertiesView;
 
-	public ActionEditRows(final TourPropertiesView tourPropertiesView) {
+	public ActionEditRows(final TourDataEditorView tourPropertiesView) {
 
 		super(null, AS_CHECK_BOX);
 

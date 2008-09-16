@@ -25,9 +25,9 @@ class ActionUndoChanges extends Action {
 	/**
 	 * 
 	 */
-	private final TourPropertiesView	fTourPropertiesView;
+	private final TourDataEditorView	fTourPropertiesView;
 
-	public ActionUndoChanges(final TourPropertiesView tourPropertiesView) {
+	public ActionUndoChanges(final TourDataEditorView tourPropertiesView) {
 
 		super(null, AS_PUSH_BUTTON);
 		

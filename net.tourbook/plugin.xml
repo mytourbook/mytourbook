@@ -216,7 +216,7 @@
       </view>
       <view
             category="net.tourbook.category.tour"
-            class="net.tourbook.ui.views.TourPropertiesView"
+            class="net.tourbook.ui.views.TourDataEditorView"
             icon="icons/tour-properties.gif"
             id="net.tourbook.views.TourPropertiesView"
             name="%command_view_tourProperies">

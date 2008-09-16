@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.mapping;
 
 import java.util.ArrayList;
@@ -37,12 +36,14 @@ import de.byteholder.geoclipse.swt.Map;
 
 public class ActionSelectMapProvider extends Action implements IMenuCreator {
 
-	private static final String							TOGGLE_MARKER	= " (x)";						//$NON-NLS-1$
+	private static final String							TOGGLE_MARKER		= " (x)";						//$NON-NLS-1$
 
-	private static int									fFactoryCounter	= 0;
+	private static final String							DEFAULT_FACTORY_ID	= "osm";
 
-	private static IPreferenceStore						fPrefStore		= TourbookPlugin.getDefault()
-																				.getPreferenceStore();
+	private static int									fFactoryCounter		= 0;
+
+	private static IPreferenceStore						fPrefStore			= TourbookPlugin.getDefault()
+																					.getPreferenceStore();
 
 	private final MappingView							fMappingView;
 
@@ -218,7 +219,10 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 		fSelectedTileFactory = mapProvider;
 
 		final Map map = fMappingView.getMap();
-		map.resetOverlayImageCache();
+
+//		map.resetOverlayImageCache();
+//		map.resetOverlays();
+		
 		map.setTileFactory(mapProvider);
 	}
 
@@ -226,7 +230,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 	 * Select a tile factory by it's factory ID
 	 * 
 	 * @param factoryId
-	 *            factory ID or <code>null</code> to select the first tile factory
+	 *            factory ID or <code>null</code> to select the default factory (OSM)
 	 */
 	public void setSelectedFactory(final String factoryId) {
 
@@ -248,14 +252,25 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 		}
 
 		/*
-		 * factory is not available, select first factory
+		 * factory is not available, get default map provider
 		 */
-		final MapProviderAction mapProviderAction = fMapProviderActions.get(0);
+		for (final MapProviderAction mapProviderAction : fMapProviderActions.values()) {
+			final MapProvider mapProvider = mapProviderAction.mapProvider;
+			if (mapProvider.getInfo().getFactoryID().equals(DEFAULT_FACTORY_ID)) {
+				selectMapProviderInTheMap(mapProvider);
+				return;
+			}
+		}
+
+		/*
+		 * factory is not available, get first factory
+		 */
+		final MapProviderAction mapProviderAction = fMapProviderActions.values().iterator().next();
 		if (mapProviderAction != null) {
 
 			mapProviderAction.setChecked(true);
 
-			selectMapProviderInTheMap(fMappingView.getFactories().get(0));
+			selectMapProviderInTheMap(mapProviderAction.mapProvider);
 		}
 	}
 

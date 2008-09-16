@@ -41,6 +41,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
@@ -468,7 +469,6 @@ public class MappingView extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked")
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
@@ -482,12 +482,12 @@ public class MappingView extends ViewPart {
 					}
 
 					// get modified tours
-					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
-					final long tourId = fTourData.getTourId();
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
+					final long mapTourId = fTourData.getTourId();
 
-					// check if the tour in the editor was modified
+					// update tour in map
 					for (final TourData tourData : modifiedTours) {
-						if (tourData.getTourId() == tourId) {
+						if (tourData.getTourId() == mapTourId) {
 
 							// keep changed data
 							fTourData = tourData;
@@ -1185,6 +1185,8 @@ public class MappingView extends ViewPart {
 	private void paintTours(final ArrayList<Long> tourIdList) {
 
 		fTourDataList = new ArrayList<TourData>();
+		
+		// the overlay key is unique for the selected tours
 		long overlayKey = 0;
 
 		// get tour data for each tour id
@@ -1220,8 +1222,6 @@ public class MappingView extends ViewPart {
 
 			fMap.setOverlayKey(Long.toString(overlayKey));
 			fMap.resetOverlays();
-
-//			enableActions();
 		}
 
 		createLegendImage(PaintManager.getInstance().getLegendProvider());

@@ -46,6 +46,7 @@ import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.ActionEditTour;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionOpenPrefDialog;
@@ -328,12 +329,11 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked")
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
 					// update modified tours
-					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) propertyData;
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
 
 					fTourViewer.update(modifiedTours.toArray(), null);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,28 +15,21 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import net.tourbook.ui.views.TourDataEditorView;
+import java.util.ArrayList;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
+import net.tourbook.data.TourData;
 
-public class ActionHandlerViewTourProperties extends AbstractHandler {
+public class TourProperties {
 
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+	public ArrayList<TourData>	modifiedTours;
 
-		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TourDataEditorView.ID,
-					null,
-					IWorkbenchPage.VIEW_ACTIVATE);
+	/**
+	 * when <code>true</code> the {@link TourData} have been reverted
+	 */
+	public boolean				isReverted	= false;
 
-		} catch (final PartInitException e) {
-			e.printStackTrace();
-		}
-		return null;
+	public TourProperties(final ArrayList<TourData> modifiedTour) {
+		this.modifiedTours = modifiedTour;
 	}
 
 }

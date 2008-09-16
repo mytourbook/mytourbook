@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -19,7 +19,6 @@
  *
  * 
  */
-
 package net.tourbook.data;
 
 import java.io.IOException;
@@ -28,6 +27,29 @@ import java.io.RandomAccessFile;
 /**
  */
 public class DataUtil {
+
+	public static int parseInt(final byte[] buffer) {
+
+		int value = 0;
+		try {
+			value = Integer.parseInt(new String(buffer, 0, 4), 16);
+		} catch (final NumberFormatException e) {
+			e.printStackTrace();
+		}
+
+		return value;
+	}
+
+	public static short parseShort(final byte[] buffer, final int offset, final int length) {
+
+		short value = 0;
+		try {
+			value = Short.parseShort(new String(buffer, offset, length));
+		} catch (final NumberFormatException e) {
+			e.printStackTrace();
+		}
+		return value;
+	}
 
 	/**
 	 * read an file offset value from the file stream
@@ -39,9 +61,14 @@ public class DataUtil {
 	 */
 	public static int readFileOffset(final RandomAccessFile fileRawData, final byte[] buffer) throws IOException {
 
-		fileRawData.read(buffer);
+		double value = 0;
+		try {
+			fileRawData.read(buffer);
+			value = (Integer.parseInt(new String(buffer, 0, 4), 16) * 2.5) + 5;
 
-		return (int) ((Integer.parseInt(new String(buffer, 0, 4), 16) * 2.5) + 5);
+		} catch (final NumberFormatException e) {
+			e.printStackTrace();
+		}
+		return (int) value;
 	}
-
 }

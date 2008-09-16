@@ -43,6 +43,7 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionCollapseOthers;
@@ -383,7 +384,6 @@ public class TaggingView extends ViewPart implements ISelectedTours, ITourViewer
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked")
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_TAGS_CHANGED) {
@@ -407,8 +407,7 @@ public class TaggingView extends ViewPart implements ISelectedTours, ITourViewer
 
 				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
-					// get a clone of the modified tours because the tours are removed from the list
-					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) ((ArrayList<TourData>) propertyData).clone();
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
 
 					updateViewerAfterTourIsModified(fRootItem, modifiedTours);
 				}

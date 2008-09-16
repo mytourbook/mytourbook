@@ -72,8 +72,7 @@ public class TourManager {
 	public static final int						TOUR_PROPERTY_COMPARE_TOUR_CHANGED		= 40;
 
 	/**
-	 * The property data contains an {@link ArrayList} with all {@link TourData} which have been
-	 * modified
+	 * Property data contain {@link TourProperties}
 	 */
 	public static final int						TOUR_PROPERTIES_CHANGED					= 50;
 
@@ -1220,6 +1219,7 @@ public class TourManager {
 			fPropertyListeners.remove(listener);
 		}
 	}
+
 	public void removeTourFromCache(final Long tourId) {
 		fTourDataMap.remove(tourId);
 	}
@@ -1235,7 +1235,7 @@ public class TourManager {
 	 *         canceled
 	 */
 	public boolean saveTours() {
-		
+
 		final Object[] allListeners = fTourSaveListeners.getListeners();
 		for (final Object tourSaveListener : allListeners) {
 			if (((ITourSaveListener) tourSaveListener).saveTour() == false) {

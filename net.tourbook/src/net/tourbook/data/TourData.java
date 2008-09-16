@@ -2739,10 +2739,10 @@ public class TourData {
 
 	/**
 	 * @param zoomLevel
-	 * @return Returns the world position for the suplied zoom level
+	 * @return Returns the world position for the suplied zoom level and projection id
 	 */
-	public Point[] getWorldPosition(final int zoomLevel) {
-		return fWorldPosition.get(zoomLevel);
+	public Point[] getWorldPosition(final String projectionId, final int zoomLevel) {
+		return fWorldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
 
 	/**
@@ -3222,7 +3222,7 @@ public class TourData {
 		this.tourType = tourType;
 	}
 
-	public void setWorldPosition(final Point[] worldPositions, final int zoomLevel) {
-		fWorldPosition.put(zoomLevel, worldPositions);
+	public void setWorldPosition(final String projectionId, final Point[] worldPositions, final int zoomLevel) {
+		fWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
 	}
 }

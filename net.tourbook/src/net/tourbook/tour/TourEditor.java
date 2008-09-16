@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -61,8 +61,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	private TourData						fTourData;
 
 	private boolean							fIsTourDirty		= false;
-//	private boolean							fIsTourChanged			= false;
-//	private boolean							fIsTourPropertyModified	= false;
 
 	private PostSelectionProvider			fPostSelectionProvider;
 	private ISelectionListener				fPostSelectionListener;
@@ -95,11 +93,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			public void partClosed(final IWorkbenchPartReference partRef) {
-//				if (fIsTourChanged) {
-//					TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
-//				}
-			}
+			public void partClosed(final IWorkbenchPartReference partRef) {}
 
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
@@ -168,16 +162,16 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 					}
 
 					// get modified tours
-					final ArrayList<?> modifiedTours = (ArrayList<?>) propertyData;
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
 					final long tourId = fTourData.getTourId();
 
 					// check if the tour in the editor was modified
 					for (final Object object : modifiedTours) {
-
 						if (object instanceof TourData) {
-							final TourData tourData = (TourData) object;
 
+							final TourData tourData = (TourData) object;
 							if (tourData.getTourId() == tourId) {
+
 								if (isDirty()) {
 
 									final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
@@ -270,7 +264,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		TourDatabase.saveTour(fTourData);
 
 		fIsTourDirty = false;
-//		fIsTourChanged = false;
 
 		TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
 
@@ -287,16 +280,11 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			firePostSelection(new SelectionNewRefTours());
 		}
 
-//		if (fIsTourPropertyModified) {
-//
-//			fIsTourPropertyModified = false;
-//
 		// notify all views which display the tour type
 		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 		modifiedTour.add(fTourData);
 
-		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
-//		}
+		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, new TourProperties(modifiedTour));
 	}
 
 	@Override
@@ -354,7 +342,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		TourManager.getInstance().removeTourFromCache(fEditorInput.getTourId());
 
 		fIsTourDirty = false;
-//		fIsTourChanged = false;
 
 		firePropertyChange(PROP_DIRTY);
 		updateRevertHandler();
@@ -365,7 +352,10 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 		modifiedTour.add(fTourData);
 
-		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
+		final TourProperties tourProperties = new TourProperties(modifiedTour);
+		tourProperties.isReverted = true;
+
+		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, tourProperties);
 	}
 
 	public void saveState(final IMemento memento) {
@@ -391,7 +381,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	public void setTourDirty() {
 
 		fIsTourDirty = true;
-//		fIsTourChanged = true;
 
 		firePropertyChange(PROP_DIRTY);
 		updateRevertHandler();
@@ -401,8 +390,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	 * Marks the tour dirty
 	 */
 	public void setTourDirtyAndUpdateChart() {
-
-//		fIsTourPropertyModified = true;
 
 		fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
 
@@ -414,9 +401,12 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		fRevertActionHandler.fireHandlerChanged();
 	}
 
+	/**
+	 * load tour data and update the tour chart
+	 */
 	private void updateTourChart() {
 
-		// load the tourdata from the database
+		// load tourdata 
 		fTourData = TourManager.getInstance().getTourData(fEditorInput.getTourId());
 
 		if (fTourData != null) {

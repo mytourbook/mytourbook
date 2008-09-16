@@ -708,11 +708,14 @@ public class TourPainter extends MapPainter {
 		/*
 		 * world positions are cached to optimize performance when multiple tours are selected
 		 */
-		java.awt.Point worldPositions[] = tourData.getWorldPosition(zoomLevel);
+		final String projectionId = tileFactory.getProjection().getId();
+		java.awt.Point worldPositions[] = tourData.getWorldPosition(projectionId, zoomLevel);
 		final boolean createWorldPosition = worldPositions == null;
 		if (createWorldPosition) {
+
 			worldPositions = new java.awt.Point[latitudeSerie.length];
-			tourData.setWorldPosition(worldPositions, zoomLevel);
+
+			tourData.setWorldPosition(projectionId, worldPositions, zoomLevel);
 		}
 
 		final Display display = Display.getCurrent();
@@ -735,7 +738,7 @@ public class TourPainter extends MapPainter {
 
 			if (createWorldPosition) {
 
-				// convert lat/long into world pixels
+				// convert lat/long into world pixels which depends on the map projection
 
 				worldPosition = tileFactory.geoToPixel(new GeoPosition(latitudeSerie[serieIndex],
 						longitudeSerie[serieIndex]), zoomLevel);
@@ -797,6 +800,8 @@ public class TourPainter extends MapPainter {
 
 			} else {
 
+				// draw tour with dots
+
 				if (tileViewport.inside(worldPosition.x, worldPosition.y)) {
 
 					// current position is inside the tile
@@ -819,7 +824,7 @@ public class TourPainter extends MapPainter {
 				}
 			}
 		}
-		System.out.println();
+
 		return isTourInTile;
 	}
 

@@ -25,9 +25,9 @@ class ActionSaveTour extends Action {
 	/**
 	 * 
 	 */
-	private final TourPropertiesView	fTourPropertiesView;
+	private final TourDataEditorView	fTourPropertiesView;
 
-	public ActionSaveTour(final TourPropertiesView tourPropertiesView) {
+	public ActionSaveTour(final TourDataEditorView tourPropertiesView) {
 
 		super(null, AS_PUSH_BUTTON);
 

@@ -24,6 +24,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.ISelectedTours;
 
 import org.eclipse.jface.action.Action;
@@ -75,7 +76,8 @@ public class ActionRemoveAllTags extends Action {
 						TourDatabase.saveTour(tourData);
 					}
 
-					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
+					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED,
+							new TourProperties(selectedTours));
 
 					TourManager.firePropertyChange(TourManager.TOUR_TAGS_CHANGED, new ChangedTags(removedTags,
 							selectedTours,

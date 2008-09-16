@@ -35,6 +35,7 @@ import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
 import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionCollapseOthers;
@@ -416,12 +417,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			@SuppressWarnings("unchecked")
 			public void propertyChanged(final int propertyId, final Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 
 					// get a clone of the modified tours because the tours are removed from the list
-					final ArrayList<TourData> modifiedTours = (ArrayList<TourData>) ((ArrayList<TourData>) propertyData).clone();
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
 
 					updateTourViewer(fRootItem, modifiedTours);
 
