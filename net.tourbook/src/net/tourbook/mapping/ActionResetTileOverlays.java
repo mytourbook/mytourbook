@@ -13,36 +13,30 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.mapping;
 
-import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-class ActionSaveTour extends Action {
+public class ActionResetTileOverlays extends Action {
 
-	/**
-	 * 
-	 */
-	private final TourDataEditorView	fTourPropertiesView;
+	private MappingView	fMapView;
 
-	public ActionSaveTour(final TourDataEditorView tourPropertiesView) {
+	public ActionResetTileOverlays(final MappingView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 
-		fTourPropertiesView = tourPropertiesView;
+		fMapView = mapView;
 
-		setToolTipText(Messages.app_action_save_tour_tooltip);
+		setText(Messages.map_action_reset_tile_overlays);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
-
-		setEnabled(false);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_reload_map));
 	}
 
 	@Override
 	public void run() {
-		fTourPropertiesView.actionSaveTour();
+		fMapView.actionResetTileOverlays();
 	}
+
 }

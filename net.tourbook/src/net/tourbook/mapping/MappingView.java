@@ -138,7 +138,8 @@ public class MappingView extends ViewPart {
 	private TourData								fTourData;
 	private TourData								fPreviousTourData;
 
-	private ActionFailedMapImages					fActionFailedMapImages;
+	private ActionReloadFailedMapImages				fActionReloadFailedMapImages;
+	private ActionResetTileOverlays					fActionResetTileOverlays;
 	private ActionSelectMapProvider					fActionSelectMapProvider;
 	private ActionSaveDefaultPosition				fActionSaveDefaultPosition;
 	private ActionSetDefaultPosition				fActionSetDefaultPosition;
@@ -196,10 +197,6 @@ public class MappingView extends ViewPart {
 
 	public MappingView() {}
 
-	public void actionFailedMapImages() {
-		fMap.reload();
-	}
-
 	void actionOpenMapProviderDialog() {
 
 		final ModifyMapProviderDialog dialog = new ModifyMapProviderDialog(Display.getCurrent().getActiveShell(), this);
@@ -207,6 +204,14 @@ public class MappingView extends ViewPart {
 		if (dialog.open() == Window.OK) {
 			fActionSelectMapProvider.updateMapProviders();
 		}
+	}
+
+	public void actionReloadFailedMapImages() {
+		fMap.reload();
+	}
+
+	void actionResetTileOverlays() {
+		fMap.resetOverlays();
 	}
 
 	void actionSaveDefaultPosition() {
@@ -591,7 +596,8 @@ public class MappingView extends ViewPart {
 		fActionShowLegendInMap = new ActionShowLegendInMap(this);
 		fActionShowStartEndInMap = new ActionShowStartEndInMap(this);
 		fActionShowTourMarker = new ActionShowTourMarker(this);
-		fActionFailedMapImages = new ActionFailedMapImages(this);
+		fActionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
+		fActionResetTileOverlays = new ActionResetTileOverlays(this);
 
 		/*
 		 * fill view toolbar
@@ -631,7 +637,8 @@ public class MappingView extends ViewPart {
 		menuMgr.add(fActionSaveDefaultPosition);
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionSynchTourZoomLevel);
-		menuMgr.add(fActionFailedMapImages);
+		menuMgr.add(fActionReloadFailedMapImages);
+		menuMgr.add(fActionResetTileOverlays);
 	}
 
 	/**
@@ -1185,7 +1192,7 @@ public class MappingView extends ViewPart {
 	private void paintTours(final ArrayList<Long> tourIdList) {
 
 		fTourDataList = new ArrayList<TourData>();
-		
+
 		// the overlay key is unique for the selected tours
 		long overlayKey = 0;
 

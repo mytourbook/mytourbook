@@ -13,36 +13,21 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.ui.views.tourDataEditor;
 
-import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.EditingSupport;
 
-import org.eclipse.jface.action.Action;
+public abstract class DoubleDataSerieEditingSupport extends EditingSupport {
 
-class ActionUndoChanges extends Action {
+	protected double[]	fDataSerie;
 
-	/**
-	 * 
-	 */
-	private final TourDataEditorView	fTourPropertiesView;
-
-	public ActionUndoChanges(final TourDataEditorView tourPropertiesView) {
-
-		super(null, AS_PUSH_BUTTON);
-		
-		fTourPropertiesView = tourPropertiesView;
-
-		setToolTipText(Messages.app_action_undo_modifications_tooltip);
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit_disabled));
-
-		setEnabled(false);
+	public DoubleDataSerieEditingSupport(final ColumnViewer viewer) {
+		super(viewer);
 	}
 
-	@Override
-	public void run() {
-		fTourPropertiesView.actionUndoChanges();
+	public void setDataSerie(final double[] dataSerie) {
+		fDataSerie = dataSerie;
 	}
+
 }

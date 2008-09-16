@@ -13,30 +13,36 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.ui.views.tourDataEditor;
 
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.action.Action;
 
-public class ActionHandlerViewTourProperties extends AbstractHandler {
+class ActionUndoChanges extends Action {
 
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+	/**
+	 * 
+	 */
+	private final TourDataEditorView	fTourPropertiesView;
 
-		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TourDataEditorView.ID,
-					null,
-					IWorkbenchPage.VIEW_ACTIVATE);
+	public ActionUndoChanges(final TourDataEditorView tourPropertiesView) {
 
-		} catch (final PartInitException e) {
-			e.printStackTrace();
-		}
-		return null;
+		super(null, AS_PUSH_BUTTON);
+		
+		fTourPropertiesView = tourPropertiesView;
+
+		setToolTipText(Messages.app_action_undo_modifications_tooltip);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit_disabled));
+
+		setEnabled(false);
 	}
 
+	@Override
+	public void run() {
+		fTourPropertiesView.actionUndoChanges();
+	}
 }

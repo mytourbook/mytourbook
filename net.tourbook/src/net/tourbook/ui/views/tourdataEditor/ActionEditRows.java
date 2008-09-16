@@ -13,30 +13,33 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.mapping;
+package net.tourbook.ui.views.tourDataEditor;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionFailedMapImages extends Action {
+class ActionEditRows extends Action {
 
-	private MappingView	fMapView;
+	/**
+	 * 
+	 */
+	private final TourDataEditorView	fTourPropertiesView;
 
-	public ActionFailedMapImages(final MappingView mapView) {
+	public ActionEditRows(final TourDataEditorView tourPropertiesView) {
 
-		super(null, AS_PUSH_BUTTON);
+		super(null, AS_CHECK_BOX);
 
-		fMapView = mapView;
+		fTourPropertiesView = tourPropertiesView;
 
-		setText(Messages.map_action_reload_map);
+		setToolTipText(Messages.app_action_edit_rows_tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_reload_map));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_row));
 	}
 
 	@Override
 	public void run() {
-		fMapView.actionFailedMapImages();
+		fTourPropertiesView.actionEditRow();
 	}
-
 }

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import net.tourbook.ui.views.IntegerDataSerieEditingSupport;
+import net.tourbook.ui.views.tourDataEditor.IntegerDataSerieEditingSupport;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.EditingSupport;
