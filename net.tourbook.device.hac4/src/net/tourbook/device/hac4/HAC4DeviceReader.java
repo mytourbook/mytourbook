@@ -543,6 +543,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 			e.printStackTrace();
 		} catch (final Exception e) {
 			e.printStackTrace();
+			hac4DeviceData.dumpData();
 		} finally {
 			if (fileRawData != null) {
 				try {

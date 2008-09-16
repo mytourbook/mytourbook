@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -16,7 +16,6 @@
 /*
  * Author: Wolfgang Schramm Created: 23.05.2005
  */
-
 package net.tourbook.device.hac4;
 
 import java.io.IOException;
@@ -177,96 +176,34 @@ public class HAC4DeviceData {
 	 */
 	public short	transferDay;
 
-	public HAC4DeviceData() {}
+	public static int parseInt(final byte[] buffer) {
 
-	/**
-	 * @param fileRawData
-	 * @throws IOException
-	 * @throws NumberFormatException
-	 */
-	public void readFromFile(RandomAccessFile fileRawData) throws IOException,
-			NumberFormatException {
+		int value = 0;
+		try {
+			value = Integer.parseInt(new String(buffer, 0, 4), 16);
+		} catch (final NumberFormatException e) {
+			e.printStackTrace();
+		}
 
-		byte[] buffer = new byte[5];
-
-		fileRawData.read(buffer);
-		deviceType = new String(buffer, 0, 4);
-
-		fileRawData.read(buffer);
-		wheelPerimeter = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		fileRawData.read(buffer);
-		personWeight = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		fileRawData.read(buffer);
-		homeAltitude = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		// pulse 1/2 upper/lower
-		fileRawData.read(buffer);
-		pulse1UpperBound = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		fileRawData.read(buffer);
-		pulse1LowerBound = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		fileRawData.read(buffer);
-		pulse2UpperBound = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		fileRawData.read(buffer);
-		pulse2LowerBound = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		fileRawData.read(buffer);
-		count1min = Short.parseShort(new String(buffer, 0, 2));
-		count1sec = Short.parseShort(new String(buffer, 2, 2));
-
-		fileRawData.read(buffer);
-		count2min = Short.parseShort(new String(buffer, 0, 2));
-		count2sec = Short.parseShort(new String(buffer, 2, 2));
-
-		fileRawData.read(buffer);
-		altitudeError = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		fileRawData.read(buffer);
-		totalDistanceHigh = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		fileRawData.read(buffer);
-		totalDistanceLow = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		offsetNextMemory = DataUtil.readFileOffset(fileRawData, buffer);
-
-		fileRawData.read(buffer);
-		transferYear = Short.parseShort(new String(buffer, 0, 4));
-
-		fileRawData.read(buffer);
-		transferMonth = Short.parseShort(new String(buffer, 0, 2));
-		transferDay = Short.parseShort(new String(buffer, 2, 2));
-
-		fileRawData.read(buffer);
-		totalAltitudeUp = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		fileRawData.read(buffer);
-		totalAltitudeDown = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		fileRawData.read(buffer);
-		maxAltitude = Integer.parseInt(new String(buffer, 0, 4), 16);
-
-		fileRawData.read(buffer);
-		totalTravelTimeHourLow = Short.parseShort(new String(buffer, 0, 2));
-		totalTravelTimeHourHigh = Short.parseShort(new String(buffer, 2, 2));
-
-		fileRawData.read(buffer);
-		totalTravelTimeSec = Short.parseShort(new String(buffer, 0, 2));
-		totalTravelTimeMin = Short.parseShort(new String(buffer, 2, 2));
-
-		offsetCCRecord = DataUtil.readFileOffset(fileRawData, buffer);
-		offsetDDRecord = DataUtil.readFileOffset(fileRawData, buffer);
-		offsetCompareRecord = DataUtil.readFileOffset(fileRawData, buffer);
-
-		// dumpData();
+		return value;
 	}
+
+	public static short parseShort(final byte[] buffer, final int offset, final int length) {
+
+		short value = 0;
+		try {
+			value = Short.parseShort(new String(buffer, offset, length));
+		} catch (final NumberFormatException e) {
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public HAC4DeviceData() {}
 
 	public void dumpData() {
 
-		PrintStream out = System.out;
+		final PrintStream out = System.out;
 
 		out.println("----------------------------------------------------"); //$NON-NLS-1$
 		out.println("DEVICE DATA"); //$NON-NLS-1$
@@ -303,6 +240,88 @@ public class HAC4DeviceData {
 		out.println("Offset next free memory:	" + offsetNextMemory); //$NON-NLS-1$
 		out.println("Offset compare record:		" + offsetCompareRecord); //$NON-NLS-1$
 
+	}
+
+	/**
+	 * @param fileRawData
+	 * @throws IOException
+	 * @throws NumberFormatException
+	 */
+	public void readFromFile(final RandomAccessFile fileRawData) throws IOException, NumberFormatException {
+
+		final byte[] buffer = new byte[5];
+
+		fileRawData.read(buffer);
+		deviceType = new String(buffer, 0, 4);
+
+		fileRawData.read(buffer);
+		wheelPerimeter = parseInt(buffer);
+
+		fileRawData.read(buffer);
+		personWeight = parseInt(buffer);
+
+		fileRawData.read(buffer);
+		homeAltitude = parseInt(buffer);
+
+		// pulse 1/2 upper/lower
+		fileRawData.read(buffer);
+		pulse1UpperBound = parseInt(buffer);
+
+		fileRawData.read(buffer);
+		pulse1LowerBound = parseInt(buffer);
+
+		fileRawData.read(buffer);
+		pulse2UpperBound = parseInt(buffer);
+
+		fileRawData.read(buffer);
+		pulse2LowerBound = parseInt(buffer);
+
+		fileRawData.read(buffer);
+		count1min = parseShort(buffer, 0, 2);
+		count1sec = parseShort(buffer, 2, 2);
+
+		fileRawData.read(buffer);
+		count2min = parseShort(buffer, 0, 2);
+		count2sec = parseShort(buffer, 2, 2);
+
+		fileRawData.read(buffer);
+		altitudeError = parseInt(buffer);
+
+		fileRawData.read(buffer);
+		totalDistanceHigh = parseInt(buffer);
+
+		fileRawData.read(buffer);
+		totalDistanceLow = parseInt(buffer);
+
+		offsetNextMemory = DataUtil.readFileOffset(fileRawData, buffer);
+
+		fileRawData.read(buffer);
+		transferYear = parseShort(buffer, 0, 4);
+
+		fileRawData.read(buffer);
+		transferMonth = parseShort(buffer, 0, 2);
+		transferDay = parseShort(buffer, 2, 2);
+
+		fileRawData.read(buffer);
+		totalAltitudeUp = parseInt(buffer);
+
+		fileRawData.read(buffer);
+		totalAltitudeDown = parseInt(buffer);
+
+		fileRawData.read(buffer);
+		maxAltitude = parseInt(buffer);
+
+		fileRawData.read(buffer);
+		totalTravelTimeHourLow = parseShort(buffer, 0, 2);
+		totalTravelTimeHourHigh = parseShort(buffer, 2, 2);
+
+		fileRawData.read(buffer);
+		totalTravelTimeSec = parseShort(buffer, 0, 2);
+		totalTravelTimeMin = parseShort(buffer, 2, 2);
+
+		offsetCCRecord = DataUtil.readFileOffset(fileRawData, buffer);
+		offsetDDRecord = DataUtil.readFileOffset(fileRawData, buffer);
+		offsetCompareRecord = DataUtil.readFileOffset(fileRawData, buffer);
 	}
 
 }
