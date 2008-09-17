@@ -62,9 +62,9 @@ public class TourData {
 	 */
 	@Transient
 	public static final int			MIN_TIMEINTERVAL_FOR_MAX_SPEED	= 20;
+
 	@Transient
 	public static final float		MAX_BIKE_SPEED					= 120f;
-
 	/**
 	 * Unique persistence id which identifies the tour
 	 */
@@ -145,14 +145,14 @@ public class TourData {
 	 * data from the device
 	 */
 	private long					deviceTravelTime;
+
 	private int						deviceDistance;
-
 	private int						deviceWheel;
+
 	private int						deviceWeight;
-
 	private int						deviceTotalUp;
-	private int						deviceTotalDown;
 
+	private int						deviceTotalDown;
 	/**
 	 * total distance (m)
 	 */
@@ -207,17 +207,17 @@ public class TourData {
 	private float					maxSpeed;															// db-version 4
 
 	private int						avgPulse;															// db-version 4
+
 	private int						avgCadence;														// db-version 4
 	private int						avgTemperature;													// db-version 4
-
 	private String					tourTitle;															// db-version 4
+
 	private String					tourDescription;													// db-version 4
 	private String					tourStartPlace;													// db-version 4
 	private String					tourEndPlace;														// db-version 4
-
 	private String					calories;															// db-version 4
-	private float					bikerWeight;														// db-version 4
 
+	private float					bikerWeight;														// db-version 4
 	/**
 	 * visible name for the used plugin to import the data
 	 */
@@ -265,6 +265,13 @@ public class TourData {
 	@ManyToOne
 	private TourBike				tourBike;
 
+	/**
+	 * contains the relative time in seconds, {@link #startHour} and {@link #startMinute} contains
+	 * the absolute time when a tour is started
+	 */
+	@Transient
+	public int[]					timeSerie;
+
 	/*
 	 * tourCategory is currently (version 1.6) not used but is defined in older databases, it is
 	 * disabled because the field is not available in the database table
@@ -283,13 +290,6 @@ public class TourData {
 	/*
 	 * TRANSIENT DATA
 	 */
-
-	/**
-	 * contains the relative time in seconds, {@link #startHour} and {@link #startMinute} contains
-	 * the absolute time when a tour is started
-	 */
-	@Transient
-	public int[]					timeSerie;
 
 	/**
 	 * contains the absolute distance in m (metric system)
@@ -337,27 +337,27 @@ public class TourData {
 	@Transient
 	private int[]					speedSerie;
 
+	@Transient
+	private int[]					speedSerieImperial;
+
 	/*
 	 * computed data series
 	 */
 
-	@Transient
-	private int[]					speedSerieImperial;
 	/**
 	 * Is <code>true</code> when the data in {@link #speedSerie} are from the device and not
 	 * computed. Speed data are normally available from an ergometer and not from a bike computer
 	 */
 	@Transient
 	private boolean					isSpeedSerieFromDevice			= false;
-
 	@Transient
 	private int[]					paceSerie;
 
 	@Transient
 	private int[]					paceSerieImperial;
+
 	@Transient
 	private int[]					powerSerie;
-
 	/**
 	 * Is <code>true</code> when the data in {@link #powerSerie} are from the device and not
 	 * computed. Power data are normally available from an ergometer and not from a bike computer
@@ -370,9 +370,9 @@ public class TourData {
 
 	@Transient
 	private int[]					altimeterSerieImperial;
+
 	@Transient
 	public int[]					gradientSerie;
-
 	@Transient
 	public int[]					tourCompareSerie;
 
@@ -384,12 +384,12 @@ public class TourData {
 
 	@Transient
 	public double[]					longitudeSerie;
+
 	/**
 	 * contains the bounds of the tour in latitude/longitude
 	 */
 	@Transient
 	public Rectangle				gpsBounds;
-
 	/**
 	 * Index of the segmented data in the original serie
 	 */
@@ -473,13 +473,13 @@ public class TourData {
 
 	@Transient
 	public double					mapMinLatitude;
+
 	@Transient
 	public double					mapMaxLatitude;
 	@Transient
 	public double					mapMinLongitude;
 	@Transient
 	public double					mapMaxLongitude;
-
 	/**
 	 * caches the world positions for lat/long values for each zoom level
 	 */
@@ -2662,13 +2662,13 @@ public class TourData {
 		return tourDescription == null ? "" : tourDescription; //$NON-NLS-1$
 	}
 
-//	public Set<TourCategory> getTourCategory() {
-//		return tourCategory;
-//	}
-
 	public int getTourDistance() {
 		return tourDistance;
 	}
+
+//	public Set<TourCategory> getTourCategory() {
+//		return tourCategory;
+//	}
 
 	public int getTourDrivingTime() {
 		return tourDrivingTime;
@@ -2762,46 +2762,6 @@ public class TourData {
 
 		return result;
 	}
-
-//	/**
-//	 * Called before this object gets persisted, copy data from the tourdata object into the object
-//	 * which gets serialized
-//	 */
-//	/*
-//	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
-//	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
-//	 */
-//	public void onPrePersistOLD() {
-//
-//		if (timeSerie == null) {
-//			serieData = new SerieData();
-//			return;
-//		}
-//
-//		final int serieLength = timeSerie.length;
-//
-//		serieData = new SerieData(serieLength);
-//
-//		System.arraycopy(altitudeSerie, 0, serieData.altitudeSerie, 0, serieLength);
-//		System.arraycopy(cadenceSerie, 0, serieData.cadenceSerie, 0, serieLength);
-//		System.arraycopy(distanceSerie, 0, serieData.distanceSerie, 0, serieLength);
-//		System.arraycopy(pulseSerie, 0, serieData.pulseSerie, 0, serieLength);
-//		System.arraycopy(temperatureSerie, 0, serieData.temperatureSerie, 0, serieLength);
-//		System.arraycopy(timeSerie, 0, serieData.timeSerie, 0, serieLength);
-//
-//		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0,
-//		// serieLength);
-//		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
-//		// serieLength);
-//
-//		if (latitudeSerie != null) {
-//
-//			serieData.initializeGPSData(serieLength);
-//
-//			System.arraycopy(latitudeSerie, 0, serieData.latitude, 0, serieLength);
-//			System.arraycopy(longitudeSerie, 0, serieData.longitude, 0, serieLength);
-//		}
-//	}
 
 	/**
 	 * Called after the object was loaded from the persistence store
@@ -2950,6 +2910,46 @@ public class TourData {
 		}
 
 	}
+
+//	/**
+//	 * Called before this object gets persisted, copy data from the tourdata object into the object
+//	 * which gets serialized
+//	 */
+//	/*
+//	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
+//	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
+//	 */
+//	public void onPrePersistOLD() {
+//
+//		if (timeSerie == null) {
+//			serieData = new SerieData();
+//			return;
+//		}
+//
+//		final int serieLength = timeSerie.length;
+//
+//		serieData = new SerieData(serieLength);
+//
+//		System.arraycopy(altitudeSerie, 0, serieData.altitudeSerie, 0, serieLength);
+//		System.arraycopy(cadenceSerie, 0, serieData.cadenceSerie, 0, serieLength);
+//		System.arraycopy(distanceSerie, 0, serieData.distanceSerie, 0, serieLength);
+//		System.arraycopy(pulseSerie, 0, serieData.pulseSerie, 0, serieLength);
+//		System.arraycopy(temperatureSerie, 0, serieData.temperatureSerie, 0, serieLength);
+//		System.arraycopy(timeSerie, 0, serieData.timeSerie, 0, serieLength);
+//
+//		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0,
+//		// serieLength);
+//		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
+//		// serieLength);
+//
+//		if (latitudeSerie != null) {
+//
+//			serieData.initializeGPSData(serieLength);
+//
+//			System.arraycopy(latitudeSerie, 0, serieData.latitude, 0, serieLength);
+//			System.arraycopy(longitudeSerie, 0, serieData.longitude, 0, serieLength);
+//		}
+//	}
 
 	/**
 	 * Called before this object gets persisted, copy data from the tourdata object into the object
@@ -3224,5 +3224,17 @@ public class TourData {
 
 	public void setWorldPosition(final String projectionId, final Point[] worldPositions, final int zoomLevel) {
 		fWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
+	}
+
+	@Override
+	public String toString() {
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("[TourData] ");
+		sb.append("tourId:");
+		sb.append(tourId);
+
+		return sb.toString();
 	}
 }

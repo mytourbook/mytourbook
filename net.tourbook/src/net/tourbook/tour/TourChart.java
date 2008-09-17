@@ -878,7 +878,7 @@ public class TourChart extends Chart {
 
 		ChartDataYSerie yData;
 
-		final ChartDataModel dataModel = getDataModel();
+		final ChartDataModel dataModel = getChartDataModel();
 
 		if (dataModel == null) {
 			return;
@@ -910,7 +910,7 @@ public class TourChart extends Chart {
 
 			final boolean isAltMinEnabled = prefStore.getBoolean(tagIsMinEnabled);
 
-			final ArrayList<ChartDataYSerie> yDataList = getDataModel().getYData();
+			final ArrayList<ChartDataYSerie> yDataList = getChartDataModel().getYData();
 
 			// get altimeter data from all y-data
 			ChartDataYSerie yData = null;
@@ -955,7 +955,7 @@ public class TourChart extends Chart {
 									final float[] segmentSerie,
 									final String customDataKey) {
 
-		final ChartDataYSerie yData = (ChartDataYSerie) getDataModel().getCustomData(customDataKey);
+		final ChartDataYSerie yData = (ChartDataYSerie) getChartDataModel().getCustomData(customDataKey);
 
 		if (yData != null) {
 			yData.setCustomLayers(segmentValueLayers);
@@ -1134,7 +1134,7 @@ public class TourChart extends Chart {
 
 		// keep min/max values for the 'old' chart in the chart config
 		if (fTourChartConfig != null && fTourChartConfig.getMinMaxKeeper() != null && keepMinMaxValues) {
-			fTourChartConfig.getMinMaxKeeper().saveMinMaxValues(getDataModel());
+			fTourChartConfig.getMinMaxKeeper().saveMinMaxValues(getChartDataModel());
 		}
 
 		// set current tour data and chart config

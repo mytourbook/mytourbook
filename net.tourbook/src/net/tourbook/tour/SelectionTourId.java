@@ -28,12 +28,22 @@ public class SelectionTourId implements ISelection {
 		fTourId = tourId;
 	}
 
-	public boolean isEmpty() {
-		return false;
-	}
-
 	public Long getTourId() {
 		return fTourId;
 	}
 
+	public boolean isEmpty() {
+		return false;
+	}
+
+	@Override
+	public String toString() {
+
+		final StringBuilder sb = new StringBuilder();
+		
+		sb.append("[SelectionTourId] ");//$NON-NLS-1$
+		sb.append("tourId:" + fTourId);//$NON-NLS-1$
+
+		return sb.toString();
+	}
 }

@@ -474,7 +474,7 @@ public class MappingView extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 

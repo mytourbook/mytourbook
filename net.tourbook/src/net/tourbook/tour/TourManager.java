@@ -45,6 +45,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.joda.time.DateTime;
@@ -72,7 +73,7 @@ public class TourManager {
 	public static final int						TOUR_PROPERTY_COMPARE_TOUR_CHANGED		= 40;
 
 	/**
-	 * Property data contain {@link TourProperties}
+	 * Properties for a tour have changed, property data contains {@link TourProperties}
 	 */
 	public static final int						TOUR_PROPERTIES_CHANGED					= 50;
 
@@ -207,9 +208,15 @@ public class TourManager {
 
 	public static void firePropertyChange(final int propertyId, final Object propertyData) {
 		final Object[] allListeners = fPropertyListeners.getListeners();
-		for (final Object allListener : allListeners) {
-			final ITourPropertyListener listener = (ITourPropertyListener) allListener;
-			listener.propertyChanged(propertyId, propertyData);
+		for (final Object listener : allListeners) {
+			((ITourPropertyListener) listener).propertyChanged(null, propertyId, propertyData);
+		}
+	}
+
+	public static void firePropertyChange(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+		final Object[] allListeners = fPropertyListeners.getListeners();
+		for (final Object listener : allListeners) {
+			((ITourPropertyListener) listener).propertyChanged(part, propertyId, propertyData);
 		}
 	}
 
@@ -1220,6 +1227,12 @@ public class TourManager {
 		}
 	}
 
+	/**
+	 * Removes {@link TourData} with the tourId from the cache, requesting tour data the next time
+	 * with {@link #getTourData(Long)}, tour will be loaded from the database
+	 * 
+	 * @param tourId
+	 */
 	public void removeTourFromCache(final Long tourId) {
 		fTourDataMap.remove(tourId);
 	}

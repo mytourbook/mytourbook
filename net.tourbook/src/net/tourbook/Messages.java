@@ -567,6 +567,10 @@ public class Messages extends NLS {
 
 	public static String	tour_properties_dlg_save_tour_title;
 
+	public static String	tour_properties_part_name_is_modified;
+
+	public static String	tour_properties_part_name_tour_editor;
+
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;
 

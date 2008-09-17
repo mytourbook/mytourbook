@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.ISelection;
 public class SelectionTourData implements ISelection {
 
 	private TourChart	fTourChart;
+
 	private TourData	fTourData;
 	
 	private boolean		fForceRedraw	= false;
@@ -69,6 +70,11 @@ public class SelectionTourData implements ISelection {
 
 	public void setForceRedraw(final boolean fForceRedraw) {
 		this.fForceRedraw = fForceRedraw;
+	}
+
+	@Override
+	public String toString() {
+		return "SelectionTourData\ttourData:" + fTourData.toString();
 	}
 
 }

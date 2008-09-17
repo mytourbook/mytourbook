@@ -13,14 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.statistic;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
 
+/**
+ * Plugin interface for statistics
+ */
 public abstract class TourbookStatistic {
 
 	protected static final String	NEW_LINE	= "\n"; //$NON-NLS-1$
@@ -82,6 +85,20 @@ public abstract class TourbookStatistic {
 	 * reset the selection in the statistic chart
 	 */
 	public abstract void resetSelection();
+
+	/**
+	 * Restores the state from a memento (e.g. select previous selection), default does nothing
+	 * 
+	 * @param memento
+	 */
+	public abstract void restoreState(final IMemento memento);
+
+	/**
+	 * Saves the state of the statistic into the memento, default does nothing
+	 * 
+	 * @param memento
+	 */
+	public abstract void saveState(final IMemento memento);
 
 	/**
 	 * Select the day in the statistic, this is used to visualize a selected tour in the statistic

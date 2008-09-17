@@ -29,12 +29,28 @@ public class SelectionActiveEditor implements ISelection {
 		fEditorPart = activeEditor;
 	}
 
-	public boolean isEmpty() {
-		return false;
-	}
-
 	public IEditorPart getEditor() {
 		return fEditorPart;
 	}
 
+	public boolean isEmpty() {
+		return false;
+	}
+
+	@Override
+	public String toString() {
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("[SelectionActiveEditor] ");//$NON-NLS-1$
+
+		if (fEditorPart instanceof TourEditor) {
+			final TourEditor tourEditor = (TourEditor) fEditorPart;
+			sb.append(tourEditor);
+		}
+
+		return sb.toString();
+	}
+
+	
 }

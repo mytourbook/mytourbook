@@ -121,7 +121,7 @@ public abstract class TourChartViewPart extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 					fTourChart.updateSegmentLayer((Boolean) propertyData);

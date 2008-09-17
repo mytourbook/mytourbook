@@ -72,6 +72,30 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 	private boolean							fIsRefTourCreated	= false;
 
+	/**
+	 * revert data in the editor to the data in the database
+	 */
+	void actionRevertTourData() {
+
+		fIsTourDirty = false;
+
+		firePropertyChange(PROP_DIRTY);
+		updateRevertHandler();
+
+		TourManager.getInstance().removeTourFromCache(fEditorInput.getTourId());
+		updateTourChart();
+
+		// notify all views which display the tour
+		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
+		modifiedTour.add(fTourData);
+
+		// fire property change
+		final TourProperties tourProperties = new TourProperties(modifiedTour);
+		tourProperties.isReverted = true;
+
+		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, tourProperties);
+	}
+
 	private void addPartListener() {
 
 		// set the part listener
@@ -116,6 +140,10 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
+				if (part == TourEditor.this) {
+					return;
+				}
+
 				if (selection instanceof SelectionChartXSliderPosition) {
 
 					fTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
@@ -145,7 +173,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 
@@ -155,14 +183,16 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 					fTourChart.updateTourChart(true);
 
-				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					if (fTourData == null) {
 						return;
 					}
 
+					final TourProperties tourProperties = (TourProperties) propertyData;
+
 					// get modified tours
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
+					final ArrayList<TourData> modifiedTours = tourProperties.modifiedTours;
 					final long tourId = fTourData.getTourId();
 
 					// check if the tour in the editor was modified
@@ -172,16 +202,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 							final TourData tourData = (TourData) object;
 							if (tourData.getTourId() == tourId) {
 
-								if (isDirty()) {
-
-									final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
-									modifiedTour.add(tourData);
-									if (TourManager.saveTourEditors(modifiedTour)) {
-										updateTourData(tourData);
-									}
-								} else {
-									updateTourData(tourData);
-								}
+								updateTourProperties(tourProperties, tourData);
 
 								// exit here because only one tourdata can be inside a tour editor
 								return;
@@ -191,12 +212,56 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 				}
 			}
 
-			private void updateTourData(final TourData tourData) {
+			private void updateTour(final TourData tourData) {
 
-				// keep changed data
+				// keep modified data
 				fTourData = tourData;
 
-				fTourChart.updateTourChart(fTourData, true);
+				// update chart
+				fTourChart.updateTourChart(fTourData, false);
+			}
+
+			/**
+			 * current tour was changed, update
+			 */
+			private void updateTourProperties(final TourProperties tourProperties, final TourData tourData) {
+
+				if (tourProperties.isReverted) {
+
+					fIsTourDirty = false;
+
+					firePropertyChange(PROP_DIRTY);
+					updateRevertHandler();
+
+					updateTour(tourData);
+
+				} else if (tourProperties.isTourEdited) {
+
+					if (isDirty() == false) {
+
+						// tour is not yet dirty
+						fIsTourDirty = true;
+
+						firePropertyChange(PROP_DIRTY);
+						updateRevertHandler();
+					}
+
+					updateTour(tourData);
+
+				} else {
+
+					if (isDirty()) {
+
+						final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
+						modifiedTour.add(tourData);
+						if (TourManager.saveTourEditors(modifiedTour)) {
+							updateTour(tourData);
+						}
+
+					} else {
+						updateTour(tourData);
+					}
+				}
 			}
 		};
 
@@ -270,6 +335,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		// hide the dirty indicator
 		firePropertyChange(PROP_DIRTY);
 
+		// update actions
 		updateRevertHandler();
 
 		if (fIsRefTourCreated) {
@@ -332,34 +398,9 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		if (memento == null) {
 			return;
 		}
-
-//		return new TourEditorInput(Long.parseLong(memento.getString(MEMENTO_TOUR_ID)));
-
-	}
-
-	public void revertTourData() {
-
-		TourManager.getInstance().removeTourFromCache(fEditorInput.getTourId());
-
-		fIsTourDirty = false;
-
-		firePropertyChange(PROP_DIRTY);
-		updateRevertHandler();
-
-		updateTourChart();
-
-		// notify all views which display the tour
-		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
-		modifiedTour.add(fTourData);
-
-		final TourProperties tourProperties = new TourProperties(modifiedTour);
-		tourProperties.isReverted = true;
-
-		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, tourProperties);
 	}
 
 	public void saveState(final IMemento memento) {
-
 		memento.putString(MEMENTO_TOUR_ID, Long.toString(fEditorInput.getTourId()));
 	}
 
@@ -386,14 +427,15 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		updateRevertHandler();
 	}
 
-	/**
-	 * Marks the tour dirty
-	 */
-	public void setTourDirtyAndUpdateChart() {
+	@Override
+	public String toString() {
 
-		fTourChart.updateTourChart(fTourData, fTourChartConfig, false);
+		final StringBuilder sb = new StringBuilder();
 
-		setTourDirty();
+		sb.append("[TourEditor] "); //$NON-NLS-1$
+		sb.append(fTourData);
+
+		return sb.toString();
 	}
 
 	private void updateRevertHandler() {

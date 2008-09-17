@@ -25,6 +25,7 @@ import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
@@ -188,9 +189,16 @@ public class TourStatisticsView extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final int propertyId, final Object propertyData) {
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
+					final TourProperties tourProperties = (TourProperties) propertyData;
+
+					if (tourProperties.isTourEdited) {
+						// ignore edit changes
+						return;
+					}
+					
 					// update statistics
 					refreshStatistics();
 				}

@@ -203,6 +203,11 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 		fPostSelectionListener = new ISelectionListener() {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+				if (part == TourChartView.this) {
+					return;
+				}
+
 				onSelectionChanged(selection);
 			}
 		};
@@ -237,7 +242,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 	private void addTourPropertyListener() {
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 
@@ -407,6 +412,12 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			if (chartDataModel != null) {
 
 				final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+				final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+
+				if (fTourData == null || fTourData.equals(tourData) == false) {
+					updateChart(tourData);
+				}
 
 				// set slider position
 				fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,

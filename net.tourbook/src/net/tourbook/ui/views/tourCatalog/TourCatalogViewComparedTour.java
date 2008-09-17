@@ -165,7 +165,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	private void addRefTourPropertyListener() {
 
 		fRefTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyRefTourChanged) {

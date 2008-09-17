@@ -338,6 +338,9 @@ public class StatisticContainer extends Composite {
 		return numberOfYears;
 	}
 
+	/**
+	 * @return Returns all statistic plugins
+	 */
 	private ArrayList<TourbookStatistic> getStatistics() {
 		if (fStatistics == null) {
 			readStatistics();
@@ -591,7 +594,7 @@ public class StatisticContainer extends Composite {
 		fActivePerson = activePerson;
 		fActiveTourTypeFilter = activeTourTypeFilter;
 
-		int previousStatistic = 0;
+		int prevStatIndex = 0;
 
 		if (memento != null) {
 
@@ -601,13 +604,13 @@ public class StatisticContainer extends Composite {
 
 			final String mementoStatisticId = memento.getString(MEMENTO_SELECTED_STATISTIC);
 			if (mementoStatisticId != null) {
-				int statisticIndex = 0;
+				int statIndex = 0;
 				for (final TourbookStatistic statistic : getStatistics()) {
 					if (mementoStatisticId.equalsIgnoreCase(statistic.fStatisticId)) {
-						previousStatistic = statisticIndex;
+						prevStatIndex = statIndex;
 						break;
 					}
-					statisticIndex++;
+					statIndex++;
 				}
 			}
 
@@ -630,9 +633,13 @@ public class StatisticContainer extends Composite {
 		selectActiveYear();
 
 		// select statistic item
-		fComboStatistics.select(previousStatistic);
-
+		fComboStatistics.select(prevStatIndex);
 		onSelectStatistic();
+
+		// restore statistic state (e.g. reselect previous selection)
+		if (memento != null) {
+			getStatistics().get(prevStatIndex).restoreState(memento);
+		}
 	}
 
 	/**
@@ -643,7 +650,12 @@ public class StatisticContainer extends Composite {
 		// keep statistic id for the selected statistic
 		final int selectionIndex = fComboStatistics.getSelectionIndex();
 		if (selectionIndex != -1) {
-			memento.putString(MEMENTO_SELECTED_STATISTIC, getStatistics().get(selectionIndex).fStatisticId);
+
+			final TourbookStatistic tourbookStatistic = getStatistics().get(selectionIndex);
+
+			memento.putString(MEMENTO_SELECTED_STATISTIC, tourbookStatistic.fStatisticId);
+
+			tourbookStatistic.saveState(memento);
 		}
 
 		memento.putInteger(MEMENTO_NUMBER_OF_YEARS, fComboNumberOfYears.getSelectionIndex());

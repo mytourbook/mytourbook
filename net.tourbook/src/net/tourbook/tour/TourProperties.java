@@ -24,9 +24,16 @@ public class TourProperties {
 	public ArrayList<TourData>	modifiedTours;
 
 	/**
-	 * when <code>true</code> the {@link TourData} have been reverted
+	 * when <code>true</code>, tour data have been reverted and {@link TourProperties#modifiedTours}
+	 * contains the reverted {@link TourData}
 	 */
 	public boolean				isReverted	= false;
+
+	/**
+	 * when <code>true</code>, tour data have been modified in an editor and
+	 * {@link TourProperties#modifiedTours} contains the modified {@link TourData}
+	 */
+	public boolean				isTourEdited		= false;
 
 	public TourProperties(final ArrayList<TourData> modifiedTour) {
 		this.modifiedTours = modifiedTour;

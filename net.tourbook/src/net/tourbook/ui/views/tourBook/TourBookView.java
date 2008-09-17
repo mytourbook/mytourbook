@@ -310,7 +310,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
 

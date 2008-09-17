@@ -681,7 +681,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void fireSegmentLayerChanged() {
 
 		// show/hide the segments in the chart
-		TourManager.firePropertyChange(TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED, fShowSegmentsInChart);
+		TourManager.firePropertyChange(TourSegmenterView.this,
+				TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED,
+				fShowSegmentsInChart);
 	}
 
 	/**

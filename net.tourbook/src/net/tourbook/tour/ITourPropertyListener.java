@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,8 +15,17 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import org.eclipse.ui.IWorkbenchPart;
+
 public interface ITourPropertyListener {
 
-	public void propertyChanged(int propertyId, Object propertyData);
+	/**
+	 * @param part
+	 *            part where the property was fired, can be <code>null</code> when the part is not
+	 *            set
+	 * @param propertyId
+	 * @param propertyData
+	 */
+	public void propertyChanged(final IWorkbenchPart part, int propertyId, Object propertyData);
 
 }
