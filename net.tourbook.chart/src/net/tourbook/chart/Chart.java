@@ -537,6 +537,9 @@ public class Chart extends ViewForm {
 		return fChartComponents.getChartComponentGraph().canScrollZoomedChart;
 	}
 
+	/**
+	 * @return Returns the data model for the chart
+	 */
 	public ChartDataModel getChartDataModel() {
 		return fChartDataModel;
 	}
@@ -556,13 +559,6 @@ public class Chart extends ViewForm {
 
 	public ChartProperties getChartProperties() {
 		return fChartComponents.getChartProperties();
-	}
-
-	/**
-	 * @return Returns the data model for the chart
-	 */
-	public ChartDataModel getDataModel() {
-		return fChartDataModel;
 	}
 
 	public int getDevGraphImageXOffset() {
@@ -833,11 +829,11 @@ public class Chart extends ViewForm {
 		fChartComponents.getChartComponentGraph().fGraphAlpha = alphaValue;
 	}
 
-	public void setGridDistance(final int horizontalGrid, final int verticalGrid){
+	public void setGridDistance(final int horizontalGrid, final int verticalGrid) {
 
 		gridVerticalDistance = verticalGrid;
 		gridHorizontalDistance = horizontalGrid;
-		
+
 		fChartComponents.onResize();
 	}
 

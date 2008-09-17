@@ -47,11 +47,19 @@ public class SelectionChartInfo implements ISelection {
 
 	@Override
 	public String toString() {
-		final String string = super.toString() + " l:" //$NON-NLS-1$
-				+ leftSliderValuesIndex
-				+ " r:" //$NON-NLS-1$
-				+ rightSliderValuesIndex;
-		return string;
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("[SelectionChartInfo] "); //$NON-NLS-1$
+		sb.append("left:"); //$NON-NLS-1$
+		sb.append(leftSliderValuesIndex);
+		sb.append(" right:"); //$NON-NLS-1$
+		sb.append(rightSliderValuesIndex);
+
+		sb.append("\n\t");//$NON-NLS-1$
+		sb.append(fChart.getChartDataModel());
+
+		return sb.toString();
 	}
 
 }

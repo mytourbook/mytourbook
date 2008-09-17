@@ -55,7 +55,7 @@ public class ChartDataModel {
 	/**
 	 * storage for custom data
 	 */
-	private HashMap<String, Object>		customData					= new HashMap<String, Object>();
+	private HashMap<String, Object>		fCustomData					= new HashMap<String, Object>();
 
 	/**
 	 * true: the chart graphs are separate drawn vertically
@@ -101,8 +101,8 @@ public class ChartDataModel {
 	 * it has not been set.
 	 */
 	public Object getCustomData(final String key) {
-		if (customData.containsKey(key)) {
-			return customData.get(key);
+		if (fCustomData.containsKey(key)) {
+			return fCustomData.get(key);
 		} else {
 			return null;
 		}
@@ -166,7 +166,7 @@ public class ChartDataModel {
 	 * value.
 	 */
 	public void setCustomData(final String key, final Object value) {
-		customData.put(key, value);
+		fCustomData.put(key, value);
 	}
 
 	public void setStackedChart(final boolean isStackedChart) {
@@ -183,10 +183,31 @@ public class ChartDataModel {
 
 	/**
 	 * @param data2nd
-	 *        The xData2nd to set.
+	 *            The xData2nd to set.
 	 */
 	public void setXData2nd(final ChartDataXSerie data2nd) {
 		xData2nd = data2nd;
+	}
+
+	@Override
+	public String toString() {
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("[ChartDataModel]");//$NON-NLS-1$
+		sb.append("\n\ttitle:<" + fTitle + ">");//$NON-NLS-1$//$NON-NLS-2$
+
+		if (fCustomData != null) {
+
+			sb.append("\n\tcustomData: ");
+
+			for (final Object customData : fCustomData.values()) {
+				sb.append("\t");//$NON-NLS-1$
+				sb.append(customData);
+			}
+		}
+
+		return sb.toString();
 	}
 
 }

@@ -37,15 +37,15 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public static final int			BAR_LAYOUT_BESIDE		= 3;
 
-	public static final String		YDATA_INFO				= "yDataInfo";								//$NON-NLS-1$
+	public static final String		YDATA_INFO				= "yDataInfo";					//$NON-NLS-1$
 
 	public static final int			FILL_METHOD_NOFILL		= 0;
+
 	public static final int			FILL_METHOD_FILL_BOTTOM	= 1;
 	public static final int			FILL_METHOD_FILL_ZERO	= 2;
-
 	private int						fChartLayout			= BAR_LAYOUT_SINGLE_SERIE;
-	private String					fYTitle;
 
+	private String					fYTitle;
 	/**
 	 * contains the color index for each value
 	 */
@@ -68,11 +68,14 @@ public class ChartDataYSerie extends ChartDataSerie {
 	private ArrayList<IChartLayer>	fCustomLayers			= new ArrayList<IChartLayer>();
 
 	private ChartYSlider			ySliderTop;
-	private ChartYSlider			ySliderBottom;
 
+	private ChartYSlider			ySliderBottom;
 	private final int				fChartType;
 
-	public ChartDataYSerie(final int chartType, final int chartLayout, final int[][] lowValueSeries, final int[][] highValueSeries) {
+	public ChartDataYSerie(	final int chartType,
+							final int chartLayout,
+							final int[][] lowValueSeries,
+							final int[][] highValueSeries) {
 
 		fChartType = chartType;
 		fChartLayout = chartLayout;
@@ -90,14 +93,21 @@ public class ChartDataYSerie extends ChartDataSerie {
 		setMinMaxValues(new int[][] { lowValueSerie }, new int[][] { highValueSerie });
 	}
 
+	public ChartDataYSerie(final int chartType, final int[][] lowValueSeries, final int[][] highValueSeries) {
+		fChartType = chartType;
+		setMinMaxValues(lowValueSeries, highValueSeries);
+	}
+
 //	public ChartDataYSerie(int chartType, int[][] valueSerie) {
 //		fChartType = chartType;
 //		setMinMaxValues(valueSerie);
 //	}
 
-	public ChartDataYSerie(final int chartType, final int[][] lowValueSeries, final int[][] highValueSeries) {
-		fChartType = chartType;
-		setMinMaxValues(lowValueSeries, highValueSeries);
+	/**
+	 * @return Returns the chartLayout.
+	 */
+	protected int getChartLayout() {
+		return fChartLayout;
 	}
 
 //	int getAdjustedMaxValue() {
@@ -113,13 +123,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 //		// : (fSavedMinValue - (fSavedMinValue / 100));
 //		return fOriginalMinValue;
 //	}
-
-	/**
-	 * @return Returns the chartLayout.
-	 */
-	protected int getChartLayout() {
-		return fChartLayout;
-	}
 
 	public int getChartType() {
 		return fChartType;
@@ -391,7 +394,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 		ySliderBottom = new ChartYSlider(this);
 	}
 
-
 	/**
 	 * set the direction for the y axis <code>
 	 * true: the direction is from bottom to top by increasing number
@@ -410,5 +412,10 @@ public class ChartDataYSerie extends ChartDataSerie {
 	 */
 	public void setYTitle(final String title) {
 		fYTitle = title;
+	}
+
+	@Override
+	public String toString() {
+		return "[ChartDataYSerie]";//$NON-NLS-1$
 	}
 }

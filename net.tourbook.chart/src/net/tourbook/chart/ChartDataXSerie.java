@@ -93,7 +93,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 		fChartSegments = chartSegments;
 	}
 
-	@Override 
+	@Override
 	void setMinMaxValues(final int[][] lowValues, final int[][] highValues) {}
 
 	/**
@@ -109,7 +109,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 
 	/**
 	 * @param startValue
-	 *        The startValue to set.
+	 *            The startValue to set.
 	 */
 	public void setStartValue(final int startValue) {
 		this.startValue = startValue;
@@ -125,5 +125,10 @@ public class ChartDataXSerie extends ChartDataSerie {
 	public void setSynchMarkerValueIndex(final int startIndex, final int endIndex) {
 		fSynchMarkerStartIndex = startIndex;
 		fSynchMarkerEndIndex = endIndex;
+	}
+
+	@Override
+	public String toString() {
+		return "[ChartDataXSerie]";//$NON-NLS-1$
 	}
 }
