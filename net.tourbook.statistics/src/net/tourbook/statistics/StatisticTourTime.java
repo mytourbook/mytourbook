@@ -48,6 +48,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
 
@@ -58,13 +59,13 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	private int							fCurrentYear;
 	private int							fNumberOfYears;
 
-	private final Calendar				fCalendar		= GregorianCalendar.getInstance();
-	private final DateFormat			fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
+	private final Calendar				fCalendar					= GregorianCalendar.getInstance();
+	private final DateFormat			fDateFormatter				= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private Chart						fChart;
 	private TourTimeData				fTourTimeData;
 
-	private final BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
+	private final BarChartMinMaxKeeper	fMinMaxKeeper				= new BarChartMinMaxKeeper();
 	private boolean						fIsSynchScaleEnabled;
 
 	private IPostSelectionProvider		fPostSelectionProvider;
@@ -262,6 +263,32 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	@Override
 	public void resetSelection() {
 		fChart.setSelectedBars(null);
+	}
+
+	@Override
+	public void restoreState(final IMemento memento) {
+
+		final String mementoTourId = memento.getString(MEMENTO_SELECTED_TOUR_ID);
+		if (mementoTourId != null) {
+			try {
+				final long tourId = Long.parseLong(mementoTourId);
+				selectTour(tourId);
+			} catch (final Exception e) {
+				// ignore
+			}
+		}
+	}
+
+	@Override
+	public void saveState(final IMemento memento) {
+
+		final ISelection selection = fChart.getSelection();
+		if (fTourTimeData != null && selection instanceof SelectionBarChart) {
+
+			final Long selectedTourId = fTourTimeData.fTourIds[((SelectionBarChart) selection).valueIndex];
+
+			memento.putString(MEMENTO_SELECTED_TOUR_ID, Long.toString(selectedTourId));
+		}
 	}
 
 	@Override

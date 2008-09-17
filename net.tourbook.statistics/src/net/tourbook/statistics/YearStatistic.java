@@ -31,9 +31,11 @@ import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IMemento;
 
 public abstract class YearStatistic extends TourbookStatistic implements IYearStatistic {
 
+	protected static final String	MEMENTO_SELECTED_TOUR_ID	= "statistic.selected.tourId";
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	/**
@@ -99,5 +101,15 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 		final String tourTypeName = TourDatabase.getTourTypeName(tourTypeList.get(serieIndex - colorOffset).getTypeId());
 
 		return tourTypeName;
+	}
+
+	@Override
+	public void restoreState(final IMemento memento) {
+	// do nothing
+	}
+
+	@Override
+	public void saveState(final IMemento memento) {
+	// do nothing
 	}
 }

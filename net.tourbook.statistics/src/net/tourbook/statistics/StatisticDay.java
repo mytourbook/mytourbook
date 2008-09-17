@@ -53,7 +53,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 
 public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider {
@@ -92,12 +94,14 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+
+					final TourProperties tourProperties = (TourProperties) propertyData;
 
 					// check if a tour was modified
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
+					final ArrayList<TourData> modifiedTours = tourProperties.modifiedTours;
 					for (final TourData modifiedTourData : modifiedTours) {
 
 						final long modifiedTourId = modifiedTourData.getTourId();
@@ -108,8 +112,11 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 							final long tourId = tourIds[tourIdIndex];
 
 							if (tourId == modifiedTourId) {
+
 								// set new tour title
 								fTourDayData.tourTitle.set(tourIdIndex, modifiedTourData.getTourTitle());
+
+								break;
 							}
 						}
 					}
@@ -510,6 +517,32 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	@Override
 	public void resetSelection() {
 		fChart.setSelectedBars(null);
+	}
+
+	@Override
+	public void restoreState(final IMemento memento) {
+
+		final String mementoTourId = memento.getString(MEMENTO_SELECTED_TOUR_ID);
+		if (mementoTourId != null) {
+			try {
+				final long tourId = Long.parseLong(mementoTourId);
+				selectTour(tourId);
+			} catch (final Exception e) {
+				// ignore
+			}
+		}
+	}
+
+	@Override
+	public void saveState(final IMemento memento) {
+
+		final ISelection selection = fChart.getSelection();
+		if (fTourDayData != null && selection instanceof SelectionBarChart) {
+
+			final Long selectedTourId = fTourDayData.fTourIds[((SelectionBarChart) selection).valueIndex];
+
+			memento.putString(MEMENTO_SELECTED_TOUR_ID, Long.toString(selectedTourId));
+		}
 	}
 
 	@Override
