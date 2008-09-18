@@ -43,6 +43,18 @@ public abstract class TourbookStatistic {
 	 */
 	public abstract void activateActions(IWorkbenchPartSite partSite);
 
+	public boolean canSelectDay() {
+		return false;
+	}
+
+	public boolean canSelectMonth() {
+		return false;
+	}
+
+	public boolean canSelectTour() {
+		return false;
+	}
+
 	/**
 	 * Create the statistic component
 	 * 

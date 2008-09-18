@@ -63,9 +63,9 @@ public class StatisticContainer extends Composite {
 	private static final String				MEMENTO_SELECTED_STATISTIC	= "statistic.container.selected_statistic"; //$NON-NLS-1$
 	private static final String				MEMENTO_NUMBER_OF_YEARS		= "statistic.container.number_of_years";	//$NON-NLS-1$
 
-	private static final int				SELECTION_TYPE_MONTH		= 1;
-	private static final int				SELECTION_TYPE_DAY			= 2;
-	private static final int				SELECTION_TYPE_TOUR			= 3;
+//	private static final int				SELECTION_TYPE_MONTH		= 1;
+//	private static final int				SELECTION_TYPE_DAY			= 2;
+//	private static final int				SELECTION_TYPE_TOUR			= 3;
 
 	private Calendar						fCalendar					= GregorianCalendar.getInstance();
 
@@ -91,11 +91,11 @@ public class StatisticContainer extends Composite {
 	private ActionSynchChartScale			fActionSynchChartScale;
 	private boolean							fIsSynchScaleEnabled;
 
-	private long							fSelectedDate;
-	private long							fSelectedMonth;
-	private long							fSelectedTourId;
+	private long							fSelectedDate				= -1;
+	private long							fSelectedMonth				= -1;
+	private long							fSelectedTourId				= -1;
 
-	private int								fLastSelectionType;
+//	private int								fLastSelectionType;
 	private IPostSelectionProvider			fPostSelectionProvider;
 
 	public StatisticContainer(	final IViewSite viewSite,
@@ -357,25 +357,29 @@ public class StatisticContainer extends Composite {
 
 		refreshStatistic(fActivePerson, fActiveTourTypeFilter, fActiveYear, false);
 
-		// reselect data
-		switch (fLastSelectionType) {
-		case SELECTION_TYPE_MONTH:
-			selectMonth(fSelectedMonth);
-			break;
-
-		case SELECTION_TYPE_DAY:
-			selectDay(fSelectedDate);
-			break;
-
-		case SELECTION_TYPE_TOUR:
-			if (selectTour(fSelectedTourId)) {
-//						fTourChartViewer.showTourChart(true);
-			} else {
-				// a tour was not selected, hide the tour chart
-//						fTourChartViewer.showTourChart(-1);
-			}
-			break;
+		if (fActiveStatistic.canSelectTour()) {
+			selectTour(fSelectedTourId);
 		}
+
+//		// reselect data
+//		switch (fLastSelectionType) {
+//		case SELECTION_TYPE_MONTH:
+//			selectMonth(fSelectedMonth);
+//			break;
+//
+//		case SELECTION_TYPE_DAY:
+//			selectDay(fSelectedDate);
+//			break;
+//
+//		case SELECTION_TYPE_TOUR:
+//			if (selectTour(fSelectedTourId)) {
+////						fTourChartViewer.showTourChart(true);
+//			} else {
+//				// a tour was not selected, hide the tour chart
+////						fTourChartViewer.showTourChart(-1);
+//			}
+//			break;
+//		}
 	}
 
 	private void onSelectYear() {
@@ -692,9 +696,9 @@ public class StatisticContainer extends Composite {
 	/**
 	 * @param date
 	 */
-	public void selectDay(final long date) {
+	private void selectDay(final long date) {
 
-		fLastSelectionType = SELECTION_TYPE_DAY;
+//		fLastSelectionType = SELECTION_TYPE_DAY;
 
 		fSelectedDate = date;
 		fActiveStatistic.selectDay(date);
@@ -704,20 +708,20 @@ public class StatisticContainer extends Composite {
 	 * @param date
 	 *            contains the date value in milliseconds
 	 */
-	public void selectMonth(final long date) {
+	private void selectMonth(final long date) {
 
-		fLastSelectionType = SELECTION_TYPE_MONTH;
+//		fLastSelectionType = SELECTION_TYPE_MONTH;
 
 		fSelectedMonth = date;
 		fActiveStatistic.selectMonth(date);
 	}
 
-	public boolean selectTour(final Long tourId) {
+	private boolean selectTour(final Long tourId) {
 
 		final boolean isTourSelected = fActiveStatistic.selectTour(tourId);
 
 		if (isTourSelected) {
-			fLastSelectionType = SELECTION_TYPE_TOUR;
+//			fLastSelectionType = SELECTION_TYPE_TOUR;
 			fSelectedTourId = tourId;
 		}
 
