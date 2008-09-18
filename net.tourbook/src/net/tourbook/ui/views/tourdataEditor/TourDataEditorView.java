@@ -1607,7 +1607,8 @@ public class TourDataEditorView extends ViewPart implements ITourViewer {
 				final Table table = fDataViewer.getTable();
 				final boolean isFocus = table.isFocusControl();
 
-				fColumnManager.saveState(fSessionMemento);
+// disabled: new columns are not displayed 
+//				fColumnManager.saveState(fSessionMemento);
 
 				fDataViewerContainer.setRedraw(false);
 				{
