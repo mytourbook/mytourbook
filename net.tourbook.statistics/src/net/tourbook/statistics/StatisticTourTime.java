@@ -59,13 +59,13 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 	private int							fCurrentYear;
 	private int							fNumberOfYears;
 
-	private final Calendar				fCalendar					= GregorianCalendar.getInstance();
-	private final DateFormat			fDateFormatter				= DateFormat.getDateInstance(DateFormat.FULL);
+	private final Calendar				fCalendar		= GregorianCalendar.getInstance();
+	private final DateFormat			fDateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private Chart						fChart;
 	private TourTimeData				fTourTimeData;
 
-	private final BarChartMinMaxKeeper	fMinMaxKeeper				= new BarChartMinMaxKeeper();
+	private final BarChartMinMaxKeeper	fMinMaxKeeper	= new BarChartMinMaxKeeper();
 	private boolean						fIsSynchScaleEnabled;
 
 	private IPostSelectionProvider		fPostSelectionProvider;
@@ -80,6 +80,11 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 //		fContextBarChart = contextService.activateContext(Chart.CONTEXT_ID_BAR_CHART);
 //		net.tourbook.chart.context.isTourChart
 //		fChart.updateChartActionHandlers();
+	}
+
+	@Override
+	public boolean canSelectTour() {
+		return true;
 	}
 
 	/**
@@ -323,6 +328,7 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		final long[] tourIds = fTourTimeData.fTourIds;
 
 		if (tourIds.length == 0) {
+			fSelectedTourId = null;
 			return false;
 		}
 
@@ -335,12 +341,15 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			if ((tourIds[tourIndex] == tourId)) {
 				selectedTours[tourIndex] = true;
 				isSelected = true;
+				fSelectedTourId = tourId;
+				break;
 			}
 		}
 
 		if (isSelected == false) {
 			// select first tour
 			selectedTours[0] = true;
+			fSelectedTourId = tourIds[0];
 		}
 
 		fChart.setSelectedBars(selectedTours);

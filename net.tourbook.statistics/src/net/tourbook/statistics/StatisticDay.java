@@ -127,6 +127,11 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
 	}
 
+	@Override
+	public boolean canSelectTour() {
+		return true;
+	}
+
 	public boolean canTourBeVisible() {
 		return true;
 	}
