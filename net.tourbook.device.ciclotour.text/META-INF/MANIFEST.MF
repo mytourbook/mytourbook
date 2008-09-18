@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Text Plug-in
+Bundle-SymbolicName: net.tourbook.device.ciclotour.text;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: net.tourbook.device.ciclotour.text.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ net.tourbook
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
