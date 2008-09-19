@@ -54,8 +54,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private static final String				TAG_TRK					= "trk";												//$NON-NLS-1$
 	private static final String				TAG_TRKPT				= "trkpt";												//$NON-NLS-1$
-	private static final String				TAG_RTE					= "rte";												//$NON-NLS-1$
-	private static final String				TAG_RTEPT				= "rtept";												//$NON-NLS-1$
+//	private static final String				TAG_RTE					= "rte";												//$NON-NLS-1$
+//	private static final String				TAG_RTEPT				= "rtept";												//$NON-NLS-1$
 
 	private static final String				TAG_TIME				= "time";												//$NON-NLS-1$
 	private static final String				TAG_ELE					= "ele";												//$NON-NLS-1$
@@ -224,7 +224,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				}
 			}
 
-			if (name.equals(TAG_TRKPT) || name.equals(TAG_RTEPT)) {
+			if (name.equals(TAG_TRKPT) /* || name.equals(TAG_RTEPT) */) {
 
 				/*
 				 * trackpoint ends
@@ -234,7 +234,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 				finalizeTrackpoint();
 
-			} else if (name.equals(TAG_TRK) || name.equals(TAG_RTE)) {
+			} else if (name.equals(TAG_TRK) /* || name.equals(TAG_RTE) */) {
 
 				/*
 				 * track ends
@@ -508,7 +508,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 						fCharacters.delete(0, fCharacters.length());
 					}
 
-				} else if (name.equals(TAG_TRKPT) || name.equals(TAG_RTEPT)) {
+				} else if (name.equals(TAG_TRKPT) /* || name.equals(TAG_RTEPT) */) {
 
 					/*
 					 * new trackpoing
@@ -523,7 +523,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					fTimeData.longitude = getDoubleValue(attributes.getValue(ATTR_LONGITUDE));
 				}
 
-			} else if (name.equals(TAG_TRK) || name.equals(TAG_RTE)) {
+			} else if (name.equals(TAG_TRK) /* || name.equals(TAG_RTE) */) {
 
 				/*
 				 * new track starts
