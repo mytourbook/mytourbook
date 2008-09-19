@@ -99,7 +99,7 @@
             id="net.tourbook.preferences.PrefPageClients"
             name="%preference_page_People"/>
       <page
-            class="net.tourbook.preferences.PrefPageStatistic"
+            class="net.tourbook.preferences.PrefPageStatisticTourFrequency"
             id="net.tourbook.preferences.PrefPageStatistic"
             name="%preference_page_Statistics"/>
       <page

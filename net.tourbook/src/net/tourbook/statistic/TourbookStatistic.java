@@ -22,7 +22,7 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
 
 /**
- * Plugin interface for statistics
+ * Plugin interface for statistics in MyTourbook
  */
 public abstract class TourbookStatistic {
 

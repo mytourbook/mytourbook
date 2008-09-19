@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageStatistic extends FieldEditorPreferencePage implements IWorkbenchPreferencePage,
+public class PrefPageStatisticTourFrequency extends FieldEditorPreferencePage implements IWorkbenchPreferencePage,
 		IPropertyChangeListener {
 
 	private IntegerFieldEditor												fEditorDistanceLowValue;
@@ -61,7 +61,7 @@ public class PrefPageStatistic extends FieldEditorPreferencePage implements IWor
 
 	private org.eclipse.core.runtime.Preferences.IPropertyChangeListener	fPrefChangeListener;
 
-	public PrefPageStatistic() {
+	public PrefPageStatisticTourFrequency() {
 		super(GRID);
 	}
 
