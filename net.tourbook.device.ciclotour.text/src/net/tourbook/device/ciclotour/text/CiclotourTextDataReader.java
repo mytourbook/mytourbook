@@ -65,7 +65,17 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
 				final int day = Integer.parseInt(dayDenom);
 				final int month = Integer.parseInt(monthDenom);
-				final int year = Integer.parseInt(yearDenom);
+				int year = Integer.parseInt(yearDenom);
+				
+				// we assume that a two-digit date smaller 90 is in the 21st century,
+				// and dates larger 90 in the 20st century, covering a timespan of
+				// 1900 to 2089, which should be ample.
+				if (year < 90) {
+					year += 2000;
+				}
+				else {
+					year += 1900;
+				}
 
 				cal.set(Calendar.DAY_OF_MONTH, day);
 				cal.set(Calendar.MONTH, month - 1);
