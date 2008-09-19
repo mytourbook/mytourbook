@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.statistics;
 
 import java.text.DateFormat;
@@ -154,9 +153,10 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 						valueIndex = tourIds.length - 1;
 					}
 
-					final long selectedTourId = tourIds[valueIndex];
-					DataProviderTourTime.getInstance().setSelectedTourId(selectedTourId);
-					fPostSelectionProvider.setSelection(new SelectionTourId(selectedTourId));
+					fSelectedTourId = tourIds[valueIndex];
+
+					DataProviderTourTime.getInstance().setSelectedTourId(fSelectedTourId);
+					fPostSelectionProvider.setSelection(new SelectionTourId(fSelectedTourId));
 				}
 			}
 		});
@@ -168,9 +168,9 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 			public void selectionChanged(final int serieIndex, final int valueIndex) {
 				final long[] tourIds = fTourTimeData.fTourIds;
 				if (tourIds.length > 0) {
-					final long selectedTourId = tourIds[valueIndex];
-					DataProviderTourTime.getInstance().setSelectedTourId(selectedTourId);
-					TourManager.getInstance().openTourInEditor(selectedTourId);
+					fSelectedTourId = tourIds[valueIndex];
+					DataProviderTourTime.getInstance().setSelectedTourId(fSelectedTourId);
+					TourManager.getInstance().openTourInEditor(fSelectedTourId);
 				}
 			}
 		});
@@ -188,8 +188,8 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 						if (barChartSelection.serieIndex != -1) {
 
-							final long selectedTourId = fTourTimeData.fTourIds[barChartSelection.valueIndex];
-							TourManager.getInstance().openTourInEditor(selectedTourId);
+							fSelectedTourId = fTourTimeData.fTourIds[barChartSelection.valueIndex];
+							TourManager.getInstance().openTourInEditor(fSelectedTourId);
 						}
 					}
 				}
@@ -286,6 +286,10 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 
 	@Override
 	public void saveState(final IMemento memento) {
+
+		if (fChart == null || fChart.isDisposed()) {
+			return;
+		}
 
 		final ISelection selection = fChart.getSelection();
 		if (fTourTimeData != null && selection instanceof SelectionBarChart) {

@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-
 package net.tourbook.statistics;
 
 import java.text.DateFormat;
@@ -221,8 +220,8 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 						if (barChartSelection.serieIndex != -1) {
 
-							final long selectedTourId = fTourDayData.fTourIds[barChartSelection.valueIndex];
-							TourManager.getInstance().openTourInEditor(selectedTourId);
+							fSelectedTourId = fTourDayData.fTourIds[barChartSelection.valueIndex];
+							TourManager.getInstance().openTourInEditor(fSelectedTourId);
 						}
 					}
 				}
@@ -540,6 +539,10 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	@Override
 	public void saveState(final IMemento memento) {
+
+		if (fChart == null || fChart.isDisposed()) {
+			return;
+		}
 
 		final ISelection selection = fChart.getSelection();
 		if (fTourDayData != null && selection instanceof SelectionBarChart) {
