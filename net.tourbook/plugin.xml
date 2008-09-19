@@ -98,10 +98,18 @@
             class="net.tourbook.preferences.PrefPagePeople"
             id="net.tourbook.preferences.PrefPageClients"
             name="%preference_page_People"/>
+
       <page
+            class="net.tourbook.preferences.PrefPageStatistic"
+            id="net.tourbook.preferences.prefPageStatistic"
+            name="%preference_page_statistics"/>
+
+      <page
+            category="net.tourbook.preferences.prefPageStatistic"
             class="net.tourbook.preferences.PrefPageStatisticTourFrequency"
-            id="net.tourbook.preferences.PrefPageStatistic"
-            name="%preference_page_Statistics"/>
+            id="net.tourbook.preferences.prefPageStatisticTourFrequency"
+            name="%preference_page_statistics_tourFrequency"/>
+
       <page
             class="net.tourbook.preferences.PrefPageTourChart"
             id="net.tourbook.preferences.PrefPageChartGraphs"

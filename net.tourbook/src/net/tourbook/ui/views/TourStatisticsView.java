@@ -149,6 +149,10 @@ public class TourStatisticsView extends ViewPart {
 					// update statistics
 					refreshStatistics();
 
+				} else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
+
+					fStatisticContainer.refreshStatisticProvider();
+					
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
 					// measurement system has changed

@@ -23,7 +23,12 @@ public interface ITourbookPreferences {
 	public static final String	DUMMY_FIELD								= "";											//$NON-NLS-1$
 
 	/*
-	 * statistics where the units can be set in the preferences
+	 * statistic provider
+	 */
+	public static final String	STATISTICS_STATISTIC_PROVIDER_IDS		= "statistics.provider.ids";					//$NON-NLS-1$
+
+	/*
+	 * statistic: number frequency - where the units can be set in the preferences
 	 */
 	public static final String	STAT_DISTANCE_NUMBERS					= "statistic.distance.numbers";				//$NON-NLS-1$
 	public static final String	STAT_DISTANCE_LOW_VALUE					= "statistic.distance.lowvalue";				//$NON-NLS-1$
@@ -144,5 +149,6 @@ public interface ITourbookPreferences {
 	 * id's for preference pages
 	 */
 	public static final String	PREF_PAGE_TAGS							= "net.tourbook.preferences.PrefPageTags";		//$NON-NLS-1$
+
 
 }

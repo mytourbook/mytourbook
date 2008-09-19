@@ -28,9 +28,11 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
+import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -60,39 +62,125 @@ import org.eclipse.ui.part.PageBook;
 
 public class StatisticContainer extends Composite {
 
-	private static final String				MEMENTO_SELECTED_STATISTIC	= "statistic.container.selected_statistic"; //$NON-NLS-1$
-	private static final String				MEMENTO_NUMBER_OF_YEARS		= "statistic.container.number_of_years";	//$NON-NLS-1$
+	private static final String					MEMENTO_SELECTED_STATISTIC	= "statistic.container.selected_statistic"; //$NON-NLS-1$
+	private static final String					MEMENTO_NUMBER_OF_YEARS		= "statistic.container.number_of_years";	//$NON-NLS-1$
 
-	private Calendar						fCalendar					= GregorianCalendar.getInstance();
+	private static ArrayList<TourbookStatistic>	fStatisticExtensionPoints;
 
-	private TourbookStatistic				fActiveStatistic;
-	private int								fActiveYear					= -1;
+	private Calendar							fCalendar					= GregorianCalendar.getInstance();
 
-	private TourPerson						fActivePerson;
-	private TourTypeFilter					fActiveTourTypeFilter;
+	private TourbookStatistic					fActiveStatistic;
+	private int									fActiveYear					= -1;
 
-	private Combo							fComboYear;
-	private Combo							fComboStatistics;
-	private Combo							fComboNumberOfYears;
-	private PageBook						fPageBookStatistic;
-	private Composite						fStatContainer;
+	private TourPerson							fActivePerson;
+	private TourTypeFilter						fActiveTourTypeFilter;
 
-	private IViewSite						fViewSite;
-	private ToolBarManager					fTBM;
-	private ToolBar							fToolBar;
+	private Combo								fComboYear;
+	private Combo								fComboStatistics;
+	private Combo								fComboNumberOfYears;
+	private PageBook							fPageBookStatistic;
+	private Composite							fStatContainer;
 
-	private ArrayList<Integer>				fTourYears;
-	private ArrayList<TourbookStatistic>	fStatistics;
+	private IViewSite							fViewSite;
+	private ToolBarManager						fTBM;
+	private ToolBar								fToolBar;
 
-	private ActionSynchChartScale			fActionSynchChartScale;
-	private boolean							fIsSynchScaleEnabled;
+	private ArrayList<Integer>					fTourYears;
 
-	private long							fSelectedDate				= -1;
-	private long							fSelectedMonth				= -1;
-	private long							fSelectedTourId				= -1;
+	/**
+	 * contains the statistics in the same sort order as the statistic combo box
+	 */
+	private ArrayList<TourbookStatistic>		fComboStatisticProvider;
 
-//	private int								fLastSelectionType;
-	private IPostSelectionProvider			fPostSelectionProvider;
+	private ActionSynchChartScale				fActionSynchChartScale;
+	private boolean								fIsSynchScaleEnabled;
+
+	private long								fSelectedDate				= -1;
+	private long								fSelectedMonth				= -1;
+	private long								fSelectedTourId				= -1;
+
+	private IPostSelectionProvider				fPostSelectionProvider;
+
+	/**
+	 * @return Returns statistics from the extension registry in the sort order of the registry
+	 */
+	public static ArrayList<TourbookStatistic> getStatisticExtensionPoints() {
+
+		if (fStatisticExtensionPoints != null) {
+			return fStatisticExtensionPoints;
+		}
+
+		fStatisticExtensionPoints = new ArrayList<TourbookStatistic>();
+
+		final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
+				TourbookPlugin.EXT_POINT_STATISTIC_YEAR);
+
+		if (extPoint != null) {
+
+			for (final IExtension extension : extPoint.getExtensions()) {
+
+				for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
+
+					if (configElement.getName().equalsIgnoreCase("statistic")) { //$NON-NLS-1$
+
+						Object object;
+						try {
+							object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
+							if (object instanceof TourbookStatistic) {
+
+								final TourbookStatistic statisticItem = (TourbookStatistic) object;
+
+								statisticItem.fVisibleName = configElement.getAttribute("name"); //$NON-NLS-1$
+								statisticItem.fStatisticId = configElement.getAttribute("id"); //$NON-NLS-1$
+
+								fStatisticExtensionPoints.add(statisticItem);
+							}
+						} catch (final CoreException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+
+		return fStatisticExtensionPoints;
+	}
+
+	/**
+	 * @return Returns statistic providers with the custom sort order
+	 */
+	public static ArrayList<TourbookStatistic> getStatisticProviders() {
+
+		final ArrayList<TourbookStatistic> availableStatistics = getStatisticExtensionPoints();
+		final ArrayList<TourbookStatistic> visibleStatistics = new ArrayList<TourbookStatistic>();
+
+		final String[] prefStoreStatisticIds = StringToArrayConverter.//
+		convertStringToArray(TourbookPlugin.getDefault()
+				.getPreferenceStore()
+				.getString(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS));
+
+		// get all statistics which are saved in the pref store
+		for (final String statisticId : prefStoreStatisticIds) {
+
+			// get statistic item from the id
+			for (final TourbookStatistic tourbookStatistic : availableStatistics) {
+				if (statisticId.equals(tourbookStatistic.fStatisticId)) {
+					visibleStatistics.add(tourbookStatistic);
+					break;
+				}
+			}
+		}
+
+		// get statistics which are available but not saved in the prefstore
+		for (final TourbookStatistic availableStatistic : availableStatistics) {
+
+			if (visibleStatistics.contains(availableStatistic) == false) {
+				visibleStatistics.add(availableStatistic);
+			}
+		}
+
+		return visibleStatistics;
+	}
 
 	public StatisticContainer(	final IViewSite viewSite,
 								final IPostSelectionProvider selectionProvider,
@@ -110,7 +198,7 @@ public class StatisticContainer extends Composite {
 			public void widgetDisposed(final DisposeEvent e) {
 
 				// dispose all statistic resources
-				for (final TourbookStatistic statistic : fStatistics) {
+				for (final TourbookStatistic statistic : getComboStatistics()) {
 					statistic.dispose();
 				}
 			}
@@ -196,7 +284,7 @@ public class StatisticContainer extends Composite {
 		});
 
 		// fill combobox with statistic names
-		for (final TourbookStatistic statistic : getAllStatistics()) {
+		for (final TourbookStatistic statistic : getComboStatistics()) {
 			fComboStatistics.add(statistic.fVisibleName);
 		}
 
@@ -275,13 +363,14 @@ public class StatisticContainer extends Composite {
 	}
 
 	/**
-	 * @return Returns all statistic plugins
+	 * @return Returns all statistic plugins which are displayed in the statistic combo box
 	 */
-	private ArrayList<TourbookStatistic> getAllStatistics() {
-		if (fStatistics == null) {
-			readStatistics();
+	private ArrayList<TourbookStatistic> getComboStatistics() {
+		if (fComboStatisticProvider == null) {
+			fComboStatisticProvider = getStatisticProviders();
 		}
-		return fStatistics;
+
+		return fComboStatisticProvider;
 	}
 
 	private int getNumberOfYears() {
@@ -306,26 +395,27 @@ public class StatisticContainer extends Composite {
 			return null;
 		}
 
-		final TourbookStatistic statistic = fStatistics.get(selectedIndex);
+		final TourbookStatistic statistic = getComboStatistics().get(selectedIndex);
 
-		// get statistic container
+		// get statistic control
 		Composite statControlContainer = statistic.getControl();
-		if (statControlContainer == null) {
-
-			// create statistic control
-			statControlContainer = new Composite(fPageBookStatistic, SWT.NONE);
-			final GridLayout gl = new GridLayout();
-			gl.marginHeight = 0;
-			gl.marginWidth = 0;
-			statControlContainer.setLayout(gl);
-			statControlContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-			statistic.createControl(statControlContainer, fViewSite, fPostSelectionProvider);
-			statistic.setContainer(statControlContainer);
-
-			final Composite statControl = statistic.getControl();
-			statControl.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		if (statControlContainer != null) {
+			return statistic;
 		}
+
+		// create statistic ui
+		statControlContainer = new Composite(fPageBookStatistic, SWT.NONE);
+		final GridLayout gl = new GridLayout();
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		statControlContainer.setLayout(gl);
+		statControlContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		statistic.createControl(statControlContainer, fViewSite, fPostSelectionProvider);
+		statistic.setContainer(statControlContainer);
+
+		final Composite statControl = statistic.getControl();
+		statControl.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		return statistic;
 	}
@@ -377,45 +467,6 @@ public class StatisticContainer extends Composite {
 	}
 
 	/**
-	 * read statistics from the extension registry
-	 */
-	private void readStatistics() {
-
-		fStatistics = new ArrayList<TourbookStatistic>();
-
-		final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
-				TourbookPlugin.EXT_POINT_STATISTIC_YEAR);
-
-		if (extPoint != null) {
-
-			for (final IExtension extension : extPoint.getExtensions()) {
-
-				for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
-
-					if (configElement.getName().equalsIgnoreCase("statistic")) { //$NON-NLS-1$
-
-						Object object;
-						try {
-							object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
-							if (object instanceof TourbookStatistic) {
-
-								final TourbookStatistic yearStatistic = (TourbookStatistic) object;
-
-								yearStatistic.fVisibleName = configElement.getAttribute("name"); //$NON-NLS-1$
-								yearStatistic.fStatisticId = configElement.getAttribute("id"); //$NON-NLS-1$
-
-								fStatistics.add(yearStatistic);
-							}
-						} catch (final CoreException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * update all statistics which have been created because person or tour type can be changed
 	 * 
 	 * @param person
@@ -434,7 +485,7 @@ public class StatisticContainer extends Composite {
 		selectYear();
 
 		// tell all existing statistics the data have changed
-		for (final TourbookStatistic statistic : fStatistics) {
+		for (final TourbookStatistic statistic : getComboStatistics()) {
 
 			if (statistic.getControl() != null) {
 				if (statistic instanceof IYearStatistic) {
@@ -486,6 +537,48 @@ public class StatisticContainer extends Composite {
 		}
 		fillToolbar();
 		fPageBookStatistic.showPage(fActiveStatistic.getControl());
+	}
+
+//	private void resetSelection() {
+//
+//		if (fActiveStatistic == null) {
+//			return;
+//		}
+//
+//		// reset selection
+//		fSelectedDate = -1;
+//		fSelectedMonth = -1;
+//		fSelectedTourId = -1;
+//
+//		fActiveStatistic.resetSelection();
+//	}
+
+	public void refreshStatisticProvider() {
+
+		// get selected stat
+		final TourbookStatistic selectedStatistic = getSelectedStatistic();
+
+		fComboStatisticProvider = getStatisticProviders();
+
+		fComboStatistics.removeAll();
+		int indexCounter = 0;
+		int selectedIndex = 0;
+
+		// fill combobox with statistic names
+		for (final TourbookStatistic statistic : getComboStatistics()) {
+
+			fComboStatistics.add(statistic.fVisibleName);
+
+			if (selectedStatistic.fStatisticId.equals(statistic.fStatisticId)) {
+				selectedIndex = indexCounter;
+			}
+
+			indexCounter++;
+		}
+
+		// reselect stat
+		fComboStatistics.select(selectedIndex);
+		onSelectStatistic();
 	}
 
 	/**
@@ -550,20 +643,6 @@ public class StatisticContainer extends Composite {
 		}
 	}
 
-//	private void resetSelection() {
-//
-//		if (fActiveStatistic == null) {
-//			return;
-//		}
-//
-//		// reset selection
-//		fSelectedDate = -1;
-//		fSelectedMonth = -1;
-//		fSelectedTourId = -1;
-//
-//		fActiveStatistic.resetSelection();
-//	}
-
 	/**
 	 * Restore selected statistic
 	 * 
@@ -589,7 +668,7 @@ public class StatisticContainer extends Composite {
 			final String mementoStatisticId = memento.getString(MEMENTO_SELECTED_STATISTIC);
 			if (mementoStatisticId != null) {
 				int statIndex = 0;
-				for (final TourbookStatistic statistic : getAllStatistics()) {
+				for (final TourbookStatistic statistic : getComboStatistics()) {
 					if (mementoStatisticId.equalsIgnoreCase(statistic.fStatisticId)) {
 						prevStatIndex = statIndex;
 						break;
@@ -622,7 +701,7 @@ public class StatisticContainer extends Composite {
 
 		// restore statistic state (e.g. reselect previous selection)
 		if (memento != null) {
-			getAllStatistics().get(prevStatIndex).restoreState(memento);
+			getComboStatistics().get(prevStatIndex).restoreState(memento);
 		}
 	}
 
@@ -635,7 +714,7 @@ public class StatisticContainer extends Composite {
 		final int selectionIndex = fComboStatistics.getSelectionIndex();
 		if (selectionIndex != -1) {
 
-			final TourbookStatistic tourbookStatistic = getAllStatistics().get(selectionIndex);
+			final TourbookStatistic tourbookStatistic = getComboStatistics().get(selectionIndex);
 
 			memento.putString(MEMENTO_SELECTED_STATISTIC, tourbookStatistic.fStatisticId);
 

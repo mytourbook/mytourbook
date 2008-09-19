@@ -79,8 +79,38 @@ public abstract class TourbookStatistic {
 	 */
 	public void dispose() {}
 
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TourbookStatistic)) {
+			return false;
+		}
+		final TourbookStatistic other = (TourbookStatistic) obj;
+		if (fStatisticId == null) {
+			if (other.fStatisticId != null) {
+				return false;
+			}
+		} else if (!fStatisticId.equals(other.fStatisticId)) {
+			return false;
+		}
+		return true;
+	}
+
 	public Composite getControl() {
 		return fContainer;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((fStatisticId == null) ? 0 : fStatisticId.hashCode());
+		return result;
 	}
 
 	/**

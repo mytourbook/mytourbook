@@ -69,6 +69,10 @@ public class Messages extends NLS {
 	public static String		action_tagView_flat_hierarchical;
 	public static String		action_tagView_flat_layout;
 
+	public static String	app_action_button_down;
+
+	public static String	app_action_button_up;
+
 	public static String		app_action_collapse_all_tooltip;
 	public static String		app_action_collapse_others_tooltip;
 	public static String		app_action_dlg_confirm_save_editors_message;
@@ -406,6 +410,8 @@ public class Messages extends NLS {
 	public static String		pref_regional_title;
 	public static String		pref_regional_useCustomDecimalFormat;
 	public static String		pref_regional_value_example;
+
+	public static String	pref_statistic_lbl_info;
 
 	public static String		pref_tourtag_btn_new_tag;
 	public static String		pref_tourtag_btn_new_tag_category;
