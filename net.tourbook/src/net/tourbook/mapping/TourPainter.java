@@ -88,6 +88,11 @@ public class TourPainter extends MapPainter {
 
 		final LegendConfig config = legendProvider.getLegendConfig();
 
+		// ensure units are available
+		if (config.units == null || config.unitLabels == null) {
+			return;
+		}
+
 		// get configuration for the legend 
 		final ArrayList<Integer> legendUnits = new ArrayList<Integer>(config.units);
 		final Integer unitFactor = config.unitFactor;
