@@ -4211,7 +4211,8 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			/*
-			 * set focus when the mouse is over the chart and the mousewheel is scrolled,
+			 * set focus when the mouse is over the chart and the mousewheel is scrolled, this will
+			 * also activate the part with the chart component
 			 */
 			if (isFocusControl() == false) {
 				forceFocus();
@@ -4219,14 +4220,6 @@ public class ChartComponentGraph extends Canvas {
 
 			fChartComponents.handleLeftRightEvent(event);
 
-//			if (canAutoMoveSliders) {
-//				Display.getCurrent().asyncExec(new Runnable() {
-//					public void run() {
-//						moveSlidersToBorder();
-//					}
-//				});
-//
-//			}
 			if (canAutoZoomToSlider) {
 
 				/*
