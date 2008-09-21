@@ -69,6 +69,8 @@ public class Messages extends NLS {
 	public static String		action_tagView_flat_hierarchical;
 	public static String		action_tagView_flat_layout;
 
+	public static String	action_tourbook_select_year_month_tours;
+
 	public static String	app_action_button_down;
 
 	public static String	app_action_button_up;

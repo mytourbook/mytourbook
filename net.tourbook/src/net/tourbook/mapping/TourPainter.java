@@ -27,6 +27,7 @@ import net.tourbook.preferences.PrefPageMapAppearance;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -89,9 +90,9 @@ public class TourPainter extends MapPainter {
 		final LegendConfig config = legendProvider.getLegendConfig();
 
 		// ensure units are available
-//		if (config.units == null || config.unitLabels == null) {
-//			return;
-//		}
+		if (config.units == null /* || config.unitLabels == null */) {
+			return;
+		}
 
 		// get configuration for the legend 
 		final ArrayList<Integer> legendUnits = new ArrayList<Integer>(config.units);
@@ -540,88 +541,98 @@ public class TourPainter extends MapPainter {
 	@Override
 	protected boolean doPaint(final GC gc, final Map map, final Tile tile) {
 
-		boolean isTourInTile = false;
 		final PaintManager paintManager = PaintManager.getInstance();
 
 		final ArrayList<TourData> tourDataList = paintManager.getTourData();
-
-		if (tourDataList == null) {
+		if (tourDataList == null) { 
 			return false;
 		}
 
-		for (final TourData tourData : tourDataList) {
+		final boolean[] isInTile = new boolean[1];
 
-			if (tourData == null) {
-				continue;
-			}
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			public void run() {
 
-			final double[] latitudeSerie = tourData.latitudeSerie;
-			final double[] longitudeSerie = tourData.longitudeSerie;
-			if (latitudeSerie == null || longitudeSerie == null) {
-				return false;
-			}
+				boolean isTourInTile = false;
 
-			inizializeLegendData(tourData);
+				for (final TourData tourData : tourDataList) {
 
-			// draw tour into the tile
-			final boolean isDrawTourInTile = drawTourInTile(gc, map, tile, tourData);
+					if (tourData == null) {
+						continue;
+					}
 
-			isTourInTile = isTourInTile || isDrawTourInTile;
+					// check is position is available
+					final double[] latitudeSerie = tourData.latitudeSerie;
+					final double[] longitudeSerie = tourData.longitudeSerie;
+					if (latitudeSerie == null || longitudeSerie == null) {
+						continue;
+					}
 
-			// status if a marker is drawn
-			boolean isMarkerInTile = false;
+					getDataSerie(tourData);
 
-			// draw start/end marker
-			if (paintManager.isShowStartEndInMap()) {
+					// draw tour into the tile
+					final boolean isDrawTourInTile = drawTourInTile(gc, map, tile, tourData);
 
-				// draw end marker
-				isMarkerInTile = drawMarker(gc,
-						map,
-						tile,
-						latitudeSerie[latitudeSerie.length - 1],
-						longitudeSerie[longitudeSerie.length - 1],
-						fImageEndMarker);
+					isTourInTile = isTourInTile || isDrawTourInTile;
 
-				isTourInTile = isTourInTile || isMarkerInTile;
+					// status if a marker is drawn
+					boolean isMarkerInTile = false;
 
-				// draw start marker
-				isMarkerInTile = drawMarker(gc,//
-						map,
-						tile,
-						latitudeSerie[0],
-						longitudeSerie[0],
-						fImageStartMarker);
-			}
+					// draw start/end marker
+					if (paintManager.isShowStartEndInMap()) {
 
-			boolean isTourMarkerInTile = false;
+						// draw end marker
+						isMarkerInTile = drawMarker(gc,
+								map,
+								tile,
+								latitudeSerie[latitudeSerie.length - 1],
+								longitudeSerie[longitudeSerie.length - 1],
+								fImageEndMarker);
 
-			// draw tour marker
-			if (paintManager.isShowTourMarker()) {
+						isTourInTile = isTourInTile || isMarkerInTile;
 
-				boolean isTourMarkerInTile2 = false;
+						// draw start marker
+						isMarkerInTile = drawMarker(gc,//
+								map,
+								tile,
+								latitudeSerie[0],
+								longitudeSerie[0],
+								fImageStartMarker);
+					}
 
-				for (final TourMarker tourMarker : tourData.getTourMarkers()) {
-
-					final int serieIndex = tourMarker.getSerieIndex();
+					boolean isTourMarkerInTile = false;
 
 					// draw tour marker
-					isTourMarkerInTile2 = drawTourMarker(gc,
-							map,
-							tile,
-							latitudeSerie[serieIndex],
-							longitudeSerie[serieIndex],
-							fImageTourMarker,
-							tourMarker);
+					if (paintManager.isShowTourMarker()) {
 
-					isTourMarkerInTile = isTourMarkerInTile || isTourMarkerInTile2;
+						boolean isTourMarkerInTile2 = false;
+
+						for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+
+							final int serieIndex = tourMarker.getSerieIndex();
+
+							// draw tour marker
+							isTourMarkerInTile2 = drawTourMarker(gc,
+									map,
+									tile,
+									latitudeSerie[serieIndex],
+									longitudeSerie[serieIndex],
+									fImageTourMarker,
+									tourMarker);
+
+							isTourMarkerInTile = isTourMarkerInTile || isTourMarkerInTile2;
+						}
+
+					}
+
+					isTourInTile = isTourInTile || isMarkerInTile || isTourMarkerInTile;
 				}
 
+				isInTile[0] = isTourInTile;
 			}
+		});
 
-			isTourInTile = isTourInTile || isMarkerInTile || isTourMarkerInTile;
-		}
-
-		return isTourInTile;
+		return isInTile[0];
 	}
 
 	private boolean drawMarker(	final GC gc,
@@ -666,8 +677,6 @@ public class TourPainter extends MapPainter {
 	}
 
 	private void drawTourDot(final GC gc, final int serieIndex, final java.awt.Point devPosition) {
-
-//		gc.setLineWidth(LINE_WIDTH);
 
 		if (fDataSerie == null) {
 
@@ -934,6 +943,66 @@ public class TourPainter extends MapPainter {
 		return isMarkerInTile;
 	}
 
+	private void getDataSerie(final TourData tourData) {
+
+		fLegendProvider = PaintManager.getInstance().getLegendProvider();
+
+		switch (fLegendProvider.getTourColorId()) {
+		case MappingView.TOUR_COLOR_ALTITUDE:
+
+			final int[] altitudeSerie = tourData.getAltitudeSerie();
+			if (altitudeSerie == null) {
+				fDataSerie = null;
+			} else {
+				fDataSerie = altitudeSerie;
+			}
+			break;
+
+		case MappingView.TOUR_COLOR_GRADIENT:
+
+			final int[] gradientSerie = tourData.getGradientSerie();
+			if (gradientSerie == null) {
+				fDataSerie = null;
+			} else {
+				fDataSerie = gradientSerie;
+			}
+			break;
+
+		case MappingView.TOUR_COLOR_PULSE:
+
+			final int[] pulseSerie = tourData.pulseSerie;
+			if (pulseSerie == null) {
+				fDataSerie = null;
+			} else {
+				fDataSerie = pulseSerie;
+			}
+			break;
+
+		case MappingView.TOUR_COLOR_SPEED:
+
+			final int[] speedSerie = tourData.getSpeedSerie();
+			if (speedSerie == null) {
+				fDataSerie = null;
+			} else {
+				fDataSerie = speedSerie;
+			}
+			break;
+
+		case MappingView.TOUR_COLOR_PACE:
+
+			final int[] paceSerie = tourData.getPaceSerie();
+			if (paceSerie == null) {
+				fDataSerie = null;
+			} else {
+				fDataSerie = paceSerie;
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+
 	/**
 	 * @param legendBounds
 	 * @param valueIndex
@@ -994,66 +1063,6 @@ public class TourPainter extends MapPainter {
 		}
 
 		return valuePosition;
-	}
-
-	private void inizializeLegendData(final TourData tourData) {
-
-		fLegendProvider = PaintManager.getInstance().getLegendProvider();
-
-		switch (fLegendProvider.getTourColorId()) {
-		case MappingView.TOUR_COLOR_ALTITUDE:
-
-			final int[] altitudeSerie = tourData.getAltitudeSerie();
-			if (altitudeSerie == null) {
-				fDataSerie = null;
-			} else {
-				fDataSerie = altitudeSerie;
-			}
-			break;
-
-		case MappingView.TOUR_COLOR_GRADIENT:
-
-			final int[] gradientSerie = tourData.getGradientSerie();
-			if (gradientSerie == null) {
-				fDataSerie = null;
-			} else {
-				fDataSerie = gradientSerie;
-			}
-			break;
-
-		case MappingView.TOUR_COLOR_PULSE:
-
-			final int[] pulseSerie = tourData.pulseSerie;
-			if (pulseSerie == null) {
-				fDataSerie = null;
-			} else {
-				fDataSerie = pulseSerie;
-			}
-			break;
-
-		case MappingView.TOUR_COLOR_SPEED:
-
-			final int[] speedSerie = tourData.getSpeedSerie();
-			if (speedSerie == null) {
-				fDataSerie = null;
-			} else {
-				fDataSerie = speedSerie;
-			}
-			break;
-
-		case MappingView.TOUR_COLOR_PACE:
-
-			final int[] paceSerie = tourData.getPaceSerie();
-			if (paceSerie == null) {
-				fDataSerie = null;
-			} else {
-				fDataSerie = paceSerie;
-			}
-			break;
-
-		default:
-			break;
-		}
 	}
 
 	/**

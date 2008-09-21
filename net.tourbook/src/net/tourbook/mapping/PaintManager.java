@@ -100,6 +100,11 @@ public class PaintManager {
 		fTourBounds = mapPositions;
 	}
 
+	/**
+	 * Sets {@link TourData} which will be painted
+	 * 
+	 * @param tourDataList
+	 */
 	public void setTourData(final ArrayList<TourData> tourDataList) {
 		fTourDataList = tourDataList;
 	}
