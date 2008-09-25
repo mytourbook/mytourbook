@@ -961,7 +961,7 @@ public class ChartComponents extends Composite {
 	 */
 	boolean onResize() {
 
-		if (getChartDataModel() == null || getClientArea().width == 0) {
+		if (isDisposed() || getChartDataModel() == null || getClientArea().width == 0) {
 			return false;
 		}
 
