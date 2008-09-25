@@ -11,6 +11,7 @@ Bundle-ClassPath: net.tourbook.jar,
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.forms;bundle-version="3.3.100",
  org.eclipse.core.runtime,
  org.eclipse.update.ui,
  org.eclipse.core.expressions,

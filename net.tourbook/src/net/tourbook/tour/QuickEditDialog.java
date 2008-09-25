@@ -116,13 +116,13 @@ public class QuickEditDialog extends TitleAreaDialog {
 
 		// title
 		label = new Label(container, SWT.NONE);
-		label.setText(Messages.Tour_Properties_Label_tour_title);
+		label.setText(Messages.tour_editor_label_tour_title);
 		fTextTitle = new Text(container, SWT.BORDER);
 		fTextTitle.setLayoutData(gd);
 
 		// description
 		label = new Label(container, SWT.NONE);
-		label.setText(Messages.Tour_Properties_Label_description);
+		label.setText(Messages.tour_editor_label_description);
 		label.setLayoutData(new GridData(SWT.NONE, SWT.TOP, false, false));
 		fTextDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
 		GridDataFactory//
@@ -133,13 +133,13 @@ public class QuickEditDialog extends TitleAreaDialog {
 
 		// start location
 		label = new Label(container, SWT.NONE);
-		label.setText(Messages.Tour_Properties_Label_start_location);
+		label.setText(Messages.tour_editor_label_start_location);
 		fTextStartLocation = new Text(container, SWT.BORDER);
 		fTextStartLocation.setLayoutData(gd);
 
 		// end location
 		label = new Label(container, SWT.NONE);
-		label.setText(Messages.Tour_Properties_Label_end_location);
+		label.setText(Messages.tour_editor_label_end_location);
 		fTextEndLocation = new Text(container, SWT.BORDER);
 		fTextEndLocation.setLayoutData(gd);
 	}

@@ -137,9 +137,10 @@ public class TourDatabase {
 	private static HashMap<Long, TourTag>		fTourTags;
 
 	private static HashMap<Long, TagCollection>	fTagCollections;
-	private boolean								fIsTableChecked;
 
+	private boolean								fIsTableChecked;
 	private boolean								fIsVersionChecked;
+
 	private final ListenerList					fPropertyListeners							= new ListenerList(ListenerList.IDENTITY);
 
 	private String								fDatabasePath								= (Platform.getInstanceLocation()
@@ -1010,6 +1011,7 @@ public class TourDatabase {
 	}
 
 	private boolean checkDb() {
+		
 		try {
 			checkServer();
 		} catch (final MyTourbookException e) {
@@ -1146,15 +1148,23 @@ public class TourDatabase {
 
 			if (result.next()) {
 
-				// version record was found
+				// version record was found, check if the database contains the correct version
 
 				final int currentDbVersion = result.getInt(1);
 
-				// check if the database contains the correct version
-				if (currentDbVersion != TOURBOOK_DB_VERSION) {
+				System.out.println("Database version: " + currentDbVersion); //$NON-NLS-1$
+
+				if (currentDbVersion < TOURBOOK_DB_VERSION) {
+
 					if (updateDbDesign(conn, currentDbVersion, monitor) == false) {
 						return false;
 					}
+
+				} else if (currentDbVersion > TOURBOOK_DB_VERSION) {
+
+					MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+							Messages.tour_database_version_info_title,
+							NLS.bind(Messages.tour_database_version_info_message, currentDbVersion, TOURBOOK_DB_VERSION));
 				}
 
 			} else {
@@ -1172,8 +1182,9 @@ public class TourDatabase {
 				conn.createStatement().executeUpdate(sqlString);
 			}
 
-			fIsVersionChecked = true;
 			conn.close();
+
+			fIsVersionChecked = true;
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);

@@ -13,38 +13,37 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.tag;
+package net.tourbook.ui;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
 
-import net.tourbook.Messages;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.ITourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
-import net.tourbook.ui.ISelectedTours;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionRemoveAllTags extends Action {
+class ActionTourType extends Action {
 
+	private TourType		fTourType;
 	private ISelectedTours	fTourProvider;
 	private boolean			fIsSaveTour;
 
-	public ActionRemoveAllTags(final ISelectedTours tourProvider) {
-		this(tourProvider, true);
-	}
+	public ActionTourType(final TourType tourType, final ISelectedTours tourProvider, final boolean isSaveTour) {
 
-	public ActionRemoveAllTags(final ISelectedTours tourProvider, final boolean isSaveTour) {
+		super(tourType.getName(), AS_CHECK_BOX);
 
-		super(Messages.action_tag_remove_all, AS_PUSH_BUTTON);
+		final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
+		setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
 
+		fTourType = tourType;
 		fTourProvider = tourProvider;
 		fIsSaveTour = isSaveTour;
 	}
@@ -69,43 +68,35 @@ public class ActionRemoveAllTags extends Action {
 					}
 				}
 
-				final HashMap<Long, TourTag> removedTags = new HashMap<Long, TourTag>();
-
-				// remove tag in all tours (without tours from an editor)
+				// add the tag in all tours (without tours which are opened in an editor)
 				for (final TourData tourData : selectedTours) {
 
-					// get all tag's which will be removed
-					final Set<TourTag> tourTags = tourData.getTourTags();
-
-					for (final TourTag tourTag : tourTags) {
-						removedTags.put(tourTag.getTagId(), tourTag);
-					}
-
-					// remove all tour tags
-					tourTags.clear();
+					// set tour type
+					tourData.setTourType(fTourType);
 
 					if (fIsSaveTour) {
+						// save tour with modified tags
 						TourDatabase.saveTour(tourData);
 					}
 				}
 
 				if (fIsSaveTour) {
+
 					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED,
 							new TourProperties(selectedTours));
 
-					TourManager.firePropertyChange(TourManager.TOUR_TAGS_CHANGED, new ChangedTags(removedTags,
-							selectedTours,
-							false));
 				} else {
-					
+
+					// don't fire changes when the tour is not saved
+
 					if (fTourProvider instanceof ITourEditor) {
 						((ITourEditor) fTourProvider).tourIsModified();
 					}
 				}
 			}
-
 		};
-		
+
 		BusyIndicator.showWhile(Display.getCurrent(), runnable);
 	}
+
 }

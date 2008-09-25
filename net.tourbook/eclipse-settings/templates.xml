@@ -1,1 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="false" context="java" deleted="false" description="non-externalized string marker" enabled="true" id="org.eclipse.jdt.ui.templates.non-nls" name="nls">//$$NON-NLS-${1}$$</template></templates>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java-statements" deleted="false" description="if not null" enabled="true" name="ifnotnull">if (${cursor} != null) {&#13;
+	&#13;
+}</template></templates>

@@ -954,7 +954,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
 
-		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
+		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionOpenTagPrefs);

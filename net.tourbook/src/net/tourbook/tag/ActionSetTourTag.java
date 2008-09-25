@@ -55,6 +55,8 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 	private ArrayList<TourData>		fSelectedTours;
 
+	public boolean					fIsSaveTour;
+
 	public class ActionTagCategory extends Action implements IMenuCreator {
 
 		private Menu			fCategoryMenu;
@@ -123,17 +125,22 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 		@Override
 		public void run() {
-			TagManager.setTagIntoTour(fTourTag, fTourProvider, fIsAddMode);
+			TagManager.setTagIntoTour(fTourTag, fTourProvider, fIsAddMode, fIsSaveTour);
 		}
 
 	}
 
 	public ActionSetTourTag(final ISelectedTours tourProvider, final boolean isAddMode) {
+		this(tourProvider, isAddMode, true);
+	}
+
+	public ActionSetTourTag(final ISelectedTours tourProvider, final boolean isAddMode, final boolean isSaveTour) {
 
 		super(UI.IS_NOT_INITIALIZED, AS_DROP_DOWN_MENU);
 
 		fTourProvider = tourProvider;
 		fIsAddMode = isAddMode;
+		fIsSaveTour = isSaveTour;
 
 		setText(isAddMode ? Messages.action_tag_add : Messages.action_tag_remove);
 		setMenuCreator(this);

@@ -35,6 +35,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -281,6 +282,14 @@ public class TourManager {
 	}
 
 	/**
+	 * @return returns the title of this tour
+	 */
+	public static String getTourTitle(final TourData tourData) {
+
+		return getTourDateFull(tourData) + UI.DASH_WITH_SPACE + getTourTimeShort(tourData);
+	}
+
+	/**
 	 * @return returns the detailed title of this tour (displayed as chart title)
 	 */
 	public static String getTourTitleDetailed(final TourData tourData) {
@@ -290,7 +299,7 @@ public class TourManager {
 		return getTourDateFull(tourData) + //
 				" - " //$NON-NLS-1$
 				+ getTourTimeShort(tourData)
-				+ ((tourTitle.length() == 0) ? "" : " - " + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ 
+				+ ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ 
 	}
 
 	/**
@@ -302,6 +311,25 @@ public class TourManager {
 	 *         user prevented to save the editors
 	 */
 	public static boolean saveTourEditors(final ArrayList<TourData> selectedTours) {
+
+		boolean isSaveConfirmed = false;
+
+		final TourDataEditorView tourDataEditor = UI.getTourDataEditor();
+		if (tourDataEditor != null && tourDataEditor.isDirty()) {
+
+			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), //
+					Messages.app_action_dlg_confirm_save_editors_title,
+					Messages.app_action_dlg_confirm_save_editors_message)) {
+
+				isSaveConfirmed = true;
+
+				// save tour in tour data editor
+				tourDataEditor.saveTour();
+
+			} else {
+				return false;
+			}
+		}
 
 		final ArrayList<IEditorPart> openedEditors = UI.getOpenedEditors();
 		final ArrayList<IEditorPart> editorsToBeSaved = new ArrayList<IEditorPart>();
@@ -334,7 +362,7 @@ public class TourManager {
 		// tour editors must be saved when they contain a tour which will be modified
 		if (editorsToBeSaved.size() > 0) {
 
-			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), //
+			if (isSaveConfirmed || MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), //
 					Messages.app_action_dlg_confirm_save_editors_title,
 					Messages.app_action_dlg_confirm_save_editors_message)) {
 
@@ -766,7 +794,7 @@ public class TourManager {
 		ChartDataXSerie xDataDistance = null;
 		if (distanceSerie != null) {
 			xDataDistance = new ChartDataXSerie(distanceSerie);
-			xDataDistance.setLabel(Messages.Tour_Properties_Label_distance);
+			xDataDistance.setLabel(Messages.tour_editor_label_distance);
 			xDataDistance.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 			xDataDistance.setValueDivisor(1000);
 			xDataDistance.setDefaultRGB(new RGB(0, 0, 0));
@@ -776,8 +804,8 @@ public class TourManager {
 		 * time
 		 */
 		final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.timeSerie);
-		xDataTime.setLabel(Messages.Tour_Properties_Label_time);
-		xDataTime.setUnitLabel(Messages.Tour_Properties_Label_time_unit);
+		xDataTime.setLabel(Messages.tour_editor_label_time);
+		xDataTime.setUnitLabel(Messages.tour_editor_abel_time_unit);
 		xDataTime.setDefaultRGB(new RGB(0, 0, 0));
 		xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_SECOND);
 

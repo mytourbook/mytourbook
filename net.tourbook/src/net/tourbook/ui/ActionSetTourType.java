@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -21,85 +21,34 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 public class ActionSetTourType extends Action implements IMenuCreator {
 
-	private Menu			fMenu;
+	private Menu	fMenu;
 
-	private ISelectedTours	fTourProvider;
-
-	private class ActionTourType extends Action {
-
-		private TourType	fTourType;
-
-		public ActionTourType(final TourType tourType) {
-
-			super(tourType.getName(), AS_CHECK_BOX);
-
-			final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
-			setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
-
-			fTourType = tourType;
-		}
-
-		@Override
-		public void run() {
-
-			final Runnable runnable = new Runnable() {
-
-				public void run() {
-
-					// get tours which tour type should be changed
-					final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
-
-					if (selectedTours == null || selectedTours.size() == 0) {
-						return;
-					}
-
-					if (TourManager.saveTourEditors(selectedTours)) {
-
-						// add the tag in all tours (without tours which are opened in an editor)
-						for (final TourData tourData : selectedTours) {
-
-							// set tour type
-							tourData.setTourType(fTourType);
-
-							// save tour with modified tags
-							TourDatabase.saveTour(tourData);
-						}
-
-						TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED,
-								new TourProperties(selectedTours));
-					}
-				}
-			};
-
-			BusyIndicator.showWhile(Display.getCurrent(), runnable);
-		}
-
-	}
+	ISelectedTours	fTourProvider;
+	boolean			fIsSaveTour;
 
 	public ActionSetTourType(final ISelectedTours tourProvider) {
+		this(tourProvider, true);
+	}
+
+	public ActionSetTourType(final ISelectedTours tourProvider, final boolean isSaveTour) {
 
 		super(Messages.App_Action_set_tour_type, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 
 		fTourProvider = tourProvider;
+		fIsSaveTour = isSaveTour;
 	}
 
 	private void addActionToMenu(final Action action) {
@@ -161,7 +110,7 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 						isChecked = true;
 					}
 
-					final ActionTourType actionTourType = new ActionTourType(tourType);
+					final ActionTourType actionTourType = new ActionTourType(tourType, fTourProvider, fIsSaveTour);
 					actionTourType.setChecked(isChecked);
 
 					addActionToMenu(actionTourType);

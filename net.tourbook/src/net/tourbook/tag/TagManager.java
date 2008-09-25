@@ -25,6 +25,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tour.ITourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.ISelectedTours;
@@ -37,7 +38,6 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * @author FC081647
  */
 public class TagManager {
 
@@ -66,6 +66,7 @@ public class TagManager {
 
 	private static ISelectedTours		fTourProvider;
 	private static boolean				fIsAddMode;
+	private static boolean				fIsSaveTour;
 
 	public static class ActionRecentTag extends Action {
 
@@ -73,7 +74,7 @@ public class TagManager {
 
 		@Override
 		public void run() {
-			setTagIntoTour(fTag, fTourProvider, fIsAddMode);
+			setTagIntoTour(fTag, fTourProvider, fIsAddMode, fIsSaveTour);
 		}
 
 		private void setTag(final TourTag tag) {
@@ -106,10 +107,12 @@ public class TagManager {
 	 * Create the menu entries for the recently used tags
 	 * 
 	 * @param menuMgr
+	 * @param isSaveTour
 	 */
 	public static void fillRecentTagsIntoMenu(	final IMenuManager menuMgr,
 												final ISelectedTours tourProvider,
-												final boolean isAddMode) {
+												final boolean isAddMode,
+												final boolean isSaveTour) {
 
 		if (fActionsRecentTags == null) {
 
@@ -126,6 +129,7 @@ public class TagManager {
 
 		fTourProvider = tourProvider;
 		fIsAddMode = isAddMode;
+		fIsSaveTour = isSaveTour;
 
 		// add separator
 		menuMgr.add(new Separator());
@@ -208,7 +212,10 @@ public class TagManager {
 		TourbookPlugin.getDefault().getDialogSettingsSection(SETTINGS_SECTION_RECENT_TAGS).put(SETTINGS_TAG_ID, tagIds);
 	}
 
-	public static void setTagIntoTour(final TourTag tourTag, final ISelectedTours tourProvider, final boolean isAddMode) {
+	public static void setTagIntoTour(	final TourTag tourTag,
+										final ISelectedTours tourProvider,
+										final boolean isAddMode,
+										final boolean isSaveTour) {
 
 		final Runnable runnable = new Runnable() {
 
@@ -221,34 +228,49 @@ public class TagManager {
 					return;
 				}
 
-				if (TourManager.saveTourEditors(selectedTours)) {
+				if (isSaveTour) {
+					if (TourManager.saveTourEditors(selectedTours) == false) {
+						return;
+					}
+				}
 
-					// add the tag in all tours (without tours which are opened in an editor)
-					for (final TourData tourData : selectedTours) {
+				// add the tag in all tours (without tours which are opened in an editor)
+				for (final TourData tourData : selectedTours) {
 
-						// set tag into tour
-						final Set<TourTag> tourTags = tourData.getTourTags();
+					// set tag into tour
+					final Set<TourTag> tourTags = tourData.getTourTags();
 
-						if (isAddMode) {
-							// add tag to the tour
-							tourTags.add(tourTag);
-						} else {
-							// remove tag from tour
-							tourTags.remove(tourTag);
-						}
+					if (isAddMode) {
+						// add tag to the tour
+						tourTags.add(tourTag);
+					} else {
+						// remove tag from tour
+						tourTags.remove(tourTag);
+					}
 
+					if (isSaveTour) {
 						// save tour with modified tags
 						TourDatabase.saveTour(tourData);
 					}
+				}
+
+				if (isSaveTour) {
 
 					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED,
 							new TourProperties(selectedTours));
 
 					TourManager.firePropertyChange(TourManager.TOUR_TAGS_CHANGED, //
 							new ChangedTags(tourTag, selectedTours, isAddMode));
+				} else {
 
-					TagManager.addRecentTag(tourTag);
+					// when tour is not saved notify tour editor
+
+					if (fTourProvider instanceof ITourEditor) {
+						((ITourEditor) fTourProvider).tourIsModified();
+					}
 				}
+
+				TagManager.addRecentTag(tourTag);
 			}
 
 		};

@@ -28,6 +28,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -60,6 +61,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -72,6 +75,7 @@ public class UI {
 //	System.out.println("Execution time : " + (endTime - startTime) + " ms");
 
 	public static final String				EMPTY_STRING					= "";											//$NON-NLS-1$
+	public static final String				DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
 	public static final String				EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
 
 	public static final String				IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";						//$NON-NLS-1$
@@ -107,10 +111,10 @@ public class UI {
 	private static final String				UNIT_FAHRENHEIT_F				= "\u00B0F";									//$NON-NLS-1$
 	private static final String				UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
 	private static final String				UNIT_PACE_MIN_P_MILE			= "min/mi";									//$NON-NLS-1$
-	
-	public static final String				SYMBOL_AVERAGE 					= "\u00D8";									//$NON-NLS-1$
+
+	public static final String				SYMBOL_AVERAGE					= "\u00D8";									//$NON-NLS-1$
 	public static final String				SYMBOL_AVERAGE_WITH_SPACE		= "\u00D8 ";									//$NON-NLS-1$
-	
+
 	public static final float				UNIT_MILE						= 1.609344f;
 	private static final float				UNIT_FOOT						= 0.3048f;
 
@@ -272,6 +276,32 @@ public class UI {
 		}
 
 		return editorParts;
+	}
+
+	/**
+	 * @return Returns the tour data editor or <code>null</code> when the editor is not opened
+	 */
+	public static TourDataEditorView getTourDataEditor() {
+
+		final IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
+
+		for (final IWorkbenchWindow wbWindow : wbWindows) {
+			final IWorkbenchPage[] pages = wbWindow.getPages();
+
+			for (final IWorkbenchPage wbPage : pages) {
+
+				final IViewReference[] viewRefs = wbPage.getViewReferences();
+
+				for (final IViewReference viewRef : viewRefs) {
+					final IViewPart view = viewRef.getView(false);
+					if (view instanceof TourDataEditorView) {
+						return (TourDataEditorView) view;
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**

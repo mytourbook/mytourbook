@@ -2585,6 +2585,9 @@ public class TourData {
 		return startMinute;
 	}
 
+	/**
+	 * @return Returns the month for the tour start in the range 1...12
+	 */
 	public short getStartMonth() {
 		return startMonth;
 	}
@@ -2733,6 +2736,10 @@ public class TourData {
 		return tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
 	}
 
+	/**
+	 * @return Returns the {@link TourType} for the tour or <code>null</code> when tour type is not
+	 *         defined
+	 */
 	public TourType getTourType() {
 		return tourType;
 	}

@@ -214,7 +214,7 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 			menuMgr.add(fActionRemoveTag);
 			menuMgr.add(fActionRemoveAllTags);
 
-			TagManager.fillRecentTagsIntoMenu(menuMgr, this, true);
+			TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
 
 			menuMgr.add(new Separator());
 			menuMgr.add(fActionOpenTagPrefs);

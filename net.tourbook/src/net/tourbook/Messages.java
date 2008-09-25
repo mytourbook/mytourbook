@@ -278,6 +278,8 @@ public class Messages extends NLS {
 
 //	public static String	Image__tag_category_opened;
 	public static String		Image__tag_root;
+	public static String	Image__tour;
+
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
 	public static String		Image__undo_edit;
@@ -523,11 +525,6 @@ public class Messages extends NLS {
 
 	public static String		Tour_Database_update_tour;
 
-	public static String		Tour_Properties_Label_device_name;
-	public static String		Tour_Properties_Label_distance;
-	public static String		Tour_Properties_Label_time;
-	public static String		Tour_Properties_Label_time_unit;
-
 	public static String		Tour_Marker_Column_horizontal_offset;
 	public static String		Tour_Marker_Column_horizontal_offset_tooltip;
 	public static String		Tour_Marker_Column_km_tooltip;
@@ -548,21 +545,7 @@ public class Messages extends NLS {
 	public static String		Tour_Marker_Position_vertical_chart_bottom;
 	public static String		Tour_Marker_Position_vertical_chart_top;
 
-	public static String		Tour_Properties_Label_datapoints;
-	public static String		Tour_Properties_Label_description;
-	public static String		Tour_Properties_Label_driving_time;
-	public static String		Tour_Properties_Label_end_location;
-	public static String		Tour_Properties_Label_recording_time;
-	public static String		Tour_Properties_Label_start_location;
-	public static String		Tour_Properties_Label_start_time;
-	public static String		Tour_Properties_Label_tour_date;
-	public static String		Tour_Properties_Label_tour_tag;
-	public static String		Tour_Properties_Label_tour_title;
-	public static String		Tour_Properties_Label_tour_type;
-	public static String		Tour_Properties_tabLabel_info;
 	public static String		Tour_Properties_tabLabel_time;
-	public static String		Tour_Properties_tabLabel_tour_data;
-
 	public static String		Tour_Segmenter_Label_default_tolerance;
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;
@@ -571,13 +554,51 @@ public class Messages extends NLS {
 	public static String		tag_view_title_tag;
 	public static String		tag_view_title_tag_category;
 
-	public static String	tour_properties_dlg_save_tour_message;
+	public static String	tour_database_version_info_message;
 
-	public static String	tour_properties_dlg_save_tour_title;
+	public static String	tour_database_version_info_title;
 
-	public static String	tour_properties_part_name_is_modified;
+	public static String	tour_editor_abel_time_unit;
 
-	public static String	tour_properties_part_name_tour_editor;
+	public static String	tour_editor_dlg_save_tour_message;
+
+	public static String	tour_editor_dlg_save_tour_title;
+
+	public static String	tour_editor_label_datapoints;
+
+	public static String	tour_editor_label_description;
+
+	public static String	tour_editor_label_device_name;
+
+	public static String	tour_editor_label_distance;
+
+	public static String	tour_editor_label_driving_time;
+
+	public static String	tour_editor_label_end_location;
+
+	public static String	tour_editor_label_recording_time;
+
+	public static String	tour_editor_label_start_location;
+
+	public static String	tour_editor_label_start_time;
+
+	public static String	tour_editor_label_time;
+
+	public static String	tour_editor_label_tour_date;
+
+	public static String	tour_editor_label_tour_tag;
+
+	public static String	tour_editor_label_tour_title;
+
+	public static String	tour_editor_label_tour_type;
+
+	public static String	tour_editor_part_name_is_modified;
+
+	public static String	tour_editor_part_name_tour_editor;
+
+	public static String	tour_editor_tabLabel_info;
+
+	public static String	tour_editor_tabLabel_tour_data;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;
