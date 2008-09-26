@@ -189,19 +189,19 @@ public class CiclotourTextDataReader extends TourbookDevice {
 				final float gradient = Float.parseFloat(tokenizer.nextToken());
 				final int cadence = Integer.parseInt(tokenizer.nextToken());
 
-				// values are recorded absolutely, but we need to get the difference
-				// between the current and the previous data point. Let's compute
-				// the delta
-				distanceDelta = distance - previousDistance;
-				timeDelta = time - previousTime;
-				altDelta = alt - previousAlt;
-
 				final DateFormat df = DateFormat.getTimeInstance(DateFormat.MEDIUM, Locale.GERMAN);
 
 				final Calendar dataCal = Calendar.getInstance();
 
 				dataCal.setTime(df.parse(recTime));
 				time = this.getSeconds(dataCal);
+
+				// values are recorded absolutely, but we need to get the difference
+				// between the current and the previous data point. Let's compute
+				// the delta
+				distanceDelta = distance - previousDistance;
+				timeDelta = time - previousTime;
+				altDelta = alt - previousAlt;
 
 				timeDataList.add(timeData = new TimeData());
 
