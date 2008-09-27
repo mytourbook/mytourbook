@@ -42,28 +42,28 @@ public class ActionEditQuick extends Action {
 	@Override
 	public void run() {
 
-		// get tours which tour type should be changed
+		// get selected tour
 		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
-
 		if (selectedTours == null || selectedTours.size() != 1) {
 			return;
 		}
 
-		if (TourManager.saveTourEditors(selectedTours)) {
+		if (TourManager.saveTourEditors(selectedTours) == false) {
+			return;
+		}
 
-			final QuickEditDialog dialog = new QuickEditDialog(Display.getCurrent().getActiveShell(),
-					selectedTours.get(0));
-			if (dialog.open() == Window.OK) {
+		final QuickEditDialog dialog = new QuickEditDialog(Display.getCurrent().getActiveShell(), selectedTours.get(0));
 
-				// update all tours (without tours from an editor) with the new tour type
-				for (final TourData tourData : selectedTours) {
+		if (dialog.open() == Window.OK) {
 
-					// save the tour
-					TourDatabase.saveTour(tourData);
-				}
+			// update all tours (without tours from an editor) with the new tour type
+			for (final TourData tourData : selectedTours) {
 
-				TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, new TourProperties(selectedTours));
+				// save the tour
+				TourDatabase.saveTour(tourData);
 			}
+
+			TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, new TourProperties(selectedTours));
 		}
 	}
 

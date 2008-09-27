@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -30,9 +30,9 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
- * this is a copy of ControlContribution which will force the height for the toolbar with a image in
- * a push toolitem. this is a really hack but there was no other solution to enlarge the height for
- * a toolbar
+ * !!! This is a copy of ControlContribution which will force the height for the toolbar with a
+ * image in a push toolitem. this is a really hack but there was no other solution to enlarge the
+ * height for a toolbar !!!
  */
 public abstract class CustomControlContribution extends ContributionItem {
 	private Image	image;
@@ -76,6 +76,11 @@ public abstract class CustomControlContribution extends ContributionItem {
 	 */
 	protected abstract Control createControl(Composite parent);
 
+	@Override
+	public void dispose() {
+		image.dispose();
+	}
+
 	/**
 	 * The control item implementation of this <code>IContributionItem</code> method calls the
 	 * <code>createControl</code> framework method. Subclasses must implement
@@ -118,11 +123,6 @@ public abstract class CustomControlContribution extends ContributionItem {
 
 		final ToolItem imageItem = new ToolItem(toolbar, SWT.PUSH);
 		imageItem.setImage(image);
-	}
-
-	@Override
-	public void dispose() {
-		image.dispose();
 	}
 
 }

@@ -40,9 +40,9 @@ import org.eclipse.swt.widgets.Text;
 public class QuickEditDialog extends TitleAreaDialog {
 
 	private Text					fTextTitle;
-	private Text					fTextStartLocation;
-	private Text					fTextEndLocation;
 	private Text					fTextDescription;
+//	private Text					fTextStartLocation;
+//	private Text					fTextEndLocation;
 
 	private TourData				fTourData;
 
@@ -96,9 +96,9 @@ public class QuickEditDialog extends TitleAreaDialog {
 
 		// set field content
 		fTextTitle.setText(fTourData.getTourTitle());
-		fTextStartLocation.setText(fTourData.getTourStartPlace());
-		fTextEndLocation.setText(fTourData.getTourEndPlace());
 		fTextDescription.setText(fTourData.getTourDescription());
+//		fTextStartLocation.setText(fTourData.getTourStartPlace());
+//		fTextEndLocation.setText(fTourData.getTourEndPlace());
 
 		return dlgAreaContainer;
 	}
@@ -131,17 +131,17 @@ public class QuickEditDialog extends TitleAreaDialog {
 				.hint(SWT.DEFAULT, pixelConverter.convertHeightInCharsToPixels(4))
 				.applyTo(fTextDescription);
 
-		// start location
-		label = new Label(container, SWT.NONE);
-		label.setText(Messages.tour_editor_label_start_location);
-		fTextStartLocation = new Text(container, SWT.BORDER);
-		fTextStartLocation.setLayoutData(gd);
-
-		// end location
-		label = new Label(container, SWT.NONE);
-		label.setText(Messages.tour_editor_label_end_location);
-		fTextEndLocation = new Text(container, SWT.BORDER);
-		fTextEndLocation.setLayoutData(gd);
+//		// start location
+//		label = new Label(container, SWT.NONE);
+//		label.setText(Messages.tour_editor_label_start_location);
+//		fTextStartLocation = new Text(container, SWT.BORDER);
+//		fTextStartLocation.setLayoutData(gd);
+//
+//		// end location
+//		label = new Label(container, SWT.NONE);
+//		label.setText(Messages.tour_editor_label_end_location);
+//		fTextEndLocation = new Text(container, SWT.BORDER);
+//		fTextEndLocation.setLayoutData(gd);
 	}
 
 	@Override
@@ -159,8 +159,8 @@ public class QuickEditDialog extends TitleAreaDialog {
 		 */
 		fTourData.setTourTitle(fTextTitle.getText().trim());
 		fTourData.setTourDescription(fTextDescription.getText().trim());
-		fTourData.setTourStartPlace(fTextStartLocation.getText().trim());
-		fTourData.setTourEndPlace(fTextEndLocation.getText().trim());
+//		fTourData.setTourStartPlace(fTextStartLocation.getText().trim());
+//		fTourData.setTourEndPlace(fTextEndLocation.getText().trim());
 
 		super.okPressed();
 	}

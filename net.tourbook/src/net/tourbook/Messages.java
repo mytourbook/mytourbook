@@ -21,9 +21,6 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";						//$NON-NLS-1$
 
-//	public static String		App_Action_set_tour_type_dlg_title;
-//	public static String		App_Action_set_tour_type_dlg_message;
-
 	public static String		dialog_quick_edit_dialog_area_title;
 	public static String		dialog_quick_edit_dialog_save;
 	public static String		dialog_quick_edit_dialog_title;
@@ -40,58 +37,46 @@ public class Messages extends NLS {
 	public static String		App_Action_open_tour_segmenter_tooltip;
 
 	public static String		action_tag_add;
-
 	public static String		action_tag_dlg_rename_message;
 	public static String		action_tag_dlg_rename_title;
-
 	public static String		action_tag_open_tagging_structure;
 	public static String		action_tag_recently_used;
-
 	public static String		action_tag_remove;
-
 	public static String		action_tag_remove_all;
-//	public static String		action_tag_remove_all_dlg_message;
-//
-//	public static String		action_tag_remove_all_dlg_title;
-
 	public static String		action_tag_rename_tag;
 	public static String		action_tag_rename_tag_category;
 	public static String		action_tag_set_all_tag_structures;
-
-//	public static String		action_tag_set_dlg_message;
-//
-//	public static String		action_tag_set_dlg_title;
-
 	public static String		action_tag_set_tag_expand_type;
 
 	public static String		action_tagcategory_dlg_rename_message;
 	public static String		action_tagcategory_dlg_rename_title;
+
 	public static String		action_tagView_flat_hierarchical;
 	public static String		action_tagView_flat_layout;
 
-	public static String	action_tourbook_select_year_month_tours;
+	public static String		action_tourbook_select_year_month_tours;
 
-	public static String	app_action_button_down;
+	public static String		action_tourType_modify_tourTypes;
 
-	public static String	app_action_button_up;
-
+	public static String		app_action_button_down;
+	public static String		app_action_button_up;
 	public static String		app_action_collapse_all_tooltip;
 	public static String		app_action_collapse_others_tooltip;
 	public static String		app_action_dlg_confirm_save_editors_message;
-
 	public static String		app_action_dlg_confirm_save_editors_title;
+	public static String	app_action_dlg_confirm_save_tour_data_editor_message;
 
-	public static String	app_action_edit_rows_tooltip;
+	public static String	app_action_dlg_confirm_save_tour_data_editor_title;
 
+	public static String		app_action_edit_rows_tooltip;
 	public static String		app_action_expand_selection_tooltip;
 	public static String		app_action_expand_type_flat;
 	public static String		app_action_expand_type_year_day;
 	public static String		app_action_expand_type_year_month_day;
 	public static String		app_action_quick_edit;
+	public static String		app_action_save_tour_tooltip;
+	public static String		app_action_undo_modifications_tooltip;
 
-	public static String	app_action_save_tour_tooltip;
-
-	public static String	app_action_undo_modifications_tooltip;
 	public static String		App_Action_set_tour_type;
 
 	public static String		App_measurement_imperial;
@@ -227,7 +212,7 @@ public class Messages extends NLS {
 	public static String		Image__database_placeholder;
 	public static String		Image__delete;
 	public static String		Image__delete_disabled;
-	public static String	Image__edit_row;
+	public static String		Image__edit_row;
 
 	public static String		Image__edit_tour;
 	public static String		Image__edit_tour_disabled;
@@ -278,7 +263,7 @@ public class Messages extends NLS {
 
 //	public static String	Image__tag_category_opened;
 	public static String		Image__tag_root;
-	public static String	Image__tour;
+	public static String		Image__tour;
 
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
@@ -350,33 +335,33 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
 	public static String		Pref_Graphs_Error_value_must_be_integer;
 
-	public static String	Pref_Graphs_force_minimum_value;
+	public static String		Pref_Graphs_force_minimum_value;
 
-	public static String	Pref_Graphs_grid_distance;
+	public static String		Pref_Graphs_grid_distance;
 
-	public static String	Pref_Graphs_grid_horizontal_distance;
+	public static String		Pref_Graphs_grid_horizontal_distance;
 
-	public static String	Pref_Graphs_grid_vertical_distance;
+	public static String		Pref_Graphs_grid_vertical_distance;
 
-	public static String	Pref_Graphs_Group_mouse_mode;
+	public static String		Pref_Graphs_Group_mouse_mode;
 
 	public static String		Pref_Graphs_Group_units_for_xaxis;
 	public static String		Pref_Graphs_Group_zoom_options;
 	public static String		Pref_Graphs_Label_select_graph;
 
-	public static String	Pref_Graphs_Label_select_graph_tooltip;
+	public static String		Pref_Graphs_Label_select_graph_tooltip;
 
-	public static String	Pref_Graphs_move_sliders_when_zoomed;
-	public static String	Pref_Graphs_Radio_mouse_mode_slider;
+	public static String		Pref_Graphs_move_sliders_when_zoomed;
+	public static String		Pref_Graphs_Radio_mouse_mode_slider;
 
-	public static String	Pref_Graphs_Radio_mouse_mode_zoom;
+	public static String		Pref_Graphs_Radio_mouse_mode_zoom;
 
 	public static String		Pref_Graphs_Radio_show_distance;
 	public static String		Pref_Graphs_Radio_show_time;
 	public static String		Pref_Graphs_Tab_default_values;
 	public static String		Pref_Graphs_Tab_graph_defaults;
 
-	public static String	Pref_Graphs_Tab_zoom_options;
+	public static String		Pref_Graphs_Tab_zoom_options;
 	public static String		Pref_Graphs_Text_min_value;
 
 	public static String		Pref_People_Action_add_person;
@@ -400,13 +385,13 @@ public class Messages extends NLS {
 	public static String		Pref_People_Label_weight;
 	public static String		Pref_People_Title;
 
-	public static String	pref_map_layout_symbol;
+	public static String		pref_map_layout_symbol;
 
-	public static String	pref_map_layout_symbol_dot;
+	public static String		pref_map_layout_symbol_dot;
 
-	public static String	pref_map_layout_symbol_line;
+	public static String		pref_map_layout_symbol_line;
 
-	public static String	pref_map_layout_symbol_width;
+	public static String		pref_map_layout_symbol_width;
 
 	public static String		pref_regional_decimalSeparator;
 	public static String		pref_regional_description;
@@ -415,7 +400,7 @@ public class Messages extends NLS {
 	public static String		pref_regional_useCustomDecimalFormat;
 	public static String		pref_regional_value_example;
 
-	public static String	pref_statistic_lbl_info;
+	public static String		pref_statistic_lbl_info;
 
 	public static String		pref_tourtag_btn_new_tag;
 	public static String		pref_tourtag_btn_new_tag_category;
@@ -482,7 +467,7 @@ public class Messages extends NLS {
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
 	public static String		PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
-	public static String	Tour_Action_auto_move_sliders_when_zoomed;
+	public static String		Tour_Action_auto_move_sliders_when_zoomed;
 
 	public static String		Tour_Action_auto_zoom_to_slider_position;
 	public static String		Tour_Action_chart_options_tooltip;
@@ -510,18 +495,18 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Action_delete_selected_tours;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_message;
 
-	public static String	Tour_Book_Action_delete_selected_tours_dlg_message_confirm;
+	public static String		Tour_Book_Action_delete_selected_tours_dlg_message_confirm;
 	public static String		Tour_Book_Action_delete_selected_tours_dlg_title;
 
-	public static String	Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
+	public static String		Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
 
-	public static String	Tour_Book_Action_delete_selected_tours_task;
+	public static String		Tour_Book_Action_delete_selected_tours_task;
 	public static String		Tour_Book_Combo_statistic_tooltip;
 	public static String		Tour_Book_Combo_year_tooltip;
 	public static String		Tour_Book_Label_chart_title;
 
 	public static String		Tour_Database_load_all_tours;
-	public static String	Tour_Database_update_computed_values;
+	public static String		Tour_Database_update_computed_values;
 
 	public static String		Tour_Database_update_tour;
 
@@ -554,51 +539,55 @@ public class Messages extends NLS {
 	public static String		tag_view_title_tag;
 	public static String		tag_view_title_tag_category;
 
-	public static String	tour_database_version_info_message;
+	public static String		tour_database_version_info_message;
 
-	public static String	tour_database_version_info_title;
+	public static String		tour_database_version_info_title;
 
-	public static String	tour_editor_abel_time_unit;
+	public static String		tour_editor_abel_time_unit;
 
-	public static String	tour_editor_dlg_save_tour_message;
+	public static String		tour_editor_dlg_save_tour_message;
 
-	public static String	tour_editor_dlg_save_tour_title;
+	public static String		tour_editor_dlg_save_tour_title;
 
-	public static String	tour_editor_label_datapoints;
+	public static String		tour_editor_label_datapoints;
 
-	public static String	tour_editor_label_description;
+	public static String		tour_editor_label_description;
 
-	public static String	tour_editor_label_device_name;
+	public static String		tour_editor_label_device_name;
 
-	public static String	tour_editor_label_distance;
+	public static String		tour_editor_label_distance;
 
-	public static String	tour_editor_label_driving_time;
+	public static String		tour_editor_label_driving_time;
 
-	public static String	tour_editor_label_end_location;
+	public static String		tour_editor_label_end_location;
 
-	public static String	tour_editor_label_recording_time;
+	public static String		tour_editor_label_recording_time;
 
-	public static String	tour_editor_label_start_location;
+	public static String		tour_editor_label_start_location;
 
-	public static String	tour_editor_label_start_time;
+	public static String		tour_editor_label_start_time;
 
-	public static String	tour_editor_label_time;
+	public static String		tour_editor_label_time;
 
-	public static String	tour_editor_label_tour_date;
+	public static String	tour_editor_label_time_unit;
 
-	public static String	tour_editor_label_tour_tag;
+	public static String		tour_editor_label_tour_date;
 
-	public static String	tour_editor_label_tour_title;
+	public static String	tour_editor_label_tour_distance;
 
-	public static String	tour_editor_label_tour_type;
+	public static String		tour_editor_label_tour_tag;
 
-	public static String	tour_editor_part_name_is_modified;
+	public static String		tour_editor_label_tour_title;
 
-	public static String	tour_editor_part_name_tour_editor;
+	public static String		tour_editor_label_tour_type;
 
-	public static String	tour_editor_tabLabel_info;
+	public static String		tour_editor_part_name_is_modified;
 
-	public static String	tour_editor_tabLabel_tour_data;
+	public static String		tour_editor_part_name_tour_editor;
+
+	public static String		tour_editor_tabLabel_info;
+
+	public static String		tour_editor_tabLabel_tour_data;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;
@@ -664,18 +653,18 @@ public class Messages extends NLS {
 	public static String		tourCatalog_wizard_Page_reference_tour_title;
 	public static String		tourCatalog_wizard_Wizard_title;
 
-	public static String	TourChart_Property_button_compute_values;
+	public static String		TourChart_Property_button_compute_values;
 
-	public static String	TourChart_Property_button_compute_values_tooltip;
+	public static String		TourChart_Property_button_compute_values_tooltip;
 
 	public static String		TourChart_Property_chart_type_bar;
 	public static String		TourChart_Property_chart_type_line;
 	public static String		TourChart_Property_check_customize_pace_clipping;
 	public static String		TourChart_Property_check_customize_value_clipping;
 	public static String		TourChart_Property_check_customize_value_computing;
-	public static String	TourChart_Property_dlg_compute_values_message;
+	public static String		TourChart_Property_dlg_compute_values_message;
 
-	public static String	TourChart_Property_dlg_compute_values_title;
+	public static String		TourChart_Property_dlg_compute_values_title;
 
 	public static String		TourChart_Property_label_chart_type;
 	public static String		TourChart_Property_label_pace_speed;

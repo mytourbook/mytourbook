@@ -318,8 +318,8 @@ public class TourManager {
 		if (tourDataEditor != null && tourDataEditor.isDirty()) {
 
 			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), //
-					Messages.app_action_dlg_confirm_save_editors_title,
-					Messages.app_action_dlg_confirm_save_editors_message)) {
+					Messages.app_action_dlg_confirm_save_tour_data_editor_title,
+					Messages.app_action_dlg_confirm_save_tour_data_editor_message)) {
 
 				isSaveConfirmed = true;
 
@@ -805,7 +805,7 @@ public class TourManager {
 		 */
 		final ChartDataXSerie xDataTime = new ChartDataXSerie(tourData.timeSerie);
 		xDataTime.setLabel(Messages.tour_editor_label_time);
-		xDataTime.setUnitLabel(Messages.tour_editor_abel_time_unit);
+		xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
 		xDataTime.setDefaultRGB(new RGB(0, 0, 0));
 		xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_SECOND);
 

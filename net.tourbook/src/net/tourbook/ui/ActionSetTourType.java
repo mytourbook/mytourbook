@@ -25,6 +25,7 @@ import net.tourbook.database.TourDatabase;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
@@ -37,6 +38,38 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 
 	ISelectedTours	fTourProvider;
 	boolean			fIsSaveTour;
+
+	public static void fillMenu(final IMenuManager menuMgr, final ISelectedTours tourProvider, final boolean isSaveTour) {
+
+		// get tours which tour type should be changed
+		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+		if (selectedTours == null) {
+			return;
+		}
+
+		// get tour type which will be checked in the menu
+		TourType checkedTourType = null;
+		if (selectedTours.size() == 1) {
+			checkedTourType = selectedTours.get(0).getTourType();
+		}
+
+		// add all tour types to the menu
+		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+
+		for (final TourType tourType : tourTypes) {
+
+			boolean isChecked = false;
+
+			if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
+				isChecked = true;
+			}
+
+			final ActionTourType actionTourType = new ActionTourType(tourType, tourProvider, isSaveTour);
+			actionTourType.setChecked(isChecked);
+
+			menuMgr.add(actionTourType);
+		}
+	}
 
 	public ActionSetTourType(final ISelectedTours tourProvider) {
 		this(tourProvider, true);
@@ -51,16 +84,48 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 		fIsSaveTour = isSaveTour;
 	}
 
-	private void addActionToMenu(final Action action) {
+	private void addActionToMenu(final Action action, final Menu menu) {
 
 		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(fMenu, -1);
+		item.fill(menu, -1);
 	}
 
 	public void dispose() {
 		if (fMenu != null) {
 			fMenu.dispose();
 			fMenu = null;
+		}
+	}
+
+	private void fillMenu(final Menu menu) {
+
+		// get tours which tour type should be changed
+		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+		if (selectedTours == null) {
+			return;
+		}
+
+		// get tour type which will be checked in the menu
+		TourType checkedTourType = null;
+		if (selectedTours.size() == 1) {
+			checkedTourType = selectedTours.get(0).getTourType();
+		}
+
+		// add all tour types to the menu
+		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+
+		for (final TourType tourType : tourTypes) {
+
+			boolean isChecked = false;
+
+			if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
+				isChecked = true;
+			}
+
+			final ActionTourType actionTourType = new ActionTourType(tourType, fTourProvider, fIsSaveTour);
+			actionTourType.setChecked(isChecked);
+
+			addActionToMenu(actionTourType, menu);
 		}
 	}
 
@@ -86,35 +151,7 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 					item.dispose();
 				}
 
-				// get tours which tour type should be changed
-				final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
-
-				if (selectedTours == null) {
-					return;
-				}
-
-				// get tour type which will be checked in the menu
-				TourType checkedTourType = null;
-				if (selectedTours.size() == 1) {
-					checkedTourType = selectedTours.get(0).getTourType();
-				}
-
-				// add all tour types to the menu
-				final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
-
-				for (final TourType tourType : tourTypes) {
-
-					boolean isChecked = false;
-
-					if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
-						isChecked = true;
-					}
-
-					final ActionTourType actionTourType = new ActionTourType(tourType, fTourProvider, fIsSaveTour);
-					actionTourType.setChecked(isChecked);
-
-					addActionToMenu(actionTourType);
-				}
+				fillMenu(fMenu);
 			}
 		});
 

@@ -141,6 +141,10 @@ public class UI {
 	public static final float				UNIT_FAHRENHEIT_ADD				= 32;
 
 	public static final String				UNIT_LABEL_TIME					= "h";											//$NON-NLS-1$
+	
+	/**
+	 * contains the unit label in the currenty measurement system for the distance values
+	 */
 	public static String					UNIT_LABEL_DISTANCE;
 	public static String					UNIT_LABEL_ALTITUDE;
 	public static String					UNIT_LABEL_ALTIMETER;

@@ -116,12 +116,12 @@
             name="%preference_page_Graphs"/>
       <page
             class="net.tourbook.preferences.PrefPageTourTypeFilterList"
-            id="net.tourbook.preferences.PrefPageTourTypes"
+            id="net.tourbook.preferences.PrefPageTourTypeFilter"
             name="%preference_page_tour_type_root"/>
       <page
-            category="net.tourbook.preferences.PrefPageTourTypes"
+            category="net.tourbook.preferences.PrefPageTourTypeFilter"
             class="net.tourbook.preferences.PrefPageTourTypes"
-            id="net.tourbook.preferences.PrefPageTourTypes"
+            id="net.tourbook.preferences.PrefPageTourTypeDefinition"
             name="%preference_page_tour_types"/>
 
       <page
