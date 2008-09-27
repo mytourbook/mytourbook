@@ -102,7 +102,8 @@ public class TourData {
 	private short					startWeek;
 
 	/**
-	 * tttt (h) total distance at tour start (km)
+	 * total distance of the device at tour start (km) tttt (h), the distance for the tour provides
+	 * the field tourDistance
 	 */
 	private int						startDistance;
 
@@ -153,9 +154,9 @@ public class TourData {
 	private int						deviceTotalUp;
 
 	private int						deviceTotalDown;
-	
+
 	/**
-	 * total distance (m)
+	 * total distance of the tour (m), this value is computed from the distance data serie
 	 */
 	private int						tourDistance;
 
@@ -490,6 +491,7 @@ public class TourData {
 	 */
 	@Transient
 	public boolean					isTourDeleted					= false;
+
 	public TourData() {}
 
 	/**
@@ -1646,6 +1648,7 @@ public class TourData {
 		int timeIndex = 0;
 
 		int recordingTime = 0; // time in seconds
+		
 		int altitudeAbsolute = 0;
 		int distanceAbsolute = 0;
 
@@ -3118,6 +3121,11 @@ public class TourData {
 		this.startDay = startDay;
 	}
 
+	/**
+	 * Set the distance at tour start, this is the distance which the device has accumulated
+	 * 
+	 * @param startDistance
+	 */
 	public void setStartDistance(final int startDistance) {
 		this.startDistance = startDistance;
 	}
