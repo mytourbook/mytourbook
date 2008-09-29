@@ -330,12 +330,14 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					// update modified tours
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
-
-					fTourViewer.update(modifiedTours.toArray(), null);
+					if (modifiedTours != null) {
+						fTourViewer.update(modifiedTours.toArray(), null);
+					}
 
 				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
 

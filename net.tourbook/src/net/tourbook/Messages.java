@@ -385,6 +385,14 @@ public class Messages extends NLS {
 	public static String		Pref_People_Label_weight;
 	public static String		Pref_People_Title;
 
+	public static String	pref_general_confirmation_tourdata_editor_undo;
+
+	public static String	pref_general_confirmations;
+
+	public static String	pref_general_restart_app_message;
+
+	public static String	pref_general_restart_app_title;
+
 	public static String		pref_map_layout_symbol;
 
 	public static String		pref_map_layout_symbol_dot;
@@ -545,9 +553,23 @@ public class Messages extends NLS {
 
 	public static String		tour_editor_abel_time_unit;
 
+	public static String	tour_editor_dlg_discard_tour_message;
+
+	public static String	tour_editor_dlg_discard_tour_title;
+
+	public static String	tour_editor_dlg_revert_tour_message;
+
+	public static String	tour_editor_dlg_revert_tour_title;
+
+	public static String	tour_editor_dlg_revert_tour_toggle_message;
+
+	public static String	tour_editor_dlg_save_invalid_tour;
+
 	public static String		tour_editor_dlg_save_tour_message;
 
 	public static String		tour_editor_dlg_save_tour_title;
+
+	public static String	tour_editor_error_invalid_floating_value;
 
 	public static String		tour_editor_label_datapoints;
 

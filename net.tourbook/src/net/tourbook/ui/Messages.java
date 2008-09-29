@@ -142,6 +142,18 @@ public class Messages extends NLS {
 
 	public static String		Image_configure_columns;
 
+	public static String	MessageManager_pErrorSummary;
+
+	public static String	MessageManager_pMessageSummary;
+
+	public static String	MessageManager_pWarningSummary;
+
+	public static String	MessageManager_sErrorSummary;
+
+	public static String	MessageManager_sMessageSummary;
+
+	public static String	MessageManager_sWarningSummary;
+
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

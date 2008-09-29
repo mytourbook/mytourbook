@@ -22,7 +22,6 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.ITourEditor;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -82,15 +81,14 @@ class ActionTourType extends Action {
 
 				if (fIsSaveTour) {
 
-					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED,
-							new TourProperties(selectedTours));
+					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
 
 				} else {
 
 					// don't fire changes when the tour is not saved
 
 					if (fTourProvider instanceof ITourEditor) {
-						((ITourEditor) fTourProvider).tourIsModified();
+						((ITourEditor) fTourProvider).setTourIsModified();
 					}
 				}
 			}

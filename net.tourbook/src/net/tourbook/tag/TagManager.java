@@ -27,7 +27,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.ITourEditor;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.ISelectedTours;
 
 import org.eclipse.jface.action.Action;
@@ -256,8 +255,7 @@ public class TagManager {
 
 				if (isSaveTour) {
 
-					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED,
-							new TourProperties(selectedTours));
+					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
 
 					TourManager.firePropertyChange(TourManager.TOUR_TAGS_CHANGED, //
 							new ChangedTags(tourTag, selectedTours, isAddMode));
@@ -266,7 +264,7 @@ public class TagManager {
 					// when tour is not saved notify tour editor
 
 					if (fTourProvider instanceof ITourEditor) {
-						((ITourEditor) fTourProvider).tourIsModified();
+						((ITourEditor) fTourProvider).setTourIsModified();
 					}
 				}
 

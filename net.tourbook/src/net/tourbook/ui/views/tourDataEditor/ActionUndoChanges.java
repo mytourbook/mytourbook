@@ -25,13 +25,13 @@ class ActionUndoChanges extends Action {
 	/**
 	 * 
 	 */
-	private final TourDataEditorView	fTourPropertiesView;
+	private final TourDataEditorView	fTourDataEditor;
 
 	public ActionUndoChanges(final TourDataEditorView tourPropertiesView) {
 
 		super(null, AS_PUSH_BUTTON);
 		
-		fTourPropertiesView = tourPropertiesView;
+		fTourDataEditor = tourPropertiesView;
 
 		setToolTipText(Messages.app_action_undo_modifications_tooltip);
 
@@ -43,6 +43,6 @@ class ActionUndoChanges extends Action {
 
 	@Override
 	public void run() {
-		fTourPropertiesView.actionUndoChanges();
+		fTourDataEditor.actionUndoChanges();
 	}
 }

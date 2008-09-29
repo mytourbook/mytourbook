@@ -63,7 +63,7 @@ public class ActionEditQuick extends Action {
 				TourDatabase.saveTour(tourData);
 			}
 
-			TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, new TourProperties(selectedTours));
+			TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
 		}
 	}
 

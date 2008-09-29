@@ -370,11 +370,13 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+				
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
-
-					updateTourViewer(fRootItem, modifiedTours);
+					if (modifiedTours != null) {
+						updateTourViewer(fRootItem, modifiedTours);
+					}
 
 				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
 

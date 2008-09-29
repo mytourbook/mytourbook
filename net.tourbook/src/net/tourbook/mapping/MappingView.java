@@ -494,20 +494,24 @@ public class MappingView extends ViewPart {
 						return;
 					}
 
-					// get modified tours
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
-					final long mapTourId = fTourData.getTourId();
+					if (modifiedTours != null) {
 
-					// update tour in map
-					for (final TourData tourData : modifiedTours) {
-						if (tourData.getTourId() == mapTourId) {
+						// get modified tours
 
-							// keep changed data
-							fTourData = tourData;
+						final long mapTourId = fTourData.getTourId();
 
-							resetMap();
+						// update tour in map
+						for (final TourData tourData : modifiedTours) {
+							if (tourData.getTourId() == mapTourId) {
 
-							return;
+								// keep changed data
+								fTourData = tourData;
+
+								resetMap();
+
+								return;
+							}
 						}
 					}
 

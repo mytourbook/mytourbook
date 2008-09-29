@@ -405,11 +405,12 @@ public class TaggingView extends ViewPart implements ISelectedTours, ITourViewer
 
 					reloadViewer();
 
-				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
-
-					updateViewerAfterTourIsModified(fRootItem, modifiedTours);
+					if (modifiedTours != null) {
+						updateViewerAfterTourIsModified(fRootItem, modifiedTours);
+					}
 				}
 			}
 		};

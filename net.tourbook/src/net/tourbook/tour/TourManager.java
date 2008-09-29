@@ -207,7 +207,12 @@ public class TourManager {
 		return chartConfig;
 	}
 
+	public static void firePropertyChange(final int propertyId, final ArrayList<TourData> selectedTours) {
+		firePropertyChange(propertyId, new TourProperties(selectedTours));
+	}
+
 	public static void firePropertyChange(final int propertyId, final Object propertyData) {
+
 		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (final Object listener : allListeners) {
 			((ITourPropertyListener) listener).propertyChanged(null, propertyId, propertyData);
@@ -215,6 +220,7 @@ public class TourManager {
 	}
 
 	public static void firePropertyChange(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+
 		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (final Object listener : allListeners) {
 			((ITourPropertyListener) listener).propertyChanged(part, propertyId, propertyData);
@@ -303,12 +309,13 @@ public class TourManager {
 	}
 
 	/**
-	 * Check if the selected tours are opened in an editor
+	 * Save tours which are modified and opened in a tour editor.<br>
+	 * Every editor which saves a tour will fire a modify event
 	 * 
 	 * @param selectedTours
-	 *            contains the tours which will be checked
+	 *            contains the tours which will be saved when modified
 	 * @return Returns <code>true</code> when the tours are saved or <code>false</code> when the
-	 *         user prevented to save the editors
+	 *         user prevented to save the tours or the tour is invalid
 	 */
 	public static boolean saveTourEditors(final ArrayList<TourData> selectedTours) {
 
@@ -324,12 +331,19 @@ public class TourManager {
 				isSaveConfirmed = true;
 
 				// save tour in tour data editor
-				tourDataEditor.saveTour();
+
+				if (tourDataEditor.saveTourData() == false) {
+					return false;
+				}
 
 			} else {
 				return false;
 			}
 		}
+
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// don't resave the tour in the tour data editor in the editor part 
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		final ArrayList<IEditorPart> openedEditors = UI.getOpenedEditors();
 		final ArrayList<IEditorPart> editorsToBeSaved = new ArrayList<IEditorPart>();

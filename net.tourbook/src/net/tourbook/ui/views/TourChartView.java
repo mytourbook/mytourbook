@@ -277,7 +277,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 					fTourChart.updateTourChart(true, true);
 
-				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					if (fTourData == null) {
 						return;
@@ -285,18 +285,21 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 					// get modified tours
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
-					final long chartTourId = fTourData.getTourId();
+					if (modifiedTours != null) {
 
-					// update modified tour in the chart
-					for (final TourData tourData : modifiedTours) {
-						if (tourData.getTourId() == chartTourId) {
+						final long chartTourId = fTourData.getTourId();
 
-							// keep changed data
-							fTourData = tourData;
+						// update modified tour in the chart
+						for (final TourData tourData : modifiedTours) {
+							if (tourData.getTourId() == chartTourId) {
 
-							updateChart(tourData);
+								// keep changed data
+								fTourData = tourData;
 
-							return;
+								updateChart(tourData);
+
+								return;
+							}
 						}
 					}
 				}

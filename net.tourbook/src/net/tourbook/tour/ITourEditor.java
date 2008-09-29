@@ -17,6 +17,6 @@ package net.tourbook.tour;
 
 public interface ITourEditor {
 
-	void tourIsModified();
+	void setTourIsModified();
 
 }

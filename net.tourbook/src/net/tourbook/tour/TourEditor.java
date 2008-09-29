@@ -350,7 +350,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 		modifiedTour.add(fTourData);
 
-		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, new TourProperties(modifiedTour));
+		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
 	}
 
 	@Override
