@@ -97,25 +97,26 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
-					final TourProperties tourProperties = (TourProperties) propertyData;
-
 					// check if a tour was modified
-					final ArrayList<TourData> modifiedTours = tourProperties.modifiedTours;
-					for (final TourData modifiedTourData : modifiedTours) {
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
+					if (modifiedTours != null) {
 
-						final long modifiedTourId = modifiedTourData.getTourId();
+						for (final TourData modifiedTourData : modifiedTours) {
 
-						final long[] tourIds = fTourDayData.fTourIds;
-						for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
+							final long modifiedTourId = modifiedTourData.getTourId();
 
-							final long tourId = tourIds[tourIdIndex];
+							final long[] tourIds = fTourDayData.fTourIds;
+							for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
 
-							if (tourId == modifiedTourId) {
+								final long tourId = tourIds[tourIdIndex];
 
-								// set new tour title
-								fTourDayData.tourTitle.set(tourIdIndex, modifiedTourData.getTourTitle());
+								if (tourId == modifiedTourId) {
 
-								break;
+									// set new tour title
+									fTourDayData.tourTitle.set(tourIdIndex, modifiedTourData.getTourTitle());
+
+									break;
+								}
 							}
 						}
 					}
