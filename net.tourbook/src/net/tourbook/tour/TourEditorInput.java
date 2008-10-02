@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.ui.UI;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IMemento;
@@ -30,7 +32,7 @@ import org.eclipse.ui.IPersistableElement;
 public class TourEditorInput implements IEditorInput, IPersistableElement {
 
 	private long	fTourId;
-	String			fEditorTitle;
+	String			fEditorTitle	= UI.EMPTY_STRING;
 
 	public TourEditorInput(final long tourId) {
 		fTourId = tourId;

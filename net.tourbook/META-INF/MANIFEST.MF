@@ -22,7 +22,9 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.rxtx,
  de.byteholder.geoclipse,
  de.byteholder.gpx,
- org.aspencloud.cdatetime
+ org.eclipse.core.databinding;bundle-version="1.1.0",
+ com.ibm.icu;bundle-version="3.8.1",
+ net.tourbook.ext.datetime;bundle-version="1.7.0"
 Eclipse-RegisterBuddy: net.tourbook.ext.ejb3
 Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
  net.tourbook.colors;uses:="net.tourbook.mapping,org.eclipse.swt.graphics",

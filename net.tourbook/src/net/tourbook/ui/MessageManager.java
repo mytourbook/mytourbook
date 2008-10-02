@@ -69,16 +69,16 @@ public class MessageManager implements IMessageManager {
 																						.getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
 
 	private static final String[]				SINGLE_MESSAGE_SUMMARY_KEYS		= {
-			Messages.MessageManager_sMessageSummary,
-			Messages.MessageManager_sMessageSummary,
-			Messages.MessageManager_sWarningSummary,
-			Messages.MessageManager_sErrorSummary								};
+			Messages.message_manager_sMessageSummary,
+			Messages.message_manager_sMessageSummary,
+			Messages.message_manager_sWarningSummary,
+			Messages.message_manager_sErrorSummary								};
 
 	private static final String[]				MULTIPLE_MESSAGE_SUMMARY_KEYS	= {
-			Messages.MessageManager_pMessageSummary,
-			Messages.MessageManager_pMessageSummary,
-			Messages.MessageManager_pWarningSummary,
-			Messages.MessageManager_pErrorSummary								};
+			Messages.message_manager_pMessageSummary,
+			Messages.message_manager_pMessageSummary,
+			Messages.message_manager_pWarningSummary,
+			Messages.message_manager_pErrorSummary								};
 
 	class ControlDecorator {
 		private ControlDecoration	decoration;

@@ -65,8 +65,9 @@ public class TourData {
 
 	@Transient
 	public static final float		MAX_BIKE_SPEED					= 120f;
+
 	/**
-	 * Unique persistence id which identifies the tour
+	 * persistence unique id which identifies the tour
 	 */
 	@Id
 	private Long					tourId;
@@ -102,7 +103,7 @@ public class TourData {
 	private short					startWeek;
 
 	/**
-	 * total distance of the device at tour start (km) tttt (h), the distance for the tour provides
+	 * total distance of the device at tour start (km) tttt (h), the distance for the tour is stored
 	 * the field tourDistance
 	 */
 	private int						startDistance;
@@ -151,8 +152,8 @@ public class TourData {
 	private int						deviceWheel;
 
 	private int						deviceWeight;
-	private int						deviceTotalUp;
 
+	private int						deviceTotalUp;
 	private int						deviceTotalDown;
 
 	/**
@@ -1648,7 +1649,7 @@ public class TourData {
 		int timeIndex = 0;
 
 		int recordingTime = 0; // time in seconds
-		
+
 		int altitudeAbsolute = 0;
 		int distanceAbsolute = 0;
 
@@ -3087,30 +3088,6 @@ public class TourData {
 
 	public void setDpTolerance(final short dpTolerance) {
 		this.dpTolerance = dpTolerance;
-	}
-
-	/**
-	 * @param maxAltitude
-	 *            the maxAltitude to set
-	 */
-	public void setMaxAltitude(final int maxAltitude) {
-		this.maxAltitude = maxAltitude;
-	}
-
-	/**
-	 * @param maxPulse
-	 *            the maxPulse to set
-	 */
-	public void setMaxPulse(final int maxPulse) {
-		this.maxPulse = maxPulse;
-	}
-
-	/**
-	 * @param maxSpeed
-	 *            the maxSpeed to set
-	 */
-	public void setMaxSpeed(final float maxSpeed) {
-		this.maxSpeed = maxSpeed;
 	}
 
 	public void setStartAltitude(final short startAltitude) {

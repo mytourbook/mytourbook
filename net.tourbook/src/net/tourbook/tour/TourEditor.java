@@ -469,6 +469,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			final String tourTitle = TourManager.getTourDateShort(fTourData);
 
 			fEditorInput.fEditorTitle = tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
+			
 			setPartName(tourTitle);
 			setTitleToolTip("title tooltip ???"); //$NON-NLS-1$
 		}

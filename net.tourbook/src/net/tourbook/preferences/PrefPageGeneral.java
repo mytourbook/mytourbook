@@ -19,7 +19,6 @@ import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -39,7 +38,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 	private boolean				fShowMeasurementSystemInUI;
 	private BooleanFieldEditor	fEditShowMeasurementInUI;
-	private BooleanFieldEditor	fEditorConfirmUndo;
+
+//	private BooleanFieldEditor	fEditorConfirmUndo;
 
 	@Override
 	protected void createFieldEditors() {
@@ -55,23 +55,11 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	private void createUIConfirmations(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.pref_general_confirmations);
+		group.setText(Messages.pref_general_confirmation);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 
-		final IPreferenceStore prefStore = getPreferenceStore();
-
-		/*
-		 * set boolean value for the boolean field
-		 */
-		final String confirmUndo = prefStore.getString(ITourbookPreferences.TOUR_DATA_EDITOR_UNDO_CONFIRMATION);
-		if (confirmUndo.equals(MessageDialogWithToggle.ALWAYS)) {
-			prefStore.setValue(ITourbookPreferences.TOUR_DATA_EDITOR_UNDO_CONFIRMATION_BOOLEAN, true);
-		} else {
-			prefStore.setValue(ITourbookPreferences.TOUR_DATA_EDITOR_UNDO_CONFIRMATION_BOOLEAN, false);
-		}
-
 		// checkbox: confirm undo in tour editor
-		addField(fEditorConfirmUndo = new BooleanFieldEditor(ITourbookPreferences.TOUR_DATA_EDITOR_UNDO_CONFIRMATION_BOOLEAN,
+		addField(new BooleanFieldEditor(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR,
 				Messages.pref_general_confirmation_tourdata_editor_undo,
 				group));
 
@@ -150,18 +138,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	@Override
 	public boolean performOk() {
 
-		final IPreferenceStore prefStore = getPreferenceStore();
-
-		/*
-		 * set confirm value into the pref store from the boolean field editor
-		 */
-		prefStore.setValue(ITourbookPreferences.TOUR_DATA_EDITOR_UNDO_CONFIRMATION,
-				fEditorConfirmUndo.getBooleanValue() ? //
-						MessageDialogWithToggle.ALWAYS
-						: MessageDialogWithToggle.NEVER);
-
 		final boolean isOK = super.performOk();
-
 		if (isOK) {
 
 			// fire one event for all modified measurement values

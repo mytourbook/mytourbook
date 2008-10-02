@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,12 +15,14 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import net.tourbook.ui.UI;
+
 public interface ITourbookPreferences {
 
 	/*
 	 * dummy field used by field editors so they don't assert
 	 */
-	public static final String	DUMMY_FIELD									= "";														//$NON-NLS-1$
+	public static final String	DUMMY_FIELD									= UI.EMPTY_STRING;											//$NON-NLS-1$
 
 	/*
 	 * statistic provider
@@ -154,7 +156,6 @@ public interface ITourbookPreferences {
 	/*
 	 * tour data editor
 	 */
-	public static final String	TOUR_DATA_EDITOR_UNDO_CONFIRMATION			= "tourdata.editor.undo-confirmation";						//$NON-NLS-1$
-	public static final String	TOUR_DATA_EDITOR_UNDO_CONFIRMATION_BOOLEAN	= "tourdata.editor.undo-confirmation-boolean";				//$NON-NLS-1$
+	public static final String	TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR	= "tourdata.editor.confirmation-revert-tour";				//$NON-NLS-1$
 
 }
