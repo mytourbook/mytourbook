@@ -105,10 +105,12 @@ public class MappingView extends ViewPart {
 	private static final String						MEMENTO_SHOW_SLIDER_IN_MAP			= "action.show-slider-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_SLIDER_IN_LEGEND		= "action.show-slider-in-legend";			//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_LEGEND_IN_MAP			= "action.show-legend-in-map";				//$NON-NLS-1$
-	private static final String						MEMENTO_ZOOM_CENTERED				= "action.zoom-centered";					//$NON-NLS-1$
 	private static final String						MEMENTO_SHOW_TOUR_IN_MAP			= "action.show-tour-in-map";				//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_WITH_SELECTED_TOUR	= "action.synch-with-selected-tour";		//$NON-NLS-1$
 	private static final String						MEMENTO_SYNCH_WITH_TOURCHART_SLIDER	= "action.synch-with-tourchart-slider";	//$NON-NLS-1$
+	private static final String						MEMENTO_ZOOM_CENTERED				= "action.zoom-centered";					//$NON-NLS-1$
+	private static final String						MEMENTO_MAP_DIM_LEVEL				= "action.map-dim-level";					//$NON-NLS-1$
+
 	private static final String						MEMENTO_SYNCH_TOUR_ZOOM_LEVEL		= "synch-tour-zoom-level";					//$NON-NLS-1$
 	private static final String						MEMENTO_CURRENT_FACTORY_ID			= "current.factory-id";					//$NON-NLS-1$
 
@@ -137,6 +139,7 @@ public class MappingView extends ViewPart {
 	private TourData								fTourData;
 	private TourData								fPreviousTourData;
 
+	private ActionDimMap							fActionDimMap;
 	private ActionReloadFailedMapImages				fActionReloadFailedMapImages;
 	private ActionResetTileOverlays					fActionResetTileOverlays;
 	private ActionSelectMapProvider					fActionSelectMapProvider;
@@ -197,7 +200,18 @@ public class MappingView extends ViewPart {
 
 	private ArrayList<TourData>						fTourDataList;
 
+	private int										fMapDimLevel;
+
 	public MappingView() {}
+
+	void actionDimMap(final int dimLevel) {
+
+		// check if the dim level was changed 
+		if (fMapDimLevel != dimLevel) {
+			fMapDimLevel = dimLevel;
+			fMap.dimMap(dimLevel);
+		}
+	}
 
 	void actionOpenMapProviderDialog() {
 
@@ -208,7 +222,7 @@ public class MappingView extends ViewPart {
 		}
 	}
 
-	public void actionReloadFailedMapImages() {
+	void actionReloadFailedMapImages() {
 		fMap.reload();
 	}
 
@@ -610,6 +624,7 @@ public class MappingView extends ViewPart {
 		fActionShowTourMarker = new ActionShowTourMarker(this);
 		fActionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
 		fActionResetTileOverlays = new ActionResetTileOverlays(this);
+		fActionDimMap = new ActionDimMap(this);
 
 		/*
 		 * fill view toolbar
@@ -644,6 +659,7 @@ public class MappingView extends ViewPart {
 		menuMgr.add(fActionShowLegendInMap);
 		menuMgr.add(fActionShowSliderInMap);
 		menuMgr.add(fActionShowSliderInLegend);
+		menuMgr.add(fActionDimMap);
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionSetDefaultPosition);
 		menuMgr.add(fActionSaveDefaultPosition);
@@ -862,6 +878,10 @@ public class MappingView extends ViewPart {
 
 	public Map getMap() {
 		return fMap;
+	}
+
+	public int getMapDimLevel() {
+		return fMapDimLevel;
 	}
 
 	private Rectangle2D getPositionRect(final Set<GeoPosition> positions, final int zoom) {
@@ -1379,6 +1399,12 @@ public class MappingView extends ViewPart {
 				fActionSynchTourZoomLevel.setZoomLevel(zoomLevel);
 			}
 
+			final Integer mementoDimLevel = memento.getInteger(MEMENTO_MAP_DIM_LEVEL);
+			if (mementoDimLevel != null) {
+				fMapDimLevel = mementoDimLevel;
+				fActionDimMap.setDimLevel(mementoDimLevel);
+			}
+
 			// action: show start/end in map
 			final Integer mementoShowStartEndInMap = memento.getInteger(MEMENTO_SHOW_START_END_IN_MAP);
 			if (mementoShowStartEndInMap != null) {
@@ -1411,7 +1437,7 @@ public class MappingView extends ViewPart {
 				fActionShowSliderInLegend.setChecked(mementoShowSliderInLegend == 1);
 			}
 
-			// restore: factory ID
+			// restore map factory by selecting the last used map factory
 			fActionSelectMapProvider.setSelectedFactory(memento.getString(MEMENTO_CURRENT_FACTORY_ID));
 
 			// restore: default position
@@ -1488,6 +1514,9 @@ public class MappingView extends ViewPart {
 		final boolean isShowTileInfo = store.getBoolean(MappingView.SHOW_TILE_INFO);
 		fMap.setDrawTileBorders(isShowTileInfo);
 
+		// set dim level after the map providers are set
+		fMap.setDimLevel(fMapDimLevel);
+
 		// show map with the default position
 		actionSetDefaultPosition();
 	}
@@ -1506,6 +1535,7 @@ public class MappingView extends ViewPart {
 		memento.putInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR, fActionSynchWithTour.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, fActionSynchWithSlider.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, fActionSynchTourZoomLevel.getZoomLevel());
+		memento.putInteger(MEMENTO_MAP_DIM_LEVEL, fActionDimMap.getDimLevel());
 
 		memento.putInteger(MEMENTO_SHOW_START_END_IN_MAP, fActionShowStartEndInMap.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SHOW_TOUR_MARKER, fActionShowTourMarker.isChecked() ? 1 : 0);

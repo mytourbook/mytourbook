@@ -105,6 +105,14 @@ public abstract class TourbookStatistic {
 		return fContainer;
 	}
 
+	/**
+	 * @return When a tour can be selected in the statistic, this will return the tour Id of the
+	 *         selected tour or <code>null</code> otherwise.
+	 */
+	public Long getSelectedTour() {
+		return null;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

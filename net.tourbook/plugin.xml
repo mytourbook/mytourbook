@@ -114,6 +114,12 @@
             class="net.tourbook.preferences.PrefPageTourChart"
             id="net.tourbook.preferences.PrefPageChartGraphs"
             name="%preference_page_Graphs"/>
+            
+      <page
+            class="net.tourbook.preferences.PrefPageTourEditor"
+            id="net.tourbook.preferences.PrefPageTourEditor"
+            name="%preference_page_tourEditor"/>
+
       <page
             class="net.tourbook.preferences.PrefPageTourTypeFilterList"
             id="net.tourbook.preferences.PrefPageTourTypeFilter"

@@ -81,6 +81,18 @@ public class Messages extends NLS {
 	public static String		legendcolor_dialog_txt_min_value;
 
 	public static String		map_action_change_tile_factory_tooltip;
+
+	public static String	map_action_dim_map;
+
+	public static String	map_action_dim_map_0;
+
+	public static String	map_action_dim_map_100;
+
+	public static String	map_action_dim_map_25;
+
+	public static String	map_action_dim_map_50;
+
+	public static String	map_action_dim_map_75;
 	public static String		map_action_modify_map_provider;
 
 	public static String	map_action_reload_map;

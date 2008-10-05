@@ -36,6 +36,8 @@ import de.byteholder.geoclipse.swt.Map;
 
 public class ActionSelectMapProvider extends Action implements IMenuCreator {
 
+	private static final String							TOOLTIP_DASH		= " - ";
+
 	private static final String							TOGGLE_MARKER		= " (x)";						//$NON-NLS-1$
 
 	private static final String							DEFAULT_FACTORY_ID	= "osm";
@@ -215,7 +217,8 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 
 		// update tooltip, show selected map provider
 		setToolTipText(newMapProvider.getInfo().getFactoryName()
-				+ " - " + Messages.map_action_change_tile_factory_tooltip); //$NON-NLS-1$
+				+ TOOLTIP_DASH
+				+ Messages.map_action_change_tile_factory_tooltip); 
 	}
 
 	private void selectMapProviderInTheMap(final TileFactory mapProvider) {
@@ -227,7 +230,11 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 //		map.disposeOverlayImageCache();
 
 		map.setTileFactory(mapProvider);
+		
+		// reset overlays must be done after the new map provider is set
 		map.resetOverlays();
+		
+		map.setDimLevel(fMappingView.getMapDimLevel());
 	}
 
 	/**
@@ -241,7 +248,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 		if (factoryId != null) {
 
 			for (final MapProviderAction factoryAction : fMapProviderActions.values()) {
-				
+
 				final TileFactory mapProvider = factoryAction.mapProvider;
 				fFactoryCounter++;
 

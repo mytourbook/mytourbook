@@ -155,5 +155,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL, PrefPageMapAppearance.MAP_TOUR_SYMBOL_DOT);
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 3);
+		
+		/*
+		 * Tour data editor
+		 */
+		store.setDefault(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT, 5);
+		
+		
 	}
 }

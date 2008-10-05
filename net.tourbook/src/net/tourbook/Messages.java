@@ -261,7 +261,6 @@ public class Messages extends NLS {
 	public static String		Image__tag;
 	public static String		Image__tag_category;
 
-//	public static String	Image__tag_category_opened;
 	public static String		Image__tag_root;
 	public static String		Image__tour;
 
@@ -330,37 +329,25 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Check_autozoom;
 	public static String		Pref_Graphs_Check_force_minimum_for_altimeter;
 	public static String		Pref_Graphs_Check_force_minimum_for_gradient;
-//	public static String		Pref_Graphs_Check_scroll_zoomed_chart;
 	public static String		Pref_Graphs_Check_show_start_time;
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
 	public static String		Pref_Graphs_Error_value_must_be_integer;
-
 	public static String		Pref_Graphs_force_minimum_value;
-
 	public static String		Pref_Graphs_grid_distance;
-
 	public static String		Pref_Graphs_grid_horizontal_distance;
-
 	public static String		Pref_Graphs_grid_vertical_distance;
-
 	public static String		Pref_Graphs_Group_mouse_mode;
-
 	public static String		Pref_Graphs_Group_units_for_xaxis;
 	public static String		Pref_Graphs_Group_zoom_options;
 	public static String		Pref_Graphs_Label_select_graph;
-
 	public static String		Pref_Graphs_Label_select_graph_tooltip;
-
 	public static String		Pref_Graphs_move_sliders_when_zoomed;
 	public static String		Pref_Graphs_Radio_mouse_mode_slider;
-
 	public static String		Pref_Graphs_Radio_mouse_mode_zoom;
-
 	public static String		Pref_Graphs_Radio_show_distance;
 	public static String		Pref_Graphs_Radio_show_time;
 	public static String		Pref_Graphs_Tab_default_values;
 	public static String		Pref_Graphs_Tab_graph_defaults;
-
 	public static String		Pref_Graphs_Tab_zoom_options;
 	public static String		Pref_Graphs_Text_min_value;
 
@@ -404,6 +391,14 @@ public class Messages extends NLS {
 
 	public static String		pref_statistic_lbl_info;
 
+	public static String	pref_tour_editor_description_height;
+
+	public static String	pref_tour_editor_description_height_tooltip;
+
+	public static String	pref_tour_editor_dlg_desc_height_message;
+
+	public static String	pref_tour_editor_dlg_desc_height_title;
+
 	public static String		pref_tourtag_btn_new_tag;
 	public static String		pref_tourtag_btn_new_tag_category;
 	public static String		pref_tourtag_btn_rename;
@@ -428,7 +423,6 @@ public class Messages extends NLS {
 	public static String		pref_view_layout_label_sub;
 	public static String		pref_view_layout_label_sub_sub;
 	public static String		pref_view_layout_label_title;
-//	public static String		pref_view_layout_label_tour;
 
 	public static String		Pref_Statistic_Label_altitude;
 	public static String		Pref_Statistic_Label_altitude_low_value;
@@ -484,7 +478,6 @@ public class Messages extends NLS {
 	public static String		Tour_Action_graph_speed_tooltip;
 	public static String		Tour_Action_graph_temperature_tooltip;
 	public static String		Tour_Action_graph_tour_compare_tooltip;
-
 	public static String		Tour_Action_open_tour_segmenter_tooltip;
 	public static String		Tour_Action_scroll_zoomed_chart;
 	public static String		Tour_Action_show_distance_on_x_axis;
@@ -505,7 +498,7 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Label_chart_title;
 
 	public static String		Tour_Database_load_all_tours;
-	
+
 	public static String		Tour_Database_update_computed_values;
 	public static String		Tour_Database_update_tour;
 
@@ -556,8 +549,7 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_distance;
 	public static String		tour_editor_label_driving_time;
 	public static String		tour_editor_label_end_location;
-
-	public static String	tour_editor_label_paused_time;
+	public static String		tour_editor_label_paused_time;
 	public static String		tour_editor_label_recording_time;
 	public static String		tour_editor_label_start_location;
 	public static String		tour_editor_label_start_time;
@@ -568,12 +560,8 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_tour_tag;
 	public static String		tour_editor_label_tour_title;
 	public static String		tour_editor_label_tour_type;
-	public static String		tour_editor_part_name_is_modified;
-	public static String		tour_editor_part_name_tour_editor;
-
-	public static String	tour_editor_section_date_time;
-
-	public static String	tour_editor_section_tour;
+	public static String		tour_editor_section_date_time;
+	public static String		tour_editor_section_tour;
 	public static String		tour_editor_tabLabel_info;
 	public static String		tour_editor_tabLabel_tour_data;
 

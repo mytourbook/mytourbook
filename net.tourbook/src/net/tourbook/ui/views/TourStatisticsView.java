@@ -16,16 +16,21 @@
 package net.tourbook.ui.views;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContainer;
+import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
+import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
@@ -49,7 +54,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourStatisticsView extends ViewPart {
+public class TourStatisticsView extends ViewPart implements ISelectedTours {
 
 	static public final String		ID			= "net.tourbook.views.StatisticView";	//$NON-NLS-1$
 
@@ -152,7 +157,7 @@ public class TourStatisticsView extends ViewPart {
 				} else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
 
 					fStatisticContainer.refreshStatisticProvider();
-					
+
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
 					// measurement system has changed
@@ -202,7 +207,7 @@ public class TourStatisticsView extends ViewPart {
 						// ignore edit changes
 						return;
 					}
-					
+
 					// update statistics
 					refreshStatistics();
 				}
@@ -266,6 +271,28 @@ public class TourStatisticsView extends ViewPart {
 		super.dispose();
 	}
 
+	public ArrayList<TourData> getSelectedTours() {
+
+		final TourbookStatistic selectedStatistic = fStatisticContainer.getSelectedStatistic();
+		if (selectedStatistic == null) {
+			return null;
+		}
+
+		final Long selectedTour = selectedStatistic.getSelectedTour();
+		if (selectedTour == null) {
+			return null;
+		}
+
+		final TourData tourInDb = TourDatabase.getTourFromDb(selectedTour);
+		if (tourInDb == null) {
+			return null;
+		} else {
+			final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+			selectedTours.add(tourInDb);
+			return selectedTours;
+		}
+	}
+
 	@Override
 	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
 
@@ -275,6 +302,10 @@ public class TourStatisticsView extends ViewPart {
 		if (fSessionMemento == null) {
 			fSessionMemento = memento;
 		}
+	}
+
+	public boolean isFromTourEditor() {
+		return false;
 	}
 
 	private void refreshStatistics() {

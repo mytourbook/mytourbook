@@ -384,10 +384,18 @@ public class StatisticContainer extends Composite {
 	}
 
 	/**
-	 * @return Returns the selected statistic in the combo box or <code>null</code> when a statistic
-	 *         is not available
+	 * @return Returns the visible statistic {@link TourbookStatistic} or <code>null</code> when a
+	 *         statistic is not available
 	 */
-	private TourbookStatistic getSelectedStatistic() {
+	public TourbookStatistic getSelectedStatistic() {
+		return fActiveStatistic;
+	}
+
+	/**
+	 * @return Returns the selected statistic in the combo box, it creates the statistic when this
+	 *         is not done, returns <code>null</code> when a statistic is not available
+	 */
+	private TourbookStatistic getStatistic() {
 
 		// get selected statistic
 		final int selectedIndex = fComboStatistics.getSelectionIndex();
@@ -422,7 +430,7 @@ public class StatisticContainer extends Composite {
 
 	private void onSelectStatistic() {
 
-		fActiveStatistic = getSelectedStatistic();
+		fActiveStatistic = getStatistic();
 		if (fActiveStatistic == null) {
 			return;
 		}
@@ -473,7 +481,7 @@ public class StatisticContainer extends Composite {
 	 */
 	public void refreshStatistic(final TourPerson person, final TourTypeFilter tourTypeFilter) {
 
-		fActiveStatistic = getSelectedStatistic();
+		fActiveStatistic = getStatistic();
 		if (fActiveStatistic == null) {
 			return;
 		}
@@ -506,6 +514,20 @@ public class StatisticContainer extends Composite {
 //		resetSelection();
 	}
 
+//	private void resetSelection() {
+//
+//		if (fActiveStatistic == null) {
+//			return;
+//		}
+//
+//		// reset selection
+//		fSelectedDate = -1;
+//		fSelectedMonth = -1;
+//		fSelectedTourId = -1;
+//
+//		fActiveStatistic.resetSelection();
+//	}
+
 	private void refreshStatistic(	final TourPerson person,
 									final TourTypeFilter activeTourTypeFilter,
 									final int selectedYear,
@@ -520,7 +542,7 @@ public class StatisticContainer extends Composite {
 		}
 		fActiveYear = selectedYear;
 
-		fActiveStatistic = getSelectedStatistic();
+		fActiveStatistic = getStatistic();
 		if (fActiveStatistic == null) {
 			return;
 		}
@@ -539,24 +561,10 @@ public class StatisticContainer extends Composite {
 		fPageBookStatistic.showPage(fActiveStatistic.getControl());
 	}
 
-//	private void resetSelection() {
-//
-//		if (fActiveStatistic == null) {
-//			return;
-//		}
-//
-//		// reset selection
-//		fSelectedDate = -1;
-//		fSelectedMonth = -1;
-//		fSelectedTourId = -1;
-//
-//		fActiveStatistic.resetSelection();
-//	}
-
 	public void refreshStatisticProvider() {
 
 		// get selected stat
-		final TourbookStatistic selectedStatistic = getSelectedStatistic();
+		final TourbookStatistic selectedStatistic = getStatistic();
 
 		fComboStatisticProvider = getStatisticProviders();
 
