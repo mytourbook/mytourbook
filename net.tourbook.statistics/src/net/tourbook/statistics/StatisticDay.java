@@ -439,6 +439,11 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		return fCurrentMonth;
 	}
 
+	@Override
+	public Long getSelectedTour() {
+		return fSelectedTourId;
+	}
+
 	public Long getSelectedTourId() {
 		return fSelectedTourId;
 	}
@@ -592,6 +597,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			final boolean isTourSelected = tourIds[tourIndex] == tourId ? true : false;
 			if (isTourSelected) {
 				isSelected = true;
+				fSelectedTourId = tourId;
 			}
 			selectedItems[tourIndex] = isTourSelected;
 		}
