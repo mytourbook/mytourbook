@@ -57,26 +57,213 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 	private Calendar			fCalendar				= GregorianCalendar.getInstance();
 	private GregorianCalendar	fFileDate;
 
+	/**
+	 * @param timeData
+	 * @param rawData
+	 * @throws IOException
+	 */
+	public static void readTimeSlice(final int data, final TimeData timeData) throws IOException {
+
+		// pulse (4 bits)
+		if ((data & 0x8000) != 0) {
+			// -
+			timeData.pulse = (short) ((0xFFF0 | ((data & 0xF000) >> 12)) * 2);
+		} else {
+			// +
+			timeData.pulse = (short) (((data & 0xF000) >> 12) * 2);
+		}
+
+		// altitude (6 bits)
+		if ((data & 0x0800) != 0) {
+			// -
+			timeData.altitude = (short) (0xFFC0 | ((data & 0x0FC0) >> 6));
+			if (timeData.altitude < -16) {
+				timeData.altitude = (-16 + ((timeData.altitude + 16) * 7));
+			}
+		} else {
+			// +
+			timeData.altitude = (short) ((data & 0x0FC0) >> 6);
+			if (timeData.altitude > 16) {
+				timeData.altitude = (16 + ((timeData.altitude - 16) * 7));
+			}
+		}
+
+		// distance (6 bits)
+		timeData.distance = (short) (data & 0x003F) * 10;
+	}
+
 	// plugin constructor
 	public HAC4ProDeviceDataReader() {
 		canReadFromDevice = true;
 	}
 
-	public boolean processDeviceData(String importFileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
+	/**
+	 * Adjust the offset for the DD record so it's within the tour data area
+	 * 
+	 * @param offsetNextDDRecord
+	 * @return
+	 */
+	private int adjustDDRecordOffset(final int offsetNextDDRecord) {
+
+		int offsetDDRecord;
+
+		if (offsetNextDDRecord == OFFSET_TOUR_DATA_START) {
+			offsetDDRecord = OFFSET_TOUR_DATA_END - RECORD_LENGTH;
+		} else {
+			offsetDDRecord = offsetNextDDRecord - RECORD_LENGTH;
+		}
+
+		return offsetDDRecord;
+	}
+
+	@Override
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+
+		final File fileRaw = new File(rawDataFileName);
+
+		final long lastModified = fileRaw.lastModified();
+
+		/*
+		 * get the year, because the year is not saved in the raw data file, the modified year of
+		 * the file is used
+		 */
+		final GregorianCalendar fileDate = new GregorianCalendar();
+		fileDate.setTime(new Date(lastModified));
+
+		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
+				(short) fileDate.get(Calendar.YEAR),
+				(short) fileDate.get(Calendar.MONTH) + 1,
+				(short) fileDate.get(Calendar.DAY_OF_MONTH)).toString();
+	}
+
+	@Override
+	public boolean checkStartSequence(final int byteIndex, final int newByte) {
+
+		/*
+		 * check if the first 4 bytes are set to AFRO
+		 */
+		if (byteIndex == 0 & newByte == 'A') {
+			return true;
+		}
+		if (byteIndex == 1 & newByte == 'F') {
+			return true;
+		}
+		if (byteIndex == 2 & newByte == 'R') {
+			return true;
+		}
+		if (byteIndex == 3 & newByte == 'O') {
+			return true;
+		}
+
+		return false;
+	}
+
+	public void computeTourAltitudeUpDown(final TourData tourData) {
+
+		final int[] altitudeSerie = tourData.altitudeSerie;
+
+		if (altitudeSerie.length < 2) {
+			return;
+		}
+
+		float altUp = 0f;
+		float altDown = 0f;
+
+		int lastAltitude1 = altitudeSerie[0];
+		int lastAltitude2 = altitudeSerie[1];
+
+		int logUp = 0;
+		int logDown = 0;
+
+		for (final int altitude : altitudeSerie) {
+
+			if (lastAltitude1 == lastAltitude2 + 1 & altitude == lastAltitude1) {
+				// altUp += 0.5f;
+				logUp++;
+			} else if (lastAltitude1 == lastAltitude2 - 1 & altitude == lastAltitude1) {
+				// altDown += 0.5f;
+				logDown++;
+			} else if (altitude > lastAltitude2) {
+				altUp += altitude - lastAltitude2;
+			} else if (altitude < lastAltitude2) {
+				altDown += lastAltitude2 - altitude;
+			}
+
+			lastAltitude1 = lastAltitude2;
+			lastAltitude2 = altitude;
+		}
+
+		tourData.setTourAltUp((int) altUp);
+		tourData.setTourAltDown((int) altDown);
+
+		// System.out.println("Up: " + logUp + " Down: " + logDown);
+	}
+
+	public String getDeviceModeName(final int profileId) {
+
+		// 1: run
+		// 2: bike 2
+		// 3: bike1
+		// 4: ski
+
+		switch (profileId) {
+		case 1:
+			return Messages.HAC4_Profile_run;
+
+		case 2:
+			return Messages.HAC4_Profile_bike2;
+
+		case 3:
+			return Messages.HAC4_Profile_bike1;
+
+		case 4:
+			return Messages.HAC4_Profile_ski;
+
+		default:
+			break;
+		}
+
+		return Messages.HAC4_Profile_unknown;
+	}
+
+	@Override
+	public SerialParameters getPortParameters(final String portName) {
+
+		return new SerialParameters(portName,
+				9600,
+				SerialPort.FLOWCONTROL_NONE,
+				SerialPort.FLOWCONTROL_NONE,
+				SerialPort.DATABITS_8,
+				SerialPort.STOPBITS_1,
+				SerialPort.PARITY_NONE);
+	}
+
+	@Override
+	public int getStartSequenceSize() {
+		return 4;
+	}
+
+	public int getTransferDataSize() {
+		return 0x1009A;
+	}
+
+	public boolean processDeviceData(	final String importFileName,
+										final DeviceData deviceData,
+										final HashMap<String, TourData> tourDataMap) {
 
 		boolean returnValue = false;
 
-		byte[] recordBuffer = new byte[RECORD_LENGTH];
+		final byte[] recordBuffer = new byte[RECORD_LENGTH];
 
 		RandomAccessFile file = null;
 
-		HAC4ProDeviceData hac5DeviceData = new HAC4ProDeviceData();
+		final HAC4ProDeviceData hac4ProDeviceData = new HAC4ProDeviceData();
 
 		try {
-			File fileRaw = new File(importFileName);
+			final File fileRaw = new File(importFileName);
 			file = new RandomAccessFile(fileRaw, "r"); //$NON-NLS-1$
 
-			long lastModified = fileRaw.lastModified();
+			final long lastModified = fileRaw.lastModified();
 
 			// dump header
 			// file.seek(OFFSET_RAWDATA + 0x0380);
@@ -96,37 +283,39 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 			short lastTourMonth = -1;
 
 			// read device data
-			hac5DeviceData.readFromFile(file);
+			hac4ProDeviceData.readFromFile(file);
 
 			/*
 			 * get position for the next free tour and get the last dd-record from this position
 			 */
 			file.seek(OFFSET_NEXT_FREE_BLOCK);
-			int offsetNextFreeTour = DeviceReaderTools.get2ByteData(file);
+			final int offsetNextFreeTour = DeviceReaderTools.get2ByteData(file);
 
 			int offsetDDRecord = adjustDDRecordOffset(offsetNextFreeTour);
-			int initialOffsetDDRecord = offsetDDRecord;
+			final int initialOffsetDDRecord = offsetDDRecord;
+			int bytes;
+			int tourCounter = 0;
 
 			while (true) {
 
 				// read DD record
 				file.seek(OFFSET_RAWDATA + offsetDDRecord);
-				file.read(recordBuffer);
-				if ((recordBuffer[0] & 0xFF) != 0xDD) {
+				bytes = file.read(recordBuffer);
+				if ((recordBuffer[0] & 0xFF) != 0xDD || bytes == -1) {
 					returnValue = true;
 					break;
 				}
 
 				// read AA record
-				int offsetAARecordInDDRecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
+				final int offsetAARecordInDDRecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
 
 				// dump AA block
 				// file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
 				// dumpBuffer(file, recordBuffer);
 
 				file.seek(OFFSET_RAWDATA + offsetAARecordInDDRecord);
-				file.read(recordBuffer);
-				if ((recordBuffer[0] & 0xFF) != 0xAA) {
+				bytes = file.read(recordBuffer);
+				if ((recordBuffer[0] & 0xFF) != 0xAA || bytes == -1) {
 					returnValue = true;
 					break;
 				}
@@ -134,13 +323,13 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				/*
 				 * check if the AA and the DD records point to each other
 				 */
-				int offsetDDRecordInAARecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
+				final int offsetDDRecordInAARecord = DeviceReaderTools.get2ByteData(recordBuffer, 2);
 				if (offsetDDRecordInAARecord != offsetDDRecord) {
 					returnValue = true;
 					break;
 				}
 
-				TourData tourData = new TourData();
+				final TourData tourData = new TourData();
 
 				tourData.importRawDataFile = importFileName;
 
@@ -172,9 +361,9 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				/*
 				 * read/save BB records
 				 */
-				ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+				final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
 
-				short timeInterval = tourData.getDeviceTimeInterval();
+				final short timeInterval = tourData.getDeviceTimeInterval();
 
 				short absolutePulse = tourData.getStartPulse();
 				short absoluteAltitude = tourData.getStartAltitude();
@@ -194,7 +383,10 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				while (true) {
 
 					// read BB or CC record
-					file.read(recordBuffer);
+					bytes = file.read(recordBuffer);
+					if (bytes == -1) {
+						break;
+					}
 
 					if ((recordBuffer[0] & 0xFF) == 0xCC) {
 						isCCRecord = true;
@@ -300,8 +492,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 				// read/save DD record
 				offsetDDRecord = (int) file.getFilePointer();
-				file.read(recordBuffer);
-				if ((recordBuffer[0] & 0xFF) != 0xDD) {
+				bytes = file.read(recordBuffer);
+				if ((recordBuffer[0] & 0xFF) != 0xDD || bytes == -1) {
 					break;
 				}
 
@@ -318,7 +510,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 					/*
 					 * disable data series when no data are available
 					 */
-					TimeData firstTimeData = timeDataList.get(0);
+					final TimeData firstTimeData = timeDataList.get(0);
 					if (sumDistance == 0) {
 						firstTimeData.distance = Integer.MIN_VALUE;
 					}
@@ -350,6 +542,8 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				// System.out.println("");
 				// System.out.println("");
 
+				offsetDDRecord = adjustDDRecordOffset(offsetAARecordInDDRecord);
+
 				/*
 				 * make sure not to end in an endless loop where the current DD offset is the same
 				 * as the first DD offset (this seems to be unlikely but it happend already 2 Month
@@ -359,23 +553,28 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 					returnValue = true;
 					break;
 				}
-				offsetDDRecord = adjustDDRecordOffset(offsetAARecordInDDRecord);
+
+				// check if something got wrong
+				if (tourCounter++ == 1000) {
+					returnValue = true;
+					break;
+				}
 			}
 
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 			returnValue = false;
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 			returnValue = false;
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			e.printStackTrace();
 			returnValue = false;
 		} finally {
 			if (file != null) {
 				try {
 					file.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}
@@ -393,52 +592,11 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		return returnValue;
 	}
 
-	public void computeTourAltitudeUpDown(TourData tourData) {
-
-		int[] altitudeSerie = tourData.altitudeSerie;
-
-		if (altitudeSerie.length < 2) {
-			return;
-		}
-
-		float altUp = 0f;
-		float altDown = 0f;
-
-		int lastAltitude1 = altitudeSerie[0];
-		int lastAltitude2 = altitudeSerie[1];
-
-		int logUp = 0;
-		int logDown = 0;
-
-		for (int altitude : altitudeSerie) {
-
-			if (lastAltitude1 == lastAltitude2 + 1 & altitude == lastAltitude1) {
-				// altUp += 0.5f;
-				logUp++;
-			} else if (lastAltitude1 == lastAltitude2 - 1 & altitude == lastAltitude1) {
-				// altDown += 0.5f;
-				logDown++;
-			} else if (altitude > lastAltitude2) {
-				altUp += altitude - lastAltitude2;
-			} else if (altitude < lastAltitude2) {
-				altDown += lastAltitude2 - altitude;
-			}
-
-			lastAltitude1 = lastAltitude2;
-			lastAltitude2 = altitude;
-		}
-
-		tourData.setTourAltUp((int) altUp);
-		tourData.setTourAltDown((int) altDown);
-
-		// System.out.println("Up: " + logUp + " Down: " + logDown);
-	}
-
 	/**
 	 * @param buffer
 	 * @param tourData
 	 */
-	private void readAARecord(byte[] buffer, TourData tourData) {
+	private void readAARecord(final byte[] buffer, final TourData tourData) {
 
 		// 00 1 0xAA
 		//
@@ -468,10 +626,10 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		//
 		// 15 1 ? 0xFF
 
-		byte byteValue = buffer[1];
+		final byte byteValue = buffer[1];
 
 		int timeInterval = byteValue & 0x0F;
-		int profile = (byteValue & 0xF0) >> 4;
+		final int profile = (byteValue & 0xF0) >> 4;
 
 		// set the timeinterval from the AA record
 		timeInterval = timeInterval == 0 ? 2 : timeInterval == 1 ? 5 : timeInterval == 2 ? 10 : 20;
@@ -492,135 +650,11 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 	}
 
 	/**
-	 * @param timeData
-	 * @param rawData
-	 * @throws IOException
-	 */
-	public static void readTimeSlice(int data, TimeData timeData) throws IOException {
-
-		// pulse (4 bits)
-		if ((data & 0x8000) != 0) {
-			// -
-			timeData.pulse = (short) ((0xFFF0 | ((data & 0xF000) >> 12)) * 2);
-		} else {
-			// +
-			timeData.pulse = (short) (((data & 0xF000) >> 12) * 2);
-		}
-
-		// altitude (6 bits)
-		if ((data & 0x0800) != 0) {
-			// -
-			timeData.altitude = (short) (0xFFC0 | ((data & 0x0FC0) >> 6));
-			if (timeData.altitude < -16) {
-				timeData.altitude = (-16 + ((timeData.altitude + 16) * 7));
-			}
-		} else {
-			// +
-			timeData.altitude = (short) ((data & 0x0FC0) >> 6);
-			if (timeData.altitude > 16) {
-				timeData.altitude = (16 + ((timeData.altitude - 16) * 7));
-			}
-		}
-
-		// distance (6 bits)
-		timeData.distance = (short) (data & 0x003F) * 10;
-	}
-
-	public String getDeviceModeName(int profileId) {
-
-		// 1: run
-		// 2: bike 2
-		// 3: bike1
-		// 4: ski
-
-		switch (profileId) {
-		case 1:
-			return Messages.HAC4_Profile_run;
-
-		case 2:
-			return Messages.HAC4_Profile_bike2;
-
-		case 3:
-			return Messages.HAC4_Profile_bike1;
-
-		case 4:
-			return Messages.HAC4_Profile_ski;
-
-		default:
-			break;
-		}
-
-		return Messages.HAC4_Profile_unknown;
-	}
-
-	@Override
-	public SerialParameters getPortParameters(String portName) {
-
-		return new SerialParameters(portName,
-				9600,
-				SerialPort.FLOWCONTROL_NONE,
-				SerialPort.FLOWCONTROL_NONE,
-				SerialPort.DATABITS_8,
-				SerialPort.STOPBITS_1,
-				SerialPort.PARITY_NONE);
-	}
-
-	/**
-	 * Adjust the offset for the DD record so it's within the tour data area
-	 * 
-	 * @param offsetNextDDRecord
-	 * @return
-	 */
-	private int adjustDDRecordOffset(int offsetNextDDRecord) {
-
-		int offsetDDRecord;
-
-		if (offsetNextDDRecord == OFFSET_TOUR_DATA_START) {
-			offsetDDRecord = OFFSET_TOUR_DATA_END - RECORD_LENGTH;
-		} else {
-			offsetDDRecord = offsetNextDDRecord - RECORD_LENGTH;
-		}
-
-		return offsetDDRecord;
-	}
-
-	public int getTransferDataSize() {
-		return 0x1009A;
-	}
-
-	@Override
-	public boolean checkStartSequence(int byteIndex, int newByte) {
-
-		/*
-		 * check if the first 4 bytes are set to AFRO
-		 */
-		if (byteIndex == 0 & newByte == 'A') {
-			return true;
-		}
-		if (byteIndex == 1 & newByte == 'F') {
-			return true;
-		}
-		if (byteIndex == 2 & newByte == 'R') {
-			return true;
-		}
-		if (byteIndex == 3 & newByte == 'O') {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public int getStartSequenceSize() {
-		return 4;
-	}
-
-	/**
 	 * checks if the data file has a valid HAC4Pro data format
 	 * 
 	 * @return true for a valid HAC4Pro data format
 	 */
-	public boolean validateRawData(String fileName) {
+	public boolean validateRawData(final String fileName) {
 
 		boolean isValid = false;
 
@@ -628,10 +662,10 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 		try {
 
-			byte[] bufferHeader = new byte[6];
-			byte[] bufferData = new byte[2];
+			final byte[] bufferHeader = new byte[6];
+			final byte[] bufferData = new byte[2];
 
-			File dataFile = new File(fileName);
+			final File dataFile = new File(fileName);
 			inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
 			inStream.read(bufferHeader);
@@ -663,41 +697,22 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 			isValid = true;
 			// }
 
-		} catch (NumberFormatException nfe) {
+		} catch (final NumberFormatException nfe) {
 			return false;
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			return false;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (inStream != null) {
 				try {
 					inStream.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}
 		}
 
 		return isValid;
-	}
-
-	@Override
-	public String buildFileNameFromRawData(String rawDataFileName) {
-
-		File fileRaw = new File(rawDataFileName);
-
-		long lastModified = fileRaw.lastModified();
-
-		/*
-		 * get the year, because the year is not saved in the raw data file, the modified year of
-		 * the file is used
-		 */
-		GregorianCalendar fileDate = new GregorianCalendar();
-		fileDate.setTime(new Date(lastModified));
-
-		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
-				(short) fileDate.get(Calendar.YEAR), (short) fileDate.get(Calendar.MONTH) + 1,
-				(short) fileDate.get(Calendar.DAY_OF_MONTH)).toString();
 	}
 }
