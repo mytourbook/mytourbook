@@ -553,9 +553,12 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		final ISelection selection = fChart.getSelection();
 		if (fTourDayData != null && selection instanceof SelectionBarChart) {
 
-			final Long selectedTourId = fTourDayData.fTourIds[((SelectionBarChart) selection).valueIndex];
+			final int valueIndex = ((SelectionBarChart) selection).valueIndex;
 
-			memento.putString(MEMENTO_SELECTED_TOUR_ID, Long.toString(selectedTourId));
+			// check array bounds
+			if (valueIndex < fTourDayData.fTourIds.length) {
+				memento.putString(MEMENTO_SELECTED_TOUR_ID, Long.toString(fTourDayData.fTourIds[valueIndex]));
+			}
 		}
 	}
 
