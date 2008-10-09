@@ -201,6 +201,10 @@ public class TourStatisticsView extends ViewPart implements ISelectedTours {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
+					if (part == TourStatisticsView.this) {
+						return;
+					}
+
 					final TourProperties tourProperties = (TourProperties) propertyData;
 
 					if (tourProperties.isTourEdited) {

@@ -502,9 +502,9 @@ public class MappingView extends ViewPart {
 
 					resetMap();
 
-				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
-					if (fTourData == null) {
+					if (fTourData == null || part == MappingView.this) {
 						return;
 					}
 
@@ -771,9 +771,59 @@ public class MappingView extends ViewPart {
 		restoreSettings();
 
 		// show map from last selection
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+//		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-		fMap.queueRedrawMap();
+		if (fTourData == null) {
+			// a tour is not displayed, find a tour provider which provides a tour
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+
+					final Long tourId = TourManager.getTourProvider();
+					if (tourId != null) {
+
+						final TourData tourData = TourManager.getInstance().getTourData(tourId);
+						if (tourData != null) {
+
+							fTourData = tourData;
+
+							/*
+							 * set position and zoomlevel to show the entire tour
+							 */
+							final PaintManager paintManager = PaintManager.getInstance();
+							final Set<GeoPosition> tourBounds = getTourBounds(tourData);
+
+							paintManager.setTourBounds(tourBounds);
+							setTourZoomLevel(tourBounds, true);
+
+//							final PaintManager paintManager = PaintManager.getInstance();
+//							paintManager.setTourData(fTourData);
+//
+//							// set slider position
+//							fDirectMappingPainter.setPaintContext(fMap,
+//									fActionShowTourInMap.isChecked(),
+//									fTourData,
+//									fCurrentLeftSliderValueIndex,
+//									fCurrentRightSliderValueIndex,
+//									fActionShowSliderInMap.isChecked(),
+//									fActionShowSliderInLegend.isChecked());
+//
+//							final Set<GeoPosition> tourBounds = getTourBounds(fTourData);
+//							paintManager.setTourBounds(tourBounds);
+//
+//							fMap.setShowOverlays(fActionShowTourInMap.isChecked());
+//
+//							setTourZoomLevel(tourBounds, false);
+
+							paintTour(tourData, true, false);
+
+							enableActions(false);
+						}
+					}
+				}
+			});
+		} else {
+			fMap.queueRedrawMap();
+		}
 	}
 
 	@Override

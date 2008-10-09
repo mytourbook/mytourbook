@@ -210,10 +210,9 @@ public class TourData {
 	private float					maxSpeed;															// db-version 4
 
 	private int						avgPulse;															// db-version 4
-
 	private int						avgCadence;														// db-version 4
-
 	private int						avgTemperature;													// db-version 4
+
 	private String					tourTitle;															// db-version 4
 	private String					tourDescription;													// db-version 4
 
@@ -282,6 +281,8 @@ public class TourData {
 	 * TRANSIENT DATA
 	 */
 	/////////////////////////////////////////////////////////////////////
+	//
+	//
 	/**
 	 * contains the relative time in seconds, {@link #startHour} and {@link #startMinute} contains
 	 * the absolute time when a tour is started
@@ -516,6 +517,7 @@ public class TourData {
 
 		paceSerie = null;
 		altimeterSerie = null;
+		gradientSerie = null;
 
 		speedSerieImperial = null;
 		paceSerieImperial = null;
@@ -2289,9 +2291,10 @@ public class TourData {
 		return calories;
 	}
 
-	public int getDeviceDistance() {
-		return deviceDistance;
-	}
+// not used 5.10.2008 
+//	public int getDeviceDistance() {
+//		return deviceDistance;
+//	}
 
 	public String getDeviceId() {
 		return devicePluginId;
@@ -2321,13 +2324,14 @@ public class TourData {
 		return deviceTimeInterval;
 	}
 
-	public int getDeviceTotalDown() {
-		return deviceTotalDown;
-	}
+// not used 5.10.2008 
+//	public int getDeviceTotalDown() {
+//		return deviceTotalDown;
+//	}
 
-	public int getDeviceTotalUp() {
-		return deviceTotalUp;
-	}
+//	public int getDeviceTotalUp() {
+//		return deviceTotalUp;
+//	}
 
 	public String getDeviceTourType() {
 		return deviceTourType;
@@ -3032,9 +3036,10 @@ public class TourData {
 		this.calories = calories;
 	}
 
-	public void setDeviceDistance(final int deviceDistance) {
-		this.deviceDistance = deviceDistance;
-	}
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
 
 	public void setDeviceId(final String deviceId) {
 		this.devicePluginId = deviceId;

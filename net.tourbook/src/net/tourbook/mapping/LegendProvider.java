@@ -158,6 +158,10 @@ public class LegendProvider implements ILegendProvider {
 			maxValue = fLegendColor.overwriteMaxValue * unitFactor;
 		}
 
+		if (maxValue < minValue) {
+			maxValue = minValue + 1;
+		}
+		
 		final List<Integer> legendUnits = getLegendUnits(legendBounds, minValue, maxValue);
 		if (legendUnits.size() > 0) {
 

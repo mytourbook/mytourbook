@@ -48,8 +48,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -74,104 +72,107 @@ public class UI {
 //	long endTime = System.currentTimeMillis();
 //	System.out.println("Execution time : " + (endTime - startTime) + " ms");
 
-	public static final String				EMPTY_STRING					= "";											//$NON-NLS-1$
-	public static final String				DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
-	public static final String				EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
-
-	public static final String				IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";						//$NON-NLS-1$
-
-	public static final String				VIEW_COLOR_CATEGORY				= "view.color.category";						//$NON-NLS-1$
-	public static final String				VIEW_COLOR_TITLE				= "view.color.title";							//$NON-NLS-1$
-	public static final String				VIEW_COLOR_SUB					= "view.color.sub";							//$NON-NLS-1$
-	public static final String				VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";						//$NON-NLS-1$
-	public static final String				VIEW_COLOR_TOUR					= "view.color.tour";							//$NON-NLS-1$
-
+	public static final String						EMPTY_STRING					= "";											//$NON-NLS-1$
+	public static final String						DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
+	public static final String						EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
 	/**
 	 * contains a new line string
 	 */
-	public static final String				NEW_LINE						= "\n";										//$NON-NLS-1$
+	public static final String						NEW_LINE						= "\n";										//$NON-NLS-1$
 
-	public static final String				SYSTEM_NEW_LINE					= System.getProperty("line.separator");		//$NON-NLS-1$
+	public static final String						SYSTEM_NEW_LINE					= System.getProperty("line.separator");		//$NON-NLS-1$
 
-	public static final int					DEFAULT_FIELD_WIDTH				= 40;
+	public static final String						IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";						//$NON-NLS-1$
+
+	public static final String						VIEW_COLOR_CATEGORY				= "view.color.category";						//$NON-NLS-1$
+	public static final String						VIEW_COLOR_TITLE				= "view.color.title";							//$NON-NLS-1$
+	public static final String						VIEW_COLOR_SUB					= "view.color.sub";							//$NON-NLS-1$
+	public static final String						VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";						//$NON-NLS-1$
+	public static final String						VIEW_COLOR_TOUR					= "view.color.tour";							//$NON-NLS-1$
+
+	public static final int							DEFAULT_FIELD_WIDTH				= 40;
 
 	/*
 	 * labels for the different measurement systems
 	 */
-	private static final String				UNIT_ALTITUDE_M					= "m";											//$NON-NLS-1$
-	public static final String				UNIT_DISTANCE_KM				= "km";										//$NON-NLS-1$
-	private static final String				UNIT_SPEED_KM_H					= "km/h";										//$NON-NLS-1$
-	private static final String				UNIT_FAHRENHEIT_C				= "\u00B0C";									//$NON-NLS-1$
-	private static final String				UNIT_ALTIMETER_M_H				= "m/h";										//$NON-NLS-1$
-	private static final String				UNIT_PACE_MIN_P_KM				= "min/km";									//$NON-NLS-1$
+	private static final String						UNIT_ALTITUDE_M					= "m";											//$NON-NLS-1$
+	public static final String						UNIT_DISTANCE_KM				= "km";										//$NON-NLS-1$
+	private static final String						UNIT_SPEED_KM_H					= "km/h";										//$NON-NLS-1$
+	private static final String						UNIT_FAHRENHEIT_C				= "\u00B0C";									//$NON-NLS-1$
+	private static final String						UNIT_ALTIMETER_M_H				= "m/h";										//$NON-NLS-1$
+	private static final String						UNIT_PACE_MIN_P_KM				= "min/km";									//$NON-NLS-1$
 
-	private static final String				UNIT_ALTITUDE_FT				= "ft";										//$NON-NLS-1$
-	public static final String				UNIT_DISTANCE_MI				= "mi";										//$NON-NLS-1$
-	private static final String				UNIT_SPEED_MPH					= "mph";										//$NON-NLS-1$
-	private static final String				UNIT_FAHRENHEIT_F				= "\u00B0F";									//$NON-NLS-1$
-	private static final String				UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
-	private static final String				UNIT_PACE_MIN_P_MILE			= "min/mi";									//$NON-NLS-1$
+	private static final String						UNIT_ALTITUDE_FT				= "ft";										//$NON-NLS-1$
+	public static final String						UNIT_DISTANCE_MI				= "mi";										//$NON-NLS-1$
+	private static final String						UNIT_SPEED_MPH					= "mph";										//$NON-NLS-1$
+	private static final String						UNIT_FAHRENHEIT_F				= "\u00B0F";									//$NON-NLS-1$
+	private static final String						UNIT_ALTIMETER_FT_H				= "ft/h";										//$NON-NLS-1$
+	private static final String						UNIT_PACE_MIN_P_MILE			= "min/mi";									//$NON-NLS-1$
 
-	public static final String				SYMBOL_AVERAGE					= "\u00D8";									//$NON-NLS-1$
-	public static final String				SYMBOL_AVERAGE_WITH_SPACE		= "\u00D8 ";									//$NON-NLS-1$
+	public static final String						SYMBOL_AVERAGE					= "\u00D8";									//$NON-NLS-1$
+	public static final String						SYMBOL_AVERAGE_WITH_SPACE		= "\u00D8 ";									//$NON-NLS-1$
 
-	public static final float				UNIT_MILE						= 1.609344f;
-	private static final float				UNIT_FOOT						= 0.3048f;
+	public static final float						UNIT_MILE						= 1.609344f;
+	private static final float						UNIT_FOOT						= 0.3048f;
 
 	/**
 	 * contains the system of measurement value for distances relative to the metric system, the
 	 * metric systemis <code>1</code>
 	 */
-	public static float						UNIT_VALUE_DISTANCE				= 1;
+	public static float								UNIT_VALUE_DISTANCE				= 1;
 
 	/**
 	 * contains the system of measurement value for altitudes relative to the metric system, the
 	 * metric system is <code>1</code>
 	 */
-	public static float						UNIT_VALUE_ALTITUDE				= 1;
+	public static float								UNIT_VALUE_ALTITUDE				= 1;
 
 	/**
 	 * contains the system of measurement value for the temperature, is set to <code>1</code> for
 	 * the metric system
 	 */
-	public static float						UNIT_VALUE_TEMPERATURE			= 1;
+	public static float								UNIT_VALUE_TEMPERATURE			= 1;
 
 	// (Celcius * 9/5) + 32 = Fahrenheit
-	public static final float				UNIT_FAHRENHEIT_MULTI			= 1.8f;
-	public static final float				UNIT_FAHRENHEIT_ADD				= 32;
+	public static final float						UNIT_FAHRENHEIT_MULTI			= 1.8f;
+	public static final float						UNIT_FAHRENHEIT_ADD				= 32;
 
-	public static final String				UNIT_LABEL_TIME					= "h";											//$NON-NLS-1$
-	
+	public static final String						UNIT_LABEL_TIME					= "h";											//$NON-NLS-1$
+
 	/**
 	 * contains the unit label in the currenty measurement system for the distance values
 	 */
-	public static String					UNIT_LABEL_DISTANCE;
-	public static String					UNIT_LABEL_ALTITUDE;
-	public static String					UNIT_LABEL_ALTIMETER;
-	public static String					UNIT_LABEL_TEMPERATURE;
-	public static String					UNIT_LABEL_SPEED;
-	public static String					UNIT_LABEL_PACE;
+	public static String							UNIT_LABEL_DISTANCE;
+	public static String							UNIT_LABEL_ALTITUDE;
+	public static String							UNIT_LABEL_ALTIMETER;
+	public static String							UNIT_LABEL_TEMPERATURE;
+	public static String							UNIT_LABEL_SPEED;
+	public static String							UNIT_LABEL_PACE;
 
-	private static final String				TOUR_TYPE_PREFIX				= "tourType";									//$NON-NLS-1$
+	private static final String						TOUR_TYPE_PREFIX				= "tourType";									//$NON-NLS-1$
 
-	public final static ImageRegistry		IMAGE_REGISTRY;
+	public final static ImageRegistry				IMAGE_REGISTRY;
 
-	public static final String				IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";							//$NON-NLS-1$
-	public static final String				IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";					//$NON-NLS-1$
+	public static final String						IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";							//$NON-NLS-1$
+	public static final String						IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";					//$NON-NLS-1$
 
-	private static final int				TOUR_TYPE_IMAGE_WIDTH			= 16;
-	private static final int				TOUR_TYPE_IMAGE_HEIGHT			= 16;
+	private static final int						TOUR_TYPE_IMAGE_WIDTH			= 16;
+	private static final int						TOUR_TYPE_IMAGE_HEIGHT			= 16;
 
-	private static UI						instance;
+	private static UI								instance;
 
-	public static final DateFormat			TimeFormatterShort				= DateFormat.getTimeInstance(DateFormat.SHORT);
-	public static final DateFormat			DateFormatterShort				= DateFormat.getDateInstance(DateFormat.SHORT);
-	public static final DateFormat			DateFormatterFull				= DateFormat.getDateInstance(DateFormat.FULL);
-	public static final SimpleDateFormat	MonthFormatter					= new SimpleDateFormat("MMM");					//$NON-NLS-1$
+	public static final DateFormat					TimeFormatterShort				= DateFormat.getTimeInstance(DateFormat.SHORT);
+	public static final DateFormat					DateFormatterShort				= DateFormat.getDateInstance(DateFormat.SHORT);
+	public static final DateFormat					DateFormatterFull				= DateFormat.getDateInstance(DateFormat.FULL);
+	public static final SimpleDateFormat			MonthFormatter					= new SimpleDateFormat("MMM");					//$NON-NLS-1$
+	public static final SimpleDateFormat			WeekDayFormatter				= new SimpleDateFormat("EEEE");				//$NON-NLS-1$
 
-	public static Styler					TAG_STYLER;
-	public static Styler					TAG_CATEGORY_STYLER;
-	public static Styler					TAG_SUB_STYLER;
+	public static Styler							TAG_STYLER;
+	public static Styler							TAG_CATEGORY_STYLER;
+	public static Styler							TAG_SUB_STYLER;
+
+	private final static HashMap<String, Image>		fImageCache						= new HashMap<String, Image>();
+	private final static HashMap<String, Boolean>	fDirtyImages					= new HashMap<String, Boolean>();
 
 	static {
 
@@ -195,8 +196,6 @@ public class UI {
 		TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
 		TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
 	}
-
-	private final HashMap<String, Image>	fImageCache						= new HashMap<String, Image>();
 
 	/**
 	 * Change the title for the application
@@ -533,6 +532,37 @@ public class UI {
 	private UI() {}
 
 	/**
+	 * create image tour type image from scratch
+	 */
+	private Image createTourTypeImage(final long typeId, final String colorId) {
+
+		final Display display = Display.getCurrent();
+
+		final Image tourTypeImage = new Image(display, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
+		final GC gcImage = new GC(tourTypeImage);
+		{
+			drawTourTypeImage(typeId, gcImage);
+		}
+		gcImage.dispose();
+
+		/*
+		 * set transparency
+		 */
+		final ImageData imageData = tourTypeImage.getImageData();
+		tourTypeImage.dispose();
+
+		final int transparentPixel = imageData.getPixel(0, 0);
+		imageData.transparentPixel = transparentPixel;
+
+		final Image transparentImage = new Image(display, imageData);
+
+		// keep image in cache
+		fImageCache.put(colorId, transparentImage);
+
+		return transparentImage;
+	}
+
+	/**
 	 * dispose resources
 	 */
 	public void dispose() {
@@ -541,29 +571,14 @@ public class UI {
 
 	private void disposeImages() {
 
+//		System.out.println("disposeImages:\t");
 		for (final Image image : fImageCache.values()) {
 			image.dispose();
 		}
 		fImageCache.clear();
 	}
 
-	/**
-	 * dispose all tour type images
-	 */
-	public void disposeTourTypeImages() {
-
-		for (final Iterator<String> iterator = fImageCache.keySet().iterator(); iterator.hasNext();) {
-
-			final String imageId = iterator.next();
-
-			if (imageId.startsWith(TOUR_TYPE_PREFIX)) {
-				fImageCache.get(imageId).dispose();
-				iterator.remove();
-			}
-		}
-	}
-
-	private void drawImage(final long typeId, final GC gcImage) {
+	private void drawTourTypeImage(final long typeId, final GC gcImage) {
 
 		final Display display = Display.getCurrent();
 		final DrawingColors drawingColors = getTourTypeColors(display, typeId);
@@ -626,126 +641,105 @@ public class UI {
 		return drawingColors;
 	}
 
+	/**
+	 * @param typeId
+	 * @return Returns an image which represents the tour type
+	 */
 	public Image getTourTypeImage(final long typeId) {
 
-		if (false) {
-			return getTourTypeImageOLD(typeId);
+		final String keyColorId = TOUR_TYPE_PREFIX + typeId;
+		final Image existingImage = fImageCache.get(keyColorId);
+
+		// check if image is available
+		if (existingImage != null && existingImage.isDisposed() == false) {
+
+			// check if the image is dirty
+
+			if (fDirtyImages.size() == 0 || fDirtyImages.containsKey(keyColorId) == false) {
+
+				// image is available and not dirty
+				return existingImage;
+			}
+		}
+
+		// create image for the tour type
+
+		if (existingImage == null || existingImage.isDisposed()) {
+
+			return createTourTypeImage(typeId, keyColorId);
+
 		} else {
-			return getTourTypeImageNEW(typeId);
+
+			// old tour type image is available and not disposed but is dirty, update the image
+
+			return updateTourTypeImage(existingImage, typeId, keyColorId);
+		}
+
+	}
+
+	/**
+	 * dispose all tour type images
+	 */
+	public void setTourTypeImagesDirty() {
+
+		for (final Iterator<String> iterator = fImageCache.keySet().iterator(); iterator.hasNext();) {
+
+			final String imageId = iterator.next();
+
+			if (imageId.startsWith(TOUR_TYPE_PREFIX)) {
+
+				fDirtyImages.put(imageId, true);
+
+//				fImageCache.get(imageId).dispose();
+//				iterator.remove();
+
+//				System.out.println("setTourTypeImagesDirty:\t" + imageId);
+			}
 		}
 	}
 
 	/**
-	 * @param typeId
-	 * @return Returns an image which represents the tour type
+	 * updates an existing tour type image
+	 * 
+	 * @param existingImage
 	 */
-	public Image getTourTypeImageNEW(final long typeId) {
+	private Image updateTourTypeImage(final Image existingImage, final long typeId, final String keyColorId) {
 
-		final String colorId = TOUR_TYPE_PREFIX + typeId;
-		Image tourTypeImage = fImageCache.get(colorId);
+		final Display display = Display.getCurrent();
 
-		if (tourTypeImage != null && tourTypeImage.isDisposed() == false) {
-
-			return tourTypeImage;
-
-		} else {
-
-			// create image for the tour type
-
-			final Display display = Display.getCurrent();
-
-			/*
-			 * create image
-			 */
-			tourTypeImage = new Image(display, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
-			final Image maskImage = new Image(display, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
-
-			final GC gcImage = new GC(tourTypeImage);
-			{
-				drawImage(typeId, gcImage);
-			}
-			gcImage.dispose();
-
-			/*
-			 * set transparency
-			 */
-			final ImageData imageData = tourTypeImage.getImageData();
-			final int transparentPixel = imageData.getPixel(0, 0);
-			imageData.transparentPixel = transparentPixel;
-			final Image transparentImage = new Image(display, imageData);
-
-			tourTypeImage.dispose();
-			maskImage.dispose();
-
-			// keep image in cache
-			fImageCache.put(colorId, transparentImage);
-
-			return transparentImage;
+		final Image tourTypeImage = new Image(display, TOUR_TYPE_IMAGE_WIDTH, TOUR_TYPE_IMAGE_HEIGHT);
+		GC gc = new GC(tourTypeImage);
+		{
+			drawTourTypeImage(typeId, gc);
 		}
-	}
+		gc.dispose();
 
-	/**
-	 * @param typeId
-	 * @return Returns an image which represents the tour type
-	 */
-	public Image getTourTypeImageOLD(final long typeId) {
+		/*
+		 * set transparency
+		 */
+		final ImageData imageData = tourTypeImage.getImageData();
+		tourTypeImage.dispose();
 
-		final String colorId = TOUR_TYPE_PREFIX + typeId;
-		Image image = fImageCache.get(colorId);
+		final int transparentPixel = imageData.getPixel(0, 0);
+		imageData.transparentPixel = transparentPixel;
 
-		if (image == null || image.isDisposed()) {
-
-			/*
-			 * create image for the tour type
-			 */
-
-			final Display display = Display.getCurrent();
-
-			final int imageWidth = 16;
-			final int imageHeight = 16;
-
-			final DrawingColors drawingColors = getTourTypeColors(display, typeId);
-
-			/*
-			 * Use magenta as transparency color since it is used infrequently.
-			 */
-			final Color colorTransparent = display.getSystemColor(SWT.COLOR_MAGENTA);
-			final Color colorBright = drawingColors.colorBright;
-			final Color colorDark = drawingColors.colorDark;
-			final Color colorLine = drawingColors.colorLine;
-
-			final PaletteData palette = new PaletteData(new RGB[] {
-					colorTransparent.getRGB(),
-					colorDark.getRGB(),
-					colorBright.getRGB(),
-					colorLine.getRGB() });
-
-			final ImageData data = new ImageData(imageWidth, imageHeight, 8, palette);
-			data.transparentPixel = 0;
-
-			image = new Image(display, data);
-			image.setBackground(colorTransparent);
-
-			final GC gc = new GC(image);
-			{
-
-				gc.setForeground(colorBright);
-				gc.setBackground(colorDark);
-
-				gc.fillGradientRectangle(4, 4, imageWidth - 8, imageHeight - 8, false);
-
-				gc.setForeground(colorLine);
-				gc.drawRectangle(3, 3, imageWidth - 7, imageHeight - 7);
-
-			}
-
-			drawingColors.dispose();
-			gc.dispose();
-
-			fImageCache.put(colorId, image);
+		/*
+		 * update existing image
+		 */
+		final Image transparentImage = new Image(display, imageData);
+		gc = new GC(existingImage);
+		{
+			gc.drawImage(transparentImage, 0, 0);
 		}
+		gc.dispose();
+		transparentImage.dispose();
 
-		return image;
+		fDirtyImages.remove(keyColorId);
+
+//		// keep image in cache
+//		fImageCache.put(keyColorId, transparentImage);
+
+		return existingImage;
 	}
 
 }

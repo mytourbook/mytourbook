@@ -231,8 +231,8 @@
       <view
             category="net.tourbook.category.tour"
             class="net.tourbook.ui.views.tourDataEditor.TourDataEditorView"
-            icon="icons/tour-properties.gif"
-            id="net.tourbook.views.TourPropertiesView"
+            icon="icons/tour-editor.gif"
+            id="net.tourbook.views.TourDataEditorView"
             name="%command_view_tourProperies">
       </view>
       <view
@@ -719,6 +719,13 @@
             
          <toolbar
                id="net.tourbook.toolbars.tourViews">
+            <command
+                  commandId="net.tourbook.command.tourProperties"
+                  icon="icons/tour-editor.gif"
+                  label="%command_view_tourProperies"
+                  mnemonic="%command_view_tourProperies_mnemonic"
+                  tooltip="%command_view_tourProperies_tooltip">
+            </command>
             
             <command
                   commandId="net.tourbook.command.selectedTour"
@@ -738,13 +745,6 @@
                   icon="icons/tour-tag.gif"
                   label="%command_tagging_name"
                   tooltip="%command_tagging_name_tooltip">
-            </command>
-            <command
-                  commandId="net.tourbook.command.tourProperties"
-                  icon="icons/tour-properties.gif"
-                  label="%command_view_tourProperies"
-                  mnemonic="%command_view_tourProperies_mnemonic"
-                  tooltip="%command_view_tourProperies_tooltip">
             </command>
             <command
                   commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"

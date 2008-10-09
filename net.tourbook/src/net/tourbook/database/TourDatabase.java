@@ -200,7 +200,7 @@ public class TourDatabase {
 			fTourTypes = null;
 		}
 
-		UI.getInstance().disposeTourTypeImages();
+		UI.getInstance().setTourTypeImagesDirty();
 	}
 
 	public static void computeComputedValuesForAllTours() {

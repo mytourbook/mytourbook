@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";						//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
 	public static String		dialog_quick_edit_dialog_area_title;
 	public static String		dialog_quick_edit_dialog_save;
@@ -53,6 +53,8 @@ public class Messages extends NLS {
 
 	public static String		action_tagView_flat_hierarchical;
 	public static String		action_tagView_flat_layout;
+
+	public static String		action_tour_editor_delete_time_slices;
 
 	public static String		action_tourbook_select_year_month_tours;
 
@@ -391,13 +393,10 @@ public class Messages extends NLS {
 
 	public static String		pref_statistic_lbl_info;
 
-	public static String	pref_tour_editor_description_height;
-
-	public static String	pref_tour_editor_description_height_tooltip;
-
-	public static String	pref_tour_editor_dlg_desc_height_message;
-
-	public static String	pref_tour_editor_dlg_desc_height_title;
+	public static String		pref_tour_editor_description_height;
+	public static String		pref_tour_editor_description_height_tooltip;
+	public static String		pref_tour_editor_dlg_desc_height_message;
+	public static String		pref_tour_editor_dlg_desc_height_title;
 
 	public static String		pref_tourtag_btn_new_tag;
 	public static String		pref_tourtag_btn_new_tag_category;
@@ -535,14 +534,26 @@ public class Messages extends NLS {
 	public static String		tour_database_version_info_title;
 
 	public static String		tour_editor_abel_time_unit;
+	public static String		tour_editor_dlg_delete_rows_message;
+
+	public static String	tour_editor_dlg_delete_rows_not_successive;
+
+	public static String		tour_editor_dlg_delete_rows_title;
+
 	public static String		tour_editor_dlg_discard_tour_message;
 	public static String		tour_editor_dlg_discard_tour_title;
+	public static String	tour_editor_dlg_reload_data_message;
+
+	public static String	tour_editor_dlg_reload_data_title;
+
 	public static String		tour_editor_dlg_revert_tour_message;
 	public static String		tour_editor_dlg_revert_tour_title;
 	public static String		tour_editor_dlg_revert_tour_toggle_message;
 	public static String		tour_editor_dlg_save_invalid_tour;
 	public static String		tour_editor_dlg_save_tour_message;
 	public static String		tour_editor_dlg_save_tour_title;
+	public static String		tour_editor_label_calendar_week;
+
 	public static String		tour_editor_label_datapoints;
 	public static String		tour_editor_label_description;
 	public static String		tour_editor_label_device_name;
@@ -550,7 +561,11 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_driving_time;
 	public static String		tour_editor_label_end_location;
 	public static String		tour_editor_label_paused_time;
+
+	public static String		tour_editor_label_person;
 	public static String		tour_editor_label_recording_time;
+
+	public static String		tour_editor_label_ref_tour;
 	public static String		tour_editor_label_start_location;
 	public static String		tour_editor_label_start_time;
 	public static String		tour_editor_label_time;
@@ -560,9 +575,16 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_tour_tag;
 	public static String		tour_editor_label_tour_title;
 	public static String		tour_editor_label_tour_type;
+
+	public static String		tour_editor_ref_tour_time_slices;
+
+	public static String		tour_editor_section_characteristics;
 	public static String		tour_editor_section_date_time;
+	public static String		tour_editor_section_info;
 	public static String		tour_editor_section_tour;
+
 	public static String		tour_editor_tabLabel_info;
+	public static String		tour_editor_tabLabel_tour;
 	public static String		tour_editor_tabLabel_tour_data;
 
 	public static String		tour_statistic_label_years;
@@ -644,6 +666,8 @@ public class Messages extends NLS {
 
 	public static String		TourData_Label_device_marker;
 	public static String		TourData_Label_new_marker;
+
+	public static String		TourDataEditorView_tour_editor_status_tour_contains_ref_tour;
 
 	public static String		UI_Label_no_chart_is_selected;
 

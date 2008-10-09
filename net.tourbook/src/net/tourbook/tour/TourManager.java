@@ -17,6 +17,7 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 
@@ -33,6 +34,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ChangedTags;
+import net.tourbook.ui.ISelectedTours;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -46,7 +48,11 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.joda.time.DateTime;
@@ -250,6 +256,10 @@ public class TourManager {
 				0);
 	}
 
+	private static String getTourDateFull(final Date date) {
+		return UI.DateFormatterFull.format(date.getTime());
+	}
+
 	public static String getTourDateFull(final TourData tourData) {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
@@ -272,6 +282,51 @@ public class TourManager {
 	}
 
 	/**
+	 * Searches all tour providers in the workbench to get a selected tour
+	 * 
+	 * @return Tour id or <code>null</code> when tour id was not found
+	 */
+	public static Long getTourProvider() {
+
+		final IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		final ArrayList<ISelectedTours> allTourProvider = new ArrayList<ISelectedTours>();
+
+		// get all tourProviders
+		for (final IWorkbenchWindow wbWindow : wbWindows) {
+			final IWorkbenchPage[] pages = wbWindow.getPages();
+
+			for (final IWorkbenchPage wbPage : pages) {
+				final IViewReference[] viewRefs = wbPage.getViewReferences();
+
+				for (final IViewReference viewRef : viewRefs) {
+					final IViewPart view = viewRef.getView(false);
+
+					if (view instanceof ISelectedTours) {
+
+						final ISelectedTours tourProvider = (ISelectedTours) view;
+						allTourProvider.add(tourProvider);
+
+						final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+						if (selectedTours != null && selectedTours.size() > 0) {
+
+							/*
+							 * a tour provider is found which also provides a tour, select this tour
+							 */
+							return selectedTours.get(0).getTourId();
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private static String getTourTimeShort(final Date date) {
+		return UI.TimeFormatterShort.format(date.getTime());
+	}
+
+	/**
 	 * @return returns the date of this tour
 	 */
 	public static String getTourTimeShort(final TourData tourData) {
@@ -287,11 +342,14 @@ public class TourManager {
 		return UI.TimeFormatterShort.format(calendar.getTime());
 	}
 
+	public static String getTourTitle(final Date date) {
+		return getTourDateFull(date) + UI.DASH_WITH_SPACE + getTourTimeShort(date);
+	}
+
 	/**
 	 * @return returns the title of this tour
 	 */
 	public static String getTourTitle(final TourData tourData) {
-
 		return getTourDateFull(tourData) + UI.DASH_WITH_SPACE + getTourTimeShort(tourData);
 	}
 

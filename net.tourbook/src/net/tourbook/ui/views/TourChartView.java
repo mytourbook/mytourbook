@@ -279,7 +279,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
-					if (fTourData == null) {
+					if (fTourData == null || part == TourChartView.this) {
 						return;
 					}
 
@@ -356,12 +356,18 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		// set this view part as selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		// show current selected chart if there are any
-		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
-		if (selection != null) {
-			onSelectionChanged(selection);
-		} else {
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		if (fTourData == null) {
+
 			fPageBook.showPage(fPageNoChart);
+			
+			// a tour is not displayed, find a tour provider which provides a tour
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+					updateChart(TourManager.getTourProvider());
+				}
+			});
 		}
 	}
 

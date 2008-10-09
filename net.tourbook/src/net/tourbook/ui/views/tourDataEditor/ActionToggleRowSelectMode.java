@@ -20,14 +20,11 @@ import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-class ActionEditRows extends Action {
+class ActionToggleRowSelectMode extends Action {
 
-	/**
-	 * 
-	 */
 	private final TourDataEditorView	fTourPropertiesView;
 
-	public ActionEditRows(final TourDataEditorView tourPropertiesView) {
+	public ActionToggleRowSelectMode(final TourDataEditorView tourPropertiesView) {
 
 		super(null, AS_CHECK_BOX);
 
@@ -40,6 +37,6 @@ class ActionEditRows extends Action {
 
 	@Override
 	public void run() {
-		fTourPropertiesView.actionEditRow();
+		fTourPropertiesView.actionToggleEditMode();
 	}
 }

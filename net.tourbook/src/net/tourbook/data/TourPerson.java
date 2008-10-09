@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.UI;
 
 @Entity
 public class TourPerson {
@@ -67,6 +68,45 @@ public class TourPerson {
 	 */
 	public TourPerson() {}
 
+	public String getDeviceReaderId() {
+		return deviceReaderId;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public float getHeight() {
+		return height;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	/**
+	 * @return Return the person first and last name
+	 */
+	public String getName() {
+		return firstName + (lastName.equals(UI.EMPTY_STRING) ? UI.EMPTY_STRING : " " + lastName); //$NON-NLS-1$ 
+	}
+
+	public long getPersonId() {
+		return personId;
+	}
+
+	public String getRawDataPath() {
+		return rawDataPath;
+	}
+
+	public TourBike getTourBike() {
+		return tourBike;
+	}
+
+	public float getWeight() {
+		return weight;
+	}
+
 	public boolean persist() {
 
 		boolean isSaved = false;
@@ -101,30 +141,6 @@ public class TourPerson {
 		return isSaved;
 	}
 
-	public String getDeviceReaderId() {
-		return deviceReaderId;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public float getHeight() {
-		return height;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public long getPersonId() {
-		return personId;
-	}
-
-	public float getWeight() {
-		return weight;
-	}
-
 	public void setDeviceReaderId(final String deviceId) {
 		this.deviceReaderId = deviceId;
 	}
@@ -141,27 +157,15 @@ public class TourPerson {
 		this.lastName = lastName;
 	}
 
-	public void setWeight(final float weight) {
-		this.weight = weight;
-	}
-
-	public TourBike getTourBike() {
-		return tourBike;
+	public void setRawDataPath(final String rawDataPath) {
+		this.rawDataPath = rawDataPath;
 	}
 
 	public void setTourBike(final TourBike tourBike) {
 		this.tourBike = tourBike;
 	}
 
-	public String getRawDataPath() {
-		return rawDataPath;
-	}
-
-	public void setRawDataPath(final String rawDataPath) {
-		this.rawDataPath = rawDataPath;
-	}
-
-	public String getName() {
-		return firstName + (lastName.equals("") ? "" : " " + lastName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	public void setWeight(final float weight) {
+		this.weight = weight;
 	}
 }

@@ -65,6 +65,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -279,7 +280,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		final Tree tree = new Tree(treeContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 
 		tree.setLinesVisible(false);
-		final int colorColumnWidth = tree.getItemHeight() * 4 + 5; 
+		final int colorColumnWidth = tree.getItemHeight() * 4 + 5;
 
 		// tree columns
 		TreeColumn tc;
@@ -347,11 +348,20 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				if (element instanceof ColorDefinition) {
 					final ColorDefinition treeItem = (ColorDefinition) element;
 
-					if (fExpandedItem != null) {
-						fColorViewer.collapseToLevel(fExpandedItem, 1);
-					}
-					fColorViewer.expandToLevel(treeItem, 1);
-					fExpandedItem = treeItem;
+					/*
+					 * run not in the treeExpand method, this is blocked by the viewer with the
+					 * message: Ignored reentrant call while viewer is busy
+					 */
+					Display.getCurrent().asyncExec(new Runnable() {
+						public void run() {
+
+							if (fExpandedItem != null) {
+								fColorViewer.collapseToLevel(fExpandedItem, 1);
+							}
+							fColorViewer.expandToLevel(treeItem, 1);
+							fExpandedItem = treeItem;
+						}
+					});
 				}
 			}
 		});

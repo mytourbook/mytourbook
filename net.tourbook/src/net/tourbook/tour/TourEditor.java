@@ -185,7 +185,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
-					if (fTourData == null) {
+					if (fTourData == null || part == TourEditor.this) {
 						return;
 					}
 
