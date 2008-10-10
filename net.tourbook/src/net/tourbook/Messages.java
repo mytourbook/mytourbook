@@ -566,6 +566,8 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_recording_time;
 
 	public static String		tour_editor_label_ref_tour;
+
+	public static String	tour_editor_label_ref_tour_none;
 	public static String		tour_editor_label_start_location;
 	public static String		tour_editor_label_start_time;
 	public static String		tour_editor_label_time;
@@ -575,6 +577,8 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_tour_tag;
 	public static String		tour_editor_label_tour_title;
 	public static String		tour_editor_label_tour_type;
+
+	public static String	tour_editor_message_person_is_required;
 
 	public static String		tour_editor_ref_tour_time_slices;
 

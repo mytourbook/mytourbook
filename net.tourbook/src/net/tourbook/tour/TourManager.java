@@ -673,6 +673,10 @@ public class TourManager {
 				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
 				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
 
+				if (timeValues == null || tourData == null) {
+					return 0;
+				}
+
 				final int leftDistance = distanceValues[valueIndexLeft];
 				final int rightDistance = distanceValues[valueIndexRight];
 				final int leftTime = timeValues[valueIndexLeft];
@@ -714,6 +718,10 @@ public class TourManager {
 				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
 				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
 				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+
+				if (timeValues == null || tourData == null) {
+					return 0;
+				}
 
 				final int leftDistance = distanceValues[valueIndexLeft];
 				final int rightDistance = distanceValues[valueIndexRight];
@@ -757,6 +765,10 @@ public class TourManager {
 				final int[] altitudeValues = ((ChartDataSerie) (customDataAltitude)).getHighValues()[0];
 				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
 				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+
+				if (timeValues == null || tourData == null) {
+					return 0;
+				}
 
 				final int leftAltitude = altitudeValues[valueIndexLeft];
 				final int rightAltitude = altitudeValues[valueIndexRight];

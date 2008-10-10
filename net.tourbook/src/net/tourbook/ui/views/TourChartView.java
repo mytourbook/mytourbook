@@ -361,7 +361,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		if (fTourData == null) {
 
 			fPageBook.showPage(fPageNoChart);
-			
+
 			// a tour is not displayed, find a tour provider which provides a tour
 			Display.getCurrent().asyncExec(new Runnable() {
 				public void run() {
@@ -445,18 +445,20 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
 			if (chartDataModel != null) {
 
-				final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
-
 				final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+				if (tourData != null) {
 
-				if (fTourData == null || fTourData.equals(tourData) == false) {
-					updateChart(tourData);
+					if (fTourData == null || fTourData.equals(tourData) == false) {
+						updateChart(tourData);
+					}
+
+					final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+					// set slider position
+					fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
+							chartInfo.leftSliderValuesIndex,
+							chartInfo.rightSliderValuesIndex));
 				}
-
-				// set slider position
-				fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
-						chartInfo.leftSliderValuesIndex,
-						chartInfo.rightSliderValuesIndex));
 			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {

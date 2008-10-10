@@ -1058,7 +1058,6 @@ public class MappingView extends ViewPart {
 		} else if (selection instanceof SelectionActiveEditor) {
 
 			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
-
 			if (editor instanceof TourEditor) {
 
 				final TourEditor fTourEditor = (TourEditor) editor;
@@ -1072,9 +1071,9 @@ public class MappingView extends ViewPart {
 						chartInfo.leftSliderValuesIndex,
 						chartInfo.rightSliderValuesIndex,
 						chartInfo.selectedSliderValuesIndex);
-			}
 
-			enableActions(false);
+				enableActions(false);
+			}
 
 		} else if (selection instanceof SelectionChartInfo) {
 
@@ -1082,15 +1081,18 @@ public class MappingView extends ViewPart {
 			if (chartDataModel != null) {
 
 				final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-				final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+				if (tourData != null) {
 
-				paintTourSliders(tourData,
-						chartInfo.leftSliderValuesIndex,
-						chartInfo.rightSliderValuesIndex,
-						chartInfo.selectedSliderValuesIndex);
+					final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+					paintTourSliders(tourData,
+							chartInfo.leftSliderValuesIndex,
+							chartInfo.rightSliderValuesIndex,
+							chartInfo.selectedSliderValuesIndex);
+
+					enableActions(false);
+				}
 			}
-
-			enableActions(false);
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
 
@@ -1098,17 +1100,19 @@ public class MappingView extends ViewPart {
 
 			final ChartDataModel chartDataModel = xSliderPos.getChart().getChartDataModel();
 			final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+			if (tourData != null) {
 
-			final int leftSliderValueIndex = xSliderPos.getSlider1ValueIndex();
-			int rightSliderValueIndex = xSliderPos.getSlider2ValueIndex();
+				final int leftSliderValueIndex = xSliderPos.getSlider1ValueIndex();
+				int rightSliderValueIndex = xSliderPos.getSlider2ValueIndex();
 
-			rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-					? leftSliderValueIndex
-					: rightSliderValueIndex;
+				rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+						? leftSliderValueIndex
+						: rightSliderValueIndex;
 
-			paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex, leftSliderValueIndex);
+				paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex, leftSliderValueIndex);
 
-			enableActions(false);
+				enableActions(false);
+			}
 
 		} else if (selection instanceof PointOfInterest) {
 
@@ -1161,9 +1165,9 @@ public class MappingView extends ViewPart {
 
 				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
 				paintTour(tourData, false, true);
-			}
 
-			enableActions(false);
+				enableActions(false);
+			}
 		}
 
 	}
@@ -1393,12 +1397,14 @@ public class MappingView extends ViewPart {
 		if (fTourData == null) {
 			return;
 		}
+		
+// tour data must be cleared where the data are modified
+//		fTourData.clearComputedSeries();
 
-		fTourData.clearComputedSeries();
+		fMap.disposeOverlayImageCache();
 
 		paintTour(fTourData, true, false);
 
-		fMap.disposeOverlayImageCache();
 		fMap.queueRedrawMap();
 	}
 

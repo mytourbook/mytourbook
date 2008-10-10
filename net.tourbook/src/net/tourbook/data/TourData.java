@@ -481,11 +481,13 @@ public class TourData {
 
 	@Transient
 	public double					mapMaxLongitude;
+
 	/**
 	 * caches the world positions for lat/long values for each zoom level
 	 */
 	@Transient
 	public Map<Integer, Point[]>	fWorldPosition					= new HashMap<Integer, Point[]>();
+
 	/**
 	 * when a tour was deleted and is still visible in the raw data view, resaving the tour or
 	 * finding the tour in the entity manager causes lots of trouble with hibernate, therefor this
@@ -523,6 +525,13 @@ public class TourData {
 		paceSerieImperial = null;
 		altimeterSerieImperial = null;
 		altitudeSerieImperial = null;
+	}
+
+	/**
+	 * clears the cached world positions, this is necessary when the data serie have been modified
+	 */
+	public void clearWorldPositions() {
+		fWorldPosition.clear();
 	}
 
 	public void computeAltimeterGradientSerie() {
@@ -2284,17 +2293,17 @@ public class TourData {
 		return ignoreTimeCounter;
 	}
 
+// not used 5.10.2008 
+//	public int getDeviceDistance() {
+//		return deviceDistance;
+//	}
+
 	/**
 	 * @return the calories
 	 */
 	public String getCalories() {
 		return calories;
 	}
-
-// not used 5.10.2008 
-//	public int getDeviceDistance() {
-//		return deviceDistance;
-//	}
 
 	public String getDeviceId() {
 		return devicePluginId;
@@ -2316,14 +2325,6 @@ public class TourData {
 		}
 	}
 
-	/**
-	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
-	 *         slices are unequally
-	 */
-	public short getDeviceTimeInterval() {
-		return deviceTimeInterval;
-	}
-
 // not used 5.10.2008 
 //	public int getDeviceTotalDown() {
 //		return deviceTotalDown;
@@ -2332,6 +2333,14 @@ public class TourData {
 //	public int getDeviceTotalUp() {
 //		return deviceTotalUp;
 //	}
+
+	/**
+	 * @return Returns the time difference between 2 time slices or <code>-1</code> when the time
+	 *         slices are unequally
+	 */
+	public short getDeviceTimeInterval() {
+		return deviceTimeInterval;
+	}
 
 	public String getDeviceTourType() {
 		return deviceTourType;
@@ -2677,16 +2686,16 @@ public class TourData {
 		return tourDrivingTime;
 	}
 
+//	public Set<TourCategory> getTourCategory() {
+//		return tourCategory;
+//	}
+
 	/**
 	 * @return the tourEndPlace
 	 */
 	public String getTourEndPlace() {
 		return tourEndPlace == null ? "" : tourEndPlace; //$NON-NLS-1$
 	}
-
-//	public Set<TourCategory> getTourCategory() {
-//		return tourCategory;
-//	}
 
 	/**
 	 * @return Returns the unique key in the database for this {@link TourData} entity
@@ -2956,14 +2965,6 @@ public class TourData {
 		serieData.longitude = longitudeSerie;
 	}
 
-	/**
-	 * @param avgCadence
-	 *            the avgCadence to set
-	 */
-	public void setAvgCadence(final int avgCadence) {
-		this.avgCadence = avgCadence;
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -3005,6 +3006,14 @@ public class TourData {
 //	}
 
 	/**
+	 * @param avgCadence
+	 *            the avgCadence to set
+	 */
+	public void setAvgCadence(final int avgCadence) {
+		this.avgCadence = avgCadence;
+	}
+
+	/**
 	 * @param avgPulse
 	 *            the avgPulse to set
 	 */
@@ -3028,6 +3037,11 @@ public class TourData {
 		this.bikerWeight = bikerWeight;
 	}
 
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
+
 	/**
 	 * @param calories
 	 *            the calories to set
@@ -3035,11 +3049,6 @@ public class TourData {
 	public void setCalories(final String calories) {
 		this.calories = calories;
 	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
 
 	public void setDeviceId(final String deviceId) {
 		this.devicePluginId = deviceId;

@@ -561,7 +561,7 @@ public class TourPainter extends MapPainter {
 						continue;
 					}
 
-					// check is position is available
+					// check if position is available
 					final double[] latitudeSerie = tourData.latitudeSerie;
 					final double[] longitudeSerie = tourData.longitudeSerie;
 					if (latitudeSerie == null || longitudeSerie == null) {
@@ -702,7 +702,7 @@ public class TourPainter extends MapPainter {
 	private boolean drawTourInTile(final GC gc, final Map map, final Tile tile, final TourData tourData) {
 
 		boolean isTourInTile = false;
-
+		System.out.println(tile);
 		final TileFactory tileFactory = map.getTileFactory();
 		final int zoomLevel = map.getZoom();
 		final int tileSize = tileFactory.getInfo().getTileSize();
@@ -777,11 +777,7 @@ public class TourPainter extends MapPainter {
 
 						isTourInTile = true;
 
-						if (isDrawLine) {
-							drawTourLine(gc, serieIndex, devPosition, devPreviousPosition);
-						} else {
-							drawTourDot(gc, serieIndex, devPosition);
-						}
+						drawTourLine(gc, serieIndex, devPosition, devPreviousPosition);
 
 						// initialize previous pixel
 						if (devPreviousPosition == null) {
@@ -827,7 +823,7 @@ public class TourPainter extends MapPainter {
 					if (devPosition.equals(devPreviousPosition) == false) {
 
 						isTourInTile = true;
-
+						System.out.println(fDataSerie[serieIndex]);
 						drawTourDot(gc, serieIndex, devPosition);
 
 						// initialize previous pixel
