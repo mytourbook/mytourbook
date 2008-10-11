@@ -31,7 +31,7 @@ public class DeviceReaderTools {
 	 *        byte[] buffer to convert to string format
 	 */
 
-	public static String byteArrayToHexString(byte in[]) {
+	public static String byteArrayToHexString(final byte in[]) {
 
 		byte ch = 0x00;
 
@@ -41,7 +41,7 @@ public class DeviceReaderTools {
 			return null;
 		}
 
-		String pseudo[] = { "0", //$NON-NLS-1$
+		final String pseudo[] = { "0", //$NON-NLS-1$
 				"1", //$NON-NLS-1$
 				"2", //$NON-NLS-1$
 				"3", //$NON-NLS-1$
@@ -58,7 +58,7 @@ public class DeviceReaderTools {
 				"E", //$NON-NLS-1$
 				"F" }; //$NON-NLS-1$
 
-		StringBuffer out = new StringBuffer(in.length * 2 + in.length);
+		final StringBuilder out = new StringBuilder(in.length * 2 + in.length);
 
 		while (i < in.length) {
 
@@ -72,13 +72,13 @@ public class DeviceReaderTools {
 			ch = (byte) (ch & 0x0F);
 
 			// convert the nibble to a String Character
-			out.append(pseudo[(int) ch]);
+			out.append(pseudo[ch]);
 
 			// Strip off low nibble
 			ch = (byte) (in[i] & 0x0F);
 
 			// convert the nibble to a String Character
-			out.append(pseudo[(int) ch]);
+			out.append(pseudo[ch]);
 
 			// add space between two bytes
 			out.append(' ');
@@ -86,28 +86,17 @@ public class DeviceReaderTools {
 			i++;
 		}
 
-		String rslt = new String(out);
+		final String rslt = new String(out);
 
 		return rslt;
 	}
 
-	public static int get2ByteData(RandomAccessFile file) throws IOException {
+	public static int convert1ByteBCD(final byte[] buffer, final int offset) {
 
-		int ch1 = file.read();
-		int ch2 = file.read();
-		if ((ch1 | ch2) < 0) {
-			throw new EOFException();
-		}
-		int offset = (ch2 << 8) + (ch1 << 0);
-		return (offset);
-	}
+		final byte bufferByte = buffer[offset];
 
-	public static int convert1ByteBCD(byte[] buffer, int offset) {
-
-		byte bufferByte = buffer[offset];
-
-		int nipple1 = (bufferByte & 0x0F);
-		int nipple2 = ((bufferByte & 0xF0) >> 4) * 10;
+		final int nipple1 = (bufferByte & 0x0F);
+		final int nipple2 = ((bufferByte & 0xF0) >> 4) * 10;
 
 		return nipple2 + nipple1;
 	}
@@ -119,10 +108,21 @@ public class DeviceReaderTools {
 	 * @param offset
 	 * @return Returns unsigned integer address
 	 */
-	public static int get2ByteData(byte[] buffer, int offset) {
-		int byte1 = (buffer[offset] & 0xFF) << 0;
-		int byte2 = (buffer[offset + 1] & 0xFF) << 8;
+	public static int get2ByteData(final byte[] buffer, final int offset) {
+		final int byte1 = (buffer[offset] & 0xFF) << 0;
+		final int byte2 = (buffer[offset + 1] & 0xFF) << 8;
 		return byte2 + byte1;
+	}
+
+	public static int get2ByteData(final RandomAccessFile file) throws IOException {
+
+		final int ch1 = file.read();
+		final int ch2 = file.read();
+		if ((ch1 | ch2) < 0) {
+			throw new EOFException();
+		}
+		final int offset = (ch2 << 8) + (ch1 << 0);
+		return (offset);
 	}
 
 	/**
@@ -132,11 +132,11 @@ public class DeviceReaderTools {
 	 *        position in the buffer where the data are read
 	 * @return
 	 */
-	public static long get4ByteData(byte[] buffer, int offset) {
-		long byte1 = (buffer[offset] & 0xFF) << 0;
-		long byte2 = (buffer[offset + 1] & 0xFF) << 8;
-		long byte3 = (buffer[offset + 2] & 0xFF) << 16;
-		long byte4 = (buffer[offset + 3] & 0xFF) << 24;
+	public static long get4ByteData(final byte[] buffer, final int offset) {
+		final long byte1 = (buffer[offset] & 0xFF) << 0;
+		final long byte2 = (buffer[offset + 1] & 0xFF) << 8;
+		final long byte3 = (buffer[offset + 2] & 0xFF) << 16;
+		final long byte4 = (buffer[offset + 3] & 0xFF) << 24;
 		return byte4 + byte3 + byte2 + byte1;
 	}
 
@@ -145,7 +145,7 @@ public class DeviceReaderTools {
 	 * @param rawData
 	 * @throws IOException
 	 */
-	public static void readTimeSlice(int data, TimeData timeData) throws IOException {
+	public static void readTimeSlice(final int data, final TimeData timeData) throws IOException {
 
 		// pulse (4 bits)
 		if ((data & 0x8000) != 0) {
