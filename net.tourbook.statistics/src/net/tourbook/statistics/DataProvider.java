@@ -57,7 +57,7 @@ public abstract class DataProvider {
 	 */
 	static String getYearList(final int finalYear, final int numberOfYears) {
 
-		final StringBuffer buffer = new StringBuffer();
+		final StringBuilder buffer = new StringBuilder();
 
 		for (int currentYear = finalYear; currentYear >= finalYear - numberOfYears + 1; currentYear--) {
 
