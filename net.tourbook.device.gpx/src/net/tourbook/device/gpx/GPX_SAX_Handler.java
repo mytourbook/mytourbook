@@ -25,6 +25,7 @@ import java.util.TimeZone;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 
@@ -35,14 +36,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class GPX_SAX_Handler extends DefaultHandler {
-
-	/**
-	 * Earth radius is 6367 km.
-	 */
-	static final double						EARTH_RADIUS			= 6367d;
-
-	// --- Mathematic constants ---
-	private static final double				DEGRAD					= Math.PI / 180.0d;
 
 	private static final String				NAME_SPACE_GPX_1_0		= "http://www.topografix.com/GPX/1/0";					//$NON-NLS-1$
 	private static final String				NAME_SPACE_GPX_1_1		= "http://www.topografix.com/GPX/1/1";					//$NON-NLS-1$
@@ -289,7 +282,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			fTimeData.absoluteDistance = 0;
 		} else {
 			if (fTimeData.absoluteDistance == Float.MIN_VALUE) {
-				fTimeData.absoluteDistance = fAbsoluteDistance += getDistance();
+				fTimeData.absoluteDistance = fAbsoluteDistance += DeviceReaderTools.computeDistance(fPrevTimeData.latitude,
+						fPrevTimeData.longitude,
+						fTimeData.latitude,
+						fTimeData.longitude);
 			}
 		}
 
@@ -301,35 +297,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		}
 
 		fPrevTimeData = fTimeData;
-	}
-
-	/**
-	 * @return Return the distance in meters between two positions
-	 */
-	private double getDistance() {
-
-		double lat1 = fPrevTimeData.latitude;
-		double lon1 = fPrevTimeData.longitude;
-
-		double lat2 = fTimeData.latitude;
-		double lon2 = fTimeData.longitude;
-
-		double a, c;
-
-		// convert the degree values to radians before calculation
-		lat1 = lat1 * DEGRAD;
-		lon1 = lon1 * DEGRAD;
-		lat2 = lat2 * DEGRAD;
-		lon2 = lon2 * DEGRAD;
-
-		final double dlon = lon2 - lon1;
-		final double dlat = lat2 - lat1;
-
-		a = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
-
-		c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-		return (EARTH_RADIUS * c) * 1000;
 	}
 
 	private double getDoubleValue(final String textValue) {
