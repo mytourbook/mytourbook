@@ -336,7 +336,7 @@ public class RawDataManager {
 				 */
 				for (final TourbookDevice device : deviceList) {
 
-					if (device.fileExtension.equalsIgnoreCase(fileExtension)) {
+					if (device.fileExtension.equals("*") || device.fileExtension.equalsIgnoreCase(fileExtension)) {
 
 						// device file extension was found in the filename extension
 
