@@ -25,6 +25,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -33,8 +34,10 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 
+import net.tourbook.device.DeviceReaderTools;
 import net.tourbook.importdata.ExternalDevice;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.WizardImportData;
@@ -48,7 +51,9 @@ import org.dinopolis.gpstool.gpsinput.GPSTrack;
 import org.dinopolis.gpstool.gpsinput.GPSTrackpoint;
 import org.dinopolis.gpstool.gpsinput.GPSWaypoint;
 import org.dinopolis.gpstool.gpsinput.garmin.FixedGPSGarminDataProcessor;
+import org.dinopolis.gpstool.gpsinput.garmin.GarminProduct;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrack;
+import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointAdapter;
 import org.dinopolis.util.ProgressListener;
 import org.dinopolis.util.text.OneArgumentMessageFormat;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -58,6 +63,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.osgi.framework.Version;
 
 public class GarminExternalDevice extends ExternalDevice {
 
@@ -68,8 +74,7 @@ public class GarminExternalDevice extends ExternalDevice {
 		buildNewFileNames = false;
 		Properties veloProp = new Properties();
 		try {
-			veloProp.load(this.getClass()
-					.getResourceAsStream("/velocity.properties")); //$NON-NLS-1$
+			veloProp.load(this.getClass().getResourceAsStream("/velocity.properties")); //$NON-NLS-1$
 			Velocity.init(veloProp);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -82,7 +87,7 @@ public class GarminExternalDevice extends ExternalDevice {
 
 		return new IRunnableWithProgress() {
 
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")//$NON-NLS-1$
 			public void run(final IProgressMonitor monitor) {
 				fCancelImport = false;
 				final Thread currentThread = Thread.currentThread();
@@ -137,6 +142,8 @@ public class GarminExternalDevice extends ExternalDevice {
 						monitorDevInfo = Messages.Garmin_unknown_device;
 					}
 
+					GarminProduct productInfo = garminDataProcessor.getGarminProductInfo(2000L);
+
 					garminDataProcessor.addProgressListener(new ProgressListener() {
 						private int	done;
 
@@ -183,6 +190,27 @@ public class GarminExternalDevice extends ExternalDevice {
 						// save files
 						for (GarminTrack track : destTracks) {
 
+							// compute distance if not supported by device
+							GarminTrackpointAdapter prevGta = null;
+							for (Iterator wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
+								GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
+								if (wp instanceof GarminTrackpointAdapter) {
+									GarminTrackpointAdapter gta = (GarminTrackpointAdapter) wp;
+									if (!gta.hasValidDistance()) {
+										if (prevGta != null) {
+											gta.setDistance(prevGta.getDistance()
+													+ DeviceReaderTools.computeDistance(prevGta.getLatitude(),
+															prevGta.getLongitude(),
+															gta.getLatitude(),
+															gta.getLongitude()));
+										} else {
+											gta.setDistance(0);
+										}
+									}
+									prevGta = gta;
+								}
+							}
+
 							// create context
 							VelocityContext context = new VelocityContext();
 
@@ -197,13 +225,13 @@ public class GarminExternalDevice extends ExternalDevice {
 							File receivedFile = new File(RawDataManager.getTempDir()
 									+ File.separator
 									+ track.getIdentification()
-									+ ".gpx"); //$NON-NLS-1$
+									+ ".tcx"); //$NON-NLS-1$
 
 							Reader reader = new InputStreamReader(this.getClass()
-									.getResourceAsStream("/gpx-template/gpx-1.0.vm")); //$NON-NLS-1$
+									.getResourceAsStream("/gpx-template/tcx-2.0.vm")); //$NON-NLS-1$
 							Writer writer = new FileWriter(receivedFile);
 
-							addDefaultValuesToContext(context);
+							addValuesToContext(context, productInfo);
 
 							Velocity.evaluate(context, writer, "MyTourbook", reader); //$NON-NLS-1$
 							writer.close();
@@ -253,12 +281,12 @@ public class GarminExternalDevice extends ExternalDevice {
 
 			/**
 			 * If in the tracks date or altitude values is missing, these are copied from activeLog.
-			 *
+			 * 
 			 * @param monitor
 			 * @param activeLog
 			 * @param tracks
 			 */
-			@SuppressWarnings("unchecked") //$NON-NLS-1$
+			@SuppressWarnings("unchecked")//$NON-NLS-1$
 			private void mergeActiveLog(GarminTrack activeLog, List<GarminTrack> tracks) {
 
 				Map<ListIterator<GPSTrackpoint>, GPSTrackpoint> destinationTracks = new HashMap<ListIterator<GPSTrackpoint>, GPSTrackpoint>();
@@ -305,84 +333,168 @@ public class GarminExternalDevice extends ExternalDevice {
 					}
 				}
 			}
+
+			// ----------------------------------------------------------------------
+			/**
+			 * Adds some important values to the velocity context (e.g. date, ...).
+			 * 
+			 * @param context
+			 *            the velocity context holding all the data
+			 * @param productInfo
+			 *            infos about the Garmin device
+			 */
+			@SuppressWarnings("unchecked")//$NON-NLS-1$
+			private void addValuesToContext(VelocityContext context, GarminProduct productInfo) {
+				DecimalFormat double6formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
+				double6formatter.applyPattern("0.0000000"); //$NON-NLS-1$
+				DecimalFormat int_formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
+				int_formatter.applyPattern("000000"); //$NON-NLS-1$
+				DecimalFormat double2formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
+				double2formatter.applyPattern("0.00"); //$NON-NLS-1$
+				OneArgumentMessageFormat string_formatter = new OneArgumentMessageFormat("{0}", Locale.US); //$NON-NLS-1$
+				SimpleDateFormat dateFormat = new SimpleDateFormat();
+				dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+				context.put("dateformatter", dateFormat); //$NON-NLS-1$
+				context.put("double6formatter", double6formatter); //$NON-NLS-1$
+				context.put("intformatter", int_formatter); //$NON-NLS-1$
+				context.put("stringformatter", string_formatter); //$NON-NLS-1$
+				context.put("double2formatter", double2formatter); //$NON-NLS-1$
+
+				// current time, date
+				Calendar now = Calendar.getInstance();
+				Date creationDate = now.getTime();
+				context.put("creation_date", creationDate); //$NON-NLS-1$
+
+				// author
+				context.put("author", System.getProperty(WizardImportData.SYSPROPERTY_IMPORT_PERSON, "MyTourbook")); //$NON-NLS-1$ //$NON-NLS-2$
+
+				// device infos
+				String productName = productInfo.getProductName();
+				context.put("devicename", productName.substring(0, productName.indexOf(' ')));
+				context.put("productid", "" + productInfo.getProductId());
+				context.put("devicemajorversion", "" + (productInfo.getProductSoftware() / 100));
+				context.put("deviceminorversion", "" + (productInfo.getProductSoftware() % 100));
+
+				// Version
+				String pluginmajorversion = "0";
+				String pluginminorversion = "0";
+				Version version = Activator.getDefault().getVersion();
+				if (version != null) {
+					pluginmajorversion = "" + version.getMajor();
+					pluginminorversion = "" + version.getMinor();
+				}
+				context.put("pluginmajorversion", pluginmajorversion);
+				context.put("pluginminorversion", pluginminorversion);
+
+				// extent of waypoint, routes and tracks:
+				double min_latitude = 90.0;
+				double min_longitude = 180.0;
+				double max_latitude = -90.0;
+				double max_longitude = -180.0;
+
+				List routes = (List) context.get("routes"); //$NON-NLS-1$
+				if (routes != null) {
+					Iterator route_iterator = routes.iterator();
+					while (route_iterator.hasNext()) {
+						GPSRoute route = (GPSRoute) route_iterator.next();
+						min_longitude = route.getMinLongitude();
+						max_longitude = route.getMaxLongitude();
+						min_latitude = route.getMinLatitude();
+						max_latitude = route.getMaxLatitude();
+					}
+				}
+
+				List tracks = (List) context.get("tracks"); //$NON-NLS-1$
+				if (tracks != null) {
+					Iterator track_iterator = tracks.iterator();
+					while (track_iterator.hasNext()) {
+						GPSTrack track = (GPSTrack) track_iterator.next();
+						min_longitude = Math.min(min_longitude, track.getMinLongitude());
+						max_longitude = Math.max(max_longitude, track.getMaxLongitude());
+						min_latitude = Math.min(min_latitude, track.getMinLatitude());
+						max_latitude = Math.max(max_latitude, track.getMaxLatitude());
+					}
+				}
+				List waypoints = (List) context.get("waypoints"); //$NON-NLS-1$
+				if (waypoints != null) {
+					Iterator waypoint_iterator = waypoints.iterator();
+					while (waypoint_iterator.hasNext()) {
+						GPSWaypoint waypoint = (GPSWaypoint) waypoint_iterator.next();
+						min_longitude = Math.min(min_longitude, waypoint.getLongitude());
+						max_longitude = Math.max(max_longitude, waypoint.getLongitude());
+						min_latitude = Math.min(min_latitude, waypoint.getLatitude());
+						max_latitude = Math.max(max_latitude, waypoint.getLatitude());
+					}
+				}
+				context.put("min_latitude", new Double(min_latitude)); //$NON-NLS-1$
+				context.put("min_longitude", new Double(min_longitude)); //$NON-NLS-1$
+				context.put("max_latitude", new Double(max_latitude)); //$NON-NLS-1$
+				context.put("max_longitude", new Double(max_longitude)); //$NON-NLS-1$
+
+				Date starttime = null;
+				Date endtime = null;
+				int heartNum = 0;
+				long heartSum = 0;
+				int cadNum = 0;
+				long cadSum = 0;
+				short maximumheartrate = 0;
+				double totaldistance = 0;
+
+				for (Iterator trackIter = tracks.iterator(); trackIter.hasNext();) {
+					GPSTrack track = (GPSTrack) trackIter.next();
+					for (Iterator wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
+						GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
+
+						// starttime, totaltime
+						if (wp.getDate() != null) {
+							if (starttime == null)
+								starttime = wp.getDate();
+							endtime = wp.getDate();
+						}
+						if (wp instanceof GarminTrackpointAdapter) {
+							GarminTrackpointAdapter gta = (GarminTrackpointAdapter) wp;
+
+							// averageheartrate, maximumheartrate
+							if (gta.hasValidHeartrate()) {
+								heartSum += gta.getHeartrate();
+								heartNum++;
+								if (gta.getHeartrate() > maximumheartrate)
+									maximumheartrate = gta.getHeartrate();
+							}
+
+							// averagecadence
+							if (gta.hasValidCadence()) {
+								cadSum += gta.getCadence();
+								cadNum++;
+							}
+
+							// totaldistance
+							if (gta.hasValidDistance())
+								totaldistance = gta.getDistance();
+						}
+					}
+				}
+
+				if (starttime != null)
+					context.put("starttime", starttime);
+				else
+					context.put("starttime", creationDate);
+
+				if (starttime != null && endtime != null)
+					context.put("totaltime", ((double) endtime.getTime() - starttime.getTime()) / 1000);
+				else
+					context.put("totaltime", (double) 0);
+
+				context.put("totaldistance", totaldistance);
+
+				if (maximumheartrate != 0)
+					context.put("maximumheartrate", maximumheartrate);
+				if (heartNum != 0)
+					context.put("averageheartrate", heartSum / heartNum);
+				if (cadNum != 0)
+					context.put("averagecadence", cadSum / cadNum);
+			}
 		};
-	}
-
-	// ----------------------------------------------------------------------
-	/**
-	 * Adds some important values to the velocity context (e.g. date, ...).
-	 *
-	 * @param context
-	 *        the velocity context holding all the data
-	 */
-	@SuppressWarnings("unchecked") //$NON-NLS-1$
-	private void addDefaultValuesToContext(VelocityContext context) {
-		DecimalFormat latitude_formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-		latitude_formatter.applyPattern("0.0000000"); //$NON-NLS-1$
-		DecimalFormat longitude_formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-		longitude_formatter.applyPattern("0.0000000"); //$NON-NLS-1$
-		DecimalFormat altitude_formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-		altitude_formatter.applyPattern("000000"); //$NON-NLS-1$
-		OneArgumentMessageFormat string_formatter = new OneArgumentMessageFormat("{0}", Locale.US); //$NON-NLS-1$
-		context.put("dateformatter", new SimpleDateFormat()); //$NON-NLS-1$
-		context.put("latitudeformatter", latitude_formatter); //$NON-NLS-1$
-		context.put("longitudeformatter", longitude_formatter); //$NON-NLS-1$
-		context.put("altitudeformatter", altitude_formatter); //$NON-NLS-1$
-		context.put("stringformatter", string_formatter); //$NON-NLS-1$
-		// current time, date
-		Calendar now = Calendar.getInstance();
-		context.put("creation_date", now.getTime()); //$NON-NLS-1$
-
-		// author
-		context.put("author", System.getProperty(WizardImportData.SYSPROPERTY_IMPORT_PERSON, "MyTourbook")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		// extent of waypoint, routes and tracks:
-		double min_latitude = 90.0;
-		double min_longitude = 180.0;
-		double max_latitude = -90.0;
-		double max_longitude = -180.0;
-
-		List routes = (List) context.get("routes"); //$NON-NLS-1$
-		GPSRoute route;
-		if (routes != null) {
-			Iterator route_iterator = routes.iterator();
-			while (route_iterator.hasNext()) {
-				route = (GPSRoute) route_iterator.next();
-				min_longitude = route.getMinLongitude();
-				max_longitude = route.getMaxLongitude();
-				min_latitude = route.getMinLatitude();
-				max_latitude = route.getMaxLatitude();
-			}
-		}
-
-		List tracks = (List) context.get("tracks"); //$NON-NLS-1$
-		GPSTrack track;
-		if (tracks != null) {
-			Iterator track_iterator = tracks.iterator();
-			while (track_iterator.hasNext()) {
-				track = (GPSTrack) track_iterator.next();
-				min_longitude = Math.min(min_longitude, track.getMinLongitude());
-				max_longitude = Math.max(max_longitude, track.getMaxLongitude());
-				min_latitude = Math.min(min_latitude, track.getMinLatitude());
-				max_latitude = Math.max(max_latitude, track.getMaxLatitude());
-			}
-		}
-		List waypoints = (List) context.get("waypoints"); //$NON-NLS-1$
-		GPSWaypoint waypoint;
-		if (waypoints != null) {
-			Iterator waypoint_iterator = waypoints.iterator();
-			while (waypoint_iterator.hasNext()) {
-				waypoint = (GPSWaypoint) waypoint_iterator.next();
-				min_longitude = Math.min(min_longitude, waypoint.getLongitude());
-				max_longitude = Math.max(max_longitude, waypoint.getLongitude());
-				min_latitude = Math.min(min_latitude, waypoint.getLatitude());
-				max_latitude = Math.max(max_latitude, waypoint.getLatitude());
-			}
-		}
-		context.put("min_latitude", new Double(min_latitude)); //$NON-NLS-1$
-		context.put("min_longitude", new Double(min_longitude)); //$NON-NLS-1$
-		context.put("max_latitude", new Double(max_latitude)); //$NON-NLS-1$
-		context.put("max_longitude", new Double(max_longitude)); //$NON-NLS-1$
 	}
 
 	@Override

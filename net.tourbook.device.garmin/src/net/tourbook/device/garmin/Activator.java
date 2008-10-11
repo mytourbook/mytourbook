@@ -15,12 +15,16 @@
  *******************************************************************************/
 package net.tourbook.device.garmin;
 
+import org.eclipse.osgi.framework.internal.core.AbstractBundle;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 
 /**
  * The activator class controls the plug-in life cycle
  */
+@SuppressWarnings("restriction")
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
@@ -28,6 +32,8 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator	plugin;
+
+	private Version				version;
 
 	/**
 	 * The constructor
@@ -38,6 +44,11 @@ public class Activator extends AbstractUIPlugin {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
+		Bundle bundle = context.getBundle();
+		if (bundle instanceof AbstractBundle) {
+			AbstractBundle abstractBundle = (AbstractBundle) bundle;
+			version = abstractBundle.getVersion();
+		}
 		super.start(context);
 	}
 
@@ -56,4 +67,7 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	public Version getVersion() {
+		return version;
+	}
 }

@@ -1,4 +1,4 @@
-<?xml version="1.0"?> $dateformatter.applyPattern("yyyy-MM-dd'T'HH:mm:ssZ") $longitudeformatter.applyPattern("0.000000") $latitudeformatter.applyPattern("0.000000") $altitudeformatter.applyPattern("0")
+<?xml version="1.0" encoding="UTF-8" ?> $dateformatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss'Z'") $double6formatter.applyPattern("0.000000") $double2formatter.applyPattern("0.00") $intformatter.applyPattern("0")
 <gpx  version="1.0"
   creator="$author"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,9 +11,9 @@
 ## print all waypoints that are available:
 #if($printwaypoints)
 #foreach( $point in $waypoints )
-  <wpt lat="$latitudeformatter.format($point.Latitude)" lon="$longitudeformatter.format($point.Longitude)">
+  <wpt lat="$double6formatter.format($point.Latitude)" lon="$double6formatter.format($point.Longitude)">
 #if($point.hasValidAltitude())
-    <ele>$altitudeformatter.format($point.Altitude)</ele>
+    <ele>$intformatter.format($point.Altitude)</ele>
 #end
     <name>$!point.Identification</name>
 #if($point.getComment().length() > 0)
@@ -36,9 +36,9 @@
     <number>$velocityCount</number>
 #set ($points = $route.getWaypoints())
 #foreach ($point in $points)
-    <rtept lat="$latitudeformatter.format($point.Latitude)" lon="$longitudeformatter.format($point.Longitude)">
+    <rtept lat="$double6formatter.format($point.Latitude)" lon="$double6formatter.format($point.Longitude)">
 #if($point.hasValidAltitude())
-        <ele>$altitudeformatter.format($point.Altitude)</ele>
+        <ele>$intformatter.format($point.Altitude)</ele>
 #end
 #if($point.getIdentification().length() > 0)
     <name>![CDATA[$!point.Identification]]</name>
@@ -70,9 +70,9 @@
     <trkseg>
 #set($close_segment = true)
 #end
-      <trkpt lat="$latitudeformatter.format($point.Latitude)" lon="$longitudeformatter.format($point.Longitude)">
+      <trkpt lat="$double6formatter.format($point.Latitude)" lon="$double6formatter.format($point.Longitude)">
 #if($point.hasValidAltitude())
-        <ele>$altitudeformatter.format($point.Altitude)</ele>
+        <ele>$intformatter.format($point.Altitude)</ele>
 #end
 #if($point.getDate())## only if there is a time set! 
         <time>$dateformatter.format($point.getDate())</time>

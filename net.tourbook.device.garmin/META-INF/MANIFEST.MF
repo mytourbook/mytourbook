@@ -13,10 +13,10 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %Bundle-Vendor.0
 Bundle-ClassPath: .,
- gpsinput-0.5.3.jar,
- dinopolis-util-0.5.3.jar,
  log4j-1.2.14.jar,
  velocity-1.5.jar,
  commons-collections-3.2.jar,
- commons-lang-2.4.jar
+ commons-lang-2.4.jar,
+ dinopolis-util-0.5.4mt.jar,
+ gpsinput-0.5.4mt.jar
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
