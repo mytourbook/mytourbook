@@ -121,7 +121,7 @@ public abstract class TreeViewerItem {
 	public String getSQlTourPersonId() {
 
 		final TourPerson fActivePerson = TourbookPlugin.getDefault().getActivePerson();
-		final StringBuffer sqlString = new StringBuffer();
+		final StringBuilder sqlString = new StringBuilder();
 
 		final long personId = fActivePerson == null ? -1 : fActivePerson.getPersonId();
 		if (personId == -1) {

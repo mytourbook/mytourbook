@@ -2920,16 +2920,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void selectTimeSlice(final SelectionChartInfo chartInfo) {
 
-		int leftIndex = chartInfo.leftSliderValuesIndex;
-//		final int rightIndex = chartInfo.rightSliderValuesIndex;
-
 		final Table table = (Table) fDataViewer.getControl();
 		final int itemCount = table.getItemCount();
 
 		// adjust to array bounds 
-		leftIndex = Math.max(0, Math.min(leftIndex, itemCount - 1));
+		int valueIndex = chartInfo.selectedSliderValuesIndex;
+		valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
 
-		table.setSelection(leftIndex);
+		table.setSelection(valueIndex);
 		table.showSelection();
 
 		// fire slider position

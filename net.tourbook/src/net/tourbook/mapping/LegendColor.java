@@ -104,7 +104,7 @@ public class LegendColor {
 	 */
 	public String createConstructorString() {
 
-		final StringBuffer buffer = new StringBuffer();
+		final StringBuilder buffer = new StringBuilder();
 
 		buffer.append('\n');
 		buffer.append('\n');

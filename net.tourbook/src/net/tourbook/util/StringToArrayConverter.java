@@ -21,6 +21,20 @@ public class StringToArrayConverter {
 
 	public static final String	STRING_SEPARATOR	= ",";	//$NON-NLS-1$
 
+	public static String convertArrayToString(final String[] array) {
+		return convertArrayToString(array, STRING_SEPARATOR);
+	}
+
+	public static String convertArrayToString(final String[] array, final String separator) {
+		final StringBuilder buf = new StringBuilder();
+		for (final String element : array) {
+			buf.append(element);
+			buf.append(separator);
+		}
+		return buf.toString();
+
+	}
+
 	public static String[] convertStringToArray(final String str) {
 		return convertStringToArray(str, STRING_SEPARATOR);
 	}
@@ -33,20 +47,6 @@ public class StringToArrayConverter {
 			res[i] = tok.nextToken();
 		}
 		return res;
-	}
-
-	public static String convertArrayToString(final String[] array) {
-		return convertArrayToString(array, STRING_SEPARATOR);
-	}
-
-	public static String convertArrayToString(final String[] array, final String separator) {
-		final StringBuffer buf = new StringBuffer();
-		for (final String element : array) {
-			buf.append(element);
-			buf.append(separator);
-		}
-		return buf.toString();
-
 	}
 
 }
