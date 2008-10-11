@@ -24,11 +24,19 @@ import net.tourbook.data.TimeData;
 public class DeviceReaderTools {
 
 	/**
+	 * Earth radius is 6367 km.
+	 */
+	static final double			EARTH_RADIUS	= 6367d;
+
+	// --- Mathematic constants ---
+	private static final double	DEGRAD			= Math.PI / 180.0d;
+
+	/**
 	 * Convert a byte[] array to readable string format. This makes the "hex" readable!
 	 * 
 	 * @return result String buffer in String format
 	 * @param in
-	 *        byte[] buffer to convert to string format
+	 *            byte[] buffer to convert to string format
 	 */
 
 	public static String byteArrayToHexString(final byte in[]) {
@@ -127,9 +135,9 @@ public class DeviceReaderTools {
 
 	/**
 	 * @param buffer
-	 *        buffer where the data are stored
+	 *            buffer where the data are stored
 	 * @param offset
-	 *        position in the buffer where the data are read
+	 *            position in the buffer where the data are read
 	 * @return
 	 */
 	public static long get4ByteData(final byte[] buffer, final int offset) {
@@ -174,4 +182,31 @@ public class DeviceReaderTools {
 		// distance (6 bits)
 		timeData.distance = (short) (data & 0x003F) * 10;
 	}
+
+	/**
+	 * @return Return the distance in meters between two positions
+	 */
+	public static double computeDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
+
+		double a, c;
+
+		// convert the degree values to radians before calculation
+		latitude1 = latitude1 * DEGRAD;
+		longitude1 = longitude1 * DEGRAD;
+		latitude2 = latitude2 * DEGRAD;
+		longitude2 = longitude2 * DEGRAD;
+
+		final double dlon = longitude2 - longitude1;
+		final double dlat = latitude2 - latitude1;
+
+		a = Math.pow(Math.sin(dlat / 2), 2)
+				+ Math.cos(latitude1)
+				* Math.cos(latitude2)
+				* Math.pow(Math.sin(dlon / 2), 2);
+
+		c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+		return (EARTH_RADIUS * c) * 1000;
+	}
+
 }
