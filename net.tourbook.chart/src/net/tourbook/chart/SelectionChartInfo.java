@@ -28,6 +28,10 @@ public class SelectionChartInfo implements ISelection {
 
 	public int							leftSliderValuesIndex;
 	public int							rightSliderValuesIndex;
+	
+	/**
+	 * contains the value index for the slider which is selected
+	 */
 	public int							selectedSliderValuesIndex;
 
 	@SuppressWarnings("unused")//$NON-NLS-1$

@@ -2689,18 +2689,19 @@ public class ChartComponentGraph extends Canvas {
 			/*
 			 * left and right slider have different label backgrounds
 			 */
-			if (slider == getLeftSlider()) {
-				// left slider
-				gc.setBackground(colorDark);
-				gc.setForeground(colorBright);
-			} else {
-				// right slider
-				gc.setBackground(colorBright);
-				gc.setForeground(colorDark);
-			}
+//			if (slider == getLeftSlider()) {
+//				// left slider
+			gc.setBackground(colorDark);
+			gc.setForeground(colorBright);
+//			} else {
+//				// right slider
+//				gc.setBackground(colorBright);
+//				gc.setForeground(colorDark);
+//			}
 
 			// draw label background
-			gc.fillGradientRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight, false);
+//			gc.fillGradientRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight, false);
+			gc.fillRectangle(labelX + 1, labelY, labelWidth - 1, labelHeight);
 
 			// draw label border
 			gc.setForeground(colorLine);
@@ -3107,7 +3108,10 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private Color getColor(final RGB rgb) {
 
-		final String colorKey = rgb.toString();
+// this is a performance bottleneck
+//		final String colorKey = rgb.toString();
+
+		final String colorKey = Integer.toString(rgb.hashCode());
 
 		final Color color = fColorCache.get(colorKey);
 
@@ -4396,36 +4400,17 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		if (isLayerImageVisible) {
-//			if (fIsGraphDirty == false) {
 			gc.drawImage(fLayerImage, imageScrollPosition, 0);
-//			}
 			return fLayerImage;
 		} else {
-//			if (fIsGraphDirty == false) {
 			gc.drawImage(fGraphImage, imageScrollPosition, 0);
-//			}
 			return fGraphImage;
 		}
 	}
 
 	private void paintDraggedChart(final GC gc) {
 
-		int devXDiff = 0;
-
-//		if (fIsPaintDraggedImage) {
-//
-//			final int devXOffsetNew = (int) (fXOffsetZoomRatio * fDevVirtualGraphImageWidth);
-//			devXDiff = fDevGraphImageXOffset - devXOffsetNew;
-//			System.out.println(devXDiff);
-//		} else {
-//
-//			/*
-//			 * draw background between moved chart and the client area
-//			 */
-//			devXDiff = fDraggedChartDraggedPos.x - fDraggedChartStartPos.x;
-//		}
-		devXDiff = fDraggedChartDraggedPos.x - fDraggedChartStartPos.x;
-
+		final int devXDiff = fDraggedChartDraggedPos.x - fDraggedChartStartPos.x;
 		final int devYDiff = 0;
 
 		gc.setBackground(fChart.getBackgroundColor());
