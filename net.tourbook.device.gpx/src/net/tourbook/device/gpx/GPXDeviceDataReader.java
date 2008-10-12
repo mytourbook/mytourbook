@@ -27,6 +27,11 @@ import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.ui.UI;
+
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
+import org.xml.sax.SAXParseException;
 
 public class GPXDeviceDataReader extends TourbookDevice {
 
@@ -36,16 +41,18 @@ public class GPXDeviceDataReader extends TourbookDevice {
 	public GPXDeviceDataReader() {}
 
 	@Override
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+		// NEXT Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public boolean checkStartSequence(final int byteIndex, final int newByte) {
 		return true;
 	}
 
 	public String getDeviceModeName(final int profileId) {
 		return ""; //$NON-NLS-1$
-	}
-
-	public int getTransferDataSize() {
-		return -1;
 	}
 
 	@Override
@@ -58,7 +65,12 @@ public class GPXDeviceDataReader extends TourbookDevice {
 		return 0;
 	}
 
-	public boolean processDeviceData(final String importFilePath, final DeviceData deviceData,
+	public int getTransferDataSize() {
+		return -1;
+	}
+
+	public boolean processDeviceData(	final String importFilePath,
+										final DeviceData deviceData,
 										final HashMap<String, TourData> tourDataMap) {
 
 		/*
@@ -67,32 +79,55 @@ public class GPXDeviceDataReader extends TourbookDevice {
 		BufferedReader fileReader = null;
 		try {
 			fileReader = new BufferedReader(new FileReader(importFilePath));
-			String fileHeader = fileReader.readLine();
+			final String fileHeader = fileReader.readLine();
 			if (fileHeader == null || fileHeader.contains(XML_START_ID) == false) {
 				fileReader.close();
 				return false;
 			}
-		} catch (FileNotFoundException e1) {
+		} catch (final FileNotFoundException e1) {
 			e1.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				if (fileReader != null) {
 					fileReader.close();
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
 
-		GPX_SAX_Handler handler = new GPX_SAX_Handler(this, importFilePath, deviceData, tourDataMap);
+		final GPX_SAX_Handler handler = new GPX_SAX_Handler(this, importFilePath, deviceData, tourDataMap);
 
 		try {
 
 			SAXParserFactory.newInstance().newSAXParser().parse("file:" + importFilePath, handler);//$NON-NLS-1$
 
-		} catch (Exception e) {
+		} catch (final SAXParseException e) {
+
+			final StringBuilder sb = new StringBuilder()//
+			.append("XML error when parsing file:\n")
+					.append(UI.NEW_LINE)
+					.append(importFilePath)
+					.append(UI.NEW_LINE)
+					.append(UI.NEW_LINE)
+					.append(e.getLocalizedMessage())
+					.append(UI.NEW_LINE)
+					.append(UI.NEW_LINE)
+					.append("Line: ")
+					.append(e.getLineNumber())
+					.append("\tColumn: ")
+					.append(e.getColumnNumber())
+			//
+			;
+
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", sb.toString());
+
+			e.printStackTrace();
+			return false;
+
+		} catch (final Exception e) {
 			System.err.println("Error parsing file: " + importFilePath); //$NON-NLS-1$ 
 			e.printStackTrace();
 			return false;
@@ -103,11 +138,5 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
 	public boolean validateRawData(final String fileName) {
 		return true;
-	}
-
-	@Override
-	public String buildFileNameFromRawData(final String rawDataFileName) {
-		// NEXT Auto-generated method stub
-		return null;
 	}
 }
