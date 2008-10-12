@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.tourbook.ext.eclipse.nl_de"
+      id="net.tourbook.ext.eclipse.nl_de.feature"
       label="Eclipse German Translation"
       version="1.6.0.v2008-08"
       provider-name="MyTourbook">
