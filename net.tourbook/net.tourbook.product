@@ -78,14 +78,14 @@
 
    <features>
       <feature id="org.eclipse.rcp" version="3.4.0.v20080324a-989JERhEk-jWnd5IY8K5tjxB"/>
-      <feature id="net.tourbook.ext.eclipse" version="1.6.0.v2008-08"/>
-      <feature id="net.tourbook.ext.eclipse.nl_de" version="1.6.0.v2008-08"/>
+      <feature id="net.tourbook.ext.eclipse.feature" version="1.6.0.v2008-08"/>
+      <feature id="net.tourbook.ext.eclipse.nl_de.feature" version="1.6.0.v2008-08"/>
       <feature id="net.tourbook.ext.derby.feature" version="10.3.2.1"/>
       <feature id="net.tourbook.ext.ejb3.feature" version="3.3.0"/>
-      <feature id="net.tourbook.device.feature" version="1.6.1.v2008-09"/>
       <feature id="net.tourbook.feature" version="1.6.1.v2008-09"/>
-      <feature id="net.tourbook.geoclipse.feature" version="0.1.2.v2008-09"/>
+      <feature id="net.tourbook.device.feature" version="1.6.1.v2008-09"/>
       <feature id="net.tourbook.statistics.feature" version="1.6.1.v2008-09"/>
+      <feature id="net.tourbook.geoclipse.feature" version="0.1.2.v2008-09"/>
    </features>
 
 </product>
