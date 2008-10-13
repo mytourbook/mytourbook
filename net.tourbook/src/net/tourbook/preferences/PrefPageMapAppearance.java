@@ -6,6 +6,7 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -18,8 +19,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageMapAppearance extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		MAP_TOUR_SYMBOL_LINE	= "line"; //$NON-NLS-1$
-	public static final String		MAP_TOUR_SYMBOL_DOT		= "dot"; //$NON-NLS-1$
+	public static final String		MAP_TOUR_SYMBOL_LINE	= "line";											//$NON-NLS-1$
+	public static final String		MAP_TOUR_SYMBOL_DOT		= "dot";											//$NON-NLS-1$
+	public static final String		MAP_TOUR_SYMBOL_SQUARE	= "square";										//$NON-NLS-1$
 
 	private final IPreferenceStore	fPrefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 	private boolean					fIsModified;
@@ -35,20 +37,26 @@ public class PrefPageMapAppearance extends FieldEditorPreferencePage implements 
 				1,
 				new String[][] {
 						{ Messages.pref_map_layout_symbol_line, MAP_TOUR_SYMBOL_LINE },
-						{ Messages.pref_map_layout_symbol_dot, MAP_TOUR_SYMBOL_DOT } },
+						{ Messages.pref_map_layout_symbol_dot, MAP_TOUR_SYMBOL_DOT },
+						{ Messages.pref_map_layout_symbol_square, MAP_TOUR_SYMBOL_SQUARE } },
 				parent,
 				true));
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(container);
 
-		// show lines
+		// line width
 		final IntegerFieldEditor editor = new IntegerFieldEditor(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH,
 				Messages.pref_map_layout_symbol_width,
 				container);
 		addField(editor);
 		UI.setFieldWidth(container, editor, UI.DEFAULT_FIELD_WIDTH);
 		editor.setValidRange(1, 50);
+
+		// dim color
+		addField(new ColorFieldEditor(ITourbookPreferences.MAP_LAYOUT_DIM_COLOR,
+				Messages.pref_map_layout_dim_color,
+				container));
 	}
 
 	public void init(final IWorkbench workbench) {

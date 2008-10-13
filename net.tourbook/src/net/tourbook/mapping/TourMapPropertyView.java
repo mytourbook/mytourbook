@@ -29,6 +29,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourMapPropertyView extends ViewPart {
@@ -37,6 +38,8 @@ public class TourMapPropertyView extends ViewPart {
 
 	private Button				fRadioTileInfoNo;
 	private Button				fRadioTileInfoYes;
+
+	private Scale				fScaleDimMap;
 
 	private void createLayout(final Composite parent) {
 
@@ -91,6 +94,24 @@ public class TourMapPropertyView extends ViewPart {
 					}
 				});
 			}
+
+			/*
+			 * scale: dim map
+			 */
+			label = new Label(infoContainer, SWT.NONE);
+			label.setText(Messages.map_properties_map_dim_level);
+
+			fScaleDimMap = new Scale(infoContainer, SWT.NONE);
+			fScaleDimMap.setIncrement(1);
+			fScaleDimMap.setPageIncrement(10);
+			fScaleDimMap.setMinimum(0);
+			fScaleDimMap.setMaximum(100);
+			fScaleDimMap.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onChangeProperty();
+				}
+			});
 		}
 	}
 
@@ -102,16 +123,10 @@ public class TourMapPropertyView extends ViewPart {
 		restoreSettings();
 	}
 
-	private void enableControls() {
-
-	}
-
 	/**
 	 * Property was changed, fire a property change event
 	 */
 	private void onChangeProperty() {
-
-		enableControls();
 
 		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -119,7 +134,9 @@ public class TourMapPropertyView extends ViewPart {
 
 		// radio: tile info
 		final boolean isShowTileInfo = fRadioTileInfoYes.getSelection();
-		store.setValue(MappingView.SHOW_TILE_INFO, isShowTileInfo);
+		store.setValue(MappingView.PREF_SHOW_TILE_INFO, isShowTileInfo);
+
+		store.setValue(MappingView.PREF_DEBUG_MAP_DIM_LEVEL, fScaleDimMap.getSelection());
 
 	}
 
@@ -130,14 +147,15 @@ public class TourMapPropertyView extends ViewPart {
 		// get values from pref store
 
 		// tile info
-		final boolean isShowTileInfo = store.getBoolean(MappingView.SHOW_TILE_INFO);
+		final boolean isShowTileInfo = store.getBoolean(MappingView.PREF_SHOW_TILE_INFO);
 		if (isShowTileInfo) {
 			fRadioTileInfoYes.setSelection(true);
 		} else {
 			fRadioTileInfoNo.setSelection(true);
 		}
 
-		enableControls();
+		// dim map
+		fScaleDimMap.setSelection(store.getInt(MappingView.PREF_DEBUG_MAP_DIM_LEVEL));
 	}
 
 	@Override

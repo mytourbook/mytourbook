@@ -314,14 +314,14 @@
             class="net.tourbook.mapping.MappingView"
             icon="icons/earth-globe-abstract.png"
             id="net.tourbook.mapping.mappingViewID"
-            name="%command_tour_map_name" >
+            name="%view_name_tour_map" >
       </view>
       <view
             category="net.tourbook.category.system"
             class="net.tourbook.mapping.TourMapPropertyView"
             icon="icons/tour-map-properties.gif"
             id="net.tourbook.mapping.TourMapPropertyView"
-            name="%command_view_tour_properties_name">
+            name="%view_name_map_properties">
       </view>
       
    </extension>
@@ -658,7 +658,7 @@
          </command>
          <command
                commandId="net.tourbook.command.tourProperties"
-               icon="icons/tour-properties.gif"
+               icon="icons/tour-editor.gif"
                label="%command_view_tourProperies"
                mnemonic="%command_view_tourProperies_mnemonic"
                tooltip="%command_view_tourProperies_tooltip">

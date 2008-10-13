@@ -28,6 +28,8 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
@@ -218,7 +220,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 		// update tooltip, show selected map provider
 		setToolTipText(newMapProvider.getInfo().getFactoryName()
 				+ TOOLTIP_DASH
-				+ Messages.map_action_change_tile_factory_tooltip); 
+				+ Messages.map_action_change_tile_factory_tooltip);
 	}
 
 	private void selectMapProviderInTheMap(final TileFactory mapProvider) {
@@ -230,11 +232,14 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 //		map.disposeOverlayImageCache();
 
 		map.setTileFactory(mapProvider);
-		
+
 		// reset overlays must be done after the new map provider is set
 		map.resetOverlays();
-		
-		map.setDimLevel(fMappingView.getMapDimLevel());
+
+		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
+
+		map.setDimLevel(fMappingView.getMapDimLevel(), dimColor);
 	}
 
 	/**

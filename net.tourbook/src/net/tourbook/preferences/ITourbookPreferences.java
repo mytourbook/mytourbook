@@ -145,7 +145,8 @@ public interface ITourbookPreferences {
 	 * layout for maps
 	 */
 	public static final String	MAP_LAYOUT_SYMBOL							= "map.layout.symbol";										//$NON-NLS-1$
-	public static final String	MAP_LAYOUT_SYMBOL_WIDTH						= "map.layout.symbol.width";								//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_SYMBOL_WIDTH						= "map.layout.symbol-width";								//$NON-NLS-1$
+	public static final String	MAP_LAYOUT_DIM_COLOR						= "map.layout.dim-color";
 
 	/*
 	 * id's for preference pages
@@ -157,6 +158,6 @@ public interface ITourbookPreferences {
 	 * tour data editor
 	 */
 	public static final String	TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR	= "tourdata.editor.confirmation-revert-tour";				//$NON-NLS-1$
-	public static final String	TOUR_EDITOR_DESCRIPTION_HEIGHT			= "tourdata.editor.description-height";					//$NON-NLS-1$
+	public static final String	TOUR_EDITOR_DESCRIPTION_HEIGHT				= "tourdata.editor.description-height";					//$NON-NLS-1$
 
 }

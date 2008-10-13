@@ -137,8 +137,6 @@ public class ActionDimMap extends Action implements IMenuCreator {
 		fSelectedDimLevel = dimLevel;
 		boolean isDimAvail = false;
 
-//		System.out.println("setDimLevel:" + dimLevel);
-		
 		/*
 		 * check selected dim level and uncheck others
 		 */

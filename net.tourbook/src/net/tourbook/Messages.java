@@ -379,9 +379,13 @@ public class Messages extends NLS {
 	public static String		pref_general_restart_app_message;
 	public static String		pref_general_restart_app_title;
 
+	public static String	pref_map_layout_dim_color;
+
 	public static String		pref_map_layout_symbol;
 	public static String		pref_map_layout_symbol_dot;
 	public static String		pref_map_layout_symbol_line;
+
+	public static String	pref_map_layout_symbol_square;
 	public static String		pref_map_layout_symbol_width;
 
 	public static String		pref_regional_decimalSeparator;

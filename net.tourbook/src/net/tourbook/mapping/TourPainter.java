@@ -50,6 +50,7 @@ import de.byteholder.gpx.GeoPosition;
 public class TourPainter extends MapPainter {
 
 	private static int			LINE_WIDTH			= 7;
+	private int					LINE_WIDTH2			= LINE_WIDTH / 2;
 
 	private static final String	SPACER				= " ";						//$NON-NLS-1$
 	private static final String	IMAGE_START_MARKER	= "map-marker-start.png";	//$NON-NLS-1$
@@ -544,7 +545,7 @@ public class TourPainter extends MapPainter {
 		final PaintManager paintManager = PaintManager.getInstance();
 
 		final ArrayList<TourData> tourDataList = paintManager.getTourData();
-		if (tourDataList == null) { 
+		if (tourDataList == null) {
 			return false;
 		}
 
@@ -682,7 +683,8 @@ public class TourPainter extends MapPainter {
 
 			// draw default dot when data are not available
 
-			gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
+//			gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
+			gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
 
 		} else {
 
@@ -691,8 +693,10 @@ public class TourPainter extends MapPainter {
 			final Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
 
 			{
-				gc.setForeground(lineColor);
-				gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
+//				gc.setForeground(lineColor);
+//				gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
+				gc.setBackground(lineColor);
+				gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
 			}
 
 			lineColor.dispose();
@@ -702,7 +706,7 @@ public class TourPainter extends MapPainter {
 	private boolean drawTourInTile(final GC gc, final Map map, final Tile tile, final TourData tourData) {
 
 		boolean isTourInTile = false;
-		System.out.println(tile);
+
 		final TileFactory tileFactory = map.getTileFactory();
 		final int zoomLevel = map.getZoom();
 		final int tileSize = tileFactory.getInfo().getTileSize();
@@ -742,10 +746,12 @@ public class TourPainter extends MapPainter {
 		java.awt.Point lastInsidePosition = null;
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		final boolean isDrawLine = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL)
-				.equals(PrefPageMapAppearance.MAP_TOUR_SYMBOL_LINE);
+		final String drawSymbol = prefStore.getString(ITourbookPreferences.MAP_LAYOUT_SYMBOL);
+		final boolean isDrawLine = drawSymbol.equals(PrefPageMapAppearance.MAP_TOUR_SYMBOL_LINE);
+		final boolean isDrawSquare = drawSymbol.equals(PrefPageMapAppearance.MAP_TOUR_SYMBOL_SQUARE);
 
 		LINE_WIDTH = prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
+		LINE_WIDTH2 = LINE_WIDTH / 2;
 		gc.setLineWidth(LINE_WIDTH);
 
 		for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
@@ -810,7 +816,7 @@ public class TourPainter extends MapPainter {
 
 			} else {
 
-				// draw tour with dots
+				// draw tour with dots/squares
 
 				if (tileViewport.inside(worldPosition.x, worldPosition.y)) {
 
@@ -823,8 +829,12 @@ public class TourPainter extends MapPainter {
 					if (devPosition.equals(devPreviousPosition) == false) {
 
 						isTourInTile = true;
-						System.out.println(fDataSerie[serieIndex]);
-						drawTourDot(gc, serieIndex, devPosition);
+
+						if (isDrawSquare) {
+							drawTourSquare(gc, serieIndex, devPosition);
+						} else {
+							drawTourDot(gc, serieIndex, devPosition);
+						}
 
 						// initialize previous pixel
 						if (devPreviousPosition == null) {
@@ -937,6 +947,29 @@ public class TourPainter extends MapPainter {
 		}
 
 		return isMarkerInTile;
+	}
+
+	private void drawTourSquare(final GC gc, final int serieIndex, final java.awt.Point devPosition) {
+
+		if (fDataSerie == null) {
+
+			// draw default square when data are not available
+
+			gc.fillRectangle(devPosition.x - LINE_WIDTH2, devPosition.y - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
+
+		} else {
+
+			// draw dot with the color from the legend provider
+
+			final Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
+
+			{
+				gc.setBackground(lineColor);
+				gc.fillRectangle(devPosition.x - LINE_WIDTH2, devPosition.y - LINE_WIDTH2, LINE_WIDTH, LINE_WIDTH);
+			}
+
+			lineColor.dispose();
+		}
 	}
 
 	private void getDataSerie(final TourData tourData) {

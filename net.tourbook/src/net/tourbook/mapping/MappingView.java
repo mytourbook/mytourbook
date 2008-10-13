@@ -53,6 +53,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -120,10 +121,13 @@ public class MappingView extends ViewPart {
 
 	private static final String						MEMENTO_TOUR_COLOR_ID				= "tour-color-id";							//$NON-NLS-1$
 
-	final static String								SHOW_TILE_INFO						= "show.tile-info";						//$NON-NLS-1$
+	final static String								PREF_SHOW_TILE_INFO					= "map.debug.show.tile-info";				//$NON-NLS-1$
+	final static String								PREF_DEBUG_MAP_DIM_LEVEL			= "map.debug.dim-map";						//$NON-NLS-1$
 
 	public static final int							LEGEND_MARGIN_TOP_BOTTOM			= 10;
 	public static final int							LEGEND_UNIT_DISTANCE				= 60;
+
+	private static final String						MAP_DIM_COLOR						= "map.dim.color";
 
 	private static IMemento							fSessionMemento;
 
@@ -201,15 +205,31 @@ public class MappingView extends ViewPart {
 	private ArrayList<TourData>						fTourDataList;
 
 	private int										fMapDimLevel;
+	private RGB										fMapDimColor;
 
 	public MappingView() {}
 
 	void actionDimMap(final int dimLevel) {
 
-		// check if the dim level was changed 
+		// check if the dim level/color was changed 
 		if (fMapDimLevel != dimLevel) {
+
 			fMapDimLevel = dimLevel;
-			fMap.dimMap(dimLevel);
+
+			final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+			final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
+
+			fMap.dimMap(dimLevel, dimColor);
+		}
+	}
+
+	private void actionDimMap(final RGB dimColor) {
+
+		if (fMapDimColor != dimColor) {
+
+			fMapDimColor = dimColor;
+
+			fMap.dimMap(fMapDimLevel, dimColor);
 		}
 	}
 
@@ -418,16 +438,27 @@ public class MappingView extends ViewPart {
 			public void propertyChange(final Preferences.PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
+				final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
-				if (property.equals(SHOW_TILE_INFO)) {
+				if (property.equals(PREF_SHOW_TILE_INFO)) {
 
 					// map properties has changed
 
-					final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-					final boolean isShowTileInfo = store.getBoolean(SHOW_TILE_INFO);
+					final boolean isShowTileInfo = store.getBoolean(PREF_SHOW_TILE_INFO);
 
 					fMap.setDrawTileBorders(isShowTileInfo);
 					fMap.queueRedrawMap();
+
+				} else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
+
+					float prefDimLevel = store.getInt(MappingView.PREF_DEBUG_MAP_DIM_LEVEL);
+					prefDimLevel *= 2.55;
+					prefDimLevel -= 255;
+					actionDimMap((int) Math.abs(prefDimLevel));
+
+				} else if (property.equals(ITourbookPreferences.MAP_LAYOUT_DIM_COLOR)) {
+
+					actionDimMap(PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR));
 
 				} else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
 
@@ -1397,8 +1428,8 @@ public class MappingView extends ViewPart {
 		if (fTourData == null) {
 			return;
 		}
-		
-// tour data must be cleared where the data are modified
+
+// tour data must be cleared where tour data are modified
 //		fTourData.clearComputedSeries();
 
 		fMap.disposeOverlayImageCache();
@@ -1567,11 +1598,13 @@ public class MappingView extends ViewPart {
 		}
 
 		// debug info
-		final boolean isShowTileInfo = store.getBoolean(MappingView.SHOW_TILE_INFO);
+		final boolean isShowTileInfo = store.getBoolean(MappingView.PREF_SHOW_TILE_INFO);
 		fMap.setDrawTileBorders(isShowTileInfo);
 
-		// set dim level after the map providers are set
-		fMap.setDimLevel(fMapDimLevel);
+		// set dim level/color after the map providers are set
+		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
+
+		fMap.setDimLevel(fMapDimLevel, dimColor);
 
 		// show map with the default position
 		actionSetDefaultPosition();
@@ -1833,22 +1866,74 @@ public class MappingView extends ViewPart {
 
 		case TOUR_COLOR_PULSE:
 
-			final int[] pulseSerie = fTourData.pulseSerie;
-			if (pulseSerie == null) {
+			minValue = Integer.MIN_VALUE;
+			maxValue = Integer.MAX_VALUE;
+			setInitialValue = true;
+
+			for (final TourData tourData : fTourDataList) {
+
+				final int[] dataSerie = tourData.pulseSerie;
+				if (dataSerie == null || dataSerie.length == 0) {
+					continue;
+				}
+
+				/*
+				 * get min/max values
+				 */
+				for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
+
+					if (setInitialValue) {
+						setInitialValue = false;
+						minValue = maxValue = dataSerie[valueIndex];
+					}
+
+					final int dataValue = dataSerie[valueIndex];
+					minValue = (minValue <= dataValue) ? minValue : dataValue;
+					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+				}
+			}
+
+			if (minValue == Integer.MIN_VALUE || maxValue == Integer.MAX_VALUE) {
 				return false;
 			}
 
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_HEARTBEAT);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(legendBounds, pulseSerie, Messages.graph_label_heartbeat_unit);
+			legendProvider.setLegendColorValues(legendBounds, minValue, maxValue, Messages.graph_label_heartbeat_unit);
 
 			break;
 
 		case TOUR_COLOR_SPEED:
 
-			final int[] speedSerie = fTourData.getSpeedSerie();
-			if (speedSerie == null) {
+			minValue = Integer.MIN_VALUE;
+			maxValue = Integer.MAX_VALUE;
+			setInitialValue = true;
+
+			for (final TourData tourData : fTourDataList) {
+
+				final int[] dataSerie = tourData.getSpeedSerie();
+				if (dataSerie == null || dataSerie.length == 0) {
+					continue;
+				}
+
+				/*
+				 * get min/max values
+				 */
+				for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
+
+					if (setInitialValue) {
+						setInitialValue = false;
+						minValue = maxValue = dataSerie[valueIndex];
+					}
+
+					final int dataValue = dataSerie[valueIndex];
+					minValue = (minValue <= dataValue) ? minValue : dataValue;
+					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+				}
+			}
+
+			if (minValue == Integer.MIN_VALUE || maxValue == Integer.MAX_VALUE) {
 				return false;
 			}
 
@@ -1856,14 +1941,40 @@ public class MappingView extends ViewPart {
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_SPEED);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(legendBounds, speedSerie, UI.UNIT_LABEL_SPEED);
+			legendProvider.setLegendColorValues(legendBounds, minValue, maxValue, UI.UNIT_LABEL_SPEED);
 
 			break;
 
 		case TOUR_COLOR_PACE:
 
-			final int[] paceSerie = fTourData.getPaceSerie();
-			if (paceSerie == null) {
+			minValue = Integer.MIN_VALUE;
+			maxValue = Integer.MAX_VALUE;
+			setInitialValue = true;
+
+			for (final TourData tourData : fTourDataList) {
+
+				final int[] dataSerie = tourData.getPaceSerie();
+				if (dataSerie == null || dataSerie.length == 0) {
+					continue;
+				}
+
+				/*
+				 * get min/max values
+				 */
+				for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
+
+					if (setInitialValue) {
+						setInitialValue = false;
+						minValue = maxValue = dataSerie[valueIndex];
+					}
+
+					final int dataValue = dataSerie[valueIndex];
+					minValue = (minValue <= dataValue) ? minValue : dataValue;
+					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+				}
+			}
+
+			if (minValue == Integer.MIN_VALUE || maxValue == Integer.MAX_VALUE) {
 				return false;
 			}
 
@@ -1871,14 +1982,40 @@ public class MappingView extends ViewPart {
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_PACE);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(legendBounds, paceSerie, UI.UNIT_LABEL_PACE);
+			legendProvider.setLegendColorValues(legendBounds, minValue, maxValue, UI.UNIT_LABEL_PACE);
 
 			break;
 
 		case TOUR_COLOR_GRADIENT:
 
-			final int[] gradientSerie = fTourData.getGradientSerie();
-			if (gradientSerie == null) {
+			minValue = Integer.MIN_VALUE;
+			maxValue = Integer.MAX_VALUE;
+			setInitialValue = true;
+
+			for (final TourData tourData : fTourDataList) {
+
+				final int[] dataSerie = tourData.getGradientSerie();
+				if (dataSerie == null || dataSerie.length == 0) {
+					continue;
+				}
+
+				/*
+				 * get min/max values
+				 */
+				for (int valueIndex = 0; valueIndex < dataSerie.length; valueIndex++) {
+
+					if (setInitialValue) {
+						setInitialValue = false;
+						minValue = maxValue = dataSerie[valueIndex];
+					}
+
+					final int dataValue = dataSerie[valueIndex];
+					minValue = (minValue <= dataValue) ? minValue : dataValue;
+					maxValue = (maxValue >= dataValue) ? maxValue : dataValue;
+				}
+			}
+
+			if (minValue == Integer.MIN_VALUE || maxValue == Integer.MAX_VALUE) {
 				return false;
 			}
 
@@ -1886,7 +2023,7 @@ public class MappingView extends ViewPart {
 			colorDefinition = colorProvider.getGraphColorDefinition(GraphColorProvider.PREF_GRAPH_GRADIENT);
 
 			legendProvider.setLegendColorColors(colorDefinition.getNewLegendColor());
-			legendProvider.setLegendColorValues(legendBounds, gradientSerie, Messages.graph_label_gradient_unit);
+			legendProvider.setLegendColorValues(legendBounds, minValue, maxValue, Messages.graph_label_gradient_unit);
 
 			break;
 

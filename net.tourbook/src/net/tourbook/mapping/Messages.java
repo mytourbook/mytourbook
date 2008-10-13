@@ -124,6 +124,8 @@ public class Messages extends NLS {
 	public static String		map_action_zoom_show_all;
 	public static String		map_action_zoom_show_entire_tour;
 
+	public static String	map_properties_map_dim_level;
+
 	public static String		map_properties_show_tile_info;
 	public static String		map_properties_show_tile_info_no;
 	public static String		map_properties_show_tile_info_yes;
