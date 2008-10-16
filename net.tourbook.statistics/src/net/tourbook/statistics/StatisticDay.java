@@ -98,7 +98,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					// check if a tour was modified
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
 
 						for (final TourData modifiedTourData : modifiedTours) {
