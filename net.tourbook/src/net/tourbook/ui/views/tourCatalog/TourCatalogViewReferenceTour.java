@@ -223,7 +223,8 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 						- xValues[refTour.getStartValueIndex()];
 
 				TourManager.firePropertyChange(TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED,
-						new TourPropertyRefTourChanged(fTourChart, refTour.getRefId(), refTourXMarkerValue));
+						new TourPropertyRefTourChanged(fTourChart, refTour.getRefId(), refTourXMarkerValue),
+						TourCatalogViewReferenceTour.this);
 
 				// set title
 				changedChartDataModel.setTitle(NLS.bind(Messages.tourCatalog_view_label_chart_title_reference_tour,

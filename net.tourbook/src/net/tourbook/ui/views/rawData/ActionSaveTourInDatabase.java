@@ -196,7 +196,7 @@ public class ActionSaveTourInDatabase extends Action {
 
 							// save the person and or bike when it's not yet set
 							if (saveInDatabase == true) {
-								if (TourDatabase.saveTour(tourData)) {
+								if (TourDatabase.saveTour(tourData) != null) {
 									isModified = true;
 								}
 							}

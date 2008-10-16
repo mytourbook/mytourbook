@@ -101,7 +101,7 @@ public class PaintManager {
 	}
 
 	/**
-	 * Sets {@link TourData} which will be painted
+	 * Sets {@link TourData} for all tours which are displayed
 	 * 
 	 * @param tourDataList
 	 */

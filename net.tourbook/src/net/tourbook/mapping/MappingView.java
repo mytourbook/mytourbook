@@ -141,12 +141,14 @@ public class MappingView extends ViewPart {
 	private ITourPropertyListener					fTourPropertyListener;
 	private IPropertyListener						fTourChangeListener;
 
-	private TourData								fTourData;
+	/**
+	 * contains the tours which are displayed in the map
+	 */
+	private ArrayList<TourData>						fTourDataList;
 	private TourData								fPreviousTourData;
 
 	private ActionDimMap							fActionDimMap;
 	private ActionReloadFailedMapImages				fActionReloadFailedMapImages;
-//	private ActionResetTileOverlays					fActionResetTileOverlays;
 	private ActionSelectMapProvider					fActionSelectMapProvider;
 	private ActionSaveDefaultPosition				fActionSaveDefaultPosition;
 	private ActionSetDefaultPosition				fActionSetDefaultPosition;
@@ -202,8 +204,6 @@ public class MappingView extends ViewPart {
 	private final HashMap<Integer, ILegendProvider>	fLegendProviders					= new HashMap<Integer, ILegendProvider>();
 
 	private long									fPreviousOverlayKey;
-
-	private ArrayList<TourData>						fTourDataList;
 
 	private int										fMapDimLevel;
 	private RGB										fMapDimColor;
@@ -296,17 +296,7 @@ public class MappingView extends ViewPart {
 	}
 
 	void actionSetShowTourInMap() {
-
-		// show/hide legend
-		fMap.setShowLegend(fActionShowTourInMap.isChecked());
-
-		if (fTourDataList != null && fTourDataList.size() > 1) {
-			// multiple tours are displayed
-			paintTours();
-			enableActions(true);
-		} else {
-			paintTour(fTourData, true, false);
-		}
+		paintAllTours();
 	}
 
 	void actionSetShowTourMarkerInMap() {
@@ -333,7 +323,7 @@ public class MappingView extends ViewPart {
 		// repaint map
 		fDirectMappingPainter.setPaintContext(fMap,
 				fActionShowTourInMap.isChecked(),
-				fTourData,
+				fTourDataList.get(0),
 				fCurrentLeftSliderValueIndex,
 				fCurrentRightSliderValueIndex,
 				fActionShowSliderInMap.isChecked(),
@@ -356,9 +346,10 @@ public class MappingView extends ViewPart {
 
 			fMap.setShowOverlays(true);
 
-			paintTour(fTourData, false, true);
+			final TourData firstTourData = fTourDataList.get(0);
 
-			setMapToSliderBounds(fTourData);
+			paintOneTour(firstTourData, false, true);
+			setMapToSliderBounds(firstTourData);
 		}
 	}
 
@@ -371,7 +362,7 @@ public class MappingView extends ViewPart {
 			fActionShowTourInMap.setChecked(true);
 			fMap.setShowOverlays(true);
 
-			paintTour(fTourData, true, true);
+			paintOneTour(fTourDataList.get(0), true, true);
 
 		} else {
 
@@ -536,35 +527,21 @@ public class MappingView extends ViewPart {
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
+				if (part == MappingView.this) {
+					return;
+				}
+
 				if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 					resetMap();
 
 				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
-					if (fTourData == null || part == MappingView.this) {
-						return;
-					}
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
+					if (modifiedTours != null && modifiedTours.size() > 0) {
 
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
-					if (modifiedTours != null) {
-
-						// get modified tours
-
-						final long mapTourId = fTourData.getTourId();
-
-						// update tour in map
-						for (final TourData tourData : modifiedTours) {
-							if (tourData.getTourId() == mapTourId) {
-
-								// keep changed data
-								fTourData = tourData;
-
-								resetMap();
-
-								return;
-							}
-						}
+						fTourDataList = modifiedTours;
+						resetMap();
 					}
 
 				} else if (propertyId == TourManager.SLIDER_POSITION_CHANGED) {
@@ -811,9 +788,9 @@ public class MappingView extends ViewPart {
 		// show map from last selection
 //		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-		if (fTourData == null) {
+		if (fTourDataList == null) {
 			// a tour is not displayed, find a tour provider which provides a tour
-			searchTourProviderAndShowMap();
+			showToursFromTourProvider();
 		} else {
 			fMap.queueRedrawMap();
 		}
@@ -879,18 +856,24 @@ public class MappingView extends ViewPart {
 		fActionShowSliderInLegend.setEnabled(isOneTour);
 
 		if (isForceTourColor) {
+
 			fActionTourColorAltitude.setEnabled(true);
 			fActionTourColorGradient.setEnabled(true);
 			fActionTourColorPulse.setEnabled(true);
 			fActionTourColorSpeed.setEnabled(true);
 			fActionTourColorPace.setEnabled(true);
-		} else if (fIsTour && fTourData != null) {
+
+		} else if (isOneTour) {
+
+			final TourData oneTourData = fTourDataList.get(0);
 			fActionTourColorAltitude.setEnabled(true);
-			fActionTourColorGradient.setEnabled(fTourData.getGradientSerie() != null);
-			fActionTourColorPulse.setEnabled(fTourData.pulseSerie != null);
-			fActionTourColorSpeed.setEnabled(fTourData.getSpeedSerie() != null);
-			fActionTourColorPace.setEnabled(fTourData.getPaceSerie() != null);
+			fActionTourColorGradient.setEnabled(oneTourData.getGradientSerie() != null);
+			fActionTourColorPulse.setEnabled(oneTourData.pulseSerie != null);
+			fActionTourColorSpeed.setEnabled(oneTourData.getSpeedSerie() != null);
+			fActionTourColorPace.setEnabled(oneTourData.getPaceSerie() != null);
+
 		} else {
+
 			fActionTourColorAltitude.setEnabled(false);
 			fActionTourColorGradient.setEnabled(false);
 			fActionTourColorPulse.setEnabled(false);
@@ -899,8 +882,15 @@ public class MappingView extends ViewPart {
 		}
 	}
 
+	/**
+	 * Converts the tour id's into {@link TourData}
+	 * 
+	 * @param tourIdList
+	 * @return unique overlay key
+	 */
 	private long fillTourDataList(final ArrayList<Long> tourIdList) {
-		// the overlay key is unique for the selected tours
+
+		// create a unique overlay key for the selected tours
 		long overlayKey = 0;
 
 		// get tour data for each tour id
@@ -912,6 +902,7 @@ public class MappingView extends ViewPart {
 				overlayKey += tourData.getTourId();
 			}
 		}
+
 		return overlayKey;
 	}
 
@@ -1005,7 +996,8 @@ public class MappingView extends ViewPart {
 	 * Checks if {@link TourData} can be painted
 	 * 
 	 * @param tourData
-	 * @return <code>true</code> when the {@link TourData} can be painted
+	 * @return <code>true</code> when {@link TourData} contains a tour which can be painted in the
+	 *         map
 	 */
 	private boolean isPaintDataValid(final TourData tourData) {
 
@@ -1014,8 +1006,10 @@ public class MappingView extends ViewPart {
 		}
 
 		// check if coordinates are available
+
 		final double[] longitudeSerie = tourData.longitudeSerie;
 		final double[] latitudeSerie = tourData.latitudeSerie;
+
 		if (longitudeSerie == null || longitudeSerie.length == 0 || latitudeSerie == null || latitudeSerie.length == 0) {
 			return false;
 		}
@@ -1030,7 +1024,7 @@ public class MappingView extends ViewPart {
 			final SelectionTourData selectionTourData = (SelectionTourData) selection;
 			final TourData tourData = selectionTourData.getTourData();
 
-			paintTour(tourData, selectionTourData.isForceRedraw(), true);
+			paintOneTour(tourData, selectionTourData.isForceRedraw(), true);
 
 			enableActions(false);
 
@@ -1039,7 +1033,7 @@ public class MappingView extends ViewPart {
 			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
-			paintTour(tourData, false, true);
+			paintOneTour(tourData, false, true);
 
 			enableActions(false);
 
@@ -1065,7 +1059,7 @@ public class MappingView extends ViewPart {
 				final TourChart fTourChart = fTourEditor.getTourChart();
 				final TourData tourData = fTourChart.getTourData();
 
-				paintTour(tourData, false, true);
+				paintOneTour(tourData, false, true);
 
 				final SelectionChartInfo chartInfo = fTourChart.getChartInfo();
 				paintTourSliders(tourData,
@@ -1120,7 +1114,7 @@ public class MappingView extends ViewPart {
 			fIsTour = false;
 
 			// disable tour data
-			fTourData = null;
+			fTourDataList = null;
 			fPreviousTourData = null;
 			PaintManager.getInstance().setTourData(new ArrayList<TourData>());
 
@@ -1143,14 +1137,14 @@ public class MappingView extends ViewPart {
 				final long tourId = comparedTour.getTourId();
 
 				final TourData tourData = TourManager.getInstance().getTourData(tourId);
-				paintTour(tourData, false, true);
+				paintOneTour(tourData, false, true);
 
 			} else if (firstElement instanceof TVICompareResultComparedTour) {
 
 				final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
 				final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData()
 						.getTourId());
-				paintTour(tourData, false, true);
+				paintOneTour(tourData, false, true);
 			}
 
 			enableActions(false);
@@ -1165,7 +1159,7 @@ public class MappingView extends ViewPart {
 			if (refItem != null) {
 
 				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
-				paintTour(tourData, false, true);
+				paintOneTour(tourData, false, true);
 
 				enableActions(false);
 			}
@@ -1173,31 +1167,69 @@ public class MappingView extends ViewPart {
 
 	}
 
+	private void paintAllTours() {
+
+		if (fTourDataList == null) {
+			return;
+		}
+
+		// show/hide legend
+		fMap.setShowLegend(fActionShowTourInMap.isChecked());
+
+		if (fTourDataList.size() > 1) {
+			// multiple tours are displayed
+			paintTours();
+
+			enableActions(true);
+		} else {
+			paintOneTour(fTourDataList.get(0), true, false);
+			enableActions(false);
+		}
+	}
+
 	private void paintEntireTour() {
 
-		if (isPaintDataValid(fTourData) == false) {
+		if (fTourDataList == null || fTourDataList.size() == 0 || isPaintDataValid(fTourDataList.get(0)) == false) {
 			showDefaultMap();
 			return;
 		}
 
 		final PaintManager paintManager = PaintManager.getInstance();
-		paintManager.setTourData(fTourData);
+		paintManager.setTourData(fTourDataList);
+		final TourData firstTourData = fTourDataList.get(0);
 
 		// set slider position
 		fDirectMappingPainter.setPaintContext(fMap,
 				fActionShowTourInMap.isChecked(),
-				fTourData,
+				firstTourData,
 				fCurrentLeftSliderValueIndex,
 				fCurrentRightSliderValueIndex,
 				fActionShowSliderInMap.isChecked(),
 				fActionShowSliderInLegend.isChecked());
 
-		final Set<GeoPosition> tourBounds = getTourBounds(fTourData);
+		final Set<GeoPosition> tourBounds = getTourBounds(firstTourData);
 		paintManager.setTourBounds(tourBounds);
 
 		fMap.setShowOverlays(fActionShowTourInMap.isChecked());
 
 		setTourZoomLevel(tourBounds, false);
+
+		fMap.queueRedrawMap();
+	}
+
+	/**
+	 * Paint tours with already defined tour data in <code>fTourDataList</code>
+	 */
+	private void paintMultipleTours() {
+
+		fIsTour = true;
+
+		// force single tour to be repainted
+		fPreviousTourData = null;
+
+		final boolean isShowTour = fActionShowTourInMap.isChecked();
+		fMap.setShowOverlays(isShowTour);
+		fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
 
 		fMap.queueRedrawMap();
 	}
@@ -1210,7 +1242,7 @@ public class MappingView extends ViewPart {
 	 * @param isSynchronized
 	 *            when <code>true</code>, map will be synchronized
 	 */
-	private void paintTour(final TourData tourData, final boolean forceRedraw, final boolean isSynchronized) {
+	private void paintOneTour(final TourData tourData, final boolean forceRedraw, final boolean isSynchronized) {
 
 		if (isPaintDataValid(tourData) == false) {
 			showDefaultMap();
@@ -1221,8 +1253,11 @@ public class MappingView extends ViewPart {
 		final boolean isShowTour = fActionShowTourInMap.isChecked();
 
 		// prevent loading the same tour
-		if (forceRedraw == false && tourData == fTourData) {
-			return;
+		if (forceRedraw == false) {
+
+			if (fTourDataList != null && fTourDataList.size() > 0 && fTourDataList.get(0) == tourData) {
+				return;
+			}
 		}
 
 		// force multiple tours to be repainted
@@ -1237,7 +1272,6 @@ public class MappingView extends ViewPart {
 		final PaintManager paintManager = PaintManager.getInstance();
 
 		paintManager.setTourData(tourData);
-		fTourData = tourData;
 
 		/*
 		 * set tour into tour data list, this is currently used to draw the legend, it's also used
@@ -1308,7 +1342,7 @@ public class MappingView extends ViewPart {
 	}
 
 	/**
-	 * Paint tours with already defined tour data in <code>fTourDataList</code>
+	 * paints the tours which are set in {@link #fTourDataList}
 	 */
 	private void paintTours() {
 
@@ -1316,11 +1350,33 @@ public class MappingView extends ViewPart {
 
 		// force single tour to be repainted
 		fPreviousTourData = null;
-		fTourData = null;
+
+		PaintManager.getInstance().setTourData(fTourDataList);
+
+		fDirectMappingPainter.disablePaintContext();
 
 		final boolean isShowTour = fActionShowTourInMap.isChecked();
 		fMap.setShowOverlays(isShowTour);
 		fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
+
+		// get overlay key for all tours which have valid tour data
+		long newOverlayKey = -1;
+		for (final TourData tourData : fTourDataList) {
+
+			if (isPaintDataValid(tourData)) {
+				newOverlayKey += tourData.getTourId();
+			}
+		}
+
+		if (fPreviousOverlayKey != newOverlayKey) {
+
+			fPreviousOverlayKey = newOverlayKey;
+
+			fMap.setOverlayKey(Long.toString(newOverlayKey));
+			fMap.resetOverlays();
+		}
+
+		createLegendImage(PaintManager.getInstance().getLegendProvider());
 
 		fMap.queueRedrawMap();
 	}
@@ -1331,7 +1387,6 @@ public class MappingView extends ViewPart {
 
 		// force single tour to be repainted
 		fPreviousTourData = null;
-		fTourData = null;
 
 		fTourDataList = new ArrayList<TourData>();
 
@@ -1395,16 +1450,14 @@ public class MappingView extends ViewPart {
 
 	private void resetMap() {
 
-		if (fTourData == null) {
+		if (fTourDataList == null) {
 			return;
 		}
 
-// tour data must be cleared where tour data are modified
-//		fTourData.clearComputedSeries();
-
 		fMap.disposeOverlayImageCache();
 
-		paintTour(fTourData, true, false);
+//		paintOneTour(fTourDataList, true, false);
+		paintAllTours();
 
 		fMap.queueRedrawMap();
 	}
@@ -1633,68 +1686,6 @@ public class MappingView extends ViewPart {
 		memento.putInteger(MEMENTO_TOUR_COLOR_ID, colorId);
 	}
 
-	private void searchTourProviderAndShowMap() {
-
-		Display.getCurrent().asyncExec(new Runnable() {
-			public void run() {
-
-				// validate widget
-				if (fMap.isDisposed()) {
-					return;
-				}
-
-				/*
-				 * check if tour is set from a selection provider
-				 */
-				if (fTourData != null) {
-					return;
-				}
-				
-				final Long tourId = TourManager.getTourProvider();
-				if (tourId != null) {
-
-					final TourData tourData = TourManager.getInstance().getTourData(tourId);
-					if (tourData != null) {
-
-						fTourData = tourData;
-
-						/*
-						 * set position and zoomlevel to show the entire tour
-						 */
-						final PaintManager paintManager = PaintManager.getInstance();
-						final Set<GeoPosition> tourBounds = getTourBounds(tourData);
-
-						paintManager.setTourBounds(tourBounds);
-						setTourZoomLevel(tourBounds, true);
-
-//							final PaintManager paintManager = PaintManager.getInstance();
-//							paintManager.setTourData(fTourData);
-//
-//							// set slider position
-//							fDirectMappingPainter.setPaintContext(fMap,
-//									fActionShowTourInMap.isChecked(),
-//									fTourData,
-//									fCurrentLeftSliderValueIndex,
-//									fCurrentRightSliderValueIndex,
-//									fActionShowSliderInMap.isChecked(),
-//									fActionShowSliderInLegend.isChecked());
-//
-//							final Set<GeoPosition> tourBounds = getTourBounds(fTourData);
-//							paintManager.setTourBounds(tourBounds);
-//
-//							fMap.setShowOverlays(fActionShowTourInMap.isChecked());
-//
-//							setTourZoomLevel(tourBounds, false);
-
-						paintTour(tourData, true, false);
-
-						enableActions(false);
-					}
-				}
-			}
-		});
-	}
-
 	@Override
 	public void setFocus() {
 		fMap.setFocus();
@@ -1822,7 +1813,7 @@ public class MappingView extends ViewPart {
 		fIsTour = false;
 
 		// disable tour data
-		fTourData = null;
+		fTourDataList = null;
 		fPreviousTourData = null;
 
 		// update direct painter to draw nothing
@@ -1858,6 +1849,51 @@ public class MappingView extends ViewPart {
 				}
 			});
 		}
+	}
+
+	private void showToursFromTourProvider() {
+
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+
+				// validate widget
+				if (fMap.isDisposed()) {
+					return;
+				}
+
+				/*
+				 * check if tour is set from a selection provider
+				 */
+				if (fTourDataList != null) {
+					return;
+				}
+
+				final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
+				if (tourDataList != null) {
+
+//					final TourData tourData = TourManager.getInstance().getTourData(tourDataList);
+//					if (tourData != null) {
+
+					fTourDataList = tourDataList;
+
+					paintAllTours();
+
+//						/*
+//						 * set position and zoomlevel to show the entire tour
+//						 */
+//						final PaintManager paintManager = PaintManager.getInstance();
+//						final Set<GeoPosition> tourBounds = getTourBounds(tourData);
+//
+//						paintManager.setTourBounds(tourBounds);
+//						setTourZoomLevel(tourBounds, true);
+//
+//						paintOneTour(tourData, true, false);
+//
+//						enableActions(false);
+//					}
+				}
+			}
+		});
 	}
 
 	/**

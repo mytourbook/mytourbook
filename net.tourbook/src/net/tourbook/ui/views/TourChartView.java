@@ -269,6 +269,10 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
+				if (part == TourChartView.this) {
+					return;
+				}
+
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
@@ -284,7 +288,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 					}
 
 					// get modified tours
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
 
 						final long chartTourId = fTourData.getTourId();
@@ -359,28 +363,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
 		if (fTourData == null) {
-
-			fPageBook.showPage(fPageNoChart);
-
-			// a tour is not displayed, find a tour provider which provides a tour
-			Display.getCurrent().asyncExec(new Runnable() {
-				public void run() {
-					
-					// validate widget
-					if (fPageBook.isDisposed()) {
-						return;
-					}
-					
-					/*
-					 * check if tour was set from a selection provider
-					 */
-					if (fTourData != null) {
-						return;
-					}
-
-					updateChart(TourManager.getTourProvider());
-				}
-			});
+			showTourFromTourProvider();
 		}
 	}
 
@@ -406,7 +389,9 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 	private void fireSliderPosition() {
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
-				TourManager.firePropertyChange(TourManager.SLIDER_POSITION_CHANGED, fTourChart.getChartInfo());
+				TourManager.firePropertyChange(TourManager.SLIDER_POSITION_CHANGED,
+						fTourChart.getChartInfo(),
+						TourChartView.this);
 			}
 		});
 	}
@@ -532,6 +517,34 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 		fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart, fTourData));
 
 		fireSliderPosition();
+	}
+
+	private void showTourFromTourProvider() {
+
+		fPageBook.showPage(fPageNoChart);
+
+		// a tour is not displayed, find a tour provider which provides a tour
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+
+				// validate widget
+				if (fPageBook.isDisposed()) {
+					return;
+				}
+
+				/*
+				 * check if tour was set from a selection provider
+				 */
+				if (fTourData != null) {
+					return;
+				}
+
+				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+				if (selectedTours != null && selectedTours.size() > 0) {
+					updateChart(selectedTours.get(0));
+				}
+			}
+		});
 	}
 
 	private void updateChart() {

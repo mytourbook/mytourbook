@@ -86,7 +86,7 @@ public class TourManager {
 	 * Tags for a tour has been modified. The property data contains an object {@link ChangedTags}
 	 * which contains the tags and the modified tours
 	 */
-	public static final int						NOTIFY_TAG_VIEW						= 60;
+	public static final int						NOTIFY_TAG_VIEW							= 60;
 
 	/**
 	 * structure of the tags changed, this includes add/remove of tags and categories and
@@ -211,8 +211,8 @@ public class TourManager {
 		return chartConfig;
 	}
 
-	public static void firePropertyChange(final int propertyId, final ArrayList<TourData> selectedTours) {
-		firePropertyChange(propertyId, new TourProperties(selectedTours));
+	public static void firePropertyChange(final int propertyId, final ArrayList<TourData> modifiedTours) {
+		firePropertyChange(propertyId, new TourProperties(modifiedTours));
 	}
 
 	public static void firePropertyChange(final int propertyId, final Object propertyData) {
@@ -223,7 +223,7 @@ public class TourManager {
 		}
 	}
 
-	public static void firePropertyChange(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+	public static void firePropertyChange(final int propertyId, final Object propertyData, final IWorkbenchPart part) {
 
 		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (final Object listener : allListeners) {
@@ -238,6 +238,45 @@ public class TourManager {
 		}
 
 		return instance;
+	}
+
+	/**
+	 * Searches all tour providers in the workbench and returns tours which are selected
+	 * 
+	 * @return Returns tour id's or <code>null</code> when tours are not found
+	 */
+	public static ArrayList<TourData> getSelectedTours() {
+
+		final IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
+
+		// get all tourProviders
+		for (final IWorkbenchWindow wbWindow : wbWindows) {
+			final IWorkbenchPage[] pages = wbWindow.getPages();
+
+			for (final IWorkbenchPage wbPage : pages) {
+				final IViewReference[] viewRefs = wbPage.getViewReferences();
+
+				for (final IViewReference viewRef : viewRefs) {
+					final IViewPart view = viewRef.getView(false);
+
+					if (view instanceof ISelectedTours) {
+
+						final ISelectedTours tourProvider = (ISelectedTours) view;
+						final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+
+						if (selectedTours != null && selectedTours.size() > 0) {
+
+							/*
+							 * a tour provider is found which also provides tours
+							 */
+							return selectedTours;
+						}
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -277,47 +316,6 @@ public class TourManager {
 		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 
 		return UI.DateFormatterShort.format(calendar.getTime());
-	}
-
-	/**
-	 * Searches all tour providers in the workbench to get a selected tour
-	 * 
-	 * @return Tour id or <code>null</code> when tour id was not found
-	 */
-	public static Long getTourProvider() {
-
-		final IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		final ArrayList<ISelectedTours> allTourProvider = new ArrayList<ISelectedTours>();
-
-		// get all tourProviders
-		for (final IWorkbenchWindow wbWindow : wbWindows) {
-			final IWorkbenchPage[] pages = wbWindow.getPages();
-
-			for (final IWorkbenchPage wbPage : pages) {
-				final IViewReference[] viewRefs = wbPage.getViewReferences();
-
-				for (final IViewReference viewRef : viewRefs) {
-					final IViewPart view = viewRef.getView(false);
-
-					if (view instanceof ISelectedTours) {
-
-						final ISelectedTours tourProvider = (ISelectedTours) view;
-						allTourProvider.add(tourProvider);
-
-						final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-						if (selectedTours != null && selectedTours.size() > 0) {
-
-							/*
-							 * a tour provider is found which also provides a tour, select this tour
-							 */
-							return selectedTours.get(0).getTourId();
-						}
-					}
-				}
-			}
-		}
-
-		return null;
 	}
 
 	private static String getTourTimeShort(final Date date) {
@@ -452,6 +450,102 @@ public class TourManager {
 //	}
 
 	/**
+	 * Saves tours which have been modified, checks if the tour is in the tour data editor and fires
+	 * a {@link TourManager#TOUR_PROPERTIES_CHANGED} event
+	 * 
+	 * @param modifiedTours
+	 *            modified tours
+	 * @return Returns a list with all persisted {@link TourData}
+	 */
+	public static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours) {
+
+		TourData tourDataEditorTour = null;
+		boolean fireChangeEvent = false;
+		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
+
+		for (final TourData tourData : modifiedTours) {
+
+			boolean saveTour = false;
+			TourData savedTour = null;
+
+			final TourDataEditorView tourDataEditor = UI.getTourDataEditor();
+			if (tourDataEditor != null) {
+
+				final TourData tourDataInEditor = tourDataEditor.getTourData();
+				if (tourDataInEditor == tourData) {
+
+					// selected tour is in the tour data editor
+
+					if (tourDataEditor.isDirty()) {
+
+						// tour in the editor is already dirty, tour MUST BE SAVED IN THE TOUR EDITOR
+
+					} else {
+
+						/*
+						 * tour in the editor is not dirty, save tour and update editor ui
+						 */
+
+						savedTour = TourDatabase.saveTour(tourData);
+
+						tourDataEditor.updateUI(tourData);
+
+						// there is only one tour data editor
+						tourDataEditorTour = tourData;
+
+						fireChangeEvent = true;
+					}
+
+				} else if (tourDataInEditor.getTourId().longValue() == tourData.getTourId().longValue()) {
+
+					// this case should not happen
+
+					MessageDialog.openError(Display.getCurrent().getActiveShell(), "Internal Error",//$NON-NLS-1$
+							"The selected tour is in the tour editor but TourData are different." //$NON-NLS-1$
+									+ UI.NEW_LINE
+									+ UI.NEW_LINE
+									+ "Tour in Editor:\t" //$NON-NLS-1$
+									+ tourDataInEditor.toString()
+									+ UI.NEW_LINE
+									+ UI.NEW_LINE
+									+ "Selected Tour:\t" //$NON-NLS-1$
+									+ tourData.toString());
+				} else {
+
+					// tour is not in the tour editor
+
+					saveTour = true;
+				}
+			} else {
+
+				// tour is not in the tour editor
+
+				saveTour = true;
+			}
+
+			if (saveTour) {
+
+				// save the tour
+				savedTour = TourDatabase.saveTour(tourData);
+
+				fireChangeEvent = true;
+			}
+
+			if (savedTour != null) {
+				savedTours.add(savedTour);
+			}
+		}
+
+		if (fireChangeEvent) {
+			final TourProperties propertyData = new TourProperties(savedTours);
+			propertyData.tourDataEditorTour = tourDataEditorTour;
+			firePropertyChange(TOUR_PROPERTIES_CHANGED, propertyData);
+		}
+
+		return savedTours;
+	}
+
+	/**
 	 * set the graph colors from the pref store
 	 * 
 	 * @param prefStore
@@ -498,7 +592,7 @@ public class TourManager {
 	}
 
 	/**
-	 * Tour save listener will be called to save tours before the application is shut down
+	 * Tour save listeners will be called to save tours before the application is shut down
 	 * 
 	 * @param listener
 	 */
@@ -1288,7 +1382,7 @@ public class TourManager {
 
 		final TourData tourDataInMap = fTourDataMap.get(tourId);
 		if (tourDataInMap != null) {
-			System.out.println("tourDataInMap\t:" + tourDataInMap);
+//			System.out.println("tourDataInMap\t:" + tourDataInMap);
 			return tourDataInMap;
 		}
 
@@ -1300,7 +1394,7 @@ public class TourManager {
 
 		// keep the tour data
 		updateTourInCache(tourDataFromDb);
-		System.out.println("tourDataFromDb\t:" + tourDataFromDb);
+//		System.out.println("tourDataFromDb\t:" + tourDataFromDb);
 
 		return tourDataFromDb;
 	}
@@ -1354,8 +1448,10 @@ public class TourManager {
 	}
 
 	/**
+	 * Before the application is shut down, the tour save listeners are called to save unsaved data.
+	 * 
 	 * @return Returns <code>true</code> when the tours have been saved or false when it was
-	 *         canceled
+	 *         canceled by the user
 	 */
 	public boolean saveTours() {
 
@@ -1375,94 +1471,6 @@ public class TourManager {
 
 	public void updateTourInCache(final TourData tourData) {
 		fTourDataMap.put(tourData.getTourId(), tourData);
-	}
-
-	/**
-	 * Saves tours which have been modified, checks if the tour is in the tour data editor and fires
-	 * a {@link TOUR_PROPERTIES_CHANGED} event
-	 * 
-	 * @param selectedTours
-	 *            modified tours
-	 */
-	public static void saveModifiedTours(final ArrayList<TourData> selectedTours) {
-	
-		TourData tourDataEditorTour = null;
-		boolean fireChangeEvent = false;
-	
-		for (final TourData tourData : selectedTours) {
-	
-			boolean saveTour = false;
-	
-			final TourDataEditorView tourDataEditor = UI.getTourDataEditor();
-			if (tourDataEditor != null) {
-	
-				final TourData tourDataInEditor = tourDataEditor.getTourData();
-				if (tourDataInEditor == tourData) {
-	
-					// selected tour is in the tour editor
-	
-					if (tourDataEditor.isDirty()) {
-	
-						// tour in the editor is already dirty, tour MUST BE SAVED IN THE TOUR EDITOR
-	
-					} else {
-	
-						/*
-						 * tour in the editor is not dirty, save tour and update editor ui
-						 */
-	
-						TourDatabase.saveTour(tourData);
-	
-						tourDataEditor.updateUI(tourData);
-	
-						// there is only one tour data editor
-						tourDataEditorTour = tourData;
-	
-						fireChangeEvent = true;
-					}
-	
-				} else if (tourDataInEditor.getTourId().longValue() == tourData.getTourId().longValue()) {
-	
-					// this case should not happen
-	
-					MessageDialog.openError(Display.getCurrent().getActiveShell(), "Internal Error",//$NON-NLS-1$
-							"The selected tour is in the tour editor but TourData are different." //$NON-NLS-1$
-									+ UI.NEW_LINE
-									+ UI.NEW_LINE
-									+ "Tour in Editor:\t" //$NON-NLS-1$
-									+ tourDataInEditor.toString()
-									+ UI.NEW_LINE
-									+ UI.NEW_LINE
-									+ "Selected Tour:\t" //$NON-NLS-1$
-									+ tourData.toString());
-				} else {
-	
-					// tour is not in the tour editor
-	
-					saveTour = true;
-				}
-			} else {
-	
-				// tour is not in the tour editor
-	
-				saveTour = true;
-			}
-	
-			if (saveTour) {
-	
-				// save the tour
-				TourDatabase.saveTour(tourData);
-	
-				fireChangeEvent = true;
-			}
-	
-		}
-	
-		if (fireChangeEvent) {
-			final TourProperties propertyData = new TourProperties(selectedTours);
-			propertyData.tourDataEditorTour = tourDataEditorTour;
-			firePropertyChange(TOUR_PROPERTIES_CHANGED, propertyData);
-		}
 	}
 
 }

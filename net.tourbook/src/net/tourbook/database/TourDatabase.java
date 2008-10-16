@@ -875,21 +875,20 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Persist the tourData in the database
+	 * Persist {@link TourData} in the database and updates the tour data cache with the persisted
+	 * tour
 	 * 
 	 * @param tourData
-	 * @return returns true if the save was successful
+	 * @return returns persisted {@link TourData}
 	 */
-	public static boolean saveTour(final TourData tourData) {
+	public static TourData saveTour(final TourData tourData) {
 
 		/*
 		 * prevent saving a tour which was deleted before
 		 */
 		if (tourData.isTourDeleted) {
-			return false;
+			return null;
 		}
-
-		boolean isSaved = false;
 
 		EntityManager em = TourDatabase.getInstance().getEntityManager();
 
@@ -926,8 +925,6 @@ public class TourDatabase {
 			} finally {
 				if (ts.isActive()) {
 					ts.rollback();
-				} else {
-					isSaved = true;
 				}
 				em.close();
 			}
@@ -948,7 +945,7 @@ public class TourDatabase {
 			TourManager.getInstance().updateTourInCache(persistedEntity);
 		}
 
-		return isSaved;
+		return persistedEntity;
 	}
 
 	public static void updateActiveTourTypeList(final TourTypeFilter tourTypeFilter) {
@@ -1011,7 +1008,7 @@ public class TourDatabase {
 	}
 
 	private boolean checkDb() {
-		
+
 		try {
 			checkServer();
 		} catch (final MyTourbookException e) {

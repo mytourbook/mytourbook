@@ -331,11 +331,20 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
+				if (part == RawDataView.this) {
+					return;
+				}
+				
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					// update modified tours
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
+						
+						// update model
+ 						RawDataManager.getInstance().updateTourDataModel(modifiedTours);
+
+						// update viewer
 						fTourViewer.update(modifiedTours.toArray(), null);
 					}
 

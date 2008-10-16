@@ -22,7 +22,10 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 public class TourProperties {
 
-	public ArrayList<TourData>	modifiedTours;
+	/**
+	 * contains the tours which have been modified
+	 */
+	private ArrayList<TourData>	modifiedTours;
 
 	/**
 	 * when <code>true</code>, tour data have been reverted and {@link TourProperties#modifiedTours}
@@ -43,6 +46,13 @@ public class TourProperties {
 
 	public TourProperties(final ArrayList<TourData> modifiedTour) {
 		this.modifiedTours = modifiedTour;
+	}
+
+	/**
+	 * @return Returns all tours which have been modified
+	 */
+	public ArrayList<TourData> getModifiedTours() {
+		return modifiedTours;
 	}
 
 }

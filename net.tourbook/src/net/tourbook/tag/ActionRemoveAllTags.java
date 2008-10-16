@@ -71,10 +71,10 @@ public class ActionRemoveAllTags extends Action {
 				}
 
 				// save all tours with the removed tags
-				TourManager.saveModifiedTours(selectedTours);
+				final ArrayList<TourData> savedTours = TourManager.saveModifiedTours(selectedTours);
 
 				TourManager.firePropertyChange(TourManager.NOTIFY_TAG_VIEW, //
-						new ChangedTags(removedTags, selectedTours, false));
+						new ChangedTags(removedTags, savedTours, false));
 			}
 
 		};

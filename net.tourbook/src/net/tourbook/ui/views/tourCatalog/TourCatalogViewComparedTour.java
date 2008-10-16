@@ -365,7 +365,8 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 						endIndex,
 						speed,
 						isDataSaved,
-						fComparedTourItem));
+						fComparedTourItem),
+				this);
 	}
 
 	private void onMoveSynchedMarker(final int movedValueIndex, final int movedEndIndex) {

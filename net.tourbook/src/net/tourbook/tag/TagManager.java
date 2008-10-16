@@ -237,10 +237,10 @@ public class TagManager {
 				}
 
 				// save all modified tours
-				TourManager.saveModifiedTours(selectedTours);
+				final ArrayList<TourData> savedTours = TourManager.saveModifiedTours(selectedTours);
 
 				TourManager.firePropertyChange(TourManager.NOTIFY_TAG_VIEW, //
-						new ChangedTags(tourTag, selectedTours, isAddMode));
+						new ChangedTags(tourTag, savedTours, isAddMode));
 
 				TagManager.addRecentTag(tourTag);
 			}

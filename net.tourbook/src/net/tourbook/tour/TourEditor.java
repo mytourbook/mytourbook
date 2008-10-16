@@ -26,8 +26,6 @@ import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.views.tourCatalog.SelectionNewRefTours;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -77,23 +75,23 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	 */
 	void actionRevertTourData() {
 
-		fIsTourDirty = false;
-
-		firePropertyChange(PROP_DIRTY);
-		updateRevertHandler();
-
-		TourManager.getInstance().removeTourFromCache(fEditorInput.getTourId());
-		updateTourChart();
-
-		// notify all views which display the tour
-		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
-		modifiedTour.add(fTourData);
-
-		// fire property change
-		final TourProperties tourProperties = new TourProperties(modifiedTour);
-		tourProperties.isReverted = true;
-
-		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, tourProperties);
+//		fIsTourDirty = false;
+//
+//		firePropertyChange(PROP_DIRTY);
+//		updateRevertHandler();
+//
+//		TourManager.getInstance().removeTourFromCache(fEditorInput.getTourId());
+//		updateTourChart();
+//
+//		// notify all views which display the tour
+//		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
+//		modifiedTour.add(fTourData);
+//
+//		// fire property change
+//		final TourProperties tourProperties = new TourProperties(modifiedTour);
+//		tourProperties.isReverted = true;
+//
+//		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, tourProperties);
 	}
 
 	private void addPartListener() {
@@ -175,6 +173,10 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
+				if (part == TourEditor.this) {
+					return;
+				}
+
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
@@ -185,14 +187,14 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
-					if (fTourData == null || part == TourEditor.this) {
+					if (fTourData == null) {
 						return;
 					}
 
 					final TourProperties tourProperties = (TourProperties) propertyData;
 
 					// get modified tours
-					final ArrayList<TourData> modifiedTours = tourProperties.modifiedTours;
+					final ArrayList<TourData> modifiedTours = tourProperties.getModifiedTours();
 					final long tourId = fTourData.getTourId();
 
 					// check if the tour in the editor was modified
@@ -327,31 +329,31 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	@Override
 	public void doSave(final IProgressMonitor monitor) {
 
-		TourDatabase.saveTour(fTourData);
-
-		fIsTourDirty = false;
-
-		TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
-
-		// hide the dirty indicator
-		firePropertyChange(PROP_DIRTY);
-
-		// update actions
-		updateRevertHandler();
-
-		if (fIsRefTourCreated) {
-
-			fIsRefTourCreated = false;
-
-			// update tour map view
-			firePostSelection(new SelectionNewRefTours());
-		}
-
-		// notify all views which display the tour type
-		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
-		modifiedTour.add(fTourData);
-
-		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
+//		TourDatabase.saveTour(fTourData);
+//
+//		fIsTourDirty = false;
+//
+//		TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
+//
+//		// hide the dirty indicator
+//		firePropertyChange(PROP_DIRTY);
+//
+//		// update actions
+//		updateRevertHandler();
+//
+//		if (fIsRefTourCreated) {
+//
+//			fIsRefTourCreated = false;
+//
+//			// update tour map view
+//			firePostSelection(new SelectionNewRefTours());
+//		}
+//
+//		// notify all views which display the tour type
+//		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
+//		modifiedTour.add(fTourData);
+//
+//		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
 	}
 
 	@Override
@@ -470,7 +472,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			final String tourTitle = TourManager.getTourDateShort(fTourData);
 
 			fEditorInput.fEditorTitle = tourTitle == null ? "" : tourTitle; //$NON-NLS-1$
-			
+
 			setPartName(tourTitle);
 			setTitleToolTip("title tooltip ???"); //$NON-NLS-1$
 		}

@@ -927,7 +927,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(fActionSelectYearMonthTours);
 		menuMgr.add(new Separator());
-		
+
 		menuMgr.add(fActionModifyColumns);
 
 		/*
@@ -1013,21 +1013,75 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
 
-		// loop: all selected tours
-		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+//		// loop: all selected tours
+//		for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+//
+//			final Object treeItem = iter.next();
+//
+//			if (treeItem instanceof TVITourBookTour) {
+//
+//				final TVITourBookTour tviTour = ((TVITourBookTour) treeItem);
+//
+//				final TourData tourData = TourManager.getInstance().getTourData(tviTour.getTourId());
+//
+//				if (tourData != null) {
+//					selectedTourData.add(tourData);
+//				}
+//			}
+//		}
 
-			final Object treeItem = iter.next();
+		final ArrayList<Long> tourIds = new ArrayList<Long>();
 
-			if (treeItem instanceof TVITourBookTour) {
+		if (selectedTours.size() < 2) {
 
-				final TVITourBookTour tviTour = ((TVITourBookTour) treeItem);
+			// one item is selected
 
-				final TourData tourData = TourManager.getInstance().getTourData(tviTour.getTourId());
+			final Object selectedItem = selectedTours.getFirstElement();
+			if (selectedItem instanceof TVITourBookYear) {
 
-				if (tourData != null) {
-					selectedTourData.add(tourData);
+				// one year is selected
+
+				if (fActionSelectYearMonthTours.isChecked()) {
+
+					// loop: all months
+					for (final TreeViewerItem viewerItem : ((TVITourBookYear) selectedItem).getFetchedChildren()) {
+						if (viewerItem instanceof TVITourBookMonth) {
+							getMonthTourIds((TVITourBookMonth) viewerItem, tourIds);
+						}
+					}
+				}
+
+			} else if (selectedItem instanceof TVITourBookMonth) {
+
+				// one month is selected
+
+				if (fActionSelectYearMonthTours.isChecked()) {
+					getMonthTourIds((TVITourBookMonth) selectedItem, tourIds);
+				}
+
+			} else if (selectedItem instanceof TVITourBookTour) {
+
+				// one tour is selected
+
+				tourIds.add(((TVITourBookTour) selectedItem).getTourId());
+			}
+
+		} else {
+
+			// multiple items are selected
+
+			// get all selected tours, ignore year and month items
+			for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
+				final Object viewItem = tourIterator.next();
+
+				if (viewItem instanceof TVITourBookTour) {
+					tourIds.add(((TVITourBookTour) viewItem).getTourId());
 				}
 			}
+		}
+
+		for (final Long tourId : tourIds) {
+			selectedTourData.add(TourManager.getInstance().getTourData(tourId));
 		}
 
 		return selectedTourData;
@@ -1178,7 +1232,7 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 			fTourViewer.setInput(fRootItem = new TVITourBookRoot(this));
 
 			fTourViewer.setExpandedElements(expandedElements);
-			fTourViewer.setSelection(selection);
+			fTourViewer.setSelection(selection, true);
 		}
 		tree.setRedraw(true);
 	}

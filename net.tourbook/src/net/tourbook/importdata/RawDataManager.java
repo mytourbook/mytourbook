@@ -59,7 +59,7 @@ public class RawDataManager {
 
 	private static final String			RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
 
-	private static final String			TEMP_IMPORTED_FILE					= "received-device-data.txt"; //$NON-NLS-1$
+	private static final String			TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
 
 	private static RawDataManager		instance							= null;
 
@@ -451,8 +451,7 @@ public class RawDataManager {
 					} finally {
 
 						if (destFileName == null) {
-							MessageDialog.openError(Display.getCurrent().getActiveShell(),
-									"Error Creating Filename", //$NON-NLS-1$
+							MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error Creating Filename", //$NON-NLS-1$
 									"The filename for the received data" //$NON-NLS-1$
 											+ " could not be created from the file '" //$NON-NLS-1$
 											+ sourceFileName
@@ -654,5 +653,17 @@ public class RawDataManager {
 
 			}
 		});
+	}
+
+	/**
+	 * Updates the model with modified tours
+	 * 
+	 * @param modifiedTours
+	 */
+	public void updateTourDataModel(final ArrayList<TourData> modifiedTours) {
+
+		for (final TourData tourData : modifiedTours) {
+			fTourDataMap.put(tourData.getTourId().toString(), tourData);
+		}
 	}
 }

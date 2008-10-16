@@ -418,10 +418,14 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 				
+				if (part == TourCatalogView.this) {
+					return;
+				}
+				
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					// get a clone of the modified tours because the tours are removed from the list
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).modifiedTours;
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
 						updateTourViewer(fRootItem, modifiedTours);
 					}
