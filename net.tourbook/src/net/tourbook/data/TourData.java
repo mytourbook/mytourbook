@@ -148,7 +148,9 @@ public class TourData {
 	 */
 	private long					deviceTravelTime;
 
+	@SuppressWarnings("unused")
 	private int						deviceDistance;
+	
 	private int						deviceWheel;
 
 	private int						deviceWeight;
@@ -3244,6 +3246,8 @@ public class TourData {
 		sb.append("[TourData] ");
 		sb.append("tourId:");
 		sb.append(tourId);
+		sb.append("\t" + super.toString());
+		sb.append("\t" + System.identityHashCode(this));
 
 		return sb.toString();
 	}

@@ -28,7 +28,7 @@ public class ActionDimMap extends Action implements IMenuCreator {
 
 	private static final int		DIM_LEVELS			= 11;	// 0...100%
 
-	private static final String		PERCENT				= "%";
+	private static final String		PERCENT				= "%"; //$NON-NLS-1$
 
 	private Menu					fMenu;
 
@@ -54,7 +54,7 @@ public class ActionDimMap extends Action implements IMenuCreator {
 
 		@Override
 		public void run() {
-			
+
 			setDimLevel(fActionDimLevel);
 
 			fMapView.actionDimMap(fSelectedDimLevel);
@@ -77,16 +77,19 @@ public class ActionDimMap extends Action implements IMenuCreator {
 
 				// action: disable dimming
 
-				dimAction = new ActionDim(0xFF, Messages.map_action_dim_map_0);
+				dimAction = new ActionDim(0xFF, Messages.map_action_dim_map_disabled);
 				dimAction.setChecked(true);
 
 			} else {
 
+				/*
+				 * convert dim level from 100% to 255
+				 */
 				float dimLevel = ((float) 0xFF / (DIM_LEVELS - 1)) * actionIndex;
 				dimLevel = Math.abs(dimLevel - 0xFF);
-				
+
 				final int dimLevelText = (int) (Math.abs(dimLevel - 0xFF) / 0xFF * 100);
-				
+
 				dimAction = new ActionDim((int) dimLevel, dimLevelText + PERCENT);
 
 //				System.out.println(dimLevel + " " + dimLevelText);
@@ -128,11 +131,12 @@ public class ActionDimMap extends Action implements IMenuCreator {
 	}
 
 	/**
-	 * Sets the dim level and checks the corresponding dim action
+	 * Sets the dim level and selects the corresponding dim action
 	 * 
 	 * @param dimLevel
+	 * @return Return the dim level which was set
 	 */
-	public void setDimLevel(final int dimLevel) {
+	public int setDimLevel(final int dimLevel) {
 
 		fSelectedDimLevel = dimLevel;
 		boolean isDimAvail = false;
@@ -140,22 +144,41 @@ public class ActionDimMap extends Action implements IMenuCreator {
 		/*
 		 * check selected dim level and uncheck others
 		 */
+		ActionDim dimLevelRoughly = null;
+
 		for (final ActionDim dimAction : fDimActions) {
-			if (dimAction.fActionDimLevel == dimLevel) {
+			final int actionDimLevel = dimAction.fActionDimLevel;
+			if (actionDimLevel == fSelectedDimLevel) {
 				dimAction.setChecked(true);
 				isDimAvail = true;
 			} else {
 				if (dimAction.isChecked()) {
 					dimAction.setChecked(false);
 				}
+
+				/*
+				 * when the dim level is not exactly like the action dim level, find the nearest dim
+				 * level action
+				 */
+				if (fSelectedDimLevel < actionDimLevel) {
+					dimLevelRoughly = dimAction;
+				}
 			}
 		}
 
 		if (isDimAvail == false) {
-			// set default value
-			fSelectedDimLevel = 0;
-			fDimActions.get(0).setChecked(true);
+
+			if (dimLevelRoughly != null) {
+				fSelectedDimLevel = dimLevelRoughly.fActionDimLevel;
+				dimLevelRoughly.setChecked(true);
+			} else {
+				// set default value
+				fSelectedDimLevel = 0;
+				fDimActions.get(0).setChecked(true);
+			}
 		}
+
+		return fSelectedDimLevel;
 	}
 
 }

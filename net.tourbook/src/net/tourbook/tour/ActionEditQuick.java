@@ -19,7 +19,6 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.ISelectedTours;
 
 import org.eclipse.jface.action.Action;
@@ -48,22 +47,11 @@ public class ActionEditQuick extends Action {
 			return;
 		}
 
-		if (TourManager.saveTourEditors(selectedTours) == false) {
-			return;
-		}
-
 		final QuickEditDialog dialog = new QuickEditDialog(Display.getCurrent().getActiveShell(), selectedTours.get(0));
-
 		if (dialog.open() == Window.OK) {
 
-			// update all tours (without tours from an editor) with the new tour type
-			for (final TourData tourData : selectedTours) {
-
-				// save the tour
-				TourDatabase.saveTour(tourData);
-			}
-
-			TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
+			// save all tours with the new tour type
+			TourManager.saveModifiedTours(selectedTours);
 		}
 	}
 

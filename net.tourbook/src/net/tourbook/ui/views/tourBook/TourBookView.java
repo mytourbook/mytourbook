@@ -275,7 +275,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 					UI.updateUnits();
 
 					fColumnManager.saveState(fSessionMemento);
-
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 

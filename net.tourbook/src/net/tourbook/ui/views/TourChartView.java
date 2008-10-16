@@ -365,6 +365,19 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			// a tour is not displayed, find a tour provider which provides a tour
 			Display.getCurrent().asyncExec(new Runnable() {
 				public void run() {
+					
+					// validate widget
+					if (fPageBook.isDisposed()) {
+						return;
+					}
+					
+					/*
+					 * check if tour was set from a selection provider
+					 */
+					if (fTourData != null) {
+						return;
+					}
+
 					updateChart(TourManager.getTourProvider());
 				}
 			});

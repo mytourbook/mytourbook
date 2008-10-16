@@ -25,7 +25,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.ITourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ISelectedTours;
 
@@ -65,7 +64,6 @@ public class TagManager {
 
 	private static ISelectedTours		fTourProvider;
 	private static boolean				fIsAddMode;
-	private static boolean				fIsSaveTour;
 
 	public static class ActionRecentTag extends Action {
 
@@ -73,7 +71,7 @@ public class TagManager {
 
 		@Override
 		public void run() {
-			setTagIntoTour(fTag, fTourProvider, fIsAddMode, fIsSaveTour);
+			setTagIntoTour(fTag, fTourProvider, fIsAddMode);
 		}
 
 		private void setTag(final TourTag tag) {
@@ -128,7 +126,6 @@ public class TagManager {
 
 		fTourProvider = tourProvider;
 		fIsAddMode = isAddMode;
-		fIsSaveTour = isSaveTour;
 
 		// add separator
 		menuMgr.add(new Separator());
@@ -211,10 +208,7 @@ public class TagManager {
 		TourbookPlugin.getDefault().getDialogSettingsSection(SETTINGS_SECTION_RECENT_TAGS).put(SETTINGS_TAG_ID, tagIds);
 	}
 
-	public static void setTagIntoTour(	final TourTag tourTag,
-										final ISelectedTours tourProvider,
-										final boolean isAddMode,
-										final boolean isSaveTour) {
+	public static void setTagIntoTour(final TourTag tourTag, final ISelectedTours tourProvider, final boolean isAddMode) {
 
 		final Runnable runnable = new Runnable() {
 
@@ -227,13 +221,7 @@ public class TagManager {
 					return;
 				}
 
-				if (isSaveTour) {
-					if (TourManager.saveTourEditors(selectedTours) == false) {
-						return;
-					}
-				}
-
-				// add the tag in all tours (without tours which are opened in an editor)
+				// add the tag into all selected tours
 				for (final TourData tourData : selectedTours) {
 
 					// set tag into tour
@@ -246,27 +234,13 @@ public class TagManager {
 						// remove tag from tour
 						tourTags.remove(tourTag);
 					}
-
-					if (isSaveTour) {
-						// save tour with modified tags
-						TourDatabase.saveTour(tourData);
-					}
 				}
 
-				if (isSaveTour) {
+				// save all modified tours
+				TourManager.saveModifiedTours(selectedTours);
 
-					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
-
-					TourManager.firePropertyChange(TourManager.TOUR_TAGS_CHANGED, //
-							new ChangedTags(tourTag, selectedTours, isAddMode));
-				} else {
-
-					// when tour is not saved notify tour editor
-
-					if (fTourProvider instanceof ITourEditor) {
-						((ITourEditor) fTourProvider).setTourIsModified();
-					}
-				}
+				TourManager.firePropertyChange(TourManager.NOTIFY_TAG_VIEW, //
+						new ChangedTags(tourTag, selectedTours, isAddMode));
 
 				TagManager.addRecentTag(tourTag);
 			}

@@ -39,8 +39,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	private boolean				fShowMeasurementSystemInUI;
 	private BooleanFieldEditor	fEditShowMeasurementInUI;
 
-//	private BooleanFieldEditor	fEditorConfirmUndo;
-
 	@Override
 	protected void createFieldEditors() {
 
@@ -60,7 +58,18 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		// checkbox: confirm undo in tour editor
 		addField(new BooleanFieldEditor(ITourbookPreferences.TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR,
-				Messages.pref_general_confirmation_tourdata_editor_undo,
+				Messages.pref_general_hide_confirmation + Messages.tour_editor_dlg_revert_tour_message,
+				group));
+
+		// checkbox: confirm undo in tour editor
+		addField(new BooleanFieldEditor(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
+				Messages.pref_general_hide_warning
+				/*
+				 * the externalize string wizard has problems when the messages are from 2 different
+				 * packages, Eclipse 3.4
+				 */
+				+ net.tourbook.mapping.Messages.map_dlg_dim_warning_message//
+				,
 				group));
 
 		// set margins after the editors are added

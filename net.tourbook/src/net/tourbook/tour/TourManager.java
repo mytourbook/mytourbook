@@ -46,8 +46,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -88,7 +86,7 @@ public class TourManager {
 	 * Tags for a tour has been modified. The property data contains an object {@link ChangedTags}
 	 * which contains the tags and the modified tours
 	 */
-	public static final int						TOUR_TAGS_CHANGED						= 60;
+	public static final int						NOTIFY_TAG_VIEW						= 60;
 
 	/**
 	 * structure of the tags changed, this includes add/remove of tags and categories and
@@ -366,94 +364,92 @@ public class TourManager {
 				+ ((tourTitle.length() == 0) ? UI.EMPTY_STRING : UI.DASH_WITH_SPACE + tourTitle); //$NON-NLS-1$ //$NON-NLS-2$ 
 	}
 
-	/**
-	 * Save tours which are modified and opened in a tour editor.<br>
-	 * Every editor which saves a tour will fire a modify event
-	 * 
-	 * @param selectedTours
-	 *            contains the tours which will be saved when modified
-	 * @return Returns <code>true</code> when the tours are saved or <code>false</code> when the
-	 *         user prevented to save the tours or the tour is invalid
-	 */
-	public static boolean saveTourEditors(final ArrayList<TourData> selectedTours) {
-
-		boolean isSaveConfirmed = false;
-
-		final TourDataEditorView tourDataEditor = UI.getTourDataEditor();
-		if (tourDataEditor != null && tourDataEditor.isDirty()) {
-
-			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), //
-					Messages.app_action_dlg_confirm_save_tour_data_editor_title,
-					Messages.app_action_dlg_confirm_save_tour_data_editor_message)) {
-
-				isSaveConfirmed = true;
-
-				// save tour in tour data editor
-
-				if (tourDataEditor.saveTourData() == false) {
-					return false;
-				}
-
-			} else {
-				return false;
-			}
-		}
-
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// don't resave the tour in the tour data editor in the editor part 
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-		final ArrayList<IEditorPart> openedEditors = UI.getOpenedEditors();
-		final ArrayList<IEditorPart> editorsToBeSaved = new ArrayList<IEditorPart>();
-
-		// check if a tour is opened in an editor
-		for (final IEditorPart editorPart : openedEditors) {
-			if (editorPart instanceof TourEditor) {
-
-				final IEditorInput editorInput = editorPart.getEditorInput();
-
-				if (editorInput instanceof TourEditorInput) {
-
-					final TourEditor tourEditor = (TourEditor) editorPart;
-					final long editorTourId = ((TourEditorInput) editorInput).getTourId();
-
-					for (final TourData tourData : selectedTours) {
-						if (editorTourId == tourData.getTourId()) {
-
-							// a tour editor was found containing the current tour
-
-							if (tourEditor.isDirty()) {
-								editorsToBeSaved.add(tourEditor);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		// tour editors must be saved when they contain a tour which will be modified
-		if (editorsToBeSaved.size() > 0) {
-
-			if (isSaveConfirmed || MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), //
-					Messages.app_action_dlg_confirm_save_editors_title,
-					Messages.app_action_dlg_confirm_save_editors_message)) {
-
-				// save all editors
-				for (final IEditorPart editorPart : editorsToBeSaved) {
-					editorPart.doSave(null);
-				}
-
-				return true;
-
-			} else {
-				return false;
-			}
-
-		} else {
-			return true;
-		}
-
-	}
+//	/**
+//	 * Save tours which are modified and opened in a tour editor.<br>
+//	 * Every editor which saves a tour will fire a modify event
+//	 * 
+//	 * @param selectedTours
+//	 *            contains the tours which will be saved when modified
+//	 * @return Returns <code>true</code> when the tours are saved or <code>false</code> when the
+//	 *         user prevented to save the tours or the tour is invalid
+//	 */
+//	public static boolean saveTourEditors(final ArrayList<TourData> selectedTours) {
+//
+//		boolean isSaveConfirmed = false;
+//
+//		final TourDataEditorView tourDataEditor = UI.getTourDataEditor();
+//		if (tourDataEditor != null && tourDataEditor.isDirty()) {
+//
+//			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), //
+//					Messages.app_action_dlg_confirm_save_tour_data_editor_title,
+//					NLS.bind(Messages.app_action_dlg_confirm_save_tour_data_editor_message,
+//							tourDataEditor.getTourTitle()))) {
+//
+//				isSaveConfirmed = true;
+//
+//				// save tour in tour data editor
+//				tourDataEditor.saveTour();
+//
+//			} else {
+//				return false;
+//			}
+//		}
+//
+//		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//		// don't resave the tour in the tour data editor in the editor part 
+//		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//
+//		final ArrayList<IEditorPart> openedEditors = UI.getOpenedEditors();
+//		final ArrayList<IEditorPart> editorsToBeSaved = new ArrayList<IEditorPart>();
+//
+//		// check if a tour is opened in an editor
+//		for (final IEditorPart editorPart : openedEditors) {
+//			if (editorPart instanceof TourEditor) {
+//
+//				final IEditorInput editorInput = editorPart.getEditorInput();
+//
+//				if (editorInput instanceof TourEditorInput) {
+//
+//					final TourEditor tourEditor = (TourEditor) editorPart;
+//					final long editorTourId = ((TourEditorInput) editorInput).getTourId();
+//
+//					for (final TourData tourData : selectedTours) {
+//						if (editorTourId == tourData.getTourId()) {
+//
+//							// a tour editor was found containing the current tour
+//
+//							if (tourEditor.isDirty()) {
+//								editorsToBeSaved.add(tourEditor);
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//
+//		// tour editors must be saved when they contain a tour which will be modified
+//		if (editorsToBeSaved.size() > 0) {
+//
+//			if (isSaveConfirmed || MessageDialog.openConfirm(Display.getCurrent().getActiveShell(), //
+//					Messages.app_action_dlg_confirm_save_editors_title,
+//					Messages.app_action_dlg_confirm_save_editors_message)) {
+//
+//				// save all editors
+//				for (final IEditorPart editorPart : editorsToBeSaved) {
+//					editorPart.doSave(null);
+//				}
+//
+//				return true;
+//
+//			} else {
+//				return false;
+//			}
+//
+//		} else {
+//			return true;
+//		}
+//
+//	}
 
 	/**
 	 * set the graph colors from the pref store
@@ -1292,19 +1288,21 @@ public class TourManager {
 
 		final TourData tourDataInMap = fTourDataMap.get(tourId);
 		if (tourDataInMap != null) {
+			System.out.println("tourDataInMap\t:" + tourDataInMap);
 			return tourDataInMap;
 		}
 
-		final TourData tourData = TourDatabase.getTourFromDb(tourId);
+		final TourData tourDataFromDb = TourDatabase.getTourFromDb(tourId);
 
-		if (tourData == null) {
+		if (tourDataFromDb == null) {
 			return null;
 		}
 
 		// keep the tour data
-		updateTourInCache(tourData);
+		updateTourInCache(tourDataFromDb);
+		System.out.println("tourDataFromDb\t:" + tourDataFromDb);
 
-		return tourData;
+		return tourDataFromDb;
 	}
 
 	/**
@@ -1377,6 +1375,94 @@ public class TourManager {
 
 	public void updateTourInCache(final TourData tourData) {
 		fTourDataMap.put(tourData.getTourId(), tourData);
+	}
+
+	/**
+	 * Saves tours which have been modified, checks if the tour is in the tour data editor and fires
+	 * a {@link TOUR_PROPERTIES_CHANGED} event
+	 * 
+	 * @param selectedTours
+	 *            modified tours
+	 */
+	public static void saveModifiedTours(final ArrayList<TourData> selectedTours) {
+	
+		TourData tourDataEditorTour = null;
+		boolean fireChangeEvent = false;
+	
+		for (final TourData tourData : selectedTours) {
+	
+			boolean saveTour = false;
+	
+			final TourDataEditorView tourDataEditor = UI.getTourDataEditor();
+			if (tourDataEditor != null) {
+	
+				final TourData tourDataInEditor = tourDataEditor.getTourData();
+				if (tourDataInEditor == tourData) {
+	
+					// selected tour is in the tour editor
+	
+					if (tourDataEditor.isDirty()) {
+	
+						// tour in the editor is already dirty, tour MUST BE SAVED IN THE TOUR EDITOR
+	
+					} else {
+	
+						/*
+						 * tour in the editor is not dirty, save tour and update editor ui
+						 */
+	
+						TourDatabase.saveTour(tourData);
+	
+						tourDataEditor.updateUI(tourData);
+	
+						// there is only one tour data editor
+						tourDataEditorTour = tourData;
+	
+						fireChangeEvent = true;
+					}
+	
+				} else if (tourDataInEditor.getTourId().longValue() == tourData.getTourId().longValue()) {
+	
+					// this case should not happen
+	
+					MessageDialog.openError(Display.getCurrent().getActiveShell(), "Internal Error",//$NON-NLS-1$
+							"The selected tour is in the tour editor but TourData are different." //$NON-NLS-1$
+									+ UI.NEW_LINE
+									+ UI.NEW_LINE
+									+ "Tour in Editor:\t" //$NON-NLS-1$
+									+ tourDataInEditor.toString()
+									+ UI.NEW_LINE
+									+ UI.NEW_LINE
+									+ "Selected Tour:\t" //$NON-NLS-1$
+									+ tourData.toString());
+				} else {
+	
+					// tour is not in the tour editor
+	
+					saveTour = true;
+				}
+			} else {
+	
+				// tour is not in the tour editor
+	
+				saveTour = true;
+			}
+	
+			if (saveTour) {
+	
+				// save the tour
+				TourDatabase.saveTour(tourData);
+	
+				fireChangeEvent = true;
+			}
+	
+		}
+	
+		if (fireChangeEvent) {
+			final TourProperties propertyData = new TourProperties(selectedTours);
+			propertyData.tourDataEditorTour = tourDataEditorTour;
+			firePropertyChange(TOUR_PROPERTIES_CHANGED, propertyData);
+		}
 	}
 
 }

@@ -18,6 +18,7 @@ package net.tourbook.tour;
 import java.util.ArrayList;
 
 import net.tourbook.data.TourData;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 public class TourProperties {
 
@@ -27,13 +28,18 @@ public class TourProperties {
 	 * when <code>true</code>, tour data have been reverted and {@link TourProperties#modifiedTours}
 	 * contains the reverted {@link TourData}
 	 */
-	public boolean				isReverted	= false;
+	public boolean				isReverted		= false;
 
 	/**
 	 * when <code>true</code>, tour data have been modified in an editor and
 	 * {@link TourProperties#modifiedTours} contains the modified {@link TourData}
 	 */
-	public boolean				isTourEdited		= false;
+	public boolean				isTourEdited	= false;
+
+	/**
+	 * contains the {@link TourData} which is edited in the {@link TourDataEditorView}
+	 */
+	public TourData				tourDataEditorTour;
 
 	public TourProperties(final ArrayList<TourData> modifiedTour) {
 		this.modifiedTours = modifiedTour;

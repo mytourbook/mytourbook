@@ -52,6 +52,7 @@ import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.viewers.ISelection;
@@ -127,7 +128,7 @@ public class MappingView extends ViewPart {
 	public static final int							LEGEND_MARGIN_TOP_BOTTOM			= 10;
 	public static final int							LEGEND_UNIT_DISTANCE				= 60;
 
-	private static final String						MAP_DIM_COLOR						= "map.dim.color";
+	private static final String						MAP_DIM_COLOR						= "map.dim.color";							//$NON-NLS-1$
 
 	private static IMemento							fSessionMemento;
 
@@ -145,7 +146,7 @@ public class MappingView extends ViewPart {
 
 	private ActionDimMap							fActionDimMap;
 	private ActionReloadFailedMapImages				fActionReloadFailedMapImages;
-	private ActionResetTileOverlays					fActionResetTileOverlays;
+//	private ActionResetTileOverlays					fActionResetTileOverlays;
 	private ActionSelectMapProvider					fActionSelectMapProvider;
 	private ActionSaveDefaultPosition				fActionSaveDefaultPosition;
 	private ActionSetDefaultPosition				fActionSetDefaultPosition;
@@ -216,6 +217,9 @@ public class MappingView extends ViewPart {
 
 			fMapDimLevel = dimLevel;
 
+			/*
+			 * dim color is stored in the pref store and not in the memento
+			 */
 			final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 			final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
 
@@ -454,7 +458,10 @@ public class MappingView extends ViewPart {
 					float prefDimLevel = store.getInt(MappingView.PREF_DEBUG_MAP_DIM_LEVEL);
 					prefDimLevel *= 2.55;
 					prefDimLevel -= 255;
-					actionDimMap((int) Math.abs(prefDimLevel));
+
+					final int dimLevel = (int) Math.abs(prefDimLevel);
+					fActionDimMap.setDimLevel(dimLevel);
+					actionDimMap(dimLevel);
 
 				} else if (property.equals(ITourbookPreferences.MAP_LAYOUT_DIM_COLOR)) {
 
@@ -654,7 +661,7 @@ public class MappingView extends ViewPart {
 		fActionShowStartEndInMap = new ActionShowStartEndInMap(this);
 		fActionShowTourMarker = new ActionShowTourMarker(this);
 		fActionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
-		fActionResetTileOverlays = new ActionResetTileOverlays(this);
+//		fActionResetTileOverlays = new ActionResetTileOverlays(this);
 		fActionDimMap = new ActionDimMap(this);
 
 		/*
@@ -697,7 +704,7 @@ public class MappingView extends ViewPart {
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionSynchTourZoomLevel);
 		menuMgr.add(fActionReloadFailedMapImages);
-		menuMgr.add(fActionResetTileOverlays);
+//		menuMgr.add(fActionResetTileOverlays);
 	}
 
 	/**
@@ -806,54 +813,13 @@ public class MappingView extends ViewPart {
 
 		if (fTourData == null) {
 			// a tour is not displayed, find a tour provider which provides a tour
-			Display.getCurrent().asyncExec(new Runnable() {
-				public void run() {
-
-					final Long tourId = TourManager.getTourProvider();
-					if (tourId != null) {
-
-						final TourData tourData = TourManager.getInstance().getTourData(tourId);
-						if (tourData != null) {
-
-							fTourData = tourData;
-
-							/*
-							 * set position and zoomlevel to show the entire tour
-							 */
-							final PaintManager paintManager = PaintManager.getInstance();
-							final Set<GeoPosition> tourBounds = getTourBounds(tourData);
-
-							paintManager.setTourBounds(tourBounds);
-							setTourZoomLevel(tourBounds, true);
-
-//							final PaintManager paintManager = PaintManager.getInstance();
-//							paintManager.setTourData(fTourData);
-//
-//							// set slider position
-//							fDirectMappingPainter.setPaintContext(fMap,
-//									fActionShowTourInMap.isChecked(),
-//									fTourData,
-//									fCurrentLeftSliderValueIndex,
-//									fCurrentRightSliderValueIndex,
-//									fActionShowSliderInMap.isChecked(),
-//									fActionShowSliderInLegend.isChecked());
-//
-//							final Set<GeoPosition> tourBounds = getTourBounds(fTourData);
-//							paintManager.setTourBounds(tourBounds);
-//
-//							fMap.setShowOverlays(fActionShowTourInMap.isChecked());
-//
-//							setTourZoomLevel(tourBounds, false);
-
-							paintTour(tourData, true, false);
-
-							enableActions(false);
-						}
-					}
-				}
-			});
+			searchTourProviderAndShowMap();
 		} else {
 			fMap.queueRedrawMap();
+		}
+
+		if (fMapDimLevel < 30) {
+			showDimWarning();
 		}
 	}
 
@@ -908,7 +874,7 @@ public class MappingView extends ViewPart {
 
 		fActionShowStartEndInMap.setEnabled(isOneTour);
 		fActionShowTourMarker.setEnabled(isOneTour);
-		fActionShowLegendInMap.setEnabled(isOneTour);
+		fActionShowLegendInMap.setEnabled(fIsTour);
 		fActionShowSliderInMap.setEnabled(isOneTour);
 		fActionShowSliderInLegend.setEnabled(isOneTour);
 
@@ -989,6 +955,10 @@ public class MappingView extends ViewPart {
 
 		final double[] latitudeSerie = tourData.latitudeSerie;
 		final double[] longitudeSerie = tourData.longitudeSerie;
+
+		if (latitudeSerie == null || longitudeSerie == null) {
+			return null;
+		}
 
 		/*
 		 * get min/max longitude/latitude
@@ -1489,7 +1459,6 @@ public class MappingView extends ViewPart {
 			final Integer mementoDimLevel = memento.getInteger(MEMENTO_MAP_DIM_LEVEL);
 			if (mementoDimLevel != null) {
 				fMapDimLevel = mementoDimLevel;
-				fActionDimMap.setDimLevel(mementoDimLevel);
 			}
 
 			// action: show start/end in map
@@ -1603,8 +1572,8 @@ public class MappingView extends ViewPart {
 
 		// set dim level/color after the map providers are set
 		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
-
 		fMap.setDimLevel(fMapDimLevel, dimColor);
+		fMapDimLevel = fActionDimMap.setDimLevel(fMapDimLevel);
 
 		// show map with the default position
 		actionSetDefaultPosition();
@@ -1624,7 +1593,8 @@ public class MappingView extends ViewPart {
 		memento.putInteger(MEMENTO_SYNCH_WITH_SELECTED_TOUR, fActionSynchWithTour.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, fActionSynchWithSlider.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, fActionSynchTourZoomLevel.getZoomLevel());
-		memento.putInteger(MEMENTO_MAP_DIM_LEVEL, fActionDimMap.getDimLevel());
+
+		memento.putInteger(MEMENTO_MAP_DIM_LEVEL, fMapDimLevel);
 
 		memento.putInteger(MEMENTO_SHOW_START_END_IN_MAP, fActionShowStartEndInMap.isChecked() ? 1 : 0);
 		memento.putInteger(MEMENTO_SHOW_TOUR_MARKER, fActionShowTourMarker.isChecked() ? 1 : 0);
@@ -1661,6 +1631,68 @@ public class MappingView extends ViewPart {
 			colorId = TOUR_COLOR_ALTITUDE;
 		}
 		memento.putInteger(MEMENTO_TOUR_COLOR_ID, colorId);
+	}
+
+	private void searchTourProviderAndShowMap() {
+
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+
+				// validate widget
+				if (fMap.isDisposed()) {
+					return;
+				}
+
+				/*
+				 * check if tour is set from a selection provider
+				 */
+				if (fTourData != null) {
+					return;
+				}
+				
+				final Long tourId = TourManager.getTourProvider();
+				if (tourId != null) {
+
+					final TourData tourData = TourManager.getInstance().getTourData(tourId);
+					if (tourData != null) {
+
+						fTourData = tourData;
+
+						/*
+						 * set position and zoomlevel to show the entire tour
+						 */
+						final PaintManager paintManager = PaintManager.getInstance();
+						final Set<GeoPosition> tourBounds = getTourBounds(tourData);
+
+						paintManager.setTourBounds(tourBounds);
+						setTourZoomLevel(tourBounds, true);
+
+//							final PaintManager paintManager = PaintManager.getInstance();
+//							paintManager.setTourData(fTourData);
+//
+//							// set slider position
+//							fDirectMappingPainter.setPaintContext(fMap,
+//									fActionShowTourInMap.isChecked(),
+//									fTourData,
+//									fCurrentLeftSliderValueIndex,
+//									fCurrentRightSliderValueIndex,
+//									fActionShowSliderInMap.isChecked(),
+//									fActionShowSliderInLegend.isChecked());
+//
+//							final Set<GeoPosition> tourBounds = getTourBounds(fTourData);
+//							paintManager.setTourBounds(tourBounds);
+//
+//							fMap.setShowOverlays(fActionShowTourInMap.isChecked());
+//
+//							setTourZoomLevel(tourBounds, false);
+
+						paintTour(tourData, true, false);
+
+						enableActions(false);
+					}
+				}
+			}
+		});
 	}
 
 	@Override
@@ -1722,7 +1754,7 @@ public class MappingView extends ViewPart {
 	 */
 	private void setTourZoomLevel(final Set<GeoPosition> positions, final boolean isAdjustZoomLevel) {
 
-		if (positions.size() < 2) {
+		if (positions == null || positions.size() < 2) {
 			return;
 		}
 
@@ -1800,6 +1832,32 @@ public class MappingView extends ViewPart {
 		fMap.setShowLegend(false);
 
 		fMap.queueRedrawMap();
+	}
+
+	/**
+	 * show warning that map is dimmed and can be invisible
+	 */
+	private void showDimWarning() {
+
+		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+		if (store.getBoolean(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING) == false) {
+
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+
+					final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(Display.getCurrent()
+							.getActiveShell(),//
+							Messages.map_dlg_dim_warning_title, // title
+							Messages.map_dlg_dim_warning_message, // message
+							Messages.map_dlg_dim_warning_toggle_message, // toggle message
+							false, // toggle default state
+							null,
+							null);
+
+					store.setValue(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING, dialog.getToggleState());
+				}
+			});
+		}
 	}
 
 	/**

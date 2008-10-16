@@ -205,9 +205,7 @@ public class TourStatisticsView extends ViewPart implements ISelectedTours {
 						return;
 					}
 
-					final TourProperties tourProperties = (TourProperties) propertyData;
-
-					if (tourProperties.isTourEdited) {
+					if (((TourProperties) propertyData).isTourEdited) {
 						// ignore edit changes
 						return;
 					}

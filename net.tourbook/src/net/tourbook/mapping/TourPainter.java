@@ -959,7 +959,7 @@ public class TourPainter extends MapPainter {
 
 		} else {
 
-			// draw dot with the color from the legend provider
+			// draw square with the color from the legend provider
 
 			final Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
 

@@ -375,7 +375,11 @@ public class Messages extends NLS {
 	public static String		Pref_People_Title;
 
 	public static String		pref_general_confirmation;
-	public static String		pref_general_confirmation_tourdata_editor_undo;
+
+	public static String	pref_general_hide_confirmation;
+
+	public static String	pref_general_hide_warning;
+
 	public static String		pref_general_restart_app_message;
 	public static String		pref_general_restart_app_title;
 

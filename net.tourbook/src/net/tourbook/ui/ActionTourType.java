@@ -19,8 +19,6 @@ import java.util.ArrayList;
 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.ITourEditor;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
@@ -33,7 +31,6 @@ class ActionTourType extends Action {
 
 	private TourType		fTourType;
 	private ISelectedTours	fTourProvider;
-	private boolean			fIsSaveTour;
 
 	public ActionTourType(final TourType tourType, final ISelectedTours tourProvider, final boolean isSaveTour) {
 
@@ -44,7 +41,6 @@ class ActionTourType extends Action {
 
 		fTourType = tourType;
 		fTourProvider = tourProvider;
-		fIsSaveTour = isSaveTour;
 	}
 
 	@Override
@@ -61,36 +57,15 @@ class ActionTourType extends Action {
 					return;
 				}
 
-				if (fIsSaveTour) {
-					if (TourManager.saveTourEditors(selectedTours) == false) {
-						return;
-					}
-				}
-
 				// add the tag in all tours (without tours which are opened in an editor)
 				for (final TourData tourData : selectedTours) {
 
 					// set tour type
 					tourData.setTourType(fTourType);
-
-					if (fIsSaveTour) {
-						// save tour with modified tags
-						TourDatabase.saveTour(tourData);
-					}
 				}
 
-				if (fIsSaveTour) {
-
-					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
-
-				} else {
-
-					// don't fire changes when the tour is not saved
-
-					if (fTourProvider instanceof ITourEditor) {
-						((ITourEditor) fTourProvider).setTourIsModified();
-					}
-				}
+				// save all tours with the new tour type
+				TourManager.saveModifiedTours(selectedTours);
 			}
 		};
 

@@ -385,7 +385,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 					UI.updateUnits();
 
 					fColumnManager.saveState(fSessionMemento);
-
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 

@@ -136,6 +136,7 @@ public class TourMapPropertyView extends ViewPart {
 		final boolean isShowTileInfo = fRadioTileInfoYes.getSelection();
 		store.setValue(MappingView.PREF_SHOW_TILE_INFO, isShowTileInfo);
 
+		// dim level
 		store.setValue(MappingView.PREF_DEBUG_MAP_DIM_LEVEL, fScaleDimMap.getSelection());
 
 	}

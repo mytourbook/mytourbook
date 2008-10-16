@@ -22,8 +22,6 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.ITourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ISelectedTours;
 
@@ -34,18 +32,12 @@ import org.eclipse.swt.widgets.Display;
 public class ActionRemoveAllTags extends Action {
 
 	private ISelectedTours	fTourProvider;
-	private boolean			fIsSaveTour;
 
 	public ActionRemoveAllTags(final ISelectedTours tourProvider) {
-		this(tourProvider, true);
-	}
-
-	public ActionRemoveAllTags(final ISelectedTours tourProvider, final boolean isSaveTour) {
 
 		super(Messages.action_tag_remove_all, AS_PUSH_BUTTON);
 
 		fTourProvider = tourProvider;
-		fIsSaveTour = isSaveTour;
 	}
 
 	@Override
@@ -62,12 +54,6 @@ public class ActionRemoveAllTags extends Action {
 					return;
 				}
 
-				if (fIsSaveTour) {
-					if (TourManager.saveTourEditors(selectedTours) == false) {
-						return;
-					}
-				}
-
 				final HashMap<Long, TourTag> removedTags = new HashMap<Long, TourTag>();
 
 				// remove tag in all tours (without tours from an editor)
@@ -82,24 +68,13 @@ public class ActionRemoveAllTags extends Action {
 
 					// remove all tour tags
 					tourTags.clear();
-
-					if (fIsSaveTour) {
-						TourDatabase.saveTour(tourData);
-					}
 				}
 
-				if (fIsSaveTour) {
-					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, selectedTours);
+				// save all tours with the removed tags
+				TourManager.saveModifiedTours(selectedTours);
 
-					TourManager.firePropertyChange(TourManager.TOUR_TAGS_CHANGED, new ChangedTags(removedTags,
-							selectedTours,
-							false));
-				} else {
-
-					if (fTourProvider instanceof ITourEditor) {
-						((ITourEditor) fTourProvider).setTourIsModified();
-					}
-				}
+				TourManager.firePropertyChange(TourManager.NOTIFY_TAG_VIEW, //
+						new ChangedTags(removedTags, selectedTours, false));
 			}
 
 		};

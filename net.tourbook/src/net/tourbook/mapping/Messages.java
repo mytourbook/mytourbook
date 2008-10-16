@@ -26,17 +26,13 @@ public class Messages extends NLS {
 	public static String		graph_label_heartbeat_unit;
 
 	public static String		image_action_change_tile_factory;
-
-	public static String	image_action_reload_map;
+	public static String		image_action_reload_map;
 	public static String		image_action_show_tour_in_map;
 	public static String		image_action_show_tour_in_map_disabled;
-	public static String	image_action_synch_with_slider;
-
-	public static String	image_action_synch_with_slider_disabled;
-
+	public static String		image_action_synch_with_slider;
+	public static String		image_action_synch_with_slider_disabled;
 	public static String		image_action_synch_with_tour;
 	public static String		image_action_synch_with_tour_disabled;
-
 	public static String		image_action_tour_color_altitude;
 	public static String		image_action_tour_color_altitude_disabled;
 	public static String		image_action_tour_color_gradient;
@@ -47,7 +43,6 @@ public class Messages extends NLS {
 	public static String		image_action_tour_color_pulse_disabled;
 	public static String		image_action_tour_color_speed;
 	public static String		image_action_tour_color_speed_disabled;
-
 	public static String		image_action_zoom_centered;
 	public static String		image_action_zoom_in;
 	public static String		image_action_zoom_in_disabled;
@@ -81,23 +76,11 @@ public class Messages extends NLS {
 	public static String		legendcolor_dialog_txt_min_value;
 
 	public static String		map_action_change_tile_factory_tooltip;
-
-	public static String	map_action_dim_map;
-
-	public static String	map_action_dim_map_0;
-
-	public static String	map_action_dim_map_100;
-
-	public static String	map_action_dim_map_25;
-
-	public static String	map_action_dim_map_50;
-
-	public static String	map_action_dim_map_75;
+	public static String		map_action_dim_map;
+	public static String		map_action_dim_map_disabled;
 	public static String		map_action_modify_map_provider;
-
-	public static String	map_action_reload_map;
-
-	public static String	map_action_reset_tile_overlays;
+	public static String		map_action_reload_map;
+	public static String		map_action_reset_tile_overlays;
 	public static String		map_action_save_default_position;
 	public static String		map_action_set_default_position;
 	public static String		map_action_show_legend_in_map;
@@ -105,10 +88,8 @@ public class Messages extends NLS {
 	public static String		map_action_show_slider_in_map;
 	public static String		map_action_show_start_finish_in_map;
 	public static String		map_action_show_tour_in_map;
-
 	public static String		map_action_show_tour_marker;
-	public static String	map_action_synch_with_slider;
-
+	public static String		map_action_synch_with_slider;
 	public static String		map_action_synch_with_tour;
 	public static String		map_action_tour_color_altitude_tooltip;
 	public static String		map_action_tour_color_gradient_tooltip;
@@ -124,8 +105,11 @@ public class Messages extends NLS {
 	public static String		map_action_zoom_show_all;
 	public static String		map_action_zoom_show_entire_tour;
 
-	public static String	map_properties_map_dim_level;
+	public static String		map_dlg_dim_warning_message;
+	public static String		map_dlg_dim_warning_title;
+	public static String		map_dlg_dim_warning_toggle_message;
 
+	public static String		map_properties_map_dim_level;
 	public static String		map_properties_show_tile_info;
 	public static String		map_properties_show_tile_info_no;
 	public static String		map_properties_show_tile_info_yes;

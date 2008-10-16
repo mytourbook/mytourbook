@@ -386,7 +386,7 @@ public class TaggingView extends ViewPart implements ISelectedTours, ITourViewer
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_TAGS_CHANGED) {
+				if (propertyId == TourManager.NOTIFY_TAG_VIEW) {
 					if (propertyData instanceof ChangedTags) {
 
 						final ChangedTags changedTags = (ChangedTags) propertyData;

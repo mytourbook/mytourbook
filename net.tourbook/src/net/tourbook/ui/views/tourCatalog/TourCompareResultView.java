@@ -303,7 +303,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 					UI.updateUnits();
 
 					fColumnManager.saveState(fSessionMemento);
-
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 

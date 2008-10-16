@@ -233,7 +233,7 @@
             class="net.tourbook.ui.views.tourDataEditor.TourDataEditorView"
             icon="icons/tour-editor.gif"
             id="net.tourbook.views.TourDataEditorView"
-            name="%command_view_tourProperies">
+            name="%command_view_tourEditor">
       </view>
       <view
             category="net.tourbook.category.tour"
@@ -659,9 +659,9 @@
          <command
                commandId="net.tourbook.command.tourProperties"
                icon="icons/tour-editor.gif"
-               label="%command_view_tourProperies"
-               mnemonic="%command_view_tourProperies_mnemonic"
-               tooltip="%command_view_tourProperies_tooltip">
+               label="%command_view_tourEditor"
+               mnemonic="%command_view_tourEditor_mnemonic"
+               tooltip="%command_view_tourEditor_tooltip">
          </command>
          <command
                commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
@@ -722,9 +722,9 @@
             <command
                   commandId="net.tourbook.command.tourProperties"
                   icon="icons/tour-editor.gif"
-                  label="%command_view_tourProperies"
-                  mnemonic="%command_view_tourProperies_mnemonic"
-                  tooltip="%command_view_tourProperies_tooltip">
+                  label="%command_view_tourEditor"
+                  mnemonic="%command_view_tourEditor_mnemonic"
+                  tooltip="%command_view_tourEditor_tooltip">
             </command>
             
             <command
@@ -1017,7 +1017,7 @@
       <command
             defaultHandler="net.tourbook.tour.ActionHandlerViewTourProperties"
             id="net.tourbook.command.tourProperties"
-            name="%command_view_tourProperies">
+            name="%command_view_tourEditor">
       </command>
       <command
             defaultHandler="net.tourbook.mapping.ActionHandlerOpenTourMapView"
