@@ -209,6 +209,11 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		return fCurrentMonth;
 	}
 
+	@Override
+	public Long getSelectedTour() {
+		return fSelectedTourId;
+	}
+	
 	public Long getSelectedTourId() {
 		return fSelectedTourId;
 	}
