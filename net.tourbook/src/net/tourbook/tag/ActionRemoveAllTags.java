@@ -23,7 +23,8 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.tour.TourProperties;
+import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -31,13 +32,33 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionRemoveAllTags extends Action {
 
-	private ISelectedTours	fTourProvider;
+	private ITourProvider	fTourProvider;
+	private boolean			fIsSaveTour;
 
-	public ActionRemoveAllTags(final ISelectedTours tourProvider) {
+	/**
+	 * Removes all tags and saves the tours
+	 * 
+	 * @param tourProvider
+	 */
+	public ActionRemoveAllTags(final ITourProvider tourProvider) {
+		this(tourProvider, true);
+	}
+
+	/**
+	 * Removes all tags
+	 * 
+	 * @param tourProvider
+	 * @param isSaveTour
+	 *            when <code>true</code> the tour will be saved and a
+	 *            {@link TourManager#TOUR_PROPERTIES_CHANGED} event is fired, otherwise the
+	 *            {@link TourData} from the tour provider is only modified
+	 */
+	public ActionRemoveAllTags(final ITourProvider tourProvider, final boolean isSaveTour) {
 
 		super(Messages.action_tag_remove_all, AS_PUSH_BUTTON);
 
 		fTourProvider = tourProvider;
+		fIsSaveTour = isSaveTour;
 	}
 
 	@Override
@@ -48,7 +69,7 @@ public class ActionRemoveAllTags extends Action {
 			public void run() {
 
 				// get tours which tour type should be changed
-				final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+				ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
 
 				if (selectedTours == null || selectedTours.size() == 0) {
 					return;
@@ -70,13 +91,23 @@ public class ActionRemoveAllTags extends Action {
 					tourTags.clear();
 				}
 
-				// save all tours with the removed tags
-				final ArrayList<TourData> savedTours = TourManager.saveModifiedTours(selectedTours);
+				if (fIsSaveTour) {
+
+					// save all tours with the removed tags
+					final ArrayList<TourData> savedTours = TourManager.saveModifiedTours(selectedTours);
+					selectedTours = savedTours;
+
+				} else {
+
+					// tours are not saved but the tour provider must be notified
+
+					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED,
+							new TourProperties(selectedTours));
+				}
 
 				TourManager.firePropertyChange(TourManager.NOTIFY_TAG_VIEW, //
-						new ChangedTags(removedTags, savedTours, false));
+						new ChangedTags(removedTags, selectedTours, false));
 			}
-
 		};
 
 		BusyIndicator.showWhile(Display.getCurrent(), runnable);

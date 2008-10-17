@@ -52,7 +52,7 @@ import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TableColumnDefinition;
 import net.tourbook.ui.TableColumnFactory;
@@ -110,7 +110,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * 
  */
-public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer {
+public class RawDataView extends ViewPart implements ITourProvider, ITourViewer {
 
 	private static final String				FILESTRING_SEPARATOR			= "|";											//$NON-NLS-1$
 
@@ -1031,10 +1031,6 @@ public class RawDataView extends ViewPart implements ISelectedTours, ITourViewer
 		if (fSessionMemento == null) {
 			fSessionMemento = memento;
 		}
-	}
-
-	public boolean isFromTourEditor() {
-		return false;
 	}
 
 	public void recreateViewer() {

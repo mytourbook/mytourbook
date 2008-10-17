@@ -21,6 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -36,10 +37,20 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 
 	private Menu	fMenu;
 
-	ISelectedTours	fTourProvider;
+	ITourProvider	fTourProvider;
 	boolean			fIsSaveTour;
 
-	public static void fillMenu(final IMenuManager menuMgr, final ISelectedTours tourProvider, final boolean isSaveTour) {
+	/**
+	 * Adds all tour types to the menu manager
+	 * 
+	 * @param menuMgr
+	 * @param tourProvider
+	 * @param isSaveTour
+	 *            when <code>true</code> the tour will be saved and a
+	 *            {@link TourManager#TOUR_PROPERTIES_CHANGED} event is fired, otherwise the
+	 *            {@link TourData} from the tour provider is only modified
+	 */
+	public static void fillMenu(final IMenuManager menuMgr, final ITourProvider tourProvider, final boolean isSaveTour) {
 
 		// get tours which tour type should be changed
 		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
@@ -71,11 +82,11 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 		}
 	}
 
-	public ActionSetTourType(final ISelectedTours tourProvider) {
+	public ActionSetTourType(final ITourProvider tourProvider) {
 		this(tourProvider, true);
 	}
 
-	public ActionSetTourType(final ISelectedTours tourProvider, final boolean isSaveTour) {
+	public ActionSetTourType(final ITourProvider tourProvider, final boolean isSaveTour) {
 
 		super(Messages.App_Action_set_tour_type, AS_DROP_DOWN_MENU);
 		setMenuCreator(this);

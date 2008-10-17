@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -30,9 +31,18 @@ import org.eclipse.swt.widgets.Display;
 class ActionTourType extends Action {
 
 	private TourType		fTourType;
-	private ISelectedTours	fTourProvider;
+	private ITourProvider	fTourProvider;
+	private boolean			fIsSaveTour;
 
-	public ActionTourType(final TourType tourType, final ISelectedTours tourProvider, final boolean isSaveTour) {
+	/**
+	 * @param tourType
+	 * @param tourProvider
+	 * @param isSaveTour
+	 *            when <code>true</code> the tour will be saved and a
+	 *            {@link TourManager#TOUR_PROPERTIES_CHANGED} event is fired, otherwise the
+	 *            {@link TourData} from the tour provider is only updated
+	 */
+	public ActionTourType(final TourType tourType, final ITourProvider tourProvider, final boolean isSaveTour) {
 
 		super(tourType.getName(), AS_CHECK_BOX);
 
@@ -41,6 +51,7 @@ class ActionTourType extends Action {
 
 		fTourType = tourType;
 		fTourProvider = tourProvider;
+		fIsSaveTour = isSaveTour;
 	}
 
 	@Override
@@ -50,9 +61,7 @@ class ActionTourType extends Action {
 
 			public void run() {
 
-				// get tours which tour type should be changed
 				final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
-
 				if (selectedTours == null || selectedTours.size() == 0) {
 					return;
 				}
@@ -64,8 +73,18 @@ class ActionTourType extends Action {
 					tourData.setTourType(fTourType);
 				}
 
-				// save all tours with the new tour type
-				TourManager.saveModifiedTours(selectedTours);
+				if (fIsSaveTour) {
+
+					// save all tours with the removed tags
+					TourManager.saveModifiedTours(selectedTours);
+
+				} else {
+
+					// tours are not saved but the tour provider must be notified
+
+					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED,
+							new TourProperties(selectedTours));
+				}
 			}
 		};
 

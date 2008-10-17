@@ -19,11 +19,16 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -41,6 +46,7 @@ import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
@@ -48,12 +54,15 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
@@ -308,6 +317,26 @@ public class UI {
 	}
 
 	/**
+	 * Opens the menu for a control aligned below the control on the left side
+	 * 
+	 * @param control
+	 *            Controls which menu is opened
+	 */
+	public static void openControlMenu(final Control control) {
+
+		final Rectangle rect = control.getBounds();
+		Point pt = new Point(rect.x, rect.y + rect.height);
+		pt = control.getParent().toDisplay(pt);
+
+		final Menu menu = control.getMenu();
+
+		if (menu != null && menu.isDisposed() == false) {
+			menu.setLocation(pt.x, pt.y);
+			menu.setVisible(true);
+		}
+	}
+
+	/**
 	 * Restore the sash weight from a memento
 	 * 
 	 * @param sash
@@ -436,6 +465,56 @@ public class UI {
 			e.printStackTrace();
 			e = e.getNextException();
 		}
+	}
+
+	public static void updateUITags(final TourData tourData, final Label tourTagLabel) {
+
+		// tour tags
+		final Set<TourTag> tourTags = tourData.getTourTags();
+
+		if (tourTags == null || tourTags.size() == 0) {
+			tourTagLabel.setText(UI.EMPTY_STRING);
+		} else {
+
+			// sort tour tags by name
+			final ArrayList<TourTag> tourTagList = new ArrayList<TourTag>(tourTags);
+			Collections.sort(tourTagList, new Comparator<TourTag>() {
+				public int compare(final TourTag tt1, final TourTag tt2) {
+					return tt1.getTagName().compareTo(tt2.getTagName());
+				}
+			});
+
+			final StringBuilder sb = new StringBuilder();
+			int index = 0;
+			for (final TourTag tourTag : tourTagList) {
+
+				if (index > 0) {
+					sb.append(", "); //$NON-NLS-1$
+				}
+
+				sb.append(tourTag.getTagName());
+
+				index++;
+			}
+			tourTagLabel.setText(sb.toString());
+			tourTagLabel.setToolTipText(sb.toString());
+		}
+		tourTagLabel.pack(true);
+	}
+
+	public static void updateUITourType(final TourData tourData, final CLabel lblTourType) {
+
+		// tour type
+		final TourType tourType = tourData.getTourType();
+		if (tourType == null) {
+			lblTourType.setText(UI.EMPTY_STRING);
+			lblTourType.setImage(null);
+		} else {
+			lblTourType.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+			lblTourType.setText(tourType.getName());
+		}
+		lblTourType.pack(true);
+		lblTourType.redraw(); // display changed tour image
 	}
 
 	/**
@@ -741,5 +820,6 @@ public class UI {
 
 		return existingImage;
 	}
+
 
 }

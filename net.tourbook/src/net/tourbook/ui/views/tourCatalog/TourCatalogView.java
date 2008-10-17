@@ -46,7 +46,7 @@ import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionRefreshView;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
@@ -94,7 +94,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedTours {
+public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvider {
 
 	private static final String			MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";					//$NON-NLS-1$
 	private static final String			MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";						//$NON-NLS-1$
@@ -895,10 +895,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ISelectedT
 		if (fSessionMemento == null) {
 			fSessionMemento = memento;
 		}
-	}
-
-	public boolean isFromTourEditor() {
-		return false;
 	}
 
 	/**

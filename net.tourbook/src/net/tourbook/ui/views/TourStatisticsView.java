@@ -30,7 +30,7 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
@@ -54,7 +54,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourStatisticsView extends ViewPart implements ISelectedTours {
+public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	static public final String		ID			= "net.tourbook.views.StatisticView";	//$NON-NLS-1$
 
@@ -304,10 +304,6 @@ public class TourStatisticsView extends ViewPart implements ISelectedTours {
 		if (fSessionMemento == null) {
 			fSessionMemento = memento;
 		}
-	}
-
-	public boolean isFromTourEditor() {
-		return false;
 	}
 
 	private void refreshStatistics() {

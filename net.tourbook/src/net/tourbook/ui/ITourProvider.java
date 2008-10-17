@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2001, 2008  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
  * Foundation version 2 of the License.
@@ -13,10 +13,21 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.tour;
 
-public interface ITourEditor {
+package net.tourbook.ui;
 
-	void setTourIsModified();
+import java.util.ArrayList;
+
+import net.tourbook.data.TourData;
+
+/**
+ * This interface provides tours which are selected in a view
+ */
+public interface ITourProvider {
+
+	/**
+	 * Returns the tours which are selected or <code>null</code> when a tour is not selected
+	 */
+	ArrayList<TourData> getSelectedTours();
 
 }

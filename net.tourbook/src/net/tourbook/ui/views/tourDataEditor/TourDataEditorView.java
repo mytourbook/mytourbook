@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
-import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
@@ -32,7 +31,6 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourReference;
-import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
@@ -40,22 +38,18 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.ITourEditor;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.ITourSaveListener;
-import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourChart;
-import net.tourbook.tour.TourEditor;
-import net.tourbook.tour.TourEditorInput;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnDefinition;
@@ -116,8 +110,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -128,8 +120,6 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISaveablePart2;
@@ -149,7 +139,7 @@ import org.eclipse.ui.part.ViewPart;
 // author: Wolfgang Schramm
 // create: 24.08.2007
 
-public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer, ISelectedTours, ITourEditor {
+public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer, ITourProvider {
 
 	public static final String			ID						= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
@@ -201,7 +191,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionSetTourTag			fActionAddTag;
 	private ActionSetTourTag			fActionRemoveTag;
 	private ActionRemoveAllTags			fActionRemoveAllTags;
-
 	private ActionOpenPrefDialog		fActionOpenTagPrefs;
 	private ActionOpenPrefDialog		fActionOpenTourTypePrefs;
 
@@ -212,11 +201,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Form						fEditorForm;
 	private CTabFolder					fTabFolder;
 
-	/**
-	 * contains the tour editor when the tour is opened by an editor or <code>null</code> when the
-	 * source of the tour is not from an editor
-	 */
-	private TourEditor					fTourEditor;
 	private TourChart					fTourChart;
 	private TourData					fTourData;
 
@@ -243,7 +227,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private DateTime					fDtDrivingTime;
 	private DateTime					fDtPausedTime;
 
-	private Label						fLblDatapoints;
+	private Label						fLblTimeSlicesCount;
 	private Label						fLblDeviceName;
 
 	private Text						fTextStartLocation;
@@ -285,7 +269,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean						fIsTourDirty			= false;
 
 	/**
-	 * <code>true</code> when the tour is currently being saved
+	 * is <code>true</code> when the tour is currently being saved to prevent a modify event or the
+	 * onSelectionChanged event
 	 */
 	private boolean						fIsSavingInProgress		= false;
 
@@ -295,6 +280,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private boolean						fDisableModifyEvent		= false;
 
+	/**
+	 * contains the tour id for the last selection event or <code>null</code> the last selection
+	 * didn't contain a tour
+	 */
 	private Long						fSelectionTourId;
 
 	private KeyAdapter					fKeyListener;
@@ -679,8 +668,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {
-				fIsPartHidden = true;
 //				System.out.println("TourDataEditorView:partHidden");
+
+				fIsPartHidden = true;
+
+				// disable tour because the tour could be modified or deleted when the part is hidden
+				fTourData = null;
 			}
 
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
@@ -690,8 +683,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 
 			public void partVisible(final IWorkbenchPartReference partRef) {
-				fIsPartHidden = false;
 //				System.out.println("TourDataEditorView:partVisible");
+
+				fIsPartHidden = false;
+
+				displaySelectedTour();
 			}
 		};
 		// register the listener in the page
@@ -795,7 +791,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 									/*
 									 * nothing to do because the tour is already saved when it was
-									 * not modified and the UI is updated
+									 * not modified, the UI is already updated
 									 */
 									continue;
 								}
@@ -824,7 +820,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		};
-		
+
 		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
 	}
 
@@ -832,7 +828,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fTourSaveListener = new ITourSaveListener() {
 			public boolean saveTour() {
-				return TourDataEditorView.this.saveTourInternal();
+				fIsSavingInProgress = true;
+				boolean isTourSaved;
+				{
+					isTourSaved = TourDataEditorView.this.saveTourInternal();
+				}
+				fIsSavingInProgress = false;
+				return isTourSaved;
 			}
 		};
 
@@ -873,10 +875,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fActionDeleteTimeSlices = new ActionDeleteTimeSlices(this);
 
-		fActionAddTag = new ActionSetTourTag(this, true);
-		fActionRemoveTag = new ActionSetTourTag(this, false);
-		fActionRemoveAllTags = new ActionRemoveAllTags(this);
-
+		fActionAddTag = new ActionSetTourTag(this, true, false);
+		fActionRemoveTag = new ActionSetTourTag(this, false, false);
+		fActionRemoveAllTags = new ActionRemoveAllTags(this, false);
 		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 
@@ -1244,14 +1245,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fPageBook.showPage(fPageNoTour);
 
-		// show data from last selection
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
-
-		enableControls();
-
-		if (fTourData == null) {
-			getAndDisplayTour();
-		}
+		displaySelectedTour();
 	}
 
 	private Composite createSection(final Composite parent, final FormToolkit tk, final String title) {
@@ -1296,12 +1290,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fTagLink.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				openControlMenu(fTagLink);
+				UI.openControlMenu(fTagLink);
 			}
 		});
+		tk.adapt(fTagLink, true, true);
 
 		fLblTourTags = tk.createLabel(section, UI.EMPTY_STRING, SWT.WRAP);
-		tk.adapt(fLblTourTags, false, false);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 				// hint is necessary that the width is not expanded when the text is long
@@ -1317,12 +1311,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fTourTypeLink.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				openControlMenu(fTourTypeLink);
+				UI.openControlMenu(fTourTypeLink);
 			}
 		});
+		tk.adapt(fTourTypeLink, true, true);
 
 		fLblTourType = new CLabel(section, SWT.NONE);
-		tk.adapt(fLblTourType);
 		GridDataFactory.swtDefaults()//
 				.grab(true, false)
 				.span(3, 1)
@@ -1430,12 +1424,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fLblRefTour = tk.createLabel(section, UI.EMPTY_STRING);
 
 		/*
-		 * data points
+		 * number of time slices
 		 */
 		tk.createLabel(section, Messages.tour_editor_label_datapoints);
 
-		fLblDatapoints = tk.createLabel(section, UI.EMPTY_STRING, SWT.TRAIL);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(fLblDatapoints);
+		fLblTimeSlicesCount = tk.createLabel(section, UI.EMPTY_STRING, SWT.TRAIL);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(fLblTimeSlicesCount);
 
 		/*
 		 * device name
@@ -1960,6 +1954,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fireRevertNotification();
 	}
 
+	/**
+	 * tries to get tour data from the last selection or from a tour provider
+	 */
+	private void displaySelectedTour() {
+
+		// show tour from last selection
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		if (fTourData == null) {
+			getAndDisplayTour();
+		}
+
+		setTourClean();
+	}
+
 	private void displayTour(final Long tourId) {
 
 		if (tourId == null) {
@@ -1977,7 +1986,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final TourData tourData = TourManager.getInstance().getTourData(tourId);
 		if (tourData != null) {
-			fTourEditor = null;
 			fTourChart = null;
 			updateUIFromTourData(tourData, false);
 		}
@@ -1998,7 +2006,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fDisableModifyEvent = true;
 		{
-			fTourEditor = null;
 			fTourChart = null;
 			updateUIFromTourData(tourData, true);
 		}
@@ -2341,24 +2348,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * get data for this tour data editor from a {@link TourEditor}
-	 * 
-	 * @param editor
-	 */
-	private void getTourEditorData(final TourEditor editor) {
-
-		fTourEditor = editor;
-		fTourChart = fTourEditor.getTourChart();
-
-		// update dirty state from the editor
-		if (fTourEditor.isDirty()) {
-			setTourDirty();
-		} else {
-			setTourClean();
-		}
-	}
-
-	/**
 	 * @return Returns the title of the active tour
 	 */
 	public String getTourTitle() {
@@ -2416,10 +2405,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	public boolean isFromTourEditor() {
-		return false;
-	}
-
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
@@ -2441,7 +2426,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * Checks the selection if it contains the current tour
+	 * Checks the selection if it contains the current tour, {@link #fSelectionTourId} contains the
+	 * tour id which is within the selection or <code>null</code> when there is not tour in the
+	 * selection
 	 * 
 	 * @param selection
 	 * @return Returns <code>true</code> when the current tour is within the selection
@@ -2491,27 +2478,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						// select time slices
 						selectTimeSlice(chartInfo);
 					}
-				}
-			}
-
-		} else if (selection instanceof SelectionActiveEditor) {
-
-			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
-
-			if (editor == fTourEditor) {
-				// the same editor is selected as the current
-				isCurrentTourSelected = true;
-
-			} else if (editor instanceof TourEditor) {
-
-				// check tour id in the editor
-				final TourEditor tourEditor = (TourEditor) editor;
-				fSelectionTourId = tourEditor.getTourChart().getTourData().getTourId();
-				if (currentTourId == fSelectionTourId) {
-
-					// get editor data when tour data are set but not yet the tour editor
-					getTourEditorData(tourEditor);
-					isCurrentTourSelected = true;
 				}
 			}
 
@@ -2573,9 +2539,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return;
 		}
 
-		if (isTourInSelection(selection)) {
+		if (isTourInSelection(selection) || fSelectionTourId == null) {
 
-			// tour in the selection is already displayed
+			// tour in the selection is already displayed or a tour is not in the selection
 			return;
 
 		} else {
@@ -2592,13 +2558,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			final SelectionTourData selectionTourData = (SelectionTourData) selection;
 			final TourData tourData = selectionTourData.getTourData();
 			if (tourData == null) {
-				fTourEditor = null;
 				fTourChart = null;
 			} else {
 
 				final TourChart tourChart = selectionTourData.getTourChart();
 
-				fTourEditor = null;
 				fTourChart = tourChart;
 				updateUIFromTourData(tourData, false);
 			}
@@ -2606,25 +2570,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		} else if (selection instanceof SelectionTourId) {
 
 			displayTour(((SelectionTourId) selection).getTourId());
-
-		} else if (selection instanceof SelectionActiveEditor) {
-
-			final IEditorPart editor = ((SelectionActiveEditor) selection).getEditor();
-
-			if (editor instanceof TourEditor) {
-
-				/*
-				 * prevent loading the data from the same editor when data have not been modified
-				 */
-				if (editor == fTourEditor && editor.isDirty() == false) {
-					return;
-				}
-
-				getTourEditorData(((TourEditor) editor));
-
-				final TourData tourData = fTourChart.getTourData();
-				updateUIFromTourData(tourData, false);
-			}
 
 		} else if (selection instanceof SelectionChartInfo) {
 
@@ -2636,7 +2581,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					if (fTourData == null) {
 						fTourData = tourData;
-						fTourEditor = null;
 						fTourChart = null;
 						updateUIFromTourData(tourData, false);
 
@@ -2646,7 +2590,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 							// a new tour id is in the selection
 							fTourData = tourData;
-							fTourEditor = null;
 							fTourChart = null;
 							updateUIFromTourData(tourData, false);
 						}
@@ -2663,23 +2606,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		fDisableModifyEvent = false;
-	}
-
-	/**
-	 * Opens the menu for a control aligned below the control on the left side
-	 * 
-	 * @param control
-	 *            Controls which menu is opened
-	 */
-	private void openControlMenu(final Control control) {
-
-		final Rectangle rect = control.getBounds();
-		Point pt = new Point(rect.x, rect.y + rect.height);
-		pt = control.getParent().toDisplay(pt);
-
-		final Menu menu = control.getMenu();
-		menu.setLocation(pt.x, pt.y);
-		menu.setVisible(true);
 	}
 
 	public int promptToSaveOnClose() {
@@ -2906,46 +2832,46 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
-	/**
-	 * @return Returns <code>true</code> when the tour was saved in a {@link TourEditor}
-	 */
-	private boolean saveTourInEditorParts() {
-
-		final Long viewTourId = fTourData.getTourId();
-
-		// check if a tour is opened in the tour editor
-		for (final IEditorPart editorPart : UI.getOpenedEditors()) {
-			if (editorPart instanceof TourEditor) {
-
-				final IEditorInput editorInput = editorPart.getEditorInput();
-				if (editorInput instanceof TourEditorInput) {
-
-					final TourEditor tourEditor = (TourEditor) editorPart;
-					final long editorTourId = ((TourEditorInput) editorInput).getTourId();
-
-					if (editorTourId == viewTourId) {
-
-						// a tour editor was found containing the current tour
-
-						if (tourEditor.isDirty()) {
-
-							// save tour in the editor
-							editorPart.doSave(null);
-
-							setTourClean();
-
-							fIsSavingInProgress = false;
-
-							// there can be only one editor for a tour
-							return true;
-						}
-					}
-				}
-			}
-		}
-
-		return false;
-	}
+//	/**
+//	 * @return Returns <code>true</code> when the tour was saved in a {@link TourEditor}
+//	 */
+//	private boolean saveTourInEditorParts() {
+//
+//		final Long viewTourId = fTourData.getTourId();
+//
+//		// check if a tour is opened in the tour editor
+//		for (final IEditorPart editorPart : UI.getOpenedEditors()) {
+//			if (editorPart instanceof TourEditor) {
+//
+//				final IEditorInput editorInput = editorPart.getEditorInput();
+//				if (editorInput instanceof TourEditorInput) {
+//
+//					final TourEditor tourEditor = (TourEditor) editorPart;
+//					final long editorTourId = ((TourEditorInput) editorInput).getTourId();
+//
+//					if (editorTourId == viewTourId) {
+//
+//						// a tour editor was found containing the current tour
+//
+//						if (tourEditor.isDirty()) {
+//
+//							// save tour in the editor
+//							editorPart.doSave(null);
+//
+//							setTourClean();
+//
+//							fIsSavingInProgress = false;
+//
+//							// there can be only one editor for a tour
+//							return true;
+//						}
+//					}
+//				}
+//			}
+//		}
+//
+//		return false;
+//	}
 
 	/**
 	 * saves the tour in the {@link TourDataEditorView}
@@ -3005,7 +2931,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fIsSavingInProgress = false;
 
-		return saveTourInEditorParts();
+		return true;
 	}
 
 	private void selectTimeSlice(final SelectionChartInfo chartInfo) {
@@ -3067,13 +2993,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 * marker in the part name
 		 */
 		firePropertyChange(PROP_DIRTY);
-	}
-
-	public void setTourIsModified() {
-
-		updateUIFromTourData(fTourData, false);
-
-		setTourDirty();
 	}
 
 	private void updateContentOnKeyUp() {
@@ -3279,6 +3198,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		updateUITabTimeSlices(forceReload);
 
 		enableActions();
+		enableControls();
 
 		fPageBook.showPage(fEditorForm);
 	}
@@ -3317,12 +3237,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// data points
 		final int[] timeSerie = fTourData.timeSerie;
 		if (timeSerie == null) {
-			fLblDatapoints.setText(UI.EMPTY_STRING);
+			fLblTimeSlicesCount.setText(UI.EMPTY_STRING);
 		} else {
 			final int dataPoints = timeSerie.length;
-			fLblDatapoints.setText(Integer.toString(dataPoints));
+			fLblTimeSlicesCount.setText(Integer.toString(dataPoints));
 		}
-		fLblDatapoints.pack(true);
+		fLblTimeSlicesCount.pack(true);
 
 		// device name
 		fLblDeviceName.setText(fTourData.getDeviceName());
@@ -3332,49 +3252,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fTextStartLocation.setText(fTourData.getTourStartPlace());
 		fTextEndLocation.setText(fTourData.getTourEndPlace());
 
-		// tour type
-		final TourType tourType = fTourData.getTourType();
-		if (tourType == null) {
-			fLblTourType.setText(UI.EMPTY_STRING);
-			fLblTourType.setImage(null);
-		} else {
-			fLblTourType.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
-			fLblTourType.setText(tourType.getName());
-		}
-		fLblTourType.pack(true);
-		fLblTourType.redraw(); // display changed tour image
-
-		// tour tags
-		final Set<TourTag> tourTags = fTourData.getTourTags();
-
-		if (tourTags == null || tourTags.size() == 0) {
-			fLblTourTags.setText(UI.EMPTY_STRING);
-		} else {
-
-			// sort tour tags by name
-			final ArrayList<TourTag> tourTagList = new ArrayList<TourTag>(tourTags);
-			Collections.sort(tourTagList, new Comparator<TourTag>() {
-				public int compare(final TourTag tt1, final TourTag tt2) {
-					return tt1.getTagName().compareTo(tt2.getTagName());
-				}
-			});
-
-			final StringBuilder sb = new StringBuilder();
-			int index = 0;
-			for (final TourTag tourTag : tourTagList) {
-
-				if (index > 0) {
-					sb.append(", "); //$NON-NLS-1$
-				}
-
-				sb.append(tourTag.getTagName());
-
-				index++;
-			}
-			fLblTourTags.setText(sb.toString());
-			fLblTourTags.setToolTipText(sb.toString());
-		}
-		fLblTourTags.pack(true);
+		UI.updateUITourType(fTourData, fLblTourType);
+		UI.updateUITags(fTourData, fLblTourTags);
 
 		// tour distance
 		final int tourDistance = fTourData.getTourDistance();
@@ -3446,6 +3325,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		}
 	}
+
 
 	/**
 	 * update week info

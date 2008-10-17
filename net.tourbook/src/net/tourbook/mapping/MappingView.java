@@ -58,6 +58,8 @@ import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -92,6 +94,10 @@ import de.byteholder.gpx.ext.PointOfInterest;
  * @since 1.3.0
  */
 public class MappingView extends ViewPart {
+
+	private static final int						DEFAULT_LEGEND_WIDTH				= 150;
+
+	private static final int						DEFAULT_LEGEND_HEIGHT				= 300;
 
 	public static final String						ID									= "net.tourbook.mapping.mappingViewID";	//$NON-NLS-1$
 
@@ -703,8 +709,11 @@ public class MappingView extends ViewPart {
 		if (legendImage != null && !legendImage.isDisposed()) {
 			legendImage.dispose();
 		}
-		final int legendWidth = 150;
-		final int legendHeight = 300;
+		final int legendWidth = DEFAULT_LEGEND_WIDTH;
+		int legendHeight = DEFAULT_LEGEND_HEIGHT;
+
+		final Rectangle mapBounds = fMap.getBounds();
+		legendHeight = Math.min(legendHeight, mapBounds.height);
 
 		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
@@ -763,6 +772,39 @@ public class MappingView extends ViewPart {
 		fMapLegend = new MapLegend();
 		fMap.setLegend(fMapLegend);
 		fMap.setShowLegend(true);
+
+		fMap.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+
+				/*
+				 * check if the legend size must be adjusted
+				 */
+				final Image legendImage = fMapLegend.getImage();
+				if (legendImage == null || legendImage.isDisposed()) {
+					return;
+				}
+
+				final boolean showTour = fActionShowTourInMap.isChecked();
+				final boolean showLegend = fActionShowLegendInMap.isChecked();
+				if (fIsTour == false || showTour == false || showLegend == false) {
+					return;
+				}
+
+				/*
+				 * check height
+				 */
+				final Rectangle mapBounds = fMap.getBounds();
+				final Rectangle legendBounds = legendImage.getBounds();
+
+				if (mapBounds.height < DEFAULT_LEGEND_HEIGHT //
+						|| (mapBounds.height > DEFAULT_LEGEND_HEIGHT //
+						&& legendBounds.height < DEFAULT_LEGEND_HEIGHT)) {
+
+					createLegendImage(PaintManager.getInstance().getLegendProvider());
+				}
+			}
+		});
 
 		// create list with all map factories
 		fTileFactories = new ArrayList<MapProvider>();
@@ -1255,7 +1297,7 @@ public class MappingView extends ViewPart {
 		// prevent loading the same tour
 		if (forceRedraw == false) {
 
-			if (fTourDataList != null && fTourDataList.size() > 0 && fTourDataList.get(0) == tourData) {
+			if (fTourDataList != null && fTourDataList.size() == 1 && fTourDataList.get(0) == tourData) {
 				return;
 			}
 		}

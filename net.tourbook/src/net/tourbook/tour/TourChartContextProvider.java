@@ -30,7 +30,7 @@ import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionSetTourType;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 
 import org.eclipse.jface.action.Action;
@@ -38,7 +38,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Display;
 
-public class TourChartContextProvider implements IChartContextProvider, ISelectedTours {
+public class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
 	public ChartXSlider				fSlider;
 
@@ -262,8 +262,5 @@ public class TourChartContextProvider implements IChartContextProvider, ISelecte
 
 	}
 
-	public boolean isFromTourEditor() {
-		return true;
-	}
 
 }

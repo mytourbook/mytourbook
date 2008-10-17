@@ -26,9 +26,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionEditTour extends Action {
 
-	private ISelectedTours	fTourProvider;
+	private ITourProvider	fTourProvider;
 
-	public ActionEditTour(final ISelectedTours tourProvider) {
+	public ActionEditTour(final ITourProvider tourProvider) {
 
 		fTourProvider = tourProvider;
 

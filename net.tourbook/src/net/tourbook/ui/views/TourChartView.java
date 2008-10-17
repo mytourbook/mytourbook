@@ -45,7 +45,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionSetTourType;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogReferenceTour;
@@ -78,7 +78,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Shows the selected tour in a chart
  */
-public class TourChartView extends ViewPart implements ISelectedTours {
+public class TourChartView extends ViewPart implements ITourProvider {
 
 	public static final String		ID	= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
@@ -96,7 +96,7 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 	private PageBook				fPageBook;
 	private Label					fPageNoChart;
 
-	private class TourChartContextProvicer implements IChartContextProvider, ISelectedTours {
+	private class TourChartContextProvicer implements IChartContextProvider, ITourProvider {
 
 		final ActionEditQuick		fActionQuickEdit		= new ActionEditQuick(TourChartView.this);
 		final ActionEditTour		fActionEditTour			= new ActionEditTour(TourChartView.this);
@@ -160,10 +160,6 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 			tourList.add(fTourData);
 
 			return tourList;
-		}
-
-		public boolean isFromTourEditor() {
-			return false;
 		}
 	}
 
@@ -410,10 +406,6 @@ public class TourChartView extends ViewPart implements ISelectedTours {
 
 	public TourChart getTourChart() {
 		return fTourChart;
-	}
-
-	public boolean isFromTourEditor() {
-		return false;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

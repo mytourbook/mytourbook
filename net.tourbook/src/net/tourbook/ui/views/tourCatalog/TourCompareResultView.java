@@ -44,7 +44,7 @@ import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
@@ -99,7 +99,7 @@ import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourCompareResultView extends ViewPart implements ITourViewer, ISelectedTours {
+public class TourCompareResultView extends ViewPart implements ITourViewer, ITourProvider {
 
 	public static final String					ID					= "net.tourbook.views.tourCatalog.CompareResultView";	//$NON-NLS-1$
 
@@ -1075,10 +1075,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ISel
 		if (fSessionMemento == null) {
 			fSessionMemento = memento;
 		}
-	}
-
-	public boolean isFromTourEditor() {
-		return false;
 	}
 
 	private void onSelectionChanged(final SelectionChangedEvent event) {

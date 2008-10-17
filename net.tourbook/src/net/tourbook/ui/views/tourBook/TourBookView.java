@@ -47,7 +47,7 @@ import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionRefreshView;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TreeColumnDefinition;
@@ -100,7 +100,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourBookView extends ViewPart implements ISelectedTours, ITourViewer {
+public class TourBookView extends ViewPart implements ITourProvider, ITourViewer {
 
 	static public final String			ID											= "net.tourbook.views.tourListView";			//$NON-NLS-1$
 
@@ -129,19 +129,23 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 
 	private ActionEditQuick				fActionEditQuick;
 
-	private ActionSetTourTag			fActionAddTag;
 	private ActionCollapseAll			fActionCollapseAll;
 	private ActionCollapseOthers		fActionCollapseOthers;
+	private ActionExpandSelection		fActionExpandSelection;
+
 	private ActionDeleteTour			fActionDeleteTour;
 	private ActionEditTour				fActionEditTour;
-	private ActionExpandSelection		fActionExpandSelection;
-	private ActionModifyColumns			fActionModifyColumns;
-	private ActionOpenPrefDialog		fActionOpenTagPrefs;
+
+	private ActionSetTourTag			fActionAddTag;
 	private ActionSetTourTag			fActionRemoveTag;
 	private ActionRemoveAllTags			fActionRemoveAllTags;
-	private ActionRefreshView			fActionRefreshView;
-	private ActionSelectYearMonthTours	fActionSelectYearMonthTours;
+	private ActionOpenPrefDialog		fActionOpenTagPrefs;
+
 	private ActionSetTourType			fActionSetTourType;
+
+	private ActionSelectYearMonthTours	fActionSelectYearMonthTours;
+	private ActionModifyColumns			fActionModifyColumns;
+	private ActionRefreshView			fActionRefreshView;
 
 	private int							fTourViewerSelectedYear						= -1;
 	private int							fTourViewerSelectedMonth					= -1;
@@ -1099,10 +1103,6 @@ public class TourBookView extends ViewPart implements ISelectedTours, ITourViewe
 		if (fSessionMemento == null) {
 			fSessionMemento = memento;
 		}
-	}
-
-	public boolean isFromTourEditor() {
-		return false;
 	}
 
 	private void onSelectTreeItem(final SelectionChangedEvent event) {

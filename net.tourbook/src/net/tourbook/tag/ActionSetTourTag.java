@@ -26,7 +26,8 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
@@ -45,8 +46,10 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 	private Menu					fMenu;
 
-	private final ISelectedTours	fTourProvider;
+	private final ITourProvider	fTourProvider;
+
 	private final boolean			fIsAddMode;
+	private boolean					fIsSaveTour;
 
 	/**
 	 * contains the tags for all selected tours in the viewer
@@ -123,17 +126,34 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 
 		@Override
 		public void run() {
-			TagManager.setTagIntoTour(fTourTag, fTourProvider, fIsAddMode);
+			TagManager.setTagIntoTour(fTourTag, fTourProvider, fIsAddMode, fIsSaveTour);
 		}
 
 	}
 
-	public ActionSetTourTag(final ISelectedTours tourProvider, final boolean isAddMode) {
+	/**
+	 * @param tourProvider
+	 * @param isAddMode
+	 */
+	public ActionSetTourTag(final ITourProvider tourProvider, final boolean isAddMode) {
+		this(tourProvider, isAddMode, true);
+	}
+
+	/**
+	 * @param tourProvider
+	 * @param isAddMode
+	 * @param isSaveTour
+	 *            when <code>true</code> the tour will be saved and a
+	 *            {@link TourManager#TOUR_PROPERTIES_CHANGED} event is fired, otherwise the
+	 *            {@link TourData} from the tour provider is only updated
+	 */
+	public ActionSetTourTag(final ITourProvider tourProvider, final boolean isAddMode, final boolean isSaveTour) {
 
 		super(UI.IS_NOT_INITIALIZED, AS_DROP_DOWN_MENU);
 
 		fTourProvider = tourProvider;
 		fIsAddMode = isAddMode;
+		fIsSaveTour = isSaveTour;
 
 		setText(isAddMode ? Messages.action_tag_add : Messages.action_tag_remove);
 		setMenuCreator(this);

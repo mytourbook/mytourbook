@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
@@ -27,9 +27,9 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionEditQuick extends Action {
 
-	private ISelectedTours	fTourProvider;
+	private ITourProvider	fTourProvider;
 
-	public ActionEditQuick(final ISelectedTours tourProvider) {
+	public ActionEditQuick(final ITourProvider tourProvider) {
 
 		setText(Messages.app_action_quick_edit);
 //		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
@@ -41,7 +41,7 @@ public class ActionEditQuick extends Action {
 	@Override
 	public void run() {
 
-		// get selected tour
+		// get selected tour, make sure only one tour is selected
 		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
 		if (selectedTours == null || selectedTours.size() != 1) {
 			return;

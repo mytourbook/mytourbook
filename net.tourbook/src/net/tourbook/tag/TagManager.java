@@ -26,7 +26,8 @@ import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.tour.TourProperties;
+import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -62,8 +63,10 @@ public class TagManager {
 
 	private static ActionRecentTag[]	fActionsRecentTags;
 
-	private static ISelectedTours		fTourProvider;
+	private static ITourProvider		fTourProvider;
 	private static boolean				fIsAddMode;
+
+	private static boolean				fIsSaveTour;
 
 	public static class ActionRecentTag extends Action {
 
@@ -71,7 +74,7 @@ public class TagManager {
 
 		@Override
 		public void run() {
-			setTagIntoTour(fTag, fTourProvider, fIsAddMode);
+			setTagIntoTour(fTag, fTourProvider, fIsAddMode, fIsSaveTour);
 		}
 
 		private void setTag(final TourTag tag) {
@@ -107,7 +110,7 @@ public class TagManager {
 	 * @param isSaveTour
 	 */
 	public static void fillRecentTagsIntoMenu(	final IMenuManager menuMgr,
-												final ISelectedTours tourProvider,
+												final ITourProvider tourProvider,
 												final boolean isAddMode,
 												final boolean isSaveTour) {
 
@@ -126,6 +129,7 @@ public class TagManager {
 
 		fTourProvider = tourProvider;
 		fIsAddMode = isAddMode;
+		fIsSaveTour = isSaveTour;
 
 		// add separator
 		menuMgr.add(new Separator());
@@ -208,14 +212,17 @@ public class TagManager {
 		TourbookPlugin.getDefault().getDialogSettingsSection(SETTINGS_SECTION_RECENT_TAGS).put(SETTINGS_TAG_ID, tagIds);
 	}
 
-	public static void setTagIntoTour(final TourTag tourTag, final ISelectedTours tourProvider, final boolean isAddMode) {
+	public static void setTagIntoTour(	final TourTag tourTag,
+										final ITourProvider tourProvider,
+										final boolean isAddMode,
+										final boolean isSaveTour) {
 
 		final Runnable runnable = new Runnable() {
 
 			public void run() {
 
 				// get tours which tag should be changed
-				final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+				ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
 				if (selectedTours == null || selectedTours.size() == 0) {
 					return;
@@ -236,13 +243,24 @@ public class TagManager {
 					}
 				}
 
-				// save all modified tours
-				final ArrayList<TourData> savedTours = TourManager.saveModifiedTours(selectedTours);
+				TagManager.addRecentTag(tourTag);
+
+				if (isSaveTour) {
+
+					// save all tours with the removed tags
+					final ArrayList<TourData> savedTours = TourManager.saveModifiedTours(selectedTours);
+					selectedTours = savedTours;
+
+				} else {
+
+					// tours are not saved but the tour provider must be notified
+
+					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED,
+							new TourProperties(selectedTours));
+				}
 
 				TourManager.firePropertyChange(TourManager.NOTIFY_TAG_VIEW, //
-						new ChangedTags(tourTag, savedTours, isAddMode));
-
-				TagManager.addRecentTag(tourTag);
+						new ChangedTags(tourTag, selectedTours, false));
 			}
 
 		};

@@ -54,7 +54,7 @@ import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionRefreshView;
 import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
@@ -106,7 +106,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
-public class TaggingView extends ViewPart implements ISelectedTours, ITourViewer {
+public class TaggingView extends ViewPart implements ITourProvider, ITourViewer {
 
 	static public final String				ID								= "net.tourbook.views.tagViewID";	//$NON-NLS-1$
 
@@ -1212,10 +1212,6 @@ public class TaggingView extends ViewPart implements ISelectedTours, ITourViewer
 		if (fSessionMemento == null) {
 			fSessionMemento = memento;
 		}
-	}
-
-	public boolean isFromTourEditor() {
-		return false;
 	}
 
 	public void recreateViewer() {
