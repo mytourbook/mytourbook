@@ -34,7 +34,7 @@ import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ActionOpenPrefDialog;
 import net.tourbook.ui.ActionSetTourType;
-import net.tourbook.ui.ISelectedTours;
+import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -43,7 +43,7 @@ import org.eclipse.jface.action.Separator;
 /**
  * provides the fill menu methods for the chart context menu
  */
-class TourContextProvider implements IChartContextProvider, ISelectedTours {
+class TourContextProvider implements IChartContextProvider, ITourProvider {
 
 	/** 
 	 * 
@@ -180,9 +180,4 @@ class TourContextProvider implements IChartContextProvider, ISelectedTours {
 
 		return null;
 	}
-
-	public boolean isFromTourEditor() {
-		return false;
-	}
-
 }
