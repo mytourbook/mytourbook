@@ -163,31 +163,6 @@ public class TourChartView extends ViewPart implements ITourProvider {
 		}
 	}
 
-//	private void addPartListener() {
-//
-//		fPartListener = new IPartListener2() {
-//			public void partActivated(final IWorkbenchPartReference partRef) {
-//				int a = 0;
-//				a++;
-//			}
-//
-//			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-//
-//			public void partClosed(final IWorkbenchPartReference partRef) {}
-//
-//			public void partDeactivated(final IWorkbenchPartReference partRef) {}
-//
-//			public void partHidden(final IWorkbenchPartReference partRef) {}
-//
-//			public void partInputChanged(final IWorkbenchPartReference partRef) {}
-//
-//			public void partOpened(final IWorkbenchPartReference partRef) {}
-//
-//			public void partVisible(final IWorkbenchPartReference partRef) {}
-//		};
-//		getViewSite().getPage().addPartListener(fPartListener);
-//	}
-
 	private void addPrefListener() {
 
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {

@@ -271,16 +271,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
+				if (partRef.getPart(false) == TourCatalogView.this) {
+					saveSession();
 				}
 			}
 
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
-				}
-			}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
@@ -417,11 +413,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
-				
+
 				if (part == TourCatalogView.this) {
 					return;
 				}
-				
+
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					// get a clone of the modified tours because the tours are removed from the list
@@ -1035,7 +1031,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		}
 	}
 
-	private void saveSettings() {
+	private void saveSession() {
 		fSessionMemento = XMLMemento.createWriteRoot("TourCatalogView"); //$NON-NLS-1$
 		saveState(fSessionMemento);
 	}

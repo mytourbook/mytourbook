@@ -256,22 +256,25 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-
-				if (ID.equals(partRef.getId())) {
-					// keep settings for this part
-					savePartSettings();
-				}
-
-				if (fTourChart != null) {
-					// hide the tour segments
-					fShowSegmentsInChart = false;
-					fireSegmentLayerChanged();
+				if (partRef.getPart(false) == TourSegmenterView.this) {
+					saveSession();
 				}
 			}
 
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {
+
+				if (fTourChart != null) {
+
+					// hide the tour segments
+
+					fShowSegmentsInChart = false;
+					fActionShowSegments.setChecked(fShowSegmentsInChart);
+
+					fireSegmentLayerChanged();
+				}
+			}
 
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
@@ -953,9 +956,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 //
 //	public void reloadViewer() {}
 
-	private void savePartSettings() {
+	private void saveSession() {
 
-		fSessionMemento = XMLMemento.createWriteRoot("TourPropertiesView"); //$NON-NLS-1$
+		fSessionMemento = XMLMemento.createWriteRoot("TourSegmenterView"); //$NON-NLS-1$
 
 		saveState(fSessionMemento);
 	}

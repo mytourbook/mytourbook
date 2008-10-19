@@ -18,6 +18,7 @@ package net.tourbook.mapping;
 
 import net.tourbook.plugin.TourbookPlugin;
 
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
@@ -61,7 +62,9 @@ public class TourMapPropertyView extends ViewPart {
 		});
 
 		final Composite infoContainer = new Composite(viewContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(infoContainer);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(infoContainer);
+
 		{
 			/*
 			 * tile info
@@ -106,6 +109,7 @@ public class TourMapPropertyView extends ViewPart {
 			fScaleDimMap.setPageIncrement(10);
 			fScaleDimMap.setMinimum(0);
 			fScaleDimMap.setMaximum(100);
+			GridDataFactory.fillDefaults().grab(true, false).hint(1, SWT.DEFAULT).applyTo(fScaleDimMap);
 			fScaleDimMap.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {

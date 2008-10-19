@@ -194,23 +194,18 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private void addPartListener() {
 		fPartListener = new IPartListener2() {
-			public void partActivated(final IWorkbenchPartReference partRef) {
-//				disableTourChartSelection();
-			}
+
+			public void partActivated(final IWorkbenchPartReference partRef) {}
 
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
+				if (partRef.getPart(false) == RawDataView.this) {
+					saveSession();
 				}
 			}
 
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
-				}
-			}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				if (RawDataView.this == partRef.getPart(false)) {
@@ -334,15 +329,15 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 				if (part == RawDataView.this) {
 					return;
 				}
-				
+
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					// update modified tours
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
-						
+
 						// update model
- 						RawDataManager.getInstance().updateTourDataModel(modifiedTours);
+						RawDataManager.getInstance().updateTourDataModel(modifiedTours);
 
 						// update viewer
 						fTourViewer.update(modifiedTours.toArray(), null);
@@ -1022,6 +1017,59 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		return fTourViewer;
 	}
 
+	private void importFiles(final RawDataManager rawDataManager, final IMemento memento) {
+
+		// restore imported tours
+		final String mementoImportedFiles = memento.getString(MEMENTO_IMPORT_FILENAME);
+		final ArrayList<String> notImportedFiles = new ArrayList<String>();
+
+		if (mementoImportedFiles != null) {
+
+			rawDataManager.getTourDataMap().clear();
+
+			final String[] files = StringToArrayConverter.convertStringToArray(mementoImportedFiles,
+					FILESTRING_SEPARATOR);
+			int importCounter = 0;
+
+			// loop: import all files
+			for (final String fileName : files) {
+
+				final File file = new File(fileName);
+				if (file.exists()) {
+					if (rawDataManager.importRawData(file, null, false, null)) {
+						importCounter++;
+					} else {
+						notImportedFiles.add(fileName);
+					}
+				}
+			}
+
+			if (importCounter > 0) {
+
+				rawDataManager.updateTourDataFromDb();
+				reloadViewer();
+
+				// restore selected tour
+				final Integer selectedTourIndex = memento.getInteger(MEMENTO_SELECTED_TOUR_INDEX);
+
+				final Object tourData = fTourViewer.getElementAt(selectedTourIndex);
+
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						if (tourData != null) {
+							fTourViewer.setSelection(new StructuredSelection(tourData), true);
+						}
+					}
+				});
+			}
+		}
+
+		if (notImportedFiles.size() > 0) {
+			RawDataManager.showMsgBoxInvalidFormat(notImportedFiles);
+		}
+
+	}
+
 	@Override
 	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
 
@@ -1115,61 +1163,17 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			}
 			rawDataManager.setIsChecksumValidation(fActionDisableChecksumValidation.isChecked() == false);
 
-			// restore imported tours
-			final String mementoImportedFiles = memento.getString(MEMENTO_IMPORT_FILENAME);
-			final ArrayList<String> notImportedFiles = new ArrayList<String>();
-
-			if (mementoImportedFiles != null) {
-
-				rawDataManager.getTourDataMap().clear();
-
-				final String[] files = StringToArrayConverter.convertStringToArray(mementoImportedFiles,
-						FILESTRING_SEPARATOR);
-				int importCounter = 0;
-
-				// loop: import all files
-				for (final String fileName : files) {
-
-					final File file = new File(fileName);
-					if (file.exists()) {
-						if (rawDataManager.importRawData(file, null, false, null)) {
-							importCounter++;
-						} else {
-							notImportedFiles.add(fileName);
-						}
-					}
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+					importFiles(rawDataManager, memento);
 				}
-
-				if (importCounter > 0) {
-
-					rawDataManager.updateTourDataFromDb();
-					reloadViewer();
-
-					// restore selected tour
-					final Integer selectedTourIndex = memento.getInteger(MEMENTO_SELECTED_TOUR_INDEX);
-
-					final Object tourData = fTourViewer.getElementAt(selectedTourIndex);
-
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-							if (tourData != null) {
-								fTourViewer.setSelection(new StructuredSelection(tourData), true);
-							}
-						}
-					});
-				}
-			}
-
-			if (notImportedFiles.size() > 0) {
-				RawDataManager.showMsgBoxInvalidFormat(notImportedFiles);
-			}
-
+			});
 		}
 
 	}
 
-	private void saveSettings() {
-		fSessionMemento = XMLMemento.createWriteRoot("DeviceImportView"); //$NON-NLS-1$
+	private void saveSession() {
+		fSessionMemento = XMLMemento.createWriteRoot("RawDataView"); //$NON-NLS-1$
 		saveState(fSessionMemento);
 	}
 

@@ -411,16 +411,12 @@ public class MappingView extends ViewPart {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
+				if (partRef.getPart(false) == MappingView.this) {
+					saveSession();
 				}
 			}
 
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
-				}
-			}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
@@ -713,7 +709,7 @@ public class MappingView extends ViewPart {
 		int legendHeight = DEFAULT_LEGEND_HEIGHT;
 
 		final Rectangle mapBounds = fMap.getBounds();
-		legendHeight = Math.min(legendHeight, mapBounds.height);
+		legendHeight = Math.max(1, Math.min(legendHeight, mapBounds.height));
 
 		final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
@@ -882,6 +878,7 @@ public class MappingView extends ViewPart {
 
 		final boolean isMultipleTours = fTourDataList != null && fTourDataList.size() > 1;
 		final boolean isOneTour = fIsTour && isMultipleTours == false;
+
 		/*
 		 * enable/disable tour actions
 		 */
@@ -897,7 +894,15 @@ public class MappingView extends ViewPart {
 		fActionShowSliderInMap.setEnabled(isOneTour);
 		fActionShowSliderInLegend.setEnabled(isOneTour);
 
-		if (isForceTourColor) {
+		if (fTourDataList == null) {
+
+			fActionTourColorAltitude.setEnabled(false);
+			fActionTourColorGradient.setEnabled(false);
+			fActionTourColorPulse.setEnabled(false);
+			fActionTourColorSpeed.setEnabled(false);
+			fActionTourColorPace.setEnabled(false);
+
+		} else if (isForceTourColor) {
 
 			fActionTourColorAltitude.setEnabled(true);
 			fActionTourColorGradient.setEnabled(true);
@@ -1674,8 +1679,8 @@ public class MappingView extends ViewPart {
 		actionSetDefaultPosition();
 	}
 
-	private void saveSettings() {
-		fSessionMemento = XMLMemento.createWriteRoot("DeviceImportView"); //$NON-NLS-1$
+	private void saveSession() {
+		fSessionMemento = XMLMemento.createWriteRoot("MappingView"); //$NON-NLS-1$
 		saveState(fSessionMemento);
 	}
 

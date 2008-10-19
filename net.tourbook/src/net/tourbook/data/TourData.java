@@ -150,7 +150,7 @@ public class TourData {
 
 	@SuppressWarnings("unused")
 	private int						deviceDistance;
-	
+
 	private int						deviceWheel;
 
 	private int						deviceWeight;
@@ -1773,7 +1773,11 @@ public class TourData {
 					if (tdDistance == Float.MIN_VALUE) {
 						distanceDiff = 0;
 					} else {
-						distanceDiff = (Math.round(tdDistance) - distanceAbsolute);
+						/*
+						 * Math.round() cannot be used because the tour id contains the last
+						 * distance serie value, Math.round() creates another tour id
+						 */
+						distanceDiff = (int) tdDistance - distanceAbsolute;
 					}
 					distanceSerie[timeIndex] = distanceAbsolute += distanceDiff;
 
@@ -3243,11 +3247,24 @@ public class TourData {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("[TourData] ");
-		sb.append("tourId:");
+		sb.append("[TourData] ");//$NON-NLS-1$
+		sb.append("tourId:");//$NON-NLS-1$
 		sb.append(tourId);
-		sb.append("\t" + super.toString());
-		sb.append("\t" + System.identityHashCode(this));
+		sb.append("\t" + super.toString());//$NON-NLS-1$
+		sb.append("\t" + System.identityHashCode(this));//$NON-NLS-1$
+
+		return sb.toString();
+	}
+
+	public String toStringWithHash() {
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("[TourData] ");//$NON-NLS-1$
+		sb.append("tourId:");//$NON-NLS-1$
+		sb.append(tourId);
+		sb.append(UI.NEW_LINE);
+		sb.append(System.identityHashCode(this));
 
 		return sb.toString();
 	}

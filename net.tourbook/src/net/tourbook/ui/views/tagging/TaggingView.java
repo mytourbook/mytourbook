@@ -289,16 +289,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
+				if (partRef.getPart(false) == TaggingView.this) {
+					saveSession();
 				}
 			}
 
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
-				}
-			}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
@@ -389,7 +385,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				if (part == TaggingView.this) {
 					return;
 				}
-				
+
 				if (propertyId == TourManager.NOTIFY_TAG_VIEW) {
 					if (propertyData instanceof ChangedTags) {
 
@@ -1292,9 +1288,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 	}
 
-	private void saveSettings() {
+	private void saveSession() {
 		if (fSessionMemento == null) {
-			fSessionMemento = XMLMemento.createWriteRoot("TagView"); //$NON-NLS-1$
+			fSessionMemento = XMLMemento.createWriteRoot("TaggingView"); //$NON-NLS-1$
 		}
 		saveState(fSessionMemento);
 	}

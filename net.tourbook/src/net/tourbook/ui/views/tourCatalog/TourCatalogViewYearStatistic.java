@@ -164,16 +164,12 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
+				if (partRef.getPart(false) == TourCatalogViewYearStatistic.this) {
+					saveSession();
 				}
 			}
 
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
-				}
-			}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
@@ -562,8 +558,8 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		setYearData();
 	}
 
-	private void saveSettings() {
-		fSessionMemento = XMLMemento.createWriteRoot("DeviceImportView"); //$NON-NLS-1$
+	private void saveSession() {
+		fSessionMemento = XMLMemento.createWriteRoot("TourCatalogViewYearStatistic"); //$NON-NLS-1$
 		saveState(fSessionMemento);
 	}
 

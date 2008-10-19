@@ -229,16 +229,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
+				if (partRef.getPart(false) == TourBookView.this) {
+					saveSession();
 				}
 			}
 
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
-				}
-			}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
@@ -1315,8 +1311,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 	}
 
-	private void saveSettings() {
-		fSessionMemento = XMLMemento.createWriteRoot("DeviceImportView"); //$NON-NLS-1$
+	private void saveSession() {
+		fSessionMemento = XMLMemento.createWriteRoot("TourBookView"); //$NON-NLS-1$
 		saveState(fSessionMemento);
 	}
 

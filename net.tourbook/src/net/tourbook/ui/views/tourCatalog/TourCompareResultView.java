@@ -258,16 +258,12 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
+				if (partRef.getPart(false) == TourCompareResultView.this) {
+					saveSession();
 				}
 			}
 
-			public void partDeactivated(final IWorkbenchPartReference partRef) {
-				if (ID.equals(partRef.getId())) {
-					saveSettings();
-				}
-			}
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
@@ -369,11 +365,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
-				
+
 				if (part == TourCompareResultView.this) {
 					return;
 				}
-				
+
 				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
@@ -1283,8 +1279,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		}
 	}
 
-	private void saveSettings() {
-		fSessionMemento = XMLMemento.createWriteRoot("CompareResultView"); //$NON-NLS-1$
+	private void saveSession() {
+		fSessionMemento = XMLMemento.createWriteRoot("TourCompareResultView"); //$NON-NLS-1$
 		saveState(fSessionMemento);
 	}
 

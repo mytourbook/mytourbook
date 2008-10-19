@@ -42,7 +42,7 @@ public class TourProperties {
 	/**
 	 * contains the {@link TourData} which is edited in the {@link TourDataEditorView}
 	 */
-	public TourData				tourDataEditorTour;
+	public TourData				tourDataEditorSavedTour;
 
 	public TourProperties(final ArrayList<TourData> modifiedTour) {
 		this.modifiedTours = modifiedTour;

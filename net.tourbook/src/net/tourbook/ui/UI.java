@@ -84,10 +84,12 @@ public class UI {
 	public static final String						EMPTY_STRING					= "";											//$NON-NLS-1$
 	public static final String						DASH_WITH_SPACE					= " - ";										//$NON-NLS-1$
 	public static final String						EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
+
 	/**
 	 * contains a new line string
 	 */
 	public static final String						NEW_LINE						= "\n";										//$NON-NLS-1$
+	public static final String						NEW_LINE2						= "\n\n";										//$NON-NLS-1$
 
 	public static final String						SYSTEM_NEW_LINE					= System.getProperty("line.separator");		//$NON-NLS-1$
 
@@ -820,6 +822,5 @@ public class UI {
 
 		return existingImage;
 	}
-
 
 }

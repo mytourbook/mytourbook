@@ -779,16 +779,16 @@ public class TourPainter extends MapPainter {
 					// current position is inside the tile
 
 					// check if position is in the viewport or position has changed
-					if (devPosition.equals(devPreviousPosition) == false) {
+					if (devPreviousPosition != null && devPosition.equals(devPreviousPosition) == false) {
 
 						isTourInTile = true;
 
 						drawTourLine(gc, serieIndex, devPosition, devPreviousPosition);
 
 						// initialize previous pixel
-						if (devPreviousPosition == null) {
-							devPreviousPosition = devPosition;
-						}
+//						if (devPreviousPosition == null) {
+//							devPreviousPosition = devPosition;
+//						}
 					}
 
 					lastInsideIndex = serieIndex;
@@ -797,7 +797,7 @@ public class TourPainter extends MapPainter {
 
 				// current position is outside the tile
 
-				if (serieIndex == lastInsideIndex + 1) {
+				if (serieIndex == lastInsideIndex + 1 && lastInsidePosition != null) {
 
 					/*
 					 * this position is the first which is outside of the tile, draw a line from the
@@ -807,9 +807,9 @@ public class TourPainter extends MapPainter {
 					drawTourLine(gc, serieIndex, devPosition, lastInsidePosition);
 
 					// initialize previous pixel
-					if (devPreviousPosition == null) {
-						devPreviousPosition = devPosition;
-					}
+//					if (devPreviousPosition == null) {
+//						devPreviousPosition = devPosition;
+//					}
 				}
 
 				devPreviousPosition = devPosition;

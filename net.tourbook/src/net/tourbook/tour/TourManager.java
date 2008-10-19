@@ -375,7 +375,7 @@ public class TourManager {
 	 */
 	public static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours) {
 
-		TourData tourDataEditorTour = null;
+		TourData tourDataEditorSavedTour = null;
 		boolean fireChangeEvent = false;
 		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
 
@@ -385,7 +385,7 @@ public class TourManager {
 			TourData savedTour = null;
 
 			final TourDataEditorView tourDataEditor = UI.getTourDataEditor();
-			if (tourDataEditor != null) {
+			if (tourDataEditor != null && tourDataEditor.isClosed() == false) {
 
 				final TourData tourDataInEditor = tourDataEditor.getTourData();
 				if (tourDataInEditor == tourData) {
@@ -406,15 +406,18 @@ public class TourManager {
 
 						savedTour = TourDatabase.saveTour(tourData);
 
-						// there is only one tour data editor
-						tourDataEditorTour = savedTour;
+						/*
+						 * set flag for the tour data editor that the tour is saved and the ui is
+						 * updated
+						 */
+						tourDataEditorSavedTour = savedTour;
 					}
 
 					/*
-					 * update ui in the tour data editor
+					 * update UI in the tour data editor with the modified tour data
 					 */
-
 					tourDataEditor.updateUI(savedTour);
+
 					fireChangeEvent = true;
 
 				} else if (tourDataInEditor.getTourId().longValue() == tourData.getTourId().longValue()) {
@@ -422,15 +425,16 @@ public class TourManager {
 					// this case should not happen
 
 					MessageDialog.openError(Display.getCurrent().getActiveShell(), "Internal Error",//$NON-NLS-1$
-							"The selected tour is in the tour editor but TourData are different." //$NON-NLS-1$
-									+ UI.NEW_LINE
-									+ UI.NEW_LINE
+							"This error should not happen and occures when the internal structure of the application is corrupted. " //$NON-NLS-1$
+									+ "You should restart the application and inform the author of the application how this error occured." //$NON-NLS-1$
+									+ UI.NEW_LINE2
+									+ "The tour editor contains the selected tour but the TourData is different." //$NON-NLS-1$
+									+ UI.NEW_LINE2
 									+ "Tour in Editor:\t" //$NON-NLS-1$
-									+ tourDataInEditor.toString()
-									+ UI.NEW_LINE
-									+ UI.NEW_LINE
+									+ tourDataInEditor.toStringWithHash()
+									+ UI.NEW_LINE2
 									+ "Selected Tour:\t" //$NON-NLS-1$
-									+ tourData.toString());
+									+ tourData.toStringWithHash());
 				} else {
 
 					// tour is not in the tour editor
@@ -459,7 +463,7 @@ public class TourManager {
 
 		if (fireChangeEvent) {
 			final TourProperties propertyData = new TourProperties(savedTours);
-			propertyData.tourDataEditorTour = tourDataEditorTour;
+			propertyData.tourDataEditorSavedTour = tourDataEditorSavedTour;
 			firePropertyChange(TOUR_PROPERTIES_CHANGED, propertyData);
 		}
 
