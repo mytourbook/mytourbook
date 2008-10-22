@@ -4410,6 +4410,10 @@ public class ChartComponentGraph extends Canvas {
 
 	private void paintDraggedChart(final GC gc) {
 
+		if (fDraggedChartDraggedPos == null) {
+			return;
+		}
+		
 		final int devXDiff = fDraggedChartDraggedPos.x - fDraggedChartStartPos.x;
 		final int devYDiff = 0;
 
