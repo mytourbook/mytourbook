@@ -58,6 +58,7 @@ import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.Color;
@@ -340,6 +341,10 @@ public class MappingView extends ViewPart {
 
 	void actionSynchWithSlider() {
 
+		if (fTourDataList == null) {
+			return;
+		}
+		
 		fIsMapSynchedWithSlider = fActionSynchWithSlider.isChecked();
 
 		if (fIsMapSynchedWithSlider) {
@@ -1264,22 +1269,22 @@ public class MappingView extends ViewPart {
 		fMap.queueRedrawMap();
 	}
 
-	/**
-	 * Paint tours with already defined tour data in <code>fTourDataList</code>
-	 */
-	private void paintMultipleTours() {
-
-		fIsTour = true;
-
-		// force single tour to be repainted
-		fPreviousTourData = null;
-
-		final boolean isShowTour = fActionShowTourInMap.isChecked();
-		fMap.setShowOverlays(isShowTour);
-		fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
-
-		fMap.queueRedrawMap();
-	}
+//	/**
+//	 * Paint tours with already defined tour data in <code>fTourDataList</code>
+//	 */
+//	private void paintMultipleTours() {
+//
+//		fIsTour = true;
+//
+//		// force single tour to be repainted
+//		fPreviousTourData = null;
+//
+//		final boolean isShowTour = fActionShowTourInMap.isChecked();
+//		fMap.setShowOverlays(isShowTour);
+//		fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
+//
+//		fMap.queueRedrawMap();
+//	}
 
 	/**
 	 * Paint the currently selected tour in the map
@@ -1430,31 +1435,37 @@ public class MappingView extends ViewPart {
 
 	private void paintTours(final ArrayList<Long> tourIdList) {
 
-		fIsTour = true;
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			public void run() {
 
-		// force single tour to be repainted
-		fPreviousTourData = null;
+				fIsTour = true;
 
-		fTourDataList = new ArrayList<TourData>();
+				// force single tour to be repainted
+				fPreviousTourData = null;
 
-		PaintManager.getInstance().setTourData(fTourDataList);
+				fTourDataList = new ArrayList<TourData>();
 
-		fDirectMappingPainter.disablePaintContext();
+				PaintManager.getInstance().setTourData(fTourDataList);
 
-		final boolean isShowTour = fActionShowTourInMap.isChecked();
-		fMap.setShowOverlays(isShowTour);
-		fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
+				fDirectMappingPainter.disablePaintContext();
 
-		final long newOverlayKey = fillTourDataList(tourIdList);
-		if (fPreviousOverlayKey != newOverlayKey) {
+				final boolean isShowTour = fActionShowTourInMap.isChecked();
+				fMap.setShowOverlays(isShowTour);
+				fMap.setShowLegend(isShowTour && fActionShowLegendInMap.isChecked());
 
-			fPreviousOverlayKey = newOverlayKey;
+				final long newOverlayKey = fillTourDataList(tourIdList);
 
-			fMap.setOverlayKey(Long.toString(newOverlayKey));
-			fMap.resetOverlays();
-		}
+				if (fPreviousOverlayKey != newOverlayKey) {
 
-		createLegendImage(PaintManager.getInstance().getLegendProvider());
+					fPreviousOverlayKey = newOverlayKey;
+
+					fMap.setOverlayKey(Long.toString(newOverlayKey));
+					fMap.resetOverlays();
+				}
+
+				createLegendImage(PaintManager.getInstance().getLegendProvider());
+			}
+		});
 
 		fMap.queueRedrawMap();
 	}

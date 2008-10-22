@@ -415,18 +415,28 @@ public class MessageManager implements IMessageManager {
 	 */
 
 	/**
-	 * @return Returns the number of messages
+	 * @return Returns the number of error messages
 	 */
 	@SuppressWarnings("unchecked")
-	public int getMessageCount() {
-		
-		final ArrayList<ControlDecorator> mergedList = new ArrayList<ControlDecorator>();
+	public int getErrorMessageCount() {
+
+		int errors = 0;
+
 		for (final Enumeration<ControlDecorator> enm = decorators.elements(); enm.hasMoreElements();) {
 			final ControlDecorator dec = enm.nextElement();
-			dec.addAll(mergedList);
+			final ArrayList<?> allMessages = dec.controlMessages;
+
+			for (final Object object : allMessages) {
+				if (object instanceof Message) {
+					final Message message = (Message) object;
+					if (message.getMessageType() == IMessageProvider.ERROR) {
+						errors++;
+					}
+				}
+			}
 		}
 
-		return mergedList.size();
+		return errors;
 	}
 
 	/*

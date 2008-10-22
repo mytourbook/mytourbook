@@ -25,6 +25,8 @@ public class Messages extends NLS {
 	public static String		dialog_quick_edit_dialog_save;
 	public static String		dialog_quick_edit_dialog_title;
 
+	public static String	dialog_quick_edit_dialog_update;
+
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
 	public static String		App_Action_Menu_file;
@@ -589,6 +591,8 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_tour_type;
 
 	public static String	tour_editor_message_person_is_required;
+
+	public static String	tour_editor_message_show_another_tour;
 
 	public static String		tour_editor_ref_tour_time_slices;
 

@@ -385,7 +385,7 @@ public class TourManager {
 			TourData savedTour = null;
 
 			final TourDataEditorView tourDataEditor = UI.getTourDataEditor();
-			if (tourDataEditor != null && tourDataEditor.isClosed() == false) {
+			if (tourDataEditor != null) {
 
 				final TourData tourDataInEditor = tourDataEditor.getTourData();
 				if (tourDataInEditor == tourData) {

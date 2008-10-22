@@ -949,11 +949,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionEditTour);
 		menuMgr.add(fActionDeleteTour);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);

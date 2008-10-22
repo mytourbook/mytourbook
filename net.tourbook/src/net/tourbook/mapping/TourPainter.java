@@ -693,10 +693,16 @@ public class TourPainter extends MapPainter {
 			final Color lineColor = fLegendProvider.getValueColor(fDataSerie[serieIndex]);
 
 			{
-//				gc.setForeground(lineColor);
-//				gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
-				gc.setBackground(lineColor);
-				gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
+				if (LINE_WIDTH == 2) {
+					// oval is not filled with width of 2
+//					gc.setForeground(lineColor);
+//					gc.drawOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
+					gc.setBackground(lineColor);
+					gc.fillRectangle(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
+				} else {
+					gc.setBackground(lineColor);
+					gc.fillOval(devPosition.x, devPosition.y, LINE_WIDTH, LINE_WIDTH);
+				}
 			}
 
 			lineColor.dispose();
@@ -714,7 +720,7 @@ public class TourPainter extends MapPainter {
 		// get viewport for the current tile
 		final int worldTileX = tile.getX() * tileSize;
 		final int worldTileY = tile.getY() * tileSize;
-		final java.awt.Rectangle tileViewport = new java.awt.Rectangle(worldTileX, worldTileY, tileSize, tileSize);
+		final Rectangle tileViewport = new Rectangle(worldTileX, worldTileY, tileSize, tileSize);
 
 		java.awt.Point worldPosition;
 		java.awt.Point devPosition;
@@ -818,7 +824,7 @@ public class TourPainter extends MapPainter {
 
 				// draw tour with dots/squares
 
-				if (tileViewport.inside(worldPosition.x, worldPosition.y)) {
+				if (tileViewport.contains(worldPosition.x, worldPosition.y)) {
 
 					// current position is inside the tile
 

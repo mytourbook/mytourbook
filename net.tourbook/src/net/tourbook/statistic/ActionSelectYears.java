@@ -30,34 +30,56 @@ public class ActionSelectYears extends Action implements IMenuCreator {
 
 	private Menu							fMenu;
 
-	private ArrayList<ActionYear>			fYearActions	= new ArrayList<ActionYear>();
+	private ArrayList<ActionYear>			fYearActions		= new ArrayList<ActionYear>();
 
 	private TourCatalogViewYearStatistic	fYearStatistic;
 
-	private int								fNumberOfYears;
+	private int								fSelectedYear;
+
+	public int								fIsSelectionCounter	= 0;
 
 	private class ActionYear extends Action {
 
-		private int	fYears;
+		private int	fActionYear;
 
-		public ActionYear(final int years) {
-			super(Integer.toString(years), AS_RADIO_BUTTON);
+		public ActionYear(final int year) {
 
-			fYears = years;
+			super(Integer.toString(year), AS_RADIO_BUTTON);
+
+			fActionYear = year;
 		}
 
 		@Override
 		public void run() {
 
-			if (isChecked()) {
+			if (fIsSelectionCounter == 0) {
 
-				// ignore uncheck event
+				setChecked(false);
 
-				fNumberOfYears = fYears;
-				fYearStatistic.onExecuteSelectNumberOfYears(fYears);
+			} else if (fIsSelectionCounter == 1) {
+
+				/*
+				 * there is somewhere a bug that the first selection does not work
+				 */
+
+				setChecked(true);
+
+				fSelectedYear = fActionYear;
+				fYearStatistic.onExecuteSelectNumberOfYears(fActionYear);
+
+			} else {
+
+				if (isChecked()) {
+
+					// ignore uncheck event
+
+					fSelectedYear = fActionYear;
+					fYearStatistic.onExecuteSelectNumberOfYears(fActionYear);
+				}
 			}
-		}
 
+			fIsSelectionCounter++;
+		}
 	}
 
 	public ActionSelectYears(final TourCatalogViewYearStatistic yearStatistic) {
@@ -103,17 +125,17 @@ public class ActionSelectYears extends Action implements IMenuCreator {
 		return fMenu;
 	}
 
-	public int getNumberOfYears() {
-		return fNumberOfYears;
+	public int getSelectedYear() {
+		return fSelectedYear;
 	}
 
-	public void setNumberOfYears(final int numberOfYears) {
+	public void setNumberOfYears(final int selectedYear) {
 
-		fNumberOfYears = numberOfYears;
+		fSelectedYear = selectedYear;
 
 		// update check status for the menu items
 		for (final ActionYear yearAction : fYearActions) {
-			if (yearAction.fYears == numberOfYears) {
+			if (yearAction.fActionYear == selectedYear) {
 				yearAction.setChecked(true);
 			} else {
 				yearAction.setChecked(false);

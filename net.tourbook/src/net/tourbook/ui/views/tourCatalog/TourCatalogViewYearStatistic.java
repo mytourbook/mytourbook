@@ -554,7 +554,14 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 			fActionSelectYears.setNumberOfYears(3);
 		}
 
-		fNumberOfYears = fActionSelectYears.getNumberOfYears();
+		fNumberOfYears = fActionSelectYears.getSelectedYear();
+
+		/*
+		 * reselect again because there is somewhere a bug because the first time setting the
+		 * checkmark for the year does not work
+		 */
+		fActionSelectYears.setNumberOfYears(fNumberOfYears);
+
 		setYearData();
 	}
 
