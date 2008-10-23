@@ -70,6 +70,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.DeviceResourceException;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -96,15 +97,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -115,6 +112,9 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private static final String				FILESTRING_SEPARATOR			= "|";											//$NON-NLS-1$
 
 	public static final String				ID								= "net.tourbook.views.rawData.RawDataView";	//$NON-NLS-1$
+
+	final IDialogSettings					fViewState						= TourbookPlugin.getDefault()
+																					.getDialogSettingsSection(ID);
 
 	public static final int					COLUMN_DATE						= 0;
 	public static final int					COLUMN_TITLE					= 1;
@@ -127,8 +127,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private static final String				MEMENTO_MERGE_TRACKS			= "importview.action.merge-tracks";			//$NON-NLS-1$
 	private static final String				MEMENTO_IS_CHECKSUM_VALIDATION	= "importview.action.is-checksum-validation";	//$NON-NLS-1$
-
-	private static IMemento					fSessionMemento;
 
 	private TableViewer						fTourViewer;
 
@@ -201,7 +199,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == RawDataView.this) {
-					saveSession();
+					saveState();
 				}
 			}
 
@@ -265,7 +263,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 					UI.updateUnits();
 
-					fColumnManager.saveState(fSessionMemento);
+					fColumnManager.saveState(fViewState);
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
@@ -414,7 +412,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		createResources();
 
 		// define all columns
-		fColumnManager = new ColumnManager(this, fSessionMemento);
+		fColumnManager = new ColumnManager(this, fViewState);
 		defineViewerColumns(parent);
 
 		fViewerContainer = new Composite(parent, SWT.NONE);
@@ -435,7 +433,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
 
-		restoreState(fSessionMemento);
+		restoreState();
 	}
 
 	private void createResources() {
@@ -1017,15 +1015,17 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		return fTourViewer;
 	}
 
-	private void importFiles(final RawDataManager rawDataManager, final IMemento memento) {
+	private void importFiles() {
 
 		// restore imported tours
-		final String mementoImportedFiles = memento.getString(MEMENTO_IMPORT_FILENAME);
+		final String mementoImportedFiles = fViewState.get(MEMENTO_IMPORT_FILENAME);
 		final ArrayList<String> notImportedFiles = new ArrayList<String>();
 
 		if (mementoImportedFiles != null) {
 
-			rawDataManager.getTourDataMap().clear();
+			final RawDataManager rawDataMgr = RawDataManager.getInstance();
+
+			rawDataMgr.getTourDataMap().clear();
 
 			final String[] files = StringToArrayConverter.convertStringToArray(mementoImportedFiles,
 					FILESTRING_SEPARATOR);
@@ -1036,7 +1036,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 				final File file = new File(fileName);
 				if (file.exists()) {
-					if (rawDataManager.importRawData(file, null, false, null)) {
+					if (rawDataMgr.importRawData(file, null, false, null)) {
 						importCounter++;
 					} else {
 						notImportedFiles.add(fileName);
@@ -1046,21 +1046,24 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 			if (importCounter > 0) {
 
-				rawDataManager.updateTourDataFromDb();
+				rawDataMgr.updateTourDataFromDb();
 				reloadViewer();
 
 				// restore selected tour
-				final Integer selectedTourIndex = memento.getInteger(MEMENTO_SELECTED_TOUR_INDEX);
+				try {
+					final Integer selectedTourIndex = fViewState.getInt(MEMENTO_SELECTED_TOUR_INDEX);
 
-				final Object tourData = fTourViewer.getElementAt(selectedTourIndex);
+					final Object tourData = fTourViewer.getElementAt(selectedTourIndex);
 
-				Display.getDefault().asyncExec(new Runnable() {
-					public void run() {
-						if (tourData != null) {
-							fTourViewer.setSelection(new StructuredSelection(tourData), true);
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							if (tourData != null) {
+								fTourViewer.setSelection(new StructuredSelection(tourData), true);
+							}
 						}
-					}
-				});
+					});
+
+				} catch (final NumberFormatException e) {}
 			}
 		}
 
@@ -1068,17 +1071,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			RawDataManager.showMsgBoxInvalidFormat(notImportedFiles);
 		}
 
-	}
-
-	@Override
-	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-
-		super.init(site, memento);
-
-		// set the session memento
-		if (fSessionMemento == null) {
-			fSessionMemento = memento;
-		}
 	}
 
 	public void recreateViewer() {
@@ -1129,56 +1121,40 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 	}
 
-	private void restoreState(final IMemento memento) {
+	private void restoreState() {
 
 		final RawDataManager rawDataManager = RawDataManager.getInstance();
 
-		if (memento == null) {
+//		if (memento == null) {
+//
+//			fActionMergeTours.setChecked(true);
+//			rawDataManager.setMergeTracks(true);
+//
+//			// enable checksum validation
+//			fActionDisableChecksumValidation.setChecked(false);
+//			rawDataManager.setIsChecksumValidation(true);
+//
+//		} else {
 
-			fActionMergeTours.setChecked(true);
-			rawDataManager.setMergeTracks(true);
+		// restore: set merge tracks status befor the tours are imported
+		final boolean isMergeTracks = fViewState.getBoolean(MEMENTO_MERGE_TRACKS);
+		fActionMergeTours.setChecked(isMergeTracks);
+		rawDataManager.setMergeTracks(isMergeTracks);
 
-			// enable checksum validation
-			fActionDisableChecksumValidation.setChecked(false);
-			rawDataManager.setIsChecksumValidation(true);
+		// restore: is checksum validation
+		fActionDisableChecksumValidation.setChecked(fViewState.getBoolean(MEMENTO_IS_CHECKSUM_VALIDATION));
+		rawDataManager.setIsChecksumValidation(fActionDisableChecksumValidation.isChecked() == false);
 
-		} else {
-
-			// restore: set merge tracks status befor the tours are imported
-			final Integer mergeTracks = memento.getInteger(MEMENTO_MERGE_TRACKS);
-			if (mergeTracks == null) {
-				fActionMergeTours.setChecked(false);
-			} else {
-				fActionMergeTours.setChecked(mergeTracks == 1 ? true : false);
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+				importFiles();
 			}
-			rawDataManager.setMergeTracks(fActionMergeTours.isChecked());
-
-			// restore: is checksum validation
-			final Integer isChecksumValidation = memento.getInteger(MEMENTO_IS_CHECKSUM_VALIDATION);
-			if (isChecksumValidation == null) {
-				// enable checksum validation
-				fActionDisableChecksumValidation.setChecked(false);
-			} else {
-				fActionDisableChecksumValidation.setChecked(isChecksumValidation == 1 ? false : true);
-			}
-			rawDataManager.setIsChecksumValidation(fActionDisableChecksumValidation.isChecked() == false);
-
-			Display.getCurrent().asyncExec(new Runnable() {
-				public void run() {
-					importFiles(rawDataManager, memento);
-				}
-			});
-		}
+		});
+//		}
 
 	}
 
-	private void saveSession() {
-		fSessionMemento = XMLMemento.createWriteRoot("RawDataView"); //$NON-NLS-1$
-		saveState(fSessionMemento);
-	}
-
-	@Override
-	public void saveState(final IMemento memento) {
+	private void saveState() {
 
 		// save sash weights
 		final Table table = fTourViewer.getTable();
@@ -1187,23 +1163,23 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			return;
 		}
 
-		memento.putInteger(MEMENTO_SASH_CONTAINER, table.getSize().x);
+		fViewState.put(MEMENTO_SASH_CONTAINER, table.getSize().x);
 
 		final RawDataManager rawDataMgr = RawDataManager.getInstance();
 
 		// save imported file names
 		final HashSet<String> importedFiles = rawDataMgr.getImportedFiles();
-		memento.putString(MEMENTO_IMPORT_FILENAME,
+		fViewState.put(MEMENTO_IMPORT_FILENAME,
 				StringToArrayConverter.convertArrayToString(importedFiles.toArray(new String[importedFiles.size()]),
 						FILESTRING_SEPARATOR));
 
 		// save selected tour in the viewer
-		memento.putInteger(MEMENTO_SELECTED_TOUR_INDEX, table.getSelectionIndex());
+		fViewState.put(MEMENTO_SELECTED_TOUR_INDEX, table.getSelectionIndex());
 
-		memento.putInteger(MEMENTO_MERGE_TRACKS, fActionMergeTours.isChecked() ? 1 : 0);
-		memento.putInteger(MEMENTO_IS_CHECKSUM_VALIDATION, fActionDisableChecksumValidation.isChecked() ? 0 : 1);
+		fViewState.put(MEMENTO_MERGE_TRACKS, fActionMergeTours.isChecked());
+		fViewState.put(MEMENTO_IS_CHECKSUM_VALIDATION, fActionDisableChecksumValidation.isChecked());
 
-		fColumnManager.saveState(memento);
+		fColumnManager.saveState(fViewState);
 	}
 
 	/**

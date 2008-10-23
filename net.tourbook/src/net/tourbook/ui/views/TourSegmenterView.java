@@ -46,6 +46,7 @@ import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -70,17 +71,13 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -89,14 +86,14 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourSegmenterView extends ViewPart implements ITourViewer {
 
-	public static final String		ID				= "net.tourbook.views.TourSegmenter";	//$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.views.TourSegmenter";						//$NON-NLS-1$
 
-	private static final int		COLUMN_DEFAULT	= 0;									// sort by time
+	final IDialogSettings			fViewState		= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
+
+	private static final int		COLUMN_DEFAULT	= 0;														// sort by time
 	private static final int		COLUMN_SPEED	= 10;
 	private static final int		COLUMN_PACE		= 20;
 	private static final int		COLUMN_GRADIENT	= 30;
-
-	private static IMemento			fSessionMemento;
 
 	private PageBook				fPageBook;
 	private Composite				fPageSegmenter;
@@ -257,7 +254,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourSegmenterView.this) {
-					saveSession();
+					saveState();
 				}
 			}
 
@@ -349,7 +346,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	public void createPartControl(final Composite parent) {
 
 		// define all columns
-		fColumnManager = new ColumnManager(this, fSessionMemento);
+		fColumnManager = new ColumnManager(this, fViewState);
 		defineViewerColumns(parent);
 
 		fPageBook = new PageBook(parent, SWT.NONE);
@@ -753,17 +750,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return fSegmentViewer;
 	}
 
-	@Override
-	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-
-		super.init(site, memento);
-
-		// set the session memento if it's not yet set
-		if (fSessionMemento == null) {
-			fSessionMemento = memento;
-		}
-	}
-
 	/**
 	 * handle a tour selection event
 	 * 
@@ -835,14 +821,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			return;
 		}
 
-		if (fTourData == null) {
+		if (fTourData == null || fTourData.altitudeSerie == null || fTourData.getMetricDistanceSerie() == null) {
+
 			fPageBook.showPage(fPageNoChart);
 			return;
-		} else {
-			if (fTourData.getMetricDistanceSerie() == null || fTourData.altitudeSerie == null) {
-				fPageBook.showPage(fPageNoChart);
-				return;
-			}
 		}
 
 		fPageBook.showPage(fPageSegmenter);
@@ -935,56 +917,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fSegmentViewer.setInput(new Object[0]);
 	}
 
-//	public void recreateViewer() {
-//
-//		saveViewerSettings(fSessionMemento);
-//
-//		// dispose viewer
-//		final Control[] children = fViewerContainer.getChildren();
-//		for (int childIndex = 0; childIndex < children.length; childIndex++) {
-//			children[childIndex].dispose();
-//		}
-//
-//		// recreate viewer
-//		createSegmentViewer(fViewerContainer);
-//
-//		fViewerContainer.layout();
-//
-//		// update viewer content
-//		setTableInput();
-//	}
-//
-//	public void reloadViewer() {}
-
-	private void saveSession() {
-
-		fSessionMemento = XMLMemento.createWriteRoot("TourSegmenterView"); //$NON-NLS-1$
-
-		saveState(fSessionMemento);
-	}
-
-	@Override
-	public void saveState(final IMemento memento) {
-		saveViewerSettings(memento);
-	}
-
-	private void saveViewerSettings(final IMemento memento) {
-
-		if (memento == null) {
-			return;
-		}
-
-		fColumnManager.saveState(memento);
+	private void saveState() {
+		fColumnManager.saveState(fViewState);
 	}
 
 	@Override
 	public void setFocus() {
 		fScaleTolerance.setFocus();
 	}
-
-//	private void setTableInput() {
-//		fSegmentViewer.setInput(new Object[0]);
-//	}
 
 	/**
 	 * when dp tolerance was changed set the tour dirty

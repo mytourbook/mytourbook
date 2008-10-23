@@ -61,6 +61,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -84,32 +85,24 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvider {
 
-	private static final String			MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";					//$NON-NLS-1$
-	private static final String			MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";						//$NON-NLS-1$
-
 	public static final String			ID									= "net.tourbook.views.tourCatalog.TourCatalogView"; //$NON-NLS-1$
+
+	final IDialogSettings				fViewState							= TourbookPlugin.getDefault()
+																					.getDialogSettingsSection(ID);
 
 	public static final int				COLUMN_LABEL						= 0;
 	public static final int				COLUMN_SPEED						= 1;
 
-	/**
-	 * This memento allows this view to save and restore state when it is closed and opened within a
-	 * session. A different memento is supplied by the platform for persistance at workbench
-	 * shutdown.
-	 */
-	private static IMemento				fSessionMemento						= null;
+	private static final String			MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID	= "tour.catalog.active.ref.id";					//$NON-NLS-1$
+	private static final String			MEMENTO_TOUR_CATALOG_LINK_TOUR		= "tour.catalog.link.tour";						//$NON-NLS-1$
 
 	private TVICatalogRootItem			fRootItem;
 
@@ -272,7 +265,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourCatalogView.this) {
-					saveSession();
+					saveState();
 				}
 			}
 
@@ -380,7 +373,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 					UI.updateUnits();
 
-					fColumnManager.saveState(fSessionMemento);
+					fColumnManager.saveState(fViewState);
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
@@ -482,7 +475,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	public void createPartControl(final Composite parent) {
 
 		// define all columns for the viewer
-		fColumnManager = new ColumnManager(this, fSessionMemento);
+		fColumnManager = new ColumnManager(this, fViewState);
 		defineViewerColumns(parent);
 
 		fViewerContainer = new Composite(parent, SWT.NONE);
@@ -504,7 +497,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		fTourViewer.setInput(fRootItem = new TVICatalogRootItem(this));
 
-		restoreState(fSessionMemento);
+		restoreState();
 	}
 
 	private void createTourViewer(final Composite parent) {
@@ -883,16 +876,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		return fTourViewer;
 	}
 
-	@Override
-	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-		super.init(site, memento);
-
-		// set the session memento if it's net yet set
-		if (fSessionMemento == null) {
-			fSessionMemento = memento;
-		}
-	}
-
 	/**
 	 * Selection changes in the tour map viewer
 	 * 
@@ -998,23 +981,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		tree.setRedraw(true);
 	}
 
-	/**
-	 * Restore settings from the last session
-	 * 
-	 * @param memento
-	 */
-	private void restoreState(final IMemento memento) {
+	private void restoreState() {
 
-		if (memento == null) {
-			return;
-		}
-
-		/*
-		 * select ref tour in tour viewer
-		 */
-		final String mementoRefId = memento.getString(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID);
+		// selected ref tour in tour viewer
+		final String mementoRefId = fViewState.get(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID);
 		if (mementoRefId != null) {
-
 			try {
 				selectRefTour(Long.parseLong(mementoRefId));
 			} catch (final NumberFormatException e) {
@@ -1022,27 +993,16 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			}
 		}
 
-		/*
-		 * action: link tour with statistics
-		 */
-		final Integer mementoLinkTour = memento.getInteger(MEMENTO_TOUR_CATALOG_LINK_TOUR);
-		if (mementoLinkTour != null) {
-			fActionLinkTour.setChecked(mementoLinkTour == 1);
-		}
+		// action: link tour with statistics
+		fActionLinkTour.setChecked(fViewState.getBoolean(MEMENTO_TOUR_CATALOG_LINK_TOUR));
 	}
 
-	private void saveSession() {
-		fSessionMemento = XMLMemento.createWriteRoot("TourCatalogView"); //$NON-NLS-1$
-		saveState(fSessionMemento);
-	}
+	public void saveState() {
 
-	@Override
-	public void saveState(final IMemento memento) {
+		fViewState.put(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID, Long.toString(fActiveRefId));
+		fViewState.put(MEMENTO_TOUR_CATALOG_LINK_TOUR, fActionLinkTour.isChecked());
 
-		memento.putString(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID, Long.toString(fActiveRefId));
-		memento.putInteger(MEMENTO_TOUR_CATALOG_LINK_TOUR, fActionLinkTour.isChecked() ? 1 : 0);
-
-		fColumnManager.saveState(memento);
+		fColumnManager.saveState(fViewState);
 	}
 
 	/**

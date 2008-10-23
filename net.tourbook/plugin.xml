@@ -672,26 +672,10 @@
                tooltip="%command_tourChart_tool_graphAnalyzer_tooltip">
          </command>
       </menuContribution>
+      
       <menuContribution
             locationURI="menu:net.tourbook.menu.main.tools?after=tools">
-         <command
-               commandId="net.tourbook.command.tourChart.tool.adjustAltitude"
-               disabledIcon="icons/adjust-altitude-disabled.gif"
-               icon="icons/adjust-altitude.gif"
-               label="%command_tourChart_tool_adjustAltitude"
-               mnemonic="%command_tourChart_tool_adjustAltitude_mnemonic"
-               style="push"
-               tooltip="%command_tourChart_tool_adjustAltitude_tooltip">
-         </command>
-         <command
-               commandId="net.tourbook.command.tourChart.tool.tourMarker"
-               disabledIcon="icons/marker-editor-disabled.gif"
-               icon="icons/marker-editor.gif"
-               label="%command_tourChart_tool_tourMarker"
-               mnemonic="%command_tourChart_tool_tourMarker_mnemonic"
-               style="push"
-               tooltip="%command_tourChart_tool_tourMarker_tooltip">
-         </command>
+
          <command
                commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
                icon="icons/tour-segmenter.gif"
@@ -710,7 +694,6 @@
                label="%command_tourCompare_wizard"
                mnemonic="%command_tourCompare_wizard_mnemonic">
          </command>
-      
       
       </menuContribution>
 
@@ -771,15 +754,7 @@
                   style="push"
                   tooltip="%command_tourChart_tool_adjustAltitude_tooltip">
             </command>
-            <command
-                  commandId="net.tourbook.command.tourChart.tool.tourMarker"
-                  disabledIcon="icons/marker-editor-disabled.gif"
-                  icon="icons/marker-editor.gif"
-                  label="%command_tourChart_tool_tourMarker"
-                  mnemonic="%command_tourChart_tool_tourMarker_mnemonic"
-                  style="push"
-                  tooltip="%command_tourChart_tool_tourMarker_tooltip">
-            </command>
+
             <command
                   commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
                   icon="icons/tour-segmenter.gif"

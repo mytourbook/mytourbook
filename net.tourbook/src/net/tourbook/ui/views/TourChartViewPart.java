@@ -16,20 +16,20 @@
 package net.tourbook.ui.views;
 
 import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
+import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
@@ -46,7 +46,6 @@ public abstract class TourChartViewPart extends ViewPart {
 	protected PostSelectionProvider		fPostSelectionProvider;
 
 	private IPropertyChangeListener		fPrefChangeListener;
-	private IPropertyListener			fTourDbListener;
 	private ITourPropertyListener		fTourPropertyListener;
 	private ISelectionListener			fPostSelectionListener;
 
@@ -93,41 +92,30 @@ public abstract class TourChartViewPart extends ViewPart {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourDbListener() {
-
-		fTourDbListener = new IPropertyListener() {
-			public void propertyChanged(final Object source, final int propId) {
-				if (propId == TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED) {
-
-					if (fTourData == null) {
-						return;
-					}
-
-					// reload data from the database
-					fTourData = TourDatabase.getTourFromDb(fTourData.getTourId());
-
-					updateChart();
-
-				} else if (propId == TourDatabase.TOUR_IS_CHANGED) {
-
-					updateChart();
-				}
-			}
-		};
-
-		TourDatabase.getInstance().addPropertyListener(fTourDbListener);
-	}
-
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+
+				if (fTourData == null || part == TourChartViewPart.this) {
+					return;
+				}
 
 				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
 
 				} else if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 					fTourChart.updateTourChart(true, true);
+
+				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+
+					final TourData tourData = UI.getTourPropertyTourData((TourProperties) propertyData, fTourData);
+					if (tourData != null) {
+
+						fTourData = tourData;
+
+						updateChart();
+					}
 				}
 			}
 		};
@@ -139,7 +127,6 @@ public abstract class TourChartViewPart extends ViewPart {
 	public void createPartControl(final Composite parent) {
 
 		addPrefListener();
-		addTourDbListener();
 		addTourPropertyListener();
 		addSelectionListener();
 
@@ -153,13 +140,14 @@ public abstract class TourChartViewPart extends ViewPart {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 
-		TourDatabase.getInstance().removePropertyListener(fTourDbListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		super.dispose();
 	}
+
+	
 
 	/**
 	 * A post selection event was received by the selection listener

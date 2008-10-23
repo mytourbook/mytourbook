@@ -59,6 +59,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
@@ -88,14 +89,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
@@ -103,12 +100,14 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	public static final String					ID					= "net.tourbook.views.tourCatalog.CompareResultView";	//$NON-NLS-1$
 
+	final IDialogSettings						fViewState			= TourbookPlugin.getDefault()
+																			.getDialogSettingsSection(ID);
+
 	/**
-	 * This memento allows this view to save and restore state when it is closed and opened within a
-	 * session. A different memento is supplied by the platform for persistance at workbench
-	 * shutdown.
+	 * resource manager for images
 	 */
-	private static IMemento						fSessionMemento		= null;
+	private Image								fDbImage			= TourbookPlugin.getImageDescriptor(Messages.Image__database)
+																			.createImage(true);
 
 	private Composite							fViewerContainer;
 	private CheckboxTreeViewer					fTourViewer;
@@ -135,12 +134,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private ActionSetTourType					fActionSetTourType;
 
 	private boolean								fIsToolbarCreated;
-
-	/**
-	 * resource manager for images
-	 */
-	private Image								dbImage				= TourbookPlugin.getImageDescriptor(Messages.Image__database)
-																			.createImage(true);
 
 	private final NumberFormat					nf					= NumberFormat.getNumberInstance();
 
@@ -259,7 +252,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourCompareResultView.this) {
-					saveSession();
+					saveState();
 				}
 			}
 
@@ -298,7 +291,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					UI.updateUnits();
 
-					fColumnManager.saveState(fSessionMemento);
+					fColumnManager.saveState(fViewState);
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
@@ -432,7 +425,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	public void createPartControl(final Composite parent) {
 
 		// define all columns for the viewer
-		fColumnManager = new ColumnManager(this, fSessionMemento);
+		fColumnManager = new ColumnManager(this, fViewState);
 		defineViewerColumns(parent);
 
 		fViewerContainer = new Composite(parent, SWT.NONE);
@@ -452,8 +445,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
 		fTourViewer.setInput(fRootItem = new TVICompareResultRootItem());
-
-		restoreState(fSessionMemento);
 	}
 
 	private Control createTourViewer(final Composite parent) {
@@ -581,7 +572,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					// display an image when a tour is saved
 					if (compareItem.isSaved()) {
-						cell.setImage(dbImage);
+						cell.setImage(fDbImage);
 					} else {
 						cell.setImage(null);
 					}
@@ -807,7 +798,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
-		dbImage.dispose();
+		fDbImage.dispose();
 
 		super.dispose();
 	}
@@ -1063,16 +1054,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		return fTourViewer;
 	}
 
-	@Override
-	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-		super.init(site, memento);
-
-		// set the session memento if it's net yet set
-		if (fSessionMemento == null) {
-			fSessionMemento = memento;
-		}
-	}
-
 	private void onSelectionChanged(final SelectionChangedEvent event) {
 
 		final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -1197,13 +1178,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		fTourViewer.update(comparedTourItems.toArray(), null);
 	}
 
-	private void restoreState(final IMemento memento) {
-
-		if (memento != null) {
-
-		}
-	}
-
 	/**
 	 * Persist the compared tours which are checked or selected
 	 */
@@ -1279,15 +1253,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		}
 	}
 
-	private void saveSession() {
-		fSessionMemento = XMLMemento.createWriteRoot("TourCompareResultView"); //$NON-NLS-1$
-		saveState(fSessionMemento);
-	}
+	private void saveState() {
 
-	@Override
-	public void saveState(final IMemento memento) {
-
-		fColumnManager.saveState(memento);
+		fColumnManager.saveState(fViewState);
 	}
 
 	private void setCellColor(final ViewerCell cell, final Object element) {

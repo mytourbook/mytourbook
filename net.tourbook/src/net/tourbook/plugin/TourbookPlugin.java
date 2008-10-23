@@ -106,14 +106,18 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
 	/**
 	 * @param sectionName
-	 * @return Returns the dialog setting section for the sectionName
+	 * @return Returns the dialog setting section for the sectionName, a section is always returned
+	 *         even when it's empty
 	 */
 	public IDialogSettings getDialogSettingsSection(final String sectionName) {
+
 		final IDialogSettings dialogSettings = getDialogSettings();
 		IDialogSettings section = dialogSettings.getSection(sectionName);
+
 		if (section == null) {
 			section = dialogSettings.addNewSection(sectionName);
 		}
+
 		return section;
 	}
 

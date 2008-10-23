@@ -25,7 +25,6 @@ import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
@@ -65,7 +64,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -90,7 +88,6 @@ public class TourChartView extends ViewPart implements ITourProvider {
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	private PostSelectionProvider	fPostSelectionProvider;
-	private IPropertyListener		fTourDbListener;
 	private ITourPropertyListener	fTourPropertyListener;
 
 	private PageBook				fPageBook;
@@ -210,32 +207,6 @@ public class TourChartView extends ViewPart implements ITourProvider {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourDbListener() {
-
-		fTourDbListener = new IPropertyListener() {
-
-			public void propertyChanged(final Object source, final int propId) {
-				if (propId == TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED) {
-
-					if (fTourData == null) {
-						return;
-					}
-
-					// reload data from the database
-					fTourData = TourDatabase.getTourFromDb(fTourData.getTourId());
-
-					updateChart();
-
-				} else if (propId == TourDatabase.TOUR_IS_CHANGED) {
-
-					updateChart();
-				}
-			}
-		};
-
-		TourDatabase.getInstance().addPropertyListener(fTourDbListener);
-	}
-
 	private void addTourPropertyListener() {
 		fTourPropertyListener = new ITourPropertyListener() {
 			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
@@ -264,7 +235,7 @@ public class TourChartView extends ViewPart implements ITourProvider {
 
 						final long chartTourId = fTourData.getTourId();
 
-						// update modified tour in the chart
+						// update chart with the modified tour
 						for (final TourData tourData : modifiedTours) {
 							if (tourData.getTourId() == chartTourId) {
 
@@ -324,8 +295,6 @@ public class TourChartView extends ViewPart implements ITourProvider {
 
 		addSelectionListener();
 		addPrefListener();
-
-		addTourDbListener();
 		addTourPropertyListener();
 
 		// set this view part as selection provider
@@ -345,7 +314,6 @@ public class TourChartView extends ViewPart implements ITourProvider {
 
 		page.removePostSelectionListener(fPostSelectionListener);
 
-		TourDatabase.getInstance().removePropertyListener(fTourDbListener);
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);

@@ -17,6 +17,7 @@
 package net.tourbook.ui.views;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Formatter;
 
 import net.tourbook.Messages;
@@ -24,15 +25,16 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
@@ -72,7 +74,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
@@ -104,7 +105,7 @@ public class TourMarkerView extends ViewPart {
 	private Label					fPageNoChart;
 	private Composite				fViewerContainer;
 
-	private IPropertyListener		fTourChangeListener;
+	private ITourPropertyListener	fTourPropertyListener;
 
 	private Chart					fTourChart;
 
@@ -184,18 +185,39 @@ public class TourMarkerView extends ViewPart {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourChangeListener() {
+	private void addTourPropertyListener() {
 
-		fTourChangeListener = new IPropertyListener() {
+		fTourPropertyListener = new ITourPropertyListener() {
+			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
 
-			public void propertyChanged(final Object source, final int propId) {
-				if (propId == TourDatabase.TOUR_IS_CHANGED) {
-					fMarkerViewer.setInput(this);
+				if (fTourData == null || part == TourMarkerView.this) {
+					return;
+				}
+
+				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+
+					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
+					if (modifiedTours != null) {
+
+						// update modified tour
+
+						final long viewTourId = fTourData.getTourId();
+
+						for (final TourData tourData : modifiedTours) {
+							if (tourData.getTourId() == viewTourId) {
+
+								fMarkerViewer.setInput(this);
+
+								// nothing more to do, the view contains only one tour
+								return;
+							}
+						}
+					}
 				}
 			}
 		};
 
-		TourDatabase.getInstance().addPropertyListener(fTourChangeListener);
+		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
 	}
 
 	/**
@@ -234,7 +256,7 @@ public class TourMarkerView extends ViewPart {
 		createContextMenu();
 
 		addSelectionListener();
-		addTourChangeListener();
+		addTourPropertyListener();
 		addPrefListener();
 
 		// this part is a selection provider
@@ -373,7 +395,7 @@ public class TourMarkerView extends ViewPart {
 	@Override
 	public void dispose() {
 
-		TourDatabase.getInstance().removePropertyListener(fTourChangeListener);
+		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);

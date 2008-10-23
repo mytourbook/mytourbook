@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.util.StringToArrayConverter;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
@@ -32,7 +33,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.ui.IMemento;
 
 /**
  * Manages the columns for a tree/table-viewer
@@ -71,11 +71,11 @@ public class ColumnManager {
 	 */
 	private String[]					fColumnIdsAndWidth;
 
-	public ColumnManager(final ITourViewer viewerAdapter, final IMemento memento) {
+	public ColumnManager(final ITourViewer viewerAdapter, final IDialogSettings viewState) {
 
 		fTourViewer = viewerAdapter;
 
-		restoreState(memento);
+		restoreState(viewState);
 	}
 
 	public void addColumn(final ColumnDefinition colDef) {
@@ -460,22 +460,22 @@ public class ColumnManager {
 	/**
 	 * Restore the column order and width from a memento
 	 * 
-	 * @param memento
+	 * @param settings
 	 */
-	private void restoreState(final IMemento memento) {
+	private void restoreState(final IDialogSettings settings) {
 
-		if (memento == null) {
+		if (settings == null) {
 			return;
 		}
 
 		// restore table columns sort order
-		final String mementoColumnSortOrderIds = memento.getString(MEMENTO_COLUMN_SORT_ORDER);
+		final String mementoColumnSortOrderIds = settings.get(MEMENTO_COLUMN_SORT_ORDER);
 		if (mementoColumnSortOrderIds != null) {
 			fVisibleColumnIds = StringToArrayConverter.convertStringToArray(mementoColumnSortOrderIds);
 		}
 
 		// restore column width
-		final String mementoColumnWidth = memento.getString(MEMENTO_COLUMN_WIDTH);
+		final String mementoColumnWidth = settings.get(MEMENTO_COLUMN_WIDTH);
 		if (mementoColumnWidth != null) {
 			fColumnIdsAndWidth = StringToArrayConverter.convertStringToArray(mementoColumnWidth);
 		}
@@ -484,24 +484,24 @@ public class ColumnManager {
 	/**
 	 * Save the column order and width into a memento
 	 * 
-	 * @param memento
+	 * @param settings
 	 */
-	public void saveState(final IMemento memento) {
+	public void saveState(final IDialogSettings settings) {
 
-		if (memento == null) {
+		if (settings == null) {
 			return;
 		}
 
 		// save column sort order
 		fVisibleColumnIds = getColumnIdsFromViewer();
 		if (fVisibleColumnIds != null) {
-			memento.putString(MEMENTO_COLUMN_SORT_ORDER, StringToArrayConverter.convertArrayToString(fVisibleColumnIds));
+			settings.put(MEMENTO_COLUMN_SORT_ORDER, StringToArrayConverter.convertArrayToString(fVisibleColumnIds));
 		}
 
 		// save columns width and keep it for internal use
 		fColumnIdsAndWidth = getColumnIdAndWidthFromViewer();
 		if (fColumnIdsAndWidth != null) {
-			memento.putString(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(fColumnIdsAndWidth));
+			settings.put(MEMENTO_COLUMN_WIDTH, StringToArrayConverter.convertArrayToString(fColumnIdsAndWidth));
 		}
 	}
 

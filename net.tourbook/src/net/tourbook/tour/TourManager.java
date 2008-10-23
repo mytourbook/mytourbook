@@ -78,7 +78,8 @@ public class TourManager {
 	public static final int						TOUR_PROPERTY_COMPARE_TOUR_CHANGED		= 40;
 
 	/**
-	 * Properties for a tour have changed, property data contains {@link TourProperties}
+	 * Properties for a tour have changed, property data contains {@link TourProperties} with the
+	 * modified {@link TourData}
 	 */
 	public static final int						TOUR_PROPERTIES_CHANGED					= 50;
 

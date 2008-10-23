@@ -114,15 +114,15 @@ public class TourDatabase {
 	 */
 	public static final int						ENTITY_IS_NOT_SAVED							= -1;
 
-	/**
-	 * Db property: tour was changed and saved in the database
-	 */
-	public static final int						TOUR_IS_CHANGED_AND_PERSISTED				= 1;
-
-	/**
-	 * Db property: tour was changed but not yet saved in the database
-	 */
-	public static final int						TOUR_IS_CHANGED								= 2;
+//	/**
+//	 * Db property: tour was changed and saved in the database
+//	 */
+//	public static final int						TOUR_IS_CHANGED_AND_PERSISTED				= 1;
+//
+//	/**
+//	 * Db property: tour was changed but not yet saved in the database
+//	 */
+//	public static final int						TOUR_IS_CHANGED								= 2;
 
 	private static TourDatabase					instance;
 

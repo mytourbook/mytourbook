@@ -33,6 +33,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 
@@ -312,6 +313,28 @@ public class UI {
 						return (TourDataEditorView) view;
 					}
 				}
+			}
+		}
+
+		return null;
+	}
+
+	public static TourData getTourPropertyTourData(final TourProperties propertyData, final TourData oldTourData) {
+
+		final ArrayList<TourData> modifiedTours = propertyData.getModifiedTours();
+		if (modifiedTours == null) {
+			return null;
+		}
+
+		// update modified tour
+
+		final long oldTourId = oldTourData.getTourId();
+
+		for (final TourData tourData : modifiedTours) {
+			if (tourData.getTourId() == oldTourId) {
+
+				// nothing more to do, only one tour
+				return tourData;
 			}
 		}
 
@@ -822,5 +845,4 @@ public class UI {
 
 		return existingImage;
 	}
-
 }

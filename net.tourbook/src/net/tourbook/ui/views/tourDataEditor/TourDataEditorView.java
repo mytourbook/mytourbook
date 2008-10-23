@@ -38,6 +38,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
+import net.tourbook.tour.ActionEditTourMarker;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.ITourSaveListener;
 import net.tourbook.tour.SelectionTourData;
@@ -70,6 +71,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -120,16 +122,13 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -160,8 +159,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final int			TAB_INDEX_TITLE					= 0;
 	private static final int			TAB_INDEX_INFO					= 1;
 	private static final int			TAB_INDEX_TIME_SLICES			= 2;
-
-	private static IMemento				fSessionMemento;
 
 	/*
 	 * data series which are displayed in the viewer
@@ -323,6 +320,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private boolean						fIsInfoDisplayed;
 
 	private int							fUpdateCounter;
+
+	private ActionEditTourMarker		fActionTourMarker;
+
+	final IDialogSettings				fViewState						= TourbookPlugin.getDefault()
+																				.getDialogSettingsSection(ID);
 
 	private final class IntegerEditingSupport extends IntegerDataSerieEditingSupport {
 
@@ -622,7 +624,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fIsRowEditMode = fActionToggleRowSelectMode.isChecked();
 
-		fColumnManager.saveState(fSessionMemento);
+		fColumnManager.saveState(fViewState);
 		fColumnManager.clearColumns();
 		defineViewerColumns(fDataViewerContainer);
 
@@ -665,7 +667,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourDataEditorView.this) {
-					saveSession();
+					saveState();
 				}
 			}
 
@@ -785,35 +787,37 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					final TourProperties tourProperties = (TourProperties) propertyData;
 					final ArrayList<TourData> modifiedTours = tourProperties.getModifiedTours();
-					if (modifiedTours != null) {
 
-						// get modified tours
+					if (modifiedTours == null) {
+						return;
+					}
 
-						final long viewTourId = fTourData.getTourId();
+					final long viewTourId = fTourData.getTourId();
 
-						// update modified tour
-						for (final TourData tourData : modifiedTours) {
-							if (tourData.getTourId() == viewTourId) {
+					for (final TourData tourData : modifiedTours) {
+						if (tourData.getTourId() == viewTourId) {
 
-								if (tourProperties.tourDataEditorSavedTour == fTourData) {
+							// update modified tour
 
-									/*
-									 * nothing to do because the tour is already saved when it was
-									 * not modified before, the UI is already updated
-									 */
-									continue;
-								}
+							if (tourProperties.tourDataEditorSavedTour == fTourData) {
 
-								if (tourProperties.isReverted) {
-									setTourClean();
-								}
-
-								updateUIFromTourData(tourData, true, false);
-								setTourDirty();
-
-								// nothing more to do, the editor contains only one tour
+								/*
+								 * nothing to do because the tour is already saved (when it was not
+								 * modified before) and the UI is already updated
+								 */
 								return;
 							}
+
+							if (tourProperties.isReverted) {
+								setTourClean();
+							} else {
+								setTourDirty();
+							}
+
+							updateUIFromTourData(tourData, true, tourProperties.isReverted);
+
+							// nothing more to do, the editor contains only one tour
+							return;
 						}
 					}
 
@@ -877,6 +881,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fActionSaveTour = new ActionSaveTour(this);
 		fActionUndoChanges = new ActionUndoChanges(this);
+		fActionTourMarker = new ActionEditTourMarker(this, false);
 		fActionToggleRowSelectMode = new ActionToggleRowSelectMode(this);
 
 		fActionDeleteTimeSlices = new ActionDeleteTimeSlices(this);
@@ -899,6 +904,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		tbm.add(fActionSaveTour);
 		tbm.add(fActionUndoChanges);
+
+		tbm.add(new Separator());
+		tbm.add(fActionTourMarker);
 
 		tbm.add(new Separator());
 		tbm.add(fActionToggleRowSelectMode);
@@ -1223,10 +1231,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	public void createPartControl(final Composite parent) {
 
 		// define all columns
-		fColumnManager = new ColumnManager(this, fSessionMemento);
+		fColumnManager = new ColumnManager(this, fViewState);
 		defineViewerColumns(parent);
 
-		restoreStateBeforeUI(fSessionMemento);
+		restoreStateBeforeUI();
 
 		createFieldListener(); // must be set before the UI is created
 		createUI(parent);
@@ -1243,7 +1251,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// this part is a selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		restoreStateWithUI(fSessionMemento);
+		restoreStateWithUI();
 
 		fPageBook.showPage(fPageNoTour);
 
@@ -2040,12 +2048,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void enableActions() {
 
 		final boolean isTourValid = isTourValid();
+		final boolean isTourInDb = isTourInDb();
 
 		/*
 		 * tour can only be saved when the tour is saved in the database
 		 */
-		fActionSaveTour.setEnabled(fIsTourDirty && isTourValid && isTourInDb());
+		fActionSaveTour.setEnabled(fIsTourDirty && isTourValid && isTourInDb);
 		fActionUndoChanges.setEnabled(fIsTourDirty);
+		fActionTourMarker.setEnabled(isTourValid & isTourInDb);
 
 		final boolean isTimeSliceTab = fTabFolder.getSelectionIndex() == TAB_INDEX_TIME_SLICES;
 		fActionModifyColumns.setEnabled(isTimeSliceTab);
@@ -2353,17 +2363,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	public ColumnViewer getViewer() {
 		return fDataViewer;
-	}
-
-	@Override
-	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-
-		super.init(site, memento);
-
-		// set the session memento if it's not yet set
-		if (fSessionMemento == null) {
-			fSessionMemento = memento;
-		}
 	}
 
 	/**
@@ -2758,58 +2757,34 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		});
 	}
 
-	private void restoreStateBeforeUI(final IMemento memento) {
+	private void restoreStateBeforeUI() {
 
-		if (memento != null) {
-
-			// restore from memento
-
-			final Integer mementoRowEditMode = memento.getInteger(MEMENTO_ROW_EDIT_MODE);
-			if (mementoRowEditMode != null) {
-				fIsRowEditMode = mementoRowEditMode == 1 ? true : false;
-			}
-		}
+		// row or column edit mode
+		fIsRowEditMode = fViewState.getBoolean(MEMENTO_ROW_EDIT_MODE);
 	}
 
-	private void restoreStateWithUI(final IMemento memento) {
+	private void restoreStateWithUI() {
 
-		if (memento == null) {
-
-			// memento is not set, set defaults
-
+		// select tab
+		try {
+			fTabFolder.setSelection(fViewState.getInt(MEMENTO_SELECTED_TAB));
+		} catch (final NumberFormatException e) {
 			fTabFolder.setSelection(TAB_INDEX_TITLE);
-
-		} else {
-
-			// restore from memento
-
-			// select tab
-			final Integer selectedTab = memento.getInteger(MEMENTO_SELECTED_TAB);
-			if (selectedTab != null) {
-				fTabFolder.setSelection(selectedTab);
-			} else {
-				fTabFolder.setSelection(TAB_INDEX_TITLE);
-			}
-
 		}
 
 		fActionToggleRowSelectMode.setChecked(fIsRowEditMode);
 	}
 
-	private void saveSession() {
-		fSessionMemento = XMLMemento.createWriteRoot("TourDataEditorView"); //$NON-NLS-1$
-		saveState(fSessionMemento);
-	}
+	private void saveState() {
 
-	@Override
-	public void saveState(final IMemento memento) {
+		final IDialogSettings settings = TourbookPlugin.getDefault().getDialogSettingsSection(ID);
 
 		// save selected tab
-		memento.putInteger(MEMENTO_SELECTED_TAB, fTabFolder.getSelectionIndex());
+		settings.put(MEMENTO_SELECTED_TAB, fTabFolder.getSelectionIndex());
 
-		memento.putInteger(MEMENTO_ROW_EDIT_MODE, fActionToggleRowSelectMode.isChecked() ? 1 : 0);
+		settings.put(MEMENTO_ROW_EDIT_MODE, fActionToggleRowSelectMode.isChecked());
 
-		fColumnManager.saveState(memento);
+		fColumnManager.saveState(settings);
 	}
 
 	/**
@@ -2916,8 +2891,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fTourData = TourDatabase.saveTour(fTourData);
 		setTourClean();
 
-		TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
-
 		// notify all views which display the tour type
 		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 		modifiedTour.add(fTourData);
@@ -2994,6 +2967,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void updateContentOnKeyUp() {
 
+		if (fTourData == null) {
+			return;
+		}
 		// set changed data
 		fTourData.setTourTitle(fTextTitle.getText());
 
@@ -3155,6 +3131,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	public void updateUI(final TourData tourData) {
 
 		updateUIFromTourData(tourData, true, true);
+	}
+
+	public void updateUI(final TourData tourData, final boolean isDirty) {
+
+		updateUI(tourData);
+
+		if (isDirty) {
+			setTourDirty();
+		}
 	}
 
 	/**

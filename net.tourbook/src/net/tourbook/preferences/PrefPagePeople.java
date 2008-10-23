@@ -398,17 +398,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private ExternalDevice getSelectedDevice() {
-
-		final int selectedIndex = fComboDevice.getSelectionIndex();
-
-		if (selectedIndex == -1 || selectedIndex == 0) {
-			return null;
-		}
-
-		return fDeviceList.get(selectedIndex);
-	}
-
 	/**
 	 * field: first name
 	 */
@@ -439,35 +428,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	}
 
 	/**
-	 * field: last name
-	 */
-	private void createFieldLastName() {
-
-		final Label lbl = new Label(fPersonDetailContainer, SWT.NONE);
-		lbl.setText(Messages.Pref_People_Label_last_name);
-
-		fTextLastName = new Text(fPersonDetailContainer, SWT.BORDER);
-		final GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-		fTextLastName.setLayoutData(gd);
-		fTextLastNameModifyListener = new ModifyListener() {
-			public void modifyText(final ModifyEvent e) {
-				if (fCurrentPerson != null) {
-					final String lastName = ((Text) (e.widget)).getText();
-					if (!lastName.equals(fCurrentPerson.getLastName())) {
-						fCurrentPerson.setLastName(lastName);
-						fIsPersonModified = true;
-
-						fPeopleViewer.update(fCurrentPerson, null);
-					}
-				}
-			}
-		};
-
-		// filler
-		new Label(fPersonDetailContainer, SWT.NONE);
-	}
-
-	/**
 	 * field: height
 	 */
 	private void createFieldHeight(final int floatInputWidth) {
@@ -494,6 +454,35 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					}
 					fIsPersonModified = true;
 					validatePerson();
+				}
+			}
+		};
+
+		// filler
+		new Label(fPersonDetailContainer, SWT.NONE);
+	}
+
+	/**
+	 * field: last name
+	 */
+	private void createFieldLastName() {
+
+		final Label lbl = new Label(fPersonDetailContainer, SWT.NONE);
+		lbl.setText(Messages.Pref_People_Label_last_name);
+
+		fTextLastName = new Text(fPersonDetailContainer, SWT.BORDER);
+		final GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		fTextLastName.setLayoutData(gd);
+		fTextLastNameModifyListener = new ModifyListener() {
+			public void modifyText(final ModifyEvent e) {
+				if (fCurrentPerson != null) {
+					final String lastName = ((Text) (e.widget)).getText();
+					if (!lastName.equals(fCurrentPerson.getLastName())) {
+						fCurrentPerson.setLastName(lastName);
+						fIsPersonModified = true;
+
+						fPeopleViewer.update(fCurrentPerson, null);
+					}
 				}
 			}
 		};
@@ -620,7 +609,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final GridLayout gridLayout = new GridLayout();
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
-		gridLayout.marginRight = 10;
+		gridLayout.marginRight = 0;
 		container.setLayout(gridLayout);
 
 		// button: add
@@ -770,6 +759,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			fIsPersonListModified = false;
 		}
+	}
+
+	private ExternalDevice getSelectedDevice() {
+
+		final int selectedIndex = fComboDevice.getSelectionIndex();
+
+		if (selectedIndex == -1 || selectedIndex == 0) {
+			return null;
+		}
+
+		return fDeviceList.get(selectedIndex);
 	}
 
 	public void init(final IWorkbench workbench) {

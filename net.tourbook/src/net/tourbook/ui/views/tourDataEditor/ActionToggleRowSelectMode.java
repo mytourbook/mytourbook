@@ -31,8 +31,9 @@ class ActionToggleRowSelectMode extends Action {
 		fTourPropertiesView = tourPropertiesView;
 
 		setToolTipText(Messages.app_action_edit_rows_tooltip);
-
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_row));
+		
+		setEnabled(false);
 	}
 
 	@Override

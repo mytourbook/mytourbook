@@ -44,19 +44,19 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class ActionSetTourTag extends Action implements IMenuCreator {
 
-	private Menu					fMenu;
+	private Menu				fMenu;
 
 	private final ITourProvider	fTourProvider;
 
-	private final boolean			fIsAddMode;
-	private boolean					fIsSaveTour;
+	private final boolean		fIsAddMode;
+	private boolean				fIsSaveTour;
 
 	/**
 	 * contains the tags for all selected tours in the viewer
 	 */
-	private Set<TourTag>			fSelectedTags;
+	private Set<TourTag>		fSelectedTags;
 
-	private ArrayList<TourData>		fSelectedTours;
+	private ArrayList<TourData>	fSelectedTours;
 
 	public class ActionTagCategory extends Action implements IMenuCreator {
 

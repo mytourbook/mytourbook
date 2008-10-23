@@ -70,6 +70,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -96,28 +97,25 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
 public class TaggingView extends ViewPart implements ITourProvider, ITourViewer {
 
-	static public final String				ID								= "net.tourbook.views.tagViewID";	//$NON-NLS-1$
+	static public final String				ID								= "net.tourbook.views.tagViewID";		//$NON-NLS-1$
 
-	private static final String				MEMENTO_TAG_VIEW_LAYOUT			= "tagview.layout";				//$NON-NLS-1$
+	final IDialogSettings					fViewState						= TourbookPlugin.getDefault()
+																					.getDialogSettingsSection(ID);
+
+	private static final String				MEMENTO_TAG_VIEW_LAYOUT			= "tagview.layout";					//$NON-NLS-1$
 
 	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
 	static final int						TAG_VIEW_LAYOUT_HIERARCHICAL	= 10;
 
 	private int								fTagViewLayout					= TAG_VIEW_LAYOUT_HIERARCHICAL;
-
-	private IMemento						fSessionMemento;
 
 	private Composite						fViewerContainer;
 
@@ -290,7 +288,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TaggingView.this) {
-					saveSession();
+					saveState();
 				}
 			}
 
@@ -332,7 +330,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					UI.updateUnits();
 
-					fColumnManager.saveState(fSessionMemento);
+					fColumnManager.saveState(fViewState);
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
@@ -470,7 +468,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	public void createPartControl(final Composite parent) {
 
 		// define all columns
-		fColumnManager = new ColumnManager(this, fSessionMemento);
+		fColumnManager = new ColumnManager(this, fViewState);
 		defineViewerColumns(parent);
 
 		fViewerContainer = new Composite(parent, SWT.NONE);
@@ -492,7 +490,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		enableActions();
 
-		restoreState(fSessionMemento);
+		restoreState();
 		reloadViewer();
 	}
 
@@ -1199,17 +1197,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		return fTagViewer;
 	}
 
-	@Override
-	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-
-		super.init(site, memento);
-
-		// set the session memento if it's not yet set
-		if (fSessionMemento == null) {
-			fSessionMemento = memento;
-		}
-	}
-
 	public void recreateViewer() {
 
 		fViewerContainer.setRedraw(false);
@@ -1247,61 +1234,46 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		tree.setRedraw(true);
 	}
 
-	private void restoreState(final IMemento memento) {
+	private void restoreState() {
 
-		fTagViewLayout = -1;
+		fTagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
 
-		if (memento != null) {
+		// restore view layout
+		try {
 
-			/*
-			 * restore states from the memento
-			 */
+			final int viewLayout = fViewState.getInt(MEMENTO_TAG_VIEW_LAYOUT);
+			switch (viewLayout) {
 
-			// restore view layout
-			final Integer mementoViewLayout = memento.getInteger(MEMENTO_TAG_VIEW_LAYOUT);
-			if (mementoViewLayout != null) {
+			case TAG_VIEW_LAYOUT_FLAT:
 
-				switch (mementoViewLayout) {
+				fTagViewLayout = viewLayout;
+				fActionSetLayoutFlat.setChecked(true);
+				break;
 
-				case TAG_VIEW_LAYOUT_FLAT:
+			case TAG_VIEW_LAYOUT_HIERARCHICAL:
 
-					fTagViewLayout = mementoViewLayout;
-					fActionSetLayoutFlat.setChecked(true);
-					break;
+				fTagViewLayout = viewLayout;
+				fActionSetLayoutHierarchical.setChecked(true);
+				break;
 
-				case TAG_VIEW_LAYOUT_HIERARCHICAL:
-
-					fTagViewLayout = mementoViewLayout;
-					fActionSetLayoutHierarchical.setChecked(true);
-					break;
-
-				default:
-					break;
-				}
+			default:
+				break;
 			}
-		}
 
-		// set default tag view layout
-		if (fTagViewLayout == -1) {
+		} catch (final NumberFormatException e) {
+
+			// set default tag view layout
 			fTagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
 			fActionSetLayoutHierarchical.setChecked(true);
 		}
 	}
 
-	private void saveSession() {
-		if (fSessionMemento == null) {
-			fSessionMemento = XMLMemento.createWriteRoot("TaggingView"); //$NON-NLS-1$
-		}
-		saveState(fSessionMemento);
-	}
+	private void saveState() {
 
-	@Override
-	public void saveState(final IMemento memento) {
-
-		fColumnManager.saveState(memento);
+		fColumnManager.saveState(fViewState);
 
 		// save view layout
-		memento.putInteger(MEMENTO_TAG_VIEW_LAYOUT, fTagViewLayout);
+		fViewState.put(MEMENTO_TAG_VIEW_LAYOUT, fTagViewLayout);
 
 //		final Object[] expandedElements = fTagViewer.getExpandedElements();
 //		final Object[] visibleExpandedElements = fTagViewer.getVisibleExpandedElements();

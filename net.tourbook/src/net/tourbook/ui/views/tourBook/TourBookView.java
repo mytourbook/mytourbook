@@ -31,6 +31,7 @@ import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditQuick;
+import net.tourbook.tour.ActionEditTourMarker;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionNewTours;
@@ -64,6 +65,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -90,25 +92,22 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourBookView extends ViewPart implements ITourProvider, ITourViewer {
 
 	static public final String			ID											= "net.tourbook.views.tourListView";			//$NON-NLS-1$
 
+	final IDialogSettings				fViewState									= TourbookPlugin.getDefault()
+																							.getDialogSettingsSection(ID);
+
 	private static final String			MEMENTO_TOURVIEWER_SELECTED_YEAR			= "tourbook.view.tourviewer.selected-year";	//$NON-NLS-1$
 	private static final String			MEMENTO_TOURVIEWER_SELECTED_MONTH			= "tourbook.view.tourviewer.selected-month";	//$NON-NLS-1$
 	private static final String			MEMENTO_TOURVIEWER_SELECT_YEAR_MONTH_TOURS	= "tourbook.view.select-year-month-tours";		//$NON-NLS-1$
-
-	private static IMemento				fSessionMemento;
 
 	private TreeViewer					fTourViewer;
 
@@ -136,12 +135,13 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionDeleteTour			fActionDeleteTour;
 	private ActionEditTour				fActionEditTour;
 
+	private ActionEditTourMarker		fActionTourMarker;
+
+	private ActionSetTourType			fActionSetTourType;
 	private ActionSetTourTag			fActionAddTag;
 	private ActionSetTourTag			fActionRemoveTag;
 	private ActionRemoveAllTags			fActionRemoveAllTags;
 	private ActionOpenPrefDialog		fActionOpenTagPrefs;
-
-	private ActionSetTourType			fActionSetTourType;
 
 	private ActionSelectYearMonthTours	fActionSelectYearMonthTours;
 	private ActionModifyColumns			fActionModifyColumns;
@@ -230,7 +230,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourBookView.this) {
-					saveSession();
+					saveState();
 				}
 			}
 
@@ -274,7 +274,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					UI.updateUnits();
 
-					fColumnManager.saveState(fSessionMemento);
+					fColumnManager.saveState(fViewState);
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
@@ -347,8 +347,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionEditQuick = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(this);
 		fActionDeleteTour = new ActionDeleteTour(this);
-		fActionSetTourType = new ActionSetTourType(this);
 
+		fActionTourMarker = new ActionEditTourMarker(this, true);
+
+		fActionSetTourType = new ActionSetTourType(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
@@ -390,7 +392,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	public void createPartControl(final Composite parent) {
 
 		// define all columns for the viewer
-		fColumnManager = new ColumnManager(this, fSessionMemento);
+		fColumnManager = new ColumnManager(this, fViewState);
 		defineViewerColumns(parent);
 
 		fViewerContainer = new Composite(parent, SWT.NONE);
@@ -412,7 +414,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActivePerson = tourbookPlugin.getActivePerson();
 		fActiveTourTypeFilter = tourbookPlugin.getActiveTourTypeFilter();
 
-		restoreState(fSessionMemento);
+		restoreState();
 
 		// update the viewer
 		fRootItem = new TVITourBookRoot(this);
@@ -858,6 +860,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		final int selectedItems = selection.size();
 		final boolean isTourSelected = tourItems > 0;
+		final boolean isOneTour = tourItems == 1;
 
 		final TVITourBookItem firstElement = (TVITourBookItem) selection.getFirstElement();
 		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
@@ -866,8 +869,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 * enable actions
 		 */
 
-		fActionEditTour.setEnabled(tourItems == 1);
-		fActionEditQuick.setEnabled(tourItems == 1);
+		fActionEditTour.setEnabled(isOneTour);
+		fActionEditQuick.setEnabled(isOneTour);
 
 		// enable delete ation when at least one tour is selected
 		if (isTourSelected) {
@@ -876,6 +879,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			fActionDeleteTour.setEnabled(false);
 		}
 
+		fActionTourMarker.setEnabled(isOneTour);
+
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
@@ -883,7 +888,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionAddTag.setEnabled(isTourSelected);
 
 		// remove tags
-		if (firstTour != null && tourItems == 1) {
+		if (firstTour != null && isOneTour) {
 
 			// one tour is selected
 
@@ -959,6 +964,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(fActionRemoveAllTags);
 
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionTourMarker);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionOpenTagPrefs);
@@ -1089,16 +1097,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	public ColumnViewer getViewer() {
 		return fTourViewer;
-	}
-
-	@Override
-	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-		super.init(site, memento);
-
-		// set the session memento if it's not yet set
-		if (fSessionMemento == null) {
-			fSessionMemento = memento;
-		}
 	}
 
 	private void onSelectTreeItem(final SelectionChangedEvent event) {
@@ -1285,48 +1283,35 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 	}
 
-	private void restoreState(final IMemento memento) {
+	private void restoreState() {
 
-		if (memento != null) {
-
-			/*
-			 * restore states from the memento
-			 */
-
-			// set tour viewer reselection data
-			final Integer selectedYear = memento.getInteger(MEMENTO_TOURVIEWER_SELECTED_YEAR);
-			final Integer selectedMonth = memento.getInteger(MEMENTO_TOURVIEWER_SELECTED_MONTH);
-			fTourViewerSelectedYear = selectedYear == null ? -1 : selectedYear;
-			fTourViewerSelectedMonth = selectedMonth == null ? -1 : selectedMonth;
-
-			final Boolean mementoSelectYearMonth = memento.getBoolean(MEMENTO_TOURVIEWER_SELECT_YEAR_MONTH_TOURS);
-			if (mementoSelectYearMonth != null) {
-				fActionSelectYearMonthTours.setChecked(mementoSelectYearMonth);
-			}
-
-		} else {
-
-			// default: uncheck action because it degrades performance
-			fActionSelectYearMonthTours.setChecked(false);
+		// set tour viewer reselection data
+		try {
+			fTourViewerSelectedYear = fViewState.getInt(MEMENTO_TOURVIEWER_SELECTED_YEAR);
+		} catch (final NumberFormatException e) {
+			fTourViewerSelectedYear = -1;
 		}
+
+		try {
+			fTourViewerSelectedMonth = fViewState.getInt(MEMENTO_TOURVIEWER_SELECTED_MONTH);
+		} catch (final NumberFormatException e) {
+			fTourViewerSelectedMonth = -1;
+		}
+
+		fActionSelectYearMonthTours.setChecked(fViewState.getBoolean(MEMENTO_TOURVIEWER_SELECT_YEAR_MONTH_TOURS));
+
 	}
 
-	private void saveSession() {
-		fSessionMemento = XMLMemento.createWriteRoot("TourBookView"); //$NON-NLS-1$
-		saveState(fSessionMemento);
-	}
-
-	@Override
-	public void saveState(final IMemento memento) {
+	private void saveState() {
 
 		// save selection in the tour viewer
-		memento.putInteger(MEMENTO_TOURVIEWER_SELECTED_YEAR, fTourViewerSelectedYear);
-		memento.putInteger(MEMENTO_TOURVIEWER_SELECTED_MONTH, fTourViewerSelectedMonth);
+		fViewState.put(MEMENTO_TOURVIEWER_SELECTED_YEAR, fTourViewerSelectedYear);
+		fViewState.put(MEMENTO_TOURVIEWER_SELECTED_MONTH, fTourViewerSelectedMonth);
 
 		// action: select tours for year/month
-		memento.putBoolean(MEMENTO_TOURVIEWER_SELECT_YEAR_MONTH_TOURS, fActionSelectYearMonthTours.isChecked());
+		fViewState.put(MEMENTO_TOURVIEWER_SELECT_YEAR_MONTH_TOURS, fActionSelectYearMonthTours.isChecked());
 
-		fColumnManager.saveState(memento);
+		fColumnManager.saveState(fViewState);
 	}
 
 	public void setActiveYear(final int activeYear) {
