@@ -271,7 +271,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			conn.close();
 
 			// select person/tour type which was selected in the last session
-			fApplicationActionBarAdvisor.personSelector.fireEventNewPersonIsSelected();
+			fApplicationActionBarAdvisor.fPersonSelector.fireEventNewPersonIsSelected();
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);

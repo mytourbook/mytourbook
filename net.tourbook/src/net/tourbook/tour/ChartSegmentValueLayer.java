@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -40,10 +40,6 @@ public class ChartSegmentValueLayer implements IChartLayer {
 
 	private int[]		fXDataSerie;
 
-	public void setLineColor(final RGB lineColor) {
-		this.lineColor = lineColor;
-	}
-
 	/**
 	 * Draws the marker(s) for the current graph config
 	 * 
@@ -52,6 +48,12 @@ public class ChartSegmentValueLayer implements IChartLayer {
 	 * @param chartComponents
 	 */
 	public void draw(final GC gc, final ChartDrawingData drawingData, final Chart chart) {
+
+		final int[] segmentSerie = fTourData.segmentSerieIndex;
+
+		if (segmentSerie == null) {
+			return;
+		}
 
 		final Display display = Display.getCurrent();
 
@@ -78,8 +80,6 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		gc.setForeground(colorLine);
 
 		Point lastPoint = null;
-
-		final int[] segmentSerie = fTourData.segmentSerieIndex;
 
 		for (int segmentIndex = 0; segmentIndex < segmentSerie.length; segmentIndex++) {
 
@@ -112,6 +112,10 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		}
 
 		colorLine.dispose();
+	}
+
+	public void setLineColor(final RGB lineColor) {
+		this.lineColor = lineColor;
 	}
 
 	public void setTourData(final TourData tourData) {

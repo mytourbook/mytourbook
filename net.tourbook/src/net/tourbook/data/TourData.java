@@ -393,7 +393,7 @@ public class TourData {
 	public Rectangle				gpsBounds;
 
 	/**
-	 * Index of the segmented data in the original serie
+	 * Index of the segmented data in the data series
 	 */
 	@Transient
 	public int[]					segmentSerieIndex;
@@ -403,8 +403,6 @@ public class TourData {
 	 */
 	@Transient
 	public int						offsetDDRecord;
-	@Transient
-	protected Object[]				fTourSegments;
 
 	/*
 	 * data for the tour segments
@@ -2073,9 +2071,7 @@ public class TourData {
 			timeStart = timeEnd;
 		}
 
-		fTourSegments = tourSegments.toArray();
-
-		return fTourSegments;
+		return tourSegments.toArray();
 	}
 
 	public void dumpData() {
@@ -2728,10 +2724,6 @@ public class TourData {
 
 	public Collection<TourReference> getTourReferences() {
 		return tourReferences;
-	}
-
-	public Object[] getTourSegments() {
-		return fTourSegments;
 	}
 
 	/**

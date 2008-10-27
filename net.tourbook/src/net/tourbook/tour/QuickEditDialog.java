@@ -24,7 +24,6 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 
@@ -96,7 +95,7 @@ public class QuickEditDialog extends TitleAreaDialog implements ITourProvider {
 		// set text for the OK button
 		String okText = null;
 
-		final TourDataEditorView tourDataEditor = UI.getTourDataEditor();
+		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
 		if (tourDataEditor != null && tourDataEditor.isDirty() && tourDataEditor.getTourData() == fTourData) {
 			okText = Messages.dialog_quick_edit_dialog_update;
 		}

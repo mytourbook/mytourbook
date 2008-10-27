@@ -34,9 +34,9 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourProperties;
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -69,8 +69,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -244,6 +242,35 @@ public class UI {
 		}
 	}
 
+	/**
+	 * Compares two {@link TourData}
+	 * 
+	 * @param tourData1
+	 * @param tourData2
+	 * @return Returns <code>true</code> when they are the same, otherwise this is an internal error
+	 */
+	public static boolean checkTourData(final TourData tourData1, final TourData tourData2) {
+
+		if (tourData1.getTourId().longValue() == tourData2.getTourId().longValue() && tourData1 != tourData2) {
+
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Internal Error",//$NON-NLS-1$
+					"This error should not happen and occures when the internal structure of the application is corrupted. " //$NON-NLS-1$
+							+ "You should restart the application." //$NON-NLS-1$
+							+ UI.NEW_LINE2
+							+ "The tour editor contains the selected tour but the TourData is different." //$NON-NLS-1$
+							+ UI.NEW_LINE2
+							+ "Tour in Editor:\t" //$NON-NLS-1$
+							+ tourData2.toStringWithHash()
+							+ UI.NEW_LINE2
+							+ "Selected Tour:\t" //$NON-NLS-1$
+							+ tourData1.toStringWithHash());
+
+			return false;
+		}
+
+		return true;
+	}
+
 	public static final String formatSeconds(final long value) {
 
 		return new Formatter().format(Messages.Format_hhmmss,
@@ -272,15 +299,11 @@ public class UI {
 	public static ArrayList<IEditorPart> getOpenedEditors() {
 
 		final ArrayList<IEditorPart> editorParts = new ArrayList<IEditorPart>();
-		final IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
 
-		for (final IWorkbenchWindow wbWindow : wbWindows) {
-			final IWorkbenchPage[] pages = wbWindow.getPages();
+		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
+				for (final IEditorReference editorRef : wbPage.getEditorReferences()) {
 
-			for (final IWorkbenchPage wbPage : pages) {
-				final IEditorReference[] editorRefs = wbPage.getEditorReferences();
-
-				for (final IEditorReference editorRef : editorRefs) {
 					final IEditorPart editor = editorRef.getEditor(false);
 
 					if (editor != null) {
@@ -293,31 +316,51 @@ public class UI {
 		return editorParts;
 	}
 
-	/**
-	 * @return Returns the tour data editor or <code>null</code> when the editor is not opened
-	 */
-	public static TourDataEditorView getTourDataEditor() {
-
-		final IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
-
-		for (final IWorkbenchWindow wbWindow : wbWindows) {
-			final IWorkbenchPage[] pages = wbWindow.getPages();
-
-			for (final IWorkbenchPage wbPage : pages) {
-
-				final IViewReference[] viewRefs = wbPage.getViewReferences();
-
-				for (final IViewReference viewRef : viewRefs) {
-					final IViewPart view = viewRef.getView(false);
-					if (view instanceof TourDataEditorView) {
-						return (TourDataEditorView) view;
-					}
-				}
-			}
-		}
-
-		return null;
-	}
+//	/**
+//	 * @return Returns the tour data editor or <code>null</code> when the editor is not opened
+//	 */
+//	public static TourDataEditorView getTourDataEditor() {
+//
+//		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+//
+//			final IWorkbenchPage[] pages = wbWindow.getPages();
+//			for (final IWorkbenchPage wbPage : pages) {
+//
+//				final IViewReference viewRef = wbPage.findViewReference(TourDataEditorView.ID);
+//				if (viewRef == null) {
+//
+//					/*
+//					 * the tour editor could be opened in another perspective, I didn't find a
+//					 * solution to get this view in other perspectives, findViewReference finds the
+//					 * view only for the active perspective
+//					 */
+//					
+//					final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+//					if (tourDataEditor!=null) {
+//
+//					}
+//					if (TourDataEditorView.isOpened()) {
+//						try {
+//							return (TourDataEditorView) wbPage.showView(TourDataEditorView.ID,
+//									null,
+//									IWorkbenchPage.VIEW_VISIBLE);
+//						} catch (final PartInitException e) {
+//							e.printStackTrace();
+//						}
+//					}
+//					
+//				} else {
+//					final IViewPart view = viewRef.getView(false);
+//					if (view instanceof TourDataEditorView) {
+//
+//						return (TourDataEditorView) view;
+//					}
+//				}
+//			}
+//		}
+//
+//		return null;
+//	}
 
 	public static TourData getTourPropertyTourData(final TourProperties propertyData, final TourData oldTourData) {
 
@@ -845,4 +888,5 @@ public class UI {
 
 		return existingImage;
 	}
+
 }

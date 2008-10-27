@@ -30,6 +30,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
+import net.tourbook.tour.ActionEditAdjustAltitude;
 import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ActionEditTourMarker;
 import net.tourbook.tour.ITourPropertyListener;
@@ -134,8 +135,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private ActionDeleteTour			fActionDeleteTour;
 	private ActionEditTour				fActionEditTour;
-
 	private ActionEditTourMarker		fActionTourMarker;
+	private ActionEditAdjustAltitude	fActionAdjustAltitude;
 
 	private ActionSetTourType			fActionSetTourType;
 	private ActionSetTourTag			fActionAddTag;
@@ -349,6 +350,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionDeleteTour = new ActionDeleteTour(this);
 
 		fActionTourMarker = new ActionEditTourMarker(this, true);
+		fActionAdjustAltitude = new ActionEditAdjustAltitude(this, true);
 
 		fActionSetTourType = new ActionSetTourType(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
@@ -880,6 +882,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		}
 
 		fActionTourMarker.setEnabled(isOneTour);
+		fActionAdjustAltitude.setEnabled(isOneTour);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
@@ -967,6 +970,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionTourMarker);
+		menuMgr.add(fActionAdjustAltitude);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionOpenTagPrefs);

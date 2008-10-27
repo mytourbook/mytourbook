@@ -1730,8 +1730,9 @@ public class MappingView extends ViewPart {
 //		fMap.setCenterPosition(new GeoPosition(sliderLat, leftSliderLong));
 //		fMap.setCenterPosition(new GeoPosition(leftSliderLat, leftSliderLong));
 
-		fMap.setCenterPosition(new GeoPosition(latitudeSerie[fCurrentSelectedSliderValueIndex],
-				longitudeSerie[fCurrentSelectedSliderValueIndex]));
+		final int sliderIndex = Math.max(0, Math.min(fCurrentSelectedSliderValueIndex, latitudeSerie.length - 1));
+
+		fMap.setCenterPosition(new GeoPosition(latitudeSerie[sliderIndex], longitudeSerie[sliderIndex]));
 
 	}
 

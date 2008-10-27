@@ -41,11 +41,9 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -148,6 +146,12 @@ public class TourManager {
 	public static final int						GRADIENT_DIVISOR						= 10;
 
 	private static TourManager					instance;
+
+	/**
+	 * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part
+	 * is not opened
+	 */
+	private static TourDataEditorView			fTourDataEditorInstance;
 
 	private ComputeChartValue					computeAltimeterAvg;
 	private ComputeChartValue					computeGradientAvg;
@@ -281,6 +285,14 @@ public class TourManager {
 	}
 
 	/**
+	 * @return Returns the instance of the {@link TourDataEditorView} or <code>null</code> when this
+	 *         part is not opened
+	 */
+	public static TourDataEditorView getTourDataEditor() {
+		return fTourDataEditorInstance;
+	}
+
+	/**
 	 * @return returns the date of the tour
 	 */
 	public static DateTime getTourDate(final TourData tourData) {
@@ -385,10 +397,15 @@ public class TourManager {
 			boolean saveTour = false;
 			TourData savedTour = null;
 
-			final TourDataEditorView tourDataEditor = UI.getTourDataEditor();
+			final TourDataEditorView tourDataEditor = getTourDataEditor();
 			if (tourDataEditor != null) {
 
 				final TourData tourDataInEditor = tourDataEditor.getTourData();
+
+				if (UI.checkTourData(tourData, tourDataInEditor) == false) {
+					return savedTours;
+				}
+
 				if (tourDataInEditor == tourData) {
 
 					// selected tour is in the tour data editor
@@ -398,6 +415,26 @@ public class TourManager {
 						// tour in the editor is already dirty, tour MUST BE SAVED IN THE TOUR EDITOR
 
 						savedTour = tourData;
+
+						/*
+						 * make the tour data editor visible, it could be hidden and confuses the
+						 * user when the changes are not visible
+						 */
+
+						/*
+						 * the tour editor could be opened in another perspective, I didn't find a
+						 * solution to get this view in other perspectives, findViewReference finds
+						 * the view only for the active perspective
+						 */
+
+						try {
+							PlatformUI.getWorkbench()
+									.getActiveWorkbenchWindow()
+									.getActivePage()
+									.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+						} catch (final PartInitException e) {
+							e.printStackTrace();
+						}
 
 					} else {
 
@@ -421,21 +458,6 @@ public class TourManager {
 
 					fireChangeEvent = true;
 
-				} else if (tourDataInEditor.getTourId().longValue() == tourData.getTourId().longValue()) {
-
-					// this case should not happen
-
-					MessageDialog.openError(Display.getCurrent().getActiveShell(), "Internal Error",//$NON-NLS-1$
-							"This error should not happen and occures when the internal structure of the application is corrupted. " //$NON-NLS-1$
-									+ "You should restart the application and inform the author of the application how this error occured." //$NON-NLS-1$
-									+ UI.NEW_LINE2
-									+ "The tour editor contains the selected tour but the TourData is different." //$NON-NLS-1$
-									+ UI.NEW_LINE2
-									+ "Tour in Editor:\t" //$NON-NLS-1$
-									+ tourDataInEditor.toStringWithHash()
-									+ UI.NEW_LINE2
-									+ "Selected Tour:\t" //$NON-NLS-1$
-									+ tourData.toStringWithHash());
 				} else {
 
 					// tour is not in the tour editor
@@ -496,6 +518,10 @@ public class TourManager {
 
 		yData.setRgbBright(new RGB[] { PreferenceConverter.getColor(prefStore, prefGraphName
 				+ GraphColorProvider.PREF_COLOR_BRIGHT) });
+	}
+
+	public static void setTourDataEditor(final TourDataEditorView tourDataEditorView) {
+		fTourDataEditorInstance = tourDataEditorView;
 	}
 
 	/**

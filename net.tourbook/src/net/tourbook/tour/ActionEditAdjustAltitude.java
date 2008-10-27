@@ -24,20 +24,21 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionEditTourMarker extends Action {
+public class ActionEditAdjustAltitude extends Action {
 
 	private ITourProvider	fTourProvider;
 	private boolean			fIsSaveTour;
 
-	public ActionEditTourMarker(final ITourProvider tourProvider, final boolean isSaveTour) {
+	public ActionEditAdjustAltitude(final ITourProvider tourProvider, final boolean isSaveTour) {
 
 		fTourProvider = tourProvider;
 		fIsSaveTour = isSaveTour;
 
-		setText(Messages.app_action_edit_tour_marker);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker));
+		setText(Messages.app_action_edit_adjust_altitude);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude));
 
 		setEnabled(false);
 	}
@@ -53,33 +54,36 @@ public class ActionEditTourMarker extends Action {
 		}
 
 		final TourData tourData = selectedTours.get(0);
-		(new MarkerDialog(Display.getCurrent().getActiveShell(), tourData, null)).open();
 
-		/*
-		 * Currently the dialog works with the markers from the tour editor not with a backup, so
-		 * changes in the dialog are made in the tourdata of the tour editor -> the tour will be
-		 * dirty when this dialog was opened
-		 */
+		final AdjustAltitudeDialog dialog = new AdjustAltitudeDialog(Display.getCurrent().getActiveShell(), tourData);
+		dialog.create();
+		dialog.init();
 
-		if (fIsSaveTour) {
-			TourManager.saveModifiedTours(selectedTours);
+		if (dialog.open() != Window.OK) {
+
+			dialog.restoreOriginalAltitudeValues();
+
 		} else {
 
-			/*
-			 * don't save the tour, just update the tour data editor
-			 */
-			final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-			if (tourDataEditor != null) {
+			if (fIsSaveTour) {
+				TourManager.saveModifiedTours(selectedTours);
+			} else {
 
-				tourDataEditor.updateUI(tourData, true);
+				/*
+				 * don't save the tour, just update the tour data editor
+				 */
+				final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+				if (tourDataEditor != null) {
 
-				final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
-				modifiedTours.add(tourData);
-				final TourProperties propertyData = new TourProperties(modifiedTours);
+					tourDataEditor.updateUI(tourData, true);
 
-				TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, propertyData);
+					final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
+					modifiedTours.add(tourData);
+					final TourProperties propertyData = new TourProperties(modifiedTours);
+
+					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, propertyData);
+				}
 			}
 		}
 	}
-
 }

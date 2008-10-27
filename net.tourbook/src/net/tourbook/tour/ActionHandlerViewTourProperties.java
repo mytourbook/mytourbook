@@ -29,9 +29,8 @@ public class ActionHandlerViewTourProperties extends AbstractHandler {
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TourDataEditorView.ID,
-					null,
-					IWorkbenchPage.VIEW_ACTIVATE);
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()//
+					.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_ACTIVATE);
 
 		} catch (final PartInitException e) {
 			e.printStackTrace();

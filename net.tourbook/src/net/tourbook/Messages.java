@@ -21,6 +21,8 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
+	public static String	Image__edit_adjust_altitude;
+
 	public static String		Image__edit_tour_marker;
 
 	public static String		dialog_quick_edit_dialog_area_title;
@@ -73,6 +75,8 @@ public class Messages extends NLS {
 	public static String		app_action_dlg_confirm_save_tour_data_editor_message;
 
 	public static String		app_action_dlg_confirm_save_tour_data_editor_title;
+
+	public static String	app_action_edit_adjust_altitude;
 
 	public static String		app_action_edit_rows_tooltip;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -128,13 +128,13 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 		setShell();
 	}
 
-	public AdjustAltitudeDialog(final Shell parentShell, final TourChart tourChart) {
+	public AdjustAltitudeDialog(final Shell parentShell, final TourData tourData) {
 
 		super(parentShell);
 
 		setShell();
 
-		fTourData = tourChart.getTourData();
+		fTourData = tourData;
 
 		/*
 		 * keep a backup of the altitude data because these data will be changed in this dialog
@@ -333,6 +333,12 @@ public class AdjustAltitudeDialog extends TitleAreaDialog {
 			fAltiStartDiff = 0;
 			fAltiMaxDiff = 0;
 		}
+	}
+
+	@Override
+	protected void cancelPressed() {
+		// TODO Auto-generated method stub
+		super.cancelPressed();
 	}
 
 	@Override

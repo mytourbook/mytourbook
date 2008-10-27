@@ -46,25 +46,23 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	private IWorkbenchAction					fActionSave;
-	private IWorkbenchAction					fActionSaveAll;
+	private IWorkbenchWindow					fWindow;
 
 	private IContributionItem					fActionViewShortList;
 	private IWorkbenchAction					fActionPreferences;
 
-	PersonContributionItem						personSelector;
-	TourTypeContributionItem					tourTypeSelector;
-	private MeasurementSystemContributionItem	measurementSelector;
+	PersonContributionItem						fPersonSelector;
+	TourTypeContributionItem					fTourTypeSelector;
+	private MeasurementSystemContributionItem	fMeasurementSelector;
 
 	private IWorkbenchAction					fActionAbout;
 	private IWorkbenchAction					fActionQuit;
 
-	private IWorkbenchAction					savePerspectiveAction;
-	private IWorkbenchAction					resetPerspectiveAction;
-	private IWorkbenchAction					closePerspAction;
-	private IWorkbenchAction					closeAllPerspsAction;
-	private IWorkbenchAction					editActionSetAction;
-	private IWorkbenchWindow					fWindow;
+	private IWorkbenchAction					fActionSavePerspective;
+	private IWorkbenchAction					fActionResetPerspective;
+	private IWorkbenchAction					fActionClosePerspective;
+	private IWorkbenchAction					fActionCloseAllPerspective;
+	private IWorkbenchAction					fActionEditActionSets;
 
 	public ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
 		super(configurer);
@@ -84,10 +82,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			menu.add(changePerspMenuMgr);
 		}
 
-		menu.add(savePerspectiveAction);
-		menu.add(resetPerspectiveAction);
-		menu.add(closePerspAction);
-		menu.add(closeAllPerspsAction);
+		menu.add(fActionSavePerspective);
+		menu.add(fActionResetPerspective);
+		menu.add(fActionClosePerspective);
+		menu.add(fActionCloseAllPerspective);
 	}
 
 	private MenuManager createFileMenu() {
@@ -95,11 +93,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		final MenuManager fileMenu = new MenuManager(Messages.App_Action_Menu_file, IWorkbenchActionConstants.M_FILE);
 
 		fileMenu.add(new GroupMarker("fileNew")); //$NON-NLS-1$
-
-		fileMenu.add(fActionSave);
-		fileMenu.add(fActionSaveAll);
-
-		fileMenu.add(new GroupMarker("fileSave")); //$NON-NLS-1$
 
 		fileMenu.add(new Separator("update")); //$NON-NLS-1$
 		fileMenu.add(new Separator());
@@ -167,14 +160,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void fillCoolBar(final ICoolBarManager coolBar) {
 
 		final IToolBarManager tbmPeople = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		tbmPeople.add(personSelector);
+		tbmPeople.add(fPersonSelector);
 
 		coolBar.add(new ToolBarContributionItem(tbmPeople, "people")); //$NON-NLS-1$
 
 		// ---------------------------------------------------------
 
 		final IToolBarManager tbmTourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		tbmTourType.add(tourTypeSelector);
+		tbmTourType.add(fTourTypeSelector);
 
 		coolBar.add(new ToolBarContributionItem(tbmTourType, "tourtype")); //$NON-NLS-1$
 
@@ -185,52 +178,19 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI)) {
 
 			final IToolBarManager tbmSystem = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-			tbmSystem.add(measurementSelector);
+			tbmSystem.add(fMeasurementSelector);
 
 			coolBar.add(new ToolBarContributionItem(tbmSystem, "measurementSystem")); //$NON-NLS-1$
 		}
 
 		// ---------------------------------------------------------
 
-		final IToolBarManager tbmSave = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		tbmSave.add(fActionSave);
-		tbmSave.add(fActionSaveAll);
-
-		coolBar.add(new ToolBarContributionItem(tbmSave, "save")); //$NON-NLS-1$
-
-		// ---------------------------------------------------------
-
-//		IToolBarManager openToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+//		final IToolBarManager tbmSave = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+//		tbmSave.add(fActionSave);
+//		tbmSave.add(fActionSaveAll);
 //
-//		openToolbar.add(new Separator());
-//		openToolbar.add(fActionTourChartView);
-//
-//		openToolbar.add(new Separator());
-//		openToolbar.add(fActionRawDataView);
-//		openToolbar.add(fActionTourBookView);
-//		openToolbar.add(fActionTourCatalogView);
-//		openToolbar.add(fActionStatisticsView);
-//
-//		coolBar.add(new ToolBarContributionItem(openToolbar, "main")); //$NON-NLS-1$
+//		coolBar.add(new ToolBarContributionItem(tbmSave, "save")); //$NON-NLS-1$
 
-		// ---------------------------------------------------------
-
-//		IToolBarManager tbmCompare = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-//
-//		tbmCompare.add(new Separator());
-//		tbmCompare.add(fActionTourCompareWizard);
-//		tbmCompare.add(fActionTourCompareView);
-//
-//		coolBar.add(new ToolBarContributionItem(tbmCompare, "compare")); //$NON-NLS-1$
-
-		// ---------------------------------------------------------
-
-//		IToolBarManager prefToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-//
-//		prefToolbar.add(new Separator());
-//		prefToolbar.add(fActionPreferences);
-//
-//		coolBar.add(new ToolBarContributionItem(prefToolbar, "pref")); //$NON-NLS-1$
 	}
 
 	@Override
@@ -251,9 +211,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		fWindow = window;
 
-		personSelector = new PersonContributionItem();
-		tourTypeSelector = new TourTypeContributionItem();
-		measurementSelector = new MeasurementSystemContributionItem();
+		fPersonSelector = new PersonContributionItem();
+		fTourTypeSelector = new TourTypeContributionItem();
+		fMeasurementSelector = new MeasurementSystemContributionItem();
 
 		fActionQuit = ActionFactory.QUIT.create(window);
 		register(fActionQuit);
@@ -266,36 +226,30 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fActionPreferences.setText(Messages.App_Action_open_preferences);
 		register(fActionPreferences);
 
-		fActionSave = ActionFactory.SAVE.create(window);
-		register(fActionSave);
-
-		fActionSaveAll = ActionFactory.SAVE_ALL.create(window);
-		register(fActionSaveAll);
-
 		fActionViewShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
 
-		editActionSetAction = ActionFactory.EDIT_ACTION_SETS.create(window);
-		register(editActionSetAction);
+		fActionEditActionSets = ActionFactory.EDIT_ACTION_SETS.create(window);
+		register(fActionEditActionSets);
 
-		savePerspectiveAction = ActionFactory.SAVE_PERSPECTIVE.create(window);
-		register(savePerspectiveAction);
+		fActionSavePerspective = ActionFactory.SAVE_PERSPECTIVE.create(window);
+		register(fActionSavePerspective);
 
-		resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
-		register(resetPerspectiveAction);
+		fActionResetPerspective = ActionFactory.RESET_PERSPECTIVE.create(window);
+		register(fActionResetPerspective);
 
-		closePerspAction = ActionFactory.CLOSE_PERSPECTIVE.create(window);
-		register(closePerspAction);
+		fActionClosePerspective = ActionFactory.CLOSE_PERSPECTIVE.create(window);
+		register(fActionClosePerspective);
 
-		closeAllPerspsAction = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
-		register(closeAllPerspsAction);
+		fActionCloseAllPerspective = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
+		register(fActionCloseAllPerspective);
 
 	}
 
 	@Override
 	public IStatus saveState(final IMemento memento) {
 
-		personSelector.saveState(memento);
-		tourTypeSelector.saveState(memento);
+		fPersonSelector.saveState(memento);
+		fTourTypeSelector.saveState(memento);
 
 		return super.saveState(memento);
 	}
