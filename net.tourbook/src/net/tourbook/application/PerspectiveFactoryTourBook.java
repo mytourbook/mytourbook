@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.ui.views.TourChartView;
+import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.TourMarkerView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 

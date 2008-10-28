@@ -33,9 +33,9 @@ import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.views.TourChartViewPart;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourChartViewPart;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;

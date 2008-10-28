@@ -53,7 +53,7 @@ public class ActionEditTourMarker extends Action {
 		}
 
 		final TourData tourData = selectedTours.get(0);
-		(new MarkerDialog(Display.getCurrent().getActiveShell(), tourData, null)).open();
+		(new DialogMarker(Display.getCurrent().getActiveShell(), tourData, null)).open();
 
 		/*
 		 * Currently the dialog works with the markers from the tour editor not with a backup, so

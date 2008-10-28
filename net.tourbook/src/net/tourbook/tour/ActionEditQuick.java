@@ -47,7 +47,7 @@ public class ActionEditQuick extends Action {
 			return;
 		}
 
-		final QuickEditDialog dialog = new QuickEditDialog(Display.getCurrent().getActiveShell(), selectedTours.get(0));
+		final DialogQuickEdit dialog = new DialogQuickEdit(Display.getCurrent().getActiveShell(), selectedTours.get(0));
 		if (dialog.open() == Window.OK) {
 
 			// save all tours with the new tour type

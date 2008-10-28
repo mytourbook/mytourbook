@@ -223,7 +223,7 @@
       </category>
       <view
             category="net.tourbook.category.tour"
-            class="net.tourbook.ui.views.TourChartView"
+            class="net.tourbook.ui.tourChart.TourChartView"
             icon="icons/tour-chart.gif"
             id="net.tourbook.views.TourChartView"
             name="%view_name_Chart">
@@ -300,7 +300,7 @@
                       name="%view_name_ChartProperty"
                       id="net.tourbook.views.TourChartPropertyView"
                       category="net.tourbook.category.system"
-                      class="net.tourbook.ui.views.TourChartPropertyView"
+                      class="net.tourbook.ui.tourChart.TourChartPropertyView"
                       icon="icons/tourchart-properties.gif"
                       >
         </view>
@@ -745,7 +745,7 @@
             name="%command_general_preferences">
       </command>
       <command
-            defaultHandler="net.tourbook.tour.ActionHandlerViewSelectedTour"
+            defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewSelectedTour"
             id="net.tourbook.command.selectedTour"
             name="%command_view_selectedTour">
       </command>
@@ -778,18 +778,18 @@
             name="%command_tourCompare_wizard">
       </command>
       <command
-            defaultHandler="net.tourbook.tour.ActionHandlerViewGraphAnalyzer"
+            defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewGraphAnalyzer"
             id="net.tourbook.command.tourChart.tool.graphAnalyzer"
             name="%command_tourChart_tool_graphAnalyzer">
          
       </command>
       <command
-            defaultHandler="net.tourbook.tour.ActionHandlerViewTourSegmenter"
+            defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewTourSegmenter"
             id="net.tourbook.command.tourChart.tool.tourSegmenter"
             name="%command_tourChart_tool_tourSegmenter">
       </command>
       <command
-            defaultHandler="net.tourbook.tour.ActionHandlerViewTourProperties"
+            defaultHandler="net.tourbook.ui.tourChart.action.ActionHandlerViewTourProperties"
             id="net.tourbook.command.tourDataEditor"
             name="%command_view_tourEditor">
       </command>

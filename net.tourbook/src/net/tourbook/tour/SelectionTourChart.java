@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.ui.tourChart.TourChart;
+
 import org.eclipse.jface.viewers.ISelection;
 
 /**

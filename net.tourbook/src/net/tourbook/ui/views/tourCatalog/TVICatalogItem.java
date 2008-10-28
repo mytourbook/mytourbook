@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.TreeViewerItem;
 
 public abstract class TVICatalogItem extends TreeViewerItem {
 

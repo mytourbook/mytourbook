@@ -19,8 +19,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 
 import net.tourbook.data.TourCompared;
-import net.tourbook.tour.TVICatalogTourItem;
-import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.TreeViewerItem;
 
 /**
  * Represents a compared tour (tree item) in the tour map viewer

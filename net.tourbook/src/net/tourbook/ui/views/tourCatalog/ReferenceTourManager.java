@@ -29,10 +29,10 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourChart;
-import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;

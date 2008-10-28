@@ -23,9 +23,9 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ViewerDetailForm;
+import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.util.TableLayoutComposite;
 
 import org.eclipse.jface.dialogs.IDialogSettings;

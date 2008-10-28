@@ -22,8 +22,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 
 public abstract class TVITagViewItem extends TreeViewerItem {

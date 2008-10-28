@@ -36,6 +36,8 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.StringToArrayConverter;
@@ -530,7 +532,7 @@ public class TourManager {
 	 * @param chartConfig
 	 * @param prefStore
 	 */
-	static void updateZoomOptionsInChartConfig(	final TourChartConfiguration chartConfig,
+	public static void updateZoomOptionsInChartConfig(	final TourChartConfiguration chartConfig,
 												final IPreferenceStore prefStore) {
 
 		chartConfig.autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);

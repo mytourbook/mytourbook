@@ -21,7 +21,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import net.tourbook.tour.ITourItem;
-import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.TreeViewerItem;
 
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 

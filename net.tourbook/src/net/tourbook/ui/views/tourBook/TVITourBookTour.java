@@ -17,7 +17,7 @@ package net.tourbook.ui.views.tourBook;
 
 import java.util.ArrayList;
 
-import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.TreeViewerItem;
 
 public class TVITourBookTour extends TVITourBookItem {
 

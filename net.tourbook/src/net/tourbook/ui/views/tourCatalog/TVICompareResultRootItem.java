@@ -18,7 +18,7 @@ package net.tourbook.ui.views.tourCatalog;
 import java.util.ArrayList;
 
 import net.tourbook.data.TourReference;
-import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.TreeViewerItem;
 
 /**
  * Rootitem for compare results, the children are reference tours

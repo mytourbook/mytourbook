@@ -19,7 +19,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
-import net.tourbook.tour.TourChartConfiguration;
+import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 /**
  * contains data and configuration for the compared tour

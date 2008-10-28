@@ -24,13 +24,8 @@ import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ActionRemoveAllTags;
-import net.tourbook.tag.ActionSetTourTag;
-import net.tourbook.tag.TagManager;
-import net.tourbook.ui.ActionOpenPrefDialog;
-import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 
 import org.eclipse.jface.action.Action;
@@ -40,19 +35,12 @@ import org.eclipse.swt.widgets.Display;
 
 public class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
-	public ChartXSlider				fSlider;
+	public ChartXSlider		fSlider;
 
-	private MarkerDialog			fMarkerDialog;
-	private TourEditor				fTourEditor;
+	private TourEditor		fTourEditor;
+	private DialogMarker	fMarkerDialog;
 
-	private ActionSetTourType		fActionSetTourType;
-	private ActionEditQuick			fActionQuickEdit;
-
-	private ActionSetTourTag		fActionAddTag;
-	private ActionSetTourTag		fActionRemoveTag;
-	private ActionRemoveAllTags		fActionRemoveAllTags;
-
-	private ActionOpenPrefDialog	fActionOpenTagPrefs;
+	private ActionEditQuick	fActionQuickEdit;
 
 	/**
 	 * add a new reference tour to all reference tours
@@ -102,7 +90,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 				final TourMarker newTourMarker = createTourMarker(tourData);
 
-				final MarkerDialog markerDialog = new MarkerDialog(Display.getCurrent().getActiveShell(),
+				final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(),
 						tourData,
 						null);
 
@@ -134,7 +122,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		}
 	}
 
-	public TourChartContextProvider(final MarkerDialog markerDialog) {
+	public TourChartContextProvider(final DialogMarker markerDialog) {
 		fMarkerDialog = markerDialog;
 	}
 
@@ -143,14 +131,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		fTourEditor = tourEditor;
 
 		fActionQuickEdit = new ActionEditQuick(this);
-		fActionSetTourType = new ActionSetTourType(this);
-
-		fActionAddTag = new ActionSetTourTag(this, true);
-		fActionRemoveTag = new ActionSetTourTag(this, false);
-		fActionRemoveAllTags = new ActionRemoveAllTags(this);
-
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
-				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 
 	private void createMarkerMenu(	final IMenuManager menuMgr,
@@ -173,28 +153,13 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	 * enable actions for the tour editor
 	 */
 	private void enableActions() {
-		
+
 		final TourChart tourChart = fTourEditor.getTourChart();
 		final TourData tourData = tourChart.getTourData();
 
 		final boolean isDataAvailable = tourData != null && tourData.getTourPerson() != null;
 
-		boolean isTagAvailable = false;
-		if (isDataAvailable) {
-			isTagAvailable = tourData.getTourTags().size() > 0;
-		}
-
 		fActionQuickEdit.setEnabled(isDataAvailable);
-		fActionSetTourType.setEnabled(TourDatabase.getTourTypes().size() > 0);
-
-		fActionAddTag.setEnabled(isDataAvailable);
-		fActionRemoveTag.setEnabled(isDataAvailable && isTagAvailable);
-		fActionRemoveAllTags.setEnabled(isDataAvailable && isTagAvailable);
-
-		fActionSetTourType.setEnabled(isDataAvailable);
-
-		// enable actions for the recent tags
-		TagManager.enableRecentTagActions(isDataAvailable);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
@@ -207,17 +172,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 			menuMgr.add(new Separator());
 			menuMgr.add(fActionQuickEdit);
-			menuMgr.add(fActionSetTourType);
-
-			menuMgr.add(new Separator());
-			menuMgr.add(fActionAddTag);
-			menuMgr.add(fActionRemoveTag);
-			menuMgr.add(fActionRemoveAllTags);
-
-			TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-
-			menuMgr.add(new Separator());
-			menuMgr.add(fActionOpenTagPrefs);
 
 			enableActions();
 		}
@@ -261,6 +215,5 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		return selectedTourData;
 
 	}
-
 
 }

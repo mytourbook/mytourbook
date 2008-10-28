@@ -26,12 +26,12 @@ import java.util.Formatter;
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourChart;
-import net.tourbook.tour.TourChartConfiguration;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.ViewerDetailForm;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;

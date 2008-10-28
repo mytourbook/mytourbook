@@ -31,11 +31,11 @@ import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TreeViewerItem;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionExpandSelection;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourViewer;
+import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.Preferences;

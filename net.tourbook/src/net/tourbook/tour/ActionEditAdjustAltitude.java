@@ -55,7 +55,7 @@ public class ActionEditAdjustAltitude extends Action {
 
 		final TourData tourData = selectedTours.get(0);
 
-		final AdjustAltitudeDialog dialog = new AdjustAltitudeDialog(Display.getCurrent().getActiveShell(), tourData);
+		final DialogAdjustAltitude dialog = new DialogAdjustAltitude(Display.getCurrent().getActiveShell(), tourData);
 		dialog.create();
 		dialog.init();
 

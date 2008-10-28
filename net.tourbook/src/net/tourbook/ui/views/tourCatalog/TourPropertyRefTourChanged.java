@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import net.tourbook.tour.TourChart;
+import net.tourbook.ui.tourChart.TourChart;
 
 public class TourPropertyRefTourChanged {
 

@@ -24,9 +24,9 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourReference;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.SelectionTourChart;
-import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.views.TourChartViewPart;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourChartViewPart;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;

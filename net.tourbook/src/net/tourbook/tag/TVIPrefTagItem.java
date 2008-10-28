@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
-import net.tourbook.tour.TreeViewerItem;
+import net.tourbook.ui.TreeViewerItem;
 
 import org.eclipse.jface.viewers.TreeViewer;
 

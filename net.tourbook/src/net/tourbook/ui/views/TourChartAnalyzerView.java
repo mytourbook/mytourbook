@@ -32,10 +32,10 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.TourChart;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
