@@ -23,20 +23,12 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
-
-import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.widgets.Display;
 
 /**
  *
@@ -47,8 +39,6 @@ public class ReferenceTourManager {
 
 	private final HashMap<Long, TourCompareConfig>	fCompareConfigCache	= new HashMap<Long, TourCompareConfig>();
 
-	private ReferenceTourManager() {}
-
 	public static ReferenceTourManager getInstance() {
 		if (instance == null) {
 			instance = new ReferenceTourManager();
@@ -56,41 +46,26 @@ public class ReferenceTourManager {
 		return instance;
 	}
 
+	private ReferenceTourManager() {}
+
 	/**
-	 * persists a new reference tour
-	 * 
-	 * @param tourEditor
+	 * @return Returns an array with all reference tours
 	 */
-	public TourReference addReferenceTour(final TourEditor tourEditor) {
+	public Object[] getReferenceTours() {
 
-		// get the reference tour name
-		final InputDialog dialog = new InputDialog(Display.getCurrent().getActiveShell(),
-				Messages.tourCatalog_view_dlg_add_reference_tour_title,
-				Messages.tourCatalog_view_dlg_add_reference_tour_msg,
-				"", //$NON-NLS-1$
-				null);
+		List<?> referenceTours = null;
 
-		if (dialog.open() != Window.OK) {
-			return null;
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		if (em != null) {
+
+			referenceTours = em.createQuery("SELECT refTour \n" //$NON-NLS-1$
+					+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " refTour")).getResultList(); //$NON-NLS-1$ //$NON-NLS-2$
+
+			em.close();
 		}
 
-		final TourChart tourChart = tourEditor.getTourChart();
-		final SelectionChartInfo chartInfo = tourChart.getChartInfo();
-		final TourData tourData = tourChart.getTourData();
-
-		// create new tour reference
-		final TourReference newTourReference = new TourReference(dialog.getValue(),
-				tourData,
-				chartInfo.leftSliderValuesIndex,
-				chartInfo.rightSliderValuesIndex);
-
-		// add the tour reference into the tour data collection
-		tourData.getTourReferences().add(newTourReference);
-
-		tourEditor.setTourDirty();
-		tourEditor.setRefTourIsCreated();
-
-		return newTourReference;
+		return referenceTours.toArray();
 	}
 
 	/**
@@ -141,25 +116,5 @@ public class ReferenceTourManager {
 		}
 
 		return compareConfig;
-	}
-
-	/**
-	 * @return Returns an array with all reference tours
-	 */
-	public Object[] getReferenceTours() {
-
-		List<?> referenceTours = null;
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-		if (em != null) {
-
-			referenceTours = em.createQuery("SELECT refTour \n" //$NON-NLS-1$
-					+ ("FROM " + TourDatabase.TABLE_TOUR_REFERENCE + " refTour")).getResultList(); //$NON-NLS-1$ //$NON-NLS-2$
-
-			em.close();
-		}
-
-		return referenceTours.toArray();
 	}
 }

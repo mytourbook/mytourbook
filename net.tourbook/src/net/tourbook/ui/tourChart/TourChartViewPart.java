@@ -21,6 +21,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -93,19 +94,21 @@ public abstract class TourChartViewPart extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
 				if (fTourData == null || part == TourChartViewPart.this) {
 					return;
 				}
 
-				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
+				if (propertyId == TourProperty.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
 
-				} else if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+				} else if (propertyId == TourProperty.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 					fTourChart.updateTourChart(true, true);
 
-				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				} else if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					final TourData tourData = UI.getTourPropertyTourData((TourProperties) propertyData, fTourData);
 					if (tourData != null) {

@@ -81,7 +81,7 @@ public class ActionEditAdjustAltitude extends Action {
 					modifiedTours.add(tourData);
 					final TourProperties propertyData = new TourProperties(modifiedTours);
 
-					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, propertyData);
+					TourManager.firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED, propertyData);
 				}
 			}
 		}

@@ -25,6 +25,7 @@ import net.tourbook.data.TourReference;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartViewPart;
 
@@ -222,7 +223,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 				final int refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
 						- xValues[refTour.getStartValueIndex()];
 
-				TourManager.firePropertyChange(TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED,
+				TourManager.firePropertyChange(TourProperty.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED,
 						new TourPropertyRefTourChanged(fTourChart, refTour.getRefId(), refTourXMarkerValue),
 						TourCatalogViewReferenceTour.this);
 

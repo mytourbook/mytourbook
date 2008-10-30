@@ -24,6 +24,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
@@ -101,11 +102,11 @@ public class ActionRemoveAllTags extends Action {
 
 					// tours are not saved but the tour provider must be notified
 
-					TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED,
+					TourManager.firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED,
 							new TourProperties(selectedTours));
 				}
 
-				TourManager.firePropertyChange(TourManager.NOTIFY_TAG_VIEW, //
+				TourManager.firePropertyChange(TourProperty.NOTIFY_TAG_VIEW, //
 						new ChangedTags(removedTags, selectedTours, false));
 			}
 		};

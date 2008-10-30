@@ -36,6 +36,7 @@ import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionCollapseOthers;
 import net.tourbook.ui.ActionEditTour;
@@ -218,9 +219,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private void addCompareTourPropertyListener() {
 
 		fCompareTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED
+				if (propertyId == TourProperty.TOUR_PROPERTY_COMPARE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyCompareTourChanged) {
 
 					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
@@ -405,13 +408,15 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
 				if (part == TourCatalogView.this) {
 					return;
 				}
 
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					// get a clone of the modified tours because the tours are removed from the list
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
@@ -419,7 +424,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 						updateTourViewer(fRootItem, modifiedTours);
 					}
 
-				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
+				} else if (propertyId == TourProperty.TAG_STRUCTURE_CHANGED
+						|| propertyId == TourProperty.REFERENCE_TOUR_IS_CREATED) {
 
 					reloadViewer();
 				}
@@ -886,21 +892,16 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		// show the reference tour chart
 		final Object item = selection.getFirstElement();
 
-		ISelection tourCatalogSelection = null;
-		boolean selectTourInChart = false;
-
 		if (item instanceof TVICatalogReferenceTour) {
 
 			// reference tour is selected
 
 			final TVICatalogReferenceTour refItem = (TVICatalogReferenceTour) item;
 
-			tourCatalogSelection = new SelectionTourCatalogView(refItem.refId);
 			fActiveRefId = refItem.refId;
 
-			((SelectionTourCatalogView) tourCatalogSelection).setRefItem(refItem);
-
-			selectTourInChart = true;
+			// fire selection for the selected tour catalog item
+			fPostSelectionProvider.setSelection(new SelectionTourCatalogView(refItem));
 
 		} else if (item instanceof TVICatalogYearItem) {
 
@@ -908,12 +909,20 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 			final TVICatalogYearItem yearItem = (TVICatalogYearItem) item;
 
-			tourCatalogSelection = new SelectionTourCatalogView(yearItem.refId);
 			fActiveRefId = yearItem.refId;
 
-			((SelectionTourCatalogView) tourCatalogSelection).setYearData(yearItem);
+			// fire selection for the selected tour catalog item
+			fPostSelectionProvider.setSelection(new SelectionTourCatalogView(yearItem));
 
-			selectTourInChart = true;
+			/*
+			 * get selection from year statistic view, this selection is set from the previous fired
+			 * selection
+			 */
+			final ISelection selectionInTourChart = getSite().getWorkbenchWindow()
+					.getSelectionService()
+					.getSelection(TourCatalogViewYearStatistic.ID);
+
+			fPostSelectionProvider.setSelection(selectionInTourChart);
 
 		} else if (item instanceof TVICatalogComparedTour) {
 
@@ -921,27 +930,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 			final TVICatalogComparedTour compItem = (TVICatalogComparedTour) item;
 
-			tourCatalogSelection = new StructuredSelection(compItem);
 			fActiveRefId = compItem.getRefId();
-		}
-
-		if (tourCatalogSelection != null) {
 
 			// fire selection for the selected tour catalog item
-			fPostSelectionProvider.setSelection(tourCatalogSelection);
-
-			if (selectTourInChart) {
-
-				/*
-				 * get selection from year statistic view, this selection is set from the previous
-				 * fired selection
-				 */
-				final ISelection selectionInTourChart = getSite().getWorkbenchWindow()
-						.getSelectionService()
-						.getSelection(TourCatalogViewYearStatistic.ID);
-
-				fPostSelectionProvider.setSelection(selectionInTourChart);
-			}
+			fPostSelectionProvider.setSelection(new StructuredSelection(compItem));
 		}
 	}
 

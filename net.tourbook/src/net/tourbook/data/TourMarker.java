@@ -26,7 +26,7 @@ import net.tourbook.Messages;
 import net.tourbook.chart.ChartMarker;
 
 @Entity
-public class TourMarker {
+public class TourMarker implements Cloneable {
 
 	/**
 	 * visual position for markers, they must correspond to the position in {@link ChartMarker}
@@ -47,6 +47,9 @@ public class TourMarker {
 			Messages.Tour_Marker_Position_horizontal_right, // 11
 															};
 
+	/**
+	 * Unique id for the {@link TourMarker} entity
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long					markerId;
@@ -70,8 +73,8 @@ public class TourMarker {
 	private int						visualPosition;
 
 	private int						labelXOffset;
-	private int						labelYOffset;
 
+	private int						labelYOffset;
 	/**
 	 * markerType contains the type of the marker, this can be: crossing, hotel, view point
 	 */
@@ -83,8 +86,8 @@ public class TourMarker {
 	private int						serieIndex;
 
 	private String					label					= "";	//$NON-NLS-1$
-	private String					category				= "";	//$NON-NLS-1$
 
+	private String					category				= "";	//$NON-NLS-1$
 	/**
 	 * visibleType is used to show the marker with different visible effects (color)
 	 */
@@ -96,6 +99,29 @@ public class TourMarker {
 	public TourMarker(final TourData tourData, final int markerType) {
 		this.tourData = tourData;
 		this.type = markerType;
+	}
+
+	public TourMarker(final TourMarker tourMarker) {
+
+		category = new String(tourMarker.category);
+		label = new String(tourMarker.label);
+
+		distance = tourMarker.distance;
+		labelXOffset = tourMarker.labelXOffset;
+		labelYOffset = tourMarker.labelYOffset;
+		markerId = tourMarker.markerId;
+		markerType = tourMarker.markerType;
+		serieIndex = tourMarker.serieIndex;
+		time = tourMarker.time;
+		type = tourMarker.type;
+		visualPosition = tourMarker.visualPosition;
+
+		tourData = tourMarker.tourData;
+	}
+
+	@Override
+	public TourMarker clone() {
+		return new TourMarker(this);
 	}
 
 	/**
@@ -134,6 +160,24 @@ public class TourMarker {
 			return false;
 		}
 
+		return true;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof TourMarker)) {
+			return false;
+		}
+		final TourMarker other = (TourMarker) obj;
+		if (markerId != other.markerId) {
+			return false;
+		}
 		return true;
 	}
 
@@ -186,6 +230,14 @@ public class TourMarker {
 
 	public int getVisualPosition() {
 		return visualPosition;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (markerId ^ (markerId >>> 32));
+		return result;
 	}
 
 	/**

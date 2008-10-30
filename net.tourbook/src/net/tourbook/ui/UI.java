@@ -33,7 +33,9 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -66,12 +68,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 public class UI {
 
@@ -293,29 +291,29 @@ public class UI {
 		return instance;
 	}
 
-	/**
-	 * @return Returns a list with all opened editors
-	 */
-	public static ArrayList<IEditorPart> getOpenedEditors() {
-
-		final ArrayList<IEditorPart> editorParts = new ArrayList<IEditorPart>();
-
-		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
-				for (final IEditorReference editorRef : wbPage.getEditorReferences()) {
-
-					final IEditorPart editor = editorRef.getEditor(false);
-
-					if (editor != null) {
-						editorParts.add(editor);
-					}
-				}
-			}
-		}
-
-		return editorParts;
-	}
-
+//	/**
+//	 * @return Returns a list with all opened editors
+//	 */
+//	public static ArrayList<IEditorPart> getOpenedEditors() {
+//
+//		final ArrayList<IEditorPart> editorParts = new ArrayList<IEditorPart>();
+//
+//		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+//			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
+//				for (final IEditorReference editorRef : wbPage.getEditorReferences()) {
+//
+//					final IEditorPart editor = editorRef.getEditor(false);
+//
+//					if (editor != null) {
+//						editorParts.add(editor);
+//					}
+//				}
+//			}
+//		}
+//
+//		return editorParts;
+//	}
+//
 //	/**
 //	 * @return Returns the tour data editor or <code>null</code> when the editor is not opened
 //	 */
@@ -382,6 +380,30 @@ public class UI {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Check if the tour is modified
+	 * 
+	 * @param tourData
+	 *            tour which is checked
+	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
+	 */
+	public static boolean isTourModified(final TourData tourData) {
+
+		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+		if (tourDataEditor != null
+				&& tourDataEditor.isDirty()
+				&& tourData.getTourId().longValue() == tourDataEditor.getTourData().getTourId().longValue()) {
+
+			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+					Messages.dialog_is_tour_modified_title,
+					Messages.dialog_is_tour_modified_message);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

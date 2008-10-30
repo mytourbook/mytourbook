@@ -47,6 +47,7 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ActionEditTour;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ActionOpenPrefDialog;
@@ -322,13 +323,15 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
 				if (part == RawDataView.this) {
 					return;
 				}
 
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					// update modified tours
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
@@ -341,7 +344,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 						fTourViewer.update(modifiedTours.toArray(), null);
 					}
 
-				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
+				} else if (propertyId == TourProperty.TAG_STRUCTURE_CHANGED) {
 
 					RawDataManager.getInstance().updateTourDataFromDb();
 

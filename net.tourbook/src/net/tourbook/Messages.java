@@ -25,6 +25,10 @@ public class Messages extends NLS {
 
 	public static String		Image__edit_tour_marker;
 
+	public static String	dialog_is_tour_modified_message;
+
+	public static String	dialog_is_tour_modified_title;
+
 	public static String		dialog_quick_edit_dialog_area_title;
 	public static String		dialog_quick_edit_dialog_save;
 	public static String		dialog_quick_edit_dialog_title;
@@ -642,6 +646,8 @@ public class Messages extends NLS {
 	public static String		tourCatalog_view_compare_job_task;
 	public static String		tourCatalog_view_compare_job_title;
 	public static String		tourCatalog_view_dlg_add_reference_tour_msg;
+
+	public static String	tourCatalog_view_dlg_add_reference_tour_save_modified_tour;
 	public static String		tourCatalog_view_dlg_add_reference_tour_title;
 	public static String		tourCatalog_view_dlg_delete_comparedTour_msg;
 	public static String		tourCatalog_view_dlg_delete_comparedTour_title;

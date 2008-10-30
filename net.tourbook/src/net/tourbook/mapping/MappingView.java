@@ -39,6 +39,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
@@ -509,17 +510,19 @@ public class MappingView extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
 				if (part == MappingView.this) {
 					return;
 				}
 
-				if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+				if (propertyId == TourProperty.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 					resetMap();
 
-				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				} else if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
 					if (modifiedTours != null && modifiedTours.size() > 0) {
@@ -528,7 +531,7 @@ public class MappingView extends ViewPart {
 						resetMap();
 					}
 
-				} else if (propertyId == TourManager.SLIDER_POSITION_CHANGED) {
+				} else if (propertyId == TourProperty.SLIDER_POSITION_CHANGED) {
 					onSelectionChanged((ISelection) propertyData);
 				}
 			}
@@ -1096,38 +1099,46 @@ public class MappingView extends ViewPart {
 			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
 			if (chartDataModel != null) {
 
-				final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-				if (tourData != null) {
+				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				if (tourId instanceof Long) {
 
-					final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+					if (tourData != null) {
 
-					paintTourSliders(tourData,
-							chartInfo.leftSliderValuesIndex,
-							chartInfo.rightSliderValuesIndex,
-							chartInfo.selectedSliderValuesIndex);
+						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
 
-					enableActions(false);
+						paintTourSliders(tourData,
+								chartInfo.leftSliderValuesIndex,
+								chartInfo.rightSliderValuesIndex,
+								chartInfo.selectedSliderValuesIndex);
+
+						enableActions(false);
+					}
 				}
 			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
 
 			final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
-
 			final ChartDataModel chartDataModel = xSliderPos.getChart().getChartDataModel();
-			final TourData tourData = (TourData) chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-			if (tourData != null) {
 
-				final int leftSliderValueIndex = xSliderPos.getSlider1ValueIndex();
-				int rightSliderValueIndex = xSliderPos.getSlider2ValueIndex();
+			final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+			if (tourId instanceof Long) {
 
-				rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-						? leftSliderValueIndex
-						: rightSliderValueIndex;
+				final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+				if (tourData != null) {
 
-				paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex, leftSliderValueIndex);
+					final int leftSliderValueIndex = xSliderPos.getSlider1ValueIndex();
+					int rightSliderValueIndex = xSliderPos.getSlider2ValueIndex();
 
-				enableActions(false);
+					rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+							? leftSliderValueIndex
+							: rightSliderValueIndex;
+
+					paintTourSliders(tourData, leftSliderValueIndex, rightSliderValueIndex, leftSliderValueIndex);
+
+					enableActions(false);
+				}
 			}
 
 		} else if (selection instanceof PointOfInterest) {

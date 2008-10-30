@@ -33,6 +33,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ActionModifyColumns;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourViewer;
@@ -330,13 +331,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
 				if (fTourData == null || part == TourSegmenterView.this) {
 					return;
 				}
 
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					final TourProperties tourProperties = (TourProperties) propertyData;
 					final ArrayList<TourData> modifiedTours = tourProperties.getModifiedTours();
@@ -753,7 +756,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void fireSegmentLayerChanged() {
 
 		// show/hide the segments in the chart
-		TourManager.firePropertyChange(TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED,
+		TourManager.firePropertyChange(TourProperty.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED,
 				fShowSegmentsInChart,
 				TourSegmenterView.this);
 	}

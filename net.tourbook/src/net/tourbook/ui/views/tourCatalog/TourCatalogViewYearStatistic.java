@@ -36,6 +36,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.ActionSelectYears;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.UI;
 import net.tourbook.util.ArrayListToArray;
 import net.tourbook.util.PostSelectionProvider;
@@ -139,9 +140,11 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	private void addCompareTourPropertyListener() {
 
 		fCompareTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED
+				if (propertyId == TourProperty.TOUR_PROPERTY_COMPARE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyCompareTourChanged) {
 
 					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;

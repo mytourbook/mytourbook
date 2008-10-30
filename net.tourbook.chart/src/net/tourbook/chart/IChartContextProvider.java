@@ -23,29 +23,15 @@ import org.eclipse.jface.action.IMenuManager;
 public interface IChartContextProvider {
 
 	/**
-	 * Fills the context menu for the chart slider
-	 * 
-	 * @param menuMgr
-	 * @param leftSlider
-	 * @param rightSlider
-	 * @return
-	 */
-	public void fillXSliderContextMenu(	IMenuManager menuMgr,
-										ChartXSlider leftSlider,
-										ChartXSlider rightSlider);;
-
-	/**
 	 * Will be called when the context menu in a bar chart will be opened
 	 * 
 	 * @param hoveredBarSerieIndex
-	 *        contains the serie index for the hovered bar,<br>
-	 *        or <code>-1</code> when a bar is not hovered
+	 *            contains the serie index for the hovered bar,<br>
+	 *            or <code>-1</code> when a bar is not hovered
 	 * @param hoveredBarValueIndex
 	 * @param chartWidget
 	 */
-	public void fillBarChartContextMenu(IMenuManager menuMgr,
-										int hoveredBarSerieIndex,
-										int hoveredBarValueIndex);
+	public void fillBarChartContextMenu(IMenuManager menuMgr, int hoveredBarSerieIndex, int hoveredBarValueIndex);;
 
 	/**
 	 * Fills the context menu for the chart
@@ -53,5 +39,25 @@ public interface IChartContextProvider {
 	 * @param menuMgr
 	 */
 	public void fillContextMenu(IMenuManager menuMgr);
+
+	/**
+	 * Fills the context menu for the chart slider
+	 * 
+	 * @param menuMgr
+	 * @param leftSlider
+	 * @param rightSlider
+	 * @return
+	 */
+	public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider);
+
+	/**
+	 * @return Returns the left slider
+	 */
+	public ChartXSlider getLeftSlider();
+
+	/**
+	 * @return Returns the right slider
+	 */
+	public ChartXSlider getRightSlider();
 
 }

@@ -35,34 +35,23 @@ public class SelectionTourCatalogView implements ISelection {
 	 * unique id for {@link TourCompared} entity or <code>-1</code> when the compared tour is not
 	 * saved in the database
 	 */
-	private Long					fCompareId;
 	private Long					fCompTourId;
 
-	private int						fCompareStartIndex;
-	private int						fCompareEndIndex;
-
-	private TVICatalogYearItem		fYearItem;
-
 	private TVICatalogReferenceTour	fRefItem;
+	private TVICatalogYearItem		fYearItem;
 
 	public SelectionTourCatalogView(final Long refId) {
 		fRefId = refId;
 	}
 
-	public int getCompareEndIndex() {
-		return fCompareEndIndex;
+	public SelectionTourCatalogView(final TVICatalogReferenceTour refItem) {
+		fRefId = refItem.refId;
+		fRefItem = refItem;
 	}
 
-	/**
-	 * @return Returns the key for the {@link TourCompared} instance or <code>null</code> when it's
-	 *         not set
-	 */
-	public Long getCompareId() {
-		return fCompareId;
-	}
-
-	public int getCompareStartIndex() {
-		return fCompareStartIndex;
+	public SelectionTourCatalogView(final TVICatalogYearItem yearItem) {
+		fRefId = yearItem.refId;
+		fYearItem = yearItem;
 	}
 
 	/**
@@ -96,36 +85,12 @@ public class SelectionTourCatalogView implements ISelection {
 		return false;
 	}
 
-	public void setRefItem(final TVICatalogReferenceTour refItem) {
-		fRefItem = refItem;
-	}
-
-	/**
-	 * Set data for the compared tour
-	 * 
-	 * @param compareId
-	 *            database Id for the compared tour
-	 * @param compTourId
-	 *            database Id for the compared tour data
-	 * @param compStartIndex
-	 *            start index of the x-marker
-	 * @param compEndIndex
-	 *            end index of the x-marker
-	 */
-	public void setTourCompareData(	final long compareId,
-									final long compTourId,
-									final int compStartIndex,
-									final int compEndIndex) {
-
-		fCompareId = compareId;
-		fCompTourId = compTourId;
-
-		fCompareStartIndex = compStartIndex;
-		fCompareEndIndex = compEndIndex;
-	}
-
-	public void setYearData(final TVICatalogYearItem yearItem) {
-		fYearItem = yearItem;
-	}
+//	public void setRefItem(final TVICatalogReferenceTour refItem) {
+//		fRefItem = refItem;
+//	}
+//
+//	public void setYearData(final TVICatalogYearItem yearItem) {
+//		fYearItem = yearItem;
+//	}
 
 }

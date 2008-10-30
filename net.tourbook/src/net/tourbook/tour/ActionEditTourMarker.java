@@ -19,11 +19,13 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionEditTourMarker extends Action {
@@ -31,6 +33,13 @@ public class ActionEditTourMarker extends Action {
 	private ITourProvider	fTourProvider;
 	private boolean			fIsSaveTour;
 
+	private TourMarker		fSelectedTourMarker;
+
+	/**
+	 * @param tourProvider
+	 * @param isSaveTour
+	 *            when <code>true</code> the tour will be saved when the marker dialog is closed
+	 */
 	public ActionEditTourMarker(final ITourProvider tourProvider, final boolean isSaveTour) {
 
 		fTourProvider = tourProvider;
@@ -53,33 +62,37 @@ public class ActionEditTourMarker extends Action {
 		}
 
 		final TourData tourData = selectedTours.get(0);
-		(new DialogMarker(Display.getCurrent().getActiveShell(), tourData, null)).open();
 
-		/*
-		 * Currently the dialog works with the markers from the tour editor not with a backup, so
-		 * changes in the dialog are made in the tourdata of the tour editor -> the tour will be
-		 * dirty when this dialog was opened
-		 */
+		final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(),
+				tourData,
+				fSelectedTourMarker);
 
-		if (fIsSaveTour) {
-			TourManager.saveModifiedTours(selectedTours);
-		} else {
+		if (markerDialog.open() == Window.OK) {
 
-			/*
-			 * don't save the tour, just update the tour data editor
-			 */
-			final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-			if (tourDataEditor != null) {
+			if (fIsSaveTour) {
+				TourManager.saveModifiedTours(selectedTours);
+			} else {
 
-				tourDataEditor.updateUI(tourData, true);
+				/*
+				 * don't save the tour, just update the tour data editor
+				 */
+				final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+				if (tourDataEditor != null) {
 
-				final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
-				modifiedTours.add(tourData);
-				final TourProperties propertyData = new TourProperties(modifiedTours);
+					tourDataEditor.updateUI(tourData, true);
 
-				TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, propertyData);
+					final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
+					modifiedTours.add(tourData);
+					final TourProperties propertyData = new TourProperties(modifiedTours);
+
+					TourManager.firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED, propertyData);
+				}
 			}
 		}
+	}
+
+	public void setSelectedMarker(final TourMarker tourMarker) {
+		fSelectedTourMarker = tourMarker;
 	}
 
 }

@@ -230,6 +230,13 @@
       </view>
       <view
             category="net.tourbook.category.tour"
+            class="net.tourbook.mapping.MappingView"
+            icon="icons/earth-globe-abstract.png"
+            id="net.tourbook.mapping.mappingViewID"
+            name="%view_name_tour_map">
+      </view>
+      <view
+            category="net.tourbook.category.tour"
             class="net.tourbook.ui.views.tourDataEditor.TourDataEditorView"
             icon="icons/tour-editor.gif"
             id="net.tourbook.views.TourDataEditorView"
@@ -238,7 +245,7 @@
       <view
             category="net.tourbook.category.tour"
             class="net.tourbook.ui.views.TourMarkerView"
-            icon="icons/marker-list.gif"
+            icon="icons/marker-editor.gif"
             id="net.tourbook.views.TourMarkerView"
             name="%view_name_Marker"/>
      <view
@@ -305,17 +312,6 @@
                       >
         </view>
         
-      <category
-            id="net.tourbook.category.tourMaps"
-            name="%view_category_tour_map">
-      </category>
-      <view
-            category="net.tourbook.category.tourMaps"
-            class="net.tourbook.mapping.MappingView"
-            icon="icons/earth-globe-abstract.png"
-            id="net.tourbook.mapping.mappingViewID"
-            name="%view_name_tour_map" >
-      </view>
       <view
             category="net.tourbook.category.system"
             class="net.tourbook.mapping.TourMapPropertyView"
@@ -449,9 +445,9 @@
          point="org.eclipse.ui.editors">
       <editor
             class="net.tourbook.tour.TourEditor"
-            icon="icons/tour-editor.gif"
+            icon="icons/tour-viewer.gif"
             id="net.tourbook.tour.TourEditor"
-            name="Tour Editor">
+            name="%command_view_tourViewer">
       </editor>
    </extension>
    <extension

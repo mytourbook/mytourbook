@@ -37,6 +37,7 @@ import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionEditTour;
 import net.tourbook.ui.ActionModifyColumns;
@@ -171,9 +172,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private void addCompareTourPropertyListener() {
 
 		fCompareTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED
+				if (propertyId == TourProperty.TOUR_PROPERTY_COMPARE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyCompareTourChanged) {
 
 					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
@@ -357,20 +360,22 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
 				if (part == TourCompareResultView.this) {
 					return;
 				}
 
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
 						updateTourViewer(fRootItem, modifiedTours);
 					}
 
-				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
+				} else if (propertyId == TourProperty.TAG_STRUCTURE_CHANGED) {
 
 					reloadViewer();
 				}

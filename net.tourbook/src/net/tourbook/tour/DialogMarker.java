@@ -16,6 +16,7 @@
 package net.tourbook.tour;
 
 import java.text.NumberFormat;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import net.tourbook.Messages;
@@ -32,7 +33,6 @@ import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.TableLayoutComposite;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -93,7 +93,7 @@ public class DialogMarker extends TitleAreaDialog {
 	private TourData			fTourData;
 
 	/**
-	 * currently selected tour marker
+	 * marker which is currently selected
 	 */
 	private TourMarker			fSelectedTourMarker;
 
@@ -130,7 +130,9 @@ public class DialogMarker extends TitleAreaDialog {
 
 	private NumberFormat		fNF								= NumberFormat.getNumberInstance();
 
-//	private Image				fWindowIcon;
+	private HashSet<TourMarker>	fTourMarkersBackup;
+
+	private boolean				fIsOkPressed					= false;
 
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -205,6 +207,16 @@ public class DialogMarker extends TitleAreaDialog {
 		super(parentShell);
 
 		fTourData = tourData;
+
+		/*
+		 * make a backup copy of the tour markers, modify the original data so that the tour chart
+		 * displays the modifications
+		 */
+		fTourMarkersBackup = new HashSet<TourMarker>();
+		for (final TourMarker tourMarker : fTourData.getTourMarkers()) {
+			fTourMarkersBackup.add(tourMarker.clone());
+		}
+
 		fInitialTourMarker = initialTourMarker;
 
 		// make dialog resizable
@@ -230,7 +242,17 @@ public class DialogMarker extends TitleAreaDialog {
 	@Override
 	public boolean close() {
 
-		restoreVisibleType();
+		if (fIsOkPressed) {
+
+			restoreVisibleType();
+
+		} else {
+			/*
+			 * when OK is not pressed, revert tour markers, this happens when the Cancel button is
+			 * pressed or when the window is closed
+			 */
+			fTourData.setTourMarkers(fTourMarkersBackup);
+		}
 
 		saveDialogSettings();
 
@@ -243,39 +265,18 @@ public class DialogMarker extends TitleAreaDialog {
 		super.configureShell(shell);
 		shell.setText(Messages.Dlg_TourMarker_Dlg_title);
 
-//		shell.addDisposeListener(new DisposeListener() {
-//			public void widgetDisposed(DisposeEvent e) {
-//				if (fWindowIcon.isDisposed() == false) {
-//					fWindowIcon.dispose();
-//				}
-//			}
-//		});
-
 		/*
 		 * don't close the dialog when the enter key is pressed, except when the close button has
 		 * the focus
 		 */
 //		shell.addTraverseListener(new TraverseListener() {
-//			public void keyTraversed(TraverseEvent e) {
+//			public void keyTraversed(final TraverseEvent e) {
 //				if (e.detail == SWT.TRAVERSE_RETURN) {
 //					e.detail = SWT.TRAVERSE_TAB_NEXT;
 //					e.doit = true;
 //				}
 //			}
 //		});
-	}
-
-	@Override
-	protected void createButtonsForButtonBar(final Composite parent) {
-
-		fBtnClose = createButton(parent, IDialogConstants.CLOSE_ID, IDialogConstants.CLOSE_LABEL, false);
-
-		fBtnClose.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				close();
-			}
-		});
 	}
 
 	@Override
@@ -517,6 +518,14 @@ public class DialogMarker extends TitleAreaDialog {
 			}
 		});
 
+//		fTextMarkerName.addTraverseListener(new TraverseListener() {
+//			public void keyTraversed(final TraverseEvent e) {
+//				if (e.detail == SWT.TRAVERSE_RETURN) {
+//					fMarkerViewer.getTable().setFocus();
+//				}
+//			}
+//		});
+
 		/*
 		 * marker position
 		 */
@@ -699,8 +708,12 @@ public class DialogMarker extends TitleAreaDialog {
 		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
 
-	public TourData getTourData() {
-		return fTourData;
+	@Override
+	protected void okPressed() {
+
+		fIsOkPressed = true;
+
+		super.okPressed();
 	}
 
 	/**
@@ -708,7 +721,7 @@ public class DialogMarker extends TitleAreaDialog {
 	 */
 	private void onChangeMarkerUI() {
 
-		saveMarkerValuesFromUI(fSelectedTourMarker);
+		updateMarkerFromUI(fSelectedTourMarker);
 
 		fLabelXValue.setText(Integer.toString(fScaleX.getSelection() - OFFSET_0));
 		fLabelYValue.setText(Integer.toString(fScaleY.getSelection() - OFFSET_0));
@@ -771,7 +784,7 @@ public class DialogMarker extends TitleAreaDialog {
 
 		// save values for previous marker
 		if (fSelectedTourMarker != null && newSelectedMarker != fSelectedTourMarker) {
-			saveMarkerValuesFromUI(fSelectedTourMarker);
+			updateMarkerFromUI(fSelectedTourMarker);
 			restoreVisibleType();
 		}
 
@@ -820,7 +833,7 @@ public class DialogMarker extends TitleAreaDialog {
 		dlgSettings.put(DIALOG_SETTINGS_VIEWER_WIDTH, fMarkerListContainer.getSize().x);
 	}
 
-	private void saveMarkerValuesFromUI(final TourMarker tourMarker) {
+	private void updateMarkerFromUI(final TourMarker tourMarker) {
 
 		if (tourMarker == null) {
 			return;

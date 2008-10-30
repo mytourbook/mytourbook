@@ -163,6 +163,14 @@ class TourContextProvider implements IChartContextProvider, ITourProvider {
 										final ChartXSlider leftSlider,
 										final ChartXSlider rightSlider) {}
 
+	public ChartXSlider getLeftSlider() {
+		return null;
+	}
+
+	public ChartXSlider getRightSlider() {
+		return null;
+	}
+
 	public ArrayList<TourData> getSelectedTours() {
 
 		final Long selectedTourId = fBarSelectionProvider.getSelectedTourId();

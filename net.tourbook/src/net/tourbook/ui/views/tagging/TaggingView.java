@@ -44,6 +44,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionCollapseOthers;
 import net.tourbook.ui.ActionEditTour;
@@ -378,13 +379,15 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
 				if (part == TaggingView.this) {
 					return;
 				}
 
-				if (propertyId == TourManager.NOTIFY_TAG_VIEW) {
+				if (propertyId == TourProperty.NOTIFY_TAG_VIEW) {
 					if (propertyData instanceof ChangedTags) {
 
 						final ChangedTags changedTags = (ChangedTags) propertyData;
@@ -399,11 +402,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 						updateViewerAfterTagStructureIsModified(fRootItem, changedTagsClone, isAddMode);
 					}
 
-				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
+				} else if (propertyId == TourProperty.TAG_STRUCTURE_CHANGED) {
 
 					reloadViewer();
 
-				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				} else if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
 					if (modifiedTours != null) {

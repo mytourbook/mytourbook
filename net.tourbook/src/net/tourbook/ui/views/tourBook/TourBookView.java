@@ -39,6 +39,7 @@ import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ActionCollapseAll;
 import net.tourbook.ui.ActionCollapseOthers;
 import net.tourbook.ui.ActionEditTour;
@@ -135,7 +136,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private ActionDeleteTour			fActionDeleteTour;
 	private ActionEditTour				fActionEditTour;
-	private ActionEditTourMarker		fActionTourMarker;
+	private ActionEditTourMarker		fActionEditTourMarkers;
 	private ActionEditAdjustAltitude	fActionAdjustAltitude;
 
 	private ActionSetTourType			fActionSetTourType;
@@ -320,9 +321,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED) {
+				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED) {
 
 					/*
 					 * it is possible when a tour type was modified, the tour can be hidden or
@@ -330,11 +333,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					 */
 					reloadViewer();
 
-				} else if (propertyId == TourManager.TAG_STRUCTURE_CHANGED) {
+				} else if (propertyId == TourProperty.TAG_STRUCTURE_CHANGED) {
 
 					reloadViewer();
 
-				} else if (propertyId == TourManager.ALL_TOURS_ARE_MODIFIED) {
+				} else if (propertyId == TourProperty.ALL_TOURS_ARE_MODIFIED) {
 
 					reloadViewer();
 				}
@@ -349,7 +352,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionEditTour = new ActionEditTour(this);
 		fActionDeleteTour = new ActionDeleteTour(this);
 
-		fActionTourMarker = new ActionEditTourMarker(this, true);
+		fActionEditTourMarkers = new ActionEditTourMarker(this, true);
 		fActionAdjustAltitude = new ActionEditAdjustAltitude(this, true);
 
 		fActionSetTourType = new ActionSetTourType(this);
@@ -881,7 +884,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			fActionDeleteTour.setEnabled(false);
 		}
 
-		fActionTourMarker.setEnabled(isOneTour);
+		fActionEditTourMarkers.setEnabled(isOneTour);
 		fActionAdjustAltitude.setEnabled(isOneTour);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
@@ -961,16 +964,16 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(fActionDeleteTour);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(fActionEditTourMarkers);
+		menuMgr.add(fActionAdjustAltitude);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
 
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-
-		menuMgr.add(new Separator());
-		menuMgr.add(fActionTourMarker);
-		menuMgr.add(fActionAdjustAltitude);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionOpenTagPrefs);

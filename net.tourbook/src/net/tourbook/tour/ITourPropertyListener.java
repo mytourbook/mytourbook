@@ -23,9 +23,9 @@ public interface ITourPropertyListener {
 	 * @param part
 	 *            part where the property was fired, can be <code>null</code> when the part is not
 	 *            set
-	 * @param propertyId
+	 * @param tourProperty
 	 * @param propertyData
 	 */
-	public void propertyChanged(final IWorkbenchPart part, int propertyId, Object propertyData);
+	public void propertyChanged(final IWorkbenchPart part, TourProperty tourProperty, Object propertyData);
 
 }

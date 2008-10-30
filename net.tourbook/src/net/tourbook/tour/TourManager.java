@@ -27,13 +27,11 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ComputeChartValue;
-import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
@@ -57,83 +55,34 @@ import org.joda.time.DateTime;
 
 public class TourManager {
 
-	/**
-	 * properties of the tour chart has been changed
-	 */
-	public static final int						TOUR_CHART_PROPERTY_IS_MODIFIED			= 10;
+	public static final String					CUSTOM_DATA_TIME		= "time";									//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_DISTANCE	= "distance";								//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_ALTITUDE	= "altitude";								//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_SPEED		= "speed";									//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_PACE		= "pace";									//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_POWER		= "power";									//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_GRADIENT	= "gradient";								//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_ALTIMETER	= "altimeter";								//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_PULSE		= "pulse";									//$NON-NLS-1$
 
-	/**
-	 * 
-	 */
-	public static final int						TOUR_PROPERTY_SEGMENT_LAYER_CHANGED		= 20;
+	public static final String					CUSTOM_DATA_TOUR_ID		= "tourdata";								//$NON-NLS-1$
 
-	/**
-	 * 
-	 */
-	public static final int						TOUR_PROPERTY_REFERENCE_TOUR_CHANGED	= 30;
+	public static final String					ANALYZER_INFO			= "AnalyzerInfo";							//$NON-NLS-1$
+	public static final String					X_AXIS_TIME				= "time";									//$NON-NLS-1$
+	public static final String					X_AXIS_DISTANCE			= "distance";								//$NON-NLS-1$
 
-	/**
-	 * 
-	 */
-	public static final int						TOUR_PROPERTY_COMPARE_TOUR_CHANGED		= 40;
+	public static final int						GRAPH_ALTITUDE			= 1000;
+	public static final int						GRAPH_SPEED				= 1001;
+	public static final int						GRAPH_ALTIMETER			= 1002;
+	public static final int						GRAPH_PULSE				= 1003;
+	public static final int						GRAPH_TEMPERATURE		= 1004;
+	public static final int						GRAPH_CADENCE			= 1005;
+	public static final int						GRAPH_GRADIENT			= 1006;
+	public static final int						GRAPH_POWER				= 1007;
+	public static final int						GRAPH_PACE				= 1008;
+	public static final int						GRAPH_TOUR_COMPARE		= 2000;
 
-	/**
-	 * Properties for a tour have changed, property data contains {@link TourProperties} with the
-	 * modified {@link TourData}
-	 */
-	public static final int						TOUR_PROPERTIES_CHANGED					= 50;
-
-	/**
-	 * Tags for a tour has been modified. The property data contains an object {@link ChangedTags}
-	 * which contains the tags and the modified tours
-	 */
-	public static final int						NOTIFY_TAG_VIEW							= 60;
-
-	/**
-	 * structure of the tags changed, this includes add/remove of tags and categories and
-	 * tag/category renaming
-	 */
-	public static final int						TAG_STRUCTURE_CHANGED					= 70;
-
-	/**
-	 * Sliders in the tourchart moved. Property data contains {@link SelectionChartInfo} with the
-	 * position of the sliders
-	 */
-	public static final int						SLIDER_POSITION_CHANGED					= 80;
-
-	/**
-	 * All computed data for all tours are modified
-	 */
-	public static final int						ALL_TOURS_ARE_MODIFIED					= 90;
-
-	public static final String					CUSTOM_DATA_TIME						= "time";									//$NON-NLS-1$
-	public static final String					CUSTOM_DATA_DISTANCE					= "distance";								//$NON-NLS-1$
-	public static final String					CUSTOM_DATA_ALTITUDE					= "altitude";								//$NON-NLS-1$
-	public static final String					CUSTOM_DATA_SPEED						= "speed";									//$NON-NLS-1$
-	public static final String					CUSTOM_DATA_PACE						= "pace";									//$NON-NLS-1$
-	public static final String					CUSTOM_DATA_POWER						= "power";									//$NON-NLS-1$
-	public static final String					CUSTOM_DATA_GRADIENT					= "gradient";								//$NON-NLS-1$
-	public static final String					CUSTOM_DATA_ALTIMETER					= "altimeter";								//$NON-NLS-1$
-	public static final String					CUSTOM_DATA_PULSE						= "pulse";									//$NON-NLS-1$
-
-	public static final String					CUSTOM_DATA_TOUR_DATA					= "tourdata";								//$NON-NLS-1$
-
-	public static final String					ANALYZER_INFO							= "AnalyzerInfo";							//$NON-NLS-1$
-	public static final String					X_AXIS_TIME								= "time";									//$NON-NLS-1$
-	public static final String					X_AXIS_DISTANCE							= "distance";								//$NON-NLS-1$
-
-	public static final int						GRAPH_ALTITUDE							= 1000;
-	public static final int						GRAPH_SPEED								= 1001;
-	public static final int						GRAPH_ALTIMETER							= 1002;
-	public static final int						GRAPH_PULSE								= 1003;
-	public static final int						GRAPH_TEMPERATURE						= 1004;
-	public static final int						GRAPH_CADENCE							= 1005;
-	public static final int						GRAPH_GRADIENT							= 1006;
-	public static final int						GRAPH_POWER								= 1007;
-	public static final int						GRAPH_PACE								= 1008;
-	public static final int						GRAPH_TOUR_COMPARE						= 2000;
-
-	public static final int[]					allGraphIDs								= new int[] {
+	public static final int[]					allGraphIDs				= new int[] {
 			GRAPH_ALTITUDE,
 			GRAPH_SPEED,
 			GRAPH_ALTIMETER,
@@ -143,9 +92,9 @@ public class TourManager {
 			GRAPH_GRADIENT,
 			GRAPH_POWER,
 			GRAPH_PACE,
-			GRAPH_TOUR_COMPARE															};
+			GRAPH_TOUR_COMPARE											};
 
-	public static final int						GRADIENT_DIVISOR						= 10;
+	public static final int						GRADIENT_DIVISOR		= 10;
 
 	private static TourManager					instance;
 
@@ -161,10 +110,10 @@ public class TourManager {
 	private ComputeChartValue					computePowerAvg;
 	private ComputeChartValue					computeSpeedAvg;
 
-	private final LinkedHashMap<Long, TourData>	fTourDataMap							= new LinkedHashMap<Long, TourData>();
+	private final LinkedHashMap<Long, TourData>	fTourDataMap			= new LinkedHashMap<Long, TourData>();
 
-	private static final ListenerList			fPropertyListeners						= new ListenerList(ListenerList.IDENTITY);
-	private static final ListenerList			fTourSaveListeners						= new ListenerList(ListenerList.IDENTITY);
+	private static final ListenerList			fPropertyListeners		= new ListenerList(ListenerList.IDENTITY);
+	private static final ListenerList			fTourSaveListeners		= new ListenerList(ListenerList.IDENTITY);
 
 	/**
 	 * tour chart which shows the selected tour
@@ -218,23 +167,29 @@ public class TourManager {
 		return chartConfig;
 	}
 
-	public static void firePropertyChange(final int propertyId, final ArrayList<TourData> modifiedTours) {
-		firePropertyChange(propertyId, new TourProperties(modifiedTours));
+	public static void firePropertyChange(final TourProperty tourProperty) {
+		firePropertyChange(tourProperty, null);
 	}
 
-	public static void firePropertyChange(final int propertyId, final Object propertyData) {
+	public static void firePropertyChange(final TourProperty tourProperty, final ArrayList<TourData> modifiedTours) {
+		firePropertyChange(tourProperty, new TourProperties(modifiedTours));
+	}
+
+	public static void firePropertyChange(final TourProperty tourProperty, final Object propertyData) {
 
 		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourPropertyListener) listener).propertyChanged(null, propertyId, propertyData);
+			((ITourPropertyListener) listener).propertyChanged(null, tourProperty, propertyData);
 		}
 	}
 
-	public static void firePropertyChange(final int propertyId, final Object propertyData, final IWorkbenchPart part) {
+	public static void firePropertyChange(	final TourProperty tourProperty,
+											final Object propertyData,
+											final IWorkbenchPart part) {
 
 		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourPropertyListener) listener).propertyChanged(part, propertyId, propertyData);
+			((ITourPropertyListener) listener).propertyChanged(part, tourProperty, propertyData);
 		}
 	}
 
@@ -381,8 +336,35 @@ public class TourManager {
 	 * Saves tours which have been modified and updates the tour data editor, fires a
 	 * {@link TourManager#TOUR_PROPERTIES_CHANGED} event.<br>
 	 * <br>
-	 * When a tour is openend in the tour data editor, the tour will be saved when the tour is not
-	 * dirty, when the tour is dirty it will not be saved. The change event is always fired.
+	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
+	 * tour is not dirty, if the tour is dirty, saving is not done. The change event is always
+	 * fired.
+	 * 
+	 * @param tourData
+	 *            modified tour
+	 * @return Returns the persisted {@link TourData}
+	 */
+	public static TourData saveModifiedTour(final TourData tourData) {
+
+		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
+		modifiedTours.add(tourData);
+
+		final ArrayList<TourData> savedTourData = saveModifiedTours(modifiedTours);
+
+		if (savedTourData == null) {
+			return null;
+		} else {
+			return savedTourData.get(0);
+		}
+	}
+
+	/**
+	 * Saves tours which have been modified and updates the tour data editor, fires a
+	 * {@link TourManager#TOUR_PROPERTIES_CHANGED} event.<br>
+	 * <br>
+	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
+	 * tour is not dirty, if the tour is dirty, saving is not done. The change event is always
+	 * fired.
 	 * 
 	 * @param modifiedTours
 	 *            modified tours
@@ -396,7 +378,7 @@ public class TourManager {
 
 		for (final TourData tourData : modifiedTours) {
 
-			boolean saveTour = false;
+			boolean doSaveTour = false;
 			TourData savedTour = null;
 
 			final TourDataEditorView tourDataEditor = getTourDataEditor();
@@ -434,6 +416,7 @@ public class TourManager {
 									.getActiveWorkbenchWindow()
 									.getActivePage()
 									.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+							
 						} catch (final PartInitException e) {
 							e.printStackTrace();
 						}
@@ -464,16 +447,16 @@ public class TourManager {
 
 					// tour is not in the tour editor
 
-					saveTour = true;
+					doSaveTour = true;
 				}
 			} else {
 
 				// tour is not in the tour editor
 
-				saveTour = true;
+				doSaveTour = true;
 			}
 
-			if (saveTour) {
+			if (doSaveTour) {
 
 				// save the tour
 				savedTour = TourDatabase.saveTour(tourData);
@@ -489,7 +472,7 @@ public class TourManager {
 		if (fireChangeEvent) {
 			final TourProperties propertyData = new TourProperties(savedTours);
 			propertyData.tourDataEditorSavedTour = tourDataEditorSavedTour;
-			firePropertyChange(TOUR_PROPERTIES_CHANGED, propertyData);
+			firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED, propertyData);
 		}
 
 		return savedTours;
@@ -533,7 +516,7 @@ public class TourManager {
 	 * @param prefStore
 	 */
 	public static void updateZoomOptionsInChartConfig(	final TourChartConfiguration chartConfig,
-												final IPreferenceStore prefStore) {
+														final IPreferenceStore prefStore) {
 
 		chartConfig.autoZoomToSlider = prefStore.getBoolean(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER);
 		chartConfig.moveSlidersWhenZoomed = prefStore.getBoolean(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED);
@@ -713,12 +696,19 @@ public class TourManager {
 					return 0;
 				}
 
-				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
 				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
-				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-
-				if (timeValues == null || tourData == null) {
+				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
+				if (timeValues == null) {
 					return 0;
+				}
+
+				TourData tourData = null;
+				final Object tourId = chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				if (tourId instanceof Long) {
+					tourData = TourManager.getInstance().getTourData((Long) tourId);
+					if (tourData == null) {
+						return 0;
+					}
 				}
 
 				final int leftDistance = distanceValues[valueIndexLeft];
@@ -759,12 +749,19 @@ public class TourManager {
 					return 0;
 				}
 
-				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
 				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
-				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-
-				if (timeValues == null || tourData == null) {
+				final int[] distanceValues = ((ChartDataSerie) (customDataDistance)).getHighValues()[0];
+				if (timeValues == null) {
 					return 0;
+				}
+
+				TourData tourData = null;
+				final Object tourId = chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				if (tourId instanceof Long) {
+					tourData = TourManager.getInstance().getTourData((Long) tourId);
+					if (tourData == null) {
+						return 0;
+					}
 				}
 
 				final int leftDistance = distanceValues[valueIndexLeft];
@@ -808,10 +805,17 @@ public class TourManager {
 
 				final int[] altitudeValues = ((ChartDataSerie) (customDataAltitude)).getHighValues()[0];
 				final int[] timeValues = ((ChartDataSerie) (chartModel.getCustomData(TourManager.CUSTOM_DATA_TIME))).getHighValues()[0];
-				final TourData tourData = (TourData) chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-
-				if (timeValues == null || tourData == null) {
+				if (timeValues == null) {
 					return 0;
+				}
+
+				TourData tourData = null;
+				final Object tourId = chartModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				if (tourId instanceof Long) {
+					tourData = TourManager.getInstance().getTourData((Long) tourId);
+					if (tourData == null) {
+						return 0;
+					}
 				}
 
 				final int leftAltitude = altitudeValues[valueIndexLeft];
@@ -1279,7 +1283,7 @@ public class TourManager {
 
 		chartDataModel.setCustomData(CUSTOM_DATA_TIME, xDataTime);
 		chartDataModel.setCustomData(CUSTOM_DATA_DISTANCE, xDataDistance);
-		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_DATA, tourData);
+		chartDataModel.setCustomData(CUSTOM_DATA_TOUR_ID, tourData.getTourId());
 
 		return chartDataModel;
 	}

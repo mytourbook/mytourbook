@@ -34,6 +34,7 @@ import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartViewPart;
 
@@ -165,9 +166,11 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	private void addRefTourPropertyListener() {
 
 		fRefTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
-				if (propertyId == TourManager.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED
+				if (propertyId == TourProperty.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyRefTourChanged) {
 
 					/*
@@ -359,7 +362,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 	private void fireChangeEvent(final int startIndex, final int endIndex, final float speed, final boolean isDataSaved) {
 
-		TourManager.firePropertyChange(TourManager.TOUR_PROPERTY_COMPARE_TOUR_CHANGED,
+		TourManager.firePropertyChange(TourProperty.TOUR_PROPERTY_COMPARE_TOUR_CHANGED,
 				new TourPropertyCompareTourChanged(fCTCompareId,
 						startIndex,
 						endIndex,

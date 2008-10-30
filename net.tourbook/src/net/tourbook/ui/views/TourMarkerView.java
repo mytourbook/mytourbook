@@ -27,6 +27,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionEditTourMarker;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
@@ -34,6 +35,8 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
+import net.tourbook.tour.TourProperty;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.util.PixelConverter;
@@ -51,6 +54,8 @@ import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -69,6 +74,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
@@ -80,7 +86,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourMarkerView extends ViewPart {
+public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	public static final String		ID						= "net.tourbook.views.TourMarkerView";	//$NON-NLS-1$
 
@@ -108,6 +114,8 @@ public class TourMarkerView extends ViewPart {
 	private ITourPropertyListener	fTourPropertyListener;
 
 	private Chart					fTourChart;
+
+	private ActionEditTourMarker	fActionEditTourMarkers;
 
 	// private TourMarker fBackupMarker = new TourMarker();
 
@@ -179,6 +187,9 @@ public class TourMarkerView extends ViewPart {
 
 		fPostSelectionListener = new ISelectionListener() {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+				if (part == TourMarkerView.this) {
+					return;
+				}
 				onSelectionChanged(selection);
 			}
 		};
@@ -188,13 +199,15 @@ public class TourMarkerView extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
 				if (fTourData == null || part == TourMarkerView.this) {
 					return;
 				}
 
-				if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
@@ -206,7 +219,10 @@ public class TourMarkerView extends ViewPart {
 						for (final TourData tourData : modifiedTours) {
 							if (tourData.getTourId() == viewTourId) {
 
-								fMarkerViewer.setInput(this);
+								// get modified tour
+								fTourData = tourData;
+
+								fMarkerViewer.setInput(new Object[0]);
 
 								// nothing more to do, the view contains only one tour
 								return;
@@ -255,12 +271,17 @@ public class TourMarkerView extends ViewPart {
 
 		createContextMenu();
 
+		fActionEditTourMarkers = new ActionEditTourMarker(this, true);
+
 		addSelectionListener();
 		addTourPropertyListener();
 		addPrefListener();
 
 		// this part is a selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
+
+		// show default page
+		fPageBook.showPage(fPageNoChart);
 
 		/*
 		 * get markers from current selection
@@ -298,24 +319,31 @@ public class TourMarkerView extends ViewPart {
 			public void keyPressed(final KeyEvent e) {
 
 				final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
+				if (selection.size() > 0 && e.keyCode == SWT.CR) {
 
-				if (selection.size() > 0) {
-					if (e.keyCode == SWT.CR) {
-						if (e.stateMask == SWT.CONTROL) {
-							// edit visual position
-							fMarkerViewer.editElement(selection.getFirstElement(), COLUMN_VISUAL_POSITION);
-						} else {
-							if (fMarkerViewer.isCellEditorActive() == false) {
-								fMarkerViewer.editElement(selection.getFirstElement(), COLUMN_REMARK);
-							}
+					// run async, otherwise it would pop up the dialog two times
+					Display.getCurrent().asyncExec(new Runnable() {
+						public void run() {
+							fActionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
+//							fActionEditTourMarkers.run();
 						}
-					}
+					});
 				}
 			}
 		});
 
 		fMarkerViewer = new TableViewer(table);
 
+		fMarkerViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(final DoubleClickEvent event) {
+
+				final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
+				if (selection.size() > 0) {
+					fActionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
+					fActionEditTourMarkers.run();
+				}
+			}
+		});
 		/*
 		 * create columns
 		 */
@@ -405,8 +433,14 @@ public class TourMarkerView extends ViewPart {
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
+		menuMgr.add(fActionEditTourMarkers);
+
 		// add standard group which allows other plug-ins to contribute here
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+		// set the marker which should be selected in the marker dialog
+		final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
+		fActionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
 	}
 
 	/**
@@ -448,6 +482,14 @@ public class TourMarkerView extends ViewPart {
 
 	public Object getMarkerViewer() {
 		return fMarkerViewer;
+	}
+
+	public ArrayList<TourData> getSelectedTours() {
+
+		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+		selectedTours.add(fTourData);
+
+		return selectedTours;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -513,6 +555,8 @@ public class TourMarkerView extends ViewPart {
 				}
 			}
 		}
+
+		fActionEditTourMarkers.setEnabled(fTourData != null);
 	}
 
 	@Override

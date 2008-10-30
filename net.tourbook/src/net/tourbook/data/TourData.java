@@ -3188,7 +3188,12 @@ public class TourData {
 		this.tourId = tourId;
 	}
 
-	public void setTourMarkers(final Set<TourMarker> tourMarkers) {
+	public void setTourMarkers(final HashSet<TourMarker> tourMarkers) {
+		
+		if (this.tourMarkers != null) {
+			this.tourMarkers.clear();
+		}
+		
 		this.tourMarkers = tourMarkers;
 	}
 
@@ -3239,7 +3244,7 @@ public class TourData {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("[TourData] ");//$NON-NLS-1$
+		sb.append("[TourData] ");//$NON-NLS-1$ 
 		sb.append("tourId:");//$NON-NLS-1$
 		sb.append(tourId);
 		sb.append("\t" + super.toString());//$NON-NLS-1$

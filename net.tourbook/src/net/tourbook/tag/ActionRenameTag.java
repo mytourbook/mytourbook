@@ -23,6 +23,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tagging.TVITagViewTag;
@@ -207,7 +208,7 @@ public class ActionRenameTag extends Action {
 				TourManager.getInstance().clearTourDataCache();
 
 				// fire modify event
-				TourManager.firePropertyChange(TourManager.TAG_STRUCTURE_CHANGED, null);
+				TourManager.firePropertyChange(TourProperty.TAG_STRUCTURE_CHANGED, null);
 			}
 		});
 	}

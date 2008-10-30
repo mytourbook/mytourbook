@@ -143,21 +143,23 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part, final int propertyId, final Object propertyData) {
+			public void propertyChanged(final IWorkbenchPart part,
+										final TourProperty propertyId,
+										final Object propertyData) {
 
 				if (part == TourEditor.this) {
 					return;
 				}
 
-				if (propertyId == TourManager.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
+				if (propertyId == TourProperty.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
 
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
 
-				} else if (propertyId == TourManager.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+				} else if (propertyId == TourProperty.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 					fTourChart.updateTourChart(true);
 
-				} else if (propertyId == TourManager.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				} else if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					if (fTourData == null) {
 						return;
@@ -317,7 +319,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 //
 //			fIsRefTourCreated = false;
 //
-//			// update tour map view
+//			// update tour catalog view
 //			firePostSelection(new SelectionNewRefTours());
 //		}
 //
