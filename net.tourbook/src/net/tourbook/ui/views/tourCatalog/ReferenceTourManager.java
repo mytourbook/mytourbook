@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -98,8 +98,8 @@ public class ReferenceTourManager {
 			 */
 
 			final TourData refTourData = refTour.getTourData();
-			final TourChartConfiguration refTourChartConfig = TourManager.createTourChartConfiguration();
 
+			final TourChartConfiguration refTourChartConfig = TourManager.createTourChartConfiguration();
 			final TourChartConfiguration compTourchartConfig = TourManager.createTourChartConfiguration();
 
 			final ChartDataModel chartDataModel = TourManager.getInstance().createChartDataModel(refTourData,
@@ -107,7 +107,7 @@ public class ReferenceTourManager {
 
 			compareConfig = new TourCompareConfig(refTour,
 					chartDataModel,
-					refTourData,
+					refTourData.getTourId(),
 					refTourChartConfig,
 					compTourchartConfig);
 

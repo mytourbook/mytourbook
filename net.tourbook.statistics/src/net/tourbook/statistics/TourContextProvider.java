@@ -30,11 +30,12 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ActionOpenPrefDialog;
-import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionSetTourType;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -52,6 +53,8 @@ class TourContextProvider implements IChartContextProvider, ITourProvider {
 
 	private final ActionEditQuick		fActionEditQuick;
 	private final ActionEditTour		fActionEditTour;
+	private ActionOpenTour				fActionOpenTour;
+
 	private final ActionSetTourType		fActionSetTourType;
 	private final ActionSetTourTag		fActionAddTag;
 	private final ActionSetTourTag		fActionRemoveTag;
@@ -103,6 +106,8 @@ class TourContextProvider implements IChartContextProvider, ITourProvider {
 
 		fActionEditQuick = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(Messages.action_edit_tour);
+		fActionOpenTour = new ActionOpenTour(this);
+
 		fActionSetTourType = new ActionSetTourType(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
@@ -125,9 +130,10 @@ class TourContextProvider implements IChartContextProvider, ITourProvider {
 		}
 
 		fActionEditQuick.setEnabled(isTourHovered);
-		fActionSetTourType.setEnabled(isTourHovered && TourDatabase.getTourTypes().size() > 0);
 		fActionEditTour.setEnabled(isTourHovered);
+		fActionOpenTour.setEnabled(isTourHovered);
 
+		fActionSetTourType.setEnabled(isTourHovered && TourDatabase.getTourTypes().size() > 0);
 		fActionAddTag.setEnabled(isTourHovered);
 		fActionRemoveTag.setEnabled(isTourHovered && isTagAvailable);
 		fActionRemoveAllTags.setEnabled(isTourHovered && isTagAvailable);
@@ -141,17 +147,15 @@ class TourContextProvider implements IChartContextProvider, ITourProvider {
 										final int hoveredBarValueIndex) {
 
 		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
-
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-
-		menuMgr.add(new Separator());
 		menuMgr.add(fActionOpenTagPrefs);
 
 		enableActions(hoveredBarSerieIndex != -1);

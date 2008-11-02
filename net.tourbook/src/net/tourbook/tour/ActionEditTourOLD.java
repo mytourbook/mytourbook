@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,34 +13,31 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.tour;
 
+import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.tourChart.TourChartView;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionModifyColumns extends Action {
+public class ActionEditTourOLD extends Action {
 
-	private ITourViewer	fTourViewer;
+	private TourChartView	fTourChartView;
 
-	public ActionModifyColumns(final ITourViewer tourViewer) {
+	public ActionEditTourOLD(final TourChartView tourChartView) {
 
-		fTourViewer = tourViewer;
+		fTourChartView = tourChartView;
 
-		setText(Messages.Action_configure_columns);
-		setToolTipText(Messages.Action_configure_columns_tooltip);
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_configure_columns));
+		setText(Messages.App_Action_edit_tour);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
 	}
 
 	@Override
 	public void run() {
 
-		final ColumnManager columnManager = fTourViewer.getColumnManager();
-		
-		if (columnManager != null) {
-			columnManager.openColumnDialog();
-		}
+		TourManager.getInstance().openTourInEditor(fTourChartView.getTourChart().getTourData().getTourId());
 	}
 
 }

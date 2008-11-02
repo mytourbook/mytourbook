@@ -86,7 +86,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	/**
 	 * year item for the visible statistics
 	 */
-	private TVICatalogReferenceTour				fCurrentRefItem;
+	private TVICatalogRefTourItem				fCurrentRefItem;
 
 	private PageBook							fPageBook;
 
@@ -447,7 +447,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 			final SelectionTourCatalogView tourCatalogItem = (SelectionTourCatalogView) selection;
 
-			final TVICatalogReferenceTour refItem = tourCatalogItem.getRefItem();
+			final TVICatalogRefTourItem refItem = tourCatalogItem.getRefItem();
 			if (refItem != null) {
 
 				// reference tour is selected
@@ -718,7 +718,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		/*
 		 * set/restore min/max values
 		 */
-		final TVICatalogReferenceTour refItem = fCurrentRefItem;
+		final TVICatalogRefTourItem refItem = fCurrentRefItem;
 		final int minValue = yData.getVisibleMinValue();
 		final int maxValue = yData.getVisibleMaxValue();
 

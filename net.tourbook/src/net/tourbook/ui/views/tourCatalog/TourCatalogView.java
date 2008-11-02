@@ -32,26 +32,28 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.tour.TourProperty;
-import net.tourbook.ui.ActionCollapseAll;
-import net.tourbook.ui.ActionCollapseOthers;
-import net.tourbook.ui.ActionEditTour;
-import net.tourbook.ui.ActionExpandSelection;
-import net.tourbook.ui.ActionModifyColumns;
-import net.tourbook.ui.ActionOpenPrefDialog;
-import net.tourbook.ui.ActionRefreshView;
-import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
+import net.tourbook.ui.IReferenceTourProvider;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionCollapseAll;
+import net.tourbook.ui.action.ActionCollapseOthers;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionExpandSelection;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionRefreshView;
+import net.tourbook.ui.action.ActionSetTourType;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -85,6 +87,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -92,7 +95,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvider {
+public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvider, IReferenceTourProvider {
 
 	public static final String			ID									= "net.tourbook.views.tourCatalog.TourCatalogView"; //$NON-NLS-1$
 
@@ -134,6 +137,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private ActionRemoveAllTags			fActionRemoveAllTags;
 	private ActionOpenPrefDialog		fActionOpenTagPrefs;
 	private ActionSetTourTag			fActionRemoveTag;
+	private ActionTourCompareWizard		fActionTourCompareWizard;
+	private ActionOpenTour				fActionOpenTour;
 
 	/**
 	 * tour item which is selected by the link tour action
@@ -150,6 +155,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 */
 	private boolean						fIsToolbarCreated					= false;
 	private ColumnManager				fColumnManager;
+
 
 	class TourContentProvider implements ITreeContentProvider {
 
@@ -438,6 +444,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		fActionRemoveComparedTours = new ActionRemoveComparedTours(this);
 		fActionRenameRefTour = new ActionRenameRefTour(this);
+		fActionTourCompareWizard = new ActionTourCompareWizard(this);
 		fActionLinkTour = new ActionLinkTour(this);
 		fActionRefreshView = new ActionRefreshView(this);
 		fActionModifyColumns = new ActionModifyColumns(this);
@@ -448,6 +455,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		fActionEditQuick = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(this);
+		fActionOpenTour = new ActionOpenTour(this);
 		fActionSetTourType = new ActionSetTourType(this);
 
 		fActionAddTag = new ActionSetTourTag(this, true);
@@ -504,6 +512,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		fTourViewer.setInput(fRootItem = new TVICatalogRootItem(this));
 
 		restoreState();
+
+		// move the horizontal scrollbar to the left border
+		final ScrollBar horizontalBar = fTourViewer.getTree().getHorizontalBar();
+		if (horizontalBar != null) {
+			horizontalBar.setSelection(0);
+		}
 	}
 
 	private void createTourViewer(final Composite parent) {
@@ -579,11 +593,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 				final Object element = cell.getElement();
 
-				if ((element instanceof TVICatalogReferenceTour)) {
+				if ((element instanceof TVICatalogRefTourItem)) {
 
 					// ref tour item
 
-					final TVICatalogReferenceTour refItem = (TVICatalogReferenceTour) element;
+					final TVICatalogRefTourItem refItem = (TVICatalogRefTourItem) element;
 
 					final StyledString styledString = new StyledString();
 					styledString.append(refItem.label, UI.TAG_STYLER);
@@ -711,7 +725,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 			final Object treeItem = iter.next();
 
-			if (treeItem instanceof TVICatalogReferenceTour) {
+			if (treeItem instanceof TVICatalogRefTourItem) {
 				refItems++;
 			} else if (treeItem instanceof TVICatalogComparedTour) {
 				if (tourItems == 0) {
@@ -732,6 +746,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		fActionRemoveComparedTours.setEnabled(isOneTour);
 
+		fActionTourCompareWizard.setEnabled(refItems > 0);
+
 		// enable remove button when only one type of item is selected
 		if (yearItems == 0 && ((refItems > 0 && tourItems == 0) || (refItems == 0 & tourItems > 0))) {
 			fActionRemoveComparedTours.setEnabled(true);
@@ -739,8 +755,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			fActionRemoveComparedTours.setEnabled(false);
 		}
 
-		fActionEditTour.setEnabled(isOneTour);
 		fActionEditQuick.setEnabled(isOneTour);
+		fActionEditTour.setEnabled(isOneTour);
+		fActionOpenTour.setEnabled(isOneTour);
 
 		fActionRenameRefTour.setEnabled(refItems == 1 && tourItems == 0 && yearItems == 0);
 
@@ -793,23 +810,22 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		menuMgr.add(fActionCollapseAll);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionSetTourType);
-		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionTourCompareWizard);
+		menuMgr.add(fActionRenameRefTour);
+		menuMgr.add(fActionRemoveComparedTours);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(fActionEditQuick);
+		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionOpenTour);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
-
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-
-		menuMgr.add(new Separator());
 		menuMgr.add(fActionOpenTagPrefs);
-
-		menuMgr.add(new Separator());
-		menuMgr.add(fActionRenameRefTour);
-		menuMgr.add(fActionRemoveComparedTours);
 
 		enableActions();
 	}
@@ -847,6 +863,23 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 	public ColumnManager getColumnManager() {
 		return fColumnManager;
+	}
+
+	public ArrayList<Long> getSelectedReferenceTours() {
+
+		final IStructuredSelection selectedItems = ((IStructuredSelection) fTourViewer.getSelection());
+		final ArrayList<Long> selectedReferenceTour = new ArrayList<Long>();
+
+		// loop: all selected items
+		for (final Iterator<?> iter = selectedItems.iterator(); iter.hasNext();) {
+			final Object treeItem = iter.next();
+
+			if (treeItem instanceof TVICatalogRefTourItem) {
+				selectedReferenceTour.add(((TVICatalogRefTourItem) treeItem).refId);
+			}
+		}
+
+		return selectedReferenceTour;
 	}
 
 	public ArrayList<TourData> getSelectedTours() {
@@ -892,11 +925,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		// show the reference tour chart
 		final Object item = selection.getFirstElement();
 
-		if (item instanceof TVICatalogReferenceTour) {
+		if (item instanceof TVICatalogRefTourItem) {
 
 			// reference tour is selected
 
-			final TVICatalogReferenceTour refItem = (TVICatalogReferenceTour) item;
+			final TVICatalogRefTourItem refItem = (TVICatalogRefTourItem) item;
 
 			fActiveRefId = refItem.refId;
 
@@ -1017,9 +1050,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		// search ref tour
 		for (final Object refTourItem : refTourItems) {
-			if (refTourItem instanceof TVICatalogReferenceTour) {
+			if (refTourItem instanceof TVICatalogRefTourItem) {
 
-				final TVICatalogReferenceTour tvtiRefTour = (TVICatalogReferenceTour) refTourItem;
+				final TVICatalogRefTourItem tvtiRefTour = (TVICatalogRefTourItem) refTourItem;
 				if (tvtiRefTour.refId == refId) {
 
 					// select ref tour
@@ -1066,7 +1099,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			if (unfetchedChildren != null) {
 
 				for (final TreeViewerItem rootChild : unfetchedChildren) {
-					final TVICatalogReferenceTour mapRefTour = (TVICatalogReferenceTour) rootChild;
+					final TVICatalogRefTourItem mapRefTour = (TVICatalogRefTourItem) rootChild;
 
 					if (mapRefTour.refId == refId) {
 

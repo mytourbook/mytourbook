@@ -45,9 +45,9 @@ class ActionRenameRefTour extends Action {
 
 		final Object selectedItem = (((ITreeSelection) fTourCatalogView.getTourViewer().getSelection()).getFirstElement());
 
-		if (selectedItem instanceof TVICatalogReferenceTour) {
+		if (selectedItem instanceof TVICatalogRefTourItem) {
 
-			final TVICatalogReferenceTour ttiRefTour = (TVICatalogReferenceTour) selectedItem;
+			final TVICatalogRefTourItem ttiRefTour = (TVICatalogRefTourItem) selectedItem;
 
 			// ask for the reference tour name
 			final InputDialog dialog = new InputDialog(this.fTourCatalogView.getSite().getShell(),

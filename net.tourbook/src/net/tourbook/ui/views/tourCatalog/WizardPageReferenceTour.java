@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -24,6 +26,7 @@ import net.tourbook.data.TourReference;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.IReferenceTourProvider;
 import net.tourbook.ui.ViewerDetailForm;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.util.TableLayoutComposite;
@@ -60,20 +63,22 @@ import org.eclipse.swt.widgets.TableColumn;
 
 public class WizardPageReferenceTour extends WizardPage {
 
-	public static final int		COLUMN_REF_TOUR			= 0;
+	public static final int			COLUMN_REF_TOUR			= 0;
 
 	// dialog settings
-	private static final String	REF_TOUR_CHECKED		= "RefTour.checkedTours";	//$NON-NLS-1$
-	private static final String	REF_TOUR_VIEWER_WIDTH	= "RefTour.viewerWidth";	//$NON-NLS-1$
+	private static final String		REF_TOUR_CHECKED		= "RefTour.checkedTours";	//$NON-NLS-1$
+	private static final String		REF_TOUR_VIEWER_WIDTH	= "RefTour.viewerWidth";	//$NON-NLS-1$
 
-	private ViewerDetailForm	fViewerDetailForm;
-	private Composite			fRefContainer;
+	private ViewerDetailForm		fViewerDetailForm;
+	private Composite				fRefContainer;
 
-	private CheckboxTableViewer	fRefTourViewer;
-	private Group				fChartGroup;
-	private Chart				fRefTourChart;
+	private CheckboxTableViewer		fRefTourViewer;
+	private Group					fChartGroup;
+	private Chart					fRefTourChart;
 
-	private Object[]			fRefTours;
+	private Object[]				fRefTours;
+
+	private IReferenceTourProvider	fRefTourProvider;
 
 	private class RefTourContentProvider implements IStructuredContentProvider {
 
@@ -82,8 +87,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		public void dispose() {}
 
 		public Object[] getElements(final Object parent) {
-			fRefTours = ReferenceTourManager.getInstance().getReferenceTours();
-			return fRefTours;
+			return fRefTours = ReferenceTourManager.getInstance().getReferenceTours();
 		}
 
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
@@ -107,8 +111,12 @@ public class WizardPageReferenceTour extends WizardPage {
 		}
 	}
 
-	protected WizardPageReferenceTour(final String pageName) {
-		super(pageName);
+	protected WizardPageReferenceTour(final IReferenceTourProvider refTourProvider) {
+
+		super("reference-tour");//$NON-NLS-1$
+
+		fRefTourProvider = refTourProvider;
+
 		setTitle(Messages.tourCatalog_wizard_Page_reference_tour_title);
 	}
 
@@ -261,15 +269,7 @@ public class WizardPageReferenceTour extends WizardPage {
 		final String[] refTourIds = new String[checkedElements.length];
 
 		for (int tourIndex = 0; tourIndex < checkedElements.length; tourIndex++) {
-			refTourIds[tourIndex] = Long.toString(((TourReference) (checkedElements[tourIndex])).getRefId()/*
-																											 * .getTourData
-																											 * (
-																											 * )
-																											 * .
-																											 * getTourId
-																											 * (
-																											 * )
-																											 */);
+			refTourIds[tourIndex] = Long.toString(((TourReference) (checkedElements[tourIndex])).getRefId());
 		}
 		wizardSettings.put(REF_TOUR_CHECKED, refTourIds);
 	}
@@ -287,22 +287,47 @@ public class WizardPageReferenceTour extends WizardPage {
 		}
 		fViewerDetailForm.setViewerWidth(viewerWidth);
 
-		// restore checked reference tours
-		final String[] persistedTourIds = wizardSettings.getArray(REF_TOUR_CHECKED);
+		if (fRefTourProvider == null) {
 
-		if (persistedTourIds != null) {
-			for (final Object refTour : fRefTours) {
-				final TourReference tourReference = (TourReference) refTour;
-				// final String refTourId = Long.toString(tourReference
-				// .getTourData()
-				// .getTourId());
+			// restore checked reference tours
+			final String[] persistedTourIds = wizardSettings.getArray(REF_TOUR_CHECKED);
 
-				final String refId = Long.toString(tourReference.getRefId());
+			if (persistedTourIds != null) {
+				for (final Object refTour : fRefTours) {
+					final TourReference tourReference = (TourReference) refTour;
+					// final String refTourId = Long.toString(tourReference
+					// .getTourData()
+					// .getTourId());
 
-				for (final String persistedRefId : persistedTourIds) {
-					if (persistedRefId.compareTo(refId) == 0) {
-						fRefTourViewer.setChecked(tourReference, true);
-						break;
+					final String refId = Long.toString(tourReference.getRefId());
+
+					for (final String persistedRefId : persistedTourIds) {
+						if (persistedRefId.compareTo(refId) == 0) {
+							fRefTourViewer.setChecked(tourReference, true);
+							break;
+						}
+					}
+				}
+			}
+		} else {
+
+			// check reference tours from the reference tour provider
+
+			final ArrayList<Long> selectedRefTours = fRefTourProvider.getSelectedReferenceTours();
+			if (selectedRefTours != null) {
+
+				// loop: all selected reference tours
+				for (final Long selectedRefTourId : selectedRefTours) {
+
+					// loop: all available reference tours
+					for (final Object refTour : fRefTours) {
+
+						final TourReference tourReference = (TourReference) refTour;
+
+						if (selectedRefTourId.equals(tourReference.getRefId())) {
+							fRefTourViewer.setChecked(tourReference, true);
+							break;
+						}
 					}
 				}
 			}

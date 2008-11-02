@@ -31,7 +31,6 @@ import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionEditAdjustAltitude;
-import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ActionEditTourMarker;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -40,14 +39,6 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperty;
-import net.tourbook.ui.ActionCollapseAll;
-import net.tourbook.ui.ActionCollapseOthers;
-import net.tourbook.ui.ActionEditTour;
-import net.tourbook.ui.ActionExpandSelection;
-import net.tourbook.ui.ActionModifyColumns;
-import net.tourbook.ui.ActionOpenPrefDialog;
-import net.tourbook.ui.ActionRefreshView;
-import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
@@ -56,6 +47,16 @@ import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionCollapseAll;
+import net.tourbook.ui.action.ActionCollapseOthers;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionExpandSelection;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionRefreshView;
+import net.tourbook.ui.action.ActionSetTourType;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -138,6 +139,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionEditTour				fActionEditTour;
 	private ActionEditTourMarker		fActionEditTourMarkers;
 	private ActionEditAdjustAltitude	fActionAdjustAltitude;
+	private ActionOpenTour				fActionOpenTour;
 
 	private ActionSetTourType			fActionSetTourType;
 	private ActionSetTourTag			fActionAddTag;
@@ -350,7 +352,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		fActionEditQuick = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(this);
+		fActionOpenTour = new ActionOpenTour(this);
 		fActionDeleteTour = new ActionDeleteTour(this);
+		fActionOpenTour = new ActionOpenTour(this);
 
 		fActionEditTourMarkers = new ActionEditTourMarker(this, true);
 		fActionAdjustAltitude = new ActionEditAdjustAltitude(this, true);
@@ -875,6 +879,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		 */
 
 		fActionEditTour.setEnabled(isOneTour);
+		fActionOpenTour.setEnabled(isOneTour);
 		fActionEditQuick.setEnabled(isOneTour);
 
 		// enable delete ation when at least one tour is selected
@@ -961,7 +966,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionEditTour);
-		menuMgr.add(fActionDeleteTour);
+		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditTourMarkers);
@@ -972,11 +977,11 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
-
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
+		menuMgr.add(fActionOpenTagPrefs);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionOpenTagPrefs);
+		menuMgr.add(fActionDeleteTour);
 
 		enableActions();
 	}

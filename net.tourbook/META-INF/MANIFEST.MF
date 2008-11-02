@@ -123,6 +123,7 @@ Export-Package: net.tourbook;uses:="org.eclipse.osgi.util",
    org.eclipse.ui.dialogs,
    org.eclipse.swt.widgets,
    org.eclipse.jface.dialogs",
+ net.tourbook.ui.action,
  net.tourbook.util;
   uses:="org.eclipse.jface.wizard,
    org.eclipse.core.runtime,

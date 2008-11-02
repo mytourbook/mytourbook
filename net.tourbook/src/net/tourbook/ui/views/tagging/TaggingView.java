@@ -36,7 +36,6 @@ import net.tourbook.tag.ActionRenameTag;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -45,14 +44,6 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.tour.TourProperty;
-import net.tourbook.ui.ActionCollapseAll;
-import net.tourbook.ui.ActionCollapseOthers;
-import net.tourbook.ui.ActionEditTour;
-import net.tourbook.ui.ActionExpandSelection;
-import net.tourbook.ui.ActionModifyColumns;
-import net.tourbook.ui.ActionOpenPrefDialog;
-import net.tourbook.ui.ActionRefreshView;
-import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
@@ -60,6 +51,16 @@ import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionCollapseAll;
+import net.tourbook.ui.action.ActionCollapseOthers;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionExpandSelection;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionRefreshView;
+import net.tourbook.ui.action.ActionSetTourType;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -146,6 +147,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionMenuSetAllTagStructures	fActionSetAllTagStructures;
 	private ActionMenuSetTagStructure		fActionSetTagStructure;
 	private ActionSetTourType				fActionSetTourType;
+	private ActionOpenTour					fActionOpenTour;
 
 	private ActionModifyColumns				fActionModifyColumns;
 
@@ -159,6 +161,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 																					.createImage();
 
 	private IPartListener2					fPartListener;
+
 
 	private static final NumberFormat		fNF								= NumberFormat.getNumberInstance();
 
@@ -423,6 +426,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		fActionEditQuick = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(this);
+		fActionOpenTour = new ActionOpenTour(this);
 
 		fActionSetTourType = new ActionSetTourType(this);
 
@@ -1029,6 +1033,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
 
 		fActionEditTour.setEnabled(tourItems == 1);
+		fActionOpenTour.setEnabled(tourItems == 1);
 		fActionEditQuick.setEnabled(tourItems == 1);
 
 		// action: set tour type
@@ -1105,21 +1110,21 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
-
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
+		menuMgr.add(fActionOpenTagPrefs);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionSetTagStructure);
 		menuMgr.add(fActionSetAllTagStructures);
 		menuMgr.add(fActionRenameTag);
-		menuMgr.add(fActionOpenTagPrefs);
 
 		enableActions();
 	}

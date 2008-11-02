@@ -13,40 +13,31 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui;
-
-import java.util.ArrayList;
+package net.tourbook.ui.action;
 
 import net.tourbook.Messages;
-import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourViewer;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionEditTour extends Action {
+public class ActionRefreshView extends Action {
 
-	private ITourProvider	fTourProvider;
+	private ITourViewer	fTourViewer;
 
-	public ActionEditTour(final ITourProvider tourProvider) {
+	public ActionRefreshView(final ITourViewer tourViewer) {
 
-		fTourProvider = tourProvider;
+		super(null, AS_PUSH_BUTTON);
 
-		setText(Messages.App_Action_edit_tour);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
+		fTourViewer = tourViewer;
 
-		setEnabled(false);
+		setToolTipText(Messages.tag_view_action_refresh_view_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__refresh));
 	}
 
 	@Override
 	public void run() {
-
-		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
-
-		if (selectedTours != null && selectedTours.size() > 0) {
-			TourManager.getInstance().openTourInEditor(selectedTours.get(0).getTourId());
-		}
+		fTourViewer.reloadViewer();
 	}
 
 }

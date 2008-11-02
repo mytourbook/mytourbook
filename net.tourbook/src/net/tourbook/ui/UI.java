@@ -69,7 +69,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 public class UI {
 
@@ -360,6 +364,14 @@ public class UI {
 //		return null;
 //	}
 
+	/**
+	 * Checks if propertyData has the same tour as the oldTourData
+	 * 
+	 * @param propertyData
+	 * @param oldTourData
+	 * @return Returns {@link TourData} from the propertyData or <code>null</code> when it's another
+	 *         tour
+	 */
 	public static TourData getTourPropertyTourData(final TourProperties propertyData, final TourData oldTourData) {
 
 		final ArrayList<TourData> modifiedTours = propertyData.getModifiedTours();
@@ -367,19 +379,41 @@ public class UI {
 			return null;
 		}
 
-		// update modified tour
-
 		final long oldTourId = oldTourData.getTourId();
 
 		for (final TourData tourData : modifiedTours) {
 			if (tourData.getTourId() == oldTourId) {
 
-				// nothing more to do, only one tour
+				// nothing more to do, only one tour is supported
 				return tourData;
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Check if the tour is modified
+	 * 
+	 * @param tourData
+	 *            tour which is checked
+	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
+	 */
+	public static boolean isTourEditorModified() {
+
+		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+		if (tourDataEditor != null && tourDataEditor.isDirty()) {
+
+			openTourEditor();
+
+			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+					Messages.dialog_is_tour_editor_modified_title,
+					Messages.dialog_is_tour_editor_modified_message);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -395,6 +429,8 @@ public class UI {
 		if (tourDataEditor != null
 				&& tourDataEditor.isDirty()
 				&& tourData.getTourId().longValue() == tourDataEditor.getTourData().getTourId().longValue()) {
+
+			openTourEditor();
 
 			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
 					Messages.dialog_is_tour_modified_title,
@@ -423,6 +459,24 @@ public class UI {
 		if (menu != null && menu.isDisposed() == false) {
 			menu.setLocation(pt.x, pt.y);
 			menu.setVisible(true);
+		}
+	}
+
+	public static void openTourEditor() {
+
+		try {
+			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+			final String viewId = TourDataEditorView.ID;
+
+			final IViewPart viewPart = page.showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
+			if (page.isPartVisible(viewPart) == false) {
+
+				page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
+			}
+
+		} catch (final PartInitException e) {
+			e.printStackTrace();
 		}
 	}
 

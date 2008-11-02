@@ -170,8 +170,8 @@ public class TVICatalogYearItem extends TVICatalogItem {
 		}
 	}
 
-	TVICatalogReferenceTour getRefItem() {
-		return (TVICatalogReferenceTour) getParentItem();
+	TVICatalogRefTourItem getRefItem() {
+		return (TVICatalogRefTourItem) getParentItem();
 	}
 
 	@Override

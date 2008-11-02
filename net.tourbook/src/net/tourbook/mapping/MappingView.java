@@ -44,7 +44,7 @@ import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.core.runtime.Preferences;
@@ -1187,7 +1187,7 @@ public class MappingView extends ViewPart {
 
 			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
 
-			final TVICatalogReferenceTour refItem = tourCatalogSelection.getRefItem();
+			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
 			if (refItem != null) {
 
 				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());

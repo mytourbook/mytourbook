@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -26,19 +26,19 @@ import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
 
 /**
- * TTI (TreeViewerItem) is used in the tree viewer {@link TourCatalogView}, it contains tree items
- * for reference tours
+ * Contains a reference tours item
  */
-public class TVICatalogReferenceTour extends TVICatalogTourItem {
+public class TVICatalogRefTourItem extends TVICatalogTourItem {
 
 	String	label;
 	long	refId;
 
 	int		yearMapMinValue	= Integer.MIN_VALUE;
 	int		yearMapMaxValue;
+
 	int		tourCounter;
 
-	public TVICatalogReferenceTour(final TVICatalogRootItem parentItem) {
+	public TVICatalogRefTourItem(final TVICatalogRootItem parentItem) {
 		setParentItem(parentItem);
 	}
 
@@ -50,10 +50,10 @@ public class TVICatalogReferenceTour extends TVICatalogTourItem {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof TVICatalogReferenceTour)) {
+		if (!(obj instanceof TVICatalogRefTourItem)) {
 			return false;
 		}
-		final TVICatalogReferenceTour other = (TVICatalogReferenceTour) obj;
+		final TVICatalogRefTourItem other = (TVICatalogRefTourItem) obj;
 		if (refId != other.refId) {
 			return false;
 		}
@@ -69,7 +69,8 @@ public class TVICatalogReferenceTour extends TVICatalogTourItem {
 		/**
 		 * derby does not support expression in "GROUP BY" statements, this is a workaround found
 		 * here: http://mail-archives.apache.org/mod_mbox/db-derby-dev/200605.mbox/%3C7415300
-		 * .1147889647479.JavaMail.jira@brutus%3E <code>
+		 * .1147889647479.JavaMail.jira@brutus%3E <br>
+		 * <code>
 		 * 	String subSQLString = "(SELECT YEAR(tourDate)\n"
 		 * 		+ ("FROM " + TourDatabase.TABLE_TOUR_COMPARED + "\n")
 		 * 		+ (" WHERE "

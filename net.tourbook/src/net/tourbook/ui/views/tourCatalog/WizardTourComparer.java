@@ -18,6 +18,7 @@ package net.tourbook.ui.views.tourCatalog;
 import net.tourbook.Messages;
 import net.tourbook.data.TourReference;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.IReferenceTourProvider;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.Wizard;
@@ -29,9 +30,27 @@ public class WizardTourComparer extends Wizard {
 	private WizardPageCompareTour	pageCompareTour;
 	private WizardPageReferenceTour	pageReferenceTour;
 
+	private IReferenceTourProvider	fRefTourProvider;
+
 	public WizardTourComparer() {
 		setDialogSettings();
 		setWindowTitle(Messages.tourCatalog_wizard_Wizard_title);
+	}
+
+	public WizardTourComparer(final IReferenceTourProvider refTourProvider) {
+		this();
+		fRefTourProvider = refTourProvider;
+	}
+
+	@Override
+	public void addPages() {
+
+		pageCompareTour = new WizardPageCompareTour();
+		addPage(pageCompareTour);
+
+		pageReferenceTour = new WizardPageReferenceTour(fRefTourProvider); 
+		addPage(pageReferenceTour);
+
 	}
 
 	@Override
@@ -53,15 +72,9 @@ public class WizardTourComparer extends Wizard {
 		return true;
 	}
 
-	@Override
-	public void addPages() {
-
-		pageCompareTour = new WizardPageCompareTour("compare-tour"); //$NON-NLS-1$
-		addPage(pageCompareTour);
-
-		pageReferenceTour = new WizardPageReferenceTour("reference-tour"); //$NON-NLS-1$
-		addPage(pageReferenceTour);
-
+	private void persistDialogSettings() {
+		pageReferenceTour.persistDialogSettings();
+		pageCompareTour.persistDialogSettings();
 	}
 
 	private void setDialogSettings() {
@@ -76,8 +89,4 @@ public class WizardTourComparer extends Wizard {
 		super.setDialogSettings(wizardSettings);
 	}
 
-	private void persistDialogSettings() {
-		pageReferenceTour.persistDialogSettings();
-		pageCompareTour.persistDialogSettings();
-	}
 }

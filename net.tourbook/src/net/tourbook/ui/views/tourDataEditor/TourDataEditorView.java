@@ -48,9 +48,6 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.tour.TourProperty;
-import net.tourbook.ui.ActionModifyColumns;
-import net.tourbook.ui.ActionOpenPrefDialog;
-import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
@@ -58,10 +55,14 @@ import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnDefinition;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.ui.action.ActionSetTourType;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -2509,8 +2510,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		} else if (selection instanceof StructuredSelection) {
 
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+
 			if (firstElement instanceof TVICatalogComparedTour) {
 				fSelectionTourId = ((TVICatalogComparedTour) firstElement).getTourId();
+				if (currentTourId == fSelectionTourId) {
+					isCurrentTourSelected = true;
+				}
+
+			} else if (firstElement instanceof TVICompareResultComparedTour) {
+
+				final long comparedTourTourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData()
+						.getTourId();
+
+				fSelectionTourId = comparedTourTourId;
 				if (currentTourId == fSelectionTourId) {
 					isCurrentTourSelected = true;
 				}
@@ -2636,7 +2648,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
 
-			final TVICatalogReferenceTour refItem = tourCatalogSelection.getRefItem();
+			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
 			if (refItem != null) {
 				displayTour(refItem.getTourId());
 			}
@@ -2676,7 +2688,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 			if (firstElement instanceof TVICatalogComparedTour) {
+
 				displayTour(((TVICatalogComparedTour) firstElement).getTourId());
+
+			} else if (firstElement instanceof TVICompareResultComparedTour) {
+
+				displayTour(((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId());
 			}
 		}
 	}
@@ -2885,7 +2902,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			return false;
 		}
-	} 
+	}
 
 	/**
 	 * saves the tour when it is dirty, valid and confirmation is done
@@ -3050,7 +3067,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * show the default title in the editor
 	 */
 	private void showDefaultTitle() {
-		
+
 		fMessageManager.removeMessage(MESSAGE_KEY_ANOTHER_SELECTION);
 		updateUITitle();
 

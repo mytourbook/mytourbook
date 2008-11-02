@@ -37,14 +37,14 @@ public class SelectionTourCatalogView implements ISelection {
 	 */
 	private Long					fCompTourId;
 
-	private TVICatalogReferenceTour	fRefItem;
+	private TVICatalogRefTourItem	fRefItem;
 	private TVICatalogYearItem		fYearItem;
 
 	public SelectionTourCatalogView(final Long refId) {
 		fRefId = refId;
 	}
 
-	public SelectionTourCatalogView(final TVICatalogReferenceTour refItem) {
+	public SelectionTourCatalogView(final TVICatalogRefTourItem refItem) {
 		fRefId = refItem.refId;
 		fRefItem = refItem;
 	}
@@ -67,10 +67,10 @@ public class SelectionTourCatalogView implements ISelection {
 	}
 
 	/**
-	 * @return Returns the item {@link TVICatalogReferenceTour} or <code>null</code> when it's not
+	 * @return Returns the item {@link TVICatalogRefTourItem} or <code>null</code> when it's not
 	 *         set
 	 */
-	public TVICatalogReferenceTour getRefItem() {
+	public TVICatalogRefTourItem getRefItem() {
 		return fRefItem;
 	}
 

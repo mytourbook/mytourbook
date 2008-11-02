@@ -167,8 +167,10 @@ public class WizardPageCompareTour extends WizardPage {
 		}
 	}
 
-	protected WizardPageCompareTour(final String pageName) {
-		super(pageName);
+	WizardPageCompareTour() {
+
+		super("compare-tour");//$NON-NLS-1$
+
 		setTitle(Messages.tourCatalog_wizard_Page_compared_tours_title);
 	}
 

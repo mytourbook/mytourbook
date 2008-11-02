@@ -160,9 +160,9 @@ public class ActionDeleteTour extends Action {
 		}
 
 		/*
-		 * confirm a second time when more than one tour is deleted
+		 * confirm a second time
 		 */
-		if (selectedTours > 1) {
+		if (selectedTours > 0) {
 			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
 					Messages.Tour_Book_Action_delete_selected_tours_dlg_title_confirm,
 					NLS.bind(Messages.Tour_Book_Action_delete_selected_tours_dlg_message_confirm, selectedTours)) == false) {

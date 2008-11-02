@@ -21,19 +21,15 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";							//$NON-NLS-1$
 
-	public static String	Image__edit_adjust_altitude;
-
-	public static String		Image__edit_tour_marker;
-
-	public static String	dialog_is_tour_modified_message;
-
-	public static String	dialog_is_tour_modified_title;
+	public static String		dialog_is_tour_editor_modified_message;
+	public static String		dialog_is_tour_editor_modified_title;
+	public static String		dialog_is_tour_modified_message;
+	public static String		dialog_is_tour_modified_title;
 
 	public static String		dialog_quick_edit_dialog_area_title;
 	public static String		dialog_quick_edit_dialog_save;
 	public static String		dialog_quick_edit_dialog_title;
-
-	public static String	dialog_quick_edit_dialog_update;
+	public static String		dialog_quick_edit_dialog_update;
 
 	public static String		App_Action_About;
 	public static String		App_Action_edit_tour;
@@ -41,6 +37,7 @@ public class Messages extends NLS {
 	public static String		App_Action_Menu_help;
 	public static String		App_Action_Menu_tools;
 	public static String		App_Action_Menu_view;
+
 	public static String		App_Action_open_perspective;
 	public static String		App_Action_open_preferences;
 	public static String		App_Action_open_tour_segmenter;
@@ -65,9 +62,8 @@ public class Messages extends NLS {
 	public static String		action_tagView_flat_layout;
 
 	public static String		action_tour_editor_delete_time_slices;
-
 	public static String		action_tourbook_select_year_month_tours;
-
+	public static String		action_tourCatalog_open_compare_wizard;
 	public static String		action_tourType_modify_tourTypes;
 
 	public static String		app_action_button_down;
@@ -77,18 +73,16 @@ public class Messages extends NLS {
 	public static String		app_action_dlg_confirm_save_editors_message;
 	public static String		app_action_dlg_confirm_save_editors_title;
 	public static String		app_action_dlg_confirm_save_tour_data_editor_message;
-
 	public static String		app_action_dlg_confirm_save_tour_data_editor_title;
-
-	public static String	app_action_edit_adjust_altitude;
-
+	public static String		app_action_edit_adjust_altitude;
 	public static String		app_action_edit_rows_tooltip;
-
-	public static String	app_action_edit_tour_marker;
+	public static String		app_action_edit_tour_marker;
 	public static String		app_action_expand_selection_tooltip;
 	public static String		app_action_expand_type_flat;
 	public static String		app_action_expand_type_year_day;
 	public static String		app_action_expand_type_year_month_day;
+
+	public static String	app_action_open_tour;
 	public static String		app_action_quick_edit;
 	public static String		app_action_save_tour_tooltip;
 	public static String		app_action_undo_modifications_tooltip;
@@ -122,17 +116,13 @@ public class Messages extends NLS {
 	public static String		Compare_Result_Column_diff;
 	public static String		Compare_Result_Column_diff_label;
 	public static String		Compare_Result_Column_diff_tooltip;
-//	public static String		Compare_Result_Column_km_tooltip;
 	public static String		Compare_Result_Column_kmh_db_label;
 	public static String		Compare_Result_Column_kmh_db_tooltip;
 	public static String		Compare_Result_Column_kmh_label;
-//	public static String		Compare_Result_Column_kmh_moved_;
 	public static String		Compare_Result_Column_kmh_moved_label;
 	public static String		Compare_Result_Column_kmh_moved_tooltip;
 	public static String		Compare_Result_Column_kmh_tooltip;
 	public static String		Compare_Result_Column_tour;
-//	public static String		Compare_Result_time_interval;
-//	public static String		Compare_Result_time_interval_tooltip;
 
 	public static String		Database_Confirm_update;
 	public static String		Database_Confirm_update_title;
@@ -228,12 +218,16 @@ public class Messages extends NLS {
 	public static String		Image__database_placeholder;
 	public static String		Image__delete;
 	public static String		Image__delete_disabled;
-	public static String		Image__edit_row;
 
+	public static String		Image__edit_adjust_altitude;
+	public static String		Image__edit_row;
 	public static String		Image__edit_tour;
 	public static String		Image__edit_tour_disabled;
+	public static String		Image__edit_tour_marker;
+	public static String		Image__edit_tour_marker_new;
+
 	public static String		Image__expand_all;
-//	public static String		Image__fit_to_window;
+
 	public static String		Image__graph_altimeter;
 	public static String		Image__graph_altitude;
 	public static String		Image__graph_cadence;
@@ -276,12 +270,14 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics;
 	public static String		Image__tag;
 	public static String		Image__tag_category;
-
 	public static String		Image__tag_root;
 	public static String		Image__tour;
+	public static String		Image__tour_map_ref_tour_new;
 
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
+
+	public static String	Image__tour_viewer;
 	public static String		Image__undo_edit;
 	public static String		Image__undo_edit_disabled;
 	public static String		Image__undo_tour_type_filter;
@@ -390,20 +386,20 @@ public class Messages extends NLS {
 
 	public static String		pref_general_confirmation;
 
-	public static String	pref_general_hide_confirmation;
+	public static String		pref_general_hide_confirmation;
 
-	public static String	pref_general_hide_warning;
+	public static String		pref_general_hide_warning;
 
 	public static String		pref_general_restart_app_message;
 	public static String		pref_general_restart_app_title;
 
-	public static String	pref_map_layout_dim_color;
+	public static String		pref_map_layout_dim_color;
 
 	public static String		pref_map_layout_symbol;
 	public static String		pref_map_layout_symbol_dot;
 	public static String		pref_map_layout_symbol_line;
 
-	public static String	pref_map_layout_symbol_square;
+	public static String		pref_map_layout_symbol_square;
 	public static String		pref_map_layout_symbol_width;
 
 	public static String		pref_regional_decimalSeparator;
@@ -558,15 +554,15 @@ public class Messages extends NLS {
 	public static String		tour_editor_abel_time_unit;
 	public static String		tour_editor_dlg_delete_rows_message;
 
-	public static String	tour_editor_dlg_delete_rows_not_successive;
+	public static String		tour_editor_dlg_delete_rows_not_successive;
 
 	public static String		tour_editor_dlg_delete_rows_title;
 
 	public static String		tour_editor_dlg_discard_tour_message;
 	public static String		tour_editor_dlg_discard_tour_title;
-	public static String	tour_editor_dlg_reload_data_message;
+	public static String		tour_editor_dlg_reload_data_message;
 
-	public static String	tour_editor_dlg_reload_data_title;
+	public static String		tour_editor_dlg_reload_data_title;
 
 	public static String		tour_editor_dlg_revert_tour_message;
 	public static String		tour_editor_dlg_revert_tour_title;
@@ -589,7 +585,7 @@ public class Messages extends NLS {
 
 	public static String		tour_editor_label_ref_tour;
 
-	public static String	tour_editor_label_ref_tour_none;
+	public static String		tour_editor_label_ref_tour_none;
 	public static String		tour_editor_label_start_location;
 	public static String		tour_editor_label_start_time;
 	public static String		tour_editor_label_time;
@@ -597,14 +593,14 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_tour_date;
 	public static String		tour_editor_label_tour_distance;
 
-	public static String	tour_editor_label_tour_id;
+	public static String		tour_editor_label_tour_id;
 	public static String		tour_editor_label_tour_tag;
 	public static String		tour_editor_label_tour_title;
 	public static String		tour_editor_label_tour_type;
 
-	public static String	tour_editor_message_person_is_required;
+	public static String		tour_editor_message_person_is_required;
 
-	public static String	tour_editor_message_show_another_tour;
+	public static String		tour_editor_message_show_another_tour;
 
 	public static String		tour_editor_ref_tour_time_slices;
 
@@ -647,7 +643,7 @@ public class Messages extends NLS {
 	public static String		tourCatalog_view_compare_job_title;
 	public static String		tourCatalog_view_dlg_add_reference_tour_msg;
 
-	public static String	tourCatalog_view_dlg_add_reference_tour_save_modified_tour;
+	public static String		tourCatalog_view_dlg_add_reference_tour_save_modified_tour;
 	public static String		tourCatalog_view_dlg_add_reference_tour_title;
 	public static String		tourCatalog_view_dlg_delete_comparedTour_msg;
 	public static String		tourCatalog_view_dlg_delete_comparedTour_title;

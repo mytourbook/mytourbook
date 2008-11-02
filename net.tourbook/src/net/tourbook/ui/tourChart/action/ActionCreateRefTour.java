@@ -21,6 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
+import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.UI;
@@ -41,7 +42,8 @@ public class ActionCreateRefTour extends Action {
 	public ActionCreateRefTour(final TourChart tourChart) {
 
 		setText(Messages.tourCatalog_view_action_create_reference_tour);
-
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_map_ref_tour_new));
+		
 		fTourChart = tourChart;
 	}
 

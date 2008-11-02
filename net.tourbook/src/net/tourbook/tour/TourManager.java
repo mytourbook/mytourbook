@@ -110,7 +110,12 @@ public class TourManager {
 	private ComputeChartValue					computePowerAvg;
 	private ComputeChartValue					computeSpeedAvg;
 
-	private final LinkedHashMap<Long, TourData>	fTourDataMap			= new LinkedHashMap<Long, TourData>();
+	private final LinkedHashMap<Long, TourData>	fTourDataCache			= new LinkedHashMap<Long, TourData>();
+
+// 
+//	TourDataCache is disabled because it's much slower when tours are compared a 2nd or more times	
+//	
+//	private final TourDataCache			fTourDataCache			= new TourDataCache();
 
 	private static final ListenerList			fPropertyListeners		= new ListenerList(ListenerList.IDENTITY);
 	private static final ListenerList			fTourSaveListeners		= new ListenerList(ListenerList.IDENTITY);
@@ -411,15 +416,7 @@ public class TourManager {
 						 * the view only for the active perspective
 						 */
 
-						try {
-							PlatformUI.getWorkbench()
-									.getActiveWorkbenchWindow()
-									.getActivePage()
-									.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
-							
-						} catch (final PartInitException e) {
-							e.printStackTrace();
-						}
+						UI.openTourEditor();
 
 					} else {
 
@@ -556,7 +553,7 @@ public class TourManager {
 	 * {@link #getTourData} the database
 	 */
 	public void clearTourDataCache() {
-		fTourDataMap.clear();
+		fTourDataCache.clear();
 	}
 
 	/**
@@ -1338,10 +1335,9 @@ public class TourManager {
 			return null;
 		}
 
-		final TourData tourDataInMap = fTourDataMap.get(tourId);
-		if (tourDataInMap != null) {
-//			System.out.println("tourDataInMap\t:" + tourDataInMap);
-			return tourDataInMap;
+		final TourData tourDataInCache = fTourDataCache.get(tourId);
+		if (tourDataInCache != null) {
+			return tourDataInCache;
 		}
 
 		final TourData tourDataFromDb = TourDatabase.getTourFromDb(tourId);
@@ -1352,7 +1348,6 @@ public class TourManager {
 
 		// keep the tour data
 		updateTourInCache(tourDataFromDb);
-//		System.out.println("tourDataFromDb\t:" + tourDataFromDb);
 
 		return tourDataFromDb;
 	}
@@ -1380,7 +1375,7 @@ public class TourManager {
 	}
 
 	public void removeAllToursFromCache() {
-		fTourDataMap.values().clear();
+		fTourDataCache.clear();
 	}
 
 	public void removePropertyListener(final ITourPropertyListener listener) {
@@ -1396,7 +1391,7 @@ public class TourManager {
 	 * @param tourId
 	 */
 	public void removeTourFromCache(final Long tourId) {
-		fTourDataMap.remove(tourId);
+		fTourDataCache.remove(tourId);
 	}
 
 	public void removeTourSaveListener(final ITourSaveListener listener) {
@@ -1428,7 +1423,7 @@ public class TourManager {
 	}
 
 	public void updateTourInCache(final TourData tourData) {
-		fTourDataMap.put(tourData.getTourId(), tourData);
+		fTourDataCache.put(tourData.getTourId(), tourData);
 	}
 
 }

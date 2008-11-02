@@ -126,7 +126,6 @@ public class DialogMarker extends TitleAreaDialog {
 	private Button				fBtnDelete;
 	private Button				fBtnUndo;
 	private Button				fBtnReset;
-	private Button				fBtnClose;
 
 	private NumberFormat		fNF								= NumberFormat.getNumberInstance();
 
@@ -228,7 +227,7 @@ public class DialogMarker extends TitleAreaDialog {
 		// update data model, add new marker to the marker list
 		fTourData.getTourMarkers().add(newTourMarker);
 
-		// update the viewer and select new marker
+		// update the viewer and select the new marker
 		fMarkerViewer.refresh();
 		fMarkerViewer.setSelection(new StructuredSelection(newTourMarker), true);
 
@@ -244,6 +243,9 @@ public class DialogMarker extends TitleAreaDialog {
 
 		if (fIsOkPressed) {
 
+			/*
+			 * the markers are already set into the tour data because the original values are edited
+			 */
 			restoreVisibleType();
 
 		} else {
@@ -401,7 +403,7 @@ public class DialogMarker extends TitleAreaDialog {
 
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
-		fTourChart.setContextProvider(new TourChartContextProvider(this));
+		fTourChart.setContextProvider(new DialogMarkerTourChartContextProvicer(this));
 
 		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
 		gd.heightHint = 400;
@@ -708,6 +710,10 @@ public class DialogMarker extends TitleAreaDialog {
 		return TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
 
+	TourChart getTourChart() {
+		return fTourChart;
+	}
+
 	@Override
 	protected void okPressed() {
 
@@ -814,7 +820,7 @@ public class DialogMarker extends TitleAreaDialog {
 	}
 
 	/**
-	 * restore type from backup
+	 * restore type from the backup for the currently selected tour marker
 	 */
 	private void restoreVisibleType() {
 

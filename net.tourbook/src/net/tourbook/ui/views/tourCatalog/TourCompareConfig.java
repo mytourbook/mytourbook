@@ -19,6 +19,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 /**
@@ -27,36 +28,24 @@ import net.tourbook.ui.tourChart.TourChartConfiguration;
 public class TourCompareConfig {
 
 	private TourReference					fRefTour;
-	private TourData						fRefTourData;
 	private TourChartConfiguration			fRefTourChartConfig;
 
 	private TourChartConfiguration			fCompareTourChartConfig;
 
 	private SelectionChartXSliderPosition	xSliderPosition;
+	private Long							fRefTourTourId;
 
 	TourCompareConfig(	final TourReference refTour,
 						final ChartDataModel refChartDataModel,
-						final TourData refTourData,
+						final Long refTourTourId,
 						final TourChartConfiguration refTourChartConfig,
 						final TourChartConfiguration compTourChartConfig) {
 
 		fRefTour = refTour;
-		fRefTourData = refTourData;
+		fRefTourTourId = refTourTourId;
 
 		fRefTourChartConfig = refTourChartConfig;
 		fCompareTourChartConfig = compTourChartConfig;
-	}
-
-	SelectionChartXSliderPosition getXSliderPosition() {
-		return xSliderPosition;
-	}
-
-	void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
-		xSliderPosition = sliderPosition;
-	}
-
-	TourChartConfiguration getRefTourChartConfig() {
-		return fRefTourChartConfig;
 	}
 
 	TourChartConfiguration getCompTourChartConfig() {
@@ -67,8 +56,26 @@ public class TourCompareConfig {
 		return fRefTour;
 	}
 
+	TourChartConfiguration getRefTourChartConfig() {
+		return fRefTourChartConfig;
+	}
+
 	TourData getRefTourData() {
-		return fRefTourData;
+		
+		/*
+		 * ensure to have the correct tour data, load tour data because tour data in the ref tour
+		 * could be changed, this is a wrong concept which could be changed but requires additonal
+		 * work
+		 */
+		return TourManager.getInstance().getTourData(fRefTourTourId);
+	}
+
+	SelectionChartXSliderPosition getXSliderPosition() {
+		return xSliderPosition;
+	}
+
+	void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition) {
+		xSliderPosition = sliderPosition;
 	}
 
 }

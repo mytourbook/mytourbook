@@ -22,10 +22,11 @@ import net.tourbook.Messages;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.tour.ActionEditQuick;
-import net.tourbook.tour.ActionEditTour;
 import net.tourbook.tour.ActionEditTourMarker;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.tourChart.action.ActionCreateMarker;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 
@@ -38,6 +39,7 @@ class TourChartViewContextProvicer implements IChartContextProvider, ITourProvid
 
 	private ActionEditQuick			fActionQuickEdit;
 	private ActionEditTour			fActionEditTour;
+	private ActionOpenTour			fActionOpenTour;
 
 	private ActionCreateRefTour		fActionCreateRefTour;
 	private ActionCreateMarker		fActionCreateMarker;
@@ -58,12 +60,16 @@ class TourChartViewContextProvicer implements IChartContextProvider, ITourProvid
 
 		fActionQuickEdit = new ActionEditQuick(fTourChartView);
 		fActionEditTour = new ActionEditTour(fTourChartView);
+		fActionOpenTour = new ActionOpenTour(fTourChartView);
 
 		final TourChart tourChart = fTourChartView.getTourChart();
 
 		fActionCreateRefTour = new ActionCreateRefTour(tourChart);
 
-		fActionCreateMarker = new ActionCreateMarker(tourChart, Messages.tourCatalog_view_action_create_marker, true);
+		fActionCreateMarker = new ActionCreateMarker(tourChart, //
+				Messages.tourCatalog_view_action_create_marker,
+				true);
+		
 		fActionCreateMarkerLeft = new ActionCreateMarker(tourChart,
 				Messages.tourCatalog_view_action_create_left_marker,
 				true);
@@ -84,11 +90,10 @@ class TourChartViewContextProvicer implements IChartContextProvider, ITourProvid
 
 		menuMgr.add(fActionQuickEdit);
 		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditTourMarkers);
-
-		menuMgr.add(new Separator());
 
 		/*
 		 * enable actions

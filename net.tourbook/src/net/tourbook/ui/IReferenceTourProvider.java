@@ -15,28 +15,17 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
+import java.util.ArrayList;
 
-import org.eclipse.jface.action.Action;
+/**
+ * This interface provides reference tours which are selected in a view
+ */
+public interface IReferenceTourProvider {
 
-public class ActionRefreshView extends Action {
-
-	private ITourViewer	fTourViewer;
-
-	public ActionRefreshView(final ITourViewer tourViewer) {
-
-		super(null, AS_PUSH_BUTTON);
-
-		fTourViewer = tourViewer;
-
-		setToolTipText(Messages.tag_view_action_refresh_view_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__refresh));
-	}
-
-	@Override
-	public void run() {
-		fTourViewer.reloadViewer();
-	}
+	/**
+	 * Returns the reference tours which are selected or <code>null</code> when a reference tour is
+	 * not selected
+	 */
+	ArrayList<Long> getSelectedReferenceTours();
 
 }

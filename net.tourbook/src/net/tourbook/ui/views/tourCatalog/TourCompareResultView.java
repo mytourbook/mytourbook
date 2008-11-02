@@ -33,16 +33,10 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.tour.TourProperty;
-import net.tourbook.ui.ActionCollapseAll;
-import net.tourbook.ui.ActionEditTour;
-import net.tourbook.ui.ActionModifyColumns;
-import net.tourbook.ui.ActionOpenPrefDialog;
-import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
@@ -50,6 +44,13 @@ import net.tourbook.ui.TreeColumnDefinition;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.TreeViewerItem;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionCollapseAll;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionSetTourType;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -133,6 +134,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private ActionEditQuick						fActionEditQuick;
 	private ActionEditTour						fActionEditTour;
 	private ActionSetTourType					fActionSetTourType;
+	private ActionOpenTour						fActionOpenTour;
 
 	private boolean								fIsToolbarCreated;
 
@@ -143,6 +145,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private ColumnManager						fColumnManager;
 
 	SelectionRemovedComparedTours				fOldRemoveSelection	= null;
+
 
 	class ResultContentProvider implements ITreeContentProvider {
 
@@ -392,6 +395,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		fActionCheckTours = new ActionCheckTours(this);
 		fActionUncheckTours = new ActionUncheckTours(this);
 
+		fActionSetTourType = new ActionSetTourType(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
@@ -401,7 +405,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		fActionEditQuick = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(this);
-		fActionSetTourType = new ActionSetTourType(this);
+		fActionOpenTour = new ActionOpenTour(this);
 
 		fActionModifyColumns = new ActionModifyColumns(this);
 		fActionCollapseAll = new ActionCollapseAll(this);
@@ -931,8 +935,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		TagManager.enableRecentTagActions(isTourSelected);
 
 		// actions: edit tour
-		fActionEditTour.setEnabled(isOneTourSelected);
 		fActionEditQuick.setEnabled(isOneTourSelected);
+		fActionEditTour.setEnabled(isOneTourSelected);
+		fActionOpenTour.setEnabled(isOneTourSelected);
 
 		// action: tour type
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
@@ -945,21 +950,19 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		menuMgr.add(fActionRemoveComparedTourSaveStatus);
 		menuMgr.add(fActionCheckTours);
 		menuMgr.add(fActionUncheckTours);
+		
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionEditQuick);
+		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
-
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-
-		menuMgr.add(new Separator());
 		menuMgr.add(fActionOpenTagPrefs);
-
-		menuMgr.add(new Separator());
-		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionSetTourType);
-		menuMgr.add(fActionEditTour);
 
 		enableActions();
 	}

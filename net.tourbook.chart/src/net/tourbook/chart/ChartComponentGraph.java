@@ -685,11 +685,17 @@ public class ChartComponentGraph extends Canvas {
 			slider2 = xSliderB;
 		}
 
+		/*
+		 * check if a slider was hit
+		 */
 		if (slider1 == null && slider2 == null) {
 			// no slider was hit
 			return;
 		}
 
+		/*
+		 * check if one slider was hit, when yes, the leftslider is set and the right slider is null
+		 */
 		if (slider1 != null && slider2 == null) {
 			// only slider 1 was hit
 			contextLeftSlider = slider1;
@@ -701,17 +707,18 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
-		// both sliders were hit
+		/*
+		 * both sliders are hit
+		 */
+		final int xSlider1Position = slider1.getHitRectangle().x;
+		final int xSlider2Position = slider2.getHitRectangle().x;
 
-		final int xSlider1 = slider1.getHitRectangle().x;
-		final int xSlider2 = slider2.getHitRectangle().x;
-
-		if (xSlider1 == xSlider2) {
+		if (xSlider1Position == xSlider2Position) {
 			// both sliders are at the same position
 			contextLeftSlider = slider1;
 			return;
 		}
-		if (xSlider1 < xSlider2) {
+		if (xSlider1Position < xSlider2Position) {
 			contextLeftSlider = slider1;
 			contextRightSlider = slider2;
 		} else {
@@ -4413,7 +4420,7 @@ public class ChartComponentGraph extends Canvas {
 		if (fDraggedChartDraggedPos == null) {
 			return;
 		}
-		
+
 		final int devXDiff = fDraggedChartDraggedPos.x - fDraggedChartStartPos.x;
 		final int devYDiff = 0;
 

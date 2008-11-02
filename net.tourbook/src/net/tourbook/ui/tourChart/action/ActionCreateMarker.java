@@ -24,7 +24,6 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
@@ -37,15 +36,15 @@ public class ActionCreateMarker extends Action {
 	 * 
 	 */
 	private final TourChart	fTourChart;
-	private boolean						fIsLeftSlider;
+	private boolean			fIsLeftSlider;
 
-	public ActionCreateMarker(final TourChart tourChart,
-								final String text,
-								final boolean isLeftSlider) {
+	private IMarkerReceiver	fMarkerReceiver;
+
+	public ActionCreateMarker(final TourChart tourChart, final String text, final boolean isLeftSlider) {
 
 		super(text);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new));
 
 		fTourChart = tourChart;
 		fIsLeftSlider = isLeftSlider;
@@ -59,8 +58,7 @@ public class ActionCreateMarker extends Action {
 	 */
 	private TourMarker createTourMarker(final TourData tourData) {
 
-		final ChartXSlider slider = fIsLeftSlider
-				? fTourChart.getLeftSlider() : fTourChart.getRightSlider();
+		final ChartXSlider slider = fIsLeftSlider ? fTourChart.getLeftSlider() : fTourChart.getRightSlider();
 
 		if (slider == null) {
 			return null;
@@ -84,16 +82,22 @@ public class ActionCreateMarker extends Action {
 
 		final TourData tourData = fTourChart.getTourData();
 
-		if (UI.isTourModified(tourData)) {
-			return;
-		}
+//		if (UI.isTourModified(tourData)) {
+//			return;
+//		}
 
 		final TourMarker newTourMarker = createTourMarker(tourData);
 		if (newTourMarker == null) {
 			return;
 		}
 
-		
+		if (fMarkerReceiver != null) {
+			fMarkerReceiver.addTourMarker(newTourMarker);
+			
+			// the marker dialog will not be opened
+			return;
+		}
+
 		final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(), tourData, null);
 
 		markerDialog.create();
@@ -103,26 +107,15 @@ public class ActionCreateMarker extends Action {
 			TourManager.saveModifiedTour(tourData);
 		}
 
-//		/*
-//		 * Currently the dialog works with the markers from the tour editor not with a backup, so
-//		 * changes in the dialog are made in the tourdata of the tour editor -> the tour will be
-//		 * dirty when this dialog was opened
-//		 */
-//
-//		// force the tour to be saved
-//		tourChart.setTourDirty(true);
-//
-//		// update chart
-//		tourChart.updateMarkerLayer(true);
-//
-//		// update marker list and other listener
-//		TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED);
-
 //		} else if (this.fChartContextProvider.fMarkerDialog != null) {
 //
 //			final TourMarker newTourMarker = createTourMarker(this.fChartContextProvider.fMarkerDialog.getTourData());
 //
 //			this.fChartContextProvider.fMarkerDialog.addTourMarker(newTourMarker);
 //		}
+	}
+
+	public void setMarkerReceiver(final IMarkerReceiver markerReceiver) {
+		fMarkerReceiver = markerReceiver;
 	}
 }

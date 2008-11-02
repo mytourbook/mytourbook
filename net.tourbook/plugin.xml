@@ -245,7 +245,7 @@
       <view
             category="net.tourbook.category.tour"
             class="net.tourbook.ui.views.TourMarkerView"
-            icon="icons/marker-editor.gif"
+            icon="icons/tour-marker.png"
             id="net.tourbook.views.TourMarkerView"
             name="%view_name_Marker"/>
      <view
@@ -273,7 +273,7 @@
       <view
             category="net.tourbook.category.compareTours"
             class="net.tourbook.ui.views.tourCatalog.TourCatalogViewReferenceTour"
-            icon="icons/tour-map-reftour.gif"
+            icon="icons/tour-map-reftour.png"
             id="net.tourbook.views.tourCatalog.referenceTourView"
             name="%view_name_tourCatalog_referenceTour">
       </view>
@@ -315,7 +315,7 @@
       <view
             category="net.tourbook.category.system"
             class="net.tourbook.mapping.TourMapPropertyView"
-            icon="icons/tour-map-properties.gif"
+            icon="icons/tour-map-properties.png"
             id="net.tourbook.mapping.TourMapPropertyView"
             name="%view_name_map_properties">
       </view>
@@ -445,7 +445,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="net.tourbook.tour.TourEditor"
-            icon="icons/tour-viewer.gif"
+            icon="icons/tour-viewer.png" 
             id="net.tourbook.tour.TourEditor"
             name="%command_view_tourViewer">
       </editor>
@@ -535,7 +535,7 @@
          </command>
          <command
                commandId="net.tourbook.command.tourCompareWizard"
-               icon="icons/tour-map-compare-wizard.gif"
+               icon="icons/tour-map-compare-wizard.png"
                label="%command_tourCompare_wizard"
                mnemonic="%command_tourCompare_wizard_mnemonic">
          </command>
@@ -590,7 +590,7 @@
             </command>
             <command
                   commandId="net.tourbook.command.tourCompareWizard"
-                  icon="icons/tour-map-compare-wizard.gif"
+                  icon="icons/tour-map-compare-wizard.png"
                   label="%command_tourCompare_wizard"
                   mnemonic="%command_tourCompare_wizard_mnemonic"
                   style="push">

@@ -26,6 +26,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -115,13 +116,13 @@ public class ActionRemoveComparedTours extends Action {
 		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
 			final Object element = iterator.next();
-			if (element instanceof TVICatalogReferenceTour) {
+			if (element instanceof TVICatalogRefTourItem) {
 
 				/*
 				 * remove all compared tours from the current reference tour
 				 */
 
-				final TVICatalogReferenceTour refTourItem = (TVICatalogReferenceTour) element;
+				final TVICatalogRefTourItem refTourItem = (TVICatalogRefTourItem) element;
 				final Collection<StoredComparedTour> storedCompTours = TourCompareManager.getComparedToursFromDb(refTourItem.refId)
 						.values();
 
@@ -167,6 +168,10 @@ public class ActionRemoveComparedTours extends Action {
 	@Override
 	public void run() {
 
+		if (UI.isTourEditorModified()) {
+			return;
+		}
+
 		final TreeViewer tourViewer = fTourView.getTourViewer();
 
 		final SelectionRemovedComparedTours removedTours = new SelectionRemovedComparedTours();
@@ -177,7 +182,7 @@ public class ActionRemoveComparedTours extends Action {
 		final Object firstItem = selection.getFirstElement();
 
 		boolean isRemoved = false;
-		if (firstItem instanceof TVICatalogReferenceTour) {
+		if (firstItem instanceof TVICatalogRefTourItem) {
 
 			// remove the reference tours and it's children
 			isRemoved = removeRefTours(selection, removedTours);

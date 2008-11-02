@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,31 +13,37 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.ui.action;
 
-import net.tourbook.Messages;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.ui.tourChart.TourChartView;
+import net.tourbook.ui.ColumnManager;
+import net.tourbook.ui.ITourViewer;
+import net.tourbook.ui.Messages;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionEditTour extends Action {
+public class ActionModifyColumns extends Action {
 
-	private TourChartView	fTourChartView;
+	private ITourViewer	fTourViewer;
 
-	public ActionEditTour(final TourChartView tourChartView) {
+	public ActionModifyColumns(final ITourViewer tourViewer) {
 
-		fTourChartView = tourChartView;
+		fTourViewer = tourViewer;
 
-		setText(Messages.App_Action_edit_tour);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
+		setText(Messages.Action_configure_columns);
+		setToolTipText(Messages.Action_configure_columns_tooltip);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_configure_columns));
 	}
 
 	@Override
 	public void run() {
 
-		TourManager.getInstance().openTourInEditor(fTourChartView.getTourChart().getTourData().getTourId());
+		final ColumnManager columnManager = fTourViewer.getColumnManager();
+		
+		if (columnManager != null) {
+			columnManager.openColumnDialog();
+		}
 	}
 
 }

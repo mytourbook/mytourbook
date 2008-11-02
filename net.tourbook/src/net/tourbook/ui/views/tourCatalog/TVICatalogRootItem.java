@@ -64,7 +64,7 @@ public class TVICatalogRootItem extends TVICatalogItem {
 
 			while (result.next()) {
 
-				final TVICatalogReferenceTour refItem = new TVICatalogReferenceTour(this);
+				final TVICatalogRefTourItem refItem = new TVICatalogRefTourItem(this);
 				children.add(refItem);
 
 				refItem.label = result.getString(1);

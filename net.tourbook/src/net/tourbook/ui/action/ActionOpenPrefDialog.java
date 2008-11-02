@@ -13,46 +13,33 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.tour;
-
-import java.util.ArrayList;
+package net.tourbook.ui.action;
 
 import net.tourbook.Messages;
-import net.tourbook.data.TourData;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
-public class ActionEditQuick extends Action {
+public final class ActionOpenPrefDialog extends Action {
 
-	private ITourProvider	fTourProvider;
+	private String	fPrefPageId;
 
-	public ActionEditQuick(final ITourProvider tourProvider) {
+	public ActionOpenPrefDialog(final String text, final String prefPageId) {
 
-		setText(Messages.app_action_quick_edit);
-//		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
-//		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
+		setText(text);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__options));
 
-		fTourProvider = tourProvider;
+		fPrefPageId = prefPageId;
 	}
 
 	@Override
 	public void run() {
-
-		// get selected tour, make sure only one tour is selected
-		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
-		if (selectedTours == null || selectedTours.size() != 1) {
-			return;
-		}
-
-		final DialogQuickEdit dialog = new DialogQuickEdit(Display.getCurrent().getActiveShell(), selectedTours.get(0));
-		if (dialog.open() == Window.OK) {
-
-			// save all tours with the new tour type
-			TourManager.saveModifiedTours(selectedTours);
-		}
+		PreferencesUtil.createPreferenceDialogOn(//
+		Display.getCurrent().getActiveShell(),
+				fPrefPageId,
+				null,
+				null).open();
 	}
-
 }

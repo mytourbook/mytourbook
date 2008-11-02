@@ -37,7 +37,7 @@ import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogReferenceTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -344,7 +344,7 @@ public class TourChartView extends ViewPart implements ITourProvider {
 
 			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
 
-			final TVICatalogReferenceTour refItem = tourCatalogSelection.getRefItem();
+			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
 			if (refItem != null) {
 				updateChart(refItem.getTourId());
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -230,7 +230,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 				// set title
 				changedChartDataModel.setTitle(NLS.bind(Messages.tourCatalog_view_label_chart_title_reference_tour,
 						refTour.getLabel(),
-						TourManager.getTourTitleDetailed(compareConfig.getRefTourData())));
+						TourManager.getTourTitleDetailed(fTourData)));
 
 			}
 		});

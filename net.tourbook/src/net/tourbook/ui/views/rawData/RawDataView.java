@@ -40,7 +40,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.ActionEditQuick;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -48,16 +47,18 @@ import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.tour.TourProperty;
-import net.tourbook.ui.ActionEditTour;
-import net.tourbook.ui.ActionModifyColumns;
-import net.tourbook.ui.ActionOpenPrefDialog;
-import net.tourbook.ui.ActionSetTourType;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TableColumnDefinition;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionSetTourType;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
@@ -145,6 +146,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private ActionSetTourTag				fActionRemoveTag;
 	private ActionRemoveAllTags				fActionRemoveAllTags;
 	private ActionOpenPrefDialog			fActionOpenTagPrefs;
+	private ActionOpenTour					fActionOpenTour;
 
 	private ImageDescriptor					imageDescDatabase;
 	private ImageDescriptor					imageDescDatabaseOtherPerson;
@@ -363,6 +365,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		fActionEditTour = new ActionEditTour(this);
 		fActionEditQuick = new ActionEditQuick(this);
+		fActionOpenTour = new ActionOpenTour(this);
 		fActionSetTourType = new ActionSetTourType(this);
 
 		fActionAddTag = new ActionSetTourTag(this, true);
@@ -867,6 +870,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		fActionEditTour.setEnabled(selectedItems == 1 && savedTours == 1);
 		fActionEditQuick.setEnabled(selectedItems == 1 && savedTours == 1);
+		fActionOpenTour.setEnabled(selectedItems == 1 && savedTours == 1);
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
@@ -914,17 +918,15 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
-		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(fActionSetTourType);
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
-
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-
-		menuMgr.add(new Separator());
 		menuMgr.add(fActionOpenTagPrefs);
 
 		// add standard group which allows other plug-ins to contribute here

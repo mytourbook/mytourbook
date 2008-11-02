@@ -21,6 +21,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import net.tourbook.tour.TourManager;
+
 /**
  * Represents a reference tour which is between the {@link #startIndex} and {@link #endIndex} in the
  * {@link TourData} of a tour
@@ -94,7 +96,13 @@ public class TourReference {
 	}
 
 	public TourData getTourData() {
-		return tourData;
+		
+		/*
+		 * ensure to have the correct tour data, load tour data because tour data in the ref tour
+		 * could be changed, this is a wrong concept which could be changed but requires additonal
+		 * work
+		 */
+		return TourManager.getInstance().getTourData(tourData.getTourId());
 	}
 
 	@Override

@@ -13,33 +13,41 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.ui.action;
+
+import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 
-public final class ActionOpenPrefDialog extends Action {
+public class ActionEditTour extends Action {
 
-	private String	fPrefPageId;
+	private ITourProvider	fTourProvider;
 
-	public ActionOpenPrefDialog(final String text, final String prefPageId) {
+	public ActionEditTour(final ITourProvider tourProvider) {
 
-		setText(text);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__options));
+		fTourProvider = tourProvider;
 
-		fPrefPageId = prefPageId;
+		setText(Messages.App_Action_edit_tour);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
+
+		setEnabled(false);
 	}
 
 	@Override
 	public void run() {
-		PreferencesUtil.createPreferenceDialogOn(//
-		Display.getCurrent().getActiveShell(),
-				fPrefPageId,
-				null,
-				null).open();
+
+		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+
+		if (selectedTours != null && selectedTours.size() > 0) {
+			TourManager.getInstance().openTourInEditor(selectedTours.get(0).getTourId());
+		}
 	}
+
 }
