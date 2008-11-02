@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.3.0.GA/lib/ejb3-persistence.jar" sourcepath="net.tourbook.ext.ejb3_3.3.0src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.3.0.GA/lib/ejb3-persistence.jar" sourcepath="L:/java-resources/hibernate 3.3.0/cvs entitymanager_3_3_0_GA/HibernateExt/jpa-api"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.3.0.GA/lib/hibernate-annotations.jar" sourcepath="net.tourbook.ext.ejb3_3.3.0src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.3.0.GA/lib/hibernate-commons-annotations.jar" sourcepath="net.tourbook.ext.ejb3_3.3.0src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-entitymanager-3.3.0.GA/lib/hibernate-validator.jar" sourcepath="net.tourbook.ext.ejb3_3.3.0src.zip"/>
