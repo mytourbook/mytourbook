@@ -19,6 +19,7 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
@@ -66,15 +67,15 @@ class TourChartViewContextProvicer implements IChartContextProvider, ITourProvid
 
 		fActionCreateRefTour = new ActionCreateRefTour(tourChart);
 
-		fActionCreateMarker = new ActionCreateMarker(tourChart, //
+		fActionCreateMarker = new ActionCreateMarker(this, //
 				Messages.tourCatalog_view_action_create_marker,
 				true);
 		
-		fActionCreateMarkerLeft = new ActionCreateMarker(tourChart,
+		fActionCreateMarkerLeft = new ActionCreateMarker(this,
 				Messages.tourCatalog_view_action_create_left_marker,
 				true);
 
-		fActionCreateMarkerRight = new ActionCreateMarker(tourChart,
+		fActionCreateMarkerRight = new ActionCreateMarker(this,
 				Messages.tourCatalog_view_action_create_right_marker,
 				false);
 
@@ -133,6 +134,10 @@ class TourChartViewContextProvicer implements IChartContextProvider, ITourProvid
 
 		}
 
+	}
+
+	public Chart getChart() {
+		return fTourChartView.getTourChart();
 	}
 
 	public ChartXSlider getLeftSlider() {

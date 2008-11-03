@@ -17,14 +17,15 @@
 package net.tourbook.ui.tourChart.action;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.ChartXSlider;
+import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
@@ -35,18 +36,20 @@ public class ActionCreateMarker extends Action {
 	/**
 	 * 
 	 */
-	private final TourChart	fTourChart;
-	private boolean			fIsLeftSlider;
+	private final IChartContextProvider	fChartContextProvider;
+	private boolean						fIsLeftSlider;
 
-	private IMarkerReceiver	fMarkerReceiver;
+	private IMarkerReceiver				fMarkerReceiver;
 
-	public ActionCreateMarker(final TourChart tourChart, final String text, final boolean isLeftSlider) {
+	public ActionCreateMarker(	final IChartContextProvider chartContextProvider,
+								final String text,
+								final boolean isLeftSlider) {
 
 		super(text);
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new));
 
-		fTourChart = tourChart;
+		fChartContextProvider = chartContextProvider;
 		fIsLeftSlider = isLeftSlider;
 	}
 
@@ -58,7 +61,12 @@ public class ActionCreateMarker extends Action {
 	 */
 	private TourMarker createTourMarker(final TourData tourData) {
 
-		final ChartXSlider slider = fIsLeftSlider ? fTourChart.getLeftSlider() : fTourChart.getRightSlider();
+		final ChartXSlider leftSlider = fChartContextProvider.getLeftSlider();
+		final ChartXSlider rightSlider = fChartContextProvider.getRightSlider();
+
+		final ChartXSlider slider = rightSlider == null ? //
+				leftSlider
+				: fIsLeftSlider ? leftSlider : rightSlider;
 
 		if (slider == null) {
 			return null;
@@ -80,11 +88,17 @@ public class ActionCreateMarker extends Action {
 	@Override
 	public void run() {
 
-		final TourData tourData = fTourChart.getTourData();
+		final Chart chart = fChartContextProvider.getChart();
 
-//		if (UI.isTourModified(tourData)) {
-//			return;
-//		}
+		TourData tourData = null;
+		final Object tourId = chart.getChartDataModel().getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+		if (tourId instanceof Long) {
+			tourData = TourManager.getInstance().getTourData((Long) tourId);
+		}
+
+		if (tourData == null) {
+			return;
+		}
 
 		final TourMarker newTourMarker = createTourMarker(tourData);
 		if (newTourMarker == null) {
@@ -93,7 +107,7 @@ public class ActionCreateMarker extends Action {
 
 		if (fMarkerReceiver != null) {
 			fMarkerReceiver.addTourMarker(newTourMarker);
-			
+
 			// the marker dialog will not be opened
 			return;
 		}

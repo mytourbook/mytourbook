@@ -425,6 +425,33 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
+	 * execute the action which is defined when a bar is selected with the left mouse button
+	 */
+	private void actionSelectBars() {
+
+		if (fHoveredBarSerieIndex < 0) {
+			return;
+		}
+
+		boolean[] selectedBarItems;
+
+		if (fDrawingData.size() == 0) {
+			selectedBarItems = null;
+		} else {
+
+			final ChartDrawingData chartDrawingData = fDrawingData.get(0);
+			final ChartDataXSerie xData = chartDrawingData.getXData();
+
+			selectedBarItems = new boolean[xData.fHighValues[0].length];
+			selectedBarItems[fHoveredBarValueIndex] = true;
+		}
+
+		setSelectedBars(selectedBarItems);
+
+		fChart.fireBarSelectionEvent(fHoveredBarSerieIndex, fHoveredBarValueIndex);
+	}
+
+	/**
 	 * hookup all listeners
 	 */
 	private void addListener() {
@@ -907,6 +934,10 @@ public class ChartComponentGraph extends Canvas {
 
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(final IMenuManager menuMgr) {
+
+				actionSelectBars();
+				hideToolTip();
+
 				fChart.fillContextMenu(menuMgr,
 						contextLeftSlider,
 						contextRightSlider,
@@ -3129,14 +3160,6 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	/**
-	 * @return when the zoomed graph can't be scrolled the chart image can be wider than the visible
-	 *         part. It returns the device offset to the start of the visible chart
-	 */
-	int getDevGraphImageXOffset() {
-		return fDevGraphImageXOffset;
-	}
-
 //	void enforceChartImageMinMaxWidth() {
 //
 ////		if (graphZoomParts != 1) {
@@ -3170,6 +3193,14 @@ public class ChartComponentGraph extends Canvas {
 //		}
 ////		}
 //	}
+
+	/**
+	 * @return when the zoomed graph can't be scrolled the chart image can be wider than the visible
+	 *         part. It returns the device offset to the start of the visible chart
+	 */
+	int getDevGraphImageXOffset() {
+		return fDevGraphImageXOffset;
+	}
 
 	/**
 	 * @return Returns the virtual graph image width, this is the width of the graph image when the
@@ -3823,27 +3854,10 @@ public class ChartComponentGraph extends Canvas {
 			if (ySliderDragged != null)
 				// y-slider was hit
 				ySliderDragged.setDevYClickOffset(devYMouse - ySliderDragged.getHitRectangle().y);
+
 			else if (fHoveredBarSerieIndex != -1) {
 
-				// execute the action which is defined when a bar is selected
-				// with the left mouse button
-
-				boolean[] selectedBarItems;
-
-				if (fDrawingData.size() == 0) {
-					selectedBarItems = null;
-				} else {
-
-					final ChartDrawingData chartDrawingData = fDrawingData.get(0);
-					final ChartDataXSerie xData = chartDrawingData.getXData();
-
-					selectedBarItems = new boolean[xData.fHighValues[0].length];
-					selectedBarItems[fHoveredBarValueIndex] = true;
-				}
-
-				setSelectedBars(selectedBarItems);
-
-				fChart.fireBarSelectionEvent(fHoveredBarSerieIndex, fHoveredBarValueIndex);
+				actionSelectBars();
 
 			} else if (hBar.isVisible()) {
 

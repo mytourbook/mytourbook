@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -49,6 +49,11 @@ public interface IChartContextProvider {
 	 * @return
 	 */
 	public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider);
+
+	/**
+	 * @return Returns the chart where the context menu is created
+	 */
+	public Chart getChart();
 
 	/**
 	 * @return Returns the left slider

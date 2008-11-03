@@ -17,6 +17,7 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
@@ -117,6 +118,11 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 //			createMarkerMenu(menuMgr, leftSlider, rightSlider);
 //		}
 
+	}
+
+	public Chart getChart() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public ChartXSlider getLeftSlider() {

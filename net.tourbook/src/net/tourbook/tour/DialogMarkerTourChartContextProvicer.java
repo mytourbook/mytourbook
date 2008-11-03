@@ -17,10 +17,10 @@
 package net.tourbook.tour;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourMarker;
-import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.action.ActionCreateMarker;
 import net.tourbook.ui.tourChart.action.IMarkerReceiver;
 
@@ -44,18 +44,16 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 
 		fMarkerDialog = markerDialog;
 
-		final TourChart tourChart = fMarkerDialog.getTourChart();
+		fActionCreateMarker = new ActionCreateMarker(this, Messages.tourCatalog_view_action_create_marker, true);
 
-		fActionCreateMarker = new ActionCreateMarker(tourChart, Messages.tourCatalog_view_action_create_marker, true);
-		
-		fActionCreateMarkerLeft = new ActionCreateMarker(tourChart,
+		fActionCreateMarkerLeft = new ActionCreateMarker(this,
 				Messages.tourCatalog_view_action_create_left_marker,
 				true);
 
-		fActionCreateMarkerRight = new ActionCreateMarker(tourChart,
+		fActionCreateMarkerRight = new ActionCreateMarker(this,
 				Messages.tourCatalog_view_action_create_right_marker,
 				false);
-		
+
 		fActionCreateMarker.setMarkerReceiver(this);
 		fActionCreateMarkerLeft.setMarkerReceiver(this);
 		fActionCreateMarkerRight.setMarkerReceiver(this);
@@ -88,6 +86,10 @@ class DialogMarkerTourChartContextProvicer implements IChartContextProvider, IMa
 				menuMgr.add(fActionCreateMarkerRight);
 			}
 		}
+	}
+
+	public Chart getChart() {
+		return fMarkerDialog.getTourChart();
 	}
 
 	public ChartXSlider getLeftSlider() {

@@ -404,7 +404,7 @@ public class UI {
 		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
 		if (tourDataEditor != null && tourDataEditor.isDirty()) {
 
-			openTourEditor();
+			openTourEditor(false);
 
 			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
 					Messages.dialog_is_tour_editor_modified_title,
@@ -430,7 +430,7 @@ public class UI {
 				&& tourDataEditor.isDirty()
 				&& tourData.getTourId().longValue() == tourDataEditor.getTourData().getTourId().longValue()) {
 
-			openTourEditor();
+			openTourEditor(false);
 
 			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
 					Messages.dialog_is_tour_modified_title,
@@ -462,7 +462,7 @@ public class UI {
 		}
 	}
 
-	public static void openTourEditor() {
+	public static void openTourEditor(final boolean isActive) {
 
 		try {
 			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -470,7 +470,7 @@ public class UI {
 			final String viewId = TourDataEditorView.ID;
 
 			final IViewPart viewPart = page.showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
-			if (page.isPartVisible(viewPart) == false) {
+			if (page.isPartVisible(viewPart) == false || isActive) {
 
 				page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
 			}

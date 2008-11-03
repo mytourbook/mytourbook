@@ -15,23 +15,20 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import java.util.ArrayList;
-
 import net.tourbook.Messages;
-import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionEditTour extends Action {
 
-	private ITourProvider	fTourProvider;
+//	private ITourProvider	fTourProvider;
 
 	public ActionEditTour(final ITourProvider tourProvider) {
 
-		fTourProvider = tourProvider;
+//		fTourProvider = tourProvider;
 
 		setText(Messages.App_Action_edit_tour);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
@@ -43,11 +40,13 @@ public class ActionEditTour extends Action {
 	@Override
 	public void run() {
 
-		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+		UI.openTourEditor(true);
 
-		if (selectedTours != null && selectedTours.size() > 0) {
-			TourManager.getInstance().openTourInEditor(selectedTours.get(0).getTourId());
-		}
+//		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
+//
+//		if (selectedTours != null && selectedTours.size() > 0) {
+//			TourManager.getInstance().openTourInEditor(selectedTours.get(0).getTourId());
+//		}
 	}
 
 }

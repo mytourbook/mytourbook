@@ -25,7 +25,6 @@ import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
@@ -33,11 +32,11 @@ import net.tourbook.tag.TagManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourType;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 
@@ -49,6 +48,7 @@ class TourContextProvider implements IChartContextProvider, ITourProvider {
 	/** 
 	 * 
 	 */
+	private Chart						fChart;
 	private final IBarSelectionProvider	fBarSelectionProvider;
 
 	private final ActionEditQuick		fActionEditQuick;
@@ -62,31 +62,31 @@ class TourContextProvider implements IChartContextProvider, ITourProvider {
 	private final ActionRemoveAllTags	fActionRemoveAllTags;
 	private final ActionOpenPrefDialog	fActionOpenTagPrefs;
 
-	private class ActionEditTour extends Action {
-
-		public ActionEditTour(final String text) {
-
-			super(text);
-
-			setImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj.gif")); //$NON-NLS-1$
-			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj_disabled.gif")); //$NON-NLS-1$
-		}
-
-		@Override
-		public void run() {
-
-			final Long selectedTourId = fBarSelectionProvider.getSelectedTourId();
-
-			if (selectedTourId != null) {
-
-				// select the tour in the chart and open the tour in the editor
-
-				fBarSelectionProvider.selectTour(selectedTourId);
-
-				TourManager.getInstance().openTourInEditor(selectedTourId);
-			}
-		}
-	}
+//	private class ActionEditTour extends Action {
+//
+//		public ActionEditTour(final String text) {
+//
+//			super(text);
+//
+//			setImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj.gif")); //$NON-NLS-1$
+//			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj_disabled.gif")); //$NON-NLS-1$
+//		}
+//
+//		@Override
+//		public void run() {
+//
+//			final Long selectedTourId = fBarSelectionProvider.getSelectedTourId();
+//
+//			if (selectedTourId != null) {
+//
+//				// select the tour in the chart and open the tour in the editor
+//
+//				fBarSelectionProvider.selectTour(selectedTourId);
+//
+//				TourManager.getInstance().openTourInEditor(selectedTourId);
+//			}
+//		}
+//	}
 
 //	private class ActionZoomIntoMonth extends Action {
 //
@@ -102,10 +102,11 @@ class TourContextProvider implements IChartContextProvider, ITourProvider {
 
 	public TourContextProvider(final Chart chart, final IBarSelectionProvider barSelectionProvider) {
 
+		fChart = chart;
 		fBarSelectionProvider = barSelectionProvider;
 
 		fActionEditQuick = new ActionEditQuick(this);
-		fActionEditTour = new ActionEditTour(Messages.action_edit_tour);
+		fActionEditTour = new ActionEditTour(this);
 		fActionOpenTour = new ActionOpenTour(this);
 
 		fActionSetTourType = new ActionSetTourType(this);
@@ -166,6 +167,10 @@ class TourContextProvider implements IChartContextProvider, ITourProvider {
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
 										final ChartXSlider leftSlider,
 										final ChartXSlider rightSlider) {}
+
+	public Chart getChart() {
+		return fChart;
+	}
 
 	public ChartXSlider getLeftSlider() {
 		return null;

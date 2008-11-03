@@ -416,7 +416,7 @@ public class TourManager {
 						 * the view only for the active perspective
 						 */
 
-						UI.openTourEditor();
+						UI.openTourEditor(false);
 
 					} else {
 
