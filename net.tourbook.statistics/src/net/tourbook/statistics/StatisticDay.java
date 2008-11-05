@@ -628,7 +628,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		});
 
 		// set the menu context provider
-		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourContextProvider(fChart, this));
+		chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourChartContextProvider(fChart, this));
 	}
 
 	@Override

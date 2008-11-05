@@ -1109,6 +1109,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		menuMgr.add(fActionCollapseAll);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(fActionRenameTag);
+		menuMgr.add(fActionSetTagStructure);
+		menuMgr.add(fActionSetAllTagStructures);
+
+		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionEditTour);
 		menuMgr.add(fActionOpenTour);
@@ -1120,11 +1125,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		menuMgr.add(fActionRemoveAllTags);
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
 		menuMgr.add(fActionOpenTagPrefs);
-
-		menuMgr.add(new Separator());
-		menuMgr.add(fActionSetTagStructure);
-		menuMgr.add(fActionSetAllTagStructures);
-		menuMgr.add(fActionRenameTag);
 
 		enableActions();
 	}

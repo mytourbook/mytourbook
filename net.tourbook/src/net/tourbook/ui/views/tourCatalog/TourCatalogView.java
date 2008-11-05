@@ -156,7 +156,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private boolean						fIsToolbarCreated					= false;
 	private ColumnManager				fColumnManager;
 
-
 	class TourContentProvider implements ITreeContentProvider {
 
 		public void dispose() {}
@@ -456,12 +455,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		fActionEditQuick = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(this);
 		fActionOpenTour = new ActionOpenTour(this);
-		fActionSetTourType = new ActionSetTourType(this);
 
+		fActionSetTourType = new ActionSetTourType(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
-
 		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
@@ -737,8 +735,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			}
 		}
 
-		final boolean isTourSelected = tourItems > 0;// && refItems == 0 && yearItems == 0;
+		final boolean isTourSelected = tourItems > 0;
 		final boolean isOneTour = tourItems == 1 && refItems == 0 && yearItems == 0;
+		final boolean isOneRefTour = refItems == 1 && yearItems == 0 && tourItems == 0;
 
 		final int selectedItems = selection.size();
 		final TreeViewerItem firstElement = (TreeViewerItem) selection.getFirstElement();
@@ -755,9 +754,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			fActionRemoveComparedTours.setEnabled(false);
 		}
 
-		fActionEditQuick.setEnabled(isOneTour);
-		fActionEditTour.setEnabled(isOneTour);
-		fActionOpenTour.setEnabled(isOneTour);
+		fActionEditQuick.setEnabled(isOneTour || isOneRefTour);
+		fActionEditTour.setEnabled(isOneTour || isOneRefTour);
+		fActionOpenTour.setEnabled(isOneTour || isOneRefTour);
 
 		fActionRenameRefTour.setEnabled(refItems == 1 && tourItems == 0 && yearItems == 0);
 
@@ -898,6 +897,15 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				final TVICatalogComparedTour tourItem = ((TVICatalogComparedTour) treeItem);
 
 				final TourData tourData = TourManager.getInstance().getTourData(tourItem.getTourId());
+				if (tourData != null) {
+					selectedTourData.add(tourData);
+				}
+
+			} else if (treeItem instanceof TVICatalogRefTourItem) {
+
+				final TVICatalogRefTourItem refItem = (TVICatalogRefTourItem) treeItem;
+
+				final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
 				if (tourData != null) {
 					selectedTourData.add(tourData);
 				}

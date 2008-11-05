@@ -23,54 +23,71 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.ActionRemoveAllTags;
+import net.tourbook.tag.ActionSetTourTag;
+import net.tourbook.tag.TagManager;
+import net.tourbook.tour.ActionEditAdjustAltitude;
 import net.tourbook.tour.ActionEditTourMarker;
+import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
+import net.tourbook.ui.action.ActionSetTourType;
 import net.tourbook.ui.tourChart.action.ActionCreateMarker;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 
-class TourChartViewContextProvicer implements IChartContextProvider, ITourProvider {
+public class TourChartContextProvicer implements IChartContextProvider, ITourProvider {
 
-	private final TourChartView		fTourChartView;
+	private final ITourChartViewer	fTourChartViewer;
 
 	private ActionEditQuick			fActionQuickEdit;
 	private ActionEditTour			fActionEditTour;
+	private ActionEditTourMarker		fActionEditTourMarkers;
+	private ActionEditAdjustAltitude	fActionAdjustAltitude;
 	private ActionOpenTour			fActionOpenTour;
 
 	private ActionCreateRefTour		fActionCreateRefTour;
 	private ActionCreateMarker		fActionCreateMarker;
 	private ActionCreateMarker		fActionCreateMarkerLeft;
 	private ActionCreateMarker		fActionCreateMarkerRight;
-	private ActionEditTourMarker	fActionEditTourMarkers;
+
+	private ActionSetTourType		fActionSetTourType;
+	private ActionSetTourTag		fActionAddTag;
+	private ActionSetTourTag		fActionRemoveTag;
+	private ActionRemoveAllTags		fActionRemoveAllTags;
+	private ActionOpenPrefDialog	fActionOpenTagPrefs;
 
 	private ChartXSlider			fLeftSlider;
-
 	private ChartXSlider			fRightSlider;
 
+
 	/**
-	 * @param tourChartView
+	 * Provides a context menu for a tour chart
+	 * 
+	 * @param tourChartViewer
 	 */
-	TourChartViewContextProvicer(final TourChartView tourChartView) {
+	public TourChartContextProvicer(final ITourChartViewer tourChartViewer) {
 
-		fTourChartView = tourChartView;
+		fTourChartViewer = tourChartViewer;
 
-		fActionQuickEdit = new ActionEditQuick(fTourChartView);
-		fActionEditTour = new ActionEditTour(fTourChartView);
-		fActionOpenTour = new ActionOpenTour(fTourChartView);
+		fActionQuickEdit = new ActionEditQuick(fTourChartViewer);
+		fActionEditTour = new ActionEditTour(fTourChartViewer);
+		fActionOpenTour = new ActionOpenTour(fTourChartViewer);
 
-		final TourChart tourChart = fTourChartView.getTourChart();
+		final TourChart tourChart = fTourChartViewer.getTourChart();
 
 		fActionCreateRefTour = new ActionCreateRefTour(tourChart);
 
 		fActionCreateMarker = new ActionCreateMarker(this, //
 				Messages.tourCatalog_view_action_create_marker,
 				true);
-		
+
 		fActionCreateMarkerLeft = new ActionCreateMarker(this,
 				Messages.tourCatalog_view_action_create_left_marker,
 				true);
@@ -81,6 +98,16 @@ class TourChartViewContextProvicer implements IChartContextProvider, ITourProvid
 
 		fActionEditTourMarkers = new ActionEditTourMarker(this, true);
 		fActionEditTourMarkers.setEnabled(true);
+
+		fActionAdjustAltitude = new ActionEditAdjustAltitude(this, false);
+		fActionAdjustAltitude.setEnabled(true);
+
+		fActionSetTourType = new ActionSetTourType(this);
+		fActionAddTag = new ActionSetTourTag(this, true);
+		fActionRemoveTag = new ActionSetTourTag(this, false);
+		fActionRemoveAllTags = new ActionRemoveAllTags(this);
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
+				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
@@ -89,18 +116,27 @@ class TourChartViewContextProvicer implements IChartContextProvider, ITourProvid
 
 	public void fillContextMenu(final IMenuManager menuMgr) {
 
+
+		menuMgr.add(new Separator());
 		menuMgr.add(fActionQuickEdit);
 		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionEditTourMarkers);
+		menuMgr.add(fActionAdjustAltitude);
 		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionEditTourMarkers);
+		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionAddTag);
+		menuMgr.add(fActionRemoveTag);
+		menuMgr.add(fActionRemoveAllTags);
+		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
+		menuMgr.add(fActionOpenTagPrefs);
 
 		/*
 		 * enable actions
 		 */
-		final boolean isDataAvailable = fTourChartView.fTourData != null
-				&& fTourChartView.fTourData.getTourPerson() != null;
+		final TourData tourData = fTourChartViewer.getTourChart().getTourData();
+		final boolean isDataAvailable = tourData != null && tourData.getTourPerson() != null;
 
 		fActionQuickEdit.setEnabled(isDataAvailable);
 		fActionEditTour.setEnabled(isDataAvailable);
@@ -127,7 +163,7 @@ class TourChartViewContextProvicer implements IChartContextProvider, ITourProvid
 			menuMgr.add(new Separator());
 
 			// action: create reference tour
-			final TourData tourData = fTourChartView.getTourChart().getTourData();
+			final TourData tourData = fTourChartViewer.getTourChart().getTourData();
 			final boolean canCreateRefTours = tourData.altitudeSerie != null && tourData.distanceSerie != null;
 
 			fActionCreateRefTour.setEnabled(canCreateRefTours);
@@ -137,7 +173,7 @@ class TourChartViewContextProvicer implements IChartContextProvider, ITourProvid
 	}
 
 	public Chart getChart() {
-		return fTourChartView.getTourChart();
+		return fTourChartViewer.getTourChart();
 	}
 
 	public ChartXSlider getLeftSlider() {
@@ -151,7 +187,7 @@ class TourChartViewContextProvicer implements IChartContextProvider, ITourProvid
 	public ArrayList<TourData> getSelectedTours() {
 
 		final ArrayList<TourData> tourList = new ArrayList<TourData>();
-		tourList.add(fTourChartView.fTourData);
+		tourList.add(fTourChartViewer.getTourChart().getTourData());
 
 		return tourList;
 	}

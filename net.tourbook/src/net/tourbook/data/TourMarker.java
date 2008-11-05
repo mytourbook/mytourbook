@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -58,7 +58,7 @@ public class TourMarker implements Cloneable {
 	private TourData				tourData;
 
 	/**
-	 * type contains the marker type which is defined in {@link ChartMarker} like
+	 * Contains the marker type which is defined in {@link ChartMarker} like
 	 * {@link ChartMarker#MARKER_TYPE_DEVICE}
 	 */
 	private int						type;
@@ -178,6 +178,9 @@ public class TourMarker implements Cloneable {
 		if (markerId != other.markerId) {
 			return false;
 		}
+		if (serieIndex != other.serieIndex) {
+			return false;
+		}
 		return true;
 	}
 
@@ -237,6 +240,7 @@ public class TourMarker implements Cloneable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (markerId ^ (markerId >>> 32));
+		result = prime * result + serieIndex;
 		return result;
 	}
 
@@ -311,10 +315,6 @@ public class TourMarker implements Cloneable {
 		backupMarker.tourData = tourData;
 	}
 
-//	public void setType(int type) {
-//		this.type = type;
-//	}
-
 	public void setSerieIndex(final int serieIndex) {
 		this.serieIndex = serieIndex;
 	}
@@ -330,4 +330,16 @@ public class TourMarker implements Cloneable {
 	public void setVisualPosition(final int visualPosition) {
 		this.visualPosition = visualPosition;
 	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder().append(" distance:")
+				.append(distance)
+				.append(" time:")
+				.append(time)
+				.append(" serieIndex:")
+				.append(serieIndex)
+				.toString();
+	}
+
 }

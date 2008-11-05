@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import java.util.ArrayList;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
@@ -35,7 +37,9 @@ import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperty;
+import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourChartContextProvicer;
 import net.tourbook.ui.tourChart.TourChartViewPart;
 
 import org.eclipse.jface.action.Action;
@@ -57,7 +61,7 @@ import org.eclipse.ui.part.PageBook;
 // author: Wolfgang Schramm
 // create: 06.09.2007
 
-public class TourCatalogViewComparedTour extends TourChartViewPart implements ISynchedChart {
+public class TourCatalogViewComparedTour extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
 
 	public static final String					ID				= "net.tourbook.views.tourCatalog.comparedTourView";	//$NON-NLS-1$
 
@@ -228,12 +232,12 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 		addRefTourPropertyListener();
 
+		fPageBook.showPage(fPageNoChart);
+
 		// show current selected tour
 		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
 		if (selection != null) {
 			onSelectionChanged(selection);
-		} else {
-			fPageBook.showPage(fPageNoChart);
 		}
 
 		enableSynchronization();
@@ -245,6 +249,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
 		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+		fTourChart.setContextProvider(new TourChartContextProvicer(this));
 
 		fTourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(final Event event) {
@@ -372,6 +377,16 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 				this);
 	}
 
+	public ArrayList<TourData> getSelectedTours() {
+		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+		selectedTours.add(fTourData);
+		return selectedTours;
+	}
+
+	public TourChart getTourChart() {
+		return fTourChart;
+	}
+
 	private void onMoveSynchedMarker(final int movedValueIndex, final int movedEndIndex) {
 
 		// update the chart
@@ -419,9 +434,9 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	@Override
 	protected void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-//		if (fIsDataDirty && part != TourCatalogViewComparedTour.this) {
-//			return;
-//		}
+		if (part == TourCatalogViewComparedTour.this) {
+			return;
+		}
 
 		onSelectionChanged(selection);
 	}
@@ -466,10 +481,6 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	}
 
 	private void saveComparedTour() {
-
-//		if (fIsDataDirty == false) {
-//			return;
-//		}
 
 		if (fCTCompareId == -1) {
 			persistComparedTour();
@@ -552,7 +563,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 		if (answer == SWT.YES) {
 			saveComparedTour();
 //		} else if (answer == SWT.CANCEL) {
-// disabled, pop up for every selection when multiple selections are fired
+// disabled, pops up for every selection when multiple selections are fired
 //			return false;
 		} else {
 			fireChangeEvent(fComputedStartIndex, fComputedEndIndex);

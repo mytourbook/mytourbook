@@ -15,34 +15,79 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.resource.ImageDescriptor;
+import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.ui.UI;
+
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageAppearance extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
+	private final IPreferenceStore	fPrefStore				= TourbookPlugin.getDefault().getPreferenceStore();
+
+	private boolean					fIsModified;
 
 	public PrefPageAppearance() {
-		noDefaultAndApplyButton();
-	}
-
-	public PrefPageAppearance(final String title) {
-		super(title);
-	}
-
-	public PrefPageAppearance(final String title, final ImageDescriptor image) {
-		super(title, image);
+//		noDefaultAndApplyButton();
 	}
 
 	@Override
-	protected Control createContents(final Composite parent) {
-		return null;
+	protected void createFieldEditors() {
+
+		final Composite parent = getFieldEditorParent();
+		GridLayoutFactory.fillDefaults().applyTo(parent);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(container);
+
+		// line width
+		final IntegerFieldEditor editor = new IntegerFieldEditor(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS,
+				Messages.pref_appearance_number_of_recent_tags,
+				container);
+		addField(editor);
+		UI.setFieldWidth(container, editor, UI.DEFAULT_FIELD_WIDTH);
+		editor.setValidRange(2, 9);
+		editor.getLabelControl(container).setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
 	}
 
 	public void init(final IWorkbench workbench) {
+		setPreferenceStore(fPrefStore);
+	}
 
+	@Override
+	protected void performDefaults() {
+		fIsModified = true;
+		super.performDefaults();
+	}
+
+	@Override
+	public boolean performOk() {
+
+		final boolean isOK = super.performOk();
+		if (isOK && fIsModified) {
+
+			fIsModified = false;
+
+			// fire one event for all modifications
+//			getPreferenceStore().setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
+		}
+
+		return isOK;
+	}
+
+	@Override
+	public void propertyChange(final PropertyChangeEvent event) {
+		fIsModified = true;
+		super.propertyChange(event);
 	}
 
 }

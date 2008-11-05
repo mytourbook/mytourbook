@@ -28,7 +28,7 @@ public abstract class TVICatalogTourItem extends TVICatalogItem {
 	private long	tourId;
 
 	/**
-	 * @return Returns the Id for the {@link TourData} entity
+	 * @return Returns the TourId for the {@link TourData} entity
 	 */
 	public long getTourId() {
 		return tourId;

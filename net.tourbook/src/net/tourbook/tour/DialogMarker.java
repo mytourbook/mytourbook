@@ -133,7 +133,7 @@ public class DialogMarker extends TitleAreaDialog {
 
 	private boolean				fIsOkPressed					= false;
 
-	class MarkerViewerContentProvicer implements IStructuredContentProvider {
+	private class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
 		public void dispose() {}
 
@@ -148,7 +148,7 @@ public class DialogMarker extends TitleAreaDialog {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	class MarkerViewerLabelProvider extends CellLabelProvider {
+	private class MarkerViewerLabelProvider extends CellLabelProvider {
 
 		@Override
 		public void update(final ViewerCell cell) {

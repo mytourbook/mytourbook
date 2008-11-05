@@ -17,62 +17,93 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.ActionRemoveAllTags;
+import net.tourbook.tag.ActionSetTourTag;
+import net.tourbook.tag.TagManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionOpenPrefDialog;
+import net.tourbook.ui.action.ActionSetTourType;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.action.ActionCreateMarker;
+import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 
+/**
+ * Chart context provider for the tour viewer (which is currently the TourEditor)
+ */
 public class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
-	public ChartXSlider		fSlider;
+	private TourEditor					fTourEditor;
 
-//	TourEditor		fTourEditor;
-//	DialogMarker	fMarkerDialog;
+	private ActionEditQuick				fActionQuickEdit;
+	private ActionEditTour				fActionEditTour;
+	private ActionEditTourMarker		fActionEditTourMarkers;
+	private ActionEditAdjustAltitude	fActionAdjustAltitude;
 
-//	private ActionEditQuick	fActionQuickEdit;
+	private ActionCreateRefTour			fActionCreateRefTour;
+	private ActionCreateMarker			fActionCreateMarker;
+	private ActionCreateMarker			fActionCreateMarkerLeft;
+	private ActionCreateMarker			fActionCreateMarkerRight;
 
-	public TourChartContextProvider(final DialogMarker markerDialog) {
-//		fMarkerDialog = markerDialog;
+	private ActionSetTourType			fActionSetTourType;
+	private ActionSetTourTag			fActionAddTag;
+	private ActionSetTourTag			fActionRemoveTag;
+	private ActionRemoveAllTags			fActionRemoveAllTags;
+	private ActionOpenPrefDialog		fActionOpenTagPrefs;
+
+	private ChartXSlider				fLeftSlider;
+	private ChartXSlider				fRightSlider;
+
+	/**
+	 * @param tourEditor
+	 * @param tourChartView
+	 */
+	TourChartContextProvider(final TourEditor tourEditor) {
+
+		fTourEditor = tourEditor;
+		final TourChart tourChart = fTourEditor.getTourChart();
+
+		fActionQuickEdit = new ActionEditQuick(this);
+		fActionEditTour = new ActionEditTour(this);
+
+		fActionEditTourMarkers = new ActionEditTourMarker(this, true);
+		fActionEditTourMarkers.setEnabled(true);
+
+		fActionAdjustAltitude = new ActionEditAdjustAltitude(this, false);
+		fActionAdjustAltitude.setEnabled(true);
+		
+
+		fActionCreateRefTour = new ActionCreateRefTour(tourChart);
+
+		fActionCreateMarker = new ActionCreateMarker(this, //
+				Messages.tourCatalog_view_action_create_marker,
+				true);
+
+		fActionCreateMarkerLeft = new ActionCreateMarker(this,
+				Messages.tourCatalog_view_action_create_left_marker,
+				true);
+
+		fActionCreateMarkerRight = new ActionCreateMarker(this,
+				Messages.tourCatalog_view_action_create_right_marker,
+				false);
+
+		fActionSetTourType = new ActionSetTourType(this);
+		fActionAddTag = new ActionSetTourTag(this, true);
+		fActionRemoveTag = new ActionSetTourTag(this, false);
+		fActionRemoveAllTags = new ActionRemoveAllTags(this);
+		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
+				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
-
-	public TourChartContextProvider(final TourEditor tourEditor) {
-
-//		fTourEditor = tourEditor;
-
-//		fActionQuickEdit = new ActionEditQuick(this);
-	}
-
-//	private void createMarkerMenu(	final IMenuManager menuMgr,
-//									final ChartXSlider leftSlider,
-//									final ChartXSlider rightSlider) {
-//
-////		if (leftSlider != null || rightSlider != null) {
-////
-////			// marker menu
-////			if (leftSlider != null && rightSlider == null) {
-////				menuMgr.add(new ActionCreateMarker(this, Messages.tourCatalog_view_action_create_marker, leftSlider));
-////			} else {
-////				menuMgr.add(new ActionCreateMarker(this, Messages.tourCatalog_view_action_create_left_marker, leftSlider));
-////				menuMgr.add(new ActionCreateMarker(this, Messages.tourCatalog_view_action_create_right_marker, rightSlider));
-////			}
-////		}
-//	}
-
-//	/**
-//	 * enable actions for the tour editor
-//	 */
-//	private void enableActions() {
-//
-////		final TourChart tourChart = fTourEditor.getTourChart();
-////		final TourData tourData = tourChart.getTourData();
-////
-////		final boolean isDataAvailable = tourData != null && tourData.getTourPerson() != null;
-////
-////		fActionQuickEdit.setEnabled(isDataAvailable);
-//	}
 
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
 										final int hoveredBarSerieIndex,
@@ -80,67 +111,78 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 	public void fillContextMenu(final IMenuManager menuMgr) {
 
-//		if (fTourEditor != null) {
-//
-//			menuMgr.add(new Separator());
-//			menuMgr.add(fActionQuickEdit);
-//
-//			enableActions();
-//		}
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionQuickEdit);
+		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionEditTourMarkers);
+		menuMgr.add(fActionAdjustAltitude);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionSetTourType);
+		menuMgr.add(fActionAddTag);
+		menuMgr.add(fActionRemoveTag);
+		menuMgr.add(fActionRemoveAllTags);
+		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
+		menuMgr.add(fActionOpenTagPrefs);
+
+		/*
+		 * enable actions
+		 */
+		final boolean isDataAvailable = fTourEditor.getTourData() != null
+				&& fTourEditor.getTourData().getTourPerson() != null;
+
+		fActionQuickEdit.setEnabled(isDataAvailable);
+		fActionEditTour.setEnabled(isDataAvailable);
 	}
 
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
 										final ChartXSlider leftSlider,
 										final ChartXSlider rightSlider) {
 
-//		if (fTourEditor != null) {
-//
-//			// context dialog for the tour editor
-//
-//			if (leftSlider != null || rightSlider != null) {
-//
-//				createMarkerMenu(menuMgr, leftSlider, rightSlider);
-//
-//				// action: create chart reference
-//				final TourData tourData = fTourEditor.getTourChart().getTourData();
-//				final boolean isEnabled = tourData.altitudeSerie != null && tourData.distanceSerie != null;
-//
-//				final ActionCreateRefTour actionAddTourReference = new ActionCreateRefTour();
-//				actionAddTourReference.setEnabled(isEnabled);
-//
-//				menuMgr.add(actionAddTourReference);
-//			}
-//
-//		} else if (fMarkerDialog != null) {
-//
-//			// context menu for the marker dialog
-//
-//			createMarkerMenu(menuMgr, leftSlider, rightSlider);
-//		}
+		fLeftSlider = leftSlider;
+		fRightSlider = rightSlider;
+
+		if (leftSlider != null || rightSlider != null) {
+
+			// marker actions
+			if (leftSlider != null && rightSlider == null) {
+				menuMgr.add(fActionCreateMarker);
+			} else {
+				menuMgr.add(fActionCreateMarkerLeft);
+				menuMgr.add(fActionCreateMarkerRight);
+			}
+
+			menuMgr.add(fActionCreateRefTour);
+			menuMgr.add(new Separator());
+
+			// action: create reference tour
+			final TourData tourData = fTourEditor.getTourChart().getTourData();
+			final boolean canCreateRefTours = tourData.altitudeSerie != null && tourData.distanceSerie != null;
+
+			fActionCreateRefTour.setEnabled(canCreateRefTours);
+
+		}
 
 	}
 
 	public Chart getChart() {
-		// TODO Auto-generated method stub
-		return null;
+		return fTourEditor.getTourChart();
 	}
 
 	public ChartXSlider getLeftSlider() {
-		// TODO Auto-generated method stub
-		return null;
+		return fLeftSlider;
 	}
 
 	public ChartXSlider getRightSlider() {
-		// TODO Auto-generated method stub
-		return null;
+		return fRightSlider;
 	}
 
 	public ArrayList<TourData> getSelectedTours() {
 
-		final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
-		selectedTourData.add(fTourEditor.getTourChart().getTourData());
-		return selectedTourData;
+		final ArrayList<TourData> tourList = new ArrayList<TourData>();
+		tourList.add(fTourEditor.getTourData());
 
+		return tourList;
 	}
 
 }

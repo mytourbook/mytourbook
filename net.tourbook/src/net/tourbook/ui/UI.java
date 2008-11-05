@@ -465,15 +465,28 @@ public class UI {
 	public static void openTourEditor(final boolean isActive) {
 
 		try {
-			final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			final IWorkbenchWindow wbWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			final IWorkbenchPage page = wbWindow.getActivePage();
 
 			final String viewId = TourDataEditorView.ID;
 
 			final IViewPart viewPart = page.showView(viewId, null, IWorkbenchPage.VIEW_VISIBLE);
-			if (page.isPartVisible(viewPart) == false || isActive) {
+
+			if (isActive) {
 
 				page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
+
+			} else if (page.isPartVisible(viewPart) == false || isActive) {
+
+				page.bringToTop(viewPart);
 			}
+
+// this does not restore the part when it's in a fast view
+//
+//			final IWorkbenchPartReference partRef = page.getReference(viewPart);
+//			final int partState = page.getPartState(partRef);
+//			page.setPartState(partRef, IWorkbenchPage.STATE_MAXIMIZED);
+//			page.setPartState(partRef, IWorkbenchPage.STATE_RESTORED);
 
 		} catch (final PartInitException e) {
 			e.printStackTrace();

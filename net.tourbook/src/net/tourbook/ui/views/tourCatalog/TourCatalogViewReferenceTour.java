@@ -15,18 +15,23 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperty;
+import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourChartContextProvicer;
 import net.tourbook.ui.tourChart.TourChartViewPart;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -43,7 +48,7 @@ import org.eclipse.ui.part.PageBook;
 // author: Wolfgang Schramm
 // create: 09.07.2007
 
-public class TourCatalogViewReferenceTour extends TourChartViewPart {
+public class TourCatalogViewReferenceTour extends TourChartViewPart implements ITourChartViewer {
 
 	public static final String	ID				= "net.tourbook.views.tourCatalog.referenceTourView";	//$NON-NLS-1$
 
@@ -66,6 +71,7 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
 		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+		fTourChart.setContextProvider(new TourChartContextProvicer(this));
 
 		fTourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(final Event event) {
@@ -87,13 +93,19 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 			}
 		});
 
+		fPageBook.showPage(fPageNoChart);
+
 		// show current selected tour
 		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
 		if (selection != null) {
 			onSelectionChanged(selection);
-		} else {
-			fPageBook.showPage(fPageNoChart);
 		}
+	}
+
+	public ArrayList<TourData> getSelectedTours() {
+		final ArrayList<TourData> selectedTour = new ArrayList<TourData>();
+		selectedTour.add(fTourData);
+		return selectedTour;
 	}
 
 	public TourChart getTourChart() {
@@ -124,9 +136,9 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 	@Override
 	protected void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-//		if (part != TourCatalogViewReferenceTour.this) {
-//			return;
-//		}
+		if (part == TourCatalogViewReferenceTour.this) {
+			return;
+		}
 
 		onSelectionChanged(selection);
 	}
@@ -137,55 +149,6 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 
 		fPostSelectionProvider.setSelection(new SelectionTourChart(fTourChart));
 	}
-
-//	/**
-//	 * @param refId
-//	 *        Reference Id
-//	 * @return
-//	 */
-//	private TourCompareConfig createTourCompareConfig(final long refId) {
-//
-//		final ReferenceTourManager refTourManager = ReferenceTourManager.getInstance();
-//
-//		TourCompareConfig compareConfig = refTourManager.getTourCompareConfig(refId);
-//
-//		if (compareConfig != null) {
-//			return compareConfig;
-//		}
-//
-//		// load the reference tour from the database
-//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-//		final TourReference refTour = em.find(TourReference.class, refId);
-//		em.close();
-//
-//		if (refTour == null) {
-//			return null;
-//		} else {
-//
-//			/*
-//			 * create a new reference tour configuration
-//			 */
-//
-//			final TourData refTourData = refTour.getTourData();
-//			final TourChartConfiguration refTourChartConfig = TourManager.createTourChartConfiguration();
-//
-//			final TourChartConfiguration compTourchartConfig = TourManager.createTourChartConfiguration();
-//
-//			final ChartDataModel chartDataModel = TourManager.getInstance()
-//					.createChartDataModel(refTourData, refTourChartConfig);
-//
-//			compareConfig = new TourCompareConfig(refTour,
-//					chartDataModel,
-//					refTourData,
-//					refTourChartConfig,
-//					compTourchartConfig);
-//
-//			// keep ref config in the cache
-//			refTourManager.setTourCompareConfig(refId, compareConfig);
-//		}
-//
-//		return compareConfig;
-//	}
 
 	/**
 	 * set the configuration for a reference tour
@@ -244,7 +207,6 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart {
 		}
 
 		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getInstance().getTourCompareConfig(refId);
-
 		if (tourCompareConfig == null) {
 			return;
 		}

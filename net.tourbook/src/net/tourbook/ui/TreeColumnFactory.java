@@ -284,7 +284,8 @@ public abstract class TreeColumnFactory {
 		@Override
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
-			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "tag", SWT.TRAIL); //$NON-NLS-1$
+			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+																			"tag", SWT.LEAD); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_tag_label);
 			colDef.setColumnHeader(Messages.ColumnFactory_tag);

@@ -30,8 +30,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.ActionEditAdjustAltitude;
-import net.tourbook.tour.ActionEditTourMarker;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionNewTours;
@@ -137,8 +135,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private ActionDeleteTour			fActionDeleteTour;
 	private ActionEditTour				fActionEditTour;
-	private ActionEditTourMarker		fActionEditTourMarkers;
-	private ActionEditAdjustAltitude	fActionAdjustAltitude;
 	private ActionOpenTour				fActionOpenTour;
 
 	private ActionSetTourType			fActionSetTourType;
@@ -355,9 +351,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionOpenTour = new ActionOpenTour(this);
 		fActionDeleteTour = new ActionDeleteTour(this);
 		fActionOpenTour = new ActionOpenTour(this);
-
-		fActionEditTourMarkers = new ActionEditTourMarker(this, true);
-		fActionAdjustAltitude = new ActionEditAdjustAltitude(this, true);
 
 		fActionSetTourType = new ActionSetTourType(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
@@ -889,9 +882,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			fActionDeleteTour.setEnabled(false);
 		}
 
-		fActionEditTourMarkers.setEnabled(isOneTour);
-		fActionAdjustAltitude.setEnabled(isOneTour);
-
 		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
@@ -967,10 +957,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionEditTour);
 		menuMgr.add(fActionOpenTour);
-
-		menuMgr.add(new Separator());
-		menuMgr.add(fActionEditTourMarkers);
-		menuMgr.add(fActionAdjustAltitude);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionSetTourType);

@@ -93,7 +93,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		String title = null;
 		final IProduct product = Platform.getProduct();
 		if (product != null) {
-			title = product.getName() + " (" + MyTourbookSplashHandler.APP_BUILD_ID_VERSION + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+			title = product.getName() + " - " + MyTourbookSplashHandler.APP_BUILD_ID_VERSION; //$NON-NLS-1$ 
 		}
 		if (title == null) {
 			title = UI.EMPTY_STRING;

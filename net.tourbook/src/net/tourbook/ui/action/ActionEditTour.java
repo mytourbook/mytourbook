@@ -39,14 +39,7 @@ public class ActionEditTour extends Action {
 
 	@Override
 	public void run() {
-
 		UI.openTourEditor(true);
-
-//		final ArrayList<TourData> selectedTours = fTourProvider.getSelectedTours();
-//
-//		if (selectedTours != null && selectedTours.size() > 0) {
-//			TourManager.getInstance().openTourInEditor(selectedTours.get(0).getTourId());
-//		}
 	}
 
 }

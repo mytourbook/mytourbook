@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.DialogQuickEdit;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
@@ -34,8 +35,7 @@ public class ActionEditQuick extends Action {
 	public ActionEditQuick(final ITourProvider tourProvider) {
 
 		setText(Messages.app_action_quick_edit);
-//		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
-//		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit));
 
 		fTourProvider = tourProvider;
 	}

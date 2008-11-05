@@ -162,4 +162,9 @@ public interface ITourbookPreferences {
 	public static final String	TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR	= "tourdata.editor.confirmation.revert-tour";				//$NON-NLS-1$
 	public static final String	TOUR_EDITOR_DESCRIPTION_HEIGHT				= "tourdata.editor.description-height";					//$NON-NLS-1$
 
+	/*
+	 * common appearance
+	 */
+	public static final String	APPEARANCE_NUMBER_OF_RECENT_TAGS			= "appearance.number-of-recent-tags";
+
 }

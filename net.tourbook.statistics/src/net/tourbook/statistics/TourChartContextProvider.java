@@ -43,17 +43,17 @@ import org.eclipse.jface.action.Separator;
 /**
  * provides the fill menu methods for the chart context menu
  */
-class TourContextProvider implements IChartContextProvider, ITourProvider {
+class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
 	/** 
 	 * 
 	 */
-	private Chart						fChart;
+	private final Chart					fChart;
 	private final IBarSelectionProvider	fBarSelectionProvider;
 
 	private final ActionEditQuick		fActionEditQuick;
 	private final ActionEditTour		fActionEditTour;
-	private ActionOpenTour				fActionOpenTour;
+	private final ActionOpenTour		fActionOpenTour;
 
 	private final ActionSetTourType		fActionSetTourType;
 	private final ActionSetTourTag		fActionAddTag;
@@ -62,45 +62,7 @@ class TourContextProvider implements IChartContextProvider, ITourProvider {
 	private final ActionRemoveAllTags	fActionRemoveAllTags;
 	private final ActionOpenPrefDialog	fActionOpenTagPrefs;
 
-//	private class ActionEditTour extends Action {
-//
-//		public ActionEditTour(final String text) {
-//
-//			super(text);
-//
-//			setImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj.gif")); //$NON-NLS-1$
-//			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor("write_obj_disabled.gif")); //$NON-NLS-1$
-//		}
-//
-//		@Override
-//		public void run() {
-//
-//			final Long selectedTourId = fBarSelectionProvider.getSelectedTourId();
-//
-//			if (selectedTourId != null) {
-//
-//				// select the tour in the chart and open the tour in the editor
-//
-//				fBarSelectionProvider.selectTour(selectedTourId);
-//
-//				TourManager.getInstance().openTourInEditor(selectedTourId);
-//			}
-//		}
-//	}
-
-//	private class ActionZoomIntoMonth extends Action {
-//
-//		public ActionZoomIntoMonth(String text) {
-//			super(text);
-//		}
-//
-//		@Override
-//		public void run() {
-//			fChart.zoomWithParts(12, fBarSelectionProvider.getSelectedMonth() - 1, false);
-//		}
-//	}
-
-	public TourContextProvider(final Chart chart, final IBarSelectionProvider barSelectionProvider) {
+	public TourChartContextProvider(final Chart chart, final IBarSelectionProvider barSelectionProvider) {
 
 		fChart = chart;
 		fBarSelectionProvider = barSelectionProvider;
@@ -116,7 +78,6 @@ class TourContextProvider implements IChartContextProvider, ITourProvider {
 
 		fActionOpenTagPrefs = new ActionOpenPrefDialog(net.tourbook.Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
-
 	}
 
 	private void enableActions(final boolean isTourHovered) {

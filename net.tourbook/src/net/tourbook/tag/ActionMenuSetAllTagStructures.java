@@ -27,6 +27,7 @@ import net.tourbook.ui.views.tagging.TaggingView;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -37,7 +38,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 public class ActionMenuSetAllTagStructures extends Action implements IMenuCreator {
 
-	private Menu	fMenu;
+	private Menu		fMenu;
 
 	private TaggingView	fTagView;
 
@@ -53,6 +54,12 @@ public class ActionMenuSetAllTagStructures extends Action implements IMenuCreato
 
 		@Override
 		public void run() {
+
+			if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+					Messages.action_tag_set_all_confirm_title,
+					Messages.action_tag_set_all_confirm_message) == false) {
+				return;
+			}
 
 			final Runnable runnable = new Runnable() {
 

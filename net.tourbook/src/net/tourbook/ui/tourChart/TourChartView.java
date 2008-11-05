@@ -34,7 +34,7 @@ import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.tour.TourProperty;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
@@ -64,7 +64,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Shows the selected tour in a chart
  */
-public class TourChartView extends ViewPart implements ITourProvider {
+public class TourChartView extends ViewPart implements ITourChartViewer {
 
 	public static final String		ID	= "net.tourbook.views.TourChartView";	//$NON-NLS-1$
 
@@ -190,7 +190,7 @@ public class TourChartView extends ViewPart implements ITourProvider {
 		fTourChart.setShowZoomActions(true);
 		fTourChart.setShowSlider(true);
 		fTourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
-		fTourChart.setContextProvider(new TourChartViewContextProvicer(this));
+		fTourChart.setContextProvider(new TourChartContextProvicer(this));
 
 		fTourChart.addDoubleClickListener(new Listener() {
 			public void handleEvent(final Event event) {

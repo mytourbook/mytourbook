@@ -75,4 +75,9 @@ public enum TourProperty {
 	 */
 	REFERENCE_TOUR_IS_CREATED,
 
+	/**
+	 * {@link TourData} have been modified, the UI must be updated with the changed data
+	 */
+	UPDATE_UI,
+
 }

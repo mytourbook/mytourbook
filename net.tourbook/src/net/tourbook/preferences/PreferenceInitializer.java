@@ -162,6 +162,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * Tour data editor
 		 */
 		store.setDefault(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT, 5);
-
+		
+		/*
+		 * general appearance
+		 */
+		store.setDefault(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS, 3);
 	}
 }

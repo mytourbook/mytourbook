@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,36 +15,16 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import net.tourbook.ui.tourChart.TourChart;
+
 /**
- * The viewer is able to show a tour chart
+ * Interface for a viewer which displays a tour chart
  */
-public interface ITourChartViewer {
+public interface ITourChartViewer extends ITourProvider {
 
 	/**
-	 * Show the tour chart for the given tour id, when the tour id is -1, the tour chart should be
-	 * hidden
-	 * 
-	 * @param tourId
+	 * @return Return the {@link TourChart} of the viewer
 	 */
-	public void showTourChart(long tourId);
-
-	/**
-	 * Open the tour in the editor
-	 * 
-	 * @param tourId
-	 */
-	public void openTourChart(long tourId);
-
-	/**
-	 * Set in the viewer the active year which was selected in the statistic
-	 * 
-	 * @param activeYear
-	 */
-	public void setActiveYear(int activeYear);
-
-	/**
-	 * show the tour chart container
-	 */
-	public void showTourChart(boolean isVisible);
+	TourChart getTourChart();
 
 }

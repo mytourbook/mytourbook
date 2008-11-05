@@ -22,14 +22,17 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Formatter;
 import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourType;
@@ -65,6 +68,7 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
+import net.tourbook.util.TableLayoutComposite;
 
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -86,22 +90,30 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -131,6 +143,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -166,8 +179,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final String			MEMENTO_ROW_EDIT_MODE			= "tourProperties.editMode";				//$NON-NLS-1$
 
 	private static final int			TAB_INDEX_TITLE					= 0;
-	private static final int			TAB_INDEX_INFO					= 1;
+	private static final int			TAB_INDEX_TOUR_MARKER			= 1;
 	private static final int			TAB_INDEX_TIME_SLICES			= 2;
+	private static final int			TAB_INDEX_INFO					= 3;
+
+	private static final int			COLUMN_TIME						= 0;
+	private static final int			COLUMN_DISTANCE					= 1;
+	private static final int			COLUMN_MARKER_LABEL				= 2;
 
 	/*
 	 * data series which are displayed in the viewer
@@ -198,7 +216,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ActionSaveTour				fActionSaveTour;
 	private ActionUndoChanges			fActionUndoChanges;
 	private ActionToggleRowSelectMode	fActionToggleRowSelectMode;
-	private ActionEditTourMarker		fActionTourMarker;
+	private ActionEditTourMarker		fActionEditTourMarker;
 	private ActionEditAdjustAltitude	fActionAdjustAltitude;
 
 	private ActionSetTourTag			fActionAddTag;
@@ -221,10 +239,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Composite					fInfoContainer;
 	private Composite					fDataViewerContainer;
 
-	private TableViewer					fDataViewer;
-
 	private Composite					fTimeSliceContainer;
 	private Label						fTimeSliceLabel;
+
+	private TableViewer					fDataViewer;
+	private TableViewer					fMarkerViewer;
 
 	/**
 	 * items which are displayed in the time slice vierer
@@ -326,12 +345,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private int[][]						fRefTourRange;
 
+	private boolean						fIsPartVisible					= false;
+
 	/**
 	 * when <code>true</code> additional info is displayed in the title area
 	 */
 	private boolean						fIsInfoInTitle;
 
-	private int							fUpdateCounter;
+	private int							fUIUpdateCounter;
+
+	/**
+	 * when <code>true</code> the UI update runnable is run, this will optimize performance to not
+	 * update the UI when the part is hidden
+	 */
+	private int							fUIRunnableCounter				= 0;
+	private TourData					fUIRunnableTourData;
+	private boolean						fUIRunnableForceTimeSliceReload;
+	private boolean						fUIRunnableIsModifyEventDisabled;
 
 	private final class IntegerEditingSupport extends IntegerDataSerieEditingSupport {
 
@@ -394,6 +424,69 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					// ignore invalid characters
 				} finally {}
 			}
+		}
+	}
+
+	private class MarkerViewerContentProvicer implements IStructuredContentProvider {
+
+		public void dispose() {}
+
+		public Object[] getElements(final Object inputElement) {
+			if (fTourData == null) {
+				return new Object[0];
+			} else {
+				return fTourData.getTourMarkers().toArray();
+			}
+		}
+
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+	}
+
+	private class MarkerViewerLabelProvider extends CellLabelProvider {
+
+		@Override
+		public void update(final ViewerCell cell) {
+
+			final TourMarker tourMarker = (TourMarker) cell.getElement();
+
+			switch (cell.getColumnIndex()) {
+
+			case COLUMN_TIME:
+				final int time = tourMarker.getTime();
+
+				cell.setText(new Formatter().format(//
+				Messages.Format_hhmm,
+						(time / 3600),
+						((time % 3600) / 60)).toString());
+				break;
+
+			case COLUMN_DISTANCE:
+				fNumberFormatter.setMinimumFractionDigits(1);
+				fNumberFormatter.setMaximumFractionDigits(1);
+				cell.setText(fNumberFormatter.format((tourMarker.getDistance()) / (1000 * UI.UNIT_VALUE_DISTANCE)));
+
+				if (tourMarker.getType() == ChartMarker.MARKER_TYPE_DEVICE) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+				}
+				break;
+
+			case COLUMN_MARKER_LABEL:
+				cell.setText(tourMarker.getLabel());
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Sort the markers by time
+	 */
+	private class MarkerViewerSorter extends ViewerSorter {
+		@Override
+		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
 		}
 	}
 
@@ -654,7 +747,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// set the part listener
 		fPartListener = new IPartListener2() {
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+			public void partActivated(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourDataEditorView.this) {
+					fPostSelectionProvider.setSelection(new SelectionTourData(null, fTourData));
+				}
+			}
 
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
@@ -662,14 +759,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (partRef.getPart(false) == TourDataEditorView.this) {
 
 					saveState();
-
 					TourManager.setTourDataEditor(null);
 				}
 			}
 
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+			public void partHidden(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourDataEditorView.this) {
+					fIsPartVisible = false;
+				}
+			}
 
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
@@ -679,7 +779,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 
-			public void partVisible(final IWorkbenchPartReference partRef) {}
+			public void partVisible(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourDataEditorView.this) {
+
+					fIsPartVisible = true;
+
+					Display.getCurrent().asyncExec(new Runnable() {
+						public void run() {
+							updateUIRunnable();
+						}
+					});
+				}
+			}
 		};
 
 		// register the listener in the page
@@ -808,6 +919,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				} else if (propertyId == TourProperty.TAG_STRUCTURE_CHANGED) {
 
 					updateUIFromTourData(fTourData, false, true);
+
+				} else if (propertyId == TourProperty.UPDATE_UI) {
+
+					fTourData = TourManager.getInstance().getTourData(fTourData.getTourId());
+
+					updateUIFromTourData(fTourData, false, true);
 				}
 			}
 		};
@@ -865,7 +982,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		fActionSaveTour = new ActionSaveTour(this);
 		fActionUndoChanges = new ActionUndoChanges(this);
-		fActionTourMarker = new ActionEditTourMarker(this, false);
+		fActionEditTourMarker = new ActionEditTourMarker(this, false);
 		fActionAdjustAltitude = new ActionEditAdjustAltitude(this, false);
 		fActionToggleRowSelectMode = new ActionToggleRowSelectMode(this);
 
@@ -891,7 +1008,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tbm.add(fActionUndoChanges);
 
 		tbm.add(new Separator());
-		tbm.add(fActionTourMarker);
+		tbm.add(fActionEditTourMarker);
 		tbm.add(fActionAdjustAltitude);
 
 		tbm.add(new Separator());
@@ -1157,6 +1274,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
+	 * create the views context menu
+	 */
+	private void createMarkerContextMenu() {
+
+		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(final IMenuManager manager) {
+				fillMarkerContextMenu(manager);
+			}
+		});
+
+		final Control viewerControl = fMarkerViewer.getControl();
+		final Menu menu = menuMgr.createContextMenu(viewerControl);
+		viewerControl.setMenu(menu);
+
+		getSite().registerContextMenu(menuMgr, fMarkerViewer);
+	}
+
+	/**
 	 * create the drop down menus, this must be created after the parent control is created
 	 */
 	private void createMenus() {
@@ -1233,6 +1370,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		addTourSaveListener();
 
 		createActions();
+		createMarkerContextMenu();
 
 		// this part is a selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -1556,18 +1694,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		});
 
-		final CTabItem fTabItemLocation = new CTabItem(fTabFolder, SWT.FLAT);
-		fTabItemLocation.setText(Messages.tour_editor_tabLabel_tour);
-		fTabItemLocation.setControl(createUITabData(fTabFolder, toolkit));
+		final CTabItem fTabItemTour = new CTabItem(fTabFolder, SWT.FLAT);
+		fTabItemTour.setText(Messages.tour_editor_tabLabel_tour);
+		fTabItemTour.setControl(createUITabData(fTabFolder, toolkit));
 
-		final CTabItem fTabMisc = new CTabItem(fTabFolder, SWT.FLAT);
-		fTabMisc.setText(Messages.tour_editor_tabLabel_info);
-		fTabMisc.setControl(createUITabInfo(fTabFolder, toolkit));
+		final CTabItem fTabItemMarker = new CTabItem(fTabFolder, SWT.FLAT);
+		fTabItemMarker.setText(Messages.tour_editor_tabLabel_tour_marker);
+		fTabItemMarker.setControl(createUITabMarker(fTabFolder));
 
-		final CTabItem fTabItemTimeSlices = new CTabItem(fTabFolder, SWT.FLAT);
-		fTabItemTimeSlices.setText(Messages.tour_editor_tabLabel_tour_data);
-		fTabItemTimeSlices.setControl(createUITabTimeSlices(fTabFolder));
+		final CTabItem fTabItemSlices = new CTabItem(fTabFolder, SWT.FLAT);
+		fTabItemSlices.setText(Messages.tour_editor_tabLabel_tour_data);
+		fTabItemSlices.setControl(createUITabSlices(fTabFolder));
 
+		final CTabItem fTabInfo = new CTabItem(fTabFolder, SWT.FLAT);
+		fTabInfo.setText(Messages.tour_editor_tabLabel_info);
+		fTabInfo.setControl(createUITabInfo(fTabFolder, toolkit));
 	}
 
 	private void createUISectionSeparator(final FormToolkit tk, final Composite parent) {
@@ -1642,11 +1783,105 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return sc;
 	}
 
+	private Control createUITabMarker(final Composite parent) {
+
+		final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
+		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
+		tableLayouter.setLayoutData(gd);
+
+		/*
+		 * create table
+		 */
+		final Table table = new Table(tableLayouter, SWT.FULL_SELECTION | SWT.BORDER | SWT.MULTI);
+
+		table.setLayout(new TableLayout());
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+
+		fMarkerViewer = new TableViewer(table);
+
+		/*
+		 * create columns
+		 */
+		TableViewerColumn tvc;
+		final PixelConverter pixelConverter = new PixelConverter(table);
+
+		final MarkerViewerLabelProvider labelProvider = new MarkerViewerLabelProvider();
+
+//		// column: time
+//		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
+//		tvcColumn = tvc.getColumn();
+//		tvcColumn.setText(Messages.Tour_Marker_Column_time);
+//		tvc.setLabelProvider(new CellLabelProvider() {
+//			@Override
+//			public void update(final ViewerCell cell) {
+//
+//				final TourMarker tourMarker = (TourMarker) cell.getElement();
+//
+//				final int time = tourMarker.getTime();
+//
+//				cell.setText(new Formatter().format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60))
+//						.toString());
+//			}
+//		});
+//		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), false));
+
+		// column: time
+		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
+		tvc.getColumn().setText(Messages.Tour_Marker_Column_time);
+		tvc.setLabelProvider(labelProvider);
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), false));
+
+		// column: distance km/mi
+		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
+		tvc.getColumn().setText(UI.UNIT_LABEL_DISTANCE);
+		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
+		tvc.setLabelProvider(labelProvider);
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), false));
+
+		// column: marker
+		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
+		tvc.getColumn().setText(Messages.Tour_Marker_Column_remark);
+		tvc.setLabelProvider(labelProvider);
+		tableLayouter.addColumnData(new ColumnWeightData(1, true));
+
+		/*
+		 * create table viewer
+		 */
+
+		fMarkerViewer.setContentProvider(new MarkerViewerContentProvicer());
+		fMarkerViewer.setLabelProvider(labelProvider);
+		fMarkerViewer.setSorter(new MarkerViewerSorter());
+
+		fMarkerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(final SelectionChangedEvent event) {
+				final StructuredSelection selection = (StructuredSelection) event.getSelection();
+				if (selection != null) {
+					fireSliderPosition(selection);
+				}
+			}
+		});
+
+		fMarkerViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(final DoubleClickEvent event) {
+
+				// edit selected marker
+				final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
+				if (selection.size() > 0) {
+					fActionEditTourMarker.setSelectedMarker((TourMarker) selection.getFirstElement());
+					fActionEditTourMarker.run();
+				}
+			}
+		});
+
+		return tableLayouter;
+	}
+
 	/**
 	 * @param parent
 	 * @return returns the controls for the tab
 	 */
-	private Control createUITabTimeSlices(final Composite parent) {
+	private Control createUITabSlices(final Composite parent) {
 
 		fTimeSliceContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(fTimeSliceContainer);
@@ -2044,7 +2279,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		fActionSaveTour.setEnabled(fIsTourDirty && isTourValid);
 		fActionUndoChanges.setEnabled(fIsTourDirty);
-		fActionTourMarker.setEnabled(isTourValid);
+		fActionEditTourMarker.setEnabled(isTourValid);
 		fActionAdjustAltitude.setEnabled(isTourValid);
 
 		final boolean isTimeSliceTab = fTabFolder.getSelectionIndex() == TAB_INDEX_TIME_SLICES;
@@ -2054,19 +2289,48 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void enableControls() {
 
-//		final boolean canEditTour = isTourInDb();
-//
-//		fTextTitle.setEnabled(canEditTour);
-//		fTextDescription.setEnabled(canEditTour);
-//
-//		fTextStartLocation.setEnabled(canEditTour);
-//		fTextEndLocation.setEnabled(canEditTour);
+		final boolean isTourInDb = isTourInDb();
+		final boolean isManualTour = false;
+		final boolean isDeviceTour = !isManualTour;
+
+		fTextTitle.setEnabled(isTourInDb);
+		fTextDescription.setEnabled(isTourInDb);
+
+		fTextStartLocation.setEnabled(isTourInDb);
+		fTextEndLocation.setEnabled(isTourInDb);
+
+		fDtTourDate.setEnabled(isManualTour);
+		fDtStartTime.setEnabled(isManualTour);
+
+		fDtRecordingTime.setEnabled(isManualTour);
+		fDtDrivingTime.setEnabled(isManualTour);
+		fDtPausedTime.setEnabled(isManualTour);
+
+		fTextTourDistance.setEnabled(isManualTour);
+
+		fTagLink.setEnabled(isTourInDb);
+		fTourTypeLink.setEnabled(isTourInDb);
+
+		fMarkerViewer.getTable().setEnabled(isTourInDb && isDeviceTour);
+		fDataViewer.getTable().setEnabled(isTourInDb && isDeviceTour);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
 		menuMgr.add(fActionDeleteTimeSlices);
 
+	}
+
+	private void fillMarkerContextMenu(final IMenuManager menuMgr) {
+
+		menuMgr.add(fActionEditTourMarker);
+
+		// add standard group which allows other plug-ins to contribute here
+		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+		// set the marker which should be selected in the marker dialog
+		final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
+		fActionEditTourMarker.setSelectedMarker((TourMarker) selection.getFirstElement());
 	}
 
 	/**
@@ -2114,22 +2378,45 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		final Object[] selectedData = selection.toArray();
+		if (selectedData == null || selectedData.length == 0) {
+			return;
+		}
+
+		final Object firstItem = selectedData[0];
 
 		if (selectedData.length > 1) {
 
 			// two or more data are selected, set the 2 sliders to the first and last selected data
 
-			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(fTourChart,
-					((TimeSlice) selectedData[0]).serieIndex,
-					((TimeSlice) selectedData[selectedData.length - 1]).serieIndex));
+			if (firstItem instanceof TimeSlice) {
+
+				fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(fTourChart,
+						((TimeSlice) firstItem).serieIndex,
+						((TimeSlice) selectedData[selectedData.length - 1]).serieIndex));
+
+			} else if (firstItem instanceof TourMarker) {
+
+				fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(fTourChart,
+						((TourMarker) firstItem).getSerieIndex(),
+						((TourMarker) selectedData[selectedData.length - 1]).getSerieIndex()));
+			}
 
 		} else if (selectedData.length > 0) {
 
 			// one data is selected
 
-			fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(fTourChart,
-					((TimeSlice) selectedData[0]).serieIndex,
-					SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
+			if (firstItem instanceof TimeSlice) {
+
+				fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(fTourChart,
+						((TimeSlice) firstItem).serieIndex,
+						SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
+
+			} else if (firstItem instanceof TourMarker) {
+
+				fPostSelectionProvider.setSelection(new SelectionChartXSliderPosition(fTourChart,
+						((TourMarker) firstItem).getSerieIndex(),
+						SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
+			}
 		}
 	}
 
@@ -3241,12 +3528,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * updates the fields in the tour data editor and enables actions and controls
 	 * 
 	 * @param tourData
-	 * @param forceReload
+	 * @param forceTimeSliceReload
 	 *            <code>true</code> will reload time slices
 	 * @param isModifyEventDisabled
 	 */
 	private void updateUIFromTourData(	final TourData tourData,
-										final boolean forceReload,
+										final boolean forceTimeSliceReload,
 										final boolean isModifyEventDisabled) {
 
 		if (tourData == null) {
@@ -3254,7 +3541,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return;
 		}
 
-		fUpdateCounter++;
+		fUIUpdateCounter++;
 
 		/*
 		 * set tour data because the TOUR_PROPERTIES_CHANGED event can occure before the runnable is
@@ -3264,7 +3551,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final Runnable runnable = new Runnable() {
 
-			final int	fRunnableCounter	= fUpdateCounter;
+			final int	fRunnableCounter	= fUIUpdateCounter;
 
 			public void run() {
 
@@ -3273,52 +3560,73 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 */
 
 				// check if this is the last runnable
-				if (fRunnableCounter != fUpdateCounter) {
+				if (fRunnableCounter != fUIUpdateCounter) {
 					// a new runnable was created
 					return;
 				}
 
-				fIsModifyEventDisabled = isModifyEventDisabled;
+				fUIRunnableTourData = tourData;
+				fUIRunnableForceTimeSliceReload = forceTimeSliceReload;
+				fUIRunnableIsModifyEventDisabled = isModifyEventDisabled;
+				fUIRunnableCounter = fUIUpdateCounter - 1;
 
-				if (fEditorForm.isDisposed()) {
-					// widget is disposed
-					return;
+				if (fIsPartVisible) {
+					updateUIRunnable();
 				}
-
-				// keep tour data
-				fTourData = tourData;
-
-				// a tour which is not saved has no tour references
-				final Collection<TourReference> tourReferences = tourData.getTourReferences();
-				if (tourReferences == null) {
-					fIsReferenceTourAvailable = false;
-				} else {
-					fIsReferenceTourAvailable = tourReferences.size() > 0;
-				}
-
-				// show tour type image when tour type is set
-				final TourType tourType = tourData.getTourType();
-				if (tourType == null) {
-					fEditorForm.setImage(null);
-				} else {
-					fEditorForm.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
-				}
-
-				fEditorForm.setText(getTourTitle());
-
-				updateUITabData();
-				updateUITabTimeSlices(forceReload);
-
-				enableActions();
-				enableControls();
-
-				fPageBook.showPage(fEditorForm);
-
-				fIsModifyEventDisabled = false;
 			}
 		};
 
 		Display.getCurrent().asyncExec(runnable);
+	}
+
+	private void updateUIRunnable() {
+
+		if (fUIRunnableCounter == fUIUpdateCounter) {
+			// UI is updated
+			return;
+		}
+
+		fUIRunnableCounter = fUIUpdateCounter;
+
+		if (fEditorForm.isDisposed() || fUIRunnableTourData == null) {
+			// widget is disposed or data is not set
+			return;
+		}
+
+		System.out.println("updateUIRunnable");
+		fIsModifyEventDisabled = fUIRunnableIsModifyEventDisabled;
+
+		// keep tour data
+		fTourData = fUIRunnableTourData;
+
+		// a tour which is not saved has no tour references
+		final Collection<TourReference> tourReferences = fUIRunnableTourData.getTourReferences();
+		if (tourReferences == null) {
+			fIsReferenceTourAvailable = false;
+		} else {
+			fIsReferenceTourAvailable = tourReferences.size() > 0;
+		}
+
+		// show tour type image when tour type is set
+		final TourType tourType = fUIRunnableTourData.getTourType();
+		if (tourType == null) {
+			fEditorForm.setImage(null);
+		} else {
+			fEditorForm.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+		}
+
+		fEditorForm.setText(getTourTitle());
+
+		updateUITabData();
+		updateUITabTimeSlices(fUIRunnableForceTimeSliceReload);
+		fMarkerViewer.setInput(new Object[0]);
+
+		enableActions();
+		enableControls();
+
+		fPageBook.showPage(fEditorForm);
+
+		fIsModifyEventDisabled = false;
 	}
 
 	private void updateUITabData() {

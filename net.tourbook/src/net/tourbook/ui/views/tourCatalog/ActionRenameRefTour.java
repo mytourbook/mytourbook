@@ -21,11 +21,14 @@ import javax.persistence.EntityTransaction;
 import net.tourbook.Messages;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourProperty;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.widgets.Display;
 
 class ActionRenameRefTour extends Action {
 
@@ -83,9 +86,24 @@ class ActionRenameRefTour extends Action {
 						ts.rollback();
 					} else {
 
-						// refresh the tree viewer and resort the ref tours
-						fTourCatalogView.reloadViewer();
+						Display.getCurrent().asyncExec(new Runnable() {
+							public void run() {
+
+								// refresh the tree viewer and resort the ref tours
+								fTourCatalogView.reloadViewer();
+
+								// ref tour is modified, fire event
+//								final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
+//								modifiedTours.add(refTour.getTourData());
+
+//								TourManager.saveModifiedTour(tourData);
+								TourManager.getInstance().removeTourFromCache(refTour.getTourData().getTourId());
+
+								TourManager.firePropertyChange(TourProperty.UPDATE_UI);
+							}
+						});
 					}
+
 					em.close();
 				}
 			}

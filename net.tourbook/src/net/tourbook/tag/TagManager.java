@@ -25,6 +25,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.tour.TourProperty;
@@ -58,8 +59,7 @@ public class TagManager {
 	 * number of tags which are displayed in the context menu or saved in the dialog settings, it's
 	 * set to 9 to have a unique accelerator key
 	 */
-	public static final int				MAX_RECENT_TAGS					= 9;
-
+//	public static final int				MAX_RECENT_TAGS					= 9;
 	private static LinkedList<TourTag>	fRecentTags						= new LinkedList<TourTag>();
 
 	private static ActionRecentTag[]	fActionsRecentTags;
@@ -118,7 +118,8 @@ public class TagManager {
 		if (fActionsRecentTags == null) {
 
 			// create actions for recenct tags
-			fActionsRecentTags = new ActionRecentTag[TagManager.MAX_RECENT_TAGS];
+
+			fActionsRecentTags = new ActionRecentTag[getMaxTags()];
 			for (int actionIndex = 0; actionIndex < fActionsRecentTags.length; actionIndex++) {
 				fActionsRecentTags[actionIndex] = new ActionRecentTag();
 			}
@@ -163,13 +164,22 @@ public class TagManager {
 		}
 	}
 
+	private static int getMaxTags() {
+
+		int maxTags = TourbookPlugin.getDefault()
+				.getPreferenceStore()
+				.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS);
+
+		return maxTags = maxTags == 0 ? 3 : maxTags;
+	}
+
 	public static ActionRecentTag[] getRecentTagActions() {
 		return fActionsRecentTags;
 	}
 
 	public static void restoreSettings() {
 
-		final String[] tagIds = new String[Math.min(MAX_RECENT_TAGS, fRecentTags.size())];
+		final String[] tagIds = new String[Math.min(getMaxTags(), fRecentTags.size())];
 		int tagIndex = 0;
 
 		for (final TourTag tag : fRecentTags) {
@@ -199,13 +209,14 @@ public class TagManager {
 
 	public static void saveSettings() {
 
-		final String[] tagIds = new String[Math.min(MAX_RECENT_TAGS, fRecentTags.size())];
+		final int maxTags = getMaxTags();
+		final String[] tagIds = new String[Math.min(maxTags, fRecentTags.size())];
 		int tagIndex = 0;
 
 		for (final TourTag tag : fRecentTags) {
 			tagIds[tagIndex++] = Long.toString(tag.getTagId());
 
-			if (tagIndex == MAX_RECENT_TAGS) {
+			if (tagIndex == maxTags) {
 				break;
 			}
 		}

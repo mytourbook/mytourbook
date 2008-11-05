@@ -22,6 +22,7 @@ import java.util.Formatter;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartMarker;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -39,6 +40,10 @@ import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -116,8 +121,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	private Chart					fTourChart;
 
 	private ActionEditTourMarker	fActionEditTourMarkers;
-
-	// private TourMarker fBackupMarker = new TourMarker();
 
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -325,7 +328,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 					Display.getCurrent().asyncExec(new Runnable() {
 						public void run() {
 							fActionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
-//							fActionEditTourMarkers.run();
+							fActionEditTourMarkers.run();
 						}
 					});
 				}
@@ -334,16 +337,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 		fMarkerViewer = new TableViewer(table);
 
-		fMarkerViewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(final DoubleClickEvent event) {
-
-				final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
-				if (selection.size() > 0) {
-					fActionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
-					fActionEditTourMarkers.run();
-				}
-			}
-		});
 		/*
 		 * create columns
 		 */
@@ -384,6 +377,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				fNF.setMinimumFractionDigits(1);
 				fNF.setMaximumFractionDigits(1);
 				cell.setText(fNF.format(((float) tourMarker.getDistance()) / 1000 / UI.UNIT_VALUE_DISTANCE));
+
+				if (tourMarker.getType() == ChartMarker.MARKER_TYPE_DEVICE) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+				}
 			}
 		});
 		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), false));
@@ -415,6 +412,18 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				final StructuredSelection selection = (StructuredSelection) event.getSelection();
 				if (selection != null) {
 					fireSliderPosition(selection);
+				}
+			}
+		});
+
+		fMarkerViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(final DoubleClickEvent event) {
+
+				// edit selected marker
+				final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
+				if (selection.size() > 0) {
+					fActionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
+					fActionEditTourMarkers.run();
 				}
 			}
 		});
@@ -494,6 +503,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	private void onSelectionChanged(final ISelection selection) {
 
+		long tourId = -1;
+
 		if (selection instanceof SelectionTourData) {
 
 			// a tour was selected, get the chart and update the marker viewer
@@ -501,35 +512,16 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
 			fTourData = tourDataSelection.getTourData();
 
-			if (fTourData == null) {
-
-				// hide the marker editor
-
-				fPageBook.showPage(fPageNoChart);
-				fTourChart = null;
-			} else {
-
-				// show the markers for the given tour
-
-				fMarkerViewer.setInput(this);
-				fPageBook.showPage(fViewerContainer);
-
+			if (fTourData != null) {
 				fTourChart = tourDataSelection.getTourChart();
+			} else {
+				fTourChart = null;
 			}
 
 		} else if (selection instanceof SelectionTourId) {
 
-			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
-
-			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
-
-			if (tourData != null) {
-				fTourData = tourData;
-				fMarkerViewer.setInput(this);
-				fPageBook.showPage(fViewerContainer);
-			}
-
 			fTourChart = null;
+			tourId = ((SelectionTourId) selection).getTourId();
 
 		} else if (selection instanceof SelectionActiveEditor) {
 
@@ -548,15 +540,46 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				final TourData tourData = tourChart.getTourData();
 				if (tourData != fTourData) {
 					fTourData = tourData;
-					fMarkerViewer.setInput(this);
-					fPageBook.showPage(fViewerContainer);
-
 					fTourChart = tourChart;
 				}
 			}
+
+		} else if (selection instanceof SelectionTourCatalogView) {
+
+			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+
+			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+			if (refItem != null) {
+				fTourChart = null;
+				tourId = refItem.getTourId();
+			}
+
+		} else if (selection instanceof StructuredSelection) {
+
+			fTourChart = null;
+			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+			if (firstElement instanceof TVICatalogComparedTour) {
+				tourId = ((TVICatalogComparedTour) firstElement).getTourId();
+			} else if (firstElement instanceof TVICompareResultComparedTour) {
+				tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
+			}
 		}
 
-		fActionEditTourMarkers.setEnabled(fTourData != null);
+		if (tourId >= 0) {
+			final TourData tourData = TourManager.getInstance().getTourData(tourId);
+			if (tourData != null) {
+				fTourData = tourData;
+			}
+		}
+
+		final boolean isTour = fTourData != null;
+
+		if (isTour) {
+			fPageBook.showPage(fViewerContainer);
+			fMarkerViewer.setInput(new Object[0]);
+		}
+
+		fActionEditTourMarkers.setEnabled(isTour);
 	}
 
 	@Override

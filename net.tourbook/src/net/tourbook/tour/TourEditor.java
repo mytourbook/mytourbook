@@ -49,22 +49,22 @@ import org.eclipse.ui.part.EditorPart;
 
 public class TourEditor extends EditorPart implements IPersistableEditor {
 
-	public static final String				ID					= "net.tourbook.tour.TourEditor";	//$NON-NLS-1$
+	public static final String		ID				= "net.tourbook.tour.TourEditor";	//$NON-NLS-1$
 
-	private static final String				MEMENTO_TOUR_ID		= "tourId";						//$NON-NLS-1$
+	private static final String		MEMENTO_TOUR_ID	= "tourId";						//$NON-NLS-1$
 
-	private TourEditorInput					fEditorInput;
+	private TourEditorInput			fEditorInput;
 
-	private TourChart						fTourChart;
-	private TourChartConfiguration			fTourChartConfig;
-	private TourData						fTourData;
+	private TourChart				fTourChart;
+	private TourChartConfiguration	fTourChartConfig;
+	private TourData				fTourData;
 
-	private boolean							fIsTourDirty		= false;
+	private boolean					fIsTourDirty	= false;
 
-	private PostSelectionProvider			fPostSelectionProvider;
-	private ISelectionListener				fPostSelectionListener;
-	private IPartListener2					fPartListener;
-	private ITourPropertyListener			fTourPropertyListener;
+	private PostSelectionProvider	fPostSelectionProvider;
+	private ISelectionListener		fPostSelectionListener;
+	private IPartListener2			fPartListener;
+	private ITourPropertyListener	fTourPropertyListener;
 
 	private void addPartListener() {
 
@@ -73,15 +73,9 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 			public void partActivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourEditor.this) {
-
-//					fTourChart.activateActionHandlers(getSite());
-//
-//					updateRevertHandler();
-//
-//					/*
-//					 * fire selection
-//					 */
-//					fPostSelectionProvider.setSelection(new SelectionActiveEditor(TourEditor.this));
+					if (partRef.getPart(false) == TourEditor.this) {
+						fPostSelectionProvider.setSelection(new SelectionTourData(fTourChart, fTourData));
+					}
 				}
 			}
 
@@ -178,7 +172,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 							final TourData tourData = (TourData) object;
 							if (tourData.getTourId() == tourId) {
 
-//								updateTourProperties(tourProperties, tourData);
 								updateTour(tourData);
 
 								// exit here because only one tourdata can be inside a tour editor
@@ -197,49 +190,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 				// update chart
 				fTourChart.updateTourChart(fTourData, false);
 			}
-
-//			/**
-//			 * current tour was changed, update
-//			 */
-//			private void updateTourProperties(final TourProperties tourProperties, final TourData tourData) {
-//
-//				if (tourProperties.isReverted) {
-//
-//					fIsTourDirty = false;
-//
-//					firePropertyChange(PROP_DIRTY);
-//					updateRevertHandler();
-//
-//					updateTour(tourData);
-//
-//				} else if (tourProperties.isTourEdited) {
-//
-//					if (isDirty() == false) {
-//
-//						// tour is not yet dirty
-//						fIsTourDirty = true;
-//
-//						firePropertyChange(PROP_DIRTY);
-//						updateRevertHandler();
-//					}
-//
-//					updateTour(tourData);
-//
-//				} else {
-//
-////					if (isDirty()) {
-////
-////						final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
-////						modifiedTour.add(tourData);
-////						if (TourManager.saveTourEditors(modifiedTour)) {
-////							updateTour(tourData);
-////						}
-////
-////					} else {
-//						updateTour(tourData);
-////					}
-//				}
-//			}
 		};
 
 		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
@@ -247,12 +197,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 	private void createActions() {
 
-//		fHandlerService = (IHandlerService) getSite().getService(IHandlerService.class);
-//
-//		fRevertActionHandler = new ActionHandlerRevertTourEditor(this);
-//
-//		fHandlerService.activateHandler("net.tourbook.command.tourEditor.revert", //$NON-NLS-1$
-//				fRevertActionHandler);
 	}
 
 	@Override
@@ -275,12 +219,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			}
 		});
 
-//		fTourChart.addTourModifyListener(new ITourModifyListener() {
-//			public void tourIsModified() {
-//				setTourDirty();
-//			}
-//		});
-
 		fTourChartConfig = TourManager.createTourChartConfiguration();
 		fTourChart.createTourEditorActionHandlers(fTourChartConfig);
 
@@ -301,34 +239,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	}
 
 	@Override
-	public void doSave(final IProgressMonitor monitor) {
-
-//		TourDatabase.saveTour(fTourData);
-//
-//		fIsTourDirty = false;
-//
-//		TourDatabase.getInstance().firePropertyChange(TourDatabase.TOUR_IS_CHANGED_AND_PERSISTED);
-//
-//		// hide the dirty indicator
-//		firePropertyChange(PROP_DIRTY);
-//
-//		// update actions
-//		updateRevertHandler();
-//
-//		if (fIsRefTourCreated) {
-//
-//			fIsRefTourCreated = false;
-//
-//			// update tour catalog view
-//			firePostSelection(new SelectionNewRefTours());
-//		}
-//
-//		// notify all views which display the tour type
-//		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
-//		modifiedTour.add(fTourData);
-//
-//		TourManager.firePropertyChange(TourManager.TOUR_PROPERTIES_CHANGED, modifiedTour);
-	}
+	public void doSave(final IProgressMonitor monitor) {}
 
 	@Override
 	public void doSaveAs() {}
@@ -344,6 +255,10 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 	public TourChart getTourChart() {
 		return fTourChart;
+	}
+
+	public TourData getTourData() {
+		return fTourData;
 	}
 
 	@Override
@@ -386,24 +301,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		fTourChart.setFocus();
 	}
 
-//	/**
-//	 * set status a reference tour was created
-//	 */
-//	public void setRefTourIsCreated() {
-//		fIsRefTourCreated = true;
-//	}
-
-//	/**
-//	 * Set the tour dirty
-//	 */
-//	public void setTourDirty() {
-//
-//		fIsTourDirty = true;
-//
-//		firePropertyChange(PROP_DIRTY);
-//		updateRevertHandler();
-//	}
-
 	@Override
 	public String toString() {
 
@@ -414,11 +311,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 		return sb.toString();
 	}
-
-//	private void updateRevertHandler() {
-//		fRevertActionHandler.setEnabled(fIsTourDirty);
-//		fRevertActionHandler.fireHandlerChanged();
-//	}
 
 	/**
 	 * load tour data and update the tour chart

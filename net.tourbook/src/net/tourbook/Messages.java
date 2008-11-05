@@ -52,6 +52,10 @@ public class Messages extends NLS {
 	public static String		action_tag_remove_all;
 	public static String		action_tag_rename_tag;
 	public static String		action_tag_rename_tag_category;
+	public static String	action_tag_set_all_confirm_message;
+
+	public static String	action_tag_set_all_confirm_title;
+
 	public static String		action_tag_set_all_tag_structures;
 	public static String		action_tag_set_tag_expand_type;
 
@@ -253,6 +257,8 @@ public class Messages extends NLS {
 	public static String		Image__link;
 	public static String		Image__open_tour_segmenter;
 	public static String		Image__options;
+
+	public static String	Image__quick_edit;
 	public static String		Image__refresh;
 	public static String		Image__remove_all;
 	public static String		Image__remove_all_disabled;
@@ -383,6 +389,10 @@ public class Messages extends NLS {
 	public static String		Pref_People_Label_rawdata_path;
 	public static String		Pref_People_Label_weight;
 	public static String		Pref_People_Title;
+
+	public static String	pref_appearance_number_of_recent_tags;
+
+	public static String	pref_appearance_number_of_recent_tags_tooltip;
 
 	public static String		pref_general_confirmation;
 
@@ -612,6 +622,8 @@ public class Messages extends NLS {
 	public static String		tour_editor_tabLabel_info;
 	public static String		tour_editor_tabLabel_tour;
 	public static String		tour_editor_tabLabel_tour_data;
+
+	public static String	tour_editor_tabLabel_tour_marker;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;
