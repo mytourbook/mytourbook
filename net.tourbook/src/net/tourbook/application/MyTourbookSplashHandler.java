@@ -100,7 +100,7 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 
 			public void paintControl(final PaintEvent e) {
 				final GC gc = e.gc;
-				final String version = "Version " + APP_BUILD_ID; //$NON-NLS-1$
+				final String version = "Version " + APP_BUILD_ID_VERSION; //$NON-NLS-1$
 				final Point extend = gc.textExtent(version);
 
 				gc.setForeground(getForeground());

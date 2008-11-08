@@ -22,9 +22,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -46,26 +43,45 @@ public class TourMapPropertyView extends ViewPart {
 
 		Label label;
 
-		final ScrolledComposite scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
-		scrolledContainer.setExpandVertical(true);
-		scrolledContainer.setExpandHorizontal(true);
+//		final ScrolledComposite scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+//		scrolledContainer.setExpandVertical(true);
+//		scrolledContainer.setExpandHorizontal(true);
+//
+//		final Composite viewContainer = new Composite(scrolledContainer, SWT.NONE);
+//		GridLayoutFactory.fillDefaults().applyTo(viewContainer);
+//
+//		scrolledContainer.setContent(viewContainer);
+//		scrolledContainer.addControlListener(new ControlAdapter() {
+//			@Override
+//			public void controlResized(final ControlEvent e) {
+//				scrolledContainer.setMinSize(viewContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+//			}
+//		});
 
-		final Composite viewContainer = new Composite(scrolledContainer, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(viewContainer);
-
-		scrolledContainer.setContent(viewContainer);
-		scrolledContainer.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				scrolledContainer.setMinSize(viewContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-			}
-		});
-
-		final Composite infoContainer = new Composite(viewContainer, SWT.NONE);
+		final Composite infoContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(infoContainer);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(infoContainer);
 
 		{
+			/*
+			 * scale: dim map
+			 */
+			label = new Label(infoContainer, SWT.NONE);
+			label.setText(Messages.map_properties_map_dim_level);
+
+			fScaleDimMap = new Scale(infoContainer, SWT.NONE);
+			fScaleDimMap.setIncrement(1);
+			fScaleDimMap.setPageIncrement(10);
+			fScaleDimMap.setMinimum(0);
+			fScaleDimMap.setMaximum(100);
+			GridDataFactory.fillDefaults().grab(true, false).hint(1, SWT.DEFAULT).applyTo(fScaleDimMap);
+			fScaleDimMap.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onChangeProperty();
+				}
+			});
+
 			/*
 			 * tile info
 			 */
@@ -97,25 +113,6 @@ public class TourMapPropertyView extends ViewPart {
 					}
 				});
 			}
-
-			/*
-			 * scale: dim map
-			 */
-			label = new Label(infoContainer, SWT.NONE);
-			label.setText(Messages.map_properties_map_dim_level);
-
-			fScaleDimMap = new Scale(infoContainer, SWT.NONE);
-			fScaleDimMap.setIncrement(1);
-			fScaleDimMap.setPageIncrement(10);
-			fScaleDimMap.setMinimum(0);
-			fScaleDimMap.setMaximum(100);
-			GridDataFactory.fillDefaults().grab(true, false).hint(1, SWT.DEFAULT).applyTo(fScaleDimMap);
-			fScaleDimMap.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onChangeProperty();
-				}
-			});
 		}
 	}
 

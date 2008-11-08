@@ -68,6 +68,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -301,7 +302,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
-					recreateViewer();
+					recreateViewer(null);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -474,7 +475,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTourViewer = new ContainerCheckedTreeViewer(tree);
-		fColumnManager.createColumns();
+		fColumnManager.createColumns(fTourViewer);
 
 		fTourViewer.setContentProvider(new ResultContentProvider());
 		fTourViewer.setUseHashlookup(true);
@@ -1082,7 +1083,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		}
 	}
 
-	public void recreateViewer() {
+	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		fViewerContainer.setRedraw(false);
 		{
@@ -1100,6 +1101,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			fTourViewer.setSelection(selection);
 		}
 		fViewerContainer.setRedraw(true);
+		
+		return fTourViewer;
 	}
 
 	public void reloadViewer() {

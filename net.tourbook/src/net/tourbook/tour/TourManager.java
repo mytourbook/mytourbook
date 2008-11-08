@@ -29,6 +29,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -391,8 +392,10 @@ public class TourManager {
 
 				final TourData tourDataInEditor = tourDataEditor.getTourData();
 
-				if (UI.checkTourData(tourData, tourDataInEditor) == false) {
-					return savedTours;
+				try {
+					UI.checkTourData(tourData, tourDataInEditor);
+				} catch (final MyTourbookException e) {
+					e.printStackTrace();
 				}
 
 				if (tourDataInEditor == tourData) {
@@ -1337,6 +1340,7 @@ public class TourManager {
 
 		final TourData tourDataInCache = fTourDataCache.get(tourId);
 		if (tourDataInCache != null) {
+//			System.out.println("tourDataInCache:" + tourDataInCache);
 			return tourDataInCache;
 		}
 
@@ -1345,6 +1349,7 @@ public class TourManager {
 		if (tourDataFromDb == null) {
 			return null;
 		}
+//		System.out.println("tourDataFromDb:" + tourDataFromDb);
 
 		// keep the tour data
 		updateTourInCache(tourDataFromDb);

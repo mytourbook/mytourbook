@@ -47,10 +47,10 @@ import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.tour.TourProperty;
+import net.tourbook.ui.ColumnDefinition;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
-import net.tourbook.ui.TableColumnDefinition;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -270,7 +270,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
-					recreateViewer();
+					fTourViewer = (TableViewer) recreateViewer(fTourViewer);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -476,7 +476,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		table.setLinesVisible(prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTourViewer = new TableViewer(table);
-		fColumnManager.createColumns();
+		fColumnManager.createColumns(fTourViewer);
 
 		// table viewer
 		fTourViewer.setContentProvider(new TourDataContentProvider());
@@ -513,7 +513,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private void defineViewerColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
-		TableColumnDefinition colDef;
+		ColumnDefinition colDef;
 
 		/*
 		 * column: database indicator
@@ -1078,7 +1078,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 	}
 
-	public void recreateViewer() {
+	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		fViewerContainer.setRedraw(false);
 		{
@@ -1090,6 +1090,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			reloadViewer();
 		}
 		fViewerContainer.setRedraw(true);
+
+		return fTourViewer;
 	}
 
 	public void reloadViewer() {

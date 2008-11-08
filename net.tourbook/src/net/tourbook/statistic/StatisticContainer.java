@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
@@ -55,7 +56,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.PageBook;
@@ -201,6 +201,8 @@ public class StatisticContainer extends Composite {
 				for (final TourbookStatistic statistic : getComboStatistics()) {
 					statistic.dispose();
 				}
+
+				fActiveStatistic = null;
 			}
 		});
 	}
@@ -543,7 +545,7 @@ public class StatisticContainer extends Composite {
 		fActiveYear = selectedYear;
 
 		fActiveStatistic = getStatistic();
-		if (fActiveStatistic == null) {
+		if (fActiveStatistic == null || fActiveStatistic.getControl().isDisposed()) {
 			return;
 		}
 
@@ -654,48 +656,37 @@ public class StatisticContainer extends Composite {
 	/**
 	 * Restore selected statistic
 	 * 
-	 * @param memento
+	 * @param viewState
 	 * @param activeTourTypeFilter
 	 * @param activePerson
 	 */
-	public void restoreStatistics(	final IMemento memento,
+	public void restoreStatistics(	final IDialogSettings viewState,
 									final TourPerson activePerson,
 									final TourTypeFilter activeTourTypeFilter) {
 
 		fActivePerson = activePerson;
 		fActiveTourTypeFilter = activeTourTypeFilter;
 
+		// select statistic
 		int prevStatIndex = 0;
-
-		if (memento != null) {
-
-			/*
-			 * select statistic
-			 */
-
-			final String mementoStatisticId = memento.getString(MEMENTO_SELECTED_STATISTIC);
-			if (mementoStatisticId != null) {
-				int statIndex = 0;
-				for (final TourbookStatistic statistic : getComboStatistics()) {
-					if (mementoStatisticId.equalsIgnoreCase(statistic.fStatisticId)) {
-						prevStatIndex = statIndex;
-						break;
-					}
-					statIndex++;
+		final String mementoStatisticId = viewState.get(MEMENTO_SELECTED_STATISTIC);
+		if (mementoStatisticId != null) {
+			int statIndex = 0;
+			for (final TourbookStatistic statistic : getComboStatistics()) {
+				if (mementoStatisticId.equalsIgnoreCase(statistic.fStatisticId)) {
+					prevStatIndex = statIndex;
+					break;
 				}
+				statIndex++;
 			}
+		}
 
-			/*
-			 * number of years
-			 */
-			final Integer numberOfYears = memento.getInteger(MEMENTO_NUMBER_OF_YEARS);
-			if (numberOfYears != null) {
-				fComboNumberOfYears.select(numberOfYears);
-			} else {
-				fComboNumberOfYears.select(0);
-			}
-
-		} else {
+		// select number of years
+		try {
+			final int numberOfYears = viewState.getInt(MEMENTO_NUMBER_OF_YEARS);
+			fComboNumberOfYears.select(numberOfYears);
+		} catch (final NumberFormatException e) {
+			// select one year
 			fComboNumberOfYears.select(0);
 		}
 
@@ -708,28 +699,29 @@ public class StatisticContainer extends Composite {
 		onSelectStatistic();
 
 		// restore statistic state (e.g. reselect previous selection)
-		if (memento != null) {
-			getComboStatistics().get(prevStatIndex).restoreState(memento);
+		if (viewState != null) {
+			getComboStatistics().get(prevStatIndex).restoreState(viewState);
 		}
 	}
 
 	/**
 	 * save statistic
 	 */
-	public void saveState(final IMemento memento) {
+	public void saveState(final IDialogSettings viewState) {
+
+		final ArrayList<TourbookStatistic> comboStatistics = getComboStatistics();
 
 		// keep statistic id for the selected statistic
 		final int selectionIndex = fComboStatistics.getSelectionIndex();
 		if (selectionIndex != -1) {
-
-			final TourbookStatistic tourbookStatistic = getComboStatistics().get(selectionIndex);
-
-			memento.putString(MEMENTO_SELECTED_STATISTIC, tourbookStatistic.fStatisticId);
-
-			tourbookStatistic.saveState(memento);
+			viewState.put(MEMENTO_SELECTED_STATISTIC, comboStatistics.get(selectionIndex).fStatisticId);
 		}
 
-		memento.putInteger(MEMENTO_NUMBER_OF_YEARS, fComboNumberOfYears.getSelectionIndex());
+		for (final TourbookStatistic tourbookStatistic : comboStatistics) {
+			tourbookStatistic.saveState(viewState);
+		}
+
+		viewState.put(MEMENTO_NUMBER_OF_YEARS, fComboNumberOfYears.getSelectionIndex());
 	}
 
 	/**

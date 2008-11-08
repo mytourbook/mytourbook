@@ -162,7 +162,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private IPartListener2					fPartListener;
 
-
 	private static final NumberFormat		fNF								= NumberFormat.getNumberInstance();
 
 	/**
@@ -338,7 +337,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
-					recreateViewer();
+					fTagViewer = (TreeViewer) recreateViewer(fTagViewer);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -514,7 +513,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTagViewer = new TreeViewer(tree);
-		fColumnManager.createColumns();
+		fColumnManager.createColumns(fTagViewer);
 
 		fTagViewer.setContentProvider(new TagContentProvider());
 		fTagViewer.setComparer(new TagComparer());
@@ -1205,7 +1204,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		return fTagViewer;
 	}
 
-	public void recreateViewer() {
+	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		fViewerContainer.setRedraw(false);
 		{
@@ -1224,6 +1223,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 		fViewerContainer.setRedraw(true);
 
+		return fTagViewer;
 	}
 
 	/**

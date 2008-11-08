@@ -46,6 +46,7 @@ import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -53,7 +54,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -435,7 +435,10 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	@Override
 	public void dispose() {
+		
 		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		
+		super.dispose();
 	}
 
 	public Integer getSelectedMonth() {
@@ -533,9 +536,9 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	}
 
 	@Override
-	public void restoreState(final IMemento memento) {
+	public void restoreState(final IDialogSettings viewState) {
 
-		final String mementoTourId = memento.getString(MEMENTO_SELECTED_TOUR_ID);
+		final String mementoTourId = viewState.get(MEMENTO_SELECTED_TOUR_ID);
 		if (mementoTourId != null) {
 			try {
 				final long tourId = Long.parseLong(mementoTourId);
@@ -547,7 +550,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	}
 
 	@Override
-	public void saveState(final IMemento memento) {
+	public void saveState(final IDialogSettings viewState) {
 
 		if (fChart == null || fChart.isDisposed()) {
 			return;
@@ -560,7 +563,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 			// check array bounds
 			if (valueIndex < fTourDayData.fTourIds.length) {
-				memento.putString(MEMENTO_SELECTED_TOUR_ID, Long.toString(fTourDayData.fTourIds[valueIndex]));
+				viewState.put(MEMENTO_SELECTED_TOUR_ID, Long.toString(fTourDayData.fTourIds[valueIndex]));
 			}
 		}
 	}

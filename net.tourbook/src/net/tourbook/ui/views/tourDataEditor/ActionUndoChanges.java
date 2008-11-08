@@ -33,6 +33,7 @@ class ActionUndoChanges extends Action {
 		
 		fTourDataEditor = tourPropertiesView;
 
+		setText(Messages.app_action_undo_modifications);
 		setToolTipText(Messages.app_action_undo_modifications_tooltip);
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit));

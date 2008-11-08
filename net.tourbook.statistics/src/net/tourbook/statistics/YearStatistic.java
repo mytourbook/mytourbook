@@ -28,10 +28,10 @@ import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IMemento;
 
 public abstract class YearStatistic extends TourbookStatistic implements IYearStatistic {
 
@@ -104,12 +104,12 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 	}
 
 	@Override
-	public void restoreState(final IMemento memento) {
+	public void restoreState(final IDialogSettings viewState) {
 	// do nothing
 	}
 
 	@Override
-	public void saveState(final IMemento memento) {
+	public void saveState(final IDialogSettings viewState) {
 	// do nothing
 	}
 }

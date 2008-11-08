@@ -89,6 +89,8 @@ public class Messages extends NLS {
 	public static String	app_action_open_tour;
 	public static String		app_action_quick_edit;
 	public static String		app_action_save_tour_tooltip;
+	public static String	app_action_undo_modifications;
+
 	public static String		app_action_undo_modifications_tooltip;
 
 	public static String		App_Action_set_tour_type;

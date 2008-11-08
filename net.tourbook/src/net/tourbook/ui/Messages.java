@@ -76,6 +76,10 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_longitude;
 	public static String		ColumnFactory_longitude_label;
 	public static String		ColumnFactory_longitude_tooltip;
+	public static String	ColumnFactory_marker_label;
+
+	public static String	ColumnFactory_marker_label_tooltip;
+
 	public static String		ColumnFactory_max_altitude_label;
 	public static String		ColumnFactory_max_altitude_tooltip;
 	public static String		ColumnFactory_max_pulse;
@@ -122,8 +126,14 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_tour_tag_label;
 	public static String		ColumnFactory_tour_tag_tooltip;
 	public static String		ColumnFactory_tour_time;
+
+	public static String	ColumnFactory_tour_time_hhmmss;
 	public static String		ColumnFactory_tour_time_label;
+
+	public static String	ColumnFactory_tour_time_label_hhmmss;
 	public static String		ColumnFactory_tour_time_tooltip;
+
+	public static String	ColumnFactory_tour_time_tooltip_hhmmss;
 	public static String		ColumnFactory_tour_title;
 	public static String		ColumnFactory_tour_title_label;
 	public static String		ColumnFactory_tour_title_tooltip;

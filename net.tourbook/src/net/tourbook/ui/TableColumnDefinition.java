@@ -48,4 +48,9 @@ public class TableColumnDefinition extends ColumnDefinition {
 		fTableColumn = tableColumn;
 	}
 
+	@Override
+	public String toString() {
+		return fColumnId;
+	}
+
 }

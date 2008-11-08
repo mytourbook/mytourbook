@@ -16,6 +16,7 @@
 package net.tourbook.tour;
 
 import net.tourbook.data.TourData;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -26,9 +27,8 @@ import org.eclipse.jface.viewers.ISelection;
 public class SelectionTourData implements ISelection {
 
 	private TourChart	fTourChart;
-
 	private TourData	fTourData;
-	
+
 	private boolean		fForceRedraw	= false;
 
 	public SelectionTourData(final TourChart tourChart, final TourData tourData) {
@@ -75,7 +75,30 @@ public class SelectionTourData implements ISelection {
 
 	@Override
 	public String toString() {
-		return "SelectionTourData\ttourData:" + fTourData.toString();
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("[SelectionTourData]\n");//$NON-NLS-1$
+
+		sb.append("\tfTourData:");//$NON-NLS-1$
+		if (fTourData == null) {
+			sb.append(fTourData);
+		} else {
+			sb.append(fTourData.toString());
+		}
+
+		sb.append(UI.NEW_LINE);
+
+		sb.append("\tfTourChart:");//$NON-NLS-1$
+		if (fTourChart == null) {
+			sb.append(fTourChart);
+		} else {
+			sb.append(fTourChart.toString());
+		}
+
+		sb.append(UI.NEW_LINE);
+
+		return sb.toString();
 	}
 
 }

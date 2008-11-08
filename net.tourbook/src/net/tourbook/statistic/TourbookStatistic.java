@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartSite;
 
@@ -77,7 +77,12 @@ public abstract class TourbookStatistic {
 	/**
 	 * Disposes of the statistic
 	 */
-	public void dispose() {}
+	public void dispose() {
+		if (fContainer != null && fContainer.isDisposed() == false) {
+			fContainer.dispose();
+			fContainer = null;
+		}
+	}
 
 	@Override
 	public boolean equals(final Object obj) {
@@ -139,16 +144,16 @@ public abstract class TourbookStatistic {
 	/**
 	 * Restores the state from a memento (e.g. select previous selection), default does nothing
 	 * 
-	 * @param memento
+	 * @param viewState
 	 */
-	public abstract void restoreState(final IMemento memento);
+	public abstract void restoreState(final IDialogSettings viewState);
 
 	/**
 	 * Saves the state of the statistic into the memento, default does nothing
 	 * 
-	 * @param memento
+	 * @param viewState
 	 */
-	public abstract void saveState(final IMemento memento);
+	public abstract void saveState(final IDialogSettings viewState);
 
 	/**
 	 * Select the day in the statistic, this is used to visualize a selected tour in the statistic

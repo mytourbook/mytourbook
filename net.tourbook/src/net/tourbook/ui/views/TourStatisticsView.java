@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContainer;
@@ -38,6 +37,7 @@ import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -46,20 +46,17 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourStatisticsView extends ViewPart implements ITourProvider {
 
-	static public final String		ID			= "net.tourbook.views.StatisticView";	//$NON-NLS-1$
+	static public final String		ID			= "net.tourbook.views.StatisticView";						//$NON-NLS-1$
 
-	private static IMemento			fSessionMemento;
+	final IDialogSettings			fViewState	= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
 
 	private StatisticContainer		fStatisticContainer;
 
@@ -110,7 +107,11 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			public void partClosed(final IWorkbenchPartReference partRef) {}
+			public void partClosed(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourStatisticsView.this) {
+					saveState();
+				}
+			}
 
 			public void partDeactivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourStatisticsView.this) {
@@ -202,7 +203,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			public void propertyChanged(final IWorkbenchPart part,
 										final TourProperty propertyId,
 										final Object propertyData) {
-				
+
 				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
 
 					if (part == TourStatisticsView.this) {
@@ -240,7 +241,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
 		fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
 
-		fStatisticContainer.restoreStatistics(fSessionMemento, fActivePerson, fActiveTourTypeFilter);
+		fStatisticContainer.restoreStatistics(fViewState, fActivePerson, fActiveTourTypeFilter);
 	}
 
 	private void createResources() {
@@ -284,29 +285,19 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			return null;
 		}
 
-		final Long selectedTour = selectedStatistic.getSelectedTour();
-		if (selectedTour == null) {
+		final Long selectedTourId = selectedStatistic.getSelectedTour();
+		if (selectedTourId == null) {
 			return null;
 		}
 
-		final TourData tourInDb = TourDatabase.getTourFromDb(selectedTour);
-		if (tourInDb == null) {
+//		final TourData tourInDb = TourDatabase.getTourFromDb(selectedTourId);
+		final TourData selectedTourData = TourManager.getInstance().getTourData(selectedTourId);
+		if (selectedTourData == null) {
 			return null;
 		} else {
 			final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
-			selectedTours.add(tourInDb);
+			selectedTours.add(selectedTourData);
 			return selectedTours;
-		}
-	}
-
-	@Override
-	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
-
-		super.init(site, memento);
-
-		// set the session memento if it's not yet set
-		if (fSessionMemento == null) {
-			fSessionMemento = memento;
 		}
 	}
 
@@ -314,9 +305,8 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		fStatisticContainer.refreshStatistic(fActivePerson, fActiveTourTypeFilter);
 	}
 
-	@Override
-	public void saveState(final IMemento memento) {
-		fStatisticContainer.saveState(memento);
+	public void saveState() {
+		fStatisticContainer.saveState(fViewState);
 	}
 
 	@Override

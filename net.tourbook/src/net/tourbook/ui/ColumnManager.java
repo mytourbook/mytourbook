@@ -17,11 +17,16 @@ package net.tourbook.ui;
 
 import java.util.ArrayList;
 
+import net.tourbook.database.MyTourbookException;
 import net.tourbook.util.StringToArrayConverter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.AbstractColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnLayoutData;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -42,14 +47,12 @@ import org.eclipse.swt.widgets.TreeColumn;
 public class ColumnManager {
 
 	/**
-	 * minimum column width when the column width is 0, there was an bug that this happened
+	 * minimum column width, when the column width is 0, there was a bug that this happened
 	 */
 	private static final int			MINIMUM_COLUMN_WIDTH			= 7;
 
 	private static final String			MEMENTO_COLUMN_SORT_ORDER		= "column_sort_order";					//$NON-NLS-1$
 	private static final String			MEMENTO_COLUMN_WIDTH			= "column_width";						//$NON-NLS-1$
-
-	private ITourViewer					fTourViewer;
 
 	/**
 	 * column definitions for all columns which are defined for the viewer
@@ -71,9 +74,18 @@ public class ColumnManager {
 	 */
 	private String[]					fColumnIdsAndWidth;
 
-	public ColumnManager(final ITourViewer viewerAdapter, final IDialogSettings viewState) {
+	private AbstractColumnLayout		fColumnLayout;
 
-		fTourViewer = viewerAdapter;
+	private ITourViewer					fTourViewer;
+
+	/**
+	 * viewer which is managed by this {@link ColumnManager}
+	 */
+	private ColumnViewer				fColumnViewer;
+
+	public ColumnManager(final ITourViewer tourViewer, final IDialogSettings viewState) {
+
+		fTourViewer = tourViewer;
 
 		restoreState(viewState);
 	}
@@ -91,30 +103,31 @@ public class ColumnManager {
 
 	/**
 	 * Creates the columns in the tree/table for all defined columns
+	 * 
+	 * @param columnViewer
 	 */
-	public void createColumns() {
+	public void createColumns(final ColumnViewer columnViewer) {
+
+		fColumnViewer = columnViewer;
 
 		setVisibleColumnDefinitions();
 
-		final ColumnViewer viewer = fTourViewer.getViewer();
-
-		if (viewer instanceof TableViewer) {
+		if (columnViewer instanceof TableViewer) {
 
 			// create all columns in the table
 
 			for (final ColumnDefinition colDef : fVisibleColumnDefinitions) {
-				createTableColumn((TableColumnDefinition) colDef, (TableViewer) viewer);
+				createTableColumn((TableColumnDefinition) colDef, (TableViewer) columnViewer);
 			}
 
-		} else if (viewer instanceof TreeViewer) {
+		} else if (columnViewer instanceof TreeViewer) {
 
 			// create all columns in the tree
 
 			for (final ColumnDefinition colDef : fVisibleColumnDefinitions) {
-				createTreeColumn((TreeColumnDefinition) colDef, (TreeViewer) viewer);
+				createTreeColumn((TreeColumnDefinition) colDef, (TreeViewer) columnViewer);
 			}
 		}
-
 	}
 
 	/**
@@ -136,7 +149,7 @@ public class ColumnManager {
 		}
 
 		tvc.setEditingSupport(colDef.getEditingSupport());
-		
+
 		tc = tvc.getColumn();
 
 		final String columnText = colDef.getColumnText();
@@ -152,13 +165,36 @@ public class ColumnManager {
 		/*
 		 * set column width
 		 */
-		int columnWidth = colDef.getColumnWidth();
-		if (colDef.isColumnHidden()) {
-			columnWidth = 0;
+		if (fColumnLayout == null) {
+
+			// set the column width with pixels
+
+			tc.setWidth(getColumnWidth(colDef));
+
 		} else {
-			columnWidth = columnWidth < MINIMUM_COLUMN_WIDTH ? colDef.getDefaultColumnWidth() : columnWidth;
+
+			// use the column layout to set the width of the columns
+
+			final ColumnLayoutData columnLayoutData = colDef.getColumnWeightData();
+
+			if (columnLayoutData == null) {
+				try {
+					throw new MyTourbookException("ColumnWeightData is not set for the column: " + colDef);
+				} catch (final MyTourbookException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (columnLayoutData instanceof ColumnPixelData) {
+				final ColumnPixelData columnPixelData = (ColumnPixelData) columnLayoutData;
+
+				// overwrite the width
+				columnPixelData.width = getColumnWidth(colDef);
+				fColumnLayout.setColumnData(tc, columnPixelData);
+			} else {
+				fColumnLayout.setColumnData(tc, columnLayoutData);
+			}
 		}
-		tc.setWidth(columnWidth);
 
 		tc.setResizable(colDef.isColumnResizable());
 		tc.setMoveable(colDef.isColumnMoveable());
@@ -264,26 +300,24 @@ public class ColumnManager {
 
 		final ArrayList<String> columnIdsAndWidth = new ArrayList<String>();
 
-		final ColumnViewer columnViewer = fTourViewer.getViewer();
+		if (fColumnViewer instanceof TableViewer) {
 
-		if (columnViewer instanceof TableViewer) {
-
-			final Table table = ((TableViewer) columnViewer).getTable();
+			final Table table = ((TableViewer) fColumnViewer).getTable();
 			if (table.isDisposed()) {
 				return null;
 			}
 
 			for (final TableColumn column : table.getColumns()) {
 
-				final String columnId = ((TableColumnDefinition) column.getData()).getColumnId();
+				final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
 				final int columnWidth = column.getWidth();
 
 				setColumnIdAndWidth(columnIdsAndWidth, columnId, columnWidth);
 			}
 
-		} else if (columnViewer instanceof TreeViewer) {
+		} else if (fColumnViewer instanceof TreeViewer) {
 
-			final Tree tree = ((TreeViewer) columnViewer).getTree();
+			final Tree tree = ((TreeViewer) fColumnViewer).getTree();
 			if (tree.isDisposed()) {
 				return null;
 			}
@@ -308,19 +342,18 @@ public class ColumnManager {
 		final ArrayList<String> orderedColumnIds = new ArrayList<String>();
 
 		int[] columnOrder = null;
-		final ColumnViewer columnViewer = fTourViewer.getViewer();
 
-		if (columnViewer instanceof TableViewer) {
+		if (fColumnViewer instanceof TableViewer) {
 
-			final Table table = ((TableViewer) columnViewer).getTable();
+			final Table table = ((TableViewer) fColumnViewer).getTable();
 			if (table.isDisposed()) {
 				return null;
 			}
 			columnOrder = table.getColumnOrder();
 
-		} else if (columnViewer instanceof TreeViewer) {
+		} else if (fColumnViewer instanceof TreeViewer) {
 
-			final Tree tree = ((TreeViewer) columnViewer).getTree();
+			final Tree tree = ((TreeViewer) fColumnViewer).getTree();
 			if (tree.isDisposed()) {
 				return null;
 			}
@@ -364,6 +397,19 @@ public class ColumnManager {
 		return 0;
 	}
 
+	private int getColumnWidth(final TableColumnDefinition colDef) {
+		
+		int columnWidth = colDef.getColumnWidth();
+		
+		if (colDef.isColumnHidden()) {
+			columnWidth = 0;
+		} else {
+			columnWidth = columnWidth < MINIMUM_COLUMN_WIDTH ? colDef.getDefaultColumnWidth() : columnWidth;
+		}
+		
+		return columnWidth;
+	}
+
 	/**
 	 * Read the order/width for the columns, this is necessary because the user can have rearranged
 	 * the columns and/or resized the columns with the mouse
@@ -384,23 +430,22 @@ public class ColumnManager {
 
 		final ArrayList<ColumnDefinition> allDialogColumns = new ArrayList<ColumnDefinition>();
 
-		final ColumnViewer columnViewer = fTourViewer.getViewer();
 		int[] columnOrder = null;
 
 		/*
 		 * get column order from viewer
 		 */
-		if (columnViewer instanceof TableViewer) {
+		if (fColumnViewer instanceof TableViewer) {
 
-			final Table table = ((TableViewer) columnViewer).getTable();
+			final Table table = ((TableViewer) fColumnViewer).getTable();
 			if (table.isDisposed()) {
 				return null;
 			}
 			columnOrder = table.getColumnOrder();
 
-		} else if (columnViewer instanceof TreeViewer) {
+		} else if (fColumnViewer instanceof TreeViewer) {
 
-			final Tree tree = ((TreeViewer) columnViewer).getTree();
+			final Tree tree = ((TreeViewer) fColumnViewer).getTree();
 			if (tree.isDisposed()) {
 				return null;
 			}
@@ -559,7 +604,17 @@ public class ColumnManager {
 		fColumnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
 	}
 
-//	/**
+	/**
+	 * Sets the column layout for the viewer which is managed by the {@link ColumnManager}.
+	 * <p>
+	 * When the columnLayout is set, all columns must have a {@link ColumnWeightData}, otherwise it
+	 * will fail
+	 * 
+	 * @param columnLayout
+	 */
+	public void setColumnLayout(final AbstractColumnLayout columnLayout) {
+		fColumnLayout = columnLayout;
+	}
 
 	/**
 	 * Set the visible column definitions from the visible ids
@@ -649,7 +704,7 @@ public class ColumnManager {
 
 		setColumnIdsFromModifyDialog(tableItems);
 
-		fTourViewer.recreateViewer();
+		fColumnViewer = fTourViewer.recreateViewer(fColumnViewer);
 	}
 
 }

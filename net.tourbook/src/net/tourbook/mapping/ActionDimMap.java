@@ -91,8 +91,6 @@ public class ActionDimMap extends Action implements IMenuCreator {
 				final int dimLevelText = (int) (Math.abs(dimLevel - 0xFF) / 0xFF * 100);
 
 				dimAction = new ActionDim((int) dimLevel, dimLevelText + PERCENT);
-
-//				System.out.println(dimLevel + " " + dimLevelText);
 			}
 
 			fDimActions.add(dimAction);

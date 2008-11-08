@@ -398,10 +398,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				new Transfer[] { LocalSelectionTransfer.getTransfer() },
 				new TagDropAdapter(this, fTagViewer));
 
-		createTagViewerColumns(treeLayout);
-	}
-
-	private void createTagViewerColumns(final TreeColumnLayout treeLayout) {
 		/*
 		 * create columns
 		 */
@@ -1010,7 +1006,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		return true;
 	}
 
-	public void recreateViewer() {}
+	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+		return null;
+	}
 
 	public void reloadViewer() {}
 

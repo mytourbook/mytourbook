@@ -151,7 +151,7 @@ public class ColumnModifyDialog extends TrayDialog {
 				}
 			}
 		});
-		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(10), true));
+		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(12), true));
 		
 		// column: width
 		tvc = new TableViewerColumn(fColumnViewer, SWT.TRAIL);

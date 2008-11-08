@@ -4462,14 +4462,21 @@ public class ChartComponentGraph extends Canvas {
 	 * @param isGraphDirty
 	 */
 	void redrawBarSelection() {
+		
+		if (isDisposed()) {
+			return;
+		}
+		
 		fIsSelectionDirty = true;
 		redraw();
 	}
 
 	public void redrawChart() {
+		
 		if (isDisposed()) {
 			return;
 		}
+		
 		fIsGraphDirty = true;
 		redraw();
 	}

@@ -180,8 +180,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	}
 
 	/**
+	 * !!! Recursive !!!<br>
+	 * <br>
 	 * Find the compared tours in the tour map tree viewer<br>
-	 * !!! Recursive !!!
+	 * <br>
+	 * !!! Recursive !!!<br>
 	 * 
 	 * @param comparedTours
 	 * @param parentItem
@@ -385,7 +388,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
-					recreateViewer();
+					fTourViewer = (TreeViewer) recreateViewer(fTourViewer);
 
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
@@ -532,7 +535,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTourViewer = new TreeViewer(tree);
-		fColumnManager.createColumns();
+		fColumnManager.createColumns(fTourViewer);
 
 		fTourViewer.setContentProvider(new TourContentProvider());
 		fTourViewer.setUseHashlookup(true);
@@ -811,7 +814,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionTourCompareWizard);
 		menuMgr.add(fActionRenameRefTour);
-		menuMgr.add(fActionRemoveComparedTours);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
@@ -825,6 +827,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		menuMgr.add(fActionRemoveAllTags);
 		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
 		menuMgr.add(fActionOpenTagPrefs);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionRemoveComparedTours);
 
 		enableActions();
 	}
@@ -978,7 +983,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		}
 	}
 
-	public void recreateViewer() {
+	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		final Object[] expandedElements = fTourViewer.getExpandedElements();
 		final ISelection selection = fTourViewer.getSelection();
@@ -996,6 +1001,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			fTourViewer.setSelection(selection);
 		}
 		fViewerContainer.setRedraw(true);
+		
+		return fTourViewer;
 	}
 
 	public void reloadViewer() {
@@ -1182,4 +1189,5 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			}
 		}
 	}
+
 }

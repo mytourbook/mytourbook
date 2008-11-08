@@ -278,7 +278,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
-					recreateViewer();
+					fTourViewer = (TreeViewer) recreateViewer(fTourViewer);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -438,7 +438,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
 		fTourViewer = new TreeViewer(tree);
-		fColumnManager.createColumns();
+		fColumnManager.createColumns(fTourViewer);
 
 		fTourViewer.setContentProvider(new TourBookContentProvider());
 		fTourViewer.setComparer(new ItemComparer());
@@ -1193,7 +1193,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		enableActions();
 	}
 
-	public void recreateViewer() {
+	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		fViewerContainer.setRedraw(false);
 		{
@@ -1211,6 +1211,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			fTourViewer.setSelection(selection);
 		}
 		fViewerContainer.setRedraw(true);
+
+		return fTourViewer;
 	}
 
 	public void reloadViewer() {

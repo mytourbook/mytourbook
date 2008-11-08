@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import net.tourbook.ui.views.tourDataEditor.IntegerDataSerieEditingSupport;
-
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnLayoutData;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.swt.events.SelectionAdapter;
 
@@ -26,54 +26,56 @@ public class ColumnDefinition implements Cloneable {
 	/**
 	 * visible name in the modify dialog
 	 */
-	private String					fLabel;
+	private String				fLabel;
 
 	/**
 	 * every column in a table must have a unique id
 	 */
-	protected String				fColumnId;
+	protected String			fColumnId;
 
 	/**
 	 * visibility status used in the modify dialog, this is used if the dialog is canceled to not
 	 * touch the visible status
 	 */
-	private boolean					fIsCheckedInDialog;
+	private boolean				fIsCheckedInDialog;
 
 	/**
 	 * when <code>true</code> the visibility for this column can be changed
 	 */
-	private boolean					fCanModifyVisibility	= true;
+	private boolean				fCanModifyVisibility	= true;
 
-	protected int					fStyle;
+	protected int				fStyle;
 
-	private CellLabelProvider		fCellLabelProvider;
+	private CellLabelProvider	fCellLabelProvider;
 
-	private String					fColumnText;
-	private String					fColumnToolTipText;
-	private int						fColumnWidth;
-	private String					fColumnUnit;
-	private boolean					fIsColumnResizable		= true;
+	private String				fColumnText;
+	private String				fColumnToolTipText;
+	private int					fColumnWidth;
+	private String				fColumnUnit;
+	private boolean				fIsColumnResizable		= true;
 
-	private boolean					fIsColumnMoveable		= true;
-	private SelectionAdapter		fColumnSelectionListener;
+	private boolean				fIsColumnMoveable		= true;
+	private SelectionAdapter	fColumnSelectionListener;
 
-	private int						fCreateIndex;
+	private int					fCreateIndex;
 
 	/**
 	 * when <code>true</code> this column will be checked in the modify dialog when the default
 	 * button is selected
 	 */
-	private boolean					fIsDefaultColumn		= false;
+	private boolean				fIsDefaultColumn		= false;
 
-	private int						fDefaultColumnWidth;
+	private int					fDefaultColumnWidth;
 
 	/**
 	 * column will have the width 0 to be hidden, this is necessary that the first visible column
 	 * can be right aligned
 	 */
-	private boolean					fIsColumnHidden			= false;
+	private boolean				fIsColumnHidden			= false;
 
-	private IntegerDataSerieEditingSupport	fEditingSupport;
+	private EditingSupport		fEditingSupport;
+
+	private ColumnLayoutData	fColumnLayoutData;
 
 	public void addSelectionListener(final SelectionAdapter selectionAdapter) {
 		fColumnSelectionListener = selectionAdapter;
@@ -165,6 +167,10 @@ public class ColumnDefinition implements Cloneable {
 
 	public String getColumnUnit() {
 		return fColumnUnit;
+	}
+
+	public ColumnLayoutData getColumnWeightData() {
+		return fColumnLayoutData;
 	}
 
 	public int getColumnWidth() {
@@ -263,6 +269,16 @@ public class ColumnDefinition implements Cloneable {
 		fColumnUnit = columnUnit;
 	}
 
+	public void setColumnWeightData(final ColumnLayoutData layoutData) {
+
+		fColumnLayoutData = layoutData;
+
+		if (layoutData instanceof ColumnPixelData) {
+			// keep the default width
+			fDefaultColumnWidth = ((ColumnPixelData) layoutData).width;
+		}
+	}
+
 	public void setColumnWidth(final int columnWidth) {
 		fColumnWidth = columnWidth;
 	}
@@ -277,18 +293,12 @@ public class ColumnDefinition implements Cloneable {
 	}
 
 	public void setDefaultColumnWidth(final int defaultColumnWidth) {
+		// set the default width
 		fDefaultColumnWidth = defaultColumnWidth;
 	}
 
-	public void setEditingSupport(final IntegerDataSerieEditingSupport editingSupport) {
+	public void setEditingSupport(final EditingSupport editingSupport) {
 		fEditingSupport = editingSupport;
-	}
-
-	public void setEditorDataSerie(final int[] dataSerie) {
-		if (fEditingSupport != null) {
-			fEditingSupport.setDataSerie(dataSerie);
-		}
-
 	}
 
 	/**

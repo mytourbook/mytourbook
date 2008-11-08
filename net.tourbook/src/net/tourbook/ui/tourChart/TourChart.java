@@ -93,15 +93,15 @@ public class TourChart extends Chart {
 	public static final String				COMMAND_ID_GRAPH_TOUR_COMPARE			= "net.tourbook.command.graph.tourCompare";					//$NON-NLS-1$
 
 	static final String						SEGMENT_VALUES							= "segmentValues";												//$NON-NLS-1$
-
+ 
 	private TourData						fTourData;
 	private TourChartConfiguration					fTourChartConfig;
 
 	private Map<String, TCActionProxy>		fActionProxies;
 
 	private boolean							fShowActions;
-	private final TCActionHandlerManager	fTCActionHandlerManager					= TCActionHandlerManager.getInstance();
 
+	private final TCActionHandlerManager	fTCActionHandlerManager					= TCActionHandlerManager.getInstance();
 	private ActionChartOptions				fActionOptions;
 
 	/**
@@ -110,16 +110,16 @@ public class TourChart extends Chart {
 	private IDataModelListener				fChartDataModelListener;
 
 	private final ListenerList				fSelectionListeners						= new ListenerList();
+
 	private ITourModifyListener				fTourModifyListener;
 	private IPropertyChangeListener			fPrefChangeListener;
-
 	private ChartMarkerLayer				fMarkerLayer;
+
 	private ChartSegmentLayer				fSegmentLayer;
 	private ChartSegmentValueLayer			fSegmentValueLayer;
-
 	private boolean							fIsTourDirty;
-	private boolean							fIsSegmentLayerVisible;
 
+	private boolean							fIsSegmentLayerVisible;
 	public TourChart(final Composite parent, final int style, final boolean showActions) {
 
 		super(parent, style);
@@ -171,6 +171,15 @@ public class TourChart extends Chart {
 		}
 	}
 
+	/**
+	 * add a data model listener which is fired when the data model has changed
+	 * 
+	 * @param dataModelListener
+	 */
+	public void addDataModelListener(final IDataModelListener dataModelListener) {
+		fChartDataModelListener = dataModelListener;
+	}
+
 //	@Override
 //	public void activateActions(IWorkbenchPartSite partSite) {
 //
@@ -186,15 +195,6 @@ public class TourChart extends Chart {
 ////		IContextService contextService = (IContextService) partSite.getService(IContextService.class);
 ////		contextService.deactivateContext(fContextBarChart);
 //	}
-
-	/**
-	 * add a data model listener which is fired when the data model has changed
-	 * 
-	 * @param dataModelListener
-	 */
-	public void addDataModelListener(final IDataModelListener dataModelListener) {
-		fChartDataModelListener = dataModelListener;
-	}
 
 	private void addPrefListeners() {
 		fPrefChangeListener = new Preferences.IPropertyChangeListener() {
@@ -1061,6 +1061,20 @@ public class TourChart extends Chart {
 			synchedChart.getChartDataModel().resetMinMaxValues();
 			synchedChart.onExecuteZoomOut(true);
 		}
+	}
+
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append(this.getClass().getSimpleName());
+		sb.append(UI.NEW_LINE);
+
+		sb.append(fTourData);
+		sb.append(UI.NEW_LINE);
+
+		return sb.toString();
 	}
 
 	/**

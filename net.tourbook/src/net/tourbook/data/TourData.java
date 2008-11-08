@@ -496,7 +496,10 @@ public class TourData {
 	@Transient
 	public boolean					isTourDeleted					= false;
 
-	public TourData() {}
+	public TourData() {
+		int a = 0;
+		a++;
+	}
 
 	/**
 	 * clear imperial altitude series so the next time when it's needed it will be recomputed

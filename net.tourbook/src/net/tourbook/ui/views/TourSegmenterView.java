@@ -24,6 +24,7 @@ import net.tourbook.algorithm.Point;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourSegment;
+import net.tourbook.database.MyTourbookException;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourPropertyListener;
@@ -34,9 +35,9 @@ import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperties;
 import net.tourbook.tour.TourProperty;
+import net.tourbook.ui.ColumnDefinition;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourViewer;
-import net.tourbook.ui.TableColumnDefinition;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionModifyColumns;
@@ -305,7 +306,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					fColumnManager.clearColumns();
 					defineViewerColumns(fViewerContainer);
 
-					recreateViewer();
+					recreateViewer(null);
 
 					// refresh tour with the new measurement system
 					fireSegmentLayerChanged();
@@ -510,7 +511,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		table.setLinesVisible(true);
 
 		fSegmentViewer = new TableViewer(table);
-		fColumnManager.createColumns();
+		fColumnManager.createColumns(fSegmentViewer);
 
 		fSegmentViewer.setContentProvider(new ViewContentProvider());
 		fSegmentViewer.setSorter(new ViewSorter());
@@ -549,7 +550,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void defineViewerColumns(final Composite parent) {
 
 		final PixelConverter pixelConverter = new PixelConverter(parent);
-		TableColumnDefinition colDef;
+		ColumnDefinition colDef;
 
 		final SelectionAdapter defaultColumnSelectionListener = new SelectionAdapter() {
 			@Override
@@ -783,9 +784,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					final TourData tourChartTourData = tourChart.getTourData();
 					if (tourChartTourData == tourData) {
 
-						UI.checkTourData(tourData, tourChartTourData);
-
-						return tourChart;
+						try {
+							UI.checkTourData(tourData, tourChartTourData);
+						} catch (final MyTourbookException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -809,10 +812,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 						final TourChart tourChart = tourChartView.getTourChart();
 						final TourData tourChartTourData = tourChart.getTourData();
 						if (tourChartTourData == tourData) {
-
-							UI.checkTourData(tourData, tourChartTourData);
-
-							return tourChart;
+							try {
+								UI.checkTourData(tourData, tourChartTourData);
+							} catch (final MyTourbookException e) {
+								e.printStackTrace();
+							}
 						}
 					}
 				}
@@ -986,7 +990,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fireSegmentLayerChanged();
 	}
 
-	public void recreateViewer() {
+	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		fViewerContainer.setRedraw(false);
 		{
@@ -999,6 +1003,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			reloadViewer();
 		}
 		fViewerContainer.setRedraw(true);
+
+		return fSegmentViewer;
 	}
 
 	public void reloadViewer() {

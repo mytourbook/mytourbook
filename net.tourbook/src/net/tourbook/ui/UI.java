@@ -30,6 +30,7 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
+import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -250,24 +251,27 @@ public class UI {
 	 * @param tourData1
 	 * @param tourData2
 	 * @return Returns <code>true</code> when they are the same, otherwise this is an internal error
+	 * @throws MyTourbookException
+	 *             throws this exception when {@link TourData} are corrupted
 	 */
-	public static boolean checkTourData(final TourData tourData1, final TourData tourData2) {
+	public static boolean checkTourData(final TourData tourData1, final TourData tourData2) throws MyTourbookException {
 
 		if (tourData1.getTourId().longValue() == tourData2.getTourId().longValue() && tourData1 != tourData2) {
 
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Internal Error",//$NON-NLS-1$
-					"This error should not happen and occures when the internal structure of the application is corrupted. " //$NON-NLS-1$
-							+ "You should restart the application." //$NON-NLS-1$
-							+ UI.NEW_LINE2
-							+ "The tour editor contains the selected tour but the TourData is different." //$NON-NLS-1$
-							+ UI.NEW_LINE2
-							+ "Tour in Editor:\t" //$NON-NLS-1$
-							+ tourData2.toStringWithHash()
-							+ UI.NEW_LINE2
-							+ "Selected Tour:\t" //$NON-NLS-1$
-							+ tourData1.toStringWithHash());
+			final String errorMessage = "This error should not happen and occures when the internal structure of the application is corrupted. " //$NON-NLS-1$
+					+ "You should restart the application." //$NON-NLS-1$
+					+ UI.NEW_LINE2
+					+ "The tour editor contains the selected tour but the TourData are different." //$NON-NLS-1$
+					+ UI.NEW_LINE2
+					+ "Tour in Editor:\t" //$NON-NLS-1$
+					+ tourData2.toStringWithHash()
+					+ UI.NEW_LINE2
+					+ "Selected Tour:\t" //$NON-NLS-1$
+					+ tourData1.toStringWithHash();
 
-			return false;
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Internal Error", errorMessage); //$NON-NLS-1$
+
+			throw new MyTourbookException(errorMessage);
 		}
 
 		return true;
@@ -393,7 +397,7 @@ public class UI {
 	}
 
 	/**
-	 * Check if the tour is modified
+	 * Check if the tour in the {@link TourDataEditorView} is modified
 	 * 
 	 * @param tourData
 	 *            tour which is checked

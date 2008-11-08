@@ -17,6 +17,7 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 /**
  * is the data model which is used by chart to draw it. All data which are required to draw the
@@ -199,11 +200,14 @@ public class ChartDataModel {
 
 		if (fCustomData != null) {
 
-			sb.append("\n\tcustomData: ");
+			sb.append("\n\tcustomData: ");//$NON-NLS-1$
 
-			for (final Object customData : fCustomData.values()) {
-				sb.append("\t");//$NON-NLS-1$
-				sb.append(customData);
+			for (final Entry<String, Object> entry : fCustomData.entrySet()) {
+
+				sb.append("\t"); //$NON-NLS-1$
+				sb.append(entry.getKey());
+				sb.append(":");//$NON-NLS-1$
+				sb.append(entry.getValue());
 			}
 		}
 
