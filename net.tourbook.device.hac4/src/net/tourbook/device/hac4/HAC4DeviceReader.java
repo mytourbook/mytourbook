@@ -326,7 +326,10 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 					// decode temperature
 					temperature = Short.parseShort(new String(buffer, 0, 2), 16);
-
+					if (temperature > 127) {
+						temperature = (short) (temperature - 255);
+					}
+					
 					// read encoded data
 					fileRawData.read(buffer);
 
