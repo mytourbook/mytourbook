@@ -398,15 +398,15 @@ public class ColumnManager {
 	}
 
 	private int getColumnWidth(final TableColumnDefinition colDef) {
-		
+
 		int columnWidth = colDef.getColumnWidth();
-		
+
 		if (colDef.isColumnHidden()) {
 			columnWidth = 0;
 		} else {
 			columnWidth = columnWidth < MINIMUM_COLUMN_WIDTH ? colDef.getDefaultColumnWidth() : columnWidth;
 		}
-		
+
 		return columnWidth;
 	}
 
@@ -564,7 +564,11 @@ public class ColumnManager {
 			// column is visible
 
 			if (columnWidth == 0) {
-				columnWidth = MINIMUM_COLUMN_WIDTH;
+				/*
+				 * there is somewhere an error that the column width is 0,
+				 */
+				columnWidth = colDef.getDefaultColumnWidth();
+				columnWidth = Math.max(MINIMUM_COLUMN_WIDTH, columnWidth);
 			}
 		}
 

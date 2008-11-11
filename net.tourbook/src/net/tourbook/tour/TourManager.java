@@ -1390,8 +1390,10 @@ public class TourManager {
 	}
 
 	/**
-	 * Removes {@link TourData} with the tourId from the cache, requesting tour data the next time
-	 * with {@link #getTourData(Long)}, tour will be loaded from the database
+	 * Removes {@link TourData} with the tourId from the cache.
+	 * <p>
+	 * When the tour is requested next time with {@link #getTourData(Long)}, is will be loaded from
+	 * the database.
 	 * 
 	 * @param tourId
 	 */

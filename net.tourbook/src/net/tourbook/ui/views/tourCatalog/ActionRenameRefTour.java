@@ -21,8 +21,10 @@ import javax.persistence.EntityTransaction;
 import net.tourbook.Messages;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperty;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -45,6 +47,10 @@ class ActionRenameRefTour extends Action {
 
 	@Override
 	public void run() {
+
+		if (UI.isTourEditorModified()) {
+			return;
+		}
 
 		final Object selectedItem = (((ITreeSelection) fTourCatalogView.getTourViewer().getSelection()).getFirstElement());
 
@@ -93,13 +99,10 @@ class ActionRenameRefTour extends Action {
 								fTourCatalogView.reloadViewer();
 
 								// ref tour is modified, fire event
-//								final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
-//								modifiedTours.add(refTour.getTourData());
+								final Long tourId = refTour.getTourData().getTourId();
+								TourManager.getInstance().removeTourFromCache(tourId);
 
-//								TourManager.saveModifiedTour(tourData);
-								TourManager.getInstance().removeTourFromCache(refTour.getTourData().getTourId());
-
-								TourManager.firePropertyChange(TourProperty.UPDATE_UI);
+								TourManager.firePropertyChange(TourProperty.UPDATE_UI, new SelectionTourId(tourId));
 							}
 						});
 					}

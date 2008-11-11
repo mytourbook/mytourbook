@@ -126,7 +126,7 @@ public class RawDataManager {
 
 	private RawDataManager() {}
 
-	public void executeImportFromDevice() {
+	void actionImportFromDevice() {
 
 		new WizardImportDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 				new WizardImportData(),
@@ -135,7 +135,7 @@ public class RawDataManager {
 		showRawDataView();
 	}
 
-	public void executeImportFromDeviceDirect() {
+	void actionImportFromDeviceDirect() {
 
 		final WizardImportData importWizard = new WizardImportData();
 
@@ -156,7 +156,7 @@ public class RawDataManager {
 	/**
 	 * import tour data from a file
 	 */
-	public void executeImportFromFile() {
+	void actionImportFromFile() {
 
 		final List<TourbookDevice> deviceList = DeviceManager.getDeviceList();
 
@@ -205,6 +205,7 @@ public class RawDataManager {
 		}
 
 		final String[] selectedFileNames = fileDialog.getFileNames();
+		setImportCanceled(false);
 
 		Display.getDefault().asyncExec(new Runnable() {
 
@@ -227,7 +228,7 @@ public class RawDataManager {
 					// replace filename, keep the directory path
 					fileName = filePath.removeLastSegments(1).append(fileName).makeAbsolute().toString();
 
-					if (rawDataManager.importRawData(fileName, null, false, null)) {
+					if (rawDataManager.importRawData(new File(fileName), null, false, null)) {
 						importCounter++;
 					} else {
 						notImportedFiles.add(fileName);
@@ -284,8 +285,8 @@ public class RawDataManager {
 	 * @param destinationPath
 	 *            if not null copy the file to this path
 	 * @param buildNewFileNames
-	 *            if true create a new filename depending on the content of the file, keep old name
-	 *            if false
+	 *            if <code>true</code> create a new filename depending on the content of the file,
+	 *            keep old name if false
 	 * @param fileCollision
 	 *            behavior if destination file exists (ask if null)
 	 * @return Returns <code>true</code> when the import was successfully
@@ -340,7 +341,7 @@ public class RawDataManager {
 
 						// device file extension was found in the filename extension
 
-						if (importRawDataFromFile(device, fileName, destinationPath, buildNewFileNames, fileCollision)) {
+						if (importWithDevice(device, fileName, destinationPath, buildNewFileNames, fileCollision)) {
 							isDataImported = true;
 							fIsImported = true;
 							break;
@@ -358,7 +359,7 @@ public class RawDataManager {
 					 * the file extension
 					 */
 					for (final TourbookDevice device : deviceList) {
-						if (importRawDataFromFile(device, fileName, destinationPath, buildNewFileNames, fileCollision)) {
+						if (importWithDevice(device, fileName, destinationPath, buildNewFileNames, fileCollision)) {
 							isDataImported = true;
 							fIsImported = true;
 							break;
@@ -373,29 +374,6 @@ public class RawDataManager {
 		});
 
 		return fIsImported;
-	}
-
-	/**
-	 * Import the raw data from a file and save the imported data in the fields
-	 * <code>fDeviceData</code> and <code>fTourData</code>
-	 * 
-	 * @param importFileName
-	 *            the file to be imported
-	 * @param destinationPath
-	 *            if not null copy the file to this path
-	 * @param buildNewFileNames
-	 *            if true create a new filename depending on the content of the file, keep old name
-	 *            if false
-	 * @param fileCollision
-	 *            behavior if destination file exists (ask if null)
-	 * @return Returns <code>true</code> when the import was successfully
-	 */
-	public boolean importRawData(	final String importFileName,
-									final String destinationPath,
-									final boolean buildNewFileNames,
-									final FileCollisionBehavior fileCollision) {
-		final File importFile = new File(importFileName);
-		return importRawData(importFile, destinationPath, buildNewFileNames, fileCollision);
 	}
 
 	/**
@@ -414,11 +392,11 @@ public class RawDataManager {
 	 *            behavior if destination file exists (ask if null)
 	 * @return Return <code>true</code> when the data have been imported
 	 */
-	private boolean importRawDataFromFile(	final TourbookDevice device,
-											String sourceFileName,
-											final String destinationPath,
-											final boolean buildNewFileName,
-											FileCollisionBehavior fileCollision) {
+	private boolean importWithDevice(	final TourbookDevice device,
+										String sourceFileName,
+										final String destinationPath,
+										final boolean buildNewFileName,
+										FileCollisionBehavior fileCollision) {
 
 		if (fileCollision == null) {
 			fileCollision = new FileCollisionBehavior();
@@ -451,6 +429,7 @@ public class RawDataManager {
 					} finally {
 
 						if (destFileName == null) {
+
 							MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error Creating Filename", //$NON-NLS-1$
 									"The filename for the received data" //$NON-NLS-1$
 											+ " could not be created from the file '" //$NON-NLS-1$

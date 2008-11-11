@@ -47,8 +47,8 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
 	private ActionEditQuick				fActionQuickEdit;
 	private ActionEditTour				fActionEditTour;
-	private ActionEditTourMarker		fActionEditTourMarkers;
-	private ActionEditAdjustAltitude	fActionAdjustAltitude;
+	private ActionOpenMarkerDialog		fActionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog	fActionAdjustAltitude;
 
 	private ActionCreateRefTour			fActionCreateRefTour;
 	private ActionCreateMarker			fActionCreateMarker;
@@ -76,10 +76,10 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		fActionQuickEdit = new ActionEditQuick(this);
 		fActionEditTour = new ActionEditTour(this);
 
-		fActionEditTourMarkers = new ActionEditTourMarker(this, true);
-		fActionEditTourMarkers.setEnabled(true);
+		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		fActionOpenMarkerDialog.setEnabled(true);
 
-		fActionAdjustAltitude = new ActionEditAdjustAltitude(this, false);
+		fActionAdjustAltitude = new ActionOpenAdjustAltitudeDialog(this, false);
 		fActionAdjustAltitude.setEnabled(true);
 		
 
@@ -114,7 +114,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionQuickEdit);
 		menuMgr.add(fActionEditTour);
-		menuMgr.add(fActionEditTourMarkers);
+		menuMgr.add(fActionOpenMarkerDialog);
 		menuMgr.add(fActionAdjustAltitude);
 
 		menuMgr.add(new Separator());

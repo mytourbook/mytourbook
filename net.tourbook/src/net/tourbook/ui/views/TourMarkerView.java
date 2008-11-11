@@ -18,7 +18,6 @@ package net.tourbook.ui.views;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Formatter;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
@@ -28,7 +27,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ActionEditTourMarker;
+import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourPropertyListener;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
@@ -120,7 +119,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	private Chart					fTourChart;
 
-	private ActionEditTourMarker	fActionEditTourMarkers;
+	private ActionOpenMarkerDialog	fActionEditTourMarkers;
 
 	class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
@@ -274,7 +273,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 		createContextMenu();
 
-		fActionEditTourMarkers = new ActionEditTourMarker(this, true);
+		fActionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
 
 		addSelectionListener();
 		addTourPropertyListener();
@@ -286,17 +285,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		// show default page
 		fPageBook.showPage(fPageNoChart);
 
-		/*
-		 * get markers from current selection
-		 */
-		final ISelection curretSelection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
-		if (curretSelection instanceof SelectionActiveEditor) {
-			onSelectionChanged(curretSelection);
-		} else {
-			final IEditorPart activeEditor = getSite().getPage().getActiveEditor();
-			if (activeEditor != null) {
-				onSelectionChanged(new SelectionActiveEditor(activeEditor));
-			}
+		// show marker from last selection
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		if (fTourData == null) {
+			showTourFromTourProvider();
 		}
 	}
 
@@ -320,6 +313,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		table.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(final KeyEvent e) {
+
+				if (isTourInDb() == false) {
+					return;
+				}
 
 				final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
 				if (selection.size() > 0 && e.keyCode == SWT.CR) {
@@ -351,16 +348,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-
-				final TourMarker tourMarker = (TourMarker) cell.getElement();
-
-				final int time = tourMarker.getTime();
-
-				cell.setText(new Formatter().format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60))
-						.toString());
+				cell.setText(UI.formatSeconds(((TourMarker) cell.getElement()).getTime()));
 			}
 		});
-		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), false));
+		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(12), false));
 
 		// column: distance km/mi
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
@@ -419,6 +410,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		fMarkerViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
 
+				if (isTourInDb() == false) {
+					return;
+				}
+
 				// edit selected marker
 				final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
 				if (selection.size() > 0) {
@@ -450,6 +445,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		// set the marker which should be selected in the marker dialog
 		final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
 		fActionEditTourMarkers.setSelectedMarker((TourMarker) selection.getFirstElement());
+
+		/*
+		 * enable actions
+		 */
+		final boolean tourInDb = isTourInDb();
+
+		fActionEditTourMarkers.setEnabled(tourInDb);
 	}
 
 	/**
@@ -499,6 +501,18 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		selectedTours.add(fTourData);
 
 		return selectedTours;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the tour is saved in the database
+	 */
+	private boolean isTourInDb() {
+
+		if (fTourData != null && fTourData.getTourPerson() != null) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -585,6 +599,34 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	@Override
 	public void setFocus() {
 		fMarkerViewer.getTable().setFocus();
+	}
+
+	private void showTourFromTourProvider() {
+
+		fPageBook.showPage(fPageNoChart);
+
+		// a tour is not displayed, find a tour provider which provides a tour
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
+
+				// validate widget
+				if (fPageBook.isDisposed()) {
+					return;
+				}
+
+				/*
+				 * check if tour was set from a selection provider
+				 */
+				if (fTourData != null) {
+					return;
+				}
+
+				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+				if (selectedTours != null && selectedTours.size() > 0) {
+					onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
+				}
+			}
+		});
 	}
 
 }

@@ -49,6 +49,10 @@ public class SelectionTourData implements ISelection {
 		fForceRedraw = forceRedraw;
 	}
 
+	public SelectionTourData(final TourData tourData) {
+		fTourData = tourData;
+	}
+
 	/**
 	 * @return Returns the tour chart for the tour data or <code>null</code> when a tour chart is
 	 *         not available

@@ -1243,17 +1243,20 @@ public class ChartComponents extends Composite {
 		final int slider2ValueIndex = sliderPosition.getSlider2ValueIndex();
 
 		final int[] xValues = getChartDataModel().getXData().fHighValues[0];
+		final boolean centerSliderPosition = sliderPosition.isCenterSliderPosition();
 
+		// move left slider
 		if (slider1ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
-			fComponentGraph.setXSliderValueIndex(leftSlider, 0);
+			fComponentGraph.setXSliderValueIndex(leftSlider, 0, centerSliderPosition);
 		} else if (slider1ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
-			fComponentGraph.setXSliderValueIndex(leftSlider, slider1ValueIndex);
+			fComponentGraph.setXSliderValueIndex(leftSlider, slider1ValueIndex, centerSliderPosition);
 		}
 
+		// move right slider
 		if (slider2ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
-			fComponentGraph.setXSliderValueIndex(rightSlider, xValues.length - 1);
+			fComponentGraph.setXSliderValueIndex(rightSlider, xValues.length - 1, centerSliderPosition);
 		} else if (slider2ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
-			fComponentGraph.setXSliderValueIndex(rightSlider, slider2ValueIndex);
+			fComponentGraph.setXSliderValueIndex(rightSlider, slider2ValueIndex, centerSliderPosition);
 		}
 
 		fComponentGraph.redraw();

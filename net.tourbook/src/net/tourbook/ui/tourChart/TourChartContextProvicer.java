@@ -27,8 +27,8 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.ActionEditAdjustAltitude;
-import net.tourbook.tour.ActionEditTourMarker;
+import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
+import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -44,28 +44,27 @@ import org.eclipse.jface.action.Separator;
 
 public class TourChartContextProvicer implements IChartContextProvider, ITourProvider {
 
-	private final ITourChartViewer	fTourChartViewer;
+	private final ITourChartViewer			fTourChartViewer;
 
-	private ActionEditQuick			fActionQuickEdit;
-	private ActionEditTour			fActionEditTour;
-	private ActionEditTourMarker		fActionEditTourMarkers;
-	private ActionEditAdjustAltitude	fActionAdjustAltitude;
-	private ActionOpenTour			fActionOpenTour;
+	private ActionEditQuick					fActionQuickEdit;
+	private ActionEditTour					fActionEditTour;
+	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
+	private ActionOpenTour					fActionOpenTour;
 
-	private ActionCreateRefTour		fActionCreateRefTour;
-	private ActionCreateMarker		fActionCreateMarker;
-	private ActionCreateMarker		fActionCreateMarkerLeft;
-	private ActionCreateMarker		fActionCreateMarkerRight;
+	private ActionCreateRefTour				fActionCreateRefTour;
+	private ActionCreateMarker				fActionCreateMarker;
+	private ActionCreateMarker				fActionCreateMarkerLeft;
+	private ActionCreateMarker				fActionCreateMarkerRight;
 
-	private ActionSetTourType		fActionSetTourType;
-	private ActionSetTourTag		fActionAddTag;
-	private ActionSetTourTag		fActionRemoveTag;
-	private ActionRemoveAllTags		fActionRemoveAllTags;
-	private ActionOpenPrefDialog	fActionOpenTagPrefs;
+	private ActionSetTourType				fActionSetTourType;
+	private ActionSetTourTag				fActionAddTag;
+	private ActionSetTourTag				fActionRemoveTag;
+	private ActionRemoveAllTags				fActionRemoveAllTags;
+	private ActionOpenPrefDialog			fActionOpenTagPrefDialog;
 
-	private ChartXSlider			fLeftSlider;
-	private ChartXSlider			fRightSlider;
-
+	private ChartXSlider					fLeftSlider;
+	private ChartXSlider					fRightSlider;
 
 	/**
 	 * Provides a context menu for a tour chart
@@ -96,17 +95,17 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 				Messages.tourCatalog_view_action_create_right_marker,
 				false);
 
-		fActionEditTourMarkers = new ActionEditTourMarker(this, true);
-		fActionEditTourMarkers.setEnabled(true);
+		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		fActionOpenMarkerDialog.setEnabled(true);
 
-		fActionAdjustAltitude = new ActionEditAdjustAltitude(this, false);
-		fActionAdjustAltitude.setEnabled(true);
+		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, false);
+		fActionOpenAdjustAltitudeDialog.setEnabled(true);
 
 		fActionSetTourType = new ActionSetTourType(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
 		fActionRemoveTag = new ActionSetTourTag(this, false);
 		fActionRemoveAllTags = new ActionRemoveAllTags(this);
-		fActionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
+		fActionOpenTagPrefDialog = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure,
 				ITourbookPreferences.PREF_PAGE_TAGS);
 	}
 
@@ -116,12 +115,14 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 
 	public void fillContextMenu(final IMenuManager menuMgr) {
 
+		final TourData tourData = fTourChartViewer.getTourChart().getTourData();
+		final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionQuickEdit);
 		menuMgr.add(fActionEditTour);
-		menuMgr.add(fActionEditTourMarkers);
-		menuMgr.add(fActionAdjustAltitude);
+		menuMgr.add(fActionOpenMarkerDialog);
+		menuMgr.add(fActionOpenAdjustAltitudeDialog);
 		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());
@@ -129,17 +130,24 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		menuMgr.add(fActionAddTag);
 		menuMgr.add(fActionRemoveTag);
 		menuMgr.add(fActionRemoveAllTags);
-		TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
-		menuMgr.add(fActionOpenTagPrefs);
+		if (isTourSaved) {
+			TagManager.fillRecentTagsIntoMenu(menuMgr, this, true, true);
+		}
+		menuMgr.add(fActionOpenTagPrefDialog);
 
 		/*
 		 * enable actions
 		 */
-		final TourData tourData = fTourChartViewer.getTourChart().getTourData();
-		final boolean isDataAvailable = tourData != null && tourData.getTourPerson() != null;
+		fActionQuickEdit.setEnabled(isTourSaved);
+		fActionEditTour.setEnabled(isTourSaved);
+		fActionOpenMarkerDialog.setEnabled(isTourSaved);
+		fActionOpenAdjustAltitudeDialog.setEnabled(isTourSaved);
+		fActionOpenTour.setEnabled(isTourSaved);
 
-		fActionQuickEdit.setEnabled(isDataAvailable);
-		fActionEditTour.setEnabled(isDataAvailable);
+		fActionSetTourType.setEnabled(isTourSaved);
+		fActionAddTag.setEnabled(isTourSaved);
+		fActionRemoveTag.setEnabled(isTourSaved);
+		fActionRemoveAllTags.setEnabled(isTourSaved);
 	}
 
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
@@ -162,12 +170,21 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 			menuMgr.add(fActionCreateRefTour);
 			menuMgr.add(new Separator());
 
-			// action: create reference tour
+			/*
+			 * enable actions
+			 */
 			final TourData tourData = fTourChartViewer.getTourChart().getTourData();
-			final boolean canCreateRefTours = tourData.altitudeSerie != null && tourData.distanceSerie != null;
+			final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
+			
+			final boolean canCreateRefTours = tourData.altitudeSerie != null
+					&& tourData.distanceSerie != null
+					&& isTourSaved;
+
+			fActionCreateMarker.setEnabled(isTourSaved);
+			fActionCreateMarkerLeft.setEnabled(isTourSaved);
+			fActionCreateMarkerRight.setEnabled(isTourSaved);
 
 			fActionCreateRefTour.setEnabled(canCreateRefTours);
-
 		}
 
 	}

@@ -23,7 +23,7 @@ public class ActionHandlerImportFromFile extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent arg0) throws ExecutionException {
 
-		RawDataManager.getInstance().executeImportFromFile();
+		RawDataManager.getInstance().actionImportFromFile();
 
 		return null;
 	}

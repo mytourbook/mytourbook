@@ -224,6 +224,10 @@ public class DialogMarker extends TitleAreaDialog {
 
 	public void addTourMarker(final TourMarker newTourMarker) {
 
+		if (newTourMarker == null) {
+			return;
+		}
+		
 		// update data model, add new marker to the marker list
 		fTourData.getTourMarkers().add(newTourMarker);
 
@@ -244,11 +248,13 @@ public class DialogMarker extends TitleAreaDialog {
 		if (fIsOkPressed) {
 
 			/*
-			 * the markers are already set into the tour data because the original values are edited
+			 * the markers are already set into the tour data because the original values are
+			 * modified
 			 */
 			restoreVisibleType();
 
 		} else {
+			
 			/*
 			 * when OK is not pressed, revert tour markers, this happens when the Cancel button is
 			 * pressed or when the window is closed

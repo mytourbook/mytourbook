@@ -299,75 +299,6 @@ public class UI {
 		return instance;
 	}
 
-//	/**
-//	 * @return Returns a list with all opened editors
-//	 */
-//	public static ArrayList<IEditorPart> getOpenedEditors() {
-//
-//		final ArrayList<IEditorPart> editorParts = new ArrayList<IEditorPart>();
-//
-//		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-//			for (final IWorkbenchPage wbPage : wbWindow.getPages()) {
-//				for (final IEditorReference editorRef : wbPage.getEditorReferences()) {
-//
-//					final IEditorPart editor = editorRef.getEditor(false);
-//
-//					if (editor != null) {
-//						editorParts.add(editor);
-//					}
-//				}
-//			}
-//		}
-//
-//		return editorParts;
-//	}
-//
-//	/**
-//	 * @return Returns the tour data editor or <code>null</code> when the editor is not opened
-//	 */
-//	public static TourDataEditorView getTourDataEditor() {
-//
-//		for (final IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-//
-//			final IWorkbenchPage[] pages = wbWindow.getPages();
-//			for (final IWorkbenchPage wbPage : pages) {
-//
-//				final IViewReference viewRef = wbPage.findViewReference(TourDataEditorView.ID);
-//				if (viewRef == null) {
-//
-//					/*
-//					 * the tour editor could be opened in another perspective, I didn't find a
-//					 * solution to get this view in other perspectives, findViewReference finds the
-//					 * view only for the active perspective
-//					 */
-//					
-//					final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-//					if (tourDataEditor!=null) {
-//
-//					}
-//					if (TourDataEditorView.isOpened()) {
-//						try {
-//							return (TourDataEditorView) wbPage.showView(TourDataEditorView.ID,
-//									null,
-//									IWorkbenchPage.VIEW_VISIBLE);
-//						} catch (final PartInitException e) {
-//							e.printStackTrace();
-//						}
-//					}
-//					
-//				} else {
-//					final IViewPart view = viewRef.getView(false);
-//					if (view instanceof TourDataEditorView) {
-//
-//						return (TourDataEditorView) view;
-//					}
-//				}
-//			}
-//		}
-//
-//		return null;
-//	}
-
 	/**
 	 * Checks if propertyData has the same tour as the oldTourData
 	 * 
@@ -397,10 +328,9 @@ public class UI {
 	}
 
 	/**
-	 * Check if the tour in the {@link TourDataEditorView} is modified
+	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
+	 * modified
 	 * 
-	 * @param tourData
-	 *            tour which is checked
 	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
 	 */
 	public static boolean isTourEditorModified() {
@@ -408,37 +338,11 @@ public class UI {
 		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
 		if (tourDataEditor != null && tourDataEditor.isDirty()) {
 
-			openTourEditor(false);
+			openTourEditor(true);
 
 			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
 					Messages.dialog_is_tour_editor_modified_title,
 					Messages.dialog_is_tour_editor_modified_message);
-
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Check if the tour is modified
-	 * 
-	 * @param tourData
-	 *            tour which is checked
-	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
-	 */
-	public static boolean isTourModified(final TourData tourData) {
-
-		final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-		if (tourDataEditor != null
-				&& tourDataEditor.isDirty()
-				&& tourData.getTourId().longValue() == tourDataEditor.getTourData().getTourId().longValue()) {
-
-			openTourEditor(false);
-
-			MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
-					Messages.dialog_is_tour_modified_title,
-					Messages.dialog_is_tour_modified_message);
 
 			return true;
 		}

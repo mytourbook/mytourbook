@@ -120,13 +120,6 @@ public class ActionCreateMarker extends Action {
 		if (markerDialog.open() == Window.OK) {
 			TourManager.saveModifiedTour(tourData);
 		}
-
-//		} else if (this.fChartContextProvider.fMarkerDialog != null) {
-//
-//			final TourMarker newTourMarker = createTourMarker(this.fChartContextProvider.fMarkerDialog.getTourData());
-//
-//			this.fChartContextProvider.fMarkerDialog.addTourMarker(newTourMarker);
-//		}
 	}
 
 	public void setMarkerReceiver(final IMarkerReceiver markerReceiver) {

@@ -18,6 +18,8 @@ package net.tourbook.tour;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.data.TourData;
 import net.tourbook.tag.ChangedTags;
+import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 public enum TourProperty {
 
@@ -76,7 +78,10 @@ public enum TourProperty {
 	REFERENCE_TOUR_IS_CREATED,
 
 	/**
-	 * {@link TourData} have been modified, the UI must be updated with the changed data
+	 * {@link TourData} have been modified, the UI must be updated by reloading the {@link TourData}
+	 * <p>
+	 * When this property is fired, the {@link TourDataEditorView} must not be dirty,
+	 * {@link UI#isTourModified(TourData)} must return false.
 	 */
 	UPDATE_UI,
 

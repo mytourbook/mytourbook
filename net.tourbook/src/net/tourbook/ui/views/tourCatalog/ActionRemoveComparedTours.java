@@ -26,6 +26,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.UI;
@@ -114,7 +115,7 @@ public class ActionRemoveComparedTours extends Action {
 
 		final TreeViewer tourViewer = fTourView.getTourViewer();
 		final ArrayList<Long> removedComparedTours = removedTours.removedComparedTours;
-		final ArrayList<TourData> modifiedRefTours = new ArrayList<TourData>();
+		final ArrayList<Long> modifiedRefTours = new ArrayList<Long>();
 
 		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
@@ -153,7 +154,7 @@ public class ActionRemoveComparedTours extends Action {
 					if (tourData.getTourReferences().remove(refTour)) {
 						TourDatabase.saveTour(tourData);
 
-						modifiedRefTours.add(tourData);
+						modifiedRefTours.add(tourData.getTourId());
 					}
 
 					// remove the ref tour from the fDataModel
@@ -168,7 +169,7 @@ public class ActionRemoveComparedTours extends Action {
 		}
 
 		if (modifiedRefTours.size() > 0) {
-			TourManager.firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED, modifiedRefTours);
+			TourManager.firePropertyChange(TourProperty.UPDATE_UI, new SelectionTourIds(modifiedRefTours));
 		}
 
 		return true;

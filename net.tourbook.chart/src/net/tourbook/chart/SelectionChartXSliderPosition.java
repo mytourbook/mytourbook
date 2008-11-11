@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -25,32 +25,48 @@ public class SelectionChartXSliderPosition implements ISelection {
 	public static final int	IGNORE_SLIDER_POSITION			= -1;
 	public static final int	SLIDER_POSITION_AT_CHART_BORDER	= -2;
 
-	private int				slider1ValueIndex				= IGNORE_SLIDER_POSITION;
-	private int				slider2ValueIndex				= IGNORE_SLIDER_POSITION;
+	private int				fSlider1ValueIndex				= IGNORE_SLIDER_POSITION;
+	private int				fSlider2ValueIndex				= IGNORE_SLIDER_POSITION;
+	
+	private boolean			fCenterSliderPosition			= false;
 
-	private Chart			chart;
+	private Chart			fChart;
 
-	public SelectionChartXSliderPosition(Chart chart, int valueIndex1, int valueIndex2) {
+	public SelectionChartXSliderPosition(final Chart chart, final int valueIndex1, final int valueIndex2) {
 
-		this.chart = chart;
+		fChart = chart;
 
-		slider1ValueIndex = valueIndex1;
-		slider2ValueIndex = valueIndex2;
+		fSlider1ValueIndex = valueIndex1;
+		fSlider2ValueIndex = valueIndex2;
+	}
+
+	public SelectionChartXSliderPosition(	final Chart chart,
+											final int serieIndex1,
+											final int serieIndex2,
+											final boolean centerSliderPosition) {
+
+		this(chart, serieIndex1, serieIndex2);
+
+		this.fCenterSliderPosition = centerSliderPosition;
+	}
+
+	public Chart getChart() {
+		return fChart;
+	}
+
+	public int getSlider1ValueIndex() {
+		return fSlider1ValueIndex;
+	}
+
+	public int getSlider2ValueIndex() {
+		return fSlider2ValueIndex;
+	}
+
+	public boolean isCenterSliderPosition() {
+		return fCenterSliderPosition;
 	}
 
 	public boolean isEmpty() {
 		return false;
-	}
-
-	public int getSlider1ValueIndex() {
-		return slider1ValueIndex;
-	}
-
-	public int getSlider2ValueIndex() {
-		return slider2ValueIndex;
-	}
-
-	public Chart getChart() {
-		return chart;
 	}
 }

@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.tourDataEditor;
 
 import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
@@ -26,6 +27,7 @@ class ActionDeleteTimeSlices extends Action {
 	public ActionDeleteTimeSlices(final TourDataEditorView tourPropertiesView) {
 
 		super(Messages.action_tour_editor_delete_time_slices, AS_PUSH_BUTTON);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
 
 		fTourPropertiesView = tourPropertiesView;
 	}

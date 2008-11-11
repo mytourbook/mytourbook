@@ -66,6 +66,8 @@ public class Messages extends NLS {
 	public static String		action_tagView_flat_layout;
 
 	public static String		action_tour_editor_delete_time_slices;
+
+	public static String	action_tour_editor_delete_tour_marker;
 	public static String		action_tourbook_select_year_month_tours;
 	public static String		action_tourCatalog_open_compare_wizard;
 	public static String		action_tourType_modify_tourTypes;
@@ -564,7 +566,15 @@ public class Messages extends NLS {
 	public static String		tour_database_version_info_title;
 
 	public static String		tour_editor_abel_time_unit;
+	public static String	tour_editor_dlg_delete_marker_message;
+
+	public static String	tour_editor_dlg_delete_marker_title;
+
 	public static String		tour_editor_dlg_delete_rows_message;
+
+	public static String	tour_editor_dlg_delete_rows_mode_message;
+
+	public static String	tour_editor_dlg_delete_rows_mode_toggle_message;
 
 	public static String		tour_editor_dlg_delete_rows_not_successive;
 

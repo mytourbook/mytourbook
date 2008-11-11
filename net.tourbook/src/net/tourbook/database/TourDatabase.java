@@ -890,6 +890,15 @@ public class TourDatabase {
 			return null;
 		}
 
+		/*
+		 * prevent saving a tour when a person is not set, this check is for internal use that all
+		 * data are valid
+		 */
+		if (tourData.getTourPerson() == null) {
+			System.out.println("Cannot save a tour without a person: " + tourData);//$NON-NLS-1$
+			return null;
+		}
+
 		EntityManager em = TourDatabase.getInstance().getEntityManager();
 
 		TourData persistedEntity = null;

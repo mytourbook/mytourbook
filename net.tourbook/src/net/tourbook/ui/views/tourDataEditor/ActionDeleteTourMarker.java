@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -13,19 +13,27 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.importdata;
+package net.tourbook.ui.views.tourDataEditor;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
 
-public class ActionHandlerImportFromDeviceDirect extends AbstractHandler {
+import org.eclipse.jface.action.Action;
 
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+class ActionDeleteTourMarker extends Action {
 
-		RawDataManager.getInstance().actionImportFromDeviceDirect();
+	private final TourDataEditorView	fTourPropertiesView;
 
-		return null;
+	public ActionDeleteTourMarker(final TourDataEditorView tourPropertiesView) {
+
+		super(Messages.action_tour_editor_delete_tour_marker, AS_PUSH_BUTTON);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+
+		fTourPropertiesView = tourPropertiesView;
 	}
 
+	@Override
+	public void run() {
+		fTourPropertiesView.actionDeleteTourMarker();
+	}
 }

@@ -3681,16 +3681,7 @@ public class ChartComponentGraph extends Canvas {
 				break;
 			}
 
-			setXSliderValueIndex(fSelectedXSlider, valueIndex);
-
-			setChartPosition(fSelectedXSlider);
-
-			/*
-			 * set position where the double click occured, this position will be used when the
-			 * chart is zoomed
-			 */
-			final int devMousePosInChart = fSelectedXSlider.getDevVirtualSliderLinePos();
-			fXOffsetMouseZoomInRatio = (float) devMousePosInChart / fDevVirtualGraphImageWidth;
+			setXSliderValueIndex(fSelectedXSlider, valueIndex, true);
 
 			redraw();
 			setDefaultCursor();
@@ -4462,21 +4453,21 @@ public class ChartComponentGraph extends Canvas {
 	 * @param isGraphDirty
 	 */
 	void redrawBarSelection() {
-		
+
 		if (isDisposed()) {
 			return;
 		}
-		
+
 		fIsSelectionDirty = true;
 		redraw();
 	}
 
 	public void redrawChart() {
-		
+
 		if (isDisposed()) {
 			return;
 		}
-		
+
 		fIsGraphDirty = true;
 		redraw();
 	}
@@ -4701,28 +4692,41 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
-	private void setChartPosition(final ChartXSlider sliderDragged) {
+	/**
+	 * Move a zoomed chart that the slider gets visible
+	 * 
+	 * @param slider
+	 * @param centerSliderPosition
+	 */
+	private void setChartPosition(final ChartXSlider slider, final boolean centerSliderPosition) {
 
 		if (fGraphZoomRatio == 1) {
 			// nothing to do
 			return;
 		}
 
-		final int devSliderPos = fSelectedXSlider.getDevVirtualSliderLinePos();
+		final int devSliderPos = slider.getDevVirtualSliderLinePos();
 
 		final int devVisibleChartWidth = getDevVisibleChartWidth();
 		float devXOffset = devSliderPos;
 
-		/*
-		 * check if the slider is in the visible area
-		 */
-		if (devSliderPos < fDevGraphImageXOffset) {
+		if (centerSliderPosition) {
 
-			devXOffset = devSliderPos + 1;
+			devXOffset = devSliderPos - devVisibleChartWidth / 2;
 
-		} else if (devSliderPos > fDevGraphImageXOffset + devVisibleChartWidth) {
+		} else {
 
-			devXOffset = devSliderPos - devVisibleChartWidth - 0;
+			/*
+			 * check if the slider is in the visible area
+			 */
+			if (devSliderPos < fDevGraphImageXOffset) {
+
+				devXOffset = devSliderPos + 1;
+
+			} else if (devSliderPos > fDevGraphImageXOffset + devVisibleChartWidth) {
+
+				devXOffset = devSliderPos - devVisibleChartWidth - 0;
+			}
 		}
 
 		if (devXOffset != devSliderPos) {
@@ -4731,10 +4735,10 @@ public class ChartComponentGraph extends Canvas {
 			 * slider is not visible
 			 */
 
-			// adjust left border
+			// check left border
 			devXOffset = Math.max(devXOffset, 0);
 
-			// adjust right border
+			// check right border
 			devXOffset = Math.min(devXOffset, fDevVirtualGraphImageWidth - devVisibleChartWidth);
 
 			fXOffsetZoomRatio = devXOffset / fDevVirtualGraphImageWidth;
@@ -4754,6 +4758,12 @@ public class ChartComponentGraph extends Canvas {
 
 			fChartComponents.onResize();
 		}
+
+		/*
+		 * set position where the double click occured, this position will be used when the chart is
+		 * zoomed
+		 */
+		fXOffsetMouseZoomInRatio = (float) devSliderPos / fDevVirtualGraphImageWidth;
 	}
 
 	void setDefaultCursor() {
@@ -5035,8 +5045,9 @@ public class ChartComponentGraph extends Canvas {
 	 * 
 	 * @param slider
 	 * @param valueIndex
+	 * @param centerSliderPosition
 	 */
-	void setXSliderValueIndex(final ChartXSlider slider, int valueIndex) {
+	void setXSliderValueIndex(final ChartXSlider slider, int valueIndex, final boolean centerSliderPosition) {
 
 		final ChartDataXSerie xData = getXData();
 
@@ -5054,6 +5065,8 @@ public class ChartComponentGraph extends Canvas {
 
 		final int linePos = (int) (fDevVirtualGraphImageWidth * (float) xValues[valueIndex] / xValues[xValues.length - 1]);
 		slider.moveToDevPosition(linePos, true, true);
+
+		setChartPosition(slider, centerSliderPosition);
 
 		fIsSliderDirty = true;
 	}

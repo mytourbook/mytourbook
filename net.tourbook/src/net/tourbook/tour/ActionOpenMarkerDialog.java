@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -27,18 +28,25 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionEditAdjustAltitude extends Action {
+public class ActionOpenMarkerDialog extends Action {
 
 	private ITourProvider	fTourProvider;
 	private boolean			fIsSaveTour;
 
-	public ActionEditAdjustAltitude(final ITourProvider tourProvider, final boolean isSaveTour) {
+	private TourMarker		fSelectedTourMarker;
+
+	/**
+	 * @param tourProvider
+	 * @param isSaveTour
+	 *            when <code>true</code> the tour will be saved when the marker dialog is closed
+	 */
+	public ActionOpenMarkerDialog(final ITourProvider tourProvider, final boolean isSaveTour) {
 
 		fTourProvider = tourProvider;
 		fIsSaveTour = isSaveTour;
 
-		setText(Messages.app_action_edit_adjust_altitude);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude));
+		setText(Messages.app_action_edit_tour_marker);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker));
 
 		setEnabled(false);
 	}
@@ -55,15 +63,11 @@ public class ActionEditAdjustAltitude extends Action {
 
 		final TourData tourData = selectedTours.get(0);
 
-		final DialogAdjustAltitude dialog = new DialogAdjustAltitude(Display.getCurrent().getActiveShell(), tourData);
-		dialog.create();
-		dialog.init();
+		final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(),
+				tourData,
+				fSelectedTourMarker);
 
-		if (dialog.open() != Window.OK) {
-
-			dialog.restoreOriginalAltitudeValues();
-
-		} else {
+		if (markerDialog.open() == Window.OK) {
 
 			if (fIsSaveTour) {
 				TourManager.saveModifiedTours(selectedTours);
@@ -86,4 +90,9 @@ public class ActionEditAdjustAltitude extends Action {
 			}
 		}
 	}
+
+	public void setSelectedMarker(final TourMarker tourMarker) {
+		fSelectedTourMarker = tourMarker;
+	}
+
 }

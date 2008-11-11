@@ -109,11 +109,11 @@ public class WizardImportData extends Wizard {
 		if (fRunnableReceiveData != null) {
 			return false;
 		}
+		
 		/*
 		 * set the device which is used to read the data
 		 */
 		fImportDevice = fPageImportSettings.getSelectedDevice();
-
 		if (fImportDevice == null) {
 			return false;
 		}

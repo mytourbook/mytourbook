@@ -163,6 +163,14 @@ public class TourMarker implements Cloneable {
 		return true;
 	}
 
+	/**
+	 * !!!!!!!!!!!!!!!!!<br>
+	 * serieIndex is not used for equals or hashcode because this is modified when markers are
+	 * deleted<br>
+	 * !!!!!!!!!!!!!!!!!<br>
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -176,9 +184,6 @@ public class TourMarker implements Cloneable {
 		}
 		final TourMarker other = (TourMarker) obj;
 		if (markerId != other.markerId) {
-			return false;
-		}
-		if (serieIndex != other.serieIndex) {
 			return false;
 		}
 		return true;
@@ -235,12 +240,19 @@ public class TourMarker implements Cloneable {
 		return visualPosition;
 	}
 
+	/**
+	 * !!!!!!!!!!!!!!!!!<br>
+	 * serieIndex is not used for equals or hashcode because this is modified when markers are
+	 * deleted<br>
+	 * !!!!!!!!!!!!!!!!!<br>
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (markerId ^ (markerId >>> 32));
-		result = prime * result + serieIndex;
 		return result;
 	}
 
@@ -333,7 +345,10 @@ public class TourMarker implements Cloneable {
 
 	@Override
 	public String toString() {
-		return new StringBuilder().append(" distance:")
+		return new StringBuilder().append(TourMarker.class.getSimpleName())
+				.append(" id:")
+				.append(markerId)
+				.append(" distance:")
 				.append(distance)
 				.append(" time:")
 				.append(time)

@@ -48,6 +48,11 @@ public class TourProperties {
 		this.modifiedTours = modifiedTour;
 	}
 
+	public TourProperties(final TourData tourData) {
+		modifiedTours = new ArrayList<TourData>();
+		modifiedTours.add(tourData);
+	}
+
 	/**
 	 * @return Returns all tours which have been modified
 	 */

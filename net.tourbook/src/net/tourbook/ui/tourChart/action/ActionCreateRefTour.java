@@ -43,19 +43,19 @@ public class ActionCreateRefTour extends Action {
 
 		setText(Messages.tourCatalog_view_action_create_reference_tour);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_map_ref_tour_new));
-		
+
 		fTourChart = tourChart;
 	}
 
 	@Override
 	public void run() {
 
-		final SelectionChartInfo chartInfo = fTourChart.getChartInfo();
-		final TourData tourData = fTourChart.getTourData();
-
-		if (UI.isTourModified(tourData)) {
+		if (UI.isTourEditorModified()) {
 			return;
 		}
+
+		final SelectionChartInfo chartInfo = fTourChart.getChartInfo();
+		final TourData tourData = fTourChart.getTourData();
 
 		// get the reference tour name
 		final InputDialog dialog = new InputDialog(Display.getCurrent().getActiveShell(),

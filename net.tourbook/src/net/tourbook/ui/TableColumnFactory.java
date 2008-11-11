@@ -218,7 +218,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "distance", SWT.TRAIL); //$NON-NLS-1$
-			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(10);
+			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(11);
 		
 			colDef.setColumnLabel(Messages.ColumnFactory_distance_label);
 			colDef.setColumnHeader(UI.UNIT_LABEL_DISTANCE);
@@ -578,7 +578,7 @@ public abstract class TableColumnFactory {
 		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final int pixelWidth = pixelConverter.convertWidthInCharsToPixels(12);
-			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourTimeHHMMSS", SWT.LEAD); //$NON-NLS-1$
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "tourTimeHHMMSS", SWT.TRAIL); //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_tour_time_label_hhmmss);
 			colDef.setColumnHeader(Messages.ColumnFactory_tour_time_label_hhmmss);
