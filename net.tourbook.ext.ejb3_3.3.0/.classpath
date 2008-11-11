@@ -11,7 +11,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations-3.3.0.GA/lib/ejb3-persistence.jar" sourcepath="L:/java-resources/hibernate 3.3.0/cvs entitymanager_3_3_0_GA/HibernateExt/jpa-api/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations-3.3.0.GA/lib/hibernate-commons-annotations.jar" sourcepath="net.tourbook.ext.ejb3_3.3.0src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-annotations-3.3.0.GA/hibernate-annotations.jar" sourcepath="M:/java-external-source/entitymanager_3_3_0_GA/HibernateExt/annotations/src/java"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/hibernate3.jar" sourcepath="L:/java-resources/hibernate 3.3.0/hibernate-3.2.2-src/src"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/hibernate3.jar" sourcepath="/org.hibernate source 3.3.0/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/antlr-2.7.6.jar" sourcepath="net.tourbook.ext.ejb3_3.3.0src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/asm.jar" sourcepath="net.tourbook.ext.ejb3_3.3.0src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2/lib/asm-attrs.jar" sourcepath="net.tourbook.ext.ejb3_3.3.0src.zip"/>
