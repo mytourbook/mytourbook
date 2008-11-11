@@ -222,7 +222,6 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 }
