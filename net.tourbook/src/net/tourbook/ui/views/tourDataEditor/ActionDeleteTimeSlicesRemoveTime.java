@@ -13,22 +13,27 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.ui.views.tourDataEditor;
 
-public class ChartMarker {
+import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
 
-	/**
-	 * x-position in graph units
-	 */
-	public int	graphX;
-	
-	/**
-	 * index in the data serie
-	 */
-	public int	serieIndex;
+import org.eclipse.jface.action.Action;
 
-	public ChartMarker() {
-		super();
+class ActionDeleteTimeSlicesRemoveTime extends Action {
+
+	private final TourDataEditorView	fTourPropertiesView;
+
+	public ActionDeleteTimeSlicesRemoveTime(final TourDataEditorView tourPropertiesView) {
+
+		super(Messages.action_tour_editor_delete_time_slices_remove_time, AS_PUSH_BUTTON);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+
+		fTourPropertiesView = tourPropertiesView;
 	}
 
+	@Override
+	public void run() {
+		fTourPropertiesView.actionDeleteTimeSlices(true);
+	}
 }

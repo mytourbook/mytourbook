@@ -21,7 +21,23 @@ import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
-public enum TourProperty {
+public enum TourEventId {
+
+	/**
+	 * Properties for a tour have changed, property data contains {@link TourProperties} with the
+	 * modified {@link TourData}
+	 */
+	TOUR_CHANGED,
+
+	/**
+	 * {@link TourData} has been modified, the UI must be updated by reloading {@link TourData}
+	 * <p>
+	 * When this property is fired, the {@link TourDataEditorView} must <b>NOT</b> be dirty. The
+	 * check method {@link UI#isTourEditorModified(TourData)} must return false.
+	 * <p>
+	 * When a tour is modified, the event {@link #TOUR_PROPERTIES_CHANGED} must be fired
+	 */
+	UPDATE_UI,
 
 	/**
 	 * properties of the tour chart has been changed
@@ -31,23 +47,22 @@ public enum TourProperty {
 	/**
 	 * 
 	 */
-	TOUR_PROPERTY_SEGMENT_LAYER_CHANGED,
+	SEGMENT_LAYER_CHANGED,
+
+	/**
+	 * a reference tour is created
+	 */
+	REFERENCE_TOUR_IS_CREATED,
 
 	/**
 	 * 
 	 */
-	TOUR_PROPERTY_REFERENCE_TOUR_CHANGED,
+	REFERENCE_TOUR_CHANGED,
 
 	/**
 	 * 
 	 */
-	TOUR_PROPERTY_COMPARE_TOUR_CHANGED,
-
-	/**
-	 * Properties for a tour have changed, property data contains {@link TourProperties} with the
-	 * modified {@link TourData}
-	 */
-	TOUR_PROPERTIES_CHANGED,
+	COMPARE_TOUR_CHANGED,
 
 	/**
 	 * Tags for a tour has been modified. The property data contains an object {@link ChangedTags}
@@ -71,18 +86,5 @@ public enum TourProperty {
 	 * All computed data for all tours are modified
 	 */
 	ALL_TOURS_ARE_MODIFIED,
-
-	/**
-	 * a reference tour is created
-	 */
-	REFERENCE_TOUR_IS_CREATED,
-
-	/**
-	 * {@link TourData} have been modified, the UI must be updated by reloading the {@link TourData}
-	 * <p>
-	 * When this property is fired, the {@link TourDataEditorView} must not be dirty,
-	 * {@link UI#isTourModified(TourData)} must return false.
-	 */
-	UPDATE_UI,
 
 }

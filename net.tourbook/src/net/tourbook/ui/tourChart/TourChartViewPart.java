@@ -18,10 +18,10 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.UI;
 import net.tourbook.util.PostSelectionProvider;
 
@@ -45,7 +45,7 @@ public abstract class TourChartViewPart extends ViewPart {
 	protected PostSelectionProvider		fPostSelectionProvider;
 
 	private IPropertyChangeListener		fPrefChangeListener;
-	private ITourPropertyListener		fTourPropertyListener;
+	private ITourEventListener		fTourPropertyListener;
 	private ISelectionListener			fPostSelectionListener;
 
 	private void addPrefListener() {
@@ -93,24 +93,24 @@ public abstract class TourChartViewPart extends ViewPart {
 
 	private void addTourPropertyListener() {
 
-		fTourPropertyListener = new ITourPropertyListener() {
+		fTourPropertyListener = new ITourEventListener() {
 			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
+										final TourEventId propertyId,
 										final Object propertyData) {
 
 				if (fTourData == null || part == TourChartViewPart.this) {
 					return;
 				}
 
-				if (propertyId == TourProperty.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
+				if (propertyId == TourEventId.SEGMENT_LAYER_CHANGED) {
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
 
-				} else if (propertyId == TourProperty.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+				} else if (propertyId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 					fTourChart.updateTourChart(true, true);
 
-				} else if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				} else if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
-					final TourData tourData = UI.getTourPropertyTourData((TourProperties) propertyData, fTourData);
+					final TourData tourData = UI.getTourPropertyTourData((TourEvent) propertyData, fTourData);
 					if (tourData != null) {
 
 						fTourData = tourData;

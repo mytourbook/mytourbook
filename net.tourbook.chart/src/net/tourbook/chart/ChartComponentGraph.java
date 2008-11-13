@@ -5150,6 +5150,10 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private void switchSliderTo2ndXData(final ChartXSlider slider) {
 
+		if (fDrawingData.size() == 0) {
+			return;
+		}
+		
 		final ChartDrawingData chartDrawingData = fDrawingData.get(0);
 		if (chartDrawingData == null) {
 			return;

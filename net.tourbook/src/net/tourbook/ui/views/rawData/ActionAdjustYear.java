@@ -34,9 +34,14 @@ public class ActionAdjustYear extends Action implements IMenuCreator {
 
 	private Menu		fMenu;
 
+	private ActionYear	fActionYear_5;
+	private ActionYear	fActionYear_4;
+	private ActionYear	fActionYear_3;
+	private ActionYear	fActionYear_2;
 	private ActionYear	fActionYearLast;
 	private ActionYear	fActionYearThis;
 	private ActionYear	fActionYearNext;
+
 
 	private class ActionYear extends Action {
 
@@ -63,6 +68,10 @@ public class ActionAdjustYear extends Action implements IMenuCreator {
 		fCalendar.setTime(new Date());
 		final int thisYear = fCalendar.get(Calendar.YEAR);
 
+		fActionYear_5 = new ActionYear(thisYear - 5);
+		fActionYear_4 = new ActionYear(thisYear - 4);
+		fActionYear_3 = new ActionYear(thisYear - 3);
+		fActionYear_2 = new ActionYear(thisYear - 2);
 		fActionYearLast = new ActionYear(thisYear - 1);
 		fActionYearThis = new ActionYear(thisYear);
 		fActionYearNext = new ActionYear(thisYear + 1);
@@ -91,6 +100,10 @@ public class ActionAdjustYear extends Action implements IMenuCreator {
 
 		fMenu = new Menu(parent);
 
+		addActionToMenu(fActionYear_5);
+		addActionToMenu(fActionYear_4);
+		addActionToMenu(fActionYear_3);
+		addActionToMenu(fActionYear_2);
 		addActionToMenu(fActionYearLast);
 		addActionToMenu(fActionYearThis);
 		addActionToMenu(fActionYearNext);

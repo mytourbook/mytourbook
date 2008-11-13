@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -15,22 +15,17 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IWorkbenchPart;
 
-/**
- * When the selection is set by this type and is not empty, the raw tour data has changed (added,
- * removed)
- */
-public class SelectionNewTours implements ISelection {
+public interface ITourEventListener {
 
-	private boolean	fIsEmpty;
-
-	public boolean isEmpty() {
-		return fIsEmpty;
-	}
-
-	public void setEmpty(final boolean isEmpty) {
-		fIsEmpty = isEmpty;
-	}
+	/**
+	 * @param part
+	 *            part where the property was fired, can be <code>null</code> when the part is not
+	 *            set
+	 * @param tourProperty
+	 * @param propertyData
+	 */
+	public void propertyChanged(final IWorkbenchPart part, TourEventId tourProperty, Object propertyData);
 
 }

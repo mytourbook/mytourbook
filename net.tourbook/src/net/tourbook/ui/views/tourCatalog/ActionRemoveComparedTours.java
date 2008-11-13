@@ -28,7 +28,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
@@ -169,7 +169,7 @@ public class ActionRemoveComparedTours extends Action {
 		}
 
 		if (modifiedRefTours.size() > 0) {
-			TourManager.firePropertyChange(TourProperty.UPDATE_UI, new SelectionTourIds(modifiedRefTours));
+			TourManager.fireEvent(TourEventId.UPDATE_UI, new SelectionTourIds(modifiedRefTours));
 		}
 
 		return true;

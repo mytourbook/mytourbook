@@ -32,11 +32,11 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.IDataModelListener;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvicer;
@@ -100,7 +100,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	private PageBook							fPageBook;
 	private Label								fPageNoChart;
 
-	private ITourPropertyListener				fRefTourPropertyListener;
+	private ITourEventListener				fRefTourPropertyListener;
 
 	private ActionSynchChartHorizontalByScale	fActionSynchChartsByScale;
 	private ActionSynchChartHorizontalBySize	fActionSynchChartsBySize;
@@ -169,12 +169,12 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 
 	private void addRefTourPropertyListener() {
 
-		fRefTourPropertyListener = new ITourPropertyListener() {
+		fRefTourPropertyListener = new ITourEventListener() {
 			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
+										final TourEventId propertyId,
 										final Object propertyData) {
 
-				if (propertyId == TourProperty.TOUR_PROPERTY_REFERENCE_TOUR_CHANGED
+				if (propertyId == TourEventId.REFERENCE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyRefTourChanged) {
 
 					/*
@@ -367,7 +367,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 	private void fireChangeEvent(final int startIndex, final int endIndex, final float speed, final boolean isDataSaved) {
 
-		TourManager.firePropertyChange(TourProperty.TOUR_PROPERTY_COMPARE_TOUR_CHANGED,
+		TourManager.fireEvent(TourEventId.COMPARE_TOUR_CHANGED,
 				new TourPropertyCompareTourChanged(fCTCompareId,
 						startIndex,
 						endIndex,

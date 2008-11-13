@@ -21,7 +21,7 @@ import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartMarker;
+import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -162,7 +162,7 @@ public class DialogMarker extends TitleAreaDialog {
 				fNF.setMaximumFractionDigits(1);
 				cell.setText(fNF.format((tourMarker.getDistance()) / (1000 * UI.UNIT_VALUE_DISTANCE)));
 
-				if (tourMarker.getType() == ChartMarker.MARKER_TYPE_DEVICE) {
+				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
 					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 				}
 				break;
@@ -681,7 +681,7 @@ public class DialogMarker extends TitleAreaDialog {
 		// check if custom markers are selected
 		for (final Iterator<TourMarker> iter = markerSelection.iterator(); iter.hasNext();) {
 			final TourMarker tourMarker = iter.next();
-			if (tourMarker.getType() != ChartMarker.MARKER_TYPE_DEVICE) {
+			if (tourMarker.getType() != ChartLabel.MARKER_TYPE_DEVICE) {
 				isCustomMarker = true;
 				break;
 			}
@@ -834,7 +834,7 @@ public class DialogMarker extends TitleAreaDialog {
 			return;
 		}
 
-		fSelectedTourMarker.setVisibleType(ChartMarker.VISIBLE_TYPE_DEFAULT);
+		fSelectedTourMarker.setVisibleType(ChartLabel.VISIBLE_TYPE_DEFAULT);
 	}
 
 	private void saveDialogSettings() {
@@ -864,7 +864,7 @@ public class DialogMarker extends TitleAreaDialog {
 	private void updateMarkerUI() {
 
 		// make the marker more visible by setting another type
-		fSelectedTourMarker.setVisibleType(ChartMarker.VISIBLE_TYPE_TYPE_EDIT);
+		fSelectedTourMarker.setVisibleType(ChartLabel.VISIBLE_TYPE_TYPE_EDIT);
 
 		fTextMarkerName.setText(fSelectedTourMarker.getLabel());
 		fComboMarkerPosition.select(fSelectedTourMarker.getVisualPosition());

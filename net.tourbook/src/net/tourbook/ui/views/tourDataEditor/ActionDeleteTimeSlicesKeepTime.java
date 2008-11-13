@@ -13,19 +13,27 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.tour;
+package net.tourbook.ui.views.tourDataEditor;
 
-import org.eclipse.ui.IWorkbenchPart;
+import net.tourbook.Messages;
+import net.tourbook.plugin.TourbookPlugin;
 
-public interface ITourPropertyListener {
+import org.eclipse.jface.action.Action;
 
-	/**
-	 * @param part
-	 *            part where the property was fired, can be <code>null</code> when the part is not
-	 *            set
-	 * @param tourProperty
-	 * @param propertyData
-	 */
-	public void propertyChanged(final IWorkbenchPart part, TourProperty tourProperty, Object propertyData);
+class ActionDeleteTimeSlicesKeepTime extends Action {
 
+	private final TourDataEditorView	fTourPropertiesView;
+
+	public ActionDeleteTimeSlicesKeepTime(final TourDataEditorView tourPropertiesView) {
+
+		super(Messages.action_tour_editor_delete_time_slices_keep_time, AS_PUSH_BUTTON);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+
+		fTourPropertiesView = tourPropertiesView;
+	}
+
+	@Override
+	public void run() {
+		fTourPropertiesView.actionDeleteTimeSlices(false);
+	}
 }

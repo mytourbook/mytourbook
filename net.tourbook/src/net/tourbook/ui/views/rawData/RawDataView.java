@@ -41,12 +41,12 @@ import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ITourItem;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.ColumnDefinition;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
@@ -161,7 +161,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private ISelectionListener				fPostSelectionListener;
 	private IPropertyChangeListener			fPrefChangeListener;
 	private PostSelectionProvider			fPostSelectionProvider;
-	private ITourPropertyListener			fTourPropertyListener;
+	private ITourEventListener			fTourPropertyListener;
 
 	public Calendar							fCalendar						= GregorianCalendar.getInstance();
 	private DateFormat						fDateFormatter					= DateFormat.getDateInstance(DateFormat.SHORT);
@@ -324,19 +324,19 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private void addTourPropertyListener() {
 
-		fTourPropertyListener = new ITourPropertyListener() {
+		fTourPropertyListener = new ITourEventListener() {
 			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
+										final TourEventId propertyId,
 										final Object propertyData) {
 
 				if (part == RawDataView.this) {
 					return;
 				}
 
-				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
 					// update modified tours
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
 
 						// update model
@@ -346,7 +346,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 						fTourViewer.update(modifiedTours.toArray(), null);
 					}
 
-				} else if (propertyId == TourProperty.TAG_STRUCTURE_CHANGED) {
+				} else if (propertyId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
 					RawDataManager.getInstance().updateTourDataFromDb();
 
@@ -1102,11 +1102,11 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private void removeTours(final ArrayList<ITourItem> removedTours) {
 
-		final HashMap<String, TourData> tourMap = RawDataManager.getInstance().getTourDataMap();
+		final HashMap<Long, TourData> tourMap = RawDataManager.getInstance().getTourDataMap();
 
 		for (final ITourItem tourItem : removedTours) {
 
-			final TourData tourData = tourMap.get(tourItem.getTourId().toString());
+			final TourData tourData = tourMap.get(tourItem.getTourId());
 			if (tourData != null) {
 
 				// when a tour was deleted the person in the tour data must be removed

@@ -38,11 +38,11 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -84,7 +84,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	protected TourDayData			fTourDayData;
 
 	boolean							fIsSynchScaleEnabled;
-	private ITourPropertyListener	fTourPropertyListener;
+	private ITourEventListener	fTourPropertyListener;
 
 	@Override
 	public void activateActions(final IWorkbenchPartSite partSite) {
@@ -93,15 +93,15 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	private void addTourPropertyListener() {
 
-		fTourPropertyListener = new ITourPropertyListener() {
+		fTourPropertyListener = new ITourEventListener() {
 			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
+										final TourEventId propertyId,
 										final Object propertyData) {
 
-				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
 					// check if a tour was modified
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
 
 						for (final TourData modifiedTourData : modifiedTours) {

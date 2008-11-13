@@ -57,36 +57,36 @@ public class RawDataManager {
 
 //	public static final String			TEMP_RAW_DATA_FILE					= "temp-device-data.txt";						//$NON-NLS-1$
 
-	private static final String			RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
+	private static final String		RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
 
-	private static final String			TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
+	private static final String		TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
 
-	private static RawDataManager		instance							= null;
+	private static RawDataManager	instance							= null;
 
 	/**
 	 * contains the device data imported from the device/file
 	 */
-	private DeviceData					fDeviceData							= new DeviceData();
+	private DeviceData				fDeviceData							= new DeviceData();
 
 	/**
 	 * contains the tour data which were imported or received
 	 */
-	private HashMap<String, TourData>	fTourDataMap						= new HashMap<String, TourData>();
+	private HashMap<Long, TourData>	fTourDataMap						= new HashMap<Long, TourData>();
 
 	/**
 	 * contains the filenames for all imported files
 	 */
-	private HashSet<String>				fImportedFiles						= new HashSet<String>();
+	private HashSet<String>			fImportedFiles						= new HashSet<String>();
 
-	private boolean						fIsImported;
+	private boolean					fIsImported;
 
-	private boolean						fImportCanceled;
+	private boolean					fImportCanceled;
 
-	private int							fImportSettingsImportYear			= -1;
-	private boolean						fImportSettingsIsMergeTracks;
-	private boolean						fImportSettingsIsChecksumValidation	= true;
+	private int						fImportSettingsImportYear			= -1;
+	private boolean					fImportSettingsIsMergeTracks;
+	private boolean					fImportSettingsIsChecksumValidation	= true;
 
-	private String						fLastImportedFile;
+	private String					fLastImportedFile;
 
 	public static RawDataManager getInstance() {
 		if (instance == null) {
@@ -272,7 +272,7 @@ public class RawDataManager {
 	/**
 	 * @return Returns the tour data which were imported or received, key is tour ID
 	 */
-	public HashMap<String, TourData> getTourDataMap() {
+	public HashMap<Long, TourData> getTourDataMap() {
 		return fTourDataMap;
 	}
 
@@ -622,7 +622,7 @@ public class RawDataManager {
 
 								dbTourData.importRawDataFile = mapTourData.importRawDataFile;
 
-								fTourDataMap.put(dbTourData.getTourId().toString(), dbTourData);
+								fTourDataMap.put(dbTourData.getTourId(), dbTourData);
 							}
 						} catch (final Exception e) {
 							e.printStackTrace();
@@ -642,7 +642,7 @@ public class RawDataManager {
 	public void updateTourDataModel(final ArrayList<TourData> modifiedTours) {
 
 		for (final TourData tourData : modifiedTours) {
-			fTourDataMap.put(tourData.getTourId().toString(), tourData);
+			fTourDataMap.put(tourData.getTourId(), tourData);
 		}
 	}
 }

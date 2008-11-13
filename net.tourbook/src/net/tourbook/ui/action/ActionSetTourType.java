@@ -48,7 +48,7 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 	 * @param tourProvider
 	 * @param isSaveTour
 	 *            when <code>true</code> the tour will be saved and a
-	 *            {@link TourManager#TOUR_PROPERTIES_CHANGED} event is fired, otherwise the
+	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
 	 *            {@link TourData} from the tour provider is only modified
 	 */
 	public static void fillMenu(final IMenuManager menuMgr, final ITourProvider tourProvider, final boolean isSaveTour) {

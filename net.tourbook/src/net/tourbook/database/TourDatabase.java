@@ -879,7 +879,7 @@ public class TourDatabase {
 	 * tour
 	 * 
 	 * @param tourData
-	 * @return returns persisted {@link TourData}
+	 * @return returns persisted {@link TourData} or <code>null</code> when saving fails
 	 */
 	public static TourData saveTour(final TourData tourData) {
 

@@ -17,14 +17,14 @@
 package net.tourbook.ui.views.tourDataEditor;
 
 import net.tourbook.Messages;
-import net.tourbook.chart.ChartMarker;
+import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.DialogMarker;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -58,13 +58,17 @@ public class ActionCreateTourMarker extends Action {
 
 			// create a new marker
 			final int serieIndex = ((TimeSlice) firstElement).serieIndex;
+			final int[] distSerie = tourData.getMetricDistanceSerie();
 
-			final TourMarker tourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_CUSTOM);
+			final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
 			tourMarker.setSerieIndex(serieIndex);
-			tourMarker.setDistance(tourData.getMetricDistanceSerie()[serieIndex]);
 			tourMarker.setTime(tourData.timeSerie[serieIndex]);
 			tourMarker.setLabel(Messages.TourData_Label_new_marker);
-			tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+			tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+
+			if (distSerie != null) {
+				tourMarker.setDistance(distSerie[serieIndex]);
+			}
 
 			return tourMarker;
 		}
@@ -87,8 +91,8 @@ public class ActionCreateTourMarker extends Action {
 //			fTourDataEditorView.updateViewer();
 //			fTourDataEditorView.setTourDirty();
 
-			final TourProperties propertyData = new TourProperties(tourData);
-			TourManager.firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED, propertyData);
+			final TourEvent propertyData = new TourEvent(tourData);
+			TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData);
 
 		}
 

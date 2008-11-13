@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -31,7 +31,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
 public class ChartSegmentLayer implements IChartLayer {
@@ -43,21 +42,13 @@ public class ChartSegmentLayer implements IChartLayer {
 	/**
 	 * Adds a new marker to the internal marker list, the list can be retrieved with getMarkerList()
 	 * 
-	 * @param marker
+	 * @param chartMarker
 	 * @param xCoord
 	 *            Position of the marker on the x axis
 	 * @param label
 	 */
-	public void addMarker(final ChartMarker marker) {
-		fChartMarkers.add(marker);
-	}
-
-	public RGB getLineColor() {
-		return lineColor;
-	}
-
-	public void setLineColor(final RGB lineColor) {
-		this.lineColor = lineColor;
+	public void addMarker(final ChartMarker chartMarker) {
+		fChartMarkers.add(chartMarker);
 	}
 
 	/**
@@ -78,17 +69,16 @@ public class ChartSegmentLayer implements IChartLayer {
 
 		final int graphYBottom = drawingData.getGraphYBottom();
 
-		final int yMarkerBar = drawingData.getDevMarginTop()
-				+ drawingData.getDevXTitelBarHeight()
-				+ drawingData.getDevMarkerBarHeight();
+//		final int yMarkerBar = drawingData.getDevMarginTop()
+//				+ drawingData.getDevXTitelBarHeight()
+//				+ drawingData.getDevMarkerBarHeight();
 
-		// yMarkerBar=
 		final int[] yValues = drawingData.getYData().getHighValues()[0];
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 
 		final Color colorLine = new Color(display, getLineColor());
-		Point labelExtend;
+//		final Point labelExtend;
 		Point lastPoint = null;
 
 		for (final ChartMarker chartMarker : fChartMarkers) {
@@ -99,27 +89,27 @@ public class ChartSegmentLayer implements IChartLayer {
 			final int yValue = yValues[yValueIndex];
 
 			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
-			int devYMarker = devYBottom - devYGraph;
+			int devYSegment = devYBottom - devYGraph;
 
 			// don't draw over the graph borders
-			if (devYMarker > devYBottom) {
-				devYMarker = devYBottom;
+			if (devYSegment > devYBottom) {
+				devYSegment = devYBottom;
 			}
-			if (devYMarker < devYTop) {
-				devYMarker = devYTop;
+			if (devYSegment < devYTop) {
+				devYSegment = devYTop;
 			}
 
 			gc.setForeground(colorLine);
 
-			// connect the two marker with a line
+			// connect the two segments with a line
 			if (lastPoint == null) {
-				lastPoint = new Point(devXOffset, devYMarker);
+				lastPoint = new Point(devXOffset, devYSegment);
 			} else {
 				gc.setLineStyle(SWT.LINE_SOLID);
-				gc.drawLine(lastPoint.x, lastPoint.y, devXOffset, devYMarker);
+				gc.drawLine(lastPoint.x, lastPoint.y, devXOffset, devYSegment);
 
 				lastPoint.x = devXOffset;
-				lastPoint.y = devYMarker;
+				lastPoint.y = devYSegment;
 			}
 
 			gc.setForeground(colorLine);
@@ -127,40 +117,51 @@ public class ChartSegmentLayer implements IChartLayer {
 			// draw a line from the marker to the top of the graph
 			gc.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
 			gc.setLineStyle(SWT.LINE_DOT);
-			gc.drawLine(devXOffset, devYMarker, devXOffset, devYBottom - devGraphHeight);
+			gc.drawLine(devXOffset, devYSegment, devXOffset, devYBottom - devGraphHeight);
 
 			gc.setForeground(colorLine);
 
-			// draw marker label
-			if (!chartMarker.markerLabel.equalsIgnoreCase("")) { //$NON-NLS-1$
-
-				labelExtend = gc.textExtent(chartMarker.markerLabel);
-
-				final int xPos = devXOffset - labelExtend.y;
-				int yPos = yMarkerBar - labelExtend.y;
-
-				yPos = devYBottom - 5;
-
-				if (chart.getAdvancedGraphics()) {
-					final Transform tr = new Transform(display);
-					tr.translate(xPos, yPos);
-					tr.rotate(-90f);
-
-					gc.setTransform(tr);
-					// gc.setAntialias(SWT.ON);
-
-					gc.drawText(chartMarker.markerLabel, 0, 0, true);
-
-					gc.setTransform(null);
-					// gc.setAntialias(SWT.OFF);
-
-					tr.dispose();
-				} else {
-					gc.drawText(chartMarker.markerLabel, xPos, yPos, true);
-				}
-			}
+//			// draw marker label
+//			final String markerLabel = chartMarker.markerLabel;
+//			if (markerLabel.length() > 0) {
+//
+//				labelExtend = gc.textExtent(markerLabel);
+//
+//				final int xPos = devXOffset - labelExtend.y;
+//				int yPos = yMarkerBar - labelExtend.y;
+//
+//				yPos = devYBottom - 5;
+//
+//				if (chart.getAdvancedGraphics()) {
+//
+//					final Transform tr = new Transform(display);
+//					tr.translate(xPos, yPos);
+//					tr.rotate(-90f);
+//
+//					gc.setTransform(tr);
+//					// gc.setAntialias(SWT.ON);
+//
+//					gc.drawText(markerLabel, 0, 0, true);
+//
+//					gc.setTransform(null);
+//					// gc.setAntialias(SWT.OFF);
+//
+//					tr.dispose();
+//
+//				} else {
+//					gc.drawText(markerLabel, xPos, yPos, true);
+//				}
+//			}
 		}
 
 		colorLine.dispose();
+	}
+
+	public RGB getLineColor() {
+		return lineColor;
+	}
+
+	public void setLineColor(final RGB lineColor) {
+		this.lineColor = lineColor;
 	}
 }

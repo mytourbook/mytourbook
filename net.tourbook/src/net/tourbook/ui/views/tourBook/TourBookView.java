@@ -30,13 +30,12 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
@@ -117,7 +116,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private ISelectionListener			fPostSelectionListener;
 	private IPartListener2				fPartListener;
-	private ITourPropertyListener		fTourPropertyListener;
+	private ITourEventListener		fTourPropertyListener;
 	private IPropertyChangeListener		fPrefChangeListener;
 
 	TVITourBookRoot						fRootItem;
@@ -306,7 +305,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-				if (selection instanceof SelectionNewTours || selection instanceof SelectionDeletedTours) {
+				if (selection instanceof SelectionDeletedTours) {
 					reloadViewer();
 				}
 			}
@@ -318,12 +317,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private void addTourPropertyListener() {
 
-		fTourPropertyListener = new ITourPropertyListener() {
+		fTourPropertyListener = new ITourEventListener() {
 			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
+										final TourEventId propertyId,
 										final Object propertyData) {
 
-				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED) {
+				if (propertyId == TourEventId.TOUR_CHANGED || propertyId == TourEventId.UPDATE_UI) {
 
 					/*
 					 * it is possible when a tour type was modified, the tour can be hidden or
@@ -331,11 +330,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					 */
 					reloadViewer();
 
-				} else if (propertyId == TourProperty.TAG_STRUCTURE_CHANGED) {
-
-					reloadViewer();
-
-				} else if (propertyId == TourProperty.ALL_TOURS_ARE_MODIFIED) {
+				} else if (propertyId == TourEventId.TAG_STRUCTURE_CHANGED
+						|| propertyId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
 					reloadViewer();
 				}

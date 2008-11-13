@@ -21,7 +21,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEventId;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -275,7 +275,7 @@ public class TourChartPropertyView extends ViewPart {
 					TourManager.getInstance().removeAllToursFromCache();
 
 					// fire unique event for all changes
-					TourManager.firePropertyChange(TourProperty.ALL_TOURS_ARE_MODIFIED, null);
+					TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED, null);
 				}
 			}
 		});
@@ -339,7 +339,7 @@ public class TourChartPropertyView extends ViewPart {
 		TourManager.getInstance().removeAllToursFromCache();
 
 		// fire unique event for all changes
-		TourManager.firePropertyChange(TourProperty.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
+		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED, null);
 	}
 
 	private void restoreSettings() {

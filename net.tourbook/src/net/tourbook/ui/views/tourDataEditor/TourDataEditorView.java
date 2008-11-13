@@ -29,7 +29,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ChartMarker;
+import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
@@ -46,14 +46,13 @@ import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourSaveListener;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ColumnDefinition;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
@@ -161,214 +160,215 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourViewer, ITourProvider {
 
-	public static final String				ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
+	public static final String					ID								= "net.tourbook.views.TourDataEditorView";	//$NON-NLS-1$
 
-	final IDialogSettings					fViewState						= TourbookPlugin.getDefault()
-																					.getDialogSettingsSection(ID);
-	final IDialogSettings					fViewStateSlice					= TourbookPlugin.getDefault()
-																					.getDialogSettingsSection(//
-																					ID + ".slice");					//$NON-NLS-1$
-	final IDialogSettings					fViewStateMarker				= TourbookPlugin.getDefault()
-																					.getDialogSettingsSection(//
-																					ID + ".marker");					//$NON-NLS-1$
+	final IDialogSettings						fViewState						= TourbookPlugin.getDefault()
+																						.getDialogSettingsSection(ID);
+	final IDialogSettings						fViewStateSlice					= TourbookPlugin.getDefault()
+																						.getDialogSettingsSection(//
+																						ID + ".slice");					//$NON-NLS-1$
+	final IDialogSettings						fViewStateMarker				= TourbookPlugin.getDefault()
+																						.getDialogSettingsSection(//
+																						ID + ".marker");					//$NON-NLS-1$
 
-	private static final String				WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
-	private static final String				WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
-	private static final String				WIDGET_KEY_PERSON				= "tourPerson";							//$NON-NLS-1$
-	private static final String				MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";						//$NON-NLS-1$
+	private static final String					WIDGET_KEY						= "widgetKey";								//$NON-NLS-1$
+	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";							//$NON-NLS-1$
+	private static final String					WIDGET_KEY_PERSON				= "tourPerson";							//$NON-NLS-1$
+	private static final String					MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";						//$NON-NLS-1$
 
 	/**
 	 * shows the busy indicator to load the slice viewer when there are more items than this value
 	 */
-	private static final int				BUSY_INDICATOR_ITEMS			= 5000;
+	private static final int					BUSY_INDICATOR_ITEMS			= 5000;
 
-	private static final String				MEMENTO_SELECTED_TAB			= "tourProperties.selectedTab";			//$NON-NLS-1$
-	private static final String				MEMENTO_ROW_EDIT_MODE			= "tourProperties.editMode";				//$NON-NLS-1$
+	private static final String					MEMENTO_SELECTED_TAB			= "tourProperties.selectedTab";			//$NON-NLS-1$
+	private static final String					MEMENTO_ROW_EDIT_MODE			= "tourProperties.editMode";				//$NON-NLS-1$
 
 	/*
 	 * data series which are displayed in the viewer
 	 */
-	private int[]							fSerieTime;
-	private int[]							fSerieDistance;
-	private int[]							fSerieAltitude;
-	private int[]							fSerieTemperature;
-	private int[]							fSerieCadence;
-	private int[]							fSerieGradient;
-	private int[]							fSerieSpeed;
-	private int[]							fSeriePace;
-	private int[]							fSeriePower;
-	private int[]							fSeriePulse;
-	private double[]						fSerieLatitude;
-	private double[]						fSerieLongitude;
+	private int[]								fSerieTime;
+	private int[]								fSerieDistance;
+	private int[]								fSerieAltitude;
+	private int[]								fSerieTemperature;
+	private int[]								fSerieCadence;
+	private int[]								fSerieGradient;
+	private int[]								fSerieSpeed;
+	private int[]								fSeriePace;
+	private int[]								fSeriePower;
+	private int[]								fSeriePulse;
+	private double[]							fSerieLatitude;
+	private double[]							fSerieLongitude;
 
 	// slice viewer
-	private ColumnDefinition				fColDefAltitude;
-	private ColumnDefinition				fColDefCadence;
-	private ColumnDefinition				fColDefPulse;
-	private ColumnDefinition				fColDefTemperature;
-	private ColumnDefinition				fColDefSliceMarker;
+	private ColumnDefinition					fColDefAltitude;
+	private ColumnDefinition					fColDefCadence;
+	private ColumnDefinition					fColDefPulse;
+	private ColumnDefinition					fColDefTemperature;
+	private ColumnDefinition					fColDefSliceMarker;
 
 	// marker viewer
-	private ColumnDefinition				fColDefMarker;
+	private ColumnDefinition					fColDefMarker;
 
-	private ActionModifyColumns				fActionModifyColumns;
+	private ActionModifyColumns					fActionModifyColumns;
 
-	private ActionSaveTour					fActionSaveTour;
-	private ActionUndoChanges				fActionUndoChanges;
-	private ActionToggleRowSelectMode		fActionToggleRowSelectMode;
-	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
-	private ActionDeleteTimeSlices			fActionDeleteTimeSlices;
-	private ActionSetTourTag				fActionAddTag;
-	private ActionCreateTourMarker			fActionCreateTourMarker;
+	private ActionSaveTour						fActionSaveTour;
+	private ActionUndoChanges					fActionUndoChanges;
+	private ActionToggleRowSelectMode			fActionToggleRowSelectMode;
+	private ActionOpenMarkerDialog				fActionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog		fActionOpenAdjustAltitudeDialog;
+	private ActionDeleteTimeSlicesKeepTime		fActionDeleteTimeSlicesKeepTime;
+	private ActionDeleteTimeSlicesRemoveTime	fActionDeleteTimeSlicesRemoveTime;
+	private ActionSetTourTag					fActionAddTag;
+	private ActionCreateTourMarker				fActionCreateTourMarker;
 
-	private ActionSetTourTag				fActionRemoveTag;
-	private ActionRemoveAllTags				fActionRemoveAllTags;
-	private ActionOpenPrefDialog			fActionOpenTagPrefs;
-	private ActionOpenPrefDialog			fActionOpenTourTypePrefs;
-	private PageBook						fPageBook;
+	private ActionSetTourTag					fActionRemoveTag;
+	private ActionRemoveAllTags					fActionRemoveAllTags;
+	private ActionOpenPrefDialog				fActionOpenTagPrefs;
+	private ActionOpenPrefDialog				fActionOpenTourTypePrefs;
+	private PageBook							fPageBook;
 
-	private Label							fPageNoTour;
-	private Form							fPageEditorForm;
+	private Label								fPageNoTour;
+	private Form								fPageEditorForm;
 
-	private CTabFolder						fTabFolder;
-	private CTabItem						fTabTour;
-	private CTabItem						fTabMarker;
-	private CTabItem						fTabSlices;
-	private CTabItem						fTabInfo;
-	private TourChart						fTourChart;
+	private CTabFolder							fTabFolder;
+	private CTabItem							fTabTour;
+	private CTabItem							fTabMarker;
+	private CTabItem							fTabSlices;
+	private CTabItem							fTabInfo;
+	private TourChart							fTourChart;
 
-	private TourData						fTourData;
-	private Composite						fTourContainer;
+	private TourData							fTourData;
+	private Composite							fTourContainer;
 
-	private Composite						fInfoContainer;
-	private Composite						fMarkerViewerContainer;
-	private Composite						fSliceContainer;
+	private Composite							fInfoContainer;
+	private Composite							fMarkerViewerContainer;
+	private Composite							fSliceContainer;
 
-	private Composite						fSliceViewerContainer;
-	private Label							fTimeSliceLabel;
-	private TableViewer						fSliceViewer;
+	private Composite							fSliceViewerContainer;
+	private Label								fTimeSliceLabel;
+	private TableViewer							fSliceViewer;
 
-	private Object[]						fSliceViewerItems;
-	private ColumnManager					fSliceColumnManager;
+	private Object[]							fSliceViewerItems;
+	private ColumnManager						fSliceColumnManager;
 
-	private TableViewer						fMarkerViewer;
-	private ColumnManager					fMarkerColumnManager;
+	private TableViewer							fMarkerViewer;
+	private ColumnManager						fMarkerColumnManager;
 
-	private Text							fTextTitle;
+	private Text								fTextTitle;
 
-	private Text							fTextDescription;
-	private DateTime						fDtTourDate;
+	private Text								fTextDescription;
+	private DateTime							fDtTourDate;
 
-	private DateTime						fDtStartTime;
-	private DateTime						fDtRecordingTime;
+	private DateTime							fDtStartTime;
+	private DateTime							fDtRecordingTime;
 
-	private DateTime						fDtDrivingTime;
-	private DateTime						fDtPausedTime;
-	private Label							fLblTimeSlicesCount;
+	private DateTime							fDtDrivingTime;
+	private DateTime							fDtPausedTime;
+	private Label								fLblTimeSlicesCount;
 
-	private Label							fLblDeviceName;
-	private Label							fLblTourId;
-	private Text							fTextStartLocation;
+	private Label								fLblDeviceName;
+	private Label								fLblTourId;
+	private Text								fTextStartLocation;
 
-	private Text							fTextEndLocation;
-	private Text							fTextTourDistance;
+	private Text								fTextEndLocation;
+	private Text								fTextTourDistance;
 
-	private Label							fLblTourDistanceUnit;
-	private Link							fTagLink;
+	private Label								fLblTourDistanceUnit;
+	private Link								fTagLink;
 
-	private Label							fLblTourTags;
-	private Link							fTourTypeLink;
-	private CLabel							fLblTourType;
-	private Label							fLblRefTour;
+	private Label								fLblTourTags;
+	private Link								fTourTypeLink;
+	private CLabel								fLblTourType;
+	private Label								fLblRefTour;
 
-	private Label							fLblPerson;
-	private MessageManager					fMessageManager;
+	private Label								fLblPerson;
+	private MessageManager						fMessageManager;
 
-	private PostSelectionProvider			fPostSelectionProvider;
+	private PostSelectionProvider				fPostSelectionProvider;
 
-	private ISelectionListener				fPostSelectionListener;
-	private IPartListener2					fPartListener;
-	private IPropertyChangeListener			fPrefChangeListener;
-	private ITourPropertyListener			fTourPropertyListener;
-	private ITourSaveListener				fTourSaveListener;
-	private Calendar						fCalendar						= GregorianCalendar.getInstance();
+	private ISelectionListener					fPostSelectionListener;
+	private IPartListener2						fPartListener;
+	private IPropertyChangeListener				fPrefChangeListener;
+	private ITourEventListener					fTourEventListener;
+	private ITourSaveListener					fTourSaveListener;
+	private Calendar							fCalendar						= GregorianCalendar.getInstance();
 
-	private NumberFormat					fNumberFormatter				= NumberFormat.getNumberInstance();
+	private NumberFormat						fNumberFormatter				= NumberFormat.getNumberInstance();
 	/**
 	 * <code>true</code>: rows can be selected in the viewer<br>
 	 * <code>false</code>: cell can be selected in the viewer
 	 */
-	private boolean							fIsRowEditMode					= true;
+	private boolean								fIsRowEditMode					= true;
 
-	private long							fSliceViewerTourId				= -1;
-	private SelectionChartXSliderPosition	fSliceViewerXSliderPosition;
+	private long								fSliceViewerTourId				= -1;
+	private SelectionChartXSliderPosition		fSliceViewerXSliderPosition;
 
-	private boolean							fIsTourDirty					= false;
+	private boolean								fIsTourDirty					= false;
 
 	/**
 	 * is <code>true</code> when the tour is currently being saved to prevent a modify event or the
 	 * onSelectionChanged event
 	 */
-	private boolean							fIsSavingInProgress				= false;
+	private boolean								fIsSavingInProgress				= false;
 
 	/**
 	 * when <code>true</code>, the tour dirty flag is disabled to load data into the fields
 	 */
-	private boolean							fIsDirtyDisabled				= false;
+	private boolean								fIsDirtyDisabled				= false;
 
 	/**
 	 * contains the tour id from the last selection event
 	 */
-	private Long							fSelectionTourId;
+	private Long								fSelectionTourId;
 
-	private KeyAdapter						fKeyListener;
-	private ModifyListener					fModifyListener;
-	private ModifyListener					fVerifyFloatValue;
-	private SelectionAdapter				fTourTimeListener;
-	private SelectionAdapter				fDateTimeListener;
-	private PixelConverter					fPixelConverter;
+	private KeyAdapter							fKeyListener;
+	private ModifyListener						fModifyListener;
+	private ModifyListener						fVerifyFloatValue;
+	private SelectionAdapter					fTourTimeListener;
+	private SelectionAdapter					fDateTimeListener;
+	private PixelConverter						fPixelConverter;
 
 	/**
 	 * this width is used as a hint for the width of the description field, this value also
 	 * influences the width of the columns in this editor
 	 */
-	private int								fTextColumnWidth				= 150;
+	private int									fTextColumnWidth				= 150;
 
 	/**
 	 * is <code>true</code> when {@link #fTourChart} contains reference tours
 	 */
-	private boolean							fIsReferenceTourAvailable;
+	private boolean								fIsReferenceTourAvailable;
 
 	/**
 	 * range for the reference tours, is <code>null</code> when reference tours are not available<br>
 	 * 1st index = ref tour<br>
 	 * 2nd index: 0:start, 1:end
 	 */
-	private int[][]							fRefTourRange;
+	private int[][]								fRefTourRange;
 
-	private boolean							fIsPartVisible					= false;
+	private boolean								fIsPartVisible					= false;
 
 	/**
 	 * when <code>true</code> additional info is displayed in the title area
 	 */
-	private boolean							fIsInfoInTitle;
+	private boolean								fIsInfoInTitle;
 
 	/**
 	 * every requested UI update increased this counter
 	 */
-	private int								fUIUpdateCounter;
+	private int									fUIUpdateCounter;
 
 	/**
 	 * counter when the UI update runnable is run, this will optimize performance to not update the
 	 * UI when the part is hidden
 	 */
-	private int								fUIRunnableCounter				= 0;
+	private int									fUIRunnableCounter				= 0;
 
-	private int								fUIUpdateTitleCounter			= 0;
-	private TourData						fUIRunnableTourData;
-	private boolean							fUIRunnableForceTimeSliceReload;
-	private boolean							fUIRunnableIsDirtyDisabled;
+	private int									fUIUpdateTitleCounter			= 0;
+	private TourData							fUIRunnableTourData;
+	private boolean								fUIRunnableForceTimeSliceReload;
+	private boolean								fUIRunnableIsDirtyDisabled;
 
 // disabled because tour data get corrupted, the tour date could be from another tour	
 //	private int							fUIUpdateCounterTabTour			= -1;
@@ -376,14 +376,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //	private int							fUIUpdateCounterTabMarker		= -1;
 //	private int							fUIUpdateCounterTabSlices		= -1;
 
-	private SliceIntegerEditingSupport		fAltitudeEditingSupport;
-	private SliceIntegerEditingSupport		fPulseEditingSupport;
-	private SliceIntegerEditingSupport		fTemperatureEditingSupport;
-	private SliceIntegerEditingSupport		fCadenceEditingSupport;
+	private SliceIntegerEditingSupport			fAltitudeEditingSupport;
+	private SliceIntegerEditingSupport			fPulseEditingSupport;
+	private SliceIntegerEditingSupport			fTemperatureEditingSupport;
+	private SliceIntegerEditingSupport			fCadenceEditingSupport;
 
-	private HashMap<Integer, TourMarker>	fMarkerMap						= new HashMap<Integer, TourMarker>();
+	private HashMap<Integer, TourMarker>		fMarkerMap						= new HashMap<Integer, TourMarker>();
 
-	private ActionDeleteTourMarker			fActionDeleteTourMarker;
+	private ActionDeleteTourMarker				fActionDeleteTourMarker;
 
 	private final class MarkerEditingSupport extends EditingSupport {
 
@@ -586,12 +586,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					}
 
 					// create a new marker
-					final TourMarker newMarker = new TourMarker(fTourData, ChartMarker.MARKER_TYPE_CUSTOM);
+					final TourMarker newMarker = new TourMarker(fTourData, ChartLabel.MARKER_TYPE_CUSTOM);
+
 					newMarker.setSerieIndex(serieIndex);
-					newMarker.setDistance(fTourData.getMetricDistanceSerie()[serieIndex]);
 					newMarker.setTime(fTourData.timeSerie[serieIndex]);
 					newMarker.setLabel(newMarkerLabel);
-					newMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+					newMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+
+					final int[] distSerie = fTourData.getMetricDistanceSerie();
+					if (distSerie != null) {
+						newMarker.setDistance(distSerie[serieIndex]);
+					}
 
 					fTourData.getTourMarkers().add(newMarker);
 					updateMarkerMap();
@@ -644,8 +649,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	/**
 	 * delete selected time slices
+	 * 
+	 * @param removeTime
 	 */
-	void actionDeleteTimeSlices() {
+	void actionDeleteTimeSlices(final boolean removeTime) {
 
 		// a tour with reference tours is currently not supported 
 		if (fIsReferenceTourAvailable) {
@@ -734,6 +741,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		Arrays.sort(indices);
 		int lastSelectionIndex = indices[0];
 
+		if (removeTime) {
+			// this must be done before the time series are modified
+			removeTimeAndDistance(firstIndex, lastIndex);
+		}
+
 		/*
 		 * update data series
 		 */
@@ -778,7 +790,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// segments must be recomputed
 		fTourData.segmentSerieIndex = null;
 
-		removeTourMarkers(firstIndex, lastIndex);
+		removeTourMarkers(firstIndex, lastIndex, removeTime);
 
 		updateDataSeriesFromTourData();
 		updateUINumberOfTimeSlice();
@@ -998,12 +1010,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
-		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
-										final Object propertyData) {
+		fTourEventListener = new ITourEventListener() {
+			public void propertyChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object eventData) {
 
 				if (fTourData == null || part == TourDataEditorView.this) {
 					return;
@@ -1011,10 +1021,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				final long tourDataEditorTourId = fTourData.getTourId();
 
-				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				if (propertyId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					final TourProperties tourProperties = (TourProperties) propertyData;
-					final ArrayList<TourData> modifiedTours = tourProperties.getModifiedTours();
+					final TourEvent tourEvent = (TourEvent) eventData;
+					final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
 					if (modifiedTours == null) {
 						return;
@@ -1025,7 +1035,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 							// update modified tour
 
-							if (tourProperties.tourDataEditorSavedTour == fTourData) {
+							if (tourEvent.tourDataEditorSavedTour == fTourData) {
 
 								/*
 								 * nothing to do because the tour is already saved (when it was not
@@ -1034,49 +1044,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 								return;
 							}
 
-							if (tourProperties.isReverted) {
+							if (tourEvent.isReverted) {
 								setTourClean();
 							} else {
 								setTourDirty();
 							}
 
-							updateUIFromTourData(tourData, true, tourProperties.isReverted);
+							updateUIFromTourData(tourData, true, tourEvent.isReverted);
 
 							// nothing more to do, the editor contains only one tour
 							return;
 						}
 					}
 
-				} else if (propertyId == TourProperty.TAG_STRUCTURE_CHANGED) {
+				} else if (propertyId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
 					updateUIFromTourData(fTourData, false, true);
 
-				} else if (propertyId == TourProperty.UPDATE_UI) {
+				} else if (propertyId == TourEventId.UPDATE_UI) {
 
 					// check if this tour data editor contains a tour which must be updated
 
-					Long updatedTourId = null;
-
-					if (propertyData instanceof SelectionTourId) {
-
-						final Long tourId = ((SelectionTourId) propertyData).getTourId();
-						if (tourDataEditorTourId == tourId) {
-							updatedTourId = tourId;
-						}
-
-					} else if (propertyData instanceof SelectionTourIds) {
-
-						for (final Long tourId : ((SelectionTourIds) propertyData).getTourIds()) {
-							if (tourDataEditorTourId == tourId) {
-								updatedTourId = tourId;
-								break;
-							}
-						}
-					}
-
 					// update editor
-					if (updatedTourId != null) {
+					if (UI.containsTourId(eventData, tourDataEditorTourId) != null) {
 
+						// reload tour data
 						fTourData = TourManager.getInstance().getTourData(fTourData.getTourId());
 						updateMarkerMap();
 
@@ -1086,7 +1078,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addPropertyListener(fTourEventListener);
 	}
 
 	private void addTourSaveListener() {
@@ -1175,7 +1167,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, false);
 		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, false);
 
-		fActionDeleteTimeSlices = new ActionDeleteTimeSlices(this);
+		fActionDeleteTimeSlicesKeepTime = new ActionDeleteTimeSlicesKeepTime(this);
+		fActionDeleteTimeSlicesRemoveTime = new ActionDeleteTimeSlicesRemoveTime(this);
 
 		fActionCreateTourMarker = new ActionCreateTourMarker(this);
 		fActionDeleteTourMarker = new ActionDeleteTourMarker(this);
@@ -1496,7 +1489,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		addSelectionListener();
 		addPartListener();
 		addPrefListener();
-		addTourPropertyListener();
+		addTourEventListener();
 		addTourSaveListener();
 
 		createActions();
@@ -1808,7 +1801,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			@Override
 			public void keyPressed(final KeyEvent e) {
 				if (e.keyCode == SWT.DEL) {
-					actionDeleteTimeSlices();
+					actionDeleteTimeSlices(true);
 				}
 			}
 		});
@@ -2041,6 +2034,60 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return fSliceContainer;
 	}
 
+	private void defineMarkerViewerColumns(final Composite parent) {
+
+		final PixelConverter pixelConverter = new PixelConverter(parent);
+
+		ColumnDefinition colDef;
+
+		/*
+		 * column: time
+		 */
+		colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(fMarkerColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(UI.formatSeconds(((TourMarker) cell.getElement()).getTime()));
+			}
+		});
+
+		/*
+		 * column: distance
+		 */
+		colDef = TableColumnFactory.DISTANCE.createColumn(fMarkerColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourMarker marker = (TourMarker) cell.getElement();
+				fNumberFormatter.setMinimumFractionDigits(3);
+				fNumberFormatter.setMaximumFractionDigits(3);
+
+				cell.setText(fNumberFormatter.format((marker.getDistance()) / (1000 * UI.UNIT_VALUE_DISTANCE)));
+			}
+		});
+
+		/*
+		 * column: marker
+		 */
+		fColDefMarker = colDef = TableColumnFactory.MARKER.createColumn(fMarkerColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final TourMarker tourMarker = (TourMarker) cell.getElement();
+
+				cell.setText(tourMarker.getLabel());
+
+				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+				}
+			}
+		});
+	}
+
 //	private Control createUITabMarkerOLDOLDOLDOLDOLDOLDOLD(final Composite parent) {
 //
 //		final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
@@ -2116,60 +2163,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //
 //		return tableLayouter;
 //	}
-
-	private void defineMarkerViewerColumns(final Composite parent) {
-
-		final PixelConverter pixelConverter = new PixelConverter(parent);
-
-		ColumnDefinition colDef;
-
-		/*
-		 * column: time
-		 */
-		colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(fMarkerColumnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(UI.formatSeconds(((TourMarker) cell.getElement()).getTime()));
-			}
-		});
-
-		/*
-		 * column: distance
-		 */
-		colDef = TableColumnFactory.DISTANCE.createColumn(fMarkerColumnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourMarker marker = (TourMarker) cell.getElement();
-				fNumberFormatter.setMinimumFractionDigits(3);
-				fNumberFormatter.setMaximumFractionDigits(3);
-
-				cell.setText(fNumberFormatter.format((marker.getDistance()) / (1000 * UI.UNIT_VALUE_DISTANCE)));
-			}
-		});
-
-		/*
-		 * column: marker
-		 */
-		fColDefMarker = colDef = TableColumnFactory.MARKER.createColumn(fMarkerColumnManager, pixelConverter);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final TourMarker tourMarker = (TourMarker) cell.getElement();
-
-				cell.setText(tourMarker.getLabel());
-
-				if (tourMarker.getType() == ChartMarker.MARKER_TYPE_DEVICE) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-				}
-			}
-		});
-	}
 
 	private void defineSliceViewerColumns(final Composite parent) {
 
@@ -2470,7 +2463,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (tourMarker != null) {
 					cell.setText(tourMarker.getLabel());
 
-					if (tourMarker.getType() == ChartMarker.MARKER_TYPE_DEVICE) {
+					if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
 						cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 					}
 
@@ -2556,7 +2549,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removePropertyListener(fTourEventListener);
 		TourManager.getInstance().removeTourSaveListener(fTourSaveListener);
 
 		super.dispose();
@@ -2626,17 +2619,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// add standard group which allows other plug-ins to contribute here
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-		// set the marker which should be selected in the marker dialog
-		final IStructuredSelection selection = (IStructuredSelection) fMarkerViewer.getSelection();
-		fActionOpenMarkerDialog.setSelectedMarker((TourMarker) selection.getFirstElement());
+		// set marker which should be selected in the marker dialog
+		final StructuredSelection markerSelection = (StructuredSelection) fMarkerViewer.getSelection();
+		fActionOpenMarkerDialog.setSelectedMarker((TourMarker) markerSelection.getFirstElement());
 
 		/*
 		 * enable actions
 		 */
+		final boolean isMarkerSelected = markerSelection.size() > 0;
 		final boolean tourInDb = isTourInDb();
 
 		fActionOpenMarkerDialog.setEnabled(tourInDb);
-		fActionDeleteTourMarker.setEnabled(tourInDb);
+		fActionDeleteTourMarker.setEnabled(tourInDb && isMarkerSelected);
 	}
 
 	private void fillSliceContextMenu(final IMenuManager menuMgr) {
@@ -2644,18 +2638,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		menuMgr.add(fActionCreateTourMarker);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(fActionDeleteTimeSlices);
+		menuMgr.add(fActionDeleteTimeSlicesRemoveTime);
+		menuMgr.add(fActionDeleteTimeSlicesKeepTime);
 
 		/*
 		 * enable actions
 		 */
 		final StructuredSelection sliceSelection = (StructuredSelection) fSliceViewer.getSelection();
-		final boolean isOneTimeSlice = sliceSelection.size() == 1;
 
+		final boolean isOneTimeSlice = sliceSelection.size() == 1;
+		final boolean isSliceSelected = sliceSelection.size() > 0;
 		final boolean isTourInDb = isTourInDb();
 
 		fActionCreateTourMarker.setEnabled(isTourInDb && isOneTimeSlice);
-		fActionDeleteTimeSlices.setEnabled(isTourInDb && sliceSelection.size() > 0);
+		fActionDeleteTimeSlicesRemoveTime.setEnabled(isTourInDb && isSliceSelected);
+		fActionDeleteTimeSlicesKeepTime.setEnabled(isTourInDb && isSliceSelected);
 	}
 
 	private void fillToolbar() {
@@ -2693,10 +2690,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 		modifiedTour.add(fTourData);
 
-		final TourProperties propertyData = new TourProperties(modifiedTour);
-		propertyData.isTourEdited = true;
+		final TourEvent propertyData = new TourEvent(modifiedTour);
+		propertyData.isTourModified = true;
 
-		TourManager.firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED, propertyData, TourDataEditorView.this);
+		TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData, TourDataEditorView.this);
 	}
 
 	/**
@@ -2707,10 +2704,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 		modifiedTour.add(fTourData);
 
-		final TourProperties tourProperties = new TourProperties(modifiedTour);
+		final TourEvent tourProperties = new TourEvent(modifiedTour);
 		tourProperties.isReverted = true;
 
-		TourManager.firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED, tourProperties, TourDataEditorView.this);
+		TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourProperties, TourDataEditorView.this);
 	}
 
 	/**
@@ -3284,6 +3281,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return;
 		}
 
+		// ensure that the tour manager contains the same tour data
+		if (fTourData != null) {
+			try {
+				UI.checkTourData(fTourData, TourManager.getInstance().getTourData(fTourData.getTourId()));
+			} catch (final MyTourbookException e) {
+				e.printStackTrace();
+			}
+		}
+
 		if (isTourInSelection(selection)) {
 
 			/*
@@ -3648,14 +3654,49 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		});
 	}
 
+	private void removeTimeAndDistance(final int firstIndex, final int lastIndex) {
+
+		final int[] timeSerie = fTourData.timeSerie;
+		final int[] distSerie = fTourData.distanceSerie;
+
+		if (timeSerie.length == 0) {
+			return;
+		}
+
+		/*
+		 * check if lastIndex is the last time slice, this will already remove time and distance
+		 */
+		if (lastIndex == timeSerie.length - 1) {
+			return;
+		}
+
+		final int timeDiff = timeSerie[lastIndex + 1] - timeSerie[firstIndex];
+		int distDiff = -1;
+
+		if (distSerie != null) {
+			distDiff = distSerie[lastIndex + 1] - distSerie[firstIndex];
+		}
+
+		// update remaining time and distance data series
+		for (int serieIndex = lastIndex + 1; serieIndex < timeSerie.length; serieIndex++) {
+
+			timeSerie[serieIndex] = timeSerie[serieIndex] - timeDiff;
+
+			if (distDiff != -1) {
+				distSerie[serieIndex] = distSerie[serieIndex] - distDiff;
+			}
+		}
+	}
+
 	/**
 	 * Removes markers which are deleted and updates marker serie index which are positioned after
 	 * the deleted time slices
 	 * 
 	 * @param firstSerieIndex
 	 * @param lastSerieIndex
+	 * @param removeTime
 	 */
-	private void removeTourMarkers(final int firstSerieIndex, final int lastSerieIndex) {
+	private void removeTourMarkers(final int firstSerieIndex, final int lastSerieIndex, final boolean removeTime) {
 
 		// check if markers are available
 		final Set<TourMarker> tourMarkers = fTourData.getTourMarkers();
@@ -3671,20 +3712,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			final int markerSerieIndex = tourMarker.getSerieIndex();
 			if (markerSerieIndex >= firstSerieIndex && markerSerieIndex <= lastSerieIndex) {
 				tourMarkers.remove(tourMarker);
-//				System.out.println(tourMarker + " isRemoved: " + isRemoved);
 			}
 		}
 		updateMarkerMap();
 
 		// update marker index
 		final int diffSerieIndex = lastSerieIndex - firstSerieIndex + 1;
+		final int[] timeSerie = fTourData.timeSerie;
+		final int[] distSerie = fTourData.distanceSerie;
 
 		for (final TourMarker tourMarker : fMarkerMap.values()) {
 
 			final int markerSerieIndex = tourMarker.getSerieIndex();
 
 			if (markerSerieIndex > lastSerieIndex) {
-				tourMarker.setSerieIndex(markerSerieIndex - diffSerieIndex);
+				final int serieIndex = markerSerieIndex - diffSerieIndex;
+				tourMarker.setSerieIndex(serieIndex);
+
+				if (removeTime) {
+
+					tourMarker.setTime(timeSerie[serieIndex]);
+
+					if (distSerie != null) {
+						tourMarker.setDistance(distSerie[serieIndex]);
+					}
+				}
 			}
 		}
 		updateMarkerMap();
@@ -3790,9 +3842,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 		modifiedTour.add(fTourData);
 
-		TourManager.firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED,
-				new TourProperties(modifiedTour),
-				TourDataEditorView.this);
+		TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(modifiedTour), TourDataEditorView.this);
 
 		fIsSavingInProgress = false;
 

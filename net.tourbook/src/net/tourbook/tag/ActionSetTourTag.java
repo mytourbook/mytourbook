@@ -144,7 +144,7 @@ public class ActionSetTourTag extends Action implements IMenuCreator {
 	 * @param isAddMode
 	 * @param isSaveTour
 	 *            when <code>true</code> the tour will be saved and a
-	 *            {@link TourManager#TOUR_PROPERTIES_CHANGED} event is fired, otherwise the
+	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
 	 *            {@link TourData} from the tour provider is only updated
 	 */
 	public ActionSetTourTag(final ITourProvider tourProvider, final boolean isAddMode, final boolean isSaveTour) {

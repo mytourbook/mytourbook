@@ -21,21 +21,21 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartMarker;
+import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
@@ -115,7 +115,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	private Label					fPageNoChart;
 	private Composite				fViewerContainer;
 
-	private ITourPropertyListener	fTourPropertyListener;
+	private ITourEventListener	fTourPropertyListener;
 
 	private Chart					fTourChart;
 
@@ -200,18 +200,18 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 	private void addTourPropertyListener() {
 
-		fTourPropertyListener = new ITourPropertyListener() {
+		fTourPropertyListener = new ITourEventListener() {
 			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
+										final TourEventId propertyId,
 										final Object propertyData) {
 
 				if (fTourData == null || part == TourMarkerView.this) {
 					return;
 				}
 
-				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
 
 						// update modified tour
@@ -369,7 +369,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				fNF.setMaximumFractionDigits(1);
 				cell.setText(fNF.format(((float) tourMarker.getDistance()) / 1000 / UI.UNIT_VALUE_DISTANCE));
 
-				if (tourMarker.getType() == ChartMarker.MARKER_TYPE_DEVICE) {
+				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
 					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 				}
 			}

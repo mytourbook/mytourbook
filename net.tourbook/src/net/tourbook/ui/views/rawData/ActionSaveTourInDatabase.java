@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.rawData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,9 +26,13 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceManager;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
-import net.tourbook.tour.SelectionNewTours;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.ui.EmptySelection;
 import net.tourbook.ui.ResizeableListDialog;
 
 import org.eclipse.jface.action.Action;
@@ -47,7 +52,7 @@ public class ActionSaveTourInDatabase extends Action {
 
 	private static final String		MEMENTO_SELECTED_PERSON	= "action-save-tour.selected-person";	//$NON-NLS-1$
 
-	private RawDataView				fViewPart;
+	private RawDataView				fRawDataView;
 
 	private TourPerson				fTourPerson;
 
@@ -85,7 +90,7 @@ public class ActionSaveTourInDatabase extends Action {
 
 	public ActionSaveTourInDatabase(final RawDataView viewPart) {
 
-		fViewPart = viewPart;
+		fRawDataView = viewPart;
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_tour));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_tour_disabled));
@@ -165,11 +170,12 @@ public class ActionSaveTourInDatabase extends Action {
 
 			public void run() {
 
-				boolean isModified = false;
 				boolean saveInDatabase = false;
+				final ArrayList<TourData> savedTours = new ArrayList<TourData>();
+				final ArrayList<Long> savedToursIds = new ArrayList<Long>();
 
 				// get selected tours
-				final IStructuredSelection selection = ((IStructuredSelection) fViewPart.getViewer().getSelection());
+				final IStructuredSelection selection = ((IStructuredSelection) fRawDataView.getViewer().getSelection());
 
 				// loop: all selected tours
 				for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
@@ -196,8 +202,12 @@ public class ActionSaveTourInDatabase extends Action {
 
 							// save the person and or bike when it's not yet set
 							if (saveInDatabase == true) {
-								if (TourDatabase.saveTour(tourData) != null) {
-									isModified = true;
+
+								final TourData savedTour = TourDatabase.saveTour(tourData);
+
+								if (savedTour != null) {
+									savedTours.add(savedTour);
+									savedToursIds.add(savedTour.getTourId());
 								}
 							}
 						}
@@ -205,23 +215,28 @@ public class ActionSaveTourInDatabase extends Action {
 				}
 
 				// update viewer, fire selection event
-				if (isModified) {
+				if (savedToursIds.size() > 0) {
 
-					// update the table viewer
-					fViewPart.reloadViewer();
+					// update raw data map with the saved tour data 
+					final HashMap<Long, TourData> rawDataMap = RawDataManager.getInstance().getTourDataMap();
+					for (final TourData tourData : savedTours) {
+						rawDataMap.put(tourData.getTourId(), tourData);
+					}
 
 					/*
-					 * fire event that new tours have been saved in the database
+					 * the selection provider can contain old tour data which conflicts with the
+					 * tour data in the tour data editor
 					 */
-					final SelectionNewTours selectionNewTours = new SelectionNewTours();
+					fRawDataView.getSite().getSelectionProvider().setSelection(new EmptySelection());
 
-					// activate selection
-					selectionNewTours.setEmpty(false);
+					// update import viewer
+					fRawDataView.reloadViewer();
 
-					fViewPart.fireSelectionEvent(selectionNewTours);
-
-					// deactivate selection
-					selectionNewTours.setEmpty(true);
+					/*
+					 * notify all views, it is not checked if the tour data editor is dirty because
+					 * newly saved tours can not be modified in the tour data editor
+					 */
+					TourManager.fireEvent(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds));
 				}
 			}
 		};
@@ -235,7 +250,7 @@ public class ActionSaveTourInDatabase extends Action {
 			fPeople = TourDatabase.getTourPeople();
 		}
 
-		final ResizeableListDialog dialog = new ResizeableListDialog(fViewPart.getSite().getShell());
+		final ResizeableListDialog dialog = new ResizeableListDialog(fRawDataView.getSite().getShell());
 
 		dialog.setContentProvider(new PeopleContentProvider());
 		dialog.setLabelProvider(new PeopleLabelProvider());

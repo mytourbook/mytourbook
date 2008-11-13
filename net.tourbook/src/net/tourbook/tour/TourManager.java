@@ -173,29 +173,27 @@ public class TourManager {
 		return chartConfig;
 	}
 
-	public static void firePropertyChange(final TourProperty tourProperty) {
-		firePropertyChange(tourProperty, null);
+	public static void fireEvent(final TourEventId tourProperty) {
+		fireEvent(tourProperty, null);
 	}
 
-	public static void firePropertyChange(final TourProperty tourProperty, final ArrayList<TourData> modifiedTours) {
-		firePropertyChange(tourProperty, new TourProperties(modifiedTours));
+	public static void fireEvent(final TourEventId tourProperty, final ArrayList<TourData> modifiedTours) {
+		fireEvent(tourProperty, new TourEvent(modifiedTours)); 
 	}
 
-	public static void firePropertyChange(final TourProperty tourProperty, final Object propertyData) {
+	public static void fireEvent(final TourEventId tourProperty, final Object propertyData) {
 
 		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourPropertyListener) listener).propertyChanged(null, tourProperty, propertyData);
+			((ITourEventListener) listener).propertyChanged(null, tourProperty, propertyData);
 		}
 	}
 
-	public static void firePropertyChange(	final TourProperty tourProperty,
-											final Object propertyData,
-											final IWorkbenchPart part) {
+	public static void fireEvent(final TourEventId tourProperty, final Object propertyData, final IWorkbenchPart part) {
 
 		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourPropertyListener) listener).propertyChanged(part, tourProperty, propertyData);
+			((ITourEventListener) listener).propertyChanged(part, tourProperty, propertyData);
 		}
 	}
 
@@ -340,7 +338,7 @@ public class TourManager {
 
 	/**
 	 * Saves tours which have been modified and updates the tour data editor, fires a
-	 * {@link TourManager#TOUR_PROPERTIES_CHANGED} event.<br>
+	 * {@link TourManager#TOUR_CHANGED} event.<br>
 	 * <br>
 	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
 	 * tour is not dirty, if the tour is dirty, saving is not done. The change event is always
@@ -366,7 +364,7 @@ public class TourManager {
 
 	/**
 	 * Saves tours which have been modified and updates the tour data editor, fires a
-	 * {@link TourManager#TOUR_PROPERTIES_CHANGED} event.<br>
+	 * {@link TourManager#TOUR_CHANGED} event.<br>
 	 * <br>
 	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
 	 * tour is not dirty, if the tour is dirty, saving is not done. The change event is always
@@ -470,9 +468,9 @@ public class TourManager {
 		}
 
 		if (fireChangeEvent) {
-			final TourProperties propertyData = new TourProperties(savedTours);
+			final TourEvent propertyData = new TourEvent(savedTours);
 			propertyData.tourDataEditorSavedTour = tourDataEditorSavedTour;
-			firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED, propertyData);
+			fireEvent(TourEventId.TOUR_CHANGED, propertyData);
 		}
 
 		return savedTours;
@@ -524,7 +522,7 @@ public class TourManager {
 
 	private TourManager() {}
 
-	public void addPropertyListener(final ITourPropertyListener listener) {
+	public void addPropertyListener(final ITourEventListener listener) {
 		fPropertyListeners.add(listener);
 	}
 
@@ -1216,6 +1214,13 @@ public class TourManager {
 				}
 				break;
 
+			case GRAPH_PULSE:
+				if (yDataPulse != null) {
+					chartDataModel.addYData(yDataPulse);
+					chartDataModel.setCustomData(CUSTOM_DATA_PULSE, yDataPulse);
+				}
+				break;
+				
 			case GRAPH_SPEED:
 				if (yDataSpeed != null) {
 					chartDataModel.addYData(yDataSpeed);
@@ -1254,13 +1259,6 @@ public class TourManager {
 			case GRAPH_CADENCE:
 				if (yDataCadence != null) {
 					chartDataModel.addYData(yDataCadence);
-				}
-				break;
-
-			case GRAPH_PULSE:
-				if (yDataPulse != null) {
-					chartDataModel.addYData(yDataPulse);
-					chartDataModel.setCustomData(CUSTOM_DATA_PULSE, yDataPulse);
 				}
 				break;
 
@@ -1383,7 +1381,7 @@ public class TourManager {
 		fTourDataCache.clear();
 	}
 
-	public void removePropertyListener(final ITourPropertyListener listener) {
+	public void removePropertyListener(final ITourEventListener listener) {
 		if (listener != null) {
 			fPropertyListeners.remove(listener);
 		}

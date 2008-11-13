@@ -18,7 +18,7 @@ package net.tourbook.ui.tourChart.action;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
-import net.tourbook.chart.ChartMarker;
+import net.tourbook.chart.ChartLabel;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.data.TourData;
@@ -73,14 +73,18 @@ public class ActionCreateMarker extends Action {
 		}
 
 		final int serieIndex = slider.getValuesIndex();
+		final int[] distSerie = tourData.getMetricDistanceSerie();
 
 		// create a new marker
-		final TourMarker tourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_CUSTOM);
+		final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
 		tourMarker.setSerieIndex(serieIndex);
-		tourMarker.setDistance(tourData.getMetricDistanceSerie()[serieIndex]);
 		tourMarker.setTime(tourData.timeSerie[serieIndex]);
 		tourMarker.setLabel(Messages.TourData_Label_new_marker);
-		tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+		tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+
+		if (distSerie != null) {
+			tourMarker.setDistance(distSerie[serieIndex]);
+		}
 
 		return tourMarker;
 	}

@@ -23,7 +23,7 @@ import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
@@ -102,7 +102,7 @@ class ActionRenameRefTour extends Action {
 								final Long tourId = refTour.getTourData().getTourId();
 								TourManager.getInstance().removeTourFromCache(tourId);
 
-								TourManager.firePropertyChange(TourProperty.UPDATE_UI, new SelectionTourId(tourId));
+								TourManager.fireEvent(TourEventId.UPDATE_UI, new SelectionTourId(tourId));
 							}
 						});
 					}

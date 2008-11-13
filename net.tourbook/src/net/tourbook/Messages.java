@@ -65,7 +65,9 @@ public class Messages extends NLS {
 	public static String		action_tagView_flat_hierarchical;
 	public static String		action_tagView_flat_layout;
 
-	public static String		action_tour_editor_delete_time_slices;
+	public static String	action_tour_editor_delete_time_slices_keep_time;
+
+	public static String	action_tour_editor_delete_time_slices_remove_time;
 
 	public static String	action_tour_editor_delete_tour_marker;
 	public static String		action_tourbook_select_year_month_tours;

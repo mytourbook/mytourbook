@@ -23,8 +23,8 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
@@ -51,7 +51,7 @@ public class ActionRemoveAllTags extends Action {
 	 * @param tourProvider
 	 * @param isSaveTour
 	 *            when <code>true</code> the tour will be saved and a
-	 *            {@link TourManager#TOUR_PROPERTIES_CHANGED} event is fired, otherwise the
+	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
 	 *            {@link TourData} from the tour provider is only modified
 	 */
 	public ActionRemoveAllTags(final ITourProvider tourProvider, final boolean isSaveTour) {
@@ -102,11 +102,11 @@ public class ActionRemoveAllTags extends Action {
 
 					// tours are not saved but the tour provider must be notified
 
-					TourManager.firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED,
-							new TourProperties(selectedTours));
+					TourManager.fireEvent(TourEventId.TOUR_CHANGED,
+							new TourEvent(selectedTours));
 				}
 
-				TourManager.firePropertyChange(TourProperty.NOTIFY_TAG_VIEW, //
+				TourManager.fireEvent(TourEventId.NOTIFY_TAG_VIEW, //
 						new ChangedTags(removedTags, selectedTours, false));
 			}
 		};

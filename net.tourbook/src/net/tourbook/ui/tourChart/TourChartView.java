@@ -26,15 +26,16 @@ import net.tourbook.data.TourData;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEditor;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.ITourChartViewer;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
@@ -76,7 +77,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	private PostSelectionProvider	fPostSelectionProvider;
-	private ITourPropertyListener	fTourPropertyListener;
+	private ITourEventListener	fTourPropertyListener;
 
 	private PageBook				fPageBook;
 	private Label					fPageNoChart;
@@ -129,31 +130,33 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	}
 
 	private void addTourPropertyListener() {
-		fTourPropertyListener = new ITourPropertyListener() {
+
+		fTourPropertyListener = new ITourEventListener() {
+
 			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
+										final TourEventId propertyId,
 										final Object propertyData) {
 
 				if (part == TourChartView.this) {
 					return;
 				}
 
-				if (propertyId == TourProperty.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
+				if (propertyId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
 
-				} else if (propertyId == TourProperty.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+				} else if (propertyId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 					fTourChart.updateTourChart(true, true);
 
-				} else if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				} else if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
 					if (fTourData == null || part == TourChartView.this) {
 						return;
 					}
 
 					// get modified tours
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
 
 						final long chartTourId = fTourData.getTourId();
@@ -162,14 +165,21 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 						for (final TourData tourData : modifiedTours) {
 							if (tourData.getTourId() == chartTourId) {
 
-								// keep changed data
-								fTourData = tourData;
-
 								updateChart(tourData);
-
 								return;
 							}
 						}
+					}
+
+				} else if (propertyId == TourEventId.UPDATE_UI) {
+
+					// check if this tour data editor contains a tour which must be updated
+
+					// update editor
+					if (UI.containsTourId(propertyData, fTourData.getTourId()) != null) {
+
+						// reload tour data and update chart
+						updateChart(TourManager.getInstance().getTourData(fTourData.getTourId()));
 					}
 				}
 			}
@@ -251,7 +261,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private void fireSliderPosition() {
 		Display.getCurrent().asyncExec(new Runnable() {
 			public void run() {
-				TourManager.firePropertyChange(TourProperty.SLIDER_POSITION_CHANGED,
+				TourManager.fireEvent(TourEventId.SLIDER_POSITION_CHANGED,
 						fTourChart.getChartInfo(),
 						TourChartView.this);
 			}

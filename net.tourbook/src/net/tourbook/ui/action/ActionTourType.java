@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 
@@ -42,7 +42,7 @@ class ActionTourType extends Action {
 	 * @param tourProvider
 	 * @param isSaveTour
 	 *            when <code>true</code> the tour will be saved and a
-	 *            {@link TourManager#TOUR_PROPERTIES_CHANGED} event is fired, otherwise the
+	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
 	 *            {@link TourData} from the tour provider is only updated
 	 */
 	public ActionTourType(final TourType tourType, final ITourProvider tourProvider, final boolean isSaveTour) {
@@ -85,8 +85,8 @@ class ActionTourType extends Action {
 
 					// tours are not saved but the tour provider must be notified
 
-					TourManager.firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED,
-							new TourProperties(selectedTours));
+					TourManager.fireEvent(TourEventId.TOUR_CHANGED,
+							new TourEvent(selectedTours));
 				}
 			}
 		};

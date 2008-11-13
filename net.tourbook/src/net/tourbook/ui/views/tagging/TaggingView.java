@@ -37,13 +37,13 @@ import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ITourItem;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
@@ -128,7 +128,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private PostSelectionProvider			fPostSelectionProvider;
 
-	private ITourPropertyListener			fTourPropertyListener;
+	private ITourEventListener			fTourPropertyListener;
 	private ISelectionListener				fPostSelectionListener;
 
 	private ActionSetTourTag				fActionAddTag;
@@ -380,16 +380,16 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private void addTourPropertyListener() {
 
-		fTourPropertyListener = new ITourPropertyListener() {
+		fTourPropertyListener = new ITourEventListener() {
 			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
+										final TourEventId propertyId,
 										final Object propertyData) {
 
 				if (part == TaggingView.this) {
 					return;
 				}
 
-				if (propertyId == TourProperty.NOTIFY_TAG_VIEW) {
+				if (propertyId == TourEventId.NOTIFY_TAG_VIEW) {
 					if (propertyData instanceof ChangedTags) {
 
 						final ChangedTags changedTags = (ChangedTags) propertyData;
@@ -404,13 +404,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 						updateViewerAfterTagStructureIsModified(fRootItem, changedTagsClone, isAddMode);
 					}
 
-				} else if (propertyId == TourProperty.TAG_STRUCTURE_CHANGED) {
+				} else if (propertyId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
 					reloadViewer();
 
-				} else if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				} else if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
-					final ArrayList<TourData> modifiedTours = ((TourProperties) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
 					if (modifiedTours != null) {
 						updateViewerAfterTourIsModified(fRootItem, modifiedTours);
 					}

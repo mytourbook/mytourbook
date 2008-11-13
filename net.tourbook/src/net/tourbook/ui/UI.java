@@ -34,8 +34,10 @@ import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 
@@ -256,6 +258,10 @@ public class UI {
 	 */
 	public static boolean checkTourData(final TourData tourData1, final TourData tourData2) throws MyTourbookException {
 
+		if (tourData1 == null || tourData2 == null) {
+			return true;
+		}
+		
 		if (tourData1.getTourId().longValue() == tourData2.getTourId().longValue() && tourData1 != tourData2) {
 
 			final String errorMessage = "This error should not happen and occures when the internal structure of the application is corrupted. " //$NON-NLS-1$
@@ -275,6 +281,38 @@ public class UI {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checks if tour id is contained in the property data
+	 * 
+	 * @param propertyData
+	 * @param checkedTourId
+	 * @return Returns the tour id when it is contained in the property data, otherwise it returns
+	 *         <code>null</code>
+	 */
+	public static Long containsTourId(final Object propertyData, final long checkedTourId) {
+
+		Long containedTourId = null;
+
+		if (propertyData instanceof SelectionTourId) {
+
+			final Long tourId = ((SelectionTourId) propertyData).getTourId();
+			if (checkedTourId == tourId) {
+				containedTourId = tourId;
+			}
+
+		} else if (propertyData instanceof SelectionTourIds) {
+
+			for (final Long tourId : ((SelectionTourIds) propertyData).getTourIds()) {
+				if (checkedTourId == tourId) {
+					containedTourId = tourId;
+					break;
+				}
+			}
+		}
+
+		return containedTourId;
 	}
 
 	public static final String formatSeconds(final long value) {
@@ -307,7 +345,7 @@ public class UI {
 	 * @return Returns {@link TourData} from the propertyData or <code>null</code> when it's another
 	 *         tour
 	 */
-	public static TourData getTourPropertyTourData(final TourProperties propertyData, final TourData oldTourData) {
+	public static TourData getTourPropertyTourData(final TourEvent propertyData, final TourData oldTourData) {
 
 		final ArrayList<TourData> modifiedTours = propertyData.getModifiedTours();
 		if (modifiedTours == null) {
@@ -885,5 +923,4 @@ public class UI {
 
 		return existingImage;
 	}
-
 }

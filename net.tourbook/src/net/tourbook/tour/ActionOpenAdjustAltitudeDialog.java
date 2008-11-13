@@ -79,9 +79,9 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 
 					final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
 					modifiedTours.add(tourData);
-					final TourProperties propertyData = new TourProperties(modifiedTours);
+					final TourEvent propertyData = new TourEvent(modifiedTours);
 
-					TourManager.firePropertyChange(TourProperty.TOUR_PROPERTIES_CHANGED, propertyData);
+					TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData);
 				}
 			}
 		}

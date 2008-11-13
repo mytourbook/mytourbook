@@ -26,6 +26,7 @@ import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.util.PostSelectionProvider;
@@ -64,7 +65,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	private PostSelectionProvider	fPostSelectionProvider;
 	private ISelectionListener		fPostSelectionListener;
 	private IPartListener2			fPartListener;
-	private ITourPropertyListener	fTourPropertyListener;
+	private ITourEventListener	fTourPropertyListener;
 
 	private void addPartListener() {
 
@@ -136,30 +137,30 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 	private void addTourPropertyListener() {
 
-		fTourPropertyListener = new ITourPropertyListener() {
+		fTourPropertyListener = new ITourEventListener() {
 			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
+										final TourEventId propertyId,
 										final Object propertyData) {
 
 				if (part == TourEditor.this) {
 					return;
 				}
 
-				if (propertyId == TourProperty.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED) {
+				if (propertyId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
 					fTourChart.updateSegmentLayer((Boolean) propertyData);
 
-				} else if (propertyId == TourProperty.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+				} else if (propertyId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 					fTourChart.updateTourChart(true);
 
-				} else if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				} else if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
 					if (fTourData == null) {
 						return;
 					}
 
-					final TourProperties tourProperties = (TourProperties) propertyData;
+					final TourEvent tourProperties = (TourEvent) propertyData;
 
 					// get modified tours
 					final ArrayList<TourData> modifiedTours = tourProperties.getModifiedTours();
@@ -172,23 +173,34 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 							final TourData tourData = (TourData) object;
 							if (tourData.getTourId() == tourId) {
 
-								updateTour(tourData);
+								updateChart(tourData);
 
 								// exit here because only one tourdata can be inside a tour editor
 								return;
 							}
 						}
 					}
+
+				} else if (propertyId == TourEventId.UPDATE_UI) {
+
+					// check if this tour viewer contains a tour which must be updated
+
+					// update editor
+					if (UI.containsTourId(propertyData, fTourData.getTourId()) != null) {
+
+						// reload tour data and update chart
+						updateChart(TourManager.getInstance().getTourData(fTourData.getTourId()));
+					}
 				}
 			}
 
-			private void updateTour(final TourData tourData) {
-
+			private void updateChart(final TourData tourData) {
+				
 				// keep modified data
 				fTourData = tourData;
-
+				
 				// update chart
-				fTourChart.updateTourChart(fTourData, false);
+				fTourChart.updateTourChart(tourData, false);
 			}
 		};
 

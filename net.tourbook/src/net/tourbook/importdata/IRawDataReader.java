@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -23,6 +23,11 @@ import net.tourbook.data.TourData;
 public interface IRawDataReader {
 
 	/**
+	 * @return returns the profile name for the profile id
+	 */
+	public String getDeviceModeName(int modeId);
+
+	/**
 	 * @return Returns the complete data size which will be received on the COM port for this device
 	 */
 	public int getTransferDataSize();
@@ -36,7 +41,7 @@ public interface IRawDataReader {
 	 * @return Returns <code>true</code> when the import was successfull, the parameters
 	 *         <code>deviceData</code> and <code>tourData</code> are set from the imported file.
 	 */
-	public boolean processDeviceData(String fileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap);
+	public boolean processDeviceData(String fileName, DeviceData deviceData, HashMap<Long, TourData> tourDataMap);
 
 	/**
 	 * Validate data format
@@ -46,10 +51,5 @@ public interface IRawDataReader {
 	 * @return return <code>true</code> when the file has the format for this device reader
 	 */
 	public boolean validateRawData(String fileName);
-
-	/**
-	 * @return returns the profile name for the profile id
-	 */
-	public String getDeviceModeName(int modeId);
 
 }

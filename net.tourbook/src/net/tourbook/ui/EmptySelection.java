@@ -13,27 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
  *******************************************************************************/
-package net.tourbook.ui.views.tourDataEditor;
+package net.tourbook.ui;
 
-import net.tourbook.Messages;
-import net.tourbook.plugin.TourbookPlugin;
+import org.eclipse.jface.viewers.ISelection;
 
-import org.eclipse.jface.action.Action;
+public class EmptySelection implements ISelection {
 
-class ActionDeleteTimeSlices extends Action {
-
-	private final TourDataEditorView	fTourPropertiesView;
-
-	public ActionDeleteTimeSlices(final TourDataEditorView tourPropertiesView) {
-
-		super(Messages.action_tour_editor_delete_time_slices, AS_PUSH_BUTTON);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
-
-		fTourPropertiesView = tourPropertiesView;
+	public boolean isEmpty() {
+		return true;
 	}
 
-	@Override
-	public void run() {
-		fTourPropertiesView.actionDeleteTimeSlices();
-	}
 }

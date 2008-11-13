@@ -27,14 +27,14 @@ import net.tourbook.data.TourSegment;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEditor;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
 import net.tourbook.ui.ColumnDefinition;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourViewer;
@@ -128,7 +128,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private ISelectionListener		fPostSelectionListener;
 	private IPartListener2			fPartListener;
 	private IPropertyChangeListener	fPrefChangeListener;
-	private ITourPropertyListener	fTourPropertyListener;
+	private ITourEventListener		fTourPropertyListener;
 
 	private PostSelectionProvider	fPostSelectionProvider;
 
@@ -322,6 +322,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fPostSelectionListener = new ISelectionListener() {
 
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+				if (part == TourSegmenterView.this) {
+					return;
+				}
 				onSelectionChanged(selection);
 			}
 		};
@@ -331,19 +334,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void addTourPropertyListener() {
 
-		fTourPropertyListener = new ITourPropertyListener() {
-			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
-										final Object propertyData) {
+		fTourPropertyListener = new ITourEventListener() {
+			public void propertyChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (fTourData == null || part == TourSegmenterView.this) {
 					return;
 				}
 
-				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					final TourProperties tourProperties = (TourProperties) propertyData;
-					final ArrayList<TourData> modifiedTours = tourProperties.getModifiedTours();
+					final TourEvent tourEvent = (TourEvent) eventData;
+					final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
 					if (modifiedTours == null || modifiedTours.size() == 0) {
 						return;
@@ -356,7 +357,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 						// update existing tour
 
-						if (tourProperties.isReverted) {
+						if (tourEvent.isReverted) {
 
 							/*
 							 * tour is reverted, saving existing tour is not necessary, just update
@@ -367,9 +368,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 							// all done
 							return;
 						}
-					}
 
-					onSelectionChanged(new SelectionTourData(null, modifiedTourData));
+						createSegments();
+						reloadViewer();
+
+					} else {
+
+						onSelectionChanged(new SelectionTourData(null, modifiedTourData));
+					}
 				}
 			}
 		};
@@ -500,6 +506,35 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fLabelToleranceValue = new Label(segmentContainer, SWT.NONE);
 		fLabelToleranceValue.setText(Messages.Tour_Segmenter_Label_default_tolerance);
 		fLabelToleranceValue.setLayoutData(gd);
+	}
+
+	/**
+	 * create points for the simplifier from distance and altitude
+	 */
+	private void createSegments() {
+
+		final int[] distanceSerie = fTourData.getMetricDistanceSerie();
+		final int[] altitudeSerie = fTourData.altitudeSerie;
+
+		final Point graphPoints[] = new Point[distanceSerie.length];
+		for (int iPoint = 0; iPoint < graphPoints.length; iPoint++) {
+			graphPoints[iPoint] = new Point(distanceSerie[iPoint], altitudeSerie[iPoint], iPoint);
+		}
+
+		final DouglasPeuckerSimplifier dpSimplifier = new DouglasPeuckerSimplifier(fDpTolerance, graphPoints);
+		final Object[] simplePoints = dpSimplifier.simplify();
+
+		/*
+		 * copie the data index for the simplified points into the tour data
+		 */
+		fTourData.segmentSerieIndex = new int[simplePoints.length];
+
+		final int[] segmentSerieIndex = fTourData.segmentSerieIndex;
+
+		for (int iPoint = 0; iPoint < simplePoints.length; iPoint++) {
+			final Point point = (Point) simplePoints[iPoint];
+			segmentSerieIndex[iPoint] = point.serieIndex;
+		}
 	}
 
 	private void createSegmentViewer(final Composite parent) {
@@ -757,9 +792,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void fireSegmentLayerChanged() {
 
 		// show/hide the segments in the chart
-		TourManager.firePropertyChange(TourProperty.TOUR_PROPERTY_SEGMENT_LAYER_CHANGED,
-				fShowSegmentsInChart,
-				TourSegmenterView.this);
+		TourManager.fireEvent(TourEventId.SEGMENT_LAYER_CHANGED, fShowSegmentsInChart, TourSegmenterView.this);
 	}
 
 	/**
@@ -921,29 +954,30 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		if (nextTourData == null || nextTourData.altitudeSerie == null || nextTourData.getMetricDistanceSerie() == null) {
 
 			fPageBook.showPage(fPageNoChart);
+			fTourData = null;
+			fTourChart = null;
 			return;
 		}
 
 		/*
 		 * save previous tour when a new tour is selected
 		 */
-		if (saveTourData()) {
-			// saving a tour fires a property change
-//			return;
+		if (fTourData != null && fTourData.getTourId() == nextTourData.getTourId()) {
+
+			// do nothing, it's the same tour
+
+		} else {
+
+			saveTourData();
+
+			if (nextTourChart == null) {
+				nextTourChart = getActiveTourChart(nextTourData);
+			}
+
+			fTourChart = nextTourChart;
+
+			setTour(nextTourData);
 		}
-
-//		if (nextTourChart == null) {
-//			int a = 0;
-//			a++;
-//		}
-
-		if (nextTourChart == null) {
-			nextTourChart = getActiveTourChart(nextTourData);
-		}
-
-		fTourChart = nextTourChart;
-
-		setTour(nextTourData);
 	}
 
 	private void onToleranceChanged(final int dpTolerance, final boolean forceRecalc) {
@@ -960,29 +994,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		// update tolerance into the tour data
 		fTourData.setDpTolerance((short) dpTolerance);
 
-		// create points for the simplifier from distance and altitude
-		final int[] distanceSerie = fTourData.getMetricDistanceSerie();
-		final int[] altitudeSerie = fTourData.altitudeSerie;
-
-		final Point graphPoints[] = new Point[distanceSerie.length];
-		for (int iPoint = 0; iPoint < graphPoints.length; iPoint++) {
-			graphPoints[iPoint] = new Point(distanceSerie[iPoint], altitudeSerie[iPoint], iPoint);
-		}
-
-		final DouglasPeuckerSimplifier dpSimplifier = new DouglasPeuckerSimplifier(dpTolerance, graphPoints);
-		final Object[] simplePoints = dpSimplifier.simplify();
-
-		/*
-		 * copie the data index for the simplified points into the tour data
-		 */
-		fTourData.segmentSerieIndex = new int[simplePoints.length];
-
-		final int[] segmentSerieIndex = fTourData.segmentSerieIndex;
-
-		for (int iPoint = 0; iPoint < simplePoints.length; iPoint++) {
-			final Point point = (Point) simplePoints[iPoint];
-			segmentSerieIndex[iPoint] = point.serieIndex;
-		}
+		createSegments();
 
 		// update table and create the tour segments in tour data
 		reloadViewer();

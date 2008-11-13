@@ -23,7 +23,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 
@@ -83,6 +83,6 @@ public class ActionCreateRefTour extends Action {
 		TourManager.saveModifiedTours(modifiedTours);
 
 		// update tour catalog view
-		TourManager.firePropertyChange(TourProperty.REFERENCE_TOUR_IS_CREATED);
+		TourManager.fireEvent(TourEventId.REFERENCE_TOUR_IS_CREATED);
 	}
 }

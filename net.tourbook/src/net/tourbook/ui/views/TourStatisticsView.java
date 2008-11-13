@@ -24,12 +24,11 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContainer;
 import net.tourbook.statistic.TourbookStatistic;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionNewTours;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperties;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
@@ -91,7 +90,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	protected Long					fActiveTourId;
 
-	private ITourPropertyListener	fTourPropertyListener;
+	private ITourEventListener	fTourPropertyListener;
 	private ISelectionListener		fPostSelectionListener;
 
 	private void addPartListener() {
@@ -182,11 +181,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-				if (selection instanceof SelectionNewTours) {
-
-					refreshStatistics();
-
-				} else if (selection instanceof SelectionDeletedTours) {
+				if (selection instanceof SelectionDeletedTours) {
 
 					refreshStatistics();
 				}
@@ -199,23 +194,26 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	private void addTourPropertyListener() {
 
-		fTourPropertyListener = new ITourPropertyListener() {
+		fTourPropertyListener = new ITourEventListener() {
 			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
+										final TourEventId propertyId,
 										final Object propertyData) {
 
-				if (propertyId == TourProperty.TOUR_PROPERTIES_CHANGED && propertyData instanceof TourProperties) {
+				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
 					if (part == TourStatisticsView.this) {
 						return;
 					}
 
-					if (((TourProperties) propertyData).isTourEdited) {
+					if (((TourEvent) propertyData).isTourModified) {
 						// ignore edit changes
 						return;
 					}
 
 					// update statistics
+					refreshStatistics();
+
+				} else if (propertyId == TourEventId.UPDATE_UI) {
 					refreshStatistics();
 				}
 			}

@@ -34,9 +34,9 @@ import net.tourbook.colors.GraphColorProvider;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.ActionSelectYears;
-import net.tourbook.tour.ITourPropertyListener;
+import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.UI;
 import net.tourbook.util.ArrayListToArray;
 import net.tourbook.util.PostSelectionProvider;
@@ -96,7 +96,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	 */
 	private StructuredSelection					fCurrentSelection;
 
-	private ITourPropertyListener				fCompareTourPropertyListener;
+	private ITourEventListener				fCompareTourPropertyListener;
 
 	private IPropertyChangeListener				fPrefChangeListener;
 	private IPartListener2						fPartListener;
@@ -139,12 +139,12 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 
 	private void addCompareTourPropertyListener() {
 
-		fCompareTourPropertyListener = new ITourPropertyListener() {
+		fCompareTourPropertyListener = new ITourEventListener() {
 			public void propertyChanged(final IWorkbenchPart part,
-										final TourProperty propertyId,
+										final TourEventId propertyId,
 										final Object propertyData) {
 
-				if (propertyId == TourProperty.TOUR_PROPERTY_COMPARE_TOUR_CHANGED
+				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyCompareTourChanged) {
 
 					final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;

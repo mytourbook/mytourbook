@@ -25,8 +25,9 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartLabel;
+import net.tourbook.chart.ChartLabelLayer;
 import net.tourbook.chart.ChartMarker;
-import net.tourbook.chart.ChartMarkerLayer;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.data.TourData;
@@ -93,9 +94,9 @@ public class TourChart extends Chart {
 	public static final String				COMMAND_ID_GRAPH_TOUR_COMPARE			= "net.tourbook.command.graph.tourCompare";					//$NON-NLS-1$
 
 	static final String						SEGMENT_VALUES							= "segmentValues";												//$NON-NLS-1$
- 
+
 	private TourData						fTourData;
-	private TourChartConfiguration					fTourChartConfig;
+	private TourChartConfiguration			fTourChartConfig;
 
 	private Map<String, TCActionProxy>		fActionProxies;
 
@@ -113,13 +114,15 @@ public class TourChart extends Chart {
 
 	private ITourModifyListener				fTourModifyListener;
 	private IPropertyChangeListener			fPrefChangeListener;
-	private ChartMarkerLayer				fMarkerLayer;
 
+	private ChartLabelLayer					fLabelLayer;
 	private ChartSegmentLayer				fSegmentLayer;
 	private ChartSegmentValueLayer			fSegmentValueLayer;
-	private boolean							fIsTourDirty;
 
 	private boolean							fIsSegmentLayerVisible;
+
+	private boolean							fIsTourDirty;
+
 	public TourChart(final Composite parent, final int style, final boolean showActions) {
 
 		super(parent, style);
@@ -384,46 +387,41 @@ public class TourChart extends Chart {
 	/**
 	 * create the layer which displays the tour marker
 	 */
-	private void createMarkerLayer() {
+	private void createLabelLayer() {
 
 		// set data serie for the x-axis
 		final int[] xAxisSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
 
-		fMarkerLayer = new ChartMarkerLayer();
-		fMarkerLayer.setLineColor(new RGB(50, 100, 10));
+		fLabelLayer = new ChartLabelLayer();
+		fLabelLayer.setLineColor(new RGB(50, 100, 10));
 
 		final Collection<TourMarker> tourMarkerList = fTourData.getTourMarkers();
-		final int[] altitudeSerie = fTourData.altitudeSerie;
 
 		for (final TourMarker tourMarker : tourMarkerList) {
 
-			final ChartMarker chartMarker = new ChartMarker();
+			final ChartLabel chartLabel = new ChartLabel();
 
 			final int markerIndex = Math.min(tourMarker.getSerieIndex(), xAxisSerie.length - 1);
 
-			chartMarker.graphX = xAxisSerie[markerIndex];
+			chartLabel.graphX = xAxisSerie[markerIndex];
+			chartLabel.serieIndex = markerIndex;
 
-			chartMarker.markerLabel = tourMarker.getLabel();
-			if (altitudeSerie != null) {
-				chartMarker.graphLabel = Integer.toString(altitudeSerie[markerIndex]);
-			}
+			chartLabel.markerLabel = tourMarker.getLabel();
+			chartLabel.visualPosition = tourMarker.getVisualPosition();
+			chartLabel.type = tourMarker.getType();
+			chartLabel.visualType = tourMarker.getVisibleType();
 
-			chartMarker.serieIndex = markerIndex;
-			chartMarker.visualPosition = tourMarker.getVisualPosition();
-			chartMarker.type = tourMarker.getType();
-			chartMarker.visualType = tourMarker.getVisibleType();
+			chartLabel.labelXOffset = tourMarker.getLabelXOffset();
+			chartLabel.labelYOffset = tourMarker.getLabelYOffset();
 
-			chartMarker.labelXOffset = tourMarker.getLabelXOffset();
-			chartMarker.labelYOffset = tourMarker.getLabelYOffset();
-
-			fMarkerLayer.addMarker(chartMarker);
+			fLabelLayer.addLabel(chartLabel);
 		}
 	}
 
 	/**
 	 * Creates the layers from the segmented tour data
 	 */
-	private void createSegmentLayers() {
+	private void createSegmentLayer() {
 
 		if (fTourData == null) {
 			return;
@@ -438,6 +436,9 @@ public class TourChart extends Chart {
 
 		final int[] xDataSerie = fTourChartConfig.showTimeOnXAxis ? fTourData.timeSerie : fTourData.getDistanceSerie();
 
+		/*
+		 * create segment layer
+		 */
 		fSegmentLayer = new ChartSegmentLayer();
 		fSegmentLayer.setLineColor(new RGB(0, 177, 219));
 
@@ -451,6 +452,9 @@ public class TourChart extends Chart {
 			fSegmentLayer.addMarker(chartMarker);
 		}
 
+		/*
+		 * create segment value layer
+		 */
 		fSegmentValueLayer = new ChartSegmentValueLayer();
 		fSegmentValueLayer.setLineColor(new RGB(231, 104, 38));
 		fSegmentValueLayer.setTourData(fTourData);
@@ -884,40 +888,42 @@ public class TourChart extends Chart {
 	 */
 	private void setGraphLayers() {
 
-		final ArrayList<IChartLayer> customLayers = new ArrayList<IChartLayer>();
-		final ArrayList<IChartLayer> segmentValueLayers = new ArrayList<IChartLayer>();
-
-		if (fSegmentLayer != null) {
-			customLayers.add(fSegmentLayer);
-		}
-
-		if (fSegmentValueLayer != null) {
-			segmentValueLayers.add(fSegmentValueLayer);
-		}
-
-		if (fMarkerLayer != null) {
-			customLayers.add(fMarkerLayer);
-		}
-
-		ChartDataYSerie yData;
-
 		final ChartDataModel dataModel = getChartDataModel();
-
 		if (dataModel == null) {
 			return;
 		}
 
-		yData = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
-		if (yData != null) {
-			yData.setCustomLayers(customLayers);
+		ChartDataYSerie yDataWithLabels;
+
+		// get y-data which is displayed, this graph will display the tour markers
+		yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
+
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_PULSE);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_SPEED);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_PACE);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_POWER);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_GRADIENT);
+		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTIMETER);
 		}
 
-		setSegmentLayer(segmentValueLayers, fTourData.segmentSeriePulse, TourManager.CUSTOM_DATA_PULSE);
-		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieSpeed, TourManager.CUSTOM_DATA_SPEED);
-		setSegmentLayer(segmentValueLayers, fTourData.segmentSeriePace, TourManager.CUSTOM_DATA_PACE);
-		setSegmentLayer(segmentValueLayers, fTourData.segmentSeriePower, TourManager.CUSTOM_DATA_POWER);
-		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieGradient, TourManager.CUSTOM_DATA_GRADIENT);
-		setSegmentLayer(segmentValueLayers, fTourData.segmentSerieAltimeter, TourManager.CUSTOM_DATA_ALTIMETER);
+		setYDataLayers(TourManager.CUSTOM_DATA_ALTITUDE, fTourData.segmentSerieAltitude, yDataWithLabels);
+		setYDataLayers(TourManager.CUSTOM_DATA_PULSE, fTourData.segmentSeriePulse, yDataWithLabels);
+		setYDataLayers(TourManager.CUSTOM_DATA_SPEED, fTourData.segmentSerieSpeed, yDataWithLabels);
+		setYDataLayers(TourManager.CUSTOM_DATA_PACE, fTourData.segmentSeriePace, yDataWithLabels);
+		setYDataLayers(TourManager.CUSTOM_DATA_POWER, fTourData.segmentSeriePower, yDataWithLabels);
+		setYDataLayers(TourManager.CUSTOM_DATA_GRADIENT, fTourData.segmentSerieGradient, yDataWithLabels);
+		setYDataLayers(TourManager.CUSTOM_DATA_ALTIMETER, fTourData.segmentSerieAltimeter, yDataWithLabels);
 	}
 
 	private boolean setMinDefaultValue(	final String property,
@@ -974,18 +980,6 @@ public class TourChart extends Chart {
 		enableZoomOptions();
 	}
 
-	private void setSegmentLayer(	final ArrayList<IChartLayer> segmentValueLayers,
-									final float[] segmentSerie,
-									final String customDataKey) {
-
-		final ChartDataYSerie yData = (ChartDataYSerie) getChartDataModel().getCustomData(customDataKey);
-
-		if (yData != null) {
-			yData.setCustomLayers(segmentValueLayers);
-			yData.setCustomData(SEGMENT_VALUES, segmentSerie);
-		}
-	}
-
 	/**
 	 * set tour dirty to save the tour when the tour is closed
 	 */
@@ -995,6 +989,39 @@ public class TourChart extends Chart {
 
 		if (fTourModifyListener != null) {
 			fTourModifyListener.tourIsModified();
+		}
+	}
+
+	private void setYDataLayers(final String customDataKey,
+								final Object segmentDataSerie,
+								final ChartDataYSerie yDataWithLabels) {
+
+		final ChartDataModel dataModel = getChartDataModel();
+		final ChartDataYSerie yData = (ChartDataYSerie) dataModel.getCustomData(customDataKey);
+
+		if (yData != null) {
+
+			final ArrayList<IChartLayer> chartLayers = new ArrayList<IChartLayer>();
+
+			// show label layer at ONE visible graph
+			if (fLabelLayer != null && yData == yDataWithLabels) {
+				chartLayers.add(fLabelLayer);
+			}
+
+			final ChartDataYSerie yDataAltitude = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTITUDE);
+
+			if (yData == yDataAltitude) {
+				if (fSegmentLayer != null) {
+					chartLayers.add(fSegmentLayer);
+				}
+			} else {
+				if (fSegmentValueLayer != null) {
+					chartLayers.add(fSegmentValueLayer);
+				}
+			}
+
+			yData.setCustomLayers(chartLayers);
+			yData.setCustomData(SEGMENT_VALUES, segmentDataSerie);
 		}
 	}
 
@@ -1065,7 +1092,7 @@ public class TourChart extends Chart {
 
 	@Override
 	public String toString() {
-		
+
 		final StringBuilder sb = new StringBuilder();
 
 		sb.append(this.getClass().getSimpleName());
@@ -1085,9 +1112,9 @@ public class TourChart extends Chart {
 	public void updateMarkerLayer(final boolean showLayer) {
 
 		if (showLayer) {
-			createMarkerLayer();
+			createLabelLayer();
 		} else {
-			fMarkerLayer = null;
+			fLabelLayer = null;
 		}
 
 		setGraphLayers();
@@ -1102,7 +1129,7 @@ public class TourChart extends Chart {
 		fIsSegmentLayerVisible = showLayer;
 
 		if (fIsSegmentLayerVisible) {
-			createSegmentLayers();
+			createSegmentLayer();
 		} else {
 			fSegmentLayer = null;
 			fSegmentValueLayer = null;
@@ -1201,8 +1228,9 @@ public class TourChart extends Chart {
 			fChartDataModelListener.dataModelChanged(newChartDataModel);
 		}
 
-		createSegmentLayers();
-		createMarkerLayer();
+		createSegmentLayer();
+		createLabelLayer();
+
 		setGraphLayers();
 
 		updateChart(newChartDataModel);
@@ -1234,6 +1262,5 @@ public class TourChart extends Chart {
 		fActionProxies.get(COMMAND_ID_CAN_AUTO_ZOOM_TO_SLIDER).setEnabled(isEnabled);
 		fActionProxies.get(COMMAND_ID_CAN_MOVE_SLIDERS_WHN_ZOOMED).setEnabled(isEnabled);
 	}
-
 
 }

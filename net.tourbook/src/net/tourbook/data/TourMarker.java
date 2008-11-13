@@ -23,13 +23,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.Messages;
-import net.tourbook.chart.ChartMarker;
+import net.tourbook.chart.ChartLabel;
 
 @Entity
 public class TourMarker implements Cloneable {
 
 	/**
-	 * visual position for markers, they must correspond to the position in {@link ChartMarker}
+	 * visual position for markers, they must correspond to the position in {@link ChartLabel}
 	 */
 	@Transient
 	public static final String[]	visualPositionLabels	= new String[] {
@@ -58,8 +58,8 @@ public class TourMarker implements Cloneable {
 	private TourData				tourData;
 
 	/**
-	 * Contains the marker type which is defined in {@link ChartMarker} like
-	 * {@link ChartMarker#MARKER_TYPE_DEVICE}
+	 * Contains the marker type which is defined in {@link ChartLabel} like
+	 * {@link ChartLabel#MARKER_TYPE_DEVICE}
 	 */
 	private int						type;
 
@@ -94,11 +94,19 @@ public class TourMarker implements Cloneable {
 	@Transient
 	private int						visibleType;
 
+	/**
+	 * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
+	 * not persisted
+	 */
+	@Transient
+	private long					createId;
+
 	public TourMarker() {}
 
 	public TourMarker(final TourData tourData, final int markerType) {
 		this.tourData = tourData;
 		this.type = markerType;
+		this.createId = System.currentTimeMillis();
 	}
 
 	public TourMarker(final TourMarker tourMarker) {
@@ -115,6 +123,7 @@ public class TourMarker implements Cloneable {
 		time = tourMarker.time;
 		type = tourMarker.type;
 		visualPosition = tourMarker.visualPosition;
+		createId = tourMarker.createId;
 
 		tourData = tourMarker.tourData;
 	}
@@ -183,6 +192,9 @@ public class TourMarker implements Cloneable {
 			return false;
 		}
 		final TourMarker other = (TourMarker) obj;
+		if (createId != other.createId) {
+			return false;
+		}
 		if (markerId != other.markerId) {
 			return false;
 		}
@@ -252,6 +264,7 @@ public class TourMarker implements Cloneable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (int) (createId ^ (createId >>> 32));
 		result = prime * result + (int) (markerId ^ (markerId >>> 32));
 		return result;
 	}

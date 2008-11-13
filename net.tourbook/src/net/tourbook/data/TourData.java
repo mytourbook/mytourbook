@@ -42,7 +42,7 @@ import javax.persistence.PostUpdate;
 import javax.persistence.Transient;
 
 import net.tourbook.Messages;
-import net.tourbook.chart.ChartMarker;
+import net.tourbook.chart.ChartLabel;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
@@ -1464,9 +1464,9 @@ public class TourData {
 								final int distanceAbsolute) {
 
 		// create a new marker
-		final TourMarker tourMarker = new TourMarker(this, ChartMarker.MARKER_TYPE_DEVICE);
+		final TourMarker tourMarker = new TourMarker(this, ChartLabel.MARKER_TYPE_DEVICE);
 
-		tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+		tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 		tourMarker.setTime(timeAbsolute + timeData.marker);
 		tourMarker.setDistance(distanceAbsolute);
 		tourMarker.setSerieIndex(timeIndex);
@@ -1490,7 +1490,6 @@ public class TourData {
 	public void createTimeSeries(final ArrayList<TimeData> timeDataList, final boolean isCreateMarker) {
 
 		final int serieLength = timeDataList.size();
-
 		if (serieLength == 0) {
 			return;
 		}
@@ -1915,43 +1914,45 @@ public class TourData {
 	 * 
 	 * @param uniqueKey
 	 *            unique key to identify a tour
+	 * @return
 	 */
-	public void createTourId(final String uniqueKey) {
+	public Long createTourId(final String uniqueKey) {
 
 //		final String uniqueKey = Integer.toString(Math.abs(getStartDistance()));
 
-		String tourId;
+		String tourIdKey;
 
 		try {
 			/*
 			 * this is the default implementation to create a tour id, but on the 5.5.2007 a
 			 * NumberFormatException occured so the calculation for the tour id was adjusted
 			 */
-			tourId = Short.toString(getStartYear())
+			tourIdKey = Short.toString(getStartYear())
 					+ Short.toString(getStartMonth())
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
 					+ uniqueKey;
 
-			setTourId(Long.parseLong(tourId));
+			tourId = Long.parseLong(tourIdKey);
 
 		} catch (final NumberFormatException e) {
 
 			/*
-			 * the distance was shorted so that the maximum of a Long datatype is not exceeded
+			 * the distance is shorted that the maximum of a Long datatype is not exceeded
 			 */
 
-			tourId = Short.toString(getStartYear())
+			tourIdKey = Short.toString(getStartYear())
 					+ Short.toString(getStartMonth())
 					+ Short.toString(getStartDay())
 					+ Short.toString(getStartHour())
 					+ Short.toString(getStartMinute())
 					+ uniqueKey.substring(0, Math.min(5, uniqueKey.length()));
 
-			setTourId(Long.parseLong(tourId));
+			tourId = Long.parseLong(tourIdKey);
 		}
 
+		return tourId;
 	}
 
 	/**
@@ -3187,16 +3188,12 @@ public class TourData {
 		this.tourEndPlace = tourEndPlace;
 	}
 
-	public void setTourId(final Long tourId) {
-		this.tourId = tourId;
-	}
-
 	public void setTourMarkers(final HashSet<TourMarker> tourMarkers) {
-		
+
 		if (this.tourMarkers != null) {
 			this.tourMarkers.clear();
 		}
-		
+
 		this.tourMarkers = tourMarkers;
 	}
 

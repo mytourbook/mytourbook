@@ -148,6 +148,10 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		fActionAddTag.setEnabled(isTourSaved);
 		fActionRemoveTag.setEnabled(isTourSaved);
 		fActionRemoveAllTags.setEnabled(isTourSaved);
+		
+		// enable actions for the recent tags
+		TagManager.enableRecentTagActions(isTourSaved);
+
 	}
 
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,

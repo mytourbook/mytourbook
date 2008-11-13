@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -30,36 +30,28 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
-public class ChartMarkerLayer implements IChartLayer {
+public class ChartLabelLayer implements IChartLayer {
 
-	private static final int				MARKER_HEIGHT	= 4;
-	private static final int				MARKER_WIDTH	= 4;
-	private static final int				MARKER_OFFSET	= 3;
+	private static final int			LABEL_HEIGHT	= 4;
+	private static final int			LABEL_WIDTH		= 4;
+	private static final int			LABEL_OFFSET	= 3;
 
-	int										fMarkerOffset	= MARKER_OFFSET;
+	private int							fLabelOffset	= LABEL_OFFSET;
 
-	private final ArrayList<ChartMarker>	fChartMarkers	= new ArrayList<ChartMarker>();
+	private final ArrayList<ChartLabel>	fChartLabels	= new ArrayList<ChartLabel>();
 
-	private RGB								fLineColor		= new RGB(189, 0, 255);
+	private RGB							fLineColor		= new RGB(189, 0, 255);
 
 	/**
 	 * Adds a new marker to the internal marker list, the list can be retrieved with getMarkerList()
 	 * 
-	 * @param marker
+	 * @param label
 	 * @param xCoord
-	 *        Position of the marker on the x axis
+	 *            Position of the marker on the x axis
 	 * @param label
 	 */
-	public void addMarker(final ChartMarker marker) {
-		fChartMarkers.add(marker);
-	}
-
-	public RGB getLineColor() {
-		return fLineColor;
-	}
-
-	public void setLineColor(final RGB lineColor) {
-		fLineColor = lineColor;
+	public void addLabel(final ChartLabel label) {
+		fChartLabels.add(label);
 	}
 
 	/**
@@ -89,10 +81,10 @@ public class ChartMarkerLayer implements IChartLayer {
 
 		gc.setClipping(0, devYTop, devGraphWidth, devGraphHeight);
 
-		for (final ChartMarker chartMarker : fChartMarkers) {
+		for (final ChartLabel chartMarker : fChartLabels) {
 
 			final int yValue = yValues[chartMarker.serieIndex];
-			final int devYGraph = (int) ((float) (yValue - graphYBottom) * scaleY) - 0;
+			final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
 
 			int devXMarker = (int) (chartMarker.graphX * scaleX) - devGraphImageOffset;
 			int devYMarker = devYBottom - devYGraph;
@@ -101,23 +93,19 @@ public class ChartMarkerLayer implements IChartLayer {
 			final Point labelExtend = gc.textExtent(chartMarker.markerLabel);
 			final int markerType = chartMarker.type;
 
-			if (markerType == ChartMarker.MARKER_TYPE_DEVICE) {
+			if (markerType == ChartLabel.MARKER_TYPE_DEVICE) {
 				gc.setBackground(display.getSystemColor(SWT.COLOR_RED));
 			} else {
 				gc.setBackground(colorLine);
 			}
 			gc.setForeground(colorLine);
 
-			final int markerWidth2 = MARKER_WIDTH / 2;
+			final int markerWidth2 = LABEL_WIDTH / 2;
 
 			// draw marker
-			gc.fillRectangle(
-					devXMarker - markerWidth2,
-					devYBottom - devYGraph,
-					MARKER_WIDTH,
-					MARKER_HEIGHT);
+			gc.fillRectangle(devXMarker - markerWidth2, devYBottom - devYGraph, LABEL_WIDTH, LABEL_HEIGHT);
 
-			if (chartMarker.visualType != ChartMarker.VISIBLE_TYPE_DEFAULT) {
+			if (chartMarker.visualType != ChartLabel.VISIBLE_TYPE_DEFAULT) {
 				gc.setForeground(display.getSystemColor(SWT.COLOR_BLUE));
 			}
 
@@ -129,66 +117,66 @@ public class ChartMarkerLayer implements IChartLayer {
 //			fMarkerOffset = 0;
 
 			switch (visualPosition) {
-			case ChartMarker.VISUAL_VERTICAL_ABOVE_GRAPH:
-				devYMarker -= fMarkerOffset;
+			case ChartLabel.VISUAL_VERTICAL_ABOVE_GRAPH:
+				devYMarker -= fLabelOffset;
 				break;
 
-			case ChartMarker.VISUAL_VERTICAL_BELOW_GRAPH:
-				devYMarker += labelWidth + fMarkerOffset + markerWidth2;
+			case ChartLabel.VISUAL_VERTICAL_BELOW_GRAPH:
+				devYMarker += labelWidth + fLabelOffset + markerWidth2;
 				break;
 
-			case ChartMarker.VISUAL_VERTICAL_TOP_CHART:
+			case ChartLabel.VISUAL_VERTICAL_TOP_CHART:
 				devYMarker = devYTop + labelWidth;
 				break;
 
-			case ChartMarker.VISUAL_VERTICAL_BOTTOM_CHART:
-				devYMarker = devYBottom - fMarkerOffset;
+			case ChartLabel.VISUAL_VERTICAL_BOTTOM_CHART:
+				devYMarker = devYBottom - fLabelOffset;
 				break;
 
-			case ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_LEFT:
-				devXMarker -= labelWidth + fMarkerOffset;
-				devYMarker -= labelHeight + fMarkerOffset;
+			case ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_LEFT:
+				devXMarker -= labelWidth + fLabelOffset;
+				devYMarker -= labelHeight + fLabelOffset;
 				isVertical = false;
 				break;
 
-			case ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED:
+			case ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED:
 				devXMarker -= labelWidth / 2;
-				devYMarker -= labelHeight + fMarkerOffset;
+				devYMarker -= labelHeight + fLabelOffset;
 				isVertical = false;
 				break;
 
-			case ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_RIGHT:
-				devXMarker += fMarkerOffset + markerWidth2;
-				devYMarker -= labelHeight + fMarkerOffset;
+			case ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_RIGHT:
+				devXMarker += fLabelOffset + markerWidth2;
+				devYMarker -= labelHeight + fLabelOffset;
 				isVertical = false;
 				break;
 
-			case ChartMarker.VISUAL_HORIZONTAL_BELOW_GRAPH_LEFT:
-				devXMarker -= labelWidth + fMarkerOffset;
-				devYMarker += fMarkerOffset + markerWidth2;
+			case ChartLabel.VISUAL_HORIZONTAL_BELOW_GRAPH_LEFT:
+				devXMarker -= labelWidth + fLabelOffset;
+				devYMarker += fLabelOffset + markerWidth2;
 				isVertical = false;
 				break;
 
-			case ChartMarker.VISUAL_HORIZONTAL_BELOW_GRAPH_CENTERED:
+			case ChartLabel.VISUAL_HORIZONTAL_BELOW_GRAPH_CENTERED:
 				devXMarker -= labelWidth / 2;
-				devYMarker += fMarkerOffset + markerWidth2;
+				devYMarker += fLabelOffset + markerWidth2;
 				isVertical = false;
 				break;
 
-			case ChartMarker.VISUAL_HORIZONTAL_BELOW_GRAPH_RIGHT:
-				devXMarker += fMarkerOffset + markerWidth2;
-				devYMarker += fMarkerOffset + markerWidth2;
+			case ChartLabel.VISUAL_HORIZONTAL_BELOW_GRAPH_RIGHT:
+				devXMarker += fLabelOffset + markerWidth2;
+				devYMarker += fLabelOffset + markerWidth2;
 				isVertical = false;
 				break;
 
-			case ChartMarker.VISUAL_HORIZONTAL_GRAPH_LEFT:
-				devXMarker -= labelWidth + fMarkerOffset;
+			case ChartLabel.VISUAL_HORIZONTAL_GRAPH_LEFT:
+				devXMarker -= labelWidth + fLabelOffset;
 				devYMarker -= labelHeight / 2;
 				isVertical = false;
 				break;
 
-			case ChartMarker.VISUAL_HORIZONTAL_GRAPH_RIGHT:
-				devXMarker += fMarkerOffset + markerWidth2;
+			case ChartLabel.VISUAL_HORIZONTAL_GRAPH_RIGHT:
+				devXMarker += fLabelOffset + markerWidth2;
 				devYMarker -= labelHeight / 2;
 				isVertical = false;
 				break;
@@ -211,7 +199,7 @@ public class ChartMarkerLayer implements IChartLayer {
 					devXMarker -= labelHeight;
 
 					// don't draw the marker before the chart
-					int devXImageOffset = chart.getDevGraphImageXOffset();
+					final int devXImageOffset = chart.getDevGraphImageXOffset();
 					if (devXImageOffset == 0 && devXMarker < 0) {
 						devXMarker = 0;
 					}
@@ -244,7 +232,7 @@ public class ChartMarkerLayer implements IChartLayer {
 					// horizontal position
 
 					// don't draw the marker before the chart
-					int devXImageOffset = chart.getDevGraphImageXOffset();
+					final int devXImageOffset = chart.getDevGraphImageXOffset();
 					if (devXImageOffset == 0 && devXMarker < 0) {
 						devXMarker = 0;
 					}
@@ -269,5 +257,13 @@ public class ChartMarkerLayer implements IChartLayer {
 		gc.setClipping((Rectangle) null);
 
 		colorLine.dispose();
+	}
+
+	public RGB getLineColor() {
+		return fLineColor;
+	}
+
+	public void setLineColor(final RGB lineColor) {
+		fLineColor = lineColor;
 	}
 }

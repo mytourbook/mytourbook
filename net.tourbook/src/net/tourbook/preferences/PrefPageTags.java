@@ -31,7 +31,7 @@ import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourProperty;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourViewer;
 import net.tourbook.ui.TreeViewerItem;
@@ -552,7 +552,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 			TourManager.getInstance().clearTourDataCache();
 
 			// fire modify event
-			TourManager.firePropertyChange(TourProperty.TAG_STRUCTURE_CHANGED, null);
+			TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED, null);
 		}
 	}
 

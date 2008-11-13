@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class ChartSegmentValueLayer implements IChartLayer {
 
-	private RGB			lineColor	= new RGB(255, 0, 0);
+	private RGB			lineColorRGB	= new RGB(255, 0, 0);
 
 	private TourData	fTourData;
 
@@ -76,8 +76,8 @@ public class ChartSegmentValueLayer implements IChartLayer {
 		final float scaleX = drawingData.getScaleX();
 		final float scaleY = drawingData.getScaleY();
 
-		final Color colorLine = new Color(display, lineColor);
-		gc.setForeground(colorLine);
+		final Color lineColor = new Color(display, lineColorRGB);
+		gc.setForeground(lineColor);
 
 		Point lastPoint = null;
 
@@ -111,11 +111,11 @@ public class ChartSegmentValueLayer implements IChartLayer {
 			}
 		}
 
-		colorLine.dispose();
+		lineColor.dispose();
 	}
 
 	public void setLineColor(final RGB lineColor) {
-		this.lineColor = lineColor;
+		this.lineColorRGB = lineColor;
 	}
 
 	public void setTourData(final TourData tourData) {

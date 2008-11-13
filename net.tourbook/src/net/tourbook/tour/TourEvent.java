@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.data.TourData;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
-public class TourProperties {
+public class TourEvent {
 
 	/**
 	 * contains the tours which have been modified
@@ -28,27 +28,27 @@ public class TourProperties {
 	private ArrayList<TourData>	modifiedTours;
 
 	/**
-	 * when <code>true</code>, tour data have been reverted and {@link TourProperties#modifiedTours}
+	 * when <code>true</code>, tour data have been reverted and {@link TourEvent#modifiedTours}
 	 * contains the reverted {@link TourData}
 	 */
 	public boolean				isReverted		= false;
 
 	/**
-	 * when <code>true</code>, tour data have been modified in an editor and
-	 * {@link TourProperties#modifiedTours} contains the modified {@link TourData}
+	 * when <code>true</code>, tour data have been modified in the editor,
+	 * {@link TourEvent#modifiedTours} contains the modified {@link TourData}
 	 */
-	public boolean				isTourEdited	= false;
+	public boolean				isTourModified	= false;
 
 	/**
 	 * contains the {@link TourData} which is edited in the {@link TourDataEditorView}
 	 */
 	public TourData				tourDataEditorSavedTour;
 
-	public TourProperties(final ArrayList<TourData> modifiedTour) {
+	public TourEvent(final ArrayList<TourData> modifiedTour) {
 		this.modifiedTours = modifiedTour;
 	}
 
-	public TourProperties(final TourData tourData) {
+	public TourEvent(final TourData tourData) {
 		modifiedTours = new ArrayList<TourData>();
 		modifiedTours.add(tourData);
 	}
