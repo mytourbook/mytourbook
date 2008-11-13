@@ -35,63 +35,63 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class GarminSAXHandler extends DefaultHandler {
 
-	private static final String			TRAINING_CENTER_DATABASE_V1	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1"; //$NON-NLS-1$
-	private static final String			TRAINING_CENTER_DATABASE_V2	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"; //$NON-NLS-1$
+	private static final String		TRAINING_CENTER_DATABASE_V1	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1"; //$NON-NLS-1$
+	private static final String		TRAINING_CENTER_DATABASE_V2	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"; //$NON-NLS-1$
 
-	private static final String			TAG_DATABASE				= "TrainingCenterDatabase";									//$NON-NLS-1$
+	private static final String		TAG_DATABASE				= "TrainingCenterDatabase";									//$NON-NLS-1$
 
-	private static final String			TAG_ACTIVITY				= "Activity";													//$NON-NLS-1$
-	private static final String			TAG_COURSE					= "Course";													//$NON-NLS-1$
-	private static final String			TAG_HISTORY					= "History";													//$NON-NLS-1$
+	private static final String		TAG_ACTIVITY				= "Activity";													//$NON-NLS-1$
+	private static final String		TAG_COURSE					= "Course";													//$NON-NLS-1$
+	private static final String		TAG_HISTORY					= "History";													//$NON-NLS-1$
 
-	private static final String			TAG_LAP						= "Lap";														//$NON-NLS-1$
-	private static final String			TAG_TRACKPOINT				= "Trackpoint";												//$NON-NLS-1$
+	private static final String		TAG_LAP						= "Lap";														//$NON-NLS-1$
+	private static final String		TAG_TRACKPOINT				= "Trackpoint";												//$NON-NLS-1$
 
-	private static final String			TAG_LONGITUDE_DEGREES		= "LongitudeDegrees";											//$NON-NLS-1$
-	private static final String			TAG_LATITUDE_DEGREES		= "LatitudeDegrees";											//$NON-NLS-1$
-	private static final String			TAG_ALTITUDE_METERS			= "AltitudeMeters";											//$NON-NLS-1$
-	private static final String			TAG_DISTANCE_METERS			= "DistanceMeters";											//$NON-NLS-1$
-	private static final String			TAG_CADENCE					= "Cadence";													//$NON-NLS-1$
-	private static final String			TAG_HEART_RATE_BPM			= "HeartRateBpm";												//$NON-NLS-1$
-	private static final String			TAG_TIME					= "Time";														//$NON-NLS-1$
-	private static final String			TAG_VALUE					= "Value";														//$NON-NLS-1$
+	private static final String		TAG_LONGITUDE_DEGREES		= "LongitudeDegrees";											//$NON-NLS-1$
+	private static final String		TAG_LATITUDE_DEGREES		= "LatitudeDegrees";											//$NON-NLS-1$
+	private static final String		TAG_ALTITUDE_METERS			= "AltitudeMeters";											//$NON-NLS-1$
+	private static final String		TAG_DISTANCE_METERS			= "DistanceMeters";											//$NON-NLS-1$
+	private static final String		TAG_CADENCE					= "Cadence";													//$NON-NLS-1$
+	private static final String		TAG_HEART_RATE_BPM			= "HeartRateBpm";												//$NON-NLS-1$
+	private static final String		TAG_TIME					= "Time";														//$NON-NLS-1$
+	private static final String		TAG_VALUE					= "Value";														//$NON-NLS-1$
 
-	private static final Calendar		fCalendar					= GregorianCalendar.getInstance();
-	private static final DateFormat		iso							= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
+	private static final Calendar	fCalendar					= GregorianCalendar.getInstance();
+	private static final DateFormat	iso							= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");			//$NON-NLS-1$
 
-	private int							fDataVersion				= -1;
-	private boolean						fIsInActivity				= false;
-	private boolean						fIsInCourse					= false;
+	private int						fDataVersion				= -1;
+	private boolean					fIsInActivity				= false;
+	private boolean					fIsInCourse					= false;
 
-	private boolean						fIsInLap					= false;
-	private boolean						fIsInTrackpoint				= false;
-	private boolean						fIsInTime					= false;
-	private boolean						fIsInLatitude				= false;
-	private boolean						fIsInLongitude				= false;
-	private boolean						fIsInAltitude				= false;
-	private boolean						fIsInDistance				= false;
-	private boolean						fIsInCadence;
+	private boolean					fIsInLap					= false;
+	private boolean					fIsInTrackpoint				= false;
+	private boolean					fIsInTime					= false;
+	private boolean					fIsInLatitude				= false;
+	private boolean					fIsInLongitude				= false;
+	private boolean					fIsInAltitude				= false;
+	private boolean					fIsInDistance				= false;
+	private boolean					fIsInCadence;
 
-	private boolean						fIsInHeartRate				= false;
-	private boolean						fIsInHeartRateValue			= false;
+	private boolean					fIsInHeartRate				= false;
+	private boolean					fIsInHeartRateValue			= false;
 
-	private ArrayList<TimeData>			fTimeDataList;
-	private TimeData					fTimeData;
-	private TourbookDevice				fDeviceDataReader;
+	private ArrayList<TimeData>		fTimeDataList;
+	private TimeData				fTimeData;
+	private TourbookDevice			fDeviceDataReader;
 
-	private String						fImportFileName;
+	private String					fImportFileName;
 
-	private HashMap<String, TourData>	fTourDataMap;
+	private HashMap<Long, TourData>	fTourDataMap;
 
-	private int							fLapCounter;
-	private boolean						fSetLapMarker				= false;
-	private boolean						fSetLapStartTime			= false;
-	private ArrayList<Long>				fLapStart;
+	private int						fLapCounter;
+	private boolean					fSetLapMarker				= false;
+	private boolean					fSetLapStartTime			= false;
+	private ArrayList<Long>			fLapStart;
 
-	private boolean						fIsImported;
-	private long						fCurrentTime;
+	private boolean					fIsImported;
+	private long					fCurrentTime;
 
-	private StringBuilder				fCharacters					= new StringBuilder();
+	private StringBuilder			fCharacters					= new StringBuilder();
 
 	{
 		iso.setTimeZone(TimeZone.getTimeZone("GMT")); //$NON-NLS-1$
@@ -100,7 +100,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	public GarminSAXHandler(final TourbookDevice deviceDataReader,
 							final String importFileName,
 							final DeviceData deviceData,
-							final HashMap<String, TourData> tourDataMap) {
+							final HashMap<Long, TourData> tourDataMap) {
 
 		fDeviceDataReader = deviceDataReader;
 		fImportFileName = importFileName;
@@ -661,7 +661,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		 * set tour start date/time
 		 */
 		fCalendar.setTimeInMillis(fTimeDataList.get(0).absoluteTime);
-		
+
 		tourData.setStartMinute((short) fCalendar.get(Calendar.MINUTE));
 		tourData.setStartHour((short) fCalendar.get(Calendar.HOUR_OF_DAY));
 		tourData.setStartDay((short) fCalendar.get(Calendar.DAY_OF_MONTH));
@@ -683,10 +683,9 @@ public class GarminSAXHandler extends DefaultHandler {
 		} else {
 			uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
 		}
-		tourData.createTourId(uniqueKey);
+		final Long tourId = tourData.createTourId(uniqueKey);
 
 		// check if the tour is already imported
-		final String tourId = tourData.getTourId().toString();
 		if (fTourDataMap.containsKey(tourId) == false) {
 
 			tourData.computeTourDrivingTime();

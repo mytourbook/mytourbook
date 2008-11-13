@@ -79,7 +79,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private TourbookDevice					fDeviceDataReader;
 	private String							fImportFileName;
-	private HashMap<String, TourData>		fTourDataMap;
+	private HashMap<Long, TourData>			fTourDataMap;
 	private int								fLapCounter;
 
 	private boolean							fIsSetLapMarker			= false;
@@ -105,7 +105,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	public GPX_SAX_Handler(	final TourbookDevice deviceDataReader,
 							final String importFileName,
 							final DeviceData deviceData,
-							final HashMap<String, TourData> tourDataMap) {
+							final HashMap<Long, TourData> tourDataMap) {
 
 		fDeviceDataReader = deviceDataReader;
 		fImportFileName = importFileName;
@@ -392,10 +392,9 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		} else {
 			uniqueKey = Integer.toString(distanceSerie[distanceSerie.length - 1]);
 		}
-		tourData.createTourId(uniqueKey);
+		final Long tourId = tourData.createTourId(uniqueKey);
 
 		// check if the tour is already imported
-		final String tourId = tourData.getTourId().toString();
 		if (fTourDataMap.containsKey(tourId) == false) {
 
 			tourData.computeTourDrivingTime();

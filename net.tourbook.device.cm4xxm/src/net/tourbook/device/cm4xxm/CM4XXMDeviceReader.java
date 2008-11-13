@@ -66,7 +66,45 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 	}
 
 	@Override
-	public boolean checkStartSequence(int byteIndex, int newByte) {
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+		RandomAccessFile fileRawData = null;
+
+		final CM4XXMDeviceData cm4xxDeviceData = new CM4XXMDeviceData();
+
+		try {
+
+			fileRawData = new RandomAccessFile(rawDataFileName, "r"); //$NON-NLS-1$
+
+			// position file pointer to the device data
+			fileRawData.seek(OFFSET_DEVICE_DATA);
+
+			// read device data
+			cm4xxDeviceData.readFromFile(fileRawData);
+
+		} catch (final FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (final IOException e) {
+			e.printStackTrace();
+		} catch (final Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (fileRawData != null) {
+				try {
+					fileRawData.close();
+				} catch (final IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+
+		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
+				cm4xxDeviceData.transferYear,
+				cm4xxDeviceData.transferMonth,
+				cm4xxDeviceData.transferDay).toString();
+	}
+
+	@Override
+	public boolean checkStartSequence(final int byteIndex, final int newByte) {
 
 		/*
 		 * check if the first 4 bytes are set to AFRO
@@ -87,7 +125,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		return false;
 	}
 
-	public String getDeviceModeName(int profileId) {
+	public String getDeviceModeName(final int profileId) {
 
 		// "2E" bike2 (CM414M) 
 		// "3E" bike1 (CM414M) 
@@ -104,12 +142,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		return Messages.CM4XXM_profile_unknown;
 	}
 
-	public int getTransferDataSize() {
-		return CM4XXM_DATA_SIZE;
-	}
-
 	@Override
-	public SerialParameters getPortParameters(String portName) {
+	public SerialParameters getPortParameters(final String portName) {
 
 		return new SerialParameters(portName,
 				9600,
@@ -129,19 +163,23 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		return null;
 	}
 
-	public boolean processDeviceData(String importFileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
+	public int getTransferDataSize() {
+		return CM4XXM_DATA_SIZE;
+	}
+
+	public boolean processDeviceData(final String importFileName, final DeviceData deviceData, final HashMap<Long, TourData> tourDataMap) {
 
 		RandomAccessFile fileRawData = null;
 
-		byte[] buffer = new byte[5];
+		final byte[] buffer = new byte[5];
 		String recordType = ""; //$NON-NLS-1$
 
-		CM4XXMDeviceData cm4xxmDeviceData = new CM4XXMDeviceData();
+		final CM4XXMDeviceData cm4xxmDeviceData = new CM4XXMDeviceData();
 
 		// reset tour data list
 //		tourDataMap.clear();
 
-		TourType defaultTourType = getTourType();
+		final TourType defaultTourType = getTourType();
 
 		try {
 
@@ -166,7 +204,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 			 */
 			fileRawData.seek(cm4xxmDeviceData.offsetDDRecord + 5);
 			int offsetAARecord = DataUtil.readFileOffset(fileRawData, buffer);
-			int initialOffsetAARecord = offsetAARecord;
+			final int initialOffsetAARecord = offsetAARecord;
 			int offsetDDRecord;
 
 			boolean isLastTour = true;
@@ -196,7 +234,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
 				fileRawData.seek(offsetAARecord);
 
-				TourData tourData = new TourData();
+				final TourData tourData = new TourData();
 
 				tourData.setDeviceTimeInterval(CM4XXM_TIMESLICE);
 				tourData.importRawDataFile = importFileName;
@@ -210,7 +248,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				if (isLastTour) {
 					isLastTour = false;
 
-					int deviceTravelTimeHours = (cm4xxmDeviceData.totalTravelTimeHour1);
+					final int deviceTravelTimeHours = (cm4xxmDeviceData.totalTravelTimeHour1);
 
 					tourData.setDeviceTravelTime((deviceTravelTimeHours * 3600)
 							+ (cm4xxmDeviceData.totalTravelTimeMin1 * 60)
@@ -244,7 +282,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				tourData.setStartYear(tourYear);
 
 				// create time list
-				ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+				final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
 
 				short temperature;
 				short marker;
@@ -395,10 +433,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				}
 
 				// after all data are added, the tour id can be created
-				tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
+				final Long tourId = tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 				// check if the tour is in the tour map
-				final String tourId = tourData.getTourId().toString();
 				if (tourDataMap.containsKey(tourId) == false) {
 
 					// add new tour to the map
@@ -407,7 +444,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 					/*
 					 * disable data series when no data are available
 					 */
-					TimeData firstTimeData = timeDataList.get(0);
+					final TimeData firstTimeData = timeDataList.get(0);
 					if (sumDistance == 0) {
 						firstTimeData.distance = Integer.MIN_VALUE;
 					}
@@ -488,17 +525,17 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 					break;
 				}
 			}
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (fileRawData != null) {
 				try {
 					fileRawData.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}
@@ -511,9 +548,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		return true;
 	}
 
-	private void readStartBlock(RandomAccessFile file, TourData tourData) throws IOException {
+	private void readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {
 
-		byte[] buffer = new byte[5];
+		final byte[] buffer = new byte[5];
 
 		file.read(buffer);
 		tourData.setDeviceTourType(new String(buffer, 0, 2));
@@ -541,11 +578,11 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		tourData.setStartPulse((short) Integer.parseInt(new String(buffer, 0, 4), 16));
 	}
 
-	public final int readSummary(byte[] buffer) throws IOException {
-		int ch0 = buffer[0];
-		int ch1 = buffer[1];
-		int ch2 = buffer[2];
-		int ch3 = buffer[3];
+	public final int readSummary(final byte[] buffer) throws IOException {
+		final int ch0 = buffer[0];
+		final int ch1 = buffer[1];
+		final int ch2 = buffer[2];
+		final int ch3 = buffer[3];
 		if ((ch0 | ch1 | ch2 | ch3) < 0) {
 			throw new EOFException();
 		}
@@ -557,13 +594,13 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 	 * @param rawData
 	 * @throws IOException
 	 */
-	public void readTimeSlice(RandomAccessFile file, TimeData timeData) throws IOException {
+	public void readTimeSlice(final RandomAccessFile file, final TimeData timeData) throws IOException {
 
 		// read encoded data
-		byte[] buffer = new byte[5];
+		final byte[] buffer = new byte[5];
 		file.read(buffer);
 
-		int data = Integer.parseInt(new String(buffer, 0, 4), 16);
+		final int data = Integer.parseInt(new String(buffer, 0, 4), 16);
 
 		// decode pulse (4 bits)
 		if ((data & 0x8000) != 0) {
@@ -595,7 +632,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 	 * 
 	 * @return true for a valid HAC4 data format
 	 */
-	public boolean validateRawData(String fileName) {
+	public boolean validateRawData(final String fileName) {
 
 		boolean isValid = false;
 
@@ -603,9 +640,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
 		try {
 
-			byte[] buffer = new byte[5];
+			final byte[] buffer = new byte[5];
 
-			File dataFile = new File(fileName);
+			final File dataFile = new File(fileName);
 			inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
 			inStream.read(buffer);
@@ -638,59 +675,23 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 			if (checksum == lastValue) {
 				isValid = true;
 			}
-		} catch (NumberFormatException nfe) {
+		} catch (final NumberFormatException nfe) {
 			return false;
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			return false;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (inStream != null) {
 				try {
 					inStream.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}
 		}
 
 		return isValid;
-	}
-
-	@Override
-	public String buildFileNameFromRawData(String rawDataFileName) {
-		RandomAccessFile fileRawData = null;
-
-		CM4XXMDeviceData cm4xxDeviceData = new CM4XXMDeviceData();
-
-		try {
-
-			fileRawData = new RandomAccessFile(rawDataFileName, "r"); //$NON-NLS-1$
-
-			// position file pointer to the device data
-			fileRawData.seek(OFFSET_DEVICE_DATA);
-
-			// read device data
-			cm4xxDeviceData.readFromFile(fileRawData);
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (fileRawData != null) {
-				try {
-					fileRawData.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-		}
-
-		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
-				cm4xxDeviceData.transferYear, cm4xxDeviceData.transferMonth, cm4xxDeviceData.transferDay).toString();
 	}
 
 }

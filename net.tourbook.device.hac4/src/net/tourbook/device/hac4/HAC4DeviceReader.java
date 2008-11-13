@@ -174,7 +174,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 	public boolean processDeviceData(	final String importFileName,
 										final DeviceData deviceData,
-										final HashMap<String, TourData> tourDataMap) {
+										final HashMap<Long, TourData> tourDataMap) {
 
 		RandomAccessFile fileRawData = null;
 
@@ -199,6 +199,10 @@ public class HAC4DeviceReader extends TourbookDevice {
 			 * might be not correct but there is no other way to get the year
 			 */
 			short tourYear = hac4DeviceData.transferYear;
+			if (importYear != -1) {
+				tourYear = (short) importYear;
+			}
+
 			short lastTourMonth = 0;
 
 			// move file pointer to the DD record of the last tour and
@@ -329,7 +333,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 					if (temperature > 127) {
 						temperature = (short) (temperature - 255);
 					}
-					
+
 					// read encoded data
 					fileRawData.read(buffer);
 
@@ -442,10 +446,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 				}
 
 				// after all data are added, the tour id can be created
-				tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
+				final Long tourId = tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 				// check if the tour is in the tour map
-				final String tourId = tourData.getTourId().toString();
 				if (tourDataMap.containsKey(tourId) == false && timeDataList.size() > 0) {
 
 					// add new tour to the map

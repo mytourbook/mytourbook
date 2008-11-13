@@ -25,7 +25,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-import net.tourbook.chart.ChartMarker;
+import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -44,11 +44,17 @@ public class CRPDataReader extends TourbookDevice {
 	}
 
 	@Override
-	public boolean checkStartSequence(int byteIndex, int newByte) {
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean checkStartSequence(final int byteIndex, final int newByte) {
 		return false;
 	}
 
-	public String getDeviceModeName(int profileId) {
+	public String getDeviceModeName(final int profileId) {
 
 		// 0: Run
 		// 1: Ski
@@ -79,12 +85,8 @@ public class CRPDataReader extends TourbookDevice {
 		return Messages.CRP_Profile_unknown;
 	}
 
-	public int getTransferDataSize() {
-		return -1;
-	}
-
 	@Override
-	public SerialParameters getPortParameters(String portName) {
+	public SerialParameters getPortParameters(final String portName) {
 		return null;
 	}
 
@@ -93,7 +95,11 @@ public class CRPDataReader extends TourbookDevice {
 		return -1;
 	}
 
-	public boolean processDeviceData(String importFileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
+	public int getTransferDataSize() {
+		return -1;
+	}
+
+	public boolean processDeviceData(final String importFileName, final DeviceData deviceData, final HashMap<Long, TourData> tourDataMap) {
 
 		boolean returnValue = false;
 
@@ -115,17 +121,18 @@ public class CRPDataReader extends TourbookDevice {
 
 			fileReader = new BufferedReader(new FileReader(importFileName));
 
-			String fileHeader = fileReader.readLine();
+			final String fileHeader = fileReader.readLine();
 			if (fileHeader.startsWith("HRMProfilDatas") == false) { //$NON-NLS-1$
 				return false;
 			}
 
 			String line;
 			StringTokenizer tokenLine;
-			ArrayList<String> trackPoints = new ArrayList<String>();
+			final ArrayList<String> trackPoints = new ArrayList<String>();
 
 			tokenLine = new StringTokenizer(fileReader.readLine());
-			@SuppressWarnings("unused") //$NON-NLS-1$
+			@SuppressWarnings("unused")//$NON-NLS-1$
+			final
 			String fileVersion = tokenLine.nextToken();
 
 			// get all trackpoints
@@ -145,21 +152,21 @@ public class CRPDataReader extends TourbookDevice {
 			tokenLine = new StringTokenizer(fileReader.readLine());
 
 			// start date
-			String tourStartDate = tokenLine.nextToken();
-			int tourYear = Integer.parseInt(tourStartDate.substring(6));
-			int tourMonth = Integer.parseInt(tourStartDate.substring(3, 5));
-			int tourDay = Integer.parseInt(tourStartDate.substring(0, 2));
+			final String tourStartDate = tokenLine.nextToken();
+			final int tourYear = Integer.parseInt(tourStartDate.substring(6));
+			final int tourMonth = Integer.parseInt(tourStartDate.substring(3, 5));
+			final int tourDay = Integer.parseInt(tourStartDate.substring(0, 2));
 
 			// start time
-			String tourStartTime = tokenLine.nextToken();
-			int tourHour = Integer.parseInt(tourStartTime.substring(0, 2));
-			int tourMin = tourStartTime.length() > 5
+			final String tourStartTime = tokenLine.nextToken();
+			final int tourHour = Integer.parseInt(tourStartTime.substring(0, 2));
+			final int tourMin = tourStartTime.length() > 5
 					? Integer.parseInt(tourStartTime.substring(3, 5))
 					: Integer.parseInt(tourStartTime.substring(3));
 
 			// recording time
-			String tourRecTimeSt = tokenLine.nextToken();
-			int tourRecordingTime = Integer.parseInt(tourRecTimeSt.substring(0, 2))
+			final String tourRecTimeSt = tokenLine.nextToken();
+			final int tourRecordingTime = Integer.parseInt(tourRecTimeSt.substring(0, 2))
 					* 3600
 					+ Integer.parseInt(tourRecTimeSt.substring(3, 5))
 					* 60
@@ -185,8 +192,8 @@ public class CRPDataReader extends TourbookDevice {
 			 * line: interval/mode
 			 */
 			tokenLine = new StringTokenizer(fileReader.readLine());
-			int interval = Integer.parseInt(tokenLine.nextToken());
-			int tourMode = Integer.parseInt(tokenLine.nextToken());
+			final int interval = Integer.parseInt(tokenLine.nextToken());
+			final int tourMode = Integer.parseInt(tokenLine.nextToken());
 
 			// skip empty lines
 			fileReader.readLine();
@@ -208,7 +215,7 @@ public class CRPDataReader extends TourbookDevice {
 			/*
 			 * set tour data
 			 */
-			TourData tourData = new TourData();
+			final TourData tourData = new TourData();
 
 			tourData.setTourTitle(tourName);
 			tourData.setTourDescription(tourDesc);
@@ -233,7 +240,7 @@ public class CRPDataReader extends TourbookDevice {
 			/*
 			 * set time serie from the imported trackpoints
 			 */
-			ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+			final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
 			TimeData timeData;
 
 			int tpIndex = 0;
@@ -241,15 +248,15 @@ public class CRPDataReader extends TourbookDevice {
 
 			int pulse;
 			int distance = 0;
-			@SuppressWarnings("unused") //$NON-NLS-1$
+			@SuppressWarnings("unused")//$NON-NLS-1$
 			int speed;
 			int altitude;
-			@SuppressWarnings("unused") //$NON-NLS-1$
+			@SuppressWarnings("unused")//$NON-NLS-1$
 			int color;
-			@SuppressWarnings("unused") //$NON-NLS-1$
+			@SuppressWarnings("unused")//$NON-NLS-1$
 			int symbol;
 			int temperature;
-			@SuppressWarnings("unused") //$NON-NLS-1$
+			@SuppressWarnings("unused")//$NON-NLS-1$
 			String trackpointTime;
 
 			int oldDistance = 0;
@@ -262,7 +269,7 @@ public class CRPDataReader extends TourbookDevice {
 			int sumPulse = 0;
 			int sumTemperature = 0;
 
-			for (String trackPoint : trackPoints) {
+			for (final String trackPoint : trackPoints) {
 
 				tokenLine = new StringTokenizer(trackPoint);
 
@@ -305,9 +312,9 @@ public class CRPDataReader extends TourbookDevice {
 					timeData.marker = 1;
 
 					// create a new marker
-					TourMarker tourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_DEVICE);
+					final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
 					tourMarker.setLabel(comment);
-					tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+					tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					tourMarker.setTime(timeData.time);
 					tourMarker.setDistance(timeData.distance);
 					tourMarker.setSerieIndex(tpIndex);
@@ -343,10 +350,9 @@ public class CRPDataReader extends TourbookDevice {
 			tourData.setStartDistance(distance);
 
 			// create unique tour id
-			tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
+			final Long tourId = tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 			// check if the tour is in the tour map
-			final String tourId = tourData.getTourId().toString();
 			if (tourDataMap.containsKey(tourId) == false) {
 
 				// add new tour to the map
@@ -355,7 +361,7 @@ public class CRPDataReader extends TourbookDevice {
 				/*
 				 * disable data series when no data are available
 				 */
-				TimeData firstTimeData = timeDataList.get(0);
+				final TimeData firstTimeData = timeDataList.get(0);
 				if (sumDistance == 0) {
 					firstTimeData.distance = Integer.MIN_VALUE;
 				}
@@ -387,7 +393,7 @@ public class CRPDataReader extends TourbookDevice {
 
 			returnValue = true;
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -400,7 +406,7 @@ public class CRPDataReader extends TourbookDevice {
 	 * 
 	 * @return true for a valid .crp data format
 	 */
-	public boolean validateRawData(String fileName) {
+	public boolean validateRawData(final String fileName) {
 
 		BufferedReader fileReader = null;
 
@@ -408,7 +414,7 @@ public class CRPDataReader extends TourbookDevice {
 
 			fileReader = new BufferedReader(new FileReader(fileName));
 
-			String fileHeader = fileReader.readLine();
+			final String fileHeader = fileReader.readLine();
 			if (fileHeader == null) {
 				return false;
 			}
@@ -417,27 +423,21 @@ public class CRPDataReader extends TourbookDevice {
 				return false;
 			}
 
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		} finally {
 			if (fileReader != null) {
 				try {
 					fileReader.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}
 		}
 
 		return true;
-	}
-
-	@Override
-	public String buildFileNameFromRawData(final String rawDataFileName) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

@@ -121,7 +121,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
 	public boolean processDeviceData(	final String fileName,
 										final DeviceData deviceData,
-										final HashMap<String, TourData> tourDataMap) {
+										final HashMap<Long, TourData> tourDataMap) {
 
 		// immediately bail out if the file format is not correct.
 		if (!validateRawData(fileName)) {
@@ -220,10 +220,9 @@ public class CiclotourTextDataReader extends TourbookDevice {
 			}
 
 			tourData.setStartDistance(Math.round(distance));
-			tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
+			final Long tourId = tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 			// check if the tour is in the tour map
-			final String tourId = tourData.getTourId().toString();
 			if (tourDataMap.containsKey(tourId) == false) {
 
 				// add new tour to the map

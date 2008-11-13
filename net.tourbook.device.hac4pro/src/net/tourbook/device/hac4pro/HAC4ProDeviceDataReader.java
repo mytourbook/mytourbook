@@ -249,7 +249,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 	public boolean processDeviceData(	final String importFileName,
 										final DeviceData deviceData,
-										final HashMap<String, TourData> tourDataMap) {
+										final HashMap<Long, TourData> tourDataMap) {
 
 		boolean returnValue = false;
 
@@ -498,10 +498,9 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				}
 
 				// after all data are added, the tour id can be created
-				tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
+				final Long tourId = tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 				// check if the tour is in the tour map
-				final String tourId = tourData.getTourId().toString();
 				if (tourDataMap.containsKey(tourId) == false) {
 
 					// add new tour to the map

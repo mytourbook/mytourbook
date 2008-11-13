@@ -96,7 +96,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
 	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
-										final HashMap<String, TourData> tourDataMap) {
+										final HashMap<Long, TourData> tourDataMap) {
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -259,10 +259,9 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 			tourData.setStartDistance(distance);
 
 			// create unique tour id
-			tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
+			final Long tourId = tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 			// check if the tour is in the tour map
-			final String tourId = tourData.getTourId().toString();
 			if (tourDataMap.containsKey(tourId) == false) {
 
 				// add new tour to the map

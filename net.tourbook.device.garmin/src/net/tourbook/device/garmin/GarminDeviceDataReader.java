@@ -97,7 +97,7 @@ public class GarminDeviceDataReader extends TourbookDevice {
 
 	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
-										final HashMap<String, TourData> tourDataMap) {
+										final HashMap<Long, TourData> tourDataMap) {
 
 		if (isXMLFile(importFilePath) == false) {
 			return false;

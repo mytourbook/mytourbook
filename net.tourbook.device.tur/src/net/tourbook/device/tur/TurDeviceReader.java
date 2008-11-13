@@ -30,7 +30,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
-import net.tourbook.chart.ChartMarker;
+import net.tourbook.chart.ChartLabel;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -55,13 +55,19 @@ public class TurDeviceReader extends TourbookDevice {
 		canReadFromDevice = false;
 	}
 
+	@Override
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see net.tourbook.importdata.TourbookDevice#checkStartSequence(int, int)
 	 */
 	@Override
-	public boolean checkStartSequence(int byteIndex, int newByte) {
+	public boolean checkStartSequence(final int byteIndex, final int newByte) {
 		/*
 		 * check if the first 4 bytes are set to AFRO
 		 */
@@ -120,10 +126,19 @@ public class TurDeviceReader extends TourbookDevice {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see net.tourbook.importdata.IRawDataReader#getDeviceModeName(int)
+	 */
+	public String getDeviceModeName(final int modeId) {
+		return ""; //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.tourbook.importdata.TourbookDevice#getPortParameters(java.lang.String)
 	 */
 	@Override
-	public SerialParameters getPortParameters(String portName) {
+	public SerialParameters getPortParameters(final String portName) {
 		// we don't have a device but a file
 		return null;
 	}
@@ -138,13 +153,8 @@ public class TurDeviceReader extends TourbookDevice {
 		return 16;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.tourbook.importdata.IRawDataReader#getDeviceModeName(int)
-	 */
-	public String getDeviceModeName(int modeId) {
-		return ""; //$NON-NLS-1$
+	private TourType getTourType() {
+		return null;
 	}
 
 	/*
@@ -157,29 +167,25 @@ public class TurDeviceReader extends TourbookDevice {
 		return 0;
 	}
 
-	private TourType getTourType() {
-		return null;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see net.tourbook.importdata.IRawDataReader#processDeviceData(java.lang.String,
 	 *      net.tourbook.importdata.DeviceData, java.util.ArrayList)
 	 */
-	public boolean processDeviceData(String importFileName, DeviceData deviceData, HashMap<String, TourData> tourDataMap) {
+	public boolean processDeviceData(final String importFileName, final DeviceData deviceData, final HashMap<Long, TourData> tourDataMap) {
 
 		FileInputStream fileTurData = null;
-		TurDeviceData turDeviceData = new TurDeviceData();
+		final TurDeviceData turDeviceData = new TurDeviceData();
 
-		TourType defaultTourType = getTourType();
+		final TourType defaultTourType = getTourType();
 
 		try {
 			fileTurData = new FileInputStream(importFileName);
 
 			turDeviceData.readFromFile(fileTurData);
 
-			TourData tourData = new TourData();
+			final TourData tourData = new TourData();
 			tourData.importRawDataFile = importFileName;
 
 			tourData.setDeviceMode(Short.parseShort(turDeviceData.deviceMode));
@@ -202,7 +208,7 @@ public class TurDeviceReader extends TourbookDevice {
 			tourData.setTourEndPlace(turDeviceData.tourEndPlace);
 //			tourData.setTourAltUp(Integer.parseInt(turDeviceData.tourAltUp));
 
-			int entryCount = Integer.parseInt(TurFileUtil.readText(fileTurData));
+			final int entryCount = Integer.parseInt(TurFileUtil.readText(fileTurData));
 
 			int secStart1 = 0;
 			int secStart2 = 0;
@@ -218,7 +224,7 @@ public class TurDeviceReader extends TourbookDevice {
 			int sumPulse = 0;
 			int sumTemperature = 0;
 
-			ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+			final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
 
 			for (int dataIndex = 0; dataIndex < entryCount; dataIndex++) {
 
@@ -229,23 +235,23 @@ public class TurDeviceReader extends TourbookDevice {
 					secStart4 = TurFileUtil.readByte(fileTurData); // Byte 4
 				}
 
-				int sec1 = TurFileUtil.readByte(fileTurData); // Byte 5
-				int sec2 = TurFileUtil.readByte(fileTurData); // Byte 6
-				int sec3 = TurFileUtil.readByte(fileTurData); // Byte 7
-				int sec4 = TurFileUtil.readByte(fileTurData); // Byte 8
+				final int sec1 = TurFileUtil.readByte(fileTurData); // Byte 5
+				final int sec2 = TurFileUtil.readByte(fileTurData); // Byte 6
+				final int sec3 = TurFileUtil.readByte(fileTurData); // Byte 7
+				final int sec4 = TurFileUtil.readByte(fileTurData); // Byte 8
 
-				int dst1 = TurFileUtil.readByte(fileTurData); // Byte 9
-				int dst2 = TurFileUtil.readByte(fileTurData); // Byte 10
-				int dst3 = TurFileUtil.readByte(fileTurData); // Byte 11
-				int dst4 = TurFileUtil.readByte(fileTurData); // Byte 12
+				final int dst1 = TurFileUtil.readByte(fileTurData); // Byte 9
+				final int dst2 = TurFileUtil.readByte(fileTurData); // Byte 10
+				final int dst3 = TurFileUtil.readByte(fileTurData); // Byte 11
+				final int dst4 = TurFileUtil.readByte(fileTurData); // Byte 12
 
-				int hm1 = TurFileUtil.readByte(fileTurData); // Byte 13
-				int hm2 = TurFileUtil.readByte(fileTurData); // Byte 14
+				final int hm1 = TurFileUtil.readByte(fileTurData); // Byte 13
+				final int hm2 = TurFileUtil.readByte(fileTurData); // Byte 14
 
-				int pulse = TurFileUtil.readByte(fileTurData); // Byte 15
-				int cadence = TurFileUtil.readByte(fileTurData); // Byte 16
+				final int pulse = TurFileUtil.readByte(fileTurData); // Byte 15
+				final int cadence = TurFileUtil.readByte(fileTurData); // Byte 16
 
-				int temperature = TurFileUtil.readByte(fileTurData); // Byte 17
+				final int temperature = TurFileUtil.readByte(fileTurData); // Byte 17
 
 				// Read last 3 Byte of binary data (not used)
 				TurFileUtil.readByte(fileTurData);
@@ -253,8 +259,8 @@ public class TurDeviceReader extends TourbookDevice {
 				TurFileUtil.readByte(fileTurData);
 
 				// Calculate values
-				int secStart = secStart1 + (256 * secStart2) + (256 * 256 * secStart3) + (256 * 256 * 256 * secStart4);
-				int seconds = sec1 + (256 * sec2) + (256 * 256 * sec3) + (256 * 256 * 256 * sec4);
+				final int secStart = secStart1 + (256 * secStart2) + (256 * 256 * secStart3) + (256 * 256 * 256 * secStart4);
+				final int seconds = sec1 + (256 * sec2) + (256 * 256 * sec3) + (256 * 256 * 256 * sec4);
 				int distance = dst1 + (256 * dst2) + (256 * 256 * dst3) + (256 * 256 * 256 * dst4);
 				distance *= 10; // distance in 10m
 				int altitude = hm1 + (256 * hm2);
@@ -272,7 +278,7 @@ public class TurDeviceReader extends TourbookDevice {
 					tourData.setDeviceTimeInterval((short) seconds);
 				}
 
-				TimeData timeData = new TimeData();
+				final TimeData timeData = new TimeData();
 
 				timeData.altitude = altitude - oldAltitude;
 				oldAltitude = altitude;
@@ -311,10 +317,9 @@ public class TurDeviceReader extends TourbookDevice {
 			}
 
 			// after all data are added, the tour id can be created
-			tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
+			final Long tourId = tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 			// check if the tour is in the tour map
-			final String tourId = tourData.getTourId().toString();
 			if (tourDataMap.containsKey(tourId) == false) {
 
 				// add new tour to the map
@@ -323,7 +328,7 @@ public class TurDeviceReader extends TourbookDevice {
 				/*
 				 * disable data series when no data are available
 				 */
-				TimeData firstTimeData = timeDataList.get(0);
+				final TimeData firstTimeData = timeDataList.get(0);
 				if (sumDistance == 0) {
 					firstTimeData.distance = Integer.MIN_VALUE;
 				}
@@ -346,24 +351,24 @@ public class TurDeviceReader extends TourbookDevice {
 				// Read last 0A from binary block
 				TurFileUtil.readByte(fileTurData);
 				// Read Marker
-				int markerCount = Integer.parseInt(TurFileUtil.readText(fileTurData));
+				final int markerCount = Integer.parseInt(TurFileUtil.readText(fileTurData));
 
 				final int[] distanceSerie = tourData.getMetricDistanceSerie();
 
 				// create new markers
 				for (int i = 0; i < markerCount; i++) {
-					TourMarker tourMarker = new TourMarker(tourData, ChartMarker.MARKER_TYPE_DEVICE);
+					final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
 					tourMarker.setTime(Integer.parseInt(TurFileUtil.readText(fileTurData)));
 					String label = TurFileUtil.readText(fileTurData);
 					label = label.substring(0, label.indexOf(';'));
-					int index = label.indexOf(", Type:"); //$NON-NLS-1$
+					final int index = label.indexOf(", Type:"); //$NON-NLS-1$
 					if (index > 0) {
 						label = label.substring(0, index);
 					} else if (index == 0) {
 						label = Messages.TourData_Tour_Marker_unnamed;
 					}
 					tourMarker.setLabel(label);
-					tourMarker.setVisualPosition(ChartMarker.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
+					tourMarker.setVisualPosition(ChartLabel.VISUAL_HORIZONTAL_ABOVE_GRAPH_CENTERED);
 					for (int j = 0; j < tourData.timeSerie.length; j++) {
 						if (tourData.timeSerie[j] > tourMarker.getTime()) {
 							if (distanceSerie != null) {
@@ -386,20 +391,20 @@ public class TurDeviceReader extends TourbookDevice {
 				tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 			}
 
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 			return false;
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 			return false;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			return false;
 		} finally {
 			if (fileTurData != null) {
 				try {
 					fileTurData.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}
@@ -413,7 +418,7 @@ public class TurDeviceReader extends TourbookDevice {
 	 * 
 	 * @see net.tourbook.importdata.IRawDataReader#validateRawData(java.lang.String)
 	 */
-	public boolean validateRawData(String fileName) {
+	public boolean validateRawData(final String fileName) {
 
 		boolean isValid = false;
 
@@ -421,9 +426,9 @@ public class TurDeviceReader extends TourbookDevice {
 
 		try {
 
-			byte[] buffer = new byte[17];
+			final byte[] buffer = new byte[17];
 
-			File dataFile = new File(fileName);
+			final File dataFile = new File(fileName);
 			inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
 			inStream.read(buffer);
@@ -433,29 +438,23 @@ public class TurDeviceReader extends TourbookDevice {
 
 			isValid = true;
 
-		} catch (NumberFormatException nfe) {
+		} catch (final NumberFormatException nfe) {
 			return false;
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			return false;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (inStream != null) {
 				try {
 					inStream.close();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					e1.printStackTrace();
 				}
 			}
 		}
 
 		return isValid;
-	}
-
-	@Override
-	public String buildFileNameFromRawData(final String rawDataFileName) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

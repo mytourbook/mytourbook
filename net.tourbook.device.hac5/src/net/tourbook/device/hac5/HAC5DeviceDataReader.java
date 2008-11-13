@@ -79,6 +79,26 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	}
 
 	@Override
+	public String buildFileNameFromRawData(final String rawDataFileName) {
+
+		final File fileRaw = new File(rawDataFileName);
+
+		final long lastModified = fileRaw.lastModified();
+
+		/*
+		 * get the year, because the year is not saved in the raw data file, the modified year of
+		 * the file is used
+		 */
+		final GregorianCalendar fileDate = new GregorianCalendar();
+		fileDate.setTime(new Date(lastModified));
+
+		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
+				(short) fileDate.get(Calendar.YEAR),
+				(short) fileDate.get(Calendar.MONTH) + 1,
+				(short) fileDate.get(Calendar.DAY_OF_MONTH)).toString();
+	}
+
+	@Override
 	public boolean checkStartSequence(final int byteIndex, final int newByte) {
 
 		/*
@@ -131,10 +151,6 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return Messages.HAC5_profile_none;
 	}
 
-	public int getTransferDataSize() {
-		return 0x10007;
-	}
-
 	@Override
 	public SerialParameters getPortParameters(final String portName) {
 
@@ -154,8 +170,13 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return 4;
 	}
 
-	public boolean processDeviceData(final String importFileName, final DeviceData deviceData,
-										final HashMap<String, TourData> tourDataMap) {
+	public int getTransferDataSize() {
+		return 0x10007;
+	}
+
+	public boolean processDeviceData(	final String importFileName,
+										final DeviceData deviceData,
+										final HashMap<Long, TourData> tourDataMap) {
 		boolean returnValue = false;
 
 		final byte[] recordBuffer = new byte[RECORD_LENGTH];
@@ -411,10 +432,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 				readDDRecord(recordBuffer, tourData);
 
 				// after all data are added, the tour id can be created
-				tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
+				final Long tourId = tourData.createTourId(Integer.toString(Math.abs(tourData.getStartDistance())));
 
 				// check if the tour is in the tour map
-				final String tourId = tourData.getTourId().toString();
 				if (tourDataMap.containsKey(tourId) == false) {
 
 					// add new tour to the map
@@ -423,7 +443,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 					/*
 					 * disable data series when no data are available
 					 */
-					TimeData firstTimeData = timeDataList.get(0);
+					final TimeData firstTimeData = timeDataList.get(0);
 					if (sumDistance == 0) {
 						firstTimeData.distance = Integer.MIN_VALUE;
 					}
@@ -628,25 +648,6 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		}
 
 		return isValid;
-	}
-
-	@Override
-	public String buildFileNameFromRawData(String rawDataFileName) {
-
-		File fileRaw = new File(rawDataFileName);
-
-		long lastModified = fileRaw.lastModified();
-
-		/*
-		 * get the year, because the year is not saved in the raw data file, the modified year of
-		 * the file is used
-		 */
-		GregorianCalendar fileDate = new GregorianCalendar();
-		fileDate.setTime(new Date(lastModified));
-
-		return new Formatter().format(net.tourbook.Messages.Format_rawdata_file_yyyy_mm_dd + fileExtension,
-				(short) fileDate.get(Calendar.YEAR), (short) fileDate.get(Calendar.MONTH) + 1,
-				(short) fileDate.get(Calendar.DAY_OF_MONTH)).toString();
 	}
 
 }

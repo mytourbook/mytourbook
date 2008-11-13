@@ -71,7 +71,7 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
 	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
-										final HashMap<String, TourData> tourDataMap) {
+										final HashMap<Long, TourData> tourDataMap) {
 
 		/*
 		 * check if the file is a xml file
