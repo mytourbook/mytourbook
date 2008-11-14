@@ -26,6 +26,6 @@ public interface ITourEventListener {
 	 * @param tourProperty
 	 * @param propertyData
 	 */
-	public void propertyChanged(final IWorkbenchPart part, TourEventId tourProperty, Object propertyData);
+	public void tourChanged(final IWorkbenchPart part, TourEventId tourProperty, Object propertyData);
 
 }

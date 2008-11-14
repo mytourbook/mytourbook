@@ -381,7 +381,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourEventListener() {
-			public void propertyChanged(final IWorkbenchPart part,
+			public void tourChanged(final IWorkbenchPart part,
 										final TourEventId propertyId,
 										final Object propertyData) {
 

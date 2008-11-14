@@ -65,7 +65,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	private PostSelectionProvider	fPostSelectionProvider;
 	private ISelectionListener		fPostSelectionListener;
 	private IPartListener2			fPartListener;
-	private ITourEventListener	fTourPropertyListener;
+	private ITourEventListener		fTourEventListener;
 
 	private void addPartListener() {
 
@@ -135,32 +135,32 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
-		fTourPropertyListener = new ITourEventListener() {
-			public void propertyChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+		fTourEventListener = new ITourEventListener() {
+			public void tourChanged(final IWorkbenchPart part,
+										final TourEventId eventId,
+										final Object eventData) {
 
 				if (part == TourEditor.this) {
 					return;
 				}
 
-				if (propertyId == TourEventId.SEGMENT_LAYER_CHANGED) {
+				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					fTourChart.updateSegmentLayer((Boolean) propertyData);
+					fTourChart.updateSegmentLayer((Boolean) eventData);
 
-				} else if (propertyId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 					fTourChart.updateTourChart(true);
 
-				} else if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
 					if (fTourData == null) {
 						return;
 					}
 
-					final TourEvent tourProperties = (TourEvent) propertyData;
+					final TourEvent tourProperties = (TourEvent) eventData;
 
 					// get modified tours
 					final ArrayList<TourData> modifiedTours = tourProperties.getModifiedTours();
@@ -181,12 +181,12 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 						}
 					}
 
-				} else if (propertyId == TourEventId.UPDATE_UI) {
+				} else if (eventId == TourEventId.UPDATE_UI) {
 
 					// check if this tour viewer contains a tour which must be updated
 
 					// update editor
-					if (UI.containsTourId(propertyData, fTourData.getTourId()) != null) {
+					if (UI.containsTourId(eventData, fTourData.getTourId()) != null) {
 
 						// reload tour data and update chart
 						updateChart(TourManager.getInstance().getTourData(fTourData.getTourId()));
@@ -204,7 +204,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addPropertyListener(fTourEventListener);
 	}
 
 	private void createActions() {
@@ -215,7 +215,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	public void createPartControl(final Composite parent) {
 
 		addPartListener();
-		addTourPropertyListener();
+		addTourEventListener();
 		createActions();
 
 		fTourChart = new TourChart(parent, SWT.FLAT, true);
@@ -245,7 +245,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 		site.getPage().removePartListener(fPartListener);
 		site.getPage().removePostSelectionListener(fPostSelectionListener);
 
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removePropertyListener(fTourEventListener);
 
 		super.dispose();
 	}

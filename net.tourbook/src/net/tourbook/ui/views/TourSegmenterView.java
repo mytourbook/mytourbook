@@ -71,6 +71,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -320,11 +321,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void addSelectionListener() {
 
 		fPostSelectionListener = new ISelectionListener() {
-
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
 				if (part == TourSegmenterView.this) {
 					return;
 				}
+
 				onSelectionChanged(selection);
 			}
 		};
@@ -335,7 +337,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourEventListener() {
-			public void propertyChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (fTourData == null || part == TourSegmenterView.this) {
 					return;
@@ -449,10 +451,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
 		if (fTourData == null) {
-			final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-			if (selectedTours != null && selectedTours.size() > 0) {
-				onSelectionChanged(new SelectionTourData(null, selectedTours.get(0)));
-			}
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+
+					final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+
+					if (selectedTours != null && selectedTours.size() > 0) {
+						onSelectionChanged(new SelectionTourData(null, selectedTours.get(0)));
+					}
+				}
+			});
 		}
 
 	}
@@ -555,7 +563,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void selectionChanged(final SelectionChangedEvent event) {
 
 				final StructuredSelection selection = (StructuredSelection) event.getSelection();
-
 				if (selection != null) {
 
 					/*
@@ -850,6 +857,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 							} catch (final MyTourbookException e) {
 								e.printStackTrace();
 							}
+
+							return tourChart;
 						}
 					}
 				}
@@ -964,11 +973,24 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 */
 		if (fTourData != null && fTourData.getTourId() == nextTourData.getTourId()) {
 
-			// do nothing, it's the same tour
+			// nothing to do, it's the same tour
 
 		} else {
 
-			saveTourData();
+			final TourData savedTour = saveTourData();
+			if (savedTour != null) {
+
+				/*
+				 * when tour is saved, the change notification is not fired because another tour is
+				 * already selected, but to update the tour in a TourViewer, a change nofification
+				 * must be fired afterwords
+				 */
+				Display.getCurrent().asyncExec(new Runnable() {
+					public void run() {
+						TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(savedTour));
+					}
+				});
+			}
 
 			if (nextTourChart == null) {
 				nextTourChart = getActiveTourChart(nextTourData);
@@ -1027,25 +1049,23 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fColumnManager.saveState(fViewState);
 	}
 
-	private boolean saveTourData() {
+	private TourData saveTourData() {
 
 		if (fIsTourDirty == false || fTourData == null || fSavedDpTolerance == -1) {
 			// nothing to do
-			return false;
+			return null;
 		}
 
-		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
-		modifiedTours.add(fTourData);
-
+		TourData savedTour;
 		fIsSaving = true;
 		{
-			TourManager.saveModifiedTours(modifiedTours);
+			savedTour = TourManager.saveModifiedTour(fTourData, false);
 		}
 		fIsSaving = false;
 
 		fIsTourDirty = false;
 
-		return false;
+		return savedTour;
 	}
 
 	@Override

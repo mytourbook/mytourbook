@@ -178,14 +178,14 @@ public class TourManager {
 	}
 
 	public static void fireEvent(final TourEventId tourProperty, final ArrayList<TourData> modifiedTours) {
-		fireEvent(tourProperty, new TourEvent(modifiedTours)); 
+		fireEvent(tourProperty, new TourEvent(modifiedTours));
 	}
 
 	public static void fireEvent(final TourEventId tourProperty, final Object propertyData) {
 
 		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).propertyChanged(null, tourProperty, propertyData);
+			((ITourEventListener) listener).tourChanged(null, tourProperty, propertyData);
 		}
 	}
 
@@ -193,7 +193,7 @@ public class TourManager {
 
 		final Object[] allListeners = fPropertyListeners.getListeners();
 		for (final Object listener : allListeners) {
-			((ITourEventListener) listener).propertyChanged(part, tourProperty, propertyData);
+			((ITourEventListener) listener).tourChanged(part, tourProperty, propertyData);
 		}
 	}
 
@@ -349,11 +349,21 @@ public class TourManager {
 	 * @return Returns the persisted {@link TourData}
 	 */
 	public static TourData saveModifiedTour(final TourData tourData) {
+		return saveModifiedTour(tourData, true);
+	}
+
+	/**
+	 * @param tourData
+	 * @param canFireNotification
+	 *            When <code>true</code>, a notification is fired when the data are saved
+	 * @return Returns the saved {@link TourData} or <code>null</code> when saving fails
+	 */
+	public static TourData saveModifiedTour(final TourData tourData, final boolean canFireNotification) {
 
 		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
 		modifiedTours.add(tourData);
 
-		final ArrayList<TourData> savedTourData = saveModifiedTours(modifiedTours);
+		final ArrayList<TourData> savedTourData = saveModifiedTours(modifiedTours, canFireNotification);
 
 		if (savedTourData == null) {
 			return null;
@@ -375,6 +385,24 @@ public class TourManager {
 	 * @return Returns a list with all persisted {@link TourData}
 	 */
 	public static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours) {
+		return saveModifiedTours(modifiedTours, true);
+	}
+
+	/**
+	 * Saves tours which have been modified and updates the tour data editor, fires a
+	 * {@link TourManager#TOUR_CHANGED} event.<br>
+	 * <br>
+	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
+	 * tour is not dirty, if the tour is dirty, saving is not done.
+	 * 
+	 * @param modifiedTours
+	 *            modified tours
+	 * @param canFireNotification
+	 *            when <code>true</code>, a notification is fired when the data are saved
+	 * @return a list with all persisted {@link TourData}
+	 */
+	public static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours,
+														final boolean canFireNotification) {
 
 		TourData tourDataEditorSavedTour = null;
 		boolean fireChangeEvent = false;
@@ -467,7 +495,7 @@ public class TourManager {
 			}
 		}
 
-		if (fireChangeEvent) {
+		if (canFireNotification && fireChangeEvent) {
 			final TourEvent propertyData = new TourEvent(savedTours);
 			propertyData.tourDataEditorSavedTour = tourDataEditorSavedTour;
 			fireEvent(TourEventId.TOUR_CHANGED, propertyData);
@@ -1220,7 +1248,7 @@ public class TourManager {
 					chartDataModel.setCustomData(CUSTOM_DATA_PULSE, yDataPulse);
 				}
 				break;
-				
+
 			case GRAPH_SPEED:
 				if (yDataSpeed != null) {
 					chartDataModel.addYData(yDataSpeed);

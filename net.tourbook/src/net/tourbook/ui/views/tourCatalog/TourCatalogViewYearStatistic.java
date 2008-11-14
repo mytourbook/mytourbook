@@ -140,7 +140,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	private void addCompareTourPropertyListener() {
 
 		fCompareTourPropertyListener = new ITourEventListener() {
-			public void propertyChanged(final IWorkbenchPart part,
+			public void tourChanged(final IWorkbenchPart part,
 										final TourEventId propertyId,
 										final Object propertyData) {
 

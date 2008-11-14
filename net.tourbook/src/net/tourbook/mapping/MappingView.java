@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
@@ -37,9 +38,9 @@ import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEditor;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
@@ -510,7 +511,7 @@ public class MappingView extends ViewPart {
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourEventListener() {
-			public void propertyChanged(final IWorkbenchPart part,
+			public void tourChanged(final IWorkbenchPart part,
 										final TourEventId propertyId,
 										final Object propertyData) {
 
@@ -1120,7 +1121,12 @@ public class MappingView extends ViewPart {
 		} else if (selection instanceof SelectionChartXSliderPosition) {
 
 			final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
-			final ChartDataModel chartDataModel = xSliderPos.getChart().getChartDataModel();
+			final Chart chart = xSliderPos.getChart();
+			if (chart == null) {
+				return;
+			}
+			 
+			final ChartDataModel chartDataModel = chart.getChartDataModel();
 
 			final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
 			if (tourId instanceof Long) {

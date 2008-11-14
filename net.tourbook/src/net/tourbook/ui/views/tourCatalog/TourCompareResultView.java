@@ -176,7 +176,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private void addCompareTourPropertyListener() {
 
 		fCompareTourPropertyListener = new ITourEventListener() {
-			public void propertyChanged(final IWorkbenchPart part,
+			public void tourChanged(final IWorkbenchPart part,
 										final TourEventId propertyId,
 										final Object propertyData) {
 
@@ -364,7 +364,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private void addTourPropertyListener() {
 
 		fTourPropertyListener = new ITourEventListener() {
-			public void propertyChanged(final IWorkbenchPart part,
+			public void tourChanged(final IWorkbenchPart part,
 										final TourEventId propertyId,
 										final Object propertyData) {
 

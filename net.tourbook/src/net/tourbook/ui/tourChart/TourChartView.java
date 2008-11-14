@@ -31,9 +31,9 @@ import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEditor;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
@@ -133,7 +133,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		fTourPropertyListener = new ITourEventListener() {
 
-			public void propertyChanged(final IWorkbenchPart part,
+			public void tourChanged(final IWorkbenchPart part,
 										final TourEventId propertyId,
 										final Object propertyData) {
 
@@ -367,7 +367,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 				final TourData editorTourData = ((TourEditor) editor).getTourChart().getTourData();
 
-				// prevent loading the same tour when it has not been modified
+				// prevent loading the same tour when it is not modified
 				if (editor.isDirty() == false //
 						&& fTourData != null
 						&& fTourData.equals(editorTourData)) {

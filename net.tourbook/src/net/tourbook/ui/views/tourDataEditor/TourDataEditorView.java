@@ -1013,7 +1013,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void addTourEventListener() {
 
 		fTourEventListener = new ITourEventListener() {
-			public void propertyChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object eventData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object eventData) {
 
 				if (fTourData == null || part == TourDataEditorView.this) {
 					return;
