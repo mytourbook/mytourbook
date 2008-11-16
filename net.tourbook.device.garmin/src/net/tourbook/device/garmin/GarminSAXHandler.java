@@ -689,7 +689,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		if (fTourDataMap.containsKey(tourId) == false) {
 
 			tourData.computeTourDrivingTime();
-			tourData.computeValues();
+			tourData.computeComputedValues();
 
 			tourData.setDeviceId(fDeviceDataReader.deviceId);
 			tourData.setDeviceName(fDeviceDataReader.visibleName);

@@ -267,10 +267,6 @@ public class TourManager {
 				0);
 	}
 
-	private static String getTourDateFull(final Date date) {
-		return UI.DateFormatterFull.format(date.getTime());
-	}
-
 	public static String getTourDateFull(final TourData tourData) {
 
 		final Calendar calendar = GregorianCalendar.getInstance();
@@ -278,6 +274,10 @@ public class TourManager {
 		calendar.set(tourData.getStartYear(), tourData.getStartMonth() - 1, tourData.getStartDay());
 
 		return UI.DateFormatterFull.format(calendar.getTime());
+	}
+
+	private static String getTourDateLong(final Date date) {
+		return UI.DateFormatterLong.format(date.getTime());
 	}
 
 	/**
@@ -313,14 +313,18 @@ public class TourManager {
 	}
 
 	public static String getTourTitle(final Date date) {
-		return getTourDateFull(date) + UI.DASH_WITH_SPACE + getTourTimeShort(date);
+		return getTourDateLong(date) // 
+				+ UI.DASH_WITH_SPACE
+				+ getTourTimeShort(date);
 	}
 
 	/**
 	 * @return returns the title of this tour
 	 */
 	public static String getTourTitle(final TourData tourData) {
-		return getTourDateFull(tourData) + UI.DASH_WITH_SPACE + getTourTimeShort(tourData);
+		return getTourDateLong(getTourDate(tourData).toDate())//
+				+ UI.DASH_WITH_SPACE
+				+ getTourTimeShort(tourData);
 	}
 
 	/**
@@ -358,7 +362,7 @@ public class TourManager {
 	 *            When <code>true</code>, a notification is fired when the data are saved
 	 * @return Returns the saved {@link TourData} or <code>null</code> when saving fails
 	 */
-	public static TourData saveModifiedTour(final TourData tourData, final boolean canFireNotification) {
+	private static TourData saveModifiedTour(final TourData tourData, final boolean canFireNotification) {
 
 		final ArrayList<TourData> modifiedTours = new ArrayList<TourData>();
 		modifiedTours.add(tourData);
@@ -401,8 +405,8 @@ public class TourManager {
 	 *            when <code>true</code>, a notification is fired when the data are saved
 	 * @return a list with all persisted {@link TourData}
 	 */
-	public static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours,
-														final boolean canFireNotification) {
+	private static ArrayList<TourData> saveModifiedTours(	final ArrayList<TourData> modifiedTours,
+															final boolean canFireNotification) {
 
 		TourData tourDataEditorSavedTour = null;
 		boolean fireChangeEvent = false;
@@ -438,13 +442,6 @@ public class TourManager {
 						 * make the tour data editor visible, it could be hidden and confuses the
 						 * user when the changes are not visible
 						 */
-
-						/*
-						 * the tour editor could be opened in another perspective, I didn't find a
-						 * solution to get this view in other perspectives, findViewReference finds
-						 * the view only for the active perspective
-						 */
-
 						UI.openTourEditor(false);
 
 					} else {
@@ -1406,7 +1403,18 @@ public class TourManager {
 	}
 
 	public void removeAllToursFromCache() {
+
+//		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>(fTourDataCache.values());
+
 		fTourDataCache.clear();
+
+		// notify listener to reload the tours
+		/*
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! this is not
+		 * working because the tour data editor does not reload the tour
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 */
+//		fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(modifiedTour));
 	}
 
 	public void removePropertyListener(final ITourEventListener listener) {

@@ -222,7 +222,7 @@ public class TourDatabase {
 					final TourData tourData = getTourFromDb(tourId);
 					if (tourData != null) {
 
-						tourData.computeValues();
+						tourData.computeComputedValues();
 						saveTour(tourData);
 					}
 
@@ -254,7 +254,7 @@ public class TourDatabase {
 			final TourData tourData = getTourFromDb(tourId);
 			if (tourData != null) {
 
-				tourData.computeValues();
+				tourData.computeComputedValues();
 				saveTour(tourData);
 			}
 		}
@@ -2179,7 +2179,7 @@ public class TourDatabase {
 				monitor.subTask(msg);
 			}
 
-			tourData.computeValues();
+			tourData.computeComputedValues();
 
 			final TourPerson person = tourData.getTourPerson();
 			tourData.setTourBike(person.getTourBike());

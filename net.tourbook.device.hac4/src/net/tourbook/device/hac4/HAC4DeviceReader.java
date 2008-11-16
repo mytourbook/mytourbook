@@ -474,7 +474,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 					tourData.createTimeSeries(timeDataList, true);
 					tourData.setTourType(defaultTourType);
 					tourData.computeTourDrivingTime();
-					tourData.computeValues();
+					tourData.computeComputedValues();
 
 					tourData.setDeviceId(deviceId);
 					tourData.setDeviceName(visibleName);

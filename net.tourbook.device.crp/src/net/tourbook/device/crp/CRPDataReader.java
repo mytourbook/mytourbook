@@ -378,7 +378,7 @@ public class CRPDataReader extends TourbookDevice {
 				// create additional data
 				tourData.createTimeSeries(timeDataList, false);
 				tourData.computeTourDrivingTime();
-				tourData.computeValues();
+				tourData.computeComputedValues();
 
 				tourData.setTourAltUp(tourAltUp);
 				tourData.setTourAltDown(tourAltDown);

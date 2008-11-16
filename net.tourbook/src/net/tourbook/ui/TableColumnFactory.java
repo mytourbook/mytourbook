@@ -54,7 +54,7 @@ public abstract class TableColumnFactory {
 			
 			final String unitLabel = "\\ " + UI.UNIT_LABEL_ALTITUDE; //$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label); 
 			colDef.setColumnHeader(unitLabel);
 			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
@@ -72,7 +72,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeDownH", SWT.TRAIL); //$NON-NLS-1$
 			final String unitLabel = "\\ " + UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour; //$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label  + " (" + unitLabel + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label); 
 			colDef.setColumnHeader(unitLabel);
 			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_down_tooltip);
@@ -90,7 +90,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL); //$NON-NLS-1$
 			final String unitLabel = "/ " + UI.UNIT_LABEL_ALTITUDE;//$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label  + " (" + UI.UNIT_LABEL_ALTITUDE + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label); 
 			colDef.setColumnHeader(unitLabel); 
 			colDef.setColumnUnit(unitLabel); 
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_up_tooltip);
@@ -108,7 +108,7 @@ public abstract class TableColumnFactory {
 			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "altitudeUpH", SWT.TRAIL); //$NON-NLS-1$
 			final String unitLabel = "/ " + UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour; //$NON-NLS-1$
 		
-			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label  + " (" + unitLabel + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label); 
 			colDef.setColumnHeader(unitLabel);
 			colDef.setColumnUnit(unitLabel);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_altitude_up_tooltip);

@@ -40,13 +40,13 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ColumnDefinition;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
@@ -653,8 +653,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 			public void update(final ViewerCell cell) {
 				final int tourDistance = ((TourData) cell.getElement()).getTourDistance();
 				if (tourDistance != 0) {
-					fNumberFormatter.setMinimumFractionDigits(2);
-					fNumberFormatter.setMaximumFractionDigits(2);
+					fNumberFormatter.setMinimumFractionDigits(3);
+					fNumberFormatter.setMaximumFractionDigits(3);
 					cell.setText(fNumberFormatter.format(((float) tourDistance) / 1000 / UI.UNIT_VALUE_DISTANCE));
 				}
 			}

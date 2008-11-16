@@ -231,7 +231,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 				// create additional data
 				tourData.createTimeSeries(timeDataList, false);
 				tourData.computeTourDrivingTime();
-				tourData.computeValues();
+				tourData.computeComputedValues();
 
 				tourData.setDeviceId(deviceId);
 				tourData.setDeviceName(visibleName);

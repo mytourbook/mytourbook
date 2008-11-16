@@ -27,7 +27,7 @@ public class SelectionChartXSliderPosition implements ISelection {
 
 	private int				fSlider1ValueIndex				= IGNORE_SLIDER_POSITION;
 	private int				fSlider2ValueIndex				= IGNORE_SLIDER_POSITION;
-	
+
 	private boolean			fCenterSliderPosition			= false;
 
 	private Chart			fChart;
@@ -68,5 +68,9 @@ public class SelectionChartXSliderPosition implements ISelection {
 
 	public boolean isEmpty() {
 		return false;
+	}
+
+	public void setChart(final Chart chart) {
+		fChart = chart;
 	}
 }

@@ -159,7 +159,8 @@ public class TourData {
 	private int						deviceTotalDown;
 
 	/**
-	 * total distance of the tour (m), this value is computed from the distance data serie
+	 * total distance of the tour in meters (metric system), this value is computed from the
+	 * distance data serie
 	 */
 	private int						tourDistance;
 
@@ -322,6 +323,9 @@ public class TourData {
 	@Transient
 	public int[]					pulseSerie;
 
+	/**
+	 * contains the temperature in the metric measurement system
+	 */
 	@Transient
 	public int[]					temperatureSerie;
 
@@ -978,6 +982,20 @@ public class TourData {
 		return totalBreakTime;
 	}
 
+	/**
+	 * compute maximum and average fields
+	 */
+	public void computeComputedValues() {
+
+		computeMaxAltitude();
+		computeMaxPulse();
+		computeMaxSpeed();
+
+		computeAvgPulse();
+		computeAvgCadence();
+		computeAvgTemperature();
+	}
+
 	private void computeMaxAltitude() {
 
 		if (altitudeSerie == null) {
@@ -1433,21 +1451,12 @@ public class TourData {
 	}
 
 	public void computeTourDrivingTime() {
-		tourDrivingTime = Math.max(0, timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length));
-	}
 
-	/**
-	 * compute maximum and average fields
-	 */
-	public void computeValues() {
-
-		computeMaxAltitude();
-		computeMaxPulse();
-		computeMaxSpeed();
-
-		computeAvgPulse();
-		computeAvgCadence();
-		computeAvgTemperature();
+		if (timeSerie == null || timeSerie.length == 0) {
+			tourDrivingTime = 0;
+		} else {
+			tourDrivingTime = Math.max(0, timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length));
+		}
 	}
 
 	/**
@@ -2365,7 +2374,7 @@ public class TourData {
 	}
 
 	/**
-	 * @return Returns the distance data serie for the current measurement system which can be
+	 * @return Returns the distance data serie for the current measurement system, this can be
 	 *         metric or imperial
 	 */
 	public int[] getDistanceSerie() {
@@ -2443,7 +2452,7 @@ public class TourData {
 
 	/**
 	 * @return Returns the distance serie from the metric system, the distance serie is
-	 *         <b>always</b> saved in the database in the metric system
+	 *         <b>always</b> saved in the database with the metric system
 	 */
 	public int[] getMetricDistanceSerie() {
 		return distanceSerie;
@@ -2550,6 +2559,10 @@ public class TourData {
 		return serieData;
 	}
 
+	/**
+	 * @return the speed data in the current measurement system, which is defined in
+	 *         {@link UI#UNIT_VALUE_DISTANCE}
+	 */
 	public int[] getSpeedSerie() {
 
 		if (isSpeedSerieFromDevice) {
@@ -2684,6 +2697,9 @@ public class TourData {
 		return tourDescription == null ? "" : tourDescription; //$NON-NLS-1$
 	}
 
+	/**
+	 * @return the tour distance in metric measurement system
+	 */
 	public int getTourDistance() {
 		return tourDistance;
 	}
@@ -2691,10 +2707,6 @@ public class TourData {
 	public int getTourDrivingTime() {
 		return tourDrivingTime;
 	}
-
-//	public Set<TourCategory> getTourCategory() {
-//		return tourCategory;
-//	}
 
 	/**
 	 * @return the tourEndPlace
@@ -2784,6 +2796,46 @@ public class TourData {
 
 		return result;
 	}
+
+//	/**
+//	 * Called before this object gets persisted, copy data from the tourdata object into the object
+//	 * which gets serialized
+//	 */
+//	/*
+//	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
+//	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
+//	 */
+//	public void onPrePersistOLD() {
+//
+//		if (timeSerie == null) {
+//			serieData = new SerieData();
+//			return;
+//		}
+//
+//		final int serieLength = timeSerie.length;
+//
+//		serieData = new SerieData(serieLength);
+//
+//		System.arraycopy(altitudeSerie, 0, serieData.altitudeSerie, 0, serieLength);
+//		System.arraycopy(cadenceSerie, 0, serieData.cadenceSerie, 0, serieLength);
+//		System.arraycopy(distanceSerie, 0, serieData.distanceSerie, 0, serieLength);
+//		System.arraycopy(pulseSerie, 0, serieData.pulseSerie, 0, serieLength);
+//		System.arraycopy(temperatureSerie, 0, serieData.temperatureSerie, 0, serieLength);
+//		System.arraycopy(timeSerie, 0, serieData.timeSerie, 0, serieLength);
+//
+//		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0,
+//		// serieLength);
+//		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
+//		// serieLength);
+//
+//		if (latitudeSerie != null) {
+//
+//			serieData.initializeGPSData(serieLength);
+//
+//			System.arraycopy(latitudeSerie, 0, serieData.latitude, 0, serieLength);
+//			System.arraycopy(longitudeSerie, 0, serieData.longitude, 0, serieLength);
+//		}
+//	}
 
 	/**
 	 * Called after the object was loaded from the persistence store
@@ -2967,46 +3019,6 @@ public class TourData {
 		serieData.longitude = longitudeSerie;
 	}
 
-//	/**
-//	 * Called before this object gets persisted, copy data from the tourdata object into the object
-//	 * which gets serialized
-//	 */
-//	/*
-//	 * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
-//	 * http://opensource.atlassian.com/projects/hibernate/browse/HHH-1921 2006-08-11
-//	 */
-//	public void onPrePersistOLD() {
-//
-//		if (timeSerie == null) {
-//			serieData = new SerieData();
-//			return;
-//		}
-//
-//		final int serieLength = timeSerie.length;
-//
-//		serieData = new SerieData(serieLength);
-//
-//		System.arraycopy(altitudeSerie, 0, serieData.altitudeSerie, 0, serieLength);
-//		System.arraycopy(cadenceSerie, 0, serieData.cadenceSerie, 0, serieLength);
-//		System.arraycopy(distanceSerie, 0, serieData.distanceSerie, 0, serieLength);
-//		System.arraycopy(pulseSerie, 0, serieData.pulseSerie, 0, serieLength);
-//		System.arraycopy(temperatureSerie, 0, serieData.temperatureSerie, 0, serieLength);
-//		System.arraycopy(timeSerie, 0, serieData.timeSerie, 0, serieLength);
-//
-//		// System.arraycopy(speedSerie, 0, serieData.speedSerie, 0,
-//		// serieLength);
-//		// System.arraycopy(powerSerie, 0, serieData.powerSerie, 0,
-//		// serieLength);
-//
-//		if (latitudeSerie != null) {
-//
-//			serieData.initializeGPSData(serieLength);
-//
-//			System.arraycopy(latitudeSerie, 0, serieData.latitude, 0, serieLength);
-//			System.arraycopy(longitudeSerie, 0, serieData.longitude, 0, serieLength);
-//		}
-//	}
-
 	/**
 	 * @param avgCadence
 	 *            the avgCadence to set
@@ -3023,6 +3035,11 @@ public class TourData {
 		this.avgPulse = avgPulse;
 	}
 
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
+
 	/**
 	 * @param avgTemperature
 	 *            the avgTemperature to set
@@ -3038,11 +3055,6 @@ public class TourData {
 	public void setBikerWeight(final float bikerWeight) {
 		this.bikerWeight = bikerWeight;
 	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
 
 	/**
 	 * @param calories
@@ -3257,10 +3269,9 @@ public class TourData {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("[TourData] ");//$NON-NLS-1$
-		sb.append("tourId:");//$NON-NLS-1$
+		sb.append("   tourId:");//$NON-NLS-1$
 		sb.append(tourId);
-		sb.append(UI.NEW_LINE);
+		sb.append("   identityHashCode:");//$NON-NLS-1$
 		sb.append(System.identityHashCode(this));
 
 		return sb.toString();

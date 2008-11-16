@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
@@ -333,8 +334,31 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
 
-			fTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
+			final SelectionChartXSliderPosition xSliderPosition = (SelectionChartXSliderPosition) selection;
 
+			final Chart chart = xSliderPosition.getChart();
+			if (chart != fTourChart) {
+
+				// it's not the same chart, check if it's the same tour
+
+				final Object tourId = chart.getChartDataModel().getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				if (tourId instanceof Long) {
+
+					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+					if (tourData != null) {
+
+						if (fTourData.equals(tourData)) {
+
+							// it's the same tour, overwrite chart
+
+							xSliderPosition.setChart(fTourChart);
+						}
+					}
+				}
+			}
+
+			fTourChart.setXSliderPosition(xSliderPosition);
+			
 		} else if (selection instanceof StructuredSelection) {
 
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();

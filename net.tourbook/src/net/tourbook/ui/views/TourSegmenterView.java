@@ -106,11 +106,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private PageBook				fPageBook;
 	private Composite				fPageSegmenter;
+	private Label					fPageInvalidData;
+	private Label					fPageNoData;
+
 	private Composite				fViewerContainer;
 
 	private Scale					fScaleTolerance;
 	private Label					fLabelToleranceValue;
-	private Label					fPageNoChart;
 	private Label					fLblTitle;
 
 	private TableViewer				fSegmentViewer;
@@ -129,7 +131,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private ISelectionListener		fPostSelectionListener;
 	private IPartListener2			fPartListener;
 	private IPropertyChangeListener	fPrefChangeListener;
-	private ITourEventListener		fTourPropertyListener;
+	private ITourEventListener		fTourEventListener;
 
 	private PostSelectionProvider	fPostSelectionProvider;
 
@@ -142,6 +144,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private boolean					fIsTourDirty		= false;
 
 	private boolean					fIsSaving;
+
+	/**
+	 * when <code>true</code>, the tour dirty flag is disabled to load data into the fields
+	 */
+	private boolean					fIsDirtyDisabled	= false;
 
 	private class ActionShowSegments extends Action {
 
@@ -270,7 +277,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourSegmenterView.this) {
-					saveTourData();
+					saveTour();
 					saveState();
 					hideTourSegmentsInChart();
 				}
@@ -334,9 +341,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
-		fTourPropertyListener = new ITourEventListener() {
+		fTourEventListener = new ITourEventListener() {
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (fTourData == null || part == TourSegmenterView.this) {
@@ -359,20 +366,23 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 						// update existing tour
 
-						if (tourEvent.isReverted) {
+						if (checkDataValidation(modifiedTourData)) {
 
-							/*
-							 * tour is reverted, saving existing tour is not necessary, just update
-							 * the tour
-							 */
-							setTour(modifiedTourData);
+							if (tourEvent.isReverted) {
 
-							// all done
-							return;
+								/*
+								 * tour is reverted, saving existing tour is not necessary, just
+								 * update the tour
+								 */
+								setTour(modifiedTourData);
+
+								// all done
+								return;
+							}
+
+							createSegments();
+							reloadViewer();
 						}
-
-						createSegments();
-						reloadViewer();
 
 					} else {
 
@@ -382,7 +392,33 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addPropertyListener(fTourEventListener);
+	}
+
+	/**
+	 * check if data for the segmenter is valid
+	 */
+	private boolean checkDataValidation(final TourData tourData) {
+
+		if (tourData == null) {
+			fPageBook.showPage(fPageNoData);
+
+			fTourData = null;
+			fTourChart = null;
+
+			return false;
+		}
+		if (tourData.altitudeSerie == null
+				|| tourData.altitudeSerie.length == 0
+				|| tourData.getMetricDistanceSerie() == null
+				|| tourData.getMetricDistanceSerie().length == 0) {
+
+			fPageBook.showPage(fPageInvalidData);
+
+			return false;
+		}
+
+		return true;
 	}
 
 	private void createActions() {
@@ -417,18 +453,19 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		fPageBook = new PageBook(parent, SWT.NONE);
 
-		fPageNoChart = new Label(fPageBook, SWT.WRAP);
-		fPageNoChart.setText(Messages.Tour_Segmenter_Label_no_chart);
+		fPageNoData = new Label(fPageBook, SWT.WRAP);
+		fPageNoData.setText(Messages.Tour_Segmenter_Label_no_chart);
+
+		fPageInvalidData = new Label(fPageBook, SWT.WRAP);
+		fPageInvalidData.setText(Messages.Tour_Segmenter_label_invalid_data);
 
 		fPageSegmenter = new Composite(fPageBook, SWT.NONE);
-		GridLayoutFactory.fillDefaults().spacing(0, 1).applyTo(fPageSegmenter);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(fPageSegmenter);
 
-		createSegmenterLayout(fPageSegmenter);
+		fPageBook.showPage(fPageNoData);
 
-		fViewerContainer = new Composite(fPageSegmenter, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(fViewerContainer);
-		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
-		createSegmentViewer(fViewerContainer);
+		createUIHeader(fPageSegmenter);
+		createUIViewer(fPageSegmenter);
 
 		createMenus();
 		createActions();
@@ -436,12 +473,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		addSelectionListener();
 		addPartListener();
 		addPrefListener();
-		addTourPropertyListener();
+		addTourEventListener();
 
 		// tell the site that this view is a selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
-
-		fPageBook.showPage(fPageNoChart);
 
 		// set default value, show segments in opened charts
 		fShowSegmentsInChart = true;
@@ -463,57 +498,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			});
 		}
 
-	}
-
-	private void createSegmenterLayout(final Composite parent) {
-
-		GridData gd;
-		Label label;
-
-		final Composite segmentContainer = new Composite(parent, SWT.NONE);
-		segmentContainer.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
-		GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(segmentContainer);
-
-		/*
-		 * tour title
-		 */
-		fLblTitle = new Label(segmentContainer, SWT.NONE);
-		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-		gd.horizontalSpan = 3;
-		fLblTitle.setLayoutData(gd);
-
-		/*
-		 * scale: tolerance
-		 */
-		label = new Label(segmentContainer, SWT.NONE);
-		label.setText(Messages.Tour_Segmenter_Label_tolerance);
-
-		fScaleTolerance = new Scale(segmentContainer, SWT.HORIZONTAL);
-		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-		fScaleTolerance.setMaximum(100);
-		fScaleTolerance.setLayoutData(gd);
-		fScaleTolerance.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onToleranceChanged(getTolerance(), false);
-				setTourDirty();
-			}
-		});
-
-		fScaleTolerance.addListener(SWT.MouseWheel, new Listener() {
-			public void handleEvent(final Event event) {
-				onToleranceChanged(getTolerance(), false);
-				setTourDirty();
-			}
-		});
-
-		gd = new GridData();
-		gd.horizontalAlignment = GridData.FILL;
-		gd.verticalAlignment = GridData.CENTER;
-		gd.widthHint = 30;
-		fLabelToleranceValue = new Label(segmentContainer, SWT.NONE);
-		fLabelToleranceValue.setText(Messages.Tour_Segmenter_Label_default_tolerance);
-		fLabelToleranceValue.setLayoutData(gd);
 	}
 
 	/**
@@ -546,12 +530,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	private void createSegmentViewer(final Composite parent) {
-		// table
-		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
 
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		final Table table = new Table(parent, //
+				SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI /* | SWT.BORDER */);
+
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
 		fSegmentViewer = new TableViewer(table);
 		fColumnManager.createColumns(fSegmentViewer);
@@ -587,6 +572,66 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}
 			}
 		});
+	}
+
+	private void createUIHeader(final Composite parent) {
+
+		final PixelConverter pc = new PixelConverter(parent);
+		GridData gd;
+		Label label;
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).extendedMargins(3, 3, 3, 2).applyTo(container);
+
+		/*
+		 * tour title
+		 */
+		fLblTitle = new Label(container, SWT.NONE);
+		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		gd.horizontalSpan = 3;
+		fLblTitle.setLayoutData(gd);
+
+		/*
+		 * scale: tolerance
+		 */
+		label = new Label(container, SWT.NONE);
+		label.setText(Messages.Tour_Segmenter_Label_tolerance);
+
+		fScaleTolerance = new Scale(container, SWT.HORIZONTAL);
+		gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+		fScaleTolerance.setMaximum(100);
+		fScaleTolerance.setLayoutData(gd);
+		fScaleTolerance.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onToleranceChanged(getTolerance(), false);
+				setTourDirty();
+			}
+		});
+
+		fScaleTolerance.addListener(SWT.MouseWheel, new Listener() {
+			public void handleEvent(final Event event) {
+//				onToleranceChanged(getTolerance(), false);
+//				setTourDirty();
+			}
+		});
+
+		fLabelToleranceValue = new Label(container, SWT.NONE);
+		fLabelToleranceValue.setText(Messages.Tour_Segmenter_Label_default_tolerance);
+		GridDataFactory.fillDefaults()
+				.align(SWT.FILL, SWT.CENTER)
+				.hint(pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+				.applyTo(fLabelToleranceValue);
+	}
+
+	private void createUIViewer(final Composite parent) {
+
+		fViewerContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(fViewerContainer);
+		GridLayoutFactory.fillDefaults().applyTo(fViewerContainer);
+
+		createSegmentViewer(fViewerContainer);
 	}
 
 	private void defineViewerColumns(final Composite parent) {
@@ -788,7 +833,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removePropertyListener(fTourEventListener);
 
 		super.dispose();
 	}
@@ -913,93 +958,105 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			return;
 		}
 
-		TourData nextTourData = null;
-		TourChart nextTourChart = null;
-
-		if (selection instanceof SelectionActiveEditor) {
-
-			final IEditorPart editorPart = ((SelectionActiveEditor) selection).getEditor();
-
-			if (editorPart instanceof TourEditor) {
-
-				final TourEditor tourEditor = (TourEditor) editorPart;
-
-				// check if editor changed
-				if (fTourChart != null & fTourChart == tourEditor.getTourChart()) {
-					return;
-				}
-
-				nextTourChart = tourEditor.getTourChart();
-				nextTourData = nextTourChart.getTourData();
-
-			} else {
-				return;
-			}
-
-		} else if (selection instanceof SelectionTourData) {
-
-			final SelectionTourData selectionTourData = (SelectionTourData) selection;
-
-			nextTourData = selectionTourData.getTourData();
-			nextTourChart = selectionTourData.getTourChart();
-
-		} else if (selection instanceof SelectionTourId) {
-
-			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
-
-			if (fTourData != null) {
-				if (fTourData.getTourId().equals(tourIdSelection.getTourId())) {
-					// don't reload the same tour
-					return;
-				}
-			}
-
-			nextTourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
-
-		} else {
-			return;
-		}
-
-		if (nextTourData == null || nextTourData.altitudeSerie == null || nextTourData.getMetricDistanceSerie() == null) {
-
-			fPageBook.showPage(fPageNoChart);
-			fTourData = null;
-			fTourChart = null;
-			return;
-		}
-
 		/*
-		 * save previous tour when a new tour is selected
+		 * run selection async because a tour could be modified and needs to be saved, modifications
+		 * are not reported to the tour data editor, saving needs also to be asynch with the tour
+		 * data editor
 		 */
-		if (fTourData != null && fTourData.getTourId() == nextTourData.getTourId()) {
+		Display.getCurrent().asyncExec(new Runnable() {
+			public void run() {
 
-			// nothing to do, it's the same tour
+				if (fPageBook.isDisposed()) {
+					return;
+				}
+				
+				TourData nextTourData = null;
+				TourChart nextTourChart = null;
 
-		} else {
+				if (selection instanceof SelectionActiveEditor) {
 
-			final TourData savedTour = saveTourData();
-			if (savedTour != null) {
+					final IEditorPart editorPart = ((SelectionActiveEditor) selection).getEditor();
+
+					if (editorPart instanceof TourEditor) {
+
+						final TourEditor tourEditor = (TourEditor) editorPart;
+
+						// check if editor changed
+						if (fTourChart != null & fTourChart == tourEditor.getTourChart()) {
+							return;
+						}
+
+						nextTourChart = tourEditor.getTourChart();
+						nextTourData = nextTourChart.getTourData();
+
+					} else {
+						return;
+					}
+
+				} else if (selection instanceof SelectionTourData) {
+
+					final SelectionTourData selectionTourData = (SelectionTourData) selection;
+
+					nextTourData = selectionTourData.getTourData();
+					nextTourChart = selectionTourData.getTourChart();
+
+				} else if (selection instanceof SelectionTourId) {
+
+					final SelectionTourId tourIdSelection = (SelectionTourId) selection;
+
+					if (fTourData != null) {
+						if (fTourData.getTourId().equals(tourIdSelection.getTourId())) {
+							// don't reload the same tour
+							return;
+						}
+					}
+
+					nextTourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+
+				} else {
+					return;
+				}
+
+				if (checkDataValidation(nextTourData) == false) {
+					return;
+				}
 
 				/*
-				 * when tour is saved, the change notification is not fired because another tour is
-				 * already selected, but to update the tour in a TourViewer, a change nofification
-				 * must be fired afterwords
+				 * save previous tour when a new tour is selected
 				 */
-				Display.getCurrent().asyncExec(new Runnable() {
-					public void run() {
-						TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(savedTour));
+				if (fTourData != null && fTourData.getTourId() == nextTourData.getTourId()) {
+
+					// nothing to do, it's the same tour
+
+				} else {
+
+					final TourData savedTour = saveTour();
+					if (savedTour != null) {
+
+						/*
+						 * when a tour is saved, the change notification is not fired because
+						 * another tour is already selected, but to update the tour in a TourViewer,
+						 * a change nofification must be fired afterwords
+						 */
+//				Display.getCurrent().asyncExec(new Runnable() {
+//					public void run() {
+//						TourManager.fireEvent(TourEventId.TOUR_CHANGED,
+//								new TourEvent(savedTour),
+//								TourSegmenterView.this);
+//					}
+//				});
 					}
-				});
+
+					if (nextTourChart == null) {
+						nextTourChart = getActiveTourChart(nextTourData);
+					}
+
+					fTourChart = nextTourChart;
+
+					setTour(nextTourData);
+				}
 			}
-
-			if (nextTourChart == null) {
-				nextTourChart = getActiveTourChart(nextTourData);
-			}
-
-			fTourChart = nextTourChart;
-
-			setTour(nextTourData);
-		}
+		});
 	}
 
 	private void onToleranceChanged(final int dpTolerance, final boolean forceRecalc) {
@@ -1049,7 +1106,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fColumnManager.saveState(fViewState);
 	}
 
-	private TourData saveTourData() {
+	private TourData saveTour() {
 
 		if (fIsTourDirty == false || fTourData == null || fSavedDpTolerance == -1) {
 			// nothing to do
@@ -1059,7 +1116,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		TourData savedTour;
 		fIsSaving = true;
 		{
-			savedTour = TourManager.saveModifiedTour(fTourData, false);
+			savedTour = TourManager.saveModifiedTour(fTourData);
 		}
 		fIsSaving = false;
 
@@ -1080,6 +1137,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void setTour(final TourData tourData) {
 
+		fIsDirtyDisabled = true;
 		fTourData = tourData;
 
 		fPageBook.showPage(fPageSegmenter);
@@ -1098,6 +1156,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		fScaleTolerance.setSelection((int) tolerance);
 		fLabelToleranceValue.setText(Integer.toString(fTourData.getDpTolerance()));
 
+		fIsDirtyDisabled = false;
+
 		// force the segements to be rebuild for the new tour
 		onToleranceChanged(fDpTolerance, true);
 	}
@@ -1107,6 +1167,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private void setTourDirty() {
 
+		if (fIsDirtyDisabled) {
+			return;
+		}
+		
 		if (fTourData != null && fSavedDpTolerance != fTourData.getDpTolerance()) {
 			fIsTourDirty = true;
 		}

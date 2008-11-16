@@ -20,24 +20,24 @@ import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-class ActionToggleRowSelectMode extends Action {
+class ActionToggleReadEditMode extends Action {
 
 	private final TourDataEditorView	fTourPropertiesView;
 
-	public ActionToggleRowSelectMode(final TourDataEditorView tourPropertiesView) {
+	public ActionToggleReadEditMode(final TourDataEditorView tourPropertiesView) {
 
 		super(null, AS_CHECK_BOX);
 
 		fTourPropertiesView = tourPropertiesView;
 
-		setToolTipText(Messages.app_action_edit_rows_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_row));
+		setToolTipText(Messages.app_action_read_edit_tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit));
 		
 		setEnabled(false);
 	}
 
 	@Override
 	public void run() {
-		fTourPropertiesView.actionToggleRowSelectMode();
+		fTourPropertiesView.actionToggleReadEditMode();
 	}
 }

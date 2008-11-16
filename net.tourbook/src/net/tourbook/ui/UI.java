@@ -178,6 +178,7 @@ public class UI {
 
 	public static final DateFormat					TimeFormatterShort				= DateFormat.getTimeInstance(DateFormat.SHORT);
 	public static final DateFormat					DateFormatterShort				= DateFormat.getDateInstance(DateFormat.SHORT);
+	public static final DateFormat					DateFormatterLong				= DateFormat.getDateInstance(DateFormat.LONG);
 	public static final DateFormat					DateFormatterFull				= DateFormat.getDateInstance(DateFormat.FULL);
 	public static final SimpleDateFormat			MonthFormatter					= new SimpleDateFormat("MMM");					//$NON-NLS-1$
 	public static final SimpleDateFormat			WeekDayFormatter				= new SimpleDateFormat("EEEE");				//$NON-NLS-1$
@@ -261,23 +262,39 @@ public class UI {
 		if (tourData1 == null || tourData2 == null) {
 			return true;
 		}
-		
+
 		if (tourData1.getTourId().longValue() == tourData2.getTourId().longValue() && tourData1 != tourData2) {
 
-			final String errorMessage = "This error should not happen and occures when the internal structure of the application is corrupted. " //$NON-NLS-1$
-					+ "You should restart the application." //$NON-NLS-1$
-					+ UI.NEW_LINE2
-					+ "The tour editor contains the selected tour but the TourData are different." //$NON-NLS-1$
-					+ UI.NEW_LINE2
-					+ "Tour in Editor:\t" //$NON-NLS-1$
-					+ tourData2.toStringWithHash()
-					+ UI.NEW_LINE2
-					+ "Selected Tour:\t" //$NON-NLS-1$
-					+ tourData1.toStringWithHash();
+			final StringBuilder sb = new StringBuilder()//
+			.append("ERROR: ") //$NON-NLS-1$
+					.append("The internal structure of the application is out of synch.") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append("You can solve the problem by:")
+					.append(UI.NEW_LINE2)
+					.append("- restarting the application") //$NON-NLS-1$
+					.append(UI.NEW_LINE)
+					.append("- close the tour editor in all perspectives") //$NON-NLS-1$
+					.append(UI.NEW_LINE)
+					.append("- save/revert tour and select another tour") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append(UI.NEW_LINE)
+					.append("The tour editor contains the selected tour, but the data are different.") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append("Tour in Editor:") //$NON-NLS-1$
+					.append(tourData2.toStringWithHash())
+					.append(UI.NEW_LINE)
+					.append("Selected Tour:") //$NON-NLS-1$
+					.append(tourData1.toStringWithHash())
+					.append(UI.NEW_LINE2)
+					.append(UI.NEW_LINE)
+					.append("You should also inform the author of the application how this error occured. ")
+					.append("However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
+					.append(UI.NEW_LINE2)
+					.append("These actions must be reproducable otherwise the bug cannot be identified."); //$NON-NLS-1$
 
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Internal Error", errorMessage); //$NON-NLS-1$
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error: Out of Synch", sb.toString()); //$NON-NLS-1$
 
-			throw new MyTourbookException(errorMessage);
+			throw new MyTourbookException(sb.toString());
 		}
 
 		return true;

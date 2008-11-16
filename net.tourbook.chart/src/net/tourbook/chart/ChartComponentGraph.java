@@ -3681,7 +3681,7 @@ public class ChartComponentGraph extends Canvas {
 				break;
 			}
 
-			setXSliderValueIndex(fSelectedXSlider, valueIndex, true);
+			setXSliderValueIndex(fSelectedXSlider, valueIndex, false);
 
 			redraw();
 			setDefaultCursor();

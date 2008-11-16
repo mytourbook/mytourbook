@@ -346,7 +346,7 @@ public class TurDeviceReader extends TourbookDevice {
 				}
 
 				tourData.createTimeSeries(timeDataList, true);
-				tourData.computeValues();
+				tourData.computeComputedValues();
 
 				// Read last 0A from binary block
 				TurFileUtil.readByte(fileTurData);

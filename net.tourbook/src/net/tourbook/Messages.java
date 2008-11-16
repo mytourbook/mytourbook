@@ -92,6 +92,8 @@ public class Messages extends NLS {
 
 	public static String	app_action_open_tour;
 	public static String		app_action_quick_edit;
+
+	public static String	app_action_read_edit_tooltip;
 	public static String		app_action_save_tour_tooltip;
 	public static String	app_action_undo_modifications;
 
@@ -557,6 +559,8 @@ public class Messages extends NLS {
 
 	public static String		Tour_Properties_tabLabel_time;
 	public static String		Tour_Segmenter_Label_default_tolerance;
+
+	public static String	Tour_Segmenter_label_invalid_data;
 	public static String		Tour_Segmenter_Label_no_chart;
 	public static String		Tour_Segmenter_Label_tolerance;
 

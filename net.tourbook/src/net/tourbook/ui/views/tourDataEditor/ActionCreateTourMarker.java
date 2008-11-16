@@ -88,12 +88,7 @@ public class ActionCreateTourMarker extends Action {
 
 		if (markerDialog.open() == Window.OK) {
 
-//			fTourDataEditorView.updateViewer();
-//			fTourDataEditorView.setTourDirty();
-
-			final TourEvent propertyData = new TourEvent(tourData);
-			TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData);
-
+			TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(tourData));
 		}
 
 		// markers in tourData could be modified even when the Cancel button is pressed

@@ -456,7 +456,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 					tourData.createTimeSeries(timeDataList, true);
 					tourData.computeTourDrivingTime();
-					tourData.computeValues();
+					tourData.computeComputedValues();
 
 					tourData.setDeviceId(deviceId);
 					tourData.setDeviceName(visibleName);

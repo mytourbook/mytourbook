@@ -21,6 +21,7 @@ package net.tourbook.tour;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
@@ -109,25 +110,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 					return;
 				}
 
-				if (selection instanceof SelectionChartXSliderPosition) {
-
-					fTourChart.setXSliderPosition((SelectionChartXSliderPosition) selection);
-
-				} else if (!selection.isEmpty() && selection instanceof SelectionDeletedTours) {
-
-					final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
-					final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
-					final long tourId = fTourData.getTourId().longValue();
-
-					// find the current tour id in the removed tour id's
-					for (final ITourItem tourItem : removedTours) {
-						if (tourId == tourItem.getTourId().longValue()) {
-
-							// close this editor
-							getSite().getPage().closeEditor(TourEditor.this, false);
-						}
-					}
-				}
+				onSelectionChanged(selection);
 			}
 		};
 
@@ -138,9 +121,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	private void addTourEventListener() {
 
 		fTourEventListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId eventId,
-										final Object eventData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourEditor.this) {
 					return;
@@ -195,10 +176,10 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 			}
 
 			private void updateChart(final TourData tourData) {
-				
+
 				// keep modified data
 				fTourData = tourData;
-				
+
 				// update chart
 				fTourChart.updateTourChart(tourData, false);
 			}
@@ -295,6 +276,83 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
+	}
+
+	private void onSelectionChanged(final ISelection selection) {
+
+		if (selection instanceof SelectionChartXSliderPosition) {
+
+			final SelectionChartXSliderPosition xSliderPosition = (SelectionChartXSliderPosition) selection;
+			final Chart chart = xSliderPosition.getChart();
+			if (chart == null) {
+				return;
+			}
+			
+			if (chart != fTourChart) {
+
+				// it's not the same chart, check if it's the same tour
+
+				final Object tourId = chart.getChartDataModel().getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				if (tourId instanceof Long) {
+
+					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+					if (tourData != null) {
+
+						if (fTourData.equals(tourData)) {
+
+							// it's the same tour, overwrite chart
+
+							xSliderPosition.setChart(fTourChart);
+						}
+					}
+				}
+			}
+
+			fTourChart.setXSliderPosition(xSliderPosition);
+
+		} else if (!selection.isEmpty() && selection instanceof SelectionDeletedTours) {
+
+			final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
+			final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
+			final long tourId = fTourData.getTourId().longValue();
+
+			// find the current tour id in the removed tour id's
+			for (final ITourItem tourItem : removedTours) {
+				if (tourId == tourItem.getTourId().longValue()) {
+
+					// close this editor
+					getSite().getPage().closeEditor(TourEditor.this, false);
+				}
+			}
+
+		} else if (selection instanceof SelectionChartInfo) {
+
+			final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
+			if (chartDataModel != null) {
+
+				final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
+				if (tourId instanceof Long) {
+
+					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+					if (tourData != null) {
+
+						if (fTourData == null || fTourData.equals(tourData) == false) {
+
+							fTourData = tourData;
+
+							updateTourChart();
+						}
+
+						final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+						// set slider position
+						fTourChart.setXSliderPosition(new SelectionChartXSliderPosition(fTourChart,
+								chartInfo.leftSliderValuesIndex,
+								chartInfo.rightSliderValuesIndex));
+					}
+				}
+			}
+		}
 	}
 
 	public void restoreState(final IMemento memento) {
