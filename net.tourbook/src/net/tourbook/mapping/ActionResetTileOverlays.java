@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionResetTileOverlays extends Action {
 
-	private MappingView	fMapView;
+	private MapView	fMapView;
 
-	public ActionResetTileOverlays(final MappingView mapView) {
+	public ActionResetTileOverlays(final MapView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 

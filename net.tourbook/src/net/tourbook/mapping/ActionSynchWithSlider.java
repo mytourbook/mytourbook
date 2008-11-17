@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSynchWithSlider extends Action {
 
-	private MappingView	fMapView;
+	private MapView	fMapView;
 
-	public ActionSynchWithSlider(final MappingView mapView) {
+	public ActionSynchWithSlider(final MapView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

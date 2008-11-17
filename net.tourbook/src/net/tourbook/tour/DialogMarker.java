@@ -79,10 +79,11 @@ public class DialogMarker extends TitleAreaDialog {
 	private static final String	DIALOG_SETTINGS_POSITION		= "marker_position";				//$NON-NLS-1$
 	private static final String	DIALOG_SETTINGS_VIEWER_WIDTH	= "viewer_width";					//$NON-NLS-1$
 
-	private static final int	COLUMN_DISTANCE					= 0;
-	private static final int	COLUMN_MARKER_LABEL				= 1;
-	private static final int	COLUMN_X_OFFSET					= 2;
-	private static final int	COLUMN_Y_OFFSET					= 3;
+	private static final int	COLUMN_FORCE_RIGHT_ALIGN		= 0;
+	private static final int	COLUMN_DISTANCE					= 1;
+	private static final int	COLUMN_MARKER_LABEL				= 2;
+	private static final int	COLUMN_X_OFFSET					= 3;
+	private static final int	COLUMN_Y_OFFSET					= 4;
 
 	private static final int	OFFSET_PAGE_INCREMENT			= 20;
 
@@ -158,8 +159,8 @@ public class DialogMarker extends TitleAreaDialog {
 			switch (cell.getColumnIndex()) {
 
 			case COLUMN_DISTANCE:
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
+				fNF.setMinimumFractionDigits(3);
+				fNF.setMaximumFractionDigits(3);
 				cell.setText(fNF.format((tourMarker.getDistance()) / (1000 * UI.UNIT_VALUE_DISTANCE)));
 
 				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
@@ -346,12 +347,16 @@ public class DialogMarker extends TitleAreaDialog {
 
 		final MarkerViewerLabelProvider labelProvider = new MarkerViewerLabelProvider();
 
+		// column: hidden column to show first visible column with right alignment
+		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
+		tableLayouter.addColumnData(new ColumnPixelData(0, false));
+
 		// column: distance km/mi
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.TRAIL);
 		tvc.getColumn().setText(UI.UNIT_LABEL_DISTANCE);
 		tvc.getColumn().setToolTipText(Messages.Tour_Marker_Column_km_tooltip);
 		tvc.setLabelProvider(labelProvider);
-		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), false));
+		tableLayouter.addColumnData(new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(11), false));
 
 		// column: marker
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);
@@ -376,7 +381,6 @@ public class DialogMarker extends TitleAreaDialog {
 		/*
 		 * create table viewer
 		 */
-
 		fMarkerViewer.setContentProvider(new MarkerViewerContentProvicer());
 		fMarkerViewer.setLabelProvider(labelProvider);
 		fMarkerViewer.setSorter(new MarkerViewerSorter());

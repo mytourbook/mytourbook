@@ -230,7 +230,7 @@
       </view>
       <view
             category="net.tourbook.category.tour"
-            class="net.tourbook.mapping.MappingView"
+            class="net.tourbook.mapping.MapView"
             icon="icons/earth-globe-abstract.png"
             id="net.tourbook.mapping.mappingViewID"
             name="%view_name_tour_map">

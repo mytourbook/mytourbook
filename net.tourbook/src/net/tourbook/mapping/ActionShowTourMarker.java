@@ -20,9 +20,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowTourMarker extends Action {
 
-	private MappingView	fMapView;
+	private MapView	fMapView;
 
-	public ActionShowTourMarker(final MappingView mapView) {
+	public ActionShowTourMarker(final MapView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

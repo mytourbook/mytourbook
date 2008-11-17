@@ -33,9 +33,9 @@ import net.tourbook.tour.SelectionActiveEditor;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEditor;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
@@ -365,8 +365,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 
 				final TourMarker tourMarker = (TourMarker) cell.getElement();
 
-				fNF.setMinimumFractionDigits(1);
-				fNF.setMaximumFractionDigits(1);
+				fNF.setMinimumFractionDigits(3);
+				fNF.setMaximumFractionDigits(3);
 				cell.setText(fNF.format(((float) tourMarker.getDistance()) / 1000 / UI.UNIT_VALUE_DISTANCE));
 
 				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
@@ -374,7 +374,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 				}
 			}
 		});
-		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(8), false));
+		tableLayout.setColumnData(tvcColumn, new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(11), false));
 
 		// column: remark
 		tvc = new TableViewerColumn(fMarkerViewer, SWT.LEAD);

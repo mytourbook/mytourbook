@@ -15,24 +15,46 @@
  *******************************************************************************/
 package net.tourbook.mapping;
 
-import org.eclipse.jface.action.Action;
+import net.tourbook.data.TourData;
 
-public class ActionShowStartEndInMap extends Action {
+import org.eclipse.jface.viewers.ISelection;
 
-	private MapView	fMapView;
+public class SelectionMapPosition implements ISelection {
 
-	public ActionShowStartEndInMap(final MapView mapView) {
+	private boolean		centerSliderPosition;
+	private TourData	tourData;
+	private int			valueIndex1;
+	private int			valueIndex2;
 
-		super(null, AS_CHECK_BOX);
+	public SelectionMapPosition(final TourData tourData,
+								final int valueIndex1,
+								final int valueIndex2,
+								final boolean centerSliderPosition) {
 
-		fMapView = mapView;
-
-		setText(Messages.map_action_show_start_finish_in_map);
+		this.tourData = tourData;
+		this.valueIndex1 = valueIndex1;
+		this.valueIndex2 = valueIndex2;
+		this.centerSliderPosition = centerSliderPosition;
 	}
 
-	@Override
-	public void run() {
-		fMapView.actionSetShowStartEndInMap();
+	public int getSlider1ValueIndex() {
+		return valueIndex1;
+	}
+
+	public int getSlider2ValueIndex() {
+		return valueIndex2;
+	}
+
+	public TourData getTourData() {
+		return tourData;
+	}
+
+	public boolean isCenterSliderPosition() {
+		return centerSliderPosition;
+	}
+
+	public boolean isEmpty() {
+		return false;
 	}
 
 }

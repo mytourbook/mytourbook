@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowTourInMap extends Action {
 
-	private MappingView	fMapView;
+	private MapView	fMapView;
 
-	public ActionShowTourInMap(final MappingView mapView) {
+	public ActionShowTourInMap(final MapView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

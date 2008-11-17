@@ -91,7 +91,7 @@ import de.byteholder.gpx.ext.PointOfInterest;
  * @author Wolfgang Schramm
  * @since 1.3.0
  */
-public class MappingView extends ViewPart {
+public class MapView extends ViewPart {
 
 	private static final int						DEFAULT_LEGEND_WIDTH				= 150;
 
@@ -138,7 +138,7 @@ public class MappingView extends ViewPart {
 	private IPropertyChangeListener					fPrefChangeListener;
 	private IPropertyChangeListener					fTourbookPrefChangeListener;
 	private IPartListener2							fPartListener;
-	private ITourEventListener					fTourPropertyListener;
+	private ITourEventListener						fTourEventListener;
 
 	/**
 	 * contains the tours which are displayed in the map
@@ -207,7 +207,7 @@ public class MappingView extends ViewPart {
 	private int										fMapDimLevel						= -1;
 	private RGB										fMapDimColor;
 
-	public MappingView() {}
+	public MapView() {}
 
 	void actionDimMap(final int dimLevel) {
 
@@ -307,9 +307,12 @@ public class MappingView extends ViewPart {
 	}
 
 	void actionSetTourColor(final int colorId) {
+		
 		PaintManager.getInstance().setLegendProvider(getLegendProvider(colorId));
+		
 		fMap.disposeOverlayImageCache();
 		fMap.queueRedrawMap();
+		
 		createLegendImage(getLegendProvider(colorId));
 	}
 
@@ -408,7 +411,7 @@ public class MappingView extends ViewPart {
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == MappingView.this) {
+				if (partRef.getPart(false) == MapView.this) {
 					saveState();
 				}
 			}
@@ -445,7 +448,7 @@ public class MappingView extends ViewPart {
 
 				} else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
 
-					float prefDimLevel = store.getInt(MappingView.PREF_DEBUG_MAP_DIM_LEVEL);
+					float prefDimLevel = store.getInt(MapView.PREF_DEBUG_MAP_DIM_LEVEL);
 					prefDimLevel *= 2.55;
 					prefDimLevel -= 255;
 
@@ -508,14 +511,12 @@ public class MappingView extends ViewPart {
 		TourbookPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(fTourbookPrefChangeListener);
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
-		fTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+		fTourEventListener = new ITourEventListener() {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
-				if (part == MappingView.this) {
+				if (part == MapView.this) {
 					return;
 				}
 
@@ -538,7 +539,7 @@ public class MappingView extends ViewPart {
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addPropertyListener(fTourEventListener);
 	}
 
 	/**
@@ -728,20 +729,20 @@ public class MappingView extends ViewPart {
 
 	private void createLegendProviders() {
 
-		fLegendProviders.put(MappingView.TOUR_COLOR_PULSE, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), MappingView.TOUR_COLOR_PULSE));
+		fLegendProviders.put(MapView.TOUR_COLOR_PULSE, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), MapView.TOUR_COLOR_PULSE));
 
-		fLegendProviders.put(MappingView.TOUR_COLOR_ALTITUDE, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), MappingView.TOUR_COLOR_ALTITUDE));
+		fLegendProviders.put(MapView.TOUR_COLOR_ALTITUDE, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), MapView.TOUR_COLOR_ALTITUDE));
 
-		fLegendProviders.put(MappingView.TOUR_COLOR_SPEED, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), MappingView.TOUR_COLOR_SPEED));
+		fLegendProviders.put(MapView.TOUR_COLOR_SPEED, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), MapView.TOUR_COLOR_SPEED));
 
-		fLegendProviders.put(MappingView.TOUR_COLOR_PACE, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), MappingView.TOUR_COLOR_PACE));
+		fLegendProviders.put(MapView.TOUR_COLOR_PACE, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), MapView.TOUR_COLOR_PACE));
 
-		fLegendProviders.put(MappingView.TOUR_COLOR_GRADIENT, //
-				new LegendProvider(new LegendConfig(), new LegendColor(), MappingView.TOUR_COLOR_GRADIENT));
+		fLegendProviders.put(MapView.TOUR_COLOR_GRADIENT, //
+				new LegendProvider(new LegendConfig(), new LegendColor(), MapView.TOUR_COLOR_GRADIENT));
 
 	}
 
@@ -803,7 +804,7 @@ public class MappingView extends ViewPart {
 		addPartListener();
 		addPrefListener();
 		addSelectionListener();
-		addTourPropertyListener();
+		addTourEventListener();
 		addTourbookPrefListener();
 
 		restoreState();
@@ -836,7 +837,7 @@ public class MappingView extends ViewPart {
 		getViewSite().getPage().removePostSelectionListener(fPostSelectionListener);
 		getViewSite().getPage().removePartListener(fPartListener);
 
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removePropertyListener(fTourEventListener);
 
 		final TourbookPlugin tourbookPlugin = TourbookPlugin.getDefault();
 		tourbookPlugin.getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
@@ -1125,7 +1126,7 @@ public class MappingView extends ViewPart {
 			if (chart == null) {
 				return;
 			}
-			 
+
 			final ChartDataModel chartDataModel = chart.getChartDataModel();
 
 			final Object tourId = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_ID);
@@ -1146,6 +1147,21 @@ public class MappingView extends ViewPart {
 					enableActions(false);
 				}
 			}
+
+		} else if (selection instanceof SelectionMapPosition) {
+
+			final SelectionMapPosition mapPositionSelection = (SelectionMapPosition) selection;
+
+			final int valueIndex1 = mapPositionSelection.getSlider1ValueIndex();
+			int valueIndex2 = mapPositionSelection.getSlider2ValueIndex();
+
+			valueIndex2 = valueIndex2 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+					? valueIndex1
+					: valueIndex2;
+
+			paintTourSliders(mapPositionSelection.getTourData(), valueIndex1, valueIndex2, valueIndex1);
+
+			enableActions(false);
 
 		} else if (selection instanceof PointOfInterest) {
 
@@ -1481,7 +1497,6 @@ public class MappingView extends ViewPart {
 
 		if (fIsMapSynchedWithSlider) {
 
-//			fMap.setZoom(tourData.mapZoomLevel);
 			setMapToSliderBounds(tourData);
 
 			fMap.queueRedrawMap();
@@ -1642,7 +1657,7 @@ public class MappingView extends ViewPart {
 		}
 
 		// debug info
-		final boolean isShowTileInfo = store.getBoolean(MappingView.PREF_SHOW_TILE_INFO);
+		final boolean isShowTileInfo = store.getBoolean(MapView.PREF_SHOW_TILE_INFO);
 		fMap.setDrawTileBorders(isShowTileInfo);
 
 		// set dim level/color after the map providers are set

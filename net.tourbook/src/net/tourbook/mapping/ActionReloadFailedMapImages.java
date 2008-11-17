@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionReloadFailedMapImages extends Action {
 
-	private MappingView	fMapView;
+	private MapView	fMapView;
 
-	public ActionReloadFailedMapImages(final MappingView mapView) {
+	public ActionReloadFailedMapImages(final MapView mapView) {
 
 		super(null, AS_PUSH_BUTTON);
 

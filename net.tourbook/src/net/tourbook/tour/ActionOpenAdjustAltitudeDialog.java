@@ -39,6 +39,7 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 
 		setText(Messages.app_action_edit_adjust_altitude);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_adjust_altitude_disabled));
 
 		setEnabled(false);
 	}

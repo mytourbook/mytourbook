@@ -19,9 +19,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowSliderInLegend extends Action {
 
-	private MappingView	fMapView;
+	private MapView	fMapView;
 
-	public ActionShowSliderInLegend(final MappingView mapView) {
+	public ActionShowSliderInLegend(final MapView mapView) {
 
 		super(Messages.map_action_show_slider_in_legend, AS_CHECK_BOX);
 

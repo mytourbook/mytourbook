@@ -19,9 +19,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSetDefaultPosition extends Action {
 
-	private MappingView	fMapView;
+	private MapView	fMapView;
 
-	public ActionSetDefaultPosition(final MappingView mapView) {
+	public ActionSetDefaultPosition(final MapView mapView) {
 
 		super(Messages.map_action_set_default_position, AS_PUSH_BUTTON);
 

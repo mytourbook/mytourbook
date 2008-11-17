@@ -232,11 +232,17 @@ public class Messages extends NLS {
 	public static String		Image__delete_disabled;
 
 	public static String		Image__edit_adjust_altitude;
+
+	public static String	Image__edit_adjust_altitude_disabled;
 	public static String		Image__edit_row;
 	public static String		Image__edit_tour;
 	public static String		Image__edit_tour_disabled;
 	public static String		Image__edit_tour_marker;
+
+	public static String	Image__edit_tour_marker_disabled;
 	public static String		Image__edit_tour_marker_new;
+
+	public static String	Image__edit_tour_marker_new_disabled;
 
 	public static String		Image__expand_all;
 

@@ -19,9 +19,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowLegendInMap extends Action {
 
-	private MappingView	fMapView;
+	private MapView	fMapView;
 
-	public ActionShowLegendInMap(final MappingView mapView) {
+	public ActionShowLegendInMap(final MapView mapView) {
 
 		super(null, AS_CHECK_BOX);
 

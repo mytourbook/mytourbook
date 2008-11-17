@@ -21,10 +21,10 @@ import org.eclipse.jface.action.Action;
 
 public class ActionTourColor extends Action {
 
-	private MappingView	fMapView;
+	private MapView	fMapView;
 	private int			fColorId;
 
-	public ActionTourColor(	final MappingView mapView,
+	public ActionTourColor(	final MapView mapView,
 							final int colorId,
 							final String toolTipText,
 							final String imageEnabled,
