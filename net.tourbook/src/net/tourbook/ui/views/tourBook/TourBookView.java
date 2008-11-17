@@ -30,12 +30,14 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
+import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
+import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
@@ -135,6 +137,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private ActionDeleteTour			fActionDeleteTour;
 	private ActionEditTour				fActionEditTour;
 	private ActionOpenTour				fActionOpenTour;
+	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
 
 	private ActionSetTourType			fActionSetTourType;
 	private ActionSetTourTag			fActionAddTag;
@@ -151,6 +155,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private Long						fActiveTourId;
 
 	private Composite					fViewerContainer;
+
 
 	private class ItemComparer implements IElementComparer {
 
@@ -346,7 +351,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionEditTour = new ActionEditTour(this);
 		fActionOpenTour = new ActionOpenTour(this);
 		fActionDeleteTour = new ActionDeleteTour(this);
-		fActionOpenTour = new ActionOpenTour(this);
+
+		fActionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		fActionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
 
 		fActionSetTourType = new ActionSetTourType(this);
 		fActionAddTag = new ActionSetTourTag(this, true);
@@ -870,7 +877,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionEditTour.setEnabled(isOneTour);
 		fActionOpenTour.setEnabled(isOneTour);
 		fActionEditQuick.setEnabled(isOneTour);
-
+		fActionOpenMarkerDialog.setEnabled(isOneTour);
+		fActionOpenAdjustAltitudeDialog.setEnabled(isOneTour);
+		
 		// enable delete ation when at least one tour is selected
 		if (isTourSelected) {
 			fActionDeleteTour.setEnabled(true);
@@ -952,6 +961,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionEditTour);
+		menuMgr.add(fActionOpenMarkerDialog);
+		menuMgr.add(fActionOpenAdjustAltitudeDialog);
 		menuMgr.add(fActionOpenTour);
 
 		menuMgr.add(new Separator());
