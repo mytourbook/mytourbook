@@ -513,6 +513,12 @@
                tooltip="%command_tour_map_name_tooltip">
          </command>
          <command
+               commandId="net.tourbook.mapping.command.taggingView"
+               icon="icons/tour-tag.gif"
+               label="%command_tagging_name"
+               tooltip="%command_tagging_name_tooltip">
+         </command>
+         <command
                commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
                icon="icons/chart-analyzer.gif"
                label="%command_tourChart_tool_graphAnalyzer"
@@ -567,6 +573,12 @@
                   icon="icons/earth-globe-abstract.png"
                   label="%command_tour_map_name"
                   tooltip="%command_tour_map_name_tooltip">
+            </command>
+            <command
+                  commandId="net.tourbook.mapping.command.taggingView"
+                  icon="icons/tour-tag.gif"
+                  label="%command_tagging_name"
+                  tooltip="%command_tagging_name_tooltip">
             </command>
             <command
                   commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"

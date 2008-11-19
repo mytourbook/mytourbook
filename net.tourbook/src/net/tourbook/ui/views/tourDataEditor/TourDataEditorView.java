@@ -806,25 +806,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return;
 		}
 
-		/*
-		 * check row/cell mode, row mode must be set, it works with the cell mode but can be
-		 * confusing because multiple rows can be selected but they are not visible
-		 */
-		if (fIsRowEditMode == false) {
-			final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(Display.getCurrent()
-					.getActiveShell(),
-					Messages.tour_editor_dlg_delete_rows_title,
-					Messages.tour_editor_dlg_delete_rows_mode_message,
-					Messages.tour_editor_dlg_delete_rows_mode_toggle_message,
-					true,
-					null,
-					null);
-
-			if (dialog.getToggleState()) {
-				fActionToggleRowSelectMode.setChecked(true);
-				actionToggleRowSelectMode();
-			}
-
+		if (isRowSelectionMode() == false) {
 			return;
 		}
 
@@ -980,6 +962,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	void actionDeleteTourMarker() {
 
+		if (isRowSelectionMode() == false) {
+			return;
+		}
+
 		final StructuredSelection selection = (StructuredSelection) fMarkerViewer.getSelection();
 		if (selection.size() == 0) {
 			return;
@@ -1002,7 +988,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		fireModifyNotification();
 
 		// select next available marker
-
 		final int itemCount = table.getItemCount();
 		if (itemCount > 0) {
 
@@ -1211,7 +1196,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 							return;
 						}
 					}
-					
+
 					// removed old tour data from the selection provider
 					fPostSelectionProvider.clearSelection();
 
@@ -1609,6 +1594,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (selection.size() > 0) {
 					fActionOpenMarkerDialog.setSelectedMarker((TourMarker) selection.getFirstElement());
 					fActionOpenMarkerDialog.run();
+				}
+			}
+		});
+		
+		table.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(final KeyEvent e) {
+
+				if (fIsEditMode == false || isTourInDb() == false) {
+					return;
+				}
+
+				if (e.keyCode == SWT.DEL) {
+					actionDeleteTourMarker();
 				}
 			}
 		});
@@ -2242,6 +2241,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return markerContainer;
 	}
 
+	/**
+	 * @param parent
+	 * @return returns the controls for the tab
+	 */
+	private Control createUITabSlices(final Composite parent) {
+
+		fSliceContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(fSliceContainer);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(fSliceContainer);
+
+		fSliceViewerContainer = new Composite(fSliceContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(fSliceViewerContainer);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(fSliceViewerContainer);
+
+		createSliceViewer(fSliceViewerContainer);
+
+		fTimeSliceLabel = new Label(fSliceContainer, SWT.WRAP);
+		fTimeSliceLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+		fTimeSliceLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		fTimeSliceLabel.setVisible(false);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTimeSliceLabel);
+
+		return fSliceContainer;
+	}
+
 //	private Control createUITabMarkerOLDOLDOLDOLDOLDOLDOLD(final Composite parent) {
 //
 //		final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
@@ -2318,31 +2342,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //		return tableLayouter;
 //	}
 
-	/**
-	 * @param parent
-	 * @return returns the controls for the tab
-	 */
-	private Control createUITabSlices(final Composite parent) {
-
-		fSliceContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(fSliceContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(fSliceContainer);
-
-		fSliceViewerContainer = new Composite(fSliceContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(fSliceViewerContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(fSliceViewerContainer);
-
-		createSliceViewer(fSliceViewerContainer);
-
-		fTimeSliceLabel = new Label(fSliceContainer, SWT.WRAP);
-		fTimeSliceLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-		fTimeSliceLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-		fTimeSliceLabel.setVisible(false);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(fTimeSliceLabel);
-
-		return fSliceContainer;
-	}
-
 	private Composite createUITabTour(final Composite parent, final FormToolkit tk) {
 
 		// scrolled container
@@ -2407,6 +2406,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				fNumberFormatter.setMaximumFractionDigits(3);
 
 				cell.setText(fNumberFormatter.format((marker.getDistance()) / (1000 * UI.UNIT_VALUE_DISTANCE)));
+
+				if (marker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+				}
 			}
 		});
 
@@ -2421,10 +2424,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				final TourMarker tourMarker = (TourMarker) cell.getElement();
 
 				cell.setText(tourMarker.getLabel());
-
-				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-				}
 			}
 		});
 	}
@@ -3377,6 +3376,35 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			return false;
 		}
+	}
+
+	/**
+	 * check row/cell mode, row mode must be set, it works with the cell mode but can be confusing
+	 * because multiple rows can be selected but they are not visible
+	 * 
+	 * @return
+	 */
+	private boolean isRowSelectionMode() {
+
+		if (fIsRowEditMode == false) {
+			final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(Display.getCurrent()
+					.getActiveShell(),
+					Messages.tour_editor_dlg_delete_rows_title,
+					Messages.tour_editor_dlg_delete_rows_mode_message,
+					Messages.tour_editor_dlg_delete_rows_mode_toggle_message,
+					true,
+					null,
+					null);
+
+			if (dialog.getToggleState()) {
+				fActionToggleRowSelectMode.setChecked(true);
+				actionToggleRowSelectMode();
+			}
+
+			return false;
+		}
+
+		return true;
 	}
 
 	public boolean isSaveAsAllowed() {
