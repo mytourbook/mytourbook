@@ -36,14 +36,14 @@ import net.tourbook.tag.ActionRenameTag;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.tag.TagManager;
-import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
@@ -128,7 +128,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private PostSelectionProvider			fPostSelectionProvider;
 
-	private ITourEventListener			fTourPropertyListener;
+	private ITourEventListener				fTourEventListener;
 	private ISelectionListener				fPostSelectionListener;
 
 	private ActionSetTourTag				fActionAddTag;
@@ -378,21 +378,19 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
-		fTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+		fTourEventListener = new ITourEventListener() {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TaggingView.this) {
 					return;
 				}
 
-				if (propertyId == TourEventId.NOTIFY_TAG_VIEW) {
-					if (propertyData instanceof ChangedTags) {
+				if (eventId == TourEventId.NOTIFY_TAG_VIEW) {
+					if (eventData instanceof ChangedTags) {
 
-						final ChangedTags changedTags = (ChangedTags) propertyData;
+						final ChangedTags changedTags = (ChangedTags) eventData;
 
 						final boolean isAddMode = changedTags.isAddMode();
 
@@ -404,13 +402,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 						updateViewerAfterTagStructureIsModified(fRootItem, changedTagsClone, isAddMode);
 					}
 
-				} else if (propertyId == TourEventId.TAG_STRUCTURE_CHANGED) {
+				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
 					reloadViewer();
 
-				} else if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if (modifiedTours != null) {
 						updateViewerAfterTourIsModified(fRootItem, modifiedTours);
 					}
@@ -418,7 +416,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addPropertyListener(fTourEventListener);
 	}
 
 	private void createActions() {
@@ -489,7 +487,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		// set selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
 
-		addTourPropertyListener();
+		addTourEventListener();
 		addPrefListener();
 		addPartListener();
 		addSelectionListener();
@@ -981,7 +979,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	public void dispose() {
 
 		getSite().getPage().removePostSelectionListener(fPostSelectionListener);
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removePropertyListener(fTourEventListener);
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
 		fImgTag.dispose();

@@ -161,7 +161,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private ISelectionListener				fPostSelectionListener;
 	private IPropertyChangeListener			fPrefChangeListener;
 	private PostSelectionProvider			fPostSelectionProvider;
-	private ITourEventListener			fTourPropertyListener;
+	private ITourEventListener				fTourEventListener;
 
 	public Calendar							fCalendar						= GregorianCalendar.getInstance();
 	private DateFormat						fDateFormatter					= DateFormat.getDateInstance(DateFormat.SHORT);
@@ -322,21 +322,19 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
-		fTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+		fTourEventListener = new ITourEventListener() {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == RawDataView.this) {
 					return;
 				}
 
-				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+				if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
 					// update modified tours
-					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if (modifiedTours != null) {
 
 						// update model
@@ -344,9 +342,12 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 						// update viewer
 						fTourViewer.update(modifiedTours.toArray(), null);
+
+						// remove old selection, old selection can have the same tour but with old data
+						fPostSelectionProvider.clearSelection();
 					}
 
-				} else if (propertyId == TourEventId.TAG_STRUCTURE_CHANGED) {
+				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
 					RawDataManager.getInstance().updateTourDataFromDb();
 
@@ -354,7 +355,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 				}
 			}
 		};
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addPropertyListener(fTourEventListener);
 	}
 
 	private void createActions() {
@@ -432,7 +433,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		addPartListener();
 		addSelectionListener();
 		addPrefListener();
-		addTourPropertyListener();
+		addTourEventListener();
 
 		// set this view part as selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -816,7 +817,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		getViewSite().getPage().removePartListener(fPartListener);
 		getSite().getPage().removeSelectionListener(fPostSelectionListener);
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removePropertyListener(fTourEventListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
@@ -957,10 +958,6 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionModifyColumns);
-	}
-
-	void fireSelectionEvent(final ISelection selection) {
-		fPostSelectionProvider.setSelection(selection);
 	}
 
 	@SuppressWarnings("unchecked")

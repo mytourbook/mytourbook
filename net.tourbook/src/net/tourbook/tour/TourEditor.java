@@ -156,6 +156,9 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 
 								updateChart(tourData);
 
+								// removed old tour data from the selection provider
+								fPostSelectionProvider.clearSelection();
+
 								// exit here because only one tourdata can be inside a tour editor
 								return;
 							}
@@ -237,14 +240,6 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
 	@Override
 	public void doSaveAs() {}
 
-	/**
-	 * provides the service to fire post selections
-	 * 
-	 * @param selection
-	 */
-	public void firePostSelection(final ISelection selection) {
-		fPostSelectionProvider.setSelection(selection);
-	}
 
 	public TourChart getTourChart() {
 		return fTourChart;

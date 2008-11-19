@@ -34,9 +34,9 @@ import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourViewer;
@@ -119,7 +119,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private ISelectionListener					fPostSelectionListener;
 	private IPartListener2						fPartListener;
 	private IPropertyChangeListener				fPrefChangeListener;
-	private ITourEventListener				fTourPropertyListener;
+	private ITourEventListener					fTourPropertyListener;
 	private PostSelectionProvider				fPostSelectionProvider;
 
 	private ActionSaveComparedTours				fActionSaveComparedTours;
@@ -141,12 +141,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	private final NumberFormat					nf					= NumberFormat.getNumberInstance();
 
-	private ITourEventListener				fCompareTourPropertyListener;
+	private ITourEventListener					fCompareTourPropertyListener;
 
 	private ColumnManager						fColumnManager;
 
 	SelectionRemovedComparedTours				fOldRemoveSelection	= null;
-
 
 	class ResultContentProvider implements ITreeContentProvider {
 
@@ -176,9 +175,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private void addCompareTourPropertyListener() {
 
 		fCompareTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
 				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyCompareTourChanged) {
@@ -361,25 +358,23 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
 		fTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourCompareResultView.this) {
 					return;
 				}
 
-				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+				if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if (modifiedTours != null) {
 						updateTourViewer(fRootItem, modifiedTours);
 					}
 
-				} else if (propertyId == TourEventId.TAG_STRUCTURE_CHANGED) {
+				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
 					reloadViewer();
 				}
@@ -447,7 +442,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		addSelectionListeners();
 		addCompareTourPropertyListener();
 		addPrefListener();
-		addTourPropertyListener();
+		addTourEventListener();
 
 		createActions();
 		fillViewMenu();
@@ -951,7 +946,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		menuMgr.add(fActionRemoveComparedTourSaveStatus);
 		menuMgr.add(fActionCheckTours);
 		menuMgr.add(fActionUncheckTours);
-		
+
 		menuMgr.add(new Separator());
 		menuMgr.add(fActionEditQuick);
 		menuMgr.add(fActionEditTour);
@@ -1101,7 +1096,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 			fTourViewer.setSelection(selection);
 		}
 		fViewerContainer.setRedraw(true);
-		
+
 		return fTourViewer;
 	}
 

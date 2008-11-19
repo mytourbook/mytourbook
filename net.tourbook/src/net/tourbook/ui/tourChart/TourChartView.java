@@ -78,7 +78,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	private PostSelectionProvider	fPostSelectionProvider;
-	private ITourEventListener	fTourPropertyListener;
+	private ITourEventListener		fTourEventListener;
 
 	private PageBook				fPageBook;
 	private Label					fPageNoChart;
@@ -130,34 +130,32 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
-		fTourPropertyListener = new ITourEventListener() {
+		fTourEventListener = new ITourEventListener() {
 
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourChartView.this) {
 					return;
 				}
 
-				if (propertyId == TourEventId.SEGMENT_LAYER_CHANGED) {
+				if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
-					fTourChart.updateSegmentLayer((Boolean) propertyData);
+					fTourChart.updateSegmentLayer((Boolean) eventData);
 
-				} else if (propertyId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+				} else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 					fTourChart.updateTourChart(true, true);
 
-				} else if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
 					if (fTourData == null || part == TourChartView.this) {
 						return;
 					}
 
 					// get modified tours
-					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if (modifiedTours != null) {
 
 						final long chartTourId = fTourData.getTourId();
@@ -167,17 +165,21 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 							if (tourData.getTourId() == chartTourId) {
 
 								updateChart(tourData);
+								
+								// removed old tour data from the selection provider
+								fPostSelectionProvider.clearSelection();
+
 								return;
 							}
 						}
 					}
 
-				} else if (propertyId == TourEventId.UPDATE_UI) {
+				} else if (eventId == TourEventId.UPDATE_UI) {
 
 					// check if this tour data editor contains a tour which must be updated
 
 					// update editor
-					if (UI.containsTourId(propertyData, fTourData.getTourId()) != null) {
+					if (UI.containsTourId(eventData, fTourData.getTourId()) != null) {
 
 						// reload tour data and update chart
 						updateChart(TourManager.getInstance().getTourData(fTourData.getTourId()));
@@ -186,7 +188,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			}
 		};
 
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addPropertyListener(fTourEventListener);
 	}
 
 	@Override
@@ -229,7 +231,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		addSelectionListener();
 		addPrefListener();
-		addTourPropertyListener();
+		addTourEventListener();
 
 		// set this view part as selection provider
 		getSite().setSelectionProvider(fPostSelectionProvider = new PostSelectionProvider());
@@ -248,7 +250,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 		page.removePostSelectionListener(fPostSelectionListener);
 
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removePropertyListener(fTourEventListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
@@ -358,7 +360,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 			}
 
 			fTourChart.setXSliderPosition(xSliderPosition);
-			
+
 		} else if (selection instanceof StructuredSelection) {
 
 			final Object firstElement = ((StructuredSelection) selection).getFirstElement();

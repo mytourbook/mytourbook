@@ -115,7 +115,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 	private Label					fPageNoChart;
 	private Composite				fViewerContainer;
 
-	private ITourEventListener	fTourPropertyListener;
+	private ITourEventListener		fTourPropertyListener;
 
 	private Chart					fTourChart;
 
@@ -198,20 +198,18 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
 		fTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (fTourData == null || part == TourMarkerView.this) {
 					return;
 				}
 
-				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+				if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if (modifiedTours != null) {
 
 						// update modified tour
@@ -225,6 +223,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 								fTourData = tourData;
 
 								fMarkerViewer.setInput(new Object[0]);
+
+								// removed old tour data from the selection provider
+								fPostSelectionProvider.clearSelection();
 
 								// nothing more to do, the view contains only one tour
 								return;
@@ -276,7 +277,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider {
 		fActionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
 
 		addSelectionListener();
-		addTourPropertyListener();
+		addTourEventListener();
 		addPrefListener();
 
 		// this part is a selection provider

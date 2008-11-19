@@ -376,18 +376,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 								 */
 								setTour(modifiedTourData);
 
-								// all done
-								return;
-							}
+							} else {
 
-							createSegments();
-							reloadViewer();
+								createSegments();
+								reloadViewer();
+							}
 						}
 
 					} else {
 
+						// display new tour
+
 						onSelectionChanged(new SelectionTourData(null, modifiedTourData));
 					}
+
+					// removed old tour data from the selection provider
+					fPostSelectionProvider.clearSelection();
 				}
 			}
 		};
@@ -969,7 +973,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (fPageBook.isDisposed()) {
 					return;
 				}
-				
+
 				TourData nextTourData = null;
 				TourChart nextTourChart = null;
 
@@ -1170,7 +1174,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		if (fIsDirtyDisabled) {
 			return;
 		}
-		
+
 		if (fTourData != null && fSavedDpTolerance != fTourData.getDpTolerance()) {
 			fIsTourDirty = true;
 		}

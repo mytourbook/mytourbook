@@ -102,60 +102,59 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBookView extends ViewPart implements ITourProvider, ITourViewer {
 
-	static public final String			ID											= "net.tourbook.views.tourListView";			//$NON-NLS-1$
+	static public final String				ID											= "net.tourbook.views.tourListView";			//$NON-NLS-1$
 
-	final IDialogSettings				fViewState									= TourbookPlugin.getDefault()
-																							.getDialogSettingsSection(ID);
+	final IDialogSettings					fViewState									= TourbookPlugin.getDefault()
+																								.getDialogSettingsSection(ID);
 
-	private static final String			MEMENTO_TOURVIEWER_SELECTED_YEAR			= "tourbook.view.tourviewer.selected-year";	//$NON-NLS-1$
-	private static final String			MEMENTO_TOURVIEWER_SELECTED_MONTH			= "tourbook.view.tourviewer.selected-month";	//$NON-NLS-1$
-	private static final String			MEMENTO_TOURVIEWER_SELECT_YEAR_MONTH_TOURS	= "tourbook.view.select-year-month-tours";		//$NON-NLS-1$
+	private static final String				MEMENTO_TOURVIEWER_SELECTED_YEAR			= "tourbook.view.tourviewer.selected-year";	//$NON-NLS-1$
+	private static final String				MEMENTO_TOURVIEWER_SELECTED_MONTH			= "tourbook.view.tourviewer.selected-month";	//$NON-NLS-1$
+	private static final String				MEMENTO_TOURVIEWER_SELECT_YEAR_MONTH_TOURS	= "tourbook.view.select-year-month-tours";		//$NON-NLS-1$
 
-	private TreeViewer					fTourViewer;
+	private TreeViewer						fTourViewer;
 
-	private ColumnManager				fColumnManager;
-	private PostSelectionProvider		fPostSelectionProvider;
+	private ColumnManager					fColumnManager;
+	private PostSelectionProvider			fPostSelectionProvider;
 
-	private ISelectionListener			fPostSelectionListener;
-	private IPartListener2				fPartListener;
-	private ITourEventListener		fTourPropertyListener;
-	private IPropertyChangeListener		fPrefChangeListener;
+	private ISelectionListener				fPostSelectionListener;
+	private IPartListener2					fPartListener;
+	private ITourEventListener				fTourPropertyListener;
+	private IPropertyChangeListener			fPrefChangeListener;
 
-	TVITourBookRoot						fRootItem;
+	TVITourBookRoot							fRootItem;
 
-	TourPerson							fActivePerson;
-	TourTypeFilter						fActiveTourTypeFilter;
+	TourPerson								fActivePerson;
+	TourTypeFilter							fActiveTourTypeFilter;
 
-	public NumberFormat					fNF											= NumberFormat.getNumberInstance();
+	public NumberFormat						fNF											= NumberFormat.getNumberInstance();
 
-	private ActionEditQuick				fActionEditQuick;
+	private ActionEditQuick					fActionEditQuick;
 
-	private ActionCollapseAll			fActionCollapseAll;
-	private ActionCollapseOthers		fActionCollapseOthers;
-	private ActionExpandSelection		fActionExpandSelection;
+	private ActionCollapseAll				fActionCollapseAll;
+	private ActionCollapseOthers			fActionCollapseOthers;
+	private ActionExpandSelection			fActionExpandSelection;
 
-	private ActionDeleteTour			fActionDeleteTour;
-	private ActionEditTour				fActionEditTour;
-	private ActionOpenTour				fActionOpenTour;
+	private ActionDeleteTour				fActionDeleteTour;
+	private ActionEditTour					fActionEditTour;
+	private ActionOpenTour					fActionOpenTour;
 	private ActionOpenMarkerDialog			fActionOpenMarkerDialog;
 	private ActionOpenAdjustAltitudeDialog	fActionOpenAdjustAltitudeDialog;
 
-	private ActionSetTourType			fActionSetTourType;
-	private ActionSetTourTag			fActionAddTag;
-	private ActionSetTourTag			fActionRemoveTag;
-	private ActionRemoveAllTags			fActionRemoveAllTags;
-	private ActionOpenPrefDialog		fActionOpenTagPrefs;
+	private ActionSetTourType				fActionSetTourType;
+	private ActionSetTourTag				fActionAddTag;
+	private ActionSetTourTag				fActionRemoveTag;
+	private ActionRemoveAllTags				fActionRemoveAllTags;
+	private ActionOpenPrefDialog			fActionOpenTagPrefs;
 
-	private ActionSelectYearMonthTours	fActionSelectYearMonthTours;
-	private ActionModifyColumns			fActionModifyColumns;
-	private ActionRefreshView			fActionRefreshView;
+	private ActionSelectYearMonthTours		fActionSelectYearMonthTours;
+	private ActionModifyColumns				fActionModifyColumns;
+	private ActionRefreshView				fActionRefreshView;
 
-	private int							fTourViewerSelectedYear						= -1;
-	private int							fTourViewerSelectedMonth					= -1;
-	private Long						fActiveTourId;
+	private int								fTourViewerSelectedYear						= -1;
+	private int								fTourViewerSelectedMonth					= -1;
+	private Long							fActiveTourId;
 
-	private Composite					fViewerContainer;
-
+	private Composite						fViewerContainer;
 
 	private class ItemComparer implements IElementComparer {
 
@@ -320,14 +319,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		getSite().getPage().addPostSelectionListener(fPostSelectionListener);
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
 		fTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (propertyId == TourEventId.TOUR_CHANGED || propertyId == TourEventId.UPDATE_UI) {
+				if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
 
 					/*
 					 * it is possible when a tour type was modified, the tour can be hidden or
@@ -335,8 +332,8 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					 */
 					reloadViewer();
 
-				} else if (propertyId == TourEventId.TAG_STRUCTURE_CHANGED
-						|| propertyId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED
+						|| eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
 					reloadViewer();
 				}
@@ -413,7 +410,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		addSelectionListener();
 		addPartListener();
 		addPrefListener();
-		addTourPropertyListener();
+		addTourEventListener();
 
 		final TourbookPlugin tourbookPlugin = TourbookPlugin.getDefault();
 		fActivePerson = tourbookPlugin.getActivePerson();
@@ -879,7 +876,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionEditQuick.setEnabled(isOneTour);
 		fActionOpenMarkerDialog.setEnabled(isOneTour);
 		fActionOpenAdjustAltitudeDialog.setEnabled(isOneTour);
-		
+
 		// enable delete ation when at least one tour is selected
 		if (isTourSelected) {
 			fActionDeleteTour.setEnabled(true);

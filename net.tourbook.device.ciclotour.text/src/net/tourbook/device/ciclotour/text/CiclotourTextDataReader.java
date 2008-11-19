@@ -18,7 +18,7 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 
 public class CiclotourTextDataReader extends TourbookDevice {
-	private static final String	FILE_HEADER	= "Time:	Distance:	Alt.:	Speed:	HR:	Temperature:	Gradient:	Cadence:";
+	private static final String	FILE_HEADER	= "Time:	Distance:	Alt.:	Speed:	HR:	Temperature:	Gradient:	Cadence:"; //$NON-NLS-1$
 
 	public CiclotourTextDataReader() {
 		canReadFromDevice = false;
@@ -177,7 +177,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 				}
 
 				// file format is Tabbed Seperated Values
-				tokenizer = new StringTokenizer(tokenLine, "\t");
+				tokenizer = new StringTokenizer(tokenLine, "\t"); //$NON-NLS-1$
 				final String recTime = tokenizer.nextToken();
 				distance = Float.parseFloat(tokenizer.nextToken());
 				alt = Integer.parseInt(tokenizer.nextToken());

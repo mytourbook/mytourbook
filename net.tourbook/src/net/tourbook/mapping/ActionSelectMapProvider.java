@@ -38,11 +38,11 @@ import de.byteholder.geoclipse.swt.Map;
 
 public class ActionSelectMapProvider extends Action implements IMenuCreator {
 
-	private static final String							TOOLTIP_DASH		= " - ";
+	private static final String							TOOLTIP_DASH		= " - "; //$NON-NLS-1$
 
 	private static final String							TOGGLE_MARKER		= " (x)";						//$NON-NLS-1$
 
-	private static final String							DEFAULT_FACTORY_ID	= "osm";
+	private static final String							DEFAULT_FACTORY_ID	= "osm"; //$NON-NLS-1$
 
 	private static int									fFactoryCounter		= 0;
 

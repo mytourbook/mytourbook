@@ -337,7 +337,7 @@ public class RawDataManager {
 				 */
 				for (final TourbookDevice device : deviceList) {
 
-					if (device.fileExtension.equals("*") || device.fileExtension.equalsIgnoreCase(fileExtension)) {
+					if (device.fileExtension.equals("*") || device.fileExtension.equalsIgnoreCase(fileExtension)) { //$NON-NLS-1$
 
 						// device file extension was found in the filename extension
 

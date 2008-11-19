@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Composite;
 
 public abstract class YearStatistic extends TourbookStatistic implements IYearStatistic {
 
-	protected static final String	MEMENTO_SELECTED_TOUR_ID	= "statistic.selected.tourId";
+	protected static final String	MEMENTO_SELECTED_TOUR_ID	= "statistic.selected.tourId"; //$NON-NLS-1$
 	private IPropertyChangeListener	fPrefChangeListener;
 
 	/**

@@ -146,6 +146,12 @@ public class Messages extends NLS {
 	public static String		ColumnModifyDialog_Button_move_down;
 	public static String		ColumnModifyDialog_Button_move_up;
 	public static String		ColumnModifyDialog_Button_select_all;
+
+	public static String	ColumnModifyDialog_column_column;
+
+	public static String	ColumnModifyDialog_column_unit;
+
+	public static String	ColumnModifyDialog_column_width;
 	public static String		ColumnModifyDialog_Dialog_title;
 	public static String		ColumnModifyDialog_Label_hint;
 	public static String		ColumnModifyDialog_Label_info;

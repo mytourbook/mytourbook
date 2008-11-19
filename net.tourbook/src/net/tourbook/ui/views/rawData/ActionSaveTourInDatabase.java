@@ -30,8 +30,8 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.EmptySelection;
 import net.tourbook.ui.ResizeableListDialog;
 
@@ -166,8 +166,7 @@ public class ActionSaveTourInDatabase extends Action {
 
 		bike = person.getTourBike();
 
-		final Runnable runnable = new Runnable() {
-
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 			public void run() {
 
 				boolean saveInDatabase = false;
@@ -239,8 +238,7 @@ public class ActionSaveTourInDatabase extends Action {
 					TourManager.fireEvent(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds));
 				}
 			}
-		};
-		BusyIndicator.showWhile(Display.getCurrent(), runnable);
+		});
 	}
 
 	private TourPerson selectPersonDialog() {

@@ -35,8 +35,8 @@ import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourChart;
 import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvicer;
@@ -100,7 +100,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	private PageBook							fPageBook;
 	private Label								fPageNoChart;
 
-	private ITourEventListener				fRefTourPropertyListener;
+	private ITourEventListener					fRefTourPropertyListener;
 
 	private ActionSynchChartHorizontalByScale	fActionSynchChartsByScale;
 	private ActionSynchChartHorizontalBySize	fActionSynchChartsBySize;
@@ -170,9 +170,7 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	private void addRefTourPropertyListener() {
 
 		fRefTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
 				if (propertyId == TourEventId.REFERENCE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyRefTourChanged) {
@@ -367,14 +365,12 @@ public class TourCatalogViewComparedTour extends TourChartViewPart implements IS
 	 */
 	private void fireChangeEvent(final int startIndex, final int endIndex, final float speed, final boolean isDataSaved) {
 
-		TourManager.fireEvent(TourEventId.COMPARE_TOUR_CHANGED,
-				new TourPropertyCompareTourChanged(fCTCompareId,
-						startIndex,
-						endIndex,
-						speed,
-						isDataSaved,
-						fComparedTourItem),
-				this);
+		TourManager.fireEvent(TourEventId.COMPARE_TOUR_CHANGED, new TourPropertyCompareTourChanged(fCTCompareId,
+				startIndex,
+				endIndex,
+				speed,
+				isDataSaved,
+				fComparedTourItem), this);
 	}
 
 	public ArrayList<TourData> getSelectedTours() {

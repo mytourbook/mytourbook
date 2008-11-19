@@ -148,7 +148,7 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	MAP_LAYOUT_SYMBOL							= "map.layout.symbol";										//$NON-NLS-1$
 	public static final String	MAP_LAYOUT_SYMBOL_WIDTH						= "map.layout.symbol-width";								//$NON-NLS-1$
-	public static final String	MAP_LAYOUT_DIM_COLOR						= "map.layout.dim-color";
+	public static final String	MAP_LAYOUT_DIM_COLOR						= "map.layout.dim-color"; //$NON-NLS-1$
 
 	/*
 	 * id's for preference pages
@@ -165,6 +165,6 @@ public interface ITourbookPreferences {
 	/*
 	 * common appearance
 	 */
-	public static final String	APPEARANCE_NUMBER_OF_RECENT_TAGS			= "appearance.number-of-recent-tags";
+	public static final String	APPEARANCE_NUMBER_OF_RECENT_TAGS			= "appearance.number-of-recent-tags"; //$NON-NLS-1$
 
 }

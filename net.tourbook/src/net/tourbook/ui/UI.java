@@ -269,7 +269,7 @@ public class UI {
 			.append("ERROR: ") //$NON-NLS-1$
 					.append("The internal structure of the application is out of synch.") //$NON-NLS-1$
 					.append(UI.NEW_LINE2)
-					.append("You can solve the problem by:")
+					.append("You can solve the problem by:") //$NON-NLS-1$
 					.append(UI.NEW_LINE2)
 					.append("- restarting the application") //$NON-NLS-1$
 					.append(UI.NEW_LINE)
@@ -287,7 +287,7 @@ public class UI {
 					.append(tourData1.toStringWithHash())
 					.append(UI.NEW_LINE2)
 					.append(UI.NEW_LINE)
-					.append("You should also inform the author of the application how this error occured. ")
+					.append("You should also inform the author of the application how this error occured. ") //$NON-NLS-1$
 					.append("However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
 					.append(UI.NEW_LINE2)
 					.append("These actions must be reproducable otherwise the bug cannot be identified."); //$NON-NLS-1$

@@ -33,9 +33,9 @@ import net.tourbook.tag.ActionRemoveAllTags;
 import net.tourbook.tag.ActionSetTourTag;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ColumnManager;
 import net.tourbook.ui.IReferenceTourProvider;
 import net.tourbook.ui.ITourProvider;
@@ -118,9 +118,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private ISelectionListener			fPostSelectionListener;
 	private IPartListener2				fPartListener;
 	private PostSelectionProvider		fPostSelectionProvider;
-	private ITourEventListener		fCompareTourPropertyListener;
+	private ITourEventListener			fCompareTourPropertyListener;
 	private IPropertyChangeListener		fPrefChangeListener;
-	private ITourEventListener		fTourPropertyListener;
+	private ITourEventListener			fTourEventListener;
 
 	private ActionRemoveComparedTours	fActionRemoveComparedTours;
 	private ActionRenameRefTour			fActionRenameRefTour;
@@ -227,9 +227,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	private void addCompareTourPropertyListener() {
 
 		fCompareTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
 				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyCompareTourChanged) {
@@ -413,33 +411,31 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		prefStore.addPropertyChangeListener(fPrefChangeListener);
 	}
 
-	private void addTourPropertyListener() {
+	private void addTourEventListener() {
 
-		fTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+		fTourEventListener = new ITourEventListener() {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourCatalogView.this) {
 					return;
 				}
 
-				if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+				if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
 					// get a clone of the modified tours because the tours are removed from the list
-					final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
+					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 					if (modifiedTours != null) {
 						updateTourViewer(fRootItem, modifiedTours);
 					}
 
-				} else if (propertyId == TourEventId.TAG_STRUCTURE_CHANGED
-						|| propertyId == TourEventId.REFERENCE_TOUR_IS_CREATED) {
+				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED
+						|| eventId == TourEventId.REFERENCE_TOUR_IS_CREATED) {
 
 					reloadViewer();
 				}
 			}
 		};
-		TourManager.getInstance().addPropertyListener(fTourPropertyListener);
+		TourManager.getInstance().addPropertyListener(fTourEventListener);
 	}
 
 	private void createActions() {
@@ -504,7 +500,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		addPartListener();
 		addPostSelectionListener();
 		addCompareTourPropertyListener();
-		addTourPropertyListener();
+		addTourEventListener();
 		addPrefListener();
 
 		// set selection provider
@@ -526,7 +522,6 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		// tour tree
 		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.MULTI | SWT.FULL_SELECTION);
 
-//		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		tree.setHeaderVisible(true);
@@ -705,7 +700,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		getViewSite().getPage().removePartListener(fPartListener);
 
 		TourManager.getInstance().removePropertyListener(fCompareTourPropertyListener);
-		TourManager.getInstance().removePropertyListener(fTourPropertyListener);
+		TourManager.getInstance().removePropertyListener(fTourEventListener);
 
 		TourbookPlugin.getDefault().getPluginPreferences().removePropertyChangeListener(fPrefChangeListener);
 
@@ -861,7 +856,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		menuMgr.add(fActionModifyColumns);
 	}
 
-	public void fireSelection(final ISelection selection) {
+	void fireSelection(final ISelection selection) {
 		fPostSelectionProvider.setSelection(selection);
 	}
 
@@ -1001,7 +996,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			fTourViewer.setSelection(selection);
 		}
 		fViewerContainer.setRedraw(true);
-		
+
 		return fTourViewer;
 	}
 

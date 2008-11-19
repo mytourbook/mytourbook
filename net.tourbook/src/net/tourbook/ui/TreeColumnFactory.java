@@ -26,7 +26,7 @@ public abstract class TreeColumnFactory {
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "altitudeDown", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = "\\ " + UI.UNIT_LABEL_ALTITUDE;
+			final String unitLabel = "\\ " + UI.UNIT_LABEL_ALTITUDE; //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_down_label); 
 			colDef.setColumnHeader(unitLabel); 
@@ -43,7 +43,7 @@ public abstract class TreeColumnFactory {
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "altitudeUp", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = "/ " + UI.UNIT_LABEL_ALTITUDE;
+			final String unitLabel = "/ " + UI.UNIT_LABEL_ALTITUDE; //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_altitude_up_label);
 			colDef.setColumnHeader(unitLabel); 
@@ -188,7 +188,7 @@ public abstract class TreeColumnFactory {
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "maxAltitude", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = "^" + UI.UNIT_LABEL_ALTITUDE;
+			final String unitLabel = "^" + UI.UNIT_LABEL_ALTITUDE; //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_max_altitude_label);
 			colDef.setColumnHeader(unitLabel); 
@@ -222,7 +222,7 @@ public abstract class TreeColumnFactory {
 		public TreeColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
 			
 			final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "maxSpeed", SWT.TRAIL); //$NON-NLS-1$
-			final String unitLabel = "^" + UI.UNIT_LABEL_SPEED;
+			final String unitLabel = "^" + UI.UNIT_LABEL_SPEED; //$NON-NLS-1$
 			
 			colDef.setColumnLabel(Messages.ColumnFactory_max_speed_label);
 			colDef.setColumnHeader(unitLabel); 

@@ -359,13 +359,13 @@ public class TourMarker implements Cloneable {
 	@Override
 	public String toString() {
 		return new StringBuilder().append(TourMarker.class.getSimpleName())
-				.append(" id:")
+				.append(" id:") //$NON-NLS-1$
 				.append(markerId)
-				.append(" distance:")
+				.append(" distance:") //$NON-NLS-1$
 				.append(distance)
-				.append(" time:")
+				.append(" time:") //$NON-NLS-1$
 				.append(time)
-				.append(" serieIndex:")
+				.append(" serieIndex:") //$NON-NLS-1$
 				.append(serieIndex)
 				.toString();
 	}

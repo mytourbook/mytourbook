@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2008  Wolfgang Schramm and Contributors
  *  
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software 
@@ -24,8 +24,34 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 
 public class PostSelectionProvider implements IPostSelectionProvider {
 
-	ListenerList		postSelectionListeners	= new ListenerList();
-	private ISelection	currentSelection;
+//	private static ISelection	EMPTY_SELECTION			= new EmptySelection();
+
+	ListenerList				postSelectionListeners	= new ListenerList();
+	private ISelection			currentSelection;
+
+	public void addPostSelectionChangedListener(final ISelectionChangedListener listener) {
+		postSelectionListeners.add(listener);
+	}
+
+	public void addSelectionChangedListener(final ISelectionChangedListener listener) {}
+
+	/**
+	 * Clears the current selection in the selection provider
+	 */
+	public void clearSelection() {
+//		currentSelection = EMPTY_SELECTION;
+		currentSelection = null;
+	}
+
+	public ISelection getSelection() {
+		return currentSelection;
+	}
+
+	public void removePostSelectionChangedListener(final ISelectionChangedListener listener) {
+		postSelectionListeners.remove(listener);
+	}
+
+	public void removeSelectionChangedListener(final ISelectionChangedListener listener) {}
 
 	public void setSelection(final ISelection selection) {
 
@@ -47,20 +73,4 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 			});
 		}
 	}
-
-	public ISelection getSelection() {
-		return currentSelection;
-	}
-
-	public void addPostSelectionChangedListener(final ISelectionChangedListener listener) {
-		postSelectionListeners.add(listener);
-	}
-
-	public void removePostSelectionChangedListener(final ISelectionChangedListener listener) {
-		postSelectionListeners.remove(listener);
-	}
-
-	public void addSelectionChangedListener(final ISelectionChangedListener listener) {}
-
-	public void removeSelectionChangedListener(final ISelectionChangedListener listener) {}
 }

@@ -353,7 +353,7 @@ public class GarminExternalDevice extends ExternalDevice {
 				double2formatter.applyPattern("0.00"); //$NON-NLS-1$
 				OneArgumentMessageFormat string_formatter = new OneArgumentMessageFormat("{0}", Locale.US); //$NON-NLS-1$
 				SimpleDateFormat dateFormat = new SimpleDateFormat();
-				dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+				dateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 				context.put("dateformatter", dateFormat); //$NON-NLS-1$
 				context.put("double6formatter", double6formatter); //$NON-NLS-1$
 				context.put("intformatter", int_formatter); //$NON-NLS-1$
@@ -370,21 +370,21 @@ public class GarminExternalDevice extends ExternalDevice {
 
 				// device infos
 				String productName = productInfo.getProductName();
-				context.put("devicename", productName.substring(0, productName.indexOf(' ')));
-				context.put("productid", "" + productInfo.getProductId());
-				context.put("devicemajorversion", "" + (productInfo.getProductSoftware() / 100));
-				context.put("deviceminorversion", "" + (productInfo.getProductSoftware() % 100));
+				context.put("devicename", productName.substring(0, productName.indexOf(' '))); //$NON-NLS-1$
+				context.put("productid", "" + productInfo.getProductId()); //$NON-NLS-1$ //$NON-NLS-2$
+				context.put("devicemajorversion", "" + (productInfo.getProductSoftware() / 100)); //$NON-NLS-1$ //$NON-NLS-2$
+				context.put("deviceminorversion", "" + (productInfo.getProductSoftware() % 100)); //$NON-NLS-1$ //$NON-NLS-2$
 
 				// Version
-				String pluginmajorversion = "0";
-				String pluginminorversion = "0";
+				String pluginmajorversion = "0"; //$NON-NLS-1$
+				String pluginminorversion = "0"; //$NON-NLS-1$
 				Version version = Activator.getDefault().getVersion();
 				if (version != null) {
-					pluginmajorversion = "" + version.getMajor();
-					pluginminorversion = "" + version.getMinor();
+					pluginmajorversion = "" + version.getMajor(); //$NON-NLS-1$
+					pluginminorversion = "" + version.getMinor(); //$NON-NLS-1$
 				}
-				context.put("pluginmajorversion", pluginmajorversion);
-				context.put("pluginminorversion", pluginminorversion);
+				context.put("pluginmajorversion", pluginmajorversion); //$NON-NLS-1$
+				context.put("pluginminorversion", pluginminorversion); //$NON-NLS-1$
 
 				// extent of waypoint, routes and tracks:
 				double min_latitude = 90.0;
@@ -476,23 +476,23 @@ public class GarminExternalDevice extends ExternalDevice {
 				}
 
 				if (starttime != null)
-					context.put("starttime", starttime);
+					context.put("starttime", starttime); //$NON-NLS-1$
 				else
-					context.put("starttime", creationDate);
+					context.put("starttime", creationDate); //$NON-NLS-1$
 
 				if (starttime != null && endtime != null)
-					context.put("totaltime", ((double) endtime.getTime() - starttime.getTime()) / 1000);
+					context.put("totaltime", ((double) endtime.getTime() - starttime.getTime()) / 1000); //$NON-NLS-1$
 				else
-					context.put("totaltime", (double) 0);
+					context.put("totaltime", (double) 0); //$NON-NLS-1$
 
-				context.put("totaldistance", totaldistance);
+				context.put("totaldistance", totaldistance); //$NON-NLS-1$
 
 				if (maximumheartrate != 0)
-					context.put("maximumheartrate", maximumheartrate);
+					context.put("maximumheartrate", maximumheartrate); //$NON-NLS-1$
 				if (heartNum != 0)
-					context.put("averageheartrate", heartSum / heartNum);
+					context.put("averageheartrate", heartSum / heartNum); //$NON-NLS-1$
 				if (cadNum != 0)
-					context.put("averagecadence", cadSum / cadNum);
+					context.put("averagecadence", cadSum / cadNum); //$NON-NLS-1$
 			}
 		};
 	}

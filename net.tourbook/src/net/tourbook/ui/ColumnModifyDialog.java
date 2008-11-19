@@ -120,7 +120,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		// column: label
 		tvc = new TableViewerColumn(fColumnViewer, SWT.LEAD);
 		tvcColumn = tvc.getColumn();
-		tvcColumn.setText("Column");
+		tvcColumn.setText(Messages.ColumnModifyDialog_column_column);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -138,7 +138,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		// column: unit
 		tvc = new TableViewerColumn(fColumnViewer, SWT.LEAD);
 		tvcColumn = tvc.getColumn();
-		tvcColumn.setText("Unit");
+		tvcColumn.setText(Messages.ColumnModifyDialog_column_unit);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -156,7 +156,7 @@ public class ColumnModifyDialog extends TrayDialog {
 		// column: width
 		tvc = new TableViewerColumn(fColumnViewer, SWT.TRAIL);
 		tvcColumn = tvc.getColumn();
-		tvcColumn.setText("Width");
+		tvcColumn.setText(Messages.ColumnModifyDialog_column_width);
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

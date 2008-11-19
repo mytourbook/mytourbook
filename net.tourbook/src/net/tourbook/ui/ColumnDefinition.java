@@ -326,6 +326,6 @@ public class ColumnDefinition implements Cloneable {
 
 	@Override
 	public String toString() {
-		return fColumnId + ":" + fColumnWidth + " (" + fDefaultColumnWidth + ")";
+		return fColumnId + ":" + fColumnWidth + " (" + fDefaultColumnWidth + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

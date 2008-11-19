@@ -179,7 +179,7 @@ public class ColumnManager {
 
 			if (columnLayoutData == null) {
 				try {
-					throw new MyTourbookException("ColumnWeightData is not set for the column: " + colDef);
+					throw new MyTourbookException("ColumnWeightData is not set for the column: " + colDef); //$NON-NLS-1$
 				} catch (final MyTourbookException e) {
 					e.printStackTrace();
 				}
