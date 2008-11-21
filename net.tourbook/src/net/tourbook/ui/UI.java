@@ -354,6 +354,22 @@ public class UI {
 		return instance;
 	}
 
+	private static String getSQLExceptionText(final SQLException e) {
+
+		final StringBuilder sb = new StringBuilder()//
+		.append(UI.NEW_LINE)
+				.append("--- SQLException ---") //$NON-NLS-1$
+				.append(UI.NEW_LINE2)
+				.append("SQLState: " + (e).getSQLState()) //$NON-NLS-1$
+				.append(UI.NEW_LINE)
+				.append("Severity: " + (e).getErrorCode()) //$NON-NLS-1$
+				.append(UI.NEW_LINE)
+				.append("Message: " + (e).getMessage()) //$NON-NLS-1$
+				.append(UI.NEW_LINE);
+
+		return sb.toString();
+	}
+
 	/**
 	 * Checks if propertyData has the same tour as the oldTourData
 	 * 
@@ -577,14 +593,22 @@ public class UI {
 	}
 
 	public static void showSQLException(SQLException e) {
+
 		while (e != null) {
-			System.out.println("\n---SQLException Caught---\n"); //$NON-NLS-1$
-			System.out.println("SQLState: " + (e).getSQLState()); //$NON-NLS-1$
-			System.out.println("Severity: " + (e).getErrorCode()); //$NON-NLS-1$
-			System.out.println("Message: " + (e).getMessage()); //$NON-NLS-1$
+
+			System.out.println(getSQLExceptionText(e));
 			e.printStackTrace();
+
 			e = e.getNextException();
 		}
+
+	}
+
+	public static void showSQLException(final SQLException e, final String sqlStatement) {
+
+		MessageDialog.openError(Display.getCurrent().getActiveShell(), "SQL Error", "SQL statement: "//$NON-NLS-1$ //$NON-NLS-2$
+				+ sqlStatement
+				+ getSQLExceptionText(e));
 	}
 
 	public static void updateUITags(final TourData tourData, final Label tourTagLabel) {

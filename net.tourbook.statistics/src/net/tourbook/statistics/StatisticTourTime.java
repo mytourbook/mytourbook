@@ -297,7 +297,10 @@ public class StatisticTourTime extends YearStatistic implements IBarSelectionPro
 		}
 
 		final ISelection selection = fChart.getSelection();
-		if (fTourTimeData != null && selection instanceof SelectionBarChart) {
+		if (fTourTimeData != null
+				&& fTourTimeData.fTourIds != null
+				&& fTourTimeData.fTourIds.length > 0
+				&& selection instanceof SelectionBarChart) {
 
 			final Long selectedTourId = fTourTimeData.fTourIds[((SelectionBarChart) selection).valueIndex];
 

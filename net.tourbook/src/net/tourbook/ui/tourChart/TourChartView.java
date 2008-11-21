@@ -29,6 +29,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.IDataModelListener;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionActiveEditor;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEditor;
@@ -165,7 +166,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 							if (tourData.getTourId() == chartTourId) {
 
 								updateChart(tourData);
-								
+
 								// removed old tour data from the selection provider
 								fPostSelectionProvider.clearSelection();
 
@@ -402,6 +403,12 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 				updateChart(editorTourData);
 			}
+
+		} else if (selection instanceof SelectionDeletedTours) {
+
+			fTourData = null;
+
+			fPageBook.showPage(fPageNoChart);
 		}
 	}
 

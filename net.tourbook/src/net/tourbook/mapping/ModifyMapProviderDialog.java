@@ -104,7 +104,7 @@ public class ModifyMapProviderDialog extends TitleAreaDialog {
 	 */
 	private void createMapProviderList() {
 
-		final List<MapProvider> mapProviders = fMappingView.getFactories();
+		final List<MapProvider> mapProviders = fMappingView.getTileFactories();
 
 		final String[] storedProviderIds = StringToArrayConverter.convertStringToArray(//
 		fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER));

@@ -938,7 +938,7 @@ public class MapView extends ViewPart {
 		return overlayKey;
 	}
 
-	public List<MapProvider> getFactories() {
+	public List<MapProvider> getTileFactories() {
 		return fTileFactories;
 	}
 
@@ -1590,7 +1590,7 @@ public class MapView extends ViewPart {
 		} catch (final NumberFormatException e) {}
 
 		// restore map factory by selecting the last used map factory
-		fActionSelectMapProvider.setSelectedFactory(settings.get(MEMENTO_CURRENT_FACTORY_ID));
+		fActionSelectMapProvider.selectMapProvider(settings.get(MEMENTO_CURRENT_FACTORY_ID));
 
 		// restore: default position
 		try {

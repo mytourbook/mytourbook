@@ -50,6 +50,7 @@ import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourSaveListener;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEvent;
@@ -1597,7 +1598,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		});
-		
+
 		table.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(final KeyEvent e) {
@@ -3624,6 +3625,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void onSelectionChanged(final ISelection selection) {
 
 		if (fIsSavingInProgress) {
+			return;
+		}
+
+		if (selection instanceof SelectionDeletedTours) {
+
+			fTourData = null;
+			setTourClean();
+			
+			fPageBook.showPage(fPageNoTour);
+
 			return;
 		}
 

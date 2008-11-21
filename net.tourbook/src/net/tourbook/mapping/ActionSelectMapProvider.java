@@ -38,18 +38,14 @@ import de.byteholder.geoclipse.swt.Map;
 
 public class ActionSelectMapProvider extends Action implements IMenuCreator {
 
-	private static final String							TOOLTIP_DASH		= " - "; //$NON-NLS-1$
-
 	private static final String							TOGGLE_MARKER		= " (x)";						//$NON-NLS-1$
 
-	private static final String							DEFAULT_FACTORY_ID	= "osm"; //$NON-NLS-1$
-
-	private static int									fFactoryCounter		= 0;
+	private static final String							DEFAULT_FACTORY_ID	= "osm";						//$NON-NLS-1$
 
 	private static IPreferenceStore						fPrefStore			= TourbookPlugin.getDefault()
 																					.getPreferenceStore();
 
-	private final MapView							fMappingView;
+	private final MapView								fMappingView;
 
 	private Menu										fMenu;
 	private final ActionModifyMapProvider				fActionModifyMapProvider;
@@ -59,39 +55,43 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 	/**
 	 * tile factory which is currently selected
 	 */
-	private TileFactory									fSelectedTileFactory;
+	private TileFactory									fSelectedMapProvider;
 
 	private ArrayList<MapProvider>						fSortedMapProviders;
 	private ArrayList<MapProviderAction>				fSortedMapProviderActions;
+
+	private int											fMapProviderToggleCounter;
 
 	/**
 	 * Action for a map provider
 	 */
 	private class MapProviderAction extends Action {
 
-		private final MapProvider	mapProvider;
-		private final String		label;
-		private boolean				canBeToggled;
+		private final MapProvider	fMapProvider;
+		private final String		fActionLabel;
+		private boolean				fCanBeToggled;
 
 		public MapProviderAction(final MapProvider mapProvider, final String label) {
 
 			super(label, AS_RADIO_BUTTON);
 
-			this.mapProvider = mapProvider;
-			this.label = label;
+			this.fMapProvider = mapProvider;
+			this.fActionLabel = label;
 		}
 
 		boolean isCanBeToggled() {
-			return canBeToggled;
+			return fCanBeToggled;
 		}
 
 		@Override
 		public void run() {
-			selectMapProviderInTheMap(mapProvider);
+
+			// select this map provider
+			selectMapProviderInTheMap(fMapProvider);
 		}
 
 		void setCanBeToggled(final boolean canBeToggled) {
-			this.canBeToggled = canBeToggled;
+			this.fCanBeToggled = canBeToggled;
 		}
 	}
 
@@ -106,15 +106,17 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_change_tile_factory));
 
 		/*
-		 * create an action for each factory
+		 * create an action for each map provider
 		 */
 		fMapProviderActions = new HashMap<String, MapProviderAction>();
-		final List<MapProvider> factories = mapView.getFactories();
+		for (final TileFactory tileFactory : mapView.getTileFactories()) {
 
-		for (final TileFactory tileFactory : factories) {
-			fMapProviderActions.put(tileFactory.getInfo().getFactoryID(),
-					new MapProviderAction(new MapProvider(tileFactory, tileFactory.getProjection()),
-							tileFactory.getInfo().getFactoryName()));
+			final MapProviderAction mapProviderAction = new MapProviderAction(//
+			new MapProvider(tileFactory, //
+					tileFactory.getProjection()), //
+					tileFactory.getInfo().getFactoryName());
+
+			fMapProviderActions.put(tileFactory.getInfo().getFactoryID(), mapProviderAction);
 		}
 
 		fActionModifyMapProvider = new ActionModifyMapProvider(mapView);
@@ -145,7 +147,7 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 
 			final MapProviderAction mapProviderAction = fMapProviderActions.get(mapProvider.getInfo().getFactoryID());
 
-			updateToggleStateIntoAction(mapProvider, mapProviderAction);
+			updateActionToggleState(mapProvider, mapProviderAction);
 
 			addActionToMenu(mapProviderAction);
 		}
@@ -161,13 +163,13 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 	}
 
 	/**
-	 * @return Returns the tile factory which is currently selected
+	 * @return Returns the map provider which is currently selected
 	 */
 	public TileFactory getSelectedFactory() {
-		if (fSelectedTileFactory == null) {
-			return fMappingView.getFactories().get(0);
+		if (fSelectedMapProvider == null) {
+			return fMapProviderActions.get(0).fMapProvider;
 		}
-		return fSelectedTileFactory;
+		return fSelectedMapProvider;
 	}
 
 	@Override
@@ -177,118 +179,170 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 		 * toggle map providers
 		 */
 
-		// get a list of all map provider actions which can be toggled
-		final ArrayList<MapProviderAction> toggleMapProviderActions = new ArrayList<MapProviderAction>();
+		final ArrayList<MapProviderAction> sortedToggleMapProviderActions = new ArrayList<MapProviderAction>();
+
+		// get all map provider actions which can be toggled
 		for (final MapProviderAction mapProviderAction : fSortedMapProviderActions) {
 			if (mapProviderAction.isCanBeToggled()) {
-				toggleMapProviderActions.add(mapProviderAction);
+				sortedToggleMapProviderActions.add(mapProviderAction);
 			}
 		}
 
 		MapProvider newMapProvider;
 
-		if (toggleMapProviderActions.size() > 0) {
+		if (sortedToggleMapProviderActions.size() > 0) {
 
 			// use custom toggle mechanism
 
-			// get next factory
-			final MapProviderAction action = toggleMapProviderActions.get(++fFactoryCounter
-					% toggleMapProviderActions.size());
-			newMapProvider = action.mapProvider;
+			/*
+			 * find selected map provider in the toggle map providers, it is possible that the
+			 * selected map provider is not found when a map provider was selected manually without
+			 * toggle mechanism
+			 */
+			int toggleCounter = -1;
+			int actionCounter = 0;
+
+			for (final MapProviderAction mapProviderAction : sortedToggleMapProviderActions) {
+				if (fSelectedMapProvider == mapProviderAction.fMapProvider) {
+					toggleCounter = actionCounter;
+					break;
+				}
+				actionCounter++;
+			}
+
+			if (toggleCounter != -1) {
+
+				// map provider action was found, toggle to the next map provider
+
+				if (toggleCounter == sortedToggleMapProviderActions.size() - 1) {
+
+					// last map provider was selected, get first map provider
+					newMapProvider = sortedToggleMapProviderActions.get(0).fMapProvider;
+
+				} else {
+					// get next map provider
+					newMapProvider = sortedToggleMapProviderActions.get(toggleCounter + 1).fMapProvider;
+				}
+			} else {
+
+				// get first map provider
+				newMapProvider = sortedToggleMapProviderActions.get(0).fMapProvider;
+			}
 
 		} else {
 
 			// toggle all available map factories
 
 			// get next factory
-			final List<MapProvider> mapFactories = fMappingView.getFactories();
-			newMapProvider = mapFactories.get(++fFactoryCounter % mapFactories.size());
+			newMapProvider = fSortedMapProviders.get(++fMapProviderToggleCounter % fSortedMapProviders.size());
 		}
 
-		// check map provider action for the selected map provider
-		for (final MapProviderAction factoryAction : fSortedMapProviderActions) {
-			if (factoryAction.mapProvider.getInfo().getFactoryID().equals(newMapProvider.getInfo().getFactoryID())) {
-				factoryAction.setChecked(true);
+		final String newMapProviderID = newMapProvider.getInfo().getFactoryID();
+
+		// check action for the selected map provider
+		for (final MapProviderAction mapProviderAction : fSortedMapProviderActions) {
+			if (mapProviderAction.fMapProvider.getInfo().getFactoryID().equals(newMapProviderID)) {
+				mapProviderAction.setChecked(true);
 			} else {
-				factoryAction.setChecked(false);
+				mapProviderAction.setChecked(false);
 			}
 		}
 
 		// select map provider in the map
 		selectMapProviderInTheMap(newMapProvider);
-
-		// update tooltip, show selected map provider
-		setToolTipText(newMapProvider.getInfo().getFactoryName()
-				+ TOOLTIP_DASH
-				+ Messages.map_action_change_tile_factory_tooltip);
-	}
-
-	private void selectMapProviderInTheMap(final TileFactory mapProvider) {
-
-		fSelectedTileFactory = mapProvider;
-
-		final Map map = fMappingView.getMap();
-
-//		map.disposeOverlayImageCache();
-
-		map.setTileFactory(mapProvider);
-
-		// reset overlays must be done after the new map provider is set
-		map.resetOverlays();
-
-		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
-
-		map.setDimLevel(fMappingView.getMapDimLevel(), dimColor);
 	}
 
 	/**
-	 * Select a tile factory by it's factory ID
+	 * Select a map provider by it's factory ID
 	 * 
-	 * @param factoryId
+	 * @param mapProviderId
 	 *            factory ID or <code>null</code> to select the default factory (OSM)
 	 */
-	public void setSelectedFactory(final String factoryId) {
+	public void selectMapProvider(final String mapProviderId) {
 
-		if (factoryId != null) {
+		if (mapProviderId != null) {
 
-			for (final MapProviderAction factoryAction : fMapProviderActions.values()) {
+			for (final MapProviderAction mapProviderAction : fMapProviderActions.values()) {
 
-				final TileFactory mapProvider = factoryAction.mapProvider;
-				fFactoryCounter++;
+				final TileFactory mapProvider = mapProviderAction.fMapProvider;
 
-				// check facory ID
-				if (mapProvider.getInfo().getFactoryID().equals(factoryId)) {
+				// check factory ID
+				if (mapProvider.getInfo().getFactoryID().equals(mapProviderId)) {
 
-					// factory is available
-					factoryAction.setChecked(true);
+					// map provider is available
+					mapProviderAction.setChecked(true);
 					selectMapProviderInTheMap(mapProvider);
+
 					return;
 				}
 			}
 		}
 
 		/*
-		 * factory is not available, get default map provider
+		 * if map provider is not set, get default map provider
 		 */
 		for (final MapProviderAction mapProviderAction : fMapProviderActions.values()) {
-			final MapProvider mapProvider = mapProviderAction.mapProvider;
+			final MapProvider mapProvider = mapProviderAction.fMapProvider;
 			if (mapProvider.getInfo().getFactoryID().equals(DEFAULT_FACTORY_ID)) {
+				mapProviderAction.setChecked(true);
 				selectMapProviderInTheMap(mapProvider);
 				return;
 			}
 		}
 
 		/*
-		 * factory is not available, get first factory
+		 * if map provider is not set, get first one
 		 */
 		final MapProviderAction mapProviderAction = fMapProviderActions.values().iterator().next();
 		if (mapProviderAction != null) {
 
 			mapProviderAction.setChecked(true);
-
-			selectMapProviderInTheMap(mapProviderAction.mapProvider);
+			selectMapProviderInTheMap(mapProviderAction.fMapProvider);
 		}
+	}
+
+	private void selectMapProviderInTheMap(final TileFactory mapProvider) {
+
+		// check if a new map provider is selected
+		if (fSelectedMapProvider != null && fSelectedMapProvider == mapProvider) {
+			return;
+		}
+
+		fSelectedMapProvider = mapProvider;
+
+		final Map map = fMappingView.getMap();
+		map.setTileFactory(mapProvider);
+
+		// reset overlays must be done after the new map provider is set
+		map.resetOverlays();
+
+		// set map dim level
+		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
+		map.setDimLevel(fMappingView.getMapDimLevel(), dimColor);
+
+		// update tooltip, show selected map provider
+		setToolTipText(mapProvider.getInfo().getFactoryName());
+	}
+
+	/**
+	 * Update the toggle state from the map provider into the action
+	 * 
+	 * @param mapProvider
+	 * @param mapProviderAction
+	 */
+	private void updateActionToggleState(final MapProvider mapProvider, final MapProviderAction mapProviderAction) {
+
+		final boolean canBeToggled = mapProvider.canBeToggled();
+
+		// update action label
+		if (canBeToggled) {
+			mapProviderAction.setText(mapProviderAction.fActionLabel + TOGGLE_MARKER);
+		} else {
+			mapProviderAction.setText(mapProviderAction.fActionLabel);
+		}
+
+		mapProviderAction.setCanBeToggled(canBeToggled);
 	}
 
 	/**
@@ -297,14 +351,14 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 	 */
 	void updateMapProviders() {
 
-		final List<MapProvider> allMapProviders = fMappingView.getFactories();
+		final List<MapProvider> allMapProviders = fMappingView.getTileFactories();
 
 		final String[] storedProviderIds = StringToArrayConverter.convertStringToArray(//
 		fPrefStore.getString(ITourbookPreferences.MAP_PROVIDERS_SORT_ORDER));
 
 		final ArrayList<MapProvider> mapProviders = new ArrayList<MapProvider>();
 
-		// put all map providers into the viewer which are defined in the pref store
+		// get sorted map providers from the pref store
 		for (final String storeMapProvider : storedProviderIds) {
 
 			// find the stored map provider in the available map providers
@@ -352,31 +406,11 @@ public class ActionSelectMapProvider extends Action implements IMenuCreator {
 
 			final MapProviderAction mapProviderAction = fMapProviderActions.get(mapProvider.getInfo().getFactoryID());
 
-			updateToggleStateIntoAction(mapProvider, mapProviderAction);
+			updateActionToggleState(mapProvider, mapProviderAction);
 
 			sortedMapProviderActions.add(mapProviderAction);
 		}
 
 		fSortedMapProviderActions = sortedMapProviderActions;
-	}
-
-	/**
-	 * Update the toggle state from the map provider into the action
-	 * 
-	 * @param mapProvider
-	 * @param mapProviderAction
-	 */
-	private void updateToggleStateIntoAction(final MapProvider mapProvider, final MapProviderAction mapProviderAction) {
-
-		final boolean canBeToggled = mapProvider.canBeToggled();
-
-		// update action label
-		if (canBeToggled) {
-			mapProviderAction.setText(mapProviderAction.label + TOGGLE_MARKER);
-		} else {
-			mapProviderAction.setText(mapProviderAction.label);
-		}
-
-		mapProviderAction.setCanBeToggled(canBeToggled);
 	}
 }

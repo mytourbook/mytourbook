@@ -182,7 +182,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (selection instanceof SelectionDeletedTours) {
-
 					refreshStatistics();
 				}
 			}

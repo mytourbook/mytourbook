@@ -88,7 +88,7 @@ public class TVITourBookRoot extends TVITourBookItem {
 			conn.close();
 
 		} catch (final SQLException e) {
-			UI.showSQLException(e);
+			UI.showSQLException(e, sb.toString());
 		}
 	}
 
