@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Device Reader for CM414M and CM436M
 Bundle-SymbolicName: net.tourbook.device.cm4xxm;singleton:=true
-Bundle-Version: 1.6.1.v2008-09
+Bundle-Version: 8.11.0.v2008-11-22
 Bundle-Activator: net.tourbook.device.cm4xxm.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
