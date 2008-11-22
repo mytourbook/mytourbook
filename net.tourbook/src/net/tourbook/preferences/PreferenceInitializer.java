@@ -119,7 +119,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_MOUSE_MODE, Chart.MOUSE_MODE_ZOOM);
 
 		// move sliders to border when zoomed
-		store.setDefault(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, true);
+		store.setDefault(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, false);
 
 		// graph grid distance
 		store.setDefault(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, 30);
