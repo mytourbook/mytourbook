@@ -31,6 +31,10 @@ public class PerspectiveFactoryRawData implements IPerspectiveFactory {
 
 	public void createInitialLayout(final IPageLayout layout) {
 
+		layout.setEditorAreaVisible(false);
+
+		//--------------------------------------------------------------------------------
+
 		final IFolderLayout leftFolder = layout.createFolder(FOLDER_ID_LEFT,
 				IPageLayout.LEFT,
 				0.4f,
@@ -38,15 +42,14 @@ public class PerspectiveFactoryRawData implements IPerspectiveFactory {
 
 		leftFolder.addView(RawDataView.ID);
 
+		//--------------------------------------------------------------------------------
+
 		final IFolderLayout topFolder = layout.createFolder(FOLDER_ID_TOP,
 				IPageLayout.TOP,
 				0.5f,
 				IPageLayout.ID_EDITOR_AREA);
 
 		topFolder.addView(TourChartView.ID);
-
-		layout.setEditorAreaVisible(false);
-
 	}
 
 }

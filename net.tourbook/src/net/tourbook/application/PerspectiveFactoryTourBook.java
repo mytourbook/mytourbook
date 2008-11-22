@@ -33,6 +33,8 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 
 	public void createInitialLayout(final IPageLayout layout) {
 
+		layout.setEditorAreaVisible(false);
+
 		//--------------------------------------------------------------------------------
 
 		final IFolderLayout listFolder = layout.createFolder(FOLDER_ID_LIST,

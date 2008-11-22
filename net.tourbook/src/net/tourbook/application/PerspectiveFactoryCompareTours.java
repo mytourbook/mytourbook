@@ -32,6 +32,8 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 	private static final String	FOLDER_ID_REF		= "ref";									//$NON-NLS-1$
 
 	public void createInitialLayout(final IPageLayout layout) {
+		
+		layout.setEditorAreaVisible(false);
 
 		//--------------------------------------------------------------------------------
 
@@ -56,8 +58,6 @@ public class PerspectiveFactoryCompareTours implements IPerspectiveFactory {
 		final IFolderLayout compFolder = layout.createFolder(FOLDER_ID_COMPARE, IPageLayout.BOTTOM, 0.5f, FOLDER_ID_REF);
 
 		compFolder.addView(TourCatalogViewComparedTour.ID);
-
-		layout.setEditorAreaVisible(false);
 	}
 
 }

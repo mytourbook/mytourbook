@@ -31,12 +31,18 @@ public class PerspectiveFactoryStatistic implements IPerspectiveFactory {
 
 	public void createInitialLayout(final IPageLayout layout) {
 
+		layout.setEditorAreaVisible(false);
+
+		//--------------------------------------------------------------------------------
+
 		final IFolderLayout topFolder = layout.createFolder(FOLDER_ID_TOP,
 				IPageLayout.TOP,
 				0.5f,
 				IPageLayout.ID_EDITOR_AREA);
 
 		topFolder.addView(TourStatisticsView.ID);
+
+		//--------------------------------------------------------------------------------
 
 		final IFolderLayout bottomFolder = layout.createFolder(FOLDER_ID_BOTTOM,
 				IPageLayout.LEFT,
@@ -51,9 +57,6 @@ public class PerspectiveFactoryStatistic implements IPerspectiveFactory {
 //				IPageLayout.ID_EDITOR_AREA);
 //
 //		rightFolder.addPlaceholder(TourChartView.ID);
-
-		// hide editor area
-		layout.setEditorAreaVisible(false);
 
 	}
 }
