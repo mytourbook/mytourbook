@@ -154,14 +154,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * map appearance
 		 */
 		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL, PrefPageMapAppearance.MAP_TOUR_SYMBOL_DOT);
-		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 3);
+		store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH, 4);
 		
 		PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR, new RGB(0x00, 0x00, 0x00));
 
 		/*
 		 * Tour data editor
 		 */
-		store.setDefault(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT, 5);
+		store.setDefault(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT, 3);
 		
 		/*
 		 * general appearance

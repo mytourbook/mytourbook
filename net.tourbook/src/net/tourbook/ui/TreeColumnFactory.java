@@ -130,7 +130,7 @@ public abstract class TreeColumnFactory {
 			colDef.setColumnLabel(Messages.ColumnFactory_date_label);
 			colDef.setColumnHeader(Messages.ColumnFactory_date);
 			colDef.setColumnToolTipText(Messages.ColumnFactory_date_tooltip);
-			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(16));
+			colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(18));
 
 			return colDef;
 		};

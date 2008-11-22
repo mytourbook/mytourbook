@@ -307,12 +307,12 @@ public class MapView extends ViewPart {
 	}
 
 	void actionSetTourColor(final int colorId) {
-		
+
 		PaintManager.getInstance().setLegendProvider(getLegendProvider(colorId));
-		
+
 		fMap.disposeOverlayImageCache();
 		fMap.queueRedrawMap();
-		
+
 		createLegendImage(getLegendProvider(colorId));
 	}
 
@@ -938,10 +938,6 @@ public class MapView extends ViewPart {
 		return overlayKey;
 	}
 
-	public List<MapProvider> getTileFactories() {
-		return fTileFactories;
-	}
-
 	private ILegendProvider getLegendProvider(final int colorId) {
 		return fLegendProviders.get(colorId);
 	}
@@ -966,6 +962,10 @@ public class MapView extends ViewPart {
 		}
 
 		return rect;
+	}
+
+	public List<MapProvider> getTileFactories() {
+		return fTileFactories;
 	}
 
 	/**
@@ -1533,8 +1533,13 @@ public class MapView extends ViewPart {
 		} catch (final NumberFormatException e) {}
 
 		try {
-			final boolean isSynchTour = settings.getBoolean(MEMENTO_SYNCH_WITH_SELECTED_TOUR);
-
+			boolean isSynchTour;
+			if (settings.get(MEMENTO_SYNCH_WITH_SELECTED_TOUR) == null) {
+				// set default value
+				isSynchTour = true;
+			} else {
+				isSynchTour = settings.getBoolean(MEMENTO_SYNCH_WITH_SELECTED_TOUR);
+			}
 			fActionSynchWithTour.setChecked(isSynchTour);
 			fIsMapSynchedWithTour = isSynchTour;
 		} catch (final NumberFormatException e) {}
@@ -1546,9 +1551,16 @@ public class MapView extends ViewPart {
 			fIsMapSynchedWithSlider = isSynchSlider;
 		} catch (final NumberFormatException e) {}
 
+		// action: show tour in map
 		try {
-			final boolean isShowTour = settings.getBoolean(MEMENTO_SHOW_TOUR_IN_MAP);
-
+			boolean isShowTour;
+			if (settings.get(MEMENTO_SHOW_TOUR_IN_MAP) == null) {
+				// set default value
+				isShowTour = true;
+			} else {
+				isShowTour = settings.getBoolean(MEMENTO_SHOW_TOUR_IN_MAP);
+			}
+			
 			fActionShowTourInMap.setChecked(isShowTour);
 			fMap.setShowOverlays(isShowTour);
 			fMap.setShowLegend(isShowTour);
@@ -1576,7 +1588,15 @@ public class MapView extends ViewPart {
 
 		// action: show legend in map
 		try {
-			fActionShowLegendInMap.setChecked(settings.getBoolean(MEMENTO_SHOW_LEGEND_IN_MAP));
+			boolean isShowLegend;
+			if (settings.get(MEMENTO_SHOW_LEGEND_IN_MAP) == null) {
+				// set default value
+				isShowLegend = true;
+			} else {
+				isShowLegend = settings.getBoolean(MEMENTO_SHOW_LEGEND_IN_MAP);
+			}
+
+			fActionShowLegendInMap.setChecked(isShowLegend);
 		} catch (final NumberFormatException e) {}
 
 		// action: show slider in map
@@ -1662,7 +1682,7 @@ public class MapView extends ViewPart {
 
 		// set dim level/color after the map providers are set
 		if (fMapDimLevel == -1) {
-			fMapDimLevel = 127;
+			fMapDimLevel = 0xd0;
 		}
 		final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_DIM_COLOR);
 		fMap.setDimLevel(fMapDimLevel, dimColor);
