@@ -2364,6 +2364,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// set content for scrolled composite
 		sc.setContent(fTourContainer);
 
+		tk.setBorderStyle(SWT.BORDER);
+
 		createSectionTitle(fTourContainer, tk);
 		createUISectionSeparator(tk, fTourContainer);
 
@@ -2558,6 +2560,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		});
 
 		/*
+		 * column: gradient
+		 */
+		colDef = TableColumnFactory.GRADIENT.createColumn(fSliceColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (fSerieGradient != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					fNumberFormatter.setMinimumFractionDigits(1);
+					fNumberFormatter.setMaximumFractionDigits(1);
+
+					cell.setText(fNumberFormatter.format((float) fSerieGradient[timeSlice.serieIndex] / 10));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+
+		/*
 		 * column: pulse
 		 */
 		fColDefPulse = colDef = TableColumnFactory.PULSE.createColumn(fSliceColumnManager, pixelConverter);
@@ -2567,6 +2589,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (fSeriePulse != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 					cell.setText(Integer.toString(fSeriePulse[timeSlice.serieIndex]));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+
+		/*
+		 * column: marker
+		 */
+		fColDefSliceMarker = colDef = TableColumnFactory.MARKER.createColumn(fSliceColumnManager, pixelConverter);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+
+				final TourMarker tourMarker = fMarkerMap.get(timeSlice.serieIndex);
+				if (tourMarker != null) {
+					cell.setText(tourMarker.getLabel());
+
+					if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
+						cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+					}
+
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -2612,25 +2659,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (fSerieCadence != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 					cell.setText(Integer.toString(fSerieCadence[timeSlice.serieIndex]));
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-
-		/*
-		 * column: gradient
-		 */
-		colDef = TableColumnFactory.GRADIENT.createColumn(fSliceColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				if (fSerieGradient != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					fNumberFormatter.setMinimumFractionDigits(1);
-					fNumberFormatter.setMaximumFractionDigits(1);
-
-					cell.setText(fNumberFormatter.format((float) fSerieGradient[timeSlice.serieIndex] / 10));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -2730,31 +2758,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				}
 			}
 		});
-
-		/*
-		 * column: marker
-		 */
-		fColDefSliceMarker = colDef = TableColumnFactory.MARKER.createColumn(fSliceColumnManager, pixelConverter);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-
-				final TourMarker tourMarker = fMarkerMap.get(timeSlice.serieIndex);
-				if (tourMarker != null) {
-					cell.setText(tourMarker.getLabel());
-
-					if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
-						cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-					}
-
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-
 	}
 
 	/**
