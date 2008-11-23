@@ -79,6 +79,10 @@ public class TVICompareResultReferenceTour extends TVICompareResultItem {
 
 		final long refId = refTour.getRefId();
 
+		if (fStoredComparedTours != null) {
+			fStoredComparedTours.clear();
+		}
+		
 		fStoredComparedTours = TourCompareManager.getComparedToursFromDb(refId);
 
 		final TVICompareResultComparedTour[] comparedTours = TourCompareManager.getInstance().getComparedTours();

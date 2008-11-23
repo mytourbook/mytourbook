@@ -155,6 +155,11 @@ public class TVICatalogYearItem extends TVICatalogItem {
 
 					// tour tags
 					if (resultTagId instanceof Long) {
+
+						if (tourItem.tagIds != null) {
+							tourItem.tagIds.clear();
+						}
+
 						tourItem.tagIds = tagIds = new ArrayList<Long>();
 						tagIds.add((Long) resultTagId);
 					}

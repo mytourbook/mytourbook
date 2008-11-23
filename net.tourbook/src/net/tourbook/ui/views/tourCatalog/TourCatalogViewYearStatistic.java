@@ -35,8 +35,8 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.ActionSelectYears;
 import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 import net.tourbook.util.ArrayListToArray;
 import net.tourbook.util.PostSelectionProvider;
@@ -96,7 +96,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	 */
 	private StructuredSelection					fCurrentSelection;
 
-	private ITourEventListener				fCompareTourPropertyListener;
+	private ITourEventListener					fCompareTourPropertyListener;
 
 	private IPropertyChangeListener				fPrefChangeListener;
 	private IPartListener2						fPartListener;
@@ -140,9 +140,7 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 	private void addCompareTourPropertyListener() {
 
 		fCompareTourPropertyListener = new ITourEventListener() {
-			public void tourChanged(final IWorkbenchPart part,
-										final TourEventId propertyId,
-										final Object propertyData) {
+			public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
 				if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
 						&& propertyData instanceof TourPropertyCompareTourChanged) {
@@ -656,6 +654,16 @@ public class TourCatalogViewYearStatistic extends ViewPart {
 		fPageBook.showPage(fYearChart);
 
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+		if (fAllTours != null) {
+			fAllTours.clear();
+		}
+		if (fDOYValues != null) {
+			fDOYValues.clear();
+		}
+		if (fTourSpeed != null) {
+			fTourSpeed.clear();
+		}
 
 		fDOYValues = new ArrayList<Integer>(); // DOY...Day Of Year
 		fTourSpeed = new ArrayList<Integer>();

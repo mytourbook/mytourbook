@@ -411,7 +411,7 @@ public class TourCompareManager {
 										final IProgressMonitor monitor) {
 
 				int tourCounter = 0;
-				fComparedTourItems = new ArrayList<TVICompareResultComparedTour>();
+				fComparedTourItems.clear();
 
 				// get all reference tours
 				getRefToursData();

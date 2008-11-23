@@ -180,6 +180,9 @@ public abstract class TreeViewerItem {
 	 * @param children
 	 */
 	public void setChildren(final ArrayList<TreeViewerItem> children) {
+		if (fChildren != null) {
+			fChildren.clear();
+		}
 		fChildren = children;
 	}
 

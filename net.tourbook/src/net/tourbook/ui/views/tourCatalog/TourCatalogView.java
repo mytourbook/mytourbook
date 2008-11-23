@@ -1165,6 +1165,10 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 							final Set<TourTag> tourTags = modifiedTourData.getTourTags();
 							final ArrayList<Long> tagIds;
 
+							if (tourItem.tagIds != null) {
+								tourItem.tagIds.clear();
+							}
+							
 							tourItem.tagIds = tagIds = new ArrayList<Long>();
 							for (final TourTag tourTag : tourTags) {
 								tagIds.add(tourTag.getTagId());
