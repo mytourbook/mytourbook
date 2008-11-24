@@ -845,6 +845,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		int tourItems = 0;
 		int items = 0;
 		int otherItems = 0;
+
 		TVITourBookTour firstTour = null;
 
 		for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
@@ -863,19 +864,22 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		final int selectedItems = selection.size();
 		final boolean isTourSelected = tourItems > 0;
 		final boolean isOneTour = tourItems == 1;
+		boolean isDeviceTour = false;
 
 		final TVITourBookItem firstElement = (TVITourBookItem) selection.getFirstElement();
 		final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
-
+		if (isOneTour) {
+			final TourData firstTourData = TourManager.getInstance().getTourData(firstTour.getTourId());
+			isDeviceTour = firstTourData.isManualTour() == false;
+		}
 		/*
 		 * enable actions
 		 */
-
 		fActionEditTour.setEnabled(isOneTour);
 		fActionOpenTour.setEnabled(isOneTour);
 		fActionEditQuick.setEnabled(isOneTour);
-		fActionOpenMarkerDialog.setEnabled(isOneTour);
-		fActionOpenAdjustAltitudeDialog.setEnabled(isOneTour);
+		fActionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
+		fActionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
 
 		// enable delete ation when at least one tour is selected
 		if (isTourSelected) {
@@ -891,7 +895,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		fActionAddTag.setEnabled(isTourSelected);
 
 		// remove tags
-		if (firstTour != null && isOneTour) {
+		if (isOneTour) {
 
 			// one tour is selected
 

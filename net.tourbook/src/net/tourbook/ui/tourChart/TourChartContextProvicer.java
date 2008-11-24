@@ -138,6 +138,8 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		/*
 		 * enable actions
 		 */
+		final boolean isTagSet = tourData.getTourTags().size() > 0;
+
 		fActionQuickEdit.setEnabled(isTourSaved);
 		fActionEditTour.setEnabled(isTourSaved);
 		fActionOpenMarkerDialog.setEnabled(isTourSaved);
@@ -147,8 +149,8 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 		fActionSetTourType.setEnabled(isTourSaved);
 		fActionAddTag.setEnabled(isTourSaved);
 		fActionRemoveTag.setEnabled(isTourSaved);
-		fActionRemoveAllTags.setEnabled(isTourSaved);
-		
+		fActionRemoveAllTags.setEnabled(isTourSaved && isTagSet);
+
 		// enable actions for the recent tags
 		TagManager.enableRecentTagActions(isTourSaved);
 
@@ -179,7 +181,7 @@ public class TourChartContextProvicer implements IChartContextProvider, ITourPro
 			 */
 			final TourData tourData = fTourChartViewer.getTourChart().getTourData();
 			final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
-			
+
 			final boolean canCreateRefTours = tourData.altitudeSerie != null
 					&& tourData.distanceSerie != null
 					&& isTourSaved;

@@ -225,7 +225,7 @@ public class TourCompareManager {
 		final int[] compareTourDataDistance = compareTourData.getMetricDistanceSerie();
 		final int[] compareTourDataTime = compareTourData.timeSerie;
 
-		if (compareTourDataDistance == null) {
+		if (compareTourDataDistance == null || compareTourDataTime == null) {
 			return compareResultItem;
 		}
 		// normalize the tour which will be compared
@@ -433,7 +433,9 @@ public class TourCompareManager {
 					// load compared tour from the database
 					final TourData compareTourData = TourManager.getInstance().getTourData(tourId);
 
-					if (compareTourData != null && compareTourData.timeSerie.length > 0) {
+					if (compareTourData != null
+							&& compareTourData.timeSerie != null
+							&& compareTourData.timeSerie.length > 0) {
 
 						// loop: all reference tours
 						for (int refTourIndex = 0; refTourIndex < refTourContext.length; refTourIndex++) {

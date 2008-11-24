@@ -40,7 +40,7 @@ public class ActionCreateTourMarker extends Action {
 		super(Messages.tourCatalog_view_action_create_marker);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new));
 
-		this.fTourDataEditorView = tourDataEditorView;
+		fTourDataEditorView = tourDataEditorView;
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class ActionCreateTourMarker extends Action {
 		final StructuredSelection selection = (StructuredSelection) fTourDataEditorView.getSliceViewer().getSelection();
 		final Object firstElement = selection.getFirstElement();
 
-		if (firstElement instanceof TimeSlice) {
+		if (firstElement instanceof TimeSlice && tourData.timeSerie != null) {
 
 			// create a new marker
 			final int serieIndex = ((TimeSlice) firstElement).serieIndex;

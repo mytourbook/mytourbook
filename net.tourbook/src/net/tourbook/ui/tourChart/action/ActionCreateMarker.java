@@ -69,7 +69,7 @@ public class ActionCreateMarker extends Action {
 				leftSlider
 				: fIsLeftSlider ? leftSlider : rightSlider;
 
-		if (slider == null) {
+		if (slider == null || tourData.timeSerie == null) {
 			return null;
 		}
 

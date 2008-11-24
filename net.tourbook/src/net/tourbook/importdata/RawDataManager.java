@@ -618,8 +618,10 @@ public class RawDataManager {
 							final TourData dbTourData = TourManager.getInstance().getTourData(tourId);
 							if (dbTourData != null) {
 
-								// tour is in the database, replace the imported tour with the tour from the database
-
+								/*
+								 * tour is saved in the database, set rawdata file name to display
+								 * the filepath
+								 */
 								dbTourData.importRawDataFile = mapTourData.importRawDataFile;
 
 								fTourDataMap.put(dbTourData.getTourId(), dbTourData);

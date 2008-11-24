@@ -376,6 +376,11 @@ public class ChartComponentGraph extends Canvas {
 	private boolean						fIsPaintDraggedImage	= false;
 
 	/**
+	 * is <code>true</code> when data for a graph is available
+	 */
+	private boolean						fIsGraphVisible			= false;
+
+	/**
 	 * is <code>true</code> when the chart is panned
 	 */
 //	private boolean						fIsMoveMode				= false;
@@ -480,7 +485,7 @@ public class ChartComponentGraph extends Canvas {
 
 		addMouseMoveListener(new MouseMoveListener() {
 			public void mouseMove(final MouseEvent e) {
-				if (fDrawingData != null) {
+				if (fIsGraphVisible) {
 					onMouseMove(e);
 				}
 			}
@@ -488,19 +493,19 @@ public class ChartComponentGraph extends Canvas {
 
 		addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(final MouseEvent e) {
-				if (fDrawingData != null) {
+				if (fIsGraphVisible) {
 					onMouseDoubleClick(e);
 				}
 			}
 
 			public void mouseDown(final MouseEvent e) {
-				if (fDrawingData != null) {
+				if (fIsGraphVisible) {
 					onMouseDown(e);
 				}
 			}
 
 			public void mouseUp(final MouseEvent e) {
-				if (fDrawingData != null) {
+				if (fIsGraphVisible) {
 					onMouseUp(e);
 				}
 			}
@@ -512,7 +517,7 @@ public class ChartComponentGraph extends Canvas {
 			}
 
 			public void mouseExit(final MouseEvent e) {
-				if (fDrawingData != null) {
+				if (fIsGraphVisible) {
 					onMouseExit(e);
 				}
 			}
@@ -522,7 +527,9 @@ public class ChartComponentGraph extends Canvas {
 
 		addListener(SWT.MouseWheel, new Listener() {
 			public void handleEvent(final Event event) {
-				onMouseWheel(event);
+				if (fIsGraphVisible) {
+					onMouseWheel(event);
+				}
 			}
 		});
 
@@ -4311,9 +4318,11 @@ public class ChartComponentGraph extends Canvas {
 		final Rectangle clientArea = getClientArea();
 
 		if (fDrawingData == null || fDrawingData.isEmpty()) {
+
 			// fill the image area when there is no graphic
 			gc.setBackground(fChart.getBackgroundColor());
 			gc.fillRectangle(clientArea);
+
 			return;
 		}
 
@@ -4338,6 +4347,9 @@ public class ChartComponentGraph extends Canvas {
 			if (fGraphImage != null) {
 
 				final Image image = paintChartImage(gc);
+				if (image == null) {
+					return;
+				}
 
 				final int gcHeight = clientArea.height;
 				final int imageHeight = image.getBounds().height;
@@ -4412,10 +4424,14 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		if (isLayerImageVisible) {
-			gc.drawImage(fLayerImage, imageScrollPosition, 0);
+			if (fLayerImage != null) {
+				gc.drawImage(fLayerImage, imageScrollPosition, 0);
+			}
 			return fLayerImage;
 		} else {
-			gc.drawImage(fGraphImage, imageScrollPosition, 0);
+			if (fGraphImage != null) {
+				gc.drawImage(fGraphImage, imageScrollPosition, 0);
+			}
 			return fGraphImage;
 		}
 	}
@@ -4801,6 +4817,8 @@ public class ChartComponentGraph extends Canvas {
 		// to check for null and isEmpty
 		fDrawingData = drawingData;
 
+		fIsGraphVisible = drawingData != null && drawingData.isEmpty() == false;
+
 		// force all graphics to be recreated
 		fIsGraphDirty = true;
 		fIsSliderDirty = true;
@@ -4841,7 +4859,7 @@ public class ChartComponentGraph extends Canvas {
 	 */
 	private boolean setFocusToControl() {
 
-		if (fDrawingData == null || fDrawingData.isEmpty()) {
+		if (fIsGraphVisible == false) {
 			// we can't get the focus
 			return false;
 		}
@@ -5153,7 +5171,7 @@ public class ChartComponentGraph extends Canvas {
 		if (fDrawingData.size() == 0) {
 			return;
 		}
-		
+
 		final ChartDrawingData chartDrawingData = fDrawingData.get(0);
 		if (chartDrawingData == null) {
 			return;

@@ -277,6 +277,10 @@ public class Messages extends NLS {
 	public static String		Image__tag_root;
 	public static String		Image__tour_map_ref_tour_new;
 
+	public static String	Image__tour_new;
+
+	public static String	Image__tour_new_disabled;
+
 	public static String		Image__tour_options;
 	public static String		Image__tour_segmenter;
 
@@ -549,6 +553,10 @@ public class Messages extends NLS {
 	public static String		tour_database_version_info_message;
 	public static String		tour_database_version_info_title;
 
+	public static String	tour_editor_dlg_create_tour_message;
+
+	public static String	tour_editor_dlg_create_tour_title;
+
 	public static String		tour_editor_dlg_delete_marker_message;
 	public static String		tour_editor_dlg_delete_marker_title;
 	public static String		tour_editor_dlg_delete_rows_message;
@@ -572,6 +580,8 @@ public class Messages extends NLS {
 	public static String		tour_editor_label_distance;
 	public static String		tour_editor_label_driving_time;
 	public static String		tour_editor_label_end_location;
+
+	public static String	tour_editor_label_import_file_path;
 	public static String		tour_editor_label_paused_time;
 	public static String		tour_editor_label_person;
 	public static String		tour_editor_label_recording_time;
@@ -597,6 +607,8 @@ public class Messages extends NLS {
 	public static String		tour_editor_tabLabel_tour;
 	public static String		tour_editor_tabLabel_tour_data;
 	public static String		tour_editor_tabLabel_tour_marker;
+
+	public static String	tour_editor_tour_new_tooltip;
 
 	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;

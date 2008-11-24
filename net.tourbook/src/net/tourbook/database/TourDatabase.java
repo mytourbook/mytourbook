@@ -76,7 +76,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int					TOURBOOK_DB_VERSION							= 5;
+	private static final int					TOURBOOK_DB_VERSION							= 6;
+	
+//	private static final int					TOURBOOK_DB_VERSION							= 5;	8.11
 
 	private static final String					DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";				//$NON-NLS-1$
 
@@ -1424,11 +1426,18 @@ public class TourDatabase {
 				 * <p>
 				 * therefor the gpsData are put into the serieData object
 				 */
-//						+ "gpsData 				BLOB,				\n" //$NON-NLS-1$
+				//	+ "gpsData 				BLOB,				\n" //$NON-NLS-1$
+				//
 				// version 5 end
 				//
 				+ "tourType_typeId 		BIGINT,				\n" //$NON-NLS-1$
 				+ "tourPerson_personId 	BIGINT,				\n" //$NON-NLS-1$
+
+				// version 6 start
+				//				
+				+ "tourImportFilePath	VARCHAR(255),		\n" //$NON-NLS-1$
+				//				
+				// version 6 end
 
 				+ "serieData 			BLOB NOT NULL		\n" //$NON-NLS-1$
 
@@ -2011,36 +2020,38 @@ public class TourDatabase {
 			updateDbDesign_1_2(conn);
 			currentDbVersion = newVersion = 2;
 		}
+
 		if (currentDbVersion == 2) {
 			updateDbDesign_2_3(conn);
 			currentDbVersion = newVersion = 3;
 		}
+
 		if (currentDbVersion == 3) {
 			updateDbDesign_3_4(conn, monitor);
 			currentDbVersion = newVersion = 4;
 		}
+
+		boolean isPostUpdate5 = false;
 		if (currentDbVersion == 4) {
 			updateDbDesign_4_5(conn, monitor);
 			currentDbVersion = newVersion = 5;
+			isPostUpdate5 = true;
+		}
+
+		if (currentDbVersion == 5) {
+			updateDbDesign_5_6(conn);
+			currentDbVersion = newVersion = 6;
 		}
 
 		/*
 		 * update version number
 		 */
-		try {
-			final String sqlString = "" //$NON-NLS-1$
-					+ ("update " + TABLE_DB_VERSION) //$NON-NLS-1$
-					+ (" set VERSION=" + newVersion) //$NON-NLS-1$
-					+ (" where 1=1"); //$NON-NLS-1$
-			conn.createStatement().executeUpdate(sqlString);
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		}
+		updateVersionNumber(conn, newVersion);
 
 		/*
 		 * post updates
 		 */
-		if (newVersion == 5) {
+		if (isPostUpdate5) {
 
 			/*
 			 * do this post update after the version number is updated because the post update uses
@@ -2054,6 +2065,9 @@ public class TourDatabase {
 	}
 
 	private void updateDbDesign_1_2(final Connection conn) {
+
+		System.out.println("Database update: 2");//$NON-NLS-1$
+		System.out.println();
 
 		try {
 			final Statement statement = conn.createStatement();
@@ -2079,6 +2093,9 @@ public class TourDatabase {
 
 	private void updateDbDesign_2_3(final Connection conn) {
 
+		System.out.println("Database update: 3");//$NON-NLS-1$
+		System.out.println();
+
 		try {
 			final Statement statement = conn.createStatement();
 
@@ -2099,6 +2116,9 @@ public class TourDatabase {
 	}
 
 	private void updateDbDesign_3_4(final Connection conn, final IProgressMonitor monitor) {
+
+		System.out.println("Database update: 4");//$NON-NLS-1$
+		System.out.println();
 
 		try {
 			final Statement statement = conn.createStatement();
@@ -2195,6 +2215,9 @@ public class TourDatabase {
 
 	private void updateDbDesign_4_5(final Connection conn, final IProgressMonitor monitor) {
 
+		System.out.println("Database update: 5");//$NON-NLS-1$
+		System.out.println();
+
 		try {
 			final Statement statement = conn.createStatement();
 
@@ -2205,6 +2228,40 @@ public class TourDatabase {
 			statement.executeBatch();
 			statement.close();
 
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+	}
+
+	private void updateDbDesign_5_6(final Connection conn) {
+
+		System.out.println("Database update: 6");//$NON-NLS-1$
+		System.out.println();
+
+		try {
+			final Statement statement = conn.createStatement();
+
+			String sql;
+
+			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN tourImportFilePath		VARCHAR(255)"; //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sql);
+			statement.execute(sql);
+
+			statement.executeBatch();
+			statement.close();
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+	}
+
+	private void updateVersionNumber(final Connection conn, final int newVersion) {
+		try {
+			final String sqlString = "" //$NON-NLS-1$
+					+ ("update " + TABLE_DB_VERSION) //$NON-NLS-1$
+					+ (" set VERSION=" + newVersion) //$NON-NLS-1$
+					+ (" where 1=1"); //$NON-NLS-1$
+			conn.createStatement().executeUpdate(sqlString);
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}

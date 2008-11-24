@@ -67,6 +67,12 @@ public class TourData {
 	public static final float		MAX_BIKE_SPEED					= 120f;
 
 	/**
+	 * Device Id for manually created tours
+	 */
+	@Transient
+	public static final String		DEVICE_ID_FOR_MANUAL_TOUR		= "manual";						//$NON-NLS-1$
+
+	/**
 	 * persistence unique id which identifies the tour
 	 */
 	@Id
@@ -165,12 +171,12 @@ public class TourData {
 	private int						tourDistance;
 
 	/**
-	 * total recording time (sec)
+	 * total recording time in seconds
 	 */
 	private int						tourRecordingTime;
 
 	/**
-	 * total driving time (sec)
+	 * total driving time in seconds
 	 */
 	private int						tourDrivingTime;
 
@@ -234,6 +240,12 @@ public class TourData {
 	 * visible name for {@link #deviceMode}
 	 */
 	private String					deviceModeName;													// db-version 4
+
+	/**
+	 * file path for the imported tour
+	 */
+	private String					tourImportFilePath;												// db-version 6
+
 	/**
 	 * data series for time, speed, altitude,...
 	 */
@@ -281,7 +293,7 @@ public class TourData {
 	//
 	/////////////////////////////////////////////////////////////////////
 	/*
-	 * TRANSIENT DATA
+	 * ........................TRANSIENT.DATA............................
 	 */
 	/////////////////////////////////////////////////////////////////////
 	//
@@ -1452,10 +1464,12 @@ public class TourData {
 
 	public void computeTourDrivingTime() {
 
-		if (timeSerie == null || timeSerie.length == 0) {
-			tourDrivingTime = 0;
-		} else {
-			tourDrivingTime = Math.max(0, timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length));
+		if (isManualTour() == false) {
+			if (timeSerie == null || timeSerie.length == 0) {
+				tourDrivingTime = 0;
+			} else {
+				tourDrivingTime = Math.max(0, timeSerie[timeSerie.length - 1] - getBreakTime(0, timeSerie.length));
+			}
 		}
 	}
 
@@ -1747,7 +1761,7 @@ public class TourData {
 					 * distance
 					 */
 					final float tdDistance = timeData.absoluteDistance;
-					if (tdDistance == Float.MIN_VALUE) {
+					if (tdDistance == Float.MIN_VALUE || tdDistance >= Integer.MAX_VALUE) {
 						distanceDiff = 0;
 					} else {
 						distanceDiff = (int) tdDistance;
@@ -1779,7 +1793,8 @@ public class TourData {
 					 * distance
 					 */
 					final float tdDistance = timeData.absoluteDistance;
-					if (tdDistance == Float.MIN_VALUE) {
+					if (tdDistance == Float.MIN_VALUE || tdDistance >= Integer.MAX_VALUE) {
+						// ensure to have correct data
 						distanceDiff = 0;
 					} else {
 						/*
@@ -1799,7 +1814,7 @@ public class TourData {
 							altitudeDiff = 0;
 						} else {
 							final float tdAltitude = timeData.absoluteAltitude;
-							if (tdAltitude == Float.MIN_VALUE) {
+							if (tdAltitude == Float.MIN_VALUE || tdAltitude >= Integer.MAX_VALUE) {
 								altitudeDiff = 0;
 							} else {
 								altitudeDiff = (int) (tdAltitude - altitudeAbsolute);
@@ -1840,7 +1855,7 @@ public class TourData {
 				 */
 				if (isPulse) {
 					final int tdPulse = timeData.pulse;
-					pulseSerie[timeIndex] = tdPulse == Integer.MIN_VALUE ? 0 : tdPulse;
+					pulseSerie[timeIndex] = tdPulse == Integer.MIN_VALUE || tdPulse == Integer.MAX_VALUE ? 0 : tdPulse;
 				}
 
 				/*
@@ -1848,7 +1863,9 @@ public class TourData {
 				 */
 				if (isCadence) {
 					final int tdCadence = timeData.cadence;
-					cadenceSerie[timeIndex] = tdCadence == Integer.MIN_VALUE ? 0 : tdCadence;
+					cadenceSerie[timeIndex] = tdCadence == Integer.MIN_VALUE || tdCadence == Integer.MAX_VALUE
+							? 0
+							: tdCadence;
 				}
 
 				/*
@@ -1875,34 +1892,63 @@ public class TourData {
 			// convert data from the tour format into an interger[]
 			for (final TimeData timeData : timeDataList) {
 
-				timeSerie[timeIndex] = recordingTime += timeData.time;
+				final int tdTime = timeData.time;
+				timeSerie[timeIndex] = recordingTime += tdTime == Integer.MIN_VALUE ? 0 : tdTime;
 
 				if (isDistance) {
-					distanceSerie[timeIndex] = distanceAbsolute += timeData.distance;
+					final int tdDistance = timeData.distance;
+					if (tdDistance == Integer.MIN_VALUE) {
+						System.out.println("tourId:" + tourId + " - tdDistance is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+					}
+					distanceSerie[timeIndex] = distanceAbsolute += tdDistance == Integer.MIN_VALUE ? 0 : tdDistance;
 				}
 
 				if (isAltitude) {
-					altitudeSerie[timeIndex] = altitudeAbsolute += timeData.altitude;
+					final int tdAltitude = timeData.altitude;
+					if (tdAltitude == Integer.MIN_VALUE) {
+						System.out.println("tourId:" + tourId + " - tdAltitude is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+					}
+					altitudeSerie[timeIndex] = altitudeAbsolute += tdAltitude == Integer.MIN_VALUE ? 0 : tdAltitude;
 				}
 
 				if (isPulse) {
-					pulseSerie[timeIndex] = timeData.pulse;
+					final int tdPulse = timeData.pulse;
+					if (tdPulse == Integer.MIN_VALUE) {
+						System.out.println("tourId:" + tourId + " - tdPulse is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+					}
+					pulseSerie[timeIndex] = tdPulse == Integer.MIN_VALUE ? 0 : tdPulse;
 				}
 
 				if (isTemperature) {
-					temperatureSerie[timeIndex] = timeData.temperature;
+					final int tdTemperature = timeData.temperature;
+					if (tdTemperature == Integer.MIN_VALUE) {
+						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+					}
+					temperatureSerie[timeIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
 				}
 
 				if (isCadence) {
-					cadenceSerie[timeIndex] = timeData.cadence;
+					final int tdCadence = timeData.cadence;
+					if (tdCadence == Integer.MIN_VALUE) {
+						System.out.println("tourId:" + tourId + " - tdCadence is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+					}
+					cadenceSerie[timeIndex] = tdCadence == Integer.MIN_VALUE ? 0 : tdCadence;
 				}
 
 				if (isPower) {
-					powerSerie[timeIndex] = timeData.power;
+					final int tdPower = timeData.power;
+					if (tdPower == Integer.MIN_VALUE) {
+						System.out.println("tourId:" + tourId + " - tdPower is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+					}
+					powerSerie[timeIndex] = tdPower == Integer.MIN_VALUE ? 0 : tdPower;
 				}
 
 				if (isSpeed) {
-					speedSerie[timeIndex] = timeData.speed;
+					final int tdSpeed = timeData.speed;
+					if (tdSpeed == Integer.MIN_VALUE) {
+						System.out.println("tourId:" + tourId + " - tdSpeed is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+					}
+					speedSerie[timeIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
 				}
 
 				if (isCreateMarker && timeData.marker != 0) {
@@ -2722,6 +2768,10 @@ public class TourData {
 		return tourId;
 	}
 
+	public String getTourImportFilePath() {
+		return tourImportFilePath;
+	}
+
 	public Set<TourMarker> getTourMarkers() {
 		return tourMarkers;
 	}
@@ -2779,24 +2829,6 @@ public class TourData {
 		return fWorldPosition.get(projectionId.hashCode() + zoomLevel);
 	}
 
-	/**
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		int result = 17;
-
-		result = 37 * result + this.getStartYear();
-		result = 37 * result + this.getStartMonth();
-		result = 37 * result + this.getStartDay();
-		result = 37 * result + this.getStartHour();
-		result = 37 * result + this.getStartMinute();
-		result = 37 * result + this.getTourDistance();
-		result = 37 * result + this.getTourRecordingTime();
-
-		return result;
-	}
-
 //	/**
 //	 * Called before this object gets persisted, copy data from the tourdata object into the object
 //	 * which gets serialized
@@ -2838,6 +2870,37 @@ public class TourData {
 //	}
 
 	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		int result = 17;
+
+		result = 37 * result + this.getStartYear();
+		result = 37 * result + this.getStartMonth();
+		result = 37 * result + this.getStartDay();
+		result = 37 * result + this.getStartHour();
+		result = 37 * result + this.getStartMinute();
+		result = 37 * result + this.getTourDistance();
+		result = 37 * result + this.getTourRecordingTime();
+
+		return result;
+	}
+
+	/**
+	 * @return <code>true</code> when the tour is manually created and not imported from a file or
+	 *         device
+	 */
+	public boolean isManualTour() {
+		
+		if (devicePluginId == null) {
+			return false;
+		}
+		
+		return devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR);
+	}
+
+	/**
 	 * Called after the object was loaded from the persistence store
 	 */
 	@PostLoad
@@ -2845,6 +2908,11 @@ public class TourData {
 	public void onPostLoad() {
 
 		timeSerie = serieData.timeSerie;
+
+		// manually created tours have currently no time series
+		if (timeSerie == null) {
+			return;
+		}
 
 		altitudeSerie = serieData.altitudeSerie;
 		cadenceSerie = serieData.cadenceSerie;
@@ -3019,6 +3087,11 @@ public class TourData {
 		serieData.longitude = longitudeSerie;
 	}
 
+// not used 5.10.2008
+//	public void setDeviceDistance(final int deviceDistance) {
+//		this.deviceDistance = deviceDistance;
+//	}
+
 	/**
 	 * @param avgCadence
 	 *            the avgCadence to set
@@ -3034,11 +3107,6 @@ public class TourData {
 	public void setAvgPulse(final int avgPulse) {
 		this.avgPulse = avgPulse;
 	}
-
-// not used 5.10.2008
-//	public void setDeviceDistance(final int deviceDistance) {
-//		this.deviceDistance = deviceDistance;
-//	}
 
 	/**
 	 * @param avgTemperature
@@ -3198,6 +3266,10 @@ public class TourData {
 	 */
 	public void setTourEndPlace(final String tourEndPlace) {
 		this.tourEndPlace = tourEndPlace;
+	}
+
+	public void setTourImportFilePath(final String tourImportFilePath) {
+		this.tourImportFilePath = tourImportFilePath;
 	}
 
 	public void setTourMarkers(final HashSet<TourMarker> tourMarkers) {

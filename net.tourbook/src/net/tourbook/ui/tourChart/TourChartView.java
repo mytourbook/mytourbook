@@ -163,6 +163,21 @@ public class TourChartView extends ViewPart implements ITourChartViewer {
 
 						// update chart with the modified tour
 						for (final TourData tourData : modifiedTours) {
+
+							if (tourData == null) {
+
+								/*
+								 * tour is not set, this can be the case when a manual tour is
+								 * discarded
+								 */
+								fPageBook.showPage(fPageNoChart);
+
+								// removed old tour data from the selection provider
+								fPostSelectionProvider.clearSelection();
+
+								return;
+							}
+
 							if (tourData.getTourId() == chartTourId) {
 
 								updateChart(tourData);

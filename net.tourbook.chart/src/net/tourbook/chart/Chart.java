@@ -332,6 +332,10 @@ public class Chart extends ViewForm {
 
 	void enableActions() {
 
+		if (fChartActionProxies == null) {
+			return;
+		}
+
 		final ChartComponentGraph chartComponentGraph = fChartComponents.getChartComponentGraph();
 
 		final boolean canZoomOut = chartComponentGraph.getGraphZoomRatio() > 1;
@@ -364,6 +368,10 @@ public class Chart extends ViewForm {
 							final ChartXSlider rightSlider,
 							final int hoveredBarSerieIndex,
 							final int hoveredBarValueIndex) {
+
+		if (fChartActionProxies == null) {
+			return;
+		}
 
 		if (fChartDataModel.getChartType() == ChartDataModel.CHART_TYPE_BAR) {
 

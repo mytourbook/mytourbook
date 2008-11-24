@@ -131,6 +131,10 @@ public class TourManager {
 		final int[] distanceSerie = tourData.getMetricDistanceSerie();
 		final int[] timeSerie = tourData.timeSerie;
 
+		if (timeSerie == null || timeSerie.length == 0) {
+			return 0;
+		}
+
 		final int distance = distanceSerie[endIndex] - distanceSerie[startIndex];
 		final int time = Math.max(0, timeSerie[endIndex]
 				- timeSerie[startIndex]
@@ -597,7 +601,8 @@ public class TourManager {
 		final int[] altimeterSerie = tourData.getAltimeterSerie();
 		final int[] distanceSerie = tourData.getDistanceSerie();
 
-		if (speedSerie == null
+		if ((timeSerie == null || timeSerie.length == 0)
+				|| speedSerie == null
 				|| paceSerie == null
 				|| altimeterSerie == null
 				|| distanceSerie == null
@@ -926,7 +931,7 @@ public class TourManager {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartDataModel.CHART_TYPE_LINE);
 
-		if (tourData.timeSerie.length == 0) {
+		if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
 			return chartDataModel;
 		}
 
