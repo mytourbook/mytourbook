@@ -79,7 +79,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private TimeData				fTimeData;
 	private TourbookDevice			fDeviceDataReader;
 
-	private String					fImportFileName;
+	private String					fImportFilePath;
 
 	private HashMap<Long, TourData>	fTourDataMap;
 
@@ -103,7 +103,7 @@ public class GarminSAXHandler extends DefaultHandler {
 							final HashMap<Long, TourData> tourDataMap) {
 
 		fDeviceDataReader = deviceDataReader;
-		fImportFileName = importFileName;
+		fImportFilePath = importFileName;
 		fTourDataMap = tourDataMap;
 	}
 
@@ -128,7 +128,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		final int[] timeSerie = tourData.timeSerie;
 		final int[] altitudeSerie = tourData.altitudeSerie;
 
-		if (altitudeSerie == null) {
+		if (altitudeSerie == null || timeSerie == null) {
 			return;
 		}
 
@@ -670,7 +670,8 @@ public class GarminSAXHandler extends DefaultHandler {
 		tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 
 		tourData.setDeviceTimeInterval((short) -1);
-		tourData.importRawDataFile = fImportFileName;
+		tourData.importRawDataFile = fImportFilePath;
+		tourData.setTourImportFilePath(fImportFilePath);
 
 		tourData.createTimeSeries(fTimeDataList, true);
 		computeAltitudeUpDown(tourData);

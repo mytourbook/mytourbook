@@ -232,6 +232,7 @@ public class CRPDataReader extends TourbookDevice {
 			tourData.setStartYear((short) tourYear);
 
 			tourData.importRawDataFile = importFileName;
+			tourData.setTourImportFilePath(importFileName);
 
 			// tourData.setStartDistance((int) DeviceReaderTools.get4ByteData(buffer, 8));
 			// tourData.setStartAltitude((short) DeviceReaderTools.get2ByteData(buffer, 12));

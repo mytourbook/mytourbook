@@ -78,7 +78,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private TimeData						fPrevTimeData;
 
 	private TourbookDevice					fDeviceDataReader;
-	private String							fImportFileName;
+	private String							fImportFilePath;
 	private HashMap<Long, TourData>			fTourDataMap;
 	private int								fLapCounter;
 
@@ -108,7 +108,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 							final HashMap<Long, TourData> tourDataMap) {
 
 		fDeviceDataReader = deviceDataReader;
-		fImportFileName = importFileName;
+		fImportFilePath = importFileName;
 		fTourDataMap = tourDataMap;
 	}
 
@@ -125,7 +125,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		final int[] timeSerie = tourData.timeSerie;
 		final int[] altitudeSerie = tourData.altitudeSerie;
 
-		if (altitudeSerie == null) {
+		if (timeSerie == null || altitudeSerie == null) {
 			return;
 		}
 
@@ -209,7 +209,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 								final String message = e3.getMessage();
 								MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
-								System.err.println(message + " in " + fImportFileName); //$NON-NLS-1$
+								System.err.println(message + " in " + fImportFilePath); //$NON-NLS-1$
 //								e2.printStackTrace();
 							}
 						}
@@ -379,7 +379,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 		tourData.setStartWeek((short) fCalendar.get(Calendar.WEEK_OF_YEAR));
 
 		tourData.setDeviceTimeInterval((short) -1);
-		tourData.importRawDataFile = fImportFileName;
+		tourData.importRawDataFile = fImportFilePath;
+		tourData.setTourImportFilePath(fImportFilePath);
 
 		tourData.createTimeSeries(fTimeDataList, true);
 		computeAltitudeUpDown(tourData);

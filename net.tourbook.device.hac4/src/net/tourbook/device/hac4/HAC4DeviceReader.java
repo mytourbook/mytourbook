@@ -245,6 +245,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
 				tourData.setDeviceTimeInterval(HAC4_TIMESLICE);
 				tourData.importRawDataFile = importFileName;
+				tourData.setTourImportFilePath(importFileName);
 
 				readStartBlock(fileRawData, tourData);
 

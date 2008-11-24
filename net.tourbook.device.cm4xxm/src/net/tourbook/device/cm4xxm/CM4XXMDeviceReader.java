@@ -238,6 +238,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
 				tourData.setDeviceTimeInterval(CM4XXM_TIMESLICE);
 				tourData.importRawDataFile = importFileName;
+				tourData.setTourImportFilePath(importFileName);
 
 				readStartBlock(fileRawData, tourData);
 

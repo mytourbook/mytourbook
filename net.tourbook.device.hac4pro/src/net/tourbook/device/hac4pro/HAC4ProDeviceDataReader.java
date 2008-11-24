@@ -332,6 +332,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 				final TourData tourData = new TourData();
 
 				tourData.importRawDataFile = importFileName;
+				tourData.setTourImportFilePath(importFileName);
 
 				/*
 				 * save AA record data

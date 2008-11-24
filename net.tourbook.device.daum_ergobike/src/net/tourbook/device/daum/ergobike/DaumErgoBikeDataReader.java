@@ -187,6 +187,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 			tourData.setStartYear((short) tourYear);
 
 			tourData.importRawDataFile = importFilePath;
+			tourData.setTourImportFilePath(importFilePath);
 
 			/*
 			 * set time serie from the imported trackpoints
