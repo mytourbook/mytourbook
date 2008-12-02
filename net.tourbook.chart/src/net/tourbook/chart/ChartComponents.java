@@ -30,7 +30,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 
 /**
  * Chart widget which represents the chart ui The chart consists of these components
@@ -221,27 +220,27 @@ public class ChartComponents extends Composite {
 			}
 		});
 
-		fComponentGraph.addListener(SWT.Traverse, new Listener() {
-			public void handleEvent(final Event event) {
-
-				switch (event.detail) {
-				case SWT.TRAVERSE_RETURN:
-				case SWT.TRAVERSE_ESCAPE:
-				case SWT.TRAVERSE_TAB_NEXT:
-				case SWT.TRAVERSE_TAB_PREVIOUS:
-				case SWT.TRAVERSE_PAGE_NEXT:
-				case SWT.TRAVERSE_PAGE_PREVIOUS:
-					event.doit = true;
-					break;
-				}
-			}
-		});
-
-		fComponentGraph.addListener(SWT.KeyDown, new Listener() {
-			public void handleEvent(final Event event) {
-				handleLeftRightEvent(event);
-			}
-		});
+//		fComponentGraph.addListener(SWT.Traverse, new Listener() {
+//			public void handleEvent(final Event event) {
+//
+//				switch (event.detail) {
+//				case SWT.TRAVERSE_RETURN:
+//				case SWT.TRAVERSE_ESCAPE:
+//				case SWT.TRAVERSE_TAB_NEXT:
+//				case SWT.TRAVERSE_TAB_PREVIOUS:
+//				case SWT.TRAVERSE_PAGE_NEXT:
+//				case SWT.TRAVERSE_PAGE_PREVIOUS:
+//					event.doit = true;
+//					break;
+//				}
+//			}
+//		});
+//
+//		fComponentGraph.addListener(SWT.KeyDown, new Listener() {
+//			public void handleEvent(final Event event) {
+//				handleLeftRightEvent(event);
+//			}
+//		});
 
 	}
 
@@ -939,21 +938,21 @@ public class ChartComponents extends Composite {
 		return fVisibleGraphRect.width;
 	}
 
-	void handleLeftRightEvent(final Event event) {
-
-		switch (fChartDataModel.getChartType()) {
-		case ChartDataModel.CHART_TYPE_BAR:
-			selectBarItem(event);
-			break;
-
-		case ChartDataModel.CHART_TYPE_LINE:
-			fComponentGraph.moveXSlider(event);
-			break;
-
-		default:
-			break;
-		}
-	}
+//	void handleLeftRightEvent(final Event event) {
+//
+//		switch (fChartDataModel.getChartType()) {
+//		case ChartDataModel.CHART_TYPE_BAR:
+//			selectBarItem(event);
+//			break;
+//
+//		case ChartDataModel.CHART_TYPE_LINE:
+//			fComponentGraph.moveXSlider(event);
+//			break;
+//
+//		default:
+//			break;
+//		}
+//	}
 
 	/**
 	 * Resize handler for all components, computes the chart when the chart data or the client area
@@ -997,7 +996,7 @@ public class ChartComponents extends Composite {
 		return true;
 	}
 
-	private void selectBarItem(final Event event) {
+	void selectBarItem(final Event event) {
 
 		fKeyDownCounter[0]++;
 		final int[] selectedIndex = new int[] { Chart.NO_BAR_SELECTION };

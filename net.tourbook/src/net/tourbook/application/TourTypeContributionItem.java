@@ -105,7 +105,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 
 		final ArrayList<TourTypeFilter> filterList = readXMLFilterFile();
 
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		final ArrayList<TourType> tourTypesNotDisplayed = (ArrayList<TourType>) tourTypes.clone();
 
 		/*
@@ -177,7 +177,7 @@ public class TourTypeContributionItem extends CustomControlContribution {
 	 */
 	private static ArrayList<TourTypeFilter> readXMLFilterFile() {
 
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		final ArrayList<TourTypeFilter> filterList = new ArrayList<TourTypeFilter>();
 
 		final IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());

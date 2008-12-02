@@ -157,10 +157,10 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private Image							imageDatabasePlaceholder;
 	private Image							imageDelete;
 
+	private PostSelectionProvider			fPostSelectionProvider;
 	private IPartListener2					fPartListener;
 	private ISelectionListener				fPostSelectionListener;
 	private IPropertyChangeListener			fPrefChangeListener;
-	private PostSelectionProvider			fPostSelectionProvider;
 	private ITourEventListener				fTourEventListener;
 
 	public Calendar							fCalendar						= GregorianCalendar.getInstance();
@@ -191,6 +191,19 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		}
 
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+	}
+
+	void actionClearView() {
+
+		// remove all tours
+		RawDataManager.getInstance().removeAllTours();
+
+		reloadViewer();
+
+		fPostSelectionProvider.setSelection(new SelectionDeletedTours());
+		// don't throw the selection again
+		fPostSelectionProvider.clearSelection();
+
 	}
 
 	private void addPartListener() {
@@ -295,6 +308,10 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		fPostSelectionListener = new ISelectionListener() {
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+				if (part == RawDataView.this) {
+					return;
+				}
 
 				if (!selection.isEmpty() && selection instanceof SelectionDeletedTours) {
 
@@ -873,7 +890,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		fActionEditQuick.setEnabled(selectedItems == 1 && savedTours == 1);
 		fActionOpenTour.setEnabled(selectedItems == 1 && savedTours == 1);
 
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
 		fActionAddTag.setEnabled(isTourSelected);

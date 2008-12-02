@@ -758,7 +758,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		fActionRenameRefTour.setEnabled(refItems == 1 && tourItems == 0 && yearItems == 0);
 
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
 		/*

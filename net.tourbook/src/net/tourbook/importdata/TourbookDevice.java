@@ -40,7 +40,8 @@ public abstract class TourbookDevice implements IRawDataReader {
 	public boolean	canReadFromDevice						= false;
 
 	/**
-	 * when set to <code>true</code>, in the import dialog multiple files can be selected
+	 * when <code>true</code>, multiple files can be selected in the import, default is
+	 * <code>false</code>
 	 */
 	public boolean	canSelectMultipleFilesInImportDialog	= false;
 

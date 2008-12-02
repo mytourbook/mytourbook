@@ -16,7 +16,6 @@
 package net.tourbook.ui.views.rawData;
 
 import net.tourbook.Messages;
-import net.tourbook.importdata.RawDataManager;
 import net.tourbook.plugin.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -38,11 +37,7 @@ public class ActionClearView extends Action {
 
 	@Override
 	public void run() {
-
-		// remove all tours
-		RawDataManager.getInstance().removeAllTours();
-
-		fRawDataView.reloadViewer();
+		fRawDataView.actionClearView();
 	}
 
 }

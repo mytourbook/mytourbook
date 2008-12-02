@@ -834,7 +834,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tourData.createTourId(uniqueKey.substring(uniqueKey.length() - 5, uniqueKey.length()));
 
 		tourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
-		tourData.setDeviceName(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
+		
+// manual device name is translated in TourData  
+//		tourData.setDeviceName(TourData.DEVICE_NAME_FOR_MANUAL_TOUR);
 
 		tourData.setTourPerson(activePerson);
 
@@ -3016,7 +3018,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		tbm.add(fActionCreateTour);
 		tbm.add(fActionSaveTour);
 
 		tbm.add(new Separator());
@@ -3026,6 +3027,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		tbm.add(new Separator());
 		tbm.add(fActionToggleReadEditMode);
 		tbm.add(fActionToggleRowSelectMode);
+		
+		tbm.add(new Separator());
+		tbm.add(fActionCreateTour);
 
 		tbm.update(true);
 
@@ -4872,31 +4876,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// title/description
 		fTextTitle.setText(fTourData.getTourTitle());
 		fTextDescription.setText(fTourData.getTourDescription());
+		
+		// start/end location
+		fTextStartLocation.setText(fTourData.getTourStartPlace());
+		fTextEndLocation.setText(fTourData.getTourEndPlace());
 
 		// tour date
 		fDtTourDate.setDate(tourYear, tourMonth, tourDay);
 
 		// start time
 		fDtStartTime.setTime(fTourData.getStartHour(), fTourData.getStartMinute(), 0);
-
-		// recording time
-		final int recordingTime = fTourData.getTourRecordingTime();
-		fDtRecordingTime.setTime(recordingTime / 3600, ((recordingTime % 3600) / 60), ((recordingTime % 3600) % 60));
-
-		// driving time
-		final int drivingTime = fTourData.getTourDrivingTime();
-		fDtDrivingTime.setTime(drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
-
-		// paused time
-		final int pausedTime = recordingTime - drivingTime;
-		fDtPausedTime.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
-
-		// start/end location
-		fTextStartLocation.setText(fTourData.getTourStartPlace());
-		fTextEndLocation.setText(fTourData.getTourEndPlace());
-
-		UI.updateUITourType(fTourData, fLblTourType);
-		UI.updateUITags(fTourData, fLblTourTags);
 
 		// tour distance
 		final int tourDistance = fTourData.getTourDistance();
@@ -4913,26 +4902,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		}
 		fLblTourDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
+		
+		// recording time
+		final int recordingTime = fTourData.getTourRecordingTime();
+		fDtRecordingTime.setTime(recordingTime / 3600, ((recordingTime % 3600) / 60), ((recordingTime % 3600) % 60));
 
-		/*
-		 * person
-		 */
-		final TourPerson tourPerson = fTourData.getTourPerson();
-		if (tourPerson == null) {
-			fTextPerson.setText(UI.EMPTY_STRING);
-		} else {
-			fTextPerson.setText(tourPerson.getName());
-		}
+		// driving time
+		final int drivingTime = fTourData.getTourDrivingTime();
+		fDtDrivingTime.setTime(drivingTime / 3600, ((drivingTime % 3600) / 60), ((drivingTime % 3600) % 60));
 
-		/*
-		 * tour ID
-		 */
-		final Long tourId = fTourData.getTourId();
-		if (tourId == null) {
-			fTextTourId.setText(UI.EMPTY_STRING);
-		} else {
-			fTextTourId.setText(Long.toString(tourId));
-		}
+		// paused time
+		final int pausedTime = recordingTime - drivingTime;
+		fDtPausedTime.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
+
+		UI.updateUITourType(fTourData, fLblTourType);
+		UI.updateUITags(fTourData, fLblTourTags);
 
 		/*
 		 * layout container to resize labels

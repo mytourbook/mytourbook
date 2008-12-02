@@ -916,6 +916,9 @@ public class TourChart extends Chart {
 		if (yDataWithLabels == null) {
 			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_ALTIMETER);
 		}
+		if (yDataWithLabels == null) {
+			yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_TEMPERATURE);
+		}
 
 		setYDataLayers(TourManager.CUSTOM_DATA_ALTITUDE, fTourData.segmentSerieAltitude, yDataWithLabels);
 		setYDataLayers(TourManager.CUSTOM_DATA_PULSE, fTourData.segmentSeriePulse, yDataWithLabels);
@@ -924,6 +927,7 @@ public class TourChart extends Chart {
 		setYDataLayers(TourManager.CUSTOM_DATA_POWER, fTourData.segmentSeriePower, yDataWithLabels);
 		setYDataLayers(TourManager.CUSTOM_DATA_GRADIENT, fTourData.segmentSerieGradient, yDataWithLabels);
 		setYDataLayers(TourManager.CUSTOM_DATA_ALTIMETER, fTourData.segmentSerieAltimeter, yDataWithLabels);
+		setYDataLayers(TourManager.CUSTOM_DATA_TEMPERATURE, null, yDataWithLabels);
 	}
 
 	private boolean setMinDefaultValue(	final String property,
@@ -1003,7 +1007,7 @@ public class TourChart extends Chart {
 
 			final ArrayList<IChartLayer> chartLayers = new ArrayList<IChartLayer>();
 
-			// show label layer at ONE visible graph
+			// show label layer only at ONE visible graph
 			if (fLabelLayer != null && yData == yDataWithLabels) {
 				chartLayers.add(fLabelLayer);
 			}
@@ -1021,7 +1025,10 @@ public class TourChart extends Chart {
 			}
 
 			yData.setCustomLayers(chartLayers);
-			yData.setCustomData(SEGMENT_VALUES, segmentDataSerie);
+
+			if (segmentDataSerie != null) {
+				yData.setCustomData(SEGMENT_VALUES, segmentDataSerie);
+			}
 		}
 	}
 

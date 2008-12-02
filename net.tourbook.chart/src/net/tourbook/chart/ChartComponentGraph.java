@@ -551,6 +551,28 @@ public class ChartComponentGraph extends Canvas {
 			}
 		});
 
+		addListener(SWT.Traverse, new Listener() {
+			public void handleEvent(final Event event) {
+
+				switch (event.detail) {
+				case SWT.TRAVERSE_RETURN:
+				case SWT.TRAVERSE_ESCAPE:
+				case SWT.TRAVERSE_TAB_NEXT:
+				case SWT.TRAVERSE_TAB_PREVIOUS:
+				case SWT.TRAVERSE_PAGE_NEXT:
+				case SWT.TRAVERSE_PAGE_PREVIOUS:
+					event.doit = true;
+					break;
+				}
+			}
+		});
+
+		addListener(SWT.KeyDown, new Listener() {
+			public void handleEvent(final Event event) {
+				onKeyDown(event);
+			}
+		});
+
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(final DisposeEvent e) {
 				onDispose();
@@ -3167,6 +3189,22 @@ public class ChartComponentGraph extends Canvas {
 		}
 	}
 
+	/**
+	 * @return when the zoomed graph can't be scrolled the chart image can be wider than the visible
+	 *         part. It returns the device offset to the start of the visible chart
+	 */
+	int getDevGraphImageXOffset() {
+		return fDevGraphImageXOffset;
+	}
+
+	/**
+	 * @return Returns the virtual graph image width, this is the width of the graph image when the
+	 *         full graph would be displayed
+	 */
+	int getDevVirtualGraphImageWidth() {
+		return fDevVirtualGraphImageWidth;
+	}
+
 //	void enforceChartImageMinMaxWidth() {
 //
 ////		if (graphZoomParts != 1) {
@@ -3200,22 +3238,6 @@ public class ChartComponentGraph extends Canvas {
 //		}
 ////		}
 //	}
-
-	/**
-	 * @return when the zoomed graph can't be scrolled the chart image can be wider than the visible
-	 *         part. It returns the device offset to the start of the visible chart
-	 */
-	int getDevGraphImageXOffset() {
-		return fDevGraphImageXOffset;
-	}
-
-	/**
-	 * @return Returns the virtual graph image width, this is the width of the graph image when the
-	 *         full graph would be displayed
-	 */
-	int getDevVirtualGraphImageWidth() {
-		return fDevVirtualGraphImageWidth;
-	}
 
 	/**
 	 * @return Returns the visible width of the chart graph
@@ -3633,66 +3655,84 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * move the x-slider to the next right or left position in the x-data
+	 * move the x-slider with the keyboard
 	 * 
 	 * @param event
 	 */
-	void moveXSlider(final Event event) {
+	private void moveXSlider(final Event event) {
 
-		final boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
-		final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
+		boolean isShift = (event.stateMask & SWT.SHIFT) != 0;
+		boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
 
-		if (event.keyCode == SWT.ARROW_LEFT || event.keyCode == SWT.ARROW_RIGHT) {
-
-			if (fSelectedXSlider == null) {
-				final ChartXSlider leftSlider = getLeftSlider();
-				if (leftSlider != null) {
-					// set default slider
-					fSelectedXSlider = leftSlider;
-				} else {
-					return;
-				}
-			}
-
-			if (isShift && (event.stateMask & SWT.CTRL) == 0) {
-				// select the other slider
-				fSelectedXSlider = fSelectedXSlider == xSliderA ? xSliderB : xSliderA;
-				fIsSliderDirty = true;
-				redraw();
+		if (fSelectedXSlider == null) {
+			final ChartXSlider leftSlider = getLeftSlider();
+			if (leftSlider != null) {
+				// set default slider
+				fSelectedXSlider = leftSlider;
+			} else {
 				return;
 			}
+		}
 
-			int valueIndex = fSelectedXSlider.getValuesIndex();
-			final int[] xValues = getXData().getHighValues()[0];
+		if (isShift && (event.stateMask & SWT.CTRL) == 0) {
+			// select the other slider
+			fSelectedXSlider = fSelectedXSlider == xSliderA ? xSliderB : xSliderA;
+			fIsSliderDirty = true;
+			redraw();
+			return;
+		}
 
-			int sliderDiff = isCtrl ? 10 : 1;
-			sliderDiff *= isShift ? 5 : 1;
-			switch (event.keyCode) {
-			case SWT.ARROW_RIGHT:
+		if (event.keyCode == SWT.PAGE_UP || event.keyCode == SWT.PAGE_DOWN) {
+			isCtrl = true;
+			isShift = true;
+		}
 
-				valueIndex += sliderDiff;
+		int valueIndex = fSelectedXSlider.getValuesIndex();
+		final int[] xValues = getXData().getHighValues()[0];
 
-				if (valueIndex >= xValues.length) {
-					valueIndex = 0;
-				}
-				break;
+		// accelerate slider move speed
+		int sliderDiff = isCtrl ? 10 : 1;
+		sliderDiff *= isShift ? 10 : 1;
 
-			case SWT.ARROW_LEFT:
+		switch (event.keyCode) {
+		case SWT.PAGE_DOWN:
+		case SWT.ARROW_RIGHT:
 
-				valueIndex -= sliderDiff;
+			valueIndex += sliderDiff;
 
-				if (valueIndex < 0) {
-					valueIndex = xValues.length - 1;
-				}
+			if (valueIndex >= xValues.length) {
+				valueIndex = 0;
+			}
+			break;
 
-				break;
+		case SWT.PAGE_UP:
+		case SWT.ARROW_LEFT:
+
+			valueIndex -= sliderDiff;
+
+			if (valueIndex < 0) {
+				valueIndex = xValues.length - 1;
 			}
 
-			setXSliderValueIndex(fSelectedXSlider, valueIndex, false);
+			break;
 
-			redraw();
-			setDefaultCursor();
+		case SWT.HOME:
+
+			valueIndex = 0;
+
+			break;
+
+		case SWT.END:
+
+			valueIndex = xValues.length - 1;
+
+			break;
 		}
+
+		setXSliderValueIndex(fSelectedXSlider, valueIndex, false);
+
+		redraw();
+		setDefaultCursor();
 	}
 
 	private void moveYSlider(final ChartYSlider ySlider, final int graphX, final int devY) {
@@ -3737,6 +3777,22 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		fColorCache.dispose();
+	}
+
+	private void onKeyDown(final Event event) {
+
+		switch (fChart.getChartDataModel().getChartType()) {
+		case ChartDataModel.CHART_TYPE_BAR:
+			fChartComponents.selectBarItem(event);
+			break;
+
+		case ChartDataModel.CHART_TYPE_LINE:
+			moveXSlider(event);
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	void onMouseDoubleClick(final MouseEvent e) {
@@ -4241,7 +4297,7 @@ public class ChartComponentGraph extends Canvas {
 				forceFocus();
 			}
 
-			fChartComponents.handleLeftRightEvent(event);
+			onKeyDown(event);
 
 			if (canAutoZoomToSlider) {
 
@@ -5059,7 +5115,8 @@ public class ChartComponentGraph extends Canvas {
 	}
 
 	/**
-	 * Set the value index for a slider and move the slider to this position
+	 * Set value index for a slider and move the slider to this position, slider will be made
+	 * visible
 	 * 
 	 * @param slider
 	 * @param valueIndex

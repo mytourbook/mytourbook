@@ -888,7 +888,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			fActionDeleteTour.setEnabled(false);
 		}
 
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
 		// add tag
@@ -1018,6 +1018,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				tourIds.add(tourItem.getTourId());
 			}
 		}
+	}
+
+	PostSelectionProvider getPostSelectionProvider() {
+		return fPostSelectionProvider;
 	}
 
 	public ArrayList<TourData> getSelectedTours() {

@@ -755,7 +755,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 	private void updateViewers() {
 
 		fFilterList = TourTypeContributionItem.getTourTypeFilters();
-		fTourTypes = TourDatabase.getTourTypes();
+		fTourTypes = TourDatabase.getAllTourTypes();
 
 		// show contents in the viewers
 		fFilterViewer.setInput(new Object());

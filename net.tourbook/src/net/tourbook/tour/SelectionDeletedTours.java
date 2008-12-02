@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import org.eclipse.jface.viewers.ISelection;
 
 /**
- * contains tours which has been deleted in the database
+ * contains tours which has been deleted in the database or removed from a view (tours in the import
+ * view which are not saved but removed)
  */
 public class SelectionDeletedTours implements ISelection {
 

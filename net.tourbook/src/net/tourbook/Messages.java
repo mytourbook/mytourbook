@@ -550,6 +550,12 @@ public class Messages extends NLS {
 	public static String		tag_view_title_tag;
 	public static String		tag_view_title_tag_category;
 
+	public static String	tour_data_label_device_marker;
+
+	public static String	tour_data_label_feature_since_version_8_12;
+
+	public static String	tour_data_label_manually_created_tour;
+
 	public static String		tour_database_version_info_message;
 	public static String		tour_database_version_info_title;
 
@@ -686,7 +692,6 @@ public class Messages extends NLS {
 	public static String		TourChart_Property_label_pace_speed;
 	public static String		TourChart_Property_label_time_slices;
 
-	public static String		TourData_Label_device_marker;
 	public static String		TourData_Label_new_marker;
 
 	public static String		TourDataEditorView_tour_editor_status_tour_contains_ref_tour;

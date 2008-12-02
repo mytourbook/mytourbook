@@ -46,6 +46,7 @@ import net.tourbook.chart.ChartLabel;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Rectangle;
@@ -70,7 +71,10 @@ public class TourData {
 	 * Device Id for manually created tours
 	 */
 	@Transient
-	public static final String		DEVICE_ID_FOR_MANUAL_TOUR		= "manual";						//$NON-NLS-1$
+	public static final String		DEVICE_ID_FOR_MANUAL_TOUR		= "manual";										//$NON-NLS-1$
+
+	@Transient
+	public static final String		DEVICE_NAME_FOR_MANUAL_TOUR		= Messages.tour_data_label_manually_created_tour;
 
 	/**
 	 * persistence unique id which identifies the tour
@@ -198,53 +202,53 @@ public class TourData {
 	/**
 	 * Profile used by the device
 	 */
-	private short					deviceMode;														// db-version 3
+	private short					deviceMode;																		// db-version 3
 
 	/**
 	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time slices
 	 * are unequally
 	 */
-	private short					deviceTimeInterval;												// db-version 3
+	private short					deviceTimeInterval;																// db-version 3
 
 	/**
 	 * maximum altitude in metric system
 	 */
-	private int						maxAltitude;														// db-version 4
+	private int						maxAltitude;																		// db-version 4
 
-	private int						maxPulse;															// db-version 4
+	private int						maxPulse;																			// db-version 4
 
 	/**
 	 * maximum speed in metric system
 	 */
-	private float					maxSpeed;															// db-version 4
+	private float					maxSpeed;																			// db-version 4
 
-	private int						avgPulse;															// db-version 4
-	private int						avgCadence;														// db-version 4
-	private int						avgTemperature;													// db-version 4
+	private int						avgPulse;																			// db-version 4
+	private int						avgCadence;																		// db-version 4
+	private int						avgTemperature;																	// db-version 4
 
-	private String					tourTitle;															// db-version 4
-	private String					tourDescription;													// db-version 4
+	private String					tourTitle;																			// db-version 4
+	private String					tourDescription;																	// db-version 4
 
-	private String					tourStartPlace;													// db-version 4
-	private String					tourEndPlace;														// db-version 4
+	private String					tourStartPlace;																	// db-version 4
+	private String					tourEndPlace;																		// db-version 4
 
-	private String					calories;															// db-version 4
-	private float					bikerWeight;														// db-version 4
+	private String					calories;																			// db-version 4
+	private float					bikerWeight;																		// db-version 4
 
 	/**
 	 * visible name for the used plugin to import the data
 	 */
-	private String					devicePluginName;													// db-version 4
+	private String					devicePluginName;																	// db-version 4
 
 	/**
 	 * visible name for {@link #deviceMode}
 	 */
-	private String					deviceModeName;													// db-version 4
+	private String					deviceModeName;																	// db-version 4
 
 	/**
 	 * file path for the imported tour
 	 */
-	private String					tourImportFilePath;												// db-version 6
+	private String					tourImportFilePath;																// db-version 6
 
 	/**
 	 * data series for time, speed, altitude,...
@@ -301,6 +305,8 @@ public class TourData {
 	/**
 	 * contains the relative time in seconds, {@link #startHour} and {@link #startMinute} contains
 	 * the absolute time when a tour is started
+	 * <p>
+	 * {@link #timeSerie} is null for a manually created tour
 	 */
 	@Transient
 	public int[]					timeSerie;
@@ -1495,7 +1501,7 @@ public class TourData {
 		tourMarker.setSerieIndex(timeIndex);
 
 		if (timeData.markerLabel == null) {
-			tourMarker.setLabel(Messages.TourData_Label_device_marker);
+			tourMarker.setLabel(Messages.tour_data_label_device_marker);
 		} else {
 			tourMarker.setLabel(timeData.markerLabel);
 		}
@@ -1898,7 +1904,7 @@ public class TourData {
 				if (isDistance) {
 					final int tdDistance = timeData.distance;
 					if (tdDistance == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdDistance is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+						System.out.println("tourId:" + tourId + " - tdDistance is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					distanceSerie[timeIndex] = distanceAbsolute += tdDistance == Integer.MIN_VALUE ? 0 : tdDistance;
 				}
@@ -1906,7 +1912,7 @@ public class TourData {
 				if (isAltitude) {
 					final int tdAltitude = timeData.altitude;
 					if (tdAltitude == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdAltitude is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+						System.out.println("tourId:" + tourId + " - tdAltitude is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					altitudeSerie[timeIndex] = altitudeAbsolute += tdAltitude == Integer.MIN_VALUE ? 0 : tdAltitude;
 				}
@@ -1914,7 +1920,7 @@ public class TourData {
 				if (isPulse) {
 					final int tdPulse = timeData.pulse;
 					if (tdPulse == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdPulse is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+						System.out.println("tourId:" + tourId + " - tdPulse is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					pulseSerie[timeIndex] = tdPulse == Integer.MIN_VALUE ? 0 : tdPulse;
 				}
@@ -1922,7 +1928,7 @@ public class TourData {
 				if (isTemperature) {
 					final int tdTemperature = timeData.temperature;
 					if (tdTemperature == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+						System.out.println("tourId:" + tourId + " - tdTemperature is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					temperatureSerie[timeIndex] = tdTemperature == Integer.MIN_VALUE ? 0 : tdTemperature;
 				}
@@ -1930,7 +1936,7 @@ public class TourData {
 				if (isCadence) {
 					final int tdCadence = timeData.cadence;
 					if (tdCadence == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdCadence is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+						System.out.println("tourId:" + tourId + " - tdCadence is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					cadenceSerie[timeIndex] = tdCadence == Integer.MIN_VALUE ? 0 : tdCadence;
 				}
@@ -1938,7 +1944,7 @@ public class TourData {
 				if (isPower) {
 					final int tdPower = timeData.power;
 					if (tdPower == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdPower is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+						System.out.println("tourId:" + tourId + " - tdPower is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					powerSerie[timeIndex] = tdPower == Integer.MIN_VALUE ? 0 : tdPower;
 				}
@@ -1946,7 +1952,7 @@ public class TourData {
 				if (isSpeed) {
 					final int tdSpeed = timeData.speed;
 					if (tdSpeed == Integer.MIN_VALUE) {
-						System.out.println("tourId:" + tourId + " - tdSpeed is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$
+						System.out.println("tourId:" + tourId + " - tdSpeed is MIN_VALUE"); //$NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					speedSerie[timeIndex] = tdSpeed == Integer.MIN_VALUE ? 0 : tdSpeed;
 				}
@@ -2379,7 +2385,9 @@ public class TourData {
 	}
 
 	public String getDeviceName() {
-		if (devicePluginName == null) {
+		if (isManualTour()) {
+			return DEVICE_NAME_FOR_MANUAL_TOUR;
+		} else if (devicePluginName == null || devicePluginName.length() == 0) {
 			return UI.EMPTY_STRING;
 		} else {
 			return devicePluginName;
@@ -2769,7 +2777,15 @@ public class TourData {
 	}
 
 	public String getTourImportFilePath() {
-		return tourImportFilePath;
+		if (tourImportFilePath == null || tourImportFilePath.length() == 0) {
+			if (isManualTour()) {
+				return UI.EMPTY_STRING;
+			} else {
+				return Messages.tour_data_label_feature_since_version_8_12;
+			}
+		} else {
+			return tourImportFilePath;
+		}
 	}
 
 	public Set<TourMarker> getTourMarkers() {
@@ -2892,11 +2908,11 @@ public class TourData {
 	 *         device
 	 */
 	public boolean isManualTour() {
-		
+
 		if (devicePluginId == null) {
 			return false;
 		}
-		
+
 		return devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR);
 	}
 
@@ -3268,6 +3284,11 @@ public class TourData {
 		this.tourEndPlace = tourEndPlace;
 	}
 
+	/**
+	 * Sets the file path for the imported file, this is displayed in the {@link TourDataEditorView}
+	 * 
+	 * @param tourImportFilePath
+	 */
 	public void setTourImportFilePath(final String tourImportFilePath) {
 		this.tourImportFilePath = tourImportFilePath;
 	}

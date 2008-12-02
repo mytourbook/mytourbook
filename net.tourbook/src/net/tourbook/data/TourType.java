@@ -29,6 +29,9 @@ import org.eclipse.swt.graphics.RGB;
 @Entity
 public class TourType {
 
+	/**
+	 * contains the entity id
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long	typeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
@@ -86,7 +89,7 @@ public class TourType {
 
 	/**
 	 * @return Returns the type id, this can be the saved type id or
-	 *         {@link TourType#TOUR_TYPE_ID_NOT_DEFINED}
+	 *         {@link TourDatabase#ENTITY_IS_NOT_SAVED}
 	 */
 	public long getTypeId() {
 		return typeId;

@@ -936,7 +936,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		fActionOpenTour.setEnabled(isOneTourSelected);
 
 		// action: tour type
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 	}
 

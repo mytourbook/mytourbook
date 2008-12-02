@@ -25,6 +25,7 @@ import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.ui.TreeViewerItem;
+import net.tourbook.util.PostSelectionProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -63,7 +64,7 @@ public class ActionDeleteTour extends Action {
 		TreeViewerItem firstSelectedParent = null;
 
 		final ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
-		
+
 		if (monitor != null) {
 			monitor.beginTask(Messages.Tour_Book_Action_delete_selected_tours_task, selection.size());
 		}
@@ -79,7 +80,7 @@ public class ActionDeleteTour extends Action {
 				if (TourDatabase.removeTour(tourItem.getTourId())) {
 
 					removedTours.add(tourItem);
-					
+
 					final TreeViewerItem tourParent = tourItem.getParentItem();
 
 					// get the index for the first selected tour item
@@ -199,11 +200,14 @@ public class ActionDeleteTour extends Action {
 			}
 		}
 
+		final PostSelectionProvider postSelectionProvider = fTourViewer.getPostSelectionProvider();
+
 		// fire post selection
-		fTourViewer.firePostSelection(selectionRemovedTours);
+		postSelectionProvider.setSelection(selectionRemovedTours);
 
 		// set selection empty
 		selectionRemovedTours.removedTours.clear();
+		postSelectionProvider.clearSelection();
 
 		if (fNextSelectedTreeItem != null) {
 			fTourViewer.getViewer().setSelection(new StructuredSelection(fNextSelectedTreeItem), true);

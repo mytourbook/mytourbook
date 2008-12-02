@@ -31,6 +31,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.mapping.ILegendProvider;
 import net.tourbook.plugin.TourbookPlugin;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 import net.tourbook.util.TreeColumnLayout;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -124,23 +125,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	}
 
-	private class TourTypeColorDefinition extends ColorDefinition {
-
-		TourType	fTourType;
-
-		TourTypeColorDefinition(final TourType tourType,
-								final String prefName,
-								final String visibleName,
-								final RGB defaultGradientBright,
-								final RGB defaultGradientDark,
-								final RGB defaultLineColor) {
-
-			super(prefName, visibleName, defaultGradientBright, defaultGradientDark, defaultLineColor, null);
-
-			fTourType = tourType;
-		}
-	}
-
 	private void createButtons(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -224,7 +208,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		final Composite viewerContainer = createUI(parent);
 
 		// read tour typed from the database
-		fTourTypes = TourDatabase.getTourTypes();
+		fTourTypes = TourDatabase.getAllTourTypes();
 
 		// fill the color definitions
 		fColorDefinitions = new ArrayList<TourTypeColorDefinition>();
@@ -542,11 +526,11 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private void onAddTourType() {
 
-		// ask for the reference tour name
+		// ask for the tour type name
 		final InputDialog dialog = new InputDialog(this.getShell(),
 				Messages.Pref_TourTypes_Dlg_new_tour_type_title,
 				Messages.Pref_TourTypes_Dlg_new_tour_type_msg,
-				"", //$NON-NLS-1$
+				UI.EMPTY_STRING,
 				fTourNameValidator);
 
 		if (dialog.open() != Window.OK) {
@@ -558,17 +542,18 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(newTourType,
 				Long.toString(newTourType.getTypeId()),
-				newTourType.getName(),
-				new RGB(255, 255, 255),
-				new RGB(255, 167, 199),
-				new RGB(232, 152, 180));
+				newTourType.getName());
 
 		newTourType.setColorBright(newColorDefinition.getDefaultGradientBright());
 		newTourType.setColorDark(newColorDefinition.getDefaultGradientDark());
 		newTourType.setColorLine(newColorDefinition.getDefaultLineColor());
 
 		// add new entity to db
-		if (persistTourType(newTourType)) {
+		final TourType saveTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
+		if (saveTourType != null) {
+
+			// overwrite tour type object
+			newColorDefinition.setTourType(saveTourType);
 
 			createColorNames(newColorDefinition);
 
@@ -576,11 +561,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 			fColorViewer.add(this, newColorDefinition);
 
-			// update the import combo
-			// fComboImportTourType.add(newTourType.getName());
-
 			// update internal tour type list
-			fTourTypes.add(newTourType);
+			fTourTypes.add(saveTourType);
 
 			fIsModified = true;
 		}
@@ -618,13 +600,14 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			/*
 			 * update the tour type in the db
 			 */
-			final TourType tourType = ((TourTypeColorDefinition) colorDefinition).fTourType;
+			final TourTypeColorDefinition tourTypeColorDefinition = (TourTypeColorDefinition) colorDefinition;
+			final TourType tourType = tourTypeColorDefinition.getTourType();
 
 			tourType.setColorBright(colorDefinition.getNewGradientBright());
 			tourType.setColorDark(colorDefinition.getNewGradientDark());
 			tourType.setColorLine(colorDefinition.getNewLineColor());
 
-			persistTourType(tourType);
+			tourTypeColorDefinition.setTourType(TourDatabase.saveEntity(tourType, tourType.getTypeId(), TourType.class));
 
 			fIsModified = true;
 		}
@@ -633,7 +616,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	private void onDeleteTourType() {
 
 		final TourTypeColorDefinition selectedColorDefinition = getSelectedColorDefinition();
-		final TourType selectedTourType = selectedColorDefinition.fTourType;
+		final TourType selectedTourType = selectedColorDefinition.getTourType();
 
 		// confirm deletion
 		final String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
@@ -669,7 +652,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	private void onRenameTourType() {
 
 		final TourTypeColorDefinition selectedColorDefinition = getSelectedColorDefinition();
-		final TourType selectedTourType = selectedColorDefinition.fTourType;
+		final TourType selectedTourType = selectedColorDefinition.getTourType();
 
 		// ask for the tour type name
 		final InputDialog dialog = new InputDialog(this.getShell(),
@@ -688,7 +671,13 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		selectedColorDefinition.setVisibleName(newTourTypeName);
 
 		// update entity in the db
-		if (persistTourType(selectedTourType)) {
+		final TourType saveTourType = TourDatabase.saveEntity(selectedTourType,
+				selectedTourType.getTypeId(),
+				TourType.class);
+
+		if (saveTourType != null) {
+
+			selectedColorDefinition.setTourType(saveTourType);
 
 			// update viewer
 			fColorViewer.update(selectedColorDefinition, null);
@@ -722,38 +711,38 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		return super.performOk();
 	}
 
-	private boolean persistTourType(final TourType tourType) {
-
-		boolean isSaved = false;
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		final EntityTransaction ts = em.getTransaction();
-
-		try {
-
-			if (tourType.getTypeId() == -1) {
-				// entity is new
-				ts.begin();
-				em.persist(tourType);
-				ts.commit();
-			} else {
-				// update entity
-				ts.begin();
-				em.merge(tourType);
-				ts.commit();
-			}
-
-		} catch (final Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (ts.isActive()) {
-				ts.rollback();
-			} else {
-				isSaved = true;
-			}
-			em.close();
-		}
-		return isSaved;
-	}
+//	private boolean persistTourType(final TourType tourType) {
+//
+//		boolean isSaved = false;
+//
+//		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+//		final EntityTransaction ts = em.getTransaction();
+//
+//		try {
+//
+//			if (tourType.getTypeId() == -1) {
+//				// entity is new
+//				ts.begin();
+//				em.persist(tourType);
+//				ts.commit();
+//			} else {
+//				// update entity
+//				ts.begin();
+//				em.merge(tourType);
+//				ts.commit();
+//			}
+//
+//		} catch (final Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			if (ts.isActive()) {
+//				ts.rollback();
+//			} else {
+//				isSaved = true;
+//			}
+//			em.close();
+//		}
+//		return isSaved;
+//	}
 
 }

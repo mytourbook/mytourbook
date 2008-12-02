@@ -225,14 +225,18 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 	private void adjustEndAltitude(final int[] altiSrc, final TourData tourData, final int newEndAlti) {
 
 		final int[] altiDest = tourData.altitudeSerie;
-		final int[] distanceSerie = tourData.getDistanceSerie();
+		int[] endDataSerie = tourData.getDistanceSerie();
+
+		if (endDataSerie == null) {
+			endDataSerie = tourData.timeSerie;
+		}
 
 		final int altiEndDiff = newEndAlti - altiSrc[altiDest.length - 1];
-		final float tourDistance = distanceSerie[distanceSerie.length - 1];
+		final float lastEndDataValue = endDataSerie[endDataSerie.length - 1];
 
 		for (int serieIndex = 0; serieIndex < altiDest.length; serieIndex++) {
-			final float distance = distanceSerie[serieIndex];
-			final float altiDiff = distance / tourDistance * altiEndDiff;
+			final float endDataValue = endDataSerie[serieIndex];
+			final float altiDiff = endDataValue / lastEndDataValue * altiEndDiff;
 			altiDest[serieIndex] = altiSrc[serieIndex] + Math.round(altiDiff);
 		}
 	}
@@ -335,12 +339,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog {
 			fAltiStartDiff = 0;
 			fAltiMaxDiff = 0;
 		}
-	}
-
-	@Override
-	protected void cancelPressed() {
-		// TODO Auto-generated method stub
-		super.cancelPressed();
 	}
 
 	@Override

@@ -73,7 +73,7 @@ public class TourTag implements Comparable<Object> {
 	public TourTag() {}
 
 	public TourTag(final String tagName) {
-		name = tagName;
+		name = tagName.trim();
 	}
 
 	public int compareTo(final Object obj) {

@@ -95,7 +95,7 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 		fActionEditTour.setEnabled(isTourHovered);
 		fActionOpenTour.setEnabled(isTourHovered);
 
-		fActionSetTourType.setEnabled(isTourHovered && TourDatabase.getTourTypes().size() > 0);
+		fActionSetTourType.setEnabled(isTourHovered && TourDatabase.getAllTourTypes().size() > 0);
 		fActionAddTag.setEnabled(isTourHovered);
 		fActionRemoveTag.setEnabled(isTourHovered && isTagAvailable);
 		fActionRemoveAllTags.setEnabled(isTourHovered && isTagAvailable);

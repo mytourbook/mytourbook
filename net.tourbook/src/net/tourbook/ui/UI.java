@@ -19,8 +19,6 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -620,29 +618,17 @@ public class UI {
 			tourTagLabel.setText(UI.EMPTY_STRING);
 		} else {
 
-			// sort tour tags by name
-			final ArrayList<TourTag> tourTagList = new ArrayList<TourTag>(tourTags);
-			Collections.sort(tourTagList, new Comparator<TourTag>() {
-				public int compare(final TourTag tt1, final TourTag tt2) {
-					return tt1.getTagName().compareTo(tt2.getTagName());
-				}
-			});
-
-			final StringBuilder sb = new StringBuilder();
-			int index = 0;
-			for (final TourTag tourTag : tourTagList) {
-
-				if (index > 0) {
-					sb.append(", "); //$NON-NLS-1$
-				}
-
-				sb.append(tourTag.getTagName());
-
-				index++;
+			// get all tag id's
+			final ArrayList<Long> tagIds = new ArrayList<Long>();
+			for (final TourTag tourTag : tourTags) {
+				tagIds.add(tourTag.getTagId());
 			}
-			tourTagLabel.setText(sb.toString());
-			tourTagLabel.setToolTipText(sb.toString());
+
+			final String tagLabels = TourDatabase.getTagNames(tagIds);
+			tourTagLabel.setText(tagLabels);
+			tourTagLabel.setToolTipText(tagLabels);
 		}
+
 		tourTagLabel.pack(true);
 	}
 
@@ -833,7 +819,7 @@ public class UI {
 	private DrawingColors getTourTypeColors(final Display display, final long tourTypeId) {
 
 		final DrawingColors drawingColors = new DrawingColors();
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 
 		TourType colorTourType = null;
 

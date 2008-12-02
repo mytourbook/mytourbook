@@ -77,7 +77,7 @@ public class TourDatabase {
 	 * version for the database which is required that the tourbook application works successfully
 	 */
 	private static final int					TOURBOOK_DB_VERSION							= 6;
-	
+
 //	private static final int					TOURBOOK_DB_VERSION							= 5;	8.11
 
 	private static final String					DERBY_CLIENT_DRIVER							= "org.apache.derby.jdbc.ClientDriver";				//$NON-NLS-1$
@@ -175,7 +175,7 @@ public class TourDatabase {
 	}
 
 	/**
-	 * remove all tour tags which are loaded from the database so the next time they will be
+	 * removes all tour tags which are loaded from the database so the next time they will be
 	 * reloaded
 	 */
 	public static void clearTourTags() {
@@ -377,6 +377,34 @@ public class TourDatabase {
 		return fTourTags;
 	}
 
+	/**
+	 * @return Returns all tour types which are stored in the database sorted by name
+	 */
+	@SuppressWarnings("unchecked")
+	public static ArrayList<TourType> getAllTourTypes() {
+
+		if (fTourTypes != null) {
+			return fTourTypes;
+		}
+
+		fTourTypes = new ArrayList<TourType>();
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+		if (em != null) {
+
+			final Query query = em.createQuery("SELECT TourType" //$NON-NLS-1$
+					+ (" FROM " + TourDatabase.TABLE_TOUR_TYPE + " TourType ") //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" ORDER  BY TourType.name")); //$NON-NLS-1$
+
+			fTourTypes = (ArrayList<TourType>) query.getResultList();
+
+			em.close();
+		}
+
+		return fTourTypes;
+	}
+
 	public static TourDatabase getInstance() {
 		if (instance == null) {
 			instance = new TourDatabase();
@@ -503,7 +531,16 @@ public class TourDatabase {
 		// get tag name for each tag id
 		for (final Long tagId : tagIds) {
 			final TourTag tag = hashTags.get(tagId);
-			tagList.add(tag.getTagName());
+
+			if (tag != null) {
+				tagList.add(tag.getTagName());
+			} else {
+				try {
+					throw new MyTourbookException("tag id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-1$
+				} catch (final MyTourbookException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		// sort tags by name
@@ -595,7 +632,7 @@ public class TourDatabase {
 
 		String tourTypeName = Messages.ui_tour_not_defined;
 
-		for (final TourType tourType : getTourTypes()) {
+		for (final TourType tourType : getAllTourTypes()) {
 			if (tourType.getTypeId() == typeId) {
 				tourTypeName = tourType.getName();
 				break;
@@ -603,34 +640,6 @@ public class TourDatabase {
 		}
 
 		return tourTypeName;
-	}
-
-	/**
-	 * @return Returns all tour types which are stored in the database sorted by name
-	 */
-	@SuppressWarnings("unchecked")
-	public static ArrayList<TourType> getTourTypes() {
-
-		if (fTourTypes != null) {
-			return fTourTypes;
-		}
-
-		fTourTypes = new ArrayList<TourType>();
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-		if (em != null) {
-
-			final Query query = em.createQuery("SELECT TourType" //$NON-NLS-1$
-					+ (" FROM " + TourDatabase.TABLE_TOUR_TYPE + " TourType ") //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" ORDER  BY TourType.name")); //$NON-NLS-1$
-
-			fTourTypes = (ArrayList<TourType>) query.getResultList();
-
-			em.close();
-		}
-
-		return fTourTypes;
 	}
 
 	/**
@@ -775,15 +784,15 @@ public class TourDatabase {
 	 * @param entity
 	 * @param id
 	 * @param entityClass
-	 * @return Returns <code>true</code> when the entity was saved
+	 * @return saved entity
 	 */
 	public static <T> T saveEntity(final T entity, final long id, final Class<?> entityClass) {
 
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-		boolean isSaved = false;
 		final EntityTransaction ts = em.getTransaction();
+
 		T savedEntity = null;
+		boolean isSaved = false;
 
 		try {
 
@@ -834,9 +843,10 @@ public class TourDatabase {
 	 */
 	public static <T> T saveEntity(final T entity, final long id, final Class<T> entityClass, final EntityManager em) {
 
-		boolean isSaved = false;
 		final EntityTransaction ts = em.getTransaction();
+
 		T savedEntity = null;
+		boolean isSaved = false;
 
 		try {
 

@@ -65,6 +65,7 @@ public class TourManager {
 	public static final String					CUSTOM_DATA_GRADIENT	= "gradient";								//$NON-NLS-1$
 	public static final String					CUSTOM_DATA_ALTIMETER	= "altimeter";								//$NON-NLS-1$
 	public static final String					CUSTOM_DATA_PULSE		= "pulse";									//$NON-NLS-1$
+	public static final String					CUSTOM_DATA_TEMPERATURE	= "temperature";							//$NON-NLS-1$
 
 	public static final String					CUSTOM_DATA_TOUR_ID		= "tourdata";								//$NON-NLS-1$
 
@@ -1295,6 +1296,7 @@ public class TourManager {
 			case GRAPH_TEMPERATURE:
 				if (yDataTemperature != null) {
 					chartDataModel.addYData(yDataTemperature);
+					chartDataModel.setCustomData(CUSTOM_DATA_TEMPERATURE, yDataTemperature);
 				}
 				break;
 

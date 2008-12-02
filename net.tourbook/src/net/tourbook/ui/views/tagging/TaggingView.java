@@ -402,7 +402,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 						updateViewerAfterTagStructureIsModified(fRootItem, changedTagsClone, isAddMode);
 					}
 
-				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED || eventId == TourEventId.UPDATE_UI) {
 
 					reloadViewer();
 
@@ -1034,7 +1034,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		fActionEditQuick.setEnabled(tourItems == 1);
 
 		// action: set tour type
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		fActionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
 		// action: add tag

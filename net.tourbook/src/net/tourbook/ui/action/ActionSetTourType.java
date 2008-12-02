@@ -66,7 +66,7 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 		}
 
 		// add all tour types to the menu
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 
 		for (final TourType tourType : tourTypes) {
 
@@ -124,7 +124,7 @@ public class ActionSetTourType extends Action implements IMenuCreator {
 		}
 
 		// add all tour types to the menu
-		final ArrayList<TourType> tourTypes = TourDatabase.getTourTypes();
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 
 		for (final TourType tourType : tourTypes) {
 
