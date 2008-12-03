@@ -57,7 +57,6 @@ import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.events.DisposeEvent;
@@ -587,7 +586,7 @@ public class TourChart extends Chart {
 
 		final IToolBarManager tbm = getToolBarManager();
 
-		fActionOptions = new ActionChartOptions(this, (ToolBarManager) tbm);
+		fActionOptions = new ActionChartOptions(this);
 
 		/*
 		 * add the actions to the toolbar

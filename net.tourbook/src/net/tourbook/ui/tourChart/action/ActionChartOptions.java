@@ -25,25 +25,26 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.Widget;
 
 public class ActionChartOptions extends Action implements IMenuCreator {
 
-	private Menu			fMenu	= null;
+	private Menu		fMenu	= null;
 
-	private TourChart		fTourChart;
+	private TourChart	fTourChart;
 
-	private ToolBarManager	fTBM;
-
-	public ActionChartOptions(final TourChart tourChart, final ToolBarManager tbm) {
+	public ActionChartOptions(final TourChart tourChart) {
 
 		super(null, Action.AS_DROP_DOWN_MENU);
 
 		fTourChart = tourChart;
-		fTBM = tbm;
 
 		setToolTipText(Messages.Tour_Action_chart_options_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_options));
@@ -85,8 +86,30 @@ public class ActionChartOptions extends Action implements IMenuCreator {
 	@Override
 	public void runWithEvent(final Event event) {
 
-		// show the drop-down menu, this only works in the runWithEvent not in the run method
-		getMenuCreator().getMenu(fTBM.getControl()).setVisible(true);
+		// open and position drop down menu below the action button
+		final Widget item = event.widget;
+		if (item instanceof ToolItem) {
+
+			final ToolItem toolItem = (ToolItem) item;
+
+			final IMenuCreator mc = getMenuCreator();
+			if (mc != null) {
+
+				final ToolBar toolBar = toolItem.getParent();
+
+				final Menu menu = mc.getMenu(toolBar);
+				if (menu != null) {
+
+					final Rectangle toolItemBounds = toolItem.getBounds();
+					Point topLeft = new Point(toolItemBounds.x, toolItemBounds.y + toolItemBounds.height);
+					topLeft = toolBar.toDisplay(topLeft);
+					
+					menu.setLocation(topLeft.x, topLeft.y);
+					menu.setVisible(true);
+				}
+			}
+		}
+
 	}
 
 }
