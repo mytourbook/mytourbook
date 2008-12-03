@@ -71,7 +71,7 @@ public class TourData {
 	 * Device Id for manually created tours
 	 */
 	@Transient
-	public static final String		DEVICE_ID_FOR_MANUAL_TOUR		= "manual";										//$NON-NLS-1$
+	public static final String		DEVICE_ID_FOR_MANUAL_TOUR		= "manual";								//$NON-NLS-1$
 
 	/**
 	 * Device id for csv files which behave like manually created tours, marker and timeslices are
@@ -79,8 +79,8 @@ public class TourData {
 	 * this is the id of the deviceDataReader
 	 */
 	@Transient
-	public static final String		DEVICE_ID_CSV_DATA_READER		= "net.tourbook.device.CSVDataReader";				//$NON-NLS-1$
-	
+	public static final String		DEVICE_ID_CSV_TOUR_DATA_READER	= "net.tourbook.device.CSVTourDataReader";	//$NON-NLS-1$
+
 	/**
 	 * entity id which identifies the tour
 	 */
@@ -207,53 +207,53 @@ public class TourData {
 	/**
 	 * Profile used by the device
 	 */
-	private short					deviceMode;																		// db-version 3
+	private short					deviceMode;																// db-version 3
 
 	/**
 	 * time difference between 2 time slices or <code>-1</code> for GPS devices when the time slices
 	 * are unequally
 	 */
-	private short					deviceTimeInterval;																// db-version 3
+	private short					deviceTimeInterval;														// db-version 3
 
 	/**
 	 * maximum altitude in metric system
 	 */
-	private int						maxAltitude;																		// db-version 4
+	private int						maxAltitude;																// db-version 4
 
-	private int						maxPulse;																			// db-version 4
+	private int						maxPulse;																	// db-version 4
 
 	/**
 	 * maximum speed in metric system
 	 */
-	private float					maxSpeed;																			// db-version 4
+	private float					maxSpeed;																	// db-version 4
 
-	private int						avgPulse;																			// db-version 4
-	private int						avgCadence;																		// db-version 4
-	private int						avgTemperature;																	// db-version 4
+	private int						avgPulse;																	// db-version 4
+	private int						avgCadence;																// db-version 4
+	private int						avgTemperature;															// db-version 4
 
-	private String					tourTitle;																			// db-version 4
-	private String					tourDescription;																	// db-version 4
+	private String					tourTitle;																	// db-version 4
+	private String					tourDescription;															// db-version 4
 
-	private String					tourStartPlace;																	// db-version 4
-	private String					tourEndPlace;																		// db-version 4
+	private String					tourStartPlace;															// db-version 4
+	private String					tourEndPlace;																// db-version 4
 
-	private String					calories;																			// db-version 4
-	private float					bikerWeight;																		// db-version 4
+	private String					calories;																	// db-version 4
+	private float					bikerWeight;																// db-version 4
 
 	/**
 	 * visible name for the used plugin to import the data
 	 */
-	private String					devicePluginName;																	// db-version 4
+	private String					devicePluginName;															// db-version 4
 
 	/**
 	 * visible name for {@link #deviceMode}
 	 */
-	private String					deviceModeName;																	// db-version 4
+	private String					deviceModeName;															// db-version 4
 
 	/**
 	 * file path for the imported tour
 	 */
-	private String					tourImportFilePath;																// db-version 6
+	private String					tourImportFilePath;														// db-version 6
 
 	/**
 	 * data series for time, speed, altitude,...
@@ -2918,7 +2918,8 @@ public class TourData {
 			return false;
 		}
 
-		return devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR) || devicePluginId.equals(DEVICE_ID_CSV_DATA_READER);
+		return devicePluginId.equals(DEVICE_ID_FOR_MANUAL_TOUR)
+				|| devicePluginId.equals(DEVICE_ID_CSV_TOUR_DATA_READER);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="plugin_export" name="build">
 	<target name="plugin_export">
-		<pde.exportPlugins destination="M:\mytourbook PRODUCT\8.12.0" exportSource="false" exportType="zip" filename="mytourbook_testversion_8.12.0.win32.win32.x86.zip" plugins="net.tourbook,net.tourbook.branding,net.tourbook.chart,net.tourbook.device,net.tourbook.device.ciclotour.text,net.tourbook.device.cm4xxm,net.tourbook.device.crp,net.tourbook.device.csv.tours,net.tourbook.device.daum_ergobike,net.tourbook.device.garmin,net.tourbook.device.gpx,net.tourbook.device.hac4,net.tourbook.device.hac4pro,net.tourbook.device.hac5,net.tourbook.device.tur,net.tourbook.rxtx,net.tourbook.rxtx.linux,net.tourbook.rxtx.linux64,net.tourbook.rxtx.macosx,net.tourbook.rxtx.win32,net.tourbook.statistics" qualifier="200809221504" useJARFormat="true"/>
+		<pde.exportPlugins destination="M:\mytourbook PRODUCT\8.12.0" exportSource="false" exportType="zip" filename="mytourbook_testversion_8.12.0.win32.win32.x86.zip" plugins="net.tourbook,net.tourbook.branding,net.tourbook.chart,net.tourbook.device,net.tourbook.device.ciclotour.text,net.tourbook.device.cm4xxm,net.tourbook.device.crp,net.tourbook.device.csv.tours,net.tourbook.device.daum_ergobike,net.tourbook.device.garmin,net.tourbook.device.gpx,net.tourbook.device.hac4,net.tourbook.device.hac4pro,net.tourbook.device.hac5,net.tourbook.device.tur,net.tourbook.statistics" qualifier="200809221504" useJARFormat="true"/>
 	</target>
 </project>

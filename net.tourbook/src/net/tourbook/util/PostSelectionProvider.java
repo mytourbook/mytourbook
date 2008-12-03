@@ -24,8 +24,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 
 public class PostSelectionProvider implements IPostSelectionProvider {
 
-//	private static ISelection	EMPTY_SELECTION			= new EmptySelection();
-
 	ListenerList				postSelectionListeners	= new ListenerList();
 	private ISelection			currentSelection;
 
@@ -39,7 +37,6 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 	 * Clears the current selection in the selection provider
 	 */
 	public void clearSelection() {
-//		currentSelection = EMPTY_SELECTION;
 		currentSelection = null;
 	}
 

@@ -59,6 +59,7 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenPrefDialog;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourType;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.util.PixelConverter;
 import net.tourbook.util.PostSelectionProvider;
 import net.tourbook.util.StringToArrayConverter;
@@ -201,6 +202,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		reloadViewer();
 
 		fPostSelectionProvider.setSelection(new SelectionDeletedTours());
+		
 		// don't throw the selection again
 		fPostSelectionProvider.clearSelection();
 
@@ -215,6 +217,15 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == RawDataView.this) {
+
+					final TourDataEditorView tourEditor = TourManager.getTourDataEditor();
+					if (tourEditor != null) {
+
+						// hide tours which are originated from this view
+
+						tourEditor.clearEditorContent();
+					}
+
 					saveState();
 				}
 			}
@@ -378,8 +389,8 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 	private void createActions() {
 
 		// context menu
-		fActionSaveTour = new ActionSaveTourInDatabase(this);
-		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this);
+		fActionSaveTour = new ActionSaveTourInDatabase(this, false);
+		fActionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
 
 		fActionEditTour = new ActionEditTour(this);
 		fActionEditQuick = new ActionEditQuick(this);
@@ -841,7 +852,7 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		super.dispose();
 	}
 
-	private void enableActions() {
+	void enableActions() {
 
 		final StructuredSelection selection = (StructuredSelection) fTourViewer.getSelection();
 
@@ -959,8 +970,13 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 		 */
 		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
 
+		viewTbm.add(fActionSaveTourWithPerson);
+		viewTbm.add(fActionSaveTour);
+		viewTbm.add(new Separator());
+
 		// place for import and transfer actions
 		viewTbm.add(new GroupMarker("import")); //$NON-NLS-1$
+		viewTbm.add(new Separator());
 
 		viewTbm.add(fActionClearView);
 
@@ -1242,6 +1258,9 @@ public class RawDataView extends ViewPart implements ITourProvider, ITourViewer 
 
 		fActivePerson = TourbookPlugin.getDefault().getActivePerson();
 
+		// update person in save action
+		enableActions();
+		
 		// update person in the raw data
 		RawDataManager.getInstance().updateTourDataFromDb();
 

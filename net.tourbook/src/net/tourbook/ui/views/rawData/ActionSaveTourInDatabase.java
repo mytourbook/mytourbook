@@ -88,11 +88,14 @@ public class ActionSaveTourInDatabase extends Action {
 		}
 	}
 
-	public ActionSaveTourInDatabase(final RawDataView viewPart) {
+	public ActionSaveTourInDatabase(final RawDataView viewPart, final boolean isWithPerson) {
 
 		fRawDataView = viewPart;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_tour));
+		setImageDescriptor(isWithPerson
+				? TourbookPlugin.getImageDescriptor(Messages.Image__save_tour)
+				: TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person));
+
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_tour_disabled));
 
 		// setToolTipText("Save tour(s) in the database so it can be viewed in
@@ -230,6 +233,8 @@ public class ActionSaveTourInDatabase extends Action {
 
 					// update import viewer
 					fRawDataView.reloadViewer();
+
+					fRawDataView.enableActions();
 
 					/*
 					 * notify all views, it is not checked if the tour data editor is dirty because

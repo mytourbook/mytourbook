@@ -3731,10 +3731,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		if (selection instanceof SelectionDeletedTours) {
 
-			fTourData = null;
-			setTourClean();
-
-			fPageBook.showPage(fPageNoTour);
+			clearEditorContent();
 
 			return;
 		}
@@ -3864,6 +3861,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				displayTour(((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId());
 			}
 		}
+	}
+
+	public void clearEditorContent() {
+		fTourData = null;
+		setTourClean();
+
+		fPageBook.showPage(fPageNoTour);
 	}
 
 	private void onSelectTab() {
